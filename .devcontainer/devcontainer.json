@@ -1,0 +1,73 @@
+{
+  "name": "GOLFFOX Development Environment",
+  "image": "mcr.microsoft.com/devcontainers/universal:2",
+  
+  "features": {
+    "ghcr.io/devcontainers/features/flutter:1": {
+      "version": "3.24.0",
+      "channel": "stable"
+    },
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "18"
+    },
+    "ghcr.io/devcontainers/features/git:1": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dart-code.flutter",
+        "dart-code.dart-code",
+        "ms-vscode.vscode-typescript-next",
+        "bradlc.vscode-tailwindcss",
+        "esbenp.prettier-vscode",
+        "ms-vscode.vscode-json",
+        "github.copilot",
+        "github.copilot-chat",
+        "ms-vscode.hexeditor",
+        "redhat.vscode-yaml",
+        "ms-vscode.makefile-tools"
+      ],
+      "settings": {
+        "dart.flutterSdkPath": "/usr/local/flutter",
+        "dart.debugExternalPackageLibraries": true,
+        "dart.debugSdkLibraries": false,
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+          "source.fixAll": true,
+          "source.organizeImports": true
+        },
+        "typescript.preferences.importModuleSpecifier": "relative",
+        "prettier.requireConfig": true,
+        "files.associations": {
+          "*.dart": "dart"
+        }
+      }
+    }
+  },
+
+  "forwardPorts": [3000, 8000, 5432],
+  "portsAttributes": {
+    "3000": {
+      "label": "Next.js Web App",
+      "onAutoForward": "notify"
+    },
+    "8000": {
+      "label": "Flutter Web",
+      "onAutoForward": "notify"
+    },
+    "5432": {
+      "label": "PostgreSQL",
+      "onAutoForward": "silent"
+    }
+  },
+
+  "postCreateCommand": "bash .devcontainer/setup.sh",
+  
+  "remoteUser": "codespace",
+  
+  "mounts": [
+    "source=${localWorkspaceFolder}/.env.example,target=${containerWorkspaceFolder}/.env,type=bind,consistency=cached"
+  ]
+}

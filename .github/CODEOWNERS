@@ -1,0 +1,54 @@
+# CODEOWNERS - GOLFFOX
+# Este arquivo define quem deve revisar mudanças em diferentes partes do código.
+# Mais informações: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Global owners - serão solicitados para revisar qualquer mudança
+* @pglemos
+
+# Flutter/Dart code
+*.dart @pglemos
+lib/ @pglemos
+test/ @pglemos
+pubspec.yaml @pglemos
+analysis_options.yaml @pglemos
+
+# Next.js/TypeScript code
+web-app/ @pglemos
+*.ts @pglemos
+*.tsx @pglemos
+*.js @pglemos
+*.jsx @pglemos
+package.json @pglemos
+tsconfig.json @pglemos
+
+# CI/CD and DevOps
+.github/ @pglemos
+*.yml @pglemos
+*.yaml @pglemos
+Dockerfile* @pglemos
+docker-compose.yml @pglemos
+Makefile @pglemos
+
+# Database and migrations
+database/ @pglemos
+*.sql @pglemos
+
+# Documentation
+*.md @pglemos
+docs/ @pglemos
+
+# Configuration files
+.env* @pglemos
+*.config.js @pglemos
+*.config.ts @pglemos
+
+# Security sensitive files
+.github/workflows/ @pglemos
+scripts/ @pglemos
+
+# Mobile platform specific
+android/ @pglemos
+ios/ @pglemos
+
+# Web platform specific
+web/ @pglemos
