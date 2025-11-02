@@ -1,0 +1,69 @@
+{
+  "resumo": "UI/UX Premium GolfFox v30.0 completamente refatorada no padrão Apple/Tesla/SpaceX/Stripe Dashboard. Design system com tokens próprios, cards premium, animações fluidas, sidebar 11 seções, mapa Google Maps realtime, todas as páginas CRUD e pronta para deploy na Vercel.",
+  
+  "ui": {
+    "layout": "web-app/app/layout.tsx - Root layout com Inter font e metadata",
+    "globals_css": "web-app/app/globals.css - Sistema completo de design tokens com cores GolfFox (#FF6B00 laranja, #F5F5F7 fundo), radius 20-24px, shadows premium, animações fade-in/slide-in",
+    "app_shell": "web-app/components/app-shell.tsx - Container principal que integra Topbar + Sidebar + Main content responsivo",
+    "topbar": "web-app/components/topbar.tsx - Header fixo 64px com logo GOLF FOX + badge 'Admin • Premium', 4 pills navegação (Painel, App Motorista, App Passageiro, Operator Portal), search global, botão Preferências, avatar com dropdown",
+    "sidebar": "web-app/components/sidebar.tsx - Sidebar fixa 240px com 11 seções animadas (Dashboard, Mapa, Rotas, Veículos, Motoristas, Empresas, Permissões, Socorro, Alertas, Relatórios, Custos, Ajuda), hover scale + highlight laranja, ativo com barra laranja + bold, stagger animations 0.03s",
+    "dashboard": "web-app/app/admin/page.tsx - Hero com gradient sutil, filtros (Empresa, Data, Turno), 4 KPIs cards (Colaboradores, Veículos, Rotas, Alertas), cards Mapa preview + Notificações, atividades recentes, animações motion.div",
+    "mapa": "web-app/app/admin/mapa/page.tsx + components/fleet-map.tsx - Google Maps em tela larga, ícones ônibus 4 cores (verde=movimento, amarelo=parado<2min, vermelho=parado>3min, azul=garagem), filtros flutuantes, painel lateral ao clicar veículo, polylines rotas, legendas, realtime Supabase, atualização 10s",
+    "rotas": "web-app/app/admin/rotas/page.tsx - Listagem premium com search, cards hover, origem→destino, badges, botões Editar + Ver Mapa",
+    "veiculos": "web-app/app/admin/veiculos/page.tsx - Listagem completa frota",
+    "motoristas": "web-app/app/admin/motoristas/page.tsx - Cadastro motoristas com documentos",
+    "empresas": "web-app/app/admin/empresas/page.tsx - CRUD empresas operadores",
+    "permissoes": "web-app/app/admin/permissoes/page.tsx - Controle acesso roles",
+    "socorro": "web-app/app/admin/socorro/page.tsx - Despache emergência",
+    "alertas": "web-app/app/admin/alertas/page.tsx - Histórico notificações",
+    "relatorios": "web-app/app/admin/relatorios/page.tsx - Análise operacional",
+    "custos": "web-app/app/admin/custos/page.tsx - Gestão financeira frota",
+    "ajuda": "web-app/app/admin/ajuda-suporte/page.tsx - Central ajuda"
+  },
+  
+  "components": {
+    "kpi_card": "web-app/components/kpi-card.tsx - Card premium 140px min-height, icon container laranja, valor text-3xl bold, trend badges, hover scale 1.02 + shadow",
+    "fleet_map": "web-app/components/fleet-map.tsx - Componente Google Maps completo com marcadores 3D, filtros, painel lateral, polyline, legenda, actions flutuantes, realtime",
+    "button": "web-app/components/ui/button.tsx - Variants default/destructive/outline/secondary/ghost/link, sizes sm/default/lg/icon, hover scale + shadow, focus ring brand",
+    "card": "web-app/components/ui/card.tsx - Radius xl, border cinza, shadow sm, Header/Content/Footer/Title/Description",
+    "badge": "web-app/components/ui/badge.tsx - Variants default/secondary/destructive/outline/success/warning, rounded-full",
+    "input": "web-app/components/ui/input.tsx - Height 44px, radius lg, focus ring brand 20%, placeholder cinza",
+    "dropdown_menu": "web-app/components/ui/dropdown-menu.tsx - Radix UI com slide-in, align end"
+  },
+  
+  "styles": {
+    "globals_css": "web-app/app/globals.css - Tokens CSS :root com --brand #FF6B00, --accent #0F172A, --bg #F5F5F7, --ink #1D1D1F, radius 8-24px, shadows xs-xl, transitions fast/base/slow, keyframes fade-in/slide-in/pulse-glow, utilities .glass, .scrollbar-hide, .loader-spinner",
+    "tailwind_config": "web-app/tailwind.config.js - Configurado com tailwindcss-animate, container max-width 1440px, extend colors primary/secondary/etc"
+  },
+  
+  "sql": {
+    "views": "database/migrations/gf_views.sql - get_user_name(), get_driver_position_lat/lng(), v_driver_last_position, v_active_trips, v_route_stops",
+    "tables": "database/migrations/gf_tables_auxiliares.sql - gf_employee_company, gf_route_plan, gf_vehicle_costs, gf_driver_events, gf_driver_documents, gf_vehicle_maintenance, gf_alerts, gf_notifications (tudo com prefixo gf_)",
+    "rpc": "database/migrations/gf_rpc_map_snapshot.sql - gf_map_snapshot_full() para retornar buses/stops/routes filtrados"
+  },
+  
+  "integrations": {
+    "supabase": "lib/supabase.ts - Cliente @supabase/supabase-js configurado, realtime subscription canal 'map-updates' tabela driver_positions",
+    "google_maps": "components/fleet-map.tsx - @googlemaps/js-api-loader, libraries places/geometry/drawing/visualization, API key NEXT_PUBLIC_GOOGLE_MAPS_API_KEY"
+  },
+  
+  "env": {
+    "configurado": "web-app/.env.local já existe com NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, NEXT_PUBLIC_GOOGLE_MAPS_API_KEY"
+  },
+  
+  "observacoes": [
+    "Design Apple-inspired: fundo #F5F5F7, cards brancos radius 20-24px, espaçamento generoso, tipografia grande",
+    "Componentização Stripe/Linear: sidebar stagger animations, KPI cards hover premium, dropdowns slide-in",
+    "Cores GOLF FOX: laranja #FF6B00 acento, azul marinho #0F172A, cinza claro #F5F5F7, SEM gradientes exagerados",
+    "SEM template genérico: design próprio, não usa tons azuis aleatórios, cards NÃO achatados, NÃO sem spacing",
+    "Topbar fixo 64px: logo + badge + 4 pills + search + preferências + avatar",
+    "Sidebar 240px: 11 seções animadas, hover scale + highlight laranja, ativo barra laranja",
+    "Mapa Google: 4 cores ônibus fixas (verde/amarelo/vermelho/azul), filtros, painel lateral, polyline rotas",
+    "Realtime: Supabase subscriptions driver_positions, atualização 10s + onChange",
+    "Páginas CRUD: todas refatoradas (Rotas, Veículos, Motoristas, Empresas, Permissões)",
+    "Páginas operacionais: Socorro, Alertas, Relatórios, Custos, Ajuda presentes",
+    "Pronto Vercel: build OK, env configurado, standalone output, webpack alias @",
+    "Variáveis de ambiente: SEM hardcode, sempre process.env, nunca commitadas"
+  ]
+}
+

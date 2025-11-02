@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <!-- Base path (mantém substituição do Flutter) -->
+  <base href="$FLUTTER_BASE_HREF">
+
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1.0"
+  >
+
+  <title>GolfFox Transport</title>
+  <meta name="description" content="GolfFox — plataforma de gestão de transporte: rotas, usuários, incidentes e métricas em tempo real.">
+
+  <!-- Cor do tema por modo -->
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#FAFAFA">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)"  content="#0F172A">
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="application-name" content="GolfFox">
+  <meta name="mobile-web-app-capable" content="yes">
+
+  <!-- iOS PWA -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="GolfFox">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+  <!-- (Opcional) Splash screens iOS — exporte e descomente se tiver
+  <link rel="apple-touch-startup-image" href="icons/splash-1170x2532.png" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3)">
+  -->
+
+  <!-- Favicon / ícones -->
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/Icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="icons/Icon-512.png">
+  <!-- Ícone maskable para Android -->
+  <link rel="icon" type="image/png" sizes="512x512" href="icons/Icon-maskable-512.png" purpose="maskable">
+
+  <!-- Social (Open Graph / Twitter) -->
+  <meta property="og:title" content="GolfFox Transport">
+  <meta property="og:description" content="Gestão de transporte moderna e em tempo real.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="icons/Icon-512.png">
+  <meta property="og:locale" content="pt_BR">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="GolfFox Transport">
+  <meta name="twitter:description" content="Gestão de transporte moderna e em tempo real.">
+  <meta name="twitter:image" content="icons/Icon-512.png">
+
+  <!-- Performance: fontes e DNS -->
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <!-- Se usar GoogleFonts (Inter) no app, ajuda no FCP: -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <!-- DNS Prefetch para APIs (ajuste domínios reais) -->
+  <link rel="dns-prefetch" href="//supabase.co">
+
+  <!-- Estilos do loader inicial -->
+  <style>
+    :root {
+      color-scheme: light dark;
+    }
+    html, body {
+      height: 100%;
+      margin: 0;
+      background: #FAFAFA;
+    }
+    @media (prefers-color-scheme: dark) {
+      body { background: #0F172A; }
+    }
+    /* Loader centrado */
+    #loader {
+      position: fixed; inset: 0;
+      display: grid; place-items: center;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    }
+    .brand {
+      display: flex; flex-direction: column; align-items: center; gap: 14px;
+    }
+    .logo {
+      width: 84px; height: 84px; border-radius: 999px;
+      display: grid; place-items: center;
+      color: white;
+      background: radial-gradient(circle at 50% 50%, rgba(37,99,235,0.95), rgba(37,99,235,0.65));
+      box-shadow: 0 12px 32px rgba(37,99,235,0.35);
+      animation: pulse 1.2s ease-in-out infinite alternate;
+    }
+    @keyframes pulse {
+      from { transform: scale(0.98); box-shadow: 0 10px 24px rgba(37,99,235,0.25); }
+      to   { transform: scale(1.02);  box-shadow: 0 16px 40px rgba(37,99,235,0.40); }
+    }
+    .name {
+      font-weight: 800; letter-spacing: -0.02em;
+      color: #2563EB;
+    }
+    @media (prefers-color-scheme: dark) {
+      .name { color: #60A5FA; }
+    }
+    .spinner {
+      margin-top: 10px;
+      width: 22px; height: 22px;
+      border: 2px solid rgba(0,0,0,0.15);
+      border-top-color: currentColor;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      color: #2563EB;
+    }
+    @media (prefers-color-scheme: dark) {
+      .spinner { border-color: rgba(255,255,255,0.2); color: #60A5FA; }
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Remove highlight no iOS */
+    * { -webkit-tap-highlight-color: transparent; }
+  </style>
+</head>
+<body>
+  <!-- Loader inicial (some quando o Flutter renderiza o primeiro frame) -->
+  <div id="loader" aria-label="Carregando aplicação">
+    <div class="brand">
+      <div class="logo">
+        <!-- ícone simples -->
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M3 7h13a4 4 0 0 1 3.6 2.4l1.2 2.8A3 3 0 0 1 18.9 16H17a3 3 0 0 1-3-3V7M6 16a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm10 2a2 2 0 1 0 .001-4.001A2 2 0 0 0 16 18Z" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="name">GolfFox</div>
+      <div class="spinner" role="status"></div>
+    </div>
+  </div>
+
+  <!-- Configuração de ambiente -->
+  <script src="env.js"></script>
+  
+  <!-- App Flutter -->
+  <script src="flutter_bootstrap.js" async></script>
+
+  <!-- Esconde o loader quando o Flutter desenhar o primeiro frame -->
+  <script>
+    window.addEventListener('flutter-first-frame', function () {
+      const el = document.getElementById('loader');
+      if (el) el.remove();
+    });
+  </script>
+
+  <noscript>
+    <div style="padding:16px; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;">
+      Para usar o GolfFox, ative o JavaScript no seu navegador.
+    </div>
+  </noscript>
+
+  <!-- (Opcional) CSP — ajuste conforme suas integrações; não habilite sem validar recursos necessários
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self';
+                 img-src 'self' data: https:;
+                 style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+                 font-src 'self' https://fonts.gstatic.com data:;
+                 script-src 'self' 'wasm-unsafe-eval';
+                 connect-src 'self' https://*.supabase.co https://*.supabase.in https:;
+                 object-src 'none'">
+  -->
+</body>
+</html>

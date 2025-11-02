@@ -1,0 +1,440 @@
+// ========================================
+// GolfFox Maintenance Model v11.0
+// Modelo de dados para manutencao de veiculos
+// ========================================
+
+import '../core/theme/gf_tokens.dart';
+
+enum MaintenanceType {
+  preventive,
+  corrective,
+  emergency,
+  inspection,
+  cleaning,
+}
+
+extension MaintenanceTypeExtension on MaintenanceType {
+  String get displayName {
+    switch (this) {
+      case MaintenanceType.preventive:
+        return 'Preventiva';
+      case MaintenanceType.corrective:
+        return 'Corretiva';
+      case MaintenanceType.emergency:
+        return 'Emergencial';
+      case MaintenanceType.inspection:
+        return 'Inspecao';
+      case MaintenanceType.cleaning:
+        return 'Limpeza';
+    }
+  }
+
+  int get colorValue {
+    switch (this) {
+      case MaintenanceType.preventive:
+        return GfTokens.success;
+      case MaintenanceType.corrective:
+        return GfTokens.warning;
+      case MaintenanceType.emergency:
+        return GfTokens.colorError;
+      case MaintenanceType.inspection:
+        return GfTokens.info;
+      case MaintenanceType.cleaning:
+        return GfTokens.primary;
+    }
+  }
+}
+
+enum MaintenanceStatus {
+  scheduled,
+  inProgress,
+  completed,
+  cancelled,
+  overdue,
+}
+
+extension MaintenanceStatusExtension on MaintenanceStatus {
+  String get displayName {
+    switch (this) {
+      case MaintenanceStatus.scheduled:
+        return 'Agendada';
+      case MaintenanceStatus.inProgress:
+        return 'Em Andamento';
+      case MaintenanceStatus.completed:
+        return 'Concluida';
+      case MaintenanceStatus.cancelled:
+        return 'Cancelada';
+      case MaintenanceStatus.overdue:
+        return 'Atrasada';
+    }
+  }
+
+  int get colorValue {
+    switch (this) {
+      case MaintenanceStatus.scheduled:
+        return GfTokens.info;
+      case MaintenanceStatus.inProgress:
+        return GfTokens.warning;
+      case MaintenanceStatus.completed:
+        return GfTokens.success;
+      case MaintenanceStatus.cancelled:
+        return GfTokens.colorOnSurfaceVariant;
+      case MaintenanceStatus.overdue:
+        return GfTokens.colorError;
+    }
+  }
+}
+
+enum MaintenancePriority {
+  low,
+  medium,
+  high,
+  critical,
+}
+
+extension MaintenancePriorityExtension on MaintenancePriority {
+  String get displayName {
+    switch (this) {
+      case MaintenancePriority.low:
+        return 'Baixa';
+      case MaintenancePriority.medium:
+        return 'Media';
+      case MaintenancePriority.high:
+        return 'Alta';
+      case MaintenancePriority.critical:
+        return 'Critica';
+    }
+  }
+
+  int get colorValue {
+    switch (this) {
+      case MaintenancePriority.low:
+        return GfTokens.success;
+      case MaintenancePriority.medium:
+        return GfTokens.warning;
+      case MaintenancePriority.high:
+        return GfTokens.colorError;
+      case MaintenancePriority.critical:
+        return GfTokens.accent;
+    }
+  }
+}
+
+class MaintenanceItem {
+  final String id;
+  final String description;
+  final String? partNumber;
+  final double? cost;
+  final int quantity;
+  final bool isCompleted;
+  final String? notes;
+
+  const MaintenanceItem({
+    required this.id,
+    required this.description,
+    this.partNumber,
+    this.cost,
+    required this.quantity,
+    required this.isCompleted,
+    this.notes,
+  });
+
+  factory MaintenanceItem.fromJson(Map<String, dynamic> json) {
+    return MaintenanceItem(
+      id: json['id'] ?? '',
+      description: json['description'] ?? '',
+      partNumber: json['part_number'],
+      cost: json['cost']?.toDouble(),
+      quantity: json['quantity'] ?? 1,
+      isCompleted: json['is_completed'] ?? false,
+      notes: json['notes'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'description': description,
+      'part_number': partNumber,
+      'cost': cost,
+      'quantity': quantity,
+      'is_completed': isCompleted,
+      'notes': notes,
+    };
+  }
+
+  MaintenanceItem copyWith({
+    String? id,
+    String? description,
+    String? partNumber,
+    double? cost,
+    int? quantity,
+    bool? isCompleted,
+    String? notes,
+  }) {
+    return MaintenanceItem(
+      id: id ?? this.id,
+      description: description ?? this.description,
+      partNumber: partNumber ?? this.partNumber,
+      cost: cost ?? this.cost,
+      quantity: quantity ?? this.quantity,
+      isCompleted: isCompleted ?? this.isCompleted,
+      notes: notes ?? this.notes,
+    );
+  }
+
+  double get totalCost => (cost ?? 0.0) * quantity;
+}
+
+class MaintenanceRecord {
+  final String id;
+  final String vehicleId;
+  final String title;
+  final String description;
+  final MaintenanceType type;
+  final MaintenanceStatus status;
+  final MaintenancePriority priority;
+  final DateTime scheduledDate;
+  final DateTime? startDate;
+  final DateTime? completedDate;
+  final double odometerReading;
+  final double? estimatedCost;
+  final double? actualCost;
+  final String? serviceProviderId;
+  final String? serviceProviderName;
+  final String? technicianId;
+  final String? technicianName;
+  final List<MaintenanceItem> items;
+  final List<String> attachments;
+  final String? notes;
+  final String? completionNotes;
+  final DateTime? nextMaintenanceDate;
+  final double? nextMaintenanceOdometer;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final String companyId;
+
+  const MaintenanceRecord({
+    required this.id,
+    required this.vehicleId,
+    required this.title,
+    required this.description,
+    required this.type,
+    required this.status,
+    required this.priority,
+    required this.scheduledDate,
+    this.startDate,
+    this.completedDate,
+    required this.odometerReading,
+    this.estimatedCost,
+    this.actualCost,
+    this.serviceProviderId,
+    this.serviceProviderName,
+    this.technicianId,
+    this.technicianName,
+    required this.items,
+    required this.attachments,
+    this.notes,
+    this.completionNotes,
+    this.nextMaintenanceDate,
+    this.nextMaintenanceOdometer,
+    required this.createdAt,
+    required this.updatedAt,
+    required this.companyId,
+  });
+
+  factory MaintenanceRecord.fromJson(Map<String, dynamic> json) {
+    return MaintenanceRecord(
+      id: json['id'] ?? '',
+      vehicleId: json['vehicle_id'] ?? '',
+      title: json['title'] ?? '',
+      description: json['description'] ?? '',
+      type: MaintenanceType.values.firstWhere(
+        (e) => e.name == json['type'],
+        orElse: () => MaintenanceType.preventive,
+      ),
+      status: MaintenanceStatus.values.firstWhere(
+        (e) => e.name == json['status'],
+        orElse: () => MaintenanceStatus.scheduled,
+      ),
+      priority: MaintenancePriority.values.firstWhere(
+        (e) => e.name == json['priority'],
+        orElse: () => MaintenancePriority.medium,
+      ),
+      scheduledDate: DateTime.parse(
+          json['scheduled_date'] ?? DateTime.now().toIso8601String()),
+      startDate: json['start_date'] != null
+          ? DateTime.parse(json['start_date'])
+          : null,
+      completedDate: json['completed_date'] != null
+          ? DateTime.parse(json['completed_date'])
+          : null,
+      odometerReading: (json['odometer_reading'] ?? 0.0).toDouble(),
+      estimatedCost: json['estimated_cost']?.toDouble(),
+      actualCost: json['actual_cost']?.toDouble(),
+      serviceProviderId: json['service_provider_id'],
+      serviceProviderName: json['service_provider_name'],
+      technicianId: json['technician_id'],
+      technicianName: json['technician_name'],
+      items: (json['items'] as List<dynamic>?)
+              ?.map((item) => MaintenanceItem.fromJson(item))
+              .toList() ??
+          [],
+      attachments: List<String>.from(json['attachments'] ?? []),
+      notes: json['notes'],
+      completionNotes: json['completion_notes'],
+      nextMaintenanceDate: json['next_maintenance_date'] != null
+          ? DateTime.parse(json['next_maintenance_date'])
+          : null,
+      nextMaintenanceOdometer: json['next_maintenance_odometer']?.toDouble(),
+      createdAt: DateTime.parse(
+          json['created_at'] ?? DateTime.now().toIso8601String()),
+      updatedAt: DateTime.parse(
+          json['updated_at'] ?? DateTime.now().toIso8601String()),
+      companyId: json['company_id'] ?? '',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'vehicle_id': vehicleId,
+      'title': title,
+      'description': description,
+      'type': type.name,
+      'status': status.name,
+      'priority': priority.name,
+      'scheduled_date': scheduledDate.toIso8601String(),
+      'start_date': startDate?.toIso8601String(),
+      'completed_date': completedDate?.toIso8601String(),
+      'odometer_reading': odometerReading,
+      'estimated_cost': estimatedCost,
+      'actual_cost': actualCost,
+      'service_provider_id': serviceProviderId,
+      'service_provider_name': serviceProviderName,
+      'technician_id': technicianId,
+      'technician_name': technicianName,
+      'items': items.map((item) => item.toJson()).toList(),
+      'attachments': attachments,
+      'notes': notes,
+      'completion_notes': completionNotes,
+      'next_maintenance_date': nextMaintenanceDate?.toIso8601String(),
+      'next_maintenance_odometer': nextMaintenanceOdometer,
+      'created_at': createdAt.toIso8601String(),
+      'updated_at': updatedAt.toIso8601String(),
+      'company_id': companyId,
+    };
+  }
+
+  MaintenanceRecord copyWith({
+    String? id,
+    String? vehicleId,
+    String? title,
+    String? description,
+    MaintenanceType? type,
+    MaintenanceStatus? status,
+    MaintenancePriority? priority,
+    DateTime? scheduledDate,
+    DateTime? startDate,
+    DateTime? completedDate,
+    double? odometerReading,
+    double? estimatedCost,
+    double? actualCost,
+    String? serviceProviderId,
+    String? serviceProviderName,
+    String? technicianId,
+    String? technicianName,
+    List<MaintenanceItem>? items,
+    List<String>? attachments,
+    String? notes,
+    String? completionNotes,
+    DateTime? nextMaintenanceDate,
+    double? nextMaintenanceOdometer,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    String? companyId,
+  }) {
+    return MaintenanceRecord(
+      id: id ?? this.id,
+      vehicleId: vehicleId ?? this.vehicleId,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      type: type ?? this.type,
+      status: status ?? this.status,
+      priority: priority ?? this.priority,
+      scheduledDate: scheduledDate ?? this.scheduledDate,
+      startDate: startDate ?? this.startDate,
+      completedDate: completedDate ?? this.completedDate,
+      odometerReading: odometerReading ?? this.odometerReading,
+      estimatedCost: estimatedCost ?? this.estimatedCost,
+      actualCost: actualCost ?? this.actualCost,
+      serviceProviderId: serviceProviderId ?? this.serviceProviderId,
+      serviceProviderName: serviceProviderName ?? this.serviceProviderName,
+      technicianId: technicianId ?? this.technicianId,
+      technicianName: technicianName ?? this.technicianName,
+      items: items ?? this.items,
+      attachments: attachments ?? this.attachments,
+      notes: notes ?? this.notes,
+      completionNotes: completionNotes ?? this.completionNotes,
+      nextMaintenanceDate: nextMaintenanceDate ?? this.nextMaintenanceDate,
+      nextMaintenanceOdometer:
+          nextMaintenanceOdometer ?? this.nextMaintenanceOdometer,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      companyId: companyId ?? this.companyId,
+    );
+  }
+
+  // Getters uteis
+  bool get isCompleted => status == MaintenanceStatus.completed;
+  bool get isInProgress => status == MaintenanceStatus.inProgress;
+  bool get isScheduled => status == MaintenanceStatus.scheduled;
+  bool get isOverdue =>
+      status == MaintenanceStatus.overdue ||
+      (status == MaintenanceStatus.scheduled &&
+          scheduledDate.isBefore(DateTime.now()));
+
+  Duration? get duration {
+    if (startDate != null && completedDate != null) {
+      return completedDate!.difference(startDate!);
+    }
+    return null;
+  }
+
+  double get totalEstimatedCost =>
+      (estimatedCost ?? 0.0) +
+      items.fold(0.0, (sum, item) => sum + item.totalCost);
+
+  double get totalActualCost =>
+      (actualCost ?? 0.0) +
+      items.fold(0.0, (sum, item) => sum + item.totalCost);
+
+  int get completedItemsCount => items.where((item) => item.isCompleted).length;
+
+  double get progressPercentage =>
+      items.isEmpty ? 0.0 : completedItemsCount / items.length;
+
+  double get totalCost {
+    final itemsCost = items.fold<double>(
+        0.0, (sum, item) => sum + (item.cost ?? 0.0) * item.quantity);
+    final mainCost = actualCost ?? estimatedCost ?? 0.0;
+    return itemsCost + mainCost;
+  }
+
+  String get statusText => status.displayName;
+  String get typeText => type.displayName;
+  String get priorityText => priority.displayName;
+
+  String get durationText {
+    final dur = duration;
+    if (dur == null) return 'N/A';
+
+    if (dur.inDays > 0) {
+      return '${dur.inDays}d ${dur.inHours % 24}h';
+    } else if (dur.inHours > 0) {
+      return '${dur.inHours}h ${dur.inMinutes % 60}m';
+    } else {
+      return '${dur.inMinutes}m';
+    }
+  }
+}

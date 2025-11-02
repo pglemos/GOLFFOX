@@ -1,0 +1,20 @@
+{
+  "name": "golffox-web",
+  "version": 2,
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/next"
+    }
+  ],
+  "env": {
+    "NEXT_PUBLIC_SUPABASE_URL": "@supabase_url",
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY": "@supabase_anon_key",
+    "NEXT_PUBLIC_GOOGLE_MAPS_API_KEY": "@google_maps_api_key"
+  },
+  "functions": {
+    "app/**/*.js": {
+      "maxDuration": 30
+    }
+  }
+}

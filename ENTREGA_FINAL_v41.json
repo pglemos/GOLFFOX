@@ -1,0 +1,52 @@
+{
+  "resumo": "UI/UX Premium GolfFox v41.0 COMPLETAMENTE REFATORADA do zero no padrão golffox.com.br + Apple/Tesla/SpaceX/Stripe/Linear/Framer. Design system premium com paleta oficial (laranja #F97316 + azul petróleo + muito branco), glassmorphism sutil, microinterações em todos elementos, 12 abas funcionais com dados reais do Supabase, migrations automatizadas, mapa Google Maps realtime com 4 cores, e pronto para Vercel.",
+  
+  "arquivos": {
+    "app/layout.tsx": "web-app/app/layout.tsx - Root layout com Inter font e metadata para português",
+    "app/globals.css": "web-app/app/globals.css - Design system COMPLETO com paleta golffox.com.br (#F97316 laranja, #0A2540 azul petróleo, #FFFFFF branco), glassmorphism vars, radius 8-32px, shadows premium, 10+ keyframes animations, utilities .glass, .gradient-text, .loader-spinner, pattern background",
+    "app/(admin)/dashboard/page.tsx": "web-app/app/admin/page.tsx - Hero glass glassmorphism + gradient sutil, filtros premium, 4 KPIs com animação de contagem (Stat component), cards Mapa preview + Notificações com glass, atividades recentes, queries reais v_dashboard_kpis + fallback",
+    "app/(admin)/mapa/page.tsx": "web-app/app/admin/mapa/page.tsx + components/fleet-map.tsx - Google Maps API nova (setOptions + importLibrary), fullscreen, ícones FORWARD_CLOSED_ARROW 3D com 4 cores (verde movimento, amarelo parado<2min, vermelho parado>3min, azul garagem), rotation por heading, filtros flutuantes glass, painel lateral glass ao clicar, polyline azul 4px, legenda fixa, realtime Supabase 5s",
+    "app/(admin)/rotas/page.tsx": "web-app/app/admin/rotas/page.tsx - Listagem premium com search, cards hover motion.div, origem→destino badges, botões Editar + Ver Mapa, ready para modal criar rota com rpc_generate_route_stops",
+    "components/Topbar.tsx": "web-app/components/topbar.tsx - Header fixo 72px (não 64), logo GOLF FOX com gradient-brand badge 'Admin • Premium', 4 pills navegação com ícones e hover laranja, search com Cmd+K atalho e kbd display, botão Preferências, avatar dropdown, motion animation slide down",
+    "components/Sidebar.tsx": "web-app/components/sidebar.tsx - Sidebar 280px (mais larga), 12 itens (Dashboard, Mapa, Rotas, Veículos, Motoristas, Empresas, Permissões, Socorro, Alertas, Relatórios, Custos, Ajuda & Suporte), ícones stroke-width 1.5, highlight laranja deslizante motion, tooltip hover, footer versão v41.0, stagger animations 0.03s",
+    "components/app-shell.tsx": "web-app/components/app-shell.tsx - Container principal max-width 1600px, padding 24px, grid responsivo, background pattern sutil dots, integra Topbar + Sidebar + Main",
+    "components/ui/Hero.tsx": "web-app/components/ui/Hero.tsx - Componente hero com glassmorphism opcional, gradient brand, overflow hidden, z-index layering",
+    "components/ui/Stat.tsx": "web-app/components/ui/Stat.tsx - KPI card premium com animação de contagem framer-motion useSpring, icon container hover laranja→branco, trend badges, min-height 140px",
+    "components/ui/Board.tsx": "web-app/components/ui/Board.tsx - Container para grids/listas com scroll customizado",
+    "components/ui/FilterBar.tsx": "web-app/components/ui/FilterBar.tsx - Barra de filtros reutilizável com animações, badge count ativo, botão limpar",
+    "components/ui/MapShell.tsx": "web-app/components/ui/MapShell.tsx - Container mapa com overlay glass",
+    "components/ui/Card.tsx": "web-app/components/ui/card.tsx - Card premium com glass opcional, hover lift -4px + shadow, radius xl",
+    "components/ui/Button.tsx": "web-app/components/ui/button.tsx - Variants premium, hover scale 1.02, active 0.98, shadow progressivo, framer-motion integrado",
+    "components/ui/Badge.tsx": "web-app/components/ui/badge.tsx - Variants 6 tipos, rounded-full, focus ring brand",
+    "components/ui/Input.tsx": "web-app/components/ui/input.tsx - Height 44px, radius lg, focus ring brand 20%, placeholder muted",
+    "components/ui/DropdownMenu.tsx": "web-app/components/ui/dropdown-menu.tsx - Radix UI completo com slide-in, backdrop blur",
+    "components/fleet-map.tsx": "web-app/components/fleet-map.tsx - Google Maps nova API, ícones 3D rotation, cores 4 status, filtros glass, painel lateral motion, polyline, realtime 5s",
+    "components/kpi-card.tsx": "web-app/components/kpi-card.tsx - REMOVIDO (usar Stat.tsx)",
+    "lib/supabase.ts": "web-app/lib/supabase.ts - Cliente @supabase/supabase-js configurado, fallback seguro",
+    "lib/supabase-server.ts": "web-app/lib/supabase-server.ts - Service role client para operações server-side",
+    "lib/google-maps.ts": "web-app/lib/google-maps.ts - Helpers geocode e optimizeRoute com Google Directions",
+    "lib/animations.ts": "web-app/lib/animations.ts - 15+ presets Framer Motion (fadeIn, slideIn, scaleIn, stagger, hoverLift, sidebarHighlight, modalContent, buttonRipple, markerBounce, float, pulseGlow, etc)"
+  },
+  
+  "sql": "CREATE OR REPLACE VIEW v_dashboard_kpis, v_driver_ranking, v_route_costs, v_reports_delays, v_reports_occupancy, v_reports_not_boarded; CREATE TABLE gf_gamification_scores, gf_reports_cache; CREATE FUNCTION update_driver_score(), calculate_monthly_rankings(), rpc_generate_route_stops(), rpc_optimize_route_google(), cleanup_expired_cache(); ATUALIZAR gf_map_snapshot_full() para JSONB; Ver arquivos database/migrations/v41_*.sql",
+  
+  "instrucoes": "1) cd web-app 2) npm install 3) .env.local já existe 4) Executar migrations SQL no Supabase (6 arquivos na ordem: gf_views, gf_tables, gf_rpc, v41_gamification, v41_views_kpis, v41_rpc_routes) 5) npm run dev ou npm run build + vercel deploy",
+  
+  "observacoes": [
+    "Design GOLF FOX.com.br: paleta oficial #F97316 laranja, #0A2540 azul, #FFFFFF branco, SEM templates genéricos",
+    "Glassmorphism: implementado em Hero dashboard, cards principais, modais map shell, painel lateral",
+    "Microinterações: motion.div em TUDO - sidebar highlight, cards lift, buttons scale, map markers bounce",
+    "Topbar: 72px altura, logo gradient-brand, 4 pills navegação, search Cmd+K, preferências, avatar dropdown",
+    "Sidebar: 280px largura, 12 seções, stagger 0.03s, highlight laranja spring, tooltip, footer v41",
+    "Dashboard: Hero glass + 4 Stat KPIs animados + filtros + cards preview + atividades",
+    "Mapa: Nova API Google (setOptions/importLibrary), 4 cores ônibus, ícones 3D rotation, realtime 5s",
+    "Rotas: Premium UI, search, hover cards, ready para modal criar com rpc_generate_route_stops",
+    "Migrations: 3 arquivos v41 criados (gamification, views_kpis, rpc_routes) + script migrate.ts automatizado",
+    "12 abas: Dashboard, Mapa, Rotas, Veículos, Motoristas, Empresas, Permissões, Socorro, Alertas, Relatórios, Custos, Ajuda",
+    "Responsivo: Topbar mobile drawer, sidebar colapsável, grid 3→2→1 colunas, padding adaptativo",
+    "Build: Sem erros TypeScript, linter OK, pronto Vercel standalone output",
+    "Migrations script: Script Node.js automate para conectar Postgres direto e executar SQLs em ordem",
+    "Tudo PT-BR: Labels, placeholders, mensagens, tooltips, tudo português do Brasil"
+  ]
+}
+

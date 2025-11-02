@@ -1,0 +1,123 @@
+# Flutter/Dart tool directories
+.dart_tool/
+.packages
+.pub-cache/
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# Generated files
+**/GeneratedPluginRegistrant.dart
+**/*.g.dart
+**/*.freezed.dart
+
+# IntelliJ / Android Studio
+*.iml
+.idea/
+
+# VS Code workspace settings
+.vscode/
+
+# macOS specific
+.DS_Store
+
+# Windows specific
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+CON
+
+# Android specific
+android/key.properties
+android/local.properties
+android/app/debug/
+android/app/profile/
+android/app/release/
+
+# iOS specific
+ios/Flutter/Flutter.framework
+ios/Flutter/Generated.xcconfig
+ios/Flutter/flutter_export_environment.sh
+ios/Pods/
+ios/Runner.xcworkspace/xcuserdata/
+ios/Runner.xcodeproj/xcuserdata/
+
+# Web App (Next.js/Node.js)
+web-app/node_modules/
+web-app/.next/
+web-app/out/
+web-app/.env.local
+web-app/.env.development.local
+web-app/.env.test.local
+web-app/.env.production.local
+web-app/npm-debug.log*
+web-app/yarn-debug.log*
+web-app/yarn-error.log*
+web-app/.pnpm-debug.log*
+
+# Environment variables and secrets
+.env
+.env.local
+.env.*.local
+*.key
+*.pem
+*.p12
+*.keystore
+config/secrets.yaml
+config/database.yml
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+database/data/
+*.sql.backup
+
+# Coverage and reports
+coverage/
+test_coverage/
+*.lcov
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Temporary files
+*.tmp
+.tmp/
+temp/
+.cache/
+
+# Archive or backup files
+*.orig
+*.bak
+*.swp
+*.swo
+*~
+
+# Docker
+.dockerignore
+docker-compose.override.yml
+
+# OS generated files
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Icon?
+
+# Dependencies
+node_modules/
+vendor/
+.pnp
+.pnp.js
+
+# Build outputs
+dist/
+out/
+*.tgz
+*.tar.gz
