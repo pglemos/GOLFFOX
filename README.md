@@ -1,9 +1,13 @@
 # 🚌 GolfFox - Sistema de Gestão de Transporte Urbano
 
-[![Flutter](https://img.shields.io/badge/Flutter-3.0+-blue.svg)](https://flutter.dev/)
+[![Flutter](https://img.shields.io/badge/Flutter-3.24+-blue.svg)](https://flutter.dev/)
 [![Next.js](https://img.shields.io/badge/Next.js-14+-black.svg)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue.svg)](https://www.typescriptlang.org/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![CI/CD](https://github.com/golffox/golffox/workflows/CI/badge.svg)](https://github.com/golffox/golffox/actions)
+[![CI/CD](https://github.com/pglemos/GOLFFOX/workflows/CI/badge.svg)](https://github.com/pglemos/GOLFFOX/actions)
+[![Deploy](https://github.com/pglemos/GOLFFOX/workflows/Deploy/badge.svg)](https://github.com/pglemos/GOLFFOX/actions)
+[![Codecov](https://codecov.io/gh/pglemos/GOLFFOX/branch/main/graph/badge.svg)](https://codecov.io/gh/pglemos/GOLFFOX)
+[![Dependabot](https://img.shields.io/badge/Dependabot-enabled-brightgreen.svg)](https://github.com/pglemos/GOLFFOX/network/dependencies)
 
 ## 📋 Sobre o Projeto
 
@@ -318,7 +322,70 @@ npm install
 - Verifique as configurações do Supabase RLS
 - Confirme as chaves de API no `.env`
 
-## 📈 Roadmap
+## 🔄 CI/CD e Qualidade
+
+O projeto utiliza GitHub Actions para automação completa:
+
+### 🧪 Pipeline de Testes
+- **Testes Unitários**: Flutter e Next.js
+- **Análise de Código**: Dart Analyzer e ESLint
+- **Cobertura**: Codecov integration
+- **Formatação**: Dart formatter e Prettier
+
+### 🚀 Deploy Automático
+- **Flutter Web**: GitHub Pages
+- **Next.js**: Vercel
+- **Releases**: Automático com changelog
+
+### 🔒 Segurança
+- **Dependabot**: Atualizações automáticas
+- **Security Scanning**: Análise de vulnerabilidades
+- **Secrets Detection**: Verificação de credenciais
+
+## 🤝 Contribuindo
+
+Contribuições são sempre bem-vindas! Veja como você pode ajudar:
+
+### 📋 Como Contribuir
+
+1. **Fork** o projeto
+2. **Clone** seu fork: `git clone https://github.com/seu-usuario/GOLFFOX.git`
+3. **Crie** uma branch: `git checkout -b feature/nova-funcionalidade`
+4. **Commit** suas mudanças: `git commit -m 'feat: adiciona nova funcionalidade'`
+5. **Push** para a branch: `git push origin feature/nova-funcionalidade`
+6. **Abra** um Pull Request
+
+### 📝 Padrões de Commit
+
+Utilizamos [Conventional Commits](https://www.conventionalcommits.org/):
+
+```
+feat: nova funcionalidade
+fix: correção de bug
+docs: documentação
+style: formatação
+refactor: refatoração
+test: testes
+chore: manutenção
+```
+
+### 🧪 Antes de Contribuir
+
+```bash
+# Execute os testes
+flutter test
+cd web-app && npm test
+
+# Verifique a formatação
+flutter format --set-exit-if-changed .
+cd web-app && npm run lint
+
+# Execute a análise
+flutter analyze
+cd web-app && npm run type-check
+```
+
+## 📊 Status do Projeto
 
 - [ ] **v2.0**: Integração com sistemas de pagamento
 - [ ] **v2.1**: IA para otimização de rotas
@@ -332,10 +399,10 @@ Este projeto está licenciado sob a Licença MIT - veja o arquivo [LICENSE](LICE
 
 ## 🆘 Suporte
 
-- **Issues**: [GitHub Issues](https://github.com/golffox/golffox/issues)
-- **Discussões**: [GitHub Discussions](https://github.com/golffox/golffox/discussions)
-- **Email**: suporte@golffox.com
-- **Documentação**: [docs.golffox.com](https://docs.golffox.com)
+- **Issues**: [GitHub Issues](https://github.com/pglemos/GOLFFOX/issues)
+- **Discussões**: [GitHub Discussions](https://github.com/pglemos/GOLFFOX/discussions)
+- **Pull Requests**: [Contribuições](https://github.com/pglemos/GOLFFOX/pulls)
+- **Documentação**: Veja a pasta `docs/` do projeto
 
 ## 🙏 Agradecimentos
 
