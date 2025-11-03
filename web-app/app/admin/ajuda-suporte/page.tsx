@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+// @ts-ignore - TypeScript has issues resolving this module in Vercel build
 import { AppShell } from "@/components/app-shell"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
