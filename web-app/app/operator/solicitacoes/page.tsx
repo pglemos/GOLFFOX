@@ -11,27 +11,59 @@ import { useEffect, useState } from "react"
 // @ts-ignore
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
+// @ts-ignore
+import { SolicitacaoModal } from "@/components/operator/solicitacao-modal"
 
 export default function SolicitacoesOperatorPage() {
   const router = useRouter()
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [items, setItems] = useState<any[]>([])
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [empresaId, setEmpresaId] = useState<string | null>(null)
 
   useEffect(() => {
     const run = async () => {
       const { data: { session } } = await supabase.auth.getSession()
       if (!session) { router.push("/"); return }
+      
+      const { data: userData } = await supabase
+        .from('users')
+        .select('company_id')
+        .eq('id', session.user.id)
+        .single()
+
+      if (userData?.company_id) {
+        setEmpresaId(userData.company_id)
+      }
+      
       setUser({ ...session.user })
       setLoading(false)
-      load()
     }
     run()
   }, [router])
 
+  useEffect(() => {
+    if (empresaId) {
+      load()
+    }
+  }, [empresaId])
+
   const load = async () => {
-    const { data } = await supabase.from('gf_service_requests').select('*').order('created_at', { ascending: false })
-    setItems(data || [])
+    try {
+      if (empresaId) {
+        const { data, error } = await supabase
+          .from('gf_service_requests')
+          .select('*')
+          .eq('empresa_id', empresaId)
+          .order('created_at', { ascending: false })
+        
+        if (error) throw error
+        setItems(data || [])
+      }
+    } catch (error) {
+      console.error("Erro ao carregar solicitações:", error)
+    }
   }
 
   const columns = [
@@ -52,7 +84,7 @@ export default function SolicitacoesOperatorPage() {
             <h1 className="text-3xl font-bold mb-2">Solicitações & Mudanças</h1>
             <p className="text-[var(--ink-muted)]">Abra solicitações para a GOLF FOX e acompanhe o status</p>
           </div>
-          <Button className="bg-orange-500 hover:bg-orange-600">
+          <Button className="bg-orange-500 hover:bg-orange-600" onClick={() => setIsModalOpen(true)}>
             <Plus className="h-4 w-4 mr-2" /> Nova Solicitação
           </Button>
         </div>
@@ -78,6 +110,18 @@ export default function SolicitacoesOperatorPage() {
             </Card>
           ))}
         </div>
+
+        {empresaId && (
+          <SolicitacaoModal
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+            onSave={() => {
+              load()
+              setIsModalOpen(false)
+            }}
+            empresaId={empresaId}
+          />
+        )}
       </div>
     </AppShell>
   )

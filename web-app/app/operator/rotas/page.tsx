@@ -7,10 +7,14 @@ import { AppShell } from "@/components/app-shell"
 import { Card } from "@/components/ui/card"
 // @ts-ignore
 import { Badge } from "@/components/ui/badge"
-import { Navigation, Users } from "lucide-react"
+import { Navigation, Users, MapPin, Plus } from "lucide-react"
 // @ts-ignore
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
+// @ts-ignore
+import { Button } from "@/components/ui/button"
+// @ts-ignore
+import { default as Link } from "next/link"
 
 export default function OperatorRotasPage() {
   const router = useRouter()
@@ -53,9 +57,17 @@ export default function OperatorRotasPage() {
   return (
     <AppShell user={{ id: user?.id || "", name: user?.name || "Operador", email: user?.email || "", role: "operator" }}>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold mb-2">Rotas dos Funcionários</h1>
-          <p className="text-[var(--muted)]">Visualize em qual rota cada funcionário está</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold mb-2">Rotas</h1>
+            <p className="text-[var(--ink-muted)]">Solicite e acompanhe rotas atribuídas pela GOLF FOX</p>
+          </div>
+          <Link href="/operator/solicitacoes">
+            <Button className="bg-orange-500 hover:bg-orange-600">
+              <Plus className="h-4 w-4 mr-2" />
+              Solicitar Nova Rota
+            </Button>
+          </Link>
         </div>
 
         <div className="grid gap-4">
@@ -68,8 +80,14 @@ export default function OperatorRotasPage() {
                     <h3 className="font-bold text-lg">{rota.name}</h3>
                     <Badge>{rota.companies?.name || "Sem empresa"}</Badge>
                   </div>
-                  <p className="text-sm text-[var(--muted)]">{rota.origin} → {rota.destination}</p>
+                  <p className="text-sm text-[var(--ink-muted)]">{rota.origin} → {rota.destination}</p>
                 </div>
+                <Link href={`/operator/rotas/mapa?route_id=${rota.id}`}>
+                  <Button variant="outline" size="sm">
+                    <MapPin className="h-4 w-4 mr-2" />
+                    Ver no Mapa
+                  </Button>
+                </Link>
               </div>
 
               {rota.gf_route_plan && rota.gf_route_plan.length > 0 && (

@@ -11,12 +11,14 @@ import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 // @ts-ignore
 import { Badge } from "@/components/ui/badge"
-import { Users, Plus, Search, Mail, Phone, Building } from "lucide-react"
+import { Users, Plus, Search, Mail, Phone, Building, Upload } from "lucide-react"
 // @ts-ignore
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import toast from "react-hot-toast"
+// @ts-ignore
+import { FuncionarioModal } from "@/components/operator/funcionario-modal"
 
 export default function FuncionariosPage() {
   const router = useRouter()
@@ -24,6 +26,9 @@ export default function FuncionariosPage() {
   const [loading, setLoading] = useState(true)
   const [funcionarios, setFuncionarios] = useState<any[]>([])
   const [searchQuery, setSearchQuery] = useState("")
+  const [selectedFuncionario, setSelectedFuncionario] = useState<any>(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [empresaId, setEmpresaId] = useState<string | null>(null)
 
   useEffect(() => {
     const getUser = async () => {
@@ -49,6 +54,7 @@ export default function FuncionariosPage() {
         .single()
 
       if (userData?.company_id) {
+        setEmpresaId(userData.company_id)
         const { data, error } = await supabase
           .from('gf_employee_company')
           .select(`
@@ -97,10 +103,19 @@ export default function FuncionariosPage() {
             <h1 className="text-3xl font-bold mb-2">Funcionários</h1>
             <p className="text-[var(--ink-muted)]">Gerencie os funcionários da sua empresa</p>
           </div>
-          <Button>
-            <Plus className="h-4 w-4 mr-2" />
-            Adicionar Funcionário
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline">
+              <Upload className="h-4 w-4 mr-2" />
+              Importar CSV
+            </Button>
+            <Button onClick={() => {
+              setSelectedFuncionario(null)
+              setIsModalOpen(true)
+            }}>
+              <Plus className="h-4 w-4 mr-2" />
+              Adicionar Funcionário
+            </Button>
+          </div>
         </div>
 
         {/* Busca */}
@@ -153,6 +168,16 @@ export default function FuncionariosPage() {
                         )}
                       </div>
                     </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setSelectedFuncionario(funcionario)
+                        setIsModalOpen(true)
+                      }}
+                    >
+                      Editar
+                    </Button>
                   </div>
                 </Card>
               </motion.div>
@@ -168,6 +193,21 @@ export default function FuncionariosPage() {
             </Card>
           )}
         </div>
+
+        <FuncionarioModal
+          funcionario={selectedFuncionario}
+          isOpen={isModalOpen}
+          onClose={() => {
+            setIsModalOpen(false)
+            setSelectedFuncionario(null)
+          }}
+          onSave={() => {
+            loadFuncionarios()
+            setIsModalOpen(false)
+            setSelectedFuncionario(null)
+          }}
+          empresaId={empresaId || ""}
+        />
       </div>
     </AppShell>
   )

@@ -25,11 +25,28 @@ export default function PrestadoresOperatorPage() {
       loadPrestadores()
     }
     run()
-  }, [router])
+  }, [router, user?.id])
 
   const loadPrestadores = async () => {
-    const { data } = await supabase.from('v_operator_assigned_carriers').select('*').limit(50)
-    setPrestadores(data || [])
+    try {
+      const { data: userData } = await supabase
+        .from('users')
+        .select('company_id')
+        .eq('id', user?.id)
+        .single()
+
+      if (userData?.company_id) {
+        const { data, error } = await supabase
+          .from('v_operator_assigned_carriers')
+          .select('*')
+          .eq('empresa_id', userData.company_id)
+        
+        if (error) throw error
+        setPrestadores(data || [])
+      }
+    } catch (error) {
+      console.error("Erro ao carregar prestadores:", error)
+    }
   }
 
   if (loading) return <div className="min-h-screen flex items-center justify-center"><div className="w-16 h-16 border-4 border-orange-500 border-t-transparent rounded-full animate-spin" /></div>
