@@ -1,115 +1,114 @@
-import { createClient } from '@supabase/supabase-js'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
+interface UserData {
+  id: string
+  email: string
+  role: string
+  accessToken: string
+}
+
+function extractUserFromCookie(cookieValue: string): UserData | null {
+  try {
+    const decoded = atob(cookieValue) // Base64 decode
+    return JSON.parse(decoded)
+  } catch {
+    return null
+  }
+}
+
 export async function middleware(req: NextRequest) {
-  const pathname = req.nextUrl.pathname
+  const { pathname } = req.nextUrl
   
-  // Rotas públicas - não precisam de autenticação
-  const publicRoutes = ['/', '/login', '/unauthorized']
-  const isPublicRoute = publicRoutes.includes(pathname) || pathname.startsWith('/api/')
+  console.log('🔍 Middleware executado para:', pathname)
+
+  // Rotas públicas que não precisam de autenticação
+  const publicRoutes = ['/', '/login', '/unauthorized', '/test-auth']
+  const apiRoutes = ['/api/']
   
-  // Se é rota pública, permitir acesso
-  if (isPublicRoute) {
+  // Verificar se é rota pública
+  if (publicRoutes.includes(pathname) || apiRoutes.some(route => pathname.startsWith(route))) {
+    console.log('✅ Rota pública permitida:', pathname)
     return NextResponse.next()
   }
-  
+
+  // Identificar tipo de rota protegida
   const isAdminRoute = pathname.startsWith('/admin')
   const isOperatorRoute = pathname.startsWith('/operator')
   const isCarrierRoute = pathname.startsWith('/carrier')
-  
+
+  console.log('🔒 Verificando rota protegida:', { pathname, isAdminRoute, isOperatorRoute, isCarrierRoute })
+
   // Se não é rota protegida, permitir acesso
   if (!isAdminRoute && !isOperatorRoute && !isCarrierRoute) {
     return NextResponse.next()
   }
-  
-  // Criar cliente Supabase para middleware
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-  
-  if (!supabaseUrl || !supabaseAnonKey) {
-    // Se não tem env vars, permitir mas será validado no client
-    return NextResponse.next()
-  }
-  
-  const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-    auth: {
-      persistSession: false,
-      autoRefreshToken: false,
-    },
-  })
 
-  // Tentar obter sessão dos cookies do Supabase
-  // Supabase armazena sessão em cookie específico
-  const cookies = req.cookies.getAll()
-  const supabaseProjectRef = supabaseUrl.split('//')[1]?.split('.')[0]
-  const authCookieName = `sb-${supabaseProjectRef}-auth-token`
-  const authCookie = cookies.find(c => c.name === authCookieName)?.value
+  // Tentar obter dados do usuário do cookie personalizado
+  let user: UserData | null = null
   
-  let user = null
-  let userRole: string | null = null
-  
-  if (authCookie) {
-    try {
-      const cookieData = JSON.parse(decodeURIComponent(authCookie))
-      if (cookieData?.access_token) {
-        const { data: { user: authUser } } = await supabase.auth.getUser(cookieData.access_token)
-        if (authUser) {
-          user = authUser
-          // Buscar role do usuário na tabela users
-          const { data: userData } = await supabase
-            .from('users')
-            .select('role')
-            .eq('id', authUser.id)
-            .single()
-          
-          userRole = userData?.role || authUser.user_metadata?.role || null
-        }
-      }
-    } catch (error) {
-      // Cookie inválido ou parse error
-      console.error('Middleware auth error:', error)
+  try {
+    const sessionCookie = req.cookies.get('golffox-session')?.value
+    console.log('🍪 Cookie de sessão encontrado:', !!sessionCookie)
+    
+    if (sessionCookie) {
+      user = extractUserFromCookie(sessionCookie)
+      console.log('👤 Usuário extraído do cookie:', user ? `${user.email} (${user.role})` : 'null')
     }
+  } catch (error) {
+    console.error('❌ Erro ao extrair usuário do cookie:', error)
   }
 
   // Se não está autenticado e tenta acessar rota protegida
   if (!user && (isAdminRoute || isOperatorRoute || isCarrierRoute)) {
+    console.log('❌ Usuário não autenticado tentando acessar rota protegida')
     const redirectUrl = new URL('/login', req.url)
     redirectUrl.searchParams.set('next', pathname)
     return NextResponse.redirect(redirectUrl)
   }
 
-  // Se está autenticado, verificar role
-  if (user && userRole) {
-    // Regras de autorização
-    if (isAdminRoute && userRole !== 'admin') {
+  // Se está autenticado, verificar permissões
+  if (user) {
+    console.log('🔐 Verificando permissões para:', user.role, 'na rota:', pathname)
+    
+    // Verificar se o usuário tem permissão para acessar a rota
+    if (isAdminRoute && user.role !== 'admin') {
+      console.log('❌ Acesso negado: usuário não é admin')
       const redirectUrl = new URL('/unauthorized', req.url)
-      redirectUrl.searchParams.set('reason', 'admin_only')
-      redirectUrl.searchParams.set('role', userRole)
+      redirectUrl.searchParams.set('reason', 'insufficient_permissions')
+      redirectUrl.searchParams.set('required', 'admin')
+      redirectUrl.searchParams.set('current', user.role)
       return NextResponse.redirect(redirectUrl)
     }
-
-    if (isOperatorRoute && !['operator', 'admin'].includes(userRole)) {
+    
+    if (isOperatorRoute && !['admin', 'operator'].includes(user.role)) {
+      console.log('❌ Acesso negado: usuário não é operator ou admin')
       const redirectUrl = new URL('/unauthorized', req.url)
-      redirectUrl.searchParams.set('reason', 'operator_access_required')
-      redirectUrl.searchParams.set('role', userRole)
+      redirectUrl.searchParams.set('reason', 'insufficient_permissions')
+      redirectUrl.searchParams.set('required', 'operator')
+      redirectUrl.searchParams.set('current', user.role)
       return NextResponse.redirect(redirectUrl)
     }
-
-    if (isCarrierRoute && !['carrier', 'admin'].includes(userRole)) {
+    
+    if (isCarrierRoute && !['admin', 'carrier'].includes(user.role)) {
+      console.log('❌ Acesso negado: usuário não é carrier ou admin')
       const redirectUrl = new URL('/unauthorized', req.url)
-      redirectUrl.searchParams.set('reason', 'carrier_access_required')
-      redirectUrl.searchParams.set('role', userRole)
+      redirectUrl.searchParams.set('reason', 'insufficient_permissions')
+      redirectUrl.searchParams.set('required', 'carrier')
+      redirectUrl.searchParams.set('current', user.role)
       return NextResponse.redirect(redirectUrl)
     }
-  } else if (user && !userRole) {
-    // Usuário autenticado mas sem role definido - redirecionar para login
-    const redirectUrl = new URL('/login', req.url)
-    redirectUrl.searchParams.set('error', 'no_role')
-    return NextResponse.redirect(redirectUrl)
+    
+    console.log('✅ Acesso permitido')
+    return NextResponse.next()
   }
 
-  return NextResponse.next()
+  // Se chegou até aqui sem usuário válido, redirecionar para login
+  console.log('❌ Falha na autenticação - redirecionando para login')
+  const redirectUrl = new URL('/login', req.url)
+  redirectUrl.searchParams.set('next', pathname)
+  redirectUrl.searchParams.set('error', 'no_auth')
+  return NextResponse.redirect(redirectUrl)
 }
 
 export const config = {
@@ -119,7 +118,6 @@ export const config = {
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
-     * - public folder
      */
     '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],

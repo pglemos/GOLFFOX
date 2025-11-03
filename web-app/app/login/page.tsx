@@ -60,49 +60,43 @@ function LoginContent() {
 
     setLoading(true)
     setError(null)
-    console.log('🔄 Iniciando login...')
+    console.log('🔐 Iniciando login para:', loginEmail)
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: loginEmail,
-        password: loginPassword,
-      })
+      // Usar o novo sistema de autenticação
+      const { AuthManager } = await import('@/lib/auth')
+      const result = await AuthManager.login(loginEmail, loginPassword)
 
-      if (error) {
-        console.error('Erro no login:', error.message)
-        throw error
-      }
+      if (result.success && result.user) {
+        console.log('✅ Login bem-sucedido!')
+        console.log('👤 Usuário:', result.user.email, 'Role:', result.user.role)
 
-      if (data.session) {
-        console.log('✅ Login realizado com sucesso')
-        
+        // Aguardar um pouco para garantir que os cookies sejam salvos
+        await new Promise(resolve => setTimeout(resolve, 100))
+
+        // Determinar URL de redirecionamento
         const nextUrl = searchParams.get('next')
-        let redirectUrl: string
-        
+        let redirectUrl = '/'
+
         if (nextUrl) {
-          // Se há um parâmetro next, redireciona para lá
-          redirectUrl = decodeURIComponent(nextUrl)
+          redirectUrl = nextUrl
           console.log('🔄 Redirecionando para URL solicitada:', redirectUrl)
         } else {
-          // Senão, redireciona baseado no role
-          const userRole = data.user.user_metadata?.role || getUserRoleByEmail(data.user.email)
-          redirectUrl = `/${userRole}`
-          console.log('🔄 Redirecionando para:', redirectUrl)
+          // Redirecionar baseado na role
+          redirectUrl = AuthManager.getRedirectUrl(result.user.role)
+          console.log('🔄 Redirecionando baseado na role:', redirectUrl)
         }
-        
-        // Use window.location for more reliable navigation
-        if (typeof window !== 'undefined') {
-          window.location.href = redirectUrl
-        } else {
-          router.push(redirectUrl)
-        }
+
+        // Usar router.push para navegação
+        console.log('🚀 Executando redirecionamento...')
+        router.push(redirectUrl)
       } else {
-        console.warn('Login sem sessão criada')
-        setError("Erro na autenticação - sessão não criada")
+        console.error('❌ Erro de login:', result.error)
+        setError(result.error || 'Erro no login')
       }
-    } catch (err: any) {
-      console.error('Erro no processo de login:', err)
-      setError(err.message || "Erro no login - verifique suas credenciais")
+    } catch (err) {
+      console.error('💥 Erro inesperado no login:', err)
+      setError('Erro inesperado durante o login')
     } finally {
       setLoading(false)
     }
