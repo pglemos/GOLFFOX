@@ -17,6 +17,7 @@ interface AppShellProps {
   panel?: 'admin' | 'operator' | 'carrier'
 }
 
+// Named export for AppShell component
 export function AppShell({ user, children, panel }: AppShellProps) {
   const pathname = usePathname()
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
