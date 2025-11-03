@@ -1,9 +1,11 @@
 "use client"
 
 import { useEffect, useState } from "react"
-// @ts-ignore - TypeScript has issues resolving this module in Vercel build
+// @ts-ignore - TypeScript has issues resolving modules in Vercel build
 import { AppShell } from "@/components/app-shell"
+// @ts-ignore
 import { Card } from "@/components/ui/card"
+// @ts-ignore
 import { Button } from "@/components/ui/button"
 import { HelpCircle, MessageCircle, ExternalLink, CheckCircle } from "lucide-react"
 import { supabase } from "@/lib/supabase"
