@@ -15,6 +15,20 @@ const nextConfig = {
     NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
     NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,
   },
+  async redirects() {
+    return [
+      {
+        source: '/operador',
+        destination: '/operator',
+        permanent: true,
+      },
+      {
+        source: '/operador/:path*',
+        destination: '/operator/:path*',
+        permanent: true,
+      },
+    ]
+  },
   // Configuração para Google Maps
   webpack: (config) => {
     config.resolve.alias = {
