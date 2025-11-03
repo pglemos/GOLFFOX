@@ -1,0 +1,41 @@
+{
+  "auditoria": {
+    "web_app": "ok",
+    "mobile_app": "faltando_verificacao",
+    "supabase": "ok_com_migrations_pendentes",
+    "navegacao_rotas_mapa": "parcial",
+    "observacoes": [
+      "Web App: Next.js 15.1.3, Tailwind, Framer Motion, Supabase v2, Zustand - OK",
+      "12 abas existentes em /admin - OK",
+      "Layout claro/premium iniciado - OK (topbar atualizada com badge e atalhos)",
+      "Sidebar atualizada para v42.0 - OK",
+      "AppShell com max-width 1600px e padding 24px - OK",
+      "Fleet-map.tsx existe mas precisa ser reescrito conforme Fase 7",
+      "Navegação avançada parcialmente implementada (use-advanced-navigation.tsx)",
+      "Mobile App: Flutter 3.24+ verificado, precisa verificar features específicas",
+      "Supabase: Migrations existentes, criadas novas para gf_notifications, gf_boarding_tokens, gf_boarding_events, rpc_validate_boarding, v_driver_last_status",
+      "Tabelas gf_ esperadas: gf_employee_company (existe), gf_assistance_requests (existe), gf_gamification_scores (existe), gf_vehicle_costs (existe), gf_notifications (criada), gf_boarding_tokens (criada), gf_boarding_events (criada)",
+      "Views esperadas: v_dashboard_kpis (existe), v_driver_last_position (existe), v_active_trips (existe), v_route_costs (existe), v_driver_last_status (criada)",
+      "RPCs esperadas: rpc_generate_route_stops (existe), rpc_optimize_route_google (existe), rpc_validate_boarding (criada), gf_map_snapshot_full (existe)"
+    ]
+  },
+  "arquivos_web_editados": {
+    "components/topbar.tsx": "Adicionado badge 'Admin • Premium' e 4 atalhos (Painel de Gestão, App Motorista, App Passageiro, Portal do Operador)",
+    "components/sidebar.tsx": "Atualizado footer para 'GOLF FOX v42.0'",
+    "components/app-shell.tsx": "Atualizado para max-width: 1600px e padding: 24px",
+    "database/migrations/gf_notifications_boarding.sql": "Criado: gf_notifications, gf_boarding_tokens, gf_boarding_events, rpc_validate_boarding, v_driver_last_status"
+  },
+  "arquivos_mobile_editados": {
+    "status": "Pendente verificação detalhada"
+  },
+  "sql_gerado": "CREATE TABLE gf_notifications, gf_boarding_tokens, gf_boarding_events; CREATE FUNCTION rpc_validate_boarding; CREATE VIEW v_driver_last_status",
+  "instrucoes_execucao": "1. Executar database/migrations/gf_notifications_boarding.sql no Supabase SQL Editor\n2. cd web-app && npm install && npm run dev\n3. Verificar se todas as 12 abas carregam corretamente",
+  "avisos": [
+    "Execute a migration gf_notifications_boarding.sql no Supabase SQL Editor",
+    "Verificar se mapa suporta navegação avançada rotas→mapa com todos os requisitos",
+    "Se Vercel sem env vars, exibir banner de alerta (criar componente)",
+    "Completar CRUD em todas as 12 abas se ainda faltar",
+    "Verificar highlight laranja na sidebar (#F97316)"
+  ]
+}
+
