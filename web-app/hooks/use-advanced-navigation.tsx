@@ -103,14 +103,23 @@ export function useAdvancedNavigation() {
     }
 
     if (points.length === 1) {
+      const firstPoint = points[0]
+      if (!firstPoint) {
+        return {
+          center: { lat: 0, lng: 0 },
+          zoom: 10,
+          bounds: { north: 0, south: 0, east: 0, west: 0 }
+        }
+      }
+      
       return {
-        center: points[0],
+        center: firstPoint,
         zoom: 15,
         bounds: {
-          north: points[0].lat + 0.01,
-          south: points[0].lat - 0.01,
-          east: points[0].lng + 0.01,
-          west: points[0].lng - 0.01
+          north: firstPoint.lat + 0.01,
+          south: firstPoint.lat - 0.01,
+          east: firstPoint.lng + 0.01,
+          west: firstPoint.lng - 0.01
         }
       }
     }
@@ -182,10 +191,19 @@ export function useAdvancedNavigation() {
       // 2. Manter estado da rota se especificado
       if (maintainState) {
         const currentState: RouteState = {
-          selectedRoute: searchParams.get('route') || undefined,
-          filters: Object.fromEntries(searchParams.entries()),
-          searchQuery: searchParams.get('search') || undefined
+          filters: Object.fromEntries(searchParams.entries())
         }
+        
+        const selectedRoute = searchParams.get('route')
+        if (selectedRoute) {
+          currentState.selectedRoute = selectedRoute
+        }
+        
+        const searchQuery = searchParams.get('search')
+        if (searchQuery) {
+          currentState.searchQuery = searchQuery
+        }
+        
         setRouteState(currentState)
       }
 

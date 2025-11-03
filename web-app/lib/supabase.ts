@@ -48,14 +48,14 @@ if (envUrl && envAnon) {
           // Simulando resposta vazia para manter UI funcionando
           
           // Determinar o tipo de resposta baseado na URL
-          let mockData = { data: null, error: null, count: 0 }
+          let mockData: { data: any; error: null; count?: number } = { data: null, error: null, count: 0 }
           
           if (url.includes('count=exact')) {
             // Para consultas de contagem
             mockData = { data: null, error: null, count: 0 }
           } else if (url.includes('select=')) {
             // Para consultas de seleção
-            mockData = { data: [], error: null }
+            mockData = { data: [] as any[], error: null }
           }
           
           return new Response(JSON.stringify(mockData), {

@@ -185,7 +185,7 @@ export function useLazyImage(src: string, options: IntersectionObserverInit = {}
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
+        if (entry && entry.isIntersecting) {
           setIsInView(true)
           setImageSrc(src)
           observer.unobserve(element)

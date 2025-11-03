@@ -57,11 +57,16 @@ export const optimizeRoute = async (waypoints: Array<{ lat: number; lng: number;
   
   if (!apiKey || waypoints.length < 2) return null
 
+  const firstWaypoint = waypoints[0]
+  const lastWaypoint = waypoints[waypoints.length - 1]
+  
+  if (!firstWaypoint || !lastWaypoint) return null
+
   try {
     const _waypointsStr = waypoints.map(w => `${w.lat},${w.lng}`).join('|')
     
     const response = await fetch(
-      `https://maps.googleapis.com/maps/api/directions/json?origin=${waypoints[0].lat},${waypoints[0].lng}&destination=${waypoints[waypoints.length - 1].lat},${waypoints[waypoints.length - 1].lng}&waypoints=optimize:true|${waypoints.slice(1, -1).map(w => `${w.lat},${w.lng}`).join('|')}&key=${apiKey}`
+      `https://maps.googleapis.com/maps/api/directions/json?origin=${firstWaypoint.lat},${firstWaypoint.lng}&destination=${lastWaypoint.lat},${lastWaypoint.lng}&waypoints=optimize:true|${waypoints.slice(1, -1).map(w => `${w.lat},${w.lng}`).join('|')}&key=${apiKey}`
     )
     
     const data = await response.json()
@@ -72,8 +77,8 @@ export const optimizeRoute = async (waypoints: Array<{ lat: number; lng: number;
       
       // Reordenar waypoints conforme otimização do Google
       const optimizedWaypoints = route.waypoint_order.map((index: number) => waypoints[index + 1])
-      optimizedWaypoints.unshift(waypoints[0])
-      optimizedWaypoints.push(waypoints[waypoints.length - 1])
+      optimizedWaypoints.unshift(firstWaypoint)
+      optimizedWaypoints.push(lastWaypoint)
       
       return {
         optimized: optimizedWaypoints,

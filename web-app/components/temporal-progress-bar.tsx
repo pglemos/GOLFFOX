@@ -106,9 +106,15 @@ export function TemporalProgressBar({
   const calculateStopProgress = (index: number) => {
     if (stops.length < 2) return 0
     
-    const startTime = new Date(stops[0].scheduledTime).getTime()
-    const endTime = new Date(stops[stops.length - 1].scheduledTime).getTime()
-    const stopTime = new Date(stops[index].scheduledTime).getTime()
+    const firstStop = stops[0]
+    const lastStop = stops[stops.length - 1]
+    const currentStop = stops[index]
+    
+    if (!firstStop || !lastStop || !currentStop) return 0
+    
+    const startTime = new Date(firstStop.scheduledTime).getTime()
+    const endTime = new Date(lastStop.scheduledTime).getTime()
+    const stopTime = new Date(currentStop.scheduledTime).getTime()
     
     return ((stopTime - startTime) / (endTime - startTime)) * 100
   }
@@ -128,10 +134,10 @@ export function TemporalProgressBar({
             <Button
               variant="outline"
               size="sm"
-              onClick={() => onPlayPause?.(!isPlaying)}
+              onClick={() => onPlayPause?.(!_isPlaying)}
               className="w-8 h-8 p-0"
             >
-              {isPlaying ? (
+              {_isPlaying ? (
                 <Pause className="w-4 h-4" />
               ) : (
                 <Play className="w-4 h-4" />
@@ -232,8 +238,10 @@ export function TemporalProgressBar({
                 {index < stops.length - 1 && (
                   <div className="absolute top-8 left-full ml-2 text-xs text-gray-500 whitespace-nowrap">
                     {(() => {
+                      const nextStop = stops[index + 1]
+                      if (!nextStop) return ''
                       const currentStopTime = new Date(stop.scheduledTime)
-                      const nextStopTime = new Date(stops[index + 1].scheduledTime)
+                      const nextStopTime = new Date(nextStop.scheduledTime)
                       const duration = nextStopTime.getTime() - currentStopTime.getTime()
                       const minutes = Math.round(duration / (1000 * 60))
                       return `${minutes}min`

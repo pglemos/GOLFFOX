@@ -229,6 +229,9 @@ export function useSupabaseQuery<T>(
         window.removeEventListener('offline', handleOffline)
       }
     }
+    
+    // Retorno vazio para o caso de SSR
+    return () => {}
   }, [executeQuery, error])
 
   return { data, loading, error, refetch, isOffline }

@@ -89,6 +89,9 @@ export function useAccessibility(config: Partial<AccessibilityConfig> = {}): {
         window.speechSynthesis.removeEventListener('voiceschanged', detectScreenReader)
       }
     }
+    
+    // Return empty cleanup function if speechSynthesis is not available
+    return () => {}
   }, [])
 
   // Monitor focus changes
@@ -212,12 +215,12 @@ export function useAccessibility(config: Partial<AccessibilityConfig> = {}): {
       if (event.key !== 'Tab') return
 
       if (event.shiftKey) {
-        if (document.activeElement === firstElement) {
+        if (document.activeElement === firstElement && lastElement) {
           event.preventDefault()
           lastElement.focus()
         }
       } else {
-        if (document.activeElement === lastElement) {
+        if (document.activeElement === lastElement && firstElement) {
           event.preventDefault()
           firstElement.focus()
         }

@@ -49,6 +49,7 @@
     ".next",
     "out",
     "dist",
-    "build"
+    "build",
+    "scripts"
   ]
 }
