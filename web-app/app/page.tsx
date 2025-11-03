@@ -1,7 +1,7 @@
 "use client"
 
-import { useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { useEffect, Suspense } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
 import { supabase } from "@/lib/supabase"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -10,8 +10,9 @@ import { Truck, Mail, Lock } from "lucide-react"
 import { useState } from "react"
 import { motion } from "framer-motion"
 
-export default function LoginPage() {
+function LoginContent() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [loading, setLoading] = useState(false)
@@ -37,11 +38,18 @@ export default function LoginPage() {
     // Check if user is already logged in
     supabase.auth.getSession().then(({ data: { session } }: { data: { session: any } }) => {
       if (session) {
-        const userRole = session.user.user_metadata?.role || getUserRoleByEmail(session.user.email)
-        router.push(`/${userRole}`)
+        const nextUrl = searchParams.get('next')
+        if (nextUrl) {
+          // Se há um parâmetro next, redireciona para lá
+          router.push(decodeURIComponent(nextUrl))
+        } else {
+          // Senão, redireciona baseado no role
+          const userRole = session.user.user_metadata?.role || getUserRoleByEmail(session.user.email)
+          router.push(`/${userRole}`)
+        }
       }
     })
-  }, [router])
+  }, [router, searchParams])
 
   const handleLogin = async (demoEmail?: string, demoPassword?: string) => {
     const loginEmail = demoEmail || email
@@ -69,15 +77,26 @@ export default function LoginPage() {
 
       if (data.session) {
         console.log('✅ Login realizado com sucesso')
-        // Redirect to dashboard based on role
-        const userRole = data.user.user_metadata?.role || getUserRoleByEmail(data.user.email)
-        console.log('🔄 Redirecionando para:', `/${userRole}`)
+        
+        const nextUrl = searchParams.get('next')
+        let redirectUrl: string
+        
+        if (nextUrl) {
+          // Se há um parâmetro next, redireciona para lá
+          redirectUrl = decodeURIComponent(nextUrl)
+          console.log('🔄 Redirecionando para URL solicitada:', redirectUrl)
+        } else {
+          // Senão, redireciona baseado no role
+          const userRole = data.user.user_metadata?.role || getUserRoleByEmail(data.user.email)
+          redirectUrl = `/${userRole}`
+          console.log('🔄 Redirecionando para:', redirectUrl)
+        }
         
         // Use window.location for more reliable navigation
         if (typeof window !== 'undefined') {
-          window.location.href = `/${userRole}`
+          window.location.href = redirectUrl
         } else {
-          router.push(`/${userRole}`)
+          router.push(redirectUrl)
         }
       } else {
         console.warn('Login sem sessão criada')
@@ -190,5 +209,13 @@ export default function LoginPage() {
         </motion.div>
       </div>
     </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <LoginContent />
+    </Suspense>
   )
 }
