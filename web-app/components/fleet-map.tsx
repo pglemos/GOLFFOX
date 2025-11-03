@@ -303,10 +303,9 @@ export function FleetMap({ companyId, routeId }: FleetMapProps) {
   // Função para obter a API Key de forma robusta
   const getGoogleMapsApiKey = () => {
     const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ||
-      (typeof window !== 'undefined' && (window as any).__NEXT_DATA__?.env?.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY) ||
-      'AIzaSyD79t05YxpU2RnEczY-NSDxhdbY9OvigsM' // Fallback para a chave configurada
+      (typeof window !== 'undefined' && (window as any).__NEXT_DATA__?.env?.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY)
     
-    if (!apiKey || apiKey === 'AIzaSyD79t05YxpU2RnEczY-NSDxhdbY9OvigsM') {
+    if (!apiKey) {
       // NEXT_PUBLIC_GOOGLE_MAPS_API_KEY não configurado
       setMapError('API Key do Google Maps não configurada. Verifique as variáveis de ambiente.')
       return null

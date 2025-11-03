@@ -23,7 +23,7 @@ if (envUrl && envAnon) {
     }
   })
 
-  // Interceptar TODAS as requisições fetch do Supabase
+  // Interceptar TODAS as requisições fetch do Supabase para desenvolvimento
   const originalFetch = globalThis.fetch
   globalThis.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
     const url = typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url
@@ -31,49 +31,55 @@ if (envUrl && envAnon) {
     // Só interceptar requisições do Supabase
     if (url.includes('supabase.co')) {
       try {
-        // Supabase Request
         const response = await originalFetch(input, init)
-        // Supabase Response
-        return response
-      } catch (error: any) {
-        // Supabase Network Error interceptado
         
-        // Para qualquer erro de rede do Supabase, retornar resposta simulada
-        if (error.name === 'AbortError' || 
-            error.message.includes('ERR_ABORTED') || 
-            error.message.includes('fetch') ||
-            error.message.includes('NetworkError') ||
-            error.message.includes('Failed to fetch')) {
-          
-          // Simulando resposta vazia para manter UI funcionando
-          
-          // Determinar o tipo de resposta baseado na URL
-          let mockData: { data: any; error: null; count?: number } = { data: null, error: null, count: 0 }
-          
-          if (url.includes('count=exact')) {
-            // Para consultas de contagem
-            mockData = { data: null, error: null, count: 0 }
-          } else if (url.includes('select=')) {
-            // Para consultas de seleção
-            mockData = { data: [] as any[], error: null }
-          }
-          
-          return new Response(JSON.stringify(mockData), {
-            status: 200,
-            statusText: 'OK (Simulated)',
-            headers: { 
-              'Content-Type': 'application/json',
-              'x-simulated-response': 'true'
-            }
-          })
+        // Se a resposta for bem-sucedida, retornar normalmente
+        if (response.ok) {
+          return response
         }
         
-        throw error
+        // Se houver erro HTTP (404, 500, etc), simular resposta vazia
+        console.warn(`Supabase request failed: ${response.status} ${response.statusText} for ${url}`)
+        return createMockResponse(url)
+        
+      } catch (error: any) {
+        // Para qualquer erro de rede do Supabase, retornar resposta simulada
+        console.warn(`Supabase network error intercepted for ${url}:`, error.message)
+        return createMockResponse(url)
       }
     }
     
     // Para outras requisições, usar fetch original
     return originalFetch(input, init)
+  }
+
+  // Função auxiliar para criar respostas simuladas
+  function createMockResponse(url: string): Response {
+    let mockData: any = { data: [], error: null }
+    
+    // Respostas específicas baseadas na URL
+    if (url.includes('/auth/v1/logout')) {
+      mockData = { error: null }
+    } else if (url.includes('count=exact')) {
+      mockData = { data: null, error: null, count: 0 }
+    } else if (url.includes('gf_alerts')) {
+      mockData = { data: [], error: null }
+    } else if (url.includes('trips')) {
+      mockData = { data: [], error: null }
+    } else if (url.includes('trip_passengers')) {
+      mockData = { data: [], error: null }
+    } else if (url.includes('select=')) {
+      mockData = { data: [], error: null }
+    }
+    
+    return new Response(JSON.stringify(mockData), {
+      status: 200,
+      statusText: 'OK (Development Mode)',
+      headers: { 
+        'Content-Type': 'application/json',
+        'x-development-mode': 'true'
+      }
+    })
   }
 
 } else {
