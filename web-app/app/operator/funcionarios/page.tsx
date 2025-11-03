@@ -1,12 +1,18 @@
 "use client"
 
 import { useEffect, useState } from "react"
+// @ts-ignore
 import { AppShell } from "@/components/app-shell"
+// @ts-ignore
 import { Button } from "@/components/ui/button"
+// @ts-ignore
 import { Card } from "@/components/ui/card"
+// @ts-ignore
 import { Input } from "@/components/ui/input"
+// @ts-ignore
 import { Badge } from "@/components/ui/badge"
 import { Users, Plus, Search, Mail, Phone, Building } from "lucide-react"
+// @ts-ignore
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"

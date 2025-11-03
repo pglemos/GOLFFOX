@@ -1,6 +1,6 @@
 "use client"
 
-import Link from "next/link"
+import { default as Link } from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
 import {
   LayoutDashboard,
@@ -14,7 +14,11 @@ import {
   AlertTriangle,
   BarChart3,
   DollarSign,
-  HelpCircle
+  HelpCircle,
+  FileText,
+  Building2,
+  Settings,
+  MessageSquare
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { listItem, staggerContainer, sidebarHighlight } from "@/lib/animations"
@@ -107,19 +111,61 @@ const operatorMenuItems = [
     icon: Users, 
     label: "Funcionários", 
     href: "/operator/funcionarios",
-    description: "Portal do Operador"
+    description: "Gerencie seus funcionários"
   },
   { 
     icon: Navigation, 
     label: "Rotas", 
     href: "/operator/rotas",
-    description: "Rotas atribuídas"
+    description: "Solicitar e acompanhar rotas"
+  },
+  { 
+    icon: Building2, 
+    label: "Prestadores", 
+    href: "/operator/prestadores",
+    description: "Transportadoras alocadas pela GOLF FOX"
+  },
+  { 
+    icon: FileText, 
+    label: "Solicitações", 
+    href: "/operator/solicitacoes",
+    description: "Solicitações e mudanças para GOLF FOX"
+  },
+  { 
+    icon: DollarSign, 
+    label: "Custos", 
+    href: "/operator/custos",
+    description: "Faturas e conciliação GOLF FOX"
   },
   { 
     icon: AlertTriangle, 
     label: "Alertas", 
     href: "/operator/alertas",
-    description: "Notificações"
+    description: "Notificações do sistema"
+  },
+  { 
+    icon: BarChart3, 
+    label: "Relatórios", 
+    href: "/operator/relatorios",
+    description: "Análise e exportação"
+  },
+  { 
+    icon: Shield, 
+    label: "Conformidade", 
+    href: "/operator/conformidade",
+    description: "Incidentes e segurança"
+  },
+  { 
+    icon: MessageSquare, 
+    label: "Comunicações", 
+    href: "/operator/comunicacoes",
+    description: "Broadcasts e mensagens"
+  },
+  { 
+    icon: Settings, 
+    label: "Preferências", 
+    href: "/operator/preferencias",
+    description: "Configurações e integrações"
   },
   { 
     icon: HelpCircle, 
@@ -229,22 +275,25 @@ export function Sidebar({ isOpen = true, isMobile = false, panel = 'admin' }: Si
                       <motion.div
                         variants={sidebarHighlight}
                         whileHover="hover"
-                        className="absolute left-0 top-0 bottom-0 w-1 bg-[var(--brand)] rounded-r opacity-0 group-hover:opacity-100 transition-opacity"
+                        className={cn(
+                          "absolute left-0 top-0 bottom-0 w-1 rounded-r opacity-0 group-hover:opacity-100 transition-opacity",
+                          panel === 'operator' ? "bg-orange-500" : "bg-[var(--brand)]"
+                        )}
                       />
                       <Icon 
                         className={cn(
                           "h-5 w-5 transition-colors flex-shrink-0",
                           "stroke-[1.5px]",
                           isActive 
-                            ? "text-[var(--brand)]" 
-                            : "text-[var(--ink-muted)] group-hover:text-[var(--brand)]"
+                            ? (panel === 'operator' ? "text-orange-500" : "text-[var(--brand)]")
+                            : (panel === 'operator' ? "text-[var(--ink-muted)] group-hover:text-orange-500" : "text-[var(--ink-muted)] group-hover:text-[var(--brand)]")
                         )} 
                       />
                       <div className="flex-1 min-w-0">
                         <span className={cn(
                           "block transition-colors",
                           isActive 
-                            ? "text-[var(--brand)] font-semibold" 
+                            ? (panel === 'operator' ? "text-orange-500 font-semibold" : "text-[var(--brand)] font-semibold")
                             : "group-hover:text-[var(--ink-strong)]"
                         )}>
                           {item.label}
@@ -269,8 +318,19 @@ export function Sidebar({ isOpen = true, isMobile = false, panel = 'admin' }: Si
             {/* Footer */}
             <div className="border-t border-[var(--border)] pt-4 mt-auto">
               <div className="flex items-center gap-3 px-4 py-2">
-                <div className="w-8 h-8 rounded-lg gradient-brand flex items-center justify-center flex-shrink-0 shadow-sm">
+                <div className={cn(
+                  "w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm",
+                  panel === 'operator' ? "bg-orange-500" : "gradient-brand"
+                )}>
                   <span className="text-white text-xs font-bold">GF</span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-semibold text-[var(--ink-strong)]">
+                    GOLF FOX
+                  </p>
+                  <p className="text-xs text-[var(--ink-muted)]">
+                    {panel === 'operator' ? 'v42.6' : 'v42.0'}
+                  </p>
                 </div>
               </div>
             </div>

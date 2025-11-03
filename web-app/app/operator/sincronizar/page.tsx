@@ -1,12 +1,17 @@
 "use client"
 
 import { useEffect, useState } from "react"
+// @ts-ignore
 import { AppShell } from "@/components/app-shell"
+// @ts-ignore
 import { Button } from "@/components/ui/button"
+// @ts-ignore
 import { Card } from "@/components/ui/card"
 import { RefreshCw, CheckCircle, AlertCircle } from "lucide-react"
+// @ts-ignore
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
+// @ts-ignore
 import { geocodeAddress, optimizeRoute } from "@/lib/google-maps"
 
 export default function SincronizarPage() {

@@ -22,7 +22,7 @@ import {
 } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
-import Link from "next/link"
+import { default as Link } from "next/link"
 import { motion } from "framer-motion"
 import { staggerContainer, listItem } from "@/lib/animations"
 import { useSupabaseCount } from "@/hooks/use-supabase-query"
