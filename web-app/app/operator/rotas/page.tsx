@@ -31,17 +31,35 @@ export default function OperatorRotasPage() {
       }
       setUser({ ...session.user })
       setLoading(false)
-      loadRotas()
     }
     getUser()
   }, [router])
 
+  useEffect(() => {
+    if (user?.id) {
+      loadRotas()
+    }
+  }, [user?.id])
+
   const loadRotas = async () => {
     try {
-      const { data, error } = await supabase
+      // Filtrar rotas apenas da empresa do operador
+      const { data: userData } = await supabase
+        .from('users')
+        .select('company_id')
+        .eq('id', user?.id)
+        .single()
+
+      let query = supabase
         .from("routes")
         .select("*, companies(name), gf_route_plan(*, gf_employee_company(name, cpf))")
         .eq("is_active", true)
+
+      if (userData?.company_id) {
+        query = query.eq("company_id", userData.company_id)
+      }
+
+      const { data, error } = await query
 
       if (error) throw error
       setRotas(data || [])
