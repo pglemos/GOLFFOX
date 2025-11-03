@@ -1,0 +1,9 @@
+.cursor/
+tools/
+database/
+docs/
+*.md
+*.json
+!package.json
+!vercel.json
+
