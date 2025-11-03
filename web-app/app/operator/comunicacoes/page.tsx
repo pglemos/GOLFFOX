@@ -11,27 +11,62 @@ import { useEffect, useState } from "react"
 // @ts-ignore
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
+// @ts-ignore
+import { BroadcastModal } from "@/components/operator/broadcast-modal"
 
 export default function ComunicacoesOperatorPage() {
   const router = useRouter()
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [items, setItems] = useState<any[]>([])
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [empresaId, setEmpresaId] = useState<string | null>(null)
 
   useEffect(() => {
     const run = async () => {
       const { data: { session } } = await supabase.auth.getSession()
       if (!session) { router.push("/"); return }
+      
+      const { data: userData } = await supabase
+        .from('users')
+        .select('company_id')
+        .eq('id', session.user.id)
+        .single()
+
+      if (userData?.company_id) {
+        setEmpresaId(userData.company_id)
+      }
+      
       setUser({ ...session.user })
       setLoading(false)
-      load()
     }
     run()
   }, [router])
 
+  useEffect(() => {
+    if (empresaId) {
+      load()
+    }
+  }, [empresaId])
+
   const load = async () => {
-    const { data } = await supabase.from('gf_announcements').select('*').order('created_at', { ascending: false })
-    setItems(data || [])
+    try {
+      let query = supabase
+        .from('gf_announcements')
+        .select('*')
+        .order('created_at', { ascending: false })
+      
+      if (empresaId) {
+        query = query.eq('empresa_id', empresaId)
+      }
+      
+      const { data, error } = await query
+      
+      if (error) throw error
+      setItems(data || [])
+    } catch (error) {
+      console.error("Erro ao carregar comunicações:", error)
+    }
   }
 
   if (loading) return <div className="min-h-screen flex items-center justify-center"><div className="w-16 h-16 border-4 border-orange-500 border-t-transparent rounded-full animate-spin" /></div>
@@ -44,7 +79,9 @@ export default function ComunicacoesOperatorPage() {
             <h1 className="text-3xl font-bold mb-2">Comunicações</h1>
             <p className="text-[var(--ink-muted)]">Broadcasts internos e histórico</p>
           </div>
-          <Button className="bg-orange-500 hover:bg-orange-600"><Send className="h-4 w-4 mr-2" /> Novo Broadcast</Button>
+          <Button className="bg-orange-500 hover:bg-orange-600" onClick={() => setIsModalOpen(true)}>
+            <Send className="h-4 w-4 mr-2" /> Novo Broadcast
+          </Button>
         </div>
 
         <div className="grid gap-4">
@@ -59,6 +96,18 @@ export default function ComunicacoesOperatorPage() {
             <Card className="p-12 text-center text-sm text-[var(--ink-muted)]">Nenhuma comunicação ainda.</Card>
           )}
         </div>
+
+        {empresaId && (
+          <BroadcastModal
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+            onSave={() => {
+              load()
+              setIsModalOpen(false)
+            }}
+            empresaId={empresaId}
+          />
+        )}
       </div>
     </AppShell>
   )

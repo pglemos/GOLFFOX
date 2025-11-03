@@ -19,6 +19,8 @@ import { motion } from "framer-motion"
 import toast from "react-hot-toast"
 // @ts-ignore
 import { FuncionarioModal } from "@/components/operator/funcionario-modal"
+// @ts-ignore
+import { CSVImportModal } from "@/components/operator/csv-import-modal"
 
 export default function FuncionariosPage() {
   const router = useRouter()
@@ -28,6 +30,7 @@ export default function FuncionariosPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedFuncionario, setSelectedFuncionario] = useState<any>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isCSVModalOpen, setIsCSVModalOpen] = useState(false)
   const [empresaId, setEmpresaId] = useState<string | null>(null)
 
   useEffect(() => {
@@ -104,7 +107,7 @@ export default function FuncionariosPage() {
             <p className="text-[var(--ink-muted)]">Gerencie os funcionários da sua empresa</p>
           </div>
           <div className="flex gap-2">
-            <Button variant="outline">
+            <Button variant="outline" onClick={() => setIsCSVModalOpen(true)}>
               <Upload className="h-4 w-4 mr-2" />
               Importar CSV
             </Button>
@@ -208,6 +211,18 @@ export default function FuncionariosPage() {
           }}
           empresaId={empresaId || ""}
         />
+
+        {empresaId && (
+          <CSVImportModal
+            isOpen={isCSVModalOpen}
+            onClose={() => setIsCSVModalOpen(false)}
+            onSave={() => {
+              loadFuncionarios()
+              setIsCSVModalOpen(false)
+            }}
+            empresaId={empresaId}
+          />
+        )}
       </div>
     </AppShell>
   )

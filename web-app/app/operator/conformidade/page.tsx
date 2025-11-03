@@ -22,14 +22,40 @@ export default function ConformidadeOperatorPage() {
       if (!session) { router.push("/"); return }
       setUser({ ...session.user })
       setLoading(false)
-      load()
     }
     run()
   }, [router])
 
+  useEffect(() => {
+    if (user?.id) {
+      load()
+    }
+  }, [user?.id])
+
   const load = async () => {
-    const { data } = await supabase.from('gf_operator_incidents').select('*').order('created_at', { ascending: false })
-    setIncidentes(data || [])
+    try {
+      const { data: userData } = await supabase
+        .from('users')
+        .select('company_id')
+        .eq('id', user?.id)
+        .single()
+
+      let query = supabase
+        .from('gf_operator_incidents')
+        .select('*')
+        .order('created_at', { ascending: false })
+
+      if (userData?.company_id) {
+        query = query.eq('empresa_id', userData.company_id)
+      }
+
+      const { data, error } = await query
+
+      if (error) throw error
+      setIncidentes(data || [])
+    } catch (error) {
+      console.error("Erro ao carregar incidentes:", error)
+    }
   }
 
   if (loading) return <div className="min-h-screen flex items-center justify-center"><div className="w-16 h-16 border-4 border-orange-500 border-t-transparent rounded-full animate-spin" /></div>
