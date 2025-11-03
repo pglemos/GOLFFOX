@@ -16,7 +16,7 @@ import { OperatorKPICards } from "@/components/operator/operator-kpi-cards"
 // @ts-ignore
 import { ControlTowerCards } from "@/components/operator/control-tower-cards"
 // @ts-ignore
-import { default as Link } from "next/link"
+import Link from "next/link"
 
 export default function OperatorDashboard() {
   const router = useRouter()

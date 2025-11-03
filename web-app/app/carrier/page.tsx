@@ -115,8 +115,8 @@ export default function CarrierDashboard() {
         setKpis(prev => ({
           ...prev,
           totalFleet: fleetData.length,
-          onRoute: fleetData.filter(v => v.status === 'on-route').length,
-          delayed: fleetData.filter(v => v.status === 'delayed').length
+          onRoute: fleetData.filter((v: any) => v.status === 'on-route').length,
+          delayed: fleetData.filter((v: any) => v.status === 'delayed').length
         }))
       }
 
@@ -134,14 +134,14 @@ export default function CarrierDashboard() {
 
       if (driversData) {
         // Buscar dados de ranking/gamificação
-        const driverIds = driversData.map(d => d.id)
+        const driverIds = driversData.map((d: any) => d.id)
         const { data: rankings } = await supabase
           .from('gf_gamification_scores')
           .select('*')
           .in('driver_id', driverIds)
 
-        const driversWithStats = (driversData || []).map(driver => {
-          const ranking = rankings?.find(r => r.driver_id === driver.id)
+        const driversWithStats = (driversData || []).map((driver: any) => {
+          const ranking = rankings?.find((r: any) => r.driver_id === driver.id)
           return {
             name: driver.name,
             trips: ranking?.trips_completed || 0,
@@ -153,7 +153,7 @@ export default function CarrierDashboard() {
         setDrivers(driversWithStats)
         setKpis(prev => ({
           ...prev,
-          activeDrivers: driversWithStats.filter(d => d.status === 'active').length
+          activeDrivers: driversWithStats.filter((d: any) => d.status === 'active').length
         }))
       }
     } catch (error) {

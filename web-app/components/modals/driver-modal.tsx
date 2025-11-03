@@ -33,6 +33,7 @@ interface DriverDocument {
   expiry_date?: string
   file_url?: string
   file_name?: string
+  is_valid?: boolean
 }
 
 interface DriverModalProps {

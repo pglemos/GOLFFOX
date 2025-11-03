@@ -25,7 +25,7 @@ interface Vehicle {
   prefix?: string
   company_id?: string
   is_active?: boolean
-  photo_url?: string
+  photo_url?: string | null
 }
 
 interface VehicleModalProps {
@@ -119,7 +119,7 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
       let vehicleId = vehicle?.id
 
       // Upload da foto primeiro se houver
-      let photoUrl = formData.photo_url
+      let photoUrl: string | null = formData.photo_url ?? null
       if (photoFile && vehicleId) {
         photoUrl = await uploadPhoto(vehicleId)
       }

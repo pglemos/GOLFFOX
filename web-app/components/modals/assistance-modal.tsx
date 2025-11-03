@@ -74,8 +74,8 @@ export function AssistanceModal({ request, isOpen, onClose, onSave }: Assistance
           .select("driver_id")
           .eq("status", "inProgress")
 
-        const activeDriverIds = new Set(activeTrips?.map(t => t.driver_id) || [])
-        setAvailableDrivers(drivers.filter(d => !activeDriverIds.has(d.id)))
+        const activeDriverIds = new Set(activeTrips?.map((t: any) => t.driver_id) || [])
+        setAvailableDrivers(drivers.filter((d: any) => !activeDriverIds.has(d.id)))
       }
 
       // Carregar veículos disponíveis (sem viagem em andamento)
@@ -90,8 +90,8 @@ export function AssistanceModal({ request, isOpen, onClose, onSave }: Assistance
           .select("vehicle_id")
           .eq("status", "inProgress")
 
-        const activeVehicleIds = new Set(activeTrips?.map(t => t.vehicle_id) || [])
-        setAvailableVehicles(vehicles.filter(v => !activeVehicleIds.has(v.id)))
+        const activeVehicleIds = new Set(activeTrips?.map((t: any) => t.vehicle_id) || [])
+        setAvailableVehicles(vehicles.filter((v: any) => !activeVehicleIds.has(v.id)))
       }
     } catch (error) {
       console.error("Erro ao carregar recursos:", error)

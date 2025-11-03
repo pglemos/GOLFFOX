@@ -6,18 +6,18 @@ import { supabase } from "@/lib/supabase"
 export default function TestAuth() {
   const [user, setUser] = useState<any>(null)
   const [cookies, setCookies] = useState<string>("")
-  const [localStorage, setLocalStorage] = useState<string>("")
+  const [localStorageValue, setLocalStorageValue] = useState<string>("")
 
   useEffect(() => {
     // Verificar sessão atual
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(({ data: { session } }: any) => {
       setUser(session?.user || null)
     })
 
     // Verificar cookies
     if (typeof window !== 'undefined') {
       setCookies(document.cookie)
-      setLocalStorage(window.localStorage.getItem('golffox-user') || 'Nenhum')
+      setLocalStorageValue(window.localStorage.getItem('golffox-user') || 'Nenhum')
     }
   }, [])
 
@@ -41,7 +41,7 @@ export default function TestAuth() {
           role: 'admin',
           accessToken: data.session.access_token
         }
-        localStorage.setItem('golffox-user', JSON.stringify(userData))
+        window.localStorage.setItem('golffox-user', JSON.stringify(userData))
         
         const cookieOptions = 'path=/; max-age=3600; SameSite=Lax'
         document.cookie = `golffox-auth=${data.session.access_token}; ${cookieOptions}`
@@ -49,7 +49,7 @@ export default function TestAuth() {
         
         // Atualizar estado
         setCookies(document.cookie)
-        setLocalStorage(JSON.stringify(userData))
+        setLocalStorageValue(JSON.stringify(userData))
       }
     }
   }
@@ -79,7 +79,7 @@ export default function TestAuth() {
       <div className="mb-4">
         <h2 className="text-lg font-semibold">LocalStorage:</h2>
         <pre className="bg-gray-100 p-2 rounded text-sm">
-          {localStorage}
+          {localStorageValue}
         </pre>
       </div>
 
