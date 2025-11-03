@@ -42,30 +42,124 @@ export default function CarrierDashboard() {
     getUser()
   }, [router])
 
+  const [fleet, setFleet] = useState<any[]>([])
+  const [drivers, setDrivers] = useState<any[]>([])
+  const [kpis, setKpis] = useState({
+    totalFleet: 0,
+    onRoute: 0,
+    activeDrivers: 0,
+    delayed: 0
+  })
+
+  useEffect(() => {
+    if (user) {
+      loadFleetData()
+    }
+  }, [user])
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin mx-auto"></div>
-          <p className="mt-4 text-[var(--muted)]">Loading...</p>
+          <p className="mt-4 text-[var(--ink-muted)]">Carregando...</p>
         </div>
       </div>
     )
   }
 
-  const fleet = [
-    { id: "BUS-01", driver: "João Silva", status: "on-route", route: "Matriz → Curvelo", lastUpdate: "há 2 min" },
-    { id: "BUS-02", driver: "Maria Santos", status: "available", route: "Livre", lastUpdate: "há 5 min" },
-    { id: "BUS-03", driver: "Pedro Costa", status: "delayed", route: "Distrito JK", lastUpdate: "há 15 min" },
-    { id: "BUS-04", driver: "Ana Paula", status: "on-route", route: "Curvelo → Matriz", lastUpdate: "agora" },
-  ]
+  const loadFleetData = async () => {
+    try {
+      // Buscar dados da transportadora
+      const { data: userData } = await supabase
+        .from('users')
+        .select('carrier_id')
+        .eq('id', user?.id)
+        .single()
 
-  const drivers = [
-    { name: "João Silva", trips: 12, rating: 4.8, status: "active" },
-    { name: "Maria Santos", trips: 15, rating: 4.9, status: "active" },
-    { name: "Pedro Costa", trips: 8, rating: 4.7, status: "active" },
-    { name: "Ana Paula", trips: 10, rating: 4.6, status: "break" },
-  ]
+      // Carregar veículos
+      let vehiclesQuery = supabase
+        .from('vehicles')
+        .select('*')
+
+      if (userData?.carrier_id) {
+        vehiclesQuery = vehiclesQuery.eq('carrier_id', userData.carrier_id)
+      }
+
+      const { data: vehicles } = await vehiclesQuery
+
+      // Carregar posições dos veículos
+      if (vehicles && vehicles.length > 0) {
+        const vehicleIds = vehicles.map(v => v.id)
+        const { data: positions } = await supabase
+          .from('driver_positions')
+          .select('*')
+          .in('vehicle_id', vehicleIds)
+          .order('updated_at', { ascending: false })
+
+        // Mapear veículos com posições
+        const fleetData = (vehicles || []).map(vehicle => {
+          const position = positions?.find(p => p.vehicle_id === vehicle.id)
+          return {
+            id: vehicle.id,
+            plate: vehicle.plate,
+            driver: position?.driver_name || 'N/A',
+            status: position ? 'on-route' : vehicle.is_active ? 'available' : 'inactive',
+            route: position?.route_name || 'Livre',
+            lastUpdate: position?.updated_at ? 
+              new Date(position.updated_at).toLocaleString('pt-BR') : 'N/A'
+          }
+        })
+
+        setFleet(fleetData)
+        setKpis(prev => ({
+          ...prev,
+          totalFleet: fleetData.length,
+          onRoute: fleetData.filter(v => v.status === 'on-route').length,
+          delayed: fleetData.filter(v => v.status === 'delayed').length
+        }))
+      }
+
+      // Carregar motoristas
+      let driversQuery = supabase
+        .from('users')
+        .select('*')
+        .eq('role', 'driver')
+
+      if (userData?.carrier_id) {
+        driversQuery = driversQuery.eq('carrier_id', userData.carrier_id)
+      }
+
+      const { data: driversData } = await driversQuery
+
+      if (driversData) {
+        // Buscar dados de ranking/gamificação
+        const driverIds = driversData.map(d => d.id)
+        const { data: rankings } = await supabase
+          .from('gf_gamification_scores')
+          .select('*')
+          .in('driver_id', driverIds)
+
+        const driversWithStats = (driversData || []).map(driver => {
+          const ranking = rankings?.find(r => r.driver_id === driver.id)
+          return {
+            name: driver.name,
+            trips: ranking?.trips_completed || 0,
+            rating: ranking?.total_points ? (ranking.total_points / 100).toFixed(1) : '0.0',
+            status: 'active'
+          }
+        })
+
+        setDrivers(driversWithStats)
+        setKpis(prev => ({
+          ...prev,
+          activeDrivers: driversWithStats.filter(d => d.status === 'active').length
+        }))
+      }
+    } catch (error) {
+      console.error("Erro ao carregar dados da frota:", error)
+    }
+  }
 
   return (
     <AppShell user={{
@@ -78,13 +172,15 @@ export default function CarrierDashboard() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h1 className="text-3xl font-bold mb-2">Fleet Management</h1>
-            <p className="text-[var(--muted)]">Monitor vehicles and drivers in real time</p>
+            <h1 className="text-3xl font-bold mb-2">Gestão de Frota</h1>
+            <p className="text-[var(--ink-muted)]">Monitore veículos e motoristas em tempo real</p>
           </div>
-          <Button>
-            <Truck className="h-4 w-4 mr-2" />
-            Reports
-          </Button>
+            <Button asChild>
+              <a href="/carrier/relatorios">
+                <Truck className="h-4 w-4 mr-2" />
+                Relatórios
+              </a>
+            </Button>
         </div>
 
         {/* Stats */}
@@ -92,8 +188,8 @@ export default function CarrierDashboard() {
           <Card className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-[var(--muted)]">Total Fleet</p>
-                <p className="text-2xl font-bold mt-1">8</p>
+                <p className="text-sm text-[var(--ink-muted)]">Total da Frota</p>
+                <p className="text-2xl font-bold mt-1">{kpis.totalFleet}</p>
               </div>
               <Truck className="h-8 w-8 text-[var(--brand)]" />
             </div>
@@ -102,8 +198,8 @@ export default function CarrierDashboard() {
           <Card className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-[var(--muted)]">On Route</p>
-                <p className="text-2xl font-bold mt-1">5</p>
+                <p className="text-sm text-[var(--ink-muted)]">Em Rota</p>
+                <p className="text-2xl font-bold mt-1">{kpis.onRoute}</p>
               </div>
               <Navigation className="h-8 w-8 text-[var(--accent)]" />
             </div>
@@ -112,8 +208,8 @@ export default function CarrierDashboard() {
           <Card className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-[var(--muted)]">Active Drivers</p>
-                <p className="text-2xl font-bold mt-1">{drivers.filter(d => d.status === "active").length}</p>
+                <p className="text-sm text-[var(--ink-muted)]">Motoristas Ativos</p>
+                <p className="text-2xl font-bold mt-1">{kpis.activeDrivers}</p>
               </div>
               <Users className="h-8 w-8 text-[var(--ok)]" />
             </div>
@@ -122,8 +218,8 @@ export default function CarrierDashboard() {
           <Card className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-[var(--muted)]">Delayed</p>
-                <p className="text-2xl font-bold mt-1">1</p>
+                <p className="text-sm text-[var(--ink-muted)]">Atrasados</p>
+                <p className="text-2xl font-bold mt-1">{kpis.delayed}</p>
               </div>
               <AlertCircle className="h-8 w-8 text-[var(--err)]" />
             </div>
@@ -232,7 +328,7 @@ export default function CarrierDashboard() {
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-2">
                         <Truck className="h-4 w-4 text-[var(--brand)]" />
-                        <span className="font-semibold">{vehicle.id}</span>
+                        <span className="font-semibold">{vehicle.plate || vehicle.id}</span>
                       </div>
                     </td>
                     <td className="py-3 px-4">{vehicle.driver}</td>
@@ -242,8 +338,9 @@ export default function CarrierDashboard() {
                         vehicle.status === "available" ? "bg-[var(--ok)]" :
                         "bg-[var(--err)]"
                       }>
-                        {vehicle.status === "on-route" ? "On Route" :
-                         vehicle.status === "available" ? "Available" : "Delayed"}
+                        {vehicle.status === "on-route" ? "Em Rota" :
+                         vehicle.status === "available" ? "Disponível" : 
+                         vehicle.status === "delayed" ? "Atrasado" : "Inativo"}
                       </Badge>
                     </td>
                     <td className="py-3 px-4">{vehicle.route}</td>

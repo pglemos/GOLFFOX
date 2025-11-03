@@ -1,8 +1,10 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { usePathname } from "next/navigation"
 import { Topbar } from "./topbar"
 import { Sidebar } from "./sidebar"
+import { EnvVarsBanner } from "./env-vars-banner"
 
 interface AppShellProps {
   user: {
@@ -12,11 +14,34 @@ interface AppShellProps {
     role: string
   }
   children: React.ReactNode
+  panel?: 'admin' | 'operator' | 'carrier'
 }
 
-export function AppShell({ user, children }: AppShellProps) {
+export function AppShell({ user, children, panel }: AppShellProps) {
+  const pathname = usePathname()
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
   const [isMobile, setIsMobile] = useState(false)
+  
+  // Detectar painel automaticamente se não fornecido
+  const detectedPanel: 'admin' | 'operator' | 'carrier' = panel || 
+    (pathname?.startsWith('/operator') ? 'operator' : 
+     pathname?.startsWith('/carrier') ? 'carrier' : 'admin')
+  
+  // Configurações de branding por painel
+  const panelConfig = {
+    admin: {
+      branding: 'Admin • Premium',
+      homeUrl: '/admin'
+    },
+    operator: {
+      branding: 'Operador',
+      homeUrl: '/operator'
+    },
+    carrier: {
+      branding: 'Transportadora',
+      homeUrl: '/carrier'
+    }
+  }[detectedPanel]
 
   // Detect mobile screen size
   useEffect(() => {
@@ -34,11 +59,16 @@ export function AppShell({ user, children }: AppShellProps) {
 
   return (
     <div className="min-h-screen bg-[var(--bg)] text-[var(--ink)] overflow-x-hidden">
+      {/* Banner de Variáveis de Ambiente */}
+      <EnvVarsBanner />
+      
       {/* Topbar Fixa */}
       <Topbar 
         user={user} 
         onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
         isSidebarOpen={isSidebarOpen}
+        panelBranding={panelConfig.branding}
+        panelHomeUrl={panelConfig.homeUrl}
       />
 
       {/* Container Principal */}
@@ -51,8 +81,8 @@ export function AppShell({ user, children }: AppShellProps) {
           />
         )}
 
-        {/* Sidebar */}
-        <Sidebar isOpen={isSidebarOpen} isMobile={isMobile} />
+          {/* Sidebar */}
+          <Sidebar isOpen={isSidebarOpen} isMobile={isMobile} panel={detectedPanel} />
 
         {/* Main Content */}
         <main className={`
@@ -60,7 +90,7 @@ export function AppShell({ user, children }: AppShellProps) {
           ${isSidebarOpen && !isMobile ? 'lg:ml-64' : 'ml-0'}
           w-full
         `}>
-          <div className="container-responsive py-4 sm:py-6">
+          <div className="mx-auto max-w-[1600px] px-6 py-6">
             {children}
           </div>
         </main>

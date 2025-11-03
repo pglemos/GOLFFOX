@@ -1,14 +1,12 @@
 {
   "version": 2,
+  "buildCommand": "cd web-app && npm run build",
+  "outputDirectory": "web-app/.next",
+  "installCommand": "cd web-app && npm install",
+  "framework": "nextjs",
   "functions": {
     "app/**/*.js": {
       "maxDuration": 30
     }
-  },
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/"
-    }
-  ]
+  }
 }

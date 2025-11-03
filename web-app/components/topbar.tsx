@@ -16,6 +16,7 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Badge } from "@/components/ui/badge"
 import { 
   DropdownMenu,
   DropdownMenuContent,
@@ -35,9 +36,17 @@ interface TopbarProps {
   }
   onToggleSidebar?: () => void
   isSidebarOpen?: boolean
+  panelBranding?: string
+  panelHomeUrl?: string
 }
 
-export function Topbar({ user, onToggleSidebar, isSidebarOpen: _isSidebarOpen = true }: TopbarProps) {
+export function Topbar({ 
+  user, 
+  onToggleSidebar, 
+  isSidebarOpen: _isSidebarOpen = true,
+  panelBranding = "Admin • Premium",
+  panelHomeUrl = "/admin"
+}: TopbarProps) {
   const router = useRouter()
   const { isTopbarItemActive: _isTopbarItemActive } = useNavigation()
   const [isLoggingOut, setIsLoggingOut] = useState(false)
@@ -145,7 +154,7 @@ export function Topbar({ user, onToggleSidebar, isSidebarOpen: _isSidebarOpen = 
         </Button>
 
         {/* Logo GOLF FOX */}
-        <Link href="/admin" className="flex items-center gap-2 sm:gap-3 flex-shrink-0 group">
+        <Link href={panelHomeUrl} className="flex items-center gap-2 sm:gap-3 flex-shrink-0 group">
           <motion.div
             whileHover={{ scale: 1.05, rotate: 5 }}
             whileTap={{ scale: 0.95 }}
@@ -153,9 +162,14 @@ export function Topbar({ user, onToggleSidebar, isSidebarOpen: _isSidebarOpen = 
           >
             <span className="text-white font-bold text-lg sm:text-xl">G</span>
           </motion.div>
-          <span className="font-bold text-lg sm:text-2xl tracking-tight text-[var(--ink-strong)] hidden xs:block">
-            GOLF FOX
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="font-bold text-lg sm:text-2xl tracking-tight text-[var(--ink-strong)] hidden xs:block">
+              GOLF FOX
+            </span>
+            <Badge className="hidden sm:flex bg-[var(--brand)] text-white border-none px-2 py-0.5 text-xs font-semibold">
+              {panelBranding}
+            </Badge>
+          </div>
         </Link>
 
         {/* Search - Hidden on small screens */}
@@ -178,6 +192,30 @@ export function Topbar({ user, onToggleSidebar, isSidebarOpen: _isSidebarOpen = 
               </div>
             )}
           </div>
+        </div>
+
+        {/* 4 Atalhos */}
+        <div className="hidden lg:flex items-center gap-2 ml-4 border-l border-[var(--border)] pl-4">
+          <Button variant="ghost" size="sm" className="text-xs" asChild>
+            <Link href="/admin">
+              Painel de Gestão
+            </Link>
+          </Button>
+          <Button variant="ghost" size="sm" className="text-xs" asChild>
+            <Link href="/driver">
+              App Motorista
+            </Link>
+          </Button>
+          <Button variant="ghost" size="sm" className="text-xs" asChild>
+            <Link href="/passenger">
+              App Passageiro
+            </Link>
+          </Button>
+          <Button variant="ghost" size="sm" className="text-xs" asChild>
+            <Link href="/operator">
+              Portal do Operador
+            </Link>
+          </Button>
         </div>
 
         {/* Right Actions */}

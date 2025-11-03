@@ -6,15 +6,20 @@ import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { Truck, Plus, Search, Wrench, ClipboardCheck } from "lucide-react"
+import { Truck, Plus, Search, Wrench, ClipboardCheck, Edit, Trash2 } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
+import { VehicleModal } from "@/components/modals/vehicle-modal"
+import { motion } from "framer-motion"
 
 export default function VeiculosPage() {
   const router = useRouter()
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [veiculos, setVeiculos] = useState<any[]>([])
+  const [selectedVehicle, setSelectedVehicle] = useState<any>(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState("")
 
   useEffect(() => {
     const getUser = async () => {
@@ -106,41 +111,121 @@ export default function VeiculosPage() {
             <h1 className="text-3xl font-bold mb-2">Veículos</h1>
             <p className="text-[var(--muted)]">Gerencie a frota de veículos</p>
           </div>
-          <Button>
+          <Button onClick={() => {
+            setSelectedVehicle(null)
+            setIsModalOpen(true)
+          }}>
             <Plus className="h-4 w-4 mr-2" />
             Cadastrar Veículo
           </Button>
         </div>
 
-        <div className="grid gap-4">
-          {veiculos.map((veiculo) => (
-            <Card key={veiculo.id} className="p-4">
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Truck className="h-5 w-5 text-[var(--brand)]" />
-                    <h3 className="font-bold text-lg">{veiculo.plate}</h3>
-                    <Badge>{veiculo.model || "Sem modelo"}</Badge>
-                  </div>
-                  <div className="flex gap-4 text-sm text-[var(--muted)]">
-                    <span>Ano: {veiculo.year || "N/A"}</span>
-                    <span>Status: {veiculo.is_active ? "Ativo" : "Inativo"}</span>
-                  </div>
-                </div>
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm">
-                    <Wrench className="h-4 w-4 mr-2" />
-                    Manutenção
-                  </Button>
-                  <Button variant="outline" size="sm">
-                    <ClipboardCheck className="h-4 w-4 mr-2" />
-                    Checklist
-                  </Button>
-                </div>
-              </div>
-            </Card>
-          ))}
+        {/* Busca */}
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+          <Input
+            placeholder="Buscar veículos por placa, modelo..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10"
+          />
         </div>
+
+        <div className="grid gap-4">
+          {veiculos
+            .filter(v => 
+              searchQuery === "" || 
+              v.plate?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+              v.model?.toLowerCase().includes(searchQuery.toLowerCase())
+            )
+            .map((veiculo) => (
+            <motion.div
+              key={veiculo.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <Card className="p-4 hover:shadow-lg transition-shadow">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1 flex gap-4">
+                    {veiculo.photo_url && (
+                      <img 
+                        src={veiculo.photo_url} 
+                        alt={veiculo.plate}
+                        className="w-20 h-20 rounded-lg object-cover border border-[var(--border)]"
+                      />
+                    )}
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Truck className="h-5 w-5 text-[var(--brand)]" />
+                        <h3 className="font-bold text-lg">{veiculo.plate}</h3>
+                        {veiculo.prefix && (
+                          <Badge variant="outline">Prefixo: {veiculo.prefix}</Badge>
+                        )}
+                        <Badge variant={veiculo.is_active ? "default" : "secondary"}>
+                          {veiculo.is_active ? "Ativo" : "Inativo"}
+                        </Badge>
+                      </div>
+                      <p className="font-medium mb-1">{veiculo.model || "Sem modelo"}</p>
+                      <div className="flex gap-4 text-sm text-[var(--ink-muted)]">
+                        <span>Ano: {veiculo.year || "N/A"}</span>
+                        <span>Capacidade: {veiculo.capacity || "N/A"} lugares</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => {
+                        setSelectedVehicle(veiculo)
+                        setIsModalOpen(true)
+                      }}
+                    >
+                      <Edit className="h-4 w-4 mr-2" />
+                      Editar
+                    </Button>
+                    <Button variant="outline" size="sm">
+                      <Wrench className="h-4 w-4 mr-2" />
+                      Manutenção
+                    </Button>
+                    <Button variant="outline" size="sm">
+                      <ClipboardCheck className="h-4 w-4 mr-2" />
+                      Checklist
+                    </Button>
+                  </div>
+                </div>
+              </Card>
+            </motion.div>
+          ))}
+          {veiculos.length === 0 && (
+            <Card className="p-12 text-center">
+              <Truck className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-lg font-medium mb-2">Nenhum veículo encontrado</h3>
+              <p className="text-sm text-[var(--ink-muted)] mb-4">
+                {searchQuery ? "Tente ajustar sua busca" : "Comece cadastrando seu primeiro veículo"}
+              </p>
+              <Button onClick={() => {
+                setSelectedVehicle(null)
+                setIsModalOpen(true)
+              }}>
+                <Plus className="h-4 w-4 mr-2" />
+                Cadastrar Veículo
+              </Button>
+            </Card>
+          )}
+        </div>
+
+        {/* Modal */}
+        <VehicleModal
+          vehicle={selectedVehicle}
+          isOpen={isModalOpen}
+          onClose={() => {
+            setIsModalOpen(false)
+            setSelectedVehicle(null)
+          }}
+          onSave={loadVeiculos}
+        />
       </div>
     </AppShell>
   )

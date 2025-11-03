@@ -41,40 +41,73 @@ export default function OperatorDashboard() {
 
       setUser({ ...session.user, ...data })
       setLoading(false)
+      loadTrips()
     }
 
     getUser()
   }, [router])
 
-  const trips = [
-    { 
-      id: "TR-001", 
-      route: "Matriz → Curvelo",
-      vehicle: "Ônibus 03",
-      driver: "João Silva",
-      status: "inProgress",
-      scheduled: "08:00",
-      progress: 65
-    },
-    { 
-      id: "TR-002", 
-      route: "Curvelo → Matriz",
-      vehicle: "Ônibus 12",
-      driver: "Maria Santos",
-      status: "scheduled",
-      scheduled: "10:00",
-      progress: 0
-    },
-    { 
-      id: "TR-003", 
-      route: "Distrito JK → Matriz",
-      vehicle: "Ônibus 05",
-      driver: "Pedro Costa",
-      status: "completed",
-      scheduled: "06:00",
-      progress: 100
-    },
-  ]
+  const [trips, setTrips] = useState<any[]>([])
+  const [kpis, setKpis] = useState({
+    total: 0,
+    inProgress: 0,
+    completed: 0
+  })
+
+  const loadTrips = async () => {
+    try {
+      // Buscar viagens relacionadas à empresa do operador
+      const { data: userData } = await supabase
+        .from('users')
+        .select('company_id')
+        .eq('id', user?.id)
+        .single()
+
+      let query = supabase
+        .from('trips')
+        .select(`
+          *,
+          routes(name),
+          vehicles(plate, model),
+          drivers:users!trips_driver_id_fkey(name)
+        `)
+        .order('scheduled_at', { ascending: false })
+        .limit(50)
+
+      if (userData?.company_id) {
+        // Filtrar por company_id se disponível
+        query = query.eq('company_id', userData.company_id)
+      }
+
+      const { data, error } = await query
+
+      if (error) throw error
+      
+      const formattedTrips = (data || []).map(trip => ({
+        id: trip.id,
+        route: trip.routes?.name || 'Rota sem nome',
+        vehicle: trip.vehicles?.plate || trip.vehicles?.model || 'Veículo não informado',
+        driver: trip.drivers?.name || 'Motorista não informado',
+        status: trip.status || 'scheduled',
+        scheduled: trip.scheduled_at ? new Date(trip.scheduled_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : 'N/A',
+        progress: trip.status === 'completed' ? 100 : trip.status === 'inProgress' ? 50 : 0,
+        scheduled_at: trip.scheduled_at
+      }))
+
+      setTrips(formattedTrips)
+      
+      // Calcular KPIs
+      setKpis({
+        total: formattedTrips.length,
+        inProgress: formattedTrips.filter(t => t.status === 'inProgress').length,
+        completed: formattedTrips.filter(t => t.status === 'completed').length
+      })
+    } catch (error) {
+      console.error("Erro ao carregar viagens:", error)
+      // Manter dados vazios em caso de erro
+      setTrips([])
+    }
+  }
 
   if (loading) {
     return (
@@ -135,12 +168,12 @@ export default function OperatorDashboard() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h1 className="text-3xl font-bold mb-2">Operator Panel</h1>
-            <p className="text-[var(--muted)]">Manage trips and routes in real time</p>
+            <h1 className="text-3xl font-bold mb-2">Painel do Operador</h1>
+            <p className="text-[var(--ink-muted)]">Gerencie viagens e rotas em tempo real</p>
           </div>
           <Button>
             <Truck className="h-4 w-4 mr-2" />
-            New Trip
+            Nova Viagem
           </Button>
         </div>
 
@@ -151,7 +184,7 @@ export default function OperatorDashboard() {
             <div className="relative flex-1 max-w-md">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--muted)]" />
               <Input
-                placeholder="Search by ID, route, vehicle, driver..."
+                placeholder="Buscar por ID, rota, veículo, motorista..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10"
@@ -167,9 +200,9 @@ export default function OperatorDashboard() {
                   size="sm"
                   onClick={() => setStatusFilter(status)}
                 >
-                  {status === "all" ? "All" : 
-                   status === "inProgress" ? "In Progress" :
-                   status === "completed" ? "Completed" : "Scheduled"}
+                  {status === "all" ? "Todos" : 
+                   status === "inProgress" ? "Em Andamento" :
+                   status === "completed" ? "Concluídas" : "Agendadas"}
                 </Button>
               ))}
             </div>
@@ -181,8 +214,8 @@ export default function OperatorDashboard() {
           <Card className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-[var(--muted)]">Total Trips</p>
-                <p className="text-2xl font-bold mt-1">{trips.length}</p>
+                <p className="text-sm text-[var(--ink-muted)]">Total de Viagens</p>
+                <p className="text-2xl font-bold mt-1">{kpis.total}</p>
               </div>
               <MapPin className="h-8 w-8 text-[var(--brand)]" />
             </div>
@@ -191,8 +224,8 @@ export default function OperatorDashboard() {
           <Card className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-[var(--muted)]">In Progress</p>
-                <p className="text-2xl font-bold mt-1">{trips.filter(t => t.status === "inProgress").length}</p>
+                <p className="text-sm text-[var(--ink-muted)]">Em Andamento</p>
+                <p className="text-2xl font-bold mt-1">{kpis.inProgress}</p>
               </div>
               <Clock className="h-8 w-8 text-[var(--warning)]" />
             </div>
@@ -201,8 +234,8 @@ export default function OperatorDashboard() {
           <Card className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-[var(--muted)]">Completed (Today)</p>
-                <p className="text-2xl font-bold mt-1">{trips.filter(t => t.status === "completed").length}</p>
+                <p className="text-sm text-[var(--ink-muted)]">Concluídas</p>
+                <p className="text-2xl font-bold mt-1">{kpis.completed}</p>
               </div>
               <CheckCircle className="h-8 w-8 text-[var(--ok)]" />
             </div>
@@ -212,15 +245,15 @@ export default function OperatorDashboard() {
         {/* Trips List */}
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold">Trips</h2>
-            <span className="text-sm text-[var(--muted)]">{filteredTrips.length} trip(s)</span>
+            <h2 className="text-xl font-bold">Viagens</h2>
+            <span className="text-sm text-[var(--ink-muted)]">{filteredTrips.length} viagem(ns)</span>
           </div>
 
           {filteredTrips.length === 0 ? (
             <Card className="p-12 text-center">
               <MapPin className="h-16 w-16 mx-auto mb-4 text-[var(--muted)]" />
-              <h3 className="text-lg font-semibold mb-2">No trips found</h3>
-              <p className="text-sm text-[var(--muted)]">Try adjusting the filters or create a new trip</p>
+              <h3 className="text-lg font-semibold mb-2">Nenhuma viagem encontrada</h3>
+              <p className="text-sm text-[var(--ink-muted)]">Tente ajustar os filtros ou criar uma nova viagem</p>
             </Card>
           ) : (
             <div className="space-y-3">
@@ -236,7 +269,9 @@ export default function OperatorDashboard() {
                         <div className="flex items-center gap-2 mb-2">
                           <span className="font-bold">#{trip.id}</span>
                           <Badge className={getStatusColor(trip.status)}>
-                            {getStatusLabel(trip.status)}
+                            {trip.status === "inProgress" ? "Em Andamento" :
+                             trip.status === "completed" ? "Concluída" :
+                             trip.status === "scheduled" ? "Agendada" : trip.status}
                           </Badge>
                         </div>
                         
@@ -279,12 +314,12 @@ export default function OperatorDashboard() {
                     {/* Actions */}
                     <div className="flex flex-col gap-2">
                       <Button size="sm" variant="outline">
-                        View details
+                        Ver Detalhes
                       </Button>
                       {trip.status === "inProgress" && (
                         <Button size="sm" variant="ghost">
                           <XCircle className="h-4 w-4 mr-1" />
-                          Cancel
+                          Cancelar
                         </Button>
                       )}
                     </div>

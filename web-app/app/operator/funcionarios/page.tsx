@@ -5,27 +5,19 @@ import { AppShell } from "@/components/app-shell"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Users, Plus, Search, MapPin } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
+import { Users, Plus, Search, Mail, Phone, Building } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
-import { geocodeAddress } from "@/lib/google-maps"
+import { motion } from "framer-motion"
+import toast from "react-hot-toast"
 
 export default function FuncionariosPage() {
   const router = useRouter()
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [funcionarios, setFuncionarios] = useState<any[]>([])
-  const [empresas, setEmpresas] = useState<any[]>([])
-  const [formData, setFormData] = useState({
-    name: "",
-    cpf: "",
-    address: "",
-    company_id: "",
-    phone: "",
-    email: ""
-  })
-  const [showForm, setShowForm] = useState(false)
-  const [geocoding, setGeocoding] = useState(false)
+  const [searchQuery, setSearchQuery] = useState("")
 
   useEffect(() => {
     const getUser = async () => {
@@ -36,67 +28,46 @@ export default function FuncionariosPage() {
       }
       setUser({ ...session.user })
       setLoading(false)
-      loadData()
+      loadFuncionarios()
     }
     getUser()
   }, [router])
 
-  const loadData = async () => {
+  const loadFuncionarios = async () => {
     try {
-      const [funcResult, empResult] = await Promise.all([
-        supabase.from("gf_employee_company").select("*, companies(name)").eq("is_active", true),
-        supabase.from("companies").select("*").eq("is_active", true)
-      ])
-
-      if (funcResult.error) throw funcResult.error
-      if (empResult.error) throw empResult.error
-
-      setFuncionarios(funcResult.data || [])
-      setEmpresas(empResult.data || [])
-    } catch (error) {
-      console.error("Erro ao carregar dados:", error)
-    }
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setGeocoding(true)
-
-    try {
-      // Geocodificar endereço
-      const location = await geocodeAddress(formData.address)
-
-      // Gerar senha automática (por enquanto simples, pode melhorar)
-      const generatedPassword = `${formData.cpf.slice(-6)}${Math.random().toString(36).slice(-4)}`
-
-      const { data, error } = await supabase
-        .from("gf_employee_company")
-        .insert({
-          name: formData.name,
-          cpf: formData.cpf,
-          address: formData.address,
-          company_id: formData.company_id,
-          phone: formData.phone,
-          email: formData.email,
-          login_cpf: formData.cpf,
-          password_hash: generatedPassword, // Em produção, hash adequado
-          latitude: location?.lat || null,
-          longitude: location?.lng || null,
-          created_by: user?.id
-        })
-        .select()
+      // Buscar funcionários associados à empresa do operador
+      const { data: userData } = await supabase
+        .from('users')
+        .select('company_id')
+        .eq('id', user?.id)
         .single()
 
-      if (error) throw error
+      if (userData?.company_id) {
+        const { data, error } = await supabase
+          .from('gf_employee_company')
+          .select(`
+            *,
+            employee:users!gf_employee_company_employee_id_fkey(id, name, email, phone)
+          `)
+          .eq('company_id', userData.company_id)
 
-      alert(`Funcionário cadastrado!\nLogin: ${formData.cpf}\nSenha: ${generatedPassword}`)
-      setFormData({ name: "", cpf: "", address: "", company_id: "", phone: "", email: "" })
-      setShowForm(false)
-      loadData()
+        if (error) throw error
+        setFuncionarios(data || [])
+      } else {
+        // Se não tem company_id, buscar todos os funcionários
+        const { data, error } = await supabase
+          .from('gf_employee_company')
+          .select(`
+            *,
+            employee:users!gf_employee_company_employee_id_fkey(id, name, email, phone)
+          `)
+
+        if (error) throw error
+        setFuncionarios(data || [])
+      }
     } catch (error: any) {
-      alert(`Erro ao cadastrar: ${error.message}`)
-    } finally {
-      setGeocoding(false)
+      console.error("Erro ao carregar funcionários:", error)
+      toast.error("Erro ao carregar funcionários")
     }
   }
 
@@ -104,116 +75,94 @@ export default function FuncionariosPage() {
     return <div className="min-h-screen flex items-center justify-center"><div className="w-16 h-16 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin mx-auto"></div></div>
   }
 
+  const filteredFuncionarios = funcionarios.filter(f => {
+    const employee = f.employee
+    if (!employee) return false
+    return searchQuery === "" || 
+      employee.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      employee.email?.toLowerCase().includes(searchQuery.toLowerCase())
+  })
+
   return (
     <AppShell user={{ id: user?.id || "", name: user?.name || "Operador", email: user?.email || "", role: "operator" }}>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold mb-2">Funcionários</h1>
-            <p className="text-[var(--muted)]">Cadastre funcionários para automação de passageiros</p>
+            <p className="text-[var(--ink-muted)]">Gerencie os funcionários da sua empresa</p>
           </div>
-          <Button onClick={() => setShowForm(!showForm)}>
+          <Button>
             <Plus className="h-4 w-4 mr-2" />
-            {showForm ? "Cancelar" : "Cadastrar Funcionário"}
+            Adicionar Funcionário
           </Button>
         </div>
 
-        {showForm && (
-          <Card className="p-6">
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2">Nome</label>
-                  <Input
-                    required
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    placeholder="Nome completo"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">CPF</label>
-                  <Input
-                    required
-                    value={formData.cpf}
-                    onChange={(e) => setFormData({ ...formData, cpf: e.target.value })}
-                    placeholder="000.000.000-00"
-                  />
-                </div>
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium mb-2">Endereço Completo</label>
-                  <Input
-                    required
-                    value={formData.address}
-                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                    placeholder="Rua, número, bairro, cidade"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">Empresa</label>
-                  <select
-                    required
-                    className="w-full px-3 py-2 rounded-xl border border-[var(--muted)]/20 bg-[var(--bg-soft)]"
-                    value={formData.company_id}
-                    onChange={(e) => setFormData({ ...formData, company_id: e.target.value })}
-                  >
-                    <option value="">Selecione uma empresa</option>
-                    {empresas.map(emp => (
-                      <option key={emp.id} value={emp.id}>{emp.name}</option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">Telefone</label>
-                  <Input
-                    value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    placeholder="(00) 00000-0000"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">Email</label>
-                  <Input
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    placeholder="email@empresa.com"
-                  />
-                </div>
-              </div>
-              <Button type="submit" disabled={geocoding} className="w-full">
-                {geocoding ? "Geocodificando endereço..." : "Cadastrar Funcionário"}
-              </Button>
-            </form>
-          </Card>
-        )}
+        {/* Busca */}
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+          <Input
+            placeholder="Buscar funcionários por nome, email..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10"
+          />
+        </div>
 
         <div className="grid gap-4">
-          {funcionarios.map((func) => (
-            <Card key={func.id} className="p-4">
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Users className="h-5 w-5 text-[var(--brand)]" />
-                    <h3 className="font-bold text-lg">{func.name}</h3>
+          {filteredFuncionarios.map((funcionario, index) => {
+            const employee = funcionario.employee
+            return (
+              <motion.div
+                key={funcionario.id || index}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.05 }}
+              >
+                <Card className="p-4 hover:shadow-lg transition-shadow">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Users className="h-5 w-5 text-[var(--brand)]" />
+                        <h3 className="font-bold text-lg">{employee?.name || "Nome não disponível"}</h3>
+                        <Badge variant="outline">Funcionário</Badge>
+                      </div>
+                      <div className="space-y-1 text-sm text-[var(--ink-muted)]">
+                        {employee?.email && (
+                          <div className="flex items-center gap-2">
+                            <Mail className="h-4 w-4" />
+                            <span>{employee.email}</span>
+                          </div>
+                        )}
+                        {employee?.phone && (
+                          <div className="flex items-center gap-2">
+                            <Phone className="h-4 w-4" />
+                            <span>{employee.phone}</span>
+                          </div>
+                        )}
+                        {funcionario.company_id && (
+                          <div className="flex items-center gap-2">
+                            <Building className="h-4 w-4" />
+                            <span>Empresa: {funcionario.company_id}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                  <p className="text-sm text-[var(--muted)] mb-1">CPF: {func.cpf}</p>
-                  <p className="text-sm text-[var(--muted)] mb-1">Login: {func.login_cpf}</p>
-                  <p className="text-sm text-[var(--muted)] mb-1">Endereço: {func.address}</p>
-                  <p className="text-sm text-[var(--muted)]">Empresa: {func.companies?.name || "N/A"}</p>
-                  {func.latitude && func.longitude && (
-                    <p className="text-xs text-[var(--muted)] mt-2">
-                      <MapPin className="h-3 w-3 inline mr-1" />
-                      {func.latitude.toFixed(6)}, {func.longitude.toFixed(6)}
-                    </p>
-                  )}
-                </div>
-              </div>
+                </Card>
+              </motion.div>
+            )
+          })}
+          {filteredFuncionarios.length === 0 && (
+            <Card className="p-12 text-center">
+              <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-lg font-medium mb-2">Nenhum funcionário encontrado</h3>
+              <p className="text-sm text-[var(--ink-muted)] mb-4">
+                {searchQuery ? "Tente ajustar sua busca" : "Comece adicionando funcionários à sua empresa"}
+              </p>
             </Card>
-          ))}
+          )}
         </div>
       </div>
     </AppShell>
   )
 }
-

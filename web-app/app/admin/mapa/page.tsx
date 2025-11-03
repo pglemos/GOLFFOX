@@ -4,14 +4,26 @@ import { useEffect, useState } from "react"
 import { AppShell } from "@/components/app-shell"
 import { FleetMap } from "@/components/fleet-map"
 import { supabase } from "@/lib/supabase"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { motion } from "framer-motion"
 import { MapPin } from "lucide-react"
 
 export default function MapaPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
+  
+  // Ler parâmetros da URL para rota específica
+  const routeId = searchParams?.get('route') || null
+  const latParam = searchParams?.get('lat')
+  const lngParam = searchParams?.get('lng')
+  const zoomParam = searchParams?.get('zoom')
+  
+  const initialCenter = latParam && lngParam 
+    ? { lat: parseFloat(latParam), lng: parseFloat(lngParam) }
+    : null
+  const initialZoom = zoomParam ? parseInt(zoomParam, 10) : null
 
   useEffect(() => {
     const getUser = async () => {
@@ -68,7 +80,11 @@ export default function MapaPage() {
           </div>
         </motion.div>
 
-        <FleetMap />
+        <FleetMap 
+          routeId={routeId || undefined}
+          initialCenter={initialCenter || undefined}
+          initialZoom={initialZoom || undefined}
+        />
       </div>
     </AppShell>
   )

@@ -20,7 +20,8 @@ import { cn } from "@/lib/utils"
 import { listItem, staggerContainer, sidebarHighlight } from "@/lib/animations"
 import { useNavigation } from "@/hooks/use-navigation"
 
-const menuItems = [
+// Menus por painel
+const adminMenuItems = [
   { 
     icon: LayoutDashboard, 
     label: "Dashboard", 
@@ -95,13 +96,99 @@ const menuItems = [
   }
 ]
 
+const operatorMenuItems = [
+  { 
+    icon: LayoutDashboard, 
+    label: "Dashboard", 
+    href: "/operator",
+    description: "Visão geral do operador"
+  },
+  { 
+    icon: Users, 
+    label: "Funcionários", 
+    href: "/operator/funcionarios",
+    description: "Portal do Operador"
+  },
+  { 
+    icon: Navigation, 
+    label: "Rotas", 
+    href: "/operator/rotas",
+    description: "Rotas atribuídas"
+  },
+  { 
+    icon: AlertTriangle, 
+    label: "Alertas", 
+    href: "/operator/alertas",
+    description: "Notificações"
+  },
+  { 
+    icon: HelpCircle, 
+    label: "Ajuda", 
+    href: "/operator/ajuda",
+    description: "Central de ajuda"
+  }
+]
+
+const carrierMenuItems = [
+  { 
+    icon: LayoutDashboard, 
+    label: "Dashboard", 
+    href: "/carrier",
+    description: "Visão geral da transportadora"
+  },
+  { 
+    icon: MapPin, 
+    label: "Mapa", 
+    href: "/carrier/mapa",
+    description: "Frota em tempo real"
+  },
+  { 
+    icon: Truck, 
+    label: "Veículos", 
+    href: "/carrier/veiculos",
+    description: "Frota da transportadora"
+  },
+  { 
+    icon: Users, 
+    label: "Motoristas", 
+    href: "/carrier/motoristas",
+    description: "Motoristas da transportadora"
+  },
+  { 
+    icon: AlertTriangle, 
+    label: "Alertas", 
+    href: "/carrier/alertas",
+    description: "Notificações"
+  },
+  { 
+    icon: BarChart3, 
+    label: "Relatórios", 
+    href: "/carrier/relatorios",
+    description: "Relatórios da transportadora"
+  },
+  { 
+    icon: HelpCircle, 
+    label: "Ajuda", 
+    href: "/carrier/ajuda",
+    description: "Central de ajuda"
+  }
+]
+
 interface SidebarProps {
   isOpen?: boolean
   isMobile?: boolean
+  panel?: 'admin' | 'operator' | 'carrier'
 }
 
-export function Sidebar({ isOpen = true, isMobile = false }: SidebarProps) {
+export function Sidebar({ isOpen = true, isMobile = false, panel = 'admin' }: SidebarProps) {
   const { isSidebarItemActive } = useNavigation()
+  
+  // Selecionar menu baseado no painel
+  const menuItems = panel === 'operator' 
+    ? operatorMenuItems 
+    : panel === 'carrier' 
+    ? carrierMenuItems 
+    : adminMenuItems
 
   return (
     <AnimatePresence>
@@ -186,7 +273,7 @@ export function Sidebar({ isOpen = true, isMobile = false }: SidebarProps) {
                   <span className="text-white text-xs font-bold">GF</span>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-bold text-[var(--ink-strong)] truncate">GolfFox v41.0</p>
+                  <p className="text-xs font-bold text-[var(--ink-strong)] truncate">GOLF FOX v42.0</p>
                   <p className="text-xs text-[var(--ink-muted)] truncate">Premium UI</p>
                 </div>
               </div>

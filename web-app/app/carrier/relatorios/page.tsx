@@ -2,19 +2,15 @@
 
 import { useEffect, useState } from "react"
 import { AppShell } from "@/components/app-shell"
-import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
 import { BarChart3, Download, FileText, Calendar, Filter } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 import { 
   exportToCSV, 
   exportToExcel, 
-  exportToPDF,
-  formatDelaysReport,
-  formatOccupancyReport,
-  formatNotBoardedReport
+  exportToPDF
 } from "@/lib/export-utils"
 import toast from "react-hot-toast"
 import { 
@@ -23,6 +19,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { Input } from "@/components/ui/input"
 import { motion } from "framer-motion"
 
 interface ReportConfig {
@@ -30,54 +27,33 @@ interface ReportConfig {
   title: string
   description: string
   icon: typeof FileText
-  viewName?: string
-  formatter?: (rows: any[]) => any
 }
 
-export default function RelatoriosPage() {
+export default function CarrierRelatoriosPage() {
   const router = useRouter()
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [dateStart, setDateStart] = useState(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0])
   const [dateEnd, setDateEnd] = useState(new Date().toISOString().split('T')[0])
-  const [selectedCompany, setSelectedCompany] = useState<string>("")
 
   const reports: ReportConfig[] = [
     { 
-      id: 'delays',
-      title: 'Atrasos', 
-      description: 'Análise de atrasos por rota, motorista e horário',
-      icon: BarChart3,
-      viewName: 'v_reports_delays',
-      formatter: formatDelaysReport
-    },
-    { 
-      id: 'occupancy',
-      title: 'Ocupação', 
-      description: 'Ocupação por horário (heatmap)',
-      icon: BarChart3,
-      viewName: 'v_reports_occupancy',
-      formatter: formatOccupancyReport
-    },
-    { 
-      id: 'not_boarded',
-      title: 'Não Embarcados', 
-      description: 'Passageiros que não embarcaram',
-      icon: FileText,
-      viewName: 'v_reports_not_boarded',
-      formatter: formatNotBoardedReport
-    },
-    { 
-      id: 'routes',
-      title: 'Rotas Eficientes', 
-      description: 'Análise de eficiência das rotas',
-      icon: FileText
+      id: 'fleet',
+      title: 'Frota em Uso', 
+      description: 'Relatório de utilização da frota',
+      icon: BarChart3
     },
     { 
       id: 'drivers',
-      title: 'Ranking de Motoristas', 
-      description: 'Ranking por pontualidade, eficiência e conclusão',
+      title: 'Performance de Motoristas', 
+      description: 'Análise de desempenho dos motoristas',
       icon: BarChart3
+    },
+    { 
+      id: 'trips',
+      title: 'Viagens Realizadas', 
+      description: 'Relatório de viagens completadas',
+      icon: FileText
     },
   ]
 
@@ -96,40 +72,12 @@ export default function RelatoriosPage() {
 
   const handleExport = async (report: ReportConfig, format: 'csv' | 'excel' | 'pdf') => {
     try {
-      let data: any[] = []
-
-      if (report.viewName) {
-        // Buscar dados da view
-        let query = supabase.from(report.viewName).select('*')
-        
-        if (dateStart) {
-          query = query.gte('scheduled_at', dateStart)
-        }
-        if (dateEnd) {
-          query = query.lte('scheduled_at', dateEnd + 'T23:59:59')
-        }
-
-        const { data: viewData, error } = await query
-        
-        if (error) throw error
-        data = viewData || []
-      } else {
-        // Para relatórios sem view, usar dados básicos
-        data = []
-      }
-
-      let formattedData: any
-
-      if (report.formatter) {
-        formattedData = report.formatter(data)
-      } else {
-        // Formato padrão
-        formattedData = {
-          title: report.title,
-          description: report.description,
-          headers: ['Data', 'Informações'],
-          rows: data.map((row: any) => [new Date().toLocaleDateString('pt-BR'), JSON.stringify(row)])
-        }
+      // Dados básicos para o relatório
+      const formattedData = {
+        title: report.title,
+        description: report.description,
+        headers: ['Data', 'Informações'],
+        rows: [[new Date().toLocaleDateString('pt-BR'), `Relatório ${report.title} - Em desenvolvimento`]]
       }
 
       const filename = `${report.id}-${dateStart}-${dateEnd}.${format === 'excel' ? 'xlsx' : format}`
@@ -159,11 +107,11 @@ export default function RelatoriosPage() {
   }
 
   return (
-    <AppShell user={{ id: user?.id || "", name: user?.name || "Admin", email: user?.email || "", role: "admin" }}>
+    <AppShell user={{ id: user?.id || "", name: user?.name || "Transportadora", email: user?.email || "", role: "carrier" }}>
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold mb-2">Relatórios</h1>
-          <p className="text-[var(--ink-muted)]">Visões de operação e análises</p>
+          <p className="text-[var(--ink-muted)]">Relatórios da transportadora</p>
         </div>
 
         {/* Filtros */}
@@ -172,7 +120,7 @@ export default function RelatoriosPage() {
             <Filter className="h-5 w-5 text-[var(--brand)]" />
             <h3 className="font-semibold">Filtros</h3>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <label className="text-sm font-medium">Data Início</label>
               <div className="relative">
@@ -196,14 +144,6 @@ export default function RelatoriosPage() {
                   className="pl-10"
                 />
               </div>
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Empresa</label>
-              <Input
-                placeholder="Todas as empresas"
-                value={selectedCompany}
-                onChange={(e) => setSelectedCompany(e.target.value)}
-              />
             </div>
           </div>
         </Card>

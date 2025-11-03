@@ -19,6 +19,8 @@ import { supabase } from "@/lib/supabase"
 import { motion, AnimatePresence } from "framer-motion"
 import { modalContent } from "@/lib/animations"
 import { loadGoogleMapsAPI } from "@/lib/google-maps-loader"
+import { TemporalProgressBar } from "./temporal-progress-bar"
+import { InteractiveMarkerHotspot } from "./interactive-marker-hotspot"
 
 // Declaração de tipos para Google Maps
 declare global {
@@ -58,6 +60,8 @@ interface Stop {
   address: string
   stop_name: string
   passenger_name?: string
+  passenger_id?: string
+  estimated_arrival?: string
 }
 
 interface Route {
@@ -69,9 +73,11 @@ interface Route {
 interface FleetMapProps {
   companyId?: string
   routeId?: string
+  initialCenter?: { lat: number; lng: number }
+  initialZoom?: number
 }
 
-export function FleetMap({ companyId, routeId }: FleetMapProps) {
+export function FleetMap({ companyId, routeId, initialCenter, initialZoom }: FleetMapProps) {
   const mapRef = useRef<HTMLDivElement>(null)
   const mapInstanceRef = useRef<google.maps.Map | null>(null)
   const markersRef = useRef<Map<string, google.maps.Marker>>(new Map())
@@ -82,11 +88,20 @@ export function FleetMap({ companyId, routeId }: FleetMapProps) {
   const [routes, setRoutes] = useState<Route[]>([])
   const [loading, setLoading] = useState(true)
   const [mapError, setMapError] = useState<string | null>(null)
+  const [selectedStopId, setSelectedStopId] = useState<string | null>(null)
+  const [hotspotPosition, setHotspotPosition] = useState<{ x: number; y: number } | null>(null)
   const [filters, setFilters] = useState({
     company: companyId || '',
     route: routeId || '',
     status: ''
   })
+
+  // Atualizar filtro quando routeId mudar
+  useEffect(() => {
+    if (routeId) {
+      setFilters(prev => ({ ...prev, route: routeId }))
+    }
+  }, [routeId])
 
   // Cores dos ônibus
   const busColors = {
@@ -334,9 +349,10 @@ export function FleetMap({ companyId, routeId }: FleetMapProps) {
         // Google Maps API carregada com sucesso
         
         // Criando instância do mapa...
+        const defaultCenter = { lat: -19.916681, lng: -43.934493 }
         const map = new google.maps.Map(mapRef.current, {
-          center: { lat: -19.916681, lng: -43.934493 },
-          zoom: 12,
+          center: initialCenter || defaultCenter,
+          zoom: initialZoom || 12,
           styles: [
             {
               featureType: "poi",
@@ -453,45 +469,187 @@ export function FleetMap({ companyId, routeId }: FleetMapProps) {
           markersRef.current.set(bus.id, marker)
         })
 
-        // Adicionar pontos de parada (se rota selecionada)
+        // Adicionar pontos de parada (se rota selecionada) com SVG marcadores
         if (selectedBus || filters.route) {
-          stops
+          const routeStops = stops
             .filter(stop => !selectedBus || stop.route_id === selectedBus.route_id)
-            .forEach(stop => {
-              const marker = new google.maps.Marker({
-                position: { lat: stop.lat, lng: stop.lng },
-                map,
-                icon: {
-                  path: 'M 0,0 C -2,-20 -10,-22 -10,-30 A 10,10 0 1,1 10,-30 C 10,-22 2,-20 0,0 z',
-                  fillColor: '#3B82F6',
-                  fillOpacity: 1,
-                  strokeColor: '#FFFFFF',
-                  strokeWeight: 2,
-                  scale: 0.8,
-                },
-                title: stop.stop_name || stop.address
-              })
-
-              markersRef.current.set(`stop-${stop.id}`, marker)
+            .sort((a, b) => a.stop_order - b.stop_order)
+          
+          routeStops.forEach((stop, index) => {
+            // Determinar se é embarque ou desembarque (por padrão, par ímpar = embarque, par = desembarque)
+            const isPickup = index === 0 || index % 2 === 0
+            const stopType = isPickup ? 'pickup' : 'dropoff'
+            
+            // Criar SVG para marcador (círculo para embarque, quadrado para desembarque)
+            const markerSize = 32
+            const svgMarkup = stopType === 'pickup'
+              ? `<svg width="${markerSize}" height="${markerSize}" xmlns="http://www.w3.org/2000/svg">
+                   <circle cx="${markerSize/2}" cy="${markerSize/2}" r="${markerSize/2 - 2}" fill="#10B981" stroke="#FFFFFF" stroke-width="2"/>
+                   <text x="50%" y="50%" text-anchor="middle" dominant-baseline="central" fill="#FFFFFF" font-size="14" font-weight="bold">${index + 1}</text>
+                 </svg>`
+              : `<svg width="${markerSize}" height="${markerSize}" xmlns="http://www.w3.org/2000/svg">
+                   <rect x="2" y="2" width="${markerSize - 4}" height="${markerSize - 4}" fill="#F59E0B" stroke="#FFFFFF" stroke-width="2" rx="4"/>
+                   <text x="50%" y="50%" text-anchor="middle" dominant-baseline="central" fill="#FFFFFF" font-size="14" font-weight="bold">${index + 1}</text>
+                 </svg>`
+            
+            const icon = {
+              url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svgMarkup),
+              scaledSize: new google.maps.Size(markerSize, markerSize),
+              anchor: new google.maps.Point(markerSize/2, markerSize/2)
+            }
+            
+            const marker = new google.maps.Marker({
+              position: { lat: stop.lat, lng: stop.lng },
+              map,
+              icon,
+              title: `${stop.stop_name || stop.address} - Parada ${index + 1}`,
+              label: {
+                text: `${index + 1}`,
+                color: '#FFFFFF',
+                fontSize: '12px',
+                fontWeight: 'bold'
+              },
+              zIndex: 1000 + index
             })
+
+            // Adicionar tooltip persistente ao passar o mouse
+            const infoWindow = new google.maps.InfoWindow({
+              content: `
+                <div style="padding: 8px; min-width: 200px;">
+                  <div style="font-weight: bold; margin-bottom: 4px; font-size: 14px;">
+                    ${stop.passenger_name || stop.stop_name || 'Parada sem nome'}
+                  </div>
+                  <div style="font-size: 12px; color: #666; margin-bottom: 4px;">
+                    ${stop.address || 'Endereço não informado'}
+                  </div>
+                  <div style="font-size: 11px; color: #888;">
+                    Horário: ${stop.estimated_arrival ? new Date(stop.estimated_arrival).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : 'Não definido'}
+                  </div>
+                </div>
+              `,
+              pixelOffset: new google.maps.Size(0, -10)
+            })
+
+            marker.addListener('mouseover', () => {
+              infoWindow.open(map, marker)
+            })
+
+            marker.addListener('mouseout', () => {
+              // Manter tooltip aberto (persistente)
+            })
+
+            marker.addListener('click', (e: any) => {
+              // Fechar tooltip ao clicar para não sobrepor com hotspot
+              infoWindow.close()
+              
+              // Calcular posição do hotspot baseado no evento do mapa
+              if (e && mapInstanceRef.current) {
+                const overlay = new google.maps.OverlayView()
+                overlay.draw = () => {
+                  const projection = overlay.getProjection()
+                  if (projection && e.latLng) {
+                    const point = projection.fromLatLngToContainerPixel(e.latLng)
+                    if (point) {
+                      setHotspotPosition({ x: point.x, y: point.y })
+                      setSelectedStopId(stop.id)
+                    }
+                  }
+                }
+                overlay.setMap(mapInstanceRef.current)
+                setTimeout(() => overlay.setMap(null), 100)
+              } else {
+                // Fallback: usar posição central do marcador
+                if (mapInstanceRef.current) {
+                  const bounds = mapInstanceRef.current.getBounds()
+                  if (bounds) {
+                    const ne = bounds.getNorthEast()
+                    const sw = bounds.getSouthWest()
+                    if (ne && sw) {
+                      const centerPixel = mapInstanceRef.current.getProjection()?.fromLatLngToPoint(
+                        new google.maps.LatLng(stop.lat, stop.lng)
+                      )
+                      if (centerPixel) {
+                        const scale = Math.pow(2, mapInstanceRef.current.getZoom() || 12)
+                        const worldCoordinate = new google.maps.Point(
+                          centerPixel.x * scale,
+                          centerPixel.y * scale
+                        )
+                        setHotspotPosition({ 
+                          x: worldCoordinate.x, 
+                          y: worldCoordinate.y 
+                        })
+                      }
+                    }
+                  }
+                }
+              }
+            })
+
+            markersRef.current.set(`stop-${stop.id}`, marker)
+          })
         }
 
-        // Desenhar polylines das rotas
+        // Desenhar polylines das rotas com linha contínua #2E7D32 e sombra
         if (selectedBus || filters.route) {
           routes
             .filter(route => !selectedBus || route.id === selectedBus.route_id)
             .forEach(route => {
               if (route.polyline_points && route.polyline_points.length > 0) {
+                // Linha principal - cor #2E7D32, 4px, com sombra
                 const polyline = new google.maps.Polyline({
                   path: route.polyline_points.map(p => ({ lat: p.lat, lng: p.lng })),
                   geodesic: true,
-                  strokeColor: '#3B82F6',
-                  strokeOpacity: 0.6,
-                  strokeWeight: 4
+                  strokeColor: '#2E7D32',
+                  strokeOpacity: 1.0,
+                  strokeWeight: 4,
+                  zIndex: 500
                 })
 
                 polyline.setMap(map)
                 polylineRef.current = polyline
+                
+                // Linha de sombra (para efeito de profundidade)
+                const shadowPolyline = new google.maps.Polyline({
+                  path: route.polyline_points.map(p => ({ lat: p.lat, lng: p.lng })),
+                  geodesic: true,
+                  strokeColor: '#000000',
+                  strokeOpacity: 0.3,
+                  strokeWeight: 6,
+                  zIndex: 499
+                })
+                shadowPolyline.setMap(map)
+              } else {
+                // Se não tem polyline_points, criar linha conectando as paradas
+                const routeStops = stops
+                  .filter(stop => stop.route_id === route.id)
+                  .sort((a, b) => a.stop_order - b.stop_order)
+                
+                if (routeStops.length > 1) {
+                  const stopPath = routeStops.map(stop => ({ lat: stop.lat, lng: stop.lng }))
+                  
+                  const polyline = new google.maps.Polyline({
+                    path: stopPath,
+                    geodesic: true,
+                    strokeColor: '#2E7D32',
+                    strokeOpacity: 1.0,
+                    strokeWeight: 4,
+                    zIndex: 500
+                  })
+
+                  polyline.setMap(map)
+                  polylineRef.current = polyline
+                  
+                  // Sombra
+                  const shadowPolyline = new google.maps.Polyline({
+                    path: stopPath,
+                    geodesic: true,
+                    strokeColor: '#000000',
+                    strokeOpacity: 0.3,
+                    strokeWeight: 6,
+                    zIndex: 499
+                  })
+                  shadowPolyline.setMap(map)
+                }
               }
             })
         }
@@ -565,10 +723,94 @@ export function FleetMap({ companyId, routeId }: FleetMapProps) {
     )
   }
 
+  // Calcular paradas formatadas para a barra temporal
+  const formattedStops = stops
+    .filter(stop => selectedBus?.route_id === stop.route_id || filters.route === stop.route_id)
+    .sort((a, b) => a.stop_order - b.stop_order)
+    .map((stop, index) => ({
+      id: stop.id,
+      scheduledTime: stop.estimated_arrival || new Date().toISOString(),
+      address: stop.address || stop.stop_name || '',
+      type: (index === 0 || index % 2 === 0 ? 'pickup' : 'dropoff') as 'pickup' | 'dropoff',
+      passengerName: stop.passenger_name || stop.stop_name || ''
+    }))
+
+  // Calcular tempo total da rota
+  const calculateRouteDuration = () => {
+    if (formattedStops.length < 2) return '00:00'
+    const first = formattedStops[0]
+    const last = formattedStops[formattedStops.length - 1]
+    if (!first || !last) return '00:00'
+    
+    const startTime = new Date(first.scheduledTime)
+    const endTime = new Date(last.scheduledTime)
+    const duration = endTime.getTime() - startTime.getTime()
+    const hours = Math.floor(duration / (1000 * 60 * 60))
+    const minutes = Math.floor((duration % (1000 * 60 * 60)) / (1000 * 60))
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`
+  }
+
+  const routeDuration = calculateRouteDuration()
+
+  // Calcular zoom automático para englobar todos os pontos quando routeId mudar
+  useEffect(() => {
+    if (!mapInstanceRef.current || !routeId || stops.length === 0) return
+
+    const routeStops = stops
+      .filter(stop => stop.route_id === routeId)
+      .sort((a, b) => a.stop_order - b.stop_order)
+
+    if (routeStops.length === 0) return
+
+    const bounds = new google.maps.LatLngBounds()
+    routeStops.forEach(stop => {
+      bounds.extend(new google.maps.LatLng(stop.lat, stop.lng))
+    })
+
+    // Adicionar margem de 20%
+    const ne = bounds.getNorthEast()
+    const sw = bounds.getSouthWest()
+    if (!ne || !sw) return
+
+    const latMargin = (ne.lat() - sw.lat()) * 0.2
+    const lngMargin = (ne.lng() - sw.lng()) * 0.2
+
+    bounds.extend(new google.maps.LatLng(ne.lat() + latMargin, ne.lng() + lngMargin))
+    bounds.extend(new google.maps.LatLng(sw.lat() - latMargin, sw.lng() - lngMargin))
+
+    mapInstanceRef.current.fitBounds(bounds)
+  }, [routeId, stops])
+
   return (
-    <div className="relative w-full h-[calc(100vh-300px)] rounded-[var(--radius-xl)] overflow-hidden border border-[var(--border)] shadow-lg">
+    <div className="relative w-full rounded-[var(--radius-xl)] overflow-hidden border border-[var(--border)] shadow-lg">
+      {/* Barra Superior Fixa com Tempo Total */}
+      {(selectedBus || filters.route) && formattedStops.length > 0 && (
+        <div className="absolute top-0 left-0 right-0 z-30 bg-white/95 backdrop-blur-sm border-b border-[var(--border)] px-6 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div>
+              <div className="text-xs text-[var(--ink-muted)]">Tempo Total da Rota</div>
+              <div className="text-2xl font-bold text-[var(--ink-strong)] font-mono">
+                {routeDuration}
+              </div>
+            </div>
+            {selectedBus && (
+              <div className="border-l border-[var(--border)] pl-4">
+                <div className="text-xs text-[var(--ink-muted)]">Veículo</div>
+                <div className="text-lg font-semibold">{selectedBus.vehicle_plate}</div>
+              </div>
+            )}
+          </div>
+          <div className="text-sm text-[var(--ink-muted)]">
+            {formattedStops.length} paradas
+          </div>
+        </div>
+      )}
+
       {/* Mapa */}
-      <div ref={mapRef} className="w-full h-full" />
+      <div 
+        ref={mapRef} 
+        className={`w-full ${(selectedBus || filters.route) && formattedStops.length > 0 ? 'h-[calc(100vh-450px)]' : 'h-[calc(100vh-300px)]'}`}
+      />
 
       {/* Filtros Flutuantes */}
       <motion.div
@@ -604,6 +846,54 @@ export function FleetMap({ companyId, routeId }: FleetMapProps) {
           </div>
         </Card>
       </motion.div>
+
+      {/* Barra Temporal Interativa */}
+      {(selectedBus || filters.route) && formattedStops.length > 0 && (
+        <div className="absolute bottom-0 left-0 right-0 z-30 bg-white border-t border-[var(--border)]">
+          <TemporalProgressBar stops={formattedStops} />
+        </div>
+      )}
+
+      {/* Hotspot Interativo para Parada Selecionada */}
+      {selectedStopId && hotspotPosition && (() => {
+        const selectedStop = stops.find(s => s.id === selectedStopId)
+        if (!selectedStop) return null
+        
+        const stopIndex = formattedStops.findIndex(s => s.id === selectedStopId)
+        const stopType = stopIndex >= 0 ? formattedStops[stopIndex].type : 'pickup'
+        
+        return (
+          <InteractiveMarkerHotspot
+            stop={{
+              id: selectedStop.id,
+              type: stopType,
+              address: selectedStop.address || selectedStop.stop_name || '',
+              scheduledTime: selectedStop.estimated_arrival || new Date().toISOString(),
+              passenger: {
+                id: selectedStop.passenger_id || '',
+                name: selectedStop.passenger_name || selectedStop.stop_name || 'Passageiro',
+                type: 'regular',
+                photo: undefined
+              },
+              coordinates: { lat: selectedStop.lat, lng: selectedStop.lng },
+              stopNumber: stopIndex + 1,
+              isCompleted: false,
+              isCurrent: false
+            }}
+            position={hotspotPosition}
+            onClose={() => {
+              setSelectedStopId(null)
+              setHotspotPosition(null)
+            }}
+            onCenterMap={(coords) => {
+              if (mapInstanceRef.current) {
+                mapInstanceRef.current.setCenter(coords)
+                mapInstanceRef.current.setZoom(16)
+              }
+            }}
+          />
+        )
+      })()}
 
       {/* Ações flutuantes */}
       <div className="absolute bottom-6 right-6 z-10 flex flex-col gap-2">
