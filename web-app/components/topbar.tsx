@@ -166,9 +166,6 @@ export function Topbar({
             <span className="font-bold text-lg sm:text-2xl tracking-tight text-[var(--ink-strong)] hidden xs:block">
               GOLF FOX
             </span>
-            <Badge className="hidden sm:flex bg-[var(--brand)] text-white border-none px-2 py-0.5 text-xs font-semibold">
-              {panelBranding}
-            </Badge>
           </div>
         </Link>
 
@@ -194,29 +191,7 @@ export function Topbar({
           </div>
         </div>
 
-        {/* 4 Atalhos */}
-        <div className="hidden lg:flex items-center gap-2 ml-4 border-l border-[var(--border)] pl-4">
-          <Button variant="ghost" size="sm" className="text-xs" asChild>
-            <Link href="/admin">
-              Painel de Gestão
-            </Link>
-          </Button>
-          <Button variant="ghost" size="sm" className="text-xs" asChild>
-            <Link href="/driver">
-              App Motorista
-            </Link>
-          </Button>
-          <Button variant="ghost" size="sm" className="text-xs" asChild>
-            <Link href="/passenger">
-              App Passageiro
-            </Link>
-          </Button>
-          <Button variant="ghost" size="sm" className="text-xs" asChild>
-            <Link href="/operator">
-              Portal do Operador
-            </Link>
-          </Button>
-        </div>
+
 
         {/* Right Actions */}
         <div className="flex items-center gap-2 ml-auto">{/* Mobile search button */}

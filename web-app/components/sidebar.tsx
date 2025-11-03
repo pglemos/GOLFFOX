@@ -272,10 +272,6 @@ export function Sidebar({ isOpen = true, isMobile = false, panel = 'admin' }: Si
                 <div className="w-8 h-8 rounded-lg gradient-brand flex items-center justify-center flex-shrink-0 shadow-sm">
                   <span className="text-white text-xs font-bold">GF</span>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs font-bold text-[var(--ink-strong)] truncate">GOLF FOX v42.0</p>
-                  <p className="text-xs text-[var(--ink-muted)] truncate">Premium UI</p>
-                </div>
               </div>
             </div>
           </nav>

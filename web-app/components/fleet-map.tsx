@@ -99,7 +99,7 @@ export function FleetMap({ companyId, routeId, initialCenter, initialZoom }: Fle
   // Atualizar filtro quando routeId mudar
   useEffect(() => {
     if (routeId) {
-      setFilters(prev => ({ ...prev, route: routeId }))
+      setFilters(prev => ({ ...prev, route: routeId || '' }))
     }
   }, [routeId])
 
