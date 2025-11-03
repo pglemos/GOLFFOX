@@ -11,7 +11,7 @@ SELECT
     FROM public.trip_passengers tp
     JOIN public.trips t ON tp.trip_id = t.id
     WHERE t.status = 'inProgress'
-      AND tp.status IN ('pending', 'confirmed', 'pickedup')
+      AND tp.status IN ('pending', 'confirmed', 'pickedup', 'picked_up')
   ) AS colaboradores_em_transito,
   
   -- Veículos Ativos
@@ -78,7 +78,7 @@ SELECT
     ELSE EXTRACT(EPOCH FROM (t.completed_at - t.scheduled_at)) / 60
   END AS total_delay_minutes,
   COUNT(DISTINCT tp.id) AS total_passengers,
-  COUNT(DISTINCT CASE WHEN tp.status = 'pickedup' THEN tp.id END) AS picked_up_passengers
+  COUNT(DISTINCT CASE WHEN tp.status IN ('pickedup', 'picked_up') THEN tp.id END) AS picked_up_passengers
 FROM public.trips t
 JOIN public.routes r ON t.route_id = r.id
 LEFT JOIN public.trip_passengers tp ON tp.trip_id = t.id
@@ -116,8 +116,8 @@ SELECT
   t.scheduled_at,
   CASE 
     WHEN t.completed_at IS NULL THEN 'trip_not_completed'
-    WHEN tp.status = 'confirmed' THEN 'missed_pickup'
-    WHEN tp.status = 'pending' THEN 'never_confirmed'
+    WHEN tp.status IN ('confirmed') THEN 'missed_pickup'
+    WHEN tp.status IN ('pending') THEN 'never_confirmed'
     ELSE 'other'
   END AS reason,
   COALESCE(a.description, 'Sem motivo informado') AS alert_description
@@ -126,7 +126,7 @@ JOIN public.routes r ON t.route_id = r.id
 JOIN public.trip_passengers tp ON tp.trip_id = t.id
 LEFT JOIN public.gf_alerts a ON a.trip_id = t.id AND a.affected_user_id = tp.passenger_id
 WHERE t.status = 'completed'
-  AND tp.status NOT IN ('pickedup', 'completed', 'dropped_off');
+  AND tp.status NOT IN ('pickedup', 'picked_up', 'completed', 'dropped_off');
 
 -- Tabela: Cache de Relatórios Pesados
 CREATE TABLE IF NOT EXISTS public.gf_reports_cache (

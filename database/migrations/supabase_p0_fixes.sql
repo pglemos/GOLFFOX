@@ -8,23 +8,22 @@
 -- ============================================================================
 
 -- ============================================================================
--- 1. FIX RLS HELPER FUNCTION - Return UUID instead of TEXT
 -- ============================================================================
 
 -- Drop existing function
-DROP FUNCTION IF EXISTS get_user_carrier_id();
+DROP FUNCTION IF EXISTS public.get_user_carrier_id();
 
 -- Recreate with correct UUID return type
-CREATE OR REPLACE FUNCTION get_user_carrier_id()
+CREATE OR REPLACE FUNCTION public.get_user_carrier_id()
 RETURNS uuid 
 LANGUAGE sql 
 STABLE 
 SECURITY DEFINER 
 AS $$
-  SELECT carrier_id FROM users WHERE id = auth.uid();
+  SELECT carrier_id::uuid FROM public.users WHERE id = auth.uid();
 $$;
 
-COMMENT ON FUNCTION get_user_carrier_id() IS 'Returns the carrier_id for the current authenticated user (used in RLS policies)';
+COMMENT ON FUNCTION public.get_user_carrier_id() IS 'Returns the carrier_id for the current authenticated user (used in RLS policies)';
 
 
 -- ============================================================================
@@ -32,18 +31,18 @@ COMMENT ON FUNCTION get_user_carrier_id() IS 'Returns the carrier_id for the cur
 -- ============================================================================
 
 -- Drop existing policies that used the old function
-DROP POLICY IF EXISTS "routes_select_policy" ON routes;
-DROP POLICY IF EXISTS "routes_insert_policy" ON routes;
-DROP POLICY IF EXISTS "routes_update_policy" ON routes;
-DROP POLICY IF EXISTS "routes_delete_policy" ON routes;
+DROP POLICY IF EXISTS "routes_select_policy" ON public.routes;
+DROP POLICY IF EXISTS "routes_insert_policy" ON public.routes;
+DROP POLICY IF EXISTS "routes_update_policy" ON public.routes;
+DROP POLICY IF EXISTS "routes_delete_policy" ON public.routes;
 
 -- Recreate SELECT policy with proper role-based filtering
-CREATE POLICY "routes_select_policy" ON routes
+CREATE POLICY "routes_select_policy" ON public.routes
 FOR SELECT USING (
-  CASE get_user_role()
+  CASE public.get_user_role()
     WHEN 'admin' THEN true
-    WHEN 'operator' THEN company_id = get_user_company_id()
-    WHEN 'carrier' THEN carrier_id = get_user_carrier_id()
+    WHEN 'operator' THEN company_id = public.get_user_company_id()
+    WHEN 'carrier' THEN carrier_id = public.get_user_carrier_id()
     WHEN 'driver' THEN true
     WHEN 'passenger' THEN true
     ELSE false
@@ -51,34 +50,34 @@ FOR SELECT USING (
 );
 
 -- Carrier can insert routes for their carrier_id
-CREATE POLICY "routes_insert_policy" ON routes
+CREATE POLICY "routes_insert_policy" ON public.routes
 FOR INSERT WITH CHECK (
-  CASE get_user_role()
+  CASE public.get_user_role()
     WHEN 'admin' THEN true
-    WHEN 'operator' THEN company_id = get_user_company_id()
-    WHEN 'carrier' THEN carrier_id = get_user_carrier_id()
+    WHEN 'operator' THEN company_id = public.get_user_company_id()
+    WHEN 'carrier' THEN carrier_id = public.get_user_carrier_id()
     ELSE false
   END
 );
 
 -- Carrier can update their own routes
-CREATE POLICY "routes_update_policy" ON routes
+CREATE POLICY "routes_update_policy" ON public.routes
 FOR UPDATE USING (
-  CASE get_user_role()
+  CASE public.get_user_role()
     WHEN 'admin' THEN true
-    WHEN 'operator' THEN company_id = get_user_company_id()
-    WHEN 'carrier' THEN carrier_id = get_user_carrier_id()
+    WHEN 'operator' THEN company_id = public.get_user_company_id()
+    WHEN 'carrier' THEN carrier_id = public.get_user_carrier_id()
     ELSE false
   END
 );
 
 -- Carrier can delete their own routes
-CREATE POLICY "routes_delete_policy" ON routes
+CREATE POLICY "routes_delete_policy" ON public.routes
 FOR DELETE USING (
-  CASE get_user_role()
+  CASE public.get_user_role()
     WHEN 'admin' THEN true
-    WHEN 'operator' THEN company_id = get_user_company_id()
-    WHEN 'carrier' THEN carrier_id = get_user_carrier_id()
+    WHEN 'operator' THEN company_id = public.get_user_company_id()
+    WHEN 'carrier' THEN carrier_id = public.get_user_carrier_id()
     ELSE false
   END
 );
@@ -88,46 +87,46 @@ FOR DELETE USING (
 -- 3. FIX VEHICLES TABLE RLS (Carrier filtering)
 -- ============================================================================
 
-DROP POLICY IF EXISTS "vehicles_select_policy" ON vehicles;
-DROP POLICY IF EXISTS "vehicles_insert_policy" ON vehicles;
-DROP POLICY IF EXISTS "vehicles_update_policy" ON vehicles;
-DROP POLICY IF EXISTS "vehicles_delete_policy" ON vehicles;
+DROP POLICY IF EXISTS "vehicles_select_policy" ON public.vehicles;
+DROP POLICY IF EXISTS "vehicles_insert_policy" ON public.vehicles;
+DROP POLICY IF EXISTS "vehicles_update_policy" ON public.vehicles;
+DROP POLICY IF EXISTS "vehicles_delete_policy" ON public.vehicles;
 
-CREATE POLICY "vehicles_select_policy" ON vehicles
+CREATE POLICY "vehicles_select_policy" ON public.vehicles
 FOR SELECT USING (
-  CASE get_user_role()
+  CASE public.get_user_role()
     WHEN 'admin' THEN true
-    WHEN 'carrier' THEN carrier_id = get_user_carrier_id()
+    WHEN 'carrier' THEN carrier_id = public.get_user_carrier_id()
     WHEN 'driver' THEN id IN (
-      SELECT vehicle_id FROM trips WHERE driver_id = auth.uid()
+      SELECT vehicle_id FROM public.trips WHERE driver_id = auth.uid()
     )
     ELSE false
   END
 );
 
-CREATE POLICY "vehicles_insert_policy" ON vehicles
+CREATE POLICY "vehicles_insert_policy" ON public.vehicles
 FOR INSERT WITH CHECK (
-  CASE get_user_role()
+  CASE public.get_user_role()
     WHEN 'admin' THEN true
-    WHEN 'carrier' THEN carrier_id = get_user_carrier_id()
+    WHEN 'carrier' THEN carrier_id = public.get_user_carrier_id()
     ELSE false
   END
 );
 
-CREATE POLICY "vehicles_update_policy" ON vehicles
+CREATE POLICY "vehicles_update_policy" ON public.vehicles
 FOR UPDATE USING (
-  CASE get_user_role()
+  CASE public.get_user_role()
     WHEN 'admin' THEN true
-    WHEN 'carrier' THEN carrier_id = get_user_carrier_id()
+    WHEN 'carrier' THEN carrier_id = public.get_user_carrier_id()
     ELSE false
   END
 );
 
-CREATE POLICY "vehicles_delete_policy" ON vehicles
+CREATE POLICY "vehicles_delete_policy" ON public.vehicles
 FOR DELETE USING (
-  CASE get_user_role()
+  CASE public.get_user_role()
     WHEN 'admin' THEN true
-    WHEN 'carrier' THEN carrier_id = get_user_carrier_id()
+    WHEN 'carrier' THEN carrier_id = public.get_user_carrier_id()
     ELSE false
   END
 );
@@ -138,17 +137,17 @@ FOR DELETE USING (
 -- ============================================================================
 
 -- Ensure driver_positions policies are correct
-DROP POLICY IF EXISTS "driver_positions_select_policy" ON driver_positions;
-DROP POLICY IF EXISTS "driver_positions_insert_policy" ON driver_positions;
+DROP POLICY IF EXISTS "driver_positions_select_policy" ON public.driver_positions;
+DROP POLICY IF EXISTS "driver_positions_insert_policy" ON public.driver_positions;
 
 -- Anyone authenticated can view positions (filtered by trip access)
-CREATE POLICY "driver_positions_select_policy" ON driver_positions
+CREATE POLICY "driver_positions_select_policy" ON public.driver_positions
 FOR SELECT USING (
   auth.role() = 'authenticated'
 );
 
 -- Only the driver can insert their own positions
-CREATE POLICY "driver_positions_insert_policy" ON driver_positions
+CREATE POLICY "driver_positions_insert_policy" ON public.driver_positions
 FOR INSERT WITH CHECK (
   driver_id = auth.uid()
 );
@@ -159,10 +158,10 @@ FOR INSERT WITH CHECK (
 -- ============================================================================
 
 -- Enable realtime replication for driver_positions table
-ALTER PUBLICATION supabase_realtime ADD TABLE driver_positions;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.driver_positions;
 
 -- Verify realtime is enabled (this will show in logs)
-COMMENT ON TABLE driver_positions IS 'Real-time GPS tracking positions for trips (Realtime enabled)';
+COMMENT ON TABLE public.driver_positions IS 'Real-time GPS tracking positions for trips (Realtime enabled)';
 
 
 -- ============================================================================
@@ -171,23 +170,23 @@ COMMENT ON TABLE driver_positions IS 'Real-time GPS tracking positions for trips
 
 -- Index for real-time queries filtered by trip_id
 CREATE INDEX IF NOT EXISTS idx_driver_positions_trip_id 
-ON driver_positions(trip_id, timestamp DESC);
+ON public.driver_positions(trip_id, timestamp DESC);
 
 -- Index for driver queries
 CREATE INDEX IF NOT EXISTS idx_driver_positions_driver_id 
-ON driver_positions(driver_id, timestamp DESC);
+ON public.driver_positions(driver_id, timestamp DESC);
 
 -- Composite index for trip + driver queries
 CREATE INDEX IF NOT EXISTS idx_driver_positions_trip_driver 
-ON driver_positions(trip_id, driver_id, timestamp DESC);
+ON public.driver_positions(trip_id, driver_id, timestamp DESC);
 
 -- Index for routes carrier filtering
 CREATE INDEX IF NOT EXISTS idx_routes_carrier_id 
-ON routes(carrier_id);
+ON public.routes(carrier_id);
 
 -- Index for vehicles carrier filtering
 CREATE INDEX IF NOT EXISTS idx_vehicles_carrier_id 
-ON vehicles(carrier_id);
+ON public.vehicles(carrier_id);
 
 
 -- ============================================================================
@@ -212,20 +211,20 @@ END $$;
 -- ============================================================================
 
 -- Revoke all default permissions
-REVOKE ALL ON driver_positions FROM PUBLIC;
-REVOKE ALL ON routes FROM PUBLIC;
-REVOKE ALL ON vehicles FROM PUBLIC;
+REVOKE ALL ON public.driver_positions FROM PUBLIC;
+REVOKE ALL ON public.routes FROM PUBLIC;
+REVOKE ALL ON public.vehicles FROM PUBLIC;
 
 -- Grant only necessary permissions to authenticated users (RLS will control)
-GRANT SELECT, INSERT ON driver_positions TO authenticated;
-GRANT SELECT ON routes TO authenticated;
-GRANT SELECT ON vehicles TO authenticated;
+GRANT SELECT, INSERT ON public.driver_positions TO authenticated;
+GRANT SELECT ON public.routes TO authenticated;
+GRANT SELECT ON public.vehicles TO authenticated;
 
 -- Admin/Operator/Carrier can modify routes
-GRANT INSERT, UPDATE, DELETE ON routes TO authenticated;
+GRANT INSERT, UPDATE, DELETE ON public.routes TO authenticated;
 
 -- Carrier can modify vehicles
-GRANT INSERT, UPDATE, DELETE ON vehicles TO authenticated;
+GRANT INSERT, UPDATE, DELETE ON public.vehicles TO authenticated;
 
 
 -- ============================================================================

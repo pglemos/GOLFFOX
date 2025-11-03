@@ -3,8 +3,7 @@
 -- Criação da tabela para posições dos veículos com suporte a real-time
 -- ========================================
 
--- Criar tabela de posições dos veículos
-CREATE TABLE IF NOT EXISTS vehicle_positions (
+CREATE TABLE IF NOT EXISTS public.vehicle_positions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   vehicle_id VARCHAR(50) NOT NULL,
   license_plate VARCHAR(20) NOT NULL,
@@ -24,13 +23,13 @@ CREATE TABLE IF NOT EXISTS vehicle_positions (
 );
 
 -- Criar índices para performance
-CREATE INDEX IF NOT EXISTS idx_vehicle_positions_vehicle_id ON vehicle_positions(vehicle_id);
-CREATE INDEX IF NOT EXISTS idx_vehicle_positions_route_id ON vehicle_positions(route_id);
-CREATE INDEX IF NOT EXISTS idx_vehicle_positions_status ON vehicle_positions(status);
-CREATE INDEX IF NOT EXISTS idx_vehicle_positions_last_update ON vehicle_positions(last_update);
+CREATE INDEX IF NOT EXISTS idx_vehicle_positions_vehicle_id ON public.vehicle_positions(vehicle_id);
+CREATE INDEX IF NOT EXISTS idx_vehicle_positions_route_id ON public.vehicle_positions(route_id);
+CREATE INDEX IF NOT EXISTS idx_vehicle_positions_status ON public.vehicle_positions(status);
+CREATE INDEX IF NOT EXISTS idx_vehicle_positions_last_update ON public.vehicle_positions(last_update);
 
 -- Criar função para atualizar updated_at automaticamente
-CREATE OR REPLACE FUNCTION update_updated_at_column()
+CREATE OR REPLACE FUNCTION public.update_updated_at_column()
 RETURNS TRIGGER AS $$
 BEGIN
     NEW.updated_at = NOW();
@@ -40,23 +39,23 @@ $$ language 'plpgsql';
 
 -- Criar trigger para atualizar updated_at
 CREATE TRIGGER update_vehicle_positions_updated_at 
-    BEFORE UPDATE ON vehicle_positions 
+    BEFORE UPDATE ON public.vehicle_positions 
     FOR EACH ROW 
-    EXECUTE FUNCTION update_updated_at_column();
+    EXECUTE FUNCTION public.update_updated_at_column();
 
 -- Habilitar Row Level Security (RLS)
-ALTER TABLE vehicle_positions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.vehicle_positions ENABLE ROW LEVEL SECURITY;
 
 -- Política para permitir leitura para usuários autenticados
-CREATE POLICY "Allow read access for authenticated users" ON vehicle_positions
+CREATE POLICY "Allow read access for authenticated users" ON public.vehicle_positions
     FOR SELECT USING (auth.role() = 'authenticated');
 
 -- Política para permitir inserção/atualização para usuários autenticados
-CREATE POLICY "Allow insert/update for authenticated users" ON vehicle_positions
+CREATE POLICY "Allow insert/update for authenticated users" ON public.vehicle_positions
     FOR ALL USING (auth.role() = 'authenticated');
 
 -- Inserir dados mock para demonstração
-INSERT INTO vehicle_positions (
+INSERT INTO public.vehicle_positions (
     vehicle_id, license_plate, driver_name, latitude, longitude, 
     status, speed, heading, route_id, route_name, passenger_count, capacity
 ) VALUES 
