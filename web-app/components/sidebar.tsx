@@ -123,7 +123,7 @@ export function Sidebar({ isOpen = true, isMobile = false }: SidebarProps) {
               animate="visible"
               className="space-y-1 flex-1"
             >
-              {menuItems.map((item, i) => {
+              {menuItems.map((item, _i) => {
                 const Icon = item.icon
                 const isActive = isSidebarItemActive(item.href)
                 

@@ -73,9 +73,11 @@ export function AccessibilityControls({
 
   const handleFontSizeChange = (value: number[]) => {
     const newSize = value[0]
-    setFontSize(newSize)
-    document.documentElement.style.fontSize = `${newSize}px`
-    announce(`Tamanho da fonte alterado para ${newSize} pixels`)
+    if (newSize !== undefined) {
+      setFontSize(newSize)
+      document.documentElement.style.fontSize = `${newSize}px`
+      announce(`Tamanho da fonte alterado para ${newSize} pixels`)
+    }
   }
 
   const handleAnimationToggle = (enabled: boolean) => {

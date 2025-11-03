@@ -1,7 +1,6 @@
 "use client"
 
 import * as React from "react"
-import { motion, AnimatePresence } from "framer-motion"
 import { Filter, X } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "./button"
@@ -15,8 +14,6 @@ interface FilterBarProps {
 
 const FilterBar = React.forwardRef<HTMLDivElement, FilterBarProps>(
   ({ className, children, onClear, activeCount = 0, ...props }, ref) => {
-    const [isOpen, setIsOpen] = React.useState(true)
-
     return (
       <div ref={ref} className={cn("filter-bar", className)} {...props}>
         <div className="flex items-center gap-2 flex-shrink-0">

@@ -17,7 +17,7 @@ import {
 } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { motion, AnimatePresence } from "framer-motion"
-import { scaleIn, modalBackdrop, modalContent } from "@/lib/animations"
+import { modalContent } from "@/lib/animations"
 
 // Declaração de tipos para Google Maps
 declare global {
@@ -96,7 +96,7 @@ export function FleetMap({ companyId, routeId }: FleetMapProps) {
   }
 
   // Ícone de ônibus
-  const getBusIcon = useCallback((color: string, heading: number = 0) => {
+  const getBusIcon = useCallback((color: string, _heading: number = 0) => {
     if (typeof google === 'undefined' || !google.maps) {
       return undefined
     }
@@ -287,12 +287,12 @@ export function FleetMap({ companyId, routeId }: FleetMapProps) {
       script.defer = true
       
       script.onload = () => {
-        console.log('Script do Google Maps carregado')
+        // Script do Google Maps carregado
         resolve()
       }
       
-      script.onerror = (error) => {
-        console.error('Erro ao carregar script do Google Maps:', error)
+      script.onerror = (_error) => {
+        // Erro ao carregar script do Google Maps
         reject(new Error('Falha ao carregar Google Maps API'))
       }
       
@@ -307,14 +307,14 @@ export function FleetMap({ companyId, routeId }: FleetMapProps) {
       'AIzaSyD79t05YxpU2RnEczY-NSDxhdbY9OvigsM' // Fallback para a chave configurada
     
     if (!apiKey || apiKey === 'AIzaSyD79t05YxpU2RnEczY-NSDxhdbY9OvigsM') {
-      console.error('NEXT_PUBLIC_GOOGLE_MAPS_API_KEY não configurado')
+      // NEXT_PUBLIC_GOOGLE_MAPS_API_KEY não configurado
       setMapError('API Key do Google Maps não configurada. Verifique as variáveis de ambiente.')
       return null
     }
 
     // Validar formato básico da API key
     if (!apiKey.startsWith('AIza') || apiKey.length < 35) {
-      console.error('API Key do Google Maps parece inválida:', apiKey.substring(0, 10) + '...')
+      // API Key do Google Maps parece inválida
       setMapError('API Key do Google Maps parece inválida. Verifique a configuração no Google Cloud Console.')
       return null
     }
@@ -325,10 +325,10 @@ export function FleetMap({ companyId, routeId }: FleetMapProps) {
   // Inicializar mapa
   useEffect(() => {
     const initMap = async () => {
-      console.log('Inicializando mapa...')
+      // Inicializando mapa...
       
       const apiKey = getGoogleMapsApiKey()
-      console.log('API Key disponível:', !!apiKey)
+      // API Key disponível
       
       if (!apiKey) {
         // Erro já foi definido na função getGoogleMapsApiKey
@@ -341,22 +341,22 @@ export function FleetMap({ companyId, routeId }: FleetMapProps) {
       const maxAttempts = 50 // 5 segundos máximo
       
       while (!mapRef.current && attempts < maxAttempts) {
-        console.log(`Aguardando mapRef... tentativa ${attempts + 1}`)
+        // Aguardando mapRef...
         await new Promise(resolve => setTimeout(resolve, 100))
         attempts++
       }
 
       if (!mapRef.current) {
-        console.error('Elemento do mapa não encontrado após aguardar')
+        // Elemento do mapa não encontrado após aguardar
         setMapError('Elemento do mapa não foi encontrado.')
         setLoading(false)
         return
       }
 
-      console.log('mapRef.current disponível:', !!mapRef.current)
+      // mapRef.current disponível
 
       try {
-        console.log('Carregando Google Maps API...')
+        // Carregando Google Maps API...
         
         // Adicionar listener para erros do Google Maps
         const originalConsoleError = console.error
@@ -377,9 +377,9 @@ export function FleetMap({ companyId, routeId }: FleetMapProps) {
           await loadGoogleMapsScript(apiKey)
         }
         
-        console.log('Google Maps API carregada com sucesso')
+        // Google Maps API carregada com sucesso
         
-        console.log('Criando instância do mapa...')
+        // Criando instância do mapa...
         const map = new google.maps.Map(mapRef.current, {
           center: { lat: -19.916681, lng: -43.934493 },
           zoom: 12,
@@ -402,21 +402,20 @@ export function FleetMap({ companyId, routeId }: FleetMapProps) {
           disableDefaultUI: false
         })
 
-        console.log('Mapa criado com sucesso')
+        // Mapa criado com sucesso
         mapInstanceRef.current = map
         
         // Carregar dados após o mapa estar pronto
-        console.log('Carregando dados do mapa...')
+        // Carregando dados do mapa...
         await loadMapData()
-        console.log('Dados do mapa carregados')
+        // Dados do mapa carregados
         setLoading(false)
       } catch (error) {
-        console.error('Erro detalhado ao carregar Google Maps:', error)
+        // Erro detalhado ao carregar Google Maps
         let errorMessage = 'Erro ao carregar o mapa. Verifique sua conexão com a internet.'
         
         if (error instanceof Error) {
-          console.error('Mensagem do erro:', error.message)
-          console.error('Stack trace:', error.stack)
+          // Mensagem do erro e Stack trace
           
           // Verificar tipos específicos de erro
           if (error.message.includes('ApiProjectMapError')) {
@@ -437,7 +436,7 @@ export function FleetMap({ companyId, routeId }: FleetMapProps) {
         // Tentar recarregar após um delay se for um erro temporário
         setTimeout(() => {
           if (!mapInstanceRef.current && !errorMessage.includes('configuração')) {
-            console.log('Tentando recarregar o mapa após erro...')
+            // Tentando recarregar o mapa após erro...
             setMapError(null)
             setLoading(true)
             initMap()

@@ -17,15 +17,15 @@ interface TemporalProgressBarProps {
   stops: Stop[]
   currentTime?: Date
   isPlaying?: boolean
-  onPlayPause?: (playing: boolean) => void
+  onPlayPause?: (_playing: boolean) => void
   onReset?: () => void
-  onProgressChange?: (progress: number) => void
+  onProgressChange?: (_progress: number) => void
 }
 
 export function TemporalProgressBar({
   stops,
   currentTime = new Date(),
-  isPlaying = false,
+  isPlaying: _isPlaying = false,
   onPlayPause,
   onReset,
   onProgressChange
@@ -33,14 +33,19 @@ export function TemporalProgressBar({
   const [progress, setProgress] = useState(0)
   const [currentStopIndex, setCurrentStopIndex] = useState(0)
   const [timeRemaining, setTimeRemaining] = useState('')
-  const [totalDuration, setTotalDuration] = useState(0)
+  const [_totalDuration, setTotalDuration] = useState(0)
 
   // Calcular duração total e progresso
   useEffect(() => {
     if (stops.length < 2) return
 
-    const startTime = new Date(stops[0].scheduledTime)
-    const endTime = new Date(stops[stops.length - 1].scheduledTime)
+    const firstStop = stops[0]
+    const lastStop = stops[stops.length - 1]
+    
+    if (!firstStop || !lastStop) return
+    
+    const startTime = new Date(firstStop.scheduledTime)
+    const endTime = new Date(lastStop.scheduledTime)
     const total = endTime.getTime() - startTime.getTime()
     const elapsed = currentTime.getTime() - startTime.getTime()
     
@@ -59,8 +64,10 @@ export function TemporalProgressBar({
       // Encontrar parada atual
       const currentIndex = stops.findIndex((stop, index) => {
         if (index === stops.length - 1) return true
+        const nextStop = stops[index + 1]
+        if (!nextStop) return true
         const stopTime = new Date(stop.scheduledTime).getTime()
-        const nextStopTime = new Date(stops[index + 1].scheduledTime).getTime()
+        const nextStopTime = new Date(nextStop.scheduledTime).getTime()
         return currentTime.getTime() >= stopTime && currentTime.getTime() < nextStopTime
       })
       

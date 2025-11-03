@@ -1,0 +1,49 @@
+# =============================================================================
+# VARIÁVEIS DE AMBIENTE PARA CONFIGURAR NO VERCEL
+# =============================================================================
+# 
+# Copie e cole estas variáveis no painel do Vercel:
+# 1. Acesse: https://vercel.com/dashboard
+# 2. Selecione seu projeto GOLFFOX
+# 3. Vá em Settings > Environment Variables
+# 4. Adicione cada variável abaixo:
+
+# -----------------------------------------------------------------------------
+# SUPABASE (OBRIGATÓRIO)
+# -----------------------------------------------------------------------------
+SUPABASE_URL=https://vmoxzesvjcfmrebagcwo.supabase.co
+SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZtb3h6ZXN2amNmbXJlYmFnY3dvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE1MTQyMTMsImV4cCI6MjA3NzA5MDIxM30.QKRKu1bIPhsyDPFuBKEIjseC5wNC35RKbOxQ7FZmEvU
+SUPABASE_SERVICE_ROLE=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZtb3h6ZXN2amNmbXJlYmFnY3dvIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2MTUxNDIxMywiZXhwIjoyMDc3MDkwMjEzfQ.EJylgYksLGJ7icYf77dPULYZNA4u35JRg-gkoGgMI_A
+
+# Next.js Public Variables (OBRIGATÓRIO)
+NEXT_PUBLIC_SUPABASE_URL=https://vmoxzesvjcfmrebagcwo.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZtb3h6ZXN2amNmbXJlYmFnY3dvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE1MTQyMTMsImV4cCI6MjA3NzA5MDIxM30.QKRKu1bIPhsyDPFuBKEIjseC5wNC35RKbOxQ7FZmEvU
+
+# -----------------------------------------------------------------------------
+# GOOGLE MAPS (OBRIGATÓRIO)
+# -----------------------------------------------------------------------------
+GOOGLE_MAPS_API_KEY=AIzaSyD79t05YxpU2RnEczY-NSDxhdbY9OvigsM
+NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=AIzaSyD79t05YxpU2RnEczY-NSDxhdbY9OvigsM
+
+# -----------------------------------------------------------------------------
+# CONFIGURAÇÕES BÁSICAS (RECOMENDADO)
+# -----------------------------------------------------------------------------
+NODE_ENV=production
+NEXTAUTH_SECRET=golffox-production-secret-2024-change-this
+JWT_SECRET=golffox-jwt-secret-2024-change-this
+
+# -----------------------------------------------------------------------------
+# INSTRUÇÕES:
+# -----------------------------------------------------------------------------
+# 1. No Vercel Dashboard, vá em Settings > Environment Variables
+# 2. Para cada variável acima:
+#    - Name: nome da variável (ex: SUPABASE_URL)
+#    - Value: valor da variável (ex: https://vmoxzesvjcfmrebagcwo.supabase.co)
+#    - Environment: Production, Preview, Development (marque todos)
+# 3. Clique em "Save" para cada variável
+# 4. Faça um novo deploy para aplicar as mudanças
+#
+# IMPORTANTE: 
+# - Nunca compartilhe estas chaves publicamente
+# - As chaves NEXT_PUBLIC_* são expostas no cliente
+# - As outras chaves ficam apenas no servidor

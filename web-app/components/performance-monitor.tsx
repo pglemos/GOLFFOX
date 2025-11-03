@@ -8,18 +8,15 @@ import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import { 
   Activity, 
-  Cpu, 
   HardDrive, 
   Wifi, 
   Clock, 
   TrendingUp,
-  TrendingDown,
   AlertTriangle,
   CheckCircle,
   Settings,
   X,
-  Minimize2,
-  Maximize2
+  Minimize2
 } from 'lucide-react'
 import { usePerformance } from '@/hooks/use-performance'
 import { useResponsive } from '@/hooks/use-responsive'

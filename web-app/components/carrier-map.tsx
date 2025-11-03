@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from "react"
 import { setOptions, importLibrary } from "@googlemaps/js-api-loader"
-import { Map } from "lucide-react"
+import { Map as MapIcon } from "lucide-react"
 
 interface Vehicle {
   id: string
@@ -106,10 +106,11 @@ export function CarrierMap({ vehicles, className = "" }: CarrierMapProps) {
     const bounds = new google.maps.LatLngBounds()
     
     vehicles.forEach(vehicle => {
+      const icon = getVehicleIcon(vehicle.status)
       const marker = new google.maps.Marker({
         position: { lat: vehicle.lat, lng: vehicle.lng },
         map: mapInstanceRef.current,
-        icon: getVehicleIcon(vehicle.status),
+        ...(icon && { icon }),
         title: `${vehicle.plate} - ${vehicle.status}`
       })
 
@@ -132,11 +133,13 @@ export function CarrierMap({ vehicles, className = "" }: CarrierMapProps) {
     })
 
     // Ajustar zoom para mostrar todos os veículos
-    if (vehicles.length > 1) {
-      mapInstanceRef.current.fitBounds(bounds)
-    } else if (vehicles.length === 1) {
-      mapInstanceRef.current.setCenter({ lat: vehicles[0].lat, lng: vehicles[0].lng })
-      mapInstanceRef.current.setZoom(15)
+    if (mapInstanceRef.current) {
+      if (vehicles.length > 1) {
+        mapInstanceRef.current.fitBounds(bounds)
+      } else if (vehicles.length === 1 && vehicles[0]) {
+        mapInstanceRef.current.setCenter({ lat: vehicles[0].lat, lng: vehicles[0].lng })
+        mapInstanceRef.current.setZoom(15)
+      }
     }
   }, [vehicles, loading, getVehicleIcon])
 
@@ -144,7 +147,7 @@ export function CarrierMap({ vehicles, className = "" }: CarrierMapProps) {
     return (
       <div className={`aspect-[4/3] bg-[var(--bg)] rounded-xl flex items-center justify-center border border-[var(--muted)]/20 ${className}`}>
         <div className="text-center">
-          <Map className="h-16 w-16 mx-auto mb-4 text-[var(--err)]" />
+          <MapIcon className="h-16 w-16 mx-auto mb-4 text-[var(--err)]" />
           <p className="text-[var(--err)]">{error}</p>
         </div>
       </div>
@@ -155,7 +158,7 @@ export function CarrierMap({ vehicles, className = "" }: CarrierMapProps) {
     return (
       <div className={`aspect-[4/3] bg-[var(--bg)] rounded-xl flex items-center justify-center border border-[var(--muted)]/20 ${className}`}>
         <div className="text-center">
-          <Map className="h-16 w-16 mx-auto mb-4 text-[var(--muted)] animate-pulse" />
+          <MapIcon className="h-16 w-16 mx-auto mb-4 text-[var(--muted)] animate-pulse" />
           <p className="text-[var(--muted)]">Carregando mapa...</p>
         </div>
       </div>

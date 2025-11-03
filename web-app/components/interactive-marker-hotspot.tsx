@@ -43,7 +43,7 @@ interface InteractiveMarkerHotspotProps {
   stop: StopDetails
   position: { x: number; y: number }
   onClose: () => void
-  onCenterMap: (coordinates: { lat: number; lng: number }) => void
+  onCenterMap: (_coordinates: { lat: number; lng: number }) => void
   className?: string
 }
 

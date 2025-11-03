@@ -31,12 +31,12 @@ if (envUrl && envAnon) {
     // Só interceptar requisições do Supabase
     if (url.includes('supabase.co')) {
       try {
-        console.log(`🌐 Supabase Request: ${init?.method || 'GET'} ${url}`)
+        // Supabase Request
         const response = await originalFetch(input, init)
-        console.log(`✅ Supabase Response: ${response.status} ${url}`)
+        // Supabase Response
         return response
       } catch (error: any) {
-        console.error(`❌ Supabase Network Error interceptado: ${error.message} - ${url}`)
+        // Supabase Network Error interceptado
         
         // Para qualquer erro de rede do Supabase, retornar resposta simulada
         if (error.name === 'AbortError' || 
@@ -45,7 +45,7 @@ if (envUrl && envAnon) {
             error.message.includes('NetworkError') ||
             error.message.includes('Failed to fetch')) {
           
-          console.log('🔄 Simulando resposta vazia para manter UI funcionando')
+          // Simulando resposta vazia para manter UI funcionando
           
           // Determinar o tipo de resposta baseado na URL
           let mockData = { data: null, error: null, count: 0 }
@@ -78,7 +78,7 @@ if (envUrl && envAnon) {
 
 } else {
   // Fallback seguro: permite que a UI funcione sem backend configurado
-  console.warn('Supabase não configurado. Defina NEXT_PUBLIC_SUPABASE_URL e NEXT_PUBLIC_SUPABASE_ANON_KEY no ambiente.')
+  // Supabase não configurado. Defina NEXT_PUBLIC_SUPABASE_URL e NEXT_PUBLIC_SUPABASE_ANON_KEY no ambiente.
   supabase = {
     auth: {
       getSession: async () => ({ data: { session: null }, error: null }),

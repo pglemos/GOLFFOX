@@ -55,7 +55,7 @@ export default function EmpresasPage() {
 
       if (error) throw error
       setFuncionarios(data || [])
-      const empresa = empresas.find(e => e.id === empresaId)
+      const empresa = Array.isArray(empresas) ? empresas.find((e: any) => e.id === empresaId) : null
       setSelectedEmpresa(empresa)
     } catch (error) {
       console.log("Erro ao carregar funcionários - usando fallback")
@@ -82,7 +82,7 @@ export default function EmpresasPage() {
         </div>
 
         <div className="grid gap-4">
-          {empresas.map((empresa) => (
+          {Array.isArray(empresas) && empresas.map((empresa: any) => (
             <Card key={empresa.id} className="p-4 cursor-pointer hover:bg-[var(--bg-soft)]" onClick={() => loadFuncionarios(empresa.id)}>
               <div className="flex items-start justify-between">
                 <div className="flex-1">

@@ -37,7 +37,7 @@ export default function CustosPage() {
         .eq("date", today)
 
       if (error) throw error
-      const total = data?.reduce((acc, item) => acc + (item.total || 0), 0) || 0
+      const total = data?.reduce((acc: number, item: any) => acc + (item.total || 0), 0) || 0
       setCustoTotal(total)
     } catch (error) {
       console.error("Erro ao carregar custos:", error)

@@ -9,7 +9,7 @@ export const getGoogleMapsConfig = (): GoogleMapsConfig => {
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''
   
   if (!apiKey) {
-    console.warn('NEXT_PUBLIC_GOOGLE_MAPS_API_KEY não configurado')
+    // NEXT_PUBLIC_GOOGLE_MAPS_API_KEY não configurado
   }
 
   return {
@@ -40,8 +40,8 @@ export const geocodeAddress = async (address: string): Promise<{ lat: number; ln
     }
     
     return null
-  } catch (error) {
-    console.error('Erro ao geocodificar endereço:', error)
+  } catch (_error) {
+    // Erro ao geocodificar endereço
     return null
   }
 }
@@ -58,7 +58,7 @@ export const optimizeRoute = async (waypoints: Array<{ lat: number; lng: number;
   if (!apiKey || waypoints.length < 2) return null
 
   try {
-    const waypointsStr = waypoints.map(w => `${w.lat},${w.lng}`).join('|')
+    const _waypointsStr = waypoints.map(w => `${w.lat},${w.lng}`).join('|')
     
     const response = await fetch(
       `https://maps.googleapis.com/maps/api/directions/json?origin=${waypoints[0].lat},${waypoints[0].lng}&destination=${waypoints[waypoints.length - 1].lat},${waypoints[waypoints.length - 1].lng}&waypoints=optimize:true|${waypoints.slice(1, -1).map(w => `${w.lat},${w.lng}`).join('|')}&key=${apiKey}`
@@ -84,8 +84,8 @@ export const optimizeRoute = async (waypoints: Array<{ lat: number; lng: number;
     }
     
     return null
-  } catch (error) {
-    console.error('Erro ao otimizar rota:', error)
+  } catch (_error) {
+    // Erro ao otimizar rota
     return null
   }
 }

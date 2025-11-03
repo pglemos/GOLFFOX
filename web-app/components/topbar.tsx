@@ -1,9 +1,9 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { motion, AnimatePresence } from "framer-motion"
+import { motion } from "framer-motion"
 import { 
   Search, 
   Settings2,
@@ -37,69 +37,69 @@ interface TopbarProps {
   isSidebarOpen?: boolean
 }
 
-export function Topbar({ user, onToggleSidebar, isSidebarOpen = true }: TopbarProps) {
+export function Topbar({ user, onToggleSidebar, isSidebarOpen: _isSidebarOpen = true }: TopbarProps) {
   const router = useRouter()
-  const { isTopbarItemActive } = useNavigation()
+  const { isTopbarItemActive: _isTopbarItemActive } = useNavigation()
   const [isLoggingOut, setIsLoggingOut] = useState(false)
 
   const handleLogout = async () => {
     try {
       setIsLoggingOut(true)
-      console.log('🔄 Iniciando logout...')
+      // Iniciando logout...
 
       // Check if there's an active session first
       const { data: { session }, error: sessionError } = await supabase.auth.getSession()
       
       if (sessionError) {
-        console.warn('Erro ao verificar sessão:', sessionError.message)
+        // Erro ao verificar sessão
       }
       
       // If there's a session, sign out from Supabase
       if (session) {
-        console.log('📤 Fazendo logout do Supabase...')
+        // Fazendo logout do Supabase...
         const { error } = await supabase.auth.signOut({
           scope: 'local' // Only sign out locally to avoid server issues
         })
         
         if (error) {
-          console.warn('Aviso no logout:', error.message)
+          // Aviso no logout
           // Don't throw error for session issues, just log and continue
         } else {
-          console.log('✅ Logout do Supabase realizado')
+          // Logout do Supabase realizado
         }
       } else {
-        console.log('ℹ️ Nenhuma sessão ativa encontrada')
+        // Nenhuma sessão ativa encontrada
       }
 
       // Clear any local storage data regardless of session status
       if (typeof window !== 'undefined') {
-        console.log('🧹 Limpando armazenamento local...')
+        // Limpando armazenamento local...
         try {
           localStorage.clear()
           sessionStorage.clear()
-          console.log('✅ Armazenamento limpo')
-        } catch (storageError) {
-          console.warn('Erro ao limpar armazenamento:', storageError)
+          // Armazenamento limpo
+        } catch (_storageError) {
+          // Erro ao limpar armazenamento
         }
       }
 
       // Use window.location for more reliable navigation
-      console.log('🔄 Redirecionando para página inicial...')
+      // Redirecionando para página inicial...
       if (typeof window !== 'undefined') {
         window.location.href = '/'
       } else {
         router.push('/')
       }
       
-    } catch (error: any) {
-      console.error('Erro no logout:', error)
+    } catch (_error: any) {
+      // Erro no logout
       // Even if there's an error, still try to clear storage and redirect
       if (typeof window !== 'undefined') {
         try {
           localStorage.clear()
           sessionStorage.clear()
-        } catch (storageError) {
-          console.warn('Erro ao limpar armazenamento no catch:', storageError)
+        } catch (_storageError) {
+          console.warn('Erro ao limpar armazenamento no catch:', _storageError)
         }
         // Force redirect even on error
         window.location.href = '/'

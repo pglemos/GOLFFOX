@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Clock, MapPin, User, Phone, Mail, AlertCircle } from 'lucide-react'
+import { Clock, MapPin, Phone, Mail, AlertCircle } from 'lucide-react'
 
 interface PassengerInfo {
   id: string
@@ -45,7 +45,7 @@ const passengerTypeColors = {
   visitor: 'bg-purple-100 text-purple-800'
 }
 
-export function AdvancedTooltip({ stop, isVisible, position, onClose }: AdvancedTooltipProps) {
+export function AdvancedTooltip({ stop, isVisible, position, onClose: _onClose }: AdvancedTooltipProps) {
   const tooltipRef = useRef<HTMLDivElement>(null)
   const [adjustedPosition, setAdjustedPosition] = useState(position)
 

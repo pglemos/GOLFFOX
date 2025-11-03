@@ -178,7 +178,12 @@ export function AdvancedPlaybackControls({
                   >
                     <Slider
                       value={[playbackState.volume]}
-                      onValueChange={(value) => onVolumeChange(value[0])}
+                      onValueChange={(value) => {
+                        const newVolume = value[0]
+                        if (newVolume !== undefined) {
+                          onVolumeChange(newVolume)
+                        }
+                      }}
                       max={100}
                       step={1}
                       className="w-full"

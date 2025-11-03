@@ -146,9 +146,9 @@ export default function CarrierDashboard() {
             <CarrierMap 
               vehicles={fleet.map(vehicle => ({
                 id: vehicle.id,
-                plate: vehicle.plate,
-                lat: vehicle.lat || -14.235, // Default para centro do Brasil se não tiver coordenadas
-                lng: vehicle.lng || -51.9253,
+                plate: vehicle.id, // Usando id como plate já que não existe propriedade plate
+                lat: (vehicle as any).lat || -14.235, // Default para centro do Brasil se não tiver coordenadas
+                lng: (vehicle as any).lng || -51.9253,
                 status: vehicle.status as 'on_route' | 'available' | 'delayed'
               }))}
             />

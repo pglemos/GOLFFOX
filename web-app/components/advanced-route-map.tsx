@@ -151,11 +151,13 @@ export function AdvancedRouteMap({
     }
     
     // Selecionar parada e mostrar informações
-    setSelectedStop(stop)
+    setSelectedStop(stop || null)
     setFocusedMarkerIndex(index)
     
     // Anunciar para leitores de tela
-    announce(`Marcador ${index + 1} selecionado: ${stop.passenger_name} em ${stop.address}`)
+    if (stop) {
+      announce(`Marcador ${index + 1} selecionado: ${stop.passenger_name} em ${stop.address}`)
+    }
   }, [routeData, announce])
 
   const handleKeyboardNavigation = useCallback((event: KeyboardEvent) => {
@@ -191,8 +193,10 @@ export function AdvancedRouteMap({
         event.preventDefault()
         if (focusedMarkerIndex >= 0) {
           const stop = routeData.stops[focusedMarkerIndex]
-          setSelectedStop(stop)
-          announce(`Detalhes da parada: ${stop.passenger_name}`)
+          setSelectedStop(stop || null)
+          if (stop) {
+            announce(`Detalhes da parada: ${stop.passenger_name}`)
+          }
         }
         break
         
@@ -234,11 +238,6 @@ export function AdvancedRouteMap({
     }
   }, [])
 
-  // Iniciar monitoramento de FPS
-  useEffect(() => {
-    monitorFPS()
-  }, [monitorFPS])
-
   // Event listener para navegação por teclado
   useEffect(() => {
     if (keyboardNavigationActive) {
@@ -247,6 +246,7 @@ export function AdvancedRouteMap({
         document.removeEventListener('keydown', handleKeyboardNavigation)
       }
     }
+    return undefined
   }, [keyboardNavigationActive, handleKeyboardNavigation])
 
   // Carregar dados da rota
@@ -295,7 +295,7 @@ export function AdvancedRouteMap({
 
         if (stopsError) throw stopsError
 
-        const processedStops: RouteStop[] = stops?.map((stop, index) => ({
+        const processedStops: RouteStop[] = stops?.map((stop: any, index: number) => ({
           id: stop.id,
           route_id: stop.route_id,
           stop_order: stop.stop_order,
@@ -355,8 +355,6 @@ export function AdvancedRouteMap({
       await measureOperation('initialize_map', async () => {
         // Configurar Google Maps
         setOptions({
-          apiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!,
-          version: "weekly",
           libraries: ["places", "geometry", "drawing"]
         })
 
@@ -396,7 +394,7 @@ export function AdvancedRouteMap({
           fullscreenControl: false,
           // Otimizações de performance
           clickableIcons: false,
-          keyboardShortcuts: usingKeyboard,
+          keyboardShortcuts: accessibilityState.isKeyboardUser,
           restriction: {
             latLngBounds: bounds,
             strictBounds: false
@@ -406,6 +404,10 @@ export function AdvancedRouteMap({
         // Aplicar configurações de movimento reduzido se necessário
         if (prefersReducedMotion) {
           mapOptions.gestureHandling = "none"
+        }
+
+        if (!mapRef.current) {
+          throw new Error('Map container not found')
         }
 
         const map = new Map(mapRef.current, mapOptions)
@@ -452,9 +454,30 @@ export function AdvancedRouteMap({
           }
         }
 
-        // Criar marcadores customizados
+        // Criar marcadores para as paradas
         routeData.stops.forEach((stop, index) => {
-          createCustomMarker(map, stop, index)
+          const marker = new google.maps.Marker({
+            position: { lat: stop.lat, lng: stop.lng },
+            map: map,
+            title: stop.stop_name,
+            icon: {
+              url: stop.stop_type === 'pickup' ? 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="12" cy="12" r="10" fill="#10B981" stroke="#ffffff" stroke-width="2"/>
+                  <text x="12" y="16" text-anchor="middle" fill="white" font-size="12" font-weight="bold">${index + 1}</text>
+                </svg>
+              `) : 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="12" cy="12" r="10" fill="#EF4444" stroke="#ffffff" stroke-width="2"/>
+                  <text x="12" y="16" text-anchor="middle" fill="white" font-size="12" font-weight="bold">${index + 1}</text>
+                </svg>
+              `),
+              scaledSize: new google.maps.Size(32, 32),
+              anchor: new google.maps.Point(16, 16)
+            }
+          })
+          
+          markersRef.current.push(marker)
         })
 
         return map
@@ -468,7 +491,7 @@ export function AdvancedRouteMap({
       setError('Erro ao carregar o mapa')
       announce('Erro ao carregar o mapa')
     }
-  }, [routeData, initialZoom, showControls, measureOperation, announce, usingKeyboard, prefersReducedMotion])
+  }, [routeData, initialZoom, showControls, measureOperation, announce, accessibilityState.isKeyboardUser, prefersReducedMotion])
 
   // Criar polyline do trajeto
   const createRoutePolyline = useCallback(async (google: typeof window.google, map: google.maps.Map) => {
@@ -541,12 +564,12 @@ export function AdvancedRouteMap({
         icon: markerIcon,
         title: `Parada ${index + 1}: ${stop.passenger_name} - ${stop.address}`,
         zIndex: focusedMarkerIndex === index ? 20 : 10,
-        optimized: !reduceMotion // Usar otimização quando motion reduzido está desabilitado
+        optimized: !prefersReducedMotion // Usar otimização quando motion reduzido está desabilitado
       })
 
       // Adicionar eventos de hover e clique
       marker.addListener('mouseover', (event: google.maps.MapMouseEvent) => {
-        if (event.domEvent) {
+        if (event.domEvent && 'pageX' in event.domEvent && 'pageY' in event.domEvent) {
           setTooltipPosition({
             x: event.domEvent.pageX,
             y: event.domEvent.pageY
@@ -592,11 +615,13 @@ export function AdvancedRouteMap({
         // Usar requestAnimationFrame para não bloquear a UI
         await new Promise(resolve => {
           requestAnimationFrame(() => {
-            batch.forEach((stop, localIndex) => {
-              const globalIndex = batchIndex * batchSize + localIndex
-              const marker = createSingleMarker(stop, globalIndex)
-              markersRef.current.push(marker)
-            })
+            if (batch) {
+              batch.forEach((stop, localIndex) => {
+                const globalIndex = batchIndex * batchSize + localIndex
+                const marker = createSingleMarker(stop, globalIndex)
+                markersRef.current.push(marker)
+              })
+            }
             resolve(void 0)
           })
         })
@@ -613,7 +638,7 @@ export function AdvancedRouteMap({
         markersRef.current.push(marker)
       })
     }
-  }, [routeData, focusedMarkerIndex, keyboardNavigationActive, announce, createCustomMarkerIcon, reduceMotion])
+  }, [routeData, focusedMarkerIndex, keyboardNavigationActive, announce, prefersReducedMotion])
 
   // Cache para ícones de marcadores para melhorar performance
   const iconCache = useRef<Map<string, google.maps.Icon>>(new Map())
@@ -670,7 +695,9 @@ export function AdvancedRouteMap({
     if (iconCache.current.size > 50) {
       // Limpar cache quando muito grande
       const firstKey = iconCache.current.keys().next().value
-      iconCache.current.delete(firstKey)
+      if (firstKey) {
+        iconCache.current.delete(firstKey)
+      }
     }
     iconCache.current.set(cacheKey, icon)
     
@@ -693,10 +720,12 @@ export function AdvancedRouteMap({
     if (routeData && markersRef.current.length > 0) {
       markersRef.current.forEach((marker, index) => {
         const stop = routeData.stops[index]
-        const isFocused = focusedMarkerIndex === index
-        const newIcon = createCustomMarkerIcon(stop.stop_type, index + 1, isFocused)
-        marker.setIcon(newIcon)
-        marker.setZIndex(isFocused ? 20 : 10)
+        if (stop) {
+          const isFocused = focusedMarkerIndex === index
+          const newIcon = createCustomMarkerIcon(stop.stop_type, index + 1, isFocused)
+          marker.setIcon(newIcon)
+          marker.setZIndex(isFocused ? 20 : 10)
+        }
       })
     }
   }, [focusedMarkerIndex, routeData])
@@ -733,48 +762,49 @@ export function AdvancedRouteMap({
   }, [isMuted])
 
   const handlePreviousStop = useCallback(() => {
-    if (stops.length === 0) return
+    if (!routeData?.stops || routeData.stops.length === 0) return
     
-    const currentIndex = stops.findIndex(stop => stop.isCurrent)
+    const currentIndex = routeData.stops.findIndex((stop: any) => stop.isCurrent)
     if (currentIndex > 0) {
-      const newStops = stops.map((stop, index) => ({
+      const newStops = routeData.stops.map((stop: any, index: number) => ({
         ...stop,
         isCurrent: index === currentIndex - 1,
         isCompleted: index < currentIndex - 1
       }))
-      setStops(newStops)
+      // Atualizar routeData com as novas paradas
+      setRouteData(prev => prev ? { ...prev, stops: newStops } : null)
       
       // Centralizar no mapa
       const previousStop = newStops[currentIndex - 1]
-      if (mapRef.current && previousStop) {
-        mapRef.current.panTo(previousStop.coordinates)
-        mapRef.current.setZoom(16)
+      if (googleMapRef.current && previousStop) {
+        googleMapRef.current.panTo({ lat: previousStop.lat, lng: previousStop.lng })
+        googleMapRef.current.setZoom(16)
       }
     }
-  }, [stops])
+  }, [routeData])
 
   const handleNextStop = useCallback(() => {
-    if (stops.length === 0) return
+    if (!routeData?.stops || routeData.stops.length === 0) return
     
-    const currentIndex = stops.findIndex(stop => stop.isCurrent)
-    if (currentIndex < stops.length - 1) {
-      const newStops = stops.map((stop, index) => ({
+    const currentIndex = routeData.stops.findIndex((stop: any) => stop.isCurrent)
+    if (currentIndex < routeData.stops.length - 1) {
+      const newStops = routeData.stops.map((stop: any, index: number) => ({
         ...stop,
         isCurrent: index === currentIndex + 1,
         isCompleted: index <= currentIndex
       }))
-      setStops(newStops)
+      setRouteData(prev => prev ? { ...prev, stops: newStops } : null)
       
       // Centralizar no mapa
       const nextStop = newStops[currentIndex + 1]
-      if (mapRef.current && nextStop) {
-        mapRef.current.panTo(nextStop.coordinates)
-        mapRef.current.setZoom(16)
+      if (googleMapRef.current && nextStop) {
+        googleMapRef.current.panTo({ lat: nextStop.lat, lng: nextStop.lng })
+        googleMapRef.current.setZoom(16)
       }
     }
-  }, [stops])
+  }, [routeData])
 
-  const handleMarkerClick = useCallback((stop: Stop, event: any) => {
+  const handleMarkerClick = useCallback((stop: RouteStop, event: any) => {
     // Calcular posição do hotspot
     const rect = mapContainerRef.current?.getBoundingClientRect()
     if (rect) {
@@ -788,7 +818,7 @@ export function AdvancedRouteMap({
     }
   }, [])
 
-  const handleMarkerHover = useCallback((stop: Stop, event: any) => {
+  const handleMarkerHover = useCallback((stop: RouteStop, event: any) => {
     // Calcular posição do tooltip
     const rect = mapContainerRef.current?.getBoundingClientRect()
     if (rect) {
@@ -804,7 +834,7 @@ export function AdvancedRouteMap({
 
   const handleMarkerLeave = useCallback(() => {
     setShowTooltip(false)
-    setTooltipPosition(null)
+    setTooltipPosition({ x: 0, y: 0 })
   }, [])
 
   const handleCloseHotspot = useCallback(() => {
@@ -814,9 +844,9 @@ export function AdvancedRouteMap({
   }, [])
 
   const handleCenterMap = useCallback((coordinates: { lat: number; lng: number }) => {
-    if (mapRef.current) {
-      mapRef.current.panTo(coordinates)
-      mapRef.current.setZoom(16)
+    if (googleMapRef.current) {
+      googleMapRef.current.panTo(coordinates)
+      googleMapRef.current.setZoom(16)
     }
   }, [])
   const handlePlayPause = (playing: boolean) => {
@@ -935,8 +965,8 @@ export function AdvancedRouteMap({
         <div className={`flex items-center gap-2 text-xs text-gray-500 ${
           isMobile ? 'justify-center' : ''
         }`} role="status" aria-label="Métricas de performance" aria-live="polite">
-          <span aria-label={`Taxa de quadros por segundo: ${performanceMetrics.fps}`}>FPS: {performanceMetrics.fps}</span>
-          <span aria-label={`Tempo de carregamento: ${performanceMetrics.loadTime.toFixed(0)} milissegundos`}>Load: {performanceMetrics.loadTime.toFixed(0)}ms</span>
+          <span aria-label={`Taxa de quadros por segundo: ${metrics.fps}`}>FPS: {metrics.fps}</span>
+          <span aria-label={`Tempo de carregamento: ${metrics.loadTime.toFixed(0)} milissegundos`}>Load: {metrics.loadTime.toFixed(0)}ms</span>
         </div>
       </div>
 
@@ -1024,10 +1054,7 @@ export function AdvancedRouteMap({
       {/* Mapa */}
       <Card className="overflow-hidden shadow-lg">
         <div 
-          ref={(el) => {
-            mapRef.current = el
-            mapContainerRef.current = el
-          }}
+          ref={mapContainerRef}
           className={isFullscreen ? "h-[calc(100vh-200px)] w-full" : "h-96 w-full"}
           role="application"
           aria-label={`Mapa interativo da rota ${routeData?.name || routeId} com ${routeData?.stops.length || 0} paradas`}
@@ -1061,12 +1088,16 @@ export function AdvancedRouteMap({
       {/* Barra de progresso temporal */}
       {routeData && (
         <TemporalProgressBar
-          stops={routeData.stops}
+          stops={routeData.stops.map(stop => ({
+            id: stop.id,
+            scheduledTime: stop.estimated_arrival || new Date().toISOString(),
+            address: stop.address,
+            type: stop.stop_type
+          }))}
           currentTime={currentTime}
           isPlaying={isPlaying}
           onPlayPause={handlePlayPause}
           onProgressChange={handleProgressChange}
-          className="mt-4"
         />
       )}
 
@@ -1076,16 +1107,12 @@ export function AdvancedRouteMap({
           stop={{
             id: selectedStop.id,
             address: selectedStop.address,
-            scheduledTime: selectedStop.estimated_arrival,
+            scheduledTime: selectedStop.estimated_arrival || new Date().toISOString(),
             type: selectedStop.stop_type as 'pickup' | 'dropoff',
             passenger: selectedStop.passenger || {
               id: selectedStop.passenger_id || '',
               name: selectedStop.passenger_name || 'Passageiro não identificado',
-              phone: selectedStop.passenger?.phone,
-              email: selectedStop.passenger?.email,
-              photo: selectedStop.passenger_photo,
-              type: 'visitor',
-              observations: selectedStop.observations
+              type: 'visitor' as const
             },
             coordinates: { lat: selectedStop.lat, lng: selectedStop.lng }
           }}
@@ -1103,17 +1130,23 @@ export function AdvancedRouteMap({
               id: selectedStop.id,
               type: selectedStop.stop_type as 'pickup' | 'dropoff',
               address: selectedStop.address,
-              scheduledTime: selectedStop.estimated_arrival,
-              passenger: selectedStop.passenger || {
+              scheduledTime: selectedStop.estimated_arrival || new Date().toISOString(),
+              passenger: selectedStop.passenger ? {
+                id: selectedStop.passenger.id,
+                name: selectedStop.passenger.name,
+                ...(selectedStop.passenger.photo && { photo: selectedStop.passenger.photo }),
+                type: selectedStop.passenger.type === 'student' ? 'student' as const : 'regular' as const,
+                ...(selectedStop.passenger.phone && { phone: selectedStop.passenger.phone }),
+                ...(selectedStop.passenger.observations && { observations: selectedStop.passenger.observations })
+              } : {
                 id: selectedStop.passenger_id || '',
                 name: selectedStop.passenger_name || 'Passageiro não identificado',
-                phone: selectedStop.passenger?.phone,
-                email: selectedStop.passenger?.email,
-                photo: selectedStop.passenger_photo,
-                type: 'visitor',
-                observations: selectedStop.observations
+                type: 'regular' as const
               },
-              coordinates: { lat: selectedStop.lat, lng: selectedStop.lng }
+              coordinates: { lat: selectedStop.lat, lng: selectedStop.lng },
+              stopNumber: selectedStop.stop_order,
+              isCompleted: false,
+              isCurrent: true
             }}
             position={hotspotPosition}
             onClose={handleCloseHotspot}
@@ -1252,7 +1285,7 @@ export function AdvancedRouteMap({
         <Button
           variant="outline"
           size={isMobile ? "default" : "sm"}
-          onClick={togglePerformanceMonitor}
+          onClick={performanceMonitor.toggle}
           className="bg-white/90 backdrop-blur-sm shadow-lg"
           title="Alternar monitor de performance"
           aria-label="Alternar monitor de performance"
@@ -1263,7 +1296,7 @@ export function AdvancedRouteMap({
         <Button
           variant="outline"
           size={isMobile ? "default" : "sm"}
-          onClick={toggleAccessibilityControls}
+          onClick={accessibilityControls.toggle}
           className="bg-white/90 backdrop-blur-sm shadow-lg"
           title="Alternar controles de acessibilidade"
           aria-label="Alternar controles de acessibilidade"

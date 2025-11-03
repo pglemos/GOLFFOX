@@ -97,15 +97,17 @@ export default function SincronizarPage() {
               // Inserir pontos otimizados
               for (let i = 0; i < optimized.optimized.length; i++) {
                 const ponto = optimized.optimized[i]
-                await supabase
-                  .from("gf_route_plan")
-                  .insert({
-                    route_id: rota.id,
-                    stop_order: i + 1,
-                    latitude: ponto.lat,
-                    longitude: ponto.lng,
-                    address: ponto.address
-                  })
+                if (ponto && ponto.lat && ponto.lng) {
+                  await supabase
+                    .from("gf_route_plan")
+                    .insert({
+                      route_id: rota.id,
+                      stop_order: i + 1,
+                      latitude: ponto.lat,
+                      longitude: ponto.lng,
+                      address: ponto.address
+                    })
+                }
               }
 
               processadas++

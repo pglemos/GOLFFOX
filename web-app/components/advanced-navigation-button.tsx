@@ -53,7 +53,7 @@ export function AdvancedNavigationButton({
 
       if (error) throw error
 
-      return data?.map(point => ({
+      return data?.map((point: any) => ({
         lat: point.latitude,
         lng: point.longitude,
         address: point.address || '',
