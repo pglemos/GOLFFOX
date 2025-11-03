@@ -48,7 +48,6 @@ export function useAdvancedNavigation() {
     switch (targetTab) {
       case 'mapa':
         assetsToPreload.push(
-          'https://maps.googleapis.com/maps/api/js',
           '/icons/marker-pickup.svg',
           '/icons/marker-dropoff.svg',
           '/icons/bus-marker.svg'

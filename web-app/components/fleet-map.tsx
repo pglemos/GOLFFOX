@@ -18,6 +18,7 @@ import {
 import { supabase } from "@/lib/supabase"
 import { motion, AnimatePresence } from "framer-motion"
 import { modalContent } from "@/lib/animations"
+import { loadGoogleMapsAPI } from "@/lib/google-maps-loader"
 
 // Declaração de tipos para Google Maps
 declare global {
@@ -256,50 +257,6 @@ export function FleetMap({ companyId, routeId }: FleetMapProps) {
     }
   }, [filters.company, filters.route])
 
-  // Função para carregar o script do Google Maps dinamicamente
-  const loadGoogleMapsScript = (apiKey: string): Promise<void> => {
-    return new Promise((resolve, reject) => {
-      // Verificar se já existe e está carregado
-      if (window.google && window.google.maps) {
-        resolve()
-        return
-      }
-
-      // Verificar se já existe um script sendo carregado
-      const existingScript = document.querySelector('script[src*="maps.googleapis.com"]')
-      if (existingScript) {
-        // Se já existe, aguardar o carregamento
-        const checkLoaded = () => {
-          if (window.google && window.google.maps) {
-            resolve()
-          } else {
-            setTimeout(checkLoaded, 100)
-          }
-        }
-        checkLoaded()
-        return
-      }
-
-      // Criar novo script apenas se não existir
-      const script = document.createElement('script')
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places,geometry&v=weekly`
-      script.async = true
-      script.defer = true
-      
-      script.onload = () => {
-        // Script do Google Maps carregado
-        resolve()
-      }
-      
-      script.onerror = (_error) => {
-        // Erro ao carregar script do Google Maps
-        reject(new Error('Falha ao carregar Google Maps API'))
-      }
-      
-      document.head.appendChild(script)
-    })
-  }
-
   // Função para obter a API Key de forma robusta
   const getGoogleMapsApiKey = () => {
     const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ||
@@ -371,10 +328,8 @@ export function FleetMap({ companyId, routeId }: FleetMapProps) {
           originalConsoleError.apply(console, args)
         }
         
-        // Carregar o script do Google Maps dinamicamente
-        if (!window.google) {
-          await loadGoogleMapsScript(apiKey)
-        }
+        // Carregar API do Google Maps usando gerenciador centralizado
+        await loadGoogleMapsAPI(apiKey)
         
         // Google Maps API carregada com sucesso
         
