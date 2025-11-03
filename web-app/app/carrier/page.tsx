@@ -90,7 +90,7 @@ export default function CarrierDashboard() {
 
       // Carregar posições dos veículos
       if (vehicles && vehicles.length > 0) {
-        const vehicleIds = vehicles.map(v => v.id)
+        const vehicleIds = vehicles.map((v: any) => v.id)
         const { data: positions } = await supabase
           .from('driver_positions')
           .select('*')
@@ -98,8 +98,8 @@ export default function CarrierDashboard() {
           .order('updated_at', { ascending: false })
 
         // Mapear veículos com posições
-        const fleetData = (vehicles || []).map(vehicle => {
-          const position = positions?.find(p => p.vehicle_id === vehicle.id)
+        const fleetData = (vehicles || []).map((vehicle: any) => {
+          const position = positions?.find((p: any) => p.vehicle_id === vehicle.id)
           return {
             id: vehicle.id,
             plate: vehicle.plate,

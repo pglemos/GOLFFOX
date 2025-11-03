@@ -688,6 +688,65 @@ export function FleetMap({ companyId, routeId, initialCenter, initialZoom }: Fle
     return () => clearInterval(interval)
   }, [loadMapData])
 
+  // Calcular zoom automático para englobar todos os pontos quando routeId mudar
+  useEffect(() => {
+    if (!mapInstanceRef.current || !routeId || stops.length === 0) return
+
+    const routeStops = stops
+      .filter(stop => stop.route_id === routeId)
+      .sort((a, b) => a.stop_order - b.stop_order)
+
+    if (routeStops.length === 0) return
+
+    const bounds = new google.maps.LatLngBounds()
+    routeStops.forEach(stop => {
+      bounds.extend(new google.maps.LatLng(stop.lat, stop.lng))
+    })
+
+    // Adicionar margem de 20%
+    const ne = bounds.getNorthEast()
+    const sw = bounds.getSouthWest()
+    if (!ne || !sw) return
+
+    const latMargin = (ne.lat() - sw.lat()) * 0.2
+    const lngMargin = (ne.lng() - sw.lng()) * 0.2
+
+    bounds.extend(new google.maps.LatLng(ne.lat() + latMargin, ne.lng() + lngMargin))
+    bounds.extend(new google.maps.LatLng(sw.lat() - latMargin, sw.lng() - lngMargin))
+
+    mapInstanceRef.current.fitBounds(bounds)
+  }, [routeId, stops])
+
+  // Calcular paradas formatadas para a barra temporal
+  const formattedStops = stops
+    .filter(stop => selectedBus?.route_id === stop.route_id || filters.route === stop.route_id)
+    .sort((a, b) => a.stop_order - b.stop_order)
+    .map((stop, index) => ({
+      id: stop.id,
+      scheduledTime: stop.estimated_arrival || new Date().toISOString(),
+      address: stop.address || stop.stop_name || '',
+      type: (index === 0 || index % 2 === 0 ? 'pickup' : 'dropoff') as 'pickup' | 'dropoff',
+      passengerName: stop.passenger_name || stop.stop_name || ''
+    }))
+
+  // Calcular tempo total da rota
+  const calculateRouteDuration = () => {
+    if (formattedStops.length < 2) return '00:00'
+    const first = formattedStops[0]
+    const last = formattedStops[formattedStops.length - 1]
+    if (!first || !last) return '00:00'
+    
+    const startTime = new Date(first.scheduledTime)
+    const endTime = new Date(last.scheduledTime)
+    const duration = endTime.getTime() - startTime.getTime()
+    const hours = Math.floor(duration / (1000 * 60 * 60))
+    const minutes = Math.floor((duration % (1000 * 60 * 60)) / (1000 * 60))
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`
+  }
+
+  const routeDuration = calculateRouteDuration()
+
+  // Early returns após todos os hooks
   if (loading) {
     return (
       <div className="w-full h-[calc(100vh-300px)] rounded-[var(--radius-xl)] bg-[var(--bg-soft)] flex items-center justify-center border border-[var(--border)]">
@@ -722,64 +781,6 @@ export function FleetMap({ companyId, routeId, initialCenter, initialZoom }: Fle
       </div>
     )
   }
-
-  // Calcular paradas formatadas para a barra temporal
-  const formattedStops = stops
-    .filter(stop => selectedBus?.route_id === stop.route_id || filters.route === stop.route_id)
-    .sort((a, b) => a.stop_order - b.stop_order)
-    .map((stop, index) => ({
-      id: stop.id,
-      scheduledTime: stop.estimated_arrival || new Date().toISOString(),
-      address: stop.address || stop.stop_name || '',
-      type: (index === 0 || index % 2 === 0 ? 'pickup' : 'dropoff') as 'pickup' | 'dropoff',
-      passengerName: stop.passenger_name || stop.stop_name || ''
-    }))
-
-  // Calcular tempo total da rota
-  const calculateRouteDuration = () => {
-    if (formattedStops.length < 2) return '00:00'
-    const first = formattedStops[0]
-    const last = formattedStops[formattedStops.length - 1]
-    if (!first || !last) return '00:00'
-    
-    const startTime = new Date(first.scheduledTime)
-    const endTime = new Date(last.scheduledTime)
-    const duration = endTime.getTime() - startTime.getTime()
-    const hours = Math.floor(duration / (1000 * 60 * 60))
-    const minutes = Math.floor((duration % (1000 * 60 * 60)) / (1000 * 60))
-    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`
-  }
-
-  const routeDuration = calculateRouteDuration()
-
-  // Calcular zoom automático para englobar todos os pontos quando routeId mudar
-  useEffect(() => {
-    if (!mapInstanceRef.current || !routeId || stops.length === 0) return
-
-    const routeStops = stops
-      .filter(stop => stop.route_id === routeId)
-      .sort((a, b) => a.stop_order - b.stop_order)
-
-    if (routeStops.length === 0) return
-
-    const bounds = new google.maps.LatLngBounds()
-    routeStops.forEach(stop => {
-      bounds.extend(new google.maps.LatLng(stop.lat, stop.lng))
-    })
-
-    // Adicionar margem de 20%
-    const ne = bounds.getNorthEast()
-    const sw = bounds.getSouthWest()
-    if (!ne || !sw) return
-
-    const latMargin = (ne.lat() - sw.lat()) * 0.2
-    const lngMargin = (ne.lng() - sw.lng()) * 0.2
-
-    bounds.extend(new google.maps.LatLng(ne.lat() + latMargin, ne.lng() + lngMargin))
-    bounds.extend(new google.maps.LatLng(sw.lat() - latMargin, sw.lng() - lngMargin))
-
-    mapInstanceRef.current.fitBounds(bounds)
-  }, [routeId, stops])
 
   return (
     <div className="relative w-full rounded-[var(--radius-xl)] overflow-hidden border border-[var(--border)] shadow-lg">

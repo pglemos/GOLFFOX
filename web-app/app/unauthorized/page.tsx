@@ -5,8 +5,9 @@ import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { ShieldAlert, ArrowLeft } from "lucide-react"
 import { motion } from "framer-motion"
+import { Suspense } from "react"
 
-export default function UnauthorizedPage() {
+function UnauthorizedContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const reason = searchParams.get('reason') || 'unauthorized'
@@ -68,6 +69,18 @@ export default function UnauthorizedPage() {
         </Card>
       </motion.div>
     </div>
+  )
+}
+
+export default function UnauthorizedPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      </div>
+    }>
+      <UnauthorizedContent />
+    </Suspense>
   )
 }
 

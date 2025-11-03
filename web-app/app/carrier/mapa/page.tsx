@@ -1,12 +1,12 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, Suspense } from "react"
 import { AppShell } from "@/components/app-shell"
 import { FleetMap } from "@/components/fleet-map"
 import { supabase } from "@/lib/supabase"
 import { useRouter, useSearchParams } from "next/navigation"
 
-export default function CarrierMapaPage() {
+function CarrierMapaContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [user, setUser] = useState<any>(null)
@@ -58,6 +58,18 @@ export default function CarrierMapaPage() {
         </div>
       </div>
     </AppShell>
+  )
+}
+
+export default function CarrierMapaPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      </div>
+    }>
+      <CarrierMapaContent />
+    </Suspense>
   )
 }
 

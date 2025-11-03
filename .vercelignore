@@ -3,7 +3,11 @@ tools/
 database/
 docs/
 *.md
-*.json
+# Only ignore JSON files at the repo root, not in subfolders like web-app
+/*.json
 !package.json
 !vercel.json
+# Ensure web-app TypeScript config is included for alias resolution
+!web-app/tsconfig.json
+!tsconfig.json
 
