@@ -9,6 +9,7 @@ import { FleetMap } from "@/components/fleet-map"
 import { useEffect, useState } from "react"
 // @ts-ignore
 import { supabase } from "@/lib/supabase"
+import { useOperatorTenant } from "@/components/providers/operator-tenant-provider"
 
 function OperatorMapaPageInner() {
   const params = useSearchParams()
@@ -19,6 +20,7 @@ function OperatorMapaPageInner() {
   const initialCenter = latParam && lngParam ? { lat: parseFloat(latParam), lng: parseFloat(lngParam) } : undefined
   const initialZoom = zoomParam ? parseInt(zoomParam) : undefined
 
+  const { tenantCompanyId, loading: tenantLoading } = useOperatorTenant()
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
 
@@ -32,12 +34,25 @@ function OperatorMapaPageInner() {
     run()
   }, [])
 
-  if (loading) return null
+  if (loading || tenantLoading) {
+    return (
+      <AppShell user={{ id: user?.id || "", name: user?.name || "Operador", email: user?.email || "", role: "operator" }}>
+        <div className="h-[calc(100vh-8rem)] flex items-center justify-center">
+          <div className="w-16 h-16 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin mx-auto"></div>
+        </div>
+      </AppShell>
+    )
+  }
 
   return (
     <AppShell user={{ id: user?.id || "", name: user?.name || "Operador", email: user?.email || "", role: "operator" }}>
       <div className="h-[calc(100vh-8rem)]">
-        <FleetMap routeId={routeId} initialCenter={initialCenter} initialZoom={initialZoom} />
+        <FleetMap 
+          companyId={tenantCompanyId || undefined} 
+          routeId={routeId} 
+          initialCenter={initialCenter} 
+          initialZoom={initialZoom} 
+        />
       </div>
     </AppShell>
   )
@@ -45,7 +60,11 @@ function OperatorMapaPageInner() {
 
 export default function OperatorMapaPage() {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={
+      <div className="h-[calc(100vh-8rem)] flex items-center justify-center">
+        <div className="w-16 h-16 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin mx-auto"></div>
+      </div>
+    }>
       <OperatorMapaPageInner />
     </Suspense>
   )

@@ -13,7 +13,8 @@ import {
   Users, 
   Truck, 
   Edit, 
-  Navigation 
+  Navigation,
+  Sparkles
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -24,6 +25,8 @@ import { AppShell } from "@/components/app-shell"
 import { QuickNavigation, AdvancedNavigationButton } from "@/components/advanced-navigation-button"
 import { useAdvancedNavigation } from "@/hooks/use-advanced-navigation"
 import { supabase } from "@/lib/supabase"
+import { RouteModal } from "@/components/modals/route-modal"
+import toast from "react-hot-toast"
 
 export function RotasPageContent() {
   const router = useRouter()
@@ -32,6 +35,8 @@ export function RotasPageContent() {
   const [loading, setLoading] = useState(true)
   const [rotas, setRotas] = useState<any[]>([])
   const [searchQuery, setSearchQuery] = useState("")
+  const [selectedRoute, setSelectedRoute] = useState<any>(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
   useEffect(() => {
     const getUser = async () => {
@@ -91,11 +96,12 @@ export function RotasPageContent() {
               <p className="text-gray-600 mt-1">Gerencie as rotas do sistema</p>
             </div>
             <div className="flex gap-2">
-              <Button asChild>
-                <Link href="/admin/rotas/nova">
-                  <Plus className="h-4 w-4 mr-2" />
-                  Nova Rota
-                </Link>
+              <Button onClick={() => {
+                setSelectedRoute(null)
+                setIsModalOpen(true)
+              }}>
+                <Plus className="h-4 w-4 mr-2" />
+                Nova Rota
               </Button>
             </div>
           </div>
@@ -153,22 +159,85 @@ export function RotasPageContent() {
                     </div>
                   </div>
 
-                  <div className="flex gap-2">
-                    <Button variant="outline" size="sm" asChild className="flex-1">
-                      <Link href={`/admin/rotas/${rota.id}/editar`}>
+                  <div className="flex flex-col gap-2">
+                    <div className="flex gap-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="flex-1"
+                        onClick={() => {
+                          setSelectedRoute(rota)
+                          setIsModalOpen(true)
+                        }}
+                      >
                         <Edit className="h-4 w-4 mr-2" />
                         Editar
-                      </Link>
-                    </Button>
-                    <AdvancedNavigationButton
-                      routeId={rota.id}
-                      variant="outline"
-                      size="sm"
-                      className="flex-1"
-                    >
-                      <Navigation className="h-4 w-4 mr-2" />
-                      Ver no Mapa
-                    </AdvancedNavigationButton>
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="flex-1"
+                        onClick={async () => {
+                          try {
+                            const { error } = await supabase.rpc('rpc_generate_route_stops', {
+                              p_route_id: rota.id
+                            })
+                            if (error) throw error
+                            toast.success('Pontos gerados com sucesso!')
+                            loadRotas()
+                          } catch (error: any) {
+                            toast.error(`Erro: ${error.message}`)
+                          }
+                        }}
+                      >
+                        <Sparkles className="h-4 w-4 mr-2" />
+                        Gerar Pontos
+                      </Button>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="flex-1"
+                        onClick={async () => {
+                          try {
+                            const response = await fetch(`/api/admin/optimize-route?routeId=${rota.id}`, {
+                              method: 'POST'
+                            })
+                            if (!response.ok) throw new Error('Erro ao otimizar')
+                            toast.success('Rota otimizada com sucesso!')
+                            loadRotas()
+                          } catch (error: any) {
+                            toast.error(`Erro: ${error.message}`)
+                          }
+                        }}
+                      >
+                        <Navigation className="h-4 w-4 mr-2" />
+                        Otimizar
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="flex-1"
+                        onClick={() => {
+                          // Buscar coordenadas da rota para deep-link
+                          const center = rota.origin_lat && rota.origin_lng 
+                            ? { lat: rota.origin_lat, lng: rota.origin_lng }
+                            : null
+                          const zoom = 14
+                          
+                          const params = new URLSearchParams({
+                            route: rota.id,
+                            ...(center ? { lat: center.lat.toString(), lng: center.lng.toString(), zoom: zoom.toString() } : {})
+                          })
+                          
+                          router.push(`/admin/mapa?${params.toString()}`)
+                        }}
+                      >
+                        <MapPin className="h-4 w-4 mr-2" />
+                        Ver no Mapa
+                      </Button>
+                    </div>
                   </div>
                 </Card>
               </motion.div>
@@ -182,15 +251,33 @@ export function RotasPageContent() {
               <p className="text-gray-600 mb-4">
                 {searchQuery ? "Tente ajustar sua busca" : "Comece criando sua primeira rota"}
               </p>
-              <Button asChild>
-                <Link href="/admin/rotas/nova">
-                  <Plus className="h-4 w-4 mr-2" />
-                  Nova Rota
-                </Link>
+              <Button onClick={() => {
+                setSelectedRoute(null)
+                setIsModalOpen(true)
+              }}>
+                <Plus className="h-4 w-4 mr-2" />
+                Nova Rota
               </Button>
             </div>
           )}
         </div>
+
+        {/* Modal de Rota */}
+        <RouteModal
+          route={selectedRoute}
+          isOpen={isModalOpen}
+          onClose={() => {
+            setIsModalOpen(false)
+            setSelectedRoute(null)
+          }}
+          onSave={loadRotas}
+          onGenerateStops={async (routeId) => {
+            await loadRotas()
+          }}
+          onOptimize={async (routeId) => {
+            await loadRotas()
+          }}
+        />
       </TransitionOverlay>
     </AppShell>
   )

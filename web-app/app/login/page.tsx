@@ -71,8 +71,19 @@ function LoginContent() {
         console.log('✅ Login bem-sucedido!')
         console.log('👤 Usuário:', result.user.email, 'Role:', result.user.role)
 
-        // Aguardar um pouco para garantir que os cookies sejam salvos
-        await new Promise(resolve => setTimeout(resolve, 100))
+        // Garantir que o cookie de sessão seja persistido no servidor (lido pelo middleware)
+        try {
+          const resp = await fetch('/api/auth/set-session', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user: result.user })
+          })
+          if (!resp.ok) {
+            console.warn('⚠️ Falha ao setar cookie de sessão via API:', await resp.text())
+          }
+        } catch (e) {
+          console.warn('⚠️ Erro ao chamar /api/auth/set-session:', e)
+        }
 
         // Determinar URL de redirecionamento
         const nextUrl = searchParams.get('next')
@@ -87,9 +98,9 @@ function LoginContent() {
           console.log('🔄 Redirecionando baseado na role:', redirectUrl)
         }
 
-        // Usar router.push para navegação
+        // Usar router.replace para evitar voltar ao login
         console.log('🚀 Executando redirecionamento...')
-        router.push(redirectUrl)
+        router.replace(redirectUrl)
       } else {
         console.error('❌ Erro de login:', result.error)
         setError(result.error || 'Erro no login')

@@ -18,58 +18,169 @@ import {
   Filter,
   Calendar,
   Activity,
-  TrendingUp
+  TrendingUp,
+  Plus,
+  Edit,
+  Trash2,
+  Settings,
+  UserPlus,
+  FileText,
+  CheckCircle,
+  XCircle,
+  Clock
 } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { motion } from "framer-motion"
 import { staggerContainer, listItem } from "@/lib/animations"
-import { useSupabaseCount } from "@/hooks/use-supabase-query"
+import { formatCount, formatRelativeTime } from "@/lib/kpi-utils"
+
+interface KpiData {
+  company_id: string
+  company_name: string
+  trips_today: number
+  vehicles_active: number
+  employees_in_transit: number
+  critical_alerts: number
+  routes_today: number
+}
+
+interface AuditLog {
+  id: string
+  actor_id: string | null
+  action_type: string
+  resource_type: string | null
+  resource_id: string | null
+  details: any
+  created_at: string
+}
 
 export default function AdminDashboard() {
   const router = useRouter()
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
+  const [kpisData, setKpisData] = useState<KpiData[]>([])
+  const [auditLogs, setAuditLogs] = useState<AuditLog[]>([])
+  const [kpisLoading, setKpisLoading] = useState(true)
+  const [activitiesLoading, setActivitiesLoading] = useState(true)
   const [filters, setFilters] = useState({
     empresa: '',
     data: new Date().toISOString().split('T')[0],
     turno: ''
   })
 
-  // Usar o novo hook para cada consulta de KPI
-  const { data: colaboradoresTransito, loading: loadingColaboradores } = useSupabaseCount(
-    'trip_passengers',
-    {},
-    { cacheKey: 'colaboradores_transito', retryAttempts: 3 }
-  )
+  // Calcular KPIs agregados (todas as empresas ou filtrado)
+  const aggregatedKpis = kpisData.reduce((acc, kpi) => {
+    if (filters.empresa && kpi.company_id !== filters.empresa) return acc
+    return {
+      trips_today: acc.trips_today + (kpi.trips_today || 0),
+      vehicles_active: acc.vehicles_active + (kpi.vehicles_active || 0),
+      employees_in_transit: acc.employees_in_transit + (kpi.employees_in_transit || 0),
+      critical_alerts: acc.critical_alerts + (kpi.critical_alerts || 0),
+      routes_today: acc.routes_today + (kpi.routes_today || 0),
+    }
+  }, { trips_today: 0, vehicles_active: 0, employees_in_transit: 0, critical_alerts: 0, routes_today: 0 })
 
-  const { data: veiculosAtivos, loading: loadingVeiculos } = useSupabaseCount(
-    'trips',
-    { status: 'inProgress' },
-    { cacheKey: 'veiculos_ativos', retryAttempts: 3 }
-  )
+  // Buscar KPIs da view (ou materialized view se disponível)
+  useEffect(() => {
+    const loadKpis = async () => {
+      try {
+        setKpisLoading(true)
+        // Tentar primeiro a materialized view, depois a view normal
+        let query = supabase.from('mv_admin_kpis').select('*')
+        
+        const { data: mvData, error: mvError } = await query
+        
+        if (mvError || !mvData || mvData.length === 0) {
+          // Fallback para view normal
+          const { data: viewData, error: viewError } = await supabase
+            .from('v_admin_dashboard_kpis')
+            .select('*')
+          
+          if (viewError) {
+            console.error('Erro ao carregar KPIs:', viewError)
+            setKpisData([])
+          } else {
+            setKpisData(viewData || [])
+          }
+        } else {
+          setKpisData(mvData)
+        }
+      } catch (error) {
+        console.error('Erro ao carregar KPIs:', error)
+        setKpisData([])
+      } finally {
+        setKpisLoading(false)
+      }
+    }
 
-  const { data: rotasDia, loading: loadingRotas } = useSupabaseCount(
-    'trips',
-    { scheduled_at: { gte: new Date().toISOString().split('T')[0] } },
-    { cacheKey: 'rotas_dia', retryAttempts: 3 }
-  )
+    if (!loading) {
+      loadKpis()
+    }
+  }, [loading, filters.empresa])
 
-  const { data: alertasCriticos, loading: loadingAlertas } = useSupabaseCount(
-    'gf_alerts',
-    { severity: 'critical', is_resolved: false },
-    { cacheKey: 'alertas_criticos', retryAttempts: 3 }
-  )
+  // Buscar atividades recentes (gf_audit_log)
+  useEffect(() => {
+    const loadActivities = async () => {
+      try {
+        setActivitiesLoading(true)
+        const { data, error } = await supabase
+          .from('gf_audit_log')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(50)
+        
+        if (error) {
+          console.error('Erro ao carregar atividades:', error)
+          setAuditLogs([])
+        } else {
+          setAuditLogs(data || [])
+        }
+      } catch (error) {
+        console.error('Erro ao carregar atividades:', error)
+        setAuditLogs([])
+      } finally {
+        setActivitiesLoading(false)
+      }
+    }
 
-  const kpis = {
-    colaboradoresTransito: colaboradoresTransito || 0,
-    veiculosAtivos: veiculosAtivos || 0,
-    rotasDia: rotasDia || 0,
-    alertasCriticos: alertasCriticos || 0
+    if (!loading) {
+      loadActivities()
+    }
+  }, [loading])
+
+  // Função para obter ícone por action_type
+  const getActionIcon = (actionType: string) => {
+    const iconMap: Record<string, any> = {
+      'create': Plus,
+      'update': Edit,
+      'delete': Trash2,
+      'approve': CheckCircle,
+      'reject': XCircle,
+      'configure': Settings,
+      'invite': UserPlus,
+      'export': FileText,
+      'login': Activity,
+      'logout': Activity,
+    }
+    return iconMap[actionType.toLowerCase()] || Activity
   }
 
-  const kpisLoading = loadingColaboradores || loadingVeiculos || loadingRotas || loadingAlertas
+  // Função para obter cor por action_type
+  const getActionColor = (actionType: string) => {
+    const colorMap: Record<string, string> = {
+      'create': 'bg-[var(--success)]',
+      'update': 'bg-[var(--brand)]',
+      'delete': 'bg-[var(--error)]',
+      'approve': 'bg-[var(--success)]',
+      'reject': 'bg-[var(--error)]',
+      'configure': 'bg-[var(--brand)]',
+      'invite': 'bg-[var(--brand)]',
+      'export': 'bg-[var(--brand)]',
+    }
+    return colorMap[actionType.toLowerCase()] || 'bg-[var(--brand)]'
+  }
 
   useEffect(() => {
     const getUser = async () => {
@@ -92,8 +203,6 @@ export default function AdminDashboard() {
     getUser()
   }, [router])
 
-  // Remover o useEffect complexo de KPIs, pois agora usamos hooks individuais
-
   if (loading || kpisLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[var(--bg)]">
@@ -104,27 +213,6 @@ export default function AdminDashboard() {
       </div>
     )
   }
-
-  const activities = [
-    { 
-      title: "Viagem #84A1D2C0", 
-      subtitle: "Rota Curvelo → Matriz", 
-      status: "Em andamento",
-      statusColor: "bg-[var(--brand)]"
-    },
-    { 
-      title: "Alerta #C202", 
-      subtitle: "12 min de atraso • Ônibus 03", 
-      status: "Aberto",
-      statusColor: "bg-[var(--error)]"
-    },
-    { 
-      title: "Usuário criado", 
-      subtitle: "Operador: Maria Silva", 
-      status: "Concluído",
-      statusColor: "bg-[var(--success)]"
-    },
-  ]
 
   return (
     <AppShell user={{
@@ -199,25 +287,23 @@ export default function AdminDashboard() {
             <Stat
               icon={Users}
               label="Colaboradores em Trânsito"
-              value={kpis.colaboradoresTransito}
+              value={formatCount(aggregatedKpis.employees_in_transit)}
               hint="Ativo agora"
-              trend={5}
             />
           </motion.div>
           <motion.div variants={listItem}>
             <Stat
               icon={Truck}
               label="Veículos Ativos"
-              value={kpis.veiculosAtivos}
+              value={formatCount(aggregatedKpis.vehicles_active)}
               hint="Em rota"
-              trend={2}
             />
           </motion.div>
           <motion.div variants={listItem}>
             <Stat
               icon={Navigation}
               label="Rotas do Dia"
-              value={kpis.rotasDia}
+              value={formatCount(aggregatedKpis.routes_today)}
               hint="Hoje"
             />
           </motion.div>
@@ -225,9 +311,8 @@ export default function AdminDashboard() {
             <Stat
               icon={AlertCircle}
               label="Alertas Críticos"
-              value={kpis.alertasCriticos}
+              value={formatCount(aggregatedKpis.critical_alerts)}
               hint="Atenção necessária"
-              trend={-3}
             />
           </motion.div>
         </motion.div>
@@ -303,20 +388,46 @@ export default function AdminDashboard() {
             </Button>
           </div>
           <Card>
-            <div className="divide-y divide-[var(--border)]">
-              {activities.map((activity, i) => (
-                <div key={i} className="p-4 sm:p-6 hover:bg-[var(--bg-hover)] transition-colors flex items-center gap-3 sm:gap-4">
-                  <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full ${activity.statusColor} flex items-center justify-center flex-shrink-0 shadow-sm`}>
-                    <Activity className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-bold text-base sm:text-lg truncate">{activity.title}</p>
-                    <p className="text-xs sm:text-sm text-[var(--ink-muted)] truncate">{activity.subtitle}</p>
-                  </div>
-                  <Badge className="text-xs">{activity.status}</Badge>
-                </div>
-              ))}
-            </div>
+            {activitiesLoading ? (
+              <div className="p-8 text-center text-[var(--ink-muted)]">
+                Carregando atividades...
+              </div>
+            ) : auditLogs.length === 0 ? (
+              <div className="p-8 text-center text-[var(--ink-muted)]">
+                Nenhuma atividade recente
+              </div>
+            ) : (
+              <div className="divide-y divide-[var(--border)]">
+                {auditLogs.map((log) => {
+                  const ActionIcon = getActionIcon(log.action_type)
+                  const actionColor = getActionColor(log.action_type)
+                  const resourceName = log.resource_type 
+                    ? `${log.resource_type}${log.resource_id ? ` #${log.resource_id.slice(0, 8)}` : ''}`
+                    : 'Sistema'
+                  const actionText = log.action_type 
+                    ? log.action_type.charAt(0).toUpperCase() + log.action_type.slice(1).toLowerCase()
+                    : 'Ação'
+                  
+                  return (
+                    <div key={log.id} className="p-4 sm:p-6 hover:bg-[var(--bg-hover)] transition-colors flex items-center gap-3 sm:gap-4">
+                      <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full ${actionColor} flex items-center justify-center flex-shrink-0 shadow-sm`}>
+                        <ActionIcon className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-bold text-base sm:text-lg truncate">
+                          {actionText}: {resourceName}
+                        </p>
+                        <p className="text-xs sm:text-sm text-[var(--ink-muted)] truncate">
+                          {formatRelativeTime(log.created_at)}
+                          {log.details?.companyId && ` • Empresa: ${log.details.companyId.slice(0, 8)}`}
+                        </p>
+                      </div>
+                      <Badge className="text-xs">{log.action_type}</Badge>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
           </Card>
         </div>
       </div>

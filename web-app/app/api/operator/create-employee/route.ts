@@ -1,26 +1,41 @@
-import { NextRequest, NextResponse } from "next/server"
-import { createClient } from "@supabase/supabase-js"
+import { NextRequest, NextResponse } from 'next/server'
+import { createClient } from '@supabase/supabase-js'
 
-export async function POST(req: NextRequest) {
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
+
+export async function POST(request: NextRequest) {
   try {
-    const supabaseAdmin = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE!,
-      {
-        auth: {
-          autoRefreshToken: false,
-          persistSession: false
-        }
-      }
-    )
+    const { email, name, phone, role = 'passenger' } = await request.json()
 
-    const body = await req.json()
-    const { email, password, name, phone, role = 'passenger' } = body
+    if (!email || !name) {
+      return NextResponse.json(
+        { error: 'Email e nome são obrigatórios' },
+        { status: 400 }
+      )
+    }
 
-    // Create user via admin API
-    const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
-      email,
-      password: password || Math.random().toString(36).slice(-8),
+    // Verificar se usuário já existe
+    const { data: existingUser } = await supabase
+      .from('users')
+      .select('id')
+      .eq('email', email.toLowerCase())
+      .single()
+
+    if (existingUser) {
+      return NextResponse.json({
+        userId: existingUser.id,
+        created: false
+      })
+    }
+
+    // Criar usuário no Supabase Auth
+    const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+      email: email.toLowerCase(),
+      password: `temp_${Math.random().toString(36).slice(2)}`, // Senha temporária
+      email_confirm: true,
       user_metadata: {
         name,
         phone,
@@ -28,25 +43,41 @@ export async function POST(req: NextRequest) {
       }
     })
 
-    if (authError) throw authError
+    if (authError || !authData.user) {
+      return NextResponse.json(
+        { error: authError?.message || 'Erro ao criar usuário' },
+        { status: 500 }
+      )
+    }
 
-    // Update users table
-    const { error: userError } = await supabaseAdmin
+    // Criar registro na tabela users
+    const { error: userError } = await supabase
       .from('users')
-      .update({
+      .insert({
+        id: authData.user.id,
+        email: email.toLowerCase(),
         name,
         phone,
         role
       })
-      .eq('id', authData.user.id)
 
-    if (userError) throw userError
+    if (userError) {
+      // Tentar limpar o usuário do auth se falhar na tabela
+      await supabase.auth.admin.deleteUser(authData.user.id)
+      return NextResponse.json(
+        { error: userError.message || 'Erro ao criar registro de usuário' },
+        { status: 500 }
+      )
+    }
 
-    return NextResponse.json({ user: authData.user, userId: authData.user.id })
+    return NextResponse.json({
+      userId: authData.user.id,
+      created: true
+    })
   } catch (error: any) {
-    console.error("Erro ao criar funcionário:", error)
+    console.error('Erro ao criar funcionário:', error)
     return NextResponse.json(
-      { error: error.message },
+      { error: error.message || 'Erro desconhecido' },
       { status: 500 }
     )
   }

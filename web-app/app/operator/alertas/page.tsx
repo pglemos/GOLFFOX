@@ -14,11 +14,14 @@ import { Badge } from "@/components/ui/badge"
 import { AlertTriangle, Search, Bell, Clock } from "lucide-react"
 // @ts-ignore
 import { supabase } from "@/lib/supabase"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { motion } from "framer-motion"
+import { useOperatorTenant } from "@/components/providers/operator-tenant-provider"
 
 export default function AlertasOperatorPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const { tenantCompanyId, loading: tenantLoading } = useOperatorTenant()
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [alertas, setAlertas] = useState<any[]>([])
@@ -34,31 +37,24 @@ export default function AlertasOperatorPage() {
       }
       setUser({ ...session.user })
       setLoading(false)
-      loadAlertas()
     }
     getUser()
   }, [router])
 
+  useEffect(() => {
+    if (tenantCompanyId && !tenantLoading) {
+      loadAlertas()
+    }
+  }, [tenantCompanyId, tenantLoading])
+
   const loadAlertas = async () => {
     try {
-      // Buscar alertas relacionados à empresa do operador
-      const { data: userData } = await supabase
-        .from('users')
-        .select('company_id')
-        .eq('id', user?.id)
-        .single()
-
-      let query = supabase
-        .from('gf_alerts')
+      // Usar view segura que já filtra por tenantCompanyId via RLS
+      const { data, error } = await supabase
+        .from('v_operator_alerts_secure')
         .select('*')
         .order('created_at', { ascending: false })
         .limit(50)
-
-      if (userData?.company_id) {
-        query = query.or(`company_id.eq.${userData.company_id},company_id.is.null`)
-      }
-
-      const { data, error } = await query
 
       if (error) throw error
       setAlertas(data || [])
@@ -74,13 +70,31 @@ export default function AlertasOperatorPage() {
   const filteredAlertas = alertas.filter(a => {
     const matchesSearch = searchQuery === "" || 
       a.message?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      a.type?.toLowerCase().includes(searchQuery.toLowerCase())
-    const matchesFilter = filterType === "all" || a.type === filterType
-    return matchesSearch && matchesFilter
+      a.alert_type?.toLowerCase().includes(searchQuery.toLowerCase())
+
+    // Filtro via URL (?filter=delay|stopped|deviation)
+    const urlFilter = searchParams?.get('filter') || null
+    const filterMap: Record<string, string> = {
+      delay: 'route_delayed',
+      stopped: 'bus_stopped',
+      deviation: 'route_deviation',
+    }
+    const mappedUrlFilter = urlFilter ? filterMap[urlFilter] : null
+
+    const matchesUrlFilter = !mappedUrlFilter || a.alert_type === mappedUrlFilter
+
+    // Filtro de severidade via dropdown (error|warning|info)
+    const matchesSeverity = filterType === "all" 
+      || (filterType === 'error' && (a.severity === 'error' || a.severity === 'critical'))
+      || (filterType === 'warning' && a.severity === 'warning')
+      || (filterType === 'info' && (a.severity === 'info' || !a.severity))
+
+    return matchesSearch && matchesUrlFilter && matchesSeverity
   })
 
-  const getAlertColor = (type: string) => {
-    switch (type) {
+  const getAlertColor = (severity?: string) => {
+    switch (severity) {
+      case 'critical':
       case 'error':
         return 'bg-[var(--error)]'
       case 'warning':
@@ -135,9 +149,9 @@ export default function AlertasOperatorPage() {
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
-                      <AlertTriangle className={`h-5 w-5 ${getAlertColor(alerta.type)}`} />
-                      <h3 className="font-bold text-lg capitalize">{alerta.type || "Alerta"}</h3>
-                      <Badge className={getAlertColor(alerta.type)}>
+                      <AlertTriangle className={`h-5 w-5 ${getAlertColor(alerta.severity)}`} />
+                      <h3 className="font-bold text-lg capitalize">{alerta.alert_type || "Alerta"}</h3>
+                      <Badge className={getAlertColor(alerta.severity)}>
                         {alerta.severity || "normal"}
                       </Badge>
                     </div>

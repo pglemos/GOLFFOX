@@ -14,8 +14,9 @@ function MapaContent() {
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   
-  // Ler parâmetros da URL para rota específica
+  // Ler parâmetros da URL para rota específica e filtros
   const routeId = searchParams?.get('route') || null
+  const companyId = searchParams?.get('company') || null
   const latParam = searchParams?.get('lat')
   const lngParam = searchParams?.get('lng')
   const zoomParam = searchParams?.get('zoom')
@@ -81,6 +82,7 @@ function MapaContent() {
         </motion.div>
 
         <FleetMap 
+          companyId={companyId || undefined}
           routeId={routeId || undefined}
           initialCenter={initialCenter || undefined}
           initialZoom={initialZoom || undefined}

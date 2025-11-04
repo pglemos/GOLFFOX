@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { supabase } from "@/lib/supabase"
 import { useNavigation } from "@/hooks/use-navigation"
+import { OperatorLogoSection } from "@/components/operator/operator-logo-section"
 
 interface TopbarProps {
   user?: {
@@ -153,21 +154,8 @@ export function Topbar({
           <Menu className="h-5 w-5" />
         </Button>
 
-        {/* Logo GOLF FOX */}
-        <Link href={panelHomeUrl} className="flex items-center gap-2 sm:gap-3 flex-shrink-0 group">
-          <motion.div
-            whileHover={{ scale: 1.05, rotate: 5 }}
-            whileTap={{ scale: 0.95 }}
-            className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl gradient-brand flex items-center justify-center shadow-md"
-          >
-            <span className="text-white font-bold text-lg sm:text-xl">G</span>
-          </motion.div>
-          <div className="flex items-center gap-2">
-            <span className="font-bold text-lg sm:text-2xl tracking-tight text-[var(--ink-strong)] hidden xs:block">
-              GOLF FOX
-            </span>
-          </div>
-        </Link>
+                {/* Logo / Empresa */}
+        <OperatorLogoSection panelHomeUrl={panelHomeUrl} />
 
         {/* Search - Hidden on small screens */}
         <div className="hidden md:flex flex-1 max-w-md ml-auto">
@@ -216,7 +204,7 @@ export function Topbar({
             className="hidden xl:flex items-center gap-2 rounded-full border-[var(--border)] hover:bg-[var(--brand-light)] hover:text-[var(--brand)] hover:border-[var(--brand)] transition-all duration-200"
             asChild
           >
-            <Link href="/admin/preferences">
+            <Link href="/admin/preferences" prefetch={false}>
               <Settings2 className="h-4 w-4" />
               Preferências
             </Link>
@@ -228,7 +216,7 @@ export function Topbar({
             className="xl:hidden hover:bg-[var(--bg-hover)]"
             asChild
           >
-            <Link href="/admin/preferences">
+            <Link href="/admin/preferences" prefetch={false}>
               <Settings2 className="h-5 w-5" />
             </Link>
           </Button>

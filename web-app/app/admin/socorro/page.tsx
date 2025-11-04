@@ -5,7 +5,7 @@ import { AppShell } from "@/components/app-shell"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { LifeBuoy, Send, Plus, Search } from "lucide-react"
+import { LifeBuoy, Send, Plus, Search, Clock, AlertCircle } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 import { AssistanceModal } from "@/components/modals/assistance-modal"
@@ -46,7 +46,7 @@ export default function SocorroPage() {
           trips(id, route_id),
           routes(id, name),
           vehicles!gf_assistance_requests_dispatched_vehicle_id_fkey(id, plate, model),
-          drivers:users!gf_assistance_requests_dispatched_driver_id_fkey(id, name, email)
+          drivers:users!gf_assistance_requests_dispatched_driver_id_fkey(id, email)
         `)
         .order("created_at", { ascending: false })
 
@@ -82,8 +82,8 @@ export default function SocorroPage() {
             <p className="text-[var(--ink-muted)]">Gerencie ocorrências e emergências</p>
           </div>
           <Button onClick={() => {
-            // Criar nova ocorrência (implementar depois)
-            toast.error("Funcionalidade de criar ocorrência em breve")
+            setSelectedRequest(null)
+            setIsModalOpen(true)
           }}>
             <Plus className="h-4 w-4 mr-2" />
             Nova Ocorrência
@@ -158,26 +158,88 @@ export default function SocorroPage() {
                         <p>🚌 Rota: {ocorrencia.routes.name || ocorrencia.route_id}</p>
                       )}
                       {ocorrencia.drivers && (
-                        <p>👤 Motorista: {ocorrencia.drivers.name}</p>
+                        <p>
+                          👤 Motorista: {(
+                            ocorrencia.drivers.email?.split("@")[0] || ocorrencia.dispatched_driver_id
+                          )}
+                        </p>
                       )}
                       {ocorrencia.vehicles && (
                         <p>🚛 Veículo: {ocorrencia.vehicles.plate}</p>
                       )}
                       <p>🕐 {new Date(ocorrencia.created_at).toLocaleString('pt-BR')}</p>
+                      {ocorrencia.status === 'open' && ocorrencia.created_at && (
+                        <div className="flex items-center gap-1 mt-2">
+                          <Clock className="h-3 w-3 text-orange-500" />
+                          <span className="text-xs text-orange-600 font-medium">
+                            Tempo de resposta: {(() => {
+                              const minutes = Math.floor((Date.now() - new Date(ocorrencia.created_at).getTime()) / (1000 * 60))
+                              return `${minutes}min`
+                            })()}
+                          </span>
+                        </div>
+                      )}
                     </div>
                   </div>
-                  {ocorrencia.status === 'open' && (
-                    <Button 
-                      variant="destructive"
-                      onClick={() => {
-                        setSelectedRequest(ocorrencia)
-                        setIsModalOpen(true)
-                      }}
-                    >
-                      <Send className="h-4 w-4 mr-2" />
-                      Despachar
-                    </Button>
-                  )}
+                  <div className="flex flex-col gap-2">
+                    {ocorrencia.status === 'open' && (
+                      <Button 
+                        variant="destructive"
+                        onClick={async () => {
+                          setSelectedRequest(ocorrencia)
+                          setIsModalOpen(true)
+                          
+                          // Criar alerta crítico
+                          try {
+                            const { data: { session } } = await supabase.auth.getSession()
+                            if (session) {
+                              await supabase.from('gf_incidents').insert({
+                                company_id: ocorrencia.company_id || null,
+                                route_id: ocorrencia.route_id || null,
+                                vehicle_id: ocorrencia.vehicle_id || null,
+                                driver_id: ocorrencia.driver_id || null,
+                                severity: 'critical',
+                                status: 'open',
+                                description: `Ocorrência de socorro: ${ocorrencia.request_type} - ${ocorrencia.description || ''}`
+                              })
+                            }
+                          } catch (error) {
+                            console.error('Erro ao criar alerta:', error)
+                          }
+                        }}
+                      >
+                        <Send className="h-4 w-4 mr-2" />
+                        Despachar
+                      </Button>
+                    )}
+                    {ocorrencia.status === 'dispatched' && (
+                      <Button 
+                        variant="outline"
+                        onClick={async () => {
+                          try {
+                            const { error } = await supabase
+                              .from('gf_assistance_requests')
+                              .update({ status: 'resolved', resolved_at: new Date().toISOString() })
+                              .eq('id', ocorrencia.id)
+                            
+                            if (error) throw error
+                            
+                            // Calcular SLA
+                            const responseTime = new Date(ocorrencia.dispatched_at || Date.now()).getTime() - new Date(ocorrencia.created_at).getTime()
+                            const resolutionTime = Date.now() - new Date(ocorrencia.created_at).getTime()
+                            
+                            toast.success(`Ocorrência resolvida! SLA: ${Math.floor(responseTime / 60000)}min resposta, ${Math.floor(resolutionTime / 60000)}min total`)
+                            loadOcorrencias()
+                          } catch (error: any) {
+                            toast.error(`Erro: ${error.message}`)
+                          }
+                        }}
+                      >
+                        <LifeBuoy className="h-4 w-4 mr-2" />
+                        Resolver
+                      </Button>
+                    )}
+                  </div>
                 </div>
               </Card>
             </motion.div>

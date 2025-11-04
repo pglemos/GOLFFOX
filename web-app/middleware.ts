@@ -19,8 +19,20 @@ function extractUserFromCookie(cookieValue: string): UserData | null {
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl
-  
-  console.log('🔍 Middleware executado para:', pathname)
+
+  // Structured logging helper
+  const now = new Date().toISOString()
+  const userAgent = req.headers.get('user-agent') || 'unknown'
+  const forwardedFor = req.headers.get('x-forwarded-for') || ''
+  const clientIp = (forwardedFor.split(',')[0] || '').trim() || 'unknown'
+  const log = (level: 'info' | 'warning' | 'error', message: string, meta: Record<string, any> = {}) => {
+    const entry = { ts: now, level, path: pathname, ip: clientIp, ua: userAgent, ...meta }
+    if (level === 'error') console.error(message, entry)
+    else if (level === 'warning') console.warn(message, entry)
+    else console.log(message, entry)
+  }
+
+  log('info', '🔍 Middleware executado', {})
 
   // Rotas públicas que não precisam de autenticação
   const publicRoutes = ['/', '/login', '/unauthorized', '/test-auth']
@@ -28,7 +40,7 @@ export async function middleware(req: NextRequest) {
   
   // Verificar se é rota pública
   if (publicRoutes.includes(pathname) || apiRoutes.some(route => pathname.startsWith(route))) {
-    console.log('✅ Rota pública permitida:', pathname)
+    log('info', '✅ Rota pública permitida', {})
     return NextResponse.next()
   }
 
@@ -37,7 +49,7 @@ export async function middleware(req: NextRequest) {
   const isOperatorRoute = pathname.startsWith('/operator')
   const isCarrierRoute = pathname.startsWith('/carrier')
 
-  console.log('🔒 Verificando rota protegida:', { pathname, isAdminRoute, isOperatorRoute, isCarrierRoute })
+  log('info', '🔒 Verificando rota protegida', { isAdminRoute, isOperatorRoute, isCarrierRoute })
 
   // Se não é rota protegida, permitir acesso
   if (!isAdminRoute && !isOperatorRoute && !isCarrierRoute) {
@@ -49,19 +61,21 @@ export async function middleware(req: NextRequest) {
   
   try {
     const sessionCookie = req.cookies.get('golffox-session')?.value
-    console.log('🍪 Cookie de sessão encontrado:', !!sessionCookie)
+    if (!sessionCookie) {
+      log('info', '🍪 Cookie de sessão ausente', {})
+    }
     
     if (sessionCookie) {
       user = extractUserFromCookie(sessionCookie)
-      console.log('👤 Usuário extraído do cookie:', user ? `${user.email} (${user.role})` : 'null')
+      log('info', '👤 Usuário extraído do cookie', { email: user?.email, role: user?.role })
     }
   } catch (error) {
-    console.error('❌ Erro ao extrair usuário do cookie:', error)
+    log('error', '❌ Erro ao extrair usuário do cookie', { error })
   }
 
   // Se não está autenticado e tenta acessar rota protegida
   if (!user && (isAdminRoute || isOperatorRoute || isCarrierRoute)) {
-    console.log('❌ Usuário não autenticado tentando acessar rota protegida')
+    log('info', '❌ Usuário não autenticado tentando acessar rota protegida')
     const redirectUrl = new URL('/login', req.url)
     redirectUrl.searchParams.set('next', pathname)
     return NextResponse.redirect(redirectUrl)
@@ -69,11 +83,11 @@ export async function middleware(req: NextRequest) {
 
   // Se está autenticado, verificar permissões
   if (user) {
-    console.log('🔐 Verificando permissões para:', user.role, 'na rota:', pathname)
+    log('info', '🔐 Verificando permissões', { role: user.role })
     
     // Verificar se o usuário tem permissão para acessar a rota
     if (isAdminRoute && user.role !== 'admin') {
-      console.log('❌ Acesso negado: usuário não é admin')
+      log('warning', '❌ Acesso negado: usuário não é admin', { current: user.role, required: 'admin' })
       const redirectUrl = new URL('/unauthorized', req.url)
       redirectUrl.searchParams.set('reason', 'insufficient_permissions')
       redirectUrl.searchParams.set('required', 'admin')
@@ -82,7 +96,7 @@ export async function middleware(req: NextRequest) {
     }
     
     if (isOperatorRoute && !['admin', 'operator'].includes(user.role)) {
-      console.log('❌ Acesso negado: usuário não é operator ou admin')
+      log('warning', '❌ Acesso negado: usuário não é operator ou admin', { current: user.role, required: 'operator' })
       const redirectUrl = new URL('/unauthorized', req.url)
       redirectUrl.searchParams.set('reason', 'insufficient_permissions')
       redirectUrl.searchParams.set('required', 'operator')
@@ -91,7 +105,7 @@ export async function middleware(req: NextRequest) {
     }
     
     if (isCarrierRoute && !['admin', 'carrier'].includes(user.role)) {
-      console.log('❌ Acesso negado: usuário não é carrier ou admin')
+      log('warning', '❌ Acesso negado: usuário não é carrier ou admin', { current: user.role, required: 'carrier' })
       const redirectUrl = new URL('/unauthorized', req.url)
       redirectUrl.searchParams.set('reason', 'insufficient_permissions')
       redirectUrl.searchParams.set('required', 'carrier')
@@ -99,12 +113,12 @@ export async function middleware(req: NextRequest) {
       return NextResponse.redirect(redirectUrl)
     }
     
-    console.log('✅ Acesso permitido')
+    log('info', '✅ Acesso permitido')
     return NextResponse.next()
   }
 
   // Se chegou até aqui sem usuário válido, redirecionar para login
-  console.log('❌ Falha na autenticação - redirecionando para login')
+  log('info', '❌ Falha na autenticação - redirecionando para login')
   const redirectUrl = new URL('/login', req.url)
   redirectUrl.searchParams.set('next', pathname)
   redirectUrl.searchParams.set('error', 'no_auth')

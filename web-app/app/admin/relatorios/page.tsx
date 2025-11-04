@@ -5,7 +5,7 @@ import { AppShell } from "@/components/app-shell"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { BarChart3, Download, FileText, Calendar, Filter } from "lucide-react"
+import { BarChart3, Download, FileText, Calendar, Filter, Clock, Mail } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 import { 
@@ -41,6 +41,9 @@ export default function RelatoriosPage() {
   const [dateStart, setDateStart] = useState(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0])
   const [dateEnd, setDateEnd] = useState(new Date().toISOString().split('T')[0])
   const [selectedCompany, setSelectedCompany] = useState<string>("")
+  const [schedules, setSchedules] = useState<any[]>([])
+  const [showScheduleModal, setShowScheduleModal] = useState(false)
+  const [selectedReportForSchedule, setSelectedReportForSchedule] = useState<string | null>(null)
 
   const reports: ReportConfig[] = [
     { 
@@ -90,67 +93,73 @@ export default function RelatoriosPage() {
       }
       setUser({ ...session.user })
       setLoading(false)
+      loadSchedules()
     }
     getUser()
   }, [router])
 
+  const loadSchedules = async () => {
+    try {
+      const response = await fetch('/api/reports/schedule')
+      const data = await response.json()
+      setSchedules(data.schedules || [])
+    } catch (error) {
+      console.error('Erro ao carregar agendamentos:', error)
+    }
+  }
+
   const handleExport = async (report: ReportConfig, format: 'csv' | 'excel' | 'pdf') => {
     try {
-      let data: any[] = []
+      toast.loading('Gerando relatório...', { id: 'export' })
 
-      if (report.viewName) {
-        // Buscar dados da view
-        let query = supabase.from(report.viewName).select('*')
-        
-        if (dateStart) {
-          query = query.gte('scheduled_at', dateStart)
-        }
-        if (dateEnd) {
-          query = query.lte('scheduled_at', dateEnd + 'T23:59:59')
-        }
+      // Usar API server-side
+      const response = await fetch('/api/reports/run', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          reportKey: report.id,
+          format,
+          filters: {
+            companyId: selectedCompany || null,
+            periodStart: dateStart || null,
+            periodEnd: dateEnd || null
+          }
+        })
+      })
 
-        const { data: viewData, error } = await query
-        
-        if (error) throw error
-        data = viewData || []
-      } else {
-        // Para relatórios sem view, usar dados básicos
-        data = []
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Erro ao gerar relatório')
       }
 
-      let formattedData: any
-
-      if (report.formatter) {
-        formattedData = report.formatter(data)
-      } else {
-        // Formato padrão
-        formattedData = {
-          title: report.title,
-          description: report.description,
-          headers: ['Data', 'Informações'],
-          rows: data.map((row: any) => [new Date().toLocaleDateString('pt-BR'), JSON.stringify(row)])
+      // Obter blob e fazer download
+      const blob = await response.blob()
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      
+      const contentDisposition = response.headers.get('content-disposition')
+      let filename = `${report.id}-${dateStart}-${dateEnd}.${format === 'excel' ? 'xlsx' : format}`
+      
+      if (contentDisposition) {
+        const filenameMatch = contentDisposition.match(/filename="(.+)"/)
+        if (filenameMatch) {
+          filename = filenameMatch[1]
         }
       }
+      
+      a.download = filename
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      window.URL.revokeObjectURL(url)
 
-      const filename = `${report.id}-${dateStart}-${dateEnd}.${format === 'excel' ? 'xlsx' : format}`
-
-      switch (format) {
-        case 'csv':
-          exportToCSV(formattedData, filename)
-          toast.success('Relatório exportado como CSV!')
-          break
-        case 'excel':
-          exportToExcel(formattedData, filename)
-          toast.success('Relatório exportado como Excel!')
-          break
-        case 'pdf':
-          exportToPDF(formattedData, filename)
-          toast.success('Abrindo relatório para impressão/PDF!')
-          break
-      }
+      toast.success('Relatório exportado com sucesso!', { id: 'export' })
     } catch (error: any) {
       console.error("Erro ao exportar:", error)
-      toast.error(`Erro ao exportar: ${error.message}`)
+      toast.error(`Erro ao exportar: ${error.message}`, { id: 'export' })
     }
   }
 
@@ -227,28 +236,42 @@ export default function RelatoriosPage() {
                       <p className="text-sm text-[var(--ink-muted)]">{report.description}</p>
                     </div>
                   </div>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="outline" size="sm" className="w-full">
-                        <Download className="h-4 w-4 mr-2" />
-                        Exportar
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => handleExport(report, 'csv')}>
-                        <FileText className="h-4 w-4 mr-2" />
-                        Exportar CSV
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleExport(report, 'excel')}>
-                        <FileText className="h-4 w-4 mr-2" />
-                        Exportar Excel
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleExport(report, 'pdf')}>
-                        <FileText className="h-4 w-4 mr-2" />
-                        Exportar PDF
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                  <div className="flex flex-col gap-2">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="outline" size="sm" className="w-full">
+                          <Download className="h-4 w-4 mr-2" />
+                          Exportar
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => handleExport(report, 'csv')}>
+                          <FileText className="h-4 w-4 mr-2" />
+                          Exportar CSV
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleExport(report, 'excel')}>
+                          <FileText className="h-4 w-4 mr-2" />
+                          Exportar Excel
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleExport(report, 'pdf')}>
+                          <FileText className="h-4 w-4 mr-2" />
+                          Exportar PDF
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="w-full"
+                      onClick={() => {
+                        setSelectedReportForSchedule(report.id)
+                        setShowScheduleModal(true)
+                      }}
+                    >
+                      <Clock className="h-4 w-4 mr-2" />
+                      Agendar
+                    </Button>
+                  </div>
                 </Card>
               </motion.div>
             )

@@ -7,7 +7,7 @@ import { AppShell } from "@/components/app-shell"
 import { Card } from "@/components/ui/card"
 // @ts-ignore
 import { Badge } from "@/components/ui/badge"
-import { Navigation, Users, MapPin, Plus } from "lucide-react"
+import { Navigation, Users, MapPin, Plus, Map, Zap } from "lucide-react"
 // @ts-ignore
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
@@ -15,9 +15,14 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 // @ts-ignore
 import { default as Link } from "next/link"
+import { useOperatorTenant } from "@/components/providers/operator-tenant-provider"
+import operatorI18n from "@/i18n/operator.json"
+import { useOperatorTenant } from "@/components/providers/operator-tenant-provider"
+import operatorI18n from "@/i18n/operator.json"
 
 export default function OperatorRotasPage() {
   const router = useRouter()
+  const { tenantCompanyId, companyName, loading: tenantLoading } = useOperatorTenant()
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [rotas, setRotas] = useState<any[]>([])
@@ -36,29 +41,18 @@ export default function OperatorRotasPage() {
   }, [router])
 
   useEffect(() => {
-    if (user?.id) {
+    if (tenantCompanyId && !tenantLoading) {
       loadRotas()
     }
-  }, [user?.id])
+  }, [tenantCompanyId, tenantLoading])
 
-  const loadRotas = async () => {
+    const loadRotas = async () => {
     try {
-      // Filtrar rotas apenas da empresa do operador
-      const { data: userData } = await supabase
-        .from('users')
-        .select('company_id')
-        .eq('id', user?.id)
-        .single()
-
-      let query = supabase
-        .from("routes")
-        .select("*, companies(name), gf_route_plan(*, gf_employee_company(name, cpf))")
-
-      if (userData?.company_id) {
-        query = query.eq("company_id", userData.company_id)
-      }
-
-      const { data, error } = await query
+      // Usar view segura que já filtra por tenantCompanyId via RLS
+      const { data, error } = await supabase
+        .from("v_operator_routes_secure")
+        .select("*")
+        .order("name", { ascending: true })
 
       if (error) throw error
       setRotas(data || [])
@@ -76,15 +70,23 @@ export default function OperatorRotasPage() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold mb-2">Rotas</h1>
-            <p className="text-[var(--ink-muted)]">Solicite e acompanhe rotas atribuídas pela GOLF FOX</p>
+            <h1 className="text-3xl font-bold mb-2">{operatorI18n.routes_title}</h1>
+            <p className="text-[var(--ink-muted)]">{operatorI18n.routes_subtitle}</p>
           </div>
-          <Link href="/operator/solicitacoes">
-            <Button className="bg-orange-500 hover:bg-orange-600">
-              <Plus className="h-4 w-4 mr-2" />
-              Solicitar Nova Rota
-            </Button>
-          </Link>
+          <div className="flex gap-2">
+            <Link href="/operator/rotas/mapa">
+              <Button variant="outline">
+                <Map className="h-4 w-4 mr-2" />
+                Ver no Mapa
+              </Button>
+            </Link>
+            <Link href="/operator/solicitacoes">
+              <Button className="bg-orange-500 hover:bg-orange-600">
+                <Plus className="h-4 w-4 mr-2" />
+                Nova Rota
+              </Button>
+            </Link>
+          </div>
         </div>
 
         <div className="grid gap-4">
@@ -95,9 +97,26 @@ export default function OperatorRotasPage() {
                   <div className="flex items-center gap-2 mb-2">
                     <Navigation className="h-5 w-5 text-[var(--brand)]" />
                     <h3 className="font-bold text-lg">{rota.name}</h3>
-                    <Badge>{rota.companies?.name || "Sem empresa"}</Badge>
+                    {rota.carrier_name && (
+                      <Badge variant="outline">{rota.carrier_name}</Badge>
+                    )}
                   </div>
-                  <p className="text-sm text-[var(--ink-muted)]">{rota.origin} → {rota.destination}</p>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-3 text-sm">
+                    <div>
+                      <span className="text-[var(--ink-muted)]">Total de Viagens:</span>
+                      <p className="font-semibold">{rota.total_trips || 0}</p>
+                    </div>
+                    <div>
+                      <span className="text-[var(--ink-muted)]">Concluídas:</span>
+                      <p className="font-semibold text-green-600">{rota.completed_trips || 0}</p>
+                    </div>
+                    {rota.avg_delay_minutes && (
+                      <div>
+                        <span className="text-[var(--ink-muted)]">Atraso Médio:</span>
+                        <p className="font-semibold">{Number(rota.avg_delay_minutes).toFixed(1)} min</p>
+                      </div>
+                    )}
+                  </div>
                 </div>
                 <Link href={`/operator/rotas/mapa?route_id=${rota.id}`}>
                   <Button variant="outline" size="sm">

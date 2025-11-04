@@ -77,26 +77,48 @@ function LoginContent() {
 
       if (data.session) {
         console.log('✅ Login realizado com sucesso')
-        
+
+        // Montar dados de sessão para o middleware
+        const userRole = data.user.user_metadata?.role || getUserRoleByEmail(data.user.email)
+        const userData = {
+          id: data.user.id,
+          email: data.user.email,
+          role: userRole,
+          accessToken: data.session.access_token,
+        }
+
+        // Persistir cookie de sessão no servidor
+        try {
+          const resp = await fetch('/api/auth/set-session', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user: userData }),
+          })
+          if (!resp.ok) {
+            console.warn('⚠️ Falha ao setar cookie de sessão via API:', await resp.text())
+          }
+        } catch (e) {
+          console.warn('⚠️ Erro ao chamar /api/auth/set-session:', e)
+        }
+
         const nextUrl = searchParams.get('next')
         let redirectUrl: string
-        
+
         if (nextUrl) {
           // Se há um parâmetro next, redireciona para lá
           redirectUrl = decodeURIComponent(nextUrl)
           console.log('🔄 Redirecionando para URL solicitada:', redirectUrl)
         } else {
-          // Senão, redireciona baseado no role
-          const userRole = data.user.user_metadata?.role || getUserRoleByEmail(data.user.email)
+          // Senão, redireciona baseado na role
           redirectUrl = `/${userRole}`
           console.log('🔄 Redirecionando para:', redirectUrl)
         }
-        
+
         // Use window.location for more reliable navigation
         if (typeof window !== 'undefined') {
-          window.location.href = redirectUrl
+          window.location.replace(redirectUrl)
         } else {
-          router.push(redirectUrl)
+          router.replace(redirectUrl)
         }
       } else {
         console.warn('Login sem sessão criada')

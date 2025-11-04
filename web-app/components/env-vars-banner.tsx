@@ -4,46 +4,26 @@ import { useEffect, useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { AlertTriangle, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
-
-interface MissingEnvVar {
-  name: string
-  description: string
-}
+import { validateEnv, isDevelopment } from "@/lib/env"
 
 export function EnvVarsBanner() {
-  const [missingVars, setMissingVars] = useState<MissingEnvVar[]>([])
+  const [missingVars, setMissingVars] = useState<string[]>([])
+  const [invalidVars, setInvalidVars] = useState<Array<{ key: string; reason: string }>>([])
   const [isDismissed, setIsDismissed] = useState(false)
 
   useEffect(() => {
-    // Verificar variáveis de ambiente críticas
-    const requiredVars: MissingEnvVar[] = []
-    
-    if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
-      requiredVars.push({
-        name: "NEXT_PUBLIC_SUPABASE_URL",
-        description: "URL do projeto Supabase"
-      })
+    // Só mostrar banner em desenvolvimento
+    if (!isDevelopment()) {
+      return
     }
-    
-    if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-      requiredVars.push({
-        name: "NEXT_PUBLIC_SUPABASE_ANON_KEY",
-        description: "Chave anônima do Supabase"
-      })
-    }
-    
-    if (!process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY) {
-      requiredVars.push({
-        name: "NEXT_PUBLIC_GOOGLE_MAPS_API_KEY",
-        description: "Chave da API do Google Maps"
-      })
-    }
+
+    const validation = validateEnv()
+    setMissingVars(validation.missing)
+    setInvalidVars(validation.invalid)
     
     // Verificar se foi fechado anteriormente
     const dismissed = sessionStorage.getItem('env_vars_banner_dismissed') === 'true'
     setIsDismissed(dismissed)
-    
-    setMissingVars(requiredVars)
   }, [])
 
   const handleDismiss = () => {
@@ -51,7 +31,8 @@ export function EnvVarsBanner() {
     sessionStorage.setItem('env_vars_banner_dismissed', 'true')
   }
 
-  if (missingVars.length === 0 || isDismissed) {
+  // Só mostrar em desenvolvimento
+  if (!isDevelopment() || (missingVars.length === 0 && invalidVars.length === 0) || isDismissed) {
     return null
   }
 
@@ -73,18 +54,31 @@ export function EnvVarsBanner() {
                   Variáveis de Ambiente Faltantes
                 </p>
                 <p className="text-xs sm:text-sm opacity-90 mt-0.5">
-                  {missingVars.length === 1 
-                    ? `Falta configurar: ${missingVars[0].name}`
-                    : `Faltam ${missingVars.length} variáveis de ambiente críticas`
+                  {missingVars.length > 0 && invalidVars.length > 0
+                    ? `${missingVars.length} variáveis faltando e ${invalidVars.length} inválidas`
+                    : missingVars.length === 1
+                    ? `Falta configurar: ${missingVars[0]}`
+                    : missingVars.length > 0
+                    ? `Faltam ${missingVars.length} variáveis de ambiente críticas`
+                    : `${invalidVars.length} variável(is) inválida(s)`
                   }
                 </p>
                 <div className="mt-1 flex flex-wrap gap-2">
-                  {missingVars.map((v) => (
+                  {missingVars.map((key) => (
                     <code 
-                      key={v.name}
+                      key={key}
                       className="text-xs bg-white/20 px-2 py-0.5 rounded font-mono"
                     >
-                      {v.name}
+                      {key}
+                    </code>
+                  ))}
+                  {invalidVars.map(({ key, reason }) => (
+                    <code 
+                      key={key}
+                      className="text-xs bg-white/20 px-2 py-0.5 rounded font-mono"
+                      title={reason}
+                    >
+                      {key} (inválido)
                     </code>
                   ))}
                 </div>
@@ -104,4 +98,5 @@ export function EnvVarsBanner() {
     </AnimatePresence>
   )
 }
+
 
