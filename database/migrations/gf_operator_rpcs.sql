@@ -158,7 +158,7 @@ DECLARE
 BEGIN
   -- Calcular pontualidade
   SELECT 
-    (COUNT(DISTINCT t.id) FILTER (WHERE t.status = 'completed' AND t.actual_arrival <= t.scheduled_arrival + INTERVAL '5 minutes')::NUMERIC / 
+    (COUNT(DISTINCT t.id) FILTER (WHERE t.status = 'completed' AND t.completed_at <= t.scheduled_at + INTERVAL '5 minutes')::NUMERIC / 
      NULLIF(COUNT(DISTINCT t.id) FILTER (WHERE t.status = 'completed'), 0)) * 100
   INTO v_punctuality
   FROM trips t

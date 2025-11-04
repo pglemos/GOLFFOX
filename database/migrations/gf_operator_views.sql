@@ -8,15 +8,21 @@ SELECT
   COUNT(DISTINCT t.id) FILTER (WHERE DATE(t.scheduled_at) = CURRENT_DATE) as trips_today,
   COUNT(DISTINCT t.id) FILTER (WHERE t.status = 'inProgress') as trips_in_progress,
   COUNT(DISTINCT t.id) FILTER (WHERE t.status = 'completed') as trips_completed,
-  COUNT(DISTINCT t.id) FILTER (WHERE t.status = 'completed' AND t.actual_arrival > t.scheduled_arrival + INTERVAL '5 minutes') as delays_over_5min,
-  AVG(t.current_occupancy::NUMERIC / NULLIF(v.capacity, 0)) FILTER (WHERE t.status = 'inProgress') as avg_occupancy,
+  COUNT(DISTINCT t.id) FILTER (WHERE t.status = 'completed' AND t.completed_at > t.scheduled_at + INTERVAL '5 minutes') as delays_over_5min,
+  AVG(
+    (
+      SELECT COUNT(*)::NUMERIC 
+      FROM trip_passengers tp 
+      WHERE tp.trip_id = t.id
+    )
+  ) FILTER (WHERE t.status = 'inProgress') as avg_occupancy,
   -- Custo/dia faturado GOLF FOX
   SUM(COALESCE(il.amount, 0)) FILTER (WHERE DATE(i.created_at) = CURRENT_DATE) as daily_cost,
   -- SLA D+0 GOLF FOX→Operador (viagens concluídas no prazo hoje)
   CASE 
-    WHEN COUNT(DISTINCT t.id) FILTER (WHERE DATE(t.scheduled_at) = CURRENT_DATE AND t.status = 'completed') > 0 
-    THEN (COUNT(DISTINCT t.id) FILTER (WHERE DATE(t.scheduled_at) = CURRENT_DATE AND t.status = 'completed' AND t.actual_arrival <= t.scheduled_arrival + INTERVAL '5 minutes')::NUMERIC / 
-          NULLIF(COUNT(DISTINCT t.id) FILTER (WHERE DATE(t.scheduled_at) = CURRENT_DATE AND t.status = 'completed'), 0)) * 100
+  WHEN COUNT(DISTINCT t.id) FILTER (WHERE DATE(t.scheduled_at) = CURRENT_DATE AND t.status = 'completed') > 0
+  THEN (COUNT(DISTINCT t.id) FILTER (WHERE DATE(t.scheduled_at) = CURRENT_DATE AND t.status = 'completed' AND t.completed_at <= t.scheduled_at + INTERVAL '5 minutes')::NUMERIC /
+  NULLIF(COUNT(DISTINCT t.id) FILTER (WHERE DATE(t.scheduled_at) = CURRENT_DATE AND t.status = 'completed'), 0)) * 100
     ELSE 0
   END as sla_d0
 FROM companies c
@@ -33,34 +39,28 @@ CREATE OR REPLACE VIEW v_operator_routes AS
 SELECT 
   r.id,
   r.name,
-  r.origin,
-  r.destination,
   r.company_id as empresa_id,
-  r.is_active,
   COUNT(DISTINCT t.id) as total_trips,
   COUNT(DISTINCT t.id) FILTER (WHERE t.status = 'completed') as completed_trips,
   -- Agregado de SLA
-  AVG(EXTRACT(EPOCH FROM (t.actual_arrival - t.scheduled_arrival))/60) FILTER (WHERE t.status = 'completed') as avg_delay_minutes,
+  AVG(EXTRACT(EPOCH FROM (t.completed_at - t.scheduled_at))/60) FILTER (WHERE t.status = 'completed') as avg_delay_minutes,
   -- Transportadora alocada
   c.name as carrier_name
 FROM routes r
 LEFT JOIN trips t ON t.route_id = r.id
 LEFT JOIN gf_assigned_carriers ac ON ac.empresa_id = r.company_id AND CURRENT_DATE BETWEEN ac.period_start AND COALESCE(ac.period_end, CURRENT_DATE + INTERVAL '1 year')
 LEFT JOIN companies c ON c.id = ac.carrier_id
-GROUP BY r.id, r.name, r.origin, r.destination, r.company_id, r.is_active, c.name;
+GROUP BY r.id, r.name, r.company_id, c.name;
 
 -- v_operator_alerts: Alertas do operador
 CREATE OR REPLACE VIEW v_operator_alerts AS
 SELECT 
   a.id,
-  a.type,
   a.severity,
   a.message,
-  a.route_id,
-  r.company_id as empresa_id,
+  a.company_id as empresa_id,
   a.created_at
 FROM gf_alerts a
-LEFT JOIN routes r ON r.id = a.route_id
 WHERE a.created_at >= NOW() - INTERVAL '30 days';
 
 -- v_operator_costs: Custos consolidados do operador
@@ -89,17 +89,10 @@ SELECT
   c.name as carrier_name,
   ac.period_start,
   ac.period_end,
-  ac.notes,
-  -- SLAs agregados
-  AVG(cs.punctuality_score) as avg_punctuality,
-  AVG(cs.availability_score) as avg_availability,
-  SUM(cs.incident_count) as total_incidents,
-  COUNT(cs.id) as score_periods
+  ac.notes
 FROM gf_assigned_carriers ac
 JOIN companies c ON c.id = ac.carrier_id
-LEFT JOIN gf_carrier_scores cs ON cs.carrier_id = ac.carrier_id
-WHERE c.role = 'carrier'
-GROUP BY ac.empresa_id, c.id, c.name, ac.period_start, ac.period_end, ac.notes;
+WHERE c.role = 'carrier';
 
 -- v_operator_carrier_sla: SLA detalhado por transportadora e período
 CREATE OR REPLACE VIEW v_operator_carrier_sla AS
@@ -109,8 +102,8 @@ SELECT
   c.name as carrier_name,
   DATE_TRUNC('month', t.scheduled_at) as period,
   COUNT(DISTINCT t.id) as total_trips,
-  COUNT(DISTINCT t.id) FILTER (WHERE t.status = 'completed' AND t.actual_arrival <= t.scheduled_arrival + INTERVAL '5 minutes') as on_time_trips,
-  (COUNT(DISTINCT t.id) FILTER (WHERE t.status = 'completed' AND t.actual_arrival <= t.scheduled_arrival + INTERVAL '5 minutes')::NUMERIC / 
+  COUNT(DISTINCT t.id) FILTER (WHERE t.status = 'completed' AND t.completed_at <= t.scheduled_at + INTERVAL '5 minutes') as on_time_trips,
+  (COUNT(DISTINCT t.id) FILTER (WHERE t.status = 'completed' AND t.completed_at <= t.scheduled_at + INTERVAL '5 minutes')::NUMERIC / 
    NULLIF(COUNT(DISTINCT t.id) FILTER (WHERE t.status = 'completed'), 0)) * 100 as punctuality_percentage,
   COUNT(DISTINCT t.id) FILTER (WHERE t.status = 'cancelled') as cancelled_trips
 FROM gf_assigned_carriers ac
@@ -126,8 +119,8 @@ SELECT
   r.company_id as empresa_id,
   DATE_TRUNC('month', t.scheduled_at) as period,
   COUNT(DISTINCT t.id) as total_trips,
-  COUNT(DISTINCT t.id) FILTER (WHERE t.status = 'completed' AND t.actual_arrival <= t.scheduled_arrival + INTERVAL '5 minutes') as on_time_trips,
-  (COUNT(DISTINCT t.id) FILTER (WHERE t.status = 'completed' AND t.actual_arrival <= t.scheduled_arrival + INTERVAL '5 minutes')::NUMERIC / 
+  COUNT(DISTINCT t.id) FILTER (WHERE t.status = 'completed' AND t.completed_at <= t.scheduled_at + INTERVAL '5 minutes') as on_time_trips,
+  (COUNT(DISTINCT t.id) FILTER (WHERE t.status = 'completed' AND t.completed_at <= t.scheduled_at + INTERVAL '5 minutes')::NUMERIC / 
    NULLIF(COUNT(DISTINCT t.id) FILTER (WHERE t.status = 'completed'), 0)) * 100 as sla_percentage
 FROM trips t
 JOIN routes r ON r.id = t.route_id
@@ -147,7 +140,7 @@ SELECT
   sr.sla_target,
   sr.created_by,
   sr.assigned_to,
-  u.name as assigned_to_name,
+  u.email as assigned_to_email,
   -- Calcula tempo de resposta
   CASE 
     WHEN sr.status IN ('aprovado', 'reprovado', 'em_operacao') AND sr.resolved_at IS NOT NULL
@@ -164,20 +157,14 @@ CREATE OR REPLACE VIEW v_operator_employees AS
 SELECT 
   ec.id,
   ec.company_id as empresa_id,
-  ec.employee_id,
-  u.name,
-  u.email,
-  u.phone,
+  ec.name,
+  ec.cpf,
+  ec.email,
+  ec.phone,
   ec.address,
   ec.latitude,
   ec.longitude,
   ec.is_active,
-  ec.route_id,
-  r.name as route_name,
-  ec.cost_center_id,
-  cc.name as cost_center_name
-FROM gf_employee_company ec
-JOIN users u ON u.id = ec.employee_id
-LEFT JOIN routes r ON r.id = ec.route_id
-LEFT JOIN gf_cost_centers cc ON cc.id = ec.cost_center_id;
+  ec.created_at
+FROM gf_employee_company ec;
 
