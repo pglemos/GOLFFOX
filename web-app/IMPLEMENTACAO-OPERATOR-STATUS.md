@@ -74,22 +74,55 @@ ON CONFLICT (user_id, company_id) DO NOTHING;
 REFRESH MATERIALIZED VIEW mv_operator_kpis;
 ```
 
-### 2. Variáveis de Ambiente
+### 2. Configuração de Ambiente (Vercel)
 
-Certifique-se de ter configurado no Vercel:
+**📖 Veja guia completo:** `docs/CONFIGURACAO-AMBIENTE.md`
 
-```env
-# Já configurado
-NEXT_PUBLIC_SUPABASE_URL=...
-NEXT_PUBLIC_SUPABASE_ANON_KEY=...
-SUPABASE_SERVICE_ROLE_KEY=...
-NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=...
+#### Variáveis Obrigatórias
 
-# Adicionar/verificar
-CRON_SECRET=seu-secret-aqui  # Para proteger endpoint de cron
+Configure no Vercel Dashboard:
+
+```bash
+NEXT_PUBLIC_SUPABASE_URL=https://seu-projeto.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=sua-chave-anon
+SUPABASE_SERVICE_ROLE_KEY=sua-chave-service-role
+NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=sua-chave-google-maps
+CRON_SECRET=seu-secret-aleatorio-aqui
 ```
 
-### 3. Testes Manuais Recomendados
+#### Como Gerar CRON_SECRET
+
+```bash
+# No terminal
+openssl rand -base64 32
+
+# Ou use Node.js
+node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
+```
+
+#### Configurar no Vercel
+
+1. Acesse [Vercel Dashboard](https://vercel.com/dashboard)
+2. Selecione seu projeto
+3. Vá em **Settings** → **Environment Variables**
+4. Adicione todas as variáveis
+5. Marque **Production**, **Preview**, **Development**
+6. Clique em **Save**
+
+### 3. Testes Manuais
+
+**📖 Veja guia completo:** `docs/GUIA-TESTES-OPERATOR.md`
+
+#### Checklist Rápido
+
+- [ ] **Teste 1**: Login e Seleção de Empresa
+- [ ] **Teste 2**: Dashboard e KPIs
+- [ ] **Teste 3**: Multi-tenant (Isolamento de Dados)
+- [ ] **Teste 4**: Funcionários (Importação CSV)
+- [ ] **Teste 5**: Rotas e Mapa
+- [ ] **Teste 6**: Custos e Reconciliação
+- [ ] **Teste 7**: Relatórios
+- [ ] **Teste 8**: Vercel Cron
 
 #### Teste 1: Login e Seleção de Empresa
 - [ ] Fazer login como operador
