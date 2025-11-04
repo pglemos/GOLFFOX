@@ -21,17 +21,18 @@ import toast from "react-hot-toast"
 import { FuncionarioModal } from "@/components/operator/funcionario-modal"
 // @ts-ignore
 import { CSVImportModal } from "@/components/operator/csv-import-modal"
+import { useOperatorTenant } from "@/components/providers/operator-tenant-provider"
 
 export default function FuncionariosPage() {
   const router = useRouter()
+  const { tenantCompanyId, companyName, loading: tenantLoading } = useOperatorTenant()
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [funcionarios, setFuncionarios] = useState<any[]>([])
   const [searchQuery, setSearchQuery] = useState("")
-  const [selectedFuncionario, setSelectedFuncionario] = useState<any>(null)
+  const [selectedFuncionario, setSelectedFuncionario] = useState<any>(null)     
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isCSVModalOpen, setIsCSVModalOpen] = useState(false)
-  const [empresaId, setEmpresaId] = useState<string | null>(null)
 
   useEffect(() => {
     const getUser = async () => {
@@ -42,38 +43,29 @@ export default function FuncionariosPage() {
       }
       setUser({ ...session.user })
       setLoading(false)
-      loadFuncionarios()
     }
     getUser()
   }, [router])
 
+  useEffect(() => {
+    if (tenantCompanyId && !tenantLoading) {
+      loadFuncionarios()
+    }
+  }, [tenantCompanyId, tenantLoading])
+
   const loadFuncionarios = async () => {
+    if (!tenantCompanyId) return
+    
     try {
-      // Buscar funcionários associados à empresa do operador
-      const { data: userData } = await supabase
-        .from('users')
-        .select('company_id')
-        .eq('id', user?.id)
-        .single()
+      // RLS já filtra por company_id automaticamente
+      const { data, error } = await supabase
+        .from('gf_employee_company')
+        .select('id, company_id, name, cpf, email, phone, is_active, address, lat, lng')
+        .eq('company_id', tenantCompanyId)
+        .order('name', { ascending: true })
 
-      if (userData?.company_id) {
-        setEmpresaId(userData.company_id)
-        const { data, error } = await supabase
-          .from('gf_employee_company')
-          .select('id, company_id, name, cpf, email, phone, is_active')
-          .eq('company_id', userData.company_id)
-
-        if (error) throw error
-        setFuncionarios(data || [])
-      } else {
-        // Se não tem company_id, buscar todos os funcionários
-        const { data, error } = await supabase
-          .from('gf_employee_company')
-          .select('id, company_id, name, cpf, email, phone, is_active')
-
-        if (error) throw error
-        setFuncionarios(data || [])
-      }
+      if (error) throw error
+      setFuncionarios(data || [])
     } catch (error: any) {
       console.error("Erro ao carregar funcionários:", error)
       toast.error("Erro ao carregar funcionários")
