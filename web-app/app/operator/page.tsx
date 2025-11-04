@@ -17,9 +17,11 @@ import { OperatorKPICards } from "@/components/operator/operator-kpi-cards"
 import { ControlTowerCards } from "@/components/operator/control-tower-cards"
 // @ts-ignore
 import Link from "next/link"
+import { useOperatorTenant } from "@/components/providers/operator-tenant-provider"
 
 export default function OperatorDashboard() {
   const router = useRouter()
+  const { tenantCompanyId, companyName, loading: tenantLoading } = useOperatorTenant()
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [kpis, setKpis] = useState({
@@ -37,7 +39,6 @@ export default function OperatorDashboard() {
     routeDeviations: 0,
     openAssistance: 0
   })
-  const [empresaId, setEmpresaId] = useState<string | null>(null)
 
   useEffect(() => {
     const getUser = async () => {
@@ -55,26 +56,28 @@ export default function OperatorDashboard() {
 
       if (data) {
         setUser({ ...session.user, ...data })
-        setEmpresaId(data.company_id)
-        if (data.company_id) {
-          loadKPIs(data.company_id)
-          loadControlTower(data.company_id)
-        }
       }
-      
+
       setLoading(false)
     }
 
     getUser()
   }, [router])
 
+  useEffect(() => {
+    if (tenantCompanyId && !tenantLoading) {
+      loadKPIs(tenantCompanyId)
+      loadControlTower(tenantCompanyId)
+    }
+  }, [tenantCompanyId, tenantLoading])
+
   const loadKPIs = async (companyId: string) => {
     try {
-      // Buscar KPIs da view v_operator_dashboard_kpis
+      // Usar materialized view para performance
       const { data, error } = await supabase
-        .from("v_operator_dashboard_kpis")
+        .from("mv_operator_kpis")
         .select("*")
-        .eq("empresa_id", companyId)
+        .eq("company_id", companyId)
         .single()
 
       if (error) {

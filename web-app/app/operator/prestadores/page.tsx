@@ -56,7 +56,7 @@ export default function PrestadoresOperatorPage() {
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold mb-2">Prestadores Alocados</h1>
-          <p className="text-[var(--ink-muted)]">Lista read-only de transportadoras alocadas pela GOLF FOX</p>
+            <p className="text-[var(--ink-muted)]">Lista read-only de transportadoras alocadas</p>
         </div>
 
         <div className="grid gap-4">

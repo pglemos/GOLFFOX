@@ -21,28 +21,19 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { useOperatorTenant } from "@/components/providers/operator-tenant-provider"
 
 export default function RelatoriosOperatorPage() {
   const router = useRouter()
+  const { tenantCompanyId, companyName, loading: tenantLoading } = useOperatorTenant()
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
-  const [empresaId, setEmpresaId] = useState<string | null>(null)
 
   useEffect(() => {
     const run = async () => {
       const { data: { session } } = await supabase.auth.getSession()
       if (!session) { router.push("/"); return }
-      
-      const { data: userData } = await supabase
-        .from('users')
-        .select('company_id')
-        .eq('id', session.user.id)
-        .single()
 
-      if (userData?.company_id) {
-        setEmpresaId(userData.company_id)
-      }
-      
       setUser({ ...session.user })
       setLoading(false)
     }
@@ -58,15 +49,13 @@ export default function RelatoriosOperatorPage() {
         rows: []
       }
 
-      // Tentar buscar dados de views se disponíveis
+      // Tentar buscar dados de views seguras se disponíveis
       if (report.viewName) {
-        let query = supabase.from(report.viewName).select('*').limit(100)
-        
-        if (empresaId) {
-          query = query.eq('empresa_id', empresaId)
-        }
-        
-        const { data, error } = await query
+        // Views seguras já filtram por company_id via RLS
+        const { data, error } = await supabase
+          .from(report.viewName)
+          .select('*')
+          .limit(100)
         
         if (error) throw error
         
