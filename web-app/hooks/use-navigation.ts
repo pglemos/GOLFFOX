@@ -36,9 +36,9 @@ export function useNavigation(): NavigationState {
 
   // Lógica específica para itens do Sidebar
   const isSidebarItemActive = (path: string): boolean => {
-    if (path === "/admin") {
-      // Dashboard ativo apenas na rota exata
-      return currentPath === "/admin"
+    // Dashboards dos painéis só ficam ativos na rota exata
+    if (path === "/admin" || path === "/operator" || path === "/carrier") {
+      return currentPath === path
     }
     // Outras rotas podem ter subrotas ativas
     return currentPath === path || currentPath.startsWith(path + '/')

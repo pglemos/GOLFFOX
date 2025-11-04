@@ -53,7 +53,6 @@ export default function OperatorRotasPage() {
       let query = supabase
         .from("routes")
         .select("*, companies(name), gf_route_plan(*, gf_employee_company(name, cpf))")
-        .eq("is_active", true)
 
       if (userData?.company_id) {
         query = query.eq("company_id", userData.company_id)

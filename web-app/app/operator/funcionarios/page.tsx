@@ -60,10 +60,7 @@ export default function FuncionariosPage() {
         setEmpresaId(userData.company_id)
         const { data, error } = await supabase
           .from('gf_employee_company')
-          .select(`
-            *,
-            employee:users!gf_employee_company_employee_id_fkey(id, name, email, phone)
-          `)
+          .select('id, company_id, name, cpf, email, phone, is_active')
           .eq('company_id', userData.company_id)
 
         if (error) throw error
@@ -72,10 +69,7 @@ export default function FuncionariosPage() {
         // Se não tem company_id, buscar todos os funcionários
         const { data, error } = await supabase
           .from('gf_employee_company')
-          .select(`
-            *,
-            employee:users!gf_employee_company_employee_id_fkey(id, name, email, phone)
-          `)
+          .select('id, company_id, name, cpf, email, phone, is_active')
 
         if (error) throw error
         setFuncionarios(data || [])
@@ -91,11 +85,9 @@ export default function FuncionariosPage() {
   }
 
   const filteredFuncionarios = funcionarios.filter(f => {
-    const employee = f.employee
-    if (!employee) return false
     return searchQuery === "" || 
-      employee.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      employee.email?.toLowerCase().includes(searchQuery.toLowerCase())
+      f.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      f.email?.toLowerCase().includes(searchQuery.toLowerCase())
   })
 
   return (
@@ -134,7 +126,6 @@ export default function FuncionariosPage() {
 
         <div className="grid gap-4">
           {filteredFuncionarios.map((funcionario, index) => {
-            const employee = funcionario.employee
             return (
               <motion.div
                 key={funcionario.id || index}
@@ -147,20 +138,20 @@ export default function FuncionariosPage() {
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
                         <Users className="h-5 w-5 text-[var(--brand)]" />
-                        <h3 className="font-bold text-lg">{employee?.name || "Nome não disponível"}</h3>
+                        <h3 className="font-bold text-lg">{funcionario?.name || "Nome não disponível"}</h3>
                         <Badge variant="outline">Funcionário</Badge>
                       </div>
                       <div className="space-y-1 text-sm text-[var(--ink-muted)]">
-                        {employee?.email && (
+                        {funcionario?.email && (
                           <div className="flex items-center gap-2">
                             <Mail className="h-4 w-4" />
-                            <span>{employee.email}</span>
+                            <span>{funcionario.email}</span>
                           </div>
                         )}
-                        {employee?.phone && (
+                        {funcionario?.phone && (
                           <div className="flex items-center gap-2">
                             <Phone className="h-4 w-4" />
-                            <span>{employee.phone}</span>
+                            <span>{funcionario.phone}</span>
                           </div>
                         )}
                         {funcionario.company_id && (

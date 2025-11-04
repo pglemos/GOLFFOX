@@ -41,11 +41,16 @@ export default function TestAuth() {
           role: 'admin',
           accessToken: data.session.access_token
         }
+        // Persistência para debug
         window.localStorage.setItem('golffox-user', JSON.stringify(userData))
+        window.localStorage.setItem('golffox-auth', JSON.stringify(userData))
         
         const cookieOptions = 'path=/; max-age=3600; SameSite=Lax'
         document.cookie = `golffox-auth=${data.session.access_token}; ${cookieOptions}`
         document.cookie = `golffox-user=${JSON.stringify(userData)}; ${cookieOptions}`
+        // Cookie esperado pelo middleware (Base64 de JSON)
+        const sessionCookie = btoa(JSON.stringify(userData))
+        document.cookie = `golffox-session=${sessionCookie}; ${cookieOptions}`
         
         // Atualizar estado
         setCookies(document.cookie)

@@ -181,6 +181,43 @@ def test_rpcs(cur, empresa_id, uid):
         print("Sem rotas para testar rpc_request_route_change.")
 
 
+def ensure_carrier(cur):
+    cur.execute("SELECT id FROM public.carriers LIMIT 1;")
+    r = cur.fetchone()
+    if r:
+        return r[0]
+    cur.execute(
+        "INSERT INTO public.carriers (id, name) VALUES (gen_random_uuid(), %s) RETURNING id;",
+        ("Transportadora Demo",),
+    )
+    return cur.fetchone()[0]
+
+
+def seed_minimal_route(cur, empresa_id):
+    # Garante uma transportadora e cria uma rota simples para a empresa
+    carrier_id = ensure_carrier(cur)
+    cur.execute(
+        """
+        SELECT id FROM public.routes WHERE company_id = %s ORDER BY created_at LIMIT 1;
+        """,
+        (empresa_id,),
+    )
+    r = cur.fetchone()
+    if r:
+        return r[0]
+    cur.execute(
+        """
+        INSERT INTO public.routes (id, name, company_id, carrier_id)
+        VALUES (gen_random_uuid(), %s, %s, %s)
+        RETURNING id;
+        """,
+        ("Rota Demo", empresa_id, carrier_id),
+    )
+    route_id = cur.fetchone()[0]
+    print("Rota criada para testes:", route_id)
+    return route_id
+
+
 def verify_gf_service_requests_payload(cur):
     cur.execute(
         """
@@ -208,6 +245,8 @@ def main():
 
         # Validar RLS via sessão simulada e exportar CSVs
         set_operator_session(cur, uid)
+        # Semear rota mínima para testes de alteração de rota
+        seed_minimal_route(cur, empresa_id)
         reports_dir = ROOT / "database" / "reports"
         for view in [
             "v_operator_routes",

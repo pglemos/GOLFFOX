@@ -115,7 +115,20 @@ export class AuthManager {
 
   private static getUserRoleByEmail(email: string): string {
     const demoAccounts = [
+      // Conjunto A (golffox.com)
+      { email: 'admin@golffox.com', role: 'admin' },
+      { email: 'operator@golffox.com', role: 'operator' },
+      { email: 'carrier@golffox.com', role: 'carrier' },
+      { email: 'driver@golffox.com', role: 'driver' },
+
+      // Conjunto B (Português, usados na página de login)
       { email: 'golffox@admin.com', role: 'admin' },
+      { email: 'operador@empresa.com', role: 'operator' },
+      { email: 'transportadora@trans.com', role: 'carrier' },
+      { email: 'motorista@trans.com', role: 'driver' },
+      { email: 'passageiro@empresa.com', role: 'passenger' },
+
+      // Variantes antigas
       { email: 'operador@golffox.com', role: 'operator' },
       { email: 'transportadora@golffox.com', role: 'carrier' },
       { email: 'motorista@golffox.com', role: 'driver' }
