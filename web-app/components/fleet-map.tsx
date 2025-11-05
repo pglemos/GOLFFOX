@@ -207,14 +207,7 @@ export function FleetMap({ companyId, routeId, initialCenter, initialZoom }: Fle
         return
       }
 
-      let attempts = 0
-      const maxAttempts = 50
-      
-      while (!mapRef.current && attempts < maxAttempts) {
-        await new Promise(resolve => setTimeout(resolve, 100))
-        attempts++
-      }
-
+      // Garantir que o contêiner do mapa exista (ref deve estar definido após o primeiro render)
       if (!mapRef.current) {
         setMapError('Elemento do mapa não foi encontrado.')
         setLoading(false)
@@ -524,40 +517,6 @@ export function FleetMap({ companyId, routeId, initialCenter, initialZoom }: Fle
       passengerName: stop.passenger_name || stop.stop_name || ''
     }))
 
-  if (loading) {
-    return (
-      <div className="w-full h-[calc(100vh-300px)] rounded-[var(--radius-xl)] bg-[var(--bg-soft)] flex items-center justify-center border border-[var(--border)]">
-        <div className="text-center">
-          <div className="loader-spinner mx-auto"></div>
-          <p className="mt-4 text-[var(--ink-muted)]">Carregando mapa...</p>
-        </div>
-      </div>
-    )
-  }
-
-  if (mapError) {
-    return (
-      <div className="w-full h-[calc(100vh-300px)] rounded-[var(--radius-xl)] bg-[var(--bg-soft)] flex items-center justify-center border border-[var(--border)]">
-        <div className="text-center max-w-md">
-          <AlertCircle className="h-16 w-16 text-[var(--danger)] mx-auto mb-4" />
-          <h3 className="text-xl font-semibold mb-2 text-[var(--ink)]">Erro no Mapa</h3>
-          <p className="text-[var(--ink-muted)] mb-6">{mapError}</p>
-          <Button 
-            onClick={() => {
-              setMapError(null)
-              setLoading(true)
-              window.location.reload()
-            }}
-            className="flex items-center gap-2"
-          >
-            <RefreshCw className="h-4 w-4" />
-            Tentar Novamente
-          </Button>
-        </div>
-      </div>
-    )
-  }
-
   return (
     <div className="relative w-full rounded-[var(--radius-xl)] overflow-hidden border border-[var(--border)] shadow-lg">
       {/* Barra Superior Fixa */}
@@ -596,6 +555,38 @@ export function FleetMap({ companyId, routeId, initialCenter, initialZoom }: Fle
         ref={mapRef} 
         className={`w-full ${(selectedBus || filters.route) && formattedStops.length > 0 ? 'h-[calc(100vh-450px)]' : 'h-[calc(100vh-300px)]'}`}
       />
+
+      {/* Overlay de loading */}
+      {loading && (
+        <div className="absolute inset-0 z-40 flex items-center justify-center bg-white/70 backdrop-blur-sm">
+          <div className="text-center">
+            <div className="loader-spinner mx-auto"></div>
+            <p className="mt-4 text-[var(--ink-muted)]">Carregando mapa...</p>
+          </div>
+        </div>
+      )}
+
+      {/* Overlay de erro */}
+      {mapError && (
+        <div className="absolute inset-0 z-40 flex items-center justify-center bg-white/80 backdrop-blur-sm">
+          <div className="text-center max-w-md">
+            <AlertCircle className="h-16 w-16 text-[var(--danger)] mx-auto mb-4" />
+            <h3 className="text-xl font-semibold mb-2 text-[var(--ink)]">Erro no Mapa</h3>
+            <p className="text-[var(--ink-muted)] mb-6">{mapError}</p>
+            <Button 
+              onClick={() => {
+                setMapError(null)
+                setLoading(true)
+                window.location.reload()
+              }}
+              className="flex items-center gap-2"
+            >
+              <RefreshCw className="h-4 w-4" />
+              Tentar Novamente
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* Filtros Flutuantes */}
       <motion.div

@@ -69,42 +69,49 @@ export function validateEnv(): EnvValidation {
   const missing: string[] = []
   const invalid: Array<{ key: string; reason: string }> = []
 
+  // Atenção: em componentes client, acessos dinâmicos a process.env (ex: process.env[key])
+  // não são substituídos pelo bundler do Next. Precisamos referenciar explicitamente.
+  const env = {
+    NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
+    NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,
+    RESEND_API_KEY: process.env.RESEND_API_KEY,
+    REPORTS_FROM_EMAIL: process.env.REPORTS_FROM_EMAIL,
+    REPORTS_BCC: process.env.REPORTS_BCC,
+    NEXT_PUBLIC_BASE_URL: process.env.NEXT_PUBLIC_BASE_URL,
+  }
+
   // Validar variáveis obrigatórias
-  for (const key of REQUIRED_ENV_VARS) {
-    const value = process.env[key]
-    if (!value) {
-      missing.push(key)
-    } else {
-      // Validações específicas
-      if (key === 'NEXT_PUBLIC_SUPABASE_URL' && !isValidSupabaseUrl(value)) {
-        invalid.push({ key, reason: 'URL do Supabase inválida' })
-      }
-      if (key === 'NEXT_PUBLIC_SUPABASE_ANON_KEY' && !isValidSupabaseKey(value)) {
-        invalid.push({ key, reason: 'API Key do Supabase inválida' })
-      }
-      if (key === 'NEXT_PUBLIC_GOOGLE_MAPS_API_KEY' && !isValidGoogleMapsKey(value)) {
-        invalid.push({ key, reason: 'API Key do Google Maps inválida' })
-      }
-    }
+  if (!env.NEXT_PUBLIC_SUPABASE_URL) {
+    missing.push('NEXT_PUBLIC_SUPABASE_URL')
+  } else if (!isValidSupabaseUrl(env.NEXT_PUBLIC_SUPABASE_URL)) {
+    invalid.push({ key: 'NEXT_PUBLIC_SUPABASE_URL', reason: 'URL do Supabase inválida' })
+  }
+
+  if (!env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    missing.push('NEXT_PUBLIC_SUPABASE_ANON_KEY')
+  } else if (!isValidSupabaseKey(env.NEXT_PUBLIC_SUPABASE_ANON_KEY)) {
+    invalid.push({ key: 'NEXT_PUBLIC_SUPABASE_ANON_KEY', reason: 'API Key do Supabase inválida' })
+  }
+
+  if (!env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY) {
+    missing.push('NEXT_PUBLIC_GOOGLE_MAPS_API_KEY')
+  } else if (!isValidGoogleMapsKey(env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY)) {
+    invalid.push({ key: 'NEXT_PUBLIC_GOOGLE_MAPS_API_KEY', reason: 'API Key do Google Maps inválida' })
   }
 
   // Validar variáveis opcionais (apenas se definidas)
-  for (const key of OPTIONAL_ENV_VARS) {
-    const value = process.env[key]
-    if (value) {
-      if (key === 'REPORTS_FROM_EMAIL' && !isValidEmail(value)) {
-        invalid.push({ key, reason: 'Email inválido' })
-      }
-      if (key === 'REPORTS_BCC' && !isValidEmail(value)) {
-        invalid.push({ key, reason: 'Email BCC inválido' })
-      }
-      if (key === 'NEXT_PUBLIC_BASE_URL') {
-        try {
-          new URL(value)
-        } catch {
-          invalid.push({ key, reason: 'URL base inválida' })
-        }
-      }
+  if (env.REPORTS_FROM_EMAIL && !isValidEmail(env.REPORTS_FROM_EMAIL)) {
+    invalid.push({ key: 'REPORTS_FROM_EMAIL', reason: 'Email inválido' })
+  }
+  if (env.REPORTS_BCC && !isValidEmail(env.REPORTS_BCC)) {
+    invalid.push({ key: 'REPORTS_BCC', reason: 'Email BCC inválido' })
+  }
+  if (env.NEXT_PUBLIC_BASE_URL) {
+    try {
+      new URL(env.NEXT_PUBLIC_BASE_URL)
+    } catch {
+      invalid.push({ key: 'NEXT_PUBLIC_BASE_URL', reason: 'URL base inválida' })
     }
   }
 

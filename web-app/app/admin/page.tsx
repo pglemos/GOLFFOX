@@ -87,26 +87,59 @@ export default function AdminDashboard() {
     const loadKpis = async () => {
       try {
         setKpisLoading(true)
-        // Tentar primeiro a materialized view, depois a view normal
-        let query = supabase.from('mv_admin_kpis').select('*')
-        
-        const { data: mvData, error: mvError } = await query
-        
-        if (mvError || !mvData || mvData.length === 0) {
-          // Fallback para view normal
-          const { data: viewData, error: viewError } = await supabase
-            .from('v_admin_dashboard_kpis')
-            .select('*')
-          
-          if (viewError) {
-            console.error('Erro ao carregar KPIs:', viewError)
-            setKpisData([])
-          } else {
-            setKpisData(viewData || [])
+        // Estratégia: tentar materialized view -> view admin -> view operador
+        const tryFetch = async (viewName: string) => {
+          const { data, error } = await supabase.from(viewName as any).select('*')
+          if (error) {
+            // Tratar erro de view inexistente (PGRST205) como "não disponível"
+            const code = (error as any)?.code
+            if (code === 'PGRST205') {
+              return { ok: false, data: null }
+            }
+            // Outros erros: logar e seguir para próximo fallback
+            console.warn(`Falha ao ler ${viewName}:`, error.message)
+            return { ok: false, data: null }
           }
-        } else {
-          setKpisData(mvData)
+          if (!data || data.length === 0) {
+            return { ok: false, data: null }
+          }
+          return { ok: true, data }
         }
+
+        // 1) Materialized view
+        const mv = await tryFetch('mv_admin_kpis')
+        if (mv.ok) {
+          setKpisData(mv.data as any)
+          return
+        }
+
+        // 2) View admin
+        const adminView = await tryFetch('v_admin_dashboard_kpis')
+        if (adminView.ok) {
+          setKpisData(adminView.data as any)
+          return
+        }
+
+        // 3) Fallback: usar view do operador se disponível
+        const operatorView = await tryFetch('v_operator_dashboard_kpis')
+        if (operatorView.ok) {
+          // Mapeia campos do operador para KpiData se necessário
+          const mapped = (operatorView.data as any[]).map((row) => ({
+            company_id: row.company_id || row.company || '',
+            company_name: row.company_name || row.company || 'Empresa',
+            trips_today: row.trips_today ?? row.trips ?? 0,
+            vehicles_active: row.vehicles_active ?? row.vehicles ?? 0,
+            employees_in_transit: row.employees_in_transit ?? row.employees ?? 0,
+            critical_alerts: row.critical_alerts ?? row.alerts ?? 0,
+            routes_today: row.routes_today ?? row.routes ?? 0,
+          }))
+          setKpisData(mapped)
+          return
+        }
+
+        // 4) Último recurso: sem views, evitar erro e exibir vazio
+        console.info('Views de KPIs não disponíveis; exibindo dados vazios.')
+        setKpisData([])
       } catch (error) {
         console.error('Erro ao carregar KPIs:', error)
         setKpisData([])

@@ -19,6 +19,11 @@ function extractUserFromCookie(cookieValue: string): UserData | null {
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl
+  // Determinar origem confiável para redirecionamentos
+  const envBase = process.env.NEXT_PUBLIC_BASE_URL
+  const headerHost = req.headers.get('host') || ''
+  const requestOrigin = `${req.nextUrl.protocol}//${headerHost}`
+  const origin = envBase ? envBase : requestOrigin
 
   // Structured logging helper
   const now = new Date().toISOString()
@@ -32,7 +37,7 @@ export async function middleware(req: NextRequest) {
     else console.log(message, entry)
   }
 
-  log('info', '🔍 Middleware executado', {})
+  log('info', '🔍 Middleware executado', { origin })
 
   // Rotas públicas que não precisam de autenticação
   const publicRoutes = ['/', '/login', '/unauthorized', '/test-auth']
@@ -76,8 +81,9 @@ export async function middleware(req: NextRequest) {
   // Se não está autenticado e tenta acessar rota protegida
   if (!user && (isAdminRoute || isOperatorRoute || isCarrierRoute)) {
     log('info', '❌ Usuário não autenticado tentando acessar rota protegida')
-    const redirectUrl = new URL('/login', req.url)
+    const redirectUrl = new URL('/login', origin)
     redirectUrl.searchParams.set('next', pathname)
+    log('info', '↪️ Redirecionando para login', { redirect: redirectUrl.toString() })
     return NextResponse.redirect(redirectUrl)
   }
 
@@ -88,28 +94,31 @@ export async function middleware(req: NextRequest) {
     // Verificar se o usuário tem permissão para acessar a rota
     if (isAdminRoute && user.role !== 'admin') {
       log('warning', '❌ Acesso negado: usuário não é admin', { current: user.role, required: 'admin' })
-      const redirectUrl = new URL('/unauthorized', req.url)
+      const redirectUrl = new URL('/unauthorized', origin)
       redirectUrl.searchParams.set('reason', 'insufficient_permissions')
       redirectUrl.searchParams.set('required', 'admin')
       redirectUrl.searchParams.set('current', user.role)
+      log('warning', '↪️ Redirecionando para unauthorized', { redirect: redirectUrl.toString() })
       return NextResponse.redirect(redirectUrl)
     }
     
     if (isOperatorRoute && !['admin', 'operator'].includes(user.role)) {
       log('warning', '❌ Acesso negado: usuário não é operator ou admin', { current: user.role, required: 'operator' })
-      const redirectUrl = new URL('/unauthorized', req.url)
+      const redirectUrl = new URL('/unauthorized', origin)
       redirectUrl.searchParams.set('reason', 'insufficient_permissions')
       redirectUrl.searchParams.set('required', 'operator')
       redirectUrl.searchParams.set('current', user.role)
+      log('warning', '↪️ Redirecionando para unauthorized', { redirect: redirectUrl.toString() })
       return NextResponse.redirect(redirectUrl)
     }
     
     if (isCarrierRoute && !['admin', 'carrier'].includes(user.role)) {
       log('warning', '❌ Acesso negado: usuário não é carrier ou admin', { current: user.role, required: 'carrier' })
-      const redirectUrl = new URL('/unauthorized', req.url)
+      const redirectUrl = new URL('/unauthorized', origin)
       redirectUrl.searchParams.set('reason', 'insufficient_permissions')
       redirectUrl.searchParams.set('required', 'carrier')
       redirectUrl.searchParams.set('current', user.role)
+      log('warning', '↪️ Redirecionando para unauthorized', { redirect: redirectUrl.toString() })
       return NextResponse.redirect(redirectUrl)
     }
     
@@ -119,9 +128,10 @@ export async function middleware(req: NextRequest) {
 
   // Se chegou até aqui sem usuário válido, redirecionar para login
   log('info', '❌ Falha na autenticação - redirecionando para login')
-  const redirectUrl = new URL('/login', req.url)
+  const redirectUrl = new URL('/login', origin)
   redirectUrl.searchParams.set('next', pathname)
   redirectUrl.searchParams.set('error', 'no_auth')
+  log('info', '↪️ Redirecionando para login (final fallback)', { redirect: redirectUrl.toString() })
   return NextResponse.redirect(redirectUrl)
 }
 
