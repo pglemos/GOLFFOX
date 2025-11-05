@@ -24,6 +24,8 @@ import {
 } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import toast from "react-hot-toast"
+import { auditLogs } from "@/lib/audit-log"
+import { useSupabaseSync } from "@/hooks/use-supabase-sync"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 interface RouteData {
@@ -78,6 +80,7 @@ export function RouteModal({
   onGenerateStops,
   onOptimize
 }: RouteModalProps) {
+  const { sync } = useSupabaseSync({ showToast: false })
   const [formData, setFormData] = useState<RouteData>({
     name: "",
     company_id: "",
@@ -173,6 +176,9 @@ export function RouteModal({
 
         if (error) throw error
         toast.success('Rota atualizada com sucesso!')
+
+        // Log de auditoria para update
+        await auditLogs.update('route', route.id, { name: formData.name })
       } else {
         // Criar
         const { data, error } = await supabase
@@ -198,13 +204,33 @@ export function RouteModal({
           .single()
 
         if (error) throw error
-        toast.success('Rota criada com sucesso!')
         
         // Atualizar formData com o ID criado
         if (data) {
           setFormData({ ...formData, id: data.id })
+          
+          // Sincronização com Supabase (garantia adicional)
+          await sync({
+            resourceType: 'route',
+            resourceId: data.id,
+            action: 'create',
+            data: routeData,
+          })
+          
+          // Log de auditoria
+          await auditLogs.create('route', data.id, { name: formData.name, company_id: formData.company_id })
         }
-      }
+      } else {
+        // Sincronização com Supabase para update
+        await sync({
+          resourceType: 'route',
+          resourceId: route.id,
+          action: 'update',
+          data: routeData,
+        })
+        
+        // Log de auditoria para update
+        await auditLogs.update('route', route.id, { name: formData.name })
 
       onSave()
       onClose()

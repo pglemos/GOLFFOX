@@ -23,6 +23,7 @@ import {
 import { cn } from "@/lib/utils"
 import { listItem, staggerContainer, sidebarHighlight } from "@/lib/animations"
 import { useNavigation } from "@/hooks/use-navigation"
+import { SyncAlertBadge } from "@/components/sync-alert-badge"
 
 // Menus por painel
 const adminMenuItems = [
@@ -91,6 +92,12 @@ const adminMenuItems = [
     label: "Custos", 
     href: "/admin/custos",
     description: "Gestão financeira"
+  },
+  { 
+    icon: Settings, 
+    label: "Sincronização", 
+    href: "/admin/sincronizacao",
+    description: "Monitoramento de sincronização"
   },
   { 
     icon: HelpCircle, 
@@ -259,6 +266,7 @@ export function Sidebar({ isOpen = true, isMobile = false, panel = 'admin' }: Si
               {menuItems.map((item, _i) => {
                 const Icon = item.icon
                 const isActive = isSidebarItemActive(item.href)
+                const showSyncAlert = item.href === "/admin/sincronizacao"
                 
                 return (
                   <motion.div
@@ -290,7 +298,7 @@ export function Sidebar({ isOpen = true, isMobile = false, panel = 'admin' }: Si
                             : (panel === 'operator' ? "text-[var(--ink-muted)] group-hover:text-orange-500" : "text-[var(--ink-muted)] group-hover:text-[var(--brand)]")
                         )} 
                       />
-                      <div className="flex-1 min-w-0">
+                      <div className="flex-1 min-w-0 flex items-center justify-between gap-2">
                         <span className={cn(
                           "block transition-colors",
                           isActive 
@@ -299,6 +307,7 @@ export function Sidebar({ isOpen = true, isMobile = false, panel = 'admin' }: Si
                         )}>
                           {item.label}
                         </span>
+                        {showSyncAlert && <SyncAlertBadge />}
                       </div>
                       
                       {/* Tooltip - apenas em desktop */}

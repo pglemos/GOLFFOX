@@ -8,6 +8,7 @@ import { Briefcase, Plus, Users } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 import { useSupabaseQuery } from "@/hooks/use-supabase-query"
+import { CreateOperatorModal } from "@/components/modals/create-operator-modal"
 
 export default function EmpresasPage() {
   const router = useRouter()
@@ -15,6 +16,7 @@ export default function EmpresasPage() {
   const [loading, setLoading] = useState(true)
   const [selectedEmpresa, setSelectedEmpresa] = useState<any>(null)
   const [funcionarios, setFuncionarios] = useState<any[]>([])
+  const [isCreateOperatorModalOpen, setIsCreateOperatorModalOpen] = useState(false)
 
   // Usar hook otimizado para carregar empresas
   const { 
@@ -75,7 +77,7 @@ export default function EmpresasPage() {
             <h1 className="text-3xl font-bold mb-2">Empresas</h1>
             <p className="text-[var(--muted)]">Gerencie empresas e funcionários</p>
           </div>
-          <Button>
+          <Button onClick={() => setIsCreateOperatorModalOpen(true)}>
             <Plus className="h-4 w-4 mr-2" />
             Criar Operador
           </Button>
@@ -116,6 +118,17 @@ export default function EmpresasPage() {
             </div>
           </Card>
         )}
+
+        {/* Modal Criar Operador */}
+        <CreateOperatorModal
+          isOpen={isCreateOperatorModalOpen}
+          onClose={() => setIsCreateOperatorModalOpen(false)}
+          onSave={() => {
+            setIsCreateOperatorModalOpen(false)
+            // Recarregar empresas se necessário
+            window.location.reload()
+          }}
+        />
       </div>
     </AppShell>
   )

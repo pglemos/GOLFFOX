@@ -10,6 +10,11 @@ import { Truck, Plus, Search, Wrench, ClipboardCheck, Edit, Trash2 } from "lucid
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 import { VehicleModal } from "@/components/modals/vehicle-modal"
+import { VehicleMaintenanceModal } from "@/components/modals/vehicle-maintenance-modal"
+import { VehicleChecklistModal } from "@/components/modals/vehicle-checklist-modal"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label"
 import { motion } from "framer-motion"
 
 export default function VeiculosPage() {
@@ -19,6 +24,14 @@ export default function VeiculosPage() {
   const [veiculos, setVeiculos] = useState<any[]>([])
   const [selectedVehicle, setSelectedVehicle] = useState<any>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isMaintenanceModalOpen, setIsMaintenanceModalOpen] = useState(false)
+  const [isChecklistModalOpen, setIsChecklistModalOpen] = useState(false)
+  const [selectedMaintenance, setSelectedMaintenance] = useState<any>(null)
+  const [selectedChecklist, setSelectedChecklist] = useState<any>(null)
+  const [maintenances, setMaintenances] = useState<any[]>([])
+  const [checklists, setChecklists] = useState<any[]>([])
+  const [activeTab, setActiveTab] = useState<string>("dados")
+  const [viewingVehicle, setViewingVehicle] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState("")
 
   useEffect(() => {
@@ -99,6 +112,49 @@ export default function VeiculosPage() {
     }
   }
 
+  const loadMaintenances = async (vehicleId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from("gf_vehicle_maintenance")
+        .select("*")
+        .eq("vehicle_id", vehicleId)
+        .order("due_at", { ascending: false })
+
+      if (error) throw error
+      setMaintenances(data || [])
+    } catch (error) {
+      console.error("Erro ao carregar manutenções:", error)
+      setMaintenances([])
+    }
+  }
+
+  const loadChecklists = async (vehicleId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from("gf_vehicle_checklists")
+        .select(`
+          *,
+          drivers:users!gf_vehicle_checklists_driver_id_fkey(id, name, email)
+        `)
+        .eq("vehicle_id", vehicleId)
+        .order("filled_at", { ascending: false })
+
+      if (error) throw error
+      setChecklists(data || [])
+    } catch (error) {
+      console.error("Erro ao carregar checklists:", error)
+      setChecklists([])
+    }
+  }
+
+  const handleViewVehicle = (vehicle: any) => {
+    setViewingVehicle(vehicle.id)
+    setSelectedVehicle(vehicle)
+    setActiveTab("dados")
+    loadMaintenances(vehicle.id)
+    loadChecklists(vehicle.id)
+  }
+
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center"><div className="w-16 h-16 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin mx-auto"></div></div>
   }
@@ -149,6 +205,7 @@ export default function VeiculosPage() {
                 <div className="flex items-start justify-between">
                   <div className="flex-1 flex gap-4">
                     {veiculo.photo_url && (
+                      /* eslint-disable-next-line @next/next/no-img-element */
                       <img 
                         src={veiculo.photo_url} 
                         alt={veiculo.plate}
@@ -185,13 +242,12 @@ export default function VeiculosPage() {
                       <Edit className="h-4 w-4 mr-2" />
                       Editar
                     </Button>
-                    <Button variant="outline" size="sm">
-                      <Wrench className="h-4 w-4 mr-2" />
-                      Manutenção
-                    </Button>
-                    <Button variant="outline" size="sm">
-                      <ClipboardCheck className="h-4 w-4 mr-2" />
-                      Checklist
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => handleViewVehicle(veiculo)}
+                    >
+                      Ver Detalhes
                     </Button>
                   </div>
                 </div>
@@ -216,7 +272,7 @@ export default function VeiculosPage() {
           )}
         </div>
 
-        {/* Modal */}
+        {/* Modal de Veículo */}
         <VehicleModal
           vehicle={selectedVehicle}
           isOpen={isModalOpen}
@@ -226,6 +282,240 @@ export default function VeiculosPage() {
           }}
           onSave={loadVeiculos}
         />
+
+        {/* Modal de Manutenção */}
+        {viewingVehicle && (
+          <VehicleMaintenanceModal
+            maintenance={selectedMaintenance}
+            vehicleId={viewingVehicle}
+            isOpen={isMaintenanceModalOpen}
+            onClose={() => {
+              setIsMaintenanceModalOpen(false)
+              setSelectedMaintenance(null)
+            }}
+            onSave={() => {
+              if (viewingVehicle) {
+                loadMaintenances(viewingVehicle)
+              }
+            }}
+          />
+        )}
+
+        {/* Modal de Checklist */}
+        {viewingVehicle && (
+          <VehicleChecklistModal
+            checklist={selectedChecklist}
+            vehicleId={viewingVehicle}
+            isOpen={isChecklistModalOpen}
+            onClose={() => {
+              setIsChecklistModalOpen(false)
+              setSelectedChecklist(null)
+            }}
+            onSave={() => {
+              if (viewingVehicle) {
+                loadChecklists(viewingVehicle)
+              }
+            }}
+          />
+        )}
+
+        {/* Modal de Detalhes do Veículo com Tabs */}
+        {viewingVehicle && selectedVehicle && (
+          <Dialog open={!!viewingVehicle} onOpenChange={() => {
+            setViewingVehicle(null)
+            setSelectedVehicle(null)
+            setMaintenances([])
+            setChecklists([])
+          }}>
+            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  <Truck className="h-5 w-5" />
+                  {selectedVehicle.plate} - {selectedVehicle.model}
+                </DialogTitle>
+              </DialogHeader>
+
+              <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                <TabsList className="grid w-full grid-cols-3">
+                  <TabsTrigger value="dados">Dados</TabsTrigger>
+                  <TabsTrigger value="manutencao">Manutenção</TabsTrigger>
+                  <TabsTrigger value="checklist">Checklist</TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="dados" className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label className="text-sm font-medium">Placa</Label>
+                      <p className="text-sm">{selectedVehicle.plate}</p>
+                    </div>
+                    <div>
+                      <Label className="text-sm font-medium">Modelo</Label>
+                      <p className="text-sm">{selectedVehicle.model || "N/A"}</p>
+                    </div>
+                    <div>
+                      <Label className="text-sm font-medium">Ano</Label>
+                      <p className="text-sm">{selectedVehicle.year || "N/A"}</p>
+                    </div>
+                    <div>
+                      <Label className="text-sm font-medium">Capacidade</Label>
+                      <p className="text-sm">{selectedVehicle.capacity || "N/A"} lugares</p>
+                    </div>
+                    {selectedVehicle.prefix && (
+                      <div>
+                        <Label className="text-sm font-medium">Prefixo</Label>
+                        <p className="text-sm">{selectedVehicle.prefix}</p>
+                      </div>
+                    )}
+                    <div>
+                      <Label className="text-sm font-medium">Status</Label>
+                      <Badge variant={selectedVehicle.is_active ? "default" : "secondary"}>
+                        {selectedVehicle.is_active ? "Ativo" : "Inativo"}
+                      </Badge>
+                    </div>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="manutencao" className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-semibold">Histórico de Manutenções</h3>
+                    <Button
+                      size="sm"
+                      onClick={() => {
+                        setSelectedMaintenance(null)
+                        setIsMaintenanceModalOpen(true)
+                      }}
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      Nova Manutenção
+                    </Button>
+                  </div>
+                  <div className="space-y-2">
+                    {maintenances.length === 0 ? (
+                      <Card className="p-8 text-center">
+                        <Wrench className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                        <p className="text-sm text-[var(--ink-muted)]">Nenhuma manutenção registrada</p>
+                      </Card>
+                    ) : (
+                      maintenances.map((maintenance) => (
+                        <Card key={maintenance.id} className="p-4">
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-2">
+                                <Badge variant="outline">{maintenance.type}</Badge>
+                                <Badge variant={
+                                  maintenance.status === 'completed' ? 'default' :
+                                  maintenance.status === 'scheduled' ? 'secondary' :
+                                  maintenance.status === 'cancelled' ? 'outline' : 'destructive'
+                                }>
+                                  {maintenance.status === 'pending' ? 'Pendente' :
+                                   maintenance.status === 'scheduled' ? 'Agendada' :
+                                   maintenance.status === 'completed' ? 'Concluída' : 'Cancelada'}
+                                </Badge>
+                              </div>
+                              <p className="text-sm text-[var(--ink-muted)]">
+                                Vencimento: {new Date(maintenance.due_at).toLocaleDateString('pt-BR')}
+                              </p>
+                              {maintenance.notes && (
+                                <p className="text-sm mt-2">{maintenance.notes}</p>
+                              )}
+                            </div>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                setSelectedMaintenance(maintenance)
+                                setIsMaintenanceModalOpen(true)
+                              }}
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </Card>
+                      ))
+                    )}
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="checklist" className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-semibold">Histórico de Checklists</h3>
+                    <Button
+                      size="sm"
+                      onClick={() => {
+                        setSelectedChecklist(null)
+                        setIsChecklistModalOpen(true)
+                      }}
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      Novo Checklist
+                    </Button>
+                  </div>
+                  <div className="space-y-2">
+                    {checklists.length === 0 ? (
+                      <Card className="p-8 text-center">
+                        <ClipboardCheck className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                        <p className="text-sm text-[var(--ink-muted)]">Nenhum checklist registrado</p>
+                      </Card>
+                    ) : (
+                      checklists.map((checklist) => (
+                        <Card key={checklist.id} className="p-4">
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-2">
+                                <Badge variant={
+                                  checklist.status === 'completed' ? 'default' :
+                                  checklist.status === 'failed' ? 'destructive' : 'secondary'
+                                }>
+                                  {checklist.status === 'pending' ? 'Pendente' :
+                                   checklist.status === 'completed' ? 'Concluído' : 'Falhou'}
+                                </Badge>
+                                <span className="text-sm text-[var(--ink-muted)]">
+                                  {new Date(checklist.filled_at).toLocaleDateString('pt-BR')}
+                                </span>
+                                {checklist.drivers && (
+                                  <span className="text-sm text-[var(--ink-muted)]">
+                                    - {checklist.drivers.name || checklist.drivers.email}
+                                  </span>
+                                )}
+                              </div>
+                              {checklist.issues && Object.keys(checklist.issues).length > 0 && (
+                                <div className="mt-2">
+                                  <p className="text-xs font-medium mb-1">Problemas encontrados:</p>
+                                  <div className="flex flex-wrap gap-1">
+                                    {Object.entries(checklist.issues).map(([key, value]: [string, any]) => (
+                                      value === 'failed' && (
+                                        <Badge key={key} variant="destructive" className="text-xs">
+                                          {key}
+                                        </Badge>
+                                      )
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+                              {checklist.notes && (
+                                <p className="text-sm mt-2">{checklist.notes}</p>
+                              )}
+                            </div>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                setSelectedChecklist(checklist)
+                                setIsChecklistModalOpen(true)
+                              }}
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </Card>
+                      ))
+                    )}
+                  </div>
+                </TabsContent>
+              </Tabs>
+            </DialogContent>
+          </Dialog>
+        )}
       </div>
     </AppShell>
   )

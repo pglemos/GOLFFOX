@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label"
 import { LifeBuoy, Send, Truck, Users, Navigation } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import toast from "react-hot-toast"
+import { useSupabaseSync } from "@/hooks/use-supabase-sync"
 import { 
   Select,
   SelectContent,
@@ -51,6 +52,7 @@ export function AssistanceModal({ request, isOpen, onClose, onSave }: Assistance
   const [selectedDriverId, setSelectedDriverId] = useState<string>("")
   const [selectedVehicleId, setSelectedVehicleId] = useState<string>("")
   const [loading, setLoading] = useState(false)
+  const { sync } = useSupabaseSync({ showToast: false })
 
   useEffect(() => {
     if (isOpen && request) {
@@ -119,6 +121,18 @@ export function AssistanceModal({ request, isOpen, onClose, onSave }: Assistance
         .eq("id", request.id)
 
       if (error) throw error
+
+      // Sincronização com Supabase (garantia adicional)
+      await sync({
+        resourceType: 'assistance',
+        resourceId: request.id,
+        action: 'update',
+        data: {
+          status: 'dispatched',
+          dispatched_driver_id: selectedDriverId,
+          dispatched_vehicle_id: selectedVehicleId,
+        },
+      })
 
       toast.success("Socorro despachado com sucesso!")
       onSave()

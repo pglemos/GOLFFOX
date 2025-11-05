@@ -1,0 +1,52 @@
+{
+  "timestamp": "2025-11-05T01:51:22.565Z",
+  "tables": {
+    "gf_user_company_map": "EXISTS",
+    "gf_company_branding": "EXISTS",
+    "gf_route_optimization_cache": "EXISTS",
+    "gf_report_schedules": "EXISTS",
+    "gf_report_history": "EXISTS"
+  },
+  "views": {
+    "v_my_companies": "EXISTS",
+    "v_operator_dashboard_kpis_secure": "EXISTS",
+    "v_operator_routes_secure": "EXISTS",
+    "v_operator_alerts_secure": "EXISTS",
+    "v_operator_costs_secure": "EXISTS",
+    "v_reports_delays_secure": "EXISTS",
+    "v_reports_occupancy_secure": "EXISTS",
+    "v_reports_not_boarded_secure": "EXISTS",
+    "v_reports_efficiency_secure": "EXISTS",
+    "v_reports_roi_sla_secure": "EXISTS"
+  },
+  "matviews": {
+    "mv_operator_kpis": "EXISTS"
+  },
+  "functions": {
+    "company_ownership": "EXISTS",
+    "refresh_mv_operator_kpis": "EXISTS"
+  },
+  "rls_policies": {
+    "routes": "5",
+    "trips": "7",
+    "gf_alerts": "4",
+    "gf_service_requests": "3",
+    "gf_employee_company": "5",
+    "gf_invoices": "3",
+    "gf_invoice_lines": "2"
+  },
+  "rls_enabled": {
+    "gf_alerts": "ENABLED",
+    "gf_employee_company": "ENABLED",
+    "gf_invoice_lines": "ENABLED",
+    "gf_invoices": "ENABLED",
+    "gf_service_requests": "ENABLED",
+    "routes": "ENABLED",
+    "trips": "ENABLED"
+  },
+  "mappings": {
+    "total_mappings": "2",
+    "unique_users": "2",
+    "unique_companies": "2"
+  }
+}

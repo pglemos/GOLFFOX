@@ -20,6 +20,13 @@ async function runMigrations() {
     connectionString: DATABASE_URL,
   })
 
+  const results = {
+    timestamp: new Date().toISOString(),
+    migrations_applied: [],
+    migrations_skipped: [],
+    migrations_failed: []
+  }
+
   try {
     console.log('🔌 Conectando ao banco de dados...')
     await client.connect()
@@ -33,40 +40,78 @@ async function runMigrations() {
 
       if (!fs.existsSync(migrationPath)) {
         console.error(`❌ Arquivo não encontrado: ${migrationPath}`)
+        results.migrations_failed.push({ file: migrationFile, reason: 'File not found' })
         continue
       }
 
       console.log(`📦 Executando migration ${i + 1}/${migrations.length}: ${migrationFile}`)
-      
+
       const sql = fs.readFileSync(migrationPath, 'utf8')
-      
+      const startTime = Date.now()
+
       try {
         await client.query(sql)
-        console.log(`✅ Migration executada com sucesso: ${migrationFile}\n`)
+        const duration = Date.now() - startTime
+        console.log(`✅ Migration executada com sucesso: ${migrationFile} (${duration}ms)\n`)
+        results.migrations_applied.push({ file: migrationFile, duration_ms: duration })
       } catch (error) {
         // Ignorar erros de "já existe" (idempotência)
-        if (error.message.includes('already exists') || error.message.includes('duplicate')) {
+        const errorMsg = error.message.toLowerCase()
+        const isIdempotentError = 
+          errorMsg.includes('already exists') || 
+          errorMsg.includes('duplicate') ||
+          errorMsg.includes('relation already exists') ||
+          errorMsg.includes('constraint already exists') ||
+          errorMsg.includes('function already exists') ||
+          errorMsg.includes('index already exists') ||
+          errorMsg.includes('view already exists')
+
+        if (isIdempotentError) {
           console.log(`⚠️  Migration já existe (ignorado): ${migrationFile}\n`)
+          results.migrations_skipped.push({ file: migrationFile, reason: 'Already exists' })
         } else {
           console.error(`❌ Erro ao executar ${migrationFile}:`, error.message)
-          throw error
+          results.migrations_failed.push({ file: migrationFile, reason: error.message })
+          // Continuar com próxima migration ao invés de parar
+          console.log(`   ⚠️  Continuando com próximas migrations...\n`)
         }
       }
     }
 
-    console.log('✅ Todas as migrations foram executadas com sucesso!')
-    
+    console.log('\n📊 Resumo:')
+    console.log(`   ✅ Aplicadas: ${results.migrations_applied.length}`)
+    console.log(`   ⏭️  Ignoradas: ${results.migrations_skipped.length}`)
+    console.log(`   ❌ Falhadas: ${results.migrations_failed.length}`)
+
+    if (results.migrations_failed.length > 0) {
+      console.log('\n⚠️  ATENÇÃO: Algumas migrations falharam!')
+      results.migrations_failed.forEach(m => {
+        console.log(`   - ${m.file}: ${m.reason}`)
+      })
+    }
+
     // Popular materialized view
     console.log('\n🔄 Populando materialized view mv_operator_kpis...')
     try {
       await client.query('REFRESH MATERIALIZED VIEW mv_operator_kpis;')
       console.log('✅ Materialized view populada!')
+      results.materialized_view_refreshed = true
     } catch (error) {
       console.log(`⚠️  Aviso ao popular materialized view: ${error.message}`)
+      results.materialized_view_refreshed = false
+      results.materialized_view_error = error.message
     }
+
+    // Salvar resultado
+    const outputPath = path.join(__dirname, '..', 'MIGRATIONS_RESULT.json')
+    fs.writeFileSync(outputPath, JSON.stringify(results, null, 2))
+    console.log(`\n✅ Resultado salvo em: ${outputPath}`)
 
   } catch (error) {
     console.error('❌ Erro fatal:', error.message)
+    results.fatal_error = error.message
+    const outputPath = path.join(__dirname, '..', 'MIGRATIONS_RESULT.json')
+    fs.writeFileSync(outputPath, JSON.stringify(results, null, 2))
     process.exit(1)
   } finally {
     await client.end()

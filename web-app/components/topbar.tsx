@@ -27,6 +27,7 @@ import {
 import { supabase } from "@/lib/supabase"
 import { useNavigation } from "@/hooks/use-navigation"
 import { OperatorLogoSection } from "@/components/operator/operator-logo-section"
+import { SyncAlertNotification } from "@/components/sync-alert-notification"
 
 interface TopbarProps {
   user?: {
@@ -190,6 +191,9 @@ export function Topbar({
           >
             <Search className="h-5 w-5" />
           </Button>
+
+          {/* Sync Alerts */}
+          <SyncAlertNotification />
 
           {/* Notifications */}
           <Button variant="ghost" size="icon" className="relative hover:bg-[var(--bg-hover)]">

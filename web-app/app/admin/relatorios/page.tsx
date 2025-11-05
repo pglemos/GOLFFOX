@@ -24,6 +24,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { motion } from "framer-motion"
+import { ScheduleReportModal } from "@/components/modals/schedule-report-modal"
+import { CardHeader, CardTitle, CardContent } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Edit, Trash2 } from "lucide-react"
 
 interface ReportConfig {
   id: string
@@ -44,6 +48,7 @@ export default function RelatoriosPage() {
   const [schedules, setSchedules] = useState<any[]>([])
   const [showScheduleModal, setShowScheduleModal] = useState(false)
   const [selectedReportForSchedule, setSelectedReportForSchedule] = useState<string | null>(null)
+  const [selectedSchedule, setSelectedSchedule] = useState<any>(null)
 
   const reports: ReportConfig[] = [
     { 
@@ -277,6 +282,86 @@ export default function RelatoriosPage() {
             )
           })}
         </div>
+
+        {/* Agendamentos Existentes */}
+        {schedules.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Mail className="h-5 w-5 text-[var(--brand)]" />
+                Agendamentos de Relatórios
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                {schedules.map((schedule) => (
+                  <div key={schedule.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-[var(--bg-hover)] transition-colors">
+                    <div className="flex-1">
+                      <div className="font-semibold">
+                        {reports.find(r => r.id === schedule.report_key)?.title || schedule.report_key}
+                      </div>
+                      <div className="text-sm text-[var(--ink-muted)]">
+                        {schedule.cron} para {schedule.recipients?.join(', ') || 'N/A'}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Badge variant={schedule.is_active ? 'default' : 'secondary'}>
+                        {schedule.is_active ? 'Ativo' : 'Inativo'}
+                      </Badge>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setSelectedSchedule(schedule)
+                          setSelectedReportForSchedule(schedule.report_key)
+                          setShowScheduleModal(true)
+                        }}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={async () => {
+                          if (confirm('Tem certeza que deseja deletar este agendamento?')) {
+                            try {
+                              const response = await fetch(`/api/reports/schedule?scheduleId=${schedule.id}`, {
+                                method: 'DELETE'
+                              })
+                              if (!response.ok) throw new Error('Erro ao deletar')
+                              toast.success('Agendamento deletado com sucesso!')
+                              loadSchedules()
+                            } catch (error: any) {
+                              toast.error(`Erro: ${error.message}`)
+                            }
+                          }
+                        }}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Modal de Agendamento */}
+        {showScheduleModal && selectedReportForSchedule && (
+          <ScheduleReportModal
+            isOpen={showScheduleModal}
+            onClose={() => {
+              setShowScheduleModal(false)
+              setSelectedReportForSchedule(null)
+              setSelectedSchedule(null)
+            }}
+            onSave={loadSchedules}
+            reportKey={selectedReportForSchedule}
+            companyId={selectedCompany || undefined}
+            schedule={selectedSchedule}
+          />
+        )}
       </div>
     </AppShell>
   )

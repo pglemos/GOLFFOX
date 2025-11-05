@@ -2,11 +2,19 @@
 
 import { useEffect, useState, Suspense } from "react"
 import { AppShell } from "@/components/app-shell"
-import { FleetMap } from "@/components/fleet-map"
+import dynamic from "next/dynamic"
 import { supabase } from "@/lib/supabase"
 import { useRouter, useSearchParams } from "next/navigation"
 import { motion } from "framer-motion"
 import { MapPin } from "lucide-react"
+
+// Lazy load FleetMap (componente pesado)
+const FleetMap = dynamic(() => import('@/components/fleet-map').then(m => ({ default: m.FleetMap })), { 
+  ssr: false,
+  loading: () => <div className="w-full h-[600px] bg-gray-100 animate-pulse rounded-lg flex items-center justify-center">
+    <p className="text-[var(--ink-muted)]">Carregando mapa...</p>
+  </div>
+})
 
 function MapaContent() {
   const router = useRouter()

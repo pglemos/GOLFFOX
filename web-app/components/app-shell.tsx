@@ -5,6 +5,17 @@ import { usePathname } from "next/navigation"
 import { Topbar } from "./topbar"
 import { Sidebar } from "./sidebar"
 import { EnvVarsBanner } from "./env-vars-banner"
+import dynamic from "next/dynamic"
+
+// Lazy load PerformanceMonitor apenas em dev
+const PerformanceMonitor = process.env.NODE_ENV === 'development' 
+  ? dynamic(() => import('./performance-monitor').then(m => ({ default: m.PerformanceMonitor })), { ssr: false })
+  : () => null
+
+// Importar Web Vitals apenas em dev
+if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
+  require('@/lib/web-vitals')
+}
 
 interface AppShellProps {
   user: {
@@ -96,6 +107,11 @@ export function AppShell({ user, children, panel }: AppShellProps) {
           </div>
         </main>
       </div>
+
+      {/* Performance Monitor (apenas em dev) */}
+      {process.env.NODE_ENV === 'development' && (
+        <PerformanceMonitor isVisible={true} />
+      )}
     </div>
   )
 }

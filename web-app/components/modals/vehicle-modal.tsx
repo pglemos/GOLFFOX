@@ -15,6 +15,8 @@ import { Label } from "@/components/ui/label"
 import { Truck, Upload, X, Calendar, Wrench, ClipboardCheck } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import toast from "react-hot-toast"
+import { auditLogs } from "@/lib/audit-log"
+import { useSupabaseSync } from "@/hooks/use-supabase-sync"
 
 interface Vehicle {
   id?: string
@@ -47,6 +49,7 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
   const [loading, setLoading] = useState(false)
   const [photoFile, setPhotoFile] = useState<File | null>(null)
   const [photoPreview, setPhotoPreview] = useState<string>("")
+  const { sync } = useSupabaseSync({ showToast: false }) // Toast já é mostrado no modal
 
   useEffect(() => {
     if (vehicle) {
@@ -139,7 +142,19 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
           .eq("id", vehicleId)
 
         if (error) throw error
+        
+        // Sincronização com Supabase (garantia adicional)
+        await sync({
+          resourceType: 'vehicle',
+          resourceId: vehicleId,
+          action: 'update',
+          data: vehicleData,
+        })
+        
         toast.success("Veículo atualizado com sucesso!")
+        
+        // Log de auditoria
+        await auditLogs.update('vehicle', vehicleId, { plate: vehicleData.plate, model: vehicleData.model })
       } else {
         // Criar
         const { data, error } = await supabase
@@ -161,7 +176,18 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
             .eq("id", vehicleId)
         }
 
+        // Sincronização com Supabase (garantia adicional)
+        await sync({
+          resourceType: 'vehicle',
+          resourceId: vehicleId,
+          action: 'create',
+          data: vehicleData,
+        })
+        
         toast.success("Veículo cadastrado com sucesso!")
+        
+        // Log de auditoria
+        await auditLogs.create('vehicle', vehicleId, { plate: vehicleData.plate, model: vehicleData.model })
       }
 
       onSave()
@@ -191,10 +217,11 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
             <div className="flex items-center gap-4">
               {photoPreview && (
                 <div className="relative w-32 h-32 rounded-lg overflow-hidden border border-[var(--border)]">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img 
                     src={photoPreview} 
                     alt="Preview" 
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover" 
                   />
                   <button
                     type="button"

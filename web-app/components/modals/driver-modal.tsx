@@ -14,6 +14,8 @@ import { Label } from "@/components/ui/label"
 import { Users, Upload, X, Award } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import toast from "react-hot-toast"
+import { auditLogs } from "@/lib/audit-log"
+import { useSupabaseSync } from "@/hooks/use-supabase-sync"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 
@@ -54,6 +56,7 @@ export function DriverModal({ driver, isOpen, onClose, onSave }: DriverModalProp
   const [documents, setDocuments] = useState<DriverDocument[]>([])
   const [loading, setLoading] = useState(false)
   const [rankings, setRankings] = useState<any>(null)
+  const { sync } = useSupabaseSync({ showToast: false })
 
   useEffect(() => {
     if (driver) {
@@ -113,7 +116,19 @@ export function DriverModal({ driver, isOpen, onClose, onSave }: DriverModalProp
           .eq("id", driver.id)
 
         if (error) throw error
+        
+        // Sincronização com Supabase (garantia adicional)
+        await sync({
+          resourceType: 'driver',
+          resourceId: driver.id,
+          action: 'update',
+          data: driverData,
+        })
+        
         toast.success("Motorista atualizado com sucesso!")
+        
+        // Log de auditoria
+        await auditLogs.update('driver', driver.id, { name: driverData.name, email: driverData.email })
       } else {
         const { data, error } = await supabase
           .from("users")
@@ -122,7 +137,19 @@ export function DriverModal({ driver, isOpen, onClose, onSave }: DriverModalProp
           .single()
 
         if (error) throw error
+        
+        // Sincronização com Supabase (garantia adicional)
+        await sync({
+          resourceType: 'driver',
+          resourceId: data.id,
+          action: 'create',
+          data: driverData,
+        })
+        
         toast.success("Motorista cadastrado com sucesso!")
+        
+        // Log de auditoria
+        await auditLogs.create('driver', data.id, { name: driverData.name, email: driverData.email })
       }
 
       onSave()

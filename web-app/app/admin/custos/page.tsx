@@ -19,7 +19,13 @@ import {
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 import { formatCurrency } from "@/lib/kpi-utils"
-import { CostCharts } from "@/components/costs/cost-charts"
+import dynamic from "next/dynamic"
+
+// Lazy load CostCharts (componente pesado com Recharts)
+const CostCharts = dynamic(() => import('@/components/costs/cost-charts').then(m => ({ default: m.CostCharts })), {
+  ssr: false,
+  loading: () => <div className="w-full h-[400px] bg-gray-100 animate-pulse rounded-lg" />
+})
 import { ReconciliationModal } from "@/components/costs/reconciliation-modal"
 import { motion } from "framer-motion"
 import { staggerContainer, listItem } from "@/lib/animations"

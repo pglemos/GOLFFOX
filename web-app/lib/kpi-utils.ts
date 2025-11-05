@@ -39,6 +39,13 @@ export function formatCount(value: number | null | undefined): string {
 }
 
 /**
+ * Formata número genérico (com separador de milhares)
+ */
+export function formatNumber(value: number | null | undefined): string {
+  return formatCount(value)
+}
+
+/**
  * Formata número como distância (km)
  */
 export function formatDistance(value: number | null | undefined, decimals: number = 2): string {

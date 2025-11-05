@@ -11,6 +11,10 @@ import { DriverModal } from "@/components/modals/driver-modal"
 import { Input } from "@/components/ui/input"
 import { motion } from "framer-motion"
 import { Badge } from "@/components/ui/badge"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label"
+import { AlertTriangle, Calendar, ExternalLink } from "lucide-react"
 
 export default function MotoristasPage() {
   const router = useRouter()
@@ -19,6 +23,10 @@ export default function MotoristasPage() {
   const [motoristas, setMotoristas] = useState<any[]>([])
   const [selectedDriver, setSelectedDriver] = useState<any>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [viewingDriver, setViewingDriver] = useState<string | null>(null)
+  const [activeTab, setActiveTab] = useState<string>("dados")
+  const [documents, setDocuments] = useState<any[]>([])
+  const [ranking, setRanking] = useState<any>(null)
   const [searchQuery, setSearchQuery] = useState("")
 
   useEffect(() => {
@@ -47,6 +55,64 @@ export default function MotoristasPage() {
     } catch (error) {
       console.error("Erro ao carregar motoristas:", error)
     }
+  }
+
+  const loadDocuments = async (driverId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from("gf_driver_documents")
+        .select("*")
+        .eq("driver_id", driverId)
+        .order("expires_at", { ascending: true })
+
+      if (error) throw error
+      
+      // Calcular status automaticamente
+      const now = new Date()
+      const thirtyDaysFromNow = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000)
+      
+      const documentsWithStatus = (data || []).map((doc: any) => {
+        let status = 'valid'
+        if (doc.expires_at) {
+          const expiryDate = new Date(doc.expires_at)
+          if (expiryDate < now) {
+            status = 'expired'
+          } else if (expiryDate <= thirtyDaysFromNow) {
+            status = 'expiring_soon'
+          }
+        }
+        return { ...doc, status }
+      })
+      
+      setDocuments(documentsWithStatus)
+    } catch (error) {
+      console.error("Erro ao carregar documentos:", error)
+      setDocuments([])
+    }
+  }
+
+  const loadRanking = async (driverId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from("v_reports_driver_ranking")
+        .select("*")
+        .eq("driver_id", driverId)
+        .single()
+
+      if (error && error.code !== 'PGRST116') throw error
+      setRanking(data || null)
+    } catch (error) {
+      console.error("Erro ao carregar ranking:", error)
+      setRanking(null)
+    }
+  }
+
+  const handleViewDriver = (driver: any) => {
+    setViewingDriver(driver.id)
+    setSelectedDriver(driver)
+    setActiveTab("dados")
+    loadDocuments(driver.id)
+    loadRanking(driver.id)
   }
 
   if (loading) {
@@ -120,13 +186,12 @@ export default function MotoristasPage() {
                       <Edit className="h-4 w-4 mr-2" />
                       Editar
                     </Button>
-                    <Button variant="outline" size="sm">
-                      <Award className="h-4 w-4 mr-2" />
-                      Ranking
-                    </Button>
-                    <Button variant="outline" size="sm">
-                      <FileText className="h-4 w-4 mr-2" />
-                      Documentos
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => handleViewDriver(motorista)}
+                    >
+                      Ver Detalhes
                     </Button>
                   </div>
                 </div>
@@ -151,7 +216,7 @@ export default function MotoristasPage() {
           )}
         </div>
 
-        {/* Modal */}
+        {/* Modal de Motorista */}
         <DriverModal
           driver={selectedDriver}
           isOpen={isModalOpen}
@@ -161,6 +226,213 @@ export default function MotoristasPage() {
           }}
           onSave={loadMotoristas}
         />
+
+        {/* Modal de Detalhes do Motorista com Tabs */}
+        {viewingDriver && selectedDriver && (
+          <Dialog open={!!viewingDriver} onOpenChange={() => {
+            setViewingDriver(null)
+            setSelectedDriver(null)
+            setDocuments([])
+            setRanking(null)
+          }}>
+            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  <Users className="h-5 w-5" />
+                  {selectedDriver.name} - {selectedDriver.email}
+                </DialogTitle>
+              </DialogHeader>
+
+              <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                <TabsList className="grid w-full grid-cols-3">
+                  <TabsTrigger value="dados">Dados</TabsTrigger>
+                  <TabsTrigger value="documentos">
+                    Documentos
+                    {documents.some(d => d.status === 'expiring_soon' || d.status === 'expired') && (
+                      <AlertTriangle className="h-3 w-3 ml-1 text-orange-500" />
+                    )}
+                  </TabsTrigger>
+                  <TabsTrigger value="ranking">Ranking</TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="dados" className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label className="text-sm font-medium">Nome</Label>
+                      <p className="text-sm">{selectedDriver.name}</p>
+                    </div>
+                    <div>
+                      <Label className="text-sm font-medium">Email</Label>
+                      <p className="text-sm">{selectedDriver.email}</p>
+                    </div>
+                    {selectedDriver.phone && (
+                      <div>
+                        <Label className="text-sm font-medium">Telefone</Label>
+                        <p className="text-sm">{selectedDriver.phone}</p>
+                      </div>
+                    )}
+                    {selectedDriver.cpf && (
+                      <div>
+                        <Label className="text-sm font-medium">CPF</Label>
+                        <p className="text-sm">{selectedDriver.cpf}</p>
+                      </div>
+                    )}
+                    <div>
+                      <Label className="text-sm font-medium">Papel</Label>
+                      <Badge variant="outline">{selectedDriver.role || "driver"}</Badge>
+                    </div>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="documentos" className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-semibold">Documentos do Motorista</h3>
+                  </div>
+                  <div className="space-y-2">
+                    {documents.length === 0 ? (
+                      <Card className="p-8 text-center">
+                        <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                        <p className="text-sm text-[var(--ink-muted)]">Nenhum documento cadastrado</p>
+                      </Card>
+                    ) : (
+                      documents.map((doc) => {
+                        const isExpiring = doc.status === 'expiring_soon'
+                        const isExpired = doc.status === 'expired'
+                        
+                        return (
+                          <Card key={doc.id} className={`p-4 ${isExpired ? 'border-red-300 bg-red-50' : isExpiring ? 'border-orange-300 bg-orange-50' : ''}`}>
+                            <div className="flex items-start justify-between">
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-2">
+                                  <Badge variant={
+                                    isExpired ? 'destructive' :
+                                    isExpiring ? 'default' : 'secondary'
+                                  }>
+                                    {doc.type}
+                                  </Badge>
+                                  {isExpired && (
+                                    <Badge variant="destructive">
+                                      <AlertTriangle className="h-3 w-3 mr-1" />
+                                      Expirado
+                                    </Badge>
+                                  )}
+                                  {isExpiring && (
+                                    <Badge variant="default">
+                                      <AlertTriangle className="h-3 w-3 mr-1" />
+                                      Vencendo em breve
+                                    </Badge>
+                                  )}
+                                </div>
+                                {doc.expires_at && (
+                                  <p className="text-sm text-[var(--ink-muted)]">
+                                    <Calendar className="h-3 w-3 inline mr-1" />
+                                    Vencimento: {new Date(doc.expires_at).toLocaleDateString('pt-BR')}
+                                    {isExpiring && (
+                                      <span className="ml-2 text-orange-600 font-medium">
+                                        ({Math.ceil((new Date(doc.expires_at).getTime() - Date.now()) / (1000 * 60 * 60 * 24))} dias restantes)
+                                      </span>
+                                    )}
+                                    {isExpired && (
+                                      <span className="ml-2 text-red-600 font-medium">
+                                        (Expirado há {Math.ceil((Date.now() - new Date(doc.expires_at).getTime()) / (1000 * 60 * 60 * 24))} dias)
+                                      </span>
+                                    )}
+                                  </p>
+                                )}
+                                {doc.file_url && (
+                                  <a
+                                    href={doc.file_url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-xs text-[var(--brand)] hover:underline flex items-center gap-1 mt-2"
+                                  >
+                                    <ExternalLink className="h-3 w-3" />
+                                    Ver documento
+                                  </a>
+                                )}
+                              </div>
+                            </div>
+                          </Card>
+                        )
+                      })
+                    )}
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="ranking" className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-semibold">Ranking do Motorista</h3>
+                  </div>
+                  {ranking ? (
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-4 gap-4">
+                        <Card className="p-4">
+                          <div className="text-xs text-[var(--ink-muted)] mb-1">Pontualidade</div>
+                          <div className="text-2xl font-bold text-green-600">
+                            {ranking.punctuality_score ? `${ranking.punctuality_score.toFixed(1)}%` : 'N/A'}
+                          </div>
+                        </Card>
+                        <Card className="p-4">
+                          <div className="text-xs text-[var(--ink-muted)] mb-1">Rotas Cumpridas</div>
+                          <div className="text-2xl font-bold text-blue-600">
+                            {ranking.routes_completed || 0}
+                          </div>
+                        </Card>
+                        <Card className="p-4">
+                          <div className="text-xs text-[var(--ink-muted)] mb-1">Eficiência</div>
+                          <div className="text-2xl font-bold text-purple-600">
+                            {ranking.efficiency_score ? `${ranking.efficiency_score.toFixed(1)}` : 'N/A'}
+                          </div>
+                        </Card>
+                        <Card className="p-4">
+                          <div className="text-xs text-[var(--ink-muted)] mb-1">Rotas no Prazo</div>
+                          <div className="text-2xl font-bold text-[var(--brand)]">
+                            {ranking.on_time_routes || 0}
+                          </div>
+                        </Card>
+                      </div>
+                      <Card className="p-4">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Award className="h-5 w-5 text-[var(--brand)]" />
+                          <span className="font-semibold">Estatísticas Detalhadas</span>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4 text-sm">
+                          <div>
+                            <span className="text-[var(--ink-muted)]">Rotas Completadas: </span>
+                            <span className="font-medium">{ranking.routes_completed || 0}</span>
+                          </div>
+                          {ranking.avg_delay_minutes !== null && ranking.avg_delay_minutes !== undefined && (
+                            <div>
+                              <span className="text-[var(--ink-muted)]">Atraso Médio: </span>
+                              <span className="font-medium">{ranking.avg_delay_minutes.toFixed(1)} min</span>
+                            </div>
+                          )}
+                          {ranking.on_time_routes !== null && ranking.on_time_routes !== undefined && (
+                            <div>
+                              <span className="text-[var(--ink-muted)]">Rotas no Prazo: </span>
+                              <span className="font-medium">{ranking.on_time_routes}</span>
+                            </div>
+                          )}
+                          {ranking.total_passengers_transported !== null && ranking.total_passengers_transported !== undefined && (
+                            <div>
+                              <span className="text-[var(--ink-muted)]">Passageiros Transportados: </span>
+                              <span className="font-medium">{ranking.total_passengers_transported}</span>
+                            </div>
+                          )}
+                        </div>
+                      </Card>
+                    </div>
+                  ) : (
+                    <Card className="p-8 text-center">
+                      <Award className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                      <p className="text-sm text-[var(--ink-muted)]">Nenhum dado de ranking disponível ainda</p>
+                    </Card>
+                  )}
+                </TabsContent>
+              </Tabs>
+            </DialogContent>
+          </Dialog>
+        )}
       </div>
     </AppShell>
   )

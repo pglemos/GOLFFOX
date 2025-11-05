@@ -23,6 +23,7 @@ import {
 import { supabase } from "@/lib/supabase"
 import toast from "react-hot-toast"
 import { formatCurrency, formatDistance, formatDuration } from "@/lib/kpi-utils"
+import { auditLogs } from "@/lib/audit-log"
 
 interface InvoiceLine {
   id: string
@@ -166,19 +167,11 @@ export function ReconciliationModal({
       if (error) throw error
 
       // Log de auditoria
-      await supabase
-        .from('gf_audit_log')
-        .insert({
-          actor_id: session.user.id,
-          action_type: 'approve',
-          resource_type: 'invoice',
-          resource_id: invoiceId,
-          details: {
-            companyId: invoice?.empresa_id || invoice?.carrier_id,
-            invoiceNumber: invoice?.invoice_number,
-            totalAmount: invoice?.total_amount
-          }
-        })
+      await auditLogs.approve('invoice', invoiceId, {
+        companyId: invoice?.empresa_id || invoice?.carrier_id,
+        invoiceNumber: invoice?.invoice_number,
+        totalAmount: invoice?.total_amount
+      })
 
       toast.success('Fatura aprovada com sucesso!')
       onApprove?.()
@@ -211,19 +204,11 @@ export function ReconciliationModal({
       if (error) throw error
 
       // Log de auditoria
-      await supabase
-        .from('gf_audit_log')
-        .insert({
-          actor_id: session.user.id,
-          action_type: 'reject',
-          resource_type: 'invoice',
-          resource_id: invoiceId,
-          details: {
-            companyId: invoice?.empresa_id || invoice?.carrier_id,
-            invoiceNumber: invoice?.invoice_number,
-            totalAmount: invoice?.total_amount
-          }
-        })
+      await auditLogs.reject('invoice', invoiceId, {
+        companyId: invoice?.empresa_id || invoice?.carrier_id,
+        invoiceNumber: invoice?.invoice_number,
+        totalAmount: invoice?.total_amount
+      })
 
       toast.success('Fatura rejeitada')
       onReject?.()
