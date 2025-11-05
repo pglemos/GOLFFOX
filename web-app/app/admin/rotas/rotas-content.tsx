@@ -179,12 +179,15 @@ export function RotasPageContent() {
                         className="flex-1"
                         onClick={async () => {
                           try {
-                            const { error } = await supabase.rpc('rpc_generate_route_stops', {
-                              p_route_id: rota.id
+                            const resp = await fetch('/api/admin/generate-stops', {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({ routeId: rota.id, dbSave: true })
                             })
-                            if (error) throw error
+                            const data = await resp.json()
+                            if (!resp.ok) throw new Error(data?.error || 'Erro ao gerar pontos')
                             toast.success('Pontos gerados com sucesso!')
-                            loadRotas()
+                            await loadRotas()
                           } catch (error: any) {
                             toast.error(`Erro: ${error.message}`)
                           }

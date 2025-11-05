@@ -27,6 +27,7 @@ import toast from "react-hot-toast"
 import { auditLogs } from "@/lib/audit-log"
 import { useSupabaseSync } from "@/hooks/use-supabase-sync"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Badge } from "@/components/ui/badge"
 
 interface RouteData {
   id?: string
@@ -99,6 +100,11 @@ export function RouteModal({
   const [generatingStops, setGeneratingStops] = useState(false)
   const [optimizing, setOptimizing] = useState(false)
   const [newException, setNewException] = useState("")
+  const [avgSpeedKmh, setAvgSpeedKmh] = useState<number>(30)
+  const [employeeTable, setEmployeeTable] = useState<string>(process.env.NEXT_PUBLIC_EMPLOYEE_DB_TABLE || 'gf_employee_company')
+  const [debounceMs, setDebounceMs] = useState<number>(Number(process.env.NEXT_PUBLIC_STOPS_DEBOUNCE_MS || 500))
+  const [itemsPerPage, setItemsPerPage] = useState<number>(Number(process.env.NEXT_PUBLIC_EMPLOYEE_PAGE_SIZE || 200))
+  const [realtimeRetries, setRealtimeRetries] = useState<number>(Number(process.env.NEXT_PUBLIC_REALTIME_RETRIES || 3))
 
   useEffect(() => {
     if (route) {
@@ -131,8 +137,6 @@ export function RouteModal({
       const { data, error } = await supabase
         .from('companies')
         .select('id, name')
-        .in('role', ['operator', 'carrier'])
-        .eq('is_active', true)
         .order('name')
 
       if (error) throw error
@@ -151,55 +155,47 @@ export function RouteModal({
 
     setLoading(true)
     try {
+      // Payload comum para sincronização/auditoria
+      const payload = {
+        name: formData.name,
+        company_id: formData.company_id,
+        description: formData.description || null,
+        origin_address: formData.origin_address || null,
+        origin_lat: formData.origin_lat || null,
+        origin_lng: formData.origin_lng || null,
+        destination_address: formData.destination_address || null,
+        destination_lat: formData.destination_lat || null,
+        destination_lng: formData.destination_lng || null,
+        scheduled_time: formData.scheduled_time || null,
+        days_of_week: formData.days_of_week || [],
+        exceptions: formData.exceptions || [],
+        holidays: formData.holidays || [],
+        is_active: formData.is_active,
+        shift: formData.shift
+      }
       if (route?.id) {
         // Atualizar
         const { error } = await supabase
           .from('routes')
-          .update({
-            name: formData.name,
-            company_id: formData.company_id,
-            description: formData.description || null,
-            origin_address: formData.origin_address || null,
-            origin_lat: formData.origin_lat || null,
-            origin_lng: formData.origin_lng || null,
-            destination_address: formData.destination_address || null,
-            destination_lat: formData.destination_lat || null,
-            destination_lng: formData.destination_lng || null,
-            scheduled_time: formData.scheduled_time || null,
-            days_of_week: formData.days_of_week || [],
-            exceptions: formData.exceptions || [],
-            holidays: formData.holidays || [],
-            is_active: formData.is_active,
-            shift: formData.shift
-          })
+          .update(payload)
           .eq('id', route.id)
 
         if (error) throw error
         toast.success('Rota atualizada com sucesso!')
 
-        // Log de auditoria para update
+        // Sincronização e auditoria para update
+        await sync({
+          resourceType: 'route',
+          resourceId: route.id,
+          action: 'update',
+          data: payload,
+        })
         await auditLogs.update('route', route.id, { name: formData.name })
       } else {
         // Criar
         const { data, error } = await supabase
           .from('routes')
-          .insert({
-            name: formData.name,
-            company_id: formData.company_id,
-            description: formData.description || null,
-            origin_address: formData.origin_address || null,
-            origin_lat: formData.origin_lat || null,
-            origin_lng: formData.origin_lng || null,
-            destination_address: formData.destination_address || null,
-            destination_lat: formData.destination_lat || null,
-            destination_lng: formData.destination_lng || null,
-            scheduled_time: formData.scheduled_time || null,
-            days_of_week: formData.days_of_week || [],
-            exceptions: formData.exceptions || [],
-            holidays: formData.holidays || [],
-            is_active: formData.is_active,
-            shift: formData.shift
-          })
+          .insert(payload)
           .select()
           .single()
 
@@ -214,23 +210,13 @@ export function RouteModal({
             resourceType: 'route',
             resourceId: data.id,
             action: 'create',
-            data: routeData,
+            data: payload,
           })
           
           // Log de auditoria
           await auditLogs.create('route', data.id, { name: formData.name, company_id: formData.company_id })
         }
-      } else {
-        // Sincronização com Supabase para update
-        await sync({
-          resourceType: 'route',
-          resourceId: route.id,
-          action: 'update',
-          data: routeData,
-        })
-        
-        // Log de auditoria para update
-        await auditLogs.update('route', route.id, { name: formData.name })
+      }
 
       onSave()
       onClose()
@@ -253,16 +239,22 @@ export function RouteModal({
 
     setGeneratingStops(true)
     try {
-      const { error } = await supabase.rpc('rpc_generate_route_stops', {
-        p_route_id: routeId
+      const resp = await fetch('/api/admin/generate-stops', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          routeId,
+          avgSpeedKmh,
+          employeeDb: employeeTable,
+          itemsPerPage,
+          dbSave: true, // salvar direto em gf_route_plan com service role
+          tableName: 'gf_route_plan'
+        })
       })
-
-      if (error) throw error
-      toast.success('Pontos gerados com sucesso!')
-      
-      if (onGenerateStops) {
-        await onGenerateStops(routeId)
-      }
+      const data = await resp.json()
+      if (!resp.ok) throw new Error(data?.error || 'Falha ao gerar pontos')
+      toast.success('Pontos gerados e salvos com sucesso!')
+      if (onGenerateStops) await onGenerateStops(routeId)
     } catch (error: any) {
       console.error('Erro ao gerar pontos:', error)
       toast.error(`Erro ao gerar pontos: ${error.message}`)
@@ -326,6 +318,51 @@ export function RouteModal({
     const exceptions = formData.exceptions || []
     setFormData({ ...formData, exceptions: exceptions.filter(e => e !== date) })
   }
+
+  // Realtime: assina mudanças no plano da rota e sincroniza com debounce
+  useEffect(() => {
+    const routeId = route?.id || formData.id
+    if (!isOpen || !routeId) return
+    let attempts = 0
+    let timeoutRef: any
+    let unsub: any
+    let scheduled: any
+
+    const trigger = () => {
+      if (scheduled) clearTimeout(scheduled)
+      scheduled = setTimeout(async () => {
+        try {
+          if (onGenerateStops) await onGenerateStops(routeId)
+          toast.success('Plano de rota atualizado')
+        } catch (e) {
+          // silencioso
+        }
+      }, debounceMs)
+    }
+
+    const subscribe = () => {
+      attempts++
+      unsub = supabase
+        .channel(`rt_gf_route_plan_${routeId}`)
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'gf_route_plan', filter: `route_id=eq.${routeId}` }, trigger)
+        .subscribe((status) => {
+          if (status === 'SUBSCRIBED') {
+            // ok
+          } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+            if (attempts <= realtimeRetries) {
+              timeoutRef = setTimeout(subscribe, 1000 * attempts)
+            }
+          }
+        })
+    }
+    subscribe()
+
+    return () => {
+      if (timeoutRef) clearTimeout(timeoutRef)
+      if (scheduled) clearTimeout(scheduled)
+      if (unsub) supabase.removeChannel(unsub)
+    }
+  }, [isOpen, route?.id, formData.id, debounceMs, realtimeRetries])
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -506,6 +543,35 @@ export function RouteModal({
               className="rounded"
             />
             <Label htmlFor="is_active">Rota ativa</Label>
+          </div>
+        </div>
+
+        {/* Configuração do Gerador */}
+        <div className="space-y-3 p-3 border rounded-md">
+          <div className="font-medium">Configuração do Gerador</div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div>
+              <Label>Fonte de funcionários</Label>
+              <Input value={employeeTable} onChange={(e) => setEmployeeTable(e.target.value)} placeholder="ex.: gf_employee_company" />
+            </div>
+            <div>
+              <Label>Velocidade média (km/h)</Label>
+              <Input type="number" value={avgSpeedKmh} onChange={(e) => setAvgSpeedKmh(Number(e.target.value) || 30)} />
+            </div>
+            <div>
+              <Label>Debounce realtime (ms)</Label>
+              <Input type="number" value={debounceMs} onChange={(e) => setDebounceMs(Number(e.target.value) || 500)} />
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div>
+              <Label>Itens por página</Label>
+              <Input type="number" value={itemsPerPage} onChange={(e) => setItemsPerPage(Number(e.target.value) || 200)} />
+            </div>
+            <div>
+              <Label>Tentativas de reconexão</Label>
+              <Input type="number" value={realtimeRetries} onChange={(e) => setRealtimeRetries(Number(e.target.value) || 3)} />
+            </div>
           </div>
         </div>
 

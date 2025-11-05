@@ -13,7 +13,7 @@ import TemporalProgressBar from './temporal-progress-bar'
 import { MapSkeletonLoader } from './map-skeleton-loader'
 import { InteractiveMarkerHotspot } from './interactive-marker-hotspot'
 import { AdvancedPlaybackControls } from './advanced-playback-controls'
-import { PerformanceMonitor, usePerformanceMonitor } from './performance-monitor'
+// PerformanceMonitor removido
 import { AccessibilityControls, useAccessibilityControls } from './accessibility-controls'
 import { useResponsive, useReducedMotion } from '@/hooks/use-responsive'
 import { usePerformance } from '@/hooks/use-performance'
@@ -80,7 +80,7 @@ export function AdvancedRouteMap({
   const prefersReducedMotion = useReducedMotion()
   const { metrics, isPerformanceGood, measureOperation } = usePerformance()
   const { state: accessibilityState, announce, focusElement } = useAccessibility()
-  const performanceMonitor = usePerformanceMonitor()
+  // PerformanceMonitor removido
   const accessibilityControls = useAccessibilityControls()
   
   const [isLoading, setIsLoading] = useState(true)
@@ -1266,8 +1266,7 @@ export function AdvancedRouteMap({
         )}
       </AnimatePresence>
 
-      {/* Monitor de Performance */}
-      <PerformanceMonitor />
+      {/* Monitor de Performance removido */}
 
       {/* Controles de Acessibilidade */}
       <AccessibilityControls />
@@ -1282,17 +1281,7 @@ export function AdvancedRouteMap({
         role="toolbar"
         aria-label="Controles de performance e acessibilidade"
       >
-        <Button
-          variant="outline"
-          size={isMobile ? "default" : "sm"}
-          onClick={performanceMonitor.toggle}
-          className="bg-white/90 backdrop-blur-sm shadow-lg"
-          title="Alternar monitor de performance"
-          aria-label="Alternar monitor de performance"
-        >
-          <Activity className="w-4 h-4" />
-          {isMobile && <span className="ml-2">Performance</span>}
-        </Button>
+        {/* Botão de Performance removido */}
         <Button
           variant="outline"
           size={isMobile ? "default" : "sm"}

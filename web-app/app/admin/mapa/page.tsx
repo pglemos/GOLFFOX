@@ -8,8 +8,8 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { motion } from "framer-motion"
 import { MapPin } from "lucide-react"
 
-// Lazy load FleetMap (componente pesado)
-const FleetMap = dynamic(() => import('@/components/fleet-map').then(m => ({ default: m.FleetMap })), { 
+// Lazy load AdminMap (componente pesado)
+const AdminMap = dynamic(() => import('@/components/admin-map').then(m => ({ default: m.AdminMap })), { 
   ssr: false,
   loading: () => <div className="w-full h-[600px] bg-gray-100 animate-pulse rounded-lg flex items-center justify-center">
     <p className="text-[var(--ink-muted)]">Carregando mapa...</p>
@@ -25,6 +25,7 @@ function MapaContent() {
   // Ler parâmetros da URL para rota específica e filtros
   const routeId = searchParams?.get('route') || null
   const companyId = searchParams?.get('company') || null
+  const vehicleId = searchParams?.get('vehicle') || null
   const latParam = searchParams?.get('lat')
   const lngParam = searchParams?.get('lng')
   const zoomParam = searchParams?.get('zoom')
@@ -89,9 +90,10 @@ function MapaContent() {
           </div>
         </motion.div>
 
-        <FleetMap 
+        <AdminMap 
           companyId={companyId || undefined}
           routeId={routeId || undefined}
+          vehicleId={vehicleId || undefined}
           initialCenter={initialCenter || undefined}
           initialZoom={initialZoom || undefined}
         />

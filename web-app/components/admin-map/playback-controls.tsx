@@ -1,0 +1,109 @@
+/**
+ * Controles de Playback
+ * Timeline, play/pause, velocidade
+ */
+
+'use client'
+
+import { Card } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Slider } from '@/components/ui/slider'
+import { useState } from 'react'
+import { Play, Pause, Square, SkipBack, SkipForward, Gauge } from 'lucide-react'
+
+interface PlaybackControlsProps {
+  isPlaying: boolean
+  onPlay: () => void
+  onPause: () => void
+  onStop: () => void
+  onSpeedChange: (speed: 1 | 2 | 4) => void
+  progress?: number
+  currentTime?: Date
+  duration?: Date
+}
+
+export function PlaybackControls({
+  isPlaying,
+  onPlay,
+  onPause,
+  onStop,
+  onSpeedChange,
+  progress = 0,
+}: PlaybackControlsProps) {
+  const [speed, setSpeed] = useState<1 | 2 | 4>(1)
+
+  const handleSpeedChange = (newSpeed: 1 | 2 | 4) => {
+    setSpeed(newSpeed)
+    onSpeedChange(newSpeed)
+  }
+
+  return (
+    <Card className="p-4 glass shadow-xl">
+      <div className="flex items-center gap-4">
+        {/* Controles de reprodução */}
+        <div className="flex items-center gap-2">
+          <Button size="icon" variant="outline" onClick={onStop}>
+            <Square className="h-4 w-4" />
+          </Button>
+          <Button size="icon" variant="outline" onClick={() => {
+            // Skip back
+          }}>
+            <SkipBack className="h-4 w-4" />
+          </Button>
+          <Button size="icon" onClick={isPlaying ? onPause : onPlay}>
+            {isPlaying ? (
+              <Pause className="h-4 w-4" />
+            ) : (
+              <Play className="h-4 w-4" />
+            )}
+          </Button>
+          <Button size="icon" variant="outline" onClick={() => {
+            // Skip forward
+          }}>
+            <SkipForward className="h-4 w-4" />
+          </Button>
+        </div>
+
+        {/* Timeline slider */}
+        <div className="flex-1">
+          <Slider
+            value={[progress]}
+            onValueChange={(value) => {
+              // Seek to position
+            }}
+            max={100}
+            step={0.1}
+            className="w-full"
+          />
+        </div>
+
+        {/* Velocidade */}
+        <div className="flex items-center gap-2 border-l pl-4">
+          <Gauge className="h-4 w-4 text-[var(--ink-muted)]" />
+          <Button
+            size="sm"
+            variant={speed === 1 ? 'default' : 'outline'}
+            onClick={() => handleSpeedChange(1)}
+          >
+            1×
+          </Button>
+          <Button
+            size="sm"
+            variant={speed === 2 ? 'default' : 'outline'}
+            onClick={() => handleSpeedChange(2)}
+          >
+            2×
+          </Button>
+          <Button
+            size="sm"
+            variant={speed === 4 ? 'default' : 'outline'}
+            onClick={() => handleSpeedChange(4)}
+          >
+            4×
+          </Button>
+        </div>
+      </div>
+    </Card>
+  )
+}
+
