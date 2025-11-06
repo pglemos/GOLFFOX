@@ -197,10 +197,14 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
         })
       }
       
-      // GARANTIR que capacity NUNCA está presente antes de qualquer operação
+      // GARANTIR que capacity e company_id NUNCA estão presentes antes de qualquer operação
       if ('capacity' in finalVehicleData) {
         delete finalVehicleData.capacity
         console.warn('🔒 Capacity removido do payload antes de operação (coluna não existe)')
+      }
+      if ('company_id' in finalVehicleData) {
+        delete finalVehicleData.company_id
+        console.warn('🔒 Company_id removido do payload antes de operação (coluna não existe)')
       }
       
       if (vehicleId) {
