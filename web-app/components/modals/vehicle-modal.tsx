@@ -164,7 +164,7 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
         photoUrl = await uploadPhoto(vehicleId)
       }
 
-      // Preparar dados do veículo (SEM capacity inicialmente)
+      // Preparar dados do veículo (SEM capacity - sempre removido por segurança)
       const vehicleDataRaw: any = {
         plate: formData.plate,
         model: formData.model,
@@ -175,49 +175,30 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
         company_id: formData.company_id || null,
       }
       
-      // Adicionar capacity APENAS se suportado E se tiver valor
-      if (capacitySupported && formData.capacity && formData.capacity.toString().trim() !== '') {
-        const capacityValue = parseInt(formData.capacity as string)
-        if (!isNaN(capacityValue) && capacityValue > 0) {
-          vehicleDataRaw.capacity = capacityValue
-        }
-      }
+      // NUNCA adicionar capacity ao payload - a coluna não existe no banco de produção
+      // Mesmo que capacitySupported seja true, não incluímos para evitar erros
       
-      // Garantir que capacity NUNCA seja enviado se não for suportado
+      // Criar objeto final SEM capacity (sempre removido)
       const finalVehicleData: any = { ...vehicleDataRaw }
       
-      // REMOVER capacity se não suportado (múltiplas verificações para garantir)
-      if (!capacitySupported) {
-        delete finalVehicleData.capacity
-      }
-      
-      // Verificação adicional: garantir que capacity não está presente
-      if ('capacity' in finalVehicleData && !capacitySupported) {
+      // GARANTIR que capacity NUNCA está presente (remoção definitiva)
+      if ('capacity' in finalVehicleData) {
         delete finalVehicleData.capacity
       }
       
       // Log para debug
-      if (!capacitySupported && formData.capacity) {
-        console.warn('⚠️ Capacity não suportado - removendo do payload:', {
+      if (formData.capacity) {
+        console.warn('⚠️ Capacity removido do payload (coluna não existe no banco):', {
           capacityOriginal: formData.capacity,
           finalDataKeys: Object.keys(finalVehicleData),
           hasCapacity: 'capacity' in finalVehicleData
         })
       }
       
-      // Log do payload final antes de enviar (apenas em dev)
-      if (process.env.NODE_ENV === 'development') {
-        console.log('📤 Payload final para Supabase:', {
-          hasCapacity: 'capacity' in finalVehicleData,
-          keys: Object.keys(finalVehicleData),
-          capacitySupported
-        })
-      }
-
-      // ÚLTIMA VERIFICAÇÃO ANTES DE ENVIAR: garantir que capacity não está presente
-      if (!capacitySupported && 'capacity' in finalVehicleData) {
+      // GARANTIR que capacity NUNCA está presente antes de qualquer operação
+      if ('capacity' in finalVehicleData) {
         delete finalVehicleData.capacity
-        console.warn('🔒 Última verificação: capacity removido antes de enviar ao banco')
+        console.warn('🔒 Capacity removido do payload antes de operação (coluna não existe)')
       }
       
       if (vehicleId) {
@@ -242,10 +223,10 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
         // Log de auditoria
         await auditLogs.update('vehicle', vehicleId, { plate: finalVehicleData.plate, model: finalVehicleData.model })
       } else {
-        // VERIFICAÇÃO FINAL: Garantir que capacity NUNCA seja enviado se não suportado
-        if (!capacitySupported && 'capacity' in finalVehicleData) {
+        // GARANTIR que capacity NUNCA está presente antes de criar
+        if ('capacity' in finalVehicleData) {
           delete finalVehicleData.capacity
-          console.log('🔒 Removendo capacity do payload final antes de criar (não suportado)')
+          console.warn('🔒 Capacity removido do payload antes de criar (coluna não existe)')
         }
         
         // Criar

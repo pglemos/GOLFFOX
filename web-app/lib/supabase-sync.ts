@@ -212,12 +212,10 @@ function mapDataToSupabase(
       // Garantir que campos numéricos sejam números
       if (mapped.year) mapped.year = parseInt(mapped.year) || null
       
-      // REMOVER capacity SEMPRE para evitar erro de schema cache
-      // A coluna pode não existir no banco, então SEMPRE removemos por segurança
-      // Mesmo que o componente tenha verificado suporte, removemos aqui como camada extra de proteção
+      // REMOVER capacity SEMPRE - a coluna NÃO existe no banco de produção
+      // Esta é a última camada de proteção antes de enviar ao Supabase
       if ('capacity' in mapped) {
         delete mapped.capacity
-        console.warn('⚠️ Capacity removido do payload em mapDataToSupabase (proteção extra)')
       }
       
       // Garantir boolean
