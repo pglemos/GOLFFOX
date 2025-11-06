@@ -202,8 +202,12 @@ class DataSanitizer {
           return sanitizeJson(input);
         } else if (input is String) {
           try {
-            final decoded = jsonDecode(input) as Map<String, dynamic>;
-            return sanitizeJson(decoded);
+            final decoded = jsonDecode(input);
+            if (decoded is Map<String, dynamic>) {
+              return sanitizeJson(decoded);
+            }
+            // Not a JSON object, sanitize as text
+            return sanitizeText(input);
           } catch (e) {
             return sanitizeText(input);
           }
@@ -283,4 +287,3 @@ mixin SanitizerMixin {
   /// Verifica padrões perigosos
   bool containsDangerousPatterns(String? input) => DataSanitizer.containsDangerousPatterns(input);
 }
-

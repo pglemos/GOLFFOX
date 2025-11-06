@@ -354,8 +354,7 @@ class UserProfile {
     return UserProfile(
       id: json['id'] as String,
       email: json['email'] as String,
-      fullName: json['email']
-          as String, // Using email as fullName since table doesn't have name field
+      fullName: (json['full_name'] as String?) ?? (json['email'] as String),
       role: parseRole(json['role'] as String?) ?? UserRole.passenger,
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: DateTime.parse(json['updated_at'] as String),

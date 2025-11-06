@@ -21,6 +21,7 @@ class _DriverChecklistScreenState extends State<DriverChecklistScreen> {
 
   Future<void> _submitChecklist() async {
     if (!_formKey.currentState!.validate()) return;
+    _formKey.currentState!.save();
 
     setState(() => _loading = true);
 
@@ -30,19 +31,19 @@ class _DriverChecklistScreenState extends State<DriverChecklistScreen> {
       if (driverId == null) throw Exception('Usuário não autenticado');
 
       // Buscar trip ativa
-      final tripResponse = await SupabaseService.instance.client
+      final trip = await SupabaseService.instance.client
           .from('trips')
           .select('id')
           .eq('driver_id', driverId)
           .eq('status', 'inProgress')
           .maybeSingle();
 
-      if (tripResponse.data == null) {
+      if (trip == null) {
         throw Exception('Nenhuma viagem ativa encontrada');
       }
 
       await SupabaseService.instance.client.from('checklists').insert({
-        'trip_id': tripResponse.data!['id'],
+        'trip_id': trip['id'],
         'type': 'pre_trip',
         'completed_by': driverId,
         'vehicle_condition': _vehicleCondition,
@@ -57,7 +58,7 @@ class _DriverChecklistScreenState extends State<DriverChecklistScreen> {
       if (mounted) {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
-            builder: (_) => DriverRouteScreen(trip: tripResponse.data!),
+            builder: (_) => DriverRouteScreen(trip: trip),
           ),
         );
       }

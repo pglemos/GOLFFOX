@@ -431,6 +431,8 @@ export function AdminMap({
           id,
           plate,
           model,
+          year,
+          prefix,
           capacity,
           is_active,
           photo_url,
@@ -646,37 +648,93 @@ export function AdminMap({
       // Carregar rotas (lazy loading será aplicado via loadVisibleRoutes)
       await loadVisibleRoutes()
 
-      // Carregar alertas
-      const { data: alertsData, error: alertsError } = await supabase
-        .from('v_alerts_open')
-        .select('*')
+      // Carregar alertas (fallback sem a view v_alerts_open)
+      let combinedAlerts: any[] = []
+      let alertsErrorMsg: string | null = null
 
-      if (!alertsError && alertsData) {
-        // Validar alertas com coordenadas
-        const validAlerts = alertsData
-          .filter((a: any) => {
-            // Se tem coordenadas, validar
+      try {
+        // Incidentes abertos
+        let incidentsQuery = supabase
+          .from('gf_incidents')
+          .select('id, company_id, route_id, vehicle_id, severity, description, created_at, lat, lng, status')
+          .eq('status', 'open')
+
+        if (filters.company) {
+          incidentsQuery = incidentsQuery.eq('company_id', filters.company)
+        }
+
+        const { data: incidentsData, error: incidentsError } = await incidentsQuery
+
+        // Solicitações de socorro abertas
+        let assistanceQuery = supabase
+          .from('gf_service_requests')
+          .select('id, company_id, route_id, vehicle_id, severity, description, created_at, lat, lng, tipo, status')
+          .eq('tipo', 'socorro')
+          .eq('status', 'open')
+
+        if (filters.company) {
+          assistanceQuery = assistanceQuery.eq('company_id', filters.company)
+        }
+
+        const { data: assistanceData, error: assistanceError } = await assistanceQuery
+
+        if (incidentsError && assistanceError) {
+          const msg = (incidentsError as any)?.message ?? (assistanceError as any)?.message ?? (() => { try { return JSON.stringify(incidentsError || assistanceError) } catch { return String(incidentsError || assistanceError) } })()
+          alertsErrorMsg = msg
+        } else {
+          const mappedIncidents = (incidentsData || []).map((i: any) => ({
+            alert_id: i.id,
+            alert_type: 'incident',
+            company_id: i.company_id,
+            route_id: i.route_id,
+            vehicle_id: i.vehicle_id,
+            severity: i.severity,
+            lat: i.lat,
+            lng: i.lng,
+            description: i.description,
+            created_at: i.created_at,
+          }))
+
+          const mappedAssistance = (assistanceData || []).map((a: any) => ({
+            alert_id: a.id,
+            alert_type: 'assistance',
+            company_id: a.company_id,
+            route_id: a.route_id,
+            vehicle_id: a.vehicle_id,
+            severity: a.severity || 'high',
+            lat: a.lat,
+            lng: a.lng,
+            description: a.description,
+            created_at: a.created_at,
+          }))
+
+          combinedAlerts = [...mappedIncidents, ...mappedAssistance]
+
+          // Validar alertas com coordenadas quando presentes
+          const validAlerts = combinedAlerts.filter((a: any) => {
             if (a.lat !== undefined && a.lng !== undefined) {
               if (!isValidCoordinate(a.lat, a.lng)) {
                 console.warn(`Alerta ${a.alert_id} tem coordenadas inválidas`)
                 return false
               }
-              
-              // Normalizar coordenadas
+
               const normalized = normalizeCoordinate(a.lat, a.lng)
               if (normalized) {
                 a.lat = normalized.lat
                 a.lng = normalized.lng
               }
             }
-            
             return true
           })
-        
-        setAlerts(validAlerts as any)
-      } else if (alertsError) {
-        const msg = (alertsError as any)?.message ?? (() => { try { return JSON.stringify(alertsError) } catch { return String(alertsError) } })()
-        console.error('Erro ao carregar alertas:', msg)
+
+          setAlerts(validAlerts as any)
+        }
+      } catch (alertsError: any) {
+        alertsErrorMsg = alertsError?.message ?? (() => { try { return JSON.stringify(alertsError) } catch { return String(alertsError) } })()
+      }
+
+      if (alertsErrorMsg) {
+        console.error('Erro ao carregar alertas:', alertsErrorMsg)
       }
 
       // Carregar paradas das rotas

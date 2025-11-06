@@ -234,3 +234,4 @@ JOIN companies c ON c.id = ucm.company_id;
 
 **Próxima Ação:** Executar testes seguindo este checklist e documentar resultados.
 
+

@@ -172,3 +172,4 @@ Status Atual:
   - `refresh-kpis` → `0 3 * * *`
   - `dispatch-reports` → `0 4 * * *`
 
+

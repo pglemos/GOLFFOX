@@ -23,9 +23,12 @@ class _DriverDashboardScreenState extends State<DriverDashboardScreen> {
   Future<void> _loadCurrentTrip() async {
     try {
       final driverId = SupabaseService.instance.currentUserId;
-      if (driverId == null) return;
+      if (driverId == null) {
+        setState(() => _loading = false);
+        return;
+      }
 
-      final response = await SupabaseService.instance.client
+      final trip = await SupabaseService.instance.client
           .from('trips')
           .select('*, routes(*), vehicles(*)')
           .eq('driver_id', driverId)
@@ -33,7 +36,7 @@ class _DriverDashboardScreenState extends State<DriverDashboardScreen> {
           .maybeSingle();
 
       setState(() {
-        _currentTrip = response.data;
+        _currentTrip = trip;
         _loading = false;
       });
     } catch (e) {

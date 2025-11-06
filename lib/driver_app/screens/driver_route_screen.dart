@@ -59,13 +59,14 @@ class _DriverRouteScreenState extends State<DriverRouteScreen> {
 
   Future<void> _loadPassengers() async {
     try {
-      final response = await SupabaseService.instance.client
+      final rows = await SupabaseService.instance.client
           .from('trip_passengers')
           .select()
           .eq('trip_id', widget.trip['id']);
 
+      final count = rows is List ? rows.length : 0;
       setState(() {
-        _passengerCount = response.data?.length ?? 0;
+        _passengerCount = count;
       });
     } catch (e) {
       print('Erro ao carregar passageiros: $e');
@@ -83,7 +84,7 @@ class _DriverRouteScreenState extends State<DriverRouteScreen> {
           .eq('is_active', true)
           .maybeSingle();
 
-      if (employee.data == null) {
+      if (employee == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Passageiro não encontrado ou inativo')),
         );
@@ -93,7 +94,7 @@ class _DriverRouteScreenState extends State<DriverRouteScreen> {
       // Marcar embarque
       await SupabaseService.instance.client.from('trip_passengers').insert({
         'trip_id': widget.trip['id'],
-        'passenger_id': employee.data!['id'],
+        'passenger_id': employee['id'],
         'status': 'pickedup',
       });
 

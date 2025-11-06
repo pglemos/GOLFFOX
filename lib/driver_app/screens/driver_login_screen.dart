@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../services/supabase_service.dart';
+import '../../services/auth_service.dart';
 
 class DriverLoginScreen extends StatefulWidget {
   const DriverLoginScreen({super.key});
@@ -25,20 +26,30 @@ class _DriverLoginScreenState extends State<DriverLoginScreen> {
       // Buscar funcionário por CPF
       final employee = await SupabaseService.instance.client
           .from('gf_employee_company')
-          .select()
+          .select('id, email, is_active')
           .eq('login_cpf', cpf)
           .eq('is_active', true)
           .maybeSingle();
 
-      if (employee.data == null) {
+      if (employee == null) {
         throw Exception('CPF ou senha inválidos');
       }
 
-      // Login com Supabase Auth (se implementado) ou validação direta
-      // Por enquanto, validação simples - em produção usar auth adequado
-      final passwordHash = employee.data!['password_hash'];
-      if (passwordHash != _passwordController.text) {
-        throw Exception('CPF ou senha inválidos');
+      // Tenta autenticar via Supabase Auth usando o e-mail do funcionário
+      final email = (employee['email'] as String?)?.trim();
+      if (email == null || email.isEmpty) {
+        throw Exception('Conta sem e-mail vinculado. Contate o suporte.');
+      }
+
+      final authService = AuthService();
+      final user = await authService.signInWithEmail(
+        context,
+        email,
+        _passwordController.text,
+      );
+
+      if (user == null) {
+        throw Exception('Falha ao autenticar. Verifique suas credenciais.');
       }
 
       // Navegar para dashboard do motorista

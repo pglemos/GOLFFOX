@@ -50,7 +50,6 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
   const [photoFile, setPhotoFile] = useState<File | null>(null)
   const [photoPreview, setPhotoPreview] = useState<string>("")
   const { sync } = useSupabaseSync({ showToast: false }) // Toast já é mostrado no modal
-  const [capacitySupported, setCapacitySupported] = useState<boolean>(true)
 
   useEffect(() => {
     if (vehicle) {
@@ -69,42 +68,6 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
     }
     setPhotoFile(null)
   }, [vehicle, isOpen])
-
-  // Verificar suporte à coluna 'capacity' (alguns ambientes podem não ter aplicado a migration)
-  useEffect(() => {
-    const checkCapacitySupport = async () => {
-      try {
-        // Tentar fazer uma query simples para verificar se a coluna existe
-        const { error } = await supabase
-          .from("vehicles")
-          .select("id, capacity")
-          .limit(1)
-
-        if (error) {
-          const msg = String(error.message || error).toLowerCase()
-          // PostgREST costuma retornar erro de schema cache quando a coluna não existe
-          if (msg.includes("capacity") || msg.includes("schema cache") || msg.includes("column")) {
-            console.warn("⚠️ Coluna 'capacity' não disponível no schema atual. O campo será omitido ao salvar.")
-            setCapacitySupported(false)
-            return
-          }
-          // Se for outro tipo de erro, assumir que não suporta
-          console.warn("⚠️ Erro ao verificar capacity, assumindo não suportado:", error.message)
-          setCapacitySupported(false)
-          return
-        }
-        
-        // Se não houve erro, a coluna existe
-        console.log("✅ Coluna 'capacity' está disponível no schema")
-        setCapacitySupported(true)
-      } catch (e: any) {
-        // Em caso de erro, assumir que não suporta para evitar problemas
-        console.warn("⚠️ Falha ao verificar suporte de 'capacity', assumindo não suportado:", e?.message || e)
-        setCapacitySupported(false)
-      }
-    }
-    checkCapacitySupport()
-  }, [])
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
