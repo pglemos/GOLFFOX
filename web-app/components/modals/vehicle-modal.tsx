@@ -164,7 +164,7 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
         photoUrl = await uploadPhoto(vehicleId)
       }
 
-      // Preparar dados do veículo (SEM capacity - sempre removido por segurança)
+      // Preparar dados do veículo (SEM capacity e company_id - sempre removidos por segurança)
       const vehicleDataRaw: any = {
         plate: formData.plate,
         model: formData.model,
@@ -172,18 +172,20 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
         prefix: formData.prefix || null,
         is_active: formData.is_active !== undefined ? formData.is_active : true,
         photo_url: photoUrl || null,
-        company_id: formData.company_id || null,
+        // NÃO incluir company_id - a coluna não existe no banco de produção
       }
       
-      // NUNCA adicionar capacity ao payload - a coluna não existe no banco de produção
-      // Mesmo que capacitySupported seja true, não incluímos para evitar erros
+      // NUNCA adicionar capacity ou company_id ao payload - essas colunas não existem no banco
       
-      // Criar objeto final SEM capacity (sempre removido)
+      // Criar objeto final SEM capacity e company_id (sempre removidos)
       const finalVehicleData: any = { ...vehicleDataRaw }
       
-      // GARANTIR que capacity NUNCA está presente (remoção definitiva)
+      // GARANTIR que capacity e company_id NUNCA estão presentes (remoção definitiva)
       if ('capacity' in finalVehicleData) {
         delete finalVehicleData.capacity
+      }
+      if ('company_id' in finalVehicleData) {
+        delete finalVehicleData.company_id
       }
       
       // Log para debug

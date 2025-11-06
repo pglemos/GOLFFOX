@@ -212,10 +212,13 @@ function mapDataToSupabase(
       // Garantir que campos numéricos sejam números
       if (mapped.year) mapped.year = parseInt(mapped.year) || null
       
-      // REMOVER capacity SEMPRE - a coluna NÃO existe no banco de produção
+      // REMOVER capacity e company_id SEMPRE - essas colunas NÃO existem no banco de produção
       // Esta é a última camada de proteção antes de enviar ao Supabase
       if ('capacity' in mapped) {
         delete mapped.capacity
+      }
+      if ('company_id' in mapped) {
+        delete mapped.company_id
       }
       
       // Garantir boolean
