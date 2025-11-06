@@ -225,10 +225,14 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
         // Log de auditoria
         await auditLogs.update('vehicle', vehicleId, { plate: finalVehicleData.plate, model: finalVehicleData.model })
       } else {
-        // GARANTIR que capacity NUNCA está presente antes de criar
+        // GARANTIR que capacity e company_id NUNCA estão presentes antes de criar
         if ('capacity' in finalVehicleData) {
           delete finalVehicleData.capacity
           console.warn('🔒 Capacity removido do payload antes de criar (coluna não existe)')
+        }
+        if ('company_id' in finalVehicleData) {
+          delete finalVehicleData.company_id
+          console.warn('🔒 Company_id removido do payload antes de criar (coluna não existe)')
         }
         
         // Criar
