@@ -224,6 +224,14 @@ export default function VeiculosPage() {
               <Card className="p-4 hover:shadow-lg transition-shadow">
                 <div className="flex items-start justify-between">
                   <div className="flex-1 flex gap-4">
+                    {veiculo.photo_url && (
+                      /* eslint-disable-next-line @next/next/no-img-element */
+                      <img 
+                        src={veiculo.photo_url} 
+                        alt={veiculo.plate}
+                        className="w-20 h-20 rounded-lg object-cover border border-[var(--border)]"
+                      />
+                    )}
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
                         <Truck className="h-5 w-5 text-[var(--brand)]" />
@@ -231,10 +239,14 @@ export default function VeiculosPage() {
                         {veiculo.prefix && (
                           <Badge variant="outline">Prefixo: {veiculo.prefix}</Badge>
                         )}
+                        <Badge variant={veiculo.is_active ? "default" : "secondary"}>
+                          {veiculo.is_active ? "Ativo" : "Inativo"}
+                        </Badge>
                       </div>
                       <p className="font-medium mb-1">{veiculo.model || "Sem modelo"}</p>
                       <div className="flex gap-4 text-sm text-[var(--ink-muted)]">
                         <span>Ano: {veiculo.year || "N/A"}</span>
+                        {veiculo.capacity && <span>Capacidade: {veiculo.capacity} lugares</span>}
                       </div>
                     </div>
                   </div>
@@ -372,12 +384,24 @@ export default function VeiculosPage() {
                       <Label className="text-sm font-medium">Ano</Label>
                       <p className="text-sm">{selectedVehicle.year || "N/A"}</p>
                     </div>
+                    {selectedVehicle.capacity && (
+                      <div>
+                        <Label className="text-sm font-medium">Capacidade</Label>
+                        <p className="text-sm">{selectedVehicle.capacity} lugares</p>
+                      </div>
+                    )}
                     {selectedVehicle.prefix && (
                       <div>
                         <Label className="text-sm font-medium">Prefixo</Label>
                         <p className="text-sm">{selectedVehicle.prefix}</p>
                       </div>
                     )}
+                    <div>
+                      <Label className="text-sm font-medium">Status</Label>
+                      <Badge variant={selectedVehicle.is_active ? "default" : "secondary"}>
+                        {selectedVehicle.is_active ? "Ativo" : "Inativo"}
+                      </Badge>
+                    </div>
                   </div>
                 </TabsContent>
 

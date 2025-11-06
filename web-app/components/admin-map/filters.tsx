@@ -92,14 +92,17 @@ export function MapFilters({
       const { data: routesData } = await routesQuery
       if (routesData) setRoutes(routesData)
 
-      // Carregar veículos (SEM filtro de empresa - company_id não existe)
-      const vehiclesQuery = supabase
+      // Carregar veículos com filtro de empresa
+      let vehiclesQuery = supabase
         .from('vehicles')
-        .select('id, plate')
+        .select('id, plate, company_id')
+        .eq('is_active', true)
         .order('plate')
       
-      // NÃO aplicar filtro de company_id - a coluna não existe
-      // Se precisar filtrar por empresa, fazer no lado do cliente após carregar
+      // Aplicar filtro de empresa se selecionado
+      if (filters.company) {
+        vehiclesQuery = vehiclesQuery.eq('company_id', filters.company)
+      }
       
       const { data: vehiclesData } = await vehiclesQuery
       if (vehiclesData) setVehicles(vehiclesData)

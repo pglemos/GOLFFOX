@@ -211,20 +211,11 @@ function mapDataToSupabase(
     case 'vehicle':
       // Garantir que campos numéricos sejam números
       if (mapped.year) mapped.year = parseInt(mapped.year) || null
+      if (mapped.capacity) mapped.capacity = parseInt(mapped.capacity) || null
       
-      // REMOVER capacity, company_id, is_active e photo_url SEMPRE - essas colunas NÃO existem no banco de produção
-      // Esta é a última camada de proteção antes de enviar ao Supabase
-      if ('capacity' in mapped) {
-        delete mapped.capacity
-      }
-      if ('company_id' in mapped) {
-        delete mapped.company_id
-      }
-      if ('is_active' in mapped) {
-        delete mapped.is_active
-      }
-      if ('photo_url' in mapped) {
-        delete mapped.photo_url
+      // Garantir boolean
+      if (typeof mapped.is_active !== 'boolean') {
+        mapped.is_active = mapped.is_active !== false
       }
       break
 
