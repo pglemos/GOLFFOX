@@ -16,7 +16,9 @@
     "clean": "rimraf .next out dist",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "setup:env": "node scripts/setup-env.js"
+    "setup:env": "node scripts/setup-env.js",
+    "db:check": "node scripts/drift-check.js",
+    "db:seed:demo": "node scripts/seed-demo.js"
   },
   "dependencies": {
     "@googlemaps/js-api-loader": "^2.0.2",

@@ -198,6 +198,26 @@
     @apply bg-gradient-to-br from-[var(--accent)] via-[var(--accent-soft)] to-[var(--brand)];
     @apply p-12 shadow-[var(--shadow-xl)];
   }
+
+  /* Pseudo-elemento correto para overlay de glassmorphism no Hero */
+  .hero-glass::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    /* Leve véu branco com blur para efeito glass */
+    background: linear-gradient(180deg,
+      rgba(255, 255, 255, 0.12) 0%,
+      rgba(255, 255, 255, 0.06) 60%,
+      rgba(255, 255, 255, 0.0) 100%
+    );
+    backdrop-filter: blur(12px);
+    transition: opacity var(--transition-base);
+  }
+  .hero-glass:hover::before {
+    opacity: 0.85; /* ~15% redução para feedback sutil */
+  }
   
   .hero-glass::before {
     content: '';
@@ -431,13 +451,66 @@
   }
 }
 
-/* Gradient Overlays */
+/* Gradient Overlays - moderno e minimalista */
 .gradient-overlay {
-  background: linear-gradient(180deg, 
-    rgba(15, 23, 42, 0.03) 0%,
-    rgba(30, 41, 59, 0.03) 50%,
-    rgba(249, 115, 22, 0.03) 100%
+  /* Preservar funcionalidade: não intercepta eventos */
+  pointer-events: none;
+
+  /* Tipografia sans-serif padrão (aplica aos filhos quando houver) */
+  font-family: Inter, Roboto, system-ui, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+
+  /* Esquema de cores limitado */
+  /* Primária: var(--brand); Secundária: var(--accent); Neutra: baseada em branco/cinza */
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.06) 0%,
+    rgba(0, 0, 0, 0.06) 60%,
+    color-mix(in oklab, var(--brand) 10%, transparent) 100%
   );
+
+  /* Cantos arredondados dentro do container (será recortado por overflow-hidden) */
+  border-radius: 6px;
+
+  /* Sombra suave conforme especificação */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+  /* Transição suave para efeitos de opacidade */
+  transition: opacity 200ms ease;
+  opacity: 1;
+}
+
+/* Hover: reduzir opacidade em até 20% sem afetar interação (via hover no container) */
+.hero-glass:hover .gradient-overlay,
+.bg-gradient-to-br:hover .gradient-overlay {
+  opacity: 0.8;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .gradient-overlay {
+    /* Mobile: suavizar o overlay para legibilidade */
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.04) 0%,
+      rgba(0, 0, 0, 0.04) 60%,
+      color-mix(in oklab, var(--brand) 8%, transparent) 100%
+    );
+    border-radius: 6px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1024px) {
+  .gradient-overlay {
+    /* Tablet: manter proporção e sombra */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+}
+
+@media (min-width: 1024px) {
+  .gradient-overlay {
+    /* Desktop: manter layout otimizado */
+    max-width: 1200px; /* respeita container pai */
+  }
 }
 
 .gradient-brand {

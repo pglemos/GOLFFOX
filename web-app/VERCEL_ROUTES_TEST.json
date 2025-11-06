@@ -1,0 +1,43 @@
+{
+  "timestamp": "2025-11-06T00:41:23.631Z",
+  "domain": "golffox.vercel.app",
+  "routes_tested": {
+    "/": {
+      "name": "Home",
+      "status": 200,
+      "statusText": "OK",
+      "accessible": true,
+      "duration_ms": 2102,
+      "size_bytes": 6585,
+      "expected_statuses": [
+        200,
+        302
+      ]
+    },
+    "/operator": {
+      "name": "Operator Dashboard",
+      "status": 307,
+      "statusText": "Temporary Redirect",
+      "accessible": false,
+      "duration_ms": 255,
+      "size_bytes": 15,
+      "expected_statuses": [
+        200,
+        302,
+        401
+      ]
+    },
+    "/api/health": {
+      "name": "Health Check",
+      "status": 404,
+      "statusText": "Not Found",
+      "accessible": true,
+      "duration_ms": 405,
+      "size_bytes": 7249,
+      "expected_statuses": [
+        200,
+        404
+      ]
+    }
+  }
+}

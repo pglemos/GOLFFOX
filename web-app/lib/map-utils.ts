@@ -251,6 +251,22 @@ export async function calculateETA(
 
 /**
  * Decodifica polyline encoded (Google Maps)
+ * Usa Web Worker se disponível, senão decodifica síncronamente
+ */
+export async function decodePolylineAsync(
+  encoded: string
+): Promise<Array<{ lat: number; lng: number }>> {
+  try {
+    const { decodePolylineAsync } = await import('@/lib/polyline-decoder')
+    return decodePolylineAsync(encoded)
+  } catch (error) {
+    console.warn('Erro ao usar Web Worker, usando decodificação síncrona:', error)
+    return decodePolyline(encoded)
+  }
+}
+
+/**
+ * Decodifica polyline encoded (Google Maps) - versão síncrona
  */
 export function decodePolyline(encoded: string): Array<{ lat: number; lng: number }> {
   const points: Array<{ lat: number; lng: number }> = []

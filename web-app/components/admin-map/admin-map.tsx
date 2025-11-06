@@ -10,6 +10,7 @@ import { loadGoogleMapsAPI } from '@/lib/google-maps-loader'
 import { RealtimeService, RealtimeUpdateType } from '@/lib/realtime-service'
 import { PlaybackService } from '@/lib/playback-service'
 import { fitBoundsWithMargin, createBoundsFromPositions } from '@/lib/map-utils'
+import { getMapsBillingMonitor } from '@/lib/maps-billing-monitor'
 import { MapFilters } from './filters'
 import { MapLayers } from './layers'
 import { VehiclePanel, RoutePanel, AlertsPanel } from './panels'
@@ -28,6 +29,7 @@ import { supabase } from '@/lib/supabase'
 import { motion, AnimatePresence } from 'framer-motion'
 import { modalContent } from '@/lib/animations'
 import { MarkerClusterer } from '@googlemaps/markerclusterer'
+import toast from 'react-hot-toast'
 
 declare global {
   interface Window {
@@ -61,7 +63,7 @@ export interface Vehicle {
   heading: number | null
   vehicle_status: 'moving' | 'stopped_short' | 'stopped_long' | 'garage'
   passenger_count: number
-  last_position_time: string
+  last_position_time?: string
 }
 
 export interface RoutePolyline {
@@ -114,6 +116,13 @@ export function AdminMap({
   const [selectedRoute, setSelectedRoute] = useState<RoutePolyline | null>(null)
   const [mode, setMode] = useState<'live' | 'history'>('live')
   const [isPlaying, setIsPlaying] = useState(false)
+  const [billingStatus, setBillingStatus] = useState<any>(null)
+  const [listMode, setListMode] = useState(false) // Fallback modo lista
+  const [playbackProgress, setPlaybackProgress] = useState(0)
+  const [playbackFrom, setPlaybackFrom] = useState<Date>(new Date(Date.now() - 2 * 60 * 60 * 1000)) // Últimas 2h
+  const [playbackTo, setPlaybackTo] = useState<Date>(new Date())
+  const [playbackSpeed, setPlaybackSpeed] = useState<1 | 2 | 4>(1)
+  const [historicalPositions, setHistoricalPositions] = useState<Map<string, any>>(new Map())
   
   // Filtros
   const [filters, setFilters] = useState({
@@ -143,7 +152,23 @@ export function AdminMap({
       }
 
       try {
+        // Verificar quota antes de carregar
+        const billingMonitor = getMapsBillingMonitor()
+        const billingStatus = billingMonitor.getStatus()
+        setBillingStatus(billingStatus)
+
+        if (billingMonitor.isQuotaExceeded()) {
+          setMapError('Quota do Google Maps excedida. Usando modo lista.')
+          setListMode(true)
+          setLoading(false)
+          await loadInitialData()
+          return
+        }
+
         await loadGoogleMapsAPI(apiKey)
+        
+        // Incrementar uso
+        billingMonitor.incrementUsage(1)
         
         const defaultCenter = { lat: -19.916681, lng: -43.934493 }
         const map = new google.maps.Map(mapRef.current, {
@@ -172,16 +197,21 @@ export function AdminMap({
         // Carregar dados iniciais
         await loadInitialData()
         
-        // Inicializar realtime
+        // Inicializar realtime ou playback baseado no modo
         if (mode === 'live') {
           initRealtime()
+        } else {
+          initPlayback()
         }
         
         setLoading(false)
       } catch (error: any) {
         console.error('Erro ao inicializar mapa:', error)
-        setMapError('Erro ao carregar o mapa')
+        setMapError('Erro ao carregar o mapa. Usando modo lista.')
+        setListMode(true)
         setLoading(false)
+        // Carregar dados em modo lista
+        loadInitialData().catch(console.error)
       }
     }
 
@@ -234,8 +264,55 @@ export function AdminMap({
     }
   }, [filters.company])
 
+  // Processar atualizações do realtime
+  const handleRealtimeUpdate = useCallback((update: RealtimeUpdateType) => {
+    if (update.type === 'position') {
+      setVehicles((prev) => {
+        const index = prev.findIndex(
+          (v) => v.vehicle_id === update.data.vehicle_id
+        )
+        if (index >= 0) {
+          const updated = [...prev]
+          // Atualizar campos do veículo existente
+          updated[index] = {
+            ...updated[index],
+            lat: update.data.lat,
+            lng: update.data.lng,
+            speed: update.data.speed,
+            heading: update.data.heading,
+            vehicle_status: update.data.vehicle_status,
+            passenger_count: update.data.passenger_count,
+            last_position_time: update.data.timestamp,
+          }
+          return updated
+        } else {
+          // Buscar dados completos do veículo se não existir
+          // Por enquanto, criar veículo básico (será atualizado quando buscar dados completos)
+          return prev
+        }
+      })
+    } else if (update.type === 'alert') {
+      setAlerts((prev) => {
+        const index = prev.findIndex(
+          (a) => a.alert_id === update.data.alert_id
+        )
+        if (index >= 0) {
+          return prev
+        } else {
+          return [...prev, update.data]
+        }
+      })
+    }
+  }, [])
+
   // Inicializar realtime
   const initRealtime = useCallback(() => {
+    // Desconectar playback se estiver ativo
+    if (playbackServiceRef.current) {
+      playbackServiceRef.current.stop()
+      playbackServiceRef.current = null
+    }
+
     const service = new RealtimeService({
       onUpdate: (update: RealtimeUpdateType) => {
         handleRealtimeUpdate(update)
@@ -247,7 +324,49 @@ export function AdminMap({
 
     service.connect()
     realtimeServiceRef.current = service
-  }, [])
+  }, [handleRealtimeUpdate])
+
+  // Inicializar playback histórico
+  const initPlayback = useCallback(async () => {
+    // Desconectar realtime se estiver ativo
+    if (realtimeServiceRef.current) {
+      await realtimeServiceRef.current.disconnect()
+      realtimeServiceRef.current = null
+    }
+
+    // Criar instância do PlaybackService
+    if (!playbackServiceRef.current) {
+      playbackServiceRef.current = new PlaybackService()
+    }
+
+    // Carregar posições históricas
+    const positions = await playbackServiceRef.current.loadPositions(
+      filters.company || null,
+      filters.route || null,
+      filters.vehicle || null,
+      playbackFrom,
+      playbackTo,
+      1 // 1 minuto de intervalo
+    )
+
+    if (positions.length === 0) {
+      toast.error('Nenhuma posição histórica encontrada para o período selecionado')
+      return
+    }
+
+    toast.success(`${positions.length} posições carregadas para playback`)
+  }, [filters.company, filters.route, filters.vehicle, playbackFrom, playbackTo])
+
+  // Reagir a mudanças de modo
+  useEffect(() => {
+    if (!mapInstanceRef.current) return
+    
+    if (mode === 'live') {
+      initRealtime()
+    } else {
+      initPlayback()
+    }
+  }, [mode, initRealtime, initPlayback])
 
   // Despachar socorro
   const handleDispatchAssistance = useCallback(async (vehicle: Vehicle) => {
@@ -273,10 +392,27 @@ export function AdminMap({
 
       if (error) throw error
 
-      // TODO: Mostrar toast de sucesso
-      console.log('Socorro despachado:', data)
+      toast.success('Socorro despachado com sucesso!')
+      
+      // Recarregar alertas para mostrar o novo
+      const { data: alertsData } = await supabase
+        .from('v_alerts_open')
+        .select('*')
+        .eq('alert_id', data.id)
+        .single()
+      
+      if (alertsData) {
+        setAlerts((prev) => {
+          const exists = prev.find(a => a.alert_id === alertsData.alert_id)
+          if (!exists) {
+            return [...prev, alertsData as any]
+          }
+          return prev
+        })
+      }
     } catch (error: any) {
       console.error('Erro ao despachar socorro:', error)
+      toast.error('Erro ao despachar socorro: ' + (error.message || 'Erro desconhecido'))
     }
   }, [])
 
@@ -284,72 +420,48 @@ export function AdminMap({
   const handleExport = useCallback(async () => {
     try {
       // Exportar PNG do mapa
-      if (mapInstanceRef.current && mapRef.current) {
-        // Usar html2canvas ou similar para capturar screenshot
-        // Por enquanto, apenas log
-        console.log('Exportar PNG do mapa')
+      if (mapRef.current && !listMode) {
+        try {
+          const { exportMapPNG } = await import('@/lib/export-map-png')
+          await exportMapPNG('map-container')
+          toast.success('Mapa exportado como PNG!')
+        } catch (error: any) {
+          console.error('Erro ao exportar PNG:', error)
+          toast.error('Erro ao exportar PNG do mapa')
+        }
       }
+      
+      // Exportar CSV dos veículos visíveis
+      if (vehicles.length > 0) {
+        const csvContent = [
+          'Placa,Modelo,Rota,Motorista,Latitude,Longitude,Velocidade,Status,Passageiros',
+          ...vehicles.map(v => [
+            v.plate,
+            v.model,
+            v.route_name || 'N/A',
+            v.driver_name || 'N/A',
+            v.lat?.toFixed(6) || '0',
+            v.lng?.toFixed(6) || '0',
+            v.speed?.toString() || '0',
+            v.vehicle_status || 'N/A',
+            v.passenger_count?.toString() || '0'
+          ].join(','))
+        ].join('\n')
 
-      // Exportar CSV dos pontos visíveis
-      const csvData = vehicles.map((v) => ({
-        timestamp: v.last_position_time,
-        vehicle_id: v.vehicle_id,
-        plate: v.plate,
-        lat: v.lat,
-        lng: v.lng,
-        speed: v.speed,
-        heading: v.heading,
-        status: v.vehicle_status,
-        passengers: v.passenger_count,
-      }))
-
-      const csv = [
-        'timestamp,vehicle_id,plate,lat,lng,speed,heading,status,passengers',
-        ...csvData.map((row) =>
-          Object.values(row).map((v) => `"${v}"`).join(',')
-        ),
-      ].join('\n')
-
-      const blob = new Blob([csv], { type: 'text/csv' })
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = `mapa-export-${new Date().toISOString()}.csv`
-      a.click()
-      URL.revokeObjectURL(url)
-    } catch (error) {
+        const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' })
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = `mapa-veiculos-${new Date().toISOString().split('T')[0]}.csv`
+        a.click()
+        URL.revokeObjectURL(url)
+        toast.success('CSV exportado!')
+      }
+    } catch (error: any) {
       console.error('Erro ao exportar:', error)
+      toast.error('Erro ao exportar')
     }
-  }, [vehicles, mapInstanceRef, mapRef])
-
-  // Processar atualizações do realtime
-  const handleRealtimeUpdate = useCallback((update: RealtimeUpdateType) => {
-    if (update.type === 'position') {
-      setVehicles((prev) => {
-        const index = prev.findIndex(
-          (v) => v.vehicle_id === update.data.vehicle_id
-        )
-        if (index >= 0) {
-          const updated = [...prev]
-          updated[index] = { ...updated[index], ...update.data }
-          return updated
-        } else {
-          return [...prev, update.data as Vehicle]
-        }
-      })
-    } else if (update.type === 'alert') {
-      setAlerts((prev) => {
-        const index = prev.findIndex(
-          (a) => a.alert_id === update.data.alert_id
-        )
-        if (index >= 0) {
-          return prev
-        } else {
-          return [...prev, update.data]
-        }
-      })
-    }
-  }, [])
+  }, [vehicles, listMode])
 
   // Sincronizar URL com filtros (deep-link)
   useEffect(() => {
@@ -384,8 +496,11 @@ export function AdminMap({
     const newUrl = queryString
       ? `${window.location.pathname}?${queryString}`
       : window.location.pathname
-
-    router.replace(newUrl, { scroll: false })
+    // Atualiza a URL sem disparar navegação do Next.js para evitar fetch de payload RSC
+    const current = `${window.location.pathname}${window.location.search}`
+    if (newUrl !== current) {
+      window.history.replaceState(null, '', newUrl)
+    }
   }, [filters, mode, router])
 
   return (
@@ -400,20 +515,132 @@ export function AdminMap({
           alertsCount={alerts.length}
           mode={mode}
           onModeChange={setMode}
+          playbackFrom={playbackFrom}
+          playbackTo={playbackTo}
+          onPlaybackPeriodChange={(from, to) => {
+            setPlaybackFrom(from)
+            setPlaybackTo(to)
+            // Recarregar posições se estiver em modo histórico
+            if (mode === 'history' && playbackServiceRef.current) {
+              initPlayback()
+            }
+          }}
         />
       </div>
 
       {/* Mapa */}
-      <div ref={mapRef} className="w-full h-full" />
+      <div id="map-container" ref={mapRef} className="w-full h-full" />
 
       {/* Controles de Playback (quando em modo histórico) */}
       {mode === 'history' && (
         <div className="absolute bottom-4 left-4 right-4 z-20">
         <PlaybackControls
           isPlaying={isPlaying}
-          onPlay={() => {
-            setIsPlaying(true)
-            // Iniciar playback quando implementado
+          onPlay={async () => {
+            if (!playbackServiceRef.current) {
+              await initPlayback()
+            }
+            
+            if (playbackServiceRef.current) {
+              playbackServiceRef.current.play({
+                speed: playbackSpeed,
+                from: playbackFrom,
+                to: playbackTo,
+                onPositionUpdate: (position, timestamp) => {
+                  // Atualizar marcador do veículo no mapa
+                  const marker = markersRef.current.get(position.vehicle_id)
+                  if (marker && mapInstanceRef.current) {
+                    marker.setPosition({ lat: position.lat, lng: position.lng })
+                    if (position.heading !== null) {
+                      const icon = marker.getIcon() as google.maps.Icon
+                      if (icon) {
+                        marker.setIcon({
+                          ...icon,
+                          rotation: position.heading,
+                        })
+                      }
+                    }
+                  } else {
+                    // Criar novo marcador se não existir
+                    if (mapInstanceRef.current) {
+                      const color = '#10B981' // verde
+                      const icon = {
+                        path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+                        scale: 6,
+                        fillColor: color,
+                        fillOpacity: 1,
+                        strokeColor: '#FFFFFF',
+                        strokeWeight: 2,
+                        rotation: position.heading || 0,
+                      }
+
+                      const newMarker = new google.maps.Marker({
+                        position: { lat: position.lat, lng: position.lng },
+                        map: mapInstanceRef.current,
+                        icon,
+                        title: `Veículo ${position.vehicle_id}`,
+                      })
+
+                      markersRef.current.set(position.vehicle_id, newMarker)
+                    }
+                  }
+
+                  // Atualizar veículo no estado (ou criar se não existir)
+                  setVehicles((prev) => {
+                    const index = prev.findIndex(v => v.vehicle_id === position.vehicle_id)
+                    if (index >= 0) {
+                      const updated = [...prev]
+                      updated[index] = {
+                        ...updated[index],
+                        lat: position.lat,
+                        lng: position.lng,
+                        speed: position.speed,
+                        heading: position.heading,
+                        last_position_time: timestamp.toISOString(),
+                      }
+                      return updated
+                    } else {
+                      // Criar veículo básico se não existir
+                      return [...prev, {
+                        vehicle_id: position.vehicle_id,
+                        trip_id: position.trip_id,
+                        route_id: position.route_id,
+                        route_name: 'Rota',
+                        driver_id: position.driver_id,
+                        driver_name: 'Motorista',
+                        company_id: filters.company || '',
+                        company_name: '',
+                        plate: 'VEÍCULO',
+                        model: '',
+                        lat: position.lat,
+                        lng: position.lng,
+                        speed: position.speed,
+                        heading: position.heading,
+                        vehicle_status: 'moving' as const,
+                        passenger_count: position.passenger_count,
+                        last_position_time: timestamp.toISOString(),
+                      }]
+                    }
+                  })
+
+                  // Atualizar progresso
+                  const totalDuration = playbackTo.getTime() - playbackFrom.getTime()
+                  const elapsed = timestamp.getTime() - playbackFrom.getTime()
+                  setPlaybackProgress(Math.max(0, Math.min(100, (elapsed / totalDuration) * 100)))
+                },
+                onComplete: () => {
+                  setIsPlaying(false)
+                  toast.success('Playback concluído')
+                },
+                onPause: () => {
+                  setIsPlaying(false)
+                },
+                onPlay: () => {
+                  setIsPlaying(true)
+                },
+              })
+              setIsPlaying(true)
+            }
           }}
           onPause={() => {
             setIsPlaying(false)
@@ -422,10 +649,15 @@ export function AdminMap({
           onStop={() => {
             setIsPlaying(false)
             playbackServiceRef.current?.stop()
+            setPlaybackProgress(0)
           }}
           onSpeedChange={(speed) => {
+            setPlaybackSpeed(speed)
             playbackServiceRef.current?.setSpeed(speed)
           }}
+          progress={playbackProgress}
+          currentTime={playbackFrom}
+          duration={playbackTo}
         />
         </div>
       )}
@@ -446,12 +678,19 @@ export function AdminMap({
                 mapInstanceRef.current.setZoom(15)
               }
             }}
-            onDispatch={() => {
-              // Abrir modal de assistência
+            onDispatch={async () => {
               if (selectedVehicle) {
-                // TODO: Integrar com AssistanceModal
-                // Por enquanto, criar requisição direta
-                handleDispatchAssistance(selectedVehicle)
+                // Confirmar despacho
+                const confirmed = window.confirm(
+                  `Despachar socorro para o veículo ${selectedVehicle.plate}?\n\n` +
+                  `Motorista: ${selectedVehicle.driver_name}\n` +
+                  `Rota: ${selectedVehicle.route_name}\n` +
+                  `Posição: ${selectedVehicle.lat.toFixed(6)}, ${selectedVehicle.lng.toFixed(6)}`
+                )
+                
+                if (confirmed) {
+                  await handleDispatchAssistance(selectedVehicle)
+                }
               }
             }}
           />
@@ -492,8 +731,54 @@ export function AdminMap({
         </div>
       )}
 
-      {/* Overlay de Erro */}
-      {mapError && (
+      {/* Overlay de Erro ou Modo Lista */}
+      {mapError && listMode ? (
+        <div className="absolute inset-0 z-40 bg-white overflow-y-auto">
+          <div className="p-6">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h3 className="text-xl font-semibold mb-2">Modo Lista</h3>
+                <p className="text-[var(--ink-muted)]">{mapError}</p>
+              </div>
+              <Button onClick={() => window.location.reload()}>
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Tentar Mapa Novamente
+              </Button>
+            </div>
+            
+            {/* Lista de Veículos */}
+            {vehicles.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {vehicles.map((vehicle) => (
+                  <Card key={vehicle.vehicle_id} className="p-4 hover:shadow-md transition-shadow">
+                    <div className="flex items-start justify-between mb-2">
+                      <div>
+                        <h4 className="font-semibold">{vehicle.plate}</h4>
+                        <p className="text-sm text-[var(--ink-muted)]">{vehicle.model}</p>
+                      </div>
+                      <Badge variant={vehicle.vehicle_status === 'moving' ? 'default' : 'secondary'}>
+                        {vehicle.vehicle_status}
+                      </Badge>
+                    </div>
+                    <div className="text-sm text-[var(--ink-muted)] space-y-1">
+                      <p>Rota: {vehicle.route_name || 'N/A'}</p>
+                      <p>Motorista: {vehicle.driver_name || 'N/A'}</p>
+                      <p>Posição: {vehicle.lat?.toFixed(4)}, {vehicle.lng?.toFixed(4)}</p>
+                      <p>Velocidade: {vehicle.speed ? `${vehicle.speed} km/h` : 'N/A'}</p>
+                      <p>Passageiros: {vehicle.passenger_count || 0}</p>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-12">
+                <MapIcon className="h-16 w-16 text-[var(--ink-muted)] mx-auto mb-4" />
+                <p className="text-[var(--ink-muted)]">Nenhum veículo encontrado.</p>
+              </div>
+            )}
+          </div>
+        </div>
+      ) : mapError && !listMode ? (
         <div className="absolute inset-0 z-40 flex items-center justify-center bg-white/80 backdrop-blur-sm">
           <div className="text-center max-w-md">
             <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
@@ -505,7 +790,7 @@ export function AdminMap({
             </Button>
           </div>
         </div>
-      )}
+      ) : null}
 
       {/* Estados Vazios */}
       {!loading && !mapError && vehicles.length === 0 && (

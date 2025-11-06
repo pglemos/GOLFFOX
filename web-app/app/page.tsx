@@ -36,16 +36,24 @@ function LoginContent() {
 
   useEffect(() => {
     // Check if user is already logged in
+    const redirect = (url: string) => {
+      if (typeof window !== 'undefined') {
+        window.location.replace(url)
+      } else {
+        router.replace(url)
+      }
+    }
+
     supabase.auth.getSession().then(({ data: { session } }: { data: { session: any } }) => {
       if (session) {
         const nextUrl = searchParams.get('next')
         if (nextUrl) {
           // Se há um parâmetro next, redireciona para lá
-          router.push(decodeURIComponent(nextUrl))
+          redirect(decodeURIComponent(nextUrl))
         } else {
           // Senão, redireciona baseado no role
           const userRole = session.user.user_metadata?.role || getUserRoleByEmail(session.user.email)
-          router.push(`/${userRole}`)
+          redirect(`/${userRole}`)
         }
       }
     })
@@ -208,25 +216,7 @@ function LoginContent() {
               {loading ? "Signing in..." : "Sign In"}
             </Button>
 
-            <div className="border-t border-[var(--muted)]/20 pt-6">
-              <p className="text-sm font-semibold mb-3 text-center">Demo Accounts</p>
-              <div className="grid grid-cols-2 gap-2">
-                {demoAccounts.map((account) => (
-                  <Button
-                    key={account.email}
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleLogin(account.email, account.password)}
-                    className="text-xs"
-                  >
-                    {account.label}
-                  </Button>
-                ))}
-              </div>
-              <p className="text-xs text-center text-[var(--muted)] mt-3">
-                Password: senha123 (all accounts)
-              </p>
-            </div>
+            {/* Bloco de "Demo Accounts" removido conforme solicitação */}
           </Card>
         </motion.div>
       </div>

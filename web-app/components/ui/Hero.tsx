@@ -14,7 +14,7 @@ const Hero = React.forwardRef<HTMLDivElement, HeroProps>(
       <div
         ref={ref}
         className={cn(
-          "relative overflow-hidden p-12",
+          "relative overflow-hidden p-8 md:p-12 rounded-lg shadow-[0_2px_8px_rgba(0,0,0,0.1)] max-w-[1200px] mx-auto",
           glass ? "hero-glass" : "bg-gradient-to-br from-[var(--accent)] via-[var(--accent-soft)] to-[var(--brand)]",
           className
         )}
@@ -22,20 +22,20 @@ const Hero = React.forwardRef<HTMLDivElement, HeroProps>(
       >
         {glass && (
           <>
-            <div className="absolute inset-0 hero-glass::before opacity-90" />
-            <div className="absolute inset-0 gradient-overlay" />
+            {/* overlay glass é feito via CSS ::before; mantemos apenas o gradient extra */}
+            <div className="absolute inset-0 gradient-overlay" aria-hidden="true" role="presentation" />
           </>
         )}
         {gradient && !glass && (
-          <div className="absolute inset-0 gradient-overlay" />
+          <div className="absolute inset-0 gradient-overlay" aria-hidden="true" role="presentation" />
         )}
         
-        <div className="relative z-10">
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-3 tracking-tight">
+        <div className="relative z-10 space-y-4 md:space-y-6">
+          <h1 className="text-4xl md:text-5xl font-semibold text-white tracking-tight">
             {title}
           </h1>
           {description && (
-            <p className="text-lg md:text-xl text-white/90 max-w-2xl">
+            <p className="text-lg md:text-xl font-normal leading-relaxed text-white/90 max-w-2xl">
               {description}
             </p>
           )}

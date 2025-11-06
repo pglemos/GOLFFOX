@@ -9,6 +9,25 @@ import { useEffect, useRef } from 'react'
 import { MarkerClusterer } from '@googlemaps/markerclusterer'
 import { calculateHeading } from '@/lib/map-utils'
 import type { Vehicle, RoutePolyline, Alert } from './admin-map'
+import type { HistoricalPosition } from '@/lib/playback-service'
+
+export interface HistoricalTrajectory {
+  vehicle_id: string
+  trip_id: string
+  positions: Array<{ lat: number; lng: number; timestamp: Date }>
+  color?: string // Opcional para diferenciação
+}
+
+export interface RouteStop {
+  id: string
+  route_id: string
+  route_name: string
+  seq: number
+  name: string
+  lat: number
+  lng: number
+  radius_m: number
+}
 
 interface MapLayersProps {
   map: google.maps.Map
@@ -20,6 +39,11 @@ interface MapLayersProps {
   onRouteClick: (route: RoutePolyline) => void
   onAlertClick: (alert: Alert) => void
   clustererRef: React.MutableRefObject<MarkerClusterer | null>
+  historicalTrajectories?: HistoricalTrajectory[]
+  routeStops?: RouteStop[]
+  selectedRouteId?: string | null
+  showTrajectories?: boolean
+  mode?: 'live' | 'history'
 }
 
 export function MapLayers({
@@ -32,11 +56,17 @@ export function MapLayers({
   onRouteClick,
   onAlertClick,
   clustererRef,
+  historicalTrajectories = [],
+  routeStops = [],
+  selectedRouteId = null,
+  showTrajectories = false,
+  mode = 'live',
 }: MapLayersProps) {
   const vehicleMarkersRef = useRef<Map<string, google.maps.Marker>>(new Map())
   const routePolylinesRef = useRef<Map<string, google.maps.Polyline>>(new Map())
   const stopMarkersRef = useRef<Map<string, google.maps.Marker>>(new Map())
   const alertMarkersRef = useRef<Map<string, google.maps.Marker>>(new Map())
+  const trajectoryPolylinesRef = useRef<Map<string, google.maps.Polyline>>(new Map())
 
   // Desenhar rotas planejadas (polyline azul)
   useEffect(() => {
@@ -47,13 +77,18 @@ export function MapLayers({
     routes.forEach((route) => {
       if (!route.polyline_points || route.polyline_points.length < 2) return
 
-      const path = route.polyline_points
-        .sort((a, b) => a.order - b.order)
-        .map((p) => new google.maps.LatLng(p.lat, p.lng))
+      // Converter polyline_points para array de LatLng
+      const points = Array.isArray(route.polyline_points)
+        ? route.polyline_points
+            .sort((a: any, b: any) => (a.order || 0) - (b.order || 0))
+            .map((p: any) => new google.maps.LatLng(p.lat, p.lng))
+        : []
 
-      // Sombra
+      if (points.length < 2) return
+
+      // Sombra (polyline escura por trás)
       const shadowPolyline = new google.maps.Polyline({
-        path,
+        path: points,
         geodesic: true,
         strokeColor: '#000000',
         strokeOpacity: 0.3,
@@ -64,7 +99,7 @@ export function MapLayers({
 
       // Linha principal azul (4px)
       const polyline = new google.maps.Polyline({
-        path,
+        path: points,
         geodesic: true,
         strokeColor: '#3B82F6',
         strokeOpacity: 1.0,

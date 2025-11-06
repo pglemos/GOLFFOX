@@ -24,6 +24,7 @@ import { cn } from "@/lib/utils"
 import { listItem, staggerContainer, sidebarHighlight } from "@/lib/animations"
 import { useNavigation } from "@/hooks/use-navigation"
 import { SyncAlertBadge } from "@/components/sync-alert-badge"
+import { OperationalAlertsBadge } from "@/components/operational-alerts-badge"
 
 // Menus por painel
 const adminMenuItems = [
@@ -267,6 +268,7 @@ export function Sidebar({ isOpen = true, isMobile = false, panel = 'admin' }: Si
                 const Icon = item.icon
                 const isActive = isSidebarItemActive(item.href)
                 const showSyncAlert = item.href === "/admin/sincronizacao"
+                const showOperationalAlerts = (item.href === "/admin/alertas" || item.href === "/operator/alertas" || item.href === "/carrier/alertas")
                 
                 return (
                   <motion.div
@@ -307,7 +309,10 @@ export function Sidebar({ isOpen = true, isMobile = false, panel = 'admin' }: Si
                         )}>
                           {item.label}
                         </span>
-                        {showSyncAlert && <SyncAlertBadge />}
+                        <div className="flex items-center gap-1">
+                          {showSyncAlert && <SyncAlertBadge />}
+                          {showOperationalAlerts && <OperationalAlertsBadge />}
+                        </div>
                       </div>
                       
                       {/* Tooltip - apenas em desktop */}

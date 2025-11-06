@@ -42,7 +42,11 @@ export function RotasPageContent() {
     const getUser = async () => {
       const { data: { session } } = await supabase.auth.getSession()
       if (!session) {
-        router.push("/")
+        if (typeof window !== 'undefined') {
+          window.location.replace("/")
+        } else {
+          router.replace("/")
+        }
         return
       }
       setUser({ ...session.user })

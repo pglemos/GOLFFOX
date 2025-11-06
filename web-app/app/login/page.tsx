@@ -174,23 +174,7 @@ function LoginContent() {
               {loading ? "Entrando..." : "Entrar"}
             </Button>
 
-            <div className="space-y-2">
-              <p className="text-sm text-[var(--muted)] text-center mb-3">Contas de demonstração:</p>
-              <div className="grid grid-cols-1 gap-2">
-                {demoAccounts.map((account) => (
-                  <Button
-                    key={account.email}
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleLogin(account.email, account.password)}
-                    disabled={loading}
-                    className="text-xs"
-                  >
-                    {account.label}
-                  </Button>
-                ))}
-              </div>
-            </div>
+            {/* Contas de demonstração removidas conforme solicitação */}
           </Card>
         </motion.div>
       </div>

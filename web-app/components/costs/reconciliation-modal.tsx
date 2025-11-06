@@ -18,12 +18,14 @@ import {
   FileText,
   DollarSign,
   Clock,
-  Route as RouteIcon
+  Route as RouteIcon,
+  Download
 } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import toast from "react-hot-toast"
 import { formatCurrency, formatDistance, formatDuration } from "@/lib/kpi-utils"
 import { auditLogs } from "@/lib/audit-log"
+import { exportToCSV, exportToPDF } from "@/lib/export-utils"
 
 interface InvoiceLine {
   id: string
@@ -60,6 +62,7 @@ export function ReconciliationModal({
   const [invoiceLines, setInvoiceLines] = useState<InvoiceLine[]>([])
   const [invoice, setInvoice] = useState<any>(null)
   const [processing, setProcessing] = useState(false)
+  const [status, setStatus] = useState<'pending' | 'em_analise' | 'approved' | 'rejected'>('pending')
 
   useEffect(() => {
     if (isOpen && invoiceId) {
@@ -82,6 +85,7 @@ export function ReconciliationModal({
 
       if (invError) throw invError
       setInvoice(invData)
+      setStatus(invData.status || 'pending')
 
       // Buscar linhas da fatura
       const { data: linesData, error: linesError } = await supabase
@@ -155,22 +159,43 @@ export function ReconciliationModal({
       const { data: { session } } = await supabase.auth.getSession()
       if (!session) throw new Error('Usuário não autenticado')
 
+      // Verificar se há divergências significativas
+      const hasSignificantDiscrepancies = invoiceLines.some(line => {
+        const status = getDiscrepancyStatus(line)
+        return status.hasSignificantDiscrepancy
+      })
+
+      if (hasSignificantDiscrepancies) {
+        const confirmApprove = confirm(
+          'Esta fatura possui divergências significativas (>5% ou >R$100). Deseja realmente aprovar?'
+        )
+        if (!confirmApprove) {
+          setProcessing(false)
+          return
+        }
+      }
+
       const { error } = await supabase
         .from('gf_invoices')
         .update({
           status: 'approved',
           approved_at: new Date().toISOString(),
-          approved_by: session.user.id
+          approved_by: session.user.id,
+          reconciled_by: session.user.id,
+          updated_at: new Date().toISOString()
         })
         .eq('id', invoiceId)
 
       if (error) throw error
 
+      setStatus('approved')
+
       // Log de auditoria
       await auditLogs.approve('invoice', invoiceId, {
         companyId: invoice?.empresa_id || invoice?.carrier_id,
         invoiceNumber: invoice?.invoice_number,
-        totalAmount: invoice?.total_amount
+        totalAmount: invoice?.total_amount,
+        hasDiscrepancies: hasSignificantDiscrepancies
       })
 
       toast.success('Fatura aprovada com sucesso!')
@@ -197,11 +222,15 @@ export function ReconciliationModal({
         .update({
           status: 'rejected',
           approved_at: null,
-          approved_by: session.user.id
+          approved_by: session.user.id,
+          reconciled_by: session.user.id,
+          updated_at: new Date().toISOString()
         })
         .eq('id', invoiceId)
 
       if (error) throw error
+
+      setStatus('rejected')
 
       // Log de auditoria
       await auditLogs.reject('invoice', invoiceId, {
@@ -232,12 +261,22 @@ export function ReconciliationModal({
       const { error } = await supabase
         .from('gf_invoices')
         .update({
-          status: 'pending',
-          notes: `Revisão solicitada por ${session.user.email} em ${new Date().toLocaleString('pt-BR')}`
+          status: 'em_analise',
+          notes: `Revisão solicitada por ${session.user.email} em ${new Date().toLocaleString('pt-BR')}`,
+          updated_at: new Date().toISOString()
         })
         .eq('id', invoiceId)
 
       if (error) throw error
+
+      setStatus('em_analise')
+
+      // Log de auditoria
+      await auditLogs.update('invoice', invoiceId, {
+        action: 'request_revision',
+        companyId: invoice?.empresa_id || invoice?.carrier_id,
+        invoiceNumber: invoice?.invoice_number
+      })
 
       toast.success('Revisão solicitada')
       onClose()
@@ -246,6 +285,47 @@ export function ReconciliationModal({
       toast.error(`Erro: ${error.message}`)
     } finally {
       setProcessing(false)
+    }
+  }
+
+  const handleExport = (format: 'csv' | 'pdf') => {
+    if (!invoice || !invoiceLines.length) {
+      toast.error('Nenhum dado disponível para exportar')
+      return
+    }
+
+    try {
+      const reportData = {
+        title: `Relatório de Conciliação - Fatura ${invoice.invoice_number || invoiceId}`,
+        description: `Período: ${new Date(invoice.period_start).toLocaleDateString('pt-BR')} - ${new Date(invoice.period_end).toLocaleDateString('pt-BR')}`,
+        headers: ['Rota', 'KM Medido', 'KM Faturado', 'Tempo Medido', 'Tempo Faturado', 'Viagens Medidas', 'Viagens Faturadas', 'Valor', 'Divergência', 'Status'],
+        rows: invoiceLines.map(line => {
+          const status = getDiscrepancyStatus(line)
+          return [
+            line.route_name || 'N/A',
+            formatDistance(line.measured_km),
+            formatDistance(line.invoiced_km),
+            formatDuration(line.measured_time),
+            formatDuration(line.invoiced_time),
+            line.measured_trips?.toString() || '0',
+            line.invoiced_trips?.toString() || '0',
+            formatCurrency(line.amount),
+            line.discrepancy ? formatCurrency(line.discrepancy) : 'R$ 0,00',
+            status.hasSignificantDiscrepancy ? 'Divergência' : 'OK'
+          ]
+        })
+      }
+
+      if (format === 'csv') {
+        exportToCSV(reportData, `conciliacao-${invoice.invoice_number || invoiceId}-${new Date().toISOString().split('T')[0]}.csv`)
+      } else {
+        exportToPDF(reportData, `conciliacao-${invoice.invoice_number || invoiceId}-${new Date().toISOString().split('T')[0]}.pdf`)
+      }
+
+      toast.success(`Relatório exportado em ${format.toUpperCase()}!`)
+    } catch (error: any) {
+      console.error('Erro ao exportar relatório:', error)
+      toast.error(`Erro ao exportar: ${error.message}`)
     }
   }
 
@@ -259,8 +339,18 @@ export function ReconciliationModal({
             <FileText className="h-5 w-5 text-[var(--brand)]" />
             Conciliação de Fatura
             {invoice && (
-              <Badge variant={invoice.status === 'approved' ? 'default' : 'secondary'}>
-                {invoice.status}
+              <Badge 
+                variant={
+                  invoice.status === 'approved' ? 'default' : 
+                  invoice.status === 'rejected' ? 'destructive' : 
+                  'secondary'
+                }
+              >
+                {invoice.status === 'pending' ? 'Pendente' :
+                 invoice.status === 'em_analise' ? 'Em Análise' :
+                 invoice.status === 'approved' ? 'Aprovado' :
+                 invoice.status === 'rejected' ? 'Rejeitado' :
+                 invoice.status}
               </Badge>
             )}
           </DialogTitle>
@@ -288,8 +378,18 @@ export function ReconciliationModal({
                 </div>
                 <div>
                   <p className="text-sm text-[var(--ink-muted)]">Status</p>
-                  <Badge variant={invoice.status === 'approved' ? 'default' : 'secondary'}>
-                    {invoice.status}
+                  <Badge 
+                    variant={
+                      invoice.status === 'approved' ? 'default' : 
+                      invoice.status === 'rejected' ? 'destructive' : 
+                      'secondary'
+                    }
+                  >
+                    {invoice.status === 'pending' ? 'Pendente' :
+                     invoice.status === 'em_analise' ? 'Em Análise' :
+                     invoice.status === 'approved' ? 'Aprovado' :
+                     invoice.status === 'rejected' ? 'Rejeitado' :
+                     invoice.status}
                   </Badge>
                 </div>
                 <div>
@@ -430,34 +530,83 @@ export function ReconciliationModal({
           </div>
         )}
 
-        <DialogFooter className="flex gap-2">
-          <Button variant="outline" onClick={onClose} disabled={processing}>
-            Fechar
-          </Button>
-          <Button 
-            variant="outline" 
-            onClick={handleRequestRevision}
-            disabled={processing}
-          >
-            Solicitar Revisão
-          </Button>
-          <Button 
-            variant="outline" 
-            onClick={handleReject}
-            disabled={processing}
-            className="text-red-600 hover:text-red-700"
-          >
-            <XCircle className="h-4 w-4 mr-2" />
-            Rejeitar
-          </Button>
-          <Button 
-            onClick={handleApprove}
-            disabled={processing}
-            className="bg-green-600 hover:bg-green-700"
-          >
-            <CheckCircle className="h-4 w-4 mr-2" />
-            {processing ? 'Processando...' : 'Aprovar'}
-          </Button>
+        <DialogFooter className="flex gap-2 flex-wrap">
+          <div className="flex gap-2">
+            <Button 
+              variant="outline" 
+              onClick={() => handleExport('csv')}
+              disabled={processing || loading}
+              className="flex items-center gap-2"
+            >
+              <Download className="h-4 w-4" />
+              Exportar CSV
+            </Button>
+            <Button 
+              variant="outline" 
+              onClick={() => handleExport('pdf')}
+              disabled={processing || loading}
+              className="flex items-center gap-2"
+            >
+              <Download className="h-4 w-4" />
+              Exportar PDF
+            </Button>
+          </div>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={onClose} disabled={processing}>
+              Fechar
+            </Button>
+            {status === 'pending' && (
+              <Button 
+                variant="outline" 
+                onClick={handleRequestRevision}
+                disabled={processing}
+              >
+                Em Análise
+              </Button>
+            )}
+            {status === 'em_analise' && (
+              <>
+                <Button 
+                  variant="outline" 
+                  onClick={handleReject}
+                  disabled={processing}
+                  className="text-red-600 hover:text-red-700"
+                >
+                  <XCircle className="h-4 w-4 mr-2" />
+                  Rejeitar
+                </Button>
+                <Button 
+                  onClick={handleApprove}
+                  disabled={processing}
+                  className="bg-green-600 hover:bg-green-700"
+                >
+                  <CheckCircle className="h-4 w-4 mr-2" />
+                  {processing ? 'Processando...' : 'Aprovar'}
+                </Button>
+              </>
+            )}
+            {status === 'pending' && (
+              <>
+                <Button 
+                  variant="outline" 
+                  onClick={handleReject}
+                  disabled={processing}
+                  className="text-red-600 hover:text-red-700"
+                >
+                  <XCircle className="h-4 w-4 mr-2" />
+                  Rejeitar
+                </Button>
+                <Button 
+                  onClick={handleApprove}
+                  disabled={processing}
+                  className="bg-green-600 hover:bg-green-700"
+                >
+                  <CheckCircle className="h-4 w-4 mr-2" />
+                  {processing ? 'Processando...' : 'Aprovar'}
+                </Button>
+              </>
+            )}
+          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>

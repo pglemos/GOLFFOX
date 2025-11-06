@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { Resend } from 'resend'
+import { alertCronFailure } from '@/lib/operational-alerts'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -59,6 +60,14 @@ export async function GET(request: NextRequest) {
         })
       } catch (error: any) {
         console.error(`Erro ao processar agendamento ${schedule.id}:`, error)
+        
+        // Registrar alerta operacional
+        await alertCronFailure(
+          `dispatch-reports-${schedule.id}`,
+          error.message,
+          { schedule_id: schedule.id, report_key: schedule.report_key }
+        )
+        
         results.push({
           scheduleId: schedule.id,
           status: 'failed',
@@ -74,6 +83,10 @@ export async function GET(request: NextRequest) {
     })
   } catch (error: any) {
     console.error('Erro no cron de relatórios:', error)
+    
+    // Registrar alerta crítico
+    await alertCronFailure('dispatch-reports', error.message || 'Erro ao processar agendamentos')
+    
     return NextResponse.json(
       { error: error.message || 'Erro ao processar agendamentos' },
       { status: 500 }

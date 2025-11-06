@@ -124,6 +124,7 @@ export class PlaybackService {
       this.currentIndex = 0
     }
 
+    this.lastUpdateTime = 0 // Reset throttling
     this.options.onPlay?.()
     this.animate()
   }
@@ -156,6 +157,7 @@ export class PlaybackService {
     this.isPaused = false
     this.currentIndex = 0
     this.pausedTime = 0
+    this.lastUpdateTime = 0
 
     if (this.animationFrameId) {
       cancelAnimationFrame(this.animationFrameId)
@@ -164,17 +166,20 @@ export class PlaybackService {
   }
 
   /**
-   * Altera velocidade
+   * Altera velocidade (1x, 2x, 4x)
    */
   setSpeed(speed: 1 | 2 | 4): void {
     if (this.options) {
+      const wasPlaying = this.isPlaying && !this.isPaused
+      
       this.options.speed = speed
       this.intervalMs = 1000 / speed
 
-      // Se estiver rodando, reiniciar com nova velocidade
-      if (this.isPlaying && !this.isPaused) {
-        this.pause()
-        this.play(this.options)
+      // Se estiver rodando, ajustar velocidade dinamicamente sem reiniciar
+      if (wasPlaying) {
+        // Não reiniciar, apenas ajustar intervalo
+        // A velocidade será aplicada no próximo frame de animação
+        this.lastUpdateTime = performance.now() // Reset throttling
       }
     }
   }
@@ -205,23 +210,40 @@ export class PlaybackService {
   }
 
   /**
-   * Loop de animação
+   * Loop de animação otimizado com debounce
    */
+  private lastUpdateTime: number = 0
+  private readonly UPDATE_THROTTLE_MS = 16 // ~60fps (16ms por frame)
+
   private animate(): void {
     if (!this.isPlaying || this.isPaused) return
 
     const now = performance.now()
+    
+    // Throttle para ~60fps
+    if (now - this.lastUpdateTime < this.UPDATE_THROTTLE_MS) {
+      this.animationFrameId = requestAnimationFrame(() => this.animate())
+      return
+    }
+
+    this.lastUpdateTime = now
     const elapsed = now - this.startTime - this.pausedTime
     const targetTime = elapsed * this.options!.speed
 
     // Encontrar posições a serem exibidas baseado no tempo decorrido
+    // Limitar a 1 atualização por frame para suavidade
+    let updatesThisFrame = 0
+    const MAX_UPDATES_PER_FRAME = 1
+
     while (
       this.currentIndex < this.positions.length &&
+      updatesThisFrame < MAX_UPDATES_PER_FRAME &&
       this.positions[this.currentIndex].timestamp.getTime() <=
         this.options!.from.getTime() + targetTime
     ) {
       this.updatePosition()
       this.currentIndex++
+      updatesThisFrame++
     }
 
     // Verificar se completou

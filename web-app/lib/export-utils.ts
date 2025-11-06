@@ -9,7 +9,16 @@ export interface ReportData {
   description?: string
 }
 
-// Exportar para CSV
+// Formatar número para separador decimal BR (vírgula)
+function formatNumberBR(value: any): string {
+  if (value === null || value === undefined) return ''
+  const num = typeof value === 'number' ? value : parseFloat(value)
+  if (isNaN(num)) return String(value)
+  // Formatar com vírgula como separador decimal
+  return num.toFixed(2).replace('.', ',')
+}
+
+// Exportar para CSV com encoding UTF-8 e separador decimal BR
 export function exportToCSV(data: ReportData, filename: string = 'relatorio.csv') {
   const csvContent = [
     data.title,
@@ -17,8 +26,20 @@ export function exportToCSV(data: ReportData, filename: string = 'relatorio.csv'
     '',
     data.headers.join(','),
     ...data.rows.map(row => row.map(cell => {
+      // Formatar números com vírgula decimal
+      let cellStr: string
+      if (typeof cell === 'number') {
+        cellStr = formatNumberBR(cell)
+      } else {
+        cellStr = String(cell || '')
+        // Tentar converter strings numéricas
+        const numMatch = cellStr.match(/^(\d+\.?\d*)$/)
+        if (numMatch) {
+          cellStr = formatNumberBR(parseFloat(cellStr))
+        }
+      }
+      
       // Escapar vírgulas e aspas
-      const cellStr = String(cell || '')
       if (cellStr.includes(',') || cellStr.includes('"') || cellStr.includes('\n')) {
         return `"${cellStr.replace(/"/g, '""')}"`
       }
@@ -26,6 +47,7 @@ export function exportToCSV(data: ReportData, filename: string = 'relatorio.csv'
     }).join(','))
   ].join('\n')
 
+  // UTF-8 com BOM para Excel reconhecer corretamente
   const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' })
   const link = document.createElement('a')
   const url = URL.createObjectURL(blob)

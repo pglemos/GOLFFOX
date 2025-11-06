@@ -50,6 +50,7 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
   const [photoFile, setPhotoFile] = useState<File | null>(null)
   const [photoPreview, setPhotoPreview] = useState<string>("")
   const { sync } = useSupabaseSync({ showToast: false }) // Toast já é mostrado no modal
+  const [capacitySupported, setCapacitySupported] = useState<boolean>(true)
 
   useEffect(() => {
     if (vehicle) {
@@ -68,6 +69,33 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
     }
     setPhotoFile(null)
   }, [vehicle, isOpen])
+
+  // Verificar suporte à coluna 'capacity' (alguns ambientes podem não ter aplicado a migration)
+  useEffect(() => {
+    const checkCapacitySupport = async () => {
+      try {
+        const { error } = await supabase
+          .from("vehicles")
+          .select("capacity")
+          .limit(1)
+
+        if (error) {
+          const msg = String(error.message || error).toLowerCase()
+          // PostgREST costuma retornar erro de schema cache quando a coluna não existe
+          if (msg.includes("capacity") || msg.includes("schema cache")) {
+            console.warn("Coluna 'capacity' não disponível no schema atual. O campo será omitido ao salvar.")
+            setCapacitySupported(false)
+          }
+        } else {
+          setCapacitySupported(true)
+        }
+      } catch (e: any) {
+        // Em ambientes sem Supabase configurado, manter como suportado para não bloquear UI
+        console.warn("Falha ao verificar suporte de 'capacity':", e?.message || e)
+      }
+    }
+    checkCapacitySupport()
+  }, [])
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -132,6 +160,13 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
         year: formData.year ? parseInt(formData.year as string) : null,
         capacity: formData.capacity ? parseInt(formData.capacity as string) : null,
         photo_url: photoUrl || null
+      }
+
+      // Omitir 'capacity' se a coluna não existir no banco alvo
+      if (!capacitySupported) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { capacity, ...withoutCapacity } = vehicleData as any
+        Object.assign(vehicleData, withoutCapacity)
       }
 
       if (vehicleId) {

@@ -106,18 +106,40 @@ export async function POST(request: NextRequest) {
   }
 }
 
+// Formatar número para separador decimal BR (vírgula)
+function formatNumberBR(value: any): string {
+  if (value === null || value === undefined) return ''
+  const num = typeof value === 'number' ? value : parseFloat(value)
+  if (isNaN(num)) return String(value)
+  // Formatar com vírgula como separador decimal
+  return num.toFixed(2).replace('.', ',')
+}
+
 function generateCSV(data: any[], columns: string[], reportKey: string) {
-  // Filtrar apenas colunas válidas
+  // Filtrar apenas colunas válidas e formatar números
   const filteredData = data.map(row => {
     const filtered: any = {}
     columns.forEach(col => {
       if (row[col] !== undefined) {
-        filtered[col] = row[col]
+        // Formatar números com vírgula decimal
+        const value = row[col]
+        if (typeof value === 'number') {
+          filtered[col] = formatNumberBR(value)
+        } else {
+          // Tentar converter strings numéricas
+          const numMatch = String(value).match(/^(\d+\.?\d*)$/)
+          if (numMatch) {
+            filtered[col] = formatNumberBR(parseFloat(value))
+          } else {
+            filtered[col] = value
+          }
+        }
       }
     })
     return filtered
   })
 
+  // Gerar CSV com BOM para UTF-8
   const csv = Papa.unparse(filteredData, {
     header: true,
     delimiter: ',',
@@ -126,7 +148,10 @@ function generateCSV(data: any[], columns: string[], reportKey: string) {
 
   const filename = `relatorio_${reportKey}_${new Date().toISOString().split('T')[0]}.csv`
 
-  return new NextResponse(csv, {
+  // Adicionar BOM para Excel reconhecer UTF-8
+  const csvWithBOM = '\ufeff' + csv
+
+  return new NextResponse(csvWithBOM, {
     headers: {
       'Content-Type': 'text/csv; charset=utf-8',
       'Content-Disposition': `attachment; filename="${filename}"`

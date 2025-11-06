@@ -126,9 +126,10 @@ export function VehiclePanel({
 interface RoutePanelProps {
   route: RoutePolyline
   onClose: () => void
+  onViewDetails?: () => void
 }
 
-export function RoutePanel({ route, onClose }: RoutePanelProps) {
+export function RoutePanel({ route, onClose, onViewDetails }: RoutePanelProps) {
   return (
     <motion.div
       initial="hidden"
@@ -141,6 +142,7 @@ export function RoutePanel({ route, onClose }: RoutePanelProps) {
         <div className="flex items-start justify-between mb-6">
           <div>
             <h3 className="font-bold text-xl">{route.route_name}</h3>
+            <p className="text-sm text-[var(--ink-muted)]">{route.company_name}</p>
           </div>
           <Button size="icon" variant="ghost" onClick={onClose}>
             <X className="h-4 w-4" />
@@ -148,11 +150,37 @@ export function RoutePanel({ route, onClose }: RoutePanelProps) {
         </div>
 
         <div className="space-y-4 text-sm">
-          <div>
-            <span className="text-[var(--ink-muted)] block mb-1">Paradas:</span>
-            <p className="font-semibold">{route.stops_count}</p>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <span className="text-[var(--ink-muted)] block mb-1">Paradas:</span>
+              <p className="font-semibold text-lg">{route.stops_count || 0}</p>
+            </div>
+            <div>
+              <span className="text-[var(--ink-muted)] block mb-1">Pontos:</span>
+              <p className="font-semibold text-lg">{route.polyline_points?.length || 0}</p>
+            </div>
           </div>
-          {/* Adicionar mais métricas conforme necessário */}
+
+          {route.origin_address && (
+            <div>
+              <span className="text-[var(--ink-muted)] block mb-1">Origem:</span>
+              <p className="font-semibold">{route.origin_address}</p>
+            </div>
+          )}
+
+          {route.destination_address && (
+            <div>
+              <span className="text-[var(--ink-muted)] block mb-1">Destino:</span>
+              <p className="font-semibold">{route.destination_address}</p>
+            </div>
+          )}
+
+          <div className="flex gap-2 pt-2 border-t">
+            <Button className="flex-1" variant="outline" onClick={onViewDetails}>
+              <MapPin className="h-4 w-4 mr-2" />
+              Ver Detalhes
+            </Button>
+          </div>
         </div>
       </Card>
     </motion.div>

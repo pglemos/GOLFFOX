@@ -45,9 +45,14 @@ export function PlaybackControls({
           <Button size="icon" variant="outline" onClick={onStop}>
             <Square className="h-4 w-4" />
           </Button>
-          <Button size="icon" variant="outline" onClick={() => {
-            // Skip back
-          }}>
+          <Button 
+            size="icon" 
+            variant="outline" 
+            onClick={() => {
+              // Skip back 10 segundos (será implementado quando necessário)
+            }}
+            title="Voltar 10s"
+          >
             <SkipBack className="h-4 w-4" />
           </Button>
           <Button size="icon" onClick={isPlaying ? onPause : onPlay}>
@@ -57,24 +62,38 @@ export function PlaybackControls({
               <Play className="h-4 w-4" />
             )}
           </Button>
-          <Button size="icon" variant="outline" onClick={() => {
-            // Skip forward
-          }}>
+          <Button 
+            size="icon" 
+            variant="outline" 
+            onClick={() => {
+              // Skip forward 10 segundos (será implementado quando necessário)
+            }}
+            title="Avançar 10s"
+          >
             <SkipForward className="h-4 w-4" />
           </Button>
         </div>
 
         {/* Timeline slider */}
         <div className="flex-1">
-          <Slider
-            value={[progress]}
-            onValueChange={(value) => {
-              // Seek to position
-            }}
-            max={100}
-            step={0.1}
-            className="w-full"
-          />
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-[var(--ink-muted)] w-20 text-right">
+              {currentTime ? currentTime.toLocaleTimeString('pt-BR') : '00:00'}
+            </span>
+            <Slider
+              value={[progress]}
+              onValueChange={(value) => {
+                // Seek to position (será implementado quando necessário)
+                // playbackServiceRef.current?.seekTo(new Date(...))
+              }}
+              max={100}
+              step={0.1}
+              className="flex-1"
+            />
+            <span className="text-xs text-[var(--ink-muted)] w-20">
+              {duration ? duration.toLocaleTimeString('pt-BR') : '00:00'}
+            </span>
+          </div>
         </div>
 
         {/* Velocidade */}

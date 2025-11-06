@@ -1,6 +1,7 @@
 /**
  * Helper para registrar logs de auditoria no sistema
  * Formato padronizado: { actorId, companyId, action, resourceType, resourceId, details }
+ * Sanitiza PII (CPF, endereços completos) antes de inserir
  */
 
 import { supabase } from './supabase'
@@ -18,8 +19,57 @@ export interface LogAuditParams {
 }
 
 /**
+ * Sanitiza detalhes removendo PII (CPF, endereços completos)
+ */
+function sanitizeDetails(details: AuditLogDetails | null | undefined): AuditLogDetails | null {
+  if (!details || typeof details !== 'object') {
+    return null
+  }
+
+  const sanitized: AuditLogDetails = { ...details }
+
+  // Remover CPF se existir
+  if ('cpf' in sanitized) {
+    delete sanitized.cpf
+  }
+
+  // Remover endereço completo se existir
+  if ('address' in sanitized) {
+    delete sanitized.address
+  }
+  if ('full_address' in sanitized) {
+    delete sanitized.full_address
+  }
+
+  // Manter apenas cidade/estado se existir
+  if ('city' in sanitized || 'state' in sanitized) {
+    const cityState: AuditLogDetails = {}
+    if (sanitized.city) cityState.city = sanitized.city
+    if (sanitized.state) cityState.state = sanitized.state
+    // Remover outros campos de endereço
+    delete sanitized.street
+    delete sanitized.number
+    delete sanitized.zipcode
+    delete sanitized.neighborhood
+    // Manter apenas cidade/estado
+    Object.assign(sanitized, cityState)
+  }
+
+  // Remover campos sensíveis recursivamente se details tiver objetos aninhados
+  Object.keys(sanitized).forEach(key => {
+    const value = sanitized[key]
+    if (value && typeof value === 'object' && !Array.isArray(value) && value.constructor === Object) {
+      sanitized[key] = sanitizeDetails(value as AuditLogDetails)
+    }
+  })
+
+  return sanitized
+}
+
+/**
  * Registra um log de auditoria
  * Busca actorId e companyId automaticamente da sessão atual
+ * Sanitiza PII (CPF, endereços completos) antes de inserir
  * Não quebra o fluxo se o log falhar (apenas loga erro no console)
  */
 export async function logAudit(params: LogAuditParams): Promise<void> {
@@ -49,13 +99,16 @@ export async function logAudit(params: LogAuditParams): Promise<void> {
       }
     }
 
+    // Sanitizar detalhes removendo PII
+    const sanitizedDetails = sanitizeDetails(params.details)
+
     await supabase.from('gf_audit_log').insert({
       actor_id: actorId,
       company_id: companyId,
       action_type: params.action,
       resource_type: params.resourceType,
       resource_id: params.resourceId || null,
-      details: params.details || null,
+      details: sanitizedDetails,
     })
   } catch (error) {
     // Não quebrar o fluxo se log falhar

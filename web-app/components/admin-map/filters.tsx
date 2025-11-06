@@ -19,6 +19,8 @@ import {
 import { Calendar, Clock, Search, Radio } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { motion } from 'framer-motion'
+import { PeriodPicker } from './period-picker'
+import { useState } from 'react'
 
 interface MapFiltersProps {
   filters: {
@@ -36,6 +38,9 @@ interface MapFiltersProps {
   alertsCount: number
   mode: 'live' | 'history'
   onModeChange: (mode: 'live' | 'history') => void
+  playbackFrom?: Date
+  playbackTo?: Date
+  onPlaybackPeriodChange?: (from: Date, to: Date) => void
 }
 
 export function MapFilters({
@@ -46,49 +51,70 @@ export function MapFilters({
   alertsCount,
   mode,
   onModeChange,
+  playbackFrom,
+  playbackTo,
+  onPlaybackPeriodChange,
 }: MapFiltersProps) {
   const [companies, setCompanies] = useState<any[]>([])
   const [routes, setRoutes] = useState<any[]>([])
   const [vehicles, setVehicles] = useState<any[]>([])
   const [drivers, setDrivers] = useState<any[]>([])
+  const [showPeriodPicker, setShowPeriodPicker] = useState(false)
 
   // Carregar opções de filtros
   useEffect(() => {
     loadFilterOptions()
-  }, [])
+  }, [filters.company]) // Recarregar quando empresa mudar
 
   const loadFilterOptions = async () => {
     try {
-      // Carregar empresas
-      const { data: companiesData } = await supabase
-        .from('companies')
-        .select('id, name')
-        .order('name')
-      if (companiesData) setCompanies(companiesData)
+      // Carregar empresas (apenas uma vez)
+      if (companies.length === 0) {
+        const { data: companiesData } = await supabase
+          .from('companies')
+          .select('id, name')
+          .order('name')
+        if (companiesData) setCompanies(companiesData)
+      }
 
-      // Carregar rotas
-      const { data: routesData } = await supabase
+      // Carregar rotas (filtrar por empresa)
+      const routesQuery = supabase
         .from('routes')
         .select('id, name')
-        .eq('company_id', filters.company || null)
         .order('name')
+      
+      if (filters.company) {
+        routesQuery.eq('company_id', filters.company)
+      }
+      
+      const { data: routesData } = await routesQuery
       if (routesData) setRoutes(routesData)
 
-      // Carregar veículos
-      const { data: vehiclesData } = await supabase
+      // Carregar veículos (filtrar por empresa)
+      const vehiclesQuery = supabase
         .from('vehicles')
         .select('id, plate')
-        .eq('company_id', filters.company || null)
         .order('plate')
+      
+      if (filters.company) {
+        vehiclesQuery.eq('company_id', filters.company)
+      }
+      
+      const { data: vehiclesData } = await vehiclesQuery
       if (vehiclesData) setVehicles(vehiclesData)
 
-      // Carregar motoristas
-      const { data: driversData } = await supabase
+      // Carregar motoristas (filtrar por empresa)
+      const driversQuery = supabase
         .from('users')
         .select('id, name')
         .eq('role', 'driver')
-        .eq('company_id', filters.company || null)
         .order('name')
+      
+      if (filters.company) {
+        driversQuery.eq('company_id', filters.company)
+      }
+      
+      const { data: driversData } = await driversQuery
       if (driversData) setDrivers(driversData)
     } catch (error) {
       console.error('Erro ao carregar opções de filtros:', error)
@@ -242,11 +268,25 @@ export function MapFilters({
         </div>
 
         {/* Date Picker (quando histórico) */}
-        {mode === 'history' && (
-          <Button variant="outline" size="sm">
-            <Calendar className="h-4 w-4 mr-2" />
-            Período
-          </Button>
+        {mode === 'history' && onPlaybackPeriodChange && (
+          <>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => setShowPeriodPicker(!showPeriodPicker)}
+            >
+              <Calendar className="h-4 w-4 mr-2" />
+              Período
+            </Button>
+            {showPeriodPicker && playbackFrom && playbackTo && (
+              <PeriodPicker
+                from={playbackFrom}
+                to={playbackTo}
+                onChange={onPlaybackPeriodChange}
+                onClose={() => setShowPeriodPicker(false)}
+              />
+            )}
+          </>
         )}
 
         {/* Badges de Contagem */}
