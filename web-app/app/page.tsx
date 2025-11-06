@@ -179,7 +179,7 @@ function LoginContent() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">Password</label>
+                <label className="block text-sm font-medium mb-2">Senha</label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-[var(--muted)]" />
                   <Input
@@ -200,10 +200,10 @@ function LoginContent() {
                     onChange={(e) => setRememberMe(e.target.checked)}
                     className="rounded"
                   />
-                  <span>Stay connected</span>
+                  <span>Manter conectado</span>
                 </label>
                 <button className="text-sm text-[var(--brand)] hover:underline">
-                  Forgot password
+                  Esqueci minha senha
                 </button>
               </div>
             </div>
@@ -213,7 +213,7 @@ function LoginContent() {
               disabled={loading}
               className="w-full mb-6"
             >
-              {loading ? "Signing in..." : "Sign In"}
+              {loading ? "Signing in..." : "Entrar"}
             </Button>
 
             {/* Bloco de "Demo Accounts" removido conforme solicitação */}
