@@ -40,7 +40,7 @@ export function OperationalAlertsNotification() {
         {
           event: '*',
           schema: 'public',
-          table: 'gf_operational_alerts',
+          table: 'gf_alerts',
         },
         () => {
           loadAlerts()

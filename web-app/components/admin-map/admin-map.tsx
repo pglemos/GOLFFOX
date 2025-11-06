@@ -675,7 +675,8 @@ export function AdminMap({
         
         setAlerts(validAlerts as any)
       } else if (alertsError) {
-        console.error('Erro ao carregar alertas:', alertsError)
+        const msg = (alertsError as any)?.message ?? (() => { try { return JSON.stringify(alertsError) } catch { return String(alertsError) } })()
+        console.error('Erro ao carregar alertas:', msg)
       }
 
       // Carregar paradas das rotas
@@ -1748,4 +1749,3 @@ export function AdminMap({
     </div>
   )
 }
-

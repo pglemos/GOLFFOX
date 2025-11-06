@@ -5,6 +5,18 @@
 
 import { supabase } from './supabase'
 
+function formatSupabaseError(error: any): string {
+  if (!error) return 'Erro desconhecido'
+  const e = error.error || error
+  if (typeof e === 'string') return e
+  if (e.message) return e.message
+  try {
+    return JSON.stringify(e)
+  } catch {
+    return String(e)
+  }
+}
+
 export type AlertSeverity = 'info' | 'warning' | 'error' | 'critical'
 export type AlertType = 'api_error' | 'cron_failure' | 'performance' | 'sync_failure' | 'route_deviation' | 'other'
 
@@ -24,7 +36,7 @@ export interface OperationalAlert {
  */
 export async function createAlert(alert: OperationalAlert): Promise<void> {
   try {
-    await supabase.from('gf_operational_alerts').insert({
+    await supabase.from('gf_alerts').insert({
       type: alert.type,
       severity: alert.severity,
       title: alert.title,
@@ -37,7 +49,7 @@ export async function createAlert(alert: OperationalAlert): Promise<void> {
       is_resolved: false,
     })
   } catch (error) {
-    console.error('Erro ao criar alerta operacional:', error)
+    console.error('Erro ao criar alerta operacional:', formatSupabaseError(error))
     // Não falhar silenciosamente - logar erro
   }
 }
@@ -122,8 +134,9 @@ export async function getUnresolvedAlerts(
   limit: number = 50
 ): Promise<any[]> {
   try {
+    // Priorizar view segura por operador se existir, com fallback para tabela base
     let query = supabase
-      .from('gf_operational_alerts')
+      .from('v_operator_alerts_secure')
       .select('*')
       .eq('is_resolved', false)
       .order('created_at', { ascending: false })
@@ -133,12 +146,29 @@ export async function getUnresolvedAlerts(
       query = query.eq('severity', severity)
     }
 
-    const { data, error } = await query
+    let { data, error } = await query
+
+    // Se view segura não estiver disponível ou der erro, usar tabela base
+    if (error) {
+      const fallback = supabase
+        .from('gf_alerts')
+        .select('*')
+        .eq('is_resolved', false)
+        .order('created_at', { ascending: false })
+        .limit(limit)
+
+      if (severity) {
+        fallback.eq('severity', severity)
+      }
+      const res = await fallback
+      data = res.data
+      error = res.error
+    }
 
     if (error) throw error
     return data || []
   } catch (error) {
-    console.error('Erro ao buscar alertas:', error)
+    console.error('Erro ao buscar alertas:', formatSupabaseError(error))
     return []
   }
 }
@@ -149,7 +179,7 @@ export async function getUnresolvedAlerts(
 export async function resolveAlert(alertId: string, notes?: string): Promise<void> {
   try {
     await supabase
-      .from('gf_operational_alerts')
+      .from('gf_alerts')
       .update({
         is_resolved: true,
         resolved_at: new Date().toISOString(),
@@ -157,7 +187,7 @@ export async function resolveAlert(alertId: string, notes?: string): Promise<voi
       })
       .eq('id', alertId)
   } catch (error) {
-    console.error('Erro ao resolver alerta:', error)
+    console.error('Erro ao resolver alerta:', formatSupabaseError(error))
   }
 }
 
@@ -166,17 +196,29 @@ export async function resolveAlert(alertId: string, notes?: string): Promise<voi
  */
 export async function hasCriticalAlerts(): Promise<boolean> {
   try {
-    const { data, error } = await supabase
-      .from('gf_operational_alerts')
-      .select('id')
-      .eq('is_resolved', false)
+    // Tentar pela view segura primeiro
+    let { data, error } = await supabase
+      .from('v_operator_alerts_secure')
+      .select('id, severity, is_resolved')
       .eq('severity', 'critical')
+      .eq('is_resolved', false)
       .limit(1)
+
+    if (error) {
+      const res = await supabase
+        .from('gf_alerts')
+        .select('id')
+        .eq('is_resolved', false)
+        .eq('severity', 'critical')
+        .limit(1)
+      data = res.data
+      error = res.error
+    }
 
     if (error) throw error
     return (data?.length || 0) > 0
   } catch (error) {
-    console.error('Erro ao verificar alertas críticos:', error)
+    console.error('Erro ao verificar alertas críticos:', formatSupabaseError(error))
     return false
   }
 }
