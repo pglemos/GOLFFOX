@@ -23,6 +23,7 @@ function LoginContent() {
   const passwordInputRef = useRef<HTMLInputElement | null>(null)
   const [failedAttempts, setFailedAttempts] = useState<number>(0)
   const [blockedUntil, setBlockedUntil] = useState<number | null>(null)
+  const [transitioning, setTransitioning] = useState<boolean>(false)
 
   // Demo accounts
   const demoAccounts = [
@@ -66,7 +67,12 @@ function LoginContent() {
           if (data?.token) setCsrfToken(data.token)
         }
       } catch (_e) {
-        // Silenciar: rota /set-session irá rejeitar sem token
+        // Gerar token CSRF cliente (double-submit cookie) caso rota não exista
+        try {
+          const token = Math.random().toString(36).slice(2) + Date.now().toString(36)
+          document.cookie = `golffox-csrf=${token}; path=/; SameSite=Lax`
+          setCsrfToken(token)
+        } catch {}
       }
     }
     fetchCsrf()
@@ -100,6 +106,28 @@ function LoginContent() {
       localStorage.setItem('golffox-login-attempts', JSON.stringify({ failedAttempts, blockedUntil }))
     } catch {}
   }, [failedAttempts, blockedUntil])
+
+  // Auxiliares de segurança e navegação
+  const sanitizePath = (raw: string | null): string | null => {
+    if (!raw) return null
+    try {
+      const decoded = decodeURIComponent(raw)
+      // Permitir apenas paths internos
+      if (/^https?:\/\//i.test(decoded)) return null
+      if (!decoded.startsWith('/')) return null
+      const url = new URL(decoded, window.location.origin)
+      return url.pathname + (url.search || '') + (url.hash || '')
+    } catch {
+      return null
+    }
+  }
+
+  const isAllowedForRole = (role: string, path: string): boolean => {
+    if (path.startsWith('/admin')) return role === 'admin'
+    if (path.startsWith('/operator')) return ['admin', 'operator'].includes(role)
+    if (path.startsWith('/carrier')) return ['admin', 'carrier'].includes(role)
+    return true
+  }
 
   // Captura Enter no container do formulário
   useEffect(() => {
@@ -152,6 +180,7 @@ function LoginContent() {
     }
 
     setLoading(true)
+    setTransitioning(true)
     setError(null)
     console.log('🔐 Iniciando login para:', loginEmail)
     const prevCursor = typeof document !== 'undefined' ? document.body.style.cursor : ''
@@ -162,12 +191,41 @@ function LoginContent() {
     try {
       // Usar o novo sistema de autenticação
       const { AuthManager } = await import('@/lib/auth')
-      // Envolver com timeout de 5s para erros de conexão
-      const withTimeout = <T>(p: Promise<T>, ms: number) => new Promise<T>((resolve, reject) => {
-        const id = setTimeout(() => reject(new Error('timeout')), ms)
-        p.then((v) => { clearTimeout(id); resolve(v) }).catch((e) => { clearTimeout(id); reject(e) })
-      })
-      const result = await withTimeout(AuthManager.login(emailSanitized, loginPassword), 5000)
+      // Envolver com timeout estrito de 300ms para validar credenciais rapidamente
+      function withTimeout<T>(p: Promise<T>, ms: number) {
+        return new Promise<T>((resolve, reject) => {
+          const id = setTimeout(() => reject(new Error('timeout')), ms)
+          p.then((v) => { clearTimeout(id); resolve(v) }).catch((e) => { clearTimeout(id); reject(e) })
+        })
+      }
+      // Cache de sessão: se já autenticado e email coincide, usar diretamente
+      const stored = AuthManager.getStoredUser?.() || null
+      const sessionShortcut = (async () => {
+        if (stored && stored.email === emailSanitized) {
+          try {
+            const { data: { session } } = await supabase.auth.getSession()
+            if (session?.user?.email === emailSanitized) {
+              return { success: true, user: stored }
+            }
+          } catch {}
+        }
+        throw new Error('no_session_cache')
+      })()
+
+      let result: any
+      try {
+        result = await Promise.race([
+          withTimeout(AuthManager.login(emailSanitized, loginPassword), 300),
+          sessionShortcut,
+        ])
+      } catch (raceErr) {
+        // Se timeout de 300ms ocorrer, continuar aguardando até 1500ms como fallback
+        try {
+          result = await withTimeout(AuthManager.login(emailSanitized, loginPassword), 1500)
+        } catch (finalErr) {
+          throw finalErr
+        }
+      }
 
       if (result.success && result.user) {
         console.log('✅ Login bem-sucedido!')
@@ -191,22 +249,33 @@ function LoginContent() {
           console.warn('⚠️ Erro ao chamar /api/auth/set-session:', e)
         }
 
-        // Determinar URL de redirecionamento
-        const nextUrl = searchParams.get('next')
+        // Determinar URL de redirecionamento (sanitizada e validada)
+        const rawNext = searchParams.get('next')
+        const safeNext = sanitizePath(rawNext)
         let redirectUrl = '/'
 
-        if (nextUrl) {
-          redirectUrl = nextUrl
-          console.log('🔄 Redirecionando para URL solicitada:', redirectUrl)
+        if (safeNext && isAllowedForRole(result.user.role, safeNext)) {
+          redirectUrl = safeNext
+          console.log('🔄 Redirecionando para URL solicitada (validada):', redirectUrl)
         } else {
-          // Redirecionar baseado na role
           redirectUrl = AuthManager.getRedirectUrl(result.user.role)
           console.log('🔄 Redirecionando baseado na role:', redirectUrl)
         }
 
-        // Usar router.replace para evitar voltar ao login
-        console.log('🚀 Executando redirecionamento...')
-        router.replace(redirectUrl)
+        // Validação simples do token JWT antes do redirect
+        try {
+          const parts = (result.user.accessToken || '').split('.')
+          if (parts.length !== 3) throw new Error('invalid_jwt_structure')
+        } catch (jwtErr) {
+          setError('Sessão inválida. Tente novamente.')
+          setLoading(false)
+          setTransitioning(false)
+          return
+        }
+
+        // Navegação programática (Next router usa history.pushState sob o capô)
+        console.log('🚀 Executando redirecionamento suave...')
+        router.push(redirectUrl)
       } else {
         console.error('❌ Erro de login:', result.error)
         const msg = (result.error || '').toLowerCase()
@@ -242,6 +311,7 @@ function LoginContent() {
       passwordInputRef.current?.focus()
     } finally {
       setLoading(false)
+      setTimeout(() => setTransitioning(false), 800)
       if (typeof document !== 'undefined') document.body.style.cursor = prevCursor
     }
   }
@@ -319,6 +389,13 @@ function LoginContent() {
             >
               {loading ? "Entrando..." : "Entrar"}
             </Button>
+
+            {transitioning && (
+              <div className="flex items-center justify-center mb-2" aria-live="polite">
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600 mr-2" />
+                <span className="text-sm text-[var(--muted)]">Redirecionando…</span>
+              </div>
+            )}
 
             {/* Contas de demonstração removidas conforme solicitação */}
           </Card>
