@@ -4,17 +4,30 @@
 
 'use client'
 
-import { useEffect, useState, useCallback, useRef } from 'react'
+import { useEffect, useState, useCallback, useRef, useMemo } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { loadGoogleMapsAPI } from '@/lib/google-maps-loader'
 import { RealtimeService, RealtimeUpdateType } from '@/lib/realtime-service'
 import { PlaybackService } from '@/lib/playback-service'
 import { fitBoundsWithMargin, createBoundsFromPositions } from '@/lib/map-utils'
 import { getMapsBillingMonitor } from '@/lib/maps-billing-monitor'
+import { detectRouteDeviation, type RoutePolylinePoint } from '@/lib/route-deviation-detector'
+import { createAlert } from '@/lib/operational-alerts'
+import { analyzeTrajectory, type PlannedRoutePoint, type ActualPosition } from '@/lib/trajectory-analyzer'
+import { 
+  isValidCoordinate, 
+  isValidPolyline, 
+  filterValidCoordinates,
+  normalizeCoordinate 
+} from '@/lib/coordinate-validator'
+import { TrajectoryPanel } from './trajectory-panel'
 import { MapFilters } from './filters'
 import { MapLayers } from './layers'
+import { HeatmapLayer } from './heatmap-layer'
 import { VehiclePanel, RoutePanel, AlertsPanel } from './panels'
 import { PlaybackControls } from './playback-controls'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { useKeyboardShortcuts } from './keyboard-shortcuts'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -114,7 +127,25 @@ export function AdminMap({
   const [alerts, setAlerts] = useState<Alert[]>([])
   const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null)
   const [selectedRoute, setSelectedRoute] = useState<RoutePolyline | null>(null)
+  const [selectedAlert, setSelectedAlert] = useState<Alert | null>(null)
   const [mode, setMode] = useState<'live' | 'history'>('live')
+  const [historicalTrajectories, setHistoricalTrajectories] = useState<Array<{
+    vehicle_id: string
+    trip_id: string
+    positions: Array<{ lat: number; lng: number; timestamp: Date }>
+    color?: string
+  }>>([])
+  const [routeStops, setRouteStops] = useState<Array<{
+    id: string
+    route_id: string
+    route_name: string
+    seq: number
+    name: string
+    lat: number
+    lng: number
+    radius_m: number
+  }>>([])
+  const [showTrajectories, setShowTrajectories] = useState(false)
   const [isPlaying, setIsPlaying] = useState(false)
   const [billingStatus, setBillingStatus] = useState<any>(null)
   const [listMode, setListMode] = useState(false) // Fallback modo lista
@@ -123,6 +154,10 @@ export function AdminMap({
   const [playbackTo, setPlaybackTo] = useState<Date>(new Date())
   const [playbackSpeed, setPlaybackSpeed] = useState<1 | 2 | 4>(1)
   const [historicalPositions, setHistoricalPositions] = useState<Map<string, any>>(new Map())
+  const [showHeatmap, setShowHeatmap] = useState(false)
+  const [showTrajectoryAnalysis, setShowTrajectoryAnalysis] = useState(false)
+  const [trajectoryAnalysis, setTrajectoryAnalysis] = useState<any>(null)
+  const [notifiedDeviations, setNotifiedDeviations] = useState<Set<string>>(new Set())
   
   // Filtros
   const [filters, setFilters] = useState({
@@ -171,21 +206,87 @@ export function AdminMap({
         billingMonitor.incrementUsage(1)
         
         const defaultCenter = { lat: -19.916681, lng: -43.934493 }
+        
+        // Detectar modo dark
+        const isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        
+        // Estilos do mapa (dark mode ready)
+        const mapStyles: google.maps.MapTypeStyle[] = [
+          {
+            featureType: 'poi',
+            elementType: 'labels',
+            stylers: [{ visibility: 'off' }],
+          },
+          {
+            featureType: 'transit',
+            elementType: 'labels',
+            stylers: [{ visibility: 'off' }],
+          },
+        ]
+        
+        // Aplicar tema escuro se necessário
+        if (isDark) {
+          mapStyles.push(
+            { elementType: 'geometry', stylers: [{ color: '#242f3e' }] },
+            { elementType: 'labels.text.stroke', stylers: [{ color: '#242f3e' }] },
+            { elementType: 'labels.text.fill', stylers: [{ color: '#746855' }] },
+            {
+              featureType: 'water',
+              elementType: 'geometry',
+              stylers: [{ color: '#17263c' }],
+            },
+            {
+              featureType: 'road',
+              elementType: 'geometry',
+              stylers: [{ color: '#38414e' }],
+            },
+            {
+              featureType: 'road',
+              elementType: 'geometry.stroke',
+              stylers: [{ color: '#212a37' }],
+            },
+            {
+              featureType: 'road',
+              elementType: 'labels.text.fill',
+              stylers: [{ color: '#9ca5b3' }],
+            },
+            {
+              featureType: 'road',
+              elementType: 'labels.text.stroke',
+              stylers: [{ color: '#1a1a1a' }],
+            },
+            {
+              featureType: 'administrative',
+              elementType: 'geometry',
+              stylers: [{ color: '#757575' }],
+            },
+            {
+              featureType: 'administrative.locality',
+              elementType: 'labels.text.fill',
+              stylers: [{ color: '#b3b3b3' }],
+            },
+            {
+              featureType: 'poi.park',
+              elementType: 'geometry',
+              stylers: [{ color: '#263c3f' }],
+            },
+            {
+              featureType: 'poi.park',
+              elementType: 'labels.text.fill',
+              stylers: [{ color: '#6b9a76' }],
+            },
+            {
+              featureType: 'road',
+              elementType: 'labels.icon',
+              stylers: [{ visibility: 'off' }],
+            }
+          )
+        }
+        
         const map = new google.maps.Map(mapRef.current, {
           center: initialCenter || defaultCenter,
           zoom: initialZoom || 12,
-          styles: [
-            {
-              featureType: 'poi',
-              elementType: 'labels',
-              stylers: [{ visibility: 'off' }],
-            },
-            {
-              featureType: 'transit',
-              elementType: 'labels',
-              stylers: [{ visibility: 'off' }],
-            },
-          ],
+          styles: mapStyles,
           mapTypeControl: false,
           streetViewControl: false,
           fullscreenControl: true,
@@ -194,8 +295,21 @@ export function AdminMap({
 
         mapInstanceRef.current = map
         
+        // Listener para lazy loading de rotas quando viewport muda (será configurado após loadInitialData)
+        
         // Carregar dados iniciais
         await loadInitialData()
+        
+        // Configurar listener para lazy loading após dados iniciais
+        let boundsListenerTimeout: NodeJS.Timeout | null = null
+        const boundsListener = map.addListener('bounds_changed', () => {
+          if (boundsListenerTimeout) {
+            clearTimeout(boundsListenerTimeout)
+          }
+          boundsListenerTimeout = setTimeout(() => {
+            loadVisibleRoutes()
+          }, 500)
+        })
         
         // Inicializar realtime ou playback baseado no modo
         if (mode === 'live') {
@@ -205,6 +319,14 @@ export function AdminMap({
         }
         
         setLoading(false)
+        
+        // Cleanup
+        return () => {
+          google.maps.event.removeListener(boundsListener)
+          if (boundsListenerTimeout) {
+            clearTimeout(boundsListenerTimeout)
+          }
+        }
       } catch (error: any) {
         console.error('Erro ao inicializar mapa:', error)
         setMapError('Erro ao carregar o mapa. Usando modo lista.')
@@ -228,28 +350,300 @@ export function AdminMap({
     }
   }, [])
 
+  // Cache de rotas para lazy loading (otimizado)
+  const routesCacheRef = useRef<Map<string, RoutePolyline>>(new Map())
+  const loadedRouteIdsRef = useRef<Set<string>>(new Set())
+  const lastZoomRef = useRef<number | null>(null)
+  const lastCompanyRef = useRef<string | null>(null)
+  const routesLoadTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+
+  // Carregar rotas visíveis no viewport (lazy loading otimizado)
+  const loadVisibleRoutes = useCallback(async () => {
+    if (!mapInstanceRef.current) return
+
+    const bounds = mapInstanceRef.current.getBounds()
+    if (!bounds) return
+
+    // Limitar a 50 rotas por vez
+    const LIMIT = 50
+    const currentZoom = mapInstanceRef.current.getZoom() || 0
+    const currentCompany = filters.company || null
+    
+    // Limpar cache se empresa mudou
+    if (lastCompanyRef.current !== currentCompany) {
+      routesCacheRef.current.clear()
+      loadedRouteIdsRef.current.clear()
+      lastCompanyRef.current = currentCompany
+    }
+    
+    // Limpar cache se zoom mudou significativamente (>2 níveis)
+    if (lastZoomRef.current !== null && Math.abs(currentZoom - lastZoomRef.current) > 2) {
+      routesCacheRef.current.clear()
+      loadedRouteIdsRef.current.clear()
+    }
+    lastZoomRef.current = currentZoom
+
+    // Debounce para evitar muitas chamadas
+    if (routesLoadTimeoutRef.current) {
+      clearTimeout(routesLoadTimeoutRef.current)
+    }
+
+    routesLoadTimeoutRef.current = setTimeout(async () => {
+      try {
+        // Buscar rotas que intersectam com o viewport
+        // Por enquanto, carregar todas as rotas filtradas (otimização futura: usar geolocalização)
+        const { data: routesData, error: routesError } = await supabase
+          .from('v_route_polylines')
+          .select('*')
+          .eq('company_id', currentCompany || null)
+          .limit(LIMIT)
+
+        if (!routesError && routesData) {
+          // Filtrar apenas rotas não carregadas
+          const newRoutes = routesData.filter((r: any) => !loadedRouteIdsRef.current.has(r.route_id))
+          
+          if (newRoutes.length > 0) {
+            // Adicionar ao cache
+            newRoutes.forEach((route: any) => {
+              routesCacheRef.current.set(route.route_id, route)
+              loadedRouteIdsRef.current.add(route.route_id)
+            })
+
+            // Atualizar estado com todas as rotas do cache
+            setRoutes(Array.from(routesCacheRef.current.values()))
+          }
+        }
+      } catch (error) {
+        console.error('Erro ao carregar rotas visíveis:', error)
+      }
+    }, 300) // Debounce de 300ms
+  }, [filters.company])
+
   // Carregar dados iniciais
   const loadInitialData = useCallback(async () => {
     try {
-      // Carregar veículos
-      const { data: vehiclesData, error: vehiclesError } = await supabase
-        .from('v_live_vehicles')
-        .select('*')
-        .eq('company_id', filters.company || null)
+      console.log('🔄 Carregando dados iniciais com filtros:', filters)
+      
+      // Carregar veículos ativos diretamente (sem depender da view)
+      let vehiclesQuery = supabase
+        .from('vehicles')
+        .select(`
+          id,
+          plate,
+          model,
+          company_id,
+          companies!inner(name),
+          is_active
+        `)
+        .eq('is_active', true)
+      
+      // Aplicar filtro de empresa apenas se selecionada (e não for string vazia)
+      if (filters.company && filters.company.trim() !== '') {
+        vehiclesQuery = vehiclesQuery.eq('company_id', filters.company)
+        console.log('🔍 Aplicando filtro de empresa:', filters.company)
+      } else {
+        console.log('🔍 Sem filtro de empresa - carregando todos os veículos')
+      }
+      
+      const { data: vehiclesData, error: vehiclesError } = await vehiclesQuery
+      
+      let finalVehiclesData: any[] = []
+      
+      if (!vehiclesError && vehiclesData && vehiclesData.length > 0) {
+        console.log(`📦 Encontrados ${vehiclesData.length} veículos ativos`)
+        
+        // Buscar trips ativas para esses veículos
+        const vehicleIds = vehiclesData.map((v: any) => v.id)
+        
+        // Buscar trips ativas (inProgress) para obter informações de rota e motorista
+        const { data: activeTrips } = await supabase
+          .from('trips')
+          .select(`
+            id,
+            vehicle_id,
+            driver_id,
+            route_id,
+            status,
+            routes(name),
+            users!trips_driver_id_fkey(id, name)
+          `)
+          .in('vehicle_id', vehicleIds)
+          .eq('status', 'inProgress')
+        
+        // Mapear trips por vehicle_id
+        const tripsByVehicle = new Map()
+        if (activeTrips) {
+          activeTrips.forEach((trip: any) => {
+            if (!tripsByVehicle.has(trip.vehicle_id)) {
+              tripsByVehicle.set(trip.vehicle_id, trip)
+            }
+          })
+        }
+        
+        // Buscar últimas posições conhecidas
+        const tripIds = activeTrips?.map((t: any) => t.id) || []
+        let lastPositions: any[] = []
+        
+        if (tripIds.length > 0) {
+          // Buscar posições recentes (últimas 5 minutos) primeiro
+          const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString()
+          const { data: recentPositions } = await supabase
+            .from('driver_positions')
+            .select('trip_id, lat, lng, speed, timestamp')
+            .in('trip_id', tripIds)
+            .gte('timestamp', fiveMinutesAgo)
+            .order('timestamp', { ascending: false })
+          
+          if (recentPositions && recentPositions.length > 0) {
+            // Mapear posições para vehicle_id via trips
+            const tripToVehicle = new Map(activeTrips?.map((t: any) => [t.id, t.vehicle_id]) || [])
+            lastPositions = recentPositions.map((pos: any) => ({
+              ...pos,
+              vehicle_id: tripToVehicle.get(pos.trip_id)
+            }))
+          } else {
+            // Se não há posições recentes, buscar últimas posições conhecidas
+            const { data: allPositions } = await supabase
+              .from('driver_positions')
+              .select('trip_id, lat, lng, speed, timestamp')
+              .in('trip_id', tripIds)
+              .order('timestamp', { ascending: false })
+              .limit(tripIds.length * 10)
+            
+            if (allPositions) {
+              const tripToVehicle = new Map(activeTrips?.map((t: any) => [t.id, t.vehicle_id]) || [])
+              lastPositions = allPositions.map((pos: any) => ({
+                ...pos,
+                vehicle_id: tripToVehicle.get(pos.trip_id)
+              }))
+            }
+          }
+        }
+        
+        // Agrupar posições por vehicle_id e pegar a mais recente
+        const positionsByVehicle = new Map()
+        lastPositions.forEach((pos: any) => {
+          if (pos.vehicle_id && !positionsByVehicle.has(pos.vehicle_id)) {
+            positionsByVehicle.set(pos.vehicle_id, pos)
+          }
+        })
+        
+        // Montar dados finais dos veículos
+        finalVehiclesData = vehiclesData.map((v: any) => {
+          const trip = tripsByVehicle.get(v.id)
+          const lastPos = positionsByVehicle.get(v.id)
+          
+          // Calcular heading se houver posição
+          let heading = null
+          if (lastPos) {
+            // Tentar calcular heading (simplificado - seria melhor ter histórico)
+            heading = 0 // Por enquanto, sem heading
+          }
+          
+          // Determinar status
+          let vehicleStatus: 'moving' | 'stopped_short' | 'stopped_long' | 'garage' = 'garage'
+          if (lastPos) {
+            const posTime = new Date(lastPos.timestamp)
+            const minutesAgo = (Date.now() - posTime.getTime()) / (1000 * 60)
+            
+            if (lastPos.speed && lastPos.speed > 0.83) { // > 3 km/h
+              vehicleStatus = 'moving'
+            } else if (minutesAgo > 3) {
+              vehicleStatus = 'stopped_long'
+            } else {
+              vehicleStatus = 'stopped_short'
+            }
+          }
+          
+          return {
+            vehicle_id: v.id,
+            plate: v.plate,
+            model: v.model || '',
+            company_id: v.company_id,
+            company_name: v.companies?.name || '',
+            trip_id: trip?.id || null,
+            route_id: trip?.route_id || null,
+            route_name: trip?.routes?.name || 'Sem rota ativa',
+            driver_id: trip?.driver_id || null,
+            driver_name: trip?.users?.name || 'Sem motorista',
+            lat: lastPos?.lat || null,
+            lng: lastPos?.lng || null,
+            speed: lastPos?.speed || null,
+            heading: heading,
+            vehicle_status: vehicleStatus,
+            passenger_count: 0, // Seria necessário buscar de trip_passengers
+            last_position_time: lastPos?.timestamp || null,
+          }
+        })
+        
+        console.log(`✅ Montados ${finalVehiclesData.length} veículos com dados completos`)
+      } else if (vehiclesError) {
+        console.error('❌ Erro ao carregar veículos:', vehiclesError)
+        finalVehiclesData = []
+      } else {
+        console.log('ℹ️ Nenhum veículo ativo encontrado')
+        finalVehiclesData = []
+      }
+      
+      console.log('📊 Resultado final da query de veículos:', {
+        filtroCompany: filters.company || '(nenhum)',
+        totalRetornado: finalVehiclesData?.length || 0,
+        erro: vehiclesError?.message || null,
+        primeirosVeiculos: finalVehiclesData?.slice(0, 2).map((v: any) => ({
+          vehicle_id: v.vehicle_id,
+          plate: v.plate,
+          lat: v.lat,
+          lng: v.lng,
+          company_id: v.company_id
+        })) || []
+      })
 
-      if (!vehiclesError && vehiclesData) {
-        setVehicles(vehiclesData as any)
+      if (finalVehiclesData && finalVehiclesData.length > 0) {
+        // Validar e filtrar veículos com coordenadas válidas
+        const validVehicles = finalVehiclesData
+          .filter((v: any) => {
+            // Validar coordenadas
+            if (!isValidCoordinate(v.lat, v.lng)) {
+              console.warn(`Veículo ${v.vehicle_id} tem coordenadas inválidas:`, v.lat, v.lng)
+              return false
+            }
+            
+            // Normalizar coordenadas
+            const normalized = normalizeCoordinate(v.lat, v.lng)
+            if (normalized) {
+              v.lat = normalized.lat
+              v.lng = normalized.lng
+            }
+            
+            return true
+          })
+          .map((v: any) => ({
+            ...v,
+            // Garantir valores padrão
+            speed: v.speed !== null && !isNaN(v.speed) ? v.speed : null,
+            heading: v.heading !== null && !isNaN(v.heading) ? v.heading : null,
+          }))
+        
+        setVehicles(validVehicles as any)
+        
+        // Log para debug detalhado
+        if (validVehicles.length === 0 && finalVehiclesData && finalVehiclesData.length > 0) {
+          console.warn('⚠️ Veículos carregados mas todos foram filtrados por coordenadas inválidas:', finalVehiclesData.length)
+          console.warn('Exemplo de veículo filtrado:', finalVehiclesData[0])
+          toast.error('Veículos encontrados mas todos têm coordenadas inválidas. Verifique o console.')
+        } else if (validVehicles.length > 0) {
+          console.log(`✅ Carregados ${validVehicles.length} veículos válidos de ${finalVehiclesData.length} total`)
+        }
+      } else if (vehiclesError) {
+        console.error('❌ Erro ao carregar veículos:', vehiclesError)
+        toast.error(`Erro ao carregar veículos: ${vehiclesError.message || 'Erro desconhecido'}`)
+      } else {
+        // Nenhum dado retornado e nenhum erro
+        console.log('ℹ️ Nenhum veículo retornado da query (sem erro)')
       }
 
-      // Carregar rotas
-      const { data: routesData, error: routesError } = await supabase
-        .from('v_route_polylines')
-        .select('*')
-        .eq('company_id', filters.company || null)
-
-      if (!routesError && routesData) {
-        setRoutes(routesData as any)
-      }
+      // Carregar rotas (lazy loading será aplicado via loadVisibleRoutes)
+      await loadVisibleRoutes()
 
       // Carregar alertas
       const { data: alertsData, error: alertsError } = await supabase
@@ -257,7 +651,63 @@ export function AdminMap({
         .select('*')
 
       if (!alertsError && alertsData) {
-        setAlerts(alertsData as any)
+        // Validar alertas com coordenadas
+        const validAlerts = alertsData
+          .filter((a: any) => {
+            // Se tem coordenadas, validar
+            if (a.lat !== undefined && a.lng !== undefined) {
+              if (!isValidCoordinate(a.lat, a.lng)) {
+                console.warn(`Alerta ${a.alert_id} tem coordenadas inválidas`)
+                return false
+              }
+              
+              // Normalizar coordenadas
+              const normalized = normalizeCoordinate(a.lat, a.lng)
+              if (normalized) {
+                a.lat = normalized.lat
+                a.lng = normalized.lng
+              }
+            }
+            
+            return true
+          })
+        
+        setAlerts(validAlerts as any)
+      } else if (alertsError) {
+        console.error('Erro ao carregar alertas:', alertsError)
+      }
+
+      // Carregar paradas das rotas
+      const routeIds = routes?.map((r: any) => r.route_id) || []
+      if (routeIds.length > 0) {
+        const { data: stopsData, error: stopsError } = await supabase
+          .from('route_stops')
+          .select(`
+            id,
+            route_id,
+            seq,
+            name,
+            lat,
+            lng,
+            radius_m,
+            routes!inner(name)
+          `)
+          .in('route_id', routeIds)
+          .order('route_id', { ascending: true })
+          .order('seq', { ascending: true })
+
+        if (!stopsError && stopsData) {
+          setRouteStops(stopsData.map((stop: any) => ({
+            id: stop.id,
+            route_id: stop.route_id,
+            route_name: stop.routes?.name || '',
+            seq: stop.seq,
+            name: stop.name,
+            lat: stop.lat,
+            lng: stop.lng,
+            radius_m: stop.radius_m || 50,
+          })))
+        }
       }
     } catch (error) {
       console.error('Erro ao carregar dados iniciais:', error)
@@ -265,7 +715,7 @@ export function AdminMap({
   }, [filters.company])
 
   // Processar atualizações do realtime
-  const handleRealtimeUpdate = useCallback((update: RealtimeUpdateType) => {
+  const handleRealtimeUpdate = useCallback(async (update: RealtimeUpdateType) => {
     if (update.type === 'position') {
       setVehicles((prev) => {
         const index = prev.findIndex(
@@ -273,17 +723,131 @@ export function AdminMap({
         )
         if (index >= 0) {
           const updated = [...prev]
+          const vehicle = updated[index]
+          
+          // Validar coordenadas antes de atualizar
+          if (!isValidCoordinate(update.data.lat, update.data.lng)) {
+            console.warn(`Coordenadas inválidas recebidas para veículo ${update.data.vehicle_id}:`, 
+              update.data.lat, update.data.lng)
+            return prev // Não atualizar se coordenadas inválidas
+          }
+          
+          // Normalizar coordenadas
+          const normalized = normalizeCoordinate(update.data.lat, update.data.lng)
+          if (!normalized) {
+            return prev
+          }
+          
           // Atualizar campos do veículo existente
           updated[index] = {
-            ...updated[index],
-            lat: update.data.lat,
-            lng: update.data.lng,
-            speed: update.data.speed,
+            ...vehicle,
+            lat: normalized.lat,
+            lng: normalized.lng,
+            speed: update.data.speed !== null && !isNaN(update.data.speed) ? update.data.speed : vehicle.speed,
             heading: update.data.heading,
             vehicle_status: update.data.vehicle_status,
             passenger_count: update.data.passenger_count,
             last_position_time: update.data.timestamp,
           }
+          
+          // Verificar desvio de rota (apenas se veículo está em movimento e tem rota)
+          // Usar setTimeout para não bloquear a atualização do estado
+          if (vehicle.route_id && update.data.speed && update.data.speed > 1.4) {
+            const route = routes.find((r) => r.route_id === vehicle.route_id)
+            if (route && route.polyline_points && route.polyline_points.length >= 2) {
+              // Executar detecção de desvio de forma assíncrona para não bloquear UI
+              setTimeout(() => {
+                try {
+                  const deviation = detectRouteDeviation(
+                    update.data.lat,
+                    update.data.lng,
+                    update.data.speed,
+                    route.polyline_points,
+                    200 // 200m de threshold
+                  )
+                  
+                  // Criar alerta se desviou
+                  if (deviation.isDeviated) {
+                    const isCritical = deviation.distance > 500
+                    const deviationKey = `${vehicle.vehicle_id}-${route.route_id}-${Math.floor(deviation.distance / 100)}`
+                    
+                    createAlert({
+                      type: 'route_deviation',
+                      severity: isCritical ? 'critical' : 'error',
+                      title: `Veículo fora de rota: ${vehicle.plate}`,
+                      message: `Veículo ${vehicle.plate} está ${Math.round(deviation.distance)}m fora da rota planejada.`,
+                      metadata: {
+                        vehicle_id: vehicle.vehicle_id,
+                        route_id: vehicle.route_id,
+                        distance: deviation.distance,
+                        lat: update.data.lat,
+                        lng: update.data.lng,
+                      },
+                      company_id: vehicle.company_id,
+                    }).catch((error) => {
+                      console.error('Erro ao criar alerta de desvio:', error)
+                    })
+                    
+                    // Notificação em tempo real para desvios críticos (apenas uma vez por desvio)
+                    if (isCritical && !notifiedDeviations.has(deviationKey)) {
+                      setNotifiedDeviations((prev) => {
+                        const newSet = new Set(prev)
+                        newSet.add(deviationKey)
+                        return newSet
+                      })
+                      
+                      toast.error(
+                        `🚨 DESVIO CRÍTICO: ${vehicle.plate} está ${Math.round(deviation.distance)}m fora da rota!`,
+                        {
+                          duration: 8000,
+                          icon: '⚠️',
+                          position: 'top-right',
+                        }
+                      )
+                      
+                      // Limpar após 5 minutos
+                      setTimeout(() => {
+                        setNotifiedDeviations((prev) => {
+                          const newSet = new Set(prev)
+                          newSet.delete(deviationKey)
+                          return newSet
+                        })
+                      }, 5 * 60 * 1000)
+                    } else if (!isCritical && deviation.distance > 200) {
+                      // Notificação para desvios médios (uma vez por desvio)
+                      if (!notifiedDeviations.has(deviationKey)) {
+                        setNotifiedDeviations((prev) => {
+                          const newSet = new Set(prev)
+                          newSet.add(deviationKey)
+                          return newSet
+                        })
+                        
+                        toast.error(
+                          `⚠️ Desvio: ${vehicle.plate} está ${Math.round(deviation.distance)}m fora da rota`,
+                          {
+                            duration: 5000,
+                            position: 'top-right',
+                          }
+                        )
+                        
+                        // Limpar após 3 minutos
+                        setTimeout(() => {
+                          setNotifiedDeviations((prev) => {
+                            const newSet = new Set(prev)
+                            newSet.delete(deviationKey)
+                            return newSet
+                          })
+                        }, 3 * 60 * 1000)
+                      }
+                    }
+                  }
+                } catch (error) {
+                  console.error('Erro ao detectar desvio de rota:', error)
+                }
+              }, 0)
+            }
+          }
+          
           return updated
         } else {
           // Buscar dados completos do veículo se não existir
@@ -303,7 +867,7 @@ export function AdminMap({
         }
       })
     }
-  }, [])
+  }, [routes])
 
   // Inicializar realtime
   const initRealtime = useCallback(() => {
@@ -351,11 +915,192 @@ export function AdminMap({
 
     if (positions.length === 0) {
       toast.error('Nenhuma posição histórica encontrada para o período selecionado')
+      setHistoricalTrajectories([])
       return
     }
 
-    toast.success(`${positions.length} posições carregadas para playback`)
+    // Agrupar posições por veículo e trip para criar trajetos
+    const trajectoriesMap = new Map<string, {
+      vehicle_id: string
+      trip_id: string
+      positions: Array<{ lat: number; lng: number; timestamp: Date }>
+    }>()
+
+    positions.forEach((pos) => {
+      const key = `${pos.vehicle_id}-${pos.trip_id}`
+      if (!trajectoriesMap.has(key)) {
+        trajectoriesMap.set(key, {
+          vehicle_id: pos.vehicle_id,
+          trip_id: pos.trip_id,
+          positions: [],
+        })
+      }
+      const trajectory = trajectoriesMap.get(key)!
+      trajectory.positions.push({
+        lat: pos.lat,
+        lng: pos.lng,
+        timestamp: pos.timestamp,
+      })
+    })
+
+    // Converter para array e ordenar por timestamp dentro de cada trajeto
+    const trajectories = Array.from(trajectoriesMap.values()).map((t) => ({
+      ...t,
+      positions: t.positions.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime()),
+      color: '#F59E0B', // Amarelo/laranja para trajetos reais
+    }))
+
+    setHistoricalTrajectories(trajectories)
+    setShowTrajectories(true)
+    toast.success(`${positions.length} posições carregadas para playback (${trajectories.length} trajetos)`)
   }, [filters.company, filters.route, filters.vehicle, playbackFrom, playbackTo])
+
+  // Visualizar histórico e análise de trajeto
+  const handleViewVehicleHistory = useCallback(async (vehicle: Vehicle) => {
+    if (!vehicle.trip_id || !vehicle.route_id) {
+      toast.error('Veículo não possui viagem ou rota associada')
+      return
+    }
+
+    try {
+      // Buscar rota planejada
+      const route = routes.find((r) => r.route_id === vehicle.route_id)
+      if (!route || !route.polyline_points || route.polyline_points.length < 2) {
+        toast.error('Rota não encontrada ou incompleta')
+        return
+      }
+
+      // Buscar dados da viagem
+      const { data: tripData, error: tripError } = await supabase
+        .from('trips')
+        .select('id, started_at, completed_at, route_id')
+        .eq('id', vehicle.trip_id)
+        .single()
+
+      if (tripError || !tripData) {
+        toast.error('Dados da viagem não encontrados')
+        return
+      }
+
+      const from = tripData.started_at ? new Date(tripData.started_at) : new Date(Date.now() - 2 * 60 * 60 * 1000)
+      const to = tripData.completed_at ? new Date(tripData.completed_at) : new Date()
+
+      // Carregar posições históricas
+      if (!playbackServiceRef.current) {
+        playbackServiceRef.current = new PlaybackService()
+      }
+
+      const positions = await playbackServiceRef.current.loadPositions(
+        null,
+        vehicle.route_id,
+        vehicle.vehicle_id,
+        from,
+        to,
+        1
+      )
+
+      if (positions.length === 0) {
+        toast.error('Nenhuma posição histórica encontrada')
+        return
+      }
+
+      // Converter para formato de análise
+      const plannedRoute: PlannedRoutePoint[] = route.polyline_points.map((p, idx) => ({
+        lat: p.lat,
+        lng: p.lng,
+        order: p.order || idx,
+      }))
+
+      const actualPositions: ActualPosition[] = positions.map((p) => ({
+        lat: p.lat,
+        lng: p.lng,
+        timestamp: p.timestamp,
+        speed: p.speed,
+      }))
+
+      // Analisar trajeto
+      const analysis = analyzeTrajectory(plannedRoute, actualPositions, 200)
+      setTrajectoryAnalysis(analysis)
+      setShowTrajectoryAnalysis(true)
+      
+      // Mostrar trajeto no mapa
+      const trajectory = {
+        vehicle_id: vehicle.vehicle_id,
+        trip_id: vehicle.trip_id,
+        positions: positions.map((p) => ({
+          lat: p.lat,
+          lng: p.lng,
+          timestamp: p.timestamp,
+        })),
+        color: '#F59E0B',
+      }
+      setHistoricalTrajectories([trajectory])
+      setShowTrajectories(true)
+
+      toast.success('Análise de trajeto carregada')
+    } catch (error: any) {
+      console.error('Erro ao carregar histórico:', error)
+      toast.error('Erro ao carregar histórico: ' + (error.message || 'Erro desconhecido'))
+    }
+  }, [routes])
+
+  // Carregar trajetos quando veículo selecionado
+  const loadVehicleTrajectory = useCallback(async (vehicle: Vehicle) => {
+    if (!vehicle.trip_id) {
+      setHistoricalTrajectories([])
+      return
+    }
+
+    try {
+      // Carregar última viagem completa do veículo
+      const { data: tripData, error: tripError } = await supabase
+        .from('trips')
+        .select('id, started_at, completed_at')
+        .eq('id', vehicle.trip_id)
+        .single()
+
+      if (tripError || !tripData) {
+        console.warn('Trip não encontrada:', tripError)
+        return
+      }
+
+      const from = tripData.started_at ? new Date(tripData.started_at) : new Date(Date.now() - 2 * 60 * 60 * 1000)
+      const to = tripData.completed_at ? new Date(tripData.completed_at) : new Date()
+
+      if (!playbackServiceRef.current) {
+        playbackServiceRef.current = new PlaybackService()
+      }
+
+      const positions = await playbackServiceRef.current.loadPositions(
+        null,
+        vehicle.route_id || null,
+        vehicle.vehicle_id,
+        from,
+        to,
+        1
+      )
+
+      if (positions.length > 0) {
+        const trajectory = {
+          vehicle_id: vehicle.vehicle_id,
+          trip_id: vehicle.trip_id,
+          positions: positions.map((p) => ({
+            lat: p.lat,
+            lng: p.lng,
+            timestamp: p.timestamp,
+          })),
+          color: '#F59E0B',
+        }
+        setHistoricalTrajectories([trajectory])
+        setShowTrajectories(true)
+      } else {
+        setHistoricalTrajectories([])
+      }
+    } catch (error) {
+      console.error('Erro ao carregar trajeto do veículo:', error)
+      setHistoricalTrajectories([])
+    }
+  }, [])
 
   // Reagir a mudanças de modo
   useEffect(() => {
@@ -363,10 +1108,93 @@ export function AdminMap({
     
     if (mode === 'live') {
       initRealtime()
+      setHistoricalTrajectories([])
+      setShowTrajectories(false)
     } else {
       initPlayback()
     }
   }, [mode, initRealtime, initPlayback])
+
+  // Carregar trajeto quando veículo selecionado
+  useEffect(() => {
+    if (selectedVehicle && mode === 'live') {
+      loadVehicleTrajectory(selectedVehicle)
+    } else if (!selectedVehicle && mode === 'live') {
+      setHistoricalTrajectories([])
+      setShowTrajectories(false)
+    }
+  }, [selectedVehicle, mode, loadVehicleTrajectory])
+
+  // Atalhos de teclado
+  useKeyboardShortcuts({
+    onPlayPause: () => {
+      if (mode === 'history') {
+        if (isPlaying) {
+          playbackServiceRef.current?.pause()
+          setIsPlaying(false)
+        } else {
+          // Reativar playback se necessário
+          if (playbackServiceRef.current) {
+            playbackServiceRef.current.play({
+              speed: playbackSpeed,
+              from: playbackFrom,
+              to: playbackTo,
+              onPositionUpdate: () => {},
+              onComplete: () => setIsPlaying(false),
+              onPause: () => setIsPlaying(false),
+              onPlay: () => setIsPlaying(true),
+            })
+            setIsPlaying(true)
+          }
+        }
+      }
+    },
+    onStop: () => {
+      if (mode === 'history') {
+        playbackServiceRef.current?.stop()
+        setIsPlaying(false)
+        setPlaybackProgress(0)
+      }
+    },
+    onZoomIn: () => {
+      if (mapInstanceRef.current) {
+        const currentZoom = mapInstanceRef.current.getZoom() || 13
+        mapInstanceRef.current.setZoom(currentZoom + 1)
+      }
+    },
+    onZoomOut: () => {
+      if (mapInstanceRef.current) {
+        const currentZoom = mapInstanceRef.current.getZoom() || 13
+        mapInstanceRef.current.setZoom(currentZoom - 1)
+      }
+    },
+    onSpeedUp: () => {
+      if (mode === 'history') {
+        const speeds: (1 | 2 | 4)[] = [1, 2, 4]
+        const currentIndex = speeds.indexOf(playbackSpeed)
+        if (currentIndex < speeds.length - 1) {
+          const newSpeed = speeds[currentIndex + 1]
+          setPlaybackSpeed(newSpeed)
+          playbackServiceRef.current?.setSpeed(newSpeed)
+        }
+      }
+    },
+    onSpeedDown: () => {
+      if (mode === 'history') {
+        const speeds: (1 | 2 | 4)[] = [1, 2, 4]
+        const currentIndex = speeds.indexOf(playbackSpeed)
+        if (currentIndex > 0) {
+          const newSpeed = speeds[currentIndex - 1]
+          setPlaybackSpeed(newSpeed)
+          playbackServiceRef.current?.setSpeed(newSpeed)
+        }
+      }
+    },
+    onToggleHeatmap: () => {
+      setShowHeatmap(!showHeatmap)
+    },
+    enabled: !loading && !mapError,
+  })
 
   // Despachar socorro
   const handleDispatchAssistance = useCallback(async (vehicle: Vehicle) => {
@@ -693,6 +1521,11 @@ export function AdminMap({
                 }
               }
             }}
+            onViewHistory={async () => {
+              if (selectedVehicle) {
+                await handleViewVehicleHistory(selectedVehicle)
+              }
+            }}
           />
         )}
         {selectedRoute && (
@@ -701,25 +1534,82 @@ export function AdminMap({
             onClose={() => setSelectedRoute(null)}
           />
         )}
-        {/* AlertsPanel pode ser mostrado via botão, não sempre */}
+        {selectedAlert && (
+          <AlertsPanel
+            alerts={[selectedAlert]}
+            onClose={() => setSelectedAlert(null)}
+          />
+        )}
+        {showTrajectoryAnalysis && trajectoryAnalysis && selectedVehicle && (
+          <TrajectoryPanel
+            analysis={trajectoryAnalysis}
+            vehiclePlate={selectedVehicle.plate}
+            routeName={selectedVehicle.route_name}
+            onClose={() => {
+              setShowTrajectoryAnalysis(false)
+              setTrajectoryAnalysis(null)
+            }}
+          />
+        )}
       </AnimatePresence>
 
       {/* Camadas do Mapa */}
       {mapInstanceRef.current && (
-        <MapLayers
-          map={mapInstanceRef.current}
-          vehicles={vehicles}
-          routes={routes}
-          alerts={alerts}
-          selectedVehicle={selectedVehicle}
-          onVehicleClick={setSelectedVehicle}
-          onRouteClick={setSelectedRoute}
-          onAlertClick={(alert) => {
-            // Implementar ação de alerta
-          }}
-          clustererRef={clustererRef}
-        />
+        <>
+          <MapLayers
+            map={mapInstanceRef.current}
+            vehicles={vehicles}
+            routes={routes}
+            alerts={alerts}
+            selectedVehicle={selectedVehicle}
+            onVehicleClick={setSelectedVehicle}
+            onRouteClick={setSelectedRoute}
+            onAlertClick={(alert) => {
+              setSelectedAlert(alert)
+              // Navegar para localização do alerta no mapa
+              if (alert.lat && alert.lng && mapInstanceRef.current) {
+                mapInstanceRef.current.setCenter({ lat: alert.lat, lng: alert.lng })
+                mapInstanceRef.current.setZoom(15)
+              }
+            }}
+            clustererRef={clustererRef}
+            historicalTrajectories={historicalTrajectories}
+            routeStops={routeStops}
+            selectedRouteId={selectedRoute?.route_id || null}
+            showTrajectories={showTrajectories}
+            mode={mode}
+          />
+          {/* Heatmap Layer */}
+          <HeatmapLayer
+            map={mapInstanceRef.current}
+            vehicles={vehicles}
+            enabled={showHeatmap}
+            mode={mode}
+          />
+        </>
       )}
+
+      {/* Toggle Heatmap */}
+      <TooltipProvider>
+        <div className="absolute top-20 right-6 z-20">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                size="sm"
+                variant={showHeatmap ? 'default' : 'outline'}
+                onClick={() => setShowHeatmap(!showHeatmap)}
+                className="bg-white shadow-lg hover:bg-[var(--bg-hover)]"
+              >
+                <Layers className="h-4 w-4 mr-2" />
+                Mapa de Calor
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Mostrar/Ocultar mapa de densidade de veículos (Atalho: H)</p>
+            </TooltipContent>
+          </Tooltip>
+        </div>
+      </TooltipProvider>
 
       {/* Overlay de Loading */}
       {loading && (
@@ -757,14 +1647,20 @@ export function AdminMap({
                         <p className="text-sm text-[var(--ink-muted)]">{vehicle.model}</p>
                       </div>
                       <Badge variant={vehicle.vehicle_status === 'moving' ? 'default' : 'secondary'}>
-                        {vehicle.vehicle_status}
+                        {vehicle.vehicle_status === 'moving'
+                          ? 'Em Movimento'
+                          : vehicle.vehicle_status === 'stopped_long'
+                          ? 'Parado (>3min)'
+                          : vehicle.vehicle_status === 'stopped_short'
+                          ? 'Parado (<2min)'
+                          : 'Na Garagem'}
                       </Badge>
                     </div>
                     <div className="text-sm text-[var(--ink-muted)] space-y-1">
-                      <p>Rota: {vehicle.route_name || 'N/A'}</p>
-                      <p>Motorista: {vehicle.driver_name || 'N/A'}</p>
+                      <p>Rota: {vehicle.route_name || 'N/D'}</p>
+                      <p>Motorista: {vehicle.driver_name || 'N/D'}</p>
                       <p>Posição: {vehicle.lat?.toFixed(4)}, {vehicle.lng?.toFixed(4)}</p>
-                      <p>Velocidade: {vehicle.speed ? `${vehicle.speed} km/h` : 'N/A'}</p>
+                      <p>Velocidade: {vehicle.speed ? `${(vehicle.speed * 3.6).toFixed(0)} km/h` : 'N/D'}</p>
                       <p>Passageiros: {vehicle.passenger_count || 0}</p>
                     </div>
                   </Card>
@@ -795,28 +1691,59 @@ export function AdminMap({
       {/* Estados Vazios */}
       {!loading && !mapError && vehicles.length === 0 && (
         <div className="absolute inset-0 z-30 flex items-center justify-center bg-white/50 backdrop-blur-sm">
-          <div className="text-center max-w-md">
+          <div className="text-center max-w-md p-6 bg-white rounded-lg shadow-lg">
             <MapIcon className="h-16 w-16 text-[var(--ink-muted)] mx-auto mb-4" />
             <h3 className="text-xl font-semibold mb-2">Sem veículos ativos</h3>
-            <p className="text-[var(--ink-muted)]">
+            <p className="text-[var(--ink-muted)] mb-4">
               Nenhum veículo encontrado com os filtros selecionados.
+            </p>
+            <div className="text-sm text-left text-[var(--ink-muted)] mb-4 bg-[var(--bg-soft)] p-4 rounded">
+              <p className="font-semibold mb-2">Possíveis causas:</p>
+              <ul className="list-disc list-inside space-y-1">
+                <li>Não há trips com status "inProgress"</li>
+                <li>Não há posições de GPS nos últimos 5 minutos</li>
+                <li>Filtro de empresa está excluindo todos os veículos</li>
+                <li>Veículos não estão marcados como ativos</li>
+              </ul>
+            </div>
+            <Button 
+              onClick={() => {
+                console.log('🔄 Recarregando dados...')
+                loadInitialData()
+              }}
+              variant="outline"
+            >
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Recarregar Dados
+            </Button>
+            <p className="text-xs text-[var(--ink-light)] mt-4">
+              Abra o console (F12) para ver logs detalhados
             </p>
           </div>
         </div>
       )}
 
       {/* Botão de Exportar */}
-      <div className="absolute bottom-6 right-6 z-20">
-        <Button
-          size="icon"
-          variant="outline"
-          onClick={handleExport}
-          className="bg-white shadow-lg hover:bg-[var(--bg-hover)]"
-          title="Exportar visão (PNG + CSV)"
-        >
-          <Download className="h-4 w-4" />
-        </Button>
-      </div>
+      <TooltipProvider>
+        <div className="absolute bottom-6 right-6 z-20">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                size="icon"
+                variant="outline"
+                onClick={handleExport}
+                className="bg-white shadow-lg hover:bg-[var(--bg-hover)]"
+                aria-label="Exportar mapa e dados"
+              >
+                <Download className="h-4 w-4" aria-hidden="true" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Exportar mapa (PNG) e dados (CSV)</p>
+            </TooltipContent>
+          </Tooltip>
+        </div>
+      </TooltipProvider>
     </div>
   )
 }

@@ -9,7 +9,6 @@ import { Shield, Edit, Search } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
 import { ChangeRoleModal } from "@/components/modals/change-role-modal"
 import {
   Select,

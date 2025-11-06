@@ -135,7 +135,8 @@ function validateSyncData(
     case 'vehicle':
       if (!data.plate) errors.push('Placa é obrigatória')
       if (!data.model) errors.push('Modelo é obrigatório')
-      if (data.capacity && data.capacity < 1) {
+      // Validar capacity apenas se existir (pode não existir no schema)
+      if (data.capacity !== undefined && data.capacity !== null && data.capacity < 1) {
         errors.push('Capacidade deve ser maior que zero')
       }
       break
@@ -210,7 +211,15 @@ function mapDataToSupabase(
     case 'vehicle':
       // Garantir que campos numéricos sejam números
       if (mapped.year) mapped.year = parseInt(mapped.year) || null
-      if (mapped.capacity) mapped.capacity = parseInt(mapped.capacity) || null
+      
+      // REMOVER capacity SEMPRE para evitar erro de schema cache
+      // A coluna pode não existir no banco, então SEMPRE removemos por segurança
+      // Mesmo que o componente tenha verificado suporte, removemos aqui como camada extra de proteção
+      if ('capacity' in mapped) {
+        delete mapped.capacity
+        console.warn('⚠️ Capacity removido do payload em mapDataToSupabase (proteção extra)')
+      }
+      
       // Garantir boolean
       if (typeof mapped.is_active !== 'boolean') {
         mapped.is_active = mapped.is_active !== false

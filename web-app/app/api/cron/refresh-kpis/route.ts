@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase'
+import { supabaseServiceRole } from '@/lib/supabase-server'
 
 export async function GET(request: NextRequest) {
   const authHeader = request.headers.get('authorization')
@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const { error } = await supabase.rpc('refresh_mv_operator_kpis')
+    const { error } = await supabaseServiceRole.rpc('refresh_mv_operator_kpis')
     
     if (error) {
       console.error('Erro ao atualizar MV de KPIs:', error)

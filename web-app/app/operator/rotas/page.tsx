@@ -17,8 +17,6 @@ import { Button } from "@/components/ui/button"
 import { default as Link } from "next/link"
 import { useOperatorTenant } from "@/components/providers/operator-tenant-provider"
 import operatorI18n from "@/i18n/operator.json"
-import { useOperatorTenant } from "@/components/providers/operator-tenant-provider"
-import operatorI18n from "@/i18n/operator.json"
 
 export default function OperatorRotasPage() {
   const router = useRouter()

@@ -9,6 +9,13 @@ interface UserData {
 
 export async function POST(req: NextRequest) {
   try {
+    // Verificação simples de CSRF via double-submit cookie
+    const csrfHeader = req.headers.get('x-csrf-token') || ''
+    const csrfCookie = req.cookies.get('golffox-csrf')?.value || ''
+    if (!csrfHeader || !csrfCookie || csrfHeader !== csrfCookie) {
+      return NextResponse.json({ error: 'csrf_failed' }, { status: 403 })
+    }
+
     const body = await req.json()
     const user: UserData | undefined = body?.user
 

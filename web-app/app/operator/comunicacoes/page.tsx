@@ -1,5 +1,6 @@
 "use client"
 
+import { Suspense, useEffect, useState } from "react"
 // @ts-ignore
 import { AppShell } from "@/components/app-shell"
 // @ts-ignore
@@ -7,14 +8,13 @@ import { Card } from "@/components/ui/card"
 // @ts-ignore
 import { Button } from "@/components/ui/button"
 import { Send } from "lucide-react"
-import { useEffect, useState } from "react"
 // @ts-ignore
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 // @ts-ignore
 import { BroadcastModal } from "@/components/operator/broadcast-modal"
 
-export default function ComunicacoesOperatorPage() {
+function ComunicacoesOperatorPageInner() {
   const router = useRouter()
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
@@ -110,5 +110,13 @@ export default function ComunicacoesOperatorPage() {
         )}
       </div>
     </AppShell>
+  )
+}
+
+export default function ComunicacoesOperatorPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="w-16 h-16 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin mx-auto" /></div>}>
+      <ComunicacoesOperatorPageInner />
+    </Suspense>
   )
 }

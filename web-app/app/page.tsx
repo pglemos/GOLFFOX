@@ -153,8 +153,8 @@ function LoginContent() {
               <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-[var(--brand)] flex items-center justify-center">
                 <Truck className="h-8 w-8 text-white" />
               </div>
-              <h1 className="text-3xl font-bold mb-2">GolfFox</h1>
-              <p className="text-[var(--muted)]">Transport Management System</p>
+              <h1 className="text-3xl font-bold mb-2">GOLF FOX</h1>
+              <p className="text-[var(--muted)]">Sistema de Gestão de Transportes</p>
             </div>
 
             {error && (

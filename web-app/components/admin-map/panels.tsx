@@ -18,6 +18,7 @@ interface VehiclePanelProps {
   onClose: () => void
   onFollow: () => void
   onDispatch: () => void
+  onViewHistory?: () => void
 }
 
 export function VehiclePanel({
@@ -25,6 +26,7 @@ export function VehiclePanel({
   onClose,
   onFollow,
   onDispatch,
+  onViewHistory,
 }: VehiclePanelProps) {
   return (
     <motion.div
@@ -113,7 +115,7 @@ export function VehiclePanel({
             Despachar Socorro
           </Button>
 
-          <Button className="w-full" variant="outline">
+          <Button className="w-full" variant="outline" onClick={onViewHistory}>
             <History className="h-4 w-4 mr-2" />
             Ver Histórico (2h)
           </Button>

@@ -6,7 +6,7 @@
 import { supabase } from './supabase'
 
 export type AlertSeverity = 'info' | 'warning' | 'error' | 'critical'
-export type AlertType = 'api_error' | 'cron_failure' | 'performance' | 'sync_failure' | 'other'
+export type AlertType = 'api_error' | 'cron_failure' | 'performance' | 'sync_failure' | 'route_deviation' | 'other'
 
 export interface OperationalAlert {
   type: AlertType
@@ -16,6 +16,7 @@ export interface OperationalAlert {
   details?: Record<string, any>
   source?: string
   metadata?: Record<string, any>
+  company_id?: string
 }
 
 /**
@@ -31,6 +32,7 @@ export async function createAlert(alert: OperationalAlert): Promise<void> {
       details: alert.details || {},
       source: alert.source || 'web-app',
       metadata: alert.metadata || {},
+      company_id: alert.company_id || null,
       created_at: new Date().toISOString(),
       is_resolved: false,
     })

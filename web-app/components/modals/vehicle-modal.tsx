@@ -74,24 +74,33 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
   useEffect(() => {
     const checkCapacitySupport = async () => {
       try {
+        // Tentar fazer uma query simples para verificar se a coluna existe
         const { error } = await supabase
           .from("vehicles")
-          .select("capacity")
+          .select("id, capacity")
           .limit(1)
 
         if (error) {
           const msg = String(error.message || error).toLowerCase()
           // PostgREST costuma retornar erro de schema cache quando a coluna não existe
-          if (msg.includes("capacity") || msg.includes("schema cache")) {
-            console.warn("Coluna 'capacity' não disponível no schema atual. O campo será omitido ao salvar.")
+          if (msg.includes("capacity") || msg.includes("schema cache") || msg.includes("column")) {
+            console.warn("⚠️ Coluna 'capacity' não disponível no schema atual. O campo será omitido ao salvar.")
             setCapacitySupported(false)
+            return
           }
-        } else {
-          setCapacitySupported(true)
+          // Se for outro tipo de erro, assumir que não suporta
+          console.warn("⚠️ Erro ao verificar capacity, assumindo não suportado:", error.message)
+          setCapacitySupported(false)
+          return
         }
+        
+        // Se não houve erro, a coluna existe
+        console.log("✅ Coluna 'capacity' está disponível no schema")
+        setCapacitySupported(true)
       } catch (e: any) {
-        // Em ambientes sem Supabase configurado, manter como suportado para não bloquear UI
-        console.warn("Falha ao verificar suporte de 'capacity':", e?.message || e)
+        // Em caso de erro, assumir que não suporta para evitar problemas
+        console.warn("⚠️ Falha ao verificar suporte de 'capacity', assumindo não suportado:", e?.message || e)
+        setCapacitySupported(false)
       }
     }
     checkCapacitySupport()
@@ -155,25 +164,67 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
         photoUrl = await uploadPhoto(vehicleId)
       }
 
-      const vehicleData = {
-        ...formData,
+      // Preparar dados do veículo (SEM capacity inicialmente)
+      const vehicleDataRaw: any = {
+        plate: formData.plate,
+        model: formData.model,
         year: formData.year ? parseInt(formData.year as string) : null,
-        capacity: formData.capacity ? parseInt(formData.capacity as string) : null,
-        photo_url: photoUrl || null
+        prefix: formData.prefix || null,
+        is_active: formData.is_active !== undefined ? formData.is_active : true,
+        photo_url: photoUrl || null,
+        company_id: formData.company_id || null,
       }
-
-      // Omitir 'capacity' se a coluna não existir no banco alvo
+      
+      // Adicionar capacity APENAS se suportado E se tiver valor
+      if (capacitySupported && formData.capacity && formData.capacity.toString().trim() !== '') {
+        const capacityValue = parseInt(formData.capacity as string)
+        if (!isNaN(capacityValue) && capacityValue > 0) {
+          vehicleDataRaw.capacity = capacityValue
+        }
+      }
+      
+      // Garantir que capacity NUNCA seja enviado se não for suportado
+      const finalVehicleData: any = { ...vehicleDataRaw }
+      
+      // REMOVER capacity se não suportado (múltiplas verificações para garantir)
       if (!capacitySupported) {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { capacity, ...withoutCapacity } = vehicleData as any
-        Object.assign(vehicleData, withoutCapacity)
+        delete finalVehicleData.capacity
+      }
+      
+      // Verificação adicional: garantir que capacity não está presente
+      if ('capacity' in finalVehicleData && !capacitySupported) {
+        delete finalVehicleData.capacity
+      }
+      
+      // Log para debug
+      if (!capacitySupported && formData.capacity) {
+        console.warn('⚠️ Capacity não suportado - removendo do payload:', {
+          capacityOriginal: formData.capacity,
+          finalDataKeys: Object.keys(finalVehicleData),
+          hasCapacity: 'capacity' in finalVehicleData
+        })
+      }
+      
+      // Log do payload final antes de enviar (apenas em dev)
+      if (process.env.NODE_ENV === 'development') {
+        console.log('📤 Payload final para Supabase:', {
+          hasCapacity: 'capacity' in finalVehicleData,
+          keys: Object.keys(finalVehicleData),
+          capacitySupported
+        })
       }
 
+      // ÚLTIMA VERIFICAÇÃO ANTES DE ENVIAR: garantir que capacity não está presente
+      if (!capacitySupported && 'capacity' in finalVehicleData) {
+        delete finalVehicleData.capacity
+        console.warn('🔒 Última verificação: capacity removido antes de enviar ao banco')
+      }
+      
       if (vehicleId) {
         // Atualizar
         const { error } = await supabase
           .from("vehicles")
-          .update(vehicleData)
+          .update(finalVehicleData)
           .eq("id", vehicleId)
 
         if (error) throw error
@@ -183,18 +234,24 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
           resourceType: 'vehicle',
           resourceId: vehicleId,
           action: 'update',
-          data: vehicleData,
+          data: finalVehicleData,
         })
         
         toast.success("Veículo atualizado com sucesso!")
         
         // Log de auditoria
-        await auditLogs.update('vehicle', vehicleId, { plate: vehicleData.plate, model: vehicleData.model })
+        await auditLogs.update('vehicle', vehicleId, { plate: finalVehicleData.plate, model: finalVehicleData.model })
       } else {
+        // VERIFICAÇÃO FINAL: Garantir que capacity NUNCA seja enviado se não suportado
+        if (!capacitySupported && 'capacity' in finalVehicleData) {
+          delete finalVehicleData.capacity
+          console.log('🔒 Removendo capacity do payload final antes de criar (não suportado)')
+        }
+        
         // Criar
         const { data, error } = await supabase
           .from("vehicles")
-          .insert(vehicleData)
+          .insert(finalVehicleData)
           .select()
           .single()
 
@@ -214,15 +271,20 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
         // Sincronização com Supabase (garantia adicional)
         await sync({
           resourceType: 'vehicle',
-          resourceId: vehicleId,
+          resourceId: vehicleId || '',
           action: 'create',
-          data: vehicleData,
+          data: finalVehicleData,
         })
         
         toast.success("Veículo cadastrado com sucesso!")
         
         // Log de auditoria
-        await auditLogs.create('vehicle', vehicleId, { plate: vehicleData.plate, model: vehicleData.model })
+        if (vehicleId) {
+          await auditLogs.create('vehicle', vehicleId, { 
+            plate: finalVehicleData.plate || '', 
+            model: finalVehicleData.model || '' 
+          })
+        }
       }
 
       onSave()

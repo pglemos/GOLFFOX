@@ -4,7 +4,7 @@
 
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -16,11 +16,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Calendar, Clock, Search, Radio } from 'lucide-react'
+import { Calendar, Clock, Search, Radio, Loader2 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { motion } from 'framer-motion'
 import { PeriodPicker } from './period-picker'
-import { useState } from 'react'
 
 interface MapFiltersProps {
   filters: {
@@ -60,6 +59,9 @@ export function MapFilters({
   const [vehicles, setVehicles] = useState<any[]>([])
   const [drivers, setDrivers] = useState<any[]>([])
   const [showPeriodPicker, setShowPeriodPicker] = useState(false)
+  const [searchQuery, setSearchQuery] = useState(filters.search)
+  const [isSearching, setIsSearching] = useState(false)
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null)
 
   // Carregar opções de filtros
   useEffect(() => {
@@ -126,9 +128,42 @@ export function MapFilters({
     onFiltersChange({ ...filters, [key]: normalized })
   }
 
+  // Debounce para busca com 500ms
+  const handleSearchChange = useCallback((value: string) => {
+    setSearchQuery(value)
+    setIsSearching(true)
+
+    // Limpar timer anterior
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current)
+    }
+
+    // Novo timer com 500ms de debounce
+    debounceTimerRef.current = setTimeout(() => {
+      handleFilterChange('search', value)
+      setIsSearching(false)
+    }, 500)
+  }, [filters])
+
+  // Cleanup do timer
+  useEffect(() => {
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current)
+      }
+    }
+  }, [])
+
+  // Sincronizar searchQuery com filters.search quando mudar externamente
+  useEffect(() => {
+    if (filters.search !== searchQuery && !isSearching) {
+      setSearchQuery(filters.search)
+    }
+  }, [filters.search])
+
   return (
-    <Card className="p-4 glass shadow-xl">
-      <div className="flex flex-wrap items-center gap-3">
+    <Card className="p-4 glass shadow-xl max-md:p-2">
+      <div className="flex flex-wrap items-center gap-3 max-md:gap-2">
         {/* Modo: Ao vivo | Histórico */}
         <div className="flex items-center gap-2 border-r pr-3">
           <Button
@@ -259,11 +294,14 @@ export function MapFilters({
         {/* Busca Global */}
         <div className="relative flex-1 min-w-[200px]">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--ink-muted)]" />
+          {isSearching && (
+            <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--ink-muted)] animate-spin" />
+          )}
           <Input
             placeholder="Buscar (ID, placa, motorista)..."
-            value={filters.search}
-            onChange={(e) => handleFilterChange('search', e.target.value)}
-            className="pl-10"
+            value={searchQuery}
+            onChange={(e) => handleSearchChange(e.target.value)}
+            className={`pl-10 ${isSearching ? 'pr-10' : ''}`}
           />
         </div>
 

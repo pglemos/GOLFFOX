@@ -1,9 +1,9 @@
 /**
  * Web Vitals - Monitoramento de Performance
- * Integração com Core Web Vitals (CLS, LCP, FID/FCP)
+ * Integração com Core Web Vitals (CLS, LCP, INP/FCP)
  */
 
-import { onCLS, onFCP, onFID, onLCP, onTTFB } from 'web-vitals'
+import { onCLS, onFCP, onINP, onLCP, onTTFB } from 'web-vitals'
 
 export interface WebVitalMetric {
   name: string
@@ -25,7 +25,7 @@ export interface WebVitalsReport {
 const THRESHOLDS = {
   CLS: { good: 0.1, poor: 0.25 },
   FCP: { good: 1800, poor: 3000 },
-  FID: { good: 100, poor: 300 },
+  INP: { good: 200, poor: 500 },
   LCP: { good: 2500, poor: 4000 },
   TTFB: { good: 800, poor: 1800 },
 }
@@ -77,20 +77,20 @@ export function collectWebVitals() {
     })
   })
 
-  // FID - First Input Delay (deprecated, mas mantido para compatibilidade)
-  onFID((metric) => {
-    const rating = getRating('FID', metric.value)
+  // INP - Interaction to Next Paint (substitui FID)
+  onINP((metric) => {
+    const rating = getRating('INP', metric.value)
     collectedMetrics.push({
-      name: 'FID',
+      name: 'INP',
       value: metric.value,
       delta: metric.delta,
       id: metric.id,
       rating,
       navigationType: metric.navigationType || 'unknown',
     })
-    
+
     if (rating === 'poor') {
-      console.warn(`[Web Vitals] FID ${rating}: ${metric.value.toFixed(2)}ms`)
+      console.warn(`[Web Vitals] INP ${rating}: ${metric.value.toFixed(2)}ms`)
     }
   })
 
@@ -133,15 +133,33 @@ export function collectWebVitals() {
  * Envia métricas para o servidor (opcional)
  */
 export async function sendWebVitalsToServer(report: WebVitalsReport) {
+  const url = '/api/analytics/web-vitals'
+  const payload = JSON.stringify(report)
+
   try {
-    await fetch('/api/analytics/web-vitals', {
+    // Preferir envio não-bloqueante com Beacon quando disponível
+    if (typeof navigator !== 'undefined' && 'sendBeacon' in navigator) {
+      const blob = new Blob([payload], { type: 'application/json' })
+      const ok = (navigator as any).sendBeacon(url, blob)
+      if (ok) return
+      // Fallback caso Beacon retorne false
+    }
+
+    await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(report),
-      keepalive: true, // Manter requisição mesmo após navegação
+      body: payload,
+      keepalive: true,
+      cache: 'no-store',
     })
   } catch (error) {
-    console.error('Erro ao enviar Web Vitals:', error)
+    // Evitar ruído de erro quando a página está sendo ocultada/fechada
+    try {
+      if (typeof document !== 'undefined' && document.visibilityState === 'hidden') {
+        return
+      }
+    } catch {}
+    console.debug('Web Vitals: envio não crítico, erro ignorado:', error)
   }
 }
 
@@ -186,11 +204,13 @@ export function initWebVitals() {
 
   collectWebVitals()
 
-  // Enviar métricas ao descarregar a página
-  window.addEventListener('beforeunload', () => {
-    const report = getWebVitalsReport()
-    if (report.metrics.length > 0) {
-      sendWebVitalsToServer(report)
+  // Enviar métricas quando o documento for ocultado (mais confiável que beforeunload)
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') {
+      const report = getWebVitalsReport()
+      if (report.metrics.length > 0 && navigator.onLine) {
+        sendWebVitalsToServer(report)
+      }
     }
   })
 }

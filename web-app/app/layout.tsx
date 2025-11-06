@@ -8,7 +8,7 @@ import { ErrorBoundary } from "@/components/error-boundary";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "GolfFox - Gestão de Frotas",
+  title: "GOLF FOX - Gestão de Frotas",
   description: "Plataforma de gestão de frotas e transporte",
 };
 

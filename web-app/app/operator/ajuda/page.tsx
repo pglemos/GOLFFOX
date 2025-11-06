@@ -1,6 +1,8 @@
 "use client"
 
-import { useEffect, useState } from "react"
+export const dynamic = 'force-dynamic'
+
+import { useEffect, useState, Suspense } from "react"
 // @ts-ignore
 import { AppShell } from "@/components/app-shell"
 // @ts-ignore
@@ -50,8 +52,9 @@ export default function AjudaOperatorPage() {
   ]
 
   return (
-    <AppShell user={{ id: user?.id || "", name: user?.name || "Operador", email: user?.email || "", role: "operator" }}>
-      <div className="space-y-6">
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="w-16 h-16 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin mx-auto"></div></div>}>
+      <AppShell user={{ id: user?.id || "", name: user?.name || "Operador", email: user?.email || "", role: "operator" }}>
+        <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold mb-2">Ajuda & Suporte</h1>
           <p className="text-[var(--ink-muted)]">Central de ajuda para operadores</p>
@@ -132,8 +135,9 @@ export default function AjudaOperatorPage() {
             <span className="text-sm">Todos os sistemas operacionais</span>
           </div>
         </Card>
-      </div>
-    </AppShell>
+        </div>
+      </AppShell>
+    </Suspense>
   )
 }
 

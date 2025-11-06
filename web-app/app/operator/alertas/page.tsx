@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, Suspense } from "react"
 // @ts-ignore
 import { AppShell } from "@/components/app-shell"
 // @ts-ignore
@@ -18,7 +18,7 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { motion } from "framer-motion"
 import { useOperatorTenant } from "@/components/providers/operator-tenant-provider"
 
-export default function AlertasOperatorPage() {
+function AlertasOperatorPageInner() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { tenantCompanyId, loading: tenantLoading } = useOperatorTenant()
@@ -181,6 +181,14 @@ export default function AlertasOperatorPage() {
         </div>
       </div>
     </AppShell>
+  )
+}
+
+export default function AlertasOperatorPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="w-16 h-16 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin mx-auto"></div></div>}>
+      <AlertasOperatorPageInner />
+    </Suspense>
   )
 }
 
