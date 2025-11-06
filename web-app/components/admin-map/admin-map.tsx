@@ -424,21 +424,21 @@ export function AdminMap({
     try {
       console.log('🔄 Carregando dados iniciais com filtros:', filters)
       
-      // Carregar veículos ativos diretamente (sem depender da view)
-      // NÃO usar company_id ou join com companies - essas colunas/relações não existem
+      // Carregar veículos diretamente (sem depender da view)
+      // NÃO usar company_id, is_active ou join com companies - essas colunas/relações não existem
       let vehiclesQuery = supabase
         .from('vehicles')
         .select(`
           id,
           plate,
-          model,
-          is_active
+          model
         `)
-        .eq('is_active', true)
+      // NÃO aplicar filtro de is_active - a coluna não existe
+      // Carregar todos os veículos e filtrar no lado do cliente se necessário
       
       // NÃO aplicar filtro de company_id - a coluna não existe
       // Se precisar filtrar por empresa, fazer no lado do cliente após carregar
-      console.log('🔍 Carregando todos os veículos ativos (sem filtro de empresa - coluna não existe)')
+      console.log('🔍 Carregando todos os veículos (sem filtros de is_active ou company_id - colunas não existem)')
       
       const { data: vehiclesData, error: vehiclesError } = await vehiclesQuery
       

@@ -164,28 +164,30 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
         photoUrl = await uploadPhoto(vehicleId)
       }
 
-      // Preparar dados do veículo (SEM capacity e company_id - sempre removidos por segurança)
+      // Preparar dados do veículo (SEM capacity, company_id e is_active - sempre removidos por segurança)
       const vehicleDataRaw: any = {
         plate: formData.plate,
         model: formData.model,
         year: formData.year ? parseInt(formData.year as string) : null,
         prefix: formData.prefix || null,
-        is_active: formData.is_active !== undefined ? formData.is_active : true,
         photo_url: photoUrl || null,
-        // NÃO incluir company_id - a coluna não existe no banco de produção
+        // NÃO incluir company_id, capacity ou is_active - essas colunas não existem no banco de produção
       }
       
-      // NUNCA adicionar capacity ou company_id ao payload - essas colunas não existem no banco
+      // NUNCA adicionar capacity, company_id ou is_active ao payload - essas colunas não existem no banco
       
-      // Criar objeto final SEM capacity e company_id (sempre removidos)
+      // Criar objeto final SEM capacity, company_id e is_active (sempre removidos)
       const finalVehicleData: any = { ...vehicleDataRaw }
       
-      // GARANTIR que capacity e company_id NUNCA estão presentes (remoção definitiva)
+      // GARANTIR que capacity, company_id e is_active NUNCA estão presentes (remoção definitiva)
       if ('capacity' in finalVehicleData) {
         delete finalVehicleData.capacity
       }
       if ('company_id' in finalVehicleData) {
         delete finalVehicleData.company_id
+      }
+      if ('is_active' in finalVehicleData) {
+        delete finalVehicleData.is_active
       }
       
       // Log para debug
@@ -197,7 +199,7 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
         })
       }
       
-      // GARANTIR que capacity e company_id NUNCA estão presentes antes de qualquer operação
+      // GARANTIR que capacity, company_id e is_active NUNCA estão presentes antes de qualquer operação
       if ('capacity' in finalVehicleData) {
         delete finalVehicleData.capacity
         console.warn('🔒 Capacity removido do payload antes de operação (coluna não existe)')
@@ -205,6 +207,10 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
       if ('company_id' in finalVehicleData) {
         delete finalVehicleData.company_id
         console.warn('🔒 Company_id removido do payload antes de operação (coluna não existe)')
+      }
+      if ('is_active' in finalVehicleData) {
+        delete finalVehicleData.is_active
+        console.warn('🔒 Is_active removido do payload antes de operação (coluna não existe)')
       }
       
       if (vehicleId) {
@@ -229,7 +235,7 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
         // Log de auditoria
         await auditLogs.update('vehicle', vehicleId, { plate: finalVehicleData.plate, model: finalVehicleData.model })
       } else {
-        // GARANTIR que capacity e company_id NUNCA estão presentes antes de criar
+        // GARANTIR que capacity, company_id e is_active NUNCA estão presentes antes de criar
         if ('capacity' in finalVehicleData) {
           delete finalVehicleData.capacity
           console.warn('🔒 Capacity removido do payload antes de criar (coluna não existe)')
@@ -237,6 +243,10 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
         if ('company_id' in finalVehicleData) {
           delete finalVehicleData.company_id
           console.warn('🔒 Company_id removido do payload antes de criar (coluna não existe)')
+        }
+        if ('is_active' in finalVehicleData) {
+          delete finalVehicleData.is_active
+          console.warn('🔒 Is_active removido do payload antes de criar (coluna não existe)')
         }
         
         // Criar
