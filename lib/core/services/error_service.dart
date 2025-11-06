@@ -13,9 +13,9 @@ import 'logger_service.dart';
 /// - Automatic retry logic
 /// - Error analytics
 class ErrorService {
+  ErrorService._();
   static ErrorService? _instance;
   static ErrorService get instance => _instance ??= ErrorService._();
-  ErrorService._();
 
   final _logger = LoggerService.instance;
   final List<ErrorReport> _errorHistory = [];
@@ -158,7 +158,7 @@ class ErrorService {
   }) async {
     Object? lastError;
 
-    for (int attempt = 1; attempt <= maxAttempts; attempt++) {
+    for (var attempt = 1; attempt <= maxAttempts; attempt++) {
       try {
         return await operation();
       } catch (error) {
@@ -236,13 +236,12 @@ class ErrorService {
       code: 'supabase_error',
       message: error.toString(),
       userMessage: 'Erro no servidor. Tente novamente.',
-      severity: ErrorSeverity.error,
     );
   }
 
   GxError _categorizeNetworkError(Object error) {
     if (error is TimeoutException) {
-      return GxError(
+      return const GxError(
         code: 'timeout',
         message: 'operation timed out',
         userMessage: 'Operacao demorou muito. Verifique sua conexao.',
@@ -265,7 +264,6 @@ class ErrorService {
       code: 'unknown_error',
       message: error.toString(),
       userMessage: 'Erro inesperado. Tente novamente.',
-      severity: ErrorSeverity.error,
     );
   }
 
@@ -297,11 +295,6 @@ enum ErrorSeverity {
 
 /// Standardized error class for GolfFox
 class GxError implements Exception {
-  final String code;
-  final String message;
-  final String userMessage;
-  final ErrorSeverity severity;
-  final Map<String, dynamic>? additionalData;
 
   const GxError({
     required this.code,
@@ -310,6 +303,11 @@ class GxError implements Exception {
     this.severity = ErrorSeverity.error,
     this.additionalData,
   });
+  final String code;
+  final String message;
+  final String userMessage;
+  final ErrorSeverity severity;
+  final Map<String, dynamic>? additionalData;
 
   @override
   String toString() => 'GxError($code): $message';
@@ -317,12 +315,6 @@ class GxError implements Exception {
 
 /// Error report for tracking and analytics
 class ErrorReport {
-  final Object error;
-  final StackTrace? stackTrace;
-  final String? context;
-  final Map<String, dynamic>? additionalData;
-  final ErrorSeverity severity;
-  final DateTime timestamp;
 
   const ErrorReport({
     required this.error,
@@ -332,6 +324,12 @@ class ErrorReport {
     required this.severity,
     required this.timestamp,
   });
+  final Object error;
+  final StackTrace? stackTrace;
+  final String? context;
+  final Map<String, dynamic>? additionalData;
+  final ErrorSeverity severity;
+  final DateTime timestamp;
 
   Map<String, dynamic> toJson() => {
         'error': error.toString(),

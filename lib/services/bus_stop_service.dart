@@ -10,9 +10,9 @@ import 'supabase_service.dart';
 import 'map_service.dart';
 
 class BusStopService {
-  final SupabaseService _supabaseService;
 
   BusStopService(this._supabaseService);
+  final SupabaseService _supabaseService;
 
   /// Busca pontos de parada por rota
   Future<List<BusStop>> getBusStopsByRoute(String routeId) async {
@@ -38,7 +38,7 @@ class BusStopService {
     try {
       // Implementacao com PostGIS seria ideal, mas por enquanto usamos dados mock
       final allStops = await getAllBusStops();
-      final distance = const Distance();
+      const distance = Distance();
 
       return allStops.where((stop) {
         final distanceKm =
@@ -121,7 +121,6 @@ class BusStopService {
         description: 'Terminal principal do centro da cidade',
         position: const LatLng(-23.5505, -46.6333),
         type: BusStopType.terminal,
-        status: BusStopStatus.active,
         routeId: routeId,
         routeName: routeName,
         sequence: 1,
@@ -141,7 +140,6 @@ class BusStopService {
         description: 'Parada em frente ao shopping',
         position: const LatLng(-23.5515, -46.6343),
         type: BusStopType.shopping,
-        status: BusStopStatus.active,
         routeId: routeId,
         routeName: routeName,
         sequence: 2,
@@ -149,7 +147,6 @@ class BusStopService {
         lastVisit: baseTime.subtract(const Duration(minutes: 45)),
         hasAccessibility: true,
         hasShelter: true,
-        hasSeating: false,
         address: 'Av. Paulista, 1000',
         landmark: 'Shopping Paulista',
         amenities: ['Cobertura', 'Acessibilidade'],
@@ -161,7 +158,6 @@ class BusStopService {
         description: 'Parada hospitalar com prioridade',
         position: const LatLng(-23.5525, -46.6353),
         type: BusStopType.hospital,
-        status: BusStopStatus.active,
         routeId: routeId,
         routeName: routeName,
         sequence: 3,
@@ -181,14 +177,11 @@ class BusStopService {
         description: 'Parada escolar - horarios especiais',
         position: const LatLng(-23.5535, -46.6363),
         type: BusStopType.school,
-        status: BusStopStatus.active,
         routeId: routeId,
         routeName: routeName,
         sequence: 4,
         estimatedArrival: baseTime.add(const Duration(minutes: 25)),
         lastVisit: baseTime.subtract(const Duration(minutes: 90)),
-        hasAccessibility: false,
-        hasShelter: false,
         hasSeating: true,
         address: 'Rua das Flores, 123',
         landmark: 'Escola Municipal Joao Silva',
@@ -200,16 +193,12 @@ class BusStopService {
         name: 'Bairro Residencial',
         description: 'Parada residencial',
         position: const LatLng(-23.5545, -46.6373),
-        type: BusStopType.regular,
-        status: BusStopStatus.active,
         routeId: routeId,
         routeName: routeName,
         sequence: 5,
         estimatedArrival: baseTime.add(const Duration(minutes: 32)),
         lastVisit: baseTime.subtract(const Duration(minutes: 120)),
-        hasAccessibility: false,
         hasShelter: true,
-        hasSeating: false,
         address: 'Rua dos Jardins, 456',
         landmark: 'Proximo ao Parque Municipal',
         amenities: ['Cobertura'],
@@ -218,23 +207,17 @@ class BusStopService {
     ];
   }
 
-  List<BusStop> _getMockNearbyStops(LatLng position) {
-    return _getAllMockBusStops().take(3).toList();
-  }
+  List<BusStop> _getMockNearbyStops(LatLng position) => _getAllMockBusStops().take(3).toList();
 
-  List<BusStop> _getAllMockBusStops() {
-    return [
+  List<BusStop> _getAllMockBusStops() => [
       ..._getMockBusStops('route_1'),
       ..._getMockBusStops('route_2'),
       ..._getMockBusStops('route_3'),
       ..._getMockBusStops('route_4'),
       ..._getMockBusStops('route_5'),
     ];
-  }
 
-  BusStop? _getMockBusStop(String stopId) {
-    return _getAllMockBusStops().where((stop) => stop.id == stopId).firstOrNull;
-  }
+  BusStop? _getMockBusStop(String stopId) => _getAllMockBusStops().where((stop) => stop.id == stopId).firstOrNull;
 
   String _getRouteNameByNumber(String routeNumber) {
     switch (routeNumber) {

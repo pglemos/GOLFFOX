@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:golffox/core/routing/app_router.dart';
+import '../../core/routing/app_router.dart';
 import 'drivers_page.dart';
 import 'create_driver_page.dart';
 import 'driver_details_page.dart';

@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/mockito.dart';
-import 'package:mockito/annotations.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-
+import 'package:golffox/models/user.dart' as app_user;
 import 'package:golffox/services/auth_service.dart';
 import 'package:golffox/services/supabase_service.dart';
-import 'package:golffox/models/user.dart' as app_user;
+import 'package:mockito/annotations.dart';
+import 'package:mockito/mockito.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'auth_service_test.mocks.dart';
 

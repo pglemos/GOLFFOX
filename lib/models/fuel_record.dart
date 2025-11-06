@@ -42,14 +42,6 @@ extension FuelRecordTypeExtension on FuelRecordType {
 }
 
 class FuelStation {
-  final String id;
-  final String name;
-  final String address;
-  final String? cnpj;
-  final String? phone;
-  final double? latitude;
-  final double? longitude;
-  final bool isPreferred;
 
   const FuelStation({
     required this.id,
@@ -74,9 +66,16 @@ class FuelStation {
       isPreferred: json['is_preferred'] ?? false,
     );
   }
+  final String id;
+  final String name;
+  final String address;
+  final String? cnpj;
+  final String? phone;
+  final double? latitude;
+  final double? longitude;
+  final bool isPreferred;
 
-  Map<String, dynamic> toJson() {
-    return {
+  Map<String, dynamic> toJson() => {
       'id': id,
       'name': name,
       'address': address,
@@ -86,7 +85,6 @@ class FuelStation {
       'longitude': longitude,
       'is_preferred': isPreferred,
     };
-  }
 
   FuelStation copyWith({
     String? id,
@@ -97,8 +95,7 @@ class FuelStation {
     double? latitude,
     double? longitude,
     bool? isPreferred,
-  }) {
-    return FuelStation(
+  }) => FuelStation(
       id: id ?? this.id,
       name: name ?? this.name,
       address: address ?? this.address,
@@ -108,31 +105,9 @@ class FuelStation {
       longitude: longitude ?? this.longitude,
       isPreferred: isPreferred ?? this.isPreferred,
     );
-  }
 }
 
 class FuelRecord {
-  final String id;
-  final String vehicleId;
-  final FuelRecordType type;
-  final FuelType fuelType;
-  final double quantity;
-  final double pricePerLiter;
-  final double totalCost;
-  final double odometerReading;
-  final double? fuelLevelBefore;
-  final double? fuelLevelAfter;
-  final String? fuelStationId;
-  final String? fuelStationName;
-  final String? driverId;
-  final String? driverName;
-  final String? receiptNumber;
-  final String? notes;
-  final List<String> attachments;
-  final DateTime timestamp;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-  final String companyId;
 
   const FuelRecord({
     required this.id,
@@ -192,9 +167,29 @@ class FuelRecord {
       companyId: json['company_id'] ?? '',
     );
   }
+  final String id;
+  final String vehicleId;
+  final FuelRecordType type;
+  final FuelType fuelType;
+  final double quantity;
+  final double pricePerLiter;
+  final double totalCost;
+  final double odometerReading;
+  final double? fuelLevelBefore;
+  final double? fuelLevelAfter;
+  final String? fuelStationId;
+  final String? fuelStationName;
+  final String? driverId;
+  final String? driverName;
+  final String? receiptNumber;
+  final String? notes;
+  final List<String> attachments;
+  final DateTime timestamp;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final String companyId;
 
-  Map<String, dynamic> toJson() {
-    return {
+  Map<String, dynamic> toJson() => {
       'id': id,
       'vehicle_id': vehicleId,
       'type': type.name,
@@ -217,7 +212,6 @@ class FuelRecord {
       'updated_at': updatedAt.toIso8601String(),
       'company_id': companyId,
     };
-  }
 
   FuelRecord copyWith({
     String? id,
@@ -241,8 +235,7 @@ class FuelRecord {
     DateTime? createdAt,
     DateTime? updatedAt,
     String? companyId,
-  }) {
-    return FuelRecord(
+  }) => FuelRecord(
       id: id ?? this.id,
       vehicleId: vehicleId ?? this.vehicleId,
       type: type ?? this.type,
@@ -265,7 +258,6 @@ class FuelRecord {
       updatedAt: updatedAt ?? this.updatedAt,
       companyId: companyId ?? this.companyId,
     );
-  }
 
   // Getters uteis
   bool get isRefuel => type == FuelRecordType.refuel;
@@ -285,7 +277,7 @@ class FuelRecord {
     if (fuelLevelBefore != null && fuelLevelAfter != null) {
       return fuelLevelAfter! - fuelLevelBefore!;
     }
-    return 0.0;
+    return 0;
   }
 
   String get fuelLevelChangeText {
@@ -298,14 +290,6 @@ class FuelRecord {
 }
 
 class FuelConsumptionStats {
-  final double totalFuelConsumed;
-  final double totalDistance;
-  final double averageConsumption;
-  final double totalCost;
-  final double averagePricePerLiter;
-  final int totalRefuels;
-  final DateTime periodStart;
-  final DateTime periodEnd;
 
   const FuelConsumptionStats({
     required this.totalFuelConsumed,
@@ -362,6 +346,14 @@ class FuelConsumptionStats {
       periodEnd: periodEnd,
     );
   }
+  final double totalFuelConsumed;
+  final double totalDistance;
+  final double averageConsumption;
+  final double totalCost;
+  final double averagePricePerLiter;
+  final int totalRefuels;
+  final DateTime periodStart;
+  final DateTime periodEnd;
 
   // Getters formatados
   String get totalFuelText => '${totalFuelConsumed.toStringAsFixed(2)}L';
@@ -373,5 +365,5 @@ class FuelConsumptionStats {
       'R\$ ${averagePricePerLiter.toStringAsFixed(3)}';
   String get costPerKmText => totalDistance > 0
       ? 'R\$ ${(totalCost / totalDistance).toStringAsFixed(3)}/km'
-      : 'R\$ 0,000/km';
+      : r'R$ 0,000/km';
 }

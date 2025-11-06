@@ -5,7 +5,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:golffox/core/routing/app_router.dart';
+import '../../core/routing/app_router.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/theme/gf_tokens.dart';
 import '../../core/motion/gf_motion.dart';
@@ -27,7 +27,6 @@ class GfSideNav extends ConsumerWidget {
         border: Border(
           right: BorderSide(
             color: Color(GfTokens.stroke),
-            width: 1,
           ),
         ),
       ),
@@ -43,7 +42,6 @@ class GfSideNav extends ConsumerWidget {
               border: Border(
                 bottom: BorderSide(
                   color: Color(GfTokens.stroke),
-                  width: 1,
                 ),
               ),
             ),
@@ -86,7 +84,6 @@ class GfSideNav extends ConsumerWidget {
               border: Border(
                 top: BorderSide(
                   color: Color(GfTokens.stroke),
-                  width: 1,
                 ),
               ),
             ),
@@ -116,84 +113,84 @@ class GfSideNav extends ConsumerWidget {
   List<Widget> _buildMenuItems(
       BuildContext context, WidgetRef ref, String activeItem) {
     final menuItems = [
-      _MenuItem(
+      const _MenuItem(
         id: 'dashboard',
         title: 'Dashboard',
         icon: Icons.dashboard_outlined,
         activeIcon: Icons.dashboard,
         route: '/',
       ),
-      _MenuItem(
+      const _MenuItem(
         id: 'mapa',
         title: 'Mapa',
         icon: Icons.map_outlined,
         activeIcon: Icons.map,
         route: '/mapa',
       ),
-      _MenuItem(
+      const _MenuItem(
         id: 'rotas',
         title: 'Rotas',
         icon: Icons.route_outlined,
         activeIcon: Icons.route,
         route: '/rotas',
       ),
-      _MenuItem(
+      const _MenuItem(
         id: 'veiculos',
         title: 'Veiculos',
         icon: Icons.directions_car_outlined,
         activeIcon: Icons.directions_car,
         route: '/veiculos',
       ),
-      _MenuItem(
+      const _MenuItem(
         id: 'motoristas',
         title: 'Motoristas',
         icon: Icons.person_outline,
         activeIcon: Icons.person,
         route: '/motoristas',
       ),
-      _MenuItem(
+      const _MenuItem(
         id: 'empresas',
         title: 'Empresas',
         icon: Icons.business_outlined,
         activeIcon: Icons.business,
         route: '/empresas',
       ),
-      _MenuItem(
+      const _MenuItem(
         id: 'permissoes',
         title: 'Permissoes',
         icon: Icons.security_outlined,
         activeIcon: Icons.security,
         route: '/permissoes',
       ),
-      _MenuItem(
+      const _MenuItem(
         id: 'socorro',
         title: 'Socorro',
         icon: Icons.emergency_outlined,
         activeIcon: Icons.emergency,
         route: '/socorro',
       ),
-      _MenuItem(
+      const _MenuItem(
         id: 'alertas',
         title: 'Alertas',
         icon: Icons.warning_outlined,
         activeIcon: Icons.warning,
         route: '/alertas',
       ),
-      _MenuItem(
+      const _MenuItem(
         id: 'relatorios',
         title: 'Relatorios',
         icon: Icons.analytics_outlined,
         activeIcon: Icons.analytics,
         route: '/relatorios',
       ),
-      _MenuItem(
+      const _MenuItem(
         id: 'historico',
         title: 'Historico',
         icon: Icons.history_outlined,
         activeIcon: Icons.history,
         route: '/historico',
       ),
-      _MenuItem(
+      const _MenuItem(
         id: 'custos',
         title: 'Custos',
         icon: Icons.attach_money_outlined,
@@ -216,8 +213,7 @@ class GfSideNav extends ConsumerWidget {
   }
 
   Widget _buildMenuItem(
-      BuildContext context, WidgetRef ref, _MenuItem item, bool isActive) {
-    return _SideNavItemTile(
+      BuildContext context, WidgetRef ref, _MenuItem item, bool isActive) => _SideNavItemTile(
       item: item,
       isActive: isActive,
       onTap: () {
@@ -225,15 +221,14 @@ class GfSideNav extends ConsumerWidget {
         AppRouter.instance.go(item.route);
       },
     );
-  }
 }
 
 class _SideNavItemTile extends StatefulWidget {
+  const _SideNavItemTile(
+      {required this.item, required this.isActive, required this.onTap});
   final _MenuItem item;
   final bool isActive;
   final VoidCallback onTap;
-  const _SideNavItemTile(
-      {required this.item, required this.isActive, required this.onTap});
 
   @override
   State<_SideNavItemTile> createState() => _SideNavItemTileState();
@@ -330,11 +325,6 @@ class _SideNavItemTileState extends State<_SideNavItemTile> {
 // CLASSE AUXILIAR PARA ITENS DO MENU
 // ========================================
 class _MenuItem {
-  final String id;
-  final String title;
-  final IconData icon;
-  final IconData activeIcon;
-  final String route;
 
   const _MenuItem({
     required this.id,
@@ -343,4 +333,9 @@ class _MenuItem {
     required this.activeIcon,
     required this.route,
   });
+  final String id;
+  final String title;
+  final IconData icon;
+  final IconData activeIcon;
+  final String route;
 }

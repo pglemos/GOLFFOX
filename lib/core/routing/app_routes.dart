@@ -71,21 +71,13 @@ class AppRoutes {
   static const String maintenance = '/maintenance';
 
   /// Get route with parameters
-  static String tripDetailsWithId(String tripId) {
-    return tripDetails.replaceAll(':tripId', tripId);
-  }
+  static String tripDetailsWithId(String tripId) => tripDetails.replaceAll(':tripId', tripId);
 
-  static String tripTrackingWithId(String tripId) {
-    return tripTracking.replaceAll(':tripId', tripId);
-  }
+  static String tripTrackingWithId(String tripId) => tripTracking.replaceAll(':tripId', tripId);
 
-  static String tripPaymentWithId(String tripId) {
-    return tripPayment.replaceAll(':tripId', tripId);
-  }
+  static String tripPaymentWithId(String tripId) => tripPayment.replaceAll(':tripId', tripId);
 
-  static String tripRatingWithId(String tripId) {
-    return tripRating.replaceAll(':tripId', tripId);
-  }
+  static String tripRatingWithId(String tripId) => tripRating.replaceAll(':tripId', tripId);
 
   /// Get all routes as a list
   static List<String> get allRoutes => [
@@ -216,8 +208,7 @@ class AppRoutes {
       ];
 
   /// Get all available routes
-  static List<String> getAllRoutes() {
-    return [
+  static List<String> getAllRoutes() => [
       // Auth routes
       signup,
       forgotPassword,
@@ -281,11 +272,9 @@ class AppRoutes {
       notFound,
       maintenance,
     ];
-  }
 
   /// Get public routes (no authentication required)
-  static List<String> getPublicRoutes() {
-    return [
+  static List<String> getPublicRoutes() => [
       signup,
       forgotPassword,
       resetPassword,
@@ -293,11 +282,9 @@ class AppRoutes {
       notFound,
       maintenance,
     ];
-  }
 
   /// Get shared routes (accessible by all authenticated users)
-  static List<String> getSharedRoutes() {
-    return [
+  static List<String> getSharedRoutes() => [
       profile,
       settings,
       notifications,
@@ -311,7 +298,6 @@ class AppRoutes {
       tripPayment,
       tripRating,
     ];
-  }
 
   /// Get role-specific routes for a given role
   static List<String> getRoleRoutes(String role) {

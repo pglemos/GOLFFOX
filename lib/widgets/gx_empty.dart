@@ -3,14 +3,6 @@ import 'package:flutter/material.dart';
 import '../core/theme/gf_tokens.dart';
 
 class GxEmpty extends StatefulWidget {
-  final IconData icon;
-  final String title;
-  final String? message;
-  final Widget? action;
-  final Color? iconColor;
-  final double iconSize;
-  final bool animated;
-  final EdgeInsetsGeometry? padding;
 
   const GxEmpty({
     super.key,
@@ -23,6 +15,14 @@ class GxEmpty extends StatefulWidget {
     this.animated = true,
     this.padding,
   });
+  final IconData icon;
+  final String title;
+  final String? message;
+  final Widget? action;
+  final Color? iconColor;
+  final double iconSize;
+  final bool animated;
+  final EdgeInsetsGeometry? padding;
 
   @override
   State<GxEmpty> createState() => _GxEmptyState();
@@ -42,19 +42,19 @@ class _GxEmptyState extends State<GxEmpty> with SingleTickerProviderStateMixin {
     );
 
     _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
+      begin: 0,
+      end: 1,
     ).animate(CurvedAnimation(
       parent: _animationController,
-      curve: const Interval(0.0, 0.6, curve: Curves.easeOut),
+      curve: const Interval(0, 0.6, curve: Curves.easeOut),
     ));
 
     _scaleAnimation = Tween<double>(
       begin: 0.8,
-      end: 1.0,
+      end: 1,
     ).animate(CurvedAnimation(
       parent: _animationController,
-      curve: const Interval(0.2, 1.0, curve: Curves.elasticOut),
+      curve: const Interval(0.2, 1, curve: Curves.elasticOut),
     ));
 
     if (widget.animated) {
@@ -73,7 +73,7 @@ class _GxEmptyState extends State<GxEmpty> with SingleTickerProviderStateMixin {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    Widget content = Center(
+    final Widget content = Center(
       child: Padding(
         padding: widget.padding ?? const EdgeInsets.all(32),
         child: Column(
@@ -130,15 +130,13 @@ class _GxEmptyState extends State<GxEmpty> with SingleTickerProviderStateMixin {
 
     return AnimatedBuilder(
       animation: _animationController,
-      builder: (context, child) {
-        return FadeTransition(
+      builder: (context, child) => FadeTransition(
           opacity: _fadeAnimation,
           child: ScaleTransition(
             scale: _scaleAnimation,
             child: content,
           ),
-        );
-      },
+        ),
     );
   }
 }

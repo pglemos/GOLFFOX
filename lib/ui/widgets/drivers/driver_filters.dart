@@ -11,10 +11,7 @@ import '../../../services/driver_service.dart' as driver_services;
 
 class DriverFiltersPanel extends StatefulWidget {
   const DriverFiltersPanel({
-    super.key,
-    required this.filters,
-    required this.onFiltersChanged,
-    required this.onClearFilters,
+    required this.filters, required this.onFiltersChanged, required this.onClearFilters, super.key,
   });
 
   final driver_services.DriverFilters filters;
@@ -31,8 +28,7 @@ class _DriverFiltersPanelState extends State<DriverFiltersPanel> {
   driver_services.DriverFilters get _filters => widget.filters;
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
+  Widget build(BuildContext context) => Container(
       decoration: const BoxDecoration(
         color: Color(GfTokens.colorSurface),
         border: Border(
@@ -49,10 +45,8 @@ class _DriverFiltersPanelState extends State<DriverFiltersPanel> {
         ],
       ),
     );
-  }
 
-  Widget _buildHeader() {
-    return InkWell(
+  Widget _buildHeader() => InkWell(
       onTap: () => setState(() => _isExpanded = !_isExpanded),
       child: Padding(
         padding: const EdgeInsets.all(GfTokens.spacingMd),
@@ -108,10 +102,8 @@ class _DriverFiltersPanelState extends State<DriverFiltersPanel> {
         ),
       ),
     );
-  }
 
-  Widget _buildBody() {
-    return Padding(
+  Widget _buildBody() => Padding(
       padding: const EdgeInsets.fromLTRB(
         GfTokens.spacingMd,
         0,
@@ -131,10 +123,8 @@ class _DriverFiltersPanelState extends State<DriverFiltersPanel> {
         ],
       ),
     );
-  }
 
-  Widget _buildStatusSection() {
-    return _buildFilterSection(
+  Widget _buildStatusSection() => _buildFilterSection(
       title: 'Status',
       child: Wrap(
         spacing: GfTokens.spacingSm,
@@ -165,10 +155,8 @@ class _DriverFiltersPanelState extends State<DriverFiltersPanel> {
         }).toList(),
       ),
     );
-  }
 
-  Widget _buildLicenseSection() {
-    return _buildFilterSection(
+  Widget _buildLicenseSection() => _buildFilterSection(
       title: 'Categoria da Licenca',
       child: Wrap(
         spacing: GfTokens.spacingSm,
@@ -187,10 +175,8 @@ class _DriverFiltersPanelState extends State<DriverFiltersPanel> {
         }).toList(),
       ),
     );
-  }
 
-  Widget _buildAlertsAndOnlineSection() {
-    return Row(
+  Widget _buildAlertsAndOnlineSection() => Row(
       children: [
         Expanded(
           child: _buildFilterSection(
@@ -263,10 +249,8 @@ class _DriverFiltersPanelState extends State<DriverFiltersPanel> {
         ),
       ],
     );
-  }
 
-  Widget _buildSlidersSection() {
-    return Row(
+  Widget _buildSlidersSection() => Row(
       children: [
         Expanded(
           child: _buildFilterSection(
@@ -329,13 +313,11 @@ class _DriverFiltersPanelState extends State<DriverFiltersPanel> {
         ),
       ],
     );
-  }
 
   Widget _buildFilterSection({
     required String title,
     required Widget child,
-  }) {
-    return Column(
+  }) => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
@@ -350,7 +332,6 @@ class _DriverFiltersPanelState extends State<DriverFiltersPanel> {
         child,
       ],
     );
-  }
 
   void _updateFilters(driver_services.DriverFilters filters) {
     widget.onFiltersChanged(filters);

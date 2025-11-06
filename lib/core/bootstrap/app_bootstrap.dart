@@ -131,9 +131,6 @@ class AppBootstrap {
         url: EnvConfig.supabaseUrl,
         anonKey: EnvConfig.supabaseAnonKey,
         debug: EnvConfig.enableDebugLogs,
-        authOptions: const FlutterAuthClientOptions(
-          authFlowType: AuthFlowType.pkce,
-        ),
         realtimeClientOptions: const RealtimeClientOptions(
           logLevel: RealtimeLogLevel.info,
         ),
@@ -149,7 +146,7 @@ class AppBootstrap {
       _logger.info('Supabase initialized successfully');
       _logger.debug('Connection test query OK');
     } on TimeoutException {
-      throw BootstrapException(
+      throw const BootstrapException(
         'Supabase connection timeout. Please check your network connection and Supabase URL.',
       );
     } catch (error) {
@@ -164,7 +161,7 @@ class AppBootstrap {
     _logger.info('Setting up error handling...');
 
     // Handle Flutter framework errors
-    FlutterError.onError = (FlutterErrorDetails details) {
+    FlutterError.onError = (details) {
       _logger.error(
         'Flutter Error',
         details.exception,
@@ -237,9 +234,9 @@ class AppBootstrap {
 
 /// Custom exception for bootstrap errors
 class BootstrapException implements Exception {
-  final String message;
 
   const BootstrapException(this.message);
+  final String message;
 
   @override
   String toString() => 'BootstrapException: $message';

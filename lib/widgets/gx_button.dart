@@ -14,18 +14,6 @@ enum GxButtonSize {
 }
 
 class GxButton extends StatelessWidget {
-  final String label;
-  final VoidCallback? onPressed;
-  final IconData? icon;
-  final bool primary;
-  final bool loading;
-  final GxButtonVariant variant;
-  final GxButtonSize size;
-  final Color? color;
-  final Color? textColor;
-  final double? elevation;
-  final EdgeInsetsGeometry? padding;
-  final bool fullWidth;
 
   const GxButton(
     this.label, {
@@ -88,6 +76,18 @@ class GxButton extends StatelessWidget {
     this.padding,
     this.fullWidth = false,
   }) : variant = GxButtonVariant.elevated;
+  final String label;
+  final VoidCallback? onPressed;
+  final IconData? icon;
+  final bool primary;
+  final bool loading;
+  final GxButtonVariant variant;
+  final GxButtonSize size;
+  final Color? color;
+  final Color? textColor;
+  final double? elevation;
+  final EdgeInsetsGeometry? padding;
+  final bool fullWidth;
 
   EdgeInsetsGeometry _getPadding() {
     if (padding != null) return padding!;

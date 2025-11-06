@@ -1,16 +1,16 @@
 // lib/screens/carrier/carrier_dashboard.dart
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:golffox/models/user.dart';
-import 'package:golffox/models/trip.dart';
-import 'package:golffox/services/auth_service.dart';
-import 'package:golffox/services/supabase_service.dart';
-import 'package:golffox/core/routing/app_router.dart';
-import 'package:golffox/core/theme/gf_tokens.dart';
+import '../../models/user.dart';
+import '../../models/trip.dart';
+import '../../services/auth_service.dart';
+import '../../services/supabase_service.dart';
+import '../../core/routing/app_router.dart';
+import '../../core/theme/gf_tokens.dart';
 
 class CarrierDashboard extends StatefulWidget {
-  final User user;
   const CarrierDashboard({super.key, required this.user});
+  final User user;
 
   @override
   State<CarrierDashboard> createState() => _CarrierDashboardState();
@@ -359,9 +359,7 @@ class _CarrierDashboardState extends State<CarrierDashboard>
     );
   }
 
-  String _vehicleLabel(Map<String, dynamic> v) {
-    return (v['plate'] ?? v['name'] ?? v['id'] ?? 'veiculo').toString();
-  }
+  String _vehicleLabel(Map<String, dynamic> v) => (v['plate'] ?? v['name'] ?? v['id'] ?? 'veiculo').toString();
 }
 
 /* ======================= WIDGETS ======================= */
@@ -463,11 +461,11 @@ class _StatusChip extends StatelessWidget {
 }
 
 class KpiSpec {
+  KpiSpec(this.title, this.value, this.icon, this.color);
   final String title;
   final int value;
   final IconData icon;
   final Color color;
-  KpiSpec(this.title, this.value, this.icon, this.color);
 }
 
 class _KpiGrid extends StatelessWidget {
@@ -737,7 +735,7 @@ class _FleetPanel extends StatelessWidget {
       padding: const EdgeInsets.all(12),
       child: Column(
         children: [
-          _PanelHeader(title: 'Frota'),
+          const _PanelHeader(title: 'Frota'),
           const Divider(height: 16),
           if (vehicles.isEmpty)
             Padding(
@@ -832,7 +830,7 @@ class _QuickActions extends StatelessWidget {
       padding: const EdgeInsets.all(12),
       child: Column(
         children: [
-          _PanelHeader(title: 'Acoes rapidas'),
+          const _PanelHeader(title: 'Acoes rapidas'),
           const Divider(height: 16),
           Wrap(
             spacing: 10,

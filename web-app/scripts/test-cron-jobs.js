@@ -79,7 +79,12 @@ async function testCronJobs() {
   }
 
   console.log(`🧪 Testando cron jobs em ${BASE_URL}\n`)
-  console.log(`🔑 CRON_SECRET: ${CRON_SECRET ? '✅ Configurado' : '❌ Não configurado'}\n`)
+  console.log(`🔑 CRON_SECRET: ${CRON_SECRET ? '✅ Configurado' : '❌ Não configurado'}`)
+  if (CRON_SECRET) {
+    console.log(`   Primeiros 10 caracteres: ${CRON_SECRET.substring(0, 10)}...\n`)
+  } else {
+    console.log('')
+  }
 
   for (const endpoint of CRON_ENDPOINTS) {
     const url = `${BASE_URL}${endpoint.path}`
@@ -117,6 +122,9 @@ async function testCronJobs() {
           if (body.processed !== undefined) {
             console.log(`   📊 Processados: ${body.processed}`)
           }
+          if (body.message) {
+            console.log(`   💬 ${body.message}`)
+          }
         } catch (e) {
           // Ignorar erro de parse
         }
@@ -124,6 +132,25 @@ async function testCronJobs() {
         console.log(`   ⚠️  ${response.status} ${response.statusText}`)
         if (response.status === 401) {
           console.log(`   ⚠️  Não autorizado - verifique CRON_SECRET`)
+          console.log(`   💡 Dica: Verifique se o header está correto: Authorization: Bearer ${CRON_SECRET?.substring(0, 10)}...`)
+          try {
+            const body = JSON.parse(response.body)
+            if (body.error) {
+              console.log(`   📋 Erro: ${body.error}`)
+            }
+          } catch (e) {
+            // Ignorar
+          }
+        } else if (response.status === 500) {
+          console.log(`   ⚠️  Erro interno do servidor`)
+          try {
+            const body = JSON.parse(response.body)
+            if (body.error) {
+              console.log(`   📋 Erro: ${body.error}`)
+            }
+          } catch (e) {
+            // Ignorar
+          }
         }
       }
     } catch (error) {

@@ -133,12 +133,6 @@ extension LicenseCategoryExtension on LicenseCategory {
 }
 
 class DriverLicense {
-  final String number;
-  final LicenseCategory category;
-  final DateTime issueDate;
-  final DateTime expiryDate;
-  final String issuingAuthority;
-  final bool isValid;
 
   const DriverLicense({
     required this.number,
@@ -162,9 +156,14 @@ class DriverLicense {
       isValid: json['isValid'] as bool? ?? true,
     );
   }
+  final String number;
+  final LicenseCategory category;
+  final DateTime issueDate;
+  final DateTime expiryDate;
+  final String issuingAuthority;
+  final bool isValid;
 
-  Map<String, dynamic> toJson() {
-    return {
+  Map<String, dynamic> toJson() => {
       'number': number,
       'category': category.name,
       'issueDate': issueDate.toIso8601String(),
@@ -172,7 +171,6 @@ class DriverLicense {
       'issuingAuthority': issuingAuthority,
       'isValid': isValid,
     };
-  }
 
   DriverLicense copyWith({
     String? number,
@@ -181,8 +179,7 @@ class DriverLicense {
     DateTime? expiryDate,
     String? issuingAuthority,
     bool? isValid,
-  }) {
-    return DriverLicense(
+  }) => DriverLicense(
       number: number ?? this.number,
       category: category ?? this.category,
       issueDate: issueDate ?? this.issueDate,
@@ -190,7 +187,6 @@ class DriverLicense {
       issuingAuthority: issuingAuthority ?? this.issuingAuthority,
       isValid: isValid ?? this.isValid,
     );
-  }
 
   bool get isExpired => DateTime.now().isAfter(expiryDate);
   bool get isExpiringSoon =>
@@ -200,14 +196,6 @@ class DriverLicense {
 }
 
 class DriverCertification {
-  final String id;
-  final String name;
-  final String description;
-  final DateTime issueDate;
-  final DateTime? expiryDate;
-  final String issuingOrganization;
-  final String? certificateNumber;
-  final bool isActive;
 
   const DriverCertification({
     required this.id,
@@ -234,9 +222,16 @@ class DriverCertification {
       isActive: json['isActive'] as bool? ?? true,
     );
   }
+  final String id;
+  final String name;
+  final String description;
+  final DateTime issueDate;
+  final DateTime? expiryDate;
+  final String issuingOrganization;
+  final String? certificateNumber;
+  final bool isActive;
 
-  Map<String, dynamic> toJson() {
-    return {
+  Map<String, dynamic> toJson() => {
       'id': id,
       'name': name,
       'description': description,
@@ -246,7 +241,6 @@ class DriverCertification {
       'certificateNumber': certificateNumber,
       'isActive': isActive,
     };
-  }
 
   bool get isExpired =>
       expiryDate != null && DateTime.now().isAfter(expiryDate!);
@@ -256,14 +250,6 @@ class DriverCertification {
 }
 
 class DriverRating {
-  final String id;
-  final String tripId;
-  final String passengerId;
-  final String? passengerName;
-  final double rating;
-  final String? comment;
-  final DateTime createdAt;
-  final List<String> tags;
 
   const DriverRating({
     required this.id,
@@ -288,9 +274,16 @@ class DriverRating {
       tags: List<String>.from(json['tags'] as List? ?? []),
     );
   }
+  final String id;
+  final String tripId;
+  final String passengerId;
+  final String? passengerName;
+  final double rating;
+  final String? comment;
+  final DateTime createdAt;
+  final List<String> tags;
 
-  Map<String, dynamic> toJson() {
-    return {
+  Map<String, dynamic> toJson() => {
       'id': id,
       'tripId': tripId,
       'passengerId': passengerId,
@@ -300,18 +293,9 @@ class DriverRating {
       'createdAt': createdAt.toIso8601String(),
       'tags': tags,
     };
-  }
 }
 
 class DriverStats {
-  final int totalTrips;
-  final double totalDistance;
-  final Duration totalDrivingTime;
-  final double averageRating;
-  final int totalRatings;
-  final double fuelEfficiency;
-  final int safetyScore;
-  final DateTime lastTripDate;
 
   const DriverStats({
     this.totalTrips = 0,
@@ -340,9 +324,16 @@ class DriverStats {
           : DateTime.now(),
     );
   }
+  final int totalTrips;
+  final double totalDistance;
+  final Duration totalDrivingTime;
+  final double averageRating;
+  final int totalRatings;
+  final double fuelEfficiency;
+  final int safetyScore;
+  final DateTime lastTripDate;
 
-  Map<String, dynamic> toJson() {
-    return {
+  Map<String, dynamic> toJson() => {
       'totalTrips': totalTrips,
       'totalDistance': totalDistance,
       'totalDrivingTimeMs': totalDrivingTime.inMilliseconds,
@@ -352,7 +343,6 @@ class DriverStats {
       'safetyScore': safetyScore,
       'lastTripDate': lastTripDate.toIso8601String(),
     };
-  }
 
   String get formattedDistance {
     if (totalDistance < 1000) {
@@ -372,33 +362,11 @@ class DriverStats {
   }
 
   String get ratingDisplay => totalRatings > 0
-      ? '${averageRating.toStringAsFixed(1)} (${totalRatings})'
+      ? '${averageRating.toStringAsFixed(1)} ($totalRatings)'
       : 'Sem avaliacoes';
 }
 
 class Driver {
-  final String id;
-  final String name;
-  final String email;
-  final String? phone;
-  final String? cpf;
-  final DateTime? birthDate;
-  final String? address;
-  final String? profileImageUrl;
-  final String? emergencyContact;
-  final String? emergencyPhone;
-  final DriverStatus status;
-  final DriverLicense license;
-  final List<DriverCertification> certifications;
-  final List<DriverRating> ratings;
-  final DriverStats stats;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-  final String? currentVehicleId;
-  final Map<String, dynamic> preferences;
-  final List<String> availableHours;
-  final bool isOnline;
-  final DateTime? lastSeenAt;
 
   const Driver({
     required this.id,
@@ -478,9 +446,30 @@ class Driver {
           : null,
     );
   }
+  final String id;
+  final String name;
+  final String email;
+  final String? phone;
+  final String? cpf;
+  final DateTime? birthDate;
+  final String? address;
+  final String? profileImageUrl;
+  final String? emergencyContact;
+  final String? emergencyPhone;
+  final DriverStatus status;
+  final DriverLicense license;
+  final List<DriverCertification> certifications;
+  final List<DriverRating> ratings;
+  final DriverStats stats;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final String? currentVehicleId;
+  final Map<String, dynamic> preferences;
+  final List<String> availableHours;
+  final bool isOnline;
+  final DateTime? lastSeenAt;
 
-  Map<String, dynamic> toJson() {
-    return {
+  Map<String, dynamic> toJson() => {
       'id': id,
       'name': name,
       'email': email,
@@ -502,7 +491,6 @@ class Driver {
       'isOnline': isOnline,
       'lastSeenAt': lastSeenAt?.toIso8601String(),
     };
-  }
 
   Driver copyWith({
     String? id,
@@ -525,8 +513,7 @@ class Driver {
     List<String>? availableHours,
     bool? isOnline,
     DateTime? lastSeenAt,
-  }) {
-    return Driver(
+  }) => Driver(
       id: id ?? this.id,
       name: name ?? this.name,
       email: email ?? this.email,
@@ -548,7 +535,6 @@ class Driver {
       isOnline: isOnline ?? this.isOnline,
       lastSeenAt: lastSeenAt ?? this.lastSeenAt,
     );
-  }
 
   // Getters uteis
   bool get isAvailable => status == DriverStatus.available && isOnline;
@@ -564,7 +550,7 @@ class Driver {
   int get age {
     if (birthDate == null) return 0;
     final now = DateTime.now();
-    int age = now.year - birthDate!.year;
+    var age = now.year - birthDate!.year;
     if (now.month < birthDate!.month ||
         (now.month == birthDate!.month && now.day < birthDate!.day)) {
       age--;

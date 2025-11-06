@@ -10,9 +10,7 @@ final realtimeServiceProvider = Provider<RealtimeService>((ref) {
   service.initialize();
 
   // Limpar recursos quando o provider for descartado
-  ref.onDispose(() {
-    service.dispose();
-  });
+  ref.onDispose(service.dispose);
 
   return service;
 });
@@ -51,24 +49,22 @@ final searchVehiclePositionsProvider =
   if (query.isEmpty) return positions;
 
   final lowerQuery = query.toLowerCase();
-  return positions.where((vehicle) {
-    return vehicle.licensePlate.toLowerCase().contains(lowerQuery) ||
+  return positions.where((vehicle) => vehicle.licensePlate.toLowerCase().contains(lowerQuery) ||
         vehicle.driverName.toLowerCase().contains(lowerQuery) ||
-        (vehicle.routeName?.toLowerCase().contains(lowerQuery) ?? false);
-  }).toList();
+        (vehicle.routeName?.toLowerCase().contains(lowerQuery) ?? false)).toList();
 });
 
 /// Provider para estatisticas dos veiculos
 final vehicleStatsProvider = Provider<VehicleStats>((ref) {
   final positions = ref.watch(currentVehiclePositionsProvider);
 
-  int active = 0;
-  int inactive = 0;
-  int maintenance = 0;
-  int emergency = 0;
-  int offline = 0;
+  var active = 0;
+  var inactive = 0;
+  var maintenance = 0;
+  var emergency = 0;
+  var offline = 0;
   double totalSpeed = 0;
-  int movingVehicles = 0;
+  var movingVehicles = 0;
 
   for (final position in positions) {
     switch (position.status) {
@@ -107,13 +103,6 @@ final vehicleStatsProvider = Provider<VehicleStats>((ref) {
 
 /// Classe para estatisticas dos veiculos
 class VehicleStats {
-  final int total;
-  final int active;
-  final int inactive;
-  final int maintenance;
-  final int emergency;
-  final int offline;
-  final double averageSpeed;
 
   const VehicleStats({
     required this.total,
@@ -124,6 +113,13 @@ class VehicleStats {
     required this.offline,
     required this.averageSpeed,
   });
+  final int total;
+  final int active;
+  final int inactive;
+  final int maintenance;
+  final int emergency;
+  final int offline;
+  final double averageSpeed;
 
   double get activePercentage => total > 0 ? (active / total) * 100 : 0;
   double get inactivePercentage => total > 0 ? (inactive / total) * 100 : 0;

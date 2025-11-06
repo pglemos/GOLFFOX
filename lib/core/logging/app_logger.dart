@@ -189,7 +189,7 @@ Body: $sanitizedBody
   }
 
   /// Sanitiza dados removendo informações sensíveis
-  static dynamic _sanitizeData(dynamic data) {
+  static dynamic _sanitizeData(data) {
     if (data == null) return null;
 
     if (data is String) {
@@ -200,7 +200,7 @@ Body: $sanitizedBody
       final sanitized = <String, dynamic>{};
       data.forEach((key, value) {
         final keyStr = key.toString().toLowerCase();
-        if (_sensitiveKeywords.any((keyword) => keyStr.contains(keyword))) {
+        if (_sensitiveKeywords.any(keyStr.contains)) {
           sanitized[keyStr] = _maskValue(value.toString());
         } else {
           sanitized[keyStr] = _sanitizeData(value);
@@ -218,7 +218,7 @@ Body: $sanitizedBody
 
   /// Sanitiza mensagem de log
   static String _sanitizeMessage(String message) {
-    String sanitized = message;
+    var sanitized = message;
     
     for (final keyword in _sensitiveKeywords) {
       // Regex para encontrar padrões como "password: value" ou "password=value"

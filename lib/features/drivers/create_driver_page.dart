@@ -14,12 +14,12 @@ import '../../ui/widgets/common/gf_app_bar.dart';
 import '../../ui/widgets/common/gf_loading_indicator.dart';
 
 class CreateDriverPage extends ConsumerStatefulWidget {
-  final Driver? driver;
 
   const CreateDriverPage({
     super.key,
     this.driver,
   });
+  final Driver? driver;
 
   @override
   ConsumerState<CreateDriverPage> createState() => _CreateDriverPageState();
@@ -135,10 +135,10 @@ class _CreateDriverPageState extends ConsumerState<CreateDriverPage> {
           // Indicador de progresso
           Container(
             padding: const EdgeInsets.all(GfTokens.spacingMd),
-            decoration: BoxDecoration(
-              color: const Color(GfTokens.colorSurface),
+            decoration: const BoxDecoration(
+              color: Color(GfTokens.colorSurface),
               border: Border(
-                bottom: BorderSide(color: const Color(GfTokens.colorBorder)),
+                bottom: BorderSide(color: Color(GfTokens.colorBorder)),
               ),
             ),
             child: Row(
@@ -220,17 +220,14 @@ class _CreateDriverPageState extends ConsumerState<CreateDriverPage> {
     );
   }
 
-  Widget _buildStepConnector() {
-    return Container(
+  Widget _buildStepConnector() => Container(
       height: 2,
       width: 32,
       color: const Color(GfTokens.colorBorder),
       margin: const EdgeInsets.only(bottom: 20),
     );
-  }
 
-  Widget _buildPersonalInfoPage() {
-    return SingleChildScrollView(
+  Widget _buildPersonalInfoPage() => SingleChildScrollView(
       padding: const EdgeInsets.all(GfTokens.spacingMd),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -511,10 +508,8 @@ class _CreateDriverPageState extends ConsumerState<CreateDriverPage> {
         ],
       ),
     ).animate().fadeIn(duration: 300.ms).slideX(begin: 0.1);
-  }
 
-  Widget _buildLicenseInfoPage() {
-    return SingleChildScrollView(
+  Widget _buildLicenseInfoPage() => SingleChildScrollView(
       padding: const EdgeInsets.all(GfTokens.spacingMd),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -684,10 +679,8 @@ class _CreateDriverPageState extends ConsumerState<CreateDriverPage> {
         ],
       ),
     ).animate().fadeIn(duration: 300.ms).slideX(begin: 0.1);
-  }
 
-  Widget _buildCertificationsPage() {
-    return SingleChildScrollView(
+  Widget _buildCertificationsPage() => SingleChildScrollView(
       padding: const EdgeInsets.all(GfTokens.spacingMd),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -797,7 +790,6 @@ class _CreateDriverPageState extends ConsumerState<CreateDriverPage> {
         ],
       ),
     ).animate().fadeIn(duration: 300.ms).slideX(begin: 0.1);
-  }
 
   void _nextPage() {
     if (_currentPage < 2) {
@@ -881,7 +873,7 @@ class _CreateDriverPageState extends ConsumerState<CreateDriverPage> {
     );
   }
 
-  void _selectBirthDate() async {
+  Future<void> _selectBirthDate() async {
     final date = await showDatePicker(
       context: context,
       initialDate: _birthDate ?? DateTime.now().subtract(const Duration(days: 365 * 25)),
@@ -896,7 +888,7 @@ class _CreateDriverPageState extends ConsumerState<CreateDriverPage> {
     }
   }
 
-  void _selectHireDate() async {
+  Future<void> _selectHireDate() async {
     final date = await showDatePicker(
       context: context,
       initialDate: _hireDate ?? DateTime.now(),
@@ -911,7 +903,7 @@ class _CreateDriverPageState extends ConsumerState<CreateDriverPage> {
     }
   }
 
-  void _selectLicenseIssueDate() async {
+  Future<void> _selectLicenseIssueDate() async {
     final date = await showDatePicker(
       context: context,
       initialDate: _licenseIssueDate ?? DateTime.now().subtract(const Duration(days: 365)),
@@ -926,7 +918,7 @@ class _CreateDriverPageState extends ConsumerState<CreateDriverPage> {
     }
   }
 
-  void _selectLicenseExpiryDate() async {
+  Future<void> _selectLicenseExpiryDate() async {
     final date = await showDatePicker(
       context: context,
       initialDate: _licenseExpiryDate ?? DateTime.now().add(const Duration(days: 365)),
@@ -956,7 +948,7 @@ class _CreateDriverPageState extends ConsumerState<CreateDriverPage> {
     });
   }
 
-  void _saveDriver() async {
+  Future<void> _saveDriver() async {
     final formState = _formKey.currentState;
     if (formState == null || !formState.validate() || !_validateCurrentPage()) {
       return;
@@ -973,7 +965,7 @@ class _CreateDriverPageState extends ConsumerState<CreateDriverPage> {
         email: _emailController.text.trim(),
         phone: _phoneController.text.trim(),
         address: _addressController.text.trim(),
-        birthDate: _birthDate!,
+        birthDate: _birthDate,
         status: _status,
         license: DriverLicense(
           number: _licenseNumberController.text.trim(),

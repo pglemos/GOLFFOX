@@ -2,10 +2,6 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
 class GxLineChart extends StatelessWidget {
-  final List<FlSpot> points;
-  final Color? color;
-  final double strokeWidth;
-  final bool showDots;
 
   const GxLineChart(
       {super.key,
@@ -13,6 +9,10 @@ class GxLineChart extends StatelessWidget {
       this.color,
       this.strokeWidth = 3,
       this.showDots = false});
+  final List<FlSpot> points;
+  final Color? color;
+  final double strokeWidth;
+  final bool showDots;
 
   @override
   Widget build(BuildContext context) {

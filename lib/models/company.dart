@@ -6,14 +6,6 @@ typedef Json = Map<String, dynamic>;
 
 @immutable
 class Company {
-  final String id;
-  final String name;
-  final String? address;
-  final String? phone;
-  final String? email;
-  final bool isActive;
-  final DateTime createdAt;
-  final DateTime updatedAt;
 
   const Company({
     required this.id,
@@ -26,6 +18,37 @@ class Company {
     required this.updatedAt,
   })  : assert(id != ''),
         assert(name != '');
+
+  /// Mantem compatibilidade: carrega de snake_case (padrao Supabase)
+  factory Company.fromJson(Map<String, dynamic> json) => Company(
+        id: _asString(json[CompanyFields.id])!,
+        name: _asString(json[CompanyFields.name])!,
+        address: _asString(json[CompanyFields.address]),
+        phone: _asString(json[CompanyFields.phone]),
+        email: _asString(json[CompanyFields.email]),
+        isActive: _asBool(json[CompanyFields.isActive], defaultValue: true),
+        createdAt: _asDateTime(json[CompanyFields.createdAt])!,
+        updatedAt: _asDateTime(json[CompanyFields.updatedAt])!,
+      );
+
+  factory Company.fromAppJson(Map<String, dynamic> json) => Company(
+        id: _asString(json['id'])!,
+        name: _asString(json['name'])!,
+        address: _asString(json['address']),
+        phone: _asString(json['phone']),
+        email: _asString(json['email']),
+        isActive: _asBool(json['isActive'], defaultValue: true),
+        createdAt: _asDateTime(json['createdAt'])!,
+        updatedAt: _asDateTime(json['updatedAt'])!,
+      );
+  final String id;
+  final String name;
+  final String? address;
+  final String? phone;
+  final String? email;
+  final bool isActive;
+  final DateTime createdAt;
+  final DateTime updatedAt;
 
   /* ------------------------- SERIALIZACAO (DB / snake_case) ------------------------- */
 
@@ -41,18 +64,6 @@ class Company {
         CompanyFields.updatedAt: updatedAt.toIso8601String(),
       };
 
-  /// Mantem compatibilidade: carrega de snake_case (padrao Supabase)
-  factory Company.fromJson(Map<String, dynamic> json) => Company(
-        id: _asString(json[CompanyFields.id])!,
-        name: _asString(json[CompanyFields.name])!,
-        address: _asString(json[CompanyFields.address]),
-        phone: _asString(json[CompanyFields.phone]),
-        email: _asString(json[CompanyFields.email]),
-        isActive: _asBool(json[CompanyFields.isActive], defaultValue: true),
-        createdAt: _asDateTime(json[CompanyFields.createdAt])!,
-        updatedAt: _asDateTime(json[CompanyFields.updatedAt])!,
-      );
-
   /* ------------------------- SERIALIZACAO (App / camelCase) ------------------------- */
 
   Map<String, dynamic> toAppJson() => <String, dynamic>{
@@ -65,17 +76,6 @@ class Company {
         'createdAt': createdAt.toIso8601String(),
         'updatedAt': updatedAt.toIso8601String(),
       };
-
-  factory Company.fromAppJson(Map<String, dynamic> json) => Company(
-        id: _asString(json['id'])!,
-        name: _asString(json['name'])!,
-        address: _asString(json['address']),
-        phone: _asString(json['phone']),
-        email: _asString(json['email']),
-        isActive: _asBool(json['isActive'], defaultValue: true),
-        createdAt: _asDateTime(json['createdAt'])!,
-        updatedAt: _asDateTime(json['updatedAt'])!,
-      );
 
   /* ------------------------- Helpers p/ Supabase (INSERT/UPDATE) ------------------------- */
 
@@ -198,26 +198,29 @@ class Company {
 
   /* --------------------------------- HELPERS --------------------------------- */
 
-  static String? _asString(dynamic v) => v?.toString();
+  static String? _asString(v) => v?.toString();
 
-  static bool _asBool(dynamic v, {bool defaultValue = false}) {
+  static bool _asBool(v, {bool defaultValue = false}) {
     if (v is bool) return v;
     if (v is num) return v != 0;
     if (v is String) {
       final s = v.toLowerCase().trim();
-      if (s == 'true' || s == '1' || s == 't' || s == 'yes' || s == 'y')
+      if (s == 'true' || s == '1' || s == 't' || s == 'yes' || s == 'y') {
         return true;
-      if (s == 'false' || s == '0' || s == 'f' || s == 'no' || s == 'n')
+      }
+      if (s == 'false' || s == '0' || s == 'f' || s == 'no' || s == 'n') {
         return false;
+      }
     }
     return defaultValue;
   }
 
-  static DateTime? _asDateTime(dynamic v) {
+  static DateTime? _asDateTime(v) {
     if (v == null) return null;
     if (v is DateTime) return v;
-    if (v is int)
+    if (v is int) {
       return DateTime.fromMillisecondsSinceEpoch(v, isUtc: true).toLocal();
+    }
     if (v is String && v.isNotEmpty) return DateTime.parse(v);
     return null;
   }

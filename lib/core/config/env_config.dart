@@ -42,12 +42,10 @@ class EnvConfig {
   // Feature Flags
   static const bool enableAnalytics = bool.fromEnvironment(
     'ENABLE_ANALYTICS',
-    defaultValue: false,
   );
 
   static const bool enableCrashlytics = bool.fromEnvironment(
     'ENABLE_CRASHLYTICS',
-    defaultValue: false,
   );
 
   // Development Configuration
@@ -62,11 +60,9 @@ class EnvConfig {
   );
 
   // Validation
-  static bool get isValidConfig {
-    return supabaseUrl.isNotEmpty &&
+  static bool get isValidConfig => supabaseUrl.isNotEmpty &&
         supabaseAnonKey.isNotEmpty &&
         _isValidUrl(supabaseUrl);
-  }
 
   static bool get isDevelopment => environment == 'development';
   static bool get isProduction => environment == 'production';

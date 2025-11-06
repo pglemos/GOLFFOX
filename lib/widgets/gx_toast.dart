@@ -14,19 +14,19 @@ class GxToast {
       showGxToast(context, message, type: GxToastType.warn);
 
   static void info(BuildContext context, String message) =>
-      showGxToast(context, message, type: GxToastType.info);
+      showGxToast(context, message);
 }
 
 void showGxToast(BuildContext context, String message,
     {GxToastType type = GxToastType.info}) {
   final cs = Theme.of(context).colorScheme;
-  final Color bg = switch (type) {
+  final bg = switch (type) {
     GxToastType.success => cs.primaryContainer,
     GxToastType.warn => cs.tertiaryContainer,
     GxToastType.error => cs.errorContainer,
     _ => cs.inverseSurface,
   };
-  final Color fg = switch (type) {
+  final fg = switch (type) {
     GxToastType.success => cs.onPrimaryContainer,
     GxToastType.warn => cs.onTertiaryContainer,
     GxToastType.error => cs.onErrorContainer,

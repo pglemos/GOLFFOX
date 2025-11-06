@@ -68,34 +68,26 @@ extension VehicleEventTypeExtension on VehicleEventType {
   Color get color {
     switch (this) {
       case VehicleEventType.created:
-        return Color(GfTokens.success);
+        return const Color(GfTokens.success);
       case VehicleEventType.updated:
-        return Color(GfTokens.info);
+        return const Color(GfTokens.info);
       case VehicleEventType.statusChanged:
-        return Color(GfTokens.warning);
+        return const Color(GfTokens.warning);
       case VehicleEventType.maintenanceScheduled:
-        return Color(GfTokens.warning);
+        return const Color(GfTokens.warning);
       case VehicleEventType.maintenanceCompleted:
-        return Color(GfTokens.success);
+        return const Color(GfTokens.success);
       case VehicleEventType.fuelAdded:
-        return Color(GfTokens.colorWarning);
+        return const Color(GfTokens.colorWarning);
       case VehicleEventType.documentUpdated:
-        return Color(GfTokens.colorInfo);
+        return const Color(GfTokens.colorInfo);
       case VehicleEventType.positionUpdated:
-        return Color(GfTokens.colorPrimary);
+        return const Color(GfTokens.colorPrimary);
     }
   }
 }
 
 class VehicleEvent {
-  final String id;
-  final VehicleEventType type;
-  final String title;
-  final String description;
-  final DateTime timestamp;
-  final String? userId;
-  final String? userName;
-  final Map<String, dynamic>? metadata;
 
   const VehicleEvent({
     required this.id,
@@ -123,9 +115,16 @@ class VehicleEvent {
       metadata: json['metadata'] as Map<String, dynamic>?,
     );
   }
+  final String id;
+  final VehicleEventType type;
+  final String title;
+  final String description;
+  final DateTime timestamp;
+  final String? userId;
+  final String? userName;
+  final Map<String, dynamic>? metadata;
 
-  Map<String, dynamic> toJson() {
-    return {
+  Map<String, dynamic> toJson() => {
       'id': id,
       'type': type.name,
       'title': title,
@@ -135,16 +134,15 @@ class VehicleEvent {
       'userName': userName,
       'metadata': metadata,
     };
-  }
 }
 
 class VehicleHistory extends ConsumerStatefulWidget {
-  final String vehicleId;
 
   const VehicleHistory({
     super.key,
     required this.vehicleId,
   });
+  final String vehicleId;
 
   @override
   ConsumerState<VehicleHistory> createState() => _VehicleHistoryState();
@@ -154,8 +152,7 @@ class _VehicleHistoryState extends ConsumerState<VehicleHistory> {
   VehicleEventType? _selectedEventType;
 
   @override
-  Widget build(BuildContext context) {
-    return FutureBuilder<Vehicle?>(
+  Widget build(BuildContext context) => FutureBuilder<Vehicle?>(
       future: ref.read(vehicleServiceProvider).getVehicleById(widget.vehicleId),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -267,7 +264,6 @@ class _VehicleHistoryState extends ConsumerState<VehicleHistory> {
         );
       },
     );
-  }
 
   Widget _buildEventTypeChip(VehicleEventType? type, String label) {
     final isSelected = _selectedEventType == type;
@@ -280,21 +276,20 @@ class _VehicleHistoryState extends ConsumerState<VehicleHistory> {
         });
       },
       backgroundColor: isSelected
-          ? (type?.color ?? Color(GfTokens.colorPrimary)).withValues(alpha: 0.1)
+          ? (type?.color ?? const Color(GfTokens.colorPrimary)).withValues(alpha: 0.1)
           : null,
       selectedColor:
-          (type?.color ?? Color(GfTokens.colorPrimary)).withValues(alpha: 0.2),
-      checkmarkColor: type?.color ?? Color(GfTokens.colorPrimary),
+          (type?.color ?? const Color(GfTokens.colorPrimary)).withValues(alpha: 0.2),
+      checkmarkColor: type?.color ?? const Color(GfTokens.colorPrimary),
       side: BorderSide(
         color: isSelected
-            ? (type?.color ?? Color(GfTokens.colorPrimary))
-            : Color(GfTokens.colorBorder),
+            ? (type?.color ?? const Color(GfTokens.colorPrimary))
+            : const Color(GfTokens.colorBorder),
       ),
     );
   }
 
-  Widget _buildEventItem(VehicleEvent event, bool isLast) {
-    return Row(
+  Widget _buildEventItem(VehicleEvent event, bool isLast) => Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Timeline
@@ -404,10 +399,8 @@ class _VehicleHistoryState extends ConsumerState<VehicleHistory> {
         ),
       ],
     );
-  }
 
-  Widget _buildMetadata(Map<String, dynamic> metadata) {
-    return Container(
+  Widget _buildMetadata(Map<String, dynamic> metadata) => Container(
       padding: const EdgeInsets.all(GfTokens.spacingSm),
       decoration: BoxDecoration(
         color: Color(GfTokens.colorSurfaceVariant).withValues(alpha: 0.5),
@@ -443,10 +436,8 @@ class _VehicleHistoryState extends ConsumerState<VehicleHistory> {
         }).toList(),
       ),
     );
-  }
 
-  Widget _buildEmptyState() {
-    return Center(
+  Widget _buildEmptyState() => Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -488,7 +479,6 @@ class _VehicleHistoryState extends ConsumerState<VehicleHistory> {
         ],
       ),
     );
-  }
 
   List<VehicleEvent> _generateVehicleEvents(Vehicle vehicle) {
     final events = <VehicleEvent>[];

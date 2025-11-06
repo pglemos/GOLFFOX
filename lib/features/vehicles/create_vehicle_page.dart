@@ -14,12 +14,12 @@ import '../../models/vehicle.dart';
 import '../../services/vehicle_service.dart';
 
 class CreateVehiclePage extends ConsumerStatefulWidget {
-  final Vehicle? vehicle;
 
   const CreateVehiclePage({
     super.key,
     this.vehicle,
   });
+  final Vehicle? vehicle;
 
   @override
   ConsumerState<CreateVehiclePage> createState() => _CreateVehiclePageState();
@@ -86,8 +86,8 @@ class _CreateVehiclePageState extends ConsumerState<CreateVehiclePage>
       vsync: this,
     );
     _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
+      begin: 0,
+      end: 1,
     ).animate(CurvedAnimation(
       parent: _animationController,
       curve: Curves.easeInOut,
@@ -248,8 +248,7 @@ class _CreateVehiclePageState extends ConsumerState<CreateVehiclePage>
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       backgroundColor: const Color(GfTokens.colorSurfaceBackground),
       appBar: GfAppBar(
         title: widget.vehicle == null ? 'New Vehicle' : 'Edit Vehicle',
@@ -374,10 +373,8 @@ class _CreateVehiclePageState extends ConsumerState<CreateVehiclePage>
         ),
       ),
     );
-  }
 
-  Widget _buildBasicInfoPage() {
-    return SingleChildScrollView(
+  Widget _buildBasicInfoPage() => SingleChildScrollView(
       padding: const EdgeInsets.all(GfTokens.spacingMd),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -495,10 +492,8 @@ class _CreateVehiclePageState extends ConsumerState<CreateVehiclePage>
         ],
       ),
     );
-  }
 
-  Widget _buildSpecificationsPage() {
-    return SingleChildScrollView(
+  Widget _buildSpecificationsPage() => SingleChildScrollView(
       padding: const EdgeInsets.all(GfTokens.spacingMd),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -772,10 +767,8 @@ class _CreateVehiclePageState extends ConsumerState<CreateVehiclePage>
         ],
       ),
     );
-  }
 
-  Widget _buildDocumentsPage() {
-    return SingleChildScrollView(
+  Widget _buildDocumentsPage() => SingleChildScrollView(
       padding: const EdgeInsets.all(GfTokens.spacingMd),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -911,14 +904,12 @@ class _CreateVehiclePageState extends ConsumerState<CreateVehiclePage>
         ],
       ),
     );
-  }
 
   Widget _buildDateField({
     required String label,
     required DateTime? date,
     required ValueChanged<DateTime> onDateSelected,
-  }) {
-    return InkWell(
+  }) => InkWell(
       onTap: () async {
         final selectedDate = await showDatePicker(
           context: context,
@@ -945,5 +936,4 @@ class _CreateVehiclePageState extends ConsumerState<CreateVehiclePage>
         ),
       ),
     );
-  }
 }

@@ -3,12 +3,6 @@ import 'package:flutter_map/flutter_map.dart' as flutter_map;
 import 'package:latlong2/latlong.dart';
 
 class GxMap extends StatelessWidget {
-  final LatLng center;
-  final double zoom;
-  final List<flutter_map.Marker> markers;
-  final List<flutter_map.Polyline> polylines;
-  final List<flutter_map.Polygon> polygons;
-  final Widget? legend;
 
   const GxMap({
     super.key,
@@ -19,10 +13,15 @@ class GxMap extends StatelessWidget {
     this.polygons = const [],
     this.legend,
   });
+  final LatLng center;
+  final double zoom;
+  final List<flutter_map.Marker> markers;
+  final List<flutter_map.Polyline> polylines;
+  final List<flutter_map.Polygon> polygons;
+  final Widget? legend;
 
   @override
-  Widget build(BuildContext context) {
-    return Stack(
+  Widget build(BuildContext context) => Stack(
       children: [
         flutter_map.FlutterMap(
           options:
@@ -48,5 +47,4 @@ class GxMap extends StatelessWidget {
           ),
       ],
     );
-  }
 }

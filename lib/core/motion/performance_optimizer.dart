@@ -60,10 +60,6 @@ class PerformanceOptimizer {
 
 /// Widget otimizado para performance com hardware acceleration
 class PerformantWidget extends StatelessWidget {
-  final Widget child;
-  final bool enableHardwareAcceleration;
-  final bool enableRepaintBoundary;
-  final bool enableAutomaticKeepAlive;
 
   const PerformantWidget({
     super.key,
@@ -72,10 +68,14 @@ class PerformantWidget extends StatelessWidget {
     this.enableRepaintBoundary = true,
     this.enableAutomaticKeepAlive = false,
   });
+  final Widget child;
+  final bool enableHardwareAcceleration;
+  final bool enableRepaintBoundary;
+  final bool enableAutomaticKeepAlive;
 
   @override
   Widget build(BuildContext context) {
-    Widget optimizedChild = child;
+    var optimizedChild = child;
 
     // Adiciona RepaintBoundary para otimizar repaints
     if (enableRepaintBoundary) {
@@ -101,9 +101,9 @@ class PerformantWidget extends StatelessWidget {
 
 /// Wrapper para manter widgets vivos
 class _KeepAliveWrapper extends StatefulWidget {
-  final Widget child;
 
   const _KeepAliveWrapper({required this.child});
+  final Widget child;
 
   @override
   State<_KeepAliveWrapper> createState() => _KeepAliveWrapperState();
@@ -123,13 +123,6 @@ class _KeepAliveWrapperState extends State<_KeepAliveWrapper>
 
 /// Lista otimizada para performance com lazy loading
 class PerformantListView extends StatelessWidget {
-  final List<Widget> children;
-  final ScrollController? controller;
-  final EdgeInsets? padding;
-  final bool shrinkWrap;
-  final ScrollPhysics? physics;
-  final double? itemExtent;
-  final bool addRepaintBoundaries;
 
   const PerformantListView({
     super.key,
@@ -141,10 +134,16 @@ class PerformantListView extends StatelessWidget {
     this.itemExtent,
     this.addRepaintBoundaries = true,
   });
+  final List<Widget> children;
+  final ScrollController? controller;
+  final EdgeInsets? padding;
+  final bool shrinkWrap;
+  final ScrollPhysics? physics;
+  final double? itemExtent;
+  final bool addRepaintBoundaries;
 
   @override
-  Widget build(BuildContext context) {
-    return ListView.builder(
+  Widget build(BuildContext context) => ListView.builder(
       controller: controller,
       padding: padding,
       shrinkWrap: shrinkWrap,
@@ -159,18 +158,10 @@ class PerformantListView extends StatelessWidget {
         );
       },
     );
-  }
 }
 
 /// Grid otimizado para performance
 class PerformantGridView extends StatelessWidget {
-  final List<Widget> children;
-  final SliverGridDelegate gridDelegate;
-  final ScrollController? controller;
-  final EdgeInsets? padding;
-  final bool shrinkWrap;
-  final ScrollPhysics? physics;
-  final bool addRepaintBoundaries;
 
   const PerformantGridView({
     super.key,
@@ -182,10 +173,16 @@ class PerformantGridView extends StatelessWidget {
     this.physics,
     this.addRepaintBoundaries = true,
   });
+  final List<Widget> children;
+  final SliverGridDelegate gridDelegate;
+  final ScrollController? controller;
+  final EdgeInsets? padding;
+  final bool shrinkWrap;
+  final ScrollPhysics? physics;
+  final bool addRepaintBoundaries;
 
   @override
-  Widget build(BuildContext context) {
-    return GridView.builder(
+  Widget build(BuildContext context) => GridView.builder(
       controller: controller,
       padding: padding,
       shrinkWrap: shrinkWrap,
@@ -200,18 +197,10 @@ class PerformantGridView extends StatelessWidget {
         );
       },
     );
-  }
 }
 
 /// AnimaAAo otimizada para performance
 class PerformantAnimation extends StatefulWidget {
-  final Widget child;
-  final Duration duration;
-  final Curve curve;
-  final AnimationController? controller;
-  final VoidCallback? onComplete;
-  final bool autoStart;
-  final bool enableHardwareAcceleration;
 
   const PerformantAnimation({
     super.key,
@@ -223,6 +212,13 @@ class PerformantAnimation extends StatefulWidget {
     this.autoStart = true,
     this.enableHardwareAcceleration = true,
   });
+  final Widget child;
+  final Duration duration;
+  final Curve curve;
+  final AnimationController? controller;
+  final VoidCallback? onComplete;
+  final bool autoStart;
+  final bool enableHardwareAcceleration;
 
   @override
   State<PerformantAnimation> createState() => _PerformantAnimationState();
@@ -275,21 +271,18 @@ class _PerformantAnimationState extends State<PerformantAnimation>
   Widget build(BuildContext context) {
     Widget animatedChild = AnimatedBuilder(
       animation: _animation,
-      builder: (context, child) {
-        return Opacity(
+      builder: (context, child) => Opacity(
           opacity: _animation.value,
           child: Transform.scale(
             scale: 0.8 + (0.2 * _animation.value),
             child: widget.child,
           ),
-        );
-      },
+        ),
     );
 
     // Aplica hardware acceleration se habilitado
     if (widget.enableHardwareAcceleration) {
       animatedChild = PerformantWidget(
-        enableHardwareAcceleration: true,
         child: animatedChild,
       );
     }
@@ -301,7 +294,7 @@ class _PerformantAnimationState extends State<PerformantAnimation>
 /// Monitor de performance em tempo real
 class PerformanceMonitor {
   static final List<double> _frameTimes = [];
-  static double _averageFps = 60.0;
+  static double _averageFps = 60;
   static bool _isMonitoring = false;
 
   /// Inicia o monitoramento de performance
@@ -353,14 +346,14 @@ class PerformanceMonitor {
 
 /// Widget para exibir informaAAes de performance (apenas em debug)
 class GfPerformanceOverlay extends StatefulWidget {
-  final Widget child;
-  final bool showInRelease;
 
   const GfPerformanceOverlay({
     super.key,
     required this.child,
     this.showInRelease = false,
   });
+  final Widget child;
+  final bool showInRelease;
 
   @override
   State<GfPerformanceOverlay> createState() => _GfPerformanceOverlayState();

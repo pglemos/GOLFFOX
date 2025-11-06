@@ -11,9 +11,9 @@ import '../config/env_config.dart';
 /// - Performance monitoring
 /// - Memory-efficient buffering
 class LoggerService {
+  LoggerService._();
   static LoggerService? _instance;
   static LoggerService get instance => _instance ??= LoggerService._();
-  LoggerService._();
 
   final List<LogEntry> _buffer = [];
   static const int _maxBufferSize = 1000;
@@ -238,12 +238,6 @@ enum LogLevel {
 
 /// Individual log entry
 class LogEntry {
-  final LogLevel level;
-  final String message;
-  final DateTime timestamp;
-  final Object? data;
-  final Object? error;
-  final StackTrace? stackTrace;
 
   const LogEntry({
     required this.level,
@@ -253,6 +247,12 @@ class LogEntry {
     this.error,
     this.stackTrace,
   });
+  final LogLevel level;
+  final String message;
+  final DateTime timestamp;
+  final Object? data;
+  final Object? error;
+  final StackTrace? stackTrace;
 
   @override
   String toString() {

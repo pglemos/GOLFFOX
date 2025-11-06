@@ -2,12 +2,12 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
 class GxDonut extends StatelessWidget {
-  final List<GxDonutSlice> slices;
-  final double centerSpace;
-  final Widget? center;
 
   const GxDonut(
       {super.key, required this.slices, this.centerSpace = 36, this.center});
+  final List<GxDonutSlice> slices;
+  final double centerSpace;
+  final Widget? center;
 
   @override
   Widget build(BuildContext context) {
@@ -40,9 +40,9 @@ class GxDonut extends StatelessWidget {
 }
 
 class GxDonutSlice {
+  const GxDonutSlice(
+      {required this.value, required this.color, required this.label});
   final double value;
   final Color color;
   final String label;
-  const GxDonutSlice(
-      {required this.value, required this.color, required this.label});
 }

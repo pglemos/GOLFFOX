@@ -8,6 +8,8 @@ import '../models/vehicle_position.dart';
 import 'supabase_service.dart';
 
 class VehicleStatusService extends ChangeNotifier {
+
+  VehicleStatusService(this._supabaseService);
   final SupabaseService _supabaseService;
 
   // Cache de status dos veiculos
@@ -21,21 +23,15 @@ class VehicleStatusService extends ChangeNotifier {
   // Stream subscription para realtime
   StreamSubscription? _realtimeSubscription;
 
-  VehicleStatusService(this._supabaseService);
-
   /// Obtem o status atual de um veiculo
-  vs.VehicleStatus? getVehicleStatus(String vehicleId) {
-    return _vehicleStatuses[vehicleId];
-  }
+  vs.VehicleStatus? getVehicleStatus(String vehicleId) => _vehicleStatuses[vehicleId];
 
   /// Obtem todos os status dos veiculos
   Map<String, vs.VehicleStatus> get allVehicleStatuses =>
       Map.unmodifiable(_vehicleStatuses);
 
   /// Obtem a ultima posicao de um motorista
-  DriverPosition? getLastPosition(String driverId) {
-    return _lastPositions[driverId];
-  }
+  DriverPosition? getLastPosition(String driverId) => _lastPositions[driverId];
 
   /// Inicializa o servico
   Future<void> initialize() async {
@@ -161,9 +157,7 @@ class VehicleStatusService extends ChangeNotifier {
   final Map<String, String> _driverVehicleMap = {};
 
   /// Obtem o ID do veiculo para um motorista
-  String? _getVehicleIdForDriver(String driverId) {
-    return _driverVehicleMap[driverId];
-  }
+  String? _getVehicleIdForDriver(String driverId) => _driverVehicleMap[driverId];
 
   /// Carrega as associacoes motorista -> veiculo das trips ativas
   Future<void> _loadDriverVehicleAssociations() async {
@@ -193,9 +187,7 @@ class VehicleStatusService extends ChangeNotifier {
   final Set<String> _vehiclesInGarage = {};
 
   /// Verifica se o veiculo esta na garagem (flag do banco)
-  bool _isVehicleInGarage(String vehicleId) {
-    return _vehiclesInGarage.contains(vehicleId);
-  }
+  bool _isVehicleInGarage(String vehicleId) => _vehiclesInGarage.contains(vehicleId);
 
   /// Carrega os veiculos que estao na garagem
   Future<void> _loadVehiclesInGarage() async {
@@ -224,9 +216,7 @@ class VehicleStatusService extends ChangeNotifier {
     try {
       _realtimeSubscription = _supabaseService.client
           .from('driver_positions')
-          .stream(primaryKey: ['id']).listen((data) {
-        _handleRealtimeUpdate(data);
-      });
+          .stream(primaryKey: ['id']).listen(_handleRealtimeUpdate);
 
       debugPrint('Realtime subscription configurada para driver_positions');
     } catch (e) {
@@ -236,23 +226,21 @@ class VehicleStatusService extends ChangeNotifier {
 
   /// Processa atualizacoes em tempo real
   void _handleRealtimeUpdate(List<Map<String, dynamic>> data) {
-    bool hasUpdates = false;
+    var hasUpdates = false;
 
     for (final positionData in data) {
       try {
         final position = DriverPosition.fromJson(positionData);
         final driverId = position.driverId;
 
-        if (driverId != null) {
-          // Atualizar posicao no cache
-          final currentPosition = _lastPositions[driverId];
-          if (currentPosition == null ||
-              position.timestamp.isAfter(currentPosition.timestamp)) {
-            _lastPositions[driverId] = position;
-            hasUpdates = true;
-          }
+        // Atualizar posicao no cache
+        final currentPosition = _lastPositions[driverId];
+        if (currentPosition == null ||
+            position.timestamp.isAfter(currentPosition.timestamp)) {
+          _lastPositions[driverId] = position;
+          hasUpdates = true;
         }
-      } catch (e) {
+            } catch (e) {
         debugPrint('Erro ao processar atualizacao realtime: $e');
       }
     }

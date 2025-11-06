@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { Truck, Plus, Search, Wrench, ClipboardCheck, Edit, Trash2 } from "lucide-react"
+import { Truck, Plus, Search, Wrench, ClipboardCheck, Edit, Trash2, AlertTriangle } from "lucide-react"
+import toast from "react-hot-toast"
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 import { VehicleModal } from "@/components/modals/vehicle-modal"
@@ -33,6 +34,7 @@ export default function VeiculosPage() {
   const [activeTab, setActiveTab] = useState<string>("dados")
   const [viewingVehicle, setViewingVehicle] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState("")
+  const [deleteConfirm, setDeleteConfirm] = useState<{isOpen: boolean, vehicle: any | null}>({isOpen: false, vehicle: null})
 
   useEffect(() => {
     const getUser = async () => {
@@ -155,6 +157,24 @@ export default function VeiculosPage() {
     loadChecklists(vehicle.id)
   }
 
+  const handleDeleteVehicle = async (vehicleId: string) => {
+    try {
+      const { error } = await supabase
+        .from("vehicles")
+        .delete()
+        .eq("id", vehicleId)
+
+      if (error) throw error
+
+      toast.success("Veículo excluído com sucesso!")
+      loadVeiculos()
+      setDeleteConfirm({isOpen: false, vehicle: null})
+    } catch (error: any) {
+      console.error("Erro ao excluir veículo:", error)
+      toast.error(error.message || "Erro ao excluir veículo")
+    }
+  }
+
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center"><div className="w-16 h-16 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin mx-auto"></div></div>
   }
@@ -204,14 +224,6 @@ export default function VeiculosPage() {
               <Card className="p-4 hover:shadow-lg transition-shadow">
                 <div className="flex items-start justify-between">
                   <div className="flex-1 flex gap-4">
-                    {veiculo.photo_url && (
-                      /* eslint-disable-next-line @next/next/no-img-element */
-                      <img 
-                        src={veiculo.photo_url} 
-                        alt={veiculo.plate}
-                        className="w-20 h-20 rounded-lg object-cover border border-[var(--border)]"
-                      />
-                    )}
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
                         <Truck className="h-5 w-5 text-[var(--brand)]" />
@@ -219,14 +231,10 @@ export default function VeiculosPage() {
                         {veiculo.prefix && (
                           <Badge variant="outline">Prefixo: {veiculo.prefix}</Badge>
                         )}
-                        <Badge variant={veiculo.is_active ? "default" : "secondary"}>
-                          {veiculo.is_active ? "Ativo" : "Inativo"}
-                        </Badge>
                       </div>
                       <p className="font-medium mb-1">{veiculo.model || "Sem modelo"}</p>
                       <div className="flex gap-4 text-sm text-[var(--ink-muted)]">
                         <span>Ano: {veiculo.year || "N/A"}</span>
-                        <span>Capacidade: {veiculo.capacity || "N/A"} lugares</span>
                       </div>
                     </div>
                   </div>
@@ -248,6 +256,14 @@ export default function VeiculosPage() {
                       onClick={() => handleViewVehicle(veiculo)}
                     >
                       Ver Detalhes
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => setDeleteConfirm({isOpen: true, vehicle: veiculo})}
+                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                    >
+                      <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
                 </div>
@@ -356,22 +372,12 @@ export default function VeiculosPage() {
                       <Label className="text-sm font-medium">Ano</Label>
                       <p className="text-sm">{selectedVehicle.year || "N/A"}</p>
                     </div>
-                    <div>
-                      <Label className="text-sm font-medium">Capacidade</Label>
-                      <p className="text-sm">{selectedVehicle.capacity || "N/A"} lugares</p>
-                    </div>
                     {selectedVehicle.prefix && (
                       <div>
                         <Label className="text-sm font-medium">Prefixo</Label>
                         <p className="text-sm">{selectedVehicle.prefix}</p>
                       </div>
                     )}
-                    <div>
-                      <Label className="text-sm font-medium">Status</Label>
-                      <Badge variant={selectedVehicle.is_active ? "default" : "secondary"}>
-                        {selectedVehicle.is_active ? "Ativo" : "Inativo"}
-                      </Badge>
-                    </div>
                   </div>
                 </TabsContent>
 
@@ -516,6 +522,48 @@ export default function VeiculosPage() {
             </DialogContent>
           </Dialog>
         )}
+
+        {/* Modal de Confirmação de Exclusão */}
+        <Dialog open={deleteConfirm.isOpen} onOpenChange={(open) => !open && setDeleteConfirm({isOpen: false, vehicle: null})}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2 text-red-600">
+                <AlertTriangle className="h-5 w-5" />
+                Confirmar Exclusão
+              </DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <p>Tem certeza que deseja excluir o veículo?</p>
+              {deleteConfirm.vehicle && (
+                <Card className="p-4 bg-gray-50">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Truck className="h-4 w-4 text-[var(--brand)]" />
+                    <span className="font-bold">{deleteConfirm.vehicle.plate}</span>
+                  </div>
+                  <p className="text-sm text-[var(--ink-muted)]">{deleteConfirm.vehicle.model}</p>
+                </Card>
+              )}
+              <p className="text-sm text-red-600">
+                ⚠️ Esta ação não pode ser desfeita. Todos os dados relacionados ao veículo serão mantidos, mas o veículo não estará mais disponível.
+              </p>
+            </div>
+            <div className="flex gap-2 justify-end">
+              <Button 
+                variant="outline" 
+                onClick={() => setDeleteConfirm({isOpen: false, vehicle: null})}
+              >
+                Cancelar
+              </Button>
+              <Button 
+                variant="destructive"
+                onClick={() => deleteConfirm.vehicle && handleDeleteVehicle(deleteConfirm.vehicle.id)}
+              >
+                <Trash2 className="h-4 w-4 mr-2" />
+                Excluir Veículo
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </AppShell>
   )

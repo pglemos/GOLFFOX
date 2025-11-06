@@ -2,27 +2,27 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import 'package:golffox/models/user.dart' as app_user;
-import 'package:golffox/models/trip.dart';
-import 'package:golffox/models/driver_position.dart';
+import '../models/user.dart' as app_user;
+import '../models/trip.dart';
+import '../models/driver_position.dart';
 
 typedef Json = Map<String, dynamic>;
 
 enum SbErrorCode { auth, network, rls, notFound, conflict, invalid, unknown }
 
 class SbFailure implements Exception {
+  SbFailure(this.code, this.message, [this.cause]);
   final SbErrorCode code;
   final String message;
   final Object? cause;
-  SbFailure(this.code, this.message, [this.cause]);
   @override
   String toString() => 'SbFailure($code): $message';
 }
 
 class SupabaseService {
+  SupabaseService._();
   static SupabaseService? _instance;
   static SupabaseService get instance => _instance ??= SupabaseService._();
-  SupabaseService._();
 
   SupabaseClient get client {
     if (!Supabase.instance.isInitialized) {
@@ -72,8 +72,9 @@ class SupabaseService {
   }
 
   Future<void> ensureAuth() async {
-    if (currentUser == null)
+    if (currentUser == null) {
       throw SbFailure(SbErrorCode.auth, 'User not authenticated.');
+    }
   }
 
   /* ===================== Auth API ===================== */
@@ -91,9 +92,7 @@ class SupabaseService {
   }
 
   // Backward-compat wrapper used by AuthManager
-  Future<AuthResponse> signInWithPassword({required String email, required String password}) {
-    return signInWithEmail(email, password);
-  }
+  Future<AuthResponse> signInWithPassword({required String email, required String password}) => signInWithEmail(email, password);
 
   Future<void> signOut() async {
     await client.auth.signOut();
@@ -235,13 +234,13 @@ class SupabaseService {
         final res = await _withTimeout(
           client.from(table).update(updates).eq('id', id).select().single(),
         );
-        return res as Map<String, dynamic>;
+        return res;
       }
       // Fallback: no filter, perform update and return first row if any
       final res = await _withTimeout(
         client.from(table).update(updates).select().maybeSingle(),
       );
-      return (res ?? <String, dynamic>{}) as Map<String, dynamic>;
+      return (res ?? <String, dynamic>{});
     } on PostgrestException catch (e) {
       throw _mapPostgrest(e);
     }
@@ -301,14 +300,12 @@ class SupabaseService {
     }
   }
 
-  Stream<List<DriverPosition>> streamDriverPositionsRealtime(String tripId) {
-    return client
+  Stream<List<DriverPosition>> streamDriverPositionsRealtime(String tripId) => client
         .from('driver_positions')
         .stream(primaryKey: ['id'])
         .eq('trip_id', tripId)
         .order('timestamp', ascending: false)
         .map((rows) => rows.map((j) => DriverPosition.fromJson(j)).toList());
-  }
 
   /* ===================== Trips ===================== */
 
@@ -362,10 +359,10 @@ class SupabaseService {
       throw SbFailure(SbErrorCode.auth, 'Usuario nao autenticado.');
     }
 
-    PostgrestFilterBuilder q(String table) => client.from(table).select('*');
+    PostgrestFilterBuilder q(String table) => client.from(table).select();
 
     try {
-      List<Json> results = const [];
+      var results = const <Json>[];
 
       switch (userProfile.role) {
         case 'driver':
@@ -407,29 +404,25 @@ class SupabaseService {
           results = (await _withTimeout(query) as List).cast<Json>();
       }
 
-      return results.map((j) => Trip.fromJson(j)).toList(growable: false);
+      return results.map(Trip.fromJson).toList(growable: false);
     } on PostgrestException catch (e) {
       throw _mapPostgrest(e);
     }
   }
 
   /// Stream de um trip especifico (atualizacoes em tempo real).
-  Stream<Trip?> streamTrip(String tripId) {
-    return client
+  Stream<Trip?> streamTrip(String tripId) => client
         .from('trips')
         .stream(primaryKey: ['id'])
         .eq('id', tripId)
         .map((rows) => rows.isNotEmpty ? Trip.fromJson(rows.first) : null);
-  }
 
   /// Stream do status do trip como Json "cru", se voce realmente precisar.
-  Stream<Json> streamTripStatus(String tripId) {
-    return client
+  Stream<Json> streamTripStatus(String tripId) => client
         .from('trips')
         .stream(primaryKey: ['id'])
         .eq('id', tripId)
         .map((data) => data.isNotEmpty ? data.first : <String, dynamic>{});
-  }
 
   /* ===================== Companies / Routes / Vehicles ===================== */
 
@@ -448,7 +441,7 @@ class SupabaseService {
     if (profile == null) throw SbFailure(SbErrorCode.auth, 'Nao autenticado.');
 
     try {
-      dynamic query = client.from('routes').select('*');
+      dynamic query = client.from('routes').select();
       if (profile.role == 'operator' &&
           (profile.companyId?.isNotEmpty ?? false)) {
         query = query.eq('company_id', profile.companyId);
@@ -469,7 +462,7 @@ class SupabaseService {
     if (profile == null) throw SbFailure(SbErrorCode.auth, 'Nao autenticado.');
 
     try {
-      dynamic query = client.from('vehicles').select('*');
+      dynamic query = client.from('vehicles').select();
       if (profile.role == 'carrier' &&
           (profile.carrierId?.isNotEmpty ?? false)) {
         query = query.eq('carrier_id', profile.carrierId);

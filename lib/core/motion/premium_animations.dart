@@ -29,14 +29,12 @@ class PremiumAnimations {
     Duration duration = medium,
     Curve curve = smoothInOut,
     Offset slideOffset = const Offset(0.03, 0),
-  }) {
-    return child.animate().fadeIn(duration: duration, curve: curve).slideX(
+  }) => child.animate().fadeIn(duration: duration, curve: curve).slideX(
           begin: slideOffset.dx,
           end: 0,
           duration: duration,
           curve: curve,
         );
-  }
 
   /// Microinteracao de botao com feedback haptico
   static Widget buttonPress({
@@ -45,8 +43,7 @@ class PremiumAnimations {
     Duration duration = ultraFast,
     double scaleDown = 0.95,
     bool enableHaptic = true,
-  }) {
-    return GestureDetector(
+  }) => GestureDetector(
       onTapDown: (_) {
         if (enableHaptic) HapticFeedback.lightImpact();
       },
@@ -67,18 +64,15 @@ class PremiumAnimations {
             curve: spring,
           ),
     );
-  }
 
   /// Animacao de loading com rotacao suave
   static Widget loadingSpinner({
     required Widget child,
     Duration duration = const Duration(milliseconds: 1000),
-  }) {
-    return child.animate(onPlay: (controller) => controller.repeat()).rotate(
+  }) => child.animate(onPlay: (controller) => controller.repeat()).rotate(
           duration: duration,
           curve: Curves.linear,
         );
-  }
 
   /// Animacao de erro com shake + feedback haptico
   static Widget errorShake({
@@ -86,8 +80,7 @@ class PremiumAnimations {
     Duration duration = medium,
     double offset = 8.0,
     bool enableHaptic = true,
-  }) {
-    return child.animate(onPlay: (controller) {
+  }) => child.animate(onPlay: (controller) {
       if (enableHaptic) HapticFeedback.heavyImpact();
       controller.forward();
     }).shake(
@@ -95,15 +88,13 @@ class PremiumAnimations {
       hz: 4,
       offset: Offset(offset, 0),
     );
-  }
 
   /// Animacao de sucesso com bounce + feedback haptico
   static Widget successBounce({
     required Widget child,
     Duration duration = medium,
     bool enableHaptic = true,
-  }) {
-    return child
+  }) => child
         .animate(onPlay: (controller) {
           if (enableHaptic) HapticFeedback.mediumImpact();
           controller.forward();
@@ -121,16 +112,10 @@ class PremiumAnimations {
           duration: Duration(milliseconds: duration.inMilliseconds ~/ 2),
           curve: bounce,
         );
-  }
 }
 
 /// Widget para animacoes de entrada escalonadas (staggered)
 class StaggeredAnimation extends StatelessWidget {
-  final List<Widget> children;
-  final Duration delay;
-  final Duration duration;
-  final Curve curve;
-  final Axis direction;
 
   const StaggeredAnimation({
     super.key,
@@ -140,10 +125,14 @@ class StaggeredAnimation extends StatelessWidget {
     this.curve = PremiumAnimations.smoothOut,
     this.direction = Axis.vertical,
   });
+  final List<Widget> children;
+  final Duration delay;
+  final Duration duration;
+  final Curve curve;
+  final Axis direction;
 
   @override
-  Widget build(BuildContext context) {
-    return Column(
+  Widget build(BuildContext context) => Column(
       children: children.asMap().entries.map((entry) {
         final index = entry.key;
         final child = entry.value;
@@ -171,17 +160,10 @@ class StaggeredAnimation extends StatelessWidget {
             );
       }).toList(),
     );
-  }
 }
 
 /// Widget para hover effects responsivos
 class ResponsiveHover extends StatefulWidget {
-  final Widget child;
-  final double hoverScale;
-  final Duration duration;
-  final Color? hoverColor;
-  final double elevation;
-  final bool enableOnMobile;
 
   const ResponsiveHover({
     super.key,
@@ -192,6 +174,12 @@ class ResponsiveHover extends StatefulWidget {
     this.elevation = 4.0,
     this.enableOnMobile = false,
   });
+  final Widget child;
+  final double hoverScale;
+  final Duration duration;
+  final Color? hoverColor;
+  final double elevation;
+  final bool enableOnMobile;
 
   @override
   State<ResponsiveHover> createState() => _ResponsiveHoverState();
@@ -211,7 +199,7 @@ class _ResponsiveHoverState extends State<ResponsiveHover>
       vsync: this,
     );
     _scaleAnimation = Tween<double>(
-      begin: 1.0,
+      begin: 1,
       end: widget.hoverScale,
     ).animate(CurvedAnimation(
       parent: _controller,
@@ -243,8 +231,7 @@ class _ResponsiveHoverState extends State<ResponsiveHover>
   }
 
   @override
-  Widget build(BuildContext context) {
-    return MouseRegion(
+  Widget build(BuildContext context) => MouseRegion(
       onEnter: (_) => _onHover(true),
       onExit: (_) => _onHover(false),
       child: AnimatedBuilder(
@@ -271,7 +258,6 @@ class _ResponsiveHoverState extends State<ResponsiveHover>
         },
       ),
     );
-  }
 }
 
 /// ExtensAes para animacoes premium
@@ -280,8 +266,7 @@ extension PremiumAnimationExtensions on Widget {
   Widget premiumEntrance({
     Duration delay = Duration.zero,
     Duration duration = PremiumAnimations.medium,
-  }) {
-    return animate(delay: delay)
+  }) => animate(delay: delay)
         .fadeIn(duration: duration, curve: PremiumAnimations.smoothOut)
         .slideY(
           begin: 0.03,
@@ -295,30 +280,25 @@ extension PremiumAnimationExtensions on Widget {
           duration: duration,
           curve: PremiumAnimations.spring,
         );
-  }
 
   /// Animacao de card premium
   Widget premiumCard({
     Duration delay = Duration.zero,
     Duration duration = PremiumAnimations.fast,
-  }) {
-    return animate(delay: delay).fadeIn(duration: duration).slideY(
+  }) => animate(delay: delay).fadeIn(duration: duration).slideY(
           begin: 0.02,
           end: 0,
           duration: duration,
           curve: PremiumAnimations.smoothOut,
         );
-  }
 
   /// Animacao de modal premium
   Widget premiumModal({
     Duration duration = PremiumAnimations.medium,
-  }) {
-    return animate().fadeIn(duration: duration).scaleXY(
+  }) => animate().fadeIn(duration: duration).scaleXY(
           begin: 0.9,
           end: 1.0,
           duration: duration,
           curve: PremiumAnimations.spring,
         );
-  }
 }

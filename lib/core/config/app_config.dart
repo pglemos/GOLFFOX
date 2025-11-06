@@ -26,12 +26,10 @@ class AppConfig {
   // Configurações de Mapas
   static const String googleMapsApiKey = String.fromEnvironment(
     'GOOGLE_MAPS_API_KEY',
-    defaultValue: '',
   );
 
   static const String mapboxAccessToken = String.fromEnvironment(
     'MAPBOX_ACCESS_TOKEN',
-    defaultValue: '',
   );
 
   // Configurações de Debug

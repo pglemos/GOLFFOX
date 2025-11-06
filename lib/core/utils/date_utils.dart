@@ -21,20 +21,14 @@ class GfDateUtils {
   }
 
   /// Formata uma data para exibicao
-  static String formatDate(DateTime dateTime) {
-    return '${dateTime.day.toString().padLeft(2, '0')}/'
+  static String formatDate(DateTime dateTime) => '${dateTime.day.toString().padLeft(2, '0')}/'
         '${dateTime.month.toString().padLeft(2, '0')}/'
         '${dateTime.year}';
-  }
 
   /// Formata uma hora para exibicao
-  static String formatTime(DateTime dateTime) {
-    return '${dateTime.hour.toString().padLeft(2, '0')}:'
+  static String formatTime(DateTime dateTime) => '${dateTime.hour.toString().padLeft(2, '0')}:'
         '${dateTime.minute.toString().padLeft(2, '0')}';
-  }
 
   /// Formata data e hora para exibicao
-  static String formatDateTime(DateTime dateTime) {
-    return '${formatDate(dateTime)} ${formatTime(dateTime)}';
-  }
+  static String formatDateTime(DateTime dateTime) => '${formatDate(dateTime)} ${formatTime(dateTime)}';
 }

@@ -24,9 +24,9 @@ enum DeviceOrientation {
 /// Sistema de responsividade premium
 class ResponsiveSystem {
   /// Breakpoints otimizados para todos os dispositivos
-  static const double mobileMax = 640.0;
-  static const double tabletMax = 1024.0;
-  static const double desktopMax = 1440.0;
+  static const double mobileMax = 640;
+  static const double tabletMax = 1024;
+  static const double desktopMax = 1440;
 
   /// Detecta o tipo de dispositivo baseado na largura
   static DeviceType getDeviceType(double width) {
@@ -98,24 +98,19 @@ class ResponsiveSystem {
 
     switch (deviceType) {
       case DeviceType.mobile:
-        return 120.0;
+        return 120;
       case DeviceType.tablet:
-        return 140.0;
+        return 140;
       case DeviceType.desktop:
-        return 160.0;
+        return 160;
       case DeviceType.largeDesktop:
-        return 180.0;
+        return 180;
     }
   }
 }
 
 /// Widget responsivo que adapta automaticamente
 class ResponsiveWidget extends StatelessWidget {
-  final Widget? mobile;
-  final Widget? tablet;
-  final Widget? desktop;
-  final Widget? largeDesktop;
-  final Widget fallback;
 
   const ResponsiveWidget({
     super.key,
@@ -125,6 +120,11 @@ class ResponsiveWidget extends StatelessWidget {
     this.largeDesktop,
     required this.fallback,
   });
+  final Widget? mobile;
+  final Widget? tablet;
+  final Widget? desktop;
+  final Widget? largeDesktop;
+  final Widget fallback;
 
   @override
   Widget build(BuildContext context) {
@@ -147,11 +147,6 @@ class ResponsiveWidget extends StatelessWidget {
 
 /// Layout responsivo com grid adaptativo
 class ResponsiveGrid extends StatelessWidget {
-  final List<Widget> children;
-  final double spacing;
-  final double runSpacing;
-  final int? forceColumns;
-  final double? childAspectRatio;
 
   const ResponsiveGrid({
     super.key,
@@ -161,6 +156,11 @@ class ResponsiveGrid extends StatelessWidget {
     this.forceColumns,
     this.childAspectRatio = 1.0,
   });
+  final List<Widget> children;
+  final double spacing;
+  final double runSpacing;
+  final int? forceColumns;
+  final double? childAspectRatio;
 
   @override
   Widget build(BuildContext context) {
@@ -183,13 +183,6 @@ class ResponsiveGrid extends StatelessWidget {
 
 /// Container responsivo com padding e margin adaptativos
 class ResponsiveContainer extends StatelessWidget {
-  final Widget child;
-  final EdgeInsets? padding;
-  final EdgeInsets? margin;
-  final double? width;
-  final double? height;
-  final Decoration? decoration;
-  final bool centerOnDesktop;
 
   const ResponsiveContainer({
     super.key,
@@ -201,6 +194,13 @@ class ResponsiveContainer extends StatelessWidget {
     this.decoration,
     this.centerOnDesktop = true,
   });
+  final Widget child;
+  final EdgeInsets? padding;
+  final EdgeInsets? margin;
+  final double? width;
+  final double? height;
+  final Decoration? decoration;
+  final bool centerOnDesktop;
 
   @override
   Widget build(BuildContext context) {
@@ -238,14 +238,6 @@ class ResponsiveContainer extends StatelessWidget {
 
 /// Texto responsivo que adapta tamanho automaticamente
 class ResponsiveWrap extends StatelessWidget {
-  final List<Widget> children;
-  final double spacing;
-  final double runSpacing;
-  final WrapAlignment alignment;
-  final WrapCrossAlignment crossAxisAlignment;
-  final WrapAlignment runAlignment;
-  final int? forceColumns;
-  final double? childAspectRatio;
 
   const ResponsiveWrap({
     super.key,
@@ -258,6 +250,14 @@ class ResponsiveWrap extends StatelessWidget {
     this.forceColumns,
     this.childAspectRatio,
   });
+  final List<Widget> children;
+  final double spacing;
+  final double runSpacing;
+  final WrapAlignment alignment;
+  final WrapCrossAlignment crossAxisAlignment;
+  final WrapAlignment runAlignment;
+  final int? forceColumns;
+  final double? childAspectRatio;
 
   @override
   Widget build(BuildContext context) {
@@ -279,14 +279,6 @@ class ResponsiveWrap extends StatelessWidget {
 }
 
 class ResponsiveText extends StatelessWidget {
-  final String text;
-  final TextStyle? style;
-  final double baseFontSize;
-  final FontWeight? fontWeight;
-  final Color? color;
-  final TextAlign? textAlign;
-  final int? maxLines;
-  final TextOverflow? overflow;
 
   const ResponsiveText(
     this.text, {
@@ -299,6 +291,14 @@ class ResponsiveText extends StatelessWidget {
     this.maxLines,
     this.overflow,
   });
+  final String text;
+  final TextStyle? style;
+  final double baseFontSize;
+  final FontWeight? fontWeight;
+  final Color? color;
+  final TextAlign? textAlign;
+  final int? maxLines;
+  final TextOverflow? overflow;
 
   @override
   Widget build(BuildContext context) {

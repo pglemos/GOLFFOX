@@ -22,18 +22,6 @@ extension BoardingEventTypeExtension on BoardingEventType {
 
 @immutable
 class BoardingEvent {
-  final String id;
-  final String tripId;
-  final String passengerId;
-  final String? routeStopId;
-  final BoardingEventType eventType;
-  final DateTime timestamp;
-  final double? latitude;
-  final double? longitude;
-  final String? nfcTagId;
-  final String? qrCodeData;
-  final String? notes;
-  final DateTime createdAt;
 
   const BoardingEvent({
     required this.id,
@@ -71,9 +59,20 @@ class BoardingEvent {
       createdAt: DateTime.parse(json[BoardingEventFields.createdAt] as String),
     );
   }
+  final String id;
+  final String tripId;
+  final String passengerId;
+  final String? routeStopId;
+  final BoardingEventType eventType;
+  final DateTime timestamp;
+  final double? latitude;
+  final double? longitude;
+  final String? nfcTagId;
+  final String? qrCodeData;
+  final String? notes;
+  final DateTime createdAt;
 
-  Json toJson() {
-    return {
+  Json toJson() => {
       BoardingEventFields.id: id,
       BoardingEventFields.tripId: tripId,
       BoardingEventFields.passengerId: passengerId,
@@ -87,7 +86,6 @@ class BoardingEvent {
       BoardingEventFields.notes: notes,
       BoardingEventFields.createdAt: createdAt.toIso8601String(),
     };
-  }
 
   /* ================================= Copy ================================= */
 
@@ -104,8 +102,7 @@ class BoardingEvent {
     String? qrCodeData,
     String? notes,
     DateTime? createdAt,
-  }) {
-    return BoardingEvent(
+  }) => BoardingEvent(
       id: id ?? this.id,
       tripId: tripId ?? this.tripId,
       passengerId: passengerId ?? this.passengerId,
@@ -119,7 +116,6 @@ class BoardingEvent {
       notes: notes ?? this.notes,
       createdAt: createdAt ?? this.createdAt,
     );
-  }
 
   @override
   bool operator ==(Object other) =>

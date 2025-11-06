@@ -7,18 +7,18 @@ import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart' as flutter_map;
 import 'package:latlong2/latlong.dart';
 
-import 'package:golffox/models/user.dart' as app_user;
-import 'package:golffox/models/trip.dart';
-import 'package:golffox/models/driver_position.dart';
-import 'package:golffox/services/supabase_service.dart';
-import 'package:golffox/services/auth_service.dart';
-import 'package:golffox/core/routing/app_router.dart';
+import '../../models/user.dart' as app_user;
+import '../../models/trip.dart';
+import '../../models/driver_position.dart';
+import '../../services/supabase_service.dart';
+import '../../services/auth_service.dart';
+import '../../core/routing/app_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:golffox/core/theme/gf_tokens.dart';
+import '../../core/theme/gf_tokens.dart';
 
 class PassengerDashboard extends StatefulWidget {
-  final app_user.User user;
   const PassengerDashboard({super.key, required this.user});
+  final app_user.User user;
 
   @override
   State<PassengerDashboard> createState() => _PassengerDashboardState();
@@ -110,7 +110,7 @@ class _PassengerDashboardState extends State<PassengerDashboard>
 
       if (positions.isNotEmpty) {
         final latest = positions.first;
-        _mapController.move(LatLng(latest.latitude, latest.longitude), 15.0);
+        _mapController.move(LatLng(latest.latitude, latest.longitude), 15);
       }
     } catch (e) {
       debugPrint('Error loading driver positions: $e');
@@ -128,7 +128,7 @@ class _PassengerDashboardState extends State<PassengerDashboard>
 
         if (positions.isNotEmpty) {
           final latest = positions.first;
-          _mapController.move(LatLng(latest.latitude, latest.longitude), 15.0);
+          _mapController.move(LatLng(latest.latitude, latest.longitude), 15);
         }
       },
     );
@@ -154,8 +154,7 @@ class _PassengerDashboardState extends State<PassengerDashboard>
       isScrollControlled: true,
       useSafeArea: true,
       backgroundColor: Colors.transparent,
-      builder: (context) {
-        return _GlassBottomSheet(
+      builder: (context) => _GlassBottomSheet(
           child: DraggableScrollableSheet(
             expand: false,
             initialChildSize: 0.38,
@@ -165,8 +164,7 @@ class _PassengerDashboardState extends State<PassengerDashboard>
               scrollController: scrollCtl,
             ),
           ),
-        );
-      },
+        ),
     );
 
     if (result != null && result.isNotEmpty && mounted) {
@@ -249,7 +247,6 @@ class _PassengerDashboardState extends State<PassengerDashboard>
             // ESTADOS (erro / vazio / loading shimmer)
             Positioned.fill(
               child: IgnorePointer(
-                ignoring: true,
                 child: AnimatedSwitcher(
                   duration: GfTokens.durationSlow,
                   child: _buildOverlayStates(theme),
@@ -319,8 +316,7 @@ class _PassengerDashboardState extends State<PassengerDashboard>
     );
   }
 
-  Widget _buildMap(ThemeData theme) {
-    return ClipRect(
+  Widget _buildMap(ThemeData theme) => ClipRect(
       child: flutter_map.FlutterMap(
         mapController: _mapController,
         options: const flutter_map.MapOptions(
@@ -374,7 +370,6 @@ class _PassengerDashboardState extends State<PassengerDashboard>
         ],
       ),
     );
-  }
 
   Widget _buildOverlayStates(ThemeData theme) {
     if (_isLoading) {
@@ -487,9 +482,9 @@ class _AnimatedStatusChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    Color color = theme.colorScheme.outline;
-    IconData icon = Icons.help_outline;
-    String text = 'Sem viagem';
+    var color = theme.colorScheme.outline;
+    var icon = Icons.help_outline;
+    var text = 'Sem viagem';
 
     if (trip != null) {
       switch (trip!.status.toLowerCase()) {
@@ -539,8 +534,7 @@ class _BottomTripCardArea extends StatelessWidget {
   final Widget child;
 
   @override
-  Widget build(BuildContext context) {
-    return SafeArea(
+  Widget build(BuildContext context) => SafeArea(
       child: AnimatedSlide(
         duration: GfTokens.durationSlower,
         curve: Curves.easeOutCubic,
@@ -558,7 +552,6 @@ class _BottomTripCardArea extends StatelessWidget {
         ),
       ),
     );
-  }
 }
 
 class _TripStatusCardPremium extends StatelessWidget {
@@ -614,13 +607,13 @@ class _TripStatusCardPremium extends StatelessWidget {
             children: [
               Expanded(
                 child: FilledButton(
-                  onPressed: () => HapticFeedback.selectionClick(),
+                  onPressed: HapticFeedback.selectionClick,
                   child: const Text('Ver detalhes'),
                 ),
               ),
               const SizedBox(width: 10),
               IconButton.filledTonal(
-                onPressed: () => HapticFeedback.selectionClick(),
+                onPressed: HapticFeedback.selectionClick,
                 icon: const Icon(Icons.more_horiz),
                 tooltip: 'Mais',
               ),
@@ -676,8 +669,7 @@ class _GlassChip extends StatelessWidget {
   final Color color;
 
   @override
-  Widget build(BuildContext context) {
-    return _GlassCard(
+  Widget build(BuildContext context) => _GlassCard(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -695,7 +687,6 @@ class _GlassChip extends StatelessWidget {
         ],
       ),
     );
-  }
 }
 
 class _GlassIconButton extends StatelessWidget {
@@ -709,8 +700,7 @@ class _GlassIconButton extends StatelessWidget {
   final String? tooltip;
 
   @override
-  Widget build(BuildContext context) {
-    return Tooltip(
+  Widget build(BuildContext context) => Tooltip(
       message: tooltip ?? '',
       child: InkWell(
         borderRadius: BorderRadius.circular(14),
@@ -721,7 +711,6 @@ class _GlassIconButton extends StatelessWidget {
         ),
       ),
     );
-  }
 }
 
 class _AnimatedDriverMarker extends StatelessWidget {
@@ -736,8 +725,7 @@ class _AnimatedDriverMarker extends StatelessWidget {
   final double headingDegrees;
 
   @override
-  Widget build(BuildContext context) {
-    return TweenAnimationBuilder<double>(
+  Widget build(BuildContext context) => TweenAnimationBuilder<double>(
       duration: GfTokens.durationSlower,
       curve: Curves.easeOutCubic,
       tween: Tween(begin: 0, end: headingDegrees),
@@ -765,7 +753,6 @@ class _AnimatedDriverMarker extends StatelessWidget {
         );
       },
     );
-  }
 }
 
 class _ShimmerBar extends StatelessWidget {
@@ -773,8 +760,7 @@ class _ShimmerBar extends StatelessWidget {
   final Animation<double> animation;
 
   @override
-  Widget build(BuildContext context) {
-    return SizedBox(
+  Widget build(BuildContext context) => SizedBox(
       height: 10,
       child: ClipRRect(
         borderRadius: BorderRadius.circular(6),
@@ -789,7 +775,6 @@ class _ShimmerBar extends StatelessWidget {
         ),
       ),
     );
-  }
 }
 
 class _ShimmerPainter extends CustomPainter {
@@ -824,8 +809,7 @@ class _MapShimmerOverlay extends StatelessWidget {
   final Animation<double> animation;
 
   @override
-  Widget build(BuildContext context) {
-    return IgnorePointer(
+  Widget build(BuildContext context) => IgnorePointer(
       child: Align(
         alignment: Alignment.bottomCenter,
         child: Padding(
@@ -846,7 +830,6 @@ class _MapShimmerOverlay extends StatelessWidget {
         ),
       ),
     );
-  }
 }
 
 class _GradientFab extends StatelessWidget {
@@ -859,7 +842,7 @@ class _GradientFab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Container(
+    return DecoratedBox(
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
@@ -898,7 +881,7 @@ class _GlassBottomSheet extends StatelessWidget {
       borderRadius: const BorderRadius.vertical(top: Radius.circular(22)),
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-        child: Container(
+        child: DecoratedBox(
           decoration: BoxDecoration(
             color: theme.colorScheme.surface.withOpacity(0.75),
             border: Border(

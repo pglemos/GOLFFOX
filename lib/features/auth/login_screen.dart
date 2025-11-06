@@ -63,7 +63,7 @@ class _LoginScreenState extends State<LoginScreen> {
       if (user != null && mounted) {
         // Redirecionamento imediato para admin por e-mail
         try {
-          if ((user.email).toLowerCase() == 'golffox@admin.com') {
+          if (user.email.toLowerCase() == 'golffox@admin.com') {
             AppRouter.instance.go(AppRoutes.adminHome);
             return;
           }
@@ -111,7 +111,7 @@ class _LoginScreenState extends State<LoginScreen> {
         print('🚀 Redirecionando para: $targetRoute');
         // Redirecionar para o dashboard apropriado
         final isAdminEmail = user.email.toLowerCase() == 'golffox@admin.com';
-        final isAdminRoleString = (user.role).toLowerCase() == 'admin';
+        final isAdminRoleString = user.role.toLowerCase() == 'admin';
         final dest = (isAdminEmail || isAdminRoleString)
             ? AppRoutes.adminHome
             : targetRoute;
@@ -164,8 +164,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       backgroundColor: Colors.grey[50],
       body: SafeArea(
         child: Center(
@@ -345,5 +344,4 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ),
     );
-  }
 }

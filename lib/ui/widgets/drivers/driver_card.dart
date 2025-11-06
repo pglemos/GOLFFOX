@@ -9,11 +9,6 @@ import '../../../core/theme/gf_tokens.dart';
 import '../../../models/driver.dart';
 
 class DriverCard extends StatelessWidget {
-  final Driver driver;
-  final VoidCallback? onTap;
-  final VoidCallback? onEdit;
-  final VoidCallback? onDelete;
-  final Function(DriverStatus)? onStatusChanged;
 
   const DriverCard({
     super.key,
@@ -23,10 +18,14 @@ class DriverCard extends StatelessWidget {
     this.onDelete,
     this.onStatusChanged,
   });
+  final Driver driver;
+  final VoidCallback? onTap;
+  final VoidCallback? onEdit;
+  final VoidCallback? onDelete;
+  final Function(DriverStatus)? onStatusChanged;
 
   @override
-  Widget build(BuildContext context) {
-    return Card(
+  Widget build(BuildContext context) => Card(
       elevation: 2,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(GfTokens.radiusMd),
@@ -306,15 +305,13 @@ class DriverCard extends StatelessWidget {
         ),
       ),
     );
-  }
 
   Widget _buildInfoItem({
     required IconData icon,
     required String label,
     required String value,
     required bool isAlert,
-  }) {
-    return Row(
+  }) => Row(
       children: [
         Icon(
           icon,
@@ -351,7 +348,6 @@ class DriverCard extends StatelessWidget {
         ),
       ],
     );
-  }
 
   Widget _buildAlertsSection() {
     final alerts = <Widget>[];
@@ -384,8 +380,7 @@ class DriverCard extends StatelessWidget {
     required IconData icon,
     required String text,
     required Color color,
-  }) {
-    return Container(
+  }) => Container(
       padding: const EdgeInsets.symmetric(
         horizontal: GfTokens.spacingSm,
         vertical: 2,
@@ -417,7 +412,6 @@ class DriverCard extends StatelessWidget {
         ],
       ),
     );
-  }
 
   void _handleMenuAction(BuildContext context, String action) {
     switch (action) {
@@ -440,8 +434,7 @@ class DriverCard extends StatelessWidget {
         title: const Text('Alterar Status'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
-          children: DriverStatus.values.map((status) {
-            return ListTile(
+          children: DriverStatus.values.map((status) => ListTile(
               leading: Icon(
                 status.iconData,
                 color: status.colorValue,
@@ -452,8 +445,7 @@ class DriverCard extends StatelessWidget {
                 Navigator.of(context).pop();
                 onStatusChanged?.call(status);
               },
-            );
-          }).toList(),
+            )).toList(),
         ),
         actions: [
           TextButton(

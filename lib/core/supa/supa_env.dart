@@ -21,9 +21,7 @@ class SupaEnv {
   // ========================================
   // VALIDACAO
   // ========================================
-  static bool get isConfigured {
-    return supabaseUrl.isNotEmpty && supabaseAnonKey.isNotEmpty;
-  }
+  static bool get isConfigured => supabaseUrl.isNotEmpty && supabaseAnonKey.isNotEmpty;
 
   static String get configurationError {
     if (supabaseUrl.isEmpty && supabaseAnonKey.isEmpty) {
@@ -39,8 +37,7 @@ class SupaEnv {
   // ========================================
   // DEBUG INFO
   // ========================================
-  static Map<String, dynamic> get debugInfo {
-    return {
+  static Map<String, dynamic> get debugInfo => {
       'supabaseUrl': supabaseUrl.isNotEmpty
           ? '${supabaseUrl.substring(0, 20)}...'
           : 'NOT_SET',
@@ -49,5 +46,4 @@ class SupaEnv {
           : 'NOT_SET',
       'isConfigured': isConfigured,
     };
-  }
 }

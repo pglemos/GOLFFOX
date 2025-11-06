@@ -147,17 +147,6 @@ extension FuelTypeExtension on FuelType {
 }
 
 class VehicleSpecifications {
-  final int capacity;
-  final double engineSize;
-  final int year;
-  final String manufacturer;
-  final String model;
-  final String color;
-  final double fuelTankCapacity;
-  final double weight;
-  final double length;
-  final double width;
-  final double height;
 
   const VehicleSpecifications({
     required this.capacity,
@@ -188,9 +177,19 @@ class VehicleSpecifications {
       height: (json['height'] ?? 0.0).toDouble(),
     );
   }
+  final int capacity;
+  final double engineSize;
+  final int year;
+  final String manufacturer;
+  final String model;
+  final String color;
+  final double fuelTankCapacity;
+  final double weight;
+  final double length;
+  final double width;
+  final double height;
 
-  Map<String, dynamic> toJson() {
-    return {
+  Map<String, dynamic> toJson() => {
       'capacity': capacity,
       'engine_size': engineSize,
       'year': year,
@@ -203,7 +202,6 @@ class VehicleSpecifications {
       'width': width,
       'height': height,
     };
-  }
 
   VehicleSpecifications copyWith({
     int? capacity,
@@ -217,8 +215,7 @@ class VehicleSpecifications {
     double? length,
     double? width,
     double? height,
-  }) {
-    return VehicleSpecifications(
+  }) => VehicleSpecifications(
       capacity: capacity ?? this.capacity,
       engineSize: engineSize ?? this.engineSize,
       year: year ?? this.year,
@@ -231,18 +228,9 @@ class VehicleSpecifications {
       width: width ?? this.width,
       height: height ?? this.height,
     );
-  }
 }
 
 class VehicleDocuments {
-  final String? licensePlate;
-  final String? chassisNumber;
-  final String? renavam;
-  final DateTime? licenseExpiryDate;
-  final DateTime? inspectionExpiryDate;
-  final DateTime? insuranceExpiryDate;
-  final String? insuranceCompany;
-  final String? insurancePolicyNumber;
 
   const VehicleDocuments({
     this.licensePlate,
@@ -273,9 +261,16 @@ class VehicleDocuments {
       insurancePolicyNumber: json['insurance_policy_number'],
     );
   }
+  final String? licensePlate;
+  final String? chassisNumber;
+  final String? renavam;
+  final DateTime? licenseExpiryDate;
+  final DateTime? inspectionExpiryDate;
+  final DateTime? insuranceExpiryDate;
+  final String? insuranceCompany;
+  final String? insurancePolicyNumber;
 
-  Map<String, dynamic> toJson() {
-    return {
+  Map<String, dynamic> toJson() => {
       'license_plate': licensePlate,
       'chassis_number': chassisNumber,
       'renavam': renavam,
@@ -285,7 +280,6 @@ class VehicleDocuments {
       'insurance_company': insuranceCompany,
       'insurance_policy_number': insurancePolicyNumber,
     };
-  }
 
   VehicleDocuments copyWith({
     String? licensePlate,
@@ -296,8 +290,7 @@ class VehicleDocuments {
     DateTime? insuranceExpiryDate,
     String? insuranceCompany,
     String? insurancePolicyNumber,
-  }) {
-    return VehicleDocuments(
+  }) => VehicleDocuments(
       licensePlate: licensePlate ?? this.licensePlate,
       chassisNumber: chassisNumber ?? this.chassisNumber,
       renavam: renavam ?? this.renavam,
@@ -308,7 +301,6 @@ class VehicleDocuments {
       insurancePolicyNumber:
           insurancePolicyNumber ?? this.insurancePolicyNumber,
     );
-  }
 
   // Getters para verificar vencimentos
   bool get isLicenseExpired =>
@@ -322,7 +314,7 @@ class VehicleDocuments {
   bool get isLicenseExpiring {
     if (licenseExpiryDate == null) return false;
     final now = DateTime.now();
-    final warningPeriod = const Duration(days: 30);
+    const warningPeriod = Duration(days: 30);
     return licenseExpiryDate!.isAfter(now) &&
         licenseExpiryDate!.isBefore(now.add(warningPeriod));
   }
@@ -330,7 +322,7 @@ class VehicleDocuments {
   bool get isInspectionExpiring {
     if (inspectionExpiryDate == null) return false;
     final now = DateTime.now();
-    final warningPeriod = const Duration(days: 30);
+    const warningPeriod = Duration(days: 30);
     return inspectionExpiryDate!.isAfter(now) &&
         inspectionExpiryDate!.isBefore(now.add(warningPeriod));
   }
@@ -338,7 +330,7 @@ class VehicleDocuments {
   bool get isInsuranceExpiring {
     if (insuranceExpiryDate == null) return false;
     final now = DateTime.now();
-    final warningPeriod = const Duration(days: 30);
+    const warningPeriod = Duration(days: 30);
     return insuranceExpiryDate!.isAfter(now) &&
         insuranceExpiryDate!.isBefore(now.add(warningPeriod));
   }
@@ -358,7 +350,7 @@ class VehicleDocuments {
 
   bool get hasExpiringDocuments {
     final now = DateTime.now();
-    final warningPeriod = const Duration(days: 30);
+    const warningPeriod = Duration(days: 30);
 
     return (licenseExpiryDate?.isBefore(now.add(warningPeriod)) ?? false) ||
         (inspectionExpiryDate?.isBefore(now.add(warningPeriod)) ?? false) ||
@@ -367,26 +359,6 @@ class VehicleDocuments {
 }
 
 class Vehicle {
-  final String id;
-  final String name;
-  final VehicleType type;
-  final VehicleStatus status;
-  final FuelType fuelType;
-  final VehicleSpecifications specifications;
-  final VehicleDocuments documents;
-  final String? currentDriverId;
-  final String? currentRouteId;
-  final LatLng? currentPosition;
-  final double? currentFuelLevel;
-  final double odometer;
-  final DateTime? lastMaintenanceDate;
-  final DateTime? nextMaintenanceDate;
-  final double? maintenanceOdometer;
-  final List<String> features;
-  final String? notes;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-  final String companyId;
 
   const Vehicle({
     required this.id,
@@ -456,9 +428,28 @@ class Vehicle {
       companyId: json['company_id'] ?? '',
     );
   }
+  final String id;
+  final String name;
+  final VehicleType type;
+  final VehicleStatus status;
+  final FuelType fuelType;
+  final VehicleSpecifications specifications;
+  final VehicleDocuments documents;
+  final String? currentDriverId;
+  final String? currentRouteId;
+  final LatLng? currentPosition;
+  final double? currentFuelLevel;
+  final double odometer;
+  final DateTime? lastMaintenanceDate;
+  final DateTime? nextMaintenanceDate;
+  final double? maintenanceOdometer;
+  final List<String> features;
+  final String? notes;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final String companyId;
 
-  Map<String, dynamic> toJson() {
-    return {
+  Map<String, dynamic> toJson() => {
       'id': id,
       'name': name,
       'type': type.name,
@@ -485,7 +476,6 @@ class Vehicle {
       'updated_at': updatedAt.toIso8601String(),
       'company_id': companyId,
     };
-  }
 
   Vehicle copyWith({
     String? id,
@@ -508,8 +498,7 @@ class Vehicle {
     DateTime? createdAt,
     DateTime? updatedAt,
     String? companyId,
-  }) {
-    return Vehicle(
+  }) => Vehicle(
       id: id ?? this.id,
       name: name ?? this.name,
       type: type ?? this.type,
@@ -531,7 +520,6 @@ class Vehicle {
       updatedAt: updatedAt ?? this.updatedAt,
       companyId: companyId ?? this.companyId,
     );
-  }
 
   // Getters uteis
   bool get isActive => status == VehicleStatus.active;

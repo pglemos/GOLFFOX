@@ -6,20 +6,6 @@ typedef Json = Map<String, dynamic>;
 
 @immutable
 class RouteModel {
-  final String id;
-  final String name;
-  final String? description;
-  final String? companyId;
-  final String? transporterId;
-  final List<LatLng> polyline;
-  final String? polylineEncoded; // Polyline codificada do Google Maps
-  final double? totalDistance; // Em quilometros
-  final Duration? estimatedDuration;
-  final String status; // active, inactive, maintenance
-  final String? color; // Cor da rota no mapa
-  final bool isActive;
-  final DateTime createdAt;
-  final DateTime updatedAt;
 
   const RouteModel({
     required this.id,
@@ -37,6 +23,51 @@ class RouteModel {
     required this.createdAt,
     required this.updatedAt,
   });
+
+  factory RouteModel.fromJson(Map<String, dynamic> json) {
+    List<LatLng> polylinePoints = [];
+    if (json[RouteModelFields.polyline] != null) {
+      final polylineData = json[RouteModelFields.polyline] as List;
+      polylinePoints = polylineData
+          .map((p) => LatLng(p['lat'] as double, p['lng'] as double))
+          .toList();
+    }
+
+    return RouteModel(
+      id: json[RouteModelFields.id] as String,
+      name: json[RouteModelFields.name] as String,
+      description: json[RouteModelFields.description] as String?,
+      companyId: json[RouteModelFields.companyId] as String?,
+      transporterId: json[RouteModelFields.transporterId] as String?,
+      polyline: polylinePoints,
+      polylineEncoded: json[RouteModelFields.polylineEncoded] as String?,
+      totalDistance: json[RouteModelFields.totalDistance] != null
+          ? (json[RouteModelFields.totalDistance] as num).toDouble()
+          : null,
+      estimatedDuration: json[RouteModelFields.estimatedDuration] != null
+          ? Duration(minutes: json[RouteModelFields.estimatedDuration] as int)
+          : null,
+      status: json[RouteModelFields.status] as String? ?? 'active',
+      color: json[RouteModelFields.color] as String?,
+      isActive: json[RouteModelFields.isActive] as bool? ?? true,
+      createdAt: DateTime.parse(json[RouteModelFields.createdAt] as String),
+      updatedAt: DateTime.parse(json[RouteModelFields.updatedAt] as String),
+    );
+  }
+  final String id;
+  final String name;
+  final String? description;
+  final String? companyId;
+  final String? transporterId;
+  final List<LatLng> polyline;
+  final String? polylineEncoded; // Polyline codificada do Google Maps
+  final double? totalDistance; // Em quilometros
+  final Duration? estimatedDuration;
+  final String status; // active, inactive, maintenance
+  final String? color; // Cor da rota no mapa
+  final bool isActive;
+  final DateTime createdAt;
+  final DateTime updatedAt;
 
   /// Status da rota como enum
   RouteStatus get routeStatus {
@@ -85,37 +116,6 @@ class RouteModel {
         RouteModelFields.updatedAt: updatedAt.toIso8601String(),
       };
 
-  factory RouteModel.fromJson(Map<String, dynamic> json) {
-    List<LatLng> polylinePoints = [];
-    if (json[RouteModelFields.polyline] != null) {
-      final polylineData = json[RouteModelFields.polyline] as List;
-      polylinePoints = polylineData
-          .map((p) => LatLng(p['lat'] as double, p['lng'] as double))
-          .toList();
-    }
-
-    return RouteModel(
-      id: json[RouteModelFields.id] as String,
-      name: json[RouteModelFields.name] as String,
-      description: json[RouteModelFields.description] as String?,
-      companyId: json[RouteModelFields.companyId] as String?,
-      transporterId: json[RouteModelFields.transporterId] as String?,
-      polyline: polylinePoints,
-      polylineEncoded: json[RouteModelFields.polylineEncoded] as String?,
-      totalDistance: json[RouteModelFields.totalDistance] != null
-          ? (json[RouteModelFields.totalDistance] as num).toDouble()
-          : null,
-      estimatedDuration: json[RouteModelFields.estimatedDuration] != null
-          ? Duration(minutes: json[RouteModelFields.estimatedDuration] as int)
-          : null,
-      status: json[RouteModelFields.status] as String? ?? 'active',
-      color: json[RouteModelFields.color] as String?,
-      isActive: json[RouteModelFields.isActive] as bool? ?? true,
-      createdAt: DateTime.parse(json[RouteModelFields.createdAt] as String),
-      updatedAt: DateTime.parse(json[RouteModelFields.updatedAt] as String),
-    );
-  }
-
   /* ------------------------------ METODOS UTILITARIOS ------------------------------ */
 
   RouteModel copyWith({
@@ -133,8 +133,7 @@ class RouteModel {
     bool? isActive,
     DateTime? createdAt,
     DateTime? updatedAt,
-  }) {
-    return RouteModel(
+  }) => RouteModel(
       id: id ?? this.id,
       name: name ?? this.name,
       description: description ?? this.description,
@@ -150,7 +149,6 @@ class RouteModel {
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
-  }
 
   @override
   bool operator ==(Object other) =>

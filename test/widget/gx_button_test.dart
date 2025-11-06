@@ -5,10 +5,10 @@ import 'package:golffox/widgets/gx_button.dart';
 
 void main() {
   group('GxButton Widget Tests', () {
-    testWidgets('should render basic button with label', (WidgetTester tester) async {
+    testWidgets('should render basic button with label', (tester) async {
       // Arrange
       const buttonLabel = 'Test Button';
-      bool wasPressed = false;
+      var wasPressed = false;
 
       // Act
       await tester.pumpWidget(
@@ -31,7 +31,7 @@ void main() {
       expect(wasPressed, isTrue);
     });
 
-    testWidgets('should render outlined button variant', (WidgetTester tester) async {
+    testWidgets('should render outlined button variant', (tester) async {
       // Arrange
       const buttonLabel = 'Outlined Button';
 
@@ -55,7 +55,7 @@ void main() {
       expect(gxButton.variant, equals(GxButtonVariant.outlined));
     });
 
-    testWidgets('should render text button variant', (WidgetTester tester) async {
+    testWidgets('should render text button variant', (tester) async {
       // Arrange
       const buttonLabel = 'Text Button';
 
@@ -78,7 +78,7 @@ void main() {
       expect(gxButton.variant, equals(GxButtonVariant.text));
     });
 
-    testWidgets('should render elevated button variant', (WidgetTester tester) async {
+    testWidgets('should render elevated button variant', (tester) async {
       // Arrange
       const buttonLabel = 'Elevated Button';
 
@@ -101,7 +101,7 @@ void main() {
       expect(gxButton.variant, equals(GxButtonVariant.elevated));
     });
 
-    testWidgets('should render button with icon', (WidgetTester tester) async {
+    testWidgets('should render button with icon', (tester) async {
       // Arrange
       const buttonLabel = 'Button with Icon';
       const iconData = Icons.add;
@@ -124,7 +124,7 @@ void main() {
       expect(find.byIcon(iconData), findsOneWidget);
     });
 
-    testWidgets('should show loading state', (WidgetTester tester) async {
+    testWidgets('should show loading state', (tester) async {
       // Arrange
       const buttonLabel = 'Loading Button';
 
@@ -145,17 +145,16 @@ void main() {
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
     });
 
-    testWidgets('should be disabled when onPressed is null', (WidgetTester tester) async {
+    testWidgets('should be disabled when onPressed is null', (tester) async {
       // Arrange
       const buttonLabel = 'Disabled Button';
 
       // Act
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: GxButton(
               buttonLabel,
-              onPressed: null,
             ),
           ),
         ),
@@ -168,7 +167,7 @@ void main() {
       expect(gxButton.onPressed, isNull);
     });
 
-    testWidgets('should handle different button sizes', (WidgetTester tester) async {
+    testWidgets('should handle different button sizes', (tester) async {
       // Test small size
       await tester.pumpWidget(
         MaterialApp(
@@ -202,7 +201,7 @@ void main() {
       expect(largeButton.size, equals(GxButtonSize.large));
     });
 
-    testWidgets('should handle custom colors', (WidgetTester tester) async {
+    testWidgets('should handle custom colors', (tester) async {
       // Arrange
       const buttonLabel = 'Custom Color Button';
       const customColor = Colors.red;
@@ -228,7 +227,7 @@ void main() {
       expect(gxButton.textColor, equals(customTextColor));
     });
 
-    testWidgets('should handle full width property', (WidgetTester tester) async {
+    testWidgets('should handle full width property', (tester) async {
       // Arrange
       const buttonLabel = 'Full Width Button';
 
@@ -250,14 +249,13 @@ void main() {
       expect(gxButton.fullWidth, isTrue);
     });
 
-    testWidgets('should handle primary property', (WidgetTester tester) async {
+    testWidgets('should handle primary property', (tester) async {
       // Test primary button
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
             body: GxButton(
               'Primary Button',
-              primary: true,
               onPressed: () {},
             ),
           ),
@@ -284,10 +282,10 @@ void main() {
       expect(secondaryButton.primary, isFalse);
     });
 
-    testWidgets('should handle custom padding', (WidgetTester tester) async {
+    testWidgets('should handle custom padding', (tester) async {
       // Arrange
       const buttonLabel = 'Custom Padding Button';
-      const customPadding = EdgeInsets.all(20.0);
+      const customPadding = EdgeInsets.all(20);
 
       // Act
       await tester.pumpWidget(

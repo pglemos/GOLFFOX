@@ -11,12 +11,12 @@ import '../../../models/maintenance.dart';
 import '../../../services/vehicle_service.dart';
 
 class VehicleMaintenanceList extends ConsumerStatefulWidget {
-  final String vehicleId;
 
   const VehicleMaintenanceList({
     super.key,
     required this.vehicleId,
   });
+  final String vehicleId;
 
   @override
   ConsumerState<VehicleMaintenanceList> createState() =>
@@ -38,25 +38,25 @@ class _VehicleMaintenanceListState
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
+            const Icon(
               Icons.error_outline,
               size: 64,
-              color: const Color(GfTokens.colorError),
+              color: Color(GfTokens.colorError),
             ),
             const SizedBox(height: GfTokens.spacingMd),
-            Text(
+            const Text(
               'Erro ao carregar manutencoes',
               style: TextStyle(
                 fontSize: GfTokens.fontSizeLg,
                 fontWeight: FontWeight.w600,
-                color: const Color(GfTokens.colorOnSurface),
+                color: Color(GfTokens.colorOnSurface),
               ),
             ),
             const SizedBox(height: GfTokens.spacingSm),
             Text(
               error.toString(),
-              style: TextStyle(
-                color: const Color(GfTokens.colorOnSurfaceVariant),
+              style: const TextStyle(
+                color: Color(GfTokens.colorOnSurfaceVariant),
               ),
               textAlign: TextAlign.center,
             ),
@@ -76,19 +76,19 @@ class _VehicleMaintenanceListState
             // Filtros
             Container(
               padding: const EdgeInsets.all(GfTokens.spacingMd),
-              decoration: BoxDecoration(
-                color: const Color(GfTokens.colorSurface),
+              decoration: const BoxDecoration(
+                color: Color(GfTokens.colorSurface),
                 border: Border(
-                  bottom: BorderSide(color: const Color(GfTokens.colorBorder)),
+                  bottom: BorderSide(color: Color(GfTokens.colorBorder)),
                 ),
               ),
               child: Row(
                 children: [
-                  Text(
+                  const Text(
                     'Filtrar por:',
                     style: TextStyle(
                       fontWeight: FontWeight.w600,
-                      color: const Color(GfTokens.colorOnSurface),
+                      color: Color(GfTokens.colorOnSurface),
                     ),
                   ),
                   const SizedBox(width: GfTokens.spacingMd),
@@ -163,9 +163,9 @@ class _VehicleMaintenanceListState
         });
       },
       backgroundColor: isSelected
-          ? Color(GfTokens.colorPrimary).withValues(alpha: 0.1)
+          ? const Color(GfTokens.colorPrimary).withValues(alpha: 0.1)
           : null,
-      selectedColor: Color(GfTokens.colorPrimary).withValues(alpha: 0.2),
+      selectedColor: const Color(GfTokens.colorPrimary).withValues(alpha: 0.2),
       checkmarkColor: const Color(GfTokens.colorPrimary),
       side: BorderSide(
         color: isSelected
@@ -175,8 +175,7 @@ class _VehicleMaintenanceListState
     );
   }
 
-  Widget _buildMaintenanceCard(MaintenanceRecord record, int index) {
-    return Card(
+  Widget _buildMaintenanceCard(MaintenanceRecord record, int index) => Card(
       margin: const EdgeInsets.only(bottom: GfTokens.spacingMd),
       child: Padding(
         padding: const EdgeInsets.all(GfTokens.spacingMd),
@@ -393,10 +392,8 @@ class _VehicleMaintenanceListState
         .animate(delay: (index * 100).ms)
         .fadeIn(duration: 300.ms)
         .slideX(begin: 0.1, end: 0);
-  }
 
-  Widget _buildInfoItem(String label, String value, IconData icon) {
-    return Row(
+  Widget _buildInfoItem(String label, String value, IconData icon) => Row(
       children: [
         Icon(
           icon,
@@ -426,7 +423,6 @@ class _VehicleMaintenanceListState
         ),
       ],
     );
-  }
 
   Widget _buildEmptyState() {
     String message;
@@ -454,7 +450,7 @@ class _VehicleMaintenanceListState
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
+          const Icon(
             Icons.build_circle_outlined,
             size: 64,
             color: Color(GfTokens.colorOnSurfaceVariant),
@@ -462,7 +458,7 @@ class _VehicleMaintenanceListState
           const SizedBox(height: GfTokens.spacingMd),
           Text(
             message,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: GfTokens.fontSizeLg,
               fontWeight: FontWeight.w600,
               color: Color(GfTokens.colorOnSurface),
@@ -471,7 +467,7 @@ class _VehicleMaintenanceListState
           const SizedBox(height: GfTokens.spacingSm),
           Text(
             description,
-            style: TextStyle(
+            style: const TextStyle(
               color: Color(GfTokens.colorOnSurfaceVariant),
             ),
             textAlign: TextAlign.center,
@@ -523,7 +519,5 @@ class _VehicleMaintenanceListState
     }
   }
 
-  String _formatDate(DateTime date) {
-    return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
-  }
+  String _formatDate(DateTime date) => '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
 }

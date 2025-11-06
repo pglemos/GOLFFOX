@@ -2,14 +2,14 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:golffox/models/user.dart';
-import 'package:golffox/models/trip.dart';
+import '../models/user.dart';
+import '../models/trip.dart';
 
 /// Erros tipados para UI tratar mensagens e fallback.
 class LocalDataFailure implements Exception {
+  LocalDataFailure(this.message, [this.cause]);
   final String message;
   final Object? cause;
-  LocalDataFailure(this.message, [this.cause]);
   @override
   String toString() => 'LocalDataFailure: $message';
 }
@@ -20,10 +20,10 @@ class LocalDataFailure implements Exception {
 /// - Streams reativas: sessao do usuario e lista de viagens.
 /// - Fila de escrita para evitar condicoes de corrida.
 class LocalDataService {
-  /* ------------------ Singleton ------------------ */
-  static final LocalDataService _instance = LocalDataService._internal();
   factory LocalDataService() => _instance;
   LocalDataService._internal();
+  /* ------------------ Singleton ------------------ */
+  static final LocalDataService _instance = LocalDataService._internal();
 
   /* ------------------ Const / Keys ------------------ */
   static const _kVersion = 2; // bump quando mudar estrutura dos dados
@@ -231,7 +231,7 @@ class LocalDataService {
   /// Trips para o usuario, filtradas por papel, ordenadas por prioridade.
   Future<List<Trip>> getTripsForUser(User user) async {
     await ensureInitialized();
-    final role = (user.role).toLowerCase();
+    final role = user.role.toLowerCase();
 
     // Filtro por papel - ajuste conforme seu dominio evoluir.
     bool include(Trip t) {
@@ -291,7 +291,7 @@ class LocalDataService {
     yield await getTripsForUser(user);
     // depois, filtra o stream global
     yield* tripsStream.map((all) {
-      final role = (user.role).toLowerCase();
+      final role = user.role.toLowerCase();
       bool include(Trip t) {
         switch (role) {
           case 'driver':

@@ -10,11 +10,6 @@ import '../../../core/utils/date_utils.dart';
 import '../../../models/vehicle.dart';
 
 class VehicleCard extends StatelessWidget {
-  final Vehicle vehicle;
-  final VoidCallback? onTap;
-  final VoidCallback? onEdit;
-  final VoidCallback? onDelete;
-  final bool showActions;
 
   const VehicleCard({
     super.key,
@@ -24,10 +19,14 @@ class VehicleCard extends StatelessWidget {
     this.onDelete,
     this.showActions = true,
   });
+  final Vehicle vehicle;
+  final VoidCallback? onTap;
+  final VoidCallback? onEdit;
+  final VoidCallback? onDelete;
+  final bool showActions;
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
+  Widget build(BuildContext context) => Container(
       margin: const EdgeInsets.only(bottom: GfTokens.spacingMd),
       child: Material(
         color: const Color(GfTokens.colorSurface),
@@ -264,15 +263,13 @@ class VehicleCard extends StatelessWidget {
         ),
       ),
     );
-  }
 
   Widget _buildMetric({
     required IconData icon,
     required String label,
     required String value,
     required Color color,
-  }) {
-    return Column(
+  }) => Column(
       children: [
         Icon(
           icon,
@@ -297,7 +294,6 @@ class VehicleCard extends StatelessWidget {
         ),
       ],
     );
-  }
 
   Widget _buildAlerts() {
     final alerts = <Widget>[];
@@ -339,8 +335,7 @@ class VehicleCard extends StatelessWidget {
     required IconData icon,
     required String message,
     required Color color,
-  }) {
-    return Container(
+  }) => Container(
       padding: const EdgeInsets.symmetric(
         horizontal: GfTokens.spacingSm,
         vertical: GfTokens.spacingXs,
@@ -380,7 +375,6 @@ class VehicleCard extends StatelessWidget {
           duration: const Duration(seconds: 2),
           color: color.withValues(alpha: 0.3),
         );
-  }
 
   IconData _getVehicleIcon() {
     switch (vehicle.type) {
@@ -408,9 +402,7 @@ class VehicleCard extends StatelessWidget {
     }
   }
 
-  bool _hasAlerts() {
-    return vehicle.hasLowFuel ||
+  bool _hasAlerts() => vehicle.hasLowFuel ||
         vehicle.needsMaintenance ||
         vehicle.hasExpiringDocuments;
-  }
 }

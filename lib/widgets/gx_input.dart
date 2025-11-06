@@ -1,16 +1,6 @@
 import 'package:flutter/material.dart';
 
 class GxInput extends StatelessWidget {
-  final TextEditingController? controller;
-  final String? label;
-  final String? hint;
-  final IconData? icon;
-  final bool obscure;
-  final TextInputType? keyboardType;
-  final TextInputAction? textInputAction;
-  final FormFieldValidator<String>? validator;
-  final ValueChanged<String>? onChanged;
-  final VoidCallback? onSubmitted;
 
   const GxInput({
     super.key,
@@ -25,6 +15,16 @@ class GxInput extends StatelessWidget {
     this.onChanged,
     this.onSubmitted,
   });
+  final TextEditingController? controller;
+  final String? label;
+  final String? hint;
+  final IconData? icon;
+  final bool obscure;
+  final TextInputType? keyboardType;
+  final TextInputAction? textInputAction;
+  final FormFieldValidator<String>? validator;
+  final ValueChanged<String>? onChanged;
+  final VoidCallback? onSubmitted;
 
   @override
   Widget build(BuildContext context) {

@@ -7,16 +7,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/driver.dart';
 
 class DriverFilters {
-  static const _unset = Object();
-
-  final String? search;
-  final DriverStatus? status;
-  final LicenseCategory? licenseCategory;
-  final bool? hasAlerts;
-  final bool? isOnline;
-  final bool? hasExpiredDocuments;
-  final double? minRating;
-  final int? minTrips;
 
   const DriverFilters({
     this.search,
@@ -28,6 +18,16 @@ class DriverFilters {
     this.minRating,
     this.minTrips,
   });
+  static const _unset = Object();
+
+  final String? search;
+  final DriverStatus? status;
+  final LicenseCategory? licenseCategory;
+  final bool? hasAlerts;
+  final bool? isOnline;
+  final bool? hasExpiredDocuments;
+  final double? minRating;
+  final int? minTrips;
 
   DriverFilters copyWith({
     Object? search = _unset,
@@ -38,8 +38,7 @@ class DriverFilters {
     Object? hasExpiredDocuments = _unset,
     Object? minRating = _unset,
     Object? minTrips = _unset,
-  }) {
-    return DriverFilters(
+  }) => DriverFilters(
       search: search == _unset ? this.search : search as String?,
       status: status == _unset ? this.status : status as DriverStatus?,
       licenseCategory: licenseCategory == _unset
@@ -53,10 +52,9 @@ class DriverFilters {
       minRating: minRating == _unset ? this.minRating : minRating as double?,
       minTrips: minTrips == _unset ? this.minTrips : minTrips as int?,
     );
-  }
 
   bool get hasActiveFilters =>
-      search?.isNotEmpty == true ||
+      search?.isNotEmpty ?? false ||
       status != null ||
       licenseCategory != null ||
       hasAlerts != null ||
@@ -66,8 +64,8 @@ class DriverFilters {
       minTrips != null;
 
   int get activeFiltersCount {
-    int count = 0;
-    if (search?.isNotEmpty == true) count++;
+    var count = 0;
+    if (search?.isNotEmpty ?? false) count++;
     if (status != null) count++;
     if (licenseCategory != null) count++;
     if (hasAlerts != null) count++;
@@ -80,13 +78,6 @@ class DriverFilters {
 }
 
 class DriversOverviewStats {
-  final int totalDrivers;
-  final int activeDrivers;
-  final int availableDrivers;
-  final int onlineDrivers;
-  final int driversWithAlerts;
-  final double averageRating;
-  final int totalTrips;
 
   const DriversOverviewStats({
     this.totalDrivers = 0,
@@ -97,6 +88,13 @@ class DriversOverviewStats {
     this.averageRating = 0.0,
     this.totalTrips = 0,
   });
+  final int totalDrivers;
+  final int activeDrivers;
+  final int availableDrivers;
+  final int onlineDrivers;
+  final int driversWithAlerts;
+  final double averageRating;
+  final int totalTrips;
 }
 
 class DriverService extends StateNotifier<AsyncValue<List<Driver>>> {
@@ -118,8 +116,7 @@ class DriverService extends StateNotifier<AsyncValue<List<Driver>>> {
     }
   }
 
-  List<Driver> _generateMockDrivers() {
-    return [
+  List<Driver> _generateMockDrivers() => [
       Driver(
         id: '1',
         name: 'Joao Silva',
@@ -378,7 +375,6 @@ class DriverService extends StateNotifier<AsyncValue<List<Driver>>> {
         lastSeenAt: DateTime.now().subtract(const Duration(minutes: 1)),
       ),
     ];
-  }
 
   // Metodos publicos
   Future<void> refreshDrivers() async {
@@ -402,14 +398,12 @@ class DriverService extends StateNotifier<AsyncValue<List<Driver>>> {
       var filteredDrivers = List<Driver>.from(_drivers);
 
       // Filtro por busca
-      if (_currentFilters.search?.isNotEmpty == true) {
+      if (_currentFilters.search?.isNotEmpty ?? false) {
         final search = _currentFilters.search!.toLowerCase();
-        filteredDrivers = filteredDrivers.where((driver) {
-          return driver.name.toLowerCase().contains(search) ||
+        filteredDrivers = filteredDrivers.where((driver) => driver.name.toLowerCase().contains(search) ||
               driver.email.toLowerCase().contains(search) ||
               driver.phone?.toLowerCase().contains(search) == true ||
-              driver.cpf?.toLowerCase().contains(search) == true;
-        }).toList();
+              driver.cpf?.toLowerCase().contains(search) == true).toList();
       }
 
       // Filtro por status
@@ -580,19 +574,13 @@ class DriverService extends StateNotifier<AsyncValue<List<Driver>>> {
   }
 
   // Buscar motoristas disponiveis
-  List<Driver> getAvailableDrivers() {
-    return _drivers.where((driver) => driver.isAvailable).toList();
-  }
+  List<Driver> getAvailableDrivers() => _drivers.where((driver) => driver.isAvailable).toList();
 
   // Buscar motoristas online
-  List<Driver> getOnlineDrivers() {
-    return _drivers.where((driver) => driver.isOnline).toList();
-  }
+  List<Driver> getOnlineDrivers() => _drivers.where((driver) => driver.isOnline).toList();
 
   // Buscar motoristas com alertas
-  List<Driver> getDriversWithAlerts() {
-    return _drivers.where((driver) => driver.hasAlerts).toList();
-  }
+  List<Driver> getDriversWithAlerts() => _drivers.where((driver) => driver.hasAlerts).toList();
 
   // Stream de motoristas
   Stream<List<Driver>> get driversStream async* {

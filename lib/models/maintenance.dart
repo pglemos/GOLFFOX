@@ -121,13 +121,6 @@ extension MaintenancePriorityExtension on MaintenancePriority {
 }
 
 class MaintenanceItem {
-  final String id;
-  final String description;
-  final String? partNumber;
-  final double? cost;
-  final int quantity;
-  final bool isCompleted;
-  final String? notes;
 
   const MaintenanceItem({
     required this.id,
@@ -150,9 +143,15 @@ class MaintenanceItem {
       notes: json['notes'],
     );
   }
+  final String id;
+  final String description;
+  final String? partNumber;
+  final double? cost;
+  final int quantity;
+  final bool isCompleted;
+  final String? notes;
 
-  Map<String, dynamic> toJson() {
-    return {
+  Map<String, dynamic> toJson() => {
       'id': id,
       'description': description,
       'part_number': partNumber,
@@ -161,7 +160,6 @@ class MaintenanceItem {
       'is_completed': isCompleted,
       'notes': notes,
     };
-  }
 
   MaintenanceItem copyWith({
     String? id,
@@ -171,8 +169,7 @@ class MaintenanceItem {
     int? quantity,
     bool? isCompleted,
     String? notes,
-  }) {
-    return MaintenanceItem(
+  }) => MaintenanceItem(
       id: id ?? this.id,
       description: description ?? this.description,
       partNumber: partNumber ?? this.partNumber,
@@ -181,38 +178,11 @@ class MaintenanceItem {
       isCompleted: isCompleted ?? this.isCompleted,
       notes: notes ?? this.notes,
     );
-  }
 
   double get totalCost => (cost ?? 0.0) * quantity;
 }
 
 class MaintenanceRecord {
-  final String id;
-  final String vehicleId;
-  final String title;
-  final String description;
-  final MaintenanceType type;
-  final MaintenanceStatus status;
-  final MaintenancePriority priority;
-  final DateTime scheduledDate;
-  final DateTime? startDate;
-  final DateTime? completedDate;
-  final double odometerReading;
-  final double? estimatedCost;
-  final double? actualCost;
-  final String? serviceProviderId;
-  final String? serviceProviderName;
-  final String? technicianId;
-  final String? technicianName;
-  final List<MaintenanceItem> items;
-  final List<String> attachments;
-  final String? notes;
-  final String? completionNotes;
-  final DateTime? nextMaintenanceDate;
-  final double? nextMaintenanceOdometer;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-  final String companyId;
 
   const MaintenanceRecord({
     required this.id,
@@ -294,9 +264,34 @@ class MaintenanceRecord {
       companyId: json['company_id'] ?? '',
     );
   }
+  final String id;
+  final String vehicleId;
+  final String title;
+  final String description;
+  final MaintenanceType type;
+  final MaintenanceStatus status;
+  final MaintenancePriority priority;
+  final DateTime scheduledDate;
+  final DateTime? startDate;
+  final DateTime? completedDate;
+  final double odometerReading;
+  final double? estimatedCost;
+  final double? actualCost;
+  final String? serviceProviderId;
+  final String? serviceProviderName;
+  final String? technicianId;
+  final String? technicianName;
+  final List<MaintenanceItem> items;
+  final List<String> attachments;
+  final String? notes;
+  final String? completionNotes;
+  final DateTime? nextMaintenanceDate;
+  final double? nextMaintenanceOdometer;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final String companyId;
 
-  Map<String, dynamic> toJson() {
-    return {
+  Map<String, dynamic> toJson() => {
       'id': id,
       'vehicle_id': vehicleId,
       'title': title,
@@ -324,7 +319,6 @@ class MaintenanceRecord {
       'updated_at': updatedAt.toIso8601String(),
       'company_id': companyId,
     };
-  }
 
   MaintenanceRecord copyWith({
     String? id,
@@ -353,8 +347,7 @@ class MaintenanceRecord {
     DateTime? createdAt,
     DateTime? updatedAt,
     String? companyId,
-  }) {
-    return MaintenanceRecord(
+  }) => MaintenanceRecord(
       id: id ?? this.id,
       vehicleId: vehicleId ?? this.vehicleId,
       title: title ?? this.title,
@@ -383,7 +376,6 @@ class MaintenanceRecord {
       updatedAt: updatedAt ?? this.updatedAt,
       companyId: companyId ?? this.companyId,
     );
-  }
 
   // Getters uteis
   bool get isCompleted => status == MaintenanceStatus.completed;
@@ -416,7 +408,7 @@ class MaintenanceRecord {
 
   double get totalCost {
     final itemsCost = items.fold<double>(
-        0.0, (sum, item) => sum + (item.cost ?? 0.0) * item.quantity);
+        0, (sum, item) => sum + (item.cost ?? 0.0) * item.quantity);
     final mainCost = actualCost ?? estimatedCost ?? 0.0;
     return itemsCost + mainCost;
   }

@@ -6,22 +6,6 @@ typedef Json = Map<String, dynamic>;
 
 @immutable
 class RouteStopModel {
-  final String id;
-  final String routeId;
-  final String name;
-  final String? description;
-  final double latitude;
-  final double longitude;
-  final int order;
-  final String type; // pickup, dropoff, waypoint, depot
-  final DateTime? scheduledTime;
-  final Duration? estimatedDuration;
-  final int? estimatedPassengers;
-  final bool isActive;
-  final String? address;
-  final String? landmark;
-  final DateTime createdAt;
-  final DateTime updatedAt;
 
   const RouteStopModel({
     required this.id,
@@ -41,6 +25,47 @@ class RouteStopModel {
     required this.createdAt,
     required this.updatedAt,
   });
+
+  factory RouteStopModel.fromJson(Map<String, dynamic> json) {
+    return RouteStopModel(
+      id: json[RouteStopFields.id] as String,
+      routeId: json[RouteStopFields.routeId] as String,
+      name: json[RouteStopFields.name] as String,
+      description: json[RouteStopFields.description] as String?,
+      latitude: (json[RouteStopFields.latitude] as num).toDouble(),
+      longitude: (json[RouteStopFields.longitude] as num).toDouble(),
+      order: json[RouteStopFields.order] as int,
+      type: json[RouteStopFields.type] as String,
+      scheduledTime: json[RouteStopFields.scheduledTime] != null
+          ? DateTime.parse(json[RouteStopFields.scheduledTime] as String)
+          : null,
+      estimatedDuration: json[RouteStopFields.estimatedDuration] != null
+          ? Duration(minutes: json[RouteStopFields.estimatedDuration] as int)
+          : null,
+      estimatedPassengers: json[RouteStopFields.estimatedPassengers] as int?,
+      isActive: json[RouteStopFields.isActive] as bool? ?? true,
+      address: json[RouteStopFields.address] as String?,
+      landmark: json[RouteStopFields.landmark] as String?,
+      createdAt: DateTime.parse(json[RouteStopFields.createdAt] as String),
+      updatedAt: DateTime.parse(json[RouteStopFields.updatedAt] as String),
+    );
+  }
+  final String id;
+  final String routeId;
+  final String name;
+  final String? description;
+  final double latitude;
+  final double longitude;
+  final int order;
+  final String type; // pickup, dropoff, waypoint, depot
+  final DateTime? scheduledTime;
+  final Duration? estimatedDuration;
+  final int? estimatedPassengers;
+  final bool isActive;
+  final String? address;
+  final String? landmark;
+  final DateTime createdAt;
+  final DateTime updatedAt;
 
   /// Posicao da parada
   LatLng get position => LatLng(latitude, longitude);
@@ -94,31 +119,6 @@ class RouteStopModel {
         RouteStopFields.updatedAt: updatedAt.toIso8601String(),
       };
 
-  factory RouteStopModel.fromJson(Map<String, dynamic> json) {
-    return RouteStopModel(
-      id: json[RouteStopFields.id] as String,
-      routeId: json[RouteStopFields.routeId] as String,
-      name: json[RouteStopFields.name] as String,
-      description: json[RouteStopFields.description] as String?,
-      latitude: (json[RouteStopFields.latitude] as num).toDouble(),
-      longitude: (json[RouteStopFields.longitude] as num).toDouble(),
-      order: json[RouteStopFields.order] as int,
-      type: json[RouteStopFields.type] as String,
-      scheduledTime: json[RouteStopFields.scheduledTime] != null
-          ? DateTime.parse(json[RouteStopFields.scheduledTime] as String)
-          : null,
-      estimatedDuration: json[RouteStopFields.estimatedDuration] != null
-          ? Duration(minutes: json[RouteStopFields.estimatedDuration] as int)
-          : null,
-      estimatedPassengers: json[RouteStopFields.estimatedPassengers] as int?,
-      isActive: json[RouteStopFields.isActive] as bool? ?? true,
-      address: json[RouteStopFields.address] as String?,
-      landmark: json[RouteStopFields.landmark] as String?,
-      createdAt: DateTime.parse(json[RouteStopFields.createdAt] as String),
-      updatedAt: DateTime.parse(json[RouteStopFields.updatedAt] as String),
-    );
-  }
-
   /* ------------------------------ METODOS UTILITARIOS ------------------------------ */
 
   RouteStopModel copyWith({
@@ -138,8 +138,7 @@ class RouteStopModel {
     String? landmark,
     DateTime? createdAt,
     DateTime? updatedAt,
-  }) {
-    return RouteStopModel(
+  }) => RouteStopModel(
       id: id ?? this.id,
       routeId: routeId ?? this.routeId,
       name: name ?? this.name,
@@ -157,7 +156,6 @@ class RouteStopModel {
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
-  }
 
   @override
   bool operator ==(Object other) =>

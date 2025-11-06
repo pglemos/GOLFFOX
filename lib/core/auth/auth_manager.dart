@@ -16,9 +16,9 @@ import '../../services/supabase_service.dart';
 /// - Session persistence
 /// - Automatic token refresh
 class AuthManager extends ChangeNotifier {
+  AuthManager._();
   static AuthManager? _instance;
   static AuthManager get instance => _instance ??= AuthManager._();
-  AuthManager._();
 
   final _logger = LoggerService.instance;
   final _errorService = ErrorService.instance;
@@ -214,14 +214,10 @@ class AuthManager extends ChangeNotifier {
   }
 
   /// Check if user has required role
-  bool hasRole(UserRole requiredRole) {
-    return currentUserRole == requiredRole;
-  }
+  bool hasRole(UserRole requiredRole) => currentUserRole == requiredRole;
 
   /// Check if user has any of the required roles
-  bool hasAnyRole(List<UserRole> requiredRoles) {
-    return currentUserRole != null && requiredRoles.contains(currentUserRole);
-  }
+  bool hasAnyRole(List<UserRole> requiredRoles) => currentUserRole != null && requiredRoles.contains(currentUserRole);
 
   /// Check if user has operator privileges
   bool get isOperator => hasRole(UserRole.operator);
@@ -278,15 +274,15 @@ class AuthManager extends ChangeNotifier {
         final currentUser = _supabase.currentUser;
         if (currentUser != null) {
           // Determine role based on email
-          UserRole role = UserRole.passenger; // default
-          if (currentUser.email?.contains('operador') == true ||
-              currentUser.email?.contains('operator') == true) {
+          var role = UserRole.passenger; // default
+          if (currentUser.email?.contains('operador') ?? false ||
+              currentUser.email?.contains('operator') ?? false) {
             role = UserRole.operator;
-          } else if (currentUser.email?.contains('transportadora') == true ||
-              currentUser.email?.contains('carrier') == true) {
+          } else if (currentUser.email?.contains('transportadora') ?? false ||
+              currentUser.email?.contains('carrier') ?? false) {
             role = UserRole.carrier;
-          } else if (currentUser.email?.contains('motorista') == true ||
-              currentUser.email?.contains('driver') == true) {
+          } else if (currentUser.email?.contains('motorista') ?? false ||
+              currentUser.email?.contains('driver') ?? false) {
             role = UserRole.driver;
           }
 
@@ -343,13 +339,6 @@ class AuthManager extends ChangeNotifier {
 
 /// User profile model
 class UserProfile {
-  final String id;
-  final String email;
-  final String fullName;
-  final UserRole role;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-  final Map<String, dynamic>? metadata;
 
   const UserProfile({
     required this.id,
@@ -373,6 +362,13 @@ class UserProfile {
       metadata: json['metadata'] as Map<String, dynamic>?,
     );
   }
+  final String id;
+  final String email;
+  final String fullName;
+  final UserRole role;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final Map<String, dynamic>? metadata;
 
   Map<String, dynamic> toJson() => {
         'id': id,
@@ -387,10 +383,6 @@ class UserProfile {
 
 /// Authentication result
 class AuthResult {
-  final bool isSuccess;
-  final User? user;
-  final UserProfile? profile;
-  final GxError? error;
 
   const AuthResult._({
     required this.isSuccess,
@@ -416,4 +408,8 @@ class AuthResult {
       error: error,
     );
   }
+  final bool isSuccess;
+  final User? user;
+  final UserProfile? profile;
+  final GxError? error;
 }

@@ -2,9 +2,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import 'package:golffox/services/supabase_service.dart';
-import 'package:golffox/models/user.dart' as app_user;
-import 'package:golffox/core/theme/gf_tokens.dart';
+import 'supabase_service.dart';
+import '../models/user.dart' as app_user;
+import '../core/theme/gf_tokens.dart';
 
 /// Codigos tipados para tratar erros no UI (snackbars, etc).
 enum AuthErrorCode {
@@ -18,10 +18,10 @@ enum AuthErrorCode {
 
 /// Excecao rica para a camada de apresentacao decidir mensagens/acoes.
 class AuthFailure implements Exception {
+  AuthFailure(this.code, this.message, [this.cause]);
   final AuthErrorCode code;
   final String message;
   final Object? cause;
-  AuthFailure(this.code, this.message, [this.cause]);
 
   @override
   String toString() => 'AuthFailure($code): $message';
@@ -31,7 +31,7 @@ class AuthService {
   SupabaseService get _supabaseService => SupabaseService.instance;
 
   static const _timeout = Duration(seconds: 20);
-  static final _propagateDelay = GfTokens.durationSlow;
+  static const _propagateDelay = GfTokens.durationSlow;
 
   /// Assina com e-mail/senha + busca o perfil (com retry/backoff).
   Future<app_user.User?> signInWithEmail(
@@ -313,7 +313,7 @@ class AuthService {
     required List<Duration> delays,
     bool Function(T value)? until,
   }) async {
-    T result = await op();
+    var result = await op();
     if (until == null || until(result)) return result;
 
     for (final d in delays) {

@@ -6,15 +6,15 @@ import '../logging/app_logger.dart';
 
 /// Configuração de rate limiting
 class RateLimitConfig {
-  final int maxRequests;
-  final Duration window;
-  final Duration? blockDuration;
 
   const RateLimitConfig({
     required this.maxRequests,
     required this.window,
     this.blockDuration,
   });
+  final int maxRequests;
+  final Duration window;
+  final Duration? blockDuration;
 
   /// Configuração para login (mais restritiva)
   static const login = RateLimitConfig(
@@ -79,9 +79,9 @@ class _RateLimitEntry {
 
 /// Sistema de rate limiting
 class RateLimiter {
-  static final RateLimiter _instance = RateLimiter._internal();
   factory RateLimiter() => _instance;
   RateLimiter._internal();
+  static final RateLimiter _instance = RateLimiter._internal();
 
   final Map<String, _RateLimitEntry> _entries = {};
   Timer? _cleanupTimer;
@@ -109,7 +109,7 @@ class RateLimiter {
     }
 
     final key = _generateKey(identifier, config);
-    final entry = _entries.putIfAbsent(key, () => _RateLimitEntry());
+    final entry = _entries.putIfAbsent(key, _RateLimitEntry.new);
 
     // Verifica se está bloqueado
     if (entry.isBlocked) {
@@ -150,7 +150,7 @@ class RateLimiter {
   /// Força o bloqueio de um identificador
   void block(String identifier, RateLimitConfig config, Duration duration) {
     final key = _generateKey(identifier, config);
-    final entry = _entries.putIfAbsent(key, () => _RateLimitEntry());
+    final entry = _entries.putIfAbsent(key, _RateLimitEntry.new);
     entry.block(duration);
 
     AppLogger.warning(
@@ -211,9 +211,7 @@ class RateLimiter {
   }
 
   /// Gera chave única para o rate limit
-  String _generateKey(String identifier, RateLimitConfig config) {
-    return '${identifier}_${config.maxRequests}_${config.window.inSeconds}';
-  }
+  String _generateKey(String identifier, RateLimitConfig config) => '${identifier}_${config.maxRequests}_${config.window.inSeconds}';
 
   /// Limpa entradas antigas
   void _cleanup() {
@@ -251,12 +249,6 @@ class RateLimiter {
 
 /// Informações sobre rate limit
 class RateLimitInfo {
-  final int requestCount;
-  final int maxRequests;
-  final Duration windowDuration;
-  final bool isBlocked;
-  final DateTime? blockedUntil;
-  final int remainingRequests;
 
   const RateLimitInfo({
     required this.requestCount,
@@ -266,6 +258,12 @@ class RateLimitInfo {
     this.blockedUntil,
     required this.remainingRequests,
   });
+  final int requestCount;
+  final int maxRequests;
+  final Duration windowDuration;
+  final bool isBlocked;
+  final DateTime? blockedUntil;
+  final int remainingRequests;
 
   /// Tempo restante até o reset da janela
   Duration? get timeUntilReset {
@@ -284,51 +282,37 @@ class RateLimitInfo {
   }
 
   @override
-  String toString() {
-    return 'RateLimitInfo(requests: $requestCount/$maxRequests, '
+  String toString() => 'RateLimitInfo(requests: $requestCount/$maxRequests, '
            'blocked: $isBlocked, remaining: $remainingRequests)';
-  }
 }
 
 /// Mixin para facilitar o uso de rate limiting
 mixin RateLimitMixin {
   /// Verifica rate limit para login
-  bool checkLoginRateLimit(String identifier) {
-    return RateLimiter().isAllowed(identifier, RateLimitConfig.login);
-  }
+  bool checkLoginRateLimit(String identifier) => RateLimiter().isAllowed(identifier, RateLimitConfig.login);
 
   /// Verifica rate limit para API
-  bool checkApiRateLimit(String identifier) {
-    return RateLimiter().isAllowed(identifier, RateLimitConfig.api);
-  }
+  bool checkApiRateLimit(String identifier) => RateLimiter().isAllowed(identifier, RateLimitConfig.api);
 
   /// Verifica rate limit para upload
-  bool checkUploadRateLimit(String identifier) {
-    return RateLimiter().isAllowed(identifier, RateLimitConfig.upload);
-  }
+  bool checkUploadRateLimit(String identifier) => RateLimiter().isAllowed(identifier, RateLimitConfig.upload);
 
   /// Verifica rate limit para busca
-  bool checkSearchRateLimit(String identifier) {
-    return RateLimiter().isAllowed(identifier, RateLimitConfig.search);
-  }
+  bool checkSearchRateLimit(String identifier) => RateLimiter().isAllowed(identifier, RateLimitConfig.search);
 
   /// Verifica rate limit para criação
-  bool checkCreateRateLimit(String identifier) {
-    return RateLimiter().isAllowed(identifier, RateLimitConfig.create);
-  }
+  bool checkCreateRateLimit(String identifier) => RateLimiter().isAllowed(identifier, RateLimitConfig.create);
 
   /// Obtém informações de rate limit
-  RateLimitInfo getRateLimitInfo(String identifier, RateLimitConfig config) {
-    return RateLimiter().getInfo(identifier, config);
-  }
+  RateLimitInfo getRateLimitInfo(String identifier, RateLimitConfig config) => RateLimiter().getInfo(identifier, config);
 }
 
 /// Exceção de rate limit
 class RateLimitException implements Exception {
-  final String message;
-  final RateLimitInfo info;
 
   const RateLimitException(this.message, this.info);
+  final String message;
+  final RateLimitInfo info;
 
   @override
   String toString() => 'RateLimitException: $message ($info)';

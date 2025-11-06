@@ -9,14 +9,14 @@ import '../../../models/vehicle.dart';
 import '../../../services/vehicle_service.dart';
 
 class VehicleFiltersWidget extends StatefulWidget {
-  final VehicleFilters filters;
-  final ValueChanged<VehicleFilters> onFiltersChanged;
 
   const VehicleFiltersWidget({
     super.key,
     required this.filters,
     required this.onFiltersChanged,
   });
+  final VehicleFilters filters;
+  final ValueChanged<VehicleFilters> onFiltersChanged;
 
   @override
   State<VehicleFiltersWidget> createState() => _VehicleFiltersWidgetState();
@@ -78,8 +78,7 @@ class _VehicleFiltersWidgetState extends State<VehicleFiltersWidget>
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
+  Widget build(BuildContext context) => Container(
       decoration: BoxDecoration(
         color: const Color(GfTokens.colorSurface),
         border: Border(
@@ -215,13 +214,11 @@ class _VehicleFiltersWidgetState extends State<VehicleFiltersWidget>
         ],
       ),
     );
-  }
 
   Widget _buildFilterSection({
     required String title,
     required Widget child,
-  }) {
-    return Column(
+  }) => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
@@ -236,10 +233,8 @@ class _VehicleFiltersWidgetState extends State<VehicleFiltersWidget>
         child,
       ],
     );
-  }
 
-  Widget _buildStatusFilters() {
-    return Wrap(
+  Widget _buildStatusFilters() => Wrap(
       spacing: GfTokens.spacingSm,
       runSpacing: GfTokens.spacingSm,
       children: VehicleStatus.values.map((status) {
@@ -270,10 +265,8 @@ class _VehicleFiltersWidgetState extends State<VehicleFiltersWidget>
         );
       }).toList(),
     );
-  }
 
-  Widget _buildTypeFilters() {
-    return Wrap(
+  Widget _buildTypeFilters() => Wrap(
       spacing: GfTokens.spacingSm,
       runSpacing: GfTokens.spacingSm,
       children: VehicleType.values.map((type) {
@@ -304,10 +297,8 @@ class _VehicleFiltersWidgetState extends State<VehicleFiltersWidget>
         );
       }).toList(),
     );
-  }
 
-  Widget _buildFuelFilters() {
-    return Wrap(
+  Widget _buildFuelFilters() => Wrap(
       spacing: GfTokens.spacingSm,
       runSpacing: GfTokens.spacingSm,
       children: FuelType.values.map((fuelType) {
@@ -339,10 +330,8 @@ class _VehicleFiltersWidgetState extends State<VehicleFiltersWidget>
         );
       }).toList(),
     );
-  }
 
-  Widget _buildAlertFilters() {
-    return Column(
+  Widget _buildAlertFilters() => Column(
       children: [
         CheckboxListTile(
           title: const Text('Precisa de manutencao'),
@@ -386,16 +375,15 @@ class _VehicleFiltersWidgetState extends State<VehicleFiltersWidget>
         ),
       ],
     );
-  }
 
   int _getActiveFiltersCount() {
-    int count = 0;
-    if (_currentFilters.statuses?.isNotEmpty == true) count++;
-    if (_currentFilters.types?.isNotEmpty == true) count++;
-    if (_currentFilters.fuelTypes?.isNotEmpty == true) count++;
-    if (_currentFilters.needsMaintenance == true) count++;
-    if (_currentFilters.hasLowFuel == true) count++;
-    if (_currentFilters.hasExpiringDocuments == true) count++;
+    var count = 0;
+    if (_currentFilters.statuses?.isNotEmpty ?? false) count++;
+    if (_currentFilters.types?.isNotEmpty ?? false) count++;
+    if (_currentFilters.fuelTypes?.isNotEmpty ?? false) count++;
+    if (_currentFilters.needsMaintenance ?? false) count++;
+    if (_currentFilters.hasLowFuel ?? false) count++;
+    if (_currentFilters.hasExpiringDocuments ?? false) count++;
     return count;
   }
 }

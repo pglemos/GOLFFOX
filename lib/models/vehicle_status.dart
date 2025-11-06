@@ -84,7 +84,7 @@ class VehicleStatusCalculator {
     }
 
     // Verificar se esta na garagem (flag do veiculo ou posicao dentro da garagem)
-    if (isVehicleInGarage == true || _isInAnyGarage(lastPosition, garages)) {
+    if (isVehicleInGarage ?? false || _isInAnyGarage(lastPosition, garages)) {
       return VehicleStatusType.garage;
     }
 
@@ -137,9 +137,7 @@ class VehicleStatusCalculator {
   }
 
   /// Obtem a cor do marcador baseada no status
-  static Color getMarkerColor(VehicleStatusType status) {
-    return status.color;
-  }
+  static Color getMarkerColor(VehicleStatusType status) => status.color;
 
   /// Obtem a cor do marcador com opacidade para diferentes estados
   static Color getMarkerColorWithOpacity(VehicleStatusType status,
@@ -163,11 +161,6 @@ class VehicleStatusCalculator {
 
 /// Classe para representar o status completo do veiculo
 class VehicleStatus {
-  final String vehicleId;
-  final VehicleStatusType status;
-  final DriverPosition? lastPosition;
-  final Duration? stoppedDuration;
-  final DateTime calculatedAt;
 
   const VehicleStatus({
     required this.vehicleId,
@@ -176,11 +169,14 @@ class VehicleStatus {
     this.stoppedDuration,
     required this.calculatedAt,
   });
+  final String vehicleId;
+  final VehicleStatusType status;
+  final DriverPosition? lastPosition;
+  final Duration? stoppedDuration;
+  final DateTime calculatedAt;
 
   /// Verifica se o status esta atualizado (calculado ha menos de 1 minuto)
-  bool get isUpToDate {
-    return DateTime.now().difference(calculatedAt).inMinutes < 1;
-  }
+  bool get isUpToDate => DateTime.now().difference(calculatedAt).inMinutes < 1;
 
   /// Obtem a cor do marcador
   Color get markerColor => status.color;

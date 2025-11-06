@@ -61,25 +61,6 @@ extension RouteDeviationStatusExtension on RouteDeviationStatus {
 
 @immutable
 class RouteDeviation {
-  final String id;
-  final String tripId;
-  final String vehicleId;
-  final String driverId;
-  final String routeId;
-  final RouteDeviationType deviationType;
-  final RouteDeviationStatus status;
-  final double latitude;
-  final double longitude;
-  final double? distanceFromRoute;
-  final int? timeDeviationMinutes;
-  final String? routeStopId;
-  final String? description;
-  final DateTime detectedAt;
-  final DateTime? resolvedAt;
-  final String? resolvedBy;
-  final String? notes;
-  final DateTime createdAt;
-  final DateTime updatedAt;
 
   const RouteDeviation({
     required this.id,
@@ -139,9 +120,27 @@ class RouteDeviation {
       updatedAt: DateTime.parse(json[RouteDeviationFields.updatedAt] as String),
     );
   }
+  final String id;
+  final String tripId;
+  final String vehicleId;
+  final String driverId;
+  final String routeId;
+  final RouteDeviationType deviationType;
+  final RouteDeviationStatus status;
+  final double latitude;
+  final double longitude;
+  final double? distanceFromRoute;
+  final int? timeDeviationMinutes;
+  final String? routeStopId;
+  final String? description;
+  final DateTime detectedAt;
+  final DateTime? resolvedAt;
+  final String? resolvedBy;
+  final String? notes;
+  final DateTime createdAt;
+  final DateTime updatedAt;
 
-  Json toJson() {
-    return {
+  Json toJson() => {
       RouteDeviationFields.id: id,
       RouteDeviationFields.tripId: tripId,
       RouteDeviationFields.vehicleId: vehicleId,
@@ -162,7 +161,6 @@ class RouteDeviation {
       RouteDeviationFields.createdAt: createdAt.toIso8601String(),
       RouteDeviationFields.updatedAt: updatedAt.toIso8601String(),
     };
-  }
 
   /* ================================= Copy ================================= */
 
@@ -186,8 +184,7 @@ class RouteDeviation {
     String? notes,
     DateTime? createdAt,
     DateTime? updatedAt,
-  }) {
-    return RouteDeviation(
+  }) => RouteDeviation(
       id: id ?? this.id,
       tripId: tripId ?? this.tripId,
       vehicleId: vehicleId ?? this.vehicleId,
@@ -208,7 +205,6 @@ class RouteDeviation {
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
-  }
 
   /// Verifica se o desvio esta ativo
   bool get isActive => status == RouteDeviationStatus.active;

@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 
 class GxTable extends StatelessWidget {
-  final List<String> columns;
-  final List<List<Widget>> rows;
-  final bool dense;
 
   const GxTable(
       {super.key,
       required this.columns,
       required this.rows,
       this.dense = false});
+  final List<String> columns;
+  final List<List<Widget>> rows;
+  final bool dense;
 
   @override
   Widget build(BuildContext context) {

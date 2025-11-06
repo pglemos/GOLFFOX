@@ -5,17 +5,11 @@ import 'dart:io' show Platform;
 
 import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:golffox/services/supabase_service.dart';
-import 'package:golffox/core/theme/gf_tokens.dart';
+import 'supabase_service.dart';
+import '../core/theme/gf_tokens.dart';
 
 /// Evento de status para a UI
 class TrackingStatus {
-  final bool tracking;
-  final String? tripId;
-  final String? driverId;
-  final int queued;
-  final Position? lastPosition;
-  final String? lastError;
 
   const TrackingStatus({
     required this.tracking,
@@ -25,6 +19,12 @@ class TrackingStatus {
     this.lastPosition,
     this.lastError,
   });
+  final bool tracking;
+  final String? tripId;
+  final String? driverId;
+  final int queued;
+  final Position? lastPosition;
+  final String? lastError;
 
   TrackingStatus copyWith({
     bool? tracking,
@@ -33,8 +33,7 @@ class TrackingStatus {
     int? queued,
     Position? lastPosition,
     String? lastError,
-  }) {
-    return TrackingStatus(
+  }) => TrackingStatus(
       tracking: tracking ?? this.tracking,
       tripId: tripId ?? this.tripId,
       driverId: driverId ?? this.driverId,
@@ -42,20 +41,10 @@ class TrackingStatus {
       lastPosition: lastPosition ?? this.lastPosition,
       lastError: lastError,
     );
-  }
 }
 
 /// Config de rastreamento (ajuste conforme o cenario)
 class TrackingConfig {
-  final Duration streamInterval; // intervalo sugerido p/ Android
-  final int distanceFilterMeters; // minimo de deslocamento p/ emitir ponto
-  final Duration minTimeBetweenSaves; // debouncer p/ salvar queue
-  final Duration flushInterval; // flush periodico do queue
-  final int batchSize; // itens por envio
-  final int offlineQueueMax; // limite de itens offline
-  final LocationAccuracy accuracy; // precisao
-  final bool useStream; // true = stream; false = timer
-  final bool debugLogs;
 
   const TrackingConfig({
     this.streamInterval = const Duration(seconds: 8),
@@ -68,6 +57,15 @@ class TrackingConfig {
     this.useStream = true,
     this.debugLogs = false,
   });
+  final Duration streamInterval; // intervalo sugerido p/ Android
+  final int distanceFilterMeters; // minimo de deslocamento p/ emitir ponto
+  final Duration minTimeBetweenSaves; // debouncer p/ salvar queue
+  final Duration flushInterval; // flush periodico do queue
+  final int batchSize; // itens por envio
+  final int offlineQueueMax; // limite de itens offline
+  final LocationAccuracy accuracy; // precisao
+  final bool useStream; // true = stream; false = timer
+  final bool debugLogs;
 
   TrackingConfig tunedForBattery() => TrackingConfig(
         streamInterval: const Duration(seconds: 15),
@@ -83,10 +81,10 @@ class TrackingConfig {
 }
 
 class TrackingService {
-  /* ------------------ Singleton ------------------ */
-  static final TrackingService _instance = TrackingService._internal();
   factory TrackingService() => _instance;
   TrackingService._internal();
+  /* ------------------ Singleton ------------------ */
+  static final TrackingService _instance = TrackingService._internal();
 
   /* ------------------ State ------------------ */
   Timer? _timer; // fallback quando nao usar stream
@@ -141,7 +139,6 @@ class TrackingService {
       final settings = LocationSettings(
         accuracy: _config.accuracy,
         distanceFilter: _config.distanceFilterMeters,
-        timeLimit: null,
       );
 
       // Ajustes especificos por plataforma
@@ -153,14 +150,12 @@ class TrackingService {
               foregroundNotificationConfig: const ForegroundNotificationConfig(
                 notificationText: 'Rastreando sua viagem...',
                 notificationTitle: 'GolfFox em execucao',
-                enableWakeLock: false,
               ),
             )
           : Platform.isIOS
               ? AppleSettings(
                   accuracy: _config.accuracy,
                   distanceFilter: _config.distanceFilterMeters,
-                  allowBackgroundLocationUpdates: true,
                   pauseLocationUpdatesAutomatically: true,
                 )
               : settings;
@@ -239,7 +234,7 @@ class TrackingService {
       );
       final tooClose =
           dist < max(1, (_config.distanceFilterMeters * 0.5).round());
-      final almostStopped = (p.speed.isFinite && p.speed < 0.5);
+      final almostStopped = p.speed.isFinite && p.speed < 0.5;
       if (tooClose && almostStopped) {
         _debug('Skip point (too close & slow) d=${dist.toStringAsFixed(1)}m');
         _emitStatus(); // atualiza ultimo recebido
@@ -287,8 +282,8 @@ class TrackingService {
       _queue.removeRange(0, _queue.length - _config.offlineQueueMax + 1);
     }
     _queue.add({
-      'trip_id': _tripId!,
-      'driver_id': _driverId!,
+      'trip_id': _tripId,
+      'driver_id': _driverId,
       'latitude': p.latitude,
       'longitude': p.longitude,
       'accuracy': p.accuracy,
@@ -312,9 +307,9 @@ class TrackingService {
     final chunkSize = max(1, _config.batchSize);
 
     // backoff com jitter leve
-    Duration backoff = _backoff;
+    var backoff = _backoff;
 
-    for (int i = 0; i < copy.length; i += chunkSize) {
+    for (var i = 0; i < copy.length; i += chunkSize) {
       final chunk = copy.sublist(i, min(i + chunkSize, copy.length));
 
       try {
@@ -373,7 +368,7 @@ class TrackingService {
     _writeChain = _writeChain.then((_) async {
       try {
         final prefs = await SharedPreferences.getInstance();
-        final list = _queue.map((p) => jsonEncode(p)).toList(growable: false);
+        final list = _queue.map(jsonEncode).toList(growable: false);
         await prefs.setStringList(_kQueueKey, list);
       } catch (e) {
         _debug('Erro salvando queue: $e');
@@ -461,7 +456,7 @@ class TrackingService {
     double lat2,
     double lng2,
   ) {
-    const double R = 6371000.0;
+    const R = 6371000;
     final dLat = _deg2rad(lat2 - lat1);
     final dLon = _deg2rad(lng2 - lng1);
     final a = sin(dLat / 2) * sin(dLat / 2) +

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:golffox/services/supabase_service.dart';
+import '../../services/supabase_service.dart';
 import 'passenger_dashboard_screen.dart';
 
 class PassengerLoginScreen extends StatefulWidget {
@@ -63,8 +63,7 @@ class _PassengerLoginScreenState extends State<PassengerLoginScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24.0),
@@ -126,7 +125,6 @@ class _PassengerLoginScreenState extends State<PassengerLoginScreen> {
         ),
       ),
     );
-  }
 
   @override
   void dispose() {

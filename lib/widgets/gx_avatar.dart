@@ -1,16 +1,6 @@
 import 'package:flutter/material.dart';
 
 class GxAvatar extends StatelessWidget {
-  final String? imageUrl;
-  final String? name;
-  final double size;
-  final Color? backgroundColor;
-  final Color? textColor;
-  final VoidCallback? onTap;
-  final bool showBorder;
-  final Color? borderColor;
-  final double borderWidth;
-  final IconData? fallbackIcon;
 
   const GxAvatar({
     super.key,
@@ -25,6 +15,16 @@ class GxAvatar extends StatelessWidget {
     this.borderWidth = 2,
     this.fallbackIcon,
   });
+  final String? imageUrl;
+  final String? name;
+  final double size;
+  final Color? backgroundColor;
+  final Color? textColor;
+  final VoidCallback? onTap;
+  final bool showBorder;
+  final Color? borderColor;
+  final double borderWidth;
+  final IconData? fallbackIcon;
 
   String _getInitials(String name) {
     final words = name.trim().split(' ');
@@ -105,9 +105,7 @@ class GxAvatar extends StatelessWidget {
                 width: size,
                 height: size,
                 fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return _buildFallback(effectiveTextColor);
-                },
+                errorBuilder: (context, error, stackTrace) => _buildFallback(effectiveTextColor),
                 loadingBuilder: (context, child, loadingProgress) {
                   if (loadingProgress == null) return child;
                   return Container(
@@ -175,11 +173,6 @@ class GxAvatar extends StatelessWidget {
 
 // Widget para grupo de avatares
 class GxAvatarGroup extends StatelessWidget {
-  final List<GxAvatar> avatars;
-  final double size;
-  final int maxVisible;
-  final double overlap;
-  final VoidCallback? onMoreTap;
 
   const GxAvatarGroup({
     super.key,
@@ -189,6 +182,11 @@ class GxAvatarGroup extends StatelessWidget {
     this.overlap = 8,
     this.onMoreTap,
   });
+  final List<GxAvatar> avatars;
+  final double size;
+  final int maxVisible;
+  final double overlap;
+  final VoidCallback? onMoreTap;
 
   @override
   Widget build(BuildContext context) {
@@ -209,7 +207,7 @@ class GxAvatarGroup extends StatelessWidget {
               padding: EdgeInsets.only(
                 left: index > 0 ? -overlap : 0,
               ),
-              child: Container(
+              child: DecoratedBox(
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(

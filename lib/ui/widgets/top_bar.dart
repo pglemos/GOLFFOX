@@ -17,8 +17,7 @@ class GfTopBar extends ConsumerWidget implements PreferredSizeWidget {
   Size get preferredSize => const Size.fromHeight(GfTokens.topBarHeight);
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return Container(
+  Widget build(BuildContext context, WidgetRef ref) => Container(
       height: GfTokens.topBarHeight,
       decoration: const BoxDecoration(
         color: Color(GfTokens.shellTopBarBg),
@@ -59,10 +58,8 @@ class GfTopBar extends ConsumerWidget implements PreferredSizeWidget {
         ),
       ),
     );
-  }
 
-  Widget _buildLogo() {
-    return Row(
+  Widget _buildLogo() => Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         // Logo Golf Fox
@@ -113,7 +110,6 @@ class GfTopBar extends ConsumerWidget implements PreferredSizeWidget {
         ),
       ],
     );
-  }
 
   Widget _buildNavigationPills() {
     final pills = [
@@ -140,8 +136,7 @@ class GfTopBar extends ConsumerWidget implements PreferredSizeWidget {
     );
   }
 
-  Widget _buildPill(String title, bool isActive) {
-    return GfHoverScale(
+  Widget _buildPill(String title, bool isActive) => GfHoverScale(
       child: AnimatedContainer(
         duration: GfMotion.short,
         curve: GfMotion.easeOut,
@@ -169,10 +164,8 @@ class GfTopBar extends ConsumerWidget implements PreferredSizeWidget {
         ),
       ),
     );
-  }
 
-  Widget _buildUserActions() {
-    return Row(
+  Widget _buildUserActions() => Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         // Botao Preferencias
@@ -236,5 +229,4 @@ class GfTopBar extends ConsumerWidget implements PreferredSizeWidget {
         ),
       ],
     );
-  }
 }

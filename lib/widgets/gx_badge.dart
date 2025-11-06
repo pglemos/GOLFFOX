@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
 class GxBadge extends StatelessWidget {
+
+  const GxBadge(this.label,
+      {super.key, this.color, this.foregroundColor, this.icon});
   final String label;
   final Color? color;
   final Color? foregroundColor;
   final IconData? icon;
-
-  const GxBadge(this.label,
-      {super.key, this.color, this.foregroundColor, this.icon});
 
   @override
   Widget build(BuildContext context) {

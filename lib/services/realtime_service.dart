@@ -8,10 +8,10 @@ import '../models/vehicle_position.dart';
 /// Servico de real-time que combina dados mock para desenvolvimento
 /// e funcionalidade real-time via Supabase para producao
 class RealtimeService {
-  static RealtimeService? _instance;
-  static RealtimeService get instance => _instance ??= RealtimeService._();
 
   RealtimeService._();
+  static RealtimeService? _instance;
+  static RealtimeService get instance => _instance ??= RealtimeService._();
 
   // Configuracoes
   static const Duration _updateInterval = Duration(seconds: 5);
@@ -105,7 +105,7 @@ class RealtimeService {
           .order('updated_at', ascending: false);
 
       _currentPositions = (response as List)
-          .map((json) => _vehiclePositionFromSupabase(json))
+          .map(_vehiclePositionFromSupabase)
           .toList();
     } catch (e) {
       debugPrint('Erro ao carregar do Supabase: $e');
@@ -172,7 +172,7 @@ class RealtimeService {
   void _simulateMovement() {
     final random = Random();
 
-    for (int i = 0; i < _currentPositions.length; i++) {
+    for (var i = 0; i < _currentPositions.length; i++) {
       final vehicle = _currentPositions[i];
 
       // Apenas mover veiculos ativos
@@ -205,18 +205,18 @@ class RealtimeService {
   void _updateMockData() {
     final random = Random();
 
-    for (int i = 0; i < _currentPositions.length; i++) {
+    for (var i = 0; i < _currentPositions.length; i++) {
       final vehicle = _currentPositions[i];
 
       // Simular mudancas ocasionais de status
-      VehicleStatus newStatus = vehicle.status;
+      var newStatus = vehicle.status;
       if (random.nextDouble() < 0.05) {
         // 5% chance de mudanca
         newStatus = _getRandomStatus(random);
       }
 
       // Simular mudancas na contagem de passageiros
-      int? newPassengerCount = vehicle.passengerCount;
+      var newPassengerCount = vehicle.passengerCount;
       if (random.nextDouble() < 0.1) {
         // 10% chance de mudanca
         newPassengerCount = random.nextInt(vehicle.capacity ?? 40);
@@ -238,17 +238,13 @@ class RealtimeService {
       case PostgresChangeEvent.insert:
       case PostgresChangeEvent.update:
         final vehicleData = payload.newRecord;
-        if (vehicleData != null) {
-          final vehicle = _vehiclePositionFromSupabase(vehicleData);
-          _updateVehicleInList(vehicle);
-        }
-        break;
+        final vehicle = _vehiclePositionFromSupabase(vehicleData);
+        _updateVehicleInList(vehicle);
+              break;
       case PostgresChangeEvent.delete:
         final vehicleData = payload.oldRecord;
-        if (vehicleData != null) {
-          _removeVehicleFromList(vehicleData['id'] as String);
-        }
-        break;
+        _removeVehicleFromList(vehicleData['id'] as String);
+              break;
       case PostgresChangeEvent.all:
         // Caso para eventos gerais - nao precisamos fazer nada especifico
         debugPrint('Evento geral recebido');
@@ -274,8 +270,7 @@ class RealtimeService {
   }
 
   /// Converte dados do Supabase para VehiclePosition
-  VehiclePosition _vehiclePositionFromSupabase(Map<String, dynamic> json) {
-    return VehiclePosition(
+  VehiclePosition _vehiclePositionFromSupabase(Map<String, dynamic> json) => VehiclePosition(
       id: json['id'] as String,
       vehicleId: json['vehicle_id'] as String,
       licensePlate: json['license_plate'] as String? ?? '',
@@ -296,7 +291,6 @@ class RealtimeService {
       passengerCount: json['passenger_count'] as int?,
       capacity: json['capacity'] as int?,
     );
-  }
 
   /// Calcula nova posicao baseada em bearing e distancia
   LatLng _calculateNewPosition(LatLng start, double bearing, double distance) {

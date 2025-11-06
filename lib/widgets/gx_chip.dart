@@ -7,16 +7,6 @@ enum GxChipVariant {
 }
 
 class GxChip extends StatelessWidget {
-  final String label;
-  final IconData? icon;
-  final VoidCallback? onTap;
-  final VoidCallback? onDelete;
-  final bool selected;
-  final GxChipVariant variant;
-  final Color? color;
-  final Color? selectedColor;
-  final double? elevation;
-  final EdgeInsetsGeometry? padding;
 
   const GxChip({
     super.key,
@@ -31,6 +21,16 @@ class GxChip extends StatelessWidget {
     this.elevation,
     this.padding,
   });
+  final String label;
+  final IconData? icon;
+  final VoidCallback? onTap;
+  final VoidCallback? onDelete;
+  final bool selected;
+  final GxChipVariant variant;
+  final Color? color;
+  final Color? selectedColor;
+  final double? elevation;
+  final EdgeInsetsGeometry? padding;
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +63,7 @@ class GxChip extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(20),
             border: borderColor != null
-                ? Border.all(color: borderColor, width: 1)
+                ? Border.all(color: borderColor)
                 : null,
           ),
           child: Row(
@@ -105,11 +105,6 @@ class GxChip extends StatelessWidget {
 
 // Widget para grupo de chips
 class GxChipGroup extends StatelessWidget {
-  final List<GxChip> chips;
-  final Axis direction;
-  final WrapAlignment alignment;
-  final double spacing;
-  final double runSpacing;
 
   const GxChipGroup({
     super.key,
@@ -119,6 +114,11 @@ class GxChipGroup extends StatelessWidget {
     this.spacing = 8,
     this.runSpacing = 8,
   });
+  final List<GxChip> chips;
+  final Axis direction;
+  final WrapAlignment alignment;
+  final double spacing;
+  final double runSpacing;
 
   @override
   Widget build(BuildContext context) {
@@ -145,15 +145,6 @@ class GxChipGroup extends StatelessWidget {
 
 // Widget para chips selecionaveis
 class GxSelectableChipGroup extends StatefulWidget {
-  final List<String> options;
-  final List<String> selectedOptions;
-  final ValueChanged<List<String>>? onSelectionChanged;
-  final bool multiSelect;
-  final GxChipVariant variant;
-  final Color? color;
-  final Color? selectedColor;
-  final double spacing;
-  final double runSpacing;
 
   const GxSelectableChipGroup({
     super.key,
@@ -167,6 +158,15 @@ class GxSelectableChipGroup extends StatefulWidget {
     this.spacing = 8,
     this.runSpacing = 8,
   });
+  final List<String> options;
+  final List<String> selectedOptions;
+  final ValueChanged<List<String>>? onSelectionChanged;
+  final bool multiSelect;
+  final GxChipVariant variant;
+  final Color? color;
+  final Color? selectedColor;
+  final double spacing;
+  final double runSpacing;
 
   @override
   State<GxSelectableChipGroup> createState() => _GxSelectableChipGroupState();
@@ -205,8 +205,7 @@ class _GxSelectableChipGroupState extends State<GxSelectableChipGroup> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return GxChipGroup(
+  Widget build(BuildContext context) => GxChipGroup(
       spacing: widget.spacing,
       runSpacing: widget.runSpacing,
       chips: widget.options.map((option) {
@@ -221,5 +220,4 @@ class _GxSelectableChipGroupState extends State<GxSelectableChipGroup> {
         );
       }).toList(),
     );
-  }
 }

@@ -7,11 +7,6 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/gf_tokens.dart';
 
 class GfEmptyState extends StatelessWidget {
-  final String title;
-  final String? subtitle;
-  final IconData? icon;
-  final Widget? action;
-  final String? imagePath;
 
   const GfEmptyState({
     super.key,
@@ -21,10 +16,14 @@ class GfEmptyState extends StatelessWidget {
     this.action,
     this.imagePath,
   });
+  final String title;
+  final String? subtitle;
+  final IconData? icon;
+  final Widget? action;
+  final String? imagePath;
 
   @override
-  Widget build(BuildContext context) {
-    return Center(
+  Widget build(BuildContext context) => Center(
       child: Padding(
         padding: const EdgeInsets.all(GfTokens.spacingLg),
         child: Column(
@@ -69,5 +68,4 @@ class GfEmptyState extends StatelessWidget {
         ),
       ),
     );
-  }
 }

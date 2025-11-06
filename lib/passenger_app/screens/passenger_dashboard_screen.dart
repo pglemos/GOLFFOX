@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:golffox/services/supabase_service.dart';
-import 'package:golffox/core/location_service.dart';
+import '../../services/supabase_service.dart';
+import '../../core/location_service.dart';
 
 class PassengerDashboardScreen extends StatefulWidget {
   const PassengerDashboardScreen({super.key});
@@ -161,8 +161,7 @@ class _PassengerDashboardScreenState extends State<PassengerDashboardScreen> {
     );
   }
 
-  Widget _buildEmptyState() {
-    return const Center(
+  Widget _buildEmptyState() => const Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -175,6 +174,5 @@ class _PassengerDashboardScreenState extends State<PassengerDashboardScreen> {
         ],
       ),
     );
-  }
 }
 

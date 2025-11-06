@@ -7,12 +7,12 @@ import '../theme/gf_tokens.dart';
 /// Ensures WCAG AA compliance and inclusive design
 class GxA11y {
   /// Minimum touch target size (44x44 logical pixels)
-  static const double minTouchTarget = 44.0;
+  static const double minTouchTarget = 44;
 
   /// Minimum contrast ratios
   static const double contrastNormal = 4.5; // AA for normal text
-  static const double contrastLarge = 3.0; // AA for large text
-  static const double contrastAAA = 7.0; // AAA for normal text
+  static const double contrastLarge = 3; // AA for large text
+  static const double contrastAAA = 7; // AAA for normal text
 
   /// Focus management
   static void requestFocus(BuildContext context, FocusNode focusNode) {
@@ -52,15 +52,13 @@ class GxA11y {
   static Widget ensureTouchTarget({
     required Widget child,
     double minSize = minTouchTarget,
-  }) {
-    return ConstrainedBox(
+  }) => ConstrainedBox(
       constraints: BoxConstraints(
         minWidth: minSize,
         minHeight: minSize,
       ),
       child: child,
     );
-  }
 
   /// Create accessible button with proper semantics
   static Widget buttonSemantic({
@@ -70,7 +68,7 @@ class GxA11y {
     String? tooltip,
     bool excludeSemantics = false,
   }) {
-    Widget button = child;
+    var button = child;
 
     if (tooltip != null) {
       button = Tooltip(
@@ -122,7 +120,7 @@ class GxA11y {
     int? index,
     int? totalItems,
   }) {
-    String? label = semanticLabel;
+    var label = semanticLabel;
     if (index != null && totalItems != null) {
       label = '$semanticLabel, item ${index + 1} de $totalItems';
     }
@@ -158,17 +156,13 @@ class GxA11y {
   }
 
   /// Check if reduce motion is enabled
-  static bool shouldReduceMotion(BuildContext context) {
-    return MediaQuery.of(context).disableAnimations;
-  }
+  static bool shouldReduceMotion(BuildContext context) => MediaQuery.of(context).disableAnimations;
 
   /// Get appropriate animation duration based on accessibility settings
   static Duration getAnimationDuration(
     BuildContext context,
     Duration defaultDuration,
-  ) {
-    return shouldReduceMotion(context) ? Duration.zero : defaultDuration;
-  }
+  ) => shouldReduceMotion(context) ? Duration.zero : defaultDuration;
 }
 
 /// Accessibility-focused widget extensions
@@ -183,8 +177,7 @@ extension GxA11yWidget on Widget {
     bool? selected,
     bool? enabled,
     VoidCallback? onTap,
-  }) {
-    return Semantics(
+  }) => Semantics(
       label: label,
       hint: hint,
       value: value,
@@ -195,15 +188,10 @@ extension GxA11yWidget on Widget {
       onTap: onTap,
       child: this,
     );
-  }
 
   /// Exclude from semantics tree
-  Widget excludeSemantics() {
-    return ExcludeSemantics(child: this);
-  }
+  Widget excludeSemantics() => ExcludeSemantics(child: this);
 
   /// Ensure minimum touch target
-  Widget withTouchTarget({double minSize = GxA11y.minTouchTarget}) {
-    return GxA11y.ensureTouchTarget(child: this, minSize: minSize);
-  }
+  Widget withTouchTarget({double minSize = GxA11y.minTouchTarget}) => GxA11y.ensureTouchTarget(child: this, minSize: minSize);
 }

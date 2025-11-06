@@ -21,25 +21,6 @@ enum BusStopStatus {
 }
 
 class BusStop {
-  final String id;
-  final String name;
-  final String? description;
-  final LatLng position;
-  final BusStopType type;
-  final BusStopStatus status;
-  final String? routeId;
-  final String? routeName;
-  final int? sequence; // Ordem na rota
-  final DateTime? estimatedArrival;
-  final DateTime? lastVisit;
-  final bool hasAccessibility;
-  final bool hasShelter;
-  final bool hasSeating;
-  final String? address;
-  final String? landmark;
-  final List<String> amenities;
-  final DateTime createdAt;
-  final DateTime? updatedAt;
 
   const BusStop({
     required this.id,
@@ -104,9 +85,27 @@ class BusStop {
           : null,
     );
   }
+  final String id;
+  final String name;
+  final String? description;
+  final LatLng position;
+  final BusStopType type;
+  final BusStopStatus status;
+  final String? routeId;
+  final String? routeName;
+  final int? sequence; // Ordem na rota
+  final DateTime? estimatedArrival;
+  final DateTime? lastVisit;
+  final bool hasAccessibility;
+  final bool hasShelter;
+  final bool hasSeating;
+  final String? address;
+  final String? landmark;
+  final List<String> amenities;
+  final DateTime createdAt;
+  final DateTime? updatedAt;
 
-  Map<String, dynamic> toJson() {
-    return {
+  Map<String, dynamic> toJson() => {
       'id': id,
       'name': name,
       'description': description,
@@ -128,7 +127,6 @@ class BusStop {
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt?.toIso8601String(),
     };
-  }
 
   BusStop copyWith({
     String? id,
@@ -150,8 +148,7 @@ class BusStop {
     List<String>? amenities,
     DateTime? createdAt,
     DateTime? updatedAt,
-  }) {
-    return BusStop(
+  }) => BusStop(
       id: id ?? this.id,
       name: name ?? this.name,
       description: description ?? this.description,
@@ -172,7 +169,6 @@ class BusStop {
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
-  }
 
   @override
   bool operator ==(Object other) {
@@ -184,9 +180,7 @@ class BusStop {
   int get hashCode => id.hashCode;
 
   @override
-  String toString() {
-    return 'BusStop(id: $id, name: $name, position: $position, type: $type, status: $status)';
-  }
+  String toString() => 'BusStop(id: $id, name: $name, position: $position, type: $type, status: $status)';
 }
 
 extension BusStopTypeExtension on BusStopType {

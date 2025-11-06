@@ -5,14 +5,14 @@ import 'package:golffox/widgets/gx_card.dart';
 
 void main() {
   group('GxCard Widget Tests', () {
-    testWidgets('should render card with child widget', (WidgetTester tester) async {
+    testWidgets('should render card with child widget', (tester) async {
       // Arrange
       const childText = 'Card Content';
       const childWidget = Text(childText);
 
       // Act
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: GxCard(
               child: childWidget,
@@ -28,13 +28,13 @@ void main() {
       expect(find.byType(Padding), findsWidgets);
     });
 
-    testWidgets('should apply default padding', (WidgetTester tester) async {
+    testWidgets('should apply default padding', (tester) async {
       // Arrange
       const childWidget = Text('Test Content');
 
       // Act
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: GxCard(
               child: childWidget,
@@ -52,14 +52,14 @@ void main() {
       expect(cardPadding.padding, equals(const EdgeInsets.all(16)));
     });
 
-    testWidgets('should apply custom padding', (WidgetTester tester) async {
+    testWidgets('should apply custom padding', (tester) async {
       // Arrange
       const childWidget = Text('Test Content');
       const customPadding = EdgeInsets.symmetric(horizontal: 24, vertical: 12);
 
       // Act
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: GxCard(
               padding: customPadding,
@@ -78,14 +78,14 @@ void main() {
       expect(cardPadding.padding, equals(customPadding));
     });
 
-    testWidgets('should apply custom margin', (WidgetTester tester) async {
+    testWidgets('should apply custom margin', (tester) async {
       // Arrange
       const childWidget = Text('Test Content');
       const customMargin = EdgeInsets.all(20);
 
       // Act
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: GxCard(
               margin: customMargin,
@@ -103,16 +103,15 @@ void main() {
       expect(card.margin, equals(customMargin));
     });
 
-    testWidgets('should handle null margin', (WidgetTester tester) async {
+    testWidgets('should handle null margin', (tester) async {
       // Arrange
       const childWidget = Text('Test Content');
 
       // Act
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: GxCard(
-              margin: null,
               child: childWidget,
             ),
           ),
@@ -127,7 +126,7 @@ void main() {
       expect(card.margin, isNull);
     });
 
-    testWidgets('should render complex child widget', (WidgetTester tester) async {
+    testWidgets('should render complex child widget', (tester) async {
       // Arrange
       const complexChild = Column(
         children: [
@@ -140,7 +139,7 @@ void main() {
 
       // Act
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: GxCard(
               child: complexChild,
@@ -157,7 +156,7 @@ void main() {
       expect(find.byType(SizedBox), findsWidgets);
     });
 
-    testWidgets('should maintain card structure with different content', (WidgetTester tester) async {
+    testWidgets('should maintain card structure with different content', (tester) async {
       // Arrange
       final buttonChild = ElevatedButton(
         onPressed: () {},
@@ -183,14 +182,14 @@ void main() {
       expect(find.text('Button in Card'), findsOneWidget);
     });
 
-    testWidgets('should handle zero padding', (WidgetTester tester) async {
+    testWidgets('should handle zero padding', (tester) async {
       // Arrange
       const childWidget = Text('No Padding Content');
       const zeroPadding = EdgeInsets.zero;
 
       // Act
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: GxCard(
               padding: zeroPadding,
@@ -209,7 +208,7 @@ void main() {
       expect(cardPadding.padding, equals(zeroPadding));
     });
 
-    testWidgets('should handle asymmetric padding and margin', (WidgetTester tester) async {
+    testWidgets('should handle asymmetric padding and margin', (tester) async {
       // Arrange
       const childWidget = Text('Asymmetric Content');
       const asymmetricPadding = EdgeInsets.only(left: 10, top: 20, right: 30, bottom: 40);
@@ -217,7 +216,7 @@ void main() {
 
       // Act
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: GxCard(
               padding: asymmetricPadding,

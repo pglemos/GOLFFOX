@@ -5,26 +5,6 @@ typedef Json = Map<String, dynamic>;
 
 @immutable
 class Trip {
-  final String id;
-  final String routeId;
-  final String? driverId;
-  final String? vehicleId;
-
-  /// Valores canonicos: scheduled | inProgress | completed | cancelled
-  final String status;
-
-  final DateTime? scheduledStartTime;
-  final DateTime? actualStartTime;
-  final DateTime? actualEndTime;
-
-  final double? startLatitude;
-  final double? startLongitude;
-  final double? endLatitude;
-  final double? endLongitude;
-
-  final String? notes;
-  final DateTime createdAt;
-  final DateTime updatedAt;
 
   const Trip({
     required this.id,
@@ -44,27 +24,6 @@ class Trip {
     required this.updatedAt,
   })  : assert(id != ''),
         assert(routeId != '');
-
-  /* ------------------------------ SERIALIZACAO (DB snake_case) ------------------------------ */
-
-  /// Mantem compatibilidade com Supabase (snake_case)
-  Map<String, dynamic> toJson() => <String, dynamic>{
-        TripFields.id: id,
-        TripFields.routeId: routeId,
-        TripFields.driverId: driverId,
-        TripFields.vehicleId: vehicleId,
-        TripFields.status: status,
-        TripFields.scheduledStartTime: scheduledStartTime?.toIso8601String(),
-        TripFields.actualStartTime: actualStartTime?.toIso8601String(),
-        TripFields.actualEndTime: actualEndTime?.toIso8601String(),
-        TripFields.startLatitude: startLatitude,
-        TripFields.startLongitude: startLongitude,
-        TripFields.endLatitude: endLatitude,
-        TripFields.endLongitude: endLongitude,
-        TripFields.notes: notes,
-        TripFields.createdAt: createdAt.toIso8601String(),
-        TripFields.updatedAt: updatedAt.toIso8601String(),
-      };
 
   /// Leitura tolerante (snake_case de views/RPCs do Supabase)
   factory Trip.fromJson(Map<String, dynamic> json) {
@@ -101,26 +60,6 @@ class Trip {
     );
   }
 
-  /* ------------------------------ SERIALIZACAO (App camelCase) ------------------------------ */
-
-  Map<String, dynamic> toAppJson() => <String, dynamic>{
-        'id': id,
-        'routeId': routeId,
-        'driverId': driverId,
-        'vehicleId': vehicleId,
-        'status': status,
-        'scheduledStartTime': scheduledStartTime?.toIso8601String(),
-        'actualStartTime': actualStartTime?.toIso8601String(),
-        'actualEndTime': actualEndTime?.toIso8601String(),
-        'startLatitude': startLatitude,
-        'startLongitude': startLongitude,
-        'endLatitude': endLatitude,
-        'endLongitude': endLongitude,
-        'notes': notes,
-        'createdAt': createdAt.toIso8601String(),
-        'updatedAt': updatedAt.toIso8601String(),
-      };
-
   factory Trip.fromAppJson(Map<String, dynamic> json) {
     final id = _asString(json['id']);
     final routeId = _asString(json['routeId']);
@@ -150,6 +89,67 @@ class Trip {
       updatedAt: _asDateTime(json['updatedAt']) ?? DateTime.now(),
     );
   }
+  final String id;
+  final String routeId;
+  final String? driverId;
+  final String? vehicleId;
+
+  /// Valores canonicos: scheduled | inProgress | completed | cancelled
+  final String status;
+
+  final DateTime? scheduledStartTime;
+  final DateTime? actualStartTime;
+  final DateTime? actualEndTime;
+
+  final double? startLatitude;
+  final double? startLongitude;
+  final double? endLatitude;
+  final double? endLongitude;
+
+  final String? notes;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+
+  /* ------------------------------ SERIALIZACAO (DB snake_case) ------------------------------ */
+
+  /// Mantem compatibilidade com Supabase (snake_case)
+  Map<String, dynamic> toJson() => <String, dynamic>{
+        TripFields.id: id,
+        TripFields.routeId: routeId,
+        TripFields.driverId: driverId,
+        TripFields.vehicleId: vehicleId,
+        TripFields.status: status,
+        TripFields.scheduledStartTime: scheduledStartTime?.toIso8601String(),
+        TripFields.actualStartTime: actualStartTime?.toIso8601String(),
+        TripFields.actualEndTime: actualEndTime?.toIso8601String(),
+        TripFields.startLatitude: startLatitude,
+        TripFields.startLongitude: startLongitude,
+        TripFields.endLatitude: endLatitude,
+        TripFields.endLongitude: endLongitude,
+        TripFields.notes: notes,
+        TripFields.createdAt: createdAt.toIso8601String(),
+        TripFields.updatedAt: updatedAt.toIso8601String(),
+      };
+
+  /* ------------------------------ SERIALIZACAO (App camelCase) ------------------------------ */
+
+  Map<String, dynamic> toAppJson() => <String, dynamic>{
+        'id': id,
+        'routeId': routeId,
+        'driverId': driverId,
+        'vehicleId': vehicleId,
+        'status': status,
+        'scheduledStartTime': scheduledStartTime?.toIso8601String(),
+        'actualStartTime': actualStartTime?.toIso8601String(),
+        'actualEndTime': actualEndTime?.toIso8601String(),
+        'startLatitude': startLatitude,
+        'startLongitude': startLongitude,
+        'endLatitude': endLatitude,
+        'endLongitude': endLongitude,
+        'notes': notes,
+        'createdAt': createdAt.toIso8601String(),
+        'updatedAt': updatedAt.toIso8601String(),
+      };
 
   /* ------------------------------ Helpers p/ Supabase ------------------------------ */
 
@@ -266,10 +266,12 @@ class Trip {
             lat <= 90 &&
             lng >= -180 &&
             lng <= 180);
-    if (!coordOk(startLatitude, startLongitude))
+    if (!coordOk(startLatitude, startLongitude)) {
       errs.add('coordenadas de inicio invalidas');
-    if (!coordOk(endLatitude, endLongitude))
+    }
+    if (!coordOk(endLatitude, endLongitude)) {
       errs.add('coordenadas de termino invalidas');
+    }
     return errs;
   }
 
@@ -361,16 +363,16 @@ class Trip {
 
   /* --------------------------------- Parsers --------------------------------- */
 
-  static String? _asString(dynamic v) => v?.toString();
+  static String? _asString(v) => v?.toString();
 
-  static double? _asDouble(dynamic v) {
+  static double? _asDouble(v) {
     if (v == null) return null;
     if (v is num) return v.toDouble();
     if (v is String && v.trim().isNotEmpty) return double.tryParse(v.trim());
     return null;
   }
 
-  static DateTime? _asDateTime(dynamic v) {
+  static DateTime? _asDateTime(v) {
     if (v == null) return null;
     if (v is DateTime) return v;
     if (v is int) {

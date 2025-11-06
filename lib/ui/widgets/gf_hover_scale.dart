@@ -6,10 +6,6 @@
 import 'package:flutter/material.dart';
 
 class GfHoverScale extends StatefulWidget {
-  final Widget child;
-  final double scale;
-  final Duration duration;
-  final VoidCallback? onTap;
 
   const GfHoverScale({
     super.key,
@@ -18,6 +14,10 @@ class GfHoverScale extends StatefulWidget {
     this.duration = const Duration(milliseconds: 200),
     this.onTap,
   });
+  final Widget child;
+  final double scale;
+  final Duration duration;
+  final VoidCallback? onTap;
 
   @override
   State<GfHoverScale> createState() => _GfHoverScaleState();
@@ -37,7 +37,7 @@ class _GfHoverScaleState extends State<GfHoverScale>
       vsync: this,
     );
     _scaleAnimation = Tween<double>(
-      begin: 1.0,
+      begin: 1,
       end: widget.scale,
     ).animate(CurvedAnimation(
       parent: _controller,
@@ -66,8 +66,7 @@ class _GfHoverScaleState extends State<GfHoverScale>
   }
 
   @override
-  Widget build(BuildContext context) {
-    return MouseRegion(
+  Widget build(BuildContext context) => MouseRegion(
       onEnter: (_) => _onEnter(),
       onExit: (_) => _onExit(),
       child: GestureDetector(
@@ -83,5 +82,4 @@ class _GfHoverScaleState extends State<GfHoverScale>
         ),
       ),
     );
-  }
 }

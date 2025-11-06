@@ -6,22 +6,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart' as flutter_map;
 import 'package:latlong2/latlong.dart';
 
-import 'package:golffox/models/user.dart' as app_user;
-import 'package:golffox/models/trip.dart';
-import 'package:golffox/models/driver_position.dart';
-import 'package:golffox/services/supabase_service.dart';
-import 'package:golffox/services/tracking_service.dart';
-import 'package:golffox/core/theme/gf_tokens.dart';
+import '../../models/user.dart' as app_user;
+import '../../models/trip.dart';
+import '../../models/driver_position.dart';
+import '../../services/supabase_service.dart';
+import '../../services/tracking_service.dart';
+import '../../core/theme/gf_tokens.dart';
 
 class TripDetailScreen extends StatefulWidget {
-  final Trip trip;
-  final app_user.User user;
 
   const TripDetailScreen({
     super.key,
     required this.trip,
     required this.user,
   });
+  final Trip trip;
+  final app_user.User user;
 
   @override
   State<TripDetailScreen> createState() => _TripDetailScreenState();
@@ -337,8 +337,7 @@ class _TripDetailScreenState extends State<TripDetailScreen>
     );
   }
 
-  Widget _buildMapCard(ThemeData t) {
-    return Container(
+  Widget _buildMapCard(ThemeData t) => Container(
       height: 420,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(14),
@@ -456,10 +455,8 @@ class _TripDetailScreenState extends State<TripDetailScreen>
         ],
       ),
     );
-  }
 
-  Widget _buildInfoColumn(ThemeData t) {
-    return Column(
+  Widget _buildInfoColumn(ThemeData t) => Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         ScaleTransition(
@@ -472,7 +469,6 @@ class _TripDetailScreenState extends State<TripDetailScreen>
         _buildActions(t),
       ],
     );
-  }
 
   Widget _buildActions(ThemeData t) {
     final status = _trip.status.toLowerCase();
@@ -543,7 +539,7 @@ class _TripDetailScreenState extends State<TripDetailScreen>
         decoration: BoxDecoration(color: c, shape: BoxShape.circle),
       );
 
-  Widget _carBubble(ThemeData t) => Container(
+  Widget _carBubble(ThemeData t) => DecoratedBox(
         decoration: BoxDecoration(
           color: t.colorScheme.secondary,
           shape: BoxShape.circle,
@@ -574,8 +570,8 @@ class _TripDetailScreenState extends State<TripDetailScreen>
 /* =================== STATUS CARD =================== */
 
 class _TripStatusCard extends StatelessWidget {
-  final Trip trip;
   const _TripStatusCard({required this.trip});
+  final Trip trip;
 
   @override
   Widget build(BuildContext context) {

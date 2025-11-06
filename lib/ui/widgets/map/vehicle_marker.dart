@@ -10,12 +10,6 @@ import '../../../models/vehicle_status.dart' as vs;
 import '../../../models/driver_position.dart';
 
 class VehicleMarker extends StatelessWidget {
-  final VehiclePosition vehicle;
-  final vs.VehicleStatusType? vehicleStatus;
-  final DriverPosition? lastPosition;
-  final VoidCallback? onTap;
-  final bool isSelected;
-  final double size;
 
   const VehicleMarker({
     super.key,
@@ -26,6 +20,12 @@ class VehicleMarker extends StatelessWidget {
     this.isSelected = false,
     this.size = 40,
   });
+  final VehiclePosition vehicle;
+  final vs.VehicleStatusType? vehicleStatus;
+  final DriverPosition? lastPosition;
+  final VoidCallback? onTap;
+  final bool isSelected;
+  final double size;
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +36,7 @@ class VehicleMarker extends StatelessWidget {
 
     return GestureDetector(
       onTap: onTap,
-      child: Container(
+      child: SizedBox(
         width: size * 1.2,
         height: size * 1.2,
         child: Stack(
@@ -95,7 +95,7 @@ class VehicleMarker extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: _getOccupancyColor(),
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.white, width: 1),
+                    border: Border.all(color: Colors.white),
                   ),
                   child: Text(
                     '${vehicle.passengerCount}',
@@ -113,9 +113,7 @@ class VehicleMarker extends StatelessWidget {
     );
   }
 
-  IconData _getVehicleIcon(vs.VehicleStatusType status) {
-    return status.icon;
-  }
+  IconData _getVehicleIcon(vs.VehicleStatusType status) => status.icon;
 
   vs.VehicleStatusType _getDefaultStatus() {
     switch (vehicle.status) {
@@ -144,9 +142,6 @@ class VehicleMarker extends StatelessWidget {
 }
 
 class VehicleClusterMarker extends StatelessWidget {
-  final int count;
-  final VoidCallback? onTap;
-  final double size;
 
   const VehicleClusterMarker({
     super.key,
@@ -154,10 +149,12 @@ class VehicleClusterMarker extends StatelessWidget {
     this.onTap,
     this.size = 50,
   });
+  final int count;
+  final VoidCallback? onTap;
+  final double size;
 
   @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
+  Widget build(BuildContext context) => GestureDetector(
       onTap: onTap,
       child: Container(
         width: size,
@@ -186,5 +183,4 @@ class VehicleClusterMarker extends StatelessWidget {
         ),
       ),
     );
-  }
 }

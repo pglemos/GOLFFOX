@@ -6,19 +6,6 @@ typedef Json = Map<String, dynamic>;
 
 @immutable
 class Garage {
-  final String id;
-  final String name;
-  final String? description;
-  final String? address;
-  final double latitude;
-  final double longitude;
-  final double?
-      radius; // Raio em metros para determinar se veiculo esta na garagem
-  final List<LatLng>? polygon; // Poligono da area da garagem (opcional)
-  final bool isActive;
-  final String? companyId;
-  final DateTime createdAt;
-  final DateTime updatedAt;
 
   const Garage({
     required this.id,
@@ -35,6 +22,45 @@ class Garage {
     required this.updatedAt,
   });
 
+  factory Garage.fromJson(Map<String, dynamic> json) {
+    List<LatLng>? polygonPoints;
+    if (json['polygon'] != null) {
+      final polygonData = json['polygon'] as List;
+      polygonPoints = polygonData
+          .map((p) => LatLng(p['lat'] as double, p['lng'] as double))
+          .toList();
+    }
+
+    return Garage(
+      id: json['id'] as String,
+      name: json['name'] as String,
+      description: json['description'] as String?,
+      address: json['address'] as String?,
+      latitude: (json['latitude'] as num).toDouble(),
+      longitude: (json['longitude'] as num).toDouble(),
+      radius:
+          json['radius'] != null ? (json['radius'] as num).toDouble() : 100.0,
+      polygon: polygonPoints,
+      isActive: json['is_active'] as bool? ?? true,
+      companyId: json['company_id'] as String?,
+      createdAt: DateTime.parse(json['created_at'] as String),
+      updatedAt: DateTime.parse(json['updated_at'] as String),
+    );
+  }
+  final String id;
+  final String name;
+  final String? description;
+  final String? address;
+  final double latitude;
+  final double longitude;
+  final double?
+      radius; // Raio em metros para determinar se veiculo esta na garagem
+  final List<LatLng>? polygon; // Poligono da area da garagem (opcional)
+  final bool isActive;
+  final String? companyId;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+
   /// Posicao central da garagem
   LatLng get position => LatLng(latitude, longitude);
 
@@ -45,7 +71,7 @@ class Garage {
       return _isPointInPolygon(position, polygon!);
     } else {
       // Usar raio circular
-      final distance = Distance();
+      const distance = Distance();
       final distanceInMeters =
           distance.as(LengthUnit.Meter, this.position, position);
       return distanceInMeters <= (radius ?? 100.0);
@@ -54,8 +80,8 @@ class Garage {
 
   /// Algoritmo para verificar se um ponto esta dentro de um poligono
   bool _isPointInPolygon(LatLng point, List<LatLng> polygon) {
-    int intersectCount = 0;
-    for (int j = 0; j < polygon.length - 1; j++) {
+    var intersectCount = 0;
+    for (var j = 0; j < polygon.length - 1; j++) {
       if (_rayCastIntersect(point, polygon[j], polygon[j + 1])) {
         intersectCount++;
       }
@@ -64,12 +90,12 @@ class Garage {
   }
 
   bool _rayCastIntersect(LatLng point, LatLng vertA, LatLng vertB) {
-    double aY = vertA.latitude;
-    double bY = vertB.latitude;
-    double aX = vertA.longitude;
-    double bX = vertB.longitude;
-    double pY = point.latitude;
-    double pX = point.longitude;
+    var aY = vertA.latitude;
+    var bY = vertB.latitude;
+    var aX = vertA.longitude;
+    var bX = vertB.longitude;
+    var pY = point.latitude;
+    var pX = point.longitude;
 
     if ((aY > pY) != (bY > pY) &&
         (pX < (bX - aX) * (pY - aY) / (bY - aY) + aX)) {
@@ -97,32 +123,6 @@ class Garage {
         'updated_at': updatedAt.toIso8601String(),
       };
 
-  factory Garage.fromJson(Map<String, dynamic> json) {
-    List<LatLng>? polygonPoints;
-    if (json['polygon'] != null) {
-      final polygonData = json['polygon'] as List;
-      polygonPoints = polygonData
-          .map((p) => LatLng(p['lat'] as double, p['lng'] as double))
-          .toList();
-    }
-
-    return Garage(
-      id: json['id'] as String,
-      name: json['name'] as String,
-      description: json['description'] as String?,
-      address: json['address'] as String?,
-      latitude: (json['latitude'] as num).toDouble(),
-      longitude: (json['longitude'] as num).toDouble(),
-      radius:
-          json['radius'] != null ? (json['radius'] as num).toDouble() : 100.0,
-      polygon: polygonPoints,
-      isActive: json['is_active'] as bool? ?? true,
-      companyId: json['company_id'] as String?,
-      createdAt: DateTime.parse(json['created_at'] as String),
-      updatedAt: DateTime.parse(json['updated_at'] as String),
-    );
-  }
-
   /* ------------------------------ METODOS UTILITARIOS ------------------------------ */
 
   Garage copyWith({
@@ -138,8 +138,7 @@ class Garage {
     String? companyId,
     DateTime? createdAt,
     DateTime? updatedAt,
-  }) {
-    return Garage(
+  }) => Garage(
       id: id ?? this.id,
       name: name ?? this.name,
       description: description ?? this.description,
@@ -153,7 +152,6 @@ class Garage {
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
-  }
 
   @override
   bool operator ==(Object other) =>

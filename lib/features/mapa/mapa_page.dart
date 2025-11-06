@@ -66,9 +66,7 @@ class _MapaPageState extends ConsumerState<MapaPage> {
     final vehicleStatusService = ref.watch(vehicleStatusServiceProvider);
 
     // Calcular contadores de status
-    vehiclePositionsAsync.whenData((vehicles) {
-      _updateStatusCounts(vehicles);
-    });
+    vehiclePositionsAsync.whenData(_updateStatusCounts);
 
     return Scaffold(
       appBar: const GfAppBar(
@@ -78,8 +76,8 @@ class _MapaPageState extends ConsumerState<MapaPage> {
         children: [
           // Mapa principal
           vehiclePositionsAsync.when(
-            data: (vehicles) => _buildMap(vehicles),
-            loading: () => _buildLoadingMap(),
+            data: _buildMap,
+            loading: _buildLoadingMap,
             error: (error, stack) => _buildErrorMap(error),
           ),
 
@@ -92,9 +90,9 @@ class _MapaPageState extends ConsumerState<MapaPage> {
               selectedStatuses:
                   _selectedStatuses.map((status) => status.name).toList(),
               selectedRoute: _selectedRoute,
-              availableCompanies: [],
+              availableCompanies: const [],
               availableRoutes: _getAvailableRoutes(),
-              availableCarriers: [],
+              availableCarriers: const [],
               onFiltersChanged: (statuses, route) {
                 setState(() {
                   _selectedStatuses = statuses
@@ -138,7 +136,7 @@ class _MapaPageState extends ConsumerState<MapaPage> {
                   _showBusStops = false;
                   _busStops = [];
                 }),
-                onStopTap: (stop) => _focusOnBusStop(stop),
+                onStopTap: _focusOnBusStop,
               ),
             ),
 
@@ -209,7 +207,6 @@ class _MapaPageState extends ConsumerState<MapaPage> {
           // Legenda do mapa
           if (_isLegendExpanded)
             MapLegend(
-              isExpanded: true,
               statusCounts: _statusCounts,
               onToggle: () => setState(() => _isLegendExpanded = false),
             )
@@ -229,13 +226,13 @@ class _MapaPageState extends ConsumerState<MapaPage> {
 
     return FlutterMap(
       mapController: _mapController,
-      options: MapOptions(
-        initialCenter: const LatLng(-23.5505, -46.6333), // Sao Paulo
-        initialZoom: 12.0,
-        minZoom: 8.0,
-        maxZoom: 18.0,
-        interactionOptions: const InteractionOptions(
-          flags: InteractiveFlag.all,
+      options: const MapOptions(
+        initialCenter: LatLng(-23.5505, -46.6333), // Sao Paulo
+        initialZoom: 12,
+        minZoom: 8,
+        maxZoom: 18,
+        interactionOptions: InteractionOptions(
+          
         ),
       ),
       children: [
@@ -274,8 +271,7 @@ class _MapaPageState extends ConsumerState<MapaPage> {
     );
   }
 
-  Widget _buildLoadingMap() {
-    return Container(
+  Widget _buildLoadingMap() => Container(
       color: GolfFoxTheme.backgroundDark,
       child: const Center(
         child: Column(
@@ -296,10 +292,8 @@ class _MapaPageState extends ConsumerState<MapaPage> {
         ),
       ),
     );
-  }
 
-  Widget _buildErrorMap(Object error) {
-    return Container(
+  Widget _buildErrorMap(Object error) => Container(
       color: GolfFoxTheme.backgroundDark,
       child: Center(
         child: Column(
@@ -342,10 +336,8 @@ class _MapaPageState extends ConsumerState<MapaPage> {
         ),
       ),
     );
-  }
 
-  List<VehiclePosition> _filterVehicles(List<VehiclePosition> vehicles) {
-    return vehicles.where((vehicle) {
+  List<VehiclePosition> _filterVehicles(List<VehiclePosition> vehicles) => vehicles.where((vehicle) {
       // Filtro por status
       if (_selectedStatuses.isNotEmpty &&
           !_selectedStatuses.contains(vehicle.status)) {
@@ -359,7 +351,6 @@ class _MapaPageState extends ConsumerState<MapaPage> {
 
       return true;
     }).toList();
-  }
 
   List<String> _getAvailableRoutes() {
     final vehiclePositionsAsync = ref.read(vehiclePositionsStreamProvider);
@@ -378,7 +369,7 @@ class _MapaPageState extends ConsumerState<MapaPage> {
     );
   }
 
-  void _selectVehicle(VehiclePosition vehicle) async {
+  Future<void> _selectVehicle(VehiclePosition vehicle) async {
     setState(() {
       _selectedVehicle = vehicle;
       _showBusStops = false;
@@ -406,7 +397,7 @@ class _MapaPageState extends ConsumerState<MapaPage> {
       _isTracking = true;
     });
 
-    _mapController.move(vehicle.position, 16.0);
+    _mapController.move(vehicle.position, 16);
 
     // Parar tracking apos 10 segundos
     Future.delayed(const Duration(seconds: 10), () {
@@ -448,7 +439,7 @@ class _MapaPageState extends ConsumerState<MapaPage> {
   }
 
   void _focusOnBusStop(BusStop stop) {
-    _mapController.move(stop.position, 16.0);
+    _mapController.move(stop.position, 16);
 
     // Mostrar informacoes da parada
     ScaffoldMessenger.of(context).showSnackBar(
@@ -467,7 +458,6 @@ class _MapaPageState extends ConsumerState<MapaPage> {
                   'Chegada estimada: ${GfDateUtils.timeAgo(stop.estimatedArrival!)}'),
           ],
         ),
-        duration: const Duration(seconds: 4),
         action: SnackBarAction(
           label: 'OK',
           onPressed: () {
@@ -506,10 +496,10 @@ class _MapaPageState extends ConsumerState<MapaPage> {
       );
     }
 
-    double minLat = vehicles.first.position.latitude;
-    double maxLat = vehicles.first.position.latitude;
-    double minLng = vehicles.first.position.longitude;
-    double maxLng = vehicles.first.position.longitude;
+    var minLat = vehicles.first.position.latitude;
+    var maxLat = vehicles.first.position.latitude;
+    var minLng = vehicles.first.position.longitude;
+    var maxLng = vehicles.first.position.longitude;
 
     for (final vehicle in vehicles) {
       minLat = minLat < vehicle.position.latitude
@@ -534,7 +524,7 @@ class _MapaPageState extends ConsumerState<MapaPage> {
 
   void _updateStatusCounts(List<VehiclePosition> vehicles) {
     final vehicleStatusService = ref.read(vehicleStatusServiceProvider);
-    final Map<vs.VehicleStatusType, int> newCounts = {};
+    final newCounts = <vs.VehicleStatusType, int>{};
 
     // Inicializar contadores
     for (final statusType in vs.VehicleStatusType.values) {

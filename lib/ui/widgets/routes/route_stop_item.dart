@@ -8,10 +8,6 @@ import '../../../core/theme/gf_tokens.dart';
 import '../../../models/route.dart';
 
 class RouteStopItem extends StatelessWidget {
-  final RouteStop stop;
-  final int index;
-  final VoidCallback? onEdit;
-  final VoidCallback? onDelete;
 
   const RouteStopItem({
     super.key,
@@ -20,10 +16,13 @@ class RouteStopItem extends StatelessWidget {
     this.onEdit,
     this.onDelete,
   });
+  final RouteStop stop;
+  final int index;
+  final VoidCallback? onEdit;
+  final VoidCallback? onDelete;
 
   @override
-  Widget build(BuildContext context) {
-    return Card(
+  Widget build(BuildContext context) => Card(
       margin: const EdgeInsets.only(bottom: GfTokens.space2),
       child: Padding(
         padding: const EdgeInsets.all(GfTokens.space3),
@@ -45,10 +44,8 @@ class RouteStopItem extends StatelessWidget {
         ),
       ),
     );
-  }
 
-  Widget _buildStopIndicator() {
-    return Column(
+  Widget _buildStopIndicator() => Column(
       children: [
         Container(
           width: 32,
@@ -91,10 +88,8 @@ class RouteStopItem extends StatelessWidget {
         ),
       ],
     );
-  }
 
-  Widget _buildStopInfo() {
-    return Column(
+  Widget _buildStopInfo() => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
@@ -208,10 +203,8 @@ class RouteStopItem extends StatelessWidget {
         ],
       ],
     );
-  }
 
-  Widget _buildActions(BuildContext context) {
-    return Row(
+  Widget _buildActions(BuildContext context) => Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         // Botao de editar
@@ -242,7 +235,6 @@ class RouteStopItem extends StatelessWidget {
         ),
       ],
     );
-  }
 
   void _showDeleteConfirmation(BuildContext context) {
     showDialog(
@@ -272,7 +264,5 @@ class RouteStopItem extends StatelessWidget {
     );
   }
 
-  String _formatTime(DateTime time) {
-    return '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
-  }
+  String _formatTime(DateTime time) => '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
 }

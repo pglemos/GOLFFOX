@@ -2,14 +2,6 @@ import 'package:flutter/material.dart';
 import '../../core/theme/unified_theme.dart';
 
 class GfAppBar extends StatelessWidget implements PreferredSizeWidget {
-  final String title;
-  final List<Widget>? actions;
-  final Widget? leading;
-  final bool automaticallyImplyLeading;
-  final Color? backgroundColor;
-  final Color? foregroundColor;
-  final double? elevation;
-  final bool centerTitle;
 
   const GfAppBar({
     super.key,
@@ -22,10 +14,17 @@ class GfAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.elevation,
     this.centerTitle = true,
   });
+  final String title;
+  final List<Widget>? actions;
+  final Widget? leading;
+  final bool automaticallyImplyLeading;
+  final Color? backgroundColor;
+  final Color? foregroundColor;
+  final double? elevation;
+  final bool centerTitle;
 
   @override
-  Widget build(BuildContext context) {
-    return AppBar(
+  Widget build(BuildContext context) => AppBar(
       title: Text(
         title,
         style: TextStyle(
@@ -44,7 +43,6 @@ class GfAppBar extends StatelessWidget implements PreferredSizeWidget {
       surfaceTintColor: Colors.transparent,
       shadowColor: Colors.transparent,
     );
-  }
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);

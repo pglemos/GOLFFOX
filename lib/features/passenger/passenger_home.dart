@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:golffox/models/user.dart' as app;
-import 'package:golffox/services/supabase_service.dart';
-import 'package:golffox/screens/passenger/passenger_dashboard.dart';
+import '../../models/user.dart' as app;
+import '../../services/supabase_service.dart';
+import '../../screens/passenger/passenger_dashboard.dart';
 
 class PassengerHome extends StatelessWidget {
   const PassengerHome({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return FutureBuilder<app.User?>(
+  Widget build(BuildContext context) => FutureBuilder<app.User?>(
       future: SupabaseService.instance.getCurrentUserProfile(),
       builder: (context, snap) {
         if (snap.connectionState != ConnectionState.done) {
@@ -25,5 +24,4 @@ class PassengerHome extends StatelessWidget {
         return PassengerDashboard(user: user);
       },
     );
-  }
 }

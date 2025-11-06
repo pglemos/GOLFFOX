@@ -10,11 +10,6 @@ import '../../../models/route.dart';
 import '../gf_hover_scale.dart';
 
 class RouteCard extends StatelessWidget {
-  final BusRoute route;
-  final VoidCallback? onTap;
-  final VoidCallback? onStart;
-  final VoidCallback? onCancel;
-  final VoidCallback? onEdit;
 
   const RouteCard({
     super.key,
@@ -24,10 +19,14 @@ class RouteCard extends StatelessWidget {
     this.onCancel,
     this.onEdit,
   });
+  final BusRoute route;
+  final VoidCallback? onTap;
+  final VoidCallback? onStart;
+  final VoidCallback? onCancel;
+  final VoidCallback? onEdit;
 
   @override
-  Widget build(BuildContext context) {
-    return GfHoverScale(
+  Widget build(BuildContext context) => GfHoverScale(
       child: Card(
         elevation: 2,
         shape: RoundedRectangleBorder(
@@ -191,10 +190,8 @@ class RouteCard extends StatelessWidget {
         ),
       ),
     );
-  }
 
-  Widget _buildStatusBadge() {
-    return Container(
+  Widget _buildStatusBadge() => Container(
       padding: const EdgeInsets.symmetric(
         horizontal: GfTokens.space2,
         vertical: 4,
@@ -243,14 +240,12 @@ class RouteCard extends StatelessWidget {
         ],
       ),
     );
-  }
 
   Widget _buildInfoItem({
     required IconData icon,
     required String label,
     required String value,
-  }) {
-    return Column(
+  }) => Column(
       children: [
         Icon(
           icon,
@@ -275,7 +270,6 @@ class RouteCard extends StatelessWidget {
         ),
       ],
     );
-  }
 
   Widget _buildProgressSection() {
     final completedStops =
@@ -328,12 +322,9 @@ class RouteCard extends StatelessWidget {
     );
   }
 
-  bool _hasActions() {
-    return onStart != null || onCancel != null || onEdit != null;
-  }
+  bool _hasActions() => onStart != null || onCancel != null || onEdit != null;
 
-  Widget _buildActions() {
-    return Row(
+  Widget _buildActions() => Row(
       children: [
         if (onEdit != null) ...[
           Expanded(
@@ -378,9 +369,6 @@ class RouteCard extends StatelessWidget {
         ],
       ],
     );
-  }
 
-  String _formatTime(DateTime time) {
-    return '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
-  }
+  String _formatTime(DateTime time) => '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
 }

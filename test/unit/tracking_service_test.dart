@@ -142,7 +142,7 @@ void main() {
         final mockPosition = MockPosition();
         when(mockPosition.latitude).thenReturn(-23.5505);
         when(mockPosition.longitude).thenReturn(-46.6333);
-        when(mockPosition.accuracy).thenReturn(5.0);
+        when(mockPosition.accuracy).thenReturn(5);
         when(mockPosition.timestamp).thenReturn(DateTime.now());
 
         // Act & Assert
@@ -221,7 +221,7 @@ void main() {
       test('should validate high accuracy threshold', () {
         // Arrange
         final mockPosition = MockPosition();
-        when(mockPosition.accuracy).thenReturn(3.0); // High accuracy
+        when(mockPosition.accuracy).thenReturn(3); // High accuracy
 
         // Act & Assert
         expect(mockPosition.accuracy, lessThan(5.0)); // Good accuracy
@@ -230,7 +230,7 @@ void main() {
       test('should identify low accuracy', () {
         // Arrange
         final mockPosition = MockPosition();
-        when(mockPosition.accuracy).thenReturn(50.0); // Low accuracy
+        when(mockPosition.accuracy).thenReturn(50); // Low accuracy
 
         // Act & Assert
         expect(mockPosition.accuracy, greaterThan(20.0)); // Poor accuracy

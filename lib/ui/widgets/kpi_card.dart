@@ -9,14 +9,6 @@ import '../../core/theme/gf_tokens.dart';
 import '../../core/motion/gf_motion.dart';
 
 class GfKpiCard extends StatelessWidget {
-  final String title;
-  final String value;
-  final String? subtitle;
-  final IconData icon;
-  final Color iconColor;
-  final Color? backgroundColor;
-  final VoidCallback? onTap;
-  final bool isLoading;
 
   const GfKpiCard({
     super.key,
@@ -29,10 +21,17 @@ class GfKpiCard extends StatelessWidget {
     this.onTap,
     this.isLoading = false,
   });
+  final String title;
+  final String value;
+  final String? subtitle;
+  final IconData icon;
+  final Color iconColor;
+  final Color? backgroundColor;
+  final VoidCallback? onTap;
+  final bool isLoading;
 
   @override
-  Widget build(BuildContext context) {
-    return GfHoverScale(
+  Widget build(BuildContext context) => GfHoverScale(
       enableShadow: true,
       child: Material(
         color: Colors.transparent,
@@ -56,10 +55,8 @@ class GfKpiCard extends StatelessWidget {
         ),
       ),
     ).animate().fadeIn(duration: 300.ms).slideY(begin: 0.1, end: 0);
-  }
 
-  Widget _buildContent() {
-    return Column(
+  Widget _buildContent() => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // ========================================
@@ -128,10 +125,8 @@ class GfKpiCard extends StatelessWidget {
         ],
       ],
     );
-  }
 
-  Widget _buildLoadingState() {
-    return Column(
+  Widget _buildLoadingState() => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Header skeleton
@@ -185,7 +180,6 @@ class GfKpiCard extends StatelessWidget {
     )
         .animate(onPlay: (controller) => controller.repeat())
         .shimmer(duration: 1500.ms);
-  }
 }
 
 // ========================================
@@ -197,8 +191,7 @@ class GfKpiCardVariants {
     String? subtitle,
     VoidCallback? onTap,
     bool isLoading = false,
-  }) {
-    return GfKpiCard(
+  }) => GfKpiCard(
       title: 'Em Transito',
       value: value,
       subtitle: subtitle ?? 'colaboradores ativos',
@@ -207,15 +200,13 @@ class GfKpiCardVariants {
       onTap: onTap,
       isLoading: isLoading,
     );
-  }
 
   static GfKpiCard activeVehicles({
     required String value,
     String? subtitle,
     VoidCallback? onTap,
     bool isLoading = false,
-  }) {
-    return GfKpiCard(
+  }) => GfKpiCard(
       title: 'Veiculos Ativos',
       value: value,
       subtitle: subtitle ?? 'da frota total',
@@ -224,15 +215,13 @@ class GfKpiCardVariants {
       onTap: onTap,
       isLoading: isLoading,
     );
-  }
 
   static GfKpiCard routesToday({
     required String value,
     String? subtitle,
     VoidCallback? onTap,
     bool isLoading = false,
-  }) {
-    return GfKpiCard(
+  }) => GfKpiCard(
       title: 'Rotas do Dia',
       value: value,
       subtitle: subtitle ?? 'rotas programadas',
@@ -241,15 +230,13 @@ class GfKpiCardVariants {
       onTap: onTap,
       isLoading: isLoading,
     );
-  }
 
   static GfKpiCard criticalAlerts({
     required String value,
     String? subtitle,
     VoidCallback? onTap,
     bool isLoading = false,
-  }) {
-    return GfKpiCard(
+  }) => GfKpiCard(
       title: 'Alertas Criticos',
       value: value,
       subtitle: subtitle ?? 'requerem atencao',
@@ -258,5 +245,4 @@ class GfKpiCardVariants {
       onTap: onTap,
       isLoading: isLoading,
     );
-  }
 }

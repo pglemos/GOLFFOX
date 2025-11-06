@@ -9,12 +9,12 @@ import '../../../core/theme/gf_tokens.dart';
 import '../../../models/route.dart';
 
 class RouteProgressIndicator extends StatelessWidget {
-  final BusRoute route;
 
   const RouteProgressIndicator({
     super.key,
     required this.route,
   });
+  final BusRoute route;
 
   @override
   Widget build(BuildContext context) {
@@ -121,8 +121,7 @@ class RouteProgressIndicator extends StatelessWidget {
     required String label,
     required String value,
     required Color color,
-  }) {
-    return Row(
+  }) => Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         Icon(
@@ -153,7 +152,6 @@ class RouteProgressIndicator extends StatelessWidget {
         ),
       ],
     );
-  }
 
   Widget _buildNextStop() {
     final nextStop = route.stops.firstWhere(
@@ -171,15 +169,15 @@ class RouteProgressIndicator extends StatelessWidget {
             color: const Color(GfTokens.success).withValues(alpha: 0.3),
           ),
         ),
-        child: Row(
+        child: const Row(
           children: [
-            const Icon(
+            Icon(
               Icons.check_circle,
               color: Color(GfTokens.success),
               size: 20,
             ),
-            const SizedBox(width: GfTokens.space2),
-            const Expanded(
+            SizedBox(width: GfTokens.space2),
+            Expanded(
               child: Text(
                 'Todas as paradas foram concluidas!',
                 style: TextStyle(
@@ -313,8 +311,7 @@ class RouteProgressIndicator extends StatelessWidget {
     required String label,
     required String value,
     required Color color,
-  }) {
-    return Container(
+  }) => Container(
       padding: const EdgeInsets.all(GfTokens.space3),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
@@ -350,9 +347,6 @@ class RouteProgressIndicator extends StatelessWidget {
         ],
       ),
     );
-  }
 
-  String _formatTime(DateTime time) {
-    return '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
-  }
+  String _formatTime(DateTime time) => '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
 }

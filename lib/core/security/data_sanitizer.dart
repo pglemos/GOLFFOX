@@ -24,24 +24,24 @@ class DataSanitizer {
 
   // Padrões de XSS
   static final List<RegExp> _xssPatterns = [
-    RegExp(r'<script[^>]*>.*?</script>', caseSensitive: false, dotAll: true),
-    RegExp(r'javascript:', caseSensitive: false),
+    RegExp('<script[^>]*>.*?</script>', caseSensitive: false, dotAll: true),
+    RegExp('javascript:', caseSensitive: false),
     RegExp(r'on\w+\s*=', caseSensitive: false),
-    RegExp(r'<iframe[^>]*>.*?</iframe>', caseSensitive: false, dotAll: true),
-    RegExp(r'<object[^>]*>.*?</object>', caseSensitive: false, dotAll: true),
-    RegExp(r'<embed[^>]*>', caseSensitive: false),
-    RegExp(r'<link[^>]*>', caseSensitive: false),
-    RegExp(r'<meta[^>]*>', caseSensitive: false),
-    RegExp(r'vbscript:', caseSensitive: false),
-    RegExp(r'data:text/html', caseSensitive: false),
+    RegExp('<iframe[^>]*>.*?</iframe>', caseSensitive: false, dotAll: true),
+    RegExp('<object[^>]*>.*?</object>', caseSensitive: false, dotAll: true),
+    RegExp('<embed[^>]*>', caseSensitive: false),
+    RegExp('<link[^>]*>', caseSensitive: false),
+    RegExp('<meta[^>]*>', caseSensitive: false),
+    RegExp('vbscript:', caseSensitive: false),
+    RegExp('data:text/html', caseSensitive: false),
   ];
 
   // Padrões de path traversal
   static final List<RegExp> _pathTraversalPatterns = [
     RegExp(r'\.\./'),
     RegExp(r'\.\.\\'),
-    RegExp(r'%2e%2e%2f', caseSensitive: false),
-    RegExp(r'%2e%2e%5c', caseSensitive: false),
+    RegExp('%2e%2e%2f', caseSensitive: false),
+    RegExp('%2e%2e%5c', caseSensitive: false),
     RegExp(r'\.\.%2f', caseSensitive: false),
     RegExp(r'\.\.%5c', caseSensitive: false),
   ];
@@ -50,7 +50,7 @@ class DataSanitizer {
   static String sanitizeText(String? input) {
     if (input == null || input.isEmpty) return '';
 
-    String sanitized = input;
+    var sanitized = input;
 
     // Escape HTML entities
     _htmlEntities.forEach((char, entity) {
@@ -64,7 +64,7 @@ class DataSanitizer {
   static String sanitizeHtml(String? input) {
     if (input == null || input.isEmpty) return '';
 
-    String sanitized = input;
+    var sanitized = input;
 
     for (final pattern in _xssPatterns) {
       sanitized = sanitized.replaceAll(pattern, '');
@@ -77,7 +77,7 @@ class DataSanitizer {
   static String sanitizeSql(String? input) {
     if (input == null || input.isEmpty) return '';
 
-    String sanitized = input.trim();
+    var sanitized = input.trim();
 
     for (final pattern in _sqlInjectionPatterns) {
       sanitized = sanitized.replaceAll(pattern, '');
@@ -94,14 +94,14 @@ class DataSanitizer {
   static String sanitizePath(String? input) {
     if (input == null || input.isEmpty) return '';
 
-    String sanitized = input;
+    var sanitized = input;
 
     for (final pattern in _pathTraversalPatterns) {
       sanitized = sanitized.replaceAll(pattern, '');
     }
 
     // Remove caracteres perigosos em paths
-    sanitized = sanitized.replaceAll(RegExp(r'[<>:"|?*]'), '');
+    sanitized = sanitized.replaceAll(RegExp('[<>:"|?*]'), '');
     // Normaliza separadores
     sanitized = sanitized.replaceAll(RegExp(r'[/\\]+'), '/');
 
@@ -112,7 +112,7 @@ class DataSanitizer {
   static String sanitizeFileName(String? input) {
     if (input == null || input.isEmpty) return '';
 
-    String sanitized = input.trim();
+    var sanitized = input.trim();
 
     // Remove caracteres perigosos
     sanitized = sanitized.replaceAll(RegExp(r'[<>:"/\\|?*]'), '');
@@ -133,7 +133,7 @@ class DataSanitizer {
   /// Sanitiza telefone
   static String sanitizePhone(String? input) {
     if (input == null || input.isEmpty) return '';
-    return input.replaceAll(RegExp(r'[^0-9+]'), '');
+    return input.replaceAll(RegExp('[^0-9+]'), '');
   }
 
   /// Sanitiza URL
@@ -178,7 +178,7 @@ class DataSanitizer {
   }
 
   /// Sanitiza entrada baseada no tipo
-  static dynamic sanitizeByType(dynamic input, SanitizationType type) {
+  static dynamic sanitizeByType(input, SanitizationType type) {
     if (input == null) return null;
     switch (type) {
       case SanitizationType.text:
@@ -232,9 +232,9 @@ class DataSanitizer {
     final truncated = input.substring(0, maxLength);
     final lastSpace = truncated.lastIndexOf(' ');
     if (lastSpace > maxLength * 0.8) {
-      return truncated.substring(0, lastSpace) + '...';
+      return '${truncated.substring(0, lastSpace)}...';
     }
-    return truncated + '...';
+    return '$truncated...';
   }
 }
 

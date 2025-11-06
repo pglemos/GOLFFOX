@@ -19,12 +19,12 @@ enum TripHistoryFilter {
 }
 
 class DriverTripHistory extends StatefulWidget {
-  final String driverId;
 
   const DriverTripHistory({
     super.key,
     required this.driverId,
   });
+  final String driverId;
 
   @override
   State<DriverTripHistory> createState() => _DriverTripHistoryState();
@@ -91,8 +91,7 @@ class _DriverTripHistoryState extends State<DriverTripHistory> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Column(
+  Widget build(BuildContext context) => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Filtros
@@ -109,10 +108,8 @@ class _DriverTripHistoryState extends State<DriverTripHistory> {
         _buildTripsList(),
       ],
     );
-  }
 
-  Widget _buildFilters() {
-    return GxCard(
+  Widget _buildFilters() => GxCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -155,7 +152,6 @@ class _DriverTripHistoryState extends State<DriverTripHistory> {
         ],
       ),
     ).animate().fadeIn().slideY(begin: -0.1);
-  }
 
   Widget _buildQuickStats() {
     final filteredTrips = _filteredTrips;
@@ -206,7 +202,7 @@ class _DriverTripHistoryState extends State<DriverTripHistory> {
         Expanded(
           child: _buildStatCard(
             'Avaliacao',
-            averageRating > 0 ? '${averageRating.toStringAsFixed(1)}' : 'N/A',
+            averageRating > 0 ? averageRating.toStringAsFixed(1) : 'N/A',
             Icons.star,
             const Color(GfTokens.colorWarning),
           ),
@@ -216,8 +212,7 @@ class _DriverTripHistoryState extends State<DriverTripHistory> {
   }
 
   Widget _buildStatCard(
-      String label, String value, IconData icon, Color color) {
-    return GxCard(
+      String label, String value, IconData icon, Color color) => GxCard(
       child: Column(
         children: [
           Icon(
@@ -242,7 +237,6 @@ class _DriverTripHistoryState extends State<DriverTripHistory> {
         ],
       ),
     );
-  }
 
   Widget _buildTripsList() {
     if (_isLoading) {
@@ -255,13 +249,13 @@ class _DriverTripHistoryState extends State<DriverTripHistory> {
       return GxCard(
         child: Column(
           children: [
-            Icon(
+            const Icon(
               Icons.error_outline,
               size: 48,
-              color: const Color(GfTokens.colorError),
+              color: Color(GfTokens.colorError),
             ),
             const SizedBox(height: 16),
-            Text(
+            const Text(
               'Erro ao carregar viagens',
               style: GfTextStyles.headlineSmall,
             ),
@@ -303,10 +297,10 @@ class _DriverTripHistoryState extends State<DriverTripHistory> {
         children: [
           Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.history,
                 size: 20,
-                color: const Color(GfTokens.colorPrimary),
+                color: Color(GfTokens.colorPrimary),
               ),
               const SizedBox(width: 8),
               Text(
@@ -319,14 +313,13 @@ class _DriverTripHistoryState extends State<DriverTripHistory> {
             ],
           ),
           const SizedBox(height: 16),
-          ...filteredTrips.map((trip) => _buildTripItem(trip)).toList(),
+          ...filteredTrips.map(_buildTripItem),
         ],
       ),
     ).animate().fadeIn(delay: 200.ms).slideY(begin: -0.1);
   }
 
-  Widget _buildTripItem(TripExtended trip) {
-    return Container(
+  Widget _buildTripItem(TripExtended trip) => Container(
       margin: const EdgeInsets.only(bottom: 16),
       child: GxCard(
         child: Column(
@@ -494,10 +487,8 @@ class _DriverTripHistoryState extends State<DriverTripHistory> {
         ),
       ),
     );
-  }
 
-  Widget _buildTripInfo(IconData icon, String value) {
-    return Column(
+  Widget _buildTripInfo(IconData icon, String value) => Column(
       children: [
         Icon(
           icon,
@@ -514,7 +505,6 @@ class _DriverTripHistoryState extends State<DriverTripHistory> {
         ),
       ],
     );
-  }
 
   int _getTripCount(TripHistoryFilter filter) {
     switch (filter) {
@@ -609,8 +599,9 @@ class _DriverTripHistoryState extends State<DriverTripHistory> {
       TripStatus.cancelled,
       TripStatus.inProgress
     ];
-    if (index == 0)
+    if (index == 0) {
       return TripStatus.inProgress; // Primeira viagem em andamento
+    }
     return statuses[index % statuses.length];
   }
 }

@@ -14,40 +14,20 @@ import 'supabase_service.dart';
 import 'map_service.dart';
 
 // Providers
-final vehicleServiceProvider = Provider<VehicleService>((ref) {
-  return VehicleService(ref.read(supabaseServiceProvider));
-});
+final vehicleServiceProvider = Provider<VehicleService>((ref) => VehicleService(ref.read(supabaseServiceProvider)));
 
-final vehiclesStreamProvider = StreamProvider<List<Vehicle>>((ref) {
-  return ref.read(vehicleServiceProvider).getVehiclesStream();
-});
+final vehiclesStreamProvider = StreamProvider<List<Vehicle>>((ref) => ref.read(vehicleServiceProvider).getVehiclesStream());
 
 final vehicleProvider =
-    FutureProvider.family<Vehicle?, String>((ref, vehicleId) {
-  return ref.read(vehicleServiceProvider).getVehicleById(vehicleId);
-});
+    FutureProvider.family<Vehicle?, String>((ref, vehicleId) => ref.read(vehicleServiceProvider).getVehicleById(vehicleId));
 
 final vehicleMaintenanceProvider =
-    FutureProvider.family<List<MaintenanceRecord>, String>((ref, vehicleId) {
-  return ref.read(vehicleServiceProvider).getVehicleMaintenance(vehicleId);
-});
+    FutureProvider.family<List<MaintenanceRecord>, String>((ref, vehicleId) => ref.read(vehicleServiceProvider).getVehicleMaintenance(vehicleId));
 
 final vehicleFuelRecordsProvider =
-    FutureProvider.family<List<FuelRecord>, String>((ref, vehicleId) {
-  return ref.read(vehicleServiceProvider).getVehicleFuelRecords(vehicleId);
-});
+    FutureProvider.family<List<FuelRecord>, String>((ref, vehicleId) => ref.read(vehicleServiceProvider).getVehicleFuelRecords(vehicleId));
 
 class VehicleFilters {
-  static const _unset = Object();
-
-  final List<VehicleStatus>? statuses;
-  final List<VehicleType>? types;
-  final List<FuelType>? fuelTypes;
-  final String? searchQuery;
-  final bool? needsMaintenance;
-  final bool? hasLowFuel;
-  final bool? hasExpiringDocuments;
-  final String? companyId;
 
   const VehicleFilters({
     this.statuses,
@@ -59,6 +39,16 @@ class VehicleFilters {
     this.hasExpiringDocuments,
     this.companyId,
   });
+  static const _unset = Object();
+
+  final List<VehicleStatus>? statuses;
+  final List<VehicleType>? types;
+  final List<FuelType>? fuelTypes;
+  final String? searchQuery;
+  final bool? needsMaintenance;
+  final bool? hasLowFuel;
+  final bool? hasExpiringDocuments;
+  final String? companyId;
 
   VehicleFilters copyWith({
     Object? statuses = _unset,
@@ -69,8 +59,7 @@ class VehicleFilters {
     Object? hasLowFuel = _unset,
     Object? hasExpiringDocuments = _unset,
     Object? companyId = _unset,
-  }) {
-    return VehicleFilters(
+  }) => VehicleFilters(
       statuses:
           statuses == _unset ? this.statuses : statuses as List<VehicleStatus>?,
       types: types == _unset ? this.types : types as List<VehicleType>?,
@@ -87,28 +76,27 @@ class VehicleFilters {
           : hasExpiringDocuments as bool?,
       companyId: companyId == _unset ? this.companyId : companyId as String?,
     );
-  }
 
   bool get hasActiveFilters =>
-      statuses?.isNotEmpty == true ||
-      types?.isNotEmpty == true ||
-      fuelTypes?.isNotEmpty == true ||
-      searchQuery?.isNotEmpty == true ||
-      needsMaintenance == true ||
-      hasLowFuel == true ||
-      hasExpiringDocuments == true;
+      statuses?.isNotEmpty ?? false ||
+      types?.isNotEmpty ?? false ||
+      fuelTypes?.isNotEmpty ?? false ||
+      searchQuery?.isNotEmpty ?? false ||
+      needsMaintenance ?? false ||
+      hasLowFuel ?? false ||
+      hasExpiringDocuments ?? false;
 }
 
 class VehicleService {
+
+  VehicleService(this._supabaseService) {
+    _startRealTimeUpdates();
+  }
   final SupabaseService _supabaseService;
   final StreamController<List<Vehicle>> _vehiclesController =
       StreamController<List<Vehicle>>.broadcast();
   Timer? _updateTimer;
   List<Vehicle> _cachedVehicles = [];
-
-  VehicleService(this._supabaseService) {
-    _startRealTimeUpdates();
-  }
 
   void dispose() {
     _updateTimer?.cancel();
@@ -116,9 +104,7 @@ class VehicleService {
   }
 
   // Stream de veiculos
-  Stream<List<Vehicle>> getVehiclesStream() {
-    return _vehiclesController.stream;
-  }
+  Stream<List<Vehicle>> getVehiclesStream() => _vehiclesController.stream;
 
   // Iniciar atualizacoes em tempo real
   void _startRealTimeUpdates() {
@@ -149,25 +135,25 @@ class VehicleService {
 
     return _cachedVehicles.where((vehicle) {
       // Filtro por status
-      if (filters.statuses?.isNotEmpty == true &&
+      if (filters.statuses?.isNotEmpty ?? false &&
           !filters.statuses!.contains(vehicle.status)) {
         return false;
       }
 
       // Filtro por tipo
-      if (filters.types?.isNotEmpty == true &&
+      if (filters.types?.isNotEmpty ?? false &&
           !filters.types!.contains(vehicle.type)) {
         return false;
       }
 
       // Filtro por combustivel
-      if (filters.fuelTypes?.isNotEmpty == true &&
+      if (filters.fuelTypes?.isNotEmpty ?? false &&
           !filters.fuelTypes!.contains(vehicle.fuelType)) {
         return false;
       }
 
       // Filtro por busca
-      if (filters.searchQuery?.isNotEmpty == true) {
+      if (filters.searchQuery?.isNotEmpty ?? false) {
         final query = filters.searchQuery!.toLowerCase();
         if (!vehicle.name.toLowerCase().contains(query) &&
             !(vehicle.documents.licensePlate?.toLowerCase().contains(query) ??
@@ -181,23 +167,23 @@ class VehicleService {
       }
 
       // Filtro por manutencao
-      if (filters.needsMaintenance == true && !vehicle.needsMaintenance) {
+      if (filters.needsMaintenance ?? false && !vehicle.needsMaintenance) {
         return false;
       }
 
       // Filtro por combustivel baixo
-      if (filters.hasLowFuel == true && !vehicle.hasLowFuel) {
+      if (filters.hasLowFuel ?? false && !vehicle.hasLowFuel) {
         return false;
       }
 
       // Filtro por documentos vencendo
-      if (filters.hasExpiringDocuments == true &&
+      if (filters.hasExpiringDocuments ?? false &&
           !vehicle.hasExpiringDocuments) {
         return false;
       }
 
       // Filtro por empresa
-      if (filters.companyId?.isNotEmpty == true &&
+      if (filters.companyId?.isNotEmpty ?? false &&
           vehicle.companyId != filters.companyId) {
         return false;
       }
@@ -406,7 +392,7 @@ class VehicleService {
     final models = ['OF-1721', 'B270F', 'K270', 'City Class', 'Volksbus'];
     final colors = ['Branco', 'Azul', 'Amarelo', 'Verde', 'Vermelho'];
 
-    for (int i = 0; i < vehicleNames.length; i++) {
+    for (var i = 0; i < vehicleNames.length; i++) {
       final manufacturer = manufacturers[random.nextInt(manufacturers.length)];
       final model = models[random.nextInt(models.length)];
       final color = colors[random.nextInt(colors.length)];
@@ -469,7 +455,7 @@ class VehicleService {
     final random = Random();
     final maintenance = <MaintenanceRecord>[];
 
-    for (int i = 0; i < 5; i++) {
+    for (var i = 0; i < 5; i++) {
       maintenance.add(MaintenanceRecord(
         id: 'maintenance_${vehicleId}_$i',
         vehicleId: vehicleId,
@@ -499,7 +485,7 @@ class VehicleService {
     final random = Random();
     final records = <FuelRecord>[];
 
-    for (int i = 0; i < 10; i++) {
+    for (var i = 0; i < 10; i++) {
       records.add(FuelRecord(
         id: 'fuel_${vehicleId}_$i',
         vehicleId: vehicleId,
@@ -507,7 +493,7 @@ class VehicleService {
         fuelType: FuelType.diesel,
         quantity: 50.0 + random.nextDouble() * 100.0,
         pricePerLiter: 4.0 + random.nextDouble() * 2.0,
-        totalCost: 0.0,
+        totalCost: 0,
         odometerReading: random.nextDouble() * 100000,
         attachments: [],
         timestamp: DateTime.now().subtract(Duration(days: i * 7)),
@@ -520,7 +506,5 @@ class VehicleService {
     return records;
   }
 
-  String _generateId() {
-    return 'vehicle_${DateTime.now().millisecondsSinceEpoch}';
-  }
+  String _generateId() => 'vehicle_${DateTime.now().millisecondsSinceEpoch}';
 }

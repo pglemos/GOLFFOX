@@ -13,8 +13,7 @@ extension GxMotion on Widget {
     Duration? delay,
     Duration? duration,
   }) =>
-      this
-          .animate(delay: delay ?? Duration.zero)
+      animate(delay: delay ?? Duration.zero)
           .slideY(
             begin: 0.3,
             end: 0,
@@ -31,8 +30,7 @@ extension GxMotion on Widget {
     Duration? delay,
     Duration? duration,
   }) =>
-      this
-          .animate(delay: delay ?? Duration.zero)
+      animate(delay: delay ?? Duration.zero)
           .slideX(
             begin: 0.3,
             end: 0,
@@ -49,11 +47,10 @@ extension GxMotion on Widget {
     Duration? delay,
     Duration? duration,
   }) =>
-      this
-          .animate(delay: delay ?? Duration.zero)
+      animate(delay: delay ?? Duration.zero)
           .scale(
             begin: const Offset(0.8, 0.8),
-            end: const Offset(1.0, 1.0),
+            end: const Offset(1, 1),
             duration: duration ?? GfTokens.durationFast,
             curve: Curves.elasticOut,
           )
@@ -63,8 +60,7 @@ extension GxMotion on Widget {
           );
 
   /// Shimmer loading effect
-  Widget shimmer({Duration? duration}) => this
-      .animate(onPlay: (controller) => controller.repeat())
+  Widget shimmer({Duration? duration}) => animate(onPlay: (controller) => controller.repeat())
       .fadeIn(duration: GfTokens.durationSlow)
       .then(delay: duration ?? const Duration(milliseconds: 800))
       .fadeOut(
@@ -76,8 +72,7 @@ extension GxMotion on Widget {
     Duration? delay,
     Duration? duration,
   }) =>
-      this
-          .animate(delay: delay ?? Duration.zero)
+      animate(delay: delay ?? Duration.zero)
           .fadeIn(duration: GfTokens.durationFast)
           .slideY(
             begin: 0.2,
@@ -91,20 +86,18 @@ extension GxMotion on Widget {
     Duration? duration,
     double? scale,
   }) =>
-      this
-          .animate(onPlay: (controller) => controller.repeat(reverse: true))
+      animate(onPlay: (controller) => controller.repeat(reverse: true))
           .scale(
-            begin: const Offset(1.0, 1.0),
+            begin: const Offset(1, 1),
             end: Offset(scale ?? 1.05, scale ?? 1.05),
             duration: duration ?? GfTokens.durationSlower,
             curve: Curves.easeInOut,
           );
 
   /// Bounce animation for interactions
-  Widget bounce({Duration? duration}) => this
-      .animate(onPlay: (controller) => controller.forward())
+  Widget bounce({Duration? duration}) => animate(onPlay: (controller) => controller.forward())
       .scale(
-        begin: const Offset(1.0, 1.0),
+        begin: const Offset(1, 1),
         end: const Offset(0.95, 0.95),
         duration: duration ?? GfTokens.durationFast,
         curve: Curves.easeInOut,
@@ -112,7 +105,7 @@ extension GxMotion on Widget {
       .then()
       .scale(
         begin: const Offset(0.95, 0.95),
-        end: const Offset(1.0, 1.0),
+        end: const Offset(1, 1),
         duration: duration ?? GfTokens.durationFast,
         curve: Curves.elasticOut,
       );
@@ -122,10 +115,9 @@ extension GxMotion on Widget {
     Duration? delay,
     Duration? duration,
   }) =>
-      this
-          .animate(delay: delay ?? Duration.zero)
+      animate(delay: delay ?? Duration.zero)
           .slideX(
-            begin: -1.0,
+            begin: -1,
             end: 0,
             duration: duration ?? GfTokens.duration,
             curve: Curves.easeOutCubic,
@@ -140,10 +132,9 @@ extension GxMotion on Widget {
     Duration? delay,
     Duration? duration,
   }) =>
-      this
-          .animate(delay: delay ?? Duration.zero)
+      animate(delay: delay ?? Duration.zero)
           .slideY(
-            begin: -1.0,
+            begin: -1,
             end: 0,
             duration: duration ?? GfTokens.durationSlow,
             curve: Curves.easeOutCubic,

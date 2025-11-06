@@ -9,14 +9,14 @@ import '../../../core/theme/gf_tokens.dart';
 import '../../../models/route.dart';
 
 class RouteStopTimeline extends StatelessWidget {
-  final List<RouteStop> stops;
-  final bool isActive;
 
   const RouteStopTimeline({
     super.key,
     required this.stops,
     this.isActive = false,
   });
+  final List<RouteStop> stops;
+  final bool isActive;
 
   @override
   Widget build(BuildContext context) {
@@ -162,7 +162,7 @@ class RouteStopTimeline extends StatelessWidget {
                 color: isCurrent
                     ? stopColor.withValues(alpha: 0.1)
                     : const Color(GfTokens.colorSurface),
-                borderRadius: BorderRadius.circular(8.0),
+                borderRadius: BorderRadius.circular(8),
                 border: Border.all(
                   color: isCurrent
                       ? stopColor.withValues(alpha: 0.3)
@@ -415,7 +415,5 @@ class RouteStopTimeline extends StatelessWidget {
     }
   }
 
-  String _formatTime(DateTime time) {
-    return '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
-  }
+  String _formatTime(DateTime time) => '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
 }

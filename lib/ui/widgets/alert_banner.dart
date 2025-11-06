@@ -8,12 +8,6 @@ import 'package:flutter_animate/flutter_animate.dart';
 import '../../core/theme/gf_tokens.dart';
 
 class GfAlertBanner extends StatelessWidget {
-  final String message;
-  final String actionText;
-  final VoidCallback onActionTap;
-  final AlertSeverity severity;
-  final bool isDismissible;
-  final VoidCallback? onDismiss;
 
   const GfAlertBanner({
     super.key,
@@ -24,6 +18,12 @@ class GfAlertBanner extends StatelessWidget {
     this.isDismissible = false,
     this.onDismiss,
   });
+  final String message;
+  final String actionText;
+  final VoidCallback onActionTap;
+  final AlertSeverity severity;
+  final bool isDismissible;
+  final VoidCallback? onDismiss;
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +36,6 @@ class GfAlertBanner extends StatelessWidget {
         borderRadius: BorderRadius.circular(GfTokens.radius),
         border: Border.all(
           color: colors.border,
-          width: 1,
         ),
       ),
       child: Row(
@@ -126,36 +125,36 @@ class GfAlertBanner extends StatelessWidget {
   _AlertColors _getColorsForSeverity(AlertSeverity severity) {
     switch (severity) {
       case AlertSeverity.info:
-        return _AlertColors(
-          background: const Color(0xFFF0F9FF),
-          border: const Color(0xFFBAE6FD),
-          icon: const Color(0xFF0284C7),
-          text: const Color(0xFF0C4A6E),
-          action: const Color(0xFF0284C7),
+        return const _AlertColors(
+          background: Color(0xFFF0F9FF),
+          border: Color(0xFFBAE6FD),
+          icon: Color(0xFF0284C7),
+          text: Color(0xFF0C4A6E),
+          action: Color(0xFF0284C7),
         );
       case AlertSeverity.success:
-        return _AlertColors(
-          background: const Color(0xFFF0FDF4),
-          border: const Color(0xFFBBF7D0),
-          icon: const Color(GfTokens.success),
-          text: const Color(0xFF14532D),
-          action: const Color(GfTokens.success),
+        return const _AlertColors(
+          background: Color(0xFFF0FDF4),
+          border: Color(0xFFBBF7D0),
+          icon: Color(GfTokens.success),
+          text: Color(0xFF14532D),
+          action: Color(GfTokens.success),
         );
       case AlertSeverity.warning:
-        return _AlertColors(
-          background: const Color(0xFFFFFBEB),
-          border: const Color(0xFFFED7AA),
-          icon: const Color(GfTokens.warning),
-          text: const Color(0xFF92400E),
-          action: const Color(GfTokens.warning),
+        return const _AlertColors(
+          background: Color(0xFFFFFBEB),
+          border: Color(0xFFFED7AA),
+          icon: Color(GfTokens.warning),
+          text: Color(0xFF92400E),
+          action: Color(GfTokens.warning),
         );
       case AlertSeverity.error:
-        return _AlertColors(
-          background: const Color(0xFFFEF2F2),
-          border: const Color(0xFFFECACA),
-          icon: const Color(GfTokens.danger),
-          text: const Color(0xFF991B1B),
-          action: const Color(GfTokens.danger),
+        return const _AlertColors(
+          background: Color(0xFFFEF2F2),
+          border: Color(0xFFFECACA),
+          icon: Color(GfTokens.danger),
+          text: Color(0xFF991B1B),
+          action: Color(GfTokens.danger),
         );
     }
   }
@@ -185,11 +184,6 @@ enum AlertSeverity {
 }
 
 class _AlertColors {
-  final Color background;
-  final Color border;
-  final Color icon;
-  final Color text;
-  final Color action;
 
   const _AlertColors({
     required this.background,
@@ -198,6 +192,11 @@ class _AlertColors {
     required this.text,
     required this.action,
   });
+  final Color background;
+  final Color border;
+  final Color icon;
+  final Color text;
+  final Color action;
 }
 
 // ========================================
@@ -208,8 +207,7 @@ class GfAlertBannerVariants {
     required int count,
     VoidCallback? onViewAlerts,
     VoidCallback? onDismiss,
-  }) {
-    return GfAlertBanner(
+  }) => GfAlertBanner(
       message: '$count alerta(s) precisam de atencao imediata!',
       actionText: 'Ver alertas',
       onActionTap: onViewAlerts ?? () {},
@@ -217,13 +215,11 @@ class GfAlertBannerVariants {
       isDismissible: onDismiss != null,
       onDismiss: onDismiss,
     );
-  }
 
   static GfAlertBanner maintenance({
     VoidCallback? onViewDetails,
     VoidCallback? onDismiss,
-  }) {
-    return GfAlertBanner(
+  }) => GfAlertBanner(
       message: 'Manutencao programada para hoje as 23:00',
       actionText: 'Ver detalhes',
       onActionTap: onViewDetails ?? () {},
@@ -231,13 +227,11 @@ class GfAlertBannerVariants {
       isDismissible: onDismiss != null,
       onDismiss: onDismiss,
     );
-  }
 
   static GfAlertBanner update({
     VoidCallback? onUpdate,
     VoidCallback? onDismiss,
-  }) {
-    return GfAlertBanner(
+  }) => GfAlertBanner(
       message: 'Nova versao disponivel com melhorias importantes',
       actionText: 'Atualizar',
       onActionTap: onUpdate ?? () {},
@@ -245,13 +239,11 @@ class GfAlertBannerVariants {
       isDismissible: onDismiss != null,
       onDismiss: onDismiss,
     );
-  }
 
   static GfAlertBanner success({
     VoidCallback? onViewReport,
     VoidCallback? onDismiss,
-  }) {
-    return GfAlertBanner(
+  }) => GfAlertBanner(
       message: 'Backup dos dados concluido com sucesso',
       actionText: 'Ver relatorio',
       onActionTap: onViewReport ?? () {},
@@ -259,5 +251,4 @@ class GfAlertBannerVariants {
       isDismissible: onDismiss != null,
       onDismiss: onDismiss,
     );
-  }
 }

@@ -26,9 +26,9 @@ import 'app_routes.dart';
 /// - Navigation analytics
 /// - Error handling
 class AppRouter {
+  AppRouter._();
   static AppRouter? _instance;
   static AppRouter get instance => _instance ??= AppRouter._();
-  AppRouter._();
 
   final _logger = LoggerService.instance;
   late final GoRouter _router;
@@ -130,8 +130,7 @@ class AppRouter {
     return null;
   }
 
-  List<RouteBase> _buildRoutes() {
-    return [
+  List<RouteBase> _buildRoutes() => [
       // Root route - redirects based on authentication status
       GoRoute(
         path: '/',
@@ -226,7 +225,6 @@ class AppRouter {
         builder: (context, state) => _buildProfile(),
       ),
     ];
-  }
 
   Widget _buildErrorPage(BuildContext context, GoRouterState state) {
     LoggerService.instance.error('Route error: ${state.error}');
@@ -281,30 +279,21 @@ class AppRouter {
 
   // Page builders
 
-  Widget _buildOperatorHome() {
-    return _buildDashboardWithUser(
+  Widget _buildOperatorHome() => _buildDashboardWithUser(
       (user) => OperatorDashboard(user: user),
       fallbackRole: UserRole.operator,
     );
-  }
 
-  Widget _buildCarrierHome() {
-    return _buildDashboardWithUser((user) => CarrierDashboard(user: user));
-  }
+  Widget _buildCarrierHome() => _buildDashboardWithUser((user) => CarrierDashboard(user: user));
 
-  Widget _buildDriverHome() {
-    return _buildDashboardWithUser((user) => DriverDashboard(user: user));
-  }
+  Widget _buildDriverHome() => _buildDashboardWithUser((user) => DriverDashboard(user: user));
 
-  Widget _buildPassengerHome() {
-    return _buildDashboardWithUser((user) => PassengerDashboard(user: user));
-  }
+  Widget _buildPassengerHome() => _buildDashboardWithUser((user) => PassengerDashboard(user: user));
 
   Widget _buildDashboardWithUser(
     Widget Function(app_user.User) builder, {
     UserRole? fallbackRole,
-  }) {
-    return FutureBuilder<app_user.User?>(
+  }) => FutureBuilder<app_user.User?>(
       future: _supabaseService.getCurrentUserProfile(),
       builder: (context, snapshot) {
         if (snapshot.connectionState != ConnectionState.done) {
@@ -401,7 +390,6 @@ class AppRouter {
         return builder(user);
       },
     );
-  }
 
   Widget _buildUiCatalog() {
     // TODO: Import and return actual UiCatalogPage
@@ -412,21 +400,17 @@ class AppRouter {
     );
   }
 
-  Widget _buildSettings() {
-    return const Scaffold(
+  Widget _buildSettings() => const Scaffold(
       body: Center(
         child: Text('Settings - TODO'),
       ),
     );
-  }
 
-  Widget _buildProfile() {
-    return const Scaffold(
+  Widget _buildProfile() => const Scaffold(
       body: Center(
         child: Text('Profile - TODO'),
       ),
     );
-  }
 
   /// Basic role access check for redirect logic
   bool _hasBasicRoleAccess(String location, UserRole? role) {
@@ -448,20 +432,18 @@ class AppRouter {
   }
 
   /// Check if route is shared across roles
-  bool _isSharedRoute(String location) {
-    return location == '/profile' ||
+  bool _isSharedRoute(String location) => location == '/profile' ||
         location == '/ui-catalog' ||
         location.startsWith('/shared');
-  }
 }
 
 /// Route configuration
 class RouteConfig {
-  final List<UserRole> requiredRoles;
-  final bool isPublic;
 
   const RouteConfig({
     required this.requiredRoles,
     this.isPublic = false,
   });
+  final List<UserRole> requiredRoles;
+  final bool isPublic;
 }

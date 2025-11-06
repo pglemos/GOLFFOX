@@ -26,7 +26,5 @@ class SupabaseConfig {
   static SupabaseClient get client => Supabase.instance.client;
   static GoTrueClient get auth => client.auth;
 
-  static bool get isConfigured {
-    return supabaseUrl.isNotEmpty && supabaseAnonKey.isNotEmpty;
-  }
+  static bool get isConfigured => supabaseUrl.isNotEmpty && supabaseAnonKey.isNotEmpty;
 }

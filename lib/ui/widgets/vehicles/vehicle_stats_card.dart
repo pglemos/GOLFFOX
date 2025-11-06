@@ -13,8 +13,7 @@ class VehicleStatsCard extends ConsumerWidget {
   const VehicleStatsCard({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return Container(
+  Widget build(BuildContext context, WidgetRef ref) => Container(
       margin: const EdgeInsets.all(GfTokens.spacingMd),
       child: FutureBuilder<Map<String, dynamic>>(
         future: ref.read(vehicleServiceProvider).getVehicleStats(),
@@ -32,10 +31,8 @@ class VehicleStatsCard extends ConsumerWidget {
         },
       ),
     );
-  }
 
-  Widget _buildLoadingCard() {
-    return Container(
+  Widget _buildLoadingCard() => Container(
       padding: const EdgeInsets.all(GfTokens.spacingMd),
       decoration: BoxDecoration(
         color: const Color(GfTokens.colorSurface),
@@ -60,10 +57,8 @@ class VehicleStatsCard extends ConsumerWidget {
         ],
       ),
     );
-  }
 
-  Widget _buildErrorCard() {
-    return Container(
+  Widget _buildErrorCard() => Container(
       padding: const EdgeInsets.all(GfTokens.spacingMd),
       decoration: BoxDecoration(
         color: const Color(GfTokens.colorErrorContainer),
@@ -89,10 +84,8 @@ class VehicleStatsCard extends ConsumerWidget {
         ],
       ),
     );
-  }
 
-  Widget _buildStatsCard(Map<String, dynamic> stats) {
-    return Container(
+  Widget _buildStatsCard(Map<String, dynamic> stats) => Container(
       padding: const EdgeInsets.all(GfTokens.spacingMd),
       decoration: BoxDecoration(
         color: const Color(GfTokens.colorSurface),
@@ -243,15 +236,13 @@ class VehicleStatsCard extends ConsumerWidget {
         .animate()
         .fadeIn(duration: const Duration(milliseconds: 300))
         .slideY(begin: -0.2, end: 0);
-  }
 
   Widget _buildStatItem({
     required IconData icon,
     required String label,
     required String value,
     required Color color,
-  }) {
-    return Container(
+  }) => Container(
       padding: const EdgeInsets.all(GfTokens.spacingSm),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.05),
@@ -293,7 +284,6 @@ class VehicleStatsCard extends ConsumerWidget {
           curve: Curves.elasticOut,
         )
         .fadeIn();
-  }
 
   Widget _buildAlertItem({
     required IconData icon,

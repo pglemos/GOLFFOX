@@ -5,7 +5,7 @@ import 'gf_tokens.dart';
 /// GolfFox Theme System
 /// Inspired by Apple's Human Interface Guidelines, Tesla's minimalism, and Nubank's vibrant touches
 ThemeData gxTheme(Brightness brightness) {
-  final seed = const Color(GfTokens.brand);
+  const seed = Color(GfTokens.brand);
   final cs = ColorScheme.fromSeed(seedColor: seed, brightness: brightness);
   final textTheme = GoogleFonts.interTextTheme();
 

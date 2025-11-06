@@ -10,12 +10,6 @@ import '../../../core/theme/unified_theme.dart';
 import '../../../models/vehicle_position.dart';
 
 class MapFilters extends StatefulWidget {
-  final List<String> selectedStatuses;
-  final String? selectedRoute;
-  final List<String> availableCompanies;
-  final List<String> availableRoutes;
-  final List<String> availableCarriers;
-  final Function(List<String> statuses, String? route) onFiltersChanged;
 
   const MapFilters({
     super.key,
@@ -26,6 +20,12 @@ class MapFilters extends StatefulWidget {
     required this.availableCarriers,
     required this.onFiltersChanged,
   });
+  final List<String> selectedStatuses;
+  final String? selectedRoute;
+  final List<String> availableCompanies;
+  final List<String> availableRoutes;
+  final List<String> availableCarriers;
+  final Function(List<String> statuses, String? route) onFiltersChanged;
 
   @override
   State<MapFilters> createState() => _MapFiltersState();
@@ -35,8 +35,7 @@ class _MapFiltersState extends State<MapFilters> {
   bool _isExpanded = false;
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
+  Widget build(BuildContext context) => Container(
       margin: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -205,13 +204,11 @@ class _MapFiltersState extends State<MapFilters> {
         ],
       ),
     );
-  }
 
   Widget _buildFilterSection({
     required String title,
     required Widget child,
-  }) {
-    return Column(
+  }) => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
@@ -226,14 +223,11 @@ class _MapFiltersState extends State<MapFilters> {
         child,
       ],
     );
-  }
 
-  bool _hasActiveFilters() {
-    return widget.selectedStatuses.isNotEmpty || widget.selectedRoute != null;
-  }
+  bool _hasActiveFilters() => widget.selectedStatuses.isNotEmpty || widget.selectedRoute != null;
 
   int _getActiveFiltersCount() {
-    int count = 0;
+    var count = 0;
     if (widget.selectedStatuses.isNotEmpty) count++;
     if (widget.selectedRoute != null) count++;
     return count;

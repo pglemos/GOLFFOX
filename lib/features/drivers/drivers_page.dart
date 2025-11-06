@@ -1,6 +1,6 @@
 // ========================================
 // GolfFox Drivers Page v11.0
-// Pagina principal de listagem de motoristas
+// Página principal de listagem de motoristas
 // ========================================
 
 import 'package:flutter/material.dart';
@@ -43,8 +43,7 @@ class _DriversPageState extends ConsumerState<DriversPage> {
   void _onSearchChanged() {
     final service = ref.read(driverServiceProvider.notifier);
     final currentFilters = service.currentFilters;
-    service
-        .updateFilters(currentFilters.copyWith(search: _searchController.text));
+    service.updateFilters(currentFilters.copyWith(search: _searchController.text));
   }
 
   @override
@@ -52,19 +51,13 @@ class _DriversPageState extends ConsumerState<DriversPage> {
     final driversAsync = ref.watch(driverServiceProvider);
     final service = ref.read(driverServiceProvider.notifier);
     final currentFilters = service.currentFilters;
-    final stats = service.getDriversStats();
-    final statsError = driversAsync.maybeWhen(
-      error: (err, _) => err.toString(),
-      orElse: () => null,
-    );
-    final statsLoading = driversAsync.isLoading;
 
     return Scaffold(
-      backgroundColor: const Color(GfTokens.colorBackground),
+      backgroundColor: GfTokens.colorBackground,
       appBar: GfAppBar(
         title: 'Motoristas',
         actions: [
-          // Botao de filtros
+          // Botão de filtros
           IconButton(
             onPressed: () {
               setState(() {
@@ -80,17 +73,17 @@ class _DriversPageState extends ConsumerState<DriversPage> {
             ),
             tooltip: _showFilters ? 'Ocultar Filtros' : 'Mostrar Filtros',
           ),
-
-          // Botao de atualizar
+          
+          // Botão de atualizar
           IconButton(
-            onPressed: () => service.refreshDrivers(),
+            onPressed: service.refreshDrivers,
             icon: const Icon(Icons.refresh),
             tooltip: 'Atualizar',
           ),
-
-          // Botao de adicionar
+          
+          // Botão de adicionar
           IconButton(
-            onPressed: () => _navigateToCreateDriver(),
+            onPressed: _navigateToCreateDriver,
             icon: const Icon(Icons.add),
             tooltip: 'Adicionar Motorista',
           ),
@@ -102,12 +95,9 @@ class _DriversPageState extends ConsumerState<DriversPage> {
           Container(
             padding: const EdgeInsets.all(GfTokens.spacingMd),
             decoration: const BoxDecoration(
-              color: Color(GfTokens.colorSurface),
+              color: GfTokens.colorSurface,
               border: Border(
-                bottom: BorderSide(
-                  color: Color(GfTokens.colorBorder),
-                  width: 1,
-                ),
+                bottom: BorderSide(color: GfTokens.colorBorder),
               ),
             ),
             child: TextField(
@@ -117,42 +107,31 @@ class _DriversPageState extends ConsumerState<DriversPage> {
                 prefixIcon: const Icon(Icons.search),
                 suffixIcon: _searchController.text.isNotEmpty
                     ? IconButton(
-                        onPressed: () {
-                          _searchController.clear();
-                        },
+                        onPressed: _searchController.clear,
                         icon: const Icon(Icons.clear),
                       )
                     : null,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(GfTokens.radiusSm),
-                  borderSide: const BorderSide(
-                    color: Color(GfTokens.colorBorder),
-                    width: 1,
-                  ),
+                  borderSide: const BorderSide(color: GfTokens.colorBorder),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(GfTokens.radiusSm),
-                  borderSide: const BorderSide(
-                    color: Color(GfTokens.colorBorder),
-                    width: 1,
-                  ),
+                  borderSide: const BorderSide(color: GfTokens.colorBorder),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(GfTokens.radiusSm),
-                  borderSide: const BorderSide(
-                    color: Color(GfTokens.colorPrimary),
-                    width: 2,
-                  ),
+                  borderSide: const BorderSide(color: GfTokens.colorPrimary),
                 ),
                 filled: true,
-                fillColor: const Color(GfTokens.surfaceMuted),
+                fillColor: GfTokens.colorBackground,
               ),
             ),
           ),
 
-          // Filtros (se visiveis)
+          // Filtros (se visíveis)
           if (_showFilters)
-            DriverFiltersPanel(
+            DriverFilters(
               filters: currentFilters,
               onFiltersChanged: (filters) {
                 service.updateFilters(filters);
@@ -162,13 +141,11 @@ class _DriversPageState extends ConsumerState<DriversPage> {
               },
             ).animate().slideY(begin: -1, duration: 300.ms),
 
-          // Estatisticas
+          // Estatísticas
           Padding(
             padding: const EdgeInsets.all(GfTokens.spacingMd),
             child: DriverStatsCard(
-              stats: stats,
-              isLoading: statsLoading,
-              error: statsError,
+              stats: service.getDriversStats(),
             ),
           ),
 
@@ -186,16 +163,14 @@ class _DriversPageState extends ConsumerState<DriversPage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _navigateToCreateDriver,
-        backgroundColor: const Color(GfTokens.colorPrimary),
+        backgroundColor: GfTokens.colorPrimary,
         child: const Icon(Icons.add, color: Colors.white),
       ),
     );
   }
 
-  Widget _buildDriversList(List<Driver> drivers) {
-    return RefreshIndicator(
-      onRefresh: () =>
-          ref.read(driverServiceProvider.notifier).refreshDrivers(),
+  Widget _buildDriversList(List<Driver> drivers) => RefreshIndicator(
+      onRefresh: () => ref.read(driverServiceProvider.notifier).refreshDrivers(),
       child: ListView.builder(
         padding: const EdgeInsets.all(GfTokens.spacingMd),
         itemCount: drivers.length,
@@ -208,34 +183,31 @@ class _DriversPageState extends ConsumerState<DriversPage> {
               onTap: () => _navigateToDriverDetails(driver.id),
               onEdit: () => _navigateToEditDriver(driver),
               onDelete: () => _showDeleteConfirmation(driver),
-              onStatusChanged: (status) =>
-                  _updateDriverStatus(driver.id, status),
+              onStatusChanged: (status) => _updateDriverStatus(driver.id, status),
             ).animate().fadeIn(delay: Duration(milliseconds: index * 50)),
           );
         },
       ),
     );
-  }
 
-  Widget _buildEmptyState(DriverFilters filters) {
-    return Center(
+  Widget _buildEmptyState(DriverFilters filters) => Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(
             filters.hasActiveFilters ? Icons.search_off : Icons.person_off,
             size: 64,
-            color: const Color(GfTokens.colorOnSurfaceVariant),
+            color: GfTokens.colorOnSurfaceVariant,
           ),
           const SizedBox(height: GfTokens.spacingMd),
           Text(
-            filters.hasActiveFilters
+            filters.hasActiveFilters 
                 ? 'Nenhum motorista encontrado'
                 : 'Nenhum motorista cadastrado',
             style: TextStyle(
               fontSize: GfTokens.fontSizeLg,
               fontWeight: FontWeight.w600,
-              color: const Color(GfTokens.colorOnSurface),
+              color: GfTokens.colorOnSurface,
             ),
           ),
           const SizedBox(height: GfTokens.spacingSm),
@@ -244,7 +216,7 @@ class _DriversPageState extends ConsumerState<DriversPage> {
                 ? 'Tente ajustar os filtros de busca.'
                 : 'Comece adicionando o primeiro motorista.',
             style: TextStyle(
-              color: const Color(GfTokens.colorOnSurfaceVariant),
+              color: GfTokens.colorOnSurfaceVariant,
             ),
             textAlign: TextAlign.center,
           ),
@@ -269,17 +241,15 @@ class _DriversPageState extends ConsumerState<DriversPage> {
         ],
       ),
     );
-  }
 
-  Widget _buildErrorState(Object error, DriverService service) {
-    return Center(
+  Widget _buildErrorState(Object error, DriverService service) => Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(
             Icons.error_outline,
             size: 64,
-            color: const Color(GfTokens.colorError),
+            color: GfTokens.colorError,
           ),
           const SizedBox(height: GfTokens.spacingMd),
           Text(
@@ -287,14 +257,14 @@ class _DriversPageState extends ConsumerState<DriversPage> {
             style: TextStyle(
               fontSize: GfTokens.fontSizeLg,
               fontWeight: FontWeight.w600,
-              color: const Color(GfTokens.colorOnSurface),
+              color: GfTokens.colorOnSurface,
             ),
           ),
           const SizedBox(height: GfTokens.spacingSm),
           Text(
             error.toString(),
             style: TextStyle(
-              color: const Color(GfTokens.colorOnSurfaceVariant),
+              color: GfTokens.colorOnSurfaceVariant,
             ),
             textAlign: TextAlign.center,
           ),
@@ -306,7 +276,6 @@ class _DriversPageState extends ConsumerState<DriversPage> {
         ],
       ),
     );
-  }
 
   void _navigateToCreateDriver() {
     Navigator.of(context).push(
@@ -333,15 +302,12 @@ class _DriversPageState extends ConsumerState<DriversPage> {
   }
 
   void _updateDriverStatus(String driverId, DriverStatus status) {
-    ref
-        .read(driverServiceProvider.notifier)
-        .updateDriverStatus(driverId, status);
-
+    ref.read(driverServiceProvider.notifier).updateDriverStatus(driverId, status);
+    
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content:
-            Text('Status do motorista atualizado para ${status.displayName}'),
-        backgroundColor: const Color(GfTokens.colorSuccess),
+        content: Text('Status do motorista atualizado para ${status.displayName}'),
+        backgroundColor: GfTokens.colorSuccess,
       ),
     );
   }
@@ -350,10 +316,10 @@ class _DriversPageState extends ConsumerState<DriversPage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Confirmar Exclusao'),
+        title: const Text('Confirmar Exclusão'),
         content: Text(
           'Tem certeza que deseja excluir o motorista "${driver.name}"?\n\n'
-          'Esta acao nao pode ser desfeita.',
+          'Esta ação não pode ser desfeita.',
         ),
         actions: [
           TextButton(
@@ -366,7 +332,7 @@ class _DriversPageState extends ConsumerState<DriversPage> {
               _deleteDriver(driver);
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(GfTokens.colorError),
+              backgroundColor: GfTokens.colorError,
               foregroundColor: Colors.white,
             ),
             child: const Text('Excluir'),
@@ -378,15 +344,15 @@ class _DriversPageState extends ConsumerState<DriversPage> {
 
   void _deleteDriver(Driver driver) {
     ref.read(driverServiceProvider.notifier).deleteDriver(driver.id);
-
+    
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Motorista "${driver.name}" excluido com sucesso'),
-        backgroundColor: const Color(GfTokens.colorSuccess),
+        content: Text('Motorista "${driver.name}" excluído com sucesso'),
+        backgroundColor: GfTokens.colorSuccess,
         action: SnackBarAction(
           label: 'Desfazer',
           onPressed: () {
-            // TODO: Implementar desfazer exclusao
+            // TODO: Implementar desfazer exclusão
             ref.read(driverServiceProvider.notifier).createDriver(driver);
           },
         ),

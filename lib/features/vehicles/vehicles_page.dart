@@ -44,8 +44,8 @@ class _VehiclesPageState extends ConsumerState<VehiclesPage>
       vsync: this,
     );
     _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
+      begin: 0,
+      end: 1,
     ).animate(CurvedAnimation(
       parent: _animationController,
       curve: Curves.easeInOut,
@@ -100,9 +100,9 @@ class _VehiclesPageState extends ConsumerState<VehiclesPage>
 
     if (result == true && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('Veiculo criado com sucesso!'),
-          backgroundColor: const Color(GfTokens.colorSuccess),
+        const SnackBar(
+          content: Text('Veiculo criado com sucesso!'),
+          backgroundColor: Color(GfTokens.colorSuccess),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -123,8 +123,7 @@ class _VehiclesPageState extends ConsumerState<VehiclesPage>
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       backgroundColor: const Color(GfTokens.colorSurfaceBackground),
       appBar: GfAppBar(
         title: 'Veiculos',
@@ -376,5 +375,4 @@ class _VehiclesPageState extends ConsumerState<VehiclesPage>
           )
           .fadeIn(delay: const Duration(milliseconds: 500)),
     );
-  }
 }

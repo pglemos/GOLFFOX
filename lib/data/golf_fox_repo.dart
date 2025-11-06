@@ -11,14 +11,12 @@ import '../core/utils/result.dart';
 // ========================================
 // PROVIDER
 // ========================================
-final golfFoxRepoProvider = Provider<GolfFoxRepo>((ref) {
-  return GolfFoxRepo(Supabase.instance.client);
-});
+final golfFoxRepoProvider = Provider<GolfFoxRepo>((ref) => GolfFoxRepo(Supabase.instance.client));
 
 class GolfFoxRepo {
-  final SupabaseClient _client;
 
   GolfFoxRepo(this._client);
+  final SupabaseClient _client;
 
   // ========================================
   // METRICAS DO DASHBOARD
@@ -323,8 +321,7 @@ class GolfFoxRepo {
   // ========================================
   RealtimeChannel subscribeToDriverPositions(
     void Function(List<Map<String, dynamic>>) onData,
-  ) {
-    return _client
+  ) => _client
         .channel('driver_positions')
         .onPostgresChanges(
           event: PostgresChangeEvent.all,
@@ -339,15 +336,13 @@ class GolfFoxRepo {
           },
         )
         .subscribe();
-  }
 
   // ========================================
   // REALTIME SUBSCRIPTION PARA ALERTAS
   // ========================================
   RealtimeChannel subscribeToAlerts(
     void Function(List<Map<String, dynamic>>) onData,
-  ) {
-    return _client
+  ) => _client
         .channel('trip_events')
         .onPostgresChanges(
           event: PostgresChangeEvent.insert,
@@ -362,5 +357,4 @@ class GolfFoxRepo {
           },
         )
         .subscribe();
-  }
 }

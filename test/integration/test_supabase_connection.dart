@@ -24,7 +24,7 @@ Future<void> main() async {
     try {
       final users = await supabase.from('users').select('email, role').limit(5);
       print('✅ Usuários encontrados: ${users.length}');
-      for (var user in users) {
+      for (final user in users) {
         print('   - ${user['email']} (${user['role']})');
       }
     } catch (e) {

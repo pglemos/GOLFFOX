@@ -8,13 +8,6 @@ import '../../../core/theme/gf_tokens.dart';
 import '../../../models/route.dart';
 
 class RouteFilters extends StatefulWidget {
-  final RouteStatus? selectedStatus;
-  final String? selectedVehicle;
-  final String? selectedDriver;
-  final ValueChanged<RouteStatus?> onStatusChanged;
-  final ValueChanged<String?> onVehicleChanged;
-  final ValueChanged<String?> onDriverChanged;
-  final VoidCallback onClearFilters;
 
   const RouteFilters({
     super.key,
@@ -26,6 +19,13 @@ class RouteFilters extends StatefulWidget {
     required this.onDriverChanged,
     required this.onClearFilters,
   });
+  final RouteStatus? selectedStatus;
+  final String? selectedVehicle;
+  final String? selectedDriver;
+  final ValueChanged<RouteStatus?> onStatusChanged;
+  final ValueChanged<String?> onVehicleChanged;
+  final ValueChanged<String?> onDriverChanged;
+  final VoidCallback onClearFilters;
 
   @override
   State<RouteFilters> createState() => _RouteFiltersState();
@@ -116,8 +116,7 @@ class _RouteFiltersState extends State<RouteFilters> {
     );
   }
 
-  Widget _buildActiveFilters() {
-    return Wrap(
+  Widget _buildActiveFilters() => Wrap(
       spacing: 8,
       runSpacing: 8,
       children: [
@@ -141,14 +140,12 @@ class _RouteFiltersState extends State<RouteFilters> {
           ),
       ],
     );
-  }
 
   Widget _buildFilterChip({
     required String label,
     required Color color,
     required VoidCallback onDeleted,
-  }) {
-    return Chip(
+  }) => Chip(
       label: Text(
         label,
         style: TextStyle(
@@ -166,10 +163,8 @@ class _RouteFiltersState extends State<RouteFilters> {
       ),
       onDeleted: onDeleted,
     );
-  }
 
-  Widget _buildExpandedFilters() {
-    return Column(
+  Widget _buildExpandedFilters() => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Filtro por Status
@@ -278,10 +273,9 @@ class _RouteFiltersState extends State<RouteFilters> {
         ),
       ],
     );
-  }
 
   int _getActiveFiltersCount() {
-    int count = 0;
+    var count = 0;
     if (widget.selectedStatus != null) count++;
     if (widget.selectedVehicle != null) count++;
     if (widget.selectedDriver != null) count++;

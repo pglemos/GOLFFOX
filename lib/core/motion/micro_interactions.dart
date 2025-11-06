@@ -30,17 +30,6 @@ enum HapticType { light, medium, heavy, selection, vibrate }
 
 /// Widget para botoes com microinteracoes premium
 class InteractiveButton extends StatefulWidget {
-  final Widget child;
-  final VoidCallback? onPressed;
-  final Color? backgroundColor;
-  final Color? foregroundColor;
-  final EdgeInsetsGeometry? padding;
-  final BorderRadius? borderRadius;
-  final double? elevation;
-  final HapticType hapticType;
-  final bool enableRipple;
-  final bool enableScale;
-  final bool enableGlow;
 
   const InteractiveButton({
     super.key,
@@ -56,6 +45,17 @@ class InteractiveButton extends StatefulWidget {
     this.enableScale = true,
     this.enableGlow = false,
   });
+  final Widget child;
+  final VoidCallback? onPressed;
+  final Color? backgroundColor;
+  final Color? foregroundColor;
+  final EdgeInsetsGeometry? padding;
+  final BorderRadius? borderRadius;
+  final double? elevation;
+  final HapticType hapticType;
+  final bool enableRipple;
+  final bool enableScale;
+  final bool enableGlow;
 
   @override
   State<InteractiveButton> createState() => _InteractiveButtonState();
@@ -83,7 +83,7 @@ class _InteractiveButtonState extends State<InteractiveButton>
     );
 
     _scaleAnimation = Tween<double>(
-      begin: 1.0,
+      begin: 1,
       end: 0.95,
     ).animate(CurvedAnimation(
       parent: _scaleController,
@@ -91,8 +91,8 @@ class _InteractiveButtonState extends State<InteractiveButton>
     ));
 
     _glowAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
+      begin: 0,
+      end: 1,
     ).animate(CurvedAnimation(
       parent: _glowController,
       curve: Curves.easeOut,
@@ -139,8 +139,7 @@ class _InteractiveButtonState extends State<InteractiveButton>
   }
 
   @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
+  Widget build(BuildContext context) => GestureDetector(
       onTapDown: _handleTapDown,
       onTapUp: _handleTapUp,
       onTapCancel: _handleTapCancel,
@@ -192,21 +191,10 @@ class _InteractiveButtonState extends State<InteractiveButton>
         },
       ),
     );
-  }
 }
 
 /// Widget para cards com microinteracoes
 class InteractiveCard extends StatefulWidget {
-  final Widget child;
-  final VoidCallback? onTap;
-  final Color? backgroundColor;
-  final EdgeInsetsGeometry? padding;
-  final EdgeInsetsGeometry? margin;
-  final BorderRadius? borderRadius;
-  final double? elevation;
-  final bool enableHover;
-  final bool enableScale;
-  final bool enableShadow;
 
   const InteractiveCard({
     super.key,
@@ -221,6 +209,16 @@ class InteractiveCard extends StatefulWidget {
     this.enableScale = true,
     this.enableShadow = true,
   });
+  final Widget child;
+  final VoidCallback? onTap;
+  final Color? backgroundColor;
+  final EdgeInsetsGeometry? padding;
+  final EdgeInsetsGeometry? margin;
+  final BorderRadius? borderRadius;
+  final double? elevation;
+  final bool enableHover;
+  final bool enableScale;
+  final bool enableShadow;
 
   @override
   State<InteractiveCard> createState() => _InteractiveCardState();
@@ -250,7 +248,7 @@ class _InteractiveCardState extends State<InteractiveCard>
     ));
 
     _scaleAnimation = Tween<double>(
-      begin: 1.0,
+      begin: 1,
       end: 1.02,
     ).animate(CurvedAnimation(
       parent: _hoverController,
@@ -275,8 +273,7 @@ class _InteractiveCardState extends State<InteractiveCard>
   }
 
   @override
-  Widget build(BuildContext context) {
-    return MouseRegion(
+  Widget build(BuildContext context) => MouseRegion(
       onEnter: (_) => _handleHover(true),
       onExit: (_) => _handleHover(false),
       child: GestureDetector(
@@ -312,25 +309,10 @@ class _InteractiveCardState extends State<InteractiveCard>
         ),
       ),
     );
-  }
 }
 
 /// Widget para inputs com microinteracoes
 class InteractiveInput extends StatefulWidget {
-  final TextEditingController? controller;
-  final String? labelText;
-  final String? hintText;
-  final Widget? prefixIcon;
-  final Widget? suffixIcon;
-  final bool obscureText;
-  final TextInputType? keyboardType;
-  final String? Function(String?)? validator;
-  final void Function(String)? onChanged;
-  final VoidCallback? onTap;
-  final bool enabled;
-  final int? maxLines;
-  final Color? focusColor;
-  final Color? borderColor;
 
   const InteractiveInput({
     super.key,
@@ -349,6 +331,20 @@ class InteractiveInput extends StatefulWidget {
     this.focusColor,
     this.borderColor,
   });
+  final TextEditingController? controller;
+  final String? labelText;
+  final String? hintText;
+  final Widget? prefixIcon;
+  final Widget? suffixIcon;
+  final bool obscureText;
+  final TextInputType? keyboardType;
+  final String? Function(String?)? validator;
+  final void Function(String)? onChanged;
+  final VoidCallback? onTap;
+  final bool enabled;
+  final int? maxLines;
+  final Color? focusColor;
+  final Color? borderColor;
 
   @override
   State<InteractiveInput> createState() => _InteractiveInputState();
@@ -373,7 +369,7 @@ class _InteractiveInputState extends State<InteractiveInput>
     );
 
     _focusAnimation = Tween<double>(
-      begin: 1.0,
+      begin: 1,
       end: 1.02,
     ).animate(CurvedAnimation(
       parent: _focusController,
@@ -413,8 +409,7 @@ class _InteractiveInputState extends State<InteractiveInput>
   }
 
   @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
+  Widget build(BuildContext context) => AnimatedBuilder(
       animation: _focusController,
       builder: (context, child) {
         return Transform.scale(
@@ -459,33 +454,27 @@ class _InteractiveInputState extends State<InteractiveInput>
         );
       },
     );
-  }
 }
 
 /// Extensoes para microinteracoes rapidas
 extension MicroInteractionExtensions on Widget {
   /// Adiciona efeito de pulse
-  Widget pulse({Duration? duration, double scale = 1.1}) {
-    return animate(onPlay: (controller) => controller.repeat(reverse: true))
+  Widget pulse({Duration? duration, double scale = 1.1}) => animate(onPlay: (controller) => controller.repeat(reverse: true))
         .scaleXY(
       end: scale,
       duration: duration ?? const Duration(milliseconds: 1000),
       curve: Curves.easeInOut,
     );
-  }
 
   /// Adiciona efeito de breathing (respiracao)
-  Widget breathe({Duration? duration}) {
-    return animate(onPlay: (controller) => controller.repeat(reverse: true))
+  Widget breathe({Duration? duration}) => animate(onPlay: (controller) => controller.repeat(reverse: true))
         .fadeIn(
       duration: duration ?? const Duration(milliseconds: 2000),
       curve: Curves.easeInOut,
     );
-  }
 
   /// Adiciona efeito de glow
-  Widget glow({Color? color, double intensity = 0.3}) {
-    return Container(
+  Widget glow({Color? color, double intensity = 0.3}) => Container(
       decoration: BoxDecoration(
         boxShadow: [
           BoxShadow(
@@ -497,13 +486,10 @@ extension MicroInteractionExtensions on Widget {
       ),
       child: this,
     );
-  }
 
   /// Adiciona feedback tatil ao toque
-  Widget withHapticFeedback({HapticType type = HapticType.light}) {
-    return GestureDetector(
+  Widget withHapticFeedback({HapticType type = HapticType.light}) => GestureDetector(
       onTap: () => MicroInteractions.hapticFeedback(type),
       child: this,
     );
-  }
 }

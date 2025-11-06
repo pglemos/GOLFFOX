@@ -15,13 +15,13 @@ import 'vehicle_status_service.dart';
 import 'vehicle_position_simulator.dart';
 
 class MapService {
+
+  MapService(this._supabaseService);
   final SupabaseService _supabaseService;
   Timer? _updateTimer;
   RealtimeChannel? _realtimeSubscription;
   final StreamController<List<VehiclePosition>> _vehiclePositionsController =
       StreamController<List<VehiclePosition>>.broadcast();
-
-  MapService(this._supabaseService);
 
   Stream<List<VehiclePosition>> get vehiclePositionsStream =>
       _vehiclePositionsController.stream;
@@ -29,8 +29,8 @@ class MapService {
   // Simulacao de dados para demonstracao
   List<VehiclePosition> _generateMockVehiclePositions() {
     final random = Random();
-    final baseLatitude = -23.5505; // Sao Paulo
-    final baseLongitude = -46.6333;
+    const baseLatitude = -23.5505; // Sao Paulo
+    const baseLongitude = -46.6333;
 
     return List.generate(15, (index) {
       final latOffset = (random.nextDouble() - 0.5) * 0.1;
@@ -86,9 +86,9 @@ class MapService {
     String? routeFilter,
   }) async {
     try {
-      var query = _supabaseService.client
+      final query = _supabaseService.client
           .from('vehicle_positions')
-          .select('*')
+          .select()
           .order('last_update', ascending: false);
 
       // Aplicar filtros (simplificado)
@@ -96,8 +96,7 @@ class MapService {
 
       final response = await query;
 
-      return response.map<VehiclePosition>((json) {
-        return VehiclePosition(
+      return response.map<VehiclePosition>((json) => VehiclePosition(
           id: json['id'] as String,
           vehicleId: json['vehicle_id'] as String,
           licensePlate: json['license_plate'] as String,
@@ -117,8 +116,7 @@ class MapService {
           routeName: json['route_name'] as String?,
           passengerCount: json['passenger_count'] as int? ?? 0,
           capacity: json['capacity'] as int? ?? 30,
-        );
-      }).toList();
+        )).toList();
     } catch (e) {
       debugPrint('Erro ao buscar posicoes dos veiculos: $e');
       // Fallback para dados mock em caso de erro
@@ -169,7 +167,7 @@ class MapService {
     }
   }
 
-  void _updateVehiclePositions() async {
+  Future<void> _updateVehiclePositions() async {
     try {
       final positions = await getVehiclePositions();
       _vehiclePositionsController.add(positions);
@@ -184,11 +182,9 @@ class MapService {
     if (query.isEmpty) return allPositions;
 
     final lowerQuery = query.toLowerCase();
-    return allPositions.where((vehicle) {
-      return vehicle.licensePlate.toLowerCase().contains(lowerQuery) ||
+    return allPositions.where((vehicle) => vehicle.licensePlate.toLowerCase().contains(lowerQuery) ||
           vehicle.driverName.toLowerCase().contains(lowerQuery) ||
-          (vehicle.routeName?.toLowerCase().contains(lowerQuery) ?? false);
-    }).toList();
+          (vehicle.routeName?.toLowerCase().contains(lowerQuery) ?? false)).toList();
   }
 
   Future<VehiclePosition?> getVehicleById(String vehicleId) async {
@@ -222,12 +218,12 @@ class MapService {
 
   // Calcular zoom apropriado baseado na dispersao dos veiculos
   double calculateMapZoom(List<VehiclePosition> positions) {
-    if (positions.length <= 1) return 12.0;
+    if (positions.length <= 1) return 12;
 
-    double minLat = positions.first.position.latitude;
-    double maxLat = positions.first.position.latitude;
-    double minLng = positions.first.position.longitude;
-    double maxLng = positions.first.position.longitude;
+    var minLat = positions.first.position.latitude;
+    var maxLat = positions.first.position.latitude;
+    var minLng = positions.first.position.longitude;
+    var maxLng = positions.first.position.longitude;
 
     for (final position in positions) {
       minLat = min(minLat, position.position.latitude);
@@ -240,11 +236,11 @@ class MapService {
     final lngDiff = maxLng - minLng;
     final maxDiff = max(latDiff, lngDiff);
 
-    if (maxDiff > 0.1) return 10.0;
-    if (maxDiff > 0.05) return 11.0;
-    if (maxDiff > 0.02) return 12.0;
-    if (maxDiff > 0.01) return 13.0;
-    return 14.0;
+    if (maxDiff > 0.1) return 10;
+    if (maxDiff > 0.05) return 11;
+    if (maxDiff > 0.02) return 12;
+    if (maxDiff > 0.01) return 13;
+    return 14;
   }
 
   void dispose() {
@@ -254,9 +250,7 @@ class MapService {
 }
 
 // Provider para o SupabaseService
-final supabaseServiceProvider = Provider<SupabaseService>((ref) {
-  return SupabaseService.instance;
-});
+final supabaseServiceProvider = Provider<SupabaseService>((ref) => SupabaseService.instance);
 
 // Provider para o MapService
 final mapServiceProvider = Provider<MapService>((ref) {
@@ -270,9 +264,7 @@ final vehiclePositionsStreamProvider =
   final mapService = ref.watch(mapServiceProvider);
   mapService.startRealTimeUpdates();
 
-  ref.onDispose(() {
-    mapService.stopRealTimeUpdates();
-  });
+  ref.onDispose(mapService.stopRealTimeUpdates);
 
   return mapService.vehiclePositionsStream;
 });

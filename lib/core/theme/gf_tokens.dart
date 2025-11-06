@@ -173,10 +173,10 @@ class GfTokens {
 
   // Radius aliases (GxTokens compatibility)
   static const double radius2 = radiusLg; // 24.0
-  static const double radius3xl = 32.0;
+  static const double radius3xl = 32;
 
   // Elevation aliases (GxTokens compatibility)
-  static const double elevation1 = 1.0;
+  static const double elevation1 = 1;
   static const double elevation2 = elevationLow; // 2.0
   static const double elevation3 = elevationMedium; // 4.0
   static const double elevation4 = elevationHigh; // 8.0
@@ -187,24 +187,24 @@ class GfTokens {
   static const double textBase = fontSizeMd; // 16.0
   static const double textLg = fontSizeLg; // 18.0
   static const double textXl = fontSizeXl; // 20.0
-  static const double text2xl = 24.0;
-  static const double text3xl = 30.0;
-  static const double text4xl = 36.0;
+  static const double text2xl = 24;
+  static const double text3xl = 30;
+  static const double text4xl = 36;
 
   // Icon sizes (GxTokens compatibility)
-  static const double iconXs = 12.0;
-  static const double iconSm = 16.0;
-  static const double icon = 20.0;
-  static const double iconLg = 24.0;
-  static const double iconXl = 32.0;
-  static const double icon2xl = 48.0;
+  static const double iconXs = 12;
+  static const double iconSm = 16;
+  static const double icon = 20;
+  static const double iconLg = 24;
+  static const double iconXl = 32;
+  static const double icon2xl = 48;
 
   // Breakpoints (GxTokens compatibility)
-  static const double breakpointSm = 640.0;
-  static const double breakpointMd = 768.0;
-  static const double breakpointLg = 1024.0;
-  static const double breakpointXl = 1280.0;
-  static const double breakpoint2xl = 1536.0;
+  static const double breakpointSm = 640;
+  static const double breakpointMd = 768;
+  static const double breakpointLg = 1024;
+  static const double breakpointXl = 1280;
+  static const double breakpoint2xl = 1536;
 
   // Color aliases for GxTokens compatibility
   static const int ok = success; // 0xFF059669
@@ -264,10 +264,10 @@ extension GfIntColorX on int {
     }
 
     final color = Color(this);
-    final double normalizedAlpha = clampUnit(alpha ?? color.opacity);
-    final double normalizedRed = clampUnit(red ?? color.red / 255.0);
-    final double normalizedGreen = clampUnit(green ?? color.green / 255.0);
-    final double normalizedBlue = clampUnit(blue ?? color.blue / 255.0);
+    final normalizedAlpha = clampUnit(alpha ?? color.opacity);
+    final normalizedRed = clampUnit(red ?? color.red / 255.0);
+    final normalizedGreen = clampUnit(green ?? color.green / 255.0);
+    final normalizedBlue = clampUnit(blue ?? color.blue / 255.0);
 
     return Color.fromRGBO(
       (normalizedRed * 255).round(),

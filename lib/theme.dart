@@ -7,13 +7,6 @@ import 'core/theme/unified_theme.dart';
 /// =====================
 @immutable
 class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
-  final Color success;
-  final Color onSuccess;
-  final Color warning;
-  final Color onWarning;
-  final Color info;
-  final Color onInfo;
-  final Color accent;
 
   const AppSemanticColors({
     required this.success,
@@ -24,6 +17,13 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
     required this.onInfo,
     required this.accent,
   });
+  final Color success;
+  final Color onSuccess;
+  final Color warning;
+  final Color onWarning;
+  final Color info;
+  final Color onInfo;
+  final Color accent;
 
   @override
   AppSemanticColors copyWith({
@@ -34,8 +34,7 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
     Color? info,
     Color? onInfo,
     Color? accent,
-  }) {
-    return AppSemanticColors(
+  }) => AppSemanticColors(
       success: success ?? this.success,
       onSuccess: onSuccess ?? this.onSuccess,
       warning: warning ?? this.warning,
@@ -44,7 +43,6 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
       onInfo: onInfo ?? this.onInfo,
       accent: accent ?? this.accent,
     );
-  }
 
   @override
   AppSemanticColors lerp(ThemeExtension<AppSemanticColors>? other, double t) {
@@ -160,7 +158,7 @@ InputDecorationTheme _inputs(ColorScheme cs) => InputDecorationTheme(
         borderRadius: BorderRadius.circular(GolfFoxTheme.radiusMedium),
         borderSide: BorderSide(color: cs.error, width: 2),
       ),
-      hintStyle: TextStyle(color: GolfFoxTheme.textSecondary),
+      hintStyle: const TextStyle(color: GolfFoxTheme.textSecondary),
       labelStyle: TextStyle(color: cs.onSurface.withOpacity(0.8)),
       prefixIconColor: cs.primary,
       suffixIconColor: cs.onSurfaceVariant,
@@ -263,7 +261,6 @@ PageTransitionsTheme _transitions = const PageTransitionsTheme(
 ThemeData buildLightTheme() {
   final cs = ColorScheme.fromSeed(
     seedColor: _Seeds.lightSeed,
-    brightness: Brightness.light,
     primary: _Seeds.lightSeed,
     secondary: const Color(0xFF16A34A),
     tertiary: const Color(0xFFF59E0B),
@@ -272,7 +269,7 @@ ThemeData buildLightTheme() {
   );
 
   final text = _typography(cs);
-  final semantic = AppSemanticColors(
+  const semantic = AppSemanticColors(
     success: _Seeds.lightSuccess,
     onSuccess: Colors.white,
     warning: _Seeds.lightWarning,
@@ -319,7 +316,7 @@ ThemeData buildDarkTheme() {
   );
 
   final text = _typography(cs);
-  final semantic = AppSemanticColors(
+  const semantic = AppSemanticColors(
     success: _Seeds.darkSuccess,
     onSuccess: const Color(0xFF0F1A14),
     warning: _Seeds.darkWarning,

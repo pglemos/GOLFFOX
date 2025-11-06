@@ -7,9 +7,6 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/gf_tokens.dart';
 
 class GfErrorWidget extends StatelessWidget {
-  final String message;
-  final VoidCallback? onRetry;
-  final IconData? icon;
 
   const GfErrorWidget({
     super.key,
@@ -17,10 +14,12 @@ class GfErrorWidget extends StatelessWidget {
     this.onRetry,
     this.icon,
   });
+  final String message;
+  final VoidCallback? onRetry;
+  final IconData? icon;
 
   @override
-  Widget build(BuildContext context) {
-    return Center(
+  Widget build(BuildContext context) => Center(
       child: Padding(
         padding: const EdgeInsets.all(GfTokens.spacingLg),
         child: Column(
@@ -57,5 +56,4 @@ class GfErrorWidget extends StatelessWidget {
         ),
       ),
     );
-  }
 }

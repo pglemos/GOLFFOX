@@ -10,8 +10,7 @@ class EmpresasPage extends StatelessWidget {
   const EmpresasPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       backgroundColor: const Color(GfTokens.page),
       body: Padding(
         padding: const EdgeInsets.all(GfTokens.space6),
@@ -83,5 +82,4 @@ class EmpresasPage extends StatelessWidget {
         ),
       ),
     );
-  }
 }

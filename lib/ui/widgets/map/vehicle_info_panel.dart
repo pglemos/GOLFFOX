@@ -11,10 +11,6 @@ import '../../../models/vehicle_position.dart';
 import '../../../core/utils/date_utils.dart';
 
 class VehicleInfoPanel extends StatelessWidget {
-  final VehiclePosition vehicle;
-  final VoidCallback? onClose;
-  final VoidCallback? onTrack;
-  final VoidCallback? onContact;
 
   const VehicleInfoPanel({
     super.key,
@@ -23,10 +19,13 @@ class VehicleInfoPanel extends StatelessWidget {
     this.onTrack,
     this.onContact,
   });
+  final VehiclePosition vehicle;
+  final VoidCallback? onClose;
+  final VoidCallback? onTrack;
+  final VoidCallback? onContact;
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
+  Widget build(BuildContext context) => Container(
       margin: const EdgeInsets.all(GfTokens.space4),
       decoration: BoxDecoration(
         color: const Color(GfTokens.surface),
@@ -248,7 +247,6 @@ class VehicleInfoPanel extends StatelessWidget {
         ],
       ),
     ).animate().slideY(begin: 0.3, end: 0).fadeIn();
-  }
 
   IconData _getVehicleIcon() {
     switch (vehicle.status) {
@@ -273,11 +271,6 @@ class VehicleInfoPanel extends StatelessWidget {
 }
 
 class _InfoCard extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final String value;
-  final Color color;
-  final Widget? child;
 
   const _InfoCard({
     required this.icon,
@@ -286,10 +279,14 @@ class _InfoCard extends StatelessWidget {
     required this.color,
     this.child,
   });
+  final IconData icon;
+  final String label;
+  final String value;
+  final Color color;
+  final Widget? child;
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
+  Widget build(BuildContext context) => Container(
       padding: const EdgeInsets.all(GfTokens.space3),
       decoration: BoxDecoration(
         color: color.withOpacity(0.1),
@@ -330,5 +327,4 @@ class _InfoCard extends StatelessWidget {
         ],
       ),
     );
-  }
 }

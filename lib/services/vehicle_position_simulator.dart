@@ -9,12 +9,12 @@ import 'package:flutter/foundation.dart';
 import 'supabase_service.dart';
 
 class VehiclePositionSimulator {
+
+  VehiclePositionSimulator(this._supabaseService);
   final SupabaseService _supabaseService;
   Timer? _simulationTimer;
   final Random _random = Random();
   bool _isRunning = false;
-
-  VehiclePositionSimulator(this._supabaseService);
 
   /// Inicia a simulacao de movimento dos veiculos
   void startSimulation() {
@@ -41,7 +41,7 @@ class VehiclePositionSimulator {
     try {
       // Buscar todos os veiculos
       final vehicles =
-          await _supabaseService.client.from('vehicle_positions').select('*');
+          await _supabaseService.client.from('vehicle_positions').select();
 
       if (vehicles.isEmpty) return;
 

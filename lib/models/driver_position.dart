@@ -5,16 +5,6 @@ typedef Json = Map<String, dynamic>;
 
 @immutable
 class DriverPosition {
-  final String id;
-  final String tripId;
-  final String driverId;
-  final double latitude;
-  final double longitude;
-  final double? accuracy; // metros
-  final double? speed; // m/s (padrao de sensores)
-  final double? heading; // graus [0..360]
-  final DateTime timestamp;
-  final DateTime createdAt;
 
   const DriverPosition({
     required this.id,
@@ -28,22 +18,6 @@ class DriverPosition {
     required this.timestamp,
     required this.createdAt,
   });
-
-  /* ====================== SERIALIZACAO (DB snake_case) ====================== */
-
-  /// Compativel com Supabase: snake_case + ISO8601 para datas
-  Map<String, dynamic> toJson() => <String, dynamic>{
-        'id': id,
-        'trip_id': tripId,
-        'driver_id': driverId,
-        'lat': latitude,
-        'lng': longitude,
-        if (accuracy != null) 'accuracy': accuracy,
-        if (speed != null) 'speed': speed,
-        if (heading != null) 'heading': heading,
-        'timestamp': timestamp.toIso8601String(),
-        'created_at': createdAt.toIso8601String(),
-      };
 
   /// Leitura tolerante a tipos/chaves (snake_case do DB)
   factory DriverPosition.fromJson(Map<String, dynamic> json) {
@@ -89,21 +63,6 @@ class DriverPosition {
     );
   }
 
-  /* ====================== SERIALIZACAO (App camelCase) ====================== */
-
-  Map<String, dynamic> toAppJson() => <String, dynamic>{
-        'id': id,
-        'tripId': tripId,
-        'driverId': driverId,
-        'latitude': latitude,
-        'longitude': longitude,
-        'accuracy': accuracy,
-        'speed': speed,
-        'heading': heading,
-        'timestamp': timestamp.toIso8601String(),
-        'createdAt': createdAt.toIso8601String(),
-      };
-
   /// Aceita chaves camelCase (util em caches/LocalStorage etc.)
   factory DriverPosition.fromAppJson(Map<String, dynamic> json) {
     final id = _asString(json['id']);
@@ -147,6 +106,47 @@ class DriverPosition {
           DateTime.now(),
     );
   }
+  final String id;
+  final String tripId;
+  final String driverId;
+  final double latitude;
+  final double longitude;
+  final double? accuracy; // metros
+  final double? speed; // m/s (padrao de sensores)
+  final double? heading; // graus [0..360]
+  final DateTime timestamp;
+  final DateTime createdAt;
+
+  /* ====================== SERIALIZACAO (DB snake_case) ====================== */
+
+  /// Compativel com Supabase: snake_case + ISO8601 para datas
+  Map<String, dynamic> toJson() => <String, dynamic>{
+        'id': id,
+        'trip_id': tripId,
+        'driver_id': driverId,
+        'lat': latitude,
+        'lng': longitude,
+        if (accuracy != null) 'accuracy': accuracy,
+        if (speed != null) 'speed': speed,
+        if (heading != null) 'heading': heading,
+        'timestamp': timestamp.toIso8601String(),
+        'created_at': createdAt.toIso8601String(),
+      };
+
+  /* ====================== SERIALIZACAO (App camelCase) ====================== */
+
+  Map<String, dynamic> toAppJson() => <String, dynamic>{
+        'id': id,
+        'tripId': tripId,
+        'driverId': driverId,
+        'latitude': latitude,
+        'longitude': longitude,
+        'accuracy': accuracy,
+        'speed': speed,
+        'heading': heading,
+        'timestamp': timestamp.toIso8601String(),
+        'createdAt': createdAt.toIso8601String(),
+      };
 
   /* ================== Helpers p/ Supabase (INSERT/UPDATE) =================== */
 
@@ -190,10 +190,12 @@ class DriverPosition {
     if (id.trim().isEmpty) errs.add('id obrigatorio');
     if (tripId.trim().isEmpty) errs.add('tripId obrigatorio');
     if (driverId.trim().isEmpty) errs.add('driverId obrigatorio');
-    if (latitude.isNaN || latitude < -90 || latitude > 90)
+    if (latitude.isNaN || latitude < -90 || latitude > 90) {
       errs.add('latitude invalida');
-    if (longitude.isNaN || longitude < -180 || longitude > 180)
+    }
+    if (longitude.isNaN || longitude < -180 || longitude > 180) {
       errs.add('longitude invalida');
+    }
     return errs;
   }
 
@@ -262,9 +264,9 @@ class DriverPosition {
 
   /* ============================ Parsers ============================= */
 
-  static String? _asString(dynamic v) => v?.toString();
+  static String? _asString(v) => v?.toString();
 
-  static double? _asDouble(dynamic v) {
+  static double? _asDouble(v) {
     if (v == null) return null;
     if (v is num) return v.toDouble();
     if (v is String && v.trim().isNotEmpty) return double.tryParse(v.trim());
@@ -272,7 +274,7 @@ class DriverPosition {
     // se vier algo invalido, retornara null e a validacao pode acusar depois
   }
 
-  static DateTime? _asDateTime(dynamic v) {
+  static DateTime? _asDateTime(v) {
     if (v == null) return null;
     if (v is DateTime) return v;
     if (v is int) {

@@ -19,7 +19,7 @@ Future<void> main() async {
     try {
       final users = await supabase.from('users').select('id, email, role').limit(10);
       stdout.writeln('âœ… UsuÃ¡rios encontrados na public.users: ${users.length}');
-      for (var user in users) {
+      for (final user in users) {
         stdout.writeln('   - ${user['email']} (${user['role']})');
       }
     } catch (e) {
@@ -58,10 +58,10 @@ Future<void> main() async {
     ];
     
     stdout.writeln('\nðŸ§ª Testando outras credenciais...');
-    for (var cred in testCredentials) {
+    for (final cred in testCredentials) {
       try {
         final response = await supabase.auth.signInWithPassword(
-          email: cred['email']!,
+          email: cred['email'],
           password: cred['password']!,
         );
         

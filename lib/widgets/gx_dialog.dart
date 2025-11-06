@@ -40,8 +40,7 @@ Future<T?> showGxDialog<T>({
   required String message,
   String confirmLabel = 'OK',
   String? cancelLabel,
-}) {
-  return showDialog<T>(
+}) => showDialog<T>(
     context: context,
     builder: (ctx) {
       final t = Theme.of(ctx);
@@ -61,4 +60,3 @@ Future<T?> showGxDialog<T>({
       );
     },
   );
-}

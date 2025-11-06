@@ -7,9 +7,6 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/gf_tokens.dart';
 
 class GfLoadingIndicator extends StatelessWidget {
-  final String? message;
-  final double? size;
-  final Color? color;
 
   const GfLoadingIndicator({
     super.key,
@@ -17,10 +14,12 @@ class GfLoadingIndicator extends StatelessWidget {
     this.size,
     this.color,
   });
+  final String? message;
+  final double? size;
+  final Color? color;
 
   @override
-  Widget build(BuildContext context) {
-    return Center(
+  Widget build(BuildContext context) => Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -51,5 +50,4 @@ class GfLoadingIndicator extends StatelessWidget {
         ],
       ),
     );
-  }
 }

@@ -34,7 +34,6 @@ class GfTheme {
       scaffoldBackgroundColor: page,
       colorScheme: ColorScheme.fromSeed(
         seedColor: brand,
-        brightness: Brightness.light,
         surface: surface,
         onSurface: textBody,
         primary: brand,
@@ -115,7 +114,7 @@ class GfTheme {
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(GfTokens.radius),
-          side: const BorderSide(color: stroke, width: 1),
+          side: const BorderSide(color: stroke),
         ),
         margin: const EdgeInsets.all(0),
       ),

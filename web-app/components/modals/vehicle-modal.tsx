@@ -164,22 +164,21 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
         photoUrl = await uploadPhoto(vehicleId)
       }
 
-      // Preparar dados do veículo (SEM capacity, company_id e is_active - sempre removidos por segurança)
+      // Preparar dados do veículo (SEM capacity, company_id, is_active e photo_url - sempre removidos por segurança)
       const vehicleDataRaw: any = {
         plate: formData.plate,
         model: formData.model,
         year: formData.year ? parseInt(formData.year as string) : null,
         prefix: formData.prefix || null,
-        photo_url: photoUrl || null,
-        // NÃO incluir company_id, capacity ou is_active - essas colunas não existem no banco de produção
+        // NÃO incluir company_id, capacity, is_active ou photo_url - essas colunas não existem no banco de produção
       }
       
-      // NUNCA adicionar capacity, company_id ou is_active ao payload - essas colunas não existem no banco
+      // NUNCA adicionar capacity, company_id, is_active ou photo_url ao payload - essas colunas não existem no banco
       
-      // Criar objeto final SEM capacity, company_id e is_active (sempre removidos)
+      // Criar objeto final SEM capacity, company_id, is_active e photo_url (sempre removidos)
       const finalVehicleData: any = { ...vehicleDataRaw }
       
-      // GARANTIR que capacity, company_id e is_active NUNCA estão presentes (remoção definitiva)
+      // GARANTIR que capacity, company_id, is_active e photo_url NUNCA estão presentes (remoção definitiva)
       if ('capacity' in finalVehicleData) {
         delete finalVehicleData.capacity
       }
@@ -188,6 +187,9 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
       }
       if ('is_active' in finalVehicleData) {
         delete finalVehicleData.is_active
+      }
+      if ('photo_url' in finalVehicleData) {
+        delete finalVehicleData.photo_url
       }
       
       // Log para debug
@@ -199,7 +201,7 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
         })
       }
       
-      // GARANTIR que capacity, company_id e is_active NUNCA estão presentes antes de qualquer operação
+      // GARANTIR que capacity, company_id, is_active e photo_url NUNCA estão presentes antes de qualquer operação
       if ('capacity' in finalVehicleData) {
         delete finalVehicleData.capacity
         console.warn('🔒 Capacity removido do payload antes de operação (coluna não existe)')
@@ -211,6 +213,10 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
       if ('is_active' in finalVehicleData) {
         delete finalVehicleData.is_active
         console.warn('🔒 Is_active removido do payload antes de operação (coluna não existe)')
+      }
+      if ('photo_url' in finalVehicleData) {
+        delete finalVehicleData.photo_url
+        console.warn('🔒 Photo_url removido do payload antes de operação (coluna não existe)')
       }
       
       if (vehicleId) {
@@ -235,7 +241,7 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
         // Log de auditoria
         await auditLogs.update('vehicle', vehicleId, { plate: finalVehicleData.plate, model: finalVehicleData.model })
       } else {
-        // GARANTIR que capacity, company_id e is_active NUNCA estão presentes antes de criar
+        // GARANTIR que capacity, company_id, is_active e photo_url NUNCA estão presentes antes de criar
         if ('capacity' in finalVehicleData) {
           delete finalVehicleData.capacity
           console.warn('🔒 Capacity removido do payload antes de criar (coluna não existe)')
@@ -247,6 +253,10 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
         if ('is_active' in finalVehicleData) {
           delete finalVehicleData.is_active
           console.warn('🔒 Is_active removido do payload antes de criar (coluna não existe)')
+        }
+        if ('photo_url' in finalVehicleData) {
+          delete finalVehicleData.photo_url
+          console.warn('🔒 Photo_url removido do payload antes de criar (coluna não existe)')
         }
         
         // Criar

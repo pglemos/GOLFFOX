@@ -72,12 +72,6 @@ extension VehicleSituationExtension on VehicleSituation {
 
 @immutable
 class MapFilters {
-  final String? selectedCompany;
-  final String? selectedRoute;
-  final String? selectedCarrier;
-  final List<VehicleSituation> selectedSituations;
-  final List<ShiftType> selectedShifts;
-  final List<VehicleStatusType> selectedStatuses;
 
   const MapFilters({
     this.selectedCompany,
@@ -87,20 +81,24 @@ class MapFilters {
     this.selectedShifts = const [],
     this.selectedStatuses = const [],
   });
+  final String? selectedCompany;
+  final String? selectedRoute;
+  final String? selectedCarrier;
+  final List<VehicleSituation> selectedSituations;
+  final List<ShiftType> selectedShifts;
+  final List<VehicleStatusType> selectedStatuses;
 
   /// Verifica se ha filtros ativos
-  bool get hasActiveFilters {
-    return selectedCompany != null ||
+  bool get hasActiveFilters => selectedCompany != null ||
         selectedRoute != null ||
         selectedCarrier != null ||
         selectedSituations.isNotEmpty ||
         selectedShifts.isNotEmpty ||
         selectedStatuses.isNotEmpty;
-  }
 
   /// Conta o numero de filtros ativos
   int get activeFiltersCount {
-    int count = 0;
+    var count = 0;
     if (selectedCompany != null) count++;
     if (selectedRoute != null) count++;
     if (selectedCarrier != null) count++;
@@ -133,8 +131,7 @@ class MapFilters {
     List<VehicleSituation>? selectedSituations,
     List<ShiftType>? selectedShifts,
     List<VehicleStatusType>? selectedStatuses,
-  }) {
-    return MapFilters(
+  }) => MapFilters(
       selectedCompany: selectedCompany ?? this.selectedCompany,
       selectedRoute: selectedRoute ?? this.selectedRoute,
       selectedCarrier: selectedCarrier ?? this.selectedCarrier,
@@ -142,17 +139,14 @@ class MapFilters {
       selectedShifts: selectedShifts ?? this.selectedShifts,
       selectedStatuses: selectedStatuses ?? this.selectedStatuses,
     );
-  }
 
   /// Limpa todos os filtros
-  MapFilters clear() {
-    return const MapFilters();
-  }
+  MapFilters clear() => const MapFilters();
 
   /// Remove um filtro especifico
-  MapFilters removeCompany() => copyWith(selectedCompany: null);
-  MapFilters removeRoute() => copyWith(selectedRoute: null);
-  MapFilters removeCarrier() => copyWith(selectedCarrier: null);
+  MapFilters removeCompany() => copyWith();
+  MapFilters removeRoute() => copyWith();
+  MapFilters removeCarrier() => copyWith();
   MapFilters removeSituations() => copyWith(selectedSituations: []);
   MapFilters removeShifts() => copyWith(selectedShifts: []);
   MapFilters removeStatuses() => copyWith(selectedStatuses: []);

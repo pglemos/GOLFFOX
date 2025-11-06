@@ -34,20 +34,6 @@ enum TripStatus {
 
 // Classe Trip estendida para o widget de historico
 class TripExtended {
-  final String id;
-  final String driverId;
-  final String passengerId;
-  final String origin;
-  final String destination;
-  final DateTime startTime;
-  final DateTime? endTime;
-  final double distance;
-  final double fare;
-  final TripStatus status;
-  final double? rating;
-  final String? notes;
-  final DateTime createdAt;
-  final DateTime updatedAt;
 
   const TripExtended({
     required this.id,
@@ -65,18 +51,6 @@ class TripExtended {
     required this.createdAt,
     required this.updatedAt,
   });
-
-  Duration get duration {
-    if (endTime != null) {
-      return endTime!.difference(startTime);
-    }
-    // Se ainda esta em andamento, calcula duracao ate agora
-    if (status == TripStatus.inProgress) {
-      return DateTime.now().difference(startTime);
-    }
-    // Para viagens canceladas ou sem fim definido, retorna duracao zero
-    return Duration.zero;
-  }
 
   // Conversao do Trip original para TripExtended
   factory TripExtended.fromTrip(
@@ -107,23 +81,6 @@ class TripExtended {
     );
   }
 
-  Map<String, dynamic> toJson() => {
-        'id': id,
-        'driverId': driverId,
-        'passengerId': passengerId,
-        'origin': origin,
-        'destination': destination,
-        'startTime': startTime.toIso8601String(),
-        'endTime': endTime?.toIso8601String(),
-        'distance': distance,
-        'fare': fare,
-        'status': status.name,
-        'rating': rating,
-        'notes': notes,
-        'createdAt': createdAt.toIso8601String(),
-        'updatedAt': updatedAt.toIso8601String(),
-      };
-
   factory TripExtended.fromJson(Map<String, dynamic> json) => TripExtended(
         id: json['id'],
         driverId: json['driverId'],
@@ -141,6 +98,49 @@ class TripExtended {
         createdAt: DateTime.parse(json['createdAt']),
         updatedAt: DateTime.parse(json['updatedAt']),
       );
+  final String id;
+  final String driverId;
+  final String passengerId;
+  final String origin;
+  final String destination;
+  final DateTime startTime;
+  final DateTime? endTime;
+  final double distance;
+  final double fare;
+  final TripStatus status;
+  final double? rating;
+  final String? notes;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+
+  Duration get duration {
+    if (endTime != null) {
+      return endTime!.difference(startTime);
+    }
+    // Se ainda esta em andamento, calcula duracao ate agora
+    if (status == TripStatus.inProgress) {
+      return DateTime.now().difference(startTime);
+    }
+    // Para viagens canceladas ou sem fim definido, retorna duracao zero
+    return Duration.zero;
+  }
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'driverId': driverId,
+        'passengerId': passengerId,
+        'origin': origin,
+        'destination': destination,
+        'startTime': startTime.toIso8601String(),
+        'endTime': endTime?.toIso8601String(),
+        'distance': distance,
+        'fare': fare,
+        'status': status.name,
+        'rating': rating,
+        'notes': notes,
+        'createdAt': createdAt.toIso8601String(),
+        'updatedAt': updatedAt.toIso8601String(),
+      };
 
   TripExtended copyWith({
     String? id,
@@ -157,8 +157,7 @@ class TripExtended {
     String? notes,
     DateTime? createdAt,
     DateTime? updatedAt,
-  }) {
-    return TripExtended(
+  }) => TripExtended(
       id: id ?? this.id,
       driverId: driverId ?? this.driverId,
       passengerId: passengerId ?? this.passengerId,
@@ -174,7 +173,6 @@ class TripExtended {
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
-  }
 
   @override
   bool operator ==(Object other) =>

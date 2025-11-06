@@ -11,10 +11,6 @@ import '../../../models/bus_stop.dart';
 import '../../../core/utils/date_utils.dart';
 
 class BusStopsPanel extends StatefulWidget {
-  final List<BusStop> busStops;
-  final String? routeName;
-  final VoidCallback? onClose;
-  final Function(BusStop)? onStopTap;
 
   const BusStopsPanel({
     super.key,
@@ -23,6 +19,10 @@ class BusStopsPanel extends StatefulWidget {
     this.onClose,
     this.onStopTap,
   });
+  final List<BusStop> busStops;
+  final String? routeName;
+  final VoidCallback? onClose;
+  final Function(BusStop)? onStopTap;
 
   @override
   State<BusStopsPanel> createState() => _BusStopsPanelState();
@@ -162,17 +162,16 @@ class _BusStopsPanelState extends State<BusStopsPanel> {
 }
 
 class _BusStopTile extends StatelessWidget {
-  final BusStop stop;
-  final VoidCallback? onTap;
 
   const _BusStopTile({
     required this.stop,
     this.onTap,
   });
+  final BusStop stop;
+  final VoidCallback? onTap;
 
   @override
-  Widget build(BuildContext context) {
-    return InkWell(
+  Widget build(BuildContext context) => InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(GfTokens.radiusSmall),
       child: Padding(
@@ -295,13 +294,12 @@ class _BusStopTile extends StatelessWidget {
         ),
       ),
     );
-  }
 }
 
 class _StopsSummary extends StatelessWidget {
-  final List<BusStop> stops;
 
   const _StopsSummary({required this.stops});
+  final List<BusStop> stops;
 
   @override
   Widget build(BuildContext context) {
@@ -343,19 +341,18 @@ class _StopsSummary extends StatelessWidget {
 }
 
 class _StatusChip extends StatelessWidget {
-  final int count;
-  final String label;
-  final Color color;
 
   const _StatusChip({
     required this.count,
     required this.label,
     required this.color,
   });
+  final int count;
+  final String label;
+  final Color color;
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
+  Widget build(BuildContext context) => Container(
       padding: const EdgeInsets.symmetric(
         horizontal: 8,
         vertical: 4,
@@ -388,5 +385,4 @@ class _StatusChip extends StatelessWidget {
         ],
       ),
     );
-  }
 }

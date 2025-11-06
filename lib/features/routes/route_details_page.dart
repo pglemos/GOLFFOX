@@ -16,12 +16,12 @@ import '../../models/route.dart';
 import 'create_route_page.dart';
 
 class RouteDetailsPage extends ConsumerStatefulWidget {
-  final BusRoute route;
 
   const RouteDetailsPage({
     super.key,
     required this.route,
   });
+  final BusRoute route;
 
   @override
   ConsumerState<RouteDetailsPage> createState() => _RouteDetailsPageState();
@@ -51,11 +51,10 @@ class _RouteDetailsPageState extends ConsumerState<RouteDetailsPage>
     return Scaffold(
       appBar: GfAppBar(
         title: widget.route.name,
-        automaticallyImplyLeading: true,
         actions: [
           if (widget.route.status == RouteStatus.planned)
             IconButton(
-              onPressed: () => _editRoute(),
+              onPressed: _editRoute,
               icon: const Icon(Icons.edit),
               tooltip: 'Editar Rota',
             ),
@@ -106,14 +105,13 @@ class _RouteDetailsPageState extends ConsumerState<RouteDetailsPage>
       ),
       body: routeAsync.when(
         data: (route) => _buildContent(route ?? widget.route),
-        loading: () => _buildLoadingState(),
+        loading: _buildLoadingState,
         error: (error, stack) => _buildErrorState(error),
       ),
     );
   }
 
-  Widget _buildContent(BusRoute route) {
-    return Column(
+  Widget _buildContent(BusRoute route) => Column(
       children: [
         // Cabecalho com status e informacoes principais
         _buildHeader(route),
@@ -144,10 +142,8 @@ class _RouteDetailsPageState extends ConsumerState<RouteDetailsPage>
         ),
       ],
     );
-  }
 
-  Widget _buildHeader(BusRoute route) {
-    return Container(
+  Widget _buildHeader(BusRoute route) => Container(
       padding: const EdgeInsets.all(GfTokens.space4),
       decoration: const BoxDecoration(
         color: Color(GfTokens.surface),
@@ -264,15 +260,13 @@ class _RouteDetailsPageState extends ConsumerState<RouteDetailsPage>
         ],
       ),
     );
-  }
 
   Widget _buildMetricCard({
     required IconData icon,
     required String label,
     required String value,
     required Color color,
-  }) {
-    return Container(
+  }) => Container(
       padding: const EdgeInsets.all(GfTokens.space3),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
@@ -301,10 +295,8 @@ class _RouteDetailsPageState extends ConsumerState<RouteDetailsPage>
         ],
       ),
     );
-  }
 
-  Widget _buildOverviewTab(BusRoute route) {
-    return SingleChildScrollView(
+  Widget _buildOverviewTab(BusRoute route) => SingleChildScrollView(
       padding: const EdgeInsets.all(GfTokens.space4),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -375,14 +367,10 @@ class _RouteDetailsPageState extends ConsumerState<RouteDetailsPage>
         ],
       ),
     );
-  }
 
-  Widget _buildStopsTab(BusRoute route) {
-    return RouteStopTimeline(stops: route.stops, isActive: route.isActive);
-  }
+  Widget _buildStopsTab(BusRoute route) => RouteStopTimeline(stops: route.stops, isActive: route.isActive);
 
-  Widget _buildHistoryTab(BusRoute route) {
-    return SingleChildScrollView(
+  Widget _buildHistoryTab(BusRoute route) => SingleChildScrollView(
       padding: const EdgeInsets.all(GfTokens.space4),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -446,13 +434,11 @@ class _RouteDetailsPageState extends ConsumerState<RouteDetailsPage>
         ],
       ),
     );
-  }
 
   Widget _buildInfoCard({
     required String title,
     required List<Widget> children,
-  }) {
-    return Card(
+  }) => Card(
       child: Padding(
         padding: const EdgeInsets.all(GfTokens.space4),
         child: Column(
@@ -472,10 +458,8 @@ class _RouteDetailsPageState extends ConsumerState<RouteDetailsPage>
         ),
       ),
     );
-  }
 
-  Widget _buildInfoRow(String label, String value) {
-    return Padding(
+  Widget _buildInfoRow(String label, String value) => Padding(
       padding: const EdgeInsets.only(bottom: GfTokens.space2),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -503,7 +487,6 @@ class _RouteDetailsPageState extends ConsumerState<RouteDetailsPage>
         ],
       ),
     );
-  }
 
   Widget _buildHistoryItem({
     required IconData icon,
@@ -511,8 +494,7 @@ class _RouteDetailsPageState extends ConsumerState<RouteDetailsPage>
     required String subtitle,
     required DateTime time,
     required Color color,
-  }) {
-    return Padding(
+  }) => Padding(
       padding: const EdgeInsets.only(bottom: GfTokens.space3),
       child: Row(
         children: [
@@ -559,18 +541,14 @@ class _RouteDetailsPageState extends ConsumerState<RouteDetailsPage>
         ],
       ),
     );
-  }
 
-  Widget _buildLoadingState() {
-    return const Center(
+  Widget _buildLoadingState() => const Center(
       child: CircularProgressIndicator(
         color: Color(GfTokens.primary),
       ),
     );
-  }
 
-  Widget _buildErrorState(Object error) {
-    return Center(
+  Widget _buildErrorState(Object error) => Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -600,7 +578,6 @@ class _RouteDetailsPageState extends ConsumerState<RouteDetailsPage>
         ],
       ),
     );
-  }
 
   void _handleMenuAction(String action) {
     switch (action) {
@@ -624,13 +601,12 @@ class _RouteDetailsPageState extends ConsumerState<RouteDetailsPage>
       MaterialPageRoute(
         builder: (context) => CreateRoutePage(
           route: widget.route,
-          isAutoGenerated: false,
         ),
       ),
     );
   }
 
-  void _startRoute() async {
+  Future<void> _startRoute() async {
     setState(() => _isLoading = true);
 
     try {
@@ -722,7 +698,6 @@ class _RouteDetailsPageState extends ConsumerState<RouteDetailsPage>
             createdAt: DateTime.now(),
             updatedAt: DateTime.now(),
           ),
-          isAutoGenerated: false,
         ),
       ),
     );

@@ -9,12 +9,6 @@ import '../../core/theme/gf_tokens.dart';
 import '../../core/motion/gf_motion.dart';
 
 class GfQuickAction extends StatelessWidget {
-  final String title;
-  final String description;
-  final IconData icon;
-  final Color iconColor;
-  final VoidCallback onTap;
-  final bool isEnabled;
 
   const GfQuickAction({
     super.key,
@@ -25,10 +19,15 @@ class GfQuickAction extends StatelessWidget {
     required this.onTap,
     this.isEnabled = true,
   });
+  final String title;
+  final String description;
+  final IconData icon;
+  final Color iconColor;
+  final VoidCallback onTap;
+  final bool isEnabled;
 
   @override
-  Widget build(BuildContext context) {
-    return GfHoverScale(
+  Widget build(BuildContext context) => GfHoverScale(
       enableShadow: true,
       child: Material(
         color: Colors.transparent,
@@ -124,7 +123,6 @@ class GfQuickAction extends StatelessWidget {
         ),
       ),
     ).animate().fadeIn(duration: 300.ms).slideY(begin: 0.1, end: 0);
-  }
 }
 
 // ========================================
@@ -134,8 +132,7 @@ class GfQuickActionVariants {
   static GfQuickAction trackVehicles({
     required VoidCallback onTap,
     bool isEnabled = true,
-  }) {
-    return GfQuickAction(
+  }) => GfQuickAction(
       title: 'Rastrear Veiculos',
       description: 'Visualizar posicoes em tempo real',
       icon: Icons.gps_fixed,
@@ -143,13 +140,11 @@ class GfQuickActionVariants {
       onTap: onTap,
       isEnabled: isEnabled,
     );
-  }
 
   static GfQuickAction viewAnalytics({
     required VoidCallback onTap,
     bool isEnabled = true,
-  }) {
-    return GfQuickAction(
+  }) => GfQuickAction(
       title: 'Ver Analises',
       description: 'Relatorios e metricas detalhadas',
       icon: Icons.analytics,
@@ -157,13 +152,11 @@ class GfQuickActionVariants {
       onTap: onTap,
       isEnabled: isEnabled,
     );
-  }
 
   static GfQuickAction settings({
     required VoidCallback onTap,
     bool isEnabled = true,
-  }) {
-    return GfQuickAction(
+  }) => GfQuickAction(
       title: 'Configuracoes',
       description: 'Ajustar parametros do sistema',
       icon: Icons.settings,
@@ -171,13 +164,11 @@ class GfQuickActionVariants {
       onTap: onTap,
       isEnabled: isEnabled,
     );
-  }
 
   static GfQuickAction reopenTrip({
     required VoidCallback onTap,
     bool isEnabled = true,
-  }) {
-    return GfQuickAction(
+  }) => GfQuickAction(
       title: 'Reabrir Viagem',
       description: 'Reativar viagem encerrada',
       icon: Icons.refresh,
@@ -185,5 +176,4 @@ class GfQuickActionVariants {
       onTap: onTap,
       isEnabled: isEnabled,
     );
-  }
 }

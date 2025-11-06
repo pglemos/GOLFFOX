@@ -1,20 +1,20 @@
 import 'package:geolocator/geolocator.dart';
 
 class LocationService {
-  static final LocationService _instance = LocationService._internal();
   factory LocationService() => _instance;
   LocationService._internal();
+  static final LocationService _instance = LocationService._internal();
 
   static LocationService get instance => _instance;
 
   Future<Position?> getCurrentLocation() async {
     try {
-      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      var serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
         throw Exception('Serviço de localização desabilitado');
       }
 
-      LocationPermission permission = await Geolocator.checkPermission();
+      var permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
         if (permission == LocationPermission.denied) {
@@ -36,7 +36,7 @@ class LocationService {
   }
 
   Future<void> getLocationUpdates(void Function(Position) callback) async {
-    const LocationSettings locationSettings = LocationSettings(
+    const locationSettings = LocationSettings(
       accuracy: LocationAccuracy.high,
       distanceFilter: 10, // metros
     );

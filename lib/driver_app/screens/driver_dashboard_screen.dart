@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:golffox/services/supabase_service.dart';
+import '../../services/supabase_service.dart';
 import 'driver_checklist_screen.dart';
 import 'driver_route_screen.dart';
 
@@ -76,8 +76,7 @@ class _DriverDashboardScreenState extends State<DriverDashboardScreen> {
     );
   }
 
-  Widget _buildEmptyState() {
-    return Center(
+  Widget _buildEmptyState() => Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -96,6 +95,5 @@ class _DriverDashboardScreenState extends State<DriverDashboardScreen> {
         ],
       ),
     );
-  }
 }
 

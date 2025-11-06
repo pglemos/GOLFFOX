@@ -16,12 +16,12 @@ import '../../widgets/gx_dialog.dart';
 import '../../widgets/gx_toast.dart';
 
 class DriverDetailsPage extends ConsumerStatefulWidget {
-  final String driverId;
 
   const DriverDetailsPage({
     super.key,
     required this.driverId,
   });
+  final String driverId;
 
   @override
   ConsumerState<DriverDetailsPage> createState() => _DriverDetailsPageState();
@@ -136,11 +136,10 @@ class _DriverDetailsPageState extends ConsumerState<DriverDetailsPage>
       message: 'Are you sure you want to delete ${_driver!.name}?\n\n'
           'This action cannot be undone.',
       confirmText: 'Delete',
-      cancelText: 'Cancel',
       isDestructive: true,
     );
 
-    if (confirmed == true) {
+    if (confirmed ?? false) {
       try {
         final driverService = ref.read(driverServiceProvider.notifier);
         await driverService.deleteDriver(_driver!.id);
@@ -158,12 +157,11 @@ class _DriverDetailsPageState extends ConsumerState<DriverDetailsPage>
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return Scaffold(
+      return const Scaffold(
         appBar: GfAppBar(
           title: 'Carregando...',
-          automaticallyImplyLeading: true,
         ),
-        body: const Center(
+        body: Center(
           child: CircularProgressIndicator(),
         ),
       );
@@ -171,21 +169,20 @@ class _DriverDetailsPageState extends ConsumerState<DriverDetailsPage>
 
     if (_error != null) {
       return Scaffold(
-        appBar: GfAppBar(
+        appBar: const GfAppBar(
           title: 'Erro',
-          automaticallyImplyLeading: true,
         ),
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
+              const Icon(
                 Icons.error_outline,
                 size: 64,
-                color: const Color(GfTokens.colorError),
+                color: Color(GfTokens.colorError),
               ),
               const SizedBox(height: 16),
-              Text(
+              const Text(
                 'Erro ao carregar motorista',
                 style: GfTextStyles.headlineSmall,
               ),
@@ -210,12 +207,11 @@ class _DriverDetailsPageState extends ConsumerState<DriverDetailsPage>
     }
 
     if (_driver == null) {
-      return Scaffold(
+      return const Scaffold(
         appBar: GfAppBar(
           title: 'Driver not found',
-          automaticallyImplyLeading: true,
         ),
-        body: const Center(
+        body: Center(
           child: Text('Driver not found'),
         ),
       );
@@ -224,7 +220,6 @@ class _DriverDetailsPageState extends ConsumerState<DriverDetailsPage>
     return Scaffold(
       appBar: GfAppBar(
         title: _driver!.name,
-        automaticallyImplyLeading: true,
         actions: [
           PopupMenuButton<String>(
             icon: const Icon(Icons.more_vert),
@@ -293,12 +288,11 @@ class _DriverDetailsPageState extends ConsumerState<DriverDetailsPage>
           // Header com informações principais
           Container(
             padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: const Color(GfTokens.colorSurface),
+            decoration: const BoxDecoration(
+              color: Color(GfTokens.colorSurface),
               border: Border(
                 bottom: BorderSide(
-                  color: const Color(GfTokens.colorOutlineVariant),
-                  width: 1,
+                  color: Color(GfTokens.colorOutlineVariant),
                 ),
               ),
             ),
@@ -375,10 +369,10 @@ class _DriverDetailsPageState extends ConsumerState<DriverDetailsPage>
                       const SizedBox(height: 4),
                       Row(
                         children: [
-                          Icon(
+                          const Icon(
                             Icons.phone,
                             size: 16,
-                            color: const Color(GfTokens.colorOnSurfaceVariant),
+                            color: Color(GfTokens.colorOnSurfaceVariant),
                           ),
                           const SizedBox(width: 4),
                           Text(
@@ -488,8 +482,7 @@ class _DriverDetailsPageState extends ConsumerState<DriverDetailsPage>
     );
   }
 
-  Widget _buildQuickMetric(String label, String value, Color color) {
-    return Column(
+  Widget _buildQuickMetric(String label, String value, Color color) => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
@@ -507,15 +500,14 @@ class _DriverDetailsPageState extends ConsumerState<DriverDetailsPage>
         ),
       ],
     );
-  }
 }
 
 class _StatusChangeDialog extends StatefulWidget {
-  final DriverStatus currentStatus;
 
   const _StatusChangeDialog({
     required this.currentStatus,
   });
+  final DriverStatus currentStatus;
 
   @override
   State<_StatusChangeDialog> createState() => _StatusChangeDialogState();
@@ -531,8 +523,7 @@ class _StatusChangeDialogState extends State<_StatusChangeDialog> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
+  Widget build(BuildContext context) => AlertDialog(
       title: const Text('Alterar Status'),
       content: Column(
         mainAxisSize: MainAxisSize.min,
@@ -574,5 +565,4 @@ class _StatusChangeDialogState extends State<_StatusChangeDialog> {
         ),
       ],
     );
-  }
 }

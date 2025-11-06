@@ -19,12 +19,12 @@ import '../../services/vehicle_service.dart';
 import 'create_vehicle_page.dart';
 
 class VehicleDetailsPage extends ConsumerStatefulWidget {
-  final String vehicleId;
 
   const VehicleDetailsPage({
     super.key,
     required this.vehicleId,
   });
+  final String vehicleId;
 
   @override
   ConsumerState<VehicleDetailsPage> createState() => _VehicleDetailsPageState();
@@ -54,7 +54,7 @@ class _VehicleDetailsPageState extends ConsumerState<VehicleDetailsPage>
       ),
     );
 
-    if (result == true) {
+    if (result ?? false) {
       ref.invalidate(vehicleServiceProvider);
     }
   }
@@ -83,7 +83,7 @@ class _VehicleDetailsPageState extends ConsumerState<VehicleDetailsPage>
       ),
     );
 
-    if (confirmed == true) {
+    if (confirmed ?? false) {
       setState(() {
         _isLoading = true;
       });
@@ -160,10 +160,10 @@ class _VehicleDetailsPageState extends ConsumerState<VehicleDetailsPage>
     ));
 
     return vehicleAsync.when(
-      loading: () => Scaffold(
-        backgroundColor: const Color(GfTokens.colorSurfaceBackground),
-        appBar: const GfAppBar(title: 'Carregando...'),
-        body: const Center(child: GfLoadingIndicator()),
+      loading: () => const Scaffold(
+        backgroundColor: Color(GfTokens.colorSurfaceBackground),
+        appBar: GfAppBar(title: 'Carregando...'),
+        body: Center(child: GfLoadingIndicator()),
       ),
       error: (error, stack) => Scaffold(
         backgroundColor: const Color(GfTokens.colorSurfaceBackground),
@@ -172,25 +172,25 @@ class _VehicleDetailsPageState extends ConsumerState<VehicleDetailsPage>
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
+              const Icon(
                 Icons.error_outline,
                 size: 64,
-                color: const Color(GfTokens.colorError),
+                color: Color(GfTokens.colorError),
               ),
               const SizedBox(height: GfTokens.spacingMd),
-              Text(
+              const Text(
                 'Error loading vehicle',
                 style: TextStyle(
                   fontSize: GfTokens.fontSizeLg,
                   fontWeight: FontWeight.w600,
-                  color: const Color(GfTokens.colorOnSurface),
+                  color: Color(GfTokens.colorOnSurface),
                 ),
               ),
               const SizedBox(height: GfTokens.spacingSm),
               Text(
                 error.toString(),
-                style: TextStyle(
-                  color: const Color(GfTokens.colorOnSurfaceVariant),
+                style: const TextStyle(
+                  color: Color(GfTokens.colorOnSurfaceVariant),
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -205,10 +205,10 @@ class _VehicleDetailsPageState extends ConsumerState<VehicleDetailsPage>
       ),
       data: (vehicle) {
         if (vehicle == null) {
-          return Scaffold(
-            backgroundColor: const Color(GfTokens.colorSurfaceBackground),
-            appBar: const GfAppBar(title: 'Vehicle not found'),
-            body: const Center(
+          return const Scaffold(
+            backgroundColor: Color(GfTokens.colorSurfaceBackground),
+            appBar: GfAppBar(title: 'Vehicle not found'),
+            body: Center(
               child: Text('Vehicle not found'),
             ),
           );
@@ -221,7 +221,7 @@ class _VehicleDetailsPageState extends ConsumerState<VehicleDetailsPage>
             actions: [
               if (_isLoading)
                 const Padding(
-                  padding: EdgeInsets.all(16.0),
+                  padding: EdgeInsets.all(16),
                   child: SizedBox(
                     width: 20,
                     height: 20,
@@ -304,11 +304,11 @@ class _VehicleDetailsPageState extends ConsumerState<VehicleDetailsPage>
               // Header com status e informacoes principais
               Container(
                 padding: const EdgeInsets.all(GfTokens.spacingMd),
-                decoration: BoxDecoration(
-                  color: const Color(GfTokens.colorSurface),
+                decoration: const BoxDecoration(
+                  color: Color(GfTokens.colorSurface),
                   border: Border(
                     bottom:
-                        BorderSide(color: const Color(GfTokens.colorBorder)),
+                        BorderSide(color: Color(GfTokens.colorBorder)),
                   ),
                 ),
                 child: Column(
@@ -347,17 +347,17 @@ class _VehicleDetailsPageState extends ConsumerState<VehicleDetailsPage>
                           children: [
                             Text(
                               vehicle.type.displayName,
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontWeight: FontWeight.w600,
-                                color: const Color(GfTokens.colorOnSurface),
+                                color: Color(GfTokens.colorOnSurface),
                               ),
                             ),
                             Text(
                               vehicle.fuelType.displayName,
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: GfTokens.fontSizeSm,
                                 color:
-                                    const Color(GfTokens.colorOnSurfaceVariant),
+                                    Color(GfTokens.colorOnSurfaceVariant),
                               ),
                             ),
                           ],
@@ -434,8 +434,7 @@ class _VehicleDetailsPageState extends ConsumerState<VehicleDetailsPage>
   }
 
   Widget _buildMetricCard(
-      String title, String value, IconData icon, Color color) {
-    return Container(
+      String title, String value, IconData icon, Color color) => Container(
       padding: const EdgeInsets.all(GfTokens.spacingSm),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
@@ -464,10 +463,8 @@ class _VehicleDetailsPageState extends ConsumerState<VehicleDetailsPage>
         ],
       ),
     );
-  }
 
-  Widget _buildOverviewTab(Vehicle vehicle) {
-    return SingleChildScrollView(
+  Widget _buildOverviewTab(Vehicle vehicle) => SingleChildScrollView(
       padding: const EdgeInsets.all(GfTokens.spacingMd),
       child: Column(
         children: [
@@ -601,18 +598,12 @@ class _VehicleDetailsPageState extends ConsumerState<VehicleDetailsPage>
         ],
       ),
     );
-  }
 
-  Widget _buildMaintenanceTab(Vehicle vehicle) {
-    return VehicleMaintenanceList(vehicleId: vehicle.id);
-  }
+  Widget _buildMaintenanceTab(Vehicle vehicle) => VehicleMaintenanceList(vehicleId: vehicle.id);
 
-  Widget _buildFuelTab(Vehicle vehicle) {
-    return VehicleFuelChart(vehicleId: vehicle.id);
-  }
+  Widget _buildFuelTab(Vehicle vehicle) => VehicleFuelChart(vehicleId: vehicle.id);
 
-  Widget _buildHistoryTab(Vehicle vehicle) {
-    return SingleChildScrollView(
+  Widget _buildHistoryTab(Vehicle vehicle) => SingleChildScrollView(
       padding: const EdgeInsets.all(GfTokens.spacingMd),
       child: Column(
         children: [
@@ -651,7 +642,6 @@ class _VehicleDetailsPageState extends ConsumerState<VehicleDetailsPage>
         ],
       ),
     );
-  }
 
   Widget _buildDocumentRow(
     String label,
@@ -673,8 +663,8 @@ class _VehicleDetailsPageState extends ConsumerState<VehicleDetailsPage>
         children: [
           Text(
             label,
-            style: TextStyle(
-              color: const Color(GfTokens.colorOnSurfaceVariant),
+            style: const TextStyle(
+              color: Color(GfTokens.colorOnSurfaceVariant),
             ),
           ),
           Text(
@@ -689,8 +679,7 @@ class _VehicleDetailsPageState extends ConsumerState<VehicleDetailsPage>
     );
   }
 
-  Widget _buildSpecRow(String label, String value) {
-    return Padding(
+  Widget _buildSpecRow(String label, String value) => Padding(
       padding: const EdgeInsets.only(bottom: GfTokens.spacingSm),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -711,15 +700,13 @@ class _VehicleDetailsPageState extends ConsumerState<VehicleDetailsPage>
         ],
       ),
     );
-  }
 
   Widget _buildHistoryItem(
     String title,
     DateTime date,
     IconData icon,
     Color color,
-  ) {
-    return Padding(
+  ) => Padding(
       padding: const EdgeInsets.only(bottom: GfTokens.spacingMd),
       child: Row(
         children: [
@@ -758,5 +745,4 @@ class _VehicleDetailsPageState extends ConsumerState<VehicleDetailsPage>
         ],
       ),
     );
-  }
 }

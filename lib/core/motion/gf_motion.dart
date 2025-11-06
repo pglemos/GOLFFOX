@@ -21,8 +21,7 @@ class GfMotion {
     required Widget child,
     Duration duration = medium,
     Curve curve = easeInOut,
-  }) {
-    return CustomTransitionPage<T>(
+  }) => CustomTransitionPage<T>(
       child: child,
       transitionDuration: duration,
       reverseTransitionDuration: duration,
@@ -38,17 +37,10 @@ class GfMotion {
         );
       },
     );
-  }
 }
 
 /// Wrapper that adds subtle hover/press scale + shadow micro-interactions
 class GfHoverScale extends StatefulWidget {
-  final Widget child;
-  final double hoverScale;
-  final double pressScale;
-  final Duration duration;
-  final EdgeInsets? padding;
-  final bool enableShadow;
 
   const GfHoverScale({
     super.key,
@@ -59,6 +51,12 @@ class GfHoverScale extends StatefulWidget {
     this.padding,
     this.enableShadow = false,
   });
+  final Widget child;
+  final double hoverScale;
+  final double pressScale;
+  final Duration duration;
+  final EdgeInsets? padding;
+  final bool enableShadow;
 
   @override
   State<GfHoverScale> createState() => _GfHoverScaleState();
@@ -70,7 +68,7 @@ class _GfHoverScaleState extends State<GfHoverScale> {
 
   @override
   Widget build(BuildContext context) {
-    final double targetScale =
+    final targetScale =
         _pressing ? widget.pressScale : (_hovering ? widget.hoverScale : 1.0);
 
     final child = AnimatedScale(
@@ -87,7 +85,6 @@ class _GfHoverScaleState extends State<GfHoverScale> {
                   BoxShadow(
                     color: Colors.black.withOpacity(0.06),
                     blurRadius: 12,
-                    spreadRadius: 0,
                     offset: const Offset(0, 8),
                   ),
                 ],

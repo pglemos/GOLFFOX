@@ -31,10 +31,10 @@ class UiCatalogPage extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          Wrap(
+          const Wrap(
             spacing: 10,
             runSpacing: 10,
-            children: const [
+            children: [
               GxCard(child: Text('Card padrao')),
               GxBadge('Badge'),
               GxStatusPill(label: 'Ativo', status: GxStatus.success),
@@ -45,14 +45,14 @@ class UiCatalogPage extends StatelessWidget {
             GxButton('Primario',
                 onPressed: () =>
                     showGxToast(context, 'Ok', type: GxToastType.success)),
-            GxButton('Secundario', primary: false),
-            GxButton('Loading', loading: true),
+            const GxButton('Secundario', primary: false),
+            const GxButton('Loading', loading: true),
           ]),
           const SizedBox(height: 12),
           const GxInput(label: 'Input', hint: 'Digite algo', icon: Icons.edit),
           const SizedBox(height: 12),
           Row(children: [
-            Expanded(child: GxSearchField(hint: 'Buscar item...')),
+            const Expanded(child: GxSearchField(hint: 'Buscar item...')),
             const SizedBox(width: 10),
             GxSegmented(
                 values: const ['Dia', 'Semana', 'Mes'],
@@ -61,7 +61,7 @@ class UiCatalogPage extends StatelessWidget {
                 onChanged: (_) {}),
           ]),
           const SizedBox(height: 12),
-          Row(children: const [
+          const Row(children: [
             Expanded(
                 child: GxKpiTile(
                     title: 'Entregas',
@@ -73,14 +73,14 @@ class UiCatalogPage extends StatelessWidget {
                 child: GxKpiTile(title: 'Atrasos', value: '5', delta: -1.1)),
           ]),
           const SizedBox(height: 12),
-          SizedBox(
+          const SizedBox(
             height: 160,
             child: GxLineChart(points: [
-              const FlSpot(0, 1),
-              const FlSpot(1, 1.5),
-              const FlSpot(2, 1.2),
-              const FlSpot(3, 2.2),
-              const FlSpot(4, 1.8),
+              FlSpot(0, 1),
+              FlSpot(1, 1.5),
+              FlSpot(2, 1.2),
+              FlSpot(3, 2.2),
+              FlSpot(4, 1.8),
             ]),
           ),
           const SizedBox(height: 12),
@@ -102,29 +102,28 @@ class UiCatalogPage extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
               child: GxMap(
                 center: const LatLng(-23.5505, -46.6333),
-                zoom: 12,
                 legend: GxMapLegend.simple(),
               ),
             ),
           ),
           const SizedBox(height: 12),
-          GxTable(
-            columns: const ['ID', 'Status', 'Notas'],
+          const GxTable(
+            columns: ['ID', 'Status', 'Notas'],
             rows: [
               [
-                const Text('TR-001'),
-                const Text('inProgress'),
-                const Text('Rota Centro')
+                Text('TR-001'),
+                Text('inProgress'),
+                Text('Rota Centro')
               ],
               [
-                const Text('TR-002'),
-                const Text('scheduled'),
-                const Text('Rota Sul')
+                Text('TR-002'),
+                Text('scheduled'),
+                Text('Rota Sul')
               ],
             ],
           ),
           const SizedBox(height: 12),
-          Row(children: const [
+          const Row(children: [
             Expanded(child: GxSkeleton(height: 18)),
             SizedBox(width: 10),
             Expanded(child: GxSkeleton(height: 18)),

@@ -7,16 +7,15 @@ import '../../../models/driver.dart';
 import '../../../widgets/gx_card.dart';
 
 class DriverInfoCard extends StatelessWidget {
-  final Driver driver;
 
   const DriverInfoCard({
     super.key,
     required this.driver,
   });
+  final Driver driver;
 
   @override
-  Widget build(BuildContext context) {
-    return Column(
+  Widget build(BuildContext context) => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Informacoes Pessoais
@@ -185,14 +184,12 @@ class DriverInfoCard extends StatelessWidget {
         ),
       ],
     );
-  }
 
   Widget _buildSection({
     required String title,
     required IconData icon,
     required List<Widget> children,
-  }) {
-    return GxCard(
+  }) => GxCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -218,14 +215,12 @@ class DriverInfoCard extends StatelessWidget {
         ],
       ),
     ).animate().fadeIn().slideX(begin: -0.1);
-  }
 
   Widget _buildInfoRow(
     String label,
     String value, {
     Widget? trailing,
-  }) {
-    return Padding(
+  }) => Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -263,10 +258,8 @@ class DriverInfoCard extends StatelessWidget {
         ],
       ),
     );
-  }
 
-  Widget _buildCertificationItem(DriverCertification certification) {
-    return Container(
+  Widget _buildCertificationItem(DriverCertification certification) => Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -307,10 +300,8 @@ class DriverInfoCard extends StatelessWidget {
         ],
       ),
     );
-  }
 
-  Widget _buildAlertBadge(String text, Color color) {
-    return Container(
+  Widget _buildAlertBadge(String text, Color color) => Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
@@ -327,7 +318,6 @@ class DriverInfoCard extends StatelessWidget {
         ),
       ),
     );
-  }
 
   String _formatDuration(Duration duration) {
     final hours = duration.inHours;

@@ -4,9 +4,6 @@ import '../../../core/theme/gf_tokens.dart';
 import '../../../models/vehicle_status.dart' as vs;
 
 class MapLegend extends StatelessWidget {
-  final bool isExpanded;
-  final VoidCallback? onToggle;
-  final Map<vs.VehicleStatusType, int>? statusCounts;
 
   const MapLegend({
     super.key,
@@ -14,10 +11,12 @@ class MapLegend extends StatelessWidget {
     this.onToggle,
     this.statusCounts,
   });
+  final bool isExpanded;
+  final VoidCallback? onToggle;
+  final Map<vs.VehicleStatusType, int>? statusCounts;
 
   @override
-  Widget build(BuildContext context) {
-    return Positioned(
+  Widget build(BuildContext context) => Positioned(
       bottom: 20,
       right: 20,
       child: Material(
@@ -43,10 +42,8 @@ class MapLegend extends StatelessWidget {
         ),
       ),
     );
-  }
 
-  Widget _buildHeader() {
-    return InkWell(
+  Widget _buildHeader() => InkWell(
       onTap: onToggle,
       borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
       child: Container(
@@ -84,10 +81,8 @@ class MapLegend extends StatelessWidget {
         ),
       ),
     );
-  }
 
-  Widget _buildContent() {
-    return Container(
+  Widget _buildContent() => Container(
       padding: const EdgeInsets.all(12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -130,7 +125,6 @@ class MapLegend extends StatelessWidget {
         ],
       ),
     );
-  }
 
   Widget _buildStatusItem(vs.VehicleStatusType status) {
     final count = statusCounts?[status] ?? 0;
@@ -193,8 +187,7 @@ class MapLegend extends StatelessWidget {
     required IconData icon,
     required Color color,
     required String label,
-  }) {
-    return Padding(
+  }) => Padding(
       padding: const EdgeInsets.only(bottom: 6),
       child: Row(
         children: [
@@ -214,19 +207,18 @@ class MapLegend extends StatelessWidget {
         ],
       ),
     );
-  }
 }
 
 /// Widget compacto da legenda para quando esta minimizada
 class CompactMapLegend extends StatelessWidget {
-  final VoidCallback? onExpand;
-  final Map<vs.VehicleStatusType, int>? statusCounts;
 
   const CompactMapLegend({
     super.key,
     this.onExpand,
     this.statusCounts,
   });
+  final VoidCallback? onExpand;
+  final Map<vs.VehicleStatusType, int>? statusCounts;
 
   @override
   Widget build(BuildContext context) {

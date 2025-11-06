@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 class GxMapLegend extends StatelessWidget {
-  final List<GxLegendItem> items;
   const GxMapLegend({super.key, required this.items});
 
   factory GxMapLegend.simple({Color? route, Color? stop, Color? vehicle}) {
@@ -13,6 +12,7 @@ class GxMapLegend extends StatelessWidget {
       ],
     );
   }
+  final List<GxLegendItem> items;
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +45,7 @@ class GxMapLegend extends StatelessWidget {
 }
 
 class GxLegendItem {
+  const GxLegendItem(this.label, {required this.color});
   final String label;
   final Color color;
-  const GxLegendItem(this.label, {required this.color});
 }

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:golffox/services/supabase_service.dart';
+import '../../services/supabase_service.dart';
 import 'driver_route_screen.dart';
 
 class DriverChecklistScreen extends StatefulWidget {
@@ -75,8 +75,7 @@ class _DriverChecklistScreenState extends State<DriverChecklistScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       appBar: AppBar(title: const Text('Checklist do Veículo')),
       body: Form(
         key: _formKey,
@@ -130,6 +129,5 @@ class _DriverChecklistScreenState extends State<DriverChecklistScreen> {
         ),
       ),
     );
-  }
 }
 

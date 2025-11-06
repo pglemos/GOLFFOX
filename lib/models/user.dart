@@ -6,16 +6,6 @@ typedef Json = Map<String, dynamic>;
 
 @immutable
 class User {
-  final String id;
-  final String email;
-  final String name;
-
-  /// Valores canonicos: operator | carrier | driver | passenger
-  final String role;
-  final String? companyId;
-  final String? carrierId;
-  final DateTime createdAt;
-  final DateTime updatedAt;
 
   const User({
     required this.id,
@@ -29,19 +19,6 @@ class User {
   })  : assert(id != ''),
         assert(email != ''),
         assert(role != '');
-
-  /* ------------------------- SERIALIZACAO (DB / snake_case) ------------------------- */
-
-  Map<String, dynamic> toJson() => <String, dynamic>{
-        UserFields.id: id,
-        UserFields.email: email,
-        UserFields.name: name,
-        UserFields.role: role,
-        UserFields.companyId: companyId,
-        UserFields.carrierId: carrierId,
-        UserFields.createdAt: createdAt.toIso8601String(),
-        UserFields.updatedAt: updatedAt.toIso8601String(),
-      };
 
   factory User.fromJson(Map<String, dynamic> json) {
     final id = _asString(json[UserFields.id]);
@@ -70,19 +47,6 @@ class User {
     );
   }
 
-  /* ------------------------- SERIALIZACAO (App / camelCase) ------------------------- */
-
-  Map<String, dynamic> toAppJson() => <String, dynamic>{
-        'id': id,
-        'email': email,
-        'name': name,
-        'role': role,
-        'companyId': companyId,
-        'carrierId': carrierId,
-        'createdAt': createdAt.toIso8601String(),
-        'updatedAt': updatedAt.toIso8601String(),
-      };
-
   factory User.fromAppJson(Map<String, dynamic> json) {
     final id = _asString(json['id']);
     final email = _asString(json['email']);
@@ -109,6 +73,42 @@ class User {
       updatedAt: _asDateTime(json['updatedAt']) ?? DateTime.now(),
     );
   }
+  final String id;
+  final String email;
+  final String name;
+
+  /// Valores canonicos: operator | carrier | driver | passenger
+  final String role;
+  final String? companyId;
+  final String? carrierId;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+
+  /* ------------------------- SERIALIZACAO (DB / snake_case) ------------------------- */
+
+  Map<String, dynamic> toJson() => <String, dynamic>{
+        UserFields.id: id,
+        UserFields.email: email,
+        UserFields.name: name,
+        UserFields.role: role,
+        UserFields.companyId: companyId,
+        UserFields.carrierId: carrierId,
+        UserFields.createdAt: createdAt.toIso8601String(),
+        UserFields.updatedAt: updatedAt.toIso8601String(),
+      };
+
+  /* ------------------------- SERIALIZACAO (App / camelCase) ------------------------- */
+
+  Map<String, dynamic> toAppJson() => <String, dynamic>{
+        'id': id,
+        'email': email,
+        'name': name,
+        'role': role,
+        'companyId': companyId,
+        'carrierId': carrierId,
+        'createdAt': createdAt.toIso8601String(),
+        'updatedAt': updatedAt.toIso8601String(),
+      };
 
   /* ------------------------- Helpers p/ Supabase (INSERT/UPDATE) ------------------------- */
 
@@ -263,9 +263,9 @@ class User {
 
   /* --------------------------------- HELPERS --------------------------------- */
 
-  static String? _asString(dynamic v) => v?.toString();
+  static String? _asString(v) => v?.toString();
 
-  static DateTime? _asDateTime(dynamic v) {
+  static DateTime? _asDateTime(v) {
     if (v == null) return null;
     if (v is DateTime) return v;
     if (v is int) {
@@ -281,8 +281,9 @@ class User {
   static String _normalizeRole(String r) {
     final x = r.trim().toLowerCase();
     if (x == 'operator' || x == 'ops') return UserRoles.operator;
-    if (x == 'admin' || x == 'administrador')
+    if (x == 'admin' || x == 'administrador') {
       return UserRoles.operator; // Admin é tratado como operator
+    }
     if (x == 'carrier' || x == 'transportadora') return UserRoles.carrier;
     if (x == 'driver' || x == 'motorista') return UserRoles.driver;
     if (x == 'passenger' || x == 'passageiro') return UserRoles.passenger;

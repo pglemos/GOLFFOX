@@ -260,8 +260,7 @@ class RouteTransitions {
     BuildContext context,
     GoRouterState state,
     Widget child,
-  ) {
-    return CustomTransitionPage<T>(
+  ) => CustomTransitionPage<T>(
       key: state.pageKey,
       child: child,
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
@@ -279,15 +278,13 @@ class RouteTransitions {
         );
       },
     );
-  }
 
   /// Fade transition for authentication flows
   static Page<T> fadeTransition<T extends Object?>(
     BuildContext context,
     GoRouterState state,
     Widget child,
-  ) {
-    return CustomTransitionPage<T>(
+  ) => CustomTransitionPage<T>(
       key: state.pageKey,
       child: child,
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
@@ -297,15 +294,13 @@ class RouteTransitions {
         );
       },
     );
-  }
 
   /// Scale transition for modal-like pages
   static Page<T> scaleTransition<T extends Object?>(
     BuildContext context,
     GoRouterState state,
     Widget child,
-  ) {
-    return CustomTransitionPage<T>(
+  ) => CustomTransitionPage<T>(
       key: state.pageKey,
       child: child,
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
@@ -323,5 +318,4 @@ class RouteTransitions {
         );
       },
     );
-  }
 }

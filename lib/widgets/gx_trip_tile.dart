@@ -2,11 +2,6 @@ import 'package:flutter/material.dart';
 import 'gx_status_pill.dart';
 
 class GxTripTile extends StatelessWidget {
-  final String title;
-  final String subtitle;
-  final String meta;
-  final GxStatus status;
-  final VoidCallback? onTap;
 
   const GxTripTile({
     super.key,
@@ -16,6 +11,11 @@ class GxTripTile extends StatelessWidget {
     this.status = GxStatus.neutral,
     this.onTap,
   });
+  final String title;
+  final String subtitle;
+  final String meta;
+  final GxStatus status;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {

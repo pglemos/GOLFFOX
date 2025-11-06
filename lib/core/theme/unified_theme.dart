@@ -48,32 +48,32 @@ class GolfFoxTheme {
   // ========================================
   // ESPACAMENTOS
   // ========================================
-  static const double space1 = 4.0;
-  static const double space2 = 8.0;
-  static const double space3 = 12.0;
-  static const double space4 = 16.0;
-  static const double space5 = 20.0;
-  static const double space6 = 24.0;
-  static const double space8 = 32.0;
-  static const double space10 = 40.0;
-  static const double space12 = 48.0;
-  static const double space16 = 64.0;
+  static const double space1 = 4;
+  static const double space2 = 8;
+  static const double space3 = 12;
+  static const double space4 = 16;
+  static const double space5 = 20;
+  static const double space6 = 24;
+  static const double space8 = 32;
+  static const double space10 = 40;
+  static const double space12 = 48;
+  static const double space16 = 64;
 
   // ========================================
   // BORDER RADIUS
   // ========================================
-  static const double radiusSmall = 8.0;
-  static const double radiusMedium = 12.0;
-  static const double radiusLarge = 16.0;
-  static const double radiusXLarge = 24.0;
+  static const double radiusSmall = 8;
+  static const double radiusMedium = 12;
+  static const double radiusLarge = 16;
+  static const double radiusXLarge = 24;
 
   // ========================================
   // ELEVACOES
   // ========================================
-  static const double elevationLow = 2.0;
-  static const double elevationMedium = 4.0;
-  static const double elevationHigh = 8.0;
-  static const double elevationXHigh = 16.0;
+  static const double elevationLow = 2;
+  static const double elevationMedium = 4;
+  static const double elevationHigh = 8;
+  static const double elevationXHigh = 16;
 
   // ========================================
   // TEMA CLARO
@@ -81,7 +81,6 @@ class GolfFoxTheme {
   static ThemeData get lightTheme {
     final colorScheme = ColorScheme.fromSeed(
       seedColor: primaryOrange,
-      brightness: Brightness.light,
       primary: primaryOrange,
       secondary: primaryBlue,
       surface: surfaceLight,
@@ -132,8 +131,7 @@ class GolfFoxTheme {
   // ========================================
   // COMPONENTES DE TEMA
   // ========================================
-  static TextTheme _buildTextTheme(ColorScheme colorScheme) {
-    return GoogleFonts.interTextTheme().copyWith(
+  static TextTheme _buildTextTheme(ColorScheme colorScheme) => GoogleFonts.interTextTheme().copyWith(
       displayLarge: GoogleFonts.inter(
         fontSize: 32,
         fontWeight: FontWeight.w700,
@@ -175,11 +173,9 @@ class GolfFoxTheme {
         color: textSecondary,
       ),
     );
-  }
 
   static ElevatedButtonThemeData _buildElevatedButtonTheme(
-      ColorScheme colorScheme) {
-    return ElevatedButtonThemeData(
+      ColorScheme colorScheme) => ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
         backgroundColor: colorScheme.primary,
         foregroundColor: colorScheme.onPrimary,
@@ -197,11 +193,9 @@ class GolfFoxTheme {
         ),
       ),
     );
-  }
 
   static InputDecorationTheme _buildInputDecorationTheme(
-      ColorScheme colorScheme) {
-    return InputDecorationTheme(
+      ColorScheme colorScheme) => InputDecorationTheme(
       filled: true,
       fillColor: colorScheme.surface,
       border: OutlineInputBorder(
@@ -229,20 +223,16 @@ class GolfFoxTheme {
         color: textSecondary,
       ),
     );
-  }
 
-  static CardThemeData _buildCardTheme(ColorScheme colorScheme) {
-    return CardThemeData(
+  static CardThemeData _buildCardTheme(ColorScheme colorScheme) => CardThemeData(
       elevation: elevationLow,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(radiusLarge),
       ),
       color: colorScheme.surface,
     );
-  }
 
-  static AppBarTheme _buildAppBarTheme(ColorScheme colorScheme) {
-    return AppBarTheme(
+  static AppBarTheme _buildAppBarTheme(ColorScheme colorScheme) => AppBarTheme(
       backgroundColor: colorScheme.surface,
       foregroundColor: colorScheme.onSurface,
       elevation: 0,
@@ -253,23 +243,18 @@ class GolfFoxTheme {
         color: colorScheme.onSurface,
       ),
     );
-  }
 
   // ========================================
   // UTILITARIOS RESPONSIVOS
   // ========================================
-  static bool isMobile(BuildContext context) {
-    return MediaQuery.of(context).size.width < mobileBreakpoint;
-  }
+  static bool isMobile(BuildContext context) => MediaQuery.of(context).size.width < mobileBreakpoint;
 
   static bool isTablet(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     return width >= mobileBreakpoint && width < desktopBreakpoint;
   }
 
-  static bool isDesktop(BuildContext context) {
-    return MediaQuery.of(context).size.width >= desktopBreakpoint;
-  }
+  static bool isDesktop(BuildContext context) => MediaQuery.of(context).size.width >= desktopBreakpoint;
 
   static double getResponsivePadding(BuildContext context) {
     if (isMobile(context)) return space4;

@@ -8,16 +8,15 @@ import '../../../widgets/gx_card.dart';
 import '../../../widgets/gx_empty.dart';
 
 class DriverRatingCard extends StatelessWidget {
-  final Driver driver;
 
   const DriverRatingCard({
     super.key,
     required this.driver,
   });
+  final Driver driver;
 
   @override
-  Widget build(BuildContext context) {
-    return Column(
+  Widget build(BuildContext context) => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Resumo das Avaliacoes
@@ -34,10 +33,8 @@ class DriverRatingCard extends StatelessWidget {
         _buildRatingsList(),
       ],
     );
-  }
 
-  Widget _buildRatingSummary() {
-    return GxCard(
+  Widget _buildRatingSummary() => GxCard(
       child: Column(
         children: [
           Row(
@@ -141,10 +138,8 @@ class DriverRatingCard extends StatelessWidget {
         ],
       ),
     ).animate().fadeIn().slideY(begin: -0.1);
-  }
 
-  Widget _buildRatingDistribution() {
-    return GxCard(
+  Widget _buildRatingDistribution() => GxCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -172,11 +167,10 @@ class DriverRatingCard extends StatelessWidget {
         ],
       ),
     ).animate().fadeIn(delay: 100.ms).slideY(begin: -0.1);
-  }
 
   Widget _buildRatingsList() {
     if (driver.ratings.isEmpty) {
-      return GxCard(
+      return const GxCard(
         child: GxEmpty(
           icon: Icons.star_outline,
           title: 'Nenhuma Avaliacao',
@@ -191,10 +185,10 @@ class DriverRatingCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.reviews,
                 size: 20,
-                color: const Color(GfTokens.colorPrimary),
+                color: Color(GfTokens.colorPrimary),
               ),
               const SizedBox(width: 8),
               Text(
@@ -211,8 +205,8 @@ class DriverRatingCard extends StatelessWidget {
           // Lista de avaliacoes (limitada as 10 mais recentes)
           ...driver.ratings
               .take(10)
-              .map((rating) => _buildRatingItem(rating))
-              .toList(),
+              .map(_buildRatingItem)
+              ,
 
           if (driver.ratings.length > 10) ...[
             const SizedBox(height: 16),
@@ -223,7 +217,7 @@ class DriverRatingCard extends StatelessWidget {
                 },
                 child: Text(
                   'Ver todas as ${driver.ratings.length} avaliacoes',
-                  style: TextStyle(color: const Color(GfTokens.colorPrimary)),
+                  style: const TextStyle(color: Color(GfTokens.colorPrimary)),
                 ),
               ),
             ),
@@ -326,10 +320,10 @@ class DriverRatingCard extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 4),
-          Icon(
+          const Icon(
             Icons.star,
             size: 16,
-            color: const Color(GfTokens.colorWarning),
+            color: Color(GfTokens.colorWarning),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -367,8 +361,7 @@ class DriverRatingCard extends StatelessWidget {
     );
   }
 
-  Widget _buildRatingItem(DriverRating rating) {
-    return Container(
+  Widget _buildRatingItem(DriverRating rating) => Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -445,9 +438,6 @@ class DriverRatingCard extends StatelessWidget {
         ],
       ),
     );
-  }
 
-  int _getRatingCount(int stars) {
-    return driver.ratings.where((rating) => rating.rating == stars).length;
-  }
+  int _getRatingCount(int stars) => driver.ratings.where((rating) => rating.rating == stars).length;
 }

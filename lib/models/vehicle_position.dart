@@ -46,19 +46,6 @@ extension VehicleStatusExtension on VehicleStatus {
 }
 
 class VehiclePosition {
-  final String id;
-  final String vehicleId;
-  final String licensePlate;
-  final String driverName;
-  final LatLng position;
-  final VehicleStatus status;
-  final double? speed;
-  final double? heading;
-  final DateTime lastUpdate;
-  final String? routeId;
-  final String? routeName;
-  final int? passengerCount;
-  final int? capacity;
 
   const VehiclePosition({
     required this.id,
@@ -99,9 +86,21 @@ class VehiclePosition {
       capacity: json['capacity'] as int?,
     );
   }
+  final String id;
+  final String vehicleId;
+  final String licensePlate;
+  final String driverName;
+  final LatLng position;
+  final VehicleStatus status;
+  final double? speed;
+  final double? heading;
+  final DateTime lastUpdate;
+  final String? routeId;
+  final String? routeName;
+  final int? passengerCount;
+  final int? capacity;
 
-  Map<String, dynamic> toJson() {
-    return {
+  Map<String, dynamic> toJson() => {
       'id': id,
       'vehicle_id': vehicleId,
       'license_plate': licensePlate,
@@ -117,7 +116,6 @@ class VehiclePosition {
       'passenger_count': passengerCount,
       'capacity': capacity,
     };
-  }
 
   VehiclePosition copyWith({
     String? id,
@@ -133,8 +131,7 @@ class VehiclePosition {
     String? routeName,
     int? passengerCount,
     int? capacity,
-  }) {
-    return VehiclePosition(
+  }) => VehiclePosition(
       id: id ?? this.id,
       vehicleId: vehicleId ?? this.vehicleId,
       licensePlate: licensePlate ?? this.licensePlate,
@@ -149,7 +146,6 @@ class VehiclePosition {
       passengerCount: passengerCount ?? this.passengerCount,
       capacity: capacity ?? this.capacity,
     );
-  }
 
   bool get isOnline => DateTime.now().difference(lastUpdate).inMinutes < 5;
 
@@ -161,7 +157,7 @@ class VehiclePosition {
   }
 
   double get occupancyPercentage {
-    if (passengerCount == null || capacity == null || capacity == 0) return 0.0;
+    if (passengerCount == null || capacity == null || capacity == 0) return 0;
     return (passengerCount! / capacity!).clamp(0.0, 1.0);
   }
 }

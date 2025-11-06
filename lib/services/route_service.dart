@@ -11,29 +11,17 @@ import '../services/supabase_service.dart';
 import '../services/map_service.dart';
 
 // Providers
-final routeServiceProvider = Provider<RouteService>((ref) {
-  return RouteService(ref.read(supabaseServiceProvider));
-});
+final routeServiceProvider = Provider<RouteService>((ref) => RouteService(ref.read(supabaseServiceProvider)));
 
-final routesStreamProvider = StreamProvider<List<BusRoute>>((ref) {
-  return ref.read(routeServiceProvider).getRoutesStream();
-});
+final routesStreamProvider = StreamProvider<List<BusRoute>>((ref) => ref.read(routeServiceProvider).getRoutesStream());
 
-final activeRoutesProvider = Provider<AsyncValue<List<BusRoute>>>((ref) {
-  return ref.watch(routesStreamProvider).whenData(
+final activeRoutesProvider = Provider<AsyncValue<List<BusRoute>>>((ref) => ref.watch(routesStreamProvider).whenData(
         (routes) => routes.where((route) => route.isActive).toList(),
-      );
-});
+      ));
 
-final routeByIdProvider = FutureProvider.family<BusRoute?, String>((ref, id) async {
-  return ref.read(routeServiceProvider).getRouteById(id);
-});
+final routeByIdProvider = FutureProvider.family<BusRoute?, String>((ref, id) async => ref.read(routeServiceProvider).getRouteById(id));
 
 class RouteOptimizationResult {
-  final List<RouteStop> optimizedStops;
-  final double totalDistance;
-  final Duration estimatedDuration;
-  final List<String> optimizationNotes;
 
   const RouteOptimizationResult({
     required this.optimizedStops,
@@ -41,20 +29,22 @@ class RouteOptimizationResult {
     required this.estimatedDuration,
     required this.optimizationNotes,
   });
+  final List<RouteStop> optimizedStops;
+  final double totalDistance;
+  final Duration estimatedDuration;
+  final List<String> optimizationNotes;
 }
 
 class RouteService {
+
+  RouteService(this._supabaseService);
   final SupabaseService _supabaseService;
   final Distance _distance = const Distance();
 
-  RouteService(this._supabaseService);
-
   // Stream de rotas
-  Stream<List<BusRoute>> getRoutesStream() {
-    return _supabaseService.client.from('routes').stream(primaryKey: [
+  Stream<List<BusRoute>> getRoutesStream() => _supabaseService.client.from('routes').stream(primaryKey: [
       'id'
     ]).map((data) => data.map((json) => BusRoute.fromJson(json)).toList());
-  }
 
   // Buscar todas as rotas
   Future<List<BusRoute>> getRoutes({
@@ -63,7 +53,7 @@ class RouteService {
     String? driverId,
   }) async {
     try {
-      var query = _supabaseService.client.from('routes').select('*');
+      var query = _supabaseService.client.from('routes').select();
 
       if (status != null) {
         query = query.eq('status', status.name);
@@ -76,7 +66,7 @@ class RouteService {
       }
 
       final response = await query.order('created_at', ascending: false);
-      return response.map((json) => BusRoute.fromJson(json)).toList();
+      return response.map(BusRoute.fromJson).toList();
     } catch (e) {
       // Retornar dados simulados em caso de erro
       return _generateMockRoutes();
@@ -88,7 +78,7 @@ class RouteService {
     try {
       final response = await _supabaseService.client
           .from('routes')
-          .select('*')
+          .select()
           .eq('id', id)
           .single();
 
@@ -165,7 +155,7 @@ class RouteService {
       ));
 
       // Adicionar pontos otimizados
-      for (int i = 0; i < optimization.optimizedStops.length; i++) {
+      for (var i = 0; i < optimization.optimizedStops.length; i++) {
         final stop = optimization.optimizedStops[i];
         final estimatedTime = startTime.add(
           Duration(minutes: (i + 1) * 15), // 15 min entre paradas
@@ -252,7 +242,7 @@ class RouteService {
     final optimizedOrder = <LatLng>[];
 
     // Comecar do ponto mais ao norte (ou criterio personalizado)
-    LatLng current =
+    var current =
         unvisited.reduce((a, b) => a.latitude > b.latitude ? a : b);
 
     optimizedOrder.add(current);
@@ -263,8 +253,8 @@ class RouteService {
 
     // Algoritmo do vizinho mais proximo
     while (unvisited.isNotEmpty) {
-      LatLng nearest = unvisited.first;
-      double minDistance = _distance.as(LengthUnit.Kilometer, current, nearest);
+      var nearest = unvisited.first;
+      var minDistance = _distance.as(LengthUnit.Kilometer, current, nearest);
 
       for (final point in unvisited) {
         final dist = _distance.as(LengthUnit.Kilometer, current, point);
@@ -285,15 +275,13 @@ class RouteService {
         'Distancia total reduzida em ~${(waypoints.length * 0.15).toStringAsFixed(1)}%');
 
     // Converter para RouteStop
-    final optimizedStops = optimizedOrder.asMap().entries.map((entry) {
-      return RouteStop(
+    final optimizedStops = optimizedOrder.asMap().entries.map((entry) => RouteStop(
         id: 'optimized_${entry.key}',
         name: 'Parada Otimizada ${entry.key + 1}',
         position: entry.value,
         type: StopType.waypoint,
         order: entry.key,
-      );
-    }).toList();
+      )).toList();
 
     // Estimar duracao (velocidade media de 30 km/h + tempo de parada)
     final travelTime = Duration(minutes: (totalDistance / 30 * 60).round());
@@ -320,7 +308,7 @@ class RouteService {
       updatedAt: DateTime.now(),
     );
 
-    return await updateRoute(updatedRoute);
+    return updateRoute(updatedRoute);
   }
 
   // Completar parada
@@ -357,10 +345,10 @@ class RouteService {
         endTime: DateTime.now(),
         actualDuration: DateTime.now().difference(route.startTime!),
       );
-      return await updateRoute(finalRoute);
+      return updateRoute(finalRoute);
     }
 
-    return await updateRoute(updatedRoute);
+    return updateRoute(updatedRoute);
   }
 
   // Cancelar rota
@@ -374,7 +362,7 @@ class RouteService {
       updatedAt: DateTime.now(),
     );
 
-    return await updateRoute(updatedRoute);
+    return updateRoute(updatedRoute);
   }
 
   // Calcular ETA para proxima parada
@@ -457,7 +445,7 @@ class RouteService {
     const baseLat = -23.5505;
     const baseLng = -46.6333;
 
-    for (int i = 0; i < count; i++) {
+    for (var i = 0; i < count; i++) {
       final random = Random();
       final lat = baseLat + (random.nextDouble() - 0.5) * 0.1;
       final lng = baseLng + (random.nextDouble() - 0.5) * 0.1;
@@ -479,7 +467,7 @@ class RouteService {
             ? 'Garagem - Saida'
             : i == count - 1
                 ? 'Garagem - Retorno'
-                : 'Parada ${i}',
+                : 'Parada $i',
         description: type == StopType.depot ? 'Terminal' : 'Ponto de parada',
         position: LatLng(lat, lng),
         type: type,

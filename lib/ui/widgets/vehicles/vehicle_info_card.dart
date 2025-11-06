@@ -9,16 +9,15 @@ import '../../../core/theme/gf_tokens.dart';
 import '../../../models/vehicle.dart';
 
 class VehicleInfoCard extends StatelessWidget {
-  final Vehicle vehicle;
 
   const VehicleInfoCard({
     super.key,
     required this.vehicle,
   });
+  final Vehicle vehicle;
 
   @override
-  Widget build(BuildContext context) {
-    return Card(
+  Widget build(BuildContext context) => Card(
       child: Padding(
         padding: const EdgeInsets.all(GfTokens.spacingMd),
         child: Column(
@@ -146,10 +145,8 @@ class VehicleInfoCard extends StatelessWidget {
         ),
       ),
     ).animate().fadeIn(duration: 300.ms).slideY(begin: 0.1, end: 0);
-  }
 
-  Widget _buildInfoItem(String label, String value, IconData icon) {
-    return Column(
+  Widget _buildInfoItem(String label, String value, IconData icon) => Column(
       children: [
         Icon(
           icon,
@@ -176,7 +173,6 @@ class VehicleInfoCard extends StatelessWidget {
         ),
       ],
     );
-  }
 
   Widget _buildFuelInfo() {
     final fuelLevel = vehicle.currentFuelLevel ?? 0.0;
@@ -234,11 +230,11 @@ class VehicleInfoCard extends StatelessWidget {
           ),
           const SizedBox(height: GfTokens.spacingSm),
 
-          Text(
+          const Text(
             'Combustivel',
             style: TextStyle(
               fontSize: GfTokens.fontSizeSm,
-              color: const Color(GfTokens.colorOnSurfaceVariant),
+              color: Color(GfTokens.colorOnSurfaceVariant),
             ),
           ),
         ],
@@ -246,8 +242,7 @@ class VehicleInfoCard extends StatelessWidget {
     );
   }
 
-  Widget _buildCapacityInfo() {
-    return Container(
+  Widget _buildCapacityInfo() => Container(
       padding: const EdgeInsets.all(GfTokens.spacingMd),
       decoration: BoxDecoration(
         color: Color(GfTokens.colorInfo).withValues(alpha: 0.1),
@@ -303,7 +298,6 @@ class VehicleInfoCard extends StatelessWidget {
         ],
       ),
     );
-  }
 
   Widget _buildAlertsSection() {
     final alerts = <Widget>[];
@@ -314,7 +308,7 @@ class VehicleInfoCard extends StatelessWidget {
         'Combustivel baixo',
         '${(vehicle.currentFuelLevel ?? 0).toStringAsFixed(0)}%',
         Icons.local_gas_station,
-        Color(GfTokens.colorWarning),
+        const Color(GfTokens.colorWarning),
       ));
     }
 
@@ -324,7 +318,7 @@ class VehicleInfoCard extends StatelessWidget {
         'Manutencao necessaria',
         'Verificar agendamento',
         Icons.build,
-        Color(GfTokens.colorError),
+        const Color(GfTokens.colorError),
       ));
     }
 
@@ -334,7 +328,7 @@ class VehicleInfoCard extends StatelessWidget {
         'Documentos vencendo',
         'Verificar vencimentos',
         Icons.description,
-        Color(GfTokens.colorWarning),
+        const Color(GfTokens.colorWarning),
       ));
     }
 
@@ -343,12 +337,12 @@ class VehicleInfoCard extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        const Text(
           'Alertas',
           style: TextStyle(
             fontSize: GfTokens.fontSizeLg,
             fontWeight: FontWeight.w600,
-            color: const Color(GfTokens.colorOnSurface),
+            color: Color(GfTokens.colorOnSurface),
           ),
         ),
         const SizedBox(height: GfTokens.spacingSm),
@@ -358,8 +352,7 @@ class VehicleInfoCard extends StatelessWidget {
   }
 
   Widget _buildAlert(
-      String title, String subtitle, IconData icon, Color color) {
-    return Container(
+      String title, String subtitle, IconData icon, Color color) => Container(
       margin: const EdgeInsets.only(bottom: GfTokens.spacingSm),
       padding: const EdgeInsets.all(GfTokens.spacingSm),
       decoration: BoxDecoration(
@@ -396,13 +389,10 @@ class VehicleInfoCard extends StatelessWidget {
         ],
       ),
     );
-  }
 
-  bool _hasAlerts() {
-    return (vehicle.currentFuelLevel ?? 0) < 20 ||
+  bool _hasAlerts() => (vehicle.currentFuelLevel ?? 0) < 20 ||
         vehicle.needsMaintenance ||
         vehicle.documents.hasExpiringDocuments;
-  }
 
   IconData _getVehicleIcon(VehicleType type) {
     switch (type) {
@@ -419,7 +409,5 @@ class VehicleInfoCard extends StatelessWidget {
     }
   }
 
-  String _formatDate(DateTime date) {
-    return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
-  }
+  String _formatDate(DateTime date) => '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
 }

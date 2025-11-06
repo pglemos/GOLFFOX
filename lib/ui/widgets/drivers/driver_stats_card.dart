@@ -10,8 +10,7 @@ import '../../../services/driver_service.dart';
 
 class DriverStatsCard extends StatelessWidget {
   const DriverStatsCard({
-    super.key,
-    required this.stats,
+    required this.stats, super.key,
     this.isLoading = false,
     this.error,
   });
@@ -144,8 +143,7 @@ class _StatTile extends StatelessWidget {
   final Color color;
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
+  Widget build(BuildContext context) => Container(
       padding: const EdgeInsets.symmetric(
         horizontal: GfTokens.spacingSm,
         vertical: GfTokens.spacingSm,
@@ -179,7 +177,6 @@ class _StatTile extends StatelessWidget {
         ],
       ),
     );
-  }
 }
 
 class _InfoTile extends StatelessWidget {
@@ -194,8 +191,7 @@ class _InfoTile extends StatelessWidget {
   final IconData icon;
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
+  Widget build(BuildContext context) => Container(
       padding: const EdgeInsets.all(GfTokens.spacingSm),
       decoration: BoxDecoration(
         color: const Color(GfTokens.surfaceMuted),
@@ -232,7 +228,6 @@ class _InfoTile extends StatelessWidget {
         ],
       ),
     );
-  }
 }
 
 class _Tag extends StatelessWidget {
@@ -247,8 +242,7 @@ class _Tag extends StatelessWidget {
   final Color color;
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
+  Widget build(BuildContext context) => Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
@@ -270,15 +264,13 @@ class _Tag extends StatelessWidget {
         ],
       ),
     );
-  }
 }
 
 class _LoadingCard extends StatelessWidget {
   const _LoadingCard();
 
   @override
-  Widget build(BuildContext context) {
-    return Card(
+  Widget build(BuildContext context) => Card(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(GfTokens.radiusMd),
         side: const BorderSide(color: Color(GfTokens.colorBorder)),
@@ -298,7 +290,6 @@ class _LoadingCard extends StatelessWidget {
         ),
       ),
     );
-  }
 }
 
 class _ErrorCard extends StatelessWidget {
@@ -307,8 +298,7 @@ class _ErrorCard extends StatelessWidget {
   final String message;
 
   @override
-  Widget build(BuildContext context) {
-    return Card(
+  Widget build(BuildContext context) => Card(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(GfTokens.radiusMd),
         side: const BorderSide(color: Color(GfTokens.colorError)),
@@ -332,5 +322,4 @@ class _ErrorCard extends StatelessWidget {
         ),
       ),
     );
-  }
 }

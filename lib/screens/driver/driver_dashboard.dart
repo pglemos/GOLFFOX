@@ -1,18 +1,18 @@
 // lib/screens/driver/driver_dashboard.dart
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:golffox/models/user.dart';
-import 'package:golffox/models/trip.dart';
-import 'package:golffox/services/supabase_service.dart';
-import 'package:golffox/services/tracking_service.dart';
-import 'package:golffox/services/auth_service.dart';
-import 'package:golffox/core/routing/app_router.dart';
-import 'package:golffox/screens/driver/trip_detail_screen.dart';
-import 'package:golffox/core/theme/gf_tokens.dart';
+import '../../models/user.dart';
+import '../../models/trip.dart';
+import '../../services/supabase_service.dart';
+import '../../services/tracking_service.dart';
+import '../../services/auth_service.dart';
+import '../../core/routing/app_router.dart';
+import 'trip_detail_screen.dart';
+import '../../core/theme/gf_tokens.dart';
 
 class DriverDashboard extends StatefulWidget {
-  final User user;
   const DriverDashboard({super.key, required this.user});
+  final User user;
 
   @override
   State<DriverDashboard> createState() => _DriverDashboardState();
@@ -83,9 +83,9 @@ class _DriverDashboardState extends State<DriverDashboard>
         .from('trips')
         .stream(primaryKey: ['id'])
         .eq('driver_id', widget.user.id)
-        .order('updated_at', ascending: false)
+        .order('updated_at')
         .listen((rows) {
-          final trips = rows.map((e) => Trip.fromJson(e)).toList();
+          final trips = rows.map(Trip.fromJson).toList();
           trips.sort(_compareTrips);
           if (mounted) setState(() => _trips = trips);
         });
@@ -478,10 +478,7 @@ class _StatusChip extends StatelessWidget {
 
 class _ActiveTripCard extends StatelessWidget {
   const _ActiveTripCard(
-      {super.key,
-      required this.trip,
-      required this.onOpen,
-      required this.onAction});
+      {required this.trip, required this.onOpen, required this.onAction, super.key});
   final Trip trip;
   final VoidCallback onOpen;
   final ValueChanged<String> onAction;

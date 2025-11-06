@@ -95,8 +95,7 @@ class DashboardPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildHeader() {
-    return Column(
+  Widget _buildHeader() => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
@@ -121,10 +120,8 @@ class DashboardPage extends ConsumerWidget {
             .slideX(begin: -0.1, end: 0),
       ],
     );
-  }
 
-  Widget _buildKpiSection(AsyncValue<Map<String, int>> metricsAsync) {
-    return Column(
+  Widget _buildKpiSection(AsyncValue<Map<String, int>> metricsAsync) => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
@@ -143,10 +140,8 @@ class DashboardPage extends ConsumerWidget {
         ),
       ],
     );
-  }
 
-  Widget _buildKpiGrid(Map<String, int> metrics) {
-    return LayoutBuilder(
+  Widget _buildKpiGrid(Map<String, int> metrics) => LayoutBuilder(
       builder: (context, constraints) {
         final isWide = constraints.maxWidth > 800;
         final crossAxisCount = isWide ? 4 : 2;
@@ -180,10 +175,8 @@ class DashboardPage extends ConsumerWidget {
         );
       },
     );
-  }
 
-  Widget _buildKpiGridLoading() {
-    return LayoutBuilder(
+  Widget _buildKpiGridLoading() => LayoutBuilder(
       builder: (context, constraints) {
         final isWide = constraints.maxWidth > 800;
         final crossAxisCount = isWide ? 4 : 2;
@@ -208,10 +201,8 @@ class DashboardPage extends ConsumerWidget {
         );
       },
     );
-  }
 
-  Widget _buildKpiGridError() {
-    return Container(
+  Widget _buildKpiGridError() => Container(
       padding: const EdgeInsets.all(GfTokens.space6),
       decoration: BoxDecoration(
         color: const Color(GfTokens.surface),
@@ -245,10 +236,8 @@ class DashboardPage extends ConsumerWidget {
         ],
       ),
     );
-  }
 
-  Widget _buildOccupancyChart() {
-    return Container(
+  Widget _buildOccupancyChart() => Container(
       padding: const EdgeInsets.all(GfTokens.space6),
       decoration: BoxDecoration(
         color: const Color(GfTokens.surface),
@@ -383,10 +372,8 @@ class DashboardPage extends ConsumerWidget {
         .animate()
         .fadeIn(duration: 300.ms, delay: 200.ms)
         .slideY(begin: 0.1, end: 0);
-  }
 
-  Widget _buildQuickActions() {
-    return Column(
+  Widget _buildQuickActions() => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
@@ -429,10 +416,8 @@ class DashboardPage extends ConsumerWidget {
         ),
       ],
     );
-  }
 
-  Widget _buildAlertBanner(AsyncValue<Map<String, int>> metricsAsync) {
-    return metricsAsync.when(
+  Widget _buildAlertBanner(AsyncValue<Map<String, int>> metricsAsync) => metricsAsync.when(
       data: (metrics) {
         final criticalAlerts = metrics['criticalAlerts'] ?? 0;
         if (criticalAlerts > 0) {
@@ -446,10 +431,8 @@ class DashboardPage extends ConsumerWidget {
       loading: () => const SizedBox.shrink(),
       error: (error, stack) => const SizedBox.shrink(),
     );
-  }
 
-  Widget _buildAiInsights() {
-    return Container(
+  Widget _buildAiInsights() => Container(
       padding: const EdgeInsets.all(GfTokens.space6),
       decoration: BoxDecoration(
         color: const Color(GfTokens.surface),
@@ -503,7 +486,6 @@ class DashboardPage extends ConsumerWidget {
         .animate()
         .fadeIn(duration: 300.ms, delay: 400.ms)
         .slideY(begin: 0.1, end: 0);
-  }
 
   // ========================================
   // METODOS DE NAVEGACAO

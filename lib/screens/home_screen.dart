@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:golffox/models/user.dart';
-import 'package:golffox/screens/driver/driver_dashboard.dart';
-import 'package:golffox/screens/passenger/passenger_dashboard.dart';
-import 'package:golffox/screens/operator/operator_dashboard.dart';
-import 'package:golffox/screens/carrier/carrier_dashboard.dart';
-import 'package:golffox/core/theme/gf_tokens.dart';
+import '../models/user.dart';
+import 'driver/driver_dashboard.dart';
+import 'passenger/passenger_dashboard.dart';
+import 'operator/operator_dashboard.dart';
+import 'carrier/carrier_dashboard.dart';
+import '../core/theme/gf_tokens.dart';
 
 /// Papeis suportados na plataforma.
 enum UserRole { operator, carrier, driver, passenger, unknown }
@@ -31,12 +31,10 @@ extension UserRoleParsing on String {
   }
 }
 
-/// Builder de dashboard por papel.
-typedef _DashboardBuilder = Widget Function(User user);
 
 class HomeScreen extends StatefulWidget {
-  final User user;
   const HomeScreen({super.key, required this.user});
+  final User user;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -46,7 +44,7 @@ class _HomeScreenState extends State<HomeScreen> {
   late UserRole _role;
 
   // Mapa centralizado com todos os destinos por papel.
-  late final Map<UserRole, _DashboardBuilder> _builders = {
+  late final Map<UserRole, Widget Function(User)> _builders = {
     UserRole.operator: (u) => OperatorDashboard(user: u),
     UserRole.carrier: (u) => CarrierDashboard(user: u),
     UserRole.driver: (u) => DriverDashboard(user: u),
@@ -56,7 +54,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _role = (widget.user.role).toString().toUserRole();
+    _role = widget.user.role.toString().toUserRole();
   }
 
   @override
@@ -65,7 +63,7 @@ class _HomeScreenState extends State<HomeScreen> {
     // Se o usuario trocou (ou mudou de papel), atualiza e anima a transicao
     if (oldWidget.user.role != widget.user.role) {
       setState(() {
-        _role = (widget.user.role).toString().toUserRole();
+        _role = widget.user.role.toString().toUserRole();
       });
     }
   }
@@ -100,13 +98,13 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 class _UnknownRoleScreen extends StatelessWidget {
-  final User user;
   const _UnknownRoleScreen({required this.user});
+  final User user;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final role = (user.role).toString();
+    final role = user.role.toString();
 
     return Scaffold(
       appBar: AppBar(
@@ -115,7 +113,7 @@ class _UnknownRoleScreen extends StatelessWidget {
       ),
       body: Center(
         child: Padding(
-          padding: const EdgeInsets.all(24.0),
+          padding: const EdgeInsets.all(24),
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 520),
             child: Column(

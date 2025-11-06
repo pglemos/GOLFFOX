@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
 class GxSearchField extends StatelessWidget {
-  final TextEditingController? controller;
-  final ValueChanged<String>? onChanged;
-  final String hint;
 
   const GxSearchField(
       {super.key, this.controller, this.onChanged, this.hint = 'Buscar...'});
+  final TextEditingController? controller;
+  final ValueChanged<String>? onChanged;
+  final String hint;
 
   @override
   Widget build(BuildContext context) {

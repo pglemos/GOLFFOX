@@ -15,9 +15,7 @@ class ErrorHandler {
     if (_initialized) return;
 
     // Capturar erros do Flutter
-    FlutterError.onError = (FlutterErrorDetails details) {
-      _handleFlutterError(details);
-    };
+    FlutterError.onError = _handleFlutterError;
 
     // Capturar erros assíncronos não tratados
     PlatformDispatcher.instance.onError = (error, stack) {

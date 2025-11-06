@@ -16,11 +16,6 @@ enum AppErrorType {
 
 /// Classe base para erros da aplicação
 abstract class AppError implements Exception {
-  final String message;
-  final AppErrorType type;
-  final String? code;
-  final dynamic originalError;
-  final StackTrace? stackTrace;
 
   const AppError({
     required this.message,
@@ -29,6 +24,11 @@ abstract class AppError implements Exception {
     this.originalError,
     this.stackTrace,
   });
+  final String message;
+  final AppErrorType type;
+  final String? code;
+  final dynamic originalError;
+  final StackTrace? stackTrace;
 
   /// Retorna uma mensagem amigável para o usuário
   String get userMessage => message;
@@ -37,9 +37,7 @@ abstract class AppError implements Exception {
   bool get shouldReport => type != AppErrorType.validation;
 
   @override
-  String toString() {
-    return 'AppError{type: $type, message: $message, code: $code}';
-  }
+  String toString() => 'AppError{type: $type, message: $message, code: $code}';
 }
 
 /// Erro de rede
@@ -105,7 +103,6 @@ class AuthorizationError extends AppError {
 
 /// Erro de validação
 class ValidationError extends AppError {
-  final Map<String, List<String>>? fieldErrors;
 
   const ValidationError({
     required super.message,
@@ -114,6 +111,7 @@ class ValidationError extends AppError {
     super.originalError,
     super.stackTrace,
   }) : super(type: AppErrorType.validation);
+  final Map<String, List<String>>? fieldErrors;
 
   @override
   String get userMessage {
@@ -230,7 +228,7 @@ class UnknownError extends AppError {
 
 /// Utilitário para criar erros a partir de exceções
 class ErrorFactory {
-  static AppError fromException(dynamic exception, [StackTrace? stackTrace]) {
+  static AppError fromException(exception, [StackTrace? stackTrace]) {
     if (exception is AppError) {
       return exception;
     }

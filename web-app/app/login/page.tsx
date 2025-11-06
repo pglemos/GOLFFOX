@@ -20,6 +20,9 @@ function LoginContent() {
   const [emailValid, setEmailValid] = useState(false)
   const [passwordValid, setPasswordValid] = useState(false)
   const formRef = useRef<HTMLDivElement | null>(null)
+  const passwordInputRef = useRef<HTMLInputElement | null>(null)
+  const [failedAttempts, setFailedAttempts] = useState<number>(0)
+  const [blockedUntil, setBlockedUntil] = useState<number | null>(null)
 
   // Demo accounts
   const demoAccounts = [
@@ -77,6 +80,27 @@ function LoginContent() {
     setPasswordValid((password || '').length >= 8)
   }, [email, password])
 
+  // Carregar estado de tentativas do localStorage
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    try {
+      const raw = localStorage.getItem('golffox-login-attempts')
+      if (raw) {
+        const data = JSON.parse(raw)
+        if (typeof data?.failedAttempts === 'number') setFailedAttempts(data.failedAttempts)
+        if (typeof data?.blockedUntil === 'number') setBlockedUntil(data.blockedUntil)
+      }
+    } catch {}
+  }, [])
+
+  // Persistir estado de tentativas
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    try {
+      localStorage.setItem('golffox-login-attempts', JSON.stringify({ failedAttempts, blockedUntil }))
+    } catch {}
+  }, [failedAttempts, blockedUntil])
+
   // Captura Enter no container do formulário
   useEffect(() => {
     const el = formRef.current
@@ -117,11 +141,23 @@ function LoginContent() {
       return
     }
 
+    // Proteção simples contra brute force (cooldown baseado em falhas)
+    const now = Date.now()
+    if (blockedUntil && now < blockedUntil) {
+      const seconds = Math.ceil((blockedUntil - now) / 1000)
+      setError(`Muitas tentativas. Aguarde ${seconds}s antes de tentar novamente.`)
+      // manter o foco no campo de senha
+      passwordInputRef.current?.focus()
+      return
+    }
+
     setLoading(true)
     setError(null)
     console.log('🔐 Iniciando login para:', loginEmail)
     const prevCursor = typeof document !== 'undefined' ? document.body.style.cursor : ''
     if (typeof document !== 'undefined') document.body.style.cursor = 'progress'
+    // garantir foco no campo de senha durante autenticação
+    passwordInputRef.current?.focus()
 
     try {
       // Usar o novo sistema de autenticação
@@ -136,6 +172,10 @@ function LoginContent() {
       if (result.success && result.user) {
         console.log('✅ Login bem-sucedido!')
         console.log('👤 Usuário:', result.user.email, 'Role:', result.user.role)
+
+        // reset tentativas em sucesso
+        setFailedAttempts(0)
+        setBlockedUntil(null)
 
         // Garantir que o cookie de sessão seja persistido no servidor (lido pelo middleware)
         try {
@@ -175,6 +215,19 @@ function LoginContent() {
         } else {
           setError(result.error || 'Erro no login')
         }
+        // atualizar tentativas e definir bloqueio progressivo
+        setFailedAttempts((prev) => {
+          const next = prev + 1
+          // política: a partir de 5 falhas, bloquear 60s; a partir de 10, bloquear 300s
+          if (next >= 10) {
+            setBlockedUntil(Date.now() + 300 * 1000)
+          } else if (next >= 5) {
+            setBlockedUntil(Date.now() + 60 * 1000)
+          }
+          return next
+        })
+        // manter foco no campo de senha
+        passwordInputRef.current?.focus()
       }
     } catch (err: any) {
       console.error('💥 Erro inesperado no login:', err)
@@ -185,6 +238,8 @@ function LoginContent() {
       }
       // limpar senha por segurança, manter email
       setPassword('')
+      // manter foco no campo de senha
+      passwordInputRef.current?.focus()
     } finally {
       setLoading(false)
       if (typeof document !== 'undefined') document.body.style.cursor = prevCursor
@@ -239,6 +294,17 @@ function LoginContent() {
                     placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault()
+                        if (emailValid && passwordValid && !loading) {
+                          handleLogin()
+                        } else {
+                          setError('Preencha email válido e senha (mínimo 8 caracteres)')
+                        }
+                      }
+                    }}
+                    ref={passwordInputRef}
                     aria-invalid={!passwordValid}
                     className={`pl-10 ${passwordValid ? '' : 'border-[var(--err)]'}`}
                   />

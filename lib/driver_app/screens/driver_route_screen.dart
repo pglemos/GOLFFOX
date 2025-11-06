@@ -1,12 +1,12 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:golffox/services/supabase_service.dart';
-import 'package:golffox/core/location_service.dart';
+import '../../services/supabase_service.dart';
+import '../../core/location_service.dart';
 
 class DriverRouteScreen extends StatefulWidget {
-  final Map<String, dynamic> trip;
 
   const DriverRouteScreen({super.key, required this.trip});
+  final Map<String, dynamic> trip;
 
   @override
   State<DriverRouteScreen> createState() => _DriverRouteScreenState();
@@ -61,7 +61,7 @@ class _DriverRouteScreenState extends State<DriverRouteScreen> {
     try {
       final response = await SupabaseService.instance.client
           .from('trip_passengers')
-          .select('*')
+          .select()
           .eq('trip_id', widget.trip['id']);
 
       setState(() {
@@ -112,8 +112,7 @@ class _DriverRouteScreenState extends State<DriverRouteScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       appBar: AppBar(title: const Text('Viagem em Andamento')),
       body: Column(
         children: [
@@ -189,6 +188,5 @@ class _DriverRouteScreenState extends State<DriverRouteScreen> {
         ],
       ),
     );
-  }
 }
 

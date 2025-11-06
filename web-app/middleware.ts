@@ -23,7 +23,23 @@ export async function middleware(req: NextRequest) {
   const envBase = process.env.NEXT_PUBLIC_BASE_URL
   const headerHost = req.headers.get('host') || ''
   const requestOrigin = `${req.nextUrl.protocol}//${headerHost}`
-  const origin = envBase ? envBase : requestOrigin
+  // Preferir a origem da requisição em desenvolvimento/localhost para evitar HTTPS forçado
+  let origin = requestOrigin
+  if (envBase) {
+    try {
+      const parsed = new URL(envBase)
+      const isLocal = ['localhost', '127.0.0.1'].includes(parsed.hostname)
+      const isDev = process.env.NODE_ENV !== 'production'
+      // Em produção, permitir envBase; em dev, evitar localhost com https
+      if (!isDev && envBase) {
+        origin = envBase
+      } else if (!isLocal) {
+        origin = envBase
+      }
+    } catch {
+      // Se envBase inválido, manter requestOrigin
+    }
+  }
 
   // Structured logging helper
   const now = new Date().toISOString()

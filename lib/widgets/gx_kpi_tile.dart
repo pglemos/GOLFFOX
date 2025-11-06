@@ -1,16 +1,6 @@
 import 'package:flutter/material.dart';
 
 class GxKpiTile extends StatelessWidget {
-  final String title;
-  final String value;
-  final String? subtitle;
-  final IconData? icon;
-  final Color? color;
-  final String? trend;
-  final bool isPositiveTrend;
-  final VoidCallback? onTap;
-  final String? suffix;
-  final double? delta;
 
   const GxKpiTile({
     super.key,
@@ -40,6 +30,16 @@ class GxKpiTile extends StatelessWidget {
         trend = null,
         isPositiveTrend = true,
         onTap = null;
+  final String title;
+  final String value;
+  final String? subtitle;
+  final IconData? icon;
+  final Color? color;
+  final String? trend;
+  final bool isPositiveTrend;
+  final VoidCallback? onTap;
+  final String? suffix;
+  final double? delta;
 
   @override
   Widget build(BuildContext context) {

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:golffox/services/supabase_service.dart';
+import '../../services/supabase_service.dart';
 
 class DriverLoginScreen extends StatefulWidget {
   const DriverLoginScreen({super.key});
@@ -59,8 +59,7 @@ class _DriverLoginScreenState extends State<DriverLoginScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24.0),
@@ -122,7 +121,6 @@ class _DriverLoginScreenState extends State<DriverLoginScreen> {
         ),
       ),
     );
-  }
 
   @override
   void dispose() {
