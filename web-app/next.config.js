@@ -4,8 +4,8 @@ const nextConfig = {
   reactStrictMode: true,
   output: 'standalone',
   typescript: {
-    // Avoid failing the Vercel build due to TS errors while we stabilize types
-    ignoreBuildErrors: true,
+    // ✅ Type-safety habilitado após correção de erros
+    ignoreBuildErrors: false,
   },
   async headers() {
     return [
@@ -43,8 +43,8 @@ const nextConfig = {
     ]
   },
   eslint: {
-    // Lint will still run locally; do not block the CI build
-    ignoreDuringBuilds: true,
+    // ✅ Linting habilitado (warnings não bloqueiam build)
+    ignoreDuringBuilds: false,
   },
   env: {
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,

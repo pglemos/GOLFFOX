@@ -345,7 +345,7 @@ export function RouteModal({
       unsub = supabase
         .channel(`rt_gf_route_plan_${routeId}`)
         .on('postgres_changes', { event: '*', schema: 'public', table: 'gf_route_plan', filter: `route_id=eq.${routeId}` }, trigger)
-        .subscribe((status) => {
+        .subscribe((status: string) => {
           if (status === 'SUBSCRIBED') {
             // ok
           } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {

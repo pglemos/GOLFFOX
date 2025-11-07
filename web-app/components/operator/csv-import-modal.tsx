@@ -114,7 +114,7 @@ export function CSVImportModal({ isOpen, onClose, onSave, empresaId }: CSVImport
       setParseErrors(result.errors || [])
 
       if (result.errors && result.errors.length > 0) {
-        toast.warning(`${result.valid.length} válidos, ${result.errors.length} erros encontrados`)
+        toast(`${result.valid.length} válidos, ${result.errors.length} erros encontrados`)
       } else {
         toast.success(`${result.valid.length} funcionários encontrados no arquivo`)
       }
@@ -178,7 +178,7 @@ export function CSVImportModal({ isOpen, onClose, onSave, empresaId }: CSVImport
       setImportResult(result)
 
       if (result.unresolvedAddresses && result.unresolvedAddresses.length > 0) {
-        toast.warning(`Importação concluída: ${result.success} sucessos, ${result.errors?.length || 0} erros, ${result.unresolvedAddresses.length} endereços não resolvidos`)
+        toast(`Importação concluída: ${result.success} sucessos, ${result.errors?.length || 0} erros, ${result.unresolvedAddresses.length} endereços não resolvidos`)
       } else {
         toast.success(`Importação concluída: ${result.success} sucessos${result.errors && result.errors.length > 0 ? `, ${result.errors.length} erros` : ''}`)
       }

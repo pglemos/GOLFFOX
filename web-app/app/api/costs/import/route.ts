@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseServiceRole } from '@/lib/supabase-server'
 import { parseCSV } from '@/lib/costs/import-parser'
+import { requireCompanyAccess } from '@/lib/api-auth'
 import { z } from 'zod'
 
 const importSchema = z.object({
@@ -41,6 +42,12 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // ✅ Validar autenticação e acesso à empresa
+    const { user, error: authError } = await requireCompanyAccess(request, companyId)
+    if (authError) {
+      return authError
+    }
+
     // Parse do arquivo
     const buffer = await file.arrayBuffer()
     const text = new TextDecoder().decode(buffer)
@@ -69,7 +76,7 @@ export async function POST(request: NextRequest) {
       .eq('is_active', true)
 
     const categoryMap = new Map()
-    categories?.forEach(cat => {
+    categories?.forEach((cat: any) => {
       const key = `${cat.group_name}|${cat.category}|${cat.subcategory || ''}`
       categoryMap.set(key, cat.id)
     })
@@ -89,9 +96,9 @@ export async function POST(request: NextRequest) {
       .select('id, email')
       .eq('role', 'driver')
 
-    const routeMap = new Map(routes?.map(r => [r.name, r.id]) || [])
-    const vehicleMap = new Map(vehicles?.map(v => [v.plate, v.id]) || [])
-    const driverMap = new Map(drivers?.map(d => [d.email, d.id]) || [])
+    const routeMap = new Map(routes?.map((r: any) => [r.name, r.id]) || [])
+    const vehicleMap = new Map(vehicles?.map((v: any) => [v.plate, v.id]) || [])
+    const driverMap = new Map(drivers?.map((d: any) => [d.email, d.id]) || [])
 
     // Processar e inserir custos
     const costsToInsert = []
