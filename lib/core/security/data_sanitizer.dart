@@ -17,7 +17,10 @@ class DataSanitizer {
     RegExp(r'(\b(SELECT|INSERT|UPDATE|DELETE|DROP|CREATE|ALTER|EXEC|UNION|SCRIPT)\b)', caseSensitive: false),
     RegExp(r'(--|#|/\*|\*/)', caseSensitive: false),
     RegExp(r'(\b(OR|AND)\s+\d+\s*=\s*\d+)', caseSensitive: false),
-    RegExp(r'(\b(OR|AND)\s+[\'\"]?\w+[\'\"]?\s*=\s*[\'\"]?\w+[\'\"]?)', caseSensitive: false),
+    RegExp(
+      r'''(\b(OR|AND)\s+['"]?\w+['"]?\s*=\s*['"]?\w+['"]?)''',
+      caseSensitive: false,
+    ),
     RegExp(r'(UNION\s+SELECT)', caseSensitive: false),
     RegExp(r'(;\s*(DROP|DELETE|INSERT|UPDATE))', caseSensitive: false),
   ];
@@ -178,7 +181,7 @@ class DataSanitizer {
   }
 
   /// Sanitiza entrada baseada no tipo
-  static dynamic sanitizeByType(input, SanitizationType type) {
+  static dynamic sanitizeByType(Object? input, SanitizationType type) {
     if (input == null) return null;
     switch (type) {
       case SanitizationType.text:

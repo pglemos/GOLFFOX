@@ -23,7 +23,11 @@ class BusStopService {
           .eq('route_id', routeId)
           .order('sequence', ascending: true);
 
-      return (response as List).map((json) => BusStop.fromJson(json)).toList();
+      return (response as List)
+          .map((json) => BusStop.fromJson(
+                Map<String, dynamic>.from(json as Map),
+              ))
+          .toList();
     } catch (e) {
       // Em caso de erro, retorna dados mock para demonstracao
       return _getMockBusStops(routeId);
@@ -58,7 +62,11 @@ class BusStopService {
           .select()
           .order('name', ascending: true);
 
-      return (response as List).map((json) => BusStop.fromJson(json)).toList();
+      return (response as List)
+          .map((json) => BusStop.fromJson(
+                Map<String, dynamic>.from(json as Map),
+              ))
+          .toList();
     } catch (e) {
       return _getAllMockBusStops();
     }
@@ -73,7 +81,9 @@ class BusStopService {
           .eq('id', stopId)
           .single();
 
-      return BusStop.fromJson(response);
+      return BusStop.fromJson(
+        Map<String, dynamic>.from(response as Map),
+      );
     } catch (e) {
       return _getMockBusStop(stopId);
     }

@@ -316,8 +316,8 @@ class TrackingService {
         // como nao ha batch no service, enviamos item a item:
         for (final it in chunk) {
           await SupabaseService.instance.insertDriverPosition(
-            tripId: it['trip_id'],
-            driverId: it['driver_id'],
+            tripId: it['trip_id'] as String? ?? '',
+            driverId: it['driver_id'] as String? ?? '',
             latitude: (it['latitude'] as num).toDouble(),
             longitude: (it['longitude'] as num).toDouble(),
             accuracy: (it['accuracy'] as num?)?.toDouble(),

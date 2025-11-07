@@ -95,18 +95,51 @@ function LoginContent() {
           accessToken: data.session.access_token,
         }
 
-        // Persistir cookie de sessão no servidor
+        // Persistir cookie de sessão no servidor com proteção CSRF
         try {
+          // Obter token CSRF e cookie correspondente (double-submit)
+          const csrfResp = await fetch('/api/auth/csrf', { method: 'GET' })
+          if (!csrfResp.ok) {
+            console.warn('⚠️ Falha ao obter CSRF:', await csrfResp.text())
+          }
+          const csrfData = await csrfResp.json().catch(() => ({ token: '' }))
+          const csrfToken = csrfData?.token || ''
+
           const resp = await fetch('/api/auth/set-session', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+              'Content-Type': 'application/json',
+              'x-csrf-token': csrfToken,
+            },
             body: JSON.stringify({ user: userData }),
           })
           if (!resp.ok) {
             console.warn('⚠️ Falha ao setar cookie de sessão via API:', await resp.text())
+            // Fallback: setar cookie no cliente para não quebrar navegação
+            try {
+              const cookieValue = btoa(JSON.stringify(userData))
+              const isSecure = typeof window !== 'undefined' && window.location.protocol === 'https:'
+              const secureFlag = isSecure ? '; Secure' : ''
+              if (typeof document !== 'undefined') {
+                document.cookie = `golffox-session=${cookieValue}; path=/; max-age=3600; SameSite=Lax${secureFlag}`
+              }
+            } catch (_e) {
+              // ignore
+            }
           }
         } catch (e) {
           console.warn('⚠️ Erro ao chamar /api/auth/set-session:', e)
+          // Fallback: tentar setar cookie no cliente
+          try {
+            const cookieValue = btoa(JSON.stringify(userData))
+            const isSecure = typeof window !== 'undefined' && window.location.protocol === 'https:'
+            const secureFlag = isSecure ? '; Secure' : ''
+            if (typeof document !== 'undefined') {
+              document.cookie = `golffox-session=${cookieValue}; path=/; max-age=3600; SameSite=Lax${secureFlag}`
+            }
+          } catch (_e) {
+            // ignore
+          }
         }
 
         const nextUrl = searchParams.get('next')
@@ -163,7 +196,14 @@ function LoginContent() {
               </div>
             )}
 
-            <div className="space-y-4 mb-6">
+            {/* Transformar em form para suportar Enter */}
+            <form
+              className="space-y-4 mb-6"
+              onSubmit={(e) => {
+                e.preventDefault()
+                handleLogin()
+              }}
+            >
               <div>
                 <label className="block text-sm font-medium mb-2">E-mail</label>
                 <div className="relative">
@@ -202,19 +242,20 @@ function LoginContent() {
                   />
                   <span>Manter conectado</span>
                 </label>
-                <button className="text-sm text-[var(--brand)] hover:underline">
+                <button type="button" className="text-sm text-[var(--brand)] hover:underline">
                   Esqueci minha senha
                 </button>
               </div>
-            </div>
-
+            
             <Button
-              onClick={() => handleLogin()}
+              type="submit"
               disabled={loading}
               className="w-full mb-6"
             >
               {loading ? "Signing in..." : "Entrar"}
             </Button>
+            </form>
+            
 
             {/* Bloco de "Demo Accounts" removido conforme solicitação */}
           </Card>

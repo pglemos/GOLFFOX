@@ -173,9 +173,12 @@ export function MapLayers({
     const markers: google.maps.Marker[] = []
 
     vehicles.forEach((vehicle) => {
-      // Validar coordenadas antes de criar marcador
+      // Verificar se o veículo tem coordenadas válidas
+      // Se não tiver, pular a criação do marcador no mapa, mas o veículo ainda aparecerá na lista
       if (!isValidCoordinate(vehicle.lat, vehicle.lng)) {
-        console.warn(`Veículo ${vehicle.vehicle_id} tem coordenadas inválidas:`, vehicle.lat, vehicle.lng)
+        // Veículo sem coordenadas GPS - não criar marcador no mapa
+        // Mas o veículo ainda estará disponível na lista de veículos
+        console.log(`ℹ️ Veículo ${vehicle.plate} (${vehicle.vehicle_id}) sem coordenadas GPS - não será exibido no mapa, mas estará na lista`)
         return
       }
 

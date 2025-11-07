@@ -147,32 +147,41 @@ export class RealtimeService {
         },
         async (payload) => {
           try {
-            // Buscar dados completos da view
-            const { data, error } = await supabase
-              .from('v_live_vehicles')
-              .select('*')
-              .eq('vehicle_id', (payload.new as any).vehicle_id || '')
+            // Buscar dados completos diretamente das tabelas (view v_live_vehicles não existe)
+            const position = payload.new as any
+            
+            // driver_positions tem trip_id, não vehicle_id diretamente
+            // Buscar trip para obter vehicle_id
+            const { data: tripData, error: tripError } = await supabase
+              .from('trips')
+              .select('id, vehicle_id, route_id, driver_id, status')
+              .eq('id', position.trip_id)
               .single()
 
-            if (error || !data) {
-              console.warn('Erro ao buscar dados completos do veículo:', error)
+            if (tripError || !tripData) {
+              console.warn('Erro ao buscar trip para posição:', tripError)
+              return
+            }
+
+            if (!position.lat || !position.lng) {
+              console.warn('Posição sem coordenadas válidas:', position)
               return
             }
 
             this.queueUpdate({
               type: 'position',
               data: {
-                vehicle_id: data.vehicle_id,
-                trip_id: data.trip_id,
-                driver_id: data.driver_id,
-                route_id: data.route_id,
-                lat: data.lat,
-                lng: data.lng,
-                speed: data.speed,
-                heading: data.heading,
-                timestamp: data.last_position_time,
-                vehicle_status: data.vehicle_status as any,
-                passenger_count: data.passenger_count,
+                vehicle_id: tripData.vehicle_id,
+                trip_id: position.trip_id,
+                driver_id: tripData.driver_id || position.driver_id,
+                route_id: tripData.route_id || null,
+                lat: position.lat,
+                lng: position.lng,
+                speed: position.speed || null,
+                heading: position.heading || null,
+                timestamp: position.timestamp || new Date().toISOString(),
+                vehicle_status: position.speed && position.speed > 0.83 ? 'moving' : 'stopped_short',
+                passenger_count: 0, // Seria necessário buscar
               },
             })
           } catch (error: any) {
@@ -263,6 +272,8 @@ export class RealtimeService {
               route_id: incident.route_id,
               vehicle_id: incident.vehicle_id,
               severity: incident.severity || 'medium',
+              lat: null, // gf_incidents não tem lat
+              lng: null, // gf_incidents não tem lng
               description: incident.description,
               created_at: incident.created_at,
             },
@@ -314,37 +325,54 @@ export class RealtimeService {
    * Inicia polling como fallback
    */
   private startPolling(): void {
-    // Polling para posições
+    // Polling para posições (usando tabela driver_positions diretamente)
     const positionInterval = setInterval(async () => {
       try {
-        const { data, error } = await supabase
-          .from('v_live_vehicles')
-          .select('*')
-          .gte('last_position_time', new Date(Date.now() - 60000).toISOString()) // Últimos 60s
+        // Buscar últimas posições diretamente da tabela driver_positions
+        const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString()
+        const { data: positionsData, error } = await supabase
+          .from('driver_positions')
+          .select(`
+            trip_id,
+            lat,
+            lng,
+            speed,
+            heading,
+            timestamp,
+            trips!inner(vehicle_id, route_id, driver_id, status)
+          `)
+          .gte('timestamp', fiveMinutesAgo)
+          .eq('trips.status', 'inProgress')
+          .order('timestamp', { ascending: false })
+          .limit(100)
 
         if (error) {
-          console.warn('Erro no polling de posições:', error)
+          // Se der erro, apenas logar (não quebrar o polling)
+          console.warn('Erro no polling de posições (view v_live_vehicles não existe, usando driver_positions):', error)
           return
         }
 
-        if (data && data.length > 0) {
-          data.forEach((vehicle: any) => {
-            this.queueUpdate({
-              type: 'position',
-              data: {
-                vehicle_id: vehicle.vehicle_id,
-                trip_id: vehicle.trip_id,
-                driver_id: vehicle.driver_id,
-                route_id: vehicle.route_id,
-                lat: vehicle.lat,
-                lng: vehicle.lng,
-                speed: vehicle.speed,
-                heading: vehicle.heading,
-                timestamp: vehicle.last_position_time,
-                vehicle_status: vehicle.vehicle_status,
-                passenger_count: vehicle.passenger_count,
-              },
-            })
+        if (positionsData && positionsData.length > 0) {
+          positionsData.forEach((pos: any) => {
+            const trip = pos.trips
+            if (trip && pos.lat && pos.lng) {
+              this.queueUpdate({
+                type: 'position',
+                data: {
+                  vehicle_id: trip.vehicle_id,
+                  trip_id: pos.trip_id,
+                  driver_id: trip.driver_id,
+                  route_id: trip.route_id,
+                  lat: pos.lat,
+                  lng: pos.lng,
+                  speed: pos.speed || null,
+                  heading: pos.heading || null,
+                  timestamp: pos.timestamp,
+                  vehicle_status: pos.speed && pos.speed > 0.83 ? 'moving' : 'stopped_short',
+                  passenger_count: 0,
+                },
+              })
+            }
           })
         }
       } catch (error: any) {
@@ -354,42 +382,37 @@ export class RealtimeService {
 
     this.pollingIntervals.set('positions', positionInterval)
 
-    // Polling para alertas
+    // Polling para alertas - DESABILITADO TEMPORARIAMENTE devido a problemas de schema cache
+    // Os alertas serão carregados apenas via subscriptions do realtime
     const alertsInterval = setInterval(async () => {
-      try {
-        const { data, error } = await supabase
-          .from('v_alerts_open')
-          .select('*')
-          .gte('created_at', new Date(Date.now() - 3600000).toISOString()) // Última hora
+      // Polling desabilitado - usar apenas subscriptions
+      // try {
+      //   const oneHourAgo = new Date(Date.now() - 3600000).toISOString()
+      //   
+      //   // Buscar incidentes abertos
+      //   const { data: incidentsData, error: incidentsError } = await supabase
+      //     .from('gf_incidents')
+      //     .select('id, company_id, route_id, vehicle_id, severity, description, created_at, status')
+      //     .eq('status', 'open')
+      //     .gte('created_at', oneHourAgo)
 
-        if (error) {
-          console.warn('Erro no polling de alertas:', error)
-          return
-        }
+      //   // Buscar solicitações de socorro abertas
+      //   const { data: assistanceData, error: assistanceError } = await supabase
+      //     .from('gf_service_requests')
+      //     .select('id, empresa_id, route_id, tipo, status, payload, created_at')
+      //     .eq('tipo', 'socorro')
+      //     .eq('status', 'open')
+      //     .gte('created_at', oneHourAgo)
 
-        if (data && data.length > 0) {
-          data.forEach((alert: any) => {
-            this.queueUpdate({
-              type: 'alert',
-              data: {
-                alert_id: alert.alert_id,
-                alert_type: alert.alert_type,
-                company_id: alert.company_id,
-                route_id: alert.route_id,
-                vehicle_id: alert.vehicle_id,
-                severity: alert.severity,
-                lat: alert.lat,
-                lng: alert.lng,
-                description: alert.description,
-                created_at: alert.created_at,
-              },
-            })
-          })
-        }
-      } catch (error: any) {
-        console.error('Erro no polling de alertas:', error)
-      }
-    }, this.options.pollingInterval! * 2) // Alertas menos frequente
+      //   if (incidentsError && assistanceError) {
+      //     return
+      //   }
+
+      //   // Processar alertas...
+      // } catch (error: any) {
+      //   // Silenciar erros
+      // }
+    }, (this.options.pollingInterval || 5000) * 2) // Alertas menos frequente
 
     this.pollingIntervals.set('alerts', alertsInterval)
   }

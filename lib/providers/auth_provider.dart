@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -70,13 +71,15 @@ class AuthNotifier extends StateNotifier<AsyncValue<app_user.User?>> {
     }
   }
 
-  Future<void> signIn(String email, String password) async {
+  Future<void> signIn(
+    BuildContext context,
+    String email,
+    String password,
+  ) async {
     state = const AsyncValue.loading();
     try {
       final user = await _authService.signInWithEmail(
-        // Context sera fornecido pela UI posteriormente.
-        // ignore: avoid_dynamic_calls
-        null as dynamic,
+        context,
         email,
         password,
       );

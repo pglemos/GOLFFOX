@@ -6,10 +6,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import '../../core/theme/gf_tokens.dart';
 import '../../ui/widgets/common/gf_app_bar.dart';
-import '../../ui/widgets/common/gf_loading_indicator.dart';
 import '../../models/vehicle.dart';
 import '../../services/vehicle_service.dart';
 
@@ -216,6 +214,7 @@ class _CreateVehiclePageState extends ConsumerState<CreateVehiclePage>
         notes: _notesController.text,
         createdAt: widget.vehicle?.createdAt ?? DateTime.now(),
         updatedAt: DateTime.now(),
+        odometer: widget.vehicle?.odometer ?? 0,
         companyId: 'company_1',
       );
 
@@ -282,10 +281,12 @@ class _CreateVehiclePageState extends ConsumerState<CreateVehiclePage>
             // Indicador de progresso
             Container(
               padding: const EdgeInsets.all(GfTokens.spacingMd),
-              decoration: BoxDecoration(
-                color: const Color(GfTokens.colorSurface),
+              decoration: const BoxDecoration(
+                color: Color(GfTokens.colorSurface),
                 border: Border(
-                  bottom: BorderSide(color: const Color(GfTokens.colorBorder),
+                  bottom: BorderSide(
+                    color: Color(GfTokens.colorBorder),
+                  ),
                 ),
               ),
               child: Row(
@@ -296,8 +297,8 @@ class _CreateVehiclePageState extends ConsumerState<CreateVehiclePage>
                         height: 4,
                         decoration: BoxDecoration(
                           color: i <= _currentPage
-                              ? GfTokens.colorPrimary
-                              : GfTokens.colorBorder,
+                              ? const Color(GfTokens.colorPrimary)
+                              : const Color(GfTokens.colorBorder),
                           borderRadius: BorderRadius.circular(2),
                         ),
                       ),
@@ -331,10 +332,12 @@ class _CreateVehiclePageState extends ConsumerState<CreateVehiclePage>
             // Botoes de navegacao
             Container(
               padding: const EdgeInsets.all(GfTokens.spacingMd),
-              decoration: BoxDecoration(
-                color: const Color(GfTokens.colorSurface),
+              decoration: const BoxDecoration(
+                color: Color(GfTokens.colorSurface),
                 border: Border(
-                  top: BorderSide(color: const Color(GfTokens.colorBorder),
+                  top: BorderSide(
+                    color: Color(GfTokens.colorBorder),
+                  ),
                 ),
               ),
               child: Row(
@@ -407,7 +410,7 @@ class _CreateVehiclePageState extends ConsumerState<CreateVehiclePage>
 
           // Tipo
           DropdownButtonFormField<VehicleType>(
-            value: _selectedType,
+            initialValue: _selectedType,
             decoration: const InputDecoration(
               labelText: 'Tipo de Veiculo',
             ),
@@ -429,7 +432,7 @@ class _CreateVehiclePageState extends ConsumerState<CreateVehiclePage>
 
           // Status
           DropdownButtonFormField<VehicleStatus>(
-            value: _selectedStatus,
+            initialValue: _selectedStatus,
             decoration: const InputDecoration(
               labelText: 'Status',
             ),
@@ -451,7 +454,7 @@ class _CreateVehiclePageState extends ConsumerState<CreateVehiclePage>
 
           // Combustivel
           DropdownButtonFormField<FuelType>(
-            value: _selectedFuelType,
+            initialValue: _selectedFuelType,
             decoration: const InputDecoration(
               labelText: 'Tipo de Combustivel',
             ),
@@ -931,7 +934,9 @@ class _CreateVehiclePageState extends ConsumerState<CreateVehiclePage>
               ? '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}'
               : 'Selecionar data',
           style: TextStyle(
-            color: date != null ? GfTokens.colorOnSurface : GfTokens.colorOnSurfaceVariant,
+            color: date != null
+                ? const Color(GfTokens.colorOnSurface)
+                : const Color(GfTokens.colorOnSurfaceVariant),
           ),
         ),
       ),

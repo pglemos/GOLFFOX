@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../services/supabase_service.dart';
-import '../../core/location_service.dart';
 
 class PassengerDashboardScreen extends StatefulWidget {
   const PassengerDashboardScreen({super.key});
@@ -24,26 +23,28 @@ class _PassengerDashboardScreenState extends State<PassengerDashboardScreen> {
   Future<void> _loadCurrentTrip() async {
     try {
       // Buscar trip ativa onde o passageiro está
-      final employee = await SupabaseService.instance.client
+      final Map<String, dynamic>? employee =
+          await SupabaseService.instance.client
           .from('gf_employee_company')
           .select('id')
           .eq('login_cpf', '') // Substituir por CPF do usuário logado
           .maybeSingle();
 
-      if (employee.data == null) {
+      if (employee == null) {
         setState(() => _loading = false);
         return;
       }
 
-      final response = await SupabaseService.instance.client
+      final Map<String, dynamic>? response =
+          await SupabaseService.instance.client
           .from('trip_passengers')
           .select('*, trips(*, routes(*), vehicles(*))')
-          .eq('passenger_id', employee.data!['id'])
+          .eq('passenger_id', employee['id'] as String)
           .eq('status', 'pending')
           .maybeSingle();
 
       setState(() {
-        _currentTrip = response.data;
+        _currentTrip = response;
         _loading = false;
       });
     } catch (e) {
@@ -59,7 +60,9 @@ class _PassengerDashboardScreenState extends State<PassengerDashboardScreen> {
         .listen((data) {
       if (data.isNotEmpty && _currentTrip != null) {
         setState(() {
-          _busPosition = data.last;
+          _busPosition = Map<String, dynamic>.from(
+            data.last as Map,
+          );
         });
         
         // Verificar se ônibus está próximo (5 min)
@@ -111,9 +114,15 @@ class _PassengerDashboardScreenState extends State<PassengerDashboardScreen> {
   }
 
   Widget _buildTripView() {
-    final trip = _currentTrip!['trips'];
-    final route = trip['routes'];
-    final vehicle = trip['vehicles'];
+    Map<String, dynamic> _asMap(dynamic value) {
+      if (value is Map<String, dynamic>) return value;
+      if (value is Map) return Map<String, dynamic>.from(value);
+      return <String, dynamic>{};
+    }
+
+    final trip = _asMap(_currentTrip?['trips']);
+    final route = _asMap(trip['routes']);
+    final vehicle = _asMap(trip['vehicles']);
 
     return ListView(
       padding: const EdgeInsets.all(16),
@@ -125,14 +134,16 @@ class _PassengerDashboardScreenState extends State<PassengerDashboardScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  route['name'] ?? 'Rota',
+                  route['name'] as String? ?? 'Rota',
                   style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 const SizedBox(height: 8),
-                Text('Veículo: ${vehicle['plate'] ?? "N/A"}'),
+                Text(
+                  'Veículo: ${vehicle['plate'] as String? ?? "N/A"}',
+                ),
                 if (_busPosition != null)
                   Text(
                     'Posição: ${_busPosition!['latitude']}, ${_busPosition!['longitude']}',

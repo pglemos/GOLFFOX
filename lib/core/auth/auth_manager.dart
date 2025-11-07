@@ -3,9 +3,9 @@ import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../domain/user_role.dart';
-import '../services/logger_service.dart';
-import '../services/error_service.dart';
 import '../../services/supabase_service.dart';
+import '../services/error_service.dart';
+import '../services/logger_service.dart';
 
 /// Comprehensive authentication manager for GolfFox
 ///
@@ -275,14 +275,14 @@ class AuthManager extends ChangeNotifier {
         if (currentUser != null) {
           // Determine role based on email
           var role = UserRole.passenger; // default
-          if (currentUser.email?.contains('operador') ?? false ||
-              currentUser.email?.contains('operator') ?? false) {
+          final email = (currentUser.email ?? '').toLowerCase();
+          bool contains(String text) => email.contains(text);
+
+          if (contains('operador') || contains('operator')) {
             role = UserRole.operator;
-          } else if (currentUser.email?.contains('transportadora') ?? false ||
-              currentUser.email?.contains('carrier') ?? false) {
+          } else if (contains('transportadora') || contains('carrier')) {
             role = UserRole.carrier;
-          } else if (currentUser.email?.contains('motorista') ?? false ||
-              currentUser.email?.contains('driver') ?? false) {
+          } else if (contains('motorista') || contains('driver')) {
             role = UserRole.driver;
           }
 

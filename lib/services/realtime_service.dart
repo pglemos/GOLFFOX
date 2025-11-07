@@ -16,8 +16,6 @@ class RealtimeService {
   // Configuracoes
   static const Duration _updateInterval = Duration(seconds: 5);
   static const Duration _simulationInterval = Duration(seconds: 2);
-  static const double _maxMovementDistance = 0.001; // ~100 metros
-
   // Estado interno
   final StreamController<List<VehiclePosition>> _positionsController =
       StreamController<List<VehiclePosition>>.broadcast();
@@ -104,8 +102,13 @@ class RealtimeService {
           .select()
           .order('updated_at', ascending: false);
 
-      _currentPositions = (response as List)
-          .map(_vehiclePositionFromSupabase)
+      final List<dynamic> data = response as List<dynamic>;
+      _currentPositions = data
+          .map(
+            (item) => _vehiclePositionFromSupabase(
+              Map<String, dynamic>.from(item as Map),
+            ),
+          )
           .toList();
     } catch (e) {
       debugPrint('Erro ao carregar do Supabase: $e');
@@ -270,27 +273,32 @@ class RealtimeService {
   }
 
   /// Converte dados do Supabase para VehiclePosition
-  VehiclePosition _vehiclePositionFromSupabase(Map<String, dynamic> json) => VehiclePosition(
-      id: json['id'] as String,
-      vehicleId: json['vehicle_id'] as String,
+  VehiclePosition _vehiclePositionFromSupabase(Map<String, dynamic> json) {
+    final lat = (json['latitude'] as num?)?.toDouble() ?? 0;
+    final lng = (json['longitude'] as num?)?.toDouble() ?? 0;
+
+    return VehiclePosition(
+      id: json['id'] as String? ?? '',
+      vehicleId: json['vehicle_id'] as String? ?? '',
       licensePlate: json['license_plate'] as String? ?? '',
       driverName: json['driver_name'] as String? ?? '',
-      position: LatLng(
-        (json['latitude'] as num).toDouble(),
-        (json['longitude'] as num).toDouble(),
-      ),
+      position: LatLng(lat, lng),
       status: VehicleStatus.values.firstWhere(
-        (s) => s.name == json['status'],
+        (s) => s.name == (json['status'] as String?),
         orElse: () => VehicleStatus.offline,
       ),
       speed: (json['speed'] as num?)?.toDouble(),
       heading: (json['heading'] as num?)?.toDouble(),
-      lastUpdate: DateTime.parse(json['updated_at'] as String),
+      lastUpdate: DateTime.parse(
+        json['updated_at'] as String? ??
+            DateTime.now().toIso8601String(),
+      ),
       routeId: json['route_id'] as String?,
       routeName: json['route_name'] as String?,
-      passengerCount: json['passenger_count'] as int?,
-      capacity: json['capacity'] as int?,
+      passengerCount: (json['passenger_count'] as num?)?.toInt(),
+      capacity: (json['capacity'] as num?)?.toInt(),
     );
+  }
 
   /// Calcula nova posicao baseada em bearing e distancia
   LatLng _calculateNewPosition(LatLng start, double bearing, double distance) {

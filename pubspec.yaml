@@ -47,6 +47,7 @@ dependencies:
   hive: ^2.2.3
   hive_flutter: ^1.1.0
   path_provider: ^2.1.5
+  postgres: ^3.1.4
   
   # Security & Encryption
   crypto: ^3.0.6

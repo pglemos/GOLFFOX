@@ -92,13 +92,13 @@ class _VehiclesPageState extends ConsumerState<VehiclesPage>
   }
 
   Future<void> _navigateToCreateVehicle() async {
-    final result = await Navigator.of(context).push(
-      MaterialPageRoute(
+    final result = await Navigator.of(context).push<bool>(
+      MaterialPageRoute<bool>(
         builder: (context) => const CreateVehiclePage(),
       ),
     );
 
-    if (result == true && mounted) {
+    if ((result ?? false) && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Veiculo criado com sucesso!'),
@@ -111,7 +111,7 @@ class _VehiclesPageState extends ConsumerState<VehiclesPage>
 
   Future<void> _navigateToVehicleDetails(Vehicle vehicle) async {
     await Navigator.of(context).push(
-      MaterialPageRoute(
+      MaterialPageRoute<void>(
         builder: (context) => VehicleDetailsPage(vehicleId: vehicle.id),
       ),
     );
@@ -300,7 +300,6 @@ class _VehiclesPageState extends ConsumerState<VehiclesPage>
                   if (snapshot.hasError) {
                     return Center(
                       child: GfErrorWidget(
-                        title: 'Erro ao carregar veiculos',
                         message: snapshot.error.toString(),
                         onRetry: _refreshVehicles,
                       ),

@@ -390,17 +390,62 @@ export function AdminMap({
 
     routesLoadTimeoutRef.current = setTimeout(async () => {
       try {
-        // Buscar rotas que intersectam com o viewport
-        // Por enquanto, carregar todas as rotas filtradas (otimização futura: usar geolocalização)
-        const { data: routesData, error: routesError } = await supabase
-          .from('v_route_polylines')
-          .select('*')
-          .eq('company_id', currentCompany || null)
+        // Buscar rotas diretamente da tabela routes e montar polyline_points a partir de route_stops
+        // Carregar todas as rotas filtradas (otimização futura: usar geolocalização)
+        let routesQuery = supabase
+          .from('routes')
+          .select(`
+            id,
+            name,
+            company_id
+          `)
+          .eq('is_active', true)
           .limit(LIMIT)
+        
+        // Aplicar filtro de empresa apenas se não for null ou vazio
+        if (currentCompany && currentCompany !== 'null' && currentCompany !== '') {
+          routesQuery = routesQuery.eq('company_id', currentCompany)
+        }
+        
+        const { data: routesData, error: routesError } = await routesQuery
 
-        if (!routesError && routesData) {
+        if (!routesError && routesData && routesData.length > 0) {
+          // Buscar route_stops para cada rota
+          const routeIds = routesData.map((r: any) => r.id)
+          
+          const { data: stopsData, error: stopsError } = await supabase
+            .from('route_stops')
+            .select('route_id, lat, lng, seq, name')
+            .in('route_id', routeIds)
+            .order('route_id')
+            .order('seq')
+          
+          // Agrupar stops por route_id
+          const stopsByRoute = new Map()
+          if (stopsData) {
+            stopsData.forEach((stop: any) => {
+              if (!stopsByRoute.has(stop.route_id)) {
+                stopsByRoute.set(stop.route_id, [])
+              }
+              stopsByRoute.get(stop.route_id).push({
+                lat: stop.lat,
+                lng: stop.lng,
+                order: stop.seq
+              })
+            })
+          }
+          
+          // Converter dados da tabela para o formato esperado
+          const formattedRoutes = routesData.map((r: any) => ({
+            route_id: r.id,
+            route_name: r.name,
+            company_id: r.company_id,
+            polyline_points: stopsByRoute.get(r.id) || [],
+            stops_count: stopsByRoute.get(r.id)?.length || 0
+          }))
+          
           // Filtrar apenas rotas não carregadas
-          const newRoutes = routesData.filter((r: any) => !loadedRouteIdsRef.current.has(r.route_id))
+          const newRoutes = formattedRoutes.filter((r: any) => !loadedRouteIdsRef.current.has(r.route_id))
           
           if (newRoutes.length > 0) {
             // Adicionar ao cache
@@ -412,6 +457,8 @@ export function AdminMap({
             // Atualizar estado com todas as rotas do cache
             setRoutes(Array.from(routesCacheRef.current.values()))
           }
+        } else if (routesError) {
+          console.warn('Erro ao carregar rotas (view v_route_polylines não existe, usando tabela routes):', routesError)
         }
       } catch (error) {
         console.error('Erro ao carregar rotas visíveis:', error)
@@ -425,6 +472,7 @@ export function AdminMap({
       console.log('🔄 Carregando dados iniciais com filtros:', filters)
       
       // Carregar veículos ativos com todas as informações
+      // Usar LEFT JOIN para não excluir veículos sem company_id
       let vehiclesQuery = supabase
         .from('vehicles')
         .select(`
@@ -437,7 +485,8 @@ export function AdminMap({
           is_active,
           photo_url,
           company_id,
-          companies!inner(name)
+          carrier_id,
+          companies(name)
         `)
         .eq('is_active', true)
       
@@ -447,16 +496,79 @@ export function AdminMap({
       }
       
       console.log('🔍 Carregando veículos ativos com filtros:', filters)
+      console.log('📋 Query:', {
+        table: 'vehicles',
+        filter_is_active: true,
+        filter_company: filters.company || 'nenhum'
+      })
       
       const { data: vehiclesData, error: vehiclesError } = await vehiclesQuery
       
       let finalVehiclesData: any[] = []
       
-      if (!vehiclesError && vehiclesData && vehiclesData.length > 0) {
-        console.log(`📦 Encontrados ${vehiclesData.length} veículos ativos`)
+      // Log detalhado para debug
+      if (vehiclesError) {
+        console.error('❌ Erro na query de veículos:', {
+          message: vehiclesError.message,
+          code: vehiclesError.code,
+          details: vehiclesError.details,
+          hint: vehiclesError.hint
+        })
+        
+        // Se erro for sobre coluna inexistente, tentar query sem colunas problemáticas
+        if (vehiclesError.message?.includes('column') || vehiclesError.message?.includes('does not exist')) {
+          console.warn('⚠️ Tentando query alternativa sem colunas problemáticas...')
+          try {
+            const { data: fallbackData, error: fallbackError } = await supabase
+              .from('vehicles')
+              .select('id, plate, model, is_active, company_id')
+              .eq('is_active', true)
+            
+            if (!fallbackError && fallbackData) {
+              console.log(`✅ Query alternativa retornou ${fallbackData.length} veículos`)
+              finalVehiclesData = fallbackData as any
+            }
+          } catch (fallbackErr) {
+            console.error('❌ Query alternativa também falhou:', fallbackErr)
+          }
+        }
+      } else {
+        finalVehiclesData = vehiclesData || []
+        console.log(`📦 Query retornou ${finalVehiclesData.length} veículos`)
+        if (finalVehiclesData.length > 0) {
+          console.log('📋 Primeiros veículos:', finalVehiclesData.slice(0, 3).map((v: any) => ({
+            id: v.id,
+            plate: v.plate,
+            is_active: v.is_active,
+            company_id: v.company_id,
+            carrier_id: v.carrier_id
+          })))
+        } else {
+          // Se não retornou veículos, verificar se há veículos ativos no banco
+          console.warn('⚠️ Nenhum veículo retornado - verificando se há veículos ativos no banco...')
+          const { data: checkData, error: checkError } = await supabase
+            .from('vehicles')
+            .select('id, plate, is_active')
+            .eq('is_active', true)
+            .limit(5)
+          
+          if (checkError) {
+            console.error('❌ Erro ao verificar veículos:', checkError)
+          } else if (checkData && checkData.length > 0) {
+            console.warn(`⚠️ Encontrados ${checkData.length} veículos ativos, mas não foram retornados pela query principal`)
+            console.warn('Veículos encontrados:', checkData)
+            console.warn('⚠️ Possível problema: RLS policies podem estar bloqueando o acesso')
+          } else {
+            console.log('ℹ️ Não há veículos ativos no banco de dados')
+          }
+        }
+      }
+      
+      if (finalVehiclesData && finalVehiclesData.length > 0) {
+        console.log(`📦 Processando ${finalVehiclesData.length} veículos ativos`)
         
         // Buscar trips ativas para esses veículos
-        const vehicleIds = vehiclesData.map((v: any) => v.id)
+        const vehicleIds = finalVehiclesData.map((v: any) => v.id)
         
         // Buscar trips ativas (inProgress) para obter informações de rota e motorista
         const { data: activeTrips } = await supabase
@@ -531,8 +643,8 @@ export function AdminMap({
           }
         })
         
-        // Montar dados finais dos veículos
-        finalVehiclesData = vehiclesData.map((v: any) => {
+        // Montar dados finais dos veículos - MOSTRAR TODOS OS VEÍCULOS ATIVOS
+        const processedVehicles = finalVehiclesData.map((v: any) => {
           const trip = tripsByVehicle.get(v.id)
           const lastPos = positionsByVehicle.get(v.id)
           
@@ -556,7 +668,18 @@ export function AdminMap({
             } else {
               vehicleStatus = 'stopped_short'
             }
+          } else {
+            // Sem posição = na garagem ou sem GPS
+            vehicleStatus = 'garage'
           }
+          
+          // Se não há posição GPS, usar coordenadas padrão (centro do Brasil) ou null
+          // O mapa vai mostrar o veículo como "sem posição" mas ainda vai aparecer na lista
+          let lat = lastPos?.lat || null
+          let lng = lastPos?.lng || null
+          
+          // Se não há coordenadas válidas, ainda assim incluir o veículo
+          // Ele aparecerá na lista de veículos mesmo sem posição no mapa
           
           return {
             vehicle_id: v.id,
@@ -569,8 +692,8 @@ export function AdminMap({
             route_name: trip?.routes?.name || 'Sem rota ativa',
             driver_id: trip?.driver_id || null,
             driver_name: trip?.users?.name || 'Sem motorista',
-            lat: lastPos?.lat || null,
-            lng: lastPos?.lng || null,
+            lat: lat,
+            lng: lng,
             speed: lastPos?.speed || null,
             heading: heading,
             vehicle_status: vehicleStatus,
@@ -579,6 +702,7 @@ export function AdminMap({
           }
         })
         
+        finalVehiclesData = processedVehicles
         console.log(`✅ Montados ${finalVehiclesData.length} veículos com dados completos`)
       } else if (vehiclesError) {
         console.error('❌ Erro ao carregar veículos:', vehiclesError)
@@ -602,81 +726,162 @@ export function AdminMap({
       })
 
       if (finalVehiclesData && finalVehiclesData.length > 0) {
-        // Validar e filtrar veículos com coordenadas válidas
-        const validVehicles = finalVehiclesData
-          .filter((v: any) => {
-            // Validar coordenadas
-            if (!isValidCoordinate(v.lat, v.lng)) {
-              console.warn(`Veículo ${v.vehicle_id} tem coordenadas inválidas:`, v.lat, v.lng)
-              return false
+        // Processar TODOS os veículos - não filtrar por coordenadas
+        // Veículos sem coordenadas ainda aparecerão na lista e podem ser visualizados
+        const processedVehicles = finalVehiclesData
+          .map((v: any) => {
+            // Normalizar coordenadas se existirem
+            if (v.lat !== null && v.lng !== null && isValidCoordinate(v.lat, v.lng)) {
+              const normalized = normalizeCoordinate(v.lat, v.lng)
+              if (normalized) {
+                v.lat = normalized.lat
+                v.lng = normalized.lng
+              }
+            } else {
+              // Veículo sem coordenadas - ainda assim incluir
+              console.log(`ℹ️ Veículo ${v.plate} (${v.vehicle_id}) sem coordenadas GPS - será exibido como "na garagem"`)
+              v.lat = null
+              v.lng = null
+              v.vehicle_status = 'garage'
             }
             
-            // Normalizar coordenadas
-            const normalized = normalizeCoordinate(v.lat, v.lng)
-            if (normalized) {
-              v.lat = normalized.lat
-              v.lng = normalized.lng
+            return {
+              ...v,
+              // Garantir valores padrão
+              speed: v.speed !== null && !isNaN(v.speed) ? v.speed : null,
+              heading: v.heading !== null && !isNaN(v.heading) ? v.heading : null,
             }
-            
-            return true
           })
-          .map((v: any) => ({
-            ...v,
-            // Garantir valores padrão
-            speed: v.speed !== null && !isNaN(v.speed) ? v.speed : null,
-            heading: v.heading !== null && !isNaN(v.heading) ? v.heading : null,
-          }))
         
-        setVehicles(validVehicles as any)
+        setVehicles(processedVehicles as any)
         
-        // Log para debug detalhado
-        if (validVehicles.length === 0 && finalVehiclesData && finalVehiclesData.length > 0) {
-          console.warn('⚠️ Veículos carregados mas todos foram filtrados por coordenadas inválidas:', finalVehiclesData.length)
-          console.warn('Exemplo de veículo filtrado:', finalVehiclesData[0])
-          toast.error('Veículos encontrados mas todos têm coordenadas inválidas. Verifique o console.')
-        } else if (validVehicles.length > 0) {
-          console.log(`✅ Carregados ${validVehicles.length} veículos válidos de ${finalVehiclesData.length} total`)
+        // Contar veículos com e sem coordenadas
+        const withCoords = processedVehicles.filter((v: any) => v.lat !== null && v.lng !== null).length
+        const withoutCoords = processedVehicles.length - withCoords
+        
+        console.log(`✅ Carregados ${processedVehicles.length} veículos ativos:`)
+        console.log(`   - ${withCoords} com posição GPS`)
+        console.log(`   - ${withoutCoords} sem posição GPS (na garagem)`)
+        
+        if (withCoords === 0 && processedVehicles.length > 0) {
+          toast.success(`${processedVehicles.length} veículo(s) ativo(s) encontrado(s), mas nenhum tem posição GPS recente.`, {
+            duration: 5000
+          })
         }
       } else if (vehiclesError) {
         console.error('❌ Erro ao carregar veículos:', vehiclesError)
         toast.error(`Erro ao carregar veículos: ${vehiclesError.message || 'Erro desconhecido'}`)
       } else {
-        // Nenhum dado retornado e nenhum erro
+        // Nenhum dado retornado e nenhum erro - verificar se há veículos ativos sem filtros
         console.log('ℹ️ Nenhum veículo retornado da query (sem erro)')
+        console.log('🔍 Verificando se há veículos ativos sem filtros...')
+        
+        // Tentar buscar sem filtros para debug
+        const { data: allVehicles, error: allError } = await supabase
+          .from('vehicles')
+          .select('id, plate, is_active, company_id')
+          .eq('is_active', true)
+          .limit(5)
+        
+        if (allError) {
+          console.error('❌ Erro ao verificar veículos:', allError)
+        } else if (allVehicles && allVehicles.length > 0) {
+          console.warn(`⚠️ Encontrados ${allVehicles.length} veículos ativos, mas não foram retornados com os filtros aplicados`)
+          console.warn('Veículos encontrados:', allVehicles.map((v: any) => ({ plate: v.plate, company_id: v.company_id })))
+        } else {
+          console.log('ℹ️ Não há veículos ativos no banco de dados')
+        }
       }
 
       // Carregar rotas (lazy loading será aplicado via loadVisibleRoutes)
       await loadVisibleRoutes()
 
-      // Carregar alertas (fallback sem a view v_alerts_open)
+      // Carregar alertas - DESABILITADO (serão carregados via realtime polling)
+      console.log('ℹ️ Carregamento de alertas inicial desabilitado - serão carregados via polling do realtime-service')
+      setAlerts([]) // Inicializar vazio
+      
+      /*
+      // CÓDIGO DESABILITADO - Carregamento de alertas comentado devido a problemas de schema cache
       let combinedAlerts: any[] = []
       let alertsErrorMsg: string | null = null
-
       try {
-        // Incidentes abertos
-        let incidentsQuery = supabase
-          .from('gf_incidents')
-          .select('id, company_id, route_id, vehicle_id, severity, description, created_at, lat, lng, status')
-          .eq('status', 'open')
-
-        if (filters.company) {
-          incidentsQuery = incidentsQuery.eq('company_id', filters.company)
+        // Helper: detectar erro de tabela ausente no cache do PostgREST
+        const isMissingTableError = (err: any, table: string) => {
+          const msg = (err as any)?.message || ''
+          return typeof msg === 'string' && msg.includes(`Could not find the table 'public.${table}'`)
         }
 
-        const { data: incidentsData, error: incidentsError } = await incidentsQuery
+        // Incidentes abertos (sem lat/lng pois a tabela não tem essas colunas)
+        let incidentsData: any[] = []
+        let incidentsError: any = null
+        
+        try {
+          let incidentsQuery = supabase
+            .from('gf_incidents')
+            .select('id, company_id, route_id, vehicle_id, severity, description, created_at, status')
+            .eq('status', 'open')
 
-        // Solicitações de socorro abertas
-        let assistanceQuery = supabase
-          .from('gf_service_requests')
-          .select('id, company_id, route_id, vehicle_id, severity, description, created_at, lat, lng, tipo, status')
-          .eq('tipo', 'socorro')
-          .eq('status', 'open')
+          if (filters.company) {
+            incidentsQuery = incidentsQuery.eq('company_id', filters.company)
+          }
 
-        if (filters.company) {
-          assistanceQuery = assistanceQuery.eq('company_id', filters.company)
+          const result = await incidentsQuery
+          incidentsData = result.data || []
+          incidentsError = result.error
+        } catch (error: any) {
+          // Se erro for sobre coluna inexistente, ignorar silenciosamente
+          if (error?.message?.includes('does not exist') || error?.message?.includes('column')) {
+            console.warn('Erro ao carregar incidentes (coluna inexistente), continuando sem incidentes:', error.message)
+            incidentsError = null
+            incidentsData = []
+          } else {
+            incidentsError = error
+          }
         }
 
-        const { data: assistanceData, error: assistanceError } = await assistanceQuery
+        // Se a tabela gf_incidents não estiver no cache, seguir sem incidentes
+        if (incidentsError && isMissingTableError(incidentsError, 'gf_incidents')) {
+          console.warn('Tabela gf_incidents ausente no schema cache — seguindo sem incidentes (aplicar migration v43_admin_core).')
+          incidentsError = null
+          incidentsData = []
+        }
+
+        // Solicitações de socorro abertas (painel operador)
+        let assistanceData: any[] = []
+        let assistanceError: any = null
+        
+        try {
+          let assistanceQuery = supabase
+            .from('gf_service_requests')
+            .select('id, empresa_id, route_id, tipo, status, payload, created_at')
+            .eq('tipo', 'socorro')
+            .eq('status', 'open')
+
+          if (filters.company) {
+            // Nota: coluna é empresa_id em gf_service_requests
+            assistanceQuery = assistanceQuery.eq('empresa_id', filters.company)
+          }
+
+          const result = await assistanceQuery
+          assistanceData = result.data || []
+          assistanceError = result.error
+        } catch (error: any) {
+          // Se erro for sobre coluna inexistente, ignorar silenciosamente
+          if (error?.message?.includes('does not exist') || error?.message?.includes('column')) {
+            console.warn('Erro ao carregar assistência (coluna inexistente), continuando sem assistência:', error.message)
+            assistanceError = null
+            assistanceData = []
+          } else {
+            assistanceError = error
+          }
+        }
+
+        // Se a tabela gf_service_requests estiver ausente, seguir sem assistência
+        if (assistanceError && isMissingTableError(assistanceError, 'gf_service_requests')) {
+          console.warn('Tabela gf_service_requests ausente no schema cache — seguindo sem assistência (aplicar migrations operador).')
+          assistanceError = null
+          assistanceData = []
+        }
 
         if (incidentsError && assistanceError) {
           const msg = (incidentsError as any)?.message ?? (assistanceError as any)?.message ?? (() => { try { return JSON.stringify(incidentsError || assistanceError) } catch { return String(incidentsError || assistanceError) } })()
@@ -689,30 +894,36 @@ export function AdminMap({
             route_id: i.route_id,
             vehicle_id: i.vehicle_id,
             severity: i.severity,
-            lat: i.lat,
-            lng: i.lng,
+            lat: null, // gf_incidents não tem coluna lat
+            lng: null, // gf_incidents não tem coluna lng
             description: i.description,
             created_at: i.created_at,
           }))
 
-          const mappedAssistance = (assistanceData || []).map((a: any) => ({
-            alert_id: a.id,
-            alert_type: 'assistance',
-            company_id: a.company_id,
-            route_id: a.route_id,
-            vehicle_id: a.vehicle_id,
-            severity: a.severity || 'high',
-            lat: a.lat,
-            lng: a.lng,
-            description: a.description,
-            created_at: a.created_at,
-          }))
+          // Extrair lat/lng se presente no payload
+          const mappedAssistance = (assistanceData || []).map((a: any) => {
+            const payload = a.payload || {}
+            const lat = payload.lat ?? payload.latitude ?? null
+            const lng = payload.lng ?? payload.longitude ?? null
+            return {
+              alert_id: a.id,
+              alert_type: 'assistance',
+              company_id: a.empresa_id,
+              route_id: a.route_id,
+              vehicle_id: payload.vehicle_id ?? null,
+              severity: payload.severity ?? 'high',
+              lat,
+              lng,
+              description: payload.description ?? 'Solicitação de socorro',
+              created_at: a.created_at,
+            }
+          })
 
           combinedAlerts = [...mappedIncidents, ...mappedAssistance]
 
           // Validar alertas com coordenadas quando presentes
           const validAlerts = combinedAlerts.filter((a: any) => {
-            if (a.lat !== undefined && a.lng !== undefined) {
+            if (a.lat !== undefined && a.lng !== undefined && a.lat !== null && a.lng !== null) {
               if (!isValidCoordinate(a.lat, a.lng)) {
                 console.warn(`Alerta ${a.alert_id} tem coordenadas inválidas`)
                 return false
@@ -736,6 +947,7 @@ export function AdminMap({
       if (alertsErrorMsg) {
         console.error('Erro ao carregar alertas:', alertsErrorMsg)
       }
+      */
 
       // Carregar paradas das rotas
       const routeIds = routes?.map((r: any) => r.route_id) || []
@@ -1282,22 +1494,9 @@ export function AdminMap({
 
       toast.success('Socorro despachado com sucesso!')
       
-      // Recarregar alertas para mostrar o novo
-      const { data: alertsData } = await supabase
-        .from('v_alerts_open')
-        .select('*')
-        .eq('alert_id', data.id)
-        .single()
-      
-      if (alertsData) {
-        setAlerts((prev) => {
-          const exists = prev.find(a => a.alert_id === alertsData.alert_id)
-          if (!exists) {
-            return [...prev, alertsData as any]
-          }
-          return prev
-        })
-      }
+      // Recarregar alertas chamando loadInitialData novamente
+      // Isso vai recarregar todos os alertas incluindo o novo socorro
+      loadInitialData()
     } catch (error: any) {
       console.error('Erro ao despachar socorro:', error)
       toast.error('Erro ao despachar socorro: ' + (error.message || 'Erro desconhecido'))
@@ -1754,18 +1953,20 @@ export function AdminMap({
           <div className="text-center max-w-md p-6 bg-white rounded-lg shadow-lg">
             <MapIcon className="h-16 w-16 text-[var(--ink-muted)] mx-auto mb-4" />
             <h3 className="text-xl font-semibold mb-2">Sem veículos ativos</h3>
-            <p className="text-[var(--ink-muted)] mb-4">
+            <p className="text-sm text-[var(--ink-muted)] mb-4">
               Nenhum veículo encontrado com os filtros selecionados.
             </p>
-            <div className="text-sm text-left text-[var(--ink-muted)] mb-4 bg-[var(--bg-soft)] p-4 rounded">
-              <p className="font-semibold mb-2">Possíveis causas:</p>
-              <ul className="list-disc list-inside space-y-1">
-                <li>Não há trips com status "inProgress"</li>
-                <li>Não há posições de GPS nos últimos 5 minutos</li>
-                <li>Filtro de empresa está excluindo todos os veículos</li>
-                <li>Veículos não estão marcados como ativos</li>
+            <details className="text-left text-sm text-[var(--ink-muted)] bg-gray-50 p-4 rounded mb-4">
+              <summary className="cursor-pointer font-medium mb-2">Possíveis causas:</summary>
+              <ul className="list-disc list-inside space-y-1 mt-2">
+                <li>Não há veículos marcados como ativos no banco de dados</li>
+                <li>Políticas RLS podem estar bloqueando o acesso</li>
+                <li>Filtro de empresa pode estar excluindo todos os veículos</li>
+                <li>Veículos não têm trips ativas com status "inProgress"</li>
+                <li>Veículos sem posição GPS ainda aparecerão na lista</li>
+                <li>Verifique o console do navegador (F12) para mais detalhes</li>
               </ul>
-            </div>
+            </details>
             <Button 
               onClick={() => {
                 console.log('🔄 Recarregando dados...')

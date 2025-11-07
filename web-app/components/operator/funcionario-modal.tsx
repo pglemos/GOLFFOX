@@ -37,19 +37,21 @@ export function FuncionarioModal({ funcionario, isOpen, onClose, onSave, empresa
   })
 
   useEffect(() => {
-    if (funcionario) {
+    if (funcionario && isOpen) {
+      // Se funcionario tem dados diretos (não nested)
       setFormData({
-        name: funcionario.employee?.name || "",
-        email: funcionario.employee?.email || "",
-        phone: funcionario.employee?.phone || "",
+        name: funcionario.name || funcionario.employee?.name || "",
+        email: funcionario.email || funcionario.employee?.email || "",
+        phone: funcionario.phone || funcionario.employee?.phone || "",
         cpf: funcionario.cpf || "",
         address: funcionario.address || "",
-        latitude: funcionario.latitude,
-        longitude: funcionario.longitude,
-        cost_center_id: funcionario.cost_center_id,
+        latitude: funcionario.latitude || null,
+        longitude: funcionario.longitude || null,
+        cost_center_id: funcionario.cost_center_id || null,
         is_active: funcionario.is_active ?? true
       })
-    } else {
+    } else if (!funcionario && isOpen) {
+      // Reset para novo funcionário
       setFormData({
         name: "",
         email: "",

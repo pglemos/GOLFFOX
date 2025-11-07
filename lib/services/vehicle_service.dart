@@ -78,13 +78,13 @@ class VehicleFilters {
     );
 
   bool get hasActiveFilters =>
-      statuses?.isNotEmpty ?? false ||
-      types?.isNotEmpty ?? false ||
-      fuelTypes?.isNotEmpty ?? false ||
-      searchQuery?.isNotEmpty ?? false ||
-      needsMaintenance ?? false ||
-      hasLowFuel ?? false ||
-      hasExpiringDocuments ?? false;
+      (statuses?.isNotEmpty ?? false) ||
+      (types?.isNotEmpty ?? false) ||
+      (fuelTypes?.isNotEmpty ?? false) ||
+      (searchQuery?.isNotEmpty ?? false) ||
+      (needsMaintenance ?? false) ||
+      (hasLowFuel ?? false) ||
+      (hasExpiringDocuments ?? false);
 }
 
 class VehicleService {

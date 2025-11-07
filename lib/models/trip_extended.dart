@@ -82,21 +82,31 @@ class TripExtended {
   }
 
   factory TripExtended.fromJson(Map<String, dynamic> json) => TripExtended(
-        id: json['id'],
-        driverId: json['driverId'],
-        passengerId: json['passengerId'],
-        origin: json['origin'],
-        destination: json['destination'],
-        startTime: DateTime.parse(json['startTime']),
-        endTime:
-            json['endTime'] != null ? DateTime.parse(json['endTime']) : null,
-        distance: json['distance'].toDouble(),
-        fare: json['fare'].toDouble(),
-        status: TripStatus.fromString(json['status']),
-        rating: json['rating']?.toDouble(),
-        notes: json['notes'],
-        createdAt: DateTime.parse(json['createdAt']),
-        updatedAt: DateTime.parse(json['updatedAt']),
+        id: json['id'] as String? ?? '',
+        driverId: json['driverId'] as String? ?? '',
+        passengerId: json['passengerId'] as String? ?? '',
+        origin: json['origin'] as String? ?? '',
+        destination: json['destination'] as String? ?? '',
+        startTime: DateTime.parse(
+          json['startTime'] as String? ??
+              DateTime.now().toIso8601String(),
+        ),
+        endTime: (json['endTime'] as String?) != null
+            ? DateTime.parse(json['endTime'] as String)
+            : null,
+        distance: (json['distance'] as num?)?.toDouble() ?? 0,
+        fare: (json['fare'] as num?)?.toDouble() ?? 0,
+        status: TripStatus.fromString(json['status']?.toString() ?? ''),
+        rating: (json['rating'] as num?)?.toDouble(),
+        notes: json['notes'] as String?,
+        createdAt: DateTime.parse(
+          json['createdAt'] as String? ??
+              DateTime.now().toIso8601String(),
+        ),
+        updatedAt: DateTime.parse(
+          json['updatedAt'] as String? ??
+              DateTime.now().toIso8601String(),
+        ),
       );
   final String id;
   final String driverId;

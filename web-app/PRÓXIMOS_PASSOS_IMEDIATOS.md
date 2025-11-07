@@ -274,3 +274,4 @@ Próximos passos sugeridos:
 **Próxima Ação Imediata:** Configurar CRON_SECRET no Vercel Dashboard
 
 
+

@@ -26,6 +26,7 @@ interface Vehicle {
   capacity: number | string
   prefix?: string
   company_id?: string
+  carrier_id?: string
   is_active?: boolean
   photo_url?: string | null
 }
@@ -49,7 +50,38 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
   const [loading, setLoading] = useState(false)
   const [photoFile, setPhotoFile] = useState<File | null>(null)
   const [photoPreview, setPhotoPreview] = useState<string>("")
+  const [userInfo, setUserInfo] = useState<{role?: string, company_id?: string, carrier_id?: string}>({})
   const { sync } = useSupabaseSync({ showToast: false }) // Toast já é mostrado no modal
+
+  // Carregar informações do usuário para determinar company_id/carrier_id
+  useEffect(() => {
+    const loadUserInfo = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession()
+        if (session?.user) {
+          const { data: userData, error } = await supabase
+            .from('users')
+            .select('role, company_id, carrier_id')
+            .eq('id', session.user.id)
+            .single()
+          
+          if (!error && userData) {
+            setUserInfo({
+              role: userData.role,
+              company_id: userData.company_id,
+              carrier_id: userData.carrier_id
+            })
+          }
+        }
+      } catch (error) {
+        console.error('Erro ao carregar informações do usuário:', error)
+      }
+    }
+    
+    if (isOpen) {
+      loadUserInfo()
+    }
+  }, [isOpen])
 
   useEffect(() => {
     if (vehicle) {
@@ -121,95 +153,320 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
     try {
       let vehicleId = vehicle?.id
 
-      // Upload da foto primeiro se houver
+      // Preparar dados do veículo com validação rigorosa
       let photoUrl: string | null = formData.photo_url ?? null
+      
+      // Upload da foto ANTES se for update (já temos o ID)
+      // Com timeout para evitar travamento
       if (photoFile && vehicleId) {
-        photoUrl = await uploadPhoto(vehicleId)
+        try {
+          const uploadPromise = uploadPhoto(vehicleId)
+          const timeoutPromise = new Promise<never>((_, reject) => 
+            setTimeout(() => reject(new Error('Timeout no upload da foto (30s)')), 30000)
+          )
+          
+          const uploadedUrl = await Promise.race([uploadPromise, timeoutPromise]) as string | null
+          if (uploadedUrl) {
+            photoUrl = uploadedUrl
+          }
+        } catch (uploadError: any) {
+          console.warn('⚠️ Erro no upload da foto (continuando sem foto):', uploadError)
+          // Continuar sem foto se houver erro no upload
+        }
       }
 
-      // Preparar dados do veículo (TODAS as colunas agora existem no banco!)
+      // Converter year e capacity para números, tratando strings vazias
+      let yearValue: number | null = null
+      if (formData.year) {
+        const yearNum = typeof formData.year === 'string' ? parseInt(formData.year) : formData.year
+        if (!isNaN(yearNum)) {
+          yearValue = yearNum
+        }
+      }
+
+      let capacityValue: number | null = null
+      if (formData.capacity) {
+        const capacityNum = typeof formData.capacity === 'string' ? parseInt(formData.capacity) : formData.capacity
+        if (!isNaN(capacityNum)) {
+          capacityValue = capacityNum
+        }
+      }
+
       const vehicleDataRaw: any = {
-        plate: formData.plate,
-        model: formData.model,
-        year: formData.year ? parseInt(formData.year as string) : null,
-        prefix: formData.prefix || null,
-        capacity: formData.capacity ? parseInt(formData.capacity as string) : null,
-        is_active: formData.is_active !== undefined ? formData.is_active : true,
-        photo_url: photoUrl || null,
-        company_id: formData.company_id || null,
+        plate: formData.plate?.trim().toUpperCase() || null,
+        model: formData.model?.trim() || null,
+        year: yearValue,
+        prefix: formData.prefix?.trim() || null,
+        capacity: capacityValue,
+        is_active: formData.is_active !== undefined ? Boolean(formData.is_active) : true,
+      }
+
+      // Incluir photo_url apenas se houver valor
+      if (photoUrl) {
+        vehicleDataRaw.photo_url = photoUrl
+      }
+
+      // Incluir company_id ou carrier_id baseado no papel do usuário
+      // Para admin: pode definir qualquer company_id
+      // Para operator: deve usar o company_id do usuário
+      // Para carrier: deve usar o carrier_id do usuário
+      if (userInfo.role === 'admin') {
+        // Admin pode definir company_id manualmente se fornecido no formData
+        if (formData.company_id) {
+          vehicleDataRaw.company_id = formData.company_id
+        }
+      } else if (userInfo.role === 'operator') {
+        // Operator deve usar seu próprio company_id
+        if (userInfo.company_id) {
+          vehicleDataRaw.company_id = userInfo.company_id
+        } else if (formData.company_id) {
+          vehicleDataRaw.company_id = formData.company_id
+        }
+      } else if (userInfo.role === 'carrier') {
+        // Carrier deve usar seu próprio carrier_id
+        if (userInfo.carrier_id) {
+          vehicleDataRaw.carrier_id = userInfo.carrier_id
+        }
       }
       
-      const finalVehicleData: any = { ...vehicleDataRaw }
+      // Se for update, manter company_id/carrier_id existente se não foi alterado
+      if (vehicleId && vehicle) {
+        if (!vehicleDataRaw.company_id && vehicle.company_id) {
+          vehicleDataRaw.company_id = vehicle.company_id
+        }
+        if (!vehicleDataRaw.carrier_id && (vehicle as any).carrier_id) {
+          vehicleDataRaw.carrier_id = (vehicle as any).carrier_id
+        }
+      }
+
+      // Validar campos obrigatórios
+      if (!vehicleDataRaw.plate) {
+        throw new Error('Placa é obrigatória')
+      }
+      if (!vehicleDataRaw.model) {
+        throw new Error('Modelo é obrigatório')
+      }
+
+      // Validar tipos numéricos
+      if (vehicleDataRaw.year !== null && vehicleDataRaw.year !== undefined && (isNaN(vehicleDataRaw.year) || vehicleDataRaw.year < 1900 || vehicleDataRaw.year > new Date().getFullYear() + 1)) {
+        throw new Error('Ano inválido')
+      }
+      // Capacity é opcional, mas se fornecido, deve ser válido
+      if (vehicleDataRaw.capacity !== null && vehicleDataRaw.capacity !== undefined && vehicleDataRaw.capacity !== '' && (isNaN(vehicleDataRaw.capacity) || vehicleDataRaw.capacity < 1)) {
+        throw new Error('Capacidade deve ser um número maior que zero')
+      }
+
+      // Preparar dados finais: incluir todos os campos válidos
+      // Para update, incluir apenas campos que foram alterados
+      // Para create, incluir todos os campos necessários
+      const finalVehicleData: any = {}
+      Object.keys(vehicleDataRaw).forEach(key => {
+        const value = vehicleDataRaw[key]
+        // Incluir:
+        // - Valores não-null e não-undefined
+        // - Strings não-vazias (exceto prefix que pode ser vazio)
+        // - Números (incluindo 0)
+        // - Booleans (incluindo false)
+        if (value !== null && value !== undefined) {
+          if (typeof value === 'string') {
+            // Para strings, incluir apenas se não for vazia (exceto prefix)
+            if (value.trim() !== '' || key === 'prefix') {
+              finalVehicleData[key] = value.trim()
+            }
+          } else {
+            // Para números e booleans, sempre incluir
+            finalVehicleData[key] = value
+          }
+        }
+      })
       
+      // Validar que há dados para salvar
+      if (Object.keys(finalVehicleData).length === 0) {
+        throw new Error('Nenhum dado para salvar. Verifique os campos preenchidos.')
+      }
+      
+      console.log('📤 Dados a serem salvos:', finalVehicleData)
+      console.log('📊 Total de campos:', Object.keys(finalVehicleData).length)
       
       if (vehicleId) {
-        // Atualizar
-        const { error } = await supabase
+        // ATUALIZAR
+        // Validar ID do veículo
+        if (!vehicleId || vehicleId.trim() === '') {
+          throw new Error('ID do veículo inválido')
+        }
+        
+        console.log('🔄 Atualizando veículo:', vehicleId)
+        console.log('📦 Payload:', JSON.stringify(finalVehicleData, null, 2))
+        
+        // Adicionar timeout para evitar travamento
+        const updatePromise = supabase
           .from("vehicles")
           .update(finalVehicleData)
           .eq("id", vehicleId)
+          .select()
+          .single()
 
-        if (error) throw error
-        
-        // Sincronização com Supabase (garantia adicional)
-        await sync({
-          resourceType: 'vehicle',
-          resourceId: vehicleId,
-          action: 'update',
-          data: finalVehicleData,
+        // Criar promise de timeout
+        const timeoutPromise = new Promise<never>((_, reject) => {
+          setTimeout(() => reject(new Error('Timeout na atualização (30s) - A requisição está demorando muito')), 30000)
         })
+
+        let updateResult: any
+        try {
+          // Usar Promise.race para implementar timeout
+          updateResult = await Promise.race([updatePromise, timeoutPromise])
+        } catch (timeoutError: any) {
+          console.error('❌ Erro na requisição (timeout ou rede):', timeoutError)
+          const errorMsg = timeoutError?.message || 'Tempo de espera excedido. Tente novamente.'
+          throw new Error(`Erro de conexão: ${errorMsg}`)
+        }
+
+        const { data, error } = updateResult
+
+        if (error) {
+          console.error('❌ Erro do Supabase ao atualizar:', {
+            code: error.code,
+            message: error.message,
+            details: error.details,
+            hint: error.hint,
+            fullError: error
+          })
+          
+          // Mensagem de erro mais amigável
+          let errorMessage = 'Erro ao atualizar veículo'
+          if (error.message) {
+            errorMessage = error.message
+            // Traduzir erros comuns
+            if (error.message.includes('duplicate') || error.message.includes('unique')) {
+              errorMessage = 'Já existe um veículo com esta placa'
+            } else if (error.message.includes('foreign key') || error.message.includes('company_id')) {
+              errorMessage = 'Empresa inválida ou não encontrada'
+            } else if (error.message.includes('null value') || error.message.includes('not null')) {
+              errorMessage = 'Campo obrigatório está faltando'
+            } else if (error.message.includes('schema cache')) {
+              errorMessage = 'Erro de estrutura do banco de dados. Entre em contato com o suporte.'
+            }
+          }
+          
+          throw new Error(errorMessage)
+        }
         
+        if (!data) {
+          throw new Error('Nenhum dado retornado do servidor')
+        }
+        
+        console.log('✅ Veículo atualizado com sucesso:', data)
         toast.success("Veículo atualizado com sucesso!")
         
-        // Log de auditoria
-        await auditLogs.update('vehicle', vehicleId, { plate: finalVehicleData.plate, model: finalVehicleData.model })
+        // Log de auditoria (não bloquear em caso de erro)
+        try {
+          await Promise.race([
+            auditLogs.update('vehicle', vehicleId, { 
+              plate: finalVehicleData.plate, 
+              model: finalVehicleData.model 
+            }),
+            new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 5000))
+          ])
+        } catch (auditError) {
+          console.warn('⚠️ Erro ao registrar log de auditoria (não crítico):', auditError)
+        }
       } else {
-        // Criar
+        // CRIAR
+        console.log('🆕 Criando novo veículo')
         const { data, error } = await supabase
           .from("vehicles")
           .insert(finalVehicleData)
           .select()
           .single()
 
-        if (error) throw error
+        if (error) {
+          console.error('❌ Erro do Supabase ao criar:', {
+            code: error.code,
+            message: error.message,
+            details: error.details,
+            hint: error.hint
+          })
+          throw new Error(`Erro ao cadastrar veículo: ${error.message || JSON.stringify(error)}`)
+        }
+        
+        if (!data?.id) {
+          throw new Error('Veículo criado mas ID não retornado')
+        }
         
         vehicleId = data.id
+        console.log('✅ Veículo criado com sucesso:', data)
 
-        // Upload da foto após criar
+        // Upload da foto APÓS criar (se houver foto pendente)
         if (photoFile && vehicleId) {
-          photoUrl = await uploadPhoto(vehicleId)
-          await supabase
-            .from("vehicles")
-            .update({ photo_url: photoUrl })
-            .eq("id", vehicleId)
+          const uploadedUrl = await uploadPhoto(vehicleId)
+          if (uploadedUrl) {
+            const { error: updateError } = await supabase
+              .from("vehicles")
+              .update({ photo_url: uploadedUrl })
+              .eq("id", vehicleId)
+            
+            if (updateError) {
+              console.warn('⚠️ Erro ao atualizar foto após criar veículo (não crítico):', updateError)
+            }
+          }
         }
 
-        // Sincronização com Supabase (garantia adicional)
-        await sync({
-          resourceType: 'vehicle',
-          resourceId: vehicleId || '',
-          action: 'create',
-          data: finalVehicleData,
-        })
-        
         toast.success("Veículo cadastrado com sucesso!")
         
-        // Log de auditoria
-        if (vehicleId) {
+        // Log de auditoria (não bloquear em caso de erro)
+        try {
           await auditLogs.create('vehicle', vehicleId, { 
             plate: finalVehicleData.plate || '', 
             model: finalVehicleData.model || '' 
           })
+        } catch (auditError) {
+          console.warn('⚠️ Erro ao registrar log de auditoria (não crítico):', auditError)
         }
       }
 
+      // Aguardar um pouco antes de fechar para garantir que tudo foi salvo
+      await new Promise(resolve => setTimeout(resolve, 100))
+      
       onSave()
       onClose()
     } catch (error: any) {
-      console.error("Erro ao salvar veículo:", error)
-      toast.error(error.message || "Erro ao salvar veículo")
+      console.error("❌ Erro ao salvar veículo:", error)
+      
+      // Extrair mensagem de erro de forma mais robusta
+      let errorMessage = "Erro ao salvar veículo"
+      if (error?.message) {
+        errorMessage = error.message
+      } else if (typeof error === 'string') {
+        errorMessage = error
+      } else if (error?.toString) {
+        errorMessage = error.toString()
+      }
+      
+      // Log completo do erro para debug
+      console.error("Detalhes completos do erro:", {
+        error,
+        message: errorMessage,
+        stack: error?.stack,
+        name: error?.name
+      })
+      
+      toast.error(errorMessage, {
+        duration: 5000,
+        style: {
+          background: '#ef4444',
+          color: '#fff',
+          padding: '16px',
+          borderRadius: '8px',
+        }
+      })
     } finally {
+      // SEMPRE resetar loading, mesmo se houver erro não capturado
       setLoading(false)
+      
+      // Garantir que o loading seja resetado após um tempo máximo
+      setTimeout(() => {
+        setLoading(false)
+      }, 100)
     }
   }
 
@@ -318,15 +575,14 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="capacity">Capacidade *</Label>
+              <Label htmlFor="capacity">Capacidade</Label>
               <Input
                 id="capacity"
                 type="number"
-                value={formData.capacity}
-                onChange={(e) => setFormData({ ...formData, capacity: e.target.value })}
+                value={formData.capacity || ""}
+                onChange={(e) => setFormData({ ...formData, capacity: e.target.value || "" })}
                 placeholder="40"
                 min="1"
-                required
               />
             </div>
 

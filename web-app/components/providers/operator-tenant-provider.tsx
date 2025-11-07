@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react'
+import { createContext, useContext, useState, useEffect, ReactNode, useCallback, useMemo } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 
@@ -12,11 +12,13 @@ interface TenantContextType {
   companies: Array<{ id: string; name: string; logoUrl: string | null }>
   switchTenant: (companyId: string) => void
   loading: boolean
+  error: string | null
 }
 
 const TenantContext = createContext<TenantContextType | undefined>(undefined)
 
-export function OperatorTenantProvider({ children }: { children: ReactNode }) {
+// Wrapper para usar searchParams dentro de Suspense
+function OperatorTenantProviderInner({ children }: { children: ReactNode }) {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -26,14 +28,33 @@ export function OperatorTenantProvider({ children }: { children: ReactNode }) {
   const [brandTokens, setBrandTokens] = useState({ primaryHex: '#F97316', accentHex: '#2E7D32' })
   const [companies, setCompanies] = useState<Array<{ id: string; name: string; logoUrl: string | null }>>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  // Memoizar URL company ID para evitar re-renders desnecessários
+  const urlCompanyId = useMemo(() => {
+    try {
+      return searchParams.get('company')
+    } catch (e) {
+      return null
+    }
+  }, [searchParams])
 
   const loadCompanies = useCallback(async () => {
     try {
-      const { data, error } = await supabase
+      setLoading(true)
+      setError(null)
+      console.log('🔍 Carregando empresas do operador...')
+      
+      const { data, error: queryError } = await supabase
         .from('v_my_companies')
-        .select('id, name, logo_url, primary_hex, accent_hex')
+        .select('id, name, logo_url, primary_hex, accent_hex, branding_name')
 
-      if (error) throw error
+      if (queryError) {
+        console.error('❌ Erro ao buscar empresas:', queryError)
+        setError(`Erro ao carregar empresas: ${queryError.message}`)
+        setCompanies([])
+        return
+      }
 
       const formattedCompanies = (data || []).map(c => ({
         id: c.id,
@@ -41,78 +62,107 @@ export function OperatorTenantProvider({ children }: { children: ReactNode }) {
         logoUrl: c.logo_url || null
       }))
 
+      console.log(`✅ ${formattedCompanies.length} empresas encontradas:`, formattedCompanies.map(c => c.name))
       setCompanies(formattedCompanies)
 
-      // Determinar tenant: ?company= > localStorage > primeira empresa
-      const urlCompanyId = searchParams.get('company')
-      const storedCompanyId = typeof window !== 'undefined' 
-        ? localStorage.getItem('operator_tenant_company_id') 
-        : null
-      const selectedId = urlCompanyId || storedCompanyId || formattedCompanies[0]?.id
+      // Buscar brand tokens da primeira empresa ou empresa selecionada
+      if (formattedCompanies.length > 0) {
+        const storedCompanyId = typeof window !== 'undefined' 
+          ? localStorage.getItem('operator_tenant_company_id') 
+          : null
+        const selectedId = urlCompanyId || storedCompanyId || formattedCompanies[0]?.id
 
-      if (selectedId && formattedCompanies.length > 0) {
         const selectedCompany = formattedCompanies.find(c => c.id === selectedId) || formattedCompanies[0]
-        switchTenantInternal(selectedCompany.id, selectedCompany)
+        
+        if (selectedCompany) {
+          console.log(`✅ Empresa selecionada: ${selectedCompany.name} (${selectedCompany.id})`)
+          setTenantCompanyId(selectedCompany.id)
+          setCompanyName(selectedCompany.name)
+          setLogoUrl(selectedCompany.logoUrl || null)
+          
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('operator_tenant_company_id', selectedCompany.id)
+          }
+
+          // Buscar brand tokens
+          const { data: brandingData } = await supabase
+            .from('gf_company_branding')
+            .select('primary_hex, accent_hex')
+            .eq('company_id', selectedCompany.id)
+            .single()
+
+          if (brandingData) {
+            setBrandTokens({
+              primaryHex: brandingData.primary_hex || '#F97316',
+              accentHex: brandingData.accent_hex || '#2E7D32'
+            })
+          }
+
+          // Atualizar URL se necessário
+          if (urlCompanyId && urlCompanyId !== selectedCompany.id) {
+            // URL tem empresa diferente, atualizar para a válida
+            const url = new URL(window.location.href)
+            url.searchParams.set('company', selectedCompany.id)
+            router.replace(url.pathname + url.search, { scroll: false })
+          }
+        }
+      } else {
+        console.warn('⚠️ Nenhuma empresa encontrada para o operador')
+        setTenantCompanyId(null)
+        setError('Nenhuma empresa encontrada. Verifique se você tem acesso a pelo menos uma empresa.')
       }
-    } catch (error) {
-      console.error('Erro ao carregar empresas:', error)
+    } catch (err: any) {
+      console.error('❌ Erro ao carregar empresas:', err)
+      setError(`Erro inesperado: ${err?.message || 'Erro desconhecido'}`)
+      setCompanies([])
     } finally {
       setLoading(false)
     }
-  }, [searchParams])
-
-  const switchTenantInternal = useCallback((
-    companyId: string,
-    company?: { id: string; name: string; logoUrl: string | null }
-  ) => {
-    const companyData = company || companies.find(c => c.id === companyId)
-    if (!companyData) return
-
-    setTenantCompanyId(companyId)
-    setCompanyName(companyData.name)
-    setLogoUrl(companyData.logoUrl || null)
-    
-    // Persistir em localStorage
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('operator_tenant_company_id', companyId)
-    }
-    
-    // Atualizar URL sem recarregar a página
-    const url = new URL(window.location.href)
-    url.searchParams.set('company', companyId)
-    router.replace(url.pathname + url.search, { scroll: false })
-  }, [companies, router])
+  }, [urlCompanyId, router])
 
   const switchTenant = useCallback((companyId: string) => {
-    switchTenantInternal(companyId)
-  }, [switchTenantInternal])
+    const company = companies.find(c => c.id === companyId)
+    if (!company) {
+      console.warn(`⚠️ Empresa ${companyId} não encontrada`)
+      return
+    }
 
+    setTenantCompanyId(companyId)
+    setCompanyName(company.name)
+    setLogoUrl(company.logoUrl || null)
+    
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('operator_tenant_company_id', companyId)
+      
+      // Atualizar URL
+      const url = new URL(window.location.href)
+      url.searchParams.set('company', companyId)
+      router.replace(url.pathname + url.search, { scroll: false })
+    }
+
+    // Buscar brand tokens
+    supabase
+      .from('gf_company_branding')
+      .select('primary_hex, accent_hex')
+      .eq('company_id', companyId)
+      .single()
+      .then(({ data }) => {
+        if (data) {
+          setBrandTokens({
+            primaryHex: data.primary_hex || '#F97316',
+            accentHex: data.accent_hex || '#2E7D32'
+          })
+        }
+      })
+      .catch((err) => {
+        console.warn('Erro ao buscar branding:', err)
+      })
+  }, [companies, router])
+
+  // Carregar empresas quando o componente monta ou quando URL muda
   useEffect(() => {
     loadCompanies()
   }, [loadCompanies])
-
-  // Atualizar brand tokens quando company muda
-  useEffect(() => {
-    if (tenantCompanyId && companies.length > 0) {
-      const company = companies.find(c => c.id === tenantCompanyId)
-      if (company) {
-        // Buscar brand tokens da empresa
-        supabase
-          .from('gf_company_branding')
-          .select('primary_hex, accent_hex')
-          .eq('company_id', tenantCompanyId)
-          .single()
-          .then(({ data }) => {
-            if (data) {
-              setBrandTokens({
-                primaryHex: data.primary_hex || '#F97316',
-                accentHex: data.accent_hex || '#2E7D32'
-              })
-            }
-          })
-      }
-    }
-  }, [tenantCompanyId, companies])
 
   return (
     <TenantContext.Provider value={{
@@ -122,17 +172,33 @@ export function OperatorTenantProvider({ children }: { children: ReactNode }) {
       brandTokens,
       companies,
       switchTenant,
-      loading
+      loading,
+      error
     }}>
       {children}
     </TenantContext.Provider>
   )
 }
 
+export function OperatorTenantProvider({ children }: { children: ReactNode }) {
+  return <OperatorTenantProviderInner>{children}</OperatorTenantProviderInner>
+}
+
 export function useOperatorTenant() {
   const context = useContext(TenantContext)
   if (!context) {
-    throw new Error('useOperatorTenant must be used within OperatorTenantProvider')
+    console.error('⚠️ useOperatorTenant usado fora do OperatorTenantProvider')
+    // Retornar valores padrão em vez de lançar erro para evitar crash
+    return {
+      tenantCompanyId: null,
+      companyName: 'Operador',
+      logoUrl: null,
+      brandTokens: { primaryHex: '#F97316', accentHex: '#2E7D32' },
+      companies: [],
+      switchTenant: () => {},
+      loading: false,
+      error: 'Provider não inicializado'
+    }
   }
   return context
 }

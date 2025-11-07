@@ -5,7 +5,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import '../../core/theme/gf_tokens.dart';
 import '../../ui/widgets/common/gf_app_bar.dart';
 import '../../ui/widgets/common/gf_loading_indicator.dart';
@@ -13,8 +12,6 @@ import '../../ui/widgets/vehicles/vehicle_info_card.dart';
 import '../../ui/widgets/vehicles/vehicle_maintenance_list.dart';
 import '../../ui/widgets/vehicles/vehicle_fuel_chart.dart';
 import '../../models/vehicle.dart';
-import '../../models/maintenance.dart';
-import '../../models/fuel_record.dart';
 import '../../services/vehicle_service.dart';
 import 'create_vehicle_page.dart';
 
@@ -155,9 +152,7 @@ class _VehicleDetailsPageState extends ConsumerState<VehicleDetailsPage>
 
   @override
   Widget build(BuildContext context) {
-    final vehicleAsync = ref.watch(vehicleServiceProvider.select(
-      (service) => service.getVehicleById(widget.vehicleId),
-    ));
+    final vehicleAsync = ref.watch(vehicleProvider(widget.vehicleId));
 
     return vehicleAsync.when(
       loading: () => const Scaffold(
@@ -203,7 +198,7 @@ class _VehicleDetailsPageState extends ConsumerState<VehicleDetailsPage>
           ),
         ),
       ),
-      data: (vehicle) {
+      data: (Vehicle? vehicle) {
         if (vehicle == null) {
           return const Scaffold(
             backgroundColor: Color(GfTokens.colorSurfaceBackground),
@@ -213,6 +208,9 @@ class _VehicleDetailsPageState extends ConsumerState<VehicleDetailsPage>
             ),
           );
         }
+
+        final double fuelLevel =
+            (vehicle.currentFuelLevel ?? 0).clamp(0, 100).toDouble();
 
         return Scaffold(
           backgroundColor: const Color(GfTokens.colorSurfaceBackground),
@@ -334,7 +332,7 @@ class _VehicleDetailsPageState extends ConsumerState<VehicleDetailsPage>
                           child: Text(
                             vehicle.status.displayName,
                             style: TextStyle(
-                              color: vehicle.status.colorValue,
+                              color: Color(vehicle.status.colorValue),
                               fontWeight: FontWeight.w600,
                               fontSize: GfTokens.fontSizeSm,
                             ),
@@ -372,9 +370,9 @@ class _VehicleDetailsPageState extends ConsumerState<VehicleDetailsPage>
                         Expanded(
                           child: _buildMetricCard(
                             'Combustivel',
-                            '${vehicle.currentFuelLevel.toStringAsFixed(0)}%',
+                            '${fuelLevel.toStringAsFixed(0)}%',
                             Icons.local_gas_station,
-                            vehicle.currentFuelLevel < 20
+                            fuelLevel < 20
                                 ? const Color(GfTokens.colorWarning)
                                 : const Color(GfTokens.colorSuccess),
                           ),
@@ -383,7 +381,7 @@ class _VehicleDetailsPageState extends ConsumerState<VehicleDetailsPage>
                         Expanded(
                           child: _buildMetricCard(
                             'Odometro',
-                            '${vehicle.currentOdometer.toStringAsFixed(0)} km',
+                            '${vehicle.odometer.toStringAsFixed(0)} km',
                             Icons.speed,
                             const Color(GfTokens.colorPrimary),
                           ),

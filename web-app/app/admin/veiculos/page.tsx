@@ -52,65 +52,30 @@ export default function VeiculosPage() {
 
   const loadVeiculos = async () => {
     try {
-      console.log("Iniciando carregamento de veículos...")
+      console.log("🔄 Iniciando carregamento de veículos...")
       
-      // Consulta simples sem filtros para testar
+      // Consulta com todas as colunas necessárias
       const { data, error } = await supabase
         .from("vehicles")
-        .select("*")
+        .select(`
+          *,
+          companies(id, name)
+        `)
+        .order('created_at', { ascending: false })
 
       if (error) {
-        console.error("Erro do Supabase:", error)
-        throw error
-      }
-      
-      console.log("Dados recebidos:", data)
-      console.log("Número de veículos encontrados:", data ? data.length : 0)
-      console.log("Estrutura dos dados (primeira linha):", data && data[0] ? Object.keys(data[0]) : "Nenhum dado encontrado")
-      
-      if (data && data.length > 0) {
-        console.log("✅ Veículos carregados com sucesso!")
-        setVeiculos(data)
-      } else {
-        console.log("⚠️ Nenhum veículo encontrado na tabela")
+        console.error("❌ Erro do Supabase ao carregar veículos:", error)
+        toast.error(`Erro ao carregar veículos: ${error.message}`)
         setVeiculos([])
+        return
       }
-    } catch (error) {
-      console.error("Erro ao carregar veículos:", error)
       
-      // Fallback com dados mock se houver erro de conexão
-      const mockVeiculos = [
-        {
-          id: "1",
-          plate: "ABC-1234",
-          model: "Mercedes-Benz Sprinter",
-          year: 2022,
-          capacity: 20,
-          status: "active",
-          company_id: "mock-company"
-        },
-        {
-          id: "2", 
-          plate: "DEF-5678",
-          model: "Volkswagen Crafter",
-          year: 2021,
-          capacity: 18,
-          status: "maintenance",
-          company_id: "mock-company"
-        },
-        {
-          id: "3",
-          plate: "GHI-9012", 
-          model: "Iveco Daily",
-          year: 2023,
-          capacity: 22,
-          status: "active",
-          company_id: "mock-company"
-        }
-      ]
-      
-      console.log("Usando dados mock devido ao erro")
-      setVeiculos(mockVeiculos)
+      console.log(`✅ ${data?.length || 0} veículos carregados com sucesso!`)
+      setVeiculos(data || [])
+    } catch (error: any) {
+      console.error("❌ Erro ao carregar veículos:", error)
+      toast.error(`Erro ao carregar veículos: ${error.message || 'Erro desconhecido'}`)
+      setVeiculos([])
     }
   }
 

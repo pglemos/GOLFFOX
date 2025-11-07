@@ -1,0 +1,186 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { supabaseServiceRole } from '@/lib/supabase-server'
+import { parseCSV } from '@/lib/costs/import-parser'
+import { z } from 'zod'
+
+const importSchema = z.object({
+  company_id: z.string().uuid(),
+  data: z.array(z.object({
+    date: z.string(),
+    category: z.string(),
+    subcategory: z.string().optional(),
+    amount: z.number(),
+    qty: z.number().optional(),
+    unit: z.string().optional(),
+    route_name: z.string().optional(),
+    vehicle_plate: z.string().optional(),
+    driver_email: z.string().optional(),
+    notes: z.string().optional()
+  })),
+  mapping: z.record(z.string()).optional() // Mapeamento de colunas para campos
+})
+
+export async function POST(request: NextRequest) {
+  try {
+    const formData = await request.formData()
+    const file = formData.get('file') as File
+    const companyId = formData.get('company_id') as string
+    const mapping = formData.get('mapping') ? JSON.parse(formData.get('mapping') as string) : null
+
+    if (!file) {
+      return NextResponse.json(
+        { error: 'Arquivo não fornecido' },
+        { status: 400 }
+      )
+    }
+
+    if (!companyId) {
+      return NextResponse.json(
+        { error: 'company_id é obrigatório' },
+        { status: 400 }
+      )
+    }
+
+    // Parse do arquivo
+    const buffer = await file.arrayBuffer()
+    const text = new TextDecoder().decode(buffer)
+    
+    let parsedData
+    if (file.name.endsWith('.csv')) {
+      parsedData = await parseCSV(text, mapping)
+    } else {
+      return NextResponse.json(
+        { error: 'Formato não suportado. Use CSV ou Excel' },
+        { status: 400 }
+      )
+    }
+
+    if (!parsedData || parsedData.length === 0) {
+      return NextResponse.json(
+        { error: 'Nenhum dado válido encontrado no arquivo' },
+        { status: 400 }
+      )
+    }
+
+    // Buscar categorias de custos
+    const { data: categories } = await supabaseServiceRole
+      .from('gf_cost_categories')
+      .select('id, group_name, category, subcategory')
+      .eq('is_active', true)
+
+    const categoryMap = new Map()
+    categories?.forEach(cat => {
+      const key = `${cat.group_name}|${cat.category}|${cat.subcategory || ''}`
+      categoryMap.set(key, cat.id)
+    })
+
+    // Buscar rotas, veículos e motoristas para mapeamento
+    const { data: routes } = await supabaseServiceRole
+      .from('routes')
+      .select('id, name')
+      .eq('company_id', companyId)
+
+    const { data: vehicles } = await supabaseServiceRole
+      .from('vehicles')
+      .select('id, plate')
+
+    const { data: drivers } = await supabaseServiceRole
+      .from('users')
+      .select('id, email')
+      .eq('role', 'driver')
+
+    const routeMap = new Map(routes?.map(r => [r.name, r.id]) || [])
+    const vehicleMap = new Map(vehicles?.map(v => [v.plate, v.id]) || [])
+    const driverMap = new Map(drivers?.map(d => [d.email, d.id]) || [])
+
+    // Processar e inserir custos
+    const costsToInsert = []
+    const errors = []
+
+    for (const row of parsedData) {
+      try {
+        // Mapear categoria
+        const categoryKey = `${row.category}|${row.subcategory || ''}`
+        let categoryId = categoryMap.get(categoryKey)
+        
+        if (!categoryId) {
+          // Tentar sem subcategoria
+          for (const [key, id] of categoryMap.entries()) {
+            if (key.startsWith(`${row.category}|`)) {
+              categoryId = id
+              break
+            }
+          }
+        }
+
+        if (!categoryId) {
+          errors.push({
+            row,
+            error: `Categoria não encontrada: ${row.category}${row.subcategory ? ` / ${row.subcategory}` : ''}`
+          })
+          continue
+        }
+
+        // Mapear rota, veículo e motorista
+        const routeId = row.route_name ? routeMap.get(row.route_name) : null
+        const vehicleId = row.vehicle_plate ? vehicleMap.get(row.vehicle_plate) : null
+        const driverId = row.driver_email ? driverMap.get(row.driver_email) : null
+
+        costsToInsert.push({
+          company_id: companyId,
+          route_id: routeId,
+          vehicle_id: vehicleId,
+          driver_id: driverId,
+          cost_category_id: categoryId,
+          date: row.date,
+          amount: parseFloat(row.amount.toString()),
+          qty: row.qty ? parseFloat(row.qty.toString()) : null,
+          unit: row.unit || null,
+          notes: row.notes || null,
+          source: 'import',
+          created_by: request.headers.get('x-user-id') || null
+        })
+      } catch (err: any) {
+        errors.push({
+          row,
+          error: err.message || 'Erro ao processar linha'
+        })
+      }
+    }
+
+    if (costsToInsert.length === 0) {
+      return NextResponse.json(
+        { error: 'Nenhum custo válido para importar', errors },
+        { status: 400 }
+      )
+    }
+
+    // Inserir em lote
+    const { data: inserted, error: insertError } = await supabaseServiceRole
+      .from('gf_costs')
+      .insert(costsToInsert)
+      .select()
+
+    if (insertError) {
+      console.error('Erro ao inserir custos:', insertError)
+      return NextResponse.json(
+        { error: insertError.message, errors },
+        { status: 500 }
+      )
+    }
+
+    return NextResponse.json({
+      success: true,
+      imported: inserted?.length || 0,
+      errors: errors.length,
+      errors_details: errors.slice(0, 10) // Limitar detalhes de erros
+    })
+  } catch (error: any) {
+    console.error('Erro ao importar custos:', error)
+    return NextResponse.json(
+      { error: error.message || 'Erro desconhecido' },
+      { status: 500 }
+    )
+  }
+}
+

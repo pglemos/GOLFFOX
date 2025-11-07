@@ -24,19 +24,21 @@ class _PassengerLoginScreenState extends State<PassengerLoginScreen> {
       final cpf = _cpfController.text.replaceAll(RegExp(r'[^\d]'), '');
       
       // Buscar funcionário por CPF
-      final employee = await SupabaseService.instance.client
+      final Map<String, dynamic>? employee =
+          await SupabaseService.instance.client
           .from('gf_employee_company')
           .select()
           .eq('login_cpf', cpf)
           .eq('is_active', true)
           .maybeSingle();
 
-      if (employee.data == null) {
+      if (employee == null) {
         throw Exception('CPF ou senha inválidos');
       }
 
       // Validar senha
-      final passwordHash = employee.data!['password_hash'];
+      final passwordHash =
+          employee['password_hash'] as String? ?? '';
       if (passwordHash != _passwordController.text) {
         throw Exception('CPF ou senha inválidos');
       }
@@ -44,7 +46,7 @@ class _PassengerLoginScreenState extends State<PassengerLoginScreen> {
       // Navegar para dashboard do passageiro
       if (mounted) {
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
+          MaterialPageRoute<void>(
             builder: (_) => const PassengerDashboardScreen(),
           ),
         );

@@ -1,7 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import '../../services/supabase_service.dart';
+
 import '../../core/location_service.dart';
+import '../../services/supabase_service.dart';
 
 class DriverRouteScreen extends StatefulWidget {
 
@@ -39,37 +40,45 @@ class _DriverRouteScreenState extends State<DriverRouteScreen> {
     try {
       final location = await LocationService.instance.getCurrentLocation();
       final driverId = SupabaseService.instance.currentUserId;
+      final Object? tripId = widget.trip['id'];
 
-      if (driverId == null || location == null) return;
+      if (driverId == null || location == null || tripId == null) return;
 
       await SupabaseService.instance.client.from('driver_positions').insert({
-        'trip_id': widget.trip['id'],
+        'trip_id': tripId,
         'driver_id': driverId,
         'latitude': location.latitude,
         'longitude': location.longitude,
         'timestamp': DateTime.now().toIso8601String(),
-        'speed': location.speed ?? 0,
-        'accuracy': location.accuracy ?? 0,
+        'speed': location.speed,
+        'accuracy': location.accuracy,
       });
-    } catch (e) {
+    } catch (e, stackTrace) {
       // Se offline, guardar para enviar depois (implementar queue local)
-      print('Erro ao enviar posição: $e');
+      debugPrint('Erro ao enviar posição: $e');
+      debugPrintStack(stackTrace: stackTrace);
     }
   }
 
   Future<void> _loadPassengers() async {
     try {
-      final rows = await SupabaseService.instance.client
+      final Object? tripId = widget.trip['id'];
+      if (tripId == null) return;
+
+      final List<dynamic> rows = await SupabaseService.instance.client
           .from('trip_passengers')
           .select()
-          .eq('trip_id', widget.trip['id']);
+          .eq('trip_id', tripId);
 
-      final count = rows is List ? rows.length : 0;
+      if (!mounted) return;
+
+      final count = rows.length;
       setState(() {
         _passengerCount = count;
       });
-    } catch (e) {
-      print('Erro ao carregar passageiros: $e');
+    } catch (e, stackTrace) {
+      debugPrint('Erro ao carregar passageiros: $e');
+      debugPrintStack(stackTrace: stackTrace);
     }
   }
 
@@ -77,12 +86,16 @@ class _DriverRouteScreenState extends State<DriverRouteScreen> {
     // Validar QR/NFC e marcar embarque
     try {
       // Buscar funcionário pelo QR code (CPF)
-      final employee = await SupabaseService.instance.client
+      final dynamic employeeResult = await SupabaseService.instance.client
           .from('gf_employee_company')
           .select()
           .eq('cpf', qrCode)
           .eq('is_active', true)
           .maybeSingle();
+      final Map<String, dynamic>? employee =
+          employeeResult as Map<String, dynamic>?;
+
+      if (!mounted) return;
 
       if (employee == null) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -91,15 +104,25 @@ class _DriverRouteScreenState extends State<DriverRouteScreen> {
         return;
       }
 
+      final passengerId = employee['id'] as Object?;
+      final Object? tripId = widget.trip['id'];
+      if (passengerId == null || tripId == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Dados do passageiro inválidos')),
+        );
+        return;
+      }
+
       // Marcar embarque
       await SupabaseService.instance.client.from('trip_passengers').insert({
-        'trip_id': widget.trip['id'],
-        'passenger_id': employee['id'],
+        'trip_id': tripId,
+        'passenger_id': passengerId,
         'status': 'pickedup',
       });
 
-      _loadPassengers();
+      await _loadPassengers();
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Erro: ${e.toString()}')),
       );
@@ -128,14 +151,16 @@ class _DriverRouteScreenState extends State<DriverRouteScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Rota: ${widget.trip['routes']?['name'] ?? "N/A"}',
+                          'Rota: ${_resolveNestedValue(widget.trip, 'routes', 'name')}',
                           style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         const SizedBox(height: 8),
-                        Text('Veículo: ${widget.trip['vehicles']?['plate'] ?? "N/A"}'),
+                        Text(
+                          'Veículo: ${_resolveNestedValue(widget.trip, 'vehicles', 'plate')}',
+                        ),
                         Text('Passageiros: $_passengerCount'),
                       ],
                     ),
@@ -145,7 +170,7 @@ class _DriverRouteScreenState extends State<DriverRouteScreen> {
                 ElevatedButton.icon(
                   onPressed: () {
                     // Abrir scanner QR/NFC
-                    showDialog(
+                    showDialog<void>(
                       context: context,
                       builder: (_) => AlertDialog(
                         title: const Text('Validar Passageiro'),
@@ -189,5 +214,20 @@ class _DriverRouteScreenState extends State<DriverRouteScreen> {
         ],
       ),
     );
+}
+
+String _resolveNestedValue(
+  Map<String, dynamic> source,
+  String parentKey,
+  String childKey,
+) {
+  final parent = source[parentKey];
+  if (parent is Map<String, dynamic>) {
+    final value = parent[childKey];
+    if (value is String) {
+      return value;
+    }
+  }
+  return 'N/A';
 }
 

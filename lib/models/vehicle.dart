@@ -162,21 +162,21 @@ class VehicleSpecifications {
     required this.height,
   });
 
-  factory VehicleSpecifications.fromJson(Map<String, dynamic> json) {
-    return VehicleSpecifications(
-      capacity: json['capacity'] ?? 0,
-      engineSize: (json['engine_size'] ?? 0.0).toDouble(),
-      year: json['year'] ?? DateTime.now().year,
-      manufacturer: json['manufacturer'] ?? '',
-      model: json['model'] ?? '',
-      color: json['color'] ?? '',
-      fuelTankCapacity: (json['fuel_tank_capacity'] ?? 0.0).toDouble(),
-      weight: (json['weight'] ?? 0.0).toDouble(),
-      length: (json['length'] ?? 0.0).toDouble(),
-      width: (json['width'] ?? 0.0).toDouble(),
-      height: (json['height'] ?? 0.0).toDouble(),
-    );
-  }
+  factory VehicleSpecifications.fromJson(Map<String, dynamic> json) =>
+      VehicleSpecifications(
+        capacity: (json['capacity'] as num?)?.toInt() ?? 0,
+        engineSize: (json['engine_size'] as num?)?.toDouble() ?? 0.0,
+        year: (json['year'] as num?)?.toInt() ?? DateTime.now().year,
+        manufacturer: json['manufacturer'] as String? ?? '',
+        model: json['model'] as String? ?? '',
+        color: json['color'] as String? ?? '',
+        fuelTankCapacity:
+            (json['fuel_tank_capacity'] as num?)?.toDouble() ?? 0.0,
+        weight: (json['weight'] as num?)?.toDouble() ?? 0.0,
+        length: (json['length'] as num?)?.toDouble() ?? 0.0,
+        width: (json['width'] as num?)?.toDouble() ?? 0.0,
+        height: (json['height'] as num?)?.toDouble() ?? 0.0,
+      );
   final int capacity;
   final double engineSize;
   final int year;
@@ -243,24 +243,26 @@ class VehicleDocuments {
     this.insurancePolicyNumber,
   });
 
-  factory VehicleDocuments.fromJson(Map<String, dynamic> json) {
-    return VehicleDocuments(
-      licensePlate: json['license_plate'],
-      chassisNumber: json['chassis_number'],
-      renavam: json['renavam'],
-      licenseExpiryDate: json['license_expiry_date'] != null
-          ? DateTime.parse(json['license_expiry_date'])
-          : null,
-      inspectionExpiryDate: json['inspection_expiry_date'] != null
-          ? DateTime.parse(json['inspection_expiry_date'])
-          : null,
-      insuranceExpiryDate: json['insurance_expiry_date'] != null
-          ? DateTime.parse(json['insurance_expiry_date'])
-          : null,
-      insuranceCompany: json['insurance_company'],
-      insurancePolicyNumber: json['insurance_policy_number'],
-    );
-  }
+  factory VehicleDocuments.fromJson(Map<String, dynamic> json) =>
+      VehicleDocuments(
+        licensePlate: json['license_plate'] as String?,
+        chassisNumber: json['chassis_number'] as String?,
+        renavam: json['renavam'] as String?,
+        licenseExpiryDate: (json['license_expiry_date'] as String?) != null
+            ? DateTime.parse(json['license_expiry_date'] as String)
+            : null,
+        inspectionExpiryDate:
+            (json['inspection_expiry_date'] as String?) != null
+                ? DateTime.parse(json['inspection_expiry_date'] as String)
+                : null,
+        insuranceExpiryDate:
+            (json['insurance_expiry_date'] as String?) != null
+                ? DateTime.parse(json['insurance_expiry_date'] as String)
+                : null,
+        insuranceCompany: json['insurance_company'] as String?,
+        insurancePolicyNumber:
+            json['insurance_policy_number'] as String?,
+      );
   final String? licensePlate;
   final String? chassisNumber;
   final String? renavam;
@@ -384,48 +386,70 @@ class Vehicle {
   });
 
   factory Vehicle.fromJson(Map<String, dynamic> json) {
+    final Map<String, dynamic> specs =
+        (json['specifications'] as Map<String, dynamic>?) ??
+        <String, dynamic>{};
+    final Map<String, dynamic> documents =
+        (json['documents'] as Map<String, dynamic>?) ??
+        <String, dynamic>{};
+    final position = json['current_position'];
+    LatLng? currentPosition;
+    if (position is Map) {
+      final lat = (position['lat'] as num?)?.toDouble();
+      final lng = (position['lng'] as num?)?.toDouble();
+      if (lat != null && lng != null) {
+        currentPosition = LatLng(lat, lng);
+      }
+    }
+
     return Vehicle(
-      id: json['id'] ?? '',
-      name: json['name'] ?? '',
+      id: json['id'] as String? ?? '',
+      name: json['name'] as String? ?? '',
       type: VehicleType.values.firstWhere(
-        (e) => e.name == json['type'],
+        (e) => e.name == (json['type'] as String?),
         orElse: () => VehicleType.bus,
       ),
       status: VehicleStatus.values.firstWhere(
-        (e) => e.name == json['status'],
+        (e) => e.name == (json['status'] as String?),
         orElse: () => VehicleStatus.inactive,
       ),
       fuelType: FuelType.values.firstWhere(
-        (e) => e.name == json['fuel_type'],
+        (e) => e.name == (json['fuel_type'] as String?),
         orElse: () => FuelType.diesel,
       ),
-      specifications:
-          VehicleSpecifications.fromJson(json['specifications'] ?? {}),
-      documents: VehicleDocuments.fromJson(json['documents'] ?? {}),
-      currentDriverId: json['current_driver_id'],
-      currentRouteId: json['current_route_id'],
-      currentPosition: json['current_position'] != null
-          ? LatLng(
-              json['current_position']['lat'].toDouble(),
-              json['current_position']['lng'].toDouble(),
-            )
+      specifications: VehicleSpecifications.fromJson(
+        Map<String, dynamic>.from(specs),
+      ),
+      documents: VehicleDocuments.fromJson(
+        Map<String, dynamic>.from(documents),
+      ),
+      currentDriverId: json['current_driver_id'] as String?,
+      currentRouteId: json['current_route_id'] as String?,
+      currentPosition: currentPosition,
+      currentFuelLevel: (json['current_fuel_level'] as num?)?.toDouble(),
+      odometer: (json['odometer'] as num?)?.toDouble() ?? 0.0,
+      lastMaintenanceDate: (json['last_maintenance_date'] as String?) != null
+          ? DateTime.parse(json['last_maintenance_date'] as String)
           : null,
-      currentFuelLevel: json['current_fuel_level']?.toDouble(),
-      odometer: (json['odometer'] ?? 0.0).toDouble(),
-      lastMaintenanceDate: json['last_maintenance_date'] != null
-          ? DateTime.parse(json['last_maintenance_date'])
+      nextMaintenanceDate: (json['next_maintenance_date'] as String?) != null
+          ? DateTime.parse(json['next_maintenance_date'] as String)
           : null,
-      nextMaintenanceDate: json['next_maintenance_date'] != null
-          ? DateTime.parse(json['next_maintenance_date'])
-          : null,
-      maintenanceOdometer: json['maintenance_odometer']?.toDouble(),
-      features: List<String>.from(json['features'] ?? []),
-      notes: json['notes'],
+      maintenanceOdometer:
+          (json['maintenance_odometer'] as num?)?.toDouble(),
+      features: (json['features'] as List?)
+              ?.map((feature) => feature.toString())
+              .toList() ??
+          const [],
+      notes: json['notes'] as String?,
       createdAt: DateTime.parse(
-          json['created_at'] ?? DateTime.now().toIso8601String()),
+        json['created_at'] as String? ??
+            DateTime.now().toIso8601String(),
+      ),
       updatedAt: DateTime.parse(
-          json['updated_at'] ?? DateTime.now().toIso8601String()),
-      companyId: json['company_id'] ?? '',
+        json['updated_at'] as String? ??
+            DateTime.now().toIso8601String(),
+      ),
+      companyId: json['company_id'] as String? ?? '',
     );
   }
   final String id;

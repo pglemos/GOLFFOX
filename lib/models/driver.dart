@@ -202,8 +202,8 @@ class DriverCertification {
     required this.name,
     required this.description,
     required this.issueDate,
-    this.expiryDate,
     required this.issuingOrganization,
+    this.expiryDate,
     this.certificateNumber,
     this.isActive = true,
   });
@@ -255,10 +255,10 @@ class DriverRating {
     required this.id,
     required this.tripId,
     required this.passengerId,
-    this.passengerName,
     required this.rating,
-    this.comment,
     required this.createdAt,
+    this.passengerName,
+    this.comment,
     this.tags = const [],
   });
 
@@ -368,7 +368,7 @@ class DriverStats {
 
 class Driver {
 
-  const Driver({
+  Driver({
     required this.id,
     required this.name,
     required this.email,
@@ -401,7 +401,7 @@ class Driver {
               averageRating: 0.0,
               totalRatings: 0,
               fuelEfficiency: 0.0,
-              safetyScore: 0.0,
+              safetyScore: 0,
               lastTripDate: DateTime.now(),
             );
 

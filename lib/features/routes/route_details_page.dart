@@ -58,9 +58,19 @@ class _RouteDetailsPageState extends ConsumerState<RouteDetailsPage>
               icon: const Icon(Icons.edit),
               tooltip: 'Editar Rota',
             ),
-          PopupMenuButton<String>(
-            onSelected: _handleMenuAction,
-            itemBuilder: (context) => [
+          if (_isLoading)
+            const Padding(
+              padding: EdgeInsets.all(16),
+              child: SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+            )
+          else
+            PopupMenuButton<String>(
+              onSelected: _handleMenuAction,
+              itemBuilder: (context) => [
               if (widget.route.status == RouteStatus.planned)
                 const PopupMenuItem(
                   value: 'start',
@@ -119,9 +129,9 @@ class _RouteDetailsPageState extends ConsumerState<RouteDetailsPage>
         // Tabs
         TabBar(
           controller: _tabController,
-          labelColor: const Color(GfTokens.primary),
+          labelColor: const Color(GfTokens.colorPrimary),
           unselectedLabelColor: const Color(GfTokens.colorOnSurfaceVariant),
-          indicatorColor: const Color(GfTokens.primary),
+          indicatorColor: const Color(GfTokens.colorPrimary),
           tabs: const [
             Tab(text: 'Visao Geral'),
             Tab(text: 'Paradas'),
@@ -213,7 +223,7 @@ class _RouteDetailsPageState extends ConsumerState<RouteDetailsPage>
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
-                    color: Color(GfTokens.primary),
+                    color: Color(GfTokens.colorPrimary),
                   ),
                 ),
             ],
@@ -234,7 +244,7 @@ class _RouteDetailsPageState extends ConsumerState<RouteDetailsPage>
                   icon: Icons.location_on,
                   label: 'Paradas',
                   value: '${route.stops.length}',
-                  color: const Color(GfTokens.primary),
+                  color: const Color(GfTokens.colorPrimary),
                 ),
               ),
               const SizedBox(width: GfTokens.space3),
@@ -251,7 +261,8 @@ class _RouteDetailsPageState extends ConsumerState<RouteDetailsPage>
                 child: _buildMetricCard(
                   icon: Icons.straighten,
                   label: 'Distancia',
-                  value: '${route.totalDistance.toStringAsFixed(1)}km',
+                  value:
+                      '${(route.actualDistance ?? route.estimatedDistance ?? 0).toStringAsFixed(1)}km',
                   color: const Color(GfTokens.info),
                 ),
               ),
@@ -328,17 +339,17 @@ class _RouteDetailsPageState extends ConsumerState<RouteDetailsPage>
               if (route.scheduledStartTime != null)
                 _buildInfoRow(
                   'Horario Programado',
-                  formatDateTime(route.scheduledStartTime!),
+                  GfDateUtils.formatDateTime(route.scheduledStartTime!),
                 ),
-              if (route.actualStartTime != null)
+              if (route.startTime != null)
                 _buildInfoRow(
                   'Horario Real de Inicio',
-                  formatDateTime(route.actualStartTime!),
+                  GfDateUtils.formatDateTime(route.startTime!),
                 ),
-              if (route.actualEndTime != null)
+              if (route.endTime != null)
                 _buildInfoRow(
                   'Horario de Conclusao',
-                  formatDateTime(route.actualEndTime!),
+                  GfDateUtils.formatDateTime(route.endTime!),
                 ),
             ],
           ),
@@ -352,7 +363,7 @@ class _RouteDetailsPageState extends ConsumerState<RouteDetailsPage>
               _buildInfoRow('Total de Paradas', '${route.stops.length}'),
               _buildInfoRow(
                 'Paradas Concluidas',
-                '${route.stops.where((s) => s.actualArrivalTime != null).length}',
+                '${route.stops.where((s) => s.actualTime != null).length}',
               ),
           _buildInfoRow(
             'Distancia Total',
@@ -409,7 +420,7 @@ class _RouteDetailsPageState extends ConsumerState<RouteDetailsPage>
               title: 'Rota Iniciada',
               subtitle: 'Execucao da rota foi iniciada',
               time: route.startTime!,
-              color: const Color(GfTokens.primary),
+              color: const Color(GfTokens.colorPrimary),
             ),
 
           if (route.endTime != null)
@@ -429,7 +440,7 @@ class _RouteDetailsPageState extends ConsumerState<RouteDetailsPage>
                     title: 'Parada Visitada',
                     subtitle: stop.name,
                     time: stop.actualTime!,
-                    color: const Color(GfTokens.primary),
+                    color: const Color(GfTokens.colorPrimary),
                   )),
         ],
       ),
@@ -532,7 +543,7 @@ class _RouteDetailsPageState extends ConsumerState<RouteDetailsPage>
             ),
           ),
           Text(
-            timeAgo(time),
+            GfDateUtils.timeAgo(time),
             style: const TextStyle(
               fontSize: 12,
               color: Color(GfTokens.textMuted),
@@ -544,7 +555,7 @@ class _RouteDetailsPageState extends ConsumerState<RouteDetailsPage>
 
   Widget _buildLoadingState() => const Center(
       child: CircularProgressIndicator(
-        color: Color(GfTokens.primary),
+        color: Color(GfTokens.colorPrimary),
       ),
     );
 
@@ -598,7 +609,7 @@ class _RouteDetailsPageState extends ConsumerState<RouteDetailsPage>
 
   void _editRoute() {
     Navigator.of(context).push(
-      MaterialPageRoute(
+      MaterialPageRoute<void>(
         builder: (context) => CreateRoutePage(
           route: widget.route,
         ),
@@ -635,7 +646,7 @@ class _RouteDetailsPageState extends ConsumerState<RouteDetailsPage>
   }
 
   void _cancelRoute() {
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Cancelar Rota'),
@@ -687,14 +698,16 @@ class _RouteDetailsPageState extends ConsumerState<RouteDetailsPage>
 
   void _duplicateRoute() {
     Navigator.of(context).push(
-      MaterialPageRoute(
+      MaterialPageRoute<void>(
         builder: (context) => CreateRoutePage(
           route: widget.route.copyWith(
             id: DateTime.now().millisecondsSinceEpoch.toString(),
             name: '${widget.route.name} (Copia)',
             status: RouteStatus.planned,
-            actualStartTime: null,
-            actualEndTime: null,
+            startTime: null,
+            endTime: null,
+            actualDuration: null,
+            actualDistance: null,
             createdAt: DateTime.now(),
             updatedAt: DateTime.now(),
           ),
@@ -704,7 +717,7 @@ class _RouteDetailsPageState extends ConsumerState<RouteDetailsPage>
   }
 
   void _deleteRoute() {
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Excluir Rota'),

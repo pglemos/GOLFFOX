@@ -132,17 +132,15 @@ class MaintenanceItem {
     this.notes,
   });
 
-  factory MaintenanceItem.fromJson(Map<String, dynamic> json) {
-    return MaintenanceItem(
-      id: json['id'] ?? '',
-      description: json['description'] ?? '',
-      partNumber: json['part_number'],
-      cost: json['cost']?.toDouble(),
-      quantity: json['quantity'] ?? 1,
-      isCompleted: json['is_completed'] ?? false,
-      notes: json['notes'],
-    );
-  }
+  factory MaintenanceItem.fromJson(Map<String, dynamic> json) => MaintenanceItem(
+        id: json['id'] as String? ?? '',
+        description: json['description'] as String? ?? '',
+        partNumber: json['part_number'] as String?,
+        cost: (json['cost'] as num?)?.toDouble(),
+        quantity: (json['quantity'] as num?)?.toInt() ?? 1,
+        isCompleted: json['is_completed'] as bool? ?? false,
+        notes: json['notes'] as String?,
+      );
   final String id;
   final String description;
   final String? partNumber;
@@ -213,57 +211,73 @@ class MaintenanceRecord {
     required this.companyId,
   });
 
-  factory MaintenanceRecord.fromJson(Map<String, dynamic> json) {
-    return MaintenanceRecord(
-      id: json['id'] ?? '',
-      vehicleId: json['vehicle_id'] ?? '',
-      title: json['title'] ?? '',
-      description: json['description'] ?? '',
-      type: MaintenanceType.values.firstWhere(
-        (e) => e.name == json['type'],
-        orElse: () => MaintenanceType.preventive,
-      ),
-      status: MaintenanceStatus.values.firstWhere(
-        (e) => e.name == json['status'],
-        orElse: () => MaintenanceStatus.scheduled,
-      ),
-      priority: MaintenancePriority.values.firstWhere(
-        (e) => e.name == json['priority'],
-        orElse: () => MaintenancePriority.medium,
-      ),
-      scheduledDate: DateTime.parse(
-          json['scheduled_date'] ?? DateTime.now().toIso8601String()),
-      startDate: json['start_date'] != null
-          ? DateTime.parse(json['start_date'])
-          : null,
-      completedDate: json['completed_date'] != null
-          ? DateTime.parse(json['completed_date'])
-          : null,
-      odometerReading: (json['odometer_reading'] ?? 0.0).toDouble(),
-      estimatedCost: json['estimated_cost']?.toDouble(),
-      actualCost: json['actual_cost']?.toDouble(),
-      serviceProviderId: json['service_provider_id'],
-      serviceProviderName: json['service_provider_name'],
-      technicianId: json['technician_id'],
-      technicianName: json['technician_name'],
-      items: (json['items'] as List<dynamic>?)
-              ?.map((item) => MaintenanceItem.fromJson(item))
-              .toList() ??
-          [],
-      attachments: List<String>.from(json['attachments'] ?? []),
-      notes: json['notes'],
-      completionNotes: json['completion_notes'],
-      nextMaintenanceDate: json['next_maintenance_date'] != null
-          ? DateTime.parse(json['next_maintenance_date'])
-          : null,
-      nextMaintenanceOdometer: json['next_maintenance_odometer']?.toDouble(),
-      createdAt: DateTime.parse(
-          json['created_at'] ?? DateTime.now().toIso8601String()),
-      updatedAt: DateTime.parse(
-          json['updated_at'] ?? DateTime.now().toIso8601String()),
-      companyId: json['company_id'] ?? '',
-    );
-  }
+  factory MaintenanceRecord.fromJson(Map<String, dynamic> json) => MaintenanceRecord(
+        id: json['id'] as String? ?? '',
+        vehicleId: json['vehicle_id'] as String? ?? '',
+        title: json['title'] as String? ?? '',
+        description: json['description'] as String? ?? '',
+        type: MaintenanceType.values.firstWhere(
+          (e) => e.name == (json['type'] as String?),
+          orElse: () => MaintenanceType.preventive,
+        ),
+        status: MaintenanceStatus.values.firstWhere(
+          (e) => e.name == (json['status'] as String?),
+          orElse: () => MaintenanceStatus.scheduled,
+        ),
+        priority: MaintenancePriority.values.firstWhere(
+          (e) => e.name == (json['priority'] as String?),
+          orElse: () => MaintenancePriority.medium,
+        ),
+        scheduledDate: DateTime.parse(
+          json['scheduled_date'] as String? ??
+              DateTime.now().toIso8601String(),
+        ),
+        startDate: (json['start_date'] as String?) != null
+            ? DateTime.parse(json['start_date'] as String)
+            : null,
+        completedDate: (json['completed_date'] as String?) != null
+            ? DateTime.parse(json['completed_date'] as String)
+            : null,
+        odometerReading:
+            (json['odometer_reading'] as num?)?.toDouble() ?? 0.0,
+        estimatedCost: (json['estimated_cost'] as num?)?.toDouble(),
+        actualCost: (json['actual_cost'] as num?)?.toDouble(),
+        serviceProviderId: json['service_provider_id'] as String?,
+        serviceProviderName: json['service_provider_name'] as String?,
+        technicianId: json['technician_id'] as String?,
+        technicianName: json['technician_name'] as String?,
+        items: (json['items'] as List<dynamic>?)
+                ?.map(
+                  (item) => MaintenanceItem.fromJson(
+                    Map<String, dynamic>.from(
+                      item as Map,
+                    ),
+                  ),
+                )
+                .toList() ??
+            const [],
+        attachments: (json['attachments'] as List?)
+                ?.map((attachment) => attachment.toString())
+                .toList() ??
+            const [],
+        notes: json['notes'] as String?,
+        completionNotes: json['completion_notes'] as String?,
+        nextMaintenanceDate:
+            (json['next_maintenance_date'] as String?) != null
+                ? DateTime.parse(json['next_maintenance_date'] as String)
+                : null,
+        nextMaintenanceOdometer:
+            (json['next_maintenance_odometer'] as num?)?.toDouble(),
+        createdAt: DateTime.parse(
+          json['created_at'] as String? ??
+              DateTime.now().toIso8601String(),
+        ),
+        updatedAt: DateTime.parse(
+          json['updated_at'] as String? ??
+              DateTime.now().toIso8601String(),
+        ),
+        companyId: json['company_id'] as String? ?? '',
+      );
   final String id;
   final String vehicleId;
   final String title;

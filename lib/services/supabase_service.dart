@@ -441,16 +441,21 @@ class SupabaseService {
     if (profile == null) throw SbFailure(SbErrorCode.auth, 'Nao autenticado.');
 
     try {
-      dynamic query = client.from('routes').select();
+      PostgrestFilterBuilder<dynamic> query =
+          client.from('routes').select();
+      final companyId = profile.companyId;
+      final carrierId = profile.carrierId;
+
       if (profile.role == 'operator' &&
-          (profile.companyId?.isNotEmpty ?? false)) {
-        query = query.eq('company_id', profile.companyId);
+          (companyId?.isNotEmpty ?? false)) {
+        query = query.eq('company_id', companyId!);
       } else if (profile.role == 'carrier' &&
-          (profile.carrierId?.isNotEmpty ?? false)) {
-        query = query.eq('carrier_id', profile.carrierId);
+          (carrierId?.isNotEmpty ?? false)) {
+        query = query.eq('carrier_id', carrierId!);
       }
-      query = query.order('name');
-      final res = await _withTimeout(query);
+      final res = await _withTimeout(
+        query.order('name'),
+      );
       return (res as List).cast<Json>();
     } on PostgrestException catch (e) {
       throw _mapPostgrest(e);
@@ -462,13 +467,17 @@ class SupabaseService {
     if (profile == null) throw SbFailure(SbErrorCode.auth, 'Nao autenticado.');
 
     try {
-      dynamic query = client.from('vehicles').select();
+      PostgrestFilterBuilder<dynamic> query =
+          client.from('vehicles').select();
+      final carrierId = profile.carrierId;
+
       if (profile.role == 'carrier' &&
-          (profile.carrierId?.isNotEmpty ?? false)) {
-        query = query.eq('carrier_id', profile.carrierId);
+          (carrierId?.isNotEmpty ?? false)) {
+        query = query.eq('carrier_id', carrierId!);
       }
-      query = query.order('plate');
-      final res = await _withTimeout(query);
+      final res = await _withTimeout(
+        query.order('plate'),
+      );
       return (res as List).cast<Json>();
     } on PostgrestException catch (e) {
       throw _mapPostgrest(e);
@@ -485,7 +494,8 @@ class SupabaseService {
     int? offset,
   }) async {
     try {
-      dynamic query = client.from('mvw_trip_report').select();
+      PostgrestFilterBuilder<dynamic> query =
+          client.from('mvw_trip_report').select();
 
       if (startDate != null) {
         query = query.gte('created_at', startDate.toIso8601String());
@@ -496,14 +506,15 @@ class SupabaseService {
       if (status != null) {
         query = query.eq('status', status);
       }
-      query = query.order('created_at', ascending: false);
+      PostgrestTransformBuilder<dynamic> ordered =
+          query.order('created_at', ascending: false);
 
       if (limit != null) {
         final from = offset ?? 0;
-        query = query.range(from, from + limit - 1);
+        ordered = ordered.range(from, from + limit - 1);
       }
 
-      final res = await _withTimeout(query);
+      final res = await _withTimeout(ordered);
       return (res as List).cast<Json>();
     } on PostgrestException catch (e) {
       throw _mapPostgrest(e);

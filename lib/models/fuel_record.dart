@@ -56,14 +56,14 @@ class FuelStation {
 
   factory FuelStation.fromJson(Map<String, dynamic> json) {
     return FuelStation(
-      id: json['id'] ?? '',
-      name: json['name'] ?? '',
-      address: json['address'] ?? '',
-      cnpj: json['cnpj'],
-      phone: json['phone'],
-      latitude: json['latitude']?.toDouble(),
-      longitude: json['longitude']?.toDouble(),
-      isPreferred: json['is_preferred'] ?? false,
+      id: json['id'] as String? ?? '',
+      name: json['name'] as String? ?? '',
+      address: json['address'] as String? ?? '',
+      cnpj: json['cnpj'] as String?,
+      phone: json['phone'] as String?,
+      latitude: (json['latitude'] as num?)?.toDouble(),
+      longitude: (json['longitude'] as num?)?.toDouble(),
+      isPreferred: json['is_preferred'] as bool? ?? false,
     );
   }
   final String id;
@@ -135,36 +135,46 @@ class FuelRecord {
 
   factory FuelRecord.fromJson(Map<String, dynamic> json) {
     return FuelRecord(
-      id: json['id'] ?? '',
-      vehicleId: json['vehicle_id'] ?? '',
+      id: json['id'] as String? ?? '',
+      vehicleId: json['vehicle_id'] as String? ?? '',
       type: FuelRecordType.values.firstWhere(
-        (e) => e.name == json['type'],
+        (e) => e.name == json['type'] as String?,
         orElse: () => FuelRecordType.refuel,
       ),
       fuelType: FuelType.values.firstWhere(
-        (e) => e.name == json['fuel_type'],
+        (e) => e.name == json['fuel_type'] as String?,
         orElse: () => FuelType.diesel,
       ),
-      quantity: (json['quantity'] ?? 0.0).toDouble(),
-      pricePerLiter: (json['price_per_liter'] ?? 0.0).toDouble(),
-      totalCost: (json['total_cost'] ?? 0.0).toDouble(),
-      odometerReading: (json['odometer_reading'] ?? 0.0).toDouble(),
-      fuelLevelBefore: json['fuel_level_before']?.toDouble(),
-      fuelLevelAfter: json['fuel_level_after']?.toDouble(),
-      fuelStationId: json['fuel_station_id'],
-      fuelStationName: json['fuel_station_name'],
-      driverId: json['driver_id'],
-      driverName: json['driver_name'],
-      receiptNumber: json['receipt_number'],
-      notes: json['notes'],
-      attachments: List<String>.from(json['attachments'] ?? []),
-      timestamp:
-          DateTime.parse(json['timestamp'] ?? DateTime.now().toIso8601String()),
+      quantity: (json['quantity'] as num?)?.toDouble() ?? 0.0,
+      pricePerLiter: (json['price_per_liter'] as num?)?.toDouble() ?? 0.0,
+      totalCost: (json['total_cost'] as num?)?.toDouble() ?? 0.0,
+      odometerReading:
+          (json['odometer_reading'] as num?)?.toDouble() ?? 0.0,
+      fuelLevelBefore: (json['fuel_level_before'] as num?)?.toDouble(),
+      fuelLevelAfter: (json['fuel_level_after'] as num?)?.toDouble(),
+      fuelStationId: json['fuel_station_id'] as String?,
+      fuelStationName: json['fuel_station_name'] as String?,
+      driverId: json['driver_id'] as String?,
+      driverName: json['driver_name'] as String?,
+      receiptNumber: json['receipt_number'] as String?,
+      notes: json['notes'] as String?,
+      attachments: (json['attachments'] as List?)
+              ?.map((attachment) => attachment.toString())
+              .toList() ??
+          const [],
+      timestamp: DateTime.parse(
+        json['timestamp'] as String? ??
+            DateTime.now().toIso8601String(),
+      ),
       createdAt: DateTime.parse(
-          json['created_at'] ?? DateTime.now().toIso8601String()),
+        json['created_at'] as String? ??
+            DateTime.now().toIso8601String(),
+      ),
       updatedAt: DateTime.parse(
-          json['updated_at'] ?? DateTime.now().toIso8601String()),
-      companyId: json['company_id'] ?? '',
+        json['updated_at'] as String? ??
+            DateTime.now().toIso8601String(),
+      ),
+      companyId: json['company_id'] as String? ?? '',
     );
   }
   final String id;

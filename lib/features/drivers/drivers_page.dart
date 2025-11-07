@@ -53,7 +53,7 @@ class _DriversPageState extends ConsumerState<DriversPage> {
     final currentFilters = service.currentFilters;
 
     return Scaffold(
-      backgroundColor: GfTokens.colorBackground,
+      backgroundColor: const Color(GfTokens.colorBackground),
       appBar: GfAppBar(
         title: 'Motoristas',
         actions: [
@@ -95,9 +95,9 @@ class _DriversPageState extends ConsumerState<DriversPage> {
           Container(
             padding: const EdgeInsets.all(GfTokens.spacingMd),
             decoration: const BoxDecoration(
-              color: GfTokens.colorSurface,
+              color: Color(GfTokens.colorSurface),
               border: Border(
-                bottom: BorderSide(color: GfTokens.colorBorder),
+                bottom: BorderSide(color: Color(GfTokens.colorBorder)),
               ),
             ),
             child: TextField(
@@ -113,32 +113,30 @@ class _DriversPageState extends ConsumerState<DriversPage> {
                     : null,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(GfTokens.radiusSm),
-                  borderSide: const BorderSide(color: GfTokens.colorBorder),
+                  borderSide: const BorderSide(color: Color(GfTokens.colorBorder)),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(GfTokens.radiusSm),
-                  borderSide: const BorderSide(color: GfTokens.colorBorder),
+                  borderSide: const BorderSide(color: Color(GfTokens.colorBorder)),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(GfTokens.radiusSm),
-                  borderSide: const BorderSide(color: GfTokens.colorPrimary),
+                  borderSide: const BorderSide(color: Color(GfTokens.colorPrimary)),
                 ),
                 filled: true,
-                fillColor: GfTokens.colorBackground,
+                fillColor: const Color(GfTokens.colorBackground),
               ),
             ),
           ),
 
           // Filtros (se visíveis)
           if (_showFilters)
-            DriverFilters(
+            DriverFiltersPanel(
               filters: currentFilters,
-              onFiltersChanged: (filters) {
+              onFiltersChanged: (DriverFilters filters) {
                 service.updateFilters(filters);
               },
-              onClearFilters: () {
-                service.clearFilters();
-              },
+              onClearFilters: service.clearFilters,
             ).animate().slideY(begin: -1, duration: 300.ms),
 
           // Estatísticas
@@ -163,7 +161,7 @@ class _DriversPageState extends ConsumerState<DriversPage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _navigateToCreateDriver,
-        backgroundColor: GfTokens.colorPrimary,
+        backgroundColor: const Color(GfTokens.colorPrimary),
         child: const Icon(Icons.add, color: Colors.white),
       ),
     );
@@ -197,7 +195,7 @@ class _DriversPageState extends ConsumerState<DriversPage> {
           Icon(
             filters.hasActiveFilters ? Icons.search_off : Icons.person_off,
             size: 64,
-            color: GfTokens.colorOnSurfaceVariant,
+            color: const Color(GfTokens.colorOnSurfaceVariant),
           ),
           const SizedBox(height: GfTokens.spacingMd),
           Text(
@@ -207,7 +205,7 @@ class _DriversPageState extends ConsumerState<DriversPage> {
             style: TextStyle(
               fontSize: GfTokens.fontSizeLg,
               fontWeight: FontWeight.w600,
-              color: GfTokens.colorOnSurface,
+              color: const Color(GfTokens.colorOnSurface),
             ),
           ),
           const SizedBox(height: GfTokens.spacingSm),
@@ -216,7 +214,7 @@ class _DriversPageState extends ConsumerState<DriversPage> {
                 ? 'Tente ajustar os filtros de busca.'
                 : 'Comece adicionando o primeiro motorista.',
             style: TextStyle(
-              color: GfTokens.colorOnSurfaceVariant,
+              color: const Color(GfTokens.colorOnSurfaceVariant),
             ),
             textAlign: TextAlign.center,
           ),
@@ -249,7 +247,7 @@ class _DriversPageState extends ConsumerState<DriversPage> {
           Icon(
             Icons.error_outline,
             size: 64,
-            color: GfTokens.colorError,
+            color: const Color(GfTokens.colorError),
           ),
           const SizedBox(height: GfTokens.spacingMd),
           Text(
@@ -257,14 +255,14 @@ class _DriversPageState extends ConsumerState<DriversPage> {
             style: TextStyle(
               fontSize: GfTokens.fontSizeLg,
               fontWeight: FontWeight.w600,
-              color: GfTokens.colorOnSurface,
+              color: const Color(GfTokens.colorOnSurface),
             ),
           ),
           const SizedBox(height: GfTokens.spacingSm),
           Text(
             error.toString(),
             style: TextStyle(
-              color: GfTokens.colorOnSurfaceVariant,
+              color: const Color(GfTokens.colorOnSurfaceVariant),
             ),
             textAlign: TextAlign.center,
           ),
@@ -279,7 +277,7 @@ class _DriversPageState extends ConsumerState<DriversPage> {
 
   void _navigateToCreateDriver() {
     Navigator.of(context).push(
-      MaterialPageRoute(
+      MaterialPageRoute<void>(
         builder: (context) => const CreateDriverPage(),
       ),
     );
@@ -287,7 +285,7 @@ class _DriversPageState extends ConsumerState<DriversPage> {
 
   void _navigateToEditDriver(Driver driver) {
     Navigator.of(context).push(
-      MaterialPageRoute(
+      MaterialPageRoute<void>(
         builder: (context) => CreateDriverPage(driver: driver),
       ),
     );
@@ -295,7 +293,7 @@ class _DriversPageState extends ConsumerState<DriversPage> {
 
   void _navigateToDriverDetails(String driverId) {
     Navigator.of(context).push(
-      MaterialPageRoute(
+      MaterialPageRoute<void>(
         builder: (context) => DriverDetailsPage(driverId: driverId),
       ),
     );
@@ -307,13 +305,13 @@ class _DriversPageState extends ConsumerState<DriversPage> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Status do motorista atualizado para ${status.displayName}'),
-        backgroundColor: GfTokens.colorSuccess,
+        backgroundColor: const Color(GfTokens.colorSuccess),
       ),
     );
   }
 
   void _showDeleteConfirmation(Driver driver) {
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Confirmar Exclusão'),
@@ -332,7 +330,7 @@ class _DriversPageState extends ConsumerState<DriversPage> {
               _deleteDriver(driver);
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: GfTokens.colorError,
+              backgroundColor: const Color(GfTokens.colorError),
               foregroundColor: Colors.white,
             ),
             child: const Text('Excluir'),
@@ -348,7 +346,7 @@ class _DriversPageState extends ConsumerState<DriversPage> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Motorista "${driver.name}" excluído com sucesso'),
-        backgroundColor: GfTokens.colorSuccess,
+        backgroundColor: const Color(GfTokens.colorSuccess),
         action: SnackBarAction(
           label: 'Desfazer',
           onPressed: () {

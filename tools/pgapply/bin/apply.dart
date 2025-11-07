@@ -31,7 +31,9 @@ Future<void> main(List<String> args) async {
   try {
     stdout.writeln('Connecting to $host:$port/$db as $user ...');
     final conn = await Connection.open(endpoint, settings: settings);
-    stdout.writeln('Connected. Applying migration: ${filePath.split(Platform.pathSeparator).last}');
+    stdout.writeln(
+      'Connected. Applying migration: ${filePath.split(Platform.pathSeparator).last}',
+    );
     // Use simple (multi-statement) query
     await conn.execute(Sql.named(sql));
     stdout.writeln('Migration applied successfully.');

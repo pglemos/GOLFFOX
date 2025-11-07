@@ -1,304 +1,456 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 import { AppShell } from "@/components/app-shell"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { KpiCard } from "@/components/kpi-card"
+import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { 
   DollarSign, 
-  TrendingUp, 
-  Route,
-  Building2,
-  Truck,
+  TrendingUp,
   FileText,
-  Filter
+  Upload,
+  Plus,
+  Download,
+  AlertCircle,
+  Building2
 } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
-import { formatCurrency } from "@/lib/kpi-utils"
+import toast from "react-hot-toast"
 import dynamic from "next/dynamic"
+import { CostDashboard } from "@/components/costs/cost-dashboard"
+import { CostDetailTable } from "@/components/costs/cost-detail-table"
+import { CostFilters, CostFilters as CostFiltersType } from "@/components/costs/cost-filters"
+import { ManualCostForm } from "@/components/costs/manual-cost-form"
+import { ImportCostModal } from "@/components/costs/import-cost-modal"
+import { ReconciliationModal } from "@/components/costs/reconciliation-modal"
+import { BudgetView } from "@/components/costs/budget-view"
 
-// Lazy load CostCharts (componente pesado com Recharts)
+// Lazy load de componentes pesados
 const CostCharts = dynamic(() => import('@/components/costs/cost-charts').then(m => ({ default: m.CostCharts })), {
   ssr: false,
   loading: () => <div className="w-full h-[400px] bg-gray-100 animate-pulse rounded-lg" />
 })
-import { ReconciliationModal } from "@/components/costs/reconciliation-modal"
-import { motion } from "framer-motion"
-import { staggerContainer, listItem } from "@/lib/animations"
 
-interface CostsBreakdown {
-  company_id: string
-  company_name: string
-  by_route: any
-  by_vehicle: any
-  by_company: number
-  daily_total: number
-}
-
-export default function CustosPage() {
+export default function CustosAdminPage() {
   const router = useRouter()
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
-  const [costsData, setCostsData] = useState<CostsBreakdown[]>([])
-  const [invoices, setInvoices] = useState<any[]>([])
+  const [selectedCompanyId, setSelectedCompanyId] = useState<string | null>(null)
+  const [companies, setCompanies] = useState<Array<{ id: string; name: string }>>([])
+  const [costs, setCosts] = useState<any[]>([])
+  const [filters, setFilters] = useState<CostFiltersType>({})
+  const [routes, setRoutes] = useState<Array<{ id: string; name: string }>>([])
+  const [vehicles, setVehicles] = useState<Array<{ id: string; plate: string }>>([])
+  const [drivers, setDrivers] = useState<Array<{ id: string; email: string }>>([])
+  const [categories, setCategories] = useState<Array<{ id: string; group_name: string; category: string }>>([])
+  const [carriers, setCarriers] = useState<Array<{ id: string; name: string }>>([])
   const [selectedInvoiceId, setSelectedInvoiceId] = useState<string | null>(null)
   const [isReconciliationOpen, setIsReconciliationOpen] = useState(false)
-  const [filters, setFilters] = useState({
-    company: '',
-    period_start: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-    period_end: new Date().toISOString().split('T')[0]
-  })
+  const [isManualFormOpen, setIsManualFormOpen] = useState(false)
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     const getUser = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (!session) {
-        router.push("/")
-        return
+      try {
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+        if (sessionError) {
+          console.error('Erro ao verificar sessão:', sessionError)
+          setError('Erro ao verificar autenticação')
+          return
+        }
+        if (!session) {
+          router.push("/")
+          return
+        }
+
+        const { data: userData } = await supabase
+          .from('users')
+          .select('*')
+          .eq('id', session.user.id)
+          .single()
+
+        if (userData && userData.role !== 'admin') {
+          router.push('/operator')
+          return
+        }
+
+        setUser({ ...session.user, ...userData })
+      } catch (err: any) {
+        console.error('Erro ao obter usuário:', err)
+        setError('Erro ao carregar dados do usuário')
+      } finally {
+        setLoading(false)
       }
-      setUser({ ...session.user })
-      setLoading(false)
-      loadCosts()
-      loadInvoices()
     }
     getUser()
   }, [router])
 
   useEffect(() => {
-    if (!loading) {
+    loadCompanies()
+    loadOptions()
+  }, [])
+
+  const loadCompanies = useCallback(async () => {
+    try {
+      const { data, error } = await supabase
+        .from('companies')
+        .select('id, name')
+        .eq('is_active', true)
+        .order('name')
+
+      if (error) throw error
+
+      setCompanies(data || [])
+      if (data && data.length > 0 && !selectedCompanyId) {
+        setSelectedCompanyId(data[0].id)
+      }
+    } catch (err: any) {
+      console.error('Erro ao carregar empresas:', err)
+      toast.error('Erro ao carregar empresas')
+    }
+  }, [])
+
+  const loadOptions = useCallback(async () => {
+    try {
+      const [routesRes, vehiclesRes, driversRes, categoriesRes, carriersRes] = await Promise.all([
+        supabase.from('routes').select('id, name').order('name'),
+        supabase.from('vehicles').select('id, plate').order('plate'),
+        supabase.from('users').select('id, email').eq('role', 'driver').order('email'),
+        fetch('/api/costs/categories').then(r => r.json()),
+        supabase.from('carriers').select('id, name').order('name')
+      ])
+
+      if (routesRes.data) setRoutes(routesRes.data)
+      if (vehiclesRes.data) setVehicles(vehiclesRes.data)
+      if (driversRes.data) setDrivers(driversRes.data)
+      if (categoriesRes) setCategories(categoriesRes)
+      if (carriersRes.data) setCarriers(carriersRes.data)
+    } catch (err) {
+      console.error('Erro ao carregar opções:', err)
+    }
+  }, [])
+
+  const loadCosts = useCallback(async () => {
+    if (!selectedCompanyId) return
+
+    try {
+      setLoading(true)
+      setError(null)
+
+      const params = new URLSearchParams({
+        company_id: selectedCompanyId,
+        limit: '1000'
+      })
+
+      if (filters.start_date) params.append('start_date', filters.start_date)
+      if (filters.end_date) params.append('end_date', filters.end_date)
+      if (filters.route_id) params.append('route_id', filters.route_id)
+      if (filters.vehicle_id) params.append('vehicle_id', filters.vehicle_id)
+      if (filters.category_id) params.append('category_id', filters.category_id)
+
+      const res = await fetch(`/api/costs/manual?${params.toString()}`)
+      if (!res.ok) {
+        const errorData = await res.json()
+        throw new Error(errorData.error || 'Erro ao carregar custos')
+      }
+
+      const { data } = await res.json()
+      setCosts(data || [])
+    } catch (err: any) {
+      console.error('Erro ao carregar custos:', err)
+      setError(err.message || 'Erro ao carregar custos')
+      toast.error(`Erro: ${err.message || 'Erro desconhecido'}`)
+      setCosts([])
+    } finally {
+      setLoading(false)
+    }
+  }, [selectedCompanyId, filters])
+
+  useEffect(() => {
+    if (selectedCompanyId) {
       loadCosts()
-      loadInvoices()
     }
-  }, [filters, loading])
+  }, [selectedCompanyId, loadCosts])
 
-  const loadCosts = async () => {
+  const handleFiltersChange = (newFilters: CostFiltersType) => {
+    setFilters(newFilters)
+  }
+
+  const handleExport = async (format: 'csv' | 'excel' | 'pdf') => {
+    if (!selectedCompanyId) {
+      toast.error('Selecione uma empresa primeiro')
+      return
+    }
+
     try {
-      let query = supabase.from('v_costs_breakdown').select('*')
+      const params = new URLSearchParams({
+        company_id: selectedCompanyId,
+        format
+      })
+
+      if (Object.keys(filters).length > 0) {
+        params.append('filters', JSON.stringify(filters))
+      }
+
+      const res = await fetch(`/api/costs/export?${params.toString()}`)
       
-      if (filters.company) {
-        query = query.eq('company_id', filters.company)
+      if (!res.ok) {
+        const error = await res.json()
+        throw new Error(error.error || 'Erro ao exportar')
       }
 
-      const { data, error } = await query
+      if (format === 'csv') {
+        const blob = await res.blob()
+        const url = window.URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = `custos_${new Date().toISOString().split('T')[0]}.csv`
+        a.click()
+        window.URL.revokeObjectURL(url)
+      }
 
-      if (error) throw error
-      setCostsData(data || [])
-    } catch (error) {
-      console.error("Erro ao carregar custos:", error)
+      toast.success(`Exportação ${format.toUpperCase()} gerada com sucesso!`)
+    } catch (error: any) {
+      console.error('Erro ao exportar:', error)
+      toast.error(`Erro: ${error.message || 'Erro desconhecido'}`)
     }
   }
-
-  const loadInvoices = async () => {
-    try {
-      let query = supabase
-        .from('gf_invoices')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(20)
-
-      if (filters.period_start) {
-        query = query.gte('period_start', filters.period_start)
-      }
-      if (filters.period_end) {
-        query = query.lte('period_end', filters.period_end)
-      }
-
-      const { data, error } = await query
-
-      if (error) throw error
-      setInvoices(data || [])
-    } catch (error) {
-      console.error("Erro ao carregar faturas:", error)
-    }
-  }
-
-  // Calcular KPIs agregados
-  const aggregatedKpis = costsData.reduce((acc, cost) => {
-    if (filters.company && cost.company_id !== filters.company) return acc
-    return {
-      dailyTotal: acc.dailyTotal + (cost.daily_total || 0),
-      byCompany: acc.byCompany + (cost.by_company || 0),
-      byRoute: acc.byRoute + (() => {
-        const routes = Array.isArray(cost.by_route) ? cost.by_route : []
-        return routes.reduce((sum: number, r: any) => sum + (parseFloat(r.total_cost || 0)), 0)
-      })(),
-      byVehicle: acc.byVehicle + (() => {
-        const vehicles = Array.isArray(cost.by_vehicle) ? cost.by_vehicle : []
-        return vehicles.reduce((sum: number, v: any) => sum + (parseFloat(v.total_cost || 0)), 0)
-      })()
-    }
-  }, { dailyTotal: 0, byCompany: 0, byRoute: 0, byVehicle: 0 })
 
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="w-16 h-16 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin mx-auto"></div>
+        <div className="w-16 h-16 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
       </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <AppShell user={{ id: user?.id || "", name: user?.name || "Admin", email: user?.email || "", role: "admin" }}>
+        <div className="min-h-screen flex items-center justify-center p-4">
+          <Card className="p-8 max-w-md w-full text-center">
+            <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+            <h2 className="text-xl font-bold mb-2 text-red-600">Erro ao carregar</h2>
+            <p className="text-gray-600 mb-4">{error}</p>
+            <Button onClick={() => window.location.reload()} variant="default">
+              Tentar Novamente
+            </Button>
+          </Card>
+        </div>
+      </AppShell>
     )
   }
 
   return (
     <AppShell user={{ id: user?.id || "", name: user?.name || "Admin", email: user?.email || "", role: "admin" }}>
-      <div className="space-y-8 animate-fade-in">
-        <div>
-          <h1 className="text-3xl font-bold mb-2">Custos</h1>
-          <p className="text-[var(--ink-muted)]">Análise de custos operacionais e conciliação de faturas</p>
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex items-center justify-between flex-wrap gap-4">
+          <div>
+            <h1 className="text-3xl font-bold mb-2">Custos</h1>
+            <p className="text-gray-600">
+              Gestão completa de custos - Visão Administrativa
+            </p>
+          </div>
+          <div className="flex gap-2 flex-wrap">
+            <Button variant="outline" onClick={() => setIsImportModalOpen(true)} disabled={!selectedCompanyId}>
+              <Upload className="h-4 w-4 mr-2" />
+              Importar CSV
+            </Button>
+            <Button variant="outline" onClick={() => handleExport('csv')} disabled={!selectedCompanyId}>
+              <Download className="h-4 w-4 mr-2" />
+              Exportar CSV
+            </Button>
+            <Button variant="outline" onClick={() => handleExport('excel')} disabled={!selectedCompanyId}>
+              <Download className="h-4 w-4 mr-2" />
+              Exportar Excel
+            </Button>
+            <Button onClick={() => setIsManualFormOpen(true)} disabled={!selectedCompanyId}>
+              <Plus className="h-4 w-4 mr-2" />
+              Adicionar Custo
+            </Button>
+          </div>
         </div>
 
-        {/* Filtros */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <Filter className="h-5 w-5 text-[var(--brand)]" />
-              <CardTitle className="text-lg">Filtros</CardTitle>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label className="block text-sm font-medium mb-2">Empresa</label>
-                <Input
-                  placeholder="Todas as empresas"
-                  value={filters.company}
-                  onChange={(e) => setFilters({ ...filters, company: e.target.value })}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">Período Início</label>
-                <Input
-                  type="date"
-                  value={filters.period_start}
-                  onChange={(e) => setFilters({ ...filters, period_start: e.target.value })}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">Período Fim</label>
-                <Input
-                  type="date"
-                  value={filters.period_end}
-                  onChange={(e) => setFilters({ ...filters, period_end: e.target.value })}
-                />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* KPIs */}
-        <motion.div
-          variants={staggerContainer}
-          initial="hidden"
-          animate="visible"
-          className="grid grid-cols-1 md:grid-cols-4 gap-6"
-        >
-          <motion.div variants={listItem}>
-            <KpiCard
-              icon={DollarSign}
-              label="Custo Total do Dia"
-              value={formatCurrency(aggregatedKpis.dailyTotal)}
-              hint="Hoje"
-            />
-          </motion.div>
-          <motion.div variants={listItem}>
-            <KpiCard
-              icon={Route}
-              label="Por Rota"
-              value={formatCurrency(aggregatedKpis.byRoute)}
-              hint="Total"
-            />
-          </motion.div>
-          <motion.div variants={listItem}>
-            <KpiCard
-              icon={Building2}
-              label="Por Empresa"
-              value={formatCurrency(aggregatedKpis.byCompany)}
-              hint="Total"
-            />
-          </motion.div>
-          <motion.div variants={listItem}>
-            <KpiCard
-              icon={Truck}
-              label="Por Veículo"
-              value={formatCurrency(aggregatedKpis.byVehicle)}
-              hint="Total"
-            />
-          </motion.div>
-        </motion.div>
-
-        {/* Gráficos */}
-        <CostCharts companyId={filters.company || undefined} period="month" />
-
-        {/* Faturas Pendentes */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <FileText className="h-5 w-5 text-[var(--brand)]" />
-              Faturas Pendentes de Conciliação
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {invoices.length === 0 ? (
-              <div className="text-center py-8 text-[var(--ink-muted)]">
-                Nenhuma fatura encontrada
-              </div>
-            ) : (
-              <div className="space-y-2">
-                {invoices
-                  .filter(inv => inv.status === 'pending' || inv.status === 'reconciled')
-                  .map((invoice) => (
-                    <div
-                      key={invoice.id}
-                      className="flex items-center justify-between p-4 border rounded-lg hover:bg-[var(--bg-hover)] transition-colors"
-                    >
-                      <div>
-                        <div className="font-semibold">
-                          {invoice.invoice_number || `Fatura #${invoice.id.slice(0, 8)}`}
-                        </div>
-                        <div className="text-sm text-[var(--ink-muted)]">
-                          {new Date(invoice.period_start).toLocaleDateString('pt-BR')} - {new Date(invoice.period_end).toLocaleDateString('pt-BR')}
-                        </div>
-                        <div className="text-sm font-medium mt-1">
-                          {formatCurrency(invoice.total_amount)}
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Badge variant={invoice.status === 'approved' ? 'default' : 'secondary'}>
-                          {invoice.status}
-                        </Badge>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => {
-                            setSelectedInvoiceId(invoice.id)
-                            setIsReconciliationOpen(true)
-                          }}
-                        >
-                          Conciliação
-                        </Button>
-                      </div>
-                    </div>
+        {/* Seletor de Empresa */}
+        {companies.length > 0 && (
+          <Card className="p-4">
+            <div className="flex items-center gap-4">
+              <Building2 className="h-5 w-5 text-gray-600" />
+              <div className="flex-1">
+                <label className="text-sm font-medium text-gray-700">Empresa</label>
+                <select
+                  className="w-full mt-1 px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm"
+                  value={selectedCompanyId || ''}
+                  onChange={(e) => setSelectedCompanyId(e.target.value)}
+                >
+                  <option value="">Selecione uma empresa</option>
+                  {companies.map(company => (
+                    <option key={company.id} value={company.id}>{company.name}</option>
                   ))}
+                </select>
               </div>
-            )}
-          </CardContent>
-        </Card>
+            </div>
+          </Card>
+        )}
 
-        {/* Modal de Conciliação */}
-        <ReconciliationModal
-          invoiceId={selectedInvoiceId}
-          isOpen={isReconciliationOpen}
-          onClose={() => {
-            setIsReconciliationOpen(false)
-            setSelectedInvoiceId(null)
-          }}
-          onApprove={loadInvoices}
-          onReject={loadInvoices}
-        />
+        {!selectedCompanyId ? (
+          <Card className="p-12 text-center">
+            <Building2 className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium mb-2">Selecione uma empresa</h3>
+            <p className="text-gray-500">
+              Selecione uma empresa acima para visualizar os custos
+            </p>
+          </Card>
+        ) : (
+          <>
+            {/* Filtros */}
+            <CostFilters
+              onFiltersChange={handleFiltersChange}
+              routes={routes}
+              vehicles={vehicles}
+              drivers={drivers}
+              categories={categories}
+              carriers={carriers}
+            />
+
+            {/* Tabs */}
+            <Tabs defaultValue="overview" className="w-full">
+              <TabsList className="grid w-full grid-cols-6">
+                <TabsTrigger value="overview">Visão Geral</TabsTrigger>
+                <TabsTrigger value="detail">Detalhamento</TabsTrigger>
+                <TabsTrigger value="reconciliation">Conciliação</TabsTrigger>
+                <TabsTrigger value="cost-centers">Centros de Custo</TabsTrigger>
+                <TabsTrigger value="budget">Orçamento</TabsTrigger>
+                <TabsTrigger value="audit">Auditoria</TabsTrigger>
+              </TabsList>
+
+              {/* Visão Geral */}
+              <TabsContent value="overview" className="mt-6">
+                <CostDashboard companyId={selectedCompanyId} period="30" />
+              </TabsContent>
+
+              {/* Detalhamento */}
+              <TabsContent value="detail" className="mt-6">
+                <CostDetailTable
+                  costs={costs}
+                  onReconcile={(cost) => {
+                    if (cost.invoice_id) {
+                      setSelectedInvoiceId(cost.invoice_id)
+                      setIsReconciliationOpen(true)
+                    } else {
+                      toast.info('Este custo não está vinculado a uma fatura')
+                    }
+                  }}
+                  loading={loading}
+                />
+              </TabsContent>
+
+              {/* Conciliação */}
+              <TabsContent value="reconciliation" className="mt-6">
+                <Card className="p-6">
+                  <h3 className="text-lg font-bold mb-4">Conciliação de Faturas</h3>
+                  <p className="text-gray-600 mb-4">
+                    Concilie custos medidos com faturas recebidas das transportadoras
+                  </p>
+                  <Button onClick={() => {
+                    supabase
+                      .from('gf_invoices')
+                      .select('id')
+                      .eq('empresa_id', selectedCompanyId)
+                      .eq('status', 'pending')
+                      .limit(1)
+                      .single()
+                      .then(({ data }) => {
+                        if (data) {
+                          setSelectedInvoiceId(data.id)
+                          setIsReconciliationOpen(true)
+                        } else {
+                          toast.info('Nenhuma fatura pendente encontrada')
+                        }
+                      })
+                  }}>
+                    <FileText className="h-4 w-4 mr-2" />
+                    Abrir Conciliação
+                  </Button>
+                </Card>
+              </TabsContent>
+
+              {/* Centros de Custo */}
+              <TabsContent value="cost-centers" className="mt-6">
+                <Card className="p-6">
+                  <h3 className="text-lg font-bold mb-4">Centros de Custo</h3>
+                  <p className="text-gray-600">
+                    Breakdown de custos por centro de custo
+                  </p>
+                  <p className="text-sm text-gray-500 mt-2">
+                    Funcionalidade em desenvolvimento
+                  </p>
+                </Card>
+              </TabsContent>
+
+              {/* Orçamento */}
+              <TabsContent value="budget" className="mt-6">
+                <BudgetView companyId={selectedCompanyId} />
+              </TabsContent>
+
+              {/* Auditoria */}
+              <TabsContent value="audit" className="mt-6">
+                <Card className="p-6">
+                  <h3 className="text-lg font-bold mb-4">Auditoria de Custos</h3>
+                  <p className="text-gray-600">
+                    Log de inclusões, edições e exclusões de custos
+                  </p>
+                  <p className="text-sm text-gray-500 mt-2">
+                    Funcionalidade em desenvolvimento
+                  </p>
+                </Card>
+              </TabsContent>
+            </Tabs>
+
+            {/* Modais */}
+            <ManualCostForm
+              isOpen={isManualFormOpen}
+              onClose={() => setIsManualFormOpen(false)}
+              onSave={() => {
+                loadCosts()
+                setIsManualFormOpen(false)
+              }}
+              companyId={selectedCompanyId}
+            />
+
+            <ImportCostModal
+              isOpen={isImportModalOpen}
+              onClose={() => setIsImportModalOpen(false)}
+              onSave={() => {
+                loadCosts()
+                setIsImportModalOpen(false)
+              }}
+              companyId={selectedCompanyId}
+            />
+
+            {selectedInvoiceId && (
+              <ReconciliationModal
+                invoiceId={selectedInvoiceId}
+                isOpen={isReconciliationOpen}
+                onClose={() => {
+                  setIsReconciliationOpen(false)
+                  setSelectedInvoiceId(null)
+                }}
+                onApprove={() => {
+                  loadCosts()
+                }}
+                onReject={() => {
+                  loadCosts()
+                }}
+              />
+            )}
+          </>
+        )}
       </div>
     </AppShell>
   )
 }
-
