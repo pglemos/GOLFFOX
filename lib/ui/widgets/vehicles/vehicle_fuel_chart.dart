@@ -178,7 +178,7 @@ class _VehicleFuelChartState extends ConsumerState<VehicleFuelChart> {
             'Consumo Medio',
             '${stats.averageConsumption.toStringAsFixed(1)} km/L',
             Icons.speed,
-            Color(GfTokens.colorPrimary),
+            const Color(GfTokens.colorPrimary),
           ),
         ),
         const SizedBox(width: GfTokens.spacingSm),
@@ -187,7 +187,7 @@ class _VehicleFuelChartState extends ConsumerState<VehicleFuelChart> {
             'Gasto Total',
             'R\$ ${stats.totalCost.toStringAsFixed(2)}',
             Icons.attach_money,
-            Color(GfTokens.colorSuccess),
+            const Color(GfTokens.colorSuccess),
           ),
         ),
         const SizedBox(width: GfTokens.spacingSm),
@@ -196,7 +196,7 @@ class _VehicleFuelChartState extends ConsumerState<VehicleFuelChart> {
             'Abastecimentos',
             '${stats.totalRefuels}',
             Icons.local_gas_station,
-            Color(GfTokens.colorInfo),
+            const Color(GfTokens.colorInfo),
           ),
         ),
       ],
@@ -224,9 +224,9 @@ class _VehicleFuelChartState extends ConsumerState<VehicleFuelChart> {
           ),
           Text(
             title,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: GfTokens.fontSizeSm,
-              color: const Color(GfTokens.colorOnSurfaceVariant),
+              color: Color(GfTokens.colorOnSurfaceVariant),
             ),
             textAlign: TextAlign.center,
           ),
@@ -387,9 +387,9 @@ class _VehicleFuelChartState extends ConsumerState<VehicleFuelChart> {
                   children: [
                     Text(
                       record.type.displayName,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontWeight: FontWeight.w600,
-                        color: const Color(GfTokens.colorOnSurface),
+                        color: Color(GfTokens.colorOnSurface),
                       ),
                     ),
                     Text(
@@ -406,17 +406,17 @@ class _VehicleFuelChartState extends ConsumerState<VehicleFuelChart> {
                   children: [
                     Text(
                       '${record.quantity.toStringAsFixed(1)}L',
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: GfTokens.fontSizeSm,
-                        color: const Color(GfTokens.colorOnSurfaceVariant),
+                        color: Color(GfTokens.colorOnSurfaceVariant),
                       ),
                     ),
                     const SizedBox(width: GfTokens.spacingMd),
                     Text(
                       '${record.odometerReading.toStringAsFixed(0)} km',
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: GfTokens.fontSizeSm,
-                        color: const Color(GfTokens.colorOnSurfaceVariant),
+                        color: Color(GfTokens.colorOnSurfaceVariant),
                       ),
                     ),
                   ],
@@ -427,17 +427,17 @@ class _VehicleFuelChartState extends ConsumerState<VehicleFuelChart> {
                   children: [
                     Text(
                       _formatDate(record.timestamp),
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: GfTokens.fontSizeSm,
-                        color: const Color(GfTokens.colorOnSurfaceVariant),
+                        color: Color(GfTokens.colorOnSurfaceVariant),
                       ),
                     ),
                     if (record.fuelStationName != null)
                       Text(
                         record.fuelStationName!,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: GfTokens.fontSizeSm,
-                          color: const Color(GfTokens.colorOnSurfaceVariant),
+                          color: Color(GfTokens.colorOnSurfaceVariant),
                         ),
                       ),
                   ],
@@ -453,25 +453,25 @@ class _VehicleFuelChartState extends ConsumerState<VehicleFuelChart> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
+          const Icon(
             Icons.local_gas_station_outlined,
             size: 64,
-            color: const Color(GfTokens.colorOnSurfaceVariant),
+            color: Color(GfTokens.colorOnSurfaceVariant),
           ),
           const SizedBox(height: GfTokens.spacingMd),
-          Text(
+          const Text(
             'Nenhum registro de combustivel',
             style: TextStyle(
               fontSize: GfTokens.fontSizeLg,
               fontWeight: FontWeight.w600,
-              color: const Color(GfTokens.colorOnSurface),
+              color: Color(GfTokens.colorOnSurface),
             ),
           ),
           const SizedBox(height: GfTokens.spacingSm),
-          Text(
+          const Text(
             'Este veiculo ainda nao possui registros de abastecimento.',
             style: TextStyle(
-              color: const Color(GfTokens.colorOnSurfaceVariant),
+              color: Color(GfTokens.colorOnSurfaceVariant),
             ),
             textAlign: TextAlign.center,
           ),

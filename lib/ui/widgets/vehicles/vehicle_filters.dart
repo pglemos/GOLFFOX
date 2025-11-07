@@ -79,11 +79,11 @@ class _VehicleFiltersWidgetState extends State<VehicleFiltersWidget>
 
   @override
   Widget build(BuildContext context) => Container(
-      decoration: BoxDecoration(
-        color: const Color(GfTokens.colorSurface),
+      decoration: const BoxDecoration(
+        color: Color(GfTokens.colorSurface),
         border: Border(
           bottom: BorderSide(
-            color: const Color(GfTokens.colorBorder),
+            color: Color(GfTokens.colorBorder),
             width: 1,
           ),
         ),
@@ -97,18 +97,18 @@ class _VehicleFiltersWidgetState extends State<VehicleFiltersWidget>
               padding: const EdgeInsets.all(GfTokens.spacingMd),
               child: Row(
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.filter_list,
-                    color: const Color(GfTokens.colorPrimary),
+                    color: Color(GfTokens.colorPrimary),
                     size: 20,
                   ),
                   const SizedBox(width: GfTokens.spacingSm),
-                  Text(
+                  const Text(
                     'Filtros',
                     style: TextStyle(
                       fontSize: GfTokens.fontSizeMd,
                       fontWeight: FontWeight.w600,
-                      color: const Color(GfTokens.colorOnSurface),
+                      color: Color(GfTokens.colorOnSurface),
                     ),
                   ),
                   const Spacer(),
@@ -120,15 +120,15 @@ class _VehicleFiltersWidgetState extends State<VehicleFiltersWidget>
                       ),
                       decoration: BoxDecoration(
                         color:
-                            Color(GfTokens.colorPrimary).withValues(alpha: 0.1),
+                            const Color(GfTokens.colorPrimary).withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(GfTokens.radiusSm),
                       ),
                       child: Text(
                         _getActiveFiltersCount().toString(),
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: GfTokens.fontSizeXs,
                           fontWeight: FontWeight.w600,
-                          color: const Color(GfTokens.colorPrimary),
+                          color: Color(GfTokens.colorPrimary),
                         ),
                       ),
                     ),
@@ -142,11 +142,11 @@ class _VehicleFiltersWidgetState extends State<VehicleFiltersWidget>
                         minimumSize: Size.zero,
                         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       ),
-                      child: Text(
+                      child: const Text(
                         'Limpar',
                         style: TextStyle(
                           fontSize: GfTokens.fontSizeSm,
-                          color: const Color(GfTokens.colorPrimary),
+                          color: Color(GfTokens.colorPrimary),
                         ),
                       ),
                     ),
@@ -155,9 +155,9 @@ class _VehicleFiltersWidgetState extends State<VehicleFiltersWidget>
                   AnimatedRotation(
                     turns: _isExpanded ? 0.5 : 0,
                     duration: const Duration(milliseconds: 300),
-                    child: Icon(
+                    child: const Icon(
                       Icons.keyboard_arrow_down,
-                      color: const Color(GfTokens.colorOnSurfaceVariant),
+                      color: Color(GfTokens.colorOnSurfaceVariant),
                     ),
                   ),
                 ],
@@ -223,10 +223,10 @@ class _VehicleFiltersWidgetState extends State<VehicleFiltersWidget>
       children: [
         Text(
           title,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: GfTokens.fontSizeSm,
             fontWeight: FontWeight.w600,
-            color: const Color(GfTokens.colorOnSurface),
+            color: Color(GfTokens.colorOnSurface),
           ),
         ),
         const SizedBox(height: GfTokens.spacingSm),
@@ -286,7 +286,7 @@ class _VehicleFiltersWidgetState extends State<VehicleFiltersWidget>
               types: currentTypes.isEmpty ? null : currentTypes,
             ));
           },
-          selectedColor: Color(GfTokens.colorPrimary).withValues(alpha: 0.2),
+          selectedColor: const Color(GfTokens.colorPrimary).withValues(alpha: 0.2),
           checkmarkColor: const Color(GfTokens.colorPrimary),
           labelStyle: TextStyle(
             color: isSelected
@@ -319,7 +319,7 @@ class _VehicleFiltersWidgetState extends State<VehicleFiltersWidget>
               fuelTypes: currentFuelTypes.isEmpty ? null : currentFuelTypes,
             ));
           },
-          selectedColor: Color(GfTokens.colorSecondary).withValues(alpha: 0.2),
+          selectedColor: const Color(GfTokens.colorSecondary).withValues(alpha: 0.2),
           checkmarkColor: const Color(GfTokens.colorSecondary),
           labelStyle: TextStyle(
             color: isSelected

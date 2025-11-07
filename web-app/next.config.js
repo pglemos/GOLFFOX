@@ -4,9 +4,8 @@ const nextConfig = {
   reactStrictMode: true,
   output: 'standalone',
   typescript: {
-    // ⚠️ Temporariamente habilitado para permitir deploy (erros pré-existentes)
-    // TODO: Corrigir erros TypeScript restantes
-    ignoreBuildErrors: true,
+    // ✅ Type-safety habilitado após correção de erros
+    ignoreBuildErrors: false,
   },
   async headers() {
     return [
@@ -44,9 +43,8 @@ const nextConfig = {
     ]
   },
   eslint: {
-    // ⚠️ Temporariamente habilitado para permitir deploy (warnings pré-existentes)
-    // TODO: Corrigir warnings ESLint restantes
-    ignoreDuringBuilds: true,
+    // ✅ Linting habilitado (warnings não bloqueiam build)
+    ignoreDuringBuilds: false,
   },
   env: {
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,

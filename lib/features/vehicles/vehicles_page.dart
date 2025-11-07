@@ -132,8 +132,8 @@ class _VehiclesPageState extends ConsumerState<VehiclesPage>
             icon: Icon(
               _showStats ? Icons.bar_chart : Icons.bar_chart_outlined,
               color: _showStats
-                  ? Color(GfTokens.colorPrimary)
-                  : Color(GfTokens.colorOnSurface),
+                  ? const Color(GfTokens.colorPrimary)
+                  : const Color(GfTokens.colorOnSurface),
             ),
             onPressed: _toggleStats,
             tooltip:
@@ -143,8 +143,8 @@ class _VehiclesPageState extends ConsumerState<VehiclesPage>
             icon: Icon(
               _showFilters ? Icons.filter_list : Icons.filter_list_outlined,
               color: _showFilters
-                  ? Color(GfTokens.colorPrimary)
-                  : Color(GfTokens.colorOnSurface),
+                  ? const Color(GfTokens.colorPrimary)
+                  : const Color(GfTokens.colorOnSurface),
             ),
             onPressed: _toggleFilters,
             tooltip: _showFilters ? 'Ocultar filtros' : 'Mostrar filtros',
@@ -163,11 +163,11 @@ class _VehiclesPageState extends ConsumerState<VehiclesPage>
             // Barra de busca
             Container(
               padding: const EdgeInsets.all(GfTokens.spacingMd),
-              decoration: BoxDecoration(
-                color: const Color(GfTokens.colorSurface),
+              decoration: const BoxDecoration(
+                color: Color(GfTokens.colorSurface),
                 border: Border(
                   bottom: BorderSide(
-                    color: const Color(GfTokens.colorBorder),
+                    color: Color(GfTokens.colorBorder),
                     width: 1,
                   ),
                 ),
@@ -230,16 +230,16 @@ class _VehiclesPageState extends ConsumerState<VehiclesPage>
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(
+                          const Icon(
                             Icons.filter_list,
                             size: 16,
-                            color: const Color(GfTokens.colorPrimary),
+                            color: Color(GfTokens.colorPrimary),
                           ),
                           const SizedBox(width: GfTokens.spacingXs),
-                          Text(
+                          const Text(
                             'Filtros ativos',
                             style: TextStyle(
-                              color: const Color(GfTokens.colorPrimary),
+                              color: Color(GfTokens.colorPrimary),
                               fontSize: GfTokens.fontSizeSm,
                               fontWeight: FontWeight.w500,
                             ),
@@ -247,10 +247,10 @@ class _VehiclesPageState extends ConsumerState<VehiclesPage>
                           const SizedBox(width: GfTokens.spacingXs),
                           GestureDetector(
                             onTap: _clearFilters,
-                            child: Icon(
+                            child: const Icon(
                               Icons.close,
                               size: 16,
-                              color: const Color(GfTokens.colorPrimary),
+                              color: Color(GfTokens.colorPrimary),
                             ),
                           ),
                         ],

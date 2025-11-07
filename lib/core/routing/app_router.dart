@@ -302,7 +302,7 @@ class AppRouter {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   CircularProgressIndicator(),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16),
                   Text('Carregando perfil do usuario...'),
                 ],
               ),
@@ -315,9 +315,9 @@ class AppRouter {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.error_outline, size: 64, color: Colors.red),
+                  const Icon(Icons.error_outline, size: 64, color: Colors.red),
                   const SizedBox(height: 16),
-                  Text(
+                  const Text(
                     'Erro ao carregar perfil',
                     style:
                         TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -361,9 +361,9 @@ class AppRouter {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.person_off, size: 64, color: Colors.orange),
+                  const Icon(Icons.person_off, size: 64, color: Colors.orange),
                   const SizedBox(height: 16),
-                  Text(
+                  const Text(
                     'Perfil nao encontrado',
                     style:
                         TextStyle(fontSize: 18, fontWeight: FontWeight.bold),

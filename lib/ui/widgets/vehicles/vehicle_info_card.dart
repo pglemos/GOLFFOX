@@ -32,18 +32,18 @@ class VehicleInfoCard extends StatelessWidget {
                     children: [
                       Text(
                         vehicle.name,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: GfTokens.fontSizeXl,
                           fontWeight: FontWeight.w600,
-                          color: const Color(GfTokens.colorOnSurface),
+                          color: Color(GfTokens.colorOnSurface),
                         ),
                       ),
                       if (vehicle.documents.licensePlate != null)
                         Text(
                           vehicle.documents.licensePlate!,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: GfTokens.fontSizeLg,
-                            color: const Color(GfTokens.colorOnSurfaceVariant),
+                            color: Color(GfTokens.colorOnSurfaceVariant),
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -126,17 +126,17 @@ class VehicleInfoCard extends StatelessWidget {
             // Ultima atualizacao
             Row(
               children: [
-                Icon(
+                const Icon(
                   Icons.update,
                   size: 16,
-                  color: const Color(GfTokens.colorOnSurfaceVariant),
+                  color: Color(GfTokens.colorOnSurfaceVariant),
                 ),
                 const SizedBox(width: GfTokens.spacingXs),
                 Text(
                   'Atualizado em ${_formatDate(vehicle.updatedAt)}',
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: GfTokens.fontSizeSm,
-                    color: const Color(GfTokens.colorOnSurfaceVariant),
+                    color: Color(GfTokens.colorOnSurfaceVariant),
                   ),
                 ),
               ],
@@ -156,18 +156,18 @@ class VehicleInfoCard extends StatelessWidget {
         const SizedBox(height: GfTokens.spacingXs),
         Text(
           value,
-          style: TextStyle(
+          style: const TextStyle(
             fontWeight: FontWeight.w600,
-            color: const Color(GfTokens.colorOnSurface),
+            color: Color(GfTokens.colorOnSurface),
             fontSize: GfTokens.fontSizeSm,
           ),
           textAlign: TextAlign.center,
         ),
         Text(
           label,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: GfTokens.fontSizeXs,
-            color: const Color(GfTokens.colorOnSurfaceVariant),
+            color: Color(GfTokens.colorOnSurfaceVariant),
           ),
           textAlign: TextAlign.center,
         ),
@@ -245,26 +245,26 @@ class VehicleInfoCard extends StatelessWidget {
   Widget _buildCapacityInfo() => Container(
       padding: const EdgeInsets.all(GfTokens.spacingMd),
       decoration: BoxDecoration(
-        color: Color(GfTokens.colorInfo).withValues(alpha: 0.1),
+        color: const Color(GfTokens.colorInfo).withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(GfTokens.radiusSm),
         border:
-            Border.all(color: Color(GfTokens.colorInfo).withValues(alpha: 0.3)),
+            Border.all(color: const Color(GfTokens.colorInfo).withValues(alpha: 0.3)),
       ),
       child: Column(
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Icon(
+              const Icon(
                 Icons.people,
-                color: const Color(GfTokens.colorInfo),
+                color: Color(GfTokens.colorInfo),
                 size: 20,
               ),
               Text(
                 '${vehicle.specifications.capacity}',
-                style: TextStyle(
+                style: const TextStyle(
                   fontWeight: FontWeight.w600,
-                  color: const Color(GfTokens.colorInfo),
+                  color: Color(GfTokens.colorInfo),
                 ),
               ),
             ],
@@ -276,23 +276,23 @@ class VehicleInfoCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: List.generate(
               (vehicle.specifications.capacity / 10).ceil().clamp(1, 5),
-              (index) => Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 1),
+              (index) => const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 1),
                 child: Icon(
                   Icons.person,
                   size: 12,
-                  color: const Color(GfTokens.colorInfo),
+                  color: Color(GfTokens.colorInfo),
                 ),
               ),
             ),
           ),
           const SizedBox(height: GfTokens.spacingSm),
 
-          Text(
+          const Text(
             'Passageiros',
             style: TextStyle(
               fontSize: GfTokens.fontSizeSm,
-              color: const Color(GfTokens.colorOnSurfaceVariant),
+              color: Color(GfTokens.colorOnSurfaceVariant),
             ),
           ),
         ],

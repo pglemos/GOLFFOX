@@ -603,18 +603,18 @@ class _TripStatusCardPremium extends StatelessWidget {
           // mini progresso (fake/visual, substitua por % real se houver)
           _ShimmerBar(animation: shimmerAnim),
           const SizedBox(height: 8),
-          Row(
+          const Row(
             children: [
               Expanded(
                 child: FilledButton(
                   onPressed: HapticFeedback.selectionClick,
-                  child: const Text('Ver detalhes'),
+                  child: Text('Ver detalhes'),
                 ),
               ),
-              const SizedBox(width: 10),
+              SizedBox(width: 10),
               IconButton.filledTonal(
                 onPressed: HapticFeedback.selectionClick,
-                icon: const Icon(Icons.more_horiz),
+                icon: Icon(Icons.more_horiz),
                 tooltip: 'Mais',
               ),
             ],

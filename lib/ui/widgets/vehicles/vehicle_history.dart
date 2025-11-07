@@ -164,25 +164,25 @@ class _VehicleHistoryState extends ConsumerState<VehicleHistory> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(
+                const Icon(
                   Icons.error_outline,
                   size: 64,
-                  color: const Color(GfTokens.colorError),
+                  color: Color(GfTokens.colorError),
                 ),
                 const SizedBox(height: GfTokens.spacingMd),
-                Text(
+                const Text(
                   'Erro ao carregar historico',
                   style: TextStyle(
                     fontSize: GfTokens.fontSizeLg,
                     fontWeight: FontWeight.w600,
-                    color: const Color(GfTokens.colorOnSurface),
+                    color: Color(GfTokens.colorOnSurface),
                   ),
                 ),
                 const SizedBox(height: GfTokens.spacingSm),
                 Text(
                   snapshot.error.toString(),
-                  style: TextStyle(
-                    color: const Color(GfTokens.colorOnSurfaceVariant),
+                  style: const TextStyle(
+                    color: Color(GfTokens.colorOnSurfaceVariant),
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -209,20 +209,20 @@ class _VehicleHistoryState extends ConsumerState<VehicleHistory> {
             // Filtros
             Container(
               padding: const EdgeInsets.all(GfTokens.spacingMd),
-              decoration: BoxDecoration(
-                color: const Color(GfTokens.colorSurface),
+              decoration: const BoxDecoration(
+                color: Color(GfTokens.colorSurface),
                 border: Border(
-                  bottom: BorderSide(color: const Color(GfTokens.colorBorder)),
+                  bottom: BorderSide(color: Color(GfTokens.colorBorder)),
                 ),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  const Text(
                     'Filtrar por tipo:',
                     style: TextStyle(
                       fontWeight: FontWeight.w600,
-                      color: const Color(GfTokens.colorOnSurface),
+                      color: Color(GfTokens.colorOnSurface),
                     ),
                   ),
                   const SizedBox(height: GfTokens.spacingSm),
@@ -343,17 +343,17 @@ class _VehicleHistoryState extends ConsumerState<VehicleHistory> {
                     Expanded(
                       child: Text(
                         event.title,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontWeight: FontWeight.w600,
-                          color: const Color(GfTokens.colorOnSurface),
+                          color: Color(GfTokens.colorOnSurface),
                         ),
                       ),
                     ),
                     Text(
                       _formatTimestamp(event.timestamp),
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: GfTokens.fontSizeSm,
-                        color: const Color(GfTokens.colorOnSurfaceVariant),
+                        color: Color(GfTokens.colorOnSurfaceVariant),
                       ),
                     ),
                   ],
@@ -361,25 +361,25 @@ class _VehicleHistoryState extends ConsumerState<VehicleHistory> {
                 const SizedBox(height: GfTokens.spacingXs),
                 Text(
                   event.description,
-                  style: TextStyle(
-                    color: const Color(GfTokens.colorOnSurfaceVariant),
+                  style: const TextStyle(
+                    color: Color(GfTokens.colorOnSurfaceVariant),
                   ),
                 ),
                 if (event.userName != null) ...[
                   const SizedBox(height: GfTokens.spacingSm),
                   Row(
                     children: [
-                      Icon(
+                      const Icon(
                         Icons.person,
                         size: 16,
-                        color: const Color(GfTokens.colorOnSurfaceVariant),
+                        color: Color(GfTokens.colorOnSurfaceVariant),
                       ),
                       const SizedBox(width: GfTokens.spacingXs),
                       Text(
                         'Por ${event.userName}',
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: GfTokens.fontSizeSm,
-                          color: const Color(GfTokens.colorOnSurfaceVariant),
+                          color: Color(GfTokens.colorOnSurfaceVariant),
                           fontStyle: FontStyle.italic,
                         ),
                       ),
@@ -394,7 +394,7 @@ class _VehicleHistoryState extends ConsumerState<VehicleHistory> {
             ),
           )
               .animate()
-              .fadeIn(delay: Duration(milliseconds: 100))
+              .fadeIn(delay: const Duration(milliseconds: 100))
               .slideX(begin: 0.3),
         ),
       ],
@@ -403,7 +403,7 @@ class _VehicleHistoryState extends ConsumerState<VehicleHistory> {
   Widget _buildMetadata(Map<String, dynamic> metadata) => Container(
       padding: const EdgeInsets.all(GfTokens.spacingSm),
       decoration: BoxDecoration(
-        color: Color(GfTokens.colorSurfaceVariant).withValues(alpha: 0.5),
+        color: const Color(GfTokens.colorSurfaceVariant).withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(GfTokens.radiusXs),
       ),
       child: Column(
@@ -415,18 +415,18 @@ class _VehicleHistoryState extends ConsumerState<VehicleHistory> {
               children: [
                 Text(
                   '${entry.key}: ',
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: GfTokens.fontSizeSm,
                     fontWeight: FontWeight.w500,
-                    color: const Color(GfTokens.colorOnSurfaceVariant),
+                    color: Color(GfTokens.colorOnSurfaceVariant),
                   ),
                 ),
                 Expanded(
                   child: Text(
                     entry.value.toString(),
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: GfTokens.fontSizeSm,
-                      color: const Color(GfTokens.colorOnSurfaceVariant),
+                      color: Color(GfTokens.colorOnSurfaceVariant),
                     ),
                   ),
                 ),
@@ -441,18 +441,18 @@ class _VehicleHistoryState extends ConsumerState<VehicleHistory> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
+          const Icon(
             Icons.history,
             size: 64,
-            color: const Color(GfTokens.colorOnSurfaceVariant),
+            color: Color(GfTokens.colorOnSurfaceVariant),
           ),
           const SizedBox(height: GfTokens.spacingMd),
-          Text(
+          const Text(
             'Nenhum evento encontrado',
             style: TextStyle(
               fontSize: GfTokens.fontSizeLg,
               fontWeight: FontWeight.w600,
-              color: const Color(GfTokens.colorOnSurface),
+              color: Color(GfTokens.colorOnSurface),
             ),
           ),
           const SizedBox(height: GfTokens.spacingSm),
@@ -460,8 +460,8 @@ class _VehicleHistoryState extends ConsumerState<VehicleHistory> {
             _selectedEventType != null
                 ? 'Nao ha eventos do tipo "${_selectedEventType!.displayName}".'
                 : 'Este veiculo ainda nao possui historico de eventos.',
-            style: TextStyle(
-              color: const Color(GfTokens.colorOnSurfaceVariant),
+            style: const TextStyle(
+              color: Color(GfTokens.colorOnSurfaceVariant),
             ),
             textAlign: TextAlign.center,
           ),

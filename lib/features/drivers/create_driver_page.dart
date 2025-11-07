@@ -3,10 +3,11 @@
 // Página para criar e editar motoristas
 // ========================================
 
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_animate/flutter_animate.dart';
+
 import '../../core/theme/gf_tokens.dart';
 import '../../models/driver.dart';
 import '../../services/driver_service.dart';
@@ -190,7 +191,8 @@ class _CreateDriverPageState extends ConsumerState<CreateDriverPage> {
                   ? const Color(GfTokens.colorSuccess)
                   : isActive
                       ? const Color(GfTokens.colorPrimary)
-                      : const Color(GfTokens.colorOnSurfaceVariant).withOpacity(0.3),
+                      : const Color(GfTokens.colorOnSurfaceVariant)
+                          .withValues(alpha: 0.3),
               shape: BoxShape.circle,
             ),
             child: Icon(
@@ -231,12 +233,12 @@ class _CreateDriverPageState extends ConsumerState<CreateDriverPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          const Text(
             'Informações Pessoais',
             style: TextStyle(
               fontSize: GfTokens.fontSizeLg,
               fontWeight: FontWeight.w600,
-              color: const Color(GfTokens.colorOnSurface),
+              color: Color(GfTokens.colorOnSurface),
             ),
           ),
           
@@ -248,24 +250,25 @@ class _CreateDriverPageState extends ConsumerState<CreateDriverPage> {
               children: [
                 CircleAvatar(
                   radius: 50,
-                  backgroundColor: const Color(GfTokens.colorPrimary).withOpacity(0.1),
+                  backgroundColor:
+                      const Color(GfTokens.colorPrimary).withValues(alpha: 0.1),
                   backgroundImage: _photoUrl != null 
                       ? NetworkImage(_photoUrl!)
                       : null,
                   child: _photoUrl == null
-                      ? Icon(
+                      ? const Icon(
                           Icons.person,
                           size: 50,
-                          color: const Color(GfTokens.colorPrimary),
+                          color: Color(GfTokens.colorPrimary),
                         )
                       : null,
                 ),
                 Positioned(
                   bottom: 0,
                   right: 0,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: const Color(GfTokens.colorPrimary),
+                  child: DecoratedBox(
+                    decoration: const BoxDecoration(
+                      color: Color(GfTokens.colorPrimary),
                       shape: BoxShape.circle,
                     ),
                     child: IconButton(
@@ -391,27 +394,27 @@ class _CreateDriverPageState extends ConsumerState<CreateDriverPage> {
 
           // Status
           DropdownButtonFormField<DriverStatus>(
-            value: _status,
+            initialValue: _status,
             decoration: const InputDecoration(
               labelText: 'Status *',
               prefixIcon: Icon(Icons.info),
             ),
-            items: DriverStatus.values.map((status) {
-              return DropdownMenuItem(
-                value: status,
-                child: Row(
-                  children: [
-                    Icon(
-                      status.iconData,
-                      size: 16,
-                      color: status.colorValue,
-                    ),
-                    const SizedBox(width: 8),
-                    Text(status.displayName),
-                  ],
-                ),
-              );
-            }).toList(),
+            items: DriverStatus.values
+                .map((status) => DropdownMenuItem(
+                      value: status,
+                      child: Row(
+                        children: [
+                          Icon(
+                            status.iconData,
+                            size: 16,
+                            color: status.colorValue,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(status.displayName),
+                        ],
+                      ),
+                    ))
+                .toList(),
             onChanged: (value) {
               if (value != null) {
                 setState(() {
@@ -513,12 +516,12 @@ class _CreateDriverPageState extends ConsumerState<CreateDriverPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          const Text(
             'Informações da Licença',
             style: TextStyle(
               fontSize: GfTokens.fontSizeLg,
               fontWeight: FontWeight.w600,
-              color: const Color(GfTokens.colorOnSurface),
+              color: Color(GfTokens.colorOnSurface),
             ),
           ),
           
@@ -560,32 +563,32 @@ class _CreateDriverPageState extends ConsumerState<CreateDriverPage> {
 
           // Categoria da licença
           DropdownButtonFormField<LicenseCategory>(
-            value: _licenseCategory,
+            initialValue: _licenseCategory,
             decoration: const InputDecoration(
               labelText: 'Categoria *',
               prefixIcon: Icon(Icons.category),
             ),
-            items: LicenseCategory.values.map((category) {
-              return DropdownMenuItem(
-                value: category,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      category.displayName,
-                      style: const TextStyle(fontWeight: FontWeight.w500),
-                    ),
-                    Text(
-                      category.description,
-                      style: const TextStyle(
-                        fontSize: GfTokens.fontSizeXs,
-                        color: Color(GfTokens.colorOnSurfaceVariant),
+            items: LicenseCategory.values
+                .map((category) => DropdownMenuItem(
+                      value: category,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            category.displayName,
+                            style: const TextStyle(fontWeight: FontWeight.w500),
+                          ),
+                          Text(
+                            category.description,
+                            style: const TextStyle(
+                              fontSize: GfTokens.fontSizeXs,
+                              color: Color(GfTokens.colorOnSurfaceVariant),
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                  ],
-                ),
-              );
-            }).toList(),
+                    ))
+                .toList(),
             onChanged: (value) {
               if (value != null) {
                 setState(() {
@@ -686,13 +689,13 @@ class _CreateDriverPageState extends ConsumerState<CreateDriverPage> {
         children: [
           Row(
             children: [
-              Expanded(
+              const Expanded(
                 child: Text(
                   'Certificações',
                   style: TextStyle(
                     fontSize: GfTokens.fontSizeLg,
                     fontWeight: FontWeight.w600,
-                    color: const Color(GfTokens.colorOnSurface),
+                    color: Color(GfTokens.colorOnSurface),
                   ),
                 ),
               ),
@@ -707,27 +710,27 @@ class _CreateDriverPageState extends ConsumerState<CreateDriverPage> {
           const SizedBox(height: GfTokens.spacingMd),
 
           if (_certifications.isEmpty)
-            Center(
+            const Center(
               child: Column(
                 children: [
                   Icon(
                     Icons.verified,
                     size: 64,
-                    color: const Color(GfTokens.colorOnSurfaceVariant),
+                    color: Color(GfTokens.colorOnSurfaceVariant),
                   ),
-                  const SizedBox(height: GfTokens.spacingMd),
+                  SizedBox(height: GfTokens.spacingMd),
                   Text(
                     'Nenhuma certificacao adicionada',
                     style: TextStyle(
-                      color: const Color(GfTokens.colorOnSurfaceVariant),
+                      color: Color(GfTokens.colorOnSurfaceVariant),
                     ),
                   ),
-                  const SizedBox(height: GfTokens.spacingSm),
+                  SizedBox(height: GfTokens.spacingSm),
                   Text(
                     'Adicione certificações para melhorar o perfil do motorista.',
                     style: TextStyle(
                       fontSize: GfTokens.fontSizeSm,
-                      color: const Color(GfTokens.colorOnSurfaceVariant),
+                      color: Color(GfTokens.colorOnSurfaceVariant),
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -769,10 +772,10 @@ class _CreateDriverPageState extends ConsumerState<CreateDriverPage> {
                             ),
                           )
                         else
-                          Text(
+                          const Text(
                             'Sem data de validade',
                             style: TextStyle(
-                              color: const Color(GfTokens.colorOnSurfaceVariant),
+                              color: Color(GfTokens.colorOnSurfaceVariant),
                               fontSize: GfTokens.fontSizeSm,
                             ),
                           ),

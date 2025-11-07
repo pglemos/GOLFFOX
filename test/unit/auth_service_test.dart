@@ -22,7 +22,6 @@ void main() {
       mockSupabaseService = MockSupabaseService();
       mockSupabaseClient = MockSupabaseClient();
       mockContext = MockBuildContext();
-      
       authService = AuthService();
     });
 
@@ -54,7 +53,8 @@ void main() {
             .thenAnswer((_) async => mockProfile);
 
         // Act
-        final result = await authService.signInWithEmail(mockContext, email, password);
+        final result =
+            await authService.signInWithEmail(email, password);
 
         // Assert
         expect(result, equals(mockProfile));
@@ -75,7 +75,7 @@ void main() {
 
         // Act & Assert
         expect(
-          () => authService.signInWithEmail(mockContext, email, password),
+          () => authService.signInWithEmail(email, password),
           throwsA(isA<AuthFailure>().having(
             (e) => e.code,
             'code',
@@ -101,7 +101,7 @@ void main() {
 
         // Act & Assert
         expect(
-          () => authService.signInWithEmail(mockContext, email, password),
+          () => authService.signInWithEmail(email, password),
           throwsA(isA<AuthFailure>().having(
             (e) => e.code,
             'code',
@@ -130,7 +130,7 @@ void main() {
 
         // Act & Assert
         expect(
-          () => authService.signInWithEmail(mockContext, email, password),
+          () => authService.signInWithEmail(email, password),
           throwsA(isA<AuthFailure>().having(
             (e) => e.code,
             'code',
@@ -146,7 +146,7 @@ void main() {
 
         // Act & Assert
         expect(
-          () => authService.signInWithEmail(mockContext, invalidEmail, password),
+          () => authService.signInWithEmail(invalidEmail, password),
           throwsA(isA<AuthFailure>()),
         );
       });
@@ -158,7 +158,7 @@ void main() {
 
         // Act & Assert
         expect(
-          () => authService.signInWithEmail(mockContext, email, weakPassword),
+          () => authService.signInWithEmail(email, weakPassword),
           throwsA(isA<AuthFailure>()),
         );
       });

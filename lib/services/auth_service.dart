@@ -35,7 +35,6 @@ class AuthService {
 
   /// Assina com e-mail/senha + busca o perfil (com retry/backoff).
   Future<app_user.User?> signInWithEmail(
-    BuildContext context,
     String email,
     String password,
   ) async {

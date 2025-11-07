@@ -23,7 +23,7 @@ import { TemporalProgressBar } from "./temporal-progress-bar"
 import { InteractiveMarkerHotspot } from "./interactive-marker-hotspot"
 import { useRouter, useSearchParams } from "next/navigation"
 import { MarkerClusterer } from "@googlemaps/markerclusterer"
-import { formatTimeRemaining, formatRelativeTime } from "@/lib/kpi-utils"
+import { formatRelativeTime } from "@/lib/kpi-utils"
 
 declare global {
   interface Window {

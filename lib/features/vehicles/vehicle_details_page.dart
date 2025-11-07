@@ -445,17 +445,17 @@ class _VehicleDetailsPageState extends ConsumerState<VehicleDetailsPage>
           const SizedBox(height: GfTokens.spacingXs),
           Text(
             value,
-            style: TextStyle(
+            style: const TextStyle(
               fontWeight: FontWeight.w600,
-              color: const Color(GfTokens.colorOnSurface),
+              color: Color(GfTokens.colorOnSurface),
               fontSize: GfTokens.fontSizeSm,
             ),
           ),
           Text(
             title,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: GfTokens.fontSizeXs,
-              color: const Color(GfTokens.colorOnSurfaceVariant),
+              color: Color(GfTokens.colorOnSurfaceVariant),
             ),
           ),
         ],
@@ -476,12 +476,12 @@ class _VehicleDetailsPageState extends ConsumerState<VehicleDetailsPage>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  const Text(
                     'Documentos',
                     style: TextStyle(
                       fontSize: GfTokens.fontSizeLg,
                       fontWeight: FontWeight.w600,
-                      color: const Color(GfTokens.colorOnSurface),
+                      color: Color(GfTokens.colorOnSurface),
                     ),
                   ),
                   const SizedBox(height: GfTokens.spacingMd),
@@ -526,12 +526,12 @@ class _VehicleDetailsPageState extends ConsumerState<VehicleDetailsPage>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  const Text(
                     'Especificacoes',
                     style: TextStyle(
                       fontSize: GfTokens.fontSizeLg,
                       fontWeight: FontWeight.w600,
-                      color: const Color(GfTokens.colorOnSurface),
+                      color: Color(GfTokens.colorOnSurface),
                     ),
                   ),
                   const SizedBox(height: GfTokens.spacingMd),
@@ -564,12 +564,12 @@ class _VehicleDetailsPageState extends ConsumerState<VehicleDetailsPage>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
+                    const Text(
                       'Recursos',
                       style: TextStyle(
                         fontSize: GfTokens.fontSizeLg,
                         fontWeight: FontWeight.w600,
-                        color: const Color(GfTokens.colorOnSurface),
+                        color: Color(GfTokens.colorOnSurface),
                       ),
                     ),
                     const SizedBox(height: GfTokens.spacingMd),
@@ -611,12 +611,12 @@ class _VehicleDetailsPageState extends ConsumerState<VehicleDetailsPage>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  const Text(
                     'Historico do Veiculo',
                     style: TextStyle(
                       fontSize: GfTokens.fontSizeLg,
                       fontWeight: FontWeight.w600,
-                      color: const Color(GfTokens.colorOnSurface),
+                      color: Color(GfTokens.colorOnSurface),
                     ),
                   ),
                   const SizedBox(height: GfTokens.spacingMd),
@@ -684,15 +684,15 @@ class _VehicleDetailsPageState extends ConsumerState<VehicleDetailsPage>
         children: [
           Text(
             label,
-            style: TextStyle(
-              color: const Color(GfTokens.colorOnSurfaceVariant),
+            style: const TextStyle(
+              color: Color(GfTokens.colorOnSurfaceVariant),
             ),
           ),
           Text(
             value,
-            style: TextStyle(
+            style: const TextStyle(
               fontWeight: FontWeight.w500,
-              color: const Color(GfTokens.colorOnSurface),
+              color: Color(GfTokens.colorOnSurface),
             ),
           ),
         ],
@@ -725,16 +725,16 @@ class _VehicleDetailsPageState extends ConsumerState<VehicleDetailsPage>
               children: [
                 Text(
                   title,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontWeight: FontWeight.w600,
-                    color: const Color(GfTokens.colorOnSurface),
+                    color: Color(GfTokens.colorOnSurface),
                   ),
                 ),
                 Text(
                   '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year} as ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}',
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: GfTokens.fontSizeSm,
-                    color: const Color(GfTokens.colorOnSurfaceVariant),
+                    color: Color(GfTokens.colorOnSurfaceVariant),
                   ),
                 ),
               ],

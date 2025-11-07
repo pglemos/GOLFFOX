@@ -569,9 +569,9 @@ class _RouteDetailsPageState extends ConsumerState<RouteDetailsPage>
             color: Color(GfTokens.error),
           ),
           const SizedBox(height: GfTokens.space4),
-          Text(
+          const Text(
             'Erro ao carregar detalhes da rota',
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
               color: Color(GfTokens.textTitle),

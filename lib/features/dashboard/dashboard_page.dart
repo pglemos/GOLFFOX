@@ -3,15 +3,16 @@
 // Página principal do painel administrativo
 // ========================================
 
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../core/theme/gf_tokens.dart';
+import '../../data/golf_fox_repo.dart';
+import '../../ui/widgets/alert_banner.dart';
 import '../../ui/widgets/kpi_card.dart';
 import '../../ui/widgets/quick_action.dart';
-import '../../ui/widgets/alert_banner.dart';
-import '../../data/golf_fox_repo.dart';
 import '../../ui/widgets/side_nav.dart';
 import '../../ui/widgets/top_bar.dart';
 
@@ -134,9 +135,9 @@ class DashboardPage extends ConsumerWidget {
         ),
         const SizedBox(height: GfTokens.space4),
         metricsAsync.when(
-          data: (metrics) => _buildKpiGrid(metrics),
-          loading: () => _buildKpiGridLoading(),
-          error: (error, stack) => _buildKpiGridError(),
+          data: _buildKpiGrid,
+          loading: _buildKpiGridLoading,
+          error: _buildKpiGridError,
         ),
       ],
     );
@@ -157,19 +158,19 @@ class DashboardPage extends ConsumerWidget {
           children: [
             GfKpiCardVariants.inTransit(
               value: '${metrics['inTransit'] ?? 0}',
-              onTap: () => _navigateToTrips(),
+              onTap: _navigateToTrips,
             ),
             GfKpiCardVariants.activeVehicles(
               value: '${metrics['activeVehicles'] ?? 0}',
-              onTap: () => _navigateToVehicles(),
+              onTap: _navigateToVehicles,
             ),
             GfKpiCardVariants.routesToday(
               value: '${metrics['routesToday'] ?? 0}',
-              onTap: () => _navigateToRoutes(),
+              onTap: _navigateToRoutes,
             ),
             GfKpiCardVariants.criticalAlerts(
               value: '${metrics['criticalAlerts'] ?? 0}',
-              onTap: () => _navigateToAlerts(),
+              onTap: _navigateToAlerts,
             ),
           ],
         );
@@ -202,7 +203,7 @@ class DashboardPage extends ConsumerWidget {
       },
     );
 
-  Widget _buildKpiGridError() => Container(
+  Widget _buildKpiGridError(Object _, StackTrace __) => Container(
       padding: const EdgeInsets.all(GfTokens.space6),
       decoration: BoxDecoration(
         color: const Color(GfTokens.surface),
@@ -270,35 +271,28 @@ class DashboardPage extends ConsumerWidget {
               child: LineChart(
                 LineChartData(
                   gridData: FlGridData(
-                    show: true,
                     drawVerticalLine: false,
                     horizontalInterval: 20,
-                    getDrawingHorizontalLine: (value) {
-                      return FlLine(
-                        color: const Color(GfTokens.stroke),
-                        strokeWidth: 1,
-                      );
-                    },
+                    getDrawingHorizontalLine: (value) => const FlLine(
+                      color: Color(GfTokens.stroke),
+                      strokeWidth: 1,
+                    ),
                   ),
                   titlesData: FlTitlesData(
                     leftTitles: AxisTitles(
                       sideTitles: SideTitles(
-                        showTitles: true,
                         reservedSize: 40,
-                        getTitlesWidget: (value, meta) {
-                          return Text(
-                            '${value.toInt()}',
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: Color(GfTokens.textMuted),
-                            ),
-                          );
-                        },
+                        getTitlesWidget: (value, meta) => Text(
+                          '${value.toInt()}',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Color(GfTokens.textMuted),
+                          ),
+                        ),
                       ),
                     ),
                     bottomTitles: AxisTitles(
                       sideTitles: SideTitles(
-                        showTitles: true,
                         reservedSize: 30,
                         getTitlesWidget: (value, meta) {
                           final hours = [
@@ -323,12 +317,6 @@ class DashboardPage extends ConsumerWidget {
                         },
                       ),
                     ),
-                    rightTitles: const AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
-                    topTitles: const AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
                   ),
                   borderData: FlBorderData(show: false),
                   lineBarsData: [
@@ -345,18 +333,15 @@ class DashboardPage extends ConsumerWidget {
                       color: const Color(GfTokens.brand),
                       barWidth: 3,
                       dotData: FlDotData(
-                        show: true,
-                        getDotPainter: (spot, percent, barData, index) {
-                          return FlDotCirclePainter(
-                            radius: 4,
-                            color: const Color(GfTokens.brand),
-                            strokeWidth: 2,
-                            strokeColor: const Color(GfTokens.surface),
-                          );
-                        },
+                        getDotPainter: (spot, percent, barData, index) =>
+                            FlDotCirclePainter(
+                          radius: 4,
+                          color: const Color(GfTokens.brand),
+                          strokeWidth: 2,
+                          strokeColor: const Color(GfTokens.surface),
+                        ),
                       ),
                       belowBarData: BarAreaData(
-                        show: true,
                         color:
                             const Color(GfTokens.brand).withValues(alpha: 0.1),
                       ),
@@ -396,19 +381,18 @@ class DashboardPage extends ConsumerWidget {
               crossAxisCount: crossAxisCount,
               crossAxisSpacing: GfTokens.space4,
               mainAxisSpacing: GfTokens.space4,
-              childAspectRatio: 1.0,
               children: [
                 GfQuickActionVariants.trackVehicles(
-                  onTap: () => _navigateToMap(),
+                  onTap: _navigateToMap,
                 ),
                 GfQuickActionVariants.viewAnalytics(
-                  onTap: () => _navigateToReports(),
+                  onTap: _navigateToReports,
                 ),
                 GfQuickActionVariants.settings(
-                  onTap: () => _openSettings(),
+                  onTap: _openSettings,
                 ),
                 GfQuickActionVariants.reopenTrip(
-                  onTap: () => _showReopenTripDialog(),
+                  onTap: _showReopenTripDialog,
                 ),
               ],
             );
@@ -423,7 +407,7 @@ class DashboardPage extends ConsumerWidget {
         if (criticalAlerts > 0) {
           return GfAlertBannerVariants.criticalAlerts(
             count: criticalAlerts,
-            onViewAlerts: () => _navigateToAlerts(),
+            onViewAlerts: _navigateToAlerts,
           );
         }
         return const SizedBox.shrink();
@@ -447,7 +431,7 @@ class DashboardPage extends ConsumerWidget {
               Container(
                 padding: const EdgeInsets.all(GfTokens.space2),
                 decoration: BoxDecoration(
-                  color: const Color(GfTokens.brand).withOpacity(0.1),
+                  color: const Color(GfTokens.brand).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(GfTokens.radiusSmall),
                 ),
                 child: const Icon(
@@ -491,42 +475,42 @@ class DashboardPage extends ConsumerWidget {
   // METODOS DE NAVEGACAO
   // ========================================
   void _navigateToTrips() {
-    // TODO: Implementar navegação para viagens
+    // TODO(golffox-team): Implementar navegação para viagens
     debugPrint('Navegando para viagens');
   }
 
   void _navigateToVehicles() {
-    // TODO: Implementar navegação para veículos
+    // TODO(golffox-team): Implementar navegação para veículos
     debugPrint('Navegando para veículos');
   }
 
   void _navigateToRoutes() {
-    // TODO: Implementar navegação para rotas
+    // TODO(golffox-team): Implementar navegação para rotas
     debugPrint('Navegando para rotas');
   }
 
   void _navigateToAlerts() {
-    // TODO: Implementar navegação para alertas
+    // TODO(golffox-team): Implementar navegação para alertas
     debugPrint('Navegando para alertas');
   }
 
   void _navigateToMap() {
-    // TODO: Implementar navegação para mapa
+    // TODO(golffox-team): Implementar navegação para mapa
     debugPrint('Navegando para mapa');
   }
 
   void _navigateToReports() {
-    // TODO: Implementar navegação para relatórios
+    // TODO(golffox-team): Implementar navegação para relatórios
     debugPrint('Navegando para relatórios');
   }
 
   void _openSettings() {
-    // TODO: Implementar abertura de configurações
+    // TODO(golffox-team): Implementar abertura de configurações
     debugPrint('Abrindo configurações');
   }
 
   void _showReopenTripDialog() {
-    // TODO: Implementar dialogo de reabertura de viagem
+    // TODO(golffox-team): Implementar dialogo de reabertura de viagem
     debugPrint('Mostrando dialogo de reabertura de viagem');
   }
 }

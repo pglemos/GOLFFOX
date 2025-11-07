@@ -266,7 +266,7 @@ export function CostDetailTable({ costs, onReconcile, loading }: CostDetailTable
                   )}
                 </tr>
               ))
-            ) : grouping !== 'none' && groupedData.groups ? (
+            ) : (grouping === 'group' || grouping === 'category') && groupedData.groups ? (
               Object.entries(groupedData.groups).flatMap(([groupName, group]) => [
                 <tr 
                   key={`${groupName}-header`}

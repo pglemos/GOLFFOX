@@ -164,8 +164,8 @@ function generateCSV(data: any[], columns: string[], reportKey: string) {
   // Gerar CSV com BOM para UTF-8
   const csv = Papa.unparse(filteredData, {
     header: true,
-    delimiter: ',',
-    encoding: 'UTF-8'
+    delimiter: ','
+    // encoding não é suportado em UnparseConfig - BOM será adicionado manualmente
   })
 
   const filename = `relatorio_${reportKey}_${new Date().toISOString().split('T')[0]}.csv`
@@ -220,10 +220,12 @@ async function generateExcel(data: any[], columns: string[], reportKey: string) 
 async function generatePDF(data: any[], columns: string[], reportKey: string) {
   try {
     // Dynamic import para PDFKit
+    // @ts-ignore - pdfkit não tem tipos oficiais
     const PDFDocument = await import('pdfkit')
     
     // Criar documento PDF
     const chunks: Buffer[] = []
+    // @ts-ignore - pdfkit não tem tipos oficiais
     const doc = new PDFDocument.default({
       size: 'A4',
       margins: { top: 50, bottom: 50, left: 50, right: 50 }
@@ -269,7 +271,7 @@ async function generatePDF(data: any[], columns: string[], reportKey: string) {
     doc.end()
 
     // Coletar chunks
-    doc.on('data', (chunk) => chunks.push(chunk))
+    doc.on('data', (chunk: Buffer) => chunks.push(chunk))
     
     return new Promise<NextResponse>((resolve) => {
       doc.on('end', () => {

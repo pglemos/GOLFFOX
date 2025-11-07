@@ -264,10 +264,10 @@ class _CreateVehiclePageState extends ConsumerState<CreateVehiclePage>
           else
             TextButton(
               onPressed: _saveVehicle,
-              child: Text(
+              child: const Text(
                 'Salvar',
                 style: TextStyle(
-                  color: const Color(GfTokens.colorPrimary),
+                  color: Color(GfTokens.colorPrimary),
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -382,12 +382,12 @@ class _CreateVehiclePageState extends ConsumerState<CreateVehiclePage>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          const Text(
             'Informacoes Basicas',
             style: TextStyle(
               fontSize: GfTokens.fontSizeXl,
               fontWeight: FontWeight.w600,
-              color: const Color(GfTokens.colorOnSurface),
+              color: Color(GfTokens.colorOnSurface),
             ),
           ),
           const SizedBox(height: GfTokens.spacingMd),
@@ -501,12 +501,12 @@ class _CreateVehiclePageState extends ConsumerState<CreateVehiclePage>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          const Text(
             'Especificacoes',
             style: TextStyle(
               fontSize: GfTokens.fontSizeXl,
               fontWeight: FontWeight.w600,
-              color: const Color(GfTokens.colorOnSurface),
+              color: Color(GfTokens.colorOnSurface),
             ),
           ),
           const SizedBox(height: GfTokens.spacingMd),
@@ -621,7 +621,7 @@ class _CreateVehiclePageState extends ConsumerState<CreateVehiclePage>
                   decoration: const InputDecoration(
                     labelText: 'Motor (L)',
                   ),
-                  keyboardType: TextInputType.numberWithOptions(decimal: true),
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Tamanho do motor e obrigatorio';
@@ -643,7 +643,7 @@ class _CreateVehiclePageState extends ConsumerState<CreateVehiclePage>
                   decoration: const InputDecoration(
                     labelText: 'Tanque (L)',
                   ),
-                  keyboardType: TextInputType.numberWithOptions(decimal: true),
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Capacidade do tanque e obrigatoria';
@@ -659,7 +659,7 @@ class _CreateVehiclePageState extends ConsumerState<CreateVehiclePage>
                   decoration: const InputDecoration(
                     labelText: 'Peso (kg)',
                   ),
-                  keyboardType: TextInputType.numberWithOptions(decimal: true),
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Peso e obrigatorio';
@@ -673,12 +673,12 @@ class _CreateVehiclePageState extends ConsumerState<CreateVehiclePage>
           const SizedBox(height: GfTokens.spacingMd),
 
           // Dimensoes
-          Text(
+          const Text(
             'Dimensoes',
             style: TextStyle(
               fontSize: GfTokens.fontSizeLg,
               fontWeight: FontWeight.w600,
-              color: const Color(GfTokens.colorOnSurface),
+              color: Color(GfTokens.colorOnSurface),
             ),
           ),
           const SizedBox(height: GfTokens.spacingSm),
@@ -691,7 +691,7 @@ class _CreateVehiclePageState extends ConsumerState<CreateVehiclePage>
                   decoration: const InputDecoration(
                     labelText: 'Comprimento (m)',
                   ),
-                  keyboardType: TextInputType.numberWithOptions(decimal: true),
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Comprimento e obrigatorio';
@@ -707,7 +707,7 @@ class _CreateVehiclePageState extends ConsumerState<CreateVehiclePage>
                   decoration: const InputDecoration(
                     labelText: 'Largura (m)',
                   ),
-                  keyboardType: TextInputType.numberWithOptions(decimal: true),
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Largura e obrigatoria';
@@ -723,7 +723,7 @@ class _CreateVehiclePageState extends ConsumerState<CreateVehiclePage>
                   decoration: const InputDecoration(
                     labelText: 'Altura (m)',
                   ),
-                  keyboardType: TextInputType.numberWithOptions(decimal: true),
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Altura e obrigatoria';
@@ -737,12 +737,12 @@ class _CreateVehiclePageState extends ConsumerState<CreateVehiclePage>
           const SizedBox(height: GfTokens.spacingMd),
 
           // Recursos
-          Text(
+          const Text(
             'Recursos',
             style: TextStyle(
               fontSize: GfTokens.fontSizeLg,
               fontWeight: FontWeight.w600,
-              color: const Color(GfTokens.colorOnSurface),
+              color: Color(GfTokens.colorOnSurface),
             ),
           ),
           const SizedBox(height: GfTokens.spacingSm),
@@ -776,12 +776,12 @@ class _CreateVehiclePageState extends ConsumerState<CreateVehiclePage>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          const Text(
             'Documentos',
             style: TextStyle(
               fontSize: GfTokens.fontSizeXl,
               fontWeight: FontWeight.w600,
-              color: const Color(GfTokens.colorOnSurface),
+              color: Color(GfTokens.colorOnSurface),
             ),
           ),
           const SizedBox(height: GfTokens.spacingMd),
@@ -825,12 +825,12 @@ class _CreateVehiclePageState extends ConsumerState<CreateVehiclePage>
           const SizedBox(height: GfTokens.spacingMd),
 
           // Datas de vencimento
-          Text(
+          const Text(
             'Vencimentos',
             style: TextStyle(
               fontSize: GfTokens.fontSizeLg,
               fontWeight: FontWeight.w600,
-              color: const Color(GfTokens.colorOnSurface),
+              color: Color(GfTokens.colorOnSurface),
             ),
           ),
           const SizedBox(height: GfTokens.spacingSm),
@@ -869,12 +869,12 @@ class _CreateVehiclePageState extends ConsumerState<CreateVehiclePage>
           const SizedBox(height: GfTokens.spacingMd),
 
           // Seguro
-          Text(
+          const Text(
             'Seguro',
             style: TextStyle(
               fontSize: GfTokens.fontSizeLg,
               fontWeight: FontWeight.w600,
-              color: const Color(GfTokens.colorOnSurface),
+              color: Color(GfTokens.colorOnSurface),
             ),
           ),
           const SizedBox(height: GfTokens.spacingSm),

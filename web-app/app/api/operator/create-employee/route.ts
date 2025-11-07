@@ -16,27 +16,9 @@ function getSupabaseAdmin() {
 export async function POST(request: NextRequest) {
   try {
     // ✅ Validar autenticação (operator ou admin)
-<<<<<<< Current (Your changes)
-<<<<<<< Current (Your changes)
-<<<<<<< Current (Your changes)
-    const authError = await requireAuth(request, ['operator', 'admin'])
-    if (authError) {
-      return authError
-=======
     const authErrorResponse = await requireAuth(request, ['operator', 'admin'])
     if (authErrorResponse) {
       return authErrorResponse
->>>>>>> Incoming (Background Agent changes)
-=======
-    const authErrorResponse = await requireAuth(request, ['operator', 'admin'])
-    if (authErrorResponse) {
-      return authErrorResponse
->>>>>>> Incoming (Background Agent changes)
-=======
-    const authErrorResponse = await requireAuth(request, ['operator', 'admin'])
-    if (authErrorResponse) {
-      return authErrorResponse
->>>>>>> Incoming (Background Agent changes)
     }
 
     const supabase = getSupabaseAdmin()
@@ -115,4 +97,3 @@ export async function POST(request: NextRequest) {
   }
 }
 
-continue 

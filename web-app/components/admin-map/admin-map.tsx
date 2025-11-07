@@ -83,8 +83,11 @@ export interface RoutePolyline {
   route_id: string
   route_name: string
   company_id: string
+  company_name?: string // Nome da empresa (opcional)
   polyline_points: Array<{ lat: number; lng: number; order: number }>
   stops_count: number
+  origin_address?: string // Endereço de origem (opcional)
+  destination_address?: string // Endereço de destino (opcional)
 }
 
 export interface Alert {

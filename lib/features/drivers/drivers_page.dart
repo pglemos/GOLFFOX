@@ -202,10 +202,10 @@ class _DriversPageState extends ConsumerState<DriversPage> {
             filters.hasActiveFilters 
                 ? 'Nenhum motorista encontrado'
                 : 'Nenhum motorista cadastrado',
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: GfTokens.fontSizeLg,
               fontWeight: FontWeight.w600,
-              color: const Color(GfTokens.colorOnSurface),
+              color: Color(GfTokens.colorOnSurface),
             ),
           ),
           const SizedBox(height: GfTokens.spacingSm),
@@ -213,8 +213,8 @@ class _DriversPageState extends ConsumerState<DriversPage> {
             filters.hasActiveFilters
                 ? 'Tente ajustar os filtros de busca.'
                 : 'Comece adicionando o primeiro motorista.',
-            style: TextStyle(
-              color: const Color(GfTokens.colorOnSurfaceVariant),
+            style: const TextStyle(
+              color: Color(GfTokens.colorOnSurfaceVariant),
             ),
             textAlign: TextAlign.center,
           ),
@@ -244,25 +244,25 @@ class _DriversPageState extends ConsumerState<DriversPage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
+          const Icon(
             Icons.error_outline,
             size: 64,
-            color: const Color(GfTokens.colorError),
+            color: Color(GfTokens.colorError),
           ),
           const SizedBox(height: GfTokens.spacingMd),
-          Text(
+          const Text(
             'Erro ao carregar motoristas',
             style: TextStyle(
               fontSize: GfTokens.fontSizeLg,
               fontWeight: FontWeight.w600,
-              color: const Color(GfTokens.colorOnSurface),
+              color: Color(GfTokens.colorOnSurface),
             ),
           ),
           const SizedBox(height: GfTokens.spacingSm),
           Text(
             error.toString(),
-            style: TextStyle(
-              color: const Color(GfTokens.colorOnSurfaceVariant),
+            style: const TextStyle(
+              color: Color(GfTokens.colorOnSurfaceVariant),
             ),
             textAlign: TextAlign.center,
           ),

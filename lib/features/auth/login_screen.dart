@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import '../../services/auth_service.dart';
+
 import '../../core/routing/app_router.dart';
 import '../../core/routing/app_routes.dart';
 import '../../domain/user_role.dart';
+import '../../services/auth_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -46,18 +47,17 @@ class _LoginScreenState extends State<LoginScreen> {
         }
         return;
       }
-      print('🔐 Iniciando login para: ${_emailController.text.trim()}');
+      debugPrint('🔐 Iniciando login para: ${_emailController.text.trim()}');
 
       // Autenticação real com Supabase
       final authService = AuthService();
       final user = await authService.signInWithEmail(
-        context,
         _emailController.text.trim(),
         _passwordController.text,
       );
 
-      print('👤 Usuário retornado: $user');
-      print('📝 Role do usuário: ${user?.role}');
+      debugPrint('👤 Usuário retornado: $user');
+      debugPrint('📝 Role do usuário: ${user?.role}');
 
       if (user != null && mounted) {
         // Redirecionamento imediato para admin por e-mail
@@ -66,12 +66,12 @@ class _LoginScreenState extends State<LoginScreen> {
             AppRouter.instance.go(AppRoutes.adminHome);
             return;
           }
-        } catch (_) {}
+        } on Exception catch (_) {}
         // Login bem-sucedido - redirecionar baseado no papel do usuário
 
         // Converter string role para enum UserRole
         final userRole = parseRole(user.role);
-        print('🎭 UserRole convertido: $userRole');
+        debugPrint('🎭 UserRole convertido: $userRole');
 
         // Determinar rota baseada no papel do usuário
         String targetRoute;
@@ -97,7 +97,7 @@ class _LoginScreenState extends State<LoginScreen> {
             break;
         }
 
-        print('🎯 Rota de destino: $targetRoute');
+        debugPrint('🎯 Rota de destino: $targetRoute');
 
         // Mostrar mensagem de sucesso
         ScaffoldMessenger.of(context).showSnackBar(
@@ -107,7 +107,7 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         );
 
-        print('🚀 Redirecionando para: $targetRoute');
+        debugPrint('🚀 Redirecionando para: $targetRoute');
         // Redirecionar para o dashboard apropriado
         final isAdminEmail = user.email.toLowerCase() == 'golffox@admin.com';
         final isAdminRoleString = user.role.toLowerCase() == 'admin';
@@ -116,43 +116,42 @@ class _LoginScreenState extends State<LoginScreen> {
             : targetRoute;
         try {
           AppRouter.instance.go(dest);
-        } catch (_) {
+        } on Exception catch (_) {
           if (!mounted) return;
           // Fallback seguro caso o GoRouter nao esteja pronto
-          Navigator.of(context).pushReplacement<void, void>(
+          await Navigator.of(context).pushReplacement<void, void>(
             MaterialPageRoute<void>(
-                builder: (_) => const Scaffold(body: SizedBox.shrink())),
+              builder: (_) => const Scaffold(body: SizedBox.shrink()),
+            ),
           );
         }
       } else {
-        print('❌ Usuário é null ou widget não está montado');
+        debugPrint('❌ Usuário é null ou widget não está montado');
       }
     } on AuthFailure catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(e.message),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.message),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } on Exception catch (e) {
       // Fallback: se for admin, navega mesmo que algum serviço tenha falhado
       if (mounted &&
           _emailController.text.trim().toLowerCase() == 'golffox@admin.com') {
         try {
           AppRouter.instance.go(AppRoutes.adminHome);
           return;
-        } catch (_) {}
+        } on Exception catch (_) {}
       }
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Erro inesperado: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Erro inesperado: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
     } finally {
       if (mounted) {
         setState(() {
@@ -168,7 +167,7 @@ class _LoginScreenState extends State<LoginScreen> {
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24.0),
+            padding: const EdgeInsets.all(24),
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 400),
               child: Card(
@@ -178,7 +177,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.all(32.0),
+                  padding: const EdgeInsets.all(32),
                   child: Form(
                     key: _formKey,
                     child: Column(
@@ -188,10 +187,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         SizedBox(
                           width: 120,
                           height: 120,
-                          child: SvgPicture.asset(
-                            'assets/icons/golf_fox_logo.svg',
-                            fit: BoxFit.contain,
-                          ),
+                        child: SvgPicture.asset(
+                          'assets/icons/golf_fox_logo.svg',
+                        ),
                         ),
                         const SizedBox(height: 24),
 

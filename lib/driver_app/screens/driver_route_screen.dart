@@ -6,7 +6,7 @@ import '../../services/supabase_service.dart';
 
 class DriverRouteScreen extends StatefulWidget {
 
-  const DriverRouteScreen({super.key, required this.trip});
+  const DriverRouteScreen({required this.trip, super.key});
   final Map<String, dynamic> trip;
 
   @override
@@ -53,7 +53,7 @@ class _DriverRouteScreenState extends State<DriverRouteScreen> {
         'speed': location.speed,
         'accuracy': location.accuracy,
       });
-    } catch (e, stackTrace) {
+    } on Exception catch (e, stackTrace) {
       // Se offline, guardar para enviar depois (implementar queue local)
       debugPrint('Erro ao enviar posição: $e');
       debugPrintStack(stackTrace: stackTrace);
@@ -65,7 +65,7 @@ class _DriverRouteScreenState extends State<DriverRouteScreen> {
       final Object? tripId = widget.trip['id'];
       if (tripId == null) return;
 
-      final List<dynamic> rows = await SupabaseService.instance.client
+      final rows = await SupabaseService.instance.client
           .from('trip_passengers')
           .select()
           .eq('trip_id', tripId);
@@ -76,7 +76,7 @@ class _DriverRouteScreenState extends State<DriverRouteScreen> {
       setState(() {
         _passengerCount = count;
       });
-    } catch (e, stackTrace) {
+    } on Exception catch (e, stackTrace) {
       debugPrint('Erro ao carregar passageiros: $e');
       debugPrintStack(stackTrace: stackTrace);
     }
@@ -86,20 +86,22 @@ class _DriverRouteScreenState extends State<DriverRouteScreen> {
     // Validar QR/NFC e marcar embarque
     try {
       // Buscar funcionário pelo QR code (CPF)
-      final dynamic employeeResult = await SupabaseService.instance.client
+      final employeeResult = await SupabaseService.instance.client
           .from('gf_employee_company')
           .select()
           .eq('cpf', qrCode)
           .eq('is_active', true)
           .maybeSingle();
-      final Map<String, dynamic>? employee =
-          employeeResult as Map<String, dynamic>?;
+      final employee = employeeResult;
 
       if (!mounted) return;
 
       if (employee == null) {
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Passageiro não encontrado ou inativo')),
+          const SnackBar(
+            content: Text('Passageiro não encontrado ou inativo'),
+          ),
         );
         return;
       }
@@ -107,6 +109,7 @@ class _DriverRouteScreenState extends State<DriverRouteScreen> {
       final passengerId = employee['id'] as Object?;
       final Object? tripId = widget.trip['id'];
       if (passengerId == null || tripId == null) {
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Dados do passageiro inválidos')),
         );
@@ -121,7 +124,7 @@ class _DriverRouteScreenState extends State<DriverRouteScreen> {
       });
 
       await _loadPassengers();
-    } catch (e) {
+    } on Exception catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Erro: ${e.toString()}')),
@@ -196,15 +199,15 @@ class _DriverRouteScreenState extends State<DriverRouteScreen> {
           Container(
             padding: const EdgeInsets.all(16),
             color: Colors.blue,
-            child: Row(
+            child: const Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 Column(
                   children: [
-                    const Icon(Icons.location_on, color: Colors.white),
+                    Icon(Icons.location_on, color: Colors.white),
                     Text(
                       'Enviando posição',
-                      style: const TextStyle(color: Colors.white),
+                      style: TextStyle(color: Colors.white),
                     ),
                   ],
                 ),
