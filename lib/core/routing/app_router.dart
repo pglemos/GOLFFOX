@@ -300,10 +300,10 @@ class AppRouter {
             body: Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const CircularProgressIndicator(),
-                  const SizedBox(height: 16),
-                  const Text('Carregando perfil do usuario...'),
+                children: const [
+                  CircularProgressIndicator(),
+                  SizedBox(height: 16),
+                  Text('Carregando perfil do usuario...'),
                 ],
               ),
             ),
@@ -388,14 +388,11 @@ class AppRouter {
       },
     );
 
-  Widget _buildUiCatalog() {
-    // TODO(golffox): Import and return actual UiCatalogPage
-    return const Scaffold(
-      body: Center(
-        child: Text('UI Catalog - TODO'),
-      ),
-    );
-  }
+  Widget _buildUiCatalog() => const Scaffold(
+        body: Center(
+          child: Text('UI Catalog - TODO'),
+        ),
+      ); // TODO(golffox): Import and return actual UiCatalogPage
 
   Widget _buildSettings() => const Scaffold(
       body: Center(

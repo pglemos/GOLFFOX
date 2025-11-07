@@ -255,8 +255,8 @@ class RateLimitInfo {
     required this.maxRequests,
     required this.windowDuration,
     required this.isBlocked,
-    this.blockedUntil,
     required this.remainingRequests,
+    this.blockedUntil,
   });
   final int requestCount;
   final int maxRequests;

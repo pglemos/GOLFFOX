@@ -10,6 +10,7 @@ import { Users, Search, Mail, Phone, Building, AlertCircle } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { useRouter, useSearchParams } from "next/navigation"
 import toast from "react-hot-toast"
+import { FuncionariosErrorBoundary } from "./error-boundary"
 
 interface Funcionario {
   id: string
@@ -42,18 +43,39 @@ function FuncionariosPageContent() {
   useEffect(() => {
     const getUser = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession()
+        console.log('🔐 Verificando sessão do usuário...')
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+        
+        if (sessionError) {
+          console.error('❌ Erro ao obter sessão:', sessionError)
+          setError('Erro ao carregar sessão')
+          setLoading(false)
+          return
+        }
+        
         if (!session) {
+          console.warn('⚠️  Sem sessão - redirecionando...')
           router.push("/")
           return
         }
+        
+        console.log('✅ Usuário autenticado:', session.user.email)
         setUser(session.user)
+        setLoading(false)
       } catch (err) {
-        console.error('Erro ao obter usuário:', err)
+        console.error('❌ Erro ao obter usuário:', err)
         setError('Erro ao carregar dados do usuário')
+        setLoading(false)
       }
     }
-    getUser()
+    
+    // Timeout de segurança
+    const timeout = setTimeout(() => {
+      console.warn('⚠️  Timeout ao carregar usuário')
+      setLoading(false)
+    }, 5000)
+    
+    getUser().finally(() => clearTimeout(timeout))
   }, [router])
 
   // Carregar funcionários
@@ -107,24 +129,32 @@ function FuncionariosPageContent() {
     }
   }, [companyId])
 
-  // Se ainda está carregando o usuário, mostra loading
-  if (!user && loading) {
+  // Preparar user object com todas as propriedades necessárias (sempre válido)
+  const getUserName = () => {
+    if (!user) return "Usuário"
+    if (user.user_metadata?.name) return user.user_metadata.name
+    if (user.email) return user.email.split("@")[0]
+    return "Usuário"
+  }
+
+  const userObj = {
+    id: user?.id || "guest",
+    name: getUserName(),
+    email: user?.email || "guest@demo.com",
+    role: "operator" as const
+  }
+
+  // Se ainda está carregando o usuário (primeira vez), mostra loading simples
+  if (loading && !user && !error) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Carregando...</p>
+          <p className="text-gray-600">Carregando usuário...</p>
+          <p className="text-xs text-gray-400 mt-2">Se demorar muito, recarregue a página</p>
         </div>
       </div>
     )
-  }
-
-  // Preparar user object com todas as propriedades necessárias
-  const userObj = {
-    id: user?.id || "guest",
-    name: user?.user_metadata?.name || user?.email?.split("@")[0] || "Usuário",
-    email: user?.email || "guest@demo.com",
-    role: "operator"
   }
 
   // Se não tem company ID
@@ -285,15 +315,17 @@ function FuncionariosPageContent() {
 
 export default function FuncionariosPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Carregando...</p>
+    <FuncionariosErrorBoundary>
+      <Suspense fallback={
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-center">
+            <div className="w-16 h-16 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-gray-600">Carregando...</p>
+          </div>
         </div>
-      </div>
-    }>
-      <FuncionariosPageContent />
-    </Suspense>
+      }>
+        <FuncionariosPageContent />
+      </Suspense>
+    </FuncionariosErrorBoundary>
   )
 }
