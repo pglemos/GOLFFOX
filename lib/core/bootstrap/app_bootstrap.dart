@@ -5,8 +5,8 @@ import 'package:flutter/services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../config/env_config.dart';
-import '../services/logger_service.dart';
 import '../services/error_service.dart';
+import '../services/logger_service.dart';
 
 /// Comprehensive bootstrap system for GolfFox
 ///
@@ -101,12 +101,14 @@ class AppBootstrap {
 
       throw BootstrapException(
         'Missing required environment variables: ${missingVars.join(', ')}\n'
-        'Please run with: flutter run --dart-define=SUPABASE_URL=your_url --dart-define=SUPABASE_ANON_KEY=your_key',
+        'Please run with: flutter run --dart-define=SUPABASE_URL=your_url '
+        '--dart-define=SUPABASE_ANON_KEY=your_key',
       );
     }
 
-    _logger.info('Environment validation passed');
-    _logger.debug('Environment info: ${EnvConfig.debugInfo}');
+    _logger
+      ..info('Environment validation passed')
+      ..debug('Environment info: ${EnvConfig.debugInfo}');
   }
 
   /// Initialize core services
@@ -143,11 +145,13 @@ class AppBootstrap {
           .limit(1)
           .timeout(const Duration(seconds: 10));
 
-      _logger.info('Supabase initialized successfully');
-      _logger.debug('Connection test query OK');
+      _logger
+        ..info('Supabase initialized successfully')
+        ..debug('Connection test query OK');
     } on TimeoutException {
       throw const BootstrapException(
-        'Supabase connection timeout. Please check your network connection and Supabase URL.',
+        'Supabase connection timeout. '
+        'Please check your network connection and Supabase URL.',
       );
     } catch (error) {
       throw BootstrapException(

@@ -23,18 +23,20 @@ export async function middleware(req: NextRequest) {
   const envBase = process.env.NEXT_PUBLIC_BASE_URL
   const headerHost = req.headers.get('host') || ''
   const requestOrigin = `${req.nextUrl.protocol}//${headerHost}`
-  // Preferir a origem da requisição em desenvolvimento/localhost para evitar HTTPS forçado
+  // Preferir SEMPRE a origem da requisição em desenvolvimento para evitar redirecionar para Vercel
   let origin = requestOrigin
   if (envBase) {
     try {
       const parsed = new URL(envBase)
       const isLocal = ['localhost', '127.0.0.1'].includes(parsed.hostname)
-      const isDev = process.env.NODE_ENV !== 'production'
-      // Em produção, permitir envBase; em dev, evitar localhost com https
-      if (!isDev && envBase) {
+      const isProd = process.env.NODE_ENV === 'production'
+      // Em produção, usar envBase; em dev, só usar se for local
+      if (isProd) {
         origin = envBase
-      } else if (!isLocal) {
+      } else if (isLocal) {
         origin = envBase
+      } else {
+        origin = requestOrigin
       }
     } catch {
       // Se envBase inválido, manter requestOrigin

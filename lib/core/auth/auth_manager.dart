@@ -16,9 +16,12 @@ import '../services/logger_service.dart';
 /// - Session persistence
 /// - Automatic token refresh
 class AuthManager extends ChangeNotifier {
+  factory AuthManager() => _instance ??= AuthManager._();
+
   AuthManager._();
+
   static AuthManager? _instance;
-  static AuthManager get instance => _instance ??= AuthManager._();
+  static final AuthManager instance = AuthManager();
 
   final _logger = LoggerService.instance;
   final _errorService = ErrorService.instance;
@@ -32,7 +35,9 @@ class AuthManager extends ChangeNotifier {
 
   /// Initialize the auth manager
   Future<void> initialize() async {
-    if (_isInitialized) return;
+    if (_isInitialized) {
+      return;
+    }
 
     _logger.info(' Initializing AuthManager...');
 
@@ -96,8 +101,9 @@ class AuthManager extends ChangeNotifier {
       } else {
         throw Exception('Sign in failed: No user returned');
       }
-    } catch (error) {
+    } on Object catch (error, stackTrace) {
       _logger.error(' Sign in failed', error);
+      await _errorService.reportError(error, stackTrace);
       final gxError = await _errorService.handleSupabaseError(error);
       return AuthResult.failure(gxError);
     }
@@ -144,8 +150,9 @@ class AuthManager extends ChangeNotifier {
       } else {
         throw Exception('Sign up failed: No user returned');
       }
-    } catch (error) {
+    } on Object catch (error, stackTrace) {
       _logger.error(' Sign up failed', error);
+      await _errorService.reportError(error, stackTrace);
       final gxError = await _errorService.handleSupabaseError(error);
       return AuthResult.failure(gxError);
     }
@@ -160,8 +167,9 @@ class AuthManager extends ChangeNotifier {
       _currentUserProfile = null;
 
       _logger.success(' User signed out successfully');
-    } catch (error) {
+    } on Object catch (error, stackTrace) {
       _logger.error(' Sign out failed', error);
+      await _errorService.reportError(error, stackTrace);
       await _errorService.handleSupabaseError(error);
       rethrow;
     }
@@ -175,8 +183,9 @@ class AuthManager extends ChangeNotifier {
       await _supabase.resetPassword(email);
 
       _logger.success(' Password reset email sent');
-    } catch (error) {
+    } on Object catch (error, stackTrace) {
       _logger.error(' Password reset failed', error);
+      await _errorService.reportError(error, stackTrace);
       await _errorService.handleSupabaseError(error);
       rethrow;
     }
@@ -194,20 +203,21 @@ class AuthManager extends ChangeNotifier {
     }
 
     try {
-      _logger.info('🔄 Updating user profile');
+      _logger.info('Updating user profile');
 
       final updatedProfile = await _supabase.update(
         'users',
         updates,
-        filter: 'id=$userId',
+        filter: 'id=',
       );
 
       _currentUserProfile = UserProfile.fromJson(updatedProfile);
       notifyListeners();
 
-      _logger.success(' Profile updated successfully');
-    } catch (error) {
-      _logger.error(' Profile update failed', error);
+      _logger.success('Profile updated successfully');
+    } on Object catch (error, stackTrace) {
+      _logger.error('Profile update failed', error);
+      await _errorService.reportError(error, stackTrace);
       await _errorService.handleSupabaseError(error);
       rethrow;
     }
@@ -217,7 +227,9 @@ class AuthManager extends ChangeNotifier {
   bool hasRole(UserRole requiredRole) => currentUserRole == requiredRole;
 
   /// Check if user has any of the required roles
-  bool hasAnyRole(List<UserRole> requiredRoles) => currentUserRole != null && requiredRoles.contains(currentUserRole);
+  bool hasAnyRole(List<UserRole> requiredRoles) =>
+      currentUserRole != null &&
+      requiredRoles.contains(currentUserRole);
 
   /// Check if user has operator privileges
   bool get isOperator => hasRole(UserRole.operator);
@@ -228,16 +240,26 @@ class AuthManager extends ChangeNotifier {
     _logger.debug('Auth state changed: ${authState.event}');
 
     switch (authState.event) {
+      case AuthChangeEvent.initialSession:
+        _logger.debug('Initial session received');
+        break;
       case AuthChangeEvent.signedIn:
-        _loadUserProfile();
+        unawaited(_loadUserProfile());
+        break;
+      case AuthChangeEvent.userUpdated:
+        unawaited(_loadUserProfile());
         break;
       case AuthChangeEvent.signedOut:
+      // ignore: deprecated_member_use
+      case AuthChangeEvent.userDeleted:
         _currentUserProfile = null;
         break;
       case AuthChangeEvent.tokenRefreshed:
         _logger.debug('Token refreshed');
         break;
-      default:
+      case AuthChangeEvent.passwordRecovery:
+      case AuthChangeEvent.mfaChallengeVerified:
+        _logger.debug('Auth event: ${authState.event}');
         break;
     }
 
@@ -245,17 +267,17 @@ class AuthManager extends ChangeNotifier {
   }
 
   Future<void> _loadUserProfile() async {
-    if (!isAuthenticated || currentUserId == null) return;
+    if (!isAuthenticated || currentUserId == null) {
+      return;
+    }
 
     try {
-      _logger.info('🔍 Loading user profile for ID: $currentUserId');
+      _logger.info('Loading user profile for ID: ');
 
-      // Load current user profile from SupabaseService
-      final userProfile = await SupabaseService.instance
-          .getCurrentUserProfile();
+      final userProfile = await _supabase.getCurrentUserProfile();
 
       if (userProfile != null) {
-        _logger.info('📋 Profile data: ${userProfile.toJson()}');
+        _logger.info('Profile data: ');
         _currentUserProfile = UserProfile(
           id: userProfile.id,
           email: userProfile.email,
@@ -265,16 +287,17 @@ class AuthManager extends ChangeNotifier {
           updatedAt: userProfile.updatedAt,
         );
         _logger.info(
-            '✅ User profile loaded: ${_currentUserProfile?.email} with role: ${_currentUserProfile?.role}');
+          'User profile loaded: ${_currentUserProfile?.email} '
+          'with role: ${_currentUserProfile?.role}',
+        );
       } else {
-        _logger.warning(' No user profile found for user: $currentUserId');
-        _logger.info(' Creating user profile automatically...');
+        _logger
+          ..warning('No user profile found for user: $currentUserId')
+          ..info('Creating user profile automatically...');
 
-        // Get user info from auth.users
         final currentUser = _supabase.currentUser;
         if (currentUser != null) {
-          // Determine role based on email
-          var role = UserRole.passenger; // default
+          var role = UserRole.passenger;
           final email = (currentUser.email ?? '').toLowerCase();
           bool contains(String text) => email.contains(text);
 
@@ -295,15 +318,16 @@ class AuthManager extends ChangeNotifier {
             role: role,
           );
 
-          // Reload profile after creation
           await _loadUserProfile();
         }
       }
-    } catch (error) {
-      _logger.error(' Failed to load user profile', error);
+    } on Object catch (error, stackTrace) {
+      _logger.error('Failed to load user profile', error);
+      await _errorService.reportError(error, stackTrace);
       await _errorService.handleSupabaseError(error);
     }
   }
+
 
   Future<void> _createUserProfile({
     required String userId,
@@ -323,8 +347,9 @@ class AuthManager extends ChangeNotifier {
       });
 
       _logger.debug('User profile created for: $email');
-    } catch (error) {
+    } on Object catch (error, stackTrace) {
       _logger.error('Failed to create user profile', error);
+      await _errorService.reportError(error, stackTrace);
       rethrow;
     }
   }
@@ -350,17 +375,15 @@ class UserProfile {
     this.metadata,
   });
 
-  factory UserProfile.fromJson(Map<String, dynamic> json) {
-    return UserProfile(
-      id: json['id'] as String,
-      email: json['email'] as String,
-      fullName: (json['full_name'] as String?) ?? (json['email'] as String),
-      role: parseRole(json['role'] as String?) ?? UserRole.passenger,
-      createdAt: DateTime.parse(json['created_at'] as String),
-      updatedAt: DateTime.parse(json['updated_at'] as String),
-      metadata: json['metadata'] as Map<String, dynamic>?,
-    );
-  }
+  factory UserProfile.fromJson(Map<String, dynamic> json) => UserProfile(
+        id: json['id'] as String,
+        email: json['email'] as String,
+        fullName: (json['full_name'] as String?) ?? (json['email'] as String),
+        role: parseRole(json['role'] as String?) ?? UserRole.passenger,
+        createdAt: DateTime.parse(json['created_at'] as String),
+        updatedAt: DateTime.parse(json['updated_at'] as String),
+        metadata: json['metadata'] as Map<String, dynamic>?,
+      );
   final String id;
   final String email;
   final String fullName;
@@ -393,20 +416,17 @@ class AuthResult {
   factory AuthResult.success({
     required User user,
     UserProfile? profile,
-  }) {
-    return AuthResult._(
-      isSuccess: true,
-      user: user,
-      profile: profile,
-    );
-  }
+  }) =>
+      AuthResult._(
+        isSuccess: true,
+        user: user,
+        profile: profile,
+      );
 
-  factory AuthResult.failure(GxError error) {
-    return AuthResult._(
-      isSuccess: false,
-      error: error,
-    );
-  }
+  factory AuthResult.failure(GxError error) => AuthResult._(
+        isSuccess: false,
+        error: error,
+      );
   final bool isSuccess;
   final User? user;
   final UserProfile? profile;
