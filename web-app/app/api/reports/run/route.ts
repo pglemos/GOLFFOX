@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { requireCompanyAccess, requireAuth } from '@/lib/api-auth'
 import Papa from 'papaparse'
 
 function getSupabaseAdmin() {
@@ -53,6 +54,20 @@ export async function POST(request: NextRequest) {
         { error: 'Relatório inválido' },
         { status: 400 }
       )
+    }
+
+    // ✅ Validar autenticação e acesso à empresa (se companyId fornecido)
+    if (filters.companyId) {
+      const { user, error: authError } = await requireCompanyAccess(request, filters.companyId)
+      if (authError) {
+        return authError
+      }
+    } else {
+      // Se não há companyId, validar apenas autenticação
+      const authError = await requireAuth(request, ['admin', 'operator'])
+      if (authError) {
+        return authError
+      }
     }
 
     const config = REPORT_CONFIGS[reportKey]

@@ -13,6 +13,7 @@ import '../config/env_config.dart';
 class LoggerService {
   LoggerService._();
   static LoggerService? _instance;
+  // ignore: prefer_constructors_over_static_methods
   static LoggerService get instance => _instance ??= LoggerService._();
 
   final List<LogEntry> _buffer = [];
@@ -256,10 +257,10 @@ class LogEntry {
 
   @override
   String toString() {
-    final buffer = StringBuffer();
-    buffer.write('[${timestamp.toIso8601String()}] ');
-    buffer.write('${level.name.toUpperCase()}: ');
-    buffer.write(message);
+    final buffer = StringBuffer()
+      ..write('[${timestamp.toIso8601String()}] ')
+      ..write('${level.name.toUpperCase()}: ')
+      ..write(message);
 
     if (data != null) {
       buffer.write(' | Data: $data');

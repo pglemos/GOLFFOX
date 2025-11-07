@@ -161,14 +161,14 @@ Body: $sanitizedBody
 
     // Log no console em modo debug
     if (kDebugMode) {
-      print(logMessage);
-      
+      debugPrint(logMessage);
+
       if (error != null) {
-        print('Error: $error');
+        debugPrint('Error: $error');
       }
-      
+
       if (stackTrace != null) {
-        print('StackTrace: $stackTrace');
+        debugPrint('StackTrace: $stackTrace');
       }
     }
 

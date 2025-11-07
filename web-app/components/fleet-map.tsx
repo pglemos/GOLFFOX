@@ -294,11 +294,16 @@ export function FleetMap({ companyId, routeId, initialCenter, initialZoom }: Fle
         const icon = getBusIcon(busColors[bus.color], bus.heading)
         if (!icon) return
         
+        // ✅ Acessibilidade: título descritivo para screen readers
+        const markerTitle = `Veículo ${bus.vehicle_plate} - Rota ${bus.route_name} - Status: ${bus.status} - ${bus.passenger_count || 0} passageiros`
+        
         const marker = new google.maps.Marker({
           position: { lat: bus.lat, lng: bus.lng },
           map: null, // Não adicionar ao mapa diretamente (clusterer vai fazer isso)
           icon,
-          title: `${bus.vehicle_plate} - ${bus.route_name}`
+          title: markerTitle,
+          // Nota: Google Maps não suporta aria-label nativamente.
+          // Para navegação por teclado, seria necessário criar overlay customizado com <button>.
         })
 
         // Criar tooltip persistente
@@ -463,25 +468,20 @@ export function FleetMap({ companyId, routeId, initialCenter, initialZoom }: Fle
             }
           })
 
-        // fitBounds com 20% margem
+        // ✅ fitBounds com padding de 20% (80px em tela padrão)
         if (routeStops.length > 0) {
           const bounds = new google.maps.LatLngBounds()
           routeStops.forEach(stop => {
             bounds.extend(new google.maps.LatLng(stop.lat, stop.lng))
           })
 
-          // Adicionar margem de 20%
-          const ne = bounds.getNorthEast()
-          const sw = bounds.getSouthWest()
-          if (ne && sw) {
-            const latMargin = (ne.lat() - sw.lat()) * 0.2
-            const lngMargin = (ne.lng() - sw.lng()) * 0.2
-
-            bounds.extend(new google.maps.LatLng(ne.lat() + latMargin, ne.lng() + lngMargin))
-            bounds.extend(new google.maps.LatLng(sw.lat() - latMargin, sw.lng() - lngMargin))
-
-            map.fitBounds(bounds)
-          }
+          // Aplicar padding de 20% usando parâmetro do fitBounds
+          map.fitBounds(bounds, {
+            top: 80,
+            right: 80,
+            bottom: 80,
+            left: 80
+          })
         }
       }
     } catch (error) {

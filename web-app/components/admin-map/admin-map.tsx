@@ -675,8 +675,8 @@ export function AdminMap({
           
           // Se não há posição GPS, usar coordenadas padrão (centro do Brasil) ou null
           // O mapa vai mostrar o veículo como "sem posição" mas ainda vai aparecer na lista
-          let lat = lastPos?.lat || null
-          let lng = lastPos?.lng || null
+          const lat = lastPos?.lat || null
+          const lng = lastPos?.lng || null
           
           // Se não há coordenadas válidas, ainda assim incluir o veículo
           // Ele aparecerá na lista de veículos mesmo sem posição no mapa
@@ -1942,7 +1942,7 @@ export function AdminMap({
                 <li>Não há veículos marcados como ativos no banco de dados</li>
                 <li>Políticas RLS podem estar bloqueando o acesso</li>
                 <li>Filtro de empresa pode estar excluindo todos os veículos</li>
-                <li>Veículos não têm trips ativas com status "inProgress"</li>
+                <li>Veículos não têm trips ativas com status &quot;inProgress&quot;</li>
                 <li>Veículos sem posição GPS ainda aparecerão na lista</li>
                 <li>Verifique o console do navegador (F12) para mais detalhes</li>
               </ul>

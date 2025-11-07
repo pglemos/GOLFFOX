@@ -36,7 +36,7 @@ class SupaClient {
     try {
       final response = await instance.from('companies').select('id').limit(1);
       return response.isNotEmpty || response.isEmpty;
-    } catch (e) {
+    } on Exception {
       return false;
     }
   }

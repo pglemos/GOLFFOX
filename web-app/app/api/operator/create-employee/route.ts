@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { requireAuth } from '@/lib/api-auth'
 
 function getSupabaseAdmin() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -14,6 +15,30 @@ function getSupabaseAdmin() {
 
 export async function POST(request: NextRequest) {
   try {
+    // ✅ Validar autenticação (operator ou admin)
+<<<<<<< Current (Your changes)
+<<<<<<< Current (Your changes)
+<<<<<<< Current (Your changes)
+    const authError = await requireAuth(request, ['operator', 'admin'])
+    if (authError) {
+      return authError
+=======
+    const authErrorResponse = await requireAuth(request, ['operator', 'admin'])
+    if (authErrorResponse) {
+      return authErrorResponse
+>>>>>>> Incoming (Background Agent changes)
+=======
+    const authErrorResponse = await requireAuth(request, ['operator', 'admin'])
+    if (authErrorResponse) {
+      return authErrorResponse
+>>>>>>> Incoming (Background Agent changes)
+=======
+    const authErrorResponse = await requireAuth(request, ['operator', 'admin'])
+    if (authErrorResponse) {
+      return authErrorResponse
+>>>>>>> Incoming (Background Agent changes)
+    }
+
     const supabase = getSupabaseAdmin()
     const { email, name, phone, role = 'passenger' } = await request.json()
 
@@ -39,7 +64,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Criar usuário no Supabase Auth
-    const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+    const { data: authData, error: createUserError } = await supabase.auth.admin.createUser({
       email: email.toLowerCase(),
       password: `temp_${Math.random().toString(36).slice(2)}`, // Senha temporária
       email_confirm: true,
@@ -50,9 +75,9 @@ export async function POST(request: NextRequest) {
       }
     })
 
-    if (authError || !authData.user) {
+    if (createUserError || !authData.user) {
       return NextResponse.json(
-        { error: authError?.message || 'Erro ao criar usuário' },
+        { error: createUserError?.message || 'Erro ao criar usuário' },
         { status: 500 }
       )
     }
@@ -90,3 +115,4 @@ export async function POST(request: NextRequest) {
   }
 }
 
+continue 

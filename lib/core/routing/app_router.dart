@@ -300,9 +300,9 @@ class AppRouter {
             body: Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
+                children: [
                   CircularProgressIndicator(),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   Text('Carregando perfil do usuario...'),
                 ],
               ),
@@ -315,11 +315,12 @@ class AppRouter {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.error_outline, size: 64, color: Colors.red),
+                  Icon(Icons.error_outline, size: 64, color: Colors.red),
                   const SizedBox(height: 16),
-                  const Text(
+                  Text(
                     'Erro ao carregar perfil',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style:
+                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
                   Text(
@@ -360,11 +361,12 @@ class AppRouter {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.person_off, size: 64, color: Colors.orange),
+                  Icon(Icons.person_off, size: 64, color: Colors.orange),
                   const SizedBox(height: 16),
-                  const Text(
+                  Text(
                     'Perfil nao encontrado',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style:
+                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
                   Text(
@@ -377,7 +379,7 @@ class AppRouter {
                     onPressed: () {
                       (context as Element).markNeedsBuild();
                     },
-                    child: Text('Tentar novamente'),
+                    child: const Text('Tentar novamente'),
                   ),
                 ],
               ),

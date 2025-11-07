@@ -1,106 +1,99 @@
-# ✅ Deploy Executado - GOLF FOX
+# 🚀 Deploy no Vercel - Executado
 
-## 🎉 Passos Automáticos Concluídos
+**Data:** 07/01/2025  
+**Status:** Variáveis configuradas | Deploy em andamento
 
-### ✅ 1. Git Commit
-```
-Commit: a3b1682
-Mensagem: "feat: Deploy - Configuração completa de 3 painéis na Vercel"
-Arquivos: 32 arquivos alterados, 4135 inserções
-Status: ✅ Commit realizado com sucesso
-```
+---
 
-### ✅ 2. Git Push
-```
-Repositório: https://github.com/pglemos/GOLFFOX.git
-Branch: main
-Status: ✅ Push realizado com sucesso
-Objetos enviados: 61 objetos (39.57 KiB)
-```
+## ✅ Variáveis de Ambiente Configuradas
 
-### ✅ 3. Build Local
-```
-Status: ✅ Build compila com sucesso
-Warnings: Apenas avisos não críticos (aceitáveis)
+As seguintes variáveis foram configuradas no projeto Vercel `golffox`:
+
+### Variáveis Configuradas
+
+- ✅ `NEXT_PUBLIC_SUPABASE_URL` - Production, Preview, Development
+- ✅ `NEXT_PUBLIC_SUPABASE_ANON_KEY` - Production, Preview, Development  
+- ✅ `SUPABASE_SERVICE_ROLE_KEY` - Production, Preview, Development
+- ✅ `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` - Production, Preview, Development
+- ✅ `CRON_SECRET` - Gerado automaticamente (64 caracteres hex)
+- ✅ `NODE_ENV` - Production, Preview, Development
+
+### CRON_SECRET Gerado
+
+O `CRON_SECRET` foi gerado automaticamente. Para verificar o valor:
+
+```bash
+vercel env ls | grep CRON_SECRET
 ```
 
 ---
 
-## ⚠️ ÚLTIMA AÇÃO NECESSÁRIA (Manual)
+## 🚀 Deploy
 
-### 🔧 Configurar Variáveis de Ambiente na Vercel
+### Status
 
-**A Vercel detectou o push e iniciou o deploy, MAS o build pode falhar sem as variáveis!**
+O deploy foi iniciado via CLI do Vercel. Para verificar o status:
 
-**AÇÃO URGENTE**: Configure as variáveis ANTES do build completar.
+1. **Dashboard Vercel:**
+   - Acesse: https://vercel.com/dashboard
+   - Selecione projeto: `golffox`
+   - Verifique o último deployment
 
-**URL**: https://vercel.com/synvolt/golffox/settings/environment-variables
+2. **Via CLI:**
+   ```bash
+   vercel ls
+   ```
 
-#### Adicionar estas 4 variáveis:
+### Comandos Executados
 
-**1. NEXT_PUBLIC_SUPABASE_URL**
-- Valor: `https://vmoxzesvjcfmrebagcwo.supabase.co`
-- Environments: ☑ Production ☑ Preview ☑ Development
+```bash
+# 1. Linkar projeto
+vercel link --project golffox --yes
 
-**2. NEXT_PUBLIC_SUPABASE_ANON_KEY**
-- Valor: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZtb3h6ZXN2amNmbXJlYmFnY3dvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE1MTQyMTMsImV4cCI6MjA3NzA5MDIxM30.QKRKu1bIPhsyDPFuBKEIjseC5wNC35RKbOxQ7FZmEvU`
-- Environments: ☑ Production ☑ Preview ☑ Development
+# 2. Configurar variáveis (via script)
+.\scripts\deploy-vercel-simple.ps1
 
-**3. NEXT_PUBLIC_GOOGLE_MAPS_API_KEY**
-- Valor: `AIzaSyD79t05YxpU2RnEczY-NSDxhdbY9OvigsM`
-- Environments: ☑ Production ☑ Preview ☑ Development
-
-**4. SUPABASE_SERVICE_ROLE** ⚠️
-- Valor: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZtb3h6ZXN2amNmbXJlYmFnY3dvIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2MTUxNDIxMywiZXhwIjoyMDc3MDkwMjEzfQ.EJylgYksLGJ7icYf77dPULYZNA4u35JRg-gkoGgMI_A`
-- Environments: ☑ Production ☑ Preview ❌ Development (NUNCA!)
-
----
-
-## 📊 Status do Deploy na Vercel
-
-Após configurar as variáveis:
-
-1. **Acesse**: https://vercel.com/synvolt/golffox/deployments
-2. **Verifique** o deployment mais recente
-3. **Clique** no deployment para ver logs
-4. **Aguarde** o build completar
-
-**Se o build já falhou** (por falta de variáveis):
-- Configure as variáveis agora
-- Vá em **"Redeploy"** → **"Use existing Build Cache"** = OFF
-- Clique em **"Redeploy"**
+# 3. Deploy
+vercel --prod --yes
+```
 
 ---
 
-## 🔗 URLs de Produção (Após Deploy)
+## 📋 Próximos Passos
 
-- 🌐 **Admin**: https://golffox.vercel.app/admin
-- 🌐 **Operator**: https://golffox.vercel.app/operator
-- 🌐 **Carrier**: https://golffox.vercel.app/carrier
-- 🌐 **Login**: https://golffox.vercel.app/login
+1. **Verificar Deploy:**
+   - Acessar: https://golffox.vercel.app
+   - Verificar se a aplicação está funcionando
 
----
+2. **Testar Funcionalidades:**
+   - Login
+   - Middleware de autenticação
+   - APIs protegidas
+   - Branding do operador
 
-## ✅ Checklist Final
-
-- [x] Código commitado
-- [x] Push realizado
-- [x] Build local validado
-- [ ] **Variáveis configuradas na Vercel** ⚠️ **FAZER AGORA**
-- [ ] Deploy completado
-- [ ] URLs testadas
+3. **Verificar Logs:**
+   - Vercel Dashboard → Deployments → [último deploy] → Functions Logs
 
 ---
 
-## 🆘 Se o Build Falhar
+## 🔍 Troubleshooting
 
-1. Configure as variáveis de ambiente (se ainda não fez)
-2. Vá em: https://vercel.com/synvolt/golffox/deployments
-3. Clique no deployment que falhou
-4. Clique em **"Redeploy"**
-5. Aguarde o novo build
+### Se o deploy falhar:
+
+1. **Verificar variáveis de ambiente:**
+   ```bash
+   vercel env ls
+   ```
+
+2. **Verificar build local:**
+   ```bash
+   cd web-app
+   npm run build
+   ```
+
+3. **Ver logs do deploy:**
+   - Vercel Dashboard → Deployments → [deploy] → Build Logs
 
 ---
 
-**Próxima ação**: Configure as variáveis na Vercel AGORA para garantir que o deploy funcione! 🚀
-
+**Última atualização:** 07/01/2025

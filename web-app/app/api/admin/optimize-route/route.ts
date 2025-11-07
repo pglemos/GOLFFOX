@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
         sequence: stop.seq
       }))
 
-      return await optimizeRoutePoints(routeId, points)
+      return await optimizeRoutePoints(supabase, routeId, points)
     }
 
     // Converter para formato esperado
@@ -87,7 +87,7 @@ export async function POST(request: NextRequest) {
       sequence: stop.stop_order
     }))
 
-    return await optimizeRoutePoints(routeId, points)
+    return await optimizeRoutePoints(supabase, routeId, points)
   } catch (error: any) {
     console.error('Erro ao otimizar rota:', error)
     return NextResponse.json(
@@ -97,7 +97,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-async function optimizeRoutePoints(routeId: string, points: RoutePoint[]) {
+async function optimizeRoutePoints(supabase: ReturnType<typeof getSupabaseAdmin>, routeId: string, points: RoutePoint[]) {
   // Verificar cache (5-10 minutos)
   const { data: cached } = await supabase
     .from('gf_route_optimization_cache')
@@ -131,6 +131,12 @@ async function optimizeRoutePoints(routeId: string, points: RoutePoint[]) {
   directionsUrl.searchParams.set('destination', destination)
   if (waypoints.length > 0) {
     directionsUrl.searchParams.set('waypoints', `optimize:true|${waypoints.join('|')}`)
+  }
+  if (!GOOGLE_MAPS_API_KEY) {
+    return NextResponse.json(
+      { error: 'Google Maps API key não configurada' },
+      { status: 500 }
+    )
   }
   directionsUrl.searchParams.set('key', GOOGLE_MAPS_API_KEY)
   directionsUrl.searchParams.set('language', 'pt-BR')

@@ -342,7 +342,7 @@ export default function CustosAdminPage() {
                       setSelectedInvoiceId(cost.invoice_id)
                       setIsReconciliationOpen(true)
                     } else {
-                      toast.info('Este custo não está vinculado a uma fatura')
+                      toast('Este custo não está vinculado a uma fatura')
                     }
                   }}
                   loading={loading}
@@ -364,12 +364,12 @@ export default function CustosAdminPage() {
                       .eq('status', 'pending')
                       .limit(1)
                       .single()
-                      .then(({ data }) => {
+                      .then(({ data }: { data: any }) => {
                         if (data) {
                           setSelectedInvoiceId(data.id)
                           setIsReconciliationOpen(true)
                         } else {
-                          toast.info('Nenhuma fatura pendente encontrada')
+                          toast('Nenhuma fatura pendente encontrada')
                         }
                       })
                   }}>
