@@ -5,16 +5,16 @@
 
 import 'dart:async';
 import 'dart:math';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
-import '../models/vehicle.dart';
-import '../models/maintenance.dart';
+
 import '../models/fuel_record.dart';
-import 'supabase_service.dart';
-import 'map_service.dart';
+import '../models/maintenance.dart';
+import '../models/vehicle.dart';
 
 // Providers
-final vehicleServiceProvider = Provider<VehicleService>((ref) => VehicleService(ref.read(supabaseServiceProvider)));
+final vehicleServiceProvider = Provider<VehicleService>((ref) => VehicleService());
 
 final vehiclesStreamProvider = StreamProvider<List<Vehicle>>((ref) => ref.read(vehicleServiceProvider).getVehiclesStream());
 
@@ -89,10 +89,9 @@ class VehicleFilters {
 
 class VehicleService {
 
-  VehicleService(this._supabaseService) {
+  VehicleService() {
     _startRealTimeUpdates();
   }
-  final SupabaseService _supabaseService;
   final StreamController<List<Vehicle>> _vehiclesController =
       StreamController<List<Vehicle>>.broadcast();
   Timer? _updateTimer;

@@ -22,6 +22,11 @@ interface Funcionario {
   address?: string
 }
 
+// Validação simples para UUID v4
+const isValidUUID = (id: string) => {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id)
+}
+
 export default function FuncionariosPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -59,6 +64,13 @@ export default function FuncionariosPage() {
         return
       }
       
+      // Evitar erro de Postgres ao filtrar por UUID inválido
+      if (!isValidUUID(companyId)) {
+        setError('ID da empresa inválido. Utilize um UUID válido na URL.')
+        setLoading(false)
+        return
+      }
+      
       try {
         setLoading(true)
         console.log(`🔍 Carregando funcionários para empresa: ${companyId}`)
@@ -72,7 +84,9 @@ export default function FuncionariosPage() {
 
         if (queryError) {
           console.error("❌ Erro na query:", queryError)
-          throw queryError
+          setError(`Erro ao carregar funcionários: ${queryError.message}`)
+          setFuncionarios([])
+          return
         }
         
         console.log(`✅ ${data?.length || 0} funcionários carregados`)
