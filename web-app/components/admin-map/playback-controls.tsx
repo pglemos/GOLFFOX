@@ -29,6 +29,8 @@ export function PlaybackControls({
   onStop,
   onSpeedChange,
   progress = 0,
+  currentTime,
+  duration,
 }: PlaybackControlsProps) {
   const [speed, setSpeed] = useState<1 | 2 | 4>(1)
 
@@ -125,4 +127,3 @@ export function PlaybackControls({
     </Card>
   )
 }
-
