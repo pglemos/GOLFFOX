@@ -57,6 +57,23 @@ export async function middleware(req: NextRequest) {
 
   log('info', '🔍 Middleware executado', { origin })
 
+  // Normalização de URLs do painel do operador: remover query `company` e preservar demais parâmetros
+  try {
+    if (pathname.startsWith('/operator')) {
+      const currentUrl = new URL(req.url)
+      if (currentUrl.searchParams.has('company')) {
+        const oldCompany = currentUrl.searchParams.get('company')
+        currentUrl.searchParams.delete('company')
+        const normalizedPathQuery = `${currentUrl.pathname}${currentUrl.search || ''}`
+        const redirectUrl = new URL(normalizedPathQuery, origin)
+        log('info', '🔁 Normalizando URL do operador (removendo company)', { from: req.url, company: oldCompany, to: redirectUrl.toString() })
+        return NextResponse.redirect(redirectUrl)
+      }
+    }
+  } catch (e) {
+    log('warning', '⚠️ Falha ao normalizar URL do operador', { error: String(e) })
+  }
+
   // Rotas públicas que não precisam de autenticação
   const publicRoutes = ['/', '/login', '/unauthorized', '/test-auth']
   const apiRoutes = ['/api/']

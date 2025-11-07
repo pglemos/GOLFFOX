@@ -148,7 +148,7 @@ is_active → default true
 
 ### URL de Acesso
 ```
-https://golffox.vercel.app/operator/funcionarios?company=11111111-1111-4111-8111-1111111111c1
+https://golffox.vercel.app/operator
 ```
 
 ---

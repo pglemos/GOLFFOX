@@ -359,7 +359,8 @@ class SupabaseService {
       throw SbFailure(SbErrorCode.auth, 'Usuario nao autenticado.');
     }
 
-    PostgrestFilterBuilder q(String table) => client.from(table).select();
+    PostgrestFilterBuilder<dynamic> q(String table) =>
+        client.from(table).select();
 
     try {
       var results = const <Json>[];
@@ -570,15 +571,20 @@ class SupabaseService {
     bool force = false,
   }) async {
     try {
-      final res = await _withTimeout(client.rpc('rpc_trip_transition', params: {
-        'p_trip': tripId,
-        'p_new_status': newStatus,
-        'p_description': description,
-        'p_lat': lat,
-        'p_lng': lng,
-        'p_force': force,
-      }));
-      return (res ?? <String, dynamic>{}) as Json;
+      final res = await _withTimeout<Json?>(
+        client.rpc(
+          'rpc_trip_transition',
+          params: {
+            'p_trip': tripId,
+            'p_new_status': newStatus,
+            'p_description': description,
+            'p_lat': lat,
+            'p_lng': lng,
+            'p_force': force,
+          },
+        ),
+      );
+      return res ?? <String, dynamic>{};
     } on PostgrestException catch (e) {
       throw _mapPostgrest(e);
     } catch (e) {

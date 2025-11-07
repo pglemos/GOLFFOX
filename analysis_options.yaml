@@ -7,6 +7,8 @@ analyzer:
     # Usual non-source directories
     - build/**
     - .dart_tool/**
+    # Legacy archive not part of active code
+    - archive/**
   language:
     strict-casts: true
     strict-inference: true
@@ -102,7 +104,6 @@ linter:
     one_member_abstracts: true
     only_throw_errors: true
     overridden_fields: true
-    package_api_docs: true
     package_prefixed_library_names: true
     parameter_assignments: true
     prefer_adjacent_string_concatenation: true

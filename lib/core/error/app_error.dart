@@ -228,16 +228,16 @@ class UnknownError extends AppError {
 
 /// Utilitário para criar erros a partir de exceções
 class ErrorFactory {
-  static AppError fromException(exception, [StackTrace? stackTrace]) {
+  static AppError fromException(Object exception, [StackTrace? stackTrace]) {
     if (exception is AppError) {
       return exception;
     }
 
     // Log do erro original em modo debug
     if (kDebugMode) {
-      print('ErrorFactory.fromException: $exception');
+      debugPrint('ErrorFactory.fromException: $exception');
       if (stackTrace != null) {
-        print('StackTrace: $stackTrace');
+        debugPrint('StackTrace: $stackTrace');
       }
     }
 

@@ -14,18 +14,30 @@ import '../models/maintenance.dart';
 import '../models/vehicle.dart';
 
 // Providers
-final vehicleServiceProvider = Provider<VehicleService>((ref) => VehicleService());
+final vehicleServiceProvider =
+    Provider<VehicleService>((ref) => VehicleService());
 
-final vehiclesStreamProvider = StreamProvider<List<Vehicle>>((ref) => ref.read(vehicleServiceProvider).getVehiclesStream());
+final vehiclesStreamProvider = StreamProvider<List<Vehicle>>(
+  (ref) => ref.read(vehicleServiceProvider).getVehiclesStream(),
+);
 
-final vehicleProvider =
-    FutureProvider.family<Vehicle?, String>((ref, vehicleId) => ref.read(vehicleServiceProvider).getVehicleById(vehicleId));
+final vehicleProvider = FutureProvider.family<Vehicle?, String>(
+  (ref, vehicleId) => ref.read(vehicleServiceProvider).getVehicleById(
+        vehicleId,
+      ),
+);
 
 final vehicleMaintenanceProvider =
-    FutureProvider.family<List<MaintenanceRecord>, String>((ref, vehicleId) => ref.read(vehicleServiceProvider).getVehicleMaintenance(vehicleId));
+    FutureProvider.family<List<MaintenanceRecord>, String>(
+  (ref, vehicleId) =>
+      ref.read(vehicleServiceProvider).getVehicleMaintenance(vehicleId),
+);
 
 final vehicleFuelRecordsProvider =
-    FutureProvider.family<List<FuelRecord>, String>((ref, vehicleId) => ref.read(vehicleServiceProvider).getVehicleFuelRecords(vehicleId));
+    FutureProvider.family<List<FuelRecord>, String>(
+  (ref, vehicleId) =>
+      ref.read(vehicleServiceProvider).getVehicleFuelRecords(vehicleId),
+);
 
 class VehicleFilters {
 
@@ -84,7 +96,8 @@ class VehicleFilters {
       (searchQuery?.isNotEmpty ?? false) ||
       (needsMaintenance ?? false) ||
       (hasLowFuel ?? false) ||
-      (hasExpiringDocuments ?? false);
+      (hasExpiringDocuments ?? false) ||
+      (companyId?.isNotEmpty ?? false);
 }
 
 class VehicleService {
@@ -119,8 +132,9 @@ class VehicleService {
       final vehicles = await _generateMockVehicles();
       _cachedVehicles = vehicles;
       _vehiclesController.add(vehicles);
-    } catch (e) {
-      print('Erro ao carregar veiculos: $e');
+    } on Object catch (error, stackTrace) {
+      debugPrint('Erro ao carregar veículos: $error');
+      debugPrintStack(stackTrace: stackTrace);
     }
   }
 
@@ -128,32 +142,38 @@ class VehicleService {
   Future<List<Vehicle>> getVehicles({VehicleFilters? filters}) async {
     await _loadVehicles();
 
-    if (filters == null || !filters.hasActiveFilters) {
+    final filter = filters;
+    if (filter == null || !filter.hasActiveFilters) {
       return _cachedVehicles;
     }
 
+    final activeFilter = filter;
+
     return _cachedVehicles.where((vehicle) {
-      // Filtro por status
-      if (filters.statuses?.isNotEmpty ?? false &&
-          !filters.statuses!.contains(vehicle.status)) {
+      final statusFilters = activeFilter.statuses;
+      if (statusFilters != null &&
+          statusFilters.isNotEmpty &&
+          !statusFilters.contains(vehicle.status)) {
         return false;
       }
 
-      // Filtro por tipo
-      if (filters.types?.isNotEmpty ?? false &&
-          !filters.types!.contains(vehicle.type)) {
+      final typeFilters = activeFilter.types;
+      if (typeFilters != null &&
+          typeFilters.isNotEmpty &&
+          !typeFilters.contains(vehicle.type)) {
         return false;
       }
 
-      // Filtro por combustivel
-      if (filters.fuelTypes?.isNotEmpty ?? false &&
-          !filters.fuelTypes!.contains(vehicle.fuelType)) {
+      final fuelFilters = activeFilter.fuelTypes;
+      if (fuelFilters != null &&
+          fuelFilters.isNotEmpty &&
+          !fuelFilters.contains(vehicle.fuelType)) {
         return false;
       }
 
-      // Filtro por busca
-      if (filters.searchQuery?.isNotEmpty ?? false) {
-        final query = filters.searchQuery!.toLowerCase();
+      final searchQuery = activeFilter.searchQuery;
+      if (searchQuery != null && searchQuery.isNotEmpty) {
+        final query = searchQuery.toLowerCase();
         if (!vehicle.name.toLowerCase().contains(query) &&
             !(vehicle.documents.licensePlate?.toLowerCase().contains(query) ??
                 false) &&
@@ -165,25 +185,24 @@ class VehicleService {
         }
       }
 
-      // Filtro por manutencao
-      if (filters.needsMaintenance ?? false && !vehicle.needsMaintenance) {
+      if ((activeFilter.needsMaintenance ?? false) &&
+          !vehicle.needsMaintenance) {
         return false;
       }
 
-      // Filtro por combustivel baixo
-      if (filters.hasLowFuel ?? false && !vehicle.hasLowFuel) {
+      if ((activeFilter.hasLowFuel ?? false) && !vehicle.hasLowFuel) {
         return false;
       }
 
-      // Filtro por documentos vencendo
-      if (filters.hasExpiringDocuments ?? false &&
+      if ((activeFilter.hasExpiringDocuments ?? false) &&
           !vehicle.hasExpiringDocuments) {
         return false;
       }
 
-      // Filtro por empresa
-      if (filters.companyId?.isNotEmpty ?? false &&
-          vehicle.companyId != filters.companyId) {
+      final companyId = activeFilter.companyId;
+      if (companyId != null &&
+          companyId.isNotEmpty &&
+          vehicle.companyId != companyId) {
         return false;
       }
 
@@ -194,18 +213,19 @@ class VehicleService {
   // Buscar veiculo por ID
   Future<Vehicle?> getVehicleById(String vehicleId) async {
     await _loadVehicles();
-    try {
-      return _cachedVehicles.firstWhere((v) => v.id == vehicleId);
-    } catch (e) {
-      return null;
+    for (final vehicle in _cachedVehicles) {
+      if (vehicle.id == vehicleId) {
+        return vehicle;
+      }
     }
+    return null;
   }
 
   // Criar veiculo
   Future<Vehicle> createVehicle(Vehicle vehicle) async {
     try {
       // Simular criacao no banco
-      await Future.delayed(const Duration(milliseconds: 500));
+      await Future<void>.delayed(const Duration(milliseconds: 500));
 
       final newVehicle = vehicle.copyWith(
         id: _generateId(),
@@ -217,8 +237,8 @@ class VehicleService {
       _vehiclesController.add(_cachedVehicles);
 
       return newVehicle;
-    } catch (e) {
-      throw Exception('Erro ao criar veiculo: $e');
+    } on Object catch (error) {
+      throw Exception('Erro ao criar veiculo: $error');
     }
   }
 
@@ -226,7 +246,7 @@ class VehicleService {
   Future<Vehicle> updateVehicle(Vehicle vehicle) async {
     try {
       // Simular atualizacao no banco
-      await Future.delayed(const Duration(milliseconds: 500));
+      await Future<void>.delayed(const Duration(milliseconds: 500));
 
       final updatedVehicle = vehicle.copyWith(
         updatedAt: DateTime.now(),
@@ -239,8 +259,8 @@ class VehicleService {
       }
 
       return updatedVehicle;
-    } catch (e) {
-      throw Exception('Erro ao atualizar veiculo: $e');
+    } on Object catch (error) {
+      throw Exception('Erro ao atualizar veiculo: $error');
     }
   }
 
@@ -248,12 +268,12 @@ class VehicleService {
   Future<void> deleteVehicle(String vehicleId) async {
     try {
       // Simular exclusao no banco
-      await Future.delayed(const Duration(milliseconds: 500));
+      await Future<void>.delayed(const Duration(milliseconds: 500));
 
       _cachedVehicles.removeWhere((v) => v.id == vehicleId);
       _vehiclesController.add(_cachedVehicles);
-    } catch (e) {
-      throw Exception('Erro ao deletar veiculo: $e');
+    } on Object catch (error) {
+      throw Exception('Erro ao deletar veiculo: $error');
     }
   }
 
@@ -268,8 +288,8 @@ class VehicleService {
         );
         _vehiclesController.add(_cachedVehicles);
       }
-    } catch (e) {
-      throw Exception('Erro ao atualizar posicao: $e');
+    } on Object catch (error) {
+      throw Exception('Erro ao atualizar posicao: $error');
     }
   }
 
@@ -284,8 +304,8 @@ class VehicleService {
         );
         _vehiclesController.add(_cachedVehicles);
       }
-    } catch (e) {
-      throw Exception('Erro ao atualizar combustivel: $e');
+    } on Object catch (error) {
+      throw Exception('Erro ao atualizar combustivel: $error');
     }
   }
 
@@ -294,10 +314,10 @@ class VehicleService {
       String vehicleId) async {
     try {
       // Simular busca de manutencoes
-      await Future.delayed(const Duration(milliseconds: 300));
+      await Future<void>.delayed(const Duration(milliseconds: 300));
       return _generateMockMaintenance(vehicleId);
-    } catch (e) {
-      throw Exception('Erro ao buscar manutencoes: $e');
+    } on Object catch (error) {
+      throw Exception('Erro ao buscar manutencoes: $error');
     }
   }
 
@@ -305,10 +325,10 @@ class VehicleService {
   Future<List<FuelRecord>> getVehicleFuelRecords(String vehicleId) async {
     try {
       // Simular busca de registros
-      await Future.delayed(const Duration(milliseconds: 300));
+      await Future<void>.delayed(const Duration(milliseconds: 300));
       return _generateMockFuelRecords(vehicleId);
-    } catch (e) {
-      throw Exception('Erro ao buscar registros de combustivel: $e');
+    } on Object catch (error) {
+      throw Exception('Erro ao buscar registros de combustivel: $error');
     }
   }
 

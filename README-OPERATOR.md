@@ -6,6 +6,8 @@ Documentação completa do painel do operador multi-tenant do GOLFFOX.
 
 O painel do operador (`/operator`) é uma aplicação 100% multi-tenant que permite que operadores gerenciem a operação de transporte de uma ou mais empresas clientes. Todos os dados são isolados por `company_id` através de Row Level Security (RLS) e views seguras.
 
+Nota de links: todas as URLs absolutas devem apontar para `https://golffox.vercel.app/operator` sem o parâmetro `company`. Qualquer acesso com `?company=` é automaticamente normalizado (middleware) preservando demais parâmetros de query.
+
 ## Arquitetura Multi-tenant
 
 ### Modelo de Dados
@@ -218,6 +220,7 @@ Variáveis de ambiente necessárias:
 
 - ✅ Nenhuma string "GOLF FOX" na UI (exceto rodapé legal)
 - ✅ Todas as queries usam `*_secure` ou `company_ownership()`
+- ✅ URLs do operador normalizadas (sem `?company=`); rollback documentado em `database/migrations/20251107_update_operator_links.sql`
 - ✅ Policies RLS SELECT/INSERT/UPDATE/DELETE ativas
 - ✅ KPIs via materialized view atualizada via Cron
 - ✅ Importador RH robusto (PapaParse + Zod + geocoding + relatório)

@@ -98,13 +98,8 @@ function OperatorTenantProviderInner({ children }: { children: ReactNode }) {
             })
           }
 
-          // Atualizar URL se necessário
-          if (urlCompanyId && urlCompanyId !== selectedCompany.id) {
-            // URL tem empresa diferente, atualizar para a válida
-            const url = new URL(window.location.href)
-            url.searchParams.set('company', selectedCompany.id)
-            router.replace(url.pathname + url.search, { scroll: false })
-          }
+          // Não adicionar/atualizar o parâmetro `company` na URL.
+          // A seleção de tenant é persistida apenas em localStorage.
         }
       } else {
         console.warn('⚠️ Nenhuma empresa encontrada para o operador')
@@ -133,11 +128,7 @@ function OperatorTenantProviderInner({ children }: { children: ReactNode }) {
     
     if (typeof window !== 'undefined') {
       localStorage.setItem('operator_tenant_company_id', companyId)
-      
-      // Atualizar URL
-      const url = new URL(window.location.href)
-      url.searchParams.set('company', companyId)
-      router.replace(url.pathname + url.search, { scroll: false })
+      // Não alterar a URL com `company`. Middleware já normaliza acessos legados.
     }
 
     // Buscar brand tokens
