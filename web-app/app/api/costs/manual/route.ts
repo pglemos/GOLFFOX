@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseServiceRole } from '@/lib/supabase-server'
+import { requireCompanyAccess } from '@/lib/api-auth'
 import { z } from 'zod'
 
 const costSchema = z.object({
@@ -23,6 +24,12 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
     const validated = costSchema.parse(body)
+
+    // ✅ Validar autenticação e acesso à empresa
+    const { user, error: authError } = await requireCompanyAccess(request, validated.company_id)
+    if (authError) {
+      return authError
+    }
 
     // Verificar se categoria existe e está ativa
     const { data: category, error: categoryError } = await supabaseServiceRole
@@ -76,13 +83,6 @@ export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams
     const companyId = searchParams.get('company_id')
-    const routeId = searchParams.get('route_id')
-    const vehicleId = searchParams.get('vehicle_id')
-    const startDate = searchParams.get('start_date')
-    const endDate = searchParams.get('end_date')
-    const categoryId = searchParams.get('category_id')
-    const limit = parseInt(searchParams.get('limit') || '100')
-    const offset = parseInt(searchParams.get('offset') || '0')
 
     if (!companyId) {
       return NextResponse.json(
@@ -90,6 +90,19 @@ export async function GET(request: NextRequest) {
         { status: 400 }
       )
     }
+
+    // ✅ Validar autenticação e acesso à empresa
+    const { user, error: authError } = await requireCompanyAccess(request, companyId)
+    if (authError) {
+      return authError
+    }
+    const routeId = searchParams.get('route_id')
+    const vehicleId = searchParams.get('vehicle_id')
+    const startDate = searchParams.get('start_date')
+    const endDate = searchParams.get('end_date')
+    const categoryId = searchParams.get('category_id')
+    const limit = parseInt(searchParams.get('limit') || '100')
+    const offset = parseInt(searchParams.get('offset') || '0')
 
     let query = supabaseServiceRole
       .from('v_costs_secure')

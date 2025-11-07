@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { requireCompanyAccess } from '@/lib/api-auth'
 
 function getSupabaseAdmin() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -160,6 +161,12 @@ export async function POST(request: NextRequest) {
         { error: 'companyId e reportKey são obrigatórios' },
         { status: 400 }
       )
+    }
+
+    // ✅ Validar autenticação e acesso à empresa
+    const { user, error: authError } = await requireCompanyAccess(request, companyId)
+    if (authError) {
+      return authError
     }
 
     // Buscar configuração do schedule (se houver)

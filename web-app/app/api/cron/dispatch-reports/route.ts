@@ -58,7 +58,7 @@ export async function GET(request: NextRequest) {
         }
 
         // Gerar relatório
-        const reportResult = await generateAndDispatchReport(schedule)
+        const reportResult = await generateAndDispatchReport(supabase, schedule)
 
         results.push({
           scheduleId: schedule.id,
@@ -135,7 +135,7 @@ function shouldExecuteCron(cron: string, now: Date): boolean {
 /**
  * Gera relatório e envia por email
  */
-async function generateAndDispatchReport(schedule: any) {
+async function generateAndDispatchReport(supabase: ReturnType<typeof getSupabaseAdmin>, schedule: any) {
   try {
     // Gerar relatório via API interna
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'

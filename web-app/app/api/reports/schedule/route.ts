@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { requireCompanyAccess } from '@/lib/api-auth'
 
 function getSupabaseAdmin() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -28,6 +29,12 @@ export async function POST(request: NextRequest) {
         { error: 'companyId, reportKey, cron e recipients são obrigatórios' },
         { status: 400 }
       )
+    }
+
+    // ✅ Validar autenticação e acesso à empresa
+    const { user, error: authError } = await requireCompanyAccess(request, companyId)
+    if (authError) {
+      return authError
     }
 
     // Validar formato cron básico (5 ou 6 campos)
@@ -111,6 +118,7 @@ export async function POST(request: NextRequest) {
  */
 export async function GET(request: NextRequest) {
   try {
+    const supabase = getSupabaseAdmin()
     const searchParams = request.nextUrl.searchParams
     const companyId = searchParams.get('companyId')
 
@@ -143,6 +151,7 @@ export async function GET(request: NextRequest) {
  */
 export async function DELETE(request: NextRequest) {
   try {
+    const supabase = getSupabaseAdmin()
     const searchParams = request.nextUrl.searchParams
     const scheduleId = searchParams.get('scheduleId')
 

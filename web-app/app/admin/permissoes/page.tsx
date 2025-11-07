@@ -29,6 +29,14 @@ export default function PermissoesPage() {
   const [selectedUserForRoleChange, setSelectedUserForRoleChange] = useState<any>(null)
   const [isChangeRoleModalOpen, setIsChangeRoleModalOpen] = useState(false)
 
+  // Filtrar usuários baseado na busca
+  const filteredUsers = usuarios.filter((usuario) => {
+    const matchesSearch = searchQuery === "" || 
+      usuario.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      usuario.email?.toLowerCase().includes(searchQuery.toLowerCase())
+    return matchesSearch
+  })
+
   useEffect(() => {
     const getUser = async () => {
       const { data: { session } } = await supabase.auth.getSession()

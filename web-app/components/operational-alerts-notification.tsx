@@ -66,7 +66,9 @@ export function OperationalAlertsNotification() {
             warning: 2,
             info: 3,
           }
-          return severityOrder[a.severity] - severityOrder[b.severity]
+          const aSeverity = a.severity as OperationalAlert['severity']
+          const bSeverity = b.severity as OperationalAlert['severity']
+          return severityOrder[aSeverity] - severityOrder[bSeverity]
         })
         .slice(0, 10)
       setAlerts(sorted)

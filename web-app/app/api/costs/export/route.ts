@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseServiceRole } from '@/lib/supabase-server'
+import { requireCompanyAccess } from '@/lib/api-auth'
 import { exportToCSV, exportToExcel, exportToPDF } from '@/lib/export-utils'
 
 export async function GET(request: NextRequest) {
@@ -14,6 +15,12 @@ export async function GET(request: NextRequest) {
         { error: 'company_id é obrigatório' },
         { status: 400 }
       )
+    }
+
+    // ✅ Validar autenticação e acesso à empresa
+    const { user, error: authError } = await requireCompanyAccess(request, companyId)
+    if (authError) {
+      return authError
     }
 
     if (!['csv', 'excel', 'pdf'].includes(format)) {
@@ -113,7 +120,21 @@ export async function GET(request: NextRequest) {
 
     // Gerar arquivo conforme formato
     if (format === 'csv') {
-      const csvContent = exportToCSV(reportData, `custos_${new Date().toISOString().split('T')[0]}.csv`)
+      // Gerar CSV manualmente (exportToCSV é para cliente)
+      const csvRows = [
+        reportData.title,
+        reportData.description || '',
+        '',
+        reportData.headers.join(','),
+        ...reportData.rows.map((row: any[]) => row.map((cell: any) => {
+          const cellStr = String(cell || '')
+          if (cellStr.includes(',') || cellStr.includes('"') || cellStr.includes('\n')) {
+            return `"${cellStr.replace(/"/g, '""')}"`
+          }
+          return cellStr
+        }).join(','))
+      ]
+      const csvContent = '\ufeff' + csvRows.join('\n') // BOM para UTF-8
       return new NextResponse(csvContent, {
         headers: {
           'Content-Type': 'text/csv',

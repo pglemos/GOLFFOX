@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseServiceRole } from '@/lib/supabase-server'
+import { requireAuth } from '@/lib/api-auth'
 import { z } from 'zod'
 
 const reconcileSchema = z.object({
@@ -13,6 +14,12 @@ const reconcileSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
+    // ✅ Validar autenticação (operator ou admin)
+    const authError = await requireAuth(request, ['operator', 'admin'])
+    if (authError) {
+      return authError
+    }
+
     const body = await request.json()
     const validated = reconcileSchema.parse(body)
 
@@ -47,7 +54,7 @@ export async function POST(request: NextRequest) {
       .eq('invoice_id', validated.invoice_id)
       .limit(1)
       .single()
-      .then(r => r.data)
+      .then((r: any) => r.data)
 
     if (!conciliationData) {
       return NextResponse.json(

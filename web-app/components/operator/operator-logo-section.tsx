@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation"
 import Link from "next/link"
 import { motion } from "framer-motion"
 import { CompanySelector } from "./company-selector"
+import { useOperatorTenant } from "@/components/providers/operator-tenant-provider"
 
 interface OperatorLogoSectionProps {
   panelHomeUrl: string
@@ -12,8 +13,25 @@ interface OperatorLogoSectionProps {
 export function OperatorLogoSection({ panelHomeUrl }: OperatorLogoSectionProps) {
   const pathname = usePathname()
   const isOperatorPanel = pathname?.startsWith('/operator') ?? false
+  const { companyName, logoUrl } = useOperatorTenant()
 
   if (isOperatorPanel) {
+    // ✅ Se há logo da empresa, exibir logo customizado
+    if (logoUrl) {
+      return (
+        <Link href={panelHomeUrl} className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+          <img 
+            src={logoUrl} 
+            alt={companyName || 'Operador'} 
+            className="h-8 sm:h-10 w-auto object-contain"
+          />
+          <span className="font-bold text-lg sm:text-2xl tracking-tight text-[var(--ink-strong)] hidden xs:block">
+            {companyName || 'Operador'}
+          </span>
+        </Link>
+      )
+    }
+    // Se não há logo, usar CompanySelector (já filtra por tenant)
     return <CompanySelector />
   }
 
@@ -28,7 +46,7 @@ export function OperatorLogoSection({ panelHomeUrl }: OperatorLogoSectionProps) 
       </motion.div>
       <div className="flex items-center gap-2">
         <span className="font-bold text-lg sm:text-2xl tracking-tight text-[var(--ink-strong)] hidden xs:block">                                            
-          GOLF FOX
+          {companyName || 'GOLF FOX'}
         </span>
       </div>
     </Link>

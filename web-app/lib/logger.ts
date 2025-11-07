@@ -7,12 +7,21 @@ export type LogEntry = {
 
 const buffer: LogEntry[] = []
 
+const isDevelopment = process.env.NODE_ENV === 'development'
+
 export function log(level: LogEntry['level'], message: string, meta?: Record<string, any>) {
   const entry: LogEntry = { ts: new Date().toISOString(), level, message, meta }
   buffer.push(entry)
-  if (level === 'error') console.error('[GEN-STOPS]', message, meta || '')
-  else if (level === 'warn') console.warn('[GEN-STOPS]', message, meta || '')
-  else console.log('[GEN-STOPS]', message, meta || '')
+  
+  // ✅ Em produção, apenas logar erros e warnings
+  if (level === 'error') {
+    console.error('[GEN-STOPS]', message, meta || '')
+  } else if (level === 'warn') {
+    console.warn('[GEN-STOPS]', message, meta || '')
+  } else if (isDevelopment) {
+    // Info apenas em desenvolvimento
+    console.log('[GEN-STOPS]', message, meta || '')
+  }
 
   // Notificar canal de erros (webhook) se configurado
   if (level === 'error') {
