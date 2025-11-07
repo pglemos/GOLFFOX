@@ -145,7 +145,7 @@ export class RealtimeService {
           schema: 'public',
           table: 'driver_positions',
         },
-        async (payload) => {
+        async (payload: any) => {
           try {
             // Buscar dados completos diretamente das tabelas (view v_live_vehicles não existe)
             const position = payload.new as any
@@ -190,7 +190,7 @@ export class RealtimeService {
           }
         }
       )
-      .subscribe((status) => {
+      .subscribe((status: any) => {
         if (status === 'SUBSCRIBED') {
           console.log('Conectado ao canal driver_positions')
         } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
@@ -216,7 +216,7 @@ export class RealtimeService {
           schema: 'public',
           table: 'trips',
         },
-        (payload) => {
+        (payload: any) => {
           const trip = payload.new as any
           this.queueUpdate({
             type: 'trip',
@@ -232,7 +232,7 @@ export class RealtimeService {
           })
         }
       )
-      .subscribe((status) => {
+      .subscribe((status: any) => {
         if (status === 'SUBSCRIBED') {
           console.log('Conectado ao canal trips')
         } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
@@ -261,7 +261,7 @@ export class RealtimeService {
           table: 'gf_incidents',
           filter: 'status=eq.open',
         },
-        (payload) => {
+        (payload: any) => {
           const incident = payload.new as any
           this.queueUpdate({
             type: 'alert',
@@ -272,8 +272,8 @@ export class RealtimeService {
               route_id: incident.route_id,
               vehicle_id: incident.vehicle_id,
               severity: incident.severity || 'medium',
-              lat: null, // gf_incidents não tem lat
-              lng: null, // gf_incidents não tem lng
+              lat: undefined, // gf_incidents não tem lat
+              lng: undefined, // gf_incidents não tem lng
               description: incident.description,
               created_at: incident.created_at,
             },
@@ -295,7 +295,7 @@ export class RealtimeService {
           table: 'gf_service_requests',
           filter: 'tipo=eq.socorro',
         },
-        (payload) => {
+        (payload: any) => {
           const request = payload.new as any
           const lat = request.payload?.latitude
           const lng = request.payload?.longitude

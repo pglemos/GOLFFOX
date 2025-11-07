@@ -182,7 +182,7 @@ class ErrorService {
           {'error': error.toString(), 'context': context},
         );
 
-        await Future.delayed(delay * attempt);
+        await Future<void>.delayed(delay * attempt);
       }
     }
 

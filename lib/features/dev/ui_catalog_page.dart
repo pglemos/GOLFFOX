@@ -136,7 +136,7 @@ class UiCatalogPage extends StatelessWidget {
           Align(
             alignment: Alignment.centerLeft,
             child: GxButton('Dialogo',
-                onPressed: () => showGxDialog(
+                onPressed: () => showGxDialog<bool>(
                     context: context,
                     title: 'Confirmacao',
                     message: 'Deseja continuar?')),

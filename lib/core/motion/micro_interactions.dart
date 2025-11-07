@@ -32,8 +32,8 @@ enum HapticType { light, medium, heavy, selection, vibrate }
 class InteractiveButton extends StatefulWidget {
 
   const InteractiveButton({
-    super.key,
     required this.child,
+    super.key,
     this.onPressed,
     this.backgroundColor,
     this.foregroundColor,
@@ -120,13 +120,9 @@ class _InteractiveButtonState extends State<InteractiveButton>
     }
   }
 
-  void _handleTapUp(TapUpDetails details) {
-    _handleTapEnd();
-  }
+  void _handleTapUp(TapUpDetails details) => _handleTapEnd();
 
-  void _handleTapCancel() {
-    _handleTapEnd();
-  }
+  void _handleTapCancel() => _handleTapEnd();
 
   void _handleTapEnd() {
     if (widget.enableScale) {
@@ -146,49 +142,47 @@ class _InteractiveButtonState extends State<InteractiveButton>
       onTap: widget.enableRipple ? null : widget.onPressed,
       child: AnimatedBuilder(
         animation: Listenable.merge([_scaleAnimation, _glowAnimation]),
-        builder: (context, child) {
-          return Transform.scale(
-            scale: widget.enableScale ? _scaleAnimation.value : 1.0,
-            child: Container(
-              decoration: BoxDecoration(
-                color: widget.backgroundColor,
+        builder: (context, child) => Transform.scale(
+          scale: widget.enableScale ? _scaleAnimation.value : 1.0,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: widget.backgroundColor,
+              borderRadius: widget.borderRadius ?? BorderRadius.circular(8),
+              boxShadow: [
+                if (widget.elevation != null)
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.1),
+                    blurRadius: widget.elevation! * 2,
+                    offset: Offset(0, widget.elevation!),
+                  ),
+                if (widget.enableGlow && _glowAnimation.value > 0)
+                  BoxShadow(
+                    color: (widget.backgroundColor ??
+                            Theme.of(context).primaryColor)
+                        .withValues(alpha: _glowAnimation.value * 0.3),
+                    blurRadius: 20 * _glowAnimation.value,
+                    spreadRadius: 5 * _glowAnimation.value,
+                  ),
+              ],
+            ),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
                 borderRadius: widget.borderRadius ?? BorderRadius.circular(8),
-                boxShadow: [
-                  if (widget.elevation != null)
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: widget.elevation! * 2,
-                      offset: Offset(0, widget.elevation!),
+                onTap: widget.enableRipple ? widget.onPressed : null,
+                child: Padding(
+                  padding: widget.padding ?? const EdgeInsets.all(16),
+                  child: DefaultTextStyle(
+                    style: TextStyle(
+                      color: widget.foregroundColor ?? Colors.white,
                     ),
-                  if (widget.enableGlow && _glowAnimation.value > 0)
-                    BoxShadow(
-                      color: (widget.backgroundColor ??
-                              Theme.of(context).primaryColor)
-                          .withOpacity(_glowAnimation.value * 0.3),
-                      blurRadius: 20 * _glowAnimation.value,
-                      spreadRadius: 5 * _glowAnimation.value,
-                    ),
-                ],
-              ),
-              child: Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  borderRadius: widget.borderRadius ?? BorderRadius.circular(8),
-                  onTap: widget.enableRipple ? widget.onPressed : null,
-                  child: Padding(
-                    padding: widget.padding ?? const EdgeInsets.all(16),
-                    child: DefaultTextStyle(
-                      style: TextStyle(
-                        color: widget.foregroundColor ?? Colors.white,
-                      ),
-                      child: widget.child,
-                    ),
+                    child: widget.child,
                   ),
                 ),
               ),
             ),
-          );
-        },
+          ),
+        ),
       ),
     );
 }
@@ -197,8 +191,8 @@ class _InteractiveButtonState extends State<InteractiveButton>
 class InteractiveCard extends StatefulWidget {
 
   const InteractiveCard({
-    super.key,
     required this.child,
+    super.key,
     this.onTap,
     this.backgroundColor,
     this.padding,
@@ -280,32 +274,41 @@ class _InteractiveCardState extends State<InteractiveCard>
         onTap: widget.onTap,
         child: AnimatedBuilder(
           animation: _hoverController,
-          builder: (context, child) {
-            return Transform.scale(
-              scale: widget.enableScale ? _scaleAnimation.value : 1.0,
-              child: Container(
-                margin: widget.margin,
-                decoration: BoxDecoration(
-                  color: widget.backgroundColor ?? Colors.white,
-                  borderRadius:
-                      widget.borderRadius ?? BorderRadius.circular(12),
-                  boxShadow: widget.enableShadow
-                      ? [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: _elevationAnimation.value * 2,
-                            offset: Offset(0, _elevationAnimation.value),
-                          ),
-                        ]
-                      : null,
-                ),
-                child: Padding(
-                  padding: widget.padding ?? const EdgeInsets.all(16),
-                  child: widget.child,
-                ),
-              ),
+        builder: (context, child) {
+          final decoration = BoxDecoration(
+            color: widget.backgroundColor ?? Colors.white,
+            borderRadius: widget.borderRadius ?? BorderRadius.circular(12),
+            boxShadow: widget.enableShadow
+                ? [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.1),
+                      blurRadius: _elevationAnimation.value * 2,
+                      offset: Offset(0, _elevationAnimation.value),
+                    ),
+                  ]
+                : null,
+          );
+
+          Widget content = DecoratedBox(
+            decoration: decoration,
+            child: Padding(
+              padding: widget.padding ?? const EdgeInsets.all(16),
+              child: widget.child,
+            ),
+          );
+
+          if (widget.margin != null) {
+            content = Padding(
+              padding: widget.margin!,
+              child: content,
             );
-          },
+          }
+
+          return Transform.scale(
+            scale: widget.enableScale ? _scaleAnimation.value : 1.0,
+            child: content,
+          );
+        },
         ),
       ),
     );
@@ -411,48 +414,46 @@ class _InteractiveInputState extends State<InteractiveInput>
   @override
   Widget build(BuildContext context) => AnimatedBuilder(
       animation: _focusController,
-      builder: (context, child) {
-        return Transform.scale(
-          scale: _focusAnimation.value,
-          child: TextFormField(
-            controller: widget.controller,
-            focusNode: _focusNode,
-            obscureText: widget.obscureText,
-            keyboardType: widget.keyboardType,
-            validator: widget.validator,
-            onChanged: widget.onChanged,
-            onTap: widget.onTap,
-            enabled: widget.enabled,
-            maxLines: widget.maxLines,
-            decoration: InputDecoration(
-              labelText: widget.labelText,
-              hintText: widget.hintText,
-              prefixIcon: widget.prefixIcon,
-              suffixIcon: widget.suffixIcon,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(
-                  color: _borderColorAnimation.value ?? Colors.grey.shade300,
-                  width: _isFocused ? 2 : 1,
-                ),
+      builder: (context, child) => Transform.scale(
+        scale: _focusAnimation.value,
+        child: TextFormField(
+          controller: widget.controller,
+          focusNode: _focusNode,
+          obscureText: widget.obscureText,
+          keyboardType: widget.keyboardType,
+          validator: widget.validator,
+          onChanged: widget.onChanged,
+          onTap: widget.onTap,
+          enabled: widget.enabled,
+          maxLines: widget.maxLines,
+          decoration: InputDecoration(
+            labelText: widget.labelText,
+            hintText: widget.hintText,
+            prefixIcon: widget.prefixIcon,
+            suffixIcon: widget.suffixIcon,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(
+                color: _borderColorAnimation.value ?? Colors.grey.shade300,
+                width: _isFocused ? 2 : 1,
               ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(
-                  color: widget.borderColor ?? Colors.grey.shade300,
-                ),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(
+                color: widget.borderColor ?? Colors.grey.shade300,
               ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(
-                  color: widget.focusColor ?? Theme.of(context).primaryColor,
-                  width: 2,
-                ),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(
+                color: widget.focusColor ?? Theme.of(context).primaryColor,
+                width: 2,
               ),
             ),
           ),
-        );
-      },
+        ),
+      ),
     );
 }
 
@@ -474,11 +475,11 @@ extension MicroInteractionExtensions on Widget {
     );
 
   /// Adiciona efeito de glow
-  Widget glow({Color? color, double intensity = 0.3}) => Container(
+  Widget glow({Color? color, double intensity = 0.3}) => DecoratedBox(
       decoration: BoxDecoration(
         boxShadow: [
           BoxShadow(
-            color: (color ?? Colors.blue).withOpacity(intensity),
+            color: (color ?? Colors.blue).withValues(alpha: intensity),
             blurRadius: 20,
             spreadRadius: 5,
           ),

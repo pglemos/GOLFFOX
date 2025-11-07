@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'app_router.dart';
-
-import '../auth/auth_manager.dart';
 import '../../domain/user_role.dart';
+import '../auth/auth_manager.dart';
 import '../services/logger_service.dart';
+import 'app_router.dart';
 import 'app_routes.dart';
 
 /// Route guard for role-based access control
@@ -191,8 +190,9 @@ class RoleBasedNavigation {
     AuthManager authManager,
   ) async {
     // Obtém a localização atual via RouteInformationProvider
-    final currentLocation =
-        AppRouter.instance.router.routeInformationProvider.value.location;
+    final currentLocation = AppRouter
+        .instance.router.routeInformationProvider.value.uri
+        .toString();
     final redirectRoute = await RouteGuard.checkAccess(
       location: currentLocation,
       authManager: authManager,
@@ -264,11 +264,11 @@ class RouteTransitions {
       key: state.pageKey,
       child: child,
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        const begin = Offset(1.0, 0.0);
+        const begin = Offset(1, 0);
         const end = Offset.zero;
         const curve = Curves.easeInOutCubic;
 
-        var tween = Tween(begin: begin, end: end).chain(
+        final tween = Tween(begin: begin, end: end).chain(
           CurveTween(curve: curve),
         );
 
@@ -287,12 +287,11 @@ class RouteTransitions {
   ) => CustomTransitionPage<T>(
       key: state.pageKey,
       child: child,
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        return FadeTransition(
-          opacity: animation,
-          child: child,
-        );
-      },
+      transitionsBuilder: (context, animation, secondaryAnimation, child) =>
+          FadeTransition(
+        opacity: animation,
+        child: child,
+      ),
     );
 
   /// Scale transition for modal-like pages
@@ -305,7 +304,7 @@ class RouteTransitions {
       child: child,
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         const curve = Curves.easeInOutBack;
-        var tween = Tween(begin: 0.8, end: 1.0).chain(
+        final tween = Tween(begin: 0.8, end: 1).chain(
           CurveTween(curve: curve),
         );
 

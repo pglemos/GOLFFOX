@@ -371,9 +371,9 @@ class _DriverDashboardState extends State<DriverDashboard>
   }
 
   void _openTrip(Trip trip) {
-    Navigator.push(
+    Navigator.push<void>(
       context,
-      MaterialPageRoute(
+      MaterialPageRoute<void>(
           builder: (_) => TripDetailScreen(trip: trip, user: widget.user)),
     ).then((_) => _loadTrips());
   }

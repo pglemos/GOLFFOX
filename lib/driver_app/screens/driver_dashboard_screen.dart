@@ -45,8 +45,8 @@ class _DriverDashboardScreenState extends State<DriverDashboardScreen> {
   }
 
   Future<void> _startTrip() async {
-    Navigator.of(context).push(
-      MaterialPageRoute(
+    Navigator.of(context).push<void>(
+      MaterialPageRoute<void>(
         builder: (_) => const DriverChecklistScreen(),
       ),
     );
@@ -68,7 +68,7 @@ class _DriverDashboardScreenState extends State<DriverDashboardScreen> {
             icon: const Icon(Icons.logout),
             onPressed: () {
               SupabaseService.instance.auth.signOut();
-              Navigator.of(context).pushReplacementNamed('/driver/login');
+              Navigator.of(context).pushReplacementNamed<void, void>('/driver/login');
             },
           ),
         ],

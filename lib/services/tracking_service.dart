@@ -161,7 +161,10 @@ class TrackingService {
               : settings;
 
       _posSub = Geolocator.getPositionStream(locationSettings: locSettings)
-          .listen(_onPosition, onError: (e, st) => _emitError(e.toString()));
+          .listen(
+        _onPosition,
+        onError: (Object e, StackTrace st) => _emitError(e.toString()),
+      );
     } else {
       _timer = Timer.periodic(
         _config.streamInterval,
@@ -211,7 +214,7 @@ class TrackingService {
         desiredAccuracy: _config.accuracy,
       );
       _onPosition(p);
-    } catch (e) {
+    } on Object catch (e) {
       _emitError('Erro ao obter posicao: $e');
     }
   }
@@ -269,7 +272,7 @@ class TrackingService {
       _lastSent = p;
       // sucesso  tenta flush do que ja havia
       unawaited(_flushQueue());
-    } catch (e) {
+    } on Object catch (e) {
       _debug('Falha envio imediato, add queue: $e');
       _enqueue(p);
       await _saveQueueDebounced();
@@ -333,7 +336,7 @@ class TrackingService {
         // reset backoff ao primeiro sucesso
         backoff = const Duration(seconds: 2);
         _backoff = backoff;
-      } catch (e) {
+      } on Object catch (e) {
         _debug('Flush chunk falhou: $e');
 
         // aplica backoff + jitter e aborta o restante (tentara depois)
@@ -370,7 +373,7 @@ class TrackingService {
         final prefs = await SharedPreferences.getInstance();
         final list = _queue.map(jsonEncode).toList(growable: false);
         await prefs.setStringList(_kQueueKey, list);
-      } catch (e) {
+      } on Object catch (e) {
         _debug('Erro salvando queue: $e');
       }
     });
@@ -388,7 +391,7 @@ class TrackingService {
           _queue.add(m);
         } catch (_) {}
       }
-    } catch (e) {
+    } on Object catch (e) {
       _debug('Erro lendo queue: $e');
     }
   }

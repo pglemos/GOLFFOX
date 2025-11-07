@@ -35,10 +35,10 @@ const linkTests = [
   },
   {
     name: 'Funcionários',
-    url: `/operator/funcionarios?company=${TEST_COMPANY_ID}`,
-    expectedPattern: /^\/operator\/funcionarios\?company=[a-f0-9-]+$/,
-    shouldNotHave: null, // Este pode ter parâmetro
-    description: 'Link com parâmetro de query válido'
+    url: `/operator/funcionarios`,
+    expectedPattern: /^\/operator\/funcionarios$/,
+    shouldNotHave: '?company=',
+    description: 'Link sem parâmetro de company (normalizado)'
   },
   {
     name: 'Rotas',
@@ -67,7 +67,7 @@ const linkTests = [
 const navigationTests = [
   {
     name: 'Voltar do Funcionários para Dashboard',
-    from: `/operator/funcionarios?company=${TEST_COMPANY_ID}`,
+    from: `/operator/funcionarios`,
     to: '/operator',
     action: 'click-voltar',
     expectedUrl: '/operator'

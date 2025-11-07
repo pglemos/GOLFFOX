@@ -4,7 +4,6 @@
 // ========================================
 
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import '../../../core/theme/gf_tokens.dart';
 import '../../../models/driver.dart';
 
@@ -22,7 +21,7 @@ class DriverCard extends StatelessWidget {
   final VoidCallback? onTap;
   final VoidCallback? onEdit;
   final VoidCallback? onDelete;
-  final Function(DriverStatus)? onStatusChanged;
+  final ValueChanged<DriverStatus>? onStatusChanged;
 
   @override
   Widget build(BuildContext context) => Card(
@@ -428,7 +427,7 @@ class DriverCard extends StatelessWidget {
   }
 
   void _showStatusDialog(BuildContext context) {
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Alterar Status'),

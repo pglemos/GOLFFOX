@@ -56,8 +56,8 @@ class _DriverChecklistScreenState extends State<DriverChecklistScreen> {
       });
 
       if (mounted) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
+        Navigator.of(context).pushReplacement<void, void>(
+          MaterialPageRoute<void>(
             builder: (_) => DriverRouteScreen(trip: trip),
           ),
         );

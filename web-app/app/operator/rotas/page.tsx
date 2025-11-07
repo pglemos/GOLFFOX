@@ -15,7 +15,7 @@ import toast from "react-hot-toast"
 // @ts-ignore
 import { Button } from "@/components/ui/button"
 // @ts-ignore
-import { default as Link } from "next/link"
+import Link from "next/link"
 import { useOperatorTenant } from "@/components/providers/operator-tenant-provider"
 
 let operatorI18n: any = {
@@ -206,7 +206,7 @@ export default function OperatorRotasPage() {
                     )}
                   </div>
                 </div>
-                <Link href={`/operator/rotas/mapa?route_id=${rota.id}&company=${tenantCompanyId}`}>
+                <Link href={`/operator/rotas/mapa?route_id=${rota.id}`}>
                   <Button variant="outline" size="sm" className="flex-shrink-0">
                     <MapPin className="h-4 w-4 mr-2" />
                     Ver no Mapa

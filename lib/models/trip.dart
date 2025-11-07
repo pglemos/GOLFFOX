@@ -363,16 +363,16 @@ class Trip {
 
   /* --------------------------------- Parsers --------------------------------- */
 
-  static String? _asString(v) => v?.toString();
+  static String? _asString(Object? v) => v?.toString();
 
-  static double? _asDouble(v) {
+  static double? _asDouble(Object? v) {
     if (v == null) return null;
     if (v is num) return v.toDouble();
     if (v is String && v.trim().isNotEmpty) return double.tryParse(v.trim());
     return null;
   }
 
-  static DateTime? _asDateTime(v) {
+  static DateTime? _asDateTime(Object? v) {
     if (v == null) return null;
     if (v is DateTime) return v;
     if (v is int) {

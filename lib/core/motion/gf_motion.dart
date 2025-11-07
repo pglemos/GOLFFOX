@@ -30,7 +30,7 @@ class GfMotion {
         final slide =
             Tween<Offset>(begin: const Offset(0.02, 0), end: Offset.zero)
                 .animate(curved);
-        final fade = Tween<double>(begin: 0.0, end: 1.0).animate(curved);
+        final fade = Tween<double>(begin: 0, end: 1).animate(curved);
         return FadeTransition(
           opacity: fade,
           child: SlideTransition(position: slide, child: child),
@@ -43,8 +43,8 @@ class GfMotion {
 class GfHoverScale extends StatefulWidget {
 
   const GfHoverScale({
-    super.key,
     required this.child,
+    super.key,
     this.hoverScale = 1.02,
     this.pressScale = 0.98,
     this.duration = GfMotion.short,
@@ -83,7 +83,7 @@ class _GfHoverScaleState extends State<GfHoverScale> {
             ? BoxDecoration(
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.06),
+                    color: Colors.black.withValues(alpha: 0.06),
                     blurRadius: 12,
                     offset: const Offset(0, 8),
                   ),

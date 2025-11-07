@@ -12,7 +12,9 @@ class ErrorHandler {
 
   /// Inicializa o handler global de erros
   static void initialize() {
-    if (_initialized) return;
+    if (_initialized) {
+      return;
+    }
 
     // Capturar erros do Flutter
     FlutterError.onError = _handleFlutterError;
@@ -26,7 +28,7 @@ class ErrorHandler {
     _initialized = true;
 
     if (kDebugMode) {
-      print('✅ ErrorHandler initialized');
+      debugPrint('ErrorHandler initialized');
     }
   }
 
@@ -50,8 +52,8 @@ class ErrorHandler {
   /// Trata erros de plataforma
   static bool _handlePlatformError(Object error, StackTrace stack) {
     if (kDebugMode) {
-      print('Platform Error: $error');
-      print('Stack: $stack');
+      debugPrint('Platform Error: $error');
+      debugPrint('Stack: $stack');
     } else {
       _logError(error, stack, 'Platform Error');
     }
@@ -60,21 +62,6 @@ class ErrorHandler {
     _reportError(error, stack);
 
     return true;
-  }
-
-  /// Registra e reporta erro
-  static void _logAndReport(Object error, StackTrace? stackTrace, {String? context}) {
-    // Log usando sistema centralizado
-    AppLogger.error(
-      'Error${context != null ? ' in $context' : ''}: $error',
-      tag: 'ErrorHandler',
-      error: error,
-      stackTrace: stackTrace,
-    );
-
-    // TODO: Integrar com serviços de crash reporting
-    // Exemplos: Firebase Crashlytics, Sentry, Bugsnag
-    // crashlytics.recordError(error, stackTrace);
   }
 
   /// Reporta erro para serviços de analytics/crash reporting
@@ -92,7 +79,9 @@ class ErrorHandler {
       // FirebaseCrashlytics.instance.recordError(error, stack);
       
       if (kDebugMode) {
-        print('📊 Error reported: ${appError.type} - ${appError.message}');
+        debugPrint(
+          'Error reported: ${appError.type} - ${appError.message}',
+        );
       }
     }
   }
@@ -133,7 +122,9 @@ class ErrorHandler {
 
   /// Mostra SnackBar com erro
   static void _showSnackBar(BuildContext context, AppError error) {
-    if (!context.mounted) return;
+    if (!context.mounted) {
+      return;
+    }
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -154,9 +145,11 @@ class ErrorHandler {
 
   /// Mostra dialog com erro
   static void _showErrorDialog(BuildContext context, AppError error) {
-    if (!context.mounted) return;
+    if (!context.mounted) {
+      return;
+    }
 
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
         title: Row(
@@ -189,7 +182,7 @@ class ErrorHandler {
 
   /// Mostra informações de debug
   static void _showDebugInfo(BuildContext context, AppError error) {
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Debug Info'),
@@ -239,7 +232,15 @@ class ErrorHandler {
         return Colors.red;
       case AppErrorType.notFound:
         return Colors.grey;
-      default:
+      case AppErrorType.serverError:
+        return Colors.deepOrange;
+      case AppErrorType.timeout:
+        return Colors.purple;
+      case AppErrorType.fileSystem:
+        return Colors.brown;
+      case AppErrorType.permission:
+        return Colors.indigo;
+      case AppErrorType.unknown:
         return Colors.red;
     }
   }
@@ -259,7 +260,13 @@ class ErrorHandler {
         return Icons.search_off;
       case AppErrorType.timeout:
         return Icons.timer_off;
-      default:
+      case AppErrorType.serverError:
+        return Icons.cloud_off;
+      case AppErrorType.fileSystem:
+        return Icons.insert_drive_file;
+      case AppErrorType.permission:
+        return Icons.shield;
+      case AppErrorType.unknown:
         return Icons.error;
     }
   }
@@ -273,7 +280,7 @@ class ErrorHandler {
   }) async {
     try {
       return await operation();
-    } catch (error, stack) {
+    } on Object catch (error, stack) {
       final appError = ErrorFactory.fromException(error, stack);
       
       handleError(error, stack);
@@ -295,7 +302,7 @@ class ErrorHandler {
   }) {
     try {
       return operation();
-    } catch (error, stack) {
+    } on Object catch (error, stack) {
       final appError = ErrorFactory.fromException(error, stack);
       
       handleError(error, stack);

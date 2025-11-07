@@ -19,9 +19,9 @@ describe('normalizeOperatorUrl', () => {
     expect(out).toBe('/operator/funcionarios?search=joao')
   })
 
-  test('returns original string if invalid URL', () => {
+  test('normalizes relative operator URL by stripping company param', () => {
     const input = '/operator?company=abc'
     const out = normalizeOperatorUrl(input)
-    expect(out).toBe('/operator?company=abc')
+    expect(out).toBe('/operator')
   })
 })

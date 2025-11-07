@@ -5,10 +5,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../core/routing/app_router.dart';
-import 'package:go_router/go_router.dart';
-import '../../core/theme/gf_tokens.dart';
+
 import '../../core/motion/gf_motion.dart';
+import '../../core/routing/app_router.dart';
+import '../../core/theme/gf_tokens.dart';
 
 // Provider para controlar o item ativo
 final activeSideNavItemProvider = StateProvider<String>((ref) => 'dashboard');

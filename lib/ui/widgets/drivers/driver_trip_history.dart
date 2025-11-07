@@ -50,7 +50,7 @@ class _DriverTripHistoryState extends State<DriverTripHistory> {
       });
 
       // Simular carregamento de viagens
-      await Future.delayed(const Duration(milliseconds: 800));
+      await Future<void>.delayed(const Duration(milliseconds: 800));
 
       // Dados simulados de viagens
       final trips = _generateMockTrips();

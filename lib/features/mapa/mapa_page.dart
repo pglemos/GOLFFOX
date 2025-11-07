@@ -15,12 +15,10 @@ import '../../ui/widgets/map/vehicle_info_panel.dart';
 import '../../ui/widgets/map/vehicle_marker.dart';
 import '../../ui/widgets/map/map_legend.dart';
 import '../../ui/widgets/map/bus_stops_panel.dart';
-import '../../services/vehicle_status_service.dart';
 import '../../services/bus_stop_service.dart';
 import '../../services/map_service.dart' show vehicleStatusServiceProvider;
 import '../../providers/realtime_providers.dart';
 import '../../models/vehicle_position.dart';
-import '../../models/driver_position.dart';
 import '../../models/bus_stop.dart';
 import '../../models/vehicle_status.dart' as vs;
 import '../../core/utils/date_utils.dart';
@@ -63,7 +61,7 @@ class _MapaPageState extends ConsumerState<MapaPage> {
   @override
   Widget build(BuildContext context) {
     final vehiclePositionsAsync = ref.watch(vehiclePositionsStreamProvider);
-    final vehicleStatusService = ref.watch(vehicleStatusServiceProvider);
+    final _ = ref.watch(vehicleStatusServiceProvider);
 
     // Calcular contadores de status
     vehiclePositionsAsync.whenData(_updateStatusCounts);
@@ -159,7 +157,7 @@ class _MapaPageState extends ConsumerState<MapaPage> {
                 // Botao de atualizacao
                 FloatingActionButton(
                   heroTag: 'refresh',
-                  onPressed: () => ref.refresh(vehiclePositionsStreamProvider),
+                  onPressed: () => ref.invalidate(vehiclePositionsStreamProvider),
                   backgroundColor: GolfFoxTheme.backgroundLight,
                   foregroundColor: GolfFoxTheme.primaryOrange,
                   child: const Icon(Icons.refresh),
@@ -324,7 +322,7 @@ class _MapaPageState extends ConsumerState<MapaPage> {
             ),
             const SizedBox(height: 16),
             ElevatedButton.icon(
-              onPressed: () => ref.refresh(vehiclePositionsStreamProvider),
+              onPressed: () => ref.invalidate(vehiclePositionsStreamProvider),
               icon: const Icon(Icons.refresh),
               label: const Text('Tentar Novamente'),
               style: ElevatedButton.styleFrom(
@@ -400,7 +398,7 @@ class _MapaPageState extends ConsumerState<MapaPage> {
     _mapController.move(vehicle.position, 16);
 
     // Parar tracking apos 10 segundos
-    Future.delayed(const Duration(seconds: 10), () {
+    Future<void>.delayed(const Duration(seconds: 10), () {
       if (mounted) {
         setState(() {
           _isTracking = false;
@@ -410,7 +408,7 @@ class _MapaPageState extends ConsumerState<MapaPage> {
   }
 
   void _contactDriver(VehiclePosition vehicle) {
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
         title: Text('Contatar ${vehicle.driverName}'),

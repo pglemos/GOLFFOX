@@ -51,7 +51,7 @@ class PremiumAnimations {
       child: child
           .animate(onPlay: (controller) => controller.forward())
           .scaleXY(
-            begin: 1.0,
+            begin: 1,
             end: scaleDown,
             duration: duration,
             curve: Curves.easeInOut,
@@ -59,7 +59,7 @@ class PremiumAnimations {
           .then()
           .scaleXY(
             begin: scaleDown,
-            end: 1.0,
+            end: 1,
             duration: duration,
             curve: spring,
           ),
@@ -100,7 +100,7 @@ class PremiumAnimations {
           controller.forward();
         })
         .scaleXY(
-          begin: 1.0,
+          begin: 1,
           end: 1.1,
           duration: Duration(milliseconds: duration.inMilliseconds ~/ 2),
           curve: Curves.easeOut,
@@ -108,7 +108,7 @@ class PremiumAnimations {
         .then()
         .scaleXY(
           begin: 1.1,
-          end: 1.0,
+          end: 1,
           duration: Duration(milliseconds: duration.inMilliseconds ~/ 2),
           curve: bounce,
         );
@@ -118,8 +118,8 @@ class PremiumAnimations {
 class StaggeredAnimation extends StatelessWidget {
 
   const StaggeredAnimation({
-    super.key,
     required this.children,
+    super.key,
     this.delay = const Duration(milliseconds: 100),
     this.duration = PremiumAnimations.fast,
     this.curve = PremiumAnimations.smoothOut,
@@ -166,8 +166,8 @@ class StaggeredAnimation extends StatelessWidget {
 class ResponsiveHover extends StatefulWidget {
 
   const ResponsiveHover({
-    super.key,
     required this.child,
+    super.key,
     this.hoverScale = 1.05,
     this.duration = PremiumAnimations.ultraFast,
     this.hoverColor,
@@ -236,26 +236,24 @@ class _ResponsiveHoverState extends State<ResponsiveHover>
       onExit: (_) => _onHover(false),
       child: AnimatedBuilder(
         animation: _scaleAnimation,
-        builder: (context, child) {
-          return Transform.scale(
-            scale: _scaleAnimation.value,
-            child: AnimatedContainer(
-              duration: widget.duration,
-              decoration: BoxDecoration(
-                boxShadow: _isHovered
-                    ? [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: widget.elevation * 2,
-                          offset: Offset(0, widget.elevation),
-                        ),
-                      ]
-                    : null,
-              ),
-              child: widget.child,
+        builder: (context, child) => Transform.scale(
+          scale: _scaleAnimation.value,
+          child: AnimatedContainer(
+            duration: widget.duration,
+            decoration: BoxDecoration(
+              boxShadow: _isHovered
+                  ? [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.1),
+                        blurRadius: widget.elevation * 2,
+                        offset: Offset(0, widget.elevation),
+                      ),
+                    ]
+                  : null,
             ),
-          );
-        },
+            child: widget.child,
+          ),
+        ),
       ),
     );
 }
@@ -276,7 +274,7 @@ extension PremiumAnimationExtensions on Widget {
         )
         .scaleXY(
           begin: 0.95,
-          end: 1.0,
+          end: 1,
           duration: duration,
           curve: PremiumAnimations.spring,
         );
@@ -297,7 +295,7 @@ extension PremiumAnimationExtensions on Widget {
     Duration duration = PremiumAnimations.medium,
   }) => animate().fadeIn(duration: duration).scaleXY(
           begin: 0.9,
-          end: 1.0,
+          end: 1,
           duration: duration,
           curve: PremiumAnimations.spring,
         );

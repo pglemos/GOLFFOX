@@ -128,7 +128,7 @@ class VehiclePositionSimulator {
             'Veiculo $vehicleId movido para: (${waypoint['lat']}, ${waypoint['lng']})');
 
         // Aguardar antes do proximo ponto
-        await Future.delayed(const Duration(seconds: 10));
+        await Future<void>.delayed(const Duration(seconds: 10));
       }
     } catch (e) {
       debugPrint('Erro ao simular rota: $e');

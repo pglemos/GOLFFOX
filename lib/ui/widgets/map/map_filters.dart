@@ -4,10 +4,7 @@
 // ========================================
 
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
-import '../../../core/theme/gf_tokens.dart';
 import '../../../core/theme/unified_theme.dart';
-import '../../../models/vehicle_position.dart';
 
 class MapFilters extends StatefulWidget {
 
@@ -25,7 +22,7 @@ class MapFilters extends StatefulWidget {
   final List<String> availableCompanies;
   final List<String> availableRoutes;
   final List<String> availableCarriers;
-  final Function(List<String> statuses, String? route) onFiltersChanged;
+  final void Function(List<String> statuses, String? route) onFiltersChanged;
 
   @override
   State<MapFilters> createState() => _MapFiltersState();

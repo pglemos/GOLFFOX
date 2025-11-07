@@ -165,7 +165,7 @@ async function checkEmployeeTable() {
     console.log('═══════════════════════════════════════');
     console.log('\n🎉 FUNCIONÁRIOS PRONTOS!\n');
     console.log('TESTE AGORA:');
-    console.log('https://golffox.vercel.app/operator/funcionarios?company=<ID_DA_EMPRESA>');
+    console.log('https://golffox.vercel.app/operator/funcionarios');
     console.log('\n═══════════════════════════════════════\n');
 
   } catch (error) {

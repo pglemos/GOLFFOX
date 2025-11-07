@@ -26,7 +26,6 @@ class DriverRoutes {
           path: '/edit/:id',
           name: 'edit-driver',
           builder: (context, state) {
-            final driverId = state.pathParameters['id']!;
             // Editing by ID not supported directly in CreateDriverPage constructor.
             // Navigate to page without passing the ID; implement loading by ID as needed.
             return const CreateDriverPage();

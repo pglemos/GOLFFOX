@@ -211,7 +211,7 @@ class DataSanitizer {
             }
             // Not a JSON object, sanitize as text
             return sanitizeText(input);
-          } catch (e) {
+          } on FormatException {
             return sanitizeText(input);
           }
         }

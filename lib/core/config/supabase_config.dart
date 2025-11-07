@@ -1,5 +1,5 @@
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter/foundation.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SupabaseConfig {
   // Configuracoes do Supabase
@@ -9,7 +9,7 @@ class SupabaseConfig {
 
   static Future<void> initialize() async {
     if (kDebugMode) {
-      print('[SupabaseConfig] Inicializando Supabase...');
+      debugPrint('[SupabaseConfig] Inicializando Supabase...');
     }
 
     await Supabase.initialize(
@@ -19,7 +19,7 @@ class SupabaseConfig {
     );
 
     if (kDebugMode) {
-      print('[SupabaseConfig] Supabase inicializado com sucesso');
+      debugPrint('[SupabaseConfig] Supabase inicializado com sucesso');
     }
   }
 

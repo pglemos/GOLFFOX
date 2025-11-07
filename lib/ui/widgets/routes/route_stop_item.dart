@@ -237,7 +237,7 @@ class RouteStopItem extends StatelessWidget {
     );
 
   void _showDeleteConfirmation(BuildContext context) {
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Remover Parada'),

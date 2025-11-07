@@ -263,9 +263,9 @@ class User {
 
   /* --------------------------------- HELPERS --------------------------------- */
 
-  static String? _asString(v) => v?.toString();
+  static String? _asString(Object? v) => v?.toString();
 
-  static DateTime? _asDateTime(v) {
+  static DateTime? _asDateTime(Object? v) {
     if (v == null) return null;
     if (v is DateTime) return v;
     if (v is int) {

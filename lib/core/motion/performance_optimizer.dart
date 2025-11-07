@@ -62,8 +62,8 @@ class PerformanceOptimizer {
 class PerformantWidget extends StatelessWidget {
 
   const PerformantWidget({
-    super.key,
     required this.child,
+    super.key,
     this.enableHardwareAcceleration = true,
     this.enableRepaintBoundary = true,
     this.enableAutomaticKeepAlive = false,
@@ -125,8 +125,8 @@ class _KeepAliveWrapperState extends State<_KeepAliveWrapper>
 class PerformantListView extends StatelessWidget {
 
   const PerformantListView({
-    super.key,
     required this.children,
+    super.key,
     this.controller,
     this.padding,
     this.shrinkWrap = false,
@@ -151,12 +151,10 @@ class PerformantListView extends StatelessWidget {
       itemExtent: itemExtent,
       addRepaintBoundaries: addRepaintBoundaries,
       itemCount: children.length,
-      itemBuilder: (context, index) {
-        return PerformantWidget(
-          enableRepaintBoundary: addRepaintBoundaries,
-          child: children[index],
-        );
-      },
+      itemBuilder: (context, index) => PerformantWidget(
+        enableRepaintBoundary: addRepaintBoundaries,
+        child: children[index],
+      ),
     );
 }
 
@@ -164,9 +162,9 @@ class PerformantListView extends StatelessWidget {
 class PerformantGridView extends StatelessWidget {
 
   const PerformantGridView({
-    super.key,
     required this.children,
     required this.gridDelegate,
+    super.key,
     this.controller,
     this.padding,
     this.shrinkWrap = false,
@@ -190,12 +188,10 @@ class PerformantGridView extends StatelessWidget {
       gridDelegate: gridDelegate,
       addRepaintBoundaries: addRepaintBoundaries,
       itemCount: children.length,
-      itemBuilder: (context, index) {
-        return PerformantWidget(
-          enableRepaintBoundary: addRepaintBoundaries,
-          child: children[index],
-        );
-      },
+      itemBuilder: (context, index) => PerformantWidget(
+        enableRepaintBoundary: addRepaintBoundaries,
+        child: children[index],
+      ),
     );
 }
 
@@ -203,8 +199,8 @@ class PerformantGridView extends StatelessWidget {
 class PerformantAnimation extends StatefulWidget {
 
   const PerformantAnimation({
-    super.key,
     required this.child,
+    super.key,
     this.duration = const Duration(milliseconds: 300),
     this.curve = Curves.easeInOut,
     this.controller,
@@ -348,8 +344,8 @@ class PerformanceMonitor {
 class GfPerformanceOverlay extends StatefulWidget {
 
   const GfPerformanceOverlay({
-    super.key,
     required this.child,
+    super.key,
     this.showInRelease = false,
   });
   final Widget child;
@@ -390,17 +386,21 @@ class _GfPerformanceOverlayState extends State<GfPerformanceOverlay> {
           right: 16,
           child: Container(
             padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.7),
-              borderRadius: BorderRadius.circular(8),
-            ),
+              decoration: BoxDecoration(
+                color: Colors.black.withValues(alpha: 0.7),
+                borderRadius: BorderRadius.circular(8),
+              ),
             child: StreamBuilder<void>(
               stream: Stream.periodic(const Duration(milliseconds: 500)),
               builder: (context, snapshot) {
                 final stats = PerformanceMonitor.stats;
+                final averageFps =
+                    (stats['averageFps'] as double?) ?? PerformanceMonitor.averageFps;
+                final isPerformanceGood =
+                    (stats['isPerformanceGood'] as bool?) ?? PerformanceMonitor.isPerformanceGood;
                 return Text(
-                  'FPS: ${stats['averageFps'].toStringAsFixed(1)}\n'
-                  'Status: ${stats['isPerformanceGood'] == true ? 'OK' : 'Degraded'}',
+                  'FPS: ${averageFps.toStringAsFixed(1)}\n'
+                  "Status: ${isPerformanceGood ? 'OK' : 'Degraded'}",
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 12,

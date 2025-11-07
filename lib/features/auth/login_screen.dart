@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:go_router/go_router.dart';
 import '../../services/auth_service.dart';
 import '../../core/routing/app_router.dart';
 import '../../core/routing/app_routes.dart';
@@ -120,8 +119,8 @@ class _LoginScreenState extends State<LoginScreen> {
         } catch (_) {
           if (!mounted) return;
           // Fallback seguro caso o GoRouter nao esteja pronto
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(
+          Navigator.of(context).pushReplacement<void, void>(
+            MaterialPageRoute<void>(
                 builder: (_) => const Scaffold(body: SizedBox.shrink())),
           );
         }

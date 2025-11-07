@@ -73,7 +73,7 @@ class EnvConfig {
     try {
       final uri = Uri.parse(url);
       return uri.hasScheme && uri.hasAuthority;
-    } catch (e) {
+    } on FormatException {
       return false;
     }
   }

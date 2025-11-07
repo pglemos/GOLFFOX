@@ -22,6 +22,20 @@ import { useOperatorTenant } from "@/components/providers/operator-tenant-provid
 
 export default function OperatorDashboard() {
   const router = useRouter()
+
+  // Limpar parâmetros indesejados da URL
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location.href)
+      
+      // Se tem parâmetro ?company=, redirecionar para URL limpa
+      if (url.searchParams.has('company')) {
+        console.log('⚠️ Removendo parâmetro ?company= da URL')
+        router.replace('/operator')
+        return
+      }
+    }
+  }, [])
   const { tenantCompanyId, companyName, loading: tenantLoading, error: tenantError } = useOperatorTenant()
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)

@@ -92,7 +92,7 @@ async function checkCompany() {
     console.log('═══════════════════════════════════════');
     console.log('\n🎉 TUDO PRONTO!\n');
     console.log('TESTE AGORA:');
-    console.log(`https://golffox.vercel.app/operator/funcionarios?company=${targetCompanyId}`);
+    console.log(`https://golffox.vercel.app/operator/funcionarios`);
     console.log('\n═══════════════════════════════════════\n');
 
   } catch (error) {

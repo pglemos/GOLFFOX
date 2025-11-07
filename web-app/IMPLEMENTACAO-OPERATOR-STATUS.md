@@ -128,7 +128,7 @@ node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
 - [ ] Fazer login como operador
 - [ ] Verificar se aparece o seletor de empresas no header
 - [ ] Testar troca de empresa
-- [ ] Verificar se URL atualiza com `?company=`
+- [ ] Verificar que a URL NÃO adiciona `?company=` (normalização ativa)
 - [ ] Verificar se localStorage persiste seleção
 
 #### Teste 2: Dashboard e KPIs

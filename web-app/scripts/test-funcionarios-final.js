@@ -168,7 +168,7 @@ async function test() {
     console.log(`   Email: ${operatorEmail}`)
     console.log(`   Senha: senha123`)
     console.log(`   Company ID: ${testCompanyId}`)
-    console.log(`   URL: https://golffox.vercel.app/operator/funcionarios?company=${testCompanyId}`)
+    console.log(`   URL: https://golffox.vercel.app/operator/funcionarios`)
     console.log('')
     console.log('📊 Status:')
     console.log(`   ✅ ${directQuery.rows.length} funcionários cadastrados`)

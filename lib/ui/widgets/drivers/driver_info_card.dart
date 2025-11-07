@@ -57,11 +57,10 @@ class DriverInfoCard extends StatelessWidget {
                       : _buildAlertBadge(
                           'Valida', const Color(GfTokens.colorSuccess)),
             ),
-            if (driver.license.issueDate != null)
-              _buildInfoRow(
-                'Data de Emissao',
-                DateFormat('dd/MM/yyyy').format(driver.license.issueDate!),
-              ),
+            _buildInfoRow(
+              'Data de Emissao',
+              DateFormat('dd/MM/yyyy').format(driver.license.issueDate),
+            ),
           ],
         ),
 

@@ -18,7 +18,10 @@ export function fitBoundsWithMargin(
 ): void {
   const b = bounds instanceof google.maps.LatLngBounds
     ? bounds
-    : new google.maps.LatLngBounds(bounds.southWest, bounds.northEast)
+    : new google.maps.LatLngBounds(
+        { lat: bounds.south, lng: bounds.west },
+        { lat: bounds.north, lng: bounds.east }
+      )
 
   map.fitBounds(b, {
     top: marginPixels,

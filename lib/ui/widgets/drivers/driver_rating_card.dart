@@ -418,21 +418,19 @@ class DriverRatingCard extends StatelessWidget {
                   color: const Color(GfTokens.colorOnSurfaceVariant),
                 ),
               ),
-              if (rating.tripId != null) ...[
-                const SizedBox(width: 16),
-                Icon(
-                  Icons.route,
-                  size: 14,
+              const SizedBox(width: 16),
+              Icon(
+                Icons.route,
+                size: 14,
+                color: const Color(GfTokens.colorOnSurfaceVariant),
+              ),
+              const SizedBox(width: 4),
+              Text(
+                'Viagem: ${rating.tripId}',
+                style: GfTextStyles.labelSmall.copyWith(
                   color: const Color(GfTokens.colorOnSurfaceVariant),
                 ),
-                const SizedBox(width: 4),
-                Text(
-                  'Viagem: ${rating.tripId}',
-                  style: GfTextStyles.labelSmall.copyWith(
-                    color: const Color(GfTokens.colorOnSurfaceVariant),
-                  ),
-                ),
-              ],
+              ),
             ],
           ),
         ],

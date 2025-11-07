@@ -152,6 +152,8 @@ function LoginContent() {
         } else {
           // Senão, redireciona baseado na role
           redirectUrl = `/${userRole}`
+          // Garantir que não adicione parâmetros indesejados
+          redirectUrl = redirectUrl.split('?')[0]
           console.log('🔄 Redirecionando para:', redirectUrl)
         }
 

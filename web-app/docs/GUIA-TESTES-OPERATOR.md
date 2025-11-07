@@ -29,7 +29,7 @@ Este guia fornece um checklist completo para testar todas as funcionalidades do 
 
 3. **Testar troca de empresa**
    - Selecione uma empresa diferente
-   - Verifique se a URL atualiza com `?company=`
+   - A URL NÃO deve adicionar `?company=` (middleware normaliza)
    - Verifique se o localStorage persiste a seleção
    - Recarregue a página e verifique se a seleção persiste
 
@@ -43,7 +43,7 @@ Este guia fornece um checklist completo para testar todas as funcionalidades do 
 ✅ Seletor aparece no header  
 ✅ Logo da empresa aparece  
 ✅ Troca de empresa funciona  
-✅ URL e localStorage atualizados  
+✅ localStorage atualizado (sem `?company=` na URL)  
 ✅ Branding aplicado corretamente
 
 ---

@@ -47,11 +47,14 @@ function LoginContent() {
         const nextUrl = searchParams.get('next')
         if (nextUrl) {
           // Se há um parâmetro next, redireciona para lá
-          router.push(decodeURIComponent(nextUrl))
+          const cleanNextUrl = decodeURIComponent(nextUrl).split('?')[0]
+          router.push(cleanNextUrl)
         } else {
           // Senão, redireciona baseado no role
           const userRole = session.user.user_metadata?.role || getUserRoleByEmail(session.user.email)
-          router.push(`/${userRole}`)
+          // Garantir URL limpa sem parâmetros
+          const cleanUrl = `/${userRole}`.split('?')[0]
+          router.push(cleanUrl)
         }
       }
     })
@@ -116,7 +119,10 @@ function LoginContent() {
       if (/^https?:\/\//i.test(decoded)) return null
       if (!decoded.startsWith('/')) return null
       const url = new URL(decoded, window.location.origin)
-      return url.pathname + (url.search || '') + (url.hash || '')
+      // Remover parâmetro ?company= se existir
+      url.searchParams.delete('company')
+      // Retornar apenas pathname (sem query params indesejados)
+      return url.pathname
     } catch {
       return null
     }
@@ -258,9 +264,14 @@ function LoginContent() {
           redirectUrl = safeNext
           console.log('🔄 Redirecionando para URL solicitada (validada):', redirectUrl)
         } else {
-          redirectUrl = AuthManager.getRedirectUrl(result.user.role)
+          // Redirecionar baseado na role - URL limpa sem parâmetros
+          const userRole = result.user.role || getUserRoleByEmail(result.user.email)
+          redirectUrl = `/${userRole}`
           console.log('🔄 Redirecionando baseado na role:', redirectUrl)
         }
+
+        // Garantir que redirectUrl não tenha parâmetros indesejados
+        redirectUrl = redirectUrl.split('?')[0]
 
         // Validação simples do token JWT antes do redirect
         try {
@@ -274,7 +285,7 @@ function LoginContent() {
         }
 
         // Navegação programática (Next router usa history.pushState sob o capô)
-        console.log('🚀 Executando redirecionamento suave...')
+        console.log('🚀 Executando redirecionamento suave para:', redirectUrl)
         router.push(redirectUrl)
       } else {
         console.error('❌ Erro de login:', result.error)

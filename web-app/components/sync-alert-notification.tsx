@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge'
 import { AlertTriangle, X } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState } from 'react'
-import Link from 'next/link'
+// Removido next/link para evitar erro de export
 
 export function SyncAlertNotification() {
   const { alerts, hasCriticalAlerts, unreadCount, markAsRead } = useSyncAlerts()

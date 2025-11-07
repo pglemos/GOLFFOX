@@ -36,7 +36,7 @@ class _PassengerDashboardState extends State<PassengerDashboard>
   bool _isLoading = true;
   String? _errorMessage;
   RealtimeChannel? _positionChannel;
-  StreamSubscription? _positionSubscription;
+  StreamSubscription<List<DriverPosition>>? _positionSubscription;
 
   // Shimmer
   late final AnimationController _shimmerCtrl =

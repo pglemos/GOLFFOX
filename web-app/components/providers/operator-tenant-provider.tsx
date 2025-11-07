@@ -56,7 +56,7 @@ function OperatorTenantProviderInner({ children }: { children: ReactNode }) {
         return
       }
 
-      const formattedCompanies = (data || []).map(c => ({
+      const formattedCompanies = ((data || []) as Array<any>).map((c: any) => ({
         id: c.id,
         name: c.name || c.branding_name || 'Empresa',
         logoUrl: c.logo_url || null
@@ -72,7 +72,7 @@ function OperatorTenantProviderInner({ children }: { children: ReactNode }) {
           : null
         const selectedId = urlCompanyId || storedCompanyId || formattedCompanies[0]?.id
 
-        const selectedCompany = formattedCompanies.find(c => c.id === selectedId) || formattedCompanies[0]
+        const selectedCompany = formattedCompanies.find((c: { id: string }) => c.id === selectedId) || formattedCompanies[0]
         
         if (selectedCompany) {
           console.log(`✅ Empresa selecionada: ${selectedCompany.name} (${selectedCompany.id})`)
@@ -137,7 +137,7 @@ function OperatorTenantProviderInner({ children }: { children: ReactNode }) {
       .select('primary_hex, accent_hex')
       .eq('company_id', companyId)
       .single()
-      .then(({ data }) => {
+      .then(({ data }: { data: any }) => {
         if (data) {
           setBrandTokens({
             primaryHex: data.primary_hex || '#F97316',
@@ -145,7 +145,7 @@ function OperatorTenantProviderInner({ children }: { children: ReactNode }) {
           })
         }
       })
-      .catch((err) => {
+      .catch((err: any) => {
         console.warn('Erro ao buscar branding:', err)
       })
   }, [companies, router])

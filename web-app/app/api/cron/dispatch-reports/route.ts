@@ -3,10 +3,16 @@ import { createClient } from '@supabase/supabase-js'
 import { Resend } from 'resend'
 import { alertCronFailure } from '@/lib/operational-alerts'
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE!
-)
+function getSupabaseAdmin() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE
+  if (!url || !serviceKey) {
+    throw new Error('Supabase não configurado: defina NEXT_PUBLIC_SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY')
+  }
+  return createClient(url, serviceKey, {
+    auth: { autoRefreshToken: false, persistSession: false }
+  })
+}
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null
 
@@ -17,6 +23,7 @@ const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KE
  */
 export async function GET(request: NextRequest) {
   try {
+    const supabase = getSupabaseAdmin()
     // Verificar se é uma requisição do cron (Vercel)
     const authHeader = request.headers.get('authorization')
     const cronSecret = process.env.CRON_SECRET

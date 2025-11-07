@@ -420,7 +420,7 @@ class _CreateRoutePageState extends ConsumerState<CreateRoutePage> {
 
   void _editStop(int index) {
     // Em uma implementacao real, isso abriria um dialogo para editar a parada
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Editar Parada'),

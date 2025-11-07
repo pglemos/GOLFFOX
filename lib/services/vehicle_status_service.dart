@@ -4,7 +4,6 @@ import 'package:flutter/foundation.dart';
 import '../models/vehicle_status.dart' as vs;
 import '../models/driver_position.dart';
 import '../models/garage.dart';
-import '../models/vehicle_position.dart';
 import 'supabase_service.dart';
 
 class VehicleStatusService extends ChangeNotifier {
@@ -21,7 +20,7 @@ class VehicleStatusService extends ChangeNotifier {
   Timer? _updateTimer;
 
   // Stream subscription para realtime
-  StreamSubscription? _realtimeSubscription;
+  StreamSubscription<List<Map<String, dynamic>>>? _realtimeSubscription;
 
   /// Obtem o status atual de um veiculo
   vs.VehicleStatus? getVehicleStatus(String vehicleId) => _vehicleStatuses[vehicleId];

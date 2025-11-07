@@ -214,7 +214,7 @@ async function fix() {
     console.log('\n✅ CORREÇÕES CONCLUÍDAS!\n')
     console.log('📋 Próximos passos:')
     console.log('   1. Acesse a aplicação como usuário operador')
-    console.log(`   2. URL: https://golffox.vercel.app/operator/funcionarios?company=${testCompanyId}`)
+    console.log(`   2. URL: https://golffox.vercel.app/operator/funcionarios`)
     console.log('   3. Verifique se os funcionários aparecem')
     console.log('   4. Verifique o console do navegador para logs de debug\n')
 

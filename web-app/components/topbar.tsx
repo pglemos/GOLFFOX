@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { default as Link } from "next/link"
+// Substituir Link por <a> para evitar erro de export do next/link
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import { 
@@ -212,10 +212,10 @@ export function Topbar({
             className="hidden xl:flex items-center gap-2 rounded-full border-[var(--border)] hover:bg-[var(--brand-light)] hover:text-[var(--brand)] hover:border-[var(--brand)] transition-all duration-200"
             asChild
           >
-            <Link href="/admin/preferences" prefetch={false}>
+            <a href="/admin/preferences">
               <Settings2 className="h-4 w-4" />
               Preferências
-            </Link>
+            </a>
           </Button>
           
           <Button
@@ -224,9 +224,9 @@ export function Topbar({
             className="xl:hidden hover:bg-[var(--bg-hover)]"
             asChild
           >
-            <Link href="/admin/preferences" prefetch={false}>
+            <a href="/admin/preferences">
               <Settings2 className="h-5 w-5" />
-            </Link>
+            </a>
           </Button>
 
           {/* User Menu */}

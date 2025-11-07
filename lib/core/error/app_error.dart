@@ -149,7 +149,8 @@ class ServerError extends AppError {
   }) : super(type: AppErrorType.serverError);
 
   @override
-  String get userMessage => 'Erro interno do servidor. Tente novamente mais tarde.';
+  String get userMessage =>
+      'Erro interno do servidor. Tente novamente mais tarde.';
 }
 
 /// Erro de timeout
@@ -162,7 +163,8 @@ class TimeoutError extends AppError {
   }) : super(type: AppErrorType.timeout);
 
   @override
-  String get userMessage => 'Operação demorou muito para responder. Tente novamente.';
+  String get userMessage =>
+      'Operação demorou muito para responder. Tente novamente.';
 }
 
 /// Erro de sistema de arquivos

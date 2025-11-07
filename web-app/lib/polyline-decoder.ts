@@ -20,18 +20,21 @@ export function decodePolylineAsync(
     // Criar worker se não existir
     if (!worker) {
       try {
-        // Usar blob URL para importar o worker
+        // Verificar suporte a Worker (SSR/Node não têm Worker)
+        if (typeof Worker === 'undefined') {
+          throw new Error('Web Worker não suportado neste ambiente')
+        }
+
+        // Usar blob URL para importar o worker com funções necessárias
         const workerCode = `
-          ${decodePolyline.toString()}
+          ${decodePolylineSync.toString()}
           ${simplifyPolyline.toString()}
-          ${perpendicularDistance.toString()}
-          ${douglasPeucker.toString()}
-          
+
           self.addEventListener('message', (event) => {
             const { type, encoded, id } = event.data
             if (type === 'decode') {
               try {
-                const points = decodePolyline(encoded)
+                const points = decodePolylineSync(encoded)
                 const simplified = points.length > 1000 ? simplifyPolyline(points, 0.0001) : points
                 self.postMessage({ type: 'decode_result', id, points: simplified })
               } catch (error) {

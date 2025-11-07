@@ -1,21 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../auth/auth_manager.dart';
-import '../services/logger_service.dart';
 import '../../domain/user_role.dart';
-import '../../models/user.dart' as app_user;
-import '../../services/supabase_service.dart';
-
-import '../../screens/operator/operator_dashboard.dart';
-import '../../screens/carrier/carrier_dashboard.dart';
-import '../../screens/driver/driver_dashboard.dart';
-import '../../screens/passenger/passenger_dashboard.dart';
 import '../../features/auth/login_screen.dart';
 import '../../features/dashboard/dashboard_page.dart' as admin;
-import '../config/supabase_config.dart';
-import 'route_guards.dart';
+import '../../models/user.dart' as app_user;
+import '../../screens/carrier/carrier_dashboard.dart';
+import '../../screens/driver/driver_dashboard.dart';
+import '../../screens/operator/operator_dashboard.dart';
+import '../../screens/passenger/passenger_dashboard.dart';
+import '../../services/supabase_service.dart';
+import '../auth/auth_manager.dart';
+import '../services/logger_service.dart';
 import 'app_routes.dart';
+import 'route_guards.dart';
 
 /// Modern role-based routing system for GolfFox
 ///
@@ -28,6 +26,7 @@ import 'app_routes.dart';
 class AppRouter {
   AppRouter._();
   static AppRouter? _instance;
+  // ignore: prefer_constructors_over_static_methods
   static AppRouter get instance => _instance ??= AppRouter._();
 
   final _logger = LoggerService.instance;
@@ -76,7 +75,7 @@ class AppRouter {
   /// Replace the current route
   void replace(String location, {Object? extra}) {
     _logger.debug('Replacing route with: $location');
-    _router.replace(location, extra: extra);
+    _router.replace<void>(location, extra: extra);
   }
 
   /// Navigate to home based on user role
@@ -302,9 +301,9 @@ class AppRouter {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  CircularProgressIndicator(),
-                  SizedBox(height: 16),
-                  Text('Carregando perfil do usuario...'),
+                  const CircularProgressIndicator(),
+                  const SizedBox(height: 16),
+                  const Text('Carregando perfil do usuario...'),
                 ],
               ),
             ),
@@ -316,25 +315,25 @@ class AppRouter {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.error_outline, size: 64, color: Colors.red),
-                  SizedBox(height: 16),
-                  Text(
+                  const Icon(Icons.error_outline, size: 64, color: Colors.red),
+                  const SizedBox(height: 16),
+                  const Text(
                     'Erro ao carregar perfil',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   Text(
                     '${snapshot.error}',
                     textAlign: TextAlign.center,
                     style: TextStyle(color: Colors.grey[600]),
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: () {
                       // Forca rebuild do FutureBuilder
                       (context as Element).markNeedsBuild();
                     },
-                    child: Text('Tentar novamente'),
+                    child: const Text('Tentar novamente'),
                   ),
                 ],
               ),
@@ -351,8 +350,6 @@ class AppRouter {
               email: 'golffox@admin.com',
               name: 'GolfFox Admin',
               role: 'operator',
-              companyId: null,
-              carrierId: null,
               createdAt: now,
               updatedAt: now,
             );
@@ -363,19 +360,19 @@ class AppRouter {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.person_off, size: 64, color: Colors.orange),
-                  SizedBox(height: 16),
-                  Text(
+                  const Icon(Icons.person_off, size: 64, color: Colors.orange),
+                  const SizedBox(height: 16),
+                  const Text(
                     'Perfil nao encontrado',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   Text(
                     'Nao foi possivel encontrar o perfil do usuario.',
                     textAlign: TextAlign.center,
                     style: TextStyle(color: Colors.grey[600]),
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: () {
                       (context as Element).markNeedsBuild();
@@ -392,7 +389,7 @@ class AppRouter {
     );
 
   Widget _buildUiCatalog() {
-    // TODO: Import and return actual UiCatalogPage
+    // TODO(golffox): Import and return actual UiCatalogPage
     return const Scaffold(
       body: Center(
         child: Text('UI Catalog - TODO'),

@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, Suspense } from "react"
 import { AppShell } from "@/components/app-shell"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -27,7 +27,7 @@ const isValidUUID = (id: string) => {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id)
 }
 
-export default function FuncionariosPage() {
+function FuncionariosPageContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const companyId = searchParams.get('company')
@@ -42,37 +42,18 @@ export default function FuncionariosPage() {
   useEffect(() => {
     const getUser = async () => {
       try {
-        console.log('🔐 Verificando sessão do usuário...')
-        const { data: { session }, error } = await supabase.auth.getSession()
-        
-        if (error) {
-          console.error('❌ Erro ao obter sessão:', error)
-          setUser({ id: 'guest', email: 'guest@demo.com' }) // Fallback para testar
-          return
-        }
-        
+        const { data: { session } } = await supabase.auth.getSession()
         if (!session) {
-          console.warn('⚠️  Sem sessão - redirecionando...')
           router.push("/")
           return
         }
-        
-        console.log('✅ Usuário autenticado:', session.user.email)
         setUser(session.user)
       } catch (err) {
-        console.error('❌ Erro ao obter usuário:', err)
-        // Fallback: permitir visualização mesmo sem auth (para debug)
-        setUser({ id: 'guest', email: 'guest@demo.com' })
+        console.error('Erro ao obter usuário:', err)
+        setError('Erro ao carregar dados do usuário')
       }
     }
-    
-    // Timeout de segurança
-    const timeout = setTimeout(() => {
-      console.warn('⚠️  Timeout ao carregar usuário - usando fallback')
-      setUser({ id: 'guest', email: 'guest@demo.com' })
-    }, 5000)
-    
-    getUser().finally(() => clearTimeout(timeout))
+    getUser()
   }, [router])
 
   // Carregar funcionários
@@ -132,17 +113,24 @@ export default function FuncionariosPage() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Carregando usuário...</p>
-          <p className="text-xs text-gray-400 mt-2">Se demorar muito, recarregue a página</p>
+          <p className="text-gray-600">Carregando...</p>
         </div>
       </div>
     )
   }
 
+  // Preparar user object com todas as propriedades necessárias
+  const userObj = {
+    id: user?.id || "guest",
+    name: user?.user_metadata?.name || user?.email?.split("@")[0] || "Usuário",
+    email: user?.email || "guest@demo.com",
+    role: "operator"
+  }
+
   // Se não tem company ID
   if (!companyId) {
     return (
-      <AppShell user={{ id: user?.id || "", email: user?.email || "", role: "operator" }}>
+      <AppShell user={userObj}>
         <div className="min-h-screen flex items-center justify-center p-4">
           <Card className="p-8 max-w-md w-full text-center">
             <AlertCircle className="h-12 w-12 text-yellow-500 mx-auto mb-4" />
@@ -162,7 +150,7 @@ export default function FuncionariosPage() {
   // Se tem erro
   if (error && !loading) {
     return (
-      <AppShell user={{ id: user?.id || "", email: user?.email || "", role: "operator" }}>
+      <AppShell user={userObj}>
         <div className="min-h-screen flex items-center justify-center p-4">
           <Card className="p-8 max-w-md w-full text-center">
             <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
@@ -191,7 +179,7 @@ export default function FuncionariosPage() {
   })
 
   return (
-    <AppShell user={{ id: user?.id || "", email: user?.email || "", role: "operator" }}>
+    <AppShell user={userObj}>
       <div className="space-y-6 p-6">
         {/* Header */}
         <div className="flex items-center justify-between flex-wrap gap-4">
@@ -292,5 +280,20 @@ export default function FuncionariosPage() {
         )}
       </div>
     </AppShell>
+  )
+}
+
+export default function FuncionariosPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Carregando...</p>
+        </div>
+      </div>
+    }>
+      <FuncionariosPageContent />
+    </Suspense>
   )
 }

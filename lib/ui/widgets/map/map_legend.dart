@@ -1,6 +1,5 @@
 // lib/ui/widgets/map/map_legend.dart
 import 'package:flutter/material.dart';
-import '../../../core/theme/gf_tokens.dart';
 import '../../../models/vehicle_status.dart' as vs;
 
 class MapLegend extends StatelessWidget {

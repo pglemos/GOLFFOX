@@ -189,8 +189,10 @@ Body: $sanitizedBody
   }
 
   /// Sanitiza dados removendo informações sensíveis
-  static dynamic _sanitizeData(data) {
-    if (data == null) return null;
+  static dynamic _sanitizeData(Object? data) {
+    if (data == null) {
+      return null;
+    }
 
     if (data is String) {
       return _sanitizeMessage(data);
@@ -296,9 +298,9 @@ Body: $sanitizedBody
       if (stackTrace != null) 'stackTrace': stackTrace.toString(),
     };
 
-    // TODO: Implementar envio para serviço externo
+    // TODO(golffox): Integrate with external logging service
     if (kDebugMode) {
-      print('📤 Would send to external service: $logData');
+      debugPrint('Would send to external service: $logData');
     }
   }
 

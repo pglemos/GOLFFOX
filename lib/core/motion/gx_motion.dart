@@ -1,6 +1,3 @@
-import 'dart:ui' show Offset;
-
-import 'package:flutter/animation.dart' show Curve, Curves;
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../theme/gf_tokens.dart';

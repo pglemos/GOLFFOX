@@ -113,12 +113,12 @@ class ResponsiveSystem {
 class ResponsiveWidget extends StatelessWidget {
 
   const ResponsiveWidget({
+    required this.fallback,
     super.key,
     this.mobile,
     this.tablet,
     this.desktop,
     this.largeDesktop,
-    required this.fallback,
   });
   final Widget? mobile;
   final Widget? tablet;
@@ -149,12 +149,12 @@ class ResponsiveWidget extends StatelessWidget {
 class ResponsiveGrid extends StatelessWidget {
 
   const ResponsiveGrid({
-    super.key,
     required this.children,
+    super.key,
     this.spacing = GfTokens.gap2,
     this.runSpacing = GfTokens.gap2,
     this.forceColumns,
-    this.childAspectRatio = 1.0,
+    this.childAspectRatio = 1,
   });
   final List<Widget> children;
   final double spacing;
@@ -173,7 +173,7 @@ class ResponsiveGrid extends StatelessWidget {
         crossAxisCount: columns,
         crossAxisSpacing: spacing,
         mainAxisSpacing: runSpacing,
-        childAspectRatio: childAspectRatio ?? 1.0,
+        childAspectRatio: childAspectRatio ?? 1,
       ),
       itemCount: children.length,
       itemBuilder: (context, index) => children[index],
@@ -185,8 +185,8 @@ class ResponsiveGrid extends StatelessWidget {
 class ResponsiveContainer extends StatelessWidget {
 
   const ResponsiveContainer({
-    super.key,
     required this.child,
+    super.key,
     this.padding,
     this.margin,
     this.width,
@@ -240,8 +240,8 @@ class ResponsiveContainer extends StatelessWidget {
 class ResponsiveWrap extends StatelessWidget {
 
   const ResponsiveWrap({
-    super.key,
     required this.children,
+    super.key,
     this.spacing = GfTokens.gap2,
     this.runSpacing = GfTokens.gap2,
     this.alignment = WrapAlignment.start,

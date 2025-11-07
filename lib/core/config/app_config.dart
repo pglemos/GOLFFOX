@@ -73,7 +73,7 @@ class AppConfig {
 
     if (missingConfigs.isNotEmpty) {
       if (debugMode) {
-        print('⚠️ Configurações ausentes: ${missingConfigs.join(', ')}');
+        debugPrint('⚠️ Configurações ausentes: ${missingConfigs.join(', ')}');
       }
       return false;
     }

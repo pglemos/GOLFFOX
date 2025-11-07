@@ -1,10 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+function getSupabaseAdmin() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE
+  if (!url || !serviceKey) {
+    throw new Error('Supabase não configurado: defina NEXT_PUBLIC_SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY')
+  }
+  return createClient(url, serviceKey, {
+    auth: { autoRefreshToken: false, persistSession: false }
+  })
+}
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY
 const SMTP_HOST = process.env.SMTP_HOST
@@ -145,6 +151,7 @@ async function sendEmailSMTP(
  */
 export async function POST(request: NextRequest) {
   try {
+    const supabase = getSupabaseAdmin()
     const body = await request.json()
     const { companyId, reportKey, format = 'csv' } = body
 
@@ -285,6 +292,7 @@ export async function POST(request: NextRequest) {
  */
 export async function GET(request: NextRequest) {
   try {
+    const supabase = getSupabaseAdmin()
     const { searchParams } = new URL(request.url)
     const companyId = searchParams.get('company_id')
 

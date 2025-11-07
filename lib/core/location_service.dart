@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
 
 class LocationService {
@@ -9,7 +10,7 @@ class LocationService {
 
   Future<Position?> getCurrentLocation() async {
     try {
-      var serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      final serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
         throw Exception('Serviço de localização desabilitado');
       }
@@ -27,10 +28,12 @@ class LocationService {
       }
 
       return await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+        ),
       );
-    } catch (e) {
-      print('Erro ao obter localização: $e');
+    } on Exception catch (e) {
+      debugPrint('Erro ao obter localização: $e');
       return null;
     }
   }

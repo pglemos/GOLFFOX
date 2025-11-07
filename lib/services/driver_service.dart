@@ -379,7 +379,7 @@ class DriverService extends StateNotifier<AsyncValue<List<Driver>>> {
   // Metodos publicos
   Future<void> refreshDrivers() async {
     state = const AsyncValue.loading();
-    await Future.delayed(const Duration(milliseconds: 500));
+    await Future<void>.delayed(const Duration(milliseconds: 500));
     _loadDrivers();
   }
 
@@ -468,7 +468,7 @@ class DriverService extends StateNotifier<AsyncValue<List<Driver>>> {
 
   // CRUD Operations
   Future<Driver?> getDriverById(String id) async {
-    await Future.delayed(const Duration(milliseconds: 100));
+    await Future<void>.delayed(const Duration(milliseconds: 100));
     try {
       return _drivers.firstWhere((driver) => driver.id == id);
     } catch (e) {
@@ -477,7 +477,7 @@ class DriverService extends StateNotifier<AsyncValue<List<Driver>>> {
   }
 
   Future<void> createDriver(Driver driver) async {
-    await Future.delayed(const Duration(milliseconds: 500));
+    await Future<void>.delayed(const Duration(milliseconds: 500));
     try {
       final newDriver = driver.copyWith(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
@@ -492,7 +492,7 @@ class DriverService extends StateNotifier<AsyncValue<List<Driver>>> {
   }
 
   Future<void> updateDriver(Driver driver) async {
-    await Future.delayed(const Duration(milliseconds: 500));
+    await Future<void>.delayed(const Duration(milliseconds: 500));
     try {
       final index = _drivers.indexWhere((d) => d.id == driver.id);
       if (index != -1) {
@@ -505,7 +505,7 @@ class DriverService extends StateNotifier<AsyncValue<List<Driver>>> {
   }
 
   Future<void> deleteDriver(String id) async {
-    await Future.delayed(const Duration(milliseconds: 500));
+    await Future<void>.delayed(const Duration(milliseconds: 500));
     try {
       _drivers.removeWhere((driver) => driver.id == id);
       _applyFilters();
@@ -515,7 +515,7 @@ class DriverService extends StateNotifier<AsyncValue<List<Driver>>> {
   }
 
   Future<void> updateDriverStatus(String id, DriverStatus status) async {
-    await Future.delayed(const Duration(milliseconds: 300));
+    await Future<void>.delayed(const Duration(milliseconds: 300));
     try {
       final index = _drivers.indexWhere((d) => d.id == id);
       if (index != -1) {
@@ -531,7 +531,7 @@ class DriverService extends StateNotifier<AsyncValue<List<Driver>>> {
   }
 
   Future<void> updateDriverOnlineStatus(String id, bool isOnline) async {
-    await Future.delayed(const Duration(milliseconds: 200));
+    await Future<void>.delayed(const Duration(milliseconds: 200));
     try {
       final index = _drivers.indexWhere((d) => d.id == id);
       if (index != -1) {
@@ -585,7 +585,7 @@ class DriverService extends StateNotifier<AsyncValue<List<Driver>>> {
   // Stream de motoristas
   Stream<List<Driver>> get driversStream async* {
     while (true) {
-      await Future.delayed(const Duration(seconds: 30));
+      await Future<void>.delayed(const Duration(seconds: 30));
       yield _drivers;
     }
   }

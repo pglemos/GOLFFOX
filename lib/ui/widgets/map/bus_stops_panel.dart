@@ -22,7 +22,7 @@ class BusStopsPanel extends StatefulWidget {
   final List<BusStop> busStops;
   final String? routeName;
   final VoidCallback? onClose;
-  final Function(BusStop)? onStopTap;
+  final ValueChanged<BusStop>? onStopTap;
 
   @override
   State<BusStopsPanel> createState() => _BusStopsPanelState();

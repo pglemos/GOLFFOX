@@ -16,13 +16,11 @@ void main() {
     late AuthService authService;
     late MockSupabaseService mockSupabaseService;
     late MockSupabaseClient mockSupabaseClient;
-    late MockGoTrueClient mockGoTrueClient;
     late BuildContext mockContext;
 
     setUp(() {
       mockSupabaseService = MockSupabaseService();
       mockSupabaseClient = MockSupabaseClient();
-      mockGoTrueClient = MockGoTrueClient();
       mockContext = MockBuildContext();
       
       authService = AuthService();
