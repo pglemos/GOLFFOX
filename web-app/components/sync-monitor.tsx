@@ -127,7 +127,7 @@ export function SyncMonitor() {
                   {status.failedCount} sincronização(ões) falharam
                 </div>
                 <div className="text-sm text-orange-700 dark:text-orange-300">
-                  Clique em "Reprocessar" para tentar novamente
+                  Clique em &quot;Reprocessar&quot; para tentar novamente
                 </div>
               </div>
               <Button

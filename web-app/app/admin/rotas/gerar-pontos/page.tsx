@@ -1,7 +1,8 @@
 import StopGenerator from '../../../../components/stop-generation/stop-generator'
 
-export default function Page({ searchParams }: { searchParams: Record<string, string | string[] | undefined> }) {
-  const rid = (searchParams?.routeId as string) || ''
+export default async function Page({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
+  const params = await searchParams
+  const rid = (params?.routeId as string) || ''
   return (
     <div style={{ padding: 16 }}>
       <h1>Gerador de Pontos da Rota</h1>

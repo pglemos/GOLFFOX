@@ -415,10 +415,12 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
         
         // Log de auditoria (não bloquear em caso de erro)
         try {
-          await auditLogs.create('vehicle', vehicleId, { 
-            plate: finalVehicleData.plate || '', 
-            model: finalVehicleData.model || '' 
-          })
+          if (vehicleId) {
+            await auditLogs.create('vehicle', vehicleId, { 
+              plate: finalVehicleData.plate || '', 
+              model: finalVehicleData.model || '' 
+            })
+          }
         } catch (auditError) {
           console.warn('⚠️ Erro ao registrar log de auditoria (não crítico):', auditError)
         }

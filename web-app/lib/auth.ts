@@ -42,7 +42,10 @@ export class AuthManager {
           const secureFlag = isSecure ? '; Secure' : ''
           document.cookie = `${this.COOKIE_NAME}=${cookieValue}; path=/; max-age=3600; SameSite=Lax${secureFlag}`
           
-          console.log('🍪 Cookie salvo:', this.COOKIE_NAME, 'Secure:', isSecure)
+          // ✅ Log apenas em desenvolvimento
+          if (process.env.NODE_ENV === 'development') {
+            console.log('🍪 Cookie salvo:', this.COOKIE_NAME, 'Secure:', isSecure)
+          }
         }
 
         return { success: true, user: userData }

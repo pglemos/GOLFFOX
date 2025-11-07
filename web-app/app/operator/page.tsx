@@ -279,7 +279,6 @@ export default function OperatorDashboard() {
             stoppedVehicles={controlTower.stoppedVehicles}
             routeDeviations={controlTower.routeDeviations}
             openAssistance={controlTower.openAssistance}
-            loading={false}
           />
         </div>
 

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseServiceRole } from '@/lib/supabase-server'
+import { requireCompanyAccess } from '@/lib/api-auth'
 import { z } from 'zod'
 
 const budgetSchema = z.object({
@@ -24,6 +25,12 @@ export async function GET(request: NextRequest) {
         { error: 'company_id é obrigatório' },
         { status: 400 }
       )
+    }
+
+    // ✅ Validar autenticação e acesso à empresa
+    const { user, error: authError } = await requireCompanyAccess(request, companyId)
+    if (authError) {
+      return authError
     }
 
     let query = supabaseServiceRole
@@ -70,6 +77,12 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
     const validated = budgetSchema.parse(body)
+
+    // ✅ Validar autenticação e acesso à empresa
+    const { user, error: authError } = await requireCompanyAccess(request, validated.company_id)
+    if (authError) {
+      return authError
+    }
 
     // Verificar se já existe orçamento para o mesmo período/categoria
     const { data: existing } = await supabaseServiceRole
@@ -138,6 +151,26 @@ export async function DELETE(request: NextRequest) {
         { error: 'id é obrigatório' },
         { status: 400 }
       )
+    }
+
+    // Buscar budget para obter company_id
+    const { data: budget, error: fetchError } = await supabaseServiceRole
+      .from('gf_budgets')
+      .select('company_id')
+      .eq('id', budgetId)
+      .single()
+
+    if (fetchError || !budget) {
+      return NextResponse.json(
+        { error: 'Orçamento não encontrado' },
+        { status: 404 }
+      )
+    }
+
+    // ✅ Validar autenticação e acesso à empresa
+    const { user, error: authError } = await requireCompanyAccess(request, budget.company_id)
+    if (authError) {
+      return authError
     }
 
     const { error } = await supabaseServiceRole

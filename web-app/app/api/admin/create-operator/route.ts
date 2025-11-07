@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { requireAuth } from '@/lib/api-auth'
 
 function getSupabaseAdmin() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -12,6 +13,12 @@ function getSupabaseAdmin() {
 
 export async function POST(request: NextRequest) {
   try {
+    // ✅ Validar autenticação (apenas admin)
+    const authErrorResponse = await requireAuth(request, 'admin')
+    if (authErrorResponse) {
+      return authErrorResponse
+    }
+
     const supabaseAdmin = getSupabaseAdmin()
     const body = await request.json()
     const { companyName, operatorEmail, operatorPhone } = body
@@ -64,7 +71,7 @@ export async function POST(request: NextRequest) {
                         "!@#"
 
     // Passo 4: Criar usuário no Supabase Auth
-    const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
+    const { data: authData, error: createUserError } = await supabaseAdmin.auth.admin.createUser({
       email: operatorEmail,
       password: tempPassword,
       email_confirm: true,
@@ -74,10 +81,10 @@ export async function POST(request: NextRequest) {
       }
     })
 
-    if (authError) {
+    if (createUserError) {
       // Rollback: deletar empresa criada
       await supabaseAdmin.from('companies').delete().eq('id', company.id)
-      throw authError
+      throw createUserError
     }
 
     if (!authData.user) {
