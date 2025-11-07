@@ -1848,27 +1848,7 @@ export function AdminMap({
         </>
       )}
 
-      {/* Toggle Heatmap */}
-      <TooltipProvider>
-        <div className="absolute top-20 right-6 z-20">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                size="sm"
-                variant={showHeatmap ? 'default' : 'outline'}
-                onClick={() => setShowHeatmap(!showHeatmap)}
-                className="bg-white shadow-lg hover:bg-[var(--bg-hover)]"
-              >
-                <Layers className="h-4 w-4 mr-2" />
-                Mapa de Calor
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Mostrar/Ocultar mapa de densidade de veículos (Atalho: H)</p>
-            </TooltipContent>
-          </Tooltip>
-        </div>
-      </TooltipProvider>
+      
 
       {/* Overlay de Loading */}
       {loading && (
