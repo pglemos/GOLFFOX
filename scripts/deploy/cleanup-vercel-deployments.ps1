@@ -25,7 +25,10 @@
 
 param(
   [int]$Days = 14,
-  [bool]$ActuallyDelete = $false
+  [bool]$ActuallyDelete = $false,
+  [string]$ProjectId,
+  [string]$TeamId,
+  [string]$TeamSlug
 )
 
 $ErrorActionPreference = 'Stop'
@@ -41,13 +44,13 @@ if (-not $token) {
   Write-Error "VERCEL_TOKEN ausente. Gere um token em https://vercel.com/account/tokens e exporte em VERCEL_TOKEN."; exit 1
 }
 
-$projectId = Get-Env 'VERCEL_PROJECT_ID'
+$projectId = if ($ProjectId) { $ProjectId.Trim() } else { Get-Env 'VERCEL_PROJECT_ID' }
 if (-not $projectId) {
-  Write-Error "VERCEL_PROJECT_ID ausente. Obtenha em Project Settings > General > Project ID e exporte em VERCEL_PROJECT_ID."; exit 1
+  Write-Error "ProjectId não informado. Passe -ProjectId ou exporte VERCEL_PROJECT_ID."; exit 1
 }
 
-$teamId = Get-Env 'VERCEL_TEAM_ID'
-$teamSlug = Get-Env 'VERCEL_TEAM_SLUG'
+$teamId = if ($TeamId) { $TeamId.Trim() } else { Get-Env 'VERCEL_TEAM_ID' }
+$teamSlug = if ($TeamSlug) { $TeamSlug.Trim() } else { Get-Env 'VERCEL_TEAM_SLUG' }
 
 $headers = @{ 'Authorization' = "Bearer $token" }
 
@@ -108,4 +111,3 @@ foreach ($dep in $deployments) {
 }
 
 Write-Host "Concluído. Total deletado: $deleted" -ForegroundColor Green
-
