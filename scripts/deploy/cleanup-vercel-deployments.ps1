@@ -16,7 +16,13 @@
    $env:VERCEL_TOKEN = "<token>"
    $env:VERCEL_PROJECT_ID = "<projectId>"
    # Opcional: $env:VERCEL_TEAM_ID = "team_..." OU $env:VERCEL_TEAM_SLUG = "my-team"
+   # Remoção por idade (preview):
    ./scripts/deploy/cleanup-vercel-deployments.ps1 -Days 21 -ActuallyDelete $true
+
+   # Remoção direta por IDs:
+   ./scripts/deploy/cleanup-vercel-deployments.ps1 -DeploymentIds BzpQC68k6,BLnqmn2Do -ActuallyDelete $true
+   # Para permitir apagar deployments de produção explicitamente:
+   ./scripts/deploy/cleanup-vercel-deployments.ps1 -DeploymentIds E9WL5b3nE -AllowProductionDeletion -ActuallyDelete $true
 
  .NOTES
    Endpoint de listar: https://api.vercel.com/v6/deployments
@@ -26,6 +32,8 @@
 param(
   [int]$Days = 14,
   [bool]$ActuallyDelete = $false,
+  [string[]]$DeploymentIds,
+  [switch]$AllowProductionDeletion,
   [string]$ProjectId,
   [string]$TeamId,
   [string]$TeamSlug
@@ -45,8 +53,8 @@ if (-not $token) {
 }
 
 $projectId = if ($ProjectId) { $ProjectId.Trim() } else { Get-Env 'VERCEL_PROJECT_ID' }
-if (-not $projectId) {
-  Write-Error "ProjectId não informado. Passe -ProjectId ou exporte VERCEL_PROJECT_ID."; exit 1
+if (-not $projectId -and (-not $DeploymentIds -or $DeploymentIds.Count -eq 0)) {
+  Write-Error "ProjectId não informado. Passe -ProjectId ou exporte VERCEL_PROJECT_ID, ou forneça -DeploymentIds para deleção direta."; exit 1
 }
 
 $teamId = if ($TeamId) { $TeamId.Trim() } else { Get-Env 'VERCEL_TEAM_ID' }
@@ -57,6 +65,61 @@ $headers = @{ 'Authorization' = "Bearer $token" }
 $teamQuery = ''
 if ($teamId) { $teamQuery = "&teamId=$teamId" }
 elseif ($teamSlug) { $teamQuery = "&slug=$teamSlug" }
+
+function Get-DeploymentById([string]$id) {
+  $url = "https://api.vercel.com/v13/deployments/$id"
+  if ($teamId) { $url = "$url?teamId=$teamId" }
+  elseif ($teamSlug) { $url = "$url?slug=$teamSlug" }
+  try {
+    return Invoke-RestMethod -Method Get -Uri $url -Headers $headers
+  } catch {
+    Write-Warning ("Falha ao obter detalhes de {0}: {1}" -f $id, $_.Exception.Message)
+    return $null
+  }
+}
+
+if ($DeploymentIds -and $DeploymentIds.Count -gt 0) {
+  Write-Host "Processando deleção direta de $($DeploymentIds.Count) deployment(s) por ID..." -ForegroundColor Cyan
+
+  $deleted = 0
+  foreach ($rawId in $DeploymentIds) {
+    $id = $rawId.Trim()
+    if (-not $id) { continue }
+
+    $details = Get-DeploymentById $id
+    $target = $details.target
+    $url = $details.url
+    if ($target -eq 'production' -and -not $AllowProductionDeletion) {
+      Write-Warning ("Ignorado {0}: alvo=production. Use -AllowProductionDeletion para apagar produção." -f $id)
+      continue
+    }
+
+    if (-not $ActuallyDelete) {
+      Write-Host ("Dry-run: removeria id={0} alvo={1} url={2}" -f $id, ($target ?? 'desconhecido'), ($url ?? 'n/d')) -ForegroundColor Yellow
+      continue
+    }
+
+    $delUrl = "https://api.vercel.com/v13/deployments/$id"
+    if ($teamId) { $delUrl = "$delUrl?teamId=$teamId" }
+    elseif ($teamSlug) { $delUrl = "$delUrl?slug=$teamSlug" }
+
+    try {
+      $null = Invoke-RestMethod -Method Delete -Uri $delUrl -Headers $headers
+      Write-Host "OK: deletado $id ($url)" -ForegroundColor Green
+      $deleted++
+    } catch {
+      Write-Warning ("Falha ao deletar {0}: {1}" -f $id, $_.Exception.Message)
+    }
+  }
+
+  if ($ActuallyDelete) {
+    Write-Host "Concluído. Total deletado: $deleted" -ForegroundColor Green
+  } else {
+    Write-Host "Dry-run concluído. Sem deleções executadas." -ForegroundColor Cyan
+  }
+
+  exit 0
+}
 
 Write-Host "Listando deployments de projeto $projectId (preview) com idade > $Days dias..." -ForegroundColor Cyan
 
@@ -106,7 +169,7 @@ foreach ($dep in $deployments) {
     Write-Host "OK: deletado $id ($($dep.url))" -ForegroundColor Green
     $deleted++
   } catch {
-    Write-Warning "Falha ao deletar $id: $($_.Exception.Message)"
+    Write-Warning ("Falha ao deletar {0}: {1}" -f $id, $_.Exception.Message)
   }
 }
 
