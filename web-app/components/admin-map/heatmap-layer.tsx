@@ -7,6 +7,7 @@
 
 import { useEffect, useRef } from 'react'
 import type { Vehicle } from './admin-map'
+import { warn } from '@/lib/logger'
 
 interface HeatmapLayerProps {
   map: google.maps.Map
@@ -31,7 +32,9 @@ export function HeatmapLayer({
   useEffect(() => {
     // Verificar se biblioteca visualization está disponível
     if (!window.google?.maps?.visualization) {
-      console.warn('Google Maps visualization library not loaded. Heatmap will not work.')
+      warn('Google Maps visualization library not loaded. Heatmap disabled.', {
+        component: 'HeatmapLayer',
+      })
       return
     }
 
@@ -45,8 +48,23 @@ export function HeatmapLayer({
       return
     }
 
+    // Filtrar veículos com coordenadas válidas
+    const validVehicles = vehicles.filter((v) => {
+      const isValid = Number.isFinite(v.lat) && Number.isFinite(v.lng) && v.lat >= -90 && v.lat <= 90 && v.lng >= -180 && v.lng <= 180
+      return isValid
+    })
+
+    if (validVehicles.length !== vehicles.length) {
+      warn('Alguns veículos possuem coordenadas inválidas e foram ignorados no heatmap.', {
+        component: 'HeatmapLayer',
+        total: vehicles.length,
+        valid: validVehicles.length,
+        invalid: vehicles.length - validVehicles.length,
+      })
+    }
+
     // Preparar dados para heatmap
-    const dataPoints: HeatmapDataPoint[] = vehicles.map((vehicle) => ({
+    const dataPoints: HeatmapDataPoint[] = validVehicles.map((vehicle) => ({
       location: new google.maps.LatLng(vehicle.lat, vehicle.lng),
       weight: 1, // Peso igual para cada veículo
     }))

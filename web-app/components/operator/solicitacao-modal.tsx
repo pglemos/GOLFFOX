@@ -7,7 +7,8 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { FileText, AlertCircle } from "lucide-react"
 import { supabase } from "@/lib/supabase"
-import toast from "react-hot-toast"
+import { notifySuccess, notifyError } from "@/lib/toast"
+import { formatError } from "@/lib/error-utils"
 import { error as logError } from "@/lib/logger"
 import { useState } from "react"
 
@@ -34,7 +35,7 @@ export function SolicitacaoModal({ isOpen, onClose, onSave, empresaId }: Solicit
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!tipo) {
-      toast.error("Selecione o tipo de solicitação")
+      notifyError("Selecione o tipo de solicitação")
       return
     }
 
@@ -49,7 +50,7 @@ export function SolicitacaoModal({ isOpen, onClose, onSave, empresaId }: Solicit
 
       if (error) throw error
 
-      toast.success("Solicitação criada com sucesso!")
+      notifySuccess("Solicitação criada com sucesso!")
       onSave()
       onClose()
       // Reset form
@@ -57,7 +58,7 @@ export function SolicitacaoModal({ isOpen, onClose, onSave, empresaId }: Solicit
       setPayload({})
     } catch (error: any) {
       logError("Erro ao criar solicitação", { error }, 'SolicitacaoModal')
-      toast.error(`Erro ao criar solicitação: ${error.message}`)
+      notifyError(formatError(error, "Erro ao criar solicitação"))
     } finally {
       setLoading(false)
     }

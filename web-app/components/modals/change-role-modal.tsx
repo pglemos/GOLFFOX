@@ -12,7 +12,8 @@ import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Shield, AlertTriangle } from "lucide-react"
 import { supabase } from "@/lib/supabase"
-import toast from "react-hot-toast"
+import { notifySuccess, notifyError } from "@/lib/toast"
+import { formatError } from "@/lib/error-utils"
 import { auditLogs } from "@/lib/audit-log"
 import { useSupabaseSync } from "@/hooks/use-supabase-sync"
 import {
@@ -58,7 +59,7 @@ export function ChangeRoleModal({
 
     try {
       if (!newRole || newRole === user.role) {
-        toast.error("Selecione um papel diferente")
+        notifyError("Selecione um papel diferente")
         return
       }
 
@@ -74,7 +75,7 @@ export function ChangeRoleModal({
           .single()
 
         if (currentUserData?.role !== 'admin') {
-          toast.error("Apenas administradores podem alterar o papel de outros administradores")
+          notifyError("Apenas administradores podem alterar o papel de outros administradores")
           return
         }
       }
@@ -105,12 +106,12 @@ export function ChangeRoleModal({
         user_email: user.email,
       })
 
-      toast.success("Papel alterado com sucesso!")
+      notifySuccess("Papel alterado com sucesso!")
       onSave()
       onClose()
     } catch (error: any) {
       console.error("Erro ao alterar papel:", error)
-      toast.error(error.message || "Erro ao alterar papel")
+      notifyError(formatError(error, "Erro ao alterar papel"))
     } finally {
       setLoading(false)
     }

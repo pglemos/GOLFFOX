@@ -11,6 +11,7 @@ import { calculateHeading } from '@/lib/map-utils'
 import type { Vehicle, RoutePolyline, Alert } from './admin-map'
 import type { HistoricalPosition } from '@/lib/playback-service'
 import { MarkerManager } from './marker-manager'
+import { debug, warn, error as logError } from '@/lib/logger'
 import { isValidPolyline, filterValidCoordinates, isValidCoordinate } from '@/lib/coordinate-validator'
 
 export interface HistoricalTrajectory {
@@ -83,14 +84,14 @@ export const MapLayers = memo(function MapLayers({
 
       // Validar polyline antes de renderizar
       if (!isValidPolyline(route.polyline_points)) {
-        console.warn(`Rota ${route.route_id} tem polyline inválido`)
+        warn(`Rota ${route.route_id} tem polyline inválido`, { route_id: route.route_id }, 'AdminMapLayers')
         return
       }
 
       // Filtrar e validar coordenadas
       const validPoints = filterValidCoordinates(route.polyline_points)
       if (validPoints.length < 2) {
-        console.warn(`Rota ${route.route_id} tem menos de 2 pontos válidos após filtragem`)
+        warn(`Rota ${route.route_id} tem menos de 2 pontos válidos após filtragem`, { route_id: route.route_id, points: validPoints.length }, 'AdminMapLayers')
         return
       }
 
@@ -101,7 +102,7 @@ export const MapLayers = memo(function MapLayers({
           try {
             return new google.maps.LatLng(p.lat, p.lng)
           } catch (error) {
-            console.error(`Erro ao criar LatLng para ponto:`, p, error)
+            logError('Erro ao criar LatLng para ponto', { point: p, error }, 'AdminMapLayers')
             return null
           }
         })
@@ -178,7 +179,7 @@ export const MapLayers = memo(function MapLayers({
       if (!isValidCoordinate(vehicle.lat, vehicle.lng)) {
         // Veículo sem coordenadas GPS - não criar marcador no mapa
         // Mas o veículo ainda estará disponível na lista de veículos
-        console.log(`ℹ️ Veículo ${vehicle.plate} (${vehicle.vehicle_id}) sem coordenadas GPS - não será exibido no mapa, mas estará na lista`)
+        debug('Veículo sem coordenadas GPS — exibido só na lista', { plate: vehicle.plate, vehicle_id: vehicle.vehicle_id }, 'AdminMapLayers')
         return
       }
 
@@ -242,7 +243,7 @@ export const MapLayers = memo(function MapLayers({
           markerManagerRef.current.addMarker(vehicle.vehicle_id, marker)
         }
       } catch (error) {
-        console.error(`Erro ao criar marcador para veículo ${vehicle.vehicle_id}:`, error)
+        logError('Erro ao criar marcador para veículo', { vehicle_id: vehicle.vehicle_id, error }, 'AdminMapLayers')
         return // Pular este veículo
       }
     })
@@ -274,7 +275,7 @@ export const MapLayers = memo(function MapLayers({
       
       // Validar coordenadas
       if (!isValidCoordinate(alert.lat, alert.lng)) {
-        console.warn(`Alerta ${alert.alert_id} tem coordenadas inválidas`)
+        warn(`Alerta ${alert.alert_id} tem coordenadas inválidas`, { alert_id: alert.alert_id, lat: alert.lat, lng: alert.lng }, 'AdminMapLayers')
         return
       }
 
@@ -347,7 +348,7 @@ export const MapLayers = memo(function MapLayers({
       // Validar e filtrar posições
       const validPositions = filterValidCoordinates(trajectory.positions)
       if (validPositions.length < 2) {
-        console.warn(`Trajetória ${trajectory.vehicle_id} tem menos de 2 posições válidas`)
+        warn(`Trajetória ${trajectory.vehicle_id} tem menos de 2 posições válidas`, { vehicle_id: trajectory.vehicle_id }, 'AdminMapLayers')
         return
       }
 
@@ -357,7 +358,7 @@ export const MapLayers = memo(function MapLayers({
           try {
             return new google.maps.LatLng(p.lat, p.lng)
           } catch (error) {
-            console.error('Erro ao criar LatLng para posição histórica:', p, error)
+            logError('Erro ao criar LatLng para posição histórica', { position: p, error }, 'AdminMapLayers')
             return null
           }
         })
@@ -398,7 +399,7 @@ export const MapLayers = memo(function MapLayers({
     filteredStops.forEach((stop) => {
       // Validar coordenadas da parada
       if (!isValidCoordinate(stop.lat, stop.lng)) {
-        console.warn(`Parada ${stop.id} tem coordenadas inválidas:`, stop.lat, stop.lng)
+        warn(`Parada ${stop.id} tem coordenadas inválidas`, { stop_id: stop.id, lat: stop.lat, lng: stop.lng }, 'AdminMapLayers')
         return
       }
       

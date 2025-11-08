@@ -9,8 +9,8 @@ import '../../../widgets/gx_card.dart';
 class DriverInfoCard extends StatelessWidget {
 
   const DriverInfoCard({
-    super.key,
     required this.driver,
+    super.key,
   });
   final Driver driver;
 
@@ -71,9 +71,8 @@ class DriverInfoCard extends StatelessWidget {
           _buildSection(
             title: 'Certificacoes',
             icon: Icons.verified,
-            children: driver.certifications.map((cert) {
-              return _buildCertificationItem(cert);
-            }).toList(),
+            children:
+                driver.certifications.map(_buildCertificationItem).toList(),
           ),
           const SizedBox(height: 24),
         ],
@@ -149,15 +148,17 @@ class DriverInfoCard extends StatelessWidget {
               Wrap(
                 spacing: 8,
                 runSpacing: 8,
-                children: driver.preferences.entries.map((entry) {
-                  return Chip(
-                    label: Text('${entry.key}: ${entry.value}'),
-                    backgroundColor: const Color(GfTokens.colorSurfaceVariant),
-                    labelStyle: GfTextStyles.labelSmall.copyWith(
-                      color: const Color(GfTokens.colorOnSurfaceVariant),
-                    ),
-                  );
-                }).toList(),
+                children: driver.preferences.entries
+                    .map((entry) => Chip(
+                          label: Text('${entry.key}: ${entry.value}'),
+                          backgroundColor:
+                              const Color(GfTokens.colorSurfaceVariant),
+                          labelStyle: GfTextStyles.labelSmall.copyWith(
+                            color:
+                                const Color(GfTokens.colorOnSurfaceVariant),
+                          ),
+                        ))
+                    .toList(),
               ),
             ],
           ],

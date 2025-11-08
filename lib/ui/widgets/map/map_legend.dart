@@ -1,14 +1,15 @@
 // lib/ui/widgets/map/map_legend.dart
 import 'package:flutter/material.dart';
+
 import '../../../models/vehicle_status.dart' as vs;
 
 class MapLegend extends StatelessWidget {
 
   const MapLegend({
-    super.key,
     this.isExpanded = true,
     this.onToggle,
     this.statusCounts,
+    super.key,
   });
   final bool isExpanded;
   final VoidCallback? onToggle;
@@ -98,8 +99,7 @@ class MapLegend extends StatelessWidget {
           const SizedBox(height: 8),
 
           // Lista de status
-          ...vs.VehicleStatusType.values
-              .map((status) => _buildStatusItem(status)),
+          ...vs.VehicleStatusType.values.map(_buildStatusItem),
 
           const SizedBox(height: 12),
           const Divider(height: 1, color: Color(0xFFE5E7EB)),
@@ -165,7 +165,7 @@ class MapLegend extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               decoration: BoxDecoration(
-                color: status.color.withOpacity(0.1),
+                color: status.color.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
@@ -212,9 +212,9 @@ class MapLegend extends StatelessWidget {
 class CompactMapLegend extends StatelessWidget {
 
   const CompactMapLegend({
-    super.key,
     this.onExpand,
     this.statusCounts,
+    super.key,
   });
   final VoidCallback? onExpand;
   final Map<vs.VehicleStatusType, int>? statusCounts;

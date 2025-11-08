@@ -23,7 +23,9 @@ import {
   Navigation
 } from "lucide-react"
 import { supabase } from "@/lib/supabase"
-import toast from "react-hot-toast"
+import { notifySuccess, notifyError } from "@/lib/toast"
+import { formatError } from "@/lib/error-utils"
+import { t } from "@/lib/i18n"
 import { auditLogs } from "@/lib/audit-log"
 import { useSupabaseSync } from "@/hooks/use-supabase-sync"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -143,13 +145,13 @@ export function RouteModal({
       setCompanies(data || [])
     } catch (error: any) {
       console.error('Erro ao carregar empresas:', error)
-      toast.error('Erro ao carregar empresas')
+      notifyError(error, t('common', 'errors.loadCompanies'))
     }
   }
 
   const handleSave = async () => {
     if (!formData.name || !formData.company_id) {
-      toast.error('Preencha nome e empresa')
+      notifyError('', undefined, { i18n: { ns: 'common', key: 'validation.fillNameCompany' } })
       return
     }
 
@@ -181,7 +183,7 @@ export function RouteModal({
           .eq('id', route.id)
 
         if (error) throw error
-        toast.success('Rota atualizada com sucesso!')
+        notifySuccess('', { i18n: { ns: 'common', key: 'success.routeUpdated' } })
 
         // Sincronização e auditoria para update
         await sync({
@@ -222,7 +224,7 @@ export function RouteModal({
       onClose()
     } catch (error: any) {
       console.error('Erro ao salvar rota:', error)
-      toast.error(`Erro ao salvar: ${error.message}`)
+      notifyError(error, t('common', 'errors.saveRoute'))
     } finally {
       setLoading(false)
     }
@@ -230,7 +232,7 @@ export function RouteModal({
 
   const handleGenerateStops = async () => {
     if (!route?.id && !formData.id) {
-      toast.error('Salve a rota antes de gerar pontos')
+      notifyError('', undefined, { i18n: { ns: 'common', key: 'validation.saveRouteFirst' } })
       return
     }
 
@@ -253,11 +255,11 @@ export function RouteModal({
       })
       const data = await resp.json()
       if (!resp.ok) throw new Error(data?.error || 'Falha ao gerar pontos')
-      toast.success('Pontos gerados e salvos com sucesso!')
+      notifySuccess('', { i18n: { ns: 'common', key: 'success.pointsGeneratedSaved' } })
       if (onGenerateStops) await onGenerateStops(routeId)
     } catch (error: any) {
       console.error('Erro ao gerar pontos:', error)
-      toast.error(`Erro ao gerar pontos: ${error.message}`)
+      notifyError(error, t('common', 'errors.generatePoints'))
     } finally {
       setGeneratingStops(false)
     }
@@ -265,7 +267,7 @@ export function RouteModal({
 
   const handleOptimize = async () => {
     if (!route?.id && !formData.id) {
-      toast.error('Salve a rota antes de otimizar')
+      notifyError('', undefined, { i18n: { ns: 'common', key: 'validation.saveRouteBeforeOptimize' } })
       return
     }
 
@@ -283,14 +285,14 @@ export function RouteModal({
         throw new Error(error.message || 'Erro ao otimizar rota')
       }
 
-      toast.success('Rota otimizada com sucesso!')
+      notifySuccess('', { i18n: { ns: 'common', key: 'success.routeOptimized' } })
       
       if (onOptimize) {
         await onOptimize(routeId)
       }
     } catch (error: any) {
       console.error('Erro ao otimizar rota:', error)
-      toast.error(`Erro ao otimizar: ${error.message}`)
+      notifyError(error, t('common', 'errors.optimizeRoute'))
     } finally {
       setOptimizing(false)
     }
@@ -333,7 +335,7 @@ export function RouteModal({
       scheduled = setTimeout(async () => {
         try {
           if (onGenerateStops) await onGenerateStops(routeId)
-          toast.success('Plano de rota atualizado')
+          notifySuccess('', { i18n: { ns: 'common', key: 'success.routePlanUpdated' } })
         } catch (e) {
           // silencioso
         }

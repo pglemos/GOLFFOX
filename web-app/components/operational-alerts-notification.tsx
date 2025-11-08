@@ -19,7 +19,7 @@ import {
 import { getUnresolvedAlerts, resolveAlert, type OperationalAlert } from '@/lib/operational-alerts'
 import { supabase } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
-import toast from 'react-hot-toast'
+import { notifySuccess, notifyError } from '@/lib/toast'
 
 export function OperationalAlertsNotification() {
   const [alerts, setAlerts] = useState<any[]>([])
@@ -83,15 +83,15 @@ export function OperationalAlertsNotification() {
     try {
       const { data: { session } } = await supabase.auth.getSession()
       if (!session) {
-        toast.error('Usuário não autenticado')
+        notifyError('Usuário não autenticado', undefined, { i18n: { ns: 'common', key: 'errors.authRequired' } })
         return
       }
       await resolveAlert(alertId, `Resolvido por ${session.user.email}`)
       await loadAlerts()
-      toast.success('Alerta resolvido')
+      notifySuccess('', { i18n: { ns: 'common', key: 'success.alertResolved' } })
     } catch (error: any) {
       console.error('Erro ao resolver alerta:', error)
-      toast.error(`Erro: ${error.message}`)
+      notifyError('Erro ao resolver alerta', undefined, { i18n: { ns: 'common', key: 'errors.resolveAlert' } })
     }
   }
 

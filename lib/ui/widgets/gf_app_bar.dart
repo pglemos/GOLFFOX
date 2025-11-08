@@ -4,8 +4,8 @@ import '../../core/theme/unified_theme.dart';
 class GfAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   const GfAppBar({
-    super.key,
     required this.title,
+    super.key,
     this.actions,
     this.leading,
     this.automaticallyImplyLeading = true,

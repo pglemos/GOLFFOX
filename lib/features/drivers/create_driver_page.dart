@@ -8,9 +8,11 @@ import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/services/error_service.dart';
 import '../../core/theme/gf_tokens.dart';
 import '../../models/driver.dart';
 import '../../services/driver_service.dart';
+import '../../ui/widgets/alert_banner.dart';
 import '../../ui/widgets/common/gf_app_bar.dart';
 
 class CreateDriverPage extends ConsumerStatefulWidget {
@@ -52,6 +54,7 @@ class _CreateDriverPageState extends ConsumerState<CreateDriverPage> {
   bool _isAvailable = true;
   String? _photoUrl;
   List<DriverCertification> _certifications = [];
+  GxError? _pageError;
 
   @override
   void initState() {
@@ -132,6 +135,20 @@ class _CreateDriverPageState extends ConsumerState<CreateDriverPage> {
       ),
       body: Column(
         children: [
+          if (_pageError != null)
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: GfTokens.spacingMd,
+                vertical: GfTokens.spacingSm,
+              ),
+              child: GfAlertBanner.fromError(
+                error: _pageError!,
+                actionText: 'Fechar',
+                onActionTap: () => setState(() => _pageError = null),
+                isDismissible: true,
+                onDismiss: () => setState(() => _pageError = null),
+              ),
+            ),
           // Indicador de progresso
           Container(
             padding: const EdgeInsets.all(GfTokens.spacingMd),
@@ -1013,12 +1030,14 @@ class _CreateDriverPageState extends ConsumerState<CreateDriverPage> {
   }
 
   void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: const Color(GfTokens.colorError),
-      ),
-    );
+    setState(() {
+      _pageError = GxError(
+        code: 'form.validation',
+        message: message,
+        userMessage: message,
+        severity: ErrorSeverity.warning,
+      );
+    });
   }
 
   void _showSuccess(String message) {

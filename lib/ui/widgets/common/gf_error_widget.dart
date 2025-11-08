@@ -4,16 +4,31 @@
 // ========================================
 
 import 'package:flutter/material.dart';
+
+import '../../../core/services/error_service.dart';
 import '../../../core/theme/gf_tokens.dart';
 
 class GfErrorWidget extends StatelessWidget {
 
   const GfErrorWidget({
-    super.key,
     required this.message,
+    super.key,
     this.onRetry,
     this.icon,
   });
+  /// Fábrica para criar a partir de um erro, usando mensagens amigáveis
+  factory GfErrorWidget.fromError({
+    required Object error,
+    Key? key,
+    VoidCallback? onRetry,
+    IconData? icon,
+  }) => GfErrorWidget(
+        key: key,
+        message: ErrorService.instance.getUserFriendlyMessage(error),
+        onRetry: onRetry,
+        icon: icon,
+      );
+
   final String message;
   final VoidCallback? onRetry;
   final IconData? icon;

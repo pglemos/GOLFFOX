@@ -14,7 +14,9 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Truck, Upload, X, Calendar, Wrench, ClipboardCheck } from "lucide-react"
 import { supabase } from "@/lib/supabase"
-import toast from "react-hot-toast"
+import { notifySuccess, notifyError } from "@/lib/toast"
+import { t } from "@/lib/i18n"
+import { formatError } from "@/lib/error-utils"
 import { auditLogs } from "@/lib/audit-log"
 import { useSupabaseSync } from "@/hooks/use-supabase-sync"
 
@@ -105,7 +107,7 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
     const file = e.target.files?.[0]
     if (file) {
       if (file.size > 5 * 1024 * 1024) {
-        toast.error("Arquivo muito grande. Máximo 5MB")
+        notifyError("Arquivo muito grande. Máximo 5MB", undefined, { i18n: { ns: 'common', key: 'validation.fileTooLarge' } })
         return
       }
       setPhotoFile(file)
@@ -141,7 +143,7 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
       return data.publicUrl
     } catch (error: any) {
       console.error("Erro ao fazer upload:", error)
-      toast.error("Erro ao fazer upload da foto")
+      notifyError(formatError(error, "Erro ao fazer upload da foto"))
       return null
     }
   }
@@ -356,7 +358,7 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
         }
         
         console.log('✅ Veículo atualizado com sucesso:', data)
-        toast.success("Veículo atualizado com sucesso!")
+        notifySuccess(t('common', 'success.vehicleUpdated'))
         
         // Log de auditoria (não bloquear em caso de erro)
         try {
@@ -411,7 +413,7 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
           }
         }
 
-        toast.success("Veículo cadastrado com sucesso!")
+        notifySuccess(t('common', 'success.vehicleCreated'))
         
         // Log de auditoria (não bloquear em caso de erro)
         try {
@@ -452,7 +454,7 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
         name: error?.name
       })
       
-      toast.error(errorMessage, {
+      notifyError(formatError(error, errorMessage), undefined, {
         duration: 5000,
         style: {
           background: '#ef4444',

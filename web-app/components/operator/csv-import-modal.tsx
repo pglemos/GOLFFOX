@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Upload, FileSpreadsheet, AlertCircle, CheckCircle2 } from "lucide-react"
 import { supabase } from "@/lib/supabase"
-import toast from "react-hot-toast"
+import { notifySuccess, notifyError, notifyInfo, notifyWarning } from "@/lib/toast"
 import { useState, useRef } from "react"
 import { warn, error as logError } from "@/lib/logger"
 
@@ -125,12 +125,12 @@ export function CSVImportModal({ isOpen, onClose, onSave, empresaId }: CSVImport
     if (!file) return
 
     if (!parseCSV || !geocodeBatch || !importEmployees) {
-      toast.error('Funcionalidade de importação CSV não disponível. Verifique se o módulo está instalado.')
+      notifyError('', undefined, { i18n: { ns: 'operator', key: 'csv_import.error', params: { message: 'Funcionalidade de importação CSV não disponível. Verifique se o módulo está instalado.' } } })
       return
     }
 
     if (!empresaId) {
-      toast.error('Empresa não selecionada')
+      notifyError('', undefined, { i18n: { ns: 'operator', key: 'csv_import.error', params: { message: 'Empresa não selecionada' } } })
       return
     }
 
@@ -143,7 +143,7 @@ export function CSVImportModal({ isOpen, onClose, onSave, empresaId }: CSVImport
       const parseResult = await parseCSV(file) as ParseResult
 
       if (!parseResult || parseResult.valid.length === 0) {
-        toast.error("Nenhum funcionário válido para importar")
+        notifyError('', undefined, { i18n: { ns: 'operator', key: 'csv_import.error', params: { message: 'Nenhum funcionário válido para importar' } } })
         setImporting(false)
         return
       }
@@ -175,15 +175,15 @@ export function CSVImportModal({ isOpen, onClose, onSave, empresaId }: CSVImport
       setImportResult(result)
 
       if (result.unresolvedAddresses && result.unresolvedAddresses.length > 0) {
-        toast(`Importação concluída: ${result.success} sucessos, ${result.errors?.length || 0} erros, ${result.unresolvedAddresses.length} endereços não resolvidos`)
+        notifyWarning('', { i18n: { ns: 'operator', key: 'csv_import.summary', params: { success: result.success, errorsSuffix: result.errors && result.errors.length > 0 ? `, ${result.errors.length} erros` : '', unresolvedSuffix: `, ${result.unresolvedAddresses.length} ${operatorI18n.csv_import?.unresolved_addresses || 'Endereços não resolvidos'}` } } })
       } else {
-        toast.success(`Importação concluída: ${result.success} sucessos${result.errors && result.errors.length > 0 ? `, ${result.errors.length} erros` : ''}`)
+        notifySuccess('', { i18n: { ns: 'operator', key: 'csv_import.summary', params: { success: result.success, errorsSuffix: result.errors && result.errors.length > 0 ? `, ${result.errors.length} erros` : '', unresolvedSuffix: '' } } })
       }
 
       onSave()
     } catch (error: any) {
       logError("Erro na importação", { error }, 'CSVImportModal')
-      toast.error(`Erro na importação: ${error.message || 'Erro desconhecido'}`)
+      notifyError('', undefined, { i18n: { ns: 'operator', key: 'csv_import.error', params: { message: error?.message || 'Erro desconhecido' } } })
     } finally {
       setImporting(false)
     }

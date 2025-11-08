@@ -3,13 +3,14 @@
 // Widget de escala no hover
 // ========================================
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 class GfHoverScale extends StatefulWidget {
 
   const GfHoverScale({
-    super.key,
     required this.child,
+    super.key,
     this.scale = 1.05,
     this.duration = const Duration(milliseconds: 200),
     this.onTap,
@@ -51,14 +52,14 @@ class _GfHoverScaleState extends State<GfHoverScale>
     super.dispose();
   }
 
-  void _onEnter() {
+  void _onEnter(PointerEnterEvent event) {
     if (!_isHovered) {
       _isHovered = true;
       _controller.forward();
     }
   }
 
-  void _onExit() {
+  void _onExit(PointerExitEvent event) {
     if (_isHovered) {
       _isHovered = false;
       _controller.reverse();
@@ -67,18 +68,16 @@ class _GfHoverScaleState extends State<GfHoverScale>
 
   @override
   Widget build(BuildContext context) => MouseRegion(
-      onEnter: (_) => _onEnter(),
-      onExit: (_) => _onExit(),
+      onEnter: _onEnter,
+      onExit: _onExit,
       child: GestureDetector(
         onTap: widget.onTap,
         child: AnimatedBuilder(
           animation: _scaleAnimation,
-          builder: (context, child) {
-            return Transform.scale(
-              scale: _scaleAnimation.value,
-              child: widget.child,
-            );
-          },
+          builder: (context, child) => Transform.scale(
+            scale: _scaleAnimation.value,
+            child: widget.child,
+          ),
         ),
       ),
     );

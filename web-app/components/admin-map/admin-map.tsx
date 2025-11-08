@@ -13,7 +13,7 @@ import { fitBoundsWithMargin, createBoundsFromPositions } from '@/lib/map-utils'
 import { getMapsBillingMonitor } from '@/lib/maps-billing-monitor'
 import { detectRouteDeviation, type RoutePolylinePoint } from '@/lib/route-deviation-detector'
 import { createAlert } from '@/lib/operational-alerts'
-import { analyzeTrajectory, type PlannedRoutePoint, type ActualPosition } from '@/lib/trajectory-analyzer'
+import { analyzeTrajectory, type PlannedRoutePoint, type ActualPosition, type TrajectoryAnalysis } from '@/lib/trajectory-analyzer'
 import { 
   isValidCoordinate, 
   isValidPolyline, 
@@ -42,8 +42,9 @@ import { supabase } from '@/lib/supabase'
 import { motion, AnimatePresence } from 'framer-motion'
 import { modalContent } from '@/lib/animations'
 import { MarkerClusterer } from '@googlemaps/markerclusterer'
-import toast from 'react-hot-toast'
+import { notifySuccess, notifyError } from '@/lib/toast'
 import { debug, warn, error as logError } from '@/lib/logger'
+import { formatError, getErrorMeta } from '@/lib/error-utils'
 
 declare global {
   interface Window {
@@ -157,10 +158,10 @@ export function AdminMap({
   const [playbackFrom, setPlaybackFrom] = useState<Date>(new Date(Date.now() - 2 * 60 * 60 * 1000)) // Últimas 2h
   const [playbackTo, setPlaybackTo] = useState<Date>(new Date())
   const [playbackSpeed, setPlaybackSpeed] = useState<1 | 2 | 4>(1)
-  const [historicalPositions, setHistoricalPositions] = useState<Map<string, any>>(new Map())
+  // Removido estado não utilizado historicalPositions
   const [showHeatmap, setShowHeatmap] = useState(false)
   const [showTrajectoryAnalysis, setShowTrajectoryAnalysis] = useState(false)
-  const [trajectoryAnalysis, setTrajectoryAnalysis] = useState<any>(null)
+  const [trajectoryAnalysis, setTrajectoryAnalysis] = useState<TrajectoryAnalysis | null>(null)
   const [notifiedDeviations, setNotifiedDeviations] = useState<Set<string>>(new Set())
   
   // Filtros
@@ -518,12 +519,7 @@ export function AdminMap({
       
       // Log detalhado para debug
       if (vehiclesError) {
-        logError('Erro na query de veículos', {
-          message: vehiclesError.message,
-          code: vehiclesError.code,
-          details: vehiclesError.details,
-          hint: vehiclesError.hint
-        })
+        logError('Erro na query de veículos', getErrorMeta(vehiclesError))
         
         // Se erro for sobre coluna inexistente, tentar query sem colunas problemáticas
         if (vehiclesError.message?.includes('column') || vehiclesError.message?.includes('does not exist')) {
@@ -777,13 +773,13 @@ export function AdminMap({
         }, 'AdminMap')
         
         if (withCoords === 0 && processedVehicles.length > 0) {
-          toast.success(`${processedVehicles.length} veículo(s) ativo(s) encontrado(s), mas nenhum tem posição GPS recente.`, {
+          notifySuccess(`${processedVehicles.length} veículo(s) ativo(s) encontrado(s), mas nenhum tem posição GPS recente.`, {
             duration: 5000
           })
         }
       } else if (vehiclesError) {
         logError('Erro ao carregar veículos', { error: vehiclesError }, 'AdminMap')
-        toast.error(`Erro ao carregar veículos: ${vehiclesError.message || 'Erro desconhecido'}`)
+        notifyError(vehiclesError, 'Erro ao carregar veículos')
       } else {
         // Nenhum dado retornado e nenhum erro - verificar se há veículos ativos sem filtros
         debug('Nenhum veículo retornado da query (sem erro) - verificando se há veículos ativos sem filtros', {}, 'AdminMap')
@@ -845,7 +841,7 @@ export function AdminMap({
         } catch (error: any) {
           // Se erro for sobre coluna inexistente, ignorar silenciosamente
           if (error?.message?.includes('does not exist') || error?.message?.includes('column')) {
-            console.warn('Erro ao carregar incidentes (coluna inexistente), continuando sem incidentes:', error.message)
+            warn('Erro ao carregar incidentes (coluna inexistente), continuando sem incidentes', { message: error.message }, 'AdminMap')
             incidentsError = null
             incidentsData = []
           } else {
@@ -855,7 +851,7 @@ export function AdminMap({
 
         // Se a tabela gf_incidents não estiver no cache, seguir sem incidentes
         if (incidentsError && isMissingTableError(incidentsError, 'gf_incidents')) {
-          console.warn('Tabela gf_incidents ausente no schema cache — seguindo sem incidentes (aplicar migration v43_admin_core).')
+          warn('Tabela gf_incidents ausente no schema cache — seguindo sem incidentes (aplicar migration v43_admin_core).', undefined, 'AdminMap')
           incidentsError = null
           incidentsData = []
         }
@@ -882,7 +878,7 @@ export function AdminMap({
         } catch (error: any) {
           // Se erro for sobre coluna inexistente, ignorar silenciosamente
           if (error?.message?.includes('does not exist') || error?.message?.includes('column')) {
-            console.warn('Erro ao carregar assistência (coluna inexistente), continuando sem assistência:', error.message)
+            warn('Erro ao carregar assistência (coluna inexistente), continuando sem assistência', { message: error.message }, 'AdminMap')
             assistanceError = null
             assistanceData = []
           } else {
@@ -892,7 +888,7 @@ export function AdminMap({
 
         // Se a tabela gf_service_requests estiver ausente, seguir sem assistência
         if (assistanceError && isMissingTableError(assistanceError, 'gf_service_requests')) {
-          console.warn('Tabela gf_service_requests ausente no schema cache — seguindo sem assistência (aplicar migrations operador).')
+          warn('Tabela gf_service_requests ausente no schema cache — seguindo sem assistência (aplicar migrations operador).', undefined, 'AdminMap')
           assistanceError = null
           assistanceData = []
         }
@@ -939,7 +935,7 @@ export function AdminMap({
           const validAlerts = combinedAlerts.filter((a: any) => {
             if (a.lat !== undefined && a.lng !== undefined && a.lat !== null && a.lng !== null) {
               if (!isValidCoordinate(a.lat, a.lng)) {
-                console.warn(`Alerta ${a.alert_id} tem coordenadas inválidas`)
+                warn(`Alerta ${a.alert_id} tem coordenadas inválidas`, { lat: a.lat, lng: a.lng }, 'AdminMap')
                 return false
               }
 
@@ -959,7 +955,7 @@ export function AdminMap({
       }
 
       if (alertsErrorMsg) {
-        console.error('Erro ao carregar alertas:', alertsErrorMsg)
+        logError('Erro ao carregar alertas', { message: alertsErrorMsg }, 'AdminMap')
       }
       */
 
@@ -996,7 +992,7 @@ export function AdminMap({
         }
       }
     } catch (error) {
-      console.error('Erro ao carregar dados iniciais:', error)
+      logError('Erro ao carregar dados iniciais', { error }, 'AdminMap')
     }
   }, [filters.company])
 
@@ -1013,8 +1009,7 @@ export function AdminMap({
           
           // Validar coordenadas antes de atualizar
           if (!isValidCoordinate(update.data.lat, update.data.lng)) {
-            console.warn(`Coordenadas inválidas recebidas para veículo ${update.data.vehicle_id}:`, 
-              update.data.lat, update.data.lng)
+            warn(`Coordenadas inválidas recebidas para veículo ${update.data.vehicle_id}`, { lat: update.data.lat, lng: update.data.lng }, 'AdminMap')
             return prev // Não atualizar se coordenadas inválidas
           }
           
@@ -1071,7 +1066,7 @@ export function AdminMap({
                       },
                       company_id: vehicle.company_id,
                     }).catch((error) => {
-                      console.error('Erro ao criar alerta de desvio:', error)
+                      logError('Erro ao criar alerta de desvio', { error }, 'AdminMap')
                     })
                     
                     // Notificação em tempo real para desvios críticos (apenas uma vez por desvio)
@@ -1082,8 +1077,9 @@ export function AdminMap({
                         return newSet
                       })
                       
-                      toast.error(
+                      notifyError(
                         `🚨 DESVIO CRÍTICO: ${vehicle.plate} está ${Math.round(deviation.distance)}m fora da rota!`,
+                        undefined,
                         {
                           duration: 8000,
                           icon: '⚠️',
@@ -1108,8 +1104,9 @@ export function AdminMap({
                           return newSet
                         })
                         
-                        toast.error(
+                        notifyError(
                           `⚠️ Desvio: ${vehicle.plate} está ${Math.round(deviation.distance)}m fora da rota`,
+                          undefined,
                           {
                             duration: 5000,
                             position: 'top-right',
@@ -1128,7 +1125,7 @@ export function AdminMap({
                     }
                   }
                 } catch (error) {
-                  console.error('Erro ao detectar desvio de rota:', error)
+                  logError('Erro ao detectar desvio de rota', { error }, 'AdminMap')
                 }
               }, 0)
             }
@@ -1168,7 +1165,7 @@ export function AdminMap({
         handleRealtimeUpdate(update)
       },
       onError: (error) => {
-        console.error('Erro no realtime:', error)
+        logError('Erro no realtime', { error }, 'AdminMap')
       },
     })
 
@@ -1200,7 +1197,7 @@ export function AdminMap({
     )
 
     if (positions.length === 0) {
-      toast.error('Nenhuma posição histórica encontrada para o período selecionado')
+      notifyError('Nenhuma posição histórica encontrada para o período selecionado')
       setHistoricalTrajectories([])
       return
     }
@@ -1238,13 +1235,13 @@ export function AdminMap({
 
     setHistoricalTrajectories(trajectories)
     setShowTrajectories(true)
-    toast.success(`${positions.length} posições carregadas para playback (${trajectories.length} trajetos)`)
+    notifySuccess(`${positions.length} posições carregadas para playback (${trajectories.length} trajetos)`)
   }, [filters.company, filters.route, filters.vehicle, playbackFrom, playbackTo])
 
   // Visualizar histórico e análise de trajeto
   const handleViewVehicleHistory = useCallback(async (vehicle: Vehicle) => {
     if (!vehicle.trip_id || !vehicle.route_id) {
-      toast.error('Veículo não possui viagem ou rota associada')
+      notifyError('Veículo não possui viagem ou rota associada')
       return
     }
 
@@ -1252,7 +1249,7 @@ export function AdminMap({
       // Buscar rota planejada
       const route = routes.find((r) => r.route_id === vehicle.route_id)
       if (!route || !route.polyline_points || route.polyline_points.length < 2) {
-        toast.error('Rota não encontrada ou incompleta')
+        notifyError('Rota não encontrada ou incompleta')
         return
       }
 
@@ -1264,7 +1261,7 @@ export function AdminMap({
         .single()
 
       if (tripError || !tripData) {
-        toast.error('Dados da viagem não encontrados')
+        notifyError('Dados da viagem não encontrados')
         return
       }
 
@@ -1286,7 +1283,7 @@ export function AdminMap({
       )
 
       if (positions.length === 0) {
-        toast.error('Nenhuma posição histórica encontrada')
+        notifyError('Nenhuma posição histórica encontrada')
         return
       }
 
@@ -1323,10 +1320,10 @@ export function AdminMap({
       setHistoricalTrajectories([trajectory])
       setShowTrajectories(true)
 
-      toast.success('Análise de trajeto carregada')
+      notifySuccess('Análise de trajeto carregada')
     } catch (error: any) {
-      console.error('Erro ao carregar histórico:', error)
-      toast.error('Erro ao carregar histórico: ' + (error.message || 'Erro desconhecido'))
+      logError('Erro ao carregar histórico', { error }, 'AdminMap')
+      notifyError(formatError(error, 'Erro ao carregar histórico'))
     }
   }, [routes])
 
@@ -1346,7 +1343,7 @@ export function AdminMap({
         .single()
 
       if (tripError || !tripData) {
-        console.warn('Trip não encontrada:', tripError)
+        warn('Trip não encontrada', { error: tripError }, 'AdminMap')
         return
       }
 
@@ -1383,7 +1380,7 @@ export function AdminMap({
         setHistoricalTrajectories([])
       }
     } catch (error) {
-      console.error('Erro ao carregar trajeto do veículo:', error)
+      logError('Erro ao carregar trajeto do veículo', { error }, 'AdminMap')
       setHistoricalTrajectories([])
     }
   }, [])
@@ -1506,14 +1503,14 @@ export function AdminMap({
 
       if (error) throw error
 
-      toast.success('Socorro despachado com sucesso!')
+    notifySuccess('Socorro despachado com sucesso!')
       
       // Recarregar alertas chamando loadInitialData novamente
       // Isso vai recarregar todos os alertas incluindo o novo socorro
       loadInitialData()
     } catch (error: any) {
-      console.error('Erro ao despachar socorro:', error)
-      toast.error('Erro ao despachar socorro: ' + (error.message || 'Erro desconhecido'))
+      logError('Erro ao despachar socorro', { error }, 'AdminMap')
+    notifyError(formatError(error, 'Erro ao despachar socorro'))
     }
   }, [])
 
@@ -1525,10 +1522,10 @@ export function AdminMap({
         try {
           const { exportMapPNG } = await import('@/lib/export-map-png')
           await exportMapPNG('map-container')
-          toast.success('Mapa exportado como PNG!')
+    notifySuccess('Mapa exportado como PNG!')
         } catch (error: any) {
-          console.error('Erro ao exportar PNG:', error)
-          toast.error('Erro ao exportar PNG do mapa')
+          logError('Erro ao exportar PNG', { error }, 'AdminMap')
+    notifyError(formatError(error, 'Erro ao exportar PNG do mapa'))
         }
       }
       
@@ -1556,11 +1553,11 @@ export function AdminMap({
         a.download = `mapa-veiculos-${new Date().toISOString().split('T')[0]}.csv`
         a.click()
         URL.revokeObjectURL(url)
-        toast.success('CSV exportado!')
+    notifySuccess('CSV exportado!')
       }
     } catch (error: any) {
-      console.error('Erro ao exportar:', error)
-      toast.error('Erro ao exportar')
+      logError('Erro ao exportar', { error }, 'AdminMap')
+    notifyError(formatError(error, 'Erro ao exportar'))
     }
   }, [vehicles, listMode])
 
@@ -1731,7 +1728,7 @@ export function AdminMap({
                 },
                 onComplete: () => {
                   setIsPlaying(false)
-                  toast.success('Playback concluído')
+  notifySuccess('Playback concluído')
                 },
                 onPause: () => {
                   setIsPlaying(false)

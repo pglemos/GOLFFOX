@@ -17,7 +17,7 @@ import {
 } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
-import toast from "react-hot-toast"
+import { notifySuccess, notifyError } from "@/lib/toast"
 import { motion } from "framer-motion"
 
 const ALERT_TYPES = {
@@ -164,9 +164,9 @@ export default function AlertasPage() {
       document.body.removeChild(a)
       window.URL.revokeObjectURL(url)
 
-      toast.success('Alertas exportados!')
+      notifySuccess('', { i18n: { ns: 'common', key: 'success.exportCsv' } })
     } catch (error: any) {
-      toast.error(`Erro: ${error.message}`)
+      notifyError('Erro ao exportar', undefined, { i18n: { ns: 'common', key: 'errors.export' } })
     }
   }
 

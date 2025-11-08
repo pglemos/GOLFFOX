@@ -11,7 +11,7 @@ import { useEffect, useState } from "react"
 // @ts-ignore
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
-import toast from "react-hot-toast"
+import { notifySuccess, notifyError } from "@/lib/toast"
 // @ts-ignore
 import { exportToCSV, exportToExcel, exportToPDF, formatDelaysReport, formatOccupancyReport, formatNotBoardedReport, type ReportData } from "@/lib/export-utils"
 // @ts-ignore
@@ -80,10 +80,10 @@ export default function RelatoriosOperatorPage() {
         exportToPDF(reportData, `${report.id}_${new Date().toISOString().split('T')[0]}.pdf`)
       }
 
-      toast.success(`Relatório ${report.title} exportado com sucesso!`)
+      notifySuccess('', { i18n: { ns: 'operator', key: 'reports.exportSuccess', params: { title: report.title } } })
     } catch (error: any) {
       console.error("Erro ao exportar relatório:", error)
-      toast.error(`Erro ao exportar: ${error.message}`)
+      notifyError('Erro ao exportar', undefined, { i18n: { ns: 'operator', key: 'reports.exportError', params: { message: error.message || 'Erro desconhecido' } } })
     }
   }
 

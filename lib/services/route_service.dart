@@ -8,6 +8,7 @@ import 'dart:math';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 
+import '../core/services/logger_service.dart';
 import '../models/route.dart';
 import '../services/map_service.dart';
 import '../services/supabase_service.dart';
@@ -87,7 +88,8 @@ class RouteService {
           .single();
 
       return BusRoute.fromJson(response);
-    } on Exception {
+    } on Exception catch (e, st) {
+      LoggerService.instance.error('Erro ao buscar rota por ID', e, st);
       return null;
     }
   }
@@ -118,7 +120,8 @@ class RouteService {
           .single();
 
       return BusRoute.fromJson(response);
-    } on Exception catch (error) {
+    } on Exception catch (error, st) {
+      LoggerService.instance.error('Erro ao atualizar rota', error, st);
       throw Exception('Erro ao atualizar rota: $error');
     }
   }

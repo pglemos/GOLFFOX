@@ -1,9 +1,12 @@
 // lib/services/vehicle_status_service.dart
 import 'dart:async';
+
 import 'package:flutter/foundation.dart';
-import '../models/vehicle_status.dart' as vs;
+
+import '../core/services/logger_service.dart';
 import '../models/driver_position.dart';
 import '../models/garage.dart';
+import '../models/vehicle_status.dart' as vs;
 import 'supabase_service.dart';
 
 class VehicleStatusService extends ChangeNotifier {
@@ -60,8 +63,12 @@ class VehicleStatusService extends ChangeNotifier {
 
       debugPrint(
           'VehicleStatusService inicializado com ${_vehicleStatuses.length} veiculos');
-    } catch (e) {
-      debugPrint('Erro ao inicializar VehicleStatusService: $e');
+    } on Exception catch (error, stackTrace) {
+      LoggerService.instance.error(
+        'Erro ao inicializar VehicleStatusService',
+        error,
+        stackTrace,
+      );
     }
   }
 
@@ -78,9 +85,13 @@ class VehicleStatusService extends ChangeNotifier {
         _garages.add(Garage.fromJson(garageData));
       }
 
-      debugPrint('Carregadas ${_garages.length} garagens');
-    } catch (e) {
-      debugPrint('Erro ao carregar garagens: $e');
+      LoggerService.instance.info('Carregadas ${_garages.length} garagens');
+    } on Exception catch (error, stackTrace) {
+      LoggerService.instance.error(
+        'Erro ao carregar garagens',
+        error,
+        stackTrace,
+      );
     }
   }
 
@@ -97,7 +108,9 @@ class VehicleStatusService extends ChangeNotifier {
       final processedDrivers = <String>{};
 
       for (final positionData in response) {
-        final driverId = positionData['trips']['driver_id'] as String?;
+        final tripsData =
+            positionData['trips'] as Map<String, dynamic>? ?? const {};
+        final driverId = tripsData['driver_id'] as String?;
         if (driverId != null && !processedDrivers.contains(driverId)) {
           _lastPositions[driverId] = DriverPosition.fromJson(positionData);
           processedDrivers.add(driverId);
@@ -105,8 +118,12 @@ class VehicleStatusService extends ChangeNotifier {
       }
 
       debugPrint('Carregadas ${_lastPositions.length} posicoes de motoristas');
-    } catch (e) {
-      debugPrint('Erro ao carregar posicoes iniciais: $e');
+    } on Exception catch (error, stackTrace) {
+      LoggerService.instance.error(
+        'Erro ao carregar posicoes iniciais',
+        error,
+        stackTrace,
+      );
     }
   }
 
@@ -177,8 +194,12 @@ class VehicleStatusService extends ChangeNotifier {
 
       debugPrint(
           'Carregadas ${_driverVehicleMap.length} associacoes motorista-veiculo');
-    } catch (e) {
-      debugPrint('Erro ao carregar associacoes motorista-veiculo: $e');
+    } on Exception catch (error, stackTrace) {
+      LoggerService.instance.error(
+        'Erro ao carregar associacoes motorista-veiculo',
+        error,
+        stackTrace,
+      );
     }
   }
 
@@ -205,8 +226,12 @@ class VehicleStatusService extends ChangeNotifier {
       }
 
       debugPrint('Carregados ${_vehiclesInGarage.length} veiculos na garagem');
-    } catch (e) {
-      debugPrint('Erro ao carregar veiculos na garagem: $e');
+    } on Exception catch (error, stackTrace) {
+      LoggerService.instance.error(
+        'Erro ao carregar veiculos na garagem',
+        error,
+        stackTrace,
+      );
     }
   }
 
@@ -218,8 +243,12 @@ class VehicleStatusService extends ChangeNotifier {
           .stream(primaryKey: ['id']).listen(_handleRealtimeUpdate);
 
       debugPrint('Realtime subscription configurada para driver_positions');
-    } catch (e) {
-      debugPrint('Erro ao configurar realtime subscription: $e');
+    } on Exception catch (error, stackTrace) {
+      LoggerService.instance.error(
+        'Erro ao configurar realtime subscription',
+        error,
+        stackTrace,
+      );
     }
   }
 
@@ -239,8 +268,12 @@ class VehicleStatusService extends ChangeNotifier {
           _lastPositions[driverId] = position;
           hasUpdates = true;
         }
-            } catch (e) {
-        debugPrint('Erro ao processar atualizacao realtime: $e');
+      } on Exception catch (error, stackTrace) {
+        LoggerService.instance.error(
+          'Erro ao processar atualizacao realtime',
+          error,
+          stackTrace,
+        );
       }
     }
 
@@ -263,15 +296,21 @@ class VehicleStatusService extends ChangeNotifier {
 
       if (response.isNotEmpty) {
         final positionData = response.first;
-        final driverId = positionData['trips']['driver_id'] as String?;
+        final tripsData =
+            positionData['trips'] as Map<String, dynamic>? ?? const {};
+        final driverId = tripsData['driver_id'] as String?;
 
         if (driverId != null) {
           _lastPositions[driverId] = DriverPosition.fromJson(positionData);
           _calculateAllStatuses();
         }
       }
-    } catch (e) {
-      debugPrint('Erro ao atualizar status do veiculo $vehicleId: $e');
+    } on Exception catch (error, stackTrace) {
+      LoggerService.instance.error(
+        'Erro ao atualizar status do veiculo $vehicleId',
+        error,
+        stackTrace,
+      );
     }
   }
 

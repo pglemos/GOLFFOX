@@ -7,14 +7,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../../core/theme/gf_tokens.dart';
 import '../../../core/theme/unified_theme.dart';
-import '../../../models/bus_stop.dart';
 import '../../../core/utils/date_utils.dart';
+import '../../../models/bus_stop.dart';
 
 class BusStopsPanel extends StatefulWidget {
 
   const BusStopsPanel({
-    super.key,
     required this.busStops,
+    super.key,
     this.routeName,
     this.onClose,
     this.onStopTap,
@@ -44,7 +44,7 @@ class _BusStopsPanelState extends State<BusStopsPanel> {
         border: Border.all(color: const Color(GfTokens.stroke)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.15),
+            color: Colors.black.withValues(alpha: 0.15),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -57,7 +57,7 @@ class _BusStopsPanelState extends State<BusStopsPanel> {
           Container(
             padding: const EdgeInsets.all(GfTokens.space4),
             decoration: BoxDecoration(
-              color: GolfFoxTheme.primaryOrange.withOpacity(0.1),
+              color: GolfFoxTheme.primaryOrange.withValues(alpha: 0.1),
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(GfTokens.radius),
                 topRight: Radius.circular(GfTokens.radius),
@@ -186,7 +186,8 @@ class _BusStopTile extends StatelessWidget {
               width: 32,
               height: 32,
               decoration: BoxDecoration(
-                color: Color(stop.status.colorValue).withOpacity(0.1),
+                color:
+                    Color(stop.status.colorValue).withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
                   color: Color(stop.status.colorValue),
@@ -358,9 +359,9 @@ class _StatusChip extends StatelessWidget {
         vertical: 4,
       ),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

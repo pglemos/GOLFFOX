@@ -7,7 +7,9 @@ import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Truck, Plus, Search, Wrench, ClipboardCheck, Edit, Trash2, AlertTriangle } from "lucide-react"
-import toast from "react-hot-toast"
+import { notifySuccess, notifyError } from "@/lib/toast"
+import { formatError } from "@/lib/error-utils"
+import { t } from "@/lib/i18n"
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 import { VehicleModal } from "@/components/modals/vehicle-modal"
@@ -70,7 +72,7 @@ export default function VeiculosPage() {
 
       if (error) {
         logError("Erro do Supabase ao carregar veículos", { error }, "VeiculosPage")
-        toast.error(`Erro ao carregar veículos: ${error.message}`)
+        notifyError(`Erro ao carregar veículos: ${error.message}`, undefined, { i18n: { ns: 'common', key: 'errors.loadVehicles', params: { message: error.message } } })
         setVeiculos([])
         return
       }
@@ -80,7 +82,7 @@ export default function VeiculosPage() {
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
       logError("Erro ao carregar veículos", { error: err }, 'VeiculosPage')
-      toast.error(`Erro ao carregar veículos: ${errorMessage}`)
+      notifyError(formatError(err as Error, `Erro ao carregar veículos: ${errorMessage}`), undefined, { i18n: { ns: 'common', key: 'errors.loadVehicles', params: { message: errorMessage } } })
       setVeiculos([])
     }
   }
@@ -147,11 +149,9 @@ export default function VeiculosPage() {
         const tripsCount = typeof (payload as { tripsCount?: number }).tripsCount === "number" ? (payload as { tripsCount?: number }).tripsCount : undefined
         if (archived) {
           const countMessage = typeof tripsCount === "number" ? `${tripsCount} viagem(ns)` : "viagens"
-          toast.success(
-            `Veículo marcado como inativo porque possui ${countMessage} associadas. Finalize ou reatribua essas viagens e tente excluir novamente para removê-lo definitivamente.`
-          )
+          notifySuccess(t('common', 'success.vehicleArchivedWithTrips', { count: countMessage }))
         } else {
-          toast.success("Veículo excluído com sucesso!")
+          notifySuccess(t('common', 'success.vehicleDeleted'))
         }
         await loadVeiculos()
         debug("Veículo removido do catálogo", { vehicleId, archived, tripsCount }, "VeiculosPage")
@@ -163,15 +163,15 @@ export default function VeiculosPage() {
       if (response.status === 409 && payload && "tripsCount" in payload) {
         const tripsCount = typeof payload.tripsCount === "number" ? payload.tripsCount : undefined
         const countMessage = tripsCount ? `${tripsCount} viagem(ns)` : "viagens"
-        toast.error(`Não é possível excluir o veículo: existem ${countMessage} vinculadas.`)
+        notifyError(`Não é possível excluir o veículo: existem ${countMessage} vinculadas.`)
         debug("Tentativa de exclusão de veículo bloqueada por viagens associadas", { vehicleId, tripsCount }, "VeiculosPage")
       } else {
-        toast.error("Não foi possível excluir o veículo. Tente novamente mais tarde.")
+        notifyError("Não foi possível excluir o veículo. Tente novamente mais tarde.")
         logError("Falha ao excluir veículo", { vehicleId, status: response.status, payload }, "VeiculosPage")
       }
     } catch (error: unknown) {
       logError("Erro inesperado ao excluir veículo", { vehicleId, error }, "VeiculosPage")
-      toast.error("Erro inesperado ao excluir veículo.")
+      notifyError(formatError(error as Error, "Erro inesperado ao excluir veículo."), undefined, { i18n: { ns: 'common', key: 'errors.generic' } })
     } finally {
       if (shouldResetState) {
         setDeleteConfirm((prev) => ({ ...prev, isDeleting: false }))

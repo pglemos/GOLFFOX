@@ -20,7 +20,7 @@ import {
   Download
 } from "lucide-react"
 import { supabase } from "@/lib/supabase"
-import toast from "react-hot-toast"
+import { notifySuccess, notifyError } from "@/lib/toast"
 import { formatCurrency, formatDistance, formatDuration } from "@/lib/kpi-utils"
 import { exportToCSV, exportToPDF } from "@/lib/export-utils"
 
@@ -255,11 +255,11 @@ export function ReconciliationModal({
 
       setStatus('em_analise')
 
-      toast.success('Revisão solicitada')
+      notifySuccess('Revisão solicitada')
       onClose()
     } catch (error: any) {
       console.error('Erro ao solicitar revisão:', error)
-      toast.error(`Erro: ${error.message}`)
+      notifyError(error, 'Erro ao solicitar revisão')
     } finally {
       setProcessing(false)
     }
@@ -267,7 +267,7 @@ export function ReconciliationModal({
 
   const handleExport = (format: 'csv' | 'pdf') => {
     if (!invoice || !invoiceLines.length) {
-      toast.error('Nenhum dado disponível para exportar')
+      notifyError('Nenhum dado disponível para exportar')
       return
     }
 
@@ -299,10 +299,10 @@ export function ReconciliationModal({
         exportToPDF(reportData, `conciliacao-${invoice.invoice_number || invoiceId}-${new Date().toISOString().split('T')[0]}.pdf`)
       }
 
-      toast.success(`Relatório exportado em ${format.toUpperCase()}!`)
+      notifySuccess('', { i18n: { ns: 'common', key: 'success.exportGenerated', params: { format: format.toUpperCase() } } })
     } catch (error: any) {
       console.error('Erro ao exportar relatório:', error)
-      toast.error(`Erro ao exportar: ${error.message}`)
+      notifyError('Erro ao exportar', undefined, { i18n: { ns: 'common', key: 'errors.export' } })
     }
   }
 

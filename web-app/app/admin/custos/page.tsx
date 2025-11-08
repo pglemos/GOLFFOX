@@ -17,7 +17,7 @@ import {
 } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
-import toast from "react-hot-toast"
+import { notifySuccess, notifyError } from "@/lib/toast"
 import dynamic from "next/dynamic"
 import { CostDashboard } from "@/components/costs/cost-dashboard"
 import { CostDetailTable } from "@/components/costs/cost-detail-table"
@@ -109,7 +109,7 @@ export default function CustosAdminPage() {
       }
     } catch (err: any) {
       console.error('Erro ao carregar empresas:', err)
-      toast.error('Erro ao carregar empresas')
+      notifyError('Erro ao carregar empresas', undefined, { i18n: { ns: 'common', key: 'errors.loadCompanies' } })
     }
   }, [])
 
@@ -162,7 +162,7 @@ export default function CustosAdminPage() {
     } catch (err: any) {
       console.error('Erro ao carregar custos:', err)
       setError(err.message || 'Erro ao carregar custos')
-      toast.error(`Erro: ${err.message || 'Erro desconhecido'}`)
+      notifyError('Erro ao carregar custos', undefined, { i18n: { ns: 'common', key: 'errors.loadCosts' } })
       setCosts([])
     } finally {
       setLoading(false)
@@ -181,7 +181,7 @@ export default function CustosAdminPage() {
 
   const handleExport = async (format: 'csv' | 'excel' | 'pdf') => {
     if (!selectedCompanyId) {
-      toast.error('Selecione uma empresa primeiro')
+      notifyError('Selecione uma empresa primeiro', undefined, { i18n: { ns: 'common', key: 'validation.selectCompanyFirst' } })
       return
     }
 
@@ -212,10 +212,10 @@ export default function CustosAdminPage() {
         window.URL.revokeObjectURL(url)
       }
 
-      toast.success(`Exportação ${format.toUpperCase()} gerada com sucesso!`)
+      notifySuccess('', { i18n: { ns: 'common', key: 'success.exportGenerated', params: { format: format.toUpperCase() } } })
     } catch (error: any) {
       console.error('Erro ao exportar:', error)
-      toast.error(`Erro: ${error.message || 'Erro desconhecido'}`)
+      notifyError('Erro ao exportar', undefined, { i18n: { ns: 'common', key: 'errors.export' } })
     }
   }
 

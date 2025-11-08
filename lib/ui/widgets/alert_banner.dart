@@ -5,19 +5,48 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+
+import '../../core/services/error_service.dart';
 import '../../core/theme/gf_tokens.dart';
 
 class GfAlertBanner extends StatelessWidget {
 
   const GfAlertBanner({
-    super.key,
     required this.message,
     required this.actionText,
     required this.onActionTap,
     this.severity = AlertSeverity.warning,
     this.isDismissible = false,
     this.onDismiss,
+    super.key,
   });
+  /// Fábrica para exibir um alerta a partir de um erro padronizado
+  factory GfAlertBanner.fromError({
+    required Object error,
+    required String actionText,
+    required VoidCallback onActionTap,
+    bool isDismissible = false,
+    VoidCallback? onDismiss,
+    Key? key,
+  }) {
+    final msg = ErrorService.instance.getUserFriendlyMessage(error);
+    var sev = AlertSeverity.warning;
+
+    if (error is GxError) {
+      sev = _mapSeverity(error.severity);
+    }
+
+    return GfAlertBanner(
+      key: key,
+      message: msg,
+      actionText: actionText,
+      onActionTap: onActionTap,
+      severity: sev,
+      isDismissible: isDismissible,
+      onDismiss: onDismiss,
+    );
+  }
+
   final String message;
   final String actionText;
   final VoidCallback onActionTap;
@@ -46,7 +75,7 @@ class GfAlertBanner extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(GfTokens.space2),
             decoration: BoxDecoration(
-              color: colors.icon.withOpacity(0.1),
+              color: colors.icon.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(GfTokens.radiusSmall),
             ),
             child: Icon(
@@ -171,6 +200,19 @@ class GfAlertBanner extends StatelessWidget {
         return Icons.error_outline;
     }
   }
+
+  static AlertSeverity _mapSeverity(ErrorSeverity severity) {
+    switch (severity) {
+      case ErrorSeverity.info:
+        return AlertSeverity.info;
+      case ErrorSeverity.warning:
+        return AlertSeverity.warning;
+      case ErrorSeverity.error:
+        return AlertSeverity.error;
+      case ErrorSeverity.critical:
+        return AlertSeverity.error;
+    }
+  }
 }
 
 // ========================================
@@ -223,7 +265,6 @@ class GfAlertBannerVariants {
       message: 'Manutencao programada para hoje as 23:00',
       actionText: 'Ver detalhes',
       onActionTap: onViewDetails ?? () {},
-      severity: AlertSeverity.warning,
       isDismissible: onDismiss != null,
       onDismiss: onDismiss,
     );

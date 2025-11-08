@@ -1,5 +1,7 @@
 "use client"
 
+import { useState } from "react"
+
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -14,6 +16,7 @@ import { motion } from "framer-motion"
 
 export function CompanySelector() {
   const { tenantCompanyId, companyName, logoUrl, companies, switchTenant, brandTokens } = useOperatorTenant()
+  const [logoFailed, setLogoFailed] = useState(false)
 
   if (companies.length === 0) {
     return (
@@ -31,11 +34,15 @@ export function CompanySelector() {
 
   return (
     <div className="flex items-center gap-3 flex-shrink-0">
-      {logoUrl ? (
+      {logoUrl && !logoFailed ? (
         <img
           src={logoUrl}
           alt={companyName}
           className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg object-cover"
+          loading="lazy"
+          decoding="async"
+          referrerPolicy="no-referrer"
+          onError={() => setLogoFailed(true)}
         />
       ) : (
         <motion.div
@@ -65,9 +72,17 @@ export function CompanySelector() {
                   onClick={() => switchTenant(company.id)}
                   className={tenantCompanyId === company.id ? "bg-[var(--bg-hover)]" : ""}
                 >
-                  {company.logoUrl && (
-                    <img src={company.logoUrl} alt={company.name} className="w-6 h-6 rounded mr-2" />
-                  )}
+                  {company.logoUrl ? (
+                    <img
+                      src={company.logoUrl}
+                      alt={company.name}
+                      className="w-6 h-6 rounded mr-2 object-cover"
+                      loading="lazy"
+                      decoding="async"
+                      referrerPolicy="no-referrer"
+                      onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
+                    />
+                  ) : null}
                   {company.name}
                 </DropdownMenuItem>
               ))}

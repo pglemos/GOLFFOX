@@ -13,7 +13,9 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Users, Upload, X, Award } from "lucide-react"
 import { supabase } from "@/lib/supabase"
-import toast from "react-hot-toast"
+import { notifySuccess, notifyError } from "@/lib/toast"
+import { t } from "@/lib/i18n"
+import { formatError } from "@/lib/error-utils"
 import { auditLogs } from "@/lib/audit-log"
 import { useSupabaseSync } from "@/hooks/use-supabase-sync"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -125,7 +127,7 @@ export function DriverModal({ driver, isOpen, onClose, onSave }: DriverModalProp
           data: driverData,
         })
         
-        toast.success("Motorista atualizado com sucesso!")
+        notifySuccess('', { i18n: { ns: 'common', key: 'success.driverUpdated' } })
         
         // Log de auditoria
         await auditLogs.update('driver', driver.id, { name: driverData.name, email: driverData.email })
@@ -146,7 +148,7 @@ export function DriverModal({ driver, isOpen, onClose, onSave }: DriverModalProp
           data: driverData,
         })
         
-        toast.success("Motorista cadastrado com sucesso!")
+        notifySuccess('', { i18n: { ns: 'common', key: 'success.driverCreated' } })
         
         // Log de auditoria
         await auditLogs.create('driver', data.id, { name: driverData.name, email: driverData.email })
@@ -156,7 +158,7 @@ export function DriverModal({ driver, isOpen, onClose, onSave }: DriverModalProp
       onClose()
     } catch (error: any) {
       console.error("Erro ao salvar motorista:", error)
-      toast.error(error.message || "Erro ao salvar motorista")
+      notifyError(error, t('common', 'errors.saveDriver'))
     } finally {
       setLoading(false)
     }
@@ -164,7 +166,7 @@ export function DriverModal({ driver, isOpen, onClose, onSave }: DriverModalProp
 
   const handleDocumentUpload = async (type: DriverDocument['document_type'], file: File) => {
     if (!driver?.id) {
-      toast.error("Salve o motorista primeiro antes de adicionar documentos")
+      notifyError('', undefined, { i18n: { ns: 'common', key: 'validation.saveDriverFirst' } })
       return
     }
 
@@ -194,11 +196,11 @@ export function DriverModal({ driver, isOpen, onClose, onSave }: DriverModalProp
 
       if (docError) throw docError
 
-      toast.success("Documento enviado com sucesso!")
+      notifySuccess('', { i18n: { ns: 'common', key: 'success.documentUploaded' } })
       loadDriverData(driver.id)
     } catch (error: any) {
       console.error("Erro ao fazer upload:", error)
-      toast.error("Erro ao fazer upload do documento")
+      notifyError(error, t('common', 'errors.documentUpload'))
     }
   }
 
