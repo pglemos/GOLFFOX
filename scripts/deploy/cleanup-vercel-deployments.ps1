@@ -78,6 +78,26 @@ function Get-DeploymentById([string]$id) {
   }
 }
 
+function Resolve-FullDeploymentId([string]$partial) {
+  if ($partial -like 'dpl_*') { return $partial }
+  if (-not $projectId) { return $null }
+  $limit = 200
+  $url = "https://api.vercel.com/v6/deployments?projectId=$projectId&limit=$limit$teamQuery"
+  try {
+    $resp = Invoke-RestMethod -Method Get -Uri $url -Headers $headers
+  } catch {
+    Write-Warning ("Falha ao listar para resolver ID {0}: {1}" -f $partial, $_.Exception.Message)
+    return $null
+  }
+  foreach ($d in $resp.deployments) {
+    $uid = $d.uid
+    if (-not $uid) { continue }
+    $base = ($uid -replace '^dpl_', '')
+    if ($base -like "$partial*") { return $uid }
+  }
+  return $null
+}
+
 if ($DeploymentIds -and $DeploymentIds.Count -gt 0) {
   Write-Host "Processando deleção direta de $($DeploymentIds.Count) deployment(s) por ID..." -ForegroundColor Cyan
 
@@ -85,6 +105,9 @@ if ($DeploymentIds -and $DeploymentIds.Count -gt 0) {
   foreach ($rawId in $DeploymentIds) {
     $id = $rawId.Trim()
     if (-not $id) { continue }
+
+    $resolved = Resolve-FullDeploymentId $id
+    if ($resolved) { $id = $resolved }
 
     $details = Get-DeploymentById $id
     $target = $details.target
@@ -95,7 +118,9 @@ if ($DeploymentIds -and $DeploymentIds.Count -gt 0) {
     }
 
     if (-not $ActuallyDelete) {
-      Write-Host ("Dry-run: removeria id={0} alvo={1} url={2}" -f $id, ($target ?? 'desconhecido'), ($url ?? 'n/d')) -ForegroundColor Yellow
+      $targetVal = if ($target) { $target } else { 'desconhecido' }
+      $urlVal = if ($url) { $url } else { 'n/d' }
+      Write-Host ("Dry-run: removeria id={0} alvo={1} url={2}" -f $id, $targetVal, $urlVal) -ForegroundColor Yellow
       continue
     }
 
@@ -133,7 +158,7 @@ if (-not $response) { Write-Error "Resposta vazia da API Vercel."; exit 1 }
 $cutoff = (Get-Date).AddDays(-$Days)
 
 $deployments = $response.deployments | Where-Object {
-  $_.target -eq 'preview' -and (
+  ($_.target -ne 'production') -and (
     (Get-Date -Date '1970-01-01').AddMilliseconds([double]$_.createdAt) -lt $cutoff
   )
 }
