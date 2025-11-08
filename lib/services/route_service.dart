@@ -4,11 +4,13 @@
 // ========================================
 
 import 'dart:math';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
+
 import '../models/route.dart';
-import '../services/supabase_service.dart';
 import '../services/map_service.dart';
+import '../services/supabase_service.dart';
 
 // Providers
 final routeServiceProvider = Provider<RouteService>((ref) => RouteService(ref.read(supabaseServiceProvider)));
@@ -42,9 +44,11 @@ class RouteService {
   final Distance _distance = const Distance();
 
   // Stream de rotas
-  Stream<List<BusRoute>> getRoutesStream() => _supabaseService.client.from('routes').stream(primaryKey: [
-      'id'
-    ]).map((data) => data.map((json) => BusRoute.fromJson(json)).toList());
+  Stream<List<BusRoute>> getRoutesStream() => _supabaseService.client
+      .from('routes')
+      .stream(primaryKey: ['id']).map(
+        (data) => data.map(BusRoute.fromJson).toList(),
+      );
 
   // Buscar todas as rotas
   Future<List<BusRoute>> getRoutes({
@@ -53,21 +57,21 @@ class RouteService {
     String? driverId,
   }) async {
     try {
-      var query = _supabaseService.client.from('routes').select();
+      final query = _supabaseService.client.from('routes').select();
 
       if (status != null) {
-        query = query.eq('status', status.name);
+        query.eq('status', status.name);
       }
       if (vehicleId != null) {
-        query = query.eq('vehicle_id', vehicleId);
+        query.eq('vehicle_id', vehicleId);
       }
       if (driverId != null) {
-        query = query.eq('driver_id', driverId);
+        query.eq('driver_id', driverId);
       }
 
       final response = await query.order('created_at', ascending: false);
       return response.map(BusRoute.fromJson).toList();
-    } catch (e) {
+    } on Exception {
       // Retornar dados simulados em caso de erro
       return _generateMockRoutes();
     }
@@ -83,7 +87,7 @@ class RouteService {
           .single();
 
       return BusRoute.fromJson(response);
-    } catch (e) {
+    } on Exception {
       return null;
     }
   }
@@ -98,8 +102,8 @@ class RouteService {
           .single();
 
       return BusRoute.fromJson(response);
-    } catch (e) {
-      throw Exception('Erro ao criar rota: $e');
+    } on Exception catch (error) {
+      throw Exception('Erro ao criar rota: $error');
     }
   }
 
@@ -114,8 +118,8 @@ class RouteService {
           .single();
 
       return BusRoute.fromJson(response);
-    } catch (e) {
-      throw Exception('Erro ao atualizar rota: $e');
+    } on Exception catch (error) {
+      throw Exception('Erro ao atualizar rota: $error');
     }
   }
 
@@ -123,8 +127,8 @@ class RouteService {
   Future<void> deleteRoute(String id) async {
     try {
       await _supabaseService.client.from('routes').delete().eq('id', id);
-    } catch (e) {
-      throw Exception('Erro ao deletar rota: $e');
+    } on Exception catch (error) {
+      throw Exception('Erro ao deletar rota: $error');
     }
   }
 
@@ -166,7 +170,7 @@ class RouteService {
           name: 'Parada ${i + 1}',
           description: 'Ponto de embarque/desembarque',
           position: stop.position,
-          type: i % 2 == 0 ? StopType.pickup : StopType.dropoff,
+          type: (i.isEven) ? StopType.pickup : StopType.dropoff,
           order: i + 1,
           scheduledTime: estimatedTime,
           estimatedPassengers: Random().nextInt(10) + 5,
@@ -204,8 +208,8 @@ class RouteService {
       );
 
       return await createRoute(route);
-    } catch (e) {
-      throw Exception('Erro ao gerar rota automatica: $e');
+    } on Exception catch (error) {
+      throw Exception('Erro ao gerar rota automatica: $error');
     }
   }
 

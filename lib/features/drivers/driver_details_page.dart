@@ -79,7 +79,7 @@ class _DriverDetailsPageState extends ConsumerState<DriverDetailsPage>
       final driverService = ref.read(driverServiceProvider.notifier);
       await driverService.updateDriverOnlineStatus(
         _driver!.id,
-        !_driver!.isOnline,
+        isOnline: !_driver!.isOnline,
       );
 
       if (!mounted) return;

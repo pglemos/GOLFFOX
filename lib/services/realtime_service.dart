@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:math';
+
 import 'package:flutter/foundation.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
 import '../models/vehicle_position.dart';
 
 /// Servico de real-time que combina dados mock para desenvolvimento
@@ -10,8 +12,7 @@ import '../models/vehicle_position.dart';
 class RealtimeService {
 
   RealtimeService._();
-  static RealtimeService? _instance;
-  static RealtimeService get instance => _instance ??= RealtimeService._();
+  static final RealtimeService instance = RealtimeService._();
 
   // Configuracoes
   static const Duration _updateInterval = Duration(seconds: 5);
@@ -32,7 +33,7 @@ class RealtimeService {
       _positionsController.stream;
   List<VehiclePosition> get currentPositions =>
       List.unmodifiable(_currentPositions);
-  bool get isConnected => _useSupabase ? _realtimeChannel != null : true;
+  bool get isConnected => !_useSupabase || _realtimeChannel != null;
 
   /// Inicializa o servico
   Future<void> initialize() async {
@@ -43,10 +44,10 @@ class RealtimeService {
       await _initializeSupabase();
       _useSupabase = true;
       debugPrint('RealtimeService: Conectado ao Supabase');
-    } catch (e) {
+    } on Exception catch (error) {
       // Fallback para dados mock
       _useSupabase = false;
-      debugPrint('RealtimeService: Usando dados mock - $e');
+      debugPrint('RealtimeService: Usando dados mock - $error');
     }
 
     // Carregar dados iniciais
@@ -102,7 +103,7 @@ class RealtimeService {
           .select()
           .order('updated_at', ascending: false);
 
-      final List<dynamic> data = response as List<dynamic>;
+      final data = response as List<dynamic>;
       _currentPositions = data
           .map(
             (item) => _vehiclePositionFromSupabase(
@@ -110,8 +111,8 @@ class RealtimeService {
             ),
           )
           .toList();
-    } catch (e) {
-      debugPrint('Erro ao carregar do Supabase: $e');
+    } on Exception catch (error) {
+      debugPrint('Erro ao carregar do Supabase: $error');
       _loadMockData();
     }
   }

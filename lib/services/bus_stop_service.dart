@@ -5,9 +5,10 @@
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
+
 import '../models/bus_stop.dart';
-import 'supabase_service.dart';
 import 'map_service.dart';
+import 'supabase_service.dart';
 
 class BusStopService {
 
@@ -28,7 +29,7 @@ class BusStopService {
                 Map<String, dynamic>.from(json as Map),
               ))
           .toList();
-    } on Exception catch (error) {
+    } on Exception {
       // Em caso de erro, retorna dados mock para demonstracao
       return _getMockBusStops(routeId);
     }
@@ -97,7 +98,7 @@ class BusStopService {
         'estimated_arrival': estimatedArrival.toIso8601String(),
         'updated_at': DateTime.now().toIso8601String(),
       }).eq('id', stopId);
-    } on Exception catch (error) {
+    } on Exception {
       // TODO(golffox): log production error via AppLogger
     }
   }
@@ -109,7 +110,7 @@ class BusStopService {
         'last_visit': DateTime.now().toIso8601String(),
         'updated_at': DateTime.now().toIso8601String(),
       }).eq('id', stopId);
-    } on Exception catch (error) {
+    } on Exception {
       // TODO(golffox): log production error via AppLogger
     }
   }

@@ -99,7 +99,7 @@ class AuthService {
       // Erros de RLS/tabela ao buscar perfil.
       throw AuthFailure(
           AuthErrorCode.unknown, 'Falha ao acessar seus dados. (RLS/DB)', e);
-    } on Object catch (error, stackTrace) {
+    } on Object catch (error) {
       throw AuthFailure(AuthErrorCode.unknown, 'Falha no login: $error', error);
     }
   }
@@ -135,7 +135,7 @@ class AuthService {
     } on TimeoutException catch (e) {
       throw AuthFailure(AuthErrorCode.network,
           'Tempo esgotado conectando ao servidor. Verifique sua internet.', e);
-    } on Object catch (error, stackTrace) {
+    } on Object catch (error) {
       throw AuthFailure(
         AuthErrorCode.unknown,
         'Falha ao criar conta: $error',
@@ -168,7 +168,7 @@ class AuthService {
     } on TimeoutException catch (e) {
       throw AuthFailure(
           AuthErrorCode.network, 'Tempo esgotado conectando ao servidor.', e);
-    } on Object catch (error, stackTrace) {
+    } on Object catch (error) {
       throw AuthFailure(
         AuthErrorCode.unknown,
         'Falha ao atualizar e-mail: $error',
@@ -191,7 +191,7 @@ class AuthService {
     } on TimeoutException catch (e) {
       throw AuthFailure(
           AuthErrorCode.network, 'Tempo esgotado conectando ao servidor.', e);
-    } on Object catch (error, stackTrace) {
+    } on Object catch (error) {
       throw AuthFailure(
         AuthErrorCode.unknown,
         'Falha ao enviar recuperacao: $error',
@@ -210,7 +210,7 @@ class AuthService {
         'Tempo esgotado ao carregar perfil.',
         error,
       );
-    } on Object catch (error, stackTrace) {
+    } on Object catch (error) {
       throw AuthFailure(
         AuthErrorCode.unknown,
         'Falha ao carregar perfil: $error',

@@ -2,8 +2,9 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
-import '../models/user.dart';
+
 import '../models/trip.dart';
+import '../models/user.dart';
 
 /// Erros tipados para UI tratar mensagens e fallback.
 class LocalDataFailure implements Exception {
@@ -372,9 +373,11 @@ class LocalDataService {
     final parsed = <User>[];
     for (final s in list) {
       try {
-        final m = jsonDecode(s) as Map<String, dynamic>;
-        parsed.add(User.fromJson(m));
-      } catch (e) {
+        final decoded = jsonDecode(s);
+        if (decoded is Map<String, dynamic>) {
+          parsed.add(User.fromJson(decoded));
+        }
+      } on FormatException {
         // ignora item corrompido
       }
     }
@@ -388,9 +391,11 @@ class LocalDataService {
     final parsed = <Trip>[];
     for (final s in list) {
       try {
-        final m = jsonDecode(s) as Map<String, dynamic>;
-        parsed.add(Trip.fromJson(m));
-      } catch (e) {
+        final decoded = jsonDecode(s);
+        if (decoded is Map<String, dynamic>) {
+          parsed.add(Trip.fromJson(decoded));
+        }
+      } on FormatException {
         // ignora item corrompido
       }
     }
@@ -401,11 +406,14 @@ class LocalDataService {
     final s = _prefs!.getString(_keyCurrentUser);
     if (s == null) return null;
     try {
-      final m = jsonDecode(s) as Map<String, dynamic>;
-      return User.fromJson(m);
-    } catch (_) {
+      final decoded = jsonDecode(s);
+      if (decoded is Map<String, dynamic>) {
+        return User.fromJson(decoded);
+      }
+    } on FormatException {
       return null;
     }
+    return null;
   }
 
   /// Ordena trips por prioridade de status e depois por horario/atualizacao:
@@ -444,10 +452,8 @@ class LocalDataService {
   }
 
   /// Serializa writes para evitar corrida no SharedPreferences.
-  Future<void> _enqueueWrite(Future<void> Function() op) {
-    _lastWrite = _lastWrite.then((_) => op());
-    return _lastWrite;
-  }
+  Future<void> _enqueueWrite(Future<void> Function() op) =>
+      _lastWrite = _lastWrite.then((_) => op());
 
   /* ------------------ Dispose (testes) ------------------ */
   Future<void> dispose() async {

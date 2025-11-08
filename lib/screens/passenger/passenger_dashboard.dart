@@ -148,7 +148,9 @@ class _PassengerDashboardState extends State<PassengerDashboard>
   }
 
   Future<void> _openReportIncidentSheet() async {
-    await HapticFeedback.lightImpact();
+    if (!mounted) return;
+    final messenger = ScaffoldMessenger.of(context);
+    unawaited(HapticFeedback.lightImpact());
     final result = await showModalBottomSheet<String>(
       context: context,
       isScrollControlled: true,
@@ -166,10 +168,11 @@ class _PassengerDashboardState extends State<PassengerDashboard>
         ),
     );
 
-    if (result != null && result.isNotEmpty && mounted) {
+    if (!mounted) return;
+    if (result != null && result.isNotEmpty) {
       await HapticFeedback.mediumImpact();
       // aqui salvaria no backend
-      ScaffoldMessenger.of(context).showSnackBar(
+      messenger.showSnackBar(
         const SnackBar(content: Text('Incidente reportado com sucesso')),
       );
     }
