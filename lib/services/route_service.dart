@@ -57,16 +57,16 @@ class RouteService {
     String? driverId,
   }) async {
     try {
-      final query = _supabaseService.client.from('routes').select();
+      var query = _supabaseService.client.from('routes').select();
 
       if (status != null) {
-        query.eq('status', status.name);
+        query = query.eq('status', status.name);
       }
       if (vehicleId != null) {
-        query.eq('vehicle_id', vehicleId);
+        query = query.eq('vehicle_id', vehicleId);
       }
       if (driverId != null) {
-        query.eq('driver_id', driverId);
+        query = query.eq('driver_id', driverId);
       }
 
       final response = await query.order('created_at', ascending: false);
@@ -146,17 +146,17 @@ class RouteService {
       final optimization = await optimizeRoute(waypoints);
 
       // Criar pontos de parada
-      final stops = <RouteStop>[];
-
-      // Adicionar depot como primeiro ponto
-      stops.add(RouteStop(
-        id: 'depot_start',
-        name: 'Garagem - Saida',
-        position: const LatLng(-23.5505, -46.6333), // Sao Paulo centro
-        type: StopType.depot,
-        order: 0,
-        scheduledTime: startTime,
-      ));
+      final stops = <RouteStop>[
+        // Adicionar depot como primeiro ponto
+        RouteStop(
+          id: 'depot_start',
+          name: 'Garagem - Saida',
+          position: const LatLng(-23.5505, -46.6333), // Sao Paulo centro
+          type: StopType.depot,
+          order: 0,
+          scheduledTime: startTime,
+        ),
+      ];
 
       // Adicionar pontos otimizados
       for (var i = 0; i < optimization.optimizedStops.length; i++) {
@@ -274,9 +274,11 @@ class RouteService {
       current = nearest;
     }
 
-    optimizationNotes.add('Otimizado usando algoritmo do vizinho mais proximo');
-    optimizationNotes.add(
-        'Distancia total reduzida em ~${(waypoints.length * 0.15).toStringAsFixed(1)}%');
+    optimizationNotes
+      ..add('Otimizado usando algoritmo do vizinho mais proximo')
+      ..add(
+        'Distancia total reduzida em ~${(waypoints.length * 0.15).toStringAsFixed(1)}%',
+      );
 
     // Converter para RouteStop
     final optimizedStops = optimizedOrder.asMap().entries.map((entry) => RouteStop(
