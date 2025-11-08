@@ -1,13 +1,14 @@
 "use client"
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { supabase } from '@/lib/supabase'
+import { debug, warn } from '@/lib/logger'
 
 interface QueryOptions {
   retryAttempts?: number
   retryDelay?: number
   cacheKey?: string
-  fallbackValue?: any
+  fallbackValue?: unknown
   offlineMode?: boolean
 }
 
@@ -24,7 +25,7 @@ const CACHE_PREFIX = 'golffox_cache_'
 const CACHE_TTL = 5 * 60 * 1000 // 5 minutos
 
 class CacheManager {
-  static set(key: string, data: any, ttl: number = CACHE_TTL) {
+  static set(key: string, data: unknown, ttl: number = CACHE_TTL) {
     try {
       const item = {
         data,
@@ -32,9 +33,9 @@ class CacheManager {
         ttl
       }
       localStorage.setItem(CACHE_PREFIX + key, JSON.stringify(item))
-      console.log(`💾 Cache salvo: ${key}`)
+      debug(`Cache salvo: ${key}`, undefined, 'CacheManager')
     } catch (error) {
-      console.warn('Erro ao salvar cache:', error)
+      warn('Erro ao salvar cache', { error }, 'CacheManager')
     }
   }
 
@@ -49,10 +50,10 @@ class CacheManager {
         return null
       }
 
-      console.log(`📦 Cache recuperado: ${key}`)
+      debug(`Cache recuperado: ${key}`, undefined, 'CacheManager')
       return parsed.data
     } catch (error) {
-      console.warn('Erro ao recuperar cache:', error)
+      warn('Erro ao recuperar cache', { error }, 'CacheManager')
       return null
     }
   }
@@ -70,7 +71,7 @@ class CacheManager {
         })
       }
     } catch (error) {
-      console.warn('Erro ao limpar cache:', error)
+      warn('Erro ao limpar cache', { error }, 'CacheManager')
     }
   }
 }
@@ -81,7 +82,7 @@ function isOnline(): boolean {
 }
 
 export function useSupabaseQuery<T>(
-  queryFn: () => Promise<{ data: T | null; error: any }>,
+  queryFn: () => Promise<{ data: T | null; error: unknown }>,
   options: QueryOptions = {}
 ): QueryResult<T> {
   const {
@@ -97,10 +98,16 @@ export function useSupabaseQuery<T>(
   const [error, setError] = useState<string | null>(null)
   const [isOffline, setIsOffline] = useState(!isOnline())
 
+  // Ref para armazenar a função de query estável
+  const queryFnRef = useRef(queryFn)
+  
+  // Atualizar ref quando queryFn mudar
+  useEffect(() => {
+    queryFnRef.current = queryFn
+  }, [queryFn])
+
   const executeQuery = useCallback(async (attempt = 1): Promise<void> => {
     try {
-      console.log(`🔄 Executando consulta (tentativa ${attempt}/${retryAttempts + 1})`)
-      
       // Verificar cache primeiro
       if (cacheKey) {
         const cached = CacheManager.get(cacheKey)
@@ -115,7 +122,6 @@ export function useSupabaseQuery<T>(
 
       // Verificar conectividade
       if (!isOnline() && offlineMode) {
-        console.log('📱 Modo offline detectado')
         setIsOffline(true)
         
         // Usar dados do cache mesmo expirados se disponíveis
@@ -124,14 +130,13 @@ export function useSupabaseQuery<T>(
             const expiredCache = localStorage.getItem(CACHE_PREFIX + cacheKey)
             if (expiredCache) {
               const parsed = JSON.parse(expiredCache)
-              console.log('📦 Usando cache expirado no modo offline')
               setData(parsed.data)
               setError('Dados podem estar desatualizados (modo offline)')
               setLoading(false)
               return
             }
           } catch (e) {
-            console.warn('Erro ao acessar cache expirado:', e)
+            // Silencioso
           }
         }
         
@@ -142,7 +147,7 @@ export function useSupabaseQuery<T>(
         return
       }
 
-      const result = await queryFn()
+      const result = await queryFnRef.current()
 
       if (result.error) {
         throw new Error(result.error.message || 'Erro na consulta')
@@ -156,23 +161,16 @@ export function useSupabaseQuery<T>(
       setData(result.data)
       setError(null)
       setIsOffline(false)
-      console.log('✅ Consulta executada com sucesso')
 
-    } catch (err: any) {
-      const errorMessage = err?.message || 'Erro desconhecido'
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
       
-      // Não fazer log de erro se o interceptador já está tratando
-      if (!errorMessage.includes('ERR_ABORTED') && !errorMessage.includes('fetch')) {
-        console.log(`⚠️ Tentativa ${attempt}: ${errorMessage}`)
-      }
-
       // Para qualquer erro, primeiro tentar cache
       if (cacheKey) {
         try {
           const expiredCache = localStorage.getItem(CACHE_PREFIX + cacheKey)
           if (expiredCache) {
             const parsed = JSON.parse(expiredCache)
-            console.log('📦 Usando cache devido a erro')
             setData(parsed.data)
             setError(null)
             setIsOffline(true)
@@ -185,13 +183,13 @@ export function useSupabaseQuery<T>(
       }
 
       // Se não tem cache, usar valor padrão diretamente (sem retry desnecessário)
-      console.log('📊 Usando valor padrão')
       setData(fallbackValue)
       setError(null)
       setIsOffline(true)
       setLoading(false)
     }
-  }, [queryFn, retryAttempts, retryDelay, cacheKey, fallbackValue, offlineMode])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [queryFn, cacheKey, fallbackValue, offlineMode])
 
   const refetch = useCallback(async () => {
     setLoading(true)
@@ -205,10 +203,11 @@ export function useSupabaseQuery<T>(
 
   useEffect(() => {
     executeQuery()
+  }, [executeQuery])
 
+  useEffect(() => {
     // Listener para mudanças de conectividade
     const handleOnline = () => {
-      console.log('🌐 Conexão restaurada')
       setIsOffline(false)
       if (error) {
         executeQuery()
@@ -216,7 +215,6 @@ export function useSupabaseQuery<T>(
     }
 
     const handleOffline = () => {
-      console.log('📱 Conexão perdida')
       setIsOffline(true)
     }
 
@@ -232,7 +230,7 @@ export function useSupabaseQuery<T>(
     
     // Retorno vazio para o caso de SSR
     return () => {}
-  }, [executeQuery, error])
+  }, [error, executeQuery])
 
   return { data, loading, error, refetch, isOffline }
 }
@@ -240,11 +238,11 @@ export function useSupabaseQuery<T>(
 // Hook específico para contagens com valores padrão inteligentes
 export function useSupabaseCount(
   table: string,
-  filters: Record<string, any> = {},
+  filters: Record<string, unknown> = {},
   options: QueryOptions = {}
 ): QueryResult<number> {
   // Valores padrão baseados no tipo de consulta
-  const getSmartFallback = (table: string, filters: Record<string, any>): number => {
+  const getSmartFallback = (table: string, filters: Record<string, unknown>): number => {
     if (table === 'trip_passengers') return 150
     if (table === 'trips') {
       if (filters.status === 'scheduled') return 12

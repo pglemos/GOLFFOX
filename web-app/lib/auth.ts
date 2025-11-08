@@ -1,4 +1,5 @@
 import { supabase } from './supabase'
+import { debug, error } from './logger'
 
 export interface UserData {
   id: string
@@ -42,26 +43,26 @@ export class AuthManager {
           const secureFlag = isSecure ? '; Secure' : ''
           document.cookie = `${this.COOKIE_NAME}=${cookieValue}; path=/; max-age=3600; SameSite=Lax${secureFlag}`
           
-          // ✅ Log apenas em desenvolvimento
-          if (process.env.NODE_ENV === 'development') {
-            console.log('🍪 Cookie salvo:', this.COOKIE_NAME, 'Secure:', isSecure)
-          }
+          // Log apenas em desenvolvimento
+          debug('Cookie salvo', { cookieName: this.COOKIE_NAME, secure: isSecure }, 'AuthManager')
         }
 
         return { success: true, user: userData }
       }
 
       return { success: false, error: 'Falha na autenticação' }
-    } catch (error: any) {
-      return { success: false, error: error.message || 'Erro inesperado' }
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Erro inesperado'
+      error('Erro no login', { error: err }, 'AuthManager')
+      return { success: false, error: errorMessage }
     }
   }
 
   static async logout(): Promise<void> {
     try {
       await supabase.auth.signOut()
-    } catch (error) {
-      console.error('Erro ao fazer logout no Supabase:', error)
+    } catch (err) {
+      error('Erro ao fazer logout no Supabase', { error: err }, 'AuthManager')
     }
 
     // Limpar dados locais

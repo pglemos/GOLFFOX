@@ -4,22 +4,23 @@
 // ========================================
 
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../core/theme/gf_tokens.dart';
 import '../../core/utils/date_utils.dart';
+import '../../models/route.dart';
+import '../../services/route_service.dart';
 import '../../ui/widgets/gf_app_bar.dart';
 import '../../ui/widgets/routes/route_progress_indicator.dart';
 import '../../ui/widgets/routes/route_stop_timeline.dart';
-import '../../services/route_service.dart';
-import '../../models/route.dart';
 import 'create_route_page.dart';
 
 class RouteDetailsPage extends ConsumerStatefulWidget {
 
   const RouteDetailsPage({
-    super.key,
     required this.route,
+    super.key,
   });
   final BusRoute route;
 
@@ -194,14 +195,14 @@ class _RouteDetailsPageState extends ConsumerState<RouteDetailsPage>
                           onPlay: (controller) => controller.repeat(),
                         )
                         .scale(
-                          begin: const Offset(1.0, 1.0),
+                          begin: const Offset(1, 1),
                           end: const Offset(1.2, 1.2),
                           duration: const Duration(seconds: 1),
                         )
                         .then()
                         .scale(
                           begin: const Offset(1.2, 1.2),
-                          end: const Offset(1.0, 1.0),
+                          end: const Offset(1, 1),
                           duration: const Duration(seconds: 1),
                         ),
                     const SizedBox(width: 8),
@@ -631,7 +632,7 @@ class _RouteDetailsPageState extends ConsumerState<RouteDetailsPage>
           ),
         );
       }
-    } catch (e) {
+    } on Exception catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -648,17 +649,17 @@ class _RouteDetailsPageState extends ConsumerState<RouteDetailsPage>
   void _cancelRoute() {
     showDialog<void>(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: const Text('Cancelar Rota'),
         content: const Text('Tem certeza que deseja cancelar esta rota?'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () => Navigator.of(dialogContext).pop(),
             child: const Text('Nao'),
           ),
           ElevatedButton(
             onPressed: () async {
-              Navigator.of(context).pop();
+              Navigator.of(dialogContext).pop();
 
               try {
                 await ref.read(routeServiceProvider).cancelRoute(
@@ -666,23 +667,23 @@ class _RouteDetailsPageState extends ConsumerState<RouteDetailsPage>
                       'Cancelada pelo usuario',
                     );
 
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Rota cancelada'),
-                      backgroundColor: Color(GfTokens.warning),
-                    ),
-                  );
-                }
-              } catch (e) {
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Erro ao cancelar rota: $e'),
-                      backgroundColor: const Color(GfTokens.error),
-                    ),
-                  );
-                }
+                if (!mounted) return;
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Rota cancelada'),
+                    backgroundColor: Color(GfTokens.warning),
+                  ),
+                );
+              } on Exception catch (e) {
+                if (!mounted) return;
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Erro ao cancelar rota: $e'),
+                    backgroundColor: const Color(GfTokens.error),
+                  ),
+                );
               }
             },
             style: ElevatedButton.styleFrom(
@@ -719,43 +720,41 @@ class _RouteDetailsPageState extends ConsumerState<RouteDetailsPage>
   void _deleteRoute() {
     showDialog<void>(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: const Text('Excluir Rota'),
         content: const Text(
           'Tem certeza que deseja excluir esta rota? Esta acao nao pode ser desfeita.',
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () => Navigator.of(dialogContext).pop(),
             child: const Text('Cancelar'),
           ),
           ElevatedButton(
             onPressed: () async {
-              Navigator.of(context).pop();
+              Navigator.of(dialogContext).pop();
 
               try {
-                await ref
-                    .read(routeServiceProvider)
-                    .deleteRoute(widget.route.id);
+                await ref.read(routeServiceProvider).deleteRoute(widget.route.id);
 
-                if (mounted) {
-                  Navigator.of(context).pop();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Rota excluida com sucesso'),
-                      backgroundColor: Color(GfTokens.success),
-                    ),
-                  );
-                }
-              } catch (e) {
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Erro ao excluir rota: $e'),
-                      backgroundColor: const Color(GfTokens.error),
-                    ),
-                  );
-                }
+                if (!mounted) return;
+
+                Navigator.of(context).pop();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Rota excluida com sucesso'),
+                    backgroundColor: Color(GfTokens.success),
+                  ),
+                );
+              } on Exception catch (e) {
+                if (!mounted) return;
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Erro ao excluir rota: $e'),
+                    backgroundColor: const Color(GfTokens.error),
+                  ),
+                );
               }
             },
             style: ElevatedButton.styleFrom(

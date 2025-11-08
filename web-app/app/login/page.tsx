@@ -188,7 +188,7 @@ function LoginContent() {
     setLoading(true)
     setTransitioning(true)
     setError(null)
-    console.log('🔐 Iniciando login para:', loginEmail)
+    // Login iniciado - log removido para produção
     const prevCursor = typeof document !== 'undefined' ? document.body.style.cursor : ''
     if (typeof document !== 'undefined') document.body.style.cursor = 'progress'
     // garantir foco no campo de senha durante autenticação

@@ -1,17 +1,19 @@
-import { createClient } from '@supabase/supabase-js'
+import { createClient, SupabaseClient } from '@supabase/supabase-js'
 
 // Inicialização lazy para evitar falhas de build quando variáveis de ambiente não estão definidas.
 // Mantém API compatível: os módulos importam `supabaseServiceRole` e usam normalmente.
-let _supabaseServiceRole: any | null = null
+type SupabaseClientType = SupabaseClient<Record<string, unknown>>
 
-function ensureSupabaseServiceRole() {
+let _supabaseServiceRole: SupabaseClientType | null = null
+
+function ensureSupabaseServiceRole(): SupabaseClientType {
   if (_supabaseServiceRole) return _supabaseServiceRole
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE
   if (!url || !key) {
     throw new Error('Supabase service role não configurado: defina NEXT_PUBLIC_SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY')
   }
-  _supabaseServiceRole = createClient(url, key, {
+  _supabaseServiceRole = createClient<Record<string, unknown>>(url, key, {
     auth: {
       autoRefreshToken: false,
       persistSession: false,
@@ -21,15 +23,20 @@ function ensureSupabaseServiceRole() {
 }
 
 // Proxy para adiar criação até primeiro uso
-export const supabaseServiceRole: any = new Proxy({}, {
-  get(_target, prop) {
+// Usa Proxy para manter compatibilidade com uso dinâmico do cliente Supabase
+export const supabaseServiceRole = new Proxy({} as SupabaseClientType, {
+  get(_target, prop: string | symbol) {
     const client = ensureSupabaseServiceRole()
-    // @ts-ignore dinâmico
-    return client[prop as keyof typeof client]
+    const value = client[prop as keyof SupabaseClientType]
+    // Se for uma função, bind para manter contexto
+    if (typeof value === 'function') {
+      return (value as (...args: unknown[]) => unknown).bind(client)
+    }
+    return value
   },
-  apply(_target, thisArg, argArray) {
+  apply(_target, _thisArg, argArray: unknown[]) {
     const client = ensureSupabaseServiceRole()
-    // @ts-ignore dinâmico
-    return client.apply(thisArg, argArray)
+    // Se o proxy for chamado como função, retornar o cliente
+    return client
   }
 })

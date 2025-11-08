@@ -5,6 +5,7 @@
 
 'use client'
 
+import { memo } from 'react'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -21,7 +22,7 @@ interface VehiclePanelProps {
   onViewHistory?: () => void
 }
 
-export function VehiclePanel({
+export const VehiclePanel = memo(function VehiclePanel({
   vehicle,
   onClose,
   onFollow,
@@ -123,7 +124,7 @@ export function VehiclePanel({
       </Card>
     </motion.div>
   )
-}
+})
 
 interface RoutePanelProps {
   route: RoutePolyline
@@ -131,7 +132,7 @@ interface RoutePanelProps {
   onViewDetails?: () => void
 }
 
-export function RoutePanel({ route, onClose, onViewDetails }: RoutePanelProps) {
+export const RoutePanel = memo(function RoutePanel({ route, onClose, onViewDetails }: RoutePanelProps) {
   return (
     <motion.div
       initial="hidden"
@@ -187,14 +188,14 @@ export function RoutePanel({ route, onClose, onViewDetails }: RoutePanelProps) {
       </Card>
     </motion.div>
   )
-}
+})
 
 interface AlertsPanelProps {
   alerts: Alert[]
   onClose: () => void
 }
 
-export function AlertsPanel({ alerts, onClose }: AlertsPanelProps) {
+export const AlertsPanel = memo(function AlertsPanel({ alerts, onClose }: AlertsPanelProps) {
   return (
     <motion.div
       initial="hidden"
@@ -240,5 +241,5 @@ export function AlertsPanel({ alerts, onClose }: AlertsPanelProps) {
       </Card>
     </motion.div>
   )
-}
+})
 

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../core/routing/app_router.dart';
-import 'drivers_page.dart';
 import 'create_driver_page.dart';
 import 'driver_details_page.dart';
+import 'drivers_page.dart';
 
 class DriverRoutes {
   static const String drivers = '/drivers';
@@ -25,11 +26,9 @@ class DriverRoutes {
         GoRoute(
           path: '/edit/:id',
           name: 'edit-driver',
-          builder: (context, state) {
-            // Editing by ID not supported directly in CreateDriverPage constructor.
-            // Navigate to page without passing the ID; implement loading by ID as needed.
-            return const CreateDriverPage();
-          },
+          // Editing by ID not supported directly in CreateDriverPage constructor.
+          // Navigate without the ID; implement loading by ID as needed.
+          builder: (context, state) => const CreateDriverPage(),
         ),
         GoRoute(
           path: '/details/:id',

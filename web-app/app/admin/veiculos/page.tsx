@@ -52,7 +52,7 @@ export default function VeiculosPage() {
 
   const loadVeiculos = async () => {
     try {
-      console.log("🔄 Iniciando carregamento de veículos...")
+      // Carregando veículos...
       
       // Consulta com todas as colunas necessárias
       const { data, error } = await supabase
@@ -70,11 +70,12 @@ export default function VeiculosPage() {
         return
       }
       
-      console.log(`✅ ${data?.length || 0} veículos carregados com sucesso!`)
+      // Veículos carregados
       setVeiculos(data || [])
-    } catch (error: any) {
-      console.error("❌ Erro ao carregar veículos:", error)
-      toast.error(`Erro ao carregar veículos: ${error.message || 'Erro desconhecido'}`)
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
+      logError("Erro ao carregar veículos", { error: err }, 'VeiculosPage')
+      toast.error(`Erro ao carregar veículos: ${errorMessage}`)
       setVeiculos([])
     }
   }

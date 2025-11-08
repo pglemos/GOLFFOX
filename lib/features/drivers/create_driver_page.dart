@@ -3,9 +3,9 @@
 // Página para criar e editar motoristas
 // ========================================
 
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/theme/gf_tokens.dart';
@@ -867,7 +867,7 @@ class _CreateDriverPageState extends ConsumerState<CreateDriverPage> {
   }
 
   void _selectPhoto() {
-    // TODO: Implementar selecao de foto
+    // TODO(golffox-team): Implementar selecao de foto
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Funcionalidade de foto sera implementada em breve'),
@@ -936,7 +936,7 @@ class _CreateDriverPageState extends ConsumerState<CreateDriverPage> {
   }
 
   void _addCertification() {
-    // TODO: Implementar adicao de certificacao
+    // TODO(golffox-team): Implementar adicao de certificacao
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Funcionalidade de certificacao sera implementada em breve'),
@@ -1001,7 +1001,7 @@ class _CreateDriverPageState extends ConsumerState<CreateDriverPage> {
       if (mounted) {
         Navigator.of(context).pop();
       }
-    } catch (e) {
+    } on Exception catch (e) {
       _showError('Erro ao salvar motorista: $e');
     } finally {
       if (mounted) {

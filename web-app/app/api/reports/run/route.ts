@@ -220,13 +220,13 @@ async function generateExcel(data: any[], columns: string[], reportKey: string) 
 async function generatePDF(data: any[], columns: string[], reportKey: string) {
   try {
     // Dynamic import para PDFKit
-    // @ts-ignore - pdfkit não tem tipos oficiais
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const PDFDocument = await import('pdfkit')
     
     // Criar documento PDF
     const chunks: Buffer[] = []
-    // @ts-ignore - pdfkit não tem tipos oficiais
-    const doc = new PDFDocument.default({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const doc = new (PDFDocument as any).default({
       size: 'A4',
       margins: { top: 50, bottom: 50, left: 50, right: 50 }
     })

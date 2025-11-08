@@ -95,9 +95,11 @@ export function useSyncAlerts() {
   useEffect(() => {
     // Verificar alertas a cada 30 segundos
     checkAlerts()
-    const interval = setInterval(checkAlerts, 30000)
+    const intervalId = setInterval(checkAlerts, 30000)
 
-    return () => clearInterval(interval)
+    return () => {
+      clearInterval(intervalId)
+    }
   }, [checkAlerts])
 
   const markAsRead = useCallback(() => {

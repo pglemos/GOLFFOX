@@ -1,19 +1,14 @@
 "use client"
 
-// @ts-ignore
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
-// @ts-ignore
 import { Button } from "@/components/ui/button"
-// @ts-ignore
 import { Input } from "@/components/ui/input"
-// @ts-ignore
 import { Label } from "@/components/ui/label"
-// @ts-ignore
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Send, Users, Route, Clock } from "lucide-react"
-// @ts-ignore
 import { supabase } from "@/lib/supabase"
 import toast from "react-hot-toast"
+import { error as logError } from "@/lib/logger"
 import { useState } from "react"
 
 interface BroadcastModalProps {
@@ -57,7 +52,7 @@ export function BroadcastModal({ isOpen, onClose, onSave, empresaId }: Broadcast
       setMessage("")
       setTarget("empresa")
     } catch (error: any) {
-      console.error("Erro ao enviar broadcast:", error)
+      logError("Erro ao enviar broadcast", { error }, 'BroadcastModal')
       toast.error(`Erro ao enviar broadcast: ${error.message}`)
     } finally {
       setLoading(false)

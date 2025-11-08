@@ -1,20 +1,14 @@
 "use client"
 
 import { useEffect, useState, useCallback } from "react"
-// @ts-ignore
 import { AppShell } from "@/components/app-shell"
-// @ts-ignore
 import { Card } from "@/components/ui/card"
-// @ts-ignore
 import { Badge } from "@/components/ui/badge"
 import { Navigation, Users, MapPin, Plus, Map } from "lucide-react"
-// @ts-ignore
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 import toast from "react-hot-toast"
-// @ts-ignore
 import { Button } from "@/components/ui/button"
-// @ts-ignore
 import Link from "next/link"
 import { useOperatorTenant } from "@/components/providers/operator-tenant-provider"
 

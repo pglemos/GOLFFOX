@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+
 import '../../models/user.dart' as app;
-import '../../services/supabase_service.dart';
 import '../../screens/operator/operator_dashboard.dart';
+import '../../services/supabase_service.dart';
 
 class OperatorHome extends StatelessWidget {
   const OperatorHome({super.key});
