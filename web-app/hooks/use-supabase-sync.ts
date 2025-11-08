@@ -10,7 +10,7 @@ import {
   getSyncStatus,
   reprocessFailedSyncs,
 } from '@/lib/supabase-sync'
-import toast from 'react-hot-toast'
+import { notifySuccess, notifyError } from '@/lib/toast'
 
 export interface UseSupabaseSyncOptions {
   onSuccess?: (result: SyncResult) => void
@@ -35,15 +35,12 @@ export function useSupabaseSync(options: UseSupabaseSyncOptions = {}) {
 
         if (result.success) {
           if (showToast) {
-            toast.success('Sincronizado com Supabase com sucesso!')
+            notifySuccess('', { i18n: { ns: 'common', key: 'success.syncSupabase' } })
           }
           onSuccess?.(result)
         } else {
           if (showToast) {
-            toast.error(
-              `Falha na sincronização após ${result.attempts} tentativas. Será reprocessado automaticamente.`,
-              { duration: 5000 }
-            )
+            notifyError('', undefined, { i18n: { ns: 'common', key: 'errors.syncWillReprocess', params: { attempts: result.attempts } }, duration: 5000 })
           }
           onError?.(result)
         }
@@ -64,7 +61,7 @@ export function useSupabaseSync(options: UseSupabaseSyncOptions = {}) {
         setLastResult(errorResult)
 
         if (showToast) {
-          toast.error('Erro inesperado na sincronização')
+          notifyError('', undefined, { i18n: { ns: 'common', key: 'errors.syncUnexpected' } })
         }
         onError?.(errorResult)
 
@@ -83,14 +80,12 @@ export function useSupabaseSync(options: UseSupabaseSyncOptions = {}) {
     try {
       const result = await reprocessFailedSyncs()
       if (showToast) {
-        toast.success(
-          `Reprocessamento concluído: ${result.succeeded} sucessos, ${result.failed} falhas`
-        )
+        notifySuccess('', { i18n: { ns: 'common', key: 'success.reprocessSync', params: { succeeded: result.succeeded, failed: result.failed } } })
       }
       return result
     } catch (error: any) {
       if (showToast) {
-        toast.error('Erro ao reprocessar sincronizações falhas')
+        notifyError('', undefined, { i18n: { ns: 'common', key: 'errors.reprocessSync' } })
       }
       throw error
     } finally {

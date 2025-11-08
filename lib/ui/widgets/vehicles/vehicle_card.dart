@@ -12,12 +12,12 @@ import '../../../models/vehicle.dart';
 class VehicleCard extends StatelessWidget {
 
   const VehicleCard({
-    super.key,
     required this.vehicle,
     this.onTap,
     this.onEdit,
     this.onDelete,
     this.showActions = true,
+    super.key,
   });
   final Vehicle vehicle;
   final VoidCallback? onTap;

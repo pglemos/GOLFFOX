@@ -10,11 +10,11 @@ import '../../../models/route.dart';
 class RouteStopItem extends StatelessWidget {
 
   const RouteStopItem({
-    super.key,
     required this.stop,
     required this.index,
     this.onEdit,
     this.onDelete,
+    super.key,
   });
   final RouteStop stop;
   final int index;

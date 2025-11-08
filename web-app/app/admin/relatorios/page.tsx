@@ -16,7 +16,8 @@ import {
   formatOccupancyReport,
   formatNotBoardedReport
 } from "@/lib/export-utils"
-import toast from "react-hot-toast"
+import { withToast } from "@/lib/toast"
+import { t } from "@/lib/i18n"
 import { 
   DropdownMenu,
   DropdownMenuContent,
@@ -114,58 +115,60 @@ export default function RelatoriosPage() {
   }
 
   const handleExport = async (report: ReportConfig, format: 'csv' | 'excel' | 'pdf') => {
-    try {
-      toast.loading('Gerando relatório...', { id: 'export' })
-
-      // Usar API server-side
-      const response = await fetch('/api/reports/run', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          reportKey: report.id,
-          format,
-          filters: {
-            companyId: selectedCompany || null,
-            periodStart: dateStart || null,
-            periodEnd: dateEnd || null
-          }
+    await withToast(
+      (async () => {
+        // Usar API server-side
+        const response = await fetch('/api/reports/run', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            reportKey: report.id,
+            format,
+            filters: {
+              companyId: selectedCompany || null,
+              periodStart: dateStart || null,
+              periodEnd: dateEnd || null
+            }
+          })
         })
-      })
 
-      if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.error || 'Erro ao gerar relatório')
-      }
-
-      // Obter blob e fazer download
-      const blob = await response.blob()
-      const url = window.URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      
-      const contentDisposition = response.headers.get('content-disposition')
-      let filename = `${report.id}-${dateStart}-${dateEnd}.${format === 'excel' ? 'xlsx' : format}`
-      
-      if (contentDisposition) {
-        const filenameMatch = contentDisposition.match(/filename="(.+)"/)
-        if (filenameMatch) {
-          filename = filenameMatch[1]
+        if (!response.ok) {
+          const error = await response.json()
+          throw new Error(error.error || 'Erro ao gerar relatório')
         }
-      }
-      
-      a.download = filename
-      document.body.appendChild(a)
-      a.click()
-      document.body.removeChild(a)
-      window.URL.revokeObjectURL(url)
 
-      toast.success('Relatório exportado com sucesso!', { id: 'export' })
-    } catch (error: any) {
-      console.error("Erro ao exportar:", error)
-      toast.error(`Erro ao exportar: ${error.message}`, { id: 'export' })
-    }
+        // Obter blob e fazer download
+        const blob = await response.blob()
+        const url = window.URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        
+        const contentDisposition = response.headers.get('content-disposition')
+        let filename = `${report.id}-${dateStart}-${dateEnd}.${format === 'excel' ? 'xlsx' : format}`
+        
+        if (contentDisposition) {
+          const filenameMatch = contentDisposition.match(/filename="(.+)"/)
+          if (filenameMatch) {
+            filename = filenameMatch[1]
+          }
+        }
+        
+        a.download = filename
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+        window.URL.revokeObjectURL(url)
+        return true
+      })(),
+      {
+        loading: 'Gerando relatório...',
+        success: t('operator', 'reports.exportSuccess', { title: report.title }),
+        error: t('operator', 'reports.exportError')
+      },
+      { id: 'export' }
+    )
   }
 
   if (loading) {

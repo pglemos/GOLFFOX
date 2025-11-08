@@ -25,7 +25,7 @@ import {
   ResponsiveContainer 
 } from "recharts"
 import { formatCurrency } from "@/lib/kpi-utils"
-import toast from "react-hot-toast"
+import { notifySuccess, notifyError } from "@/lib/toast"
 
 interface BudgetViewProps {
   companyId: string
@@ -114,14 +114,14 @@ export function BudgetView({ companyId }: BudgetViewProps) {
         throw new Error(error.error || 'Erro ao salvar orçamento')
       }
 
-      toast.success('Orçamento salvo com sucesso!')
+      notifySuccess('Orçamento salvo com sucesso!')
       setShowForm(false)
       setEditingBudget(null)
       resetForm()
       loadData()
     } catch (error: any) {
       console.error('Erro ao salvar orçamento:', error)
-      toast.error(error.message || 'Erro ao salvar orçamento')
+      notifyError(error, 'Erro ao salvar orçamento')
     }
   }
 
@@ -138,11 +138,11 @@ export function BudgetView({ companyId }: BudgetViewProps) {
         throw new Error(error.error || 'Erro ao excluir orçamento')
       }
 
-      toast.success('Orçamento excluído com sucesso!')
+      notifySuccess('Orçamento excluído com sucesso!')
       loadData()
     } catch (error: any) {
       console.error('Erro ao excluir orçamento:', error)
-      toast.error(error.message || 'Erro ao excluir orçamento')
+      notifyError(error, 'Erro ao excluir orçamento')
     }
   }
 

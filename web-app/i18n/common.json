@@ -6,7 +6,10 @@
     "fillNameCompany": "Preencha nome e empresa",
     "saveRouteFirst": "Salve a rota antes de gerar pontos",
     "saveRouteBeforeOptimize": "Salve a rota antes de otimizar",
-    "selectCompanyFirst": "Selecione uma empresa primeiro"
+    "selectCompanyFirst": "Selecione uma empresa primeiro",
+    "csvOnly": "Apenas arquivos CSV são suportados",
+    "invalidCron": "Cron inválido. Formato: minuto hora dia mês dia-semana",
+    "invalidEmails": "Adicione pelo menos um email válido"
   },
   "success": {
     "vehicleUpdated": "Veículo atualizado com sucesso!",
@@ -28,7 +31,10 @@
     "routeOptimized": "Rota otimizada com sucesso!",
     "routePlanUpdated": "Plano de rota atualizado",
     "alertResolved": "Alerta resolvido",
-    "importCosts": "Importação concluída! {imported} custos importados{errorsSuffix}"
+    "importCosts": "Importação concluída! {imported} custos importados{errorsSuffix}",
+    "validRowsFound": "{valid} linhas válidas encontradas{errorsCount}",
+    "reprocessSync": "Reprocessamento concluído: {succeeded} sucessos, {failed} falhas",
+    "syncSupabase": "Sincronizado com Supabase com sucesso!"
   },
   "errors": {
     "generic": "Erro inesperado",
@@ -49,6 +55,10 @@
     "optimizeRoute": "Erro ao otimizar",
     "authRequired": "Usuário não autenticado",
     "resolveAlert": "Erro ao resolver alerta",
-    "importCosts": "Erro ao importar custos: {message}"
+    "importCosts": "Erro ao importar custos: {message}",
+    "processFile": "Erro ao processar arquivo: {message}",
+    "reprocessSync": "Erro ao reprocessar sincronizações",
+    "syncWillReprocess": "Falha na sincronização após {attempts} tentativas. Será reprocessado automaticamente.",
+    "syncUnexpected": "Erro inesperado na sincronização"
   }
 }

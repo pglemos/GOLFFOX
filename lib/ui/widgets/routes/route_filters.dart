@@ -4,20 +4,21 @@
 // ========================================
 
 import 'package:flutter/material.dart';
+
 import '../../../core/theme/gf_tokens.dart';
 import '../../../models/route.dart';
 
 class RouteFilters extends StatefulWidget {
 
   const RouteFilters({
-    super.key,
-    this.selectedStatus,
-    this.selectedVehicle,
-    this.selectedDriver,
     required this.onStatusChanged,
     required this.onVehicleChanged,
     required this.onDriverChanged,
     required this.onClearFilters,
+    this.selectedStatus,
+    this.selectedVehicle,
+    this.selectedDriver,
+    super.key,
   });
   final RouteStatus? selectedStatus;
   final String? selectedVehicle;
@@ -230,12 +231,14 @@ class _RouteFiltersState extends State<RouteFilters> {
               vertical: 8,
             ),
           ),
-          items: _getVehicleOptions().map((vehicle) {
-            return DropdownMenuItem(
-              value: vehicle,
-              child: Text('Veiculo $vehicle'),
-            );
-          }).toList(),
+          items: _getVehicleOptions()
+              .map(
+                (vehicle) => DropdownMenuItem(
+                  value: vehicle,
+                  child: Text('Veiculo $vehicle'),
+                ),
+              )
+              .toList(),
           onChanged: widget.onVehicleChanged,
         ),
 
@@ -263,12 +266,14 @@ class _RouteFiltersState extends State<RouteFilters> {
               vertical: 8,
             ),
           ),
-          items: _getDriverOptions().map((driver) {
-            return DropdownMenuItem(
-              value: driver,
-              child: Text('Motorista $driver'),
-            );
-          }).toList(),
+          items: _getDriverOptions()
+              .map(
+                (driver) => DropdownMenuItem(
+                  value: driver,
+                  child: Text('Motorista $driver'),
+                ),
+              )
+              .toList(),
           onChanged: widget.onDriverChanged,
         ),
       ],
@@ -282,19 +287,14 @@ class _RouteFiltersState extends State<RouteFilters> {
     return count;
   }
 
-  List<String> _getVehicleOptions() {
-    // Em uma implementacao real, isso viria de um servico
-    return ['001', '002', '003', '004', '005'];
-  }
+  List<String> _getVehicleOptions() =>
+      ['001', '002', '003', '004', '005'];
 
-  List<String> _getDriverOptions() {
-    // Em uma implementacao real, isso viria de um servico
-    return [
-      'Joao Silva',
-      'Maria Santos',
-      'Pedro Oliveira',
-      'Ana Costa',
-      'Carlos Lima'
-    ];
-  }
+  List<String> _getDriverOptions() => [
+        'Joao Silva',
+        'Maria Santos',
+        'Pedro Oliveira',
+        'Ana Costa',
+        'Carlos Lima'
+      ];
 }
