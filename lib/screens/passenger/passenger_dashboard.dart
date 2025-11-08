@@ -6,18 +6,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart' as flutter_map;
 import 'package:latlong2/latlong.dart';
-
-import '../../models/user.dart' as app_user;
-import '../../models/trip.dart';
-import '../../models/driver_position.dart';
-import '../../services/supabase_service.dart';
-import '../../services/auth_service.dart';
-import '../../core/routing/app_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
+import '../../core/routing/app_router.dart';
 import '../../core/theme/gf_tokens.dart';
+import '../../models/driver_position.dart';
+import '../../models/trip.dart';
+import '../../models/user.dart' as app_user;
+import '../../services/auth_service.dart';
+import '../../services/supabase_service.dart';
 
 class PassengerDashboard extends StatefulWidget {
-  const PassengerDashboard({super.key, required this.user});
+  const PassengerDashboard({required this.user, super.key});
   final app_user.User user;
 
   @override
@@ -49,7 +49,7 @@ class _PassengerDashboardState extends State<PassengerDashboard>
   @override
   void initState() {
     super.initState();
-    _loadTrips();
+    unawaited(_loadTrips());
   }
 
   @override
@@ -92,9 +92,9 @@ class _PassengerDashboardState extends State<PassengerDashboard>
         await _loadDriverPositions();
         _subscribeToDriverPositions();
       }
-    } catch (e) {
+    } on Exception catch (error) {
       setState(() {
-        _errorMessage = 'Erro ao carregar viagens: $e';
+        _errorMessage = 'Erro ao carregar viagens: $error';
         _isLoading = false;
       });
     }
@@ -112,8 +112,8 @@ class _PassengerDashboardState extends State<PassengerDashboard>
         final latest = positions.first;
         _mapController.move(LatLng(latest.latitude, latest.longitude), 15);
       }
-    } catch (e) {
-      debugPrint('Error loading driver positions: $e');
+    } on Exception catch (error) {
+      debugPrint('Error loading driver positions: $error');
     }
   }
 
@@ -139,16 +139,16 @@ class _PassengerDashboardState extends State<PassengerDashboard>
       await _authService.signOut();
       if (!mounted) return;
       AppRouter.instance.go('/');
-    } catch (e) {
+    } on Exception catch (error) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro ao fazer logout: $e')),
+        SnackBar(content: Text('Erro ao fazer logout: $error')),
       );
     }
   }
 
   Future<void> _openReportIncidentSheet() async {
-    HapticFeedback.lightImpact();
+    await HapticFeedback.lightImpact();
     final result = await showModalBottomSheet<String>(
       context: context,
       isScrollControlled: true,
@@ -159,7 +159,6 @@ class _PassengerDashboardState extends State<PassengerDashboard>
             expand: false,
             initialChildSize: 0.38,
             maxChildSize: 0.8,
-            minChildSize: 0.25,
             builder: (context, scrollCtl) => _IncidentReportSheet(
               scrollController: scrollCtl,
             ),
@@ -168,7 +167,7 @@ class _PassengerDashboardState extends State<PassengerDashboard>
     );
 
     if (result != null && result.isNotEmpty && mounted) {
-      HapticFeedback.mediumImpact();
+      await HapticFeedback.mediumImpact();
       // aqui salvaria no backend
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Incidente reportado com sucesso')),
@@ -205,7 +204,7 @@ class _PassengerDashboardState extends State<PassengerDashboard>
             Text(
               widget.user.name,
               style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurface.withOpacity(0.7)),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.7)),
             ),
           ],
         ),
@@ -321,7 +320,6 @@ class _PassengerDashboardState extends State<PassengerDashboard>
         mapController: _mapController,
         options: const flutter_map.MapOptions(
           initialCenter: LatLng(-23.5505, -46.6333),
-          initialZoom: 13.0,
         ),
         children: [
           flutter_map.TileLayer(
@@ -337,7 +335,7 @@ class _PassengerDashboardState extends State<PassengerDashboard>
                       .map((p) => LatLng(p.latitude, p.longitude))
                       .toList(),
                   strokeWidth: 4,
-                  color: theme.colorScheme.primary.withOpacity(0.9),
+                  color: theme.colorScheme.primary.withValues(alpha: 0.9),
                 ),
               ],
             ),
@@ -411,7 +409,7 @@ class _PassengerDashboardState extends State<PassengerDashboard>
             children: [
               Icon(Icons.directions_bus,
                   size: 44,
-                  color: theme.colorScheme.onSurface.withOpacity(0.6)),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
               const SizedBox(height: 8),
               Text('Nenhuma viagem ativa', style: theme.textTheme.titleMedium),
               const SizedBox(height: 6),
@@ -419,7 +417,7 @@ class _PassengerDashboardState extends State<PassengerDashboard>
                 'Suas viagens aparecerao aqui quando disponiveis.',
                 textAlign: TextAlign.center,
                 style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onSurface.withOpacity(0.7)),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.7)),
               ),
             ],
           ),
@@ -453,7 +451,7 @@ class _FrostedAppBar extends StatelessWidget implements PreferredSizeWidget {
         height: preferredSize.height + MediaQuery.of(context).padding.top,
         padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
         decoration: BoxDecoration(
-          color: theme.colorScheme.surface.withOpacity(0.4),
+          color: theme.colorScheme.surface.withValues(alpha: 0.4),
         ),
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
@@ -589,12 +587,12 @@ class _TripStatusCardPremium extends StatelessWidget {
               children: [
                 Icon(Icons.access_time,
                     size: 18,
-                    color: theme.colorScheme.onSurface.withOpacity(0.7)),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.7)),
                 const SizedBox(width: 6),
                 Text(
                   'Horario: ${_formatDateTime(trip.scheduledStartTime!)}',
                   style: theme.textTheme.bodyMedium?.copyWith(
-                      color: theme.colorScheme.onSurface.withOpacity(0.7)),
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.7)),
                 ),
               ],
             ),
@@ -642,13 +640,13 @@ class _GlassCard extends StatelessWidget {
         child: Container(
           padding: padding ?? const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: theme.colorScheme.surface.withOpacity(0.6),
+            color: theme.colorScheme.surface.withValues(alpha: 0.6),
             border: Border.all(
-              color: theme.colorScheme.outlineVariant.withOpacity(0.3),
+              color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.08),
+                color: Colors.black.withValues(alpha: 0.08),
                 blurRadius: 18,
                 offset: const Offset(0, 8),
               ),
@@ -726,33 +724,37 @@ class _AnimatedDriverMarker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => TweenAnimationBuilder<double>(
-      duration: GfTokens.durationSlower,
-      curve: Curves.easeOutCubic,
-      tween: Tween(begin: 0, end: headingDegrees),
-      builder: (_, angle, __) {
-        return Container(
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            border: Border.all(color: borderColor, width: 3),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.1),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
+        duration: GfTokens.durationSlower,
+        curve: Curves.easeOutCubic,
+        tween: Tween(begin: 0, end: headingDegrees),
+        builder: (_, angle, __) => DecoratedBox(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: borderColor, width: 3),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.1),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+              gradient: RadialGradient(
+                colors: [
+                  color.withValues(alpha: 0.95),
+                  color.withValues(alpha: 0.6)
+                ],
               ),
-            ],
-            gradient: RadialGradient(
-              colors: [color.withOpacity(0.95), color.withOpacity(0.6)],
+            ),
+            child: Transform.rotate(
+              angle: angle * math.pi / 180,
+              child: const Icon(
+                Icons.directions_car,
+                size: 22,
+                color: Colors.white,
+              ),
             ),
           ),
-          child: Transform.rotate(
-            angle: angle * math.pi / 180,
-            child:
-                const Icon(Icons.directions_car, size: 22, color: Colors.white),
-          ),
-        );
-      },
-    );
+      );
 }
 
 class _ShimmerBar extends StatelessWidget {
@@ -761,20 +763,18 @@ class _ShimmerBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => SizedBox(
-      height: 10,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(6),
-        child: AnimatedBuilder(
-          animation: animation,
-          builder: (context, _) {
-            return CustomPaint(
+        height: 10,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(6),
+          child: AnimatedBuilder(
+            animation: animation,
+            builder: (context, _) => CustomPaint(
               painter: _ShimmerPainter(progress: animation.value),
               child: const SizedBox.expand(),
-            );
-          },
+            ),
+          ),
         ),
-      ),
-    );
+      );
 }
 
 class _ShimmerPainter extends CustomPainter {
@@ -783,20 +783,21 @@ class _ShimmerPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final base = Paint()..color = Colors.white.withOpacity(0.14);
+    final base = Paint()..color = Colors.white.withValues(alpha: 0.14);
     final shimmer = Paint()
       ..shader = LinearGradient(
         begin: Alignment(-1 + progress * 2, 0),
         end: Alignment(1 + progress * 2, 0),
         colors: [
-          Colors.white.withOpacity(0.10),
-          Colors.white.withOpacity(0.35),
-          Colors.white.withOpacity(0.10),
+          Colors.white.withValues(alpha: 0.10),
+          Colors.white.withValues(alpha: 0.35),
+          Colors.white.withValues(alpha: 0.10),
         ],
         stops: const [0.2, 0.5, 0.8],
       ).createShader(Rect.fromLTWH(0, 0, size.width, size.height));
-    canvas.drawRect(Offset.zero & size, base);
-    canvas.drawRect(Offset.zero & size, shimmer);
+    canvas
+      ..drawRect(Offset.zero & size, base)
+      ..drawRect(Offset.zero & size, shimmer);
   }
 
   @override
@@ -810,26 +811,26 @@ class _MapShimmerOverlay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => IgnorePointer(
-      child: Align(
-        alignment: Alignment.bottomCenter,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 0, 16, 16 + 56),
-          child: _GlassCard(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                _ShimmerBar(animation: animation),
-                const SizedBox(height: 10),
-                _ShimmerBar(animation: animation),
-                const SizedBox(height: 10),
-                _ShimmerBar(animation: animation),
-              ],
+        child: Align(
+          alignment: Alignment.bottomCenter,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16 + 56),
+            child: _GlassCard(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _ShimmerBar(animation: animation),
+                  const SizedBox(height: 10),
+                  _ShimmerBar(animation: animation),
+                  const SizedBox(height: 10),
+                  _ShimmerBar(animation: animation),
+                ],
+              ),
             ),
           ),
         ),
-      ),
-    );
+      );
 }
 
 class _GradientFab extends StatelessWidget {
@@ -853,7 +854,7 @@ class _GradientFab extends StatelessWidget {
         borderRadius: BorderRadius.circular(28),
         boxShadow: [
           BoxShadow(
-            color: theme.colorScheme.primary.withOpacity(0.35),
+            color: theme.colorScheme.primary.withValues(alpha: 0.35),
             blurRadius: 18,
             offset: const Offset(0, 10),
           ),
@@ -883,10 +884,10 @@ class _GlassBottomSheet extends StatelessWidget {
         filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
         child: DecoratedBox(
           decoration: BoxDecoration(
-            color: theme.colorScheme.surface.withOpacity(0.75),
+            color: theme.colorScheme.surface.withValues(alpha: 0.75),
             border: Border(
               top: BorderSide(
-                color: theme.colorScheme.outlineVariant.withOpacity(0.3),
+                color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
               ),
             ),
           ),
@@ -926,7 +927,7 @@ class _IncidentReportSheetState extends State<_IncidentReportSheet> {
             width: 44,
             height: 5,
             decoration: BoxDecoration(
-              color: theme.colorScheme.outline.withOpacity(0.5),
+              color: theme.colorScheme.outline.withValues(alpha: 0.5),
               borderRadius: BorderRadius.circular(100),
             ),
           ),
@@ -981,3 +982,4 @@ class _IncidentReportSheetState extends State<_IncidentReportSheet> {
     );
   }
 }
+

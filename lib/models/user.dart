@@ -1,6 +1,6 @@
 // lib/models/user.dart
-import 'package:flutter/foundation.dart';
 import 'package:characters/characters.dart';
+import 'package:flutter/foundation.dart';
 
 typedef Json = Map<String, dynamic>;
 
@@ -12,13 +12,13 @@ class User {
     required this.email,
     required this.name,
     required this.role,
-    this.companyId,
-    this.carrierId,
     required this.createdAt,
     required this.updatedAt,
-  })  : assert(id != ''),
-        assert(email != ''),
-        assert(role != '');
+    this.companyId,
+    this.carrierId,
+  })  : assert(id != '', 'id nao pode ser vazio'),
+        assert(email != '', 'email nao pode ser vazio'),
+        assert(role != '', 'role nao pode ser vazio');
 
   factory User.fromJson(Map<String, dynamic> json) {
     final id = _asString(json[UserFields.id]);
@@ -71,6 +71,27 @@ class User {
       carrierId: _asString(json['carrierId']),
       createdAt: _asDateTime(json['createdAt']) ?? DateTime.now(),
       updatedAt: _asDateTime(json['updatedAt']) ?? DateTime.now(),
+    );
+  }
+
+  factory User.fromSupabaseAuth({
+    required String authUserId,
+    required String email,
+    String? name,
+    String role = UserRoles.passenger,
+    String? companyId,
+    String? carrierId,
+  }) {
+    final now = DateTime.now();
+    return User(
+      id: authUserId,
+      email: email,
+      name: (name ?? '').trim().isEmpty ? email : name!.trim(),
+      role: _normalizeRole(role),
+      companyId: companyId,
+      carrierId: carrierId,
+      createdAt: now,
+      updatedAt: now,
     );
   }
   final String id;
@@ -227,27 +248,6 @@ class User {
   }
 
   /// Constroi um User "rascunho" a partir do Supabase Auth (util pos-signup)
-  static User fromSupabaseAuth({
-    required String authUserId,
-    required String email,
-    String? name,
-    String role = UserRoles.passenger,
-    String? companyId,
-    String? carrierId,
-  }) {
-    final now = DateTime.now();
-    return User(
-      id: authUserId,
-      email: email,
-      name: (name ?? '').trim().isEmpty ? email : name!.trim(),
-      role: _normalizeRole(role),
-      companyId: companyId,
-      carrierId: carrierId,
-      createdAt: now,
-      updatedAt: now,
-    );
-  }
-
   /* --------------------------------- IGUALDADE --------------------------------- */
 
   @override

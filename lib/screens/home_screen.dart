@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import '../models/user.dart';
-import 'driver/driver_dashboard.dart';
-import 'passenger/passenger_dashboard.dart';
-import 'operator/operator_dashboard.dart';
-import 'carrier/carrier_dashboard.dart';
 import '../core/theme/gf_tokens.dart';
+import '../models/user.dart';
+import 'carrier/carrier_dashboard.dart';
+import 'driver/driver_dashboard.dart';
+import 'operator/operator_dashboard.dart';
+import 'passenger/passenger_dashboard.dart';
 
 /// Papeis suportados na plataforma.
 enum UserRole { operator, carrier, driver, passenger, unknown }
@@ -33,7 +33,7 @@ extension UserRoleParsing on String {
 
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key, required this.user});
+  const HomeScreen({required this.user, super.key});
   final User user;
 
   @override
@@ -129,7 +129,7 @@ class _UnknownRoleScreen extends StatelessWidget {
                 Text(
                   'O papel do usuario "$role" nao e valido ou nao esta habilitado.',
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onSurface.withOpacity(0.7),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -195,7 +195,7 @@ class _RoleInfoBadge extends StatelessWidget {
       ),
       child: DefaultTextStyle(
         style: theme.textTheme.bodySmall!.copyWith(
-          color: theme.colorScheme.onSurface.withOpacity(0.7),
+          color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
         ),
         child: Column(
           children: [

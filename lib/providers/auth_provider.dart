@@ -49,7 +49,7 @@ final tokenValidationProvider = FutureProvider<bool>((ref) async {
   final authService = ref.watch(authServiceProvider);
   try {
     return await authService.validateToken();
-  } catch (_) {
+  } on Exception {
     return false;
   }
 });
@@ -65,7 +65,7 @@ class AuthNotifier extends StateNotifier<AsyncValue<app_user.User?>> {
     try {
       final user = await _authService.getCurrentUser();
       state = AsyncValue.data(user);
-    } catch (error, stackTrace) {
+    } on Object catch (error, stackTrace) {
       state = AsyncValue.error(error, stackTrace);
     }
   }
@@ -81,7 +81,7 @@ class AuthNotifier extends StateNotifier<AsyncValue<app_user.User?>> {
         password,
       );
       state = AsyncValue.data(user);
-    } catch (error, stackTrace) {
+    } on Object catch (error, stackTrace) {
       state = AsyncValue.error(error, stackTrace);
     }
   }
@@ -90,7 +90,7 @@ class AuthNotifier extends StateNotifier<AsyncValue<app_user.User?>> {
     try {
       await _authService.signOut();
       state = const AsyncValue.data(null);
-    } catch (error, stackTrace) {
+    } on Object catch (error, stackTrace) {
       state = AsyncValue.error(error, stackTrace);
     }
   }
@@ -99,7 +99,7 @@ class AuthNotifier extends StateNotifier<AsyncValue<app_user.User?>> {
     try {
       final user = await _authService.getCurrentUser();
       state = AsyncValue.data(user);
-    } catch (error, stackTrace) {
+    } on Object catch (error, stackTrace) {
       state = AsyncValue.error(error, stackTrace);
     }
   }
