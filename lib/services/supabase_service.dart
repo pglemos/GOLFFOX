@@ -1,10 +1,11 @@
 import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../models/user.dart' as app_user;
-import '../models/trip.dart';
 import '../models/driver_position.dart';
+import '../models/trip.dart';
+import '../models/user.dart' as app_user;
 
 typedef Json = Map<String, dynamic>;
 
@@ -21,8 +22,7 @@ class SbFailure implements Exception {
 
 class SupabaseService {
   SupabaseService._();
-  static SupabaseService? _instance;
-  static SupabaseService get instance => _instance ??= SupabaseService._();
+  static final SupabaseService instance = SupabaseService._();
 
   SupabaseClient get client {
     if (!Supabase.instance.isInitialized) {
@@ -147,8 +147,10 @@ class SupabaseService {
         try {
           final normalizedRow = _normalizeUserRow(row);
           return app_user.User.fromJson(normalizedRow);
-        } catch (e) {
-          debugPrint('getCurrentUserProfile[profiles] serialization error: $e');
+        } on Exception catch (error) {
+          debugPrint(
+            'getCurrentUserProfile[profiles] serialization error: $error',
+          );
           debugPrint('Raw row data: $row');
           debugPrint('Normalized row data: ${_normalizeUserRow(row)}');
           // continua para o fallback
@@ -168,12 +170,17 @@ class SupabaseService {
         try {
           final normalizedRow = _normalizeUserRow(row);
           return app_user.User.fromJson(normalizedRow);
-        } catch (e) {
-          debugPrint('getCurrentUserProfile[users] serialization error: $e');
+        } on Exception catch (error, stackTrace) {
+          debugPrint(
+            'getCurrentUserProfile[users] serialization error: $error',
+          );
           debugPrint('Raw row data: $row');
           debugPrint('Normalized row data: ${_normalizeUserRow(row)}');
           throw SbFailure(
-              SbErrorCode.unknown, 'Erro ao processar dados do usuario: $e', e);
+            SbErrorCode.unknown,
+            'Erro ao processar dados do usuario: $error',
+            stackTrace,
+          );
         }
       }
     } on PostgrestException catch (e) {
