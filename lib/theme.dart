@@ -82,6 +82,26 @@ class _Seeds {
   static const darkInfo = Color(0xFF38BDF8);
 }
 
+const AppSemanticColors _lightSemanticColors = AppSemanticColors(
+  success: _Seeds.lightSuccess,
+  onSuccess: Colors.white,
+  warning: _Seeds.lightWarning,
+  onWarning: Color(0xFF1A1611),
+  info: _Seeds.lightInfo,
+  onInfo: Colors.white,
+  accent: _Seeds.lightAccent,
+);
+
+const AppSemanticColors _darkSemanticColors = AppSemanticColors(
+  success: _Seeds.darkSuccess,
+  onSuccess: Color(0xFF0F1A14),
+  warning: _Seeds.darkWarning,
+  onWarning: Color(0xFF1A1611),
+  info: _Seeds.darkInfo,
+  onInfo: Color(0xFF07131A),
+  accent: _Seeds.darkAccent,
+);
+
 /// =====================
 ///  Typography helpers
 /// =====================
@@ -121,7 +141,7 @@ TextTheme _typography(ColorScheme cs) {
 /// =====================
 AppBarTheme _appBar(ColorScheme cs) => AppBarTheme(
       elevation: 0,
-      backgroundColor: cs.surface.withOpacity(0.75),
+      backgroundColor: cs.surface.withValues(alpha: 0.75),
       foregroundColor: cs.onSurface,
       centerTitle: false,
       titleTextStyle: GoogleFonts.inter(
@@ -135,7 +155,7 @@ AppBarTheme _appBar(ColorScheme cs) => AppBarTheme(
 
 InputDecorationTheme _inputs(ColorScheme cs) => InputDecorationTheme(
       filled: true,
-      fillColor: cs.surfaceContainerHighest.withOpacity(0.65),
+      fillColor: cs.surfaceContainerHighest.withValues(alpha: 0.65),
       contentPadding: const EdgeInsets.symmetric(
           horizontal: GolfFoxTheme.space4, vertical: GolfFoxTheme.space4),
       border: OutlineInputBorder(
@@ -159,7 +179,7 @@ InputDecorationTheme _inputs(ColorScheme cs) => InputDecorationTheme(
         borderSide: BorderSide(color: cs.error, width: 2),
       ),
       hintStyle: const TextStyle(color: GolfFoxTheme.textSecondary),
-      labelStyle: TextStyle(color: cs.onSurface.withOpacity(0.8)),
+      labelStyle: TextStyle(color: cs.onSurface.withValues(alpha: 0.8)),
       prefixIconColor: cs.primary,
       suffixIconColor: cs.onSurfaceVariant,
     );
@@ -191,7 +211,7 @@ ButtonStyle _outlinedButton(ColorScheme cs) => OutlinedButton.styleFrom(
 
 ChipThemeData _chips(ColorScheme cs) => ChipThemeData(
       backgroundColor: cs.surfaceContainerHighest,
-      selectedColor: cs.primary.withOpacity(0.12),
+      selectedColor: cs.primary.withValues(alpha: 0.12),
       labelStyle: GoogleFonts.inter(color: cs.onSurface),
       secondaryLabelStyle: GoogleFonts.inter(color: cs.onSurface),
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
@@ -211,7 +231,7 @@ SnackBarThemeData _snack(ColorScheme cs) => SnackBarThemeData(
 NavigationBarThemeData _navBar(ColorScheme cs) => NavigationBarThemeData(
       height: 64,
       backgroundColor: cs.surface,
-      indicatorColor: cs.primary.withOpacity(0.15),
+      indicatorColor: cs.primary.withValues(alpha: 0.15),
       labelTextStyle: WidgetStateProperty.all(
         GoogleFonts.inter(fontWeight: FontWeight.w600),
       ),
@@ -224,7 +244,7 @@ NavigationBarThemeData _navBar(ColorScheme cs) => NavigationBarThemeData(
 
 NavigationRailThemeData _navRail(ColorScheme cs) => NavigationRailThemeData(
       backgroundColor: cs.surface,
-      indicatorColor: cs.primary.withOpacity(0.15),
+      indicatorColor: cs.primary.withValues(alpha: 0.15),
       selectedIconTheme: IconThemeData(color: cs.primary),
       selectedLabelTextStyle: GoogleFonts.inter(
         fontWeight: FontWeight.w700,
@@ -269,16 +289,6 @@ ThemeData buildLightTheme() {
   );
 
   final text = _typography(cs);
-  const semantic = AppSemanticColors(
-    success: _Seeds.lightSuccess,
-    onSuccess: Colors.white,
-    warning: _Seeds.lightWarning,
-    onWarning: const Color(0xFF1A1611),
-    info: _Seeds.lightInfo,
-    onInfo: Colors.white,
-    accent: _Seeds.lightAccent,
-  );
-
   return ThemeData(
     useMaterial3: true,
     brightness: Brightness.light,
@@ -300,7 +310,7 @@ ThemeData buildLightTheme() {
     filledButtonTheme: FilledButtonThemeData(style: _primaryButton(cs)),
     elevatedButtonTheme: ElevatedButtonThemeData(style: _primaryButton(cs)),
     outlinedButtonTheme: OutlinedButtonThemeData(style: _outlinedButton(cs)),
-    extensions: [semantic],
+    extensions: const [_lightSemanticColors],
   );
 }
 
@@ -316,16 +326,6 @@ ThemeData buildDarkTheme() {
   );
 
   final text = _typography(cs);
-  const semantic = AppSemanticColors(
-    success: _Seeds.darkSuccess,
-    onSuccess: const Color(0xFF0F1A14),
-    warning: _Seeds.darkWarning,
-    onWarning: const Color(0xFF1A1611),
-    info: _Seeds.darkInfo,
-    onInfo: const Color(0xFF07131A),
-    accent: _Seeds.darkAccent,
-  );
-
   return ThemeData(
     useMaterial3: true,
     brightness: Brightness.dark,
@@ -347,7 +347,7 @@ ThemeData buildDarkTheme() {
     filledButtonTheme: FilledButtonThemeData(style: _primaryButton(cs)),
     elevatedButtonTheme: ElevatedButtonThemeData(style: _primaryButton(cs)),
     outlinedButtonTheme: OutlinedButtonThemeData(style: _outlinedButton(cs)),
-    extensions: [semantic],
+    extensions: const [_darkSemanticColors],
   );
 }
 

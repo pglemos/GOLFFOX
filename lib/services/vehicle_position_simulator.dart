@@ -5,7 +5,8 @@
 
 import 'dart:async';
 import 'dart:math';
-import 'package:flutter/foundation.dart';
+
+import '../core/services/logger_service.dart';
 import 'supabase_service.dart';
 
 class VehiclePositionSimulator {
@@ -21,7 +22,7 @@ class VehiclePositionSimulator {
     if (_isRunning) return;
 
     _isRunning = true;
-    debugPrint('Iniciando simulacao de posicoes dos veiculos...');
+    LoggerService.instance.info('Iniciando simulacao de posicoes dos veiculos...');
 
     _simulationTimer = Timer.periodic(const Duration(seconds: 15), (_) {
       _updateRandomVehiclePosition();
@@ -33,7 +34,7 @@ class VehiclePositionSimulator {
     _isRunning = false;
     _simulationTimer?.cancel();
     _simulationTimer = null;
-    debugPrint('Simulacao de posicoes parada.');
+    LoggerService.instance.info('Simulacao de posicoes parada.');
   }
 
   /// Atualiza a posicao de um veiculo aleatorio
@@ -69,10 +70,15 @@ class VehiclePositionSimulator {
         'last_update': DateTime.now().toIso8601String(),
       }).eq('vehicle_id', vehicleId);
 
-      debugPrint(
-          'Posicao atualizada para veiculo $vehicleId: ($newLat, $newLng)');
-    } catch (e) {
-      debugPrint('Erro ao atualizar posicao do veiculo: $e');
+      LoggerService.instance.debug(
+        'Posicao atualizada para veiculo $vehicleId: ($newLat, $newLng)',
+      );
+    } on Exception catch (error, stackTrace) {
+      LoggerService.instance.error(
+        'Erro ao atualizar posicao do veiculo',
+        error,
+        stackTrace,
+      );
     }
   }
 
@@ -84,9 +90,15 @@ class VehiclePositionSimulator {
         'last_update': DateTime.now().toIso8601String(),
       }).eq('vehicle_id', vehicleId);
 
-      debugPrint('Status do veiculo $vehicleId alterado para: $newStatus');
-    } catch (e) {
-      debugPrint('Erro ao alterar status do veiculo: $e');
+      LoggerService.instance.info(
+        'Status do veiculo $vehicleId alterado para: $newStatus',
+      );
+    } on Exception catch (error, stackTrace) {
+      LoggerService.instance.error(
+        'Erro ao alterar status do veiculo',
+        error,
+        stackTrace,
+      );
     }
   }
 
@@ -100,10 +112,15 @@ class VehiclePositionSimulator {
         'last_update': DateTime.now().toIso8601String(),
       }).eq('vehicle_id', vehicleId);
 
-      debugPrint(
-          'Contagem de passageiros do veiculo $vehicleId alterada para: $newCount');
-    } catch (e) {
-      debugPrint('Erro ao alterar contagem de passageiros: $e');
+      LoggerService.instance.debug(
+        'Contagem de passageiros do veiculo $vehicleId alterada para: $newCount',
+      );
+    } on Exception catch (error, stackTrace) {
+      LoggerService.instance.error(
+        'Erro ao alterar contagem de passageiros',
+        error,
+        stackTrace,
+      );
     }
   }
 
@@ -124,14 +141,15 @@ class VehiclePositionSimulator {
           'last_update': DateTime.now().toIso8601String(),
         }).eq('vehicle_id', vehicleId);
 
-        debugPrint(
-            'Veiculo $vehicleId movido para: (${waypoint['lat']}, ${waypoint['lng']})');
+        LoggerService.instance.debug(
+          'Veiculo $vehicleId movido para: (${waypoint['lat']}, ${waypoint['lng']})',
+        );
 
         // Aguardar antes do proximo ponto
         await Future<void>.delayed(const Duration(seconds: 10));
       }
-    } catch (e) {
-      debugPrint('Erro ao simular rota: $e');
+    } on Exception catch (error, stackTrace) {
+      LoggerService.instance.error('Erro ao simular rota', error, stackTrace);
     }
   }
 

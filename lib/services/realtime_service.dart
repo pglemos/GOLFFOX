@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:flutter/foundation.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../core/services/logger_service.dart';
 import '../models/vehicle_position.dart';
 
 /// Servico de real-time que combina dados mock para desenvolvimento
@@ -43,11 +43,14 @@ class RealtimeService {
       // Tentar conectar com Supabase
       await _initializeSupabase();
       _useSupabase = true;
-      debugPrint('RealtimeService: Conectado ao Supabase');
+      LoggerService.instance.info('RealtimeService: Conectado ao Supabase');
     } on Exception catch (error) {
       // Fallback para dados mock
       _useSupabase = false;
-      debugPrint('RealtimeService: Usando dados mock - $error');
+      LoggerService.instance.warning(
+        'RealtimeService: Usando dados mock',
+        'error: $error',
+      );
     }
 
     // Carregar dados iniciais
@@ -57,7 +60,9 @@ class RealtimeService {
     _startUpdates();
 
     _isInitialized = true;
-    debugPrint('RealtimeService: Inicializado (Supabase: $_useSupabase)');
+    LoggerService.instance.info(
+      'RealtimeService: Inicializado (Supabase: $_useSupabase)',
+    );
   }
 
   /// Inicializa conexao com Supabase
@@ -112,7 +117,10 @@ class RealtimeService {
           )
           .toList();
     } on Exception catch (error) {
-      debugPrint('Erro ao carregar do Supabase: $error');
+      LoggerService.instance.error(
+        'RealtimeService: Erro ao carregar do Supabase',
+        error,
+      );
       _loadMockData();
     }
   }
@@ -236,7 +244,7 @@ class RealtimeService {
 
   /// Manipula atualizacoes real-time do Supabase
   void _handleRealtimeUpdate(PostgresChangePayload payload) {
-    debugPrint('Atualizacao real-time recebida: ${payload.eventType}');
+    LoggerService.instance.info('Atualizacao real-time recebida: ${payload.eventType}');
 
     switch (payload.eventType) {
       case PostgresChangeEvent.insert:
@@ -251,7 +259,7 @@ class RealtimeService {
               break;
       case PostgresChangeEvent.all:
         // Caso para eventos gerais - nao precisamos fazer nada especifico
-        debugPrint('Evento geral recebido');
+        LoggerService.instance.info('Evento geral recebido');
         break;
     }
 
@@ -378,6 +386,6 @@ class RealtimeService {
     _realtimeChannel?.unsubscribe();
     _positionsController.close();
     _isInitialized = false;
-    debugPrint('RealtimeService: Recursos limpos');
+    LoggerService.instance.info('RealtimeService: Recursos limpos');
   }
 }

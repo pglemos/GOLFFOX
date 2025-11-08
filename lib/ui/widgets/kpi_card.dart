@@ -5,18 +5,18 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import '../../core/theme/gf_tokens.dart';
 import '../../core/motion/gf_motion.dart';
+import '../../core/theme/gf_tokens.dart';
 
 class GfKpiCard extends StatelessWidget {
 
   const GfKpiCard({
-    super.key,
     required this.title,
     required this.value,
-    this.subtitle,
     required this.icon,
     required this.iconColor,
+    super.key,
+    this.subtitle,
     this.backgroundColor,
     this.onTap,
     this.isLoading = false,
@@ -47,7 +47,6 @@ class GfKpiCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(GfTokens.radius),
               border: Border.all(
                 color: const Color(GfTokens.stroke),
-                width: 1,
               ),
             ),
             child: isLoading ? _buildLoadingState() : _buildContent(),
@@ -67,7 +66,7 @@ class GfKpiCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(GfTokens.space2),
               decoration: BoxDecoration(
-                color: iconColor.withOpacity(0.1),
+                color: iconColor.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(GfTokens.radiusSmall),
               ),
               child: Icon(
@@ -103,7 +102,7 @@ class GfKpiCard extends StatelessWidget {
             fontSize: 32,
             fontWeight: FontWeight.w700,
             color: Color(GfTokens.textTitle),
-            height: 1.0,
+            height: 1,
           ),
         ),
 

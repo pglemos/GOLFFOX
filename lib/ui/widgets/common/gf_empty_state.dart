@@ -9,8 +9,8 @@ import '../../../core/theme/gf_tokens.dart';
 class GfEmptyState extends StatelessWidget {
 
   const GfEmptyState({
-    super.key,
     required this.title,
+    super.key,
     this.subtitle,
     this.icon,
     this.action,

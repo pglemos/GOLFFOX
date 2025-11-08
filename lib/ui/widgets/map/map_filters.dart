@@ -4,18 +4,19 @@
 // ========================================
 
 import 'package:flutter/material.dart';
+
 import '../../../core/theme/unified_theme.dart';
 
 class MapFilters extends StatefulWidget {
 
   const MapFilters({
-    super.key,
     required this.selectedStatuses,
-    this.selectedRoute,
     required this.availableCompanies,
     required this.availableRoutes,
     required this.availableCarriers,
     required this.onFiltersChanged,
+    this.selectedRoute,
+    super.key,
   });
   final List<String> selectedStatuses;
   final String? selectedRoute;
@@ -39,7 +40,7 @@ class _MapFiltersState extends State<MapFilters> {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -153,8 +154,8 @@ class _MapFiltersState extends State<MapFilters> {
                   // Filtro de Rotas
                   _buildFilterSection(
                     title: 'Rotas',
-                    child: DropdownButtonFormField<String>(
-                      value: widget.selectedRoute,
+                    child: DropdownButtonFormField<String?>(
+                      initialValue: widget.selectedRoute,
                       decoration: const InputDecoration(
                         hintText: 'Selecione uma rota',
                         border: OutlineInputBorder(),
@@ -162,20 +163,18 @@ class _MapFiltersState extends State<MapFilters> {
                             EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                       ),
                       items: [
-                        const DropdownMenuItem<String>(
-                          value: null,
+                        const DropdownMenuItem<String?>(
                           child: Text('Todas as rotas'),
                         ),
-                        ...widget.availableRoutes.map((route) {
-                          return DropdownMenuItem<String>(
+                        ...widget.availableRoutes.map(
+                          (route) => DropdownMenuItem<String?>(
                             value: route,
                             child: Text(route),
-                          );
-                        }),
+                          ),
+                        ),
                       ],
-                      onChanged: (value) {
-                        widget.onFiltersChanged(widget.selectedStatuses, value);
-                      },
+                      onChanged: (value) =>
+                          widget.onFiltersChanged(widget.selectedStatuses, value),
                     ),
                   ),
 

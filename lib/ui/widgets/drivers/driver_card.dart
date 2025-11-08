@@ -10,8 +10,8 @@ import '../../../models/driver.dart';
 class DriverCard extends StatelessWidget {
 
   const DriverCard({
-    super.key,
     required this.driver,
+    super.key,
     this.onTap,
     this.onEdit,
     this.onDelete,
@@ -30,7 +30,6 @@ class DriverCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(GfTokens.radiusMd),
         side: const BorderSide(
           color: Color(GfTokens.colorBorder),
-          width: 1,
         ),
       ),
       child: InkWell(

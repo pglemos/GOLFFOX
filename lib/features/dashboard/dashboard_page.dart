@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/services/logger_service.dart';
 import '../../core/theme/gf_tokens.dart';
 import '../../data/golf_fox_repo.dart';
 import '../../ui/widgets/alert_banner.dart';
@@ -476,41 +477,41 @@ class DashboardPage extends ConsumerWidget {
   // ========================================
   void _navigateToTrips() {
     // TODO(golffox-team): Implementar navegação para viagens
-    debugPrint('Navegando para viagens');
+    LoggerService.instance.debug('Navegando para viagens');
   }
 
   void _navigateToVehicles() {
     // TODO(golffox-team): Implementar navegação para veículos
-    debugPrint('Navegando para veículos');
+    LoggerService.instance.debug('Navegando para veículos');
   }
 
   void _navigateToRoutes() {
     // TODO(golffox-team): Implementar navegação para rotas
-    debugPrint('Navegando para rotas');
+    LoggerService.instance.debug('Navegando para rotas');
   }
 
   void _navigateToAlerts() {
     // TODO(golffox-team): Implementar navegação para alertas
-    debugPrint('Navegando para alertas');
+    LoggerService.instance.debug('Navegando para alertas');
   }
 
   void _navigateToMap() {
     // TODO(golffox-team): Implementar navegação para mapa
-    debugPrint('Navegando para mapa');
+    LoggerService.instance.debug('Navegando para mapa');
   }
 
   void _navigateToReports() {
     // TODO(golffox-team): Implementar navegação para relatórios
-    debugPrint('Navegando para relatórios');
+    LoggerService.instance.debug('Navegando para relatórios');
   }
 
   void _openSettings() {
     // TODO(golffox-team): Implementar abertura de configurações
-    debugPrint('Abrindo configurações');
+    LoggerService.instance.debug('Abrindo configurações');
   }
 
   void _showReopenTripDialog() {
     // TODO(golffox-team): Implementar dialogo de reabertura de viagem
-    debugPrint('Mostrando dialogo de reabertura de viagem');
+    LoggerService.instance.debug('Mostrando dialogo de reabertura de viagem');
   }
 }

@@ -5,7 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Upload, FileSpreadsheet, AlertCircle, CheckCircle2, X } from "lucide-react"
-import toast from "react-hot-toast"
+import { notifySuccess, notifyError } from "@/lib/toast"
 import { parseCSV, validateCostRow } from "@/lib/costs/import-parser"
 
 interface ImportCostModalProps {
@@ -107,16 +107,29 @@ export function ImportCostModal({ isOpen, onClose, onSave, companyId }: ImportCo
 
       const result = await res.json()
 
-      toast.success(
-        `Importação concluída! ${result.imported} custos importados${result.errors > 0 ? `, ${result.errors} erros` : ''}`
-      )
+      notifySuccess('', {
+        i18n: {
+          ns: 'common',
+          key: 'success.importCosts',
+          params: {
+            imported: result.imported,
+            errorsSuffix: result.errors > 0 ? `, ${result.errors} erros` : ''
+          }
+        }
+      })
 
       onSave()
       onClose()
       reset()
     } catch (error: any) {
       console.error('Erro ao importar custos:', error)
-      toast.error(error.message || 'Erro ao importar custos')
+      notifyError('', undefined, {
+        i18n: {
+          ns: 'common',
+          key: 'errors.importCosts',
+          params: { message: error?.message || 'Erro desconhecido' }
+        }
+      })
     } finally {
       setImporting(false)
       setImportProgress({ current: 0, total: 0 })

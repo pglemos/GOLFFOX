@@ -61,7 +61,14 @@
     "importing": "Importando funcionários",
     "success": "Importação concluída com sucesso",
     "errors": "Erros encontrados",
-    "unresolved_addresses": "Endereços não resolvidos"
+    "unresolved_addresses": "Endereços não resolvidos",
+    "summary": "Importação concluída: {success} sucessos{errorsSuffix}{unresolvedSuffix}",
+    "error": "Erro na importação: {message}"
   },
   "dashboard_subtitle": "Visão geral da sua operação"
+,
+  "reports": {
+    "exportSuccess": "Relatório {title} exportado com sucesso!",
+    "exportError": "Erro ao exportar: {message}"
+  }
 }

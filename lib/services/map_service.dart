@@ -11,6 +11,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../core/services/logger_service.dart';
 import '../models/vehicle_position.dart';
 import 'supabase_service.dart';
 import 'vehicle_position_simulator.dart';
@@ -120,7 +121,10 @@ class MapService {
           capacity: json['capacity'] as int? ?? 30,
         )).toList();
     } on Exception catch (error) {
-      debugPrint('Erro ao buscar posicoes dos veiculos: $error');
+      LoggerService.instance.error(
+        'Erro ao buscar posicoes dos veiculos',
+        error,
+      );
       // Fallback para dados mock em caso de erro
       return _generateMockVehiclePositions();
     }
@@ -157,15 +161,22 @@ class MapService {
             schema: 'public',
             table: 'vehicle_positions',
             callback: (payload) {
-              debugPrint('Real-time update received: ${payload.eventType}');
+              LoggerService.instance.info(
+                'Real-time update received: ${payload.eventType}',
+              );
               _updateVehiclePositions();
             },
           )
           .subscribe();
 
-      debugPrint('Real-time subscription configurada para vehicle_positions');
+      LoggerService.instance.info(
+        'Real-time subscription configurada para vehicle_positions',
+      );
     } on Exception catch (error) {
-      debugPrint('Erro ao configurar real-time subscription: $error');
+      LoggerService.instance.error(
+        'Erro ao configurar real-time subscription',
+        error,
+      );
     }
   }
 

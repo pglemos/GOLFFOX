@@ -6,6 +6,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 
+import '../core/services/logger_service.dart';
 import '../models/bus_stop.dart';
 import 'map_service.dart';
 import 'supabase_service.dart';
@@ -98,8 +99,12 @@ class BusStopService {
         'estimated_arrival': estimatedArrival.toIso8601String(),
         'updated_at': DateTime.now().toIso8601String(),
       }).eq('id', stopId);
-    } on Exception {
-      // TODO(golffox): log production error via AppLogger
+    } on Exception catch (e, st) {
+      LoggerService.instance.error(
+        'Falha ao atualizar chegada estimada',
+        e,
+        st,
+      );
     }
   }
 
@@ -110,8 +115,12 @@ class BusStopService {
         'last_visit': DateTime.now().toIso8601String(),
         'updated_at': DateTime.now().toIso8601String(),
       }).eq('id', stopId);
-    } on Exception {
-      // TODO(golffox): log production error via AppLogger
+    } on Exception catch (e, st) {
+      LoggerService.instance.error(
+        'Falha ao marcar ultima visita do ponto',
+        e,
+        st,
+      );
     }
   }
 

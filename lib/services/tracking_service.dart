@@ -1,12 +1,14 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:math';
 import 'dart:io' show Platform;
+import 'dart:math';
 
 import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'supabase_service.dart';
+
+import '../core/services/logger_service.dart';
 import '../core/theme/gf_tokens.dart';
+import 'supabase_service.dart';
 
 /// Evento de status para a UI
 class TrackingStatus {
@@ -168,22 +170,25 @@ class TrackingService {
     } else {
       _timer = Timer.periodic(
         _config.streamInterval,
-        (_) => _pollPosition(),
+        (_) => unawaited(_pollPosition()),
       );
       // dispara logo
       unawaited(_pollPosition());
     }
 
     // Agenda flush periodico
-    _flushTimer = Timer.periodic(_config.flushInterval, (_) => _flushQueue());
+    _flushTimer =
+        Timer.periodic(_config.flushInterval, (_) => unawaited(_flushQueue()));
 
     // Emite status inicial
     _emitStatus();
   }
 
   Future<void> stopTracking() async {
-    _posSub?.cancel();
-    _posSub = null;
+    if (_posSub != null) {
+      await _posSub!.cancel();
+      _posSub = null;
+    }
     _timer?.cancel();
     _timer = null;
     _flushTimer?.cancel();
@@ -195,7 +200,7 @@ class TrackingService {
     // Tenta flush final (sem ficar preso - com timeout leve)
     try {
       await _flushQueue(timeout: const Duration(seconds: 8));
-    } catch (_) {
+    } on Exception {
       // mantem na fila
     }
 
@@ -210,11 +215,11 @@ class TrackingService {
 
   Future<void> _pollPosition() async {
     try {
-      final p = await Geolocator.getCurrentPosition(
-        desiredAccuracy: _config.accuracy,
-      );
+      final settings = LocationSettings(accuracy: _config.accuracy);
+      final p =
+          await Geolocator.getCurrentPosition(locationSettings: settings);
       _onPosition(p);
-    } on Object catch (e) {
+    } on Exception catch (e) {
       _emitError('Erro ao obter posicao: $e');
     }
   }
@@ -272,7 +277,7 @@ class TrackingService {
       _lastSent = p;
       // sucesso  tenta flush do que ja havia
       unawaited(_flushQueue());
-    } on Object catch (e) {
+    } on Exception catch (e) {
       _debug('Falha envio imediato, add queue: $e');
       _enqueue(p);
       await _saveQueueDebounced();
@@ -336,7 +341,7 @@ class TrackingService {
         // reset backoff ao primeiro sucesso
         backoff = const Duration(seconds: 2);
         _backoff = backoff;
-      } on Object catch (e) {
+      } on Exception catch (e) {
         _debug('Flush chunk falhou: $e');
 
         // aplica backoff + jitter e aborta o restante (tentara depois)
@@ -367,18 +372,15 @@ class TrackingService {
     await _saveQueue();
   }
 
-  Future<void> _saveQueue() {
-    _writeChain = _writeChain.then((_) async {
-      try {
-        final prefs = await SharedPreferences.getInstance();
-        final list = _queue.map(jsonEncode).toList(growable: false);
-        await prefs.setStringList(_kQueueKey, list);
-      } on Object catch (e) {
-        _debug('Erro salvando queue: $e');
-      }
-    });
-    return _writeChain;
-  }
+  Future<void> _saveQueue() => _writeChain = _writeChain.then((_) async {
+        try {
+          final prefs = await SharedPreferences.getInstance();
+          final list = _queue.map(jsonEncode).toList(growable: false);
+          await prefs.setStringList(_kQueueKey, list);
+        } on Exception catch (e) {
+          _debug('Erro salvando queue: $e');
+        }
+      });
 
   Future<void> _loadQueue() async {
     try {
@@ -389,9 +391,11 @@ class TrackingService {
         try {
           final m = jsonDecode(s) as Map<String, dynamic>;
           _queue.add(m);
-        } catch (_) {}
+        } on FormatException {
+          // Ignora item corrompido
+        }
       }
-    } on Object catch (e) {
+    } on Exception catch (e) {
       _debug('Erro lendo queue: $e');
     }
   }
@@ -434,6 +438,7 @@ class TrackingService {
   }
 
   void _emitError(String msg) {
+    LoggerService.instance.error('Tracking error', msg);
     _debug(msg);
     _statusCtrl.add(TrackingStatus(
       tracking: _isTracking,
@@ -447,8 +452,7 @@ class TrackingService {
 
   void _debug(String msg) {
     if (_config.debugLogs) {
-      // ignore: avoid_print
-      print('[Tracking] $msg');
+      LoggerService.instance.debug('[Tracking] $msg');
     }
   }
 

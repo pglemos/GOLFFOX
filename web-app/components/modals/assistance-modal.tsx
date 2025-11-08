@@ -13,7 +13,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { LifeBuoy, Send, Truck, Users, Navigation } from "lucide-react"
 import { supabase } from "@/lib/supabase"
-import toast from "react-hot-toast"
+import { notifySuccess, notifyError } from "@/lib/toast"
+import { formatError } from "@/lib/error-utils"
 import { useSupabaseSync } from "@/hooks/use-supabase-sync"
 import { 
   Select,
@@ -102,7 +103,7 @@ export function AssistanceModal({ request, isOpen, onClose, onSave }: Assistance
 
   const handleDispatch = async () => {
     if (!selectedDriverId || !selectedVehicleId) {
-      toast.error("Selecione um motorista e um veículo")
+      notifyError("Selecione um motorista e um veículo", undefined, { i18n: { ns: 'common', key: 'validation.selectDriverVehicle' } })
       return
     }
 
@@ -134,12 +135,12 @@ export function AssistanceModal({ request, isOpen, onClose, onSave }: Assistance
         },
       })
 
-      toast.success("Socorro despachado com sucesso!")
+      notifySuccess("Socorro despachado com sucesso!", { i18n: { ns: 'common', key: 'success.assistanceDispatched' } })
       onSave()
       onClose()
     } catch (error: any) {
       console.error("Erro ao despachar:", error)
-      toast.error(error.message || "Erro ao despachar socorro")
+      notifyError(formatError(error, "Erro ao despachar socorro"))
     } finally {
       setLoading(false)
     }

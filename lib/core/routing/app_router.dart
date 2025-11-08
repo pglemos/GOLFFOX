@@ -10,7 +10,9 @@ import '../../screens/driver/driver_dashboard.dart';
 import '../../screens/operator/operator_dashboard.dart';
 import '../../screens/passenger/passenger_dashboard.dart';
 import '../../services/supabase_service.dart';
+import '../../ui/widgets/common/gf_error_widget.dart';
 import '../auth/auth_manager.dart';
+import '../services/error_service.dart';
 import '../services/logger_service.dart';
 import 'app_routes.dart';
 import 'route_guards.dart';
@@ -228,35 +230,18 @@ class AppRouter {
   Widget _buildErrorPage(BuildContext context, GoRouterState state) {
     LoggerService.instance.error('Route error: ${state.error}');
 
+    final Object routeError = state.error ?? GxError(
+      code: 'routing.not_found',
+      message: 'Route not found: ${state.uri.path}',
+      userMessage: 'Página não encontrada: ${state.uri.path}',
+    );
+
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Erro'),
-      ),
+      appBar: AppBar(title: const Text('Erro')),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(
-              Icons.error_outline,
-              size: 64,
-              color: Colors.red,
-            ),
-            const SizedBox(height: 16),
-            const Text(
-              'Pagina nao encontrada',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'A pagina "${state.uri.path}" nao existe.',
-              style: const TextStyle(fontSize: 16),
-            ),
-            const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: () => AppRouter.instance.goToRoleHome(),
-              child: const Text('Voltar ao Inicio'),
-            ),
-          ],
+        child: GfErrorWidget.fromError(
+          error: routeError,
+          onRetry: AppRouter.instance.goToRoleHome,
         ),
       ),
     );
@@ -312,31 +297,12 @@ class AppRouter {
         if (snapshot.hasError) {
           return Scaffold(
             body: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.error_outline, size: 64, color: Colors.red),
-                  const SizedBox(height: 16),
-                  const Text(
-                    'Erro ao carregar perfil',
-                    style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    '${snapshot.error}',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.grey[600]),
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () {
-                      // Forca rebuild do FutureBuilder
-                      (context as Element).markNeedsBuild();
-                    },
-                    child: const Text('Tentar novamente'),
-                  ),
-                ],
+              child: GfErrorWidget.fromError(
+                error: snapshot.error!,
+                onRetry: () {
+                  // Força rebuild do FutureBuilder
+                  (context as Element).markNeedsBuild();
+                },
               ),
             ),
           );

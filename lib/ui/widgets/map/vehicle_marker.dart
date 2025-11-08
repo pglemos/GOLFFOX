@@ -4,21 +4,22 @@
 // ========================================
 
 import 'package:flutter/material.dart';
+
 import '../../../core/theme/unified_theme.dart';
+import '../../../models/driver_position.dart';
 import '../../../models/vehicle_position.dart';
 import '../../../models/vehicle_status.dart' as vs;
-import '../../../models/driver_position.dart';
 
 class VehicleMarker extends StatelessWidget {
 
   const VehicleMarker({
-    super.key,
     required this.vehicle,
     this.vehicleStatus,
     this.lastPosition,
     this.onTap,
     this.isSelected = false,
     this.size = 40,
+    super.key,
   });
   final VehiclePosition vehicle;
   final vs.VehicleStatusType? vehicleStatus;
@@ -144,10 +145,10 @@ class VehicleMarker extends StatelessWidget {
 class VehicleClusterMarker extends StatelessWidget {
 
   const VehicleClusterMarker({
-    super.key,
     required this.count,
     this.onTap,
     this.size = 50,
+    super.key,
   });
   final int count;
   final VoidCallback? onTap;

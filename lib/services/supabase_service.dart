@@ -1,8 +1,8 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../core/services/logger_service.dart';
 import '../models/driver_position.dart';
 import '../models/trip.dart';
 import '../models/user.dart' as app_user;
@@ -148,16 +148,22 @@ class SupabaseService {
           final normalizedRow = _normalizeUserRow(row);
           return app_user.User.fromJson(normalizedRow);
         } on Exception catch (error) {
-          debugPrint(
-            'getCurrentUserProfile[profiles] serialization error: $error',
+          LoggerService.instance.error(
+            'getCurrentUserProfile[profiles] serialization error',
+            error,
           );
-          debugPrint('Raw row data: $row');
-          debugPrint('Normalized row data: ${_normalizeUserRow(row)}');
+          LoggerService.instance.debug('Raw row data: $row');
+          LoggerService.instance.debug(
+            'Normalized row data: ${_normalizeUserRow(row)}',
+          );
           // continua para o fallback
         }
       }
     } on PostgrestException catch (e) {
-      debugPrint('getCurrentUserProfile[profiles] error: $e');
+      LoggerService.instance.error(
+        'getCurrentUserProfile[profiles] error',
+        e,
+      );
       // continua para o fallback
     }
 
@@ -171,11 +177,15 @@ class SupabaseService {
           final normalizedRow = _normalizeUserRow(row);
           return app_user.User.fromJson(normalizedRow);
         } on Exception catch (error, stackTrace) {
-          debugPrint(
-            'getCurrentUserProfile[users] serialization error: $error',
+          LoggerService.instance.error(
+            'getCurrentUserProfile[users] serialization error',
+            error,
+            stackTrace,
           );
-          debugPrint('Raw row data: $row');
-          debugPrint('Normalized row data: ${_normalizeUserRow(row)}');
+          LoggerService.instance.debug('Raw row data: $row');
+          LoggerService.instance.debug(
+            'Normalized row data: ${_normalizeUserRow(row)}',
+          );
           throw SbFailure(
             SbErrorCode.unknown,
             'Erro ao processar dados do usuario: $error',
@@ -184,7 +194,10 @@ class SupabaseService {
         }
       }
     } on PostgrestException catch (e) {
-      debugPrint('getCurrentUserProfile[users] error: $e');
+      LoggerService.instance.error(
+        'getCurrentUserProfile[users] error',
+        e,
+      );
       throw _mapPostgrest(e);
     }
 
@@ -247,7 +260,7 @@ class SupabaseService {
       final res = await _withTimeout(
         client.from(table).update(updates).select().maybeSingle(),
       );
-      return (res ?? <String, dynamic>{});
+      return res ?? <String, dynamic>{};
     } on PostgrestException catch (e) {
       throw _mapPostgrest(e);
     }
@@ -293,26 +306,35 @@ class SupabaseService {
 
   Future<List<DriverPosition>> getDriverPositionsForTrip(String tripId) async {
     try {
-      final res = await _withTimeout(client
-          .from('driver_positions')
-          .select()
-          .eq('trip_id', tripId)
-          .order('timestamp', ascending: false)
-          .limit(200));
+      final res = await _withTimeout(
+        client
+            .from('driver_positions')
+            .select()
+            .eq('trip_id', tripId)
+            .order('timestamp')
+            .limit(200),
+      );
       return (res as List)
-          .map((j) => DriverPosition.fromJson(j as Json))
+          .cast<Json>()
+          .map(DriverPosition.fromJson)
           .toList(growable: false);
     } on PostgrestException catch (e) {
       throw _mapPostgrest(e);
     }
   }
 
-  Stream<List<DriverPosition>> streamDriverPositionsRealtime(String tripId) => client
-        .from('driver_positions')
-        .stream(primaryKey: ['id'])
-        .eq('trip_id', tripId)
-        .order('timestamp', ascending: false)
-        .map((rows) => rows.map((j) => DriverPosition.fromJson(j)).toList());
+  Stream<List<DriverPosition>> streamDriverPositionsRealtime(String tripId) =>
+      client
+          .from('driver_positions')
+          .stream(primaryKey: ['id'])
+          .eq('trip_id', tripId)
+          .order('timestamp')
+          .map(
+            (rows) => rows
+                .cast<Json>()
+                .map(DriverPosition.fromJson)
+                .toList(growable: false),
+          );
 
   /* ===================== Trips ===================== */
 
@@ -376,7 +398,7 @@ class SupabaseService {
         case 'driver':
           var query = q('trips')
               .eq('driver_id', userProfile.id)
-              .order('updated_at', ascending: false);
+              .order('updated_at');
           if (limit != null) {
             final from = offset ?? 0;
             query = query.range(from, from + limit - 1);
@@ -385,17 +407,21 @@ class SupabaseService {
           break;
 
         case 'passenger':
-          final pass = await _withTimeout(client
-              .from('trip_passengers')
-              .select('trip_id')
-              .eq('passenger_id', userProfile.id));
-          final tripIds =
-              (pass as List).map((e) => e['trip_id'] as String).toList();
+          final pass = await _withTimeout(
+            client
+                .from('trip_passengers')
+                .select('trip_id')
+                .eq('passenger_id', userProfile.id),
+          );
+          final tripIds = (pass as List)
+              .cast<Json>()
+              .map((row) => row['trip_id'] as String)
+              .toList(growable: false);
           if (tripIds.isEmpty) return const [];
 
           var query = q('trips')
               .inFilter('id', tripIds)
-              .order('updated_at', ascending: false);
+              .order('updated_at');
           if (limit != null) {
             final from = offset ?? 0;
             query = query.range(from, from + limit - 1);
@@ -404,7 +430,7 @@ class SupabaseService {
           break;
 
         default:
-          var query = q('trips').order('updated_at', ascending: false);
+          var query = q('trips').order('updated_at');
           if (limit != null) {
             final from = offset ?? 0;
             query = query.range(from, from + limit - 1);
@@ -420,17 +446,25 @@ class SupabaseService {
 
   /// Stream de um trip especifico (atualizacoes em tempo real).
   Stream<Trip?> streamTrip(String tripId) => client
-        .from('trips')
-        .stream(primaryKey: ['id'])
-        .eq('id', tripId)
-        .map((rows) => rows.isNotEmpty ? Trip.fromJson(rows.first) : null);
+      .from('trips')
+      .stream(primaryKey: ['id'])
+      .eq('id', tripId)
+      .map(
+        (rows) => rows.isNotEmpty
+            ? Trip.fromJson(Map<String, dynamic>.from(rows.first as Map))
+            : null,
+      );
 
   /// Stream do status do trip como Json "cru", se voce realmente precisar.
   Stream<Json> streamTripStatus(String tripId) => client
-        .from('trips')
-        .stream(primaryKey: ['id'])
-        .eq('id', tripId)
-        .map((data) => data.isNotEmpty ? data.first : <String, dynamic>{});
+      .from('trips')
+      .stream(primaryKey: ['id'])
+      .eq('id', tripId)
+      .map(
+        (data) => data.isNotEmpty
+            ? Map<String, dynamic>.from(data.first as Map)
+            : <String, dynamic>{},
+      );
 
   /* ===================== Companies / Routes / Vehicles ===================== */
 
@@ -502,8 +536,7 @@ class SupabaseService {
     int? offset,
   }) async {
     try {
-      PostgrestFilterBuilder<dynamic> query =
-          client.from('mvw_trip_report').select();
+      var query = client.from('mvw_trip_report').select();
 
       if (startDate != null) {
         query = query.gte('created_at', startDate.toIso8601String());
@@ -514,8 +547,7 @@ class SupabaseService {
       if (status != null) {
         query = query.eq('status', status);
       }
-      PostgrestTransformBuilder<dynamic> ordered =
-          query.order('created_at', ascending: false);
+      var ordered = query.order('created_at');
 
       if (limit != null) {
         final from = offset ?? 0;
@@ -555,11 +587,13 @@ class SupabaseService {
 
   Future<List<Json>> getChecklistsForTrip(String tripId) async {
     try {
-      final res = await _withTimeout(client
-          .from('checklists')
-          .select()
-          .eq('trip_id', tripId)
-          .order('created_at', ascending: false));
+      final res = await _withTimeout(
+        client
+            .from('checklists')
+            .select()
+            .eq('trip_id', tripId)
+            .order('created_at'),
+      );
       return (res as List).cast<Json>();
     } on PostgrestException catch (e) {
       throw _mapPostgrest(e);
@@ -594,11 +628,11 @@ class SupabaseService {
       return res ?? <String, dynamic>{};
     } on PostgrestException catch (e) {
       throw _mapPostgrest(e);
-    } catch (e) {
+    } on Exception catch (error) {
       // Quando RPC retorna erro nao-Postgrest.
       return {
         'success': false,
-        'error': e.toString(),
+        'error': error.toString(),
       };
     }
   }
@@ -618,11 +652,13 @@ class SupabaseService {
 
   Future<List<Json>> getTripEvents(String tripId) async {
     try {
-      final res = await _withTimeout(client
-          .from('trip_events')
-          .select()
-          .eq('trip_id', tripId)
-          .order('created_at', ascending: false));
+      final res = await _withTimeout(
+        client
+            .from('trip_events')
+            .select()
+            .eq('trip_id', tripId)
+            .order('created_at'),
+      );
       return (res as List).cast<Json>();
     } on PostgrestException catch (e) {
       throw _mapPostgrest(e);

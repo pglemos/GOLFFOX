@@ -10,8 +10,8 @@ import '../../../widgets/gx_empty.dart';
 class DriverRatingCard extends StatelessWidget {
 
   const DriverRatingCard({
-    super.key,
     required this.driver,
+    super.key,
   });
   final Driver driver;
 
@@ -72,8 +72,9 @@ class DriverRatingCard extends StatelessWidget {
                     const SizedBox(height: 4),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: List.generate(5, (index) {
-                        return Icon(
+                      children: List.generate(
+                        5,
+                        (index) => Icon(
                           index < driver.stats.averageRating.floor()
                               ? Icons.star
                               : index < driver.stats.averageRating
@@ -81,8 +82,8 @@ class DriverRatingCard extends StatelessWidget {
                                   : Icons.star_border,
                           color: const Color(GfTokens.colorWarning),
                           size: 20,
-                        );
-                      }),
+                        ),
+                      ),
                     ),
                     const SizedBox(height: 4),
                     Text(
@@ -213,7 +214,7 @@ class DriverRatingCard extends StatelessWidget {
             Center(
               child: TextButton(
                 onPressed: () {
-                  // TODO: Implementar visualizacao de todas as avaliacoes
+                  // TODO(golffox-team): Implementar visualizacao de todas as avaliacoes
                 },
                 child: Text(
                   'Ver todas as ${driver.ratings.length} avaliacoes',
@@ -378,13 +379,14 @@ class DriverRatingCard extends StatelessWidget {
             children: [
               // Estrelas
               Row(
-                children: List.generate(5, (index) {
-                  return Icon(
+                children: List.generate(
+                  5,
+                  (index) => Icon(
                     index < rating.rating ? Icons.star : Icons.star_border,
                     color: const Color(GfTokens.colorWarning),
                     size: 16,
-                  );
-                }),
+                  ),
+                ),
               ),
               const Spacer(),
               // Data

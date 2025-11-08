@@ -20,6 +20,7 @@ import { Calendar, Clock, Search, Radio, Loader2 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { motion } from 'framer-motion'
 import { PeriodPicker } from './period-picker'
+import { warn, error as logError } from '@/lib/logger'
 
 interface MapFiltersProps {
   filters: {
@@ -121,7 +122,7 @@ export const MapFilters = memo(function MapFilters({
       const { data: driversData } = await driversQuery
       if (driversData) setDrivers(driversData)
     } catch (error) {
-      console.error('Erro ao carregar opções de filtros:', error)
+      logError('Erro ao carregar opções de filtros', { error }, 'AdminMapFilters')
     }
   }
 

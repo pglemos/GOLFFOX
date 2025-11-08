@@ -5,8 +5,8 @@ import 'package:intl/intl.dart';
 import '../../../core/theme/gf_tokens.dart';
 import '../../../models/trip_extended.dart';
 import '../../../widgets/gx_card.dart';
-import '../../../widgets/gx_empty.dart';
 import '../../../widgets/gx_chip.dart';
+import '../../../widgets/gx_empty.dart';
 
 enum TripHistoryFilter {
   all('Todas'),
@@ -21,8 +21,8 @@ enum TripHistoryFilter {
 class DriverTripHistory extends StatefulWidget {
 
   const DriverTripHistory({
-    super.key,
     required this.driverId,
+    super.key,
   });
   final String driverId;
 
@@ -61,7 +61,7 @@ class _DriverTripHistoryState extends State<DriverTripHistory> {
           _isLoading = false;
         });
       }
-    } catch (e) {
+    } on Exception catch (e) {
       if (mounted) {
         setState(() {
           _error = e.toString();

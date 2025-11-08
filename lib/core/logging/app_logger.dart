@@ -159,22 +159,11 @@ Body: $sanitizedBody
 
     final logMessage = '[$timestamp] $levelStr $tagStr$sanitizedMessage';
 
-    // Log no console em modo debug
-    if (kDebugMode) {
-      debugPrint(logMessage);
-
-      if (error != null) {
-        debugPrint('Error: $error');
-      }
-
-      if (stackTrace != null) {
-        debugPrint('StackTrace: $stackTrace');
-      }
-    }
+    // Em desenvolvimento, usamos apenas developer.log para evitar duplicidade de saída
 
     // Log usando developer.log para melhor integração com ferramentas
     developer.log(
-      sanitizedMessage,
+      logMessage,
       time: DateTime.now(),
       level: _getLevelValue(level),
       name: _name,

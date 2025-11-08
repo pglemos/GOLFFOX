@@ -28,13 +28,12 @@ class _DriverFiltersPanelState extends State<DriverFiltersPanel> {
   driver_services.DriverFilters get _filters => widget.filters;
 
   @override
-  Widget build(BuildContext context) => Container(
+  Widget build(BuildContext context) => DecoratedBox(
       decoration: const BoxDecoration(
         color: Color(GfTokens.colorSurface),
         border: Border(
           bottom: BorderSide(
             color: Color(GfTokens.colorBorder),
-            width: 1,
           ),
         ),
       ),
@@ -186,20 +185,28 @@ class _DriverFiltersPanelState extends State<DriverFiltersPanel> {
                 CheckboxListTile(
                   title: const Text('Motoristas com alertas'),
                   value: _filters.hasAlerts ?? false,
-                  onChanged: (value) => _updateFilters(
-                    _filters.copyWith(hasAlerts: value == true ? true : null),
-                  ),
+                  onChanged: (value) {
+                    final shouldFilter = value ?? false;
+                    _updateFilters(
+                      _filters.copyWith(
+                        hasAlerts: shouldFilter ? true : null,
+                      ),
+                    );
+                  },
                   dense: true,
                   contentPadding: EdgeInsets.zero,
                 ),
                 CheckboxListTile(
                   title: const Text('Documentos vencendo'),
                   value: _filters.hasExpiredDocuments ?? false,
-                  onChanged: (value) => _updateFilters(
-                    _filters.copyWith(
-                      hasExpiredDocuments: value == true ? true : null,
-                    ),
-                  ),
+                  onChanged: (value) {
+                    final shouldFilter = value ?? false;
+                    _updateFilters(
+                      _filters.copyWith(
+                        hasExpiredDocuments: shouldFilter ? true : null,
+                      ),
+                    );
+                  },
                   dense: true,
                   contentPadding: EdgeInsets.zero,
                 ),
@@ -212,36 +219,43 @@ class _DriverFiltersPanelState extends State<DriverFiltersPanel> {
           child: _buildFilterSection(
             title: 'Status Online',
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                RadioListTile<bool?>(
-                  title: const Text('Todos'),
-                  value: null,
-                  groupValue: _filters.isOnline,
+                DropdownButtonFormField<bool?>(
+                  initialValue: _filters.isOnline,
+                  isExpanded: true,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    isDense: true,
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: GfTokens.spacingSm,
+                      vertical: GfTokens.spacingXs,
+                    ),
+                  ),
+                  items: const [
+                    DropdownMenuItem<bool?>(
+                      child: Text('Todos'),
+                    ),
+                    DropdownMenuItem<bool?>(
+                      value: true,
+                      child: Text('Online'),
+                    ),
+                    DropdownMenuItem<bool?>(
+                      value: false,
+                      child: Text('Offline'),
+                    ),
+                  ],
                   onChanged: (value) => _updateFilters(
                     _filters.copyWith(isOnline: value),
                   ),
-                  dense: true,
-                  contentPadding: EdgeInsets.zero,
                 ),
-                RadioListTile<bool?>(
-                  title: const Text('Online'),
-                  value: true,
-                  groupValue: _filters.isOnline,
-                  onChanged: (value) => _updateFilters(
-                    _filters.copyWith(isOnline: value),
+                const SizedBox(height: GfTokens.spacingXs),
+                const Text(
+                  'Selecione para limitar os resultados pelo status atual.',
+                  style: TextStyle(
+                    fontSize: GfTokens.fontSizeXs,
+                    color: Color(GfTokens.colorOnSurfaceVariant),
                   ),
-                  dense: true,
-                  contentPadding: EdgeInsets.zero,
-                ),
-                RadioListTile<bool?>(
-                  title: const Text('Offline'),
-                  value: false,
-                  groupValue: _filters.isOnline,
-                  onChanged: (value) => _updateFilters(
-                    _filters.copyWith(isOnline: value),
-                  ),
-                  dense: true,
-                  contentPadding: EdgeInsets.zero,
                 ),
               ],
             ),
@@ -260,8 +274,7 @@ class _DriverFiltersPanelState extends State<DriverFiltersPanel> {
               children: [
                 Slider(
                   value: _filters.minRating ?? 0.0,
-                  min: 0.0,
-                  max: 5.0,
+                  max: 5,
                   divisions: 10,
                   label: (_filters.minRating ?? 0.0).toStringAsFixed(1),
                   onChanged: (value) => _updateFilters(
@@ -290,7 +303,6 @@ class _DriverFiltersPanelState extends State<DriverFiltersPanel> {
               children: [
                 Slider(
                   value: (_filters.minTrips ?? 0).toDouble(),
-                  min: 0,
                   max: 100,
                   divisions: 20,
                   label: (_filters.minTrips ?? 0).toString(),

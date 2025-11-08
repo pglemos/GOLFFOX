@@ -5,19 +5,20 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import '../../core/theme/gf_tokens.dart';
+
 import '../../core/motion/gf_motion.dart';
+import '../../core/theme/gf_tokens.dart';
 
 class GfQuickAction extends StatelessWidget {
 
   const GfQuickAction({
-    super.key,
     required this.title,
     required this.description,
     required this.icon,
     required this.iconColor,
     required this.onTap,
     this.isEnabled = true,
+    super.key,
   });
   final String title;
   final String description;
@@ -43,7 +44,6 @@ class GfQuickAction extends StatelessWidget {
               borderRadius: BorderRadius.circular(GfTokens.radius),
               border: Border.all(
                 color: const Color(GfTokens.stroke),
-                width: 1,
               ),
             ),
             child: Column(

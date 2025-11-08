@@ -11,6 +11,7 @@ import '../../core/theme/gf_tokens.dart';
 import '../../models/driver.dart';
 import '../../services/driver_service.dart';
 import '../../ui/widgets/common/gf_app_bar.dart';
+import '../../ui/widgets/common/gf_error_widget.dart';
 import '../../ui/widgets/common/gf_loading_indicator.dart';
 import '../../ui/widgets/drivers/driver_card.dart';
 import '../../ui/widgets/drivers/driver_filters.dart';
@@ -240,39 +241,11 @@ class _DriversPageState extends ConsumerState<DriversPage> {
     );
 
   Widget _buildErrorState(Object error, DriverService service) => Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(
-            Icons.error_outline,
-            size: 64,
-            color: Color(GfTokens.colorError),
-          ),
-          const SizedBox(height: GfTokens.spacingMd),
-          const Text(
-            'Erro ao carregar motoristas',
-            style: TextStyle(
-              fontSize: GfTokens.fontSizeLg,
-              fontWeight: FontWeight.w600,
-              color: Color(GfTokens.colorOnSurface),
-            ),
-          ),
-          const SizedBox(height: GfTokens.spacingSm),
-          Text(
-            error.toString(),
-            style: const TextStyle(
-              color: Color(GfTokens.colorOnSurfaceVariant),
-            ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: GfTokens.spacingMd),
-          ElevatedButton(
-            onPressed: () => service.refreshDrivers(),
-            child: const Text('Tentar Novamente'),
-          ),
-        ],
-      ),
-    );
+        child: GfErrorWidget.fromError(
+          error: error,
+          onRetry: service.refreshDrivers,
+        ),
+      );
 
   void _navigateToCreateDriver() {
     Navigator.of(context).push(
