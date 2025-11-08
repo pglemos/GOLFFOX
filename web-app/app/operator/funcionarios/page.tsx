@@ -9,7 +9,8 @@ import { Badge } from "@/components/ui/badge"
 import { Users, Search, Mail, Phone, Building, AlertCircle } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { useRouter, useSearchParams } from "next/navigation"
-import toast from "react-hot-toast"
+import { notifyError } from "@/lib/toast"
+import CSVImportModal from "@/components/operator/csv-import-modal"
 import { FuncionariosErrorBoundary } from "./error-boundary"
 import { debug, error } from "@/lib/logger"
 
@@ -39,6 +40,7 @@ function FuncionariosPageContent() {
   const [funcionarios, setFuncionarios] = useState<Funcionario[]>([])
   const [searchQuery, setSearchQuery] = useState("")
   const [error, setError] = useState<string | null>(null)
+  const [isCsvModalOpen, setIsCsvModalOpen] = useState(false)
 
   // Carregar usuário
   useEffect(() => {
@@ -119,7 +121,7 @@ function FuncionariosPageContent() {
       } catch (err: any) {
         error("Erro ao carregar funcionários", { error: err }, 'FuncionariosPage')
         setError(err.message || 'Erro ao carregar funcionários')
-        toast.error(`Erro: ${err.message}`)
+        notifyError(err, `Erro: ${err.message}`)
       } finally {
         setLoading(false)
       }
@@ -220,9 +222,14 @@ function FuncionariosPageContent() {
               Empresa: {companyId.substring(0, 8)}...
             </p>
           </div>
-          <Button onClick={() => router.push('/operator')} variant="outline">
-            Voltar
-          </Button>
+          <div className="flex gap-2">
+            <Button onClick={() => router.push('/operator')} variant="outline">
+              Voltar
+            </Button>
+            <Button variant="default" onClick={() => setIsCsvModalOpen(true)}>
+              Importar CSV
+            </Button>
+          </div>
         </div>
 
         {/* Busca */}
@@ -310,6 +317,17 @@ function FuncionariosPageContent() {
           </div>
         )}
       </div>
+        {/* Modal de Importação CSV */}
+        <CSVImportModal
+          isOpen={isCsvModalOpen}
+          onClose={() => setIsCsvModalOpen(false)}
+          onSave={() => {
+            setIsCsvModalOpen(false)
+            // Recarrega a página para refletir novos dados
+            window.location.reload()
+          }}
+          empresaId={companyId || undefined}
+        />
     </AppShell>
   )
 }

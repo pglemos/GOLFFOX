@@ -42,7 +42,7 @@ export function ImportCostModal({ isOpen, onClose, onSave, companyId }: ImportCo
     if (!selectedFile) return
 
     if (!selectedFile.name.endsWith('.csv')) {
-      toast.error('Apenas arquivos CSV são suportados')
+      notifyError('', undefined, { i18n: { ns: 'common', key: 'validation.csvOnly' } })
       return
     }
 
@@ -74,13 +74,22 @@ export function ImportCostModal({ isOpen, onClose, onSave, companyId }: ImportCo
       setErrors(validationErrors)
 
       if (validated.length === 0) {
-        toast.error('Nenhuma linha válida encontrada no arquivo')
+        notifyError('')
       } else {
-        toast.success(`${validated.length} linhas válidas encontradas${validationErrors.length > 0 ? `, ${validationErrors.length} com erros` : ''}`)
+        notifySuccess('', {
+          i18n: {
+            ns: 'common',
+            key: 'success.validRowsFound',
+            params: {
+              valid: validated.length,
+              errorsCount: validationErrors.length > 0 ? `, ${validationErrors.length} com erros` : ''
+            }
+          }
+        })
       }
     } catch (error: any) {
       console.error('Erro ao processar arquivo:', error)
-      toast.error(`Erro ao processar arquivo: ${error.message}`)
+      notifyError('', undefined, { i18n: { ns: 'common', key: 'errors.processFile', params: { message: error?.message || 'Erro desconhecido' } } })
     }
   }
 

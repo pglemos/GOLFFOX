@@ -11,8 +11,8 @@ import '../../../models/route.dart';
 class RouteProgressIndicator extends StatelessWidget {
 
   const RouteProgressIndicator({
-    super.key,
     required this.route,
+    super.key,
   });
   final BusRoute route;
 

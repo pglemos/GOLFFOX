@@ -67,8 +67,23 @@
   },
   "dashboard_subtitle": "Visão geral da sua operação"
 ,
+  "employees": {
+    "created": "Funcionário cadastrado com sucesso!",
+    "updated": "Funcionário atualizado com sucesso!",
+    "saveError": "Erro ao salvar funcionário"
+  },
   "reports": {
     "exportSuccess": "Relatório {title} exportado com sucesso!",
-    "exportError": "Erro ao exportar: {message}"
+    "exportError": "Erro ao exportar: {message}",
+    "schedule": {
+      "successCreated": "Agendamento criado com sucesso!",
+      "successUpdated": "Agendamento atualizado com sucesso!",
+      "validation": {
+        "selectReport": "Selecione um relatório"
+      },
+      "errors": {
+        "createSchedule": "Erro ao criar agendamento"
+      }
+    }
   }
 }

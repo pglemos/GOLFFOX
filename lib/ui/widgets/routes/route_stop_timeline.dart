@@ -11,9 +11,9 @@ import '../../../models/route.dart';
 class RouteStopTimeline extends StatelessWidget {
 
   const RouteStopTimeline({
-    super.key,
     required this.stops,
     this.isActive = false,
+    super.key,
   });
   final List<RouteStop> stops;
   final bool isActive;

@@ -5,6 +5,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+
 import '../../../core/theme/gf_tokens.dart';
 import '../../../models/route.dart';
 import '../gf_hover_scale.dart';
@@ -12,12 +13,12 @@ import '../gf_hover_scale.dart';
 class RouteCard extends StatelessWidget {
 
   const RouteCard({
-    super.key,
     required this.route,
     this.onTap,
     this.onStart,
     this.onCancel,
     this.onEdit,
+    super.key,
   });
   final BusRoute route;
   final VoidCallback? onTap;
@@ -33,7 +34,6 @@ class RouteCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(GfTokens.radiusMd),
           side: BorderSide(
             color: Color(route.status.colorValue).withValues(alpha: 0.3),
-            width: 1,
           ),
         ),
         child: InkWell(
@@ -218,14 +218,14 @@ class RouteCard extends StatelessWidget {
                 onPlay: (controller) => controller.repeat(),
               )
               .scale(
-                begin: const Offset(1.0, 1.0),
+                begin: const Offset(1, 1),
                 end: const Offset(1.2, 1.2),
                 duration: const Duration(seconds: 1),
               )
               .then()
               .scale(
                 begin: const Offset(1.2, 1.2),
-                end: const Offset(1.0, 1.0),
+                end: const Offset(1, 1),
                 duration: const Duration(seconds: 1),
               ),
           const SizedBox(width: 6),

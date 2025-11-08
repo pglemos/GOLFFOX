@@ -21,7 +21,7 @@ import {
   getFailedSyncs,
   reprocessFailedSyncs,
 } from '@/lib/supabase-sync'
-import toast from 'react-hot-toast'
+import { notifySuccess, notifyError } from '@/lib/toast'
 
 export function SyncMonitor() {
   const [status, setStatus] = useState(getSyncStatus())
@@ -47,12 +47,12 @@ export function SyncMonitor() {
     setReprocessing(true)
     try {
       const result = await reprocessFailedSyncs()
-      toast.success(
-        `Reprocessamento concluído: ${result.succeeded} sucessos, ${result.failed} falhas`
-      )
+      notifySuccess('', {
+        i18n: { ns: 'common', key: 'success.reprocessSync', params: { succeeded: result.succeeded, failed: result.failed } }
+      })
       refresh()
     } catch (error: any) {
-      toast.error('Erro ao reprocessar sincronizações')
+      notifyError('', undefined, { i18n: { ns: 'common', key: 'errors.reprocessSync' } })
     } finally {
       setReprocessing(false)
     }

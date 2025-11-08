@@ -6,8 +6,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import '../../core/theme/gf_tokens.dart';
+
 import '../../core/motion/gf_motion.dart';
+import '../../core/theme/gf_tokens.dart';
 import '../../services/supabase_service.dart';
 
 class GfTopBar extends ConsumerWidget implements PreferredSizeWidget {
@@ -24,7 +25,6 @@ class GfTopBar extends ConsumerWidget implements PreferredSizeWidget {
         border: Border(
           bottom: BorderSide(
             color: Color(GfTokens.stroke),
-            width: 1,
           ),
         ),
       ),
@@ -66,10 +66,7 @@ class GfTopBar extends ConsumerWidget implements PreferredSizeWidget {
         SizedBox(
           width: 32,
           height: 32,
-          child: SvgPicture.asset(
-            'assets/icons/golf_fox_logo.svg',
-            fit: BoxFit.contain,
-          ),
+          child: SvgPicture.asset('assets/icons/golf_fox_logo.svg'),
         ),
 
         const SizedBox(width: GfTokens.space3),
@@ -171,7 +168,7 @@ class GfTopBar extends ConsumerWidget implements PreferredSizeWidget {
         // Botao Preferencias
         IconButton(
           onPressed: () {
-            // TODO: Abrir modal de preferencias
+            // TODO(golffox-team): Abrir modal de preferencias
           },
           icon: const Icon(
             Icons.settings_outlined,
@@ -217,7 +214,6 @@ class GfTopBar extends ConsumerWidget implements PreferredSizeWidget {
               borderRadius: BorderRadius.circular(18),
               border: Border.all(
                 color: const Color(GfTokens.stroke),
-                width: 1,
               ),
             ),
             child: const Icon(

@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { User } from "lucide-react"
 import { supabase } from "@/lib/supabase"
-import toast from "react-hot-toast"
+import { notifySuccess, notifyError } from "@/lib/toast"
 import { error as logError } from "@/lib/logger"
 import { useState, useEffect } from "react"
 
@@ -124,7 +124,9 @@ export function FuncionarioModal({ funcionario, isOpen, onClose, onSave, empresa
             .eq("id", funcionario.employee_id)
         }
 
-        toast.success("Funcionário atualizado com sucesso!")
+        notifySuccess("Funcionário atualizado com sucesso!", {
+          i18n: { namespace: 'operator', key: 'employees.updated' }
+        })
       } else {
         // Create new employee user via API route
         const res = await fetch('/api/operator/create-employee', {
@@ -161,14 +163,18 @@ export function FuncionarioModal({ funcionario, isOpen, onClose, onSave, empresa
 
         if (error) throw error
 
-        toast.success("Funcionário cadastrado com sucesso!")
+        notifySuccess("Funcionário cadastrado com sucesso!", {
+          i18n: { namespace: 'operator', key: 'employees.created' }
+        })
       }
 
       onSave()
       onClose()
     } catch (error: any) {
       logError("Erro ao salvar funcionário", { error }, 'FuncionarioModal')
-      toast.error(`Erro ao salvar funcionário: ${error.message}`)
+      notifyError(`Erro ao salvar funcionário: ${error.message}`, {
+        i18n: { namespace: 'operator', key: 'employees.saveError' }
+      })
     } finally {
       setLoading(false)
     }

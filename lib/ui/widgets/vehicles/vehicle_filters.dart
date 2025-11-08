@@ -11,9 +11,9 @@ import '../../../services/vehicle_service.dart';
 class VehicleFiltersWidget extends StatefulWidget {
 
   const VehicleFiltersWidget({
-    super.key,
     required this.filters,
     required this.onFiltersChanged,
+    super.key,
   });
   final VehicleFilters filters;
   final ValueChanged<VehicleFilters> onFiltersChanged;
@@ -78,13 +78,12 @@ class _VehicleFiltersWidgetState extends State<VehicleFiltersWidget>
   }
 
   @override
-  Widget build(BuildContext context) => Container(
+  Widget build(BuildContext context) => DecoratedBox(
       decoration: const BoxDecoration(
         color: Color(GfTokens.colorSurface),
         border: Border(
           bottom: BorderSide(
             color: Color(GfTokens.colorBorder),
-            width: 1,
           ),
         ),
       ),

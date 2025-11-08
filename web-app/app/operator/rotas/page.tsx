@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge"
 import { Navigation, Users, MapPin, Plus, Map } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
-import toast from "react-hot-toast"
+import { notifyError } from "@/lib/toast"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { useOperatorTenant } from "@/components/providers/operator-tenant-provider"
@@ -69,7 +69,9 @@ export default function OperatorRotasPage() {
       if (queryError) {
         console.error("Erro ao carregar rotas:", queryError)
         setError(`Erro ao carregar rotas: ${queryError.message}`)
-        toast.error(`Erro: ${queryError.message}`)
+        notifyError(`Erro: ${queryError.message}`, {
+          i18n: { namespace: 'common', key: 'errors.generic' }
+        })
         setRotas([])
         return
       }
@@ -78,7 +80,9 @@ export default function OperatorRotasPage() {
       console.error("Erro ao carregar rotas:", err)
       const errorMessage = err?.message || 'Erro desconhecido'
       setError(errorMessage)
-      toast.error(`Erro: ${errorMessage}`)
+      notifyError(`Erro: ${errorMessage}`, {
+        i18n: { namespace: 'common', key: 'errors.generic' }
+      })
       setRotas([])
     } finally {
       setLoading(false)
