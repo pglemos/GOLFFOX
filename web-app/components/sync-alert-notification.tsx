@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge'
 import { AlertTriangle, X } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState } from 'react'
-import Link from 'next/link'
+// Substituído Link por âncora para evitar erro de default export em build
 
 export function SyncAlertNotification() {
   const { alerts, hasCriticalAlerts, unreadCount, markAsRead } = useSyncAlerts()
@@ -105,13 +105,13 @@ export function SyncAlertNotification() {
               </div>
 
               <div className="mt-3 pt-3 border-t">
-                <Link
+                <a
                   href="/admin/sincronizacao"
                   onClick={() => setIsExpanded(false)}
                   className="text-xs text-[var(--brand)] hover:underline"
                 >
                   Ver detalhes →
-                </Link>
+                </a>
               </div>
             </div>
           </motion.div>
