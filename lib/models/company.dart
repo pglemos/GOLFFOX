@@ -1,6 +1,6 @@
 // lib/models/company.dart
-import 'package:flutter/foundation.dart';
 import 'package:characters/characters.dart';
+import 'package:flutter/foundation.dart';
 
 typedef Json = Map<String, dynamic>;
 
@@ -10,14 +10,14 @@ class Company {
   const Company({
     required this.id,
     required this.name,
-    this.address,
-    this.phone,
-    this.email,
     required this.isActive,
     required this.createdAt,
     required this.updatedAt,
-  })  : assert(id != ''),
-        assert(name != '');
+    this.address,
+    this.phone,
+    this.email,
+  })  : assert(id != '', 'id nao pode ser vazio'),
+        assert(name != '', 'name nao pode ser vazio');
 
   /// Mantem compatibilidade: carrega de snake_case (padrao Supabase)
   factory Company.fromJson(Map<String, dynamic> json) => Company(

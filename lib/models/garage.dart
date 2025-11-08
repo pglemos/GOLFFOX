@@ -10,24 +10,30 @@ class Garage {
   const Garage({
     required this.id,
     required this.name,
-    this.description,
-    this.address,
     required this.latitude,
     required this.longitude,
+    required this.createdAt,
+    required this.updatedAt,
+    this.description,
+    this.address,
     this.radius = 100.0, // 100 metros por padrao
     this.polygon,
     this.isActive = true,
     this.companyId,
-    required this.createdAt,
-    required this.updatedAt,
   });
 
   factory Garage.fromJson(Map<String, dynamic> json) {
     List<LatLng>? polygonPoints;
     if (json['polygon'] != null) {
-      final polygonData = json['polygon'] as List;
+      final polygonData = json['polygon'] as List<dynamic>;
       polygonPoints = polygonData
-          .map((p) => LatLng(p['lat'] as double, p['lng'] as double))
+          .map((p) {
+            final point = p as Map<String, dynamic>;
+            return LatLng(
+              (point['lat'] as num).toDouble(),
+              (point['lng'] as num).toDouble(),
+            );
+          })
           .toList();
     }
 
@@ -90,12 +96,12 @@ class Garage {
   }
 
   bool _rayCastIntersect(LatLng point, LatLng vertA, LatLng vertB) {
-    var aY = vertA.latitude;
-    var bY = vertB.latitude;
-    var aX = vertA.longitude;
-    var bX = vertB.longitude;
-    var pY = point.latitude;
-    var pX = point.longitude;
+    final aY = vertA.latitude;
+    final bY = vertB.latitude;
+    final aX = vertA.longitude;
+    final bX = vertB.longitude;
+    final pY = point.latitude;
+    final pX = point.longitude;
 
     if ((aY > pY) != (bY > pY) &&
         (pX < (bX - aX) * (pY - aY) / (bY - aY) + aX)) {

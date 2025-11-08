@@ -1,6 +1,15 @@
 {
+  "root": true,
   "extends": [
-    "next/core-web-vitals"
+    "next/core-web-vitals",
+    "plugin:@typescript-eslint/recommended"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "warnOnUnsupportedTypeScriptVersion": false
+  },
+  "plugins": [
+    "@typescript-eslint"
   ],
   "rules": {
     "prefer-const": "error",

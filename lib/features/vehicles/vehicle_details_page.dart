@@ -5,21 +5,22 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../core/theme/gf_tokens.dart';
-import '../../ui/widgets/common/gf_app_bar.dart';
-import '../../ui/widgets/common/gf_loading_indicator.dart';
-import '../../ui/widgets/vehicles/vehicle_info_card.dart';
-import '../../ui/widgets/vehicles/vehicle_maintenance_list.dart';
-import '../../ui/widgets/vehicles/vehicle_fuel_chart.dart';
 import '../../models/vehicle.dart';
 import '../../services/vehicle_service.dart';
+import '../../ui/widgets/common/gf_app_bar.dart';
+import '../../ui/widgets/common/gf_loading_indicator.dart';
+import '../../ui/widgets/vehicles/vehicle_fuel_chart.dart';
+import '../../ui/widgets/vehicles/vehicle_info_card.dart';
+import '../../ui/widgets/vehicles/vehicle_maintenance_list.dart';
 import 'create_vehicle_page.dart';
 
 class VehicleDetailsPage extends ConsumerStatefulWidget {
 
   const VehicleDetailsPage({
-    super.key,
     required this.vehicleId,
+    super.key,
   });
   final String vehicleId;
 
@@ -90,7 +91,7 @@ class _VehicleDetailsPageState extends ConsumerState<VehicleDetailsPage>
         if (mounted) {
           Navigator.of(context).pop();
         }
-      } catch (e) {
+      } on Exception catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -131,7 +132,7 @@ class _VehicleDetailsPageState extends ConsumerState<VehicleDetailsPage>
           ),
         );
       }
-    } catch (e) {
+    } on Exception catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -198,7 +199,7 @@ class _VehicleDetailsPageState extends ConsumerState<VehicleDetailsPage>
           ),
         ),
       ),
-      data: (Vehicle? vehicle) {
+      data: (vehicle) {
         if (vehicle == null) {
           return const Scaffold(
             backgroundColor: Color(GfTokens.colorSurfaceBackground),
@@ -209,7 +210,7 @@ class _VehicleDetailsPageState extends ConsumerState<VehicleDetailsPage>
           );
         }
 
-        final double fuelLevel =
+        final fuelLevel =
             (vehicle.currentFuelLevel ?? 0).clamp(0, 100).toDouble();
 
         return Scaffold(
@@ -576,17 +577,19 @@ class _VehicleDetailsPageState extends ConsumerState<VehicleDetailsPage>
                     Wrap(
                       spacing: GfTokens.spacingSm,
                       runSpacing: GfTokens.spacingSm,
-                      children: vehicle.features.map((feature) {
-                        return Chip(
-                          label: Text(feature),
-                          backgroundColor: const Color(GfTokens.colorPrimary)
-                              .withValues(alpha: 0.1),
-                          side: BorderSide(
-                            color: const Color(GfTokens.colorPrimary)
-                                .withValues(alpha: 0.3),
-                          ),
-                        );
-                      }).toList(),
+                      children: vehicle.features
+                          .map(
+                            (feature) => Chip(
+                              label: Text(feature),
+                              backgroundColor: const Color(GfTokens.colorPrimary)
+                                  .withValues(alpha: 0.1),
+                              side: BorderSide(
+                                color: const Color(GfTokens.colorPrimary)
+                                    .withValues(alpha: 0.3),
+                              ),
+                            ),
+                          )
+                          .toList(),
                     ),
                   ],
                 ),

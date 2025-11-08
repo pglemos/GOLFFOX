@@ -12,11 +12,11 @@ class DriverPosition {
     required this.driverId,
     required this.latitude,
     required this.longitude,
+    required this.timestamp,
+    required this.createdAt,
     this.accuracy,
     this.speed,
     this.heading,
-    required this.timestamp,
-    required this.createdAt,
   });
 
   /// Leitura tolerante a tipos/chaves (snake_case do DB)

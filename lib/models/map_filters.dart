@@ -110,10 +110,7 @@ class MapFilters {
 
   /// Obtem todos os status correspondentes as situacoes selecionadas
   List<VehicleStatusType> get allSelectedStatuses {
-    final allStatuses = <VehicleStatusType>[];
-
-    // Adicionar status explicitamente selecionados
-    allStatuses.addAll(selectedStatuses);
+    final allStatuses = <VehicleStatusType>[...selectedStatuses];
 
     // Adicionar status correspondentes as situacoes
     for (final situation in selectedSituations) {

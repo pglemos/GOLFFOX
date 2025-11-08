@@ -17,6 +17,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { motion } from "framer-motion"
+import { debug, error as logError } from "@/lib/logger"
 
 export default function VeiculosPage() {
   const router = useRouter()
@@ -34,7 +35,11 @@ export default function VeiculosPage() {
   const [activeTab, setActiveTab] = useState<string>("dados")
   const [viewingVehicle, setViewingVehicle] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState("")
-  const [deleteConfirm, setDeleteConfirm] = useState<{isOpen: boolean, vehicle: any | null}>({isOpen: false, vehicle: null})
+  const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; vehicle: any | null; isDeleting: boolean }>({
+    isOpen: false,
+    vehicle: null,
+    isDeleting: false
+  })
 
   useEffect(() => {
     const getUser = async () => {
@@ -64,7 +69,7 @@ export default function VeiculosPage() {
         .order('created_at', { ascending: false })
 
       if (error) {
-        console.error("❌ Erro do Supabase ao carregar veículos:", error)
+        logError("Erro do Supabase ao carregar veículos", { error }, "VeiculosPage")
         toast.error(`Erro ao carregar veículos: ${error.message}`)
         setVeiculos([])
         return
@@ -91,7 +96,7 @@ export default function VeiculosPage() {
       if (error) throw error
       setMaintenances(data || [])
     } catch (error) {
-      console.error("Erro ao carregar manutenções:", error)
+      logError("Erro ao carregar manutenções", { error, vehicleId }, "VeiculosPage")
       setMaintenances([])
     }
   }
@@ -110,7 +115,7 @@ export default function VeiculosPage() {
       if (error) throw error
       setChecklists(data || [])
     } catch (error) {
-      console.error("Erro ao carregar checklists:", error)
+      logError("Erro ao carregar checklists", { error, vehicleId }, "VeiculosPage")
       setChecklists([])
     }
   }
@@ -124,20 +129,53 @@ export default function VeiculosPage() {
   }
 
   const handleDeleteVehicle = async (vehicleId: string) => {
+    setDeleteConfirm((prev) => ({ ...prev, isDeleting: true }))
+    let shouldResetState = true
+
     try {
-      const { error } = await supabase
-        .from("vehicles")
-        .delete()
-        .eq("id", vehicleId)
+      const response = await fetch(`/api/admin/vehicles/${vehicleId}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json"
+        }
+      })
 
-      if (error) throw error
+      const payload = await response.json().catch(() => ({} as Record<string, unknown>))
 
-      toast.success("Veículo excluído com sucesso!")
-      loadVeiculos()
-      setDeleteConfirm({isOpen: false, vehicle: null})
-    } catch (error: any) {
-      console.error("Erro ao excluir veículo:", error)
-      toast.error(error.message || "Erro ao excluir veículo")
+      if (response.ok) {
+        const archived = Boolean((payload as { archived?: boolean }).archived)
+        const tripsCount = typeof (payload as { tripsCount?: number }).tripsCount === "number" ? (payload as { tripsCount?: number }).tripsCount : undefined
+        if (archived) {
+          const countMessage = typeof tripsCount === "number" ? `${tripsCount} viagem(ns)` : "viagens"
+          toast.success(
+            `Veículo marcado como inativo porque possui ${countMessage} associadas. Finalize ou reatribua essas viagens e tente excluir novamente para removê-lo definitivamente.`
+          )
+        } else {
+          toast.success("Veículo excluído com sucesso!")
+        }
+        await loadVeiculos()
+        debug("Veículo removido do catálogo", { vehicleId, archived, tripsCount }, "VeiculosPage")
+        setDeleteConfirm({ isOpen: false, vehicle: null, isDeleting: false })
+        shouldResetState = false
+        return
+      }
+
+      if (response.status === 409 && payload && "tripsCount" in payload) {
+        const tripsCount = typeof payload.tripsCount === "number" ? payload.tripsCount : undefined
+        const countMessage = tripsCount ? `${tripsCount} viagem(ns)` : "viagens"
+        toast.error(`Não é possível excluir o veículo: existem ${countMessage} vinculadas.`)
+        debug("Tentativa de exclusão de veículo bloqueada por viagens associadas", { vehicleId, tripsCount }, "VeiculosPage")
+      } else {
+        toast.error("Não foi possível excluir o veículo. Tente novamente mais tarde.")
+        logError("Falha ao excluir veículo", { vehicleId, status: response.status, payload }, "VeiculosPage")
+      }
+    } catch (error: unknown) {
+      logError("Erro inesperado ao excluir veículo", { vehicleId, error }, "VeiculosPage")
+      toast.error("Erro inesperado ao excluir veículo.")
+    } finally {
+      if (shouldResetState) {
+        setDeleteConfirm((prev) => ({ ...prev, isDeleting: false }))
+      }
     }
   }
 
@@ -238,7 +276,13 @@ export default function VeiculosPage() {
                     <Button 
                       variant="outline" 
                       size="sm"
-                      onClick={() => setDeleteConfirm({isOpen: true, vehicle: veiculo})}
+                      onClick={() =>
+                        setDeleteConfirm({
+                          isOpen: true,
+                          vehicle: veiculo,
+                          isDeleting: false
+                        })
+                      }
                       className="text-red-600 hover:text-red-700 hover:bg-red-50"
                     >
                       <Trash2 className="h-4 w-4" />
@@ -514,7 +558,17 @@ export default function VeiculosPage() {
         )}
 
         {/* Modal de Confirmação de Exclusão */}
-        <Dialog open={deleteConfirm.isOpen} onOpenChange={(open) => !open && setDeleteConfirm({isOpen: false, vehicle: null})}>
+        <Dialog
+          open={deleteConfirm.isOpen}
+          onOpenChange={(open) =>
+            !open &&
+            setDeleteConfirm({
+              isOpen: false,
+              vehicle: null,
+              isDeleting: false
+            })
+          }
+        >
           <DialogContent className="max-w-md">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2 text-red-600">
@@ -540,16 +594,33 @@ export default function VeiculosPage() {
             <div className="flex gap-2 justify-end">
               <Button 
                 variant="outline" 
-                onClick={() => setDeleteConfirm({isOpen: false, vehicle: null})}
+                onClick={() =>
+                  setDeleteConfirm({
+                    isOpen: false,
+                    vehicle: null,
+                    isDeleting: false
+                  })
+                }
+                disabled={deleteConfirm.isDeleting}
               >
                 Cancelar
               </Button>
               <Button 
                 variant="destructive"
                 onClick={() => deleteConfirm.vehicle && handleDeleteVehicle(deleteConfirm.vehicle.id)}
+                disabled={deleteConfirm.isDeleting}
               >
-                <Trash2 className="h-4 w-4 mr-2" />
-                Excluir Veículo
+                {deleteConfirm.isDeleting ? (
+                  <span className="flex items-center gap-2">
+                    <span className="h-4 w-4 border-2 border-white/70 border-t-transparent rounded-full animate-spin" />
+                    Excluindo...
+                  </span>
+                ) : (
+                  <>
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Excluir Veículo
+                  </>
+                )}
               </Button>
             </div>
           </DialogContent>

@@ -85,12 +85,12 @@ class RouteStop {
   const RouteStop({
     required this.id,
     required this.name,
-    this.description,
     required this.position,
     required this.type,
+    required this.order,
+    this.description,
     this.scheduledTime,
     this.actualTime,
-    required this.order,
     this.estimatedPassengers,
     this.actualPassengers,
     this.estimatedDuration,
@@ -98,35 +98,33 @@ class RouteStop {
     this.notes,
   });
 
-  factory RouteStop.fromJson(Map<String, dynamic> json) {
-    return RouteStop(
-      id: json['id'] as String,
-      name: json['name'] as String,
-      description: json['description'] as String?,
-      position: LatLng(
-        json['latitude'] as double,
-        json['longitude'] as double,
-      ),
-      type: StopType.values.firstWhere(
-        (e) => e.name == json['type'],
-        orElse: () => StopType.waypoint,
-      ),
-      scheduledTime: json['scheduled_time'] != null
-          ? DateTime.parse(json['scheduled_time'] as String)
-          : null,
-      actualTime: json['actual_time'] != null
-          ? DateTime.parse(json['actual_time'] as String)
-          : null,
-      order: json['order'] as int,
-      estimatedPassengers: json['estimated_passengers'] as int?,
-      actualPassengers: json['actual_passengers'] as int?,
-      estimatedDuration: json['estimated_duration'] != null
-          ? Duration(seconds: json['estimated_duration'] as int)
-          : null,
-      isCompleted: json['is_completed'] as bool? ?? false,
-      notes: json['notes'] as String?,
-    );
-  }
+  factory RouteStop.fromJson(Map<String, dynamic> json) => RouteStop(
+        id: json['id'] as String,
+        name: json['name'] as String,
+        description: json['description'] as String?,
+        position: LatLng(
+          (json['latitude'] as num).toDouble(),
+          (json['longitude'] as num).toDouble(),
+        ),
+        type: StopType.values.firstWhere(
+          (e) => e.name == json['type'],
+          orElse: () => StopType.waypoint,
+        ),
+        scheduledTime: json['scheduled_time'] != null
+            ? DateTime.parse(json['scheduled_time'] as String)
+            : null,
+        actualTime: json['actual_time'] != null
+            ? DateTime.parse(json['actual_time'] as String)
+            : null,
+        order: json['order'] as int,
+        estimatedPassengers: json['estimated_passengers'] as int?,
+        actualPassengers: json['actual_passengers'] as int?,
+        estimatedDuration: json['estimated_duration'] != null
+            ? Duration(seconds: json['estimated_duration'] as int)
+            : null,
+        isCompleted: json['is_completed'] as bool? ?? false,
+        notes: json['notes'] as String?,
+      );
   final String id;
   final String name;
   final String? description;
@@ -214,9 +212,11 @@ class BusRoute {
   const BusRoute({
     required this.id,
     required this.name,
-    this.description,
     required this.status,
     required this.stops,
+    required this.createdAt,
+    required this.updatedAt,
+    this.description,
     this.vehicleId,
     this.driverId,
     this.scheduledStartTime,
@@ -228,48 +228,44 @@ class BusRoute {
     this.actualDistance,
     this.maxPassengers,
     this.notes,
-    required this.createdAt,
-    required this.updatedAt,
   });
 
-  factory BusRoute.fromJson(Map<String, dynamic> json) {
-    return BusRoute(
-      id: json['id'] as String,
-      name: json['name'] as String,
-      description: json['description'] as String?,
-      status: RouteStatus.values.firstWhere(
-        (e) => e.name == json['status'],
-        orElse: () => RouteStatus.planned,
-      ),
-      stops: (json['stops'] as List<dynamic>?)
-              ?.map((stop) => RouteStop.fromJson(stop as Map<String, dynamic>))
-              .toList() ??
-          [],
-      vehicleId: json['vehicle_id'] as String?,
-      driverId: json['driver_id'] as String?,
-      scheduledStartTime: json['scheduled_start_time'] != null
-          ? DateTime.parse(json['scheduled_start_time'] as String)
-          : null,
-      startTime: json['start_time'] != null
-          ? DateTime.parse(json['start_time'] as String)
-          : null,
-      endTime: json['end_time'] != null
-          ? DateTime.parse(json['end_time'] as String)
-          : null,
-      estimatedDuration: json['estimated_duration'] != null
-          ? Duration(seconds: json['estimated_duration'] as int)
-          : null,
-      actualDuration: json['actual_duration'] != null
-          ? Duration(seconds: json['actual_duration'] as int)
-          : null,
-      estimatedDistance: json['estimated_distance'] as double?,
-      actualDistance: json['actual_distance'] as double?,
-      maxPassengers: json['max_passengers'] as int?,
-      notes: json['notes'] as String?,
-      createdAt: DateTime.parse(json['created_at'] as String),
-      updatedAt: DateTime.parse(json['updated_at'] as String),
-    );
-  }
+  factory BusRoute.fromJson(Map<String, dynamic> json) => BusRoute(
+        id: json['id'] as String,
+        name: json['name'] as String,
+        description: json['description'] as String?,
+        status: RouteStatus.values.firstWhere(
+          (e) => e.name == json['status'],
+          orElse: () => RouteStatus.planned,
+        ),
+        stops: (json['stops'] as List<dynamic>?)
+                ?.map((stop) => RouteStop.fromJson(stop as Map<String, dynamic>))
+                .toList() ??
+            [],
+        vehicleId: json['vehicle_id'] as String?,
+        driverId: json['driver_id'] as String?,
+        scheduledStartTime: json['scheduled_start_time'] != null
+            ? DateTime.parse(json['scheduled_start_time'] as String)
+            : null,
+        startTime: json['start_time'] != null
+            ? DateTime.parse(json['start_time'] as String)
+            : null,
+        endTime: json['end_time'] != null
+            ? DateTime.parse(json['end_time'] as String)
+            : null,
+        estimatedDuration: json['estimated_duration'] != null
+            ? Duration(seconds: json['estimated_duration'] as int)
+            : null,
+        actualDuration: json['actual_duration'] != null
+            ? Duration(seconds: json['actual_duration'] as int)
+            : null,
+        estimatedDistance: (json['estimated_distance'] as num?)?.toDouble(),
+        actualDistance: (json['actual_distance'] as num?)?.toDouble(),
+        maxPassengers: json['max_passengers'] as int?,
+        notes: json['notes'] as String?,
+        createdAt: DateTime.parse(json['created_at'] as String),
+        updatedAt: DateTime.parse(json['updated_at'] as String),
+      );
   final String id;
   final String name;
   final String? description;
@@ -350,11 +346,9 @@ class BusRoute {
     );
 
   // Getters uteis
-  List<RouteStop> get orderedStops {
-    final sortedStops = List<RouteStop>.from(stops);
-    sortedStops.sort((a, b) => a.order.compareTo(b.order));
-    return sortedStops;
-  }
+  List<RouteStop> get orderedStops =>
+      List<RouteStop>.from(stops)
+        ..sort((a, b) => a.order.compareTo(b.order));
 
   RouteStop? get currentStop => orderedStops.firstWhere(
       (stop) => !stop.isCompleted,

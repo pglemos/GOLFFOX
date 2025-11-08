@@ -125,10 +125,10 @@ class MaintenanceItem {
   const MaintenanceItem({
     required this.id,
     required this.description,
-    this.partNumber,
-    this.cost,
     required this.quantity,
     required this.isCompleted,
+    this.partNumber,
+    this.cost,
     this.notes,
   });
 
@@ -191,24 +191,24 @@ class MaintenanceRecord {
     required this.status,
     required this.priority,
     required this.scheduledDate,
+    required this.odometerReading,
+    required this.items,
+    required this.attachments,
+    required this.createdAt,
+    required this.updatedAt,
+    required this.companyId,
     this.startDate,
     this.completedDate,
-    required this.odometerReading,
     this.estimatedCost,
     this.actualCost,
     this.serviceProviderId,
     this.serviceProviderName,
     this.technicianId,
     this.technicianName,
-    required this.items,
-    required this.attachments,
     this.notes,
     this.completionNotes,
     this.nextMaintenanceDate,
     this.nextMaintenanceOdometer,
-    required this.createdAt,
-    required this.updatedAt,
-    required this.companyId,
   });
 
   factory MaintenanceRecord.fromJson(Map<String, dynamic> json) => MaintenanceRecord(

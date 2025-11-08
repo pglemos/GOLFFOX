@@ -499,11 +499,18 @@ export function AdminMap({
         vehiclesQuery = vehiclesQuery.eq('company_id', filters.company)
       }
       
-      debug('Carregando veículos ativos com filtros', { filters, query: {
-        table: 'vehicles',
-        filter_is_active: true,
-        filter_company: filters.company || 'nenhum'
-      })
+      debug(
+        'Carregando veículos ativos com filtros',
+        {
+          filters,
+          query: {
+            table: 'vehicles',
+            filter_is_active: true,
+            filter_company: filters.company || 'nenhum',
+          },
+        },
+        'AdminMap'
+      )
       
       const { data: vehiclesData, error: vehiclesError } = await vehiclesQuery
       
@@ -539,13 +546,15 @@ export function AdminMap({
         finalVehiclesData = vehiclesData || []
         debug(`Query retornou ${finalVehiclesData.length} veículos`, { count: finalVehiclesData.length }, 'AdminMap')
         if (finalVehiclesData.length > 0) {
-          debug('Primeiros veículos', { vehicles: finalVehiclesData.slice(0, 3).map((v: any) => ({
-            id: v.id,
-            plate: v.plate,
-            is_active: v.is_active,
-            company_id: v.company_id,
-            carrier_id: v.carrier_id
-          })))
+          debug('Primeiros veículos', {
+            vehicles: finalVehiclesData.slice(0, 3).map((v: any) => ({
+              id: v.id,
+              plate: v.plate,
+              is_active: v.is_active,
+              company_id: v.company_id,
+              carrier_id: v.carrier_id
+            }))
+          }, 'AdminMap')
         } else {
           // Se não retornou veículos, verificar se há veículos ativos no banco
           warn('Nenhum veículo retornado - verificando se há veículos ativos no banco', {}, 'AdminMap')

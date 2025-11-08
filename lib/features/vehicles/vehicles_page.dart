@@ -4,18 +4,19 @@
 // ========================================
 
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../core/theme/gf_tokens.dart';
+import '../../models/vehicle.dart';
+import '../../services/vehicle_service.dart';
 import '../../ui/widgets/common/gf_app_bar.dart';
-import '../../ui/widgets/common/gf_loading_indicator.dart';
-import '../../ui/widgets/common/gf_error_widget.dart';
 import '../../ui/widgets/common/gf_empty_state.dart';
+import '../../ui/widgets/common/gf_error_widget.dart';
+import '../../ui/widgets/common/gf_loading_indicator.dart';
 import '../../ui/widgets/vehicles/vehicle_card.dart';
 import '../../ui/widgets/vehicles/vehicle_filters.dart';
 import '../../ui/widgets/vehicles/vehicle_stats_card.dart';
-import '../../services/vehicle_service.dart';
-import '../../models/vehicle.dart';
 import 'create_vehicle_page.dart';
 import 'vehicle_details_page.dart';
 
@@ -168,7 +169,6 @@ class _VehiclesPageState extends ConsumerState<VehiclesPage>
                 border: Border(
                   bottom: BorderSide(
                     color: Color(GfTokens.colorBorder),
-                    width: 1,
                   ),
                 ),
               ),
@@ -222,7 +222,8 @@ class _VehiclesPageState extends ConsumerState<VehiclesPage>
                       ),
                       decoration: BoxDecoration(
                         color:
-                            const Color(GfTokens.colorPrimary).withOpacity(0.1),
+                            const Color(GfTokens.colorPrimary)
+                                .withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(GfTokens.radiusSm),
                         border: Border.all(
                             color: const Color(GfTokens.colorPrimary)),
@@ -367,7 +368,7 @@ class _VehiclesPageState extends ConsumerState<VehiclesPage>
       )
           .animate()
           .scale(
-            begin: const Offset(0, 0),
+            begin: Offset.zero,
             end: const Offset(1, 1),
             duration: const Duration(milliseconds: 300),
             curve: Curves.elasticOut,
