@@ -43,6 +43,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { modalContent } from '@/lib/animations'
 import { MarkerClusterer } from '@googlemaps/markerclusterer'
 import toast from 'react-hot-toast'
+import { debug, warn, error as logError } from '@/lib/logger'
 
 declare global {
   interface Window {
@@ -331,12 +332,12 @@ export function AdminMap({
           }
         }
       } catch (error: any) {
-        console.error('Erro ao inicializar mapa:', error)
+        logError('Erro ao inicializar mapa', { error }, 'AdminMap')
         setMapError('Erro ao carregar o mapa. Usando modo lista.')
         setListMode(true)
         setLoading(false)
         // Carregar dados em modo lista
-        loadInitialData().catch(console.error)
+        loadInitialData().catch((err) => logError('Erro ao carregar dados iniciais', { error: err }, 'AdminMap'))
       }
     }
 
@@ -461,10 +462,10 @@ export function AdminMap({
             setRoutes(Array.from(routesCacheRef.current.values()))
           }
         } else if (routesError) {
-          console.warn('Erro ao carregar rotas (view v_route_polylines não existe, usando tabela routes):', routesError)
+          warn('Erro ao carregar rotas (view v_route_polylines não existe, usando tabela routes)', { error: routesError }, 'AdminMap')
         }
       } catch (error) {
-        console.error('Erro ao carregar rotas visíveis:', error)
+        logError('Erro ao carregar rotas visíveis', { error }, 'AdminMap')
       }
     }, 300) // Debounce de 300ms
   }, [filters.company])
@@ -472,7 +473,7 @@ export function AdminMap({
   // Carregar dados iniciais
   const loadInitialData = useCallback(async () => {
     try {
-      console.log('🔄 Carregando dados iniciais com filtros:', filters)
+      debug('Carregando dados iniciais com filtros', { filters }, 'AdminMap')
       
       // Carregar veículos ativos com todas as informações
       // Usar LEFT JOIN para não excluir veículos sem company_id
@@ -498,12 +499,18 @@ export function AdminMap({
         vehiclesQuery = vehiclesQuery.eq('company_id', filters.company)
       }
       
-      console.log('🔍 Carregando veículos ativos com filtros:', filters)
-      console.log('📋 Query:', {
-        table: 'vehicles',
-        filter_is_active: true,
-        filter_company: filters.company || 'nenhum'
-      })
+      debug(
+        'Carregando veículos ativos com filtros',
+        {
+          filters,
+          query: {
+            table: 'vehicles',
+            filter_is_active: true,
+            filter_company: filters.company || 'nenhum',
+          },
+        },
+        'AdminMap'
+      )
       
       const { data: vehiclesData, error: vehiclesError } = await vehiclesQuery
       
@@ -511,7 +518,7 @@ export function AdminMap({
       
       // Log detalhado para debug
       if (vehiclesError) {
-        console.error('❌ Erro na query de veículos:', {
+        logError('Erro na query de veículos', {
           message: vehiclesError.message,
           code: vehiclesError.code,
           details: vehiclesError.details,
@@ -520,7 +527,7 @@ export function AdminMap({
         
         // Se erro for sobre coluna inexistente, tentar query sem colunas problemáticas
         if (vehiclesError.message?.includes('column') || vehiclesError.message?.includes('does not exist')) {
-          console.warn('⚠️ Tentando query alternativa sem colunas problemáticas...')
+          warn('Tentando query alternativa sem colunas problemáticas', {}, 'AdminMap')
           try {
             const { data: fallbackData, error: fallbackError } = await supabase
               .from('vehicles')
@@ -528,27 +535,29 @@ export function AdminMap({
               .eq('is_active', true)
             
             if (!fallbackError && fallbackData) {
-              console.log(`✅ Query alternativa retornou ${fallbackData.length} veículos`)
+              debug(`Query alternativa retornou ${fallbackData.length} veículos`, { count: fallbackData.length }, 'AdminMap')
               finalVehiclesData = fallbackData as any
             }
           } catch (fallbackErr) {
-            console.error('❌ Query alternativa também falhou:', fallbackErr)
+            logError('Query alternativa também falhou', { error: fallbackErr }, 'AdminMap')
           }
         }
       } else {
         finalVehiclesData = vehiclesData || []
-        console.log(`📦 Query retornou ${finalVehiclesData.length} veículos`)
+        debug(`Query retornou ${finalVehiclesData.length} veículos`, { count: finalVehiclesData.length }, 'AdminMap')
         if (finalVehiclesData.length > 0) {
-          console.log('📋 Primeiros veículos:', finalVehiclesData.slice(0, 3).map((v: any) => ({
-            id: v.id,
-            plate: v.plate,
-            is_active: v.is_active,
-            company_id: v.company_id,
-            carrier_id: v.carrier_id
-          })))
+          debug('Primeiros veículos', {
+            vehicles: finalVehiclesData.slice(0, 3).map((v: any) => ({
+              id: v.id,
+              plate: v.plate,
+              is_active: v.is_active,
+              company_id: v.company_id,
+              carrier_id: v.carrier_id
+            }))
+          }, 'AdminMap')
         } else {
           // Se não retornou veículos, verificar se há veículos ativos no banco
-          console.warn('⚠️ Nenhum veículo retornado - verificando se há veículos ativos no banco...')
+          warn('Nenhum veículo retornado - verificando se há veículos ativos no banco', {}, 'AdminMap')
           const { data: checkData, error: checkError } = await supabase
             .from('vehicles')
             .select('id, plate, is_active')
@@ -556,19 +565,18 @@ export function AdminMap({
             .limit(5)
           
           if (checkError) {
-            console.error('❌ Erro ao verificar veículos:', checkError)
+            logError('Erro ao verificar veículos', { error: checkError }, 'AdminMap')
           } else if (checkData && checkData.length > 0) {
-            console.warn(`⚠️ Encontrados ${checkData.length} veículos ativos, mas não foram retornados pela query principal`)
-            console.warn('Veículos encontrados:', checkData)
-            console.warn('⚠️ Possível problema: RLS policies podem estar bloqueando o acesso')
+            warn(`Encontrados ${checkData.length} veículos ativos, mas não foram retornados pela query principal`, { count: checkData.length, vehicles: checkData }, 'AdminMap')
+            warn('Possível problema: RLS policies podem estar bloqueando o acesso', {}, 'AdminMap')
           } else {
-            console.log('ℹ️ Não há veículos ativos no banco de dados')
+            debug('Não há veículos ativos no banco de dados', {}, 'AdminMap')
           }
         }
       }
       
       if (finalVehiclesData && finalVehiclesData.length > 0) {
-        console.log(`📦 Processando ${finalVehiclesData.length} veículos ativos`)
+        debug(`Processando ${finalVehiclesData.length} veículos ativos`, { count: finalVehiclesData.length }, 'AdminMap')
         
         // Buscar trips ativas para esses veículos
         const vehicleIds = finalVehiclesData.map((v: any) => v.id)
@@ -706,16 +714,16 @@ export function AdminMap({
         })
         
         finalVehiclesData = processedVehicles
-        console.log(`✅ Montados ${finalVehiclesData.length} veículos com dados completos`)
+        debug(`Montados ${finalVehiclesData.length} veículos com dados completos`, { count: finalVehiclesData.length }, 'AdminMap')
       } else if (vehiclesError) {
-        console.error('❌ Erro ao carregar veículos:', vehiclesError)
+        logError('Erro ao carregar veículos', { error: vehiclesError }, 'AdminMap')
         finalVehiclesData = []
       } else {
-        console.log('ℹ️ Nenhum veículo ativo encontrado')
+        debug('Nenhum veículo ativo encontrado', {}, 'AdminMap')
         finalVehiclesData = []
       }
       
-      console.log('📊 Resultado final da query de veículos:', {
+      debug('Resultado final da query de veículos', {
         filtroCompany: filters.company || '(nenhum)',
         totalRetornado: finalVehiclesData?.length || 0,
         erro: vehiclesError?.message || null,
@@ -742,7 +750,7 @@ export function AdminMap({
               }
             } else {
               // Veículo sem coordenadas - ainda assim incluir
-              console.log(`ℹ️ Veículo ${v.plate} (${v.vehicle_id}) sem coordenadas GPS - será exibido como "na garagem"`)
+              debug(`Veículo ${v.plate} (${v.vehicle_id}) sem coordenadas GPS - será exibido como "na garagem"`, { vehicleId: v.vehicle_id, plate: v.plate }, 'AdminMap')
               v.lat = null
               v.lng = null
               v.vehicle_status = 'garage'
@@ -762,9 +770,11 @@ export function AdminMap({
         const withCoords = processedVehicles.filter((v: any) => v.lat !== null && v.lng !== null).length
         const withoutCoords = processedVehicles.length - withCoords
         
-        console.log(`✅ Carregados ${processedVehicles.length} veículos ativos:`)
-        console.log(`   - ${withCoords} com posição GPS`)
-        console.log(`   - ${withoutCoords} sem posição GPS (na garagem)`)
+        debug(`Carregados ${processedVehicles.length} veículos ativos`, { 
+          total: processedVehicles.length,
+          withCoords,
+          withoutCoords
+        }, 'AdminMap')
         
         if (withCoords === 0 && processedVehicles.length > 0) {
           toast.success(`${processedVehicles.length} veículo(s) ativo(s) encontrado(s), mas nenhum tem posição GPS recente.`, {
@@ -772,12 +782,11 @@ export function AdminMap({
           })
         }
       } else if (vehiclesError) {
-        console.error('❌ Erro ao carregar veículos:', vehiclesError)
+        logError('Erro ao carregar veículos', { error: vehiclesError }, 'AdminMap')
         toast.error(`Erro ao carregar veículos: ${vehiclesError.message || 'Erro desconhecido'}`)
       } else {
         // Nenhum dado retornado e nenhum erro - verificar se há veículos ativos sem filtros
-        console.log('ℹ️ Nenhum veículo retornado da query (sem erro)')
-        console.log('🔍 Verificando se há veículos ativos sem filtros...')
+        debug('Nenhum veículo retornado da query (sem erro) - verificando se há veículos ativos sem filtros', {}, 'AdminMap')
         
         // Tentar buscar sem filtros para debug
         const { data: allVehicles, error: allError } = await supabase
@@ -787,12 +796,14 @@ export function AdminMap({
           .limit(5)
         
         if (allError) {
-          console.error('❌ Erro ao verificar veículos:', allError)
+          logError('Erro ao verificar veículos', { error: allError }, 'AdminMap')
         } else if (allVehicles && allVehicles.length > 0) {
-          console.warn(`⚠️ Encontrados ${allVehicles.length} veículos ativos, mas não foram retornados com os filtros aplicados`)
-          console.warn('Veículos encontrados:', allVehicles.map((v: any) => ({ plate: v.plate, company_id: v.company_id })))
+          warn(`Encontrados ${allVehicles.length} veículos ativos, mas não foram retornados com os filtros aplicados`, { 
+            count: allVehicles.length,
+            vehicles: allVehicles.map((v: any) => ({ plate: v.plate, company_id: v.company_id }))
+          }, 'AdminMap')
         } else {
-          console.log('ℹ️ Não há veículos ativos no banco de dados')
+          debug('Não há veículos ativos no banco de dados', {}, 'AdminMap')
         }
       }
 
@@ -800,7 +811,7 @@ export function AdminMap({
       await loadVisibleRoutes()
 
       // Carregar alertas - DESABILITADO (serão carregados via realtime polling)
-      console.log('ℹ️ Carregamento de alertas inicial desabilitado - serão carregados via polling do realtime-service')
+      debug('Carregamento de alertas inicial desabilitado - serão carregados via polling do realtime-service', {}, 'AdminMap')
       setAlerts([]) // Inicializar vazio
       
       /*
@@ -1952,7 +1963,7 @@ export function AdminMap({
             </details>
             <Button 
               onClick={() => {
-                console.log('🔄 Recarregando dados...')
+                debug('Recarregando dados', {}, 'AdminMap')
                 loadInitialData()
               }}
               variant="outline"

@@ -1,13 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../services/realtime_service.dart';
+
 import '../models/vehicle_position.dart';
+import '../services/realtime_service.dart';
 
 /// Provider para o RealtimeService
 final realtimeServiceProvider = Provider<RealtimeService>((ref) {
-  final service = RealtimeService.instance;
-
   // Inicializar o servico quando o provider for criado
-  service.initialize();
+  final service = RealtimeService.instance..initialize();
 
   // Limpar recursos quando o provider for descartado
   ref.onDispose(service.dispose);

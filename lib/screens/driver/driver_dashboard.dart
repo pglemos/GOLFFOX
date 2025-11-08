@@ -1,17 +1,19 @@
 // lib/screens/driver/driver_dashboard.dart
 import 'dart:async';
+
 import 'package:flutter/material.dart';
-import '../../models/user.dart';
+
+import '../../core/routing/app_router.dart';
+import '../../core/theme/gf_tokens.dart';
 import '../../models/trip.dart';
+import '../../models/user.dart';
+import '../../services/auth_service.dart';
 import '../../services/supabase_service.dart';
 import '../../services/tracking_service.dart';
-import '../../services/auth_service.dart';
-import '../../core/routing/app_router.dart';
 import 'trip_detail_screen.dart';
-import '../../core/theme/gf_tokens.dart';
 
 class DriverDashboard extends StatefulWidget {
-  const DriverDashboard({super.key, required this.user});
+  const DriverDashboard({required this.user, super.key});
   final User user;
 
   @override
@@ -49,7 +51,7 @@ class _DriverDashboardState extends State<DriverDashboard>
     await _loadTrips(firstLoad: true);
     _subscribeRealtime();
     _subscribeTracking();
-    _anim.forward();
+    unawaited(_anim.forward());
   }
 
   @override
@@ -70,8 +72,8 @@ class _DriverDashboardState extends State<DriverDashboard>
       final trips = await _svc.getTripsForUser(limit: 200);
       trips.sort(_compareTrips);
       setState(() => _trips = trips);
-    } catch (e) {
-      setState(() => _error = 'Erro ao carregar viagens: $e');
+    } on Exception catch (error) {
+      setState(() => _error = 'Erro ao carregar viagens: $error');
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -85,8 +87,8 @@ class _DriverDashboardState extends State<DriverDashboard>
         .eq('driver_id', widget.user.id)
         .order('updated_at')
         .listen((rows) {
-          final trips = rows.map(Trip.fromJson).toList();
-          trips.sort(_compareTrips);
+          final trips = rows.map(Trip.fromJson).toList()
+            ..sort(_compareTrips);
           if (mounted) setState(() => _trips = trips);
         });
   }
@@ -128,12 +130,16 @@ class _DriverDashboardState extends State<DriverDashboard>
   }
 
   Trip? get _activeTrip {
-    try {
-      return _trips.firstWhere((t) => t.status.toLowerCase() == 'inprogress');
-    } catch (_) {}
-    try {
-      return _trips.firstWhere((t) => t.status.toLowerCase() == 'scheduled');
-    } catch (_) {}
+    for (final trip in _trips) {
+      if (trip.status.toLowerCase() == 'inprogress') {
+        return trip;
+      }
+    }
+    for (final trip in _trips) {
+      if (trip.status.toLowerCase() == 'scheduled') {
+        return trip;
+      }
+    }
     return _trips.isNotEmpty ? _trips.first : null;
   }
 
@@ -159,10 +165,10 @@ class _DriverDashboardState extends State<DriverDashboard>
       await _auth.signOut();
       if (!mounted) return;
       AppRouter.instance.go('/');
-    } catch (e) {
+    } on Exception catch (error) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro ao fazer logout: $e')),
+        SnackBar(content: Text('Erro ao fazer logout: $error')),
       );
     }
   }
@@ -195,13 +201,16 @@ class _DriverDashboardState extends State<DriverDashboard>
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content: Text('Acao concluida para ${trip.id.substring(0, 8)}')),
+          content: Text('Acao concluida para ${trip.id.substring(0, 8)}'),
+        ),
       );
-    } catch (e) {
+    } on Exception catch (error) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            backgroundColor: t.colorScheme.error, content: Text('Falha: $e')),
+          backgroundColor: t.colorScheme.error,
+          content: Text('Falha: $error'),
+        ),
       );
     }
   }
@@ -223,7 +232,7 @@ class _DriverDashboardState extends State<DriverDashboard>
             Text(
               widget.user.name,
               style: t.textTheme.bodySmall?.copyWith(
-                color: t.colorScheme.onSurface.withOpacity(0.7),
+                color: t.colorScheme.onSurface.withValues(alpha: 0.7),
               ),
             ),
           ],
@@ -512,7 +521,7 @@ class _ActiveTripCard extends StatelessWidget {
           ),
           FilledButton.tonal(
             style: FilledButton.styleFrom(
-              backgroundColor: t.colorScheme.onPrimary.withOpacity(0.12),
+              backgroundColor: t.colorScheme.onPrimary.withValues(alpha: 0.12),
               foregroundColor: t.colorScheme.onPrimary,
               padding: const EdgeInsets.symmetric(horizontal: 12),
             ),
@@ -522,7 +531,7 @@ class _ActiveTripCard extends StatelessWidget {
           const SizedBox(width: 8),
           IconButton.filled(
             style: IconButton.styleFrom(
-              backgroundColor: t.colorScheme.onPrimary.withOpacity(0.12),
+              backgroundColor: t.colorScheme.onPrimary.withValues(alpha: 0.12),
               foregroundColor: t.colorScheme.onPrimary,
             ),
             onPressed: () => onAction('complete'),
@@ -556,7 +565,7 @@ class _ListTrips extends StatelessWidget {
         padding: const EdgeInsets.all(24),
         child: Column(mainAxisSize: MainAxisSize.min, children: [
           Icon(Icons.route,
-              size: 64, color: t.colorScheme.onSurface.withOpacity(0.5)),
+              size: 64, color: t.colorScheme.onSurface.withValues(alpha: 0.5)),
           const SizedBox(height: 8),
           Text('Nenhuma viagem encontrada',
               style: t.textTheme.titleMedium, textAlign: TextAlign.center),
@@ -564,7 +573,7 @@ class _ListTrips extends StatelessWidget {
           Text(
             'Suas viagens aparecerao aqui quando disponiveis.',
             style: t.textTheme.bodySmall?.copyWith(
-              color: t.colorScheme.onSurface.withOpacity(0.7),
+              color: t.colorScheme.onSurface.withValues(alpha: 0.7),
             ),
             textAlign: TextAlign.center,
           ),
@@ -710,7 +719,7 @@ class _TripCard extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 10, vertical: 6),
                           decoration: BoxDecoration(
-                            color: color.withOpacity(0.1),
+                            color: color.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -729,7 +738,7 @@ class _TripCard extends StatelessWidget {
                         const Spacer(),
                         Icon(Icons.arrow_forward_ios,
                             size: 16,
-                            color: t.colorScheme.onSurface.withOpacity(0.5)),
+                            color: t.colorScheme.onSurface.withValues(alpha: 0.5)),
                       ]),
                       const SizedBox(height: 8),
                       Text('Viagem #${trip.id.substring(0, 8)}',
@@ -740,12 +749,12 @@ class _TripCard extends StatelessWidget {
                         Row(children: [
                           Icon(Icons.access_time,
                               size: 16,
-                              color: t.colorScheme.onSurface.withOpacity(0.7)),
+                              color: t.colorScheme.onSurface.withValues(alpha: 0.7)),
                           const SizedBox(width: 6),
                           Text(
                             _fmt(trip.scheduledStartTime!),
                             style: t.textTheme.bodySmall?.copyWith(
-                              color: t.colorScheme.onSurface.withOpacity(0.7),
+                              color: t.colorScheme.onSurface.withValues(alpha: 0.7),
                             ),
                           ),
                         ]),
@@ -757,7 +766,7 @@ class _TripCard extends StatelessWidget {
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: t.textTheme.bodySmall?.copyWith(
-                            color: t.colorScheme.onSurface.withOpacity(0.7),
+                            color: t.colorScheme.onSurface.withValues(alpha: 0.7),
                           ),
                         ),
                       ],
@@ -811,3 +820,4 @@ class _TripCard extends StatelessWidget {
   String _fmt(DateTime d) =>
       '${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')} as ${d.hour.toString().padLeft(2, '0')}:${d.minute.toString().padLeft(2, '0')}';
 }
+

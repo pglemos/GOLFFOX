@@ -10,6 +10,8 @@ class RouteModel {
   const RouteModel({
     required this.id,
     required this.name,
+    required this.createdAt,
+    required this.updatedAt,
     this.description,
     this.companyId,
     this.transporterId,
@@ -20,18 +22,20 @@ class RouteModel {
     this.status = 'active',
     this.color,
     this.isActive = true,
-    required this.createdAt,
-    required this.updatedAt,
   });
 
   factory RouteModel.fromJson(Map<String, dynamic> json) {
-    List<LatLng> polylinePoints = [];
-    if (json[RouteModelFields.polyline] != null) {
-      final polylineData = json[RouteModelFields.polyline] as List;
-      polylinePoints = polylineData
-          .map((p) => LatLng(p['lat'] as double, p['lng'] as double))
-          .toList();
-    }
+    final polylineSource =
+        json[RouteModelFields.polyline] as List<dynamic>? ?? [];
+    final polylinePoints = polylineSource
+        .map((point) {
+          final data = point as Map<String, dynamic>;
+          return LatLng(
+            (data['lat'] as num).toDouble(),
+            (data['lng'] as num).toDouble(),
+          );
+        })
+        .toList();
 
     return RouteModel(
       id: json[RouteModelFields.id] as String,
@@ -41,9 +45,7 @@ class RouteModel {
       transporterId: json[RouteModelFields.transporterId] as String?,
       polyline: polylinePoints,
       polylineEncoded: json[RouteModelFields.polylineEncoded] as String?,
-      totalDistance: json[RouteModelFields.totalDistance] != null
-          ? (json[RouteModelFields.totalDistance] as num).toDouble()
-          : null,
+      totalDistance: (json[RouteModelFields.totalDistance] as num?)?.toDouble(),
       estimatedDuration: json[RouteModelFields.estimatedDuration] != null
           ? Duration(minutes: json[RouteModelFields.estimatedDuration] as int)
           : null,

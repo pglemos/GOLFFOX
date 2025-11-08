@@ -11,6 +11,7 @@ import { supabase } from "@/lib/supabase"
 import { useRouter, useSearchParams } from "next/navigation"
 import toast from "react-hot-toast"
 import { FuncionariosErrorBoundary } from "./error-boundary"
+import { debug, error } from "@/lib/logger"
 
 interface Funcionario {
   id: string
@@ -43,27 +44,27 @@ function FuncionariosPageContent() {
   useEffect(() => {
     const getUser = async () => {
       try {
-        console.log('🔐 Verificando sessão do usuário...')
+        debug('Verificando sessão do usuário', undefined, 'FuncionariosPage')
         const { data: { session }, error: sessionError } = await supabase.auth.getSession()
         
         if (sessionError) {
-          console.error('❌ Erro ao obter sessão:', sessionError)
+          error('Erro ao obter sessão', { error: sessionError }, 'FuncionariosPage')
           setError('Erro ao carregar sessão')
           setLoading(false)
           return
         }
         
         if (!session) {
-          console.warn('⚠️  Sem sessão - redirecionando...')
+          // Sem sessão - redirecionando
           router.push("/")
           return
         }
         
-        console.log('✅ Usuário autenticado:', session.user.email)
+        debug('Usuário autenticado', { email: session.user.email }, 'FuncionariosPage')
         setUser(session.user)
         setLoading(false)
       } catch (err) {
-        console.error('❌ Erro ao obter usuário:', err)
+        error('Erro ao obter usuário', { error: err }, 'FuncionariosPage')
         setError('Erro ao carregar dados do usuário')
         setLoading(false)
       }
@@ -96,7 +97,7 @@ function FuncionariosPageContent() {
       
       try {
         setLoading(true)
-        console.log(`🔍 Carregando funcionários para empresa: ${companyId}`)
+        debug('Carregando funcionários', { companyId }, 'FuncionariosPage')
         
         // Tentar carregar da tabela diretamente
         const { data, error: queryError } = await supabase
@@ -112,11 +113,11 @@ function FuncionariosPageContent() {
           return
         }
         
-        console.log(`✅ ${data?.length || 0} funcionários carregados`)
+        debug('Funcionários carregados', { count: data?.length || 0 }, 'FuncionariosPage')
         setFuncionarios(data || [])
         setError(null)
       } catch (err: any) {
-        console.error("❌ Erro ao carregar funcionários:", err)
+        error("Erro ao carregar funcionários", { error: err }, 'FuncionariosPage')
         setError(err.message || 'Erro ao carregar funcionários')
         toast.error(`Erro: ${err.message}`)
       } finally {

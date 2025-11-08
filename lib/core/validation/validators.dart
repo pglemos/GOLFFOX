@@ -211,7 +211,7 @@ class Validators {
       if (!uri.hasScheme || (!uri.scheme.startsWith('http'))) {
         return '$fieldName deve ser uma URL válida';
       }
-    } catch (e) {
+    } on FormatException {
       return '$fieldName deve ser uma URL válida';
     }
 
@@ -231,10 +231,10 @@ class Validators {
 
   /// Validação condicional
   static String? conditional(
-    String? value,
-    bool condition,
-    String? Function(String?) validator,
-  ) {
+    String? value, {
+    required bool condition,
+    required String? Function(String?) validator,
+  }) {
     if (!condition) return null;
     return validator(value);
   }

@@ -1,0 +1,25 @@
+name: Vercel Preview Deployments Cleanup
+
+on:
+  schedule:
+    - cron: '59 23 * * *' # Executa diariamente às 23:59 (UTC)
+  workflow_dispatch:
+
+jobs:
+  cleanup:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run cleanup script (delete previews older than 21 days)
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        shell: powershell
+        run: |
+          if (-not $env:VERCEL_TOKEN) {
+            Write-Error "VERCEL_TOKEN não definido em GitHub Secrets. Vá em Settings > Secrets and variables > Actions e adicione."; exit 1
+          }
+          $ProjectId = "prj_SWzDURzEoQFej5hzbcvDHbFJ6K2m"
+          pwsh -File scripts/deploy/cleanup-vercel-deployments.ps1 -ProjectId $ProjectId -Days 21 -ActuallyDelete $true
+

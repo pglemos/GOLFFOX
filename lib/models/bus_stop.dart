@@ -26,6 +26,7 @@ class BusStop {
     required this.id,
     required this.name,
     required this.position,
+    required this.createdAt,
     this.description,
     this.type = BusStopType.regular,
     this.status = BusStopStatus.active,
@@ -40,51 +41,47 @@ class BusStop {
     this.address,
     this.landmark,
     this.amenities = const [],
-    required this.createdAt,
     this.updatedAt,
   });
 
-  factory BusStop.fromJson(Map<String, dynamic> json) {
-    return BusStop(
-      id: json['id'] as String,
-      name: json['name'] as String,
-      description: json['description'] as String?,
-      position: LatLng(
-        (json['latitude'] as num).toDouble(),
-        (json['longitude'] as num).toDouble(),
-      ),
-      type: BusStopType.values.firstWhere(
-        (e) => e.name == json['type'],
-        orElse: () => BusStopType.regular,
-      ),
-      status: BusStopStatus.values.firstWhere(
-        (e) => e.name == json['status'],
-        orElse: () => BusStopStatus.active,
-      ),
-      routeId: json['route_id'] as String?,
-      routeName: json['route_name'] as String?,
-      sequence: json['sequence'] as int?,
-      estimatedArrival: json['estimated_arrival'] != null
-          ? DateTime.parse(json['estimated_arrival'] as String)
-          : null,
-      lastVisit: json['last_visit'] != null
-          ? DateTime.parse(json['last_visit'] as String)
-          : null,
-      hasAccessibility: json['has_accessibility'] as bool? ?? false,
-      hasShelter: json['has_shelter'] as bool? ?? false,
-      hasSeating: json['has_seating'] as bool? ?? false,
-      address: json['address'] as String?,
-      landmark: json['landmark'] as String?,
-      amenities: (json['amenities'] as List<dynamic>?)
-              ?.map((e) => e as String)
-              .toList() ??
-          [],
-      createdAt: DateTime.parse(json['created_at'] as String),
-      updatedAt: json['updated_at'] != null
-          ? DateTime.parse(json['updated_at'] as String)
-          : null,
-    );
-  }
+  factory BusStop.fromJson(Map<String, dynamic> json) => BusStop(
+        id: json['id'] as String,
+        name: json['name'] as String,
+        position: LatLng(
+          (json['latitude'] as num).toDouble(),
+          (json['longitude'] as num).toDouble(),
+        ),
+        createdAt: DateTime.parse(json['created_at'] as String),
+        description: json['description'] as String?,
+        type: BusStopType.values.firstWhere(
+          (e) => e.name == json['type'],
+          orElse: () => BusStopType.regular,
+        ),
+        status: BusStopStatus.values.firstWhere(
+          (e) => e.name == json['status'],
+          orElse: () => BusStopStatus.active,
+        ),
+        routeId: json['route_id'] as String?,
+        routeName: json['route_name'] as String?,
+        sequence: json['sequence'] as int?,
+        estimatedArrival: json['estimated_arrival'] != null
+            ? DateTime.parse(json['estimated_arrival'] as String)
+            : null,
+        lastVisit: json['last_visit'] != null
+            ? DateTime.parse(json['last_visit'] as String)
+            : null,
+        hasAccessibility: json['has_accessibility'] as bool? ?? false,
+        hasShelter: json['has_shelter'] as bool? ?? false,
+        hasSeating: json['has_seating'] as bool? ?? false,
+        address: json['address'] as String?,
+        landmark: json['landmark'] as String?,
+        amenities:
+            (json['amenities'] as List<dynamic>?)?.map((e) => e as String).toList() ??
+                [],
+        updatedAt: json['updated_at'] != null
+            ? DateTime.parse(json['updated_at'] as String)
+            : null,
+      );
   final String id;
   final String name;
   final String? description;

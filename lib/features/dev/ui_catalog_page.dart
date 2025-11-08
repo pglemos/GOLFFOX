@@ -1,24 +1,24 @@
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:fl_chart/fl_chart.dart';
 
-import '../../widgets/gx_button.dart';
-import '../../widgets/gx_input.dart';
-import '../../widgets/gx_card.dart';
+import '../../widgets/charts/gx_donut.dart';
+import '../../widgets/charts/gx_line_chart.dart';
 import '../../widgets/gx_badge.dart';
-import '../../widgets/gx_status_pill.dart';
-import '../../widgets/gx_toast.dart';
+import '../../widgets/gx_button.dart';
+import '../../widgets/gx_card.dart';
 import '../../widgets/gx_dialog.dart';
-import '../../widgets/gx_skeleton.dart';
 import '../../widgets/gx_empty.dart';
-import '../../widgets/gx_segmented.dart';
-import '../../widgets/gx_search_field.dart';
+import '../../widgets/gx_input.dart';
 import '../../widgets/gx_kpi_tile.dart';
+import '../../widgets/gx_search_field.dart';
+import '../../widgets/gx_segmented.dart';
+import '../../widgets/gx_skeleton.dart';
+import '../../widgets/gx_status_pill.dart';
 import '../../widgets/gx_table.dart';
+import '../../widgets/gx_toast.dart';
 import '../../widgets/map/gx_map.dart';
 import '../../widgets/map/gx_map_legend.dart';
-import '../../widgets/charts/gx_line_chart.dart';
-import '../../widgets/charts/gx_donut.dart';
 
 class UiCatalogPage extends StatelessWidget {
   const UiCatalogPage({super.key});

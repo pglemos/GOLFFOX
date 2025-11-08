@@ -44,7 +44,7 @@ extension VehicleStatusTypeExtension on VehicleStatusType {
     }
   }
 
-  int get colorValue => color.value;
+  int get colorValue => color.toARGB32();
 
   IconData get icon {
     switch (this) {
@@ -104,10 +104,9 @@ class VehicleStatusCalculator {
   }
 
   /// Verifica se o veiculo esta em movimento
-  static bool _isMoving(DriverPosition position, Duration timeDelta) {
-    // Se velocidade > 2 km/h OU ultima atualizacao  30s
-    return (position.speedKmh ?? 0.0) > 2.0 || timeDelta.inSeconds <= 30;
-  }
+  static bool _isMoving(DriverPosition position, Duration timeDelta) =>
+      // Se velocidade > 2 km/h OU ultima atualizacao  30s
+      (position.speedKmh ?? 0.0) > 2.0 || timeDelta.inSeconds <= 30;
 
   /// Verifica se a posicao esta dentro de alguma garagem
   static bool _isInAnyGarage(DriverPosition position, List<Garage> garages) {
@@ -165,9 +164,9 @@ class VehicleStatus {
   const VehicleStatus({
     required this.vehicleId,
     required this.status,
+    required this.calculatedAt,
     this.lastPosition,
     this.stoppedDuration,
-    required this.calculatedAt,
   });
   final String vehicleId;
   final VehicleStatusType status;

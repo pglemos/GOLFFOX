@@ -253,7 +253,8 @@ extension GfIntColorX on int {
   Color get asColor => Color(this);
 
   // Mantem compatibilidade com usos existentes de withOpacity em ints
-  Color withOpacity(double opacity) => Color(this).withOpacity(opacity);
+  Color withOpacity(double opacity) =>
+      Color(this).withValues(alpha: opacity);
 
   // Versao compativel do Color.withValues (mantem suporte em versoes antigas do Flutter)
   Color withValues({double? alpha, double? red, double? green, double? blue}) {
@@ -264,10 +265,16 @@ extension GfIntColorX on int {
     }
 
     final color = Color(this);
-    final normalizedAlpha = clampUnit(alpha ?? color.opacity);
-    final normalizedRed = clampUnit(red ?? color.red / 255.0);
-    final normalizedGreen = clampUnit(green ?? color.green / 255.0);
-    final normalizedBlue = clampUnit(blue ?? color.blue / 255.0);
+    final value = color.toARGB32();
+    final baseAlpha = ((value >> 24) & 0xFF) / 255.0;
+    final baseRed = ((value >> 16) & 0xFF) / 255.0;
+    final baseGreen = ((value >> 8) & 0xFF) / 255.0;
+    final baseBlue = (value & 0xFF) / 255.0;
+
+    final normalizedAlpha = clampUnit(alpha ?? baseAlpha);
+    final normalizedRed = clampUnit(red ?? baseRed);
+    final normalizedGreen = clampUnit(green ?? baseGreen);
+    final normalizedBlue = clampUnit(blue ?? baseBlue);
 
     return Color.fromRGBO(
       (normalizedRed * 255).round(),

@@ -223,7 +223,7 @@ class VehicleInfoPanel extends StatelessWidget {
                         label: const Text('Rastrear'),
                         style: OutlinedButton.styleFrom(
                           foregroundColor: GolfFoxTheme.primaryOrange,
-                          side: BorderSide(color: GolfFoxTheme.primaryOrange),
+                          side: const BorderSide(color: GolfFoxTheme.primaryOrange),
                         ),
                       ),
                     ),

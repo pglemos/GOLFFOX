@@ -47,25 +47,23 @@ class FuelStation {
     required this.id,
     required this.name,
     required this.address,
+    required this.isPreferred,
     this.cnpj,
     this.phone,
     this.latitude,
     this.longitude,
-    required this.isPreferred,
   });
 
-  factory FuelStation.fromJson(Map<String, dynamic> json) {
-    return FuelStation(
-      id: json['id'] as String? ?? '',
-      name: json['name'] as String? ?? '',
-      address: json['address'] as String? ?? '',
-      cnpj: json['cnpj'] as String?,
-      phone: json['phone'] as String?,
-      latitude: (json['latitude'] as num?)?.toDouble(),
-      longitude: (json['longitude'] as num?)?.toDouble(),
-      isPreferred: json['is_preferred'] as bool? ?? false,
-    );
-  }
+  factory FuelStation.fromJson(Map<String, dynamic> json) => FuelStation(
+        id: json['id'] as String? ?? '',
+        name: json['name'] as String? ?? '',
+        address: json['address'] as String? ?? '',
+        cnpj: json['cnpj'] as String?,
+        phone: json['phone'] as String?,
+        latitude: (json['latitude'] as num?)?.toDouble(),
+        longitude: (json['longitude'] as num?)?.toDouble(),
+        isPreferred: json['is_preferred'] as bool? ?? false,
+      );
   final String id;
   final String name;
   final String address;
@@ -118,6 +116,11 @@ class FuelRecord {
     required this.pricePerLiter,
     required this.totalCost,
     required this.odometerReading,
+    required this.attachments,
+    required this.timestamp,
+    required this.createdAt,
+    required this.updatedAt,
+    required this.companyId,
     this.fuelLevelBefore,
     this.fuelLevelAfter,
     this.fuelStationId,
@@ -126,57 +129,46 @@ class FuelRecord {
     this.driverName,
     this.receiptNumber,
     this.notes,
-    required this.attachments,
-    required this.timestamp,
-    required this.createdAt,
-    required this.updatedAt,
-    required this.companyId,
   });
 
-  factory FuelRecord.fromJson(Map<String, dynamic> json) {
-    return FuelRecord(
-      id: json['id'] as String? ?? '',
-      vehicleId: json['vehicle_id'] as String? ?? '',
-      type: FuelRecordType.values.firstWhere(
-        (e) => e.name == json['type'] as String?,
-        orElse: () => FuelRecordType.refuel,
-      ),
-      fuelType: FuelType.values.firstWhere(
-        (e) => e.name == json['fuel_type'] as String?,
-        orElse: () => FuelType.diesel,
-      ),
-      quantity: (json['quantity'] as num?)?.toDouble() ?? 0.0,
-      pricePerLiter: (json['price_per_liter'] as num?)?.toDouble() ?? 0.0,
-      totalCost: (json['total_cost'] as num?)?.toDouble() ?? 0.0,
-      odometerReading:
-          (json['odometer_reading'] as num?)?.toDouble() ?? 0.0,
-      fuelLevelBefore: (json['fuel_level_before'] as num?)?.toDouble(),
-      fuelLevelAfter: (json['fuel_level_after'] as num?)?.toDouble(),
-      fuelStationId: json['fuel_station_id'] as String?,
-      fuelStationName: json['fuel_station_name'] as String?,
-      driverId: json['driver_id'] as String?,
-      driverName: json['driver_name'] as String?,
-      receiptNumber: json['receipt_number'] as String?,
-      notes: json['notes'] as String?,
-      attachments: (json['attachments'] as List?)
-              ?.map((attachment) => attachment.toString())
-              .toList() ??
-          const [],
-      timestamp: DateTime.parse(
-        json['timestamp'] as String? ??
-            DateTime.now().toIso8601String(),
-      ),
-      createdAt: DateTime.parse(
-        json['created_at'] as String? ??
-            DateTime.now().toIso8601String(),
-      ),
-      updatedAt: DateTime.parse(
-        json['updated_at'] as String? ??
-            DateTime.now().toIso8601String(),
-      ),
-      companyId: json['company_id'] as String? ?? '',
-    );
-  }
+  factory FuelRecord.fromJson(Map<String, dynamic> json) => FuelRecord(
+        id: json['id'] as String? ?? '',
+        vehicleId: json['vehicle_id'] as String? ?? '',
+        type: FuelRecordType.values.firstWhere(
+          (e) => e.name == json['type'] as String?,
+          orElse: () => FuelRecordType.refuel,
+        ),
+        fuelType: FuelType.values.firstWhere(
+          (e) => e.name == json['fuel_type'] as String?,
+          orElse: () => FuelType.diesel,
+        ),
+        quantity: (json['quantity'] as num?)?.toDouble() ?? 0,
+        pricePerLiter: (json['price_per_liter'] as num?)?.toDouble() ?? 0,
+        totalCost: (json['total_cost'] as num?)?.toDouble() ?? 0,
+        odometerReading:
+            (json['odometer_reading'] as num?)?.toDouble() ?? 0,
+        attachments:
+            (json['attachments'] as List?)?.map((e) => e.toString()).toList() ??
+                const [],
+        timestamp: DateTime.parse(
+          json['timestamp'] as String? ?? DateTime.now().toIso8601String(),
+        ),
+        createdAt: DateTime.parse(
+          json['created_at'] as String? ?? DateTime.now().toIso8601String(),
+        ),
+        updatedAt: DateTime.parse(
+          json['updated_at'] as String? ?? DateTime.now().toIso8601String(),
+        ),
+        companyId: json['company_id'] as String? ?? '',
+        fuelLevelBefore: (json['fuel_level_before'] as num?)?.toDouble(),
+        fuelLevelAfter: (json['fuel_level_after'] as num?)?.toDouble(),
+        fuelStationId: json['fuel_station_id'] as String?,
+        fuelStationName: json['fuel_station_name'] as String?,
+        driverId: json['driver_id'] as String?,
+        driverName: json['driver_name'] as String?,
+        receiptNumber: json['receipt_number'] as String?,
+        notes: json['notes'] as String?,
+      );
   final String id;
   final String vehicleId;
   final FuelRecordType type;
@@ -321,19 +313,25 @@ class FuelConsumptionStats {
 
     if (refuelRecords.isEmpty) {
       return FuelConsumptionStats(
-        totalFuelConsumed: 0.0,
-        totalDistance: 0.0,
-        averageConsumption: 0.0,
-        totalCost: 0.0,
-        averagePricePerLiter: 0.0,
+        totalFuelConsumed: 0.toDouble(),
+        totalDistance: 0.toDouble(),
+        averageConsumption: 0.toDouble(),
+        totalCost: 0.toDouble(),
+        averagePricePerLiter: 0.toDouble(),
         totalRefuels: 0,
         periodStart: periodStart,
         periodEnd: periodEnd,
       );
     }
 
-    final totalFuel = refuelRecords.fold(0.0, (sum, r) => sum + r.quantity);
-    final totalCost = refuelRecords.fold(0.0, (sum, r) => sum + r.totalCost);
+    final totalFuel = refuelRecords.fold<double>(
+      0,
+      (sum, r) => sum + r.quantity,
+    );
+    final totalCost = refuelRecords.fold<double>(
+      0,
+      (sum, r) => sum + r.totalCost,
+    );
 
     // Calcular distancia percorrida
     refuelRecords
@@ -342,8 +340,9 @@ class FuelConsumptionStats {
         refuelRecords.first.odometerReading;
 
     final averageConsumption =
-        totalDistance > 0 ? totalDistance / totalFuel : 0.0;
-    final averagePrice = totalFuel > 0 ? totalCost / totalFuel : 0.0;
+        totalDistance > 0 ? totalDistance / totalFuel : 0.toDouble();
+    final averagePrice =
+        totalFuel > 0 ? totalCost / totalFuel : 0.toDouble();
 
     return FuelConsumptionStats(
       totalFuelConsumed: totalFuel,

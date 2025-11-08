@@ -143,19 +143,17 @@ class DriverLicense {
     this.isValid = true,
   });
 
-  factory DriverLicense.fromJson(Map<String, dynamic> json) {
-    return DriverLicense(
-      number: json['number'] as String,
-      category: LicenseCategory.values.firstWhere(
-        (e) => e.name == json['category'],
-        orElse: () => LicenseCategory.b,
-      ),
-      issueDate: DateTime.parse(json['issueDate'] as String),
-      expiryDate: DateTime.parse(json['expiryDate'] as String),
-      issuingAuthority: json['issuingAuthority'] as String,
-      isValid: json['isValid'] as bool? ?? true,
-    );
-  }
+  factory DriverLicense.fromJson(Map<String, dynamic> json) => DriverLicense(
+        number: json['number'] as String,
+        category: LicenseCategory.values.firstWhere(
+          (e) => e.name == json['category'],
+          orElse: () => LicenseCategory.b,
+        ),
+        issueDate: DateTime.parse(json['issueDate'] as String),
+        expiryDate: DateTime.parse(json['expiryDate'] as String),
+        issuingAuthority: json['issuingAuthority'] as String,
+        isValid: json['isValid'] as bool? ?? true,
+      );
   final String number;
   final LicenseCategory category;
   final DateTime issueDate;
@@ -208,20 +206,19 @@ class DriverCertification {
     this.isActive = true,
   });
 
-  factory DriverCertification.fromJson(Map<String, dynamic> json) {
-    return DriverCertification(
-      id: json['id'] as String,
-      name: json['name'] as String,
-      description: json['description'] as String,
-      issueDate: DateTime.parse(json['issueDate'] as String),
-      expiryDate: json['expiryDate'] != null
-          ? DateTime.parse(json['expiryDate'] as String)
-          : null,
-      issuingOrganization: json['issuingOrganization'] as String,
-      certificateNumber: json['certificateNumber'] as String?,
-      isActive: json['isActive'] as bool? ?? true,
-    );
-  }
+  factory DriverCertification.fromJson(Map<String, dynamic> json) =>
+      DriverCertification(
+        id: json['id'] as String,
+        name: json['name'] as String,
+        description: json['description'] as String,
+        issueDate: DateTime.parse(json['issueDate'] as String),
+        expiryDate: json['expiryDate'] != null
+            ? DateTime.parse(json['expiryDate'] as String)
+            : null,
+        issuingOrganization: json['issuingOrganization'] as String,
+        certificateNumber: json['certificateNumber'] as String?,
+        isActive: json['isActive'] as bool? ?? true,
+      );
   final String id;
   final String name;
   final String description;
@@ -262,18 +259,16 @@ class DriverRating {
     this.tags = const [],
   });
 
-  factory DriverRating.fromJson(Map<String, dynamic> json) {
-    return DriverRating(
-      id: json['id'] as String,
-      tripId: json['tripId'] as String,
-      passengerId: json['passengerId'] as String,
-      passengerName: json['passengerName'] as String?,
-      rating: (json['rating'] as num).toDouble(),
-      comment: json['comment'] as String?,
-      createdAt: DateTime.parse(json['createdAt'] as String),
-      tags: List<String>.from(json['tags'] as List? ?? []),
-    );
-  }
+  factory DriverRating.fromJson(Map<String, dynamic> json) => DriverRating(
+        id: json['id'] as String,
+        tripId: json['tripId'] as String,
+        passengerId: json['passengerId'] as String,
+        passengerName: json['passengerName'] as String?,
+        rating: (json['rating'] as num).toDouble(),
+        comment: json['comment'] as String?,
+        createdAt: DateTime.parse(json['createdAt'] as String),
+        tags: List<String>.from(json['tags'] as List? ?? []),
+      );
   final String id;
   final String tripId;
   final String passengerId;
@@ -298,6 +293,7 @@ class DriverRating {
 class DriverStats {
 
   const DriverStats({
+    required this.lastTripDate,
     this.totalTrips = 0,
     this.totalDistance = 0.0,
     this.totalDrivingTime = Duration.zero,
@@ -305,25 +301,22 @@ class DriverStats {
     this.totalRatings = 0,
     this.fuelEfficiency = 0.0,
     this.safetyScore = 100,
-    required this.lastTripDate,
   });
 
-  factory DriverStats.fromJson(Map<String, dynamic> json) {
-    return DriverStats(
-      totalTrips: json['totalTrips'] as int? ?? 0,
-      totalDistance: (json['totalDistance'] as num?)?.toDouble() ?? 0.0,
-      totalDrivingTime: Duration(
-        milliseconds: json['totalDrivingTimeMs'] as int? ?? 0,
-      ),
-      averageRating: (json['averageRating'] as num?)?.toDouble() ?? 0.0,
-      totalRatings: json['totalRatings'] as int? ?? 0,
-      fuelEfficiency: (json['fuelEfficiency'] as num?)?.toDouble() ?? 0.0,
-      safetyScore: json['safetyScore'] as int? ?? 100,
-      lastTripDate: json['lastTripDate'] != null
-          ? DateTime.parse(json['lastTripDate'] as String)
-          : DateTime.now(),
-    );
-  }
+  factory DriverStats.fromJson(Map<String, dynamic> json) => DriverStats(
+        totalTrips: json['totalTrips'] as int? ?? 0,
+        totalDistance: (json['totalDistance'] as num?)?.toDouble() ?? 0.0,
+        totalDrivingTime: Duration(
+          milliseconds: json['totalDrivingTimeMs'] as int? ?? 0,
+        ),
+        averageRating: (json['averageRating'] as num?)?.toDouble() ?? 0.0,
+        totalRatings: json['totalRatings'] as int? ?? 0,
+        fuelEfficiency: (json['fuelEfficiency'] as num?)?.toDouble() ?? 0.0,
+        safetyScore: json['safetyScore'] as int? ?? 100,
+        lastTripDate: json['lastTripDate'] != null
+            ? DateTime.parse(json['lastTripDate'] as String)
+            : DateTime.now(),
+      );
   final int totalTrips;
   final double totalDistance;
   final Duration totalDrivingTime;
@@ -372,6 +365,7 @@ class Driver {
     required this.id,
     required this.name,
     required this.email,
+    required this.license,
     this.phone,
     this.cpf,
     this.birthDate,
@@ -380,7 +374,6 @@ class Driver {
     this.emergencyContact,
     this.emergencyPhone,
     this.status = DriverStatus.inactive,
-    required this.license,
     this.certifications = const [],
     this.ratings = const [],
     DriverStats? stats,
@@ -393,59 +386,48 @@ class Driver {
     this.lastSeenAt,
   })  : createdAt = createdAt ?? DateTime.now(),
         updatedAt = updatedAt ?? DateTime.now(),
-        stats = stats ??
-            DriverStats(
-              totalTrips: 0,
-              totalDistance: 0.0,
-              totalDrivingTime: Duration.zero,
-              averageRating: 0.0,
-              totalRatings: 0,
-              fuelEfficiency: 0.0,
-              safetyScore: 0,
-              lastTripDate: DateTime.now(),
-            );
+        stats = stats ?? DriverStats(lastTripDate: DateTime.now());
 
-  factory Driver.fromJson(Map<String, dynamic> json) {
-    return Driver(
-      id: json['id'] as String,
-      name: json['name'] as String,
-      email: json['email'] as String,
-      phone: json['phone'] as String?,
-      cpf: json['cpf'] as String?,
-      birthDate: json['birthDate'] != null
-          ? DateTime.parse(json['birthDate'] as String)
-          : null,
-      address: json['address'] as String?,
-      profileImageUrl: json['profileImageUrl'] as String?,
-      status: DriverStatus.values.firstWhere(
-        (e) => e.name == json['status'],
-        orElse: () => DriverStatus.inactive,
-      ),
-      license: DriverLicense.fromJson(json['license'] as Map<String, dynamic>),
-      certifications: (json['certifications'] as List?)
-              ?.map((cert) =>
-                  DriverCertification.fromJson(cert as Map<String, dynamic>))
-              .toList() ??
-          [],
-      ratings: (json['ratings'] as List?)
-              ?.map((rating) =>
-                  DriverRating.fromJson(rating as Map<String, dynamic>))
-              .toList() ??
-          [],
-      stats: json['stats'] != null
-          ? DriverStats.fromJson(json['stats'] as Map<String, dynamic>)
-          : DriverStats(lastTripDate: DateTime.now()),
-      createdAt: DateTime.parse(json['createdAt'] as String),
-      updatedAt: DateTime.parse(json['updatedAt'] as String),
-      currentVehicleId: json['currentVehicleId'] as String?,
-      preferences: Map<String, dynamic>.from(json['preferences'] as Map? ?? {}),
-      availableHours: List<String>.from(json['availableHours'] as List? ?? []),
-      isOnline: json['isOnline'] as bool? ?? false,
-      lastSeenAt: json['lastSeenAt'] != null
-          ? DateTime.parse(json['lastSeenAt'] as String)
-          : null,
-    );
-  }
+  factory Driver.fromJson(Map<String, dynamic> json) => Driver(
+        id: json['id'] as String,
+        name: json['name'] as String,
+        email: json['email'] as String,
+        phone: json['phone'] as String?,
+        cpf: json['cpf'] as String?,
+        birthDate: json['birthDate'] != null
+            ? DateTime.parse(json['birthDate'] as String)
+            : null,
+        address: json['address'] as String?,
+        profileImageUrl: json['profileImageUrl'] as String?,
+        status: DriverStatus.values.firstWhere(
+          (e) => e.name == json['status'],
+          orElse: () => DriverStatus.inactive,
+        ),
+        license: DriverLicense.fromJson(json['license'] as Map<String, dynamic>),
+        certifications: (json['certifications'] as List?)
+                ?.map((cert) =>
+                    DriverCertification.fromJson(cert as Map<String, dynamic>))
+                .toList() ??
+            [],
+        ratings: (json['ratings'] as List?)
+                ?.map((rating) =>
+                    DriverRating.fromJson(rating as Map<String, dynamic>))
+                .toList() ??
+            [],
+        stats: json['stats'] != null
+            ? DriverStats.fromJson(json['stats'] as Map<String, dynamic>)
+            : DriverStats(lastTripDate: DateTime.now()),
+        createdAt: DateTime.parse(json['createdAt'] as String),
+        updatedAt: DateTime.parse(json['updatedAt'] as String),
+        currentVehicleId: json['currentVehicleId'] as String?,
+        preferences: Map<String, dynamic>.from(json['preferences'] as Map? ?? {}),
+        availableHours:
+            List<String>.from(json['availableHours'] as List? ?? []),
+        isOnline: json['isOnline'] as bool? ?? false,
+        lastSeenAt: json['lastSeenAt'] != null
+            ? DateTime.parse(json['lastSeenAt'] as String)
+            : null,
+      );
   final String id;
   final String name;
   final String email;

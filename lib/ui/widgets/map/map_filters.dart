@@ -56,7 +56,7 @@ class _MapFiltersState extends State<MapFilters> {
               padding: const EdgeInsets.all(16),
               child: Row(
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.filter_list,
                     color: GolfFoxTheme.primaryOrange,
                     size: 20,

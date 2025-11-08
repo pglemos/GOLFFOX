@@ -50,8 +50,8 @@ export default function StopGenerator({ routeId }: { routeId: string }) {
   function initMap() {
     if (!mapRef.current || !('google' in window)) return
     const center = { lat: -23.55052, lng: -46.633308 }
-    // @ts-ignore
-    mapObj.current = new google.maps.Map(mapRef.current, { zoom: 11, center })
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    mapObj.current = new (window as any).google.maps.Map(mapRef.current, { zoom: 11, center })
   }
 
   async function generate() {
@@ -81,8 +81,8 @@ export default function StopGenerator({ routeId }: { routeId: string }) {
   function drawOnMap(json: ApiResponse) {
     if (!mapObj.current || !json?.stops) return
     clearMarkers()
-    // @ts-ignore
-    const g = google
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const g = (window as any).google
     // Origem
     markers.current.push(new g.maps.Marker({ position: json.origin, map: mapObj.current, icon: process.env.NEXT_PUBLIC_DESTINATION_ICON || undefined }))
     // Pontos

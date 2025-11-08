@@ -5,21 +5,22 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../core/theme/gf_tokens.dart';
-import '../../ui/widgets/common/gf_app_bar.dart';
-import '../../ui/widgets/common/gf_loading_indicator.dart';
-import '../../ui/widgets/vehicles/vehicle_info_card.dart';
-import '../../ui/widgets/vehicles/vehicle_maintenance_list.dart';
-import '../../ui/widgets/vehicles/vehicle_fuel_chart.dart';
 import '../../models/vehicle.dart';
 import '../../services/vehicle_service.dart';
+import '../../ui/widgets/common/gf_app_bar.dart';
+import '../../ui/widgets/common/gf_loading_indicator.dart';
+import '../../ui/widgets/vehicles/vehicle_fuel_chart.dart';
+import '../../ui/widgets/vehicles/vehicle_info_card.dart';
+import '../../ui/widgets/vehicles/vehicle_maintenance_list.dart';
 import 'create_vehicle_page.dart';
 
 class VehicleDetailsPage extends ConsumerStatefulWidget {
 
   const VehicleDetailsPage({
-    super.key,
     required this.vehicleId,
+    super.key,
   });
   final String vehicleId;
 
@@ -90,7 +91,7 @@ class _VehicleDetailsPageState extends ConsumerState<VehicleDetailsPage>
         if (mounted) {
           Navigator.of(context).pop();
         }
-      } catch (e) {
+      } on Exception catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -131,7 +132,7 @@ class _VehicleDetailsPageState extends ConsumerState<VehicleDetailsPage>
           ),
         );
       }
-    } catch (e) {
+    } on Exception catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -198,7 +199,7 @@ class _VehicleDetailsPageState extends ConsumerState<VehicleDetailsPage>
           ),
         ),
       ),
-      data: (Vehicle? vehicle) {
+      data: (vehicle) {
         if (vehicle == null) {
           return const Scaffold(
             backgroundColor: Color(GfTokens.colorSurfaceBackground),
@@ -209,7 +210,7 @@ class _VehicleDetailsPageState extends ConsumerState<VehicleDetailsPage>
           );
         }
 
-        final double fuelLevel =
+        final fuelLevel =
             (vehicle.currentFuelLevel ?? 0).clamp(0, 100).toDouble();
 
         return Scaffold(
@@ -445,17 +446,17 @@ class _VehicleDetailsPageState extends ConsumerState<VehicleDetailsPage>
           const SizedBox(height: GfTokens.spacingXs),
           Text(
             value,
-            style: TextStyle(
+            style: const TextStyle(
               fontWeight: FontWeight.w600,
-              color: const Color(GfTokens.colorOnSurface),
+              color: Color(GfTokens.colorOnSurface),
               fontSize: GfTokens.fontSizeSm,
             ),
           ),
           Text(
             title,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: GfTokens.fontSizeXs,
-              color: const Color(GfTokens.colorOnSurfaceVariant),
+              color: Color(GfTokens.colorOnSurfaceVariant),
             ),
           ),
         ],
@@ -476,12 +477,12 @@ class _VehicleDetailsPageState extends ConsumerState<VehicleDetailsPage>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  const Text(
                     'Documentos',
                     style: TextStyle(
                       fontSize: GfTokens.fontSizeLg,
                       fontWeight: FontWeight.w600,
-                      color: const Color(GfTokens.colorOnSurface),
+                      color: Color(GfTokens.colorOnSurface),
                     ),
                   ),
                   const SizedBox(height: GfTokens.spacingMd),
@@ -526,12 +527,12 @@ class _VehicleDetailsPageState extends ConsumerState<VehicleDetailsPage>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  const Text(
                     'Especificacoes',
                     style: TextStyle(
                       fontSize: GfTokens.fontSizeLg,
                       fontWeight: FontWeight.w600,
-                      color: const Color(GfTokens.colorOnSurface),
+                      color: Color(GfTokens.colorOnSurface),
                     ),
                   ),
                   const SizedBox(height: GfTokens.spacingMd),
@@ -564,29 +565,31 @@ class _VehicleDetailsPageState extends ConsumerState<VehicleDetailsPage>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
+                    const Text(
                       'Recursos',
                       style: TextStyle(
                         fontSize: GfTokens.fontSizeLg,
                         fontWeight: FontWeight.w600,
-                        color: const Color(GfTokens.colorOnSurface),
+                        color: Color(GfTokens.colorOnSurface),
                       ),
                     ),
                     const SizedBox(height: GfTokens.spacingMd),
                     Wrap(
                       spacing: GfTokens.spacingSm,
                       runSpacing: GfTokens.spacingSm,
-                      children: vehicle.features.map((feature) {
-                        return Chip(
-                          label: Text(feature),
-                          backgroundColor: const Color(GfTokens.colorPrimary)
-                              .withValues(alpha: 0.1),
-                          side: BorderSide(
-                            color: const Color(GfTokens.colorPrimary)
-                                .withValues(alpha: 0.3),
-                          ),
-                        );
-                      }).toList(),
+                      children: vehicle.features
+                          .map(
+                            (feature) => Chip(
+                              label: Text(feature),
+                              backgroundColor: const Color(GfTokens.colorPrimary)
+                                  .withValues(alpha: 0.1),
+                              side: BorderSide(
+                                color: const Color(GfTokens.colorPrimary)
+                                    .withValues(alpha: 0.3),
+                              ),
+                            ),
+                          )
+                          .toList(),
                     ),
                   ],
                 ),
@@ -611,12 +614,12 @@ class _VehicleDetailsPageState extends ConsumerState<VehicleDetailsPage>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  const Text(
                     'Historico do Veiculo',
                     style: TextStyle(
                       fontSize: GfTokens.fontSizeLg,
                       fontWeight: FontWeight.w600,
-                      color: const Color(GfTokens.colorOnSurface),
+                      color: Color(GfTokens.colorOnSurface),
                     ),
                   ),
                   const SizedBox(height: GfTokens.spacingMd),
@@ -684,15 +687,15 @@ class _VehicleDetailsPageState extends ConsumerState<VehicleDetailsPage>
         children: [
           Text(
             label,
-            style: TextStyle(
-              color: const Color(GfTokens.colorOnSurfaceVariant),
+            style: const TextStyle(
+              color: Color(GfTokens.colorOnSurfaceVariant),
             ),
           ),
           Text(
             value,
-            style: TextStyle(
+            style: const TextStyle(
               fontWeight: FontWeight.w500,
-              color: const Color(GfTokens.colorOnSurface),
+              color: Color(GfTokens.colorOnSurface),
             ),
           ),
         ],
@@ -725,16 +728,16 @@ class _VehicleDetailsPageState extends ConsumerState<VehicleDetailsPage>
               children: [
                 Text(
                   title,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontWeight: FontWeight.w600,
-                    color: const Color(GfTokens.colorOnSurface),
+                    color: Color(GfTokens.colorOnSurface),
                   ),
                 ),
                 Text(
                   '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year} as ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}',
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: GfTokens.fontSizeSm,
-                    color: const Color(GfTokens.colorOnSurfaceVariant),
+                    color: Color(GfTokens.colorOnSurfaceVariant),
                   ),
                 ),
               ],

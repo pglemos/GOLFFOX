@@ -1,15 +1,17 @@
 // lib/screens/carrier/carrier_dashboard.dart
 import 'dart:async';
+
 import 'package:flutter/material.dart';
-import '../../models/user.dart';
-import '../../models/trip.dart';
-import '../../services/auth_service.dart';
-import '../../services/supabase_service.dart';
+
 import '../../core/routing/app_router.dart';
 import '../../core/theme/gf_tokens.dart';
+import '../../models/trip.dart';
+import '../../models/user.dart';
+import '../../services/auth_service.dart';
+import '../../services/supabase_service.dart';
 
 class CarrierDashboard extends StatefulWidget {
-  const CarrierDashboard({super.key, required this.user});
+  const CarrierDashboard({required this.user, super.key});
   final User user;
 
   @override
@@ -46,8 +48,11 @@ class _CarrierDashboardState extends State<CarrierDashboard>
     await _loadAll(firstLoad: true);
     // Poll leve a cada 20s
     _pollTimer?.cancel();
-    _pollTimer = Timer.periodic(const Duration(seconds: 20), (_) => _loadAll());
-    _anim.forward();
+    _pollTimer = Timer.periodic(
+      const Duration(seconds: 20),
+      (_) => unawaited(_loadAll()),
+    );
+    unawaited(_anim.forward());
   }
 
   @override
@@ -76,8 +81,8 @@ class _CarrierDashboardState extends State<CarrierDashboard>
         _vehicles = vehicles;
         _routes = routes;
       });
-    } catch (e) {
-      setState(() => _error = 'Falha ao carregar dados: $e');
+    } on Exception catch (error) {
+      setState(() => _error = 'Falha ao carregar dados: $error');
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -114,10 +119,10 @@ class _CarrierDashboardState extends State<CarrierDashboard>
       await _auth.signOut();
       if (!mounted) return;
       AppRouter.instance.go('/');
-    } catch (e) {
+    } on Exception catch (error) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro ao fazer logout: $e')),
+        SnackBar(content: Text('Erro ao fazer logout: $error')),
       );
     }
   }
@@ -199,7 +204,7 @@ class _CarrierDashboardState extends State<CarrierDashboard>
             Text(
               widget.user.name,
               style: t.textTheme.bodySmall?.copyWith(
-                color: t.colorScheme.onSurface.withOpacity(0.7),
+                color: t.colorScheme.onSurface.withValues(alpha: 0.7),
               ),
             ),
           ],
@@ -535,7 +540,7 @@ class _KpiCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: color.withOpacity(0.12),
+                color: color.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(icon, color: color),
@@ -559,7 +564,7 @@ class _KpiCard extends StatelessWidget {
                   Text(
                     title,
                     style: t.textTheme.labelMedium?.copyWith(
-                      color: t.colorScheme.onSurface.withOpacity(0.7),
+                      color: t.colorScheme.onSurface.withValues(alpha: 0.7),
                     ),
                   ),
                 ],
@@ -600,7 +605,7 @@ class _TripsPanel extends StatelessWidget {
               child: Text(
                 'Nenhuma viagem encontrada.',
                 style: t.textTheme.bodyMedium?.copyWith(
-                  color: t.colorScheme.onSurface.withOpacity(0.7),
+                  color: t.colorScheme.onSurface.withValues(alpha: 0.7),
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -680,7 +685,7 @@ class _TripRow extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: t.textTheme.bodySmall?.copyWith(
-                        color: t.colorScheme.onSurface.withOpacity(0.7),
+                        color: t.colorScheme.onSurface.withValues(alpha: 0.7),
                       ),
                     ),
                   ]),
@@ -693,7 +698,7 @@ class _TripRow extends StatelessWidget {
                   Text(
                     _fmt(trip.scheduledStartTime!),
                     style: t.textTheme.labelMedium?.copyWith(
-                      color: t.colorScheme.onSurface.withOpacity(0.7),
+                      color: t.colorScheme.onSurface.withValues(alpha: 0.7),
                     ),
                   ),
                 const SizedBox(height: 4),
@@ -743,7 +748,7 @@ class _FleetPanel extends StatelessWidget {
               child: Text(
                 'Sem veiculos cadastrados.',
                 style: t.textTheme.bodySmall?.copyWith(
-                  color: t.colorScheme.onSurface.withOpacity(0.7),
+                  color: t.colorScheme.onSurface.withValues(alpha: 0.7),
                 ),
               ),
             )
@@ -805,7 +810,7 @@ class _FleetPanel extends StatelessWidget {
             Text(
               '+${vehicles.length - 8} mais',
               style: t.textTheme.labelSmall?.copyWith(
-                color: t.colorScheme.onSurface.withOpacity(0.6),
+                color: t.colorScheme.onSurface.withValues(alpha: 0.6),
               ),
             ),
           ],
@@ -888,7 +893,7 @@ class _ActionButton extends StatelessWidget {
         decoration: BoxDecoration(
           color: t.colorScheme.surface,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: t.colorScheme.outline.withOpacity(0.18)),
+          border: Border.all(color: t.colorScheme.outline.withValues(alpha: 0.18)),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -934,7 +939,7 @@ class _StatusPill extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.12),
+        color: color.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Text(
@@ -947,3 +952,4 @@ class _StatusPill extends StatelessWidget {
     );
   }
 }
+

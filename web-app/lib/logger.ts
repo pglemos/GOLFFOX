@@ -1,43 +1,145 @@
+export type LogLevel = 'debug' | 'info' | 'warn' | 'error'
+
 export type LogEntry = {
   ts: string
-  level: 'info' | 'warn' | 'error'
+  level: LogLevel
   message: string
-  meta?: Record<string, any>
+  meta?: Record<string, unknown>
+  context?: string
 }
 
 const buffer: LogEntry[] = []
+const MAX_BUFFER_SIZE = 1000
 
 const isDevelopment = process.env.NODE_ENV === 'development'
+const isProduction = process.env.NODE_ENV === 'production'
 
-export function log(level: LogEntry['level'], message: string, meta?: Record<string, any>) {
-  const entry: LogEntry = { ts: new Date().toISOString(), level, message, meta }
-  buffer.push(entry)
-  
-  // ✅ Em produção, apenas logar erros e warnings
-  if (level === 'error') {
-    console.error('[GEN-STOPS]', message, meta || '')
-  } else if (level === 'warn') {
-    console.warn('[GEN-STOPS]', message, meta || '')
-  } else if (isDevelopment) {
-    // Info apenas em desenvolvimento
-    console.log('[GEN-STOPS]', message, meta || '')
+/**
+ * Sistema de logging centralizado
+ * Em produção: apenas erros e warnings são logados
+ * Em desenvolvimento: todos os logs são exibidos
+ */
+class Logger {
+  private shouldLog(level: LogLevel): boolean {
+    if (isProduction) {
+      return level === 'error' || level === 'warn'
+    }
+    return true
   }
 
-  // Notificar canal de erros (webhook) se configurado
-  if (level === 'error') {
-    const url = process.env.NEXT_PUBLIC_ERROR_WEBHOOK_URL
-    if (url) {
-      try {
-        // Fire and forget
-        fetch(url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(entry)
-        }).catch(() => {})
-      } catch {}
+  private addToBuffer(entry: LogEntry): void {
+    buffer.push(entry)
+    // Limitar tamanho do buffer
+    if (buffer.length > MAX_BUFFER_SIZE) {
+      buffer.shift()
     }
+  }
+
+  private formatMessage(context: string | undefined, message: string): string {
+    return context ? `[${context}] ${message}` : message
+  }
+
+  log(level: LogLevel, message: string, meta?: Record<string, unknown>, context?: string): void {
+    const entry: LogEntry = {
+      ts: new Date().toISOString(),
+      level,
+      message,
+      meta,
+      context,
+    }
+
+    this.addToBuffer(entry)
+
+    if (!this.shouldLog(level)) {
+      return
+    }
+
+    const formattedMessage = this.formatMessage(context, message)
+
+    switch (level) {
+      case 'error':
+        console.error(formattedMessage, meta || '')
+        this.sendToWebhook(entry)
+        break
+      case 'warn':
+        console.warn(formattedMessage, meta || '')
+        break
+      case 'info':
+        console.info(formattedMessage, meta || '')
+        break
+      case 'debug':
+        if (isDevelopment) {
+          console.debug(formattedMessage, meta || '')
+        }
+        break
+    }
+  }
+
+  private sendToWebhook(entry: LogEntry): void {
+    const url = process.env.NEXT_PUBLIC_ERROR_WEBHOOK_URL
+    if (!url) return
+
+    try {
+      // Fire and forget - não bloquear execução
+      fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(entry),
+      }).catch(() => {
+        // Silenciosamente ignorar erros de webhook
+      })
+    } catch {
+      // Silenciosamente ignorar erros
+    }
+  }
+
+  debug(message: string, meta?: Record<string, unknown>, context?: string): void {
+    this.log('debug', message, meta, context)
+  }
+
+  info(message: string, meta?: Record<string, unknown>, context?: string): void {
+    this.log('info', message, meta, context)
+  }
+
+  warn(message: string, meta?: Record<string, unknown>, context?: string): void {
+    this.log('warn', message, meta, context)
+  }
+
+  error(message: string, meta?: Record<string, unknown>, context?: string): void {
+    this.log('error', message, meta, context)
   }
 }
 
-export function getLogs() { return buffer.slice() }
-export function clearLogs() { buffer.length = 0 }
+const logger = new Logger()
+
+// Funções de conveniência
+export function log(level: LogLevel, message: string, meta?: Record<string, unknown>, context?: string): void {
+  logger.log(level, message, meta, context)
+}
+
+export function debug(message: string, meta?: Record<string, unknown>, context?: string): void {
+  logger.debug(message, meta, context)
+}
+
+export function info(message: string, meta?: Record<string, unknown>, context?: string): void {
+  logger.info(message, meta, context)
+}
+
+export function warn(message: string, meta?: Record<string, unknown>, context?: string): void {
+  logger.warn(message, meta, context)
+}
+
+export function error(message: string, meta?: Record<string, unknown>, context?: string): void {
+  logger.error(message, meta, context)
+}
+
+export function getLogs(): LogEntry[] {
+  return buffer.slice()
+}
+
+export function clearLogs(): void {
+  buffer.length = 0
+}
+
+// Exportar logger para uso avançado
+export { logger }

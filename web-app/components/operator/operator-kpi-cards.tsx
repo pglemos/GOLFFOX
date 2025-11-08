@@ -1,5 +1,6 @@
 "use client"
 
+import { memo } from "react"
 import { Card } from "@/components/ui/card"
 import { MapPin, Clock, AlertTriangle, TrendingUp, DollarSign, CheckCircle } from "lucide-react"
 import { motion } from "framer-motion"
@@ -17,7 +18,7 @@ interface KPICardsProps {
   loading?: boolean
 }
 
-export function OperatorKPICards({ kpis, loading = false }: KPICardsProps) {
+export const OperatorKPICards = memo(function OperatorKPICards({ kpis, loading = false }: KPICardsProps) {
   if (loading) {
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -117,5 +118,5 @@ export function OperatorKPICards({ kpis, loading = false }: KPICardsProps) {
       })}
     </div>
   )
-}
+})
 

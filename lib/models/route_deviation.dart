@@ -72,54 +72,54 @@ class RouteDeviation {
     required this.status,
     required this.latitude,
     required this.longitude,
+    required this.detectedAt,
+    required this.createdAt,
+    required this.updatedAt,
     this.distanceFromRoute,
     this.timeDeviationMinutes,
     this.routeStopId,
     this.description,
-    required this.detectedAt,
     this.resolvedAt,
     this.resolvedBy,
     this.notes,
-    required this.createdAt,
-    required this.updatedAt,
   });
 
   /* ====================== SERIALIZACAO (DB snake_case) ====================== */
 
-  factory RouteDeviation.fromJson(Json json) {
-    return RouteDeviation(
-      id: json[RouteDeviationFields.id] as String,
-      tripId: json[RouteDeviationFields.tripId] as String,
-      vehicleId: json[RouteDeviationFields.vehicleId] as String,
-      driverId: json[RouteDeviationFields.driverId] as String,
-      routeId: json[RouteDeviationFields.routeId] as String,
-      deviationType: RouteDeviationType.values.firstWhere(
-        (e) => e.name == json[RouteDeviationFields.deviationType],
-        orElse: () => RouteDeviationType.distanceDeviation,
-      ),
-      status: RouteDeviationStatus.values.firstWhere(
-        (e) => e.name == json[RouteDeviationFields.status],
-        orElse: () => RouteDeviationStatus.active,
-      ),
-      latitude: (json[RouteDeviationFields.latitude] as num).toDouble(),
-      longitude: (json[RouteDeviationFields.longitude] as num).toDouble(),
-      distanceFromRoute:
-          (json[RouteDeviationFields.distanceFromRoute] as num?)?.toDouble(),
-      timeDeviationMinutes:
-          json[RouteDeviationFields.timeDeviationMinutes] as int?,
-      routeStopId: json[RouteDeviationFields.routeStopId] as String?,
-      description: json[RouteDeviationFields.description] as String?,
-      detectedAt:
-          DateTime.parse(json[RouteDeviationFields.detectedAt] as String),
-      resolvedAt: json[RouteDeviationFields.resolvedAt] != null
-          ? DateTime.parse(json[RouteDeviationFields.resolvedAt] as String)
-          : null,
-      resolvedBy: json[RouteDeviationFields.resolvedBy] as String?,
-      notes: json[RouteDeviationFields.notes] as String?,
-      createdAt: DateTime.parse(json[RouteDeviationFields.createdAt] as String),
-      updatedAt: DateTime.parse(json[RouteDeviationFields.updatedAt] as String),
-    );
-  }
+  factory RouteDeviation.fromJson(Json json) => RouteDeviation(
+        id: json[RouteDeviationFields.id] as String,
+        tripId: json[RouteDeviationFields.tripId] as String,
+        vehicleId: json[RouteDeviationFields.vehicleId] as String,
+        driverId: json[RouteDeviationFields.driverId] as String,
+        routeId: json[RouteDeviationFields.routeId] as String,
+        deviationType: RouteDeviationType.values.firstWhere(
+          (e) => e.name == json[RouteDeviationFields.deviationType],
+          orElse: () => RouteDeviationType.distanceDeviation,
+        ),
+        status: RouteDeviationStatus.values.firstWhere(
+          (e) => e.name == json[RouteDeviationFields.status],
+          orElse: () => RouteDeviationStatus.active,
+        ),
+        latitude: (json[RouteDeviationFields.latitude] as num).toDouble(),
+        longitude: (json[RouteDeviationFields.longitude] as num).toDouble(),
+        distanceFromRoute:
+            (json[RouteDeviationFields.distanceFromRoute] as num?)?.toDouble(),
+        timeDeviationMinutes:
+            json[RouteDeviationFields.timeDeviationMinutes] as int?,
+        routeStopId: json[RouteDeviationFields.routeStopId] as String?,
+        description: json[RouteDeviationFields.description] as String?,
+        detectedAt:
+            DateTime.parse(json[RouteDeviationFields.detectedAt] as String),
+        resolvedAt: json[RouteDeviationFields.resolvedAt] != null
+            ? DateTime.parse(json[RouteDeviationFields.resolvedAt] as String)
+            : null,
+        resolvedBy: json[RouteDeviationFields.resolvedBy] as String?,
+        notes: json[RouteDeviationFields.notes] as String?,
+        createdAt:
+            DateTime.parse(json[RouteDeviationFields.createdAt] as String),
+        updatedAt:
+            DateTime.parse(json[RouteDeviationFields.updatedAt] as String),
+      );
   final String id;
   final String tripId;
   final String vehicleId;

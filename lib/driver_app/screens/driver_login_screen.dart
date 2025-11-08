@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../services/supabase_service.dart';
 import '../../services/auth_service.dart';
+import '../../services/supabase_service.dart';
 
 class DriverLoginScreen extends StatefulWidget {
   const DriverLoginScreen({super.key});
@@ -19,6 +19,8 @@ class _DriverLoginScreenState extends State<DriverLoginScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _loading = true);
+    final navigator = Navigator.of(context);
+    final messenger = ScaffoldMessenger.of(context);
 
     try {
       final cpf = _cpfController.text.replaceAll(RegExp(r'[^\d]'), '');
@@ -43,25 +45,23 @@ class _DriverLoginScreenState extends State<DriverLoginScreen> {
 
       final authService = AuthService();
       final user = await authService.signInWithEmail(
-        context,
         email,
         _passwordController.text,
       );
+
+      if (!context.mounted) return;
 
       if (user == null) {
         throw Exception('Falha ao autenticar. Verifique suas credenciais.');
       }
 
       // Navegar para dashboard do motorista
-      if (mounted) {
-        Navigator.of(context).pushReplacementNamed('/driver/dashboard');
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toString())),
-        );
-      }
+      await navigator.pushReplacementNamed('/driver/dashboard');
+    } on Exception catch (e) {
+      if (!context.mounted) return;
+      messenger.showSnackBar(
+        SnackBar(content: Text(e.toString())),
+      );
     } finally {
       if (mounted) {
         setState(() => _loading = false);
@@ -73,7 +73,7 @@ class _DriverLoginScreenState extends State<DriverLoginScreen> {
   Widget build(BuildContext context) => Scaffold(
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(24.0),
+          padding: const EdgeInsets.all(24),
           child: Form(
             key: _formKey,
             child: Column(

@@ -1,4 +1,3 @@
-import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -50,7 +49,7 @@ final tokenValidationProvider = FutureProvider<bool>((ref) async {
   final authService = ref.watch(authServiceProvider);
   try {
     return await authService.validateToken();
-  } catch (_) {
+  } on Exception {
     return false;
   }
 });
@@ -66,25 +65,23 @@ class AuthNotifier extends StateNotifier<AsyncValue<app_user.User?>> {
     try {
       final user = await _authService.getCurrentUser();
       state = AsyncValue.data(user);
-    } catch (error, stackTrace) {
+    } on Object catch (error, stackTrace) {
       state = AsyncValue.error(error, stackTrace);
     }
   }
 
   Future<void> signIn(
-    BuildContext context,
     String email,
     String password,
   ) async {
     state = const AsyncValue.loading();
     try {
       final user = await _authService.signInWithEmail(
-        context,
         email,
         password,
       );
       state = AsyncValue.data(user);
-    } catch (error, stackTrace) {
+    } on Object catch (error, stackTrace) {
       state = AsyncValue.error(error, stackTrace);
     }
   }
@@ -93,7 +90,7 @@ class AuthNotifier extends StateNotifier<AsyncValue<app_user.User?>> {
     try {
       await _authService.signOut();
       state = const AsyncValue.data(null);
-    } catch (error, stackTrace) {
+    } on Object catch (error, stackTrace) {
       state = AsyncValue.error(error, stackTrace);
     }
   }
@@ -102,7 +99,7 @@ class AuthNotifier extends StateNotifier<AsyncValue<app_user.User?>> {
     try {
       final user = await _authService.getCurrentUser();
       state = AsyncValue.data(user);
-    } catch (error, stackTrace) {
+    } on Object catch (error, stackTrace) {
       state = AsyncValue.error(error, stackTrace);
     }
   }

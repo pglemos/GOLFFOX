@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, useCallback, useRef } from "react"
+import { useEffect, useState, useCallback, useRef, memo } from "react"
 import { setOptions, importLibrary } from "@googlemaps/js-api-loader"
 import { Card } from "./ui/card"
 import { Button } from "./ui/button"
@@ -63,7 +63,7 @@ interface AdvancedRouteMapProps {
   showControls?: boolean
 }
 
-export function AdvancedRouteMap({ 
+export const AdvancedRouteMap = memo(function AdvancedRouteMap({ 
   routeId, 
   className = '', 
   onClose,
@@ -1307,4 +1307,4 @@ export function AdvancedRouteMap({
       </div>
     </div>
   )
-}
+})

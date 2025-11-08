@@ -24,8 +24,7 @@ class _PassengerLoginScreenState extends State<PassengerLoginScreen> {
       final cpf = _cpfController.text.replaceAll(RegExp(r'[^\d]'), '');
       
       // Buscar funcionário por CPF
-      final Map<String, dynamic>? employee =
-          await SupabaseService.instance.client
+      final employee = await SupabaseService.instance.client
           .from('gf_employee_company')
           .select()
           .eq('login_cpf', cpf)
@@ -45,16 +44,16 @@ class _PassengerLoginScreenState extends State<PassengerLoginScreen> {
 
       // Navegar para dashboard do passageiro
       if (mounted) {
-        Navigator.of(context).pushReplacement(
+        await Navigator.of(context).pushReplacement(
           MaterialPageRoute<void>(
             builder: (_) => const PassengerDashboardScreen(),
           ),
         );
       }
-    } catch (e) {
+    } on Exception catch (error) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toString())),
+          SnackBar(content: Text(error.toString())),
         );
       }
     } finally {
@@ -68,7 +67,7 @@ class _PassengerLoginScreenState extends State<PassengerLoginScreen> {
   Widget build(BuildContext context) => Scaffold(
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(24.0),
+          padding: const EdgeInsets.all(24),
           child: Form(
             key: _formKey,
             child: Column(

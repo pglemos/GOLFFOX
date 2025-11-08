@@ -5,9 +5,10 @@
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
+
 import '../models/bus_stop.dart';
-import 'supabase_service.dart';
 import 'map_service.dart';
+import 'supabase_service.dart';
 
 class BusStopService {
 
@@ -28,7 +29,7 @@ class BusStopService {
                 Map<String, dynamic>.from(json as Map),
               ))
           .toList();
-    } catch (e) {
+    } on Exception {
       // Em caso de erro, retorna dados mock para demonstracao
       return _getMockBusStops(routeId);
     }
@@ -49,7 +50,7 @@ class BusStopService {
             distance.as(LengthUnit.Kilometer, position, stop.position);
         return distanceKm <= radiusKm;
       }).toList();
-    } catch (e) {
+    } on Exception {
       return _getMockNearbyStops(position);
     }
   }
@@ -67,7 +68,7 @@ class BusStopService {
                 Map<String, dynamic>.from(json as Map),
               ))
           .toList();
-    } catch (e) {
+    } on Exception {
       return _getAllMockBusStops();
     }
   }
@@ -84,7 +85,7 @@ class BusStopService {
       return BusStop.fromJson(
         Map<String, dynamic>.from(response as Map),
       );
-    } catch (e) {
+    } on Exception {
       return _getMockBusStop(stopId);
     }
   }
@@ -97,9 +98,8 @@ class BusStopService {
         'estimated_arrival': estimatedArrival.toIso8601String(),
         'updated_at': DateTime.now().toIso8601String(),
       }).eq('id', stopId);
-    } catch (e) {
-      // Log do erro em producao
-      print('Erro ao atualizar tempo estimado: $e');
+    } on Exception {
+      // TODO(golffox): log production error via AppLogger
     }
   }
 
@@ -110,8 +110,8 @@ class BusStopService {
         'last_visit': DateTime.now().toIso8601String(),
         'updated_at': DateTime.now().toIso8601String(),
       }).eq('id', stopId);
-    } catch (e) {
-      print('Erro ao marcar ultima visita: $e');
+    } on Exception {
+      // TODO(golffox): log production error via AppLogger
     }
   }
 

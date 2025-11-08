@@ -1,10 +1,11 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import 'supabase_service.dart';
-import '../models/user.dart' as app_user;
 import '../core/theme/gf_tokens.dart';
+import '../models/user.dart' as app_user;
+import 'supabase_service.dart';
 
 /// Codigos tipados para tratar erros no UI (snackbars, etc).
 enum AuthErrorCode {
@@ -35,7 +36,6 @@ class AuthService {
 
   /// Assina com e-mail/senha + busca o perfil (com retry/backoff).
   Future<app_user.User?> signInWithEmail(
-    BuildContext context,
     String email,
     String password,
   ) async {
@@ -99,8 +99,8 @@ class AuthService {
       // Erros de RLS/tabela ao buscar perfil.
       throw AuthFailure(
           AuthErrorCode.unknown, 'Falha ao acessar seus dados. (RLS/DB)', e);
-    } catch (e) {
-      throw AuthFailure(AuthErrorCode.unknown, 'Falha no login: $e', e);
+    } on Object catch (error) {
+      throw AuthFailure(AuthErrorCode.unknown, 'Falha no login: $error', error);
     }
   }
 
@@ -135,8 +135,12 @@ class AuthService {
     } on TimeoutException catch (e) {
       throw AuthFailure(AuthErrorCode.network,
           'Tempo esgotado conectando ao servidor. Verifique sua internet.', e);
-    } catch (e) {
-      throw AuthFailure(AuthErrorCode.unknown, 'Falha ao criar conta: $e', e);
+    } on Object catch (error) {
+      throw AuthFailure(
+        AuthErrorCode.unknown,
+        'Falha ao criar conta: $error',
+        error,
+      );
     }
   }
 
@@ -164,9 +168,12 @@ class AuthService {
     } on TimeoutException catch (e) {
       throw AuthFailure(
           AuthErrorCode.network, 'Tempo esgotado conectando ao servidor.', e);
-    } catch (e) {
+    } on Object catch (error) {
       throw AuthFailure(
-          AuthErrorCode.unknown, 'Falha ao atualizar e-mail: $e', e);
+        AuthErrorCode.unknown,
+        'Falha ao atualizar e-mail: $error',
+        error,
+      );
     }
   }
 
@@ -184,9 +191,12 @@ class AuthService {
     } on TimeoutException catch (e) {
       throw AuthFailure(
           AuthErrorCode.network, 'Tempo esgotado conectando ao servidor.', e);
-    } catch (e) {
+    } on Object catch (error) {
       throw AuthFailure(
-          AuthErrorCode.unknown, 'Falha ao enviar recuperacao: $e', e);
+        AuthErrorCode.unknown,
+        'Falha ao enviar recuperacao: $error',
+        error,
+      );
     }
   }
 
@@ -194,12 +204,18 @@ class AuthService {
   Future<app_user.User?> getCurrentUser() async {
     try {
       return await _supabaseService.getCurrentUserProfile().timeout(_timeout);
-    } on TimeoutException catch (e) {
+    } on TimeoutException catch (error) {
       throw AuthFailure(
-          AuthErrorCode.network, 'Tempo esgotado ao carregar perfil.', e);
-    } catch (e) {
+        AuthErrorCode.network,
+        'Tempo esgotado ao carregar perfil.',
+        error,
+      );
+    } on Object catch (error) {
       throw AuthFailure(
-          AuthErrorCode.unknown, 'Falha ao carregar perfil: $e', e);
+        AuthErrorCode.unknown,
+        'Falha ao carregar perfil: $error',
+        error,
+      );
     }
   }
 
@@ -224,7 +240,7 @@ class AuthService {
       }
 
       return true;
-    } catch (_) {
+    } on Exception {
       return false;
     }
   }
@@ -263,7 +279,7 @@ class AuthService {
           .timeout(_timeout);
 
       return true;
-    } catch (e) {
+    } on Exception {
       // Se a chamada falhar, o token e invalido
       await signOut();
       return false;

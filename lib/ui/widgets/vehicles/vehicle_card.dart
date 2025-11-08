@@ -71,10 +71,10 @@ class VehicleCard extends StatelessWidget {
                               Expanded(
                                 child: Text(
                                   vehicle.name,
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     fontSize: GfTokens.fontSizeLg,
                                     fontWeight: FontWeight.w600,
-                                    color: const Color(GfTokens.colorOnSurface),
+                                    color: Color(GfTokens.colorOnSurface),
                                   ),
                                 ),
                               ),
@@ -110,10 +110,10 @@ class VehicleCard extends StatelessWidget {
                             children: [
                               Text(
                                 vehicle.documents.licensePlate ?? 'Sem placa',
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: GfTokens.fontSizeMd,
                                   fontWeight: FontWeight.w500,
-                                  color: const Color(
+                                  color: Color(
                                       GfTokens.colorOnSurfaceVariant),
                                 ),
                               ),
@@ -121,8 +121,8 @@ class VehicleCard extends StatelessWidget {
                               Container(
                                 width: 4,
                                 height: 4,
-                                decoration: BoxDecoration(
-                                  color: const Color(
+                                decoration: const BoxDecoration(
+                                  color: Color(
                                       GfTokens.colorOnSurfaceVariant),
                                   shape: BoxShape.circle,
                                 ),
@@ -130,9 +130,9 @@ class VehicleCard extends StatelessWidget {
                               const SizedBox(width: GfTokens.spacingSm),
                               Text(
                                 '${vehicle.specifications.manufacturer} ${vehicle.specifications.model}',
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: GfTokens.fontSizeMd,
-                                  color: const Color(
+                                  color: Color(
                                       GfTokens.colorOnSurfaceVariant),
                                 ),
                               ),
@@ -145,9 +145,9 @@ class VehicleCard extends StatelessWidget {
                     // Menu de acoes
                     if (showActions)
                       PopupMenuButton<String>(
-                        icon: Icon(
+                        icon: const Icon(
                           Icons.more_vert,
-                          color: const Color(GfTokens.colorOnSurfaceVariant),
+                          color: Color(GfTokens.colorOnSurfaceVariant),
                         ),
                         onSelected: (value) {
                           switch (value) {
@@ -160,31 +160,31 @@ class VehicleCard extends StatelessWidget {
                           }
                         },
                         itemBuilder: (context) => [
-                          PopupMenuItem(
+                          const PopupMenuItem(
                             value: 'edit',
                             child: Row(
                               children: [
                                 Icon(Icons.edit,
                                     size: 20,
                                     color:
-                                        const Color(GfTokens.colorOnSurface)),
-                                const SizedBox(width: GfTokens.spacingSm),
-                                const Text('Editar'),
+                                        Color(GfTokens.colorOnSurface)),
+                                SizedBox(width: GfTokens.spacingSm),
+                                Text('Editar'),
                               ],
                             ),
                           ),
-                          PopupMenuItem(
+                          const PopupMenuItem(
                             value: 'delete',
                             child: Row(
                               children: [
                                 Icon(Icons.delete,
                                     size: 20,
-                                    color: const Color(GfTokens.colorError)),
-                                const SizedBox(width: GfTokens.spacingSm),
+                                    color: Color(GfTokens.colorError)),
+                                SizedBox(width: GfTokens.spacingSm),
                                 Text(
                                   'Excluir',
                                   style: TextStyle(
-                                      color: const Color(GfTokens.colorError)),
+                                      color: Color(GfTokens.colorError)),
                                 ),
                               ],
                             ),
@@ -242,17 +242,17 @@ class VehicleCard extends StatelessWidget {
                 const SizedBox(height: GfTokens.spacingSm),
                 Row(
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.access_time,
                       size: 14,
-                      color: const Color(GfTokens.colorOnSurfaceVariant),
+                      color: Color(GfTokens.colorOnSurfaceVariant),
                     ),
                     const SizedBox(width: GfTokens.spacingXs),
                     Text(
                       'Atualizado ${GfDateUtils.timeAgo(vehicle.updatedAt)}',
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: GfTokens.fontSizeXs,
-                        color: const Color(GfTokens.colorOnSurfaceVariant),
+                        color: Color(GfTokens.colorOnSurfaceVariant),
                       ),
                     ),
                   ],
@@ -279,17 +279,17 @@ class VehicleCard extends StatelessWidget {
         const SizedBox(height: GfTokens.spacingXs),
         Text(
           value,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: GfTokens.fontSizeMd,
             fontWeight: FontWeight.w600,
-            color: const Color(GfTokens.colorOnSurface),
+            color: Color(GfTokens.colorOnSurface),
           ),
         ),
         Text(
           label,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: GfTokens.fontSizeXs,
-            color: const Color(GfTokens.colorOnSurfaceVariant),
+            color: Color(GfTokens.colorOnSurfaceVariant),
           ),
         ),
       ],

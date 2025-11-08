@@ -23,7 +23,7 @@ Future<void> main(List<String> args) async {
     username: user,
     password: pass,
   );
-  final settings = ConnectionSettings(
+  const settings = ConnectionSettings(
     sslMode: SslMode.require,
     connectTimeout: const Duration(seconds: 60),
   );

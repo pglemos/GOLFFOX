@@ -42,14 +42,14 @@ class TripExtended {
     required this.origin,
     required this.destination,
     required this.startTime,
-    this.endTime,
     required this.distance,
     required this.fare,
     required this.status,
-    this.rating,
-    this.notes,
     required this.createdAt,
     required this.updatedAt,
+    this.endTime,
+    this.rating,
+    this.notes,
   });
 
   // Conversao do Trip original para TripExtended
@@ -61,25 +61,24 @@ class TripExtended {
     required double distance,
     required double fare,
     double? rating,
-  }) {
-    return TripExtended(
-      id: trip.id,
-      driverId: trip.driverId ?? '',
-      passengerId: passengerId,
-      origin: origin,
-      destination: destination,
-      startTime:
-          trip.actualStartTime ?? trip.scheduledStartTime ?? trip.createdAt,
-      endTime: trip.actualEndTime,
-      distance: distance,
-      fare: fare,
-      status: TripStatus.fromString(trip.status),
-      rating: rating,
-      notes: trip.notes,
-      createdAt: trip.createdAt,
-      updatedAt: trip.updatedAt,
-    );
-  }
+  }) =>
+      TripExtended(
+        id: trip.id,
+        driverId: trip.driverId ?? '',
+        passengerId: passengerId,
+        origin: origin,
+        destination: destination,
+        startTime:
+            trip.actualStartTime ?? trip.scheduledStartTime ?? trip.createdAt,
+        endTime: trip.actualEndTime,
+        distance: distance,
+        fare: fare,
+        status: TripStatus.fromString(trip.status),
+        rating: rating,
+        notes: trip.notes,
+        createdAt: trip.createdAt,
+        updatedAt: trip.updatedAt,
+      );
 
   factory TripExtended.fromJson(Map<String, dynamic> json) => TripExtended(
         id: json['id'] as String? ?? '',

@@ -84,7 +84,6 @@ class GolfFoxTheme {
       primary: primaryOrange,
       secondary: primaryBlue,
       surface: surfaceLight,
-      background: backgroundLight,
       error: error,
     );
 
@@ -111,7 +110,6 @@ class GolfFoxTheme {
       primary: primaryOrange,
       secondary: primaryBlue,
       surface: surfaceDark,
-      background: backgroundDark,
       error: error,
     );
 

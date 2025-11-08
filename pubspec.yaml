@@ -100,6 +100,7 @@ dev_dependencies:
   # Performance Testing
   patrol: ^3.12.0
 
+  geolocator_platform_interface: any
 flutter:
   uses-material-design: true
   

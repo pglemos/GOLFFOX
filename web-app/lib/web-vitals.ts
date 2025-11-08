@@ -4,6 +4,7 @@
  */
 
 import { onCLS, onFCP, onINP, onLCP, onTTFB } from 'web-vitals'
+import { warn, debug } from './logger'
 
 export interface WebVitalMetric {
   name: string
@@ -60,7 +61,7 @@ export function collectWebVitals() {
     })
     
     if (rating === 'poor') {
-      console.warn(`[Web Vitals] CLS ${rating}: ${metric.value.toFixed(3)}`)
+      warn(`CLS ${rating}: ${metric.value.toFixed(3)}`, { metric }, 'WebVitals')
     }
   })
 
@@ -90,7 +91,7 @@ export function collectWebVitals() {
     })
 
     if (rating === 'poor') {
-      console.warn(`[Web Vitals] INP ${rating}: ${metric.value.toFixed(2)}ms`)
+      warn(`INP ${rating}: ${metric.value.toFixed(2)}ms`, { metric }, 'WebVitals')
     }
   })
 
@@ -107,7 +108,7 @@ export function collectWebVitals() {
     })
     
     if (rating === 'poor') {
-      console.warn(`[Web Vitals] LCP ${rating}: ${metric.value.toFixed(2)}ms`)
+      warn(`LCP ${rating}: ${metric.value.toFixed(2)}ms`, { metric }, 'WebVitals')
     }
   })
 
@@ -124,7 +125,7 @@ export function collectWebVitals() {
     })
     
     if (rating === 'poor') {
-      console.warn(`[Web Vitals] TTFB ${rating}: ${metric.value.toFixed(2)}ms`)
+      warn(`TTFB ${rating}: ${metric.value.toFixed(2)}ms`, { metric }, 'WebVitals')
     }
   })
 }
@@ -159,7 +160,7 @@ export async function sendWebVitalsToServer(report: WebVitalsReport) {
         return
       }
     } catch {}
-    console.debug('Web Vitals: envio não crítico, erro ignorado:', error)
+    debug('Web Vitals: envio não crítico, erro ignorado', { error }, 'WebVitals')
   }
 }
 

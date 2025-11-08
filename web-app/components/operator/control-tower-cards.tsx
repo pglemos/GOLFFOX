@@ -1,5 +1,6 @@
 "use client"
 
+import { memo } from 'react'
 import Link from 'next/link'
 import { AlertCircle, Truck, Route, HelpCircle } from 'lucide-react'
 
@@ -10,7 +11,7 @@ interface ControlTowerCardsProps {
   openAssistance: number
 }
 
-export function ControlTowerCards({
+export const ControlTowerCards = memo(function ControlTowerCards({
   delays,
   stoppedVehicles,
   routeDeviations,
@@ -83,5 +84,5 @@ export function ControlTowerCards({
       </div>
     </div>
   )
-}
+})
 

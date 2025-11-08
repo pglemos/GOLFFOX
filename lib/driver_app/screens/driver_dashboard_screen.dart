@@ -24,6 +24,7 @@ class _DriverDashboardScreenState extends State<DriverDashboardScreen> {
     try {
       final driverId = SupabaseService.instance.currentUserId;
       if (driverId == null) {
+        if (!mounted) return;
         setState(() => _loading = false);
         return;
       }
@@ -35,21 +36,24 @@ class _DriverDashboardScreenState extends State<DriverDashboardScreen> {
           .eq('status', 'inProgress')
           .maybeSingle();
 
+      if (!mounted) return;
       setState(() {
         _currentTrip = trip;
         _loading = false;
       });
-    } catch (e) {
+    } on Exception {
+      if (!mounted) return;
       setState(() => _loading = false);
     }
   }
 
   Future<void> _startTrip() async {
-    Navigator.of(context).push<void>(
+    await Navigator.of(context).push<void>(
       MaterialPageRoute<void>(
         builder: (_) => const DriverChecklistScreen(),
       ),
     );
+    if (!context.mounted) return;
   }
 
   @override
@@ -66,9 +70,11 @@ class _DriverDashboardScreenState extends State<DriverDashboardScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
-            onPressed: () {
-              SupabaseService.instance.auth.signOut();
-              Navigator.of(context).pushReplacementNamed<void, void>('/driver/login');
+            onPressed: () async {
+              await SupabaseService.instance.auth.signOut();
+              if (!context.mounted) return;
+              await Navigator.of(context)
+                  .pushReplacementNamed<void, void>('/driver/login');
             },
           ),
         ],

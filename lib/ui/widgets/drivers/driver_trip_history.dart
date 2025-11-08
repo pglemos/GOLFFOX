@@ -115,10 +115,10 @@ class _DriverTripHistoryState extends State<DriverTripHistory> {
         children: [
           Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.filter_list,
                 size: 20,
-                color: const Color(GfTokens.colorPrimary),
+                color: Color(GfTokens.colorPrimary),
               ),
               const SizedBox(width: 8),
               Text(
@@ -377,8 +377,8 @@ class _DriverTripHistoryState extends State<DriverTripHistory> {
                     Container(
                       width: 8,
                       height: 8,
-                      decoration: BoxDecoration(
-                        color: const Color(GfTokens.colorPrimary),
+                      decoration: const BoxDecoration(
+                        color: Color(GfTokens.colorPrimary),
                         shape: BoxShape.circle,
                       ),
                     ),
@@ -390,8 +390,8 @@ class _DriverTripHistoryState extends State<DriverTripHistory> {
                     Container(
                       width: 8,
                       height: 8,
-                      decoration: BoxDecoration(
-                        color: const Color(GfTokens.colorError),
+                      decoration: const BoxDecoration(
+                        color: Color(GfTokens.colorError),
                         shape: BoxShape.circle,
                       ),
                     ),
@@ -454,10 +454,10 @@ class _DriverTripHistoryState extends State<DriverTripHistory> {
               const SizedBox(height: 12),
               Row(
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.star,
                     size: 16,
-                    color: const Color(GfTokens.colorWarning),
+                    color: Color(GfTokens.colorWarning),
                   ),
                   const SizedBox(width: 4),
                   Text(

@@ -150,8 +150,7 @@ class RateLimiter {
   /// Força o bloqueio de um identificador
   void block(String identifier, RateLimitConfig config, Duration duration) {
     final key = _generateKey(identifier, config);
-    final entry = _entries.putIfAbsent(key, _RateLimitEntry.new);
-    entry.block(duration);
+    _entries.putIfAbsent(key, _RateLimitEntry.new).block(duration);
 
     AppLogger.warning(
       'Identifier manually blocked for ${duration.inMinutes} minutes',
