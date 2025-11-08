@@ -56,13 +56,13 @@ class _DriverChecklistScreenState extends State<DriverChecklistScreen> {
       });
 
       if (mounted) {
-        Navigator.of(context).pushReplacement<void, void>(
+        await Navigator.of(context).pushReplacement<void, void>(
           MaterialPageRoute<void>(
             builder: (_) => DriverRouteScreen(trip: trip),
           ),
         );
       }
-    } catch (e) {
+    } on Exception catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(e.toString())),
@@ -100,10 +100,14 @@ class _DriverChecklistScreenState extends State<DriverChecklistScreen> {
             ),
             const SizedBox(height: 16),
             DropdownButtonFormField<String>(
-              decoration: const InputDecoration(labelText: 'Nível de Combustível'),
-              items: ['Cheio', '3/4', '1/2', '1/4', 'Reserva'].map((level) {
-                return DropdownMenuItem(value: level, child: Text(level));
-              }).toList(),
+              decoration:
+                  const InputDecoration(labelText: 'Nível de Combustível'),
+              items: ['Cheio', '3/4', '1/2', '1/4', 'Reserva']
+                  .map(
+                    (level) =>
+                        DropdownMenuItem(value: level, child: Text(level)),
+                  )
+                  .toList(),
               onChanged: (value) => setState(() => _fuelLevel = value ?? ''),
               validator: (value) => value == null ? 'Selecione o nível' : null,
             ),

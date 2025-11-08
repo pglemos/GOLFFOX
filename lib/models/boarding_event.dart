@@ -27,38 +27,36 @@ class BoardingEvent {
     required this.id,
     required this.tripId,
     required this.passengerId,
-    this.routeStopId,
     required this.eventType,
     required this.timestamp,
+    required this.createdAt,
+    this.routeStopId,
     this.latitude,
     this.longitude,
     this.nfcTagId,
     this.qrCodeData,
     this.notes,
-    required this.createdAt,
   });
 
   /* ====================== SERIALIZACAO (DB snake_case) ====================== */
 
-  factory BoardingEvent.fromJson(Json json) {
-    return BoardingEvent(
-      id: json[BoardingEventFields.id] as String,
-      tripId: json[BoardingEventFields.tripId] as String,
-      passengerId: json[BoardingEventFields.passengerId] as String,
-      routeStopId: json[BoardingEventFields.routeStopId] as String?,
-      eventType: BoardingEventType.values.firstWhere(
-        (e) => e.name == json[BoardingEventFields.eventType],
-        orElse: () => BoardingEventType.boarding,
-      ),
-      timestamp: DateTime.parse(json[BoardingEventFields.timestamp] as String),
-      latitude: (json[BoardingEventFields.latitude] as num?)?.toDouble(),
-      longitude: (json[BoardingEventFields.longitude] as num?)?.toDouble(),
-      nfcTagId: json[BoardingEventFields.nfcTagId] as String?,
-      qrCodeData: json[BoardingEventFields.qrCodeData] as String?,
-      notes: json[BoardingEventFields.notes] as String?,
-      createdAt: DateTime.parse(json[BoardingEventFields.createdAt] as String),
-    );
-  }
+  factory BoardingEvent.fromJson(Json json) => BoardingEvent(
+        id: json[BoardingEventFields.id] as String,
+        tripId: json[BoardingEventFields.tripId] as String,
+        passengerId: json[BoardingEventFields.passengerId] as String,
+        eventType: BoardingEventType.values.firstWhere(
+          (e) => e.name == json[BoardingEventFields.eventType],
+          orElse: () => BoardingEventType.boarding,
+        ),
+        timestamp: DateTime.parse(json[BoardingEventFields.timestamp] as String),
+        createdAt: DateTime.parse(json[BoardingEventFields.createdAt] as String),
+        routeStopId: json[BoardingEventFields.routeStopId] as String?,
+        latitude: (json[BoardingEventFields.latitude] as num?)?.toDouble(),
+        longitude: (json[BoardingEventFields.longitude] as num?)?.toDouble(),
+        nfcTagId: json[BoardingEventFields.nfcTagId] as String?,
+        qrCodeData: json[BoardingEventFields.qrCodeData] as String?,
+        notes: json[BoardingEventFields.notes] as String?,
+      );
   final String id;
   final String tripId;
   final String passengerId;

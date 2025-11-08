@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+
 import '../../models/user.dart' as app;
-import '../../services/supabase_service.dart';
 import '../../screens/passenger/passenger_dashboard.dart';
+import '../../services/supabase_service.dart';
 
 class PassengerHome extends StatelessWidget {
   const PassengerHome({super.key});

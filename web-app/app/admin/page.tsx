@@ -138,10 +138,10 @@ export default function AdminDashboard() {
         }
 
         // 4) Último recurso: sem views, evitar erro e exibir vazio
-        console.info('Views de KPIs não disponíveis; exibindo dados vazios.')
+        // Views de KPIs não disponíveis; exibindo dados vazios
         setKpisData([])
-      } catch (error) {
-        console.error('Erro ao carregar KPIs:', error)
+      } catch (err: unknown) {
+        logError('Erro ao carregar KPIs', { error: err }, 'AdminPage')
         setKpisData([])
       } finally {
         setKpisLoading(false)

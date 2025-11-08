@@ -249,10 +249,10 @@ class _VehicleMaintenanceListState
             // Titulo e descricao
             Text(
               record.type.displayName,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: GfTokens.fontSizeLg,
                 fontWeight: FontWeight.w600,
-                color: const Color(GfTokens.colorOnSurface),
+                color: Color(GfTokens.colorOnSurface),
               ),
             ),
 
@@ -260,8 +260,8 @@ class _VehicleMaintenanceListState
               const SizedBox(height: GfTokens.spacingSm),
               Text(
                 record.description,
-                style: TextStyle(
-                  color: const Color(GfTokens.colorOnSurfaceVariant),
+                style: const TextStyle(
+                  color: Color(GfTokens.colorOnSurfaceVariant),
                 ),
               ),
             ],
@@ -295,9 +295,9 @@ class _VehicleMaintenanceListState
             if (record.items.isNotEmpty) ...[
               Text(
                 'Itens (${record.items.length})',
-                style: TextStyle(
+                style: const TextStyle(
                   fontWeight: FontWeight.w600,
-                  color: const Color(GfTokens.colorOnSurface),
+                  color: Color(GfTokens.colorOnSurface),
                 ),
               ),
               const SizedBox(height: GfTokens.spacingSm),
@@ -331,10 +331,10 @@ class _VehicleMaintenanceListState
                         if ((item.cost ?? 0) > 0)
                           Text(
                             'R\$ ${(item.cost ?? 0).toStringAsFixed(2)}',
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: GfTokens.fontSizeSm,
                               fontWeight: FontWeight.w500,
-                              color: const Color(GfTokens.colorOnSurface),
+                              color: Color(GfTokens.colorOnSurface),
                             ),
                           ),
                       ],
@@ -343,9 +343,9 @@ class _VehicleMaintenanceListState
               if (record.items.length > 3)
                 Text(
                   '+ ${record.items.length - 3} itens',
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: GfTokens.fontSizeSm,
-                    color: const Color(GfTokens.colorPrimary),
+                    color: Color(GfTokens.colorPrimary),
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -357,16 +357,16 @@ class _VehicleMaintenanceListState
               Container(
                 padding: const EdgeInsets.all(GfTokens.spacingSm),
                 decoration: BoxDecoration(
-                  color: Color(GfTokens.colorSuccess).withValues(alpha: 0.1),
+                  color: const Color(GfTokens.colorSuccess).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(GfTokens.radiusSm),
                   border: Border.all(
-                    color: Color(GfTokens.colorSuccess).withValues(alpha: 0.3),
+                    color: const Color(GfTokens.colorSuccess).withValues(alpha: 0.3),
                   ),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
+                    const Text(
                       'Custo Total',
                       style: TextStyle(
                         fontWeight: FontWeight.w600,
@@ -375,7 +375,7 @@ class _VehicleMaintenanceListState
                     ),
                     Text(
                       'R\$ ${record.totalCost.toStringAsFixed(2)}',
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: GfTokens.fontSizeLg,
                         fontWeight: FontWeight.w600,
                         color: Color(GfTokens.colorSuccess),
@@ -398,7 +398,7 @@ class _VehicleMaintenanceListState
         Icon(
           icon,
           size: 16,
-          color: Color(GfTokens.colorOnSurfaceVariant),
+          color: const Color(GfTokens.colorOnSurfaceVariant),
         ),
         const SizedBox(width: GfTokens.spacingXs),
         Column(
@@ -406,7 +406,7 @@ class _VehicleMaintenanceListState
           children: [
             Text(
               value,
-              style: TextStyle(
+              style: const TextStyle(
                 fontWeight: FontWeight.w500,
                 color: Color(GfTokens.colorOnSurface),
                 fontSize: GfTokens.fontSizeSm,
@@ -414,7 +414,7 @@ class _VehicleMaintenanceListState
             ),
             Text(
               label,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: GfTokens.fontSizeXs,
                 color: Color(GfTokens.colorOnSurfaceVariant),
               ),

@@ -5,6 +5,7 @@
 
 import { supabase } from './supabase'
 import { RealtimeChannel } from '@supabase/supabase-js'
+import { debug, warn, error } from './logger'
 
 export interface VehiclePositionUpdate {
   vehicle_id: string
@@ -95,9 +96,9 @@ export class RealtimeService {
       if (this.options.enablePolling) {
         this.startPolling()
       }
-    } catch (error: any) {
-      console.error('Erro ao conectar realtime:', error)
-      this.options.onError?.(error)
+    } catch (err: unknown) {
+      error('Erro ao conectar realtime', { error: err }, 'RealtimeService')
+      this.options.onError?.(err as Error)
       
       // Se realtime falhar, usar apenas polling
       if (this.options.enablePolling) {
@@ -159,12 +160,12 @@ export class RealtimeService {
               .single()
 
             if (tripError || !tripData) {
-              console.warn('Erro ao buscar trip para posição:', tripError)
+              warn('Erro ao buscar trip para posição', { error: tripError }, 'RealtimeService')
               return
             }
 
             if (!position.lat || !position.lng) {
-              console.warn('Posição sem coordenadas válidas:', position)
+              warn('Posição sem coordenadas válidas', { position }, 'RealtimeService')
               return
             }
 
@@ -184,17 +185,17 @@ export class RealtimeService {
                 passenger_count: 0, // Seria necessário buscar
               },
             })
-          } catch (error: any) {
-            console.error('Erro ao processar atualização de posição:', error)
-            this.options.onError?.(error)
+          } catch (err: unknown) {
+            error('Erro ao processar atualização de posição', { error: err }, 'RealtimeService')
+            this.options.onError?.(err as Error)
           }
         }
       )
-      .subscribe((status: any) => {
+      .subscribe((status: string) => {
         if (status === 'SUBSCRIBED') {
-          console.log('Conectado ao canal driver_positions')
+          debug('Conectado ao canal driver_positions', undefined, 'RealtimeService')
         } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
-          console.warn('Canal driver_positions indisponível, usando polling')
+          warn('Canal driver_positions indisponível, usando polling', undefined, 'RealtimeService')
           // Não disparamos onError aqui para evitar ruído de logs;
           // o polling já está habilitado como fallback em connect().
         }
@@ -232,11 +233,11 @@ export class RealtimeService {
           })
         }
       )
-      .subscribe((status: any) => {
+      .subscribe((status: string) => {
         if (status === 'SUBSCRIBED') {
-          console.log('Conectado ao canal trips')
+          debug('Conectado ao canal trips', undefined, 'RealtimeService')
         } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
-          console.warn('Canal trips indisponível, usando polling')
+          warn('Canal trips indisponível, usando polling', undefined, 'RealtimeService')
         }
       })
 
@@ -348,7 +349,7 @@ export class RealtimeService {
 
         if (error) {
           // Se der erro, apenas logar (não quebrar o polling)
-          console.warn('Erro no polling de posições (view v_live_vehicles não existe, usando driver_positions):', error)
+          warn('Erro no polling de posições (view v_live_vehicles não existe, usando driver_positions)', { error }, 'RealtimeService')
           return
         }
 
@@ -375,8 +376,8 @@ export class RealtimeService {
             }
           })
         }
-      } catch (error: any) {
-        console.error('Erro no polling de posições:', error)
+      } catch (err: unknown) {
+        error('Erro no polling de posições', { error: err }, 'RealtimeService')
       }
     }, this.options.pollingInterval)
 

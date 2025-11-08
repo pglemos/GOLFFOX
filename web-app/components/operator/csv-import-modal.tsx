@@ -1,16 +1,13 @@
 "use client"
 
-// @ts-ignore
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
-// @ts-ignore
 import { Button } from "@/components/ui/button"
-// @ts-ignore
 import { Label } from "@/components/ui/label"
 import { Upload, FileSpreadsheet, AlertCircle, CheckCircle2 } from "lucide-react"
-// @ts-ignore
 import { supabase } from "@/lib/supabase"
 import toast from "react-hot-toast"
 import { useState, useRef } from "react"
+import { warn, error as logError } from "@/lib/logger"
 
 // Importação condicional para evitar erros se módulo não existir
 let operatorI18n: any = { csv_import: {} }
@@ -43,7 +40,7 @@ try {
   geocodeBatch = csvModule.geocodeBatch
   importEmployees = csvModule.importEmployees
 } catch (err) {
-  console.warn('Módulo de importação CSV não encontrado:', err)
+  warn('Módulo de importação CSV não encontrado', { error: err }, 'CSVImportModal')
 }
 
 interface CSVImportModalProps {
@@ -119,7 +116,7 @@ export function CSVImportModal({ isOpen, onClose, onSave, empresaId }: CSVImport
         toast.success(`${result.valid.length} funcionários encontrados no arquivo`)
       }
     } catch (error: any) {
-      console.error("Erro ao ler arquivo:", error)
+      logError("Erro ao ler arquivo", { error }, 'CSVImportModal')
       toast.error(`Erro ao ler arquivo: ${error.message || 'Erro desconhecido'}`)
     }
   }
@@ -185,7 +182,7 @@ export function CSVImportModal({ isOpen, onClose, onSave, empresaId }: CSVImport
 
       onSave()
     } catch (error: any) {
-      console.error("Erro na importação:", error)
+      logError("Erro na importação", { error }, 'CSVImportModal')
       toast.error(`Erro na importação: ${error.message || 'Erro desconhecido'}`)
     } finally {
       setImporting(false)

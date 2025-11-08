@@ -4,18 +4,19 @@
 // ========================================
 
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../core/theme/gf_tokens.dart';
+import '../../models/vehicle.dart';
+import '../../services/vehicle_service.dart';
 import '../../ui/widgets/common/gf_app_bar.dart';
-import '../../ui/widgets/common/gf_loading_indicator.dart';
-import '../../ui/widgets/common/gf_error_widget.dart';
 import '../../ui/widgets/common/gf_empty_state.dart';
+import '../../ui/widgets/common/gf_error_widget.dart';
+import '../../ui/widgets/common/gf_loading_indicator.dart';
 import '../../ui/widgets/vehicles/vehicle_card.dart';
 import '../../ui/widgets/vehicles/vehicle_filters.dart';
 import '../../ui/widgets/vehicles/vehicle_stats_card.dart';
-import '../../services/vehicle_service.dart';
-import '../../models/vehicle.dart';
 import 'create_vehicle_page.dart';
 import 'vehicle_details_page.dart';
 
@@ -132,8 +133,8 @@ class _VehiclesPageState extends ConsumerState<VehiclesPage>
             icon: Icon(
               _showStats ? Icons.bar_chart : Icons.bar_chart_outlined,
               color: _showStats
-                  ? Color(GfTokens.colorPrimary)
-                  : Color(GfTokens.colorOnSurface),
+                  ? const Color(GfTokens.colorPrimary)
+                  : const Color(GfTokens.colorOnSurface),
             ),
             onPressed: _toggleStats,
             tooltip:
@@ -143,8 +144,8 @@ class _VehiclesPageState extends ConsumerState<VehiclesPage>
             icon: Icon(
               _showFilters ? Icons.filter_list : Icons.filter_list_outlined,
               color: _showFilters
-                  ? Color(GfTokens.colorPrimary)
-                  : Color(GfTokens.colorOnSurface),
+                  ? const Color(GfTokens.colorPrimary)
+                  : const Color(GfTokens.colorOnSurface),
             ),
             onPressed: _toggleFilters,
             tooltip: _showFilters ? 'Ocultar filtros' : 'Mostrar filtros',
@@ -163,12 +164,11 @@ class _VehiclesPageState extends ConsumerState<VehiclesPage>
             // Barra de busca
             Container(
               padding: const EdgeInsets.all(GfTokens.spacingMd),
-              decoration: BoxDecoration(
-                color: const Color(GfTokens.colorSurface),
+              decoration: const BoxDecoration(
+                color: Color(GfTokens.colorSurface),
                 border: Border(
                   bottom: BorderSide(
-                    color: const Color(GfTokens.colorBorder),
-                    width: 1,
+                    color: Color(GfTokens.colorBorder),
                   ),
                 ),
               ),
@@ -222,7 +222,8 @@ class _VehiclesPageState extends ConsumerState<VehiclesPage>
                       ),
                       decoration: BoxDecoration(
                         color:
-                            const Color(GfTokens.colorPrimary).withOpacity(0.1),
+                            const Color(GfTokens.colorPrimary)
+                                .withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(GfTokens.radiusSm),
                         border: Border.all(
                             color: const Color(GfTokens.colorPrimary)),
@@ -230,16 +231,16 @@ class _VehiclesPageState extends ConsumerState<VehiclesPage>
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(
+                          const Icon(
                             Icons.filter_list,
                             size: 16,
-                            color: const Color(GfTokens.colorPrimary),
+                            color: Color(GfTokens.colorPrimary),
                           ),
                           const SizedBox(width: GfTokens.spacingXs),
-                          Text(
+                          const Text(
                             'Filtros ativos',
                             style: TextStyle(
-                              color: const Color(GfTokens.colorPrimary),
+                              color: Color(GfTokens.colorPrimary),
                               fontSize: GfTokens.fontSizeSm,
                               fontWeight: FontWeight.w500,
                             ),
@@ -247,10 +248,10 @@ class _VehiclesPageState extends ConsumerState<VehiclesPage>
                           const SizedBox(width: GfTokens.spacingXs),
                           GestureDetector(
                             onTap: _clearFilters,
-                            child: Icon(
+                            child: const Icon(
                               Icons.close,
                               size: 16,
-                              color: const Color(GfTokens.colorPrimary),
+                              color: Color(GfTokens.colorPrimary),
                             ),
                           ),
                         ],
@@ -367,7 +368,7 @@ class _VehiclesPageState extends ConsumerState<VehiclesPage>
       )
           .animate()
           .scale(
-            begin: const Offset(0, 0),
+            begin: Offset.zero,
             end: const Offset(1, 1),
             duration: const Duration(milliseconds: 300),
             curve: Curves.elasticOut,

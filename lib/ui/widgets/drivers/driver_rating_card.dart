@@ -39,10 +39,10 @@ class DriverRatingCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.star,
                 size: 24,
-                color: const Color(GfTokens.colorWarning),
+                color: Color(GfTokens.colorWarning),
               ),
               const SizedBox(width: 8),
               Text(
@@ -145,10 +145,10 @@ class DriverRatingCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.bar_chart,
                 size: 20,
-                color: const Color(GfTokens.colorPrimary),
+                color: Color(GfTokens.colorPrimary),
               ),
               const SizedBox(width: 8),
               Text(
@@ -406,10 +406,10 @@ class DriverRatingCard extends StatelessWidget {
           const SizedBox(height: 8),
           Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.person,
                 size: 14,
-                color: const Color(GfTokens.colorOnSurfaceVariant),
+                color: Color(GfTokens.colorOnSurfaceVariant),
               ),
               const SizedBox(width: 4),
               Text(
@@ -419,10 +419,10 @@ class DriverRatingCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 16),
-              Icon(
+              const Icon(
                 Icons.route,
                 size: 14,
-                color: const Color(GfTokens.colorOnSurfaceVariant),
+                color: Color(GfTokens.colorOnSurfaceVariant),
               ),
               const SizedBox(width: 4),
               Text(

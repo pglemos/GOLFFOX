@@ -1,19 +1,14 @@
 "use client"
 
-// @ts-ignore
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
-// @ts-ignore
 import { Button } from "@/components/ui/button"
-// @ts-ignore
 import { Input } from "@/components/ui/input"
-// @ts-ignore
 import { Label } from "@/components/ui/label"
-// @ts-ignore
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { FileText, AlertCircle } from "lucide-react"
-// @ts-ignore
 import { supabase } from "@/lib/supabase"
 import toast from "react-hot-toast"
+import { error as logError } from "@/lib/logger"
 import { useState } from "react"
 
 interface SolicitacaoModalProps {
@@ -61,7 +56,7 @@ export function SolicitacaoModal({ isOpen, onClose, onSave, empresaId }: Solicit
       setTipo("")
       setPayload({})
     } catch (error: any) {
-      console.error("Erro ao criar solicitação:", error)
+      logError("Erro ao criar solicitação", { error }, 'SolicitacaoModal')
       toast.error(`Erro ao criar solicitação: ${error.message}`)
     } finally {
       setLoading(false)

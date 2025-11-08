@@ -28,8 +28,8 @@ class DriverCard extends StatelessWidget {
       elevation: 2,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(GfTokens.radiusMd),
-        side: BorderSide(
-          color: const Color(GfTokens.colorBorder),
+        side: const BorderSide(
+          color: Color(GfTokens.colorBorder),
           width: 1,
         ),
       ),
@@ -48,15 +48,15 @@ class DriverCard extends StatelessWidget {
                   CircleAvatar(
                     radius: 24,
                     backgroundColor:
-                        Color(GfTokens.colorPrimary).withValues(alpha: 0.1),
+                        const Color(GfTokens.colorPrimary).withValues(alpha: 0.1),
                     backgroundImage: driver.profileImageUrl != null
                         ? NetworkImage(driver.profileImageUrl!)
                         : null,
                     child: driver.profileImageUrl == null
                         ? Text(
                             driver.initials,
-                            style: TextStyle(
-                              color: const Color(GfTokens.colorPrimary),
+                            style: const TextStyle(
+                              color: Color(GfTokens.colorPrimary),
                               fontWeight: FontWeight.bold,
                               fontSize: GfTokens.fontSizeMd,
                             ),
@@ -129,19 +129,19 @@ class DriverCard extends StatelessWidget {
                         // Telefone e email
                         Text(
                           driver.formattedPhone,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: GfTokens.fontSizeSm,
-                            color: const Color(GfTokens.colorOnSurfaceVariant),
+                            color: Color(GfTokens.colorOnSurfaceVariant),
                           ),
                         ),
 
                         if (driver.email.isNotEmpty)
                           Text(
                             driver.email,
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: GfTokens.fontSizeSm,
                               color:
-                                  const Color(GfTokens.colorOnSurfaceVariant),
+                                  Color(GfTokens.colorOnSurfaceVariant),
                             ),
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -185,9 +185,9 @@ class DriverCard extends StatelessWidget {
                         ),
                       ),
                     ],
-                    child: Icon(
+                    child: const Icon(
                       Icons.more_vert,
-                      color: const Color(GfTokens.colorOnSurfaceVariant),
+                      color: Color(GfTokens.colorOnSurfaceVariant),
                     ),
                   ),
                 ],
@@ -232,7 +232,7 @@ class DriverCard extends StatelessWidget {
                   Expanded(
                     child: Row(
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.star,
                           size: 16,
                           color: Colors.amber,
@@ -240,18 +240,18 @@ class DriverCard extends StatelessWidget {
                         const SizedBox(width: 4),
                         Text(
                           driver.stats.averageRating.toStringAsFixed(1),
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: GfTokens.fontSizeSm,
                             fontWeight: FontWeight.w500,
-                            color: const Color(GfTokens.colorOnSurface),
+                            color: Color(GfTokens.colorOnSurface),
                           ),
                         ),
                         const SizedBox(width: 4),
                         Text(
                           '(${driver.stats.totalTrips})',
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: GfTokens.fontSizeSm,
-                            color: const Color(GfTokens.colorOnSurfaceVariant),
+                            color: Color(GfTokens.colorOnSurfaceVariant),
                           ),
                         ),
                       ],
@@ -274,9 +274,9 @@ class DriverCard extends StatelessWidget {
                       const SizedBox(width: 4),
                       Text(
                         driver.isOnline ? 'Online' : 'Offline',
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: GfTokens.fontSizeSm,
-                          color: const Color(GfTokens.colorOnSurfaceVariant),
+                          color: Color(GfTokens.colorOnSurfaceVariant),
                         ),
                       ),
                     ],
@@ -326,9 +326,9 @@ class DriverCard extends StatelessWidget {
             children: [
               Text(
                 label,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: GfTokens.fontSizeXs,
-                  color: const Color(GfTokens.colorOnSurfaceVariant),
+                  color: Color(GfTokens.colorOnSurfaceVariant),
                 ),
               ),
               Text(

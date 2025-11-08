@@ -275,10 +275,10 @@ class _LoadingCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(GfTokens.radiusMd),
         side: const BorderSide(color: Color(GfTokens.colorBorder)),
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(GfTokens.spacingMd),
+      child: const Padding(
+        padding: EdgeInsets.all(GfTokens.spacingMd),
         child: Row(
-          children: const [
+          children: [
             SizedBox(
               width: 20,
               height: 20,

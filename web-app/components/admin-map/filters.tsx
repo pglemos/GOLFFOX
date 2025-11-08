@@ -4,7 +4,7 @@
 
 'use client'
 
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback, useRef, memo } from 'react'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -42,7 +42,7 @@ interface MapFiltersProps {
   onPlaybackPeriodChange?: (from: Date, to: Date) => void
 }
 
-export function MapFilters({
+export const MapFilters = memo(function MapFilters({
   filters,
   onFiltersChange,
   vehiclesCount,
@@ -346,5 +346,5 @@ export function MapFilters({
       </div>
     </Card>
   )
-}
+})
 

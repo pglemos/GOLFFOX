@@ -15,6 +15,7 @@ import 'logger_service.dart';
 class ErrorService {
   ErrorService._();
   static ErrorService? _instance;
+  // ignore: prefer_constructors_over_static_methods
   static ErrorService get instance => _instance ??= ErrorService._();
 
   final _logger = LoggerService.instance;
@@ -186,7 +187,13 @@ class ErrorService {
       }
     }
 
-    throw lastError!;
+    if (lastError is Exception) {
+      throw lastError;
+    }
+    if (lastError is Error) {
+      throw lastError;
+    }
+    throw Exception(lastError.toString());
   }
 
   // Private methods
@@ -275,12 +282,12 @@ class ErrorService {
   }
 
   Future<void> _sendToCrashlytics(ErrorReport report) async {
-    // TODO: Implement Crashlytics integration
+    // TODO(golffox): Wire up Crashlytics integration
     _logger.debug('Would send to Crashlytics: ${report.error}');
   }
 
   Future<void> _sendToAnalytics(ErrorReport report) async {
-    // TODO: Implement Analytics integration
+    // TODO(golffox): Wire up analytics integration
     _logger.debug('Would send to Analytics: ${report.error}');
   }
 }
@@ -318,11 +325,11 @@ class ErrorReport {
 
   const ErrorReport({
     required this.error,
+    required this.severity,
+    required this.timestamp,
     this.stackTrace,
     this.context,
     this.additionalData,
-    required this.severity,
-    required this.timestamp,
   });
   final Object error;
   final StackTrace? stackTrace;

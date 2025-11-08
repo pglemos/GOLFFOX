@@ -60,7 +60,7 @@ export default function EmpresasPage() {
       const empresa = Array.isArray(empresas) ? empresas.find((e: any) => e.id === empresaId) : null
       setSelectedEmpresa(empresa)
     } catch (error) {
-      console.log("Erro ao carregar funcionários - usando fallback")
+      // Erro ao carregar funcionários - usando fallback
       setFuncionarios([])
     }
   }

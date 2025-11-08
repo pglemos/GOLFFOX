@@ -121,10 +121,10 @@ class RouteCard extends StatelessWidget {
                 Row(
                   children: [
                     if (route.vehicleId != null) ...[
-                      Icon(
+                      const Icon(
                         Icons.directions_bus,
                         size: 16,
-                        color: const Color(GfTokens.colorOnSurfaceVariant),
+                        color: Color(GfTokens.colorOnSurfaceVariant),
                       ),
                       const SizedBox(width: 4),
                       Text(
@@ -137,10 +137,10 @@ class RouteCard extends StatelessWidget {
                       const SizedBox(width: GfTokens.space3),
                     ],
                     if (route.driverId != null) ...[
-                      Icon(
+                      const Icon(
                         Icons.person,
                         size: 16,
-                        color: const Color(GfTokens.colorOnSurfaceVariant),
+                        color: Color(GfTokens.colorOnSurfaceVariant),
                       ),
                       const SizedBox(width: 4),
                       Text(
@@ -160,10 +160,10 @@ class RouteCard extends StatelessWidget {
                 Row(
                   children: [
                     if (route.startTime != null) ...[
-                      Icon(
+                      const Icon(
                         Icons.schedule,
                         size: 16,
-                        color: const Color(GfTokens.colorOnSurfaceVariant),
+                        color: Color(GfTokens.colorOnSurfaceVariant),
                       ),
                       const SizedBox(width: 4),
                       Text(

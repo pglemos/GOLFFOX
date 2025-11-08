@@ -9,9 +9,11 @@ class Trip {
   const Trip({
     required this.id,
     required this.routeId,
+    required this.status,
+    required this.createdAt,
+    required this.updatedAt,
     this.driverId,
     this.vehicleId,
-    required this.status,
     this.scheduledStartTime,
     this.actualStartTime,
     this.actualEndTime,
@@ -20,10 +22,8 @@ class Trip {
     this.endLatitude,
     this.endLongitude,
     this.notes,
-    required this.createdAt,
-    required this.updatedAt,
-  })  : assert(id != ''),
-        assert(routeId != '');
+  })  : assert(id != '', 'id nao pode ser vazio'),
+        assert(routeId != '', 'routeId nao pode ser vazio');
 
   /// Leitura tolerante (snake_case de views/RPCs do Supabase)
   factory Trip.fromJson(Map<String, dynamic> json) {

@@ -370,27 +370,25 @@ class Vehicle {
     required this.fuelType,
     required this.specifications,
     required this.documents,
+    required this.odometer,
+    required this.features,
+    required this.createdAt,
+    required this.updatedAt,
+    required this.companyId,
     this.currentDriverId,
     this.currentRouteId,
     this.currentPosition,
     this.currentFuelLevel,
-    required this.odometer,
     this.lastMaintenanceDate,
     this.nextMaintenanceDate,
     this.maintenanceOdometer,
-    required this.features,
     this.notes,
-    required this.createdAt,
-    required this.updatedAt,
-    required this.companyId,
   });
 
   factory Vehicle.fromJson(Map<String, dynamic> json) {
-    final Map<String, dynamic> specs =
-        (json['specifications'] as Map<String, dynamic>?) ??
+    final specs = (json['specifications'] as Map<String, dynamic>?) ??
         <String, dynamic>{};
-    final Map<String, dynamic> documents =
-        (json['documents'] as Map<String, dynamic>?) ??
+    final documents = (json['documents'] as Map<String, dynamic>?) ??
         <String, dynamic>{};
     final position = json['current_position'];
     LatLng? currentPosition;

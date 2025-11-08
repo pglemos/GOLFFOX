@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../core/theme/gf_tokens.dart';
 import '../../core/routing/app_router.dart';
+import '../../core/theme/gf_tokens.dart';
 import '../../models/driver.dart';
 import '../../services/driver_service.dart';
 import '../../ui/shell/gf_app_bar.dart';
@@ -17,8 +17,8 @@ import '../../widgets/gx_toast.dart';
 class DriverDetailsPage extends ConsumerStatefulWidget {
 
   const DriverDetailsPage({
-    super.key,
     required this.driverId,
+    super.key,
   });
   final String driverId;
 
@@ -62,7 +62,7 @@ class _DriverDetailsPageState extends ConsumerState<DriverDetailsPage>
           _isLoading = false;
         });
       }
-    } catch (e) {
+    } on Exception catch (e) {
       if (mounted) {
         setState(() {
           _error = e.toString();
@@ -79,8 +79,10 @@ class _DriverDetailsPageState extends ConsumerState<DriverDetailsPage>
       final driverService = ref.read(driverServiceProvider.notifier);
       await driverService.updateDriverOnlineStatus(
         _driver!.id,
-        !_driver!.isOnline,
+        isOnline: !_driver!.isOnline,
       );
+
+      if (!mounted) return;
 
       setState(() {
         _driver = _driver!.copyWith(isOnline: !_driver!.isOnline);
@@ -92,7 +94,8 @@ class _DriverDetailsPageState extends ConsumerState<DriverDetailsPage>
             ? 'Motorista ficou online'
             : 'Motorista ficou offline',
       );
-    } catch (e) {
+    } on Exception catch (e) {
+      if (!mounted) return;
       GxToast.error(context, 'Erro ao alterar status: $e');
     }
   }
@@ -107,10 +110,14 @@ class _DriverDetailsPageState extends ConsumerState<DriverDetailsPage>
       ),
     );
 
+    if (!mounted) return;
+
     if (newStatus != null && newStatus != _driver!.status) {
       try {
         final driverService = ref.read(driverServiceProvider.notifier);
         await driverService.updateDriverStatus(_driver!.id, newStatus);
+
+        if (!mounted) return;
 
         setState(() {
           _driver = _driver!.copyWith(status: newStatus);
@@ -120,7 +127,8 @@ class _DriverDetailsPageState extends ConsumerState<DriverDetailsPage>
           context,
           'Status alterado para ${newStatus.displayName}',
         );
-      } catch (e) {
+      } on Exception catch (e) {
+        if (!mounted) return;
         GxToast.error(context, 'Erro ao alterar status: $e');
       }
     }
@@ -138,16 +146,19 @@ class _DriverDetailsPageState extends ConsumerState<DriverDetailsPage>
       isDestructive: true,
     );
 
+    if (!mounted) return;
+
     if (confirmed ?? false) {
       try {
         final driverService = ref.read(driverServiceProvider.notifier);
         await driverService.deleteDriver(_driver!.id);
 
-        if (mounted) {
-          GxToast.success(context, 'Motorista excluido com sucesso');
-          AppRouter.instance.pop();
-        }
-      } catch (e) {
+        if (!mounted) return;
+
+        GxToast.success(context, 'Motorista excluido com sucesso');
+        AppRouter.instance.pop();
+      } on Exception catch (e) {
+        if (!mounted) return;
         GxToast.error(context, 'Erro ao excluir motorista: $e');
       }
     }
@@ -526,30 +537,31 @@ class _StatusChangeDialogState extends State<_StatusChangeDialog> {
       title: const Text('Alterar Status'),
       content: Column(
         mainAxisSize: MainAxisSize.min,
-        children: DriverStatus.values.map((status) {
-          return RadioListTile<DriverStatus>(
-            title: Row(
-              children: [
-                Icon(
+        children: DriverStatus.values
+            .map(
+              (status) => ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: Icon(
                   status.iconData,
                   size: 20,
                   color: status.colorValue,
                 ),
-                const SizedBox(width: 8),
-                Text(status.displayName),
-              ],
-            ),
-            value: status,
-            groupValue: _selectedStatus,
-            onChanged: (value) {
-              if (value != null) {
-                setState(() {
-                  _selectedStatus = value;
-                });
-              }
-            },
-          );
-        }).toList(),
+                title: Text(status.displayName),
+                trailing: Icon(
+                  status == _selectedStatus
+                      ? Icons.radio_button_checked
+                      : Icons.radio_button_unchecked,
+                  color:
+                      status == _selectedStatus ? status.colorValue : Colors.grey,
+                ),
+                onTap: () {
+                  setState(() {
+                    _selectedStatus = status;
+                  });
+                },
+              ),
+            )
+            .toList(),
       ),
       actions: [
         TextButton(

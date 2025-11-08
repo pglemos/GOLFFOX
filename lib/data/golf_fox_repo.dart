@@ -39,7 +39,7 @@ class GolfFoxRepo {
         'routesToday': results[2],
         'criticalAlerts': results[3],
       });
-    } catch (e) {
+    } on Exception catch (e) {
       return Err(Exception('Erro ao carregar metricas: $e'));
     }
   }
@@ -53,7 +53,7 @@ class GolfFoxRepo {
           await _client.from('trips').select('id').eq('status', 'inProgress');
 
       return (response as List).length;
-    } catch (e) {
+    } on Exception catch (_) {
       return 0;
     }
   }
@@ -75,7 +75,7 @@ class GolfFoxRepo {
       }).length;
 
       return activeVehicles;
-    } catch (e) {
+    } on Exception catch (_) {
       return 0;
     }
   }
@@ -90,7 +90,7 @@ class GolfFoxRepo {
       final response = await _client.from('routes').select('id');
 
       return (response as List).length;
-    } catch (e) {
+    } on Exception catch (_) {
       return 0;
     }
   }
@@ -106,7 +106,7 @@ class GolfFoxRepo {
           .eq('severity', 'critical');
 
       return (response as List).length;
-    } catch (e) {
+    } on Exception catch (_) {
       return 0;
     }
   }
@@ -136,7 +136,7 @@ class GolfFoxRepo {
           ''').order('timestamp', ascending: false).limit(100);
 
       return Ok(List<Map<String, dynamic>>.from(response));
-    } catch (e) {
+    } on Exception catch (e) {
       return Err(Exception('Erro ao carregar posicoes: $e'));
     }
   }
@@ -161,7 +161,7 @@ class GolfFoxRepo {
           ''').order('created_at', ascending: false);
 
       return Ok(List<Map<String, dynamic>>.from(response));
-    } catch (e) {
+    } on Exception catch (e) {
       return Err(Exception('Erro ao carregar rotas: $e'));
     }
   }
@@ -183,7 +183,7 @@ class GolfFoxRepo {
           ''').order('created_at', ascending: false);
 
       return Ok(List<Map<String, dynamic>>.from(response));
-    } catch (e) {
+    } on Exception catch (e) {
       return Err(Exception('Erro ao carregar veiculos: $e'));
     }
   }
@@ -215,7 +215,7 @@ class GolfFoxRepo {
           ''').order('scheduled_at', ascending: false).limit(50);
 
       return Ok(List<Map<String, dynamic>>.from(response));
-    } catch (e) {
+    } on Exception catch (e) {
       return Err(Exception('Erro ao carregar viagens: $e'));
     }
   }
@@ -246,7 +246,7 @@ class GolfFoxRepo {
           .limit(20);
 
       return Ok(List<Map<String, dynamic>>.from(response));
-    } catch (e) {
+    } on Exception catch (e) {
       return Err(Exception('Erro ao carregar alertas: $e'));
     }
   }
@@ -262,7 +262,7 @@ class GolfFoxRepo {
           .order('name', ascending: true);
 
       return Ok(List<Map<String, dynamic>>.from(response));
-    } catch (e) {
+    } on Exception catch (e) {
       return Err(Exception('Erro ao carregar empresas: $e'));
     }
   }
@@ -278,7 +278,7 @@ class GolfFoxRepo {
           .order('name', ascending: true);
 
       return Ok(List<Map<String, dynamic>>.from(response));
-    } catch (e) {
+    } on Exception catch (e) {
       return Err(Exception('Erro ao carregar transportadoras: $e'));
     }
   }
@@ -311,7 +311,7 @@ class GolfFoxRepo {
       final response = await query.order('created_at', ascending: false);
 
       return Ok(List<Map<String, dynamic>>.from(response));
-    } catch (e) {
+    } on Exception catch (e) {
       return Err(Exception('Erro ao carregar usuarios: $e'));
     }
   }

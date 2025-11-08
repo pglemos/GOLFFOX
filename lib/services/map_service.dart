@@ -5,14 +5,16 @@
 
 import 'dart:async';
 import 'dart:math';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
 import '../models/vehicle_position.dart';
 import 'supabase_service.dart';
-import 'vehicle_status_service.dart';
 import 'vehicle_position_simulator.dart';
+import 'vehicle_status_service.dart';
 
 class MapService {
 
@@ -92,7 +94,7 @@ class MapService {
           .order('last_update', ascending: false);
 
       // Aplicar filtros (simplificado)
-      // TODO: Implementar filtros quando a versao do Supabase for atualizada
+      // TODO(golffox): Implementar filtros quando a versao do Supabase for atualizada
 
       final response = await query;
 
@@ -117,8 +119,8 @@ class MapService {
           passengerCount: json['passenger_count'] as int? ?? 0,
           capacity: json['capacity'] as int? ?? 30,
         )).toList();
-    } catch (e) {
-      debugPrint('Erro ao buscar posicoes dos veiculos: $e');
+    } on Exception catch (error) {
+      debugPrint('Erro ao buscar posicoes dos veiculos: $error');
       // Fallback para dados mock em caso de erro
       return _generateMockVehiclePositions();
     }
@@ -162,8 +164,8 @@ class MapService {
           .subscribe();
 
       debugPrint('Real-time subscription configurada para vehicle_positions');
-    } catch (e) {
-      debugPrint('Erro ao configurar real-time subscription: $e');
+    } on Exception catch (error) {
+      debugPrint('Erro ao configurar real-time subscription: $error');
     }
   }
 
@@ -171,8 +173,8 @@ class MapService {
     try {
       final positions = await getVehiclePositions();
       _vehiclePositionsController.add(positions);
-    } catch (e) {
-      _vehiclePositionsController.addError(e);
+    } on Exception catch (error) {
+      _vehiclePositionsController.addError(error);
     }
   }
 
@@ -189,11 +191,12 @@ class MapService {
 
   Future<VehiclePosition?> getVehicleById(String vehicleId) async {
     final positions = await getVehiclePositions();
-    try {
-      return positions.firstWhere((pos) => pos.vehicleId == vehicleId);
-    } catch (e) {
-      return null;
+    for (final position in positions) {
+      if (position.vehicleId == vehicleId) {
+        return position;
+      }
     }
+    return null;
   }
 
   // Calcular centro do mapa baseado nas posicoes dos veiculos
@@ -261,8 +264,7 @@ final mapServiceProvider = Provider<MapService>((ref) {
 // Provider para stream de posicoes dos veiculos
 final vehiclePositionsStreamProvider =
     StreamProvider<List<VehiclePosition>>((ref) {
-  final mapService = ref.watch(mapServiceProvider);
-  mapService.startRealTimeUpdates();
+  final mapService = ref.watch(mapServiceProvider)..startRealTimeUpdates();
 
   ref.onDispose(mapService.stopRealTimeUpdates);
 

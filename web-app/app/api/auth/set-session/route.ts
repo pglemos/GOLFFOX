@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
+import { debug, error } from "@/lib/logger"
 
 interface UserData {
   id: string
@@ -32,13 +33,13 @@ export async function POST(req: NextRequest) {
     const forwardedHost = req.headers.get('x-forwarded-host') || ''
     const origin = `${url.protocol}//${host}`
 
-    console.log('🔐 set-session: preparando cookie', {
+    debug('set-session: preparando cookie', {
       user: { id: user.id, email: user.email, role: user.role },
       host,
       forwardedHost,
       origin,
       isSecure,
-    })
+    }, 'set-session')
 
     const res = NextResponse.json({ ok: true })
 
@@ -52,10 +53,11 @@ export async function POST(req: NextRequest) {
       maxAge: 60 * 60, // 1 hora
     })
 
-    console.log('🍪 set-session: cookie setado com sucesso')
+    debug('set-session: cookie setado com sucesso', undefined, 'set-session')
     return res
-  } catch (error: any) {
-    console.error("Erro ao setar cookie de sessão:", error)
-    return NextResponse.json({ error: error?.message || "unexpected_error" }, { status: 500 })
+  } catch (err: unknown) {
+    const errorMessage = err instanceof Error ? err.message : 'unexpected_error'
+    error("Erro ao setar cookie de sessão", { error: err }, 'set-session')
+    return NextResponse.json({ error: errorMessage }, { status: 500 })
   }
 }

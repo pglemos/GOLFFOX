@@ -4,8 +4,9 @@
 // ========================================
 
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../core/theme/gf_tokens.dart';
 import '../../models/driver.dart';
 import '../../services/driver_service.dart';
@@ -133,9 +134,7 @@ class _DriversPageState extends ConsumerState<DriversPage> {
           if (_showFilters)
             DriverFiltersPanel(
               filters: currentFilters,
-              onFiltersChanged: (DriverFilters filters) {
-                service.updateFilters(filters);
-              },
+              onFiltersChanged: service.updateFilters,
               onClearFilters: service.clearFilters,
             ).animate().slideY(begin: -1, duration: 300.ms),
 
@@ -202,10 +201,10 @@ class _DriversPageState extends ConsumerState<DriversPage> {
             filters.hasActiveFilters 
                 ? 'Nenhum motorista encontrado'
                 : 'Nenhum motorista cadastrado',
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: GfTokens.fontSizeLg,
               fontWeight: FontWeight.w600,
-              color: const Color(GfTokens.colorOnSurface),
+              color: Color(GfTokens.colorOnSurface),
             ),
           ),
           const SizedBox(height: GfTokens.spacingSm),
@@ -213,8 +212,8 @@ class _DriversPageState extends ConsumerState<DriversPage> {
             filters.hasActiveFilters
                 ? 'Tente ajustar os filtros de busca.'
                 : 'Comece adicionando o primeiro motorista.',
-            style: TextStyle(
-              color: const Color(GfTokens.colorOnSurfaceVariant),
+            style: const TextStyle(
+              color: Color(GfTokens.colorOnSurfaceVariant),
             ),
             textAlign: TextAlign.center,
           ),
@@ -244,25 +243,25 @@ class _DriversPageState extends ConsumerState<DriversPage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
+          const Icon(
             Icons.error_outline,
             size: 64,
-            color: const Color(GfTokens.colorError),
+            color: Color(GfTokens.colorError),
           ),
           const SizedBox(height: GfTokens.spacingMd),
-          Text(
+          const Text(
             'Erro ao carregar motoristas',
             style: TextStyle(
               fontSize: GfTokens.fontSizeLg,
               fontWeight: FontWeight.w600,
-              color: const Color(GfTokens.colorOnSurface),
+              color: Color(GfTokens.colorOnSurface),
             ),
           ),
           const SizedBox(height: GfTokens.spacingSm),
           Text(
             error.toString(),
-            style: TextStyle(
-              color: const Color(GfTokens.colorOnSurfaceVariant),
+            style: const TextStyle(
+              color: Color(GfTokens.colorOnSurfaceVariant),
             ),
             textAlign: TextAlign.center,
           ),
@@ -350,7 +349,7 @@ class _DriversPageState extends ConsumerState<DriversPage> {
         action: SnackBarAction(
           label: 'Desfazer',
           onPressed: () {
-            // TODO: Implementar desfazer exclusão
+            // TODO(golffox-team): Implementar desfazer exclusão
             ref.read(driverServiceProvider.notifier).createDriver(driver);
           },
         ),

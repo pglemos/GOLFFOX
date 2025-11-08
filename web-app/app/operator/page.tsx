@@ -1,22 +1,15 @@
 "use client"
 
 import { useEffect, useState, useCallback } from "react"
-// @ts-ignore
 import { AppShell } from "@/components/app-shell"
-// @ts-ignore
 import { Button } from "@/components/ui/button"
-// @ts-ignore
 import { Card } from "@/components/ui/card"
 import { MapPin } from "lucide-react"
-// @ts-ignore
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 import toast from "react-hot-toast"
-// @ts-ignore
 import { OperatorKPICards } from "@/components/operator/operator-kpi-cards"
-// @ts-ignore
 import { ControlTowerCards } from "@/components/operator/control-tower-cards"
-// @ts-ignore
 import Link from "next/link"
 import { useOperatorTenant } from "@/components/providers/operator-tenant-provider"
 

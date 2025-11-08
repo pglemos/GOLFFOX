@@ -5,7 +5,7 @@
 
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, memo } from 'react'
 import { MarkerClusterer } from '@googlemaps/markerclusterer'
 import { calculateHeading } from '@/lib/map-utils'
 import type { Vehicle, RoutePolyline, Alert } from './admin-map'
@@ -48,7 +48,7 @@ interface MapLayersProps {
   mode?: 'live' | 'history'
 }
 
-export function MapLayers({
+export const MapLayers = memo(function MapLayers({
   map,
   vehicles,
   routes,
@@ -466,5 +466,5 @@ export function MapLayers({
   }, [routeStops, map, selectedRouteId])
 
   return null
-}
+})
 

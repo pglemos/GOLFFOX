@@ -1,4 +1,6 @@
 import { supabase } from './supabase'
+import { debug, error } from './logger'
+import { getUserRoleByEmail } from './user-role'
 
 export interface UserData {
   id: string
@@ -23,8 +25,8 @@ export class AuthManager {
       }
 
       if (data.user && data.session) {
-        const userRole = this.getUserRoleByEmail(data.user.email || '')
-        
+        const userRole = getUserRoleByEmail(data.user.email || '')
+
         const userData: UserData = {
           id: data.user.id,
           email: data.user.email || '',
@@ -32,36 +34,24 @@ export class AuthManager {
           accessToken: data.session.access_token
         }
 
-        // Salvar no localStorage
-        if (typeof window !== 'undefined') {
-          localStorage.setItem(this.STORAGE_KEY, JSON.stringify(userData))
-          
-          // Salvar cookie com configurações específicas
-          const cookieValue = btoa(JSON.stringify(userData)) // Base64 encode
-          const isSecure = location.protocol === 'https:'
-          const secureFlag = isSecure ? '; Secure' : ''
-          document.cookie = `${this.COOKIE_NAME}=${cookieValue}; path=/; max-age=3600; SameSite=Lax${secureFlag}`
-          
-          // ✅ Log apenas em desenvolvimento
-          if (process.env.NODE_ENV === 'development') {
-            console.log('🍪 Cookie salvo:', this.COOKIE_NAME, 'Secure:', isSecure)
-          }
-        }
+        this.persistSession(userData, { token: data.session.access_token })
 
         return { success: true, user: userData }
       }
 
       return { success: false, error: 'Falha na autenticação' }
-    } catch (error: any) {
-      return { success: false, error: error.message || 'Erro inesperado' }
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Erro inesperado'
+      error('Erro no login', { error: err }, 'AuthManager')
+      return { success: false, error: errorMessage }
     }
   }
 
   static async logout(): Promise<void> {
     try {
       await supabase.auth.signOut()
-    } catch (error) {
-      console.error('Erro ao fazer logout no Supabase:', error)
+    } catch (err) {
+      error('Erro ao fazer logout no Supabase', { error: err }, 'AuthManager')
     }
 
     // Limpar dados locais
@@ -116,29 +106,40 @@ export class AuthManager {
     }
   }
 
-  private static getUserRoleByEmail(email: string): string {
-    const demoAccounts = [
-      // Conjunto A (golffox.com)
-      { email: 'admin@golffox.com', role: 'admin' },
-      { email: 'operator@golffox.com', role: 'operator' },
-      { email: 'carrier@golffox.com', role: 'carrier' },
-      { email: 'driver@golffox.com', role: 'driver' },
+  static persistSession(userData: UserData, options?: { storage?: 'local' | 'session' | 'both'; token?: string }) {
+    if (typeof window === 'undefined') return
 
-      // Conjunto B (Português, usados na página de login)
-      { email: 'golffox@admin.com', role: 'admin' },
-      { email: 'operador@empresa.com', role: 'operator' },
-      { email: 'transportadora@trans.com', role: 'carrier' },
-      { email: 'motorista@trans.com', role: 'driver' },
-      { email: 'passageiro@empresa.com', role: 'passenger' },
+    const storageMode = options?.storage ?? 'both'
+    const payload = JSON.stringify(userData)
 
-      // Variantes antigas
-      { email: 'operador@golffox.com', role: 'operator' },
-      { email: 'transportadora@golffox.com', role: 'carrier' },
-      { email: 'motorista@golffox.com', role: 'driver' }
-    ]
+    try {
+      if (storageMode === 'local' || storageMode === 'both') {
+        localStorage.setItem(this.STORAGE_KEY, payload)
+      }
+      if (storageMode === 'session' || storageMode === 'both') {
+        sessionStorage.setItem(this.STORAGE_KEY, payload)
+      }
+      if (options?.token) {
+        sessionStorage.setItem('golffox-auth-token', options.token)
+      }
+    } catch (storageErr) {
+      error('Falha ao persistir sessão no storage', { error: storageErr }, 'AuthManager')
+    }
 
-    const account = demoAccounts.find(acc => acc.email === email)
-    return account?.role || 'driver'
+    try {
+      if (typeof document !== 'undefined') {
+        const cookieValue = btoa(payload)
+        const isSecure = window.location?.protocol === 'https:'
+        document.cookie = `${this.COOKIE_NAME}=${cookieValue}; path=/; max-age=3600; SameSite=Lax${isSecure ? '; Secure' : ''}`
+      }
+    } catch (cookieErr) {
+      error('Falha ao gravar cookie de sessão', { error: cookieErr }, 'AuthManager')
+    }
+
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('golffox:auth', { detail: userData }))
+      debug('Sessão persistida', { role: userData.role }, 'AuthManager')
+    }
   }
 
   // Método para middleware extrair dados do cookie

@@ -6,10 +6,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../core/theme/gf_tokens.dart';
-import '../../ui/widgets/common/gf_app_bar.dart';
 import '../../models/vehicle.dart';
 import '../../services/vehicle_service.dart';
+import '../../ui/widgets/common/gf_app_bar.dart';
 
 class CreateVehiclePage extends ConsumerStatefulWidget {
 
@@ -227,7 +228,7 @@ class _CreateVehiclePageState extends ConsumerState<CreateVehiclePage>
       if (mounted) {
         Navigator.of(context).pop(true);
       }
-    } catch (e) {
+    } on Exception catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -254,7 +255,7 @@ class _CreateVehiclePageState extends ConsumerState<CreateVehiclePage>
         actions: [
           if (_isLoading)
             const Padding(
-              padding: EdgeInsets.all(16.0),
+              padding: EdgeInsets.all(16),
               child: SizedBox(
                 width: 20,
                 height: 20,
@@ -264,10 +265,10 @@ class _CreateVehiclePageState extends ConsumerState<CreateVehiclePage>
           else
             TextButton(
               onPressed: _saveVehicle,
-              child: Text(
+              child: const Text(
                 'Salvar',
                 style: TextStyle(
-                  color: const Color(GfTokens.colorPrimary),
+                  color: Color(GfTokens.colorPrimary),
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -382,12 +383,12 @@ class _CreateVehiclePageState extends ConsumerState<CreateVehiclePage>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          const Text(
             'Informacoes Basicas',
             style: TextStyle(
               fontSize: GfTokens.fontSizeXl,
               fontWeight: FontWeight.w600,
-              color: const Color(GfTokens.colorOnSurface),
+              color: Color(GfTokens.colorOnSurface),
             ),
           ),
           const SizedBox(height: GfTokens.spacingMd),
@@ -414,12 +415,14 @@ class _CreateVehiclePageState extends ConsumerState<CreateVehiclePage>
             decoration: const InputDecoration(
               labelText: 'Tipo de Veiculo',
             ),
-            items: VehicleType.values.map((type) {
-              return DropdownMenuItem(
-                value: type,
-                child: Text(type.displayName),
-              );
-            }).toList(),
+            items: VehicleType.values
+                .map(
+                  (type) => DropdownMenuItem(
+                    value: type,
+                    child: Text(type.displayName),
+                  ),
+                )
+                .toList(),
             onChanged: (value) {
               if (value != null) {
                 setState(() {
@@ -436,12 +439,14 @@ class _CreateVehiclePageState extends ConsumerState<CreateVehiclePage>
             decoration: const InputDecoration(
               labelText: 'Status',
             ),
-            items: VehicleStatus.values.map((status) {
-              return DropdownMenuItem(
-                value: status,
-                child: Text(status.displayName),
-              );
-            }).toList(),
+            items: VehicleStatus.values
+                .map(
+                  (status) => DropdownMenuItem(
+                    value: status,
+                    child: Text(status.displayName),
+                  ),
+                )
+                .toList(),
             onChanged: (value) {
               if (value != null) {
                 setState(() {
@@ -458,12 +463,14 @@ class _CreateVehiclePageState extends ConsumerState<CreateVehiclePage>
             decoration: const InputDecoration(
               labelText: 'Tipo de Combustivel',
             ),
-            items: FuelType.values.map((fuel) {
-              return DropdownMenuItem(
-                value: fuel,
-                child: Text(fuel.displayName),
-              );
-            }).toList(),
+            items: FuelType.values
+                .map(
+                  (fuel) => DropdownMenuItem(
+                    value: fuel,
+                    child: Text(fuel.displayName),
+                  ),
+                )
+                .toList(),
             onChanged: (value) {
               if (value != null) {
                 setState(() {
@@ -482,7 +489,7 @@ class _CreateVehiclePageState extends ConsumerState<CreateVehiclePage>
               hintText: 'ABC-1234',
             ),
             inputFormatters: [
-              FilteringTextInputFormatter.allow(RegExp(r'[A-Za-z0-9-]')),
+              FilteringTextInputFormatter.allow(RegExp('[A-Za-z0-9-]')),
               LengthLimitingTextInputFormatter(8),
             ],
             validator: (value) {
@@ -501,12 +508,12 @@ class _CreateVehiclePageState extends ConsumerState<CreateVehiclePage>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          const Text(
             'Especificacoes',
             style: TextStyle(
               fontSize: GfTokens.fontSizeXl,
               fontWeight: FontWeight.w600,
-              color: const Color(GfTokens.colorOnSurface),
+              color: Color(GfTokens.colorOnSurface),
             ),
           ),
           const SizedBox(height: GfTokens.spacingMd),
@@ -621,7 +628,7 @@ class _CreateVehiclePageState extends ConsumerState<CreateVehiclePage>
                   decoration: const InputDecoration(
                     labelText: 'Motor (L)',
                   ),
-                  keyboardType: TextInputType.numberWithOptions(decimal: true),
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Tamanho do motor e obrigatorio';
@@ -643,7 +650,7 @@ class _CreateVehiclePageState extends ConsumerState<CreateVehiclePage>
                   decoration: const InputDecoration(
                     labelText: 'Tanque (L)',
                   ),
-                  keyboardType: TextInputType.numberWithOptions(decimal: true),
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Capacidade do tanque e obrigatoria';
@@ -659,7 +666,7 @@ class _CreateVehiclePageState extends ConsumerState<CreateVehiclePage>
                   decoration: const InputDecoration(
                     labelText: 'Peso (kg)',
                   ),
-                  keyboardType: TextInputType.numberWithOptions(decimal: true),
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Peso e obrigatorio';
@@ -673,12 +680,12 @@ class _CreateVehiclePageState extends ConsumerState<CreateVehiclePage>
           const SizedBox(height: GfTokens.spacingMd),
 
           // Dimensoes
-          Text(
+          const Text(
             'Dimensoes',
             style: TextStyle(
               fontSize: GfTokens.fontSizeLg,
               fontWeight: FontWeight.w600,
-              color: const Color(GfTokens.colorOnSurface),
+              color: Color(GfTokens.colorOnSurface),
             ),
           ),
           const SizedBox(height: GfTokens.spacingSm),
@@ -691,7 +698,7 @@ class _CreateVehiclePageState extends ConsumerState<CreateVehiclePage>
                   decoration: const InputDecoration(
                     labelText: 'Comprimento (m)',
                   ),
-                  keyboardType: TextInputType.numberWithOptions(decimal: true),
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Comprimento e obrigatorio';
@@ -707,7 +714,7 @@ class _CreateVehiclePageState extends ConsumerState<CreateVehiclePage>
                   decoration: const InputDecoration(
                     labelText: 'Largura (m)',
                   ),
-                  keyboardType: TextInputType.numberWithOptions(decimal: true),
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Largura e obrigatoria';
@@ -723,7 +730,7 @@ class _CreateVehiclePageState extends ConsumerState<CreateVehiclePage>
                   decoration: const InputDecoration(
                     labelText: 'Altura (m)',
                   ),
-                  keyboardType: TextInputType.numberWithOptions(decimal: true),
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Altura e obrigatoria';
@@ -737,12 +744,12 @@ class _CreateVehiclePageState extends ConsumerState<CreateVehiclePage>
           const SizedBox(height: GfTokens.spacingMd),
 
           // Recursos
-          Text(
+          const Text(
             'Recursos',
             style: TextStyle(
               fontSize: GfTokens.fontSizeLg,
               fontWeight: FontWeight.w600,
-              color: const Color(GfTokens.colorOnSurface),
+              color: Color(GfTokens.colorOnSurface),
             ),
           ),
           const SizedBox(height: GfTokens.spacingSm),
@@ -750,22 +757,23 @@ class _CreateVehiclePageState extends ConsumerState<CreateVehiclePage>
           Wrap(
             spacing: GfTokens.spacingSm,
             runSpacing: GfTokens.spacingSm,
-            children: _availableFeatures.map((feature) {
-              final isSelected = _selectedFeatures.contains(feature);
-              return FilterChip(
-                label: Text(feature),
-                selected: isSelected,
-                onSelected: (selected) {
-                  setState(() {
-                    if (selected) {
-                      _selectedFeatures.add(feature);
-                    } else {
-                      _selectedFeatures.remove(feature);
-                    }
-                  });
-                },
-              );
-            }).toList(),
+            children: _availableFeatures
+                .map(
+                  (feature) => FilterChip(
+                    label: Text(feature),
+                    selected: _selectedFeatures.contains(feature),
+                    onSelected: (selected) {
+                      setState(() {
+                        if (selected) {
+                          _selectedFeatures.add(feature);
+                        } else {
+                          _selectedFeatures.remove(feature);
+                        }
+                      });
+                    },
+                  ),
+                )
+                .toList(),
           ),
         ],
       ),
@@ -776,12 +784,12 @@ class _CreateVehiclePageState extends ConsumerState<CreateVehiclePage>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          const Text(
             'Documentos',
             style: TextStyle(
               fontSize: GfTokens.fontSizeXl,
               fontWeight: FontWeight.w600,
-              color: const Color(GfTokens.colorOnSurface),
+              color: Color(GfTokens.colorOnSurface),
             ),
           ),
           const SizedBox(height: GfTokens.spacingMd),
@@ -825,12 +833,12 @@ class _CreateVehiclePageState extends ConsumerState<CreateVehiclePage>
           const SizedBox(height: GfTokens.spacingMd),
 
           // Datas de vencimento
-          Text(
+          const Text(
             'Vencimentos',
             style: TextStyle(
               fontSize: GfTokens.fontSizeLg,
               fontWeight: FontWeight.w600,
-              color: const Color(GfTokens.colorOnSurface),
+              color: Color(GfTokens.colorOnSurface),
             ),
           ),
           const SizedBox(height: GfTokens.spacingSm),
@@ -869,12 +877,12 @@ class _CreateVehiclePageState extends ConsumerState<CreateVehiclePage>
           const SizedBox(height: GfTokens.spacingMd),
 
           // Seguro
-          Text(
+          const Text(
             'Seguro',
             style: TextStyle(
               fontSize: GfTokens.fontSizeLg,
               fontWeight: FontWeight.w600,
-              color: const Color(GfTokens.colorOnSurface),
+              color: Color(GfTokens.colorOnSurface),
             ),
           ),
           const SizedBox(height: GfTokens.spacingSm),

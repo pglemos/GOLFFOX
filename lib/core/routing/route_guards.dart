@@ -260,53 +260,56 @@ class RouteTransitions {
     BuildContext context,
     GoRouterState state,
     Widget child,
-  ) => CustomTransitionPage<T>(
-      key: state.pageKey,
-      child: child,
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        const begin = Offset(1, 0);
-        const end = Offset.zero;
-        const curve = Curves.easeInOutCubic;
+  ) =>
+      CustomTransitionPage<T>(
+        key: state.pageKey,
+        child: child,
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          const begin = Offset(1, 0);
+          const end = Offset.zero;
+          const curve = Curves.easeInOutCubic;
 
-        final tween = Tween(begin: begin, end: end).chain(
-          CurveTween(curve: curve),
-        );
+          final tween = Tween<Offset>(begin: begin, end: end).chain(
+            CurveTween(curve: curve),
+          );
 
-        return SlideTransition(
-          position: animation.drive(tween),
-          child: child,
-        );
-      },
-    );
+          return SlideTransition(
+            position: animation.drive(tween),
+            child: child,
+          );
+        },
+      );
 
   /// Fade transition for authentication flows
   static Page<T> fadeTransition<T extends Object?>(
     BuildContext context,
     GoRouterState state,
     Widget child,
-  ) => CustomTransitionPage<T>(
-      key: state.pageKey,
-      child: child,
-      transitionsBuilder: (context, animation, secondaryAnimation, child) =>
-          FadeTransition(
-        opacity: animation,
+  ) =>
+      CustomTransitionPage<T>(
+        key: state.pageKey,
         child: child,
-      ),
-    );
+        transitionsBuilder: (context, animation, secondaryAnimation, child) =>
+            FadeTransition(
+          opacity: animation,
+          child: child,
+        ),
+      );
 
   /// Scale transition for modal-like pages
   static Page<T> scaleTransition<T extends Object?>(
     BuildContext context,
     GoRouterState state,
     Widget child,
-  ) => CustomTransitionPage<T>(
-      key: state.pageKey,
-      child: child,
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        const curve = Curves.easeInOutBack;
-        final tween = Tween(begin: 0.8, end: 1).chain(
-          CurveTween(curve: curve),
-        );
+  ) =>
+      CustomTransitionPage<T>(
+        key: state.pageKey,
+        child: child,
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          const curve = Curves.easeInOutBack;
+          final tween = Tween<double>(begin: 0.8, end: 1).chain(
+            CurveTween(curve: curve),
+          );
 
         return ScaleTransition(
           scale: animation.drive(tween),

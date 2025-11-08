@@ -23,8 +23,7 @@ class _PassengerDashboardScreenState extends State<PassengerDashboardScreen> {
   Future<void> _loadCurrentTrip() async {
     try {
       // Buscar trip ativa onde o passageiro está
-      final Map<String, dynamic>? employee =
-          await SupabaseService.instance.client
+      final employee = await SupabaseService.instance.client
           .from('gf_employee_company')
           .select('id')
           .eq('login_cpf', '') // Substituir por CPF do usuário logado
@@ -35,8 +34,7 @@ class _PassengerDashboardScreenState extends State<PassengerDashboardScreen> {
         return;
       }
 
-      final Map<String, dynamic>? response =
-          await SupabaseService.instance.client
+      final response = await SupabaseService.instance.client
           .from('trip_passengers')
           .select('*, trips(*, routes(*), vehicles(*))')
           .eq('passenger_id', employee['id'] as String)
@@ -47,7 +45,7 @@ class _PassengerDashboardScreenState extends State<PassengerDashboardScreen> {
         _currentTrip = response;
         _loading = false;
       });
-    } catch (e) {
+    } on Exception catch (_) {
       setState(() => _loading = false);
     }
   }
@@ -114,15 +112,15 @@ class _PassengerDashboardScreenState extends State<PassengerDashboardScreen> {
   }
 
   Widget _buildTripView() {
-    Map<String, dynamic> _asMap(dynamic value) {
+    Map<String, dynamic> asMap(Object? value) {
       if (value is Map<String, dynamic>) return value;
       if (value is Map) return Map<String, dynamic>.from(value);
       return <String, dynamic>{};
     }
 
-    final trip = _asMap(_currentTrip?['trips']);
-    final route = _asMap(trip['routes']);
-    final vehicle = _asMap(trip['vehicles']);
+    final trip = asMap(_currentTrip?['trips']);
+    final route = asMap(trip['routes']);
+    final vehicle = asMap(trip['vehicles']);
 
     return ListView(
       padding: const EdgeInsets.all(16),

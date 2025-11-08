@@ -11,45 +11,44 @@ class RouteStopModel {
     required this.id,
     required this.routeId,
     required this.name,
-    this.description,
     required this.latitude,
     required this.longitude,
     required this.order,
     required this.type,
+    required this.createdAt,
+    required this.updatedAt,
+    this.description,
     this.scheduledTime,
     this.estimatedDuration,
     this.estimatedPassengers,
     this.isActive = true,
     this.address,
     this.landmark,
-    required this.createdAt,
-    required this.updatedAt,
   });
 
-  factory RouteStopModel.fromJson(Map<String, dynamic> json) {
-    return RouteStopModel(
-      id: json[RouteStopFields.id] as String,
-      routeId: json[RouteStopFields.routeId] as String,
-      name: json[RouteStopFields.name] as String,
-      description: json[RouteStopFields.description] as String?,
-      latitude: (json[RouteStopFields.latitude] as num).toDouble(),
-      longitude: (json[RouteStopFields.longitude] as num).toDouble(),
-      order: json[RouteStopFields.order] as int,
-      type: json[RouteStopFields.type] as String,
-      scheduledTime: json[RouteStopFields.scheduledTime] != null
-          ? DateTime.parse(json[RouteStopFields.scheduledTime] as String)
-          : null,
-      estimatedDuration: json[RouteStopFields.estimatedDuration] != null
-          ? Duration(minutes: json[RouteStopFields.estimatedDuration] as int)
-          : null,
-      estimatedPassengers: json[RouteStopFields.estimatedPassengers] as int?,
-      isActive: json[RouteStopFields.isActive] as bool? ?? true,
-      address: json[RouteStopFields.address] as String?,
-      landmark: json[RouteStopFields.landmark] as String?,
-      createdAt: DateTime.parse(json[RouteStopFields.createdAt] as String),
-      updatedAt: DateTime.parse(json[RouteStopFields.updatedAt] as String),
-    );
-  }
+  factory RouteStopModel.fromJson(Map<String, dynamic> json) =>
+      RouteStopModel(
+        id: json[RouteStopFields.id] as String,
+        routeId: json[RouteStopFields.routeId] as String,
+        name: json[RouteStopFields.name] as String,
+        description: json[RouteStopFields.description] as String?,
+        latitude: (json[RouteStopFields.latitude] as num).toDouble(),
+        longitude: (json[RouteStopFields.longitude] as num).toDouble(),
+        order: json[RouteStopFields.order] as int,
+        type: json[RouteStopFields.type] as String,
+        scheduledTime: json[RouteStopFields.scheduledTime] != null
+            ? DateTime.parse(json[RouteStopFields.scheduledTime] as String)
+            : null,
+        estimatedDuration: json[RouteStopFields.estimatedDuration] != null
+            ? Duration(minutes: json[RouteStopFields.estimatedDuration] as int)
+            : null,
+        estimatedPassengers: json[RouteStopFields.estimatedPassengers] as int?,
+        isActive: json[RouteStopFields.isActive] as bool? ?? true,
+        address: json[RouteStopFields.address] as String?,
+        landmark: json[RouteStopFields.landmark] as String?,
+        createdAt: DateTime.parse(json[RouteStopFields.createdAt] as String),
+        updatedAt: DateTime.parse(json[RouteStopFields.updatedAt] as String),
+      );
   final String id;
   final String routeId;
   final String name;

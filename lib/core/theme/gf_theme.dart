@@ -116,7 +116,7 @@ class GfTheme {
           borderRadius: BorderRadius.circular(GfTokens.radius),
           side: const BorderSide(color: stroke),
         ),
-        margin: const EdgeInsets.all(0),
+        margin: EdgeInsets.zero,
       ),
 
       // ========================================
@@ -253,15 +253,12 @@ class GfTheme {
   // ========================================
   // TEMA ESCURO (fallback)
   // ========================================
-  static ThemeData dark() {
-    // Mantem tema escuro como fallback, mas nao e o padrao
-    return ThemeData.dark().copyWith(
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: const Color(GfTokens.brand),
-        brightness: Brightness.dark,
-      ),
-    );
-  }
+  static ThemeData dark() => ThemeData.dark().copyWith(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(GfTokens.brand),
+          brightness: Brightness.dark,
+        ),
+      );
 
   // ========================================
   // CORES UTILITARIAS

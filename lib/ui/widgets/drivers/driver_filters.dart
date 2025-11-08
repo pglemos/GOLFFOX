@@ -57,12 +57,12 @@ class _DriverFiltersPanelState extends State<DriverFiltersPanel> {
               color: Color(GfTokens.colorPrimary),
             ),
             const SizedBox(width: GfTokens.spacingSm),
-            Text(
+            const Text(
               'Filtros',
               style: TextStyle(
                 fontSize: GfTokens.fontSizeMd,
                 fontWeight: FontWeight.w600,
-                color: const Color(GfTokens.colorOnSurface),
+                color: Color(GfTokens.colorOnSurface),
               ),
             ),
             if (_filters.hasActiveFilters) ...[
@@ -272,9 +272,9 @@ class _DriverFiltersPanelState extends State<DriverFiltersPanel> {
                 ),
                 Text(
                   'Minimo: ${(_filters.minRating ?? 0.0).toStringAsFixed(1)} estrelas',
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: GfTokens.fontSizeSm,
-                    color: const Color(GfTokens.colorOnSurfaceVariant),
+                    color: Color(GfTokens.colorOnSurfaceVariant),
                   ),
                 ),
               ],
@@ -302,9 +302,9 @@ class _DriverFiltersPanelState extends State<DriverFiltersPanel> {
                 ),
                 Text(
                   'Minimo: ${_filters.minTrips ?? 0} viagens',
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: GfTokens.fontSizeSm,
-                    color: const Color(GfTokens.colorOnSurfaceVariant),
+                    color: Color(GfTokens.colorOnSurfaceVariant),
                   ),
                 ),
               ],
@@ -322,10 +322,10 @@ class _DriverFiltersPanelState extends State<DriverFiltersPanel> {
       children: [
         Text(
           title,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: GfTokens.fontSizeSm,
             fontWeight: FontWeight.w600,
-            color: const Color(GfTokens.colorOnSurface),
+            color: Color(GfTokens.colorOnSurface),
           ),
         ),
         const SizedBox(height: GfTokens.spacingSm),

@@ -54,21 +54,21 @@ class VehiclePosition {
     required this.driverName,
     required this.position,
     required this.status,
+    required this.lastUpdate,
     this.speed,
     this.heading,
-    required this.lastUpdate,
     this.routeId,
     this.routeName,
     this.passengerCount,
     this.capacity,
   });
 
-  factory VehiclePosition.fromJson(Map<String, dynamic> json) {
-    return VehiclePosition(
-      id: json['id'] as String,
-      vehicleId: json['vehicle_id'] as String,
-      licensePlate: json['license_plate'] as String,
-      driverName: json['driver_name'] as String,
+  factory VehiclePosition.fromJson(Map<String, dynamic> json) =>
+      VehiclePosition(
+        id: json['id'] as String,
+        vehicleId: json['vehicle_id'] as String,
+        licensePlate: json['license_plate'] as String,
+        driverName: json['driver_name'] as String,
       position: LatLng(
         (json['latitude'] as num).toDouble(),
         (json['longitude'] as num).toDouble(),
@@ -81,11 +81,10 @@ class VehiclePosition {
       heading: json['heading'] as double?,
       lastUpdate: DateTime.parse(json['last_update'] as String),
       routeId: json['route_id'] as String?,
-      routeName: json['route_name'] as String?,
-      passengerCount: json['passenger_count'] as int?,
-      capacity: json['capacity'] as int?,
-    );
-  }
+        routeName: json['route_name'] as String?,
+        passengerCount: json['passenger_count'] as int?,
+        capacity: json['capacity'] as int?,
+      );
   final String id;
   final String vehicleId;
   final String licensePlate;

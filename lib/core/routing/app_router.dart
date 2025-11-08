@@ -300,7 +300,7 @@ class AppRouter {
             body: Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
+                children: [
                   CircularProgressIndicator(),
                   SizedBox(height: 16),
                   Text('Carregando perfil do usuario...'),
@@ -319,7 +319,8 @@ class AppRouter {
                   const SizedBox(height: 16),
                   const Text(
                     'Erro ao carregar perfil',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style:
+                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
                   Text(
@@ -364,7 +365,8 @@ class AppRouter {
                   const SizedBox(height: 16),
                   const Text(
                     'Perfil nao encontrado',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style:
+                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
                   Text(
@@ -377,7 +379,7 @@ class AppRouter {
                     onPressed: () {
                       (context as Element).markNeedsBuild();
                     },
-                    child: Text('Tentar novamente'),
+                    child: const Text('Tentar novamente'),
                   ),
                 ],
               ),

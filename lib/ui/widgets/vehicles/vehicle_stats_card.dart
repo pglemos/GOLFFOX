@@ -39,19 +39,19 @@ class VehicleStatsCard extends ConsumerWidget {
         borderRadius: BorderRadius.circular(GfTokens.radiusLg),
         border: Border.all(color: const Color(GfTokens.colorBorder)),
       ),
-      child: Row(
+      child: const Row(
         children: [
           CircularProgressIndicator(
             strokeWidth: 2,
             valueColor: AlwaysStoppedAnimation<Color>(
-                const Color(GfTokens.colorPrimary)),
+                Color(GfTokens.colorPrimary)),
           ),
-          const SizedBox(width: GfTokens.spacingMd),
+          SizedBox(width: GfTokens.spacingMd),
           Text(
             'Carregando estatisticas...',
             style: TextStyle(
               fontSize: GfTokens.fontSizeMd,
-              color: const Color(GfTokens.colorOnSurfaceVariant),
+              color: Color(GfTokens.colorOnSurfaceVariant),
             ),
           ),
         ],
@@ -64,21 +64,21 @@ class VehicleStatsCard extends ConsumerWidget {
         color: const Color(GfTokens.colorErrorContainer),
         borderRadius: BorderRadius.circular(GfTokens.radiusLg),
         border: Border.all(
-            color: Color(GfTokens.colorError).withValues(alpha: 0.3)),
+            color: const Color(GfTokens.colorError).withValues(alpha: 0.3)),
       ),
-      child: Row(
+      child: const Row(
         children: [
           Icon(
             Icons.error_outline,
-            color: const Color(GfTokens.colorError),
+            color: Color(GfTokens.colorError),
             size: 20,
           ),
-          const SizedBox(width: GfTokens.spacingMd),
+          SizedBox(width: GfTokens.spacingMd),
           Text(
             'Erro ao carregar estatisticas',
             style: TextStyle(
               fontSize: GfTokens.fontSizeMd,
-              color: const Color(GfTokens.colorOnErrorContainer),
+              color: Color(GfTokens.colorOnErrorContainer),
             ),
           ),
         ],
@@ -93,7 +93,7 @@ class VehicleStatsCard extends ConsumerWidget {
         border: Border.all(color: const Color(GfTokens.colorBorder)),
         boxShadow: [
           BoxShadow(
-            color: Color(GfTokens.colorShadow).withValues(alpha: 0.05),
+            color: const Color(GfTokens.colorShadow).withValues(alpha: 0.05),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -108,22 +108,22 @@ class VehicleStatsCard extends ConsumerWidget {
               Container(
                 padding: const EdgeInsets.all(GfTokens.spacingSm),
                 decoration: BoxDecoration(
-                  color: Color(GfTokens.colorPrimary).withValues(alpha: 0.1),
+                  color: const Color(GfTokens.colorPrimary).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(GfTokens.radiusMd),
                 ),
-                child: Icon(
+                child: const Icon(
                   Icons.analytics,
-                  color: const Color(GfTokens.colorPrimary),
+                  color: Color(GfTokens.colorPrimary),
                   size: 20,
                 ),
               ),
               const SizedBox(width: GfTokens.spacingMd),
-              Text(
+              const Text(
                 'Estatisticas da Frota',
                 style: TextStyle(
                   fontSize: GfTokens.fontSizeLg,
                   fontWeight: FontWeight.w600,
-                  color: const Color(GfTokens.colorOnSurface),
+                  color: Color(GfTokens.colorOnSurface),
                 ),
               ),
               const Spacer(),
@@ -133,24 +133,24 @@ class VehicleStatsCard extends ConsumerWidget {
                   vertical: GfTokens.spacingXs,
                 ),
                 decoration: BoxDecoration(
-                  color: Color(GfTokens.colorSuccess).withValues(alpha: 0.1),
+                  color: const Color(GfTokens.colorSuccess).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(GfTokens.radiusSm),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.trending_up,
                       size: 14,
-                      color: const Color(GfTokens.colorSuccess),
+                      color: Color(GfTokens.colorSuccess),
                     ),
                     const SizedBox(width: GfTokens.spacingXs),
                     Text(
                       '${stats['utilizationRate'] ?? 0}%',
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: GfTokens.fontSizeXs,
                         fontWeight: FontWeight.w600,
-                        color: const Color(GfTokens.colorSuccess),
+                        color: Color(GfTokens.colorSuccess),
                       ),
                     ),
                   ],
@@ -267,9 +267,9 @@ class VehicleStatsCard extends ConsumerWidget {
           ),
           Text(
             label,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: GfTokens.fontSizeXs,
-              color: const Color(GfTokens.colorOnSurfaceVariant),
+              color: Color(GfTokens.colorOnSurfaceVariant),
             ),
             textAlign: TextAlign.center,
           ),

@@ -1,17 +1,13 @@
 "use client"
 
-// @ts-ignore
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
-// @ts-ignore
 import { Button } from "@/components/ui/button"
-// @ts-ignore
 import { Input } from "@/components/ui/input"
-// @ts-ignore
 import { Label } from "@/components/ui/label"
 import { User } from "lucide-react"
-// @ts-ignore
 import { supabase } from "@/lib/supabase"
 import toast from "react-hot-toast"
+import { error as logError } from "@/lib/logger"
 import { useState, useEffect } from "react"
 
 interface FuncionarioModalProps {
@@ -79,7 +75,7 @@ export function FuncionarioModal({ funcionario, isOpen, onClose, onSave, empresa
         return { lat: loc.lat, lng: loc.lng }
       }
     } catch (error) {
-      console.error("Erro ao geocodificar:", error)
+      logError("Erro ao geocodificar", { error }, 'FuncionarioModal')
     }
     return null
   }
@@ -171,7 +167,7 @@ export function FuncionarioModal({ funcionario, isOpen, onClose, onSave, empresa
       onSave()
       onClose()
     } catch (error: any) {
-      console.error("Erro ao salvar funcionário:", error)
+      logError("Erro ao salvar funcionário", { error }, 'FuncionarioModal')
       toast.error(`Erro ao salvar funcionário: ${error.message}`)
     } finally {
       setLoading(false)

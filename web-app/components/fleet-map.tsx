@@ -1,6 +1,7 @@
 "use client"
 
-import { useEffect, useState, useCallback, useRef } from "react"
+import { useEffect, useState, useCallback, useRef, memo } from "react"
+import { warn, error as logError } from "@/lib/logger"
 import { Card } from "./ui/card"
 import { Button } from "./ui/button"
 import { Badge } from "./ui/badge"
@@ -79,7 +80,7 @@ interface FleetMapProps {
   initialZoom?: number
 }
 
-export function FleetMap({ companyId, routeId, initialCenter, initialZoom }: FleetMapProps) {
+export const FleetMap = memo(function FleetMap({ companyId, routeId, initialCenter, initialZoom }: FleetMapProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const mapRef = useRef<HTMLDivElement>(null)
@@ -161,7 +162,7 @@ export function FleetMap({ companyId, routeId, initialCenter, initialZoom }: Fle
       })
 
       if (error) {
-        console.warn('Erro ao carregar dados do mapa:', error.message)
+        warn('Erro ao carregar dados do mapa', { error: error.message }, 'FleetMap')
         setBuses([])
         setStops([])
         setRoutes([])
@@ -174,7 +175,7 @@ export function FleetMap({ companyId, routeId, initialCenter, initialZoom }: Fle
         setRoutes(data.routes || [])
       }
     } catch (error) {
-      console.error('Erro ao carregar dados do mapa:', error)
+      logError('Erro ao carregar dados do mapa', { error }, 'FleetMap')
       setBuses([])
       setStops([])
       setRoutes([])
@@ -243,7 +244,7 @@ export function FleetMap({ companyId, routeId, initialCenter, initialZoom }: Fle
         await loadMapData()
         setLoading(false)
       } catch (error) {
-        console.error('Erro ao carregar Google Maps:', error)
+        logError('Erro ao carregar Google Maps', { error }, 'FleetMap')
         setMapError('Erro ao carregar o mapa. Verifique sua conexão.')
         setLoading(false)
       }
@@ -485,7 +486,7 @@ export function FleetMap({ companyId, routeId, initialCenter, initialZoom }: Fle
         }
       }
     } catch (error) {
-      console.error('Erro ao atualizar marcadores:', error)
+      // Erro ao atualizar marcadores
     }
   }, [buses, stops, routes, selectedBus, filters.route, filters.status, getBusIcon])
 
@@ -740,4 +741,4 @@ export function FleetMap({ companyId, routeId, initialCenter, initialZoom }: Fle
       </div>
     </div>
   )
-}
+})

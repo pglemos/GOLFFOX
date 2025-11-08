@@ -4,24 +4,25 @@
 // ========================================
 
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
+
 import '../../core/theme/gf_tokens.dart';
 import '../../core/theme/unified_theme.dart';
-import '../../ui/widgets/gf_app_bar.dart';
-import '../../ui/widgets/map/map_filters.dart';
-import '../../ui/widgets/map/vehicle_info_panel.dart';
-import '../../ui/widgets/map/vehicle_marker.dart';
-import '../../ui/widgets/map/map_legend.dart';
-import '../../ui/widgets/map/bus_stops_panel.dart';
+import '../../core/utils/date_utils.dart';
+import '../../models/bus_stop.dart';
+import '../../models/vehicle_position.dart';
+import '../../models/vehicle_status.dart' as vs;
+import '../../providers/realtime_providers.dart';
 import '../../services/bus_stop_service.dart';
 import '../../services/map_service.dart' show vehicleStatusServiceProvider;
-import '../../providers/realtime_providers.dart';
-import '../../models/vehicle_position.dart';
-import '../../models/bus_stop.dart';
-import '../../models/vehicle_status.dart' as vs;
-import '../../core/utils/date_utils.dart';
+import '../../ui/widgets/gf_app_bar.dart';
+import '../../ui/widgets/map/bus_stops_panel.dart';
+import '../../ui/widgets/map/map_filters.dart';
+import '../../ui/widgets/map/map_legend.dart';
+import '../../ui/widgets/map/vehicle_info_panel.dart';
+import '../../ui/widgets/map/vehicle_marker.dart';
 
 class MapaPage extends ConsumerStatefulWidget {
   const MapaPage({super.key});
@@ -229,9 +230,6 @@ class _MapaPageState extends ConsumerState<MapaPage> {
         initialZoom: 12,
         minZoom: 8,
         maxZoom: 18,
-        interactionOptions: InteractionOptions(
-          
-        ),
       ),
       children: [
         // Camada do mapa
@@ -269,71 +267,67 @@ class _MapaPageState extends ConsumerState<MapaPage> {
     );
   }
 
-  Widget _buildLoadingMap() => Container(
-      color: GolfFoxTheme.backgroundDark,
-      child: const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CircularProgressIndicator(
-              color: GolfFoxTheme.primaryOrange,
-            ),
-            SizedBox(height: 16),
-            Text(
-              'Carregando mapa...',
-              style: TextStyle(
-                fontSize: 16,
-                color: GolfFoxTheme.textSecondary,
+  Widget _buildLoadingMap() => const ColoredBox(
+        color: GolfFoxTheme.backgroundDark,
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(
+                color: GolfFoxTheme.primaryOrange,
               ),
-            ),
-          ],
+              SizedBox(height: 16),
+              Text(
+                'Carregando mapa...',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: GolfFoxTheme.textSecondary,
+                ),
+              ),
+            ],
+          ),
         ),
-      ),
-    );
+      );
 
-  Widget _buildErrorMap(Object error) => Container(
-      color: GolfFoxTheme.backgroundDark,
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(
-              Icons.error_outline,
-              size: 64,
-              color: GolfFoxTheme.error,
-            ),
-            const SizedBox(height: 16),
-            const Text(
-              'Erro ao carregar mapa',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: GolfFoxTheme.textPrimary,
+  Widget _buildErrorMap(Object error) => ColoredBox(
+        color: GolfFoxTheme.backgroundDark,
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.error_outline,
+                size: 64,
+                color: GolfFoxTheme.error,
               ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              error.toString(),
-              style: const TextStyle(
-                fontSize: 14,
-                color: GolfFoxTheme.textSecondary,
+              const SizedBox(height: 16),
+              const Text(
+                'Erro ao carregar mapa',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: GolfFoxTheme.textPrimary,
+                ),
               ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton.icon(
-              onPressed: () => ref.invalidate(vehiclePositionsStreamProvider),
-              icon: const Icon(Icons.refresh),
-              label: const Text('Tentar Novamente'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: GolfFoxTheme.primaryOrange,
-                foregroundColor: Colors.white,
+              const SizedBox(height: 8),
+              Text(
+                '$error',
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: GolfFoxTheme.textSecondary,
+                ),
+                textAlign: TextAlign.center,
               ),
-            ),
-          ],
+              const SizedBox(height: 16),
+              ElevatedButton.icon(
+                onPressed: () => ref.invalidate(vehiclePositionsStreamProvider),
+                icon: const Icon(Icons.refresh),
+                label: const Text('Tentar novamente'),
+              ),
+            ],
+          ),
         ),
-      ),
-    );
+      );
 
   List<VehiclePosition> _filterVehicles(List<VehiclePosition> vehicles) => vehicles.where((vehicle) {
       // Filtro por status
@@ -353,15 +347,12 @@ class _MapaPageState extends ConsumerState<MapaPage> {
   List<String> _getAvailableRoutes() {
     final vehiclePositionsAsync = ref.read(vehiclePositionsStreamProvider);
     return vehiclePositionsAsync.when(
-      data: (vehicles) {
-        final routes = vehicles
-            .where((v) => v.routeName != null)
-            .map((v) => v.routeName!)
-            .toSet()
-            .toList();
-        routes.sort();
-        return routes;
-      },
+      data: (vehicles) => vehicles
+          .where((v) => v.routeName != null)
+          .map((v) => v.routeName!)
+          .toSet()
+          .toList()
+        ..sort(),
       loading: () => [],
       error: (_, __) => [],
     );
@@ -384,8 +375,8 @@ class _MapaPageState extends ConsumerState<MapaPage> {
           _busStops = busStops;
           _showBusStops = true;
         });
-      } catch (e) {
-        print('Erro ao carregar pontos de parada: $e');
+      } on Exception catch (e) {
+        debugPrint('Erro ao carregar pontos de parada: $e');
       }
     }
   }
@@ -422,7 +413,7 @@ class _MapaPageState extends ConsumerState<MapaPage> {
           ElevatedButton(
             onPressed: () {
               Navigator.of(context).pop();
-              // Implementar contato (telefone, WhatsApp, etc.)
+              // TODO(golffox-team): Implementar contato do motorista
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
                   content: Text('Funcionalidade de contato sera implementada'),
@@ -440,35 +431,35 @@ class _MapaPageState extends ConsumerState<MapaPage> {
     _mapController.move(stop.position, 16);
 
     // Mostrar informacoes da parada
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              '${stop.type.icon} ${stop.name}',
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
-            if (stop.landmark != null) Text(stop.landmark!),
-            if (stop.estimatedArrival != null)
+    final messenger = ScaffoldMessenger.of(context);
+    messenger
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
               Text(
-                  'Chegada estimada: ${GfDateUtils.timeAgo(stop.estimatedArrival!)}'),
-          ],
+                '${stop.type.icon} ${stop.name}',
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              if (stop.landmark != null) Text(stop.landmark!),
+              if (stop.estimatedArrival != null)
+                Text(
+                    'Chegada estimada: ${GfDateUtils.timeAgo(stop.estimatedArrival!)}'),
+            ],
+          ),
+          action: SnackBarAction(
+            label: 'OK',
+            onPressed: messenger.hideCurrentSnackBar,
+          ),
         ),
-        action: SnackBarAction(
-          label: 'OK',
-          onPressed: () {
-            ScaffoldMessenger.of(context).hideCurrentSnackBar();
-          },
-        ),
-      ),
-    );
+      );
   }
 
   void _centerMapOnVehicles() {
-    final vehiclePositionsAsync = ref.read(vehiclePositionsStreamProvider);
-    vehiclePositionsAsync.when(
+    ref.read(vehiclePositionsStreamProvider).when(
       data: (vehicles) {
         final filteredVehicles = _filterVehicles(vehicles);
         if (filteredVehicles.isNotEmpty) {
