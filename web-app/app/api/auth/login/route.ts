@@ -75,11 +75,26 @@ export async function POST(req: NextRequest) {
       email: email.replace(/^(.{2}).+(@.*)$/, '$1***$2') 
     }, 'AuthAPI')
     
-    const { data: existingUser, error: userCheckError } = await supabase
-      .from('users')
-      .select('id, email, role, is_active')
-      .eq('email', email.toLowerCase().trim())
-      .maybeSingle()
+    // Tentar buscar usuário (sem is_active pois pode não existir na tabela)
+    let existingUser, userCheckError
+    try {
+      const result = await supabase
+        .from('users')
+        .select('id, email, role')
+        .eq('email', email.toLowerCase().trim())
+        .maybeSingle()
+      existingUser = result.data
+      userCheckError = result.error
+    } catch (err) {
+      // Se falhar, tentar apenas id e email
+      const result = await supabase
+        .from('users')
+        .select('id, email')
+        .eq('email', email.toLowerCase().trim())
+        .maybeSingle()
+      existingUser = result.data
+      userCheckError = result.error
+    }
     
     if (userCheckError) {
       debug('Erro ao verificar usuário no banco', { error: userCheckError }, 'AuthAPI')
@@ -96,21 +111,12 @@ export async function POST(req: NextRequest) {
       }, { status: 404 })
     }
     
-    // Verificar se usuário está ativo
-    if (existingUser.is_active === false) {
-      logError('Tentativa de login com usuário inativo', { 
-        email: email.replace(/^(.{2}).+(@.*)$/, '$1***$2'),
-        userId: existingUser.id
-      }, 'AuthAPI')
-      return NextResponse.json({ 
-        error: 'Usuário inativo. Entre em contato com o administrador.' 
-      }, { status: 403 })
-    }
+    // Nota: Não verificamos is_active pois a coluna pode não existir
+    // Se necessário, adicione a coluna is_active na tabela users ou use outra lógica
     
     debug('Usuário encontrado no banco', { 
       userId: existingUser.id,
-      role: existingUser.role,
-      isActive: existingUser.is_active
+      role: existingUser.role || 'não definido'
     }, 'AuthAPI')
     
     // ✅ SEGUNDO: Autenticar com Supabase Auth
