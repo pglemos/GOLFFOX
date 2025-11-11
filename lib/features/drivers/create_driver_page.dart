@@ -209,7 +209,7 @@ class _CreateDriverPageState extends ConsumerState<CreateDriverPage> {
                   ? const Color(GfTokens.colorSuccess)
                   : isActive
                       ? const Color(GfTokens.colorPrimary)
-                      : const Color(GfTokens.colorOnSurfaceVariant)
+                      : GfTokens.colorOnSurfaceVariant
                           .withValues(alpha: 0.3),
               shape: BoxShape.circle,
             ),
@@ -269,7 +269,7 @@ class _CreateDriverPageState extends ConsumerState<CreateDriverPage> {
                 CircleAvatar(
                   radius: 50,
                   backgroundColor:
-                      const Color(GfTokens.colorPrimary).withValues(alpha: 0.1),
+                      GfTokens.colorPrimary.withValues(alpha: 0.1),
                   backgroundImage: _photoUrl != null 
                       ? NetworkImage(_photoUrl!)
                       : null,
@@ -366,7 +366,7 @@ class _CreateDriverPageState extends ConsumerState<CreateDriverPage> {
                 return 'Telefone é obrigatório';
               }
               if (value.length < 10) {
-                return 'Telefone deve ter pelo menos 10 digitos';
+                return 'Telefone deve ter pelo menos 10 dígitos';
               }
               return null;
             },
@@ -449,7 +449,7 @@ class _CreateDriverPageState extends ConsumerState<CreateDriverPage> {
             onTap: _selectHireDate,
             child: InputDecorator(
               decoration: const InputDecoration(
-                labelText: 'Data de Contratacao',
+                labelText: 'Data de Contratação',
                 prefixIcon: Icon(Icons.work),
               ),
               child: Text(
@@ -502,7 +502,7 @@ class _CreateDriverPageState extends ConsumerState<CreateDriverPage> {
               Expanded(
                 child: SwitchListTile(
                   title: const Text('Online'),
-                  subtitle: const Text('Disponivel para receber viagens'),
+                  subtitle: const Text('Disponível para receber viagens'),
                   value: _isOnline,
                   onChanged: (value) {
                     setState(() {
@@ -513,8 +513,8 @@ class _CreateDriverPageState extends ConsumerState<CreateDriverPage> {
               ),
               Expanded(
                 child: SwitchListTile(
-                  title: const Text('Disponivel'),
-                  subtitle: const Text('Pode ser atribuido a veículos'),
+                  title: const Text('Disponível'),
+                  subtitle: const Text('Pode ser atribuído a veículos'),
                   value: _isAvailable,
                   onChanged: (value) {
                     setState(() {
@@ -738,7 +738,7 @@ class _CreateDriverPageState extends ConsumerState<CreateDriverPage> {
                   ),
                   SizedBox(height: GfTokens.spacingMd),
                   Text(
-                    'Nenhuma certificacao adicionada',
+                    'Nenhuma certificação adicionada',
                     style: TextStyle(
                       color: Color(GfTokens.colorOnSurfaceVariant),
                     ),
@@ -888,7 +888,7 @@ class _CreateDriverPageState extends ConsumerState<CreateDriverPage> {
     // TODO(golffox-team): Implementar selecao de foto
     SnackBarService.infoText(
       context,
-      'Funcionalidade de foto sera implementada em breve',
+      'Funcionalidade de foto será implementada em breve',
     );
   }
 
@@ -956,7 +956,7 @@ class _CreateDriverPageState extends ConsumerState<CreateDriverPage> {
     // TODO(golffox-team): Implementar adicao de certificacao
     SnackBarService.infoText(
       context,
-      'Funcionalidade de certificacao sera implementada em breve',
+      'Funcionalidade de certificação será implementada em breve',
     );
   }
 

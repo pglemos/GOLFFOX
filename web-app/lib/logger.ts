@@ -20,6 +20,22 @@ const isProduction = process.env.NODE_ENV === 'production'
  * Em desenvolvimento: todos os logs são exibidos
  */
 class Logger {
+  private sanitize(meta?: Record<string, unknown>): Record<string, unknown> | undefined {
+    if (!meta) return meta
+    const sensitiveKeys = [
+      'password', 'token', 'authorization', 'accessToken', 'refreshToken',
+      'api_key', 'apikey', 'secret', 'jwt', 'session', 'cpf', 'cnpj'
+    ]
+    const redacted: Record<string, unknown> = {}
+    for (const [k, v] of Object.entries(meta)) {
+      if (sensitiveKeys.some(sk => k.toLowerCase().includes(sk))) {
+        redacted[k] = '[REDACTED]'
+      } else {
+        redacted[k] = v
+      }
+    }
+    return redacted
+  }
   private shouldLog(level: LogLevel): boolean {
     if (isProduction) {
       return level === 'error' || level === 'warn'
@@ -44,7 +60,7 @@ class Logger {
       ts: new Date().toISOString(),
       level,
       message,
-      meta,
+      meta: this.sanitize(meta),
       context,
     }
 
@@ -58,18 +74,18 @@ class Logger {
 
     switch (level) {
       case 'error':
-        console.error(formattedMessage, meta || '')
+        console.error(formattedMessage, entry.meta || '')
         this.sendToWebhook(entry)
         break
       case 'warn':
-        console.warn(formattedMessage, meta || '')
+        console.warn(formattedMessage, entry.meta || '')
         break
       case 'info':
-        console.info(formattedMessage, meta || '')
+        console.info(formattedMessage, entry.meta || '')
         break
       case 'debug':
         if (isDevelopment) {
-          console.debug(formattedMessage, meta || '')
+          console.debug(formattedMessage, entry.meta || '')
         }
         break
     }

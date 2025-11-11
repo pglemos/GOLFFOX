@@ -36,6 +36,7 @@ class MapaPage extends ConsumerStatefulWidget {
 class _MapaPageState extends ConsumerState<MapaPage> {
   final MapController _mapController = MapController();
   VehiclePosition? _selectedVehicle;
+  // Usa o enum simples de status do modelo VehiclePosition para filtro
   List<VehicleStatus> _selectedStatuses = [];
   String? _selectedRoute;
   bool _isTracking = false;
@@ -96,6 +97,7 @@ class _MapaPageState extends ConsumerState<MapaPage> {
               availableCarriers: const [],
               onFiltersChanged: (statuses, route) {
                 setState(() {
+                  // Converte nomes de status (strings) para o enum VehicleStatus correto
                   _selectedStatuses = statuses
                       .map((status) => VehicleStatus.values
                           .firstWhere((e) => e.name == status))
@@ -160,7 +162,8 @@ class _MapaPageState extends ConsumerState<MapaPage> {
                 // Botao de atualizacao
                 FloatingActionButton(
                   heroTag: 'refresh',
-                  onPressed: () => ref.invalidate(vehiclePositionsStreamProvider),
+                  onPressed: () =>
+                      ref.invalidate(vehiclePositionsStreamProvider),
                   backgroundColor: GolfFoxTheme.backgroundLight,
                   foregroundColor: GolfFoxTheme.primaryOrange,
                   child: const Icon(Icons.refresh),
@@ -331,20 +334,21 @@ class _MapaPageState extends ConsumerState<MapaPage> {
         ),
       );
 
-  List<VehiclePosition> _filterVehicles(List<VehiclePosition> vehicles) => vehicles.where((vehicle) {
-      // Filtro por status
-      if (_selectedStatuses.isNotEmpty &&
-          !_selectedStatuses.contains(vehicle.status)) {
-        return false;
-      }
+  List<VehiclePosition> _filterVehicles(List<VehiclePosition> vehicles) =>
+      vehicles.where((vehicle) {
+        // Filtro por status
+        if (_selectedStatuses.isNotEmpty &&
+            !_selectedStatuses.contains(vehicle.status)) {
+          return false;
+        }
 
-      // Filtro por rota
-      if (_selectedRoute != null && vehicle.routeName != _selectedRoute) {
-        return false;
-      }
+        // Filtro por rota
+        if (_selectedRoute != null && vehicle.routeName != _selectedRoute) {
+          return false;
+        }
 
-      return true;
-    }).toList();
+        return true;
+      }).toList();
 
   List<String> _getAvailableRoutes() {
     final vehiclePositionsAsync = ref.read(vehiclePositionsStreamProvider);
@@ -406,23 +410,23 @@ class _MapaPageState extends ConsumerState<MapaPage> {
       builder: (context) => AlertDialog(
         title: Text('Contatar ${vehicle.driverName}'),
         content: Text(
-            'Deseja entrar em contato com o motorista do veiculo ${vehicle.licensePlate}?'),
+            'Deseja entrar em contato com o motorista do veículo ${vehicle.licensePlate}?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
             child: const Text('Cancelar'),
           ),
           ElevatedButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-            // TODO(golffox-team): Implementar contato do motorista
-            SnackBarService.info(
-              context,
-              'mapa.contact.soon',
-            );
-          },
-          child: const Text('Contatar'),
-        ),
+            onPressed: () {
+              Navigator.of(context).pop();
+              // TODO(golffox-team): Implementar contato do motorista
+              SnackBarService.info(
+                context,
+                'mapa.contact.soon',
+              );
+            },
+            child: const Text('Contatar'),
+          ),
         ],
       ),
     );
@@ -455,21 +459,21 @@ class _MapaPageState extends ConsumerState<MapaPage> {
 
   void _centerMapOnVehicles() {
     ref.read(vehiclePositionsStreamProvider).when(
-      data: (vehicles) {
-        final filteredVehicles = _filterVehicles(vehicles);
-        if (filteredVehicles.isNotEmpty) {
-          final bounds = _calculateBounds(filteredVehicles);
-          _mapController.fitCamera(
-            CameraFit.bounds(
-              bounds: bounds,
-              padding: const EdgeInsets.all(50),
-            ),
-          );
-        }
-      },
-      loading: () {},
-      error: (_, __) {},
-    );
+          data: (vehicles) {
+            final filteredVehicles = _filterVehicles(vehicles);
+            if (filteredVehicles.isNotEmpty) {
+              final bounds = _calculateBounds(filteredVehicles);
+              _mapController.fitCamera(
+                CameraFit.bounds(
+                  bounds: bounds,
+                  padding: const EdgeInsets.all(50),
+                ),
+              );
+            }
+          },
+          loading: () {},
+          error: (_, __) {},
+        );
   }
 
   LatLngBounds _calculateBounds(List<VehiclePosition> vehicles) {

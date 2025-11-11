@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer' as developer;
 import 'package:flutter/foundation.dart';
 
@@ -15,6 +16,7 @@ enum LogLevel {
 /// Sistema de logging seguro da aplicação
 class AppLogger {
   static const String _name = 'GolfFox';
+  static final List<LogRecordHandler> _externalHandlers = [];
   
   // Palavras-chave sensíveis que devem ser mascaradas
   static const List<String> _sensitiveKeywords = [
@@ -32,6 +34,13 @@ class AppLogger {
     'api_key',
     'private',
   ];
+
+  /// Registra manipuladores externos (Crashlytics, Sentry, etc).
+  /// Retorna uma callback que remove o handler.
+  static VoidCallback registerExternalHandler(LogRecordHandler handler) {
+    _externalHandlers.add(handler);
+    return () => _externalHandlers.remove(handler);
+  }
 
   /// Log de debug (apenas em modo debug)
   static void debug(String message, {String? tag, Object? error, StackTrace? stackTrace}) {
@@ -151,32 +160,38 @@ Body: $sanitizedBody
     String? tag,
     Object? error,
     StackTrace? stackTrace,
+    Map<String, Object?>? metadata,
   }) {
-    final timestamp = DateTime.now().toIso8601String();
+    final now = DateTime.now();
+    final timestamp = now.toIso8601String();
     final levelStr = level.name.toUpperCase().padRight(8);
     final tagStr = tag != null ? '[$tag] ' : '';
     final sanitizedMessage = _sanitizeMessage(message);
 
     final logMessage = '[$timestamp] $levelStr $tagStr$sanitizedMessage';
+    final record = LogRecord(
+      level: level,
+      message: sanitizedMessage,
+      timestamp: now,
+      tag: tag,
+      error: error,
+      stackTrace: stackTrace,
+      metadata: metadata,
+    );
 
-    // Em desenvolvimento, usamos apenas developer.log para evitar duplicidade de saída
-
-    // Log usando developer.log para melhor integração com ferramentas
     developer.log(
       logMessage,
-      time: DateTime.now(),
+      time: now,
       level: _getLevelValue(level),
       name: _name,
       error: error,
       stackTrace: stackTrace,
     );
 
-    // Em produção, enviar logs críticos para serviços externos
     if (!kDebugMode && (level == LogLevel.error || level == LogLevel.critical)) {
-      _sendToExternalService(level, sanitizedMessage, error, stackTrace);
+      _sendToExternalService(record);
     }
   }
-
   /// Sanitiza dados removendo informações sensíveis
   static dynamic _sanitizeData(Object? data) {
     if (data == null) {
@@ -263,33 +278,25 @@ Body: $sanitizedBody
   }
 
   /// Envia logs críticos para serviços externos (em produção)
-  static void _sendToExternalService(
-    LogLevel level,
-    String message,
-    Object? error,
-    StackTrace? stackTrace,
-  ) {
-    // Aqui você pode integrar com serviços como:
-    // - Firebase Crashlytics
-    // - Sentry
-    // - LogRocket
-    // - Datadog
-    // etc.
-    
-    // Exemplo de estrutura de dados para envio:
-    final logData = {
-      'level': level.name,
-      'message': message,
-      'timestamp': DateTime.now().toIso8601String(),
-      'platform': 'flutter',
-      'version': '1.0.0', // Versão da app
-      if (error != null) 'error': error.toString(),
-      if (stackTrace != null) 'stackTrace': stackTrace.toString(),
-    };
+  static void _sendToExternalService(LogRecord record) {
+    if (_externalHandlers.isEmpty) {
+      if (kDebugMode) {
+        debugPrint('External log handler not configured. '
+            'Record skipped: ${record.level.name} - ${record.message}');
+      }
+      return;
+    }
 
-    // TODO(golffox): Integrate with external logging service
-    if (kDebugMode) {
-      debugPrint('Would send to external service: $logData');
+    for (final handler in List<LogRecordHandler>.from(_externalHandlers)) {
+      try {
+        final result = handler(record);
+        if (result is Future) {
+          unawaited(result);
+        }
+      } catch (error, stackTrace) {
+        debugPrint('Failed to forward log record: $error');
+        debugPrintStack(stackTrace: stackTrace);
+      }
     }
   }
 
@@ -337,3 +344,27 @@ Body: $sanitizedBody
     }
   }
 }
+
+/// Estrutura de um registro de log
+class LogRecord {
+  final LogLevel level;
+  final String message;
+  final DateTime timestamp;
+  final String? tag;
+  final Object? error;
+  final StackTrace? stackTrace;
+  final Map<String, Object?>? metadata;
+
+  LogRecord({
+    required this.level,
+    required this.message,
+    required this.timestamp,
+    this.tag,
+    this.error,
+    this.stackTrace,
+    this.metadata,
+  });
+}
+
+/// Assinatura de manipuladores externos de log (Crashlytics, Sentry, etc.)
+typedef LogRecordHandler = FutureOr<void> Function(LogRecord record);

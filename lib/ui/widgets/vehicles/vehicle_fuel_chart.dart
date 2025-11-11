@@ -160,10 +160,10 @@ class _VehicleFuelChartState extends ConsumerState<VehicleFuelChart> {
         });
       },
       backgroundColor: isSelected
-          ? const Color(GfTokens.colorPrimary).withValues(alpha: 0.1)
+          ? GfTokens.colorPrimary.withValues(alpha: 0.1)
           : null,
       selectedColor:
-          const Color(GfTokens.colorPrimary).withValues(alpha: 0.2),
+          GfTokens.colorPrimary.withValues(alpha: 0.2),
       checkmarkColor: const Color(GfTokens.colorPrimary),
       side: BorderSide(
         color: isSelected
@@ -208,9 +208,9 @@ class _VehicleFuelChartState extends ConsumerState<VehicleFuelChart> {
       String title, String value, IconData icon, Color color) => Container(
       padding: const EdgeInsets.all(GfTokens.spacingMd),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
+        color: color.withOpacity(0.1),
         borderRadius: BorderRadius.circular(GfTokens.radiusSm),
-        border: Border.all(color: color.withValues(alpha: 0.3)),
+        border: Border.all(color: color.withOpacity(0.3)),
       ),
       child: Column(
         children: [

@@ -1,21 +1,22 @@
 // ========================================
 // GolfFox Supabase Environment v11.0
-// Configuracao de ambiente do Supabase
+// Configuração de ambiente do Supabase (sem segredos hardcoded)
 // ========================================
 
 class SupaEnv {
   // ========================================
   // CONFIGURACOES DO SUPABASE
   // ========================================
+  // Em produção e desenvolvimento, estes valores DEVEM vir via --dart-define
+  // ou variáveis de ambiente em tempo de build. Não manter valores reais no código.
   static const String supabaseUrl = String.fromEnvironment(
     'SUPABASE_URL',
-    defaultValue: 'https://vmoxzesvjcfmrebagcwo.supabase.co',
+    defaultValue: '',
   );
 
   static const String supabaseAnonKey = String.fromEnvironment(
     'SUPABASE_ANON_KEY',
-    defaultValue:
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZtb3h6ZXN2amNmbXJlYmFnY3dvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE1MTQyMTMsImV4cCI6MjA3NzA5MDIxM30.QKRKu1bIPhsyDPFuBKEIjseC5wNC35RKbOxQ7FZmEvU',
+    defaultValue: '',
   );
 
   // ========================================
