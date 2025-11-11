@@ -345,7 +345,7 @@ class DashboardPage extends ConsumerWidget {
                         ),
                       ),
                       belowBarData: BarAreaData(
-                        color: GfTokens.brand.withValues(alpha: 0.1),
+                        color: const Color(GfTokens.brand).withValues(alpha: 0.1),
                       ),
                     ),
                   ],
@@ -433,7 +433,7 @@ class DashboardPage extends ConsumerWidget {
               Container(
                 padding: const EdgeInsets.all(GfTokens.space2),
                 decoration: BoxDecoration(
-                  color: GfTokens.brand.withValues(alpha: 0.1),
+                  color: const Color(GfTokens.brand).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(GfTokens.radiusSmall),
                 ),
                 child: const Icon(

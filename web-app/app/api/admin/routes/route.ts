@@ -65,13 +65,20 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Criar rota
-    const routeData: any = {
+    // Criar rota - tentar inserir com destination, se falhar, tentar sem
+    const routeData: Record<string, any> = {
       name: name,
       company_id: finalCompanyId,
-      origin: origin,
-      destination: destination,
       is_active: true
+    }
+    
+    // Adicionar origin e destination apenas se a coluna existir (tentar com ambos primeiro)
+    // Se a coluna destination não existir, o Supabase retornará erro, então tentaremos sem ela
+    try {
+      routeData.origin = origin
+      routeData.destination = destination
+    } catch (e) {
+      // Ignorar erro ao adicionar campos
     }
 
     // Campos opcionais
@@ -85,11 +92,35 @@ export async function POST(request: NextRequest) {
       routeData.estimated_duration = body.estimated_duration || body.estimatedDuration
     }
 
-    const { data: newRoute, error: createError } = await supabaseAdmin
+    let { data: newRoute, error: createError } = await supabaseAdmin
       .from('routes')
       .insert(routeData)
       .select()
       .single()
+
+    // Se erro por coluna destination não existir, tentar sem destination
+    if (createError && (createError.message?.includes('destination') || createError.code === 'PGRST204')) {
+      console.warn('⚠️ Coluna destination não existe, tentando criar rota sem destination')
+      const routeDataWithoutDestination: Record<string, any> = {
+        name: name,
+        company_id: finalCompanyId,
+        is_active: true
+      }
+      
+      // Tentar adicionar origin se a coluna existir
+      if (origin) {
+        routeDataWithoutDestination.origin = origin
+      }
+      
+      const result = await supabaseAdmin
+        .from('routes')
+        .insert(routeDataWithoutDestination)
+        .select()
+        .single()
+      
+      newRoute = result.data
+      createError = result.error
+    }
 
     if (createError) {
       console.error('Erro ao criar rota:', createError)

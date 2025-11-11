@@ -162,9 +162,9 @@ class _VehicleMaintenanceListState
         });
       },
       backgroundColor: isSelected
-          ? GfTokens.colorPrimary.withValues(alpha: 0.1)
+          ? const Color(GfTokens.colorPrimary).withValues(alpha: 0.1)
           : null,
-      selectedColor: GfTokens.colorPrimary.withValues(alpha: 0.2),
+      selectedColor: const Color(GfTokens.colorPrimary).withValues(alpha: 0.2),
       checkmarkColor: const Color(GfTokens.colorPrimary),
       side: BorderSide(
         color: isSelected
