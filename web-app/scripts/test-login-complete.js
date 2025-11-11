@@ -83,36 +83,36 @@ async function testUserExists() {
   try {
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
     
-    // Verificar se usuário existe na tabela users
-    // Primeiro, tentar sem is_active (pode não existir)
-    let userData, userError
-    try {
-      const result = await supabase
-        .from('users')
-        .select('id, email, role')
-        .eq('email', TEST_EMAIL)
-        .maybeSingle()
-      userData = result.data
-      userError = result.error
-    } catch (err) {
-      // Se falhar, tentar apenas id e email
-      const result = await supabase
-        .from('users')
-        .select('id, email')
-        .eq('email', TEST_EMAIL)
-        .maybeSingle()
-      userData = result.data
-      userError = result.error
+    // Primeiro, autenticar para poder acessar a tabela users (RLS)
+    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+      email: TEST_EMAIL,
+      password: TEST_PASSWORD,
+    })
+    
+    if (authError) {
+      logTest('Autenticação para verificar usuário', false, authError.message)
+      return false
     }
+    
+    logTest('Autenticação para verificar usuário', true, 'Autenticado com sucesso')
+    
+    // Agora verificar se usuário existe na tabela users (já autenticado)
+    const { data: userData, error: userError } = await supabase
+      .from('users')
+      .select('id, email, role')
+      .eq('email', TEST_EMAIL)
+      .maybeSingle()
     
     if (userError) {
       logTest('Usuário existe na tabela users', false, userError.message)
+      await supabase.auth.signOut()
       return false
     }
     
     if (!userData) {
       logTest('Usuário existe na tabela users', false, 'Usuário não encontrado na tabela users')
-      log(`   ⚠️  Criar usuário com email: ${TEST_EMAIL}`, colors.yellow)
+      log(`   ⚠️  Execute: node scripts/create-user-in-db.js`, colors.yellow)
+      await supabase.auth.signOut()
       return false
     }
     
@@ -123,6 +123,7 @@ async function testUserExists() {
       logTest('Usuário tem role definido', false, 'Coluna role não encontrada - sistema usará fallback')
     }
     
+    await supabase.auth.signOut()
     return true
   } catch (err) {
     logTest('Verificar usuário no banco', false, err.message)
@@ -173,12 +174,11 @@ async function testAuthentication() {
 
 async function testLoginAPI() {
   log('\n═══════════════════════════════════════', colors.bright)
-  log('🧪 TESTE 4: API de Login', colors.bright)
+  log('🧪 TESTE 4: API de Login (Simulação)', colors.bright)
   log('═══════════════════════════════════════\n', colors.bright)
   
   try {
-    // Simular requisição à API de login
-    // Como estamos testando localmente, vamos testar a lógica diretamente
+    // Simular o fluxo da API de login
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
       auth: {
         autoRefreshToken: false,
@@ -186,40 +186,7 @@ async function testLoginAPI() {
       },
     })
     
-    // 1. Verificar se usuário existe
-    // Tentar com role primeiro, se falhar tentar sem
-    let existingUser, userCheckError
-    try {
-      const result = await supabase
-        .from('users')
-        .select('id, email, role')
-        .eq('email', TEST_EMAIL.toLowerCase().trim())
-        .maybeSingle()
-      existingUser = result.data
-      userCheckError = result.error
-    } catch (err) {
-      const result = await supabase
-        .from('users')
-        .select('id, email')
-        .eq('email', TEST_EMAIL.toLowerCase().trim())
-        .maybeSingle()
-      existingUser = result.data
-      userCheckError = result.error
-    }
-    
-    if (userCheckError) {
-      logTest('API: Verificar usuário no banco', false, userCheckError.message)
-      return false
-    }
-    
-    if (!existingUser) {
-      logTest('API: Verificar usuário no banco', false, 'Usuário não encontrado')
-      return false
-    }
-    
-    logTest('API: Verificar usuário no banco', true, `ID: ${existingUser.id}`)
-    
-    // 2. Autenticar
+    // 1. PRIMEIRO: Autenticar (a API faz isso primeiro)
     const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
       email: TEST_EMAIL,
       password: TEST_PASSWORD,
@@ -237,11 +204,33 @@ async function testLoginAPI() {
     
     logTest('API: Autenticação', true, 'Sessão criada com sucesso')
     
-    // 3. Verificar role
+    // 2. SEGUNDO: Verificar se usuário existe (já autenticado, RLS permite)
+    const { data: existingUser, error: userCheckError } = await supabase
+      .from('users')
+      .select('id, email, role')
+      .eq('email', TEST_EMAIL.toLowerCase().trim())
+      .maybeSingle()
+    
+    if (userCheckError) {
+      logTest('API: Verificar usuário no banco', false, userCheckError.message)
+      await supabase.auth.signOut()
+      return false
+    }
+    
+    if (!existingUser) {
+      logTest('API: Verificar usuário no banco', false, 'Usuário não encontrado após autenticação')
+      log(`   ⚠️  Execute: node scripts/create-user-in-db.js`, colors.yellow)
+      await supabase.auth.signOut()
+      return false
+    }
+    
+    logTest('API: Verificar usuário no banco', true, `ID: ${existingUser.id}`)
+    
+    // 3. TERCEIRO: Verificar role
     const role = existingUser.role || authData.user.user_metadata?.role || 'admin'
     logTest('API: Role determinado', !!role, `Role: ${role}`)
     
-    // 4. Verificar estrutura de resposta
+    // 4. QUARTO: Verificar estrutura de resposta
     const responseStructure = {
       token: !!authData.session.access_token,
       refreshToken: !!authData.session.refresh_token,
@@ -252,6 +241,12 @@ async function testLoginAPI() {
     logTest('API: Estrutura de resposta', 
       Object.values(responseStructure).every(v => v === true),
       'Todos os campos necessários presentes'
+    )
+    
+    // 5. Verificar se a resposta teria os dados da sessão
+    logTest('API: Dados de sessão disponíveis', 
+      !!authData.session.access_token && !!authData.session.refresh_token,
+      'Access token e refresh token presentes'
     )
     
     // Limpar
