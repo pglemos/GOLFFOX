@@ -4,6 +4,12 @@ import { createClient } from '@supabase/supabase-js'
 
 export async function middleware(request: NextRequest) {
   const { pathname, searchParams } = request.nextUrl
+  
+  // ✅ Bypass para rotas de API - não aplicar middleware em rotas de API
+  if (pathname.startsWith('/api')) {
+    return NextResponse.next()
+  }
+  
   const response = NextResponse.next()
 
   // Redirecionar /login para / (raiz)
@@ -50,8 +56,10 @@ export async function middleware(request: NextRequest) {
     // Se há cookie de sessão, validar
     if (sessionCookie) {
       try {
-        // Decodificar cookie (base64)
-        const decoded = Buffer.from(sessionCookie, 'base64').toString('utf-8')
+        // Decodificar cookie (base64) em ambiente Edge (sem Buffer)
+        const decoded = typeof atob === 'function'
+          ? atob(sessionCookie)
+          : Buffer.from(sessionCookie, 'base64').toString('utf-8')
         const userData = JSON.parse(decoded)
 
         if (!userData?.id || !userData?.role) {
@@ -113,5 +121,13 @@ export const config = {
     '/admin/:path*',
     '/operator',
     '/operator/:path*',
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     */
+    '/((?!api|_next/static|_next/image|favicon.ico).*)',
   ],
 }
