@@ -29,10 +29,34 @@ export async function DELETE(_req: NextRequest, { params }: { params: { vehicleI
   // Validar formato UUID antes de consultar banco
   if (!isValidUUID(vehicleId)) {
     debug("UUID inválido recebido", { vehicleId }, CONTEXT)
-    return NextResponse.json({ error: "invalid_vehicle_id_format" }, { status: 400 })
+    return NextResponse.json({ error: "invalid_vehicle_id_format", tripsCount: 0, archived: false }, { status: 400 })
   }
 
   try {
+    // PRIMEIRO: Verificar se o veículo existe antes de qualquer outra operação
+    const { data: existingVehicle, error: checkError } = await supabaseServiceRole
+      .from("vehicles")
+      .select("id")
+      .eq("id", vehicleId)
+      .maybeSingle()
+
+    if (checkError) {
+      logError("Erro ao verificar existência do veículo", { vehicleId, error: checkError }, CONTEXT)
+      return NextResponse.json({ error: "vehicle_check_failed", tripsCount: 0, archived: false }, { status: 500 })
+    }
+
+    // Se o veículo não existe, retornar sucesso (idempotência)
+    if (!existingVehicle) {
+      debug("Veículo não encontrado (já foi deletado ou nunca existiu)", { vehicleId }, CONTEXT)
+      return NextResponse.json({ 
+        success: true, 
+        archived: false, 
+        tripsCount: 0, 
+        message: "Vehicle not found" 
+      }, { status: 200 })
+    }
+
+    // SEGUNDO: Verificar viagens associadas ao veículo
     const { count: tripsCount, error: tripsError } = await supabaseServiceRole
       .from("trips")
       .select("id", { head: true, count: "exact" })
@@ -40,7 +64,7 @@ export async function DELETE(_req: NextRequest, { params }: { params: { vehicleI
 
     if (tripsError) {
       logError("Erro ao verificar viagens associadas ao veículo", { vehicleId, error: tripsError }, CONTEXT)
-      return NextResponse.json({ error: "trip_check_failed", tripsCount: 0 }, { status: 500 })
+      return NextResponse.json({ error: "trip_check_failed", tripsCount: 0, archived: false }, { status: 500 })
     }
 
     if ((tripsCount ?? 0) > 0) {
@@ -51,13 +75,14 @@ export async function DELETE(_req: NextRequest, { params }: { params: { vehicleI
 
       if (archiveError) {
         logError("Erro ao arquivar veículo com viagens associadas", { vehicleId, error: archiveError }, CONTEXT)
-        return NextResponse.json({ error: "vehicle_archive_failed", tripsCount: tripsCount ?? 0 }, { status: 500 })
+        return NextResponse.json({ error: "vehicle_archive_failed", tripsCount: tripsCount ?? 0, archived: false }, { status: 500 })
       }
 
       debug("Veículo marcado como inativo devido a viagens associadas", { vehicleId, tripsCount }, CONTEXT)
-      return NextResponse.json({ success: true, archived: true, tripsCount }, { status: 200 })
+      return NextResponse.json({ success: true, archived: true, tripsCount: tripsCount ?? 0 }, { status: 200 })
     }
 
+    // TERCEIRO: Deletar dependências (manutenções e checklists)
     const { error: maintenanceError } = await supabaseServiceRole
       .from("gf_vehicle_maintenance")
       .delete()
@@ -65,7 +90,7 @@ export async function DELETE(_req: NextRequest, { params }: { params: { vehicleI
 
     if (maintenanceError) {
       logError("Erro ao excluir manutenções vinculadas ao veículo", { vehicleId, error: maintenanceError }, CONTEXT)
-      return NextResponse.json({ error: "maintenance_delete_failed", tripsCount: 0 }, { status: 500 })
+      return NextResponse.json({ error: "maintenance_delete_failed", tripsCount: 0, archived: false }, { status: 500 })
     }
 
     const { error: checklistError } = await supabaseServiceRole
@@ -75,27 +100,10 @@ export async function DELETE(_req: NextRequest, { params }: { params: { vehicleI
 
     if (checklistError) {
       logError("Erro ao excluir checklists vinculados ao veículo", { vehicleId, error: checklistError }, CONTEXT)
-      return NextResponse.json({ error: "checklist_delete_failed", tripsCount: 0 }, { status: 500 })
+      return NextResponse.json({ error: "checklist_delete_failed", tripsCount: 0, archived: false }, { status: 500 })
     }
 
-    // Verificar se o veículo existe antes de deletar
-    const { data: existingVehicle, error: checkError } = await supabaseServiceRole
-      .from("vehicles")
-      .select("id")
-      .eq("id", vehicleId)
-      .maybeSingle()
-
-    if (checkError) {
-      logError("Erro ao verificar existência do veículo", { vehicleId, error: checkError }, CONTEXT)
-      return NextResponse.json({ error: "vehicle_check_failed", tripsCount: 0 }, { status: 500 })
-    }
-
-    // Se o veículo não existe, retornar sucesso (idempotência)
-    if (!existingVehicle) {
-      debug("Veículo não encontrado (já foi deletado ou nunca existiu)", { vehicleId }, CONTEXT)
-      return NextResponse.json({ success: true, tripsCount: 0, message: "Vehicle not found" }, { status: 200 })
-    }
-
+    // QUARTO: Deletar o veículo
     const { error: deleteError } = await supabaseServiceRole
       .from("vehicles")
       .delete()
@@ -104,6 +112,7 @@ export async function DELETE(_req: NextRequest, { params }: { params: { vehicleI
     if (deleteError) {
       logError("Erro ao excluir veículo", { vehicleId, error: deleteError }, CONTEXT)
       if (deleteError.code === "23503") {
+        // Violação de foreign key - tentar arquivar
         const { count: blockingTrips } = await supabaseServiceRole
           .from("trips")
           .select("id", { head: true, count: "exact" })
@@ -116,20 +125,20 @@ export async function DELETE(_req: NextRequest, { params }: { params: { vehicleI
 
         if (archiveAfterFailure) {
           logError("Erro ao arquivar veículo após falha de exclusão por dependências", { vehicleId, error: archiveAfterFailure }, CONTEXT)
-          return NextResponse.json({ error: "vehicle_in_use", tripsCount: blockingTrips ?? null }, { status: 409 })
+          return NextResponse.json({ error: "vehicle_in_use", tripsCount: blockingTrips ?? 0, archived: false }, { status: 409 })
         }
 
         debug("Veículo marcado como inativo após detectar viagens associadas na exclusão", { vehicleId, tripsCount: blockingTrips }, CONTEXT)
-        return NextResponse.json({ success: true, archived: true, tripsCount: blockingTrips ?? null }, { status: 200 })
+        return NextResponse.json({ success: true, archived: true, tripsCount: blockingTrips ?? 0 }, { status: 200 })
       }
-      return NextResponse.json({ error: "vehicle_delete_failed", tripsCount: 0 }, { status: 500 })
+      return NextResponse.json({ error: "vehicle_delete_failed", tripsCount: 0, archived: false }, { status: 500 })
     }
 
     debug("Veículo excluído com sucesso", { vehicleId }, CONTEXT)
-    return NextResponse.json({ success: true, tripsCount: 0 }, { status: 200 })
+    return NextResponse.json({ success: true, tripsCount: 0, archived: false }, { status: 200 })
   } catch (error: unknown) {
     logError("Erro inesperado ao excluir veículo", { vehicleId, error }, CONTEXT)
-    return NextResponse.json({ error: "internal_error", tripsCount: 0 }, { status: 500 })
+    return NextResponse.json({ error: "internal_error", tripsCount: 0, archived: false }, { status: 500 })
   }
 }
 

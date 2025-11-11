@@ -1,48 +1,30 @@
 import requests
-from requests.auth import HTTPBasicAuth
 
 BASE_URL = "http://localhost:3000"
-LOGIN_URL = f"{BASE_URL}/api/auth/login"
 CRON_DISPATCH_URL = f"{BASE_URL}/api/cron/dispatch-reports"
-USERNAME = "golffox@admin.com"
-PASSWORD = "senha123"
 TIMEOUT = 30
 
-def test_cron_dispatch_reports():
-    # Authenticate to get a token
+VALID_CRON_SECRET = "valid-cron-secret"
+INVALID_CRON_SECRET = "invalid-cron-secret"
+
+def test_cron_job_dispatch_scheduled_reports():
     try:
-        login_response = requests.post(
-            LOGIN_URL,
-            json={"email": USERNAME, "password": PASSWORD},
-            timeout=TIMEOUT
-        )
-        assert login_response.status_code == 200, "Login failed"
-        login_data = login_response.json()
-        token = login_data.get("token")
-        assert token, "Token not found in login response"
-    except Exception as e:
-        raise AssertionError(f"Login request failed: {e}")
+        # Test valid cronSecret dispatch
+        headers_valid = {
+            "cronSecret": VALID_CRON_SECRET
+        }
+        resp_dispatch_valid = requests.post(CRON_DISPATCH_URL, headers=headers_valid, timeout=TIMEOUT)
+        assert resp_dispatch_valid.status_code == 200, f"Expected 200 for valid cronSecret but got {resp_dispatch_valid.status_code}"
 
-    headers = {
-        "Authorization": f"Bearer {token}"
-    }
+        # Test invalid cronSecret dispatch
+        headers_invalid = {
+            "cronSecret": INVALID_CRON_SECRET
+        }
+        resp_dispatch_invalid = requests.post(CRON_DISPATCH_URL, headers=headers_invalid, timeout=TIMEOUT)
+        assert resp_dispatch_invalid.status_code == 401, f"Expected 401 for invalid cronSecret but got {resp_dispatch_invalid.status_code}"
 
-    # Test: invalid CRON_SECRET
-    invalid_headers = headers.copy()
-    invalid_headers["x-cron-secret"] = "invalid_secret"
-    try:
-        invalid_response = requests.post(
-            CRON_DISPATCH_URL,
-            headers=invalid_headers,
-            timeout=TIMEOUT
-        )
-        assert invalid_response.status_code == 401, (
-            f"Expected 401 for invalid CRON_SECRET, got {invalid_response.status_code} with body: {invalid_response.text}"
-        )
-    except Exception as e:
-        raise AssertionError(f"Invalid secret dispatch request failed: {e}")
-
-    # Note: Skipping valid CRON_SECRET test because real secret is unknown
+    except requests.RequestException as e:
+        assert False, f"Request failed: {e}"
 
 
-test_cron_dispatch_reports()
+test_cron_job_dispatch_scheduled_reports()
