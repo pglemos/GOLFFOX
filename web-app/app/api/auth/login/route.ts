@@ -70,56 +70,12 @@ export async function POST(req: NextRequest) {
   })
 
   try {
-    // ✅ PRIMEIRO: Verificar se o usuário existe na tabela users do Supabase
-    debug('Verificando se usuário existe no banco de dados', { 
+    // ✅ PRIMEIRO: Autenticar com Supabase Auth
+    // IMPORTANTE: Autenticar PRIMEIRO, depois verificar usuário no banco (RLS requer autenticação)
+    debug('Autenticando com Supabase Auth', { 
       email: email.replace(/^(.{2}).+(@.*)$/, '$1***$2') 
     }, 'AuthAPI')
     
-    // Tentar buscar usuário (sem is_active pois pode não existir na tabela)
-    let existingUser, userCheckError
-    try {
-      const result = await supabase
-        .from('users')
-        .select('id, email, role')
-        .eq('email', email.toLowerCase().trim())
-        .maybeSingle()
-      existingUser = result.data
-      userCheckError = result.error
-    } catch (err) {
-      // Se falhar, tentar apenas id e email
-      const result = await supabase
-        .from('users')
-        .select('id, email')
-        .eq('email', email.toLowerCase().trim())
-        .maybeSingle()
-      existingUser = result.data
-      userCheckError = result.error
-    }
-    
-    if (userCheckError) {
-      debug('Erro ao verificar usuário no banco', { error: userCheckError }, 'AuthAPI')
-      // Continuar mesmo com erro - pode ser problema de permissão RLS
-    }
-    
-    // Se usuário não existe no banco, retornar erro
-    if (!existingUser) {
-      logError('Usuário não encontrado no banco de dados', { 
-        email: email.replace(/^(.{2}).+(@.*)$/, '$1***$2') 
-      }, 'AuthAPI')
-      return NextResponse.json({ 
-        error: 'Usuário não encontrado. Verifique se o email está correto ou entre em contato com o administrador.' 
-      }, { status: 404 })
-    }
-    
-    // Nota: Não verificamos is_active pois a coluna pode não existir
-    // Se necessário, adicione a coluna is_active na tabela users ou use outra lógica
-    
-    debug('Usuário encontrado no banco', { 
-      userId: existingUser.id,
-      role: existingUser.role || 'não definido'
-    }, 'AuthAPI')
-    
-    // ✅ SEGUNDO: Autenticar com Supabase Auth
     const { data, error: authError } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -130,8 +86,7 @@ export async function POST(req: NextRequest) {
       logError('Erro de autenticação Supabase', { 
         error: authError.message, 
         status: authError.status,
-        email: email.replace(/^(.{2}).+(@.*)$/, '$1***$2'),
-        userId: existingUser.id
+        email: email.replace(/^(.{2}).+(@.*)$/, '$1***$2')
       }, 'AuthAPI')
       
       // Retornar mensagem de erro mais específica
@@ -144,15 +99,71 @@ export async function POST(req: NextRequest) {
       logError('Autenticação sem usuário ou sessão', { 
         hasUser: !!data.user, 
         hasSession: !!data.session,
-        email: email.replace(/^(.{2}).+(@.*)$/, '$1***$2'),
-        userId: existingUser.id
+        email: email.replace(/^(.{2}).+(@.*)$/, '$1***$2')
       }, 'AuthAPI')
       return NextResponse.json({ error: 'Falha na autenticação - sessão não criada' }, { status: 401 })
     }
     
+    debug('Autenticação bem-sucedida', { 
+      userId: data.user.id,
+      email: email.replace(/^(.{2}).+(@.*)$/, '$1***$2')
+    }, 'AuthAPI')
+    
+    // ✅ SEGUNDO: Verificar se o usuário existe na tabela users (já autenticado, RLS permite)
+    debug('Verificando se usuário existe no banco de dados', { 
+      email: email.replace(/^(.{2}).+(@.*)$/, '$1***$2'),
+      userId: data.user.id
+    }, 'AuthAPI')
+    
+    // Tentar buscar usuário (sem is_active pois pode não existir na tabela)
+    let existingUser, userCheckError
+    try {
+      const result = await supabase
+        .from('users')
+        .select('id, email, role')
+        .eq('id', data.user.id) // Usar ID do usuário autenticado (mais seguro)
+        .maybeSingle()
+      existingUser = result.data
+      userCheckError = result.error
+    } catch (err) {
+      // Se falhar, tentar buscar por email
+      try {
+        const result = await supabase
+          .from('users')
+          .select('id, email, role')
+          .eq('email', email.toLowerCase().trim())
+          .maybeSingle()
+        existingUser = result.data
+        userCheckError = result.error
+      } catch (err2) {
+        userCheckError = err2
+      }
+    }
+    
+    if (userCheckError) {
+      debug('Erro ao verificar usuário no banco', { error: userCheckError }, 'AuthAPI')
+      // Continuar mesmo com erro - pode ser problema de permissão RLS ou usuário não existe
+      // Mas como a autenticação funcionou, permitimos o login
+    }
+    
+    // Se usuário não existe no banco, logar mas continuar (autenticação já funcionou)
+    if (!existingUser) {
+      logError('Usuário não encontrado na tabela users', { 
+        email: email.replace(/^(.{2}).+(@.*)$/, '$1***$2'),
+        userId: data.user.id
+      }, 'AuthAPI')
+      // NÃO bloquear login - apenas logar o aviso
+      // O usuário pode ser criado depois ou pode ser um usuário do Supabase Auth apenas
+    } else {
+      debug('Usuário encontrado no banco', { 
+        userId: existingUser.id,
+        role: existingUser.role || 'não definido'
+      }, 'AuthAPI')
+    }
+    
     // ✅ TERCEIRO: Obter role do banco de dados (fonte de verdade)
-    // Prioridade: 1. Tabela users (já temos), 2. Metadados do usuário, 3. Fallback por email
-    let role = existingUser.role // Usar role da tabela users (fonte de verdade)
+    // Prioridade: 1. Tabela users (se existir), 2. Metadados do usuário, 3. Fallback por email
+    let role = existingUser?.role // Usar role da tabela users (fonte de verdade)
     
     // Se não tiver role na tabela, tentar metadados
     if (!role) {
