@@ -173,6 +173,7 @@ class _PassengerDashboardState extends State<PassengerDashboard>
     if (!mounted) return;
     if (result != null && result.isNotEmpty) {
       await HapticFeedback.mediumImpact();
+      if (!mounted) return;
       // aqui salvaria no backend
       SnackBarService.success(context, 'passenger.incident.success');
     }

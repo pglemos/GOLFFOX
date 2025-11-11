@@ -159,9 +159,11 @@ class _VehicleFuelChartState extends ConsumerState<VehicleFuelChart> {
           _selectedPeriod = value;
         });
       },
-      backgroundColor:
-          isSelected ? Color(GfTokens.colorPrimary).withValues(alpha: 0.1) : null,
-      selectedColor: Color(GfTokens.colorPrimary).withValues(alpha: 0.2),
+      backgroundColor: isSelected
+          ? const Color(GfTokens.colorPrimary).withValues(alpha: 0.1)
+          : null,
+      selectedColor:
+          const Color(GfTokens.colorPrimary).withValues(alpha: 0.2),
       checkmarkColor: const Color(GfTokens.colorPrimary),
       side: BorderSide(
         color: isSelected

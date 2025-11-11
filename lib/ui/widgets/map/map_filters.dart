@@ -5,8 +5,8 @@
 
 import 'package:flutter/material.dart';
 
-import '../../../core/theme/unified_theme.dart';
 import '../../../core/i18n/i18n.dart';
+import '../../../core/theme/unified_theme.dart';
 
 class MapFilters extends StatefulWidget {
 
@@ -159,9 +159,11 @@ class _MapFiltersState extends State<MapFilters> {
                       initialValue: widget.selectedRoute,
                       decoration: InputDecoration(
                         hintText: I18n.t(context, 'routes.search.hint'),
-                        border: OutlineInputBorder(),
-                        contentPadding:
-                            EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        border: const OutlineInputBorder(),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
                       ),
                       items: [
                         DropdownMenuItem<String?>(

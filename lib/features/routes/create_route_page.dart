@@ -7,9 +7,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 
+import '../../core/i18n/i18n.dart';
 import '../../core/services/snackbar_service.dart';
 import '../../core/theme/gf_tokens.dart';
-import '../../core/i18n/i18n.dart';
 import '../../models/route.dart';
 import '../../services/route_service.dart';
 import '../../ui/widgets/gf_app_bar.dart';

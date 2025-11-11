@@ -6,10 +6,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/i18n/i18n.dart';
 import '../../core/motion/gf_motion.dart';
 import '../../core/routing/app_router.dart';
 import '../../core/theme/gf_tokens.dart';
-import '../../core/i18n/i18n.dart';
 
 // Provider para controlar o item ativo
 final activeSideNavItemProvider = StateProvider<String>((ref) => 'dashboard');
