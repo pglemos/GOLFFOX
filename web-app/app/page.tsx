@@ -282,113 +282,154 @@ function LoginContent() {
 
       try {
         debug("Iniciando autenticação", { email: maskedEmail }, "LoginPage")
+        
+        // ✅ Garantir que CSRF token e credentials estão presentes
+        if (!csrfToken) {
+          console.error('❌ CSRF token não encontrado')
+          setError("Erro de segurança. Por favor, recarregue a página.")
+          setLoading(false)
+          setTransitioning(false)
+          if (typeof document !== "undefined") document.body.style.cursor = prevCursor
+          return
+        }
+        
         const response = await fetch(AUTH_ENDPOINT, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "x-csrf-token": csrfToken,
+            "x-csrf-token": csrfToken, // ✅ X-CSRF-Token presente
           },
           body: JSON.stringify({ email: sanitizedEmail, password: sanitizedPassword }),
           signal: controller.signal,
-          credentials: "include",
+          credentials: "include", // ✅ credentials: 'include' presente
         })
         clearTimeout(timeoutId)
 
-        if (response.ok) {
-          const data = await response.json()
-          const token: string | undefined = data?.token
-          const user = data?.user
-
-          console.log('✅ Resposta da API:', { 
-            hasToken: !!token, 
-            hasUser: !!user,
-            userRole: user?.role,
-            userEmail: user?.email?.replace(/^(.{2}).+(@.*)$/, '$1***$2')
-          })
-
-          if (!token || !user?.email) {
-            console.error('❌ Resposta inválida da API:', { token: !!token, user: !!user })
-            throw new Error("invalid_response")
-          }
-
-          AuthManager.persistSession(
-            {
-              id: user.id,
-              email: user.email,
-              role: user.role ?? getUserRoleByEmail(user.email),
-              accessToken: token,
-            },
-            { token, storage: rememberMe ? "both" : "session" }
-          )
-
-          setFailedAttempts(0)
-          setBlockedUntil(null)
-          setFieldErrors({})
-          setSuccess(true)
-
-          if (typeof window !== "undefined") {
-            window.dispatchEvent(new CustomEvent("golffox:auth-success", { detail: user }))
-            sessionStorage.setItem("golffox-last-login", new Date().toISOString())
-          }
-
-          const rawNext = searchParams.get("next")
-          const safeNext = sanitizePath(rawNext)
-          let redirectUrl = DEFAULT_LOGGED_URL
-
-          const resolvedRole = user.role ?? getUserRoleByEmail(user.email)
+        // ✅ Aguardar resposta completa antes de processar
+        if (!response.ok) {
+          const apiError = await response.json().catch(() => ({}))
+          const message = String(apiError?.error || "Falha ao autenticar")
+          const normalized = message.toLowerCase()
           
-          // Log detalhado para debug
-          console.log('🔍 Debug Login:', {
-            userRole: user.role,
-            resolvedRole,
-            email: user.email,
-            safeNext,
-            defaultUrl: DEFAULT_LOGGED_URL
-          })
-          
-          if (safeNext && isAllowedForRole(resolvedRole, safeNext)) {
-            redirectUrl = safeNext
+          // Processar erro...
+          if (normalized.includes("invalid") || normalized.includes("credenciais")) {
+            setError("Credenciais inválidas")
+            setFieldErrors((prev) => ({ ...prev, password: "E-mail ou senha incorretos" }))
+          } else if (normalized.includes("csrf")) {
+            setError("Erro de segurança. Por favor, recarregue a página.")
+          } else if (normalized.includes("timeout")) {
+            setError("Tempo de resposta excedido. Tente novamente.")
+          } else if (normalized.includes("email")) {
+            setError("E-mail não encontrado")
+            setFieldErrors((prev) => ({ ...prev, email: "E-mail não cadastrado" }))
           } else {
-            redirectUrl = AuthManager.getRedirectUrl(resolvedRole)
-          }
-          redirectUrl = redirectUrl.split("?")[0]
-
-          debug("Login bem-sucedido", { redirectUrl, email: maskedEmail, role: resolvedRole }, "LoginPage")
-          console.log('🚀 Redirecionando para:', redirectUrl)
-          console.log('👤 Role detectado:', resolvedRole)
-          console.log('📧 Email:', user.email)
-          
-          // Garantir que o redirecionamento aconteça
-          // Usar uma função assíncrona para garantir que tudo seja processado
-          const performRedirect = () => {
-            if (typeof window !== "undefined") {
-              const fullUrl = window.location.origin + redirectUrl
-              console.log('📍 Redirecionando para URL completa:', fullUrl)
-              
-              // Tentar múltiplas formas de redirecionamento
-              try {
-                window.location.href = redirectUrl
-              } catch (err1) {
-                console.warn('⚠️ Erro com href, tentando replace:', err1)
-                try {
-                  window.location.replace(redirectUrl)
-                } catch (err2) {
-                  console.error('❌ Erro com replace, tentando assign:', err2)
-                  window.location.assign(redirectUrl)
-                }
-              }
-            } else {
-              console.log('📍 Usando router.replace para:', redirectUrl)
-              router.replace(redirectUrl)
-            }
+            setError(message || "Erro ao fazer login")
           }
           
-          // Executar redirecionamento imediatamente
-          performRedirect()
-          
+          setLoading(false)
+          setTransitioning(false)
+          if (typeof document !== "undefined") document.body.style.cursor = prevCursor
           return
         }
 
+        // ✅ Aguardar resposta JSON completa antes de processar
+        const data = await response.json()
+        const token: string | undefined = data?.token
+        const user = data?.user
+
+        console.log('✅ Resposta da API:', { 
+          hasToken: !!token, 
+          hasUser: !!user,
+          userRole: user?.role,
+          userEmail: user?.email?.replace(/^(.{2}).+(@.*)$/, '$1***$2')
+        })
+
+        if (!token || !user?.email) {
+          console.error('❌ Resposta inválida da API:', { token: !!token, user: !!user })
+          setError("Resposta inválida do servidor")
+          setLoading(false)
+          setTransitioning(false)
+          if (typeof document !== "undefined") document.body.style.cursor = prevCursor
+          return
+        }
+
+        // ✅ Processar sessão antes de redirecionar
+        AuthManager.persistSession(
+          {
+            id: user.id,
+            email: user.email,
+            role: user.role ?? getUserRoleByEmail(user.email),
+            accessToken: token,
+          },
+          { token, storage: rememberMe ? "both" : "session" }
+        )
+
+        setFailedAttempts(0)
+        setBlockedUntil(null)
+        setFieldErrors({})
+        setSuccess(true)
+
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(new CustomEvent("golffox:auth-success", { detail: user }))
+          sessionStorage.setItem("golffox-last-login", new Date().toISOString())
+        }
+
+        const rawNext = searchParams.get("next")
+        const safeNext = sanitizePath(rawNext)
+        let redirectUrl = DEFAULT_LOGGED_URL
+
+        const resolvedRole = user.role ?? getUserRoleByEmail(user.email)
+        
+        // Log detalhado para debug
+        console.log('🔍 Debug Login:', {
+          userRole: user.role,
+          resolvedRole,
+          email: user.email,
+          safeNext,
+          defaultUrl: DEFAULT_LOGGED_URL
+        })
+        
+        if (safeNext && isAllowedForRole(resolvedRole, safeNext)) {
+          redirectUrl = safeNext
+        } else {
+          redirectUrl = AuthManager.getRedirectUrl(resolvedRole)
+        }
+        redirectUrl = redirectUrl.split("?")[0]
+
+        debug("Login bem-sucedido", { redirectUrl, email: maskedEmail, role: resolvedRole }, "LoginPage")
+        console.log('🚀 Redirecionando para:', redirectUrl)
+        console.log('👤 Role detectado:', resolvedRole)
+        console.log('📧 Email:', user.email)
+        
+        // ✅ Redirecionar APENAS após tudo estar processado
+        // Aguardar um pequeno delay para garantir que cookies sejam processados
+        await new Promise(resolve => setTimeout(resolve, 100))
+        
+        if (typeof window !== "undefined") {
+          const fullUrl = window.location.origin + redirectUrl
+          console.log('📍 Redirecionando para URL completa:', fullUrl)
+          
+          // Tentar múltiplas formas de redirecionamento
+          try {
+            window.location.href = redirectUrl
+          } catch (err1) {
+            console.warn('⚠️ Erro com href, tentando replace:', err1)
+            try {
+              window.location.replace(redirectUrl)
+            } catch (err2) {
+              console.error('❌ Erro com replace, tentando assign:', err2)
+              window.location.assign(redirectUrl)
+            }
+          }
+        } else {
+          console.log('📍 Usando router.replace para:', redirectUrl)
+          router.replace(redirectUrl)
+        }
+        
+        return
+
+        // Este código não deve ser alcançado se response.ok for true
+        // Mantido apenas como fallback de segurança
         const apiError = await response.json().catch(() => ({}))
         const message = String(apiError?.error || "Falha ao autenticar")
         const normalized = message.toLowerCase()
