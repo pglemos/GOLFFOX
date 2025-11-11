@@ -9,6 +9,7 @@ import { Card } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Mail, Lock, Eye, EyeOff, Moon, Sun, Globe, ChevronDown, Route, Shield, TrendingUp, Zap, Sparkles } from "lucide-react"
 import { motion } from "framer-motion"
+import dynamic from "next/dynamic"
 import { AuthManager } from "@/lib/auth"
 import { getUserRoleByEmail } from "@/lib/user-role"
 import { debug, error as logError } from "@/lib/logger"
@@ -24,46 +25,11 @@ const DEFAULT_LOGGED_URL = process.env.NEXT_PUBLIC_LOGGED_URL ?? "/operator"
 
 const sanitizeInput = (value: string) => value.replace(/[<>"'`;()]/g, "").trim()
 
-// Componente de partículas animadas
-const AnimatedParticles = () => {
-  const particles = Array.from({ length: 80 }, (_, i) => ({
-    id: i,
-    x: Math.random() * 100,
-    y: Math.random() * 100,
-    size: Math.random() * 3 + 1,
-    duration: Math.random() * 20 + 10,
-    delay: Math.random() * 5,
-  }))
-
-  return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {particles.map((particle) => (
-        <motion.div
-          key={particle.id}
-          className="absolute rounded-full bg-white/20 backdrop-blur-[1px]"
-          style={{
-            left: `${particle.x}%`,
-            top: `${particle.y}%`,
-            width: `${particle.size}px`,
-            height: `${particle.size}px`,
-          }}
-          animate={{
-            y: [0, -30, 0],
-            x: [0, Math.random() * 20 - 10, 0],
-            opacity: [0.2, 0.6, 0.2],
-            scale: [1, 1.2, 1],
-          }}
-          transition={{
-            duration: particle.duration,
-            delay: particle.delay,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-        />
-      ))}
-    </div>
-  )
-}
+// Componente de partículas animadas (renderizado somente no cliente para evitar hydration mismatch)
+const AnimatedParticles = dynamic(
+  () => import("@/components/login/animated-particles").then((m) => m.AnimatedParticles),
+  { ssr: false, loading: () => null }
+)
 
 // Componente de gradiente animado
 const AnimatedGradient = () => {
