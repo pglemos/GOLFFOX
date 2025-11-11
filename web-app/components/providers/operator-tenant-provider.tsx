@@ -104,39 +104,8 @@ function OperatorTenantProviderInner({ children }: { children: ReactNode }) {
       } else {
         console.warn('⚠️ Nenhuma empresa encontrada para o operador')
         
-        // Tentar associar operador a empresa automaticamente via API
-        try {
-          const { data: { user } } = await supabase.auth.getUser()
-          if (user && user.email) {
-            console.log('🔧 Tentando associar operador a empresa automaticamente...')
-            
-            const response = await fetch('/api/operator/associate-company', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({ email: user.email }),
-            })
-            
-            if (response.ok) {
-              const result = await response.json()
-              console.log('✅ Operador associado à empresa:', result.message)
-              // Aguardar um pouco e recarregar empresas
-              setTimeout(() => {
-                loadCompanies()
-              }, 500)
-              return
-            } else {
-              const error = await response.json()
-              console.warn('⚠️ Não foi possível associar automaticamente:', error.error)
-            }
-          }
-        } catch (autoCreateError) {
-          console.warn('⚠️ Erro ao tentar associar automaticamente:', autoCreateError)
-        }
-        
         setTenantCompanyId(null)
-        setError('Nenhuma empresa encontrada. Verifique se você tem acesso a pelo menos uma empresa.')
+        setError('Nenhuma empresa encontrada. Entre em contato com o administrador para associar seu usuário a uma empresa cadastrada.')
       }
     } catch (err: any) {
       console.error('❌ Erro ao carregar empresas:', err)
