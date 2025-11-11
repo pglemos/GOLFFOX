@@ -202,7 +202,7 @@ class ErrorService {
       return GxError(
         code: 'auth_error',
         message: error.message,
-        userMessage: 'Erro de autenticacao. Tente fazer login novamente.',
+      userMessage: 'Erro de autenticação. Tente fazer login novamente.',
         severity: ErrorSeverity.warning,
       );
     }
@@ -214,7 +214,7 @@ class ErrorService {
         return GxError(
           code: 'permission_denied',
           message: error.message,
-          userMessage: 'Voce nao tem permissao para esta operacao.',
+      userMessage: 'Você não tem permissão para esta operação.',
           severity: ErrorSeverity.warning,
         );
       }
@@ -223,7 +223,7 @@ class ErrorService {
         return GxError(
           code: 'not_found',
           message: error.message,
-          userMessage: 'Registro nao encontrado.',
+      userMessage: 'Registro não encontrado.',
           severity: ErrorSeverity.info,
         );
       }
@@ -232,7 +232,7 @@ class ErrorService {
         return GxError(
           code: 'conflict',
           message: error.message,
-          userMessage: 'Este registro ja existe.',
+      userMessage: 'Este registro já existe.',
           severity: ErrorSeverity.warning,
         );
       }
@@ -250,7 +250,7 @@ class ErrorService {
       return const GxError(
         code: 'timeout',
         message: 'operation timed out',
-        userMessage: 'Operacao demorou muito. Verifique sua conexao.',
+      userMessage: 'Operação demorou muito. Verifique sua conexão.',
         severity: ErrorSeverity.warning,
       );
     }
@@ -261,7 +261,7 @@ class ErrorService {
       return GxError(
         code: 'network_error',
         message: error.toString(),
-        userMessage: 'Erro de conexao. Verifique sua internet.',
+      userMessage: 'Erro de conexão. Verifique sua internet.',
         severity: ErrorSeverity.warning,
       );
     }

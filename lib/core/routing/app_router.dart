@@ -332,13 +332,13 @@ class AppRouter {
                   const Icon(Icons.person_off, size: 64, color: Colors.orange),
                   const SizedBox(height: 16),
                   const Text(
-                    'Perfil nao encontrado',
+          'Perfil não encontrado',
                     style:
                         TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Nao foi possivel encontrar o perfil do usuario.',
+          'Não foi possível encontrar o perfil do usuário.',
                     textAlign: TextAlign.center,
                     style: TextStyle(color: Colors.grey[600]),
                   ),

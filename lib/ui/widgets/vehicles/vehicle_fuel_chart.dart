@@ -48,7 +48,7 @@ class _VehicleFuelChartState extends ConsumerState<VehicleFuelChart> {
                 ),
                 const SizedBox(height: GfTokens.spacingMd),
                 const Text(
-                  'Erro ao carregar dados de combustivel',
+              'Erro ao carregar dados de combustível',
                   style: TextStyle(
                     fontSize: GfTokens.fontSizeLg,
                     fontWeight: FontWeight.w600,
@@ -66,7 +66,7 @@ class _VehicleFuelChartState extends ConsumerState<VehicleFuelChart> {
                 const SizedBox(height: GfTokens.spacingMd),
                 ElevatedButton(
                   onPressed: () => setState(() {}),
-                  child: const Text('Tentar Novamente'),
+                  child: const Text('Tentar novamente'),
                 ),
               ],
             ),
@@ -95,7 +95,7 @@ class _VehicleFuelChartState extends ConsumerState<VehicleFuelChart> {
               child: Row(
                 children: [
                   const Text(
-                    'Periodo:',
+                  'Período:',
                     style: TextStyle(
                       fontWeight: FontWeight.w600,
                       color: Color(GfTokens.colorOnSurface),
@@ -177,7 +177,7 @@ class _VehicleFuelChartState extends ConsumerState<VehicleFuelChart> {
       children: [
         Expanded(
           child: _buildStatCard(
-            'Consumo Medio',
+                  'Consumo médio',
             '${stats.averageConsumption.toStringAsFixed(1)} km/L',
             Icons.speed,
             const Color(GfTokens.colorPrimary),
@@ -186,7 +186,7 @@ class _VehicleFuelChartState extends ConsumerState<VehicleFuelChart> {
         const SizedBox(width: GfTokens.spacingSm),
         Expanded(
           child: _buildStatCard(
-            'Gasto Total',
+                  'Gasto total',
             'R\$ ${stats.totalCost.toStringAsFixed(2)}',
             Icons.attach_money,
             const Color(GfTokens.colorSuccess),
@@ -250,7 +250,7 @@ class _VehicleFuelChartState extends ConsumerState<VehicleFuelChart> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Consumo ao Longo do Tempo',
+                  'Consumo ao longo do tempo',
               style: TextStyle(
                 fontSize: GfTokens.fontSizeLg,
                 fontWeight: FontWeight.w600,
@@ -322,7 +322,7 @@ class _VehicleFuelChartState extends ConsumerState<VehicleFuelChart> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Historico de Abastecimentos',
+                  'Histórico de abastecimentos',
               style: TextStyle(
                 fontSize: GfTokens.fontSizeLg,
                 fontWeight: FontWeight.w600,
@@ -462,7 +462,7 @@ class _VehicleFuelChartState extends ConsumerState<VehicleFuelChart> {
           ),
           const SizedBox(height: GfTokens.spacingMd),
           const Text(
-            'Nenhum registro de combustivel',
+              'Nenhum registro de combustível',
             style: TextStyle(
               fontSize: GfTokens.fontSizeLg,
               fontWeight: FontWeight.w600,
@@ -471,7 +471,7 @@ class _VehicleFuelChartState extends ConsumerState<VehicleFuelChart> {
           ),
           const SizedBox(height: GfTokens.spacingSm),
           const Text(
-            'Este veiculo ainda nao possui registros de abastecimento.',
+              'Este veículo ainda não possui registros de abastecimento.',
             style: TextStyle(
               color: Color(GfTokens.colorOnSurfaceVariant),
             ),
@@ -483,7 +483,7 @@ class _VehicleFuelChartState extends ConsumerState<VehicleFuelChart> {
               // TODO(golffox-team): Navegar para registrar abastecimento
             },
             icon: const Icon(Icons.add),
-            label: const Text('Registrar Abastecimento'),
+              label: const Text('Registrar abastecimento'),
           ),
         ],
       ),
