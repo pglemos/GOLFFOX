@@ -9,11 +9,13 @@ import { useOperatorTenant } from "@/components/providers/operator-tenant-provid
 
 interface OperatorLogoSectionProps {
   panelHomeUrl: string
+  panelBranding?: string
 }
 
-export function OperatorLogoSection({ panelHomeUrl }: OperatorLogoSectionProps) {
+export function OperatorLogoSection({ panelHomeUrl, panelBranding }: OperatorLogoSectionProps) {
   const pathname = usePathname()
   const isOperatorPanel = pathname?.startsWith('/operator') ?? false
+  const isAdminPanel = pathname?.startsWith('/admin') ?? false
   const { companyName, logoUrl } = useOperatorTenant()
   const [imgFailed, setImgFailed] = useState(false)
 
@@ -41,6 +43,14 @@ export function OperatorLogoSection({ panelHomeUrl }: OperatorLogoSectionProps) 
     return <CompanySelector />
   }
 
+  // Determinar o texto do branding baseado no painel
+  let brandingText = panelBranding || 'GOLF FOX'
+  
+  // Se for admin, usar "Administrativo" ou o branding fornecido
+  if (isAdminPanel) {
+    brandingText = panelBranding || 'Administrativo'
+  }
+
   return (
     <Link href={panelHomeUrl} prefetch={false} className="flex items-center gap-2 sm:gap-3 flex-shrink-0 group">                                            
       <motion.div
@@ -52,7 +62,7 @@ export function OperatorLogoSection({ panelHomeUrl }: OperatorLogoSectionProps) 
       </motion.div>
       <div className="flex items-center gap-2">
         <span className="font-bold text-lg sm:text-2xl tracking-tight text-[var(--ink-strong)] hidden xs:block">                                            
-          {companyName || 'GOLF FOX'}
+          {brandingText}
         </span>
       </div>
     </Link>

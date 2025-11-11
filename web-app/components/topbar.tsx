@@ -157,7 +157,7 @@ export function Topbar({
         </Button>
 
                 {/* Logo / Empresa */}
-        <OperatorLogoSection panelHomeUrl={panelHomeUrl} />
+        <OperatorLogoSection panelHomeUrl={panelHomeUrl} panelBranding={panelBranding} />
 
         {/* Search - Hidden on small screens */}
         <div className="hidden md:flex flex-1 max-w-md ml-auto">
