@@ -208,7 +208,7 @@ class _PassengerDashboardState extends State<PassengerDashboard>
             Text(
               widget.user.name,
               style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurface.withOpacity(0.7)),
+    color: theme.colorScheme.onSurface.withValues(alpha: 0.7)),
             ),
           ],
         ),
@@ -413,7 +413,7 @@ class _PassengerDashboardState extends State<PassengerDashboard>
             children: [
               Icon(Icons.directions_bus,
                   size: 44,
-                  color: theme.colorScheme.onSurface.withOpacity(0.6)),
+    color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
               const SizedBox(height: 8),
               Text('Nenhuma viagem ativa', style: theme.textTheme.titleMedium),
               const SizedBox(height: 6),
@@ -421,7 +421,7 @@ class _PassengerDashboardState extends State<PassengerDashboard>
                 'Suas viagens aparecerao aqui quando disponiveis.',
                 textAlign: TextAlign.center,
                 style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onSurface.withOpacity(0.7)),
+    color: theme.colorScheme.onSurface.withValues(alpha: 0.7)),
               ),
             ],
           ),
@@ -455,7 +455,7 @@ class _FrostedAppBar extends StatelessWidget implements PreferredSizeWidget {
         height: preferredSize.height + MediaQuery.of(context).padding.top,
         padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
         decoration: BoxDecoration(
-          color: theme.colorScheme.surface.withOpacity(0.4),
+    color: theme.colorScheme.surface.withValues(alpha: 0.4),
         ),
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
@@ -591,12 +591,12 @@ class _TripStatusCardPremium extends StatelessWidget {
               children: [
                 Icon(Icons.access_time,
                     size: 18,
-                    color: theme.colorScheme.onSurface.withOpacity(0.7)),
+    color: theme.colorScheme.onSurface.withValues(alpha: 0.7)),
                 const SizedBox(width: 6),
                 Text(
                   'Horario: ${_formatDateTime(trip.scheduledStartTime!)}',
                   style: theme.textTheme.bodyMedium?.copyWith(
-                      color: theme.colorScheme.onSurface.withOpacity(0.7)),
+    color: theme.colorScheme.onSurface.withValues(alpha: 0.7)),
                 ),
               ],
             ),
@@ -644,13 +644,13 @@ class _GlassCard extends StatelessWidget {
         child: Container(
           padding: padding ?? const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: theme.colorScheme.surface.withOpacity(0.6),
+    color: theme.colorScheme.surface.withValues(alpha: 0.6),
             border: Border.all(
-              color: theme.colorScheme.outlineVariant.withOpacity(0.3),
+    color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.08),
+    color: Colors.black.withValues(alpha: 0.08),
                 blurRadius: 18,
                 offset: const Offset(0, 8),
               ),
@@ -744,8 +744,8 @@ class _AnimatedDriverMarker extends StatelessWidget {
               ],
               gradient: RadialGradient(
                 colors: [
-                  color.withOpacity(0.95),
-                  color.withOpacity(0.6)
+    color.withValues(alpha: 0.95),
+    color.withValues(alpha: 0.6)
                 ],
               ),
             ),
@@ -858,7 +858,7 @@ class _GradientFab extends StatelessWidget {
         borderRadius: BorderRadius.circular(28),
         boxShadow: [
           BoxShadow(
-            color: theme.colorScheme.primary.withOpacity(0.35),
+    color: theme.colorScheme.primary.withValues(alpha: 0.35),
             blurRadius: 18,
             offset: const Offset(0, 10),
           ),
@@ -888,10 +888,10 @@ class _GlassBottomSheet extends StatelessWidget {
         filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
         child: DecoratedBox(
           decoration: BoxDecoration(
-            color: theme.colorScheme.surface.withOpacity(0.75),
+    color: theme.colorScheme.surface.withValues(alpha: 0.75),
             border: Border(
               top: BorderSide(
-                color: theme.colorScheme.outlineVariant.withOpacity(0.3),
+    color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
               ),
             ),
           ),
@@ -931,7 +931,7 @@ class _IncidentReportSheetState extends State<_IncidentReportSheet> {
             width: 44,
             height: 5,
             decoration: BoxDecoration(
-              color: theme.colorScheme.outline.withOpacity(0.5),
+    color: theme.colorScheme.outline.withValues(alpha: 0.5),
               borderRadius: BorderRadius.circular(100),
             ),
           ),

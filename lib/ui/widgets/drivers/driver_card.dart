@@ -47,7 +47,7 @@ class DriverCard extends StatelessWidget {
                   CircleAvatar(
                     radius: 24,
                     backgroundColor:
-                        const Color(GfTokens.colorPrimary).withOpacity(0.1),
+    const Color(GfTokens.colorPrimary).withValues(alpha: 0.1),
                     backgroundImage: driver.profileImageUrl != null
                         ? NetworkImage(driver.profileImageUrl!)
                         : null,
@@ -384,10 +384,10 @@ class DriverCard extends StatelessWidget {
         vertical: 2,
       ),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+    color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(GfTokens.radiusSm),
         border: Border.all(
-          color: color.withOpacity(0.3),
+    color: color.withValues(alpha: 0.3),
         ),
       ),
       child: Row(

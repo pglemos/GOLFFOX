@@ -151,7 +151,7 @@ class _InteractiveButtonState extends State<InteractiveButton>
               boxShadow: [
                 if (widget.elevation != null)
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+    color: Colors.black.withValues(alpha: 0.1),
                     blurRadius: widget.elevation! * 2,
                     offset: Offset(0, widget.elevation!),
                   ),
@@ -159,7 +159,7 @@ class _InteractiveButtonState extends State<InteractiveButton>
                   BoxShadow(
                     color: (widget.backgroundColor ??
                             Theme.of(context).primaryColor)
-                        .withOpacity(_glowAnimation.value * 0.3),
+    .withValues(alpha: _glowAnimation.value * 0.3),
                     blurRadius: 20 * _glowAnimation.value,
                     spreadRadius: 5 * _glowAnimation.value,
                   ),
@@ -281,7 +281,7 @@ class _InteractiveCardState extends State<InteractiveCard>
             boxShadow: widget.enableShadow
                 ? [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
+    color: Colors.black.withValues(alpha: 0.1),
                       blurRadius: _elevationAnimation.value * 2,
                       offset: Offset(0, _elevationAnimation.value),
                     ),
@@ -479,7 +479,7 @@ extension MicroInteractionExtensions on Widget {
       decoration: BoxDecoration(
         boxShadow: [
           BoxShadow(
-            color: (color ?? Colors.blue).withOpacity(intensity),
+    color: (color ?? Colors.blue).withValues(alpha: intensity),
             blurRadius: 20,
             spreadRadius: 5,
           ),
