@@ -167,6 +167,7 @@ export async function POST(req: NextRequest) {
       userId: data.user.id
     }, 'AuthAPI')
     const token = data.session.access_token
+    const refreshToken = data.session.refresh_token
     const userPayload = {
       id: data.user.id,
       email: data.user.email ?? email,
@@ -174,19 +175,37 @@ export async function POST(req: NextRequest) {
       accessToken: token,
     }
 
-    const response = NextResponse.json({ token, user: userPayload }, { status: 200 })
+    // ✅ Retornar também os tokens de sessão para o cliente persistir no Supabase
+    const response = NextResponse.json({ 
+      token, 
+      refreshToken,
+      user: userPayload,
+      session: {
+        access_token: data.session.access_token,
+        refresh_token: data.session.refresh_token,
+        expires_in: data.session.expires_in,
+        expires_at: data.session.expires_at,
+        token_type: data.session.token_type,
+        user: {
+          id: data.user.id,
+          email: data.user.email,
+          user_metadata: data.user.user_metadata,
+          app_metadata: data.user.app_metadata,
+        }
+      }
+    }, { status: 200 })
 
     const cookieValue = Buffer.from(JSON.stringify(userPayload)).toString('base64')
     response.cookies.set('golffox-session', cookieValue, {
       httpOnly: false,
-      maxAge: 60 * 60,
+      maxAge: 60 * 60 * 24, // 24 horas
       sameSite: 'lax',
       secure: isSecureRequest(req),
       path: '/',
     })
     
     // Adicionar header Set-Cookie explícito para garantir que o cookie seja definido
-    response.headers.set('Set-Cookie', `golffox-session=${cookieValue}; Path=/; Max-Age=3600; SameSite=Lax${isSecureRequest(req) ? '; Secure' : ''}`)
+    response.headers.set('Set-Cookie', `golffox-session=${cookieValue}; Path=/; Max-Age=86400; SameSite=Lax${isSecureRequest(req) ? '; Secure' : ''}`)
 
     debug('Login API concluído', { role, emailHash: email.replace(/^(.{2}).+(@.*)$/, '$1***$2') }, 'AuthAPI')
     return response

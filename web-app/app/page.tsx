@@ -402,10 +402,12 @@ function LoginContent() {
         const data = await response.json()
         token = data?.token
         user = data?.user
+        const sessionData = data?.session
 
         console.log('✅ Login via API bem-sucedido (banco de dados verificado):', { 
           hasToken: !!token, 
           hasUser: !!user,
+          hasSession: !!sessionData,
           userRole: user?.role,
           userId: user?.id,
           userEmail: user?.email?.replace(/^(.{2}).+(@.*)$/, '$1***$2')
@@ -442,7 +444,34 @@ function LoginContent() {
         console.log('📧 Email do usuário:', user.email)
         console.log('🆔 ID do usuário:', user.id)
 
-        // ✅ Processar sessão antes de redirecionar
+        // ✅ CRÍTICO: Persistir sessão do Supabase no cliente ANTES de redirecionar
+        // Isso evita o loop de redirecionamento, pois as páginas admin verificam supabase.auth.getSession()
+        if (sessionData && typeof window !== 'undefined') {
+          try {
+            // Importar supabase dinamicamente para evitar problemas de SSR
+            const { supabase } = await import('@/lib/supabase')
+            
+            console.log('🔐 Persistindo sessão do Supabase no cliente...')
+            
+            // Persistir a sessão no Supabase client
+            const { error: sessionError } = await supabase.auth.setSession({
+              access_token: sessionData.access_token,
+              refresh_token: sessionData.refresh_token,
+            })
+            
+            if (sessionError) {
+              console.error('❌ Erro ao persistir sessão do Supabase:', sessionError)
+              // Continuar mesmo com erro - o cookie ainda foi definido
+            } else {
+              console.log('✅ Sessão do Supabase persistida com sucesso')
+            }
+          } catch (sessionErr) {
+            console.error('❌ Erro ao importar/persistir sessão do Supabase:', sessionErr)
+            // Continuar mesmo com erro - o cookie ainda foi definido
+          }
+        }
+
+        // ✅ Processar sessão customizada (cookie) antes de redirecionar
         AuthManager.persistSession(
           {
             id: user.id,

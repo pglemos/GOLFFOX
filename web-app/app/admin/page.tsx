@@ -217,39 +217,75 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     const getUser = async () => {
-      // Primeiro, tentar obter usuário do cookie de sessão customizado
-      if (typeof document !== 'undefined') {
-        const cookieMatch = document.cookie.match(/golffox-session=([^;]+)/)
-        if (cookieMatch) {
-          try {
-            const decoded = atob(cookieMatch[1])
-            const u = JSON.parse(decoded)
-            if (u?.id && u?.email) {
-              setUser({ id: u.id, email: u.email, name: u.email.split('@')[0], role: u.role || 'admin' })
-              setLoading(false)
-              return
+      try {
+        // Primeiro, tentar obter usuário do cookie de sessão customizado
+        if (typeof document !== 'undefined') {
+          const cookieMatch = document.cookie.match(/golffox-session=([^;]+)/)
+          if (cookieMatch) {
+            try {
+              const decoded = atob(cookieMatch[1])
+              const u = JSON.parse(decoded)
+              if (u?.id && u?.email) {
+                setUser({ id: u.id, email: u.email, name: u.email.split('@')[0], role: u.role || 'admin' })
+                setLoading(false)
+                return
+              }
+            } catch (err) {
+              console.warn('⚠️ Erro ao decodificar cookie de sessão:', err)
             }
-          } catch {}
+          }
         }
-      }
 
-      // Fallback: tentar sessão do Supabase
-      const { data: { session } } = await supabase.auth.getSession()
-      if (!session) {
-        // Sem sessão detectada; deixar o middleware proteger o acesso
-        // Evitar loop de redirect no cliente
+        // Fallback: tentar sessão do Supabase
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+        
+        if (sessionError) {
+          console.error('❌ Erro ao obter sessão do Supabase:', sessionError)
+          // Continuar e deixar o middleware proteger o acesso
+        }
+        
+        if (!session) {
+          // Sem sessão detectada; deixar o middleware proteger o acesso
+          // NÃO redirecionar aqui para evitar loop - o middleware já faz isso
+          console.log('⚠️ Sem sessão detectada - middleware irá proteger acesso')
+          setLoading(false)
+          return
+        }
+
+        // Buscar dados do usuário no banco
+        const { data, error: userError } = await supabase
+          .from("users")
+          .select("*")
+          .eq("id", session.user.id)
+          .maybeSingle()
+
+        if (userError) {
+          console.error('❌ Erro ao buscar usuário:', userError)
+          // Usar dados da sessão mesmo assim
+          setUser({ 
+            id: session.user.id, 
+            email: session.user.email || '', 
+            name: session.user.email?.split('@')[0] || 'Admin', 
+            role: 'admin' 
+          })
+        } else if (data) {
+          setUser({ ...session.user, ...data })
+        } else {
+          // Usuário não encontrado no banco, usar dados da sessão
+          setUser({ 
+            id: session.user.id, 
+            email: session.user.email || '', 
+            name: session.user.email?.split('@')[0] || 'Admin', 
+            role: 'admin' 
+          })
+        }
+        
         setLoading(false)
-        return
+      } catch (err) {
+        console.error('❌ Erro ao obter usuário:', err)
+        setLoading(false)
+        // Não redirecionar aqui - deixar o middleware proteger
       }
-
-      const { data } = await supabase
-        .from("users")
-        .select("*")
-        .eq("id", session.user.id)
-        .single()
-
-      setUser({ ...session.user, ...data })
-      setLoading(false)
     }
 
     getUser()
