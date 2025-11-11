@@ -1134,7 +1134,6 @@ class _CreateDriverPageState extends ConsumerState<CreateDriverPage> {
         phone: _phoneController.text.trim(),
         address: _addressController.text.trim(),
         birthDate: _birthDate,
-        status: _status,
         license: DriverLicense(
           number: _licenseNumberController.text.trim(),
           category: _licenseCategory,

@@ -231,7 +231,7 @@ class DashboardPage extends ConsumerWidget {
           ),
           SizedBox(height: GfTokens.space2),
           Text(
-            'Verifique sua conexao e tente novamente',
+            'Verifique sua conexão e tente novamente',
             style: TextStyle(
               fontSize: 14,
               color: Color(GfTokens.textMuted),
@@ -261,7 +261,7 @@ class DashboardPage extends ConsumerWidget {
           ),
           const SizedBox(height: GfTokens.space2),
           const Text(
-            'Distribuicao de passageiros ao longo do dia',
+            'Distribuição de passageiros ao longo do dia',
             style: TextStyle(
               fontSize: 14,
               color: Color(GfTokens.textMuted),

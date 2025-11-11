@@ -7,7 +7,6 @@ import 'core/theme/unified_theme.dart';
 /// =====================
 @immutable
 class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
-
   const AppSemanticColors({
     required this.success,
     required this.onSuccess,
@@ -34,15 +33,16 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
     Color? info,
     Color? onInfo,
     Color? accent,
-  }) => AppSemanticColors(
-      success: success ?? this.success,
-      onSuccess: onSuccess ?? this.onSuccess,
-      warning: warning ?? this.warning,
-      onWarning: onWarning ?? this.onWarning,
-      info: info ?? this.info,
-      onInfo: onInfo ?? this.onInfo,
-      accent: accent ?? this.accent,
-    );
+  }) =>
+      AppSemanticColors(
+        success: success ?? this.success,
+        onSuccess: onSuccess ?? this.onSuccess,
+        warning: warning ?? this.warning,
+        onWarning: onWarning ?? this.onWarning,
+        info: info ?? this.info,
+        onInfo: onInfo ?? this.onInfo,
+        accent: accent ?? this.accent,
+      );
 
   @override
   AppSemanticColors lerp(ThemeExtension<AppSemanticColors>? other, double t) {
@@ -141,7 +141,7 @@ TextTheme _typography(ColorScheme cs) {
 /// =====================
 AppBarTheme _appBar(ColorScheme cs) => AppBarTheme(
       elevation: 0,
-      backgroundColor: cs.surface.withValues(alpha: 0.75),
+      backgroundColor: cs.surface.withOpacity(0.75),
       foregroundColor: cs.onSurface,
       centerTitle: false,
       titleTextStyle: GoogleFonts.inter(
@@ -155,7 +155,7 @@ AppBarTheme _appBar(ColorScheme cs) => AppBarTheme(
 
 InputDecorationTheme _inputs(ColorScheme cs) => InputDecorationTheme(
       filled: true,
-      fillColor: cs.surfaceContainerHighest.withValues(alpha: 0.65),
+      fillColor: cs.surfaceContainerHighest.withOpacity(0.65),
       contentPadding: const EdgeInsets.symmetric(
           horizontal: GolfFoxTheme.space4, vertical: GolfFoxTheme.space4),
       border: OutlineInputBorder(
@@ -179,7 +179,7 @@ InputDecorationTheme _inputs(ColorScheme cs) => InputDecorationTheme(
         borderSide: BorderSide(color: cs.error, width: 2),
       ),
       hintStyle: const TextStyle(color: GolfFoxTheme.textSecondary),
-      labelStyle: TextStyle(color: cs.onSurface.withValues(alpha: 0.8)),
+      labelStyle: TextStyle(color: cs.onSurface.withOpacity(0.8)),
       prefixIconColor: cs.primary,
       suffixIconColor: cs.onSurfaceVariant,
     );
@@ -211,7 +211,7 @@ ButtonStyle _outlinedButton(ColorScheme cs) => OutlinedButton.styleFrom(
 
 ChipThemeData _chips(ColorScheme cs) => ChipThemeData(
       backgroundColor: cs.surfaceContainerHighest,
-      selectedColor: cs.primary.withValues(alpha: 0.12),
+      selectedColor: cs.primary.withOpacity(0.12),
       labelStyle: GoogleFonts.inter(color: cs.onSurface),
       secondaryLabelStyle: GoogleFonts.inter(color: cs.onSurface),
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
@@ -231,7 +231,7 @@ SnackBarThemeData _snack(ColorScheme cs) => SnackBarThemeData(
 NavigationBarThemeData _navBar(ColorScheme cs) => NavigationBarThemeData(
       height: 64,
       backgroundColor: cs.surface,
-      indicatorColor: cs.primary.withValues(alpha: 0.15),
+      indicatorColor: cs.primary.withOpacity(0.15),
       labelTextStyle: WidgetStateProperty.all(
         GoogleFonts.inter(fontWeight: FontWeight.w600),
       ),
@@ -244,7 +244,7 @@ NavigationBarThemeData _navBar(ColorScheme cs) => NavigationBarThemeData(
 
 NavigationRailThemeData _navRail(ColorScheme cs) => NavigationRailThemeData(
       backgroundColor: cs.surface,
-      indicatorColor: cs.primary.withValues(alpha: 0.15),
+      indicatorColor: cs.primary.withOpacity(0.15),
       selectedIconTheme: IconThemeData(color: cs.primary),
       selectedLabelTextStyle: GoogleFonts.inter(
         fontWeight: FontWeight.w700,

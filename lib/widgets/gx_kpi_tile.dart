@@ -70,8 +70,8 @@ class GxKpiTile extends StatelessWidget {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                tileColor.withValues(alpha: 0.1),
-                tileColor.withValues(alpha: 0.05),
+                tileColor.withOpacity(0.1),
+                tileColor.withOpacity(0.05),
               ],
             ),
           ),
@@ -96,7 +96,7 @@ class GxKpiTile extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: tileColor.withValues(alpha: 0.2),
+                        color: tileColor.withOpacity(0.2),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Icon(
@@ -152,7 +152,7 @@ class GxKpiTile extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
-                          color: deltaColor.withValues(alpha: 0.1),
+                          color: deltaColor.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Row(

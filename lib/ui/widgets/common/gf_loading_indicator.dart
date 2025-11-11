@@ -42,7 +42,7 @@ class GfLoadingIndicator extends StatelessWidget {
                         .textTheme
                         .bodyMedium
                         ?.color
-                        ?.withValues(alpha: 0.7),
+                        ?.withOpacity(0.7),
                   ),
               textAlign: TextAlign.center,
             ),

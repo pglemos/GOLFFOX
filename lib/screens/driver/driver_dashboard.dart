@@ -523,7 +523,7 @@ class _ActiveTripCard extends StatelessWidget {
           ),
           FilledButton.tonal(
             style: FilledButton.styleFrom(
-              backgroundColor: t.colorScheme.onPrimary.withValues(alpha: 0.12),
+              backgroundColor: t.colorScheme.onPrimary.withOpacity(0.12),
               foregroundColor: t.colorScheme.onPrimary,
               padding: const EdgeInsets.symmetric(horizontal: 12),
             ),
@@ -533,7 +533,7 @@ class _ActiveTripCard extends StatelessWidget {
           const SizedBox(width: 8),
           IconButton.filled(
             style: IconButton.styleFrom(
-              backgroundColor: t.colorScheme.onPrimary.withValues(alpha: 0.12),
+              backgroundColor: t.colorScheme.onPrimary.withOpacity(0.12),
               foregroundColor: t.colorScheme.onPrimary,
             ),
             onPressed: () => onAction('complete'),
@@ -567,7 +567,7 @@ class _ListTrips extends StatelessWidget {
         padding: const EdgeInsets.all(24),
         child: Column(mainAxisSize: MainAxisSize.min, children: [
           Icon(Icons.route,
-              size: 64, color: t.colorScheme.onSurface.withValues(alpha: 0.5)),
+              size: 64, color: t.colorScheme.onSurface.withOpacity(0.5)),
           const SizedBox(height: 8),
           Text('Nenhuma viagem encontrada',
               style: t.textTheme.titleMedium, textAlign: TextAlign.center),
@@ -575,7 +575,7 @@ class _ListTrips extends StatelessWidget {
           Text(
             'Suas viagens aparecerao aqui quando disponiveis.',
             style: t.textTheme.bodySmall?.copyWith(
-              color: t.colorScheme.onSurface.withValues(alpha: 0.7),
+              color: t.colorScheme.onSurface.withOpacity(0.7),
             ),
             textAlign: TextAlign.center,
           ),
@@ -721,7 +721,7 @@ class _TripCard extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 10, vertical: 6),
                           decoration: BoxDecoration(
-                            color: color.withValues(alpha: 0.1),
+                            color: color.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -741,7 +741,7 @@ class _TripCard extends StatelessWidget {
                         Icon(Icons.arrow_forward_ios,
                             size: 16,
                             color:
-                                t.colorScheme.onSurface.withValues(alpha: 0.5)),
+                                t.colorScheme.onSurface.withOpacity(0.5)),
                       ]),
                       const SizedBox(height: 8),
                       Text('Viagem #${trip.id.substring(0, 8)}',
@@ -753,13 +753,13 @@ class _TripCard extends StatelessWidget {
                           Icon(Icons.access_time,
                               size: 16,
                               color: t.colorScheme.onSurface
-                                  .withValues(alpha: 0.7)),
+                                  .withOpacity(0.7)),
                           const SizedBox(width: 6),
                           Text(
                             _fmt(trip.scheduledStartTime!),
                             style: t.textTheme.bodySmall?.copyWith(
                               color: t.colorScheme.onSurface
-                                  .withValues(alpha: 0.7),
+                                  .withOpacity(0.7),
                             ),
                           ),
                         ]),
@@ -772,7 +772,7 @@ class _TripCard extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                           style: t.textTheme.bodySmall?.copyWith(
                             color:
-                                t.colorScheme.onSurface.withValues(alpha: 0.7),
+                                t.colorScheme.onSurface.withOpacity(0.7),
                           ),
                         ),
                       ],
