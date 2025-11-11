@@ -141,49 +141,40 @@ function LoginContent() {
       return
     }
     
-    // Verificar cookie de sessão primeiro (mais rápido)
+    // ✅ Usar apenas verificação de cookie - não usar Supabase auth na página de login
+    // para evitar conflitos e erros de logout automático
     if (typeof window !== 'undefined') {
       const hasSessionCookie = document.cookie.includes('golffox-session')
       if (hasSessionCookie) {
-        const nextUrl = searchParams.get('next')
-        if (nextUrl) {
-          const cleanNextUrl = decodeURIComponent(nextUrl).split('?')[0]
-          console.log('🔄 Cookie de sessão encontrado, redirecionando para:', cleanNextUrl)
-          window.location.href = cleanNextUrl
-          return
+        // Tentar decodificar o cookie para obter o role
+        try {
+          const cookieMatch = document.cookie.match(/golffox-session=([^;]+)/)
+          if (cookieMatch) {
+            const decoded = atob(cookieMatch[1])
+            const userData = JSON.parse(decoded)
+            const userRole = userData.role || getUserRoleByEmail(userData.email)
+            
+            const nextUrl = searchParams.get('next')
+            if (nextUrl) {
+              const cleanNextUrl = decodeURIComponent(nextUrl).split('?')[0]
+              console.log('🔄 Cookie de sessão encontrado, redirecionando para:', cleanNextUrl)
+              window.location.href = cleanNextUrl
+              return
+            } else {
+              const redirectUrl = userRole === 'admin' ? '/admin' : 
+                                 userRole === 'operator' ? '/operator' : 
+                                 userRole === 'carrier' ? '/carrier' : '/dashboard'
+              console.log('🔄 Cookie de sessão encontrado, redirecionando para:', redirectUrl, 'role:', userRole)
+              window.location.href = redirectUrl
+              return
+            }
+          }
+        } catch (err) {
+          console.warn('⚠️ Erro ao decodificar cookie:', err)
+          // Continuar normalmente se houver erro ao decodificar
         }
       }
     }
-    
-    // Check if user is already logged in via Supabase
-    supabase.auth.getSession().then(({ data: { session } }: { data: { session: any } }) => {
-      if (session && !loading && !transitioning) {
-        // Verificar novamente se não está redirecionando
-        if (typeof window !== 'undefined' && (window as any).__golffox_redirecting) {
-          return
-        }
-        
-        const nextUrl = searchParams.get('next')
-        if (nextUrl) {
-          const cleanNextUrl = decodeURIComponent(nextUrl).split('?')[0]
-          console.log('🔄 Usuário já logado, redirecionando para:', cleanNextUrl)
-          if (typeof window !== 'undefined') {
-            window.location.href = cleanNextUrl
-          } else {
-            router.push(cleanNextUrl)
-          }
-        } else {
-          const userRole = session.user.user_metadata?.role || getUserRoleByEmail(session.user.email)
-          const cleanUrl = `/${userRole}`.split('?')[0]
-          console.log('🔄 Usuário já logado, redirecionando para:', cleanUrl, 'role:', userRole)
-          if (typeof window !== 'undefined') {
-            window.location.href = cleanUrl
-          } else {
-            router.push(cleanUrl)
-          }
-        }
-      }
-    })
   }, [router, searchParams, loading, transitioning])
 
   // Buscar CSRF token
