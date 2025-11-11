@@ -1,5 +1,10 @@
 {
   "dependencies": {
     "@vercel/speed-insights": "^1.2.0"
+  },
+  "devDependencies": {
+    "@supabase/supabase-js": "^2.81.0",
+    "node-fetch": "^2.7.0",
+    "pg": "^8.16.3"
   }
 }

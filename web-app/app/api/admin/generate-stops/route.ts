@@ -11,16 +11,17 @@ export const runtime = 'edge'
 export async function POST(req: NextRequest) {
   clearLogs()
   const body = await req.json().catch(() => ({}))
-  const routeId = body?.routeId as string
-  const employeeDb = body?.employeeDb as string | undefined
+  // Aceitar tanto route_id (snake_case - preferido) quanto routeId (camelCase - legado)
+  const routeId = (body?.route_id || body?.routeId) as string
+  const employeeDb = (body?.employee_db || body?.employeeDb) as string | undefined
   const origin = body?.origin as { lat: number; lng: number } | undefined
-  const avgSpeedKmh = body?.avgSpeedKmh as number | undefined
-  const dbSave = body?.dbSave as boolean | undefined
-  const tableName = (body?.tableName as string | undefined) || 'gf_route_plan'
-  const itemsPerPage = (body?.itemsPerPage as number | undefined) || undefined
+  const avgSpeedKmh = (body?.avg_speed_kmh || body?.avgSpeedKmh) as number | undefined
+  const dbSave = (body?.db_save || body?.dbSave) as boolean | undefined
+  const tableName = ((body?.table_name || body?.tableName) as string | undefined) || 'gf_route_plan'
+  const itemsPerPage = ((body?.items_per_page || body?.itemsPerPage) as number | undefined) || undefined
 
   if (!routeId) {
-    return new Response(JSON.stringify({ error: 'routeId é obrigatório' }), { status: 400 })
+    return new Response(JSON.stringify({ error: 'route_id ou routeId é obrigatório' }), { status: 400 })
   }
 
   log('info', 'Início da geração de pontos', { routeId })

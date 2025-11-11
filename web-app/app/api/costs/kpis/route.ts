@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseServiceRole } from '@/lib/supabase-server'
+import { requireAuth, validateAuth, requireCompanyAccess } from '@/lib/api-auth'
 
 export async function GET(request: NextRequest) {
   try {
@@ -7,11 +8,39 @@ export async function GET(request: NextRequest) {
     const companyId = searchParams.get('company_id')
     const period = searchParams.get('period') || '30' // 30 ou 90 dias
 
+    // ✅ Validar autenticação primeiro
+    const authError = await requireAuth(request, ['admin', 'operator'])
+    if (authError) {
+      return authError
+    }
+
+    // Se não há company_id, verificar se é admin (pode listar todos)
     if (!companyId) {
+      const user = await validateAuth(request)
+      if (!user || user.role !== 'admin') {
+        return NextResponse.json(
+          { 
+            error: 'company_id é obrigatório',
+            message: 'O parâmetro company_id é obrigatório para operadores. Admins podem omitir para listar KPIs de todas as empresas.'
+          },
+          { status: 400 }
+        )
+      }
+      // Admin pode listar sem filtro de company (mas precisamos de pelo menos um company_id para a view)
+      // Por enquanto, retornar erro mais descritivo
       return NextResponse.json(
-        { error: 'company_id é obrigatório' },
+        { 
+          error: 'company_id é obrigatório',
+          message: 'O parâmetro company_id é obrigatório. A view v_costs_kpis requer um company_id específico.'
+        },
         { status: 400 }
       )
+    }
+
+    // ✅ Validar acesso à empresa se company_id fornecido
+    const { user, error: companyError } = await requireCompanyAccess(request, companyId)
+    if (companyError) {
+      return companyError
     }
 
     // Buscar KPIs da view
@@ -19,25 +48,57 @@ export async function GET(request: NextRequest) {
       .from('v_costs_kpis')
       .select('*')
       .eq('company_id', companyId)
-      .single()
+      .maybeSingle()
 
     if (error) {
       console.error('Erro ao buscar KPIs de custos:', error)
+      
+      // Verificar se erro é porque view não existe
+      if (error.message?.includes('does not exist') || error.message?.includes('relation') || error.message?.includes('view')) {
+        return NextResponse.json(
+          { 
+            error: 'View v_costs_kpis não encontrada',
+            message: 'A view v_costs_kpis não existe no banco de dados. Execute as migrações de views de custos para criar a view.',
+            hint: 'Verifique se a migração v44_costs_views.sql foi executada'
+          },
+          { status: 500 }
+        )
+      }
+      
       return NextResponse.json(
-        { error: error.message },
+        { 
+          error: error.message || 'Erro ao buscar KPIs de custos',
+          details: process.env.NODE_ENV === 'development' ? error : undefined
+        },
         { status: 500 }
       )
+    }
+    
+    // Se não há dados, retornar valores padrão
+    if (!data) {
+      return NextResponse.json({
+        company_id: companyId,
+        totalCosts: 0,
+        budget: 0,
+        variance: 0,
+        period_days: parseInt(period)
+      })
     }
 
     // Adicionar variação vs orçamento se houver
     const periodDays = period === '90' ? 90 : 30
-    const { data: budgetData } = await supabaseServiceRole
+    const { data: budgetData, error: budgetError } = await supabaseServiceRole
       .from('v_costs_vs_budget')
       .select('budgeted_amount, actual_amount, variance_percent')
       .eq('company_id', companyId)
       .gte('period_year', new Date().getFullYear())
       .limit(1)
-      .single()
+      .maybeSingle()
+    
+    // Se view não existe, não é erro crítico, apenas não teremos dados de budget
+    if (budgetError && !budgetError.message?.includes('does not exist') && !budgetError.message?.includes('relation')) {
+      console.warn('Erro ao buscar dados de budget:', budgetError)
+    }
 
     const response = {
       ...data,

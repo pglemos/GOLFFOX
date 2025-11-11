@@ -13,10 +13,11 @@ export async function GET() {
     if (!supabaseUrl || !supabaseKey) {
       return NextResponse.json(
         { 
+          status: 'error',
           ok: false, 
           supabase: 'error',
           error: 'Supabase credentials not configured',
-          ts: new Date().toISOString() 
+          timestamp: new Date().toISOString() 
         },
         { status: 500 }
       )
@@ -31,21 +32,23 @@ export async function GET() {
       .limit(1)
 
     const isOk = !error
-    const status = isOk ? 200 : 500
+    const httpStatus = isOk ? 200 : 500
 
     return NextResponse.json({
+      status: isOk ? 'ok' : 'error',
       ok: isOk,
       supabase: error ? 'error' : 'ok',
       error: error?.message || null,
-      ts: new Date().toISOString()
-    }, { status })
+      timestamp: new Date().toISOString()
+    }, { status: httpStatus })
   } catch (error: any) {
     return NextResponse.json(
       { 
+        status: 'error',
         ok: false, 
         supabase: 'error',
         error: error?.message || 'Unknown error',
-        ts: new Date().toISOString() 
+        timestamp: new Date().toISOString() 
       },
       { status: 500 }
     )

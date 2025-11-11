@@ -178,17 +178,47 @@ function LoginContent() {
   useEffect(() => {
     const fetchCsrf = async () => {
       try {
-        const res = await fetch('/api/auth/csrf', { method: 'GET' })
+        const res = await fetch('/api/auth/csrf', { 
+          method: 'GET',
+          credentials: 'include' // Incluir cookies na requisição
+        })
         if (res.ok) {
           const data = await res.json()
-          if (data?.token) setCsrfToken(data.token)
+          // Aceitar tanto 'token' quanto 'csrfToken' para compatibilidade
+          const token = data?.csrfToken || data?.token
+          if (token) {
+            setCsrfToken(token)
+            console.log('✅ CSRF token obtido:', token.substring(0, 10) + '...')
+          } else {
+            console.warn('⚠️ CSRF token não encontrado na resposta:', data)
+          }
+        } else {
+          console.error('❌ Erro ao obter CSRF token:', res.status, res.statusText)
+          // Tentar ler do cookie se a API falhar
+          const cookieMatch = document.cookie.match(/golffox-csrf=([^;]+)/)
+          if (cookieMatch) {
+            setCsrfToken(cookieMatch[1])
+            console.log('✅ CSRF token obtido do cookie')
+          }
         }
-      } catch (_e) {
+      } catch (e) {
+        console.error('❌ Erro ao buscar CSRF token:', e)
+        // Tentar ler do cookie como fallback
         try {
-          const token = Math.random().toString(36).slice(2) + Date.now().toString(36)
-          document.cookie = `golffox-csrf=${token}; path=/; SameSite=Lax`
-          setCsrfToken(token)
-        } catch {}
+          const cookieMatch = document.cookie.match(/golffox-csrf=([^;]+)/)
+          if (cookieMatch) {
+            setCsrfToken(cookieMatch[1])
+            console.log('✅ CSRF token obtido do cookie (fallback)')
+          } else {
+            // Último recurso: gerar token local
+            const token = Math.random().toString(36).slice(2) + Date.now().toString(36)
+            document.cookie = `golffox-csrf=${token}; path=/; SameSite=Lax; max-age=900`
+            setCsrfToken(token)
+            console.log('✅ CSRF token gerado localmente (fallback)')
+          }
+        } catch (cookieErr) {
+          console.error('❌ Erro ao gerar CSRF token local:', cookieErr)
+        }
       }
     }
     fetchCsrf()

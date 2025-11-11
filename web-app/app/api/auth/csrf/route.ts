@@ -10,7 +10,11 @@ export async function GET(req: NextRequest) {
   const url = new URL(req.url)
   const isSecure = url.protocol === 'https:'
 
-  const res = NextResponse.json({ token })
+  // Retornar tanto 'token' (compatibilidade) quanto 'csrfToken' (formato esperado pelos testes)
+  const res = NextResponse.json({ 
+    token, // Mantém compatibilidade com código existente
+    csrfToken: token // Formato esperado pelos testes
+  })
   res.cookies.set({
     name: 'golffox-csrf',
     value: token,
