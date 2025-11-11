@@ -15,8 +15,8 @@ export async function middleware(request: NextRequest) {
       // Tentar obter do header Authorization (fallback)
       const authHeader = request.headers.get('authorization')
       if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        const loginUrl = new URL('/login', request.url)
-        loginUrl.searchParams.set('redirect', pathname)
+        const loginUrl = new URL('/', request.url)
+        loginUrl.searchParams.set('next', pathname)
         return NextResponse.redirect(loginUrl)
       }
     }
@@ -56,15 +56,15 @@ export async function middleware(request: NextRequest) {
           const { error: authError } = await supabase.auth.getUser(userData.accessToken)
           if (authError) {
             // Token inválido, redirecionar para login
-            const loginUrl = new URL('/login', request.url)
-            loginUrl.searchParams.set('redirect', pathname)
+            const loginUrl = new URL('/', request.url)
+            loginUrl.searchParams.set('next', pathname)
             return NextResponse.redirect(loginUrl)
           }
         }
       } catch (err) {
         // Cookie inválido ou erro de parsing, redirecionar para login
-        const loginUrl = new URL('/login', request.url)
-        loginUrl.searchParams.set('redirect', pathname)
+        const loginUrl = new URL('/', request.url)
+        loginUrl.searchParams.set('next', pathname)
         return NextResponse.redirect(loginUrl)
       }
     }
