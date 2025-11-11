@@ -6,6 +6,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/services/snackbar_service.dart';
 import '../../core/theme/gf_tokens.dart';
 import '../../models/vehicle.dart';
 import '../../services/vehicle_service.dart';
@@ -93,13 +94,7 @@ class _VehicleDetailsPageState extends ConsumerState<VehicleDetailsPage>
         }
       } on Exception catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Error deleting vehicle: $e'),
-              backgroundColor: const Color(GfTokens.colorError),
-              behavior: SnackBarBehavior.floating,
-            ),
-          );
+          SnackBarService.error(context, e);
         }
       } finally {
         if (mounted) {
@@ -124,23 +119,15 @@ class _VehicleDetailsPageState extends ConsumerState<VehicleDetailsPage>
       await ref.read(vehicleServiceProvider).updateVehicle(updatedVehicle);
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Status alterado para ${newStatus.displayName}'),
-            backgroundColor: const Color(GfTokens.colorSuccess),
-            behavior: SnackBarBehavior.floating,
-          ),
+        SnackBarService.success(
+          context,
+          'vehicles.status.changed',
+          params: {'status': newStatus.displayName},
         );
       }
     } on Exception catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Erro ao alterar status: $e'),
-            backgroundColor: const Color(GfTokens.colorError),
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
+        SnackBarService.error(context, e);
       }
     } finally {
       if (mounted) {

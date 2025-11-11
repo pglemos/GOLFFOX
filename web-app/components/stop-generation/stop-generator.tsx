@@ -1,5 +1,6 @@
 "use client"
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { t } from '@/lib/i18n'
 import { toCSV, toJSON } from '../../lib/exports'
 
 type LatLng = { lat: number; lng: number }
@@ -135,7 +136,7 @@ export default function StopGenerator({ routeId }: { routeId: string }) {
           <div style={{ marginTop: 16 }}>
             <h3>Resumo</h3>
             <div>Funcionários geocodificados: {Math.round((data.metrics.successRate || 0) * 100)}%</div>
-            <div>Pontos gerados: {data.metrics.count}</div>
+            <div>{t('common', 'labels.pointsGeneratedCount', { count: data.metrics.count })}</div>
             <div style={{ marginTop: 8 }}>
               <button onClick={() => {
                 const blob = new Blob([downloads?.json || ''], { type: 'application/json' })

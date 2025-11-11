@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/i18n/i18n.dart';
+import '../../core/services/snackbar_service.dart';
 import '../../core/theme/gf_tokens.dart';
 import '../../models/driver.dart';
 import '../../services/driver_service.dart';
@@ -273,12 +275,10 @@ class _DriversPageState extends ConsumerState<DriversPage> {
 
   void _updateDriverStatus(String driverId, DriverStatus status) {
     ref.read(driverServiceProvider.notifier).updateDriverStatus(driverId, status);
-    
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Status do motorista atualizado para ${status.displayName}'),
-        backgroundColor: const Color(GfTokens.colorSuccess),
-      ),
+    SnackBarService.success(
+      context,
+      'drivers.status.updated',
+      params: {'statusName': status.displayName},
     );
   }
 
@@ -314,18 +314,15 @@ class _DriversPageState extends ConsumerState<DriversPage> {
 
   void _deleteDriver(Driver driver) {
     ref.read(driverServiceProvider.notifier).deleteDriver(driver.id);
-    
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Motorista "${driver.name}" excluído com sucesso'),
-        backgroundColor: const Color(GfTokens.colorSuccess),
-        action: SnackBarAction(
-          label: 'Desfazer',
-          onPressed: () {
-            // TODO(golffox-team): Implementar desfazer exclusão
-            ref.read(driverServiceProvider.notifier).createDriver(driver);
-          },
-        ),
+    SnackBarService.success(
+      context,
+      'drivers.delete.success',
+      params: {'driverName': driver.name},
+      action: SnackBarAction(
+        label: I18n.t(context, 'common.undo'),
+        onPressed: () {
+          ref.read(driverServiceProvider.notifier).createDriver(driver);
+        },
       ),
     );
   }

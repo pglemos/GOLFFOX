@@ -9,6 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/motion/gf_motion.dart';
 import '../../core/routing/app_router.dart';
 import '../../core/theme/gf_tokens.dart';
+import '../../core/i18n/i18n.dart';
 
 // Provider para controlar o item ativo
 final activeSideNavItemProvider = StateProvider<String>((ref) => 'dashboard');
@@ -127,9 +128,9 @@ class GfSideNav extends ConsumerWidget {
         activeIcon: Icons.map,
         route: '/mapa',
       ),
-      const _MenuItem(
+      _MenuItem(
         id: 'rotas',
-        title: 'Rotas',
+        title: I18n.t(context, 'routes.title'),
         icon: Icons.route_outlined,
         activeIcon: Icons.route,
         route: '/rotas',

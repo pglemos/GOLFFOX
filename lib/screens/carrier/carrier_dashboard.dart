@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../core/routing/app_router.dart';
+import '../../core/services/snackbar_service.dart';
 import '../../core/theme/gf_tokens.dart';
 import '../../models/trip.dart';
 import '../../models/user.dart';
@@ -121,8 +122,10 @@ class _CarrierDashboardState extends State<CarrierDashboard>
       AppRouter.instance.go('/');
     } on Exception catch (error) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro ao fazer logout: $error')),
+      SnackBarService.error(
+        context,
+        error,
+        fallbackKey: 'auth.logout.error',
       );
     }
   }
@@ -351,16 +354,16 @@ class _CarrierDashboardState extends State<CarrierDashboard>
 
   void _openTripSoon(Trip t) {
     // De proposito: tela de detalhe generica poderia ser diferente no contexto de transportadora
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-          content:
-              Text('Detalhes da viagem ${t.id.substring(0, 8)} - em breve')),
+    SnackBarService.infoText(
+      context,
+      'Detalhes da viagem ${t.id.substring(0, 8)} - em breve',
     );
   }
 
   void _vehicleAction(Map<String, dynamic> v, String action) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('"$action" para ${_vehicleLabel(v)} - em breve')),
+    SnackBarService.infoText(
+      context,
+      '"$action" para ${_vehicleLabel(v)} - em breve',
     );
   }
 
@@ -869,9 +872,7 @@ class _QuickActions extends StatelessWidget {
   }
 
   void _soon(BuildContext context, String f) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('$f - em breve')),
-    );
+    SnackBarService.infoText(context, '$f - em breve');
   }
 }
 

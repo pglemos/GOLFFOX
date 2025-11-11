@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../core/routing/app_router.dart';
+import '../../core/services/snackbar_service.dart';
 import '../../core/theme/gf_tokens.dart';
 import '../../models/trip.dart';
 import '../../models/user.dart';
@@ -87,8 +88,7 @@ class _DriverDashboardState extends State<DriverDashboard>
         .eq('driver_id', widget.user.id)
         .order('updated_at')
         .listen((rows) {
-          final trips = rows.map(Trip.fromJson).toList()
-            ..sort(_compareTrips);
+          final trips = rows.map(Trip.fromJson).toList()..sort(_compareTrips);
           if (mounted) setState(() => _trips = trips);
         });
   }
@@ -167,14 +167,15 @@ class _DriverDashboardState extends State<DriverDashboard>
       AppRouter.instance.go('/');
     } on Exception catch (error) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro ao fazer logout: $error')),
+      SnackBarService.error(
+        context,
+        error,
+        fallbackKey: 'auth.logout.error',
       );
     }
   }
 
   Future<void> _handleAction(Trip trip, String action) async {
-    final t = Theme.of(context);
     try {
       if (action == 'start') {
         await _svc.updateTrip(trip.copyWith(
@@ -199,18 +200,16 @@ class _DriverDashboardState extends State<DriverDashboard>
         if (_tracking.isTracking) await _tracking.stopTracking();
       }
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Acao concluida para ${trip.id.substring(0, 8)}'),
-        ),
+      SnackBarService.successText(
+        context,
+        'Acao concluida para ${trip.id.substring(0, 8)}',
       );
     } on Exception catch (error) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          backgroundColor: t.colorScheme.error,
-          content: Text('Falha: $error'),
-        ),
+      SnackBarService.error(
+        context,
+        error,
+        fallbackKey: 'common.retry',
       );
     }
   }
@@ -487,7 +486,10 @@ class _StatusChip extends StatelessWidget {
 
 class _ActiveTripCard extends StatelessWidget {
   const _ActiveTripCard(
-      {required this.trip, required this.onOpen, required this.onAction, super.key});
+      {required this.trip,
+      required this.onOpen,
+      required this.onAction,
+      super.key});
   final Trip trip;
   final VoidCallback onOpen;
   final ValueChanged<String> onAction;
@@ -738,7 +740,8 @@ class _TripCard extends StatelessWidget {
                         const Spacer(),
                         Icon(Icons.arrow_forward_ios,
                             size: 16,
-                            color: t.colorScheme.onSurface.withValues(alpha: 0.5)),
+                            color:
+                                t.colorScheme.onSurface.withValues(alpha: 0.5)),
                       ]),
                       const SizedBox(height: 8),
                       Text('Viagem #${trip.id.substring(0, 8)}',
@@ -749,12 +752,14 @@ class _TripCard extends StatelessWidget {
                         Row(children: [
                           Icon(Icons.access_time,
                               size: 16,
-                              color: t.colorScheme.onSurface.withValues(alpha: 0.7)),
+                              color: t.colorScheme.onSurface
+                                  .withValues(alpha: 0.7)),
                           const SizedBox(width: 6),
                           Text(
                             _fmt(trip.scheduledStartTime!),
                             style: t.textTheme.bodySmall?.copyWith(
-                              color: t.colorScheme.onSurface.withValues(alpha: 0.7),
+                              color: t.colorScheme.onSurface
+                                  .withValues(alpha: 0.7),
                             ),
                           ),
                         ]),
@@ -766,7 +771,8 @@ class _TripCard extends StatelessWidget {
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: t.textTheme.bodySmall?.copyWith(
-                            color: t.colorScheme.onSurface.withValues(alpha: 0.7),
+                            color:
+                                t.colorScheme.onSurface.withValues(alpha: 0.7),
                           ),
                         ),
                       ],
@@ -820,4 +826,3 @@ class _TripCard extends StatelessWidget {
   String _fmt(DateTime d) =>
       '${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')} as ${d.hour.toString().padLeft(2, '0')}:${d.minute.toString().padLeft(2, '0')}';
 }
-

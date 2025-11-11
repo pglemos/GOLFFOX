@@ -9,6 +9,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../core/routing/app_router.dart';
+import '../../core/services/snackbar_service.dart';
 import '../../core/theme/gf_tokens.dart';
 import '../../models/driver_position.dart';
 import '../../models/trip.dart';
@@ -141,15 +142,16 @@ class _PassengerDashboardState extends State<PassengerDashboard>
       AppRouter.instance.go('/');
     } on Exception catch (error) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro ao fazer logout: $error')),
-      );
+              SnackBarService.error(
+                context,
+                error,
+                fallbackKey: 'auth.logout.error',
+              );
     }
   }
 
   Future<void> _openReportIncidentSheet() async {
     if (!mounted) return;
-    final messenger = ScaffoldMessenger.of(context);
     unawaited(HapticFeedback.lightImpact());
     final result = await showModalBottomSheet<String>(
       context: context,
@@ -172,9 +174,7 @@ class _PassengerDashboardState extends State<PassengerDashboard>
     if (result != null && result.isNotEmpty) {
       await HapticFeedback.mediumImpact();
       // aqui salvaria no backend
-      messenger.showSnackBar(
-        const SnackBar(content: Text('Incidente reportado com sucesso')),
-      );
+      SnackBarService.success(context, 'passenger.incident.success');
     }
   }
 

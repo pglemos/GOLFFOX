@@ -30,7 +30,7 @@ test.describe('Admin - Rotas e Mapa', () => {
     if (await generateButton.isVisible()) {
       await generateButton.click()
       // Verificar toast de sucesso
-      await expect(page.locator('text=Pontos gerados com sucesso')).toBeVisible()
+await expect(page.locator('text=Pontos gerados e salvos com sucesso')).toBeVisible()
     }
   })
 

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../config/env_config.dart';
+import '../error/error_utils.dart';
 import 'logger_service.dart';
 
 /// Comprehensive error handling service for GolfFox
@@ -51,11 +52,8 @@ class ErrorService {
     }
 
     // Log the error
-    _logger.error(
-      'Error reported: ${_getErrorMessage(error)}',
-      error,
-      stackTrace,
-    );
+    final formatted = ErrorUtils.formatError(error, context: context, additionalData: additionalData);
+    _logger.error('Error reported: $formatted', error, stackTrace);
 
     // Send to external services if enabled
     if (EnvConfig.enableCrashlytics) {
@@ -178,10 +176,11 @@ class ErrorService {
           rethrow;
         }
 
-        _logger.warning(
-          'operation failed (attempt $attempt/$maxAttempts), retrying...',
-          {'error': error.toString(), 'context': context},
-        );
+        final formatted = ErrorUtils.formatError(error, context: context, additionalData: {
+          'attempt': attempt,
+          'maxAttempts': maxAttempts,
+        });
+        _logger.warning('operation failed (attempt $attempt/$maxAttempts), retrying... $formatted');
 
         await Future<void>.delayed(delay * attempt);
       }

@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 class GxKpiTile extends StatelessWidget {
 
   const GxKpiTile({
-    super.key,
     required this.title,
     required this.value,
+    super.key,
     this.subtitle,
     this.icon,
     this.color,
@@ -18,9 +18,9 @@ class GxKpiTile extends StatelessWidget {
 
   // Construtor para compatibilidade com versao anterior
   const GxKpiTile.legacy({
-    super.key,
     required String label,
     required this.value,
+    super.key,
     this.delta,
     this.suffix,
   })  : title = label,

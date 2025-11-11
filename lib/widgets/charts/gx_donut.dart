@@ -3,8 +3,12 @@ import 'package:flutter/material.dart';
 
 class GxDonut extends StatelessWidget {
 
-  const GxDonut(
-      {super.key, required this.slices, this.centerSpace = 36, this.center});
+  const GxDonut({
+    required this.slices,
+    this.centerSpace = 36,
+    this.center,
+    super.key,
+  });
   final List<GxDonutSlice> slices;
   final double centerSpace;
   final Widget? center;
@@ -40,8 +44,11 @@ class GxDonut extends StatelessWidget {
 }
 
 class GxDonutSlice {
-  const GxDonutSlice(
-      {required this.value, required this.color, required this.label});
+  const GxDonutSlice({
+    required this.value,
+    required this.color,
+    required this.label,
+  });
   final double value;
   final Color color;
   final String label;

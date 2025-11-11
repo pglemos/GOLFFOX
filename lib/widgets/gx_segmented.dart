@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 
 class GxSegmented<T> extends StatelessWidget {
 
-  const GxSegmented(
-      {super.key,
-      required this.values,
-      required this.selected,
-      required this.labelOf,
-      required this.onChanged});
+  const GxSegmented({
+    required this.values,
+    required this.selected,
+    required this.labelOf,
+    required this.onChanged,
+    super.key,
+  });
   final List<T> values;
   final T selected;
   final String Function(T) labelOf;

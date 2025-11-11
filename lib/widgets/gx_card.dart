@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 
 class GxCard extends StatelessWidget {
 
-  const GxCard(
-      {super.key,
-      required this.child,
-      this.padding = const EdgeInsets.all(16),
-      this.margin});
+  const GxCard({
+    required this.child,
+    this.padding = const EdgeInsets.all(16),
+    this.margin,
+    super.key,
+  });
   final Widget child;
   final EdgeInsetsGeometry padding;
   final EdgeInsetsGeometry? margin;

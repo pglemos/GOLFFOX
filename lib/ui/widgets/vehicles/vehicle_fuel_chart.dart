@@ -13,8 +13,8 @@ import '../../../services/vehicle_service.dart';
 class VehicleFuelChart extends ConsumerStatefulWidget {
 
   const VehicleFuelChart({
-    super.key,
     required this.vehicleId,
+    super.key,
   });
   final String vehicleId;
 
@@ -160,8 +160,8 @@ class _VehicleFuelChartState extends ConsumerState<VehicleFuelChart> {
         });
       },
       backgroundColor:
-          isSelected ? GfTokens.colorPrimary.withValues(alpha: 0.1) : null,
-      selectedColor: GfTokens.colorPrimary.withValues(alpha: 0.2),
+          isSelected ? Color(GfTokens.colorPrimary).withValues(alpha: 0.1) : null,
+      selectedColor: Color(GfTokens.colorPrimary).withValues(alpha: 0.2),
       checkmarkColor: const Color(GfTokens.colorPrimary),
       side: BorderSide(
         color: isSelected
@@ -335,7 +335,7 @@ class _VehicleFuelChartState extends ConsumerState<VehicleFuelChart> {
                 child: Center(
                   child: TextButton(
                     onPressed: () {
-                      // TODO: Mostrar todos os registros
+                      // TODO(golffox-team): Mostrar todos os registros
                     },
                     child: Text('Ver todos (${sortedRecords.length})'),
                   ),
@@ -478,7 +478,7 @@ class _VehicleFuelChartState extends ConsumerState<VehicleFuelChart> {
           const SizedBox(height: GfTokens.spacingMd),
           ElevatedButton.icon(
             onPressed: () {
-              // TODO: Navegar para registrar abastecimento
+              // TODO(golffox-team): Navegar para registrar abastecimento
             },
             icon: const Icon(Icons.add),
             label: const Text('Registrar Abastecimento'),

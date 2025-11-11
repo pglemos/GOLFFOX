@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/i18n/i18n.dart';
+import '../../core/services/snackbar_service.dart';
 import '../../core/theme/gf_tokens.dart';
 import '../../core/utils/date_utils.dart';
 import '../../models/route.dart';
@@ -57,7 +59,7 @@ class _RouteDetailsPageState extends ConsumerState<RouteDetailsPage>
             IconButton(
               onPressed: _editRoute,
               icon: const Icon(Icons.edit),
-              tooltip: 'Editar Rota',
+              tooltip: I18n.t(context, 'routes.edit.title'),
             ),
           if (_isLoading)
             const Padding(
@@ -73,40 +75,40 @@ class _RouteDetailsPageState extends ConsumerState<RouteDetailsPage>
               onSelected: _handleMenuAction,
               itemBuilder: (context) => [
               if (widget.route.status == RouteStatus.planned)
-                const PopupMenuItem(
+                PopupMenuItem(
                   value: 'start',
                   child: ListTile(
                     leading:
                         Icon(Icons.play_arrow, color: Color(GfTokens.success)),
-                    title: Text('Iniciar Rota'),
+                    title: Text(I18n.t(context, 'routes.action.start')),
                     contentPadding: EdgeInsets.zero,
                   ),
                 ),
               if (widget.route.isActive)
-                const PopupMenuItem(
+                PopupMenuItem(
                   value: 'cancel',
                   child: ListTile(
                     leading:
                         Icon(Icons.stop, color: Color(GfTokens.colorError)),
-                    title: Text('Cancelar Rota'),
+                    title: Text(I18n.t(context, 'routes.action.cancel')),
                     contentPadding: EdgeInsets.zero,
                   ),
                 ),
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 'duplicate',
                 child: ListTile(
                   leading: Icon(Icons.copy),
-                  title: Text('Duplicar Rota'),
+                  title: Text(I18n.t(context, 'routes.action.duplicate')),
                   contentPadding: EdgeInsets.zero,
                 ),
               ),
               if (widget.route.status == RouteStatus.planned)
-                const PopupMenuItem(
+                PopupMenuItem(
                   value: 'delete',
                   child: ListTile(
                     leading:
                         Icon(Icons.delete, color: Color(GfTokens.colorError)),
-                    title: Text('Excluir Rota'),
+                    title: Text(I18n.t(context, 'routes.action.delete')),
                     contentPadding: EdgeInsets.zero,
                   ),
                 ),
@@ -133,10 +135,10 @@ class _RouteDetailsPageState extends ConsumerState<RouteDetailsPage>
           labelColor: const Color(GfTokens.colorPrimary),
           unselectedLabelColor: const Color(GfTokens.colorOnSurfaceVariant),
           indicatorColor: const Color(GfTokens.colorPrimary),
-          tabs: const [
-            Tab(text: 'Visao Geral'),
-            Tab(text: 'Paradas'),
-            Tab(text: 'Historico'),
+          tabs: [
+            Tab(text: I18n.t(context, 'routes.tabs.overview')),
+            Tab(text: I18n.t(context, 'routes.tabs.stops')),
+            Tab(text: I18n.t(context, 'routes.tabs.history')),
           ],
         ),
 
@@ -625,20 +627,19 @@ class _RouteDetailsPageState extends ConsumerState<RouteDetailsPage>
       await ref.read(routeServiceProvider).startRoute(widget.route.id);
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Rota iniciada com sucesso'),
-            backgroundColor: Color(GfTokens.success),
-          ),
+        SnackBarService.success(
+          context,
+          'routes.start.success',
+          params: {'name': widget.route.name},
         );
       }
     } on Exception catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Erro ao iniciar rota: $e'),
-            backgroundColor: const Color(GfTokens.error),
-          ),
+        SnackBarService.error(
+          context,
+          e,
+          fallbackKey: 'routes.start.error',
+          params: {'message': e.toString()},
         );
       }
     } finally {
@@ -650,12 +651,12 @@ class _RouteDetailsPageState extends ConsumerState<RouteDetailsPage>
     showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Cancelar Rota'),
-        content: const Text('Tem certeza que deseja cancelar esta rota?'),
+        title: Text(I18n.t(context, 'routes.cancel.title')),
+        content: Text(I18n.t(context, 'routes.cancel.prompt', params: {'name': widget.route.name})),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(),
-            child: const Text('Nao'),
+            child: Text(I18n.t(context, 'common.no')),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -669,20 +670,19 @@ class _RouteDetailsPageState extends ConsumerState<RouteDetailsPage>
 
                 if (!mounted) return;
 
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Rota cancelada'),
-                    backgroundColor: Color(GfTokens.warning),
-                  ),
+                SnackBarService.warn(
+                  context,
+                  'routes.cancel.success',
+                  params: {'name': widget.route.name},
                 );
               } on Exception catch (e) {
                 if (!mounted) return;
 
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Erro ao cancelar rota: $e'),
-                    backgroundColor: const Color(GfTokens.error),
-                  ),
+                SnackBarService.error(
+                  context,
+                  e,
+                  fallbackKey: 'routes.cancel.error',
+                  params: {'message': e.toString()},
                 );
               }
             },
@@ -690,7 +690,7 @@ class _RouteDetailsPageState extends ConsumerState<RouteDetailsPage>
               backgroundColor: const Color(GfTokens.error),
               foregroundColor: Colors.white,
             ),
-            child: const Text('Sim, Cancelar'),
+            child: Text(I18n.t(context, 'routes.cancel.confirm')),
           ),
         ],
       ),
@@ -703,7 +703,7 @@ class _RouteDetailsPageState extends ConsumerState<RouteDetailsPage>
         builder: (context) => CreateRoutePage(
           route: widget.route.copyWith(
             id: DateTime.now().millisecondsSinceEpoch.toString(),
-            name: '${widget.route.name} (Copia)',
+            name: '${widget.route.name}${I18n.t(context, 'routes.copy.suffix')}',
             status: RouteStatus.planned,
             createdAt: DateTime.now(),
             updatedAt: DateTime.now(),
@@ -717,14 +717,12 @@ class _RouteDetailsPageState extends ConsumerState<RouteDetailsPage>
     showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Excluir Rota'),
-        content: const Text(
-          'Tem certeza que deseja excluir esta rota? Esta acao nao pode ser desfeita.',
-        ),
+        title: Text(I18n.t(context, 'routes.delete.title')),
+        content: Text(I18n.t(context, 'routes.delete.prompt')),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(),
-            child: const Text('Cancelar'),
+            child: Text(I18n.t(context, 'common.cancel')),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -736,20 +734,19 @@ class _RouteDetailsPageState extends ConsumerState<RouteDetailsPage>
                 if (!mounted) return;
 
                 Navigator.of(context).pop();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Rota excluida com sucesso'),
-                    backgroundColor: Color(GfTokens.success),
-                  ),
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: SizedBox.shrink()));
+                SnackBarService.success(
+                  context,
+                  'routes.delete.success',
                 );
               } on Exception catch (e) {
                 if (!mounted) return;
 
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Erro ao excluir rota: $e'),
-                    backgroundColor: const Color(GfTokens.error),
-                  ),
+                SnackBarService.error(
+                  context,
+                  e,
+                  fallbackKey: 'routes.delete.error',
+                  params: {'message': e.toString()},
                 );
               }
             },
@@ -757,7 +754,7 @@ class _RouteDetailsPageState extends ConsumerState<RouteDetailsPage>
               backgroundColor: const Color(GfTokens.error),
               foregroundColor: Colors.white,
             ),
-            child: const Text('Excluir'),
+            child: Text(I18n.t(context, 'common.delete')),
           ),
         ],
       ),

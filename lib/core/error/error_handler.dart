@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../logging/app_logger.dart';
+import '../services/snackbar_service.dart';
 import 'app_error.dart';
 
 /// Handler global de erros da aplicação
@@ -122,25 +123,9 @@ class ErrorHandler {
 
   /// Mostra SnackBar com erro
   static void _showSnackBar(BuildContext context, AppError error) {
-    if (!context.mounted) {
-      return;
-    }
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(error.userMessage),
-        backgroundColor: _getErrorColor(error.type),
-        behavior: SnackBarBehavior.floating,
-        action: error.type == AppErrorType.network
-            ? SnackBarAction(
-                label: 'Tentar novamente',
-                onPressed: () {
-                  // Implementar retry logic se necessário
-                },
-              )
-            : null,
-      ),
-    );
+    if (!context.mounted) return;
+    // Delegar ao SnackBarService para mensagens e estilo padronizados
+    SnackBarService.error(context, error);
   }
 
   /// Mostra dialog com erro

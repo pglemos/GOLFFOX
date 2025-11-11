@@ -3,12 +3,13 @@ import 'package:flutter/material.dart';
 
 class GxLineChart extends StatelessWidget {
 
-  const GxLineChart(
-      {super.key,
-      required this.points,
-      this.color,
-      this.strokeWidth = 3,
-      this.showDots = false});
+  const GxLineChart({
+    required this.points,
+    this.color,
+    this.strokeWidth = 3,
+    this.showDots = false,
+    super.key,
+  });
   final List<FlSpot> points;
   final Color? color;
   final double strokeWidth;

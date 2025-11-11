@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/i18n/i18n.dart';
+import '../../core/services/snackbar_service.dart';
 import '../../core/theme/gf_tokens.dart';
 import '../../models/route.dart';
 import '../../services/route_service.dart';
@@ -35,12 +37,12 @@ class _RoutesPageState extends ConsumerState<RoutesPage> {
 
     return Scaffold(
       appBar: GfAppBar(
-        title: 'Rotas',
+        title: I18n.t(context, 'routes.title'),
         actions: [
           IconButton(
             onPressed: _showCreateRouteDialog,
             icon: const Icon(Icons.add),
-            tooltip: 'Nova Rota',
+            tooltip: I18n.t(context, 'routes.action.new'),
           ),
         ],
       ),
@@ -61,7 +63,7 @@ class _RoutesPageState extends ConsumerState<RoutesPage> {
                 TextField(
                   onChanged: (value) => setState(() => _searchQuery = value),
                   decoration: InputDecoration(
-                    hintText: 'Buscar rotas...',
+                    hintText: I18n.t(context, 'routes.search.hint'),
                     prefixIcon: const Icon(Icons.search),
                     suffixIcon: _searchQuery.isNotEmpty
                         ? IconButton(
@@ -125,7 +127,7 @@ class _RoutesPageState extends ConsumerState<RoutesPage> {
         backgroundColor: const Color(GfTokens.primary),
         foregroundColor: Colors.white,
         icon: const Icon(Icons.add),
-        label: const Text('Nova Rota'),
+        label: Text(I18n.t(context, 'routes.action.new')),
       ),
     );
   }
@@ -353,20 +355,19 @@ class _RoutesPageState extends ConsumerState<RoutesPage> {
 
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Rota "${route.name}" iniciada com sucesso'),
-          backgroundColor: const Color(GfTokens.success),
-        ),
+      SnackBarService.success(
+        context,
+        'routes.start.success',
+        params: {'name': route.name},
       );
     } on Exception catch (e) {
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Erro ao iniciar rota: $e'),
-          backgroundColor: const Color(GfTokens.error),
-        ),
+      SnackBarService.error(
+        context,
+        e,
+        fallbackKey: 'routes.start.error',
+        params: {'message': e.toString()},
       );
     }
   }
@@ -375,13 +376,13 @@ class _RoutesPageState extends ConsumerState<RoutesPage> {
     showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Cancelar Rota'),
+        title: Text(I18n.t(context, 'routes.cancel.title')),
         content:
-            Text('Tem certeza que deseja cancelar a rota "${route.name}"?'),
+            Text(I18n.t(context, 'routes.cancel.prompt', params: {'name': route.name})),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(),
-            child: const Text('Nao'),
+            child: Text(I18n.t(context, 'common.no')),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -395,20 +396,19 @@ class _RoutesPageState extends ConsumerState<RoutesPage> {
 
                 if (!mounted) return;
 
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Rota "${route.name}" cancelada'),
-                    backgroundColor: const Color(GfTokens.warning),
-                  ),
+                SnackBarService.warn(
+                  context,
+                  'routes.cancel.success',
+                  params: {'name': route.name},
                 );
               } on Exception catch (e) {
                 if (!mounted) return;
 
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Erro ao cancelar rota: $e'),
-                    backgroundColor: const Color(GfTokens.error),
-                  ),
+                SnackBarService.error(
+                  context,
+                  e,
+                  fallbackKey: 'routes.cancel.error',
+                  params: {'message': e.toString()},
                 );
               }
             },
@@ -416,7 +416,7 @@ class _RoutesPageState extends ConsumerState<RoutesPage> {
               backgroundColor: const Color(GfTokens.error),
               foregroundColor: Colors.white,
             ),
-            child: const Text('Sim, Cancelar'),
+            child: Text(I18n.t(context, 'routes.cancel.confirm')),
           ),
         ],
       ),

@@ -4,10 +4,10 @@
 // ========================================
 
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import '../../../core/theme/gf_tokens.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/theme/gf_tokens.dart';
 import '../../../models/vehicle.dart';
 import '../../../services/vehicle_service.dart';
 
@@ -100,21 +100,19 @@ class VehicleEvent {
     this.metadata,
   });
 
-  factory VehicleEvent.fromJson(Map<String, dynamic> json) {
-    return VehicleEvent(
-      id: json['id'] as String,
-      type: VehicleEventType.values.firstWhere(
-        (e) => e.name == json['type'],
-        orElse: () => VehicleEventType.updated,
-      ),
-      title: json['title'] as String,
-      description: json['description'] as String,
-      timestamp: DateTime.parse(json['timestamp'] as String),
-      userId: json['userId'] as String?,
-      userName: json['userName'] as String?,
-      metadata: json['metadata'] as Map<String, dynamic>?,
-    );
-  }
+  factory VehicleEvent.fromJson(Map<String, dynamic> json) => VehicleEvent(
+        id: json['id'] as String,
+        type: VehicleEventType.values.firstWhere(
+          (e) => e.name == json['type'],
+          orElse: () => VehicleEventType.updated,
+        ),
+        title: json['title'] as String,
+        description: json['description'] as String,
+        timestamp: DateTime.parse(json['timestamp'] as String),
+        userId: json['userId'] as String?,
+        userName: json['userName'] as String?,
+        metadata: json['metadata'] as Map<String, dynamic>?,
+      );
   final String id;
   final VehicleEventType type;
   final String title;
@@ -125,22 +123,22 @@ class VehicleEvent {
   final Map<String, dynamic>? metadata;
 
   Map<String, dynamic> toJson() => {
-      'id': id,
-      'type': type.name,
-      'title': title,
-      'description': description,
-      'timestamp': timestamp.toIso8601String(),
-      'userId': userId,
-      'userName': userName,
-      'metadata': metadata,
-    };
+        'id': id,
+        'type': type.name,
+        'title': title,
+        'description': description,
+        'timestamp': timestamp.toIso8601String(),
+        'userId': userId,
+        'userName': userName,
+        'metadata': metadata,
+      };
 }
 
 class VehicleHistory extends ConsumerStatefulWidget {
 
   const VehicleHistory({
-    super.key,
     required this.vehicleId,
+    super.key,
   });
   final String vehicleId;
 
@@ -408,32 +406,34 @@ class _VehicleHistoryState extends ConsumerState<VehicleHistory> {
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: metadata.entries.map((entry) {
-          return Padding(
-            padding: const EdgeInsets.only(bottom: GfTokens.spacingXs),
-            child: Row(
-              children: [
-                Text(
-                  '${entry.key}: ',
-                  style: const TextStyle(
-                    fontSize: GfTokens.fontSizeSm,
-                    fontWeight: FontWeight.w500,
-                    color: Color(GfTokens.colorOnSurfaceVariant),
-                  ),
-                ),
-                Expanded(
-                  child: Text(
-                    entry.value.toString(),
-                    style: const TextStyle(
-                      fontSize: GfTokens.fontSizeSm,
-                      color: Color(GfTokens.colorOnSurfaceVariant),
+        children: metadata.entries
+            .map(
+              (entry) => Padding(
+                padding: const EdgeInsets.only(bottom: GfTokens.spacingXs),
+                child: Row(
+                  children: [
+                    Text(
+                      '${entry.key}: ',
+                      style: const TextStyle(
+                        fontSize: GfTokens.fontSizeSm,
+                        fontWeight: FontWeight.w500,
+                        color: Color(GfTokens.colorOnSurfaceVariant),
+                      ),
                     ),
-                  ),
+                    Expanded(
+                      child: Text(
+                        entry.value.toString(),
+                        style: const TextStyle(
+                          fontSize: GfTokens.fontSizeSm,
+                          color: Color(GfTokens.colorOnSurfaceVariant),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          );
-        }).toList(),
+              ),
+            )
+            .toList(),
       ),
     );
 
@@ -481,87 +481,71 @@ class _VehicleHistoryState extends ConsumerState<VehicleHistory> {
     );
 
   List<VehicleEvent> _generateVehicleEvents(Vehicle vehicle) {
-    final events = <VehicleEvent>[];
-
-    // Evento de criacao
-    events.add(VehicleEvent(
-      id: '${vehicle.id}_created',
-      type: VehicleEventType.created,
-      title: 'Veiculo Criado',
-      description: 'Veiculo ${vehicle.name} foi adicionado ao sistema.',
-      timestamp: vehicle.createdAt,
-      userName: 'Sistema',
-      metadata: {
-        'Placa': vehicle.documents.licensePlate ?? 'Sem placa',
-        'Tipo': vehicle.type.displayName,
-        'Status': vehicle.status.displayName,
-      },
-    ));
-
-    // Evento de atualizacao (se diferente da criacao)
-    if (vehicle.updatedAt
-        .isAfter(vehicle.createdAt.add(const Duration(minutes: 1)))) {
-      events.add(VehicleEvent(
-        id: '${vehicle.id}_updated',
-        type: VehicleEventType.updated,
-        title: 'Informacoes Atualizadas',
-        description: 'As informacoes do veiculo foram atualizadas.',
-        timestamp: vehicle.updatedAt,
-        userName: 'Sistema',
-      ));
-    }
-
-    // Eventos simulados baseados no status atual
-    if (vehicle.status == VehicleStatus.maintenance) {
-      events.add(VehicleEvent(
-        id: '${vehicle.id}_maintenance',
-        type: VehicleEventType.statusChanged,
-        title: 'Status Alterado para Manutencao',
-        description: 'O veiculo foi colocado em manutencao.',
-        timestamp: DateTime.now().subtract(const Duration(hours: 2)),
-        userName: 'Joao Silva',
-        metadata: {
-          'Status Anterior': 'Disponivel',
-          'Status Atual': 'Em Manutencao',
-        },
-      ));
-    }
-
-    // Eventos de combustivel (simulados)
-    if ((vehicle.currentFuelLevel ?? 0) < 30) {
-      events.add(VehicleEvent(
-        id: '${vehicle.id}_fuel_low',
-        type: VehicleEventType.fuelAdded,
-        title: 'Nivel de Combustivel Baixo',
-        description: 'O nivel de combustivel esta abaixo de 30%.',
-        timestamp: DateTime.now().subtract(const Duration(hours: 6)),
+    final events = <VehicleEvent>[
+      VehicleEvent(
+        id: '${vehicle.id}_created',
+        type: VehicleEventType.created,
+        title: 'Veiculo Criado',
+        description: 'Veiculo ${vehicle.name} foi adicionado ao sistema.',
+        timestamp: vehicle.createdAt,
         userName: 'Sistema',
         metadata: {
-          'Nivel Atual':
-              '${(vehicle.currentFuelLevel ?? 0).toStringAsFixed(1)}%',
-          'Capacidade': '${vehicle.specifications.fuelTankCapacity}L',
+          'Placa': vehicle.documents.licensePlate ?? 'Sem placa',
+          'Tipo': vehicle.type.displayName,
+          'Status': vehicle.status.displayName,
         },
-      ));
-    }
-
-    // Eventos de documentos vencendo
-    if (vehicle.documents.hasExpiringDocuments) {
-      events.add(VehicleEvent(
-        id: '${vehicle.id}_docs_expiring',
-        type: VehicleEventType.documentUpdated,
-        title: 'Documentos Vencendo',
-        description:
-            'Alguns documentos do veiculo estao proximos do vencimento.',
-        timestamp: DateTime.now().subtract(const Duration(days: 1)),
-        userName: 'Sistema',
-        metadata: {
-          'Documentos': 'Documentos proximos do vencimento',
-        },
-      ));
-    }
-
-    // Ordenar por timestamp (mais recente primeiro)
-    events.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+      ),
+      if (vehicle.updatedAt
+          .isAfter(vehicle.createdAt.add(const Duration(minutes: 1))))
+        VehicleEvent(
+          id: '${vehicle.id}_updated',
+          type: VehicleEventType.updated,
+          title: 'Informacoes Atualizadas',
+          description: 'As informacoes do veiculo foram atualizadas.',
+          timestamp: vehicle.updatedAt,
+          userName: 'Sistema',
+        ),
+      if (vehicle.status == VehicleStatus.maintenance)
+        VehicleEvent(
+          id: '${vehicle.id}_maintenance',
+          type: VehicleEventType.statusChanged,
+          title: 'Status Alterado para Manutencao',
+          description: 'O veiculo foi colocado em manutencao.',
+          timestamp: DateTime.now().subtract(const Duration(hours: 2)),
+          userName: 'Joao Silva',
+          metadata: {
+            'Status Anterior': 'Disponivel',
+            'Status Atual': 'Em Manutencao',
+          },
+        ),
+      if ((vehicle.currentFuelLevel ?? 0) < 30)
+        VehicleEvent(
+          id: '${vehicle.id}_fuel_low',
+          type: VehicleEventType.fuelAdded,
+          title: 'Nivel de Combustivel Baixo',
+          description: 'O nivel de combustivel esta abaixo de 30%.',
+          timestamp: DateTime.now().subtract(const Duration(hours: 6)),
+          userName: 'Sistema',
+          metadata: {
+            'Nivel Atual':
+                '${(vehicle.currentFuelLevel ?? 0).toStringAsFixed(1)}%',
+            'Capacidade': '${vehicle.specifications.fuelTankCapacity}L',
+          },
+        ),
+      if (vehicle.documents.hasExpiringDocuments)
+        VehicleEvent(
+          id: '${vehicle.id}_docs_expiring',
+          type: VehicleEventType.documentUpdated,
+          title: 'Documentos Vencendo',
+          description:
+              'Alguns documentos do veiculo estao proximos do vencimento.',
+          timestamp: DateTime.now().subtract(const Duration(days: 1)),
+          userName: 'Sistema',
+          metadata: {
+            'Documentos': 'Documentos proximos do vencimento',
+          },
+        ),
+    ]..sort((a, b) => b.timestamp.compareTo(a.timestamp));
 
     return events;
   }

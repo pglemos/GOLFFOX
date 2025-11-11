@@ -9,6 +9,7 @@ import '../../models/trip.dart';
 import '../../models/user.dart';
 import '../../services/auth_service.dart';
 import '../../services/supabase_service.dart';
+import '../../core/services/snackbar_service.dart';
 
 class OperatorDashboard extends StatefulWidget {
   const OperatorDashboard({required this.user, super.key});
@@ -68,8 +69,10 @@ class _OperatorDashboardState extends State<OperatorDashboard>
       if (mounted) AppRouter.instance.go('/');
     } on Exception catch (error) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro ao fazer logout: $error')),
+      SnackBarService.error(
+        context,
+        error,
+        fallbackKey: 'auth.logout.error',
       );
     }
   }
@@ -904,9 +907,7 @@ class _QuickActions extends StatelessWidget {
   }
 
   void _soon(BuildContext context, String f) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('$f - em breve')),
-    );
+    SnackBarService.infoText(context, '$f - em breve');
   }
 }
 

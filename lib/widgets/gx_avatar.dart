@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 class GxAvatar extends StatelessWidget {
 
   const GxAvatar({
-    super.key,
     this.imageUrl,
     this.name,
     this.size = 40,
@@ -14,6 +13,7 @@ class GxAvatar extends StatelessWidget {
     this.borderColor,
     this.borderWidth = 2,
     this.fallbackIcon,
+    super.key,
   });
   final String? imageUrl;
   final String? name;
@@ -175,8 +175,8 @@ class GxAvatar extends StatelessWidget {
 class GxAvatarGroup extends StatelessWidget {
 
   const GxAvatarGroup({
-    super.key,
     required this.avatars,
+    super.key,
     this.size = 32,
     this.maxVisible = 3,
     this.overlap = 8,

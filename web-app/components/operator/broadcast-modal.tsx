@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Send, Users, Route, Clock } from "lucide-react"
 import { supabase } from "@/lib/supabase"
-import toast from "react-hot-toast"
+import { notifySuccess, notifyError } from "@/lib/toast"
 import { error as logError } from "@/lib/logger"
 import { useState } from "react"
 
@@ -27,7 +27,7 @@ export function BroadcastModal({ isOpen, onClose, onSave, empresaId }: Broadcast
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!title || !message) {
-      toast.error("Preencha título e mensagem")
+      notifyError('', undefined, { i18n: { ns: 'operator', key: 'broadcast.validation.titleMessageRequired' } })
       return
     }
 
@@ -45,7 +45,7 @@ export function BroadcastModal({ isOpen, onClose, onSave, empresaId }: Broadcast
 
       if (error) throw error
 
-      toast.success("Broadcast enviado com sucesso!")
+      notifySuccess('', { i18n: { ns: 'operator', key: 'broadcast.success.sent' } })
       onSave()
       onClose()
       setTitle("")
@@ -53,7 +53,7 @@ export function BroadcastModal({ isOpen, onClose, onSave, empresaId }: Broadcast
       setTarget("empresa")
     } catch (error: any) {
       logError("Erro ao enviar broadcast", { error }, 'BroadcastModal')
-      toast.error(`Erro ao enviar broadcast: ${error.message}`)
+      notifyError(error, `Erro ao enviar broadcast: ${error.message}`, { i18n: { ns: 'operator', key: 'broadcast.errors.send', params: { message: error.message } } })
     } finally {
       setLoading(false)
     }

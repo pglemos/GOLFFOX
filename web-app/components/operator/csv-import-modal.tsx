@@ -85,7 +85,9 @@ export function CSVImportModal({ isOpen, onClose, onSave, empresaId }: CSVImport
     if (!selectedFile) return
 
     if (!parseCSV) {
-      toast.error('Funcionalidade de importação CSV não disponível. Verifique se o módulo está instalado.')
+      notifyError('Funcionalidade de importação CSV não disponível. Verifique se o módulo está instalado.', {
+        i18n: { ns: 'operator', key: 'csv_import.error', params: { message: 'Módulo ausente' } }
+      })
       return
     }
 
@@ -98,12 +100,16 @@ export function CSVImportModal({ isOpen, onClose, onSave, empresaId }: CSVImport
       const result = await parseCSV(selectedFile) as ParseResult
 
       if (!result || !result.valid) {
-        toast.error("Erro ao processar arquivo CSV")
+        notifyError("Erro ao processar arquivo CSV", {
+          i18n: { ns: 'operator', key: 'csv_import.error', params: { message: 'Processamento' } }
+        })
         return
       }
 
       if (result.valid.length === 0) {
-        toast.error("Nenhum funcionário válido encontrado no arquivo")
+        notifyError("Nenhum funcionário válido encontrado no arquivo", {
+          i18n: { ns: 'operator', key: 'csv_import.error', params: { message: 'Nenhum válido' } }
+        })
         return
       }
 
@@ -111,13 +117,15 @@ export function CSVImportModal({ isOpen, onClose, onSave, empresaId }: CSVImport
       setParseErrors(result.errors || [])
 
       if (result.errors && result.errors.length > 0) {
-        toast(`${result.valid.length} válidos, ${result.errors.length} erros encontrados`)
+        notifyInfo(`${result.valid.length} válidos, ${result.errors.length} erros encontrados`)
       } else {
-        toast.success(`${result.valid.length} funcionários encontrados no arquivo`)
+        notifySuccess(`${result.valid.length} funcionários encontrados no arquivo`, {
+          i18n: { ns: 'common', key: 'success.validRowsFound', params: { count: result.valid.length } }
+        })
       }
     } catch (error: any) {
       logError("Erro ao ler arquivo", { error }, 'CSVImportModal')
-      toast.error(`Erro ao ler arquivo: ${error.message || 'Erro desconhecido'}`)
+      notifyError(`Erro ao ler arquivo: ${error.message || 'Erro desconhecido'}`)
     }
   }
 

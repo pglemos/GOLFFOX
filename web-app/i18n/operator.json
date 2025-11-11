@@ -79,11 +79,33 @@
       "successCreated": "Agendamento criado com sucesso!",
       "successUpdated": "Agendamento atualizado com sucesso!",
       "validation": {
-        "selectReport": "Selecione um relatório"
+        "selectReport": "Selecione um relatório",
+        "selectCompany": "Selecione uma empresa"
       },
       "errors": {
         "createSchedule": "Erro ao criar agendamento"
       }
+    }
+  },
+  "admin": {
+    "reports": {
+      "schedule": {
+        "successDeleted": "Agendamento deletado com sucesso!"
+      }
+    },
+    "operators": {
+      "createSuccess": "Operador criado com sucesso! Senha temporária: {tempPassword}"
+    }
+  },
+  "broadcast": {
+    "validation": {
+      "titleMessageRequired": "Preencha título e mensagem"
+    },
+    "success": {
+      "sent": "Broadcast enviado com sucesso!"
+    },
+    "errors": {
+      "send": "Erro ao enviar broadcast: {message}"
     }
   }
 }

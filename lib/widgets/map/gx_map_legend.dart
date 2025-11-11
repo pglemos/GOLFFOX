@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
 
 class GxMapLegend extends StatelessWidget {
-  const GxMapLegend({super.key, required this.items});
+  const GxMapLegend({required this.items, super.key});
 
-  factory GxMapLegend.simple({Color? route, Color? stop, Color? vehicle}) {
-    return GxMapLegend(
-      items: [
-        GxLegendItem('Rota', color: route ?? const Color(0xFF2563EB)),
-        GxLegendItem('Parada', color: stop ?? const Color(0xFFF59E0B)),
-        GxLegendItem('Veiculo', color: vehicle ?? const Color(0xFF16A34A)),
-      ],
-    );
-  }
+  factory GxMapLegend.simple({Color? route, Color? stop, Color? vehicle}) =>
+      GxMapLegend(
+        items: [
+          GxLegendItem('Rota', color: route ?? const Color(0xFF2563EB)),
+          GxLegendItem('Parada', color: stop ?? const Color(0xFFF59E0B)),
+          GxLegendItem('Veiculo', color: vehicle ?? const Color(0xFF16A34A)),
+        ],
+      );
   final List<GxLegendItem> items;
 
   @override

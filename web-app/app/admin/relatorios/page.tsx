@@ -16,7 +16,7 @@ import {
   formatOccupancyReport,
   formatNotBoardedReport
 } from "@/lib/export-utils"
-import { withToast } from "@/lib/toast"
+import { withToast, notifySuccess, notifyError } from "@/lib/toast"
 import { t } from "@/lib/i18n"
 import { 
   DropdownMenu,
@@ -332,10 +332,14 @@ export default function RelatoriosPage() {
                                 method: 'DELETE'
                               })
                               if (!response.ok) throw new Error('Erro ao deletar')
-                              toast.success('Agendamento deletado com sucesso!')
+                              notifySuccess('Agendamento deletado com sucesso!', {
+                                i18n: { ns: 'operator', key: 'admin.reports.schedule.successDeleted' }
+                              })
                               loadSchedules()
                             } catch (error: any) {
-                              toast.error(`Erro: ${error.message}`)
+                              notifyError(`Erro: ${error.message}`, {
+                                i18n: { ns: 'common', key: 'errors.generic' }
+                              })
                             }
                           }
                         }}

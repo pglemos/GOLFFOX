@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Wrench, Calendar } from "lucide-react"
 import { supabase } from "@/lib/supabase"
-import toast from "react-hot-toast"
+import { notifySuccess, notifyError } from "@/lib/toast"
 import { useSupabaseSync } from "@/hooks/use-supabase-sync"
 import {
   Select,
@@ -94,7 +94,7 @@ export function VehicleMaintenanceModal({
 
     try {
       if (!formData.type || !formData.due_at) {
-        toast.error("Tipo e data de vencimento são obrigatórios")
+        notifyError('', undefined, { i18n: { ns: 'common', key: 'validation.maintenanceTypeExpiryRequired' } })
         return
       }
 
@@ -123,7 +123,7 @@ export function VehicleMaintenanceModal({
           data: maintenanceData,
         })
         
-        toast.success("Manutenção atualizada com sucesso!")
+        notifySuccess('', { i18n: { ns: 'common', key: 'success.maintenanceUpdated' } })
       } else {
         // Criar
         const { data, error } = await supabase
@@ -144,7 +144,7 @@ export function VehicleMaintenanceModal({
           })
         }
         
-        toast.success("Manutenção cadastrada com sucesso!")
+        notifySuccess('', { i18n: { ns: 'common', key: 'success.maintenanceCreated' } })
       }
 
       // Log de auditoria
@@ -167,7 +167,7 @@ export function VehicleMaintenanceModal({
       onClose()
     } catch (error: any) {
       console.error("Erro ao salvar manutenção:", error)
-      toast.error(error.message || "Erro ao salvar manutenção")
+      notifyError(error, 'Erro ao salvar manutenção', { i18n: { ns: 'common', key: 'errors.saveMaintenance' } })
     } finally {
       setLoading(false)
     }

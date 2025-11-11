@@ -109,7 +109,7 @@ export function ReconciliationModal({
       setInvoiceLines(enrichedLines)
     } catch (error: any) {
       console.error('Erro ao carregar dados da fatura:', error)
-      toast.error(`Erro: ${error.message}`)
+      notifyError(error, 'Erro inesperado')
     } finally {
       setLoading(false)
     }
@@ -189,12 +189,12 @@ export function ReconciliationModal({
 
       setStatus('approved')
 
-      toast.success('Fatura aprovada com sucesso!')
+      notifySuccess('', { i18n: { ns: 'operator', key: 'reconciliation.approved' } })
       onApprove?.()
       onClose()
     } catch (error: any) {
       console.error('Erro ao aprovar fatura:', error)
-      toast.error(`Erro: ${error.message}`)
+      notifyError(error, 'Erro inesperado')
     } finally {
       setProcessing(false)
     }
@@ -223,12 +223,12 @@ export function ReconciliationModal({
 
       setStatus('rejected')
 
-      toast.success('Fatura rejeitada')
+      notifySuccess('', { i18n: { ns: 'operator', key: 'reconciliation.rejected' } })
       onReject?.()
       onClose()
     } catch (error: any) {
       console.error('Erro ao rejeitar fatura:', error)
-      toast.error(`Erro: ${error.message}`)
+      notifyError(error, 'Erro inesperado')
     } finally {
       setProcessing(false)
     }

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-
+import '../../core/i18n/i18n.dart';
 import '../../core/routing/app_router.dart';
 import '../../core/routing/app_routes.dart';
+import '../../core/services/snackbar_service.dart';
 import '../../domain/user_role.dart';
 import '../../services/auth_service.dart';
 
@@ -99,12 +100,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
         debugPrint('🎯 Rota de destino: $targetRoute');
 
-        // Mostrar mensagem de sucesso
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Bem-vindo, ${user.name}!'),
-            backgroundColor: Colors.green,
-          ),
+        // Mostrar mensagem de sucesso (i18n)
+        SnackBarService.success(
+          context,
+          'auth.login.welcome',
+          params: {'name': user.name},
         );
 
         debugPrint('🚀 Redirecionando para: $targetRoute');
@@ -130,11 +130,11 @@ class _LoginScreenState extends State<LoginScreen> {
       }
     } on AuthFailure catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(e.message),
-          backgroundColor: Colors.red,
-        ),
+      SnackBarService.error(
+        context,
+        e,
+        fallbackKey: 'auth.login.error',
+        params: {'message': e.message},
       );
     } on Exception catch (e) {
       // Fallback: se for admin, navega mesmo que algum serviço tenha falhado
@@ -146,11 +146,11 @@ class _LoginScreenState extends State<LoginScreen> {
         } on Exception catch (_) {}
       }
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Erro inesperado: $e'),
-          backgroundColor: Colors.red,
-        ),
+      SnackBarService.error(
+        context,
+        e,
+        fallbackKey: 'auth.login.unexpected',
+        params: {'message': e.toString()},
       );
     } finally {
       if (mounted) {
@@ -206,7 +206,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                         // Subtítulo
                         Text(
-                          'Sistema de Gestão',
+                          I18n.t(context, 'app.subtitle', params: {}),
                           style: TextStyle(
                             fontSize: 14,
                             color: Colors.grey[600],
@@ -220,8 +220,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           keyboardType: TextInputType.emailAddress,
                           textInputAction: TextInputAction.next,
                           decoration: InputDecoration(
-                            labelText: 'E-mail',
-                            hintText: 'Digite seu e-mail',
+                            labelText: I18n.t(context, 'auth.login.email.label'),
+                            hintText: I18n.t(context, 'auth.login.email.hint'),
                             prefixIcon: const Icon(Icons.email_outlined),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
@@ -239,11 +239,11 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'Por favor, digite seu e-mail';
+                              return I18n.t(context, 'auth.login.email.required');
                             }
                             if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
                                 .hasMatch(value)) {
-                              return 'Por favor, digite um e-mail válido';
+                              return I18n.t(context, 'auth.login.email.invalid');
                             }
                             return null;
                           },
@@ -257,8 +257,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           textInputAction: TextInputAction.done,
                           onFieldSubmitted: (_) => _handleLogin(),
                           decoration: InputDecoration(
-                            labelText: 'Senha',
-                            hintText: 'Digite sua senha',
+                            labelText: I18n.t(context, 'auth.login.password.label'),
+                            hintText: I18n.t(context, 'auth.login.password.hint'),
                             prefixIcon: const Icon(Icons.lock_outlined),
                             suffixIcon: IconButton(
                               icon: Icon(
@@ -288,10 +288,10 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'Por favor, digite sua senha';
+                              return I18n.t(context, 'auth.login.password.required');
                             }
                             if (value.length < 6) {
-                              return 'A senha deve ter pelo menos 6 caracteres';
+                              return I18n.t(context, 'auth.login.password.min_length', params: {'min': '6'});
                             }
                             return null;
                           },
@@ -322,9 +322,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                           Colors.white),
                                     ),
                                   )
-                                : const Text(
-                                    'Entrar',
-                                    style: TextStyle(
+                                : Text(
+                                    I18n.t(context, 'auth.login.submit'),
+                                    style: const TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w600,
                                     ),

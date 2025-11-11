@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Clock, Mail, Calendar } from "lucide-react"
 import { supabase } from "@/lib/supabase"
-import toast from "react-hot-toast"
+import { notifySuccess, notifyError } from "@/lib/toast"
 import { useSupabaseSync } from "@/hooks/use-supabase-sync"
 import {
   Select,
@@ -97,7 +97,9 @@ export function ScheduleReportModal({
       setCompanies(data || [])
     } catch (error: any) {
       console.error("Erro ao carregar empresas:", error)
-      toast.error("Erro ao carregar empresas")
+      notifyError("Erro ao carregar empresas", {
+        i18n: { ns: 'common', key: 'errors.generic' }
+      })
     }
   }
 
@@ -139,19 +141,27 @@ export function ScheduleReportModal({
     try {
       // Validações
       if (!selectedCompany) {
-        toast.error("Selecione uma empresa")
+        notifyError("Selecione uma empresa", {
+          i18n: { ns: 'operator', key: 'reports.schedule.validation.selectCompany' }
+        })
         return
       }
       if (!selectedReport) {
-        toast.error("Selecione um relatório")
+        notifyError("Selecione um relatório", {
+          i18n: { ns: 'operator', key: 'reports.schedule.validation.selectReport' }
+        })
         return
       }
       if (!cronExpression || !validateCron(cronExpression)) {
-        toast.error("Cron expression inválida. Use o formato: minuto hora dia mês dia-semana")
+        notifyError("Cron expression inválida. Use o formato: minuto hora dia mês dia-semana", {
+          i18n: { ns: 'common', key: 'validation.invalidCron' }
+        })
         return
       }
       if (!recipients || !validateEmails(recipients)) {
-        toast.error("Adicione pelo menos um email válido")
+        notifyError("Adicione pelo menos um email válido", {
+          i18n: { ns: 'common', key: 'validation.invalidEmails' }
+        })
         return
       }
 
@@ -204,7 +214,9 @@ export function ScheduleReportModal({
         })
       }
 
-      toast.success(`Agendamento ${schedule ? 'atualizado' : 'criado'} com sucesso!`)
+      notifySuccess(`Agendamento ${schedule ? 'atualizado' : 'criado'} com sucesso!`, {
+        i18n: { ns: 'operator', key: schedule ? 'reports.schedule.successUpdated' : 'reports.schedule.successCreated' }
+      })
       onSave()
       onClose()
       
@@ -219,7 +231,9 @@ export function ScheduleReportModal({
       }
     } catch (error: any) {
       console.error("Erro ao criar agendamento:", error)
-      toast.error(error.message || "Erro ao criar agendamento")
+      notifyError(error.message || "Erro ao criar agendamento", {
+        i18n: { ns: 'operator', key: 'reports.schedule.errors.createSchedule' }
+      })
     } finally {
       setLoading(false)
     }

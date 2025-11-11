@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+
+import '../../core/i18n/i18n.dart';
+import '../../core/services/snackbar_service.dart';
 import '../../services/auth_service.dart';
 import '../../services/supabase_service.dart';
+import '../../core/routing/app_router.dart';
+import '../../core/routing/app_routes.dart';
 
 class DriverLoginScreen extends StatefulWidget {
   const DriverLoginScreen({super.key});
@@ -19,8 +24,6 @@ class _DriverLoginScreenState extends State<DriverLoginScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _loading = true);
-    final navigator = Navigator.of(context);
-    final messenger = ScaffoldMessenger.of(context);
 
     try {
       final cpf = _cpfController.text.replaceAll(RegExp(r'[^\d]'), '');
@@ -49,18 +52,21 @@ class _DriverLoginScreenState extends State<DriverLoginScreen> {
         _passwordController.text,
       );
 
-      if (!context.mounted) return;
+      if (!mounted) return;
 
       if (user == null) {
         throw Exception('Falha ao autenticar. Verifique suas credenciais.');
       }
 
-      // Navegar para dashboard do motorista
-      await navigator.pushReplacementNamed('/driver/dashboard');
+      // Navegar para dashboard do motorista via AppRouter
+      AppRouter.instance.go(AppRoutes.driverHome);
     } on Exception catch (e) {
-      if (!context.mounted) return;
-      messenger.showSnackBar(
-        SnackBar(content: Text(e.toString())),
+      if (!mounted) return;
+      SnackBarService.error(
+        context,
+        e,
+        fallbackKey: 'driver.login.error',
+        params: {'message': e.toString()},
       );
     } finally {
       if (mounted) {
@@ -81,22 +87,22 @@ class _DriverLoginScreenState extends State<DriverLoginScreen> {
               children: [
                 const Icon(Icons.drive_eta, size: 80, color: Colors.blue),
                 const SizedBox(height: 32),
-                const Text(
-                  'App do Motorista',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                Text(
+                  I18n.t(context, 'driver.app.title'),
+                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 48),
                 TextFormField(
                   controller: _cpfController,
-                  decoration: const InputDecoration(
-                    labelText: 'CPF',
-                    hintText: '000.000.000-00',
-                    prefixIcon: Icon(Icons.person),
+                  decoration: InputDecoration(
+                    labelText: I18n.t(context, 'common.cpf'),
+                    hintText: I18n.t(context, 'common.cpf.hint'),
+                    prefixIcon: const Icon(Icons.person),
                   ),
                   keyboardType: TextInputType.number,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Digite seu CPF';
+                      return I18n.t(context, 'validation.required.cpf');
                     }
                     return null;
                   },
@@ -104,14 +110,14 @@ class _DriverLoginScreenState extends State<DriverLoginScreen> {
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _passwordController,
-                  decoration: const InputDecoration(
-                    labelText: 'Senha',
-                    prefixIcon: Icon(Icons.lock),
+                  decoration: InputDecoration(
+                    labelText: I18n.t(context, 'common.password'),
+                    prefixIcon: const Icon(Icons.lock),
                   ),
                   obscureText: true,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Digite sua senha';
+                      return I18n.t(context, 'validation.required.password');
                     }
                     return null;
                   },

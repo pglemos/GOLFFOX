@@ -9,7 +9,11 @@
     "selectCompanyFirst": "Selecione uma empresa primeiro",
     "csvOnly": "Apenas arquivos CSV são suportados",
     "invalidCron": "Cron inválido. Formato: minuto hora dia mês dia-semana",
-    "invalidEmails": "Adicione pelo menos um email válido"
+    "invalidEmails": "Adicione pelo menos um email válido",
+    "companyNameRequired": "Nome da empresa é obrigatório",
+    "validOperatorEmailRequired": "Email válido do operador é obrigatório",
+    "maintenanceTypeExpiryRequired": "Tipo e data de vencimento são obrigatórios",
+    "driverStatusRequired": "Motorista e status são obrigatórios"
   },
   "success": {
     "vehicleUpdated": "Veículo atualizado com sucesso!",
@@ -28,13 +32,25 @@
     "documentUploaded": "Documento enviado com sucesso!",
     "routeUpdated": "Rota atualizada com sucesso!",
     "pointsGeneratedSaved": "Pontos gerados e salvos com sucesso!",
+    "pointsGenerated": "Pontos gerados com sucesso!",
     "routeOptimized": "Rota otimizada com sucesso!",
     "routePlanUpdated": "Plano de rota atualizado",
     "alertResolved": "Alerta resolvido",
+    "alertAssigned": "Alerta atribuído!",
     "importCosts": "Importação concluída! {imported} custos importados{errorsSuffix}",
     "validRowsFound": "{valid} linhas válidas encontradas{errorsCount}",
     "reprocessSync": "Reprocessamento concluído: {succeeded} sucessos, {failed} falhas",
-    "syncSupabase": "Sincronizado com Supabase com sucesso!"
+    "syncSupabase": "Sincronizado com Supabase com sucesso!",
+    "costAdded": "Custo adicionado com sucesso!",
+    "maintenanceUpdated": "Manutenção atualizada com sucesso!",
+    "maintenanceCreated": "Manutenção cadastrada com sucesso!",
+    "checklistUpdated": "Checklist atualizado com sucesso!",
+    "checklistCreated": "Checklist cadastrado com sucesso!",
+    "assistanceResolvedSLA": "Ocorrência resolvida! SLA: {response}min resposta, {total}min total",
+    "noRecentGpsPositions": "{count} veículo(s) ativo(s) encontrado(s), mas nenhum tem posição GPS recente."
+  },
+  "labels": {
+    "pointsGeneratedCount": "Pontos gerados: {count}"
   },
   "errors": {
     "generic": "Erro inesperado",
@@ -46,6 +62,7 @@
     "noHistoricalPositionsPeriod": "Nenhuma posição histórica encontrada para o período selecionado",
     "noTripOrRoute": "Veículo não possui viagem ou rota associada",
     "routeIncomplete": "Rota não encontrada ou incompleta",
+    "tripDataNotFound": "Dados da viagem não encontrados",
     "saveDriver": "Erro ao salvar motorista",
     "documentUpload": "Erro ao fazer upload do documento",
     "loadCompanies": "Erro ao carregar empresas",
@@ -59,6 +76,15 @@
     "processFile": "Erro ao processar arquivo: {message}",
     "reprocessSync": "Erro ao reprocessar sincronizações",
     "syncWillReprocess": "Falha na sincronização após {attempts} tentativas. Será reprocessado automaticamente.",
-    "syncUnexpected": "Erro inesperado na sincronização"
+    "syncUnexpected": "Erro inesperado na sincronização",
+    "saveCost": "Erro ao salvar custo",
+    "saveMaintenance": "Erro ao salvar manutenção",
+    "saveChecklist": "Erro ao salvar checklist",
+    "assistanceResolve": "Erro ao resolver ocorrência: {message}",
+    "mapApiKeyMissing": "API Key do Google Maps não configurada",
+    "mapElementMissing": "Elemento do mapa não encontrado",
+    "mapsQuotaExceededListMode": "Quota do Google Maps excedida. Usando modo lista.",
+    "mapLoadFailedListMode": "Erro ao carregar o mapa. Usando modo lista.",
+    "loadHistory": "Erro ao carregar histórico"
   }
 }

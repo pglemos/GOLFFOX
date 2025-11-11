@@ -5,13 +5,13 @@ import 'package:latlong2/latlong.dart';
 class GxMap extends StatelessWidget {
 
   const GxMap({
-    super.key,
     required this.center,
     this.zoom = 12,
     this.markers = const [],
     this.polylines = const [],
     this.polygons = const [],
     this.legend,
+    super.key,
   });
   final LatLng center;
   final double zoom;
@@ -29,7 +29,6 @@ class GxMap extends StatelessWidget {
           children: [
             flutter_map.TileLayer(
               urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-              subdomains: const ['a', 'b', 'c'],
               userAgentPackageName: 'com.golffox.app',
             ),
             if (polylines.isNotEmpty)

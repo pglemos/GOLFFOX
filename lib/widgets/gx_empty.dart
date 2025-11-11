@@ -5,9 +5,9 @@ import '../core/theme/gf_tokens.dart';
 class GxEmpty extends StatefulWidget {
 
   const GxEmpty({
+    required this.title,
     super.key,
     this.icon = Icons.inbox_outlined,
-    required this.title,
     this.message,
     this.action,
     this.iconColor,
