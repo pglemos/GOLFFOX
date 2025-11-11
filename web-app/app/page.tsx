@@ -358,15 +358,18 @@ function LoginContent() {
           console.log('👤 Role detectado:', resolvedRole)
           console.log('📧 Email:', user.email)
           
-          // Forçar redirecionamento imediato sem delay
-          if (typeof window !== "undefined") {
-            console.log('📍 Redirecionando imediatamente para:', redirectUrl)
-            // Usar window.location.href em vez de replace para garantir que funcione
-            window.location.href = redirectUrl
-          } else {
-            console.log('📍 Usando router.replace para:', redirectUrl)
-            router.replace(redirectUrl)
-          }
+          // Aguardar um momento para garantir que o cookie seja processado
+          // e então redirecionar
+          setTimeout(() => {
+            if (typeof window !== "undefined") {
+              console.log('📍 Redirecionando para:', redirectUrl)
+              // Usar window.location.href para garantir redirecionamento completo
+              window.location.href = redirectUrl
+            } else {
+              console.log('📍 Usando router.replace para:', redirectUrl)
+              router.replace(redirectUrl)
+            }
+          }, 200)
           return
         }
 
