@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Mail, Lock, Eye, EyeOff, Moon, Sun, Globe, ChevronDown, Route, Shield, TrendingUp, Zap, Sparkles } from "lucide-react"
-import { motion, useMotionValue, useSpring, useTransform } from "framer-motion"
+import { motion } from "framer-motion"
 import { AuthManager } from "@/lib/auth"
 import { getUserRoleByEmail } from "@/lib/user-role"
 import { debug, error as logError } from "@/lib/logger"
@@ -113,19 +113,6 @@ function LoginContent() {
   const [failedAttempts, setFailedAttempts] = useState<number>(0)
   const [blockedUntil, setBlockedUntil] = useState<number | null>(null)
   const [transitioning, setTransitioning] = useState<boolean>(false)
-  const cardRef = useRef<HTMLDivElement | null>(null)
-
-  // Mouse tracking para efeito parallax no card
-  const mouseX = useMotionValue(0)
-  const mouseY = useMotionValue(0)
-  const rotateX = useSpring(useTransform(mouseY, [-0.5, 0.5], [5, -5]), {
-    stiffness: 150,
-    damping: 15,
-  })
-  const rotateY = useSpring(useTransform(mouseX, [-0.5, 0.5], [-5, 5]), {
-    stiffness: 150,
-    damping: 15,
-  })
 
   // Fechar dropdown ao clicar fora
   useEffect(() => {
@@ -144,50 +131,6 @@ function LoginContent() {
     }
   }, [showLanguageDropdown])
 
-  // Mouse move handler para parallax (apenas desktop)
-  useEffect(() => {
-    if (typeof window === 'undefined') return
-    
-    // Desabilitar parallax em telas pequenas
-    const isDesktop = window.innerWidth >= 1024
-    if (!isDesktop) return
-
-    const handleMouseMove = (e: MouseEvent) => {
-      if (!cardRef.current) return
-      const rect = cardRef.current.getBoundingClientRect()
-      const x = (e.clientX - rect.left) / rect.width
-      const y = (e.clientY - rect.top) / rect.height
-      mouseX.set(x - 0.5)
-      mouseY.set(y - 0.5)
-    }
-
-    const handleMouseLeave = () => {
-      mouseX.set(0)
-      mouseY.set(0)
-    }
-
-    const handleResize = () => {
-      if (window.innerWidth < 1024) {
-        mouseX.set(0)
-        mouseY.set(0)
-      }
-    }
-
-    const card = cardRef.current
-    if (card) {
-      card.addEventListener('mousemove', handleMouseMove)
-      card.addEventListener('mouseleave', handleMouseLeave)
-      window.addEventListener('resize', handleResize)
-    }
-
-    return () => {
-      if (card) {
-        card.removeEventListener('mousemove', handleMouseMove)
-        card.removeEventListener('mouseleave', handleMouseLeave)
-        window.removeEventListener('resize', handleResize)
-      }
-    }
-  }, [mouseX, mouseY])
 
   useEffect(() => {
     // Check if user is already logged in
@@ -702,109 +645,62 @@ function LoginContent() {
         {/* Card de Login */}
         <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-12 xl:px-16 py-8 sm:py-12 relative z-10">
           <motion.div
-            ref={cardRef}
-            style={{
-              rotateX: rotateX,
-              rotateY: rotateY,
-              transformStyle: 'preserve-3d',
-            }}
-            initial={{ opacity: 0, y: 50, scale: 0.9 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
             className="w-full max-w-lg"
           >
-            <Card className="relative p-8 sm:p-10 lg:p-12 bg-white/80 backdrop-blur-2xl shadow-2xl border-0 overflow-hidden">
-              {/* Efeito de brilho no card */}
-              <div className="absolute inset-0 bg-gradient-to-br from-[var(--brand)]/5 via-transparent to-[var(--accent)]/5 opacity-50 pointer-events-none" />
-              <motion.div
-                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                animate={{
-                  x: ['-200%', '200%'],
-                }}
-                transition={{
-                  duration: 4,
-                  repeat: Infinity,
-                  repeatDelay: 3,
-                  ease: "linear",
-                }}
-              />
+            <Card className="relative p-8 sm:p-10 lg:p-12 bg-white shadow-xl border border-gray-100 overflow-hidden">
+              {/* Efeito sutil de gradiente */}
+              <div className="absolute inset-0 bg-gradient-to-br from-[var(--brand)]/3 via-transparent to-[var(--accent)]/3 pointer-events-none" />
 
               {loading && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-white/95 backdrop-blur-xl rounded-3xl"
-                >
-                  <motion.div
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                    className="w-14 h-14 border-4 border-[var(--brand)]/20 border-t-[var(--brand)] rounded-full"
-                  />
-                  <motion.p
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.2 }}
-                    className="mt-6 text-sm text-gray-600 font-medium"
-                  >
+                <div className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-white/95 backdrop-blur-sm rounded-2xl">
+                  <div className="animate-spin rounded-full w-10 h-10 border-3 border-[var(--brand)]/20 border-t-[var(--brand)]" />
+                  <p className="mt-4 text-sm text-gray-600 font-medium">
                     Validando credenciais…
-                  </motion.p>
-                </motion.div>
+                  </p>
+                </div>
               )}
 
               <div className="relative z-10">
                 {/* Logo e Título */}
-                <motion.div
-                  initial={{ opacity: 0, y: -20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.3 }}
-                  className="mb-8 sm:mb-10"
-                >
+                <div className="mb-8 sm:mb-10">
                   <div className="flex items-center gap-4 mb-6">
-                    <motion.div
-                      whileHover={{ scale: 1.1, rotate: [0, -5, 5, 0] }}
-                      transition={{ duration: 0.5 }}
-                      className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center flex-shrink-0 relative overflow-hidden bg-gradient-to-br from-[var(--brand)]/10 to-[var(--brand)]/5"
-                    >
+                    <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center flex-shrink-0 bg-gradient-to-br from-[var(--brand)]/10 to-[var(--brand)]/5">
                       <img 
                         src="/icons/golf_fox_logo.svg" 
                         alt="GolfFox Logo" 
-                        className="w-12 h-12 sm:w-14 sm:h-14 relative z-10"
+                        className="w-12 h-12 sm:w-14 sm:h-14"
                       />
-                    </motion.div>
-                    <span className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+                    </div>
+                    <span className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">
                       GOLF FOX
                     </span>
                   </div>
-                  <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-3 tracking-tight leading-tight">
+                  <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-3 tracking-tight leading-tight">
                     Entre em sua conta
                   </h1>
-                  <p className="text-base sm:text-lg text-gray-600 font-light">
+                  <p className="text-base sm:text-lg text-gray-600">
                     Acesse sua frota com inteligência e controle total.
                   </p>
-                </motion.div>
+                </div>
 
                 {/* Mensagens de Erro/Sucesso */}
-            {error && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    className="mb-6 p-4 bg-red-50/80 backdrop-blur-sm border border-red-200 rounded-2xl text-sm text-red-700 shadow-lg"
-                role="alert"
-                aria-live="assertive"
-              >
-                {error}
-                  </motion.div>
-            )}
-
-            {success && !error && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    className="mb-6 p-4 bg-emerald-50/80 backdrop-blur-sm border border-emerald-200 rounded-2xl text-sm text-emerald-700 flex items-center gap-2 shadow-lg"
+                {error && (
+                  <div
+                    className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700"
+                    role="alert"
+                    aria-live="assertive"
                   >
-                    <Sparkles className="w-5 h-5" />
-                    <span className="font-semibold">Login realizado com sucesso!</span>
-                  </motion.div>
+                    {error}
+                  </div>
+                )}
+
+                {success && !error && (
+                  <div className="mb-6 p-4 bg-emerald-50 border border-emerald-200 rounded-xl text-sm text-emerald-700 flex items-center gap-2">
+                    <span className="font-medium">Login realizado com sucesso!</span>
+                  </div>
                 )}
 
                 {/* Formulário */}
@@ -818,21 +714,14 @@ function LoginContent() {
                   className="space-y-6"
                 >
                   {/* Campo Email */}
-                  <motion.div
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.5, delay: 0.4 }}
-                  >
+                  <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2.5" htmlFor="login-email">
-                    E-mail
-                  </label>
+                      E-mail
+                    </label>
                     <div className="relative group">
-                      <motion.div
-                        whileHover={{ scale: 1.02 }}
-                        className="absolute left-4 top-1/2 -translate-y-1/2 z-10"
-                      >
+                      <div className="absolute left-4 top-1/2 -translate-y-1/2 z-10">
                         <Mail className="h-5 w-5 text-gray-400 group-focus-within:text-[var(--brand)] transition-colors duration-200" />
-                      </motion.div>
+                      </div>
                     <Input
                       id="login-email"
                       ref={emailInputRef}
@@ -842,41 +731,29 @@ function LoginContent() {
                       onChange={(e) => setEmail(sanitizeInput(e.target.value))}
                         aria-invalid={email && !emailValid ? true : undefined}
                       autoComplete="email"
-                        className={`pl-12 pr-4 h-14 bg-white/80 backdrop-blur-sm border-2 transition-all duration-200 ${
+                        className={`pl-12 pr-4 h-12 bg-white border transition-all duration-200 ${
                           fieldErrors.email
-                            ? "border-red-300 focus:border-red-400 focus:ring-4 focus:ring-red-100"
-                            : "border-gray-200 focus:border-[var(--brand)] focus:ring-4 focus:ring-[var(--brand)]/10 hover:border-gray-300"
-                        } rounded-xl text-base shadow-sm hover:shadow-md`}
+                            ? "border-red-300 focus:border-red-400 focus:ring-2 focus:ring-red-100"
+                            : "border-gray-200 focus:border-[var(--brand)] focus:ring-2 focus:ring-[var(--brand)]/10 hover:border-gray-300"
+                        } rounded-lg text-base`}
                     />
                   </div>
-                  {fieldErrors.email && (
-                      <motion.p
-                        initial={{ opacity: 0, y: -5 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="mt-2 text-xs text-red-600 font-medium"
-                        aria-live="assertive"
-                      >
-                      {fieldErrors.email}
-                      </motion.p>
+                    {fieldErrors.email && (
+                      <p className="mt-2 text-xs text-red-600 font-medium" aria-live="assertive">
+                        {fieldErrors.email}
+                      </p>
                     )}
-                  </motion.div>
+                  </div>
 
                   {/* Campo Senha */}
-                  <motion.div
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.5, delay: 0.5 }}
-                  >
+                  <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2.5" htmlFor="login-password">
-                    Senha
-                  </label>
+                      Senha
+                    </label>
                     <div className="relative group">
-                      <motion.div
-                        whileHover={{ scale: 1.02 }}
-                        className="absolute left-4 top-1/2 -translate-y-1/2 z-10"
-                      >
+                      <div className="absolute left-4 top-1/2 -translate-y-1/2 z-10">
                         <Lock className="h-5 w-5 text-gray-400 group-focus-within:text-[var(--brand)] transition-colors duration-200" />
-                      </motion.div>
+                      </div>
                     <Input
                       id="login-password"
                         type={showPassword ? "text" : "password"}
@@ -886,132 +763,80 @@ function LoginContent() {
                       ref={passwordInputRef}
                         aria-invalid={password && !passwordValid ? true : undefined}
                       autoComplete="current-password"
-                        className={`pl-12 pr-12 h-14 bg-white/80 backdrop-blur-sm border-2 transition-all duration-200 ${
+                        className={`pl-12 pr-12 h-12 bg-white border transition-all duration-200 ${
                           fieldErrors.password
-                            ? "border-red-300 focus:border-red-400 focus:ring-4 focus:ring-red-100"
-                            : "border-gray-200 focus:border-[var(--brand)] focus:ring-4 focus:ring-[var(--brand)]/10 hover:border-gray-300"
-                        } rounded-xl text-base shadow-sm hover:shadow-md`}
+                            ? "border-red-300 focus:border-red-400 focus:ring-2 focus:ring-red-100"
+                            : "border-gray-200 focus:border-[var(--brand)] focus:ring-2 focus:ring-[var(--brand)]/10 hover:border-gray-300"
+                        } rounded-lg text-base`}
                       />
-                      <motion.button
+                      <button
                         type="button"
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
                         onClick={() => setShowPassword(!showPassword)}
                         className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-lg hover:bg-gray-100"
                         aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
                       >
                         {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                      </motion.button>
+                      </button>
                   </div>
-                  {fieldErrors.password && (
-                      <motion.p
-                        initial={{ opacity: 0, y: -5 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="mt-2 text-xs text-red-600 font-medium"
-                        aria-live="assertive"
-                      >
-                      {fieldErrors.password}
-                      </motion.p>
+                    {fieldErrors.password && (
+                      <p className="mt-2 text-xs text-red-600 font-medium" aria-live="assertive">
+                        {fieldErrors.password}
+                      </p>
                     )}
-                  </motion.div>
+                  </div>
 
                   {/* Checkbox e Link */}
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.6 }}
-                    className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
-                  >
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <div className="flex items-center gap-3">
                       <Checkbox
                         id="remember-me"
                         checked={rememberMe}
                         onCheckedChange={(checked) => setRememberMe(checked === true)}
-                        className="h-5 w-5 rounded-md border-2 border-gray-300 data-[state=checked]:bg-[var(--brand)] data-[state=checked]:border-[var(--brand)] data-[state=checked]:text-white focus-visible:ring-2 focus-visible:ring-[var(--brand)]/20 transition-all duration-200"
+                        className="h-4 w-4 rounded border-gray-300 data-[state=checked]:bg-[var(--brand)] data-[state=checked]:border-[var(--brand)] data-[state=checked]:text-white focus-visible:ring-2 focus-visible:ring-[var(--brand)]/20"
                       />
                       <label
                         htmlFor="remember-me"
-                        className="text-sm text-gray-600 cursor-pointer select-none hover:text-gray-700 transition-colors font-medium"
+                        className="text-sm text-gray-600 cursor-pointer select-none hover:text-gray-700 transition-colors"
                       >
                         Manter conectado
                       </label>
-                </div>
-                    <motion.button
+                    </div>
+                    <button
                       type="button"
-                      whileHover={{ x: 2 }}
                       onClick={() => {
                         setError("Funcionalidade em desenvolvimento")
                       }}
-                      className="text-sm font-semibold text-[var(--brand)] hover:text-[var(--brand-hover)] transition-colors"
+                      className="text-sm font-medium text-[var(--brand)] hover:text-[var(--brand-hover)] transition-colors"
                     >
                       Esqueceu sua senha?
-                    </motion.button>
-                  </motion.div>
+                    </button>
+                  </div>
 
                   {/* Botão Entrar */}
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.7 }}
-                  >
-              <Button
-                type="submit"
-                disabled={loading}
-                      className="w-full h-14 bg-gradient-to-r from-[var(--brand)] to-[#FB923C] hover:from-[#FB923C] hover:to-[var(--brand)] text-white font-bold text-base shadow-xl hover:shadow-2xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl relative overflow-hidden group border-0"
+                  <div>
+                    <Button
+                      type="submit"
+                      disabled={loading}
+                      className="w-full h-12 bg-[var(--brand)] hover:bg-[var(--brand-hover)] text-white font-semibold text-base shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg"
                     >
-                      <span className="relative z-10 flex items-center justify-center gap-2">
-                        {loading ? (
-                          <>
-                            <motion.span
-                              animate={{ rotate: 360 }}
-                              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                              className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full"
-                            />
-                            Validando...
-                          </>
-                        ) : (
-                          <>
-                            Entrar
-                            <motion.span
-                              animate={{ x: [0, 4, 0] }}
-                              transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-                            >
-                              →
-                            </motion.span>
-                          </>
-                        )}
-                      </span>
-                      <motion.div
-                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                        animate={{
-                          x: ['-100%', '100%'],
-                        }}
-                        transition={{
-                          duration: 2,
-                          repeat: Infinity,
-                          repeatDelay: 1,
-                          ease: "linear",
-                        }}
-                      />
-              </Button>
-                  </motion.div>
+                      {loading ? (
+                        <span className="flex items-center justify-center gap-2">
+                          <span className="animate-spin rounded-full h-4 w-4 border-2 border-white/30 border-t-white" />
+                          Validando...
+                        </span>
+                      ) : (
+                        "Entrar"
+                      )}
+                    </Button>
+                  </div>
             </form>
 
                 {/* Estado de Transição */}
                 {transitioning && !loading && (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="mt-6 flex items-center justify-center gap-3"
-                    aria-live="polite"
-                  >
-                    <motion.div
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                      className="w-6 h-6 border-3 border-[var(--brand)]/20 border-t-[var(--brand)] rounded-full"
-                    />
-                    <span className="text-sm text-gray-600 font-medium">Redirecionando…</span>
-                  </motion.div>
+                  <div className="mt-6 flex items-center justify-center gap-2" aria-live="polite">
+                    <div className="animate-spin rounded-full h-5 w-5 border-2 border-[var(--brand)]/20 border-t-[var(--brand)]" />
+                    <span className="text-sm text-gray-600">Redirecionando…</span>
+                  </div>
                 )}
 
                 {/* Mensagem JavaScript */}
