@@ -217,9 +217,28 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     const getUser = async () => {
+      // Primeiro, tentar obter usuário do cookie de sessão customizado
+      if (typeof document !== 'undefined') {
+        const cookieMatch = document.cookie.match(/golffox-session=([^;]+)/)
+        if (cookieMatch) {
+          try {
+            const decoded = atob(cookieMatch[1])
+            const u = JSON.parse(decoded)
+            if (u?.id && u?.email) {
+              setUser({ id: u.id, email: u.email, name: u.email.split('@')[0], role: u.role || 'admin' })
+              setLoading(false)
+              return
+            }
+          } catch {}
+        }
+      }
+
+      // Fallback: tentar sessão do Supabase
       const { data: { session } } = await supabase.auth.getSession()
       if (!session) {
-        router.push("/")
+        // Sem sessão detectada; deixar o middleware proteger o acesso
+        // Evitar loop de redirect no cliente
+        setLoading(false)
         return
       }
 

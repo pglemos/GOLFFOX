@@ -9,6 +9,17 @@ export async function middleware(request: NextRequest) {
   if (pathname.startsWith('/api')) {
     return NextResponse.next()
   }
+  // ✅ Bypass para assets e rotas internas do Next/Vercel
+  if (
+    pathname.startsWith('/_next') ||
+    pathname.startsWith('/static') ||
+    pathname.startsWith('/assets') ||
+    pathname.startsWith('/icons') ||
+    pathname === '/favicon.ico' ||
+    pathname.startsWith('/_vercel')
+  ) {
+    return NextResponse.next()
+  }
   
   const response = NextResponse.next()
 
@@ -79,7 +90,8 @@ export async function middleware(request: NextRequest) {
         const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
         const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-        if (supabaseUrl && supabaseAnonKey && userData.accessToken) {
+        // Em desenvolvimento, evitar validação agressiva do token para não causar loops
+        if (process.env.NODE_ENV !== 'development' && supabaseUrl && supabaseAnonKey && userData.accessToken) {
           const supabase = createClient(supabaseUrl, supabaseAnonKey, {
             auth: {
               persistSession: false,
@@ -89,17 +101,21 @@ export async function middleware(request: NextRequest) {
 
           const { error: authError } = await supabase.auth.getUser(userData.accessToken)
           if (authError) {
-            // Token inválido, redirecionar para login
+            // Token inválido, redirecionar para login e limpar cookie
             const loginUrl = new URL('/', request.url)
             loginUrl.searchParams.set('next', pathname)
-            return NextResponse.redirect(loginUrl)
+            const res = NextResponse.redirect(loginUrl)
+            res.cookies.set('golffox-session', '', { maxAge: 0, path: '/' })
+            return res
           }
         }
       } catch (err) {
-        // Cookie inválido ou erro de parsing, redirecionar para login
+        // Cookie inválido ou erro de parsing, redirecionar para login e limpar cookie
         const loginUrl = new URL('/', request.url)
         loginUrl.searchParams.set('next', pathname)
-        return NextResponse.redirect(loginUrl)
+        const res = NextResponse.redirect(loginUrl)
+        res.cookies.set('golffox-session', '', { maxAge: 0, path: '/' })
+        return res
       }
     }
   }

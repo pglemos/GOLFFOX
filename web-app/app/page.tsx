@@ -12,7 +12,8 @@ import { motion } from "framer-motion"
 import { AuthManager } from "@/lib/auth"
 import { getUserRoleByEmail } from "@/lib/user-role"
 import { debug, error as logError } from "@/lib/logger"
-import { supabase } from "@/lib/supabase"
+// Removido import do supabase - não usado na página de login para evitar problemas de renderização
+import { LoginErrorBoundary } from "./login-error-boundary"
 
 const EMAIL_REGEX =
   /^(?:[a-zA-Z0-9_'^&/+\-])+(?:\.(?:[a-zA-Z0-9_'^&/+\-])+)*@(?:(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,})$/
@@ -133,53 +134,79 @@ function LoginContent() {
   }, [showLanguageDropdown])
 
 
+  // Verificar sessão apenas uma vez no mount, com tratamento de erro robusto
   useEffect(() => {
-    // Não verificar sessão se estiver em processo de login ou redirecionamento
-    if (loading || transitioning) return
-
-    // Evitar interferência durante redirecionamentos explícitos pós-login
-    if (typeof window !== 'undefined' && (window as any).__golffox_redirecting) {
-      return
-    }
-
-    // Se a URL veio de uma proteção do middleware (possui ?next=),
-    // não fazer auto-redirect aqui para evitar loops.
-    const nextParam = searchParams.get('next')
-    if (nextParam) {
-      // Opcional: se existir um cookie de sessão potencialmente inválido, limpá-lo
+    // Timeout para evitar verificações muito rápidas que podem causar problemas
+    const timeoutId = setTimeout(() => {
       try {
-        if (typeof window !== 'undefined' && document.cookie.includes('golffox-session')) {
-          fetch('/api/auth/clear-session', { method: 'POST' }).catch(() => {})
+        // Evitar interferência durante redirecionamentos explícitos pós-login
+        if (typeof window !== 'undefined' && (window as any).__golffox_redirecting) {
+          return
         }
-      } catch {}
-      return
-    }
 
-    // ✅ Usar apenas verificação de cookie - não usar Supabase auth na página de login
-    // para evitar conflitos e erros de logout automático
-    if (typeof window !== 'undefined') {
-      const hasSessionCookie = document.cookie.includes('golffox-session')
-      if (!hasSessionCookie) return
+        // Se a URL veio de uma proteção do middleware (possui ?next=),
+        // não fazer auto-redirect aqui para evitar loops.
+        const nextParam = searchParams.get('next')
+        if (nextParam) {
+          // Se houver ?next=, apenas retornar - usuário precisa fazer login
+          return
+        }
 
-      // Tentar decodificar o cookie para obter o role
-      try {
-        const cookieMatch = document.cookie.match(/golffox-session=([^;]+)/)
-        if (!cookieMatch) return
+        // ✅ Usar apenas verificação de cookie - não usar Supabase auth na página de login
+        // para evitar conflitos e erros de logout automático
+        if (typeof window === 'undefined') return
+        
+        const hasSessionCookie = document.cookie.includes('golffox-session')
+        if (!hasSessionCookie) {
+          // Sem cookie, página de login deve ser exibida normalmente
+          return
+        }
 
-        const decoded = atob(cookieMatch[1])
-        const userData = JSON.parse(decoded)
-        const userRole = userData.role || getUserRoleByEmail(userData.email)
+        // Tentar decodificar o cookie para obter o role
+        try {
+          const cookieMatch = document.cookie.match(/golffox-session=([^;]+)/)
+          if (!cookieMatch) {
+            // Cookie malformado, limpar e continuar na página de login
+            document.cookie = 'golffox-session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT'
+            return
+          }
 
-        const redirectUrl = userRole === 'admin' ? '/admin' :
-                           userRole === 'operator' ? '/operator' :
-                           userRole === 'carrier' ? '/carrier' : '/dashboard'
-        console.log('🔄 Sessão detectada, redirecionando para:', redirectUrl, 'role:', userRole)
-        window.location.href = redirectUrl
+          const decoded = atob(cookieMatch[1])
+          const userData = JSON.parse(decoded)
+          
+          if (!userData || !userData.role) {
+            // Dados inválidos, limpar cookie
+            document.cookie = 'golffox-session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT'
+            return
+          }
+          
+          const userRole = userData.role || getUserRoleByEmail(userData.email || '')
+
+          const redirectUrl = userRole === 'admin' ? '/admin' :
+                             userRole === 'operator' ? '/operator' :
+                             userRole === 'carrier' ? '/carrier' : '/dashboard'
+          
+          console.log('🔄 Sessão detectada, redirecionando para:', redirectUrl, 'role:', userRole)
+          
+          // Redirecionar apenas se tiver role válido
+          if (userRole) {
+            window.location.href = redirectUrl
+          }
+        } catch (err) {
+          // Erro ao decodificar cookie - limpar e continuar na página de login
+          console.warn('⚠️ Erro ao decodificar cookie:', err)
+          try {
+            document.cookie = 'golffox-session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT'
+          } catch {}
+        }
       } catch (err) {
-        console.warn('⚠️ Erro ao decodificar cookie:', err)
+        // Erro geral - apenas logar e continuar na página de login
+        console.error('❌ Erro ao verificar sessão:', err)
       }
-    }
-  }, [router, searchParams, loading, transitioning])
+    }, 100) // Aguardar 100ms antes de verificar
+
+    return () => clearTimeout(timeoutId)
+  }, [searchParams]) // Executar quando searchParams mudar
 
   // Buscar CSRF token
   useEffect(() => {
@@ -1020,21 +1047,23 @@ function LoginContent() {
 
 export default function LoginPage() {
   return (
-    <Suspense
-      fallback={
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#FAF9F7] to-white">
-        <div className="text-center">
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-              className="w-12 h-12 border-4 border-[var(--brand)]/20 border-t-[var(--brand)] rounded-full mx-auto"
-            />
-            <p className="mt-6 text-gray-600 font-medium">Carregando...</p>
+    <LoginErrorBoundary>
+      <Suspense
+        fallback={
+          <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#FAF9F7] to-white">
+            <div className="text-center">
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                className="w-12 h-12 border-4 border-[var(--brand)]/20 border-t-[var(--brand)] rounded-full mx-auto"
+              />
+              <p className="mt-6 text-gray-600 font-medium">Carregando...</p>
+            </div>
           </div>
-        </div>
-      }
-    >
-      <LoginContent />
-    </Suspense>
+        }
+      >
+        <LoginContent />
+      </Suspense>
+    </LoginErrorBoundary>
   )
 }
