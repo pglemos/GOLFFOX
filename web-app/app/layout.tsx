@@ -4,6 +4,7 @@ import "./globals.css";
 import { Toaster } from "react-hot-toast";
 import { WebVitalsInit } from "@/components/web-vitals-init";
 import { ErrorBoundary } from "@/components/error-boundary";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const inter = Inter({ 
   subsets: ["latin"],
@@ -29,6 +30,7 @@ export default function RootLayout({
           <WebVitalsInit />
           {children}
           <Toaster position="top-right" />
+          <SpeedInsights />
         </ErrorBoundary>
       </body>
     </html>
