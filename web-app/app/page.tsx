@@ -354,12 +354,26 @@ function LoginContent() {
           debug("Login bem-sucedido", { redirectUrl, email: maskedEmail, role: resolvedRole }, "LoginPage")
           console.log('🚀 Redirecionando para:', redirectUrl)
           
-          // Redirecionamento imediato sem delay
+          // Aguardar um pouco para garantir que o cookie seja processado pelo navegador
+          // e que o estado seja atualizado
+          await new Promise(resolve => setTimeout(resolve, 100))
+          
+          // Redirecionamento imediato
           if (typeof window !== "undefined") {
-            console.log('📍 Usando window.location.replace')
-            window.location.replace(redirectUrl)
+            console.log('📍 Usando window.location.replace para:', redirectUrl)
+            try {
+              // Verificar se o cookie foi definido
+              const cookieCheck = document.cookie.includes('golffox-session')
+              console.log('🍪 Cookie definido?', cookieCheck)
+              
+              window.location.replace(redirectUrl)
+            } catch (err) {
+              console.error('❌ Erro ao redirecionar:', err)
+              // Fallback: tentar com window.location.href
+              window.location.href = redirectUrl
+            }
           } else {
-            console.log('📍 Usando router.replace')
+            console.log('📍 Usando router.replace para:', redirectUrl)
             router.replace(redirectUrl)
           }
           return
