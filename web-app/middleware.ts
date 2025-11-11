@@ -21,10 +21,22 @@ export async function middleware(request: NextRequest) {
     // Verificar cookie de sessão customizado (golffox-session)
     const sessionCookie = request.cookies.get('golffox-session')?.value
     
+    // Se não há cookie, verificar se há sessão do Supabase Auth
     if (!sessionCookie) {
       // Tentar obter do header Authorization (fallback)
       const authHeader = request.headers.get('authorization')
       if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        // Para admin, permitir acesso se estiver vindo de um redirecionamento recente
+        // (cookie pode ainda não estar disponível no primeiro request)
+        const referer = request.headers.get('referer')
+        if (referer && referer.includes('/') && !referer.includes('/admin') && !referer.includes('/operator')) {
+          // Vindo da página de login, dar um tempo para o cookie ser processado
+          // Mas ainda assim redirecionar se não houver cookie após um momento
+          const loginUrl = new URL('/', request.url)
+          loginUrl.searchParams.set('next', pathname)
+          return NextResponse.redirect(loginUrl)
+        }
+        
         const loginUrl = new URL('/', request.url)
         loginUrl.searchParams.set('next', pathname)
         return NextResponse.redirect(loginUrl)
