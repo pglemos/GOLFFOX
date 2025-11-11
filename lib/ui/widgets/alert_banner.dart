@@ -75,7 +75,7 @@ class GfAlertBanner extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(GfTokens.space2),
             decoration: BoxDecoration(
-              color: colors.icon.withOpacity(0.1),
+    color: colors.icon.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(GfTokens.radiusSmall),
             ),
             child: Icon(

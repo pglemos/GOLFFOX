@@ -208,7 +208,7 @@ class _PassengerDashboardState extends State<PassengerDashboard>
             Text(
               widget.user.name,
               style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurface.withValues(alpha: 0.7)),
+                  color: theme.colorScheme.onSurface.withOpacity(0.7)),
             ),
           ],
         ),
@@ -413,7 +413,7 @@ class _PassengerDashboardState extends State<PassengerDashboard>
             children: [
               Icon(Icons.directions_bus,
                   size: 44,
-                  color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
+                  color: theme.colorScheme.onSurface.withOpacity(0.6)),
               const SizedBox(height: 8),
               Text('Nenhuma viagem ativa', style: theme.textTheme.titleMedium),
               const SizedBox(height: 6),
@@ -421,7 +421,7 @@ class _PassengerDashboardState extends State<PassengerDashboard>
                 'Suas viagens aparecerao aqui quando disponiveis.',
                 textAlign: TextAlign.center,
                 style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onSurface.withValues(alpha: 0.7)),
+                    color: theme.colorScheme.onSurface.withOpacity(0.7)),
               ),
             ],
           ),
@@ -455,7 +455,7 @@ class _FrostedAppBar extends StatelessWidget implements PreferredSizeWidget {
         height: preferredSize.height + MediaQuery.of(context).padding.top,
         padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
         decoration: BoxDecoration(
-          color: theme.colorScheme.surface.withValues(alpha: 0.4),
+          color: theme.colorScheme.surface.withOpacity(0.4),
         ),
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
@@ -591,12 +591,12 @@ class _TripStatusCardPremium extends StatelessWidget {
               children: [
                 Icon(Icons.access_time,
                     size: 18,
-                    color: theme.colorScheme.onSurface.withValues(alpha: 0.7)),
+                    color: theme.colorScheme.onSurface.withOpacity(0.7)),
                 const SizedBox(width: 6),
                 Text(
                   'Horario: ${_formatDateTime(trip.scheduledStartTime!)}',
                   style: theme.textTheme.bodyMedium?.copyWith(
-                      color: theme.colorScheme.onSurface.withValues(alpha: 0.7)),
+                      color: theme.colorScheme.onSurface.withOpacity(0.7)),
                 ),
               ],
             ),

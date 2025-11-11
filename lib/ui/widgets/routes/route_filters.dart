@@ -155,8 +155,8 @@ class _RouteFiltersState extends State<RouteFilters> {
           fontWeight: FontWeight.w500,
         ),
       ),
-      backgroundColor: color.withOpacity(0.1),
-      side: BorderSide(color: color.withOpacity(0.3)),
+    backgroundColor: color.withValues(alpha: 0.1),
+    side: BorderSide(color: color.withValues(alpha: 0.3)),
       deleteIcon: Icon(
         Icons.close,
         size: 16,

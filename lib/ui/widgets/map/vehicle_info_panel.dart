@@ -34,7 +34,7 @@ class VehicleInfoPanel extends StatelessWidget {
         border: Border.all(color: const Color(GfTokens.stroke)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.15),
+    color: Colors.black.withValues(alpha: 0.15),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -290,9 +290,9 @@ class _InfoCard extends StatelessWidget {
   Widget build(BuildContext context) => Container(
       padding: const EdgeInsets.all(GfTokens.space3),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+    color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(GfTokens.radiusSmall),
-        border: Border.all(color: color.withOpacity(0.2)),
+    border: Border.all(color: color.withValues(alpha: 0.2)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

@@ -312,7 +312,7 @@ class _DriverDetailsPageState extends ConsumerState<DriverDetailsPage>
                 CircleAvatar(
                   radius: 32,
                   backgroundColor:
-                      const Color(GfTokens.colorPrimary).withValues(alpha: 0.1),
+      const Color(GfTokens.colorPrimary).withValues(alpha: 0.1),
                   backgroundImage: _driver!.profileImageUrl != null
                       ? NetworkImage(_driver!.profileImageUrl!)
                       : null,

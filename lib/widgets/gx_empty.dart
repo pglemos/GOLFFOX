@@ -84,7 +84,7 @@ class _GxEmptyState extends State<GxEmpty> with SingleTickerProviderStateMixin {
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 color:
-                    colorScheme.surfaceContainerHighest.withOpacity(0.3),
+    colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Icon(

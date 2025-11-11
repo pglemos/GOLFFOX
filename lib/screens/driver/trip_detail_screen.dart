@@ -335,7 +335,7 @@ class _TripDetailScreenState extends State<TripDetailScreen>
         borderRadius: BorderRadius.circular(14),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+    color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 14,
             offset: const Offset(0, 4),
           ),
@@ -517,7 +517,7 @@ class _TripDetailScreenState extends State<TripDetailScreen>
             Text(
               'Nenhuma acao disponivel para o status atual.',
               style: t.textTheme.bodySmall?.copyWith(
-                color: t.colorScheme.onSurface.withOpacity(0.7),
+    color: t.colorScheme.onSurface.withValues(alpha: 0.7),
               ),
             ),
         ],
@@ -538,7 +538,7 @@ class _TripDetailScreenState extends State<TripDetailScreen>
           border: Border.all(color: t.colorScheme.surface, width: 3),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.18),
+    color: Colors.black.withValues(alpha: 0.18),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -551,9 +551,9 @@ class _TripDetailScreenState extends State<TripDetailScreen>
   Widget _glass(ThemeData t, {required Widget child}) => Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
         decoration: BoxDecoration(
-          color: t.colorScheme.surface.withOpacity(0.85),
+    color: t.colorScheme.surface.withValues(alpha: 0.85),
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: t.colorScheme.outline.withOpacity(0.12)),
+    border: Border.all(color: t.colorScheme.outline.withValues(alpha: 0.12)),
         ),
         child: child,
       );
@@ -594,7 +594,7 @@ class _TripStatusCard extends StatelessWidget {
         label = 'Cancelada';
         break;
       default:
-        c = t.colorScheme.onSurface.withOpacity(0.5);
+    c = t.colorScheme.onSurface.withValues(alpha: 0.5);
         i = Icons.help_outline;
         label = trip.status;
     }
@@ -610,7 +610,7 @@ class _TripStatusCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             decoration: BoxDecoration(
-              color: c.withOpacity(0.12),
+    color: c.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -629,12 +629,12 @@ class _TripStatusCard extends StatelessWidget {
           if (trip.scheduledStartTime != null)
             Row(children: [
               Icon(Icons.access_time,
-                  size: 16, color: t.colorScheme.onSurface.withOpacity(0.7)),
+    size: 16, color: t.colorScheme.onSurface.withValues(alpha: 0.7)),
               const SizedBox(width: 6),
               Text(
                 _fmt(trip.scheduledStartTime!),
                 style: t.textTheme.labelMedium?.copyWith(
-                  color: t.colorScheme.onSurface.withOpacity(0.7),
+    color: t.colorScheme.onSurface.withValues(alpha: 0.7),
                 ),
               ),
             ]),
@@ -644,7 +644,7 @@ class _TripStatusCard extends StatelessWidget {
           Text(
             trip.notes!,
               style: t.textTheme.bodySmall?.copyWith(
-                color: t.colorScheme.onSurface.withOpacity(0.8),
+    color: t.colorScheme.onSurface.withValues(alpha: 0.8),
               ),
           ),
         ],

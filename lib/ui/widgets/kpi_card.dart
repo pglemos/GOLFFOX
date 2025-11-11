@@ -66,7 +66,7 @@ class GfKpiCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(GfTokens.space2),
               decoration: BoxDecoration(
-                color: iconColor.withValues(alpha: 0.1),
+                color: iconColor.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(GfTokens.radiusSmall),
               ),
               child: Icon(

@@ -110,7 +110,7 @@ class RouteStopTimeline extends StatelessWidget {
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: stopColor.withValues(alpha: 0.3),
+    color: stopColor.withValues(alpha: 0.3),
                         blurRadius: 8,
                         spreadRadius: 2,
                       ),
@@ -160,12 +160,12 @@ class RouteStopTimeline extends StatelessWidget {
               padding: const EdgeInsets.all(GfTokens.space3),
               decoration: BoxDecoration(
                 color: isCurrent
-                    ? stopColor.withValues(alpha: 0.1)
+        ? stopColor.withValues(alpha: 0.1)
                     : const Color(GfTokens.colorSurface),
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(
                   color: isCurrent
-                      ? stopColor.withValues(alpha: 0.3)
+        ? stopColor.withValues(alpha: 0.3)
                       : const Color(GfTokens.stroke),
                 ),
               ),
