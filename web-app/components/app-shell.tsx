@@ -32,7 +32,7 @@ export function AppShell({ user, children, panel }: AppShellProps) {
   // Configurações de branding por painel
   const panelConfig = {
     admin: {
-      branding: 'Admin • Premium',
+      branding: 'Administrativo',
       homeUrl: '/admin'
     },
     operator: {
