@@ -41,6 +41,15 @@ class AuthManager extends ChangeNotifier {
 
     _logger.info(' Initializing AuthManager...');
 
+    // Em modo dev/offline, se Supabase não estiver inicializado, evitamos
+    // registrar listeners ou acessar o cliente para não bloquear o boot.
+    if (!Supabase.instance.isInitialized) {
+      _logger.warning(' Supabase não inicializado (dev/offline). Pulando AuthManager.initialize.');
+      _isInitialized = true;
+      notifyListeners();
+      return;
+    }
+
     // Listen to auth state changes
     _authSubscription = _supabase.auth.onAuthStateChange.listen(
       _handleAuthStateChange,
