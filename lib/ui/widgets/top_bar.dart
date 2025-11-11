@@ -110,7 +110,7 @@ class GfTopBar extends ConsumerWidget implements PreferredSizeWidget {
 
   Widget _buildNavigationPills() {
     final pills = [
-      'Painel de Gestao',
+      'Painel de Gestão',
       'App do Motorista',
       'App do Passageiro',
       'Portal do Operador',
@@ -175,7 +175,7 @@ class GfTopBar extends ConsumerWidget implements PreferredSizeWidget {
             color: Color(GfTokens.textBody),
             size: 20,
           ),
-          tooltip: 'Preferencias',
+          tooltip: 'Preferências',
         ),
 
         const SizedBox(width: GfTokens.space2),

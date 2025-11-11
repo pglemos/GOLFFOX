@@ -22,15 +22,15 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzd
 # -----------------------------------------------------------------------------
 # GOOGLE MAPS (OBRIGATÓRIO)
 # -----------------------------------------------------------------------------
-GOOGLE_MAPS_API_KEY=AIzaSyD79t05YxpU2RnEczY-NSDxhdbY9OvigsM
-NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=AIzaSyD79t05YxpU2RnEczY-NSDxhdbY9OvigsM
+GOOGLE_MAPS_API_KEY=YOUR_GOOGLE_MAPS_API_KEY
+NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=YOUR_GOOGLE_MAPS_API_KEY
 
 # -----------------------------------------------------------------------------
 # CONFIGURAÇÕES BÁSICAS (RECOMENDADO)
 # -----------------------------------------------------------------------------
 NODE_ENV=production
-NEXTAUTH_SECRET=golffox-production-secret-2024-change-this
-JWT_SECRET=golffox-jwt-secret-2024-change-this
+NEXTAUTH_SECRET=change-me-in-production
+JWT_SECRET=change-me-in-production
 
 # -----------------------------------------------------------------------------
 # INSTRUÇÕES:

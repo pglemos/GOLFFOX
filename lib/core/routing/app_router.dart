@@ -3,9 +3,11 @@ import 'package:go_router/go_router.dart';
 
 import '../../domain/user_role.dart';
 import '../../features/auth/login_screen.dart';
-import '../../features/dashboard/dashboard_page.dart' as admin;
+import '../../features/drivers/driver_routes.dart';
+import '../../features/mapa/mapa_page.dart';
 import '../../models/user.dart' as app_user;
 import '../../screens/carrier/carrier_dashboard.dart';
+import '../../screens/dashboard/dashboard_page.dart' as admin;
 import '../../screens/driver/driver_dashboard.dart';
 import '../../screens/operator/operator_dashboard.dart';
 import '../../screens/passenger/passenger_dashboard.dart';
@@ -108,6 +110,18 @@ class AppRouter {
     final currentEmail = _supabaseService.currentUser?.email?.toLowerCase();
 
     _logger.debug('Route redirect check: $location (role: $currentRole)');
+
+    // Allow public routes without authentication/role checks
+    final isPublic = location.startsWith(AppRoutes.error) ||
+        location.startsWith(AppRoutes.notFound) ||
+        location.startsWith(AppRoutes.maintenance) ||
+        location.startsWith(AppRoutes.login) ||
+        location.startsWith(AppRoutes.signup) ||
+        location.startsWith(AppRoutes.forgotPassword) ||
+        location.startsWith(AppRoutes.resetPassword);
+    if (isPublic) {
+      return null;
+    }
 
     // Superuser override: e-mail de admin sempre pode acessar '/admin'
     if (currentEmail == 'golffox@admin.com') {
@@ -214,6 +228,13 @@ class AppRouter {
         builder: (context, state) => _buildUiCatalog(),
       ),
 
+      // Map routes
+      GoRoute(
+        path: AppRoutes.map,
+        name: 'map',
+        builder: (context, state) => const MapaPage(),
+      ),
+
       // Settings routes
       GoRoute(
         path: AppRoutes.settings,
@@ -227,6 +248,21 @@ class AppRouter {
         name: 'profile',
         builder: (context, state) => _buildProfile(),
       ),
+
+      // Error routes (explicit)
+      GoRoute(
+        path: AppRoutes.error,
+        name: 'error',
+        builder: _buildErrorPage,
+      ),
+      GoRoute(
+        path: AppRoutes.notFound,
+        name: 'not-found',
+        builder: _buildErrorPage,
+      ),
+
+      // Feature routes
+      ...DriverRoutes.routes,
     ];
 
   Widget _buildErrorPage(BuildContext context, GoRouterState state) {
@@ -396,9 +432,18 @@ class AppRouter {
   }
 
   /// Check if route is shared across roles
-  bool _isSharedRoute(String location) => location == '/profile' ||
-        location == '/ui-catalog' ||
-        location.startsWith('/shared');
+  bool _isSharedRoute(String location) =>
+      location.startsWith(AppRoutes.profile) ||
+      location.startsWith(AppRoutes.settings) ||
+      location.startsWith(AppRoutes.notifications) ||
+      location.startsWith(AppRoutes.help) ||
+      location.startsWith(AppRoutes.about) ||
+      // Trip routes can include parameters; match the prefix
+      location.startsWith('/trip/') ||
+      // Map routes
+      location.startsWith(AppRoutes.map) ||
+      location.startsWith(AppRoutes.mapSearch) ||
+      location.startsWith(AppRoutes.mapDirections);
 }
 
 /// Route configuration

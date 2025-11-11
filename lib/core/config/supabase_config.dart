@@ -1,15 +1,21 @@
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:golffox/core/supa/supa_env.dart';
 
+/// Deprecated: use SupaClient/SupaEnv instead.
+/// Mantido por compatibilidade, sem segredos hardcoded.
 class SupabaseConfig {
-  // Configuracoes do Supabase
-  static const String supabaseUrl = 'https://vmoxzesvjcfmrebagcwo.supabase.co';
-  static const String supabaseAnonKey =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZtb3h6ZXN2amNmbXJlYmFnY3dvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE1MTQyMTMsImV4cCI6MjA3NzA5MDIxM30.QKRKu1bIPhsyDPFuBKEIjseC5wNC35RKbOxQ7FZmEvU';
+  // Configurações do Supabase (via ambiente)
+  static final String supabaseUrl = SupaEnv.supabaseUrl;
+  static final String supabaseAnonKey = SupaEnv.supabaseAnonKey;
 
   static Future<void> initialize() async {
     if (kDebugMode) {
       debugPrint('[SupabaseConfig] Inicializando Supabase...');
+    }
+
+    if (supabaseUrl.isEmpty || supabaseAnonKey.isEmpty) {
+      throw Exception('Supabase não configurado: defina SUPABASE_URL e SUPABASE_ANON_KEY');
     }
 
     await Supabase.initialize(

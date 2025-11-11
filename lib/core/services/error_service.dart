@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../config/env_config.dart';
@@ -36,11 +37,12 @@ class ErrorService {
     Map<String, dynamic>? additionalData,
     ErrorSeverity severity = ErrorSeverity.error,
   }) async {
+    final safeData = _sanitizeData(additionalData);
     final report = ErrorReport(
       error: error,
       stackTrace: stackTrace,
       context: context,
-      additionalData: additionalData,
+      additionalData: safeData,
       severity: severity,
       timestamp: DateTime.now(),
     );
@@ -52,7 +54,7 @@ class ErrorService {
     }
 
     // Log the error
-    final formatted = ErrorUtils.formatError(error, context: context, additionalData: additionalData);
+    final formatted = ErrorUtils.formatError(error, context: context, additionalData: safeData);
     _logger.error('Error reported: $formatted', error, stackTrace);
 
     // Send to external services if enabled
@@ -64,6 +66,19 @@ class ErrorService {
     if (EnvConfig.enableAnalytics) {
       await _sendToAnalytics(report);
     }
+  }
+
+  /// Unified handler: categorizes, logs and returns a standardized GxError
+  Future<GxError> handle(Object error, {String? context}) async {
+    final gxError = from(error);
+    await reportError(
+      error,
+      StackTrace.current,
+      context: context,
+      severity: gxError.severity,
+      additionalData: {'code': gxError.code},
+    );
+    return gxError;
   }
 
   /// Handle Supabase-specific errors
@@ -107,7 +122,6 @@ class ErrorService {
     if (error is GxError) {
       return error.userMessage;
     }
-
     return _getErrorMessage(error);
   }
 
@@ -197,24 +211,98 @@ class ErrorService {
 
   // Private methods
 
+  /// Create standardized error from any exception
+  GxError from(Object error) {
+    // Supabase-auth specific
+    if (error is AuthException || error is PostgrestException) {
+      return _categorizeSupabaseError(error);
+    }
+
+    // Platform exceptions (e.g., permissions, clipboard)
+    if (error is PlatformException) {
+      final code = (error.code).toLowerCase();
+      if (code.contains('permission')) {
+        return GxError(
+          code: 'permission_denied',
+          message: error.message ?? error.toString(),
+          userMessage: 'Permissão negada para esta operação.',
+          severity: ErrorSeverity.warning,
+        );
+      }
+      if (code.contains('network')) {
+        return GxError(
+          code: 'network_error',
+          message: error.message ?? error.toString(),
+          userMessage: 'Erro de conexão. Verifique sua internet.',
+          severity: ErrorSeverity.warning,
+        );
+      }
+      return GxError(
+        code: code.isEmpty ? 'platform_error' : code,
+        message: error.message ?? error.toString(),
+        userMessage: 'Erro de plataforma. Tente novamente.',
+      );
+    }
+
+    // Common Dart exceptions
+    if (error is TimeoutException) {
+      return const GxError(
+        code: 'timeout',
+        message: 'operation timed out',
+        userMessage: 'Operação demorou muito. Verifique sua conexão.',
+        severity: ErrorSeverity.warning,
+      );
+    }
+    if (error is FormatException) {
+      return GxError(
+        code: 'invalid_format',
+        message: error.message,
+        userMessage: 'Formato inválido dos dados informados.',
+        severity: ErrorSeverity.warning,
+      );
+    }
+    if (error is ArgumentError) {
+      return GxError(
+        code: 'invalid_argument',
+        message: (error.message ?? error).toString(),
+        userMessage: 'Parâmetro inválido fornecido.',
+        severity: ErrorSeverity.warning,
+      );
+    }
+    if (error is StateError) {
+      return GxError(
+        code: 'invalid_state',
+        message: error.toString(),
+        userMessage: 'Estado inválido para esta operação.',
+      );
+    }
+
+    // Fallback
+    return GxError(
+      code: 'unknown_error',
+      message: error.toString(),
+      userMessage: 'Erro inesperado. Tente novamente.',
+    );
+  }
+
   GxError _categorizeSupabaseError(Object error) {
     if (error is AuthException) {
       return GxError(
         code: 'auth_error',
         message: error.message,
-      userMessage: 'Erro de autenticação. Tente fazer login novamente.',
+        userMessage: 'Erro de autenticação. Tente fazer login novamente.',
         severity: ErrorSeverity.warning,
       );
     }
 
     if (error is PostgrestException) {
-      final message = error.message.toLowerCase();
+      final message = (error.message ?? '').toLowerCase();
 
       if (message.contains('permission') || message.contains('rls')) {
         return GxError(
           code: 'permission_denied',
-          message: error.message,
-      userMessage: 'Você não tem permissão para esta operação.',
+          message: error.message ?? 'permission denied',
+          userMessage: 'Você não tem permissão para esta operação.',
           severity: ErrorSeverity.warning,
         );
       }
@@ -222,8 +310,8 @@ class ErrorService {
       if (error.code == '404' || message.contains('not found')) {
         return GxError(
           code: 'not_found',
-          message: error.message,
-      userMessage: 'Registro não encontrado.',
+          message: error.message ?? 'not found',
+          userMessage: 'Registro não encontrado.',
           severity: ErrorSeverity.info,
         );
       }
@@ -231,8 +319,8 @@ class ErrorService {
       if (error.code == '409' || message.contains('duplicate')) {
         return GxError(
           code: 'conflict',
-          message: error.message,
-      userMessage: 'Este registro já existe.',
+          message: error.message ?? 'conflict',
+          userMessage: 'Este registro já existe.',
           severity: ErrorSeverity.warning,
         );
       }
@@ -278,6 +366,25 @@ class ErrorService {
       return error.toString();
     }
     return error.toString();
+  }
+
+  /// Redact sensitive values in additionalData before logging/reporting
+  Map<String, dynamic>? _sanitizeData(Map<String, dynamic>? data) {
+    if (data == null) return null;
+    final sensitive = <String>{
+      'password', 'senha', 'token', 'secret', 'authorization', 'auth',
+      'cpf', 'cnpj', 'api_key', 'apiKey', 'key', 'access_token', 'refresh_token',
+    };
+    final sanitized = <String, dynamic>{};
+    data.forEach((k, v) {
+      final keyLower = k.toLowerCase();
+      if (sensitive.any((s) => keyLower.contains(s))) {
+        sanitized[k] = '***redacted***';
+      } else {
+        sanitized[k] = v;
+      }
+    });
+    return sanitized;
   }
 
   Future<void> _sendToCrashlytics(ErrorReport report) async {

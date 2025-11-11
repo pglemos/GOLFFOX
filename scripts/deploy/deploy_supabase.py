@@ -4,14 +4,19 @@ GolfFox v7.4 - Automated Supabase Deployment Script
 Executes SQL migrations directly via Supabase Management API
 """
 
+import os
 import requests
 import sys
 from pathlib import Path
 
-# Supabase credentials
-SUPABASE_URL = "https://vmoxzesvjcfmrebagcwo.supabase.co"
-ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZtb3h6ZXN2amNmbXJlYmFnY3dvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE1MTQyMTMsImV4cCI6MjA3NzA5MDIxM30.QKRKu1bIPhsyDPFuBKEIjseC5wNC35RKbOxQ7FZmEvU"
-SERVICE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZtb3h6ZXN2amNmbXJlYmFnY3dvIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2MTUxNDIxMywiZXhwIjoyMDc3MDkwMjEzfQ.EJylgYksLGJ7icYf77dPULYZNA4u35JRg-gkoGgMI_A"
+# Supabase credentials (via ambiente)
+SUPABASE_URL = os.environ.get("SUPABASE_URL") or os.environ.get("NEXT_PUBLIC_SUPABASE_URL")
+ANON_KEY = os.environ.get("SUPABASE_ANON_KEY") or os.environ.get("NEXT_PUBLIC_SUPABASE_ANON_KEY")
+SERVICE_KEY = os.environ.get("SUPABASE_SERVICE_ROLE_KEY") or os.environ.get("SUPABASE_SERVICE_ROLE")
+
+if not SUPABASE_URL or not SERVICE_KEY:
+    print("❌ Supabase não configurado: defina SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY")
+    sys.exit(1)
 
 def execute_sql(sql_content):
     """Execute SQL via Supabase REST API"""

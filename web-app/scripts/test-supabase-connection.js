@@ -8,12 +8,12 @@ const fs = require('fs');
 const path = require('path');
 
 // Configuração do Supabase
-const SUPABASE_URL = 'https://vmoxzesvjcfmrebagcwo.supabase.co';
-const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY || process.env.DATABASE_PASSWORD;
+const SUPABASE_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
+const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.DATABASE_PASSWORD;
 
-if (!SUPABASE_SERVICE_KEY) {
-  console.error('❌ ERRO: Variável SUPABASE_SERVICE_KEY não encontrada');
-  console.log('Configure com: export SUPABASE_SERVICE_KEY="sua-service-key"');
+if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
+  console.error('❌ ERRO: Variáveis SUPABASE_URL/SUPABASE_SERVICE_KEY não encontradas');
+  console.log('Configure com: export SUPABASE_URL="sua-url" e SUPABASE_SERVICE_KEY="sua-service-key"');
   process.exit(1);
 }
 

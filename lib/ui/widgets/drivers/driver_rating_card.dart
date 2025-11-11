@@ -46,7 +46,7 @@ class DriverRatingCard extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Text(
-                'Resumo das Avaliacoes',
+                'Resumo das Avaliações',
                 style: GfTextStyles.labelLarge.copyWith(
                   color: const Color(GfTokens.colorPrimary),
                   fontWeight: FontWeight.bold,
@@ -87,7 +87,7 @@ class DriverRatingCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '${driver.stats.totalRatings} avaliacoes',
+                      '${driver.stats.totalRatings} avaliações',
                       style: GfTextStyles.labelSmall.copyWith(
                         color: const Color(GfTokens.colorOnSurfaceVariant),
                       ),
@@ -111,7 +111,7 @@ class DriverRatingCard extends StatelessWidget {
                       'Muito Bom (4)',
                       _getRatingCount(4),
                       driver.stats.totalRatings,
-                      const Color(GfTokens.colorSuccess).withValues(alpha: 0.7),
+                      const Color(GfTokens.colorSuccess).withOpacity(0.7),
                     ),
                     _buildStatRow(
                       'Bom (3)',
@@ -123,7 +123,7 @@ class DriverRatingCard extends StatelessWidget {
                       'Regular (2)',
                       _getRatingCount(2),
                       driver.stats.totalRatings,
-                      const Color(GfTokens.colorError).withValues(alpha: 0.7),
+                      const Color(GfTokens.colorError).withOpacity(0.7),
                     ),
                     _buildStatRow(
                       'Ruim (1)',
@@ -153,7 +153,7 @@ class DriverRatingCard extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Text(
-                'Distribuicao das Avaliacoes',
+                'Distribuição das Avaliações',
                 style: GfTextStyles.labelLarge.copyWith(
                   color: const Color(GfTokens.colorPrimary),
                   fontWeight: FontWeight.bold,
@@ -174,8 +174,8 @@ class DriverRatingCard extends StatelessWidget {
       return const GxCard(
         child: GxEmpty(
           icon: Icons.star_outline,
-          title: 'Nenhuma Avaliacao',
-          message: 'Este motorista ainda nao recebeu avaliacoes.',
+          title: 'Nenhuma Avaliação',
+          message: 'Este motorista ainda não recebeu avaliações.',
         ),
       );
     }
@@ -193,7 +193,7 @@ class DriverRatingCard extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Text(
-                'Avaliacoes Recentes',
+                'Avaliações Recentes',
                 style: GfTextStyles.labelLarge.copyWith(
                   color: const Color(GfTokens.colorPrimary),
                   fontWeight: FontWeight.bold,
@@ -217,7 +217,7 @@ class DriverRatingCard extends StatelessWidget {
                   // TODO(golffox-team): Implementar visualizacao de todas as avaliacoes
                 },
                 child: Text(
-                  'Ver todas as ${driver.ratings.length} avaliacoes',
+                  'Ver todas as ${driver.ratings.length} avaliações',
                   style: const TextStyle(color: Color(GfTokens.colorPrimary)),
                 ),
               ),
@@ -366,7 +366,7 @@ class DriverRatingCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: GfTokens.colorSurfaceVariant.withValues(alpha: 0.3),
+        color: const Color(GfTokens.colorSurfaceVariant).withOpacity(0.3),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
           color: const Color(GfTokens.colorOutlineVariant),

@@ -162,9 +162,9 @@ class _VehicleMaintenanceListState
         });
       },
       backgroundColor: isSelected
-          ? const Color(GfTokens.colorPrimary).withValues(alpha: 0.1)
+          ? GfTokens.colorPrimary.withValues(alpha: 0.1)
           : null,
-      selectedColor: const Color(GfTokens.colorPrimary).withValues(alpha: 0.2),
+      selectedColor: GfTokens.colorPrimary.withValues(alpha: 0.2),
       checkmarkColor: const Color(GfTokens.colorPrimary),
       side: BorderSide(
         color: isSelected
@@ -215,11 +215,11 @@ class _VehicleMaintenanceListState
                       vertical: GfTokens.spacingXs,
                     ),
                     decoration: BoxDecoration(
-                      color: Color(record.priority.colorValue)
+                      color: record.priority.colorValue
                           .withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(GfTokens.radiusSm),
                       border: Border.all(
-                        color: Color(record.priority.colorValue)
+                        color: record.priority.colorValue
                             .withValues(alpha: 0.3),
                       ),
                     ),
