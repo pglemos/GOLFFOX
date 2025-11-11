@@ -6,6 +6,16 @@ export async function middleware(request: NextRequest) {
   const { pathname, searchParams } = request.nextUrl
   const response = NextResponse.next()
 
+  // Redirecionar /login para / (raiz)
+  if (pathname === '/login' || pathname.startsWith('/login/')) {
+    const rootUrl = new URL('/', request.url)
+    // Preservar parâmetros de query se existirem
+    if (searchParams.has('next')) {
+      rootUrl.searchParams.set('next', searchParams.get('next')!)
+    }
+    return NextResponse.redirect(rootUrl)
+  }
+
   // ✅ Proteger rotas /operator e /admin com autenticação
   if (pathname.startsWith('/operator') || pathname.startsWith('/admin')) {
     // Verificar cookie de sessão customizado (golffox-session)
@@ -82,6 +92,8 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
+    '/login',
+    '/login/:path*',
     '/admin/:path*',
     '/operator',
     '/operator/:path*',
