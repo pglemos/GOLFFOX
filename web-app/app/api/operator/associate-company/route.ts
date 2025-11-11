@@ -55,35 +55,24 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    // 3. Buscar ou criar empresa
-    let { data: companies } = await supabaseAdmin
+    // 3. Buscar empresa existente (não criar nova)
+    const { data: companies, error: companiesError } = await supabaseAdmin
       .from('companies')
       .select('id, name')
       .eq('is_active', true)
       .limit(1)
     
-    let companyId: string
-    
-    if (companies && companies.length > 0) {
-      companyId = companies[0].id
-    } else {
-      // Criar empresa padrão
-      const { data: newCompany, error: createError } = await supabaseAdmin
-        .from('companies')
-        .insert({
-          name: 'Minha Empresa',
-          is_active: true,
-          role: 'operator'
-        })
-        .select()
-        .single()
-      
-      if (createError || !newCompany) {
-        return NextResponse.json({ error: 'Erro ao criar empresa' }, { status: 500 })
-      }
-      
-      companyId = newCompany.id
+    if (companiesError) {
+      return NextResponse.json({ error: 'Erro ao buscar empresas' }, { status: 500 })
     }
+    
+    if (!companies || companies.length === 0) {
+      return NextResponse.json({ 
+        error: 'Nenhuma empresa cadastrada no sistema. Entre em contato com o administrador.' 
+      }, { status: 404 })
+    }
+    
+    const companyId = companies[0].id
 
     // 4. Criar mapeamento
     const { data: mapping, error: mapError } = await supabaseAdmin
