@@ -31,7 +31,8 @@ export async function POST(req: NextRequest) {
   }
 
   const email = sanitize(payload.email)
-  const password = sanitize(payload.password)
+  // Não sanitizar senha - pode conter caracteres especiais válidos
+  const password = typeof payload.password === 'string' ? payload.password : ''
 
   if (!email || !password) {
     return NextResponse.json({ error: 'missing_credentials' }, { status: 400 })
