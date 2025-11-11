@@ -18,7 +18,7 @@ function getSupabaseAdmin() {
 
 export async function POST(request: NextRequest) {
   try {
-    const { email } = await request.json()
+    const { email, companyId } = await request.json()
     
     if (!email) {
       return NextResponse.json({ error: 'Email é obrigatório' }, { status: 400 })
@@ -55,31 +55,50 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    // 3. Buscar empresa existente (não criar nova)
-    const { data: companies, error: companiesError } = await supabaseAdmin
-      .from('companies')
-      .select('id, name')
-      .eq('is_active', true)
-      .limit(1)
+    // 3. Buscar empresa (usar companyId se fornecido, senão buscar primeira disponível)
+    let finalCompanyId: string
     
-    if (companiesError) {
-      return NextResponse.json({ error: 'Erro ao buscar empresas' }, { status: 500 })
+    if (companyId) {
+      // Verificar se a empresa existe
+      const { data: company, error: companyError } = await supabaseAdmin
+        .from('companies')
+        .select('id, name')
+        .eq('id', companyId)
+        .eq('is_active', true)
+        .single()
+      
+      if (companyError || !company) {
+        return NextResponse.json({ error: 'Empresa não encontrada ou inativa' }, { status: 404 })
+      }
+      
+      finalCompanyId = company.id
+    } else {
+      // Buscar primeira empresa disponível
+      const { data: companies, error: companiesError } = await supabaseAdmin
+        .from('companies')
+        .select('id, name')
+        .eq('is_active', true)
+        .limit(1)
+      
+      if (companiesError) {
+        return NextResponse.json({ error: 'Erro ao buscar empresas' }, { status: 500 })
+      }
+      
+      if (!companies || companies.length === 0) {
+        return NextResponse.json({ 
+          error: 'Nenhuma empresa cadastrada no sistema. Entre em contato com o administrador.' 
+        }, { status: 404 })
+      }
+      
+      finalCompanyId = companies[0].id
     }
-    
-    if (!companies || companies.length === 0) {
-      return NextResponse.json({ 
-        error: 'Nenhuma empresa cadastrada no sistema. Entre em contato com o administrador.' 
-      }, { status: 404 })
-    }
-    
-    const companyId = companies[0].id
 
     // 4. Criar mapeamento
     const { data: mapping, error: mapError } = await supabaseAdmin
       .from('gf_user_company_map')
       .insert({
         user_id: operatorUser.id,
-        company_id: companyId
+        company_id: finalCompanyId
       })
       .select()
       .single()
@@ -95,7 +114,7 @@ export async function POST(request: NextRequest) {
         id: operatorUser.id,
         email: operatorUser.email,
         role: 'operator',
-        company_id: companyId,
+        company_id: finalCompanyId,
         is_active: true
       }, {
         onConflict: 'id'
@@ -104,7 +123,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ 
       success: true, 
       message: 'Operador associado à empresa com sucesso',
-      companyId 
+      companyId: finalCompanyId
     })
   } catch (error: any) {
     console.error('Erro ao associar operador:', error)
