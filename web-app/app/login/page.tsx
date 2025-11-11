@@ -325,8 +325,14 @@ function LoginContent() {
           }
           redirectUrl = redirectUrl.split("?")[0]
 
-          debug("Login bem-sucedido", { redirectUrl, email: maskedEmail }, "LoginPage")
-          setTimeout(() => router.push(redirectUrl), 400)
+          debug("Login bem-sucedido", { redirectUrl, email: maskedEmail, role: resolvedRole }, "LoginPage")
+          
+          // Redirecionamento imediato sem delay
+          if (typeof window !== "undefined") {
+            window.location.replace(redirectUrl)
+          } else {
+            router.replace(redirectUrl)
+          }
           return
         }
 
