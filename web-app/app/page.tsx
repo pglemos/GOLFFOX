@@ -297,7 +297,15 @@ function LoginContent() {
           const token: string | undefined = data?.token
           const user = data?.user
 
+          console.log('✅ Resposta da API:', { 
+            hasToken: !!token, 
+            hasUser: !!user,
+            userRole: user?.role,
+            userEmail: user?.email?.replace(/^(.{2}).+(@.*)$/, '$1***$2')
+          })
+
           if (!token || !user?.email) {
+            console.error('❌ Resposta inválida da API:', { token: !!token, user: !!user })
             throw new Error("invalid_response")
           }
 
