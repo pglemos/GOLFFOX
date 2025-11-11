@@ -8,6 +8,8 @@ const nextConfig = {
     // Evitar falha de deploy por tipos enquanto estabilizamos rotas API
     ignoreBuildErrors: true,
   },
+  // Pin workspace root to avoid incorrect root inference warnings
+  outputFileTracingRoot: __dirname,
   async headers() {
     return [
       {
@@ -72,6 +74,8 @@ const nextConfig = {
       ...config.resolve.alias,
       '@': require('path').resolve(__dirname),
     }
+    // Disable Webpack persistent caching to bypass corrupted pack cache in dev
+    config.cache = false
     return config
   },
 }

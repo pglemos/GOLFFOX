@@ -61,6 +61,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'internal_error' }, { status: 500 })
   }
 
+  // ✅ Criar cliente Supabase para verificar banco de dados
   const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     auth: {
       autoRefreshToken: false,
@@ -69,6 +70,50 @@ export async function POST(req: NextRequest) {
   })
 
   try {
+    // ✅ PRIMEIRO: Verificar se o usuário existe na tabela users do Supabase
+    debug('Verificando se usuário existe no banco de dados', { 
+      email: email.replace(/^(.{2}).+(@.*)$/, '$1***$2') 
+    }, 'AuthAPI')
+    
+    const { data: existingUser, error: userCheckError } = await supabase
+      .from('users')
+      .select('id, email, role, is_active')
+      .eq('email', email.toLowerCase().trim())
+      .maybeSingle()
+    
+    if (userCheckError) {
+      debug('Erro ao verificar usuário no banco', { error: userCheckError }, 'AuthAPI')
+      // Continuar mesmo com erro - pode ser problema de permissão RLS
+    }
+    
+    // Se usuário não existe no banco, retornar erro
+    if (!existingUser) {
+      logError('Usuário não encontrado no banco de dados', { 
+        email: email.replace(/^(.{2}).+(@.*)$/, '$1***$2') 
+      }, 'AuthAPI')
+      return NextResponse.json({ 
+        error: 'Usuário não encontrado. Verifique se o email está correto ou entre em contato com o administrador.' 
+      }, { status: 404 })
+    }
+    
+    // Verificar se usuário está ativo
+    if (existingUser.is_active === false) {
+      logError('Tentativa de login com usuário inativo', { 
+        email: email.replace(/^(.{2}).+(@.*)$/, '$1***$2'),
+        userId: existingUser.id
+      }, 'AuthAPI')
+      return NextResponse.json({ 
+        error: 'Usuário inativo. Entre em contato com o administrador.' 
+      }, { status: 403 })
+    }
+    
+    debug('Usuário encontrado no banco', { 
+      userId: existingUser.id,
+      role: existingUser.role,
+      isActive: existingUser.is_active
+    }, 'AuthAPI')
+    
+    // ✅ SEGUNDO: Autenticar com Supabase Auth
     const { data, error: authError } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -79,7 +124,8 @@ export async function POST(req: NextRequest) {
       logError('Erro de autenticação Supabase', { 
         error: authError.message, 
         status: authError.status,
-        email: email.replace(/^(.{2}).+(@.*)$/, '$1***$2')
+        email: email.replace(/^(.{2}).+(@.*)$/, '$1***$2'),
+        userId: existingUser.id
       }, 'AuthAPI')
       
       // Retornar mensagem de erro mais específica
@@ -92,35 +138,34 @@ export async function POST(req: NextRequest) {
       logError('Autenticação sem usuário ou sessão', { 
         hasUser: !!data.user, 
         hasSession: !!data.session,
-        email: email.replace(/^(.{2}).+(@.*)$/, '$1***$2')
+        email: email.replace(/^(.{2}).+(@.*)$/, '$1***$2'),
+        userId: existingUser.id
       }, 'AuthAPI')
       return NextResponse.json({ error: 'Falha na autenticação - sessão não criada' }, { status: 401 })
     }
-
-    // Tentar obter role dos metadados do usuário primeiro
-    let role = data.user.user_metadata?.role || data.user.app_metadata?.role
     
-    // Se não encontrar nos metadados, buscar na tabela users do Supabase
-    if (!role && data.user.id) {
-      try {
-        const { data: userData, error: userError } = await supabase
-          .from('users')
-          .select('role')
-          .eq('id', data.user.id)
-          .single()
-        
-        if (!userError && userData?.role) {
-          role = userData.role
-        }
-      } catch (err) {
-        debug('Erro ao buscar role na tabela users', { error: err }, 'AuthAPI')
-      }
+    // ✅ TERCEIRO: Obter role do banco de dados (fonte de verdade)
+    // Prioridade: 1. Tabela users (já temos), 2. Metadados do usuário, 3. Fallback por email
+    let role = existingUser.role // Usar role da tabela users (fonte de verdade)
+    
+    // Se não tiver role na tabela, tentar metadados
+    if (!role) {
+      role = data.user.user_metadata?.role || data.user.app_metadata?.role
+      debug('Role não encontrado na tabela, usando metadados', { role }, 'AuthAPI')
     }
     
-    // Fallback: usar função getUserRoleByEmail se ainda não encontrou
+    // Se ainda não tiver, usar fallback por email
     if (!role) {
       role = getUserRoleByEmail(data.user.email || email)
+      debug('Usando fallback por email para role', { role, email: email.replace(/^(.{2}).+(@.*)$/, '$1***$2') }, 'AuthAPI')
     }
+    
+    // Log final do role detectado
+    debug('Role final determinado', { 
+      role,
+      source: existingUser.role ? 'database' : (data.user.user_metadata?.role ? 'metadata' : 'email_fallback'),
+      userId: data.user.id
+    }, 'AuthAPI')
     const token = data.session.access_token
     const userPayload = {
       id: data.user.id,
