@@ -244,7 +244,7 @@ class _ResponsiveHoverState extends State<ResponsiveHover>
               boxShadow: _isHovered
                   ? [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.1),
+                        color: Colors.black.withOpacity(0.1),
                         blurRadius: widget.elevation * 2,
                         offset: Offset(0, widget.elevation),
                       ),

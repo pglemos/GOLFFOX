@@ -32,7 +32,7 @@ class VehicleCard extends StatelessWidget {
         color: const Color(GfTokens.colorSurface),
         borderRadius: BorderRadius.circular(GfTokens.radiusLg),
         elevation: 2,
-        shadowColor: GfTokens.colorShadow.withValues(alpha: 0.1),
+        shadowColor: const Color(GfTokens.colorShadow).withOpacity(0.1),
         child: InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(GfTokens.radiusLg),
@@ -49,7 +49,7 @@ class VehicleCard extends StatelessWidget {
                       width: 48,
                       height: 48,
                       decoration: BoxDecoration(
-                        color: Color(vehicle.status.colorValue)
+                        color: vehicle.status.colorValue
                             .withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(GfTokens.radiusMd),
                       ),
@@ -341,9 +341,9 @@ class VehicleCard extends StatelessWidget {
         vertical: GfTokens.spacingXs,
       ),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
+        color: color.withOpacity(0.1),
         borderRadius: BorderRadius.circular(GfTokens.radiusSm),
-        border: Border.all(color: color.withValues(alpha: 0.3)),
+        border: Border.all(color: color.withOpacity(0.3)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -368,12 +368,12 @@ class VehicleCard extends StatelessWidget {
         .animate()
         .shimmer(
           duration: const Duration(seconds: 2),
-          color: color.withValues(alpha: 0.3),
+          color: color.withOpacity(0.3),
         )
         .then()
         .shimmer(
           duration: const Duration(seconds: 2),
-          color: color.withValues(alpha: 0.3),
+          color: color.withOpacity(0.3),
         );
 
   IconData _getVehicleIcon() {

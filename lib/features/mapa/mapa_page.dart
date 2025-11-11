@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/i18n/i18n.dart';
 import '../../core/services/snackbar_service.dart';
@@ -22,7 +23,7 @@ import '../../services/map_service.dart' show vehicleStatusServiceProvider;
 import '../../ui/widgets/gf_app_bar.dart';
 import '../../ui/widgets/map/bus_stops_panel.dart';
 import '../../ui/widgets/map/map_filters.dart';
-import '../../ui/widgets/map/map_legend.dart';
+import '../../ui/widgets/map/map_legend.dart' show MapLegend, CompactMapLegend;
 import '../../ui/widgets/map/vehicle_info_panel.dart';
 import '../../ui/widgets/map/vehicle_marker.dart';
 
@@ -37,7 +38,7 @@ class _MapaPageState extends ConsumerState<MapaPage> {
   final MapController _mapController = MapController();
   VehiclePosition? _selectedVehicle;
   // Usa o enum simples de status do modelo VehiclePosition para filtro
-  List<VehicleStatus> _selectedStatuses = [];
+  List<VehicleStatus> _selectedStatuses = []; // VehicleStatus de vehicle_position.dart
   String? _selectedRoute;
   bool _isTracking = false;
   bool _isLegendExpanded = true;
@@ -404,32 +405,67 @@ class _MapaPageState extends ConsumerState<MapaPage> {
     });
   }
 
-  void _contactDriver(VehiclePosition vehicle) {
-    showDialog<void>(
+  Future<void> _contactDriver(VehiclePosition vehicle) async {
+    final result = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
         title: Text('Contatar ${vehicle.driverName}'),
-        content: Text(
-            'Deseja entrar em contato com o motorista do veículo ${vehicle.licensePlate}?'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Escolha como deseja entrar em contato com o motorista do veículo ${vehicle.licensePlate}:',
+            ),
+            const SizedBox(height: 16),
+            ListTile(
+              leading: const Icon(Icons.phone, color: Color(GfTokens.colorPrimary)),
+              title: const Text('Ligar'),
+              onTap: () => Navigator.of(context).pop('call'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.message, color: Color(GfTokens.colorPrimary)),
+              title: const Text('Enviar Mensagem'),
+              onTap: () => Navigator.of(context).pop('message'),
+            ),
+          ],
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
             child: const Text('Cancelar'),
           ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              // TODO(golffox-team): Implementar contato do motorista
-              SnackBarService.info(
-                context,
-                'mapa.contact.soon',
-              );
-            },
-            child: const Text('Contatar'),
-          ),
         ],
       ),
     );
+
+    if (result == null) return;
+
+    // Buscar telefone do motorista (assumindo que está disponível no vehicle ou precisa buscar)
+    // Por enquanto, usando um número padrão ou buscando do serviço
+    final phoneNumber = vehicle.driverName; // Placeholder - buscar telefone real do driver
+
+    try {
+      if (result == 'call') {
+        final uri = Uri.parse('tel:$phoneNumber');
+        if (await canLaunchUrl(uri)) {
+          await launchUrl(uri);
+        } else {
+          SnackBarService.errorText(context, 'Não foi possível fazer a ligação');
+        }
+      } else if (result == 'message') {
+        final uri = Uri.parse('sms:$phoneNumber');
+        if (await canLaunchUrl(uri)) {
+          await launchUrl(uri);
+        } else {
+          SnackBarService.errorText(context, 'Não foi possível abrir o aplicativo de mensagens');
+        }
+      }
+    } catch (e) {
+      SnackBarService.errorText(
+        context,
+        'Erro ao tentar contatar motorista: ${e.toString()}',
+      );
+    }
   }
 
   void _focusOnBusStop(BusStop stop) {

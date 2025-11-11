@@ -4,8 +4,8 @@ import '../../core/i18n/i18n.dart';
 import '../../core/routing/app_router.dart';
 import '../../core/routing/app_routes.dart';
 import '../../core/services/snackbar_service.dart';
-import '../../domain/user_role.dart';
-import '../../services/auth_service.dart';
+import '../../domain/user_role.dart' show UserRole, parseRole;
+import '../../services/auth_service.dart' show AuthService, AuthFailure;
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -172,7 +172,7 @@ class _LoginScreenState extends State<LoginScreen> {
               constraints: const BoxConstraints(maxWidth: 400),
               child: Card(
                 elevation: 8,
-                shadowColor: Colors.black.withValues(alpha: 0.1),
+                shadowColor: Colors.black.withOpacity(0.1),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
