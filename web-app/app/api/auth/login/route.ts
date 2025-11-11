@@ -139,6 +139,9 @@ export async function POST(req: NextRequest) {
       secure: isSecureRequest(req),
       path: '/',
     })
+    
+    // Adicionar header Set-Cookie explícito para garantir que o cookie seja definido
+    response.headers.set('Set-Cookie', `golffox-session=${cookieValue}; Path=/; Max-Age=3600; SameSite=Lax${isSecureRequest(req) ? '; Secure' : ''}`)
 
     debug('Login API concluído', { role, emailHash: email.replace(/^(.{2}).+(@.*)$/, '$1***$2') }, 'AuthAPI')
     return response
