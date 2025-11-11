@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, Suspense, useCallback } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
-import { supabase } from "@/lib/supabase"
+// Removido import do supabase - não usado mais na página de login para evitar conflitos
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
