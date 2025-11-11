@@ -103,6 +103,45 @@ function OperatorTenantProviderInner({ children }: { children: ReactNode }) {
         }
       } else {
         console.warn('⚠️ Nenhuma empresa encontrada para o operador')
+        
+        // Tentar criar empresa padrão automaticamente
+        try {
+          const { data: { user } } = await supabase.auth.getUser()
+          if (user) {
+            console.log('🔧 Tentando criar empresa padrão para o operador...')
+            
+            // Criar empresa padrão
+            const { data: newCompany, error: createError } = await supabase
+              .from('companies')
+              .insert({
+                name: 'Minha Empresa',
+                is_active: true,
+                role: 'operator'
+              })
+              .select()
+              .single()
+            
+            if (!createError && newCompany) {
+              // Criar mapeamento
+              const { error: mapError } = await supabase
+                .from('gf_user_company_map')
+                .insert({
+                  user_id: user.id,
+                  company_id: newCompany.id
+                })
+              
+              if (!mapError) {
+                console.log('✅ Empresa padrão criada e associada!')
+                // Recarregar empresas
+                await loadCompanies()
+                return
+              }
+            }
+          }
+        } catch (autoCreateError) {
+          console.warn('⚠️ Não foi possível criar empresa automaticamente:', autoCreateError)
+        }
+        
         setTenantCompanyId(null)
         setError('Nenhuma empresa encontrada. Verifique se você tem acesso a pelo menos uma empresa.')
       }
