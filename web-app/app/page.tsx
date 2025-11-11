@@ -446,53 +446,63 @@ function LoginContent() {
 
         // ✅ CRÍTICO: Persistir sessão do Supabase no cliente ANTES de redirecionar
         // Isso evita o loop de redirecionamento, pois as páginas admin verificam supabase.auth.getSession()
-        // O Supabase armazena a sessão no localStorage em uma chave específica
         if (sessionData && typeof window !== 'undefined') {
           try {
             console.log('🔐 Persistindo sessão do Supabase no cliente...')
             
-            // Armazenar sessão no formato que o Supabase espera no localStorage
-            // O Supabase usa a chave `sb-<project-ref>-auth-token` para armazenar a sessão
-            const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
-            const projectRef = supabaseUrl.split('//')[1]?.split('.')[0] || 'project'
+            // Importar Supabase client
+            const { supabase: supabaseClient } = await import('@/lib/supabase')
             
-            // Criar objeto de sessão no formato do Supabase
-            const sessionStorage = {
-              access_token: sessionData.access_token,
-              refresh_token: sessionData.refresh_token,
-              expires_in: sessionData.expires_in || 3600,
-              expires_at: sessionData.expires_at || Math.floor(Date.now() / 1000) + (sessionData.expires_in || 3600),
-              token_type: sessionData.token_type || 'bearer',
-              user: sessionData.user
-            }
-            
-            // Armazenar no localStorage na chave que o Supabase usa
-            const storageKey = `sb-${projectRef}-auth-token`
-            localStorage.setItem(storageKey, JSON.stringify({
-              currentSession: sessionStorage,
-              expiresAt: sessionData.expires_at || Math.floor(Date.now() / 1000) + (sessionData.expires_in || 3600)
-            }))
-            
-            console.log('✅ Sessão do Supabase persistida no localStorage')
-            
-            // Também tentar usar a API do Supabase se disponível (type-safe)
-            try {
-              const { supabase: supabaseClient } = await import('@/lib/supabase')
-              // Verificar se o método setSession existe (pode não existir no tipo mock)
-              if (supabaseClient && 'auth' in supabaseClient && typeof (supabaseClient.auth as any).setSession === 'function') {
-                await (supabaseClient.auth as any).setSession({
+            // Tentar usar setSession se disponível (método oficial do Supabase)
+            if (supabaseClient && 'auth' in supabaseClient) {
+              try {
+                // Usar type assertion para acessar setSession (pode não estar no tipo mock)
+                const authClient = supabaseClient.auth as any
+                if (typeof authClient.setSession === 'function') {
+                  const { data: sessionResult, error: sessionError } = await authClient.setSession({
+                    access_token: sessionData.access_token,
+                    refresh_token: sessionData.refresh_token,
+                  })
+                  
+                  if (sessionError) {
+                    console.error('❌ Erro ao definir sessão via setSession:', sessionError)
+                  } else {
+                    console.log('✅ Sessão do Supabase definida via setSession()')
+                    // Sessão definida com sucesso, continuar
+                  }
+                } else {
+                  console.warn('⚠️ setSession não disponível, usando fallback')
+                  throw new Error('setSession não disponível')
+                }
+              } catch (setSessionErr) {
+                // Fallback: armazenar manualmente no formato do Supabase
+                console.log('ℹ️ Usando fallback para persistir sessão manualmente')
+                
+                // O Supabase armazena no formato: sb-<project-ref>-auth-token
+                const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+                // Extrair project reference da URL (ex: https://xxxxx.supabase.co -> xxxxx)
+                const urlMatch = supabaseUrl.match(/https?:\/\/([^.]+)\.supabase\.co/)
+                const projectRef = urlMatch ? urlMatch[1] : supabaseUrl.split('//')[1]?.split('.')[0] || 'project'
+                
+                // Criar objeto de sessão no formato esperado pelo Supabase
+                const sessionObject = {
                   access_token: sessionData.access_token,
                   refresh_token: sessionData.refresh_token,
-                })
-                console.log('✅ Sessão do Supabase definida via API também')
+                  expires_in: sessionData.expires_in || 3600,
+                  expires_at: sessionData.expires_at || Math.floor(Date.now() / 1000) + (sessionData.expires_in || 3600),
+                  token_type: sessionData.token_type || 'bearer',
+                  user: sessionData.user
+                }
+                
+                // Armazenar no localStorage
+                const storageKey = `sb-${projectRef}-auth-token`
+                localStorage.setItem(storageKey, JSON.stringify(sessionObject))
+                console.log(`✅ Sessão persistida manualmente em localStorage (chave: ${storageKey})`)
               }
-            } catch (apiErr) {
-              // Ignorar erro se setSession não estiver disponível - o localStorage já foi definido
-              console.log('ℹ️ setSession não disponível, usando apenas localStorage')
             }
           } catch (sessionErr) {
             console.error('❌ Erro ao persistir sessão do Supabase:', sessionErr)
-            // Continuar mesmo com erro - o cookie ainda foi definido
+            // Continuar mesmo com erro - o cookie ainda foi definido e o middleware protegerá
           }
         }
 
