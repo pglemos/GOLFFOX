@@ -1,7 +1,7 @@
 export const runtime = 'nodejs'
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
-import { supabaseServiceRole } from '@/lib/supabase-server'
+import { createClient } from '@supabase/supabase-js'
 import { getUserRoleByEmail } from '@/lib/user-role'
 import { debug, error as logError } from '@/lib/logger'
 
@@ -41,9 +41,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'invalid_email' }, { status: 422 })
   }
 
-  if (password.length < 8) {
-    return NextResponse.json({ error: 'weak_password' }, { status: 422 })
-  }
+  // Removida validação de tamanho de senha - deixar Supabase validar
+  // A validação de senha deve ser apenas no cadastro, não no login
 
   // CSRF validation by double submit cookie
   const csrfHeader = req.headers.get('x-csrf-token')
@@ -52,15 +51,49 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'invalid_csrf' }, { status: 403 })
   }
 
+  // Usar cliente anônimo para autenticação de usuários (não service role)
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  
+  if (!supabaseUrl || !supabaseAnonKey) {
+    logError('Variáveis de ambiente do Supabase não configuradas', {}, 'AuthAPI')
+    return NextResponse.json({ error: 'internal_error' }, { status: 500 })
+  }
+
+  const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
+  })
+
   try {
-    const { data, error: authError } = await supabaseServiceRole.auth.signInWithPassword({
+    const { data, error: authError } = await supabase.auth.signInWithPassword({
       email,
       password,
     })
 
-    if (authError || !data.user || !data.session) {
-      const status = authError?.status ?? 401
-      return NextResponse.json({ error: authError?.message ?? 'unauthorized' }, { status })
+    if (authError) {
+      // Log detalhado do erro para debug
+      logError('Erro de autenticação Supabase', { 
+        error: authError.message, 
+        status: authError.status,
+        email: email.replace(/^(.{2}).+(@.*)$/, '$1***$2')
+      }, 'AuthAPI')
+      
+      // Retornar mensagem de erro mais específica
+      const errorMessage = authError.message || 'Credenciais inválidas'
+      const status = authError.status ?? 401
+      return NextResponse.json({ error: errorMessage }, { status })
+    }
+
+    if (!data.user || !data.session) {
+      logError('Autenticação sem usuário ou sessão', { 
+        hasUser: !!data.user, 
+        hasSession: !!data.session,
+        email: email.replace(/^(.{2}).+(@.*)$/, '$1***$2')
+      }, 'AuthAPI')
+      return NextResponse.json({ error: 'Falha na autenticação - sessão não criada' }, { status: 401 })
     }
 
     const role = getUserRoleByEmail(data.user.email || email)
