@@ -5,7 +5,12 @@ import { Toaster } from "react-hot-toast";
 import { WebVitalsInit } from "@/components/web-vitals-init";
 import { ErrorBoundary } from "@/components/error-boundary";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ 
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700", "800"],
+  display: "swap",
+  variable: "--font-inter",
+});
 
 export const metadata: Metadata = {
   title: "GOLF FOX - Gestão de Frotas",
