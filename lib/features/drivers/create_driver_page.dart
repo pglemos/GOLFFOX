@@ -274,7 +274,7 @@ class _CreateDriverPageState extends ConsumerState<CreateDriverPage> {
                 CircleAvatar(
                   radius: 50,
                   backgroundColor:
-                      GfTokens.colorPrimary.withValues(alpha: 0.1),
+                      const Color(GfTokens.colorPrimary).withValues(alpha: 0.1),
                   backgroundImage: _photoFile != null
                       ? FileImage(_photoFile!)
                       : _photoUrl != null 
