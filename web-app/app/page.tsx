@@ -358,18 +358,34 @@ function LoginContent() {
           console.log('👤 Role detectado:', resolvedRole)
           console.log('📧 Email:', user.email)
           
-          // Aguardar um momento para garantir que o cookie seja processado
-          // e então redirecionar
-          setTimeout(() => {
+          // Garantir que o redirecionamento aconteça
+          // Usar uma função assíncrona para garantir que tudo seja processado
+          const performRedirect = () => {
             if (typeof window !== "undefined") {
-              console.log('📍 Redirecionando para:', redirectUrl)
-              // Usar window.location.href para garantir redirecionamento completo
-              window.location.href = redirectUrl
+              const fullUrl = window.location.origin + redirectUrl
+              console.log('📍 Redirecionando para URL completa:', fullUrl)
+              
+              // Tentar múltiplas formas de redirecionamento
+              try {
+                window.location.href = redirectUrl
+              } catch (err1) {
+                console.warn('⚠️ Erro com href, tentando replace:', err1)
+                try {
+                  window.location.replace(redirectUrl)
+                } catch (err2) {
+                  console.error('❌ Erro com replace, tentando assign:', err2)
+                  window.location.assign(redirectUrl)
+                }
+              }
             } else {
               console.log('📍 Usando router.replace para:', redirectUrl)
               router.replace(redirectUrl)
             }
-          }, 200)
+          }
+          
+          // Executar redirecionamento imediatamente
+          performRedirect()
+          
           return
         }
 
