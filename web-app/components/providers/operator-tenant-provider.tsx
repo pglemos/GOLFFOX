@@ -104,42 +104,35 @@ function OperatorTenantProviderInner({ children }: { children: ReactNode }) {
       } else {
         console.warn('⚠️ Nenhuma empresa encontrada para o operador')
         
-        // Tentar criar empresa padrão automaticamente
+        // Tentar associar operador a empresa automaticamente via API
         try {
           const { data: { user } } = await supabase.auth.getUser()
-          if (user) {
-            console.log('🔧 Tentando criar empresa padrão para o operador...')
+          if (user && user.email) {
+            console.log('🔧 Tentando associar operador a empresa automaticamente...')
             
-            // Criar empresa padrão
-            const { data: newCompany, error: createError } = await supabase
-              .from('companies')
-              .insert({
-                name: 'Minha Empresa',
-                is_active: true,
-                role: 'operator'
-              })
-              .select()
-              .single()
+            const response = await fetch('/api/operator/associate-company', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ email: user.email }),
+            })
             
-            if (!createError && newCompany) {
-              // Criar mapeamento
-              const { error: mapError } = await supabase
-                .from('gf_user_company_map')
-                .insert({
-                  user_id: user.id,
-                  company_id: newCompany.id
-                })
-              
-              if (!mapError) {
-                console.log('✅ Empresa padrão criada e associada!')
-                // Recarregar empresas
-                await loadCompanies()
-                return
-              }
+            if (response.ok) {
+              const result = await response.json()
+              console.log('✅ Operador associado à empresa:', result.message)
+              // Aguardar um pouco e recarregar empresas
+              setTimeout(() => {
+                loadCompanies()
+              }, 500)
+              return
+            } else {
+              const error = await response.json()
+              console.warn('⚠️ Não foi possível associar automaticamente:', error.error)
             }
           }
         } catch (autoCreateError) {
-          console.warn('⚠️ Não foi possível criar empresa automaticamente:', autoCreateError)
+          console.warn('⚠️ Erro ao tentar associar automaticamente:', autoCreateError)
         }
         
         setTenantCompanyId(null)
