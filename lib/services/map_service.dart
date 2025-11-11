@@ -89,17 +89,12 @@ class MapService {
     String? routeFilter,
   }) async {
     try {
-      final query = _supabaseService.client
+      final response = await _supabaseService.client
           .from('vehicle_positions')
           .select()
           .order('last_update', ascending: false);
 
-      // Aplicar filtros (simplificado)
-      // TODO(golffox): Implementar filtros quando a versao do Supabase for atualizada
-
-      final response = await query;
-
-      return response.map<VehiclePosition>((json) => VehiclePosition(
+      final positions = response.map<VehiclePosition>((json) => VehiclePosition(
           id: json['id'] as String,
           vehicleId: json['vehicle_id'] as String,
           licensePlate: json['license_plate'] as String,
@@ -120,13 +115,24 @@ class MapService {
           passengerCount: json['passenger_count'] as int? ?? 0,
           capacity: json['capacity'] as int? ?? 30,
         )).toList();
+
+      return _applyLocalFilters(
+        positions,
+        statusFilter: statusFilter,
+        routeFilter: routeFilter,
+      );
     } on Exception catch (error) {
       LoggerService.instance.error(
         'Erro ao buscar posicoes dos veiculos',
         error,
       );
       // Fallback para dados mock em caso de erro
-      return _generateMockVehiclePositions();
+      final fallback = _generateMockVehiclePositions();
+      return _applyLocalFilters(
+        fallback,
+        statusFilter: statusFilter,
+        routeFilter: routeFilter,
+      );
     }
   }
 
@@ -260,6 +266,25 @@ class MapService {
   void dispose() {
     stopRealTimeUpdates();
     _vehiclePositionsController.close();
+  }
+
+  List<VehiclePosition> _applyLocalFilters(
+    List<VehiclePosition> positions, {
+    List<VehicleStatus>? statusFilter,
+    String? routeFilter,
+  }) {
+    Iterable<VehiclePosition> filtered = positions;
+
+    if (statusFilter != null && statusFilter.isNotEmpty) {
+      final allowedStatuses = statusFilter.toSet();
+      filtered = filtered.where((position) => allowedStatuses.contains(position.status));
+    }
+
+    if (routeFilter != null && routeFilter.isNotEmpty) {
+      filtered = filtered.where((position) => position.routeId == routeFilter);
+    }
+
+    return filtered.toList();
   }
 }
 

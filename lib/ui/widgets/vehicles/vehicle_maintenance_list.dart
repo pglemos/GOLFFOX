@@ -11,7 +11,6 @@ import '../../../models/maintenance.dart';
 import '../../../services/vehicle_service.dart';
 
 class VehicleMaintenanceList extends ConsumerStatefulWidget {
-
   const VehicleMaintenanceList({
     required this.vehicleId,
     super.key,
@@ -45,7 +44,7 @@ class _VehicleMaintenanceListState
             ),
             const SizedBox(height: GfTokens.spacingMd),
             const Text(
-              'Erro ao carregar manutencoes',
+              'Erro ao carregar manutenções',
               style: TextStyle(
                 fontSize: GfTokens.fontSizeLg,
                 fontWeight: FontWeight.w600,
@@ -63,7 +62,7 @@ class _VehicleMaintenanceListState
             const SizedBox(height: GfTokens.spacingMd),
             ElevatedButton(
               onPressed: () => ref.invalidate(vehicleServiceProvider),
-              child: const Text('Tentar Novamente'),
+              child: const Text('Tentar novamente'),
             ),
           ],
         ),
@@ -110,7 +109,7 @@ class _VehicleMaintenanceListState
                           const SizedBox(width: GfTokens.spacingSm),
                           _buildFilterChip(
                             'in_progress',
-                            'Em Andamento',
+                            'Em andamento',
                             records
                                 .where((r) =>
                                     r.status == MaintenanceStatus.inProgress)
@@ -119,7 +118,7 @@ class _VehicleMaintenanceListState
                           const SizedBox(width: GfTokens.spacingSm),
                           _buildFilterChip(
                             'completed',
-                            'Concluidas',
+                            'Concluídas',
                             records
                                 .where((r) =>
                                     r.status == MaintenanceStatus.completed)
@@ -176,253 +175,256 @@ class _VehicleMaintenanceListState
   }
 
   Widget _buildMaintenanceCard(MaintenanceRecord record, int index) => Card(
-      margin: const EdgeInsets.only(bottom: GfTokens.spacingMd),
-      child: Padding(
-        padding: const EdgeInsets.all(GfTokens.spacingMd),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header
-            Row(
-              children: [
-                // Status badge
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: GfTokens.spacingSm,
-                    vertical: GfTokens.spacingXs,
-                  ),
-                  decoration: BoxDecoration(
-                    color: record.status.colorValue.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(GfTokens.radiusSm),
-                    border: Border.all(
-                      color: record.status.colorValue.withValues(alpha: 0.3),
+        margin: const EdgeInsets.only(bottom: GfTokens.spacingMd),
+        child: Padding(
+          padding: const EdgeInsets.all(GfTokens.spacingMd),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header
+              Row(
+                children: [
+                  // Status badge
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: GfTokens.spacingSm,
+                      vertical: GfTokens.spacingXs,
+                    ),
+                    decoration: BoxDecoration(
+                      color: record.status.colorValue.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(GfTokens.radiusSm),
+                      border: Border.all(
+                        color: record.status.colorValue.withValues(alpha: 0.3),
+                      ),
+                    ),
+                    child: Text(
+                      record.status.displayName,
+                      style: TextStyle(
+                        color: Color(record.status.colorValue),
+                        fontWeight: FontWeight.w600,
+                        fontSize: GfTokens.fontSizeXs,
+                      ),
                     ),
                   ),
-                  child: Text(
-                    record.status.displayName,
-                    style: TextStyle(
-                      color: Color(record.status.colorValue),
-                      fontWeight: FontWeight.w600,
-                      fontSize: GfTokens.fontSizeXs,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: GfTokens.spacingSm),
+                  const SizedBox(width: GfTokens.spacingSm),
 
-                // Prioridade
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: GfTokens.spacingSm,
-                    vertical: GfTokens.spacingXs,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Color(record.priority.colorValue)
-                        .withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(GfTokens.radiusSm),
-                    border: Border.all(
+                  // Prioridade
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: GfTokens.spacingSm,
+                      vertical: GfTokens.spacingXs,
+                    ),
+                    decoration: BoxDecoration(
                       color: Color(record.priority.colorValue)
-                          .withValues(alpha: 0.3),
+                          .withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(GfTokens.radiusSm),
+                      border: Border.all(
+                        color: Color(record.priority.colorValue)
+                            .withValues(alpha: 0.3),
+                      ),
+                    ),
+                    child: Text(
+                      record.priority.displayName,
+                      style: TextStyle(
+                        color: Color(record.priority.colorValue),
+                        fontWeight: FontWeight.w600,
+                        fontSize: GfTokens.fontSizeXs,
+                      ),
                     ),
                   ),
-                  child: Text(
-                    record.priority.displayName,
-                    style: TextStyle(
-                      color: Color(record.priority.colorValue),
-                      fontWeight: FontWeight.w600,
-                      fontSize: GfTokens.fontSizeXs,
-                    ),
+                  const Spacer(),
+
+                  // Tipo
+                  Icon(
+                    _getMaintenanceIcon(record.type),
+                    color: const Color(GfTokens.colorOnSurfaceVariant),
+                    size: 20,
                   ),
-                ),
-                const Spacer(),
-
-                // Tipo
-                Icon(
-                  _getMaintenanceIcon(record.type),
-                  color: const Color(GfTokens.colorOnSurfaceVariant),
-                  size: 20,
-                ),
-              ],
-            ),
-
-            const SizedBox(height: GfTokens.spacingMd),
-
-            // Titulo e descricao
-            Text(
-              record.type.displayName,
-              style: const TextStyle(
-                fontSize: GfTokens.fontSizeLg,
-                fontWeight: FontWeight.w600,
-                color: Color(GfTokens.colorOnSurface),
+                ],
               ),
-            ),
 
-            if (record.description.isNotEmpty) ...[
-              const SizedBox(height: GfTokens.spacingSm),
+              const SizedBox(height: GfTokens.spacingMd),
+
+              // Titulo e descricao
               Text(
-                record.description,
+                record.type.displayName,
                 style: const TextStyle(
-                  color: Color(GfTokens.colorOnSurfaceVariant),
-                ),
-              ),
-            ],
-
-            const SizedBox(height: GfTokens.spacingMd),
-
-            // Informacoes
-            Row(
-              children: [
-                Expanded(
-                  child: _buildInfoItem(
-                    'Data Agendada',
-                    _formatDate(record.scheduledDate),
-                    Icons.calendar_today,
-                  ),
-                ),
-                if (record.completedDate != null)
-                  Expanded(
-                    child: _buildInfoItem(
-                      'Data Conclusao',
-                      _formatDate(record.completedDate!),
-                      Icons.check_circle,
-                    ),
-                  ),
-              ],
-            ),
-
-            const SizedBox(height: GfTokens.spacingMd),
-
-            // Itens de manutencao
-            if (record.items.isNotEmpty) ...[
-              Text(
-                'Itens (${record.items.length})',
-                style: const TextStyle(
+                  fontSize: GfTokens.fontSizeLg,
                   fontWeight: FontWeight.w600,
                   color: Color(GfTokens.colorOnSurface),
                 ),
               ),
-              const SizedBox(height: GfTokens.spacingSm),
-              ...record.items.take(3).map((item) => Padding(
-                    padding: const EdgeInsets.only(bottom: GfTokens.spacingXs),
-                    child: Row(
-                      children: [
-                        Icon(
-                          item.isCompleted
-                              ? Icons.check_circle
-                              : Icons.radio_button_unchecked,
-                          size: 16,
-                          color: item.isCompleted
-                              ? const Color(GfTokens.colorSuccess)
-                              : const Color(GfTokens.colorOnSurfaceVariant),
-                        ),
-                        const SizedBox(width: GfTokens.spacingSm),
-                        Expanded(
-                          child: Text(
-                            item.description,
-                            style: TextStyle(
-                              fontSize: GfTokens.fontSizeSm,
-                              color:
-                                  const Color(GfTokens.colorOnSurfaceVariant),
-                              decoration: item.isCompleted
-                                  ? TextDecoration.lineThrough
-                                  : null,
-                            ),
-                          ),
-                        ),
-                        if ((item.cost ?? 0) > 0)
-                          Text(
-                            'R\$ ${(item.cost ?? 0).toStringAsFixed(2)}',
-                            style: const TextStyle(
-                              fontSize: GfTokens.fontSizeSm,
-                              fontWeight: FontWeight.w500,
-                              color: Color(GfTokens.colorOnSurface),
-                            ),
-                          ),
-                      ],
-                    ),
-                  )),
-              if (record.items.length > 3)
-                Text(
-                  '+ ${record.items.length - 3} itens',
-                  style: const TextStyle(
-                    fontSize: GfTokens.fontSizeSm,
-                    color: Color(GfTokens.colorPrimary),
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-            ],
 
-            // Custo total
-            if (record.totalCost > 0) ...[
-              const SizedBox(height: GfTokens.spacingMd),
-              Container(
-                padding: const EdgeInsets.all(GfTokens.spacingSm),
-                decoration: BoxDecoration(
-                  color: const Color(GfTokens.colorSuccess).withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(GfTokens.radiusSm),
-                  border: Border.all(
-                    color: const Color(GfTokens.colorSuccess).withValues(alpha: 0.3),
+              if (record.description.isNotEmpty) ...[
+                const SizedBox(height: GfTokens.spacingSm),
+                Text(
+                  record.description,
+                  style: const TextStyle(
+                    color: Color(GfTokens.colorOnSurfaceVariant),
                   ),
                 ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'Custo Total',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        color: Color(GfTokens.colorSuccess),
+              ],
+
+              const SizedBox(height: GfTokens.spacingMd),
+
+              // Informacoes
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildInfoItem(
+                      'Data agendada',
+                      _formatDate(record.scheduledDate),
+                      Icons.calendar_today,
+                    ),
+                  ),
+                  if (record.completedDate != null)
+                    Expanded(
+                      child: _buildInfoItem(
+                        'Data de conclusão',
+                        _formatDate(record.completedDate!),
+                        Icons.check_circle,
                       ),
                     ),
-                    Text(
-                      'R\$ ${record.totalCost.toStringAsFixed(2)}',
-                      style: const TextStyle(
-                        fontSize: GfTokens.fontSizeLg,
-                        fontWeight: FontWeight.w600,
-                        color: Color(GfTokens.colorSuccess),
-                      ),
-                    ),
-                  ],
-                ),
+                ],
               ),
+
+              const SizedBox(height: GfTokens.spacingMd),
+
+              // Itens de manutencao
+              if (record.items.isNotEmpty) ...[
+                Text(
+                  'Itens (${record.items.length})',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                    color: Color(GfTokens.colorOnSurface),
+                  ),
+                ),
+                const SizedBox(height: GfTokens.spacingSm),
+                ...record.items.take(3).map((item) => Padding(
+                      padding:
+                          const EdgeInsets.only(bottom: GfTokens.spacingXs),
+                      child: Row(
+                        children: [
+                          Icon(
+                            item.isCompleted
+                                ? Icons.check_circle
+                                : Icons.radio_button_unchecked,
+                            size: 16,
+                            color: item.isCompleted
+                                ? const Color(GfTokens.colorSuccess)
+                                : const Color(GfTokens.colorOnSurfaceVariant),
+                          ),
+                          const SizedBox(width: GfTokens.spacingSm),
+                          Expanded(
+                            child: Text(
+                              item.description,
+                              style: TextStyle(
+                                fontSize: GfTokens.fontSizeSm,
+                                color:
+                                    const Color(GfTokens.colorOnSurfaceVariant),
+                                decoration: item.isCompleted
+                                    ? TextDecoration.lineThrough
+                                    : null,
+                              ),
+                            ),
+                          ),
+                          if ((item.cost ?? 0) > 0)
+                            Text(
+                              'R\$ ${(item.cost ?? 0).toStringAsFixed(2)}',
+                              style: const TextStyle(
+                                fontSize: GfTokens.fontSizeSm,
+                                fontWeight: FontWeight.w500,
+                                color: Color(GfTokens.colorOnSurface),
+                              ),
+                            ),
+                        ],
+                      ),
+                    )),
+                if (record.items.length > 3)
+                  Text(
+                    '+ ${record.items.length - 3} itens',
+                    style: const TextStyle(
+                      fontSize: GfTokens.fontSizeSm,
+                      color: Color(GfTokens.colorPrimary),
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+              ],
+
+              // Custo total
+              if (record.totalCost > 0) ...[
+                const SizedBox(height: GfTokens.spacingMd),
+                Container(
+                  padding: const EdgeInsets.all(GfTokens.spacingSm),
+                  decoration: BoxDecoration(
+                    color: const Color(GfTokens.colorSuccess)
+                        .withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(GfTokens.radiusSm),
+                    border: Border.all(
+                      color: const Color(GfTokens.colorSuccess)
+                          .withValues(alpha: 0.3),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Custo total',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          color: Color(GfTokens.colorSuccess),
+                        ),
+                      ),
+                      Text(
+                        'R\$ ${record.totalCost.toStringAsFixed(2)}',
+                        style: const TextStyle(
+                          fontSize: GfTokens.fontSizeLg,
+                          fontWeight: FontWeight.w600,
+                          color: Color(GfTokens.colorSuccess),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ],
-          ],
+          ),
         ),
-      ),
-    )
-        .animate(delay: (index * 100).ms)
-        .fadeIn(duration: 300.ms)
-        .slideX(begin: 0.1, end: 0);
+      )
+          .animate(delay: (index * 100).ms)
+          .fadeIn(duration: 300.ms)
+          .slideX(begin: 0.1, end: 0);
 
   Widget _buildInfoItem(String label, String value, IconData icon) => Row(
-      children: [
-        Icon(
-          icon,
-          size: 16,
-          color: const Color(GfTokens.colorOnSurfaceVariant),
-        ),
-        const SizedBox(width: GfTokens.spacingXs),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              value,
-              style: const TextStyle(
-                fontWeight: FontWeight.w500,
-                color: Color(GfTokens.colorOnSurface),
-                fontSize: GfTokens.fontSizeSm,
+        children: [
+          Icon(
+            icon,
+            size: 16,
+            color: const Color(GfTokens.colorOnSurfaceVariant),
+          ),
+          const SizedBox(width: GfTokens.spacingXs),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                value,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w500,
+                  color: Color(GfTokens.colorOnSurface),
+                  fontSize: GfTokens.fontSizeSm,
+                ),
               ),
-            ),
-            Text(
-              label,
-              style: const TextStyle(
-                fontSize: GfTokens.fontSizeXs,
-                color: Color(GfTokens.colorOnSurfaceVariant),
+              Text(
+                label,
+                style: const TextStyle(
+                  fontSize: GfTokens.fontSizeXs,
+                  color: Color(GfTokens.colorOnSurfaceVariant),
+                ),
               ),
-            ),
-          ],
-        ),
-      ],
-    );
+            ],
+          ),
+        ],
+      );
 
   Widget _buildEmptyState() {
     String message;
@@ -430,20 +432,20 @@ class _VehicleMaintenanceListState
 
     switch (_selectedFilter) {
       case 'scheduled':
-        message = 'Nenhuma manutencao agendada';
-        description = 'Nao ha manutencoes agendadas para este veiculo.';
+        message = 'Nenhuma manutenção agendada';
+        description = 'Não há manutenções agendadas para este veículo.';
         break;
       case 'in_progress':
-        message = 'Nenhuma manutencao em andamento';
-        description = 'Nao ha manutencoes sendo executadas no momento.';
+        message = 'Nenhuma manutenção em andamento';
+        description = 'Não há manutenções sendo executadas no momento.';
         break;
       case 'completed':
-        message = 'Nenhuma manutencao concluida';
-        description = 'Nao ha historico de manutencoes concluidas.';
+        message = 'Nenhuma manutenção concluída';
+        description = 'Não há histórico de manutenções concluídas.';
         break;
       default:
-        message = 'Nenhuma manutencao encontrada';
-        description = 'Este veiculo ainda nao possui registros de manutencao.';
+        message = 'Nenhuma manutenção encontrada';
+        description = 'Este veículo ainda não possui registros de manutenção.';
     }
 
     return Center(
@@ -478,7 +480,7 @@ class _VehicleMaintenanceListState
               // TODO(golffox-team): Navegar para criar nova manutencao
             },
             icon: const Icon(Icons.add),
-            label: const Text('Agendar Manutencao'),
+            label: const Text('Agendar manutenção'),
           ),
         ],
       ),
@@ -519,5 +521,6 @@ class _VehicleMaintenanceListState
     }
   }
 
-  String _formatDate(DateTime date) => '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
+  String _formatDate(DateTime date) =>
+      '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
 }
