@@ -185,9 +185,9 @@ class VehicleInfoCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(GfTokens.spacingMd),
       decoration: BoxDecoration(
-        color: fuelColor.withOpacity(0.1),
+    color: fuelColor.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(GfTokens.radiusSm),
-        border: Border.all(color: fuelColor.withOpacity(0.3)),
+    border: Border.all(color: fuelColor.withValues(alpha: 0.3)),
       ),
       child: Column(
         children: [
@@ -214,7 +214,7 @@ class VehicleInfoCard extends StatelessWidget {
           Container(
             height: 6,
             decoration: BoxDecoration(
-              color: fuelColor.withOpacity(0.2),
+    color: fuelColor.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(3),
             ),
             child: FractionallySizedBox(
@@ -245,10 +245,10 @@ class VehicleInfoCard extends StatelessWidget {
   Widget _buildCapacityInfo() => Container(
       padding: const EdgeInsets.all(GfTokens.spacingMd),
       decoration: BoxDecoration(
-        color: const Color(GfTokens.colorInfo).withOpacity(0.1),
+    color: const Color(GfTokens.colorInfo).withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(GfTokens.radiusSm),
         border:
-            Border.all(color: const Color(GfTokens.colorInfo).withOpacity(0.3)),
+    Border.all(color: const Color(GfTokens.colorInfo).withValues(alpha: 0.3)),
       ),
       child: Column(
         children: [

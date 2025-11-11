@@ -326,6 +326,16 @@ function LoginContent() {
           let redirectUrl = DEFAULT_LOGGED_URL
 
           const resolvedRole = user.role ?? getUserRoleByEmail(user.email)
+          
+          // Log detalhado para debug
+          console.log('🔍 Debug Login:', {
+            userRole: user.role,
+            resolvedRole,
+            email: user.email,
+            safeNext,
+            defaultUrl: DEFAULT_LOGGED_URL
+          })
+          
           if (safeNext && isAllowedForRole(resolvedRole, safeNext)) {
             redirectUrl = safeNext
           } else {
@@ -334,11 +344,14 @@ function LoginContent() {
           redirectUrl = redirectUrl.split("?")[0]
 
           debug("Login bem-sucedido", { redirectUrl, email: maskedEmail, role: resolvedRole }, "LoginPage")
+          console.log('🚀 Redirecionando para:', redirectUrl)
           
           // Redirecionamento imediato sem delay
           if (typeof window !== "undefined") {
+            console.log('📍 Usando window.location.replace')
             window.location.replace(redirectUrl)
           } else {
+            console.log('📍 Usando router.replace')
             router.replace(redirectUrl)
           }
           return
