@@ -9,6 +9,7 @@ import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 import { useSupabaseQuery } from "@/hooks/use-supabase-query"
 import { CreateOperatorModal } from "@/components/modals/create-operator-modal"
+import { AssociateOperatorModal } from "@/components/modals/associate-operator-modal"
 
 export default function EmpresasPage() {
   const router = useRouter()
@@ -17,6 +18,8 @@ export default function EmpresasPage() {
   const [selectedEmpresa, setSelectedEmpresa] = useState<any>(null)
   const [funcionarios, setFuncionarios] = useState<any[]>([])
   const [isCreateOperatorModalOpen, setIsCreateOperatorModalOpen] = useState(false)
+  const [isAssociateModalOpen, setIsAssociateModalOpen] = useState(false)
+  const [selectedCompanyForAssociation, setSelectedCompanyForAssociation] = useState<{ id: string; name: string } | null>(null)
 
   // Usar hook otimizado para carregar empresas
   const { 
@@ -85,19 +88,40 @@ export default function EmpresasPage() {
 
         <div className="grid gap-4">
           {Array.isArray(empresas) && empresas.map((empresa: any) => (
-            <Card key={empresa.id} className="p-4 cursor-pointer hover:bg-[var(--bg-soft)]" onClick={() => loadFuncionarios(empresa.id)}>
+            <Card key={empresa.id} className="p-4">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
                     <Briefcase className="h-5 w-5 text-[var(--brand)]" />
                     <h3 className="font-bold text-lg">{empresa.name}</h3>
                   </div>
-                  <p className="text-sm text-[var(--muted)]">{empresa.address}</p>
+                  <p className="text-sm text-[var(--muted)]">{empresa.address || 'Sem endereço'}</p>
                 </div>
-                <Button variant="outline" size="sm">
-                  <Users className="h-4 w-4 mr-2" />
-                  Ver Funcionários
-                </Button>
+                <div className="flex gap-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setSelectedCompanyForAssociation({ id: empresa.id, name: empresa.name })
+                      setIsAssociateModalOpen(true)
+                    }}
+                  >
+                    <UserPlus className="h-4 w-4 mr-2" />
+                    Associar Operador
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      loadFuncionarios(empresa.id)
+                    }}
+                  >
+                    <Users className="h-4 w-4 mr-2" />
+                    Ver Funcionários
+                  </Button>
+                </div>
               </div>
             </Card>
           ))}
@@ -129,6 +153,23 @@ export default function EmpresasPage() {
             window.location.reload()
           }}
         />
+
+        {/* Modal Associar Operador */}
+        {selectedCompanyForAssociation && (
+          <AssociateOperatorModal
+            isOpen={isAssociateModalOpen}
+            onClose={() => {
+              setIsAssociateModalOpen(false)
+              setSelectedCompanyForAssociation(null)
+            }}
+            onSave={() => {
+              setIsAssociateModalOpen(false)
+              setSelectedCompanyForAssociation(null)
+            }}
+            companyId={selectedCompanyForAssociation.id}
+            companyName={selectedCompanyForAssociation.name}
+          />
+        )}
       </div>
     </AppShell>
   )
