@@ -139,16 +139,18 @@ function LoginContent() {
         const nextUrl = searchParams.get('next')
         if (nextUrl) {
           const cleanNextUrl = decodeURIComponent(nextUrl).split('?')[0]
+          console.log('🔄 Usuário já logado, redirecionando para:', cleanNextUrl)
           if (typeof window !== 'undefined') {
-            window.location.replace(cleanNextUrl)
+            window.location.href = cleanNextUrl
           } else {
             router.push(cleanNextUrl)
           }
         } else {
           const userRole = session.user.user_metadata?.role || getUserRoleByEmail(session.user.email)
           const cleanUrl = `/${userRole}`.split('?')[0]
+          console.log('🔄 Usuário já logado, redirecionando para:', cleanUrl, 'role:', userRole)
           if (typeof window !== 'undefined') {
-            window.location.replace(cleanUrl)
+            window.location.href = cleanUrl
           } else {
             router.push(cleanUrl)
           }
@@ -353,25 +355,14 @@ function LoginContent() {
 
           debug("Login bem-sucedido", { redirectUrl, email: maskedEmail, role: resolvedRole }, "LoginPage")
           console.log('🚀 Redirecionando para:', redirectUrl)
+          console.log('👤 Role detectado:', resolvedRole)
+          console.log('📧 Email:', user.email)
           
-          // Aguardar um pouco para garantir que o cookie seja processado pelo navegador
-          // e que o estado seja atualizado
-          await new Promise(resolve => setTimeout(resolve, 100))
-          
-          // Redirecionamento imediato
+          // Forçar redirecionamento imediato sem delay
           if (typeof window !== "undefined") {
-            console.log('📍 Usando window.location.replace para:', redirectUrl)
-            try {
-              // Verificar se o cookie foi definido
-              const cookieCheck = document.cookie.includes('golffox-session')
-              console.log('🍪 Cookie definido?', cookieCheck)
-              
-              window.location.replace(redirectUrl)
-            } catch (err) {
-              console.error('❌ Erro ao redirecionar:', err)
-              // Fallback: tentar com window.location.href
-              window.location.href = redirectUrl
-            }
+            console.log('📍 Redirecionando imediatamente para:', redirectUrl)
+            // Usar window.location.href em vez de replace para garantir que funcione
+            window.location.href = redirectUrl
           } else {
             console.log('📍 Usando router.replace para:', redirectUrl)
             router.replace(redirectUrl)
