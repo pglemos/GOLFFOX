@@ -427,33 +427,6 @@ function LoginContent() {
         }
         
         return
-
-        // Este código não deve ser alcançado se response.ok for true
-        // Mantido apenas como fallback de segurança
-        const apiError = await response.json().catch(() => ({}))
-        const message = String(apiError?.error || "Falha ao autenticar")
-        const normalized = message.toLowerCase()
-
-        if (normalized.includes("csrf")) {
-          setError("Sessão expirada. Atualize a página e tente novamente.")
-        } else if (normalized.includes("timeout")) {
-          setError("Tempo limite excedido. Verifique sua conexão.")
-        } else if (normalized.includes("email")) {
-          setError("E-mail não encontrado")
-          setFieldErrors((prev) => ({ ...prev, email: "E-mail não localizado" }))
-          emailInputRef.current?.focus()
-        } else {
-          setError("Credenciais inválidas")
-          setFieldErrors((prev) => ({ ...prev, password: "Credenciais inválidas" }))
-          passwordInputRef.current?.focus()
-        }
-
-        setFailedAttempts((prev) => {
-          const next = prev + 1
-          const delay = Math.min(2 ** next * 300, 60_000)
-          setBlockedUntil(Date.now() + delay)
-          return next
-        })
       } catch (err) {
         clearTimeout(timeoutId)
         if ((err as Error).name === "AbortError") {
