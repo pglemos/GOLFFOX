@@ -133,6 +133,7 @@ function LoginContent() {
 
 
   useEffect(() => {
+    if (loading) return
     // Check if user is already logged in
     supabase.auth.getSession().then(({ data: { session } }: { data: { session: any } }) => {
       if (session) {
@@ -157,7 +158,7 @@ function LoginContent() {
         }
       }
     })
-  }, [router, searchParams])
+  }, [router, searchParams, loading])
 
   // Buscar CSRF token
   useEffect(() => {
@@ -403,24 +404,33 @@ function LoginContent() {
         
         // ✅ Redirecionar APENAS após tudo estar processado
         // Aguardar um pequeno delay para garantir que cookies sejam processados
-        await new Promise(resolve => setTimeout(resolve, 100))
+        await new Promise(resolve => setTimeout(resolve, 150))
         
+        // Verificar se o cookie foi definido antes de redirecionar
         if (typeof window !== "undefined") {
+          const cookieCheck = document.cookie.includes('golffox-session')
+          console.log('🍪 Cookie verificado antes do redirect:', cookieCheck)
+          
+          if (!cookieCheck) {
+            console.warn('⚠️ Cookie não encontrado, aguardando mais um pouco...')
+            await new Promise(resolve => setTimeout(resolve, 200))
+          }
+          
           const fullUrl = window.location.origin + redirectUrl
           console.log('📍 Redirecionando para URL completa:', fullUrl)
+          console.log('🔗 URL relativa:', redirectUrl)
           
-          // Tentar múltiplas formas de redirecionamento
-          try {
-            window.location.href = redirectUrl
-          } catch (err1) {
-            console.warn('⚠️ Erro com href, tentando replace:', err1)
-            try {
+          // Forçar redirecionamento de forma mais agressiva
+          // Primeiro tentar com href (permite voltar no histórico)
+          window.location.href = redirectUrl
+          
+          // Se após 500ms ainda estiver na mesma página, forçar replace
+          setTimeout(() => {
+            if (window.location.pathname === '/' || window.location.pathname === '/login') {
+              console.warn('⚠️ Ainda na página de login, forçando replace...')
               window.location.replace(redirectUrl)
-            } catch (err2) {
-              console.error('❌ Erro com replace, tentando assign:', err2)
-              window.location.assign(redirectUrl)
             }
-          }
+          }, 500)
         } else {
           console.log('📍 Usando router.replace para:', redirectUrl)
           router.replace(redirectUrl)
