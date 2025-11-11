@@ -85,7 +85,7 @@ export default function AlertasPage() {
       setAlertas(data || [])
     } catch (error) {
       console.error("Erro ao carregar alertas:", error)
-      toast.error("Erro ao carregar alertas")
+      notifyError(error, 'Erro inesperado')
     }
   }
 
@@ -114,10 +114,10 @@ export default function AlertasPage() {
         details: { severity: 'resolved' }
       })
 
-      toast.success("Alerta resolvido!")
+      notifySuccess('', { i18n: { ns: 'common', key: 'success.alertResolved' } })
       loadAlertas()
     } catch (error: any) {
-      toast.error(`Erro: ${error.message}`)
+      notifyError(error, 'Erro inesperado')
     }
   }
 
@@ -133,10 +133,10 @@ export default function AlertasPage() {
 
       if (error) throw error
 
-      toast.success("Alerta atribuído!")
+      notifySuccess('', { i18n: { ns: 'common', key: 'success.alertAssigned' } })
       loadAlertas()
     } catch (error: any) {
-      toast.error(`Erro: ${error.message}`)
+      notifyError(error, 'Erro inesperado')
     }
   }
 

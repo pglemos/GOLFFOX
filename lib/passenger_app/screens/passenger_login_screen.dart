@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+
+import '../../core/i18n/i18n.dart';
+import '../../core/routing/app_router.dart';
+import '../../core/routing/app_routes.dart';
+import '../../core/services/snackbar_service.dart';
 import '../../services/supabase_service.dart';
-import 'passenger_dashboard_screen.dart';
 
 class PassengerLoginScreen extends StatefulWidget {
   const PassengerLoginScreen({super.key});
@@ -42,18 +46,17 @@ class _PassengerLoginScreenState extends State<PassengerLoginScreen> {
         throw Exception('CPF ou senha inválidos');
       }
 
-      // Navegar para dashboard do passageiro
+      // Navegar para dashboard do passageiro via AppRouter
       if (mounted) {
-        await Navigator.of(context).pushReplacement(
-          MaterialPageRoute<void>(
-            builder: (_) => const PassengerDashboardScreen(),
-          ),
-        );
+        AppRouter.instance.go(AppRoutes.passengerHome);
       }
     } on Exception catch (error) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(error.toString())),
+        SnackBarService.error(
+          context,
+          error,
+          fallbackKey: 'passenger.login.error',
+          params: {'message': error.toString()},
         );
       }
     } finally {
@@ -75,22 +78,22 @@ class _PassengerLoginScreenState extends State<PassengerLoginScreen> {
               children: [
                 const Icon(Icons.person, size: 80, color: Colors.green),
                 const SizedBox(height: 32),
-                const Text(
-                  'App do Passageiro',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                Text(
+                  I18n.t(context, 'passenger.app.title'),
+                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 48),
                 TextFormField(
                   controller: _cpfController,
-                  decoration: const InputDecoration(
-                    labelText: 'CPF',
-                    hintText: '000.000.000-00',
-                    prefixIcon: Icon(Icons.person),
+                  decoration: InputDecoration(
+                    labelText: I18n.t(context, 'common.cpf'),
+                    hintText: I18n.t(context, 'common.cpf.hint'),
+                    prefixIcon: const Icon(Icons.person),
                   ),
                   keyboardType: TextInputType.number,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Digite seu CPF';
+                      return I18n.t(context, 'validation.required.cpf');
                     }
                     return null;
                   },
@@ -98,14 +101,14 @@ class _PassengerLoginScreenState extends State<PassengerLoginScreen> {
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _passwordController,
-                  decoration: const InputDecoration(
-                    labelText: 'Senha',
-                    prefixIcon: Icon(Icons.lock),
+                  decoration: InputDecoration(
+                    labelText: I18n.t(context, 'common.password'),
+                    prefixIcon: const Icon(Icons.lock),
                   ),
                   obscureText: true,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Digite sua senha';
+                      return I18n.t(context, 'validation.required.password');
                     }
                     return null;
                   },

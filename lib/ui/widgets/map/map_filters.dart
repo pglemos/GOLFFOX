@@ -6,6 +6,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/unified_theme.dart';
+import '../../../core/i18n/i18n.dart';
 
 class MapFilters extends StatefulWidget {
 
@@ -153,18 +154,18 @@ class _MapFiltersState extends State<MapFilters> {
 
                   // Filtro de Rotas
                   _buildFilterSection(
-                    title: 'Rotas',
+                    title: I18n.t(context, 'routes.title'),
                     child: DropdownButtonFormField<String?>(
                       initialValue: widget.selectedRoute,
-                      decoration: const InputDecoration(
-                        hintText: 'Selecione uma rota',
+                      decoration: InputDecoration(
+                        hintText: I18n.t(context, 'routes.search.hint'),
                         border: OutlineInputBorder(),
                         contentPadding:
                             EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                       ),
                       items: [
-                        const DropdownMenuItem<String?>(
-                          child: Text('Todas as rotas'),
+                        DropdownMenuItem<String?>(
+                          child: Text(I18n.t(context, 'routes.title')),
                         ),
                         ...widget.availableRoutes.map(
                           (route) => DropdownMenuItem<String?>(

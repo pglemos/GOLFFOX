@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../core/services/snackbar_service.dart';
 
 enum GxToastType { info, success, warn, error }
 
@@ -19,24 +20,18 @@ class GxToast {
 
 void showGxToast(BuildContext context, String message,
     {GxToastType type = GxToastType.info}) {
-  final cs = Theme.of(context).colorScheme;
-  final bg = switch (type) {
-    GxToastType.success => cs.primaryContainer,
-    GxToastType.warn => cs.tertiaryContainer,
-    GxToastType.error => cs.errorContainer,
-    _ => cs.inverseSurface,
-  };
-  final fg = switch (type) {
-    GxToastType.success => cs.onPrimaryContainer,
-    GxToastType.warn => cs.onTertiaryContainer,
-    GxToastType.error => cs.onErrorContainer,
-    _ => cs.onInverseSurface,
-  };
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-      behavior: SnackBarBehavior.floating,
-      backgroundColor: bg,
-      content: Text(message, style: TextStyle(color: fg)),
-    ),
-  );
+  switch (type) {
+    case GxToastType.success:
+      SnackBarService.successText(context, message);
+      break;
+    case GxToastType.warn:
+      SnackBarService.warnText(context, message);
+      break;
+    case GxToastType.error:
+      SnackBarService.errorText(context, message);
+      break;
+    case GxToastType.info:
+      SnackBarService.infoText(context, message);
+      break;
+  }
 }

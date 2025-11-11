@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Briefcase, UserPlus, Loader2 } from "lucide-react"
 import { supabase } from "@/lib/supabase"
-import toast from "react-hot-toast"
+import { notifySuccess, notifyError } from "@/lib/toast"
 import { useSupabaseSync } from "@/hooks/use-supabase-sync"
 
 interface CreateOperatorModalProps {
@@ -49,11 +49,11 @@ export function CreateOperatorModal({
     try {
       // Validações
       if (!formData.companyName.trim()) {
-        toast.error("Nome da empresa é obrigatório")
+        notifyError('', undefined, { i18n: { ns: 'common', key: 'validation.companyNameRequired' } })
         return
       }
       if (!formData.operatorEmail.trim() || !validateEmail(formData.operatorEmail)) {
-        toast.error("Email válido do operador é obrigatório")
+        notifyError('', undefined, { i18n: { ns: 'common', key: 'validation.validOperatorEmailRequired' } })
         return
       }
 
@@ -63,7 +63,7 @@ export function CreateOperatorModal({
 
       const { data: { session } } = await supabase.auth.getSession()
       if (!session) {
-        toast.error("Sessão expirada. Faça login novamente.")
+        notifyError('', undefined, { i18n: { ns: 'common', key: 'errors.authRequired' } })
         return
       }
 
@@ -127,10 +127,7 @@ export function CreateOperatorModal({
 
       // Sucesso
       setStep(7)
-      toast.success(
-        `Operador criado com sucesso! Senha temporária: ${result.tempPassword}`,
-        { duration: 10000 }
-      )
+      notifySuccess('', { i18n: { ns: 'operator', key: 'admin.operators.createSuccess', params: { tempPassword: result.tempPassword } }, duration: 10000 })
 
       // Reset form
       setFormData({
@@ -147,7 +144,7 @@ export function CreateOperatorModal({
       }, 2000)
     } catch (error: any) {
       console.error("Erro ao criar operador:", error)
-      toast.error(error.message || "Erro ao criar operador")
+      notifyError(error, "Erro ao criar operador")
       setStep(1)
     } finally {
       setLoading(false)

@@ -16,6 +16,7 @@ import '../services/error_service.dart';
 import '../services/logger_service.dart';
 import 'app_routes.dart';
 import 'route_guards.dart';
+import 'router_observer.dart';
 
 /// Modern role-based routing system for GolfFox
 ///
@@ -48,6 +49,7 @@ class AppRouter {
       redirect: _handleRedirect,
       routes: _buildRoutes(),
       errorBuilder: _buildErrorPage,
+      observers: [GxRouterObserver()],
     );
 
     _logger.info('AppRouter initialized');

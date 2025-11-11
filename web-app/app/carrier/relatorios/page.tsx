@@ -12,7 +12,7 @@ import {
   exportToExcel, 
   exportToPDF
 } from "@/lib/export-utils"
-import toast from "react-hot-toast"
+import { notifySuccess, notifyError } from "@/lib/toast"
 import { 
   DropdownMenu,
   DropdownMenuContent,
@@ -85,20 +85,20 @@ export default function CarrierRelatoriosPage() {
       switch (format) {
         case 'csv':
           exportToCSV(formattedData, filename)
-          toast.success('Relatório exportado como CSV!')
+          notifySuccess('', { i18n: { ns: 'common', key: 'success.exportCsv' } })
           break
         case 'excel':
           exportToExcel(formattedData, filename)
-          toast.success('Relatório exportado como Excel!')
+          notifySuccess('', { i18n: { ns: 'common', key: 'success.exportGenerated', params: { format: 'Excel' } } })
           break
         case 'pdf':
           exportToPDF(formattedData, filename)
-          toast.success('Abrindo relatório para impressão/PDF!')
+          notifySuccess('', { i18n: { ns: 'common', key: 'success.exportGenerated', params: { format: 'PDF' } } })
           break
       }
     } catch (error: any) {
       console.error("Erro ao exportar:", error)
-      toast.error(`Erro ao exportar: ${error.message}`)
+      notifyError(error, `Erro ao exportar: ${error.message}`, { i18n: { ns: 'common', key: 'errors.export' } })
     }
   }
 

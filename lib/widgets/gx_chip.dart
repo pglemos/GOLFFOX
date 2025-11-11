@@ -9,8 +9,8 @@ enum GxChipVariant {
 class GxChip extends StatelessWidget {
 
   const GxChip({
-    super.key,
     required this.label,
+    super.key,
     this.icon,
     this.onTap,
     this.onDelete,
@@ -107,8 +107,8 @@ class GxChip extends StatelessWidget {
 class GxChipGroup extends StatelessWidget {
 
   const GxChipGroup({
-    super.key,
     required this.chips,
+    super.key,
     this.direction = Axis.horizontal,
     this.alignment = WrapAlignment.start,
     this.spacing = 8,
@@ -147,8 +147,8 @@ class GxChipGroup extends StatelessWidget {
 class GxSelectableChipGroup extends StatefulWidget {
 
   const GxSelectableChipGroup({
-    super.key,
     required this.options,
+    super.key,
     this.selectedOptions = const [],
     this.onSelectionChanged,
     this.multiSelect = true,

@@ -4,8 +4,8 @@
 // ========================================
 
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/gf_tokens.dart';
 import '../../../models/maintenance.dart';
 import '../../../services/vehicle_service.dart';
@@ -13,8 +13,8 @@ import '../../../services/vehicle_service.dart';
 class VehicleMaintenanceList extends ConsumerStatefulWidget {
 
   const VehicleMaintenanceList({
-    super.key,
     required this.vehicleId,
+    super.key,
   });
   final String vehicleId;
 
@@ -475,7 +475,7 @@ class _VehicleMaintenanceListState
           const SizedBox(height: GfTokens.spacingMd),
           ElevatedButton.icon(
             onPressed: () {
-              // TODO: Navegar para criar nova manutencao
+              // TODO(golffox-team): Navegar para criar nova manutencao
             },
             icon: const Icon(Icons.add),
             label: const Text('Agendar Manutencao'),

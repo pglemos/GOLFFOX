@@ -4,20 +4,17 @@
 
 'use client'
 
-import { useEffect, useState, useCallback, useRef, useMemo } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useEffect, useState, useCallback, useRef } from 'react'
+import { useRouter } from 'next/navigation'
 import { loadGoogleMapsAPI } from '@/lib/google-maps-loader'
 import { RealtimeService, RealtimeUpdateType } from '@/lib/realtime-service'
 import { PlaybackService } from '@/lib/playback-service'
-import { fitBoundsWithMargin, createBoundsFromPositions } from '@/lib/map-utils'
 import { getMapsBillingMonitor } from '@/lib/maps-billing-monitor'
-import { detectRouteDeviation, type RoutePolylinePoint } from '@/lib/route-deviation-detector'
+import { detectRouteDeviation } from '@/lib/route-deviation-detector'
 import { createAlert } from '@/lib/operational-alerts'
 import { analyzeTrajectory, type PlannedRoutePoint, type ActualPosition, type TrajectoryAnalysis } from '@/lib/trajectory-analyzer'
 import { 
   isValidCoordinate, 
-  isValidPolyline, 
-  filterValidCoordinates,
   normalizeCoordinate 
 } from '@/lib/coordinate-validator'
 import { TrajectoryPanel } from './trajectory-panel'
@@ -26,6 +23,7 @@ import { MapLayers } from './layers'
 import { HeatmapLayer } from './heatmap-layer'
 import { VehiclePanel, RoutePanel, AlertsPanel } from './panels'
 import { PlaybackControls } from './playback-controls'
+import { AnimatePresence } from 'framer-motion'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { useKeyboardShortcuts } from './keyboard-shortcuts'
 import { Card } from '@/components/ui/card'
@@ -39,12 +37,11 @@ import {
   Map as MapIcon 
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
-import { motion, AnimatePresence } from 'framer-motion'
-import { modalContent } from '@/lib/animations'
 import { MarkerClusterer } from '@googlemaps/markerclusterer'
 import { notifySuccess, notifyError } from '@/lib/toast'
 import { debug, warn, error as logError } from '@/lib/logger'
 import { formatError, getErrorMeta } from '@/lib/error-utils'
+import { t } from '@/lib/i18n'
 
 declare global {
   interface Window {
@@ -119,8 +116,7 @@ export function AdminMap({
   const mapRef = useRef<HTMLDivElement>(null)
   const mapInstanceRef = useRef<google.maps.Map | null>(null)
   const markersRef = useRef<Map<string, google.maps.Marker>>(new Map())
-  const polylinesRef = useRef<Map<string, google.maps.Polyline>>(new Map())
-  const clustererRef = useRef<MarkerClusterer | null>(null)
+    const clustererRef = useRef<MarkerClusterer | null>(null)
   const realtimeServiceRef = useRef<RealtimeService | null>(null)
   const playbackServiceRef = useRef<PlaybackService | null>(null)
   
@@ -180,13 +176,13 @@ export function AdminMap({
     const initMap = async () => {
       const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
       if (!apiKey) {
-        setMapError('API Key do Google Maps não configurada')
+        setMapError(t('common', 'errors.mapApiKeyMissing'))
         setLoading(false)
         return
       }
 
       if (!mapRef.current) {
-        setMapError('Elemento do mapa não encontrado')
+        setMapError(t('common', 'errors.mapElementMissing'))
         setLoading(false)
         return
       }
@@ -198,7 +194,7 @@ export function AdminMap({
         setBillingStatus(billingStatus)
 
         if (billingMonitor.isQuotaExceeded()) {
-          setMapError('Quota do Google Maps excedida. Usando modo lista.')
+          setMapError(t('common', 'errors.mapsQuotaExceededListMode'))
           setListMode(true)
           setLoading(false)
           await loadInitialData()
@@ -334,7 +330,7 @@ export function AdminMap({
         }
       } catch (error: any) {
         logError('Erro ao inicializar mapa', { error }, 'AdminMap')
-        setMapError('Erro ao carregar o mapa. Usando modo lista.')
+        setMapError(t('common', 'errors.mapLoadFailedListMode'))
         setListMode(true)
         setLoading(false)
         // Carregar dados em modo lista
@@ -773,13 +769,13 @@ export function AdminMap({
         }, 'AdminMap')
         
         if (withCoords === 0 && processedVehicles.length > 0) {
-          notifySuccess(`${processedVehicles.length} veículo(s) ativo(s) encontrado(s), mas nenhum tem posição GPS recente.`, {
+          notifySuccess(t('common.success.noRecentGpsPositions', { count: processedVehicles.length }), {
             duration: 5000
           })
         }
       } else if (vehiclesError) {
         logError('Erro ao carregar veículos', { error: vehiclesError }, 'AdminMap')
-        notifyError(vehiclesError, 'Erro ao carregar veículos')
+        notifyError(vehiclesError, t('common.errors.loadVehicles', { message: formatError(vehiclesError) }))
       } else {
         // Nenhum dado retornado e nenhum erro - verificar se há veículos ativos sem filtros
         debug('Nenhum veículo retornado da query (sem erro) - verificando se há veículos ativos sem filtros', {}, 'AdminMap')
@@ -1197,7 +1193,7 @@ export function AdminMap({
     )
 
     if (positions.length === 0) {
-      notifyError('Nenhuma posição histórica encontrada para o período selecionado')
+      notifyError(t('common.errors.noHistoricalPositionsPeriod'))
       setHistoricalTrajectories([])
       return
     }
@@ -1235,13 +1231,13 @@ export function AdminMap({
 
     setHistoricalTrajectories(trajectories)
     setShowTrajectories(true)
-    notifySuccess(`${positions.length} posições carregadas para playback (${trajectories.length} trajetos)`)
+    notifySuccess(t('common.success.positionsLoaded', { count: positions.length, trajectories: trajectories.length }))
   }, [filters.company, filters.route, filters.vehicle, playbackFrom, playbackTo])
 
   // Visualizar histórico e análise de trajeto
   const handleViewVehicleHistory = useCallback(async (vehicle: Vehicle) => {
     if (!vehicle.trip_id || !vehicle.route_id) {
-      notifyError('Veículo não possui viagem ou rota associada')
+      notifyError(t('common.errors.noTripOrRoute'))
       return
     }
 
@@ -1249,7 +1245,7 @@ export function AdminMap({
       // Buscar rota planejada
       const route = routes.find((r) => r.route_id === vehicle.route_id)
       if (!route || !route.polyline_points || route.polyline_points.length < 2) {
-        notifyError('Rota não encontrada ou incompleta')
+        notifyError(t('common.errors.routeIncomplete'))
         return
       }
 
@@ -1261,7 +1257,7 @@ export function AdminMap({
         .single()
 
       if (tripError || !tripData) {
-        notifyError('Dados da viagem não encontrados')
+        notifyError(t('common.errors.tripDataNotFound'))
         return
       }
 
@@ -1283,7 +1279,7 @@ export function AdminMap({
       )
 
       if (positions.length === 0) {
-        notifyError('Nenhuma posição histórica encontrada')
+        notifyError(t('common.errors.noHistoricalPositions'))
         return
       }
 
@@ -1320,10 +1316,10 @@ export function AdminMap({
       setHistoricalTrajectories([trajectory])
       setShowTrajectories(true)
 
-      notifySuccess('Análise de trajeto carregada')
+      notifySuccess(t('common.success.trajectoryAnalysisLoaded'))
     } catch (error: any) {
       logError('Erro ao carregar histórico', { error }, 'AdminMap')
-      notifyError(formatError(error, 'Erro ao carregar histórico'))
+      notifyError(formatError(error, t('common.errors.loadHistory')))
     }
   }, [routes])
 
@@ -1503,14 +1499,14 @@ export function AdminMap({
 
       if (error) throw error
 
-    notifySuccess('Socorro despachado com sucesso!')
+    notifySuccess(t('common.success.assistanceDispatched'))
       
       // Recarregar alertas chamando loadInitialData novamente
       // Isso vai recarregar todos os alertas incluindo o novo socorro
       loadInitialData()
     } catch (error: any) {
       logError('Erro ao despachar socorro', { error }, 'AdminMap')
-    notifyError(formatError(error, 'Erro ao despachar socorro'))
+    notifyError(formatError(error, t('common.errors.dispatchAssistance')))
     }
   }, [])
 
@@ -1522,10 +1518,10 @@ export function AdminMap({
         try {
           const { exportMapPNG } = await import('@/lib/export-map-png')
           await exportMapPNG('map-container')
-    notifySuccess('Mapa exportado como PNG!')
+    notifySuccess(t('common.success.exportPng'))
         } catch (error: any) {
           logError('Erro ao exportar PNG', { error }, 'AdminMap')
-    notifyError(formatError(error, 'Erro ao exportar PNG do mapa'))
+    notifyError(formatError(error, t('common.errors.exportPng')))
         }
       }
       
@@ -1553,11 +1549,11 @@ export function AdminMap({
         a.download = `mapa-veiculos-${new Date().toISOString().split('T')[0]}.csv`
         a.click()
         URL.revokeObjectURL(url)
-    notifySuccess('CSV exportado!')
+    notifySuccess(t('common.success.exportCsv'))
       }
     } catch (error: any) {
       logError('Erro ao exportar', { error }, 'AdminMap')
-    notifyError(formatError(error, 'Erro ao exportar'))
+    notifyError(formatError(error, t('common.errors.export')))
     }
   }, [vehicles, listMode])
 

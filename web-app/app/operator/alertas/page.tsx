@@ -16,7 +16,7 @@ import { AlertTriangle, Search, Bell, Clock } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { useRouter, useSearchParams } from "next/navigation"
 import { motion } from "framer-motion"
-import toast from "react-hot-toast"
+import { notifyError } from "@/lib/toast"
 import { useOperatorTenant } from "@/components/providers/operator-tenant-provider"
 
 function AlertasOperatorPageInner() {
@@ -70,7 +70,7 @@ function AlertasOperatorPageInner() {
       if (queryError) {
         console.error("Erro ao carregar alertas:", queryError)
         setError(`Erro ao carregar alertas: ${queryError.message}`)
-        toast.error(`Erro: ${queryError.message}`)
+        notifyError(`Erro: ${queryError.message}`, { i18n: { ns: 'common', key: 'errors.generic' } })
         setAlertas([])
         return
       }
@@ -79,7 +79,7 @@ function AlertasOperatorPageInner() {
       console.error("Erro ao carregar alertas:", err)
       const errorMessage = err?.message || 'Erro desconhecido'
       setError(errorMessage)
-      toast.error(`Erro: ${errorMessage}`)
+      notifyError(`Erro: ${errorMessage}`, { i18n: { ns: 'common', key: 'errors.generic' } })
       setAlertas([])
     } finally {
       setLoading(false)

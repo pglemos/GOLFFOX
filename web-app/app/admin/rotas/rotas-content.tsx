@@ -26,7 +26,7 @@ import { QuickNavigation, AdvancedNavigationButton } from "@/components/advanced
 import { useAdvancedNavigation } from "@/hooks/use-advanced-navigation"
 import { supabase } from "@/lib/supabase"
 import { RouteModal } from "@/components/modals/route-modal"
-import toast from "react-hot-toast"
+import { notifySuccess, notifyError } from "@/lib/toast"
 
 export function RotasPageContent() {
   const router = useRouter()
@@ -190,10 +190,10 @@ export function RotasPageContent() {
                             })
                             const data = await resp.json()
                             if (!resp.ok) throw new Error(data?.error || 'Erro ao gerar pontos')
-                            toast.success('Pontos gerados com sucesso!')
+                            notifySuccess('', { i18n: { ns: 'common', key: 'success.pointsGeneratedSaved' } })
                             await loadRotas()
                           } catch (error: any) {
-                            toast.error(`Erro: ${error.message}`)
+                            notifyError(error, `Erro: ${error.message}`, { i18n: { ns: 'common', key: 'errors.generatePoints' } })
                           }
                         }}
                       >
@@ -212,10 +212,10 @@ export function RotasPageContent() {
                               method: 'POST'
                             })
                             if (!response.ok) throw new Error('Erro ao otimizar')
-                            toast.success('Rota otimizada com sucesso!')
+                            notifySuccess('', { i18n: { ns: 'common', key: 'success.routeOptimized' } })
                             loadRotas()
                           } catch (error: any) {
-                            toast.error(`Erro: ${error.message}`)
+                            notifyError(error, `Erro: ${error.message}`, { i18n: { ns: 'common', key: 'errors.optimizeRoute' } })
                           }
                         }}
                       >

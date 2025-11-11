@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 
 class GxTable extends StatelessWidget {
 
-  const GxTable(
-      {super.key,
-      required this.columns,
-      required this.rows,
-      this.dense = false});
+  const GxTable({
+    required this.columns,
+    required this.rows,
+    this.dense = false,
+    super.key,
+  });
   final List<String> columns;
   final List<List<Widget>> rows;
   final bool dense;

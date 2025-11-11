@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { ClipboardCheck } from "lucide-react"
 import { supabase } from "@/lib/supabase"
-import toast from "react-hot-toast"
+import { notifySuccess, notifyError } from "@/lib/toast"
 import { useSupabaseSync } from "@/hooks/use-supabase-sync"
 import {
   Select,
@@ -131,7 +131,7 @@ export function VehicleChecklistModal({
 
     try {
       if (!formData.driver_id || !formData.status) {
-        toast.error("Motorista e status são obrigatórios")
+        notifyError('', undefined, { i18n: { ns: 'common', key: 'validation.driverStatusRequired' } })
         return
       }
 
@@ -161,7 +161,7 @@ export function VehicleChecklistModal({
           data: checklistData,
         })
         
-        toast.success("Checklist atualizado com sucesso!")
+        notifySuccess('', { i18n: { ns: 'common', key: 'success.checklistUpdated' } })
       } else {
         // Criar
         const { data, error } = await supabase
@@ -182,7 +182,7 @@ export function VehicleChecklistModal({
           })
         }
         
-        toast.success("Checklist cadastrado com sucesso!")
+        notifySuccess('', { i18n: { ns: 'common', key: 'success.checklistCreated' } })
       }
 
       // Log de auditoria
@@ -205,7 +205,7 @@ export function VehicleChecklistModal({
       onClose()
     } catch (error: any) {
       console.error("Erro ao salvar checklist:", error)
-      toast.error(error.message || "Erro ao salvar checklist")
+      notifyError(error, 'Erro ao salvar checklist', { i18n: { ns: 'common', key: 'errors.saveChecklist' } })
     } finally {
       setLoading(false)
     }

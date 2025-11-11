@@ -9,6 +9,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/services/error_service.dart';
+import '../../core/services/snackbar_service.dart';
 import '../../core/theme/gf_tokens.dart';
 import '../../models/driver.dart';
 import '../../services/driver_service.dart';
@@ -885,10 +886,9 @@ class _CreateDriverPageState extends ConsumerState<CreateDriverPage> {
 
   void _selectPhoto() {
     // TODO(golffox-team): Implementar selecao de foto
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Funcionalidade de foto sera implementada em breve'),
-      ),
+    SnackBarService.infoText(
+      context,
+      'Funcionalidade de foto sera implementada em breve',
     );
   }
 
@@ -954,10 +954,9 @@ class _CreateDriverPageState extends ConsumerState<CreateDriverPage> {
 
   void _addCertification() {
     // TODO(golffox-team): Implementar adicao de certificacao
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Funcionalidade de certificacao sera implementada em breve'),
-      ),
+    SnackBarService.infoText(
+      context,
+      'Funcionalidade de certificacao sera implementada em breve',
     );
   }
 
@@ -1041,12 +1040,7 @@ class _CreateDriverPageState extends ConsumerState<CreateDriverPage> {
   }
 
   void _showSuccess(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: const Color(GfTokens.colorSuccess),
-      ),
-    );
+    SnackBarService.successText(context, message);
   }
 }
 

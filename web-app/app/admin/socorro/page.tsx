@@ -11,7 +11,7 @@ import { useRouter } from "next/navigation"
 import { AssistanceModal } from "@/components/modals/assistance-modal"
 import { Input } from "@/components/ui/input"
 import { motion } from "framer-motion"
-import toast from "react-hot-toast"
+import { notifySuccess, notifyError } from "@/lib/toast"
 
 export default function SocorroPage() {
   const router = useRouter()
@@ -228,10 +228,10 @@ export default function SocorroPage() {
                             const responseTime = new Date(ocorrencia.dispatched_at || Date.now()).getTime() - new Date(ocorrencia.created_at).getTime()
                             const resolutionTime = Date.now() - new Date(ocorrencia.created_at).getTime()
                             
-                            toast.success(`Ocorrência resolvida! SLA: ${Math.floor(responseTime / 60000)}min resposta, ${Math.floor(resolutionTime / 60000)}min total`)
+                            notifySuccess('', { i18n: { ns: 'common', key: 'success.assistanceResolvedSLA', params: { response: Math.floor(responseTime / 60000), total: Math.floor(resolutionTime / 60000) } } })
                             loadOcorrencias()
                           } catch (error: any) {
-                            toast.error(`Erro: ${error.message}`)
+                            notifyError(error, `Erro: ${error.message}`, { i18n: { ns: 'common', key: 'errors.assistanceResolve', params: { message: error.message } } })
                           }
                         }}
                       >

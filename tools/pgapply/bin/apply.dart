@@ -25,7 +25,7 @@ Future<void> main(List<String> args) async {
   );
   const settings = ConnectionSettings(
     sslMode: SslMode.require,
-    connectTimeout: const Duration(seconds: 60),
+    connectTimeout: Duration(seconds: 60),
   );
 
   try {
@@ -37,9 +37,10 @@ Future<void> main(List<String> args) async {
     // Use simple (multi-statement) query
     await conn.execute(Sql.named(sql));
     stdout.writeln('Migration applied successfully.');
-  } catch (e, st) {
-    stderr.writeln('Failed to apply migration: $e');
-    stderr.writeln(st);
+  } on Exception catch (e, st) {
+    stderr
+      ..writeln('Failed to apply migration: $e')
+      ..writeln(st);
     exit(1);
   } finally {
     // Connection closes automatically on process exit; nothing to do here.

@@ -8,6 +8,8 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 
+import '../../core/i18n/i18n.dart';
+import '../../core/services/snackbar_service.dart';
 import '../../core/theme/gf_tokens.dart';
 import '../../core/theme/unified_theme.dart';
 import '../../core/utils/date_utils.dart';
@@ -411,17 +413,16 @@ class _MapaPageState extends ConsumerState<MapaPage> {
             child: const Text('Cancelar'),
           ),
           ElevatedButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              // TODO(golffox-team): Implementar contato do motorista
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Funcionalidade de contato sera implementada'),
-                ),
-              );
-            },
-            child: const Text('Contatar'),
-          ),
+          onPressed: () {
+            Navigator.of(context).pop();
+            // TODO(golffox-team): Implementar contato do motorista
+            SnackBarService.info(
+              context,
+              'mapa.contact.soon',
+            );
+          },
+          child: const Text('Contatar'),
+        ),
         ],
       ),
     );
@@ -431,31 +432,25 @@ class _MapaPageState extends ConsumerState<MapaPage> {
     _mapController.move(stop.position, 16);
 
     // Mostrar informacoes da parada
-    final messenger = ScaffoldMessenger.of(context);
-    messenger
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                '${stop.type.icon} ${stop.name}',
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
-              if (stop.landmark != null) Text(stop.landmark!),
-              if (stop.estimatedArrival != null)
-                Text(
-                    'Chegada estimada: ${GfDateUtils.timeAgo(stop.estimatedArrival!)}'),
-            ],
-          ),
-          action: SnackBarAction(
-            label: 'OK',
-            onPressed: messenger.hideCurrentSnackBar,
-          ),
-        ),
-      );
+    final title = I18n.t(context, 'mapa.stop.title',
+        params: {'icon': stop.type.icon, 'name': stop.name});
+    final eta = stop.estimatedArrival != null
+        ? I18n.t(context, 'mapa.stop.eta',
+            params: {'eta': GfDateUtils.timeAgo(stop.estimatedArrival!)})
+        : null;
+    final infoLines = <String>[
+      title,
+      if (stop.landmark != null) stop.landmark!,
+      if (eta != null) eta,
+    ];
+    SnackBarService.infoText(
+      context,
+      infoLines.join('\n'),
+      action: SnackBarAction(
+        label: I18n.t(context, 'common.ok'),
+        onPressed: () => ScaffoldMessenger.of(context).hideCurrentSnackBar(),
+      ),
+    );
   }
 
   void _centerMapOnVehicles() {

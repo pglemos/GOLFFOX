@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../../../core/theme/gf_tokens.dart';
 import '../../../models/driver.dart';
 import '../../../widgets/gx_card.dart';
+import '../../../core/i18n/i18n.dart';
 
 class DriverInfoCard extends StatelessWidget {
 
@@ -127,7 +128,7 @@ class DriverInfoCard extends StatelessWidget {
           children: [
             _buildInfoRow(
               'Disponivel para Viagens',
-              driver.isAvailable ? 'Sim' : 'Nao',
+              driver.isAvailable ? I18n.t(context, 'common.yes') : I18n.t(context, 'common.no'),
               trailing: driver.isAvailable
                   ? _buildAlertBadge(
                       'Disponivel', const Color(GfTokens.colorSuccess))

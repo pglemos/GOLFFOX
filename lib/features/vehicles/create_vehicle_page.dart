@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/services/snackbar_service.dart';
 import '../../core/theme/gf_tokens.dart';
 import '../../models/vehicle.dart';
 import '../../services/vehicle_service.dart';
@@ -230,12 +231,11 @@ class _CreateVehiclePageState extends ConsumerState<CreateVehiclePage>
       }
     } on Exception catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Erro ao salvar veiculo: $e'),
-            backgroundColor: const Color(GfTokens.colorError),
-            behavior: SnackBarBehavior.floating,
-          ),
+        SnackBarService.error(
+          context,
+          e,
+          fallbackKey: 'vehicles.save.error',
+          params: {'message': e.toString()},
         );
       }
     } finally {

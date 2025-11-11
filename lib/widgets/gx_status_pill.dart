@@ -3,8 +3,11 @@ import 'package:flutter/material.dart';
 enum GxStatus { success, warning, info, error, neutral }
 
 class GxStatusPill extends StatelessWidget {
-  const GxStatusPill(
-      {super.key, required this.label, this.status = GxStatus.neutral});
+  const GxStatusPill({
+    required this.label,
+    this.status = GxStatus.neutral,
+    super.key,
+  });
   final String label;
   final GxStatus status;
 

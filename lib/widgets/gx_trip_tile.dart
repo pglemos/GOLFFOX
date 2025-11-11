@@ -4,10 +4,10 @@ import 'gx_status_pill.dart';
 class GxTripTile extends StatelessWidget {
 
   const GxTripTile({
-    super.key,
     required this.title,
     required this.subtitle,
     required this.meta,
+    super.key,
     this.status = GxStatus.neutral,
     this.onTap,
   });

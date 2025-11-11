@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/i18n/i18n.dart';
+import '../../core/services/snackbar_service.dart';
 import '../../core/theme/gf_tokens.dart';
 import '../../models/vehicle.dart';
 import '../../services/vehicle_service.dart';
@@ -100,13 +102,7 @@ class _VehiclesPageState extends ConsumerState<VehiclesPage>
     );
 
     if ((result ?? false) && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Veiculo criado com sucesso!'),
-          backgroundColor: Color(GfTokens.colorSuccess),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+      SnackBarService.success(context, 'vehicles.create.success');
     }
   }
 
@@ -127,7 +123,7 @@ class _VehiclesPageState extends ConsumerState<VehiclesPage>
   Widget build(BuildContext context) => Scaffold(
       backgroundColor: const Color(GfTokens.colorSurfaceBackground),
       appBar: GfAppBar(
-        title: 'Veiculos',
+        title: I18n.t(context, 'vehicles.title'),
         actions: [
           IconButton(
             icon: Icon(

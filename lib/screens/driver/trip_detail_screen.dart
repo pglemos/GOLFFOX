@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart' as flutter_map;
 import 'package:latlong2/latlong.dart';
 
+import '../../core/services/snackbar_service.dart';
 import '../../core/theme/gf_tokens.dart';
 import '../../models/driver_position.dart';
 import '../../models/trip.dart';
@@ -172,17 +173,10 @@ class _TripDetailScreenState extends State<TripDetailScreen>
       );
 
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text(' Viagem iniciada e rastreamento ativo')),
-      );
+      SnackBarService.success(context, 'driver.trip.start.success');
     } on Exception catch (error) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          backgroundColor: Colors.red,
-          content: Text('Erro: $error'),
-        ),
-      );
+      SnackBarService.error(context, error);
     }
   }
 
@@ -209,18 +203,11 @@ class _TripDetailScreenState extends State<TripDetailScreen>
       if (!ok) throw Exception(resp['error'] ?? 'Transicao invalida');
 
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text(' Viagem concluida')),
-      );
+      SnackBarService.success(context, 'driver.trip.complete.success');
       Navigator.pop(context); // volta para a lista
     } on Exception catch (error) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          backgroundColor: Colors.red,
-          content: Text('Erro: $error'),
-        ),
-      );
+      SnackBarService.error(context, error);
     }
   }
 

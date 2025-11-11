@@ -11,8 +11,8 @@ import '../../../models/vehicle.dart';
 class VehicleInfoCard extends StatelessWidget {
 
   const VehicleInfoCard({
-    super.key,
     required this.vehicle,
+    super.key,
   });
   final Vehicle vehicle;
 

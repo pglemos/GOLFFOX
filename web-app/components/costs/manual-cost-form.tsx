@@ -5,7 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import toast from "react-hot-toast"
+import { notifySuccess, notifyError } from "@/lib/toast"
 
 interface CostCategory {
   id: string
@@ -93,13 +93,13 @@ export function ManualCostForm({
         throw new Error(error.error || 'Erro ao salvar custo')
       }
 
-      toast.success('Custo adicionado com sucesso!')
+      notifySuccess('', { i18n: { ns: 'common', key: 'success.costAdded' } })
       onSave()
       onClose()
       resetForm()
     } catch (error: any) {
       console.error('Erro ao salvar custo:', error)
-      toast.error(error.message || 'Erro ao salvar custo')
+      notifyError(error, 'Erro ao salvar custo')
     } finally {
       setLoading(false)
     }
