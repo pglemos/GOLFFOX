@@ -29,19 +29,24 @@ export async function OPTIONS(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    // Primeiro, verificar autenticação ANTES de qualquer outra operação
+    // (para retornar 401 em vez de 500 quando não autenticado)
+    const { validateAuth } = await import('@/lib/api-auth')
+    let authenticatedUser = await validateAuth(request)
+    
     // Permitir bypass em modo de teste/desenvolvimento para testes automatizados
     const isTestMode = request.headers.get('x-test-mode') === 'true'
     const isDevelopment = process.env.NODE_ENV === 'development'
     
-    // ✅ Validar autenticação (operator ou admin) - apenas se não for modo de teste
-    if (!isTestMode && !isDevelopment) {
-      const authErrorResponse = await requireAuth(request, ['operator', 'admin'])
-      if (authErrorResponse) {
-        return authErrorResponse
-      }
+    // Se não há autenticação e não é modo de teste, retornar 401
+    if (!authenticatedUser && !isTestMode && !isDevelopment) {
+      return NextResponse.json(
+        { error: 'Não autorizado', message: 'Autenticação necessária. Faça login antes de acessar este endpoint.' },
+        { status: 401 }
+      )
     }
 
-    // Validar variáveis de ambiente do Supabase PRIMEIRO (antes de qualquer uso)
+    // Validar variáveis de ambiente do Supabase
     if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
       console.error('Variáveis de ambiente do Supabase não configuradas')
       return NextResponse.json(
@@ -54,10 +59,6 @@ export async function POST(request: NextRequest) {
     }
 
     const supabase = getSupabaseAdmin()
-    
-    // Obter usuário autenticado para pegar company_id
-    const { validateAuth } = await import('@/lib/api-auth')
-    let authenticatedUser = await validateAuth(request)
     
     // Em modo de teste/dev sem autenticação, usar valores padrão
     if (!authenticatedUser && (isTestMode || isDevelopment)) {
@@ -95,6 +96,7 @@ export async function POST(request: NextRequest) {
       }
     }
     
+    // Se ainda não há usuário autenticado após todas as tentativas, retornar 401
     if (!authenticatedUser) {
       return NextResponse.json(
         { error: 'Usuário não autenticado' },

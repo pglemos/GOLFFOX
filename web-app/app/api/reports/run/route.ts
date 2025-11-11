@@ -61,8 +61,8 @@ export async function POST(request: NextRequest) {
   try {
     const supabase = getSupabaseAdmin()
     const body = await request.json()
-    // Aceitar tanto reportKey quanto reportType para compatibilidade
-    const reportKey = body.reportKey || body.reportType || body.report_type
+    // Aceitar tanto reportKey quanto reportType (camelCase ou snake_case) para compatibilidade
+    const reportKey = body.reportKey || body.reportType || body.report_type || body.report_key
     const format = body.format || 'csv'
     
     // Aceitar company_id tanto em filters quanto diretamente no body
@@ -78,6 +78,7 @@ export async function POST(request: NextRequest) {
     const reportKeyAliases: Record<string, string> = {
       'general_report': 'delays', // Mapear general_report para delays (relatório padrão)
       'monthly': 'efficiency', // Mapear monthly para efficiency (relatório mensal)
+      'monthly_summary': 'efficiency', // Mapear monthly_summary para efficiency
       'financial': 'efficiency', // Mapear financial para efficiency
       'summary': 'driver_ranking', // Mapear summary para driver_ranking
       'performance': 'efficiency',
@@ -189,10 +190,23 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Se não há dados, retornar JSON informativo (mesmo para formatos de arquivo em modo de teste)
-    // Isso permite que os testes passem mesmo sem dados
+    // Se não há dados, retornar arquivo vazio ou JSON dependendo do formato
     if (!data || data.length === 0) {
-      // Sempre retornar JSON quando não há dados (testes esperam JSON)
+      // Para formatos de arquivo (PDF, Excel, CSV), gerar arquivo vazio
+      // Para JSON ou outros formatos, retornar JSON informativo
+      if (format === 'pdf' || format === 'excel' || format === 'csv') {
+        // Gerar arquivo vazio do formato solicitado
+        switch (format) {
+          case 'csv':
+            return generateCSV([], config.columns, finalReportKey)
+          case 'excel':
+            return generateExcel([], config.columns, finalReportKey)
+          case 'pdf':
+            return generatePDF([], config.columns, finalReportKey)
+        }
+      }
+      
+      // Para outros formatos ou se não for arquivo, retornar JSON
       return NextResponse.json(
         { 
           success: true,
