@@ -308,152 +308,119 @@ function LoginContent() {
         let token: string | undefined
         let user: { id: string; email: string; role?: string } | undefined
         
-        // Tentar usar API primeiro (com CSRF protection)
-        try {
-          if (csrfToken) {
-            const response = await fetch(AUTH_ENDPOINT, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                "x-csrf-token": csrfToken,
-              },
-              body: JSON.stringify({ email: sanitizedEmail, password: sanitizedPassword }),
-              signal: controller.signal,
-              credentials: "include",
-            })
-            clearTimeout(timeoutId)
-
-            if (response.ok) {
-              const data = await response.json()
-              token = data?.token
-              user = data?.user
-
-              console.log('✅ Login via API bem-sucedido:', { 
-                hasToken: !!token, 
-                hasUser: !!user,
-                userRole: user?.role,
-              })
-            } else {
-              // Se a API retornar erro, tentar Supabase diretamente
-              console.warn('⚠️ API retornou erro, tentando Supabase diretamente...')
-              throw new Error('API_ERROR')
-            }
-          } else {
-            throw new Error('NO_CSRF_TOKEN')
-          }
-        } catch (apiError: any) {
-          // Fallback: usar Supabase diretamente
-          console.log('🔄 Tentando autenticação direta com Supabase...')
-          
-          clearTimeout(timeoutId)
-          const supabaseController = new AbortController()
-          const supabaseTimeoutId = window.setTimeout(() => supabaseController.abort(), 10_000)
-          
-          try {
-            const { data: supabaseData, error: supabaseError } = await supabase.auth.signInWithPassword({
-              email: sanitizedEmail,
-              password: sanitizedPassword,
-            })
-            
-            clearTimeout(supabaseTimeoutId)
-            
-            if (supabaseError) {
-              console.error('❌ Erro Supabase:', supabaseError)
-              const errorMessage = supabaseError.message.toLowerCase()
-              
-              if (errorMessage.includes("invalid") || errorMessage.includes("credentials")) {
-                setError("Credenciais inválidas")
-                setFieldErrors((prev) => ({ ...prev, password: "E-mail ou senha incorretos" }))
-              } else if (errorMessage.includes("email")) {
-                setError("E-mail não encontrado")
-                setFieldErrors((prev) => ({ ...prev, email: "E-mail não cadastrado" }))
-              } else {
-                setError(supabaseError.message || "Erro ao fazer login")
-              }
-              
-              setLoading(false)
-              setTransitioning(false)
-              if (typeof document !== "undefined") document.body.style.cursor = prevCursor
-              return
-            }
-            
-            if (!supabaseData.user || !supabaseData.session) {
-              setError("Falha na autenticação - sessão não criada")
-              setLoading(false)
-              setTransitioning(false)
-              if (typeof document !== "undefined") document.body.style.cursor = prevCursor
-              return
-            }
-            
-            // Obter role do usuário
-            let role = supabaseData.user.user_metadata?.role || supabaseData.user.app_metadata?.role
-            
-            // Se não encontrar nos metadados, buscar na tabela users
-            if (!role && supabaseData.user.id) {
-              try {
-                const { data: userData } = await supabase
-                  .from('users')
-                  .select('role')
-                  .eq('id', supabaseData.user.id)
-                  .single()
-                
-                if (userData?.role) {
-                  role = userData.role
-                }
-              } catch (err) {
-                debug('Erro ao buscar role na tabela users', { error: err }, 'LoginPage')
-              }
-            }
-            
-            // Fallback: usar função getUserRoleByEmail
-            if (!role) {
-              role = getUserRoleByEmail(supabaseData.user.email || sanitizedEmail)
-            }
-            
-            token = supabaseData.session.access_token
-            user = {
-              id: supabaseData.user.id,
-              email: supabaseData.user.email || sanitizedEmail,
-              role,
-            }
-            
-            console.log('✅ Login via Supabase bem-sucedido:', { 
-              hasToken: !!token, 
-              hasUser: !!user,
-              userRole: user?.role,
-            })
-          } catch (supabaseErr: any) {
-            clearTimeout(supabaseTimeoutId)
-            if (supabaseErr.name === "AbortError") {
-              setError("Tempo limite excedido. Verifique sua conexão.")
-            } else {
-              setError("Erro ao conectar com o servidor de autenticação")
-            }
-            setLoading(false)
-            setTransitioning(false)
-            if (typeof document !== "undefined") document.body.style.cursor = prevCursor
-            logError("Erro ao autenticar com Supabase", { error: supabaseErr }, "LoginPage")
-            return
-          }
+        // ✅ OBRIGATÓRIO: Usar apenas a API que verifica o banco de dados do Supabase
+        // A API /api/auth/login verifica:
+        // 1. Se o usuário existe na tabela users
+        // 2. Se o usuário está ativo
+        // 3. Obtém o role do banco de dados
+        // 4. Autentica com Supabase Auth
+        
+        if (!csrfToken) {
+          console.error('❌ CSRF token não encontrado')
+          setError("Erro de segurança. Por favor, recarregue a página.")
+          setLoading(false)
+          setTransitioning(false)
+          if (typeof document !== "undefined") document.body.style.cursor = prevCursor
+          return
         }
+        
+        const response = await fetch(AUTH_ENDPOINT, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-csrf-token": csrfToken,
+          },
+          body: JSON.stringify({ email: sanitizedEmail, password: sanitizedPassword }),
+          signal: controller.signal,
+          credentials: "include",
+        })
+        clearTimeout(timeoutId)
 
-        if (!token || !user?.email) {
-          console.error('❌ Falha na autenticação:', { token: !!token, user: !!user })
-          setError("Falha na autenticação")
+        // ✅ Processar resposta da API
+        if (!response.ok) {
+          const apiError = await response.json().catch(() => ({}))
+          const message = String(apiError?.error || "Falha ao autenticar")
+          const normalized = message.toLowerCase()
+          
+          console.error('❌ Erro na API de login:', {
+            status: response.status,
+            message,
+            email: maskedEmail
+          })
+          
+          // Processar erros específicos
+          if (normalized.includes("usuário não encontrado") || normalized.includes("não encontrado")) {
+            setError("Usuário não encontrado no banco de dados. Verifique se o email está correto ou entre em contato com o administrador.")
+            setFieldErrors((prev) => ({ ...prev, email: "E-mail não cadastrado" }))
+          } else if (normalized.includes("inativo")) {
+            setError("Usuário inativo. Entre em contato com o administrador.")
+          } else if (normalized.includes("invalid") || normalized.includes("credenciais")) {
+            setError("Credenciais inválidas")
+            setFieldErrors((prev) => ({ ...prev, password: "E-mail ou senha incorretos" }))
+          } else if (normalized.includes("csrf")) {
+            setError("Erro de segurança. Por favor, recarregue a página.")
+          } else if (normalized.includes("timeout")) {
+            setError("Tempo de resposta excedido. Tente novamente.")
+          } else {
+            setError(message || "Erro ao fazer login")
+          }
+          
           setLoading(false)
           setTransitioning(false)
           if (typeof document !== "undefined") document.body.style.cursor = prevCursor
           return
         }
 
-        // ✅ Processar sessão antes de redirecionar
-        const resolvedRole = user.role ?? getUserRoleByEmail(user.email)
+        // ✅ Resposta bem-sucedida - obter dados do usuário
+        const data = await response.json()
+        token = data?.token
+        user = data?.user
+
+        console.log('✅ Login via API bem-sucedido (banco de dados verificado):', { 
+          hasToken: !!token, 
+          hasUser: !!user,
+          userRole: user?.role,
+          userId: user?.id,
+          userEmail: user?.email?.replace(/^(.{2}).+(@.*)$/, '$1***$2')
+        })
+
+        if (!token || !user?.email || !user?.id) {
+          console.error('❌ Resposta inválida da API:', { 
+            token: !!token, 
+            user: !!user,
+            hasEmail: !!user?.email,
+            hasId: !!user?.id
+          })
+          setError("Resposta inválida do servidor")
+          setLoading(false)
+          setTransitioning(false)
+          if (typeof document !== "undefined") document.body.style.cursor = prevCursor
+          return
+        }
+
+        // ✅ IMPORTANTE: O role vem do banco de dados (tabela users) via API
+        // A API já verificou se o usuário existe no banco e obteve o role
+        const userRoleFromDatabase = user.role
         
+        if (!userRoleFromDatabase) {
+          console.error('❌ Role não encontrado na resposta da API')
+          setError("Erro ao determinar permissões do usuário")
+          setLoading(false)
+          setTransitioning(false)
+          if (typeof document !== "undefined") document.body.style.cursor = prevCursor
+          return
+        }
+
+        console.log('📊 Role obtido do banco de dados:', userRoleFromDatabase)
+        console.log('📧 Email do usuário:', user.email)
+        console.log('🆔 ID do usuário:', user.id)
+
+        // ✅ Processar sessão antes de redirecionar
         AuthManager.persistSession(
           {
             id: user.id,
             email: user.email,
-            role: resolvedRole,
+            role: userRoleFromDatabase, // Usar role do banco de dados
             accessToken: token,
           },
           { token, storage: rememberMe ? "both" : "session" }
@@ -469,32 +436,45 @@ function LoginContent() {
           sessionStorage.setItem("golffox-last-login", new Date().toISOString())
         }
 
+        // ✅ Determinar URL de redirecionamento baseado no role do banco de dados
         const rawNext = searchParams.get("next")
         const safeNext = sanitizePath(rawNext)
-        let redirectUrl = DEFAULT_LOGGED_URL
+        let redirectUrl: string
 
-        const resolvedRole = user.role ?? getUserRoleByEmail(user.email)
-        
         // Log detalhado para debug
-        console.log('🔍 Debug Login:', {
-          userRole: user.role,
-          resolvedRole,
+        console.log('🔍 Determinando redirecionamento:', {
+          roleFromDatabase: userRoleFromDatabase,
           email: user.email,
           safeNext,
           defaultUrl: DEFAULT_LOGGED_URL
         })
         
-        if (safeNext && isAllowedForRole(resolvedRole, safeNext)) {
+        // Se houver parâmetro ?next= e for permitido para o role, usar ele
+        if (safeNext && isAllowedForRole(userRoleFromDatabase, safeNext)) {
           redirectUrl = safeNext
+          console.log('📍 Usando URL do parâmetro ?next=:', redirectUrl)
         } else {
-          redirectUrl = AuthManager.getRedirectUrl(resolvedRole)
+          // Caso contrário, usar o role do banco para determinar o painel
+          redirectUrl = AuthManager.getRedirectUrl(userRoleFromDatabase)
+          console.log('📍 Usando URL baseada no role do banco:', redirectUrl)
         }
+        
+        // Limpar query params da URL de redirecionamento
         redirectUrl = redirectUrl.split("?")[0]
 
-        debug("Login bem-sucedido", { redirectUrl, email: maskedEmail, role: resolvedRole }, "LoginPage")
-        console.log('🚀 Redirecionando para:', redirectUrl)
-        console.log('👤 Role detectado:', resolvedRole)
-        console.log('📧 Email:', user.email)
+        debug("Login bem-sucedido", { 
+          redirectUrl, 
+          email: maskedEmail, 
+          role: userRoleFromDatabase,
+          source: 'database'
+        }, "LoginPage")
+        
+        console.log('🚀 Preparando redirecionamento:', {
+          redirectUrl,
+          role: userRoleFromDatabase,
+          email: user.email,
+          userId: user.id
+        })
         
         // ✅ Redirecionar APENAS após tudo estar processado
         // O cookie é definido pelo servidor na resposta HTTP, então precisamos aguardar
