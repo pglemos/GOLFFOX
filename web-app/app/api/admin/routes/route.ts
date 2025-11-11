@@ -104,12 +104,12 @@ export async function POST(request: NextRequest) {
       const routeDataWithoutDestination: Record<string, any> = {
         name: name,
         company_id: finalCompanyId,
-        is_active: true
+        is_active: true,
       }
       
       // Tentar adicionar origin se a coluna existir
       if (origin) {
-        routeDataWithoutDestination.origin = origin
+        routeDataWithoutDestination['origin'] = origin
       }
       
       const result = await supabaseAdmin

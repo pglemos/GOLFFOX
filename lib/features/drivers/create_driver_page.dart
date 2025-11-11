@@ -3,7 +3,7 @@
 // Página para criar e editar motoristas
 // ========================================
 
-import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -57,7 +57,7 @@ class _CreateDriverPageState extends ConsumerState<CreateDriverPage> {
   LicenseCategory _licenseCategory = LicenseCategory.b;
   bool _isOnline = false;
   String? _photoUrl;
-  File? _photoFile;
+  Uint8List? _photoBytes;
   final ImagePicker _imagePicker = ImagePicker();
   final Uuid _uuid = const Uuid();
   List<DriverCertification> _certifications = [];
@@ -214,7 +214,7 @@ class _CreateDriverPageState extends ConsumerState<CreateDriverPage> {
                   ? const Color(GfTokens.colorSuccess)
                   : isActive
                       ? const Color(GfTokens.colorPrimary)
-                      : GfTokens.colorOnSurfaceVariant
+                      : const Color(GfTokens.colorOnSurfaceVariant)
                           .withValues(alpha: 0.3),
               shape: BoxShape.circle,
             ),
@@ -275,12 +275,12 @@ class _CreateDriverPageState extends ConsumerState<CreateDriverPage> {
                   radius: 50,
                   backgroundColor:
                       const Color(GfTokens.colorPrimary).withValues(alpha: 0.1),
-                  backgroundImage: _photoFile != null
-                      ? FileImage(_photoFile!)
+                  backgroundImage: _photoBytes != null
+                      ? MemoryImage(_photoBytes!)
                       : _photoUrl != null 
                           ? NetworkImage(_photoUrl!)
                           : null,
-                  child: _photoFile == null && _photoUrl == null
+                  child: _photoBytes == null && _photoUrl == null
                       ? const Icon(
                           Icons.person,
                           size: 50,
@@ -883,10 +883,11 @@ class _CreateDriverPageState extends ConsumerState<CreateDriverPage> {
       );
 
       if (image != null) {
+        final bytes = await image.readAsBytes();
         setState(() {
-          _photoFile = File(image.path);
+          _photoBytes = bytes;
           // TODO: Upload da foto para storage (Supabase/Cloud) e obter URL
-          // Por enquanto, mantém apenas o arquivo local
+          // Por enquanto, mantém apenas os bytes em memória
         });
         SnackBarService.successText(context, 'Foto selecionada com sucesso');
       }

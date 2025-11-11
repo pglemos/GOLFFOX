@@ -195,10 +195,10 @@ class RouteProgressIndicator extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(GfTokens.space3),
       decoration: BoxDecoration(
-        color: GfTokens.primary.withValues(alpha: 0.1),
+        color: const Color(GfTokens.primary).withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(GfTokens.radiusSm),
         border: Border.all(
-          color: GfTokens.primary.withValues(alpha: 0.3),
+          color: const Color(GfTokens.primary).withValues(alpha: 0.3),
         ),
       ),
       child: Row(
