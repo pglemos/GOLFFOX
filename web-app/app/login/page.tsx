@@ -226,10 +226,11 @@ function LoginContent() {
     fetchCsrf()
   }, [])
 
-  // Validação contínua dos campos
+  // Validação contínua dos campos (apenas email, senha será validada pelo Supabase)
   useEffect(() => {
     setEmailValid(EMAIL_REGEX.test(sanitizeInput(email)))
-    setPasswordValid(PASSWORD_REGEX.test(password.trim()))
+    // Remover validação de formato de senha - apenas verificar se não está vazia
+    setPasswordValid(password.trim().length > 0)
   }, [email, password])
 
   // Carregar estado de tentativas do localStorage
@@ -305,15 +306,8 @@ function LoginContent() {
         return
       }
 
-      if (!PASSWORD_REGEX.test(sanitizedPassword)) {
-        setError("Senha deve ter ao menos 8 caracteres, com número e letra maiúscula")
-        setFieldErrors((prev) => ({
-          ...prev,
-          password: "Senha precisa conter 8 caracteres, incluindo número e letra maiúscula",
-        }))
-        passwordInputRef.current?.focus()
-        return
-      }
+      // Removida validação de formato de senha - deixar Supabase validar
+      // A validação de senha deve ser apenas no cadastro, não no login
 
       const now = Date.now()
       if (blockedUntil && now < blockedUntil) {
