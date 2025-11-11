@@ -6,7 +6,8 @@ import { supabase } from "@/lib/supabase"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
-import { Truck, Mail, Lock } from "lucide-react"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Mail, Lock, Eye, EyeOff, Moon, Sun, Globe, ChevronDown } from "lucide-react"
 import { motion } from "framer-motion"
 import { AuthManager } from "@/lib/auth"
 import { getUserRoleByEmail } from "@/lib/user-role"
@@ -33,11 +34,34 @@ function LoginContent() {
   const [passwordValid, setPasswordValid] = useState(false)
   const [fieldErrors, setFieldErrors] = useState<{ email?: string; password?: string }>({})
   const [success, setSuccess] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
+  const [rememberMe, setRememberMe] = useState(false)
+  const [darkMode, setDarkMode] = useState(false)
+  const [language, setLanguage] = useState("Português")
+  const [showLanguageDropdown, setShowLanguageDropdown] = useState(false)
+  const languageDropdownRef = useRef<HTMLDivElement | null>(null)
   const emailInputRef = useRef<HTMLInputElement | null>(null)
   const passwordInputRef = useRef<HTMLInputElement | null>(null)
   const [failedAttempts, setFailedAttempts] = useState<number>(0)
   const [blockedUntil, setBlockedUntil] = useState<number | null>(null)
   const [transitioning, setTransitioning] = useState<boolean>(false)
+
+  // Fechar dropdown ao clicar fora
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (languageDropdownRef.current && !languageDropdownRef.current.contains(event.target as Node)) {
+        setShowLanguageDropdown(false)
+      }
+    }
+
+    if (showLanguageDropdown) {
+      document.addEventListener('mousedown', handleClickOutside)
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [showLanguageDropdown])
 
   useEffect(() => {
     // Check if user is already logged in
@@ -45,13 +69,10 @@ function LoginContent() {
       if (session) {
         const nextUrl = searchParams.get('next')
         if (nextUrl) {
-          // Se há um parâmetro next, redireciona para lá
           const cleanNextUrl = decodeURIComponent(nextUrl).split('?')[0]
           router.push(cleanNextUrl)
         } else {
-          // Senão, redireciona baseado no role
           const userRole = session.user.user_metadata?.role || getUserRoleByEmail(session.user.email)
-          // Garantir URL limpa sem parâmetros
           const cleanUrl = `/${userRole}`.split('?')[0]
           router.push(cleanUrl)
         }
@@ -59,7 +80,7 @@ function LoginContent() {
     })
   }, [router, searchParams])
 
-  // Buscar CSRF token (GET) para proteger POST subsequente
+  // Buscar CSRF token
   useEffect(() => {
     const fetchCsrf = async () => {
       try {
@@ -69,7 +90,6 @@ function LoginContent() {
           if (data?.token) setCsrfToken(data.token)
         }
       } catch (_e) {
-        // Gerar token CSRF cliente (double-submit cookie) caso rota não exista
         try {
           const token = Math.random().toString(36).slice(2) + Date.now().toString(36)
           document.cookie = `golffox-csrf=${token}; path=/; SameSite=Lax`
@@ -112,13 +132,10 @@ function LoginContent() {
     if (!raw) return null
     try {
       const decoded = decodeURIComponent(raw)
-      // Permitir apenas paths internos
       if (/^https?:\/\//i.test(decoded)) return null
       if (!decoded.startsWith('/')) return null
       const url = new URL(decoded, window.location.origin)
-      // Remover parâmetro ?company= se existir
       url.searchParams.delete('company')
-      // Retornar apenas pathname (sem query params indesejados)
       return url.pathname
     } catch {
       return null
@@ -185,7 +202,6 @@ function LoginContent() {
       setError(null)
       const prevCursor = typeof document !== "undefined" ? document.body.style.cursor : ""
       if (typeof document !== "undefined") document.body.style.cursor = "progress"
-      passwordInputRef.current?.focus()
 
       const controller = new AbortController()
       const timeoutId = window.setTimeout(() => controller.abort(), 10_000)
@@ -221,7 +237,7 @@ function LoginContent() {
               role: user.role ?? getUserRoleByEmail(user.email),
               accessToken: token,
             },
-            { token, storage: "both" }
+            { token, storage: rememberMe ? "both" : "session" }
           )
 
           setFailedAttempts(0)
@@ -299,73 +315,223 @@ function LoginContent() {
       password,
       router,
       searchParams,
+      rememberMe,
     ]
   )
 
+  // Estrelas decorativas para a seção esquerda
+  const StarField = () => {
+    const stars = Array.from({ length: 50 }, (_, i) => ({
+      id: i,
+      x: Math.random() * 100,
+      y: Math.random() * 100,
+      size: Math.random() * 2 + 1,
+      opacity: Math.random() * 0.5 + 0.3,
+    }))
+
+    return (
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {stars.map((star) => (
+          <div
+            key={star.id}
+            className="absolute rounded-full bg-white"
+            style={{
+              left: `${star.x}%`,
+              top: `${star.y}%`,
+              width: `${star.size}px`,
+              height: `${star.size}px`,
+              opacity: star.opacity,
+            }}
+          />
+        ))}
+      </div>
+    )
+  }
+
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-[var(--bg)] via-[var(--bg-soft)] to-[var(--bg)]">
-      <div className="w-full max-w-md">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <Card className="relative p-8 backdrop-blur-xl bg-white/10 border-white/20 overflow-hidden">
-            {loading && (
-              <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-white/70 backdrop-blur-sm">
-                <div className="animate-spin rounded-full h-8 w-8 border-2 border-[var(--brand)] border-t-transparent" />
-                <span className="mt-3 text-sm text-[var(--muted)]">Validando credenciais…</span>
-              </div>
-            )}
-            <div className="text-center mb-8">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-[var(--brand)] flex items-center justify-center">
-                <Truck className="h-8 w-8 text-white" />
-              </div>
-              <h1 className="text-3xl font-bold mb-2">GOLF FOX</h1>
-              <p className="text-[var(--muted)]">Sistema de Gestão de Transportes</p>
+    <div className="min-h-screen flex flex-col lg:flex-row">
+      {/* Seção Esquerda - Promocional (apenas desktop) */}
+      <motion.div
+        initial={{ opacity: 0, x: -50 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.6 }}
+        className="hidden lg:flex lg:w-1/2 relative bg-gradient-to-br from-[var(--accent)] via-[var(--accent-soft)] to-[var(--accent-dark)] overflow-hidden"
+      >
+        <StarField />
+        <div className="relative z-10 flex flex-col justify-center items-start px-12 xl:px-16 text-white">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="mb-8"
+          >
+            <div className="w-20 h-20 rounded-2xl bg-[var(--brand)] flex items-center justify-center mb-8 shadow-lg">
+              <span className="text-4xl font-bold text-white">G</span>
             </div>
+          </motion.div>
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="text-4xl xl:text-5xl font-bold mb-6 leading-tight"
+          >
+            Gestão Inteligente de Frotas
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="text-lg xl:text-xl text-white/90 leading-relaxed max-w-md"
+          >
+            Otimize rotas, monitore veículos em tempo real e reduza custos operacionais com a plataforma mais completa do mercado.
+          </motion.p>
+        </div>
+      </motion.div>
 
-            {error && (
-              <div
-                className="mb-4 p-4 bg-[var(--err)]/10 border border-[var(--err)] rounded-xl text-sm text-[var(--err)]"
-                role="alert"
-                aria-live="assertive"
+      {/* Banner Promocional Mobile (apenas mobile) */}
+      <div className="lg:hidden relative bg-gradient-to-r from-[var(--accent)] to-[var(--accent-dark)] text-white py-6 px-6 overflow-hidden">
+        <div className="absolute inset-0 opacity-20">
+          <StarField />
+        </div>
+        <div className="relative z-10 flex items-center gap-3">
+          <div className="w-12 h-12 rounded-xl bg-[var(--brand)] flex items-center justify-center shadow-lg flex-shrink-0">
+            <span className="text-2xl font-bold text-white">G</span>
+          </div>
+          <div>
+            <h2 className="text-lg font-bold leading-tight">Gestão Inteligente de Frotas</h2>
+            <p className="text-sm text-white/80 mt-1">Plataforma completa para gestão de frotas</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Seção Direita - Formulário */}
+      <div className="flex-1 lg:w-1/2 bg-[#FAF9F7] flex flex-col min-h-screen">
+        {/* Controles do Topo */}
+        <div className="flex justify-end items-center gap-3 sm:gap-4 p-4 sm:p-6">
+          {/* Dropdown de Idioma */}
+          <div className="relative" ref={languageDropdownRef}>
+            <button
+              onClick={() => setShowLanguageDropdown(!showLanguageDropdown)}
+              className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-gray-700 hover:bg-white/50 transition-colors"
+              aria-expanded={showLanguageDropdown}
+              aria-haspopup="true"
+            >
+              <Globe className="w-4 h-4" />
+              <span className="hidden sm:inline">{language}</span>
+              <span className="sm:hidden">PT</span>
+              <ChevronDown className={`w-4 h-4 transition-transform ${showLanguageDropdown ? 'rotate-180' : ''}`} />
+            </button>
+            {showLanguageDropdown && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50"
               >
-                {error}
-              </div>
+                {["Português", "English", "Español"].map((lang) => (
+                  <button
+                    key={lang}
+                    onClick={() => {
+                      setLanguage(lang)
+                      setShowLanguageDropdown(false)
+                    }}
+                    className={`w-full text-left px-4 py-2 text-sm transition-colors ${
+                      language === lang
+                        ? "bg-gray-50 text-[var(--brand)] font-medium"
+                        : "text-gray-700 hover:bg-gray-50"
+                    }`}
+                  >
+                    {lang}
+                  </button>
+                ))}
+              </motion.div>
             )}
+          </div>
 
-            {success && !error && (
-              <div className="mb-4 p-3 bg-emerald-500/10 border border-emerald-400 rounded-xl text-sm text-emerald-600 flex items-center justify-center gap-2">
-                <span className="font-medium">Login realizado com sucesso!</span>
+          {/* Toggle Dark Mode */}
+          <button
+            onClick={() => setDarkMode(!darkMode)}
+            className="p-2 rounded-lg text-gray-700 hover:bg-white/50 transition-colors"
+            aria-label="Toggle dark mode"
+          >
+            {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+          </button>
+        </div>
+
+        {/* Card de Login */}
+        <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-12 py-6 sm:py-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="w-full max-w-md"
+          >
+            <Card className="relative p-6 sm:p-8 lg:p-10 bg-white shadow-xl border-0">
+              {loading && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-white/95 backdrop-blur-sm rounded-[var(--radius-xl)]"
+                >
+                  <div className="animate-spin rounded-full h-10 w-10 border-4 border-[var(--brand)] border-t-transparent" />
+                  <span className="mt-4 text-sm text-gray-600 font-medium">Validando credenciais…</span>
+                </motion.div>
+              )}
+
+              {/* Logo e Título */}
+              <div className="mb-6 sm:mb-8">
+                <div className="flex items-center gap-2 mb-4 sm:mb-6">
+                  <div className="w-10 h-10 rounded-xl bg-[var(--brand)] flex items-center justify-center">
+                    <span className="text-xl font-bold text-white">G</span>
+                  </div>
+                  <span className="text-xl sm:text-2xl font-bold text-gray-900">
+                    <span className="text-[var(--brand)]">G</span> GOLF FOX
+                  </span>
+                </div>
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Entre em sua conta</h1>
+                <p className="text-sm sm:text-base text-gray-600">Acesse sua frota com inteligência e controle total.</p>
               </div>
-            )}
 
-            <form
-              tabIndex={0}
-              noValidate
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || (e as any).keyCode === 13) {
+              {/* Mensagens de Erro/Sucesso */}
+              {error && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700"
+                  role="alert"
+                  aria-live="assertive"
+                >
+                  {error}
+                </motion.div>
+              )}
+
+              {success && !error && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="mb-6 p-4 bg-emerald-50 border border-emerald-200 rounded-xl text-sm text-emerald-700 flex items-center gap-2"
+                >
+                  <span className="font-medium">Login realizado com sucesso!</span>
+                </motion.div>
+              )}
+
+              {/* Formulário */}
+              <form
+                onSubmit={(e) => {
                   e.preventDefault()
                   if (!loading) {
                     handleLogin()
                   }
-                }
-              }}
-              onSubmit={(e) => {
-                e.preventDefault()
-                if (!loading) {
-                  handleLogin()
-                }
-              }}
-            >
-              <div className="space-y-4 mb-6">
+                }}
+                className="space-y-5"
+              >
+                {/* Campo Email */}
                 <div>
-                  <label className="block text-sm font-medium mb-2" htmlFor="login-email">
+                  <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="login-email">
                     E-mail
                   </label>
                   <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-[var(--muted)]" />
+                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
                     <Input
                       id="login-email"
                       ref={emailInputRef}
@@ -373,73 +539,123 @@ function LoginContent() {
                       placeholder="seu@email.com"
                       value={email}
                       onChange={(e) => setEmail(sanitizeInput(e.target.value))}
-                      aria-invalid={!emailValid}
+                      aria-invalid={email && !emailValid}
                       autoComplete="email"
-                      className={`pl-10 ${emailValid ? "" : "border-[var(--err)]"}`}
+                      className={`pl-12 h-12 bg-gray-50 border-gray-200 focus:border-[var(--brand)] focus:ring-2 focus:ring-[var(--brand)]/20 ${
+                        fieldErrors.email ? "border-red-300 focus:border-red-400 focus:ring-red-200" : ""
+                      }`}
                     />
                   </div>
                   {fieldErrors.email && (
-                    <p className="mt-2 text-xs text-[var(--err)]" aria-live="assertive">
+                    <p className="mt-2 text-xs text-red-600" aria-live="assertive">
                       {fieldErrors.email}
                     </p>
                   )}
                 </div>
 
+                {/* Campo Senha */}
                 <div>
-                  <label className="block text-sm font-medium mb-2" htmlFor="login-password">
+                  <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="login-password">
                     Senha
                   </label>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-[var(--muted)]" />
+                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
                     <Input
                       id="login-password"
-                      type="password"
+                      type={showPassword ? "text" : "password"}
                       placeholder="••••••••"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       ref={passwordInputRef}
-                      aria-invalid={!passwordValid}
+                      aria-invalid={password && !passwordValid}
                       autoComplete="current-password"
-                      className={`pl-10 ${passwordValid ? "" : "border-[var(--err)]"}`}
+                      className={`pl-12 pr-12 h-12 bg-gray-50 border-gray-200 focus:border-[var(--brand)] focus:ring-2 focus:ring-[var(--brand)]/20 ${
+                        fieldErrors.password ? "border-red-300 focus:border-red-400 focus:ring-red-200" : ""
+                      }`}
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                      aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
+                    >
+                      {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                    </button>
                   </div>
                   {fieldErrors.password && (
-                    <p className="mt-2 text-xs text-[var(--err)]" aria-live="assertive">
+                    <p className="mt-2 text-xs text-red-600" aria-live="assertive">
                       {fieldErrors.password}
                     </p>
                   )}
                 </div>
-              </div>
 
-              <Button
-                type="submit"
-                disabled={loading}
-                className="w-full mb-6"
-                onTouchEnd={(e) => {
-                  e.preventDefault()
-                  if (!loading) {
-                    handleLogin()
-                  }
-                }}
-              >
-                {loading ? "Validando..." : "Entrar"}
-              </Button>
-            </form>
+                {/* Checkbox e Link */}
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                  <div className="flex items-center gap-2.5">
+                    <Checkbox
+                      id="remember-me"
+                      checked={rememberMe}
+                      onCheckedChange={(checked) => setRememberMe(checked === true)}
+                      className="h-4 w-4 rounded border-gray-300 data-[state=checked]:bg-[var(--brand)] data-[state=checked]:border-[var(--brand)] data-[state=checked]:text-white focus-visible:ring-2 focus-visible:ring-[var(--brand)]/20"
+                    />
+                    <label
+                      htmlFor="remember-me"
+                      className="text-sm text-gray-600 cursor-pointer select-none hover:text-gray-700 transition-colors"
+                    >
+                      Manter conectado
+                    </label>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      // TODO: Implementar recuperação de senha
+                      setError("Funcionalidade em desenvolvimento")
+                    }}
+                    className="text-sm font-medium text-[var(--brand)] hover:text-[var(--brand-hover)] transition-colors"
+                  >
+                    Esqueceu sua senha?
+                  </button>
+                </div>
 
-            {transitioning && (
-              <div className="flex items-center justify-center" aria-live="polite">
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600 mr-2" />
-                <span className="text-sm text-[var(--muted)]">Redirecionando…</span>
-              </div>
-            )}
+                {/* Botão Entrar */}
+                <Button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full h-12 bg-[var(--brand)] hover:bg-[var(--brand-hover)] text-white font-semibold text-base shadow-md hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {loading ? (
+                    <span className="flex items-center gap-2">
+                      <span className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></span>
+                      Validando...
+                    </span>
+                  ) : (
+                    "Entrar"
+                  )}
+                </Button>
+              </form>
 
-            <noscript>
-              <p className="mt-6 text-xs text-center text-[var(--muted)]">
-                Ative o JavaScript para utilizar o login. Caso não seja possível, entre em contato com o suporte.
-              </p>
-            </noscript>
-          </Card>
-        </motion.div>
+              {/* Estado de Transição */}
+              {transitioning && !loading && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="mt-6 flex items-center justify-center gap-2"
+                  aria-live="polite"
+                >
+                  <div className="animate-spin rounded-full h-5 w-5 border-2 border-[var(--brand)] border-t-transparent" />
+                  <span className="text-sm text-gray-600">Redirecionando…</span>
+                </motion.div>
+              )}
+
+              {/* Mensagem JavaScript */}
+              <noscript>
+                <p className="mt-6 text-xs text-center text-gray-500">
+                  Ative o JavaScript para utilizar o login. Caso não seja possível, entre em contato com o suporte.
+                </p>
+              </noscript>
+            </Card>
+          </motion.div>
+        </div>
       </div>
     </div>
   )
@@ -447,14 +663,16 @@ function LoginContent() {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center">
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-[#FAF9F7]">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+          <div className="animate-spin rounded-full h-10 w-10 border-4 border-[var(--brand)] border-t-transparent mx-auto"></div>
           <p className="mt-4 text-gray-600">Carregando...</p>
         </div>
-      </div>
-    }>
+        </div>
+      }
+    >
       <LoginContent />
     </Suspense>
   )
