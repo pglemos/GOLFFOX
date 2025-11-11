@@ -97,7 +97,30 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Falha na autenticação - sessão não criada' }, { status: 401 })
     }
 
-    const role = getUserRoleByEmail(data.user.email || email)
+    // Tentar obter role dos metadados do usuário primeiro
+    let role = data.user.user_metadata?.role || data.user.app_metadata?.role
+    
+    // Se não encontrar nos metadados, buscar na tabela users do Supabase
+    if (!role && data.user.id) {
+      try {
+        const { data: userData, error: userError } = await supabase
+          .from('users')
+          .select('role')
+          .eq('id', data.user.id)
+          .single()
+        
+        if (!userError && userData?.role) {
+          role = userData.role
+        }
+      } catch (err) {
+        debug('Erro ao buscar role na tabela users', { error: err }, 'AuthAPI')
+      }
+    }
+    
+    // Fallback: usar função getUserRoleByEmail se ainda não encontrou
+    if (!role) {
+      role = getUserRoleByEmail(data.user.email || email)
+    }
     const token = data.session.access_token
     const userPayload = {
       id: data.user.id,
