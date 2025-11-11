@@ -133,10 +133,26 @@ function LoginContent() {
 
 
   useEffect(() => {
-    if (loading) return
-    // Check if user is already logged in
+    // Não verificar sessão se estiver em processo de login
+    if (loading || transitioning) return
+    
+    // Verificar cookie de sessão primeiro (mais rápido)
+    if (typeof window !== 'undefined') {
+      const hasSessionCookie = document.cookie.includes('golffox-session')
+      if (hasSessionCookie) {
+        const nextUrl = searchParams.get('next')
+        if (nextUrl) {
+          const cleanNextUrl = decodeURIComponent(nextUrl).split('?')[0]
+          console.log('🔄 Cookie de sessão encontrado, redirecionando para:', cleanNextUrl)
+          window.location.href = cleanNextUrl
+          return
+        }
+      }
+    }
+    
+    // Check if user is already logged in via Supabase
     supabase.auth.getSession().then(({ data: { session } }: { data: { session: any } }) => {
-      if (session) {
+      if (session && !loading && !transitioning) {
         const nextUrl = searchParams.get('next')
         if (nextUrl) {
           const cleanNextUrl = decodeURIComponent(nextUrl).split('?')[0]
@@ -158,7 +174,7 @@ function LoginContent() {
         }
       }
     })
-  }, [router, searchParams, loading])
+  }, [router, searchParams, loading, transitioning])
 
   // Buscar CSRF token
   useEffect(() => {
