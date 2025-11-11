@@ -69,7 +69,7 @@ class _RouteFiltersState extends State<RouteFilters> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
-                  color: const Color(GfTokens.primary).withValues(alpha: 0.1),
+                  color: GfTokens.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
@@ -155,8 +155,8 @@ class _RouteFiltersState extends State<RouteFilters> {
           fontWeight: FontWeight.w500,
         ),
       ),
-      backgroundColor: color.withValues(alpha: 0.1),
-      side: BorderSide(color: color.withValues(alpha: 0.3)),
+      backgroundColor: color.withOpacity(0.1),
+      side: BorderSide(color: color.withOpacity(0.3)),
       deleteIcon: Icon(
         Icons.close,
         size: 16,
@@ -190,7 +190,7 @@ class _RouteFiltersState extends State<RouteFilters> {
                 widget.onStatusChanged(selected ? status : null);
               },
               backgroundColor: Colors.transparent,
-              selectedColor: Color(status.colorValue).withValues(alpha: 0.1),
+              selectedColor: status.colorValue.withValues(alpha: 0.1),
               checkmarkColor: Color(status.colorValue),
               side: BorderSide(
                 color: isSelected

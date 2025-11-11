@@ -174,10 +174,10 @@ class RouteStopItem extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
             decoration: BoxDecoration(
-              color: const Color(GfTokens.success).withValues(alpha: 0.1),
+              color: GfTokens.success.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(GfTokens.radiusSm),
               border: Border.all(
-                color: const Color(GfTokens.success).withValues(alpha: 0.3),
+                color: GfTokens.success.withValues(alpha: 0.3),
               ),
             ),
             child: Row(

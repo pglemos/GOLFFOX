@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/gf_tokens.dart';
-import '../../../models/fuel_record.dart';
+import '../../../models/fuel_record.dart' show FuelRecord, FuelRecordType, FuelConsumptionStats;
 import '../../../services/vehicle_service.dart';
 
 class VehicleFuelChart extends ConsumerStatefulWidget {

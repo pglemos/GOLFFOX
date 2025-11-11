@@ -143,7 +143,7 @@ class _DriverFiltersPanelState extends State<DriverFiltersPanel> {
             onSelected: (selected) => _updateFilters(
               _filters.copyWith(status: selected ? status : null),
             ),
-            backgroundColor: statusColor.withValues(alpha: 0.12),
+            backgroundColor: statusColor.withOpacity(0.12),
             selectedColor: statusColor,
             checkmarkColor: Colors.white,
             labelStyle: TextStyle(

@@ -3,10 +3,14 @@
 // Página para criar e editar motoristas
 // ========================================
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:uuid/uuid.dart';
 
 import '../../core/services/error_service.dart';
 import '../../core/services/snackbar_service.dart';
@@ -52,8 +56,10 @@ class _CreateDriverPageState extends ConsumerState<CreateDriverPage> {
   DriverStatus _status = DriverStatus.active;
   LicenseCategory _licenseCategory = LicenseCategory.b;
   bool _isOnline = false;
-  bool _isAvailable = true;
   String? _photoUrl;
+  File? _photoFile;
+  final ImagePicker _imagePicker = ImagePicker();
+  final Uuid _uuid = const Uuid();
   List<DriverCertification> _certifications = [];
   GxError? _pageError;
 
@@ -96,7 +102,6 @@ class _CreateDriverPageState extends ConsumerState<CreateDriverPage> {
       _status = driver.status;
       _licenseCategory = driver.license.category;
       _isOnline = driver.isOnline;
-      _isAvailable = driver.isAvailable;
       _photoUrl = driver.profileImageUrl;
       _certifications = List.from(driver.certifications);
     }
@@ -270,10 +275,12 @@ class _CreateDriverPageState extends ConsumerState<CreateDriverPage> {
                   radius: 50,
                   backgroundColor:
                       GfTokens.colorPrimary.withValues(alpha: 0.1),
-                  backgroundImage: _photoUrl != null 
-                      ? NetworkImage(_photoUrl!)
-                      : null,
-                  child: _photoUrl == null
+                  backgroundImage: _photoFile != null
+                      ? FileImage(_photoFile!)
+                      : _photoUrl != null 
+                          ? NetworkImage(_photoUrl!)
+                          : null,
+                  child: _photoFile == null && _photoUrl == null
                       ? const Icon(
                           Icons.person,
                           size: 50,
@@ -496,34 +503,16 @@ class _CreateDriverPageState extends ConsumerState<CreateDriverPage> {
 
           const SizedBox(height: GfTokens.spacingMd),
 
-          // Switches
-          Row(
-            children: [
-              Expanded(
-                child: SwitchListTile(
-                  title: const Text('Online'),
-                  subtitle: const Text('Disponível para receber viagens'),
-                  value: _isOnline,
-                  onChanged: (value) {
-                    setState(() {
-                      _isOnline = value;
-                    });
-                  },
-                ),
-              ),
-              Expanded(
-                child: SwitchListTile(
-                  title: const Text('Disponível'),
-                  subtitle: const Text('Pode ser atribuído a veículos'),
-                  value: _isAvailable,
-                  onChanged: (value) {
-                    setState(() {
-                      _isAvailable = value;
-                    });
-                  },
-                ),
-              ),
-            ],
+          // Switch Online
+          SwitchListTile(
+            title: const Text('Online'),
+            subtitle: const Text('Disponível para receber viagens'),
+            value: _isOnline,
+            onChanged: (value) {
+              setState(() {
+                _isOnline = value;
+              });
+            },
           ),
         ],
       ),
@@ -884,12 +873,29 @@ class _CreateDriverPageState extends ConsumerState<CreateDriverPage> {
     return true;
   }
 
-  void _selectPhoto() {
-    // TODO(golffox-team): Implementar selecao de foto
-    SnackBarService.infoText(
-      context,
-      'Funcionalidade de foto será implementada em breve',
-    );
+  Future<void> _selectPhoto() async {
+    try {
+      final XFile? image = await _imagePicker.pickImage(
+        source: ImageSource.gallery,
+        maxWidth: 800,
+        maxHeight: 800,
+        imageQuality: 85,
+      );
+
+      if (image != null) {
+        setState(() {
+          _photoFile = File(image.path);
+          // TODO: Upload da foto para storage (Supabase/Cloud) e obter URL
+          // Por enquanto, mantém apenas o arquivo local
+        });
+        SnackBarService.successText(context, 'Foto selecionada com sucesso');
+      }
+    } catch (e) {
+      SnackBarService.errorText(
+        context,
+        'Erro ao selecionar foto: ${e.toString()}',
+      );
+    }
   }
 
   Future<void> _selectBirthDate() async {
@@ -952,12 +958,156 @@ class _CreateDriverPageState extends ConsumerState<CreateDriverPage> {
     }
   }
 
-  void _addCertification() {
-    // TODO(golffox-team): Implementar adicao de certificacao
-    SnackBarService.infoText(
-      context,
-      'Funcionalidade de certificação será implementada em breve',
+  Future<void> _addCertification() async {
+    final nameController = TextEditingController();
+    final descriptionController = TextEditingController();
+    final organizationController = TextEditingController();
+    final certificateNumberController = TextEditingController();
+    DateTime? issueDate;
+    DateTime? expiryDate;
+
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: const Text('Adicionar Certificação'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: nameController,
+                  decoration: const InputDecoration(
+                    labelText: 'Nome da Certificação *',
+                    hintText: 'Ex: Transporte Escolar',
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: descriptionController,
+                  decoration: const InputDecoration(
+                    labelText: 'Descrição',
+                    hintText: 'Descrição da certificação',
+                  ),
+                  maxLines: 2,
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: organizationController,
+                  decoration: const InputDecoration(
+                    labelText: 'Órgão Emissor *',
+                    hintText: 'Ex: DETRAN-SP',
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: certificateNumberController,
+                  decoration: const InputDecoration(
+                    labelText: 'Número do Certificado',
+                    hintText: 'Número opcional',
+                  ),
+                ),
+                const SizedBox(height: 16),
+                InkWell(
+                  onTap: () async {
+                    final date = await showDatePicker(
+                      context: context,
+                      initialDate: issueDate ?? DateTime.now(),
+                      firstDate: DateTime.now().subtract(const Duration(days: 365 * 10)),
+                      lastDate: DateTime.now(),
+                    );
+                    if (date != null) {
+                      setDialogState(() {
+                        issueDate = date;
+                      });
+                    }
+                  },
+                  child: InputDecorator(
+                    decoration: const InputDecoration(
+                      labelText: 'Data de Emissão *',
+                      prefixIcon: Icon(Icons.calendar_today),
+                    ),
+                    child: Text(
+                      issueDate != null
+                          ? '${issueDate!.day}/${issueDate!.month}/${issueDate!.year}'
+                          : 'Selecionar data',
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                InkWell(
+                  onTap: () async {
+                    final date = await showDatePicker(
+                      context: context,
+                      initialDate: expiryDate ?? DateTime.now().add(const Duration(days: 365)),
+                      firstDate: DateTime.now(),
+                      lastDate: DateTime.now().add(const Duration(days: 365 * 10)),
+                    );
+                    if (date != null) {
+                      setDialogState(() {
+                        expiryDate = date;
+                      });
+                    }
+                  },
+                  child: InputDecorator(
+                    decoration: const InputDecoration(
+                      labelText: 'Data de Vencimento (opcional)',
+                      prefixIcon: Icon(Icons.event),
+                    ),
+                    child: Text(
+                      expiryDate != null
+                          ? '${expiryDate!.day}/${expiryDate!.month}/${expiryDate!.year}'
+                          : 'Selecionar data',
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Cancelar'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                if (nameController.text.trim().isEmpty ||
+                    organizationController.text.trim().isEmpty ||
+                    issueDate == null) {
+                  SnackBarService.errorText(
+                    context,
+                    'Preencha todos os campos obrigatórios',
+                  );
+                  return;
+                }
+                Navigator.of(context).pop(true);
+              },
+              child: const Text('Adicionar'),
+            ),
+          ],
+        ),
+      ),
     );
+
+    if (result == true && issueDate != null) {
+      final certification = DriverCertification(
+        id: _uuid.v4(),
+        name: nameController.text.trim(),
+        description: descriptionController.text.trim(),
+        issueDate: issueDate,
+        expiryDate: expiryDate,
+        issuingOrganization: organizationController.text.trim(),
+        certificateNumber: certificateNumberController.text.trim().isEmpty
+            ? null
+            : certificateNumberController.text.trim(),
+      );
+
+      setState(() {
+        _certifications.add(certification);
+      });
+
+      SnackBarService.successText(context, 'Certificação adicionada com sucesso');
+    }
   }
 
   void _removeCertification(int index) {
@@ -994,6 +1144,7 @@ class _CreateDriverPageState extends ConsumerState<CreateDriverPage> {
         ),
         certifications: _certifications,
         isOnline: _isOnline,
+        status: _isOnline && _status == DriverStatus.active ? DriverStatus.available : _status,
         emergencyContact: _emergencyContactController.text.trim(),
         emergencyPhone: _emergencyPhoneController.text.trim(),
         ratings: widget.driver?.ratings ?? [],

@@ -181,11 +181,10 @@ class _RouteDetailsPageState extends ConsumerState<RouteDetailsPage>
                   vertical: GfTokens.space2,
                 ),
                 decoration: BoxDecoration(
-                  color: Color(route.status.colorValue).withValues(alpha: 0.1),
+                  color: route.status.colorValue.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(GfTokens.radiusSmall),
                   border: Border.all(
-                    color:
-                        Color(route.status.colorValue).withValues(alpha: 0.3),
+                    color: route.status.colorValue.withValues(alpha: 0.3),
                   ),
                 ),
                 child: Row(
@@ -289,9 +288,9 @@ class _RouteDetailsPageState extends ConsumerState<RouteDetailsPage>
   }) => Container(
       padding: const EdgeInsets.all(GfTokens.space3),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
+        color: color.withOpacity(0.1),
         borderRadius: BorderRadius.circular(GfTokens.radiusMd),
-        border: Border.all(color: color.withValues(alpha: 0.3)),
+        border: Border.all(color: color.withOpacity(0.3)),
       ),
       child: Column(
         children: [

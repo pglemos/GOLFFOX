@@ -44,7 +44,7 @@ class _BusStopsPanelState extends State<BusStopsPanel> {
         border: Border.all(color: const Color(GfTokens.stroke)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.15),
+            color: Colors.black.withOpacity(0.15),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -57,7 +57,7 @@ class _BusStopsPanelState extends State<BusStopsPanel> {
           Container(
             padding: const EdgeInsets.all(GfTokens.space4),
             decoration: BoxDecoration(
-              color: GolfFoxTheme.primaryOrange.withValues(alpha: 0.1),
+              color: GolfFoxTheme.primaryOrange.withOpacity(0.1),
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(GfTokens.radius),
                 topRight: Radius.circular(GfTokens.radius),
@@ -186,8 +186,7 @@ class _BusStopTile extends StatelessWidget {
               width: 32,
               height: 32,
               decoration: BoxDecoration(
-                color:
-                    Color(stop.status.colorValue).withValues(alpha: 0.1),
+                color: stop.status.colorValue.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
                   color: Color(stop.status.colorValue),

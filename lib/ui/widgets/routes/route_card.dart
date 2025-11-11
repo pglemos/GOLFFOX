@@ -33,7 +33,7 @@ class RouteCard extends StatelessWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(GfTokens.radiusMd),
           side: BorderSide(
-            color: Color(route.status.colorValue).withValues(alpha: 0.3),
+            color: route.status.colorValue.withValues(alpha: 0.3),
           ),
         ),
         child: InkWell(
@@ -197,10 +197,10 @@ class RouteCard extends StatelessWidget {
         vertical: 4,
       ),
       decoration: BoxDecoration(
-        color: Color(route.status.colorValue).withValues(alpha: 0.1),
+        color: route.status.colorValue.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(GfTokens.radiusSm),
         border: Border.all(
-          color: Color(route.status.colorValue).withValues(alpha: 0.3),
+          color: route.status.colorValue.withValues(alpha: 0.3),
         ),
       ),
       child: Row(

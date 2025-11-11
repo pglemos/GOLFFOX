@@ -1,6 +1,6 @@
 // ========================================
 // GolfFox Dashboard v11.0 - Clear Theme
-// P├ígina principal do painel administrativo
+// Página principal do painel administrativo
 // ========================================
 
 import 'package:fl_chart/fl_chart.dart';
@@ -8,6 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/routing/app_router.dart';
+import '../../core/routing/app_routes.dart';
 import '../../core/services/logger_service.dart';
 import '../../core/theme/gf_tokens.dart';
 import '../../data/golf_fox_repo.dart';
@@ -64,7 +66,7 @@ class DashboardPage extends ConsumerWidget {
                   const SizedBox(height: GfTokens.space8),
 
                   // ========================================
-                  // GR├üFICO DE OCUPA├ç├âO
+                  // GRÁFICO DE OCUPAÇÃO
                   // ========================================
                   _buildOccupancyChart(),
 
@@ -110,7 +112,7 @@ class DashboardPage extends ConsumerWidget {
         ).animate().fadeIn(duration: 300.ms).slideX(begin: -0.1, end: 0),
         const SizedBox(height: GfTokens.space2),
         const Text(
-          'Vis├úo geral das opera├º├Áes em tempo real',
+          'Visão geral das operações em tempo real',
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w400,
@@ -127,7 +129,7 @@ class DashboardPage extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'M├®tricas principais',
+          'Métricas principais',
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.w600,
@@ -159,19 +161,19 @@ class DashboardPage extends ConsumerWidget {
           children: [
             GfKpiCardVariants.inTransit(
               value: '${metrics['inTransit'] ?? 0}',
-              onTap: _navigateToTrips,
+              onTap: () => _navigateToTrips(context),
             ),
             GfKpiCardVariants.activeVehicles(
               value: '${metrics['activeVehicles'] ?? 0}',
-              onTap: _navigateToVehicles,
+              onTap: () => _navigateToVehicles(context),
             ),
             GfKpiCardVariants.routesToday(
               value: '${metrics['routesToday'] ?? 0}',
-              onTap: _navigateToRoutes,
+              onTap: () => _navigateToRoutes(context),
             ),
             GfKpiCardVariants.criticalAlerts(
               value: '${metrics['criticalAlerts'] ?? 0}',
-              onTap: _navigateToAlerts,
+              onTap: () => _navigateToAlerts(context),
             ),
           ],
         );
@@ -220,7 +222,7 @@ class DashboardPage extends ConsumerWidget {
           ),
           SizedBox(height: GfTokens.space3),
           Text(
-            'Erro ao carregar m├®tricas',
+            'Erro ao carregar métricas',
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
@@ -250,7 +252,7 @@ class DashboardPage extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'Ocupa├º├úo por hor├írio',
+            'Ocupação por horário',
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w600,
@@ -362,7 +364,7 @@ class DashboardPage extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'A├º├Áes R├ípidas',
+          'Ações Rápidas',
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.w600,
@@ -453,10 +455,10 @@ class DashboardPage extends ConsumerWidget {
           ),
           const SizedBox(height: GfTokens.space4),
           const Text(
-            '- Pico de demanda identificado entre 17h-19h com 85% de ocupa├º├úo├º├úo\n'
-            '- Rota Centro-Zona Sul apresenta maior efici├¬ncia operacional\n'
-            '- Sugest├úo: adicionar 2 ve├¡culos no hor├írio de pico para otimizar fluxo\n'
-            '- Economia potencial de 15% no combust├¡vel com ajuste de rotas',
+            '- Pico de demanda identificado entre 17h-19h com 85% de ocupação\n'
+            '- Rota Centro-Zona Sul apresenta maior eficiência operacional\n'
+            '- Sugestão: adicionar 2 veículos no horário de pico para otimizar fluxo\n'
+            '- Economia potencial de 15% no combustível com ajuste de rotas',
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w400,
@@ -474,43 +476,78 @@ class DashboardPage extends ConsumerWidget {
   // ========================================
   // METODOS DE NAVEGACAO
   // ========================================
-  void _navigateToTrips() {
-    // TODO(golffox-team): Implementar navega├º├úo para viagens
-    LoggerService.instance.debug('Navegando para viagens');
+  static void _navigateToTrips(BuildContext context) {
+    try {
+      AppRouter.instance.go(AppRoutes.operatorTrips);
+    } catch (e) {
+      LoggerService.instance.error('Erro ao navegar para viagens: $e');
+    }
   }
 
-  void _navigateToVehicles() {
-    // TODO(golffox-team): Implementar navega├º├úo para ve├¡culos
-    LoggerService.instance.debug('Navegando para ve├¡culos');
+  static void _navigateToVehicles(BuildContext context) {
+    try {
+      AppRouter.instance.go(AppRoutes.operatorVehicles);
+    } catch (e) {
+      LoggerService.instance.error('Erro ao navegar para veículos: $e');
+    }
   }
 
-  void _navigateToRoutes() {
-    // TODO(golffox-team): Implementar navega├º├úo para rotas
-    LoggerService.instance.debug('Navegando para rotas');
+  static void _navigateToRoutes(BuildContext context) {
+    try {
+      // Assumindo que há uma rota de rotas - ajustar conforme necessário
+      AppRouter.instance.go('/admin/rotas');
+    } catch (e) {
+      LoggerService.instance.error('Erro ao navegar para rotas: $e');
+    }
   }
 
-  void _navigateToAlerts() {
-    // TODO(golffox-team): Implementar navega├º├úo para alertas
-    LoggerService.instance.debug('Navegando para alertas');
+  static void _navigateToAlerts(BuildContext context) {
+    try {
+      AppRouter.instance.go('/admin/alertas');
+    } catch (e) {
+      LoggerService.instance.error('Erro ao navegar para alertas: $e');
+    }
   }
 
-  void _navigateToMap() {
-    // TODO(golffox-team): Implementar navega├º├úo para mapa
-    LoggerService.instance.debug('Navegando para mapa');
+  static void _navigateToMap(BuildContext context) {
+    try {
+      AppRouter.instance.go(AppRoutes.map);
+    } catch (e) {
+      LoggerService.instance.error('Erro ao navegar para mapa: $e');
+    }
   }
 
-  void _navigateToReports() {
-    // TODO(golffox-team): Implementar navega├º├úo para relat├│rios
-    LoggerService.instance.debug('Navegando para relat├│rios');
+  static void _navigateToReports(BuildContext context) {
+    try {
+      AppRouter.instance.go(AppRoutes.operatorReports);
+    } catch (e) {
+      LoggerService.instance.error('Erro ao navegar para relatórios: $e');
+    }
   }
 
-  void _openSettings() {
-    // TODO(golffox-team): Implementar abertura de configura├º├Áes
-    LoggerService.instance.debug('Abrindo configura├º├Áes');
+  static void _openSettings(BuildContext context) {
+    try {
+      AppRouter.instance.go(AppRoutes.settings);
+    } catch (e) {
+      LoggerService.instance.error('Erro ao abrir configurações: $e');
+    }
   }
 
-  void _showReopenTripDialog() {
-    // TODO(golffox-team): Implementar dialogo de reabertura de viagem
-    LoggerService.instance.debug('Mostrando dialogo de reabertura de viagem');
+  static void _showReopenTripDialog(BuildContext context) {
+    showDialog<void>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Reabrir Viagem'),
+        content: const Text(
+          'Funcionalidade de reabertura de viagem será implementada em breve.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Fechar'),
+          ),
+        ],
+      ),
+    );
   }
 }

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:intl/intl.dart';
 
-import '../../../core/theme/gf_tokens.dart';
+import '../../../core/theme/gf_tokens.dart' show GfTokens, GfTextStyles;
 import '../../../models/driver.dart';
 import '../../../widgets/gx_card.dart';
 import '../../../widgets/gx_empty.dart';
