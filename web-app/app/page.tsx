@@ -133,8 +133,13 @@ function LoginContent() {
 
 
   useEffect(() => {
-    // Não verificar sessão se estiver em processo de login
+    // Não verificar sessão se estiver em processo de login ou redirecionamento
     if (loading || transitioning) return
+    
+    // Verificar se está em processo de redirecionamento
+    if (typeof window !== 'undefined' && (window as any).__golffox_redirecting) {
+      return
+    }
     
     // Verificar cookie de sessão primeiro (mais rápido)
     if (typeof window !== 'undefined') {
@@ -153,6 +158,11 @@ function LoginContent() {
     // Check if user is already logged in via Supabase
     supabase.auth.getSession().then(({ data: { session } }: { data: { session: any } }) => {
       if (session && !loading && !transitioning) {
+        // Verificar novamente se não está redirecionando
+        if (typeof window !== 'undefined' && (window as any).__golffox_redirecting) {
+          return
+        }
+        
         const nextUrl = searchParams.get('next')
         if (nextUrl) {
           const cleanNextUrl = decodeURIComponent(nextUrl).split('?')[0]
@@ -419,34 +429,40 @@ function LoginContent() {
         console.log('📧 Email:', user.email)
         
         // ✅ Redirecionar APENAS após tudo estar processado
-        // Aguardar um pequeno delay para garantir que cookies sejam processados
-        await new Promise(resolve => setTimeout(resolve, 150))
+        // O cookie é definido pelo servidor na resposta HTTP, então precisamos aguardar
+        // um pouco para garantir que o navegador processou o Set-Cookie header
+        console.log('⏳ Aguardando processamento do cookie...')
+        await new Promise(resolve => setTimeout(resolve, 300))
         
-        // Verificar se o cookie foi definido antes de redirecionar
         if (typeof window !== "undefined") {
+          // Verificar se o cookie foi definido (pode não estar visível ainda via document.cookie
+          // se for httpOnly, mas nosso cookie não é httpOnly, então deve estar visível)
           const cookieCheck = document.cookie.includes('golffox-session')
-          console.log('🍪 Cookie verificado antes do redirect:', cookieCheck)
-          
-          if (!cookieCheck) {
-            console.warn('⚠️ Cookie não encontrado, aguardando mais um pouco...')
-            await new Promise(resolve => setTimeout(resolve, 200))
-          }
+          console.log('🍪 Cookie verificado:', cookieCheck)
+          console.log('🍪 Todos os cookies:', document.cookie.substring(0, 100) + '...')
           
           const fullUrl = window.location.origin + redirectUrl
-          console.log('📍 Redirecionando para URL completa:', fullUrl)
+          console.log('📍 Redirecionando para:', fullUrl)
           console.log('🔗 URL relativa:', redirectUrl)
+          console.log('👤 Role:', resolvedRole)
           
-          // Forçar redirecionamento de forma mais agressiva
-          // Primeiro tentar com href (permite voltar no histórico)
+          // Definir um flag para evitar que o useEffect interfira
+          if (typeof window !== 'undefined') {
+            (window as any).__golffox_redirecting = true
+          }
+          
+          // Redirecionar imediatamente - o cookie já foi definido pelo servidor
+          // O navegador enviará o cookie automaticamente na próxima requisição
           window.location.href = redirectUrl
           
-          // Se após 500ms ainda estiver na mesma página, forçar replace
+          // Fallback: se após 1 segundo ainda estiver na mesma página, forçar replace
           setTimeout(() => {
-            if (window.location.pathname === '/' || window.location.pathname === '/login') {
-              console.warn('⚠️ Ainda na página de login, forçando replace...')
+            if (typeof window !== 'undefined' && 
+                (window.location.pathname === '/' || window.location.pathname === '/login')) {
+              console.warn('⚠️ Redirecionamento não ocorreu, forçando replace...')
               window.location.replace(redirectUrl)
             }
-          }, 500)
+          }, 1000)
         } else {
           console.log('📍 Usando router.replace para:', redirectUrl)
           router.replace(redirectUrl)
