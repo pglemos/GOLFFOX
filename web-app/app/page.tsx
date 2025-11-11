@@ -12,6 +12,7 @@ import { motion } from "framer-motion"
 import { AuthManager } from "@/lib/auth"
 import { getUserRoleByEmail } from "@/lib/user-role"
 import { debug, error as logError } from "@/lib/logger"
+import { supabase } from "@/lib/supabase"
 
 const EMAIL_REGEX =
   /^(?:[a-zA-Z0-9_'^&/+\-])+(?:\.(?:[a-zA-Z0-9_'^&/+\-])+)*@(?:(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,})$/
@@ -135,44 +136,47 @@ function LoginContent() {
   useEffect(() => {
     // Não verificar sessão se estiver em processo de login ou redirecionamento
     if (loading || transitioning) return
-    
-    // Verificar se está em processo de redirecionamento
+
+    // Evitar interferência durante redirecionamentos explícitos pós-login
     if (typeof window !== 'undefined' && (window as any).__golffox_redirecting) {
       return
     }
-    
+
+    // Se a URL veio de uma proteção do middleware (possui ?next=),
+    // não fazer auto-redirect aqui para evitar loops.
+    const nextParam = searchParams.get('next')
+    if (nextParam) {
+      // Opcional: se existir um cookie de sessão potencialmente inválido, limpá-lo
+      try {
+        if (typeof window !== 'undefined' && document.cookie.includes('golffox-session')) {
+          fetch('/api/auth/clear-session', { method: 'POST' }).catch(() => {})
+        }
+      } catch {}
+      return
+    }
+
     // ✅ Usar apenas verificação de cookie - não usar Supabase auth na página de login
     // para evitar conflitos e erros de logout automático
     if (typeof window !== 'undefined') {
       const hasSessionCookie = document.cookie.includes('golffox-session')
-      if (hasSessionCookie) {
-        // Tentar decodificar o cookie para obter o role
-        try {
-          const cookieMatch = document.cookie.match(/golffox-session=([^;]+)/)
-          if (cookieMatch) {
-            const decoded = atob(cookieMatch[1])
-            const userData = JSON.parse(decoded)
-            const userRole = userData.role || getUserRoleByEmail(userData.email)
-            
-            const nextUrl = searchParams.get('next')
-            if (nextUrl) {
-              const cleanNextUrl = decodeURIComponent(nextUrl).split('?')[0]
-              console.log('🔄 Cookie de sessão encontrado, redirecionando para:', cleanNextUrl)
-              window.location.href = cleanNextUrl
-              return
-            } else {
-              const redirectUrl = userRole === 'admin' ? '/admin' : 
-                                 userRole === 'operator' ? '/operator' : 
-                                 userRole === 'carrier' ? '/carrier' : '/dashboard'
-              console.log('🔄 Cookie de sessão encontrado, redirecionando para:', redirectUrl, 'role:', userRole)
-              window.location.href = redirectUrl
-              return
-            }
-          }
-        } catch (err) {
-          console.warn('⚠️ Erro ao decodificar cookie:', err)
-          // Continuar normalmente se houver erro ao decodificar
-        }
+      if (!hasSessionCookie) return
+
+      // Tentar decodificar o cookie para obter o role
+      try {
+        const cookieMatch = document.cookie.match(/golffox-session=([^;]+)/)
+        if (!cookieMatch) return
+
+        const decoded = atob(cookieMatch[1])
+        const userData = JSON.parse(decoded)
+        const userRole = userData.role || getUserRoleByEmail(userData.email)
+
+        const redirectUrl = userRole === 'admin' ? '/admin' :
+                           userRole === 'operator' ? '/operator' :
+                           userRole === 'carrier' ? '/carrier' : '/dashboard'
+        console.log('🔄 Sessão detectada, redirecionando para:', redirectUrl, 'role:', userRole)
+        window.location.href = redirectUrl
+      } catch (err) {
+        console.warn('⚠️ Erro ao decodificar cookie:', err)
       }
     }
   }, [router, searchParams, loading, transitioning])
@@ -301,70 +305,141 @@ function LoginContent() {
       try {
         debug("Iniciando autenticação", { email: maskedEmail }, "LoginPage")
         
-        // ✅ Garantir que CSRF token e credentials estão presentes
-        if (!csrfToken) {
-          console.error('❌ CSRF token não encontrado')
-          setError("Erro de segurança. Por favor, recarregue a página.")
-          setLoading(false)
-          setTransitioning(false)
-          if (typeof document !== "undefined") document.body.style.cursor = prevCursor
-          return
-        }
+        let token: string | undefined
+        let user: { id: string; email: string; role?: string } | undefined
         
-        const response = await fetch(AUTH_ENDPOINT, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-csrf-token": csrfToken, // ✅ X-CSRF-Token presente
-          },
-          body: JSON.stringify({ email: sanitizedEmail, password: sanitizedPassword }),
-          signal: controller.signal,
-          credentials: "include", // ✅ credentials: 'include' presente
-        })
-        clearTimeout(timeoutId)
+        // Tentar usar API primeiro (com CSRF protection)
+        try {
+          if (csrfToken) {
+            const response = await fetch(AUTH_ENDPOINT, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "x-csrf-token": csrfToken,
+              },
+              body: JSON.stringify({ email: sanitizedEmail, password: sanitizedPassword }),
+              signal: controller.signal,
+              credentials: "include",
+            })
+            clearTimeout(timeoutId)
 
-        // ✅ Aguardar resposta completa antes de processar
-        if (!response.ok) {
-          const apiError = await response.json().catch(() => ({}))
-          const message = String(apiError?.error || "Falha ao autenticar")
-          const normalized = message.toLowerCase()
-          
-          // Processar erro...
-          if (normalized.includes("invalid") || normalized.includes("credenciais")) {
-            setError("Credenciais inválidas")
-            setFieldErrors((prev) => ({ ...prev, password: "E-mail ou senha incorretos" }))
-          } else if (normalized.includes("csrf")) {
-            setError("Erro de segurança. Por favor, recarregue a página.")
-          } else if (normalized.includes("timeout")) {
-            setError("Tempo de resposta excedido. Tente novamente.")
-          } else if (normalized.includes("email")) {
-            setError("E-mail não encontrado")
-            setFieldErrors((prev) => ({ ...prev, email: "E-mail não cadastrado" }))
+            if (response.ok) {
+              const data = await response.json()
+              token = data?.token
+              user = data?.user
+
+              console.log('✅ Login via API bem-sucedido:', { 
+                hasToken: !!token, 
+                hasUser: !!user,
+                userRole: user?.role,
+              })
+            } else {
+              // Se a API retornar erro, tentar Supabase diretamente
+              console.warn('⚠️ API retornou erro, tentando Supabase diretamente...')
+              throw new Error('API_ERROR')
+            }
           } else {
-            setError(message || "Erro ao fazer login")
+            throw new Error('NO_CSRF_TOKEN')
           }
+        } catch (apiError: any) {
+          // Fallback: usar Supabase diretamente
+          console.log('🔄 Tentando autenticação direta com Supabase...')
           
-          setLoading(false)
-          setTransitioning(false)
-          if (typeof document !== "undefined") document.body.style.cursor = prevCursor
-          return
+          clearTimeout(timeoutId)
+          const supabaseController = new AbortController()
+          const supabaseTimeoutId = window.setTimeout(() => supabaseController.abort(), 10_000)
+          
+          try {
+            const { data: supabaseData, error: supabaseError } = await supabase.auth.signInWithPassword({
+              email: sanitizedEmail,
+              password: sanitizedPassword,
+            })
+            
+            clearTimeout(supabaseTimeoutId)
+            
+            if (supabaseError) {
+              console.error('❌ Erro Supabase:', supabaseError)
+              const errorMessage = supabaseError.message.toLowerCase()
+              
+              if (errorMessage.includes("invalid") || errorMessage.includes("credentials")) {
+                setError("Credenciais inválidas")
+                setFieldErrors((prev) => ({ ...prev, password: "E-mail ou senha incorretos" }))
+              } else if (errorMessage.includes("email")) {
+                setError("E-mail não encontrado")
+                setFieldErrors((prev) => ({ ...prev, email: "E-mail não cadastrado" }))
+              } else {
+                setError(supabaseError.message || "Erro ao fazer login")
+              }
+              
+              setLoading(false)
+              setTransitioning(false)
+              if (typeof document !== "undefined") document.body.style.cursor = prevCursor
+              return
+            }
+            
+            if (!supabaseData.user || !supabaseData.session) {
+              setError("Falha na autenticação - sessão não criada")
+              setLoading(false)
+              setTransitioning(false)
+              if (typeof document !== "undefined") document.body.style.cursor = prevCursor
+              return
+            }
+            
+            // Obter role do usuário
+            let role = supabaseData.user.user_metadata?.role || supabaseData.user.app_metadata?.role
+            
+            // Se não encontrar nos metadados, buscar na tabela users
+            if (!role && supabaseData.user.id) {
+              try {
+                const { data: userData } = await supabase
+                  .from('users')
+                  .select('role')
+                  .eq('id', supabaseData.user.id)
+                  .single()
+                
+                if (userData?.role) {
+                  role = userData.role
+                }
+              } catch (err) {
+                debug('Erro ao buscar role na tabela users', { error: err }, 'LoginPage')
+              }
+            }
+            
+            // Fallback: usar função getUserRoleByEmail
+            if (!role) {
+              role = getUserRoleByEmail(supabaseData.user.email || sanitizedEmail)
+            }
+            
+            token = supabaseData.session.access_token
+            user = {
+              id: supabaseData.user.id,
+              email: supabaseData.user.email || sanitizedEmail,
+              role,
+            }
+            
+            console.log('✅ Login via Supabase bem-sucedido:', { 
+              hasToken: !!token, 
+              hasUser: !!user,
+              userRole: user?.role,
+            })
+          } catch (supabaseErr: any) {
+            clearTimeout(supabaseTimeoutId)
+            if (supabaseErr.name === "AbortError") {
+              setError("Tempo limite excedido. Verifique sua conexão.")
+            } else {
+              setError("Erro ao conectar com o servidor de autenticação")
+            }
+            setLoading(false)
+            setTransitioning(false)
+            if (typeof document !== "undefined") document.body.style.cursor = prevCursor
+            logError("Erro ao autenticar com Supabase", { error: supabaseErr }, "LoginPage")
+            return
+          }
         }
-
-        // ✅ Aguardar resposta JSON completa antes de processar
-        const data = await response.json()
-        const token: string | undefined = data?.token
-        const user = data?.user
-
-        console.log('✅ Resposta da API:', { 
-          hasToken: !!token, 
-          hasUser: !!user,
-          userRole: user?.role,
-          userEmail: user?.email?.replace(/^(.{2}).+(@.*)$/, '$1***$2')
-        })
 
         if (!token || !user?.email) {
-          console.error('❌ Resposta inválida da API:', { token: !!token, user: !!user })
-          setError("Resposta inválida do servidor")
+          console.error('❌ Falha na autenticação:', { token: !!token, user: !!user })
+          setError("Falha na autenticação")
           setLoading(false)
           setTransitioning(false)
           if (typeof document !== "undefined") document.body.style.cursor = prevCursor
@@ -372,11 +447,13 @@ function LoginContent() {
         }
 
         // ✅ Processar sessão antes de redirecionar
+        const resolvedRole = user.role ?? getUserRoleByEmail(user.email)
+        
         AuthManager.persistSession(
           {
             id: user.id,
             email: user.email,
-            role: user.role ?? getUserRoleByEmail(user.email),
+            role: resolvedRole,
             accessToken: token,
           },
           { token, storage: rememberMe ? "both" : "session" }
@@ -435,7 +512,8 @@ function LoginContent() {
           const fullUrl = window.location.origin + redirectUrl
           console.log('📍 Redirecionando para:', fullUrl)
           console.log('🔗 URL relativa:', redirectUrl)
-          console.log('👤 Role:', resolvedRole)
+          console.log('👤 Role do banco de dados:', userRoleFromDatabase)
+          console.log('📧 Email:', user.email)
           
           // Definir um flag para evitar que o useEffect interfira
           if (typeof window !== 'undefined') {
