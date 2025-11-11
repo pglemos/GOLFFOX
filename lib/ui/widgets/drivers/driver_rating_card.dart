@@ -111,7 +111,7 @@ class DriverRatingCard extends StatelessWidget {
                       'Muito Bom (4)',
                       _getRatingCount(4),
                       driver.stats.totalRatings,
-                      const Color(GfTokens.colorSuccess).withOpacity(0.7),
+    const Color(GfTokens.colorSuccess).withValues(alpha: 0.7),
                     ),
                     _buildStatRow(
                       'Bom (3)',
@@ -123,7 +123,7 @@ class DriverRatingCard extends StatelessWidget {
                       'Regular (2)',
                       _getRatingCount(2),
                       driver.stats.totalRatings,
-                      const Color(GfTokens.colorError).withOpacity(0.7),
+    const Color(GfTokens.colorError).withValues(alpha: 0.7),
                     ),
                     _buildStatRow(
                       'Ruim (1)',
@@ -366,7 +366,7 @@ class DriverRatingCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: const Color(GfTokens.colorSurfaceVariant).withOpacity(0.3),
+    color: const Color(GfTokens.colorSurfaceVariant).withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
           color: const Color(GfTokens.colorOutlineVariant),

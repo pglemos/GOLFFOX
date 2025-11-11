@@ -129,7 +129,7 @@ class _UnknownRoleScreen extends StatelessWidget {
                 Text(
                   'O papel do usuario "$role" nao e valido ou nao esta habilitado.',
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+    color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -195,7 +195,7 @@ class _RoleInfoBadge extends StatelessWidget {
       ),
       child: DefaultTextStyle(
         style: theme.textTheme.bodySmall!.copyWith(
-          color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+    color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
         ),
         child: Column(
           children: [

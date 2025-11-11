@@ -187,7 +187,7 @@ class _OperatorDashboardState extends State<OperatorDashboard>
             Text(
               widget.user.name,
               style: t.textTheme.bodySmall?.copyWith(
-                color: t.colorScheme.onSurface.withValues(alpha: 0.7),
+    color: t.colorScheme.onSurface.withValues(alpha: 0.7),
               ),
             ),
           ],
@@ -609,7 +609,7 @@ class _KpiCard extends StatelessWidget {
                   Text(
                     title,
                     style: t.textTheme.labelMedium?.copyWith(
-                      color: t.colorScheme.onSurface.withOpacity(0.7),
+    color: t.colorScheme.onSurface.withValues(alpha: 0.7),
                     ),
                   ),
                 ],
@@ -655,7 +655,7 @@ class _TripsPanel extends StatelessWidget {
                 child: Text(
                   'Nada por aqui no momento.',
                   style: t.textTheme.bodyMedium?.copyWith(
-                    color: t.colorScheme.onSurface.withOpacity(0.7),
+    color: t.colorScheme.onSurface.withValues(alpha: 0.7),
                   ),
                 ),
               ),
@@ -739,7 +739,7 @@ class _TripRow extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: t.textTheme.bodySmall?.copyWith(
-                      color: t.colorScheme.onSurface.withValues(alpha: 0.7),
+    color: t.colorScheme.onSurface.withValues(alpha: 0.7),
                     ),
                   ),
                 ],
@@ -754,7 +754,7 @@ class _TripRow extends StatelessWidget {
                   Text(
                     _fmtTime(trip.scheduledStartTime!),
                     style: t.textTheme.labelMedium?.copyWith(
-                      color: t.colorScheme.onSurface.withOpacity(0.7),
+    color: t.colorScheme.onSurface.withValues(alpha: 0.7),
                     ),
                   ),
                 const SizedBox(height: 4),
@@ -799,7 +799,7 @@ class _RecentPanel extends StatelessWidget {
               child: Text(
                 'Sem atualizacoes recentes.',
                 style: t.textTheme.bodySmall?.copyWith(
-                  color: t.colorScheme.onSurface.withValues(alpha: 0.7),
+                  color: t.colorScheme.onSurface.withOpacity(0.7),
                 ),
               ),
             ),
@@ -929,7 +929,7 @@ class _ActionButton extends StatelessWidget {
         decoration: BoxDecoration(
           color: t.colorScheme.surface,
           borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: t.colorScheme.outline.withOpacity(0.18)),
+    border: Border.all(color: t.colorScheme.outline.withValues(alpha: 0.18)),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,

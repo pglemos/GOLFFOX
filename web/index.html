@@ -136,8 +136,28 @@
   <!-- Configuração de ambiente -->
   <script src="env.js"></script>
   
-  <!-- App Flutter -->
-  <script src="flutter_bootstrap.js" async></script>
+  <!-- App Flutter (dev via flutter.js loader; fallback to bootstrap for release) -->
+  <script src="flutter.js" defer></script>
+  <script>
+    window.addEventListener('load', function () {
+      const loader = window._flutter && window._flutter.loader;
+      if (loader) {
+        loader.loadEntrypoint({
+          onEntrypointLoaded: function (engineInitializer) {
+            engineInitializer.initializeEngine().then(function (appRunner) {
+              return appRunner.runApp();
+            });
+          }
+        });
+      } else {
+        // Fallback for prebuilt releases
+        var s = document.createElement('script');
+        s.src = 'flutter_bootstrap.js';
+        s.async = true;
+        document.head.appendChild(s);
+      }
+    });
+  </script>
 
   <!-- Esconde o loader quando o Flutter desenhar o primeiro frame -->
   <script>

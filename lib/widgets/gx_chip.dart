@@ -91,7 +91,7 @@ class GxChip extends StatelessWidget {
                   child: Icon(
                     Icons.close,
                     size: 16,
-                    color: textColor.withOpacity(0.7),
+    color: textColor.withValues(alpha: 0.7),
                   ),
                 ),
               ],

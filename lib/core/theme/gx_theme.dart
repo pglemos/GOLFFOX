@@ -20,7 +20,7 @@ ThemeData gxTheme(Brightness brightness) {
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(GfTokens.radius2),
-        side: BorderSide(color: cs.outline.withOpacity(0.1)),
+    side: BorderSide(color: cs.outline.withValues(alpha: 0.1)),
       ),
       margin: const EdgeInsets.all(GfTokens.gap),
     ),
@@ -79,7 +79,7 @@ ThemeData gxTheme(Brightness brightness) {
         vertical: GfTokens.gap,
       ),
       side: BorderSide(
-        color: cs.outline.withOpacity(0.2),
+    color: cs.outline.withValues(alpha: 0.2),
       ),
       // shape defined above
     ),
@@ -90,11 +90,11 @@ ThemeData gxTheme(Brightness brightness) {
       fillColor: cs.surface,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(GfTokens.radius),
-        borderSide: BorderSide(color: cs.outline.withOpacity(0.2)),
+    borderSide: BorderSide(color: cs.outline.withValues(alpha: 0.2)),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(GfTokens.radius),
-        borderSide: BorderSide(color: cs.outline.withOpacity(0.2)),
+    borderSide: BorderSide(color: cs.outline.withValues(alpha: 0.2)),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(GfTokens.radius),
@@ -124,7 +124,7 @@ ThemeData gxTheme(Brightness brightness) {
       elevation: GfTokens.elevation3,
       backgroundColor: cs.surface,
       selectedItemColor: cs.primary,
-      unselectedItemColor: cs.onSurface.withOpacity(0.6),
+    unselectedItemColor: cs.onSurface.withValues(alpha: 0.6),
       type: BottomNavigationBarType.fixed,
       showUnselectedLabels: true,
     ),
@@ -133,11 +133,11 @@ ThemeData gxTheme(Brightness brightness) {
     navigationRailTheme: NavigationRailThemeData(
       backgroundColor: cs.surface,
       selectedIconTheme: IconThemeData(color: cs.primary),
-      unselectedIconTheme: IconThemeData(color: cs.onSurface.withOpacity(0.6)),
+    unselectedIconTheme: IconThemeData(color: cs.onSurface.withValues(alpha: 0.6)),
       selectedLabelTextStyle:
           textTheme.labelMedium?.copyWith(color: cs.primary),
       unselectedLabelTextStyle: textTheme.labelMedium?.copyWith(
-        color: cs.onSurface.withOpacity(0.6),
+    color: cs.onSurface.withValues(alpha: 0.6),
       ),
     ),
 
@@ -152,7 +152,7 @@ ThemeData gxTheme(Brightness brightness) {
         color: cs.onSurface,
       ),
       contentTextStyle: textTheme.bodyMedium?.copyWith(
-        color: cs.onSurface.withOpacity(0.8),
+    color: cs.onSurface.withValues(alpha: 0.8),
       ),
     ),
 

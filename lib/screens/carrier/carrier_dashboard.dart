@@ -207,7 +207,7 @@ class _CarrierDashboardState extends State<CarrierDashboard>
             Text(
               widget.user.name,
               style: t.textTheme.bodySmall?.copyWith(
-                color: t.colorScheme.onSurface.withValues(alpha: 0.7),
+    color: t.colorScheme.onSurface.withValues(alpha: 0.7),
               ),
             ),
           ],

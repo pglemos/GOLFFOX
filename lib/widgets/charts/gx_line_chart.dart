@@ -32,7 +32,7 @@ class GxLineChart extends StatelessWidget {
             barWidth: strokeWidth,
             dotData: FlDotData(show: showDots),
             belowBarData:
-                BarAreaData(show: true, color: c.withOpacity(0.12)),
+    BarAreaData(show: true, color: c.withValues(alpha: 0.12)),
           )
         ],
       ),
