@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:intl/intl.dart';
 
+import '../../../core/i18n/i18n.dart';
 import '../../../core/theme/gf_tokens.dart';
 import '../../../models/driver.dart';
 import '../../../widgets/gx_card.dart';
-import '../../../core/i18n/i18n.dart';
 
 class DriverInfoCard extends StatelessWidget {
 

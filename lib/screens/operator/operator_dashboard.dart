@@ -4,12 +4,12 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../core/routing/app_router.dart';
+import '../../core/services/snackbar_service.dart';
 import '../../core/theme/gf_tokens.dart';
 import '../../models/trip.dart';
 import '../../models/user.dart';
 import '../../services/auth_service.dart';
 import '../../services/supabase_service.dart';
-import '../../core/services/snackbar_service.dart';
 
 class OperatorDashboard extends StatefulWidget {
   const OperatorDashboard({required this.user, super.key});

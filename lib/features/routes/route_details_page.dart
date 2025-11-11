@@ -78,8 +78,10 @@ class _RouteDetailsPageState extends ConsumerState<RouteDetailsPage>
                 PopupMenuItem(
                   value: 'start',
                   child: ListTile(
-                    leading:
-                        Icon(Icons.play_arrow, color: Color(GfTokens.success)),
+                    leading: const Icon(
+                      Icons.play_arrow,
+                      color: Color(GfTokens.success),
+                    ),
                     title: Text(I18n.t(context, 'routes.action.start')),
                     contentPadding: EdgeInsets.zero,
                   ),
@@ -88,8 +90,10 @@ class _RouteDetailsPageState extends ConsumerState<RouteDetailsPage>
                 PopupMenuItem(
                   value: 'cancel',
                   child: ListTile(
-                    leading:
-                        Icon(Icons.stop, color: Color(GfTokens.colorError)),
+                    leading: const Icon(
+                      Icons.stop,
+                      color: Color(GfTokens.colorError),
+                    ),
                     title: Text(I18n.t(context, 'routes.action.cancel')),
                     contentPadding: EdgeInsets.zero,
                   ),
@@ -97,7 +101,7 @@ class _RouteDetailsPageState extends ConsumerState<RouteDetailsPage>
               PopupMenuItem(
                 value: 'duplicate',
                 child: ListTile(
-                  leading: Icon(Icons.copy),
+                  leading: const Icon(Icons.copy),
                   title: Text(I18n.t(context, 'routes.action.duplicate')),
                   contentPadding: EdgeInsets.zero,
                 ),
@@ -106,8 +110,10 @@ class _RouteDetailsPageState extends ConsumerState<RouteDetailsPage>
                 PopupMenuItem(
                   value: 'delete',
                   child: ListTile(
-                    leading:
-                        Icon(Icons.delete, color: Color(GfTokens.colorError)),
+                    leading: const Icon(
+                      Icons.delete,
+                      color: Color(GfTokens.colorError),
+                    ),
                     title: Text(I18n.t(context, 'routes.action.delete')),
                     contentPadding: EdgeInsets.zero,
                   ),

@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, Suspense } from "react"
+import { SpeedInsights } from "@vercel/speed-insights/next"
 import { useRouter, useSearchParams } from "next/navigation"
 import { supabase } from "@/lib/supabase"
 import { Button } from "@/components/ui/button"
@@ -269,8 +270,11 @@ function LoginContent() {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <LoginContent />
-    </Suspense>
+    <>
+      <Suspense fallback={<div>Loading...</div>}>
+        <LoginContent />
+      </Suspense>
+      <SpeedInsights />
+    </>
   )
 }
