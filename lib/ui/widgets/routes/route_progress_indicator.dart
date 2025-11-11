@@ -9,7 +9,6 @@ import '../../../core/theme/gf_tokens.dart';
 import '../../../models/route.dart';
 
 class RouteProgressIndicator extends StatelessWidget {
-
   const RouteProgressIndicator({
     required this.route,
     super.key,
@@ -121,37 +120,38 @@ class RouteProgressIndicator extends StatelessWidget {
     required String label,
     required String value,
     required Color color,
-  }) => Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(
-          icon,
-          size: 16,
-          color: color,
-        ),
-        const SizedBox(width: 4),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              value,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-                color: color,
+  }) =>
+      Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            icon,
+            size: 16,
+            color: color,
+          ),
+          const SizedBox(width: 4),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                value,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: color,
+                ),
               ),
-            ),
-            Text(
-              label,
-              style: const TextStyle(
-                fontSize: 10,
-                color: Color(GfTokens.colorOnSurfaceVariant),
+              Text(
+                label,
+                style: const TextStyle(
+                  fontSize: 10,
+                  color: Color(GfTokens.colorOnSurfaceVariant),
+                ),
               ),
-            ),
-          ],
-        ),
-      ],
-    );
+            ],
+          ),
+        ],
+      );
 
   Widget _buildNextStop() {
     final nextStop = route.stops.firstWhere(
@@ -163,10 +163,10 @@ class RouteProgressIndicator extends StatelessWidget {
       return Container(
         padding: const EdgeInsets.all(GfTokens.space3),
         decoration: BoxDecoration(
-          color: const Color(GfTokens.success).withValues(alpha: 0.1),
+          color: GfTokens.success.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(GfTokens.radiusSm),
           border: Border.all(
-            color: const Color(GfTokens.success).withValues(alpha: 0.3),
+            color: GfTokens.success.withValues(alpha: 0.3),
           ),
         ),
         child: const Row(
@@ -195,10 +195,10 @@ class RouteProgressIndicator extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(GfTokens.space3),
       decoration: BoxDecoration(
-        color: const Color(GfTokens.primary).withValues(alpha: 0.1),
+        color: GfTokens.primary.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(GfTokens.radiusSm),
         border: Border.all(
-          color: const Color(GfTokens.primary).withValues(alpha: 0.3),
+          color: GfTokens.primary.withValues(alpha: 0.3),
         ),
       ),
       child: Row(
@@ -311,42 +311,44 @@ class RouteProgressIndicator extends StatelessWidget {
     required String label,
     required String value,
     required Color color,
-  }) => Container(
-      padding: const EdgeInsets.all(GfTokens.space3),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(GfTokens.radiusSm),
-        border: Border.all(color: color.withValues(alpha: 0.3)),
-      ),
-      child: Row(
-        children: [
-          Icon(icon, color: color, size: 20),
-          const SizedBox(width: GfTokens.space2),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  label,
-                  style: const TextStyle(
-                    fontSize: 10,
-                    color: Color(GfTokens.colorOnSurfaceVariant),
+  }) =>
+      Container(
+        padding: const EdgeInsets.all(GfTokens.space3),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(GfTokens.radiusSm),
+          border: Border.all(color: color.withOpacity(0.3)),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, color: color, size: 20),
+            const SizedBox(width: GfTokens.space2),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: const TextStyle(
+                      fontSize: 10,
+                      color: Color(GfTokens.colorOnSurfaceVariant),
+                    ),
                   ),
-                ),
-                Text(
-                  value,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: color,
+                  Text(
+                    value,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: color,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
-      ),
-    );
+          ],
+        ),
+      );
 
-  String _formatTime(DateTime time) => '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
+  String _formatTime(DateTime time) =>
+      '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
 }

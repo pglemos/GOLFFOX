@@ -27,53 +27,45 @@ class _VehicleFuelChartState extends ConsumerState<VehicleFuelChart> {
 
   @override
   Widget build(BuildContext context) {
-    final vehicleService = ref.watch(vehicleServiceProvider);
+    final fuelRecordsAsync = ref.watch(vehicleFuelRecordsProvider(widget.vehicleId));
 
-    return FutureBuilder<List<FuelRecord>>(
-      future: vehicleService.getVehicleFuelRecords(widget.vehicleId),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        }
-
-        if (snapshot.hasError) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(
-                  Icons.error_outline,
-                  size: 64,
-                  color: Color(GfTokens.colorError),
-                ),
-                const SizedBox(height: GfTokens.spacingMd),
-                const Text(
-              'Erro ao carregar dados de combustível',
-                  style: TextStyle(
-                    fontSize: GfTokens.fontSizeLg,
-                    fontWeight: FontWeight.w600,
-                    color: Color(GfTokens.colorOnSurface),
-                  ),
-                ),
-                const SizedBox(height: GfTokens.spacingSm),
-                Text(
-                  snapshot.error.toString(),
-                  style: const TextStyle(
-                    color: Color(GfTokens.colorOnSurfaceVariant),
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: GfTokens.spacingMd),
-                ElevatedButton(
-                  onPressed: () => setState(() {}),
-                  child: const Text('Tentar novamente'),
-                ),
-              ],
+    return fuelRecordsAsync.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (error, stack) => Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(
+              Icons.error_outline,
+              size: 64,
+              color: Color(GfTokens.colorError),
             ),
-          );
-        }
-
-        final records = snapshot.data!;
+            const SizedBox(height: GfTokens.spacingMd),
+            const Text(
+              'Erro ao carregar dados de combustível',
+              style: TextStyle(
+                fontSize: GfTokens.fontSizeLg,
+                fontWeight: FontWeight.w600,
+                color: Color(GfTokens.colorOnSurface),
+              ),
+            ),
+            const SizedBox(height: GfTokens.spacingSm),
+            Text(
+              error.toString(),
+              style: const TextStyle(
+                color: Color(GfTokens.colorOnSurfaceVariant),
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: GfTokens.spacingMd),
+            ElevatedButton(
+              onPressed: () => ref.invalidate(vehicleFuelRecordsProvider(widget.vehicleId)),
+              child: const Text('Tentar novamente'),
+            ),
+          ],
+        ),
+      ),
+      data: (records) {
         final filteredRecords = _filterRecordsByPeriod(records);
         final stats = FuelConsumptionStats.fromRecords(
           filteredRecords,

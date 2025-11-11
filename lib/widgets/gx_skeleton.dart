@@ -49,7 +49,7 @@ class _GxSkeletonState extends State<GxSkeleton>
           width: widget.width,
           decoration: BoxDecoration(
             color:
-                cs.surfaceContainerHighest.withValues(alpha: _animation.value),
+                cs.surfaceContainerHighest.withOpacity(_animation.value),
             borderRadius: widget.borderRadius,
           ),
         ),
