@@ -5,7 +5,7 @@
 'use client'
 
 import { useEffect, useState, useCallback, useRef } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { loadGoogleMapsAPI } from '@/lib/google-maps-loader'
 import { RealtimeService, RealtimeUpdateType } from '@/lib/realtime-service'
 import { PlaybackService } from '@/lib/playback-service'

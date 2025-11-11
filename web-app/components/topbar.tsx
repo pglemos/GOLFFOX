@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 // Substituir Link por <a> para evitar erro de export do next/link
-import { useRouter } from "next/navigation"
+import { useRouter, usePathname } from "next/navigation"
 import { motion } from "framer-motion"
 import { 
   Search, 
@@ -51,6 +51,7 @@ export function Topbar({
   panelHomeUrl = "/admin"
 }: TopbarProps) {
   const router = useRouter()
+  const pathname = usePathname()
   const { isTopbarItemActive: _isTopbarItemActive } = useNavigation()
   const [isLoggingOut, setIsLoggingOut] = useState(false)
 
@@ -156,8 +157,25 @@ export function Topbar({
           <Menu className="h-5 w-5" />
         </Button>
 
-                {/* Logo / Empresa */}
-        <OperatorLogoSection panelHomeUrl={panelHomeUrl} panelBranding={panelBranding} />
+        {/* Logo / Empresa */}
+        {(pathname?.startsWith('/operator')) ? (
+          <OperatorLogoSection panelHomeUrl={panelHomeUrl} panelBranding={panelBranding} />
+        ) : (
+          <a href={panelHomeUrl} className="flex items-center gap-2 sm:gap-3 flex-shrink-0 group">
+            <motion.div
+              whileHover={{ scale: 1.05, rotate: 5 }}
+              whileTap={{ scale: 0.95 }}
+              className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl gradient-brand flex items-center justify-center shadow-md"
+            >
+              <span className="text-white font-bold text-lg sm:text-xl">G</span>
+            </motion.div>
+            <div className="flex items-center gap-2">
+              <span className="font-bold text-lg sm:text-2xl tracking-tight text-[var(--ink-strong)] hidden xs:block">
+                {pathname?.startsWith('/admin') ? (panelBranding || 'Administrativo') : (panelBranding || 'GOLF FOX')}
+              </span>
+            </div>
+          </a>
+        )}
 
         {/* Search - Hidden on small screens */}
         <div className="hidden md:flex flex-1 max-w-md ml-auto">
