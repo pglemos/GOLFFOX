@@ -24,8 +24,10 @@ class SupabaseService {
   SupabaseService._();
   static final SupabaseService instance = SupabaseService._();
 
+  bool get isReady => Supabase.instance.isInitialized;
+
   SupabaseClient get client {
-    if (!Supabase.instance.isInitialized) {
+    if (!isReady) {
       throw Exception(
           'Supabase não foi inicializado. Chame SupaClient.initialize() primeiro.');
     }
@@ -34,10 +36,10 @@ class SupabaseService {
 
   /* ===================== Auth helpers ===================== */
 
-  Session? get currentSession => client.auth.currentSession;
-  User? get currentUser => client.auth.currentUser;
+  Session? get currentSession => isReady ? Supabase.instance.client.auth.currentSession : null;
+  User? get currentUser => isReady ? Supabase.instance.client.auth.currentUser : null;
   String? get currentUserId => currentUser?.id;
-  bool get isAuthenticated => currentSession != null;
+  bool get isAuthenticated => isReady && currentSession != null;
   GoTrueClient get auth => client.auth;
 
   Future<T> _withTimeout<T>(Future<T> f, {Duration? timeout}) =>

@@ -14,9 +14,9 @@ Future<void> bootstrap(Widget app) async {
     }
   } catch (e) {
     if (kDebugMode) {
-      debugPrint('[bootstrap] Failed to initialize Supabase: $e');
+      debugPrint('[bootstrap] Supabase não configurado ou falhou: $e');
+      debugPrint('[bootstrap] Continuando sem backend (modo offline/dev).');
     }
-    rethrow;
   }
 
   FlutterError.onError = (details) {
