@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Mail, Lock, Eye, EyeOff, Moon, Sun, Globe, ChevronDown } from "lucide-react"
+import { Mail, Lock, Eye, EyeOff, Moon, Sun, Globe, ChevronDown, Route, Shield, TrendingUp, Zap } from "lucide-react"
 import { motion } from "framer-motion"
 import { AuthManager } from "@/lib/auth"
 import { getUserRoleByEmail } from "@/lib/user-role"
@@ -365,8 +365,12 @@ function LoginContent() {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="mb-8"
           >
-            <div className="w-20 h-20 rounded-2xl bg-[var(--brand)] flex items-center justify-center mb-8 shadow-lg">
-              <span className="text-4xl font-bold text-white">G</span>
+            <div className="w-20 h-20 rounded-2xl bg-white/10 backdrop-blur-sm flex items-center justify-center mb-8 shadow-2xl border border-white/20">
+              <img 
+                src="/icons/golf_fox_logo.svg" 
+                alt="GolfFox Logo" 
+                className="w-16 h-16"
+              />
             </div>
           </motion.div>
           <motion.h1
@@ -381,10 +385,66 @@ function LoginContent() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
-            className="text-lg xl:text-xl text-white/90 leading-relaxed max-w-md"
+            className="text-lg xl:text-xl text-white/90 leading-relaxed max-w-md mb-8"
           >
             Otimize rotas, monitore veículos em tempo real e reduza custos operacionais com a plataforma mais completa do mercado.
           </motion.p>
+          <motion.a
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.6 }}
+            href="https://golffox.com.br"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 text-white/80 hover:text-white text-sm transition-colors underline underline-offset-4 hover:underline-offset-2"
+          >
+            Saiba mais sobre a GolfFox →
+          </motion.a>
+          
+          {/* Features destacadas */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.5 }}
+            className="grid grid-cols-2 gap-4 max-w-md"
+          >
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-lg bg-white/10 backdrop-blur-sm flex items-center justify-center flex-shrink-0 border border-white/20">
+                <Route className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h3 className="text-white font-semibold text-sm mb-1">Rotas Inteligentes</h3>
+                <p className="text-white/70 text-xs">Otimização automática de trajetos</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-lg bg-white/10 backdrop-blur-sm flex items-center justify-center flex-shrink-0 border border-white/20">
+                <Zap className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h3 className="text-white font-semibold text-sm mb-1">Tempo Real</h3>
+                <p className="text-white/70 text-xs">Monitoramento em tempo real</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-lg bg-white/10 backdrop-blur-sm flex items-center justify-center flex-shrink-0 border border-white/20">
+                <TrendingUp className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h3 className="text-white font-semibold text-sm mb-1">Analytics</h3>
+                <p className="text-white/70 text-xs">Relatórios e métricas detalhadas</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-lg bg-white/10 backdrop-blur-sm flex items-center justify-center flex-shrink-0 border border-white/20">
+                <Shield className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h3 className="text-white font-semibold text-sm mb-1">Segurança</h3>
+                <p className="text-white/70 text-xs">Proteção de dados avançada</p>
+              </div>
+            </div>
+          </motion.div>
         </div>
       </motion.div>
 
@@ -394,8 +454,12 @@ function LoginContent() {
           <StarField />
         </div>
         <div className="relative z-10 flex items-center gap-3">
-          <div className="w-12 h-12 rounded-xl bg-[var(--brand)] flex items-center justify-center shadow-lg flex-shrink-0">
-            <span className="text-2xl font-bold text-white">G</span>
+          <div className="w-12 h-12 rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center shadow-lg flex-shrink-0 border border-white/20">
+            <img 
+              src="/icons/golf_fox_logo.svg" 
+              alt="GolfFox Logo" 
+              className="w-10 h-10"
+            />
           </div>
           <div>
             <h2 className="text-lg font-bold leading-tight">Gestão Inteligente de Frotas</h2>
@@ -480,12 +544,16 @@ function LoginContent() {
 
               {/* Logo e Título */}
               <div className="mb-6 sm:mb-8">
-                <div className="flex items-center gap-2 mb-4 sm:mb-6">
-                  <div className="w-10 h-10 rounded-xl bg-[var(--brand)] flex items-center justify-center">
-                    <span className="text-xl font-bold text-white">G</span>
+                <div className="flex items-center gap-3 mb-4 sm:mb-6">
+                  <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <img 
+                      src="/icons/golf_fox_logo.svg" 
+                      alt="GolfFox Logo" 
+                      className="w-12 h-12"
+                    />
                   </div>
-                  <span className="text-xl sm:text-2xl font-bold text-gray-900">
-                    <span className="text-[var(--brand)]">G</span> GOLF FOX
+                  <span className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight">
+                    GOLF FOX
                   </span>
                 </div>
                 <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Entre em sua conta</h1>
