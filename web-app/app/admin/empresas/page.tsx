@@ -22,6 +22,7 @@ export default function EmpresasPage() {
   const [selectedCompanyForAssociation, setSelectedCompanyForAssociation] = useState<{ id: string; name: string } | null>(null)
 
   // Usar hook otimizado para carregar empresas
+  // Remover filtro is_active pois a coluna pode não existir
   const { 
     data: empresas = [], 
     loading: loadingEmpresas, 
@@ -30,7 +31,7 @@ export default function EmpresasPage() {
     () => supabase
       .from("companies")
       .select("*")
-      .eq("is_active", true),
+      .order('created_at', { ascending: false }),
     {
       cacheKey: 'empresas_ativas',
       fallbackValue: []
@@ -39,13 +40,46 @@ export default function EmpresasPage() {
 
   useEffect(() => {
     const getUser = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (!session) {
-        router.push("/")
-        return
+      try {
+        // Primeiro, tentar obter usuário do cookie de sessão customizado
+        if (typeof document !== 'undefined') {
+          const cookieMatch = document.cookie.match(/golffox-session=([^;]+)/)
+          if (cookieMatch) {
+            try {
+              const decoded = atob(cookieMatch[1])
+              const u = JSON.parse(decoded)
+              if (u?.id && u?.email) {
+                setUser({ id: u.id, email: u.email, name: u.email.split('@')[0], role: u.role || 'admin' })
+                setLoading(false)
+                return
+              }
+            } catch (err) {
+              console.warn('⚠️ Erro ao decodificar cookie de sessão:', err)
+            }
+          }
+        }
+
+        // Fallback: tentar sessão do Supabase
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+        
+        if (sessionError) {
+          console.error('❌ Erro ao obter sessão do Supabase:', sessionError)
+        }
+        
+        if (!session) {
+          // Sem sessão - deixar o middleware proteger o acesso (não redirecionar aqui para evitar loop)
+          console.log('⚠️ Sem sessão detectada - middleware irá proteger acesso')
+          setLoading(false)
+          return
+        }
+        
+        setUser({ ...session.user })
+        setLoading(false)
+      } catch (err) {
+        console.error('❌ Erro ao obter usuário:', err)
+        setLoading(false)
+        // Não redirecionar aqui - deixar o middleware proteger
       }
-      setUser({ ...session.user })
-      setLoading(false)
     }
     getUser()
   }, [router])
@@ -56,14 +90,18 @@ export default function EmpresasPage() {
         .from("gf_employee_company")
         .select("*")
         .eq("company_id", empresaId)
-        .eq("is_active", true)
 
-      if (error) throw error
+      if (error) {
+        console.error('Erro ao carregar funcionários:', error)
+        setFuncionarios([])
+        return
+      }
+      
       setFuncionarios(data || [])
       const empresa = Array.isArray(empresas) ? empresas.find((e: any) => e.id === empresaId) : null
       setSelectedEmpresa(empresa)
     } catch (error) {
-      // Erro ao carregar funcionários - usando fallback
+      console.error('Erro ao carregar funcionários:', error)
       setFuncionarios([])
     }
   }
@@ -85,6 +123,27 @@ export default function EmpresasPage() {
             Criar Operador
           </Button>
         </div>
+
+        {errorEmpresas && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+            <p className="text-red-800">Erro ao carregar empresas: {errorEmpresas.message}</p>
+          </div>
+        )}
+
+        {loadingEmpresas && (
+          <div className="flex items-center justify-center py-8">
+            <div className="w-8 h-8 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin"></div>
+            <span className="ml-3 text-[var(--muted)]">Carregando empresas...</span>
+          </div>
+        )}
+
+        {!loadingEmpresas && !errorEmpresas && Array.isArray(empresas) && empresas.length === 0 && (
+          <Card className="p-8 text-center">
+            <Briefcase className="h-12 w-12 text-[var(--muted)] mx-auto mb-4" />
+            <h3 className="text-lg font-semibold mb-2">Nenhuma empresa cadastrada</h3>
+            <p className="text-[var(--muted)] mb-4">Clique em "Criar Operador" para criar uma nova empresa e operador.</p>
+          </Card>
+        )}
 
         <div className="grid gap-4">
           {Array.isArray(empresas) && empresas.map((empresa: any) => (

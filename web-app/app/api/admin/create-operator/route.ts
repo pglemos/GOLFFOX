@@ -93,23 +93,58 @@ export async function POST(request: NextRequest) {
     }
 
     // Passo 5: Atualizar perfil do usuário
-    const { error: profileError } = await supabaseAdmin
-      .from('users')
-      .upsert({
-        id: authData.user.id,
-        email: operatorEmail,
-        name: operatorEmail.split('@')[0],
-        role: 'operator',
-        phone: operatorPhone || null,
-        company_id: company.id,
-        is_active: true,
-      }, {
-        onConflict: 'id'
-      })
-
-    if (profileError) {
-      console.error('Erro ao atualizar perfil:', profileError)
-      // Não falhar, pode ser que já exista
+    // Construir objeto de dados com apenas campos essenciais
+    const userData: any = {
+      id: authData.user.id,
+      email: operatorEmail,
+      role: 'operator',
+      company_id: company.id,
+    }
+    
+    // Tentar adicionar campos opcionais (podem não existir na tabela)
+    // Se der erro, será ignorado no catch abaixo
+    try {
+      // Tentar inserir com name (se a coluna existir)
+      const userDataWithName = { ...userData, name: operatorEmail.split('@')[0] }
+      if (operatorPhone) {
+        userDataWithName.phone = operatorPhone
+      }
+      
+      const { error: profileError } = await supabaseAdmin
+        .from('users')
+        .upsert(userDataWithName, {
+          onConflict: 'id'
+        })
+      
+      if (profileError && profileError.message.includes('column') && profileError.message.includes('does not exist')) {
+        // Se a coluna não existe, tentar sem name
+        const { error: profileError2 } = await supabaseAdmin
+          .from('users')
+          .upsert(userData, {
+            onConflict: 'id'
+          })
+        
+        if (profileError2) {
+          console.error('Erro ao atualizar perfil (sem name):', profileError2)
+        }
+      } else if (profileError) {
+        console.error('Erro ao atualizar perfil:', profileError)
+      }
+    } catch (e: any) {
+      // Se der erro, tentar inserir apenas com campos essenciais
+      try {
+        const { error: profileError } = await supabaseAdmin
+          .from('users')
+          .upsert(userData, {
+            onConflict: 'id'
+          })
+        
+        if (profileError) {
+          console.error('Erro ao atualizar perfil (fallback):', profileError)
+        }
+      } catch (e2) {
+        console.error('Erro ao atualizar perfil (fallback também falhou):', e2)
+      }
     }
 
     // Passo 6: Mapear usuário à empresa
