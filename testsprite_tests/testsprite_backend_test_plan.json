@@ -1,0 +1,52 @@
+[
+  {
+    "id": "TC001",
+    "title": "verify user login functionality",
+    "description": "Test the /api/auth/login endpoint to ensure users can log in with valid credentials and receive a token and user object. Verify that invalid credentials return a 401 status."
+  },
+  {
+    "id": "TC002",
+    "title": "verify csrf token retrieval",
+    "description": "Test the /api/auth/csrf endpoint to ensure it returns a valid CSRF token for secure API interactions."
+  },
+  {
+    "id": "TC003",
+    "title": "verify operator creation by admin",
+    "description": "Test the /api/admin/create-operator endpoint to ensure an admin can create an operator and company with valid data, and that invalid data or unauthorized access is handled properly."
+  },
+  {
+    "id": "TC004",
+    "title": "verify employee creation by operator",
+    "description": "Test the /api/operator/create-employee endpoint to ensure operators can create employees with valid data and that invalid data is rejected."
+  },
+  {
+    "id": "TC005",
+    "title": "verify budgets listing and creation",
+    "description": "Test the /api/costs/budgets endpoint for GET to list budgets and POST to create a new budget with valid data."
+  },
+  {
+    "id": "TC006",
+    "title": "verify cost kpis retrieval",
+    "description": "Test the /api/costs/kpis endpoint to ensure it returns accurate cost KPIs including total costs, budget, and variance."
+  },
+  {
+    "id": "TC007",
+    "title": "verify report execution",
+    "description": "Test the /api/reports/run endpoint to ensure reports can be generated in pdf, excel, and csv formats with appropriate filters."
+  },
+  {
+    "id": "TC008",
+    "title": "verify report scheduling",
+    "description": "Test the /api/reports/schedule endpoint to ensure reports can be scheduled with valid report type, schedule, and recipients."
+  },
+  {
+    "id": "TC009",
+    "title": "verify kpis refresh cron job",
+    "description": "Test the /api/cron/refresh-kpis endpoint to ensure KPIs are refreshed successfully when the cron job is triggered."
+  },
+  {
+    "id": "TC010",
+    "title": "verify health check endpoint",
+    "description": "Test the /api/health endpoint to ensure it returns the application health status including Supabase connectivity and timestamp."
+  }
+]

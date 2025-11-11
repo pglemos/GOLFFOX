@@ -39,6 +39,8 @@ export default function EmpresasPage() {
   )
 
   useEffect(() => {
+    let isMounted = true
+    
     const getUser = async () => {
       try {
         // Primeiro, tentar obter usuário do cookie de sessão customizado
@@ -48,7 +50,7 @@ export default function EmpresasPage() {
             try {
               const decoded = atob(cookieMatch[1])
               const u = JSON.parse(decoded)
-              if (u?.id && u?.email) {
+              if (u?.id && u?.email && isMounted) {
                 setUser({ id: u.id, email: u.email, name: u.email.split('@')[0], role: u.role || 'admin' })
                 setLoading(false)
                 return
@@ -66,6 +68,8 @@ export default function EmpresasPage() {
           console.error('❌ Erro ao obter sessão do Supabase:', sessionError)
         }
         
+        if (!isMounted) return
+        
         if (!session) {
           // Sem sessão - deixar o middleware proteger o acesso (não redirecionar aqui para evitar loop)
           console.log('⚠️ Sem sessão detectada - middleware irá proteger acesso')
@@ -73,16 +77,24 @@ export default function EmpresasPage() {
           return
         }
         
-        setUser({ ...session.user })
-        setLoading(false)
+        if (isMounted) {
+          setUser({ ...session.user })
+          setLoading(false)
+        }
       } catch (err) {
         console.error('❌ Erro ao obter usuário:', err)
-        setLoading(false)
+        if (isMounted) {
+          setLoading(false)
+        }
         // Não redirecionar aqui - deixar o middleware proteger
       }
     }
     getUser()
-  }, [router])
+    
+    return () => {
+      isMounted = false
+    }
+  }, []) // Remover router da dependência para evitar re-renderizações
 
   const loadFuncionarios = async (empresaId: string) => {
     try {

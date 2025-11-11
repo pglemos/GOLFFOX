@@ -58,61 +58,56 @@ export function Topbar({
   const handleLogout = async () => {
     try {
       setIsLoggingOut(true)
-      // Iniciando logout...
 
-      // Check if there's an active session first
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession()
-      
-      if (sessionError) {
-        // Erro ao verificar sessão
-      }
-      
-      // If there's a session, sign out from Supabase
-      if (session) {
-        // Fazendo logout do Supabase...
-        const { error } = await supabase.auth.signOut({
-          scope: 'local' // Only sign out locally to avoid server issues
-        })
-        
-        if (error) {
-          // Aviso no logout
-          // Don't throw error for session issues, just log and continue
-        } else {
-          // Logout do Supabase realizado
+      // 1. Fazer logout do Supabase (global, não apenas local)
+      try {
+        const { error: signOutError } = await supabase.auth.signOut()
+        if (signOutError) {
+          console.warn('Erro ao fazer logout do Supabase:', signOutError)
+          // Continuar mesmo com erro
         }
-      } else {
-        // Nenhuma sessão ativa encontrada
+      } catch (supabaseError) {
+        console.warn('Erro ao fazer logout do Supabase:', supabaseError)
+        // Continuar mesmo com erro
       }
 
-      // Clear any local storage data regardless of session status
+      // 2. Limpar cookie de sessão no servidor
+      try {
+        await fetch('/api/auth/clear-session', {
+          method: 'POST',
+          credentials: 'include'
+        })
+      } catch (apiError) {
+        console.warn('Erro ao limpar sessão no servidor:', apiError)
+        // Continuar mesmo com erro
+      }
+
+      // 3. Limpar armazenamento local
       if (typeof window !== 'undefined') {
-        // Limpando armazenamento local...
         try {
           localStorage.clear()
           sessionStorage.clear()
-          // Armazenamento limpo
-        } catch (_storageError) {
-          // Erro ao limpar armazenamento
+        } catch (storageError) {
+          console.warn('Erro ao limpar armazenamento:', storageError)
         }
       }
 
-      // Use window.location for more reliable navigation
-      // Redirecionando para página inicial...
+      // 4. Redirecionar para página inicial
+      // Usar window.location.href para forçar recarregamento completo
       if (typeof window !== 'undefined') {
         window.location.href = '/'
       } else {
         router.push('/')
       }
-      
-    } catch (_error: any) {
-      // Erro no logout
-      // Even if there's an error, still try to clear storage and redirect
+    } catch (error: any) {
+      console.error('Erro no logout:', error)
+      // Mesmo com erro, tentar limpar e redirecionar
       if (typeof window !== 'undefined') {
         try {
           localStorage.clear()
           sessionStorage.clear()
         } catch (_storageError) {
-          console.warn('Erro ao limpar armazenamento no catch:', _storageError)
+          // Ignorar erros de storage
         }
         // Force redirect even on error
         window.location.href = '/'
@@ -120,7 +115,7 @@ export function Topbar({
         router.push('/')
       }
     } finally {
-      setIsLoggingOut(false)
+      // Não definir setIsLoggingOut(false) aqui pois a página será redirecionada
     }
   }
   const [searchQuery, setSearchQuery] = useState("")

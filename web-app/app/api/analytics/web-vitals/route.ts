@@ -7,6 +7,30 @@ import { createClient } from '@supabase/supabase-js'
 
 export const runtime = 'nodejs'
 
+// GET handler para evitar 405 quando acessado incorretamente
+export async function GET(request: NextRequest) {
+  return NextResponse.json(
+    { 
+      message: 'Web Vitals API',
+      description: 'Este endpoint aceita apenas requisições POST para enviar métricas de Web Vitals',
+      usage: 'POST /api/analytics/web-vitals com body: { url, userAgent, timestamp, metrics }'
+    },
+    { status: 200 }
+  )
+}
+
+// OPTIONS handler para CORS (se necessário)
+export async function OPTIONS(request: NextRequest) {
+  return new NextResponse(null, {
+    status: 200,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type',
+    },
+  })
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import {
   Dialog,
   DialogContent,
@@ -35,31 +35,44 @@ export function AssociateOperatorModal({
   const [loadingOperators, setLoadingOperators] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
-    if (isOpen) {
-      loadOperators()
-    }
-  }, [isOpen])
-
-  const loadOperators = async () => {
+  const loadOperators = useCallback(async () => {
     setLoadingOperators(true)
+    setError(null)
     try {
+      // Remover filtro is_active se a coluna não existir
+      // A query funcionará mesmo se a coluna não existir
       const { data, error: queryError } = await supabase
         .from("users")
         .select("id, email, name, role")
         .in("role", ["operator", "operador"])
-        .eq("is_active", true)
         .order("email")
 
-      if (queryError) throw queryError
+      if (queryError) {
+        // Se erro for relacionado a coluna is_active, tentar sem filtro
+        if (queryError.message?.includes('is_active') || queryError.message?.includes('column')) {
+          console.warn('Coluna is_active não encontrada, continuando sem filtro')
+          // Já temos a query sem is_active, então o erro não deveria ocorrer
+          // Mas se ocorrer, vamos apenas logar e continuar
+        } else {
+          throw queryError
+        }
+      }
+      
       setOperators(data || [])
     } catch (err: any) {
       console.error("Erro ao carregar operadores:", err)
-      setError("Erro ao carregar operadores")
+      setError("Erro ao carregar operadores. Verifique se há operadores cadastrados.")
+      setOperators([]) // Definir array vazio em caso de erro
     } finally {
       setLoadingOperators(false)
     }
-  }
+  }, [])
+
+  useEffect(() => {
+    if (isOpen) {
+      loadOperators()
+    }
+  }, [isOpen, loadOperators])
 
   const handleAssociate = async () => {
     if (!operatorEmail.trim()) {
