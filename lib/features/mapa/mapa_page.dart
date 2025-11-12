@@ -11,6 +11,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/i18n/i18n.dart';
 import '../../core/services/snackbar_service.dart';
+import '../../core/services/error_service.dart' as gf_errors;
 import '../../core/theme/gf_tokens.dart';
 import '../../core/theme/unified_theme.dart';
 import '../../core/utils/date_utils.dart';
@@ -382,8 +383,20 @@ class _MapaPageState extends ConsumerState<MapaPage> {
           _busStops = busStops;
           _showBusStops = true;
         });
-      } on Exception catch (e) {
-        debugPrint('Erro ao carregar pontos de parada: $e');
+      } on Exception catch (e, stack) {
+        await gf_errors.ErrorService.instance.reportError(
+          e,
+          stack,
+          context: 'map.busStops.load',
+          additionalData: {'routeId': vehicle.routeId},
+          severity: gf_errors.ErrorSeverity.warning,
+        );
+        if (mounted) {
+          SnackBarService.errorText(
+            context,
+            'Erro ao carregar pontos de parada: ${e.toString()}',
+          );
+        }
       }
     }
   }
@@ -438,6 +451,7 @@ class _MapaPageState extends ConsumerState<MapaPage> {
       ),
     );
 
+    if (!mounted) return;
     if (result == null) return;
 
     // Buscar telefone do motorista (assumindo que está disponível no vehicle ou precisa buscar)
@@ -461,7 +475,14 @@ class _MapaPageState extends ConsumerState<MapaPage> {
           SnackBarService.errorText(context, 'Não foi possível abrir o aplicativo de mensagens');
         }
       }
-    } catch (e) {
+    } on Exception catch (e, stack) {
+      await gf_errors.ErrorService.instance.reportError(
+        e,
+        stack,
+        context: 'map.contactDriver',
+        additionalData: {'vehicleId': vehicle.id},
+        severity: gf_errors.ErrorSeverity.warning,
+      );
       SnackBarService.errorText(
         context,
         'Erro ao tentar contatar motorista: ${e.toString()}',
