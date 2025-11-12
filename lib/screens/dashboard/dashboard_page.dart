@@ -161,19 +161,19 @@ class DashboardPage extends ConsumerWidget {
           children: [
             GfKpiCardVariants.inTransit(
               value: '${metrics['inTransit'] ?? 0}',
-              onTap: () => _navigateToTrips(context),
+              onTap: _navigateToTrips,
             ),
             GfKpiCardVariants.activeVehicles(
               value: '${metrics['activeVehicles'] ?? 0}',
-              onTap: () => _navigateToVehicles(context),
+              onTap: _navigateToVehicles,
             ),
             GfKpiCardVariants.routesToday(
               value: '${metrics['routesToday'] ?? 0}',
-              onTap: () => _navigateToRoutes(context),
+              onTap: _navigateToRoutes,
             ),
             GfKpiCardVariants.criticalAlerts(
               value: '${metrics['criticalAlerts'] ?? 0}',
-              onTap: () => _navigateToAlerts(context),
+              onTap: _navigateToAlerts,
             ),
           ],
         );
@@ -394,7 +394,7 @@ class DashboardPage extends ConsumerWidget {
                   onTap: _openSettings,
                 ),
                 GfQuickActionVariants.reopenTrip(
-                  onTap: _showReopenTripDialog,
+                  onTap: () => _showReopenTripDialog(context),
                 ),
               ],
             );
@@ -476,60 +476,60 @@ class DashboardPage extends ConsumerWidget {
   // ========================================
   // METODOS DE NAVEGACAO
   // ========================================
-  static void _navigateToTrips(BuildContext context) {
+  static void _navigateToTrips() {
     try {
       AppRouter.instance.go(AppRoutes.operatorTrips);
-    } catch (e) {
-      LoggerService.instance.error('Erro ao navegar para viagens: $e');
+    } on Object catch (error, stack) {
+      LoggerService.instance.error('Erro ao navegar para viagens', error, stack);
     }
   }
 
-  static void _navigateToVehicles(BuildContext context) {
+  static void _navigateToVehicles() {
     try {
       AppRouter.instance.go(AppRoutes.operatorVehicles);
-    } catch (e) {
-      LoggerService.instance.error('Erro ao navegar para veículos: $e');
+    } on Object catch (error, stack) {
+      LoggerService.instance.error('Erro ao navegar para veículos', error, stack);
     }
   }
 
-  static void _navigateToRoutes(BuildContext context) {
+  static void _navigateToRoutes() {
     try {
       // Assumindo que há uma rota de rotas - ajustar conforme necessário
       AppRouter.instance.go('/admin/rotas');
-    } catch (e) {
-      LoggerService.instance.error('Erro ao navegar para rotas: $e');
+    } on Object catch (error, stack) {
+      LoggerService.instance.error('Erro ao navegar para rotas', error, stack);
     }
   }
 
-  static void _navigateToAlerts(BuildContext context) {
+  static void _navigateToAlerts() {
     try {
       AppRouter.instance.go('/admin/alertas');
-    } catch (e) {
-      LoggerService.instance.error('Erro ao navegar para alertas: $e');
+    } on Object catch (error, stack) {
+      LoggerService.instance.error('Erro ao navegar para alertas', error, stack);
     }
   }
 
-  static void _navigateToMap(BuildContext context) {
+  static void _navigateToMap() {
     try {
       AppRouter.instance.go(AppRoutes.map);
-    } catch (e) {
-      LoggerService.instance.error('Erro ao navegar para mapa: $e');
+    } on Object catch (error, stack) {
+      LoggerService.instance.error('Erro ao navegar para mapa', error, stack);
     }
   }
 
-  static void _navigateToReports(BuildContext context) {
+  static void _navigateToReports() {
     try {
       AppRouter.instance.go(AppRoutes.operatorReports);
-    } catch (e) {
-      LoggerService.instance.error('Erro ao navegar para relatórios: $e');
+    } on Object catch (error, stack) {
+      LoggerService.instance.error('Erro ao navegar para relatórios', error, stack);
     }
   }
 
-  static void _openSettings(BuildContext context) {
+  static void _openSettings() {
     try {
       AppRouter.instance.go(AppRoutes.settings);
-    } catch (e) {
-      LoggerService.instance.error('Erro ao abrir configurações: $e');
+    } on Object catch (error, stack) {
+      LoggerService.instance.error('Erro ao abrir configurações', error, stack);
     }
   }
 

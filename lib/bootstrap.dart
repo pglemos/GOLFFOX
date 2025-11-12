@@ -12,7 +12,7 @@ Future<void> bootstrap(Widget app) async {
     if (kDebugMode) {
       debugPrint('[bootstrap] Supabase initialized: ${SupaClient.status}');
     }
-  } catch (e) {
+  } on Exception catch (e) {
     if (kDebugMode) {
       debugPrint('[bootstrap] Supabase não configurado ou falhou: $e');
       debugPrint('[bootstrap] Continuando sem backend (modo offline/dev).');

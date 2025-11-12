@@ -29,6 +29,68 @@ class ErrorService {
     _logger.info('Error service initialized');
   }
 
+  /// Execute an async operation with standardized error handling and logging
+  Future<T> executeWithHandling<T>(
+    Future<T> Function() operation, {
+    String? context,
+    Map<String, dynamic>? additionalData,
+    ErrorSeverity severityOnError = ErrorSeverity.error,
+  }) async {
+    try {
+      return await operation();
+    } on PlatformException catch (e, stack) {
+      await reportError(
+        e,
+        stack,
+        context: context ?? 'Platform operation',
+        additionalData: additionalData,
+        severity: ErrorSeverity.warning,
+      );
+      rethrow;
+    } on PostgrestException catch (e, stack) {
+      await reportError(
+        e,
+        stack,
+        context: context ?? 'Supabase operation',
+        additionalData: {
+          ...?additionalData,
+          'errorType': 'supabase',
+          'errorCode': e.code,
+        },
+      );
+      rethrow;
+    } on TimeoutException catch (e, stack) {
+      await reportError(
+        e,
+        stack,
+        context: context ?? 'Timeout',
+        additionalData: additionalData,
+        severity: ErrorSeverity.warning,
+      );
+      rethrow;
+    } on Exception catch (e, stack) {
+      // ArgumentError é uma subclasse de Error, não Exception, então será capturado aqui
+      // se for lançado como Exception ou no catch genérico abaixo
+      await reportError(
+        e,
+        stack,
+        context: context,
+        additionalData: additionalData,
+        severity: severityOnError,
+      );
+      rethrow;
+    } on Object catch (e, stack) {
+      await reportError(
+        e,
+        stack,
+        context: context,
+        additionalData: additionalData,
+        severity: severityOnError,
+      );
+      rethrow;
+    }
+  }
+
   /// Report an error with context
   Future<void> reportError(
     Object error,
@@ -54,7 +116,8 @@ class ErrorService {
     }
 
     // Log the error
-    final formatted = ErrorUtils.formatError(error, context: context, additionalData: safeData);
+    final formatted = ErrorUtils.formatError(error,
+        context: context, additionalData: safeData);
     _logger.error('Error reported: $formatted', error, stackTrace);
 
     // Send to external services if enabled
@@ -174,13 +237,13 @@ class ErrorService {
     for (var attempt = 1; attempt <= maxAttempts; attempt++) {
       try {
         return await operation();
-      } catch (error) {
+      } on Object catch (error, stack) {
         lastError = error;
 
         if (attempt == maxAttempts || !shouldRetry(error, attempt)) {
           await reportError(
             error,
-            StackTrace.current,
+            stack,
             context: context,
             additionalData: {
               'attempt': attempt,
@@ -190,11 +253,13 @@ class ErrorService {
           rethrow;
         }
 
-        final formatted = ErrorUtils.formatError(error, context: context, additionalData: {
+        final formatted =
+            ErrorUtils.formatError(error, context: context, additionalData: {
           'attempt': attempt,
           'maxAttempts': maxAttempts,
         });
-        _logger.warning('operation failed (attempt $attempt/$maxAttempts), retrying... $formatted');
+        _logger.warning(
+            'operation failed (attempt $attempt/$maxAttempts), retrying... $formatted');
 
         await Future<void>.delayed(delay * attempt);
       }
@@ -220,7 +285,7 @@ class ErrorService {
 
     // Platform exceptions (e.g., permissions, clipboard)
     if (error is PlatformException) {
-      final code = (error.code).toLowerCase();
+      final code = error.code.toLowerCase();
       if (code.contains('permission')) {
         return GxError(
           code: 'permission_denied',
@@ -296,12 +361,12 @@ class ErrorService {
     }
 
     if (error is PostgrestException) {
-      final message = (error.message ?? '').toLowerCase();
+      final message = error.message.toLowerCase();
 
       if (message.contains('permission') || message.contains('rls')) {
         return GxError(
           code: 'permission_denied',
-          message: error.message ?? 'permission denied',
+          message: error.message,
           userMessage: 'Você não tem permissão para esta operação.',
           severity: ErrorSeverity.warning,
         );
@@ -310,7 +375,7 @@ class ErrorService {
       if (error.code == '404' || message.contains('not found')) {
         return GxError(
           code: 'not_found',
-          message: error.message ?? 'not found',
+          message: error.message,
           userMessage: 'Registro não encontrado.',
           severity: ErrorSeverity.info,
         );
@@ -319,7 +384,7 @@ class ErrorService {
       if (error.code == '409' || message.contains('duplicate')) {
         return GxError(
           code: 'conflict',
-          message: error.message ?? 'conflict',
+          message: error.message,
           userMessage: 'Este registro já existe.',
           severity: ErrorSeverity.warning,
         );
@@ -349,7 +414,7 @@ class ErrorService {
       return GxError(
         code: 'network_error',
         message: error.toString(),
-      userMessage: 'Erro de conexão. Verifique sua internet.',
+        userMessage: 'Erro de conexão. Verifique sua internet.',
         severity: ErrorSeverity.warning,
       );
     }
@@ -372,13 +437,24 @@ class ErrorService {
   Map<String, dynamic>? _sanitizeData(Map<String, dynamic>? data) {
     if (data == null) return null;
     final sensitive = <String>{
-      'password', 'senha', 'token', 'secret', 'authorization', 'auth',
-      'cpf', 'cnpj', 'api_key', 'apiKey', 'key', 'access_token', 'refresh_token',
+      'password',
+      'senha',
+      'token',
+      'secret',
+      'authorization',
+      'auth',
+      'cpf',
+      'cnpj',
+      'api_key',
+      'apiKey',
+      'key',
+      'access_token',
+      'refresh_token',
     };
     final sanitized = <String, dynamic>{};
     data.forEach((k, v) {
       final keyLower = k.toLowerCase();
-      if (sensitive.any((s) => keyLower.contains(s))) {
+      if (sensitive.any(keyLower.contains)) {
         sanitized[k] = '***redacted***';
       } else {
         sanitized[k] = v;
@@ -389,33 +465,19 @@ class ErrorService {
 
   Future<void> _sendToCrashlytics(ErrorReport report) async {
     // TODO(golffox): Wire up Crashlytics integration
-    _logger.debug('Would send to Crashlytics: ${report.error}');
+    try {
+      _logger.debug('Would send to Crashlytics: ${report.error}');
+    } on Exception catch (e, stack) {
+      _logger.error('Crashlytics forwarding failed', e, stack);
+    }
   }
 
   Future<void> _sendToAnalytics(ErrorReport report) async {
     // TODO(golffox): Wire up analytics integration
-    _logger.debug('Would send to Analytics: ${report.error}');
-  }
-
-  /// Execute operation with error handling and reporting
-  /// Similar to withRetry but with automatic error reporting
-  Future<T> executeWithHandling<T>(
-    Future<T> Function() operation, {
-    String? context,
-    Map<String, dynamic>? additionalData,
-    ErrorSeverity severity = ErrorSeverity.error,
-  }) async {
     try {
-      return await operation();
-    } catch (error, stackTrace) {
-      await reportError(
-        error,
-        stackTrace,
-        context: context,
-        additionalData: additionalData,
-        severity: severity,
-      );
-      rethrow;
+      _logger.debug('Would send to Analytics: ${report.error}');
+    } on Exception catch (e, stack) {
+      _logger.error('Analytics forwarding failed', e, stack);
     }
   }
 }
@@ -430,7 +492,6 @@ enum ErrorSeverity {
 
 /// Standardized error class for GolfFox
 class GxError implements Exception {
-
   const GxError({
     required this.code,
     required this.message,
@@ -450,7 +511,6 @@ class GxError implements Exception {
 
 /// Error report for tracking and analytics
 class ErrorReport {
-
   const ErrorReport({
     required this.error,
     required this.severity,

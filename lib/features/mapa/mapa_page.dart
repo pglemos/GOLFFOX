@@ -10,8 +10,8 @@ import 'package:latlong2/latlong.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/i18n/i18n.dart';
-import '../../core/services/snackbar_service.dart';
 import '../../core/services/error_service.dart' as gf_errors;
+import '../../core/services/snackbar_service.dart';
 import '../../core/theme/gf_tokens.dart';
 import '../../core/theme/unified_theme.dart';
 import '../../core/utils/date_utils.dart';
@@ -455,7 +455,7 @@ class _MapaPageState extends ConsumerState<MapaPage> {
     if (result == null) return;
 
     // Buscar telefone do motorista (assumindo que está disponível no vehicle ou precisa buscar)
-    // TODO: Implementar busca do telefone real do motorista através do serviço
+    // TODO(golffox): Implementar busca do telefone real do motorista através do serviço
     // Por enquanto, usando um placeholder - o telefone deveria vir do driver service
     final phoneNumber = vehicle.driverName; // Placeholder - buscar telefone real do driver
 
@@ -465,6 +465,7 @@ class _MapaPageState extends ConsumerState<MapaPage> {
         if (await canLaunchUrl(uri)) {
           await launchUrl(uri);
         } else {
+          if (!mounted) return;
           SnackBarService.errorText(context, 'Não foi possível fazer a ligação');
         }
       } else if (result == 'message') {
@@ -472,6 +473,7 @@ class _MapaPageState extends ConsumerState<MapaPage> {
         if (await canLaunchUrl(uri)) {
           await launchUrl(uri);
         } else {
+          if (!mounted) return;
           SnackBarService.errorText(context, 'Não foi possível abrir o aplicativo de mensagens');
         }
       }
@@ -483,6 +485,7 @@ class _MapaPageState extends ConsumerState<MapaPage> {
         additionalData: {'vehicleId': vehicle.id},
         severity: gf_errors.ErrorSeverity.warning,
       );
+      if (!mounted) return;
       SnackBarService.errorText(
         context,
         'Erro ao tentar contatar motorista: ${e.toString()}',

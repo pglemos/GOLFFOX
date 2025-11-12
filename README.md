@@ -694,6 +694,35 @@ vercel deploy --prod
 
 ### Flutter (Mobile)
 
+Os apps móveis serão desenvolvidos exclusivamente em Flutter (Dart), contemplando Passageiro e Motorista, com publicação nas lojas Google Play (Android) e Apple App Store (iOS). Abaixo, as diretrizes técnicas e de processo:
+
+- Aplicativo do Passageiro (mobile)
+  - Desenvolvido em Dart com Flutter SDK
+  - Publicado em Google Play e App Store
+  - Implementa todas as funcionalidades para passageiros
+  - Design consistente entre plataformas (iOS e Android)
+  - Atende requisitos específicos de cada loja
+
+- Aplicativo do Motorista (mobile)
+  - Desenvolvido em Dart com Flutter SDK
+  - Publicado em Google Play e App Store
+  - Implementa todas as funcionalidades para motoristas
+  - Mantém consistência visual com o app do passageiro
+  - Cumpre guidelines de publicação de cada plataforma
+
+- Gate de início dos projetos Flutter
+  - Conclusão e aprovação dos protótipos de design
+  - Definição completa dos requisitos funcionais e não‑funcionais
+  - Arquitetura técnica e padrões de código estabelecidos
+
+- Qualidade, segurança e desempenho
+  - Testes rigorosos em dispositivos reais
+  - Conformidade com políticas de segurança e privacidade
+  - Monitoramento de desempenho implementado
+  - Compatibilidade com versões anteriores do sistema
+
+Builds usuais para distribuição:
+
 ```bash
 # Android APK
 flutter build apk --release
@@ -703,10 +732,11 @@ flutter build appbundle --release
 
 # iOS
 flutter build ios --release
-
-# Web
-flutter build web --release
 ```
+
+#### Referências técnicas
+
+- `docs/ERROR_HANDLING.md`: diretrizes de tratamento de erros, conectividade e UX assíncrona em Flutter.
 
 ### Deploy no Vercel
 

@@ -22,7 +22,7 @@ void main() {
       mockSupabaseService = MockSupabaseService();
       mockSupabaseClient = MockSupabaseClient();
       mockContext = MockBuildContext();
-      authService = AuthService();
+      authService = AuthService(supabaseService: mockSupabaseService);
     });
 
     group('signInWithEmail', () {
@@ -69,6 +69,7 @@ void main() {
         
         final mockAuthResponse = MockAuthResponse();
         when(mockAuthResponse.user).thenReturn(null);
+        when(mockAuthResponse.session).thenReturn(null);
         
         when(mockSupabaseService.signInWithEmail(email, password))
             .thenAnswer((_) async => mockAuthResponse);
@@ -173,8 +174,11 @@ void main() {
         final mockUser = MockUser();
         final mockAuthResponse = MockAuthResponse();
         when(mockAuthResponse.user).thenReturn(mockUser);
-        
-        when(mockSupabaseClient.auth.signUp(email: email, password: password))
+
+        final mockGoTrueClient = MockGoTrueClient();
+        when(mockSupabaseService.client).thenReturn(mockSupabaseClient);
+        when(mockSupabaseClient.auth).thenReturn(mockGoTrueClient);
+        when(mockGoTrueClient.signUp(email: email, password: password))
             .thenAnswer((_) async => mockAuthResponse);
 
         // Act
@@ -182,7 +186,7 @@ void main() {
 
         // Assert
         expect(result, isNull);
-        verify(mockSupabaseClient.auth.signUp(email: email, password: password)).called(1);
+        verify(mockGoTrueClient.signUp(email: email, password: password)).called(1);
       });
 
       test('should throw AuthFailure when user creation fails', () async {
@@ -192,8 +196,11 @@ void main() {
         
         final mockAuthResponse = MockAuthResponse();
         when(mockAuthResponse.user).thenReturn(null);
-        
-        when(mockSupabaseClient.auth.signUp(email: email, password: password))
+
+        final mockGoTrueClient = MockGoTrueClient();
+        when(mockSupabaseService.client).thenReturn(mockSupabaseClient);
+        when(mockSupabaseClient.auth).thenReturn(mockGoTrueClient);
+        when(mockGoTrueClient.signUp(email: email, password: password))
             .thenAnswer((_) async => mockAuthResponse);
 
         // Act & Assert
@@ -211,13 +218,16 @@ void main() {
     group('signOut', () {
       test('should call supabase signOut', () async {
         // Arrange
-        when(mockSupabaseClient.auth.signOut()).thenAnswer((_) async {});
+        final mockGoTrueClient = MockGoTrueClient();
+        when(mockSupabaseService.client).thenReturn(mockSupabaseClient);
+        when(mockSupabaseClient.auth).thenReturn(mockGoTrueClient);
+        when(mockGoTrueClient.signOut()).thenAnswer((_) async {});
 
         // Act
         await authService.signOut();
 
         // Assert
-        verify(mockSupabaseClient.auth.signOut()).called(1);
+        verify(mockGoTrueClient.signOut()).called(1);
       });
     });
 

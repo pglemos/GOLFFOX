@@ -293,7 +293,10 @@ Body: $sanitizedBody
         if (result is Future) {
           unawaited(result);
         }
-      } catch (error, stackTrace) {
+      } on Exception catch (error, stackTrace) {
+        debugPrint('Failed to forward log record: $error');
+        debugPrintStack(stackTrace: stackTrace);
+      } on Error catch (error, stackTrace) {
         debugPrint('Failed to forward log record: $error');
         debugPrintStack(stackTrace: stackTrace);
       }
@@ -347,15 +350,7 @@ Body: $sanitizedBody
 
 /// Estrutura de um registro de log
 class LogRecord {
-  final LogLevel level;
-  final String message;
-  final DateTime timestamp;
-  final String? tag;
-  final Object? error;
-  final StackTrace? stackTrace;
-  final Map<String, Object?>? metadata;
-
-  LogRecord({
+  const LogRecord({
     required this.level,
     required this.message,
     required this.timestamp,
@@ -364,6 +359,14 @@ class LogRecord {
     this.stackTrace,
     this.metadata,
   });
+
+  final LogLevel level;
+  final String message;
+  final DateTime timestamp;
+  final String? tag;
+  final Object? error;
+  final StackTrace? stackTrace;
+  final Map<String, Object?>? metadata;
 }
 
 /// Assinatura de manipuladores externos de log (Crashlytics, Sentry, etc.)

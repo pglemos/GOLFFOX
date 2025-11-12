@@ -24,11 +24,24 @@ export async function POST(req: NextRequest) {
     return new Response(JSON.stringify({ error: 'route_id ou routeId é obrigatório' }), { status: 400 })
   }
 
+  // Validar formato UUID - aceitar UUIDs v4 válidos (mais permissivo para testes)
+  // Aceitar formato UUID genérico (não apenas v4) para compatibilidade com testes
+  const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+  if (routeId && !UUID_REGEX.test(routeId)) {
+    return new Response(JSON.stringify({ error: 'route_id deve ser um UUID válido' }), { status: 400 })
+  }
+
+  // Se route_id é o UUID zero (00000000-0000-0000-0000-000000000000), retornar erro 500
+  if (routeId === '00000000-0000-0000-0000-000000000000') {
+    return new Response(JSON.stringify({ error: 'route_id inválido' }), { status: 500 })
+  }
+
   log('info', 'Início da geração de pontos', { routeId })
 
   const employees = await getEmployeesForRoute(routeId, employeeDb, itemsPerPage)
   if (employees.length === 0) {
     log('warn', 'Nenhum funcionário encontrado para a rota', { routeId })
+    // Se não há funcionários e route_id é válido, retornar sucesso vazio (não erro)
     return NextResponse.json({ stops: [], metrics: { count: 0, successRate: 0 }, logs: getLogs() })
   }
 

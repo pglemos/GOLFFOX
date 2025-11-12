@@ -29,7 +29,10 @@ class AuthFailure implements Exception {
 }
 
 class AuthService {
-  SupabaseService get _supabaseService => SupabaseService.instance;
+  AuthService({SupabaseService? supabaseService})
+      : _supabaseService = supabaseService ?? SupabaseService.instance;
+
+  final SupabaseService _supabaseService;
 
   static const _timeout = Duration(seconds: 20);
   static const _propagateDelay = GfTokens.durationSlow;

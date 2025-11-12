@@ -876,7 +876,7 @@ class _CreateDriverPageState extends ConsumerState<CreateDriverPage> {
 
   Future<void> _selectPhoto() async {
     try {
-      final XFile? image = await _imagePicker.pickImage(
+      final image = await _imagePicker.pickImage(
         source: ImageSource.gallery,
         maxWidth: 800,
         maxHeight: 800,
@@ -887,16 +887,19 @@ class _CreateDriverPageState extends ConsumerState<CreateDriverPage> {
         final bytes = await image.readAsBytes();
         setState(() {
           _photoBytes = bytes;
-          // TODO: Upload da foto para storage (Supabase/Cloud) e obter URL
+          // TODO(golffox): Upload da foto para storage (Supabase/Cloud) e obter URL
           // Por enquanto, mantém apenas os bytes em memória
         });
+        if (!mounted) return;
         SnackBarService.successText(context, 'Foto selecionada com sucesso');
       }
-    } catch (e) {
-      SnackBarService.errorText(
-        context,
-        'Erro ao selecionar foto: ${e.toString()}',
-      );
+    } on Exception catch (e) {
+      if (mounted) {
+        SnackBarService.errorText(
+          context,
+          'Erro ao selecionar foto: ${e.toString()}',
+        );
+      }
     }
   }
 
@@ -1091,12 +1094,12 @@ class _CreateDriverPageState extends ConsumerState<CreateDriverPage> {
       ),
     );
 
-    if (result == true && issueDate != null) {
+    if ((result ?? false) && issueDate != null) {
       final certification = DriverCertification(
         id: _uuid.v4(),
         name: nameController.text.trim(),
         description: descriptionController.text.trim(),
-        issueDate: issueDate,
+        issueDate: issueDate!,
         expiryDate: expiryDate,
         issuingOrganization: organizationController.text.trim(),
         certificateNumber: certificateNumberController.text.trim().isEmpty
@@ -1108,6 +1111,7 @@ class _CreateDriverPageState extends ConsumerState<CreateDriverPage> {
         _certifications.add(certification);
       });
 
+      if (!mounted) return;
       SnackBarService.successText(context, 'Certificação adicionada com sucesso');
     }
   }
@@ -1129,6 +1133,7 @@ class _CreateDriverPageState extends ConsumerState<CreateDriverPage> {
     });
 
     try {
+      final errorService = ErrorService.instance;
       final driver = Driver(
         id: widget.driver?.id ?? '',
         name: _nameController.text.trim(),
@@ -1156,7 +1161,6 @@ class _CreateDriverPageState extends ConsumerState<CreateDriverPage> {
         updatedAt: DateTime.now(),
       );
 
-      final errorService = ErrorService.instance;
       final service = ref.read(driverServiceProvider.notifier);
       
       if (widget.driver != null) {
@@ -1187,7 +1191,7 @@ class _CreateDriverPageState extends ConsumerState<CreateDriverPage> {
         additionalData: {
           'isUpdate': widget.driver != null,
         },
-        severity: ErrorSeverity.error,
+        
       );
       _showError('Erro ao salvar motorista: $e');
     } finally {

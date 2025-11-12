@@ -15,7 +15,7 @@
 #### Test TC001
 - **Test Name:** user login endpoint validation
 - **Test Code:** [TC001_user_login_endpoint_validation.py](./TC001_user_login_endpoint_validation.py)
-- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/c7045b51-e031-4fc3-84a1-4c635866408d/b45d40e1-f085-46f0-ba56-078b2a2a7790
+- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/c0b43cfb-66bb-45ca-a21e-2eb2b88cce25/0a6f1fb1-4956-4cc4-a3aa-06c5eb1e8ad0
 - **Status:** ✅ Passed
 - **Analysis / Findings:** {{TODO:AI_ANALYSIS}}.
 ---
@@ -23,30 +23,30 @@
 #### Test TC002
 - **Test Name:** vehicle deletion or archival with trip validation
 - **Test Code:** [TC002_vehicle_deletion_or_archival_with_trip_validation.py](./TC002_vehicle_deletion_or_archival_with_trip_validation.py)
-- **Test Error:** Traceback (most recent call last):
-  File "/var/task/handler.py", line 258, in run_with_retry
-    exec(code, exec_env)
-  File "<string>", line 67, in <module>
-  File "<string>", line 47, in test_vehicle_deletion_or_archival_with_trip_validation
-AssertionError
-
-- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/c7045b51-e031-4fc3-84a1-4c635866408d/0e06d2fc-ebb0-4686-867c-931924a8c3b9
-- **Status:** ❌ Failed
+- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/c0b43cfb-66bb-45ca-a21e-2eb2b88cce25/6355998d-f7b5-446b-b7d9-46021ac25e98
+- **Status:** ✅ Passed
 - **Analysis / Findings:** {{TODO:AI_ANALYSIS}}.
 ---
 
 #### Test TC003
 - **Test Name:** generate optimized route stops
 - **Test Code:** [TC003_generate_optimized_route_stops.py](./TC003_generate_optimized_route_stops.py)
-- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/c7045b51-e031-4fc3-84a1-4c635866408d/a522e82d-9706-4000-bb06-70fefb89d3ba
-- **Status:** ✅ Passed
+- **Test Error:** Traceback (most recent call last):
+  File "/var/task/handler.py", line 258, in run_with_retry
+    exec(code, exec_env)
+  File "<string>", line 72, in <module>
+  File "<string>", line 38, in test_generate_optimized_route_stops
+AssertionError: Route creation failed with status 500
+
+- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/c0b43cfb-66bb-45ca-a21e-2eb2b88cce25/a62297c8-c276-4ee0-b2e9-45005ce98845
+- **Status:** ❌ Failed
 - **Analysis / Findings:** {{TODO:AI_ANALYSIS}}.
 ---
 
 #### Test TC004
 - **Test Name:** create new operator user
 - **Test Code:** [TC004_create_new_operator_user.py](./TC004_create_new_operator_user.py)
-- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/c7045b51-e031-4fc3-84a1-4c635866408d/2027a941-521c-4950-bd18-84e4ebb5dd4d
+- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/c0b43cfb-66bb-45ca-a21e-2eb2b88cce25/0bd4198d-92c3-4492-b4c8-f91485ba551a
 - **Status:** ✅ Passed
 - **Analysis / Findings:** {{TODO:AI_ANALYSIS}}.
 ---
@@ -57,11 +57,11 @@ AssertionError
 - **Test Error:** Traceback (most recent call last):
   File "/var/task/handler.py", line 258, in run_with_retry
     exec(code, exec_env)
-  File "<string>", line 105, in <module>
-  File "<string>", line 39, in test_manual_cost_entry_creation_and_retrieval
-AssertionError: POST /api/costs/manual unexpected status code: 500, body: {"error":"Não foi possível criar ou encontrar a categoria de custo"}
+  File "<string>", line 106, in <module>
+  File "<string>", line 60, in test_manual_cost_entry_creation_and_retrieval
+AssertionError: Created manual cost entry not found in retrieved costs
 
-- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/c7045b51-e031-4fc3-84a1-4c635866408d/6af3b3b9-b3e0-483b-b430-71373ad89cc9
+- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/c0b43cfb-66bb-45ca-a21e-2eb2b88cce25/9c3715ac-b1fa-4df6-97c7-2f418cb8c3df
 - **Status:** ❌ Failed
 - **Analysis / Findings:** {{TODO:AI_ANALYSIS}}.
 ---
@@ -72,11 +72,11 @@ AssertionError: POST /api/costs/manual unexpected status code: 500, body: {"erro
 - **Test Error:** Traceback (most recent call last):
   File "/var/task/handler.py", line 258, in run_with_retry
     exec(code, exec_env)
-  File "<string>", line 91, in <module>
-  File "<string>", line 89, in test_create_employee_as_operator
-AssertionError: Expected 401 for unauthorized request, got 500
+  File "<string>", line 70, in <module>
+  File "<string>", line 54, in test_create_employee_as_operator
+AssertionError: Expected 401 for unauthorized, got 201
 
-- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/c7045b51-e031-4fc3-84a1-4c635866408d/c9bd36fb-eea1-4c4a-ba6f-46e65568fcdb
+- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/c0b43cfb-66bb-45ca-a21e-2eb2b88cce25/27fe9243-1129-40e6-8c5f-14b182de3222
 - **Status:** ❌ Failed
 - **Analysis / Findings:** {{TODO:AI_ANALYSIS}}.
 ---
@@ -84,7 +84,7 @@ AssertionError: Expected 401 for unauthorized request, got 500
 #### Test TC007
 - **Test Name:** optimize route for operator
 - **Test Code:** [TC007_optimize_route_for_operator.py](./TC007_optimize_route_for_operator.py)
-- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/c7045b51-e031-4fc3-84a1-4c635866408d/835d12c0-7295-430d-a8c4-aaf299394968
+- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/c0b43cfb-66bb-45ca-a21e-2eb2b88cce25/355dddcd-789c-4b54-83de-cb98ce529f39
 - **Status:** ✅ Passed
 - **Analysis / Findings:** {{TODO:AI_ANALYSIS}}.
 ---
@@ -92,21 +92,8 @@ AssertionError: Expected 401 for unauthorized request, got 500
 #### Test TC008
 - **Test Name:** generate report on demand
 - **Test Code:** [TC008_generate_report_on_demand.py](./TC008_generate_report_on_demand.py)
-- **Test Error:** Traceback (most recent call last):
-  File "<string>", line 50, in test_generate_report_on_demand
-AssertionError: Report generation failed for format 'pdf' with status 400
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-  File "/var/task/handler.py", line 258, in run_with_retry
-    exec(code, exec_env)
-  File "<string>", line 58, in <module>
-  File "<string>", line 56, in test_generate_report_on_demand
-AssertionError: Test failed for format 'pdf': Report generation failed for format 'pdf' with status 400
-
-- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/c7045b51-e031-4fc3-84a1-4c635866408d/c7f64c9d-e7df-4bc2-a913-655df8569e05
-- **Status:** ❌ Failed
+- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/c0b43cfb-66bb-45ca-a21e-2eb2b88cce25/38d0cf17-33d6-41e4-b479-e1776ee5eac4
+- **Status:** ✅ Passed
 - **Analysis / Findings:** {{TODO:AI_ANALYSIS}}.
 ---
 
@@ -116,11 +103,11 @@ AssertionError: Test failed for format 'pdf': Report generation failed for forma
 - **Test Error:** Traceback (most recent call last):
   File "/var/task/handler.py", line 258, in run_with_retry
     exec(code, exec_env)
-  File "<string>", line 30, in <module>
-  File "<string>", line 17, in test_cron_job_dispatch_scheduled_reports
-AssertionError: Expected 200 for valid cronSecret but got 401
+  File "<string>", line 33, in <module>
+  File "<string>", line 17, in test_cron_dispatch_reports
+AssertionError: Expected 200 for valid cron secret, got 401 with content: {"error":"Unauthorized"}
 
-- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/c7045b51-e031-4fc3-84a1-4c635866408d/bf445eb6-fc33-46e9-a12b-62de9c57c285
+- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/c0b43cfb-66bb-45ca-a21e-2eb2b88cce25/4ecb5281-049f-4448-9cde-a77cb774b7b7
 - **Status:** ❌ Failed
 - **Analysis / Findings:** {{TODO:AI_ANALYSIS}}.
 ---
@@ -128,7 +115,7 @@ AssertionError: Expected 200 for valid cronSecret but got 401
 #### Test TC010
 - **Test Name:** system health check endpoint
 - **Test Code:** [TC010_system_health_check_endpoint.py](./TC010_system_health_check_endpoint.py)
-- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/c7045b51-e031-4fc3-84a1-4c635866408d/e10549f0-e87a-4cfa-90f4-07d2858db9a9
+- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/c0b43cfb-66bb-45ca-a21e-2eb2b88cce25/51f40b99-70db-439b-b608-d31e6d4a3849
 - **Status:** ✅ Passed
 - **Analysis / Findings:** {{TODO:AI_ANALYSIS}}.
 ---
@@ -136,7 +123,7 @@ AssertionError: Expected 200 for valid cronSecret but got 401
 
 ## 3️⃣ Coverage & Matching Metrics
 
-- **50.00** of tests passed
+- **60.00** of tests passed
 
 | Requirement        | Total Tests | ✅ Passed | ❌ Failed  |
 |--------------------|-------------|-----------|------------|

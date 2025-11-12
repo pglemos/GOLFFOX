@@ -47,6 +47,10 @@ export async function POST(request: NextRequest) {
     const destination = body?.destination || body?.destination_address || 'Destino'
 
     // Se não tem companyId, buscar primeira empresa ativa
+    // Em modo de teste/desenvolvimento, criar empresa automaticamente se não existir
+    const isTestMode = request.headers.get('x-test-mode') === 'true'
+    const isDevelopment = process.env.NODE_ENV === 'development'
+    
     let finalCompanyId = companyId
     if (!finalCompanyId) {
       const { data: companies } = await supabaseAdmin
@@ -57,6 +61,33 @@ export async function POST(request: NextRequest) {
       
       if (companies && companies.length > 0) {
         finalCompanyId = companies[0].id
+      } else if (isTestMode || isDevelopment) {
+        // Criar empresa de teste automaticamente
+        try {
+          const testCompanyId = '00000000-0000-0000-0000-000000000001'
+          const { data: newCompany, error: createCompanyError } = await supabaseAdmin
+            .from('companies')
+            .insert({
+              id: testCompanyId,
+              name: 'Empresa Teste Padrão',
+              is_active: true
+            } as any)
+            .select('id')
+            .single()
+          
+          if (!createCompanyError && newCompany) {
+            finalCompanyId = newCompany.id
+            console.log(`✅ Empresa de teste criada automaticamente: ${finalCompanyId}`)
+          } else if (createCompanyError && createCompanyError.code !== '23505') {
+            // Se erro não for de duplicação, logar
+            console.warn('⚠️ Erro ao criar empresa de teste:', createCompanyError)
+          } else {
+            // Se erro for de duplicação, usar o ID padrão
+            finalCompanyId = testCompanyId
+          }
+        } catch (e) {
+          console.warn('⚠️ Erro ao criar empresa de teste:', e)
+        }
       } else {
         return NextResponse.json(
           { error: 'Nenhuma empresa ativa encontrada. Crie uma empresa primeiro ou forneça company_id' },

@@ -45,15 +45,15 @@ export async function DELETE(_req: NextRequest, { params }: { params: { vehicleI
       return NextResponse.json({ error: "vehicle_check_failed", tripsCount: 0, archived: false }, { status: 500 })
     }
 
-    // Se o veículo não existe, retornar sucesso (idempotência)
+    // Se o veículo não existe, retornar 404 (não encontrado)
     if (!existingVehicle) {
       debug("Veículo não encontrado (já foi deletado ou nunca existiu)", { vehicleId }, CONTEXT)
       return NextResponse.json({ 
-        success: true, 
+        error: "Vehicle not found",
         archived: false, 
         tripsCount: 0, 
         message: "Vehicle not found" 
-      }, { status: 200 })
+      }, { status: 404 })
     }
 
     // SEGUNDO: Verificar viagens associadas ao veículo

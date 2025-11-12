@@ -9,15 +9,9 @@ class SupaEnv {
   // ========================================
   // Em produção e desenvolvimento, estes valores DEVEM vir via --dart-define
   // ou variáveis de ambiente em tempo de build. Não manter valores reais no código.
-  static const String supabaseUrl = String.fromEnvironment(
-    'SUPABASE_URL',
-    defaultValue: '',
-  );
+  static const String supabaseUrl = String.fromEnvironment('SUPABASE_URL');
 
-  static const String supabaseAnonKey = String.fromEnvironment(
-    'SUPABASE_ANON_KEY',
-    defaultValue: '',
-  );
+  static const String supabaseAnonKey = String.fromEnvironment('SUPABASE_ANON_KEY');
 
   // ========================================
   // VALIDACAO
