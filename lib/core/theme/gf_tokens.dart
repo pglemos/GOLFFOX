@@ -253,34 +253,56 @@ extension GfIntColorX on int {
   Color get asColor => Color(this);
 
   // Mantem compatibilidade com usos existentes de withOpacity em ints
-  Color withOpacity(double opacity) =>
-      Color(this).withValues(alpha: opacity);
+  Color withOpacity(double opacity) {
+    final color = Color(this);
+    return color.withValues(alpha: opacity.clamp(0.0, 1.0));
+  }
 
-  // Versao compativel do Color.withValues (mantem suporte em versoes antigas do Flutter)
+  // Versao compativel do Color.withValues usando API moderna do Flutter
   Color withValues({double? alpha, double? red, double? green, double? blue}) {
-    double clampUnit(double value) {
-      if (value < 0) return 0;
-      if (value > 1) return 1;
-      return value;
+    final color = Color(this);
+    return color.withValues(
+      alpha: alpha?.clamp(0.0, 1.0),
+      red: red?.clamp(0.0, 1.0),
+      green: green?.clamp(0.0, 1.0),
+      blue: blue?.clamp(0.0, 1.0),
+    );
+  }
+}
+
+// ========================================
+// EXTENSOES DE COMPATIBILIDADE PARA Color
+// Adiciona withValues() e toARGB32() em Color para
+// ambientes Flutter sem Color.withValues nativo.
+// ========================================
+// Nota: Flutter já tem withValues() nativo, então esta extensão
+// só é necessária se estivermos usando uma versão antiga do Flutter.
+// Em versões modernas do Flutter (3.27+), withValues já existe nativamente.
+extension GfColorCompatX on Color {
+  /// Cria uma nova cor com valores modificados (alpha, red, green, blue em 0.0-1.0)
+  /// Usa as propriedades modernas do Flutter (.a, .r, .g, .b)
+  /// Esta extensão só será usada se withValues não existir nativamente
+  Color withValues({double? alpha, double? red, double? green, double? blue}) {
+    // Clamp valores entre 0.0 e 1.0
+    double clampUnit(double v) {
+      if (v < 0.0) return 0.0;
+      if (v > 1.0) return 1.0;
+      return v;
     }
 
-    final color = Color(this);
-    final value = color.toARGB32();
-    final baseAlpha = ((value >> 24) & 0xFF) / 255.0;
-    final baseRed = ((value >> 16) & 0xFF) / 255.0;
-    final baseGreen = ((value >> 8) & 0xFF) / 255.0;
-    final baseBlue = (value & 0xFF) / 255.0;
+    // Usar propriedades modernas do Flutter (.a, .r, .g, .b) que são doubles 0.0-1.0
+    final newAlpha = clampUnit(alpha ?? a);
+    final newRed = clampUnit(red ?? r);
+    final newGreen = clampUnit(green ?? g);
+    final newBlue = clampUnit(blue ?? b);
 
-    final normalizedAlpha = clampUnit(alpha ?? baseAlpha);
-    final normalizedRed = clampUnit(red ?? baseRed);
-    final normalizedGreen = clampUnit(green ?? baseGreen);
-    final normalizedBlue = clampUnit(blue ?? baseBlue);
-
-    return Color.fromRGBO(
-      (normalizedRed * 255).round(),
-      (normalizedGreen * 255).round(),
-      (normalizedBlue * 255).round(),
-      normalizedAlpha,
+    // Usar Color.from que é a API moderna do Flutter
+    return Color.from(
+      alpha: newAlpha,
+      red: newRed,
+      green: newGreen,
+      blue: newBlue,
+      colorSpace: colorSpace,
     );
   }
 }
