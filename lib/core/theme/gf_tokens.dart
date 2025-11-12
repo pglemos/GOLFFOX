@@ -285,8 +285,8 @@ extension GfColorCompatX on Color {
   Color withValues({double? alpha, double? red, double? green, double? blue}) {
     // Clamp valores entre 0.0 e 1.0
     double clampUnit(double v) {
-      if (v < 0.0) return 0.0;
-      if (v > 1.0) return 1.0;
+      if (v < 0) return 0;
+      if (v > 1) return 1;
       return v;
     }
 

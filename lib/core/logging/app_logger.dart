@@ -296,7 +296,8 @@ Body: $sanitizedBody
       } on Exception catch (error, stackTrace) {
         debugPrint('Failed to forward log record: $error');
         debugPrintStack(stackTrace: stackTrace);
-      } on Error catch (error, stackTrace) {
+      } on Object catch (error, stackTrace) {
+        // Captura qualquer outro tipo de erro (incluindo Error) sem especificar o tipo
         debugPrint('Failed to forward log record: $error');
         debugPrintStack(stackTrace: stackTrace);
       }

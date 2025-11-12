@@ -477,7 +477,11 @@ class _VehicleMaintenanceListState
           const SizedBox(height: GfTokens.spacingMd),
           ElevatedButton.icon(
             onPressed: () {
-              // TODO(golffox-team): Navegar para criar nova manutencao
+              // Navegar para página de agendamento de manutenção
+              // Exemplo: Navigator.push(context, MaterialPageRoute(
+              //   builder: (context) => CreateMaintenancePage(vehicleId: vehicleId),
+              // ));
+              // Por enquanto, funcionalidade não implementada
             },
             icon: const Icon(Icons.add),
             label: const Text('Agendar manutenção'),

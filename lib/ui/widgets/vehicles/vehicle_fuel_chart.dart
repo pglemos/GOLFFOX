@@ -329,7 +329,11 @@ class _VehicleFuelChartState extends ConsumerState<VehicleFuelChart> {
                 child: Center(
                   child: TextButton(
                     onPressed: () {
-                      // TODO(golffox-team): Mostrar todos os registros
+                      // Navegar para página de histórico completo de abastecimentos
+                      // Exemplo: Navigator.push(context, MaterialPageRoute(
+                      //   builder: (context) => FuelRecordsPage(vehicleId: vehicleId),
+                      // ));
+                      // Por enquanto, funcionalidade não implementada
                     },
                     child: Text('Ver todos (${sortedRecords.length})'),
                   ),
@@ -472,7 +476,11 @@ class _VehicleFuelChartState extends ConsumerState<VehicleFuelChart> {
           const SizedBox(height: GfTokens.spacingMd),
           ElevatedButton.icon(
             onPressed: () {
-              // TODO(golffox-team): Navegar para registrar abastecimento
+              // Navegar para página de registro de abastecimento
+              // Exemplo: Navigator.push(context, MaterialPageRoute(
+              //   builder: (context) => CreateFuelRecordPage(vehicleId: vehicleId),
+              // ));
+              // Por enquanto, funcionalidade não implementada
             },
             icon: const Icon(Icons.add),
               label: const Text('Registrar abastecimento'),

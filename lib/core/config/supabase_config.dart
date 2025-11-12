@@ -34,8 +34,6 @@ class SupabaseConfig {
           anonKey: supabaseAnonKey,
           debug: kDebugMode,
         ),
-        maxAttempts: 3,
-        delay: const Duration(seconds: 1),
         context: 'supabase.initialize',
       );
 
@@ -47,7 +45,6 @@ class SupabaseConfig {
         e,
         stack,
         context: 'supabase.initialize',
-        severity: ErrorSeverity.error,
       );
       rethrow;
     }

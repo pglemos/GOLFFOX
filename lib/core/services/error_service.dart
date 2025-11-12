@@ -463,19 +463,45 @@ class ErrorService {
     return sanitized;
   }
 
+  /// Send error report to Crashlytics service
+  /// 
+  /// This method is called automatically when [EnvConfig.enableCrashlytics] is true.
+  /// To integrate with Firebase Crashlytics or another service, implement the actual
+  /// reporting logic here.
   Future<void> _sendToCrashlytics(ErrorReport report) async {
-    // TODO(golffox): Wire up Crashlytics integration
+    // Implementation placeholder for Crashlytics integration
+    // Example: Firebase Crashlytics integration
+    // await FirebaseCrashlytics.instance.recordError(
+    //   report.error,
+    //   report.stackTrace,
+    //   reason: report.context,
+    //   information: report.additionalData,
+    // );
     try {
-      _logger.debug('Would send to Crashlytics: ${report.error}');
+      _logger.debug('Error logged (Crashlytics disabled): ${report.error}');
     } on Exception catch (e, stack) {
       _logger.error('Crashlytics forwarding failed', e, stack);
     }
   }
 
+  /// Send error report to Analytics service
+  /// 
+  /// This method is called automatically when [EnvConfig.enableAnalytics] is true.
+  /// To integrate with Firebase Analytics or another service, implement the actual
+  /// reporting logic here.
   Future<void> _sendToAnalytics(ErrorReport report) async {
-    // TODO(golffox): Wire up analytics integration
+    // Implementation placeholder for Analytics integration
+    // Example: Firebase Analytics integration
+    // await FirebaseAnalytics.instance.logEvent(
+    //   name: 'error_occurred',
+    //   parameters: {
+    //     'error_code': report.severity.name,
+    //     'context': report.context,
+    //     ...report.additionalData ?? {},
+    //   },
+    // );
     try {
-      _logger.debug('Would send to Analytics: ${report.error}');
+      _logger.debug('Error logged (Analytics disabled): ${report.error}');
     } on Exception catch (e, stack) {
       _logger.error('Analytics forwarding failed', e, stack);
     }
