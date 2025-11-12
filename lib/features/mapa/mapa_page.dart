@@ -3,6 +3,7 @@
 // Pagina principal do mapa interativo com status em tempo real
 // ========================================
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -18,6 +19,7 @@ import '../../core/utils/date_utils.dart';
 import '../../models/bus_stop.dart';
 import '../../models/vehicle_position.dart' show VehiclePosition, VehicleStatus;
 import '../../models/vehicle_status.dart' as vs;
+import '../../providers/driver_providers.dart';
 import '../../providers/realtime_providers.dart';
 import '../../services/bus_stop_service.dart';
 import '../../services/map_service.dart' show vehicleStatusServiceProvider;
@@ -454,10 +456,30 @@ class _MapaPageState extends ConsumerState<MapaPage> {
     if (!mounted) return;
     if (result == null) return;
 
-    // Buscar telefone do motorista (assumindo que está disponível no vehicle ou precisa buscar)
-    // TODO(golffox): Implementar busca do telefone real do motorista através do serviço
-    // Por enquanto, usando um placeholder - o telefone deveria vir do driver service
-    final phoneNumber = vehicle.driverName; // Placeholder - buscar telefone real do driver
+    // Buscar telefone do motorista através do driver service
+    String? phoneNumber;
+    try {
+      final drivers = ref.read(driversListProvider);
+      final matchingDrivers = drivers.where((d) => d.name == vehicle.driverName);
+      if (matchingDrivers.isNotEmpty) {
+        phoneNumber = matchingDrivers.first.phone;
+      }
+    } on Exception catch (e) {
+      // Se não encontrar o motorista, exibir erro
+      phoneNumber = null;
+      if (kDebugMode) {
+        debugPrint('Erro ao buscar telefone do motorista: $e');
+      }
+    }
+    
+    if (phoneNumber == null || phoneNumber.isEmpty) {
+      if (!mounted) return;
+      SnackBarService.errorText(
+        context,
+        'Telefone do motorista não disponível',
+      );
+      return;
+    }
 
     try {
       if (result == 'call') {

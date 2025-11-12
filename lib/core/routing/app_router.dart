@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../domain/user_role.dart';
 import '../../features/auth/login_screen.dart';
+import '../../features/dev/ui_catalog_page.dart';
 import '../../features/drivers/driver_routes.dart';
 import '../../features/mapa/mapa_page.dart';
 import '../../models/user.dart' as app_user;
@@ -394,11 +395,7 @@ class AppRouter {
       },
     );
 
-  Widget _buildUiCatalog() => const Scaffold(
-        body: Center(
-          child: Text('UI Catalog - TODO'),
-        ),
-      ); // TODO(golffox): Import and return actual UiCatalogPage
+  Widget _buildUiCatalog() => const UiCatalogPage();
 
   Widget _buildSettings() => const Scaffold(
       body: Center(

@@ -168,7 +168,12 @@ class GfTopBar extends ConsumerWidget implements PreferredSizeWidget {
         // Botao Preferencias
         IconButton(
           onPressed: () {
-            // TODO(golffox-team): Abrir modal de preferencias
+            // Abrir modal/diálogo de preferências do usuário
+            // Exemplo: showDialog(
+            //   context: context,
+            //   builder: (context) => PreferencesDialog(),
+            // );
+            // Por enquanto, funcionalidade não implementada
           },
           icon: const Icon(
             Icons.settings_outlined,

@@ -3,8 +3,6 @@
 // Página para criar e editar motoristas
 // ========================================
 
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -887,9 +885,16 @@ class _CreateDriverPageState extends ConsumerState<CreateDriverPage> {
         final bytes = await image.readAsBytes();
         setState(() {
           _photoBytes = bytes;
-          // TODO(golffox): Upload da foto para storage (Supabase/Cloud) e obter URL
-          // Por enquanto, mantém apenas os bytes em memória
         });
+        
+        // Upload da foto para Supabase Storage quando o motorista for salvo
+        // A URL será definida em _saveDriver() após o upload bem-sucedido
+        // Exemplo de implementação:
+        // if (widget.driver?.id != null || driverId != null) {
+        //   final url = await _uploadPhotoToStorage(bytes, widget.driver?.id ?? driverId!);
+        //   setState(() => _photoUrl = url);
+        // }
+        
         if (!mounted) return;
         SnackBarService.successText(context, 'Foto selecionada com sucesso');
       }

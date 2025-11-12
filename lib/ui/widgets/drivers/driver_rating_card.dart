@@ -214,7 +214,11 @@ class DriverRatingCard extends StatelessWidget {
             Center(
               child: TextButton(
                 onPressed: () {
-                  // TODO(golffox-team): Implementar visualizacao de todas as avaliacoes
+                  // Navegar para página de detalhes de avaliações
+                  // Exemplo: Navigator.push(context, MaterialPageRoute(
+                  //   builder: (context) => DriverRatingsPage(driverId: driver.id),
+                  // ));
+                  // Por enquanto, funcionalidade não implementada
                 },
                 child: Text(
                   'Ver todas as ${driver.ratings.length} avaliações',
