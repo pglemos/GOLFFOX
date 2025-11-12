@@ -338,7 +338,7 @@ class ErrorService {
       return const GxError(
         code: 'timeout',
         message: 'operation timed out',
-      userMessage: 'Operação demorou muito. Verifique sua conexão.',
+        userMessage: 'Operação demorou muito. Verifique sua conexão.',
         severity: ErrorSeverity.warning,
       );
     }
@@ -395,6 +395,28 @@ class ErrorService {
   Future<void> _sendToAnalytics(ErrorReport report) async {
     // TODO(golffox): Wire up analytics integration
     _logger.debug('Would send to Analytics: ${report.error}');
+  }
+
+  /// Execute operation with error handling and reporting
+  /// Similar to withRetry but with automatic error reporting
+  Future<T> executeWithHandling<T>(
+    Future<T> Function() operation, {
+    String? context,
+    Map<String, dynamic>? additionalData,
+    ErrorSeverity severity = ErrorSeverity.error,
+  }) async {
+    try {
+      return await operation();
+    } catch (error, stackTrace) {
+      await reportError(
+        error,
+        stackTrace,
+        context: context,
+        additionalData: additionalData,
+        severity: severity,
+      );
+      rethrow;
+    }
   }
 }
 

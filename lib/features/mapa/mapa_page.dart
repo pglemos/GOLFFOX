@@ -15,7 +15,7 @@ import '../../core/theme/gf_tokens.dart';
 import '../../core/theme/unified_theme.dart';
 import '../../core/utils/date_utils.dart';
 import '../../models/bus_stop.dart';
-import '../../models/vehicle_position.dart';
+import '../../models/vehicle_position.dart' show VehiclePosition, VehicleStatus;
 import '../../models/vehicle_status.dart' as vs;
 import '../../providers/realtime_providers.dart';
 import '../../services/bus_stop_service.dart';
@@ -66,7 +66,7 @@ class _MapaPageState extends ConsumerState<MapaPage> {
   @override
   Widget build(BuildContext context) {
     final vehiclePositionsAsync = ref.watch(vehiclePositionsStreamProvider);
-    final _ = ref.watch(vehicleStatusServiceProvider);
+    ref.watch(vehicleStatusServiceProvider);
 
     // Calcular contadores de status
     vehiclePositionsAsync.whenData(_updateStatusCounts);
@@ -441,7 +441,8 @@ class _MapaPageState extends ConsumerState<MapaPage> {
     if (result == null) return;
 
     // Buscar telefone do motorista (assumindo que está disponível no vehicle ou precisa buscar)
-    // Por enquanto, usando um número padrão ou buscando do serviço
+    // TODO: Implementar busca do telefone real do motorista através do serviço
+    // Por enquanto, usando um placeholder - o telefone deveria vir do driver service
     final phoneNumber = vehicle.driverName; // Placeholder - buscar telefone real do driver
 
     try {

@@ -179,6 +179,7 @@ class _CreateDriverPageState extends ConsumerState<CreateDriverPage> {
           Expanded(
             child: Form(
               key: _formKey,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
               child: PageView(
                 controller: _pageController,
                 onPageChanged: (page) {
@@ -1155,20 +1156,39 @@ class _CreateDriverPageState extends ConsumerState<CreateDriverPage> {
         updatedAt: DateTime.now(),
       );
 
+      final errorService = ErrorService.instance;
       final service = ref.read(driverServiceProvider.notifier);
       
       if (widget.driver != null) {
-        await service.updateDriver(driver);
+        await errorService.executeWithHandling<void>(
+          () => service.updateDriver(driver),
+          context: 'drivers.update',
+          additionalData: {'driverId': driver.id},
+        );
         _showSuccess('Motorista atualizado com sucesso!');
       } else {
-        await service.createDriver(driver);
+        await errorService.executeWithHandling<void>(
+          () => service.createDriver(driver),
+          context: 'drivers.create',
+          additionalData: {'driverName': driver.name},
+        );
         _showSuccess('Motorista criado com sucesso!');
       }
 
       if (mounted) {
         Navigator.of(context).pop();
       }
-    } on Exception catch (e) {
+    } on Exception catch (e, stack) {
+      // Além do feedback visual, registramos o erro padronizado
+      await ErrorService.instance.reportError(
+        e,
+        stack,
+        context: 'drivers.save',
+        additionalData: {
+          'isUpdate': widget.driver != null,
+        },
+        severity: ErrorSeverity.error,
+      );
       _showError('Erro ao salvar motorista: $e');
     } finally {
       if (mounted) {
