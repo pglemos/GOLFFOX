@@ -1,93 +1,234 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import type { OptimizeRouteRequest, OptimizeRouteResponse } from '@/types/routes'
+import { calculateHash } from '@/lib/route-optimization'
 
-function getSupabaseAdmin() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE
-  if (!url || !serviceKey) {
-    throw new Error('Supabase não configurado: defina NEXT_PUBLIC_SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY')
+const RATE_LIMIT = new Map<string, { count: number; resetAt: number }>()
+
+function checkRateLimit(ip: string): boolean {
+  const now = Date.now()
+  const limit = RATE_LIMIT.get(ip)
+  
+  if (!limit || now > limit.resetAt) {
+    RATE_LIMIT.set(ip, { count: 1, resetAt: now + 60000 }) // 1 min
+    return true
   }
-  return createClient(url, serviceKey, {
-    auth: { autoRefreshToken: false, persistSession: false }
-  })
+  
+  if (limit.count >= 10) {
+    return false
+  }
+  
+  limit.count++
+  return true
 }
 
-const GOOGLE_MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
+async function optimizeWithGoogle(
+  request: OptimizeRouteRequest
+): Promise<OptimizeRouteResponse> {
+  const apiKey = process.env.GOOGLE_MAPS_API_KEY || process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
+  if (!apiKey) {
+    throw new Error('Google Maps API key não configurada')
+  }
 
-interface RoutePoint {
-  id: string
-  latitude: number
-  longitude: number
-  sequence?: number
+  const { origin, destination, waypoints, departureTimeIso } = request
+
+  if (waypoints.length <= 25) {
+    // Usar Directions API com optimize:true
+    const waypointsStr = waypoints.map(w => `${w.lat},${w.lng}`).join('|')
+    const url = new URL('https://maps.googleapis.com/maps/api/directions/json')
+    url.searchParams.set('origin', `${origin.lat},${origin.lng}`)
+    url.searchParams.set('destination', `${destination.lat},${destination.lng}`)
+    url.searchParams.set('waypoints', `optimize:true|${waypointsStr}`)
+    url.searchParams.set('departure_time', departureTimeIso || Math.floor(Date.now() / 1000).toString())
+    url.searchParams.set('traffic_model', 'best_guess')
+    url.searchParams.set('key', apiKey)
+
+    const response = await fetch(url.toString())
+    const data = await response.json()
+
+    if (data.status !== 'OK') {
+      throw new Error(`Google Directions API error: ${data.status}`)
+    }
+
+    const route = data.routes[0]
+    const orderedWaypoints = route.waypoint_order.map((idx: number) => waypoints[idx])
+    const leg = route.legs[0]
+
+    return {
+      ordered: orderedWaypoints.map((wp: typeof waypoints[0], idx: number) => ({
+        id: wp.id,
+        lat: wp.lat,
+        lng: wp.lng,
+        order: idx + 1
+      })),
+      polyline: route.overview_polyline.points,
+      totalDistanceMeters: leg.distance.value,
+      totalDurationSeconds: leg.duration_in_traffic?.value || leg.duration.value,
+      usedLiveTraffic: !!leg.duration_in_traffic,
+      warnings: data.geocoded_waypoints?.filter((w: any) => w.geocoder_status !== 'OK').map((w: any) => w.geocoder_status)
+    }
+  } else {
+    // Para >25 pontos: Distance Matrix + TSP heurístico
+    return await optimizeWithTSP(origin, destination, waypoints, apiKey, departureTimeIso)
+  }
 }
 
-/**
- * Otimiza a ordem dos pontos de uma rota usando heurística TSP
- * baseada em Google Directions + Distance Matrix
- * Versão Admin: busca pontos automaticamente da rota
- */
+async function optimizeWithTSP(
+  origin: { lat: number; lng: number },
+  destination: { lat: number; lng: number },
+  waypoints: Array<{ id: string; lat: number; lng: number }>,
+  apiKey: string,
+  departureTimeIso?: string
+): Promise<OptimizeRouteResponse> {
+  // Nearest Neighbor + 2-opt
+  const ordered: Array<{ id: string; lat: number; lng: number; order: number }> = []
+  const remaining = [...waypoints]
+  let current = origin
+
+  while (remaining.length > 0) {
+    let nearestIdx = 0
+    let nearestDist = Infinity
+
+    for (let i = 0; i < remaining.length; i++) {
+      const dist = Math.sqrt(
+        Math.pow(remaining[i].lat - current.lat, 2) +
+        Math.pow(remaining[i].lng - current.lng, 2)
+      )
+      if (dist < nearestDist) {
+        nearestDist = dist
+        nearestIdx = i
+      }
+    }
+
+    const nearest = remaining.splice(nearestIdx, 1)[0]
+    ordered.push({
+      id: nearest.id,
+      lat: nearest.lat,
+      lng: nearest.lng,
+      order: ordered.length + 1
+    })
+    current = nearest
+  }
+
+  // 2-opt improvement
+  let improved = true
+  while (improved) {
+    improved = false
+    for (let i = 0; i < ordered.length - 1; i++) {
+      for (let j = i + 2; j < ordered.length; j++) {
+        const distBefore = 
+          distance(ordered[i], ordered[i + 1]) +
+          distance(ordered[j], j < ordered.length - 1 ? ordered[j + 1] : destination)
+        const distAfter =
+          distance(ordered[i], ordered[j]) +
+          distance(ordered[i + 1], j < ordered.length - 1 ? ordered[j + 1] : destination)
+
+        if (distAfter < distBefore) {
+          const reversed = ordered.slice(i + 1, j + 1).reverse()
+          ordered.splice(i + 1, j - i, ...reversed)
+          improved = true
+        }
+      }
+    }
+  }
+
+  // Calcular distância e tempo total via Directions
+  const waypointsStr = ordered.map(w => `${w.lat},${w.lng}`).join('|')
+  const url = new URL('https://maps.googleapis.com/maps/api/directions/json')
+  url.searchParams.set('origin', `${origin.lat},${origin.lng}`)
+  url.searchParams.set('destination', `${destination.lat},${destination.lng}`)
+  url.searchParams.set('waypoints', waypointsStr)
+  url.searchParams.set('departure_time', departureTimeIso || Math.floor(Date.now() / 1000).toString())
+  url.searchParams.set('traffic_model', 'best_guess')
+  url.searchParams.set('key', apiKey)
+
+  const response = await fetch(url.toString())
+  const data = await response.json()
+
+  if (data.status !== 'OK') {
+    throw new Error(`Google Directions API error: ${data.status}`)
+  }
+
+  const route = data.routes[0]
+  const totalDistance = route.legs.reduce((sum: number, leg: any) => sum + leg.distance.value, 0)
+  const totalDuration = route.legs.reduce((sum: number, leg: any) => 
+    sum + (leg.duration_in_traffic?.value || leg.duration.value), 0)
+
+  return {
+    ordered,
+    polyline: route.overview_polyline.points,
+    totalDistanceMeters: totalDistance,
+    totalDurationSeconds: totalDuration,
+    usedLiveTraffic: route.legs.some((leg: any) => leg.duration_in_traffic),
+    warnings: []
+  }
+}
+
+function distance(a: { lat: number; lng: number }, b: { lat: number; lng: number }): number {
+  return Math.sqrt(Math.pow(a.lat - b.lat, 2) + Math.pow(a.lng - b.lng, 2))
+}
+
 export async function POST(request: NextRequest) {
   try {
-    const supabase = getSupabaseAdmin()
-    const searchParams = request.nextUrl.searchParams
-    const routeId = searchParams.get('routeId')
-
-    if (!routeId) {
+    const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown'
+    if (!checkRateLimit(ip)) {
       return NextResponse.json(
-        { error: 'routeId é obrigatório' },
+        { error: 'Rate limit excedido. Tente novamente em 1 minuto.' },
+        { status: 429 }
+      )
+    }
+
+    const body: OptimizeRouteRequest = await request.json()
+    const { companyId, origin, destination, waypoints } = body
+
+    if (!companyId || !origin || !destination || !waypoints || waypoints.length === 0) {
+      return NextResponse.json(
+        { error: 'Dados inválidos' },
         { status: 400 }
       )
     }
 
-    if (!GOOGLE_MAPS_API_KEY) {
-      return NextResponse.json(
-        { error: 'Google Maps API key não configurada' },
-        { status: 500 }
-      )
-    }
+    // Verificar cache
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    
+    if (supabaseUrl && supabaseKey) {
+      const supabase = createClient(supabaseUrl, supabaseKey)
+      const hash = calculateHash(body)
+      
+      const { data: cached } = await supabase
+        .from('gf_route_optimization_cache')
+        .select('response')
+        .eq('company_id', companyId)
+        .eq('payload_hash', hash)
+        .gt('created_at', new Date(Date.now() - 10 * 60 * 1000).toISOString())
+        .maybeSingle()
 
-    // Buscar pontos da rota (gf_route_plan ou route_stops)
-    const { data: routePoints, error: pointsError } = await supabase
-      .from('gf_route_plan')
-      .select('id, latitude, longitude, stop_order')
-      .eq('route_id', routeId)
-      .order('stop_order')
-
-    if (pointsError || !routePoints || routePoints.length < 2) {
-      // Tentar route_stops como fallback
-      const { data: stopsData, error: stopsError } = await supabase
-        .from('route_stops')
-        .select('id, lat, lng, seq')
-        .eq('route_id', routeId)
-        .order('seq')
-
-      if (stopsError || !stopsData || stopsData.length < 2) {
-        return NextResponse.json(
-          { error: 'Rota não possui pontos suficientes (mínimo 2)' },
-          { status: 400 }
-        )
+      if (cached) {
+        return NextResponse.json(cached.response)
       }
 
-      // Converter para formato esperado
-      const points: RoutePoint[] = stopsData.map((stop: any) => ({
-        id: stop.id,
-        latitude: stop.lat,
-        longitude: stop.lng,
-        sequence: stop.seq
-      }))
+      // Otimizar
+      const result = await optimizeWithGoogle(body)
 
-      return await optimizeRoutePoints(supabase, routeId, points)
+      // Salvar no cache
+      await supabase
+        .from('gf_route_optimization_cache')
+        .upsert({
+          company_id: companyId,
+          payload_hash: hash,
+          response: result,
+          created_at: new Date().toISOString()
+        }, {
+          onConflict: 'company_id,payload_hash'
+        })
+
+      return NextResponse.json(result)
     }
 
-    // Converter para formato esperado
-    const points: RoutePoint[] = routePoints.map((stop: any) => ({
-      id: stop.id,
-      latitude: stop.latitude,
-      longitude: stop.longitude,
-      sequence: stop.stop_order
-    }))
-
-    return await optimizeRoutePoints(supabase, routeId, points)
+    // Sem cache, apenas otimizar
+    const result = await optimizeWithGoogle(body)
+    return NextResponse.json(result)
   } catch (error: any) {
     console.error('Erro ao otimizar rota:', error)
     return NextResponse.json(
@@ -96,119 +237,3 @@ export async function POST(request: NextRequest) {
     )
   }
 }
-
-async function optimizeRoutePoints(supabase: ReturnType<typeof getSupabaseAdmin>, routeId: string, points: RoutePoint[]) {
-  // Verificar cache (5-10 minutos)
-  const { data: cached } = await supabase
-    .from('gf_route_optimization_cache')
-    .select('optimized_order, etas, cached_at')
-    .eq('route_id', routeId)
-    .single()
-
-  if (cached) {
-    const cacheAge = Date.now() - new Date(cached.cached_at).getTime()
-    const cacheMaxAge = 10 * 60 * 1000 // 10 minutos
-
-    if (cacheAge < cacheMaxAge) {
-      return NextResponse.json({
-        optimized_order: cached.optimized_order,
-        etas: cached.etas,
-        cached: true
-      })
-    }
-  }
-
-  // Construir origem e destino
-  const origin = `${points[0].latitude},${points[0].longitude}`
-  const destination = `${points[points.length - 1].latitude},${points[points.length - 1].longitude}`
-  const waypoints = points.slice(1, -1).map(
-    (p: RoutePoint) => `${p.latitude},${p.longitude}`
-  )
-
-  // Chamar Google Directions API para obter rota otimizada
-  const directionsUrl = new URL('https://maps.googleapis.com/maps/api/directions/json')
-  directionsUrl.searchParams.set('origin', origin)
-  directionsUrl.searchParams.set('destination', destination)
-  if (waypoints.length > 0) {
-    directionsUrl.searchParams.set('waypoints', `optimize:true|${waypoints.join('|')}`)
-  }
-  if (!GOOGLE_MAPS_API_KEY) {
-    return NextResponse.json(
-      { error: 'Google Maps API key não configurada' },
-      { status: 500 }
-    )
-  }
-  directionsUrl.searchParams.set('key', GOOGLE_MAPS_API_KEY)
-  directionsUrl.searchParams.set('language', 'pt-BR')
-
-  const directionsRes = await fetch(directionsUrl.toString())
-  const directionsData = await directionsRes.json()
-
-  if (directionsData.status !== 'OK') {
-    return NextResponse.json(
-      { error: `Google Directions API error: ${directionsData.status}` },
-      { status: 500 }
-    )
-  }
-
-  const route = directionsData.routes[0]
-  const optimizedWaypointOrder = route.waypoint_order || []
-  const legDurations = route.legs.map((leg: any) => leg.duration.value) // segundos
-
-  // Reconstruir ordem otimizada
-  const optimizedPoints: RoutePoint[] = [
-    points[0], // origem sempre primeiro
-    ...optimizedWaypointOrder.map((idx: number) => points[idx + 1]),
-    ...(points.length > 1 ? [points[points.length - 1]] : []) // destino sempre último
-  ]
-
-  // Calcular ETAs cumulativos
-  let cumulativeTime = 0
-  const etas: Record<string, number> = {}
-  optimizedPoints.forEach((point, idx) => {
-    if (idx > 0) {
-      cumulativeTime += legDurations[idx - 1] || 0
-    }
-    etas[point.id] = cumulativeTime
-  })
-
-  // Atualizar ordem na tabela gf_route_plan
-  for (let i = 0; i < optimizedPoints.length; i++) {
-    const point = optimizedPoints[i]
-    await supabase
-      .from('gf_route_plan')
-      .update({ 
-        stop_order: i + 1,
-        estimated_arrival_time: new Date(Date.now() + etas[point.id] * 1000).toISOString()
-      })
-      .eq('id', point.id)
-  }
-
-  // Salvar no cache
-  await supabase
-    .from('gf_route_optimization_cache')
-    .upsert({
-      route_id: routeId,
-      optimized_order: optimizedPoints.map((p, idx) => ({
-        id: p.id,
-        sequence: idx + 1,
-        latitude: p.latitude,
-        longitude: p.longitude
-      })),
-      etas,
-      cached_at: new Date().toISOString()
-    })
-
-  return NextResponse.json({
-    optimized_order: optimizedPoints.map((p, idx) => ({
-      id: p.id,
-      sequence: idx + 1,
-      latitude: p.latitude,
-      longitude: p.longitude
-    })),
-    etas,
-    total_duration_seconds: cumulativeTime,
-    cached: false
-  })
-}
-

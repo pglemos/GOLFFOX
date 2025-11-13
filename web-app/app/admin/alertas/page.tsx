@@ -2,14 +2,18 @@
 
 import { useEffect, useState } from "react"
 import { AppShell } from "@/components/app-shell"
-import { Card } from "@/components/ui/card"
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { 
   AlertTriangle, 
   Search, 
-  Filter, 
+  Filter,
+  ChevronDown,
+  ChevronUp,
+  Save,
+  X,
   CheckCircle, 
   User, 
   Download,
@@ -19,6 +23,8 @@ import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 import { notifySuccess, notifyError } from "@/lib/toast"
 import { motion } from "framer-motion"
+import { useAuthFast } from "@/hooks/use-auth-fast"
+import { useGlobalSync } from "@/hooks/use-global-sync"
 
 const ALERT_TYPES = {
   route_delayed: { label: 'Rota Atrasada', severity: 'warning' },
@@ -30,62 +36,114 @@ const ALERT_TYPES = {
 
 export default function AlertasPage() {
   const router = useRouter()
-  const [user, setUser] = useState<any>(null)
-  const [loading, setLoading] = useState(true)
+  const { user, loading: authLoading } = useAuthFast()
+  const [dataLoading, setDataLoading] = useState(true)
   const [alertas, setAlertas] = useState<any[]>([])
   const [searchQuery, setSearchQuery] = useState("")
+  const [filtersExpanded, setFiltersExpanded] = useState(false)
+  const [tempFilterType, setTempFilterType] = useState<string>("all")
+  const [tempFilterSeverity, setTempFilterSeverity] = useState<string>("all")
+  const [tempFilterStatus, setTempFilterStatus] = useState<string>("all")
   const [filterType, setFilterType] = useState<string>("all")
   const [filterSeverity, setFilterSeverity] = useState<string>("all")
   const [filterStatus, setFilterStatus] = useState<string>("all")
 
-  useEffect(() => {
-    const getUser = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (!session) {
-        router.push("/")
-        return
-      }
-      setUser({ ...session.user })
-      setLoading(false)
-      loadAlertas()
-    }
-    getUser()
-  }, [router])
+  const handleSaveFilters = () => {
+    setFilterType(tempFilterType)
+    setFilterSeverity(tempFilterSeverity)
+    setFilterStatus(tempFilterStatus)
+    setFiltersExpanded(false)
+  }
+
+  const handleResetFilters = () => {
+    setTempFilterType("all")
+    setTempFilterSeverity("all")
+    setTempFilterStatus("all")
+    setFilterType("all")
+    setFilterSeverity("all")
+    setFilterStatus("all")
+    setFiltersExpanded(false)
+  }
 
   useEffect(() => {
-    if (user) {
+    if (user && !authLoading) {
       loadAlertas()
     }
-  }, [filterType, filterSeverity, filterStatus, user])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, authLoading, filterSeverity, filterStatus])
+
+  // Escutar eventos de sincronização global (apenas após carregamento inicial)
+  useGlobalSync(
+    ['alert.created', 'alert.updated', 'route.created', 'route.updated', 'vehicle.created', 'vehicle.updated'],
+    () => {
+      // Recarregar alertas quando houver mudanças (apenas se não estiver carregando)
+      if (!dataLoading && user && !authLoading) {
+        loadAlertas()
+      }
+    },
+    [dataLoading, user, authLoading]
+  )
 
   const loadAlertas = async () => {
     try {
-      let query = supabase
-        .from("gf_incidents")
-        .select(`
-          *,
-          companies(name),
-          routes(name),
-          vehicles(plate),
-          drivers:users!gf_incidents_driver_id_fkey(name, email)
-        `)
-        .order("created_at", { ascending: false })
-        .limit(100)
-
+      setDataLoading(true)
+      // Usar API route para bypass RLS
+      const params = new URLSearchParams()
       if (filterSeverity !== "all") {
-        query = query.eq("severity", filterSeverity)
+        params.append('severity', filterSeverity)
       }
       if (filterStatus !== "all") {
-        query = query.eq("status", filterStatus)
+        params.append('status', filterStatus)
       }
-
-      const { data, error } = await query
-
-      if (error) throw error
-      setAlertas(data || [])
+      
+      const response = await fetch(`/api/admin/alerts-list?${params.toString()}`)
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+      const result = await response.json()
+      if (result.success) {
+        setAlertas(result.alerts || [])
+      } else {
+        throw new Error(result.error || 'Erro ao carregar alertas')
+      }
     } catch (error) {
       console.error("Erro ao carregar alertas:", error)
       notifyError(error, 'Erro inesperado')
+      setAlertas([])
+    } finally {
+      setDataLoading(false)
+    }
+  }
+
+  const handleDeleteAlerta = async (alertaId: string) => {
+    if (!confirm('Tem certeza que deseja excluir este alerta? Esta ação não pode ser desfeita.')) {
+      return
+    }
+
+    try {
+      const response = await fetch(`/api/admin/alerts/delete?id=${alertaId}`, {
+        method: 'DELETE'
+      })
+      
+      const result = await response.json()
+      
+      if (!response.ok) {
+        const errorMessage = result.message || result.error || 'Erro ao excluir alerta'
+        const errorDetails = result.details ? ` (${result.details})` : ''
+        throw new Error(`${errorMessage}${errorDetails}`)
+      }
+
+      if (result.success) {
+        notifySuccess('Alerta excluído com sucesso')
+        await new Promise(resolve => setTimeout(resolve, 300))
+        await loadAlertas()
+      } else {
+        throw new Error(result.error || 'Erro ao excluir alerta')
+      }
+    } catch (error: any) {
+      console.error('Erro ao excluir alerta:', error)
+      const errorMessage = error.message || 'Erro desconhecido ao excluir alerta'
+      notifyError(error, errorMessage)
     }
   }
 
@@ -170,7 +228,7 @@ export default function AlertasPage() {
     }
   }
 
-  if (loading) {
+  if (authLoading || !user) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="w-16 h-16 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin mx-auto"></div>
@@ -186,7 +244,7 @@ export default function AlertasPage() {
   })
 
   return (
-    <AppShell user={{ id: user?.id || "", name: user?.name || "Admin", email: user?.email || "", role: "admin" }}>
+    <AppShell user={{ id: user.id, name: user.name || "Admin", email: user.email, role: user.role || "admin" }}>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
@@ -200,38 +258,87 @@ export default function AlertasPage() {
         </div>
 
         {/* Filtros */}
-        <Card className="p-4">
-          <div className="flex flex-wrap gap-4">
-            <div className="relative flex-1 min-w-[200px]">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--ink-muted)]" />
-              <Input 
-                placeholder="Buscar alertas..." 
-                className="pl-10"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Filter className="h-5 w-5 text-[var(--brand)]" />
+                <CardTitle className="text-lg">Filtros</CardTitle>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setFiltersExpanded(!filtersExpanded)}
+                className="gap-2"
+              >
+                {filtersExpanded ? (
+                  <>
+                    <ChevronUp className="h-4 w-4" />
+                    Minimizar
+                  </>
+                ) : (
+                  <>
+                    <ChevronDown className="h-4 w-4" />
+                    Expandir
+                  </>
+                )}
+              </Button>
             </div>
-            <select 
-              className="px-3 py-2 rounded-lg border border-[var(--border)] bg-white text-sm"
-              value={filterSeverity}
-              onChange={(e) => setFilterSeverity(e.target.value)}
-            >
-              <option value="all">Todas Severidades</option>
-              <option value="critical">Crítico</option>
-              <option value="warning">Aviso</option>
-              <option value="info">Info</option>
-            </select>
-            <select 
-              className="px-3 py-2 rounded-lg border border-[var(--border)] bg-white text-sm"
-              value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value)}
-            >
-              <option value="all">Todos Status</option>
-              <option value="open">Aberto</option>
-              <option value="assigned">Atribuído</option>
-              <option value="resolved">Resolvido</option>
-            </select>
-          </div>
+          </CardHeader>
+          {filtersExpanded && (
+            <CardContent>
+              <div className="flex flex-wrap gap-4 mb-4">
+                <div className="relative flex-1 min-w-[200px]">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--ink-muted)]" />
+                  <Input 
+                    placeholder="Buscar alertas..." 
+                    className="pl-10"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                </div>
+                <select 
+                  className="px-3 py-2 rounded-lg border border-[var(--border)] bg-white text-sm"
+                  value={tempFilterSeverity}
+                  onChange={(e) => setTempFilterSeverity(e.target.value)}
+                >
+                  <option value="all">Todas Severidades</option>
+                  <option value="critical">Crítico</option>
+                  <option value="warning">Aviso</option>
+                  <option value="info">Info</option>
+                </select>
+                <select 
+                  className="px-3 py-2 rounded-lg border border-[var(--border)] bg-white text-sm"
+                  value={tempFilterStatus}
+                  onChange={(e) => setTempFilterStatus(e.target.value)}
+                >
+                  <option value="all">Todos Status</option>
+                  <option value="open">Aberto</option>
+                  <option value="assigned">Atribuído</option>
+                  <option value="resolved">Resolvido</option>
+                </select>
+              </div>
+              <div className="flex items-center justify-end gap-2 pt-4 border-t border-[var(--border)]">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleResetFilters}
+                  className="gap-2"
+                >
+                  <X className="h-4 w-4" />
+                  Limpar
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={handleSaveFilters}
+                  className="gap-2"
+                >
+                  <Save className="h-4 w-4" />
+                  Salvar Filtros
+                </Button>
+              </div>
+            </CardContent>
+          )}
         </Card>
 
         {/* Lista de Alertas */}
@@ -300,6 +407,14 @@ export default function AlertasPage() {
                       </div>
                     </div>
                     <div className="flex flex-col gap-2">
+                      <Button 
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => handleDeleteAlerta(alerta.id)}
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Excluir
+                      </Button>
                       {alerta.status !== 'resolved' && (
                         <>
                           <Button 

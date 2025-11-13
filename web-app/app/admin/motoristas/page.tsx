@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { AppShell } from "@/components/app-shell"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { Users, Plus, Award, FileText, Edit, Search } from "lucide-react"
+import { Users, Plus, Award, FileText, Edit, Search, Trash2 } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 import { DriverModal } from "@/components/modals/driver-modal"
@@ -15,12 +15,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { AlertTriangle, Calendar, ExternalLink } from "lucide-react"
+import { useAuthFast } from "@/hooks/use-auth-fast"
+import { useGlobalSync } from "@/hooks/use-global-sync"
+import { notifySuccess, notifyError } from "@/lib/toast"
 
 export default function MotoristasPage() {
   const router = useRouter()
-  const [user, setUser] = useState<any>(null)
-  const [loading, setLoading] = useState(true)
+  const { user, loading: authLoading } = useAuthFast()
   const [motoristas, setMotoristas] = useState<any[]>([])
+  const [dataLoading, setDataLoading] = useState(true)
   const [selectedDriver, setSelectedDriver] = useState<any>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [viewingDriver, setViewingDriver] = useState<string | null>(null)
@@ -30,30 +33,75 @@ export default function MotoristasPage() {
   const [searchQuery, setSearchQuery] = useState("")
 
   useEffect(() => {
-    const getUser = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (!session) {
-        router.push("/")
-        return
-      }
-      setUser({ ...session.user })
-      setLoading(false)
+    if (user && !authLoading) {
       loadMotoristas()
     }
-    getUser()
-  }, [router])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, authLoading])
+
+  // Escutar eventos de sincronização global (apenas após carregamento inicial)
+  useGlobalSync(
+    ['driver.created', 'driver.updated', 'driver.deleted', 'user.created', 'user.updated'],
+    () => {
+      // Recarregar motoristas quando houver mudanças (apenas se não estiver carregando)
+      if (!dataLoading && user && !authLoading) {
+        loadMotoristas()
+      }
+    },
+    [dataLoading, user, authLoading]
+  )
 
   const loadMotoristas = async () => {
     try {
-      const { data, error } = await supabase
-        .from("users")
-        .select("*")
-        .eq("role", "driver")
-
-      if (error) throw error
-      setMotoristas(data || [])
+      setDataLoading(true)
+      // Usar API route para bypass RLS
+      const response = await fetch('/api/admin/drivers-list')
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+      const result = await response.json()
+      if (result.success) {
+        setMotoristas(result.drivers || [])
+      } else {
+        throw new Error(result.error || 'Erro ao carregar motoristas')
+      }
     } catch (error) {
       console.error("Erro ao carregar motoristas:", error)
+      setMotoristas([])
+    } finally {
+      setDataLoading(false)
+    }
+  }
+
+  const handleDeleteMotorista = async (motoristaId: string, motoristaName: string) => {
+    if (!confirm(`Tem certeza que deseja excluir o motorista "${motoristaName}"? Esta ação não pode ser desfeita.`)) {
+      return
+    }
+
+    try {
+      const response = await fetch(`/api/admin/drivers/delete?id=${motoristaId}`, {
+        method: 'DELETE'
+      })
+      
+      const result = await response.json()
+      
+      if (!response.ok) {
+        const errorMessage = result.message || result.error || 'Erro ao excluir motorista'
+        const errorDetails = result.details ? ` (${result.details})` : ''
+        throw new Error(`${errorMessage}${errorDetails}`)
+      }
+
+      if (result.success) {
+        notifySuccess('Motorista excluído com sucesso')
+        await new Promise(resolve => setTimeout(resolve, 300))
+        await loadMotoristas()
+      } else {
+        throw new Error(result.error || 'Erro ao excluir motorista')
+      }
+    } catch (error: any) {
+      console.error('Erro ao excluir motorista:', error)
+      const errorMessage = error.message || 'Erro desconhecido ao excluir motorista'
+      notifyError(error, errorMessage)
     }
   }
 
@@ -99,7 +147,10 @@ export default function MotoristasPage() {
         .eq("driver_id", driverId)
         .single()
 
-      if (error && error.code !== 'PGRST116') throw error
+      if (error) {
+        // PGRST116 = no rows returned, não é erro
+        if ((error as any).code !== 'PGRST116') throw error
+      }
       setRanking(data || null)
     } catch (error) {
       console.error("Erro ao carregar ranking:", error)
@@ -115,12 +166,12 @@ export default function MotoristasPage() {
     loadRanking(driver.id)
   }
 
-  if (loading) {
+  if (authLoading || !user) {
     return <div className="min-h-screen flex items-center justify-center"><div className="w-16 h-16 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin mx-auto"></div></div>
   }
 
   return (
-    <AppShell user={{ id: user?.id || "", name: user?.name || "Admin", email: user?.email || "", role: "admin" }}>
+    <AppShell user={{ id: user.id, name: user.name || "Admin", email: user.email, role: user.role || "admin" }}>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
@@ -192,6 +243,14 @@ export default function MotoristasPage() {
                       onClick={() => handleViewDriver(motorista)}
                     >
                       Ver Detalhes
+                    </Button>
+                    <Button 
+                      variant="destructive" 
+                      size="sm"
+                      onClick={() => handleDeleteMotorista(motorista.id, motorista.name || motorista.email || 'Motorista')}
+                    >
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      Excluir
                     </Button>
                   </div>
                 </div>

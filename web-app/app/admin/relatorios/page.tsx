@@ -3,9 +3,9 @@
 import { useEffect, useState } from "react"
 import { AppShell } from "@/components/app-shell"
 import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { BarChart3, Download, FileText, Calendar, Filter, Clock, Mail } from "lucide-react"
+import { BarChart3, Download, FileText, Calendar, Filter, Clock, Mail, ChevronDown, ChevronUp, Save, X } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 import { 
@@ -26,9 +26,9 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { motion } from "framer-motion"
 import { ScheduleReportModal } from "@/components/modals/schedule-report-modal"
-import { CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Edit, Trash2 } from "lucide-react"
+import { useAuthFast } from "@/hooks/use-auth-fast"
 
 interface ReportConfig {
   id: string
@@ -41,11 +41,33 @@ interface ReportConfig {
 
 export default function RelatoriosPage() {
   const router = useRouter()
-  const [user, setUser] = useState<any>(null)
-  const [loading, setLoading] = useState(true)
+  const { user, loading: authLoading } = useAuthFast()
+  const [filtersExpanded, setFiltersExpanded] = useState(false)
+  const [tempDateStart, setTempDateStart] = useState(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0])
+  const [tempDateEnd, setTempDateEnd] = useState(new Date().toISOString().split('T')[0])
+  const [tempSelectedCompany, setTempSelectedCompany] = useState<string>("")
   const [dateStart, setDateStart] = useState(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0])
   const [dateEnd, setDateEnd] = useState(new Date().toISOString().split('T')[0])
   const [selectedCompany, setSelectedCompany] = useState<string>("")
+
+  const handleSaveFilters = () => {
+    setDateStart(tempDateStart)
+    setDateEnd(tempDateEnd)
+    setSelectedCompany(tempSelectedCompany)
+    setFiltersExpanded(false)
+  }
+
+  const handleResetFilters = () => {
+    const resetDateStart = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+    const resetDateEnd = new Date().toISOString().split('T')[0]
+    setTempDateStart(resetDateStart)
+    setTempDateEnd(resetDateEnd)
+    setTempSelectedCompany("")
+    setDateStart(resetDateStart)
+    setDateEnd(resetDateEnd)
+    setSelectedCompany("")
+    setFiltersExpanded(false)
+  }
   const [schedules, setSchedules] = useState<any[]>([])
   const [showScheduleModal, setShowScheduleModal] = useState(false)
   const [selectedReportForSchedule, setSelectedReportForSchedule] = useState<string | null>(null)
@@ -91,18 +113,11 @@ export default function RelatoriosPage() {
   ]
 
   useEffect(() => {
-    const getUser = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (!session) {
-        router.push("/")
-        return
-      }
-      setUser({ ...session.user })
-      setLoading(false)
+    if (user && !authLoading) {
       loadSchedules()
     }
-    getUser()
-  }, [router])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, authLoading])
 
   const loadSchedules = async () => {
     try {
@@ -171,12 +186,12 @@ export default function RelatoriosPage() {
     )
   }
 
-  if (loading) {
+  if (authLoading || !user) {
     return <div className="min-h-screen flex items-center justify-center"><div className="w-16 h-16 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin mx-auto"></div></div>
   }
 
   return (
-    <AppShell user={{ id: user?.id || "", name: user?.name || "Admin", email: user?.email || "", role: "admin" }}>
+    <AppShell user={{ id: user.id, name: user.name || "Admin", email: user.email, role: user.role || "admin" }}>
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold mb-2">Relatórios</h1>
@@ -184,45 +199,90 @@ export default function RelatoriosPage() {
         </div>
 
         {/* Filtros */}
-        <Card className="p-4">
-          <div className="flex items-center gap-2 mb-4">
-            <Filter className="h-5 w-5 text-[var(--brand)]" />
-            <h3 className="font-semibold">Filtros</h3>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Data Início</label>
-              <div className="relative">
-                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--ink-muted)]" />
-                <Input
-                  type="date"
-                  value={dateStart}
-                  onChange={(e) => setDateStart(e.target.value)}
-                  className="pl-10"
-                />
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Filter className="h-5 w-5 text-[var(--brand)]" />
+                <CardTitle className="text-lg">Filtros</CardTitle>
               </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setFiltersExpanded(!filtersExpanded)}
+                className="gap-2"
+              >
+                {filtersExpanded ? (
+                  <>
+                    <ChevronUp className="h-4 w-4" />
+                    Minimizar
+                  </>
+                ) : (
+                  <>
+                    <ChevronDown className="h-4 w-4" />
+                    Expandir
+                  </>
+                )}
+              </Button>
             </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Data Fim</label>
-              <div className="relative">
-                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--ink-muted)]" />
-                <Input
-                  type="date"
-                  value={dateEnd}
-                  onChange={(e) => setDateEnd(e.target.value)}
-                  className="pl-10"
-                />
+          </CardHeader>
+          {filtersExpanded && (
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Data Início</label>
+                  <div className="relative">
+                    <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--ink-muted)]" />
+                    <Input
+                      type="date"
+                      value={tempDateStart}
+                      onChange={(e) => setTempDateStart(e.target.value)}
+                      className="pl-10"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Data Fim</label>
+                  <div className="relative">
+                    <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--ink-muted)]" />
+                    <Input
+                      type="date"
+                      value={tempDateEnd}
+                      onChange={(e) => setTempDateEnd(e.target.value)}
+                      className="pl-10"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Empresa</label>
+                  <Input
+                    placeholder="Todas as empresas"
+                    value={tempSelectedCompany}
+                    onChange={(e) => setTempSelectedCompany(e.target.value)}
+                  />
+                </div>
               </div>
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Empresa</label>
-              <Input
-                placeholder="Todas as empresas"
-                value={selectedCompany}
-                onChange={(e) => setSelectedCompany(e.target.value)}
-              />
-            </div>
-          </div>
+              <div className="flex items-center justify-end gap-2 pt-4 border-t border-[var(--border)]">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleResetFilters}
+                  className="gap-2"
+                >
+                  <X className="h-4 w-4" />
+                  Limpar
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={handleSaveFilters}
+                  className="gap-2"
+                >
+                  <Save className="h-4 w-4" />
+                  Salvar Filtros
+                </Button>
+              </div>
+            </CardContent>
+          )}
         </Card>
 
         {/* Cards de Relatórios */}
@@ -332,9 +392,7 @@ export default function RelatoriosPage() {
                                 method: 'DELETE'
                               })
                               if (!response.ok) throw new Error('Erro ao deletar')
-                              notifySuccess('Agendamento deletado com sucesso!', {
-                                i18n: { ns: 'operator', key: 'admin.reports.schedule.successDeleted' }
-                              })
+                              notifySuccess('Agendamento deletado com sucesso!')
                               loadSchedules()
                             } catch (error: any) {
                               notifyError(`Erro: ${error.message}`, {

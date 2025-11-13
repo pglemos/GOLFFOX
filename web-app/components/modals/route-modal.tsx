@@ -6,7 +6,8 @@ import {
   Dialog, 
   DialogContent, 
   DialogHeader, 
-  DialogTitle, 
+  DialogTitle,
+  DialogDescription,
   DialogFooter 
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
@@ -28,6 +29,7 @@ import { formatError } from "@/lib/error-utils"
 import { t } from "@/lib/i18n"
 import { auditLogs } from "@/lib/audit-log"
 import { useSupabaseSync } from "@/hooks/use-supabase-sync"
+import { globalSyncManager } from "@/lib/global-sync"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 
@@ -179,11 +181,14 @@ export function RouteModal({
         // Atualizar
         const { error } = await supabase
           .from('routes')
-          .update(payload)
+          .update(payload as any)
           .eq('id', route.id)
 
         if (error) throw error
         notifySuccess('', { i18n: { ns: 'common', key: 'success.routeUpdated' } })
+
+        // Notificar sincronização global
+        globalSyncManager.triggerSync('route.updated', { id: route.id, ...payload })
 
         // Sincronização e auditoria para update
         await sync({
@@ -197,8 +202,8 @@ export function RouteModal({
         // Criar
         const { data, error } = await supabase
           .from('routes')
-          .insert(payload)
-          .select()
+          .insert(payload as any)
+          .select("*")
           .single()
 
         if (error) throw error
@@ -206,6 +211,9 @@ export function RouteModal({
         // Atualizar formData com o ID criado
         if (data) {
           setFormData({ ...formData, id: data.id })
+          
+          // Notificar sincronização global
+          globalSyncManager.triggerSync('route.created', data)
           
           // Sincronização com Supabase (garantia adicional)
           await sync({
@@ -309,9 +317,22 @@ export function RouteModal({
 
   const addException = () => {
     if (!newException) return
+    
+    // Converter formato dd/mm/aaaa para YYYY-MM-DD
+    let dateStr = newException.trim()
+    const parts = dateStr.split('/')
+    
+    if (parts.length === 3) {
+      // Formato dd/mm/aaaa
+      const day = parts[0].padStart(2, '0')
+      const month = parts[1].padStart(2, '0')
+      const year = parts[2]
+      dateStr = `${year}-${month}-${day}`
+    }
+    
     const exceptions = formData.exceptions || []
-    if (!exceptions.includes(newException)) {
-      setFormData({ ...formData, exceptions: [...exceptions, newException] })
+    if (!exceptions.includes(dateStr)) {
+      setFormData({ ...formData, exceptions: [...exceptions, dateStr] })
       setNewException("")
     }
   }
@@ -374,6 +395,9 @@ export function RouteModal({
             <Route className="h-5 w-5 text-[var(--brand)]" />
             {route?.id ? 'Editar Rota' : 'Nova Rota'}
           </DialogTitle>
+          <DialogDescription>
+            {route?.id ? "Edite os dados da rota" : "Preencha os dados da rota, selecione os funcionários e otimize o trajeto"}
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6 py-4">
@@ -513,9 +537,10 @@ export function RouteModal({
             </Label>
             <div className="flex gap-2 mb-2">
               <Input
-                type="date"
+                type="text"
                 value={newException}
                 onChange={(e) => setNewException(e.target.value)}
+                placeholder="dd/mm/aaaa"
                 className="flex-1"
               />
               <Button type="button" onClick={addException} size="sm">
@@ -548,34 +573,6 @@ export function RouteModal({
           </div>
         </div>
 
-        {/* Configuração do Gerador */}
-        <div className="space-y-3 p-3 border rounded-md">
-          <div className="font-medium">Configuração do Gerador</div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <div>
-              <Label>Fonte de funcionários</Label>
-              <Input value={employeeTable} onChange={(e) => setEmployeeTable(e.target.value)} placeholder="ex.: gf_employee_company" />
-            </div>
-            <div>
-              <Label>Velocidade média (km/h)</Label>
-              <Input type="number" value={avgSpeedKmh} onChange={(e) => setAvgSpeedKmh(Number(e.target.value) || 30)} />
-            </div>
-            <div>
-              <Label>Debounce realtime (ms)</Label>
-              <Input type="number" value={debounceMs} onChange={(e) => setDebounceMs(Number(e.target.value) || 500)} />
-            </div>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <div>
-              <Label>Itens por página</Label>
-              <Input type="number" value={itemsPerPage} onChange={(e) => setItemsPerPage(Number(e.target.value) || 200)} />
-            </div>
-            <div>
-              <Label>Tentativas de reconexão</Label>
-              <Input type="number" value={realtimeRetries} onChange={(e) => setRealtimeRetries(Number(e.target.value) || 3)} />
-            </div>
-          </div>
-        </div>
 
         <DialogFooter className="flex flex-col sm:flex-row gap-2">
           <div className="flex gap-2 flex-1">

@@ -315,11 +315,17 @@ function LoginContent() {
         return
       }
 
+      // ✅ FEEDBACK VISUAL IMEDIATO - mostrar loading ANTES de iniciar a requisição
       setLoading(true)
       setTransitioning(true)
       setError(null)
+      
       const prevCursor = typeof document !== "undefined" ? document.body.style.cursor : ""
-      if (typeof document !== "undefined") document.body.style.cursor = "progress"
+      if (typeof document !== "undefined") {
+        document.body.style.cursor = "progress"
+        // Forçar reflow para garantir que o loading seja renderizado imediatamente
+        void document.body.offsetHeight
+      }
 
       const controller = new AbortController()
       const timeoutId = window.setTimeout(() => controller.abort(), 10_000)
@@ -440,74 +446,13 @@ function LoginContent() {
         console.log('📧 Email do usuário:', user.email)
         console.log('🆔 ID do usuário:', user.id)
 
-        // ✅ CRÍTICO: Persistir sessão do Supabase no cliente ANTES de redirecionar
-        // Isso evita o loop de redirecionamento, pois as páginas admin verificam supabase.auth.getSession()
-        if (sessionData && typeof window !== 'undefined') {
-          try {
-            console.log('🔐 Persistindo sessão do Supabase no cliente...')
-            
-            // Importar Supabase client
-            const { supabase: supabaseClient } = await import('@/lib/supabase')
-            
-            // Tentar usar setSession se disponível (método oficial do Supabase)
-            if (supabaseClient && 'auth' in supabaseClient) {
-              try {
-                // Usar type assertion para acessar setSession (pode não estar no tipo mock)
-                const authClient = supabaseClient.auth as any
-                if (typeof authClient.setSession === 'function') {
-                  const { data: sessionResult, error: sessionError } = await authClient.setSession({
-                    access_token: sessionData.access_token,
-                    refresh_token: sessionData.refresh_token,
-                  })
-                  
-                  if (sessionError) {
-                    console.error('❌ Erro ao definir sessão via setSession:', sessionError)
-                  } else {
-                    console.log('✅ Sessão do Supabase definida via setSession()')
-                    // Sessão definida com sucesso, continuar
-                  }
-                } else {
-                  console.warn('⚠️ setSession não disponível, usando fallback')
-                  throw new Error('setSession não disponível')
-                }
-              } catch (setSessionErr) {
-                // Fallback: armazenar manualmente no formato do Supabase
-                console.log('ℹ️ Usando fallback para persistir sessão manualmente')
-                
-                // O Supabase armazena no formato: sb-<project-ref>-auth-token
-                const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
-                // Extrair project reference da URL (ex: https://xxxxx.supabase.co -> xxxxx)
-                const urlMatch = supabaseUrl.match(/https?:\/\/([^.]+)\.supabase\.co/)
-                const projectRef = urlMatch ? urlMatch[1] : supabaseUrl.split('//')[1]?.split('.')[0] || 'project'
-                
-                // Criar objeto de sessão no formato esperado pelo Supabase
-                const sessionObject = {
-                  access_token: sessionData.access_token,
-                  refresh_token: sessionData.refresh_token,
-                  expires_in: sessionData.expires_in || 3600,
-                  expires_at: sessionData.expires_at || Math.floor(Date.now() / 1000) + (sessionData.expires_in || 3600),
-                  token_type: sessionData.token_type || 'bearer',
-                  user: sessionData.user
-                }
-                
-                // Armazenar no localStorage
-                const storageKey = `sb-${projectRef}-auth-token`
-                localStorage.setItem(storageKey, JSON.stringify(sessionObject))
-                console.log(`✅ Sessão persistida manualmente em localStorage (chave: ${storageKey})`)
-              }
-            }
-          } catch (sessionErr) {
-            console.error('❌ Erro ao persistir sessão do Supabase:', sessionErr)
-            // Continuar mesmo com erro - o cookie ainda foi definido e o middleware protegerá
-          }
-        }
-
-        // ✅ Processar sessão customizada (cookie) antes de redirecionar
+        // ✅ OTIMIZADO: Processar sessão de forma síncrona e rápida
+        // O cookie já foi definido pelo servidor, então apenas persistir no cliente
         AuthManager.persistSession(
           {
             id: user.id,
             email: user.email,
-            role: userRoleFromDatabase, // Usar role do banco de dados
+            role: userRoleFromDatabase,
             accessToken: token,
           },
           { token, storage: rememberMe ? "both" : "session" }
@@ -527,23 +472,13 @@ function LoginContent() {
         const rawNext = searchParams.get("next")
         const safeNext = sanitizePath(rawNext)
         let redirectUrl: string
-
-        // Log detalhado para debug
-        console.log('🔍 Determinando redirecionamento:', {
-          roleFromDatabase: userRoleFromDatabase,
-          email: user.email,
-          safeNext,
-          defaultUrl: DEFAULT_LOGGED_URL
-        })
         
         // Se houver parâmetro ?next= e for permitido para o role, usar ele
         if (safeNext && isAllowedForRole(userRoleFromDatabase, safeNext)) {
           redirectUrl = safeNext
-          console.log('📍 Usando URL do parâmetro ?next=:', redirectUrl)
         } else {
           // Caso contrário, usar o role do banco para determinar o painel
           redirectUrl = AuthManager.getRedirectUrl(userRoleFromDatabase)
-          console.log('📍 Usando URL baseada no role do banco:', redirectUrl)
         }
         
         // Limpar query params da URL de redirecionamento
@@ -556,51 +491,17 @@ function LoginContent() {
           source: 'database'
         }, "LoginPage")
         
-        console.log('🚀 Preparando redirecionamento:', {
-          redirectUrl,
-          role: userRoleFromDatabase,
-          email: user.email,
-          userId: user.id
-        })
-        
-        // ✅ Redirecionar APENAS após tudo estar processado
-        // O cookie é definido pelo servidor na resposta HTTP, então precisamos aguardar
-        // um pouco para garantir que o navegador processou o Set-Cookie header
-        console.log('⏳ Aguardando processamento do cookie...')
-        await new Promise(resolve => setTimeout(resolve, 300))
-        
+        // ✅ REDIRECIONAMENTO IMEDIATO - sem delays desnecessários
+        // O cookie já foi definido pelo servidor na resposta HTTP
+        // O navegador processa o Set-Cookie header automaticamente
         if (typeof window !== "undefined") {
-          // Verificar se o cookie foi definido (pode não estar visível ainda via document.cookie
-          // se for httpOnly, mas nosso cookie não é httpOnly, então deve estar visível)
-          const cookieCheck = document.cookie.includes('golffox-session')
-          console.log('🍪 Cookie verificado:', cookieCheck)
-          console.log('🍪 Todos os cookies:', document.cookie.substring(0, 100) + '...')
+          // Definir flag para evitar interferência do useEffect
+          (window as any).__golffox_redirecting = true
           
-          const fullUrl = window.location.origin + redirectUrl
-          console.log('📍 Redirecionando para:', fullUrl)
-          console.log('🔗 URL relativa:', redirectUrl)
-          console.log('👤 Role do banco de dados:', userRoleFromDatabase)
-          console.log('📧 Email:', user.email)
-          
-          // Definir um flag para evitar que o useEffect interfira
-          if (typeof window !== 'undefined') {
-            (window as any).__golffox_redirecting = true
-          }
-          
-          // Redirecionar imediatamente - o cookie já foi definido pelo servidor
-          // O navegador enviará o cookie automaticamente na próxima requisição
+          // Redirecionar IMEDIATAMENTE - sem esperar
+          // O cookie será enviado automaticamente na próxima requisição
           window.location.href = redirectUrl
-          
-          // Fallback: se após 1 segundo ainda estiver na mesma página, forçar replace
-          setTimeout(() => {
-            if (typeof window !== 'undefined' && 
-                (window.location.pathname === '/' || window.location.pathname === '/login')) {
-              console.warn('⚠️ Redirecionamento não ocorreu, forçando replace...')
-              window.location.replace(redirectUrl)
-            }
-          }, 1000)
         } else {
-          console.log('📍 Usando router.replace para:', redirectUrl)
           router.replace(redirectUrl)
         }
         
@@ -617,8 +518,12 @@ function LoginContent() {
         passwordInputRef.current?.focus()
         logError("Erro inesperado no login", { error: err }, "LoginPage")
       } finally {
-        setLoading(false)
-        setTimeout(() => setTransitioning(false), 800)
+        // Não resetar loading/transitioning se o redirecionamento está ocorrendo
+        // Isso evita flicker antes do redirecionamento
+        if (typeof window !== "undefined" && !(window as any).__golffox_redirecting) {
+          setLoading(false)
+          setTimeout(() => setTransitioning(false), 300)
+        }
         if (typeof document !== "undefined") document.body.style.cursor = prevCursor
       }
     },
@@ -906,12 +811,26 @@ function LoginContent() {
               <div className="absolute inset-0 bg-gradient-to-br from-[var(--brand)]/3 via-transparent to-[var(--accent)]/3 pointer-events-none" />
 
               {loading && (
-                <div className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-white/95 backdrop-blur-sm rounded-2xl">
-                  <div className="animate-spin rounded-full w-10 h-10 border-3 border-[var(--brand)]/20 border-t-[var(--brand)]" />
-                  <p className="mt-4 text-sm text-gray-600 font-medium">
-                    Validando credenciais…
-                  </p>
-                </div>
+                <motion.div 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.2 }}
+                  className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-white/95 backdrop-blur-sm rounded-2xl"
+                >
+                  <motion.div 
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                    className="w-12 h-12 border-4 border-[var(--brand)]/20 border-t-[var(--brand)] rounded-full"
+                  />
+                  <motion.p 
+                    initial={{ y: 10, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: 0.1 }}
+                    className="mt-4 text-sm text-gray-600 font-medium"
+                  >
+                    {transitioning ? "Redirecionando..." : "Validando credenciais…"}
+                  </motion.p>
+                </motion.div>
               )}
 
               <div className="relative z-10">
@@ -958,7 +877,9 @@ function LoginContent() {
             <form
               onSubmit={(e) => {
                 e.preventDefault()
-                if (!loading) {
+                // ✅ Prevenir múltiplos submits e iniciar feedback visual imediato
+                if (!loading && !transitioning) {
+                  // Iniciar loading state IMEDIATAMENTE para melhor UX
                   handleLogin()
                 }
               }}
@@ -980,6 +901,13 @@ function LoginContent() {
                       placeholder="seu@email.com"
                       value={email}
                       onChange={(e) => setEmail(sanitizeInput(e.target.value))}
+                      onKeyDown={(e) => {
+                        // ✅ Permitir submit com Enter no campo de email para melhor UX
+                        if (e.key === 'Enter' && !loading && !transitioning && password.trim().length > 0) {
+                          e.preventDefault()
+                          passwordInputRef.current?.focus()
+                        }
+                      }}
                         aria-invalid={email && !emailValid ? true : undefined}
                       autoComplete="email"
                         className={`pl-12 pr-4 h-12 bg-white border transition-all duration-200 ${
@@ -1011,6 +939,13 @@ function LoginContent() {
                       placeholder="••••••••"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
+                      onKeyDown={(e) => {
+                        // ✅ Permitir submit com Enter no campo de senha para melhor UX
+                        if (e.key === 'Enter' && !loading && !transitioning) {
+                          e.preventDefault()
+                          handleLogin()
+                        }
+                      }}
                       ref={passwordInputRef}
                         aria-invalid={password && !passwordValid ? true : undefined}
                       autoComplete="current-password"
@@ -1067,16 +1002,28 @@ function LoginContent() {
                   <div>
                     <Button
                       type="submit"
-                      disabled={loading}
-                      className="w-full h-12 bg-[var(--brand)] hover:bg-[var(--brand-hover)] text-white font-semibold text-base shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg"
+                      disabled={loading || transitioning}
+                      className="w-full h-12 bg-[var(--brand)] hover:bg-[var(--brand-hover)] text-white font-semibold text-base shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg relative overflow-hidden"
                     >
-                      {loading ? (
+                      {loading || transitioning ? (
                         <span className="flex items-center justify-center gap-2">
-                          <span className="animate-spin rounded-full h-4 w-4 border-2 border-white/30 border-t-white" />
-                          Validando...
+                          <motion.span 
+                            animate={{ rotate: 360 }}
+                            transition={{ duration: 0.8, repeat: Infinity, ease: "linear" }}
+                            className="rounded-full h-4 w-4 border-2 border-white/30 border-t-white"
+                          />
+                          {transitioning ? "Redirecionando..." : "Validando..."}
                         </span>
                       ) : (
                         "Entrar"
+                      )}
+                      {/* Efeito de shimmer quando carregando */}
+                      {loading && (
+                        <motion.div
+                          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                          animate={{ x: ['-100%', '200%'] }}
+                          transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+                        />
                       )}
                     </Button>
                   </div>

@@ -19,8 +19,9 @@ function isValidUUID(uuid: string): boolean {
   return UUID_REGEX.test(uuid)
 }
 
-export async function DELETE(_req: NextRequest, { params }: { params: { vehicleId: string } }) {
-  const vehicleId = sanitizeId(params?.vehicleId)
+export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ vehicleId: string }> }) {
+  const { vehicleId: vehicleIdParam } = await params
+  const vehicleId = sanitizeId(vehicleIdParam)
 
   if (!vehicleId) {
     return NextResponse.json({ error: "invalid_vehicle_id" }, { status: 400 })
@@ -139,6 +140,63 @@ export async function DELETE(_req: NextRequest, { params }: { params: { vehicleI
   } catch (error: unknown) {
     logError("Erro inesperado ao excluir veículo", { vehicleId, error }, CONTEXT)
     return NextResponse.json({ error: "internal_error", tripsCount: 0, archived: false }, { status: 500 })
+  }
+}
+
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ vehicleId: string }> }) {
+  const { vehicleId: vehicleIdParam } = await params
+  const vehicleId = sanitizeId(vehicleIdParam)
+
+  if (!vehicleId) {
+    return NextResponse.json({ error: "invalid_vehicle_id" }, { status: 400 })
+  }
+
+  if (!isValidUUID(vehicleId)) {
+    debug("UUID inválido recebido no PATCH", { vehicleId }, CONTEXT)
+    return NextResponse.json({ error: "invalid_vehicle_id_format" }, { status: 400 })
+  }
+
+  try {
+    const body = await req.json().catch(() => ({}))
+    const updateData: Record<string, unknown> = {}
+
+    // Campos permitidos para atualização
+    const allowedFields = new Set([
+      'plate', 'model', 'year', 'capacity', 'prefix', 'company_id', 'carrier_id', 'is_active', 'photo_url'
+    ])
+
+    for (const [key, value] of Object.entries(body)) {
+      if (allowedFields.has(key)) {
+        // Normalizações básicas
+        if (typeof value === 'string') {
+          const trimmed = value.trim()
+          updateData[key] = trimmed.length > 0 ? trimmed : null
+        } else {
+          updateData[key] = value
+        }
+      }
+    }
+
+    if (Object.keys(updateData).length === 0) {
+      return NextResponse.json({ error: 'no_fields_to_update' }, { status: 400 })
+    }
+
+    const { data, error } = await supabaseServiceRole
+      .from('vehicles')
+      .update(updateData)
+      .eq('id', vehicleId)
+      .select()
+      .single()
+
+    if (error) {
+      logError('Erro ao atualizar veículo', { vehicleId, error }, CONTEXT)
+      return NextResponse.json({ error: 'vehicle_update_failed', message: error.message }, { status: 500 })
+    }
+
+    return NextResponse.json(data, { status: 200 })
+  } catch (error: unknown) {
+    logError('Erro inesperado ao atualizar veículo', { vehicleId, error }, CONTEXT)
+    return NextResponse.json({ error: 'internal_error' }, { status: 500 })
   }
 }
 

@@ -118,20 +118,176 @@
     box-sizing: border-box;
   }
   
+  /* Melhorar renderização de texto - abordagem limpa e equilibrada */
+  p, span, div, h1, h2, h3, h4, h5, h6, a, button, label, input, textarea, select {
+    /* Antialiasing para melhor qualidade */
+    -webkit-font-smoothing: antialiased;
+    /* Fallback para macOS */
+    -moz-osx-font-smoothing: grayscale;
+    /* optimizeLegibility para melhor renderização sem exageros */
+    text-rendering: optimizeLegibility;
+    /* Melhorar renderização de bordas */
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    /* Forçar renderização de alta qualidade */
+    -webkit-font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
+    font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
+  }
+  
+  /* Exceção: remover transform de elementos que não precisam (pode causar pixelização) */
+  input, textarea, select {
+    /* Inputs não devem ter transform para evitar problemas de renderização */
+    transform: none !important;
+    -webkit-transform: none !important;
+  }
+  
+  /* Headings maiores - renderização limpa */
+  h1, h2, h3 {
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  
+  /* Para elementos com fundo escuro, usar antialiased */
+  [class*="dark"] p, [class*="dark"] span, [class*="dark"] div,
+  [class*="dark"] h1, [class*="dark"] h2, [class*="dark"] h3,
+  [class*="dark"] h4, [class*="dark"] h5, [class*="dark"] h6,
+  [class*="bg-dark"], [class*="bg-black"], [style*="background: black"],
+  [style*="background-color: black"], [style*="background: #000"] {
+    -webkit-font-smoothing: antialiased;
+  }
+  
+  /* Evitar aplicar em ícones e elementos que não precisam */
+  svg, img, canvas, video {
+    -webkit-font-smoothing: auto;
+    -moz-osx-font-smoothing: auto;
+    /* Remover transform e text-shadow de elementos não-texto */
+    transform: none;
+    text-shadow: none;
+    -webkit-text-stroke: 0;
+  }
+  
+  /* Remover transform de elementos que não precisam (pode causar pixelização) */
+  svg *, img *, canvas *, video * {
+    transform: none !important;
+    text-shadow: none !important;
+    -webkit-text-stroke: 0 !important;
+  }
+  
+  /* Melhorar renderização de texto em elementos animados com Framer Motion */
+  .font-smooth {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: "rlig" 1, "calt" 1, "kern" 1, "liga" 1;
+  }
+  
+  /* Garantir alta qualidade em elementos com transform (Framer Motion) */
+  [class*="motion"] *,
+  [data-framer-name] * {
+    -webkit-font-smoothing: antialiased !important;
+    -moz-osx-font-smoothing: grayscale !important;
+    text-rendering: optimizeLegibility !important;
+    /* Melhorar renderização durante animações */
+    -webkit-backface-visibility: hidden !important;
+    backface-visibility: hidden !important;
+    /* Forçar renderização de alta qualidade */
+    -webkit-font-feature-settings: "kern" 1, "liga" 1, "calt" 1 !important;
+    font-feature-settings: "kern" 1, "liga" 1, "calt" 1 !important;
+  }
+  
+  /* Evitar pixelização em elementos com backdrop-blur */
+  [class*="backdrop-blur"],
+  [style*="backdrop-filter"] {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    /* Melhorar renderização */
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
+  
+  /* Melhorar renderização de texto em gradientes e elementos com texto sobre gradiente */
+  [class*="gradient"],
+  [style*="gradient"],
+  [class*="bg-gradient"] {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    /* Garantir renderização suave mesmo com backgrounds complexos */
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
+  
+  /* Especial para texto com bg-clip-text (gradiente no texto) */
+  [class*="bg-clip-text"],
+  [style*="background-clip: text"],
+  [style*="-webkit-background-clip: text"] {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    /* Melhorar renderização de alta qualidade */
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    /* Forçar renderização de alta qualidade */
+    -webkit-font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
+    font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
+  }
+  
   html {
     scroll-behavior: smooth;
     -webkit-text-size-adjust: 100%;
+    -moz-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    /* optimizeLegibility para renderização equilibrada */
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /* Melhorar renderização geral */
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
   }
   
   body {
-    @apply bg-[var(--bg)] text-[var(--ink)] antialiased;
-    font-family: var(--font-sans);
-    font-feature-settings: "rlig" 1, "calt" 1, "kern" 1;
+    @apply bg-[var(--bg)] text-[var(--ink)];
+    font-family: var(--font-inter, var(--font-sans));
+    font-feature-settings: "rlig" 1, "calt" 1, "kern" 1, "liga" 1;
+    /* Antialiasing para melhor qualidade */
     -webkit-font-smoothing: antialiased;
+    /* Fallback para macOS */
     -moz-osx-font-smoothing: grayscale;
+    /* optimizeLegibility para renderização equilibrada */
+    text-rendering: optimizeLegibility;
+    -webkit-text-size-adjust: 100%;
+    -moz-text-size-adjust: 100%;
+    text-size-adjust: 100%;
     overflow-x: hidden;
     margin: 0;
     padding: 0;
+    /* Melhorar renderização de subpixels */
+    font-variant-ligatures: common-ligatures;
+    font-kerning: normal;
+    font-variant-numeric: oldstyle-nums;
+    /* Melhorar renderização */
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    /* Forçar renderização de alta qualidade */
+    -webkit-font-feature-settings: "kern" 1, "liga" 1, "calt" 1, "rlig" 1;
+  }
+  
+  
+  /* Classe utilitária para texto suave */
+  .font-smooth {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: "rlig" 1, "calt" 1, "kern" 1, "liga" 1;
+    /* Melhorar qualidade de renderização */
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    /* Forçar renderização de alta qualidade */
+    -webkit-font-feature-settings: "kern" 1, "liga" 1, "calt" 1, "rlig" 1;
   }
   
   /* Pattern Background */
@@ -168,12 +324,31 @@
   
   /* Card Premium com Glassmorphism Opcional */
   .card-premium {
-    @apply bg-white rounded-[var(--radius-xl)] border border-[var(--border)];
+    @apply bg-white rounded-[var(--radius-lg)] border border-[var(--border)];
     @apply shadow-[var(--shadow-sm)] transition-all duration-200;
+    @apply overflow-hidden;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
   }
   
   .card-premium:hover {
     @apply shadow-[var(--shadow-md)] -translate-y-0.5;
+  }
+  
+  /* Garantir que textos dentro de cards não saiam */
+  .card-premium *,
+  .card-glass * {
+    max-width: 100%;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+  
+  /* Truncate para textos longos em cards */
+  .card-premium .truncate,
+  .card-glass .truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
   
   .card-glass {

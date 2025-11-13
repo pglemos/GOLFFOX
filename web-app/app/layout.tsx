@@ -9,8 +9,11 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 const inter = Inter({ 
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700", "800"],
-  display: "swap",
+  display: "swap", // Voltar para swap para melhor compatibilidade
   variable: "--font-inter",
+  preload: true,
+  adjustFontFallback: true,
+  fallback: ["-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "Helvetica Neue", "Arial", "sans-serif"],
 });
 
 export const metadata: Metadata = {
@@ -24,13 +27,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR">
-      <body className={inter.className}>
+    <html lang="pt-BR" className={inter.variable}>
+      <body className={`${inter.className} font-smooth`}>
         <ErrorBoundary>
           <WebVitalsInit />
           {children}
           <Toaster position="top-right" />
-          <SpeedInsights />
+          {process.env.NODE_ENV === 'production' && <SpeedInsights />}
         </ErrorBoundary>
       </body>
     </html>

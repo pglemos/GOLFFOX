@@ -14,7 +14,8 @@ import {
   Truck, 
   Edit, 
   Navigation,
-  Sparkles
+  Sparkles,
+  Trash2
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -22,50 +23,90 @@ import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { AppShell } from "@/components/app-shell"
-import { QuickNavigation, AdvancedNavigationButton } from "@/components/advanced-navigation-button"
+import { AdvancedNavigationButton } from "@/components/advanced-navigation-button"
 import { useAdvancedNavigation } from "@/hooks/use-advanced-navigation"
 import { supabase } from "@/lib/supabase"
 import { RouteModal } from "@/components/modals/route-modal"
+import { RouteCreateModal } from "./route-create-modal"
 import { notifySuccess, notifyError } from "@/lib/toast"
+import { useAuthFast } from "@/hooks/use-auth-fast"
+import { useGlobalSync } from "@/hooks/use-global-sync"
 
 export function RotasPageContent() {
   const router = useRouter()
   const { TransitionOverlay } = useAdvancedNavigation()
-  const [user, setUser] = useState<any>(null)
-  const [loading, setLoading] = useState(true)
+  const { user, loading } = useAuthFast()
   const [rotas, setRotas] = useState<any[]>([])
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedRoute, setSelectedRoute] = useState<any>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
 
   useEffect(() => {
-    const getUser = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (!session) {
-        if (typeof window !== 'undefined') {
-          window.location.replace("/")
-        } else {
-          router.replace("/")
-        }
-        return
-      }
-      setUser({ ...session.user })
-      setLoading(false)
+    if (!loading && user) {
       loadRotas()
     }
-    getUser()
-  }, [router])
+  }, [loading, user])
+
+  // Escutar eventos de sincronização global (apenas após carregamento inicial)
+  useGlobalSync(
+    ['route.created', 'route.updated', 'route.deleted', 'company.created', 'company.updated'],
+    () => {
+      // Recarregar rotas quando houver mudanças (apenas se já tiver carregado)
+      if (!loading && user) {
+        loadRotas()
+      }
+    },
+    [loading, user]
+  )
 
   const loadRotas = async () => {
     try {
-      const { data, error } = await supabase
-        .from("routes")
-        .select("*, companies(name)")
-
-      if (error) throw error
-      setRotas(data || [])
+      // Usar API route para bypass RLS
+      const response = await fetch('/api/admin/routes-list')
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+      const result = await response.json()
+      if (result.success) {
+        setRotas(result.routes || [])
+      } else {
+        throw new Error(result.error || 'Erro ao carregar rotas')
+      }
     } catch (error) {
       console.error("Erro ao carregar rotas:", error)
+      setRotas([])
+    }
+  }
+
+  const handleDeleteRota = async (rotaId: string, rotaName: string) => {
+    if (!confirm(`Tem certeza que deseja excluir a rota "${rotaName}"? Esta ação não pode ser desfeita.`)) {
+      return
+    }
+
+    try {
+      const response = await fetch(`/api/admin/routes/delete?id=${rotaId}`, {
+        method: 'DELETE'
+      })
+      
+      const result = await response.json()
+      
+      if (!response.ok) {
+        const errorMessage = result.message || result.error || 'Erro ao excluir rota'
+        const errorDetails = result.details ? ` (${result.details})` : ''
+        throw new Error(`${errorMessage}${errorDetails}`)
+      }
+
+      if (result.success) {
+        notifySuccess('Rota excluída com sucesso')
+        await new Promise(resolve => setTimeout(resolve, 300))
+        await loadRotas()
+      } else {
+        throw new Error(result.error || 'Erro ao excluir rota')
+      }
+    } catch (error: any) {
+      console.error('Erro ao excluir rota:', error)
+      const errorMessage = error.message || 'Erro desconhecido ao excluir rota'
+      notifyError(error, errorMessage)
     }
   }
 
@@ -86,8 +127,12 @@ export function RotasPageContent() {
     rota.companies?.name?.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
+  if (!user) {
+    return null // useAuth já redireciona
+  }
+
   return (
-    <AppShell user={user}>
+    <AppShell user={{ id: user.id, name: user.name || "Admin", email: user.email, role: user.role || "admin" }}>
       <TransitionOverlay>
         <div className="p-6 space-y-6">
           {/* Header */}
@@ -100,6 +145,18 @@ export function RotasPageContent() {
               <p className="text-gray-600 mt-1">Gerencie as rotas do sistema</p>
             </div>
             <div className="flex gap-2">
+              <RouteCreateModal
+                isOpen={isModalOpen && !selectedRoute}
+                onClose={() => {
+                  setIsModalOpen(false)
+                  setSelectedRoute(null)
+                }}
+                onSave={() => {
+                  loadRotas()
+                  setIsModalOpen(false)
+                  setSelectedRoute(null)
+                }}
+              />
               <Button onClick={() => {
                 setSelectedRoute(null)
                 setIsModalOpen(true)
@@ -120,9 +177,6 @@ export function RotasPageContent() {
               className="pl-10"
             />
           </div>
-
-          {/* Quick Navigation */}
-          <QuickNavigation currentTab="rotas" />
 
           {/* Routes Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -245,6 +299,17 @@ export function RotasPageContent() {
                         Ver no Mapa
                       </Button>
                     </div>
+                    <div className="mt-2">
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        className="w-full"
+                        onClick={() => handleDeleteRota(rota.id, rota.name || 'Rota')}
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Excluir
+                      </Button>
+                    </div>
                   </div>
                 </Card>
               </motion.div>
@@ -277,7 +342,11 @@ export function RotasPageContent() {
             setIsModalOpen(false)
             setSelectedRoute(null)
           }}
-          onSave={loadRotas}
+          onSave={() => {
+            loadRotas()
+            setIsModalOpen(false)
+            setSelectedRoute(null)
+          }}
           onGenerateStops={async (routeId) => {
             await loadRotas()
           }}

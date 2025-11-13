@@ -51,25 +51,57 @@ export default function OperatorDashboard() {
   useEffect(() => {
     const getUser = async () => {
       try {
+        // ✅ PRIMEIRO: Tentar obter do cookie de sessão customizado (mais rápido e confiável)
+        if (typeof document !== 'undefined') {
+          const cookieMatch = document.cookie.match(/golffox-session=([^;]+)/)
+          if (cookieMatch) {
+            try {
+              const decoded = atob(cookieMatch[1])
+              const userData = JSON.parse(decoded)
+              if (userData?.id && userData?.email && userData?.role) {
+                console.log('✅ Usuário obtido do cookie:', { 
+                  id: userData.id, 
+                  email: userData.email, 
+                  role: userData.role 
+                })
+                setUser(userData)
+                setLoading(false)
+                return
+              }
+            } catch (cookieErr) {
+              console.warn('⚠️ Erro ao decodificar cookie de sessão:', cookieErr)
+            }
+          }
+        }
+
+        // ✅ FALLBACK: Tentar obter sessão do Supabase Auth
         const { data: { session }, error: sessionError } = await supabase.auth.getSession()
         if (sessionError) {
-          console.error('Erro ao verificar sessão:', sessionError)
-          setError('Erro ao verificar autenticação')
-          return
+          console.error('Erro ao verificar sessão Supabase:', sessionError)
+          // Não definir erro imediatamente - pode ser apenas falta de sessão Supabase
         }
+        
         if (!session) {
-          router.push("/")
+          // Se não há sessão Supabase e não há cookie, redirecionar para login
+          if (typeof document !== 'undefined' && !document.cookie.includes('golffox-session')) {
+            console.log('⚠️ Sem sessão detectada, redirecionando para login')
+            router.push("/")
+            return
+          }
+          // Se há cookie mas não há sessão Supabase, continuar com cookie
+          setLoading(false)
           return
         }
 
+        // Buscar dados completos do usuário no banco
         const { data: userData, error: userError } = await supabase
           .from("users")
           .select("*")
           .eq("id", session.user.id)
-          .single()
+          .maybeSingle()
 
         if (userError) {
-          console.warn('Erro ao buscar dados do usuário:', userError)
+          console.warn('⚠️ Erro ao buscar dados do usuário:', userError)
         }
 
         if (userData) {
@@ -78,8 +110,9 @@ export default function OperatorDashboard() {
           setUser({ ...session.user })
         }
       } catch (err: any) {
-        console.error('Erro ao obter usuário:', err)
-        setError('Erro ao carregar dados do usuário')
+        console.error('❌ Erro ao obter usuário:', err)
+        // Não definir erro fatal - pode ser apenas problema temporário
+        // A página pode funcionar mesmo sem dados completos do usuário
       } finally {
         setLoading(false)
       }
@@ -240,17 +273,17 @@ export default function OperatorDashboard() {
       email: user?.email || "",
       role: "operator"
     }}>
-      <div className="space-y-6">
+      <div className="space-y-6 lg:space-y-8">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div>
-            <h1 className="text-3xl font-bold mb-2">Painel do Operador</h1>
-            <p className="text-gray-600">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-2">
+          <div className="flex-1 min-w-0">
+            <h1 className="text-2xl sm:text-3xl font-bold mb-2 text-[var(--ink-strong)]">Painel do Operador</h1>
+            <p className="text-sm sm:text-base text-[var(--ink-muted)]">
               {companyName ? `Empresa: ${companyName}` : "Acompanhe sua operação em tempo real"}
             </p>
           </div>
-          <Link href="/operator/rotas">
-            <Button className="bg-orange-500 hover:bg-orange-600">
+          <Link href="/operator/rotas" className="flex-shrink-0">
+            <Button className="bg-orange-500 hover:bg-orange-600 text-white">
               <MapPin className="h-4 w-4 mr-2" />
               Ver Rotas
             </Button>
@@ -259,13 +292,19 @@ export default function OperatorDashboard() {
 
         {/* KPIs */}
         <div>
-          <h2 className="text-xl font-bold mb-4">KPIs do Dia</h2>
+          <div className="mb-4">
+            <h2 className="text-lg font-semibold text-[var(--ink-strong)]">KPIs do Dia</h2>
+            <p className="text-sm text-[var(--ink-muted)] mt-1">Métricas principais da operação</p>
+          </div>
           <OperatorKPICards kpis={kpis} loading={false} />
         </div>
 
         {/* Control Tower */}
         <div>
-          <h2 className="text-xl font-bold mb-4">Torre de Controle</h2>
+          <div className="mb-4">
+            <h2 className="text-lg font-semibold text-[var(--ink-strong)]">Torre de Controle</h2>
+            <p className="text-sm text-[var(--ink-muted)] mt-1">Monitoramento em tempo real</p>
+          </div>
           <ControlTowerCards 
             delays={controlTower.delays}
             stoppedVehicles={controlTower.stoppedVehicles}
@@ -276,19 +315,26 @@ export default function OperatorDashboard() {
 
         {/* Mapa Preview */}
         <div>
-          <Card className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold">Visualização de Rotas</h2>
-              <Link href="/operator/rotas/mapa">
-                <Button variant="outline">
-                  <MapPin className="h-4 w-4 mr-2" />
-                  Ver Mapa Completo
-                </Button>
-              </Link>
-            </div>
-            <p className="text-gray-600">
-              Visualize todas as rotas ativas no mapa interativo
-            </p>
+          <Card className="overflow-hidden">
+            <CardHeader className="pb-4">
+              <div className="flex items-start justify-between">
+                <div className="flex-1 min-w-0 pr-4">
+                  <CardTitle className="text-xl font-semibold mb-1.5">Visualização de Rotas</CardTitle>
+                  <p className="text-sm text-[var(--ink-muted)]">Visualize todas as rotas ativas no mapa interativo</p>
+                </div>
+                <Link href="/operator/rotas/mapa" className="flex-shrink-0">
+                  <Button variant="outline" size="sm">
+                    <MapPin className="h-4 w-4 mr-2" />
+                    Ver Mapa
+                  </Button>
+                </Link>
+              </div>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <div className="h-48 bg-gradient-to-br from-orange-500/10 to-orange-600/10 rounded-lg flex items-center justify-center border border-orange-200/50">
+                <MapPin className="h-12 w-12 text-orange-500 opacity-40" />
+              </div>
+            </CardContent>
           </Card>
         </div>
       </div>

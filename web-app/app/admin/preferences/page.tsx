@@ -1,42 +1,28 @@
 "use client"
 
-import { useEffect, useState } from "react"
-// @ts-ignore
 import { AppShell } from "@/components/app-shell"
-// @ts-ignore
 import { Card } from "@/components/ui/card"
-// @ts-ignore
 import { Button } from "@/components/ui/button"
 import { Settings2 } from "lucide-react"
-// @ts-ignore
-import { supabase } from "@/lib/supabase"
-import { useRouter } from "next/navigation"
+import { useAuth } from "@/hooks/use-auth"
 
 export default function AdminPreferencesPage() {
-  const router = useRouter()
-  const [user, setUser] = useState<any>(null)
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    const run = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (!session) { router.push("/"); return }
-      setUser({ ...session.user })
-      setLoading(false)
-    }
-    run()
-  }, [router])
+  const { user, loading } = useAuth()
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="w-16 h-16 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin mx-auto"></div>
+      <div className="min-h-screen flex items-center justify-center bg-[var(--bg)]">
+        <div className="w-8 h-8 border-2 border-[var(--brand)] border-t-transparent rounded-full animate-spin mx-auto"></div>
       </div>
     )
   }
 
+  if (!user) {
+    return null // useAuth já redireciona
+  }
+
   return (
-    <AppShell user={{ id: user?.id || "", name: user?.name || "Admin", email: user?.email || "", role: "admin" }}>
+    <AppShell user={{ id: user.id, name: user.name || "Admin", email: user.email, role: user.role || "admin" }}>
       <div className="space-y-6">
         <div className="flex items-center gap-2">
           <Settings2 className="h-6 w-6 text-[var(--brand)]" />

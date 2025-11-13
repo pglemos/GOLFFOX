@@ -111,20 +111,19 @@ export async function POST(req: NextRequest) {
         email: email.replace(/^(.{2}).+(@.*)$/, '$1***$2')
       }, 'AuthAPI')
       
-      // Retornar mensagem de erro mais específica
-      // Sempre retornar 401 para credenciais inválidas, mesmo se Supabase retornar 400
+      // Mapear erros comuns do Supabase para códigos estáveis no cliente
+      const msg = (authError.message || '').toLowerCase()
+      let code: string = 'auth_error'
+      if (msg.includes('invalid') && msg.includes('credentials')) code = 'invalid_credentials'
+      else if (msg.includes('email not confirmed')) code = 'email_not_confirmed'
+      else if (msg.includes('password')) code = 'invalid_credentials'
+      else if (authError.status === 429 || msg.includes('too many')) code = 'rate_limited'
+      else if (msg.includes('user') && msg.includes('not') && msg.includes('found')) code = 'user_not_found'
+      
       const errorMessage = authError.message || 'Credenciais inválidas'
-      // Mapear erros comuns do Supabase para 401
-      // Supabase geralmente retorna 400 para credenciais inválidas, mas HTTP padrão é 401
-      const isAuthError = authError.message?.toLowerCase().includes('invalid') ||
-                         authError.message?.toLowerCase().includes('credentials') ||
-                         authError.message?.toLowerCase().includes('password') ||
-                         authError.message?.toLowerCase().includes('email') ||
-                         authError.status === 400 ||
-                         authError.status === 401
-      // Sempre retornar 401 para qualquer erro de autenticação
+      // Padrão HTTP: 401 para falhas de autenticação
       const status = 401
-      return NextResponse.json({ error: errorMessage }, { status })
+      return NextResponse.json({ error: errorMessage, code }, { status })
     }
 
     if (!data.user || !data.session) {
@@ -226,7 +225,7 @@ export async function POST(req: NextRequest) {
     // Log final do role detectado
     debug('Role final determinado', { 
       role,
-      source: existingUser.role ? 'database' : (data.user.user_metadata?.role ? 'metadata' : 'email_fallback'),
+      source: existingUser?.role ? 'database' : (data.user.user_metadata?.role ? 'metadata' : 'email_fallback'),
       userId: data.user.id
     }, 'AuthAPI')
     const token = data.session.access_token

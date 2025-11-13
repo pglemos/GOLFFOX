@@ -1,57 +1,41 @@
-type LatLng = { lat: number; lng: number }
-
-interface GeocodeOptions {
-  provider?: 'google' | 'mapbox'
-  apiKey?: string
+export interface GeocodeResult {
+  lat: number
+  lng: number
+  formatted_address: string
 }
 
-const cache = new Map<string, LatLng>()
-
-export async function geocodeAddress(fullAddress: string, opts: GeocodeOptions = {}): Promise<LatLng | null> {
-  const key = fullAddress.trim().toLowerCase()
-  if (cache.has(key)) return cache.get(key) as LatLng
-
-  const provider = opts.provider || (process.env.NEXT_PUBLIC_GEOCODING_PRIMARY as 'google' | 'mapbox') || 'google'
-  const apiKey = opts.apiKey || process.env.NEXT_PUBLIC_MAPS_API_KEY || ''
-
-  try {
-    if (provider === 'google') {
-      if (!apiKey) return null
-      const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(fullAddress)}&key=${apiKey}`
-      const resp = await fetch(url)
-      const data = await resp.json()
-      const result = data?.results?.[0]?.geometry?.location
-      if (result?.lat && result?.lng) {
-        const latlng = { lat: result.lat, lng: result.lng }
-        cache.set(key, latlng)
-        return latlng
-      }
-    } else if (provider === 'mapbox') {
-      if (!apiKey) return null
-      const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(fullAddress)}.json?access_token=${apiKey}`
-      const resp = await fetch(url)
-      const data = await resp.json()
-      const coords = data?.features?.[0]?.center
-      if (Array.isArray(coords) && coords.length === 2) {
-        const latlng = { lat: coords[1], lng: coords[0] }
-        cache.set(key, latlng)
-        return latlng
-      }
-    }
-  } catch (e) {
-    // fallback simples
+export async function geocodeAddress(address: string): Promise<GeocodeResult | null> {
+  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
+  if (!apiKey) {
+    console.warn('Google Maps API key não configurada')
     return null
   }
 
-  // Fallback secundário, se configurado
-  const fallback = (process.env.NEXT_PUBLIC_GEOCODING_FALLBACK as 'google' | 'mapbox') || undefined
-  if (fallback && fallback !== provider) {
-    return geocodeAddress(fullAddress, { provider: fallback, apiKey })
+  try {
+    const response = await fetch(
+      `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${apiKey}`
+    )
+    const data = await response.json()
+
+    if (data.status === 'OK' && data.results && data.results.length > 0) {
+      const result = data.results[0]
+      return {
+        lat: result.geometry.location.lat,
+        lng: result.geometry.location.lng,
+        formatted_address: result.formatted_address
+      }
+    }
+
+    return null
+  } catch (error) {
+    console.error('Erro na geocodificação:', error)
+    return null
   }
-  return null
 }
 
-export function clearGeocodeCache() {
-  cache.clear()
+export function maskCPF(cpf: string): string {
+  if (!cpf) return ''
+  const cleaned = cpf.replace(/\D/g, '')
+  if (cleaned.length !== 11) return cpf
+  return cleaned.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4')
 }
-

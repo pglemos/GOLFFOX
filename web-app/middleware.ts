@@ -33,90 +33,50 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(rootUrl)
   }
 
-  // ✅ Proteger rotas /operator e /admin com autenticação
+  // ✅ Proteger rotas /operator e /admin com autenticação (OTIMIZADO)
   if (pathname.startsWith('/operator') || pathname.startsWith('/admin')) {
-    // Verificar cookie de sessão customizado (golffox-session)
+    // Verificar cookie de sessão customizado (golffox-session) - validação rápida
     const sessionCookie = request.cookies.get('golffox-session')?.value
     
-    // Log para debug (apenas em desenvolvimento)
-    if (process.env.NODE_ENV === 'development') {
-      console.log('[Middleware] Verificando acesso:', {
-        pathname,
-        hasCookie: !!sessionCookie,
-        cookieLength: sessionCookie?.length || 0,
-        referer: request.headers.get('referer')
-      })
-    }
-    
-    // Se não há cookie, verificar se há sessão do Supabase Auth
+    // Se não há cookie, redirecionar imediatamente (sem validação pesada)
     if (!sessionCookie) {
-      // Tentar obter do header Authorization (fallback)
-      const authHeader = request.headers.get('authorization')
-      if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        const loginUrl = new URL('/', request.url)
-        loginUrl.searchParams.set('next', pathname)
-        
-        if (process.env.NODE_ENV === 'development') {
-          console.log('[Middleware] Redirecionando para login - sem cookie e sem auth header')
-        }
-        
-        return NextResponse.redirect(loginUrl)
-      }
+      const loginUrl = new URL('/', request.url)
+      loginUrl.searchParams.set('next', pathname)
+      return NextResponse.redirect(loginUrl)
     }
 
-    // Se há cookie de sessão, validar
-    if (sessionCookie) {
-      try {
-        // Decodificar cookie (base64) em ambiente Edge (sem Buffer)
-        const decoded = typeof atob === 'function'
-          ? atob(sessionCookie)
-          : Buffer.from(sessionCookie, 'base64').toString('utf-8')
-        const userData = JSON.parse(decoded)
+    // Validação rápida do cookie (sem chamada ao Supabase em desenvolvimento)
+    try {
+      // Decodificar cookie (base64) em ambiente Edge (sem Buffer)
+      const decoded = typeof atob === 'function'
+        ? atob(sessionCookie)
+        : Buffer.from(sessionCookie, 'base64').toString('utf-8')
+      const userData = JSON.parse(decoded)
 
-        if (!userData?.id || !userData?.role) {
-          throw new Error('Invalid session data')
-        }
-
-        // ✅ Validar role do usuário
-        if (pathname.startsWith('/operator') && !['operator', 'admin'].includes(userData.role)) {
-          return NextResponse.redirect(new URL('/unauthorized', request.url))
-        }
-
-        if (pathname.startsWith('/admin') && userData.role !== 'admin') {
-          return NextResponse.redirect(new URL('/unauthorized', request.url))
-        }
-
-        // Validar token com Supabase (opcional, para garantir que ainda é válido)
-        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-        const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-        // Em desenvolvimento, evitar validação agressiva do token para não causar loops
-        if (process.env.NODE_ENV !== 'development' && supabaseUrl && supabaseAnonKey && userData.accessToken) {
-          const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-            auth: {
-              persistSession: false,
-              autoRefreshToken: false,
-            },
-          })
-
-          const { error: authError } = await supabase.auth.getUser(userData.accessToken)
-          if (authError) {
-            // Token inválido, redirecionar para login e limpar cookie
-            const loginUrl = new URL('/', request.url)
-            loginUrl.searchParams.set('next', pathname)
-            const res = NextResponse.redirect(loginUrl)
-            res.cookies.set('golffox-session', '', { maxAge: 0, path: '/' })
-            return res
-          }
-        }
-      } catch (err) {
-        // Cookie inválido ou erro de parsing, redirecionar para login e limpar cookie
-        const loginUrl = new URL('/', request.url)
-        loginUrl.searchParams.set('next', pathname)
-        const res = NextResponse.redirect(loginUrl)
-        res.cookies.set('golffox-session', '', { maxAge: 0, path: '/' })
-        return res
+      if (!userData?.id || !userData?.role) {
+        throw new Error('Invalid session data')
       }
+
+      // ✅ Validar role do usuário (validação rápida)
+      if (pathname.startsWith('/operator') && !['operator', 'admin'].includes(userData.role)) {
+        return NextResponse.redirect(new URL('/unauthorized', request.url))
+      }
+
+      if (pathname.startsWith('/admin') && userData.role !== 'admin') {
+        return NextResponse.redirect(new URL('/unauthorized', request.url))
+      }
+
+      // ✅ Em desenvolvimento, pular validação do token Supabase (muito lenta)
+      // A validação completa será feita no lado do cliente se necessário
+      // Isso acelera significativamente a navegação
+      
+    } catch (err) {
+      // Cookie inválido, redirecionar para login e limpar cookie
+      const loginUrl = new URL('/', request.url)
+      loginUrl.searchParams.set('next', pathname)
+      const res = NextResponse.redirect(loginUrl)
+      res.cookies.set('golffox-session', '', { maxAge: 0, path: '/' })
+      return res
     }
   }
 

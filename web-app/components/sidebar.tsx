@@ -276,7 +276,7 @@ export function Sidebar({ isOpen = true, isMobile = false, panel = 'admin' }: Si
                   >
                     <Link
                       href={item.href}
-                      prefetch={false}
+                      prefetch={true}
                       className={cn(
                         "nav-link relative group",
                         isActive && "active"

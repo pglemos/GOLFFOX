@@ -1,100 +1,113 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 import { AppShell } from "@/components/app-shell"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { Briefcase, Plus, Users, UserPlus } from "lucide-react"
+import { Briefcase, Plus, Users, UserPlus, Trash2 } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
-import { useSupabaseQuery } from "@/hooks/use-supabase-query"
 import { CreateOperatorModal } from "@/components/modals/create-operator-modal"
 import { AssociateOperatorModal } from "@/components/modals/associate-operator-modal"
+import { useAuthFast } from "@/hooks/use-auth-fast"
+import { useGlobalSync } from "@/hooks/use-global-sync"
+import { notifySuccess, notifyError } from "@/lib/toast"
 
 export default function EmpresasPage() {
   const router = useRouter()
-  const [user, setUser] = useState<any>(null)
-  const [loading, setLoading] = useState(true)
+  const { user, loading: authLoading } = useAuthFast()
   const [selectedEmpresa, setSelectedEmpresa] = useState<any>(null)
   const [funcionarios, setFuncionarios] = useState<any[]>([])
   const [isCreateOperatorModalOpen, setIsCreateOperatorModalOpen] = useState(false)
   const [isAssociateModalOpen, setIsAssociateModalOpen] = useState(false)
   const [selectedCompanyForAssociation, setSelectedCompanyForAssociation] = useState<{ id: string; name: string } | null>(null)
 
-  // Usar hook otimizado para carregar empresas
-  // Remover filtro is_active pois a coluna pode não existir
-  const { 
-    data: empresas = [], 
-    loading: loadingEmpresas, 
-    error: errorEmpresas 
-  } = useSupabaseQuery(
-    () => supabase
-      .from("companies")
-      .select("*")
-      .order('created_at', { ascending: false }),
-    {
-      cacheKey: 'empresas_ativas',
-      fallbackValue: []
+  // Usar API route para carregar empresas (bypass RLS com service role)
+  const [empresas, setEmpresas] = useState<any[]>([])
+  const [loadingEmpresas, setLoadingEmpresas] = useState(true)
+  const [errorEmpresas, setErrorEmpresas] = useState<Error | null>(null)
+
+  const loadEmpresas = useCallback(async () => {
+    setLoadingEmpresas(true)
+    setErrorEmpresas(null)
+    try {
+      const response = await fetch('/api/admin/companies-list')
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+      const result = await response.json()
+      if (result.success) {
+        setEmpresas(result.companies || [])
+      } else {
+        throw new Error(result.error || 'Erro ao carregar empresas')
+      }
+    } catch (error: any) {
+      console.error('Erro ao carregar empresas:', error)
+      setErrorEmpresas(error)
+      setEmpresas([])
+    } finally {
+      setLoadingEmpresas(false)
     }
-  )
+  }, [])
+
+  const handleDeleteEmpresa = async (empresaId: string, empresaName: string) => {
+    if (!confirm(`Tem certeza que deseja excluir a empresa "${empresaName}"? Esta ação não pode ser desfeita.`)) {
+      return
+    }
+
+    try {
+      const response = await fetch(`/api/admin/companies/delete?id=${empresaId}`, {
+        method: 'DELETE'
+      })
+      
+      const result = await response.json()
+      
+      if (!response.ok) {
+        const errorMessage = result.message || result.error || 'Erro ao excluir empresa'
+        const errorDetails = result.details ? ` (${result.details})` : ''
+        throw new Error(`${errorMessage}${errorDetails}`)
+      }
+
+      if (result.success) {
+        notifySuccess('Empresa excluída com sucesso')
+        // Aguardar um pouco antes de recarregar para garantir que o banco foi atualizado
+        await new Promise(resolve => setTimeout(resolve, 300))
+        await loadEmpresas()
+      } else {
+        throw new Error(result.error || 'Erro ao excluir empresa')
+      }
+    } catch (error: any) {
+      console.error('Erro ao excluir empresa:', error)
+      const errorMessage = error.message || 'Erro desconhecido ao excluir empresa'
+      notifyError(error, errorMessage)
+    }
+  }
 
   useEffect(() => {
-    let isMounted = true
-    
-    const getUser = async () => {
-      try {
-        // Primeiro, tentar obter usuário do cookie de sessão customizado
-        if (typeof document !== 'undefined') {
-          const cookieMatch = document.cookie.match(/golffox-session=([^;]+)/)
-          if (cookieMatch) {
-            try {
-              const decoded = atob(cookieMatch[1])
-              const u = JSON.parse(decoded)
-              if (u?.id && u?.email && isMounted) {
-                setUser({ id: u.id, email: u.email, name: u.email.split('@')[0], role: u.role || 'admin' })
-                setLoading(false)
-                return
-              }
-            } catch (err) {
-              console.warn('⚠️ Erro ao decodificar cookie de sessão:', err)
-            }
-          }
-        }
+    loadEmpresas()
+  }, [loadEmpresas])
 
-        // Fallback: tentar sessão do Supabase
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession()
-        
-        if (sessionError) {
-          console.error('❌ Erro ao obter sessão do Supabase:', sessionError)
-        }
-        
-        if (!isMounted) return
-        
-        if (!session) {
-          // Sem sessão - deixar o middleware proteger o acesso (não redirecionar aqui para evitar loop)
-          console.log('⚠️ Sem sessão detectada - middleware irá proteger acesso')
-          setLoading(false)
-          return
-        }
-        
-        if (isMounted) {
-          setUser({ ...session.user })
-          setLoading(false)
-        }
-      } catch (err) {
-        console.error('❌ Erro ao obter usuário:', err)
-        if (isMounted) {
-          setLoading(false)
-        }
-        // Não redirecionar aqui - deixar o middleware proteger
+  // Escutar eventos de sincronização global (apenas após carregamento inicial)
+  useGlobalSync(
+    ['company.created', 'company.updated', 'company.deleted', 'user.created', 'user.updated'],
+    () => {
+      // Recarregar empresas quando houver mudanças (apenas se não estiver carregando)
+      if (!loadingEmpresas) {
+        loadEmpresas()
       }
+    },
+    [loadingEmpresas]
+  )
+
+  const refetchEmpresas = useCallback(async () => {
+    // Limpar cache
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('golffox_cache_empresas_ativas')
     }
-    getUser()
-    
-    return () => {
-      isMounted = false
-    }
-  }, []) // Remover router da dependência para evitar re-renderizações
+    await loadEmpresas()
+  }, [loadEmpresas])
+
+  // Autenticação otimizada via useAuthFast
 
   const loadFuncionarios = async (empresaId: string) => {
     try {
@@ -118,12 +131,12 @@ export default function EmpresasPage() {
     }
   }
 
-  if (loading) {
+  if (authLoading || !user) {
     return <div className="min-h-screen flex items-center justify-center"><div className="w-16 h-16 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin mx-auto"></div></div>
   }
 
   return (
-    <AppShell user={{ id: user?.id || "", name: user?.name || "Admin", email: user?.email || "", role: "admin" }}>
+    <AppShell user={{ id: user.id, name: user.name || "Admin", email: user.email, role: user.role || "admin" }}>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
@@ -138,7 +151,7 @@ export default function EmpresasPage() {
 
         {errorEmpresas && (
           <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-            <p className="text-red-800">Erro ao carregar empresas: {errorEmpresas.message}</p>
+            <p className="text-red-800">Erro ao carregar empresas: {errorEmpresas instanceof Error ? errorEmpresas.message : String(errorEmpresas)}</p>
           </div>
         )}
 
@@ -192,6 +205,17 @@ export default function EmpresasPage() {
                     <Users className="h-4 w-4 mr-2" />
                     Ver Funcionários
                   </Button>
+                  <Button 
+                    variant="destructive" 
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleDeleteEmpresa(empresa.id, empresa.name)
+                    }}
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Excluir
+                  </Button>
                 </div>
               </div>
             </Card>
@@ -218,10 +242,12 @@ export default function EmpresasPage() {
         <CreateOperatorModal
           isOpen={isCreateOperatorModalOpen}
           onClose={() => setIsCreateOperatorModalOpen(false)}
-          onSave={() => {
+          onSave={async () => {
             setIsCreateOperatorModalOpen(false)
-            // Recarregar empresas se necessário
-            window.location.reload()
+            // Aguardar um pouco para garantir que a empresa foi criada no banco
+            await new Promise(resolve => setTimeout(resolve, 1500))
+            // Recarregar dados - refetchEmpresas já limpa cache e busca novos dados
+            await refetchEmpresas()
           }}
         />
 
