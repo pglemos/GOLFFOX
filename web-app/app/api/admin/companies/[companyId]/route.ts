@@ -40,7 +40,7 @@ export async function PUT(
       return authErrorResponse
     }
 
-    const companyId = sanitizeId(params?.companyId)
+    const companyId = sanitizeId(companyIdParam)
     if (!companyId) {
       return NextResponse.json(
         { error: 'company_id é obrigatório' },
@@ -162,7 +162,7 @@ export async function DELETE(
       return authErrorResponse
     }
 
-    const companyId = sanitizeId(params?.companyId)
+    const companyId = sanitizeId(companyIdParam)
     if (!companyId) {
       return NextResponse.json(
         { error: 'company_id é obrigatório' },

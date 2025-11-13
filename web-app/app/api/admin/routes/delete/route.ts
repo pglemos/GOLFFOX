@@ -36,26 +36,68 @@ export async function DELETE(request: NextRequest) {
 
     const supabaseAdmin = getSupabaseAdmin()
 
-    // Excluir permanentemente a rota e todos os dados relacionados
-    // As foreign keys com ON DELETE CASCADE vão excluir automaticamente:
-    // - route_stops (paradas da rota) - ON DELETE CASCADE
-    // - trips (viagens relacionadas) - ON DELETE CASCADE
-    // - gf_route_plan (planos de rota) - ON DELETE CASCADE
-    // - gf_route_optimization_cache (cache de otimização) - ON DELETE CASCADE
-    
     console.log(`🗑️ Tentando excluir rota: ${routeId}`)
-    
+
+    // Verificar se existem trips vinculadas à rota
+    const { count: tripsCount, error: tripsCountError } = await supabaseAdmin
+      .from('trips')
+      .select('id', { head: true, count: 'exact' })
+      .eq('route_id', routeId)
+
+    if (tripsCountError) {
+      console.error('❌ Erro ao verificar viagens vinculadas à rota:', tripsCountError)
+      return NextResponse.json(
+        { error: 'Erro ao verificar viagens vinculadas', message: tripsCountError.message },
+        { status: 500 }
+      )
+    }
+
+    if ((tripsCount ?? 0) > 0) {
+      // Se houver trips, arquivar rota (marcar como inativa) em vez de excluir
+      const { error: archiveError } = await supabaseAdmin
+        .from('routes')
+        .update({ is_active: false })
+        .eq('id', routeId)
+
+      if (archiveError) {
+        console.error('❌ Erro ao arquivar rota com trips vinculadas:', archiveError)
+        return NextResponse.json(
+          { error: 'Erro ao arquivar rota', message: archiveError.message, tripsCount },
+          { status: 500 }
+        )
+      }
+
+      console.log(`🚩 Rota arquivada por possuir ${tripsCount} viagem(ns) vinculada(s): ${routeId}`)
+      return NextResponse.json({ success: true, archived: true, tripsCount }, { status: 200 })
+    }
+
     // Primeiro, excluir explicitamente paradas da rota (route_stops)
-    await supabaseAdmin
+    const { error: stopsDeleteError } = await supabaseAdmin
       .from('route_stops')
       .delete()
       .eq('route_id', routeId)
 
-    // Excluir trips relacionados (mesmo que seja CASCADE, fazemos explicitamente para garantir)
-    await supabaseAdmin
+    if (stopsDeleteError) {
+      console.error('❌ Erro ao excluir paradas da rota:', stopsDeleteError)
+      return NextResponse.json(
+        { error: 'Erro ao excluir paradas da rota', message: stopsDeleteError.message },
+        { status: 500 }
+      )
+    }
+
+    // Excluir trips relacionadas (por segurança, embora não deva existir aqui)
+    const { error: tripsDeleteError } = await supabaseAdmin
       .from('trips')
       .delete()
       .eq('route_id', routeId)
+
+    if (tripsDeleteError) {
+      console.error('❌ Erro ao excluir viagens da rota:', tripsDeleteError)
+      return NextResponse.json(
+        { error: 'Erro ao excluir viagens da rota', message: tripsDeleteError.message },
+        { status: 500 }
+      )
+    }
 
     // Excluir permanentemente a rota
     const { data, error } = await supabaseAdmin
@@ -80,10 +122,7 @@ export async function DELETE(request: NextRequest) {
 
     console.log(`✅ Rota excluída com sucesso: ${routeId}`, data)
 
-    return NextResponse.json({
-      success: true,
-      message: 'Rota excluída com sucesso'
-    })
+    return NextResponse.json({ success: true, message: 'Rota excluída com sucesso' })
   } catch (error: any) {
     console.error('Erro ao excluir rota:', error)
     return NextResponse.json(
