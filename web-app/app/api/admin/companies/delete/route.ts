@@ -36,19 +36,77 @@ export async function DELETE(request: NextRequest) {
 
     const supabaseAdmin = getSupabaseAdmin()
 
-    // Excluir empresa permanentemente do banco de dados
-    // As foreign keys com ON DELETE CASCADE vão excluir automaticamente:
-    // - routes (rotas)
-    // - gf_employee_company (funcionários)
-    // - gf_user_company_map (mapeamentos usuário-empresa)
-    // - gf_route_optimization_cache (cache de otimização)
-    // - gf_report_schedules (agendamentos de relatórios)
-    // - gf_costs (custos)
-    // - gf_budgets (orçamentos)
-    // A tabela users tem ON DELETE SET NULL, então apenas seta company_id para NULL
+    console.log(`🗑️ Tentando excluir empresa permanentemente: ${companyId}`)
+
+    // ORDEM CRÍTICA DE EXCLUSÃO:
+    // 1. Atualizar users para setar company_id = NULL (pode não ter ON DELETE SET NULL)
+    console.log('   1. Atualizando users (setando company_id para NULL)...')
+    const { error: usersUpdateError } = await supabaseAdmin
+      .from('users')
+      .update({ company_id: null })
+      .eq('company_id', companyId)
+
+    if (usersUpdateError) {
+      console.error('❌ Erro ao atualizar users:', usersUpdateError)
+      return NextResponse.json(
+        { 
+          error: 'Erro ao atualizar usuários da empresa', 
+          message: usersUpdateError.message,
+          details: usersUpdateError.details || usersUpdateError.hint,
+          code: usersUpdateError.code
+        },
+        { status: 500 }
+      )
+    }
+    console.log('   ✅ Users atualizados')
+
+    // 2. Excluir dependências que podem ter CASCADE mas vamos excluir explicitamente para garantir
+    console.log('   2. Excluindo dependências...')
     
-    console.log(`🗑️ Tentando excluir empresa: ${companyId}`)
-    
+    // Excluir routes (e suas dependências serão excluídas via CASCADE)
+    const { error: routesError } = await supabaseAdmin
+      .from('routes')
+      .delete()
+      .eq('company_id', companyId)
+
+    if (routesError && routesError.code !== '42P01') {
+      console.error('❌ Erro ao excluir routes:', routesError)
+      return NextResponse.json(
+        { error: 'Erro ao excluir rotas da empresa', message: routesError.message },
+        { status: 500 }
+      )
+    }
+
+    // Excluir outras dependências
+    const dependentTables = [
+      'gf_employee_company',
+      'gf_user_company_map',
+      'gf_route_optimization_cache',
+      'gf_report_schedules',
+      'gf_costs',
+      'gf_budgets',
+      'gf_company_branding',
+      'gf_service_requests' // Pode usar empresa_id ou company_id
+    ]
+
+    for (const table of dependentTables) {
+      // Algumas tabelas podem usar empresa_id em vez de company_id
+      const columnName = table === 'gf_service_requests' ? 'empresa_id' : 'company_id'
+      
+      const { error: depError } = await supabaseAdmin
+        .from(table)
+        .delete()
+        .eq(columnName, companyId)
+
+      if (depError && depError.code !== '42P01' && depError.code !== '42703') {
+        console.error(`❌ Erro ao excluir ${table}:`, depError)
+        // Não retornar erro fatal, algumas tabelas podem não existir
+      }
+    }
+    console.log('   ✅ Dependências excluídas')
+
+    // 3. Excluir empresa permanentemente
+    console.log('   3. Excluindo empresa...')
     const { data, error } = await supabaseAdmin
       .from('companies')
       .delete()

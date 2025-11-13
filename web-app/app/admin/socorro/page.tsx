@@ -13,6 +13,8 @@ import { Input } from "@/components/ui/input"
 import { motion } from "framer-motion"
 import { notifySuccess, notifyError } from "@/lib/toast"
 import { useAuthFast } from "@/hooks/use-auth-fast"
+import { EditAssistanceModal } from "@/components/modals/edit-assistance-modal"
+import { Edit } from "lucide-react"
 
 export default function SocorroPage() {
   const router = useRouter()
@@ -25,6 +27,8 @@ export default function SocorroPage() {
   const [filtersExpanded, setFiltersExpanded] = useState(false)
   const [tempFilterStatus, setTempFilterStatus] = useState<string>("all")
   const [filterStatus, setFilterStatus] = useState<string>("all")
+  const [selectedRequestForEdit, setSelectedRequestForEdit] = useState<any>(null)
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
 
   const handleSaveFilters = () => {
     setFilterStatus(tempFilterStatus)
@@ -268,6 +272,17 @@ export default function SocorroPage() {
                   </div>
                   <div className="flex flex-col gap-2">
                     <Button 
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setSelectedRequestForEdit(ocorrencia)
+                        setIsEditModalOpen(true)
+                      }}
+                    >
+                      <Edit className="h-4 w-4 mr-2" />
+                      Editar
+                    </Button>
+                    <Button 
                       variant="destructive"
                       size="sm"
                       onClick={() => handleDeleteOcorrencia(ocorrencia.id)}
@@ -357,6 +372,21 @@ export default function SocorroPage() {
             setSelectedRequest(null)
           }}
           onSave={loadOcorrencias}
+        />
+
+        {/* Modal Editar Ocorrência */}
+        <EditAssistanceModal
+          request={selectedRequestForEdit}
+          isOpen={isEditModalOpen}
+          onClose={() => {
+            setIsEditModalOpen(false)
+            setSelectedRequestForEdit(null)
+          }}
+          onSave={async () => {
+            setIsEditModalOpen(false)
+            setSelectedRequestForEdit(null)
+            await loadOcorrencias()
+          }}
         />
       </div>
     </AppShell>

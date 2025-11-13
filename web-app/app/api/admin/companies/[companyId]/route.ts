@@ -105,6 +105,11 @@ export async function PUT(
     if (body.name !== undefined) updateData.name = body.name.trim()
     if (body.cnpj !== undefined) updateData.cnpj = body.cnpj?.trim() || null
     if (body.address !== undefined) updateData.address = body.address?.trim() || null
+    if (body.address_number !== undefined) updateData.address_number = body.address_number?.trim() || null
+    if (body.address_complement !== undefined) updateData.address_complement = body.address_complement?.trim() || null
+    if (body.city !== undefined) updateData.city = body.city?.trim() || null
+    if (body.state !== undefined) updateData.state = body.state?.trim() || null
+    if (body.zip_code !== undefined) updateData.zip_code = body.zip_code?.trim() || null
     if (body.phone !== undefined) updateData.phone = body.phone?.trim() || null
     if (body.email !== undefined) updateData.email = body.email?.trim() || null
     if (body.is_active !== undefined) updateData.is_active = body.is_active

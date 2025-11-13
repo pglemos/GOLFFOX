@@ -33,8 +33,21 @@ export async function POST(request: NextRequest) {
     // Aceitar tanto snake_case quanto camelCase
     const companyName = body?.company_name || body?.companyName
     const companyId = body?.company_id || body?.companyId
-    const operatorEmail = body?.email || body?.operator_email || body?.operatorEmail
-    const operatorPhone = body?.phone || body?.operator_phone || body?.operatorPhone
+    const operatorEmail = body?.email || body?.operator_email || body?.operatorEmail || body?.responsibleEmail
+    const operatorPassword = body?.password || body?.operator_password || body?.operatorPassword || body?.responsiblePassword
+    const operatorPhone = body?.phone || body?.operator_phone || body?.operatorPhone || body?.responsiblePhone
+    const operatorName = body?.operator_name || body?.operatorName || body?.responsibleName
+    
+    // Se não houver senha, não criar usuário (apenas empresa)
+    const shouldCreateUser = !!operatorPassword && operatorPassword.length >= 6
+    // Dados adicionais da empresa
+    const cnpj = body?.cnpj || null
+    const address = body?.address || null
+    const city = body?.city || null
+    const state = body?.state || null
+    const zipCode = body?.zip_code || body?.zipCode || null
+    const companyPhone = body?.company_phone || body?.companyPhone || null
+    const companyEmail = body?.company_email || body?.companyEmail || null
 
     // Permitir bypass em modo de teste/desenvolvimento
     const isTestMode = request.headers.get('x-test-mode') === 'true'
@@ -58,7 +71,23 @@ export async function POST(request: NextRequest) {
     // Validar dados básicos
     if (!operatorEmail) {
       return NextResponse.json(
-        { error: 'Email do operador é obrigatório' },
+        { error: 'Email do responsável é obrigatório' },
+        { status: 400 }
+      )
+    }
+    
+    if (!operatorName || !operatorName.trim()) {
+      return NextResponse.json(
+        { error: 'Nome do responsável é obrigatório' },
+        { status: 400 }
+      )
+    }
+
+    // Senha não é mais obrigatória - o login pode ser criado depois
+    // Se senha for fornecida, validar
+    if (operatorPassword && operatorPassword.length < 6) {
+      return NextResponse.json(
+        { error: 'Senha deve ter no mínimo 6 caracteres' },
         { status: 400 }
       )
     }
@@ -158,13 +187,29 @@ export async function POST(request: NextRequest) {
         )
       }
 
-      // Passo 2: Criar empresa
+      // Passo 2: Criar empresa com dados completos
+      const companyData: any = {
+        name: companyName,
+        is_active: true,
+      }
+      
+      // Adicionar campos opcionais se fornecidos
+      if (cnpj) companyData.cnpj = cnpj
+      if (address) companyData.address = address
+      if (city) companyData.city = city
+      if (state) companyData.state = state
+      // Tentar zip_code ou zipCode (dependendo da estrutura da tabela)
+      if (zipCode) {
+        companyData.zip_code = zipCode
+        // Também tentar zipCode caso a coluna tenha esse nome
+        if (!companyData.zip_code) companyData.zipCode = zipCode
+      }
+      if (companyPhone) companyData.phone = companyPhone
+      if (companyEmail) companyData.email = companyEmail
+      
       const { data: newCompany, error: companyError } = await supabaseAdmin
         .from('companies')
-        .insert({
-          name: companyName,
-          is_active: true,
-        })
+        .insert(companyData)
         .select()
         .single()
 
@@ -183,21 +228,36 @@ export async function POST(request: NextRequest) {
       company = newCompany
     }
 
-    // Passo 3: Gerar senha temporária
-    const tempPassword = Math.random().toString(36).slice(-12) + 
-                        Math.random().toString(36).slice(-12).toUpperCase() + 
-                        "!@#"
+    // Passo 3: Criar usuário no Supabase Auth (apenas se senha for fornecida)
+    let authData: any = null
+    let createUserError: any = null
+    
+    if (shouldCreateUser && operatorEmail) {
+      const createUserResult = await supabaseAdmin.auth.admin.createUser({
+        email: operatorEmail,
+        password: operatorPassword,
+        email_confirm: true,
+        user_metadata: {
+          name: operatorEmail.split('@')[0],
+          role: 'operator',
+        }
+      })
+      
+      authData = createUserResult.data
+      createUserError = createUserResult.error
+    } else {
+      // Se não houver senha, não criar usuário - apenas empresa
+      console.log('⚠️ Senha não fornecida, criando apenas empresa sem usuário')
+    }
 
-    // Passo 4: Criar usuário no Supabase Auth
-    const { data: authData, error: createUserError } = await supabaseAdmin.auth.admin.createUser({
-      email: operatorEmail,
-      password: tempPassword,
-      email_confirm: true,
-      user_metadata: {
-        name: operatorEmail.split('@')[0],
-        role: 'operator',
-      }
-    })
+    // Se não houver senha, retornar apenas empresa criada
+    if (!shouldCreateUser) {
+      return NextResponse.json({
+        success: true,
+        company,
+        message: 'Empresa criada com sucesso. O login do operador pode ser criado posteriormente através do botão "Usuário Operador".'
+      }, { status: 201 })
+    }
 
     if (createUserError) {
       // Em modo de teste/dev, se há erro ao criar usuário, tentar retornar resposta simulada
@@ -225,7 +285,6 @@ export async function POST(request: NextRequest) {
                 id: existingUser.id,
                 email: operatorEmail,
               },
-              tempPassword: null, // Não retornar senha para usuário existente
             }, { status: 200 })
           }
         }
@@ -245,7 +304,6 @@ export async function POST(request: NextRequest) {
             id: 'test-operator-' + Date.now(),
             email: operatorEmail,
           },
-          tempPassword: tempPassword,
         }, { status: 201 })
       }
       
@@ -254,7 +312,7 @@ export async function POST(request: NextRequest) {
       throw createUserError
     }
 
-    if (!authData.user) {
+    if (!authData || !authData.user) {
       await supabaseAdmin.from('companies').delete().eq('id', company.id)
       throw new Error('Erro ao criar usuário')
     }
@@ -271,8 +329,9 @@ export async function POST(request: NextRequest) {
     // Tentar adicionar campos opcionais (podem não existir na tabela)
     // Se der erro, será ignorado no catch abaixo
     try {
-      // Tentar inserir com name (se a coluna existir)
-      const userDataWithName = { ...userData, name: operatorEmail.split('@')[0] }
+      // Tentar inserir com name (usar operatorName se fornecido)
+      const userName = operatorName || operatorEmail.split('@')[0]
+      const userDataWithName = { ...userData, name: userName }
       if (operatorPhone) {
         userDataWithName.phone = operatorPhone
       }
@@ -475,7 +534,6 @@ export async function POST(request: NextRequest) {
         id: authData.user.id,
         email: operatorEmail,
       },
-      tempPassword, // Retornar senha temporária (apenas nesta resposta)
     }, { status: 201 })
   } catch (error: any) {
     console.error('Erro ao criar operador:', error)

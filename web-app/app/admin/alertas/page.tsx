@@ -26,6 +26,8 @@ import { notifySuccess, notifyError } from "@/lib/toast"
 import { motion } from "framer-motion"
 import { useAuthFast } from "@/hooks/use-auth-fast"
 import { useGlobalSync } from "@/hooks/use-global-sync"
+import { EditAlertModal } from "@/components/modals/edit-alert-modal"
+import { Edit } from "lucide-react"
 
 const ALERT_TYPES = {
   route_delayed: { label: 'Rota Atrasada', severity: 'warning' },
@@ -48,6 +50,8 @@ export default function AlertasPage() {
   const [filterType, setFilterType] = useState<string>("all")
   const [filterSeverity, setFilterSeverity] = useState<string>("all")
   const [filterStatus, setFilterStatus] = useState<string>("all")
+  const [selectedAlertForEdit, setSelectedAlertForEdit] = useState<any>(null)
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
 
   const handleSaveFilters = () => {
     setFilterType(tempFilterType)
@@ -409,6 +413,17 @@ export default function AlertasPage() {
                     </div>
                     <div className="flex flex-col gap-2">
                       <Button 
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setSelectedAlertForEdit(alerta)
+                          setIsEditModalOpen(true)
+                        }}
+                      >
+                        <Edit className="h-4 w-4 mr-2" />
+                        Editar
+                      </Button>
+                      <Button 
                         variant="destructive"
                         size="sm"
                         onClick={() => handleDeleteAlerta(alerta.id)}
@@ -448,6 +463,21 @@ export default function AlertasPage() {
             ))
           )}
         </div>
+
+        {/* Modal Editar Alerta */}
+        <EditAlertModal
+          alert={selectedAlertForEdit}
+          isOpen={isEditModalOpen}
+          onClose={() => {
+            setIsEditModalOpen(false)
+            setSelectedAlertForEdit(null)
+          }}
+          onSave={async () => {
+            setIsEditModalOpen(false)
+            setSelectedAlertForEdit(null)
+            await loadAlertas()
+          }}
+        />
       </div>
     </AppShell>
   )
