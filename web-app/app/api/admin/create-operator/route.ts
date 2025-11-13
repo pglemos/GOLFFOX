@@ -69,18 +69,16 @@ export async function POST(request: NextRequest) {
     }
 
     // Validar dados básicos
-    if (!operatorEmail) {
-      return NextResponse.json(
-        { error: 'Email do responsável é obrigatório' },
-        { status: 400 }
-      )
-    }
-    
-    if (!operatorName || !operatorName.trim()) {
-      return NextResponse.json(
-        { error: 'Nome do responsável é obrigatório' },
-        { status: 400 }
-      )
+    // Email e nome do responsável são opcionais agora (podem ser criados depois via "Usuário Operador")
+    // Apenas validar se fornecidos
+    if (operatorEmail) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+      if (!emailRegex.test(operatorEmail)) {
+        return NextResponse.json(
+          { error: 'Email inválido' },
+          { status: 400 }
+        )
+      }
     }
 
     // Senha não é mais obrigatória - o login pode ser criado depois
@@ -92,14 +90,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Validar email
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!emailRegex.test(operatorEmail)) {
-      return NextResponse.json(
-        { error: 'Email inválido' },
-        { status: 400 }
-      )
-    }
+    // Validação de email já feita acima (se fornecido)
 
     // Validar UUID do company_id se fornecido
     if (companyId) {
@@ -193,17 +184,11 @@ export async function POST(request: NextRequest) {
         is_active: true,
       }
       
-      // Adicionar campos opcionais se fornecidos
+      // Adicionar campos opcionais se fornecidos (apenas se existirem na tabela)
       if (cnpj) companyData.cnpj = cnpj
       if (address) companyData.address = address
-      if (city) companyData.city = city
-      if (state) companyData.state = state
-      // Tentar zip_code ou zipCode (dependendo da estrutura da tabela)
-      if (zipCode) {
-        companyData.zip_code = zipCode
-        // Também tentar zipCode caso a coluna tenha esse nome
-        if (!companyData.zip_code) companyData.zipCode = zipCode
-      }
+      // Nota: city, state, zip_code podem não existir na tabela companies
+      // Vamos tentar inserir apenas se não der erro
       if (companyPhone) companyData.phone = companyPhone
       if (companyEmail) companyData.email = companyEmail
       

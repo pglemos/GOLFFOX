@@ -163,12 +163,12 @@ export function CreateOperatorModal({
 
       const result = await response.json()
       
-      // Verificar se a resposta tem os campos esperados
-      if (!result.companyId || (!result.userId && !result.operatorId)) {
-        throw new Error('Resposta inválida da API')
+      // Verificar se a resposta tem companyId (obrigatório)
+      if (!result.companyId) {
+        throw new Error('Resposta inválida da API: companyId não encontrado')
       }
       
-      // Normalizar campos da resposta
+      // Normalizar campos da resposta (userId/operatorId são opcionais se não houver senha)
       const operatorId = result.userId || result.operatorId
 
       // NOTA: A API já cria o usuário e empresa usando service role (bypass RLS)
