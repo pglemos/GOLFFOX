@@ -6,6 +6,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
@@ -14,7 +15,7 @@ import { Label } from "@/components/ui/label"
 import { Briefcase, UserPlus, Loader2 } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { notifySuccess, notifyError } from "@/lib/toast"
-import { useSupabaseSync } from "@/hooks/use-supabase-sync"
+import { globalSyncManager } from "@/lib/global-sync"
 
 interface CreateOperatorModalProps {
   isOpen: boolean
@@ -35,7 +36,6 @@ export function CreateOperatorModal({
     operatorPhone: "",
   })
   const [progress, setProgress] = useState("")
-  const { sync } = useSupabaseSync({ showToast: false })
 
   const validateEmail = (email: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -49,11 +49,13 @@ export function CreateOperatorModal({
     try {
       // Validações
       if (!formData.companyName.trim()) {
-        notifyError('', undefined, { i18n: { ns: 'common', key: 'validation.companyNameRequired' } })
+        notifyError(new Error('Nome da empresa é obrigatório'), 'Nome da empresa é obrigatório')
+        setLoading(false)
         return
       }
       if (!formData.operatorEmail.trim() || !validateEmail(formData.operatorEmail)) {
-        notifyError('', undefined, { i18n: { ns: 'common', key: 'validation.validOperatorEmailRequired' } })
+        notifyError(new Error('Email válido é obrigatório'), 'Email válido é obrigatório')
+        setLoading(false)
         return
       }
 
@@ -61,18 +63,54 @@ export function CreateOperatorModal({
       setProgress("Criando operador...")
       setStep(2)
 
-      const { data: { session } } = await supabase.auth.getSession()
-      if (!session) {
-        notifyError('', undefined, { i18n: { ns: 'common', key: 'errors.authRequired' } })
+      // Tentar obter token de autenticação de múltiplas fontes
+      let authToken: string | null = null
+      
+      // 1. Tentar obter da sessão do Supabase
+      try {
+        const { data: { session } } = await supabase.auth.getSession()
+        if (session?.access_token) {
+          authToken = session.access_token
+        }
+      } catch (error) {
+        console.warn('Erro ao obter sessão do Supabase:', error)
+      }
+
+      // 2. Se não houver sessão do Supabase, tentar ler do cookie golffox-session
+      if (!authToken && typeof document !== 'undefined') {
+        try {
+          const cookieMatch = document.cookie.match(/golffox-session=([^;]+)/)
+          if (cookieMatch) {
+            const decoded = atob(cookieMatch[1])
+            const userData = JSON.parse(decoded)
+            if (userData?.accessToken) {
+              authToken = userData.accessToken
+            }
+          }
+        } catch (error) {
+          console.warn('Erro ao ler cookie golffox-session:', error)
+        }
+      }
+
+      // 3. Em desenvolvimento, permitir continuar sem token (a API permite)
+      // Em Next.js, NODE_ENV está disponível no cliente
+      const isDevelopment = typeof window !== 'undefined' && (process.env.NODE_ENV === 'development' || window.location.hostname === 'localhost')
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      }
+      
+      if (authToken) {
+        headers['Authorization'] = `Bearer ${authToken}`
+      } else if (!isDevelopment) {
+        // Em produção, bloquear se não houver token
+        notifyError(new Error('Usuário não autenticado'), 'Usuário não autenticado. Faça login novamente.')
+        setLoading(false)
         return
       }
 
       const response = await fetch('/api/admin/create-operator', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`,
-        },
+        headers,
         body: JSON.stringify({
           companyName: formData.companyName,
           operatorEmail: formData.operatorEmail,
@@ -81,53 +119,44 @@ export function CreateOperatorModal({
       })
 
       if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.error || 'Erro ao criar operador')
+        const errorData = await response.json().catch(() => ({ error: 'Erro desconhecido' }))
+        const errorMessage = errorData.error || errorData.message || 'Erro ao criar operador'
+        throw new Error(errorMessage)
       }
 
       const result = await response.json()
-
-      // Sincronização com Supabase (garantia adicional)
-      if (result.operatorId && result.companyId) {
-        try {
-          await sync({
-            resourceType: 'operator',
-            resourceId: result.operatorId,
-            action: 'create',
-            data: {
-              email: formData.operatorEmail,
-              name: formData.companyName,
-              phone: formData.operatorPhone,
-              role: 'operator',
-              company_id: result.companyId,
-            },
-          })
-        } catch (syncError) {
-          console.error('Erro na sincronização (não crítico):', syncError)
-          // Não bloquear o fluxo se sincronização falhar
-        }
+      
+      // Verificar se a resposta tem os campos esperados
+      if (!result.companyId || (!result.userId && !result.operatorId)) {
+        throw new Error('Resposta inválida da API')
       }
+      
+      // Normalizar campos da resposta
+      const operatorId = result.userId || result.operatorId
 
-      // Sincronizar empresa também
-      if (result.companyId) {
-        try {
-          await sync({
-            resourceType: 'company',
-            resourceId: result.companyId,
-            action: 'create',
-            data: {
-              name: formData.companyName,
-              is_active: true,
-            },
-          })
-        } catch (syncError) {
-          console.error('Erro na sincronização da empresa (não crítico):', syncError)
-        }
-      }
+      // NOTA: A API já cria o usuário e empresa usando service role (bypass RLS)
+      // Não é necessário fazer sincronização adicional aqui, pois causaria erro de RLS
+      // A sincronização é apenas para casos onde a API não foi usada
 
       // Sucesso
       setStep(7)
-      notifySuccess('', { i18n: { ns: 'operator', key: 'admin.operators.createSuccess', params: { tempPassword: result.tempPassword } }, duration: 10000 })
+      const successMessage = result.tempPassword 
+        ? `Operador criado com sucesso! Senha temporária: ${result.tempPassword}`
+        : 'Operador criado com sucesso!'
+      notifySuccess(successMessage)
+
+      // Notificar sincronização global
+      if (result.company) {
+        globalSyncManager.triggerSync('company.created', result.company)
+      }
+      if (result.operator || result.userId) {
+        globalSyncManager.triggerSync('user.created', {
+          id: result.userId || result.operatorId,
+          email: formData.operatorEmail,
+          role: 'operator',
+          company_id: result.companyId
+        })
+      }
 
       // Reset form
       setFormData({
@@ -160,6 +189,9 @@ export function CreateOperatorModal({
             <UserPlus className="h-5 w-5" />
             Criar Operador
           </DialogTitle>
+          <DialogDescription>
+            Crie uma nova empresa e operador. Uma senha temporária será gerada automaticamente.
+          </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">

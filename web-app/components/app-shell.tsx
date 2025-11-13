@@ -1,11 +1,11 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, memo, useMemo } from "react"
 import { usePathname } from "next/navigation"
 import { Topbar } from "./topbar"
-import { Sidebar } from "./sidebar"
+import { Sidebar } from "./sidebar-new"
 import { EnvVarsBanner } from "./env-vars-banner"
-import dynamic from "next/dynamic"
+import { cn } from "@/lib/utils"
 
 interface AppShellProps {
   user: {
@@ -19,18 +19,21 @@ interface AppShellProps {
 }
 
 // Named export for AppShell component
-export function AppShell({ user, children, panel }: AppShellProps) {
+export const AppShell = memo(function AppShell({ user, children, panel }: AppShellProps) {
   const pathname = usePathname()
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
   const [isMobile, setIsMobile] = useState(false)
   
-  // Detectar painel automaticamente se não fornecido
-  const detectedPanel: 'admin' | 'operator' | 'carrier' = panel || 
+  // Detectar painel automaticamente se não fornecido (memoizado)
+  const detectedPanel: 'admin' | 'operator' | 'carrier' = useMemo(() => 
+    panel || 
     (pathname?.startsWith('/operator') ? 'operator' : 
-     pathname?.startsWith('/carrier') ? 'carrier' : 'admin')
+     pathname?.startsWith('/carrier') ? 'carrier' : 'admin'),
+    [panel, pathname]
+  )
   
-  // Configurações de branding por painel
-  const panelConfig = {
+  // Configurações de branding por painel (memoizado)
+  const panelConfig = useMemo(() => ({
     admin: {
       branding: 'Administrativo',
       homeUrl: '/admin'
@@ -43,7 +46,7 @@ export function AppShell({ user, children, panel }: AppShellProps) {
       branding: 'Transportadora',
       homeUrl: '/carrier'
     }
-  }[detectedPanel]
+  }[detectedPanel]), [detectedPanel])
 
   // Detect mobile screen size
   useEffect(() => {
@@ -83,17 +86,24 @@ export function AppShell({ user, children, panel }: AppShellProps) {
           />
         )}
 
-          {/* Sidebar */}
-          <Sidebar isOpen={isSidebarOpen} isMobile={isMobile} panel={detectedPanel} />
+        {/* Sidebar */}
+        <Sidebar 
+          isOpen={isSidebarOpen} 
+          isMobile={isMobile} 
+          panel={detectedPanel}
+          user={user}
+        />
 
         {/* Main Content */}
-        <main className={`
-          flex-1 min-h-[calc(100vh-4rem)] sm:min-h-[calc(100vh-4.5rem)] transition-all duration-300 ease-in-out
-          ${isSidebarOpen && !isMobile ? 'lg:ml-64' : 'ml-0'}
-          w-full
-        `}>
-          <div className="mx-auto max-w-[1600px] px-6 py-6">
-            {children}
+        <main className={cn(
+          "flex-1 min-h-[calc(100vh-4rem)] sm:min-h-[calc(100vh-4.5rem)] transition-all duration-300 ease-in-out",
+          "w-full overflow-y-auto bg-[var(--bg)]",
+          !isMobile ? "lg:ml-[60px]" : "ml-0"
+        )}>
+          <div className="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
+            <div className="w-full">
+              {children}
+            </div>
           </div>
         </main>
       </div>
@@ -101,4 +111,4 @@ export function AppShell({ user, children, panel }: AppShellProps) {
       {/* Performance Monitor removido */}
     </div>
   )
-}
+})

@@ -20,12 +20,14 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Label } from "@/components/ui/label"
 import { motion } from "framer-motion"
 import { debug, error as logError } from "@/lib/logger"
+import { useAuthFast } from "@/hooks/use-auth-fast"
+import { useGlobalSync } from "@/hooks/use-global-sync"
 
 export default function VeiculosPage() {
   const router = useRouter()
-  const [user, setUser] = useState<any>(null)
-  const [loading, setLoading] = useState(true)
+  const { user, loading: authLoading } = useAuthFast()
   const [veiculos, setVeiculos] = useState<any[]>([])
+  const [dataLoading, setDataLoading] = useState(true)
   const [selectedVehicle, setSelectedVehicle] = useState<any>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isMaintenanceModalOpen, setIsMaintenanceModalOpen] = useState(false)
@@ -43,47 +45,80 @@ export default function VeiculosPage() {
     isDeleting: false
   })
 
+  // Carregar dados imediatamente quando usuário estiver disponível
   useEffect(() => {
-    const getUser = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (!session) {
-        router.push("/")
-        return
-      }
-      setUser({ ...session.user })
-      setLoading(false)
+    if (user && !authLoading) {
       loadVeiculos()
     }
-    getUser()
-  }, [router])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, authLoading])
+
+  // Escutar eventos de sincronização global (apenas após carregamento inicial)
+  useGlobalSync(
+    ['vehicle.created', 'vehicle.updated', 'vehicle.deleted'],
+    () => {
+      // Recarregar veículos quando houver mudanças (apenas se não estiver carregando)
+      if (!dataLoading && user && !authLoading) {
+        loadVeiculos()
+      }
+    },
+    [dataLoading, user, authLoading]
+  )
 
   const loadVeiculos = async () => {
     try {
-      // Carregando veículos...
-      
-      // Consulta com todas as colunas necessárias
-      const { data, error } = await supabase
-        .from("vehicles")
-        .select(`
-          *,
-          companies(id, name)
-        `)
-        .order('created_at', { ascending: false })
-
-      if (error) {
-        logError("Erro do Supabase ao carregar veículos", { error }, "VeiculosPage")
-        notifyError(`Erro ao carregar veículos: ${error.message}`, undefined, { i18n: { ns: 'common', key: 'errors.loadVehicles', params: { message: error.message } } })
-        setVeiculos([])
-        return
+      setDataLoading(true)
+      // Usar API route para bypass RLS
+      const response = await fetch('/api/admin/vehicles-list')
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
       }
-      
-      // Veículos carregados
-      setVeiculos(data || [])
+      const result = await response.json()
+      if (result.success) {
+        setVeiculos(result.vehicles || [])
+      } else {
+        throw new Error(result.error || 'Erro ao carregar veículos')
+      }
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
       logError("Erro ao carregar veículos", { error: err }, 'VeiculosPage')
-      notifyError(formatError(err as Error, `Erro ao carregar veículos: ${errorMessage}`), undefined, { i18n: { ns: 'common', key: 'errors.loadVehicles', params: { message: errorMessage } } })
+      notifyError(err, `Erro ao carregar veículos: ${errorMessage}`, { i18n: { ns: 'common', key: 'errors.loadVehicles', params: { message: errorMessage } } })
       setVeiculos([])
+    } finally {
+      setDataLoading(false)
+    }
+  }
+
+  const handleDeleteVeiculo = async (veiculoId: string, veiculoPlate: string) => {
+    if (!confirm(`Tem certeza que deseja excluir o veículo "${veiculoPlate}"? Esta ação não pode ser desfeita.`)) {
+      return
+    }
+
+    try {
+      const response = await fetch(`/api/admin/vehicles/delete?id=${veiculoId}`, {
+        method: 'DELETE'
+      })
+      
+      const result = await response.json()
+      
+      if (!response.ok) {
+        const errorMessage = result.message || result.error || 'Erro ao excluir veículo'
+        const errorDetails = result.details ? ` (${result.details})` : ''
+        throw new Error(`${errorMessage}${errorDetails}`)
+      }
+
+      if (result.success) {
+        notifySuccess('Veículo excluído com sucesso')
+        // Aguardar um pouco antes de recarregar para garantir que o banco foi atualizado
+        await new Promise(resolve => setTimeout(resolve, 300))
+        await loadVeiculos()
+      } else {
+        throw new Error(result.error || 'Erro ao excluir veículo')
+      }
+    } catch (error: any) {
+      console.error('Erro ao excluir veículo:', error)
+      const errorMessage = error.message || 'Erro desconhecido ao excluir veículo'
+      notifyError(error, errorMessage)
     }
   }
 
@@ -171,7 +206,7 @@ export default function VeiculosPage() {
       }
     } catch (error: unknown) {
       logError("Erro inesperado ao excluir veículo", { vehicleId, error }, "VeiculosPage")
-      notifyError(formatError(error as Error, "Erro inesperado ao excluir veículo."), undefined, { i18n: { ns: 'common', key: 'errors.generic' } })
+      notifyError(error, "Erro inesperado ao excluir veículo.", { i18n: { ns: 'common', key: 'errors.generic' } })
     } finally {
       if (shouldResetState) {
         setDeleteConfirm((prev) => ({ ...prev, isDeleting: false }))
@@ -179,12 +214,13 @@ export default function VeiculosPage() {
     }
   }
 
-  if (loading) {
+  // Renderizar imediatamente, mostrar loading apenas para dados
+  if (authLoading || !user) {
     return <div className="min-h-screen flex items-center justify-center"><div className="w-16 h-16 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin mx-auto"></div></div>
   }
 
   return (
-    <AppShell user={{ id: user?.id || "", name: user?.name || "Admin", email: user?.email || "", role: "admin" }}>
+    <AppShell user={{ id: user.id, name: user.name || "Admin", email: user.email, role: user.role || "admin" }}>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
@@ -211,14 +247,20 @@ export default function VeiculosPage() {
           />
         </div>
 
-        <div className="grid gap-4">
-          {veiculos
-            .filter(v => 
-              searchQuery === "" || 
-              v.plate?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-              v.model?.toLowerCase().includes(searchQuery.toLowerCase())
-            )
-            .map((veiculo) => (
+        {dataLoading && veiculos.length === 0 ? (
+          <div className="flex items-center justify-center py-12">
+            <div className="w-8 h-8 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin"></div>
+            <span className="ml-3 text-[var(--muted)]">Carregando veículos...</span>
+          </div>
+        ) : (
+          <div className="grid gap-4">
+            {veiculos
+              .filter(v => 
+                searchQuery === "" || 
+                v.plate?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                v.model?.toLowerCase().includes(searchQuery.toLowerCase())
+              )
+              .map((veiculo) => (
             <motion.div
               key={veiculo.id}
               initial={{ opacity: 0, y: 20 }}
@@ -274,18 +316,12 @@ export default function VeiculosPage() {
                       Ver Detalhes
                     </Button>
                     <Button 
-                      variant="outline" 
+                      variant="destructive" 
                       size="sm"
-                      onClick={() =>
-                        setDeleteConfirm({
-                          isOpen: true,
-                          vehicle: veiculo,
-                          isDeleting: false
-                        })
-                      }
-                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                      onClick={() => handleDeleteVeiculo(veiculo.id, veiculo.plate || 'Veículo')}
                     >
-                      <Trash2 className="h-4 w-4" />
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      Excluir
                     </Button>
                   </div>
                 </div>
@@ -308,7 +344,8 @@ export default function VeiculosPage() {
               </Button>
             </Card>
           )}
-        </div>
+          </div>
+        )}
 
         {/* Modal de Veículo */}
         <VehicleModal

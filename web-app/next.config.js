@@ -24,10 +24,11 @@ const nextConfig = {
                 "form-action 'self'",
                 "object-src 'none'",
                 "script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' blob: https:",
-                "style-src 'self' 'unsafe-inline'",
+                "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+                "style-src-elem 'self' 'unsafe-inline' https://fonts.googleapis.com",
                 "img-src 'self' data: blob: https:",
-                "font-src 'self' data:",
-                "connect-src 'self' https://*.supabase.co https://*.vercel.com https://*.googleapis.com https://*.vercel.app https://vitals.vercel-insights.com",
+                "font-src 'self' data: https://fonts.gstatic.com https://fonts.googleapis.com",
+                "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.vercel.com https://*.googleapis.com https://*.vercel.app https://vitals.vercel-insights.com",
                 "worker-src 'self' blob:",
                 "frame-src 'self' https://*.google.com https://*.gstatic.com",
               ]
@@ -68,15 +69,43 @@ const nextConfig = {
       },
     ]
   },
+  // Configuração para imagens externas (Unsplash, etc)
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'assets.aceternity.com',
+        port: '',
+        pathname: '/**',
+      },
+    ],
+  },
   // Configuração para Google Maps
-  webpack: (config) => {
+  webpack: (config, { dev, isServer }) => {
     config.resolve.alias = {
       ...config.resolve.alias,
       '@': require('path').resolve(__dirname),
     }
-    // Disable Webpack persistent caching to bypass corrupted pack cache in dev
-    config.cache = false
+    // Habilitar cache do webpack para melhorar performance de compilação
+    if (dev) {
+      config.cache = {
+        type: 'filesystem',
+        buildDependencies: {
+          config: [__filename],
+        },
+      }
+    }
     return config
+  },
+  // Otimizações de compilação
+  experimental: {
+    optimizePackageImports: ['lucide-react', 'framer-motion'],
   },
 }
 

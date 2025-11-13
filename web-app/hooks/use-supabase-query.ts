@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import { supabase } from '@/lib/supabase'
 import { debug, warn } from '@/lib/logger'
 
@@ -93,46 +93,63 @@ export function useSupabaseQuery<T>(
     offlineMode = true
   } = options
 
-  const [data, setData] = useState<T | null>(fallbackValue)
+  const [data, setData] = useState<T | null>(fallbackValue as T | null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [isOffline, setIsOffline] = useState(!isOnline())
 
   // Ref para armazenar a função de query estável
   const queryFnRef = useRef(queryFn)
+  const cacheKeyRef = useRef(cacheKey)
+  const fallbackValueRef = useRef(fallbackValue)
+  const offlineModeRef = useRef(offlineMode)
+  const isExecutingRef = useRef(false)
+  const hasExecutedRef = useRef(false)
   
-  // Atualizar ref quando queryFn mudar
+  // Memoizar a função de query para evitar recriações desnecessárias
+  const memoizedQueryFn = useMemo(() => queryFn, [queryFn])
+  
+  // Atualizar refs quando valores mudarem (apenas se realmente mudaram)
   useEffect(() => {
-    queryFnRef.current = queryFn
-  }, [queryFn])
+    queryFnRef.current = memoizedQueryFn
+    cacheKeyRef.current = cacheKey
+    fallbackValueRef.current = fallbackValue
+    offlineModeRef.current = offlineMode
+  }, [memoizedQueryFn, cacheKey, fallbackValue, offlineMode])
 
-  const executeQuery = useCallback(async (attempt = 1): Promise<void> => {
+  const executeQuery = useCallback(async (): Promise<void> => {
+    // Prevenir execuções múltiplas simultâneas
+    if (isExecutingRef.current) return
+    isExecutingRef.current = true
+
     try {
       // Verificar cache primeiro
-      if (cacheKey) {
-        const cached = CacheManager.get(cacheKey)
+      if (cacheKeyRef.current) {
+        const cached = CacheManager.get(cacheKeyRef.current)
         if (cached !== null) {
-          setData(cached)
+          setData(cached as T)
           setLoading(false)
           setError(null)
           setIsOffline(false)
+          isExecutingRef.current = false
           return
         }
       }
 
       // Verificar conectividade
-      if (!isOnline() && offlineMode) {
+      if (!isOnline() && offlineModeRef.current) {
         setIsOffline(true)
         
         // Usar dados do cache mesmo expirados se disponíveis
-        if (cacheKey) {
+        if (cacheKeyRef.current) {
           try {
-            const expiredCache = localStorage.getItem(CACHE_PREFIX + cacheKey)
+            const expiredCache = localStorage.getItem(CACHE_PREFIX + cacheKeyRef.current)
             if (expiredCache) {
               const parsed = JSON.parse(expiredCache)
               setData(parsed.data)
               setError('Dados podem estar desatualizados (modo offline)')
               setLoading(false)
+              isExecutingRef.current = false
               return
             }
           } catch (e) {
@@ -141,40 +158,43 @@ export function useSupabaseQuery<T>(
         }
         
         // Usar fallback se não há cache
-        setData(fallbackValue)
+        setData(fallbackValueRef.current as T)
         setError('Sem conexão com a internet')
         setLoading(false)
+        isExecutingRef.current = false
         return
       }
 
       const result = await queryFnRef.current()
 
       if (result.error) {
-        throw new Error(result.error.message || 'Erro na consulta')
+        throw new Error((result.error as any).message || 'Erro na consulta')
       }
 
       // Salvar no cache
-      if (cacheKey && result.data !== null) {
-        CacheManager.set(cacheKey, result.data)
+      if (cacheKeyRef.current && result.data !== null) {
+        CacheManager.set(cacheKeyRef.current, result.data)
       }
 
       setData(result.data)
       setError(null)
       setIsOffline(false)
+      setLoading(false)
 
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
       
       // Para qualquer erro, primeiro tentar cache
-      if (cacheKey) {
+      if (cacheKeyRef.current) {
         try {
-          const expiredCache = localStorage.getItem(CACHE_PREFIX + cacheKey)
+          const expiredCache = localStorage.getItem(CACHE_PREFIX + cacheKeyRef.current)
           if (expiredCache) {
             const parsed = JSON.parse(expiredCache)
             setData(parsed.data)
             setError(null)
             setIsOffline(true)
             setLoading(false)
+            isExecutingRef.current = false
             return
           }
         } catch (e) {
@@ -183,33 +203,41 @@ export function useSupabaseQuery<T>(
       }
 
       // Se não tem cache, usar valor padrão diretamente (sem retry desnecessário)
-      setData(fallbackValue)
+      setData(fallbackValueRef.current as T)
       setError(null)
       setIsOffline(true)
       setLoading(false)
+    } finally {
+      isExecutingRef.current = false
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [queryFn, cacheKey, fallbackValue, offlineMode])
+  }, []) // Sem dependências - usa refs para valores atuais
 
   const refetch = useCallback(async () => {
     setLoading(true)
     setError(null)
     // Limpar cache se existir
-    if (cacheKey) {
-      CacheManager.clear(cacheKey)
+    if (cacheKeyRef.current) {
+      CacheManager.clear(cacheKeyRef.current)
     }
+    isExecutingRef.current = false // Reset flag para permitir nova execução
     await executeQuery()
-  }, [executeQuery, cacheKey])
-
-  useEffect(() => {
-    executeQuery()
   }, [executeQuery])
+
+  // Executar query apenas uma vez no mount
+  useEffect(() => {
+    if (!hasExecutedRef.current) {
+      hasExecutedRef.current = true
+      executeQuery()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []) // Executar apenas uma vez
 
   useEffect(() => {
     // Listener para mudanças de conectividade
     const handleOnline = () => {
       setIsOffline(false)
       if (error) {
+        isExecutingRef.current = false
         executeQuery()
       }
     }
@@ -230,7 +258,8 @@ export function useSupabaseQuery<T>(
     
     // Retorno vazio para o caso de SSR
     return () => {}
-  }, [error, executeQuery])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [error]) // Apenas error como dependência
 
   return { data, loading, error, refetch, isOffline }
 }
@@ -266,9 +295,11 @@ export function useSupabaseCount(
     // Aplicar filtros
     Object.entries(filters).forEach(([key, value]) => {
       if (value !== undefined && value !== null) {
-        if (typeof value === 'object' && value.operator) {
+        if (typeof value === 'object' && value !== null && 'operator' in value && 'value' in value) {
           // Filtros complexos como gte, eq, etc.
-          query = query[value.operator](key, value.value)
+          const filterValue = value as { operator: string; value: unknown }
+          const queryBuilder = query as any
+          query = queryBuilder[filterValue.operator](key, filterValue.value)
         } else {
           // Filtro simples de igualdade
           query = query.eq(key, value)

@@ -26,6 +26,8 @@ import { ManualCostForm } from "@/components/costs/manual-cost-form"
 import { ImportCostModal } from "@/components/costs/import-cost-modal"
 import { ReconciliationModal } from "@/components/costs/reconciliation-modal"
 import { BudgetView } from "@/components/costs/budget-view"
+import { useAuthFast } from "@/hooks/use-auth-fast"
+import { useGlobalSync } from "@/hooks/use-global-sync"
 
 // Lazy load de componentes pesados
 const CostCharts = dynamic(() => import('@/components/costs/cost-charts').then(m => ({ default: m.CostCharts })), {
@@ -35,8 +37,8 @@ const CostCharts = dynamic(() => import('@/components/costs/cost-charts').then(m
 
 export default function CustosAdminPage() {
   const router = useRouter()
-  const [user, setUser] = useState<any>(null)
-  const [loading, setLoading] = useState(true)
+  const { user, loading: authLoading } = useAuthFast()
+  const [dataLoading, setDataLoading] = useState(true)
   const [selectedCompanyId, setSelectedCompanyId] = useState<string | null>(null)
   const [companies, setCompanies] = useState<Array<{ id: string; name: string }>>([])
   const [costs, setCosts] = useState<any[]>([])
@@ -52,82 +54,64 @@ export default function CustosAdminPage() {
   const [isImportModalOpen, setIsImportModalOpen] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
-    const getUser = async () => {
-      try {
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession()
-        if (sessionError) {
-          console.error('Erro ao verificar sessão:', sessionError)
-          setError('Erro ao verificar autenticação')
-          return
-        }
-        if (!session) {
-          router.push("/")
-          return
-        }
-
-        const { data: userData } = await supabase
-          .from('users')
-          .select('*')
-          .eq('id', session.user.id)
-          .single()
-
-        if (userData && userData.role !== 'admin') {
-          router.push('/operator')
-          return
-        }
-
-        setUser({ ...session.user, ...userData })
-      } catch (err: any) {
-        console.error('Erro ao obter usuário:', err)
-        setError('Erro ao carregar dados do usuário')
-      } finally {
-        setLoading(false)
-      }
-    }
-    getUser()
-  }, [router])
+  // Autenticação otimizada via useAuthFast
 
   useEffect(() => {
     loadCompanies()
     loadOptions()
   }, [])
 
+  // Escutar eventos de sincronização global
+  useGlobalSync(
+    ['cost.created', 'cost.updated', 'company.created', 'company.updated', 'route.created', 'route.updated', 'vehicle.created', 'vehicle.updated'],
+    () => {
+      loadCompanies()
+      loadOptions()
+      if (selectedCompanyId) {
+        loadCosts()
+      }
+    },
+    [selectedCompanyId]
+  )
+
   const loadCompanies = useCallback(async () => {
     try {
-      const { data, error } = await supabase
-        .from('companies')
-        .select('id, name')
-        .eq('is_active', true)
-        .order('name')
-
-      if (error) throw error
-
-      setCompanies(data || [])
-      if (data && data.length > 0 && !selectedCompanyId) {
-        setSelectedCompanyId(data[0].id)
+      // Usar API route para bypass RLS
+      const response = await fetch('/api/admin/companies-list')
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+      const result = await response.json()
+      if (result.success) {
+        const companiesData = (result.companies || []).filter((c: any) => c.is_active !== false)
+        setCompanies(companiesData.map((c: any) => ({ id: c.id, name: c.name })))
+        if (companiesData.length > 0 && !selectedCompanyId) {
+          setSelectedCompanyId(companiesData[0].id)
+        }
+      } else {
+        throw new Error(result.error || 'Erro ao carregar empresas')
       }
     } catch (err: any) {
       console.error('Erro ao carregar empresas:', err)
       notifyError('Erro ao carregar empresas', undefined, { i18n: { ns: 'common', key: 'errors.loadCompanies' } })
     }
-  }, [])
+  }, [selectedCompanyId])
 
   const loadOptions = useCallback(async () => {
     try {
-      const [routesRes, vehiclesRes, driversRes, categoriesRes, carriersRes] = await Promise.all([
-        supabase.from('routes').select('id, name').order('name'),
-        supabase.from('vehicles').select('id, plate').order('plate'),
-        supabase.from('users').select('id, email').eq('role', 'driver').order('email'),
-        fetch('/api/costs/categories').then(r => r.json()),
-        supabase.from('carriers').select('id, name').order('name')
+      // Usar API route para bypass RLS
+      const [optionsRes, categoriesRes] = await Promise.all([
+        fetch('/api/admin/costs-options').then(r => r.json()),
+        fetch('/api/costs/categories').then(r => r.json())
       ])
 
-      if (routesRes.data) setRoutes(routesRes.data)
-      if (vehiclesRes.data) setVehicles(vehiclesRes.data)
-      if (driversRes.data) setDrivers(driversRes.data)
+      if (optionsRes.success) {
+        if (optionsRes.routes) setRoutes(optionsRes.routes)
+        if (optionsRes.vehicles) setVehicles(optionsRes.vehicles)
+        if (optionsRes.drivers) setDrivers(optionsRes.drivers)
+        if (optionsRes.carriers) setCarriers(optionsRes.carriers)
+      }
       if (categoriesRes) setCategories(categoriesRes)
-      if (carriersRes.data) setCarriers(carriersRes.data)
     } catch (err) {
       console.error('Erro ao carregar opções:', err)
     }
@@ -137,7 +121,7 @@ export default function CustosAdminPage() {
     if (!selectedCompanyId) return
 
     try {
-      setLoading(true)
+      setDataLoading(true)
       setError(null)
 
       const params = new URLSearchParams({
@@ -165,7 +149,7 @@ export default function CustosAdminPage() {
       notifyError('Erro ao carregar custos', undefined, { i18n: { ns: 'common', key: 'errors.loadCosts' } })
       setCosts([])
     } finally {
-      setLoading(false)
+      setDataLoading(false)
     }
   }, [selectedCompanyId, filters])
 
@@ -219,7 +203,7 @@ export default function CustosAdminPage() {
     }
   }
 
-  if (loading) {
+  if (authLoading || !user) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="w-16 h-16 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
@@ -229,7 +213,7 @@ export default function CustosAdminPage() {
 
   if (error) {
     return (
-      <AppShell user={{ id: user?.id || "", name: user?.name || "Admin", email: user?.email || "", role: "admin" }}>
+      <AppShell user={{ id: user.id, name: user.name || "Admin", email: user.email, role: user.role || "admin" }}>
         <div className="min-h-screen flex items-center justify-center p-4">
           <Card className="p-8 max-w-md w-full text-center">
             <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
@@ -245,7 +229,7 @@ export default function CustosAdminPage() {
   }
 
   return (
-    <AppShell user={{ id: user?.id || "", name: user?.name || "Admin", email: user?.email || "", role: "admin" }}>
+    <AppShell user={{ id: user.id, name: user.name || "Admin", email: user.email, role: user.role || "admin" }}>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between flex-wrap gap-4">
@@ -342,10 +326,10 @@ export default function CustosAdminPage() {
                       setSelectedInvoiceId(cost.invoice_id)
                       setIsReconciliationOpen(true)
                     } else {
-                      toast('Este custo não está vinculado a uma fatura')
+                      notifyError('Este custo não está vinculado a uma fatura', undefined, { i18n: { ns: 'common', key: 'errors.costNotLinkedToInvoice' } })
                     }
                   }}
-                  loading={loading}
+                  loading={dataLoading}
                 />
               </TabsContent>
 
@@ -369,7 +353,7 @@ export default function CustosAdminPage() {
                           setSelectedInvoiceId(data.id)
                           setIsReconciliationOpen(true)
                         } else {
-                          toast('Nenhuma fatura pendente encontrada')
+                          notifyError('Nenhuma fatura pendente encontrada', undefined, { i18n: { ns: 'common', key: 'errors.noPendingInvoice' } })
                         }
                       })
                   }}>

@@ -291,72 +291,39 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
       console.log('📊 Total de campos:', Object.keys(finalVehicleData).length)
       
       if (vehicleId) {
-        // ATUALIZAR
-        // Validar ID do veículo
+        // ATUALIZAR via API service role (evita RLS)
         if (!vehicleId || vehicleId.trim() === '') {
           throw new Error('ID do veículo inválido')
         }
-        
-        console.log('🔄 Atualizando veículo:', vehicleId)
+
+        console.log('🔄 Atualizando veículo via API:', vehicleId)
         console.log('📦 Payload:', JSON.stringify(finalVehicleData, null, 2))
-        
-        // Adicionar timeout para evitar travamento
-        const updatePromise = supabase
-          .from("vehicles")
-          .update(finalVehicleData)
-          .eq("id", vehicleId)
-          .select()
-          .single()
 
-        // Criar promise de timeout
-        const timeoutPromise = new Promise<never>((_, reject) => {
-          setTimeout(() => reject(new Error('Timeout na atualização (30s) - A requisição está demorando muito')), 30000)
-        })
-
-        let updateResult: any
+        const controller = new AbortController()
+        const timeout = setTimeout(() => controller.abort(), 30000)
+        let resp: Response
         try {
-          // Usar Promise.race para implementar timeout
-          updateResult = await Promise.race([updatePromise, timeoutPromise])
-        } catch (timeoutError: any) {
-          console.error('❌ Erro na requisição (timeout ou rede):', timeoutError)
-          const errorMsg = timeoutError?.message || 'Tempo de espera excedido. Tente novamente.'
-          throw new Error(`Erro de conexão: ${errorMsg}`)
-        }
-
-        const { data, error } = updateResult
-
-        if (error) {
-          console.error('❌ Erro do Supabase ao atualizar:', {
-            code: error.code,
-            message: error.message,
-            details: error.details,
-            hint: error.hint,
-            fullError: error
+          resp = await fetch(`/api/admin/vehicles/${vehicleId}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(finalVehicleData),
+            signal: controller.signal,
           })
-          
-          // Mensagem de erro mais amigável
-          let errorMessage = 'Erro ao atualizar veículo'
-          if (error.message) {
-            errorMessage = error.message
-            // Traduzir erros comuns
-            if (error.message.includes('duplicate') || error.message.includes('unique')) {
-              errorMessage = 'Já existe um veículo com esta placa'
-            } else if (error.message.includes('foreign key') || error.message.includes('company_id')) {
-              errorMessage = 'Empresa inválida ou não encontrada'
-            } else if (error.message.includes('null value') || error.message.includes('not null')) {
-              errorMessage = 'Campo obrigatório está faltando'
-            } else if (error.message.includes('schema cache')) {
-              errorMessage = 'Erro de estrutura do banco de dados. Entre em contato com o suporte.'
-            }
-          }
-          
-          throw new Error(errorMessage)
+        } catch (err: any) {
+          clearTimeout(timeout)
+          const msg = err?.name === 'AbortError' ? 'Timeout na atualização (30s)' : (err?.message || 'Falha de rede')
+          throw new Error(`Erro de conexão: ${msg}`)
         }
-        
-        if (!data) {
-          throw new Error('Nenhum dado retornado do servidor')
+        clearTimeout(timeout)
+
+        if (!resp.ok) {
+          let errBody: any = null
+          try { errBody = await resp.json() } catch {}
+          const message = errBody?.message || 'Erro ao atualizar veículo'
+          throw new Error(message)
         }
-        
+
+        const data = await resp.json()
         console.log('✅ Veículo atualizado com sucesso:', data)
         notifySuccess(t('common', 'success.vehicleUpdated'))
         
@@ -373,28 +340,36 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
           console.warn('⚠️ Erro ao registrar log de auditoria (não crítico):', auditError)
         }
       } else {
-        // CRIAR
-        console.log('🆕 Criando novo veículo')
-        const { data, error } = await supabase
-          .from("vehicles")
-          .insert(finalVehicleData)
-          .select()
-          .single()
-
-        if (error) {
-          console.error('❌ Erro do Supabase ao criar:', {
-            code: error.code,
-            message: error.message,
-            details: error.details,
-            hint: error.hint
+        // CRIAR via API service role (evita RLS)
+        console.log('🆕 Criando novo veículo via API')
+        const controller = new AbortController()
+        const timeout = setTimeout(() => controller.abort(), 30000)
+        let resp: Response
+        try {
+          resp = await fetch('/api/admin/vehicles', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(finalVehicleData),
+            signal: controller.signal,
           })
-          throw new Error(`Erro ao cadastrar veículo: ${error.message || JSON.stringify(error)}`)
+        } catch (err: any) {
+          clearTimeout(timeout)
+          const msg = err?.name === 'AbortError' ? 'Timeout na criação (30s)' : (err?.message || 'Falha de rede')
+          throw new Error(`Erro de conexão: ${msg}`)
         }
-        
+        clearTimeout(timeout)
+
+        if (!resp.ok) {
+          let errBody: any = null
+          try { errBody = await resp.json() } catch {}
+          const message = errBody?.message || 'Erro ao cadastrar veículo'
+          throw new Error(message)
+        }
+
+        const data = await resp.json()
         if (!data?.id) {
           throw new Error('Veículo criado mas ID não retornado')
         }
-        
         vehicleId = data.id
         console.log('✅ Veículo criado com sucesso:', data)
 
@@ -402,13 +377,17 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
         if (photoFile && vehicleId) {
           const uploadedUrl = await uploadPhoto(vehicleId)
           if (uploadedUrl) {
-            const { error: updateError } = await supabase
-              .from("vehicles")
-              .update({ photo_url: uploadedUrl })
-              .eq("id", vehicleId)
-            
-            if (updateError) {
-              console.warn('⚠️ Erro ao atualizar foto após criar veículo (não crítico):', updateError)
+            try {
+              const respPhoto = await fetch(`/api/admin/vehicles/${vehicleId}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ photo_url: uploadedUrl }),
+              })
+              if (!respPhoto.ok) {
+                console.warn('⚠️ Erro ao atualizar foto após criar veículo (não crítico): status', respPhoto.status)
+              }
+            } catch (e) {
+              console.warn('⚠️ Erro de rede ao atualizar foto (não crítico):', e)
             }
           }
         }

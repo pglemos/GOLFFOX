@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { AppShell } from "@/components/app-shell"
 import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { CarrierMap } from "@/components/carrier-map"
 import { 
@@ -168,188 +168,246 @@ export default function CarrierDashboard() {
       email: user?.email || "",
       role: "carrier"
     }}>
-      <div className="space-y-6">
+      <div className="space-y-6 lg:space-y-8">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div>
-            <h1 className="text-3xl font-bold mb-2">Gestão de Frota</h1>
-            <p className="text-[var(--ink-muted)]">Monitore veículos e motoristas em tempo real</p>
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-2">
+          <div className="flex-1 min-w-0">
+            <h1 className="text-2xl sm:text-3xl font-bold mb-2 text-[var(--ink-strong)]">Gestão de Frota</h1>
+            <p className="text-sm sm:text-base text-[var(--ink-muted)]">Monitore veículos e motoristas em tempo real</p>
           </div>
-            <Button asChild>
-              <a href="/carrier/relatorios">
-                <Truck className="h-4 w-4 mr-2" />
-                Relatórios
-              </a>
-            </Button>
+          <Button asChild className="flex-shrink-0">
+            <a href="/carrier/relatorios">
+              <Truck className="h-4 w-4 mr-2" />
+              Relatórios
+            </a>
+          </Button>
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-[var(--ink-muted)]">Total da Frota</p>
-                <p className="text-2xl font-bold mt-1">{kpis.totalFleet}</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <Card className="overflow-hidden">
+            <CardContent className="p-4 sm:p-6">
+              <div className="flex items-center justify-between">
+                <div className="flex-1 min-w-0 pr-4">
+                  <p className="text-sm font-medium text-[var(--ink-muted)] mb-1">Total da Frota</p>
+                  <p className="text-2xl font-bold text-[var(--ink-strong)] truncate">{kpis.totalFleet}</p>
+                </div>
+                <div className="p-2 rounded-lg bg-[var(--brand-light)] flex-shrink-0">
+                  <Truck className="h-5 w-5 text-[var(--brand)]" />
+                </div>
               </div>
-              <Truck className="h-8 w-8 text-[var(--brand)]" />
-            </div>
+            </CardContent>
           </Card>
           
-          <Card className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-[var(--ink-muted)]">Em Rota</p>
-                <p className="text-2xl font-bold mt-1">{kpis.onRoute}</p>
+          <Card className="overflow-hidden">
+            <CardContent className="p-4 sm:p-6">
+              <div className="flex items-center justify-between">
+                <div className="flex-1 min-w-0 pr-4">
+                  <p className="text-sm font-medium text-[var(--ink-muted)] mb-1">Em Rota</p>
+                  <p className="text-2xl font-bold text-[var(--ink-strong)] truncate">{kpis.onRoute}</p>
+                </div>
+                <div className="p-2 rounded-lg bg-[var(--accent-light)] flex-shrink-0">
+                  <Navigation className="h-5 w-5 text-[var(--accent)]" />
+                </div>
               </div>
-              <Navigation className="h-8 w-8 text-[var(--accent)]" />
-            </div>
+            </CardContent>
           </Card>
           
-          <Card className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-[var(--ink-muted)]">Motoristas Ativos</p>
-                <p className="text-2xl font-bold mt-1">{kpis.activeDrivers}</p>
+          <Card className="overflow-hidden">
+            <CardContent className="p-4 sm:p-6">
+              <div className="flex items-center justify-between">
+                <div className="flex-1 min-w-0 pr-4">
+                  <p className="text-sm font-medium text-[var(--ink-muted)] mb-1">Motoristas Ativos</p>
+                  <p className="text-2xl font-bold text-[var(--ink-strong)] truncate">{kpis.activeDrivers}</p>
+                </div>
+                <div className="p-2 rounded-lg bg-green-100 dark:bg-green-900/20 flex-shrink-0">
+                  <Users className="h-5 w-5 text-green-600 dark:text-green-400" />
+                </div>
               </div>
-              <Users className="h-8 w-8 text-[var(--ok)]" />
-            </div>
+            </CardContent>
           </Card>
           
-          <Card className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-[var(--ink-muted)]">Atrasados</p>
-                <p className="text-2xl font-bold mt-1">{kpis.delayed}</p>
+          <Card className="overflow-hidden">
+            <CardContent className="p-4 sm:p-6">
+              <div className="flex items-center justify-between">
+                <div className="flex-1 min-w-0 pr-4">
+                  <p className="text-sm font-medium text-[var(--ink-muted)] mb-1">Atrasados</p>
+                  <p className="text-2xl font-bold text-[var(--ink-strong)] truncate">{kpis.delayed}</p>
+                </div>
+                <div className="p-2 rounded-lg bg-red-100 dark:bg-red-900/20 flex-shrink-0">
+                  <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400" />
+                </div>
               </div>
-              <AlertCircle className="h-8 w-8 text-[var(--err)]" />
-            </div>
+            </CardContent>
           </Card>
         </div>
 
         {/* Fleet Status */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
           {/* Fleet Map */}
-          <Card className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold flex items-center gap-2">
-                <Map className="h-5 w-5" />
-                Fleet Map
-              </h2>
-              <Button size="sm" variant="outline">Expand</Button>
-            </div>
-            
-            {/* Map */}
-            <CarrierMap 
-              vehicles={fleet.map(vehicle => ({
-                id: vehicle.id,
-                plate: vehicle.id, // Usando id como plate já que não existe propriedade plate
-                lat: (vehicle as any).lat || -14.235, // Default para centro do Brasil se não tiver coordenadas
-                lng: (vehicle as any).lng || -51.9253,
-                status: vehicle.status as 'on_route' | 'available' | 'delayed'
-              }))}
-            />
-
-            {/* Legend */}
-            <div className="mt-4 grid grid-cols-3 gap-2">
-              <div className="flex items-center gap-2 text-xs">
-                <div className="w-3 h-3 rounded-full bg-[var(--brand)]" />
-                <span>On Route</span>
+          <Card className="overflow-hidden">
+            <CardHeader className="pb-4">
+              <div className="flex items-start justify-between">
+                <div className="flex-1 min-w-0 pr-4">
+                  <CardTitle className="text-xl font-semibold mb-1.5 flex items-center gap-2">
+                    <Map className="h-5 w-5" />
+                    Mapa da Frota
+                  </CardTitle>
+                  <p className="text-sm text-[var(--ink-muted)]">Visualização em tempo real</p>
+                </div>
+                <Button size="sm" variant="outline" className="flex-shrink-0">
+                  Expandir
+                </Button>
               </div>
-              <div className="flex items-center gap-2 text-xs">
-                <div className="w-3 h-3 rounded-full bg-[var(--ok)]" />
-                <span>Available</span>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <div className="h-64 rounded-lg overflow-hidden bg-gradient-to-br from-[var(--brand)]/10 to-[var(--accent)]/10 border border-[var(--border)]">
+                <CarrierMap 
+                  vehicles={fleet.map(vehicle => ({
+                    id: vehicle.id,
+                    plate: vehicle.id,
+                    lat: (vehicle as any).lat || -14.235,
+                    lng: (vehicle as any).lng || -51.9253,
+                    status: vehicle.status as 'on_route' | 'available' | 'delayed'
+                  }))}
+                />
               </div>
-              <div className="flex items-center gap-2 text-xs">
-                <div className="w-3 h-3 rounded-full bg-[var(--err)]" />
-                <span>Delayed</span>
+              {/* Legend */}
+              <div className="mt-4 flex flex-wrap gap-4">
+                <div className="flex items-center gap-2 text-xs">
+                  <div className="w-3 h-3 rounded-full bg-[var(--brand)]" />
+                  <span className="text-[var(--ink-muted)]">Em Rota</span>
+                </div>
+                <div className="flex items-center gap-2 text-xs">
+                  <div className="w-3 h-3 rounded-full bg-green-500" />
+                  <span className="text-[var(--ink-muted)]">Disponível</span>
+                </div>
+                <div className="flex items-center gap-2 text-xs">
+                  <div className="w-3 h-3 rounded-full bg-red-500" />
+                  <span className="text-[var(--ink-muted)]">Atrasado</span>
+                </div>
               </div>
-            </div>
+            </CardContent>
           </Card>
 
           {/* Active Drivers */}
-          <Card className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold flex items-center gap-2">
-                <Users className="h-5 w-5" />
-                Active Drivers
-              </h2>
-              <Button size="sm" variant="outline">View all</Button>
-            </div>
-
-            <div className="space-y-3">
-              {drivers.map((driver, i) => (
-                <div key={i} className="flex items-center justify-between p-3 rounded-xl bg-[var(--bg)] hover:bg-[var(--bg-soft)] transition-colors">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-[var(--brand)]/20 flex items-center justify-center">
-                      <Users className="h-5 w-5 text-[var(--brand)]" />
-                    </div>
-                    <div>
-                      <p className="font-semibold">{driver.name}</p>
-                      <p className="text-xs text-[var(--muted)]">
-                        {driver.trips} trip(s) • ⭐ {driver.rating}
-                      </p>
-                    </div>
-                  </div>
-                  <Badge className={driver.status === "active" ? "bg-[var(--ok)]" : "bg-[var(--muted)]"}>
-                    {driver.status === "active" ? "Active" : "Break"}
-                  </Badge>
+          <Card className="overflow-hidden">
+            <CardHeader className="pb-4">
+              <div className="flex items-start justify-between">
+                <div className="flex-1 min-w-0 pr-4">
+                  <CardTitle className="text-xl font-semibold mb-1.5 flex items-center gap-2">
+                    <Users className="h-5 w-5" />
+                    Motoristas Ativos
+                  </CardTitle>
+                  <p className="text-sm text-[var(--ink-muted)]">Lista de motoristas em atividade</p>
                 </div>
-              ))}
-            </div>
+                <Button size="sm" variant="outline" className="flex-shrink-0">
+                  Ver todos
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <div className="space-y-2 max-h-96 overflow-y-auto">
+                {drivers.length === 0 ? (
+                  <div className="p-8 text-center text-[var(--ink-muted)]">
+                    <p className="text-sm">Nenhum motorista ativo</p>
+                  </div>
+                ) : (
+                  drivers.map((driver, i) => (
+                    <div key={i} className="flex items-center justify-between p-3 rounded-lg hover:bg-[var(--bg-hover)] transition-colors border border-transparent hover:border-[var(--border)]">
+                      <div className="flex items-center gap-3 flex-1 min-w-0">
+                        <div className="w-10 h-10 rounded-lg bg-[var(--brand-light)] flex items-center justify-center flex-shrink-0">
+                          <Users className="h-5 w-5 text-[var(--brand)]" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-semibold text-sm text-[var(--ink-strong)] truncate">{driver.name}</p>
+                          <p className="text-xs text-[var(--ink-muted)] truncate">
+                            {driver.trips} viagem(ns) • ⭐ {driver.rating}
+                          </p>
+                        </div>
+                      </div>
+                      <Badge variant={driver.status === "active" ? "default" : "secondary"} className="flex-shrink-0">
+                        {driver.status === "active" ? "Ativo" : "Pausa"}
+                      </Badge>
+                    </div>
+                  ))
+                )}
+              </div>
+            </CardContent>
           </Card>
         </div>
 
         {/* Fleet Status Table */}
-        <Card className="p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold flex items-center gap-2">
-              <Truck className="h-5 w-5" />
-              Fleet Status
-            </h2>
-            <Button size="sm" variant="outline">
-              Refresh
-            </Button>
-          </div>
-
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-[var(--muted)]/20">
-                  <th className="text-left py-3 px-4 font-semibold text-sm">Vehicle</th>
-                  <th className="text-left py-3 px-4 font-semibold text-sm">Driver</th>
-                  <th className="text-left py-3 px-4 font-semibold text-sm">Status</th>
-                  <th className="text-left py-3 px-4 font-semibold text-sm">Route</th>
-                  <th className="text-left py-3 px-4 font-semibold text-sm">Last update</th>
-                </tr>
-              </thead>
-              <tbody>
-                {fleet.map((vehicle, i) => (
-                  <tr key={i} className="border-b border-[var(--muted)]/10 hover:bg-[var(--bg)] transition-colors">
-                    <td className="py-3 px-4">
-                      <div className="flex items-center gap-2">
-                        <Truck className="h-4 w-4 text-[var(--brand)]" />
-                        <span className="font-semibold">{vehicle.plate || vehicle.id}</span>
-                      </div>
-                    </td>
-                    <td className="py-3 px-4">{vehicle.driver}</td>
-                    <td className="py-3 px-4">
-                      <Badge className={
-                        vehicle.status === "on-route" ? "bg-[var(--brand)]" :
-                        vehicle.status === "available" ? "bg-[var(--ok)]" :
-                        "bg-[var(--err)]"
-                      }>
-                        {vehicle.status === "on-route" ? "Em Rota" :
-                         vehicle.status === "available" ? "Disponível" : 
-                         vehicle.status === "delayed" ? "Atrasado" : "Inativo"}
-                      </Badge>
-                    </td>
-                    <td className="py-3 px-4">{vehicle.route}</td>
-                    <td className="py-3 px-4 text-sm text-[var(--muted)]">{vehicle.lastUpdate}</td>
+        <Card className="overflow-hidden">
+          <CardHeader className="pb-4">
+            <div className="flex items-start justify-between">
+              <div className="flex-1 min-w-0 pr-4">
+                <CardTitle className="text-xl font-semibold mb-1.5 flex items-center gap-2">
+                  <Truck className="h-5 w-5" />
+                  Status da Frota
+                </CardTitle>
+                <p className="text-sm text-[var(--ink-muted)]">Detalhes de todos os veículos</p>
+              </div>
+              <Button size="sm" variant="outline" className="flex-shrink-0">
+                Atualizar
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-[var(--border)]">
+                    <th className="text-left py-3 px-4 font-semibold text-sm text-[var(--ink-strong)]">Veículo</th>
+                    <th className="text-left py-3 px-4 font-semibold text-sm text-[var(--ink-strong)]">Motorista</th>
+                    <th className="text-left py-3 px-4 font-semibold text-sm text-[var(--ink-strong)]">Status</th>
+                    <th className="text-left py-3 px-4 font-semibold text-sm text-[var(--ink-strong)]">Rota</th>
+                    <th className="text-left py-3 px-4 font-semibold text-sm text-[var(--ink-strong)]">Última atualização</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {fleet.length === 0 ? (
+                    <tr>
+                      <td colSpan={5} className="py-8 text-center text-[var(--ink-muted)]">
+                        <p className="text-sm">Nenhum veículo encontrado</p>
+                      </td>
+                    </tr>
+                  ) : (
+                    fleet.map((vehicle, i) => (
+                      <tr key={i} className="border-b border-[var(--border)] hover:bg-[var(--bg-hover)] transition-colors">
+                        <td className="py-3 px-4">
+                          <div className="flex items-center gap-2">
+                            <Truck className="h-4 w-4 text-[var(--brand)] flex-shrink-0" />
+                            <span className="font-semibold text-sm text-[var(--ink-strong)] truncate">{vehicle.plate || vehicle.id}</span>
+                          </div>
+                        </td>
+                        <td className="py-3 px-4">
+                          <span className="text-sm text-[var(--ink)] truncate block">{vehicle.driver}</span>
+                        </td>
+                        <td className="py-3 px-4">
+                          <Badge variant={
+                            vehicle.status === "on-route" ? "default" :
+                            vehicle.status === "available" ? "secondary" :
+                            "destructive"
+                          } className="text-xs">
+                            {vehicle.status === "on-route" ? "Em Rota" :
+                             vehicle.status === "available" ? "Disponível" : 
+                             vehicle.status === "delayed" ? "Atrasado" : "Inativo"}
+                          </Badge>
+                        </td>
+                        <td className="py-3 px-4">
+                          <span className="text-sm text-[var(--ink)] truncate block">{vehicle.route}</span>
+                        </td>
+                        <td className="py-3 px-4">
+                          <span className="text-xs text-[var(--ink-muted)] truncate block">{vehicle.lastUpdate}</span>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
         </Card>
       </div>
     </AppShell>

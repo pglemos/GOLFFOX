@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
-import { Filter, X, Calendar } from "lucide-react"
+import { Filter, X, Calendar, ChevronDown, ChevronUp, Save } from "lucide-react"
 
 export interface CostFilters {
   start_date?: string
@@ -64,91 +64,103 @@ export function CostFilters({
   categories = [],
   carriers = []
 }: CostFiltersProps) {
-  const [filters, setFilters] = useState<CostFilters>({})
-  const [showFilters, setShowFilters] = useState(false)
+  const [filtersExpanded, setFiltersExpanded] = useState(false)
+  const [tempFilters, setTempFilters] = useState<CostFilters>({})
+  const [appliedFilters, setAppliedFilters] = useState<CostFilters>({})
 
-  const handleFilterChange = (key: keyof CostFilters, value: string | undefined) => {
-    const newFilters = { ...filters }
+  const handleTempFilterChange = (key: keyof CostFilters, value: string | undefined) => {
+    const newFilters = { ...tempFilters }
     if (value) {
       newFilters[key] = value
     } else {
       delete newFilters[key]
     }
-    setFilters(newFilters)
-    onFiltersChange(newFilters)
+    setTempFilters(newFilters)
+  }
+
+  const handleSaveFilters = () => {
+    setAppliedFilters(tempFilters)
+    onFiltersChange(tempFilters)
+    setFiltersExpanded(false)
+  }
+
+  const handleResetFilters = () => {
+    setTempFilters({})
+    setAppliedFilters({})
+    onFiltersChange({})
+    setFiltersExpanded(false)
   }
 
   const handlePreset = (preset: keyof typeof PERIOD_PRESETS) => {
     const { start, end } = PERIOD_PRESETS[preset]
     const newFilters = {
-      ...filters,
+      ...tempFilters,
       start_date: start,
       end_date: end
     }
-    setFilters(newFilters)
-    onFiltersChange(newFilters)
+    setTempFilters(newFilters)
   }
 
-  const clearFilters = () => {
-    setFilters({})
-    onFiltersChange({})
-  }
-
-  const hasActiveFilters = Object.keys(filters).length > 0
+  const hasActiveFilters = Object.keys(appliedFilters).length > 0
 
   return (
-    <Card className="p-4">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <Filter className="h-5 w-5 text-gray-600" />
-          <h3 className="font-semibold">Filtros</h3>
+    <Card>
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Filter className="h-5 w-5 text-[var(--brand)]" />
+            <CardTitle className="text-lg">Filtros</CardTitle>
           {hasActiveFilters && (
             <span className="px-2 py-1 bg-orange-100 text-orange-700 rounded-full text-xs font-medium">
-              {Object.keys(filters).length} ativo(s)
+              {Object.keys(appliedFilters).length} ativo(s)
             </span>
           )}
         </div>
-        <div className="flex items-center gap-2">
-          {hasActiveFilters && (
-            <Button variant="ghost" size="sm" onClick={clearFilters}>
-              <X className="h-4 w-4 mr-1" />
-              Limpar
-            </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setFiltersExpanded(!filtersExpanded)}
+          className="gap-2"
+        >
+          {filtersExpanded ? (
+            <>
+              <ChevronUp className="h-4 w-4" />
+              Minimizar
+            </>
+          ) : (
+            <>
+              <ChevronDown className="h-4 w-4" />
+              Expandir
+            </>
           )}
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={() => setShowFilters(!showFilters)}
-          >
-            {showFilters ? 'Ocultar' : 'Mostrar'} Filtros
-          </Button>
+        </Button>
+      </div>
+    </CardHeader>
+    {filtersExpanded && (
+      <CardContent>
+        {/* Presets de Período */}
+        <div className="flex flex-wrap gap-2 mb-4">
+          {Object.entries(PERIOD_PRESETS).map(([key, preset]) => (
+            <Button
+              key={key}
+              variant={tempFilters.start_date === preset.start ? "default" : "outline"}
+              size="sm"
+              onClick={() => handlePreset(key as keyof typeof PERIOD_PRESETS)}
+            >
+              <Calendar className="h-3 w-3 mr-1" />
+              {preset.label}
+            </Button>
+          ))}
         </div>
-      </div>
 
-      {/* Presets de Período */}
-      <div className="flex flex-wrap gap-2 mb-4">
-        {Object.entries(PERIOD_PRESETS).map(([key, preset]) => (
-          <Button
-            key={key}
-            variant={filters.start_date === preset.start ? "default" : "outline"}
-            size="sm"
-            onClick={() => handlePreset(key as keyof typeof PERIOD_PRESETS)}
-          >
-            <Calendar className="h-3 w-3 mr-1" />
-            {preset.label}
-          </Button>
-        ))}
-      </div>
-
-      {showFilters && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pt-4 border-t">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
           {/* Período Customizado */}
           <div className="space-y-2">
             <Label>Data Início</Label>
             <Input
               type="date"
-              value={filters.start_date || ''}
-              onChange={(e) => handleFilterChange('start_date', e.target.value || undefined)}
+              value={tempFilters.start_date || ''}
+              onChange={(e) => handleTempFilterChange('start_date', e.target.value || undefined)}
             />
           </div>
 
@@ -156,8 +168,8 @@ export function CostFilters({
             <Label>Data Fim</Label>
             <Input
               type="date"
-              value={filters.end_date || ''}
-              onChange={(e) => handleFilterChange('end_date', e.target.value || undefined)}
+              value={tempFilters.end_date || ''}
+              onChange={(e) => handleTempFilterChange('end_date', e.target.value || undefined)}
             />
           </div>
 
@@ -167,8 +179,8 @@ export function CostFilters({
               <Label>Rota</Label>
               <select
                 className="w-full px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm"
-                value={filters.route_id || ''}
-                onChange={(e) => handleFilterChange('route_id', e.target.value || undefined)}
+                value={tempFilters.route_id || ''}
+                onChange={(e) => handleTempFilterChange('route_id', e.target.value || undefined)}
               >
                 <option value="">Todas as rotas</option>
                 {routes.map(route => (
@@ -184,8 +196,8 @@ export function CostFilters({
               <Label>Veículo</Label>
               <select
                 className="w-full px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm"
-                value={filters.vehicle_id || ''}
-                onChange={(e) => handleFilterChange('vehicle_id', e.target.value || undefined)}
+                value={tempFilters.vehicle_id || ''}
+                onChange={(e) => handleTempFilterChange('vehicle_id', e.target.value || undefined)}
               >
                 <option value="">Todos os veículos</option>
                 {vehicles.map(vehicle => (
@@ -201,8 +213,8 @@ export function CostFilters({
               <Label>Motorista</Label>
               <select
                 className="w-full px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm"
-                value={filters.driver_id || ''}
-                onChange={(e) => handleFilterChange('driver_id', e.target.value || undefined)}
+                value={tempFilters.driver_id || ''}
+                onChange={(e) => handleTempFilterChange('driver_id', e.target.value || undefined)}
               >
                 <option value="">Todos os motoristas</option>
                 {drivers.map(driver => (
@@ -218,8 +230,8 @@ export function CostFilters({
               <Label>Grupo de Custo</Label>
               <select
                 className="w-full px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm"
-                value={filters.group_name || ''}
-                onChange={(e) => handleFilterChange('group_name', e.target.value || undefined)}
+                value={tempFilters.group_name || ''}
+                onChange={(e) => handleTempFilterChange('group_name', e.target.value || undefined)}
               >
                 <option value="">Todos os grupos</option>
                 {Array.from(new Set(categories.map(c => c.group_name))).map(group => (
@@ -230,17 +242,17 @@ export function CostFilters({
           )}
 
           {/* Categoria */}
-          {categories.length > 0 && filters.group_name && (
+          {categories.length > 0 && tempFilters.group_name && (
             <div className="space-y-2">
               <Label>Categoria</Label>
               <select
                 className="w-full px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm"
-                value={filters.category_id || ''}
-                onChange={(e) => handleFilterChange('category_id', e.target.value || undefined)}
+                value={tempFilters.category_id || ''}
+                onChange={(e) => handleTempFilterChange('category_id', e.target.value || undefined)}
               >
                 <option value="">Todas as categorias</option>
                 {categories
-                  .filter(c => c.group_name === filters.group_name)
+                  .filter(c => c.group_name === tempFilters.group_name)
                   .map(cat => (
                     <option key={cat.id} value={cat.id}>{cat.category}</option>
                   ))}
@@ -254,8 +266,8 @@ export function CostFilters({
               <Label>Transportadora</Label>
               <select
                 className="w-full px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm"
-                value={filters.carrier_id || ''}
-                onChange={(e) => handleFilterChange('carrier_id', e.target.value || undefined)}
+                value={tempFilters.carrier_id || ''}
+                onChange={(e) => handleTempFilterChange('carrier_id', e.target.value || undefined)}
               >
                 <option value="">Todas as transportadoras</option>
                 {carriers.map(carrier => (
@@ -265,7 +277,27 @@ export function CostFilters({
             </div>
           )}
         </div>
-      )}
+        <div className="flex items-center justify-end gap-2 pt-4 border-t border-[var(--border)]">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleResetFilters}
+            className="gap-2"
+          >
+            <X className="h-4 w-4" />
+            Limpar
+          </Button>
+          <Button
+            size="sm"
+            onClick={handleSaveFilters}
+            className="gap-2"
+          >
+            <Save className="h-4 w-4" />
+            Salvar Filtros
+          </Button>
+        </div>
+      </CardContent>
+    )}
     </Card>
   )
 }

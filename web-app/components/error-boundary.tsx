@@ -42,7 +42,7 @@ export class ErrorBoundary extends Component<Props, State> {
   componentDidCatch(error: Error, errorInfo: any) {
     console.error('ErrorBoundary capturou um erro:', error, errorInfo)
 
-    // Registrar alerta operacional
+    // Registrar alerta operacional (com tratamento de erro - não bloquear renderização)
     createAlert({
       type: 'other',
       severity: 'error',
@@ -54,6 +54,9 @@ export class ErrorBoundary extends Component<Props, State> {
         url: typeof window !== 'undefined' ? window.location.href : 'unknown',
       },
       source: 'error-boundary',
+    }).catch((alertError) => {
+      // Não bloquear se createAlert falhar
+      console.error('Erro ao criar alerta:', alertError)
     })
 
     this.setState({

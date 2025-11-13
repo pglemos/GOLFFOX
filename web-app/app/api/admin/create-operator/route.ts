@@ -84,11 +84,14 @@ export async function POST(request: NextRequest) {
     }
 
     // ✅ Validar autenticação (apenas admin) - DEPOIS de validar dados básicos
-    if (!isTestMode && !isDevelopment) {
-      const authErrorResponse = await requireAuth(request, 'admin')
-      if (authErrorResponse) {
-        return authErrorResponse
-      }
+    // Em desenvolvimento, validar mas não bloquear se falhar (para facilitar testes)
+    const authErrorResponse = await requireAuth(request, 'admin')
+    if (authErrorResponse && !isDevelopment) {
+      return authErrorResponse
+    }
+    // Em desenvolvimento, apenas logar o aviso mas continuar
+    if (authErrorResponse && isDevelopment) {
+      console.warn('⚠️ Autenticação falhou em desenvolvimento, mas continuando...')
     }
 
     let company: any

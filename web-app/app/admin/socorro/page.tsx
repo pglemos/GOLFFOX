@@ -3,112 +3,112 @@
 import { useEffect, useState } from "react"
 import { AppShell } from "@/components/app-shell"
 import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { LifeBuoy, Send, Plus, Search, Clock, AlertCircle } from "lucide-react"
+import { LifeBuoy, Send, Plus, Search, Clock, AlertCircle, Filter, ChevronDown, ChevronUp, Save, X, Trash2 } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 import { AssistanceModal } from "@/components/modals/assistance-modal"
 import { Input } from "@/components/ui/input"
 import { motion } from "framer-motion"
 import { notifySuccess, notifyError } from "@/lib/toast"
+import { useAuthFast } from "@/hooks/use-auth-fast"
 
 export default function SocorroPage() {
   const router = useRouter()
-  const [user, setUser] = useState<any>(null)
-  const [loading, setLoading] = useState(true)
+  const { user, loading: authLoading } = useAuthFast()
+  const [dataLoading, setDataLoading] = useState(true)
   const [ocorrencias, setOcorrencias] = useState<any[]>([])
   const [selectedRequest, setSelectedRequest] = useState<any>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
+  const [filtersExpanded, setFiltersExpanded] = useState(false)
+  const [tempFilterStatus, setTempFilterStatus] = useState<string>("all")
   const [filterStatus, setFilterStatus] = useState<string>("all")
 
-  useEffect(() => {
-    const getUser = async () => {
-      try {
-        // Primeiro, tentar obter usuário do cookie de sessão customizado
-        if (typeof document !== 'undefined') {
-          const cookieMatch = document.cookie.match(/golffox-session=([^;]+)/)
-          if (cookieMatch) {
-            try {
-              const decoded = atob(cookieMatch[1])
-              const u = JSON.parse(decoded)
-              if (u?.id && u?.email) {
-                setUser({ id: u.id, email: u.email, name: u.email.split('@')[0], role: u.role || 'admin' })
-                setLoading(false)
-                loadOcorrencias()
-                return
-              }
-            } catch (err) {
-              console.warn('⚠️ Erro ao decodificar cookie de sessão:', err)
-            }
-          }
-        }
+  const handleSaveFilters = () => {
+    setFilterStatus(tempFilterStatus)
+    setFiltersExpanded(false)
+  }
 
-        // Fallback: tentar sessão do Supabase
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession()
-        
-        if (sessionError) {
-          console.error('❌ Erro ao obter sessão do Supabase:', sessionError)
-        }
-        
-        if (!session) {
-          // Sem sessão - deixar o middleware proteger o acesso (não redirecionar aqui para evitar loop)
-          console.log('⚠️ Sem sessão detectada - middleware irá proteger acesso')
-          setLoading(false)
-          return
-        }
-        
-        setUser({ ...session.user })
-        setLoading(false)
-        loadOcorrencias()
-      } catch (err) {
-        console.error('❌ Erro ao obter usuário:', err)
-        setLoading(false)
-        // Não redirecionar aqui - deixar o middleware proteger
-      }
-    }
-    getUser()
-  }, [router])
-
-  const loadOcorrencias = async () => {
-    try {
-      let query = supabase
-        .from("gf_assistance_requests")
-        .select(`
-          *,
-          trips(id, route_id),
-          routes(id, name),
-          vehicles!gf_assistance_requests_dispatched_vehicle_id_fkey(id, plate, model),
-          drivers:users!gf_assistance_requests_dispatched_driver_id_fkey(id, email)
-        `)
-        .order("created_at", { ascending: false })
-
-      if (filterStatus !== "all") {
-        query = query.eq("status", filterStatus)
-      }
-
-      const { data, error } = await query
-
-      if (error) throw error
-      setOcorrencias(data || [])
-    } catch (error) {
-      console.error("Erro ao carregar ocorrências:", error)
-    }
+  const handleResetFilters = () => {
+    setTempFilterStatus("all")
+    setFilterStatus("all")
+    setFiltersExpanded(false)
   }
 
   useEffect(() => {
-    if (user) {
+    if (user && !authLoading) {
       loadOcorrencias()
     }
-  }, [filterStatus, user])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, authLoading, filterStatus])
 
-  if (loading) {
+  const loadOcorrencias = async () => {
+    try {
+      setDataLoading(true)
+      // Usar API route para bypass RLS
+      const params = new URLSearchParams()
+      if (filterStatus !== "all") {
+        params.append('status', filterStatus)
+      }
+      
+      const response = await fetch(`/api/admin/assistance-requests-list?${params.toString()}`)
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+      const result = await response.json()
+      if (result.success) {
+        setOcorrencias(result.requests || [])
+      } else {
+        throw new Error(result.error || 'Erro ao carregar ocorrências')
+      }
+    } catch (error) {
+      console.error("Erro ao carregar ocorrências:", error)
+      setOcorrencias([])
+    } finally {
+      setDataLoading(false)
+    }
+  }
+
+  const handleDeleteOcorrencia = async (ocorrenciaId: string) => {
+    if (!confirm('Tem certeza que deseja excluir esta solicitação de socorro? Esta ação não pode ser desfeita.')) {
+      return
+    }
+
+    try {
+      const response = await fetch(`/api/admin/assistance-requests/delete?id=${ocorrenciaId}`, {
+        method: 'DELETE'
+      })
+      
+      const result = await response.json()
+      
+      if (!response.ok) {
+        const errorMessage = result.message || result.error || 'Erro ao excluir solicitação de socorro'
+        const errorDetails = result.details ? ` (${result.details})` : ''
+        throw new Error(`${errorMessage}${errorDetails}`)
+      }
+
+      if (result.success) {
+        notifySuccess('Solicitação de socorro excluída com sucesso')
+        await new Promise(resolve => setTimeout(resolve, 300))
+        await loadOcorrencias()
+      } else {
+        throw new Error(result.error || 'Erro ao excluir solicitação de socorro')
+      }
+    } catch (error: any) {
+      console.error('Erro ao excluir solicitação de socorro:', error)
+      const errorMessage = error.message || 'Erro desconhecido ao excluir solicitação de socorro'
+      notifyError(error, errorMessage)
+    }
+  }
+
+  if (authLoading || !user) {
     return <div className="min-h-screen flex items-center justify-center"><div className="w-16 h-16 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin mx-auto"></div></div>
   }
 
   return (
-    <AppShell user={{ id: user?.id || "", name: user?.name || "Admin", email: user?.email || "", role: "admin" }}>
+    <AppShell user={{ id: user.id, name: user.name || "Admin", email: user.email, role: user.role || "admin" }}>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
@@ -125,28 +125,79 @@ export default function SocorroPage() {
         </div>
 
         {/* Filtros */}
-        <div className="flex gap-4">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-            <Input
-              placeholder="Buscar ocorrências..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-          <select
-            className="px-3 py-2 rounded-lg border border-[var(--border)] bg-white text-sm"
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-          >
-            <option value="all">Todas</option>
-            <option value="open">Abertas</option>
-            <option value="dispatched">Despachadas</option>
-            <option value="resolved">Resolvidas</option>
-            <option value="cancelled">Canceladas</option>
-          </select>
-        </div>
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Filter className="h-5 w-5 text-[var(--brand)]" />
+                <CardTitle className="text-lg">Filtros</CardTitle>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setFiltersExpanded(!filtersExpanded)}
+                className="gap-2"
+              >
+                {filtersExpanded ? (
+                  <>
+                    <ChevronUp className="h-4 w-4" />
+                    Minimizar
+                  </>
+                ) : (
+                  <>
+                    <ChevronDown className="h-4 w-4" />
+                    Expandir
+                  </>
+                )}
+              </Button>
+            </div>
+          </CardHeader>
+          {filtersExpanded && (
+            <CardContent>
+              <div className="flex gap-4 mb-4">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                  <Input
+                    placeholder="Buscar ocorrências..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
+                <select
+                  className="px-3 py-2 rounded-lg border border-[var(--border)] bg-white text-sm"
+                  value={tempFilterStatus}
+                  onChange={(e) => setTempFilterStatus(e.target.value)}
+                >
+                  <option value="all">Todas</option>
+                  <option value="open">Abertas</option>
+                  <option value="dispatched">Despachadas</option>
+                  <option value="resolved">Resolvidas</option>
+                  <option value="cancelled">Canceladas</option>
+                </select>
+              </div>
+              <div className="flex items-center justify-end gap-2 pt-4 border-t border-[var(--border)]">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleResetFilters}
+                  className="gap-2"
+                >
+                  <X className="h-4 w-4" />
+                  Limpar
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={handleSaveFilters}
+                  className="gap-2"
+                >
+                  <Save className="h-4 w-4" />
+                  Salvar Filtros
+                </Button>
+              </div>
+            </CardContent>
+          )}
+        </Card>
 
         <div className="grid gap-4">
           {ocorrencias
@@ -216,6 +267,14 @@ export default function SocorroPage() {
                     </div>
                   </div>
                   <div className="flex flex-col gap-2">
+                    <Button 
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => handleDeleteOcorrencia(ocorrencia.id)}
+                    >
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      Excluir
+                    </Button>
                     {ocorrencia.status === 'open' && (
                       <Button 
                         variant="destructive"
@@ -303,4 +362,5 @@ export default function SocorroPage() {
     </AppShell>
   )
 }
+
 

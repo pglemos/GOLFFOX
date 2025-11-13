@@ -30,8 +30,9 @@ function sanitizeId(id: string | undefined | null): string | null {
  */
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { tripId: string } }
+  { params }: { params: Promise<{ tripId: string }> }
 ) {
+  const { tripId: tripIdParam } = await params
   try {
     // ✅ Validar autenticação (apenas admin)
     const authErrorResponse = await requireAuth(request, 'admin')
@@ -151,8 +152,9 @@ export async function PUT(
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { tripId: string } }
+  { params }: { params: Promise<{ tripId: string }> }
 ) {
+  const { tripId: tripIdParam } = await params
   try {
     // ✅ Validar autenticação (apenas admin)
     const authErrorResponse = await requireAuth(request, 'admin')
