@@ -80,7 +80,8 @@ export async function GET(request: NextRequest) {
     }
 
     // Paginação
-    query = query.order('scheduled_date', { ascending: false }).order('created_at', { ascending: false })
+    // Ordenar por scheduled_date apenas; alguns ambientes não possuem created_at em trips
+    query = query.order('scheduled_date', { ascending: false })
     query = query.range(offset, offset + limit - 1)
 
     const { data, error, count } = await query

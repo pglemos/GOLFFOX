@@ -17,7 +17,8 @@ import {
   CheckCircle, 
   User, 
   Download,
-  XCircle
+  XCircle,
+  Trash2
 } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"

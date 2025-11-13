@@ -40,7 +40,7 @@ export async function PUT(
       return authErrorResponse
     }
 
-    const tripId = sanitizeId(params?.tripId)
+    const tripId = sanitizeId(tripIdParam)
     if (!tripId) {
       return NextResponse.json(
         { error: 'trip_id é obrigatório' },
@@ -162,7 +162,7 @@ export async function DELETE(
       return authErrorResponse
     }
 
-    const tripId = sanitizeId(params?.tripId)
+    const tripId = sanitizeId(tripIdParam)
     if (!tripId) {
       return NextResponse.json(
         { error: 'trip_id é obrigatório' },
