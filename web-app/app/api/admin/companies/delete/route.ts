@@ -24,8 +24,19 @@ export async function DELETE(request: NextRequest) {
       console.warn('⚠️ Autenticação falhou em desenvolvimento, mas continuando...')
     }
 
+    // Aceitar tanto query param quanto body
     const { searchParams } = new URL(request.url)
-    const companyId = searchParams.get('id')
+    let companyId = searchParams.get('id')
+    
+    // Se não estiver na query, tentar no body
+    if (!companyId) {
+      try {
+        const body = await request.json()
+        companyId = body.id || body.company_id
+      } catch (e) {
+        // Body vazio ou inválido, continuar com null
+      }
+    }
 
     if (!companyId) {
       return NextResponse.json(

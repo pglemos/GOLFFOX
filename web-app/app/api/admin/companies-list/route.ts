@@ -42,10 +42,8 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    return NextResponse.json({
-      success: true,
-      companies: data || []
-    })
+    // Retornar array diretamente para compatibilidade
+    return NextResponse.json(data || [])
   } catch (error: any) {
     console.error('Erro ao listar empresas:', error)
     return NextResponse.json(

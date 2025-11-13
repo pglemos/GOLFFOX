@@ -41,10 +41,8 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    return NextResponse.json({
-      success: true,
-      vehicles: data || []
-    })
+    // Retornar array diretamente para compatibilidade
+    return NextResponse.json(data || [])
   } catch (error: any) {
     console.error('Erro ao listar veículos:', error)
     return NextResponse.json(
