@@ -8,10 +8,12 @@ import { Briefcase, Plus, Users, UserPlus, Trash2 } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 import { CreateOperatorModal } from "@/components/modals/create-operator-modal"
-import { AssociateOperatorModal } from "@/components/modals/associate-operator-modal"
+import { CompanyOperatorsModal } from "@/components/modals/company-operators-modal"
 import { useAuthFast } from "@/hooks/use-auth-fast"
 import { useGlobalSync } from "@/hooks/use-global-sync"
 import { notifySuccess, notifyError } from "@/lib/toast"
+import { EditCompanyModal } from "@/components/modals/edit-company-modal"
+import { Edit } from "lucide-react"
 
 export default function EmpresasPage() {
   const router = useRouter()
@@ -20,7 +22,10 @@ export default function EmpresasPage() {
   const [funcionarios, setFuncionarios] = useState<any[]>([])
   const [isCreateOperatorModalOpen, setIsCreateOperatorModalOpen] = useState(false)
   const [isAssociateModalOpen, setIsAssociateModalOpen] = useState(false)
-  const [selectedCompanyForAssociation, setSelectedCompanyForAssociation] = useState<{ id: string; name: string } | null>(null)
+  const [selectedCompanyForOperators, setSelectedCompanyForOperators] = useState<{ id: string; name: string } | null>(null)
+  const [isOperatorsModalOpen, setIsOperatorsModalOpen] = useState(false)
+  const [selectedCompanyForEdit, setSelectedCompanyForEdit] = useState<any>(null)
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
 
   // Usar API route para carregar empresas (bypass RLS com service role)
   const [empresas, setEmpresas] = useState<any[]>([])
@@ -145,7 +150,7 @@ export default function EmpresasPage() {
           </div>
           <Button onClick={() => setIsCreateOperatorModalOpen(true)}>
             <Plus className="h-4 w-4 mr-2" />
-            Criar Operador
+            Criar Empresa
           </Button>
         </div>
 
@@ -166,7 +171,7 @@ export default function EmpresasPage() {
           <Card className="p-8 text-center">
             <Briefcase className="h-12 w-12 text-[var(--muted)] mx-auto mb-4" />
             <h3 className="text-lg font-semibold mb-2">Nenhuma empresa cadastrada</h3>
-            <p className="text-[var(--muted)] mb-4">Clique em "Criar Operador" para criar uma nova empresa e operador.</p>
+            <p className="text-[var(--muted)] mb-4">Clique em "Criar Empresa" para criar uma nova empresa e operador.</p>
           </Card>
         )}
 
@@ -187,12 +192,25 @@ export default function EmpresasPage() {
                     size="sm"
                     onClick={(e) => {
                       e.stopPropagation()
-                      setSelectedCompanyForAssociation({ id: empresa.id, name: empresa.name })
-                      setIsAssociateModalOpen(true)
+                      console.log('Abrindo modal de edição para empresa:', empresa)
+                      setSelectedCompanyForEdit(empresa)
+                      setIsEditModalOpen(true)
+                    }}
+                  >
+                    <Edit className="h-4 w-4 mr-2" />
+                    Editar
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setSelectedCompanyForOperators({ id: empresa.id, name: empresa.name })
+                      setIsOperatorsModalOpen(true)
                     }}
                   >
                     <UserPlus className="h-4 w-4 mr-2" />
-                    Associar Operador
+                    Usuário Operador
                   </Button>
                   <Button 
                     variant="outline" 
@@ -251,22 +269,35 @@ export default function EmpresasPage() {
           }}
         />
 
-        {/* Modal Associar Operador */}
-        {selectedCompanyForAssociation && (
-          <AssociateOperatorModal
-            isOpen={isAssociateModalOpen}
+        {/* Modal Usuários Operadores */}
+        {selectedCompanyForOperators && (
+          <CompanyOperatorsModal
+            company={selectedCompanyForOperators}
+            isOpen={isOperatorsModalOpen}
             onClose={() => {
-              setIsAssociateModalOpen(false)
-              setSelectedCompanyForAssociation(null)
+              setIsOperatorsModalOpen(false)
+              setSelectedCompanyForOperators(null)
             }}
-            onSave={() => {
-              setIsAssociateModalOpen(false)
-              setSelectedCompanyForAssociation(null)
+            onSave={async () => {
+              await refetchEmpresas()
             }}
-            companyId={selectedCompanyForAssociation.id}
-            companyName={selectedCompanyForAssociation.name}
           />
         )}
+
+        {/* Modal Editar Empresa */}
+        <EditCompanyModal
+          company={selectedCompanyForEdit}
+          isOpen={isEditModalOpen}
+          onClose={() => {
+            setIsEditModalOpen(false)
+            setSelectedCompanyForEdit(null)
+          }}
+          onSave={async () => {
+            setIsEditModalOpen(false)
+            setSelectedCompanyForEdit(null)
+            await refetchEmpresas()
+          }}
+        />
       </div>
     </AppShell>
   )

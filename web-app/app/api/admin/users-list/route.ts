@@ -28,6 +28,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const role = searchParams.get('role')
     const status = searchParams.get('status')
+    const companyId = searchParams.get('company_id')
     
     let query = supabaseAdmin
       .from('users')
@@ -40,6 +41,10 @@ export async function GET(request: NextRequest) {
 
     if (status && status !== 'all') {
       query = query.eq('is_active', status === 'active')
+    }
+
+    if (companyId) {
+      query = query.eq('company_id', companyId)
     }
 
     const { data, error } = await query

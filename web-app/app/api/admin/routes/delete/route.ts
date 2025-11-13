@@ -36,42 +36,124 @@ export async function DELETE(request: NextRequest) {
 
     const supabaseAdmin = getSupabaseAdmin()
 
-    console.log(`🗑️ Tentando excluir rota: ${routeId}`)
+    console.log(`🗑️ Tentando excluir rota permanentemente: ${routeId}`)
 
-    // Verificar se existem trips vinculadas à rota
-    const { count: tripsCount, error: tripsCountError } = await supabaseAdmin
+    // Primeiro, buscar todos os trips relacionados para excluir dependências
+    const { data: trips, error: tripsFetchError } = await supabaseAdmin
       .from('trips')
-      .select('id', { head: true, count: 'exact' })
+      .select('id')
       .eq('route_id', routeId)
 
-    if (tripsCountError) {
-      console.error('❌ Erro ao verificar viagens vinculadas à rota:', tripsCountError)
+    if (tripsFetchError) {
+      console.error('❌ Erro ao buscar trips da rota:', tripsFetchError)
       return NextResponse.json(
-        { error: 'Erro ao verificar viagens vinculadas', message: tripsCountError.message },
+        { error: 'Erro ao buscar viagens da rota', message: tripsFetchError.message },
         { status: 500 }
       )
     }
 
-    if ((tripsCount ?? 0) > 0) {
-      // Se houver trips, arquivar rota (marcar como inativa) em vez de excluir
-      const { error: archiveError } = await supabaseAdmin
-        .from('routes')
-        .update({ is_active: false })
-        .eq('id', routeId)
+    const tripIds = trips?.map(t => t.id) || []
 
-      if (archiveError) {
-        console.error('❌ Erro ao arquivar rota com trips vinculadas:', archiveError)
+    if (tripIds.length > 0) {
+      console.log(`⚠️ Encontrados ${tripIds.length} trip(s) vinculado(s) à rota. Excluindo dependências...`)
+
+      // ORDEM CRÍTICA DE EXCLUSÃO (para evitar triggers que atualizam trip_summary):
+      // 1. trip_summary PRIMEIRO (antes de qualquer trigger ser disparado)
+      console.log('   1. Excluindo trip_summary (primeiro para evitar constraint violation)...')
+      const { error: tripSummaryError } = await supabaseAdmin
+        .from('trip_summary')
+        .delete()
+        .in('trip_id', tripIds)
+
+      if (tripSummaryError) {
+        // Se a tabela não existir, continuar (código 42P01 = tabela não existe)
+        if (tripSummaryError.code === '42P01') {
+          console.log('   ⚠️ Tabela trip_summary não existe (OK)')
+        } else {
+          console.error('❌ Erro ao excluir trip_summary:', tripSummaryError)
+          return NextResponse.json(
+            { error: 'Erro ao excluir resumos de viagens', message: tripSummaryError.message },
+            { status: 500 }
+          )
+        }
+      } else {
+        console.log('   ✅ Trip_summary excluído')
+      }
+
+      // 2. Excluir driver_positions
+      // NOTA: O trigger trg_driver_positions_recalc_summary tentará chamar calculate_trip_summary()
+      // que faz INSERT/UPDATE em trip_summary. Como trip_summary já foi excluído acima,
+      // o trigger pode falhar, mas não deve bloquear a exclusão se tratarmos o erro corretamente
+      console.log('   2. Excluindo driver_positions...')
+      const { error: positionsError } = await supabaseAdmin
+        .from('driver_positions')
+        .delete()
+        .in('trip_id', tripIds)
+
+      // Ignorar erros relacionados a trip_summary (trigger tentará atualizar mas já foi excluído)
+      if (positionsError) {
+        if (positionsError.code === '42P01' || positionsError.code === '42703') {
+          // Tabela não existe ou coluna não existe - OK
+          console.log('   ⚠️ Tabela/coluna não existe (OK)')
+        } else if (positionsError.message?.includes('trip_summary') || positionsError.code === '23503') {
+          // Erro de constraint relacionado a trip_summary - esperado, continuar
+          console.log('   ⚠️ Trigger tentou atualizar trip_summary (já excluído) - continuando...')
+        } else {
+          // Outro erro - logar mas continuar
+          console.log(`   ⚠️ Aviso ao excluir driver_positions: ${positionsError.message}`)
+        }
+      } else {
+        console.log('   ✅ Driver_positions excluído')
+      }
+
+      // 3. Outras dependências de trips
+      console.log('   3. Excluindo outras dependências de trips...')
+      const dependentTables = [
+        'trip_events',
+        'trip_passengers',
+        'checklists',
+        'passenger_reports',
+        'chat_messages'
+      ]
+
+      for (const table of dependentTables) {
+        const { error: depError } = await supabaseAdmin
+          .from(table)
+          .delete()
+          .in('trip_id', tripIds)
+
+        if (depError) {
+          // Se a tabela não existir ou não tiver a coluna, continuar
+          if (depError.code !== '42P01' && depError.code !== '42703') {
+            console.error(`❌ Erro ao excluir ${table}:`, depError)
+            return NextResponse.json(
+              { error: `Erro ao excluir ${table}`, message: depError.message },
+              { status: 500 }
+            )
+          }
+        }
+      }
+      console.log('   ✅ Outras dependências excluídas')
+
+      // 4. Agora excluir os trips (todas as dependências já foram excluídas)
+      console.log('   4. Excluindo trips...')
+      const { error: tripsDeleteError } = await supabaseAdmin
+        .from('trips')
+        .delete()
+        .eq('route_id', routeId)
+
+      if (tripsDeleteError) {
+        console.error('❌ Erro ao excluir viagens da rota:', tripsDeleteError)
         return NextResponse.json(
-          { error: 'Erro ao arquivar rota', message: archiveError.message, tripsCount },
+          { error: 'Erro ao excluir viagens da rota', message: tripsDeleteError.message },
           { status: 500 }
         )
       }
 
-      console.log(`🚩 Rota arquivada por possuir ${tripsCount} viagem(ns) vinculada(s): ${routeId}`)
-      return NextResponse.json({ success: true, archived: true, tripsCount }, { status: 200 })
+      console.log(`✅ ${tripIds.length} trip(s) e suas dependências excluídos com sucesso`)
     }
 
-    // Primeiro, excluir explicitamente paradas da rota (route_stops)
+    // Segundo, excluir explicitamente paradas da rota (route_stops)
     const { error: stopsDeleteError } = await supabaseAdmin
       .from('route_stops')
       .delete()
@@ -85,21 +167,7 @@ export async function DELETE(request: NextRequest) {
       )
     }
 
-    // Excluir trips relacionadas (por segurança, embora não deva existir aqui)
-    const { error: tripsDeleteError } = await supabaseAdmin
-      .from('trips')
-      .delete()
-      .eq('route_id', routeId)
-
-    if (tripsDeleteError) {
-      console.error('❌ Erro ao excluir viagens da rota:', tripsDeleteError)
-      return NextResponse.json(
-        { error: 'Erro ao excluir viagens da rota', message: tripsDeleteError.message },
-        { status: 500 }
-      )
-    }
-
-    // Excluir permanentemente a rota
+    // Terceiro, excluir permanentemente a rota
     const { data, error } = await supabaseAdmin
       .from('routes')
       .delete()

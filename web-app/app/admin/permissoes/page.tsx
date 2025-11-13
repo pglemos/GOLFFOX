@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation"
 import { Input } from "@/components/ui/input"
 import { ChangeRoleModal } from "@/components/modals/change-role-modal"
 import { notifySuccess, notifyError } from "@/lib/toast"
+import { EditUserModal } from "@/components/modals/edit-user-modal"
 import {
   Select,
   SelectContent,
@@ -47,6 +48,8 @@ export default function PermissoesPage() {
   }
   const [selectedUserForRoleChange, setSelectedUserForRoleChange] = useState<any>(null)
   const [isChangeRoleModalOpen, setIsChangeRoleModalOpen] = useState(false)
+  const [selectedUserForEdit, setSelectedUserForEdit] = useState<any>(null)
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
 
   // Filtrar usuários baseado na busca
   const filteredUsers = usuarios.filter((usuario) => {
@@ -261,6 +264,17 @@ export default function PermissoesPage() {
                             variant="outline"
                             size="sm"
                             onClick={() => {
+                              setSelectedUserForEdit(usuario)
+                              setIsEditModalOpen(true)
+                            }}
+                          >
+                            <Edit className="h-4 w-4 mr-2" />
+                            Editar
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
                               setSelectedUserForRoleChange(usuario)
                               setIsChangeRoleModalOpen(true)
                             }}
@@ -298,6 +312,21 @@ export default function PermissoesPage() {
             onSave={loadUsuarios}
           />
         )}
+
+        {/* Modal Editar Usuário */}
+        <EditUserModal
+          user={selectedUserForEdit}
+          isOpen={isEditModalOpen}
+          onClose={() => {
+            setIsEditModalOpen(false)
+            setSelectedUserForEdit(null)
+          }}
+          onSave={async () => {
+            setIsEditModalOpen(false)
+            setSelectedUserForEdit(null)
+            await loadUsuarios()
+          }}
+        />
       </div>
     </AppShell>
   )

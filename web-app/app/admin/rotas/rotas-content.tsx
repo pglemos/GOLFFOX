@@ -97,12 +97,7 @@ export function RotasPageContent() {
       }
 
       if (result.success) {
-        if (result.archived) {
-          const countMsg = typeof result.tripsCount === 'number' ? ` (${result.tripsCount} viagem(ns))` : ''
-          notifySuccess(`Rota arquivada porque possui viagens vinculadas${countMsg}`)
-        } else {
-          notifySuccess('Rota excluída com sucesso')
-        }
+        notifySuccess('Rota excluída permanentemente com sucesso')
         await new Promise(resolve => setTimeout(resolve, 300))
         await loadRotas()
       } else {
