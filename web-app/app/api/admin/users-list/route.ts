@@ -52,17 +52,20 @@ export async function GET(request: NextRequest) {
     if (error) {
       console.error('Erro ao buscar usuários:', error)
       return NextResponse.json(
-        { error: 'Erro ao buscar usuários', message: error.message },
+        { success: false, error: 'Erro ao buscar usuários', message: error.message },
         { status: 500 }
       )
     }
 
-    // Retornar array diretamente para compatibilidade
-    return NextResponse.json(data || [])
+    // Retornar no formato esperado pelo frontend
+    return NextResponse.json({
+      success: true,
+      users: data || []
+    })
   } catch (error: any) {
     console.error('Erro ao listar usuários:', error)
     return NextResponse.json(
-      { error: 'Erro ao listar usuários', message: error.message },
+      { success: false, error: 'Erro ao listar usuários', message: error.message },
       { status: 500 }
     )
   }

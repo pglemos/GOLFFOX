@@ -13,7 +13,16 @@ function getSupabaseAdmin() {
   return createClient(url, serviceKey)
 }
 
+// Aceitar tanto DELETE quanto POST para compatibilidade
 export async function DELETE(request: NextRequest) {
+  return handleDelete(request)
+}
+
+export async function POST(request: NextRequest) {
+  return handleDelete(request)
+}
+
+async function handleDelete(request: NextRequest) {
   try {
     const isDevelopment = process.env.NODE_ENV === 'development'
     const authErrorResponse = await requireAuth(request, 'admin')
@@ -27,6 +36,16 @@ export async function DELETE(request: NextRequest) {
     // Aceitar tanto query param quanto body
     const { searchParams } = new URL(request.url)
     let companyId = searchParams.get('id')
+    
+    // Se não estiver na query, tentar no body
+    if (!companyId) {
+      try {
+        const body = await request.json()
+        companyId = body.id || body.company_id
+      } catch (e) {
+        // Body vazio ou inválido, continuar com null
+      }
+    }
     
     // Se não estiver na query, tentar no body
     if (!companyId) {

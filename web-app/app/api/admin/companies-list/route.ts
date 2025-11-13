@@ -28,26 +28,41 @@ export async function GET(request: NextRequest) {
 
     const supabaseAdmin = getSupabaseAdmin()
     
-    const { data, error } = await supabaseAdmin
+    // Buscar empresas - tentar com filtro is_active, se falhar buscar todas
+    let { data, error } = await supabaseAdmin
       .from('companies')
       .select('*')
-      .eq('is_active', true) // Filtrar apenas empresas ativas
+      .eq('is_active', true)
       .order('created_at', { ascending: false })
+    
+    // Se houver erro relacionado a coluna is_active ou created_at, tentar sem filtro/ordenação
+    if (error && (error.message?.includes('is_active') || error.message?.includes('created_at') || error.message?.includes('column'))) {
+      console.warn('Coluna is_active ou created_at não encontrada, buscando todas as empresas sem filtro')
+      const result = await supabaseAdmin
+        .from('companies')
+        .select('*')
+      
+      data = result.data
+      error = result.error
+    }
 
     if (error) {
       console.error('Erro ao buscar empresas:', error)
       return NextResponse.json(
-        { error: 'Erro ao buscar empresas', message: error.message },
+        { success: false, error: 'Erro ao buscar empresas', message: error.message },
         { status: 500 }
       )
     }
 
-    // Retornar array diretamente para compatibilidade
-    return NextResponse.json(data || [])
+    // Retornar no formato esperado pelo frontend
+    return NextResponse.json({
+      success: true,
+      companies: data || []
+    })
   } catch (error: any) {
     console.error('Erro ao listar empresas:', error)
     return NextResponse.json(
-      { error: 'Erro ao listar empresas', message: error.message },
+      { success: false, error: 'Erro ao listar empresas', message: error.message },
       { status: 500 }
     )
   }

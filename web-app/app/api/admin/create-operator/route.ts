@@ -239,6 +239,7 @@ export async function POST(request: NextRequest) {
     if (!shouldCreateUser) {
       return NextResponse.json({
         success: true,
+        companyId: company.id,
         company,
         message: 'Empresa criada com sucesso. O login do operador pode ser criado posteriormente através do botão "Usuário Operador".'
       }, { status: 201 })
