@@ -59,19 +59,16 @@ export function CreateOperatorModal({
     setLoading(true)
 
     try {
-      // Validações
+      // Validações - apenas nome da empresa é obrigatório
       if (!formData.companyName.trim()) {
         notifyError(new Error('Nome da empresa é obrigatório'), 'Nome da empresa é obrigatório')
         setLoading(false)
         return
       }
-      if (!formData.responsibleEmail.trim() || !validateEmail(formData.responsibleEmail)) {
-        notifyError(new Error('Email do responsável é obrigatório'), 'Email válido do responsável é obrigatório')
-        setLoading(false)
-        return
-      }
-      if (!formData.responsibleName.trim()) {
-        notifyError(new Error('Nome do responsável é obrigatório'), 'Nome do responsável é obrigatório')
+      
+      // Validar email apenas se fornecido (opcional)
+      if (formData.responsibleEmail.trim() && !validateEmail(formData.responsibleEmail)) {
+        notifyError(new Error('Email inválido'), 'Email do responsável inválido')
         setLoading(false)
         return
       }
@@ -135,24 +132,34 @@ export function CreateOperatorModal({
         formData.zipCode ? `CEP: ${formData.zipCode}` : ''
       ].filter(Boolean).join(', ')
 
+      // Preparar dados do responsável (opcionais - apenas se fornecidos)
+      const requestBody: any = {
+        // Dados da Empresa
+        companyName: formData.companyName,
+        cnpj: formData.cnpj || null,
+        address: fullAddress || formData.address || null,
+        city: formData.city || null,
+        state: formData.state || null,
+        zipCode: formData.zipCode || null,
+        companyPhone: formData.companyPhone || null,
+        companyEmail: formData.companyEmail || null,
+      }
+      
+      // Adicionar dados do responsável apenas se fornecidos (opcional)
+      if (formData.responsibleEmail.trim()) {
+        requestBody.operatorEmail = formData.responsibleEmail
+      }
+      if (formData.responsiblePhone?.trim()) {
+        requestBody.operatorPhone = formData.responsiblePhone
+      }
+      if (formData.responsibleName.trim()) {
+        requestBody.operatorName = formData.responsibleName
+      }
+
       const response = await fetch('/api/admin/create-operator', {
         method: 'POST',
         headers,
-        body: JSON.stringify({
-          // Dados da Empresa
-          companyName: formData.companyName,
-          cnpj: formData.cnpj || null,
-          address: fullAddress || formData.address || null,
-          city: formData.city || null,
-          state: formData.state || null,
-          zipCode: formData.zipCode || null,
-          companyPhone: formData.companyPhone || null,
-          companyEmail: formData.companyEmail || null,
-          // Dados do Responsável (operador)
-          operatorEmail: formData.responsibleEmail,
-          operatorPhone: formData.responsiblePhone || null,
-          operatorName: formData.responsibleName,
-        }),
+        body: JSON.stringify(requestBody),
       })
 
       if (!response.ok) {
@@ -183,10 +190,11 @@ export function CreateOperatorModal({
       if (result.company) {
         globalSyncManager.triggerSync('company.created', result.company)
       }
+      // Sincronizar usuário apenas se foi criado (quando há senha)
       if (result.operator || result.userId) {
         globalSyncManager.triggerSync('user.created', {
           id: result.userId || result.operatorId,
-          email: formData.responsibleEmail,
+          email: result.email || formData.responsibleEmail || '',
           role: 'operator',
           company_id: result.companyId
         })
@@ -234,7 +242,7 @@ export function CreateOperatorModal({
             Criar Empresa
           </DialogTitle>
           <DialogDescription>
-            Preencha os dados da empresa e do responsável. O login do operador pode ser criado posteriormente através do botão "Usuário Operador".
+            Preencha os dados da empresa. Os operadores podem ser criados posteriormente através do botão "Usuário Operador" na lista de empresas.
           </DialogDescription>
         </DialogHeader>
 
@@ -381,40 +389,38 @@ export function CreateOperatorModal({
               </div>
             </div>
 
-            {/* Seção: Dados do Responsável */}
-            <div className="space-y-4 pt-4">
+            {/* Seção: Dados do Responsável (Opcional) */}
+            <div className="space-y-4 pt-4 border-t">
               <h3 className="font-semibold text-lg flex items-center gap-2">
                 <UserPlus className="h-5 w-5" />
-                Dados do Responsável
+                Dados do Responsável (Opcional)
               </h3>
+              <p className="text-sm text-[var(--ink-muted)] mb-4">
+                Você pode preencher os dados do responsável agora ou criar os operadores depois através do botão "Usuário Operador" na lista de empresas.
+              </p>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2 md:col-span-2">
-                  <Label htmlFor="responsibleName">Nome do Responsável *</Label>
+                  <Label htmlFor="responsibleName">Nome do Responsável</Label>
                   <Input
                     id="responsibleName"
                     value={formData.responsibleName}
                     onChange={(e) => setFormData({ ...formData, responsibleName: e.target.value })}
-                    placeholder="Nome completo do responsável"
-                    required
+                    placeholder="Nome completo do responsável (opcional)"
                     disabled={loading}
                   />
                 </div>
 
                 <div className="space-y-2 md:col-span-2">
-                  <Label htmlFor="responsibleEmail">Email do Responsável *</Label>
+                  <Label htmlFor="responsibleEmail">Email do Responsável</Label>
                   <Input
                     id="responsibleEmail"
                     type="email"
                     value={formData.responsibleEmail}
                     onChange={(e) => setFormData({ ...formData, responsibleEmail: e.target.value })}
-                    placeholder="responsavel@empresa.com"
-                    required
+                    placeholder="responsavel@empresa.com (opcional)"
                     disabled={loading}
                   />
-                  <p className="text-xs text-[var(--ink-muted)]">
-                    O login do operador pode ser criado posteriormente através do botão "Usuário Operador"
-                  </p>
                 </div>
 
                 <div className="space-y-2">
@@ -424,7 +430,7 @@ export function CreateOperatorModal({
                     type="tel"
                     value={formData.responsiblePhone}
                     onChange={(e) => setFormData({ ...formData, responsiblePhone: e.target.value })}
-                    placeholder="(00) 00000-0000"
+                    placeholder="(00) 00000-0000 (opcional)"
                     disabled={loading}
                   />
                 </div>

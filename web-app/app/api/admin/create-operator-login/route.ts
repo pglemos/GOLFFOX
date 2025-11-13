@@ -148,7 +148,10 @@ export async function POST(request: NextRequest) {
         let createResult = await supabaseAdmin.auth.admin.createUser({
           email: sanitizedEmail,
           password: sanitizedPassword,
-          email_confirm: true
+          email_confirm: true,
+          user_metadata: {
+            name: sanitizedName
+          }
         })
         
         // Se falhar com "Database error", pode ser problema de trigger
@@ -156,36 +159,50 @@ export async function POST(request: NextRequest) {
         if (createResult.error && createResult.error.message?.includes('Database error')) {
           console.warn('⚠️ Erro de banco detectado, tentando abordagem alternativa...')
           
-          // Tentar criar sem email_confirm
+          // Tentar criar sem email_confirm e sem metadata
           createResult = await supabaseAdmin.auth.admin.createUser({
             email: sanitizedEmail,
             password: sanitizedPassword
           })
           
-          // Se ainda falhar, pode ser problema de trigger/função no banco
+          // Se ainda falhar, tentar criar o usuário de forma mais básica possível
           if (createResult.error && createResult.error.message?.includes('Database error')) {
-            console.error('❌ Erro persistente de banco. Isso geralmente indica:')
-            console.error('   1. Trigger ou função no banco que está falhando')
-            console.error('   2. Constraint ou validação que está bloqueando')
-            console.error('   3. Problema na configuração do Supabase Auth')
+            console.warn('⚠️ Erro persistente, tentando criar usuário sem confirmação de email...')
             
-            // Retornar erro mais descritivo
-            return NextResponse.json(
-              { 
-                error: 'Erro ao criar usuário no sistema de autenticação',
-                message: 'Ocorreu um erro no banco de dados ao criar o usuário. Verifique se há triggers ou funções no banco que possam estar causando o problema.',
-                details: process.env.NODE_ENV === 'development' ? {
-                  originalError: createResult.error.message,
-                  suggestion: 'Verifique os logs do Supabase e as funções/triggers relacionadas a auth.users'
-                } : undefined
-              },
-              { status: 500 }
-            )
+            // Última tentativa: criar sem nenhuma opção adicional
+            try {
+              createResult = await supabaseAdmin.auth.admin.createUser({
+                email: sanitizedEmail,
+                password: sanitizedPassword,
+                email_confirm: false
+              })
+            } catch (e) {
+              // Se ainda falhar, vamos tentar continuar e criar o perfil manualmente
+              console.warn('⚠️ Erro ao criar no auth, mas vamos tentar criar perfil manualmente')
+            }
           }
         }
         
         authData = createResult.data
         createUserError = createResult.error
+        
+        // Se houver erro mas o usuário foi criado mesmo assim (pode acontecer com Database error)
+        if (createUserError && !authData?.user) {
+          // Verificar se o usuário foi criado mesmo com erro
+          console.log('   Verificando se usuário foi criado apesar do erro...')
+          try {
+            const { data: authUsers } = await supabaseAdmin.auth.admin.listUsers()
+            const foundUser = authUsers?.users?.find((u: any) => u.email?.toLowerCase() === sanitizedEmail)
+            
+            if (foundUser) {
+              console.log('   ✅ Usuário encontrado apesar do erro, usando existente')
+              authData = { user: foundUser }
+              createUserError = null
+            }
+          } catch (listErr) {
+            console.warn('   ⚠️ Não foi possível verificar usuários:', listErr)
+          }
+        }
         
         if (createUserError) {
           console.error('❌ Erro ao criar usuário:', {
@@ -300,26 +317,63 @@ export async function POST(request: NextRequest) {
         }
       }
       
-      // Outros erros
-      const detailedMessage = createUserError.message || 'Erro desconhecido ao criar usuário'
-      console.error('❌ Erro detalhado:', {
-        message: detailedMessage,
-        status: createUserError.status,
-        code: (createUserError as any).code
-      })
+      // Se o erro for "Database error", pode ser que o usuário foi criado mas o trigger falhou
+      // Vamos verificar se o usuário existe e tentar criar o perfil mesmo assim
+      if (createUserError.message?.includes('Database error')) {
+        console.warn('⚠️ Erro de banco detectado, verificando se usuário foi criado...')
+        try {
+          const { data: authUsers } = await supabaseAdmin.auth.admin.listUsers()
+          const foundUser = authUsers?.users?.find((u: any) => u.email?.toLowerCase() === sanitizedEmail)
+          
+          if (foundUser) {
+            console.log('   ✅ Usuário encontrado apesar do erro de banco, continuando...')
+            authData = { user: foundUser }
+            createUserError = null
+          } else {
+            // Usuário não foi criado, retornar erro
+            const detailedMessage = createUserError.message || 'Erro desconhecido ao criar usuário'
+            console.error('❌ Usuário não foi criado:', detailedMessage)
+            return NextResponse.json(
+              { 
+                error: 'Erro ao criar usuário no sistema de autenticação', 
+                message: 'Ocorreu um erro no banco de dados. O usuário não foi criado. Verifique os logs do Supabase para mais detalhes.',
+                details: process.env.NODE_ENV === 'development' ? {
+                  originalError: detailedMessage,
+                  code: (createUserError as any).code,
+                  status: createUserError.status,
+                  suggestion: 'Verifique se há triggers ou funções no banco que possam estar causando o problema'
+                } : undefined
+              },
+              { status: 500 }
+            )
+          }
+        } catch (checkError) {
+          console.error('❌ Erro ao verificar usuário:', checkError)
+        }
+      }
       
-      return NextResponse.json(
-        { 
-          error: 'Erro ao criar usuário no sistema de autenticação', 
+      // Se ainda houver erro e não foi resolvido acima
+      if (createUserError) {
+        const detailedMessage = createUserError.message || 'Erro desconhecido ao criar usuário'
+        console.error('❌ Erro detalhado:', {
           message: detailedMessage,
-          details: process.env.NODE_ENV === 'development' ? {
-            error: createUserError,
-            code: (createUserError as any).code,
-            status: createUserError.status
-          } : undefined
-        },
-        { status: 500 }
-      )
+          status: createUserError.status,
+          code: (createUserError as any).code
+        })
+        
+        return NextResponse.json(
+          { 
+            error: 'Erro ao criar usuário no sistema de autenticação', 
+            message: detailedMessage,
+            details: process.env.NODE_ENV === 'development' ? {
+              error: createUserError,
+              code: (createUserError as any).code,
+              status: createUserError.status
+            } : undefined
+          },
+          { status: 500 }
+        )
+      }
     }
 
     if (!authData?.user) {
