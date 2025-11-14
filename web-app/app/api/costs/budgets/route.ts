@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabaseServiceRole } from '@/lib/supabase-server'
 import { requireCompanyAccess, requireAuth, validateAuth } from '@/lib/api-auth'
 import { z } from 'zod'
+import { withRateLimit } from '@/lib/rate-limit'
 
 const budgetSchema = z.object({
   company_id: z.string().uuid(),
@@ -12,7 +13,7 @@ const budgetSchema = z.object({
   notes: z.string().optional().nullable()
 })
 
-export async function GET(request: NextRequest) {
+async function getBudgetsHandler(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams
     const companyId = searchParams.get('company_id')
@@ -107,7 +108,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-export async function POST(request: NextRequest) {
+async function createOrUpdateBudgetHandler(request: NextRequest) {
   try {
     const body = await request.json()
     
@@ -256,7 +257,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function DELETE(request: NextRequest) {
+async function deleteBudgetHandler(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams
     const budgetId = searchParams.get('id')
@@ -310,4 +311,8 @@ export async function DELETE(request: NextRequest) {
     )
   }
 }
+
+export const GET = withRateLimit(getBudgetsHandler, 'api')
+export const POST = withRateLimit(createOrUpdateBudgetHandler, 'sensitive')
+export const DELETE = withRateLimit(deleteBudgetHandler, 'sensitive')
 
