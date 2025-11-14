@@ -1,5 +1,11 @@
 # Auditoria Técnica Completa – Golf Fox (SaaS de Fretamento Corporativo)
 
+## Resumo da Implementação (Rodada Atual)
+- Correção de segurança no login API: cookie `golffox-session` agora é `httpOnly`, `secure`, `sameSite=lax` e com payload mínimo (id, role, companyId).
+- Relatórios: adicionado rate limiting e paginação com seleção explícita de colunas em `web-app/app/api/reports/run/route.ts`.
+- Documentação criada: `docs/ARQUITETURA_ATUAL.md` e `docs/GUIA_MIGRACAO_REPERTORIO.md` com estrutura alvo, convenções e mapeamento de migração.
+- Branch de refatoração criada e publicada: `refactor/repositorio-organizado`.
+
 ## Visão Geral do Sistema
 - Plataforma multi-tenant que conecta Empresa Contratante, Transportadora, Motorista e Passageiro, com operação central pela Golf Fox (operadora master).
 - Escopo funcional (documento “Visão Geral e Escopo”): planejamento de rotas, check-in/out de passageiros (NFC/QR/manual), rastreamento GPS em tempo real, gestão de frota/motoristas/custos/manutenções/incident es, relatórios operacionais e financeiros para todos os perfis.
