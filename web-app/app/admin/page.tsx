@@ -34,7 +34,6 @@ import {
 } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
-import Link from "next/link"
 import { motion } from "framer-motion"
 import { staggerContainer, listItem } from "@/lib/animations"
 import { formatCount, formatRelativeTime } from "@/lib/kpi-utils"
@@ -366,7 +365,7 @@ export default function AdminDashboard() {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.5 }}
           >
-            <Link href="/admin/mapa" className="block h-full">
+            <a href="/admin/mapa" className="block h-full">
               <Card hover className="card-glass cursor-pointer h-full overflow-hidden">
                 <CardHeader className="pb-4">
                   <div className="flex items-start justify-between">
@@ -385,7 +384,7 @@ export default function AdminDashboard() {
                   </div>
                 </CardContent>
               </Card>
-            </Link>
+            </a>
           </motion.div>
 
           {/* Notificações Recentes */}
@@ -402,9 +401,9 @@ export default function AdminDashboard() {
                     <p className="text-sm text-[var(--ink-muted)] line-clamp-2">Últimas atualizações do sistema</p>
                   </div>
                   <Button variant="ghost" size="sm" className="flex-shrink-0" asChild>
-                    <Link href="/admin/alertas">
+                    <a href="/admin/alertas">
                       <ArrowUpRight className="h-4 w-4" />
-                    </Link>
+                    </a>
                   </Button>
                 </div>
               </CardHeader>

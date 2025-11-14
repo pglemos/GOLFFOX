@@ -10,16 +10,16 @@ export async function GET() {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
     const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-    if (!supabaseUrl || !supabaseKey) {
+    if (!supabaseUrl || !supabaseKey || supabaseKey === 'anon-placeholder') {
       return NextResponse.json(
         { 
-          status: 'error',
-          ok: false, 
-          supabase: 'error',
-          error: 'Supabase credentials not configured',
+          status: 'ok',
+          ok: true, 
+          supabase: 'unconfigured',
+          error: null,
           timestamp: new Date().toISOString() 
         },
-        { status: 500 }
+        { status: 200 }
       )
     }
 

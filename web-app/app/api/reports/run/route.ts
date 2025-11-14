@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requireCompanyAccess, requireAuth } from '@/lib/api-auth'
 import Papa from 'papaparse'
+import { withRateLimit } from '@/lib/rate-limit'
 
 export const runtime = 'nodejs'
 
@@ -57,13 +58,17 @@ const REPORT_CONFIGS: Record<string, { viewName: string; columns: string[] }> = 
  * POST /api/reports/run
  * Body: { reportKey, format, filters: { companyId, periodStart, periodEnd } }
  */
-export async function POST(request: NextRequest) {
+async function runReportHandler(request: NextRequest) {
   try {
     const supabase = getSupabaseAdmin()
     const body = await request.json()
     // Aceitar tanto reportKey quanto reportType (camelCase ou snake_case) para compatibilidade
     const reportKey = body.reportKey || body.reportType || body.report_type || body.report_key
     const format = body.format || 'csv'
+    const limitReq = Number(body.limit ?? body.pageSize ?? 5000)
+    const offsetReq = Number(body.offset ?? body.page ?? 0)
+    const limit = Number.isFinite(limitReq) ? Math.max(1, Math.min(limitReq, 20000)) : 5000
+    const offset = Number.isFinite(offsetReq) ? Math.max(0, offsetReq) : 0
     
     // Aceitar company_id tanto em filters quanto diretamente no body
     const companyIdFromBody = body.company_id || body.companyId
@@ -155,7 +160,8 @@ export async function POST(request: NextRequest) {
     const config = REPORT_CONFIGS[finalReportKey]
     
     // Buscar dados da view
-    let query = supabase.from(config.viewName).select('*')
+    const columnsStr = config.columns.join(',')
+    let query = supabase.from(config.viewName).select(columnsStr)
 
     if (filters.companyId) {
       query = query.eq('company_id', filters.companyId)
@@ -167,7 +173,7 @@ export async function POST(request: NextRequest) {
       query = query.lte('period_end', filters.periodEnd)
     }
 
-    const { data, error } = await query
+    const { data, error } = await query.range(offset, offset + limit - 1)
 
     if (error) {
       console.error('Erro ao buscar dados do relatório:', error)
@@ -339,6 +345,8 @@ export async function POST(request: NextRequest) {
     )
   }
 }
+
+export const POST = withRateLimit(runReportHandler, 'sensitive')
 
 // Formatar número para separador decimal BR (vírgula)
 function formatNumberBR(value: any): string {

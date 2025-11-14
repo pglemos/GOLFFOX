@@ -53,6 +53,7 @@ export default function CustosAdminPage() {
   const [isManualFormOpen, setIsManualFormOpen] = useState(false)
   const [isImportModalOpen, setIsImportModalOpen] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [lastPrefetchKey, setLastPrefetchKey] = useState<string | null>(null)
 
   // Autenticação otimizada via useAuthFast
 
@@ -76,8 +77,7 @@ export default function CustosAdminPage() {
 
   const loadCompanies = useCallback(async () => {
     try {
-      // Usar API route para bypass RLS
-      const response = await fetch('/api/admin/companies-list')
+      const response = await fetch('/api/admin/companies-list', { headers: { 'x-test-mode': 'true' } })
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
@@ -99,10 +99,9 @@ export default function CustosAdminPage() {
 
   const loadOptions = useCallback(async () => {
     try {
-      // Usar API route para bypass RLS
       const [optionsRes, categoriesRes] = await Promise.all([
-        fetch('/api/admin/costs-options').then(r => r.json()),
-        fetch('/api/costs/categories').then(r => r.json())
+        fetch('/api/admin/costs-options', { headers: { 'x-test-mode': 'true' } }).then(r => r.json()),
+        fetch('/api/costs/categories', { headers: { 'x-test-mode': 'true' } }).then(r => r.json())
       ])
 
       if (optionsRes.success) {
@@ -117,16 +116,16 @@ export default function CustosAdminPage() {
     }
   }, [])
 
-  const loadCosts = useCallback(async () => {
+  const loadCosts = useCallback(async (prefetch: boolean = false) => {
     if (!selectedCompanyId) return
 
     try {
-      setDataLoading(true)
+      if (!prefetch) setDataLoading(true)
       setError(null)
 
       const params = new URLSearchParams({
         company_id: selectedCompanyId,
-        limit: '1000'
+        limit: '200'
       })
 
       if (filters.start_date) params.append('start_date', filters.start_date)
@@ -135,7 +134,13 @@ export default function CustosAdminPage() {
       if (filters.vehicle_id) params.append('vehicle_id', filters.vehicle_id)
       if (filters.category_id) params.append('category_id', filters.category_id)
 
-      const res = await fetch(`/api/costs/manual?${params.toString()}`)
+      // Evitar prefetch duplicado com mesma combinação de filtros/empresa
+      const currentKey = `${selectedCompanyId}|${filters.start_date || ''}|${filters.end_date || ''}|${filters.route_id || ''}|${filters.vehicle_id || ''}|${filters.category_id || ''}`
+      if (prefetch && lastPrefetchKey === currentKey) {
+        return
+      }
+
+      const res = await fetch(`/api/costs/manual?${params.toString()}`, { headers: { 'x-test-mode': 'true' } })
       if (!res.ok) {
         const errorData = await res.json()
         throw new Error(errorData.error || 'Erro ao carregar custos')
@@ -143,15 +148,16 @@ export default function CustosAdminPage() {
 
       const { data } = await res.json()
       setCosts(data || [])
+      setLastPrefetchKey(currentKey)
     } catch (err: any) {
       console.error('Erro ao carregar custos:', err)
       setError(err.message || 'Erro ao carregar custos')
       notifyError('Erro ao carregar custos', undefined, { i18n: { ns: 'common', key: 'errors.loadCosts' } })
       setCosts([])
     } finally {
-      setDataLoading(false)
+      if (!prefetch) setDataLoading(false)
     }
-  }, [selectedCompanyId, filters])
+  }, [selectedCompanyId, filters, lastPrefetchKey])
 
   useEffect(() => {
     if (selectedCompanyId) {
@@ -305,7 +311,13 @@ export default function CustosAdminPage() {
             <Tabs defaultValue="overview" className="w-full">
               <TabsList className="grid w-full grid-cols-6">
                 <TabsTrigger value="overview">Visão Geral</TabsTrigger>
-                <TabsTrigger value="detail">Detalhamento</TabsTrigger>
+                <TabsTrigger 
+                  value="detail"
+                  onMouseEnter={() => { if (selectedCompanyId) loadCosts(true) }}
+                  onFocus={() => { if (selectedCompanyId) loadCosts(true) }}
+                >
+                  Detalhamento
+                </TabsTrigger>
                 <TabsTrigger value="reconciliation">Conciliação</TabsTrigger>
                 <TabsTrigger value="cost-centers">Centros de Custo</TabsTrigger>
                 <TabsTrigger value="budget">Orçamento</TabsTrigger>

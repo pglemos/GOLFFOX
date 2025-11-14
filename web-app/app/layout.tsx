@@ -4,12 +4,11 @@ import "./globals.css";
 import { Toaster } from "react-hot-toast";
 import { WebVitalsInit } from "@/components/web-vitals-init";
 import { ErrorBoundary } from "@/components/error-boundary";
-import { SpeedInsights } from "@vercel/speed-insights/next";
 
-const inter = Inter({ 
+const inter = Inter({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700", "800"],
-  display: "swap", // Voltar para swap para melhor compatibilidade
+  display: "swap",
   variable: "--font-inter",
   preload: true,
   adjustFontFallback: true,
@@ -33,7 +32,6 @@ export default function RootLayout({
           <WebVitalsInit />
           {children}
           <Toaster position="top-right" />
-          {process.env.NODE_ENV === 'production' && <SpeedInsights />}
         </ErrorBoundary>
       </body>
     </html>

@@ -42,6 +42,8 @@ export function CostDetailTable({ costs, onReconcile, loading }: CostDetailTable
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set())
   const [sortColumn, setSortColumn] = useState<keyof CostDetail | null>(null)
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
+  const [page, setPage] = useState(0)
+  const [pageSize, setPageSize] = useState(50)
 
   const toggleGroup = (group: string) => {
     const newExpanded = new Set(expandedGroups)
@@ -87,10 +89,17 @@ export function CostDetailTable({ costs, onReconcile, loading }: CostDetailTable
     })
   }, [costs, sortColumn, sortDirection])
 
+  const pageCount = Math.max(1, Math.ceil(sortedCosts.length / pageSize))
+  const currentPage = Math.min(page, pageCount - 1)
+  const paginatedCosts = useMemo(() => {
+    const start = currentPage * pageSize
+    return sortedCosts.slice(start, start + pageSize)
+  }, [sortedCosts, currentPage, pageSize])
+
   // Agrupar custos
   const groupedData = useMemo(() => {
     if (grouping === 'none') {
-      return { items: sortedCosts }
+      return { items: paginatedCosts }
     }
 
     const groups: Record<string, {
@@ -98,7 +107,7 @@ export function CostDetailTable({ costs, onReconcile, loading }: CostDetailTable
       total: number
     }> = {}
 
-    sortedCosts.forEach(cost => {
+    paginatedCosts.forEach(cost => {
       if (grouping === 'group') {
         const key = cost.group_name || 'Outros'
         if (!groups[key]) {
@@ -201,6 +210,15 @@ export function CostDetailTable({ costs, onReconcile, loading }: CostDetailTable
             <option value="group">Por Grupo</option>
             <option value="category">Por Categoria</option>
           </select>
+          <select
+            className="px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm"
+            value={pageSize}
+            onChange={(e) => { setPageSize(parseInt(e.target.value)); setPage(0) }}
+          >
+            <option value={25}>25</option>
+            <option value={50}>50</option>
+            <option value={100}>100</option>
+          </select>
           <div className="flex gap-1">
             <Button variant="outline" size="sm" onClick={() => handleExport('csv')}>
               <Download className="h-4 w-4 mr-1" />
@@ -245,7 +263,7 @@ export function CostDetailTable({ costs, onReconcile, loading }: CostDetailTable
           </thead>
           <tbody>
             {grouping === 'none' ? (
-              sortedCosts.map(cost => (
+              paginatedCosts.map(cost => (
                 <tr key={cost.id} className="border-b hover:bg-gray-50">
                   <td className="p-2">{new Date(cost.date).toLocaleDateString('pt-BR')}</td>
                   <td className="p-2">{cost.group_name} {cost.category}{cost.subcategory ? ` - ${cost.subcategory}` : ''}</td>
@@ -320,6 +338,13 @@ export function CostDetailTable({ costs, onReconcile, loading }: CostDetailTable
             </tr>
           </tfoot>
         </table>
+      </div>
+      <div className="flex items-center justify-between mt-4">
+        <span className="text-sm text-gray-600">Página {currentPage + 1} de {pageCount}</span>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={() => setPage(p => Math.max(0, p - 1))} disabled={currentPage === 0}>Anterior</Button>
+          <Button variant="outline" size="sm" onClick={() => setPage(p => Math.min(pageCount - 1, p + 1))} disabled={currentPage >= pageCount - 1}>Próxima</Button>
+        </div>
       </div>
     </Card>
   )

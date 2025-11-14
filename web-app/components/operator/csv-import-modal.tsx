@@ -9,38 +9,32 @@ import { notifySuccess, notifyError, notifyInfo, notifyWarning } from "@/lib/toa
 import { useState, useRef } from "react"
 import { warn, error as logError } from "@/lib/logger"
 
-// Importação condicional para evitar erros se módulo não existir
-let operatorI18n: any = { csv_import: {} }
-try {
-  operatorI18n = require('@/i18n/operator.json')
-} catch (err) {
-  operatorI18n = {
-    csv_import: {
-      title: 'Importar Funcionários via CSV',
-      select_file: 'Selecionar Arquivo',
-      preview: 'Prévia',
-      errors: 'Erros',
-      geocoding: 'Geocodificando endereços...',
-      importing: 'Importando...',
-      success: 'Importação concluída',
-      import: 'Importar',
-      unresolved_addresses: 'endereços não resolvidos'
-    }
+let operatorI18n: any = {
+  csv_import: {
+    title: 'Importar Funcionários via CSV',
+    select_file: 'Selecionar Arquivo',
+    preview: 'Prévia',
+    errors: 'Erros',
+    geocoding: 'Geocodificando endereços...',
+    importing: 'Importando...',
+    success: 'Importação concluída',
+    import: 'Importar',
+    unresolved_addresses: 'endereços não resolvidos'
   }
 }
 
-// Verificar se módulos necessários existem
-let parseCSV: any = null
-let geocodeBatch: any = null
-let importEmployees: any = null
-
-try {
-  const csvModule = require('@/lib/importers/employee-csv')
-  parseCSV = csvModule.parseCSV
-  geocodeBatch = csvModule.geocodeBatch
-  importEmployees = csvModule.importEmployees
-} catch (err) {
-  warn('Módulo de importação CSV não encontrado', { error: err }, 'CSVImportModal')
+async function loadCsvModule() {
+  try {
+    const csvModule = await import('@/lib/importers/employee-csv')
+    return {
+      parseCSV: csvModule.parseCSV,
+      geocodeBatch: csvModule.geocodeBatch,
+      importEmployees: csvModule.importEmployees,
+    }
+  } catch (err) {
+    warn('Módulo de importação CSV não encontrado', { error: err }, 'CSVImportModal')
+    return null
+  }
 }
 
 interface CSVImportModalProps {
@@ -84,7 +78,8 @@ export function CSVImportModal({ isOpen, onClose, onSave, empresaId }: CSVImport
     const selectedFile = e.target.files?.[0]
     if (!selectedFile) return
 
-    if (!parseCSV) {
+    const mod = await loadCsvModule()
+    if (!mod?.parseCSV) {
       notifyError('Funcionalidade de importação CSV não disponível. Verifique se o módulo está instalado.', {
         i18n: { ns: 'operator', key: 'csv_import.error', params: { message: 'Módulo ausente' } }
       })
@@ -97,7 +92,7 @@ export function CSVImportModal({ isOpen, onClose, onSave, empresaId }: CSVImport
     setImportResult(null)
 
     try {
-      const result = await parseCSV(selectedFile) as ParseResult
+      const result = await mod.parseCSV(selectedFile) as ParseResult
 
       if (!result || !result.valid) {
         notifyError("Erro ao processar arquivo CSV", {
@@ -132,7 +127,8 @@ export function CSVImportModal({ isOpen, onClose, onSave, empresaId }: CSVImport
   const handleImport = async () => {
     if (!file) return
 
-    if (!parseCSV || !geocodeBatch || !importEmployees) {
+    const mod = await loadCsvModule()
+    if (!mod?.parseCSV || !mod?.geocodeBatch || !mod?.importEmployees) {
       notifyError('', undefined, { i18n: { ns: 'operator', key: 'csv_import.error', params: { message: 'Funcionalidade de importação CSV não disponível. Verifique se o módulo está instalado.' } } })
       return
     }
@@ -148,7 +144,7 @@ export function CSVImportModal({ isOpen, onClose, onSave, empresaId }: CSVImport
     try {
       // 1. Parse CSV
       setImportProgress({ current: 0, total: 100, stage: 'parsing' })
-      const parseResult = await parseCSV(file) as ParseResult
+      const parseResult = await mod.parseCSV(file) as ParseResult
 
       if (!parseResult || parseResult.valid.length === 0) {
         notifyError('', undefined, { i18n: { ns: 'operator', key: 'csv_import.error', params: { message: 'Nenhum funcionário válido para importar' } } })
@@ -164,14 +160,14 @@ export function CSVImportModal({ isOpen, onClose, onSave, empresaId }: CSVImport
       
       let geocodedAddresses = new Map<string, { lat: number; lng: number } | null>()
       if (addresses.length > 0) {
-        geocodedAddresses = await geocodeBatch(addresses, (current: number, total: number) => {
+        geocodedAddresses = await mod.geocodeBatch(addresses, (current: number, total: number) => {
           setImportProgress({ current, total, stage: 'geocoding' })
         })
       }
 
       // 3. Importar funcionários
       setImportProgress({ current: 0, total: parseResult.valid.length, stage: 'importing' })
-      const result = await importEmployees(
+      const result = await mod.importEmployees(
         parseResult.valid,
         empresaId,
         geocodedAddresses,
