@@ -5,6 +5,10 @@
 - Relatórios: adicionado rate limiting e paginação com seleção explícita de colunas em `web-app/app/api/reports/run/route.ts`.
 - Documentação criada: `docs/ARQUITETURA_ATUAL.md` e `docs/GUIA_MIGRACAO_REPERTORIO.md` com estrutura alvo, convenções e mapeamento de migração.
 - Branch de refatoração criada e publicada: `refactor/repositorio-organizado`.
+- Endpoints de custos: rate limiting aplicado em `export`, `import`, `manual` e `kpis` com paginação/colunas consistentes em export.
+- Observabilidade: integrada base de Sentry (`@sentry/nextjs`) com configs client/server/edge e habilitação condicional no `next.config.js`.
+- Fixture E2E de autenticação adicionada (`web-app/scripts/auth-fixture.ts`) para testes com CSRF + login e saída de cookie.
+- Criação de `archive/LEGADO_NAO_USAR/index.md` para quarentena de conteúdo legado antes da exclusão definitiva.
 
 ## Visão Geral do Sistema
 - Plataforma multi-tenant que conecta Empresa Contratante, Transportadora, Motorista e Passageiro, com operação central pela Golf Fox (operadora master).
