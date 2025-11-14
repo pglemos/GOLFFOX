@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabaseServiceRole } from '@/lib/supabase-server'
 import { requireCompanyAccess } from '@/lib/api-auth'
 import { z } from 'zod'
+import { withRateLimit } from '@/lib/rate-limit'
 
 const costSchema = z.object({
   company_id: z.string().uuid(),
@@ -24,7 +25,7 @@ const costSchema = z.object({
   path: ["date"]
 })
 
-export async function POST(request: NextRequest) {
+async function createManualCostHandler(request: NextRequest) {
   try {
     const body = await request.json()
     // Normalizar date para cost_date (a tabela usa cost_date)
@@ -277,7 +278,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET(request: NextRequest) {
+async function listManualCostsHandler(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams
     const companyId = searchParams.get('company_id')
@@ -410,4 +411,7 @@ export async function GET(request: NextRequest) {
     )
   }
 }
+
+export const POST = withRateLimit(createManualCostHandler, 'sensitive')
+export const GET = withRateLimit(listManualCostsHandler, 'api')
 
