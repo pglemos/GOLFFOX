@@ -54,7 +54,9 @@ export async function applyRateLimit(
 ): Promise<NextResponse | null> {
   try {
     // Identificar o usuário por IP ou sessão
-    const ip = request.ip ?? "unknown";
+    const xff = request.headers.get("x-forwarded-for") || "";
+    const xri = request.headers.get("x-real-ip") || "";
+    const ip = (xff.split(",")[0].trim() || xri || "unknown");
     const sessionId = request.cookies.get("golffox-session")?.value ?? "anonymous";
     const userAgent = request.headers.get("user-agent") ?? "unknown";
     
