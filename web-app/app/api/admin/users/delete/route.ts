@@ -13,7 +13,16 @@ function getSupabaseAdmin() {
   return createClient(url, serviceKey)
 }
 
+// Aceitar tanto DELETE quanto POST para compatibilidade
 export async function DELETE(request: NextRequest) {
+  return handleDelete(request)
+}
+
+export async function POST(request: NextRequest) {
+  return handleDelete(request)
+}
+
+async function handleDelete(request: NextRequest) {
   try {
     const isDevelopment = process.env.NODE_ENV === 'development'
     const authErrorResponse = await requireAuth(request, 'admin')
@@ -24,8 +33,19 @@ export async function DELETE(request: NextRequest) {
       console.warn('⚠️ Autenticação falhou em desenvolvimento, mas continuando...')
     }
 
+    // Aceitar tanto query param quanto body
     const { searchParams } = new URL(request.url)
-    const userId = searchParams.get('id')
+    let userId = searchParams.get('id')
+    
+    // Se não estiver na query, tentar no body
+    if (!userId) {
+      try {
+        const body = await request.json()
+        userId = body.id || body.user_id
+      } catch (e) {
+        // Body vazio ou inválido, continuar com null
+      }
+    }
 
     if (!userId) {
       return NextResponse.json(
