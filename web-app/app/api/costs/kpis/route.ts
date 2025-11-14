@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseServiceRole } from '@/lib/supabase-server'
 import { requireAuth, validateAuth, requireCompanyAccess } from '@/lib/api-auth'
+import { withRateLimit } from '@/lib/rate-limit'
 
-export async function GET(request: NextRequest) {
+async function getCostsKpisHandler(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams
     const companyId = searchParams.get('company_id')
@@ -140,4 +141,6 @@ export async function GET(request: NextRequest) {
     )
   }
 }
+
+export const GET = withRateLimit(getCostsKpisHandler, 'api')
 
