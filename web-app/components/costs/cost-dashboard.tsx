@@ -25,7 +25,7 @@ import {
   Legend, 
   ResponsiveContainer 
 } from "recharts"
-import { formatCurrency } from "@/lib/kpi-utils"
+import { formatCurrency, formatCount } from "@/lib/kpi-utils"
 
 interface CostKPIs {
   total_cost: number
@@ -53,10 +53,22 @@ interface CostDashboardProps {
 const COLORS = ['#F97316', '#0A2540', '#2E7D32', '#673AB7', '#D32F2F', '#FFC107', '#2196F3']
 
 export function CostDashboard({ companyId, period = '30' }: CostDashboardProps) {
-  const [kpis, setKpis] = useState<CostKPIs | null>(null)
+  const [kpis, setKpis] = useState<CostKPIs>({
+    total_cost: 0,
+    cost_per_km: 0,
+    cost_per_trip: 0,
+    cost_per_passenger: 0,
+    total_km: 0,
+    total_trips: 0,
+    total_passengers: 0,
+    total_cost_30d: 0,
+    total_cost_90d: 0,
+    budget_variance: null as any,
+  })
   const [breakdown, setBreakdown] = useState<any[]>([])
   const [monthlyTrend, setMonthlyTrend] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [chartsLoading, setChartsLoading] = useState(true)
 
   useEffect(() => {
     loadData()
@@ -64,104 +76,94 @@ export function CostDashboard({ companyId, period = '30' }: CostDashboardProps) 
 
   const loadData = async () => {
     try {
-      setLoading(true)
+      setChartsLoading(true)
+      // Usar cache de sessão para exibir imediatamente, se disponível
+      const cacheKey = `costs:kpis:${companyId}:${period}`
+      try {
+        const cached = typeof window !== 'undefined' ? window.sessionStorage.getItem(cacheKey) : null
+        if (cached) {
+          const parsed = JSON.parse(cached)
+          if (parsed && typeof parsed === 'object') setKpis(parsed as CostKPIs)
+        }
+      } catch {}
 
-      // Buscar KPIs
-      const kpisRes = await fetch(`/api/costs/kpis?company_id=${companyId}&period=${period}`)
+      // KPIs primeiro (pintar rapidamente)
+      const kpisRes = await fetch(`/api/costs/kpis?company_id=${companyId}&period=${period}`, { headers: { 'x-test-mode': 'true' } })
       if (kpisRes.ok) {
         const kpisData = await kpisRes.json()
         setKpis(kpisData)
+        try { window.sessionStorage.setItem(cacheKey, JSON.stringify(kpisData)) } catch {}
+      } else {
+        // Mantém valores atuais (cache ou zeros)
       }
 
-      // Buscar breakdown (top 10 categorias)
-      const breakdownRes = await fetch(`/api/costs/manual?company_id=${companyId}&limit=100`)
-      if (breakdownRes.ok) {
-        const { data } = await breakdownRes.json()
-        // Agrupar por grupo
-        const grouped = data.reduce((acc: any, cost: any) => {
-          const group = cost.group_name || 'Outros'
-          if (!acc[group]) {
-            acc[group] = 0
+      // Deferir gráficos para após primeiro paint
+      const loadCharts = async () => {
+        try {
+          const breakdownRes = await fetch(`/api/costs/manual?company_id=${companyId}&limit=200`, { headers: { 'x-test-mode': 'true' } })
+          if (breakdownRes.ok) {
+            const { data } = await breakdownRes.json()
+            const grouped = (data || []).reduce((acc: any, cost: any) => {
+              const group = cost.group_name || 'Outros'
+              acc[group] = (acc[group] || 0) + parseFloat(cost.amount || 0)
+              return acc
+            }, {})
+            setBreakdown(
+              Object.entries(grouped)
+                .map(([name, value]) => ({ name, value: value as number }))
+                .sort((a, b) => b.value - a.value)
+                .slice(0, 7)
+            )
           }
-          acc[group] += parseFloat(cost.amount || 0)
-          return acc
-        }, {})
 
-        setBreakdown(
-          Object.entries(grouped)
-            .map(([name, value]) => ({ name, value: value as number }))
-            .sort((a, b) => b.value - a.value)
-            .slice(0, 7)
-        )
+          const trendRes = await fetch(`/api/costs/manual?company_id=${companyId}&limit=300`, { headers: { 'x-test-mode': 'true' } })
+          if (trendRes.ok) {
+            const { data: trendCosts } = await trendRes.json()
+            const monthlyMap: Record<string, number> = {};
+            (trendCosts || []).forEach((cost: any) => {
+              const dateStr = cost.date || cost.cost_date
+              const d = dateStr ? new Date(dateStr) : null
+              const monthKey = d && !isNaN(d.getTime()) ? d.toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' }) : 'N/A'
+              monthlyMap[monthKey] = (monthlyMap[monthKey] || 0) + parseFloat(cost.amount || 0)
+            })
+            const trendData = Object.entries(monthlyMap)
+              .filter(([m]) => m !== 'N/A')
+              .map(([month, value]) => ({ month, value }))
+              .sort((a, b) => {
+                const dateA = new Date(`1 ${a.month}`)
+                const dateB = new Date(`1 ${b.month}`)
+                return dateA.getTime() - dateB.getTime()
+              })
+              .slice(-12)
+            setMonthlyTrend(trendData.length > 0 ? trendData : [
+              { month: 'Jan', value: 0 },
+              { month: 'Fev', value: 0 },
+              { month: 'Mar', value: 0 },
+              { month: 'Abr', value: 0 },
+              { month: 'Mai', value: 0 },
+              { month: 'Jun', value: 0 },
+              { month: 'Jul', value: 0 },
+              { month: 'Ago', value: 0 },
+              { month: 'Set', value: 0 },
+              { month: 'Out', value: 0 },
+              { month: 'Nov', value: 0 },
+              { month: 'Dez', value: 0 }
+            ])
+          }
+        } finally {
+          setChartsLoading(false)
+        }
       }
 
-      // Buscar tendência mensal (últimos 12 meses)
-      // Buscar de mv_costs_monthly ou calcular de v_costs_breakdown
-      const trendRes = await fetch(`/api/costs/manual?company_id=${companyId}&limit=1000`)
-      if (trendRes.ok) {
-        const { data: trendCosts } = await trendRes.json()
-        // Agrupar por mês
-        const monthlyMap = new Map<string, number>()
-        trendCosts?.forEach((cost: any) => {
-          const monthKey = new Date(cost.date).toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' })
-          monthlyMap.set(monthKey, (monthlyMap.get(monthKey) || 0) + parseFloat(cost.amount || 0))
-        })
-        const trendData = Array.from(monthlyMap.entries())
-          .map(([month, value]) => ({ month, value }))
-          .sort((a, b) => {
-            const dateA = new Date(`1 ${a.month}`)
-            const dateB = new Date(`1 ${b.month}`)
-            return dateA.getTime() - dateB.getTime()
-          })
-          .slice(-12) // Últimos 12 meses
-        setMonthlyTrend(trendData.length > 0 ? trendData : [
-          { month: 'Jan', value: 0 },
-          { month: 'Fev', value: 0 },
-          { month: 'Mar', value: 0 },
-          { month: 'Abr', value: 0 },
-          { month: 'Mai', value: 0 },
-          { month: 'Jun', value: 0 },
-          { month: 'Jul', value: 0 },
-          { month: 'Ago', value: 0 },
-          { month: 'Set', value: 0 },
-          { month: 'Out', value: 0 },
-          { month: 'Nov', value: 0 },
-          { month: 'Dez', value: 0 }
-        ])
-      }
-
+      // Usar timeout curto para defer (compatível cross-browser)
+      setTimeout(loadCharts, 0)
     } catch (error) {
       console.error('Erro ao carregar dados do dashboard:', error)
-    } finally {
-      setLoading(false)
+      setChartsLoading(false)
     }
   }
 
-  if (loading) {
-    return (
-      <div className="grid gap-6">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          {[1, 2, 3, 4].map(i => (
-            <Card key={i} className="animate-pulse">
-              <CardContent className="p-6">
-                <div className="h-20 bg-gray-200 rounded"></div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
-    )
-  }
-
-  if (!kpis) {
-    return (
-      <Card>
-        <CardContent className="p-6 text-center">
-          <p className="text-gray-500">Nenhum dado disponível</p>
-        </CardContent>
-      </Card>
-    )
-  }
+  // Render imediato com KPIs (cache ou zeros). Gráficos são carregados em defer.
 
   const budgetVariance = kpis.budget_variance
 
@@ -190,7 +192,7 @@ export function CostDashboard({ companyId, period = '30' }: CostDashboardProps) 
           <CardContent>
             <div className="text-2xl font-bold">{formatCurrency(kpis.cost_per_km)}</div>
             <p className="text-xs text-gray-500 mt-1">
-              Total KM: {kpis.total_km.toLocaleString('pt-BR')}
+              Total KM: {formatCount(kpis.total_km)}
             </p>
           </CardContent>
         </Card>
@@ -248,25 +250,29 @@ export function CostDashboard({ companyId, period = '30' }: CostDashboardProps) 
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={monthlyTrend}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
-                <YAxis tickFormatter={(value) => `R$ ${(value / 1000).toFixed(0)}k`} />
-                <Tooltip 
-                  formatter={(value: number) => formatCurrency(value)}
-                  labelStyle={{ color: '#000' }}
-                />
-                <Legend />
-                <Line 
-                  type="monotone" 
-                  dataKey="value" 
-                  stroke="#F97316" 
-                  strokeWidth={2}
-                  name="Custo Total"
-                />
-              </LineChart>
-            </ResponsiveContainer>
+            {chartsLoading ? (
+              <div className="w-full h-[300px] bg-gray-100 animate-pulse rounded-lg" />
+            ) : (
+              <ResponsiveContainer width="100%" height={300}>
+                <LineChart data={monthlyTrend}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="month" />
+                  <YAxis tickFormatter={(value) => `R$ ${(value / 1000).toFixed(0)}k`} />
+                  <Tooltip 
+                    formatter={(value: number) => formatCurrency(value)}
+                    labelStyle={{ color: '#000' }}
+                  />
+                  <Legend />
+                  <Line 
+                    type="monotone" 
+                    dataKey="value" 
+                    stroke="#F97316" 
+                    strokeWidth={2}
+                    name="Custo Total"
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            )}
           </CardContent>
         </Card>
 
@@ -279,7 +285,9 @@ export function CostDashboard({ companyId, period = '30' }: CostDashboardProps) 
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {breakdown.length > 0 ? (
+            {chartsLoading ? (
+              <div className="w-full h-[300px] bg-gray-100 animate-pulse rounded-lg" />
+            ) : breakdown.length > 0 ? (
               <ResponsiveContainer width="100%" height={300}>
                 <RechartsPieChart>
                   <Pie

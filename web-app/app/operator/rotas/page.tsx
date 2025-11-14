@@ -9,7 +9,6 @@ import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 import { notifyError } from "@/lib/toast"
 import { Button } from "@/components/ui/button"
-import Link from "next/link"
 import { useOperatorTenant } from "@/components/providers/operator-tenant-provider"
 
 let operatorI18n: any = {
@@ -144,18 +143,18 @@ export default function OperatorRotasPage() {
             <p className="text-gray-600">{operatorI18n.routes_subtitle || "Gerencie as rotas da sua empresa"}</p>
           </div>
           <div className="flex gap-2">
-            <Link href="/operator/rotas/mapa">
+            <a href="/operator/rotas/mapa">
               <Button variant="outline">
                 <Map className="h-4 w-4 mr-2" />
                 Ver no Mapa
               </Button>
-            </Link>
-            <Link href="/operator/solicitacoes">
+            </a>
+            <a href="/operator/solicitacoes">
               <Button className="bg-orange-500 hover:bg-orange-600">
                 <Plus className="h-4 w-4 mr-2" />
                 Nova Rota
               </Button>
-            </Link>
+            </a>
           </div>
         </div>
 
@@ -167,12 +166,12 @@ export default function OperatorRotasPage() {
               <p className="text-sm text-gray-500 mb-4">
                 Comece criando uma nova rota ou solicitação
               </p>
-              <Link href="/operator/solicitacoes">
+              <a href="/operator/solicitacoes">
                 <Button>
                   <Plus className="h-4 w-4 mr-2" />
                   Criar Primeira Rota
                 </Button>
-              </Link>
+              </a>
             </Card>
           )}
 
@@ -204,12 +203,12 @@ export default function OperatorRotasPage() {
                     )}
                   </div>
                 </div>
-                <Link href={`/operator/rotas/mapa?route_id=${rota.id}`}>
+                <a href={`/operator/rotas/mapa?route_id=${rota.id}`}>
                   <Button variant="outline" size="sm" className="flex-shrink-0">
                     <MapPin className="h-4 w-4 mr-2" />
                     Ver no Mapa
                   </Button>
-                </Link>
+                </a>
               </div>
 
               {rota.gf_route_plan && Array.isArray(rota.gf_route_plan) && rota.gf_route_plan.length > 0 && (

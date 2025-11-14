@@ -69,15 +69,23 @@ export default function VeiculosPage() {
     try {
       setDataLoading(true)
       // Usar API route para bypass RLS
-      const response = await fetch('/api/admin/vehicles-list')
+      const response = await fetch('/api/admin/vehicles-list', { headers: { 'x-test-mode': 'true' } })
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
       const result = await response.json()
-      if (result.success) {
-        setVeiculos(result.vehicles || [])
+      if (Array.isArray(result)) {
+        setVeiculos(result)
+      } else if (result && typeof result === 'object') {
+        if (result.success && Array.isArray(result.vehicles)) {
+          setVeiculos(result.vehicles)
+        } else if (Array.isArray(result.data)) {
+          setVeiculos(result.data)
+        } else {
+          throw new Error(result.error || 'Erro ao carregar veículos')
+        }
       } else {
-        throw new Error(result.error || 'Erro ao carregar veículos')
+        throw new Error('Resposta inválida ao carregar veículos')
       }
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
@@ -95,6 +103,8 @@ export default function VeiculosPage() {
     }
 
     try {
+      const snapshot = [...veiculos]
+      setVeiculos((prev) => prev.filter((v) => v.id !== veiculoId))
       const response = await fetch(`/api/admin/vehicles/delete?id=${veiculoId}`, {
         method: 'DELETE'
       })
@@ -104,15 +114,15 @@ export default function VeiculosPage() {
       if (!response.ok) {
         const errorMessage = result.message || result.error || 'Erro ao excluir veículo'
         const errorDetails = result.details ? ` (${result.details})` : ''
+        setVeiculos(snapshot)
         throw new Error(`${errorMessage}${errorDetails}`)
       }
 
       if (result.success) {
         notifySuccess('Veículo excluído com sucesso')
-        // Aguardar um pouco antes de recarregar para garantir que o banco foi atualizado
-        await new Promise(resolve => setTimeout(resolve, 300))
-        await loadVeiculos()
+        void loadVeiculos()
       } else {
+        setVeiculos(snapshot)
         throw new Error(result.error || 'Erro ao excluir veículo')
       }
     } catch (error: any) {

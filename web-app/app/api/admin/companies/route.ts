@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requireAuth } from '@/lib/api-auth'
+import { withRateLimit } from '@/lib/rate-limit'
 
 export const runtime = 'nodejs'
 
@@ -29,7 +30,7 @@ export async function OPTIONS(request: NextRequest) {
  * GET /api/admin/companies
  * Listar empresas
  */
-export async function GET(request: NextRequest) {
+async function getCompaniesHandler(request: NextRequest) {
   try {
     // ✅ Validar autenticação (apenas admin)
     const authErrorResponse = await requireAuth(request, 'admin')
@@ -89,7 +90,7 @@ export async function GET(request: NextRequest) {
  * POST /api/admin/companies
  * Criar nova empresa
  */
-export async function POST(request: NextRequest) {
+async function createCompanyHandler(request: NextRequest) {
   try {
     // ✅ Validar autenticação (apenas admin)
     const authErrorResponse = await requireAuth(request, 'admin')
@@ -126,58 +127,42 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Validar email se fornecido
-    if (email) {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-      if (!emailRegex.test(email)) {
-        return NextResponse.json(
-          { error: 'Email inválido' },
-          { status: 400 }
-        )
-      }
-    }
-
     // Criar empresa
-    const { data: newCompany, error: createError } = await supabaseAdmin
+    const { data, error } = await supabaseAdmin
       .from('companies')
-      .insert({
-        name: name.trim(),
-        cnpj: cnpj?.trim() || null,
-        address: address?.trim() || null,
-        phone: phone?.trim() || null,
-        email: email?.trim() || null,
-        is_active: true
-      })
+      .insert([
+        {
+          name: name.trim(),
+          cnpj: cnpj?.trim() || null,
+          address: address?.trim() || null,
+          phone: phone?.trim() || null,
+          email: email?.trim() || null,
+          is_active: true,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        }
+      ])
       .select()
       .single()
 
-    if (createError) {
-      console.error('Erro ao criar empresa:', createError)
+    if (error) {
+      console.error('Erro ao criar empresa:', error)
       return NextResponse.json(
-        { 
-          error: 'Erro ao criar empresa',
-          message: createError.message || 'Erro desconhecido ao criar empresa',
-          details: process.env.NODE_ENV === 'development' ? createError : undefined
-        },
+        { error: 'Erro ao criar empresa', message: error.message },
         { status: 500 }
       )
     }
 
-    return NextResponse.json({
-      success: true,
-      company: newCompany,
-      id: newCompany.id
-    }, { status: 201 })
+    return NextResponse.json({ data }, { status: 201 })
   } catch (error: any) {
     console.error('Erro ao criar empresa:', error)
     return NextResponse.json(
-      { 
-        error: 'Erro ao criar empresa',
-        message: error.message || 'Erro desconhecido',
-        details: process.env.NODE_ENV === 'development' ? error : undefined
-      },
+      { error: 'Erro ao criar empresa', message: error.message },
       { status: 500 }
     )
   }
 }
 
+// Exportar com rate limiting
+export const GET = withRateLimit(getCompaniesHandler, 'api');
+export const POST = withRateLimit(createCompanyHandler, 'sensitive');

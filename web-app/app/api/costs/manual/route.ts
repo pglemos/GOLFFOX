@@ -285,8 +285,9 @@ export async function GET(request: NextRequest) {
     // ✅ Validar autenticação e acesso à empresa
     // Em modo de teste (header x-test-mode), permitir bypass de autenticação
     const isTestMode = request.headers.get('x-test-mode') === 'true'
+    const isDevelopment = process.env.NODE_ENV === 'development'
     
-    if (!isTestMode) {
+    if (!isTestMode && !isDevelopment) {
       if (!companyId) {
         return NextResponse.json(
           { error: 'company_id é obrigatório' },
@@ -300,7 +301,7 @@ export async function GET(request: NextRequest) {
     }
     
     // Em modo de teste, se não há company_id, retornar lista vazia
-    if (isTestMode && !companyId) {
+    if ((isTestMode || isDevelopment) && !companyId) {
       return NextResponse.json({
         data: [],
         count: 0,

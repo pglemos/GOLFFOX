@@ -7,9 +7,6 @@ export async function GET(request: NextRequest) {
     const { data, error } = await supabaseServiceRole
       .from('gf_cost_categories')
       .select('*')
-      .order('group_name')
-      .order('category')
-      .order('subcategory')
 
     if (error) {
       console.error('Erro ao buscar categorias:', error)
@@ -35,14 +32,16 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // Filtrar por is_active se a coluna existir, caso contrário retornar todos
-    const filteredData = data?.filter((cat: any) => {
-      // Se a coluna is_active não existir, retornar todos os itens
-      if (cat.is_active === undefined) return true
-      return cat.is_active === true
-    }) || []
+    const filtered = (data || []).filter((cat: any) => (cat.is_active === undefined ? true : cat.is_active === true))
+    const sorted = filtered.sort((a: any, b: any) => {
+      const gA = (a.group_name || '').localeCompare(b.group_name || '')
+      if (gA !== 0) return gA
+      const cA = (a.category || '').localeCompare(b.category || '')
+      if (cA !== 0) return cA
+      return (a.subcategory || '').localeCompare(b.subcategory || '')
+    })
 
-    return NextResponse.json(filteredData)
+    return NextResponse.json(sorted)
   } catch (error: any) {
     console.error('Erro ao buscar categorias:', error)
     return NextResponse.json(

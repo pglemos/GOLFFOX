@@ -23,7 +23,7 @@ export function OperatorLogoSection({ panelHomeUrl, panelBranding }: OperatorLog
     // ✅ Se há logo e não falhou, exibir; caso contrário, CompanySelector
     if (logoUrl && !imgFailed) {
       return (
-        <Link href={panelHomeUrl} className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+        <a href={panelHomeUrl} className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
           <img
             src={logoUrl}
             alt={companyName || 'Operador'}
@@ -36,7 +36,7 @@ export function OperatorLogoSection({ panelHomeUrl, panelBranding }: OperatorLog
           <span className="font-bold text-lg sm:text-2xl tracking-tight text-[var(--ink-strong)] hidden xs:block">
             {companyName || 'Operador'}
           </span>
-        </Link>
+        </a>
       )
     }
     // Se não há logo ou falhou, usar CompanySelector
@@ -52,7 +52,7 @@ export function OperatorLogoSection({ panelHomeUrl, panelBranding }: OperatorLog
   }
 
   return (
-    <Link href={panelHomeUrl} prefetch={false} className="flex items-center gap-2 sm:gap-3 flex-shrink-0 group">                                            
+    <a href={panelHomeUrl} className="flex items-center gap-2 sm:gap-3 flex-shrink-0 group">
       <motion.div
         whileHover={{ scale: 1.05, rotate: 5 }}
         whileTap={{ scale: 0.95 }}
@@ -65,6 +65,6 @@ export function OperatorLogoSection({ panelHomeUrl, panelBranding }: OperatorLog
           {brandingText}
         </span>
       </div>
-    </Link>
+    </a>
   )
 }

@@ -105,7 +105,8 @@ const nextConfig = {
   },
   // Otimizações de compilação
   experimental: {
-    optimizePackageImports: ['lucide-react', 'framer-motion'],
+    // Desabilitado temporariamente para eliminar erros de bundling (exports undefined)
+    // optimizePackageImports: ['lucide-react', 'framer-motion'],
   },
 }
 

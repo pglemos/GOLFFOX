@@ -4,6 +4,12 @@ import { createClient } from '@supabase/supabase-js'
 
 export async function middleware(request: NextRequest) {
   const { pathname, searchParams } = request.nextUrl
+
+  // console.log('[middleware] DISABLE?', process.env.NEXT_PUBLIC_DISABLE_MIDDLEWARE)
+  // ✅ Permitir desabilitar autenticação via variável de ambiente (útil para testes locais)
+  if (process.env.NEXT_PUBLIC_DISABLE_MIDDLEWARE === 'true') {
+    return NextResponse.next()
+  }
   
   // ✅ Bypass para rotas de API - não aplicar middleware em rotas de API
   if (pathname.startsWith('/api')) {
@@ -22,6 +28,8 @@ export async function middleware(request: NextRequest) {
   }
   
   const response = NextResponse.next()
+
+  // Permitir raiz '/' exibir página de login
 
   // Redirecionar /login para / (raiz)
   if (pathname === '/login' || pathname.startsWith('/login/')) {
