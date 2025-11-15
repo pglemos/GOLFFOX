@@ -154,16 +154,6 @@ async function runReportHandler(request: NextRequest) {
     // Buscar dados da view
     const { data, error } = await fetchReportRange(supabase, config.viewName, config.columns, filters, limit, offset)
 
-    if (filters.companyId) {
-      query = query.eq('company_id', filters.companyId)
-    }
-    if (filters.periodStart) {
-      query = query.gte('period_start', filters.periodStart)
-    }
-    if (filters.periodEnd) {
-      query = query.lte('period_end', filters.periodEnd)
-    }
-
     
 
     if (error) {
