@@ -70,12 +70,6 @@ flutter:
   assets:
     - assets/icons/golf_fox_logo.svg
 
-flutter_launcher_icons:
-  android: true
-  ios: true
-  image_path: assets/icons/dreamflow_icon.jpg
-  remove_alpha_ios: true
-
 sentry:
   upload_debug_symbols: true
   upload_source_maps: true

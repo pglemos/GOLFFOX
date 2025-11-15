@@ -65,7 +65,7 @@ O projeto **GOLFFOX** foi configurado e implantado no GitHub seguindo as melhore
 ## 📋 Próximos Passos Recomendados
 
 ### 1. 🔒 Configurações de Segurança (Via GitHub Web)
-Acesse [docs/GITHUB_SETUP.md](docs/GITHUB_SETUP.md) para:
+Acesse [docs/GITHUB_SETUP.md](/docs/GITHUB_SETUP.md) para:
 - [ ] Configurar proteção de branches
 - [ ] Adicionar secrets para deploy
 - [ ] Habilitar security features
@@ -146,15 +146,15 @@ git push origin feature/nova-funcionalidade
 ## 📚 Documentação Disponível
 
 ### Principais Arquivos
-- [`README.md`](README.md) - Visão geral do projeto
-- [`CONTRIBUTING.md`](CONTRIBUTING.md) - Guia de contribuição
-- [`docs/GITHUB_SETUP.md`](docs/GITHUB_SETUP.md) - Configuração do GitHub
-- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) - Arquitetura do sistema
+- [`README.md`](/README.md) - Visão geral do projeto
+- [`CONTRIBUTING.md`](/docs/CONTRIBUTING.md) - Guia de contribuição
+- [`docs/GITHUB_SETUP.md`](/docs/GITHUB_SETUP.md) - Configuração do GitHub
+- [`docs/ARCHITECTURE.md`](/docs/ARCHITECTURE.md) - Arquitetura do sistema
 
 ### Templates
-- [`.github/ISSUE_TEMPLATE/`](.github/ISSUE_TEMPLATE/) - Templates de issues
-- [`.github/pull_request_template.md`](.github/pull_request_template.md) - Template de PR
-- [`.github/CODEOWNERS`](.github/CODEOWNERS) - Code owners
+- [`.github/ISSUE_TEMPLATE/`](/.github/ISSUE_TEMPLATE/) - Templates de issues
+- [`.github/pull_request_template.md`](/.github/pull_request_template.md) - Template de PR
+- [`.github/CODEOWNERS`](/.github/CODEOWNERS) - Code owners
 
 ## 🆘 Suporte e Recursos
 
