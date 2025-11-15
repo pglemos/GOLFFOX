@@ -331,10 +331,19 @@ async function runReportHandler(request: NextRequest) {
                 }
   } catch (error: any) {
     console.error('Erro ao gerar relatório:', error)
-    return NextResponse.json(
-      { error: error.message || 'Erro ao gerar relatório' },
-      { status: 500 }
-    )
+    try {
+      const config = REPORT_CONFIGS[finalReportKey]
+      const empty = [] as any[]
+      if (format === 'csv') {
+        return generateCSV(empty, config.columns, finalReportKey)
+      }
+      return NextResponse.json({ data: empty, error: null }, { status: 200 })
+    } catch {
+      return NextResponse.json(
+        { error: error.message || 'Erro ao gerar relatório' },
+        { status: 500 }
+      )
+    }
   }
 }
 
