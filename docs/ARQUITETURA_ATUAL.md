@@ -20,7 +20,8 @@ GOLFFOX/
 │   └── mobile/
 │       ├── driver/
 │       ├── passenger/
-│       └── shared/              # core Flutter compartilhado
+│       ├── shared/              # core Flutter compartilhado
+│       └── flutter-web/         # build/web do Flutter (assets)
 ├── shared/
 │   ├── domain/                  # entidades/DTOs
 │   ├── types/                   # tipos TS/JSON schemas
@@ -76,4 +77,7 @@ GOLFFOX/
 ## Build/Deploy
 - Vercel (web), com jobs cron e env em `apps/web/vercel.json`.
 - CI/CD em `infra/ci/`.
+ 
+## Legado
+- Conteúdos antigos de Next em raiz foram movidos para `archive/LEGADO_NAO_USAR/app-legacy/` para evitar conflitos com `apps/web/`.
 
