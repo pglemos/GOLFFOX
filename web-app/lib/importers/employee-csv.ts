@@ -178,9 +178,9 @@ export async function importEmployees(
       }
 
       // 3. Upsert em gf_employee_company (unique: company_id, cpf)
-      const { error } = await supabase
-        .from('gf_employee_company')
-        .upsert({
+    const { error } = await (supabase as any)
+      .from('gf_employee_company')
+      .upsert({
           employee_id: userId,
           company_id: companyId,
           name: emp.nome,

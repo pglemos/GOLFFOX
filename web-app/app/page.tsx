@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState, Suspense, useCallback } from "react"
+import { useEffect, useRef, useState, useCallback, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 // Removido import do supabase - não usado mais na página de login para evitar conflitos
 import { Button } from "@/components/ui/button"
@@ -48,10 +48,10 @@ const AnimatedGradient = () => {
           backgroundPosition: ["0% 0%", "100% 100%"],
         }}
         transition={{
-          duration: 20,
+          duration: 12,
           repeat: Infinity,
           repeatType: "reverse",
-          ease: "linear",
+          ease: "easeOut",
         }}
       />
     </div>
@@ -370,11 +370,14 @@ function LoginContent() {
           const apiError = await response.json().catch(() => ({}))
           const message = String(apiError?.error || "Falha ao autenticar")
           const normalized = message.toLowerCase()
+          const code = String(apiError?.code || '')
           
           console.error('❌ Erro na API de login:', {
             status: response.status,
             message,
-            email: maskedEmail
+            code,
+            email: maskedEmail,
+            body: apiError
           })
           
           // Processar erros específicos
@@ -383,6 +386,15 @@ function LoginContent() {
             setFieldErrors((prev) => ({ ...prev, email: "E-mail não cadastrado" }))
           } else if (normalized.includes("inativo")) {
             setError("Usuário inativo. Entre em contato com o administrador.")
+          } else if (response.status === 502 || code === 'supabase_unreachable' || normalized.includes('fetch failed')) {
+            setError("Não foi possível conectar ao Supabase. Verifique as variáveis de ambiente (URL/Anon Key) e sua conexão.")
+          } else if (response.status === 403 && (code === 'user_not_in_db' || normalized.includes('não cadastrado'))) {
+            setError("Usuário não cadastrado no sistema. O acesso é permitido apenas para usuários criados via painel administrativo.")
+            setFieldErrors((prev) => ({ ...prev, email: "Usuário não cadastrado" }))
+          } else if (response.status === 403 && (code === 'no_company_mapping' || normalized.includes('sem empresa associada'))) {
+            setError("Seu usuário operador não está associado a nenhuma empresa. Entre em contato com o administrador para associação.")
+          } else if (response.status === 403 && code === 'company_inactive') {
+            setError("A empresa associada ao seu usuário está inativa. Entre em contato com o administrador.")
           } else if (normalized.includes("invalid") || normalized.includes("credenciais")) {
             setError("Credenciais inválidas")
             setFieldErrors((prev) => ({ ...prev, password: "E-mail ou senha incorretos" }))
@@ -541,10 +553,8 @@ function LoginContent() {
   // Feature card component com animação
   const FeatureCard = ({ icon: Icon, title, description, delay }: { icon: any, title: string, description: string, delay: number }) => (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay }}
       whileHover={{ y: -4, scale: 1.02 }}
+      transition={{ duration: 0.2, ease: 'easeOut' }}
       className="group relative"
     >
       <div className="flex items-start gap-3 p-4 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all duration-300 cursor-default">
@@ -614,9 +624,9 @@ function LoginContent() {
 
           {/* Título principal */}
           <motion.h1
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: 0.5, delay: 0.2, ease: 'easeOut' }}
             className="text-4xl xl:text-5xl 2xl:text-6xl font-extrabold mb-6 leading-tight tracking-tight"
             style={{
               background: 'linear-gradient(135deg, #FFFFFF 0%, #E0E7FF 100%)',
@@ -634,9 +644,9 @@ function LoginContent() {
 
           {/* Descrição */}
           <motion.p
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: 0.5, delay: 0.3, ease: 'easeOut' }}
             className="text-lg xl:text-xl 2xl:text-2xl text-white/90 leading-relaxed max-w-lg mb-10 font-light"
           >
             Otimize rotas, monitore veículos em tempo real e reduza custos operacionais com a plataforma mais completa do mercado.
@@ -644,9 +654,9 @@ function LoginContent() {
 
           {/* Link para site */}
           <motion.a
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.4, ease: 'easeOut' }}
             href="https://golffox.com.br"
             target="_blank"
             rel="noopener noreferrer"
@@ -801,9 +811,9 @@ function LoginContent() {
         {/* Card de Login */}
         <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-12 xl:px-16 py-8 sm:py-12 relative z-10">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, ease: "easeOut" }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
             className="w-full max-w-lg"
           >
             <Card className="relative p-8 sm:p-10 lg:p-12 bg-white shadow-xl border border-gray-100 overflow-hidden">
@@ -1055,20 +1065,7 @@ function LoginContent() {
 export default function LoginPage() {
   return (
     <LoginErrorBoundary>
-      <Suspense
-        fallback={
-          <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#FAF9F7] to-white">
-            <div className="text-center">
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                className="w-12 h-12 border-4 border-[var(--brand)]/20 border-t-[var(--brand)] rounded-full mx-auto"
-              />
-              <p className="mt-6 text-gray-600 font-medium">Carregando...</p>
-            </div>
-          </div>
-        }
-      >
+      <Suspense fallback={<div />}> 
         <LoginContent />
       </Suspense>
     </LoginErrorBoundary>

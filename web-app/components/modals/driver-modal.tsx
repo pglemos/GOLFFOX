@@ -11,7 +11,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Users, Upload, X, Award } from "lucide-react"
+import { Users, Upload, X } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { notifySuccess, notifyError } from "@/lib/toast"
 import { t } from "@/lib/i18n"
@@ -57,7 +57,6 @@ export function DriverModal({ driver, isOpen, onClose, onSave }: DriverModalProp
   })
   const [documents, setDocuments] = useState<DriverDocument[]>([])
   const [loading, setLoading] = useState(false)
-  const [rankings, setRankings] = useState<any>(null)
   const { sync } = useSupabaseSync({ showToast: false })
 
   useEffect(() => {
@@ -73,7 +72,6 @@ export function DriverModal({ driver, isOpen, onClose, onSave }: DriverModalProp
         role: "driver"
       })
       setDocuments([])
-      setRankings(null)
     }
   }, [driver, isOpen])
 
@@ -88,14 +86,7 @@ export function DriverModal({ driver, isOpen, onClose, onSave }: DriverModalProp
       
       if (docs) setDocuments(docs)
 
-      // Carregar ranking
-      const { data: ranking } = await supabase
-        .from("v_driver_ranking")
-        .select("*")
-        .eq("driver_id", driverId)
-        .single()
       
-      if (ranking) setRankings(ranking)
     } catch (error) {
       console.error("Erro ao carregar dados do motorista:", error)
     }
@@ -112,7 +103,7 @@ export function DriverModal({ driver, isOpen, onClose, onSave }: DriverModalProp
       }
 
       if (driver?.id) {
-        const { error } = await supabase
+        const { error } = await (supabase as any)
           .from("users")
           .update(driverData)
           .eq("id", driver.id)
@@ -132,26 +123,39 @@ export function DriverModal({ driver, isOpen, onClose, onSave }: DriverModalProp
         // Log de auditoria
         await auditLogs.update('driver', driver.id, { name: driverData.name, email: driverData.email })
       } else {
-        const { data, error } = await supabase
-          .from("users")
-          .insert(driverData)
-          .select()
-          .single()
+        // Criar motorista via API com Service Role (respeita RLS e políticas)
+        const resp = await fetch('/api/operator/create-employee', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: driverData.email,
+            name: driverData.name,
+            phone: driverData.phone,
+            role: 'driver',
+          })
+        })
 
-        if (error) throw error
-        
-        // Sincronização com Supabase (garantia adicional)
+        const body = await resp.json().catch(() => ({}))
+        if (!resp.ok) {
+          const msg = body?.error || body?.message || 'Erro ao criar motorista'
+          throw new Error(msg)
+        }
+
+        const newDriverId = body.userId
+        if (!newDriverId) {
+          throw new Error('Falha ao obter ID do motorista criado')
+        }
+
+        // Sincronização informativa
         await sync({
           resourceType: 'driver',
-          resourceId: data.id,
+          resourceId: newDriverId,
           action: 'create',
           data: driverData,
         })
-        
+
         notifySuccess('', { i18n: { ns: 'common', key: 'success.driverCreated' } })
-        
-        // Log de auditoria
-        await auditLogs.create('driver', data.id, { name: driverData.name, email: driverData.email })
+        await auditLogs.create('driver', newDriverId, { name: driverData.name, email: driverData.email })
       }
 
       onSave()
@@ -175,17 +179,17 @@ export function DriverModal({ driver, isOpen, onClose, onSave }: DriverModalProp
       const fileName = `${driver.id}-${type}-${Date.now()}.${fileExt}`
       const filePath = `driver-documents/${fileName}`
 
-      const { error: uploadError } = await supabase.storage
+      const { error: uploadError } = await (supabase as any).storage
         .from('driver-documents')
         .upload(filePath, file)
 
       if (uploadError) throw uploadError
 
-      const { data } = supabase.storage
+      const { data } = (supabase as any).storage
         .from('driver-documents')
         .getPublicUrl(filePath)
 
-      const { error: docError } = await supabase
+      const { error: docError } = await (supabase as any)
         .from("gf_driver_documents")
         .insert({
           driver_id: driver.id,
@@ -215,10 +219,9 @@ export function DriverModal({ driver, isOpen, onClose, onSave }: DriverModalProp
         </DialogHeader>
 
         <Tabs defaultValue="dados" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="dados">Dados Pessoais</TabsTrigger>
             <TabsTrigger value="documentos">Documentos</TabsTrigger>
-            <TabsTrigger value="ranking">Ranking</TabsTrigger>
           </TabsList>
 
           <TabsContent value="dados">
@@ -349,45 +352,7 @@ export function DriverModal({ driver, isOpen, onClose, onSave }: DriverModalProp
             </div>
           </TabsContent>
 
-          <TabsContent value="ranking">
-            {rankings ? (
-              <div className="space-y-4">
-                <div className="grid grid-cols-4 gap-4">
-                  <div className="p-4 border rounded-lg">
-                    <div className="text-xs text-[var(--ink-muted)] mb-1">Pontuação Total</div>
-                    <div className="text-2xl font-bold">{rankings.total_points || 0}</div>
-                  </div>
-                  <div className="p-4 border rounded-lg">
-                    <div className="text-xs text-[var(--ink-muted)] mb-1">Pontualidade</div>
-                    <div className="text-2xl font-bold text-green-600">{rankings.punctuality_score || 0}</div>
-                  </div>
-                  <div className="p-4 border rounded-lg">
-                    <div className="text-xs text-[var(--ink-muted)] mb-1">Eficiência</div>
-                    <div className="text-2xl font-bold text-blue-600">{rankings.fuel_efficiency_score || 0}</div>
-                  </div>
-                  <div className="p-4 border rounded-lg">
-                    <div className="text-xs text-[var(--ink-muted)] mb-1">Posição</div>
-                    <div className="text-2xl font-bold text-[var(--brand)]">
-                      {rankings.ranking_position ? `#${rankings.ranking_position}` : 'N/A'}
-                    </div>
-                  </div>
-                </div>
-                <div className="p-4 border rounded-lg">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Award className="h-5 w-5 text-[var(--brand)]" />
-                    <span className="font-semibold">Estatísticas</span>
-                  </div>
-                  <p className="text-sm text-[var(--ink-muted)]">
-                    Rotas completadas: {rankings.trips_count || 0}
-                  </p>
-                </div>
-              </div>
-            ) : (
-              <div className="text-center py-8 text-[var(--ink-muted)]">
-                Nenhum dado de ranking disponível ainda
-              </div>
-            )}
-          </TabsContent>
+          
         </Tabs>
       </DialogContent>
     </Dialog>

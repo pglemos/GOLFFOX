@@ -83,7 +83,7 @@ export function ReconciliationModal({
 
       if (invError) throw invError
       setInvoice(invData)
-      setStatus(invData.status || 'pending')
+      setStatus((invData as any).status || 'pending')
 
       // Buscar linhas da fatura
       const { data: linesData, error: linesError } = await supabase

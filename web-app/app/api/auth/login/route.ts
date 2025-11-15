@@ -4,6 +4,7 @@ import { cookies } from 'next/headers'
 import { createClient } from '@supabase/supabase-js'
 import { getUserRoleByEmail } from '@/lib/user-role'
 import { debug, error as logError } from '@/lib/logger'
+import { withRateLimit } from '@/lib/rate-limit'
 
 const EMAIL_REGEX =
   /^(?:[a-zA-Z0-9_'^&\/+\-])+(?:\.(?:[a-zA-Z0-9_'^&\/+\-])+)*@(?:(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,})$/
@@ -21,7 +22,7 @@ function isSecureRequest(req: NextRequest): boolean {
   return req.nextUrl.protocol === 'https:'
 }
 
-export async function POST(req: NextRequest) {
+async function loginHandler(req: NextRequest) {
   let payload: { email?: string; password?: string } = {}
 
   try {
@@ -42,12 +43,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'invalid_email' }, { status: 422 })
   }
 
-  // Removida validação de tamanho de senha - deixar Supabase validar
-  // A validação de senha deve ser apenas no cadastro, não no login
-
   // CSRF validation by double submit cookie
-  // Em modo de teste (header x-test-mode presente) ou desenvolvimento, permitir bypass do CSRF
-  // Também permitir bypass se o header User-Agent contém "TestSprite" ou similar
   const isTestMode = req.headers.get('x-test-mode') === 'true'
   const isDevelopment = process.env.NODE_ENV === 'development'
   const userAgent = req.headers.get('user-agent') || ''
@@ -65,25 +61,16 @@ export async function POST(req: NextRequest) {
       }, 'AuthAPI')
       return NextResponse.json({ error: 'invalid_csrf' }, { status: 403 })
     }
-  } else {
-    debug('CSRF bypass allowed', { 
-      isTestMode, 
-      isDevelopment, 
-      isTestSprite,
-      userAgent: userAgent.substring(0, 50) 
-    }, 'AuthAPI')
   }
 
-  // Usar cliente anônimo para autenticação de usuários (não service role)
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY
   
   if (!supabaseUrl || !supabaseAnonKey) {
     logError('Variáveis de ambiente do Supabase não configuradas', {}, 'AuthAPI')
-    return NextResponse.json({ error: 'internal_error' }, { status: 500 })
+    return NextResponse.json({ error: 'missing_supabase_env' }, { status: 500 })
   }
 
-  // ✅ Criar cliente Supabase para verificar banco de dados
   const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     auth: {
       autoRefreshToken: false,
@@ -92,26 +79,12 @@ export async function POST(req: NextRequest) {
   })
 
   try {
-    // ✅ PRIMEIRO: Autenticar com Supabase Auth
-    // IMPORTANTE: Autenticar PRIMEIRO, depois verificar usuário no banco (RLS requer autenticação)
-    debug('Autenticando com Supabase Auth', { 
-      email: email.replace(/^(.{2}).+(@.*)$/, '$1***$2') 
-    }, 'AuthAPI')
-    
     const { data, error: authError } = await supabase.auth.signInWithPassword({
       email,
       password,
     })
 
     if (authError) {
-      // Log detalhado do erro para debug
-      logError('Erro de autenticação Supabase', { 
-        error: authError.message, 
-        status: authError.status,
-        email: email.replace(/^(.{2}).+(@.*)$/, '$1***$2')
-      }, 'AuthAPI')
-      
-      // Mapear erros comuns do Supabase para códigos estáveis no cliente
       const msg = (authError.message || '').toLowerCase()
       let code: string = 'auth_error'
       if (msg.includes('invalid') && msg.includes('credentials')) code = 'invalid_credentials'
@@ -121,47 +94,27 @@ export async function POST(req: NextRequest) {
       else if (msg.includes('user') && msg.includes('not') && msg.includes('found')) code = 'user_not_found'
       
       const errorMessage = authError.message || 'Credenciais inválidas'
-      // Padrão HTTP: 401 para falhas de autenticação
-      const status = 401
-      return NextResponse.json({ error: errorMessage, code }, { status })
+      const isNetwork = errorMessage.toLowerCase().includes('fetch failed') || (authError.status === 0)
+      const status = isNetwork ? 502 : 401
+      const codeFinal = isNetwork ? 'supabase_unreachable' : code
+      return NextResponse.json({ error: errorMessage, code: codeFinal }, { status })
     }
 
     if (!data.user || !data.session) {
-      logError('Autenticação sem usuário ou sessão', { 
-        hasUser: !!data.user, 
-        hasSession: !!data.session,
-        email: email.replace(/^(.{2}).+(@.*)$/, '$1***$2')
-      }, 'AuthAPI')
       return NextResponse.json({ error: 'Falha na autenticação - sessão não criada' }, { status: 401 })
     }
     
-    debug('Autenticação bem-sucedida', { 
-      userId: data.user.id,
-      email: email.replace(/^(.{2}).+(@.*)$/, '$1***$2')
-    }, 'AuthAPI')
-    
-    // ✅ SEGUNDO: Verificar se o usuário existe na tabela users (já autenticado, RLS permite)
-    debug('Verificando se usuário existe no banco de dados', { 
-      email: email.replace(/^(.{2}).+(@.*)$/, '$1***$2'),
-      userId: data.user.id
-    }, 'AuthAPI')
-    
-    // Tentar buscar usuário (sem is_active pois pode não existir na tabela)
-    // Não selecionar coluna 'name' se não existir - usar apenas colunas essenciais
     let existingUser, userCheckError
     try {
-      // Primeiro tentar buscar apenas com colunas que definitivamente existem
       const result = await supabase
         .from('users')
         .select('id, email, role, company_id')
-        .eq('id', data.user.id) // Usar ID do usuário autenticado (mais seguro)
+        .eq('id', data.user.id)
         .maybeSingle()
       existingUser = result.data
       userCheckError = result.error
       
-      // Se erro for sobre coluna não existir, tentar sem colunas opcionais
       if (userCheckError && (userCheckError.message?.includes('column') || userCheckError.message?.includes('does not exist'))) {
-        debug('Erro ao buscar colunas, tentando apenas colunas básicas', { error: userCheckError.message }, 'AuthAPI')
         const result2 = await supabase
           .from('users')
           .select('id, email, role')
@@ -171,7 +124,6 @@ export async function POST(req: NextRequest) {
         userCheckError = result2.error
       }
     } catch (err) {
-      // Se falhar, tentar buscar por email
       try {
         const result = await supabase
           .from('users')
@@ -187,57 +139,55 @@ export async function POST(req: NextRequest) {
     
     if (userCheckError) {
       debug('Erro ao verificar usuário no banco', { error: userCheckError }, 'AuthAPI')
-      // Continuar mesmo com erro - pode ser problema de permissão RLS ou usuário não existe
-      // Mas como a autenticação funcionou, permitimos o login
     }
     
-    // Se usuário não existe no banco, logar mas continuar (autenticação já funcionou)
     if (!existingUser) {
-      logError('Usuário não encontrado na tabela users', { 
-        email: email.replace(/^(.{2}).+(@.*)$/, '$1***$2'),
-        userId: data.user.id
-      }, 'AuthAPI')
-      // NÃO bloquear login - apenas logar o aviso
-      // O usuário pode ser criado depois ou pode ser um usuário do Supabase Auth apenas
-    } else {
-      debug('Usuário encontrado no banco', { 
-        userId: existingUser.id,
-        role: existingUser.role || 'não definido'
-      }, 'AuthAPI')
+      return NextResponse.json({ error: 'Usuário não cadastrado no sistema', code: 'user_not_in_db' }, { status: 403 })
     }
     
-    // ✅ TERCEIRO: Obter role do banco de dados (fonte de verdade)
-    // Prioridade: 1. Tabela users (se existir), 2. Metadados do usuário, 3. Fallback por email
-    let role = existingUser?.role // Usar role da tabela users (fonte de verdade)
-    
-    // Se não tiver role na tabela, tentar metadados
+    let role = existingUser?.role
     if (!role) {
       role = data.user.user_metadata?.role || data.user.app_metadata?.role
-      debug('Role não encontrado na tabela, usando metadados', { role }, 'AuthAPI')
     }
     
-    // Se ainda não tiver, usar fallback por email
     if (!role) {
       role = getUserRoleByEmail(data.user.email || email)
-      debug('Usando fallback por email para role', { role, email: email.replace(/^(.{2}).+(@.*)$/, '$1***$2') }, 'AuthAPI')
     }
     
-    // Log final do role detectado
-    debug('Role final determinado', { 
-      role,
-      source: existingUser?.role ? 'database' : (data.user.user_metadata?.role ? 'metadata' : 'email_fallback'),
-      userId: data.user.id
-    }, 'AuthAPI')
     const token = data.session.access_token
     const refreshToken = data.session.refresh_token
-    const userPayload = {
-      id: data.user.id,
-      email: data.user.email ?? email,
-      role,
-      accessToken: token,
+
+    let companyId: string | null = existingUser?.company_id || null
+    if (role === 'operator') {
+      try {
+        const { data: mapping } = await supabase
+          .from('gf_user_company_map')
+          .select('company_id')
+          .eq('user_id', data.user.id)
+          .maybeSingle()
+        companyId = mapping?.company_id || companyId || null
+        if (!companyId) {
+          return NextResponse.json({ error: 'Usuário operador sem empresa associada', code: 'no_company_mapping' }, { status: 403 })
+        }
+        const { data: company } = await supabase
+          .from('companies')
+          .select('id, is_active')
+          .eq('id', companyId)
+          .maybeSingle()
+        if (!company || company.is_active === false) {
+          return NextResponse.json({ error: 'Empresa associada inativa', code: 'company_inactive' }, { status: 403 })
+        }
+      } catch (checkErr) {
+        return NextResponse.json({ error: 'Falha ao validar empresa do operador', code: 'company_check_failed' }, { status: 500 })
+      }
     }
 
-    // ✅ Retornar também os tokens de sessão para o cliente persistir no Supabase
+    const userPayload = {
+      id: data.user.id,
+      role,
+      companyId: companyId || undefined,
+    }
+
     const response = NextResponse.json({ 
       token, 
       refreshToken,
@@ -259,15 +209,12 @@ export async function POST(req: NextRequest) {
 
     const cookieValue = Buffer.from(JSON.stringify(userPayload)).toString('base64')
     response.cookies.set('golffox-session', cookieValue, {
-      httpOnly: false,
-      maxAge: 60 * 60 * 24, // 24 horas
+      httpOnly: true,
+      maxAge: 60 * 60 * 24,
       sameSite: 'lax',
       secure: isSecureRequest(req),
       path: '/',
     })
-    
-    // Adicionar header Set-Cookie explícito para garantir que o cookie seja definido
-    response.headers.set('Set-Cookie', `golffox-session=${cookieValue}; Path=/; Max-Age=86400; SameSite=Lax${isSecureRequest(req) ? '; Secure' : ''}`)
 
     debug('Login API concluído', { role, emailHash: email.replace(/^(.{2}).+(@.*)$/, '$1***$2') }, 'AuthAPI')
     return response
@@ -277,3 +224,5 @@ export async function POST(req: NextRequest) {
   }
 }
 
+// Exportar com rate limiting - 5 tentativas por minuto por IP/sessão
+export const POST = withRateLimit(loginHandler, 'auth');

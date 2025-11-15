@@ -61,7 +61,7 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
       try {
         const { data: { session } } = await supabase.auth.getSession()
         if (session?.user) {
-          const { data: userData, error } = await supabase
+          const { data: userData, error } = await (supabase as any)
             .from('users')
             .select('role, company_id, carrier_id')
             .eq('id', session.user.id)
@@ -69,9 +69,9 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
           
           if (!error && userData) {
             setUserInfo({
-              role: userData.role,
-              company_id: userData.company_id,
-              carrier_id: userData.carrier_id
+              role: (userData as any).role,
+              company_id: (userData as any).company_id,
+              carrier_id: (userData as any).carrier_id
             })
           }
         }
@@ -127,7 +127,7 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
       const fileName = `${vehicleId}-${Date.now()}.${fileExt}`
       const filePath = `vehicles/${fileName}`
 
-      const { error: uploadError } = await supabase.storage
+      const { error: uploadError } = await (supabase as any).storage
         .from('vehicle-photos')
         .upload(filePath, photoFile, {
           cacheControl: '3600',
@@ -136,7 +136,7 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
 
       if (uploadError) throw uploadError
 
-      const { data } = supabase.storage
+      const { data } = (supabase as any).storage
         .from('vehicle-photos')
         .getPublicUrl(filePath)
 

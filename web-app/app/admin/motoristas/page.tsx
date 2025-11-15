@@ -60,10 +60,18 @@ export default function MotoristasPage() {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
       const result = await response.json()
-      if (result.success) {
-        setMotoristas(result.drivers || [])
+      if (Array.isArray(result)) {
+        setMotoristas(result)
+      } else if (result && typeof result === 'object') {
+        if (result.success && Array.isArray(result.drivers)) {
+          setMotoristas(result.drivers)
+        } else if (Array.isArray(result.data)) {
+          setMotoristas(result.data)
+        } else {
+          throw new Error(result.error || 'Erro ao carregar motoristas')
+        }
       } else {
-        throw new Error(result.error || 'Erro ao carregar motoristas')
+        throw new Error('Resposta inválida ao carregar motoristas')
       }
     } catch (error) {
       console.error("Erro ao carregar motoristas:", error)
@@ -79,6 +87,8 @@ export default function MotoristasPage() {
     }
 
     try {
+      const snapshot = [...motoristas]
+      setMotoristas((prev) => prev.filter((m) => m.id !== motoristaId))
       const response = await fetch(`/api/admin/drivers/delete?id=${motoristaId}`, {
         method: 'DELETE'
       })
@@ -88,14 +98,15 @@ export default function MotoristasPage() {
       if (!response.ok) {
         const errorMessage = result.message || result.error || 'Erro ao excluir motorista'
         const errorDetails = result.details ? ` (${result.details})` : ''
+        setMotoristas(snapshot)
         throw new Error(`${errorMessage}${errorDetails}`)
       }
 
       if (result.success) {
         notifySuccess('Motorista excluído com sucesso')
-        await new Promise(resolve => setTimeout(resolve, 300))
-        await loadMotoristas()
+        void loadMotoristas()
       } else {
+        setMotoristas(snapshot)
         throw new Error(result.error || 'Erro ao excluir motorista')
       }
     } catch (error: any) {

@@ -26,11 +26,6 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { MarkerClusterer } from "@googlemaps/markerclusterer"
 import { formatRelativeTime } from "@/lib/kpi-utils"
 
-declare global {
-  interface Window {
-    google: any
-  }
-}
 
 interface Bus {
   id: string
@@ -156,7 +151,7 @@ export const FleetMap = memo(function FleetMap({ companyId, routeId, initialCent
   // Carregar dados do mapa
   const loadMapData = useCallback(async () => {
     try {
-      const { data, error } = await supabase.rpc('gf_map_snapshot_full', {
+      const { data, error } = await (supabase as any).rpc('gf_map_snapshot_full', {
         p_company_id: filters.company || null,
         p_route_id: filters.route || null
       })

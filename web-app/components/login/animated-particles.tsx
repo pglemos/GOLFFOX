@@ -8,8 +8,8 @@ export const AnimatedParticles = () => {
     x: Math.random() * 100,
     y: Math.random() * 100,
     size: Math.random() * 3 + 1,
-    duration: Math.random() * 20 + 10,
-    delay: Math.random() * 5,
+    duration: Math.random() * 8 + 6,
+    delay: Math.random() * 2,
   }))
 
   return (
@@ -23,22 +23,22 @@ export const AnimatedParticles = () => {
             top: `${particle.y}%`,
             width: `${particle.size}px`,
             height: `${particle.size}px`,
+            willChange: 'transform, opacity',
           }}
           animate={{
-            y: [0, -30, 0],
-            x: [0, Math.random() * 20 - 10, 0],
-            opacity: [0.2, 0.6, 0.2],
-            scale: [1, 1.2, 1],
+            y: [0, -22, 0],
+            x: [0, Math.random() * 12 - 6, 0],
+            opacity: [0.25, 0.55, 0.25],
+            scale: [1, 1.12, 1],
           }}
           transition={{
             duration: particle.duration,
             delay: particle.delay,
             repeat: Infinity,
-            ease: "easeInOut",
+            ease: "easeOut",
           }}
         />
       ))}
     </div>
   )
 }
-

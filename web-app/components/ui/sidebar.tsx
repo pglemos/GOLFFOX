@@ -1,9 +1,9 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import Link, { LinkProps } from "next/link";
 import React, { useState, createContext, useContext } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 import { Menu, X } from "lucide-react";
 
 interface Links {
@@ -78,7 +78,7 @@ export const SidebarBody = (props: React.ComponentProps<typeof motion.div>) => {
   return (
     <>
       <DesktopSidebar {...props} />
-      <MobileSidebar {...(props as React.ComponentProps<"div">)} />
+      <MobileSidebar {...(props as React.ComponentProps<'div'>)} />
     </>
   );
 };
@@ -99,10 +99,7 @@ export const DesktopSidebar = ({
       animate={{
         width: animate ? (open ? "300px" : "60px") : "300px",
       }}
-      transition={{
-        duration: 0.2,
-        ease: "easeInOut",
-      }}
+      transition={{ duration: 0.12, ease: "easeOut" }}
       onMouseEnter={() => setOpen(true)}
       onMouseLeave={() => setOpen(false)}
       {...props}
@@ -116,14 +113,15 @@ export const MobileSidebar = ({
   className,
   children,
   ...props
-}: React.ComponentProps<"div">) => {
+}: React.ComponentProps<'div'>) => {
   const { open, setOpen } = useSidebar();
   return (
     <>
-      <div
+      <motion.div
         className={cn(
           "h-10 px-4 py-4 flex flex-row md:hidden items-center justify-between bg-neutral-100 dark:bg-neutral-800 w-full"
         )}
+        transition={{ duration: 0.2, ease: "easeOut" }}
         {...props}
       >
         <div className="flex justify-end z-20 w-full">
@@ -135,13 +133,10 @@ export const MobileSidebar = ({
         <AnimatePresence>
           {open && (
             <motion.div
-              initial={{ x: "-100%", opacity: 0 }}
+              initial={{ x: -80, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
-              exit={{ x: "-100%", opacity: 0 }}
-              transition={{
-                duration: 0.3,
-                ease: "easeInOut",
-              }}
+              exit={{ x: -80, opacity: 0 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
               className={cn(
                 "fixed h-full w-full inset-0 bg-white dark:bg-neutral-900 p-10 z-[100] flex flex-col justify-between",
                 className
@@ -157,7 +152,7 @@ export const MobileSidebar = ({
             </motion.div>
           )}
         </AnimatePresence>
-      </div>
+      </motion.div>
     </>
   );
 };
@@ -169,40 +164,38 @@ export const SidebarLink = ({
 }: {
   link: Links;
   className?: string;
-  props?: LinkProps;
+  props?: React.AnchorHTMLAttributes<HTMLAnchorElement>;
 }) => {
   const { open, animate } = useSidebar();
+  const router = useRouter();
   
   return (
-    <Link
+    <a
       href={link.href}
       className={cn(
         "flex items-center justify-start gap-2 group/sidebar py-2",
         className
       )}
+      onMouseEnter={() => router.prefetch(link.href)}
+      onClick={(e) => { e.preventDefault(); router.push(link.href); }}
       {...props}
     >
       {link.icon}
       <motion.span
-        animate={{
-          opacity: animate ? (open ? 1 : 0) : 1,
-        }}
-        transition={{
-          duration: 0.2,
-          ease: "easeInOut",
-        }}
-        className={cn(
-          "text-neutral-700 dark:text-neutral-200 text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre",
-          "!p-0 !m-0"
-        )}
-        style={{
+          animate={{ opacity: animate ? (open ? 1 : 0) : 1 }}
+          transition={{ duration: 0.15, ease: "easeOut" }}
+          className={cn(
+            "text-neutral-700 dark:text-neutral-200 text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre",
+            "!p-0 !m-0"
+          )}
+          style={{
           display: animate ? (open ? "inline-block" : "none") : "inline-block",
           overflow: "hidden",
         }}
       >
         {link.label}
       </motion.span>
-    </Link>
+    </a>
   );
 };
 

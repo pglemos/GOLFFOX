@@ -68,10 +68,10 @@ export function ChangeRoleModal({
         const { data: { session } } = await supabase.auth.getSession()
         const currentUser = session?.user
         // Verificar se o usuário atual é admin
-        const { data: currentUserData } = await supabase
+        const { data: currentUserData } = await (supabase as any)
           .from('users')
           .select('role')
-          .eq('id', currentUser?.id)
+          .eq('id', currentUser?.id || '')
           .single()
 
         if (currentUserData?.role !== 'admin') {
@@ -80,7 +80,7 @@ export function ChangeRoleModal({
         }
       }
 
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from("users")
         .update({ role: newRole })
         .eq("id", user.id)

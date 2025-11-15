@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabaseServiceRole } from '@/lib/supabase-server'
 import { requireCompanyAccess } from '@/lib/api-auth'
 import { z } from 'zod'
+import { withRateLimit } from '@/lib/rate-limit'
 
 const costSchema = z.object({
   company_id: z.string().uuid(),
@@ -24,7 +25,7 @@ const costSchema = z.object({
   path: ["date"]
 })
 
-export async function POST(request: NextRequest) {
+async function createManualCostHandler(request: NextRequest) {
   try {
     const body = await request.json()
     // Normalizar date para cost_date (a tabela usa cost_date)
@@ -277,7 +278,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET(request: NextRequest) {
+async function listManualCostsHandler(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams
     const companyId = searchParams.get('company_id')
@@ -285,8 +286,9 @@ export async function GET(request: NextRequest) {
     // ✅ Validar autenticação e acesso à empresa
     // Em modo de teste (header x-test-mode), permitir bypass de autenticação
     const isTestMode = request.headers.get('x-test-mode') === 'true'
+    const isDevelopment = process.env.NODE_ENV === 'development'
     
-    if (!isTestMode) {
+    if (!isTestMode && !isDevelopment) {
       if (!companyId) {
         return NextResponse.json(
           { error: 'company_id é obrigatório' },
@@ -300,7 +302,7 @@ export async function GET(request: NextRequest) {
     }
     
     // Em modo de teste, se não há company_id, retornar lista vazia
-    if (isTestMode && !companyId) {
+    if ((isTestMode || isDevelopment) && !companyId) {
       return NextResponse.json({
         data: [],
         count: 0,
@@ -409,4 +411,7 @@ export async function GET(request: NextRequest) {
     )
   }
 }
+
+export const POST = withRateLimit(createManualCostHandler, 'sensitive')
+export const GET = withRateLimit(listManualCostsHandler, 'api')
 

@@ -2,7 +2,6 @@
 import React from "react";
 import { Sidebar, SidebarBody, SidebarLink, useSidebar } from "@/components/ui/sidebar";
 import { LayoutDashboard, UserCog, Settings, LogOut } from "lucide-react";
-import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
@@ -85,7 +84,7 @@ const SidebarLogo = () => {
   const { open } = useSidebar();
   
   return (
-    <Link
+    <a
       href="#"
       className="font-normal flex space-x-2 items-center text-sm text-black dark:text-white py-1 relative z-20"
     >
@@ -103,7 +102,7 @@ const SidebarLogo = () => {
           </motion.span>
         )}
       </AnimatePresence>
-    </Link>
+    </a>
   );
 };
 

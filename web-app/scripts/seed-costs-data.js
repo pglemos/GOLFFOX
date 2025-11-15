@@ -120,13 +120,14 @@ async function seedCostsData() {
               driver_id,
               cost_category_id,
               date,
+              cost_date,
               amount,
               qty,
               unit,
               source,
               notes,
               created_at
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, NOW())
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, NOW())
             RETURNING id
           `, [
             company.id,
@@ -134,6 +135,7 @@ async function seedCostsData() {
             vehicle?.id || null,
             driver?.id || null,
             category.id,
+            dateStr,
             dateStr,
             amount,
             qty,

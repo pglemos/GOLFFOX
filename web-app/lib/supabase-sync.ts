@@ -309,7 +309,7 @@ async function executeSyncWithRetry(
     let response: any
 
     if (operation.action === 'create') {
-      const { data, error, status } = await supabase
+      const { data, error, status } = await (supabase as any)
         .from(table)
         .insert(mappedData)
         .select()
@@ -322,7 +322,7 @@ async function executeSyncWithRetry(
         throw new Error('ID do recurso é obrigatório para atualização')
       }
 
-      const { data, error, status } = await supabase
+      const { data, error, status } = await (supabase as any)
         .from(table)
         .update(mappedData)
         .eq('id', operation.resourceId)
@@ -336,7 +336,7 @@ async function executeSyncWithRetry(
         throw new Error('ID do recurso é obrigatório para deleção')
       }
 
-      const { error, status } = await supabase
+      const { error, status } = await (supabase as any)
         .from(table)
         .delete()
         .eq('id', operation.resourceId)

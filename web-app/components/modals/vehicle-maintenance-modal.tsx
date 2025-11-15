@@ -108,7 +108,7 @@ export function VehicleMaintenanceModal({
 
       if (maintenance?.id) {
         // Atualizar
-        const { error } = await supabase
+        const { error } = await (supabase as any)
           .from("gf_vehicle_maintenance")
           .update(maintenanceData)
           .eq("id", maintenance.id)
@@ -126,7 +126,7 @@ export function VehicleMaintenanceModal({
         notifySuccess('', { i18n: { ns: 'common', key: 'success.maintenanceUpdated' } })
       } else {
         // Criar
-        const { data, error } = await supabase
+        const { data, error } = await (supabase as any)
           .from("gf_vehicle_maintenance")
           .insert(maintenanceData)
           .select()
@@ -151,7 +151,7 @@ export function VehicleMaintenanceModal({
       try {
         const { data: { session } } = await supabase.auth.getSession()
         if (session) {
-          await supabase.from('gf_audit_log').insert({
+          await (supabase as any).from('gf_audit_log').insert({
             actor_id: session.user.id,
             action_type: maintenance?.id ? 'update' : 'create',
             resource_type: 'vehicle_maintenance',

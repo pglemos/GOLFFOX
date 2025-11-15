@@ -61,17 +61,26 @@ export function RotasPageContent() {
 
   const loadRotas = async () => {
     try {
-      // Usar API route para bypass RLS
       const response = await fetch('/api/admin/routes-list')
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
       const result = await response.json()
-      if (result.success) {
-        setRotas(result.routes || [])
-      } else {
-        throw new Error(result.error || 'Erro ao carregar rotas')
+      if (Array.isArray(result)) {
+        setRotas(result)
+        return
       }
+      if (result && typeof result === 'object') {
+        if (result.success && Array.isArray(result.routes)) {
+          setRotas(result.routes)
+          return
+        }
+        if (Array.isArray(result.data)) {
+          setRotas(result.data)
+          return
+        }
+      }
+      throw new Error((result && result.error) || 'Erro ao carregar rotas')
     } catch (error) {
       console.error("Erro ao carregar rotas:", error)
       setRotas([])
@@ -84,6 +93,8 @@ export function RotasPageContent() {
     }
 
     try {
+      const snapshot = [...rotas]
+      setRotas((prev) => prev.filter((r) => r.id !== rotaId))
       const response = await fetch(`/api/admin/routes/delete?id=${rotaId}`, {
         method: 'DELETE'
       })
@@ -93,14 +104,15 @@ export function RotasPageContent() {
       if (!response.ok) {
         const errorMessage = result.message || result.error || 'Erro ao excluir rota'
         const errorDetails = result.details ? ` (${result.details})` : ''
+        setRotas(snapshot)
         throw new Error(`${errorMessage}${errorDetails}`)
       }
 
       if (result.success) {
         notifySuccess('Rota excluída permanentemente com sucesso')
-        await new Promise(resolve => setTimeout(resolve, 300))
-        await loadRotas()
+        void loadRotas()
       } else {
+        setRotas(snapshot)
         throw new Error(result.error || 'Erro ao excluir rota')
       }
     } catch (error: any) {

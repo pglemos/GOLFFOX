@@ -51,3 +51,30 @@ Adicione capturas de tela para demonstrar as mudanças visuais.
 
 ## 📋 Notas Adicionais
 Adicione quaisquer notas sobre o PR aqui.
+
+---
+
+## 🔒 Checklist de Segurança
+- [ ] Cookies de sessão `httpOnly`, `secure`, `sameSite=lax` e payload mínimo confirmados
+- [ ] Nenhum token/senha exposto em cookies, logs ou responses
+- [ ] RLS v49 aplicada e verificada em `gf_user_company_map`
+- [ ] Endpoints sensíveis com `withRateLimit`
+
+## ⚡ Checklist de Performance
+- [ ] Export/relatórios usam paginação e seleção de colunas
+- [ ] Streaming CSV habilitado (custos/export, reports/run)
+- [ ] Consultas supabase sem `.select('*')` em endpoints de alto custo
+
+## 🛰️ Checklist de Observabilidade
+- [ ] `@sentry/nextjs` habilitado condicionalmente (web)
+- [ ] `sentry_flutter` integrado (mobile)
+- [ ] Logs padronizados via `logger.ts`
+
+## 📚 Checklist de Documentação
+- [ ] `docs/ARQUITETURA_ATUAL.md` atualizado
+- [ ] `docs/GUIA_MIGRACAO_REPERTORIO.md` atualizado
+- [ ] OpenAPI publicado (`/api/docs/openapi`, `docs/api/openapi.json`)
+- [ ] Conteúdos redundantes movidos para `archive/LEGADO_NAO_USAR`
+
+## 📎 Anexos
+- `docs/reports/V49_POLICY_REPORT.md` – relatório de políticas RLS v49

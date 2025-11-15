@@ -53,7 +53,7 @@ export class PlaybackService {
       const { supabase } = await import('@/lib/supabase')
       
       // Chamar função RPC v_positions_by_interval
-      const { data, error } = await supabase.rpc(
+      const { data, error } = await (supabase as any).rpc(
         'v_positions_by_interval',
         {
           p_company_id: companyId,

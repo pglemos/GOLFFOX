@@ -42,7 +42,7 @@ export function SolicitacaoModal({ isOpen, onClose, onSave, empresaId }: Solicit
     setLoading(true)
     try {
       // Chamar RPC para criar solicitação
-      const { data, error } = await supabase.rpc('rpc_request_service', {
+      const { data, error } = await (supabase as any).rpc('rpc_request_service', {
         p_empresa: empresaId,
         p_tipo: tipo,
         p_payload: payload
