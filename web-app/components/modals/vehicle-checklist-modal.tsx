@@ -146,7 +146,7 @@ export function VehicleChecklistModal({
 
       if (checklist?.id) {
         // Atualizar
-        const { error } = await supabase
+        const { error } = await (supabase as any)
           .from("gf_vehicle_checklists")
           .update(checklistData)
           .eq("id", checklist.id)
@@ -164,7 +164,7 @@ export function VehicleChecklistModal({
         notifySuccess('', { i18n: { ns: 'common', key: 'success.checklistUpdated' } })
       } else {
         // Criar
-        const { data, error } = await supabase
+        const { data, error } = await (supabase as any)
           .from("gf_vehicle_checklists")
           .insert(checklistData)
           .select()
@@ -189,7 +189,7 @@ export function VehicleChecklistModal({
       try {
         const { data: { session } } = await supabase.auth.getSession()
         if (session) {
-          await supabase.from('gf_audit_log').insert({
+          await (supabase as any).from('gf_audit_log').insert({
             actor_id: session.user.id,
             action_type: checklist?.id ? 'update' : 'create',
             resource_type: 'vehicle_checklist',
