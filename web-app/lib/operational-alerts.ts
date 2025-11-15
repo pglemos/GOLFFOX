@@ -36,7 +36,7 @@ export interface OperationalAlert {
  */
 export async function createAlert(alert: OperationalAlert): Promise<void> {
   try {
-    await supabase.from('gf_alerts').insert({
+  await (supabase as any).from('gf_alerts').insert({
       type: alert.type,
       severity: alert.severity,
       title: alert.title,
@@ -178,9 +178,9 @@ export async function getUnresolvedAlerts(
  */
 export async function resolveAlert(alertId: string, notes?: string): Promise<void> {
   try {
-    await supabase
-      .from('gf_alerts')
-      .update({
+  await (supabase as any)
+    .from('gf_alerts')
+    .update({
         is_resolved: true,
         resolved_at: new Date().toISOString(),
         resolution_notes: notes,

@@ -68,6 +68,11 @@ declare module 'lucide-react' {
   export const BarChart3: FC<IconProps>
   export const FileSpreadsheet: FC<IconProps>
   export const CheckCircle2: FC<IconProps>
+  export const Info: FC<IconProps>
+  export const Send: FC<IconProps>
+  export const Route: FC<IconProps>
+  export const Wrench: FC<IconProps>
+  export const ClipboardCheck: FC<IconProps>
   
   // Adicione outros ícones conforme necessário
   const Icon: FC<IconProps>

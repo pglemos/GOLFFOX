@@ -2,11 +2,6 @@
  * Utilitários para manipulação do mapa
  */
 
-declare global {
-  interface Window {
-    google: any
-  }
-}
 
 /**
  * Ajusta o bounds do mapa com margem

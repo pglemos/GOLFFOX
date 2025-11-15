@@ -102,7 +102,7 @@ export async function logAudit(params: LogAuditParams): Promise<void> {
     // Sanitizar detalhes removendo PII
     const sanitizedDetails = sanitizeDetails(params.details)
 
-    await supabase.from('gf_audit_log').insert({
+  await (supabase as any).from('gf_audit_log').insert({
       actor_id: actorId,
       company_id: companyId,
       action_type: params.action,

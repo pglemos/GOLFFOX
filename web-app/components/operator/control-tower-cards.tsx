@@ -1,6 +1,7 @@
 "use client"
 
 import { memo } from 'react'
+import { motion } from 'framer-motion'
 import { AlertCircle, Truck, Route, HelpCircle } from 'lucide-react'
 
 interface ControlTowerCardsProps {

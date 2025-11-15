@@ -127,7 +127,7 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
       const fileName = `${vehicleId}-${Date.now()}.${fileExt}`
       const filePath = `vehicles/${fileName}`
 
-      const { error: uploadError } = await supabase.storage
+      const { error: uploadError } = await (supabase as any).storage
         .from('vehicle-photos')
         .upload(filePath, photoFile, {
           cacheControl: '3600',
@@ -136,7 +136,7 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
 
       if (uploadError) throw uploadError
 
-      const { data } = supabase.storage
+      const { data } = (supabase as any).storage
         .from('vehicle-photos')
         .getPublicUrl(filePath)
 
