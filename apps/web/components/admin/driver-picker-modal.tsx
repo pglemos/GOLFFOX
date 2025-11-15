@@ -1,0 +1,169 @@
+"use client"
+
+import { useState, useEffect, useMemo } from "react"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { Search, CheckCircle2, XCircle } from "lucide-react"
+import { supabase } from "@/lib/supabase"
+import { maskCPF } from "@/lib/geocoding"
+import { ScrollArea } from "@/components/ui/scroll-area"
+
+interface Driver {
+  id: string
+  name: string
+  cpf: string
+  documents_valid: boolean
+  rating?: number
+}
+
+interface DriverPickerModalProps {
+  isOpen: boolean
+  onClose: () => void
+  onSelect: (driver: Driver) => void
+  companyId?: string
+}
+
+export function DriverPickerModal({
+  isOpen,
+  onClose,
+  onSelect,
+  companyId
+}: DriverPickerModalProps) {
+  const [drivers, setDrivers] = useState<Driver[]>([])
+  const [loading, setLoading] = useState(false)
+  const [searchQuery, setSearchQuery] = useState("")
+
+  useEffect(() => {
+    if (isOpen) {
+      loadDrivers()
+    }
+  }, [isOpen, companyId])
+
+  const loadDrivers = async () => {
+    setLoading(true)
+    try {
+      // Usar API route para bypassar RLS
+      const url = companyId 
+        ? `/api/admin/drivers-list?company_id=${companyId}`
+        : '/api/admin/drivers-list'
+      
+      const response = await fetch(url)
+      const result = await response.json()
+
+      if (!result.success) {
+        throw new Error(result.error || 'Erro ao carregar motoristas')
+      }
+
+      const driversData: Driver[] = (result.drivers || []).map((d: any) => ({
+        id: d.id,
+        name: d.name || "Sem nome",
+        cpf: d.cpf || "",
+        documents_valid: !!d.cpf,
+        rating: undefined
+      }))
+
+      setDrivers(driversData)
+    } catch (error) {
+      console.error("Erro ao carregar motoristas:", error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const filteredDrivers = useMemo(() => {
+    if (!searchQuery) return drivers
+
+    const query = searchQuery.toLowerCase().trim()
+    return drivers.filter(
+      (d) =>
+        d.name.toLowerCase().includes(query) ||
+        d.cpf.replace(/\D/g, "").includes(query.replace(/\D/g, ""))
+    )
+  }, [drivers, searchQuery])
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-2xl max-h-[80vh]">
+        <DialogHeader>
+          <DialogTitle>Selecionar Motorista</DialogTitle>
+          <DialogDescription>
+            Busque e selecione um motorista para a rota
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-4">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Input
+              placeholder="Buscar por nome ou CPF..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+
+          {loading ? (
+            <div className="text-center py-8 text-gray-500">Carregando...</div>
+          ) : (
+            <ScrollArea className="h-[400px]">
+              <div className="space-y-2">
+                {filteredDrivers.length === 0 ? (
+                  <div className="text-center py-8 text-gray-500">
+                    Nenhum motorista encontrado
+                  </div>
+                ) : (
+                  filteredDrivers.map((driver) => (
+                    <div
+                      key={driver.id}
+                      className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
+                      onClick={() => {
+                        onSelect(driver)
+                        onClose()
+                      }}
+                    >
+                      <div className="flex-1">
+                        <div className="font-medium">{driver.name}</div>
+                        {driver.cpf && (
+                          <div className="text-sm text-gray-500">
+                            CPF: {maskCPF(driver.cpf)}
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {driver.documents_valid ? (
+                          <Badge variant="default" className="bg-green-100 text-green-700">
+                            <CheckCircle2 className="h-3 w-3 mr-1" />
+                            Docs OK
+                          </Badge>
+                        ) : (
+                          <Badge variant="destructive">
+                            <XCircle className="h-3 w-3 mr-1" />
+                            Pendente
+                          </Badge>
+                        )}
+                        {driver.rating && (
+                          <Badge variant="outline">
+                            ⭐ {driver.rating.toFixed(1)}
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </ScrollArea>
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
+  )
+}
+

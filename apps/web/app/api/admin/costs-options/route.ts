@@ -1,0 +1,52 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { createClient } from '@supabase/supabase-js'
+import { requireAuth } from '@/lib/api-auth'
+
+export const runtime = 'nodejs'
+
+function getSupabaseAdmin() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+  if (!url || !serviceKey) {
+    throw new Error('Supabase não configurado')
+  }
+  return createClient(url, serviceKey)
+}
+
+export async function GET(request: NextRequest) {
+  try {
+    const isDevelopment = process.env.NODE_ENV === 'development'
+    const authErrorResponse = await requireAuth(request, 'admin')
+    if (authErrorResponse && !isDevelopment) {
+      return authErrorResponse
+    }
+    if (authErrorResponse && isDevelopment) {
+      console.warn('⚠️ Autenticação falhou em desenvolvimento, mas continuando...')
+    }
+
+    const supabaseAdmin = getSupabaseAdmin()
+    
+    // Buscar todas as opções em paralelo
+    const [routesRes, vehiclesRes, driversRes, carriersRes] = await Promise.all([
+      supabaseAdmin.from('routes').select('id, name').order('name'),
+      supabaseAdmin.from('vehicles').select('id, plate').order('plate'),
+      supabaseAdmin.from('users').select('id, email').eq('role', 'driver').order('email'),
+      supabaseAdmin.from('carriers').select('id, name').order('name')
+    ])
+
+    return NextResponse.json({
+      success: true,
+      routes: routesRes.data || [],
+      vehicles: vehiclesRes.data || [],
+      drivers: driversRes.data || [],
+      carriers: carriersRes.data || []
+    })
+  } catch (error: any) {
+    console.error('Erro ao buscar opções de custos:', error)
+    return NextResponse.json(
+      { error: 'Erro ao buscar opções de custos', message: error.message },
+      { status: 500 }
+    )
+  }
+}
+

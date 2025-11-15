@@ -122,3 +122,8 @@ out/
 *.tgz
 *.tar.gz
 .vercel
+
+# Sentry Config File
+.env.sentry-build-plugin
+
+sentry.properties
