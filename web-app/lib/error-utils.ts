@@ -8,15 +8,17 @@ export type SupabaseLikeError = {
 } | any
 
 // Extrai uma mensagem segura de qualquer objeto de erro
-export function formatError(error: any): string {
-  if (!error) return 'Erro desconhecido'
+export function formatError(error: any, fallbackMessage?: string): string {
+  if (!error) return fallbackMessage || 'Erro desconhecido'
   const e = (error as any).error ?? error
-  if (typeof e === 'string') return e
+  if (typeof e === 'string') return e || (fallbackMessage || 'Erro desconhecido')
   if (typeof e?.message === 'string' && e.message.length > 0) return e.message
   try {
-    return JSON.stringify(e)
+    const s = JSON.stringify(e)
+    return s && s.length > 0 ? s : (fallbackMessage || 'Erro desconhecido')
   } catch {
-    return String(e)
+    const s = String(e)
+    return s && s.length > 0 ? s : (fallbackMessage || 'Erro desconhecido')
   }
 }
 
@@ -30,4 +32,3 @@ export function getErrorMeta(error: SupabaseLikeError): Record<string, unknown> 
   if (e?.hint !== undefined) meta.hint = e.hint
   return meta
 }
-

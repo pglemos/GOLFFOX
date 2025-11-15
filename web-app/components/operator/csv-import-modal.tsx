@@ -44,25 +44,7 @@ interface CSVImportModalProps {
   empresaId: string
 }
 
-interface EmployeeRow {
-  nome: string
-  email: string
-  telefone?: string
-  cpf?: string
-  endereco?: string
-  centro_de_custo?: string
-}
-
-interface ParseResult {
-  valid: EmployeeRow[]
-  errors: Array<{ line: number; errors: string[] }>
-}
-
-interface ImportResult {
-  success: number
-  errors: Array<{ employee: string; error: string }>
-  unresolvedAddresses: string[]
-}
+import type { EmployeeRow, ParseResult, ImportResult } from '@/lib/importers/employee-csv'
 
 export function CSVImportModal({ isOpen, onClose, onSave, empresaId }: CSVImportModalProps) {
   const [loading, setLoading] = useState(false)
@@ -72,6 +54,7 @@ export function CSVImportModal({ isOpen, onClose, onSave, empresaId }: CSVImport
   const [importing, setImporting] = useState(false)
   const [importProgress, setImportProgress] = useState({ current: 0, total: 0, stage: 'parsing' as 'parsing' | 'geocoding' | 'importing' })
   const [importResult, setImportResult] = useState<ImportResult | null>(null)
+  const [csvAvailable, setCsvAvailable] = useState<boolean>(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -79,8 +62,9 @@ export function CSVImportModal({ isOpen, onClose, onSave, empresaId }: CSVImport
     if (!selectedFile) return
 
     const mod = await loadCsvModule()
+    setCsvAvailable(Boolean(mod?.parseCSV))
     if (!mod?.parseCSV) {
-      notifyError('Funcionalidade de importação CSV não disponível. Verifique se o módulo está instalado.', {
+      notifyError('Funcionalidade de importação CSV não disponível. Verifique se o módulo está instalado.', undefined, {
         i18n: { ns: 'operator', key: 'csv_import.error', params: { message: 'Módulo ausente' } }
       })
       return
@@ -95,14 +79,14 @@ export function CSVImportModal({ isOpen, onClose, onSave, empresaId }: CSVImport
       const result = await mod.parseCSV(selectedFile) as ParseResult
 
       if (!result || !result.valid) {
-        notifyError("Erro ao processar arquivo CSV", {
+        notifyError("Erro ao processar arquivo CSV", undefined, {
           i18n: { ns: 'operator', key: 'csv_import.error', params: { message: 'Processamento' } }
         })
         return
       }
 
       if (result.valid.length === 0) {
-        notifyError("Nenhum funcionário válido encontrado no arquivo", {
+        notifyError("Nenhum funcionário válido encontrado no arquivo", undefined, {
           i18n: { ns: 'operator', key: 'csv_import.error', params: { message: 'Nenhum válido' } }
         })
         return
@@ -218,7 +202,7 @@ export function CSVImportModal({ isOpen, onClose, onSave, empresaId }: CSVImport
           <DialogTitle>{operatorI18n.csv_import?.title || 'Importar Funcionários via CSV'}</DialogTitle>
         </DialogHeader>
         <div className="grid gap-4 py-4">
-          {!parseCSV && (
+          {!csvAvailable && (
             <div className="p-3 rounded-lg bg-yellow-50 border border-yellow-200">
               <div className="flex items-center gap-2">
                 <AlertCircle className="h-4 w-4 text-yellow-500" />
@@ -238,13 +222,13 @@ export function CSVImportModal({ isOpen, onClose, onSave, empresaId }: CSVImport
                 type="file"
                 accept=".csv,.txt"
                 onChange={handleFileSelect}
-                disabled={importing || !parseCSV}
+                disabled={importing || !csvAvailable}
                 className="hidden"
               />
               <Button
                 variant="outline"
                 onClick={() => fileInputRef.current?.click()}
-                disabled={importing || !parseCSV}
+                disabled={importing || !csvAvailable}
               >
                 <Upload className="h-4 w-4 mr-2" />
                 {operatorI18n.csv_import?.select_file || 'Selecionar Arquivo'}
@@ -363,7 +347,7 @@ export function CSVImportModal({ isOpen, onClose, onSave, empresaId }: CSVImport
           <Button
             type="button"
             onClick={handleImport}
-            disabled={!file || preview.length === 0 || importing || !parseCSV}
+            disabled={!file || preview.length === 0 || importing || !csvAvailable}
             className="bg-orange-500 hover:bg-orange-600"
           >
             {importing ? (operatorI18n.csv_import?.importing || 'Importando...') : (operatorI18n.csv_import?.import || 'Importar')}

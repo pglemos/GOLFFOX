@@ -94,6 +94,7 @@
     "@types/jest": "^29.5.14",
     "@types/jsonwebtoken": "^9.0.7",
     "@types/node": "^22.10.2",
+    "@types/node-fetch": "^2.6.13",
     "@types/pg": "^8.15.6",
     "@types/react": "^18.3.17",
     "@types/react-dom": "^18.3.5",
