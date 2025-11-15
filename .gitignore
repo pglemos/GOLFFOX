@@ -127,3 +127,5 @@ out/
 .env.sentry-build-plugin
 
 sentry.properties
+
+sentry.properties
