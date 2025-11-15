@@ -294,7 +294,8 @@ async function runReportHandler(request: NextRequest) {
                 try {
                   switch (format) {
                     case 'csv':
-                      return generateCSV(data, config.columns, finalReportKey)
+                      // Streaming CSV para grandes relatórios
+                      return await generateCSVStream(supabase, config.viewName, config.columns, filters, finalReportKey, limit, offset)
                     
                     case 'excel':
                       return await generateExcel(data, config.columns, finalReportKey)
@@ -391,6 +392,61 @@ function generateCSV(data: any[], columns: string[], reportKey: string) {
   const csvWithBOM = '\ufeff' + csv
 
   return new NextResponse(csvWithBOM, {
+    headers: {
+      'Content-Type': 'text/csv; charset=utf-8',
+      'Content-Disposition': `attachment; filename="${filename}"`
+    }
+  })
+}
+
+async function generateCSVStream(
+  supabase: ReturnType<typeof getSupabaseAdmin>,
+  viewName: string,
+  columns: string[],
+  filters: { companyId?: string; periodStart?: string; periodEnd?: string },
+  reportKey: string,
+  limit: number,
+  offset: number,
+) {
+  const encoder = new TextEncoder()
+  const filename = `relatorio_${reportKey}_${new Date().toISOString().split('T')[0]}.csv`
+  const stream = new ReadableStream({
+    async start(controller) {
+      const write = (s: string) => controller.enqueue(encoder.encode(s))
+      // BOM + header
+      write('\ufeff')
+      write(columns.join(',') + '\n')
+
+      let pageOffset = offset
+      const pageLimit = limit
+      while (true) {
+        const { data: page, error } = await fetchReportRange(supabase, viewName, columns, filters, pageLimit, pageOffset)
+        if (error) {
+          console.error('Erro ao paginar relatório:', error)
+          break
+        }
+        if (!page || page.length === 0) {
+          break
+        }
+        for (const row of page) {
+          const cells = columns.map((col) => {
+            const v = row[col]
+            if (typeof v === 'number') {
+              return formatNumberBR(v)
+            }
+            const str = String(v ?? '')
+            return (str.includes(',') || str.includes('"') || str.includes('\n'))
+              ? `"${str.replace(/"/g, '""')}"`
+              : str
+          })
+          write(cells.join(',') + '\n')
+        }
+        pageOffset += pageLimit
+      }
+      controller.close()
+    }
+  })
+  return new Response(stream, {
     headers: {
       'Content-Type': 'text/csv; charset=utf-8',
       'Content-Disposition': `attachment; filename="${filename}"`

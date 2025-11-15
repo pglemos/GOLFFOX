@@ -133,25 +133,72 @@ async function exportHandler(request: NextRequest) {
 
     // Gerar arquivo conforme formato
     if (format === 'csv') {
-      // Gerar CSV manualmente (exportToCSV é para cliente)
-      const csvRows = [
-        reportData.title,
-        reportData.description || '',
-        '',
-        reportData.headers.join(','),
-        ...reportData.rows.map((row: any[]) => row.map((cell: any) => {
-          const cellStr = String(cell || '')
-          if (cellStr.includes(',') || cellStr.includes('"') || cellStr.includes('\n')) {
-            return `"${cellStr.replace(/"/g, '""')}"`
+      // Streaming CSV para grandes volumes
+      const encoder = new TextEncoder()
+      const filename = `custos_${new Date().toISOString().split('T')[0]}.csv`
+      const stream = new ReadableStream({
+        async start(controller) {
+          const write = (s: string) => controller.enqueue(encoder.encode(s))
+          // BOM + título e descrição
+          write('\ufeff')
+          write(`${reportData.title}\n`)
+          write(`${reportData.description || ''}\n\n`)
+          // Header
+          write(reportData.headers.join(',') + '\n')
+
+          // Paginar e streamar linhas
+          let pageOffset = offset
+          const pageLimit = limit
+          while (true) {
+            const { data: page, error: pageError } = await supabaseServiceRole
+              .from('v_costs_secure')
+              .select(columns.join(','))
+              .eq('company_id', companyId)
+              .order('date', { ascending: false })
+              .range(pageOffset, pageOffset + pageLimit - 1)
+
+            if (pageError) {
+              console.error('Erro ao paginar custos:', pageError)
+              break
+            }
+            if (!page || page.length === 0) {
+              break
+            }
+
+            for (const cost of page) {
+              const cells = [
+                new Date(cost.date).toLocaleDateString('pt-BR'),
+                cost.group_name || '-',
+                cost.category || '-',
+                cost.subcategory || '-',
+                cost.route_name || '-',
+                cost.vehicle_plate || '-',
+                cost.driver_email || '-',
+                new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(cost.amount || 0),
+                cost.qty?.toString() || '-',
+                cost.unit || '-',
+                cost.source || 'manual',
+                cost.notes || '-'
+              ]
+              const escaped = cells.map((cell) => {
+                const cellStr = String(cell || '')
+                return (cellStr.includes(',') || cellStr.includes('"') || cellStr.includes('\n'))
+                  ? `"${cellStr.replace(/"/g, '""')}"`
+                  : cellStr
+              }).join(',')
+              write(escaped + '\n')
+            }
+
+            pageOffset += pageLimit
           }
-          return cellStr
-        }).join(','))
-      ]
-      const csvContent = '\ufeff' + csvRows.join('\n') // BOM para UTF-8
-      return new NextResponse(csvContent, {
+          controller.close()
+        }
+      })
+
+      return new Response(stream, {
         headers: {
-          'Content-Type': 'text/csv',
-          'Content-Disposition': `attachment; filename="custos_${new Date().toISOString().split('T')[0]}.csv"`
+          'Content-Type': 'text/csv; charset=utf-8',
+          'Content-Disposition': `attachment; filename="${filename}"`
         }
       })
     } else if (format === 'excel') {
