@@ -9,6 +9,9 @@
 - Observabilidade: integrada base de Sentry (`@sentry/nextjs`) com configs client/server/edge e habilitação condicional no `next.config.js`.
 - Fixture E2E de autenticação adicionada (`web-app/scripts/auth-fixture.ts`) para testes com CSRF + login e saída de cookie.
 - Criação de `archive/LEGADO_NAO_USAR/index.md` para quarentena de conteúdo legado antes da exclusão definitiva.
+- Analytics: proteção de `GET`/`POST` de Web Vitals com rate limiting (`public`/`api`).
+- Mobile: integração `sentry_flutter` condicional com bootstrap em `lib/core/error/sentry_setup.dart` e chamada em `AppBootstrap`.
+- Tipagem: expansão de ícones `lucide-react`, correções em `framer-motion` e casts localizados de Supabase para estabilidade de TypeScript.
 
 ## Visão Geral do Sistema
 - Plataforma multi-tenant que conecta Empresa Contratante, Transportadora, Motorista e Passageiro, com operação central pela Golf Fox (operadora master).
