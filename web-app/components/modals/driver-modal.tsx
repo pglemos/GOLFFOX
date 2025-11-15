@@ -179,17 +179,17 @@ export function DriverModal({ driver, isOpen, onClose, onSave }: DriverModalProp
       const fileName = `${driver.id}-${type}-${Date.now()}.${fileExt}`
       const filePath = `driver-documents/${fileName}`
 
-      const { error: uploadError } = await supabase.storage
+      const { error: uploadError } = await (supabase as any).storage
         .from('driver-documents')
         .upload(filePath, file)
 
       if (uploadError) throw uploadError
 
-      const { data } = supabase.storage
+      const { data } = (supabase as any).storage
         .from('driver-documents')
         .getPublicUrl(filePath)
 
-      const { error: docError } = await supabase
+      const { error: docError } = await (supabase as any)
         .from("gf_driver_documents")
         .insert({
           driver_id: driver.id,

@@ -73,6 +73,11 @@ declare module 'lucide-react' {
   export const Route: FC<IconProps>
   export const Wrench: FC<IconProps>
   export const ClipboardCheck: FC<IconProps>
+  export const Phone: FC<IconProps>
+  export const ChevronRight: FC<IconProps>
+  export const Mail: FC<IconProps>
+  export const Sparkles: FC<IconProps>
+  export const Key: FC<IconProps>
   
   // Adicione outros ícones conforme necessário
   const Icon: FC<IconProps>

@@ -97,7 +97,7 @@ export function ScheduleReportModal({
       setCompanies(data || [])
     } catch (error: any) {
       console.error("Erro ao carregar empresas:", error)
-      notifyError("Erro ao carregar empresas", {
+      notifyError("Erro ao carregar empresas", undefined, {
         i18n: { ns: 'common', key: 'errors.generic' }
       })
     }
@@ -141,25 +141,25 @@ export function ScheduleReportModal({
     try {
       // Validações
       if (!selectedCompany) {
-        notifyError("Selecione uma empresa", {
+        notifyError("Selecione uma empresa", undefined, {
           i18n: { ns: 'operator', key: 'reports.schedule.validation.selectCompany' }
         })
         return
       }
       if (!selectedReport) {
-        notifyError("Selecione um relatório", {
+        notifyError("Selecione um relatório", undefined, {
           i18n: { ns: 'operator', key: 'reports.schedule.validation.selectReport' }
         })
         return
       }
       if (!cronExpression || !validateCron(cronExpression)) {
-        notifyError("Cron expression inválida. Use o formato: minuto hora dia mês dia-semana", {
+        notifyError("Cron expression inválida. Use o formato: minuto hora dia mês dia-semana", undefined, {
           i18n: { ns: 'common', key: 'validation.invalidCron' }
         })
         return
       }
       if (!recipients || !validateEmails(recipients)) {
-        notifyError("Adicione pelo menos um email válido", {
+        notifyError("Adicione pelo menos um email válido", undefined, {
           i18n: { ns: 'common', key: 'validation.invalidEmails' }
         })
         return
@@ -231,7 +231,7 @@ export function ScheduleReportModal({
       }
     } catch (error: any) {
       console.error("Erro ao criar agendamento:", error)
-      notifyError(error.message || "Erro ao criar agendamento", {
+      notifyError(error.message || "Erro ao criar agendamento", undefined, {
         i18n: { ns: 'operator', key: 'reports.schedule.errors.createSchedule' }
       })
     } finally {
