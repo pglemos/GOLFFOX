@@ -98,7 +98,7 @@ export function FuncionarioModal({ funcionario, isOpen, onClose, onSave, empresa
 
       if (funcionario?.id) {
         // Update
-        const { error } = await supabase
+        const { error } = await (supabase as any)
           .from("gf_employee_company")
           .update({
             cpf: formData.cpf,
@@ -114,7 +114,7 @@ export function FuncionarioModal({ funcionario, isOpen, onClose, onSave, empresa
 
         // Update user if exists
         if (funcionario.employee_id) {
-          await supabase
+          await (supabase as any)
             .from("users")
             .update({
               name: formData.name,
@@ -148,7 +148,7 @@ export function FuncionarioModal({ funcionario, isOpen, onClose, onSave, empresa
         const { userId } = await res.json()
 
         // Create employee_company entry
-        const { error } = await supabase
+        const { error } = await (supabase as any)
           .from("gf_employee_company")
           .insert({
             employee_id: userId,
@@ -172,7 +172,7 @@ export function FuncionarioModal({ funcionario, isOpen, onClose, onSave, empresa
       onClose()
     } catch (error: any) {
       logError("Erro ao salvar funcionário", { error }, 'FuncionarioModal')
-      notifyError(`Erro ao salvar funcionário: ${error.message}`, {
+      notifyError(`Erro ao salvar funcionário: ${error.message}`, undefined, {
         i18n: { ns: 'operator', key: 'employees.saveError' }
       })
     } finally {

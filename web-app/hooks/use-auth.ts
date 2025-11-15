@@ -90,8 +90,8 @@ export function useAuth() {
       const userObj: User = {
         id: session.user.id,
         email: session.user.email || '',
-        name: userData?.name || session.user.email?.split('@')[0] || 'Usuário',
-        role: userData?.role || 'user'
+        name: (userData as any)?.name || session.user.email?.split('@')[0] || 'Usuário',
+        role: (userData as any)?.role || 'user'
       }
 
       // Atualizar cache
