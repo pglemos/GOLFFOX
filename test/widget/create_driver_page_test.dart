@@ -8,5 +8,5 @@ void main() {
     await tester.pumpWidget(const ProviderScope(child: MaterialApp(home: CreateDriverPage())));
     final form = tester.widget<Form>(find.byType(Form));
     expect(form.autovalidateMode, AutovalidateMode.onUserInteraction);
-  }, skip: true);
+  });
 }

@@ -18,6 +18,7 @@ class SentrySetup {
         options.reportPackages = true;
         options.enableNativeFramesTracking = true;
         options.environment = kReleaseMode ? 'production' : 'development';
+        options.sendDefaultPii = false;
       },
       appRunner: () {},
     );
