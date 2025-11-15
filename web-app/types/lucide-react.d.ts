@@ -88,6 +88,15 @@ declare module 'lucide-react' {
   export const PieChart: FC<IconProps>
   export const Map: FC<IconProps>
   export const Maximize2: FC<IconProps>
+  export const Radio: FC<IconProps>
+  export const Square: FC<IconProps>
+  export const SkipBack: FC<IconProps>
+  export const SkipForward: FC<IconProps>
+  export const Gauge: FC<IconProps>
+  export const Repeat: FC<IconProps>
+  export const Repeat1: FC<IconProps>
+  export const Volume2: FC<IconProps>
+  export const VolumeX: FC<IconProps>
   
   // Adicione outros ícones conforme necessário
   const Icon: FC<IconProps>

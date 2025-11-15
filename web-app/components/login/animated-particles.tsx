@@ -23,6 +23,7 @@ export const AnimatedParticles = () => {
             top: `${particle.y}%`,
             width: `${particle.size}px`,
             height: `${particle.size}px`,
+            willChange: 'transform, opacity',
           }}
           animate={{
             y: [0, -22, 0],
@@ -36,7 +37,6 @@ export const AnimatedParticles = () => {
             repeat: Infinity,
             ease: "easeOut",
           }}
-          style={{ willChange: 'transform, opacity' }}
         />
       ))}
     </div>
