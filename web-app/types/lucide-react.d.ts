@@ -78,6 +78,16 @@ declare module 'lucide-react' {
   export const Mail: FC<IconProps>
   export const Sparkles: FC<IconProps>
   export const Key: FC<IconProps>
+  export const Layers: FC<IconProps>
+  export const History: FC<IconProps>
+  export const Timer: FC<IconProps>
+  export const WifiOff: FC<IconProps>
+  export const Accessibility: FC<IconProps>
+  export const Keyboard: FC<IconProps>
+  export const TrendingDown: FC<IconProps>
+  export const PieChart: FC<IconProps>
+  export const Map: FC<IconProps>
+  export const Maximize2: FC<IconProps>
   
   // Adicione outros ícones conforme necessário
   const Icon: FC<IconProps>

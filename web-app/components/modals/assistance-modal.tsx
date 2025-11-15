@@ -111,7 +111,7 @@ export function AssistanceModal({ request, isOpen, onClose, onSave }: Assistance
 
     setLoading(true)
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from("gf_assistance_requests")
         .update({
           status: 'dispatched',
