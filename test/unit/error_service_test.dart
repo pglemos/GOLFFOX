@@ -26,8 +26,8 @@ void main() {
 
     test('executeWithHandling rethrows and reports', () async {
       final service = ErrorService.instance;
-      expect(
-        () => service.executeWithHandling<void>(
+      await expectLater(
+        service.executeWithHandling<void>(
           () async {
             throw Exception('boom');
           },

@@ -75,8 +75,8 @@ void main() {
             .thenAnswer((_) async => mockAuthResponse);
 
         // Act & Assert
-        expect(
-          () => authService.signInWithEmail(email, password),
+        await expectLater(
+          authService.signInWithEmail(email, password),
           throwsA(isA<AuthFailure>().having(
             (e) => e.code,
             'code',
@@ -85,7 +85,7 @@ void main() {
         );
       });
 
-      test('should throw AuthFailure with emailNotVerified when email not confirmed', () async {
+      test('should throw AuthFailure with emailNotVerified quando email não confirmado', () async {
         // Arrange
         const email = 'test@example.com';
         const password = 'password123';
@@ -101,8 +101,8 @@ void main() {
             .thenAnswer((_) async => mockAuthResponse);
 
         // Act & Assert
-        expect(
-          () => authService.signInWithEmail(email, password),
+        await expectLater(
+          authService.signInWithEmail(email, password),
           throwsA(isA<AuthFailure>().having(
             (e) => e.code,
             'code',
@@ -130,8 +130,8 @@ void main() {
             .thenAnswer((_) async => null);
 
         // Act & Assert
-        expect(
-          () => authService.signInWithEmail(email, password),
+        await expectLater(
+          authService.signInWithEmail(email, password),
           throwsA(isA<AuthFailure>().having(
             (e) => e.code,
             'code',
@@ -146,8 +146,8 @@ void main() {
         const password = 'password123';
 
         // Act & Assert
-        expect(
-          () => authService.signInWithEmail(invalidEmail, password),
+        await expectLater(
+          authService.signInWithEmail(invalidEmail, password),
           throwsA(isA<AuthFailure>()),
         );
       });
@@ -158,8 +158,8 @@ void main() {
         const weakPassword = '123'; // Too short
 
         // Act & Assert
-        expect(
-          () => authService.signInWithEmail(email, weakPassword),
+        await expectLater(
+          authService.signInWithEmail(email, weakPassword),
           throwsA(isA<AuthFailure>()),
         );
       });
