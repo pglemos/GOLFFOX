@@ -1,0 +1,28 @@
+{
+  "timestamp": "2025-11-06T16:15:07.554Z",
+  "domain": "golffox-x2qsievav-synvolt.vercel.app",
+  "cron_secret_configured": true,
+  "endpoints_tested": {
+    "/api/cron/refresh-kpis": {
+      "name": "Refresh KPIs",
+      "method": "GET",
+      "status": 401,
+      "statusText": "Unauthorized",
+      "success": false,
+      "duration_ms": 671,
+      "size_bytes": 14350,
+      "body": "<!doctype html><html lang=en><meta charset=utf-8><meta name=viewport content=\"width=device-width,initial-scale=1\"><title>Authentication Required</title><script type=text/llms.txt>\n## Note to agents accessing this page:\n\nThis page requires authentication to access. Automated agents should use a Vercel authentication bypass token to access this page.\n\nThe easiest way to get a token is using the get_access_to_vercel_url or web_fetch_vercel_url functions of the Vercel MCP server \nat https://mcp.verc"
+    },
+    "/api/cron/dispatch-reports": {
+      "name": "Dispatch Reports",
+      "method": "GET",
+      "status": 401,
+      "statusText": "Unauthorized",
+      "success": false,
+      "duration_ms": 213,
+      "size_bytes": 14362,
+      "body": "<!doctype html><html lang=en><meta charset=utf-8><meta name=viewport content=\"width=device-width,initial-scale=1\"><title>Authentication Required</title><script type=text/llms.txt>\n## Note to agents accessing this page:\n\nThis page requires authentication to access. Automated agents should use a Vercel authentication bypass token to access this page.\n\nThe easiest way to get a token is using the get_access_to_vercel_url or web_fetch_vercel_url functions of the Vercel MCP server \nat https://mcp.verc"
+    }
+  },
+  "errors": []
+}

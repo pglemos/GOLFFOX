@@ -1,0 +1,1092 @@
+/* ============================================================
+   GOLF FOX DESIGN SYSTEM - Premium UI v41.0
+   Identidade: golffox.com.br + Apple/Tesla/Stripe/Linear
+   ============================================================ */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* ========================================
+       CORES OFICIAIS - GolfFox.com.br
+       ======================================== */
+    
+    /* Backgrounds - Muito Branco Premium */
+    --bg: #FFFFFF;
+    --bg-soft: #F8FAFC;
+    --bg-elevated: #FFFFFF;
+    --bg-hover: #F1F5F9;
+    --bg-pattern: #FAFBFC;
+    
+    /* Text - Alta Contraste */
+    --ink: #0F172A;
+    --ink-strong: #020617;
+    --ink-muted: #64748B;
+    --ink-light: #94A3B8;
+    --ink-disabled: #CBD5E1;
+    
+    /* Brand - Laranja Assinatura */
+    --brand: #F97316;
+    --brand-hover: #FB923C;
+    --brand-light: #FFF7ED;
+    --brand-soft: #FFEDD5;
+    
+    /* Accent - Azul Petróleo Profundo */
+    --accent: #1E3A5F;
+    --accent-dark: #0A2540;
+    --accent-soft: #2D4A6B;
+    --accent-light: #E8EFF7;
+    
+    /* Status Colors */
+    --success: #10B981;
+    --success-light: #D1FAE5;
+    --warning: #F59E0B;
+    --warning-light: #FEF3C7;
+    --error: #EF4444;
+    --error-light: #FEE2E2;
+    --info: #3B82F6;
+    --info-light: #DBEAFE;
+    
+    /* Borders & Dividers */
+    --border: #E2E8F0;
+    --border-strong: #CBD5E1;
+    --border-light: #F1F5F9;
+    
+    /* Shadows - Premium Depth */
+    --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.08);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.08);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.08);
+    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+    --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.15);
+    
+    /* Glassmorphism */
+    --glass-bg: rgba(255, 255, 255, 0.85);
+    --glass-border: rgba(255, 255, 255, 0.5);
+    --glass-blur: blur(16px);
+    
+    /* Radius - Modern & Soft */
+    --radius-xs: 8px;
+    --radius-sm: 12px;
+    --radius-md: 16px;
+    --radius-lg: 20px;
+    --radius-xl: 24px;
+    --radius-2xl: 32px;
+    --radius-full: 9999px;
+    
+    /* Spacing Scale */
+    --space-xs: 4px;
+    --space-sm: 8px;
+    --space-md: 16px;
+    --space-lg: 24px;
+    --space-xl: 32px;
+    --space-2xl: 48px;
+    --space-3xl: 64px;
+    
+    /* Typography - Premium Fonts */
+    --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --font-mono: "SF Mono", Monaco, "Cascadia Code", "Roboto Mono", monospace;
+    
+    /* Font Weights */
+    --font-light: 300;
+    --font-normal: 400;
+    --font-medium: 500;
+    --font-semibold: 600;
+    --font-bold: 700;
+    --font-extrabold: 800;
+    
+    /* Transitions - Premium Smooth */
+    --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: 500ms cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    
+    /* Z-Index Scale */
+    --z-dropdown: 1000;
+    --z-sticky: 1020;
+    --z-fixed: 1030;
+    --z-modal-backdrop: 1040;
+    --z-modal: 1050;
+    --z-popover: 1060;
+    --z-tooltip: 1070;
+  }
+
+  * {
+    @apply border-border;
+    box-sizing: border-box;
+  }
+  
+  /* Melhorar renderização de texto - abordagem limpa e equilibrada */
+  p, span, div, h1, h2, h3, h4, h5, h6, a, button, label, input, textarea, select {
+    /* Antialiasing para melhor qualidade */
+    -webkit-font-smoothing: antialiased;
+    /* Fallback para macOS */
+    -moz-osx-font-smoothing: grayscale;
+    /* optimizeLegibility para melhor renderização sem exageros */
+    text-rendering: optimizeLegibility;
+    /* Melhorar renderização de bordas */
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    /* Forçar renderização de alta qualidade */
+    -webkit-font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
+    font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
+  }
+  
+  /* Exceção: remover transform de elementos que não precisam (pode causar pixelização) */
+  input, textarea, select {
+    /* Inputs não devem ter transform para evitar problemas de renderização */
+    transform: none !important;
+    -webkit-transform: none !important;
+  }
+  
+  /* Headings maiores - renderização limpa */
+  h1, h2, h3 {
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  
+  /* Para elementos com fundo escuro, usar antialiased */
+  [class*="dark"] p, [class*="dark"] span, [class*="dark"] div,
+  [class*="dark"] h1, [class*="dark"] h2, [class*="dark"] h3,
+  [class*="dark"] h4, [class*="dark"] h5, [class*="dark"] h6,
+  [class*="bg-dark"], [class*="bg-black"], [style*="background: black"],
+  [style*="background-color: black"], [style*="background: #000"] {
+    -webkit-font-smoothing: antialiased;
+  }
+  
+  /* Evitar aplicar em ícones e elementos que não precisam */
+  svg, img, canvas, video {
+    -webkit-font-smoothing: auto;
+    -moz-osx-font-smoothing: auto;
+    /* Remover transform e text-shadow de elementos não-texto */
+    transform: none;
+    text-shadow: none;
+    -webkit-text-stroke: 0;
+  }
+  
+  /* Remover transform de elementos que não precisam (pode causar pixelização) */
+  svg *, img *, canvas *, video * {
+    transform: none !important;
+    text-shadow: none !important;
+    -webkit-text-stroke: 0 !important;
+  }
+  
+  /* Melhorar renderização de texto em elementos animados com Framer Motion */
+  .font-smooth {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: "rlig" 1, "calt" 1, "kern" 1, "liga" 1;
+  }
+  
+  /* Garantir alta qualidade em elementos com transform (Framer Motion) */
+  [class*="motion"] *,
+  [data-framer-name] * {
+    -webkit-font-smoothing: antialiased !important;
+    -moz-osx-font-smoothing: grayscale !important;
+    text-rendering: optimizeLegibility !important;
+    /* Melhorar renderização durante animações */
+    -webkit-backface-visibility: hidden !important;
+    backface-visibility: hidden !important;
+    /* Forçar renderização de alta qualidade */
+    -webkit-font-feature-settings: "kern" 1, "liga" 1, "calt" 1 !important;
+    font-feature-settings: "kern" 1, "liga" 1, "calt" 1 !important;
+  }
+  
+  /* Evitar pixelização em elementos com backdrop-blur */
+  [class*="backdrop-blur"],
+  [style*="backdrop-filter"] {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    /* Melhorar renderização */
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
+  
+  /* Melhorar renderização de texto em gradientes e elementos com texto sobre gradiente */
+  [class*="gradient"],
+  [style*="gradient"],
+  [class*="bg-gradient"] {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    /* Garantir renderização suave mesmo com backgrounds complexos */
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
+  
+  /* Especial para texto com bg-clip-text (gradiente no texto) */
+  [class*="bg-clip-text"],
+  [style*="background-clip: text"],
+  [style*="-webkit-background-clip: text"] {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    /* Melhorar renderização de alta qualidade */
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    /* Forçar renderização de alta qualidade */
+    -webkit-font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
+    font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
+  }
+  
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+    -moz-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    /* optimizeLegibility para renderização equilibrada */
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /* Melhorar renderização geral */
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
+  
+  body {
+    @apply bg-[var(--bg)] text-[var(--ink)];
+    font-family: var(--font-inter, var(--font-sans));
+    font-feature-settings: "rlig" 1, "calt" 1, "kern" 1, "liga" 1;
+    /* Antialiasing para melhor qualidade */
+    -webkit-font-smoothing: antialiased;
+    /* Fallback para macOS */
+    -moz-osx-font-smoothing: grayscale;
+    /* optimizeLegibility para renderização equilibrada */
+    text-rendering: optimizeLegibility;
+    -webkit-text-size-adjust: 100%;
+    -moz-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    overflow-x: hidden;
+    margin: 0;
+    padding: 0;
+    /* Melhorar renderização de subpixels */
+    font-variant-ligatures: common-ligatures;
+    font-kerning: normal;
+    font-variant-numeric: oldstyle-nums;
+    /* Melhorar renderização */
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    /* Forçar renderização de alta qualidade */
+    -webkit-font-feature-settings: "kern" 1, "liga" 1, "calt" 1, "rlig" 1;
+  }
+  
+  
+  /* Classe utilitária para texto suave */
+  .font-smooth {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: "rlig" 1, "calt" 1, "kern" 1, "liga" 1;
+    /* Melhorar qualidade de renderização */
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    /* Forçar renderização de alta qualidade */
+    -webkit-font-feature-settings: "kern" 1, "liga" 1, "calt" 1, "rlig" 1;
+  }
+  
+  /* Pattern Background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: 
+      radial-gradient(circle at 1px 1px, var(--border) 1px, transparent 0);
+    background-size: 24px 24px;
+    opacity: 0.3;
+    pointer-events: none;
+    z-index: -1;
+  }
+  
+  /* Responsive Typography */
+  @media (max-width: 640px) {
+    body {
+      font-size: 14px;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    body {
+      font-size: 16px;
+    }
+  }
+}
+
+@layer components {
+  /* ========================================
+     COMPONENTES PREMIUM
+     ======================================== */
+  
+  /* Card Premium com Glassmorphism Opcional */
+  .card-premium {
+    @apply bg-white rounded-[var(--radius-lg)] border border-[var(--border)];
+    @apply shadow-[var(--shadow-sm)] transition-all duration-200;
+    @apply overflow-hidden;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+  
+  .card-premium:hover {
+    @apply shadow-[var(--shadow-md)] -translate-y-0.5;
+  }
+  
+  /* Garantir que textos dentro de cards não saiam */
+  .card-premium *,
+  .card-glass * {
+    max-width: 100%;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+  
+  /* Truncate para textos longos em cards */
+  .card-premium .truncate,
+  .card-glass .truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  .card-glass {
+    @apply rounded-[var(--radius-xl)] border border-[var(--glass-border)];
+    @apply bg-[var(--glass-bg)] backdrop-blur-[var(--glass-blur)];
+    @apply shadow-[var(--shadow-lg)] transition-all duration-200;
+  }
+  
+  /* Board - Container para Grids/Listas */
+  .board {
+    @apply bg-[var(--bg-soft)] rounded-[var(--radius-xl)] p-6;
+    @apply border border-[var(--border-light)];
+  }
+  
+  /* KPI Stat Card */
+  .stat-card {
+    @apply bg-white rounded-[var(--radius-xl)] border border-[var(--border)];
+    @apply p-6 shadow-[var(--shadow-sm)] transition-all duration-200;
+    @apply min-h-[140px] flex flex-col justify-between;
+  }
+  
+  .stat-card:hover {
+    @apply shadow-lg;
+    border-color: rgb(from var(--brand) r g b / 0.2);
+  }
+  
+  /* Hero com Glassmorphism */
+  .hero-glass {
+    @apply relative rounded-[var(--radius-2xl)] overflow-hidden;
+    @apply bg-gradient-to-br from-[var(--accent)] via-[var(--accent-soft)] to-[var(--brand)];
+    @apply p-12 shadow-[var(--shadow-xl)];
+  }
+
+  /* Pseudo-elemento correto para overlay de glassmorphism no Hero */
+  .hero-glass::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    /* Leve véu branco com blur para efeito glass */
+    background: linear-gradient(180deg,
+      rgba(255, 255, 255, 0.12) 0%,
+      rgba(255, 255, 255, 0.06) 60%,
+      rgba(255, 255, 255, 0.0) 100%
+    );
+    backdrop-filter: blur(12px);
+    transition: opacity var(--transition-base);
+  }
+  .hero-glass:hover::before {
+    opacity: 0.85; /* ~15% redução para feedback sutil */
+  }
+  
+  .hero-glass::before {
+    content: '';
+    @apply absolute inset-0 backdrop-blur-[var(--glass-blur)];
+    @apply bg-[var(--glass-bg)] opacity-90;
+  }
+  
+  /* Navigation Link */
+  .nav-link {
+    @apply flex items-center gap-3 px-4 py-3 rounded-[var(--radius-md)];
+    @apply text-[var(--ink-muted)] font-medium transition-all duration-200;
+    @apply hover:text-[var(--ink)] hover:bg-[var(--bg-hover)];
+    @apply relative;
+  }
+  
+  .nav-link.active {
+    @apply text-[var(--brand)] bg-[var(--brand-light)];
+    @apply font-semibold;
+  }
+  
+  .nav-link.active::before {
+    content: '';
+    @apply absolute left-0 top-0 bottom-0 w-1;
+    @apply bg-[var(--brand)] rounded-r;
+  }
+  
+  /* Button Ripple Effect */
+  .btn-ripple {
+    @apply relative overflow-hidden;
+  }
+  
+  .btn-ripple::after {
+    content: '';
+    @apply absolute inset-0 bg-white/20;
+    @apply rounded-full scale-0 transition-transform duration-300;
+    transform-origin: center;
+  }
+  
+  .btn-ripple:active::after {
+    @apply scale-100;
+  }
+  
+  /* Filter Bar */
+  .filter-bar {
+    @apply flex flex-wrap gap-3 p-4;
+    @apply bg-white rounded-[var(--radius-lg)] border border-[var(--border)];
+    @apply shadow-[var(--shadow-sm)];
+  }
+  
+  /* Map Shell */
+  .map-shell {
+    @apply relative w-full rounded-[var(--radius-xl)];
+    @apply border border-[var(--border-strong)];
+    @apply overflow-hidden shadow-[var(--shadow-lg)];
+  }
+}
+
+@layer utilities {
+  /* Text Balance */
+  .text-balance {
+    text-wrap: balance;
+  }
+  
+  /* Smooth Scroll */
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .scrollbar-custom::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  .scrollbar-custom::-webkit-scrollbar-track {
+    @apply bg-[var(--bg-soft)];
+  }
+  
+  .scrollbar-custom::-webkit-scrollbar-thumb {
+    @apply bg-[var(--border-strong)] rounded-full;
+  }
+  
+  .scrollbar-custom::-webkit-scrollbar-thumb:hover {
+    @apply bg-[var(--ink-muted)];
+  }
+  
+  /* Glass Effect */
+  .glass {
+    @apply bg-[var(--glass-bg)] backdrop-blur-[var(--glass-blur)];
+    @apply border border-[var(--glass-border)];
+  }
+  
+  /* Gradient Text */
+  .gradient-text {
+    @apply bg-gradient-to-r from-[var(--brand)] to-[var(--accent)];
+    @apply bg-clip-text text-transparent;
+  }
+}
+
+/* ========================================
+   ANIMAÇÕES PREMIUM - Framer Motion
+   ======================================== */
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes bounce-subtle {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out;
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.3s ease-out;
+}
+
+.animate-slide-in-left {
+  animation: slide-in-left 0.3s ease-out;
+}
+
+.animate-scale-in {
+  animation: scale-in 0.3s ease-out;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.animate-shimmer {
+  animation: shimmer 2s infinite;
+  background-size: 1000px 100%;
+  background-image: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(255, 255, 255, 0.4) 50%,
+    transparent 100%
+  );
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-bounce-subtle {
+  animation: bounce-subtle 2s ease-in-out infinite;
+}
+
+/* Loader Spinner Premium */
+.loader-spinner {
+  @apply inline-block w-8 h-8 border-4 border-[var(--brand-light)] border-t-[var(--brand)] rounded-full;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Gradient Overlays - moderno e minimalista */
+.gradient-overlay {
+  /* Preservar funcionalidade: não intercepta eventos */
+  pointer-events: none;
+
+  /* Tipografia sans-serif padrão (aplica aos filhos quando houver) */
+  font-family: Inter, Roboto, system-ui, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+
+  /* Esquema de cores limitado */
+  /* Primária: var(--brand); Secundária: var(--accent); Neutra: baseada em branco/cinza */
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.06) 0%,
+    rgba(0, 0, 0, 0.06) 60%,
+    color-mix(in oklab, var(--brand) 10%, transparent) 100%
+  );
+
+  /* Cantos arredondados dentro do container (será recortado por overflow-hidden) */
+  border-radius: 6px;
+
+  /* Sombra suave conforme especificação */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+  /* Transição suave para efeitos de opacidade */
+  transition: opacity 200ms ease;
+  opacity: 1;
+}
+
+/* Hover: reduzir opacidade em até 20% sem afetar interação (via hover no container) */
+.hero-glass:hover .gradient-overlay,
+.bg-gradient-to-br:hover .gradient-overlay {
+  opacity: 0.8;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .gradient-overlay {
+    /* Mobile: suavizar o overlay para legibilidade */
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.04) 0%,
+      rgba(0, 0, 0, 0.04) 60%,
+      color-mix(in oklab, var(--brand) 8%, transparent) 100%
+    );
+    border-radius: 6px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1024px) {
+  .gradient-overlay {
+    /* Tablet: manter proporção e sombra */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+}
+
+@media (min-width: 1024px) {
+  .gradient-overlay {
+    /* Desktop: manter layout otimizado */
+    max-width: 1200px; /* respeita container pai */
+  }
+}
+
+.gradient-brand {
+  background: linear-gradient(135deg, 
+    var(--accent) 0%,
+    var(--accent-soft) 50%,
+    var(--brand) 100%
+  );
+}
+
+/* Responsive Helpers */
+@media (max-width: 768px) {
+  :root {
+    --space-lg: 16px;
+    --space-xl: 24px;
+    --radius-lg: 16px;
+    --radius-xl: 20px;
+  }
+}
+
+/* ========================================
+   MEDIA QUERIES RESPONSIVAS
+   ======================================== */
+
+/* Mobile First - Smartphones (320px - 640px) */
+@media (max-width: 640px) {
+  .hero-glass {
+    @apply p-6;
+  }
+  
+  .stat-card {
+    @apply p-4 min-h-[120px];
+  }
+  
+  .board {
+    @apply p-4;
+  }
+  
+  .filter-bar {
+    @apply flex-col gap-2 p-3;
+  }
+  
+  .nav-link {
+    @apply px-3 py-2.5;
+  }
+  
+  /* Topbar mobile adjustments */
+  .topbar-mobile {
+    @apply px-4;
+  }
+  
+  /* Cards em mobile */
+  .card-premium {
+    @apply mx-2;
+  }
+  
+  /* Typography mobile */
+  h1 { @apply text-2xl; }
+  h2 { @apply text-xl; }
+  h3 { @apply text-lg; }
+}
+
+/* Tablets (641px - 1024px) */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .hero-glass {
+    @apply p-8;
+  }
+  
+  .stat-card {
+    @apply p-5 min-h-[130px];
+  }
+  
+  .board {
+    @apply p-5;
+  }
+  
+  .filter-bar {
+    @apply gap-2.5 p-3.5;
+  }
+}
+
+/* Desktop (1025px+) */
+@media (min-width: 1025px) {
+  .hero-glass {
+    @apply p-12;
+  }
+  
+  .stat-card {
+    @apply p-6 min-h-[140px];
+  }
+  
+  .board {
+    @apply p-6;
+  }
+  
+  .filter-bar {
+    @apply gap-3 p-4;
+  }
+}
+
+/* Large Desktop (1440px+) */
+@media (min-width: 1440px) {
+  .hero-glass {
+    @apply p-16;
+  }
+  
+  .stat-card {
+    @apply p-8 min-h-[160px];
+  }
+  
+  .board {
+    @apply p-8;
+  }
+}
+
+/* ========================================
+   LAYOUT RESPONSIVO ESPECÍFICO
+   ======================================== */
+
+/* Container responsivo */
+.container-responsive {
+  @apply w-full mx-auto px-4;
+  max-width: 1440px;
+}
+
+@media (min-width: 640px) {
+  .container-responsive {
+    @apply px-6;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container-responsive {
+    @apply px-8;
+  }
+}
+
+/* Sidebar responsiva */
+.sidebar-responsive {
+  @apply transition-all duration-300 ease-in-out;
+}
+
+@media (max-width: 1023px) {
+  .sidebar-responsive {
+    @apply fixed top-16 left-0 h-[calc(100vh-4rem)] w-64 z-50;
+    transform: translateX(-100%);
+  }
+  
+  .sidebar-responsive.open {
+    transform: translateX(0);
+  }
+}
+
+@media (min-width: 1024px) {
+  .sidebar-responsive {
+    @apply relative top-0 left-0 h-auto w-64;
+    transform: translateX(0);
+  }
+}
+
+/* Overflow e scroll responsivos */
+.scroll-container {
+  @apply overflow-auto scrollbar-custom;
+  max-height: calc(100vh - 8rem);
+}
+
+@media (max-width: 640px) {
+  .scroll-container {
+    max-height: calc(100vh - 6rem);
+  }
+}
+
+/* Texto responsivo */
+.text-responsive {
+  @apply text-sm;
+}
+
+@media (min-width: 640px) {
+  .text-responsive {
+    @apply text-base;
+  }
+}
+
+@media (min-width: 1024px) {
+  .text-responsive {
+    @apply text-lg;
+  }
+}
+
+/* Botões responsivos */
+.btn-responsive {
+  @apply px-3 py-2 text-sm;
+}
+
+@media (min-width: 640px) {
+  .btn-responsive {
+    @apply px-4 py-2.5 text-base;
+  }
+}
+
+@media (min-width: 1024px) {
+  .btn-responsive {
+    @apply px-6 py-3 text-base;
+  }
+}
+
+/* ========================================
+   UTILITÁRIOS DE ACESSIBILIDADE
+   ======================================== */
+
+/* Focus visible melhorado */
+.focus-visible-enhanced:focus-visible {
+  @apply outline-none ring-2 ring-[var(--brand)] ring-offset-2 ring-offset-white;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  :root {
+    --border: #000000;
+    --ink-muted: #000000;
+    --bg-hover: #f0f0f0;
+  }
+}
+
+/* ========================================
+   BREAKPOINTS CUSTOMIZADOS
+   ======================================== */
+
+/* Extra small devices */
+@media (min-width: 475px) {
+  .xs\:block {
+    display: block;
+  }
+  
+  .xs\:hidden {
+    display: none;
+  }
+  
+  .xs\:flex {
+    display: flex;
+  }
+}
+
+/* ========================================
+   CLASSES DE UTILIDADE RESPONSIVA
+   ======================================== */
+
+/* Altura do topbar responsiva */
+.topbar-height {
+  height: 4rem; /* 64px */
+}
+
+@media (min-width: 640px) {
+  .topbar-height {
+    height: 4.5rem; /* 72px */
+  }
+}
+
+/* Padding top para compensar topbar */
+.pt-topbar {
+  padding-top: 4rem;
+}
+
+@media (min-width: 640px) {
+  .pt-topbar {
+    padding-top: 4.5rem;
+  }
+}
+
+/* Altura mínima considerando topbar */
+.min-h-screen-topbar {
+  min-height: calc(100vh - 4rem);
+}
+
+@media (min-width: 640px) {
+  .min-h-screen-topbar {
+    min-height: calc(100vh - 4.5rem);
+  }
+}
+
+/* ========================================
+   GRID RESPONSIVO MELHORADO
+   ======================================== */
+
+/* Grid de cards responsivo */
+.grid-responsive-cards {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 640px) {
+  .grid-responsive-cards {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .grid-responsive-cards {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1280px) {
+  .grid-responsive-cards {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Container responsivo melhorado */
+.container-responsive {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+@media (min-width: 640px) {
+  .container-responsive {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container-responsive {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .container-responsive {
+    max-width: 1280px;
+  }
+}
+
+/* ========================================
+   UTILITÁRIOS MOBILE-FIRST
+   ======================================== */
+
+/* Texto responsivo */
+.text-responsive-sm {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+@media (min-width: 640px) {
+  .text-responsive-sm {
+    font-size: 1rem;
+    line-height: 1.5rem;
+  }
+}
+
+.text-responsive-base {
+  font-size: 1rem;
+  line-height: 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .text-responsive-base {
+    font-size: 1.125rem;
+    line-height: 1.75rem;
+  }
+}
+
+/* Espaçamento responsivo */
+.space-responsive {
+  margin-bottom: 1rem;
+}
+
+@media (min-width: 640px) {
+  .space-responsive {
+    margin-bottom: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .space-responsive {
+    margin-bottom: 2rem;
+  }
+}
+
