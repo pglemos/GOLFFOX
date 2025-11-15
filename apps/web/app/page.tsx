@@ -417,6 +417,9 @@ function LoginContent() {
         token = data?.token
         user = data?.user
         const sessionData = data?.session
+        if (user && !user.email && sessionData?.user?.email) {
+          user.email = sessionData.user.email
+        }
 
         console.log('✅ Login via API bem-sucedido (banco de dados verificado):', { 
           hasToken: !!token, 

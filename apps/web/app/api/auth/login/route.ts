@@ -184,6 +184,7 @@ async function loginHandler(req: NextRequest) {
 
     const userPayload = {
       id: data.user.id,
+      email: data.user.email || email,
       role,
       companyId: companyId || undefined,
     }
