@@ -4,11 +4,12 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { withRateLimit } from '@/lib/rate-limit'
 
 export const runtime = 'nodejs'
 
 // GET handler para evitar 405 quando acessado incorretamente
-export async function GET(request: NextRequest) {
+async function getHandler(request: NextRequest) {
   return NextResponse.json(
     { 
       message: 'Web Vitals API',
@@ -31,7 +32,7 @@ export async function OPTIONS(request: NextRequest) {
   })
 }
 
-export async function POST(request: NextRequest) {
+async function postHandler(request: NextRequest) {
   try {
     const body = await request.json()
     const { url, userAgent, timestamp, metrics } = body
@@ -82,3 +83,5 @@ export async function POST(request: NextRequest) {
   }
 }
 
+export const GET = withRateLimit(getHandler, 'public')
+export const POST = withRateLimit(postHandler, 'api')
