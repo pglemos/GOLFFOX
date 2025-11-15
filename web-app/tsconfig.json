@@ -32,6 +32,12 @@
       "@/lib/*": [
         "./lib/*"
       ],
+      "@/server/*": [
+        "./server/*"
+      ],
+      "@shared/*": [
+        "../shared/*"
+      ],
       "@/hooks/*": [
         "./hooks/*"
       ],

@@ -40,3 +40,7 @@ export const supabaseServiceRole = new Proxy({} as SupabaseClientType, {
     return client
   }
 })
+
+export function getSupabaseAdmin(): SupabaseClientType {
+  return ensureSupabaseServiceRole()
+}

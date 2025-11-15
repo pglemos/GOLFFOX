@@ -339,6 +339,17 @@ export async function POST(request: NextRequest) {
             companyId: companyId || undefined
           }, { status: 201 })
         }
+        // Se já existe registro com mesma PK, considerar sucesso idempotente
+        if (userError.code === '23505' || (userError.message?.toLowerCase().includes('duplicate key') && userError.message?.toLowerCase().includes('users_pkey'))) {
+          console.warn('⚠️ Registro de usuário já existe, retornando sucesso idempotente')
+          return NextResponse.json({
+            userId: authData.user.id,
+            created: false,
+            email: email.toLowerCase(),
+            role,
+            companyId: companyId || undefined
+          }, { status: 200 })
+        }
         
         // Se erro por coluna não existir, tentar sem name/phone
         if (userError.message.includes('column') && userError.message.includes('does not exist')) {

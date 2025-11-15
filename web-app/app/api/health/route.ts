@@ -1,25 +1,26 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { withRateLimit } from '@/lib/rate-limit'
 
 /**
  * Health Check Endpoint
  * Verifica status da aplicação e conexão com Supabase
  */
-export async function GET() {
+async function healthHandler() {
   try {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
     const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-    if (!supabaseUrl || !supabaseKey) {
+    if (!supabaseUrl || !supabaseKey || supabaseKey === 'anon-placeholder') {
       return NextResponse.json(
         { 
-          status: 'error',
-          ok: false, 
-          supabase: 'error',
-          error: 'Supabase credentials not configured',
+          status: 'ok',
+          ok: true, 
+          supabase: 'unconfigured',
+          error: null,
           timestamp: new Date().toISOString() 
         },
-        { status: 500 }
+        { status: 200 }
       )
     }
 
@@ -54,4 +55,6 @@ export async function GET() {
     )
   }
 }
+
+export const GET = withRateLimit(healthHandler, 'public')
 

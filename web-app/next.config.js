@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const isProd = process.env.NODE_ENV === 'production'
-const nextConfig = {
+let nextConfig = {
   reactStrictMode: true,
   output: 'standalone',
   typescript: {
@@ -91,6 +91,7 @@ const nextConfig = {
     config.resolve.alias = {
       ...config.resolve.alias,
       '@': require('path').resolve(__dirname),
+      '@shared': require('path').resolve(__dirname, '../shared'),
     }
     // Habilitar cache do webpack para melhorar performance de compilação
     if (dev) {
@@ -105,8 +106,22 @@ const nextConfig = {
   },
   // Otimizações de compilação
   experimental: {
-    optimizePackageImports: ['lucide-react', 'framer-motion'],
+    // Desabilitado temporariamente para eliminar erros de bundling (exports undefined)
+    // optimizePackageImports: ['lucide-react', 'framer-motion'],
   },
 }
+
+// Integrar Sentry quando DSN estiver configurado
+try {
+  const dsn = process.env.SENTRY_DSN
+  if (dsn) {
+    const { withSentryConfig } = require('@sentry/nextjs')
+    nextConfig = withSentryConfig(nextConfig, {
+      org: process.env.SENTRY_ORG || undefined,
+      project: process.env.SENTRY_PROJECT || undefined,
+      silent: true,
+    })
+  }
+} catch (_) {}
 
 module.exports = nextConfig

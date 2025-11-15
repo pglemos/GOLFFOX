@@ -161,7 +161,7 @@ class GlobalSyncManager {
     
     import('@/lib/supabase').then(({ supabase }) => {
       this.channels.forEach((channel) => {
-        supabase.removeChannel(channel)
+        (supabase as any).removeChannel(channel)
       })
     })
     this.channels.clear()

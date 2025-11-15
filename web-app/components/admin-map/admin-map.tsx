@@ -43,11 +43,6 @@ import { debug, warn, error as logError } from '@/lib/logger'
 import { formatError, getErrorMeta } from '@/lib/error-utils'
 import { t } from '@/lib/i18n'
 
-declare global {
-  interface Window {
-    google: any
-  }
-}
 
 export interface AdminMapProps {
   companyId?: string
@@ -769,13 +764,13 @@ export function AdminMap({
         }, 'AdminMap')
         
         if (withCoords === 0 && processedVehicles.length > 0) {
-          notifySuccess(t('common.success.noRecentGpsPositions', { count: processedVehicles.length }), {
+          notifySuccess(t('common','success.noRecentGpsPositions', { count: processedVehicles.length }), {
             duration: 5000
           })
         }
       } else if (vehiclesError) {
         logError('Erro ao carregar veículos', { error: vehiclesError }, 'AdminMap')
-        notifyError(vehiclesError, t('common.errors.loadVehicles', { message: formatError(vehiclesError) }))
+        notifyError(vehiclesError, t('common','errors.loadVehicles', { message: formatError(vehiclesError) }))
       } else {
         // Nenhum dado retornado e nenhum erro - verificar se há veículos ativos sem filtros
         debug('Nenhum veículo retornado da query (sem erro) - verificando se há veículos ativos sem filtros', {}, 'AdminMap')
@@ -1193,7 +1188,7 @@ export function AdminMap({
     )
 
     if (positions.length === 0) {
-      notifyError(t('common.errors.noHistoricalPositionsPeriod'))
+      notifyError(t('common','errors.noHistoricalPositionsPeriod'))
       setHistoricalTrajectories([])
       return
     }
@@ -1231,13 +1226,13 @@ export function AdminMap({
 
     setHistoricalTrajectories(trajectories)
     setShowTrajectories(true)
-    notifySuccess(t('common.success.positionsLoaded', { count: positions.length, trajectories: trajectories.length }))
+    notifySuccess(t('common','success.positionsLoaded', { count: positions.length, trajectories: trajectories.length }))
   }, [filters.company, filters.route, filters.vehicle, playbackFrom, playbackTo])
 
   // Visualizar histórico e análise de trajeto
   const handleViewVehicleHistory = useCallback(async (vehicle: Vehicle) => {
     if (!vehicle.trip_id || !vehicle.route_id) {
-      notifyError(t('common.errors.noTripOrRoute'))
+      notifyError(t('common','errors.noTripOrRoute'))
       return
     }
 
@@ -1245,7 +1240,7 @@ export function AdminMap({
       // Buscar rota planejada
       const route = routes.find((r) => r.route_id === vehicle.route_id)
       if (!route || !route.polyline_points || route.polyline_points.length < 2) {
-        notifyError(t('common.errors.routeIncomplete'))
+        notifyError(t('common','errors.routeIncomplete'))
         return
       }
 
@@ -1257,12 +1252,12 @@ export function AdminMap({
         .single()
 
       if (tripError || !tripData) {
-        notifyError(t('common.errors.tripDataNotFound'))
+        notifyError(t('common','errors.tripDataNotFound'))
         return
       }
 
-      const from = tripData.started_at ? new Date(tripData.started_at) : new Date(Date.now() - 2 * 60 * 60 * 1000)
-      const to = tripData.completed_at ? new Date(tripData.completed_at) : new Date()
+      const from = (tripData as any).started_at ? new Date((tripData as any).started_at) : new Date(Date.now() - 2 * 60 * 60 * 1000)
+      const to = (tripData as any).completed_at ? new Date((tripData as any).completed_at) : new Date()
 
       // Carregar posições históricas
       if (!playbackServiceRef.current) {
@@ -1279,7 +1274,7 @@ export function AdminMap({
       )
 
       if (positions.length === 0) {
-        notifyError(t('common.errors.noHistoricalPositions'))
+        notifyError(t('common','errors.noHistoricalPositions'))
         return
       }
 
@@ -1316,10 +1311,10 @@ export function AdminMap({
       setHistoricalTrajectories([trajectory])
       setShowTrajectories(true)
 
-      notifySuccess(t('common.success.trajectoryAnalysisLoaded'))
+      notifySuccess(t('common','success.trajectoryAnalysisLoaded'))
     } catch (error: any) {
       logError('Erro ao carregar histórico', { error }, 'AdminMap')
-      notifyError(formatError(error, t('common.errors.loadHistory')))
+      notifyError(formatError(error, t('common','errors.loadHistory')))
     }
   }, [routes])
 
@@ -1343,8 +1338,8 @@ export function AdminMap({
         return
       }
 
-      const from = tripData.started_at ? new Date(tripData.started_at) : new Date(Date.now() - 2 * 60 * 60 * 1000)
-      const to = tripData.completed_at ? new Date(tripData.completed_at) : new Date()
+      const from = (tripData as any).started_at ? new Date((tripData as any).started_at) : new Date(Date.now() - 2 * 60 * 60 * 1000)
+      const to = (tripData as any).completed_at ? new Date((tripData as any).completed_at) : new Date()
 
       if (!playbackServiceRef.current) {
         playbackServiceRef.current = new PlaybackService()
@@ -1479,7 +1474,7 @@ export function AdminMap({
   const handleDispatchAssistance = useCallback(async (vehicle: Vehicle) => {
     try {
       // Criar requisição de socorro
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('gf_service_requests')
         .insert({
           empresa_id: vehicle.company_id,
@@ -1499,14 +1494,14 @@ export function AdminMap({
 
       if (error) throw error
 
-    notifySuccess(t('common.success.assistanceDispatched'))
+    notifySuccess(t('common','success.assistanceDispatched'))
       
       // Recarregar alertas chamando loadInitialData novamente
       // Isso vai recarregar todos os alertas incluindo o novo socorro
       loadInitialData()
     } catch (error: any) {
       logError('Erro ao despachar socorro', { error }, 'AdminMap')
-    notifyError(formatError(error, t('common.errors.dispatchAssistance')))
+    notifyError(formatError(error, t('common','errors.dispatchAssistance')))
     }
   }, [])
 
@@ -1518,10 +1513,10 @@ export function AdminMap({
         try {
           const { exportMapPNG } = await import('@/lib/export-map-png')
           await exportMapPNG('map-container')
-    notifySuccess(t('common.success.exportPng'))
+          notifySuccess(t('common','success.exportPng'))
         } catch (error: any) {
           logError('Erro ao exportar PNG', { error }, 'AdminMap')
-    notifyError(formatError(error, t('common.errors.exportPng')))
+          notifyError(formatError(error, t('common','errors.exportPng')))
         }
       }
       
@@ -1549,11 +1544,11 @@ export function AdminMap({
         a.download = `mapa-veiculos-${new Date().toISOString().split('T')[0]}.csv`
         a.click()
         URL.revokeObjectURL(url)
-    notifySuccess(t('common.success.exportCsv'))
+        notifySuccess(t('common','success.exportCsv'))
       }
     } catch (error: any) {
       logError('Erro ao exportar', { error }, 'AdminMap')
-    notifyError(formatError(error, t('common.errors.export')))
+    notifyError(formatError(error, t('common','errors.export')))
     }
   }, [vehicles, listMode])
 

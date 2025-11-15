@@ -1,6 +1,8 @@
 "use client"
 import React from "react"
 import { usePathname } from "next/navigation"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { 
   Sidebar as UISidebar, 
   SidebarBody, 
@@ -26,10 +28,10 @@ import {
   MessageSquare
 } from "lucide-react"
 import { useNavigation } from "@/hooks/use-navigation"
+import { useEffect } from "react"
 import { SyncAlertBadge } from "@/components/sync-alert-badge"
 import { OperationalAlertsBadge } from "@/components/operational-alerts-badge"
 import { cn } from "@/lib/utils"
-import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
 
 // Menus por painel
@@ -254,6 +256,7 @@ const CustomSidebarLink = ({
   panel: 'admin' | 'operator' | 'carrier'
 }) => {
   const pathname = usePathname()
+  const router = useRouter()
   const { open } = useSidebar()
   const Icon = item.icon
   
@@ -280,6 +283,8 @@ const CustomSidebarLink = ({
                 : "bg-[#FFF7ED] text-[#F97316]")
             : "hover:bg-gray-100 dark:hover:bg-gray-800"
         )}
+        onMouseEnter={() => router.prefetch(item.href)}
+        onClick={(e) => { e.preventDefault(); router.push(item.href) }}
       >
         <div className="relative">
           <Icon 
@@ -335,10 +340,10 @@ const SidebarLogo = ({ panel }: { panel: 'admin' | 'operator' | 'carrier' }) => 
   const { open } = useSidebar()
   
   return (
-    <Link
-      href={panel === 'operator' ? '/operator' : panel === 'carrier' ? '/carrier' : '/admin'}
-      className="font-normal flex space-x-2 items-center text-sm text-black dark:text-white py-1 relative z-20 mb-6"
-    >
+      <a
+        href={panel === 'operator' ? '/operator' : panel === 'carrier' ? '/carrier' : '/admin'}
+        className="font-normal flex space-x-2 items-center text-sm text-black dark:text-white py-1 relative z-20 mb-6"
+      >
       <div className={cn(
         "h-8 w-8 rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm",
         panel === 'operator' ? "bg-orange-500" : "gradient-brand"
@@ -365,7 +370,7 @@ const SidebarLogo = ({ panel }: { panel: 'admin' | 'operator' | 'carrier' }) => 
           </p>
         </div>
       </motion.div>
-    </Link>
+    </a>
   )
 }
 
@@ -388,7 +393,7 @@ const SidebarUser = ({ user, panel }: {
   
   return (
     <div className="border-t border-[var(--border)] pt-4 mt-auto">
-      <Link
+      <a
         href="#"
         className="flex items-center justify-start gap-2 py-2 px-3 rounded-lg transition-colors hover:bg-gray-100 dark:hover:bg-gray-800"
       >
@@ -411,7 +416,7 @@ const SidebarUser = ({ user, panel }: {
         >
           {user.name}
         </motion.span>
-      </Link>
+      </a>
     </div>
   )
 }
@@ -429,6 +434,15 @@ export function Sidebar({ isOpen = true, isMobile = false, panel = 'admin', user
   // Estado inicial: fechado (apenas ícones)
   const [open, setOpen] = React.useState(false)
 
+  const router = useRouter()
+
+  useEffect(() => {
+    const items = panel === 'operator' ? operatorMenuItems : panel === 'carrier' ? carrierMenuItems : adminMenuItems
+    for (const item of items) {
+      router.prefetch(item.href)
+    }
+  }, [panel, router])
+
   return (
     <UISidebar open={open} setOpen={setOpen} animate={true}>
       <SidebarBody className={cn(
@@ -438,15 +452,11 @@ export function Sidebar({ isOpen = true, isMobile = false, panel = 'admin', user
       )}>
         <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden pt-6 px-4 h-full">
           <div className="flex flex-col gap-1">
-            {menuItems.map((item) => {
-              return (
-                <CustomSidebarLink
-                  key={item.href}
-                  item={item}
-                  panel={panel}
-                />
-              )
-            })}
+            {menuItems.map((item) => (
+              <motion.div key={item.href} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2, ease: 'easeOut' }}>
+                <CustomSidebarLink item={item} panel={panel} />
+              </motion.div>
+            ))}
           </div>
         </div>
         

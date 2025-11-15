@@ -137,7 +137,7 @@ export class RealtimeService {
    * Inscreve no canal de driver_positions
    */
   private async subscribeToDriverPositions(): Promise<void> {
-    const channel = supabase
+    const channel = (supabase as any)
       .channel('map:driver_positions')
       .on(
         'postgres_changes',
@@ -208,7 +208,7 @@ export class RealtimeService {
    * Inscreve no canal de trips
    */
   private async subscribeToTrips(): Promise<void> {
-    const channel = supabase
+    const channel = (supabase as any)
       .channel('map:trips')
       .on(
         'postgres_changes',
@@ -252,7 +252,7 @@ export class RealtimeService {
     // Vamos escutar ambas as tabelas
 
     // Canal para gf_incidents
-    const channelIncidents = supabase
+    const channelIncidents = (supabase as any)
       .channel('map:incidents')
       .on(
         'postgres_changes',
@@ -286,7 +286,7 @@ export class RealtimeService {
     this.channels.set('incidents', channelIncidents)
 
     // Canal para gf_service_requests (socorro)
-    const channelAssistance = supabase
+    const channelAssistance = (supabase as any)
       .channel('map:assistance')
       .on(
         'postgres_changes',

@@ -95,8 +95,8 @@ export function CreateOperatorLoginModal({
         notifySuccess(`Login de operador criado com sucesso para ${companyName}!`)
         
         // Trigger global sync
-        globalSyncManager.triggerSync('user.created')
-        globalSyncManager.triggerSync('company.updated')
+        globalSyncManager.triggerSync('user.created', { companyId })
+        globalSyncManager.triggerSync('company.updated', { companyId })
         
         onSave()
         onClose()

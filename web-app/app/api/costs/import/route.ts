@@ -3,6 +3,7 @@ import { supabaseServiceRole } from '@/lib/supabase-server'
 import { parseCSV } from '@/lib/costs/import-parser'
 import { requireCompanyAccess } from '@/lib/api-auth'
 import { z } from 'zod'
+import { withRateLimit } from '@/lib/rate-limit'
 
 const importSchema = z.object({
   company_id: z.string().uuid(),
@@ -21,7 +22,7 @@ const importSchema = z.object({
   mapping: z.record(z.string()).optional() // Mapeamento de colunas para campos
 })
 
-export async function POST(request: NextRequest) {
+async function importHandler(request: NextRequest) {
   try {
     const formData = await request.formData()
     const file = formData.get('file') as File
@@ -190,4 +191,6 @@ export async function POST(request: NextRequest) {
     )
   }
 }
+
+export const POST = withRateLimit(importHandler, 'sensitive')
 

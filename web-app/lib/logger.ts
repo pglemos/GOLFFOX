@@ -28,10 +28,12 @@ class Logger {
     ]
     const redacted: Record<string, unknown> = {}
     for (const [k, v] of Object.entries(meta)) {
+      // Normalizar objetos Error para não perder mensagem/stack no console
+      const normalized = v instanceof Error ? { name: v.name, message: v.message, stack: v.stack } : v
       if (sensitiveKeys.some(sk => k.toLowerCase().includes(sk))) {
         redacted[k] = '[REDACTED]'
       } else {
-        redacted[k] = v
+        redacted[k] = normalized
       }
     }
     return redacted

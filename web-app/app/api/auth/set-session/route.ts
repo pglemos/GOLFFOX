@@ -47,8 +47,8 @@ export async function POST(req: NextRequest) {
       name: "golffox-session",
       value: cookieValue,
       path: "/",
-      httpOnly: false, // middleware lê, e cliente pode limpar no logout
-      sameSite: "lax",
+      httpOnly: true, // ✅ FIXED: Previne acesso via JavaScript (XSS protection)
+      sameSite: "strict",
       secure: isSecure,
       maxAge: 60 * 60, // 1 hora
     })

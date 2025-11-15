@@ -10,7 +10,7 @@ import { Users, Search, Mail, Phone, Building, AlertCircle } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { useRouter, useSearchParams } from "next/navigation"
 import { notifyError } from "@/lib/toast"
-import CSVImportModal from "@/components/operator/csv-import-modal"
+import { CSVImportModal } from "@/components/operator/csv-import-modal"
 import { FuncionariosErrorBoundary } from "./error-boundary"
 import { debug, error } from "@/lib/logger"
 

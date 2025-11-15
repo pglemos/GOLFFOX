@@ -2,19 +2,12 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requireCompanyAccess, requireAuth } from '@/lib/api-auth'
 import Papa from 'papaparse'
+import { withRateLimit } from '@/lib/rate-limit'
+import { getSupabaseAdmin, fetchReportRange } from '@/server/services/reporting'
 
 export const runtime = 'nodejs'
 
-function getSupabaseAdmin() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE
-  if (!url || !serviceKey) {
-    throw new Error('Supabase não configurado: defina NEXT_PUBLIC_SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY')
-  }
-  return createClient(url, serviceKey, {
-    auth: { autoRefreshToken: false, persistSession: false }
-  })
-}
+// movido para @/server/services/reporting
 
 // OPTIONS handler para CORS
 export async function OPTIONS(request: NextRequest) {
@@ -57,13 +50,17 @@ const REPORT_CONFIGS: Record<string, { viewName: string; columns: string[] }> = 
  * POST /api/reports/run
  * Body: { reportKey, format, filters: { companyId, periodStart, periodEnd } }
  */
-export async function POST(request: NextRequest) {
+async function runReportHandler(request: NextRequest) {
   try {
     const supabase = getSupabaseAdmin()
     const body = await request.json()
     // Aceitar tanto reportKey quanto reportType (camelCase ou snake_case) para compatibilidade
     const reportKey = body.reportKey || body.reportType || body.report_type || body.report_key
     const format = body.format || 'csv'
+    const limitReq = Number(body.limit ?? body.pageSize ?? 5000)
+    const offsetReq = Number(body.offset ?? body.page ?? 0)
+    const limit = Number.isFinite(limitReq) ? Math.max(1, Math.min(limitReq, 20000)) : 5000
+    const offset = Number.isFinite(offsetReq) ? Math.max(0, offsetReq) : 0
     
     // Aceitar company_id tanto em filters quanto diretamente no body
     const companyIdFromBody = body.company_id || body.companyId
@@ -155,7 +152,7 @@ export async function POST(request: NextRequest) {
     const config = REPORT_CONFIGS[finalReportKey]
     
     // Buscar dados da view
-    let query = supabase.from(config.viewName).select('*')
+    const { data, error } = await fetchReportRange(supabase, config.viewName, config.columns, filters, limit, offset)
 
     if (filters.companyId) {
       query = query.eq('company_id', filters.companyId)
@@ -167,7 +164,7 @@ export async function POST(request: NextRequest) {
       query = query.lte('period_end', filters.periodEnd)
     }
 
-    const { data, error } = await query
+    
 
     if (error) {
       console.error('Erro ao buscar dados do relatório:', error)
@@ -297,7 +294,8 @@ export async function POST(request: NextRequest) {
                 try {
                   switch (format) {
                     case 'csv':
-                      return generateCSV(data, config.columns, finalReportKey)
+                      // Streaming CSV para grandes relatórios
+                      return await generateCSVStream(supabase, config.viewName, config.columns, filters, finalReportKey, limit, offset)
                     
                     case 'excel':
                       return await generateExcel(data, config.columns, finalReportKey)
@@ -339,6 +337,8 @@ export async function POST(request: NextRequest) {
     )
   }
 }
+
+export const POST = withRateLimit(runReportHandler, 'sensitive')
 
 // Formatar número para separador decimal BR (vírgula)
 function formatNumberBR(value: any): string {
@@ -392,6 +392,61 @@ function generateCSV(data: any[], columns: string[], reportKey: string) {
   const csvWithBOM = '\ufeff' + csv
 
   return new NextResponse(csvWithBOM, {
+    headers: {
+      'Content-Type': 'text/csv; charset=utf-8',
+      'Content-Disposition': `attachment; filename="${filename}"`
+    }
+  })
+}
+
+async function generateCSVStream(
+  supabase: ReturnType<typeof getSupabaseAdmin>,
+  viewName: string,
+  columns: string[],
+  filters: { companyId?: string; periodStart?: string; periodEnd?: string },
+  reportKey: string,
+  limit: number,
+  offset: number,
+) {
+  const encoder = new TextEncoder()
+  const filename = `relatorio_${reportKey}_${new Date().toISOString().split('T')[0]}.csv`
+  const stream = new ReadableStream({
+    async start(controller) {
+      const write = (s: string) => controller.enqueue(encoder.encode(s))
+      // BOM + header
+      write('\ufeff')
+      write(columns.join(',') + '\n')
+
+      let pageOffset = offset
+      const pageLimit = limit
+      while (true) {
+        const { data: page, error } = await fetchReportRange(supabase, viewName, columns, filters, pageLimit, pageOffset)
+        if (error) {
+          console.error('Erro ao paginar relatório:', error)
+          break
+        }
+        if (!page || page.length === 0) {
+          break
+        }
+        for (const row of page) {
+          const cells = columns.map((col) => {
+            const v = row[col]
+            if (typeof v === 'number') {
+              return formatNumberBR(v)
+            }
+            const str = String(v ?? '')
+            return (str.includes(',') || str.includes('"') || str.includes('\n'))
+              ? `"${str.replace(/"/g, '""')}"`
+              : str
+          })
+          write(cells.join(',') + '\n')
+        }
+        pageOffset += pageLimit
+      }
+      controller.close()
+    }
+  })
+  return new Response(stream, {
     headers: {
       'Content-Type': 'text/csv; charset=utf-8',
       'Content-Disposition': `attachment; filename="${filename}"`

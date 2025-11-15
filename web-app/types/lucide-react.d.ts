@@ -46,6 +46,63 @@ declare module 'lucide-react' {
   export const Building2: FC<IconProps>
   export const Briefcase: FC<IconProps>
   export const Shield: FC<IconProps>
+  export const MessageSquare: FC<IconProps>
+  export const RefreshCw: FC<IconProps>
+  export const Database: FC<IconProps>
+  export const Play: FC<IconProps>
+  export const Pause: FC<IconProps>
+  export const RotateCcw: FC<IconProps>
+  export const Settings2: FC<IconProps>
+  export const Bell: FC<IconProps>
+  export const Menu: FC<IconProps>
+  export const LogOut: FC<IconProps>
+  export const Loader2: FC<IconProps>
+  export const Check: FC<IconProps>
+  export const LayoutDashboard: FC<IconProps>
+  export const UserCog: FC<IconProps>
+  export type LucideIcon = FC<IconProps>
+  export const HardDrive: FC<IconProps>
+  export const Wifi: FC<IconProps>
+  export const Minimize2: FC<IconProps>
+  export const LifeBuoy: FC<IconProps>
+  export const BarChart3: FC<IconProps>
+  export const FileSpreadsheet: FC<IconProps>
+  export const CheckCircle2: FC<IconProps>
+  export const Info: FC<IconProps>
+  export const Send: FC<IconProps>
+  export const Route: FC<IconProps>
+  export const Wrench: FC<IconProps>
+  export const ClipboardCheck: FC<IconProps>
+  export const Phone: FC<IconProps>
+  export const ChevronRight: FC<IconProps>
+  export const Mail: FC<IconProps>
+  export const Sparkles: FC<IconProps>
+  export const Key: FC<IconProps>
+  export const Layers: FC<IconProps>
+  export const History: FC<IconProps>
+  export const Timer: FC<IconProps>
+  export const WifiOff: FC<IconProps>
+  export const Accessibility: FC<IconProps>
+  export const Keyboard: FC<IconProps>
+  export const TrendingDown: FC<IconProps>
+  export const PieChart: FC<IconProps>
+  export const Map: FC<IconProps>
+  export const Maximize2: FC<IconProps>
+  export const Radio: FC<IconProps>
+  export const Square: FC<IconProps>
+  export const SkipBack: FC<IconProps>
+  export const SkipForward: FC<IconProps>
+  export const Gauge: FC<IconProps>
+  export const Repeat: FC<IconProps>
+  export const Repeat1: FC<IconProps>
+  export const Volume2: FC<IconProps>
+  export const VolumeX: FC<IconProps>
+  export const Eye: FC<IconProps>
+  export const EyeOff: FC<IconProps>
+  export const MousePointer: FC<IconProps>
+  export const Contrast: FC<IconProps>
+  export const Type: FC<IconProps>
+  export const Zap: FC<IconProps>
   
   // Adicione outros ícones conforme necessário
   const Icon: FC<IconProps>

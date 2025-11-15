@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requireCompanyAccess } from '@/lib/api-auth'
+import { withRateLimit } from '@/lib/rate-limit'
+import nodemailer from 'nodemailer'
 
 function getSupabaseAdmin() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -140,17 +142,34 @@ async function sendEmailSMTP(
   body: string,
   attachment?: { filename: string; content: string; contentType: string }
 ) {
-  // Implementação simplificada - em produção, usar nodemailer
-  console.log('SMTP email send (mock):', { to, subject })
-  // TODO: Implementar com nodemailer se necessário
-  return { success: true }
+  if (!SMTP_HOST || !SMTP_USER || !SMTP_PASS) {
+    return { success: false, error: 'smtp_not_configured' }
+  }
+  const transporter = nodemailer.createTransport({
+    host: SMTP_HOST,
+    port: SMTP_PORT,
+    secure: SMTP_PORT === 465,
+    auth: { user: SMTP_USER, pass: SMTP_PASS },
+  })
+  const mail = await transporter.sendMail({
+    from: SMTP_FROM,
+    to,
+    subject,
+    html: body.replace(/\n/g, '<br>'),
+    attachments: attachment ? [{
+      filename: attachment.filename,
+      content: attachment.content,
+      contentType: attachment.contentType,
+    }] : undefined,
+  })
+  return { success: true, id: mail.messageId }
 }
 
 /**
  * POST /api/reports/dispatch
  * Dispatch de relatórios agendados (chamado via Vercel Cron ou manual)
  */
-export async function POST(request: NextRequest) {
+async function dispatchPostHandler(request: NextRequest) {
   try {
     const supabase = getSupabaseAdmin()
     const body = await request.json()
@@ -297,7 +316,7 @@ export async function POST(request: NextRequest) {
  * GET /api/reports/dispatch
  * Listar relatórios agendados (para debug/admin)
  */
-export async function GET(request: NextRequest) {
+async function dispatchGetHandler(request: NextRequest) {
   try {
     const supabase = getSupabaseAdmin()
     const { searchParams } = new URL(request.url)
@@ -325,3 +344,6 @@ export async function GET(request: NextRequest) {
     )
   }
 }
+
+export const POST = withRateLimit(dispatchPostHandler, 'sensitive')
+export const GET = withRateLimit(dispatchGetHandler, 'api')

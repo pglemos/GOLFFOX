@@ -365,7 +365,7 @@ export function RouteModal({
 
     const subscribe = () => {
       attempts++
-      unsub = supabase
+      unsub = (supabase as any)
         .channel(`rt_gf_route_plan_${routeId}`)
         .on('postgres_changes', { event: '*', schema: 'public', table: 'gf_route_plan', filter: `route_id=eq.${routeId}` }, trigger)
         .subscribe((status: string) => {
@@ -383,7 +383,7 @@ export function RouteModal({
     return () => {
       if (timeoutRef) clearTimeout(timeoutRef)
       if (scheduled) clearTimeout(scheduled)
-      if (unsub) supabase.removeChannel(unsub)
+      if (unsub) (supabase as any).removeChannel(unsub)
     }
   }, [isOpen, route?.id, formData.id, debounceMs, realtimeRetries])
 

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requireCompanyAccess, validateAuth } from '@/lib/api-auth'
+import { withRateLimit } from '@/lib/rate-limit'
 
 export const runtime = 'nodejs'
 
@@ -32,7 +33,7 @@ export async function OPTIONS(request: NextRequest) {
  * POST /api/reports/schedule
  * Body: { scheduleId?, companyId, reportKey, cron, recipients[], isActive }
  */
-export async function POST(request: NextRequest) {
+async function schedulePostHandler(request: NextRequest) {
   try {
     const supabase = getSupabaseAdmin()
     const body = await request.json()
@@ -367,7 +368,7 @@ export async function POST(request: NextRequest) {
  * Listar agendamentos
  * GET /api/reports/schedule?companyId=xxx
  */
-export async function GET(request: NextRequest) {
+async function scheduleGetHandler(request: NextRequest) {
   try {
     const supabase = getSupabaseAdmin()
     const searchParams = request.nextUrl.searchParams
@@ -400,7 +401,7 @@ export async function GET(request: NextRequest) {
  * Deletar agendamento
  * DELETE /api/reports/schedule?scheduleId=xxx
  */
-export async function DELETE(request: NextRequest) {
+async function scheduleDeleteHandler(request: NextRequest) {
   try {
     const supabase = getSupabaseAdmin()
     const searchParams = request.nextUrl.searchParams
@@ -429,4 +430,8 @@ export async function DELETE(request: NextRequest) {
     )
   }
 }
+
+export const POST = withRateLimit(schedulePostHandler, 'sensitive')
+export const GET = withRateLimit(scheduleGetHandler, 'api')
+export const DELETE = withRateLimit(scheduleDeleteHandler, 'sensitive')
 

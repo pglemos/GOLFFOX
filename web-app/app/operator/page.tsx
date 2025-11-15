@@ -9,7 +9,6 @@ import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 import { OperatorKPICards } from "@/components/operator/operator-kpi-cards"
 import { ControlTowerCards } from "@/components/operator/control-tower-cards"
-import Link from "next/link"
 import { useOperatorTenant } from "@/components/providers/operator-tenant-provider"
 
 export default function OperatorDashboard() {
@@ -282,12 +281,12 @@ export default function OperatorDashboard() {
               {companyName ? `Empresa: ${companyName}` : "Acompanhe sua operação em tempo real"}
             </p>
           </div>
-          <Link href="/operator/rotas" className="flex-shrink-0">
+          <a href="/operator/rotas" className="flex-shrink-0">
             <Button className="bg-orange-500 hover:bg-orange-600 text-white">
               <MapPin className="h-4 w-4 mr-2" />
               Ver Rotas
             </Button>
-          </Link>
+          </a>
         </div>
 
         {/* KPIs */}
@@ -322,12 +321,12 @@ export default function OperatorDashboard() {
                   <CardTitle className="text-xl font-semibold mb-1.5">Visualização de Rotas</CardTitle>
                   <p className="text-sm text-[var(--ink-muted)]">Visualize todas as rotas ativas no mapa interativo</p>
                 </div>
-                <Link href="/operator/rotas/mapa" className="flex-shrink-0">
+                <a href="/operator/rotas/mapa" className="flex-shrink-0">
                   <Button variant="outline" size="sm">
                     <MapPin className="h-4 w-4 mr-2" />
                     Ver Mapa
                   </Button>
-                </Link>
+                </a>
               </div>
             </CardHeader>
             <CardContent className="pt-0">
