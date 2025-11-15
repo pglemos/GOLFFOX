@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabaseServiceRole } from '@/lib/supabase-server'
 import { requireAuth } from '@/lib/api-auth'
 import { z } from 'zod'
+import { withRateLimit } from '@/lib/rate-limit'
 
 const reconcileSchema = z.object({
   invoice_id: z.string().uuid(),
@@ -12,7 +13,7 @@ const reconcileSchema = z.object({
   discrepancy_threshold_amount: z.number().default(100)
 })
 
-export async function POST(request: NextRequest) {
+async function reconcileHandler(request: NextRequest) {
   try {
     // ✅ Validar autenticação (operator ou admin)
     const authError = await requireAuth(request, ['operator', 'admin'])
@@ -126,4 +127,6 @@ export async function POST(request: NextRequest) {
     )
   }
 }
+
+export const POST = withRateLimit(reconcileHandler, 'sensitive')
 

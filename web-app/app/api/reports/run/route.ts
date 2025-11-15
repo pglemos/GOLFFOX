@@ -3,19 +3,11 @@ import { createClient } from '@supabase/supabase-js'
 import { requireCompanyAccess, requireAuth } from '@/lib/api-auth'
 import Papa from 'papaparse'
 import { withRateLimit } from '@/lib/rate-limit'
+import { getSupabaseAdmin, fetchReportRange } from '@/server/services/reporting'
 
 export const runtime = 'nodejs'
 
-function getSupabaseAdmin() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE
-  if (!url || !serviceKey) {
-    throw new Error('Supabase não configurado: defina NEXT_PUBLIC_SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY')
-  }
-  return createClient(url, serviceKey, {
-    auth: { autoRefreshToken: false, persistSession: false }
-  })
-}
+// movido para @/server/services/reporting
 
 // OPTIONS handler para CORS
 export async function OPTIONS(request: NextRequest) {
@@ -160,8 +152,7 @@ async function runReportHandler(request: NextRequest) {
     const config = REPORT_CONFIGS[finalReportKey]
     
     // Buscar dados da view
-    const columnsStr = config.columns.join(',')
-    let query = supabase.from(config.viewName).select(columnsStr)
+    const { data, error } = await fetchReportRange(supabase, config.viewName, config.columns, filters, limit, offset)
 
     if (filters.companyId) {
       query = query.eq('company_id', filters.companyId)
@@ -173,7 +164,7 @@ async function runReportHandler(request: NextRequest) {
       query = query.lte('period_end', filters.periodEnd)
     }
 
-    const { data, error } = await query.range(offset, offset + limit - 1)
+    
 
     if (error) {
       console.error('Erro ao buscar dados do relatório:', error)
