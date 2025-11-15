@@ -46,6 +46,28 @@ declare module 'lucide-react' {
   export const Building2: FC<IconProps>
   export const Briefcase: FC<IconProps>
   export const Shield: FC<IconProps>
+  export const MessageSquare: FC<IconProps>
+  export const RefreshCw: FC<IconProps>
+  export const Database: FC<IconProps>
+  export const Play: FC<IconProps>
+  export const Pause: FC<IconProps>
+  export const RotateCcw: FC<IconProps>
+  export const Settings2: FC<IconProps>
+  export const Bell: FC<IconProps>
+  export const Menu: FC<IconProps>
+  export const LogOut: FC<IconProps>
+  export const Loader2: FC<IconProps>
+  export const Check: FC<IconProps>
+  export const LayoutDashboard: FC<IconProps>
+  export const UserCog: FC<IconProps>
+  export type LucideIcon = FC<IconProps>
+  export const HardDrive: FC<IconProps>
+  export const Wifi: FC<IconProps>
+  export const Minimize2: FC<IconProps>
+  export const LifeBuoy: FC<IconProps>
+  export const BarChart3: FC<IconProps>
+  export const FileSpreadsheet: FC<IconProps>
+  export const CheckCircle2: FC<IconProps>
   
   // Adicione outros ícones conforme necessário
   const Icon: FC<IconProps>

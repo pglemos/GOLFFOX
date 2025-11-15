@@ -91,6 +91,7 @@ let nextConfig = {
     config.resolve.alias = {
       ...config.resolve.alias,
       '@': require('path').resolve(__dirname),
+      '@shared': require('path').resolve(__dirname, '../shared'),
     }
     // Habilitar cache do webpack para melhorar performance de compilação
     if (dev) {
