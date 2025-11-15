@@ -103,7 +103,7 @@ export function DriverModal({ driver, isOpen, onClose, onSave }: DriverModalProp
       }
 
       if (driver?.id) {
-        const { error } = await supabase
+        const { error } = await (supabase as any)
           .from("users")
           .update(driverData)
           .eq("id", driver.id)

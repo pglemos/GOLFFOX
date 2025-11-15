@@ -78,7 +78,7 @@ export const SidebarBody = (props: React.ComponentProps<typeof motion.div>) => {
   return (
     <>
       <DesktopSidebar {...props} />
-      <MobileSidebar {...props} />
+      <MobileSidebar {...(props as React.ComponentProps<'div'>)} />
     </>
   );
 };
@@ -113,7 +113,7 @@ export const MobileSidebar = ({
   className,
   children,
   ...props
-}: React.ComponentProps<typeof motion.div>) => {
+}: React.ComponentProps<'div'>) => {
   const { open, setOpen } = useSidebar();
   return (
     <>

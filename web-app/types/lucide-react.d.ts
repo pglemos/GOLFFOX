@@ -97,6 +97,12 @@ declare module 'lucide-react' {
   export const Repeat1: FC<IconProps>
   export const Volume2: FC<IconProps>
   export const VolumeX: FC<IconProps>
+  export const Eye: FC<IconProps>
+  export const EyeOff: FC<IconProps>
+  export const MousePointer: FC<IconProps>
+  export const Contrast: FC<IconProps>
+  export const Type: FC<IconProps>
+  export const Zap: FC<IconProps>
   
   // Adicione outros ícones conforme necessário
   const Icon: FC<IconProps>
