@@ -12,6 +12,10 @@
 - Analytics: proteção de `GET`/`POST` de Web Vitals com rate limiting (`public`/`api`).
 - Mobile: integração `sentry_flutter` condicional com bootstrap em `lib/core/error/sentry_setup.dart` e chamada em `AppBootstrap`.
 - Tipagem: expansão de ícones `lucide-react`, correções em `framer-motion` e casts localizados de Supabase para estabilidade de TypeScript.
+- OpenAPI: endpoint `/api/docs/openapi` e documento `docs/api/openapi.json` adicionados.
+- Streaming: export CSV em `costs/export` e relatórios `reports/run` agora usam streaming com paginação.
+- v49: roteiro de verificação adicionado em `web-app/scripts/check-v49-migration.ts` para checar tabela/políticas.
+  - v49 aplicada e verificada: políticas presentes e RLS habilitado em `gf_user_company_map` (ver relatório do script `web-app/scripts/apply-v49-direct.js`).
 
 ## Visão Geral do Sistema
 - Plataforma multi-tenant que conecta Empresa Contratante, Transportadora, Motorista e Passageiro, com operação central pela Golf Fox (operadora master).
