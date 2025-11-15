@@ -1,6 +1,20 @@
 
 import 'package:flutter/material.dart';
-import '../theme/app_theme.dart';
+
+enum StatusTone { success, info, warning, danger }
+
+Color statusColor(StatusTone tone) {
+  switch (tone) {
+    case StatusTone.success:
+      return const Color(0xFF047857);
+    case StatusTone.info:
+      return const Color(0xFF3B82F6);
+    case StatusTone.warning:
+      return const Color(0xFF92400E);
+    case StatusTone.danger:
+      return const Color(0xFFB91C1C);
+  }
+}
 
 class StatusPill extends StatelessWidget {
   final String label;

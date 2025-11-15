@@ -232,6 +232,6 @@ Ou configure via `vercel.json`:
 ## Suporte
 
 Para problemas específicos, consulte:
-- [docs/TROUBLESHOOTING.md](../TROUBLESHOOTING.md)
-- [docs/PAINEIS.md](../PAINEIS.md)
+- [docs/TROUBLESHOOTING.md](/docs/TROUBLESHOOTING.md)
+- [docs/PAINEIS.md](/docs/PAINEIS.md)
 
