@@ -43,11 +43,6 @@ import { debug, warn, error as logError } from '@/lib/logger'
 import { formatError, getErrorMeta } from '@/lib/error-utils'
 import { t } from '@/lib/i18n'
 
-declare global {
-  interface Window {
-    google: any
-  }
-}
 
 export interface AdminMapProps {
   companyId?: string
@@ -769,13 +764,13 @@ export function AdminMap({
         }, 'AdminMap')
         
         if (withCoords === 0 && processedVehicles.length > 0) {
-          notifySuccess(t('common.success.noRecentGpsPositions', { count: processedVehicles.length }), {
+          notifySuccess(t('common','success.noRecentGpsPositions', { count: processedVehicles.length }), {
             duration: 5000
           })
         }
       } else if (vehiclesError) {
         logError('Erro ao carregar veículos', { error: vehiclesError }, 'AdminMap')
-        notifyError(vehiclesError, t('common.errors.loadVehicles', { message: formatError(vehiclesError) }))
+        notifyError(vehiclesError, t('common','errors.loadVehicles', { message: formatError(vehiclesError) }))
       } else {
         // Nenhum dado retornado e nenhum erro - verificar se há veículos ativos sem filtros
         debug('Nenhum veículo retornado da query (sem erro) - verificando se há veículos ativos sem filtros', {}, 'AdminMap')
