@@ -1,13 +1,13 @@
 {
   "version": 2,
   "builds": [
-    { "src": "web-app/package.json", "use": "@vercel/next" }
+    { "src": "apps/web/package.json", "use": "@vercel/next" }
   ],
   "ignoreCommand": "git diff --quiet HEAD^ HEAD || exit 1",
   "crons": [
     {
       "path": "/api/cron/refresh-kpis",
-      "schedule": "0 */6 * * *"
+      "schedule": "0 3 * * *"
     },
     {
       "path": "/api/cron/refresh-costs-mv",
@@ -28,7 +28,7 @@
         { "key": "X-Frame-Options", "value": "DENY" },
         { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
         { "key": "Permissions-Policy", "value": "geolocation=(self), microphone=(), camera=()" },
-        { "key": "Content-Security-Policy", "value": "default-src 'self' https: data: blob:; img-src 'self' https: data: blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https:; connect-src 'self' https: wss:; font-src 'self' https: data:; frame-ancestors 'none';" }
+        { "key": "Content-Security-Policy", "value": "default-src 'self' https: data: blob:; img-src 'self' https: data: blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https:; connect-src 'self' https: wss: https://*.supabase.co wss://*.supabase.co; font-src 'self' https: data:; frame-ancestors 'none';" }
       ]
     }
   ]

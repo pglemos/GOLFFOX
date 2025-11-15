@@ -13,8 +13,10 @@ Padronizar e reorganizar o GOLFFOX para uma arquitetura clara, removendo redund�
 ## Mapeamento Antigo → Novo
 - `web-app/` → `apps/web/` (mantendo `app/api/*` no lugar por requisitos do Next.js).
 - `lib/` (Flutter) → `apps/mobile/{driver,passenger,shared}`.
+ - `lib/` (Flutter) → `apps/mobile/{driver,passenger,shared}`; assets web → `apps/mobile/flutter-web`.
 - `tools/db/*` e `tools/pgapply/*` → `infra/tools/*`.
 - Documentação dispersa (`RESUMO_*`, `RELATORIO_*`, `DEPLOY_*`) → `docs/` consolidado.
+ - Estrutura antiga de Next em raiz (`app/*`) → `archive/LEGADO_NAO_USAR/app-legacy/`.
 
 ## Passos para o Time
 1. Atualize imports usando aliases (`@server`, `@shared`, `@lib`).
