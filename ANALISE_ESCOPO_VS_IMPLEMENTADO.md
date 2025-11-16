@@ -89,7 +89,166 @@ O documento de escopo define **Golf Fox** como uma plataforma SaaS completa de g
 
 ---
 
-### 4. 👨‍✈️ GESTÃO DE MOTORISTAS
+### 4. 🏢 PAINEL DA TRANSPORTADORA (CARRIER)
+**Status: 25% Implementado**
+
+✅ **Implementado:**
+- Dashboard básico (`/carrier`)
+- Visualização de veículos (`/carrier/veiculos`)
+- Visualização de motoristas (`/carrier/motoristas`)
+- Mapa da frota (`/carrier/mapa`)
+- Relatórios básicos (`/carrier/relatorios`)
+- KPIs básicos: Total da Frota, Em Rota, Motoristas Ativos, Atrasados
+- Listagem de veículos com busca
+- Listagem de motoristas com busca
+- Mapa com integração ao FleetMap
+- Sistema de exportação (CSV, Excel, PDF)
+
+❌ **FALTANDO - CRÍTICO:**
+
+#### 4.1 📋 GESTÃO DE MOTORISTAS (CADASTRO COMPLETO)
+**Status: 10% Implementado**
+
+**O que falta:**
+- **Cadastro Completo:**
+  - Tabela `driver_documents` (não existe)
+  - CNH (upload, validade, categoria)
+  - CPF
+  - RG
+  - Comprovante de residência
+  - Foto 3x4
+  - Certidões (criminal, cível)
+  
+- **Exames Médicos:**
+  - Tabela `driver_medical_exams` (não existe)
+  - Exame admissional
+  - Exames periódicos
+  - Exames toxicológicos (Lei 13.103/2015)
+  - Controle de vencimentos
+  - Alertas de exames vencidos/próximos do vencimento
+  - Upload de laudos médicos
+  
+- **Documentação:**
+  - Upload de documentos digitalizados
+  - Controle de validades automático
+  - Notificações de vencimento (30/15/7 dias antes)
+  - Histórico de renovações
+  - Status de conformidade (apto/inapto/pendente)
+  
+- **Interface:**
+  - Formulário completo de cadastro
+  - Área de upload de documentos
+  - Dashboard de vencimentos por motorista
+  - Filtros: aptos, inaptos, documentos vencidos
+  - Relatório de conformidade
+
+#### 4.2 🚗 GESTÃO DE FROTA (DOCUMENTOS E MANUTENÇÕES)
+**Status: 35% Implementado**
+
+**O que falta:**
+- **Documentação de Veículos:**
+  - Tabela `vehicle_documents` (não existe)
+  - CRLV (Certificado de Registro e Licenciamento)
+  - IPVA (controle de pagamento e vencimento)
+  - Seguro (apólice, valor, vencimento, cobertura)
+  - Inspeção veicular (data, certificado)
+  - Alvará de funcionamento
+  - Controle de vencimentos com alertas
+  
+- **Manutenções:**
+  - Tabela `vehicle_maintenances` (não existe)
+  - Manutenções preventivas (agendadas por km ou data)
+  - Manutenções corretivas (quando quebra)
+  - Histórico completo de manutenções
+  - Custos por manutenção (peças, mão de obra)
+  - Status: agendada, em andamento, concluída
+  - Próxima manutenção prevista
+  - Notificações de manutenção pendente
+
+#### 4.3 🗺️ MAPA EM TEMPO REAL (VISÃO COMPLETA)
+**Status: 45% Implementado**
+
+**O que está implementado:**
+- Mapa básico com veículos
+- Status: em rota, disponível, atrasado
+- Integração com `driver_positions`
+- Visualização de posição atual
+
+**O que falta:**
+- **Pontos de Embarque/Desembarque POR VEÍCULO:**
+  - Marcadores no mapa para cada ponto de embarque
+  - Marcadores no mapa para cada ponto de desembarque
+  - Cores diferentes: pendente (vermelho), realizado (verde)
+  - À medida que os embarques são realizados, os pontos desaparecem do mapa
+  - Ordem de passagem pelos pontos
+  - ETA (tempo estimado de chegada) em cada ponto
+  
+- **Pontos de Embarque/Desembarque POR ROTA:**
+  - Visualização da rota completa
+  - Todos os pontos da rota no mapa
+  - Linha conectando os pontos (polyline)
+  - Atualização em tempo real conforme motorista avança
+  
+- **Quantidade de Passageiros em Tempo Real:**
+  - Badge no veículo mostrando "3/15" (3 embarcados de 15 total)
+  - Atualização em tempo real conforme check-ins são feitos
+  - Visualização de passageiros pendentes por ponto
+  - Painel lateral com detalhes da rota atual
+  
+- **Filtros e Visualizações:**
+  - Filtrar veículos: todos, em rota, em garagem
+  - Filtrar rotas: manhã, tarde, noite
+  - Visualizar rotas sobrepostas
+  - Clustering de veículos próximos
+  
+- **Dados em Tempo Real:**
+  - WebSocket ou polling a cada 10-30 segundos
+  - Atualização automática de posições
+  - Atualização automática de passageiros embarcados
+  - Notificações de eventos (atraso, incidente)
+
+#### 4.4 💰 CONTROLE DE CUSTOS (POR VEÍCULO E ROTA)
+**Status: 15% Implementado**
+
+**O que está implementado:**
+- Tabela `costs` básica
+- API `/api/admin/costs` (CRUD simples)
+
+**O que falta:**
+- **Custos por Veículo:**
+  - Tabela `vehicle_costs` detalhada (não existe propriamente)
+  - Combustível (data, litros, valor, km rodado)
+  - Manutenções (preventiva, corretiva)
+  - Seguro (valor mensal/anual)
+  - IPVA (valor anual)
+  - Depreciação
+  - Pneus e peças
+  - Lavagem e limpeza
+  - Pedágios
+  - Multas
+  - Custo total por mês
+  - Custo por km rodado
+  - Interface de cadastro de custos
+  - Dashboard de custos por veículo
+  - Gráficos de evolução de custos
+  
+- **Custos por Rota:**
+  - Tabela `route_costs` (não existe)
+  - Custo de combustível por rota (baseado em km)
+  - Custo de mão de obra (motorista)
+  - Custo de manutenção proporcional
+  - Custo fixo (seguro, IPVA proporcional)
+  - Pedágios específicos da rota
+  - Custo total por rota
+  - Custo por passageiro transportado
+  - Rentabilidade da rota
+  - Dashboard de custos por rota
+  - Comparação entre rotas
+  - Rotas mais/menos rentáveis
+
+---
+
+### 5. 👨‍✈️ GESTÃO DE MOTORISTAS (ADMIN)
 **Status: 40% Implementado**
 
 ✅ **Implementado:**
@@ -724,8 +883,13 @@ O documento de escopo define **Golf Fox** como uma plataforma SaaS completa de g
 |--------|---------------|---------|-----------|
 | Gestão de Empresas | 70% | 🟡 Parcial | Média |
 | Gestão de Usuários | 85% | 🟢 Quase Completo | Baixa |
-| Gestão de Frota | 60% | 🟡 Parcial | Alta |
-| Gestão de Motoristas | 40% | 🔴 Incompleto | Alta |
+| Gestão de Frota (Admin) | 60% | 🟡 Parcial | Alta |
+| **Painel da Transportadora** | **25%** | 🔴 **Incompleto** | **CRÍTICA** |
+| ↳ Gestão Motoristas (Carrier) | 10% | 🔴 Crítico | **CRÍTICA** |
+| ↳ Gestão Frota (Carrier) | 35% | 🔴 Crítico | **CRÍTICA** |
+| ↳ Mapa Tempo Real (Carrier) | 45% | 🟡 Parcial | **CRÍTICA** |
+| ↳ Controle Custos (Carrier) | 15% | 🔴 Crítico | **CRÍTICA** |
+| Gestão de Motoristas (Admin) | 40% | 🔴 Incompleto | Alta |
 | Planejamento de Rotas | 55% | 🟡 Parcial | Alta |
 | Check-in/Check-out | 20% | 🔴 Incompleto | **CRÍTICA** |
 | Rastreamento GPS | 45% | 🟡 Parcial | **CRÍTICA** |
@@ -733,7 +897,7 @@ O documento de escopo define **Golf Fox** como uma plataforma SaaS completa de g
 | App do Passageiro | 5% | 🔴 Incompleto | **CRÍTICA** |
 | Gestão de Incidentes | 15% | 🔴 Incompleto | Alta |
 | Comunicação/Qualidade | 10% | 🔴 Incompleto | Alta |
-| Gestão de Custos | 50% | 🟡 Parcial | Média |
+| Gestão de Custos (Admin) | 50% | 🟡 Parcial | Média |
 | Relatórios/Dashboards | 40% | 🟡 Parcial | Média |
 | Gestão de Contratos | 5% | 🔴 Incompleto | Baixa |
 | Socorro/Suporte | 20% | 🔴 Incompleto | Alta |
@@ -746,25 +910,54 @@ O documento de escopo define **Golf Fox** como uma plataforma SaaS completa de g
 
 ### 🔴 PRIORIDADE CRÍTICA (CORE DO SISTEMA)
 
-1. **Check-in/Check-out de Passageiros**
+1. **🏢 PAINEL DA TRANSPORTADORA (CARRIER) - NOVO!**
+   - **Gestão de Motoristas (Cadastro Completo):**
+     - Tabela `driver_documents` e `driver_medical_exams`
+     - Upload de CNH, exames médicos, documentos
+     - Controle de vencimentos com alertas
+     - Dashboard de conformidade
+     - Interface completa de cadastro
+   
+   - **Gestão de Frota (Documentos e Manutenções):**
+     - Tabela `vehicle_documents` e `vehicle_maintenances`
+     - CRLV, IPVA, Seguro, Inspeção
+     - Manutenções preventivas e corretivas
+     - Controle de custos por manutenção
+     - Alertas de vencimento
+   
+   - **Mapa em Tempo Real (Visão Completa):**
+     - Pontos de embarque/desembarque por veículo
+     - Pontos por rota com polyline
+     - Passageiros em tempo real (3/15)
+     - Atualização automática (WebSocket/polling)
+     - Filtros e clustering
+   
+   - **Controle de Custos (Por Veículo e Rota):**
+     - Tabela `vehicle_costs` detalhada
+     - Tabela `route_costs`
+     - Custos operacionais completos
+     - Dashboard de custos por veículo/rota
+     - Rentabilidade e ROI
+
+2. **Check-in/Check-out de Passageiros**
    - Sistema NFC completo
    - Sistema QR Code completo
    - Registro manual
    - Histórico de presença
 
-2. **App do Motorista (Flutter)**
+3. **App do Motorista (Flutter)**
    - Checklist obrigatório
    - Navegação GPS
    - Check-in/Check-out
    - Comunicação
 
-3. **App do Passageiro (Flutter)**
+4. **App do Passageiro (Flutter)**
    - Rastreamento em tempo real
    - QR Code / NFC
    - Notificações
    - Avaliações
 
-4. **Rastreamento GPS em Tempo Real**
+5. **Rastreamento GPS em Tempo Real**
    - Mapa global (Golf Fox)
    - Mapa por empresa
    - Mapa por transportadora
@@ -772,50 +965,50 @@ O documento de escopo define **Golf Fox** como uma plataforma SaaS completa de g
 
 ### 🟠 PRIORIDADE ALTA
 
-5. **Gestão Completa de Motoristas**
+6. **Gestão Completa de Motoristas (Admin)**
    - Documentação (CNH, exames)
    - Controle de vencimentos
    - Histórico e performance
 
-6. **Gestão Completa de Frota**
+7. **Gestão Completa de Frota (Admin)**
    - Documentação de veículos
    - Manutenções (programadas e realizadas)
    - Custos operacionais
    - Status em tempo real
 
-7. **Planejamento de Rotas Completo**
+8. **Planejamento de Rotas Completo**
    - Turnos e horários
    - Pontos detalhados
    - Rotas de ida e volta
    - Validações automáticas
 
-8. **Gestão de Incidentes**
+9. **Gestão de Incidentes**
    - Registro completo
    - Fluxo de tratamento
    - Dashboards
    - Análises
 
-9. **Sistema de Notificações**
-   - Push notifications
-   - Email/SMS
-   - Preferências por usuário
-   - Todos os tipos de eventos
+10. **Sistema de Notificações**
+    - Push notifications
+    - Email/SMS
+    - Preferências por usuário
+    - Todos os tipos de eventos
 
 ### 🟡 PRIORIDADE MÉDIA
 
-10. **Comunicação e Qualidade**
+11. **Comunicação e Qualidade**
     - Chat integrado
     - Feedback de passageiros
     - Avaliações
     - Dashboard de qualidade
 
-11. **Gestão de Custos Completa**
-    - Custos por veículo
-    - Custos por rota
+12. **Gestão de Custos Completa (Admin)**
+    - Custos por veículo (Admin)
+    - Custos por rota (Admin)
     - Controle orçamentário
     - Relatórios financeiros
 
-12. **Relatórios e Dashboards**
+13. **Relatórios e Dashboards**
     - Relatórios operacionais
     - Relatórios financeiros
     - Relatórios de qualidade
@@ -823,12 +1016,12 @@ O documento de escopo define **Golf Fox** como uma plataforma SaaS completa de g
 
 ### 🟢 PRIORIDADE BAIXA
 
-13. **Gestão de Contratos**
+14. **Gestão de Contratos**
     - Contratos digitais
     - Gestão de vencimentos
     - Faturamento
 
-14. **Branding e Personalização**
+15. **Branding e Personalização**
     - Logo e cores por empresa
     - Temas personalizados
 
@@ -836,7 +1029,12 @@ O documento de escopo define **Golf Fox** como uma plataforma SaaS completa de g
 
 ## 📈 ESTIMATIVA DE DESENVOLVIMENTO
 
-### CRÍTICO (3-4 meses)
+### CRÍTICO (4-5 meses)
+- **Painel da Transportadora: 6 semanas**
+  - Gestão Motoristas (Carrier): 2 semanas
+  - Gestão Frota (Carrier): 2 semanas
+  - Mapa Tempo Real Avançado: 1,5 semanas
+  - Controle de Custos (Carrier): 0,5 semanas
 - Check-in/Check-out: 3 semanas
 - App Motorista: 6 semanas
 - App Passageiro: 6 semanas
@@ -858,19 +1056,49 @@ O documento de escopo define **Golf Fox** como uma plataforma SaaS completa de g
 - Contratos: 2 semanas
 - Branding: 1 semana
 
-**TOTAL ESTIMADO: 8-10 meses de desenvolvimento**
+**TOTAL ESTIMADO: 9-11 meses de desenvolvimento**
 
 ---
 
 ## 🎯 PRÓXIMOS PASSOS RECOMENDADOS
 
-1. **Fase 1 (3 meses):** Apps Mobile + Check-in + GPS
-2. **Fase 2 (2 meses):** Gestão Motoristas/Frota + Incidentes
-3. **Fase 3 (2 meses):** Notificações + Comunicação + Custos
-4. **Fase 4 (2 meses):** Relatórios + Contratos + Refinamentos
+### **Fase 1 (4-5 meses) - CRÍTICO**
+1. **Painel da Transportadora (6 semanas)**
+2. Apps Mobile (Motorista + Passageiro) (12 semanas)
+3. Check-in/Check-out (3 semanas)
+4. GPS Tempo Real (4 semanas)
+
+### **Fase 2 (2-3 meses) - ALTA**
+1. Gestão Motoristas (Admin) (3 semanas)
+2. Gestão Frota (Admin) (3 semanas)
+3. Rotas Completo (2 semanas)
+4. Incidentes (2 semanas)
+5. Notificações (2 semanas)
+
+### **Fase 3 (1-2 meses) - MÉDIA**
+1. Comunicação e Qualidade (2 semanas)
+2. Custos (Admin) (2 semanas)
+3. Relatórios e Dashboards (3 semanas)
+
+### **Fase 4 (3-4 semanas) - BAIXA**
+1. Contratos (2 semanas)
+2. Branding/Personalização (1 semana)
+3. Refinamentos e ajustes finais
+
+---
+
+## 📊 STATUS GERAL DO PROJETO
+
+- **Implementação atual:** ~30-35%
+- **Falta implementar:** ~65-70%
+- **Tempo para MVP funcional:** 4-5 meses (Fase 1)
+- **Tempo para sistema completo:** 9-11 meses (todas as fases)
+
+**⚠️ IMPORTANTE:** O **Painel da Transportadora** é CRÍTICO e deve ser implementado na Fase 1, pois é a interface principal para as transportadoras gerenciarem motoristas, frota, mapa em tempo real e custos.
 
 ---
 
 **Criado em:** 16/11/2025  
-**Versão:** 1.0 - Análise Completa
+**Atualizado em:** 16/11/2025 (adicionado Painel da Transportadora)  
+**Versão:** 2.0 - Análise Completa com Painel da Transportadora
 
