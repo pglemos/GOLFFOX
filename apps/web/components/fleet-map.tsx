@@ -71,12 +71,13 @@ interface Route {
 
 interface FleetMapProps {
   companyId?: string
+  carrierId?: string
   routeId?: string
   initialCenter?: { lat: number; lng: number }
   initialZoom?: number
 }
 
-export const FleetMap = memo(function FleetMap({ companyId, routeId, initialCenter, initialZoom }: FleetMapProps) {
+export const FleetMap = memo(function FleetMap({ companyId, carrierId, routeId, initialCenter, initialZoom }: FleetMapProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const mapRef = useRef<HTMLDivElement>(null)
@@ -100,6 +101,7 @@ export const FleetMap = memo(function FleetMap({ companyId, routeId, initialCent
   // Filtros persistidos na URL
   const [filters, setFilters] = useState({
     company: companyId || searchParams?.get('company') || '',
+    carrier: carrierId || searchParams?.get('carrier') || '',
     route: routeId || searchParams?.get('route') || '',
     status: searchParams?.get('status') || ''
   })
@@ -154,6 +156,7 @@ export const FleetMap = memo(function FleetMap({ companyId, routeId, initialCent
     try {
       const { data, error } = await (supabase as any).rpc('gf_map_snapshot_full', {
         p_company_id: filters.company || null,
+        p_carrier_id: filters.carrier || null,
         p_route_id: filters.route || null
       })
 
@@ -176,7 +179,7 @@ export const FleetMap = memo(function FleetMap({ companyId, routeId, initialCent
       setStops([])
       setRoutes([])
     }
-  }, [filters.company, filters.route])
+  }, [filters.company, filters.carrier, filters.route])
 
   // Função para obter a API Key
   const getGoogleMapsApiKey = () => {
@@ -706,27 +709,27 @@ export const FleetMap = memo(function FleetMap({ companyId, routeId, initialCent
             animate="visible"
             exit="hidden"
             variants={modalContent}
-            className="absolute top-6 right-6 w-80 z-20"
+            className="absolute top-2 right-2 sm:top-6 sm:right-6 w-[calc(100vw-1rem)] sm:w-80 z-20 max-w-sm"
           >
-            <Card className="p-6 glass shadow-2xl">
-              <div className="flex items-start justify-between mb-6">
-                <div>
-                  <h3 className="font-bold text-xl">{selectedBus.vehicle_plate}</h3>
-                  <p className="text-sm text-[var(--ink-muted)]">{selectedBus.vehicle_model}</p>
+            <Card className="p-4 sm:p-6 glass shadow-2xl">
+              <div className="flex items-start justify-between mb-4 sm:mb-6">
+                <div className="flex-1 min-w-0 pr-2">
+                  <h3 className="font-bold text-lg sm:text-xl truncate">{selectedBus.vehicle_plate}</h3>
+                  <p className="text-sm text-[var(--ink-muted)] truncate">{selectedBus.vehicle_model}</p>
                 </div>
                 <Button size="icon" variant="ghost" onClick={() => setSelectedBus(null)} className="hover:bg-[var(--bg-hover)]">
                   <X className="h-4 w-4" />
                 </Button>
               </div>
 
-              <div className="space-y-4 text-sm">
+              <div className="space-y-3 sm:space-y-4 text-sm">
                 <div>
-                  <span className="text-[var(--ink-muted)] block mb-1">Motorista:</span>
-                  <p className="font-semibold text-base">{selectedBus.driver_name}</p>
+                  <span className="text-[var(--ink-muted)] block mb-1 text-xs sm:text-sm">Motorista:</span>
+                  <p className="font-semibold text-sm sm:text-base truncate">{selectedBus.driver_name}</p>
                 </div>
                 <div>
-                  <span className="text-[var(--ink-muted)] block mb-1">Rota:</span>
-                  <p className="font-semibold text-base">{selectedBus.route_name}</p>
+                  <span className="text-[var(--ink-muted)] block mb-1 text-xs sm:text-sm">Rota:</span>
+                  <p className="font-semibold text-sm sm:text-base truncate">{selectedBus.route_name}</p>
                 </div>
                 <div>
                   <span className="text-[var(--ink-muted)] block mb-2">Status:</span>
@@ -746,7 +749,7 @@ export const FleetMap = memo(function FleetMap({ companyId, routeId, initialCent
                   <UsersIcon className="h-4 w-4 text-[var(--ink-muted)]" />
                   <div className="flex-1">
                     <span className="text-[var(--ink-muted)] block text-xs">Passageiros</span>
-                    <span className="font-semibold">{selectedBus.passenger_count || 0}</span>
+                    <span className="font-semibold">{selectedBus.passenger_count || 0}/{selectedBus.capacity || 0}</span>
                   </div>
                   <Clock className="h-4 w-4 text-[var(--ink-muted)]" />
                   <div>
@@ -757,8 +760,8 @@ export const FleetMap = memo(function FleetMap({ companyId, routeId, initialCent
                   </div>
                 </div>
 
-                <Button className="w-full mt-4" variant="destructive">
-                  <AlertCircle className="h-4 w-4 mr-2" />
+                <Button className="w-full mt-4 text-xs sm:text-sm" variant="destructive">
+                  <AlertCircle className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                   Despachar Socorro
                 </Button>
               </div>
@@ -768,23 +771,23 @@ export const FleetMap = memo(function FleetMap({ companyId, routeId, initialCent
       </AnimatePresence>
 
       {/* Legenda */}
-      <div className="absolute bottom-6 left-6 z-10">
-        <Card className="p-4 glass shadow-xl">
-          <div className="space-y-2 text-sm font-medium">
-            <div className="flex items-center gap-3">
-              <div className="w-4 h-4 rounded-full" style={{ backgroundColor: busColors.green }}></div>
+      <div className="absolute bottom-2 left-2 sm:bottom-6 sm:left-6 z-10">
+        <Card className="p-2 sm:p-4 glass shadow-xl">
+          <div className="space-y-1 sm:space-y-2 text-xs sm:text-sm font-medium">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-full" style={{ backgroundColor: busColors.green }}></div>
               <span>Em Movimento</span>
             </div>
-            <div className="flex items-center gap-3">
-              <div className="w-4 h-4 rounded-full" style={{ backgroundColor: busColors.yellow }}></div>
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-full" style={{ backgroundColor: busColors.yellow }}></div>
               <span>Parado (&lt;2min)</span>
             </div>
-            <div className="flex items-center gap-3">
-              <div className="w-4 h-4 rounded-full" style={{ backgroundColor: busColors.red }}></div>
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-full" style={{ backgroundColor: busColors.red }}></div>
               <span>Parado (&gt;3min)</span>
             </div>
-            <div className="flex items-center gap-3">
-              <div className="w-4 h-4 rounded-full" style={{ backgroundColor: busColors.blue }}></div>
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-full" style={{ backgroundColor: busColors.blue }}></div>
               <span>Na Garagem</span>
             </div>
           </div>

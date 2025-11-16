@@ -53,37 +53,37 @@ export function PeriodPicker({ from, to, onChange, onClose }: PeriodPickerProps)
       animate="visible"
       exit="hidden"
       variants={modalContent}
-      className="absolute top-16 right-4 z-30"
+      className="absolute top-12 sm:top-16 right-2 sm:right-4 z-30 w-[calc(100vw-1rem)] sm:w-80 max-w-sm"
     >
-      <Card className="p-6 glass shadow-2xl w-80">
-        <div className="flex items-start justify-between mb-6">
-          <div>
-            <h3 className="font-bold text-xl">Período</h3>
-            <p className="text-sm text-[var(--ink-muted)]">Selecione o período para playback</p>
+      <Card className="p-4 sm:p-6 glass shadow-2xl">
+        <div className="flex items-start justify-between mb-4 sm:mb-6">
+          <div className="flex-1 min-w-0 pr-2">
+            <h3 className="font-bold text-lg sm:text-xl">Período</h3>
+            <p className="text-xs sm:text-sm text-[var(--ink-muted)]">Selecione o período para playback</p>
           </div>
           <Button size="icon" variant="ghost" onClick={onClose}>
             <X className="h-4 w-4" />
           </Button>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
           <div>
-            <label className="text-sm font-medium mb-2 block">De:</label>
+            <label className="text-xs sm:text-sm font-medium mb-1 sm:mb-2 block">De:</label>
             <Input
               type="datetime-local"
               value={localFrom}
               onChange={(e) => setLocalFrom(e.target.value)}
-              className="w-full"
+              className="w-full text-xs sm:text-sm"
             />
           </div>
 
           <div>
-            <label className="text-sm font-medium mb-2 block">Até:</label>
+            <label className="text-xs sm:text-sm font-medium mb-1 sm:mb-2 block">Até:</label>
             <Input
               type="datetime-local"
               value={localTo}
               onChange={(e) => setLocalTo(e.target.value)}
-              className="w-full"
+              className="w-full text-xs sm:text-sm"
             />
           </div>
 
@@ -94,6 +94,7 @@ export function PeriodPicker({ from, to, onChange, onClose }: PeriodPickerProps)
                 variant="outline"
                 size="sm"
                 onClick={() => handleQuickSelect(1)}
+                className="text-xs"
               >
                 Última hora
               </Button>
@@ -101,6 +102,7 @@ export function PeriodPicker({ from, to, onChange, onClose }: PeriodPickerProps)
                 variant="outline"
                 size="sm"
                 onClick={() => handleQuickSelect(2)}
+                className="text-xs"
               >
                 Últimas 2h
               </Button>
@@ -108,6 +110,7 @@ export function PeriodPicker({ from, to, onChange, onClose }: PeriodPickerProps)
                 variant="outline"
                 size="sm"
                 onClick={() => handleQuickSelect(6)}
+                className="text-xs"
               >
                 Últimas 6h
               </Button>
@@ -115,6 +118,7 @@ export function PeriodPicker({ from, to, onChange, onClose }: PeriodPickerProps)
                 variant="outline"
                 size="sm"
                 onClick={() => handleQuickSelect(24)}
+                className="text-xs"
               >
                 Últimas 24h
               </Button>
@@ -122,10 +126,10 @@ export function PeriodPicker({ from, to, onChange, onClose }: PeriodPickerProps)
           </div>
 
           <div className="flex gap-2 pt-2">
-            <Button variant="outline" className="flex-1" onClick={onClose}>
+            <Button variant="outline" className="flex-1 text-xs sm:text-sm" onClick={onClose}>
               Cancelar
             </Button>
-            <Button className="flex-1" onClick={handleApply}>
+            <Button className="flex-1 text-xs sm:text-sm" onClick={handleApply}>
               Aplicar
             </Button>
           </div>

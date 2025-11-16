@@ -17,6 +17,7 @@ function CarrierMapaContent() {
   const latParam = searchParams.get('lat')
   const lngParam = searchParams.get('lng')
   const zoomParam = searchParams.get('zoom')
+  const [carrierId, setCarrierId] = useState<string | null>(null)
 
   const initialCenter = latParam && lngParam 
     ? { lat: parseFloat(latParam), lng: parseFloat(lngParam) }
@@ -31,7 +32,16 @@ function CarrierMapaContent() {
         router.push("/")
         return
       }
+      
+      // Buscar carrier_id do usuário
+      const { data: userData } = await supabase
+        .from('users')
+        .select('carrier_id')
+        .eq('id', session.user.id)
+        .single()
+      
       setUser({ ...session.user })
+      setCarrierId(userData?.carrier_id || null)
       setLoading(false)
     }
     getUser()
@@ -51,6 +61,7 @@ function CarrierMapaContent() {
 
         <div className="h-[calc(100vh-300px)] min-h-[600px] rounded-lg overflow-hidden border border-[var(--border)]">
           <FleetMap 
+            carrierId={carrierId || undefined}
             routeId={routeId || undefined}
             initialCenter={initialCenter}
             initialZoom={initialZoom}

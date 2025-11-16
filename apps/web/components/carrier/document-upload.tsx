@@ -82,6 +82,12 @@ export function DocumentUpload({
       const formData = new FormData()
       formData.append('file', file)
       formData.append('folder', folder)
+      if (driverId) {
+        formData.append('driverId', driverId)
+      }
+      if (vehicleId) {
+        formData.append('vehicleId', vehicleId)
+      }
 
       const uploadRes = await fetch('/api/carrier/upload', {
         method: 'POST',

@@ -23,6 +23,8 @@ export async function POST(req: NextRequest) {
     const formData = await req.formData()
     const file = formData.get('file') as File | null
     const folder = formData.get('folder') as string | null
+    const driverId = formData.get('driverId') as string | null
+    const vehicleId = formData.get('vehicleId') as string | null
 
     if (!file) {
       return NextResponse.json(
@@ -56,8 +58,20 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    const fileName = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`
-    const filePath = `${folder}/${fileName}`
+    // Construir caminho do arquivo baseado no tipo de pasta
+    let filePath = ''
+    if (folder === 'driver-documents' && driverId) {
+      filePath = `driver-documents/${driverId}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`
+    } else if (folder === 'medical-exams' && driverId) {
+      filePath = `medical-exams/${driverId}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`
+    } else if (folder === 'vehicle-documents' && vehicleId) {
+      filePath = `vehicle-documents/${vehicleId}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`
+    } else {
+      return NextResponse.json(
+        { error: 'ID do motorista ou veículo não fornecido para a pasta especificada' },
+        { status: 400 }
+      )
+    }
 
     // Converter File para ArrayBuffer
     const arrayBuffer = await file.arrayBuffer()
@@ -79,13 +93,18 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    // Obter URL pública
-    const { data: { publicUrl } } = supabaseServiceRole.storage
+    // Obter URL assinada (bucket é privado)
+    // A URL será acessível via Supabase Storage com autenticação
+    const baseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+    const publicUrl = `${baseUrl}/storage/v1/object/carrier-documents/${filePath}`
+
+    // Também criar URL assinada válida por 1 ano para acesso direto
+    const { data: signedUrlData } = await supabaseServiceRole.storage
       .from('carrier-documents')
-      .getPublicUrl(filePath)
+      .createSignedUrl(filePath, 31536000) // 1 ano em segundos
 
     return NextResponse.json({
-      file_url: publicUrl,
+      file_url: signedUrlData?.signedUrl || publicUrl,
       file_name: file.name,
       file_size_bytes: file.size,
       file_type: file.type,

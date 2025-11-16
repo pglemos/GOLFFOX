@@ -152,10 +152,10 @@ export function InteractiveMarkerHotspot({
         exit={{ opacity: 0, scale: 0.8, y: 10 }}
         transition={{ duration: 0.2, ease: 'easeOut' }}
       >
-        <Card className="w-80 shadow-lg border-0 bg-white/95 backdrop-blur-sm">
+        <Card className="w-[calc(100vw-2rem)] sm:w-80 max-w-sm shadow-lg border-0 bg-white/95 backdrop-blur-sm">
           <CardContent className="p-0">
             {/* Cabeçalho */}
-            <div className="flex items-center justify-between p-4 border-b bg-gradient-to-r from-blue-50 to-indigo-50">
+            <div className="flex items-center justify-between p-3 sm:p-4 border-b bg-gradient-to-r from-blue-50 to-indigo-50">
               <div className="flex items-center gap-3">
                 <div className={`p-2 rounded-full ${
                   stop.type === 'pickup' ? 'bg-green-100' : 'bg-red-100'
@@ -164,8 +164,8 @@ export function InteractiveMarkerHotspot({
                     stop.type === 'pickup' ? 'text-green-600' : 'text-red-600'
                   }`} />
                 </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900">
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-sm sm:text-base text-gray-900 truncate">
                     Parada #{stop.stopNumber}
                   </h3>
                   <Badge 
@@ -209,17 +209,17 @@ export function InteractiveMarkerHotspot({
             </div>
 
             {/* Informações básicas */}
-            <div className="p-4 space-y-3">
+            <div className="p-3 sm:p-4 space-y-2 sm:space-y-3">
               {/* Passageiro */}
-              <div className="flex items-center gap-3">
-                <Avatar className="w-10 h-10">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <Avatar className="w-8 h-8 sm:w-10 sm:h-10">
                   <AvatarImage src={stop.passenger.photo} alt={stop.passenger.name} />
-                  <AvatarFallback className="text-sm font-medium">
+                  <AvatarFallback className="text-xs sm:text-sm font-medium">
                     {getInitials(stop.passenger.name)}
                   </AvatarFallback>
                 </Avatar>
-                <div className="flex-1">
-                  <p className="font-semibold text-gray-900">{stop.passenger.name}</p>
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-xs sm:text-sm text-gray-900 truncate">{stop.passenger.name}</p>
                   <Badge className={`text-xs ${passengerConfig.color}`}>
                     <PassengerIcon className={`w-3 h-3 mr-1 ${passengerConfig.iconColor}`} />
                     {passengerConfig.label}
@@ -229,16 +229,16 @@ export function InteractiveMarkerHotspot({
 
               {/* Endereço */}
               <div className="flex items-start gap-2">
-                <MapPin className="w-4 h-4 text-gray-500 mt-0.5 flex-shrink-0" />
-                <p className="text-sm text-gray-700 leading-relaxed">
+                <MapPin className="w-3 h-3 sm:w-4 sm:h-4 text-gray-500 mt-0.5 flex-shrink-0" />
+                <p className="text-xs sm:text-sm text-gray-700 leading-relaxed break-words">
                   {stop.address}
                 </p>
               </div>
 
               {/* Horário */}
               <div className="flex items-center gap-2">
-                <Clock className="w-4 h-4 text-gray-500" />
-                <p className="text-sm text-gray-700">
+                <Clock className="w-3 h-3 sm:w-4 sm:h-4 text-gray-500" />
+                <p className="text-xs sm:text-sm text-gray-700">
                   Previsto para <span className="font-medium">{formatTime(stop.scheduledTime)}</span>
                 </p>
               </div>
