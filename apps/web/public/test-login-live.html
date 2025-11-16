@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧪 Teste de Login - GolfFox</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 800px;
+            width: 100%;
+            padding: 40px;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .log {
+            margin-top: 30px;
+            background: #f5f5f5;
+            border-radius: 10px;
+            padding: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .log-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .log-entry {
+            padding: 8px;
+            margin: 4px 0;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+        }
+        
+        .log-info {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+        
+        .log-success {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        
+        .log-error {
+            background: #ffebee;
+            color: #c62828;
+        }
+        
+        .log-warning {
+            background: #fff3e0;
+            color: #ef6c00;
+        }
+        
+        .status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        
+        .status-success {
+            background: #4caf50;
+            color: white;
+        }
+        
+        .status-error {
+            background: #f44336;
+            color: white;
+        }
+        
+        .status-pending {
+            background: #ff9800;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Teste de Login - GolfFox</h1>
+        <p class="subtitle">Teste COMPLETO com logs detalhados</p>
+        
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input 
+                    type="email" 
+                    id="email" 
+                    value="golffox@admin.com" 
+                    required
+                />
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Senha:</label>
+                <input 
+                    type="password" 
+                    id="password" 
+                    value="senha123" 
+                    required
+                />
+            </div>
+            
+            <button type="submit" id="loginBtn">
+                🔐 Fazer Login e Testar
+            </button>
+        </form>
+        
+        <div class="log">
+            <div class="log-title">📋 Logs do Teste:</div>
+            <div id="logContainer"></div>
+        </div>
+    </div>
+    
+    <script>
+        const logContainer = document.getElementById('logContainer');
+        const loginForm = document.getElementById('loginForm');
+        const loginBtn = document.getElementById('loginBtn');
+        
+        function log(message, type = 'info') {
+            const entry = document.createElement('div');
+            entry.className = `log-entry log-${type}`;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logContainer.appendChild(entry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+        
+        function clearLogs() {
+            logContainer.innerHTML = '';
+        }
+        
+        async function testLogin(email, password) {
+            clearLogs();
+            loginBtn.disabled = true;
+            loginBtn.textContent = '⏳ Testando...';
+            
+            try {
+                // PASSO 1: Obter CSRF Token
+                log('🔄 PASSO 1: Obtendo CSRF token...', 'info');
+                
+                const csrfResponse = await fetch('/api/auth/csrf', {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+                
+                log(`📊 Status: ${csrfResponse.status} ${csrfResponse.statusText}`, 
+                    csrfResponse.ok ? 'success' : 'error');
+                
+                if (!csrfResponse.ok) {
+                    throw new Error(`Falha ao obter CSRF: ${csrfResponse.status}`);
+                }
+                
+                const csrfData = await csrfResponse.json();
+                const csrfToken = csrfData.token;
+                
+                log(`✅ CSRF Token obtido: ${csrfToken.substring(0, 30)}...`, 'success');
+                
+                // Verificar cookies
+                const cookies = document.cookie.split(';').map(c => c.trim());
+                const csrfCookie = cookies.find(c => c.startsWith('golffox-csrf='));
+                log(`🍪 Cookie CSRF: ${csrfCookie ? 'Presente' : 'AUSENTE'}`, 
+                    csrfCookie ? 'success' : 'error');
+                
+                // PASSO 2: Fazer Login
+                log('', 'info');
+                log('🔄 PASSO 2: Fazendo login...', 'info');
+                log(`📧 Email: ${email}`, 'info');
+                
+                const loginResponse = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-csrf-token': csrfToken
+                    },
+                    body: JSON.stringify({ email, password }),
+                    credentials: 'include'
+                });
+                
+                log(`📊 Status: ${loginResponse.status} ${loginResponse.statusText}`, 
+                    loginResponse.ok ? 'success' : 'error');
+                
+                const loginData = await loginResponse.json();
+                
+                if (!loginResponse.ok) {
+                    log(`❌ Erro: ${loginData.error || 'Desconhecido'}`, 'error');
+                    throw new Error(loginData.error || 'Login falhou');
+                }
+                
+                log(`✅ Login bem-sucedido!`, 'success');
+                log(`👤 Usuário: ${loginData.user?.email}`, 'success');
+                log(`🎭 Role: ${loginData.user?.role}`, 'success');
+                
+                // Verificar cookie de sessão
+                const sessionCookie = cookies.find(c => c.startsWith('golffox-session='));
+                log(`🍪 Cookie de sessão: ${sessionCookie ? 'Criado' : 'AUSENTE'}`, 
+                    sessionCookie ? 'success' : 'error');
+                
+                // PASSO 3: Testar acesso ao /admin
+                log('', 'info');
+                log('🔄 PASSO 3: Testando acesso ao /admin...', 'info');
+                
+                setTimeout(async () => {
+                    try {
+                        const adminResponse = await fetch('/admin', {
+                            method: 'GET',
+                            credentials: 'include',
+                            redirect: 'manual'
+                        });
+                        
+                        log(`📊 Status: ${adminResponse.status} ${adminResponse.statusText}`, 
+                            adminResponse.ok ? 'success' : 'error');
+                        
+                        if (adminResponse.type === 'opaqueredirect' || 
+                            adminResponse.status === 0 ||
+                            [301, 302, 307, 308].includes(adminResponse.status)) {
+                            log(`⚠️  REDIRECIONAMENTO detectado!`, 'warning');
+                            log(`❌ PROBLEMA: Middleware está invalidando sessão`, 'error');
+                            log(`💡 Usuário será redirecionado de volta para login`, 'warning');
+                        } else if (adminResponse.ok) {
+                            log(`✅ Acesso ao /admin PERMITIDO!`, 'success');
+                            log(`✅ Usuário vai permanecer na área administrativa`, 'success');
+                            log('', 'info');
+                            log('🎉 TESTE PASSOU! Sistema funcionando!', 'success');
+                            
+                            // Redirecionar após 2 segundos
+                            setTimeout(() => {
+                                log('🚀 Redirecionando para /admin...', 'info');
+                                window.location.href = '/admin';
+                            }, 2000);
+                        } else {
+                            log(`❌ Erro ao acessar /admin: ${adminResponse.status}`, 'error');
+                        }
+                    } catch (err) {
+                        log(`❌ Erro no PASSO 3: ${err.message}`, 'error');
+                    }
+                    
+                    loginBtn.disabled = false;
+                    loginBtn.textContent = '🔐 Fazer Login e Testar';
+                }, 1000);
+                
+            } catch (err) {
+                log(`❌ ERRO: ${err.message}`, 'error');
+                loginBtn.disabled = false;
+                loginBtn.textContent = '🔐 Fazer Login e Testar';
+            }
+        }
+        
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            testLogin(email, password);
+        });
+        
+        // Log inicial
+        log('✅ Página de teste carregada', 'success');
+        log('📍 URL: ' + window.location.href, 'info');
+        log('🍪 Cookies atuais: ' + (document.cookie || 'Nenhum'), 'info');
+        log('', 'info');
+        log('👉 Clique no botão para iniciar o teste', 'info');
+    </script>
+</body>
+</html>
+
