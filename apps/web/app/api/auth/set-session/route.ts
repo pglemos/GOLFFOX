@@ -24,8 +24,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "invalid_user_payload" }, { status: 400 })
     }
 
-    // Serialize and encode cookie value
-    const cookieValue = Buffer.from(JSON.stringify(user)).toString("base64")
+    // Payload mínimo no cookie (sem email, sem tokens)
+    const minimalPayload = {
+      id: user.id,
+      role: user.role,
+      companyId: user.companyId ?? null,
+    }
+
+    // Serializa de forma segura para cookie
+    const cookieValue = encodeURIComponent(JSON.stringify(minimalPayload))
 
     const url = new URL(req.url)
     const isSecure = url.protocol === "https:"
@@ -34,7 +41,7 @@ export async function POST(req: NextRequest) {
     const origin = `${url.protocol}//${host}`
 
     debug('set-session: preparando cookie', {
-      user: { id: user.id, email: user.email, role: user.role },
+      user: { id: user.id, role: user.role, companyId: user.companyId ?? null },
       host,
       forwardedHost,
       origin,
@@ -47,7 +54,7 @@ export async function POST(req: NextRequest) {
       name: "golffox-session",
       value: cookieValue,
       path: "/",
-      httpOnly: true, // ✅ FIXED: Previne acesso via JavaScript (XSS protection)
+      httpOnly: true,
       sameSite: "lax",
       secure: isSecure,
       maxAge: 60 * 60, // 1 hora

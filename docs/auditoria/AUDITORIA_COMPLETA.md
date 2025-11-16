@@ -17,6 +17,14 @@
 - v49: roteiro de verificação adicionado em `web-app/scripts/check-v49-migration.ts` para checar tabela/políticas.
   - v49 aplicada e verificada: políticas presentes e RLS habilitado em `gf_user_company_map` (ver relatório do script `web-app/scripts/apply-v49-direct.js`).
 
+## Atualização – Reestruturação do Repositório (esta rodada)
+- Estrutura alvo consolidada: `apps/web`, `apps/mobile`, `shared`, `database`, `infra`, `docs`, `archive/LEGADO_NAO_USAR`.
+- Conteúdo legado arquivado: `web-app/`, `65-web-app/`, `components/`, `lib/` (Dart antigo), `tools/flutter` (SDK local).
+- Scripts raiz migrados para `infra/scripts` (setup, deploy, dev).
+- Cookie de sessão corrigido em `apps/web/app/api/auth/set-session/route.ts` com payload mínimo e `httpOnly/secure`.
+- `reports/dispatch` com SMTP via `nodemailer` já operacional (TLS e anexos).
+- Rate limiting confirmado em rotas sensíveis (`reports/*`, `costs/*`, `analytics/*`, `auth/login`, `admin/companies`).
+
 ## Visão Geral do Sistema
 - Plataforma multi-tenant que conecta Empresa Contratante, Transportadora, Motorista e Passageiro, com operação central pela Golf Fox (operadora master).
 - Escopo funcional (documento “Visão Geral e Escopo”): planejamento de rotas, check-in/out de passageiros (NFC/QR/manual), rastreamento GPS em tempo real, gestão de frota/motoristas/custos/manutenções/incident es, relatórios operacionais e financeiros para todos os perfis.
