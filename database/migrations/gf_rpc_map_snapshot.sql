@@ -45,6 +45,7 @@ BEGIN
       'vehicle_id', t.vehicle_id,
       'vehicle_plate', v.plate,
       'vehicle_model', v.model,
+      'capacity', v.capacity,
       'driver_id', t.driver_id,
       'driver_name', public.get_user_name(t.driver_id),
       'company_id', r.company_id,
@@ -52,7 +53,7 @@ BEGIN
       'lat', lp.lat,
       'lng', lp.lng,
       'speed', lp.speed,
-      'heading', NULL,
+      'heading', lp.heading,
       'status', t.status,
       'last_update', lp.captured_at,
       'time_since_update_seconds', EXTRACT(EPOCH FROM (v_now - COALESCE(lp.captured_at, t.started_at))),
@@ -68,10 +69,11 @@ BEGIN
         ELSE 'yellow'
       END,
       'passenger_count', (
-        -- Compatível com schemas sem coluna 'status' em trip_passengers
+        -- Contar passageiros embarcados (pickedup ou status similar)
         SELECT COUNT(*) 
         FROM public.trip_passengers tp 
         WHERE tp.trip_id = t.id 
+        AND (tp.status IS NULL OR tp.status IN ('pending', 'confirmed', 'pickedup', 'picked_up'))
       )
     )
     ORDER BY t.started_at DESC NULLS LAST

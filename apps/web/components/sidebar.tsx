@@ -214,6 +214,12 @@ const carrierMenuItems = [
     description: "Notificações"
   },
   { 
+    icon: DollarSign, 
+    label: "Custos", 
+    href: "/carrier/custos",
+    description: "Controle de custos"
+  },
+  { 
     icon: BarChart3, 
     label: "Relatórios", 
     href: "/carrier/relatorios",

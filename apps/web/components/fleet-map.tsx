@@ -35,6 +35,7 @@ interface Bus {
   vehicle_id: string
   vehicle_plate: string
   vehicle_model: string
+  capacity?: number
   driver_id: string
   driver_name: string
   company_id: string
@@ -298,6 +299,13 @@ export const FleetMap = memo(function FleetMap({ companyId, routeId, initialCent
           map: null, // Não adicionar ao mapa diretamente (clusterer vai fazer isso)
           icon,
           title: markerTitle,
+          label: {
+            text: `${bus.passenger_count || 0}/${bus.capacity || 0}`,
+            color: '#FFFFFF',
+            fontSize: '11px',
+            fontWeight: 'bold',
+            className: 'map-passenger-badge'
+          },
           // Nota: Google Maps não suporta aria-label nativamente.
           // Para navegação por teclado, seria necessário criar overlay customizado com <button>.
         })
@@ -485,13 +493,61 @@ export const FleetMap = memo(function FleetMap({ companyId, routeId, initialCent
     }
   }, [buses, stops, routes, selectedBus, filters.route, filters.status, getBusIcon])
 
-  // Realtime subscription (atualizar a cada 5-10s)
+  // Realtime subscription com Supabase Realtime
   useEffect(() => {
+    // Primeira carga
+    loadMapData()
+
+    // Configurar Realtime subscription
+    const channel = supabase
+      .channel('fleet-map-realtime')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'driver_positions'
+        },
+        (payload) => {
+          // Recarregar dados ao receber mudança na posição
+          loadMapData()
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'trips'
+        },
+        (payload) => {
+          // Recarregar dados ao receber mudança no status da viagem
+          loadMapData()
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'trip_passengers'
+        },
+        (payload) => {
+          // Recarregar dados ao receber mudança nos passageiros
+          loadMapData()
+        }
+      )
+      .subscribe()
+
+    // Fallback: polling a cada 30 segundos para garantir sincronização
     const interval = setInterval(() => {
       loadMapData()
-    }, 7000) // 7 segundos (entre 5-10s)
+    }, 30000) // 30 segundos como fallback
 
-    return () => clearInterval(interval)
+    return () => {
+      supabase.removeChannel(channel)
+      clearInterval(interval)
+    }
   }, [loadMapData])
 
   // Atualizar filtros e URL

@@ -1,0 +1,106 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { supabaseServiceRole } from '@/lib/supabase-server'
+import { requireAuth } from '@/lib/api-auth'
+import { z } from 'zod'
+
+export const runtime = 'nodejs'
+
+const documentSchema = z.object({
+  document_type: z.enum(['crlv', 'ipva', 'seguro', 'inspecao', 'alvara']),
+  document_number: z.string().optional().nullable(),
+  file_url: z.string().url().optional().nullable(),
+  file_name: z.string().optional().nullable(),
+  issue_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional().nullable(),
+  expiry_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional().nullable(),
+  value_brl: z.number().min(0).optional().nullable(),
+  insurance_company: z.string().optional().nullable(),
+  policy_number: z.string().optional().nullable(),
+  status: z.enum(['valid', 'expired', 'pending', 'cancelled']).optional(),
+  notes: z.string().optional().nullable(),
+})
+
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 200,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    },
+  })
+}
+
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { vehicleId: string } }
+) {
+  try {
+    const authErrorResponse = await requireAuth(request, 'carrier')
+    if (authErrorResponse) return authErrorResponse
+
+    const { data, error } = await supabaseServiceRole
+      .from('vehicle_documents')
+      .select('*')
+      .eq('vehicle_id', params.vehicleId)
+      .order('created_at', { ascending: false })
+
+    if (error) {
+      return NextResponse.json(
+        { error: 'Erro ao buscar documentos', message: error.message },
+        { status: 500 }
+      )
+    }
+
+    return NextResponse.json(data || [])
+  } catch (error: any) {
+    return NextResponse.json(
+      { error: 'Erro ao processar requisição', message: error.message },
+      { status: 500 }
+    )
+  }
+}
+
+export async function POST(
+  request: NextRequest,
+  { params }: { params: { vehicleId: string } }
+) {
+  try {
+    const authErrorResponse = await requireAuth(request, 'carrier')
+    if (authErrorResponse) return authErrorResponse
+
+    const body = await request.json()
+    const validated = documentSchema.parse(body)
+
+    const { data, error } = await supabaseServiceRole
+      .from('vehicle_documents')
+      .insert({
+        vehicle_id: params.vehicleId,
+        ...validated,
+        issue_date: validated.issue_date || null,
+        expiry_date: validated.expiry_date || null,
+      })
+      .select()
+      .single()
+
+    if (error) {
+      return NextResponse.json(
+        { error: 'Erro ao criar documento', message: error.message },
+        { status: 500 }
+      )
+    }
+
+    return NextResponse.json(data, { status: 201 })
+  } catch (error: any) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: 'Dados inválidos', details: error.errors },
+        { status: 400 }
+      )
+    }
+    return NextResponse.json(
+      { error: 'Erro ao processar requisição', message: error.message },
+      { status: 500 }
+    )
+  }
+}
+
