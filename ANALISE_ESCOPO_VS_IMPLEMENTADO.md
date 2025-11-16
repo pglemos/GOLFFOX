@@ -1,0 +1,876 @@
+# 📊 ANÁLISE DETALHADA: Escopo Técnico vs Sistema Implementado
+
+**Data:** 16/11/2025  
+**Projeto:** Golf Fox - Sistema de Gestão de Fretamento Corporativo  
+**Status:** Análise Completa do que Falta Implementar
+
+---
+
+## 🎯 VISÃO GERAL
+
+O documento de escopo define **Golf Fox** como uma plataforma SaaS completa de gestão de fretamento corporativo porta-a-porta. Abaixo está a análise detalhada de cada módulo.
+
+---
+
+## ✅ O QUE JÁ ESTÁ IMPLEMENTADO
+
+### 1. 🏢 GESTÃO DE EMPRESAS
+**Status: 70% Implementado**
+
+✅ **Implementado:**
+- Tabela `companies` no banco de dados
+- CRUD completo de empresas (`/api/admin/companies`)
+- Campos: id, name, cnpj, address, phone, email, is_active
+- Interface admin (`/admin/empresas`)
+- RLS (Row Level Security) configurado
+
+❌ **Faltando:**
+- Branding personalizado por empresa (logo, cores)
+- Documentos anexos (contratos, certificados)
+- Histórico de alterações
+- Dashboard de visão consolidada por empresa
+
+---
+
+### 2. 👥 GESTÃO DE USUÁRIOS E PERFIS
+**Status: 85% Implementado**
+
+✅ **Implementado:**
+- Sistema de autenticação (Supabase Auth)
+- Tabela `users` com roles: admin, operator, carrier, driver, passenger
+- Login com CSRF protection
+- Middleware de proteção de rotas
+- Gerenciamento de permissões
+- Interface de usuários (`/api/admin/users`)
+
+❌ **Faltando:**
+- Interface para operadores criarem usuários colaboradores
+- Gestão de permissões granulares (beyond roles)
+- Perfil completo do usuário (foto, preferências)
+- Logs de acesso e atividades por usuário
+
+---
+
+### 3. 🚗 GESTÃO DE FROTA (VEÍCULOS)
+**Status: 60% Implementado**
+
+✅ **Implementado:**
+- Tabela `vehicles` no banco de dados
+- CRUD de veículos (`/api/admin/vehicles`)
+- Campos: plate, model, year, carrier_id, capacity, status
+- Interface admin (`/admin/veiculos`)
+- Associação com transportadoras
+
+❌ **Faltando:**
+- **Documentação de veículos:**
+  - CRLV (Certificado de Registro)
+  - IPVA (controle de vencimentos)
+  - Seguro (apólice, vencimento)
+  - Inspeção veicular (datas, certificados)
+  
+- **Manutenções:**
+  - Tabela `vehicle_maintenances` (não existe)
+  - Manutenções programadas vs realizadas
+  - Controle de custos por manutenção
+  - Alertas de manutenção preventiva
+  - Histórico completo de manutenções
+  
+- **Custos Operacionais:**
+  - Registro de combustível por veículo
+  - Custos de manutenção detalhados
+  - Depreciação
+  - Relatórios financeiros por veículo
+  
+- **Status em Tempo Real:**
+  - Veículo em garagem vs em rota
+  - Última localização conhecida
+  - Status do motorista vinculado
+  - Alertas de problemas mecânicos
+
+---
+
+### 4. 👨‍✈️ GESTÃO DE MOTORISTAS
+**Status: 40% Implementado**
+
+✅ **Implementado:**
+- Tabela `drivers` no banco de dados
+- Usuários com role 'driver'
+- Associação básica com transportadora
+- Interface admin (`/admin/motoristas`)
+
+❌ **Faltando (CRÍTICO):**
+- **Documentação Obrigatória:**
+  - CNH (número, categoria, validade)
+  - Upload de foto/scan da CNH
+  - CPF, RG
+  - Comprovante de endereço
+  
+- **Exames Médicos:**
+  - Tabela `driver_health_exams` (não existe)
+  - Exame admissional
+  - Exame periódico
+  - Exame toxicológico
+  - Controle de vencimentos
+  - Alertas automáticos de vencimento
+  
+- **Histórico e Performance:**
+  - Total de viagens realizadas
+  - Avaliação média
+  - Incidentes relacionados
+  - Pontualidade média
+  - Horas trabalhadas
+  
+- **Status e Disponibilidade:**
+  - Motorista disponível/ocupado/folga
+  - Escala de trabalho
+  - Histórico de jornada
+  
+- **Treinamentos:**
+  - Treinamentos realizados
+  - Certificados
+  - Vencimentos
+
+---
+
+### 5. 🗺️ PLANEJAMENTO DE ROTAS
+**Status: 55% Implementado**
+
+✅ **Implementado:**
+- Tabela `routes` no banco de dados
+- CRUD de rotas (`/api/admin/routes`)
+- Campos básicos: name, company_id, carrier_id, origin, destination
+- Tabela `route_stops` (pontos de parada)
+- Interface de criação (`/admin/rotas`)
+- Geração automática de pontos (`/api/admin/generate-stops`)
+- Otimização de rotas (`/api/admin/optimize-route`)
+
+❌ **Faltando (IMPORTANTE):**
+- **Turnos e Horários:**
+  - Tabela `route_schedules` (não existe)
+  - Definição de horários por turno (manhã, tarde, noite)
+  - Dias da semana ativos
+  - Horário de cada ponto de embarque/desembarque
+  
+- **Pontos de Parada Detalhados:**
+  - Endereço completo de cada ponto
+  - Referência (ex: "Em frente ao mercado X")
+  - Tempo estimado de espera
+  - Ordem de parada
+  - Quantidade de passageiros por ponto
+  
+- **Gestão de Capacidade:**
+  - Capacidade do veículo vs passageiros na rota
+  - Otimização para não exceder capacidade
+  
+- **Rotas de Ida e Volta:**
+  - Rota de ida (residência → empresa)
+  - Rota de retorno (empresa → residência)
+  - Definição de pontos diferentes para cada direção
+  
+- **Validações:**
+  - Verificar se veículo está disponível
+  - Verificar se motorista está disponível
+  - Validar capacidade vs passageiros
+  - Detectar conflitos de horário
+
+---
+
+### 6. 🎫 CHECK-IN / CHECK-OUT DE PASSAGEIROS
+**Status: 20% Implementado**
+
+✅ **Implementado:**
+- Tabela `trip_passengers` (relacionamento)
+- Status básico: pending, confirmed, pickedup, dropped
+- Campos de pickup_location e dropoff_location
+
+❌ **Faltando (CRÍTICO - CORE DO SISTEMA):**
+- **Sistema de Check-in:**
+  - Tabela `passenger_checkins` (não existe)
+  - Timestamp de embarque
+  - Localização GPS do embarque
+  - Método: NFC, QR Code, Manual
+  
+- **Sistema de Check-out:**
+  - Timestamp de desembarque
+  - Localização GPS do desembarque
+  - Confirmação pelo motorista
+  
+- **NFC:**
+  - Integração com leitores NFC
+  - Cadastro de cartões NFC por passageiro
+  - Validação de cartão
+  - App do motorista com leitura NFC
+  
+- **QR Code:**
+  - Geração de QR Code por passageiro
+  - Geração de QR Code por viagem
+  - App do motorista com leitor de QR Code
+  - Validação e registro
+  
+- **Registro Manual:**
+  - Lista de passageiros no app do motorista
+  - Marcar presença manualmente
+  - Confirmar embarque/desembarque
+  
+- **Histórico:**
+  - Histórico completo de check-ins por passageiro
+  - Histórico por viagem
+  - Estatísticas de presença
+  - Ausências registradas
+
+---
+
+### 7. 📍 RASTREAMENTO GPS EM TEMPO REAL
+**Status: 45% Implementado**
+
+✅ **Implementado:**
+- Tabela `driver_positions` (rastreamento GPS)
+- Campos: latitude, longitude, accuracy, speed, heading, timestamp
+- Realtime habilitado (Supabase Realtime)
+- Interface de mapa (`/admin/mapa`)
+- API de posições
+
+❌ **Faltando (IMPORTANTE):**
+- **Rastreamento Contínuo:**
+  - App do motorista enviando posição a cada X segundos
+  - Intervalo configurável
+  - Otimização de bateria
+  
+- **Mapa em Tempo Real - Golf Fox:**
+  - Visualização TODOS os veículos simultaneamente
+  - Filtro por empresa
+  - Filtro por transportadora
+  - Filtro por status (em rota, parado, etc)
+  - Atualização automática sem refresh
+  
+- **Mapa em Tempo Real - Empresa:**
+  - Visualização apenas dos veículos da empresa
+  - Rotas da empresa
+  - Passageiros da empresa
+  
+- **Mapa em Tempo Real - Transportadora:**
+  - Todos os veículos da transportadora
+  - Status: em rota vs em garagem
+  - Veículos ociosos
+  
+- **Informações no Mapa:**
+  - Ícone diferente por status
+  - Tooltip com informações do veículo
+  - Rota atual
+  - Motorista
+  - Passageiros embarcados
+  - Próxima parada
+  - ETA (tempo estimado de chegada)
+  
+- **Pontos de Embarque/Desembarque:**
+  - Marcadores no mapa
+  - Pontos pendentes vs concluídos
+  - Tempo real de progresso da rota
+  - Contagem de passageiros por ponto
+  
+- **Alertas Geográficos:**
+  - Alerta quando veículo se desvia da rota
+  - Alerta quando veículo para em local não previsto
+  - Alerta de velocidade excessiva
+  - Geofencing (cercas virtuais)
+
+---
+
+### 8. 📱 APP DO MOTORISTA
+**Status: 10% Implementado**
+
+✅ **Implementado:**
+- Interface básica (`/driver`)
+- Autenticação
+
+❌ **Faltando (CORE DO SISTEMA - PRIORIDADE ALTA):**
+- **Checklist Obrigatório:**
+  - Tabela `vehicle_checklists` (não existe)
+  - Checklist antes de iniciar rota:
+    - Nível de combustível
+    - Pneus
+    - Luzes
+    - Freios
+    - Limpeza
+    - Documentos
+  - Foto obrigatória do veículo
+  - Não permitir iniciar rota sem checklist
+  
+- **Visualização da Rota:**
+  - Lista de pontos de embarque/desembarque
+  - Mapa com todos os pontos
+  - Ordem de parada
+  - Horário previsto para cada ponto
+  
+- **Navegação GPS:**
+  - Integração com Google Maps / Waze
+  - Navegação turn-by-turn
+  - Recálculo automático de rota
+  
+- **Check-in/Check-out:**
+  - Scanner NFC
+  - Scanner QR Code
+  - Lista de passageiros
+  - Marcar presença manual
+  - Confirmar embarque
+  - Confirmar desembarque
+  
+- **Comunicação:**
+  - Chat com a central (transportadora)
+  - Enviar mensagens
+  - Receber notificações
+  - Reportar incidentes
+  
+- **Histórico:**
+  - Viagens realizadas
+  - Estatísticas (total de km, horas, viagens)
+  - Avaliações recebidas
+
+---
+
+### 9. 📱 APP DO PASSAGEIRO
+**Status: 5% Implementado**
+
+✅ **Implementado:**
+- Interface básica (`/passenger`)
+- Autenticação
+
+❌ **Faltando (CORE DO SISTEMA - PRIORIDADE ALTA):**
+- **Informações da Rota:**
+  - Horários de embarque
+  - Pontos de embarque disponíveis
+  - Tempo estimado de chegada
+  - Rota do dia (manhã/tarde)
+  
+- **Rastreamento em Tempo Real:**
+  - Ver ônibus no mapa
+  - Posição em tempo real
+  - ETA para o ponto do passageiro
+  - Notificação de aproximação
+  
+- **Notificações:**
+  - Push notification quando motorista inicia rota
+  - Notificação quando ônibus está próximo (5 min)
+  - Notificação de atraso
+  - Notificação de cancelamento
+  
+- **Check-in/Check-out:**
+  - QR Code pessoal
+  - Validação de NFC (se tiver cartão)
+  - Confirmação manual de embarque
+  - Confirmação manual de desembarque
+  
+- **Comunicação:**
+  - Enviar comentários
+  - Enviar elogios
+  - Enviar reclamações
+  - Reportar incidentes
+  - Canal direto com transportadora
+  
+- **Avaliação:**
+  - Avaliar viagem ao final (1-5 estrelas)
+  - Comentários opcionais
+  - Avaliar motorista
+  - Avaliar veículo
+  - Avaliar pontualidade
+
+---
+
+### 10. 🚨 GESTÃO DE INCIDENTES
+**Status: 15% Implementado**
+
+✅ **Implementado:**
+- Tabela básica para alertas
+- Interface de alertas (`/admin/alertas`)
+- API básica de alertas
+
+❌ **Faltando (IMPORTANTE):**
+- **Tabela Completa de Incidentes:**
+  - `incidents` (não existe adequadamente)
+  - Tipos: mecânico, acidente, atraso, comportamento, etc
+  - Gravidade: baixa, média, alta, crítica
+  - Status: aberto, em andamento, resolvido, fechado
+  
+- **Registro de Incidentes:**
+  - Por motorista (via app)
+  - Por passageiro (via app)
+  - Por operador da empresa
+  - Por Golf Fox
+  - Por transportadora
+  
+- **Informações do Incidente:**
+  - Tipo de incidente
+  - Descrição detalhada
+  - Localização (GPS)
+  - Data e hora
+  - Veículo envolvido
+  - Motorista envolvido
+  - Passageiros envolvidos
+  - Fotos anexadas
+  - Vídeos anexados
+  
+- **Fluxo de Tratamento:**
+  - Notificação automática para responsáveis
+  - Atribuição de responsável
+  - Prazo para resolução
+  - Acompanhamento de status
+  - Histórico de ações
+  - Resolução e fechamento
+  
+- **Dashboards:**
+  - Incidentes abertos
+  - Incidentes por tipo
+  - Incidentes por gravidade
+  - Tempo médio de resolução
+  - Incidentes recorrentes
+  
+- **Análise:**
+  - Incidentes por veículo
+  - Incidentes por motorista
+  - Incidentes por rota
+  - Tendências
+  - Ações preventivas
+
+---
+
+### 11. 💬 COMUNICAÇÃO E QUALIDADE
+**Status: 10% Implementado**
+
+❌ **Faltando (QUASE TUDO):**
+- **Canal de Comunicação:**
+  - Tabela `messages` (não existe)
+  - Chat entre passageiro e transportadora
+  - Chat entre motorista e central
+  - Mensagens de grupo
+  - Anexos (fotos, documentos)
+  
+- **Feedback de Passageiros:**
+  - Tabela `passenger_feedbacks` (não existe)
+  - Comentários gerais
+  - Elogios
+  - Reclamações
+  - Sugestões
+  - Dúvidas
+  
+- **Avaliações:**
+  - Tabela `ratings` (não existe)
+  - Avaliação da viagem (1-5 estrelas)
+  - Avaliação do motorista
+  - Avaliação do veículo
+  - Avaliação da pontualidade
+  - Comentários opcionais
+  
+- **Dashboard de Qualidade:**
+  - Nota média geral
+  - Nota média por motorista
+  - Nota média por veículo
+  - Nota média por transportadora
+  - Evolução temporal
+  - Comparativos
+  
+- **Ações:**
+  - Responder feedbacks
+  - Acompanhar reclamações
+  - Premiar elogios
+  - Implementar sugestões
+
+---
+
+### 12. 💰 GESTÃO DE CUSTOS
+**Status: 50% Implementado**
+
+✅ **Implementado:**
+- Tabela `costs` e relacionadas
+- Categorias de custos
+- API de custos (`/api/costs`)
+- Interface de custos (`/admin/custos`)
+- Materialize views para consolidação
+
+❌ **Faltando:**
+- **Custos por Veículo:**
+  - Combustível (registro detalhado)
+  - Manutenções (vínculo com manutenções)
+  - Seguro
+  - IPVA
+  - Depreciação
+  - Lavagem
+  - Pneus
+  - Outros
+  
+- **Custos por Rota:**
+  - Custo estimado vs realizado
+  - Custo por km
+  - Custo por passageiro
+  - Custo por viagem
+  
+- **Controle Orçamentário:**
+  - Orçamento mensal
+  - Orçamento anual
+  - Alertas de estouro
+  - Comparativo previsto vs realizado
+  
+- **Relatórios Financeiros:**
+  - Por empresa
+  - Por transportadora
+  - Por veículo
+  - Por rota
+  - Por motorista
+  - Exportação (Excel, PDF)
+
+---
+
+### 13. 📊 RELATÓRIOS E DASHBOARDS
+**Status: 40% Implementado**
+
+✅ **Implementado:**
+- Interface de relatórios (`/admin/relatorios`)
+- KPIs básicos (`/api/admin/kpis`)
+- Relatórios agendados (estrutura)
+- Export de dados
+
+❌ **Faltando (MUITOS RELATÓRIOS):**
+
+**Relatórios Operacionais:**
+- Viagens realizadas (total, por período)
+- Pontualidade (chegadas no horário vs atrasadas)
+- Taxa de ocupação (passageiros / capacidade)
+- Quilometragem percorrida
+- Tempo médio de viagem
+- Desvios de rota
+- Paradas não programadas
+- Check-ins / No-shows
+- Incidentes por período
+- Performance por motorista
+- Performance por veículo
+
+**Relatórios Financeiros:**
+- Custos consolidados
+- Custos por categoria
+- Custos por veículo
+- Custos por rota
+- ROI (Return on Investment)
+- Custos por passageiro transportado
+- Previsão vs realizado
+
+**Relatórios de Qualidade:**
+- Avaliações médias
+- Feedbacks por período
+- Reclamações vs elogios
+- NPS (Net Promoter Score)
+- Satisfação por transportadora
+- Satisfação por motorista
+
+**Dashboards Personalizados:**
+- Dashboard Golf Fox (visão global)
+- Dashboard Empresa (visão da empresa)
+- Dashboard Transportadora (visão da transportadora)
+- Filtros dinâmicos
+- Gráficos interativos
+- Export de dashboards
+
+---
+
+### 14. 📋 GESTÃO DE CONTRATOS
+**Status: 5% Implementado**
+
+❌ **Faltando (QUASE TUDO):**
+- **Tabela de Contratos:**
+  - `contracts` (não existe)
+  - Contrato entre Golf Fox e Empresa
+  - Contrato entre Golf Fox e Transportadora
+  
+- **Informações do Contrato:**
+  - Número do contrato
+  - Partes envolvidas
+  - Data de início
+  - Data de término
+  - Valor mensal
+  - Forma de pagamento
+  - Cláusulas importantes
+  - Documentos anexos (PDF do contrato)
+  
+- **Gestão:**
+  - Status: ativo, suspenso, encerrado
+  - Renovações automáticas
+  - Alertas de vencimento
+  - Histórico de alterações
+  - Aditivos contratuais
+  
+- **Financeiro:**
+  - Faturamento por contrato
+  - Pagamentos realizados
+  - Pagamentos pendentes
+  - Inadimplência
+
+---
+
+### 15. 🚑 GESTÃO DE SOCORRO E SUPORTE
+**Status: 20% Implementado**
+
+✅ **Implementado:**
+- Interface de socorro (`/admin/socorro`)
+- Estrutura básica de assistência
+- API de assistance-requests
+
+❌ **Faltando:**
+- **Tipos de Socorro:**
+  - Pane mecânica
+  - Acidente
+  - Emergência médica
+  - Segurança
+  - Outros
+  
+- **Fluxo de Atendimento:**
+  - Solicitação via app (motorista/passageiro)
+  - Notificação imediata para responsáveis
+  - Atribuição de responsável
+  - Acionamento de recursos (guincho, ambulância, polícia)
+  - Acompanhamento em tempo real
+  - Resolução e fechamento
+  
+- **Informações:**
+  - Localização GPS precisa
+  - Tipo de ocorrência
+  - Gravidade
+  - Pessoas envolvidas
+  - Fotos/vídeos
+  - Contatos de emergência
+  
+- **Dashboard:**
+  - Solicitações abertas
+  - Tempo médio de atendimento
+  - Taxa de resolução
+  - Histórico
+
+---
+
+### 16. 🔔 SISTEMA DE NOTIFICAÇÕES
+**Status: 10% Implementado**
+
+❌ **Faltando (CRÍTICO):**
+- **Tabela de Notificações:**
+  - `notifications` (básica existe, precisa melhorar)
+  - Tipo de notificação
+  - Destinatário
+  - Conteúdo
+  - Status: enviada, lida, arquivada
+  
+- **Canais:**
+  - Push notifications (mobile)
+  - Email
+  - SMS
+  - In-app notifications
+  
+- **Tipos de Notificações:**
+  - Rota iniciada
+  - Motorista a caminho
+  - Motorista próximo (5 min)
+  - Check-in realizado
+  - Atraso na rota
+  - Incidente reportado
+  - Manutenção vencendo
+  - Documento vencendo
+  - Contrato vencendo
+  - Novo feedback recebido
+  
+- **Preferências:**
+  - Por usuário
+  - Habilitar/desabilitar por tipo
+  - Escolher canais preferenciais
+  - Horários permitidos
+
+---
+
+### 17. 📱 APPS MOBILE (Flutter)
+**Status: 5% Implementado**
+
+✅ **Implementado:**
+- Estrutura básica do projeto Flutter (`apps/mobile`)
+- Configuração inicial
+
+❌ **Faltando (QUASE TUDO):**
+- **App do Motorista:**
+  - Tela de login
+  - Dashboard
+  - Lista de rotas
+  - Mapa de navegação
+  - Checklist de veículo
+  - Check-in/Check-out de passageiros
+  - NFC reader
+  - QR Code scanner
+  - Chat com central
+  - Histórico de viagens
+  - Configurações
+  
+- **App do Passageiro:**
+  - Tela de login
+  - Dashboard
+  - Informações da rota
+  - Mapa em tempo real
+  - QR Code pessoal
+  - NFC card support
+  - Check-in/Check-out
+  - Notificações
+  - Avaliação de viagens
+  - Feedback
+  - Histórico
+  - Configurações
+
+---
+
+## 📊 RESUMO POR MÓDULO
+
+| Módulo | % Implementado | Status | Prioridade |
+|--------|---------------|---------|-----------|
+| Gestão de Empresas | 70% | 🟡 Parcial | Média |
+| Gestão de Usuários | 85% | 🟢 Quase Completo | Baixa |
+| Gestão de Frota | 60% | 🟡 Parcial | Alta |
+| Gestão de Motoristas | 40% | 🔴 Incompleto | Alta |
+| Planejamento de Rotas | 55% | 🟡 Parcial | Alta |
+| Check-in/Check-out | 20% | 🔴 Incompleto | **CRÍTICA** |
+| Rastreamento GPS | 45% | 🟡 Parcial | **CRÍTICA** |
+| App do Motorista | 10% | 🔴 Incompleto | **CRÍTICA** |
+| App do Passageiro | 5% | 🔴 Incompleto | **CRÍTICA** |
+| Gestão de Incidentes | 15% | 🔴 Incompleto | Alta |
+| Comunicação/Qualidade | 10% | 🔴 Incompleto | Alta |
+| Gestão de Custos | 50% | 🟡 Parcial | Média |
+| Relatórios/Dashboards | 40% | 🟡 Parcial | Média |
+| Gestão de Contratos | 5% | 🔴 Incompleto | Baixa |
+| Socorro/Suporte | 20% | 🔴 Incompleto | Alta |
+| Notificações | 10% | 🔴 Incompleto | Alta |
+| Apps Mobile | 5% | 🔴 Incompleto | **CRÍTICA** |
+
+---
+
+## 🎯 PRIORIZAÇÃO SUGERIDA
+
+### 🔴 PRIORIDADE CRÍTICA (CORE DO SISTEMA)
+
+1. **Check-in/Check-out de Passageiros**
+   - Sistema NFC completo
+   - Sistema QR Code completo
+   - Registro manual
+   - Histórico de presença
+
+2. **App do Motorista (Flutter)**
+   - Checklist obrigatório
+   - Navegação GPS
+   - Check-in/Check-out
+   - Comunicação
+
+3. **App do Passageiro (Flutter)**
+   - Rastreamento em tempo real
+   - QR Code / NFC
+   - Notificações
+   - Avaliações
+
+4. **Rastreamento GPS em Tempo Real**
+   - Mapa global (Golf Fox)
+   - Mapa por empresa
+   - Mapa por transportadora
+   - Atualização em tempo real
+
+### 🟠 PRIORIDADE ALTA
+
+5. **Gestão Completa de Motoristas**
+   - Documentação (CNH, exames)
+   - Controle de vencimentos
+   - Histórico e performance
+
+6. **Gestão Completa de Frota**
+   - Documentação de veículos
+   - Manutenções (programadas e realizadas)
+   - Custos operacionais
+   - Status em tempo real
+
+7. **Planejamento de Rotas Completo**
+   - Turnos e horários
+   - Pontos detalhados
+   - Rotas de ida e volta
+   - Validações automáticas
+
+8. **Gestão de Incidentes**
+   - Registro completo
+   - Fluxo de tratamento
+   - Dashboards
+   - Análises
+
+9. **Sistema de Notificações**
+   - Push notifications
+   - Email/SMS
+   - Preferências por usuário
+   - Todos os tipos de eventos
+
+### 🟡 PRIORIDADE MÉDIA
+
+10. **Comunicação e Qualidade**
+    - Chat integrado
+    - Feedback de passageiros
+    - Avaliações
+    - Dashboard de qualidade
+
+11. **Gestão de Custos Completa**
+    - Custos por veículo
+    - Custos por rota
+    - Controle orçamentário
+    - Relatórios financeiros
+
+12. **Relatórios e Dashboards**
+    - Relatórios operacionais
+    - Relatórios financeiros
+    - Relatórios de qualidade
+    - Dashboards personalizados
+
+### 🟢 PRIORIDADE BAIXA
+
+13. **Gestão de Contratos**
+    - Contratos digitais
+    - Gestão de vencimentos
+    - Faturamento
+
+14. **Branding e Personalização**
+    - Logo e cores por empresa
+    - Temas personalizados
+
+---
+
+## 📈 ESTIMATIVA DE DESENVOLVIMENTO
+
+### CRÍTICO (3-4 meses)
+- Check-in/Check-out: 3 semanas
+- App Motorista: 6 semanas
+- App Passageiro: 6 semanas
+- GPS Tempo Real: 4 semanas
+
+### ALTA (2-3 meses)
+- Gestão Motoristas: 3 semanas
+- Gestão Frota: 3 semanas
+- Rotas Completo: 2 semanas
+- Incidentes: 2 semanas
+- Notificações: 2 semanas
+
+### MÉDIA (1-2 meses)
+- Comunicação: 2 semanas
+- Custos: 2 semanas
+- Relatórios: 3 semanas
+
+### BAIXA (3-4 semanas)
+- Contratos: 2 semanas
+- Branding: 1 semana
+
+**TOTAL ESTIMADO: 8-10 meses de desenvolvimento**
+
+---
+
+## 🎯 PRÓXIMOS PASSOS RECOMENDADOS
+
+1. **Fase 1 (3 meses):** Apps Mobile + Check-in + GPS
+2. **Fase 2 (2 meses):** Gestão Motoristas/Frota + Incidentes
+3. **Fase 3 (2 meses):** Notificações + Comunicação + Custos
+4. **Fase 4 (2 meses):** Relatórios + Contratos + Refinamentos
+
+---
+
+**Criado em:** 16/11/2025  
+**Versão:** 1.0 - Análise Completa
+
