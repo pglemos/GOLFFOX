@@ -18,10 +18,10 @@ GOLFFOX/
 │   │   ├── tsconfig.json
 │   │   └── vercel.json
 │   └── mobile/
-│       ├── driver/
-│       ├── passenger/
-│       ├── shared/              # core Flutter compartilhado
-│       └── flutter-web/         # build/web do Flutter (assets)
+│       ├── android/
+│       ├── ios/
+│       ├── lib/                  # apps Flutter (driver/passenger) e shared
+│       └── flutter-web/          # build/web do Flutter (assets)
 ├── shared/
 │   ├── domain/                  # entidades/DTOs
 │   ├── types/                   # tipos TS/JSON schemas
@@ -32,9 +32,9 @@ GOLFFOX/
 │   ├── seeds/
 │   └── scripts/
 ├── infra/
-│   ├── ci/                      # GitHub Actions
+│   ├── ci/                       # GitHub Actions (em .github/workflows)
 │   ├── docker/
-│   ├── scripts/
+│   ├── scripts/                  # scripts de setup/deploy/dev
 │   └── tools/
 ├── docs/
 │   ├── AUDITORIA_COMPLETA.md
@@ -50,7 +50,7 @@ GOLFFOX/
 - Entidades/Tipos: `PascalCase`.
 - Hooks: `useX.ts`.
 - APIs: recursos REST com verbos no método.
-- Aliases TS: `@server/*`, `@lib/*`, `@shared/*` via `tsconfig` e `next.config.js`.
+- Aliases TS: `@/*` (apps/web), `@server/*`, `@lib/*`, `@shared/*` via `tsconfig` e `next.config.js`.
 
 ## Camadas
 - Domínio (`shared/domain`): modelos, invariantes.
@@ -69,6 +69,11 @@ GOLFFOX/
 - Cookies de sessão `httpOnly`, `secure`, `sameSite=lax`; payload mínimo.
 - Rate limiting em endpoints sensíveis.
 - Sentry (web + mobile) para erros e performance.
+
+## Migração aplicada
+- `web-app/`, `65-web-app/`, `components/` e `lib/` (Dart antigo) foram arquivados em `archive/LEGADO_NAO_USAR/`.
+- Scripts de raiz migrados para `infra/scripts/`.
+- `apps/web` é a fonte do frontend e API; `apps/mobile` é a fonte do Flutter.
 
 ## Banco de Dados
 - Supabase/Postgres com RLS, RPCs e views.

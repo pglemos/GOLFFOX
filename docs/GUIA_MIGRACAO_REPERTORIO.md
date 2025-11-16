@@ -11,9 +11,13 @@ Padronizar e reorganizar o GOLFFOX para uma arquitetura clara, removendo redund�
 - `archive/LEGADO_NAO_USAR/` para itens antigos/POCs antes da exclusão.
 
 ## Mapeamento Antigo → Novo
-- `web-app/` → `apps/web/` (mantendo `app/api/*` no lugar por requisitos do Next.js).
-- `lib/` (Flutter) → `apps/mobile/{driver,passenger,shared}`.
- - `lib/` (Flutter) → `apps/mobile/{driver,passenger,shared}`; assets web → `apps/mobile/flutter-web`.
+- `web-app/` → `archive/LEGADO_NAO_USAR/web-app-legacy/` (fonte agora em `apps/web/`).
+- `65-web-app/` → `archive/LEGADO_NAO_USAR/65-web-app-legacy/`.
+- `components/` (raiz) → `archive/LEGADO_NAO_USAR/components-legacy/`.
+- `lib/` (Flutter antigo) → `archive/LEGADO_NAO_USAR/flutter-legacy/` (fonte agora `apps/mobile/`).
+- `tools/flutter` (SDK local) → `archive/LEGADO_NAO_USAR/flutter-sdk/`.
+- `scripts/*` (raiz) → `infra/scripts/*`.
+- `apps/web/scripts/*` permanecem para utilidades do app; novos scripts genéricos devem ir para `infra/scripts/*`.
 - `tools/db/*` e `tools/pgapply/*` → `infra/tools/*`.
 - Documentação dispersa (`RESUMO_*`, `RELATORIO_*`, `DEPLOY_*`) → `docs/` consolidado.
  - Estrutura antiga de Next em raiz (`app/*`) → `archive/LEGADO_NAO_USAR/app-legacy/`.
