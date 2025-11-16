@@ -216,7 +216,13 @@ export default function AdminDashboard() {
   }
 
   if (!user) {
-    return null // useAuthFast já cuida do redirecionamento
+    router.replace('/?next=/admin')
+    return null
+  }
+
+  if ((user as any).role && (user as any).role !== 'admin') {
+    router.replace('/unauthorized')
+    return null
   }
 
   return (

@@ -2,8 +2,8 @@
   "openapi": "3.0.3",
   "info": {
     "title": "GolfFox API",
-    "version": "1.0.0",
-    "description": "Documentação básica dos endpoints GolfFox (parcial)"
+    "version": "1.1.0",
+    "description": "Documentação dos endpoints GolfFox (expandida). Sumários por rota; request/response poderão ser enriquecidos progressivamente."
   },
   "servers": [
     { "url": "http://localhost:3000" }
@@ -11,16 +11,77 @@
   "paths": {
     "/api/auth/csrf": { "get": { "summary": "Obter token CSRF" } },
     "/api/auth/login": { "post": { "summary": "Login e criar sessão" } },
+    "/api/auth/clear-session": { "post": { "summary": "Limpar sessão" } },
+    "/api/auth/set-session": { "post": { "summary": "Definir cookie de sessão (server)" } },
+    "/api/auth/seed-admin": { "post": { "summary": "Seed de usuário admin" } },
+
     "/api/health": { "get": { "summary": "Health check" } },
+
     "/api/reports/run": { "post": { "summary": "Gerar relatório" } },
     "/api/reports/dispatch": { "post": { "summary": "Enviar relatório por email" }, "get": { "summary": "Listar envios" } },
     "/api/reports/schedule": { "get": { "summary": "Listar agendamentos" }, "post": { "summary": "Criar agendamento" }, "delete": { "summary": "Remover agendamento" } },
+
     "/api/costs/export": { "get": { "summary": "Exportar custos" } },
     "/api/costs/import": { "post": { "summary": "Importar custos" } },
     "/api/costs/manual": { "get": { "summary": "Listar custos manuais" }, "post": { "summary": "Criar custo manual" } },
     "/api/costs/kpis": { "get": { "summary": "KPIs de custos" } },
     "/api/costs/reconcile": { "post": { "summary": "Conciliação de faturas" } },
-    "/api/analytics/web-vitals": { "get": { "summary": "Info Web Vitals" }, "post": { "summary": "Enviar métricas Web Vitals" } }
+    "/api/costs/budgets": { "get": { "summary": "Listar orçamentos" }, "post": { "summary": "Criar orçamento" } },
+    "/api/costs/categories": { "get": { "summary": "Listar categorias de custo" } },
+    "/api/costs/vs-budget": { "get": { "summary": "Comparar custos vs orçamento" } },
+
+    "/api/analytics/web-vitals": { "get": { "summary": "Info Web Vitals" }, "post": { "summary": "Enviar métricas Web Vitals" } },
+
+    "/api/admin/vehicles": { "get": { "summary": "Listar veículos (admin)" }, "post": { "summary": "Criar veículo (admin)" } },
+    "/api/admin/vehicles-list": { "get": { "summary": "Lista paginada de veículos" } },
+    "/api/admin/vehicles/{vehicleId}": { "get": { "summary": "Obter veículo" } },
+    "/api/admin/vehicles/delete": { "delete": { "summary": "Remover veículo" } },
+
+    "/api/admin/users-list": { "get": { "summary": "Listar usuários" } },
+    "/api/admin/users/{userId}": { "get": { "summary": "Obter usuário" } },
+    "/api/admin/users/delete": { "delete": { "summary": "Remover usuário" } },
+
+    "/api/admin/companies": { "get": { "summary": "Listar empresas" }, "post": { "summary": "Criar empresa" } },
+    "/api/admin/companies-list": { "get": { "summary": "Lista paginada de empresas" } },
+    "/api/admin/companies/{companyId}": { "get": { "summary": "Obter empresa" } },
+    "/api/admin/companies/delete": { "delete": { "summary": "Remover empresa" } },
+
+    "/api/admin/routes": { "get": { "summary": "Listar rotas" }, "post": { "summary": "Criar rota" } },
+    "/api/admin/routes-list": { "get": { "summary": "Lista paginada de rotas" } },
+    "/api/admin/routes/delete": { "delete": { "summary": "Remover rota" } },
+    "/api/admin/trips": { "get": { "summary": "Listar viagens" }, "post": { "summary": "Criar viagem" } },
+    "/api/admin/trips/{tripId}": { "get": { "summary": "Obter viagem" } },
+
+    "/api/admin/drivers-list": { "get": { "summary": "Listar motoristas" } },
+    "/api/admin/drivers/delete": { "delete": { "summary": "Remover motorista" } },
+
+    "/api/admin/alerts-list": { "get": { "summary": "Listar alertas operacionais" } },
+    "/api/admin/alerts/{alertId}": { "get": { "summary": "Obter alerta" } },
+    "/api/admin/alerts/delete": { "delete": { "summary": "Remover alerta" } },
+
+    "/api/admin/assistance-requests-list": { "get": { "summary": "Listar pedidos de socorro" } },
+    "/api/admin/assistance-requests/{requestId}": { "get": { "summary": "Obter pedido de socorro" } },
+    "/api/admin/assistance-requests/delete": { "delete": { "summary": "Remover pedido de socorro" } },
+
+    "/api/admin/kpis": { "get": { "summary": "KPIs administrativos" } },
+    "/api/admin/optimize-route": { "post": { "summary": "Otimizar rota (admin)" } },
+    "/api/admin/generate-stops": { "post": { "summary": "Gerar pontos de parada" } },
+    "/api/admin/seed-cost-categories": { "post": { "summary": "Seed categorias de custo" } },
+    "/api/admin/fix-database": { "post": { "summary": "Executar fix automatizado no banco" } },
+    "/api/admin/execute-sql-fix": { "post": { "summary": "Executar SQL de fix" } },
+    "/api/admin/audit-log": { "get": { "summary": "Listar logs de auditoria" } },
+    "/api/admin/audit-db": { "get": { "summary": "Auditar banco (checks)" } },
+    "/api/admin/create-operator": { "post": { "summary": "Criar empresa + operador" } },
+    "/api/admin/create-operator-login": { "post": { "summary": "Criar login de operador" } },
+
+    "/api/operator/associate-company": { "post": { "summary": "Associar operador a empresa" } },
+    "/api/operator/create-employee": { "post": { "summary": "Criar funcionário (operator)" } },
+    "/api/operator/optimize-route": { "post": { "summary": "Otimizar rota (operator)" } },
+
+    "/api/cron/refresh-kpis": { "get": { "summary": "Atualizar KPIs (cron)" } },
+    "/api/cron/refresh-costs-mv": { "get": { "summary": "Atualizar matview de custos (cron)" } },
+    "/api/cron/dispatch-reports": { "get": { "summary": "Despachar relatórios (cron)" } },
+
+    "/api/docs/openapi": { "get": { "summary": "OpenAPI atual (JSON)" } }
   }
 }
-

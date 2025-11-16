@@ -9,6 +9,7 @@ let _supabaseServiceRole: SupabaseClientType | null = null
 function ensureSupabaseServiceRole(): SupabaseClientType {
   if (_supabaseServiceRole) return _supabaseServiceRole
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  // Padronizar para SUPABASE_SERVICE_ROLE_KEY; aceitar SUPABASE_SERVICE_ROLE como fallback controlado
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE
   if (!url || !key) {
     throw new Error('Supabase service role não configurado: defina NEXT_PUBLIC_SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY')

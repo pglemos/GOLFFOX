@@ -1,5 +1,11 @@
 # Auditoria Técnica Completa – Golf Fox (SaaS de Fretamento Corporativo)
 
+> Atualização: 2025-11-16
+>
+> - Adicionados/atualizados documentos canônicos: `docs/ARQUITETURA_ATUAL.md` e `docs/GUIA_MIGRACAO.md`.
+> - Revisada a seção de estrutura de repositório e migração para refletir estado atual.
+> - Incluído checklist de verificação rápida pós-migração ao final deste arquivo.
+
 ## Resumo da Implementação (Rodada Atual)
 - Correção de segurança no login API: cookie `golffox-session` agora é `httpOnly`, `secure`, `sameSite=lax` e com payload mínimo (id, role, companyId).
 - Relatórios: adicionado rate limiting e paginação com seleção explícita de colunas em `web-app/app/api/reports/run/route.ts`.
@@ -297,3 +303,13 @@
 ---
 
 > Fim da Auditoria Técnica Completa. 
+
+---
+
+## Checklist Rápido Pós-Migração (2025-11-16)
+
+- [x] `docs/ARQUITETURA_ATUAL.md` atualizado e vinculado pela auditoria
+- [x] `docs/GUIA_MIGRACAO.md` criado com passos e verificação
+- [x] Estrutura de pastas refletida na documentação
+- [x] Scripts de validação de migração referenciados em `docs/migrations/*`
+- [ ] PR aberto para `main` com descrição e checklist desta atualização

@@ -4,6 +4,14 @@
 - Monorepo com módulos principais: web (Next.js 15), mobile (Flutter 3), banco (Supabase/Postgres), scripts/infra e documentação.
 - Separação por camadas: domínio, aplicação, infra e apresentação.
 
+### Resumo Executivo
+- Fonte de verdade do frontend e API: `apps/web`
+- Fonte de verdade do mobile: `apps/mobile`
+- Código compartilhado cross-plataforma: `shared/*`
+- Banco versionado com RLS: `database/*`
+- Automação/DevOps: `infra/*`
+- Documentação canônica: `docs/*`
+
 ## Estrutura de Pastas Alvo
 ```
 GOLFFOX/
@@ -85,4 +93,9 @@ GOLFFOX/
  
 ## Legado
 - Conteúdos antigos de Next em raiz foram movidos para `archive/LEGADO_NAO_USAR/app-legacy/` para evitar conflitos com `apps/web/`.
+
+## Referências Relacionadas
+- Guia de Migração: `docs/GUIA_MIGRACAO.md`
+- Auditoria Técnica Completa: `docs/auditoria/AUDITORIA_COMPLETA.md`
+- Guia de Migração do Repositório (histórico): `docs/GUIA_MIGRACAO_REPERTORIO.md`
 

@@ -2,7 +2,7 @@ import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
 import { NextRequest, NextResponse } from "next/server";
 
-// Configuração do Redis para rate limiting
+const upstashEnabled = Boolean(process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN)
 const redis = new Redis({
   url: process.env.UPSTASH_REDIS_REST_URL || "",
   token: process.env.UPSTASH_REDIS_REST_TOKEN || "",
@@ -53,6 +53,9 @@ export async function applyRateLimit(
   identifier?: string
 ): Promise<NextResponse | null> {
   try {
+    if (!upstashEnabled) {
+      return null
+    }
     // Identificar o usuário por IP ou sessão
     const xff = request.headers.get("x-forwarded-for") || "";
     const xri = request.headers.get("x-real-ip") || "";
@@ -89,9 +92,7 @@ export async function applyRateLimit(
     
     return null; // Sucesso - não bloquear
   } catch (error) {
-    console.error("Erro ao aplicar rate limiting:", error);
-    // Em caso de erro no Redis, permitir a requisição (fail-open)
-    return null;
+    return null
   }
 }
 
