@@ -1,0 +1,88 @@
+{
+  "total": 9,
+  "passed": 7,
+  "failed": 2,
+  "warnings": 0,
+  "tests": [
+    {
+      "name": "Health Check",
+      "status": "pass",
+      "message": "API está online",
+      "details": {
+        "status": "ok",
+        "supabase": "ok"
+      },
+      "timestamp": "2025-11-16T17:45:23.158Z"
+    },
+    {
+      "name": "Supabase Connection",
+      "status": "pass",
+      "message": "Conexão com Supabase funcionando",
+      "details": null,
+      "timestamp": "2025-11-16T17:45:23.159Z"
+    },
+    {
+      "name": "CSRF Token",
+      "status": "pass",
+      "message": "Token obtido com sucesso",
+      "details": {
+        "tokenLength": 64
+      },
+      "timestamp": "2025-11-16T17:45:23.354Z"
+    },
+    {
+      "name": "Login",
+      "status": "pass",
+      "message": "Autenticação bem-sucedida",
+      "details": {
+        "role": "admin",
+        "hasToken": true
+      },
+      "timestamp": "2025-11-16T17:45:23.978Z"
+    },
+    {
+      "name": "Logo SVG",
+      "status": "fail",
+      "message": "Logo não encontrado (404)",
+      "details": {
+        "solution": "Verificar configuração de assets do Next.js"
+      },
+      "timestamp": "2025-11-16T17:45:24.084Z"
+    },
+    {
+      "name": "Admin KPIs",
+      "status": "pass",
+      "message": "KPIs carregados com sucesso",
+      "details": {
+        "keys": 2
+      },
+      "timestamp": "2025-11-16T17:45:24.400Z"
+    },
+    {
+      "name": "Audit Log",
+      "status": "fail",
+      "message": "Status 500",
+      "details": {
+        "error": "Erro ao buscar audit log"
+      },
+      "timestamp": "2025-11-16T17:45:24.628Z"
+    },
+    {
+      "name": "Home Page",
+      "status": "pass",
+      "message": "Página carrega corretamente",
+      "details": {
+        "hasLoginForm": false,
+        "hasLogo": false
+      },
+      "timestamp": "2025-11-16T17:45:24.735Z"
+    },
+    {
+      "name": "Supabase Variables",
+      "status": "pass",
+      "message": "Variáveis do Supabase parecem corretas",
+      "details": null,
+      "timestamp": "2025-11-16T17:45:24.736Z"
+    }
+  ]
+}

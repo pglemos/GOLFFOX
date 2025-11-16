@@ -95,27 +95,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  return response
-}
-
-export const config = {
-  matcher: [
-    '/login',
-    '/login/:path*',
-    '/admin/:path*',
-    '/operator',
-    '/operator/:path*',
-    /*
-     * Match all request paths except for the ones starting with:
-     * - api (API routes)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     */
-    '/((?!api|_next/static|_next/image|favicon.ico).*)',
-  ],
-}
-  // Redirecionar raiz com ?next= quando há sessão válida
+  // ✅ Redirecionar raiz com ?next= quando há sessão válida
   if (pathname === '/' && searchParams.has('next')) {
     const nextRaw = searchParams.get('next') || ''
     const sessionCookie = request.cookies.get('golffox-session')?.value
@@ -145,3 +125,24 @@ export const config = {
       }
     }
   }
+
+  return response
+}
+
+export const config = {
+  matcher: [
+    '/login',
+    '/login/:path*',
+    '/admin/:path*',
+    '/operator',
+    '/operator/:path*',
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     */
+    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+  ],
+}

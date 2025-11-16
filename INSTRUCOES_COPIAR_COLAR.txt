@@ -1,0 +1,82 @@
+==========================================================================
+INSTRUÇÕES RÁPIDAS - COPIAR E COLAR NA VERCEL
+==========================================================================
+
+ACESSE: https://vercel.com/synvolt/golffox/settings/environment-variables
+
+Clique em "Add New" e adicione CADA variável abaixo:
+
+--------------------------------------------------------------------------
+VARIÁVEL 1:
+--------------------------------------------------------------------------
+Key: NEXT_PUBLIC_SUPABASE_URL
+
+Value:
+https://vmoxzesvjcfmrebagcwo.supabase.co
+
+Environments: ✅ Production ✅ Preview ✅ Development
+
+[Add]
+
+--------------------------------------------------------------------------
+VARIÁVEL 2:
+--------------------------------------------------------------------------
+Key: NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+Value:
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZtb3h6ZXN2amNmbXJlYmFnY3dvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE1MTQyMTMsImV4cCI6MjA3NzA5MDIxM30.QKRKu1bIPhsyDPFuBKEIjseC5wNC35RKbOxQ7FZmEvU
+
+Environments: ✅ Production ✅ Preview ✅ Development
+
+[Add]
+
+--------------------------------------------------------------------------
+VARIÁVEL 3:
+--------------------------------------------------------------------------
+Key: SUPABASE_URL
+
+Value:
+https://vmoxzesvjcfmrebagcwo.supabase.co
+
+Environments: ✅ Production ✅ Preview ✅ Development
+
+[Add]
+
+--------------------------------------------------------------------------
+VARIÁVEL 4:
+--------------------------------------------------------------------------
+Key: SUPABASE_ANON_KEY
+
+Value:
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZtb3h6ZXN2amNmbXJlYmFnY3dvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE1MTQyMTMsImV4cCI6MjA3NzA5MDIxM30.QKRKu1bIPhsyDPFuBKEIjseC5wNC35RKbOxQ7FZmEvU
+
+Environments: ✅ Production ✅ Preview ✅ Development
+
+[Add]
+
+--------------------------------------------------------------------------
+VARIÁVEL 5:
+--------------------------------------------------------------------------
+Key: SUPABASE_SERVICE_ROLE_KEY
+
+Value:
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZtb3h6ZXN2amNmbXJlYmFnY3dvIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2MTUxNDIxMywiZXhwIjoyMDc3MDkwMjEzfQ.EJylgYksLGJ7icYf77dPULYZNA4u35JRg-gkoGgMI_A
+
+Environments: ✅ Production ✅ Preview ✅ Development
+
+[Add]
+
+==========================================================================
+APÓS ADICIONAR TODAS AS 5 VARIÁVEIS:
+==========================================================================
+
+1. Vá em: https://vercel.com/synvolt/golffox
+2. Aba "Deployments"
+3. Último deployment → Menu (⋮) → "Redeploy"
+4. ❌ DESMARQUE "Use existing Build Cache"
+5. Clique em "Redeploy"
+6. Aguarde 2-3 minutos
+7. Teste login em: https://golffox.vercel.app
+
+==========================================================================
+
