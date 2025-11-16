@@ -115,3 +115,33 @@ export const config = {
     '/((?!api|_next/static|_next/image|favicon.ico).*)',
   ],
 }
+  // Redirecionar raiz com ?next= quando há sessão válida
+  if (pathname === '/' && searchParams.has('next')) {
+    const nextRaw = searchParams.get('next') || ''
+    const sessionCookie = request.cookies.get('golffox-session')?.value
+    if (sessionCookie && nextRaw.startsWith('/')) {
+      try {
+        const decoded = typeof atob === 'function'
+          ? atob(sessionCookie)
+          : Buffer.from(sessionCookie, 'base64').toString('utf-8')
+        const userData = JSON.parse(decoded)
+        if (userData?.role) {
+          const nextPath = new URL(nextRaw, request.url)
+          const pathOnly = nextPath.pathname
+          const isAllowed = (
+            (pathOnly.startsWith('/admin') && userData.role === 'admin') ||
+            (pathOnly.startsWith('/operator') && ['admin', 'operator'].includes(userData.role)) ||
+            (pathOnly.startsWith('/carrier') && ['admin', 'carrier'].includes(userData.role)) ||
+            (!pathOnly.startsWith('/admin') && !pathOnly.startsWith('/operator') && !pathOnly.startsWith('/carrier'))
+          )
+          const defaultHome = userData.role === 'admin' ? '/admin'
+            : userData.role === 'operator' ? '/operator'
+            : userData.role === 'carrier' ? '/carrier' : '/'
+          const destination = isAllowed ? pathOnly : defaultHome
+          return NextResponse.redirect(new URL(destination, request.url))
+        }
+      } catch (_) {
+        // Ignorar erros de decodificação e seguir fluxo normal
+      }
+    }
+  }

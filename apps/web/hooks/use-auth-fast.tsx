@@ -53,26 +53,44 @@ export function useAuthFast() {
       return
     }
 
-    // Fallback: Supabase (assíncrono, mas não bloqueia renderização)
-    supabase.auth.getSession().then(({ data: { session }, error }) => {
-      if (!mounted) return
-
-      if (error) {
-        console.error('Erro ao obter sessão:', error)
+    // Fallback rápido: perguntar ao servidor (lê cookie httpOnly)
+    fetch('/api/auth/me', { credentials: 'include' })
+      .then(async (res) => {
+        if (!mounted) return
+        if (res.ok) {
+          const data = await res.json().catch(() => null)
+          const u = data?.user
+          if (u?.id && u?.role) {
+            setUser({ id: u.id, email: u.email || '', name: u.email?.split('@')[0] || '', role: u.role })
+            setLoading(false)
+            return
+          }
+        }
+        // Continua para Supabase
+        return supabase.auth.getSession()
+      })
+      .then((result: any) => {
+        if (!mounted || !result) return
+        const { data: { session }, error } = result
+        if (error) {
+          console.error('Erro ao obter sessão:', error)
+          setLoading(false)
+          return
+        }
+        if (session?.user) {
+          setUser({
+            id: session.user.id,
+            email: session.user.email || '',
+            name: session.user.user_metadata?.name || session.user.email?.split('@')[0] || '',
+            role: session.user.user_metadata?.role || 'admin'
+          })
+        }
         setLoading(false)
-        return
-      }
-
-      if (session?.user) {
-        setUser({
-          id: session.user.id,
-          email: session.user.email || '',
-          name: session.user.user_metadata?.name || session.user.email?.split('@')[0] || '',
-          role: session.user.user_metadata?.role || 'admin'
-        })
-      }
-      setLoading(false)
-    })
+      })
+      .catch(() => {
+        if (!mounted) return
+        setLoading(false)
+      })
 
     return () => {
       mounted = false

@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste de Login - GOLFFOX</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+            width: 100%;
+            max-width: 500px;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .result {
+            margin-top: 20px;
+            padding: 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            display: none;
+        }
+        
+        .result.show {
+            display: block;
+        }
+        
+        .result.success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        
+        .result.error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        
+        .result.info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+        
+        .result-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+        
+        .result-details {
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            background: rgba(0,0,0,0.05);
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .info-box {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            font-size: 14px;
+            color: #333;
+        }
+        
+        .info-box strong {
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Teste de Login - GOLFFOX</h1>
+        <p class="subtitle">Diagnóstico de Autenticação na Vercel</p>
+        
+        <div class="info-box">
+            <strong>Objetivo:</strong> Testar login diretamente no browser para verificar se o problema de CSRF persiste com cookies reais.
+        </div>
+        
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input 
+                    type="email" 
+                    id="email" 
+                    name="email" 
+                    placeholder="seu@email.com"
+                    value="golffox@admin.com"
+                    required
+                >
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Senha</label>
+                <input 
+                    type="password" 
+                    id="password" 
+                    name="password" 
+                    placeholder="Sua senha"
+                    required
+                >
+            </div>
+            
+            <button type="submit" id="submitBtn">
+                Testar Login
+            </button>
+        </form>
+        
+        <div id="result" class="result"></div>
+    </div>
+
+    <script>
+        const API_URL = 'https://golffox.vercel.app';
+        const form = document.getElementById('loginForm');
+        const resultDiv = document.getElementById('result');
+        const submitBtn = document.getElementById('submitBtn');
+        
+        let csrfToken = null;
+        
+        // Função para exibir resultado
+        function showResult(type, title, message, details = null) {
+            resultDiv.className = `result ${type} show`;
+            resultDiv.innerHTML = `
+                <div class="result-title">${title}</div>
+                <div>${message}</div>
+                ${details ? `<div class="result-details">${details}</div>` : ''}
+            `;
+        }
+        
+        // Obter CSRF token ao carregar a página
+        async function getCsrfToken() {
+            try {
+                showResult('info', '⏳ Carregando...', 'Obtendo CSRF token...');
+                
+                const response = await fetch(`${API_URL}/api/auth/csrf`, {
+                    method: 'GET',
+                    credentials: 'include' // IMPORTANTE: incluir cookies
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Erro ao obter CSRF: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                csrfToken = data.csrfToken || data.token;
+                
+                if (csrfToken) {
+                    showResult('success', '✅ CSRF Token Obtido', 
+                        `Token recebido com sucesso. Você pode fazer login agora.`,
+                        `Token: ${csrfToken.substring(0, 30)}...`
+                    );
+                } else {
+                    showResult('error', '❌ Erro', 'CSRF token não encontrado na resposta.');
+                }
+            } catch (error) {
+                showResult('error', '❌ Erro ao Obter CSRF', error.message);
+            }
+        }
+        
+        // Handler do formulário
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (!csrfToken) {
+                showResult('error', '❌ Erro', 'CSRF token não disponível. Recarregue a página.');
+                return;
+            }
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            // Desabilitar botão
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="loading"></span> Testando...';
+            
+            try {
+                showResult('info', '⏳ Autenticando...', 'Enviando credenciais para o servidor...');
+                
+                const response = await fetch(`${API_URL}/api/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-csrf-token': csrfToken
+                    },
+                    credentials: 'include', // IMPORTANTE: enviar cookies
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // LOGIN SUCESSO
+                    showResult('success', '✅ LOGIN BEM-SUCEDIDO!', 
+                        'Autenticação realizada com sucesso. O sistema está funcionando corretamente!',
+                        `Usuário: ${data.user?.email || email}\nRole: ${data.user?.role || 'N/A'}\nToken: ${data.token ? data.token.substring(0, 30) + '...' : 'N/A'}`
+                    );
+                    
+                    // Redirecionar após 3 segundos
+                    setTimeout(() => {
+                        window.location.href = data.user?.role === 'admin' ? '/admin' : '/operator';
+                    }, 3000);
+                } else {
+                    // LOGIN FALHOU
+                    let errorMessage = data.error || 'Erro desconhecido';
+                    let errorCode = data.code || 'unknown';
+                    
+                    // Análise do erro
+                    let diagnosis = '';
+                    
+                    if (errorCode === 'invalid_csrf' || errorMessage.includes('csrf')) {
+                        diagnosis = `
+🎯 PROBLEMA: Validação CSRF falhou mesmo no browser.
+
+💡 CAUSA PROVÁVEL:
+   • O cookie golffox-csrf não está sendo enviado corretamente
+   • Problema de domínio ou configuração de cookies na Vercel
+   • SameSite ou Secure flags podem estar bloqueando
+
+📝 SOLUÇÃO:
+   1. Verifique as DevTools (F12) > Application > Cookies
+   2. Confirme se existe cookie "golffox-csrf"
+   3. Verifique se o cookie tem os atributos corretos
+   4. Pode ser necessário ajustar configuração de cookies no servidor
+                        `;
+                    } else if (errorCode === 'user_not_in_db' || errorMessage.includes('não cadastrado')) {
+                        diagnosis = `
+🎯 PROBLEMA: Usuário não existe na tabela 'users' do Supabase.
+
+💡 SOLUÇÃO:
+   1. Acesse o Supabase SQL Editor
+   2. Execute: 
+      SELECT id, email FROM auth.users WHERE email = '${email}';
+   3. Copie o ID e execute:
+      INSERT INTO public.users (id, email, role, is_active, created_at, updated_at)
+      VALUES ('ID_COPIADO', '${email}', 'admin', true, NOW(), NOW())
+      ON CONFLICT (id) DO UPDATE SET is_active = true;
+                        `;
+                    } else if (errorCode === 'no_company_mapping') {
+                        diagnosis = `
+🎯 PROBLEMA: Usuário operador sem empresa associada.
+
+💡 SOLUÇÃO:
+   1. Liste empresas: SELECT id, name FROM companies WHERE is_active = true;
+   2. Associe: INSERT INTO gf_user_company_map (user_id, company_id, created_at)
+              VALUES ('ID_DO_USUARIO', 'ID_DA_EMPRESA', NOW());
+                        `;
+                    } else if (errorCode === 'invalid_credentials') {
+                        diagnosis = `
+🎯 PROBLEMA: Email ou senha incorretos.
+
+💡 SOLUÇÃO:
+   • Verifique se o email está correto
+   • Verifique se a senha está correta
+   • Tente resetar a senha no Supabase Auth
+                        `;
+                    } else if (errorCode === 'missing_supabase_env' || errorCode === 'supabase_unreachable') {
+                        diagnosis = `
+🎯 PROBLEMA: Variáveis de ambiente do Supabase não configuradas.
+
+💡 SOLUÇÃO:
+   1. Acesse: https://vercel.com/synvolt/golffox/settings/environment-variables
+   2. Adicione:
+      • NEXT_PUBLIC_SUPABASE_URL
+      • NEXT_PUBLIC_SUPABASE_ANON_KEY
+      • SUPABASE_URL
+      • SUPABASE_ANON_KEY
+   3. Faça REDEPLOY
+                        `;
+                    } else {
+                        diagnosis = `
+🎯 PROBLEMA: ${errorMessage}
+   Código: ${errorCode}
+
+💡 PRÓXIMOS PASSOS:
+   1. Verifique logs da Vercel
+   2. Consulte: docs/auditoria/ANALISE_PROBLEMA_LOGIN_VERCEL.md
+                        `;
+                    }
+                    
+                    showResult('error', `❌ LOGIN FALHOU (${response.status})`, 
+                        `${errorMessage} (${errorCode})`,
+                        diagnosis
+                    );
+                }
+            } catch (error) {
+                showResult('error', '❌ Erro de Rede', 
+                    error.message,
+                    'Verifique sua conexão e se o servidor está acessível.'
+                );
+            } finally {
+                // Reabilitar botão
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'Testar Login';
+            }
+        });
+        
+        // Obter CSRF token ao carregar
+        getCsrfToken();
+    </script>
+</body>
+</html>
+

@@ -110,13 +110,7 @@ function LoginContent() {
           return
         }
 
-        // Se a URL veio de uma proteção do middleware (possui ?next=),
-        // não fazer auto-redirect aqui para evitar loops.
         const nextParam = searchParams.get('next')
-        if (nextParam) {
-          // Se houver ?next=, apenas retornar - usuário precisa fazer login
-          return
-        }
 
         // ✅ Usar apenas verificação de cookie - não usar Supabase auth na página de login
         // para evitar conflitos e erros de logout automático
@@ -124,7 +118,6 @@ function LoginContent() {
         
         const hasSessionCookie = document.cookie.includes('golffox-session')
         if (!hasSessionCookie) {
-          // Sem cookie, página de login deve ser exibida normalmente
           return
         }
 
@@ -148,13 +141,36 @@ function LoginContent() {
           
           const userRole = userData.role || getUserRoleByEmail(userData.email || '')
 
-          const redirectUrl = userRole === 'admin' ? '/admin' :
-                             userRole === 'operator' ? '/operator' :
-                             userRole === 'carrier' ? '/carrier' : '/dashboard'
-          
-          console.log('🔄 Sessão detectada, redirecionando para:', redirectUrl, 'role:', userRole)
-          
-          // Redirecionar apenas se tiver role válido
+          const rawNext = nextParam
+          const safeNext = (function sanitizePath(raw: string | null): string | null {
+            if (!raw) return null
+            try {
+              const decoded = decodeURIComponent(raw)
+              if (/^https?:\/:\/\//i.test(decoded)) return null
+              if (!decoded.startsWith('/')) return null
+              const url = new URL(decoded, window.location.origin)
+              url.searchParams.delete('company')
+              return url.pathname
+            } catch {
+              return null
+            }
+          })(rawNext)
+
+          const isAllowedForRole = (role: string, path: string): boolean => {
+            if (path.startsWith('/admin')) return role === 'admin'
+            if (path.startsWith('/operator')) return ['admin', 'operator'].includes(role)
+            if (path.startsWith('/carrier')) return ['admin', 'carrier'].includes(role)
+            return true
+          }
+
+          let redirectUrl = userRole === 'admin' ? '/admin' :
+                            userRole === 'operator' ? '/operator' :
+                            userRole === 'carrier' ? '/carrier' : '/dashboard'
+
+          if (safeNext && isAllowedForRole(userRole, safeNext)) {
+            redirectUrl = safeNext
+          }
+
           if (userRole) {
             window.location.href = redirectUrl
           }
