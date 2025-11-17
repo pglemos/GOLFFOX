@@ -20,6 +20,10 @@ export function CreateCarrierModal({ isOpen, onClose, onSave }: CreateCarrierMod
   const [address, setAddress] = useState("")
   const [phone, setPhone] = useState("")
   const [contactPerson, setContactPerson] = useState("")
+  const [email, setEmail] = useState("")
+  const [cnpj, setCnpj] = useState("")
+  const [stateRegistration, setStateRegistration] = useState("")
+  const [municipalRegistration, setMunicipalRegistration] = useState("")
   const [loading, setLoading] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -34,7 +38,11 @@ export function CreateCarrierModal({ isOpen, onClose, onSave }: CreateCarrierMod
           name,
           address: address || null,
           phone: phone || null,
-          contact_person: contactPerson || null
+          contact_person: contactPerson || null,
+          email: email || null,
+          cnpj: cnpj || null,
+          state_registration: stateRegistration || null,
+          municipal_registration: municipalRegistration || null
         })
       })
 
@@ -50,6 +58,10 @@ export function CreateCarrierModal({ isOpen, onClose, onSave }: CreateCarrierMod
         setAddress("")
         setPhone("")
         setContactPerson("")
+        setEmail("")
+        setCnpj("")
+        setStateRegistration("")
+        setMunicipalRegistration("")
         onSave()
       } else {
         throw new Error(result.error || 'Erro ao criar transportadora')
@@ -64,49 +76,89 @@ export function CreateCarrierModal({ isOpen, onClose, onSave }: CreateCarrierMod
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Criar Nova Transportadora</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <Label htmlFor="name">Nome da Transportadora *</Label>
-            <Input
-              id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-              placeholder="Ex: Transportes XYZ Ltda"
-            />
+          <div className="grid grid-cols-2 gap-4">
+            <div className="col-span-2">
+              <Label htmlFor="name">Nome da Transportadora *</Label>
+              <Input
+                id="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+                placeholder="Ex: Transportes XYZ Ltda"
+              />
+            </div>
+            <div>
+              <Label htmlFor="cnpj">CNPJ</Label>
+              <Input
+                id="cnpj"
+                value={cnpj}
+                onChange={(e) => setCnpj(e.target.value)}
+                placeholder="00.000.000/0000-00"
+                maxLength={18}
+              />
+            </div>
+            <div>
+              <Label htmlFor="stateRegistration">Inscrição Estadual</Label>
+              <Input
+                id="stateRegistration"
+                value={stateRegistration}
+                onChange={(e) => setStateRegistration(e.target.value)}
+                placeholder="123456789"
+              />
+            </div>
+            <div>
+              <Label htmlFor="municipalRegistration">Inscrição Municipal</Label>
+              <Input
+                id="municipalRegistration"
+                value={municipalRegistration}
+                onChange={(e) => setMunicipalRegistration(e.target.value)}
+                placeholder="987654321"
+              />
+            </div>
+            <div>
+              <Label htmlFor="contactPerson">Pessoa de Contato</Label>
+              <Input
+                id="contactPerson"
+                value={contactPerson}
+                onChange={(e) => setContactPerson(e.target.value)}
+                placeholder="Nome do responsável"
+              />
+            </div>
+            <div>
+              <Label htmlFor="phone">Telefone</Label>
+              <Input
+                id="phone"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="(11) 98765-4321"
+              />
+            </div>
+            <div>
+              <Label htmlFor="email">E-mail</Label>
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="contato@transportadora.com"
+              />
+            </div>
+            <div className="col-span-2">
+              <Label htmlFor="address">Endereço Completo</Label>
+              <Input
+                id="address"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                placeholder="Rua, número, bairro, cidade - UF, CEP"
+              />
+            </div>
           </div>
-          <div>
-            <Label htmlFor="contactPerson">Pessoa de Contato</Label>
-            <Input
-              id="contactPerson"
-              value={contactPerson}
-              onChange={(e) => setContactPerson(e.target.value)}
-              placeholder="Nome do responsável"
-            />
-          </div>
-          <div>
-            <Label htmlFor="phone">Telefone</Label>
-            <Input
-              id="phone"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              placeholder="(11) 98765-4321"
-            />
-          </div>
-          <div>
-            <Label htmlFor="address">Endereço</Label>
-            <Input
-              id="address"
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-              placeholder="Rua, número, cidade - UF"
-            />
-          </div>
-          <div className="flex gap-2 justify-end">
+          <div className="flex gap-2 justify-end pt-4 border-t">
             <Button type="button" variant="outline" onClick={onClose} disabled={loading}>
               Cancelar
             </Button>

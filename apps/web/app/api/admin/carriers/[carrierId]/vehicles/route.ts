@@ -1,50 +1,70 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseServiceRole } from '@/lib/supabase-server'
-import { requireAuth } from '@/lib/api-auth'
+import { createServerClient } from '@/lib/supabase-server'
 
-export const runtime = 'nodejs'
-
-export async function OPTIONS() {
-  return new NextResponse(null, {
-    status: 200,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    },
-  })
-}
-
-export async function GET(
-  req: NextRequest,
+// POST /api/admin/carriers/[carrierId]/vehicles
+export async function POST(
+  request: NextRequest,
   { params }: { params: { carrierId: string } }
 ) {
   try {
-    const authErrorResponse = await requireAuth(req, 'admin')
-    if (authErrorResponse) return authErrorResponse
+    const supabase = createServerClient()
+    const { carrierId } = params
+    const body = await request.json()
 
-    const { data, error } = await supabaseServiceRole
+    const {
+      plate,
+      prefix,
+      manufacturer,
+      model,
+      year,
+      capacity,
+      is_active,
+      vehicle_type,
+      renavam,
+      chassis
+    } = body
+
+    if (!plate) {
+      return NextResponse.json(
+        { success: false, error: 'Placa é obrigatória' },
+        { status: 400 }
+      )
+    }
+
+    const { data: vehicle, error } = await supabase
       .from('vehicles')
-      .select('*')
-      .eq('carrier_id', params.carrierId)
-      .order('plate', { ascending: true })
+      .insert([
+        {
+          carrier_id: carrierId,
+          plate,
+          prefix: prefix || null,
+          manufacturer: manufacturer || null,
+          model: model || null,
+          year: year || null,
+          capacity: capacity || null,
+          is_active: is_active ?? true,
+          vehicle_type: vehicle_type || 'bus',
+          renavam: renavam || null,
+          chassis: chassis || null
+        }
+      ])
+      .select()
+      .single()
 
     if (error) {
+      console.error('Erro ao criar veículo:', error)
       return NextResponse.json(
-        { success: false, error: 'Erro ao buscar veículos', message: error.message },
+        { success: false, error: error.message },
         { status: 500 }
       )
     }
 
-    return NextResponse.json({
-      success: true,
-      vehicles: data || []
-    })
+    return NextResponse.json({ success: true, vehicle })
   } catch (error: any) {
+    console.error('Erro na API de criar veículo:', error)
     return NextResponse.json(
-      { success: false, error: 'Erro ao processar requisição', message: error.message },
+      { success: false, error: error.message || 'Erro desconhecido' },
       { status: 500 }
     )
   }
 }
-

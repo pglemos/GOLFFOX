@@ -2,18 +2,14 @@
 
 import { useEffect, useRef, useState, useCallback, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
-// Removido import do supabase - não usado mais na página de login para evitar conflitos
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Card } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Mail, Lock, Eye, EyeOff, Moon, Sun, Globe, ChevronDown, Route, Shield, TrendingUp, Zap, Bus, MapPin, Clock, BarChart3 } from "lucide-react"
-import { motion } from "framer-motion"
-import dynamic from "next/dynamic"
+import { Mail, Lock, Eye, EyeOff, ArrowRight, Sparkles } from "lucide-react"
+import { motion, AnimatePresence } from "framer-motion"
 import { AuthManager } from "@/lib/auth"
 import { getUserRoleByEmail } from "@/lib/user-role"
 import { debug, error as logError } from "@/lib/logger"
-// Removido import do supabase - não usado na página de login para evitar problemas de renderização
 import { LoginErrorBoundary } from "./login-error-boundary"
 
 const EMAIL_REGEX =
@@ -25,35 +21,38 @@ const DEFAULT_LOGGED_URL = process.env.NEXT_PUBLIC_LOGGED_URL ?? "/operator"
 
 const sanitizeInput = (value: string) => value.replace(/[<>"'`;()]/g, "").trim()
 
-// Componente de partículas animadas (renderizado somente no cliente para evitar hydration mismatch)
-const AnimatedParticles = dynamic(
-  () => import("@/components/login/animated-particles").then((m) => m.AnimatedParticles),
-  { ssr: false, loading: () => null }
-)
-
-// Componente de gradiente animado
-const AnimatedGradient = () => {
+// Efeito de partículas minimalista (estilo Apple/Tesla)
+const FloatingOrbs = () => {
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      <motion.div
-        className="absolute inset-0 opacity-30"
-        style={{
-          background: `
-            radial-gradient(circle at 20% 50%, rgba(249, 115, 22, 0.3) 0%, transparent 50%),
-            radial-gradient(circle at 80% 80%, rgba(30, 58, 95, 0.3) 0%, transparent 50%),
-            radial-gradient(circle at 40% 20%, rgba(45, 74, 107, 0.2) 0%, transparent 50%)
-          `,
-        }}
-        animate={{
-          backgroundPosition: ["0% 0%", "100% 100%"],
-        }}
-        transition={{
-          duration: 12,
-          repeat: Infinity,
-          repeatType: "reverse",
-          ease: "easeOut",
-        }}
-      />
+      {[...Array(3)].map((_, i) => (
+        <motion.div
+          key={i}
+          className="absolute w-[500px] h-[500px] rounded-full"
+          style={{
+            background: `radial-gradient(circle, ${
+              i === 0 ? 'rgba(249, 115, 22, 0.15)' : 
+              i === 1 ? 'rgba(139, 92, 246, 0.1)' : 
+              'rgba(59, 130, 246, 0.1)'
+            } 0%, transparent 70%)`,
+            filter: 'blur(60px)',
+          }}
+          initial={{
+            x: i === 0 ? '-25%' : i === 1 ? '75%' : '40%',
+            y: i === 0 ? '10%' : i === 1 ? '60%' : '-10%',
+          }}
+          animate={{
+            x: i === 0 ? '-15%' : i === 1 ? '85%' : '50%',
+            y: i === 0 ? '20%' : i === 1 ? '70%' : '0%',
+          }}
+          transition={{
+            duration: 20 + i * 5,
+            repeat: Infinity,
+            repeatType: "reverse",
+            ease: "easeInOut",
+          }}
+        />
+      ))}
     </div>
   )
 }
@@ -569,178 +568,96 @@ function LoginContent() {
     ]
   )
 
-  // Feature card component com animação
-  const FeatureCard = ({ icon: Icon, title, description, delay }: { icon: any, title: string, description: string, delay: number }) => (
+  // Estatística animada (estilo Apple)
+  const StatItem = ({ value, label, delay }: { value: string, label: string, delay: number }) => (
     <motion.div
-      whileHover={{ y: -4, scale: 1.02 }}
-      transition={{ duration: 0.2, ease: 'easeOut' }}
-      className="group relative"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, delay, ease: [0.16, 1, 0.3, 1] }}
+      className="text-center"
     >
-      <div className="flex items-start gap-3 p-4 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all duration-300 cursor-default">
-        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-white/20 to-white/5 flex items-center justify-center flex-shrink-0 border border-white/10 group-hover:from-white/30 group-hover:to-white/10 group-hover:scale-110 transition-all duration-300 shadow-lg">
-          <Icon className="w-6 h-6 text-white" />
-        </div>
-        <div className="flex-1 min-w-0">
-          <h3 className="text-white font-semibold text-sm mb-1 group-hover:text-white transition-colors">
-            {title}
-          </h3>
-          <p className="text-white/70 text-xs leading-relaxed group-hover:text-white/80 transition-colors">
-            {description}
-          </p>
-        </div>
+      <motion.div 
+        className="text-4xl md:text-5xl font-bold bg-gradient-to-br from-white via-white to-white/70 bg-clip-text text-transparent mb-2"
+        whileHover={{ scale: 1.05 }}
+        transition={{ type: "spring", stiffness: 400, damping: 10 }}
+      >
+        {value}
+      </motion.div>
+      <div className="text-sm md:text-base text-white/60 font-light tracking-wide">
+        {label}
       </div>
     </motion.div>
   )
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row relative overflow-hidden">
-      {/* Seção Esquerda - Promocional (apenas desktop) */}
+    <div className="min-h-screen flex relative overflow-hidden bg-black">
+      {/* Background com efeitos sutis */}
+      <FloatingOrbs />
+      
+      {/* Grid pattern sutil (estilo Apple) */}
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_at_center,black_20%,transparent_80%)]" />
+      
+      {/* Seção Esquerda - Hero Minimalista */}
       <motion.div
-        initial={{ opacity: 0, x: -100 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-        className="hidden lg:flex lg:w-1/2 relative bg-gradient-to-br from-[#0F172A] via-[#1E3A5F] to-[#0A2540] overflow-hidden"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1, ease: "easeOut" }}
+        className="hidden lg:flex lg:w-1/2 relative overflow-hidden items-center justify-center"
       >
-        <AnimatedGradient />
-        <AnimatedParticles />
-        
-        {/* Gradiente overlay adicional */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent z-0" />
-        
-        <div className="relative z-10 flex flex-col justify-center items-start px-16 xl:px-20 text-white">
-          {/* Logo com animação */}
+        <div className="relative z-10 max-w-2xl mx-auto text-center px-8">
+          {/* Logo minimalista */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.8, y: 30 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className="mb-10"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+            className="mb-16"
           >
-            <motion.div
-              whileHover={{ scale: 1.05, rotate: [0, -5, 5, -5, 0] }}
-              transition={{ duration: 0.5 }}
-              className="w-24 h-24 rounded-3xl bg-gradient-to-br from-white/20 to-white/5 backdrop-blur-xl flex items-center justify-center shadow-2xl border border-white/20 relative overflow-hidden"
-            >
-              <div className="absolute inset-0 bg-gradient-to-br from-[var(--brand)]/20 to-transparent opacity-50" />
-              <img 
-                src="/icons/golf_fox_logo.svg" 
-                alt="GolfFox Logo" 
-                className="w-20 h-20 relative z-10 drop-shadow-2xl"
-              />
-        <motion.div
-                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                animate={{
-                  x: ['-100%', '200%'],
-                }}
-                transition={{
-                  duration: 3,
-                  repeat: Infinity,
-                  repeatDelay: 2,
-                  ease: "linear",
-                }}
-              />
-            </motion.div>
+            <div className="inline-flex items-center justify-center w-24 h-24 rounded-3xl bg-gradient-to-br from-[#F97316] to-[#EA580C] p-[2px] shadow-2xl shadow-orange-500/20">
+              <div className="w-full h-full rounded-3xl bg-black flex items-center justify-center">
+                <img 
+                  src="/icons/golf_fox_logo.svg" 
+                  alt="Golf Fox" 
+                  className="w-16 h-16"
+                />
+              </div>
+            </div>
           </motion.div>
 
-          {/* Título principal */}
+          {/* Headline minimalista (estilo Apple) */}
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2, ease: 'easeOut' }}
-            className="text-4xl xl:text-5xl 2xl:text-6xl font-extrabold mb-6 leading-tight tracking-tight"
-            style={{
-              background: 'linear-gradient(135deg, #FFFFFF 0%, #E0E7FF 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
-            }}
+            transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            className="text-5xl xl:text-7xl font-bold mb-8 leading-[1.1] tracking-tight"
           >
-            Gestão Completa de
+            <span className="text-white">O futuro do</span>
             <br />
-            <span className="bg-gradient-to-r from-[var(--brand)] to-[#FB923C] bg-clip-text text-transparent">
-              Fretamento Corporativo
+            <span className="bg-gradient-to-r from-[#F97316] via-[#FB923C] to-[#FDBA74] bg-clip-text text-transparent">
+              transporte corporativo
             </span>
           </motion.h1>
 
-          {/* Descrição */}
+          {/* Subtítulo clean */}
           <motion.p
-            initial={{ opacity: 0, y: 16 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.3, ease: 'easeOut' }}
-            className="text-lg xl:text-xl 2xl:text-2xl text-white/90 leading-relaxed max-w-lg mb-10 font-light"
+            transition={{ duration: 0.8, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+            className="text-xl text-white/60 mb-16 font-light leading-relaxed max-w-xl mx-auto"
           >
-            Plataforma SaaS completa para gestão de transporte de colaboradores porta-a-porta. Conecte empresas, transportadoras e motoristas em tempo real.
+            Gerencie frotas, otimize rotas e monitore operações em tempo real com inteligência artificial.
           </motion.p>
 
-          {/* Link para site */}
-          <motion.a
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.4, ease: 'easeOut' }}
-            href="https://golffox.com.br"
-            target="_blank"
-            rel="noopener noreferrer"
-            whileHover={{ x: 5 }}
-            className="inline-flex items-center gap-2 text-white/80 hover:text-white text-base font-medium transition-colors group mb-12"
-          >
-            <span className="underline underline-offset-4 decoration-2 decoration-white/30 group-hover:decoration-white/60 transition-all">
-              Saiba mais sobre a GolfFox
-            </span>
-            <motion.span
-              animate={{ x: [0, 5, 0] }}
-              transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-            >
-              →
-            </motion.span>
-          </motion.a>
-
-          {/* Badges informativos */}
+          {/* Estatísticas (estilo Nike/Tesla) */}
           <motion.div
-            initial={{ opacity: 0, y: 16 }}
+            initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.5, ease: 'easeOut' }}
-            className="flex flex-wrap gap-3 mb-12"
+            transition={{ duration: 0.8, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
+            className="grid grid-cols-3 gap-8 pt-12 border-t border-white/10"
           >
-            <div className="px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center gap-2">
-              <Bus className="w-4 h-4 text-white" />
-              <span className="text-sm font-medium text-white">Frotas Gerenciadas</span>
-            </div>
-            <div className="px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center gap-2">
-              <MapPin className="w-4 h-4 text-white" />
-              <span className="text-sm font-medium text-white">Múltiplas Rotas</span>
-            </div>
-            <div className="px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center gap-2">
-              <Shield className="w-4 h-4 text-white" />
-              <span className="text-sm font-medium text-white">100% Seguro</span>
-            </div>
+            <StatItem value="24/7" label="Monitoramento" delay={0.5} />
+            <StatItem value="100%" label="Rastreável" delay={0.6} />
+            <StatItem value="< 1s" label="Tempo Real" delay={0.7} />
           </motion.div>
-          
-          {/* Features destacadas */}
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 max-w-2xl w-full">
-            <FeatureCard 
-              icon={Route} 
-              title="Planejamento de Rotas" 
-              description="Otimização automática com pontos de embarque/desembarque"
-              delay={0.6}
-            />
-            <FeatureCard 
-              icon={Bus} 
-              title="Rastreamento GPS" 
-              description="Monitoramento de veículos e motoristas em tempo real"
-              delay={0.7}
-            />
-            <FeatureCard 
-              icon={Clock} 
-              title="Check-in Digital" 
-              description="Controle de embarque via NFC, QR Code ou manual"
-              delay={0.8}
-            />
-            <FeatureCard 
-              icon={BarChart3} 
-              title="Gestão Completa" 
-              description="Controle de custos, frota, manutenção e relatórios"
-              delay={0.9}
-            />
-          </div>
         </div>
       </motion.div>
 

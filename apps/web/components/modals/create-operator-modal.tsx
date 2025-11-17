@@ -34,6 +34,8 @@ export function CreateOperatorModal({
     // Dados da Empresa
     companyName: "",
     cnpj: "",
+    stateRegistration: "",
+    municipalRegistration: "",
     address: "",
     addressNumber: "",
     addressComplement: "",
@@ -42,6 +44,7 @@ export function CreateOperatorModal({
     zipCode: "",
     companyPhone: "",
     companyEmail: "",
+    companyWebsite: "",
     // Dados do Responsável (que será o operador)
     responsibleName: "",
     responsibleEmail: "",
@@ -123,12 +126,15 @@ export function CreateOperatorModal({
         // Dados da Empresa
         companyName: formData.companyName,
         cnpj: formData.cnpj || null,
+        stateRegistration: formData.stateRegistration || null,
+        municipalRegistration: formData.municipalRegistration || null,
         address: fullAddress || formData.address || null,
         city: formData.city || null,
         state: formData.state || null,
         zipCode: formData.zipCode || null,
         companyPhone: formData.companyPhone || null,
         companyEmail: formData.companyEmail || null,
+        companyWebsite: formData.companyWebsite || null,
       }
       
       // Adicionar dados do responsável apenas se fornecidos (opcional)
@@ -190,6 +196,8 @@ export function CreateOperatorModal({
       setFormData({
         companyName: "",
         cnpj: "",
+        stateRegistration: "",
+        municipalRegistration: "",
         address: "",
         addressNumber: "",
         addressComplement: "",
@@ -198,6 +206,7 @@ export function CreateOperatorModal({
         zipCode: "",
         companyPhone: "",
         companyEmail: "",
+        companyWebsite: "",
         responsibleName: "",
         responsibleEmail: "",
         responsiblePhone: "",
@@ -294,7 +303,29 @@ export function CreateOperatorModal({
                   />
                 </div>
 
-                <div className="space-y-2 md:col-span-2">
+                <div className="space-y-2">
+                  <Label htmlFor="stateRegistration">Inscrição Estadual</Label>
+                  <Input
+                    id="stateRegistration"
+                    value={formData.stateRegistration}
+                    onChange={(e) => setFormData({ ...formData, stateRegistration: e.target.value })}
+                    placeholder="123456789"
+                    disabled={loading}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="municipalRegistration">Inscrição Municipal</Label>
+                  <Input
+                    id="municipalRegistration"
+                    value={formData.municipalRegistration}
+                    onChange={(e) => setFormData({ ...formData, municipalRegistration: e.target.value })}
+                    placeholder="987654321"
+                    disabled={loading}
+                  />
+                </div>
+
+                <div className="space-y-2">
                   <Label htmlFor="companyEmail">Email da Empresa</Label>
                   <Input
                     id="companyEmail"
@@ -302,6 +333,18 @@ export function CreateOperatorModal({
                     value={formData.companyEmail}
                     onChange={(e) => setFormData({ ...formData, companyEmail: e.target.value })}
                     placeholder="contato@empresa.com"
+                    disabled={loading}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="companyWebsite">Website</Label>
+                  <Input
+                    id="companyWebsite"
+                    type="url"
+                    value={formData.companyWebsite}
+                    onChange={(e) => setFormData({ ...formData, companyWebsite: e.target.value })}
+                    placeholder="https://www.empresa.com"
                     disabled={loading}
                   />
                 </div>
