@@ -115,13 +115,13 @@ jobs:
       run: flutter build apk --release --dart-define=SENTRY_DSN_MOBILE=${SENTRY_DSN_MOBILE}
       
     - name: Upload web build artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v5
       with:
         name: web-build
         path: build/web/
         
     - name: Upload Android APK
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v5
       with:
         name: android-apk
         path: build/app/outputs/flutter-apk/app-release.apk
@@ -210,7 +210,7 @@ jobs:
       run: npm run build
       
     - name: Upload Next.js build artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v5
       with:
         name: nextjs-build
         path: web-app/.next/
