@@ -25,7 +25,8 @@ import {
   FileText,
   Building2,
   Settings,
-  MessageSquare
+  MessageSquare,
+  Building
 } from "lucide-react"
 import { useNavigation } from "@/hooks/use-navigation"
 import { useEffect } from "react"
@@ -61,7 +62,7 @@ const adminMenuItems = [
     description: "Frota e manutenção"
   },
   { 
-    icon: Truck, 
+    icon: Building, 
     label: "Transportadoras", 
     href: "/admin/transportadoras",
     description: "Gestão de transportadoras"
