@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Mail, Lock, Eye, EyeOff, Moon, Sun, Globe, ChevronDown, Route, Shield, TrendingUp, Zap, Sparkles } from "lucide-react"
+import { Mail, Lock, Eye, EyeOff, Moon, Sun, Globe, ChevronDown, Route, Shield, TrendingUp, Zap, Bus, MapPin, Clock, BarChart3 } from "lucide-react"
 import { motion } from "framer-motion"
 import dynamic from "next/dynamic"
 import { AuthManager } from "@/lib/auth"
@@ -654,10 +654,10 @@ function LoginContent() {
               backgroundClip: 'text',
             }}
           >
-            Gestão Inteligente
+            Gestão Completa de
             <br />
             <span className="bg-gradient-to-r from-[var(--brand)] to-[#FB923C] bg-clip-text text-transparent">
-              de Frotas
+              Fretamento Corporativo
             </span>
           </motion.h1>
 
@@ -668,7 +668,7 @@ function LoginContent() {
             transition={{ duration: 0.5, delay: 0.3, ease: 'easeOut' }}
             className="text-lg xl:text-xl 2xl:text-2xl text-white/90 leading-relaxed max-w-lg mb-10 font-light"
           >
-            Otimize rotas, monitore veículos em tempo real e reduza custos operacionais com a plataforma mais completa do mercado.
+            Plataforma SaaS completa para gestão de transporte de colaboradores porta-a-porta. Conecte empresas, transportadoras e motoristas em tempo real.
           </motion.p>
 
           {/* Link para site */}
@@ -692,31 +692,52 @@ function LoginContent() {
               →
             </motion.span>
           </motion.a>
+
+          {/* Badges informativos */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.5, ease: 'easeOut' }}
+            className="flex flex-wrap gap-3 mb-12"
+          >
+            <div className="px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center gap-2">
+              <Bus className="w-4 h-4 text-white" />
+              <span className="text-sm font-medium text-white">Frotas Gerenciadas</span>
+            </div>
+            <div className="px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center gap-2">
+              <MapPin className="w-4 h-4 text-white" />
+              <span className="text-sm font-medium text-white">Múltiplas Rotas</span>
+            </div>
+            <div className="px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center gap-2">
+              <Shield className="w-4 h-4 text-white" />
+              <span className="text-sm font-medium text-white">100% Seguro</span>
+            </div>
+          </motion.div>
           
           {/* Features destacadas */}
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 max-w-2xl w-full">
             <FeatureCard 
               icon={Route} 
-              title="Rotas Inteligentes" 
-              description="Otimização automática de trajetos"
+              title="Planejamento de Rotas" 
+              description="Otimização automática com pontos de embarque/desembarque"
               delay={0.6}
             />
             <FeatureCard 
-              icon={Zap} 
-              title="Tempo Real" 
-              description="Monitoramento em tempo real"
+              icon={Bus} 
+              title="Rastreamento GPS" 
+              description="Monitoramento de veículos e motoristas em tempo real"
               delay={0.7}
             />
             <FeatureCard 
-              icon={TrendingUp} 
-              title="Analytics" 
-              description="Relatórios e métricas detalhadas"
+              icon={Clock} 
+              title="Check-in Digital" 
+              description="Controle de embarque via NFC, QR Code ou manual"
               delay={0.8}
             />
             <FeatureCard 
-              icon={Shield} 
-              title="Segurança" 
-              description="Proteção de dados avançada"
+              icon={BarChart3} 
+              title="Gestão Completa" 
+              description="Controle de custos, frota, manutenção e relatórios"
               delay={0.9}
             />
           </div>
@@ -743,8 +764,8 @@ function LoginContent() {
             />
           </motion.div>
           <div>
-            <h2 className="text-xl font-bold leading-tight mb-1">Gestão Inteligente de Frotas</h2>
-            <p className="text-sm text-white/80">Plataforma completa para gestão de frotas</p>
+            <h2 className="text-xl font-bold leading-tight mb-1">Fretamento Corporativo</h2>
+            <p className="text-sm text-white/80">Gestão completa de transporte de colaboradores</p>
           </div>
               </div>
       </motion.div>
@@ -881,7 +902,7 @@ function LoginContent() {
                     Entre em sua conta
                   </h1>
                   <p className="text-base sm:text-lg text-gray-600">
-                    Acesse sua frota com inteligência e controle total.
+                    Gerencie sua operação de transporte com inteligência e controle total.
                   </p>
                 </div>
 
