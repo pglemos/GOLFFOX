@@ -71,32 +71,11 @@ function LoginContent() {
   const [success, setSuccess] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [rememberMe, setRememberMe] = useState(false)
-  const [darkMode, setDarkMode] = useState(false)
-  const [language, setLanguage] = useState("Português")
-  const [showLanguageDropdown, setShowLanguageDropdown] = useState(false)
-  const languageDropdownRef = useRef<HTMLDivElement | null>(null)
   const emailInputRef = useRef<HTMLInputElement | null>(null)
   const passwordInputRef = useRef<HTMLInputElement | null>(null)
   const [failedAttempts, setFailedAttempts] = useState<number>(0)
   const [blockedUntil, setBlockedUntil] = useState<number | null>(null)
   const [transitioning, setTransitioning] = useState<boolean>(false)
-
-  // Fechar dropdown ao clicar fora
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (languageDropdownRef.current && !languageDropdownRef.current.contains(event.target as Node)) {
-        setShowLanguageDropdown(false)
-      }
-    }
-
-    if (showLanguageDropdown) {
-      document.addEventListener('mousedown', handleClickOutside)
-    }
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [showLanguageDropdown])
 
 
   // Verificar sessão apenas uma vez no mount, com tratamento de erro robusto
@@ -661,358 +640,255 @@ function LoginContent() {
         </div>
       </motion.div>
 
-      {/* Banner Promocional Mobile */}
-      <motion.div
-        initial={{ opacity: 0, y: -50 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="lg:hidden relative bg-gradient-to-r from-[#0F172A] via-[#1E3A5F] to-[#0A2540] text-white py-8 px-6 overflow-hidden"
-      >
-        <AnimatedParticles />
-        <div className="relative z-10 flex items-center gap-4">
+      {/* Seção Direita - Formulário Minimalista */}
+      <div className="flex-1 lg:w-1/2 bg-white flex flex-col min-h-screen relative">
+        {/* Barra superior minimalista (apenas desktop) */}
+        <div className="hidden lg:flex justify-end items-center p-8 relative z-10">
           <motion.div
-            whileHover={{ scale: 1.1, rotate: 5 }}
-            className="w-14 h-14 rounded-2xl bg-gradient-to-br from-white/20 to-white/5 backdrop-blur-xl flex items-center justify-center shadow-2xl border border-white/20 flex-shrink-0"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
+            className="text-sm text-gray-400"
           >
-            <img 
-              src="/icons/golf_fox_logo.svg" 
-              alt="GolfFox Logo" 
-              className="w-12 h-12"
-            />
+            Novo por aqui? <span className="text-gray-900 font-medium cursor-not-allowed">Fale com vendas</span>
           </motion.div>
-          <div>
-            <h2 className="text-xl font-bold leading-tight mb-1">Fretamento Corporativo</h2>
-            <p className="text-sm text-white/80">Gestão completa de transporte de colaboradores</p>
-          </div>
-              </div>
-      </motion.div>
-
-      {/* Seção Direita - Formulário */}
-      <div className="flex-1 lg:w-1/2 bg-gradient-to-br from-[#FAF9F7] via-white to-[#F8FAFC] flex flex-col min-h-screen relative">
-        {/* Padrão de fundo sutil */}
-        <div className="absolute inset-0 opacity-[0.02] pointer-events-none" style={{
-          backgroundImage: `radial-gradient(circle at 2px 2px, #1E3A5F 1px, transparent 0)`,
-          backgroundSize: '40px 40px',
-        }} />
-
-        {/* Controles do Topo */}
-        <div className="flex justify-end items-center gap-3 sm:gap-4 p-5 sm:p-6 lg:p-8 relative z-10">
-          {/* Dropdown de Idioma */}
-          <div className="relative" ref={languageDropdownRef}>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => setShowLanguageDropdown(!showLanguageDropdown)}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium text-gray-700 hover:bg-white/80 hover:shadow-md transition-all duration-200 bg-white/50 backdrop-blur-sm border border-gray-200/50"
-              aria-expanded={showLanguageDropdown}
-              aria-haspopup="true"
-            >
-              <Globe className="w-4 h-4" />
-              <span className="hidden sm:inline">{language}</span>
-              <span className="sm:hidden">PT</span>
-              <motion.div
-                animate={{ rotate: showLanguageDropdown ? 180 : 0 }}
-                transition={{ duration: 0.2 }}
-              >
-                <ChevronDown className="w-4 h-4" />
-              </motion.div>
-            </motion.button>
-            {showLanguageDropdown && (
-              <motion.div
-                initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                className="absolute right-0 mt-2 w-44 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200/50 py-2 z-50 overflow-hidden"
-              >
-                {["Português", "English", "Español"].map((lang, index) => (
-                  <motion.button
-                    key={lang}
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.05 }}
-                    whileHover={{ x: 4, backgroundColor: "rgba(249, 115, 22, 0.1)" }}
-                    onClick={() => {
-                      setLanguage(lang)
-                      setShowLanguageDropdown(false)
-                    }}
-                    className={`w-full text-left px-4 py-3 text-sm transition-all duration-200 ${
-                      language === lang
-                        ? "bg-gradient-to-r from-[var(--brand)]/10 to-transparent text-[var(--brand)] font-semibold border-l-2 border-[var(--brand)]"
-                        : "text-gray-700 hover:text-gray-900"
-                    }`}
-                  >
-                    {lang}
-                  </motion.button>
-                ))}
-              </motion.div>
-            )}
-              </div>
-
-          {/* Toggle Dark Mode */}
-          <motion.button
-            whileHover={{ scale: 1.1, rotate: 15 }}
-            whileTap={{ scale: 0.9 }}
-            onClick={() => setDarkMode(!darkMode)}
-            className="p-2.5 rounded-xl text-gray-700 hover:bg-white/80 hover:shadow-md transition-all duration-200 bg-white/50 backdrop-blur-sm border border-gray-200/50"
-            aria-label="Toggle dark mode"
-          >
-            <motion.div
-              animate={{ rotate: darkMode ? 180 : 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-            </motion.div>
-          </motion.button>
             </div>
 
-        {/* Card de Login */}
-        <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-12 xl:px-16 py-8 sm:py-12 relative z-10">
+        {/* Formulário de Login Minimalista */}
+        <div className="flex-1 flex items-center justify-center px-6 sm:px-8 lg:px-16 py-12 relative z-10">
           <motion.div
-            initial={{ opacity: 0, y: 12 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, ease: "easeOut" }}
-            className="w-full max-w-lg"
+            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+            className="w-full max-w-md"
           >
-            <Card className="relative p-8 sm:p-10 lg:p-12 bg-white shadow-xl border border-gray-100 overflow-hidden">
-              {/* Efeito sutil de gradiente */}
-              <div className="absolute inset-0 bg-gradient-to-br from-[var(--brand)]/3 via-transparent to-[var(--accent)]/3 pointer-events-none" />
-
-              {loading && (
-                <motion.div 
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.2 }}
-                  className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-white/95 backdrop-blur-sm rounded-2xl"
-                >
-                  <motion.div 
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                    className="w-12 h-12 border-4 border-[var(--brand)]/20 border-t-[var(--brand)] rounded-full"
-                  />
-                  <motion.p 
-                    initial={{ y: 10, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.1 }}
-                    className="mt-4 text-sm text-gray-600 font-medium"
-                  >
-                    {transitioning ? "Redirecionando..." : "Validando credenciais…"}
-                  </motion.p>
-                </motion.div>
-              )}
-
-              <div className="relative z-10">
-                {/* Logo e Título */}
-                <div className="mb-8 sm:mb-10">
-                  <div className="flex items-center gap-4 mb-6">
-                    <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center flex-shrink-0 bg-gradient-to-br from-[var(--brand)]/10 to-[var(--brand)]/5">
-                      <img 
-                        src="/icons/golf_fox_logo.svg" 
-                        alt="GolfFox Logo" 
-                        className="w-12 h-12 sm:w-14 sm:h-14"
-                      />
-                    </div>
-                    <span className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">
-                      GOLF FOX
-                    </span>
+            <div className="relative">
+              {/* Logo mobile */}
+              <div className="lg:hidden mb-12 text-center">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-[#F97316] to-[#EA580C] p-[2px] shadow-lg shadow-orange-500/20 mb-4">
+                  <div className="w-full h-full rounded-2xl bg-white flex items-center justify-center">
+                    <img 
+                      src="/icons/golf_fox_logo.svg" 
+                      alt="Golf Fox" 
+                      className="w-10 h-10"
+                    />
                   </div>
-                  <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-3 tracking-tight leading-tight">
-                    Entre em sua conta
-                  </h1>
-                  <p className="text-base sm:text-lg text-gray-600">
-                    Gerencie sua operação de transporte com inteligência e controle total.
-                  </p>
                 </div>
+                <h2 className="text-xl font-bold text-gray-900">Golf Fox</h2>
+              </div>
 
-                {/* Mensagens de Erro/Sucesso */}
+              {/* Loading overlay minimalista */}
+              <AnimatePresence>
+                {loading && (
+                  <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white/98 backdrop-blur-sm rounded-3xl"
+                  >
+                    <motion.div 
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                      className="w-10 h-10 border-2 border-gray-200 border-t-[#F97316] rounded-full"
+                    />
+                    <motion.p 
+                      initial={{ y: 10, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      transition={{ delay: 0.1 }}
+                      className="mt-4 text-sm text-gray-500 font-medium"
+                    >
+                      {transitioning ? "Entrando..." : "Autenticando"}
+                    </motion.p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Título minimalista */}
+              <div className="mb-12">
+                <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-3 tracking-tight">
+                  Entrar
+                </h1>
+                <p className="text-lg text-gray-500 font-light">
+                  Acesse sua conta Golf Fox
+                </p>
+              </div>
+
+              {/* Mensagens minimalistas */}
+              <AnimatePresence mode="wait">
                 {error && (
-                  <div
-                    className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700"
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="mb-8 p-4 bg-red-50/50 border border-red-100 rounded-2xl text-sm text-red-600"
                     role="alert"
-                    aria-live="assertive"
                   >
                     {error}
-                  </div>
+                  </motion.div>
                 )}
 
                 {success && !error && (
-                  <div className="mb-6 p-4 bg-emerald-50 border border-emerald-200 rounded-xl text-sm text-emerald-700 flex items-center gap-2">
-                    <span className="font-medium">Login realizado com sucesso!</span>
-                  </div>
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="mb-8 p-4 bg-green-50/50 border border-green-100 rounded-2xl text-sm text-green-600 flex items-center gap-2"
+                  >
+                    <Sparkles className="w-4 h-4" />
+                    <span>Login realizado com sucesso!</span>
+                  </motion.div>
                 )}
+              </AnimatePresence>
 
-                {/* Formulário */}
-            <form
-              onSubmit={(e) => {
-                e.preventDefault()
-                // ✅ Prevenir múltiplos submits e iniciar feedback visual imediato
-                if (!loading && !transitioning) {
-                  // Iniciar loading state IMEDIATAMENTE para melhor UX
-                  handleLogin()
-                }
-              }}
-                  className="space-y-6"
-                >
-                  {/* Campo Email */}
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2.5" htmlFor="login-email">
-                      E-mail
-                    </label>
-                    <div className="relative group">
-                      <div className="absolute left-4 top-1/2 -translate-y-1/2 z-10">
-                        <Mail className="h-5 w-5 text-gray-400 group-focus-within:text-[var(--brand)] transition-colors duration-200" />
-                      </div>
+              {/* Formulário minimalista */}
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault()
+                  if (!loading && !transitioning) {
+                    handleLogin()
+                  }
+                }}
+                className="space-y-6"
+              >
+                {/* Campo Email */}
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700" htmlFor="login-email">
+                    E-mail
+                  </label>
+                  <div className="relative">
                     <Input
                       id="login-email"
                       ref={emailInputRef}
                       type="email"
-                      placeholder="seu@email.com"
+                      placeholder="nome@empresa.com"
                       value={email}
                       onChange={(e) => setEmail(sanitizeInput(e.target.value))}
                       onKeyDown={(e) => {
-                        // ✅ Permitir submit com Enter no campo de email para melhor UX
                         if (e.key === 'Enter' && !loading && !transitioning && password.trim().length > 0) {
                           e.preventDefault()
                           passwordInputRef.current?.focus()
                         }
                       }}
-                        aria-invalid={email && !emailValid ? true : undefined}
                       autoComplete="email"
-                        className={`pl-12 pr-4 h-12 bg-white border transition-all duration-200 ${
-                          fieldErrors.email
-                            ? "border-red-300 focus:border-red-400 focus:ring-2 focus:ring-red-100"
-                            : "border-gray-200 focus:border-[var(--brand)] focus:ring-2 focus:ring-[var(--brand)]/10 hover:border-gray-300"
-                        } rounded-lg text-base`}
+                      className={`w-full h-14 px-4 bg-gray-50 border ${
+                        fieldErrors.email
+                          ? "border-red-300 focus:border-red-500 focus:ring-red-200"
+                          : "border-gray-200 focus:border-[#F97316] focus:ring-orange-100"
+                      } rounded-2xl text-base transition-all focus:ring-2 focus:bg-white placeholder:text-gray-400`}
                     />
-                  </div>
                     {fieldErrors.email && (
-                      <p className="mt-2 text-xs text-red-600 font-medium" aria-live="assertive">
+                      <p className="mt-2 text-xs text-red-600" aria-live="assertive">
                         {fieldErrors.email}
                       </p>
                     )}
                   </div>
+                </div>
 
-                  {/* Campo Senha */}
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2.5" htmlFor="login-password">
-                      Senha
-                    </label>
-                    <div className="relative group">
-                      <div className="absolute left-4 top-1/2 -translate-y-1/2 z-10">
-                        <Lock className="h-5 w-5 text-gray-400 group-focus-within:text-[var(--brand)] transition-colors duration-200" />
-                      </div>
+                {/* Campo Senha */}
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700" htmlFor="login-password">
+                    Senha
+                  </label>
+                  <div className="relative">
                     <Input
                       id="login-password"
-                        type={showPassword ? "text" : "password"}
-                      placeholder="••••••••"
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Digite sua senha"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       onKeyDown={(e) => {
-                        // ✅ Permitir submit com Enter no campo de senha para melhor UX
                         if (e.key === 'Enter' && !loading && !transitioning) {
                           e.preventDefault()
                           handleLogin()
                         }
                       }}
                       ref={passwordInputRef}
-                        aria-invalid={password && !passwordValid ? true : undefined}
                       autoComplete="current-password"
-                        className={`pl-12 pr-12 h-12 bg-white border transition-all duration-200 ${
-                          fieldErrors.password
-                            ? "border-red-300 focus:border-red-400 focus:ring-2 focus:ring-red-100"
-                            : "border-gray-200 focus:border-[var(--brand)] focus:ring-2 focus:ring-[var(--brand)]/10 hover:border-gray-300"
-                        } rounded-lg text-base`}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-lg hover:bg-gray-100"
-                        aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
-                      >
-                        {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                      </button>
-                  </div>
+                      className={`w-full h-14 px-4 pr-12 bg-gray-50 border ${
+                        fieldErrors.password
+                          ? "border-red-300 focus:border-red-500 focus:ring-red-200"
+                          : "border-gray-200 focus:border-[#F97316] focus:ring-orange-100"
+                      } rounded-2xl text-base transition-all focus:ring-2 focus:bg-white placeholder:text-gray-400`}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 transition-colors p-2 rounded-lg hover:bg-gray-100"
+                      aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
+                    >
+                      {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                    </button>
                     {fieldErrors.password && (
-                      <p className="mt-2 text-xs text-red-600 font-medium" aria-live="assertive">
+                      <p className="mt-2 text-xs text-red-600" aria-live="assertive">
                         {fieldErrors.password}
                       </p>
                     )}
                   </div>
+                </div>
 
-                  {/* Checkbox e Link */}
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                    <div className="flex items-center gap-3">
-                      <Checkbox
-                        id="remember-me"
-                        checked={rememberMe}
-                        onCheckedChange={(checked) => setRememberMe(checked === true)}
-                        className="h-4 w-4 rounded border-gray-300 data-[state=checked]:bg-[var(--brand)] data-[state=checked]:border-[var(--brand)] data-[state=checked]:text-white focus-visible:ring-2 focus-visible:ring-[var(--brand)]/20"
-                      />
-                      <label
-                        htmlFor="remember-me"
-                        className="text-sm text-gray-600 cursor-pointer select-none hover:text-gray-700 transition-colors"
-                      >
-                        Manter conectado
-                      </label>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setError("Funcionalidade em desenvolvimento")
-                      }}
-                      className="text-sm font-medium text-[var(--brand)] hover:text-[var(--brand-hover)] transition-colors"
-                    >
-                      Esqueceu sua senha?
-                    </button>
-                  </div>
+                {/* Opções extras */}
+                <div className="flex items-center justify-between text-sm">
+                  <label className="flex items-center gap-2 cursor-pointer group">
+                    <Checkbox
+                      id="remember-me"
+                      checked={rememberMe}
+                      onCheckedChange={(checked) => setRememberMe(checked === true)}
+                      className="h-4 w-4 rounded border-gray-300 data-[state=checked]:bg-[#F97316] data-[state=checked]:border-[#F97316]"
+                    />
+                    <span className="text-gray-600 group-hover:text-gray-900 transition-colors">
+                      Lembrar-me
+                    </span>
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setError("Funcionalidade em desenvolvimento")}
+                    className="text-gray-600 hover:text-gray-900 transition-colors"
+                  >
+                    Esqueceu a senha?
+                  </button>
+                </div>
 
-                  {/* Botão Entrar */}
-                  <div>
-                    <Button
-                      type="submit"
-                      disabled={loading || transitioning}
-                      className="w-full h-12 bg-[var(--brand)] hover:bg-[var(--brand-hover)] text-white font-semibold text-base shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg relative overflow-hidden"
-                    >
-                      {loading || transitioning ? (
-                        <span className="flex items-center justify-center gap-2">
-                          <motion.span 
-                            animate={{ rotate: 360 }}
-                            transition={{ duration: 0.8, repeat: Infinity, ease: "linear" }}
-                            className="rounded-full h-4 w-4 border-2 border-white/30 border-t-white"
-                          />
-                          {transitioning ? "Redirecionando..." : "Validando..."}
-                        </span>
-                      ) : (
-                        "Entrar"
-                      )}
-                      {/* Efeito de shimmer quando carregando */}
-                      {loading && (
-                        <motion.div
-                          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                          animate={{ x: ['-100%', '200%'] }}
-                          transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+                {/* Botão de Login Premium */}
+                <motion.div whileHover={{ scale: loading || transitioning ? 1 : 1.01 }} whileTap={{ scale: loading || transitioning ? 1 : 0.99 }}>
+                  <Button
+                    type="submit"
+                    disabled={loading || transitioning}
+                    className="w-full h-14 bg-gradient-to-r from-[#F97316] to-[#EA580C] hover:from-[#EA580C] hover:to-[#F97316] text-white font-semibold text-base shadow-lg shadow-orange-500/20 hover:shadow-xl hover:shadow-orange-500/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed rounded-2xl relative overflow-hidden group"
+                  >
+                    {loading || transitioning ? (
+                      <span className="flex items-center justify-center gap-2">
+                        <motion.span 
+                          animate={{ rotate: 360 }}
+                          transition={{ duration: 0.8, repeat: Infinity, ease: "linear" }}
+                          className="rounded-full h-4 w-4 border-2 border-white/30 border-t-white"
                         />
-                      )}
-                    </Button>
-                  </div>
-            </form>
+                        {transitioning ? "Entrando..." : "Autenticando"}
+                      </span>
+                    ) : (
+                      <span className="flex items-center justify-center gap-2">
+                        Entrar
+                        <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                      </span>
+                    )}
+                  </Button>
+                </motion.div>
+              </form>
 
-                {/* Estado de Transição */}
-                {transitioning && !loading && (
-                  <div className="mt-6 flex items-center justify-center gap-2" aria-live="polite">
-                    <div className="animate-spin rounded-full h-5 w-5 border-2 border-[var(--brand)]/20 border-t-[var(--brand)]" />
-                    <span className="text-sm text-gray-600">Redirecionando…</span>
-                  </div>
-                )}
-
-                {/* Mensagem JavaScript */}
-            <noscript>
-                  <p className="mt-6 text-xs text-center text-gray-500">
-                Ative o JavaScript para utilizar o login. Caso não seja possível, entre em contato com o suporte.
-              </p>
-            </noscript>
+              {/* Footer */}
+              <div className="mt-12 text-center">
+                <p className="text-sm text-gray-500">
+                  Protegido por{" "}
+                  <span className="text-gray-700 font-medium">Golf Fox Security</span>
+                </p>
               </div>
-          </Card>
-        </motion.div>
+
+              <noscript>
+                <p className="mt-6 text-xs text-center text-gray-500">
+                  Ative o JavaScript para utilizar o login.
+                </p>
+              </noscript>
+            </div>
+          </motion.div>
         </div>
       </div>
     </div>
