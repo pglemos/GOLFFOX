@@ -52,10 +52,10 @@ const adminMenuItems = [
     description: "Frota e manutenção"
   },
   { 
-    icon: Users, 
-    label: "Motoristas", 
-    href: "/admin/motoristas",
-    description: "Cadastro e ranking"
+    icon: Truck, 
+    label: "Transportadoras", 
+    href: "/admin/transportadoras",
+    description: "Gestão de transportadoras"
   },
   { 
     icon: Briefcase, 
