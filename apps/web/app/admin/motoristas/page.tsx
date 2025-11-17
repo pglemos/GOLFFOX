@@ -310,6 +310,7 @@ export default function MotoristasPage() {
               </Card>
             )}
           </div>
+        )}
 
         {/* Modal de Motorista */}
         <DriverModal
