@@ -526,16 +526,15 @@ export default function CarrierVeiculosPage() {
                 ))}
               </div>
             )}
-              {filteredVeiculos.length === 0 && (
-                <Card className="p-12 text-center">
-                  <Truck className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium mb-2">Nenhum veículo encontrado</h3>
-                  <p className="text-sm text-[var(--ink-muted)]">
-                    {searchQuery ? "Tente ajustar sua busca" : "Não há veículos cadastrados"}
-                  </p>
-                </Card>
-              )}
-            </div>
+            {filteredVeiculos.length === 0 && (
+              <Card className="p-12 text-center">
+                <Truck className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-lg font-medium mb-2">Nenhum veículo encontrado</h3>
+                <p className="text-sm text-[var(--ink-muted)]">
+                  {searchQuery ? "Tente ajustar sua busca" : "Não há veículos cadastrados"}
+                </p>
+              </Card>
+            )}
           </TabsContent>
 
           <TabsContent value="documents" className="space-y-6">

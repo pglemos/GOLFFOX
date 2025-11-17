@@ -6,10 +6,10 @@ import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { Users, Search, Mail, Phone, Building, AlertCircle, Plus } from "lucide-react"
+import { Users, Search, Mail, Phone, Building, AlertCircle, Plus, MoreVertical, Edit, Trash2 } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
-import { notifyError } from "@/lib/toast"
+import { notifySuccess, notifyError } from "@/lib/toast"
 import { CSVImportModal } from "@/components/operator/csv-import-modal"
 import { FuncionarioModal } from "@/components/operator/funcionario-modal"
 import { FuncionariosErrorBoundary } from "./error-boundary"
@@ -23,8 +23,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { MoreVertical, Edit, Trash2 } from "lucide-react"
-import { notifySuccess, notifyError } from "@/lib/toast"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 
 interface Funcionario {

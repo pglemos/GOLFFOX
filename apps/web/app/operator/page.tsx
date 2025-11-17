@@ -15,7 +15,6 @@ import { DashboardCharts } from "@/components/operator/dashboard-charts"
 import { PeriodFilter, type PeriodFilter as PeriodFilterType } from "@/components/operator/period-filter"
 import { useOperatorKPIs, useControlTower } from "@/hooks/use-operator-data"
 import { useRealtimeKPIs, useRealtimeAlerts } from "@/hooks/use-realtime-updates"
-import { useState } from "react"
 
 export default function OperatorDashboard() {
   const router = useRouter()

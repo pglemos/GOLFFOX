@@ -294,22 +294,22 @@ export default function MotoristasPage() {
               </Card>
             )}
             {motoristas.length === 0 && !dataLoading && (
-            <Card className="p-12 text-center">
-              <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium mb-2">Nenhum motorista encontrado</h3>
-              <p className="text-sm text-[var(--ink-muted)] mb-4">
-                {searchQuery ? "Tente ajustar sua busca" : "Comece cadastrando seu primeiro motorista"}
-              </p>
-              <Button onClick={() => {
-                setSelectedDriver(null)
-                setIsModalOpen(true)
-              }}>
-                <Plus className="h-4 w-4 mr-2" />
-                Cadastrar Motorista
-              </Button>
-            </Card>
-          )}
-        </div>
+              <Card className="p-12 text-center">
+                <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-lg font-medium mb-2">Nenhum motorista encontrado</h3>
+                <p className="text-sm text-[var(--ink-muted)] mb-4">
+                  {searchQuery ? "Tente ajustar sua busca" : "Comece cadastrando seu primeiro motorista"}
+                </p>
+                <Button onClick={() => {
+                  setSelectedDriver(null)
+                  setIsModalOpen(true)
+                }}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Cadastrar Motorista
+                </Button>
+              </Card>
+            )}
+          </div>
 
         {/* Modal de Motorista */}
         <DriverModal
