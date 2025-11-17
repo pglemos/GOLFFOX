@@ -56,12 +56,6 @@ const adminMenuItems = [
     description: "Gerenciar itinerários"
   },
   { 
-    icon: Truck, 
-    label: "Veículos", 
-    href: "/admin/veiculos",
-    description: "Frota e manutenção"
-  },
-  { 
     icon: Building, 
     label: "Transportadoras", 
     href: "/admin/transportadoras",
