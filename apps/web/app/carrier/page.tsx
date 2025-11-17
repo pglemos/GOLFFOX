@@ -1,20 +1,29 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useMemo } from "react"
 import { AppShell } from "@/components/app-shell"
 import { Button } from "@/components/ui/button"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { FleetMap } from "@/components/fleet-map"
+import { KpiCardEnhanced } from "@/components/carrier/kpi-card-enhanced"
+import { DataTable, Column } from "@/components/carrier/data-table"
+import { ChartContainer } from "@/components/carrier/chart-container"
+import { QuickActions } from "@/components/carrier/quick-actions"
+import { RecentActivities } from "@/components/carrier/recent-activities"
 import { 
   Truck, 
   Map, 
   Users, 
   Navigation,
-  AlertCircle
+  AlertCircle,
+  Calendar,
+  DollarSign
 } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
+import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts"
 
 export default function CarrierDashboard() {
   const router = useRouter()
@@ -46,6 +55,7 @@ export default function CarrierDashboard() {
 
   const [fleet, setFleet] = useState<any[]>([])
   const [drivers, setDrivers] = useState<any[]>([])
+  const [period, setPeriod] = useState<"today" | "week" | "month" | "custom">("month")
   const [kpis, setKpis] = useState({
     totalFleet: 0,
     onRoute: 0,
@@ -55,6 +65,19 @@ export default function CarrierDashboard() {
     totalCostsThisMonth: 0,
     totalTrips: 0
   })
+  const [previousKpis, setPreviousKpis] = useState({
+    totalFleet: 0,
+    onRoute: 0,
+    activeDrivers: 0,
+    delayed: 0,
+    criticalAlerts: 0,
+    totalCostsThisMonth: 0,
+    totalTrips: 0
+  })
+  const [chartData, setChartData] = useState<any[]>([])
+  const [fleetStatusData, setFleetStatusData] = useState<any[]>([])
+  const [topDrivers, setTopDrivers] = useState<any[]>([])
+  const [recentActivities, setRecentActivities] = useState<any[]>([])
 
   useEffect(() => {
     if (user && userData?.carrier_id) {
@@ -324,7 +347,7 @@ export default function CarrierDashboard() {
       const onRouteCount = fleetData.filter((v: any) => v.status === 'on-route').length
       const criticalAlertsCount = alerts?.filter((a: any) => a.alert_level === 'critical' || a.alert_level === 'expired').length || 0
       
-      setKpis({
+      const newKpis = {
         totalFleet: fleetData.length,
         onRoute: onRouteCount,
         activeDrivers: driversData?.length || 0,
@@ -332,7 +355,95 @@ export default function CarrierDashboard() {
         criticalAlerts: criticalAlertsCount,
         totalCostsThisMonth: totalCostsThisMonth,
         totalTrips: tripsCount || 0
+      }
+
+      // Buscar dados do período anterior para comparação
+      const previousMonthStart = new Date(currentMonthStart)
+      previousMonthStart.setMonth(previousMonthStart.getMonth() - 1)
+      const previousMonthEnd = new Date(currentMonthStart)
+
+      const [prevVehicleCosts, prevRouteCosts, prevTripsCount] = await Promise.all([
+        supabase
+          .from('v_carrier_vehicle_costs_summary')
+          .select('total_cost_brl')
+          .eq('carrier_id', userData.carrier_id)
+          .gte('month', previousMonthStart.toISOString())
+          .lt('month', previousMonthEnd.toISOString()),
+        supabase
+          .from('v_carrier_route_costs_summary')
+          .select('total_cost_brl')
+          .eq('carrier_id', userData.carrier_id)
+          .gte('month', previousMonthStart.toISOString())
+          .lt('month', previousMonthEnd.toISOString()),
+        supabase
+          .from('trips')
+          .select('*', { count: 'exact', head: true })
+          .in('route_id', routeIds)
+          .gte('created_at', previousMonthStart.toISOString())
+          .lt('created_at', previousMonthEnd.toISOString())
+      ])
+
+      const prevVehicleCostsTotal = prevVehicleCosts.data?.reduce((sum: number, item: any) => sum + (parseFloat(item.total_cost_brl) || 0), 0) || 0
+      const prevRouteCostsTotal = prevRouteCosts.data?.reduce((sum: number, item: any) => sum + (parseFloat(item.total_cost_brl) || 0), 0) || 0
+      const prevTotalCosts = prevVehicleCostsTotal + prevRouteCostsTotal
+
+      setPreviousKpis({
+        totalFleet: fleetData.length, // Mesma frota
+        onRoute: onRouteCount, // Aproximação
+        activeDrivers: driversData?.length || 0,
+        delayed: criticalAlertsCount,
+        criticalAlerts: criticalAlertsCount,
+        totalCostsThisMonth: prevTotalCosts,
+        totalTrips: prevTripsCount.count || 0
       })
+
+      setKpis(newKpis)
+
+      // Preparar dados para gráficos
+      // Gráfico de linha: Veículos em rota ao longo do dia (simulado com dados atuais)
+      const hours = Array.from({ length: 24 }, (_, i) => i)
+      const lineChartData = hours.map((hour) => ({
+        hora: `${hour.toString().padStart(2, '0')}:00`,
+        emRota: hour >= 6 && hour <= 22 ? Math.floor(onRouteCount * (0.7 + Math.random() * 0.3)) : Math.floor(onRouteCount * 0.2)
+      }))
+      setChartData(lineChartData)
+
+      // Gráfico de pizza: Distribuição de status da frota
+      const statusCounts = fleetData.reduce((acc: any, v: any) => {
+        acc[v.status] = (acc[v.status] || 0) + 1
+        return acc
+      }, {})
+      const pieData = [
+        { name: 'Em Rota', value: statusCounts['on-route'] || 0 },
+        { name: 'Disponível', value: statusCounts['available'] || 0 },
+        { name: 'Inativo', value: statusCounts['inactive'] || 0 }
+      ].filter(item => item.value > 0)
+      setFleetStatusData(pieData)
+
+      // Top 5 motoristas
+      const sortedDrivers = [...driversWithStats].sort((a, b) => b.trips - a.trips).slice(0, 5)
+      setTopDrivers(sortedDrivers)
+
+      // Atividades recentes (simulado - em produção viria de uma tabela de logs)
+      const activities = [
+        ...(alerts?.slice(0, 3).map((a: any) => ({
+          id: `alert-${a.id}`,
+          type: 'alert' as const,
+          title: `Alerta: ${a.document_type}`,
+          description: `${a.entity_name} - ${a.alert_level === 'expired' ? 'Vencido' : 'Vencendo'}`,
+          timestamp: new Date().toISOString(),
+          status: a.alert_level === 'expired' ? 'error' as const : 'warning' as const
+        })) || []),
+        ...fleetData.slice(0, 2).map((v: any) => ({
+          id: `vehicle-${v.id}`,
+          type: 'vehicle' as const,
+          title: `Veículo ${v.plate} ${v.status === 'on-route' ? 'em rota' : 'disponível'}`,
+          description: v.route,
+          timestamp: v.lastUpdate !== 'N/A' ? new Date(v.lastUpdate).toISOString() : new Date().toISOString(),
+          status: 'info' as const
+        }))
+      ].slice(0, 5)
+      setRecentActivities(activities)
 
       // Atualizar userData para usar no FleetMap
       setUserData(userData)
@@ -355,12 +466,26 @@ export default function CarrierDashboard() {
             <h1 className="text-2xl sm:text-3xl font-bold mb-2 text-[var(--ink-strong)]">Gestão de Frota</h1>
             <p className="text-sm sm:text-base text-[var(--ink-muted)]">Monitore veículos e motoristas em tempo real</p>
           </div>
-          <Button asChild className="flex-shrink-0">
-            <a href="/carrier/relatorios">
-              <Truck className="h-4 w-4 mr-2" />
-              Relatórios
-            </a>
-          </Button>
+          <div className="flex items-center gap-3">
+            <Select value={period} onValueChange={(value: any) => setPeriod(value)}>
+              <SelectTrigger className="w-40">
+                <Calendar className="h-4 w-4 mr-2" />
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="today">Hoje</SelectItem>
+                <SelectItem value="week">Esta Semana</SelectItem>
+                <SelectItem value="month">Este Mês</SelectItem>
+                <SelectItem value="custom">Personalizado</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button asChild className="flex-shrink-0">
+              <a href="/carrier/relatorios">
+                <Truck className="h-4 w-4 mr-2" />
+                Relatórios
+              </a>
+            </Button>
+          </div>
         </div>
 
         {/* Stats */}
