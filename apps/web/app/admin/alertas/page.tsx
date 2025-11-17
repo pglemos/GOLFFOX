@@ -1,6 +1,7 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useMemo, useCallback } from "react"
+import dynamic from "next/dynamic"
 import { AppShell } from "@/components/app-shell"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -20,14 +21,20 @@ import {
   XCircle,
   Trash2
 } from "lucide-react"
-import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 import { notifySuccess, notifyError } from "@/lib/toast"
 import { motion } from "framer-motion"
 import { useAuthFast } from "@/hooks/use-auth-fast"
 import { useGlobalSync } from "@/hooks/use-global-sync"
-import { EditAlertModal } from "@/components/modals/edit-alert-modal"
 import { Edit } from "lucide-react"
+import { useDebounce } from "@/hooks/use-debounce"
+import { SkeletonList } from "@/components/ui/skeleton"
+
+// Lazy load modal pesado
+const EditAlertModal = dynamic(
+  () => import("@/components/modals/edit-alert-modal").then(m => ({ default: m.EditAlertModal })),
+  { ssr: false, loading: () => null }
+)
 
 const ALERT_TYPES = {
   route_delayed: { label: 'Rota Atrasada', severity: 'warning' },
@@ -43,6 +50,7 @@ export default function AlertasPage() {
   const [dataLoading, setDataLoading] = useState(true)
   const [alertas, setAlertas] = useState<any[]>([])
   const [searchQuery, setSearchQuery] = useState("")
+  const debouncedSearchQuery = useDebounce(searchQuery, 300)
   const [filtersExpanded, setFiltersExpanded] = useState(false)
   const [tempFilterType, setTempFilterType] = useState<string>("all")
   const [tempFilterSeverity, setTempFilterSeverity] = useState<string>("all")
@@ -89,7 +97,7 @@ export default function AlertasPage() {
     [dataLoading, user, authLoading]
   )
 
-  const loadAlertas = async () => {
+  const loadAlertas = useCallback(async () => {
     try {
       setDataLoading(true)
       // Usar API route para bypass RLS
@@ -118,7 +126,23 @@ export default function AlertasPage() {
     } finally {
       setDataLoading(false)
     }
-  }
+  }, [filterSeverity, filterStatus])
+
+  // Memoizar alertas filtrados
+  const filteredAlertas = useMemo(() => {
+    let filtered = alertas
+    if (debouncedSearchQuery) {
+      const query = debouncedSearchQuery.toLowerCase()
+      filtered = filtered.filter(a => 
+        a.message?.toLowerCase().includes(query) ||
+        a.description?.toLowerCase().includes(query) ||
+        a.type?.toLowerCase().includes(query) ||
+        a.vehicle_plate?.toLowerCase().includes(query) ||
+        a.route_name?.toLowerCase().includes(query)
+      )
+    }
+    return filtered
+  }, [alertas, debouncedSearchQuery])
 
   const handleDeleteAlerta = async (alertaId: string) => {
     if (!confirm('Tem certeza que deseja excluir este alerta? Esta ação não pode ser desfeita.')) {
@@ -235,18 +259,11 @@ export default function AlertasPage() {
 
   if (authLoading || !user) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="w-16 h-16 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin mx-auto"></div>
-      </div>
+      <AppShell user={{ id: "", name: "Admin", email: "", role: "admin" }}>
+        <SkeletonList count={5} />
+      </AppShell>
     )
   }
-
-  const filteredAlertas = alertas.filter(alerta => {
-    if (searchQuery && !alerta.description?.toLowerCase().includes(searchQuery.toLowerCase())) {
-      return false
-    }
-    return true
-  })
 
   return (
     <AppShell user={{ id: user.id, name: user.name || "Admin", email: user.email, role: user.role || "admin" }}>

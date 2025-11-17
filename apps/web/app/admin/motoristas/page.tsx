@@ -1,13 +1,13 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useMemo, useCallback } from "react"
+import dynamic from "next/dynamic"
 import { AppShell } from "@/components/app-shell"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Users, Plus, Award, FileText, Edit, Search, Trash2 } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
-import { DriverModal } from "@/components/modals/driver-modal"
 import { Input } from "@/components/ui/input"
 import { motion } from "framer-motion"
 import { Badge } from "@/components/ui/badge"
@@ -18,6 +18,14 @@ import { AlertTriangle, Calendar, ExternalLink } from "lucide-react"
 import { useAuthFast } from "@/hooks/use-auth-fast"
 import { useGlobalSync } from "@/hooks/use-global-sync"
 import { notifySuccess, notifyError } from "@/lib/toast"
+import { useDebounce } from "@/hooks/use-debounce"
+import { SkeletonList } from "@/components/ui/skeleton"
+
+// Lazy load modal pesado
+const DriverModal = dynamic(
+  () => import("@/components/modals/driver-modal").then(m => ({ default: m.DriverModal })),
+  { ssr: false, loading: () => null }
+)
 
 export default function MotoristasPage() {
   const router = useRouter()
@@ -31,6 +39,7 @@ export default function MotoristasPage() {
   const [documents, setDocuments] = useState<any[]>([])
   const [ranking, setRanking] = useState<any>(null)
   const [searchQuery, setSearchQuery] = useState("")
+  const debouncedSearchQuery = useDebounce(searchQuery, 300)
 
   useEffect(() => {
     if (user && !authLoading) {
@@ -38,6 +47,18 @@ export default function MotoristasPage() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, authLoading])
+
+  // Memoizar motoristas filtrados
+  const filteredMotoristas = useMemo(() => {
+    if (!debouncedSearchQuery) return motoristas
+    const query = debouncedSearchQuery.toLowerCase()
+    return motoristas.filter(m => 
+      m.name?.toLowerCase().includes(query) ||
+      m.email?.toLowerCase().includes(query) ||
+      m.phone?.toLowerCase().includes(query) ||
+      m.carrier_name?.toLowerCase().includes(query)
+    )
+  }, [motoristas, debouncedSearchQuery])
 
   // Escutar eventos de sincronização global (apenas após carregamento inicial)
   useGlobalSync(
@@ -51,7 +72,7 @@ export default function MotoristasPage() {
     [dataLoading, user, authLoading]
   )
 
-  const loadMotoristas = async () => {
+  const loadMotoristas = useCallback(async () => {
     try {
       setDataLoading(true)
       // Usar API route para bypass RLS
@@ -79,7 +100,7 @@ export default function MotoristasPage() {
     } finally {
       setDataLoading(false)
     }
-  }
+  }, [])
 
   const handleDeleteMotorista = async (motoristaId: string, motoristaName: string) => {
     if (!confirm(`Tem certeza que deseja excluir o motorista "${motoristaName}"? Esta ação não pode ser desfeita.`)) {
@@ -209,14 +230,11 @@ export default function MotoristasPage() {
           />
         </div>
 
-        <div className="grid gap-4">
-          {motoristas
-            .filter(m => 
-              searchQuery === "" || 
-              m.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-              m.email?.toLowerCase().includes(searchQuery.toLowerCase())
-            )
-            .map((motorista) => (
+        {dataLoading && motoristas.length === 0 ? (
+          <SkeletonList count={5} />
+        ) : (
+          <div className="grid gap-4">
+            {filteredMotoristas.map((motorista) => (
             <motion.div
               key={motorista.id}
               initial={{ opacity: 0, y: 20 }}
@@ -267,8 +285,15 @@ export default function MotoristasPage() {
                 </div>
               </Card>
             </motion.div>
-          ))}
-          {motoristas.length === 0 && (
+            ))}
+            {filteredMotoristas.length === 0 && motoristas.length > 0 && (
+              <Card className="p-12 text-center">
+                <Search className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-lg font-medium mb-2">Nenhum motorista encontrado</h3>
+                <p className="text-sm text-[var(--ink-muted)]">Tente ajustar sua busca</p>
+              </Card>
+            )}
+            {motoristas.length === 0 && !dataLoading && (
             <Card className="p-12 text-center">
               <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
               <h3 className="text-lg font-medium mb-2">Nenhum motorista encontrado</h3>

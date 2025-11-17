@@ -6,13 +6,26 @@ import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { Users, Search, Mail, Phone, Building, AlertCircle } from "lucide-react"
+import { Users, Search, Mail, Phone, Building, AlertCircle, Plus } from "lucide-react"
 import { supabase } from "@/lib/supabase"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useRouter } from "next/navigation"
 import { notifyError } from "@/lib/toast"
 import { CSVImportModal } from "@/components/operator/csv-import-modal"
+import { FuncionarioModal } from "@/components/operator/funcionario-modal"
 import { FuncionariosErrorBoundary } from "./error-boundary"
-import { debug, error } from "@/lib/logger"
+import { useOperatorTenant } from "@/components/providers/operator-tenant-provider"
+import { useEmployees } from "@/hooks/use-operator-data"
+import { useDebounce } from "@/lib/debounce"
+import { Pagination } from "@/components/ui/pagination"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { MoreVertical, Edit, Trash2 } from "lucide-react"
+import { notifySuccess, notifyError } from "@/lib/toast"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 
 interface Funcionario {
   id: string
@@ -32,15 +45,28 @@ const isValidUUID = (id: string) => {
 
 function FuncionariosPageContent() {
   const router = useRouter()
-  const searchParams = useSearchParams()
-  const companyId = searchParams.get('company')
+  const { tenantCompanyId, companyName, loading: tenantLoading, error: tenantError } = useOperatorTenant()
   
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
-  const [funcionarios, setFuncionarios] = useState<Funcionario[]>([])
   const [searchQuery, setSearchQuery] = useState("")
+  const [currentPage, setCurrentPage] = useState(1)
   const [error, setError] = useState<string | null>(null)
   const [isCsvModalOpen, setIsCsvModalOpen] = useState(false)
+  const [isFuncionarioModalOpen, setIsFuncionarioModalOpen] = useState(false)
+  const [selectedFuncionario, setSelectedFuncionario] = useState<Funcionario | null>(null)
+  const queryClient = useQueryClient()
+  
+  const debouncedSearch = useDebounce(searchQuery, 300)
+  const pageSize = 50
+  
+  // Usar React Query para carregar funcionários
+  const { data: employeesData, isLoading: employeesLoading, refetch } = useEmployees(
+    tenantCompanyId,
+    currentPage,
+    pageSize,
+    debouncedSearch
+  )
 
   // Carregar usuário
   useEffect(() => {
@@ -81,56 +107,45 @@ function FuncionariosPageContent() {
     getUser().finally(() => clearTimeout(timeout))
   }, [router])
 
-  // Carregar funcionários
+  // Resetar página quando busca mudar
   useEffect(() => {
-    const loadFuncionarios = async () => {
-      if (!companyId) {
-        setError('ID da empresa não fornecido')
-        setLoading(false)
-        return
-      }
-      
-      // Evitar erro de Postgres ao filtrar por UUID inválido
-      if (!isValidUUID(companyId)) {
-        setError('ID da empresa inválido. Utilize um UUID válido na URL.')
-        setLoading(false)
-        return
-      }
-      
-      try {
-        setLoading(true)
-        debug('Carregando funcionários', { companyId }, 'FuncionariosPage')
-        
-        // Tentar carregar da tabela diretamente
-        const { data, error: queryError } = await supabase
-          .from('gf_employee_company')
-          .select('id, company_id, name, cpf, email, phone, is_active, address')
-          .eq('company_id', companyId)
-          .order('name', { ascending: true })
+    setCurrentPage(1)
+  }, [debouncedSearch])
 
-        if (queryError) {
-          console.error("❌ Erro na query:", queryError)
-          setError(`Erro ao carregar funcionários: ${queryError.message}`)
-          setFuncionarios([])
-          return
-        }
-        
-        debug('Funcionários carregados', { count: data?.length || 0 }, 'FuncionariosPage')
-        setFuncionarios(data || [])
-        setError(null)
-      } catch (err: any) {
-        error("Erro ao carregar funcionários", { error: err }, 'FuncionariosPage')
-        setError(err.message || 'Erro ao carregar funcionários')
-        notifyError(err, `Erro: ${err.message}`)
-      } finally {
-        setLoading(false)
-      }
-    }
+  // Mutation para excluir funcionário
+  const deleteEmployee = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from("gf_employee_company")
+        .update({ is_active: false })
+        .eq("id", id)
 
-    if (companyId) {
-      loadFuncionarios()
+      if (error) throw error
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["employees", tenantCompanyId] })
+      notifySuccess("Funcionário desativado com sucesso")
+    },
+    onError: (error: any) => {
+      notifyError(`Erro ao desativar funcionário: ${error.message}`)
+    },
+  })
+
+  const handleEdit = (funcionario: Funcionario) => {
+    setSelectedFuncionario(funcionario)
+    setIsFuncionarioModalOpen(true)
+  }
+
+  const handleDelete = async (funcionario: Funcionario) => {
+    if (confirm(`Tem certeza que deseja desativar ${funcionario.name}?`)) {
+      await deleteEmployee.mutateAsync(funcionario.id)
     }
-  }, [companyId])
+  }
+
+  const handleNew = () => {
+    setSelectedFuncionario(null)
+    setIsFuncionarioModalOpen(true)
+  }
 
   // Preparar user object com todas as propriedades necessárias (sempre válido)
   const getUserName = () => {
@@ -161,15 +176,15 @@ function FuncionariosPageContent() {
   }
 
   // Se não tem company ID
-  if (!companyId) {
+  if (!tenantCompanyId && !tenantLoading) {
     return (
       <AppShell user={userObj}>
         <div className="min-h-screen flex items-center justify-center p-4">
           <Card className="p-8 max-w-md w-full text-center">
             <AlertCircle className="h-12 w-12 text-yellow-500 mx-auto mb-4" />
-            <h2 className="text-xl font-bold mb-2">Empresa não especificada</h2>
+            <h2 className="text-xl font-bold mb-2">Nenhuma empresa selecionada</h2>
             <p className="text-gray-600 mb-4">
-              É necessário especificar uma empresa na URL.
+              Selecione uma empresa para continuar.
             </p>
             <Button onClick={() => router.push('/operator')} variant="default">
               Voltar para Dashboard
@@ -203,13 +218,9 @@ function FuncionariosPageContent() {
     )
   }
 
-  const filteredFuncionarios = funcionarios.filter(f => {
-    const query = searchQuery.toLowerCase()
-    return !query || 
-      f.name?.toLowerCase().includes(query) ||
-      f.email?.toLowerCase().includes(query) ||
-      f.cpf?.toLowerCase().includes(query)
-  })
+  const funcionarios = employeesData?.data || []
+  const totalPages = employeesData?.totalPages || 0
+  const totalCount = employeesData?.count || 0
 
   return (
     <AppShell user={userObj}>
@@ -219,15 +230,20 @@ function FuncionariosPageContent() {
           <div>
             <h1 className="text-3xl font-bold mb-2">Funcionários</h1>
             <p className="text-gray-600">
-              Empresa: {companyId.substring(0, 8)}...
+              {companyName ? `Empresa: ${companyName}` : "Gerencie seus funcionários"}
+              {totalCount > 0 && ` • ${totalCount} funcionário${totalCount !== 1 ? 's' : ''}`}
             </p>
           </div>
           <div className="flex gap-2">
             <Button onClick={() => router.push('/operator')} variant="outline">
               Voltar
             </Button>
-            <Button variant="default" onClick={() => setIsCsvModalOpen(true)}>
+            <Button variant="outline" onClick={() => setIsCsvModalOpen(true)}>
               Importar CSV
+            </Button>
+            <Button variant="default" onClick={handleNew}>
+              <Plus className="h-4 w-4 mr-2" />
+              Novo Funcionário
             </Button>
           </div>
         </div>
@@ -244,7 +260,7 @@ function FuncionariosPageContent() {
         </div>
 
         {/* Loading */}
-        {loading && (
+        {(loading || employeesLoading || tenantLoading) && (
           <div className="text-center py-12">
             <div className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
             <p className="text-gray-600">Carregando funcionários...</p>
@@ -252,10 +268,12 @@ function FuncionariosPageContent() {
         )}
 
         {/* Lista de funcionários */}
-        {!loading && (
-          <div className="grid gap-4">
-            {filteredFuncionarios.length > 0 ? (
-              filteredFuncionarios.map((funcionario) => (
+        {!(loading || employeesLoading || tenantLoading) && (
+          <div className="space-y-4">
+            {funcionarios.length > 0 ? (
+              <>
+                <div className="grid gap-4">
+                  {funcionarios.map((funcionario) => (
                 <Card key={funcionario.id} className="p-4 hover:shadow-lg transition-shadow">
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1 min-w-0">
@@ -300,18 +318,56 @@ function FuncionariosPageContent() {
                         )}
                       </div>
                     </div>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="sm">
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => handleEdit(funcionario)}>
+                          <Edit className="h-4 w-4 mr-2" />
+                          Editar
+                        </DropdownMenuItem>
+                        <DropdownMenuItem 
+                          onClick={() => handleDelete(funcionario)}
+                          className="text-red-600"
+                        >
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          Desativar
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
-                </Card>
-              ))
+                  </Card>
+                  ))}
+                </div>
+                
+                {/* Paginação */}
+                {totalPages > 1 && (
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={setCurrentPage}
+                    className="mt-6"
+                  />
+                )}
+              </>
             ) : (
               <Card className="p-12 text-center">
                 <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                 <h3 className="text-lg font-medium mb-2">Nenhum funcionário encontrado</h3>
-                <p className="text-sm text-gray-500">
-                  {searchQuery 
+                <p className="text-sm text-gray-500 mb-4">
+                  {debouncedSearch 
                     ? "Tente ajustar sua busca" 
                     : "Nenhum funcionário cadastrado para esta empresa"}
                 </p>
+                {!debouncedSearch && (
+                  <Button onClick={() => setIsCsvModalOpen(true)}>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Importar Funcionários
+                  </Button>
+                )}
               </Card>
             )}
           </div>
@@ -323,11 +379,28 @@ function FuncionariosPageContent() {
           onClose={() => setIsCsvModalOpen(false)}
           onSave={() => {
             setIsCsvModalOpen(false)
-            // Recarrega a página para refletir novos dados
-            window.location.reload()
+            refetch()
           }}
-          empresaId={companyId || undefined}
+          empresaId={tenantCompanyId || undefined}
         />
+
+        {/* Modal de CRUD de Funcionário */}
+        {tenantCompanyId && (
+          <FuncionarioModal
+            funcionario={selectedFuncionario}
+            isOpen={isFuncionarioModalOpen}
+            onClose={() => {
+              setIsFuncionarioModalOpen(false)
+              setSelectedFuncionario(null)
+            }}
+            onSave={() => {
+              refetch()
+              setIsFuncionarioModalOpen(false)
+              setSelectedFuncionario(null)
+            }}
+            empresaId={tenantCompanyId}
+          />
+        )}
     </AppShell>
   )
 }

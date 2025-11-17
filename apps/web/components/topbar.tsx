@@ -29,6 +29,7 @@ import { useNavigation } from "@/hooks/use-navigation"
 import { OperatorLogoSection } from "@/components/operator/operator-logo-section"
 import { SyncAlertNotification } from "@/components/sync-alert-notification"
 import { OperationalAlertsNotification } from "@/components/operational-alerts-notification"
+import { ThemeToggle } from "@/components/theme-toggle"
 
 interface TopbarProps {
   user?: {
@@ -217,6 +218,9 @@ export function Topbar({
             <Bell className="h-5 w-5" />
             <span className="absolute top-2 right-2 w-2 h-2 bg-[var(--brand)] rounded-full animate-pulse-glow"></span>
           </Button>
+
+          {/* Theme Toggle */}
+          <ThemeToggle />
 
           {/* Preferências */}
           <Button

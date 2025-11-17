@@ -488,111 +488,183 @@ export default function CarrierDashboard() {
           </div>
         </div>
 
-        {/* Stats */}
+        {/* Stats - KPIs Melhorados */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card className="overflow-hidden">
-            <CardContent className="p-4 sm:p-6">
-              <div className="flex items-center justify-between">
-                <div className="flex-1 min-w-0 pr-4">
-                  <p className="text-sm font-medium text-[var(--ink-muted)] mb-1">Total da Frota</p>
-                  <p className="text-2xl font-bold text-[var(--ink-strong)] truncate">{kpis.totalFleet}</p>
-                </div>
-                <div className="p-2 rounded-lg bg-[var(--brand-light)] flex-shrink-0">
-                  <Truck className="h-5 w-5 text-[var(--brand)]" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card className="overflow-hidden">
-            <CardContent className="p-4 sm:p-6">
-              <div className="flex items-center justify-between">
-                <div className="flex-1 min-w-0 pr-4">
-                  <p className="text-sm font-medium text-[var(--ink-muted)] mb-1">Em Rota</p>
-                  <p className="text-2xl font-bold text-[var(--ink-strong)] truncate">{kpis.onRoute}</p>
-                </div>
-                <div className="p-2 rounded-lg bg-[var(--accent-light)] flex-shrink-0">
-                  <Navigation className="h-5 w-5 text-[var(--accent)]" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card className="overflow-hidden">
-            <CardContent className="p-4 sm:p-6">
-              <div className="flex items-center justify-between">
-                <div className="flex-1 min-w-0 pr-4">
-                  <p className="text-sm font-medium text-[var(--ink-muted)] mb-1">Motoristas Ativos</p>
-                  <p className="text-2xl font-bold text-[var(--ink-strong)] truncate">{kpis.activeDrivers}</p>
-                </div>
-                <div className="p-2 rounded-lg bg-green-100 dark:bg-green-900/20 flex-shrink-0">
-                  <Users className="h-5 w-5 text-green-600 dark:text-green-400" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card className="overflow-hidden">
-            <CardContent className="p-4 sm:p-6">
-              <div className="flex items-center justify-between">
-                <div className="flex-1 min-w-0 pr-4">
-                  <p className="text-sm font-medium text-[var(--ink-muted)] mb-1">Alertas Críticos</p>
-                  <p className="text-2xl font-bold text-[var(--ink-strong)] truncate">{kpis.criticalAlerts}</p>
-                </div>
-                <div className="p-2 rounded-lg bg-red-100 dark:bg-red-900/20 flex-shrink-0">
-                  <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <KpiCardEnhanced
+            icon={Truck}
+            label="Total da Frota"
+            value={kpis.totalFleet}
+            previousValue={previousKpis.totalFleet}
+            formatValue={(v) => v.toString()}
+            iconColor="var(--brand)"
+            iconBgColor="var(--brand-light)"
+            onClick={() => router.push('/carrier/veiculos')}
+          />
+          <KpiCardEnhanced
+            icon={Navigation}
+            label="Em Rota"
+            value={kpis.onRoute}
+            previousValue={previousKpis.onRoute}
+            formatValue={(v) => v.toString()}
+            iconColor="var(--accent)"
+            iconBgColor="var(--accent-light)"
+          />
+          <KpiCardEnhanced
+            icon={Users}
+            label="Motoristas Ativos"
+            value={kpis.activeDrivers}
+            previousValue={previousKpis.activeDrivers}
+            formatValue={(v) => v.toString()}
+            iconColor="#10B981"
+            iconBgColor="rgba(16, 185, 129, 0.1)"
+            onClick={() => router.push('/carrier/motoristas')}
+          />
+          <KpiCardEnhanced
+            icon={AlertCircle}
+            label="Alertas Críticos"
+            value={kpis.criticalAlerts}
+            previousValue={previousKpis.criticalAlerts}
+            formatValue={(v) => v.toString()}
+            iconColor="#EF4444"
+            iconBgColor="rgba(239, 68, 68, 0.1)"
+            onClick={() => router.push('/carrier/alertas')}
+          />
         </div>
 
         {/* Additional KPIs Row */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          <Card className="overflow-hidden">
-            <CardContent className="p-4 sm:p-6">
-              <div className="flex items-center justify-between">
-                <div className="flex-1 min-w-0 pr-4">
-                  <p className="text-sm font-medium text-[var(--ink-muted)] mb-1">Custos do Mês</p>
-                  <p className="text-2xl font-bold text-[var(--ink-strong)] truncate">
-                    {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 0 }).format(kpis.totalCostsThisMonth)}
-                  </p>
-                </div>
-                <div className="p-2 rounded-lg bg-purple-100 dark:bg-purple-900/20 flex-shrink-0">
-                  <Truck className="h-5 w-5 text-purple-600 dark:text-purple-400" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card className="overflow-hidden">
-            <CardContent className="p-4 sm:p-6">
-              <div className="flex items-center justify-between">
-                <div className="flex-1 min-w-0 pr-4">
-                  <p className="text-sm font-medium text-[var(--ink-muted)] mb-1">Viagens do Mês</p>
-                  <p className="text-2xl font-bold text-[var(--ink-strong)] truncate">{kpis.totalTrips}</p>
-                </div>
-                <div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/20 flex-shrink-0">
-                  <Navigation className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <KpiCardEnhanced
+            icon={DollarSign}
+            label="Custos do Mês"
+            value={kpis.totalCostsThisMonth}
+            previousValue={previousKpis.totalCostsThisMonth}
+            formatValue={(v) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 0 }).format(v)}
+            iconColor="#9333EA"
+            iconBgColor="rgba(147, 51, 234, 0.1)"
+            onClick={() => router.push('/carrier/custos')}
+          />
+          <KpiCardEnhanced
+            icon={Navigation}
+            label="Viagens do Mês"
+            value={kpis.totalTrips}
+            previousValue={previousKpis.totalTrips}
+            formatValue={(v) => v.toString()}
+            iconColor="#3B82F6"
+            iconBgColor="rgba(59, 130, 246, 0.1)"
+          />
+          <KpiCardEnhanced
+            icon={AlertCircle}
+            label="Documentos Vencendo"
+            value={kpis.delayed}
+            previousValue={previousKpis.delayed}
+            formatValue={(v) => v.toString()}
+            iconColor="#F59E0B"
+            iconBgColor="rgba(245, 158, 11, 0.1)"
+            hint="Clique para ver detalhes"
+            onClick={() => router.push('/carrier/alertas')}
+          />
+        </div>
 
-          <Card className="overflow-hidden cursor-pointer hover:shadow-lg transition-shadow" onClick={() => router.push('/carrier/alertas')}>
-            <CardContent className="p-4 sm:p-6">
-              <div className="flex items-center justify-between">
-                <div className="flex-1 min-w-0 pr-4">
-                  <p className="text-sm font-medium text-[var(--ink-muted)] mb-1">Documentos Vencendo</p>
-                  <p className="text-2xl font-bold text-[var(--ink-strong)] truncate">{kpis.delayed}</p>
-                  <p className="text-xs text-[var(--ink-muted)] mt-1">Clique para ver detalhes</p>
-                </div>
-                <div className="p-2 rounded-lg bg-orange-100 dark:bg-orange-900/20 flex-shrink-0">
-                  <AlertCircle className="h-5 w-5 text-orange-600 dark:text-orange-400" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+        {/* Gráficos e Ações Rápidas */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
+          {/* Gráfico de Linha - Veículos em Rota */}
+          <ChartContainer
+            title="Veículos em Rota (24h)"
+            description="Distribuição ao longo do dia"
+            height={300}
+            className="lg:col-span-2"
+          >
+            <LineChart data={chartData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+              <XAxis 
+                dataKey="hora" 
+                stroke="var(--ink-muted)"
+                style={{ fontSize: '12px' }}
+              />
+              <YAxis 
+                stroke="var(--ink-muted)"
+                style={{ fontSize: '12px' }}
+              />
+              <Tooltip 
+                contentStyle={{ 
+                  backgroundColor: 'var(--bg)', 
+                  border: '1px solid var(--border)',
+                  borderRadius: '8px'
+                }}
+              />
+              <Line 
+                type="monotone" 
+                dataKey="emRota" 
+                stroke="var(--brand)" 
+                strokeWidth={2}
+                dot={{ fill: 'var(--brand)', r: 4 }}
+                activeDot={{ r: 6 }}
+              />
+            </LineChart>
+          </ChartContainer>
+
+          {/* Ações Rápidas */}
+          <QuickActions />
+        </div>
+
+        {/* Gráficos de Distribuição */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
+          {/* Gráfico de Pizza - Status da Frota */}
+          <ChartContainer
+            title="Distribuição da Frota"
+            description="Status atual dos veículos"
+            height={300}
+          >
+            <PieChart>
+              <Pie
+                data={fleetStatusData}
+                cx="50%"
+                cy="50%"
+                labelLine={false}
+                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                outerRadius={100}
+                fill="#8884d8"
+                dataKey="value"
+              >
+                {fleetStatusData.map((entry, index) => {
+                  const colors = ['#3B82F6', '#10B981', '#6B7280']
+                  return <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
+                })}
+              </Pie>
+              <Tooltip />
+            </PieChart>
+          </ChartContainer>
+
+          {/* Gráfico de Barras - Top Motoristas */}
+          <ChartContainer
+            title="Top 5 Motoristas"
+            description="Performance por número de viagens"
+            height={300}
+          >
+            <BarChart data={topDrivers}>
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+              <XAxis 
+                dataKey="name" 
+                stroke="var(--ink-muted)"
+                style={{ fontSize: '12px' }}
+                angle={-45}
+                textAnchor="end"
+                height={80}
+              />
+              <YAxis 
+                stroke="var(--ink-muted)"
+                style={{ fontSize: '12px' }}
+              />
+              <Tooltip 
+                contentStyle={{ 
+                  backgroundColor: 'var(--bg)', 
+                  border: '1px solid var(--border)',
+                  borderRadius: '8px'
+                }}
+              />
+              <Bar dataKey="trips" fill="var(--brand)" radius={[8, 8, 0, 0]} />
+            </BarChart>
+          </ChartContainer>
         </div>
 
         {/* Fleet Status */}
@@ -697,89 +769,78 @@ export default function CarrierDashboard() {
           </Card>
         </div>
 
-        {/* Fleet Status Table */}
-        <Card className="overflow-hidden">
-          <CardHeader className="pb-4">
-            <div className="flex items-start justify-between">
-              <div className="flex-1 min-w-0 pr-4">
-                <CardTitle className="text-xl font-semibold mb-1.5 flex items-center gap-2">
-                  <Truck className="h-5 w-5" />
-                  Status da Frota
-                </CardTitle>
-                <p className="text-sm text-[var(--ink-muted)]">Detalhes de todos os veículos</p>
-              </div>
-              <Button 
-                size="sm" 
-                variant="outline" 
-                className="flex-shrink-0"
-                onClick={loadFleetData}
-              >
-                Atualizar
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent className="pt-0">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-[var(--border)]">
-                    <th className="text-left py-3 px-4 font-semibold text-sm text-[var(--ink-strong)]">Veículo</th>
-                    <th className="text-left py-3 px-4 font-semibold text-sm text-[var(--ink-strong)]">Motorista</th>
-                    <th className="text-left py-3 px-4 font-semibold text-sm text-[var(--ink-strong)]">Status</th>
-                    <th className="text-left py-3 px-4 font-semibold text-sm text-[var(--ink-strong)]">Rota</th>
-                    <th className="text-left py-3 px-4 font-semibold text-sm text-[var(--ink-strong)]">Passageiros</th>
-                    <th className="text-left py-3 px-4 font-semibold text-sm text-[var(--ink-strong)]">Última atualização</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {fleet.length === 0 ? (
-                    <tr>
-                      <td colSpan={6} className="py-8 text-center text-[var(--ink-muted)]">
-                        <p className="text-sm">Nenhum veículo encontrado</p>
-                      </td>
-                    </tr>
-                  ) : (
-                    fleet.map((vehicle, i) => (
-                      <tr key={i} className="border-b border-[var(--border)] hover:bg-[var(--bg-hover)] transition-colors">
-                        <td className="py-3 px-4">
-                          <div className="flex items-center gap-2">
-                            <Truck className="h-4 w-4 text-[var(--brand)] flex-shrink-0" />
-                            <span className="font-semibold text-sm text-[var(--ink-strong)] truncate">{vehicle.plate || vehicle.id}</span>
-                          </div>
-                        </td>
-                        <td className="py-3 px-4">
-                          <span className="text-sm text-[var(--ink)] truncate block">{vehicle.driver}</span>
-                        </td>
-                        <td className="py-3 px-4">
-                          <Badge variant={
-                            vehicle.status === "on-route" ? "default" :
-                            vehicle.status === "available" ? "secondary" :
-                            "destructive"
-                          } className="text-xs">
-                            {vehicle.status === "on-route" ? "Em Rota" :
-                             vehicle.status === "available" ? "Disponível" : 
-                             vehicle.status === "delayed" ? "Atrasado" : "Inativo"}
-                          </Badge>
-                        </td>
-                        <td className="py-3 px-4">
-                          <span className="text-sm text-[var(--ink)] truncate block">{vehicle.route}</span>
-                        </td>
-                        <td className="py-3 px-4">
-                          <Badge variant="outline" className="text-xs">
-                            {vehicle.passengerCount || 0}/{vehicle.capacity || 0}
-                          </Badge>
-                        </td>
-                        <td className="py-3 px-4">
-                          <span className="text-xs text-[var(--ink-muted)] truncate block">{vehicle.lastUpdate}</span>
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Fleet Status Table e Atividades Recentes */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
+          {/* Tabela de Status da Frota */}
+          <div className="lg:col-span-2">
+            <DataTable
+              data={fleet}
+              columns={[
+                {
+                  key: 'plate',
+                  label: 'Veículo',
+                  sortable: true,
+                  render: (value, row) => (
+                    <div className="flex items-center gap-2">
+                      <Truck className="h-4 w-4 text-[var(--brand)] flex-shrink-0" />
+                      <span className="font-semibold text-sm">{value || row.id}</span>
+                    </div>
+                  )
+                },
+                {
+                  key: 'driver',
+                  label: 'Motorista',
+                  sortable: true
+                },
+                {
+                  key: 'status',
+                  label: 'Status',
+                  sortable: true,
+                  render: (value) => (
+                    <Badge variant={
+                      value === "on-route" ? "default" :
+                      value === "available" ? "secondary" :
+                      "destructive"
+                    } className="text-xs">
+                      {value === "on-route" ? "Em Rota" :
+                       value === "available" ? "Disponível" : 
+                       value === "delayed" ? "Atrasado" : "Inativo"}
+                    </Badge>
+                  )
+                },
+                {
+                  key: 'route',
+                  label: 'Rota',
+                  sortable: true
+                },
+                {
+                  key: 'passengerCount',
+                  label: 'Passageiros',
+                  sortable: true,
+                  render: (value, row) => (
+                    <Badge variant="outline" className="text-xs">
+                      {value || 0}/{row.capacity || 0}
+                    </Badge>
+                  )
+                },
+                {
+                  key: 'lastUpdate',
+                  label: 'Última Atualização',
+                  sortable: true
+                }
+              ]}
+              title="Status da Frota"
+              description="Detalhes de todos os veículos"
+              searchPlaceholder="Buscar veículos..."
+              pagination={true}
+              pageSize={10}
+              onRowClick={(row) => router.push(`/carrier/veiculos?vehicleId=${row.id}`)}
+            />
+          </div>
+
+          {/* Atividades Recentes */}
+          <RecentActivities activities={recentActivities} maxItems={5} />
+        </div>
       </div>
     </AppShell>
   )

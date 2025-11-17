@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useMemo, useCallback } from "react"
 import { AppShell } from "@/components/app-shell"
 import { Stat } from "@/components/ui/Stat"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -30,7 +30,9 @@ import {
   ChevronDown,
   ChevronUp,
   Save,
-  X
+  X,
+  Gauge,
+  Target
 } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
@@ -94,17 +96,44 @@ export default function AdminDashboard() {
     setFiltersExpanded(false)
   }
 
-  // Calcular KPIs agregados (todas as empresas ou filtrado)
-  const aggregatedKpis = kpisData.reduce((acc, kpi) => {
-    if (filters.empresa && kpi.company_id !== filters.empresa) return acc
+  // Memoizar cálculo de KPIs agregados e métricas adicionais
+  const aggregatedKpis = useMemo(() => {
+    const base = kpisData.reduce((acc, kpi) => {
+      if (filters.empresa && kpi.company_id !== filters.empresa) return acc
+      return {
+        trips_today: acc.trips_today + (kpi.trips_today || 0),
+        vehicles_active: acc.vehicles_active + (kpi.vehicles_active || 0),
+        employees_in_transit: acc.employees_in_transit + (kpi.employees_in_transit || 0),
+        critical_alerts: acc.critical_alerts + (kpi.critical_alerts || 0),
+        routes_today: acc.routes_today + (kpi.routes_today || 0),
+        trips_completed: acc.trips_completed + (kpi.trips_completed || 0),
+        trips_in_progress: acc.trips_in_progress + (kpi.trips_in_progress || 0),
+      }
+    }, { 
+      trips_today: 0, 
+      vehicles_active: 0, 
+      employees_in_transit: 0, 
+      critical_alerts: 0, 
+      routes_today: 0,
+      trips_completed: 0,
+      trips_in_progress: 0,
+    })
+
+    // Calcular métricas derivadas
+    const routeEfficiency = base.routes_today > 0 
+      ? Math.round((base.trips_completed / base.routes_today) * 100) 
+      : 0
+    
+    const systemHealth = base.critical_alerts === 0 
+      ? 100 
+      : Math.max(0, 100 - (base.critical_alerts * 10))
+
     return {
-      trips_today: acc.trips_today + (kpi.trips_today || 0),
-      vehicles_active: acc.vehicles_active + (kpi.vehicles_active || 0),
-      employees_in_transit: acc.employees_in_transit + (kpi.employees_in_transit || 0),
-      critical_alerts: acc.critical_alerts + (kpi.critical_alerts || 0),
-      routes_today: acc.routes_today + (kpi.routes_today || 0),
+      ...base,
+      routeEfficiency,
+      systemHealth,
     }
-  }, { trips_today: 0, vehicles_active: 0, employees_in_transit: 0, critical_alerts: 0, routes_today: 0 })
+  }, [kpisData, filters.empresa])
 
   // Buscar KPIs da view (ou materialized view se disponível)
   useEffect(() => {
@@ -206,12 +235,26 @@ export default function AdminDashboard() {
 
   if (loading || kpisLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[var(--bg)]">
-        <div className="text-center">
-          <div className="loader-spinner mx-auto"></div>
-          <p className="mt-4 text-[var(--ink-muted)]">Carregando...</p>
+      <AppShell user={{
+        id: user?.id || "",
+        name: user?.name || "Admin",
+        email: user?.email || "",
+        role: user?.role || "admin"
+      }}>
+        <div className="space-y-6 lg:space-y-8">
+          <div className="grid-responsive-cards">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div key={i} className="stat-card p-6 space-y-3">
+                <div className="h-12 w-12 rounded-lg bg-[var(--bg-hover)] animate-pulse" />
+                <div className="space-y-2">
+                  <div className="h-4 w-24 bg-[var(--bg-hover)] rounded animate-pulse" />
+                  <div className="h-8 w-16 bg-[var(--bg-hover)] rounded animate-pulse" />
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
+      </AppShell>
     )
   }
 
@@ -359,6 +402,22 @@ export default function AdminDashboard() {
               label="Alertas Críticos"
               value={formatCount(aggregatedKpis.critical_alerts)}
               hint="Atenção necessária"
+            />
+          </motion.div>
+          <motion.div variants={listItem}>
+            <Stat
+              icon={Target}
+              label="Eficiência de Rotas"
+              value={`${aggregatedKpis.routeEfficiency}%`}
+              hint="Taxa de conclusão"
+            />
+          </motion.div>
+          <motion.div variants={listItem}>
+            <Stat
+              icon={Gauge}
+              label="Saúde do Sistema"
+              value={`${aggregatedKpis.systemHealth}%`}
+              hint={aggregatedKpis.systemHealth >= 80 ? "Ótimo" : aggregatedKpis.systemHealth >= 60 ? "Bom" : "Atenção"}
             />
           </motion.div>
         </motion.div>

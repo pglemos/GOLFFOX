@@ -1,6 +1,7 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useMemo, useCallback } from "react"
+import dynamic from "next/dynamic"
 import { AppShell } from "@/components/app-shell"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -12,9 +13,6 @@ import { formatError } from "@/lib/error-utils"
 import { t } from "@/lib/i18n"
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
-import { VehicleModal } from "@/components/modals/vehicle-modal"
-import { VehicleMaintenanceModal } from "@/components/modals/vehicle-maintenance-modal"
-import { VehicleChecklistModal } from "@/components/modals/vehicle-checklist-modal"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
@@ -22,6 +20,22 @@ import { motion } from "framer-motion"
 import { debug, error as logError } from "@/lib/logger"
 import { useAuthFast } from "@/hooks/use-auth-fast"
 import { useGlobalSync } from "@/hooks/use-global-sync"
+import { useDebounce } from "@/hooks/use-debounce"
+import { SkeletonList } from "@/components/ui/skeleton"
+
+// Lazy load modais pesados
+const VehicleModal = dynamic(
+  () => import("@/components/modals/vehicle-modal").then(m => ({ default: m.VehicleModal })),
+  { ssr: false, loading: () => null }
+)
+const VehicleMaintenanceModal = dynamic(
+  () => import("@/components/modals/vehicle-maintenance-modal").then(m => ({ default: m.VehicleMaintenanceModal })),
+  { ssr: false, loading: () => null }
+)
+const VehicleChecklistModal = dynamic(
+  () => import("@/components/modals/vehicle-checklist-modal").then(m => ({ default: m.VehicleChecklistModal })),
+  { ssr: false, loading: () => null }
+)
 
 export default function VeiculosPage() {
   const router = useRouter()
@@ -39,6 +53,7 @@ export default function VeiculosPage() {
   const [activeTab, setActiveTab] = useState<string>("dados")
   const [viewingVehicle, setViewingVehicle] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState("")
+  const debouncedSearchQuery = useDebounce(searchQuery, 300)
   const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; vehicle: any | null; isDeleting: boolean }>({
     isOpen: false,
     vehicle: null,
@@ -53,6 +68,18 @@ export default function VeiculosPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, authLoading])
 
+  // Memoizar veículos filtrados
+  const filteredVeiculos = useMemo(() => {
+    if (!debouncedSearchQuery) return veiculos
+    const query = debouncedSearchQuery.toLowerCase()
+    return veiculos.filter(v => 
+      v.plate?.toLowerCase().includes(query) ||
+      v.model?.toLowerCase().includes(query) ||
+      v.brand?.toLowerCase().includes(query) ||
+      v.carrier_name?.toLowerCase().includes(query)
+    )
+  }, [veiculos, debouncedSearchQuery])
+
   // Escutar eventos de sincronização global (apenas após carregamento inicial)
   useGlobalSync(
     ['vehicle.created', 'vehicle.updated', 'vehicle.deleted'],
@@ -65,7 +92,7 @@ export default function VeiculosPage() {
     [dataLoading, user, authLoading]
   )
 
-  const loadVeiculos = async () => {
+  const loadVeiculos = useCallback(async () => {
     try {
       setDataLoading(true)
       // Usar API route para bypass RLS
@@ -95,7 +122,7 @@ export default function VeiculosPage() {
     } finally {
       setDataLoading(false)
     }
-  }
+  }, [])
 
   const handleDeleteVeiculo = async (veiculoId: string, veiculoPlate: string) => {
     if (!confirm(`Tem certeza que deseja excluir o veículo "${veiculoPlate}"? Esta ação não pode ser desfeita.`)) {
@@ -258,19 +285,10 @@ export default function VeiculosPage() {
         </div>
 
         {dataLoading && veiculos.length === 0 ? (
-          <div className="flex items-center justify-center py-12">
-            <div className="w-8 h-8 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin"></div>
-            <span className="ml-3 text-[var(--muted)]">Carregando veículos...</span>
-          </div>
+          <SkeletonList count={5} />
         ) : (
           <div className="grid gap-4">
-            {veiculos
-              .filter(v => 
-                searchQuery === "" || 
-                v.plate?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                v.model?.toLowerCase().includes(searchQuery.toLowerCase())
-              )
-              .map((veiculo) => (
+            {filteredVeiculos.map((veiculo) => (
             <motion.div
               key={veiculo.id}
               initial={{ opacity: 0, y: 20 }}

@@ -3,13 +3,19 @@
 import { useEffect, useState, useCallback } from "react"
 import { AppShell } from "@/components/app-shell"
 import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
+import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card"
 import { MapPin } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 import { OperatorKPICards } from "@/components/operator/operator-kpi-cards"
 import { ControlTowerCards } from "@/components/operator/control-tower-cards"
 import { useOperatorTenant } from "@/components/providers/operator-tenant-provider"
+import { DashboardSkeleton } from "@/components/operator/dashboard-skeleton"
+import { DashboardCharts } from "@/components/operator/dashboard-charts"
+import { PeriodFilter, type PeriodFilter as PeriodFilterType } from "@/components/operator/period-filter"
+import { useOperatorKPIs, useControlTower } from "@/hooks/use-operator-data"
+import { useRealtimeKPIs, useRealtimeAlerts } from "@/hooks/use-realtime-updates"
+import { useState } from "react"
 
 export default function OperatorDashboard() {
   const router = useRouter()
@@ -30,7 +36,17 @@ export default function OperatorDashboard() {
   const { tenantCompanyId, companyName, loading: tenantLoading, error: tenantError } = useOperatorTenant()
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
-  const [kpis, setKpis] = useState({
+  const [period, setPeriod] = useState<PeriodFilterType>("today")
+  
+  // Usar React Query para KPIs e Control Tower
+  const { data: kpisData, isLoading: kpisLoading } = useOperatorKPIs(tenantCompanyId)
+  const { data: controlTowerData, isLoading: controlTowerLoading } = useControlTower(tenantCompanyId)
+  
+  // Atualização em tempo real
+  useRealtimeKPIs(tenantCompanyId)
+  useRealtimeAlerts(tenantCompanyId)
+  
+  const kpis = kpisData || {
     trips_today: 0,
     trips_in_progress: 0,
     trips_completed: 0,
@@ -38,13 +54,15 @@ export default function OperatorDashboard() {
     avg_occupancy: 0,
     daily_cost: 0,
     sla_d0: 0
-  })
-  const [controlTower, setControlTower] = useState({
+  }
+  
+  const controlTower = controlTowerData || {
     delays: 0,
     stoppedVehicles: 0,
     routeDeviations: 0,
     openAssistance: 0
-  })
+  }
+  
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
@@ -120,118 +138,13 @@ export default function OperatorDashboard() {
     getUser()
   }, [router])
 
-  const loadKPIs = useCallback(async (companyId: string) => {
-    if (!companyId) return
-    
-    try {
-      // Tentar usar materialized view primeiro, fallback para view segura
-      let { data, error: kpiError } = await supabase
-        .from("mv_operator_kpis")
-        .select("*")
-        .eq("company_id", companyId)
-        .single()
+  // Removido - agora usando React Query hooks
 
-      // Se materialized view falhar, usar view segura
-      if (kpiError) {
-        console.warn('Materialized view não disponível, usando view segura:', kpiError)
-        const result = await supabase
-          .from("v_operator_dashboard_kpis_secure")
-          .select("*")
-          .eq("company_id", companyId)
-          .single()
-        data = result.data
-        kpiError = result.error
-      }
-
-      if (kpiError) {
-        console.error("Erro ao carregar KPIs:", kpiError)
-        // Não mostrar erro ao usuário, apenas usar valores padrão
-        return
-      }
-
-      if (data) {
-        setKpis({
-          trips_today: Number(data.trips_today || 0),
-          trips_in_progress: Number(data.trips_in_progress || 0),
-          trips_completed: Number(data.trips_completed || 0),
-          delays_over_5min: Number(data.delays_over_5min || 0),
-          avg_occupancy: Number(data.avg_occupancy || 0),
-          daily_cost: Number(data.daily_cost || 0),
-          sla_d0: Number(data.sla_d0 || 0)
-        })
-      }
-    } catch (err: any) {
-      console.error("Erro ao carregar KPIs:", err)
-      // Não mostrar erro ao usuário, apenas logar
-    }
-  }, [])
-
-  const loadControlTower = useCallback(async (companyId: string) => {
-    if (!companyId) return
-    
-    try {
-      // Buscar dados do control tower (alertas críticos)
-      const [delaysRes, stoppedRes, deviationsRes, assistanceRes] = await Promise.all([
-        // Atrasos
-        supabase
-          .from("gf_alerts")
-          .select("id", { count: "exact", head: true })
-          .eq("alert_type", "route_delayed")
-          .eq("severity", "critical")
-          .eq("company_id", companyId),
-        
-        // Veículos parados
-        supabase
-          .from("gf_alerts")
-          .select("id", { count: "exact", head: true })
-          .eq("alert_type", "bus_stopped")
-          .eq("is_resolved", false)
-          .eq("company_id", companyId),
-        
-        // Desvios
-        supabase
-          .from("gf_alerts")
-          .select("id", { count: "exact", head: true })
-          .eq("alert_type", "deviation")
-          .eq("is_resolved", false)
-          .eq("company_id", companyId),
-        
-        // Socorro aberto
-        supabase
-          .from("gf_service_requests")
-          .select("id", { count: "exact", head: true })
-          .eq("empresa_id", companyId)
-          .eq("tipo", "socorro")
-          .in("status", ["rascunho", "enviado", "em_analise"])
-      ])
-
-      setControlTower({
-        delays: delaysRes.count || 0,
-        stoppedVehicles: stoppedRes.count || 0,
-        routeDeviations: deviationsRes.count || 0,
-        openAssistance: assistanceRes.count || 0
-      })
-    } catch (err: any) {
-      console.error("Erro ao carregar torre de controle:", err)
-      // Não mostrar erro ao usuário, apenas logar
-    }
-  }, [])
-
-  useEffect(() => {
-    if (tenantCompanyId && !tenantLoading) {
-      loadKPIs(tenantCompanyId)
-      loadControlTower(tenantCompanyId)
-    }
-  }, [tenantCompanyId, tenantLoading, loadKPIs, loadControlTower])
-
-  if (loading || tenantLoading) {
+  if (loading || tenantLoading || kpisLoading || controlTowerLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Carregando...</p>
-        </div>
-      </div>
+      <AppShell user={{ id: user?.id || "", name: user?.name || "Operador", email: user?.email || "", role: "operator" }}>
+        <DashboardSkeleton />
+      </AppShell>
     )
   }
 
@@ -289,13 +202,18 @@ export default function OperatorDashboard() {
           </a>
         </div>
 
-        {/* KPIs */}
-        <div>
-          <div className="mb-4">
+        {/* Filtros de Período */}
+        <div className="flex items-center justify-between flex-wrap gap-4">
+          <div>
             <h2 className="text-lg font-semibold text-[var(--ink-strong)]">KPIs do Dia</h2>
             <p className="text-sm text-[var(--ink-muted)] mt-1">Métricas principais da operação</p>
           </div>
-          <OperatorKPICards kpis={kpis} loading={false} />
+          <PeriodFilter value={period} onChange={setPeriod} />
+        </div>
+
+        {/* KPIs */}
+        <div>
+          <OperatorKPICards kpis={kpis} loading={kpisLoading} />
         </div>
 
         {/* Control Tower */}
@@ -310,6 +228,15 @@ export default function OperatorDashboard() {
             routeDeviations={controlTower.routeDeviations}
             openAssistance={controlTower.openAssistance}
           />
+        </div>
+
+        {/* Gráficos */}
+        <div>
+          <div className="mb-4">
+            <h2 className="text-lg font-semibold text-[var(--ink-strong)]">Análises e Tendências</h2>
+            <p className="text-sm text-[var(--ink-muted)] mt-1">Visualizações detalhadas da operação</p>
+          </div>
+          <DashboardCharts kpis={kpis} period={period} />
         </div>
 
         {/* Mapa Preview */}

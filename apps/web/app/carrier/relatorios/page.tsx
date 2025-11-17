@@ -32,9 +32,11 @@ interface ReportConfig {
 export default function CarrierRelatoriosPage() {
   const router = useRouter()
   const [user, setUser] = useState<any>(null)
+  const [userData, setUserData] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [dateStart, setDateStart] = useState(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0])
   const [dateEnd, setDateEnd] = useState(new Date().toISOString().split('T')[0])
+  const [loadingReport, setLoadingReport] = useState<string | null>(null)
 
   const reports: ReportConfig[] = [
     { 
@@ -55,6 +57,24 @@ export default function CarrierRelatoriosPage() {
       description: 'Relatório de viagens completadas',
       icon: FileText
     },
+    { 
+      id: 'costs',
+      title: 'Relatório de Custos', 
+      description: 'Análise detalhada de custos por veículo e rota',
+      icon: FileText
+    },
+    { 
+      id: 'maintenances',
+      title: 'Relatório de Manutenções', 
+      description: 'Histórico e custos de manutenções',
+      icon: FileText
+    },
+    { 
+      id: 'documents',
+      title: 'Relatório de Documentos', 
+      description: 'Status e vencimentos de documentos',
+      icon: FileText
+    },
   ]
 
   useEffect(() => {
@@ -64,20 +84,208 @@ export default function CarrierRelatoriosPage() {
         router.push("/")
         return
       }
+
+      const { data } = await supabase
+        .from("users")
+        .select("carrier_id")
+        .eq("id", session.user.id)
+        .single()
+
       setUser({ ...session.user })
+      setUserData(data)
       setLoading(false)
     }
     getUser()
   }, [router])
 
   const handleExport = async (report: ReportConfig, format: 'csv' | 'excel' | 'pdf') => {
+    if (!userData?.carrier_id) {
+      notifyError(null, 'Erro: Transportadora não encontrada', {})
+      return
+    }
+
+    setLoadingReport(report.id)
     try {
-      // Dados básicos para o relatório
+      let apiUrl = ''
+      let headers: string[] = []
+      let rows: any[][] = []
+      let summary: any = null
+
+      // Buscar dados da API
+      switch (report.id) {
+        case 'fleet':
+          apiUrl = `/api/carrier/reports/fleet-usage?carrier_id=${userData.carrier_id}&start_date=${dateStart}&end_date=${dateEnd}`
+          const fleetRes = await fetch(apiUrl)
+          const fleetData = await fleetRes.json()
+          if (fleetData.success) {
+            headers = ['Placa', 'Modelo', 'Status', 'Total de Viagens', 'Viagens no Período', 'Taxa de Utilização (%)']
+            rows = fleetData.data.map((v: any) => [
+              v.plate,
+              v.model || 'N/A',
+              v.is_active ? 'Ativo' : 'Inativo',
+              v.total_trips,
+              v.trips_in_period,
+              v.utilization_rate.toFixed(2)
+            ])
+            summary = fleetData.summary
+          }
+          break
+        case 'drivers':
+          apiUrl = `/api/carrier/reports/driver-performance?carrier_id=${userData.carrier_id}&start_date=${dateStart}&end_date=${dateEnd}`
+          const driversRes = await fetch(apiUrl)
+          const driversData = await driversRes.json()
+          if (driversData.success) {
+            headers = ['Nome', 'Email', 'Total de Viagens', 'Viagens no Período', 'Pontuação', 'Avaliação', 'Pontualidade (%)']
+            rows = driversData.data.map((d: any) => [
+              d.name,
+              d.email || 'N/A',
+              d.total_trips,
+              d.trips_in_period,
+              d.total_points,
+              d.rating,
+              d.on_time_percentage.toFixed(2)
+            ])
+            summary = driversData.summary
+          }
+          break
+        case 'trips':
+          apiUrl = `/api/carrier/reports/trips?carrier_id=${userData.carrier_id}&start_date=${dateStart}&end_date=${dateEnd}`
+          const tripsRes = await fetch(apiUrl)
+          const tripsData = await tripsRes.json()
+          if (tripsData.success) {
+            headers = ['Rota', 'Motorista', 'Data de Criação', 'Data de Conclusão', 'Status', 'Passageiros', 'Duração (min)']
+            rows = tripsData.data.map((t: any) => [
+              t.route_name,
+              t.driver_name,
+              new Date(t.created_at).toLocaleDateString('pt-BR'),
+              t.completed_at ? new Date(t.completed_at).toLocaleDateString('pt-BR') : 'N/A',
+              t.status,
+              t.passenger_count,
+              t.duration_minutes || 'N/A'
+            ])
+            summary = tripsData.summary
+          }
+          break
+        case 'costs':
+          // Buscar custos de veículos e rotas
+          const [costsVehicleRes, costsRouteRes] = await Promise.all([
+            fetch(`/api/carrier/costs/vehicle?start_date=${dateStart}&end_date=${dateEnd}`),
+            fetch(`/api/carrier/costs/route?start_date=${dateStart}&end_date=${dateEnd}`)
+          ])
+          const costsVehicleData = costsVehicleRes.ok ? await costsVehicleRes.json() : []
+          const costsRouteData = costsRouteRes.ok ? await costsRouteRes.json() : []
+          
+          headers = ['Tipo', 'Veículo/Rota', 'Categoria', 'Data', 'Valor (R$)', 'Descrição']
+          rows = [
+            ...(costsVehicleData || []).map((c: any) => [
+              'Veículo',
+              c.vehicles?.plate || 'N/A',
+              c.cost_category || 'N/A',
+              new Date(c.cost_date || c.created_at).toLocaleDateString('pt-BR'),
+              parseFloat(c.amount_brl?.toString() || '0').toFixed(2),
+              c.description || 'N/A'
+            ]),
+            ...(costsRouteData || []).map((r: any) => [
+              'Rota',
+              r.routes?.name || 'N/A',
+              'Rota',
+              new Date(r.created_at).toLocaleDateString('pt-BR'),
+              parseFloat(r.total_cost_brl?.toString() || '0').toFixed(2),
+              'Custos da rota'
+            ])
+          ]
+          const totalCosts = [...(costsVehicleData || []), ...(costsRouteData || [])].reduce((sum: number, item: any) => 
+            sum + parseFloat(item.amount_brl?.toString() || item.total_cost_brl?.toString() || '0'), 0
+          )
+          summary = {
+            total_costs: totalCosts,
+            vehicle_costs: (costsVehicleData || []).reduce((sum: number, c: any) => sum + parseFloat(c.amount_brl?.toString() || '0'), 0),
+            route_costs: (costsRouteData || []).reduce((sum: number, r: any) => sum + parseFloat(r.total_cost_brl?.toString() || '0'), 0)
+          }
+          break
+        case 'maintenances':
+          // Buscar manutenções
+          const { data: maintenancesData } = await supabase
+            .from('vehicle_maintenances')
+            .select(`
+              *,
+              vehicles!inner(carrier_id, plate)
+            `)
+            .eq('vehicles.carrier_id', userData.carrier_id)
+            .gte('scheduled_date', dateStart)
+            .lte('scheduled_date', dateEnd)
+          
+          headers = ['Veículo', 'Tipo', 'Status', 'Data Agendada', 'Data Concluída', 'Custo Total (R$)', 'Oficina', 'Descrição']
+          rows = (maintenancesData || []).map((m: any) => [
+            m.vehicles?.plate || 'N/A',
+            m.maintenance_type || 'N/A',
+            m.status === 'completed' ? 'Concluída' : m.status === 'in_progress' ? 'Em Andamento' : m.status === 'scheduled' ? 'Agendada' : 'Cancelada',
+            m.scheduled_date ? new Date(m.scheduled_date).toLocaleDateString('pt-BR') : 'N/A',
+            m.completed_date ? new Date(m.completed_date).toLocaleDateString('pt-BR') : 'N/A',
+            (parseFloat(m.cost_parts_brl?.toString() || '0') + parseFloat(m.cost_labor_brl?.toString() || '0')).toFixed(2),
+            m.workshop_name || 'N/A',
+            m.description || 'N/A'
+          ])
+          const totalMaintenanceCosts = (maintenancesData || []).reduce((sum: number, m: any) => 
+            sum + parseFloat(m.cost_parts_brl?.toString() || '0') + parseFloat(m.cost_labor_brl?.toString() || '0'), 0
+          )
+          summary = {
+            total_maintenances: maintenancesData?.length || 0,
+            completed: (maintenancesData || []).filter((m: any) => m.status === 'completed').length,
+            total_costs: totalMaintenanceCosts
+          }
+          break
+        case 'documents':
+          // Buscar documentos vencendo
+          const { data: documentsData } = await supabase
+            .from('v_carrier_expiring_documents')
+            .select('*')
+            .eq('carrier_id', userData.carrier_id)
+            .gte('expiry_date', dateStart)
+            .lte('expiry_date', dateEnd)
+          
+          headers = ['Tipo', 'Entidade', 'Documento', 'Nível de Alerta', 'Data de Vencimento', 'Dias Restantes']
+          rows = (documentsData || []).map((d: any) => [
+            d.item_type === 'driver_document' ? 'Motorista' : d.item_type === 'vehicle_document' ? 'Veículo' : 'Exame',
+            d.entity_name || 'N/A',
+            d.document_type || 'N/A',
+            d.alert_level === 'expired' ? 'Vencido' : d.alert_level === 'critical' ? 'Crítico' : 'Atenção',
+            d.expiry_date ? new Date(d.expiry_date).toLocaleDateString('pt-BR') : 'N/A',
+            d.days_to_expiry || 0
+          ])
+          summary = {
+            total_documents: documentsData?.length || 0,
+            expired: (documentsData || []).filter((d: any) => d.alert_level === 'expired').length,
+            critical: (documentsData || []).filter((d: any) => d.alert_level === 'critical').length,
+            warning: (documentsData || []).filter((d: any) => d.alert_level === 'warning').length
+          }
+          break
+      }
+
+      if (rows.length === 0) {
+        notifyError(null, 'Nenhum dado encontrado para o período selecionado', {})
+        setLoadingReport(null)
+        return
+      }
+
+      // Adicionar resumo ao início
+      const summaryRows: any[][] = []
+      if (summary) {
+        summaryRows.push(['Resumo do Relatório'])
+        summaryRows.push([])
+        Object.entries(summary).forEach(([key, value]) => {
+          summaryRows.push([key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()), String(value)])
+        })
+        summaryRows.push([])
+        summaryRows.push(['Dados Detalhados'])
+        summaryRows.push([])
+      }
+
       const formattedData = {
         title: report.title,
-        description: report.description,
-        headers: ['Data', 'Informações'],
-        rows: [[new Date().toLocaleDateString('pt-BR'), `Relatório ${report.title} - Em desenvolvimento`]]
+        description: `${report.description} - Período: ${new Date(dateStart).toLocaleDateString('pt-BR')} a ${new Date(dateEnd).toLocaleDateString('pt-BR')}`,
+        headers,
+        rows: [...summaryRows, ...rows]
       }
 
       const filename = `${report.id}-${dateStart}-${dateEnd}.${format === 'excel' ? 'xlsx' : format}`
@@ -99,6 +307,8 @@ export default function CarrierRelatoriosPage() {
     } catch (error: any) {
       console.error("Erro ao exportar:", error)
       notifyError(error, `Erro ao exportar: ${error.message}`, { i18n: { ns: 'common', key: 'errors.export' } })
+    } finally {
+      setLoadingReport(null)
     }
   }
 
@@ -120,7 +330,7 @@ export default function CarrierRelatoriosPage() {
             <Filter className="h-5 w-5 text-[var(--brand)]" />
             <h3 className="font-semibold">Filtros</h3>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div className="space-y-2">
               <label className="text-sm font-medium">Data Início</label>
               <div className="relative">
@@ -146,6 +356,57 @@ export default function CarrierRelatoriosPage() {
               </div>
             </div>
           </div>
+          <div className="flex gap-2 flex-wrap">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                const today = new Date()
+                setDateStart(today.toISOString().split('T')[0])
+                setDateEnd(today.toISOString().split('T')[0])
+              }}
+            >
+              Hoje
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                const today = new Date()
+                const weekAgo = new Date(today)
+                weekAgo.setDate(today.getDate() - 7)
+                setDateStart(weekAgo.toISOString().split('T')[0])
+                setDateEnd(today.toISOString().split('T')[0])
+              }}
+            >
+              Últimos 7 dias
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                const today = new Date()
+                const monthAgo = new Date(today)
+                monthAgo.setDate(today.getDate() - 30)
+                setDateStart(monthAgo.toISOString().split('T')[0])
+                setDateEnd(today.toISOString().split('T')[0])
+              }}
+            >
+              Últimos 30 dias
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                const today = new Date()
+                const firstDay = new Date(today.getFullYear(), today.getMonth(), 1)
+                setDateStart(firstDay.toISOString().split('T')[0])
+                setDateEnd(today.toISOString().split('T')[0])
+              }}
+            >
+              Este mês
+            </Button>
+          </div>
         </Card>
 
         {/* Cards de Relatórios */}
@@ -169,21 +430,44 @@ export default function CarrierRelatoriosPage() {
                   </div>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="outline" size="sm" className="w-full">
-                        <Download className="h-4 w-4 mr-2" />
-                        Exportar
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="w-full"
+                        disabled={loadingReport === report.id}
+                      >
+                        {loadingReport === report.id ? (
+                          <>
+                            <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-2" />
+                            Carregando...
+                          </>
+                        ) : (
+                          <>
+                            <Download className="h-4 w-4 mr-2" />
+                            Exportar
+                          </>
+                        )}
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => handleExport(report, 'csv')}>
+                      <DropdownMenuItem 
+                        onClick={() => handleExport(report, 'csv')}
+                        disabled={loadingReport === report.id}
+                      >
                         <FileText className="h-4 w-4 mr-2" />
                         Exportar CSV
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleExport(report, 'excel')}>
+                      <DropdownMenuItem 
+                        onClick={() => handleExport(report, 'excel')}
+                        disabled={loadingReport === report.id}
+                      >
                         <FileText className="h-4 w-4 mr-2" />
                         Exportar Excel
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleExport(report, 'pdf')}>
+                      <DropdownMenuItem 
+                        onClick={() => handleExport(report, 'pdf')}
+                        disabled={loadingReport === report.id}
+                      >
                         <FileText className="h-4 w-4 mr-2" />
                         Exportar PDF
                       </DropdownMenuItem>

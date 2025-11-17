@@ -1,17 +1,14 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useMemo, Suspense } from "react"
+import dynamic from "next/dynamic"
 import { AppShell } from "@/components/app-shell"
 import { Button } from "@/components/ui/button"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { BarChart3, Download, FileText, Calendar, Filter, Clock, Mail, ChevronDown, ChevronUp, Save, X } from "lucide-react"
-import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 import { 
-  exportToCSV, 
-  exportToExcel, 
-  exportToPDF,
   formatDelaysReport,
   formatOccupancyReport,
   formatNotBoardedReport
@@ -25,10 +22,19 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { motion } from "framer-motion"
-import { ScheduleReportModal } from "@/components/modals/schedule-report-modal"
 import { Badge } from "@/components/ui/badge"
 import { Edit, Trash2 } from "lucide-react"
 import { useAuthFast } from "@/hooks/use-auth-fast"
+import { SkeletonList } from "@/components/ui/skeleton"
+
+// Lazy load modal pesado
+const ScheduleReportModal = dynamic(
+  () => import("@/components/modals/schedule-report-modal").then(m => ({ default: m.ScheduleReportModal })),
+  { 
+    ssr: false,
+    loading: () => null
+  }
+)
 
 interface ReportConfig {
   id: string
@@ -73,7 +79,8 @@ export default function RelatoriosPage() {
   const [selectedReportForSchedule, setSelectedReportForSchedule] = useState<string | null>(null)
   const [selectedSchedule, setSelectedSchedule] = useState<any>(null)
 
-  const reports: ReportConfig[] = [
+  // Memoizar reports para evitar recriação
+  const reports: ReportConfig[] = useMemo(() => [
     { 
       id: 'delays',
       title: 'Atrasos', 
@@ -110,7 +117,7 @@ export default function RelatoriosPage() {
       description: 'Ranking por pontualidade, eficiência e conclusão',
       icon: BarChart3
     },
-  ]
+  ], [])
 
   useEffect(() => {
     if (user && !authLoading) {
@@ -187,7 +194,11 @@ export default function RelatoriosPage() {
   }
 
   if (authLoading || !user) {
-    return <div className="min-h-screen flex items-center justify-center"><div className="w-16 h-16 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin mx-auto"></div></div>
+    return (
+      <AppShell user={{ id: "", name: "Admin", email: "", role: "admin" }}>
+        <SkeletonList count={3} />
+      </AppShell>
+    )
   }
 
   return (

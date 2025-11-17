@@ -1,23 +1,20 @@
 "use client"
 
 import { useEffect, useState, Suspense, useCallback } from "react"
-// @ts-ignore
 import { AppShell } from "@/components/app-shell"
-// @ts-ignore
 import { Button } from "@/components/ui/button"
-// @ts-ignore
 import { Card } from "@/components/ui/card"
-// @ts-ignore
 import { Input } from "@/components/ui/input"
-// @ts-ignore
 import { Badge } from "@/components/ui/badge"
-import { AlertTriangle, Search, Bell, Clock } from "lucide-react"
-// @ts-ignore
+import { AlertTriangle, Search, Bell, Clock, CheckCircle, XCircle, Plus } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { useRouter, useSearchParams } from "next/navigation"
 import { motion } from "framer-motion"
-import { notifyError } from "@/lib/toast"
+import { notifyError, notifySuccess } from "@/lib/toast"
 import { useOperatorTenant } from "@/components/providers/operator-tenant-provider"
+import { useAlerts, useResolveAlert } from "@/hooks/use-operator-data"
+import { useDebounce } from "@/lib/debounce"
+import { useInView } from "react-intersection-observer"
 
 function AlertasOperatorPageInner() {
   const router = useRouter()
@@ -25,10 +22,44 @@ function AlertasOperatorPageInner() {
   const { tenantCompanyId, loading: tenantLoading, error: tenantError } = useOperatorTenant()
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
-  const [alertas, setAlertas] = useState<any[]>([])
   const [searchQuery, setSearchQuery] = useState("")
   const [filterType, setFilterType] = useState<string>("all")
+  const [currentPage, setCurrentPage] = useState(1)
   const [error, setError] = useState<string | null>(null)
+  
+  const debouncedSearch = useDebounce(searchQuery, 300)
+  const pageSize = 50
+  
+  const urlFilter = searchParams?.get('filter')
+  const filterMap: Record<string, string> = {
+    delay: 'route_delayed',
+    stopped: 'bus_stopped',
+    deviation: 'route_deviation',
+  }
+  const mappedUrlFilter = urlFilter ? filterMap[urlFilter] : undefined
+  
+  // Usar React Query para alertas
+  const { data: alertsData, isLoading: alertsLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useAlerts(
+    tenantCompanyId,
+    currentPage,
+    pageSize,
+    {
+      type: mappedUrlFilter,
+      severity: filterType !== "all" ? filterType : undefined,
+      resolved: filterType === "resolved" ? true : filterType === "unresolved" ? false : undefined,
+    }
+  )
+  
+  const resolveAlert = useResolveAlert()
+  
+  // Infinite scroll
+  const { ref, inView } = useInView()
+  
+  useEffect(() => {
+    if (inView && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage()
+    }
+  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage])
 
   useEffect(() => {
     const getUser = async () => {
@@ -54,43 +85,16 @@ function AlertasOperatorPageInner() {
     getUser()
   }, [router])
 
-  const loadAlertas = useCallback(async () => {
-    if (!tenantCompanyId) return
-    
-    try {
-      setLoading(true)
-      setError(null)
-      // Usar view segura que já filtra por tenantCompanyId via RLS
-      const { data, error: queryError } = await supabase
-        .from('v_operator_alerts_secure')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(50)
+  // Removido - agora usando React Query
 
-      if (queryError) {
-        console.error("Erro ao carregar alertas:", queryError)
-        setError(`Erro ao carregar alertas: ${queryError.message}`)
-        notifyError(`Erro: ${queryError.message}`, { i18n: { ns: 'common', key: 'errors.generic' } })
-        setAlertas([])
-        return
-      }
-      setAlertas(data || [])
-    } catch (err: any) {
-      console.error("Erro ao carregar alertas:", err)
-      const errorMessage = err?.message || 'Erro desconhecido'
-      setError(errorMessage)
-      notifyError(`Erro: ${errorMessage}`, { i18n: { ns: 'common', key: 'errors.generic' } })
-      setAlertas([])
-    } finally {
-      setLoading(false)
-    }
-  }, [tenantCompanyId])
+  const handleResolve = async (alertId: string, resolved: boolean) => {
+    await resolveAlert.mutateAsync({ alertId, resolved })
+    notifySuccess(resolved ? "Alerta marcado como resolvido" : "Alerta marcado como não resolvido")
+  }
 
-  useEffect(() => {
-    if (tenantCompanyId && !tenantLoading) {
-      loadAlertas()
-    }
-  }, [tenantCompanyId, tenantLoading, loadAlertas])
+  const handleCreateRequest = (alerta: any) => {
+    router.push(`/operator/solicitacoes?type=socorro&alert_id=${alerta.id}`)
+  }
 
   if (loading || tenantLoading) {
     return (
@@ -133,30 +137,17 @@ function AlertasOperatorPageInner() {
     )
   }
 
+  // Flatten pages data
+  const alertas = alertsData?.pages.flatMap(page => page.data) || []
+  
   const filteredAlertas = alertas.filter(a => {
     if (!a) return false
     
-    const matchesSearch = !searchQuery || 
-      a.message?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      a.alert_type?.toLowerCase().includes(searchQuery.toLowerCase())
+    const matchesSearch = !debouncedSearch || 
+      a.message?.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+      a.alert_type?.toLowerCase().includes(debouncedSearch.toLowerCase())
 
-    // Filtro via URL (?filter=delay|stopped|deviation)
-    const urlFilter = searchParams?.get('filter')
-    const filterMap: Record<string, string> = {
-      delay: 'route_delayed',
-      stopped: 'bus_stopped',
-      deviation: 'route_deviation',
-    }
-    const mappedUrlFilter = urlFilter ? filterMap[urlFilter] : null
-    const matchesUrlFilter = !mappedUrlFilter || a.alert_type === mappedUrlFilter
-
-    // Filtro de severidade via dropdown
-    const matchesSeverity = filterType === "all" 
-      || (filterType === 'error' && (a.severity === 'error' || a.severity === 'critical'))
-      || (filterType === 'warning' && a.severity === 'warning')
-      || (filterType === 'info' && (a.severity === 'info' || !a.severity))
-
-    return matchesSearch && matchesUrlFilter && matchesSeverity
+    return matchesSearch
   })
 
   const getAlertColor = (severity?: string) => {
@@ -215,6 +206,8 @@ function AlertasOperatorPageInner() {
             <option value="error">Erro</option>
             <option value="warning">Aviso</option>
             <option value="info">Info</option>
+            <option value="resolved">Resolvidos</option>
+            <option value="unresolved">Não Resolvidos</option>
           </select>
         </div>
 
@@ -249,17 +242,67 @@ function AlertasOperatorPageInner() {
                       </div>
                     )}
                   </div>
+                  <div className="flex gap-2">
+                    {!alerta.is_resolved && (
+                      <>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleResolve(alerta.id, true)}
+                          disabled={resolveAlert.isPending}
+                        >
+                          <CheckCircle className="h-4 w-4 mr-1" />
+                          Resolver
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleCreateRequest(alerta)}
+                        >
+                          <Plus className="h-4 w-4 mr-1" />
+                          Criar Solicitação
+                        </Button>
+                      </>
+                    )}
+                    {alerta.is_resolved && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleResolve(alerta.id, false)}
+                        disabled={resolveAlert.isPending}
+                      >
+                        <XCircle className="h-4 w-4 mr-1" />
+                        Reabrir
+                      </Button>
+                    )}
+                  </div>
                 </div>
               </Card>
             </motion.div>
           ))}
-          {filteredAlertas.length === 0 && !loading && (
+          
+          {/* Infinite scroll trigger */}
+          {hasNextPage && (
+            <div ref={ref} className="flex justify-center py-4">
+              {isFetchingNextPage && (
+                <div className="w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
+              )}
+            </div>
+          )}
+          
+          {filteredAlertas.length === 0 && !alertsLoading && (
             <Card className="p-12 text-center">
               <Bell className="h-12 w-12 text-gray-400 mx-auto mb-4" />
               <h3 className="text-lg font-medium mb-2">Nenhum alerta encontrado</h3>
-              <p className="text-sm text-gray-500">
-                {searchQuery ? "Tente ajustar sua busca" : "Não há alertas no momento"}
+              <p className="text-sm text-gray-500 mb-4">
+                {debouncedSearch ? "Tente ajustar sua busca" : "Não há alertas no momento"}
               </p>
+              {!debouncedSearch && (
+                <Button onClick={() => router.push('/operator/solicitacoes')}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Criar Solicitação
+                </Button>
+              )}
             </Card>
           )}
         </div>

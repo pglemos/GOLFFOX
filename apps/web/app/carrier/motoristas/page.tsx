@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Users, Search, Award, Phone, Mail, FileText, Stethoscope, AlertCircle, Calendar, ExternalLink, Upload } from "lucide-react"
+import { Users, Search, Award, Phone, Mail, FileText, Stethoscope, AlertCircle, Calendar, ExternalLink, Upload, Filter, Trophy, Medal, Star } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
@@ -16,13 +16,18 @@ import { DocumentUpload } from "@/components/carrier/document-upload"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { ChartContainer } from "@/components/carrier/chart-container"
+import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from "recharts"
 
 export default function CarrierMotoristasPage() {
   const router = useRouter()
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [motoristas, setMotoristas] = useState<any[]>([])
+  const [motoristasWithStats, setMotoristasWithStats] = useState<any[]>([])
   const [searchQuery, setSearchQuery] = useState("")
+  const [statusFilter, setStatusFilter] = useState<string>("all")
+  const [ratingFilter, setRatingFilter] = useState<string>("all")
   const [activeTab, setActiveTab] = useState("list")
   const [selectedDriver, setSelectedDriver] = useState<string | null>(null)
   const [documents, setDocuments] = useState<any[]>([])
@@ -74,6 +79,49 @@ export default function CarrierMotoristasPage() {
 
       if (error) throw error
       setMotoristas(data || [])
+
+      // Buscar dados de ranking/gamificação
+      if (data && data.length > 0) {
+        const driverIds = data.map((d: any) => d.id)
+        const { data: rankings } = await supabase
+          .from('gf_gamification_scores')
+          .select('*')
+          .in('driver_id', driverIds)
+
+        // Buscar viagens dos motoristas
+        const { data: trips } = await supabase
+          .from('trips')
+          .select('driver_id')
+          .in('driver_id', driverIds)
+
+        const tripsByDriver = trips?.reduce((acc: any, t) => {
+          acc[t.driver_id] = (acc[t.driver_id] || 0) + 1
+          return acc
+        }, {}) || {}
+
+        const driversWithStats = data.map((driver: any) => {
+          const ranking = rankings?.find((r: any) => r.driver_id === driver.id)
+          const tripsCount = tripsByDriver[driver.id] || 0
+          return {
+            ...driver,
+            trips: ranking?.trips_completed || tripsCount,
+            rating: ranking?.total_points ? (ranking.total_points / 100).toFixed(1) : '0.0',
+            total_points: ranking?.total_points || 0,
+            on_time_percentage: ranking?.on_time_percentage || 0,
+            safety_score: ranking?.safety_score || 0,
+            status: 'active' // Simplificado
+          }
+        })
+
+        // Ordenar por performance
+        driversWithStats.sort((a, b) => {
+          const scoreA = a.total_points + (a.trips * 10)
+          const scoreB = b.total_points + (b.trips * 10)
+          return scoreB - scoreA
+        })
+
+        setMotoristasWithStats(driversWithStats)
+      }
     } catch (error) {
       console.error("Erro ao carregar motoristas:", error)
     }
@@ -134,11 +182,31 @@ export default function CarrierMotoristasPage() {
     return <div className="min-h-screen flex items-center justify-center"><div className="w-16 h-16 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin mx-auto"></div></div>
   }
 
-  const filteredMotoristas = motoristas.filter(m => 
-    searchQuery === "" || 
-    m.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    m.email?.toLowerCase().includes(searchQuery.toLowerCase())
-  )
+  const getRankIcon = (index: number) => {
+    if (index === 0) return <Trophy className="h-5 w-5 text-yellow-500" />
+    if (index === 1) return <Medal className="h-5 w-5 text-gray-400" />
+    if (index === 2) return <Medal className="h-5 w-5 text-amber-600" />
+    return null
+  }
+
+  const filteredMotoristas = motoristasWithStats.filter(m => {
+    // Filtro de busca
+    const matchesSearch = searchQuery === "" || 
+      m.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      m.email?.toLowerCase().includes(searchQuery.toLowerCase())
+
+    // Filtro de status (simplificado - todos são ativos por padrão)
+    const matchesStatus = statusFilter === "all" || statusFilter === "active"
+
+    // Filtro de avaliação
+    const rating = parseFloat(m.rating || '0')
+    const matchesRating = ratingFilter === "all" ||
+      (ratingFilter === "high" && rating >= 4.0) ||
+      (ratingFilter === "medium" && rating >= 3.0 && rating < 4.0) ||
+      (ratingFilter === "low" && rating < 3.0)
+
+    return matchesSearch && matchesStatus && matchesRating
+  })
 
   return (
     <AppShell user={{ id: user?.id || "", name: user?.name || "Transportadora", email: user?.email || "", role: "carrier" }}>
@@ -166,70 +234,171 @@ export default function CarrierMotoristasPage() {
           </TabsList>
 
           <TabsContent value="list" className="space-y-6">
-            {/* Busca */}
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-              <Input
-                placeholder="Buscar motoristas por nome, email..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
-              />
-            </div>
+            {/* Filtros e Busca */}
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <div className="relative flex-1">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                    <Input
+                      placeholder="Buscar motoristas por nome, email..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="pl-10"
+                    />
+                  </div>
+                  <Select value={statusFilter} onValueChange={setStatusFilter}>
+                    <SelectTrigger className="w-full sm:w-48">
+                      <Filter className="h-4 w-4 mr-2" />
+                      <SelectValue placeholder="Status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Todos</SelectItem>
+                      <SelectItem value="active">Ativos</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Select value={ratingFilter} onValueChange={setRatingFilter}>
+                    <SelectTrigger className="w-full sm:w-48">
+                      <Star className="h-4 w-4 mr-2" />
+                      <SelectValue placeholder="Avaliação" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Todas</SelectItem>
+                      <SelectItem value="high">Alta (≥4.0)</SelectItem>
+                      <SelectItem value="medium">Média (3.0-4.0)</SelectItem>
+                      <SelectItem value="low">Baixa (&lt;3.0)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Gráfico de Performance */}
+            {filteredMotoristas.length > 0 && (
+              <ChartContainer
+                title="Performance dos Motoristas"
+                description="Top 10 motoristas por número de viagens"
+                height={300}
+              >
+                <BarChart data={filteredMotoristas.slice(0, 10)}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                  <XAxis 
+                    dataKey="name" 
+                    stroke="var(--ink-muted)"
+                    style={{ fontSize: '12px' }}
+                    angle={-45}
+                    textAnchor="end"
+                    height={100}
+                  />
+                  <YAxis stroke="var(--ink-muted)" style={{ fontSize: '12px' }} />
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: 'var(--bg)', 
+                      border: '1px solid var(--border)',
+                      borderRadius: '8px'
+                    }}
+                  />
+                  <Bar dataKey="trips" fill="var(--brand)" radius={[8, 8, 0, 0]} />
+                </BarChart>
+              </ChartContainer>
+            )}
 
             <div className="grid gap-4">
-              {filteredMotoristas.map((motorista, index) => (
-                <motion.div
-                  key={motorista.id || index}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.05 }}
-                >
-                  <Card className="p-4 hover:shadow-lg transition-shadow">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Users className="h-5 w-5 text-[var(--brand)]" />
-                          <h3 className="font-bold text-lg">{motorista.name}</h3>
-                          <Badge variant="outline">Motorista</Badge>
+              {filteredMotoristas.map((motorista, index) => {
+                const rankIcon = getRankIcon(index)
+                return (
+                  <motion.div
+                    key={motorista.id || index}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.05 }}
+                  >
+                    <Card className="p-4 hover:shadow-lg transition-shadow">
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex items-start gap-4 flex-1">
+                          {/* Ranking */}
+                          <div className="flex flex-col items-center justify-center min-w-[60px]">
+                            {rankIcon ? (
+                              rankIcon
+                            ) : (
+                              <div className="w-10 h-10 rounded-full bg-[var(--brand-light)] flex items-center justify-center">
+                                <span className="font-bold text-[var(--brand)]">#{index + 1}</span>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Avatar */}
+                          <div className="w-16 h-16 rounded-full bg-[var(--brand-light)] flex items-center justify-center flex-shrink-0">
+                            <Users className="h-8 w-8 text-[var(--brand)]" />
+                          </div>
+
+                          {/* Informações */}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-2 flex-wrap">
+                              <h3 className="font-bold text-lg">{motorista.name}</h3>
+                              <Badge variant="outline">Motorista</Badge>
+                              <Badge variant="default" className="flex items-center gap-1">
+                                <Star className="h-3 w-3 fill-current" />
+                                {motorista.rating}
+                              </Badge>
+                            </div>
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-sm">
+                              <div>
+                                <span className="text-[var(--ink-muted)]">Viagens:</span>
+                                <span className="font-semibold ml-1">{motorista.trips}</span>
+                              </div>
+                              <div>
+                                <span className="text-[var(--ink-muted)]">Pontos:</span>
+                                <span className="font-semibold ml-1">{motorista.total_points}</span>
+                              </div>
+                              <div>
+                                <span className="text-[var(--ink-muted)]">Pontualidade:</span>
+                                <span className="font-semibold ml-1">{motorista.on_time_percentage.toFixed(0)}%</span>
+                              </div>
+                              <div>
+                                <span className="text-[var(--ink-muted)]">Segurança:</span>
+                                <span className="font-semibold ml-1">{motorista.safety_score.toFixed(1)}</span>
+                              </div>
+                            </div>
+                            <div className="space-y-1 text-sm text-[var(--ink-muted)] mt-2">
+                              {motorista.email && (
+                                <div className="flex items-center gap-2">
+                                  <Mail className="h-4 w-4" />
+                                  <span className="truncate">{motorista.email}</span>
+                                </div>
+                              )}
+                              {motorista.phone && (
+                                <div className="flex items-center gap-2">
+                                  <Phone className="h-4 w-4" />
+                                  <span>{motorista.phone}</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
                         </div>
-                        <div className="space-y-1 text-sm text-[var(--ink-muted)]">
-                          {motorista.email && (
-                            <div className="flex items-center gap-2">
-                              <Mail className="h-4 w-4" />
-                              <span>{motorista.email}</span>
-                            </div>
-                          )}
-                          {motorista.phone && (
-                            <div className="flex items-center gap-2">
-                              <Phone className="h-4 w-4" />
-                              <span>{motorista.phone}</span>
-                            </div>
-                          )}
+                        <div className="flex flex-col gap-2">
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => {
+                              setSelectedDriver(motorista.id)
+                              loadDriverDocuments(motorista.id)
+                              setActiveTab('documents')
+                            }}
+                          >
+                            <FileText className="h-4 w-4 mr-2" />
+                            Documentos
+                          </Button>
+                          <Button variant="outline" size="sm">
+                            <Award className="h-4 w-4 mr-2" />
+                            Detalhes
+                          </Button>
                         </div>
                       </div>
-                      <div className="flex gap-2">
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => {
-                            setSelectedDriver(motorista.id)
-                            loadDriverDocuments(motorista.id)
-                            setActiveTab('documents')
-                          }}
-                        >
-                          <FileText className="h-4 w-4 mr-2" />
-                          Documentos
-                        </Button>
-                        <Button variant="outline" size="sm">
-                          <Award className="h-4 w-4 mr-2" />
-                          Ranking
-                        </Button>
-                      </div>
-                    </div>
-                  </Card>
-                </motion.div>
-              ))}
+                    </Card>
+                  </motion.div>
+                )
+              })}
               {filteredMotoristas.length === 0 && (
                 <Card className="p-12 text-center">
                   <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />

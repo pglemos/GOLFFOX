@@ -4,6 +4,8 @@ import "./globals.css";
 import { Toaster } from "react-hot-toast";
 import { WebVitalsInit } from "@/components/web-vitals-init";
 import { ErrorBoundary } from "@/components/error-boundary";
+import { ReactQueryProvider } from "@/lib/react-query-provider";
+import { ThemeProvider } from "next-themes";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -26,12 +28,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR" className={inter.variable}>
+    <html lang="pt-BR" className={inter.variable} suppressHydrationWarning>
       <body className={`${inter.className} font-smooth`}>
         <ErrorBoundary>
-          <WebVitalsInit />
-          {children}
-          <Toaster position="top-right" />
+          <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+            <ReactQueryProvider>
+              <WebVitalsInit />
+              {children}
+              <Toaster position="top-right" />
+            </ReactQueryProvider>
+          </ThemeProvider>
         </ErrorBoundary>
       </body>
     </html>

@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { DollarSign, TrendingUp, TrendingDown, BarChart3, FileText, Truck, Route, Calendar } from 'lucide-react'
+import { DollarSign, TrendingUp, TrendingDown, BarChart3, FileText, Truck, Route, Calendar, Users } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
@@ -23,7 +23,17 @@ export default function CarrierCustosPage() {
     fuel_percentage: 0,
     maintenance_percentage: 0,
     total_vehicles: 0,
-    total_routes: 0
+    total_routes: 0,
+    cost_per_km: 0,
+    cost_per_passenger: 0,
+    previous_month_total: 0,
+    trend_percentage: 0
+  })
+  const [advancedAnalysis, setAdvancedAnalysis] = useState<any>({
+    costByCategory: [],
+    costByVehicle: [],
+    costByRoute: [],
+    monthlyTrend: []
   })
   const [dateStart, setDateStart] = useState(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0])
   const [dateEnd, setDateEnd] = useState(new Date().toISOString().split('T')[0])
@@ -82,10 +92,77 @@ export default function CarrierCustosPage() {
         const routeData = await routeRes.json()
         setRouteCosts(routeData || [])
         
+        // Calcular custo por passageiro
+        const totalPassengers = routeData.reduce((sum: number, r: any) => sum + (r.passengers_transported || 0), 0)
+        const totalRouteCosts = routeData.reduce((sum: number, r: any) => sum + parseFloat(r.total_cost_brl?.toString() || '0'), 0)
+        const costPerPassenger = totalPassengers > 0 ? totalRouteCosts / totalPassengers : 0
+
+        // Calcular custo por km
+        const totalKm = routeData.reduce((sum: number, r: any) => sum + parseFloat(r.distance_km?.toString() || '0'), 0)
+        const costPerKm = totalKm > 0 ? totalRouteCosts / totalKm : 0
+
+        // Buscar dados do mês anterior para comparação
+        const previousMonthStart = new Date(dateStart)
+        previousMonthStart.setMonth(previousMonthStart.getMonth() - 1)
+        const previousMonthEnd = new Date(dateStart)
+
+        const [prevVehicleRes, prevRouteRes] = await Promise.all([
+          fetch(`/api/carrier/costs/vehicle?start_date=${previousMonthStart.toISOString().split('T')[0]}&end_date=${previousMonthEnd.toISOString().split('T')[0]}`),
+          fetch(`/api/carrier/costs/route?start_date=${previousMonthStart.toISOString().split('T')[0]}&end_date=${previousMonthEnd.toISOString().split('T')[0]}`)
+        ])
+
+        let previousMonthTotal = 0
+        if (prevVehicleRes.ok) {
+          const prevVehicleData = await prevVehicleRes.json()
+          previousMonthTotal += prevVehicleData.reduce((sum: number, c: any) => sum + parseFloat(c.amount_brl?.toString() || '0'), 0)
+        }
+        if (prevRouteRes.ok) {
+          const prevRouteData = await prevRouteRes.json()
+          previousMonthTotal += prevRouteData.reduce((sum: number, r: any) => sum + parseFloat(r.total_cost_brl?.toString() || '0'), 0)
+        }
+
+        const trendPercentage = previousMonthTotal > 0
+          ? ((totalCostsThisMonth - previousMonthTotal) / previousMonthTotal) * 100
+          : 0
+
         setSummary(prev => ({
           ...prev,
-          total_routes: new Set(routeData.map((c: any) => c.route_id)).size
+          total_routes: new Set(routeData.map((c: any) => c.route_id)).size,
+          cost_per_km: costPerKm,
+          cost_per_passenger: costPerPassenger,
+          previous_month_total: previousMonthTotal,
+          trend_percentage: trendPercentage
         }))
+
+        // Análise avançada
+        const costByCategory = vehicleCosts.reduce((acc: any, cost: any) => {
+          const category = cost.cost_category || 'outros'
+          if (!acc[category]) {
+            acc[category] = 0
+          }
+          acc[category] += parseFloat(cost.amount_brl?.toString() || '0')
+          return acc
+        }, {})
+
+        setAdvancedAnalysis({
+          costByCategory: Object.entries(costByCategory).map(([name, value]) => ({ name, value })),
+          costByVehicle: vehicleCosts.reduce((acc: any, cost: any) => {
+            const vehicleId = cost.vehicle_id
+            if (!acc[vehicleId]) {
+              acc[vehicleId] = { vehicle_id: vehicleId, plate: cost.vehicles?.plate || 'N/A', total: 0 }
+            }
+            acc[vehicleId].total += parseFloat(cost.amount_brl?.toString() || '0')
+            return acc
+          }, {}),
+          costByRoute: routeData.map((r: any) => ({
+            route_id: r.route_id,
+            route_name: r.routes?.name || 'N/A',
+            total: parseFloat(r.total_cost_brl?.toString() || '0'),
+            passengers: r.passengers_transported || 0,
+            cost_per_passenger: costPerPassenger
+          })),
+          monthlyTrend: [] // Seria preenchido com dados históricos
+        })
       }
     } catch (error) {
       console.error("Erro ao carregar custos:", error)
@@ -172,13 +249,18 @@ export default function CarrierCustosPage() {
         </Card>
 
         {/* KPIs */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <Card>
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-[var(--ink-muted)]">Total do Mês</p>
                   <p className="text-2xl font-bold">{formatCurrency(summary.total_this_month)}</p>
+                  {summary.previous_month_total > 0 && (
+                    <p className={`text-xs mt-1 ${summary.trend_percentage >= 0 ? 'text-red-600' : 'text-green-600'}`}>
+                      {summary.trend_percentage >= 0 ? '↑' : '↓'} {Math.abs(summary.trend_percentage).toFixed(1)}% vs mês anterior
+                    </p>
+                  )}
                 </div>
                 <DollarSign className="h-8 w-8 text-[var(--brand)]" />
               </div>
@@ -201,10 +283,10 @@ export default function CarrierCustosPage() {
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-[var(--ink-muted)]">Manutenção</p>
-                  <p className="text-2xl font-bold">{summary.maintenance_percentage.toFixed(1)}%</p>
+                  <p className="text-sm text-[var(--ink-muted)]">Custo por KM</p>
+                  <p className="text-2xl font-bold">{formatCurrency(summary.cost_per_km)}</p>
                 </div>
-                <TrendingDown className="h-8 w-8 text-red-500" />
+                <Route className="h-8 w-8 text-blue-500" />
               </div>
             </CardContent>
           </Card>
@@ -213,10 +295,10 @@ export default function CarrierCustosPage() {
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-[var(--ink-muted)]">Veículos</p>
-                  <p className="text-2xl font-bold">{summary.total_vehicles}</p>
+                  <p className="text-sm text-[var(--ink-muted)]">Custo por Passageiro</p>
+                  <p className="text-2xl font-bold">{formatCurrency(summary.cost_per_passenger)}</p>
                 </div>
-                <Truck className="h-8 w-8 text-blue-500" />
+                <Users className="h-8 w-8 text-green-500" />
               </div>
             </CardContent>
           </Card>

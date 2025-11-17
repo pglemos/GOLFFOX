@@ -1,19 +1,32 @@
 "use client"
 
-import { useEffect, useState, useCallback } from "react"
+import { useEffect, useState, useCallback, useMemo } from "react"
+import dynamic from "next/dynamic"
 import { AppShell } from "@/components/app-shell"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Briefcase, Plus, Users, UserPlus, Trash2 } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
-import { CreateOperatorModal } from "@/components/modals/create-operator-modal"
-import { CompanyOperatorsModal } from "@/components/modals/company-operators-modal"
 import { useAuthFast } from "@/hooks/use-auth-fast"
 import { useGlobalSync } from "@/hooks/use-global-sync"
 import { notifySuccess, notifyError } from "@/lib/toast"
-import { EditCompanyModal } from "@/components/modals/edit-company-modal"
 import { Edit } from "lucide-react"
+import { SkeletonList } from "@/components/ui/skeleton"
+
+// Lazy load modais pesados
+const CreateOperatorModal = dynamic(
+  () => import("@/components/modals/create-operator-modal").then(m => ({ default: m.CreateOperatorModal })),
+  { ssr: false, loading: () => null }
+)
+const CompanyOperatorsModal = dynamic(
+  () => import("@/components/modals/company-operators-modal").then(m => ({ default: m.CompanyOperatorsModal })),
+  { ssr: false, loading: () => null }
+)
+const EditCompanyModal = dynamic(
+  () => import("@/components/modals/edit-company-modal").then(m => ({ default: m.EditCompanyModal })),
+  { ssr: false, loading: () => null }
+)
 
 export default function EmpresasPage() {
   const router = useRouter()

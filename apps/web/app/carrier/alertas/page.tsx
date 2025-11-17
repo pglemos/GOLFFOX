@@ -6,7 +6,9 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { AlertCircle, Calendar, FileText, Stethoscope, Truck, Clock, ExternalLink, Bell, Mail } from "lucide-react"
+import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { AlertCircle, Calendar, FileText, Stethoscope, Truck, Clock, ExternalLink, Bell, Mail, Filter, Download, RefreshCw } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -23,6 +25,8 @@ export default function CarrierAlertasPage() {
     expired: 0
   })
   const [activeTab, setActiveTab] = useState('all')
+  const [documentTypeFilter, setDocumentTypeFilter] = useState<string>("all")
+  const [entityTypeFilter, setEntityTypeFilter] = useState<string>("all")
 
   useEffect(() => {
     const getUser = async () => {
@@ -83,12 +87,43 @@ export default function CarrierAlertasPage() {
   }
 
   const filteredAlerts = alerts.filter(alert => {
-    if (activeTab === 'all') return true
-    if (activeTab === 'critical') return alert.alert_level === 'critical'
-    if (activeTab === 'expired') return alert.alert_level === 'expired'
-    if (activeTab === 'warning') return alert.alert_level === 'warning'
-    return true
+    // Filtro por nível de alerta
+    let matchesLevel = true
+    if (activeTab === 'critical') matchesLevel = alert.alert_level === 'critical'
+    else if (activeTab === 'expired') matchesLevel = alert.alert_level === 'expired'
+    else if (activeTab === 'warning') matchesLevel = alert.alert_level === 'warning'
+
+    // Filtro por tipo de documento
+    const matchesDocumentType = documentTypeFilter === 'all' || alert.document_type === documentTypeFilter
+
+    // Filtro por tipo de entidade
+    const matchesEntityType = entityTypeFilter === 'all' || alert.item_type === entityTypeFilter
+
+    return matchesLevel && matchesDocumentType && matchesEntityType
   })
+
+  const uniqueDocumentTypes = Array.from(new Set(alerts.map(a => a.document_type))).filter(Boolean)
+  const uniqueEntityTypes = Array.from(new Set(alerts.map(a => a.item_type))).filter(Boolean)
+
+  const handleExportAlerts = () => {
+    const csv = [
+      ['Tipo', 'Entidade', 'Documento', 'Nível', 'Vencimento', 'Dias Restantes'].join(','),
+      ...filteredAlerts.map(a => [
+        a.item_type,
+        a.entity_name,
+        a.document_type,
+        a.alert_level,
+        a.expiry_date ? new Date(a.expiry_date).toLocaleDateString('pt-BR') : 'N/A',
+        a.days_to_expiry || 0
+      ].join(','))
+    ].join('\n')
+    const blob = new Blob([csv], { type: 'text/csv' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `alertas-${new Date().toISOString().split('T')[0]}.csv`
+    a.click()
+  }
 
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center"><div className="w-16 h-16 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin mx-auto"></div></div>
@@ -101,6 +136,25 @@ export default function CarrierAlertasPage() {
           <div>
             <h1 className="text-3xl font-bold mb-2">Alertas de Vencimento</h1>
             <p className="text-[var(--ink-muted)]">Monitore documentos e exames próximos do vencimento</p>
+          </div>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={loadAlerts}
+            >
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Atualizar
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleExportAlerts}
+              disabled={filteredAlerts.length === 0}
+            >
+              <Download className="h-4 w-4 mr-2" />
+              Exportar
+            </Button>
           </div>
         </div>
 
@@ -154,6 +208,48 @@ export default function CarrierAlertasPage() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Filtros Avançados */}
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-2 mb-4">
+              <Filter className="h-5 w-5 text-[var(--brand)]" />
+              <h3 className="font-semibold">Filtros</h3>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label>Tipo de Documento</Label>
+                <Select value={documentTypeFilter} onValueChange={setDocumentTypeFilter}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todos</SelectItem>
+                    {uniqueDocumentTypes.map(type => (
+                      <SelectItem key={type} value={type}>
+                        {type.replace('_', ' ').toUpperCase()}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label>Tipo de Entidade</Label>
+                <Select value={entityTypeFilter} onValueChange={setEntityTypeFilter}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todos</SelectItem>
+                    <SelectItem value="driver_document">Documento do Motorista</SelectItem>
+                    <SelectItem value="driver_exam">Exame do Motorista</SelectItem>
+                    <SelectItem value="vehicle_document">Documento do Veículo</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid w-full grid-cols-4">
@@ -218,7 +314,7 @@ export default function CarrierAlertasPage() {
                               : `Vence em ${alert.days_to_expiry || 0} dias - Renovação recomendada`}
                           </span>
                         </div>
-                        <div className="flex items-center gap-2 mt-3 pt-3 border-t border-current/20">
+                        <div className="flex items-center gap-2 mt-3 pt-3 border-t border-current/20 flex-wrap">
                           <Button 
                             size="sm" 
                             variant="outline"
@@ -236,7 +332,17 @@ export default function CarrierAlertasPage() {
                             size="sm" 
                             variant="outline"
                             onClick={async () => {
-                              // Enviar email de alerta (implementar API de notificações)
+                              // Marcar como visualizado ou agendar renovação
+                              // Implementar ação rápida
+                            }}
+                          >
+                            <Calendar className="h-4 w-4 mr-2" />
+                            Agendar Renovação
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            onClick={async () => {
                               try {
                                 const res = await fetch('/api/notifications/email', {
                                   method: 'POST',

@@ -1,57 +1,17 @@
-/**
- * Função utilitária para debounce
- * Retorna uma função que só executa após o delay especificado
- */
-export function debounce<T extends (...args: any[]) => any>(
-  func: T,
-  wait: number = 300
-): (...args: Parameters<T>) => void {
-  let timeout: NodeJS.Timeout | null = null
+import { useEffect, useState } from "react"
 
-  return function executedFunction(...args: Parameters<T>) {
-    const later = () => {
-      timeout = null
-      func(...args)
-    }
+export function useDebounce<T>(value: T, delay: number = 300): T {
+  const [debouncedValue, setDebouncedValue] = useState<T>(value)
 
-    if (timeout) {
-      clearTimeout(timeout)
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value)
+    }, delay)
+
+    return () => {
+      clearTimeout(handler)
     }
-    timeout = setTimeout(later, wait)
-  }
+  }, [value, delay])
+
+  return debouncedValue
 }
-
-/**
- * Debounce com cancelamento
- */
-export function debounceWithCancel<T extends (...args: any[]) => any>(
-  func: T,
-  wait: number = 300
-): {
-  debounced: (...args: Parameters<T>) => void
-  cancel: () => void
-} {
-  let timeout: NodeJS.Timeout | null = null
-
-  const debounced = (...args: Parameters<T>) => {
-    const later = () => {
-      timeout = null
-      func(...args)
-    }
-
-    if (timeout) {
-      clearTimeout(timeout)
-    }
-    timeout = setTimeout(later, wait)
-  }
-
-  const cancel = () => {
-    if (timeout) {
-      clearTimeout(timeout)
-      timeout = null
-    }
-  }
-
-  return { debounced, cancel }
-}
-

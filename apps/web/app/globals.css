@@ -113,6 +113,53 @@
     --z-tooltip: 1070;
   }
 
+  .dark {
+    /* Backgrounds - Dark Mode */
+    --bg: #0B1220;
+    --bg-soft: #1E293B;
+    --bg-elevated: #1E293B;
+    --bg-hover: #334155;
+    --bg-pattern: #0F172A;
+    
+    /* Text - Light for Dark */
+    --ink: #F1F5F9;
+    --ink-strong: #FFFFFF;
+    --ink-muted: #94A3B8;
+    --ink-light: #64748B;
+    --ink-disabled: #475569;
+    
+    /* Brand - Laranja mantém */
+    --brand: #F97316;
+    --brand-hover: #FB923C;
+    --brand-light: #1E293B;
+    --brand-soft: #334155;
+    
+    /* Accent - Azul Petróleo mantém */
+    --accent: #1E3A5F;
+    --accent-dark: #0A2540;
+    --accent-soft: #2D4A6B;
+    --accent-light: #1E293B;
+    
+    /* Status Colors mantém */
+    --success: #10B981;
+    --success-light: #064E3B;
+    --warning: #F59E0B;
+    --warning-light: #78350F;
+    --error: #EF4444;
+    --error-light: #7F1D1D;
+    --info: #3B82F6;
+    --info-light: #1E3A8A;
+    
+    /* Borders & Dividers */
+    --border: #334155;
+    --border-strong: #475569;
+    --border-light: #1E293B;
+    
+    /* Glassmorphism Dark */
+    --glass-bg: rgba(30, 41, 59, 0.85);
+    --glass-border: rgba(51, 65, 85, 0.5);
+  }
+
   * {
     @apply border-border;
     box-sizing: border-box;
