@@ -584,22 +584,100 @@ function LoginContent() {
         className="hidden lg:flex lg:w-1/2 relative overflow-hidden items-center justify-center"
       >
         <div className="relative z-10 max-w-2xl mx-auto text-center px-8">
-          {/* Logo minimalista */}
+          {/* Logo com destaque PREMIUM */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-            className="mb-16"
+            initial={{ opacity: 0, scale: 0.8, y: -20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ duration: 1, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            className="mb-20"
           >
-            <div className="inline-flex items-center justify-center w-24 h-24 rounded-3xl bg-gradient-to-br from-[#F97316] to-[#EA580C] p-[2px] shadow-2xl shadow-orange-500/20">
-              <div className="w-full h-full rounded-3xl bg-black flex items-center justify-center">
-                <img 
-                  src="/icons/golf_fox_logo.svg" 
-                  alt="Golf Fox" 
-                  className="w-16 h-16"
-                />
+            <motion.div
+              whileHover={{ scale: 1.05, rotate: [0, -3, 3, 0] }}
+              transition={{ duration: 0.6 }}
+              className="relative inline-block"
+            >
+              {/* Glow effect animado */}
+              <motion.div
+                className="absolute inset-0 rounded-[40px] blur-3xl"
+                animate={{
+                  background: [
+                    "radial-gradient(circle, rgba(249,115,22,0.4) 0%, transparent 70%)",
+                    "radial-gradient(circle, rgba(249,115,22,0.6) 0%, transparent 70%)",
+                    "radial-gradient(circle, rgba(249,115,22,0.4) 0%, transparent 70%)",
+                  ],
+                  scale: [1, 1.1, 1],
+                }}
+                transition={{
+                  duration: 3,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+              />
+              
+              {/* Border gradient animado */}
+              <div className="relative w-32 h-32 rounded-[40px] bg-gradient-to-br from-[#F97316] via-[#FB923C] to-[#EA580C] p-[3px] shadow-2xl shadow-orange-500/50">
+                <div className="w-full h-full rounded-[37px] bg-black flex items-center justify-center relative overflow-hidden">
+                  {/* Shine effect */}
+                  <motion.div
+                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                    animate={{
+                      x: ['-200%', '200%'],
+                    }}
+                    transition={{
+                      duration: 3,
+                      repeat: Infinity,
+                      repeatDelay: 1,
+                      ease: "easeInOut",
+                    }}
+                  />
+                  
+                  {/* Logo */}
+                  <motion.img 
+                    src="/icons/golf_fox_logo.svg" 
+                    alt="Golf Fox" 
+                    className="w-20 h-20 relative z-10 drop-shadow-2xl"
+                    animate={{
+                      filter: [
+                        "drop-shadow(0 0 20px rgba(249,115,22,0.5))",
+                        "drop-shadow(0 0 30px rgba(249,115,22,0.7))",
+                        "drop-shadow(0 0 20px rgba(249,115,22,0.5))",
+                      ],
+                    }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    }}
+                  />
+                </div>
               </div>
-            </div>
+
+              {/* Pulse ring effect */}
+              <motion.div
+                className="absolute inset-0 rounded-[40px] border-2 border-orange-500/30"
+                animate={{
+                  scale: [1, 1.2, 1],
+                  opacity: [0.5, 0, 0.5],
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: "easeOut",
+                }}
+              />
+            </motion.div>
+
+            {/* Nome da marca */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.5 }}
+              className="mt-6"
+            >
+              <span className="text-2xl font-bold bg-gradient-to-r from-white via-orange-100 to-white bg-clip-text text-transparent tracking-wider">
+                GOLF FOX
+              </span>
+            </motion.div>
           </motion.div>
 
           {/* Headline minimalista (estilo Apple) */}
@@ -663,19 +741,64 @@ function LoginContent() {
             className="w-full max-w-md"
           >
             <div className="relative">
-              {/* Logo mobile */}
-              <div className="lg:hidden mb-12 text-center">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-[#F97316] to-[#EA580C] p-[2px] shadow-lg shadow-orange-500/20 mb-4">
-                  <div className="w-full h-full rounded-2xl bg-white flex items-center justify-center">
-                    <img 
-                      src="/icons/golf_fox_logo.svg" 
-                      alt="Golf Fox" 
-                      className="w-10 h-10"
-                    />
+              {/* Logo mobile com destaque */}
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                className="lg:hidden mb-16 text-center"
+              >
+                <div className="relative inline-block mb-4">
+                  {/* Glow mobile */}
+                  <motion.div
+                    className="absolute inset-0 rounded-3xl blur-2xl"
+                    animate={{
+                      background: [
+                        "radial-gradient(circle, rgba(249,115,22,0.3) 0%, transparent 70%)",
+                        "radial-gradient(circle, rgba(249,115,22,0.5) 0%, transparent 70%)",
+                        "radial-gradient(circle, rgba(249,115,22,0.3) 0%, transparent 70%)",
+                      ],
+                    }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    }}
+                  />
+                  
+                  <div className="relative w-24 h-24 rounded-3xl bg-gradient-to-br from-[#F97316] via-[#FB923C] to-[#EA580C] p-[2.5px] shadow-xl shadow-orange-500/30">
+                    <div className="w-full h-full rounded-[22px] bg-white flex items-center justify-center relative overflow-hidden">
+                      {/* Shine effect mobile */}
+                      <motion.div
+                        className="absolute inset-0 bg-gradient-to-r from-transparent via-orange-100 to-transparent"
+                        animate={{
+                          x: ['-200%', '200%'],
+                        }}
+                        transition={{
+                          duration: 2.5,
+                          repeat: Infinity,
+                          repeatDelay: 1,
+                          ease: "easeInOut",
+                        }}
+                      />
+                      <img 
+                        src="/icons/golf_fox_logo.svg" 
+                        alt="Golf Fox" 
+                        className="w-14 h-14 relative z-10"
+                      />
+                    </div>
                   </div>
                 </div>
-                <h2 className="text-xl font-bold text-gray-900">Golf Fox</h2>
-              </div>
+                
+                <motion.h2 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.3 }}
+                  className="text-2xl font-bold bg-gradient-to-r from-[#F97316] to-[#EA580C] bg-clip-text text-transparent"
+                >
+                  Golf Fox
+                </motion.h2>
+              </motion.div>
 
               {/* Loading overlay minimalista */}
               <AnimatePresence>
