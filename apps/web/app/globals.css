@@ -400,6 +400,29 @@
       max-width: 100%;
       min-width: 0;
     }
+    
+    /* Garantir que imagens sejam visíveis */
+    img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+    }
+    
+    /* Garantir que headings sejam visíveis */
+    h1, h2, h3, h4, h5, h6 {
+      display: block;
+      visibility: visible;
+      opacity: 1;
+      width: auto;
+      height: auto;
+    }
+    
+    /* Garantir que elementos motion.div sejam visíveis */
+    [class*="motion"] {
+      display: block !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+    }
   }
   
   /* Classe utilitária para texto suave */
