@@ -150,18 +150,18 @@ export default function TransportadorasPage() {
         <div className="grid gap-4">
           {Array.isArray(carriers) && carriers.map((carrier: any) => (
             <Card key={carrier.id} className="p-4">
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
+              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-2">
-                    <Truck className="h-5 w-5 text-[var(--brand)]" />
-                    <h3 className="font-bold text-lg">{carrier.name}</h3>
+                    <Truck className="h-5 w-5 text-[var(--brand)] flex-shrink-0" />
+                    <h3 className="font-bold text-lg break-words">{carrier.name}</h3>
                   </div>
-                  <p className="text-sm text-[var(--muted)]">{carrier.address || 'Sem endereço'}</p>
+                  <p className="text-sm text-[var(--muted)] break-words">{carrier.address || 'Sem endereço'}</p>
                   {carrier.phone && (
-                    <p className="text-xs text-[var(--muted)] mt-1">📞 {carrier.phone}</p>
+                    <p className="text-xs text-[var(--muted)] mt-1 break-words">📞 {carrier.phone}</p>
                   )}
                 </div>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2 sm:flex-nowrap">
                   <Button 
                     variant="outline" 
                     size="sm"
