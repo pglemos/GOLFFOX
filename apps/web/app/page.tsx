@@ -672,18 +672,6 @@ function LoginContent() {
                 }}
               />
             </motion.div>
-
-            {/* Nome da marca */}
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.5 }}
-              className="mt-6"
-            >
-              <span className="text-2xl font-bold bg-gradient-to-r from-white via-orange-100 to-white bg-clip-text text-transparent tracking-wider">
-                GOLF FOX
-              </span>
-            </motion.div>
           </motion.div>
 
           {/* Headline minimalista (estilo Apple) */}

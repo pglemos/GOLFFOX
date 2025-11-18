@@ -137,8 +137,13 @@ export function AddressAutocomplete({
   }
 
   return (
-    <div className={cn("grid gap-1.5 sm:gap-2", className)}>
-      {label && <Label htmlFor="address-autocomplete" className="text-sm sm:text-base">{label}</Label>}
+    <div className={cn("grid gap-2.5", className)}>
+      {label && (
+        <Label htmlFor="address-autocomplete" className="text-base font-medium flex items-center gap-2">
+          <MapPin className="h-4 w-4" />
+          {label}
+        </Label>
+      )}
       <div className="relative">
         <Autocomplete
           onLoad={onLoad}
@@ -159,21 +164,21 @@ export function AddressAutocomplete({
             required={required}
             className={cn(
               error && "border-red-500",
-              isLoading && "pr-10",
-              "text-sm sm:text-base h-9 sm:h-10"
+              isLoading && "pr-12",
+              "text-base h-11 sm:h-12 px-4 py-3 pr-12"
             )}
           />
         </Autocomplete>
         {isLoading && (
-          <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-3 w-3 sm:h-4 sm:w-4 animate-spin text-gray-400" />
+          <Loader2 className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 animate-spin text-gray-400" />
         )}
         {!isLoading && (
-          <MapPin className="absolute right-3 top-1/2 -translate-y-1/2 h-3 w-3 sm:h-4 sm:w-4 text-gray-400" />
+          <MapPin className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
         )}
       </div>
-      {error && <p className="text-xs sm:text-sm text-red-500">{error}</p>}
+      {error && <p className="text-sm text-red-500 mt-1">{error}</p>}
       {value && !autocomplete && (
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-gray-500 mt-1">
           Selecione um endereço da lista para geocodificação automática
         </p>
       )}

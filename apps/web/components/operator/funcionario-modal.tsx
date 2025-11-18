@@ -183,55 +183,59 @@ export function FuncionarioModal({ funcionario, isOpen, onClose, onSave, empresa
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="w-[95vw] max-w-[600px] max-h-[90vh] overflow-y-auto p-4 sm:p-6">
-        <DialogHeader className="pb-2 sm:pb-4">
-          <DialogTitle className="text-lg sm:text-xl">{funcionario ? "Editar Funcionário" : "Adicionar Funcionário"}</DialogTitle>
+      <DialogContent className="w-[95vw] max-w-[600px] max-h-[90vh] overflow-y-auto p-5 sm:p-8">
+        <DialogHeader className="pb-4 sm:pb-6">
+          <DialogTitle className="text-xl sm:text-2xl font-bold">{funcionario ? "Editar Funcionário" : "Adicionar Funcionário"}</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="grid gap-3 sm:gap-4 py-2 sm:py-4">
-          <div className="grid gap-1.5 sm:gap-2">
-            <Label htmlFor="name" className="text-sm sm:text-base">Nome</Label>
+        <form onSubmit={handleSubmit} className="grid gap-6 sm:gap-6 py-4">
+          <div className="grid gap-2.5">
+            <Label htmlFor="name" className="text-base font-medium">Nome *</Label>
             <Input
               id="name"
               value={formData.name}
               onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
               required
-              className="text-sm sm:text-base h-9 sm:h-10"
+              placeholder="Digite o nome completo"
+              className="text-base h-11 sm:h-12 px-4 py-3"
             />
           </div>
 
-          <div className="grid gap-1.5 sm:gap-2">
-            <Label htmlFor="email" className="text-sm sm:text-base">Email</Label>
+          <div className="grid gap-2.5">
+            <Label htmlFor="email" className="text-base font-medium">Email *</Label>
             <Input
               id="email"
               type="email"
               value={formData.email}
               onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
               required
-              className="text-sm sm:text-base h-9 sm:h-10"
+              placeholder="exemplo@email.com"
+              className="text-base h-11 sm:h-12 px-4 py-3"
             />
           </div>
 
-          <div className="grid gap-1.5 sm:gap-2">
-            <Label htmlFor="phone" className="text-sm sm:text-base">Telefone</Label>
+          <div className="grid gap-2.5">
+            <Label htmlFor="phone" className="text-base font-medium">Telefone</Label>
             <Input
               id="phone"
               value={formData.phone}
               onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
-              className="text-sm sm:text-base h-9 sm:h-10"
+              placeholder="(11) 99999-9999"
+              className="text-base h-11 sm:h-12 px-4 py-3"
             />
           </div>
 
-          <div className="grid gap-1.5 sm:gap-2">
-            <Label htmlFor="cpf" className="text-sm sm:text-base">CPF</Label>
+          <div className="grid gap-2.5">
+            <Label htmlFor="cpf" className="text-base font-medium">CPF</Label>
             <Input
               id="cpf"
               value={formData.cpf}
               onChange={(e) => setFormData(prev => ({ ...prev, cpf: e.target.value }))}
-              className="text-sm sm:text-base h-9 sm:h-10"
+              placeholder="000.000.000-00"
+              className="text-base h-11 sm:h-12 px-4 py-3"
             />
           </div>
 
-          <div className="grid gap-1.5 sm:gap-2">
+          <div className="grid gap-2.5">
             <AddressAutocomplete
               value={formData.address}
               onChange={(address, lat, lng) => {
@@ -243,7 +247,7 @@ export function FuncionarioModal({ funcionario, isOpen, onClose, onSave, empresa
                 }))
               }}
               label="Endereço"
-              placeholder="Digite o endereço completo..."
+              placeholder="Digite o endereço completo para busca automática"
               onGeocodeError={(error) => {
                 logError("Erro no autocomplete", { error }, 'FuncionarioModal')
                 notifyError(error)
@@ -252,30 +256,30 @@ export function FuncionarioModal({ funcionario, isOpen, onClose, onSave, empresa
             />
           </div>
 
-          <div className="flex items-center gap-2 py-1">
+          <div className="flex items-center gap-3 py-2">
             <input
               type="checkbox"
               id="is_active"
               checked={formData.is_active}
               onChange={(e) => setFormData(prev => ({ ...prev, is_active: e.target.checked }))}
-              className="w-4 h-4 sm:w-5 sm:h-5"
+              className="w-5 h-5 cursor-pointer"
             />
-            <Label htmlFor="is_active" className="text-sm sm:text-base cursor-pointer">Ativo</Label>
+            <Label htmlFor="is_active" className="text-base font-medium cursor-pointer">Ativo</Label>
           </div>
 
-          <DialogFooter className="flex-col sm:flex-row gap-2 sm:gap-0 pt-2 sm:pt-4">
+          <DialogFooter className="flex-col sm:flex-row gap-3 pt-6 border-t mt-4">
             <Button 
               type="button" 
               variant="outline" 
               onClick={onClose}
-              className="w-full sm:w-auto order-2 sm:order-1"
+              className="w-full sm:w-auto order-2 sm:order-1 h-11 sm:h-12 text-base font-medium"
             >
               Cancelar
             </Button>
             <Button 
               type="submit" 
               disabled={loading} 
-              className="bg-orange-500 hover:bg-orange-600 w-full sm:w-auto order-1 sm:order-2"
+              className="bg-orange-500 hover:bg-orange-600 w-full sm:w-auto order-1 sm:order-2 h-11 sm:h-12 text-base font-medium"
             >
               {loading ? "Salvando..." : "Salvar"}
             </Button>
