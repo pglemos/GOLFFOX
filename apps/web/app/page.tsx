@@ -569,7 +569,7 @@ function LoginContent() {
   )
 
   return (
-    <div className="min-h-screen flex relative overflow-hidden bg-black">
+    <div className="min-h-screen flex flex-col lg:flex-row relative overflow-hidden bg-black w-full">
       {/* Background com efeitos sutis */}
       <FloatingOrbs />
       
@@ -719,7 +719,7 @@ function LoginContent() {
       </motion.div>
 
       {/* Seção Direita - Formulário Minimalista */}
-      <div className="flex-1 lg:w-1/2 bg-white flex flex-col min-h-screen relative">
+      <div className="flex-1 lg:w-1/2 bg-white flex flex-col min-h-screen relative w-full">
         {/* Barra superior minimalista (apenas desktop) */}
         <div className="hidden lg:flex justify-end items-center p-8 relative z-10">
           <motion.div
@@ -733,20 +733,20 @@ function LoginContent() {
             </div>
 
         {/* Formulário de Login Minimalista */}
-        <div className="flex-1 flex items-center justify-center px-6 sm:px-8 lg:px-16 py-12 relative z-10">
+        <div className="flex-1 flex items-center justify-center px-4 sm:px-6 md:px-8 lg:px-16 py-6 sm:py-8 md:py-12 relative z-10 w-full">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-            className="w-full max-w-md"
+            className="w-full max-w-md mx-auto"
           >
-            <div className="relative">
+            <div className="relative w-full">
               {/* Logo mobile com destaque */}
               <motion.div 
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                className="lg:hidden mb-16 text-center"
+                className="lg:hidden mb-8 sm:mb-12 text-center"
               >
                 <div className="relative inline-block mb-4">
                   {/* Glow mobile */}
@@ -766,7 +766,7 @@ function LoginContent() {
                     }}
                   />
                   
-                  <div className="relative w-24 h-24 rounded-3xl bg-gradient-to-br from-[#F97316] via-[#FB923C] to-[#EA580C] p-[2.5px] shadow-xl shadow-orange-500/30">
+                  <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-3xl bg-gradient-to-br from-[#F97316] via-[#FB923C] to-[#EA580C] p-[2.5px] shadow-xl shadow-orange-500/30">
                     <div className="w-full h-full rounded-[22px] bg-white flex items-center justify-center relative overflow-hidden">
                       {/* Shine effect mobile */}
                       <motion.div
@@ -784,7 +784,7 @@ function LoginContent() {
                       <img 
                         src="/icons/golf_fox_logo.svg" 
                         alt="Golf Fox" 
-                        className="w-14 h-14 relative z-10"
+                        className="w-12 h-12 sm:w-14 sm:h-14 relative z-10"
                       />
                     </div>
                   </div>
@@ -794,7 +794,7 @@ function LoginContent() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.3 }}
-                  className="text-2xl font-bold bg-gradient-to-r from-[#F97316] to-[#EA580C] bg-clip-text text-transparent"
+                  className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-[#F97316] to-[#EA580C] bg-clip-text text-transparent"
                 >
                   Golf Fox
                 </motion.h2>
@@ -827,23 +827,23 @@ function LoginContent() {
               </AnimatePresence>
 
               {/* Título minimalista */}
-              <div className="mb-12">
-                <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-3 tracking-tight">
+              <div className="mb-8 sm:mb-10 md:mb-12">
+                <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-2 sm:mb-3 tracking-tight">
                   Entrar
                 </h1>
-                <p className="text-lg text-gray-500 font-light">
+                <p className="text-base sm:text-lg text-gray-500 font-light">
                   Acesse sua conta Golf Fox
                 </p>
               </div>
 
               {/* Mensagens minimalistas */}
               <AnimatePresence mode="wait">
-                {error && (
+                    {error && (
                   <motion.div
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
-                    className="mb-8 p-4 bg-red-50/50 border border-red-100 rounded-2xl text-sm text-red-600"
+                    className="mb-6 sm:mb-8 p-3 sm:p-4 bg-red-50/50 border border-red-100 rounded-xl sm:rounded-2xl text-xs sm:text-sm text-red-600"
                     role="alert"
                   >
                     {error}
@@ -855,9 +855,9 @@ function LoginContent() {
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
-                    className="mb-8 p-4 bg-green-50/50 border border-green-100 rounded-2xl text-sm text-green-600 flex items-center gap-2"
+                    className="mb-6 sm:mb-8 p-3 sm:p-4 bg-green-50/50 border border-green-100 rounded-xl sm:rounded-2xl text-xs sm:text-sm text-green-600 flex items-center gap-2"
                   >
-                    <Sparkles className="w-4 h-4" />
+                    <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
                     <span>Login realizado com sucesso!</span>
                   </motion.div>
                 )}
@@ -871,11 +871,11 @@ function LoginContent() {
                     handleLogin()
                   }
                 }}
-                className="space-y-6"
+                className="space-y-4 sm:space-y-5 md:space-y-6"
               >
                 {/* Campo Email */}
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700" htmlFor="login-email">
+                <div className="space-y-1.5 sm:space-y-2">
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700" htmlFor="login-email">
                     E-mail
                   </label>
                   <div className="relative">
@@ -892,12 +892,12 @@ function LoginContent() {
                           passwordInputRef.current?.focus()
                         }
                       }}
-                      autoComplete="email"
-                      className={`w-full h-14 px-4 bg-gray-50 border ${
+                    autoComplete="email"
+                    className={`w-full h-12 sm:h-14 px-3 sm:px-4 bg-gray-50 border ${
                         fieldErrors.email
                           ? "border-red-300 focus:border-red-500 focus:ring-red-200"
                           : "border-gray-200 focus:border-[#F97316] focus:ring-orange-100"
-                      } rounded-2xl text-base transition-all focus:ring-2 focus:bg-white placeholder:text-gray-400`}
+                      } rounded-xl sm:rounded-2xl text-base transition-all focus:ring-2 focus:bg-white placeholder:text-gray-400`}
                     />
                     {fieldErrors.email && (
                       <p className="mt-2 text-xs text-red-600" aria-live="assertive">
@@ -908,8 +908,8 @@ function LoginContent() {
                 </div>
 
                 {/* Campo Senha */}
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700" htmlFor="login-password">
+                <div className="space-y-1.5 sm:space-y-2">
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700" htmlFor="login-password">
                     Senha
                   </label>
                   <div className="relative">
@@ -927,19 +927,19 @@ function LoginContent() {
                       }}
                       ref={passwordInputRef}
                       autoComplete="current-password"
-                      className={`w-full h-14 px-4 pr-12 bg-gray-50 border ${
+                      className={`w-full h-12 sm:h-14 px-3 sm:px-4 pr-10 sm:pr-12 bg-gray-50 border ${
                         fieldErrors.password
                           ? "border-red-300 focus:border-red-500 focus:ring-red-200"
                           : "border-gray-200 focus:border-[#F97316] focus:ring-orange-100"
-                      } rounded-2xl text-base transition-all focus:ring-2 focus:bg-white placeholder:text-gray-400`}
+                      } rounded-xl sm:rounded-2xl text-base transition-all focus:ring-2 focus:bg-white placeholder:text-gray-400`}
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 transition-colors p-2 rounded-lg hover:bg-gray-100"
+                      className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 transition-colors p-1.5 sm:p-2 rounded-lg hover:bg-gray-100 touch-manipulation"
                       aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
                     >
-                      {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                      {showPassword ? <EyeOff className="h-4 w-4 sm:h-5 sm:w-5" /> : <Eye className="h-4 w-4 sm:h-5 sm:w-5" />}
                     </button>
                     {fieldErrors.password && (
                       <p className="mt-2 text-xs text-red-600" aria-live="assertive">
@@ -950,8 +950,8 @@ function LoginContent() {
                 </div>
 
                 {/* Opções extras */}
-                <div className="flex items-center justify-between text-sm">
-                  <label className="flex items-center gap-2 cursor-pointer group">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0 text-xs sm:text-sm">
+                  <label className="flex items-center gap-2 cursor-pointer group touch-manipulation">
                     <Checkbox
                       id="remember-me"
                       checked={rememberMe}
@@ -965,7 +965,7 @@ function LoginContent() {
                   <button
                     type="button"
                     onClick={() => setError("Funcionalidade em desenvolvimento")}
-                    className="text-gray-600 hover:text-gray-900 transition-colors"
+                    className="text-gray-600 hover:text-gray-900 transition-colors touch-manipulation text-xs sm:text-sm"
                   >
                     Esqueceu a senha?
                   </button>
@@ -976,7 +976,7 @@ function LoginContent() {
                   <Button
                     type="submit"
                     disabled={loading || transitioning}
-                    className="w-full h-14 bg-gradient-to-r from-[#F97316] to-[#EA580C] hover:from-[#EA580C] hover:to-[#F97316] text-white font-semibold text-base shadow-lg shadow-orange-500/20 hover:shadow-xl hover:shadow-orange-500/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed rounded-2xl relative overflow-hidden group"
+                    className="w-full h-12 sm:h-14 bg-gradient-to-r from-[#F97316] to-[#EA580C] hover:from-[#EA580C] hover:to-[#F97316] text-white font-semibold text-sm sm:text-base shadow-lg shadow-orange-500/20 hover:shadow-xl hover:shadow-orange-500/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl sm:rounded-2xl relative overflow-hidden group touch-manipulation"
                   >
                     {loading || transitioning ? (
                       <span className="flex items-center justify-center gap-2">
@@ -998,8 +998,8 @@ function LoginContent() {
               </form>
 
               {/* Footer */}
-              <div className="mt-12 text-center">
-                <p className="text-sm text-gray-500">
+              <div className="mt-8 sm:mt-10 md:mt-12 text-center">
+                <p className="text-xs sm:text-sm text-gray-500">
                   Protegido por{" "}
                   <span className="text-gray-700 font-medium">Golf Fox Security</span>
                 </p>
