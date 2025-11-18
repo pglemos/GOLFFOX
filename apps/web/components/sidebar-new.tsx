@@ -467,8 +467,6 @@ export function Sidebar({ isOpen = true, isMobile = false, panel = 'admin', user
       <SidebarBody className={cn(
         "justify-between gap-4 bg-white dark:bg-neutral-900 border-r border-[var(--border)]",
         !isMobile && "fixed top-16 sm:top-18 left-0 h-[calc(100vh-4rem)] sm:h-[calc(100vh-4.5rem)] z-50",
-        isMobile && open && "fixed top-16 sm:top-18 left-0 h-[calc(100vh-4rem)] sm:h-[calc(100vh-4.5rem)] z-50 w-[280px]",
-        isMobile && !open && "hidden",
         "!px-0 !py-0"
       )}>
         <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden pt-6 px-4 h-full">

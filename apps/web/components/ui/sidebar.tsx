@@ -85,10 +85,38 @@ export const Sidebar = ({
 };
 
 export const SidebarBody = (props: React.ComponentProps<typeof motion.div>) => {
+  const { open } = useSidebar();
+  const [isMobile, setIsMobile] = useState(false);
+  
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+  
   return (
     <>
       <DesktopSidebar {...props} />
-      {/* MobileSidebar removido - usando apenas o botão hambúrguer da Topbar */}
+      {/* Sidebar Mobile - renderizado quando aberto */}
+      <AnimatePresence>
+        {isMobile && open && (
+          <motion.div
+            initial={{ x: -280, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: -280, opacity: 0 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+            className={cn(
+              "md:hidden fixed top-16 sm:top-18 left-0 h-[calc(100vh-4rem)] sm:h-[calc(100vh-4.5rem)] z-50 w-[280px] bg-white dark:bg-neutral-900 border-r border-[var(--border)] overflow-y-auto",
+              props.className
+            )}
+          >
+            {props.children}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 };
