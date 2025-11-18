@@ -644,39 +644,40 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="max-w-6xl max-h-[90vh] overflow-hidden flex flex-col">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Route className="h-5 w-5 text-[var(--brand)]" />
+        <DialogContent className="w-[95vw] max-w-6xl max-h-[90vh] overflow-hidden flex flex-col p-4 sm:p-6">
+          <DialogHeader className="pb-2 sm:pb-4">
+            <DialogTitle className="flex items-center gap-2 text-lg sm:text-xl">
+              <Route className="h-4 w-4 sm:h-5 sm:w-5 text-[var(--brand)]" />
               Nova Rota
             </DialogTitle>
-            <DialogDescription>
+            <DialogDescription className="text-xs sm:text-sm">
               Preencha os dados da rota, selecione os funcionários e otimize o trajeto
             </DialogDescription>
           </DialogHeader>
 
-          <Tabs defaultValue="form" className="flex-1 flex flex-col overflow-hidden">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="form">Formulário</TabsTrigger>
-              <TabsTrigger value="preview" disabled={!optimizationResult}>
+          <Tabs defaultValue="form" className="flex-1 flex flex-col overflow-hidden min-h-0">
+            <TabsList className="grid w-full grid-cols-2 h-9 sm:h-10">
+              <TabsTrigger value="form" className="text-xs sm:text-sm">Formulário</TabsTrigger>
+              <TabsTrigger value="preview" disabled={!optimizationResult} className="text-xs sm:text-sm">
                 Pré-visualização
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="form" className="flex-1 overflow-y-auto space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="name">Nome da Rota *</Label>
+            <TabsContent value="form" className="flex-1 overflow-y-auto space-y-3 sm:space-y-4 pt-3 sm:pt-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+                <div className="grid gap-1.5 sm:gap-2">
+                  <Label htmlFor="name" className="text-sm sm:text-base">Nome da Rota *</Label>
                   <Input
                     id="name"
                     value={formData.name || ""}
                     onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
                     placeholder="Ex: Rota Centro - Manhã"
+                    className="text-sm sm:text-base h-9 sm:h-10"
                   />
                 </div>
 
-                <div>
-                  <Label htmlFor="company">Empresa *</Label>
+                <div className="grid gap-1.5 sm:gap-2">
+                  <Label htmlFor="company" className="text-sm sm:text-base">Empresa *</Label>
                   <Select
                     key={`company-select-${companies.length}`}
                     value={formData.company_id || ""}
@@ -688,7 +689,7 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
                       }))
                     }
                   >
-                    <SelectTrigger id="company">
+                    <SelectTrigger id="company" className="text-sm sm:text-base h-9 sm:h-10">
                       <SelectValue placeholder="Selecione a empresa" />
                     </SelectTrigger>
                     <SelectContent>
@@ -698,7 +699,7 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
                         </div>
                       ) : (
                         companies.map((c) => (
-                          <SelectItem key={c.id} value={c.id}>
+                          <SelectItem key={c.id} value={c.id} className="text-sm sm:text-base">
                             {c.name}
                           </SelectItem>
                         ))
@@ -710,9 +711,9 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
 
               {formData.company_id && (
                 <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <Label>Funcionários *</Label>
-                    <Badge variant="outline">
+                  <div className="flex items-center justify-between flex-wrap gap-2">
+                    <Label className="text-sm sm:text-base">Funcionários *</Label>
+                    <Badge variant="outline" className="text-xs sm:text-sm">
                       Selecionados: {formData.selected_employees?.length || 0} / {employees.length}
                     </Badge>
                   </div>
@@ -722,11 +723,11 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
                       placeholder="Buscar por nome ou CPF..."
                       value={searchEmployee}
                       onChange={(e) => setSearchEmployee(e.target.value)}
-                      className="pl-10"
+                      className="pl-10 text-sm sm:text-base h-9 sm:h-10"
                       aria-label="Buscar funcionários por nome ou CPF"
                     />
                   </div>
-                  <ScrollArea className="h-[300px] border rounded-lg p-2">
+                  <ScrollArea className="h-[200px] sm:h-[300px] border rounded-lg p-2">
                     {loadingEmployees ? (
                       <div className="text-center py-8 text-gray-500">Carregando...</div>
                     ) : filteredEmployees.length === 0 ? (
@@ -781,17 +782,18 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
                 </div>
               )}
 
-              <div>
-                <Label htmlFor="description">Descrição</Label>
+              <div className="grid gap-1.5 sm:gap-2">
+                <Label htmlFor="description" className="text-sm sm:text-base">Descrição</Label>
                 <Input
                   id="description"
                   value={formData.description || ""}
                   onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
                   placeholder="Descrição opcional da rota"
+                  className="text-sm sm:text-base h-9 sm:h-10"
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
                 <AddressAutocomplete
                   value={formData.origin_address || ""}
                   onChange={(address, lat, lng) => {
@@ -810,6 +812,7 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
                   onGeocodeError={(error) => {
                     notifyError(error, "Erro no autocomplete")
                   }}
+                  className="w-full"
                 />
                 <AddressAutocomplete
                   value={formData.destination_address || ""}
@@ -829,49 +832,51 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
                   onGeocodeError={(error) => {
                     notifyError(error, "Erro no autocomplete")
                   }}
+                  className="w-full"
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="time">Horário *</Label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+                <div className="grid gap-1.5 sm:gap-2">
+                  <Label htmlFor="time" className="text-sm sm:text-base">Horário *</Label>
                   <Input
                     id="time"
                     type="time"
                     value={formData.scheduled_time || ""}
                     onChange={(e) => setFormData((prev) => ({ ...prev, scheduled_time: e.target.value }))}
+                    className="text-sm sm:text-base h-9 sm:h-10"
                   />
                 </div>
-                <div>
-                  <Label htmlFor="shift">Turno *</Label>
+                <div className="grid gap-1.5 sm:gap-2">
+                  <Label htmlFor="shift" className="text-sm sm:text-base">Turno *</Label>
                   <Select
                     value={formData.shift || "manha"}
                     onValueChange={(value: "manha" | "tarde" | "noite") =>
                       setFormData((prev) => ({ ...prev, shift: value }))
                     }
                   >
-                    <SelectTrigger id="shift">
+                    <SelectTrigger id="shift" className="text-sm sm:text-base h-9 sm:h-10">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="manha">Manhã</SelectItem>
-                      <SelectItem value="tarde">Tarde</SelectItem>
-                      <SelectItem value="noite">Noite</SelectItem>
+                      <SelectItem value="manha" className="text-sm sm:text-base">Manhã</SelectItem>
+                      <SelectItem value="tarde" className="text-sm sm:text-base">Tarde</SelectItem>
+                      <SelectItem value="noite" className="text-sm sm:text-base">Noite</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
               </div>
 
-              <div>
-                <Label>Dias da Semana</Label>
-                <div className="flex flex-wrap gap-2 mt-2">
+              <div className="grid gap-1.5 sm:gap-2">
+                <Label className="text-sm sm:text-base">Dias da Semana</Label>
+                <div className="flex flex-wrap gap-2 mt-1 sm:mt-2">
                   {DAYS_OF_WEEK.map((day) => {
                     const isSelected = formData.days_of_week?.includes(day.value)
                     return (
                       <Badge
                         key={day.value}
                         variant={isSelected ? "default" : "outline"}
-                        className="cursor-pointer"
+                        className="cursor-pointer text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-1.5"
                         onClick={() => {
                           setFormData((prev) => {
                             const days = prev.days_of_week || []
@@ -891,18 +896,18 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
                 </div>
               </div>
 
-              <div>
-                <Label className="flex items-center gap-2 mb-2">
-                  <Calendar className="h-4 w-4" />
+              <div className="grid gap-1.5 sm:gap-2">
+                <Label className="flex items-center gap-2 text-sm sm:text-base">
+                  <Calendar className="h-3 w-3 sm:h-4 sm:w-4" />
                   Exceções (Datas sem rota)
                 </Label>
-                <div className="flex gap-2 mb-2">
+                <div className="flex flex-col sm:flex-row gap-2">
                   <Input
                     type="text"
                     value={newException}
                     onChange={(e) => setNewException(e.target.value)}
                     placeholder="dd/mm/aaaa"
-                    className="flex-1"
+                    className="flex-1 text-sm sm:text-base h-9 sm:h-10"
                     onKeyDown={(e) => {
                       if (e.key === "Enter") {
                         e.preventDefault()
@@ -910,13 +915,13 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
                       }
                     }}
                   />
-                  <Button type="button" onClick={addException} size="sm">
+                  <Button type="button" onClick={addException} size="sm" className="w-full sm:w-auto">
                     Adicionar
                   </Button>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {(formData.exceptions || []).map((date) => (
-                    <Badge key={date} variant="secondary" className="flex items-center gap-1">
+                    <Badge key={date} variant="secondary" className="flex items-center gap-1 text-xs sm:text-sm">
                       {new Date(date).toLocaleDateString('pt-BR')}
                       <X
                         className="h-3 w-3 cursor-pointer"
@@ -927,42 +932,43 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label>Motorista</Label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+                <div className="grid gap-1.5 sm:gap-2">
+                  <Label className="text-sm sm:text-base">Motorista</Label>
                   <Button
                     variant="outline"
-                    className="w-full justify-start"
+                    className="w-full justify-start text-sm sm:text-base h-9 sm:h-10"
                     onClick={() => setIsDriverModalOpen(true)}
                     aria-label="Selecionar motorista"
                   >
-                    <User className="h-4 w-4 mr-2" />
-                    {selectedDriver ? selectedDriver.name : "Selecionar Motorista"}
+                    <User className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
+                    <span className="truncate">{selectedDriver ? selectedDriver.name : "Selecionar Motorista"}</span>
                   </Button>
                 </div>
-                <div>
-                  <Label>Veículo</Label>
+                <div className="grid gap-1.5 sm:gap-2">
+                  <Label className="text-sm sm:text-base">Veículo</Label>
                   <Button
                     variant="outline"
-                    className="w-full justify-start"
+                    className="w-full justify-start text-sm sm:text-base h-9 sm:h-10"
                     onClick={() => setIsVehicleModalOpen(true)}
                     aria-label="Selecionar veículo"
                   >
-                    <Truck className="h-4 w-4 mr-2" />
-                    {selectedVehicle ? `${selectedVehicle.plate} (Cap: ${selectedVehicle.capacity})` : "Selecionar Veículo"}
+                    <Truck className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
+                    <span className="truncate">{selectedVehicle ? `${selectedVehicle.plate} (Cap: ${selectedVehicle.capacity})` : "Selecionar Veículo"}</span>
                   </Button>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 py-1">
                 <Checkbox
                   id="is_active"
                   checked={formData.is_active ?? true}
                   onCheckedChange={(checked) =>
                     setFormData((prev) => ({ ...prev, is_active: checked as boolean }))
                   }
+                  className="w-4 h-4 sm:w-5 sm:h-5"
                 />
-                <Label htmlFor="is_active">Rota ativa</Label>
+                <Label htmlFor="is_active" className="text-sm sm:text-base cursor-pointer">Rota ativa</Label>
               </div>
 
               {warnings.length > 0 && (
@@ -995,12 +1001,13 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
             </TabsContent>
           </Tabs>
 
-          <DialogFooter className="flex-shrink-0">
+          <DialogFooter className="flex-shrink-0 flex-col sm:flex-row gap-2 sm:gap-0 pt-2 sm:pt-4 border-t mt-2 sm:mt-4">
             <Button 
               variant="outline" 
               onClick={onClose} 
               disabled={saving}
               aria-label="Cancelar criação de rota"
+              className="w-full sm:w-auto order-3 sm:order-1 text-sm sm:text-base"
             >
               Cancelar
             </Button>
@@ -1008,15 +1015,16 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
               onClick={handleOptimize}
               disabled={optimizing || !formData.company_id || !formData.selected_employees?.length}
               variant="outline"
-              className="bg-orange-500 hover:bg-orange-600 text-white"
+              className="bg-orange-500 hover:bg-orange-600 text-white w-full sm:w-auto order-2 sm:order-2 text-sm sm:text-base"
               aria-label="Pré-visualizar e otimizar rota"
             >
-              {optimizing ? "Otimizando..." : "Pré-visualizar & Otimizar"}
+              {optimizing ? "Otimizando..." : <span className="hidden sm:inline">Pré-visualizar & Otimizar</span>}
+              <span className="sm:hidden">Otimizar</span>
             </Button>
             <Button 
               onClick={handleSave} 
               disabled={saving}
-              className="bg-orange-500 hover:bg-orange-600 text-white"
+              className="bg-orange-500 hover:bg-orange-600 text-white w-full sm:w-auto order-1 sm:order-3 text-sm sm:text-base"
               aria-label="Salvar rota"
             >
               {saving ? "Salvando..." : "Salvar"}
@@ -1146,19 +1154,19 @@ function RoutePreviewMap({
   const totalKm = (result.totalDistanceMeters / 1000).toFixed(1)
 
   return (
-    <div className="space-y-4 h-full flex flex-col">
-      <div className="grid grid-cols-3 gap-4">
-        <div className="p-3 bg-gray-50 rounded-lg">
-          <div className="text-sm text-gray-600">Distância Total</div>
-          <div className="text-2xl font-bold">{totalKm} km</div>
+    <div className="space-y-3 sm:space-y-4 h-full flex flex-col">
+      <div className="grid grid-cols-3 gap-2 sm:gap-4">
+        <div className="p-2 sm:p-3 bg-gray-50 rounded-lg">
+          <div className="text-xs sm:text-sm text-gray-600">Distância Total</div>
+          <div className="text-lg sm:text-2xl font-bold">{totalKm} km</div>
         </div>
-        <div className="p-3 bg-gray-50 rounded-lg">
-          <div className="text-sm text-gray-600">Tempo Total</div>
-          <div className="text-2xl font-bold">{totalMinutes} min</div>
+        <div className="p-2 sm:p-3 bg-gray-50 rounded-lg">
+          <div className="text-xs sm:text-sm text-gray-600">Tempo Total</div>
+          <div className="text-lg sm:text-2xl font-bold">{totalMinutes} min</div>
         </div>
-        <div className="p-3 bg-gray-50 rounded-lg">
-          <div className="text-sm text-gray-600">Paradas</div>
-          <div className="text-2xl font-bold">{result.ordered.length}</div>
+        <div className="p-2 sm:p-3 bg-gray-50 rounded-lg">
+          <div className="text-xs sm:text-sm text-gray-600">Paradas</div>
+          <div className="text-lg sm:text-2xl font-bold">{result.ordered.length}</div>
         </div>
       </div>
 
@@ -1166,18 +1174,20 @@ function RoutePreviewMap({
         <div ref={mapRef} className="w-full h-full rounded-lg" />
       </div>
 
-      <div className="border rounded-lg p-4 max-h-48 overflow-y-auto">
-        <div className="flex items-center justify-between mb-2">
-          <div className="font-medium">Ordem dos Embarques:</div>
-          <div className="flex gap-2">
+      <div className="border rounded-lg p-2 sm:p-4 max-h-48 overflow-y-auto">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mb-2">
+          <div className="font-medium text-sm sm:text-base">Ordem dos Embarques:</div>
+          <div className="flex flex-wrap gap-2 w-full sm:w-auto">
             {JSON.stringify(manualOrder.map((o: { id: string }) => o.id)) !== JSON.stringify(result.ordered.map((o: { id: string }) => o.id)) && (
               <Button
                 size="sm"
                 variant="outline"
                 onClick={() => setManualOrder(result.ordered)}
                 aria-label="Aplicar ordem otimizada"
+                className="text-xs sm:text-sm flex-1 sm:flex-initial"
               >
-                Aplicar Ordem Otimizada
+                <span className="hidden sm:inline">Aplicar Ordem Otimizada</span>
+                <span className="sm:hidden">Aplicar</span>
               </Button>
             )}
             {JSON.stringify(manualOrder.map((o: { id: string }) => o.id)) !== JSON.stringify(result.ordered.map((o: { id: string }) => o.id)) && (
@@ -1186,6 +1196,7 @@ function RoutePreviewMap({
                 variant="outline"
                 onClick={() => setManualOrder(result.ordered)}
                 aria-label="Reverter para ordem otimizada"
+                className="text-xs sm:text-sm flex-1 sm:flex-initial"
               >
                 Reverter
               </Button>
@@ -1198,7 +1209,7 @@ function RoutePreviewMap({
             return (
               <div
                 key={point.id}
-                className="flex items-center gap-2 text-sm p-2 hover:bg-gray-50 rounded cursor-move"
+                className="flex items-center gap-2 text-xs sm:text-sm p-1.5 sm:p-2 hover:bg-gray-50 rounded cursor-move"
                 draggable
                 onDragStart={(e) => {
                   e.dataTransfer.setData("text/plain", idx.toString())
@@ -1223,11 +1234,11 @@ function RoutePreviewMap({
                   }
                 }}
               >
-                <Badge>{point.order}</Badge>
-                <span className="flex-1">
+                <Badge className="text-xs">{point.order}</Badge>
+                <span className="flex-1 truncate">
                   {emp ? `${emp.first_name} ${emp.last_name}` : `Parada ${point.order}`}
                 </span>
-                <Navigation className="h-4 w-4 text-gray-400" />
+                <Navigation className="h-3 w-3 sm:h-4 sm:w-4 text-gray-400 flex-shrink-0" />
               </div>
             )
           })}

@@ -183,81 +183,100 @@ export function FuncionarioModal({ funcionario, isOpen, onClose, onSave, empresa
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[600px]">
-        <DialogHeader>
-          <DialogTitle>{funcionario ? "Editar Funcionário" : "Adicionar Funcionário"}</DialogTitle>
+      <DialogContent className="w-[95vw] max-w-[600px] max-h-[90vh] overflow-y-auto p-4 sm:p-6">
+        <DialogHeader className="pb-2 sm:pb-4">
+          <DialogTitle className="text-lg sm:text-xl">{funcionario ? "Editar Funcionário" : "Adicionar Funcionário"}</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="grid gap-4 py-4">
-          <div className="grid gap-2">
-            <Label htmlFor="name">Nome</Label>
+        <form onSubmit={handleSubmit} className="grid gap-3 sm:gap-4 py-2 sm:py-4">
+          <div className="grid gap-1.5 sm:gap-2">
+            <Label htmlFor="name" className="text-sm sm:text-base">Nome</Label>
             <Input
               id="name"
               value={formData.name}
               onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
               required
+              className="text-sm sm:text-base h-9 sm:h-10"
             />
           </div>
 
-          <div className="grid gap-2">
-            <Label htmlFor="email">Email</Label>
+          <div className="grid gap-1.5 sm:gap-2">
+            <Label htmlFor="email" className="text-sm sm:text-base">Email</Label>
             <Input
               id="email"
               type="email"
               value={formData.email}
               onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
               required
+              className="text-sm sm:text-base h-9 sm:h-10"
             />
           </div>
 
-          <div className="grid gap-2">
-            <Label htmlFor="phone">Telefone</Label>
+          <div className="grid gap-1.5 sm:gap-2">
+            <Label htmlFor="phone" className="text-sm sm:text-base">Telefone</Label>
             <Input
               id="phone"
               value={formData.phone}
               onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
+              className="text-sm sm:text-base h-9 sm:h-10"
             />
           </div>
 
-          <div className="grid gap-2">
-            <Label htmlFor="cpf">CPF</Label>
+          <div className="grid gap-1.5 sm:gap-2">
+            <Label htmlFor="cpf" className="text-sm sm:text-base">CPF</Label>
             <Input
               id="cpf"
               value={formData.cpf}
               onChange={(e) => setFormData(prev => ({ ...prev, cpf: e.target.value }))}
+              className="text-sm sm:text-base h-9 sm:h-10"
             />
           </div>
 
-          <AddressAutocomplete
-            value={formData.address}
-            onChange={(address, lat, lng) => {
-              setFormData(prev => ({
-                ...prev,
-                address,
-                latitude: lat,
-                longitude: lng
-              }))
-            }}
-            label="Endereço"
-            placeholder="Digite o endereço completo..."
-            onGeocodeError={(error) => {
-              logError("Erro no autocomplete", { error }, 'FuncionarioModal')
-              notifyError(error)
-            }}
-          />
+          <div className="grid gap-1.5 sm:gap-2">
+            <AddressAutocomplete
+              value={formData.address}
+              onChange={(address, lat, lng) => {
+                setFormData(prev => ({
+                  ...prev,
+                  address,
+                  latitude: lat,
+                  longitude: lng
+                }))
+              }}
+              label="Endereço"
+              placeholder="Digite o endereço completo..."
+              onGeocodeError={(error) => {
+                logError("Erro no autocomplete", { error }, 'FuncionarioModal')
+                notifyError(error)
+              }}
+              className="w-full"
+            />
+          </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 py-1">
             <input
               type="checkbox"
               id="is_active"
               checked={formData.is_active}
               onChange={(e) => setFormData(prev => ({ ...prev, is_active: e.target.checked }))}
+              className="w-4 h-4 sm:w-5 sm:h-5"
             />
-            <Label htmlFor="is_active">Ativo</Label>
+            <Label htmlFor="is_active" className="text-sm sm:text-base cursor-pointer">Ativo</Label>
           </div>
 
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={onClose}>Cancelar</Button>
-            <Button type="submit" disabled={loading} className="bg-orange-500 hover:bg-orange-600">
+          <DialogFooter className="flex-col sm:flex-row gap-2 sm:gap-0 pt-2 sm:pt-4">
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={onClose}
+              className="w-full sm:w-auto order-2 sm:order-1"
+            >
+              Cancelar
+            </Button>
+            <Button 
+              type="submit" 
+              disabled={loading} 
+              className="bg-orange-500 hover:bg-orange-600 w-full sm:w-auto order-1 sm:order-2"
+            >
               {loading ? "Salvando..." : "Salvar"}
             </Button>
           </DialogFooter>
