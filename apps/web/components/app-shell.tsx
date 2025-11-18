@@ -77,7 +77,10 @@ export const AppShell = memo(function AppShell({ user, children, panel }: AppShe
       />
 
       {/* Container Principal */}
-      <div className="flex relative pt-16 sm:pt-18"> {/* pt-16/18 para compensar topbar fixa responsiva */}
+      <div className={cn(
+        "flex relative pt-16 sm:pt-18",
+        isMobile ? "flex-col" : "flex-row"
+      )}> {/* pt-16/18 para compensar topbar fixa responsiva */}
         {/* Mobile Overlay */}
         {isMobile && isSidebarOpen && (
           <div 
@@ -96,9 +99,9 @@ export const AppShell = memo(function AppShell({ user, children, panel }: AppShe
 
         {/* Main Content */}
         <main className={cn(
-          "flex-1 min-h-[calc(100vh-4rem)] sm:min-h-[calc(100vh-4.5rem)] transition-all duration-300 ease-in-out",
-          "w-full overflow-y-auto bg-[var(--bg)]",
-          !isMobile ? "lg:ml-[60px]" : "ml-0",
+          "min-h-[calc(100vh-4rem)] sm:min-h-[calc(100vh-4.5rem)] transition-all duration-300 ease-in-out",
+          "overflow-y-auto bg-[var(--bg)]",
+          !isMobile ? "flex-1 lg:ml-[60px]" : "w-full ml-0 flex-shrink-0",
           "max-w-full overflow-x-hidden",
           "relative z-10"
         )}>

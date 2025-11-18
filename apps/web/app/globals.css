@@ -441,6 +441,22 @@
       max-width: 100vw;
       overflow-x: hidden;
     }
+    
+    /* Garantir que o main tenha largura correta em mobile */
+    main {
+      width: 100% !important;
+      min-width: 0 !important;
+      max-width: 100vw !important;
+      flex-shrink: 0 !important;
+      display: block !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+    }
+    
+    /* Garantir que containers flex em mobile funcionem */
+    .flex {
+      min-width: 0;
+    }
   }
   
   /* Classe utilitária para texto suave */
