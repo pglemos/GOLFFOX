@@ -463,6 +463,7 @@ export function Sidebar({ isOpen = true, isMobile = false, panel = 'admin', user
       open={isMobile ? open : undefined} 
       setOpen={isMobile ? setOpen : undefined} 
       animate={true}
+      isMobile={isMobile}
     >
       <SidebarBody className={cn(
         "justify-between gap-4 bg-white dark:bg-neutral-900 border-r border-[var(--border)]",

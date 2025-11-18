@@ -29,6 +29,7 @@ import { useGlobalSync } from "@/hooks/use-global-sync"
 import { Edit } from "lucide-react"
 import { useDebounce } from "@/hooks/use-debounce"
 import { SkeletonList } from "@/components/ui/skeleton"
+import { supabase } from "@/lib/supabase"
 
 // Lazy load modal pesado
 const EditAlertModal = dynamic(

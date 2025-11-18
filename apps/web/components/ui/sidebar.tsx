@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import React, { useState, createContext, useContext } from "react";
+import React, { useState, createContext, useContext, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { Menu, X } from "lucide-react";
@@ -22,6 +22,15 @@ interface SidebarContextProps {
 const SidebarContext = createContext<SidebarContextProps | undefined>(
   undefined
 );
+
+const SidebarBodyContext = createContext<{ isMobile: boolean } | undefined>(
+  undefined
+);
+
+export const useSidebarBody = () => {
+  const context = useContext(SidebarBodyContext);
+  return context || { isMobile: false };
+};
 
 export const useSidebar = () => {
   const context = useContext(SidebarContext);
@@ -63,11 +72,13 @@ export const Sidebar = ({
   open,
   setOpen,
   animate,
+  isMobile,
 }: {
   children: React.ReactNode;
   open?: boolean;
   setOpen?: React.Dispatch<React.SetStateAction<boolean>>;
   animate?: boolean;
+  isMobile?: boolean;
 }) => {
   // Se ambos open e setOpen forem undefined, não está controlado (permite hover interno)
   // Se pelo menos um for definido, está controlado (mobile)
@@ -79,23 +90,16 @@ export const Sidebar = ({
       setOpen={isControlled ? setOpen : undefined} 
       animate={animate}
     >
-      {children}
+      <SidebarBodyContext.Provider value={{ isMobile: isMobile ?? false }}>
+        {children}
+      </SidebarBodyContext.Provider>
     </SidebarProvider>
   );
 };
 
 export const SidebarBody = (props: React.ComponentProps<typeof motion.div>) => {
   const { open } = useSidebar();
-  const [isMobile, setIsMobile] = useState(false);
-  
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 1024);
-    };
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
+  const { isMobile } = useSidebarBody();
   
   return (
     <>
