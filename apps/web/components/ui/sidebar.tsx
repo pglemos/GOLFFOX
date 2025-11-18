@@ -69,8 +69,16 @@ export const Sidebar = ({
   setOpen?: React.Dispatch<React.SetStateAction<boolean>>;
   animate?: boolean;
 }) => {
+  // Se ambos open e setOpen forem undefined, não está controlado (permite hover interno)
+  // Se pelo menos um for definido, está controlado (mobile)
+  const isControlled = open !== undefined || setOpen !== undefined;
+  
   return (
-    <SidebarProvider open={open} setOpen={setOpen} animate={animate}>
+    <SidebarProvider 
+      open={isControlled ? open : undefined} 
+      setOpen={isControlled ? setOpen : undefined} 
+      animate={animate}
+    >
       {children}
     </SidebarProvider>
   );

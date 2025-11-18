@@ -456,10 +456,14 @@ export function Sidebar({ isOpen = true, isMobile = false, panel = 'admin', user
     }
   }, [isMobile])
 
-  // Em desktop, não passar isOpen para permitir controle interno (hover)
-  // Em mobile, passar isOpen para controle externo
+  // Em desktop, não passar isOpen nem setOpen para permitir controle interno (hover)
+  // Em mobile, passar ambos para controle externo
   return (
-    <UISidebar open={isMobile ? open : undefined} setOpen={isMobile ? setOpen : undefined} animate={true}>
+    <UISidebar 
+      open={isMobile ? open : undefined} 
+      setOpen={isMobile ? setOpen : undefined} 
+      animate={true}
+    >
       <SidebarBody className={cn(
         "justify-between gap-4 bg-white dark:bg-neutral-900 border-r border-[var(--border)]",
         !isMobile && "fixed top-16 sm:top-18 left-0 h-[calc(100vh-4rem)] sm:h-[calc(100vh-4.5rem)] z-50",
