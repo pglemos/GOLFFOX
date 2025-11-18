@@ -80,7 +80,7 @@ function LoginContent() {
 
   // Verificar sessão apenas uma vez no mount, com tratamento de erro robusto
   useEffect(() => {
-    // Timeout para evitar verificações muito rápidas que podem causar problemas
+    // Timeout maior para garantir que a página seja renderizada primeiro em mobile
     const timeoutId = setTimeout(() => {
       try {
         // Evitar interferência durante redirecionamentos explícitos pós-login
@@ -149,8 +149,14 @@ function LoginContent() {
             redirectUrl = safeNext
           }
 
+          // Aguardar um pouco mais em mobile para garantir que a página seja renderizada
+          const isMobile = window.innerWidth < 1024
+          const delay = isMobile ? 500 : 200
+          
           if (userRole) {
-            window.location.href = redirectUrl
+            setTimeout(() => {
+              window.location.href = redirectUrl
+            }, delay)
           }
         } catch (err) {
           // Erro ao decodificar cookie - limpar e continuar na página de login
@@ -163,7 +169,7 @@ function LoginContent() {
         // Erro geral - apenas logar e continuar na página de login
         console.error('❌ Erro ao verificar sessão:', err)
       }
-    }, 100) // Aguardar 100ms antes de verificar
+    }, 300) // Aguardar 300ms antes de verificar (aumentado de 100ms)
 
     return () => clearTimeout(timeoutId)
   }, [searchParams]) // Executar quando searchParams mudar
