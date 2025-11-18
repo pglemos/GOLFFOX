@@ -432,8 +432,10 @@ export function Sidebar({ isOpen = true, isMobile = false, panel = 'admin', user
     ? carrierMenuItems 
     : adminMenuItems
 
-  // Estado inicial: fechado (apenas ícones)
-  const [open, setOpen] = React.useState(false)
+  // Usar o estado isOpen passado como prop, com fallback para estado interno
+  const [internalOpen, setInternalOpen] = React.useState(false)
+  const open = isOpen !== undefined ? isOpen : internalOpen
+  const setOpen = isOpen !== undefined ? (() => {}) : setInternalOpen
 
   const router = useRouter()
 
@@ -444,11 +446,18 @@ export function Sidebar({ isOpen = true, isMobile = false, panel = 'admin', user
     }
   }, [panel, router])
 
+  // Sincronizar estado interno quando isOpen mudar
+  useEffect(() => {
+    if (isOpen !== undefined) {
+      setInternalOpen(isOpen)
+    }
+  }, [isOpen])
+
   return (
-    <UISidebar open={open} setOpen={setOpen} animate={true}>
+    <UISidebar open={open} setOpen={setOpen} animate={!isMobile}>
       <SidebarBody className={cn(
         "justify-between gap-4 bg-white dark:bg-neutral-900 border-r border-[var(--border)]",
-        "fixed top-16 sm:top-18 left-0 h-[calc(100vh-4rem)] sm:h-[calc(100vh-4.5rem)] z-50",
+        !isMobile && "fixed top-16 sm:top-18 left-0 h-[calc(100vh-4rem)] sm:h-[calc(100vh-4.5rem)] z-50",
         "!px-0 !py-0"
       )}>
         <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden pt-6 px-4 h-full">
