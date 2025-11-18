@@ -99,7 +99,8 @@ export const AppShell = memo(function AppShell({ user, children, panel }: AppShe
           "flex-1 min-h-[calc(100vh-4rem)] sm:min-h-[calc(100vh-4.5rem)] transition-all duration-300 ease-in-out",
           "w-full overflow-y-auto bg-[var(--bg)]",
           !isMobile ? "lg:ml-[60px]" : "ml-0",
-          "max-w-full overflow-x-hidden"
+          "max-w-full overflow-x-hidden",
+          "relative z-10"
         )}>
           <div className="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8 py-6 lg:py-8 w-full max-w-full">
             <div className="w-full max-w-full overflow-x-hidden">

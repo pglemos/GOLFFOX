@@ -432,10 +432,13 @@ export function Sidebar({ isOpen = true, isMobile = false, panel = 'admin', user
     ? carrierMenuItems 
     : adminMenuItems
 
-  // Usar o estado isOpen passado como prop, com fallback para estado interno
+  // Estado interno para controle de hover no desktop
   const [internalOpen, setInternalOpen] = React.useState(false)
-  const open = isOpen !== undefined ? isOpen : internalOpen
-  const setOpen = isOpen !== undefined ? (() => {}) : setInternalOpen
+  
+  // Em mobile, usar o estado controlado externamente (isOpen)
+  // Em desktop, usar estado interno para animação de hover
+  const open = isMobile ? (isOpen ?? false) : internalOpen
+  const setOpen = isMobile ? (() => {}) : setInternalOpen
 
   const router = useRouter()
 
@@ -446,15 +449,15 @@ export function Sidebar({ isOpen = true, isMobile = false, panel = 'admin', user
     }
   }, [panel, router])
 
-  // Sincronizar estado interno quando isOpen mudar
+  // Em desktop, iniciar fechado (apenas ícones)
   useEffect(() => {
-    if (isOpen !== undefined) {
-      setInternalOpen(isOpen)
+    if (!isMobile) {
+      setInternalOpen(false)
     }
-  }, [isOpen])
+  }, [isMobile])
 
   return (
-    <UISidebar open={open} setOpen={setOpen} animate={!isMobile}>
+    <UISidebar open={open} setOpen={setOpen} animate={true}>
       <SidebarBody className={cn(
         "justify-between gap-4 bg-white dark:bg-neutral-900 border-r border-[var(--border)]",
         !isMobile && "fixed top-16 sm:top-18 left-0 h-[calc(100vh-4rem)] sm:h-[calc(100vh-4.5rem)] z-50",

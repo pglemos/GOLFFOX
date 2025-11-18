@@ -88,7 +88,20 @@ export const DesktopSidebar = ({
   children,
   ...props
 }: React.ComponentProps<typeof motion.div>) => {
-  const { open, setOpen, animate } = useSidebar();
+  const { open, setOpen, animate, isControlled } = useSidebar();
+  
+  // Se não estiver controlado externamente, permitir hover
+  const handleMouseEnter = () => {
+    if (!isControlled) {
+      setOpen(true)
+    }
+  }
+  
+  const handleMouseLeave = () => {
+    if (!isControlled) {
+      setOpen(false)
+    }
+  }
   
   return (
     <motion.div
@@ -100,8 +113,8 @@ export const DesktopSidebar = ({
         width: animate ? (open ? "300px" : "60px") : "300px",
       }}
       transition={{ duration: 0.12, ease: "easeOut" }}
-      onMouseEnter={() => setOpen(true)}
-      onMouseLeave={() => setOpen(false)}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
       {...props}
     >
       {children}
