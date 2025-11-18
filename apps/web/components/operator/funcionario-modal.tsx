@@ -9,6 +9,7 @@ import { supabase } from "@/lib/supabase"
 import { notifySuccess, notifyError } from "@/lib/toast"
 import { error as logError } from "@/lib/logger"
 import { useState, useEffect } from "react"
+import { AddressAutocomplete } from "@/components/address-autocomplete"
 
 interface FuncionarioModalProps {
   funcionario: any | null
@@ -226,15 +227,23 @@ export function FuncionarioModal({ funcionario, isOpen, onClose, onSave, empresa
             />
           </div>
 
-          <div className="grid gap-2">
-            <Label htmlFor="address">Endereço</Label>
-            <Input
-              id="address"
-              value={formData.address}
-              onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))}
-              placeholder="Endereço completo para geocodificação"
-            />
-          </div>
+          <AddressAutocomplete
+            value={formData.address}
+            onChange={(address, lat, lng) => {
+              setFormData(prev => ({
+                ...prev,
+                address,
+                latitude: lat,
+                longitude: lng
+              }))
+            }}
+            label="Endereço"
+            placeholder="Digite o endereço completo..."
+            onGeocodeError={(error) => {
+              logError("Erro no autocomplete", { error }, 'FuncionarioModal')
+              notifyError(error)
+            }}
+          />
 
           <div className="flex items-center gap-2">
             <input

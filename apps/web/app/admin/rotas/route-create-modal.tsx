@@ -42,6 +42,7 @@ import { geocodeAddress } from "@/lib/geocoding"
 import type { EmployeeLite, OptimizeRouteResponse, RouteFormData } from "@/types/routes"
 import { DriverPickerModal } from "@/components/admin/driver-picker-modal"
 import { VehiclePickerModal } from "@/components/admin/vehicle-picker-modal"
+import { AddressAutocomplete } from "@/components/address-autocomplete"
 import { z } from "zod"
 import React from "react"
 
@@ -791,70 +792,44 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="origin">Origem (Garagem)</Label>
-                  <div className="flex gap-2">
-                    <Input
-                      id="origin"
-                      value={formData.origin_address || ""}
-                      onChange={(e) => setFormData((prev) => ({ ...prev, origin_address: e.target.value }))}
-                      placeholder="Endereço da garagem"
-                    />
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={async () => {
-                        if (!formData.origin_address) return
-                        const geocoded = await geocodeAddress(formData.origin_address)
-                        if (geocoded) {
-                          setFormData((prev) => ({
-                            ...prev,
-                            origin_lat: geocoded.lat,
-                            origin_lng: geocoded.lng,
-                            origin_address: geocoded.formatted_address,
-                          }))
-                          notifySuccess("Origem geocodificada!")
-                        } else {
-                          notifyError(new Error("Não foi possível geocodificar o endereço"), "Erro")
-                        }
-                      }}
-                    >
-                      <MapPin className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-                <div>
-                  <Label htmlFor="destination">Destino (Empresa)</Label>
-                  <div className="flex gap-2">
-                    <Input
-                      id="destination"
-                      value={formData.destination_address || ""}
-                      onChange={(e) => setFormData((prev) => ({ ...prev, destination_address: e.target.value }))}
-                      placeholder="Endereço da empresa"
-                    />
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={async () => {
-                        if (!formData.destination_address) return
-                        const geocoded = await geocodeAddress(formData.destination_address)
-                        if (geocoded) {
-                          setFormData((prev) => ({
-                            ...prev,
-                            destination_lat: geocoded.lat,
-                            destination_lng: geocoded.lng,
-                            destination_address: geocoded.formatted_address,
-                          }))
-                          notifySuccess("Destino geocodificado!")
-                        } else {
-                          notifyError(new Error("Não foi possível geocodificar o endereço"), "Erro")
-                        }
-                      }}
-                    >
-                      <MapPin className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
+                <AddressAutocomplete
+                  value={formData.origin_address || ""}
+                  onChange={(address, lat, lng) => {
+                    setFormData((prev) => ({
+                      ...prev,
+                      origin_address: address,
+                      origin_lat: lat || 0,
+                      origin_lng: lng || 0,
+                    }))
+                    if (address && lat && lng) {
+                      notifySuccess("Origem geocodificada automaticamente!")
+                    }
+                  }}
+                  label="Origem (Garagem)"
+                  placeholder="Digite o endereço da garagem..."
+                  onGeocodeError={(error) => {
+                    notifyError(error, "Erro no autocomplete")
+                  }}
+                />
+                <AddressAutocomplete
+                  value={formData.destination_address || ""}
+                  onChange={(address, lat, lng) => {
+                    setFormData((prev) => ({
+                      ...prev,
+                      destination_address: address,
+                      destination_lat: lat || 0,
+                      destination_lng: lng || 0,
+                    }))
+                    if (address && lat && lng) {
+                      notifySuccess("Destino geocodificado automaticamente!")
+                    }
+                  }}
+                  label="Destino (Empresa)"
+                  placeholder="Digite o endereço da empresa..."
+                  onGeocodeError={(error) => {
+                    notifyError(error, "Erro no autocomplete")
+                  }}
+                />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
