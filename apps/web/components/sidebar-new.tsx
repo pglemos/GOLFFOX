@@ -436,7 +436,7 @@ export function Sidebar({ isOpen = true, isMobile = false, panel = 'admin', user
   const [internalOpen, setInternalOpen] = React.useState(false)
   
   // Em mobile, usar o estado controlado externamente (isOpen)
-  // Em desktop, usar estado interno para animação de hover
+  // Em desktop, usar estado interno para animação de hover (não passar isOpen)
   const open = isMobile ? (isOpen ?? false) : internalOpen
   const setOpen = isMobile ? (() => {}) : setInternalOpen
 
@@ -456,8 +456,10 @@ export function Sidebar({ isOpen = true, isMobile = false, panel = 'admin', user
     }
   }, [isMobile])
 
+  // Em desktop, não passar isOpen para permitir controle interno (hover)
+  // Em mobile, passar isOpen para controle externo
   return (
-    <UISidebar open={open} setOpen={setOpen} animate={true}>
+    <UISidebar open={isMobile ? open : undefined} setOpen={isMobile ? setOpen : undefined} animate={true}>
       <SidebarBody className={cn(
         "justify-between gap-4 bg-white dark:bg-neutral-900 border-r border-[var(--border)]",
         !isMobile && "fixed top-16 sm:top-18 left-0 h-[calc(100vh-4rem)] sm:h-[calc(100vh-4.5rem)] z-50",

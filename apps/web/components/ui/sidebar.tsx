@@ -45,8 +45,10 @@ export const SidebarProvider = ({
   const [openState, setOpenState] = useState(false);
 
   // Determina se está sendo controlado externamente
-  const isControlled = openProp !== undefined;
-  const open = isControlled ? openProp : openState;
+  // Se openProp for undefined, não está controlado (permite hover interno)
+  // Se openProp for definido, está controlado (mobile)
+  const isControlled = openProp !== undefined && setOpenProp !== undefined;
+  const open = isControlled ? openProp! : openState;
   const setOpen = isControlled ? setOpenProp! : setOpenState;
 
   return (
