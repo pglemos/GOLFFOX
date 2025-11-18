@@ -361,6 +361,31 @@
     max-width: 100vw;
   }
   
+  body {
+    overflow-x: hidden;
+    max-width: 100vw;
+    position: relative;
+  }
+  
+  /* Garantir que a página de login seja visível em mobile */
+  @media (max-width: 1024px) {
+    body > div {
+      overflow-x: hidden;
+      max-width: 100vw;
+    }
+    
+    /* Garantir que formulários sejam visíveis */
+    form {
+      max-width: 100%;
+      overflow-x: hidden;
+    }
+    
+    /* Garantir que inputs não ultrapassem a largura */
+    input, textarea, select {
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+  }
   
   /* Classe utilitária para texto suave */
   .font-smooth {
