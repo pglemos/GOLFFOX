@@ -1,0 +1,82 @@
+{
+  "connection": {
+    "connected": true
+  },
+  "views": {
+    "v_admin_dashboard_kpis": {
+      "exists": true,
+      "rowCount": 1
+    },
+    "v_admin_kpis_materialized": {
+      "exists": false,
+      "error": "View não existe"
+    },
+    "v_operator_dashboard_kpis_secure": {
+      "exists": true,
+      "rowCount": 0
+    },
+    "v_operator_routes_secure": {
+      "exists": true,
+      "rowCount": 0
+    },
+    "v_operator_alerts_secure": {
+      "exists": true,
+      "rowCount": 0
+    },
+    "v_operator_costs_secure": {
+      "exists": true,
+      "rowCount": 0
+    },
+    "v_carrier_expiring_documents": {
+      "exists": true,
+      "rowCount": 0
+    },
+    "v_carrier_vehicle_costs_summary": {
+      "exists": true,
+      "rowCount": 0
+    },
+    "v_carrier_route_costs_summary": {
+      "exists": true,
+      "rowCount": 0
+    },
+    "v_my_companies": {
+      "exists": true,
+      "rowCount": 0
+    },
+    "v_operator_employees_secure": {
+      "exists": true,
+      "rowCount": 0
+    }
+  },
+  "materializedViews": {
+    "mv_admin_kpis": {
+      "exists": true,
+      "populated": true,
+      "rowCount": 1
+    },
+    "mv_operator_kpis": {
+      "exists": true,
+      "populated": false,
+      "rowCount": 0
+    }
+  },
+  "rpcFunctions": {
+    "gf_map_snapshot_full": {
+      "exists": false,
+      "error": "Could not choose the best candidate function between: public.gf_map_snapshot_full(p_company_id => uuid, p_route_id => uuid), public.gf_map_snapshot_full(p_company_id => uuid, p_carrier_id => uuid, p_route_id => uuid)"
+    },
+    "get_user_role": {
+      "exists": true,
+      "works": true
+    },
+    "get_user_company_id": {
+      "exists": true,
+      "works": true
+    },
+    "get_user_carrier_id": {
+      "exists": true,
+      "works": true
+    }
+  },
+  "timestamp": "2025-11-18T21:33:53.751Z"
+}

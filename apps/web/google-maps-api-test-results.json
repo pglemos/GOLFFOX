@@ -1,0 +1,20 @@
+{
+  "apiKey": "AIzaSyD79t05YxpU2RnE...",
+  "results": {
+    "geocoding": {
+      "ok": true,
+      "status": "OK",
+      "results": 1
+    },
+    "directions": {
+      "ok": true,
+      "status": "OK",
+      "routes": 1
+    },
+    "mapsJavaScript": {
+      "ok": true,
+      "status": "OK"
+    }
+  },
+  "timestamp": "2025-11-18T21:33:59.889Z"
+}
