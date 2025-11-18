@@ -3,18 +3,61 @@ import { z } from 'zod'
 import { geocodeAddress } from '@/lib/google-maps'
 import { supabase } from '@/lib/supabase'
 
+// Função para validar CPF
+function validateCPF(cpf: string): boolean {
+  const cleanCPF = cpf.replace(/\D/g, '')
+  if (cleanCPF.length !== 11) return false
+  if (/^(\d)\1{10}$/.test(cleanCPF)) return false // Todos os dígitos iguais
+
+  let sum = 0
+  for (let i = 0; i < 9; i++) {
+    sum += parseInt(cleanCPF.charAt(i)) * (10 - i)
+  }
+  let digit = 11 - (sum % 11)
+  if (digit >= 10) digit = 0
+  if (digit !== parseInt(cleanCPF.charAt(9))) return false
+
+  sum = 0
+  for (let i = 0; i < 10; i++) {
+    sum += parseInt(cleanCPF.charAt(i)) * (11 - i)
+  }
+  digit = 11 - (sum % 11)
+  if (digit >= 10) digit = 0
+  if (digit !== parseInt(cleanCPF.charAt(10))) return false
+
+  return true
+}
+
 // Schema Zod para validação
 const EmployeeSchema = z.object({
-  nome: z.string().min(3, 'Nome deve ter ao menos 3 caracteres'),
-  cpf: z.string().regex(/^\d{11}$/, 'CPF deve ter 11 dígitos').transform((val) => val.replace(/\D/g, '')),
-  email: z.string().email('Email inválido'),
-  telefone: z.string().optional(),
-  endereco: z.string().min(5, 'Endereço deve ter ao menos 5 caracteres'),
-  bairro: z.string().optional(),
-  cidade: z.string().optional(),
-  cep: z.string().optional(),
-  centro_custo: z.string().optional(),
-  turno: z.enum(['manha', 'tarde', 'noite']).optional()
+  nome: z.string().min(3, 'Nome deve ter ao menos 3 caracteres').max(200, 'Nome muito longo'),
+  cpf: z.string()
+    .transform((val) => val.replace(/\D/g, ''))
+    .refine((val) => val.length === 11, 'CPF deve ter 11 dígitos')
+    .refine((val) => validateCPF(val), 'CPF inválido'),
+  email: z.string()
+    .email('Email inválido')
+    .toLowerCase()
+    .max(255, 'Email muito longo'),
+  telefone: z.string()
+    .transform((val) => val ? val.replace(/\D/g, '') : '')
+    .refine((val) => !val || val.length >= 10, 'Telefone deve ter ao menos 10 dígitos')
+    .optional(),
+  endereco: z.string()
+    .min(5, 'Endereço deve ter ao menos 5 caracteres')
+    .max(500, 'Endereço muito longo'),
+  bairro: z.string().max(200, 'Bairro muito longo').optional(),
+  cidade: z.string().max(200, 'Cidade muito longa').optional(),
+  cep: z.string()
+    .transform((val) => val ? val.replace(/\D/g, '') : '')
+    .refine((val) => !val || val.length === 8, 'CEP deve ter 8 dígitos')
+    .optional(),
+  centro_custo: z.string().max(100, 'Centro de custo muito longo').optional(),
+  turno: z.enum(['manha', 'tarde', 'noite', 'Manhã', 'Tarde', 'Noite', 'MANHA', 'TARDE', 'NOITE'], {
+    errorMap: () => ({ message: 'Turno deve ser: manhã, tarde ou noite' })
+  })
+    .transform((val) => val.toLowerCase())
+    .optional()
 })
 
 export type EmployeeRow = z.infer<typeof EmployeeSchema>
@@ -94,49 +137,86 @@ export function parseCSV(file: File): Promise<ParseResult> {
 }
 
 /**
- * Geocoding em lote com rate limiting e retry exponencial
+ * Geocoding em lote com rate limiting, retry exponencial e cache
  */
 export async function geocodeBatch(
   addresses: string[],
   onProgress?: (current: number, total: number) => void
 ): Promise<Map<string, { lat: number; lng: number } | null>> {
   const results = new Map<string, { lat: number; lng: number } | null>()
+  const cache = new Map<string, { lat: number; lng: number } | null>()
   const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
   
-  for (let i = 0; i < addresses.length; i++) {
-    const address = addresses[i]
+  // Remover duplicatas mantendo ordem
+  const uniqueAddresses = Array.from(new Set(addresses))
+  
+  for (let i = 0; i < uniqueAddresses.length; i++) {
+    const address = uniqueAddresses[i]
+    
+    // Verificar cache primeiro
+    if (cache.has(address)) {
+      results.set(address, cache.get(address)!)
+      onProgress?.(i + 1, uniqueAddresses.length)
+      continue
+    }
+    
     let attempts = 0
-    let coords = null
+    let coords: { lat: number; lng: number } | null = null
+    const maxAttempts = 3
 
     // Retry exponencial: até 3 tentativas
-    while (attempts < 3 && !coords) {
+    while (attempts < maxAttempts && !coords) {
       try {
         coords = await geocodeAddress(address)
-        if (!coords) {
-          await delay(Math.pow(2, attempts) * 1000) // Exponential backoff: 1s, 2s, 4s
+        
+        if (!coords && attempts < maxAttempts - 1) {
+          // Aguardar antes de tentar novamente (exponential backoff)
+          await delay(Math.pow(2, attempts) * 1000) // 1s, 2s, 4s
           attempts++
+        } else {
+          break
         }
-      } catch (error) {
-        console.warn(`Erro ao geocodificar endereço "${address}":`, error)
-        await delay(Math.pow(2, attempts) * 1000)
-        attempts++
+      } catch (error: any) {
+        console.warn(`Erro ao geocodificar endereço "${address}" (tentativa ${attempts + 1}/${maxAttempts}):`, error.message || error)
+        
+        if (attempts < maxAttempts - 1) {
+          await delay(Math.pow(2, attempts) * 1000)
+          attempts++
+        } else {
+          // Última tentativa falhou
+          coords = null
+          break
+        }
       }
     }
 
+    // Armazenar no cache e resultados
+    cache.set(address, coords)
     results.set(address, coords)
-    onProgress?.(i + 1, addresses.length)
+    onProgress?.(i + 1, uniqueAddresses.length)
 
     // Rate limiting: ~8-10 req/s = ~120ms entre requisições
-    if (i < addresses.length - 1) {
+    // Google Maps permite até 50 req/s, mas usamos 8-10 para ser conservador
+    if (i < uniqueAddresses.length - 1) {
       await delay(120)
     }
   }
+
+  // Preencher resultados para endereços duplicados
+  addresses.forEach(addr => {
+    if (!results.has(addr)) {
+      const cached = cache.get(addr)
+      if (cached !== undefined) {
+        results.set(addr, cached)
+      }
+    }
+  })
 
   return results
 }
 
 /**
- * Upsert transacional de funcionários
+ * Upsert transacional de funcionários com validação e tratamento de duplicatas
  */
 export async function importEmployees(
   employees: EmployeeRow[],
@@ -147,29 +227,73 @@ export async function importEmployees(
   let success = 0
   const errors: Array<{ employee: string; error: string }> = []
   const unresolvedAddresses: string[] = []
+  const processedEmails = new Set<string>()
+  const processedCPFs = new Set<string>()
 
   for (let i = 0; i < employees.length; i++) {
     const emp = employees[i]
     
     try {
-      // 1. Criar usuário via API
-      const userRes = await fetch('/api/operator/create-employee', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: emp.email,
-          name: emp.nome,
-          phone: emp.telefone,
-          role: 'passenger'
-        })
-      })
-
-      if (!userRes.ok) {
-        const errorData = await userRes.json().catch(() => ({ error: 'Erro desconhecido' }))
-        throw new Error(errorData.error || 'Erro ao criar usuário')
+      // Validação de duplicatas no mesmo lote
+      if (processedEmails.has(emp.email)) {
+        throw new Error(`Email duplicado no arquivo: ${emp.email}`)
+      }
+      if (processedCPFs.has(emp.cpf)) {
+        throw new Error(`CPF duplicado no arquivo: ${emp.cpf}`)
       }
 
-      const { userId } = await userRes.json()
+      // 1. Verificar se funcionário já existe (por CPF ou email)
+      const { data: existingEmployee } = await supabase
+        .from('gf_employee_company')
+        .select('id, employee_id, email, cpf')
+        .eq('company_id', companyId)
+        .or(`cpf.eq.${emp.cpf},email.eq.${emp.email}`)
+        .maybeSingle()
+
+      let userId: string
+
+      if (existingEmployee?.employee_id) {
+        // Funcionário já existe, usar employee_id existente
+        userId = existingEmployee.employee_id
+        
+        // Atualizar dados do usuário se necessário
+        try {
+          await supabase
+            .from('users')
+            .update({
+              name: emp.nome,
+              phone: emp.telefone || null,
+            })
+            .eq('id', userId)
+        } catch (updateError) {
+          // Ignorar erro de atualização, continuar com importação
+          console.warn('Erro ao atualizar dados do usuário:', updateError)
+        }
+      } else {
+        // Criar novo usuário via API
+        const userRes = await fetch('/api/operator/create-employee', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: emp.email,
+            name: emp.nome,
+            phone: emp.telefone,
+            role: 'passenger'
+          })
+        })
+
+        if (!userRes.ok) {
+          const errorData = await userRes.json().catch(() => ({ error: 'Erro desconhecido' }))
+          throw new Error(errorData.error || `Erro ao criar usuário: ${userRes.status}`)
+        }
+
+        const userData = await userRes.json()
+        userId = userData.userId
+
+        if (!userId) {
+          throw new Error('ID do usuário não retornado pela API')
+        }
+      }
 
       // 2. Obter coordenadas
       const coords = geocodedAddresses.get(emp.endereco)
@@ -177,32 +301,65 @@ export async function importEmployees(
         unresolvedAddresses.push(emp.endereco)
       }
 
-      // 3. Upsert em gf_employee_company (unique: company_id, cpf)
-    const { error } = await (supabase as any)
-      .from('gf_employee_company')
-      .upsert({
-          employee_id: userId,
-          company_id: companyId,
-          name: emp.nome,
-          cpf: emp.cpf,
-          email: emp.email,
-          phone: emp.telefone || null,
-          address: emp.endereco,
-          latitude: coords?.lat || null,
-          longitude: coords?.lng || null,
-          is_active: true
-        }, {
-          onConflict: 'company_id,cpf'
+      // 3. Preparar dados completos do endereço
+      let fullAddress = emp.endereco
+      if (emp.bairro) fullAddress += `, ${emp.bairro}`
+      if (emp.cidade) fullAddress += `, ${emp.cidade}`
+      if (emp.cep) fullAddress += ` - CEP: ${emp.cep}`
+
+      // 4. Upsert em gf_employee_company
+      const employeeData: any = {
+        employee_id: userId,
+        company_id: companyId,
+        name: emp.nome,
+        cpf: emp.cpf,
+        email: emp.email,
+        phone: emp.telefone || null,
+        address: fullAddress,
+        latitude: coords?.lat || null,
+        longitude: coords?.lng || null,
+        is_active: true
+      }
+
+      // Adicionar campos opcionais se existirem na tabela
+      if (emp.centro_custo) {
+        employeeData.cost_center_id = emp.centro_custo
+      }
+
+      const { error: upsertError } = await supabase
+        .from('gf_employee_company')
+        .upsert(employeeData, {
+          onConflict: 'company_id,cpf',
+          ignoreDuplicates: false
         })
 
-      if (error) throw error
+      if (upsertError) {
+        // Se erro de constraint única, tentar update
+        if (upsertError.code === '23505' || upsertError.message?.includes('duplicate')) {
+          const { error: updateError } = await supabase
+            .from('gf_employee_company')
+            .update(employeeData)
+            .eq('company_id', companyId)
+            .eq('cpf', emp.cpf)
 
+          if (updateError) {
+            throw updateError
+          }
+        } else {
+          throw upsertError
+        }
+      }
+
+      // Marcar como processado
+      processedEmails.add(emp.email)
+      processedCPFs.add(emp.cpf)
       success++
     } catch (error: any) {
       errors.push({
         employee: emp.nome,
         error: error.message || 'Erro desconhecido'
       })
+      console.error(`Erro ao importar funcionário ${emp.nome}:`, error)
     }
 
     onProgress?.(i + 1, employees.length)
