@@ -268,13 +268,13 @@ export default function AlertasPage() {
 
   return (
     <AppShell user={{ id: user.id, name: user.name || "Admin", email: user.email, role: user.role || "admin" }}>
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold mb-2">Alertas</h1>
-            <p className="text-[var(--ink-muted)]">Monitoramento e gestão de alertas do sistema</p>
+      <div className="space-y-4 sm:space-y-6 w-full overflow-x-hidden">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+          <div className="min-w-0 flex-1">
+            <h1 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2 break-words">Alertas</h1>
+            <p className="text-sm sm:text-base text-[var(--ink-muted)] break-words">Monitoramento e gestão de alertas do sistema</p>
           </div>
-          <Button variant="outline" onClick={handleExport}>
+          <Button variant="outline" onClick={handleExport} className="w-full sm:w-auto flex-shrink-0">
             <Download className="h-4 w-4 mr-2" />
             Exportar
           </Button>
@@ -365,7 +365,7 @@ export default function AlertasPage() {
         </Card>
 
         {/* Lista de Alertas */}
-        <div className="grid gap-4">
+        <div className="grid gap-3 sm:gap-4 w-full">
           {filteredAlertas.length === 0 ? (
             <Card className="p-12 text-center">
               <AlertTriangle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
@@ -382,54 +382,55 @@ export default function AlertasPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3 }}
               >
-                <Card className="p-4 hover:shadow-lg transition-shadow">
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex gap-4 flex-1">
+                <Card className="p-3 sm:p-4 hover:shadow-lg transition-shadow overflow-hidden">
+                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
+                    <div className="flex gap-3 sm:gap-4 flex-1 min-w-0">
                       <AlertTriangle 
-                        className={`h-5 w-5 mt-1 ${
+                        className={`h-5 w-5 mt-1 flex-shrink-0 ${
                           alerta.severity === 'critical' ? 'text-red-500' : 
                           alerta.severity === 'warning' ? 'text-orange-500' : 
                           'text-blue-500'
                         }`} 
                       />
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex flex-wrap items-center gap-2 mb-2">
                           <Badge 
                             variant={
                               alerta.severity === 'critical' ? 'destructive' : 
                               alerta.severity === 'warning' ? 'default' : 
                               'secondary'
                             }
+                            className="text-xs"
                           >
                             {alerta.severity}
                           </Badge>
-                          <Badge variant={alerta.status === 'resolved' ? 'secondary' : 'outline'}>
+                          <Badge variant={alerta.status === 'resolved' ? 'secondary' : 'outline'} className="text-xs">
                             {alerta.status === 'open' ? 'Aberto' : 
                              alerta.status === 'assigned' ? 'Atribuído' : 
                              'Resolvido'}
                           </Badge>
-                          <span className="text-sm text-[var(--ink-muted)]">
+                          <span className="text-xs sm:text-sm text-[var(--ink-muted)] break-words">
                             {new Date(alerta.created_at).toLocaleString('pt-BR')}
                           </span>
                         </div>
-                        <p className="font-medium mb-2">{alerta.description}</p>
+                        <p className="font-medium mb-2 break-words text-sm sm:text-base">{alerta.description}</p>
                         <div className="space-y-1 text-xs text-[var(--ink-muted)]">
                           {alerta.companies && (
-                            <p>🏢 Empresa: {alerta.companies.name}</p>
+                            <p className="break-words">🏢 Empresa: {alerta.companies.name}</p>
                           )}
                           {alerta.routes && (
-                            <p>🚌 Rota: {alerta.routes.name}</p>
+                            <p className="break-words">🚌 Rota: {alerta.routes.name}</p>
                           )}
                           {alerta.vehicles && (
-                            <p>🚛 Veículo: {alerta.vehicles.plate}</p>
+                            <p className="break-words">🚛 Veículo: {alerta.vehicles.plate}</p>
                           )}
                           {alerta.drivers && (
-                            <p>👤 Motorista: {alerta.drivers.name || alerta.drivers.email}</p>
+                            <p className="break-words">👤 Motorista: {alerta.drivers.name || alerta.drivers.email}</p>
                           )}
                         </div>
                       </div>
                     </div>
-                    <div className="flex flex-col gap-2">
+                    <div className="grid grid-cols-2 sm:flex sm:flex-col gap-2 w-full sm:w-auto">
                       <Button 
                         variant="outline"
                         size="sm"
@@ -437,17 +438,19 @@ export default function AlertasPage() {
                           setSelectedAlertForEdit(alerta)
                           setIsEditModalOpen(true)
                         }}
+                        className="text-xs sm:text-sm"
                       >
-                        <Edit className="h-4 w-4 mr-2" />
-                        Editar
+                        <Edit className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                        <span className="truncate">Editar</span>
                       </Button>
                       <Button 
                         variant="destructive"
                         size="sm"
                         onClick={() => handleDeleteAlerta(alerta.id)}
+                        className="text-xs sm:text-sm"
                       >
-                        <Trash2 className="h-4 w-4 mr-2" />
-                        Excluir
+                        <Trash2 className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                        <span className="truncate">Excluir</span>
                       </Button>
                       {alerta.status !== 'resolved' && (
                         <>
@@ -455,9 +458,10 @@ export default function AlertasPage() {
                             size="sm" 
                             variant="outline"
                             onClick={() => handleResolve(alerta.id)}
+                            className="col-span-2 sm:col-span-1 text-xs sm:text-sm"
                           >
-                            <CheckCircle className="h-4 w-4 mr-2" />
-                            Resolver
+                            <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                            <span className="truncate">Resolver</span>
                           </Button>
                           <Button 
                             size="sm" 
@@ -468,9 +472,10 @@ export default function AlertasPage() {
                                 await handleAssign(alerta.id, session.user.id)
                               }
                             }}
+                            className="col-span-2 sm:col-span-1 text-xs sm:text-sm"
                           >
-                            <User className="h-4 w-4 mr-2" />
-                            Atribuir
+                            <User className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                            <span className="truncate">Atribuir</span>
                           </Button>
                         </>
                       )}
