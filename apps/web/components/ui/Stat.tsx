@@ -35,26 +35,27 @@ const Stat = ({ icon: Icon, label, value, hint, trend, trendLabel, className }: 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       whileHover={{ y: -4, scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
       transition={{ duration: 0.2 }}
-      className={cn("stat-card group cursor-pointer", className)}
+      className={cn("stat-card group cursor-pointer touch-manipulation", className)}
     >
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex items-center gap-4 flex-1">
+      <div className="flex items-start justify-between gap-2 sm:gap-4">
+        <div className="flex items-center gap-2 sm:gap-4 flex-1 min-w-0">
           {/* Icon Container */}
-          <div className="p-3 rounded-[var(--radius-lg)] bg-[var(--brand-light)] group-hover:bg-[var(--brand)] transition-colors duration-200">
-            <Icon className="w-6 h-6 text-[var(--brand)] group-hover:text-white transition-colors duration-200" />
+          <div className="p-2 sm:p-3 rounded-[var(--radius-lg)] bg-[var(--brand-light)] group-hover:bg-[var(--brand)] transition-colors duration-200 flex-shrink-0">
+            <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-[var(--brand)] group-hover:text-white transition-colors duration-200" />
           </div>
           
           {/* Content */}
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-[var(--ink-muted)] mb-2">
+            <p className="text-xs sm:text-sm font-medium text-[var(--ink-muted)] mb-1 sm:mb-2 truncate">
               {label}
             </p>
-            <motion.p className="text-3xl font-bold tabular-nums text-[var(--ink-strong)] truncate">
+            <motion.p className="text-2xl sm:text-3xl font-bold tabular-nums text-[var(--ink-strong)] truncate">
               {typeof value === 'number' ? display : displayValue}
             </motion.p>
             {hint && (
-              <p className="text-xs text-[var(--ink-muted)] mt-1.5">
+              <p className="text-xs text-[var(--ink-muted)] mt-1 sm:mt-1.5 truncate">
                 {hint}
               </p>
             )}
@@ -69,8 +70,9 @@ const Stat = ({ icon: Icon, label, value, hint, trend, trendLabel, className }: 
               ? "bg-[var(--success-light)] text-[var(--success)]" 
               : "bg-[var(--error-light)] text-[var(--error)]"
           )}>
-            {trend >= 0 ? '↑' : '↓'} {Math.abs(trend)}%
-            {trendLabel && <span className="ml-1 text-[var(--ink-muted)]">vs {trendLabel}</span>}
+            <span className="hidden sm:inline">{trend >= 0 ? '↑' : '↓'} {Math.abs(trend)}%</span>
+            <span className="sm:hidden">{trend >= 0 ? '↑' : '↓'}</span>
+            {trendLabel && <span className="ml-1 text-[var(--ink-muted)] hidden sm:inline">vs {trendLabel}</span>}
           </div>
         )}
       </div>

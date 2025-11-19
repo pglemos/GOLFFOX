@@ -21,12 +21,12 @@ interface KPICardsProps {
 export const OperatorKPICards = memo(function OperatorKPICards({ kpis, loading = false }: KPICardsProps) {
   if (loading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
         {[...Array(6)].map((_, i) => (
-          <Card key={i} className="p-4">
+          <Card key={i} className="p-3 sm:p-4">
             <div className="animate-pulse">
-              <div className="h-4 bg-gray-200 rounded w-1/2 mb-2"></div>
-              <div className="h-8 bg-gray-200 rounded w-1/3"></div>
+              <div className="h-3 sm:h-4 bg-gray-200 rounded w-1/2 mb-2"></div>
+              <div className="h-6 sm:h-8 bg-gray-200 rounded w-1/3"></div>
             </div>
           </Card>
         ))}
@@ -89,7 +89,7 @@ export const OperatorKPICards = memo(function OperatorKPICards({ kpis, loading =
   ]
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
       {cards.map((card, index) => {
         const Icon = card.icon
         return (
@@ -99,17 +99,17 @@ export const OperatorKPICards = memo(function OperatorKPICards({ kpis, loading =
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.05 }}
           >
-            <Card className="p-4 hover:shadow-md transition-shadow">
-              <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  <p className="text-sm text-[var(--ink-muted)] mb-1">{card.label}</p>
-                  <p className="text-2xl font-bold text-[var(--ink-strong)]">{card.value}</p>
+            <Card className="p-3 sm:p-4 hover:shadow-md transition-shadow">
+              <div className="flex items-center justify-between gap-2 sm:gap-3">
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs sm:text-sm text-[var(--ink-muted)] mb-1 truncate">{card.label}</p>
+                  <p className="text-xl sm:text-2xl font-bold text-[var(--ink-strong)] truncate">{card.value}</p>
                   {card.subtitle && (
-                    <p className="text-xs text-[var(--ink-muted)] mt-1">{card.subtitle}</p>
+                    <p className="text-xs text-[var(--ink-muted)] mt-1 truncate">{card.subtitle}</p>
                   )}
                 </div>
-                <div className={`w-12 h-12 rounded-lg ${card.bgColor} flex items-center justify-center flex-shrink-0`}>
-                  <Icon className={`h-6 w-6 ${card.color}`} />
+                <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-lg ${card.bgColor} flex items-center justify-center flex-shrink-0`}>
+                  <Icon className={`h-5 w-5 sm:h-6 sm:w-6 ${card.color}`} />
                 </div>
               </div>
             </Card>

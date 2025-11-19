@@ -7,6 +7,32 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Mobile optimizations */
+@layer base {
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    overflow-x: hidden;
+  }
+  
+  body {
+    overflow-x: hidden;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+  
+  /* Prevent text overflow issues */
+  p, span, div, h1, h2, h3, h4, h5, h6 {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+  }
+}
+
 @layer base {
   :root {
     /* ========================================
@@ -350,9 +376,19 @@
   button,
   a,
   [role="button"],
-  label {
+  label,
+  .touch-manipulation {
     -webkit-tap-highlight-color: rgba(249, 115, 22, 0.2);
     touch-action: manipulation;
+  }
+  
+  /* Garantir tamanho mínimo de toque em mobile */
+  @media (max-width: 1024px) {
+    button:not(.no-touch-size),
+    a[role="button"]:not(.no-touch-size),
+    [role="button"]:not(.no-touch-size) {
+      min-height: 44px;
+    }
   }
 
   /* Prevenir overflow horizontal */
@@ -903,15 +939,15 @@
 /* Mobile First - Smartphones (320px - 640px) */
 @media (max-width: 640px) {
   .hero-glass {
-    @apply p-6;
+    @apply p-4 sm:p-6;
   }
   
   .stat-card {
-    @apply p-4 min-h-[120px];
+    @apply p-3 sm:p-4 min-h-[100px] sm:min-h-[120px];
   }
   
   .board {
-    @apply p-4;
+    @apply p-3 sm:p-4;
   }
   
   .filter-bar {
@@ -919,23 +955,38 @@
   }
   
   .nav-link {
-    @apply px-3 py-2.5;
+    @apply px-2 sm:px-3 py-2 sm:py-2.5;
   }
   
   /* Topbar mobile adjustments */
   .topbar-mobile {
-    @apply px-4;
+    @apply px-3 sm:px-4;
   }
   
   /* Cards em mobile */
   .card-premium {
-    @apply mx-2;
+    @apply mx-0 sm:mx-2;
   }
   
   /* Typography mobile */
-  h1 { @apply text-2xl; }
-  h2 { @apply text-xl; }
-  h3 { @apply text-lg; }
+  h1 { @apply text-xl sm:text-2xl; }
+  h2 { @apply text-lg sm:text-xl; }
+  h3 { @apply text-base sm:text-lg; }
+  
+  /* Garantir que botões sejam tocáveis */
+  button, a[role="button"], [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Melhorar espaçamento em mobile */
+  .space-y-6 > * + * {
+    margin-top: 1rem;
+  }
+  
+  .space-y-8 > * + * {
+    margin-top: 1.5rem;
+  }
 }
 
 /* Tablets (641px - 1024px) */

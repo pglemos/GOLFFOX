@@ -155,15 +155,19 @@ export default function EmpresasPage() {
 
   return (
     <AppShell user={{ id: user.id, name: user.name || "Admin", email: user.email, role: user.role || "admin" }}>
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold mb-2">Empresas</h1>
-            <p className="text-[var(--muted)]">Gerencie empresas e funcionários</p>
+      <div className="space-y-4 sm:space-y-6 w-full overflow-x-hidden">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+          <div className="min-w-0 flex-1">
+            <h1 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2 break-words">Empresas</h1>
+            <p className="text-sm sm:text-base text-[var(--muted)] break-words">Gerencie empresas e funcionários</p>
           </div>
-          <Button onClick={() => setIsCreateOperatorModalOpen(true)}>
+          <Button 
+            onClick={() => setIsCreateOperatorModalOpen(true)}
+            className="w-full sm:w-auto flex-shrink-0"
+          >
             <Plus className="h-4 w-4 mr-2" />
-            Criar Empresa
+            <span className="hidden sm:inline">Criar Empresa</span>
+            <span className="sm:hidden">Criar</span>
           </Button>
         </div>
 
@@ -188,18 +192,18 @@ export default function EmpresasPage() {
           </Card>
         )}
 
-        <div className="grid gap-4">
+        <div className="grid gap-3 sm:gap-4 w-full">
           {Array.isArray(empresas) && empresas.map((empresa: any) => (
-            <Card key={empresa.id} className="p-4">
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Briefcase className="h-5 w-5 text-[var(--brand)]" />
-                    <h3 className="font-bold text-lg">{empresa.name}</h3>
+            <Card key={empresa.id} className="p-3 sm:p-4 overflow-hidden">
+              <div className="flex flex-col gap-3 sm:gap-4">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-start gap-2 mb-2">
+                    <Briefcase className="h-5 w-5 text-[var(--brand)] flex-shrink-0 mt-0.5" />
+                    <h3 className="font-bold text-base sm:text-lg break-words flex-1">{empresa.name}</h3>
                   </div>
-                  <p className="text-sm text-[var(--muted)]">{empresa.address || 'Sem endereço'}</p>
+                  <p className="text-sm text-[var(--muted)] break-words pl-7">{empresa.address || 'Sem endereço'}</p>
                 </div>
-                <div className="flex flex-wrap gap-2">
+                <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2 w-full">
                   <Button 
                     variant="outline" 
                     size="sm"
@@ -209,9 +213,10 @@ export default function EmpresasPage() {
                       setSelectedCompanyForEdit(empresa)
                       setIsEditModalOpen(true)
                     }}
+                    className="w-full text-xs sm:text-sm"
                   >
-                    <Edit className="h-4 w-4 mr-2" />
-                    Editar
+                    <Edit className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                    <span className="truncate">Editar</span>
                   </Button>
                   <Button 
                     variant="outline" 
@@ -221,9 +226,11 @@ export default function EmpresasPage() {
                       setSelectedCompanyForOperators({ id: empresa.id, name: empresa.name })
                       setIsOperatorsModalOpen(true)
                     }}
+                    className="w-full text-xs sm:text-sm"
                   >
-                    <UserPlus className="h-4 w-4 mr-2" />
-                    Usuário Operador
+                    <UserPlus className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                    <span className="truncate hidden sm:inline">Usuário Operador</span>
+                    <span className="truncate sm:hidden">Operador</span>
                   </Button>
                   <Button 
                     variant="outline" 
@@ -232,9 +239,11 @@ export default function EmpresasPage() {
                       e.stopPropagation()
                       loadFuncionarios(empresa.id)
                     }}
+                    className="w-full text-xs sm:text-sm"
                   >
-                    <Users className="h-4 w-4 mr-2" />
-                    Ver Funcionários
+                    <Users className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                    <span className="truncate hidden sm:inline">Ver Funcionários</span>
+                    <span className="truncate sm:hidden">Funcionários</span>
                   </Button>
                   <Button 
                     variant="destructive" 
@@ -243,9 +252,10 @@ export default function EmpresasPage() {
                       e.stopPropagation()
                       handleDeleteEmpresa(empresa.id, empresa.name)
                     }}
+                    className="w-full col-span-2 sm:col-span-1 text-xs sm:text-sm"
                   >
-                    <Trash2 className="h-4 w-4 mr-2" />
-                    Excluir
+                    <Trash2 className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                    <span className="truncate">Excluir</span>
                   </Button>
                 </div>
               </div>

@@ -53,28 +53,33 @@ export const ControlTowerCards = memo(function ControlTowerCards({
   ]
 
   return (
-    <div>
-      <h2 className="text-xl font-bold mb-4">Torre de Controle</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="w-full">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {cards.map((card) => (
-          <motion.div key={card.label} whileHover={{ y: -2, scale: 1.01 }} transition={{ duration: 0.15, ease: 'easeOut' }}>
+          <motion.div 
+            key={card.label} 
+            whileHover={{ y: -2, scale: 1.01 }} 
+            whileTap={{ scale: 0.98 }}
+            transition={{ duration: 0.15, ease: 'easeOut' }}
+            className="touch-manipulation"
+          >
             {card.value > 0 ? (
-              <a href={card.href}>
-                <div className={`${card.bgColor} rounded-lg p-4 border border-current/10 hover:shadow-md transition-shadow cursor-pointer`}>
+              <a href={card.href} className="block">
+                <div className={`${card.bgColor} rounded-lg p-3 sm:p-4 border border-current/10 hover:shadow-md active:shadow-sm transition-shadow cursor-pointer min-h-[100px] sm:min-h-[120px]`}>
                   <div className="flex items-center justify-between mb-2">
-                    <card.icon className={`${card.color} h-5 w-5`} />
-                    <span className={`${card.color} text-2xl font-bold`}>{card.value}</span>
+                    <card.icon className={`${card.color} h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0`} />
+                    <span className={`${card.color} text-xl sm:text-2xl font-bold`}>{card.value}</span>
                   </div>
-                  <p className="text-sm text-gray-700 font-medium">{card.label}</p>
+                  <p className="text-xs sm:text-sm text-gray-700 font-medium truncate">{card.label}</p>
                 </div>
               </a>
             ) : (
-              <div className={`${card.bgColor} rounded-lg p-4 border border-current/10 transition-shadow`}>
+              <div className={`${card.bgColor} rounded-lg p-3 sm:p-4 border border-current/10 transition-shadow min-h-[100px] sm:min-h-[120px]`}>
                 <div className="flex items-center justify-between mb-2">
-                  <card.icon className={`${card.color} h-5 w-5`} />
-                  <span className={`${card.color} text-2xl font-bold`}>{card.value}</span>
+                  <card.icon className={`${card.color} h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0`} />
+                  <span className={`${card.color} text-xl sm:text-2xl font-bold`}>{card.value}</span>
                 </div>
-                <p className="text-sm text-gray-700 font-medium">{card.label}</p>
+                <p className="text-xs sm:text-sm text-gray-700 font-medium truncate">{card.label}</p>
               </div>
             )}
           </motion.div>

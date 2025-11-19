@@ -275,38 +275,40 @@ export default function AdminDashboard() {
       email: user.email || "",
       role: user.role || "admin"
     }}>
-      <div className="space-y-6 lg:space-y-8 animate-fade-in">
+      <div className="space-y-4 sm:space-y-6 lg:space-y-8 animate-fade-in w-full">
         {/* Filtros */}
         <Card className="overflow-hidden">
-          <CardHeader className="pb-4">
-            <div className="flex items-center justify-between">
+          <CardHeader className="pb-4 px-3 sm:px-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
               <div className="flex items-center gap-2">
-                <Filter className="h-5 w-5 text-[var(--brand)]" />
-                <CardTitle className="text-lg font-semibold">Filtros</CardTitle>
+                <Filter className="h-5 w-5 text-[var(--brand)] flex-shrink-0" />
+                <CardTitle className="text-base sm:text-lg font-semibold">Filtros</CardTitle>
               </div>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setFiltersExpanded(!filtersExpanded)}
-                className="gap-2"
+                className="gap-2 w-full sm:w-auto min-h-[44px] touch-manipulation"
               >
                 {filtersExpanded ? (
                   <>
                     <ChevronUp className="h-4 w-4" />
-                    Minimizar
+                    <span className="hidden sm:inline">Minimizar</span>
+                    <span className="sm:hidden">Fechar</span>
                   </>
                 ) : (
                   <>
                     <ChevronDown className="h-4 w-4" />
-                    Expandir
+                    <span className="hidden sm:inline">Expandir</span>
+                    <span className="sm:hidden">Abrir</span>
                   </>
                 )}
               </Button>
             </div>
           </CardHeader>
           {filtersExpanded && (
-            <CardContent className="pt-0">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <CardContent className="pt-0 px-3 sm:px-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 mb-4">
                 <div className="space-y-2">
                   <label className="block text-sm font-medium text-[var(--ink-strong)]">Empresa</label>
                   <Input
@@ -342,12 +344,12 @@ export default function AdminDashboard() {
                   </select>
                 </div>
               </div>
-              <div className="flex items-center justify-end gap-2 pt-4 border-t border-[var(--border)]">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2 sm:gap-2 pt-4 border-t border-[var(--border)]">
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={handleResetFilters}
-                  className="gap-2"
+                  className="gap-2 w-full sm:w-auto min-h-[44px] touch-manipulation"
                 >
                   <X className="h-4 w-4" />
                   Limpar
@@ -355,7 +357,7 @@ export default function AdminDashboard() {
                 <Button
                   size="sm"
                   onClick={handleSaveFilters}
-                  className="gap-2"
+                  className="gap-2 w-full sm:w-auto min-h-[44px] touch-manipulation"
                 >
                   <Save className="h-4 w-4" />
                   Salvar Filtros
@@ -370,7 +372,7 @@ export default function AdminDashboard() {
           variants={staggerContainer}
           initial="hidden"
           animate="visible"
-          className="grid-responsive-cards"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-3 sm:gap-4 lg:gap-6"
         >
           <motion.div variants={listItem}>
             <Stat
@@ -423,27 +425,27 @@ export default function AdminDashboard() {
         </motion.div>
 
         {/* Cards de Ação Rápida */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 lg:gap-6">
           {/* Mapa da Frota Preview */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.5 }}
           >
-            <a href="/admin/mapa" className="block h-full">
+              <a href="/admin/mapa" className="block h-full">
               <Card hover className="card-glass cursor-pointer h-full overflow-hidden">
-                <CardHeader className="pb-4">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1 min-w-0 pr-4">
-                      <CardTitle className="text-xl font-semibold mb-1.5 truncate">Mapa da Frota</CardTitle>
-                      <p className="text-sm text-[var(--ink-muted)] line-clamp-2">Visualize veículos em tempo real</p>
+                <CardHeader className="pb-4 px-3 sm:px-6">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex-1 min-w-0 pr-2 sm:pr-4">
+                      <CardTitle className="text-lg sm:text-xl font-semibold mb-1.5 truncate">Mapa da Frota</CardTitle>
+                      <p className="text-xs sm:text-sm text-[var(--ink-muted)] line-clamp-2">Visualize veículos em tempo real</p>
                     </div>
-                    <div className="p-2.5 rounded-lg bg-[var(--brand-light)] group-hover:bg-[var(--brand)] transition-colors flex-shrink-0">
-                      <MapPin className="h-5 w-5 text-[var(--brand)] group-hover:text-white transition-colors" />
+                    <div className="p-2 sm:p-2.5 rounded-lg bg-[var(--brand-light)] group-hover:bg-[var(--brand)] transition-colors flex-shrink-0">
+                      <MapPin className="h-4 w-4 sm:h-5 sm:w-5 text-[var(--brand)] group-hover:text-white transition-colors" />
                     </div>
                   </div>
                 </CardHeader>
-                <CardContent className="pt-0">
+                <CardContent className="pt-0 px-3 sm:px-6">
                   <div className="h-40 bg-gradient-to-br from-[var(--brand)]/10 to-[var(--accent)]/10 rounded-lg flex items-center justify-center group-hover:from-[var(--brand)]/20 group-hover:to-[var(--accent)]/20 transition-all overflow-hidden">
                     <MapPin className="h-16 w-16 text-[var(--brand)] opacity-30 group-hover:opacity-50 transition-opacity" />
                   </div>
@@ -459,20 +461,20 @@ export default function AdminDashboard() {
             transition={{ delay: 0.6 }}
           >
             <Card className="h-full overflow-hidden">
-              <CardHeader className="pb-4">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1 min-w-0 pr-4">
-                    <CardTitle className="text-xl font-semibold mb-1.5 truncate">Notificações Recentes</CardTitle>
-                    <p className="text-sm text-[var(--ink-muted)] line-clamp-2">Últimas atualizações do sistema</p>
+              <CardHeader className="pb-4 px-3 sm:px-6">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex-1 min-w-0 pr-2 sm:pr-4">
+                    <CardTitle className="text-lg sm:text-xl font-semibold mb-1.5 truncate">Notificações Recentes</CardTitle>
+                    <p className="text-xs sm:text-sm text-[var(--ink-muted)] line-clamp-2">Últimas atualizações do sistema</p>
                   </div>
-                  <Button variant="ghost" size="sm" className="flex-shrink-0" asChild>
+                  <Button variant="ghost" size="sm" className="flex-shrink-0 min-h-[44px] min-w-[44px] touch-manipulation" asChild>
                     <a href="/admin/alertas">
                       <ArrowUpRight className="h-4 w-4" />
                     </a>
                   </Button>
                 </div>
               </CardHeader>
-              <CardContent className="pt-0">
+              <CardContent className="pt-0 px-3 sm:px-6">
                 <div className="space-y-2">
                   {[1, 2, 3].map((i) => (
                     <div key={i} className="flex items-center gap-3 p-3 rounded-lg hover:bg-[var(--bg-hover)] transition-colors border border-transparent hover:border-[var(--border)]">
@@ -492,18 +494,18 @@ export default function AdminDashboard() {
         {/* Atividades Recentes */}
         <div>
           <Card className="overflow-hidden">
-            <CardHeader className="pb-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="text-xl font-semibold mb-1.5">Atividades Recentes</CardTitle>
-                  <p className="text-sm text-[var(--ink-muted)]">Histórico de ações do sistema</p>
+            <CardHeader className="pb-4 px-3 sm:px-6">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
+                <div className="flex-1 min-w-0">
+                  <CardTitle className="text-lg sm:text-xl font-semibold mb-1.5">Atividades Recentes</CardTitle>
+                  <p className="text-xs sm:text-sm text-[var(--ink-muted)]">Histórico de ações do sistema</p>
                 </div>
-                <Button variant="ghost" size="sm">
+                <Button variant="ghost" size="sm" className="w-full sm:w-auto min-h-[44px] touch-manipulation">
                   Ver todas
                 </Button>
               </div>
             </CardHeader>
-            <CardContent className="pt-0">
+            <CardContent className="pt-0 px-3 sm:px-6">
               {activitiesLoading ? (
                 <div className="p-12 text-center text-[var(--ink-muted)]">
                   <div className="w-8 h-8 border-2 border-[var(--brand)] border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
@@ -526,12 +528,12 @@ export default function AdminDashboard() {
                       : 'Ação'
                     
                     return (
-                      <div key={log.id} className="p-4 hover:bg-[var(--bg-hover)] transition-colors flex items-center gap-4 group">
-                        <div className={`w-10 h-10 rounded-lg ${actionColor} flex items-center justify-center flex-shrink-0 shadow-sm group-hover:scale-105 transition-transform`}>
-                          <ActionIcon className="h-5 w-5 text-white" />
+                      <div key={log.id} className="p-3 sm:p-4 hover:bg-[var(--bg-hover)] active:bg-[var(--bg-hover)] transition-colors flex items-center gap-2 sm:gap-4 group touch-manipulation">
+                        <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg ${actionColor} flex items-center justify-center flex-shrink-0 shadow-sm group-hover:scale-105 transition-transform`}>
+                          <ActionIcon className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="font-semibold text-sm text-[var(--ink-strong)] truncate">
+                          <p className="font-semibold text-xs sm:text-sm text-[var(--ink-strong)] truncate">
                             {actionText}: {resourceName}
                           </p>
                           <p className="text-xs text-[var(--ink-muted)] truncate mt-0.5">
@@ -539,7 +541,7 @@ export default function AdminDashboard() {
                             {log.details?.companyId && ` • Empresa: ${log.details.companyId.slice(0, 8)}`}
                           </p>
                         </div>
-                        <Badge variant="outline" className="text-xs flex-shrink-0">{log.action_type}</Badge>
+                        <Badge variant="outline" className="text-xs flex-shrink-0 hidden sm:inline-flex">{log.action_type}</Badge>
                       </div>
                     )
                   })}

@@ -184,17 +184,17 @@ export default function OperatorDashboard() {
       email: user?.email || "",
       role: "operator"
     }}>
-      <div className="space-y-6 lg:space-y-8">
+      <div className="space-y-4 sm:space-y-6 lg:space-y-8 w-full">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-2">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 pb-2">
           <div className="flex-1 min-w-0">
-            <h1 className="text-2xl sm:text-3xl font-bold mb-2 text-[var(--ink-strong)]">Painel do Operador</h1>
-            <p className="text-sm sm:text-base text-[var(--ink-muted)]">
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-2 text-[var(--ink-strong)]">Painel do Operador</h1>
+            <p className="text-xs sm:text-sm md:text-base text-[var(--ink-muted)] truncate">
               {companyName ? `Empresa: ${companyName}` : "Acompanhe sua operação em tempo real"}
             </p>
           </div>
-          <a href="/operator/rotas" className="flex-shrink-0">
-            <Button className="bg-orange-500 hover:bg-orange-600 text-white">
+          <a href="/operator/rotas" className="flex-shrink-0 w-full sm:w-auto">
+            <Button className="bg-orange-500 hover:bg-orange-600 text-white w-full sm:w-auto min-h-[44px] touch-manipulation">
               <MapPin className="h-4 w-4 mr-2" />
               Ver Rotas
             </Button>
@@ -202,12 +202,14 @@ export default function OperatorDashboard() {
         </div>
 
         {/* Filtros de Período */}
-        <div className="flex items-center justify-between flex-wrap gap-4">
-          <div>
-            <h2 className="text-lg font-semibold text-[var(--ink-strong)]">KPIs do Dia</h2>
-            <p className="text-sm text-[var(--ink-muted)] mt-1">Métricas principais da operação</p>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
+          <div className="flex-1 min-w-0">
+            <h2 className="text-base sm:text-lg font-semibold text-[var(--ink-strong)]">KPIs do Dia</h2>
+            <p className="text-xs sm:text-sm text-[var(--ink-muted)] mt-1">Métricas principais da operação</p>
           </div>
-          <PeriodFilter value={period} onChange={setPeriod} />
+          <div className="w-full sm:w-auto">
+            <PeriodFilter value={period} onChange={setPeriod} />
+          </div>
         </div>
 
         {/* KPIs */}
@@ -217,9 +219,9 @@ export default function OperatorDashboard() {
 
         {/* Control Tower */}
         <div>
-          <div className="mb-4">
-            <h2 className="text-lg font-semibold text-[var(--ink-strong)]">Torre de Controle</h2>
-            <p className="text-sm text-[var(--ink-muted)] mt-1">Monitoramento em tempo real</p>
+          <div className="mb-3 sm:mb-4">
+            <h2 className="text-base sm:text-lg font-semibold text-[var(--ink-strong)]">Torre de Controle</h2>
+            <p className="text-xs sm:text-sm text-[var(--ink-muted)] mt-1">Monitoramento em tempo real</p>
           </div>
           <ControlTowerCards 
             delays={controlTower.delays}
@@ -231,9 +233,9 @@ export default function OperatorDashboard() {
 
         {/* Gráficos */}
         <div>
-          <div className="mb-4">
-            <h2 className="text-lg font-semibold text-[var(--ink-strong)]">Análises e Tendências</h2>
-            <p className="text-sm text-[var(--ink-muted)] mt-1">Visualizações detalhadas da operação</p>
+          <div className="mb-3 sm:mb-4">
+            <h2 className="text-base sm:text-lg font-semibold text-[var(--ink-strong)]">Análises e Tendências</h2>
+            <p className="text-xs sm:text-sm text-[var(--ink-muted)] mt-1">Visualizações detalhadas da operação</p>
           </div>
           <DashboardCharts kpis={kpis} period={period} />
         </div>
@@ -241,23 +243,23 @@ export default function OperatorDashboard() {
         {/* Mapa Preview */}
         <div>
           <Card className="overflow-hidden">
-            <CardHeader className="pb-4">
-              <div className="flex items-start justify-between">
-                <div className="flex-1 min-w-0 pr-4">
-                  <CardTitle className="text-xl font-semibold mb-1.5">Visualização de Rotas</CardTitle>
-                  <p className="text-sm text-[var(--ink-muted)]">Visualize todas as rotas ativas no mapa interativo</p>
+            <CardHeader className="pb-4 px-3 sm:px-6">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
+                <div className="flex-1 min-w-0 pr-2 sm:pr-4">
+                  <CardTitle className="text-lg sm:text-xl font-semibold mb-1.5">Visualização de Rotas</CardTitle>
+                  <p className="text-xs sm:text-sm text-[var(--ink-muted)]">Visualize todas as rotas ativas no mapa interativo</p>
                 </div>
-                <a href="/operator/rotas/mapa" className="flex-shrink-0">
-                  <Button variant="outline" size="sm">
+                <a href="/operator/rotas/mapa" className="flex-shrink-0 w-full sm:w-auto">
+                  <Button variant="outline" size="sm" className="w-full sm:w-auto min-h-[44px] touch-manipulation">
                     <MapPin className="h-4 w-4 mr-2" />
                     Ver Mapa
                   </Button>
                 </a>
               </div>
             </CardHeader>
-            <CardContent className="pt-0">
-              <div className="h-48 bg-gradient-to-br from-orange-500/10 to-orange-600/10 rounded-lg flex items-center justify-center border border-orange-200/50">
-                <MapPin className="h-12 w-12 text-orange-500 opacity-40" />
+            <CardContent className="pt-0 px-3 sm:px-6">
+              <div className="h-40 sm:h-48 bg-gradient-to-br from-orange-500/10 to-orange-600/10 rounded-lg flex items-center justify-center border border-orange-200/50">
+                <MapPin className="h-10 w-10 sm:h-12 sm:w-12 text-orange-500 opacity-40" />
               </div>
             </CardContent>
           </Card>

@@ -113,7 +113,8 @@ export const SidebarBody = (props: React.ComponentProps<typeof motion.div>) => {
             exit={{ x: -280, opacity: 0 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
             className={cn(
-              "md:hidden fixed top-16 sm:top-18 left-0 h-[calc(100vh-4rem)] sm:h-[calc(100vh-4.5rem)] z-50 w-[280px] bg-white dark:bg-neutral-900 border-r border-[var(--border)] overflow-y-auto",
+              "md:hidden fixed top-16 sm:top-18 left-0 h-[calc(100vh-4rem)] sm:h-[calc(100vh-4.5rem)] z-50 w-[280px] sm:w-[300px] bg-white dark:bg-neutral-900 border-r border-[var(--border)] overflow-y-auto",
+              "shadow-xl",
               props.className
             )}
           >

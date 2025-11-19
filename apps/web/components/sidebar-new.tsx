@@ -277,15 +277,24 @@ const CustomSidebarLink = ({
         href={item.href}
         prefetch={true}
         className={cn(
-          "flex items-center justify-start gap-2 py-2 px-3 rounded-lg transition-colors relative",
+          "flex items-center justify-start gap-2 py-2.5 sm:py-2 px-2 sm:px-3 rounded-lg transition-colors relative",
+          "min-h-[44px] sm:min-h-[40px] touch-manipulation",
           isActive 
             ? (panel === 'operator' 
                 ? "bg-orange-50 dark:bg-orange-900/20 text-orange-500" 
                 : "bg-[#FFF7ED] text-[#F97316]")
-            : "hover:bg-gray-100 dark:hover:bg-gray-800"
+            : "hover:bg-gray-100 dark:hover:bg-gray-800 active:bg-gray-200"
         )}
         onMouseEnter={() => router.prefetch(item.href)}
-        onClick={(e) => { e.preventDefault(); router.push(item.href) }}
+        onClick={(e) => { 
+          e.preventDefault()
+          router.push(item.href)
+          // Fechar sidebar no mobile após clicar
+          if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+            const event = new CustomEvent('close-sidebar')
+            window.dispatchEvent(event)
+          }
+        }}
       >
         <div className="relative">
           <Icon 
@@ -314,7 +323,7 @@ const CustomSidebarLink = ({
             ease: "easeInOut",
           }}
           className={cn(
-            "text-sm transition-colors whitespace-nowrap font-medium",
+            "text-sm sm:text-base transition-colors whitespace-nowrap font-medium",
             isActive 
               ? (panel === 'operator' ? "text-orange-500 font-semibold" : "text-[#F97316] font-semibold")
               : "text-gray-600 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-gray-100"
@@ -468,10 +477,12 @@ export function Sidebar({ isOpen = true, isMobile = false, panel = 'admin', user
       <SidebarBody className={cn(
         "justify-between gap-4 bg-white dark:bg-neutral-900 border-r border-[var(--border)]",
         !isMobile && "fixed top-16 sm:top-18 left-0 h-[calc(100vh-4rem)] sm:h-[calc(100vh-4.5rem)] z-50",
+        isMobile && "w-[280px] sm:w-[300px]",
         "!px-0 !py-0"
       )}>
-        <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden pt-6 px-4 h-full">
-          <div className="flex flex-col gap-1">
+        <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden pt-4 sm:pt-6 px-3 sm:px-4 h-full">
+          <SidebarLogo panel={panel} />
+          <div className="flex flex-col gap-1 mt-2">
             {menuItems.map((item) => (
               <motion.div key={item.href} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2, ease: 'easeOut' }}>
                 <CustomSidebarLink item={item} panel={panel} />

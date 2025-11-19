@@ -114,15 +114,19 @@ export default function TransportadorasPage() {
 
   return (
     <AppShell user={{ id: user.id, name: user.name || "Admin", email: user.email, role: user.role || "admin" }}>
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold mb-2">Transportadoras</h1>
-            <p className="text-[var(--muted)]">Gerencie transportadoras e motoristas</p>
+      <div className="space-y-4 sm:space-y-6 w-full overflow-x-hidden">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+          <div className="min-w-0 flex-1">
+            <h1 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2 break-words">Transportadoras</h1>
+            <p className="text-sm sm:text-base text-[var(--muted)] break-words">Gerencie transportadoras e motoristas</p>
           </div>
-          <Button onClick={() => setIsCreateModalOpen(true)}>
+          <Button 
+            onClick={() => setIsCreateModalOpen(true)}
+            className="w-full sm:w-auto flex-shrink-0"
+          >
             <Plus className="h-4 w-4 mr-2" />
-            Criar Transportadora
+            <span className="hidden sm:inline">Criar Transportadora</span>
+            <span className="sm:hidden">Criar</span>
           </Button>
         </div>
 
@@ -147,21 +151,21 @@ export default function TransportadorasPage() {
           </Card>
         )}
 
-        <div className="grid gap-4">
+        <div className="grid gap-3 sm:gap-4 w-full">
           {Array.isArray(carriers) && carriers.map((carrier: any) => (
-            <Card key={carrier.id} className="p-4">
-              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+            <Card key={carrier.id} className="p-3 sm:p-4 overflow-hidden">
+              <div className="flex flex-col gap-3 sm:gap-4">
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Truck className="h-5 w-5 text-[var(--brand)] flex-shrink-0" />
-                    <h3 className="font-bold text-lg break-words">{carrier.name}</h3>
+                  <div className="flex items-start gap-2 mb-2">
+                    <Truck className="h-5 w-5 text-[var(--brand)] flex-shrink-0 mt-0.5" />
+                    <h3 className="font-bold text-base sm:text-lg break-words flex-1">{carrier.name}</h3>
                   </div>
-                  <p className="text-sm text-[var(--muted)] break-words">{carrier.address || 'Sem endereço'}</p>
+                  <p className="text-sm text-[var(--muted)] break-words pl-7">{carrier.address || 'Sem endereço'}</p>
                   {carrier.phone && (
-                    <p className="text-xs text-[var(--muted)] mt-1 break-words">📞 {carrier.phone}</p>
+                    <p className="text-xs text-[var(--muted)] mt-1 break-words pl-7">{carrier.phone}</p>
                   )}
                 </div>
-                <div className="flex flex-wrap gap-2 sm:flex-nowrap">
+                <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2 w-full">
                   <Button 
                     variant="outline" 
                     size="sm"
@@ -170,9 +174,10 @@ export default function TransportadorasPage() {
                       setSelectedCarrierForEdit(carrier)
                       setIsEditModalOpen(true)
                     }}
+                    className="w-full text-xs sm:text-sm"
                   >
-                    <Edit className="h-4 w-4 mr-2" />
-                    Editar
+                    <Edit className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                    <span className="truncate">Editar</span>
                   </Button>
                   <Button 
                     variant="outline" 
@@ -182,9 +187,11 @@ export default function TransportadorasPage() {
                       setSelectedCarrierForUsers({ id: carrier.id, name: carrier.name })
                       setIsUsersModalOpen(true)
                     }}
+                    className="w-full text-xs sm:text-sm"
                   >
-                    <UserPlus className="h-4 w-4 mr-2" />
-                    Login de Acesso
+                    <UserPlus className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                    <span className="truncate hidden sm:inline">Login de Acesso</span>
+                    <span className="truncate sm:hidden">Login</span>
                   </Button>
                   <Button 
                     variant="outline" 
@@ -194,9 +201,10 @@ export default function TransportadorasPage() {
                       setSelectedCarrierForDrivers({ id: carrier.id, name: carrier.name })
                       setIsDriversModalOpen(true)
                     }}
+                    className="w-full text-xs sm:text-sm"
                   >
-                    <Users className="h-4 w-4 mr-2" />
-                    Motoristas
+                    <Users className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                    <span className="truncate">Motoristas</span>
                   </Button>
                   <Button 
                     variant="outline" 
@@ -206,9 +214,10 @@ export default function TransportadorasPage() {
                       setSelectedCarrierForVehicles({ id: carrier.id, name: carrier.name })
                       setIsVehiclesModalOpen(true)
                     }}
+                    className="w-full text-xs sm:text-sm"
                   >
-                    <Truck className="h-4 w-4 mr-2" />
-                    Veículos
+                    <Truck className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                    <span className="truncate">Veículos</span>
                   </Button>
                   <Button 
                     variant="destructive" 
@@ -217,9 +226,10 @@ export default function TransportadorasPage() {
                       e.stopPropagation()
                       handleDeleteCarrier(carrier.id, carrier.name)
                     }}
+                    className="w-full col-span-2 sm:col-span-1 text-xs sm:text-sm"
                   >
-                    <Trash2 className="h-4 w-4 mr-2" />
-                    Excluir
+                    <Trash2 className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                    <span className="truncate">Excluir</span>
                   </Button>
                 </div>
               </div>

@@ -137,12 +137,12 @@ export function DataTable<T extends Record<string, any>>({
   return (
     <Card className={className}>
       {(title || description || searchable) && (
-        <CardHeader>
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <div>
-              {title && <CardTitle>{title}</CardTitle>}
+        <CardHeader className="px-3 sm:px-6">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
+            <div className="flex-1 min-w-0">
+              {title && <CardTitle className="text-lg sm:text-xl">{title}</CardTitle>}
               {description && (
-                <p className="text-sm text-[var(--ink-muted)] mt-1">{description}</p>
+                <p className="text-xs sm:text-sm text-[var(--ink-muted)] mt-1">{description}</p>
               )}
             </div>
             {searchable && (
@@ -152,7 +152,7 @@ export function DataTable<T extends Record<string, any>>({
                   placeholder={searchPlaceholder}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10"
+                  className="pl-10 text-base h-11 sm:h-10 min-h-[44px] touch-manipulation"
                 />
               </div>
             )}
@@ -161,78 +161,90 @@ export function DataTable<T extends Record<string, any>>({
       )}
 
       <CardContent className="p-0">
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                {columns.map((column) => (
-                  <TableHead
-                    key={column.key}
-                    className={column.sortable ? "cursor-pointer select-none" : ""}
-                    onClick={() => column.sortable && handleSort(column.key)}
-                  >
-                    <div className="flex items-center">
-                      {column.label}
-                      {column.sortable && getSortIcon(column.key)}
-                    </div>
-                  </TableHead>
-                ))}
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {paginatedData.length === 0 ? (
+        <div className="overflow-x-auto -mx-3 sm:mx-0">
+          <div className="inline-block min-w-full align-middle">
+            <Table>
+              <TableHeader>
                 <TableRow>
-                  <TableCell colSpan={columns.length} className="text-center py-12">
-                    <p className="text-[var(--ink-muted)]">{emptyMessage}</p>
-                  </TableCell>
+                  {columns.map((column) => (
+                    <TableHead
+                      key={column.key}
+                      className={cn(
+                        column.sortable ? "cursor-pointer select-none touch-manipulation" : "",
+                        "px-3 sm:px-6 py-3 text-xs sm:text-sm whitespace-nowrap"
+                      )}
+                      onClick={() => column.sortable && handleSort(column.key)}
+                    >
+                      <div className="flex items-center gap-1">
+                        <span className="truncate">{column.label}</span>
+                        {column.sortable && getSortIcon(column.key)}
+                      </div>
+                    </TableHead>
+                  ))}
                 </TableRow>
-              ) : (
-                paginatedData.map((row, index) => (
-                  <TableRow
-                    key={index}
-                    className={onRowClick ? "cursor-pointer" : ""}
-                    onClick={() => onRowClick?.(row)}
-                  >
-                    {columns.map((column) => (
-                      <TableCell key={column.key}>
-                        {column.render
-                          ? column.render(row[column.key], row)
-                          : row[column.key]?.toString() || "-"}
-                      </TableCell>
-                    ))}
+              </TableHeader>
+              <TableBody>
+                {paginatedData.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={columns.length} className="text-center py-12 px-3 sm:px-6">
+                      <p className="text-sm text-[var(--ink-muted)]">{emptyMessage}</p>
+                    </TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
+                ) : (
+                  paginatedData.map((row, index) => (
+                    <TableRow
+                      key={index}
+                      className={cn(
+                        onRowClick ? "cursor-pointer touch-manipulation" : "",
+                        "hover:bg-[var(--bg-hover)] active:bg-[var(--bg-hover)]"
+                      )}
+                      onClick={() => onRowClick?.(row)}
+                    >
+                      {columns.map((column) => (
+                        <TableCell key={column.key} className="px-3 sm:px-6 py-3 text-xs sm:text-sm">
+                          <div className="truncate max-w-[200px] sm:max-w-none">
+                            {column.render
+                              ? column.render(row[column.key], row)
+                              : row[column.key]?.toString() || "-"}
+                          </div>
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
         </div>
 
         {pagination && totalPages > 1 && (
-          <div className="flex items-center justify-between px-6 py-4 border-t border-[var(--border)]">
-            <div className="text-sm text-[var(--ink-muted)]">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-0 px-3 sm:px-6 py-3 sm:py-4 border-t border-[var(--border)]">
+            <div className="text-xs sm:text-sm text-[var(--ink-muted)] text-center sm:text-left">
               Mostrando {(currentPage - 1) * pageSize + 1} a{" "}
               {Math.min(currentPage * pageSize, sortedData.length)} de {sortedData.length} registros
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center justify-center gap-2">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                 disabled={currentPage === 1}
+                className="min-h-[44px] touch-manipulation"
               >
                 <ChevronLeft className="w-4 h-4" />
-                Anterior
+                <span className="hidden sm:inline">Anterior</span>
               </Button>
-              <div className="text-sm text-[var(--ink-muted)]">
-                Página {currentPage} de {totalPages}
+              <div className="text-xs sm:text-sm text-[var(--ink-muted)] px-2">
+                {currentPage}/{totalPages}
               </div>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                 disabled={currentPage === totalPages}
+                className="min-h-[44px] touch-manipulation"
               >
-                Próxima
+                <span className="hidden sm:inline">Próxima</span>
                 <ChevronRight className="w-4 h-4" />
               </Button>
             </div>

@@ -140,15 +140,16 @@ export function Topbar({
       initial={{ y: -72 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.3, ease: "easeOut" }}
-      className="fixed top-0 left-0 right-0 h-16 sm:h-18 bg-white/80 backdrop-blur-xl border-b border-[var(--border)] z-[var(--z-fixed)]"
+      className="fixed top-0 left-0 right-0 h-16 sm:h-18 bg-white/95 dark:bg-neutral-900/95 backdrop-blur-xl border-b border-[var(--border)] z-[var(--z-fixed)] w-full"
     >
-      <div className="mx-auto max-w-[1600px] px-4 sm:px-6 h-full flex items-center gap-2 sm:gap-4">
+      <div className="mx-auto max-w-[1600px] px-3 sm:px-4 md:px-6 h-full flex items-center gap-2 sm:gap-3 md:gap-4 w-full">
         {/* Mobile menu toggle */}
         <Button
           variant="ghost"
           size="icon"
           onClick={onToggleSidebar}
-          className="lg:hidden hover:bg-[var(--bg-hover)] flex-shrink-0"
+          className="lg:hidden hover:bg-[var(--bg-hover)] active:bg-[var(--bg-hover)] flex-shrink-0 min-w-[44px] min-h-[44px] touch-manipulation"
+          aria-label="Toggle menu"
         >
           <Menu className="h-5 w-5" />
         </Button>
@@ -161,12 +162,12 @@ export function Topbar({
             <motion.div
               whileHover={{ scale: 1.05, rotate: 5 }}
               whileTap={{ scale: 0.95 }}
-              className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl gradient-brand flex items-center justify-center shadow-md"
+              className="w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-xl gradient-brand flex items-center justify-center shadow-md flex-shrink-0"
             >
-              <span className="text-white font-bold text-lg sm:text-xl">G</span>
+              <span className="text-white font-bold text-base sm:text-lg md:text-xl">G</span>
             </motion.div>
-            <div className="flex items-center gap-2">
-              <span className="font-bold text-lg sm:text-2xl tracking-tight text-[var(--ink-strong)] hidden xs:block">
+            <div className="flex items-center gap-1 sm:gap-2 min-w-0">
+              <span className="font-bold text-base sm:text-lg md:text-xl lg:text-2xl tracking-tight text-[var(--ink-strong)] truncate">
                 {pathname?.startsWith('/admin') ? (panelBranding || 'Administrativo') : (panelBranding || 'GOLF FOX')}
               </span>
             </div>
@@ -198,11 +199,12 @@ export function Topbar({
 
 
         {/* Right Actions */}
-        <div className="flex items-center gap-2 ml-auto">{/* Mobile search button */}
+        <div className="flex items-center gap-1 sm:gap-2 ml-auto flex-shrink-0">{/* Mobile search button */}
           <Button
             variant="ghost"
             size="icon"
-            className="md:hidden hover:bg-[var(--bg-hover)]"
+            className="md:hidden hover:bg-[var(--bg-hover)] active:bg-[var(--bg-hover)] min-w-[44px] min-h-[44px] touch-manipulation"
+            aria-label="Search"
           >
             <Search className="h-5 w-5" />
           </Button>
@@ -214,7 +216,7 @@ export function Topbar({
           <OperationalAlertsNotification />
 
           {/* Notifications */}
-          <Button variant="ghost" size="icon" className="relative hover:bg-[var(--bg-hover)]">
+          <Button variant="ghost" size="icon" className="relative hover:bg-[var(--bg-hover)] active:bg-[var(--bg-hover)] min-w-[44px] min-h-[44px] touch-manipulation" aria-label="Notifications">
             <Bell className="h-5 w-5" />
             <span className="absolute top-2 right-2 w-2 h-2 bg-[var(--brand)] rounded-full animate-pulse-glow"></span>
           </Button>
@@ -251,22 +253,22 @@ export function Topbar({
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
-                className="flex items-center gap-2 pl-2 hover:bg-[var(--bg-hover)] rounded-full"
+                className="flex items-center gap-1 sm:gap-2 pl-1 sm:pl-2 hover:bg-[var(--bg-hover)] active:bg-[var(--bg-hover)] rounded-full min-h-[44px] touch-manipulation"
               >
-                <div className="w-8 h-8 rounded-full gradient-brand flex items-center justify-center shadow-md">
+                <div className="w-8 h-8 rounded-full gradient-brand flex items-center justify-center shadow-md flex-shrink-0">
                   <span className="text-white text-sm font-bold">
                     {user?.name?.charAt(0).toUpperCase() || "A"}
                   </span>
                 </div>
-                <div className="text-left hidden sm:block">
-                  <p className="text-sm font-semibold leading-tight text-[var(--ink-strong)]">
+                <div className="text-left hidden sm:block min-w-0">
+                  <p className="text-sm font-semibold leading-tight text-[var(--ink-strong)] truncate max-w-[120px]">
                     {user?.name || "Admin"}
                   </p>
-                  <p className="text-xs text-[var(--ink-muted)] leading-tight capitalize">
+                  <p className="text-xs text-[var(--ink-muted)] leading-tight capitalize truncate max-w-[120px]">
                     {user?.role || "administrador"}
                   </p>
                 </div>
-                <ChevronDown className="h-4 w-4 text-[var(--ink-muted)] hidden sm:block" />
+                <ChevronDown className="h-4 w-4 text-[var(--ink-muted)] hidden sm:block flex-shrink-0" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56 bg-white border-[var(--border)] shadow-lg">

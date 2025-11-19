@@ -459,16 +459,16 @@ export default function CarrierDashboard() {
       email: user?.email || "",
       role: "carrier"
     }}>
-      <div className="space-y-6 lg:space-y-8">
+      <div className="space-y-4 sm:space-y-6 lg:space-y-8 w-full">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-2">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 pb-2">
           <div className="flex-1 min-w-0">
-            <h1 className="text-2xl sm:text-3xl font-bold mb-2 text-[var(--ink-strong)]">Gestão de Frota</h1>
-            <p className="text-sm sm:text-base text-[var(--ink-muted)]">Monitore veículos e motoristas em tempo real</p>
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-2 text-[var(--ink-strong)]">Gestão de Frota</h1>
+            <p className="text-xs sm:text-sm md:text-base text-[var(--ink-muted)]">Monitore veículos e motoristas em tempo real</p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
             <Select value={period} onValueChange={(value: any) => setPeriod(value)}>
-              <SelectTrigger className="w-40">
+              <SelectTrigger className="w-full sm:w-40 min-h-[44px] touch-manipulation">
                 <Calendar className="h-4 w-4 mr-2" />
                 <SelectValue />
               </SelectTrigger>
@@ -479,7 +479,7 @@ export default function CarrierDashboard() {
                 <SelectItem value="custom">Personalizado</SelectItem>
               </SelectContent>
             </Select>
-            <Button asChild className="flex-shrink-0">
+            <Button asChild className="flex-shrink-0 w-full sm:w-auto min-h-[44px] touch-manipulation">
               <a href="/carrier/relatorios">
                 <Truck className="h-4 w-4 mr-2" />
                 Relatórios
@@ -489,7 +489,7 @@ export default function CarrierDashboard() {
         </div>
 
         {/* Stats - KPIs Melhorados */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           <KpiCardEnhanced
             icon={Truck}
             label="Total da Frota"
@@ -532,7 +532,7 @@ export default function CarrierDashboard() {
         </div>
 
         {/* Additional KPIs Row */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
           <KpiCardEnhanced
             icon={DollarSign}
             label="Custos do Mês"
@@ -566,7 +566,7 @@ export default function CarrierDashboard() {
         </div>
 
         {/* Gráficos e Ações Rápidas */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
           {/* Gráfico de Linha - Veículos em Rota */}
           <ChartContainer
             title="Veículos em Rota (24h)"
@@ -608,7 +608,7 @@ export default function CarrierDashboard() {
         </div>
 
         {/* Gráficos de Distribuição */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 lg:gap-6">
           {/* Gráfico de Pizza - Status da Frota */}
           <ChartContainer
             title="Distribuição da Frota"
@@ -668,49 +668,51 @@ export default function CarrierDashboard() {
         </div>
 
         {/* Fleet Status */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 lg:gap-6">
           {/* Fleet Map */}
           <Card className="overflow-hidden">
-            <CardHeader className="pb-4">
-              <div className="flex items-start justify-between">
-                <div className="flex-1 min-w-0 pr-4">
-                  <CardTitle className="text-xl font-semibold mb-1.5 flex items-center gap-2">
-                    <Map className="h-5 w-5" />
-                    Mapa da Frota
+            <CardHeader className="pb-4 px-3 sm:px-6">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
+                <div className="flex-1 min-w-0 pr-2 sm:pr-4">
+                  <CardTitle className="text-lg sm:text-xl font-semibold mb-1.5 flex items-center gap-2">
+                    <Map className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
+                    <span className="truncate">Mapa da Frota</span>
                   </CardTitle>
-                  <p className="text-sm text-[var(--ink-muted)]">Visualização em tempo real</p>
+                  <p className="text-xs sm:text-sm text-[var(--ink-muted)]">Visualização em tempo real</p>
                 </div>
                 <Button 
                   size="sm" 
                   variant="outline" 
-                  className="flex-shrink-0"
+                  className="flex-shrink-0 w-full sm:w-auto min-h-[44px] touch-manipulation"
                   onClick={() => router.push('/carrier/mapa')}
                 >
                   Expandir
                 </Button>
               </div>
             </CardHeader>
-            <CardContent className="pt-0">
-              <div className="h-64 md:h-80 lg:h-96 rounded-lg overflow-hidden border border-[var(--border)] shadow-inner bg-gray-50 dark:bg-gray-900">
+            <CardContent className="pt-0 px-3 sm:px-6">
+              <div className="h-48 sm:h-64 md:h-80 lg:h-96 rounded-lg overflow-hidden border border-[var(--border)] shadow-inner bg-gray-50 dark:bg-gray-900">
                 <FleetMap 
                   carrierId={userData?.carrier_id}
                 />
               </div>
               <div className="mt-3 flex flex-wrap gap-2 text-xs text-[var(--ink-muted)]">
                 <div className="flex items-center gap-1">
-                  <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                  <div className="w-3 h-3 rounded-full bg-green-500 flex-shrink-0"></div>
                   <span>Em movimento</span>
                 </div>
                 <div className="flex items-center gap-1">
-                  <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-                  <span>Parado (&lt;2min)</span>
+                  <div className="w-3 h-3 rounded-full bg-yellow-500 flex-shrink-0"></div>
+                  <span className="hidden sm:inline">Parado (&lt;2min)</span>
+                  <span className="sm:hidden">Parado</span>
                 </div>
                 <div className="flex items-center gap-1">
-                  <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                  <span>Parado (&gt;3min)</span>
+                  <div className="w-3 h-3 rounded-full bg-red-500 flex-shrink-0"></div>
+                  <span className="hidden sm:inline">Parado (&gt;3min)</span>
+                  <span className="sm:hidden">Parado</span>
                 </div>
                 <div className="flex items-center gap-1">
-                  <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+                  <div className="w-3 h-3 rounded-full bg-blue-500 flex-shrink-0"></div>
                   <span>Na garagem</span>
                 </div>
               </div>
@@ -719,46 +721,46 @@ export default function CarrierDashboard() {
 
           {/* Active Drivers */}
           <Card className="overflow-hidden">
-            <CardHeader className="pb-4">
-              <div className="flex items-start justify-between">
-                <div className="flex-1 min-w-0 pr-4">
-                  <CardTitle className="text-xl font-semibold mb-1.5 flex items-center gap-2">
-                    <Users className="h-5 w-5" />
-                    Motoristas Ativos
+            <CardHeader className="pb-4 px-3 sm:px-6">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
+                <div className="flex-1 min-w-0 pr-2 sm:pr-4">
+                  <CardTitle className="text-lg sm:text-xl font-semibold mb-1.5 flex items-center gap-2">
+                    <Users className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
+                    <span className="truncate">Motoristas Ativos</span>
                   </CardTitle>
-                  <p className="text-sm text-[var(--ink-muted)]">Lista de motoristas em atividade</p>
+                  <p className="text-xs sm:text-sm text-[var(--ink-muted)]">Lista de motoristas em atividade</p>
                 </div>
                 <Button 
                   size="sm" 
                   variant="outline" 
-                  className="flex-shrink-0"
+                  className="flex-shrink-0 w-full sm:w-auto min-h-[44px] touch-manipulation"
                   onClick={() => router.push('/carrier/motoristas')}
                 >
                   Ver todos
                 </Button>
               </div>
             </CardHeader>
-            <CardContent className="pt-0">
+            <CardContent className="pt-0 px-3 sm:px-6">
               <div className="space-y-2 max-h-96 overflow-y-auto">
                 {drivers.length === 0 ? (
-                  <div className="p-8 text-center text-[var(--ink-muted)]">
-                    <p className="text-sm">Nenhum motorista ativo</p>
+                  <div className="p-6 sm:p-8 text-center text-[var(--ink-muted)]">
+                    <p className="text-xs sm:text-sm">Nenhum motorista ativo</p>
                   </div>
                 ) : (
                   drivers.map((driver, i) => (
-                    <div key={i} className="flex items-center justify-between p-3 rounded-lg hover:bg-[var(--bg-hover)] transition-colors border border-transparent hover:border-[var(--border)]">
-                      <div className="flex items-center gap-3 flex-1 min-w-0">
-                        <div className="w-10 h-10 rounded-lg bg-[var(--brand-light)] flex items-center justify-center flex-shrink-0">
-                          <Users className="h-5 w-5 text-[var(--brand)]" />
+                    <div key={i} className="flex items-center justify-between p-2 sm:p-3 rounded-lg hover:bg-[var(--bg-hover)] active:bg-[var(--bg-hover)] transition-colors border border-transparent hover:border-[var(--border)] touch-manipulation">
+                      <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-[var(--brand-light)] flex items-center justify-center flex-shrink-0">
+                          <Users className="h-4 w-4 sm:h-5 sm:w-5 text-[var(--brand)]" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="font-semibold text-sm text-[var(--ink-strong)] truncate">{driver.name}</p>
+                          <p className="font-semibold text-xs sm:text-sm text-[var(--ink-strong)] truncate">{driver.name}</p>
                           <p className="text-xs text-[var(--ink-muted)] truncate">
                             {driver.trips} viagem(ns) • ⭐ {driver.rating}
                           </p>
                         </div>
                       </div>
-                      <Badge variant={driver.status === "active" ? "default" : "secondary"} className="flex-shrink-0">
+                      <Badge variant={driver.status === "active" ? "default" : "secondary"} className="flex-shrink-0 text-xs">
                         {driver.status === "active" ? "Ativo" : "Pausa"}
                       </Badge>
                     </div>
@@ -770,7 +772,7 @@ export default function CarrierDashboard() {
         </div>
 
         {/* Fleet Status Table e Atividades Recentes */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
           {/* Tabela de Status da Frota */}
           <div className="lg:col-span-2">
             <DataTable
