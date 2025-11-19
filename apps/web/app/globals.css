@@ -498,6 +498,14 @@
       visibility: visible !important;
       opacity: 1 !important;
       overflow-x: hidden !important;
+      background: var(--bg) !important;
+      background-image: none !important;
+    }
+    
+    /* Garantir que o body não tenha padrão de grid em mobile */
+    body {
+      background: var(--bg) !important;
+      background-image: none !important;
     }
     
     /* Garantir que containers flex em mobile funcionem */
@@ -580,10 +588,24 @@
     }
   }
   
-  /* Esconder pattern em mobile completamente */
+  /* Esconder pattern em mobile completamente - REGRA FORTALECIDA */
   @media (max-width: 1023px) {
     body::before {
-      display: none;
+      display: none !important;
+      content: none !important;
+      background-image: none !important;
+      opacity: 0 !important;
+      visibility: hidden !important;
+    }
+    
+    /* Garantir que nenhum elemento filho aplique o padrão */
+    body > *::before,
+    body > *::after,
+    main::before,
+    main::after,
+    [class*="AppShell"]::before,
+    [class*="AppShell"]::after {
+      background-image: none !important;
     }
   }
   
