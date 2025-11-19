@@ -80,11 +80,11 @@ export function QuickActions({ className }: QuickActionsProps) {
 
   return (
     <Card className={className}>
-      <CardHeader>
-        <CardTitle className="text-lg">Ações Rápidas</CardTitle>
+      <CardHeader className="px-3 sm:px-6 pb-3 sm:pb-4">
+        <CardTitle className="text-base sm:text-lg">Ações Rápidas</CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+      <CardContent className="px-3 sm:px-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
           {defaultActions.map((action, index) => {
             const Icon = action.icon
             return (
@@ -93,14 +93,15 @@ export function QuickActions({ className }: QuickActionsProps) {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.05 }}
+                whileTap={{ scale: 0.95 }}
               >
                 <Button
                   variant={action.variant || "outline"}
-                  className="w-full h-auto flex flex-col items-center gap-2 p-4"
+                  className="w-full h-auto flex flex-col items-center gap-1.5 sm:gap-2 p-3 sm:p-4 min-h-[80px] sm:min-h-[100px] touch-manipulation"
                   onClick={() => handleAction(action)}
                 >
-                  <Icon className="w-5 h-5" />
-                  <span className="text-xs sm:text-sm">{action.label}</span>
+                  <Icon className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+                  <span className="text-xs sm:text-sm text-center leading-tight">{action.label}</span>
                 </Button>
               </motion.div>
             )

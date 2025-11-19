@@ -136,17 +136,18 @@ export default function OperatorRotasPage() {
 
   return (
     <AppShell user={{ id: user?.id || "", name: user?.name || "Operador", email: user?.email || "", role: "operator" }}>
-      <div className="space-y-6">
-        <div className="flex items-center justify-between flex-wrap gap-4">
-          <div>
-            <h1 className="text-3xl font-bold mb-2">{operatorI18n.routes_title || "Rotas"}</h1>
-            <p className="text-gray-600">{operatorI18n.routes_subtitle || "Gerencie as rotas da sua empresa"}</p>
+      <div className="space-y-4 sm:space-y-6 w-full overflow-x-hidden">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+          <div className="min-w-0 flex-1">
+            <h1 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2 break-words">{operatorI18n.routes_title || "Rotas"}</h1>
+            <p className="text-sm sm:text-base text-gray-600 break-words">{operatorI18n.routes_subtitle || "Gerencie as rotas da sua empresa"}</p>
           </div>
-          <div className="flex gap-2">
-            <a href="/operator/rotas/mapa">
-              <Button variant="outline">
-                <Map className="h-4 w-4 mr-2" />
-                Ver no Mapa
+          <div className="flex flex-wrap gap-2 w-full sm:w-auto">
+            <a href="/operator/rotas/mapa" className="flex-1 sm:flex-initial">
+              <Button variant="outline" className="w-full sm:w-auto text-xs sm:text-sm">
+                <Map className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                <span className="hidden sm:inline">Ver no Mapa</span>
+                <span className="sm:hidden">Mapa</span>
               </Button>
             </a>
             <a href="/operator/solicitacoes">

@@ -66,31 +66,31 @@ export function KpiCardEnhanced({
       className={cn("group cursor-pointer", onClick && "cursor-pointer", className)}
       onClick={onClick}
     >
-      <Card className="overflow-hidden hover:shadow-lg transition-shadow">
-        <CardContent className="p-4 sm:p-6">
-          <div className="flex items-start justify-between gap-3">
-            <div className="flex items-center gap-4 flex-1 min-w-0">
+      <Card className="overflow-hidden hover:shadow-lg transition-shadow touch-manipulation">
+        <CardContent className="p-3 sm:p-4 md:p-6">
+          <div className="flex items-start justify-between gap-2 sm:gap-3">
+            <div className="flex items-center gap-2 sm:gap-3 md:gap-4 flex-1 min-w-0">
               {/* Icon Container */}
               <div
-                className="p-2.5 sm:p-3 rounded-lg flex-shrink-0 transition-colors duration-200"
+                className="p-2 sm:p-2.5 md:p-3 rounded-lg flex-shrink-0 transition-colors duration-200"
                 style={{ backgroundColor: iconBgColor }}
               >
                 <Icon
-                  className="w-5 h-5 sm:w-6 sm:h-6 transition-colors duration-200"
+                  className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 transition-colors duration-200"
                   style={{ color: iconColor }}
                 />
               </div>
               
               {/* Content */}
               <div className="flex-1 min-w-0">
-                <p className="text-xs sm:text-sm text-[var(--ink-muted)] mb-1.5 font-medium truncate">
+                <p className="text-xs sm:text-sm text-[var(--ink-muted)] mb-1 sm:mb-1.5 font-medium truncate">
                   {label}
                 </p>
-                <p className="text-2xl sm:text-3xl font-bold tabular-nums text-[var(--ink-strong)] truncate">
+                <p className="text-xl sm:text-2xl md:text-3xl font-bold tabular-nums text-[var(--ink-strong)] truncate">
                   {formatValue(displayValue)}
                 </p>
                 {hint && (
-                  <p className="text-xs text-[var(--ink-muted)] mt-1 truncate">
+                  <p className="text-xs text-[var(--ink-muted)] mt-0.5 sm:mt-1 truncate">
                     {hint}
                   </p>
                 )}
@@ -101,7 +101,7 @@ export function KpiCardEnhanced({
             {trend !== undefined && TrendIcon && (
               <div
                 className={cn(
-                  "px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1 flex-shrink-0",
+                  "px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full text-xs font-semibold flex items-center gap-0.5 sm:gap-1 flex-shrink-0",
                   trend > 0
                     ? "bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400"
                     : trend < 0
@@ -109,20 +109,23 @@ export function KpiCardEnhanced({
                     : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-400"
                 )}
               >
-                <TrendIcon className="w-3 h-3" />
-                <span>{Math.abs(trend).toFixed(1)}%</span>
+                <TrendIcon className="w-3 h-3 flex-shrink-0" />
+                <span className="hidden sm:inline">{Math.abs(trend).toFixed(1)}%</span>
+                <span className="sm:hidden">{Math.abs(trend).toFixed(0)}%</span>
               </div>
             )}
           </div>
 
           {/* Comparison text */}
           {previousValue !== undefined && (
-            <div className="mt-3 pt-3 border-t border-[var(--border)]">
-              <p className="text-xs text-[var(--ink-muted)]">
+            <div className="mt-2 sm:mt-3 pt-2 sm:pt-3 border-t border-[var(--border)]">
+              <p className="text-xs text-[var(--ink-muted)] truncate">
                 {trend !== undefined && trend > 0 && "↑ "}
                 {trend !== undefined && trend < 0 && "↓ "}
                 {trend !== undefined && trend === 0 && "→ "}
-                Período anterior: {formatValue(previousValue)}
+                <span className="hidden sm:inline">Período anterior: </span>
+                <span className="sm:hidden">Anterior: </span>
+                {formatValue(previousValue)}
               </p>
             </div>
           )}

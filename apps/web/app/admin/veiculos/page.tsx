@@ -258,18 +258,22 @@ export default function VeiculosPage() {
 
   return (
     <AppShell user={{ id: user.id, name: user.name || "Admin", email: user.email, role: user.role || "admin" }}>
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold mb-2">Veículos</h1>
-            <p className="text-[var(--muted)]">Gerencie a frota de veículos</p>
+      <div className="space-y-4 sm:space-y-6 w-full overflow-x-hidden">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+          <div className="min-w-0 flex-1">
+            <h1 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2 break-words">Veículos</h1>
+            <p className="text-sm sm:text-base text-[var(--muted)] break-words">Gerencie a frota de veículos</p>
           </div>
-          <Button onClick={() => {
-            setSelectedVehicle(null)
-            setIsModalOpen(true)
-          }}>
+          <Button 
+            onClick={() => {
+              setSelectedVehicle(null)
+              setIsModalOpen(true)
+            }}
+            className="w-full sm:w-auto flex-shrink-0"
+          >
             <Plus className="h-4 w-4 mr-2" />
-            Cadastrar Veículo
+            <span className="hidden sm:inline">Cadastrar Veículo</span>
+            <span className="sm:hidden">Cadastrar</span>
           </Button>
         </div>
 
@@ -287,7 +291,7 @@ export default function VeiculosPage() {
         {dataLoading && veiculos.length === 0 ? (
           <SkeletonList count={5} />
         ) : (
-          <div className="grid gap-4">
+          <div className="grid gap-3 sm:gap-4 w-full">
             {filteredVeiculos.map((veiculo) => (
             <motion.div
               key={veiculo.id}
@@ -295,36 +299,36 @@ export default function VeiculosPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
             >
-              <Card className="p-4 hover:shadow-lg transition-shadow">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1 flex gap-4">
+              <Card className="p-3 sm:p-4 hover:shadow-lg transition-shadow overflow-hidden">
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
+                  <div className="flex-1 flex gap-3 sm:gap-4 min-w-0">
                     {veiculo.photo_url && (
                       /* eslint-disable-next-line @next/next/no-img-element */
                       <img 
                         src={veiculo.photo_url} 
                         alt={veiculo.plate}
-                        className="w-20 h-20 rounded-lg object-cover border border-[var(--border)]"
+                        className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg object-cover border border-[var(--border)] flex-shrink-0"
                       />
                     )}
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Truck className="h-5 w-5 text-[var(--brand)]" />
-                        <h3 className="font-bold text-lg">{veiculo.plate}</h3>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-wrap items-center gap-2 mb-2">
+                        <Truck className="h-5 w-5 text-[var(--brand)] flex-shrink-0" />
+                        <h3 className="font-bold text-base sm:text-lg break-words">{veiculo.plate}</h3>
                         {veiculo.prefix && (
-                          <Badge variant="outline">Prefixo: {veiculo.prefix}</Badge>
+                          <Badge variant="outline" className="text-xs">Prefixo: {veiculo.prefix}</Badge>
                         )}
-                        <Badge variant={veiculo.is_active ? "default" : "secondary"}>
+                        <Badge variant={veiculo.is_active ? "default" : "secondary"} className="text-xs">
                           {veiculo.is_active ? "Ativo" : "Inativo"}
                         </Badge>
                       </div>
-                      <p className="font-medium mb-1">{veiculo.model || "Sem modelo"}</p>
-                      <div className="flex gap-4 text-sm text-[var(--ink-muted)]">
-                        <span>Ano: {veiculo.year || "N/A"}</span>
-                        {veiculo.capacity && <span>Capacidade: {veiculo.capacity} lugares</span>}
+                      <p className="font-medium mb-1 break-words text-sm sm:text-base">{veiculo.model || "Sem modelo"}</p>
+                      <div className="flex flex-wrap gap-2 sm:gap-4 text-xs sm:text-sm text-[var(--ink-muted)]">
+                        <span className="break-words">Ano: {veiculo.year || "N/A"}</span>
+                        {veiculo.capacity && <span className="break-words">Capacidade: {veiculo.capacity} lugares</span>}
                       </div>
                     </div>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="grid grid-cols-2 sm:flex gap-2 w-full sm:w-auto">
                     <Button 
                       variant="outline" 
                       size="sm"
@@ -332,24 +336,28 @@ export default function VeiculosPage() {
                         setSelectedVehicle(veiculo)
                         setIsModalOpen(true)
                       }}
+                      className="text-xs sm:text-sm"
                     >
-                      <Edit className="h-4 w-4 mr-2" />
-                      Editar
+                      <Edit className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                      <span className="truncate">Editar</span>
                     </Button>
                     <Button 
                       variant="outline" 
                       size="sm"
                       onClick={() => handleViewVehicle(veiculo)}
+                      className="text-xs sm:text-sm"
                     >
-                      Ver Detalhes
+                      <span className="truncate hidden sm:inline">Ver Detalhes</span>
+                      <span className="truncate sm:hidden">Detalhes</span>
                     </Button>
                     <Button 
                       variant="destructive" 
                       size="sm"
                       onClick={() => handleDeleteVeiculo(veiculo.id, veiculo.plate || 'Veículo')}
+                      className="col-span-2 sm:col-span-1 text-xs sm:text-sm"
                     >
-                      <Trash2 className="h-4 w-4 mr-2" />
-                      Excluir
+                      <Trash2 className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                      <span className="truncate">Excluir</span>
                     </Button>
                   </div>
                 </div>

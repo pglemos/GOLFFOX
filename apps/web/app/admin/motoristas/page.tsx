@@ -204,18 +204,22 @@ export default function MotoristasPage() {
 
   return (
     <AppShell user={{ id: user.id, name: user.name || "Admin", email: user.email, role: user.role || "admin" }}>
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold mb-2">Motoristas</h1>
-            <p className="text-[var(--muted)]">Gerencie os motoristas do sistema</p>
+      <div className="space-y-4 sm:space-y-6 w-full overflow-x-hidden">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+          <div className="min-w-0 flex-1">
+            <h1 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2 break-words">Motoristas</h1>
+            <p className="text-sm sm:text-base text-[var(--muted)] break-words">Gerencie os motoristas do sistema</p>
           </div>
-          <Button onClick={() => {
-            setSelectedDriver(null)
-            setIsModalOpen(true)
-          }}>
+          <Button 
+            onClick={() => {
+              setSelectedDriver(null)
+              setIsModalOpen(true)
+            }}
+            className="w-full sm:w-auto flex-shrink-0"
+          >
             <Plus className="h-4 w-4 mr-2" />
-            Cadastrar Motorista
+            <span className="hidden sm:inline">Cadastrar Motorista</span>
+            <span className="sm:hidden">Cadastrar</span>
           </Button>
         </div>
 
@@ -233,7 +237,7 @@ export default function MotoristasPage() {
         {dataLoading && motoristas.length === 0 ? (
           <SkeletonList count={5} />
         ) : (
-          <div className="grid gap-4">
+          <div className="grid gap-3 sm:gap-4 w-full">
             {filteredMotoristas.map((motorista) => (
             <motion.div
               key={motorista.id}
@@ -241,20 +245,20 @@ export default function MotoristasPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
             >
-              <Card className="p-4 hover:shadow-lg transition-shadow">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Users className="h-5 w-5 text-[var(--brand)]" />
-                      <h3 className="font-bold text-lg">{motorista.name}</h3>
-                      <Badge variant="outline">{motorista.role || "driver"}</Badge>
+              <Card className="p-3 sm:p-4 hover:shadow-lg transition-shadow overflow-hidden">
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start gap-2 mb-2 flex-wrap">
+                      <Users className="h-5 w-5 text-[var(--brand)] flex-shrink-0 mt-0.5" />
+                      <h3 className="font-bold text-base sm:text-lg break-words flex-1">{motorista.name}</h3>
+                      <Badge variant="outline" className="text-xs flex-shrink-0">{motorista.role || "driver"}</Badge>
                     </div>
-                    <p className="text-sm text-[var(--ink-muted)] mb-1">{motorista.email}</p>
+                    <p className="text-sm text-[var(--ink-muted)] mb-1 break-words pl-7">{motorista.email}</p>
                     {motorista.phone && (
-                      <p className="text-xs text-[var(--ink-muted)]">{motorista.phone}</p>
+                      <p className="text-xs text-[var(--ink-muted)] break-words pl-7">{motorista.phone}</p>
                     )}
                   </div>
-                  <div className="flex gap-2">
+                  <div className="grid grid-cols-2 sm:flex gap-2 w-full sm:w-auto">
                     <Button 
                       variant="outline" 
                       size="sm"
@@ -262,24 +266,28 @@ export default function MotoristasPage() {
                         setSelectedDriver(motorista)
                         setIsModalOpen(true)
                       }}
+                      className="text-xs sm:text-sm"
                     >
-                      <Edit className="h-4 w-4 mr-2" />
-                      Editar
+                      <Edit className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                      <span className="truncate">Editar</span>
                     </Button>
                     <Button 
                       variant="outline" 
                       size="sm"
                       onClick={() => handleViewDriver(motorista)}
+                      className="text-xs sm:text-sm"
                     >
-                      Ver Detalhes
+                      <span className="truncate hidden sm:inline">Ver Detalhes</span>
+                      <span className="truncate sm:hidden">Detalhes</span>
                     </Button>
                     <Button 
                       variant="destructive" 
                       size="sm"
                       onClick={() => handleDeleteMotorista(motorista.id, motorista.name || motorista.email || 'Motorista')}
+                      className="col-span-2 sm:col-span-1 text-xs sm:text-sm"
                     >
-                      <Trash2 className="h-4 w-4 mr-2" />
-                      Excluir
+                      <Trash2 className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                      <span className="truncate">Excluir</span>
                     </Button>
                   </div>
                 </div>
