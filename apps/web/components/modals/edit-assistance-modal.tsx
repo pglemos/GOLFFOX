@@ -99,26 +99,26 @@ export function EditAssistanceModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-lg">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <LifeBuoy className="h-5 w-5" />
+      <DialogContent className="w-[95vw] sm:w-[90vw] max-w-lg max-h-[90vh] overflow-y-auto p-4 sm:p-6 mx-auto">
+        <DialogHeader className="pb-4 sm:pb-6">
+          <DialogTitle className="text-xl sm:text-2xl font-bold flex items-center gap-2 break-words">
+            <LifeBuoy className="h-5 w-5 flex-shrink-0" />
             Editar Ocorrência
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-sm sm:text-base break-words">
             Atualize os dados da ocorrência
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="request_type">Tipo de Solicitação *</Label>
+            <Label htmlFor="request_type" className="text-base font-medium">Tipo de Solicitação *</Label>
             <Select
               value={formData.request_type}
               onValueChange={(value) => setFormData({ ...formData, request_type: value })}
               disabled={loading}
             >
-              <SelectTrigger>
+              <SelectTrigger className="h-11 sm:h-12 text-base">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -131,7 +131,7 @@ export function EditAssistanceModal({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">Descrição *</Label>
+            <Label htmlFor="description" className="text-base font-medium">Descrição *</Label>
             <Input
               id="description"
               value={formData.description}
@@ -139,28 +139,30 @@ export function EditAssistanceModal({
               placeholder="Descrição da ocorrência"
               required
               disabled={loading}
+              className="h-11 sm:h-12 text-base"
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="address">Endereço</Label>
+            <Label htmlFor="address" className="text-base font-medium">Endereço</Label>
             <Input
               id="address"
               value={formData.address}
               onChange={(e) => setFormData({ ...formData, address: e.target.value })}
               placeholder="Endereço da ocorrência"
               disabled={loading}
+              className="h-11 sm:h-12 text-base"
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="status">Status *</Label>
+            <Label htmlFor="status" className="text-base font-medium">Status *</Label>
             <Select
               value={formData.status}
               onValueChange={(value) => setFormData({ ...formData, status: value })}
               disabled={loading}
             >
-              <SelectTrigger>
+              <SelectTrigger className="h-11 sm:h-12 text-base">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -172,14 +174,24 @@ export function EditAssistanceModal({
             </Select>
           </div>
 
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={onClose} disabled={loading}>
+          <DialogFooter className="flex-col sm:flex-row gap-3 pt-4 sm:pt-6 border-t mt-4 sm:mt-6">
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={onClose} 
+              disabled={loading}
+              className="w-full sm:w-auto order-2 sm:order-1 min-h-[44px] text-base font-medium"
+            >
               Cancelar
             </Button>
-            <Button type="submit" disabled={loading}>
+            <Button 
+              type="submit" 
+              disabled={loading}
+              className="w-full sm:w-auto order-1 sm:order-2 bg-orange-500 hover:bg-orange-600 min-h-[44px] text-base font-medium"
+            >
               {loading ? (
                 <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin flex-shrink-0" />
                   Salvando...
                 </>
               ) : (

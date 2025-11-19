@@ -197,11 +197,11 @@ export function CSVImportModal({ isOpen, onClose, onSave, empresaId }: CSVImport
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>{operatorI18n.csv_import?.title || 'Importar Funcionários via CSV'}</DialogTitle>
+      <DialogContent className="w-[95vw] sm:w-[90vw] max-w-[700px] max-h-[90vh] overflow-y-auto p-4 sm:p-6 mx-auto">
+        <DialogHeader className="pb-4 sm:pb-6">
+          <DialogTitle className="text-xl sm:text-2xl font-bold break-words">{operatorI18n.csv_import?.title || 'Importar Funcionários via CSV'}</DialogTitle>
         </DialogHeader>
-        <div className="grid gap-4 py-4">
+        <div className="grid gap-4 sm:gap-6 py-2 sm:py-4">
           {!csvAvailable && (
             <div className="p-3 rounded-lg bg-yellow-50 border border-yellow-200">
               <div className="flex items-center gap-2">
@@ -340,15 +340,21 @@ export function CSVImportModal({ isOpen, onClose, onSave, empresaId }: CSVImport
           )}
         </div>
 
-        <DialogFooter>
-          <Button type="button" variant="outline" onClick={handleClose} disabled={importing}>
+        <DialogFooter className="flex-col sm:flex-row gap-3 pt-4 sm:pt-6 border-t mt-4 sm:mt-6">
+          <Button 
+            type="button" 
+            variant="outline" 
+            onClick={handleClose} 
+            disabled={importing}
+            className="w-full sm:w-auto order-2 sm:order-1 min-h-[44px] text-base font-medium"
+          >
             Cancelar
           </Button>
           <Button
             type="button"
             onClick={handleImport}
             disabled={!file || preview.length === 0 || importing || !csvAvailable}
-            className="bg-orange-500 hover:bg-orange-600"
+            className="bg-orange-500 hover:bg-orange-600 w-full sm:w-auto order-1 sm:order-2 min-h-[44px] text-base font-medium"
           >
             {importing ? (operatorI18n.csv_import?.importing || 'Importando...') : (operatorI18n.csv_import?.import || 'Importar')}
           </Button>

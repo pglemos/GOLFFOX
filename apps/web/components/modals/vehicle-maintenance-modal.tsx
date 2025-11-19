@@ -175,24 +175,24 @@ export function VehicleMaintenanceModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Wrench className="h-5 w-5" />
+      <DialogContent className="w-[95vw] sm:w-[90vw] max-w-2xl max-h-[90vh] overflow-y-auto p-4 sm:p-6 mx-auto">
+        <DialogHeader className="pb-4 sm:pb-6">
+          <DialogTitle className="text-xl sm:text-2xl font-bold flex items-center gap-2 break-words">
+            <Wrench className="h-5 w-5 flex-shrink-0" />
             {maintenance ? "Editar Manutenção" : "Nova Manutenção"}
           </DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
           {/* Tipo */}
           <div className="space-y-2">
-            <Label htmlFor="type">Tipo de Manutenção *</Label>
+            <Label htmlFor="type" className="text-base font-medium">Tipo de Manutenção *</Label>
             <Select
               value={formData.type}
               onValueChange={(value) => setFormData({ ...formData, type: value })}
               required
             >
-              <SelectTrigger>
+              <SelectTrigger className="h-11 sm:h-12 text-base">
                 <SelectValue placeholder="Selecione o tipo" />
               </SelectTrigger>
               <SelectContent>
@@ -207,8 +207,8 @@ export function VehicleMaintenanceModal({
 
           {/* Data de Vencimento */}
           <div className="space-y-2">
-            <Label htmlFor="due_at" className="flex items-center gap-2">
-              <Calendar className="h-4 w-4" />
+            <Label htmlFor="due_at" className="text-base font-medium flex items-center gap-2">
+              <Calendar className="h-4 w-4 flex-shrink-0" />
               Data de Vencimento *
             </Label>
             <Input
@@ -217,17 +217,18 @@ export function VehicleMaintenanceModal({
               value={formData.due_at}
               onChange={(e) => setFormData({ ...formData, due_at: e.target.value })}
               required
+              className="h-11 sm:h-12 text-base"
             />
           </div>
 
           {/* Status */}
           <div className="space-y-2">
-            <Label htmlFor="status">Status</Label>
+            <Label htmlFor="status" className="text-base font-medium">Status</Label>
             <Select
               value={formData.status}
               onValueChange={(value) => setFormData({ ...formData, status: value })}
             >
-              <SelectTrigger>
+              <SelectTrigger className="h-11 sm:h-12 text-base">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -242,21 +243,31 @@ export function VehicleMaintenanceModal({
 
           {/* Notas */}
           <div className="space-y-2">
-            <Label htmlFor="notes">Notas</Label>
+            <Label htmlFor="notes" className="text-base font-medium">Notas</Label>
             <Textarea
               id="notes"
               value={formData.notes || ''}
               onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
               rows={4}
               placeholder="Observações sobre a manutenção..."
+              className="text-base min-h-[100px]"
             />
           </div>
 
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={onClose}>
+          <DialogFooter className="flex-col sm:flex-row gap-3 pt-4 sm:pt-6 border-t mt-4 sm:mt-6">
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={onClose}
+              className="w-full sm:w-auto order-2 sm:order-1 min-h-[44px] text-base font-medium"
+            >
               Cancelar
             </Button>
-            <Button type="submit" disabled={loading}>
+            <Button 
+              type="submit" 
+              disabled={loading}
+              className="w-full sm:w-auto order-1 sm:order-2 bg-orange-500 hover:bg-orange-600 min-h-[44px] text-base font-medium"
+            >
               {loading ? "Salvando..." : maintenance ? "Atualizar" : "Cadastrar"}
             </Button>
           </DialogFooter>

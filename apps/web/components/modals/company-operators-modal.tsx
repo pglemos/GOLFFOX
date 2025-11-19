@@ -110,28 +110,30 @@ export function CompanyOperatorsModal({
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Users className="h-5 w-5" />
+        <DialogContent className="w-[95vw] sm:w-[90vw] max-w-4xl max-h-[90vh] overflow-y-auto p-4 sm:p-6 mx-auto">
+          <DialogHeader className="pb-4 sm:pb-6">
+            <DialogTitle className="text-xl sm:text-2xl font-bold flex items-center gap-2 break-words">
+              <Users className="h-5 w-5 flex-shrink-0" />
               Usuários Operadores - {company?.name}
             </DialogTitle>
-            <DialogDescription>
+            <DialogDescription className="text-sm sm:text-base break-words">
               Gerencie os logins e senhas dos operadores desta empresa
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-4">
-            <div className="flex justify-between items-center">
-              <p className="text-sm text-[var(--ink-muted)]">
+          <div className="space-y-4 sm:space-y-6">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+              <p className="text-sm sm:text-base text-[var(--ink-muted)] break-words">
                 {operators.length} {operators.length === 1 ? 'operador cadastrado' : 'operadores cadastrados'}
               </p>
               <Button
                 onClick={() => setIsCreateModalOpen(true)}
                 size="sm"
+                className="w-full sm:w-auto min-h-[44px] text-xs sm:text-sm"
               >
-                <Plus className="h-4 w-4 mr-2" />
-                Criar Novo Login
+                <Plus className="h-4 w-4 mr-2 flex-shrink-0" />
+                <span className="hidden sm:inline">Criar Novo Login</span>
+                <span className="sm:hidden">Criar Login</span>
               </Button>
             </div>
 
@@ -186,7 +188,7 @@ export function CompanyOperatorsModal({
                           </div>
                         </div>
                       </div>
-                      <div className="flex gap-2 ml-4">
+                      <div className="flex flex-col sm:flex-row gap-2 ml-0 sm:ml-4 mt-3 sm:mt-0 w-full sm:w-auto">
                         <Button
                           variant="outline"
                           size="sm"
@@ -194,16 +196,18 @@ export function CompanyOperatorsModal({
                             setSelectedOperatorForEdit(operator)
                             setIsEditModalOpen(true)
                           }}
+                          className="w-full sm:w-auto min-h-[44px] text-xs sm:text-sm"
                         >
-                          <Edit className="h-4 w-4 mr-2" />
+                          <Edit className="h-4 w-4 mr-2 flex-shrink-0" />
                           Editar
                         </Button>
                         <Button
                           variant="destructive"
                           size="sm"
                           onClick={() => handleDeleteOperator(operator.id, operator.name || operator.email)}
+                          className="w-full sm:w-auto min-h-[44px] text-xs sm:text-sm"
                         >
-                          <Trash2 className="h-4 w-4 mr-2" />
+                          <Trash2 className="h-4 w-4 mr-2 flex-shrink-0" />
                           Excluir
                         </Button>
                       </div>
@@ -214,8 +218,13 @@ export function CompanyOperatorsModal({
             )}
           </div>
 
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={onClose}>
+          <DialogFooter className="pt-4 sm:pt-6 border-t mt-4 sm:mt-6">
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={onClose}
+              className="w-full sm:w-auto min-h-[44px] text-base font-medium"
+            >
               Fechar
             </Button>
           </DialogFooter>

@@ -310,10 +310,10 @@ export function ReconciliationModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <FileText className="h-5 w-5 text-orange-500" />
+      <DialogContent className="w-[95vw] sm:w-[90vw] max-w-5xl max-h-[90vh] overflow-y-auto p-4 sm:p-6 mx-auto">
+        <DialogHeader className="pb-4 sm:pb-6">
+          <DialogTitle className="text-xl sm:text-2xl font-bold flex items-center gap-2 break-words">
+            <FileText className="h-5 w-5 text-orange-500 flex-shrink-0" />
             Conciliação de Fatura
             {invoice && (
               <Badge 
@@ -339,10 +339,10 @@ export function ReconciliationModal({
             <p className="mt-4 text-gray-600">Carregando dados...</p>
           </div>
         ) : (
-          <div className="space-y-6 py-4">
+          <div className="space-y-4 sm:space-y-6 py-2 sm:py-4">
             {/* Resumo da Fatura */}
             {invoice && (
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 bg-gray-50 rounded-lg">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 p-3 sm:p-4 bg-gray-50 rounded-lg">
                 <div>
                   <p className="text-sm text-gray-600">Período</p>
                   <p className="font-semibold">
@@ -507,29 +507,36 @@ export function ReconciliationModal({
           </div>
         )}
 
-        <DialogFooter className="flex gap-2 flex-wrap">
-          <div className="flex gap-2">
+        <DialogFooter className="flex flex-col sm:flex-row gap-3 pt-4 sm:pt-6 border-t mt-4 sm:mt-6">
+          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
             <Button 
               variant="outline" 
               onClick={() => handleExport('csv')}
               disabled={processing || loading}
-              className="flex items-center gap-2"
+              className="flex items-center justify-center gap-2 min-h-[44px] text-xs sm:text-sm w-full sm:w-auto"
             >
-              <Download className="h-4 w-4" />
-              Exportar CSV
+              <Download className="h-4 w-4 flex-shrink-0" />
+              <span className="hidden sm:inline">Exportar CSV</span>
+              <span className="sm:hidden">CSV</span>
             </Button>
             <Button 
               variant="outline" 
               onClick={() => handleExport('pdf')}
               disabled={processing || loading}
-              className="flex items-center gap-2"
+              className="flex items-center justify-center gap-2 min-h-[44px] text-xs sm:text-sm w-full sm:w-auto"
             >
-              <Download className="h-4 w-4" />
-              Exportar PDF
+              <Download className="h-4 w-4 flex-shrink-0" />
+              <span className="hidden sm:inline">Exportar PDF</span>
+              <span className="sm:hidden">PDF</span>
             </Button>
           </div>
-          <div className="flex gap-2">
-            <Button variant="outline" onClick={onClose} disabled={processing}>
+          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+            <Button 
+              variant="outline" 
+              onClick={onClose} 
+              disabled={processing}
+              className="min-h-[44px] text-base font-medium w-full sm:w-auto"
+            >
               Fechar
             </Button>
             {status === 'pending' && (
@@ -538,24 +545,26 @@ export function ReconciliationModal({
                   variant="outline" 
                   onClick={handleRequestRevision}
                   disabled={processing}
+                  className="min-h-[44px] text-xs sm:text-sm w-full sm:w-auto"
                 >
-                  Solicitar Revisão
+                  <span className="hidden sm:inline">Solicitar Revisão</span>
+                  <span className="sm:hidden">Revisão</span>
                 </Button>
                 <Button 
                   variant="outline" 
                   onClick={handleReject}
                   disabled={processing}
-                  className="text-red-600 hover:text-red-700"
+                  className="text-red-600 hover:text-red-700 min-h-[44px] text-xs sm:text-sm w-full sm:w-auto"
                 >
-                  <XCircle className="h-4 w-4 mr-2" />
+                  <XCircle className="h-4 w-4 mr-2 flex-shrink-0" />
                   Rejeitar
                 </Button>
                 <Button 
                   onClick={handleApprove}
                   disabled={processing}
-                  className="bg-green-600 hover:bg-green-700"
+                  className="bg-green-600 hover:bg-green-700 min-h-[44px] text-xs sm:text-sm w-full sm:w-auto"
                 >
-                  <CheckCircle className="h-4 w-4 mr-2" />
+                  <CheckCircle className="h-4 w-4 mr-2 flex-shrink-0" />
                   {processing ? 'Processando...' : 'Aprovar'}
                 </Button>
               </>
@@ -566,17 +575,17 @@ export function ReconciliationModal({
                   variant="outline" 
                   onClick={handleReject}
                   disabled={processing}
-                  className="text-red-600 hover:text-red-700"
+                  className="text-red-600 hover:text-red-700 min-h-[44px] text-xs sm:text-sm w-full sm:w-auto"
                 >
-                  <XCircle className="h-4 w-4 mr-2" />
+                  <XCircle className="h-4 w-4 mr-2 flex-shrink-0" />
                   Rejeitar
                 </Button>
                 <Button 
                   onClick={handleApprove}
                   disabled={processing}
-                  className="bg-green-600 hover:bg-green-700"
+                  className="bg-green-600 hover:bg-green-700 min-h-[44px] text-xs sm:text-sm w-full sm:w-auto"
                 >
-                  <CheckCircle className="h-4 w-4 mr-2" />
+                  <CheckCircle className="h-4 w-4 mr-2 flex-shrink-0" />
                   {processing ? 'Processando...' : 'Aprovar'}
                 </Button>
               </>

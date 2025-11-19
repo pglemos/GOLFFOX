@@ -163,15 +163,15 @@ export function ImportCostModal({ isOpen, onClose, onSave, companyId }: ImportCo
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Upload className="h-5 w-5 text-orange-500" />
+      <DialogContent className="w-[95vw] sm:w-[90vw] max-w-[700px] max-h-[90vh] overflow-y-auto p-4 sm:p-6 mx-auto">
+        <DialogHeader className="pb-4 sm:pb-6">
+          <DialogTitle className="text-xl sm:text-2xl font-bold flex items-center gap-2 break-words">
+            <Upload className="h-5 w-5 text-orange-500 flex-shrink-0" />
             Importar Custos via CSV
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-4 py-4">
+        <div className="space-y-4 sm:space-y-6 py-2 sm:py-4">
           {/* Upload */}
           <div className="space-y-2">
             <Label htmlFor="csv-file">Arquivo CSV</Label>
@@ -276,15 +276,21 @@ export function ImportCostModal({ isOpen, onClose, onSave, companyId }: ImportCo
           )}
         </div>
 
-        <DialogFooter>
-          <Button type="button" variant="outline" onClick={handleClose} disabled={importing}>
+        <DialogFooter className="flex-col sm:flex-row gap-3 pt-4 sm:pt-6 border-t mt-4 sm:mt-6">
+          <Button 
+            type="button" 
+            variant="outline" 
+            onClick={handleClose} 
+            disabled={importing}
+            className="w-full sm:w-auto order-2 sm:order-1 min-h-[44px] text-base font-medium"
+          >
             Cancelar
           </Button>
           <Button
             type="button"
             onClick={handleImport}
             disabled={!file || preview.length === 0 || importing}
-            className="bg-orange-500 hover:bg-orange-600"
+            className="bg-orange-500 hover:bg-orange-600 w-full sm:w-auto order-1 sm:order-2 min-h-[44px] text-base font-medium"
           >
             {importing ? 'Importando...' : 'Importar'}
           </Button>

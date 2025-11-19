@@ -389,36 +389,37 @@ export function RouteModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Route className="h-5 w-5 text-[var(--brand)]" />
+      <DialogContent className="w-[95vw] sm:w-[90vw] max-w-3xl max-h-[90vh] overflow-y-auto p-4 sm:p-6 mx-auto">
+        <DialogHeader className="pb-4 sm:pb-6">
+          <DialogTitle className="text-xl sm:text-2xl font-bold flex items-center gap-2 break-words">
+            <Route className="h-5 w-5 text-[var(--brand)] flex-shrink-0" />
             {route?.id ? 'Editar Rota' : 'Nova Rota'}
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-sm sm:text-base break-words">
             {route?.id ? "Edite os dados da rota" : "Preencha os dados da rota, selecione os funcionários e otimize o trajeto"}
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-6 py-4">
+        <div className="space-y-4 sm:space-y-6 py-2 sm:py-4">
           {/* Nome e Empresa */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
             <div>
-              <Label htmlFor="name">Nome da Rota *</Label>
+              <Label htmlFor="name" className="text-base font-medium">Nome da Rota *</Label>
               <Input
                 id="name"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 placeholder="Ex: Linha 101 - Centro/Aeroporto"
+                className="h-11 sm:h-12 text-base"
               />
             </div>
             <div>
-              <Label htmlFor="company">Empresa *</Label>
+              <Label htmlFor="company" className="text-base font-medium">Empresa *</Label>
               <Select
                 value={formData.company_id}
                 onValueChange={(value) => setFormData({ ...formData, company_id: value })}
               >
-                <SelectTrigger>
+                <SelectTrigger className="h-11 sm:h-12 text-base">
                   <SelectValue placeholder="Selecione a empresa" />
                 </SelectTrigger>
                 <SelectContent>
@@ -434,20 +435,21 @@ export function RouteModal({
 
           {/* Descrição */}
           <div>
-            <Label htmlFor="description">Descrição</Label>
+            <Label htmlFor="description" className="text-base font-medium">Descrição</Label>
             <Input
               id="description"
               value={formData.description || ""}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               placeholder="Descrição da rota"
+              className="h-11 sm:h-12 text-base"
             />
           </div>
 
           {/* Origem e Destino */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
             <div>
-              <Label htmlFor="origin" className="flex items-center gap-2">
-                <MapPin className="h-4 w-4" />
+              <Label htmlFor="origin" className="text-base font-medium flex items-center gap-2">
+                <MapPin className="h-4 w-4 flex-shrink-0" />
                 Origem
               </Label>
               <Input
@@ -455,11 +457,12 @@ export function RouteModal({
                 value={formData.origin_address || ""}
                 onChange={(e) => setFormData({ ...formData, origin_address: e.target.value })}
                 placeholder="Endereço de origem"
+                className="h-11 sm:h-12 text-base"
               />
             </div>
             <div>
-              <Label htmlFor="destination" className="flex items-center gap-2">
-                <MapPin className="h-4 w-4" />
+              <Label htmlFor="destination" className="text-base font-medium flex items-center gap-2">
+                <MapPin className="h-4 w-4 flex-shrink-0" />
                 Destino
               </Label>
               <Input
@@ -467,15 +470,16 @@ export function RouteModal({
                 value={formData.destination_address || ""}
                 onChange={(e) => setFormData({ ...formData, destination_address: e.target.value })}
                 placeholder="Endereço de destino"
+                className="h-11 sm:h-12 text-base"
               />
             </div>
           </div>
 
           {/* Horário e Turno */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
             <div>
-              <Label htmlFor="time" className="flex items-center gap-2">
-                <Clock className="h-4 w-4" />
+              <Label htmlFor="time" className="text-base font-medium flex items-center gap-2">
+                <Clock className="h-4 w-4 flex-shrink-0" />
                 Horário
               </Label>
               <Input
@@ -483,15 +487,16 @@ export function RouteModal({
                 type="time"
                 value={formData.scheduled_time || ""}
                 onChange={(e) => setFormData({ ...formData, scheduled_time: e.target.value })}
+                className="h-11 sm:h-12 text-base"
               />
             </div>
             <div>
-              <Label htmlFor="shift">Turno</Label>
+              <Label htmlFor="shift" className="text-base font-medium">Turno</Label>
               <Select
                 value={formData.shift || 'manha'}
                 onValueChange={(value) => setFormData({ ...formData, shift: value })}
               >
-                <SelectTrigger>
+                <SelectTrigger className="h-11 sm:h-12 text-base">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -507,8 +512,8 @@ export function RouteModal({
 
           {/* Dias da Semana */}
           <div>
-            <Label className="flex items-center gap-2 mb-3">
-              <Calendar className="h-4 w-4" />
+            <Label className="text-base font-medium flex items-center gap-2 mb-3">
+              <Calendar className="h-4 w-4 flex-shrink-0" />
               Dias da Semana
             </Label>
             <div className="flex flex-wrap gap-2">
@@ -521,8 +526,10 @@ export function RouteModal({
                     variant={isSelected ? "default" : "outline"}
                     size="sm"
                     onClick={() => toggleDay(day.value)}
+                    className="min-h-[44px] text-xs sm:text-sm"
                   >
-                    {day.label}
+                    <span className="hidden sm:inline">{day.label}</span>
+                    <span className="sm:hidden">{day.label.substring(0, 3)}</span>
                   </Button>
                 )
               })}
@@ -531,19 +538,19 @@ export function RouteModal({
 
           {/* Exceções/Feriados */}
           <div>
-            <Label className="flex items-center gap-2 mb-3">
-              <Calendar className="h-4 w-4" />
+            <Label className="text-base font-medium flex items-center gap-2 mb-3">
+              <Calendar className="h-4 w-4 flex-shrink-0" />
               Exceções (Datas sem rota)
             </Label>
-            <div className="flex gap-2 mb-2">
+            <div className="flex flex-col sm:flex-row gap-2 mb-2">
               <Input
                 type="text"
                 value={newException}
                 onChange={(e) => setNewException(e.target.value)}
                 placeholder="dd/mm/aaaa"
-                className="flex-1"
+                className="flex-1 h-11 sm:h-12 text-base"
               />
-              <Button type="button" onClick={addException} size="sm">
+              <Button type="button" onClick={addException} size="sm" className="min-h-[44px] text-xs sm:text-sm w-full sm:w-auto">
                 Adicionar
               </Button>
             </div>
@@ -574,36 +581,46 @@ export function RouteModal({
         </div>
 
 
-        <DialogFooter className="flex flex-col sm:flex-row gap-2">
-          <div className="flex gap-2 flex-1">
+        <DialogFooter className="flex flex-col sm:flex-row gap-3 pt-4 sm:pt-6 border-t mt-4 sm:mt-6">
+          <div className="flex flex-col sm:flex-row gap-2 w-full sm:flex-1">
             {route?.id || formData.id ? (
               <>
                 <Button
                   variant="outline"
                   onClick={handleGenerateStops}
                   disabled={generatingStops}
-                  className="flex-1"
+                  className="flex-1 min-h-[44px] text-xs sm:text-sm"
                 >
-                  <Sparkles className="h-4 w-4 mr-2" />
-                  {generatingStops ? 'Gerando...' : 'Gerar Pontos'}
+                  <Sparkles className="h-4 w-4 mr-2 flex-shrink-0" />
+                  <span className="hidden sm:inline">{generatingStops ? 'Gerando...' : 'Gerar Pontos'}</span>
+                  <span className="sm:hidden">{generatingStops ? 'Gerando...' : 'Gerar'}</span>
                 </Button>
                 <Button
                   variant="outline"
                   onClick={handleOptimize}
                   disabled={optimizing}
-                  className="flex-1"
+                  className="flex-1 min-h-[44px] text-xs sm:text-sm"
                 >
-                  <Navigation className="h-4 w-4 mr-2" />
-                  {optimizing ? 'Otimizando...' : 'Otimizar Rota'}
+                  <Navigation className="h-4 w-4 mr-2 flex-shrink-0" />
+                  <span className="hidden sm:inline">{optimizing ? 'Otimizando...' : 'Otimizar Rota'}</span>
+                  <span className="sm:hidden">{optimizing ? 'Otimizando...' : 'Otimizar'}</span>
                 </Button>
               </>
             ) : null}
           </div>
-          <div className="flex gap-2">
-            <Button variant="outline" onClick={onClose}>
+          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+            <Button 
+              variant="outline" 
+              onClick={onClose}
+              className="w-full sm:w-auto order-2 sm:order-1 min-h-[44px] text-base font-medium"
+            >
               Cancelar
             </Button>
-            <Button onClick={handleSave} disabled={loading}>
+            <Button 
+              onClick={handleSave} 
+              disabled={loading}
+              className="w-full sm:w-auto order-1 sm:order-2 bg-orange-500 hover:bg-orange-600 min-h-[44px] text-base font-medium"
+            >
               {loading ? 'Salvando...' : 'Salvar'}
             </Button>
           </div>

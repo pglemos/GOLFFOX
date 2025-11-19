@@ -230,13 +230,13 @@ export function CreateOperatorModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <UserPlus className="h-5 w-5" />
+      <DialogContent className="w-[95vw] sm:w-[90vw] max-w-2xl max-h-[90vh] overflow-y-auto p-4 sm:p-6 mx-auto">
+        <DialogHeader className="pb-4 sm:pb-6">
+          <DialogTitle className="text-xl sm:text-2xl font-bold flex items-center gap-2 break-words">
+            <UserPlus className="h-5 w-5 flex-shrink-0" />
             Criar Empresa
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-sm sm:text-base break-words">
             Preencha os dados da empresa. Os operadores podem ser criados posteriormente através do botão "Usuário Operador" na lista de empresas.
           </DialogDescription>
         </DialogHeader>
@@ -267,9 +267,9 @@ export function CreateOperatorModal({
                 Dados da Empresa
               </h3>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2 md:col-span-2">
-                  <Label htmlFor="companyName">Nome da Empresa *</Label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                <div className="space-y-2 sm:col-span-2">
+                  <Label htmlFor="companyName" className="text-base font-medium">Nome da Empresa *</Label>
                   <Input
                     id="companyName"
                     value={formData.companyName}
@@ -467,14 +467,24 @@ export function CreateOperatorModal({
             </div>
           </div>
 
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={onClose} disabled={loading}>
+          <DialogFooter className="flex-col sm:flex-row gap-3 pt-4 sm:pt-6 border-t mt-4 sm:mt-6">
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={onClose} 
+              disabled={loading}
+              className="w-full sm:w-auto order-2 sm:order-1 min-h-[44px] text-base font-medium"
+            >
               Cancelar
             </Button>
-            <Button type="submit" disabled={loading}>
+            <Button 
+              type="submit" 
+              disabled={loading}
+              className="w-full sm:w-auto order-1 sm:order-2 bg-orange-500 hover:bg-orange-600 min-h-[44px] text-base font-medium"
+            >
               {loading ? (
                 <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin flex-shrink-0" />
                   Criando...
                 </>
               ) : (

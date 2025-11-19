@@ -111,19 +111,19 @@ export function AssociateOperatorModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[500px]">
-        <DialogHeader>
-          <DialogTitle>Associar Operador à Empresa</DialogTitle>
+      <DialogContent className="w-[95vw] sm:w-[90vw] max-w-[500px] max-h-[90vh] overflow-y-auto p-4 sm:p-6 mx-auto">
+        <DialogHeader className="pb-4 sm:pb-6">
+          <DialogTitle className="text-xl sm:text-2xl font-bold break-words">Associar Operador à Empresa</DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-4 py-4">
+        <div className="space-y-4 sm:space-y-6 py-2 sm:py-4">
           <div>
-            <Label>Empresa</Label>
-            <p className="text-sm text-gray-600 mt-1">{companyName}</p>
+            <Label className="text-base font-medium">Empresa</Label>
+            <p className="text-sm sm:text-base text-gray-600 mt-1 break-words">{companyName}</p>
           </div>
 
           <div>
-            <Label htmlFor="operator-email">Operador</Label>
+            <Label htmlFor="operator-email" className="text-base font-medium">Operador</Label>
             {loadingOperators ? (
               <div className="flex items-center justify-center py-4">
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -134,7 +134,7 @@ export function AssociateOperatorModal({
                 id="operator-email"
                 value={operatorEmail}
                 onChange={(e) => setOperatorEmail(e.target.value)}
-                className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--brand)]"
+                className="w-full mt-1 h-11 sm:h-12 px-3 sm:px-4 py-2 sm:py-3 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--brand)]"
               >
                 <option value="">Selecione um operador</option>
                 {operators.map((op) => (
@@ -153,19 +153,28 @@ export function AssociateOperatorModal({
           )}
         </div>
 
-        <DialogFooter>
-          <Button variant="outline" onClick={onClose} disabled={loading}>
+        <DialogFooter className="flex-col sm:flex-row gap-3 pt-4 sm:pt-6 border-t mt-4 sm:mt-6">
+          <Button 
+            variant="outline" 
+            onClick={onClose} 
+            disabled={loading}
+            className="w-full sm:w-auto order-2 sm:order-1 min-h-[44px] text-base font-medium"
+          >
             Cancelar
           </Button>
-          <Button onClick={handleAssociate} disabled={loading || !operatorEmail}>
+          <Button 
+            onClick={handleAssociate} 
+            disabled={loading || !operatorEmail}
+            className="w-full sm:w-auto order-1 sm:order-2 bg-orange-500 hover:bg-orange-600 min-h-[44px] text-base font-medium"
+          >
             {loading ? (
               <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                <Loader2 className="h-4 w-4 mr-2 animate-spin flex-shrink-0" />
                 Associando...
               </>
             ) : (
               <>
-                <UserPlus className="h-4 w-4 mr-2" />
+                <UserPlus className="h-4 w-4 mr-2 flex-shrink-0" />
                 Associar
               </>
             )}

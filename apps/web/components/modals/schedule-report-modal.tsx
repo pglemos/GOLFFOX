@@ -241,24 +241,24 @@ export function ScheduleReportModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Clock className="h-5 w-5" />
+      <DialogContent className="w-[95vw] sm:w-[90vw] max-w-2xl max-h-[90vh] overflow-y-auto p-4 sm:p-6 mx-auto">
+        <DialogHeader className="pb-4 sm:pb-6">
+          <DialogTitle className="text-xl sm:text-2xl font-bold flex items-center gap-2 break-words">
+            <Clock className="h-5 w-5 flex-shrink-0" />
             {schedule ? 'Editar Agendamento' : 'Agendar Relatório'}
           </DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
           {/* Empresa */}
           <div className="space-y-2">
-            <Label htmlFor="company">Empresa *</Label>
+            <Label htmlFor="company" className="text-base font-medium">Empresa *</Label>
             <Select
               value={selectedCompany}
               onValueChange={setSelectedCompany}
               required
             >
-              <SelectTrigger>
+              <SelectTrigger className="h-11 sm:h-12 text-base">
                 <SelectValue placeholder="Selecione uma empresa" />
               </SelectTrigger>
               <SelectContent>
@@ -273,13 +273,13 @@ export function ScheduleReportModal({
 
           {/* Relatório */}
           <div className="space-y-2">
-            <Label htmlFor="report">Relatório *</Label>
+            <Label htmlFor="report" className="text-base font-medium">Relatório *</Label>
             <Select
               value={selectedReport}
               onValueChange={setSelectedReport}
               required
             >
-              <SelectTrigger>
+              <SelectTrigger className="h-11 sm:h-12 text-base">
                 <SelectValue placeholder="Selecione um relatório" />
               </SelectTrigger>
               <SelectContent>
@@ -363,11 +363,20 @@ export function ScheduleReportModal({
             </Label>
           </div>
 
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={onClose}>
+          <DialogFooter className="flex-col sm:flex-row gap-3 pt-4 sm:pt-6 border-t mt-4 sm:mt-6">
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={onClose}
+              className="w-full sm:w-auto order-2 sm:order-1 min-h-[44px] text-base font-medium"
+            >
               Cancelar
             </Button>
-            <Button type="submit" disabled={loading}>
+            <Button 
+              type="submit" 
+              disabled={loading}
+              className="w-full sm:w-auto order-1 sm:order-2 bg-orange-500 hover:bg-orange-600 min-h-[44px] text-base font-medium"
+            >
               {loading ? "Salvando..." : "Agendar"}
             </Button>
           </DialogFooter>

@@ -172,15 +172,15 @@ export function CarrierDriversModal({ carrier, isOpen, onClose }: CarrierDrivers
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-5xl max-h-[85vh] overflow-hidden flex flex-col">
-        <DialogHeader>
-          <DialogTitle>Motoristas - {carrier.name}</DialogTitle>
+      <DialogContent className="w-[95vw] sm:w-[90vw] max-w-5xl max-h-[90vh] overflow-hidden flex flex-col p-4 sm:p-6 mx-auto">
+        <DialogHeader className="pb-4 sm:pb-6">
+          <DialogTitle className="text-xl sm:text-2xl font-bold break-words">Motoristas - {carrier.name}</DialogTitle>
         </DialogHeader>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 overflow-hidden flex flex-col">
-          <TabsList className="w-full grid grid-cols-2">
-            <TabsTrigger value="list">Lista ({drivers.length})</TabsTrigger>
-            <TabsTrigger value="form">
+          <TabsList className="w-full grid grid-cols-2 gap-1 sm:gap-2">
+            <TabsTrigger value="list" className="text-xs sm:text-sm min-h-[44px]">Lista ({drivers.length})</TabsTrigger>
+            <TabsTrigger value="form" className="text-xs sm:text-sm min-h-[44px]">
               {editingDriver ? 'Editar' : 'Novo Motorista'}
             </TabsTrigger>
           </TabsList>
@@ -191,9 +191,10 @@ export function CarrierDriversModal({ carrier, isOpen, onClose }: CarrierDrivers
               <Button size="sm" onClick={() => {
                 resetForm()
                 setActiveTab("form")
-              }}>
-                <Plus className="h-4 w-4 mr-2" />
-                Novo Motorista
+              }} className="min-h-[44px] text-xs sm:text-sm">
+                <Plus className="h-4 w-4 mr-2 flex-shrink-0" />
+                <span className="hidden sm:inline">Novo Motorista</span>
+                <span className="sm:hidden">Novo</span>
               </Button>
             </div>
 
@@ -232,16 +233,18 @@ export function CarrierDriversModal({ carrier, isOpen, onClose }: CarrierDrivers
                               size="sm"
                               variant="outline"
                               onClick={() => handleEditClick(driver)}
+                              className="min-h-[44px] min-w-[44px]"
                             >
-                              <Edit className="h-3 w-3" />
+                              <Edit className="h-4 w-4" />
                             </Button>
                             <Button
                               size="sm"
                               variant="destructive"
                               onClick={() => handleDeleteDriver(driver.id, driver.name)}
                               disabled={loading}
+                              className="min-h-[44px] min-w-[44px]"
                             >
-                              <Trash2 className="h-3 w-3" />
+                              <Trash2 className="h-4 w-4" />
                             </Button>
                           </div>
                         </div>
@@ -282,7 +285,7 @@ export function CarrierDriversModal({ carrier, isOpen, onClose }: CarrierDrivers
 
           <TabsContent value="form" className="flex-1 overflow-y-auto mt-4">
             <form onSubmit={editingDriver ? handleUpdateDriver : handleCreateDriver} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                 <div className="col-span-2">
                   <Label htmlFor="name">Nome Completo *</Label>
                   <Input
@@ -343,17 +346,22 @@ export function CarrierDriversModal({ carrier, isOpen, onClose }: CarrierDrivers
                 </div>
               </div>
               
-              <div className="flex gap-2 justify-end pt-4 border-t">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-2 justify-end pt-4 sm:pt-6 border-t mt-4 sm:mt-6">
                 <Button 
                   type="button" 
                   variant="outline" 
                   onClick={resetForm}
                   disabled={loading}
+                  className="w-full sm:w-auto order-2 sm:order-1 min-h-[44px] text-base font-medium"
                 >
-                  <X className="h-4 w-4 mr-2" />
+                  <X className="h-4 w-4 mr-2 flex-shrink-0" />
                   Cancelar
                 </Button>
-                <Button type="submit" disabled={loading || !formData.name}>
+                <Button 
+                  type="submit" 
+                  disabled={loading || !formData.name}
+                  className="w-full sm:w-auto order-1 sm:order-2 bg-orange-500 hover:bg-orange-600 min-h-[44px] text-base font-medium"
+                >
                   {loading ? 'Salvando...' : editingDriver ? 'Atualizar Motorista' : 'Criar Motorista'}
                 </Button>
               </div>

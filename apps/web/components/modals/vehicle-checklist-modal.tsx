@@ -213,24 +213,24 @@ export function VehicleChecklistModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <ClipboardCheck className="h-5 w-5" />
+      <DialogContent className="w-[95vw] sm:w-[90vw] max-w-2xl max-h-[90vh] overflow-y-auto p-4 sm:p-6 mx-auto">
+        <DialogHeader className="pb-4 sm:pb-6">
+          <DialogTitle className="text-xl sm:text-2xl font-bold flex items-center gap-2 break-words">
+            <ClipboardCheck className="h-5 w-5 flex-shrink-0" />
             {checklist ? "Editar Checklist" : "Novo Checklist"}
           </DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
           {/* Motorista */}
           <div className="space-y-2">
-            <Label htmlFor="driver_id">Motorista *</Label>
+            <Label htmlFor="driver_id" className="text-base font-medium">Motorista *</Label>
             <Select
               value={formData.driver_id || ''}
               onValueChange={(value) => setFormData({ ...formData, driver_id: value })}
               required
             >
-              <SelectTrigger>
+              <SelectTrigger className="h-11 sm:h-12 text-base">
                 <SelectValue placeholder="Selecione o motorista" />
               </SelectTrigger>
               <SelectContent>
@@ -245,19 +245,19 @@ export function VehicleChecklistModal({
 
           {/* Data */}
           <div className="space-y-2">
-            <Label htmlFor="filled_at">Data de Preenchimento</Label>
+            <Label htmlFor="filled_at" className="text-base font-medium">Data de Preenchimento</Label>
             <input
               id="filled_at"
               type="date"
               value={formData.filled_at}
               onChange={(e) => setFormData({ ...formData, filled_at: e.target.value })}
-              className="w-full px-3 py-2 rounded-lg border border-[var(--border)] bg-white"
+              className="w-full h-11 sm:h-12 px-3 sm:px-4 py-2 sm:py-3 rounded-lg border border-[var(--border)] bg-white text-base"
             />
           </div>
 
           {/* Itens do Checklist */}
           <div className="space-y-2">
-            <Label>Itens do Checklist</Label>
+            <Label className="text-base font-medium">Itens do Checklist</Label>
             <div className="space-y-2 border rounded-lg p-4">
               {CHECKLIST_ITEMS.map((item) => (
                 <div key={item.key} className="flex items-center gap-2">
@@ -276,13 +276,13 @@ export function VehicleChecklistModal({
 
           {/* Status */}
           <div className="space-y-2">
-            <Label htmlFor="status">Status *</Label>
+            <Label htmlFor="status" className="text-base font-medium">Status *</Label>
             <Select
               value={formData.status}
               onValueChange={(value) => setFormData({ ...formData, status: value })}
               required
             >
-              <SelectTrigger>
+              <SelectTrigger className="h-11 sm:h-12 text-base">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -297,21 +297,31 @@ export function VehicleChecklistModal({
 
           {/* Notas */}
           <div className="space-y-2">
-            <Label htmlFor="notes">Notas</Label>
+            <Label htmlFor="notes" className="text-base font-medium">Notas</Label>
             <Textarea
               id="notes"
               value={formData.notes || ''}
               onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
               rows={3}
               placeholder="Observações sobre o checklist..."
+              className="text-base min-h-[80px]"
             />
           </div>
 
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={onClose}>
+          <DialogFooter className="flex-col sm:flex-row gap-3 pt-4 sm:pt-6 border-t mt-4 sm:mt-6">
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={onClose}
+              className="w-full sm:w-auto order-2 sm:order-1 min-h-[44px] text-base font-medium"
+            >
               Cancelar
             </Button>
-            <Button type="submit" disabled={loading}>
+            <Button 
+              type="submit" 
+              disabled={loading}
+              className="w-full sm:w-auto order-1 sm:order-2 bg-orange-500 hover:bg-orange-600 min-h-[44px] text-base font-medium"
+            >
               {loading ? "Salvando..." : checklist ? "Atualizar" : "Cadastrar"}
             </Button>
           </DialogFooter>

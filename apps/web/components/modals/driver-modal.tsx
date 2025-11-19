@@ -210,25 +210,25 @@ export function DriverModal({ driver, isOpen, onClose, onSave }: DriverModalProp
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Users className="h-5 w-5" />
+      <DialogContent className="w-[95vw] sm:w-[90vw] max-w-4xl max-h-[90vh] overflow-y-auto p-4 sm:p-6 mx-auto">
+        <DialogHeader className="pb-4 sm:pb-6">
+          <DialogTitle className="text-xl sm:text-2xl font-bold flex items-center gap-2 break-words">
+            <Users className="h-5 w-5 flex-shrink-0" />
             {driver ? "Editar Motorista" : "Cadastrar Motorista"}
           </DialogTitle>
         </DialogHeader>
 
         <Tabs defaultValue="dados" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="dados">Dados Pessoais</TabsTrigger>
-            <TabsTrigger value="documentos">Documentos</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-2 gap-1 sm:gap-2">
+            <TabsTrigger value="dados" className="text-xs sm:text-sm min-h-[44px]">Dados Pessoais</TabsTrigger>
+            <TabsTrigger value="documentos" className="text-xs sm:text-sm min-h-[44px]">Documentos</TabsTrigger>
           </TabsList>
 
           <TabsContent value="dados">
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+            <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                 <div className="space-y-2">
-                  <Label htmlFor="name">Nome Completo *</Label>
+                  <Label htmlFor="name" className="text-base font-medium">Nome Completo *</Label>
                   <Input
                     id="name"
                     value={formData.name}
@@ -270,11 +270,20 @@ export function DriverModal({ driver, isOpen, onClose, onSave }: DriverModalProp
                 </div>
               </div>
 
-              <DialogFooter>
-                <Button type="button" variant="outline" onClick={onClose}>
+              <DialogFooter className="flex-col sm:flex-row gap-3 pt-4 sm:pt-6 border-t mt-4 sm:mt-6">
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={onClose}
+                  className="w-full sm:w-auto order-2 sm:order-1 min-h-[44px] text-base font-medium"
+                >
                   Cancelar
                 </Button>
-                <Button type="submit" disabled={loading}>
+                <Button 
+                  type="submit" 
+                  disabled={loading}
+                  className="w-full sm:w-auto order-1 sm:order-2 bg-orange-500 hover:bg-orange-600 min-h-[44px] text-base font-medium"
+                >
                   {loading ? "Salvando..." : driver ? "Atualizar" : "Cadastrar"}
                 </Button>
               </DialogFooter>
@@ -282,8 +291,8 @@ export function DriverModal({ driver, isOpen, onClose, onSave }: DriverModalProp
           </TabsContent>
 
           <TabsContent value="documentos">
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-4 sm:space-y-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                 {[
                   { type: 'cnh' as const, label: 'CNH', required: true },
                   { type: 'certificado_transporte' as const, label: 'Certificado de Transporte', required: true },
@@ -339,8 +348,8 @@ export function DriverModal({ driver, isOpen, onClose, onSave }: DriverModalProp
                             className="hidden"
                             disabled={!driver?.id}
                           />
-                          <Button type="button" variant="outline" size="sm" className="w-full" disabled={!driver?.id}>
-                            <Upload className="h-4 w-4 mr-2" />
+                          <Button type="button" variant="outline" size="sm" className="w-full min-h-[44px] text-xs sm:text-sm" disabled={!driver?.id}>
+                            <Upload className="h-4 w-4 mr-2 flex-shrink-0" />
                             {driver?.id ? "Enviar" : "Salve o motorista primeiro"}
                           </Button>
                         </label>

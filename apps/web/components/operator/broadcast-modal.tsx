@@ -61,15 +61,15 @@ export function BroadcastModal({ isOpen, onClose, onSave, empresaId }: Broadcast
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[600px]">
-        <DialogHeader>
-          <DialogTitle>Novo Broadcast</DialogTitle>
+      <DialogContent className="w-[95vw] sm:w-[90vw] max-w-[600px] max-h-[90vh] overflow-y-auto p-4 sm:p-6 mx-auto">
+        <DialogHeader className="pb-4 sm:pb-6">
+          <DialogTitle className="text-xl sm:text-2xl font-bold break-words">Novo Broadcast</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="grid gap-4 py-4">
+        <form onSubmit={handleSubmit} className="grid gap-4 sm:gap-6 py-2 sm:py-4">
           <div className="grid gap-2">
-            <Label htmlFor="target">Enviar Para</Label>
+            <Label htmlFor="target" className="text-base font-medium">Enviar Para</Label>
             <Select value={target} onValueChange={setTarget}>
-              <SelectTrigger id="target">
+              <SelectTrigger id="target" className="h-11 sm:h-12 text-base">
                 <SelectValue placeholder="Selecione o grupo" />
               </SelectTrigger>
               <SelectContent>
@@ -86,21 +86,22 @@ export function BroadcastModal({ isOpen, onClose, onSave, empresaId }: Broadcast
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="title">Título</Label>
+            <Label htmlFor="title" className="text-base font-medium">Título</Label>
             <Input
               id="title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Ex: Aviso de Alteração de Rota"
               required
+              className="h-11 sm:h-12 text-base"
             />
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="message">Mensagem</Label>
+            <Label htmlFor="message" className="text-base font-medium">Mensagem</Label>
             <textarea
               id="message"
-              className="min-h-[150px] rounded-md border border-[var(--border)] p-2"
+              className="min-h-[150px] rounded-md border border-[var(--border)] p-2 sm:p-3 text-base"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               placeholder="Digite sua mensagem aqui..."
@@ -108,11 +109,23 @@ export function BroadcastModal({ isOpen, onClose, onSave, empresaId }: Broadcast
             />
           </div>
 
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={onClose}>Cancelar</Button>
-            <Button type="submit" disabled={loading} className="bg-orange-500 hover:bg-orange-600">
-              <Send className="h-4 w-4 mr-2" />
-              {loading ? "Enviando..." : "Enviar Broadcast"}
+          <DialogFooter className="flex-col sm:flex-row gap-3 pt-4 sm:pt-6 border-t mt-4 sm:mt-6">
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={onClose}
+              className="w-full sm:w-auto order-2 sm:order-1 min-h-[44px] text-base font-medium"
+            >
+              Cancelar
+            </Button>
+            <Button 
+              type="submit" 
+              disabled={loading} 
+              className="bg-orange-500 hover:bg-orange-600 w-full sm:w-auto order-1 sm:order-2 min-h-[44px] text-base font-medium"
+            >
+              <Send className="h-4 w-4 mr-2 flex-shrink-0" />
+              <span className="hidden sm:inline">{loading ? "Enviando..." : "Enviar Broadcast"}</span>
+              <span className="sm:hidden">{loading ? "Enviando..." : "Enviar"}</span>
             </Button>
           </DialogFooter>
         </form>

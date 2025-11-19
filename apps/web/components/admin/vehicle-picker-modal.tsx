@@ -110,10 +110,10 @@ export function VehiclePickerModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[80vh]">
-        <DialogHeader>
-          <DialogTitle>Selecionar Veículo</DialogTitle>
-          <DialogDescription>
+      <DialogContent className="w-[95vw] sm:w-[90vw] max-w-2xl max-h-[90vh] overflow-y-auto p-4 sm:p-6 mx-auto">
+        <DialogHeader className="pb-4 sm:pb-6">
+          <DialogTitle className="text-xl sm:text-2xl font-bold break-words">Selecionar Veículo</DialogTitle>
+          <DialogDescription className="text-sm sm:text-base break-words">
             Busque e selecione um veículo para a rota. Verifique a capacidade antes de selecionar.
           </DialogDescription>
         </DialogHeader>

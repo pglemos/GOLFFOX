@@ -116,23 +116,23 @@ export function CreateOperatorLoginModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[500px]">
-        <DialogHeader>
-          <DialogTitle>Criar Login Operador</DialogTitle>
-          <DialogDescription>
+      <DialogContent className="w-[95vw] sm:w-[90vw] max-w-[500px] max-h-[90vh] overflow-y-auto p-4 sm:p-6 mx-auto">
+        <DialogHeader className="pb-4 sm:pb-6">
+          <DialogTitle className="text-xl sm:text-2xl font-bold break-words">Criar Login Operador</DialogTitle>
+          <DialogDescription className="text-sm sm:text-base break-words">
             Crie um novo login de operador para a empresa {companyName}. Este login dará acesso ao painel do operador.
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit}>
-          <div className="space-y-4 py-4">
+          <div className="space-y-4 sm:space-y-6 py-2 sm:py-4">
             <div>
               <Label htmlFor="company-name">Empresa</Label>
               <p className="text-sm text-gray-600 mt-1">{companyName}</p>
             </div>
 
             <div>
-              <Label htmlFor="operator-name">Nome do Operador *</Label>
+              <Label htmlFor="operator-name" className="text-base font-medium">Nome do Operador *</Label>
               <Input
                 id="operator-name"
                 value={formData.name}
@@ -140,11 +140,12 @@ export function CreateOperatorLoginModal({
                 placeholder="Nome completo do operador"
                 disabled={loading}
                 required
+                className="h-11 sm:h-12 text-base"
               />
             </div>
 
             <div>
-              <Label htmlFor="operator-email">Email *</Label>
+              <Label htmlFor="operator-email" className="text-base font-medium">Email *</Label>
               <Input
                 id="operator-email"
                 type="email"
@@ -153,11 +154,12 @@ export function CreateOperatorLoginModal({
                 placeholder="operador@empresa.com"
                 disabled={loading}
                 required
+                className="h-11 sm:h-12 text-base"
               />
             </div>
 
             <div>
-              <Label htmlFor="operator-password">Senha *</Label>
+              <Label htmlFor="operator-password" className="text-base font-medium">Senha *</Label>
               <Input
                 id="operator-password"
                 type="password"
@@ -167,11 +169,12 @@ export function CreateOperatorLoginModal({
                 disabled={loading}
                 required
                 minLength={6}
+                className="h-11 sm:h-12 text-base"
               />
             </div>
 
             <div>
-              <Label htmlFor="operator-phone">Telefone (opcional)</Label>
+              <Label htmlFor="operator-phone" className="text-base font-medium">Telefone (opcional)</Label>
               <Input
                 id="operator-phone"
                 type="tel"
@@ -179,6 +182,7 @@ export function CreateOperatorLoginModal({
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                 placeholder="+55 11 99999-9999"
                 disabled={loading}
+                className="h-11 sm:h-12 text-base"
               />
             </div>
 
@@ -189,19 +193,29 @@ export function CreateOperatorLoginModal({
             )}
           </div>
 
-          <DialogFooter>
-            <Button variant="outline" onClick={onClose} disabled={loading} type="button">
+          <DialogFooter className="flex-col sm:flex-row gap-3 pt-4 sm:pt-6 border-t mt-4 sm:mt-6">
+            <Button 
+              variant="outline" 
+              onClick={onClose} 
+              disabled={loading} 
+              type="button"
+              className="w-full sm:w-auto order-2 sm:order-1 min-h-[44px] text-base font-medium"
+            >
               Cancelar
             </Button>
-            <Button type="submit" disabled={loading}>
+            <Button 
+              type="submit" 
+              disabled={loading}
+              className="w-full sm:w-auto order-1 sm:order-2 bg-orange-500 hover:bg-orange-600 min-h-[44px] text-base font-medium"
+            >
               {loading ? (
                 <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin flex-shrink-0" />
                   Criando...
                 </>
               ) : (
                 <>
-                  <Key className="h-4 w-4 mr-2" />
+                  <Key className="h-4 w-4 mr-2 flex-shrink-0" />
                   Criar Login
                 </>
               )}

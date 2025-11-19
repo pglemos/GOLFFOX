@@ -109,16 +109,17 @@ export function CarrierUsersModal({ carrier, isOpen, onClose, onSave }: CarrierU
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>Usuários - {carrier.name}</DialogTitle>
+      <DialogContent className="w-[95vw] sm:w-[90vw] max-w-2xl max-h-[90vh] overflow-y-auto p-4 sm:p-6 mx-auto">
+        <DialogHeader className="pb-4 sm:pb-6">
+          <DialogTitle className="text-xl sm:text-2xl font-bold break-words">Usuários - {carrier.name}</DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-4">
+        <div className="space-y-4 sm:space-y-6">
           {!showCreateForm && (
-            <Button onClick={() => setShowCreateForm(true)} className="w-full">
-              <UserPlus className="h-4 w-4 mr-2" />
-              Criar Novo Login de Acesso
+            <Button onClick={() => setShowCreateForm(true)} className="w-full min-h-[44px] text-sm sm:text-base">
+              <UserPlus className="h-4 w-4 mr-2 flex-shrink-0" />
+              <span className="hidden sm:inline">Criar Novo Login de Acesso</span>
+              <span className="sm:hidden">Criar Login</span>
             </Button>
           )}
 
@@ -159,7 +160,7 @@ export function CarrierUsersModal({ carrier, isOpen, onClose, onSave }: CarrierU
                     minLength={6}
                   />
                 </div>
-                <div className="flex gap-2">
+                <div className="flex flex-col sm:flex-row gap-3 sm:gap-2 pt-4 border-t mt-4">
                   <Button
                     type="button"
                     variant="outline"
@@ -170,10 +171,11 @@ export function CarrierUsersModal({ carrier, isOpen, onClose, onSave }: CarrierU
                       setNewUserPassword("")
                     }}
                     disabled={loading}
+                    className="w-full sm:w-auto order-2 sm:order-1 min-h-[44px] text-base font-medium"
                   >
                     Cancelar
                   </Button>
-                  <Button type="submit" disabled={loading}>
+                  <Button type="submit" disabled={loading} className="w-full sm:w-auto order-1 sm:order-2 bg-orange-500 hover:bg-orange-600 min-h-[44px] text-base font-medium">
                     {loading ? 'Criando...' : 'Criar Usuário'}
                   </Button>
                 </div>
@@ -202,8 +204,9 @@ export function CarrierUsersModal({ carrier, isOpen, onClose, onSave }: CarrierU
                     variant="destructive"
                     size="sm"
                     onClick={() => handleDeleteUser(user.id, user.email)}
+                    className="min-h-[44px] text-xs sm:text-sm"
                   >
-                    <Trash2 className="h-4 w-4 mr-2" />
+                    <Trash2 className="h-4 w-4 mr-2 flex-shrink-0" />
                     Excluir
                   </Button>
                 </div>
