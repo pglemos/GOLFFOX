@@ -382,14 +382,24 @@
     touch-action: manipulation;
   }
   
-  /* Garantir tamanho mínimo de toque em mobile */
-  @media (max-width: 1024px) {
-    button:not(.no-touch-size),
-    a[role="button"]:not(.no-touch-size),
-    [role="button"]:not(.no-touch-size) {
-      min-height: 44px;
-    }
-  }
+   /* Garantir tamanho mínimo de toque em mobile */
+   @media (max-width: 1024px) {
+     button:not(.no-touch-size),
+     a[role="button"]:not(.no-touch-size),
+     [role="button"]:not(.no-touch-size),
+     .btn-mobile {
+       min-height: 44px !important;
+       min-width: 44px !important;
+     }
+     
+     /* Garantir que botões pequenos também tenham altura adequada */
+     button[class*="size-sm"],
+     button.size-sm {
+       min-height: 44px !important;
+       padding-top: 0.5rem !important;
+       padding-bottom: 0.5rem !important;
+     }
+   }
 
   /* Prevenir overflow horizontal */
   html {
