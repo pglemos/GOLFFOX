@@ -518,17 +518,26 @@
     -webkit-font-feature-settings: "kern" 1, "liga" 1, "calt" 1, "rlig" 1;
   }
   
-  /* Pattern Background */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image: 
-      radial-gradient(circle at 1px 1px, var(--border) 1px, transparent 0);
-    background-size: 24px 24px;
-    opacity: 0.3;
-    pointer-events: none;
-    z-index: -1;
+  /* Pattern Background - Apenas em desktop e quando há conteúdo */
+  @media (min-width: 1024px) {
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: 
+        radial-gradient(circle at 1px 1px, var(--border) 1px, transparent 0);
+      background-size: 24px 24px;
+      opacity: 0.15;
+      pointer-events: none;
+      z-index: -1;
+    }
+  }
+  
+  /* Esconder pattern em mobile completamente */
+  @media (max-width: 1023px) {
+    body::before {
+      display: none;
+    }
   }
   
   /* Responsive Typography */

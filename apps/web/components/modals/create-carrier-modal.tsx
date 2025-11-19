@@ -76,94 +76,112 @@ export function CreateCarrierModal({ isOpen, onClose, onSave }: CreateCarrierMod
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>Criar Nova Transportadora</DialogTitle>
+      <DialogContent className="w-[95vw] sm:w-[90vw] max-w-3xl max-h-[90vh] overflow-y-auto p-4 sm:p-6 mx-auto">
+        <DialogHeader className="pb-4 sm:pb-6">
+          <DialogTitle className="text-xl sm:text-2xl font-bold">Criar Nova Transportadora</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="col-span-2">
-              <Label htmlFor="name">Nome da Transportadora *</Label>
+        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+            <div className="col-span-1 sm:col-span-2">
+              <Label htmlFor="name" className="text-base font-medium">Nome da Transportadora *</Label>
               <Input
                 id="name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
                 placeholder="Ex: Transportes XYZ Ltda"
+                className="text-base h-11 sm:h-12 px-4 py-3"
               />
             </div>
             <div>
-              <Label htmlFor="cnpj">CNPJ</Label>
+              <Label htmlFor="cnpj" className="text-base font-medium">CNPJ</Label>
               <Input
                 id="cnpj"
                 value={cnpj}
                 onChange={(e) => setCnpj(e.target.value)}
                 placeholder="00.000.000/0000-00"
                 maxLength={18}
+                className="text-base h-11 sm:h-12 px-4 py-3"
               />
             </div>
             <div>
-              <Label htmlFor="stateRegistration">Inscrição Estadual</Label>
+              <Label htmlFor="stateRegistration" className="text-base font-medium">Inscrição Estadual</Label>
               <Input
                 id="stateRegistration"
                 value={stateRegistration}
                 onChange={(e) => setStateRegistration(e.target.value)}
                 placeholder="123456789"
+                className="text-base h-11 sm:h-12 px-4 py-3"
               />
             </div>
             <div>
-              <Label htmlFor="municipalRegistration">Inscrição Municipal</Label>
+              <Label htmlFor="municipalRegistration" className="text-base font-medium">Inscrição Municipal</Label>
               <Input
                 id="municipalRegistration"
                 value={municipalRegistration}
                 onChange={(e) => setMunicipalRegistration(e.target.value)}
                 placeholder="987654321"
+                className="text-base h-11 sm:h-12 px-4 py-3"
               />
             </div>
             <div>
-              <Label htmlFor="contactPerson">Pessoa de Contato</Label>
+              <Label htmlFor="contactPerson" className="text-base font-medium">Pessoa de Contato</Label>
               <Input
                 id="contactPerson"
                 value={contactPerson}
                 onChange={(e) => setContactPerson(e.target.value)}
                 placeholder="Nome do responsável"
+                className="text-base h-11 sm:h-12 px-4 py-3"
               />
             </div>
             <div>
-              <Label htmlFor="phone">Telefone</Label>
+              <Label htmlFor="phone" className="text-base font-medium">Telefone</Label>
               <Input
                 id="phone"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="(11) 98765-4321"
+                className="text-base h-11 sm:h-12 px-4 py-3"
               />
             </div>
             <div>
-              <Label htmlFor="email">E-mail</Label>
+              <Label htmlFor="email" className="text-base font-medium">E-mail</Label>
               <Input
                 id="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="contato@transportadora.com"
+                className="text-base h-11 sm:h-12 px-4 py-3"
               />
             </div>
-            <div className="col-span-2">
-              <Label htmlFor="address">Endereço Completo</Label>
+            <div className="col-span-1 sm:col-span-2">
+              <Label htmlFor="address" className="text-base font-medium">Endereço Completo</Label>
               <Input
                 id="address"
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
                 placeholder="Rua, número, bairro, cidade - UF, CEP"
+                className="text-base h-11 sm:h-12 px-4 py-3"
               />
             </div>
           </div>
-          <div className="flex gap-2 justify-end pt-4 border-t">
-            <Button type="button" variant="outline" onClick={onClose} disabled={loading}>
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-2 justify-end pt-4 sm:pt-6 border-t mt-4 sm:mt-6">
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={onClose} 
+              disabled={loading}
+              className="w-full sm:w-auto order-2 sm:order-1 min-h-[44px] text-base font-medium"
+            >
               Cancelar
             </Button>
-            <Button type="submit" disabled={loading || !name}>
-              {loading ? 'Criando...' : 'Criar Transportadora'}
+            <Button 
+              type="submit" 
+              disabled={loading || !name}
+              className="w-full sm:w-auto order-1 sm:order-2 bg-orange-500 hover:bg-orange-600 min-h-[44px] text-base font-medium"
+            >
+              {loading ? 'Criando...' : 'Salvar Transportadora'}
             </Button>
           </div>
         </form>

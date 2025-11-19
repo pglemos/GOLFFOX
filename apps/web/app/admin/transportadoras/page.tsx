@@ -137,17 +137,17 @@ export default function TransportadorasPage() {
         )}
 
         {loadingCarriers && (
-          <div className="flex items-center justify-center py-8">
+          <div className="flex flex-col sm:flex-row items-center justify-center py-8 gap-3">
             <div className="w-8 h-8 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin"></div>
-            <span className="ml-3 text-[var(--muted)]">Carregando transportadoras...</span>
+            <span className="text-sm sm:text-base text-[var(--muted)] text-center">Carregando transportadoras...</span>
           </div>
         )}
 
         {!loadingCarriers && !errorCarriers && Array.isArray(carriers) && carriers.length === 0 && (
-          <Card className="p-8 text-center">
+          <Card className="p-6 sm:p-8 text-center w-full">
             <Truck className="h-12 w-12 text-[var(--muted)] mx-auto mb-4" />
-            <h3 className="text-lg font-semibold mb-2">Nenhuma transportadora cadastrada</h3>
-            <p className="text-[var(--muted)] mb-4">Clique em "Criar Transportadora" para criar uma nova transportadora.</p>
+            <h3 className="text-base sm:text-lg font-semibold mb-2 break-words">Nenhuma transportadora cadastrada</h3>
+            <p className="text-sm sm:text-base text-[var(--muted)] mb-4 break-words">Clique em "Criar Transportadora" para criar uma nova transportadora.</p>
           </Card>
         )}
 

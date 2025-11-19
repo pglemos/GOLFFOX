@@ -70,49 +70,63 @@ export function EditCarrierModal({ carrier, isOpen, onClose, onSave }: EditCarri
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
-          <DialogTitle>Editar Transportadora</DialogTitle>
+      <DialogContent className="w-[95vw] sm:w-[90vw] max-w-md max-h-[90vh] overflow-y-auto p-4 sm:p-6 mx-auto">
+        <DialogHeader className="pb-4 sm:pb-6">
+          <DialogTitle className="text-xl sm:text-2xl font-bold">Editar Transportadora</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
           <div>
-            <Label htmlFor="name">Nome da Transportadora *</Label>
+            <Label htmlFor="name" className="text-base font-medium">Nome da Transportadora *</Label>
             <Input
               id="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
+              className="text-base h-11 sm:h-12 px-4 py-3"
             />
           </div>
           <div>
-            <Label htmlFor="contactPerson">Pessoa de Contato</Label>
+            <Label htmlFor="contactPerson" className="text-base font-medium">Pessoa de Contato</Label>
             <Input
               id="contactPerson"
               value={contactPerson}
               onChange={(e) => setContactPerson(e.target.value)}
+              className="text-base h-11 sm:h-12 px-4 py-3"
             />
           </div>
           <div>
-            <Label htmlFor="phone">Telefone</Label>
+            <Label htmlFor="phone" className="text-base font-medium">Telefone</Label>
             <Input
               id="phone"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
+              className="text-base h-11 sm:h-12 px-4 py-3"
             />
           </div>
           <div>
-            <Label htmlFor="address">Endereço</Label>
+            <Label htmlFor="address" className="text-base font-medium">Endereço</Label>
             <Input
               id="address"
               value={address}
               onChange={(e) => setAddress(e.target.value)}
+              className="text-base h-11 sm:h-12 px-4 py-3"
             />
           </div>
-          <div className="flex gap-2 justify-end">
-            <Button type="button" variant="outline" onClick={onClose} disabled={loading}>
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-2 justify-end pt-4 sm:pt-6 border-t mt-4 sm:mt-6">
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={onClose} 
+              disabled={loading}
+              className="w-full sm:w-auto order-2 sm:order-1 min-h-[44px] text-base font-medium"
+            >
               Cancelar
             </Button>
-            <Button type="submit" disabled={loading || !name}>
+            <Button 
+              type="submit" 
+              disabled={loading || !name}
+              className="w-full sm:w-auto order-1 sm:order-2 bg-orange-500 hover:bg-orange-600 min-h-[44px] text-base font-medium"
+            >
               {loading ? 'Salvando...' : 'Salvar Alterações'}
             </Button>
           </div>
