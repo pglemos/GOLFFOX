@@ -74,9 +74,49 @@ export const AppShell = memo(function AppShell({ user, children, panel }: AppShe
       window.removeEventListener('close-sidebar', handleCloseSidebar as EventListener)
     }
   }, [isMobile])
+  
+  // Remover padrão de grid em mobile via JavaScript (camada extra de proteção)
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+      // Remover padrão do body::before
+      const style = document.createElement('style')
+      style.textContent = `
+        @media (max-width: 1023px) {
+          body::before {
+            display: none !important;
+            content: none !important;
+            background-image: none !important;
+            background: none !important;
+            opacity: 0 !important;
+            visibility: hidden !important;
+            position: absolute !important;
+            width: 0 !important;
+            height: 0 !important;
+            overflow: hidden !important;
+            pointer-events: none !important;
+            z-index: -9999 !important;
+          }
+          body, html, main {
+            background-image: none !important;
+          }
+        }
+      `
+      document.head.appendChild(style)
+      
+      return () => {
+        document.head.removeChild(style)
+      }
+    }
+  }, [])
 
   return (
-    <div className="min-h-screen bg-[var(--bg)] text-[var(--ink)] overflow-x-hidden w-full max-w-full">
+    <div 
+      className="min-h-screen bg-[var(--bg)] text-[var(--ink)] overflow-x-hidden w-full max-w-full"
+      style={{
+        backgroundImage: 'none',
+        background: 'var(--bg)'
+      } as React.CSSProperties}
+    >
       {/* Banner de Variáveis de Ambiente */}
       <EnvVarsBanner />
       
@@ -115,13 +155,19 @@ export const AppShell = memo(function AppShell({ user, children, panel }: AppShe
         />
 
         {/* Main Content */}
-        <main className={cn(
-          "min-h-[calc(100vh-4rem)] sm:min-h-[calc(100vh-4.5rem)] transition-all duration-300 ease-in-out",                                                     
-          "overflow-y-auto overflow-x-hidden bg-[var(--bg)]",
-          !isMobile ? "flex-1 lg:ml-[60px]" : "w-full ml-0 flex-shrink-0",
-          "max-w-full w-full",
-          "relative z-10"
-        )}>
+        <main 
+          className={cn(
+            "min-h-[calc(100vh-4rem)] sm:min-h-[calc(100vh-4.5rem)] transition-all duration-300 ease-in-out",                                                     
+            "overflow-y-auto overflow-x-hidden bg-[var(--bg)]",
+            !isMobile ? "flex-1 lg:ml-[60px]" : "w-full ml-0 flex-shrink-0",
+            "max-w-full w-full",
+            "relative z-10"
+          )}
+          style={{
+            backgroundImage: 'none',
+            background: 'var(--bg)'
+          } as React.CSSProperties}
+        >
           <div className="mx-auto max-w-[1600px] px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 w-full max-w-full min-w-0">                                                     
             <div className="w-full max-w-full min-w-0 overflow-x-hidden break-words">
               {children}

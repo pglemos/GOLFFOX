@@ -508,6 +508,24 @@
       background-image: none !important;
     }
     
+    /* Remover padrão de grid de todos os containers e divs em mobile */
+    div,
+    section,
+    article,
+    aside,
+    header,
+    footer {
+      background-image: none !important;
+    }
+    
+    /* Específico para a página de transportadoras e outras páginas admin */
+    [class*="admin"],
+    [class*="Admin"],
+    [id*="admin"],
+    [id*="Admin"] {
+      background-image: none !important;
+    }
+    
     /* Garantir que containers flex em mobile funcionem */
     .flex {
       min-width: 0;
@@ -573,7 +591,62 @@
     -webkit-font-feature-settings: "kern" 1, "liga" 1, "calt" 1, "rlig" 1;
   }
   
+  /* PRIMEIRO: Esconder pattern em mobile completamente - REGRA ULTRA FORTALECIDA */
+  /* Esta regra deve vir ANTES da regra desktop para ter prioridade */
+  @media (max-width: 1023px) {
+    /* Remover completamente o pseudo-elemento body::before */
+    body::before {
+      display: none !important;
+      content: none !important;
+      background-image: none !important;
+      background: none !important;
+      opacity: 0 !important;
+      visibility: hidden !important;
+      position: absolute !important;
+      width: 0 !important;
+      height: 0 !important;
+      overflow: hidden !important;
+      pointer-events: none !important;
+      z-index: -9999 !important;
+    }
+    
+    /* Garantir que nenhum elemento filho aplique o padrão */
+    body > *::before,
+    body > *::after,
+    main::before,
+    main::after,
+    [class*="AppShell"]::before,
+    [class*="AppShell"]::after,
+    div::before,
+    div::after {
+      background-image: none !important;
+      background: none !important;
+    }
+    
+    /* Remover qualquer padrão de grid de todos os elementos */
+    *::before,
+    *::after {
+      background-image: none !important;
+    }
+    
+    /* Específico para remover padrões de grid */
+    body,
+    html,
+    main,
+    [class*="container"],
+    [class*="Container"] {
+      background-image: none !important;
+    }
+    
+    /* Garantir que elementos com background radial-gradient sejam removidos */
+    [style*="radial-gradient"],
+    [style*="background-image"] {
+      background-image: none !important;
+    }
+  }
+  
   /* Pattern Background - Apenas em desktop e quando há conteúdo */
+  /* Esta regra vem DEPOIS para não conflitar com mobile */
   @media (min-width: 1024px) {
     body::before {
       content: '';
@@ -585,27 +658,6 @@
       opacity: 0.15;
       pointer-events: none;
       z-index: -1;
-    }
-  }
-  
-  /* Esconder pattern em mobile completamente - REGRA FORTALECIDA */
-  @media (max-width: 1023px) {
-    body::before {
-      display: none !important;
-      content: none !important;
-      background-image: none !important;
-      opacity: 0 !important;
-      visibility: hidden !important;
-    }
-    
-    /* Garantir que nenhum elemento filho aplique o padrão */
-    body > *::before,
-    body > *::after,
-    main::before,
-    main::after,
-    [class*="AppShell"]::before,
-    [class*="AppShell"]::after {
-      background-image: none !important;
     }
   }
   
