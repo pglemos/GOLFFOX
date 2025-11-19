@@ -13,6 +13,7 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
       className={cn(
         glass ? "card-glass" : "card-premium",
         !hover && "hover:shadow-[var(--shadow-sm)] hover:-translate-y-0",
+        "w-full max-w-full min-w-0 overflow-hidden",
         className
       )}
       {...props}

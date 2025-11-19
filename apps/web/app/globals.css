@@ -497,11 +497,58 @@
       display: block !important;
       visibility: visible !important;
       opacity: 1 !important;
+      overflow-x: hidden !important;
     }
     
     /* Garantir que containers flex em mobile funcionem */
     .flex {
       min-width: 0;
+    }
+    
+    /* Garantir que divs dentro do main não causem overflow */
+    main > div {
+      width: 100% !important;
+      max-width: 100% !important;
+      min-width: 0 !important;
+      overflow-x: hidden !important;
+    }
+    
+    /* Garantir que Cards não causem overflow */
+    [class*="Card"], [class*="card"] {
+      max-width: 100% !important;
+      min-width: 0 !important;
+      overflow-x: hidden !important;
+      box-sizing: border-box !important;
+    }
+    
+    /* Garantir que botões dentro de cards sejam responsivos */
+    [class*="Card"] button,
+    [class*="card"] button {
+      min-height: 44px !important;
+      white-space: normal !important;
+      word-wrap: break-word !important;
+    }
+    
+    /* Garantir que grids dentro de cards sejam responsivos */
+    [class*="Card"] [class*="grid"],
+    [class*="card"] [class*="grid"] {
+      grid-template-columns: repeat(auto-fit, minmax(0, 1fr)) !important;
+    }
+    
+    /* Garantir que textos dentro de cards quebrem corretamente */
+    [class*="Card"] p,
+    [class*="Card"] span,
+    [class*="Card"] h1,
+    [class*="Card"] h2,
+    [class*="Card"] h3,
+    [class*="card"] p,
+    [class*="card"] span,
+    [class*="card"] h1,
+    [class*="card"] h2,
+    [class*="card"] h3 {
+      word-break: break-word !important;
+      overflow-wrap: anywhere !important;
+      hyphens: auto !important;
     }
   }
   
