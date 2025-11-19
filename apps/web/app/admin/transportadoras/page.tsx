@@ -210,7 +210,7 @@ export default function TransportadorasPage() {
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 w-full">
             <div className="min-w-0 flex-1 w-full sm:w-auto">
               <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-1 sm:mb-2 break-words leading-tight">Transportadoras</h1>
-              <p className="text-xs sm:text-sm md:text-base text-[var(--muted)] break-words leading-relaxed">Gerencie transportadoras e motoristas</p>
+              <p className="text-xs sm:text-sm md:text-base text-[var(--ink-muted)] break-words leading-relaxed">Gerencie transportadoras e motoristas</p>
             </div>
             <Button 
               onClick={() => setIsCreateModalOpen(true)}
@@ -231,15 +231,15 @@ export default function TransportadorasPage() {
           {loadingCarriers && (
             <div className="flex flex-col sm:flex-row items-center justify-center py-8 sm:py-12 gap-3 w-full">
               <div className="w-8 h-8 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin flex-shrink-0"></div>
-              <span className="text-xs sm:text-sm md:text-base text-[var(--muted)] text-center break-words">Carregando transportadoras...</span>
+              <span className="text-xs sm:text-sm md:text-base text-[var(--ink-muted)] text-center break-words">Carregando transportadoras...</span>
             </div>
           )}
 
           {!loadingCarriers && !errorCarriers && Array.isArray(carriers) && carriers.length === 0 && (
             <Card className="p-4 sm:p-6 md:p-8 text-center w-full max-w-full overflow-hidden">
-              <Truck className="h-10 w-10 sm:h-12 sm:w-12 text-[var(--muted)] mx-auto mb-3 sm:mb-4 flex-shrink-0" />
+              <Truck className="h-10 w-10 sm:h-12 sm:w-12 text-[var(--ink-muted)] mx-auto mb-3 sm:mb-4 flex-shrink-0" />
               <h3 className="text-sm sm:text-base md:text-lg font-semibold mb-2 break-words px-2">Nenhuma transportadora cadastrada</h3>
-              <p className="text-xs sm:text-sm md:text-base text-[var(--muted)] mb-4 break-words px-2">Clique em "Criar Transportadora" para criar uma nova transportadora.</p>
+              <p className="text-xs sm:text-sm md:text-base text-[var(--ink-muted)] mb-4 break-words px-2">Clique em "Criar Transportadora" para criar uma nova transportadora.</p>
             </Card>
           )}
 
@@ -254,12 +254,12 @@ export default function TransportadorasPage() {
                         <h3 className="font-bold text-sm sm:text-base md:text-lg break-words flex-1 min-w-0 leading-tight">{carrier.name}</h3>
                       </div>
                       {carrier.address && (
-                        <p className="text-xs sm:text-sm text-[var(--muted)] break-words pl-6 sm:pl-7 md:pl-8 w-full mt-1 leading-relaxed" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
+                        <p className="text-xs sm:text-sm text-[var(--ink-muted)] break-words pl-6 sm:pl-7 md:pl-8 w-full mt-1 leading-relaxed" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
                           {carrier.address}
                         </p>
                       )}
                       {carrier.phone && (
-                        <p className="text-xs sm:text-sm text-[var(--muted)] mt-1 break-words pl-6 sm:pl-7 md:pl-8 w-full leading-relaxed" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
+                        <p className="text-xs sm:text-sm text-[var(--ink-muted)] mt-1 break-words pl-6 sm:pl-7 md:pl-8 w-full leading-relaxed" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
                           {carrier.phone}
                         </p>
                       )}

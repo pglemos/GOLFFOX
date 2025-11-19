@@ -55,6 +55,9 @@ export const AppShell = memo(function AppShell({ user, children, panel }: AppShe
       setIsMobile(window.innerWidth < 1024)
       if (window.innerWidth < 1024) {
         setIsSidebarOpen(false)
+        document.body.setAttribute('data-mobile', 'true')
+      } else {
+        document.body.removeAttribute('data-mobile')
       }
     }
 
