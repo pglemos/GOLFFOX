@@ -260,6 +260,19 @@ Todas as correções de responsividade mobile foram implementadas com sucesso. O
 
 ---
 
+---
+
+## 🔄 Atualizações Recentes
+
+### Remoção de Elemento de Versão
+- ✅ Removido elemento `<p>v42.0</p>` do Sidebar
+- ✅ Removido de `sidebar-new.tsx` (componente ativo)
+- ✅ Removido de `sidebar.tsx` (componente legado)
+- ✅ Logo agora mostra apenas "GOLF FOX" sem versão
+
+---
+
 **Relatório gerado automaticamente**
 **Data**: 2024
+**Última atualização**: Remoção de versão do sidebar
 

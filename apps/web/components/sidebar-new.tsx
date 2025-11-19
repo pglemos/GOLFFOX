@@ -375,9 +375,6 @@ const SidebarLogo = ({ panel }: { panel: 'admin' | 'operator' | 'carrier' }) => 
           <p className="text-xs font-semibold text-[var(--ink-strong)]">
             GOLF FOX
           </p>
-          <p className="text-xs text-[var(--ink-muted)]">
-            {panel === 'operator' ? 'v42.6' : 'v42.0'}
-          </p>
         </div>
       </motion.div>
     </a>

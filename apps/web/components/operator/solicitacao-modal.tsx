@@ -70,15 +70,15 @@ export function SolicitacaoModal({ isOpen, onClose, onSave, empresaId }: Solicit
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[600px]">
-        <DialogHeader>
-          <DialogTitle>Criar Nova Solicitação</DialogTitle>
+      <DialogContent className="w-[95vw] sm:w-[90vw] max-w-[600px] max-h-[90vh] overflow-y-auto p-4 sm:p-6 mx-auto">
+        <DialogHeader className="pb-4 sm:pb-6">
+          <DialogTitle className="text-xl sm:text-2xl font-bold">Criar Nova Solicitação</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="grid gap-4 py-4">
+        <form onSubmit={handleSubmit} className="grid gap-4 sm:gap-6 py-2 sm:py-4">
           <div className="grid gap-2">
-            <Label htmlFor="tipo">Tipo de Solicitação</Label>
+            <Label htmlFor="tipo" className="text-base font-medium">Tipo de Solicitação</Label>
             <Select value={tipo} onValueChange={setTipo}>
-              <SelectTrigger id="tipo">
+              <SelectTrigger id="tipo" className="h-11 sm:h-12 text-base">
                 <SelectValue placeholder="Selecione o tipo" />
               </SelectTrigger>
               <SelectContent>
@@ -163,9 +163,20 @@ export function SolicitacaoModal({ isOpen, onClose, onSave, empresaId }: Solicit
             </>
           )}
 
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={onClose}>Cancelar</Button>
-            <Button type="submit" disabled={loading} className="bg-orange-500 hover:bg-orange-600">
+          <DialogFooter className="flex-col sm:flex-row gap-3 pt-4 sm:pt-6 border-t mt-4 sm:mt-6">
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={onClose}
+              className="w-full sm:w-auto order-2 sm:order-1 min-h-[44px] text-base font-medium"
+            >
+              Cancelar
+            </Button>
+            <Button 
+              type="submit" 
+              disabled={loading} 
+              className="bg-orange-500 hover:bg-orange-600 w-full sm:w-auto order-1 sm:order-2 min-h-[44px] text-base font-medium"
+            >
               {loading ? "Enviando..." : "Enviar Solicitação"}
             </Button>
           </DialogFooter>

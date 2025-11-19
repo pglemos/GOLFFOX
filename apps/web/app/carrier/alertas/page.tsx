@@ -131,35 +131,39 @@ export default function CarrierAlertasPage() {
 
   return (
     <AppShell user={{ id: user?.id || "", name: user?.name || "Transportadora", email: user?.email || "", role: "carrier" }}>
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold mb-2">Alertas de Vencimento</h1>
-            <p className="text-[var(--ink-muted)]">Monitore documentos e exames próximos do vencimento</p>
+      <div className="space-y-4 sm:space-y-6 w-full overflow-x-hidden">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+          <div className="min-w-0 flex-1">
+            <h1 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2 break-words">Alertas de Vencimento</h1>
+            <p className="text-sm sm:text-base text-[var(--ink-muted)] break-words">Monitore documentos e exames próximos do vencimento</p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2 w-full sm:w-auto">
             <Button
               variant="outline"
               size="sm"
               onClick={loadAlerts}
+              className="flex-1 sm:flex-initial min-h-[44px] text-xs sm:text-sm"
             >
-              <RefreshCw className="h-4 w-4 mr-2" />
-              Atualizar
+              <RefreshCw className="h-4 w-4 mr-2 flex-shrink-0" />
+              <span className="hidden sm:inline">Atualizar</span>
+              <span className="sm:hidden">Atualizar</span>
             </Button>
             <Button
               variant="outline"
               size="sm"
               onClick={handleExportAlerts}
               disabled={filteredAlerts.length === 0}
+              className="flex-1 sm:flex-initial min-h-[44px] text-xs sm:text-sm"
             >
-              <Download className="h-4 w-4 mr-2" />
-              Exportar
+              <Download className="h-4 w-4 mr-2 flex-shrink-0" />
+              <span className="hidden sm:inline">Exportar</span>
+              <span className="sm:hidden">Exportar</span>
             </Button>
           </div>
         </div>
 
         {/* Estatísticas */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
           <Card>
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
@@ -252,18 +256,26 @@ export default function CarrierAlertasPage() {
         </Card>
 
         <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="all">
-              Todos ({alerts.length})
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 gap-1 sm:gap-2">
+            <TabsTrigger value="all" className="text-xs sm:text-sm min-h-[44px]">
+              <span className="hidden sm:inline">Todos</span>
+              <span className="sm:hidden">Todos</span>
+              <span className="ml-1">({alerts.length})</span>
             </TabsTrigger>
-            <TabsTrigger value="critical">
-              Críticos ({stats.critical})
+            <TabsTrigger value="critical" className="text-xs sm:text-sm min-h-[44px]">
+              <span className="hidden sm:inline">Críticos</span>
+              <span className="sm:hidden">Críticos</span>
+              <span className="ml-1">({stats.critical})</span>
             </TabsTrigger>
-            <TabsTrigger value="expired">
-              Vencidos ({stats.expired})
+            <TabsTrigger value="expired" className="text-xs sm:text-sm min-h-[44px]">
+              <span className="hidden sm:inline">Vencidos</span>
+              <span className="sm:hidden">Vencidos</span>
+              <span className="ml-1">({stats.expired})</span>
             </TabsTrigger>
-            <TabsTrigger value="warning">
-              Atenção ({stats.warning})
+            <TabsTrigger value="warning" className="text-xs sm:text-sm min-h-[44px]">
+              <span className="hidden sm:inline">Atenção</span>
+              <span className="sm:hidden">Atenção</span>
+              <span className="ml-1">({stats.warning})</span>
             </TabsTrigger>
           </TabsList>
 
@@ -314,7 +326,7 @@ export default function CarrierAlertasPage() {
                               : `Vence em ${alert.days_to_expiry || 0} dias - Renovação recomendada`}
                           </span>
                         </div>
-                        <div className="flex items-center gap-2 mt-3 pt-3 border-t border-current/20 flex-wrap">
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-3 pt-3 border-t border-current/20">
                           <Button 
                             size="sm" 
                             variant="outline"
@@ -325,6 +337,7 @@ export default function CarrierAlertasPage() {
                                 router.push(`/carrier/veiculos?vehicleId=${alert.entity_id}`)
                               }
                             }}
+                            className="w-full min-h-[44px] text-xs sm:text-sm"
                           >
                             Ver Detalhes
                           </Button>
@@ -335,9 +348,11 @@ export default function CarrierAlertasPage() {
                               // Marcar como visualizado ou agendar renovação
                               // Implementar ação rápida
                             }}
+                            className="w-full min-h-[44px] text-xs sm:text-sm"
                           >
-                            <Calendar className="h-4 w-4 mr-2" />
-                            Agendar Renovação
+                            <Calendar className="h-4 w-4 mr-2 flex-shrink-0" />
+                            <span className="hidden sm:inline">Agendar</span>
+                            <span className="sm:hidden">Agendar</span>
                           </Button>
                           <Button 
                             size="sm" 
@@ -360,9 +375,11 @@ export default function CarrierAlertasPage() {
                                 console.error('Erro ao enviar email:', error)
                               }
                             }}
+                            className="w-full min-h-[44px] text-xs sm:text-sm"
                           >
-                            <Mail className="h-4 w-4 mr-2" />
-                            Enviar Email
+                            <Mail className="h-4 w-4 mr-2 flex-shrink-0" />
+                            <span className="hidden sm:inline">Enviar Email</span>
+                            <span className="sm:hidden">Email</span>
                           </Button>
                         </div>
                       </AlertDescription>

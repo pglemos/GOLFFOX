@@ -53,30 +53,32 @@ export default function PrestadoresOperatorPage() {
 
   return (
     <AppShell user={{ id: user?.id || "", name: user?.name || "Operador", email: user?.email || "", role: "operator" }}>
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold mb-2">Prestadores Alocados</h1>
-            <p className="text-[var(--ink-muted)]">Lista read-only de transportadoras alocadas</p>
+      <div className="space-y-4 sm:space-y-6 w-full overflow-x-hidden">
+        <div className="min-w-0 flex-1">
+          <h1 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2 break-words">Prestadores Alocados</h1>
+          <p className="text-sm sm:text-base text-[var(--ink-muted)] break-words">Lista read-only de transportadoras alocadas</p>
         </div>
 
-        <div className="grid gap-4">
+        <div className="grid gap-3 sm:gap-4 w-full">
           {prestadores.map((p, i) => (
-            <Card key={i} className="p-4">
-              <div className="flex items-center gap-3">
-                <Building2 className="h-5 w-5 text-orange-500" />
-                <div className="flex-1">
-                  <p className="font-semibold">{p.carrier_name || 'Transportadora'}</p>
-                  <p className="text-xs text-[var(--ink-muted)]">Período: {p.period_start} — {p.period_end || 'atual'}</p>
+            <Card key={i} className="p-3 sm:p-4 overflow-hidden w-full">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full">
+                <Building2 className="h-5 w-5 text-orange-500 flex-shrink-0" />
+                <div className="flex-1 min-w-0 w-full">
+                  <p className="font-semibold text-sm sm:text-base break-words">{p.carrier_name || 'Transportadora'}</p>
+                  <p className="text-xs text-[var(--ink-muted)] mt-1 break-words">Período: {p.period_start} — {p.period_end || 'atual'}</p>
                 </div>
-                <div className="text-sm text-right">
-                  <p>SLA (Pontualidade): {(p.avg_punctuality || 0).toFixed(1)}%</p>
-                  <p>Disponibilidade: {(p.avg_availability || 0).toFixed(1)}%</p>
+                <div className="text-xs sm:text-sm text-left sm:text-right w-full sm:w-auto mt-2 sm:mt-0">
+                  <p className="break-words">SLA (Pontualidade): {(p.avg_punctuality || 0).toFixed(1)}%</p>
+                  <p className="break-words">Disponibilidade: {(p.avg_availability || 0).toFixed(1)}%</p>
                 </div>
               </div>
             </Card>
           ))}
           {prestadores.length === 0 && (
-            <Card className="p-12 text-center text-sm text-[var(--ink-muted)]">Nenhum prestador alocado.</Card>
+            <Card className="p-6 sm:p-12 text-center text-sm text-[var(--ink-muted)] w-full">
+              <p className="break-words">Nenhum prestador alocado.</p>
+            </Card>
           )}
         </div>
       </div>

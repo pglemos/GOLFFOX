@@ -348,9 +348,6 @@ export function Sidebar({ isOpen = true, isMobile = false, panel = 'admin' }: Si
                   <p className="text-xs font-semibold text-[var(--ink-strong)]">
                     GOLF FOX
                   </p>
-                  <p className="text-xs text-[var(--ink-muted)]">
-                    {panel === 'operator' ? 'v42.6' : 'v42.0'}
-                  </p>
                 </div>
               </div>
             </div>
