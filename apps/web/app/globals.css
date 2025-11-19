@@ -643,6 +643,23 @@
     [style*="background-image"] {
       background-image: none !important;
     }
+    
+    /* REGRA ESPECÍFICA PARA PÁGINA DE TRANSPORTADORAS */
+    /* Forçar remoção completa do padrão em todas as divs e containers */
+    body > div > div,
+    main > div > div,
+    [class*="space-y"],
+    [class*="grid"]:not([class*="icon"]):not([class*="Icon"]):not([class*="logo"]):not([class*="Logo"]),
+    [class*="flex"]:not([class*="icon"]):not([class*="Icon"]):not([class*="logo"]):not([class*="Logo"]) {
+      background-image: none !important;
+    }
+    
+    /* Remover apenas padrões de grid (radial-gradient) de elementos de layout */
+    div:not([class*="icon"]):not([class*="Icon"]):not([class*="logo"]):not([class*="Logo"]):not(img):not(svg),
+    section:not([class*="icon"]):not([class*="Icon"]),
+    article:not([class*="icon"]):not([class*="Icon"]) {
+      background-image: none !important;
+    }
   }
   
   /* Pattern Background - Apenas em desktop e quando há conteúdo */
@@ -1069,6 +1086,8 @@
     --space-xl: 24px;
     --radius-lg: 16px;
     --radius-xl: 20px;
+    --glass-blur: blur(10px);
+    --glass-bg: rgba(255, 255, 255, 0.9);
   }
 }
 

@@ -63,8 +63,8 @@ function MapaContent() {
             <MapPin className="h-6 w-6 text-[var(--brand)]" />
           </div>
           <div>
-            <h1 className="text-4xl font-bold mb-1">Mapa da Frota</h1>
-            <p className="text-[var(--ink-muted)] text-lg">Visualize veículos e rotas em tempo real</p>
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-1">Mapa da Frota</h1>
+            <p className="text-xs sm:text-sm md:text-base text-[var(--ink-muted)]">Visualize veículos e rotas em tempo real</p>
           </div>
         </motion.div>
 

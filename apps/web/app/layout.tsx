@@ -20,12 +20,13 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "GOLF FOX - Gestão de Frotas",
   description: "Plataforma de gestão de frotas e transporte",
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 5,
-    userScalable: true,
-  },
+};
+
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
 };
 
 export default function RootLayout({

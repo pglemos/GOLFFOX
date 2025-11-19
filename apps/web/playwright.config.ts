@@ -13,13 +13,22 @@ export default defineConfig({
   },
   projects: [
     {
-      name: 'chromium',
+      name: 'chromium-desktop',
       use: { ...devices['Desktop Chrome'] },
+    },
+    {
+      name: 'chromium-mobile',
+      use: { ...devices['Pixel 5'] },
+    },
+    {
+      name: 'webkit-mobile',
+      use: { ...devices['iPhone 12'] },
     },
   ],
   webServer: {
-    command: 'npm run dev',
+    command: 'cross-env NEXT_PUBLIC_DISABLE_MIDDLEWARE=true npm run dev',
     url: 'http://localhost:3000',
+    timeout: 120000,
     reuseExistingServer: !process.env.CI,
   },
 })

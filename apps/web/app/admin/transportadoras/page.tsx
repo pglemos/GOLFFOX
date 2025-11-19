@@ -90,6 +90,91 @@ export default function TransportadorasPage() {
   useEffect(() => {
     loadCarriers()
   }, [loadCarriers])
+  
+  // Remover padrão de grid em mobile - FORÇA BRUTA (sempre executa)
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+      const removeGridPattern = () => {
+        // Sempre criar/atualizar o estilo, independente de detectar o padrão
+        const style = document.createElement('style')
+        style.id = 'remove-grid-pattern-mobile-transportadoras'
+        style.textContent = `
+          @media (max-width: 1023px) {
+            body::before {
+              display: none !important;
+              content: none !important;
+              background-image: none !important;
+              background: none !important;
+              opacity: 0 !important;
+              visibility: hidden !important;
+              position: absolute !important;
+              width: 0 !important;
+              height: 0 !important;
+              overflow: hidden !important;
+              pointer-events: none !important;
+              z-index: -9999 !important;
+            }
+            body, html, main, [class*="AppShell"], [class*="app-shell"] {
+              background-image: none !important;
+              background: var(--bg) !important;
+            }
+            body > div, main > div, [class*="container"], [class*="Container"] {
+              background-image: none !important;
+            }
+            /* Forçar remoção em todos os elementos da página de transportadoras */
+            [class*="transportadoras"], 
+            [id*="transportadoras"],
+            div[class*="space-y"] {
+              background-image: none !important;
+            }
+          }
+        `
+        // Remover estilo anterior se existir
+        const existingStyle = document.getElementById('remove-grid-pattern-mobile-transportadoras')
+        if (existingStyle) {
+          existingStyle.remove()
+        }
+        document.head.appendChild(style)
+        
+        // Também tentar remover diretamente do body via JavaScript
+        const bodyElement = document.body
+        if (bodyElement) {
+          const bodyBefore = window.getComputedStyle(bodyElement, '::before')
+          // Forçar remoção mesmo que não detecte
+          bodyElement.style.setProperty('background-image', 'none', 'important')
+        }
+      }
+      
+      // Executar imediatamente
+      removeGridPattern()
+      
+      // Executar após delays para garantir que seja aplicado
+      const timeouts = [
+        setTimeout(removeGridPattern, 50),
+        setTimeout(removeGridPattern, 100),
+        setTimeout(removeGridPattern, 300),
+        setTimeout(removeGridPattern, 500)
+      ]
+      
+      // Executar quando a janela redimensionar
+      window.addEventListener('resize', removeGridPattern)
+      
+      // Executar quando o DOM estiver completamente carregado
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', removeGridPattern)
+      }
+      
+      return () => {
+        timeouts.forEach(clearTimeout)
+        window.removeEventListener('resize', removeGridPattern)
+        document.removeEventListener('DOMContentLoaded', removeGridPattern)
+        const style = document.getElementById('remove-grid-pattern-mobile-transportadoras')
+        if (style) {
+          style.remove()
+        }
+      }
+    }
+  }, [])
 
   useGlobalSync(
     ['carrier.created', 'carrier.updated', 'carrier.deleted', 'user.created', 'user.updated'],
@@ -114,7 +199,13 @@ export default function TransportadorasPage() {
 
   return (
     <AppShell user={{ id: user.id, name: user.name || "Admin", email: user.email, role: user.role || "admin" }}>
-      <div className="w-full max-w-full overflow-x-hidden min-w-0 box-border">
+      <div 
+        className="w-full max-w-full overflow-x-hidden min-w-0 box-border"
+        style={{
+          backgroundImage: 'none',
+          background: 'var(--bg)'
+        } as React.CSSProperties}
+      >
         <div className="space-y-4 sm:space-y-6 w-full max-w-full min-w-0">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 w-full">
             <div className="min-w-0 flex-1 w-full sm:w-auto">

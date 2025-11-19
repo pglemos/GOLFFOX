@@ -40,7 +40,7 @@ export function PlaybackControls({
   }
 
   return (
-    <Card className="p-4 glass shadow-xl max-md:p-2">
+    <Card className="p-3 sm:p-4 glass shadow-md sm:shadow-xl max-md:p-2">
       <div className="flex items-center gap-4 max-md:gap-2 max-md:flex-wrap">
         {/* Controles de reprodução */}
         <div className="flex items-center gap-2">

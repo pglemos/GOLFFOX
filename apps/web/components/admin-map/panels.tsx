@@ -37,7 +37,7 @@ export const VehiclePanel = memo(function VehiclePanel({
       variants={modalContent}
       className="absolute top-2 right-2 sm:top-6 sm:right-6 w-[calc(100vw-1rem)] sm:w-80 z-30 max-w-sm"
     >
-      <Card className="p-4 sm:p-6 glass shadow-2xl">
+      <Card className="p-3 sm:p-6 glass shadow-lg sm:shadow-2xl">
         <div className="flex items-start justify-between mb-4 sm:mb-6">
           <div className="flex-1 min-w-0 pr-2">
             <h3 className="font-bold text-lg sm:text-xl truncate">{vehicle.plate}</h3>
@@ -142,7 +142,7 @@ export const RoutePanel = memo(function RoutePanel({ route, onClose, onViewDetai
       variants={modalContent}
       className="absolute top-2 right-2 sm:top-6 sm:right-6 w-[calc(100vw-1rem)] sm:w-80 z-30 max-w-sm"
     >
-      <Card className="p-4 sm:p-6 glass shadow-2xl">
+      <Card className="p-3 sm:p-6 glass shadow-lg sm:shadow-2xl">
         <div className="flex items-start justify-between mb-4 sm:mb-6">
           <div className="flex-1 min-w-0 pr-2">
             <h3 className="font-bold text-lg sm:text-xl truncate">{route.route_name}</h3>
@@ -205,7 +205,7 @@ export const AlertsPanel = memo(function AlertsPanel({ alerts, onClose }: Alerts
       variants={modalContent}
       className="absolute top-2 right-2 sm:top-6 sm:right-6 w-[calc(100vw-1rem)] sm:w-80 md:w-96 z-30 max-h-[calc(100vh-1rem)] sm:max-h-[600px] overflow-y-auto max-w-sm md:max-w-md"
     >
-      <Card className="p-4 sm:p-6 glass shadow-2xl">
+      <Card className="p-3 sm:p-6 glass shadow-lg sm:shadow-2xl">
         <div className="flex items-start justify-between mb-4 sm:mb-6">
           <div className="flex-1 min-w-0 pr-2">
             <h3 className="font-bold text-lg sm:text-xl">Alertas Abertos</h3>
