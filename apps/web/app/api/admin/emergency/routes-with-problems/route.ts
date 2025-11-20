@@ -76,10 +76,10 @@ export async function GET(req: NextRequest) {
     })
 
     // Buscar informações de veículos e motoristas através das viagens ativas
-    const routeIdsArray = Array.from(routeIdsWithProblems)
-    const routesWithProblems = (allRoutes || []).filter(route => routeIdsWithProblems.has(route.id))
+    const routesWithProblemsList = (allRoutes || []).filter(route => routeIdsWithProblems.has(route.id))
     
     // Buscar viagens ativas para essas rotas
+    const routeIdsArray = Array.from(routeIdsWithProblems)
     const { data: activeTrips } = routeIdsArray.length > 0 ? await supabase
       .from('trips')
       .select('route_id, vehicle_id, driver_id')
@@ -113,7 +113,7 @@ export async function GET(req: NextRequest) {
     const driversMap = new Map((drivers || []).map(d => [d.id, d]))
 
     // Formatar rotas com informações completas
-    const formattedRoutes = routesWithProblems.map(route => {
+    const formattedRoutes = routesWithProblemsList.map(route => {
       const vehicleId = routeVehicleMap.get(route.id)
       const driverId = routeDriverMap.get(route.id)
       const vehicle = vehicleId ? vehiclesMap.get(vehicleId) : null
