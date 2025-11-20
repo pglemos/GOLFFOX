@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect } from "react"
 import { AppShell } from "@/components/app-shell"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -52,7 +52,7 @@ export default function CarrierConfiguracoesPage() {
   const [profileImage, setProfileImage] = useState<string | null>(null)
   const [uploadingImage, setUploadingImage] = useState(false)
 
-  const loadProfileImage = useCallback(async (forceRefresh = false) => {
+  const loadProfileImage = async (forceRefresh = false) => {
     if (!user?.id) return
     try {
       // Adicionar timestamp para evitar cache
@@ -78,7 +78,7 @@ export default function CarrierConfiguracoesPage() {
     } catch (error) {
       console.error('Erro ao carregar foto de perfil:', error)
     }
-  }, [user?.id])
+  }
 
   useEffect(() => {
     if (user) {
@@ -131,7 +131,20 @@ export default function CarrierConfiguracoesPage() {
         
         // Aguardar um pouco e recarregar a imagem do banco para garantir sincronização
         setTimeout(async () => {
-          await loadProfileImage(true)
+          if (!user?.id) return
+          try {
+            const { data, error } = await supabase
+              .from('users')
+              .select('avatar_url')
+              .eq('id', user.id)
+              .maybeSingle()
+            
+            if (!error && data?.avatar_url) {
+              setProfileImage(`${data.avatar_url}?t=${Date.now()}`)
+            }
+          } catch (err) {
+            console.error('Erro ao recarregar foto:', err)
+          }
         }, 500)
       } else {
         throw new Error('URL da foto não foi retornada')
