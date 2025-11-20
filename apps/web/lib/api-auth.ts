@@ -22,18 +22,41 @@ export async function validateAuth(request: NextRequest): Promise<AuthenticatedU
     // Tentar obter do cookie primeiro
     const sessionCookie = request.cookies.get('golffox-session')?.value
     
+    console.log('🔍 validateAuth - Verificando autenticação', {
+      hasCookie: !!sessionCookie,
+      cookieLength: sessionCookie?.length || 0,
+      path: request.nextUrl.pathname,
+      method: request.method
+    })
+    
     if (sessionCookie) {
       try {
         // Tentar decodificar como base64 primeiro (formato do /api/auth/login)
         let decoded: string
         try {
           decoded = Buffer.from(sessionCookie, 'base64').toString('utf-8')
-        } catch {
+          console.log('✅ Cookie decodificado como base64')
+        } catch (base64Error) {
           // Se falhar, tentar como URI encoded (formato do /api/auth/set-session)
-          decoded = decodeURIComponent(sessionCookie)
+          try {
+            decoded = decodeURIComponent(sessionCookie)
+            console.log('✅ Cookie decodificado como URI encoded')
+          } catch (uriError) {
+            // Tentar decodificar diretamente (pode já estar em formato JSON)
+            decoded = sessionCookie
+            console.log('✅ Usando cookie diretamente (já está em formato texto)')
+          }
         }
         
         const userData = JSON.parse(decoded)
+        
+        console.log('📦 Dados do cookie:', {
+          hasId: !!userData?.id,
+          hasRole: !!userData?.role,
+          role: userData?.role,
+          hasEmail: !!userData?.email,
+          hasCompanyId: !!userData?.companyId
+        })
         
         if (userData?.id && userData?.role) {
           // Buscar email e companyId do banco se não estiverem no cookie
@@ -52,29 +75,50 @@ export async function validateAuth(request: NextRequest): Promise<AuthenticatedU
                 .eq('id', userData.id)
                 .maybeSingle()
               
-              return {
+              const authenticatedUser = {
                 id: userData.id,
                 email: userData.email || userFromDb?.email || '',
                 role: userData.role,
                 companyId: userData.companyId || userFromDb?.company_id || null
               }
+              
+              console.log('✅ Usuário autenticado via cookie (com busca no banco):', {
+                id: authenticatedUser.id,
+                role: authenticatedUser.role
+              })
+              
+              return authenticatedUser
             } catch (dbError) {
               // Se falhar ao buscar do banco, usar dados do cookie mesmo
-              console.warn('Erro ao buscar dados do usuário do banco:', dbError)
+              console.warn('⚠️ Erro ao buscar dados do usuário do banco:', dbError)
             }
           }
           
-          return {
+          const authenticatedUser = {
             id: userData.id,
             email: userData.email || '',
             role: userData.role,
             companyId: userData.companyId || null
           }
+          
+          console.log('✅ Usuário autenticado via cookie:', {
+            id: authenticatedUser.id,
+            role: authenticatedUser.role
+          })
+          
+          return authenticatedUser
+        } else {
+          console.warn('⚠️ Cookie encontrado mas dados inválidos:', {
+            hasId: !!userData?.id,
+            hasRole: !!userData?.role
+          })
         }
       } catch (parseError) {
-        console.warn('Erro ao decodificar cookie de sessão:', parseError)
+        console.error('❌ Erro ao decodificar cookie de sessão:', parseError)
         // Continuar para tentar outros métodos de autenticação
       }
+    } else {
+      console.warn('⚠️ Cookie de sessão não encontrado')
     }
     
     // Fallback: tentar validar sessão Supabase diretamente via cookies

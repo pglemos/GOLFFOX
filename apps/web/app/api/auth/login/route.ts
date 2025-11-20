@@ -214,12 +214,31 @@ async function loginHandler(req: NextRequest) {
     }, { status: 200 })
 
     const cookieValue = Buffer.from(JSON.stringify(userPayload)).toString('base64')
-    response.cookies.set('golffox-session', cookieValue, {
+    
+    // ✅ Configuração otimizada para produção (Vercel)
+    const isSecure = isSecureRequest(req)
+    const cookieOptions: any = {
       httpOnly: true,
-      maxAge: 60 * 60 * 24,
-      sameSite: 'lax',
-      secure: isSecureRequest(req),
+      maxAge: 60 * 60 * 24 * 7, // 7 dias (aumentado de 1 dia)
+      sameSite: 'lax' as const,
+      secure: isSecure,
       path: '/',
+    }
+    
+    // ✅ Em produção Vercel, garantir que cookie seja acessível
+    if (process.env.VERCEL === '1') {
+      cookieOptions.domain = undefined // Não definir domain explicitamente (usar padrão)
+      cookieOptions.sameSite = 'lax' as const // Lax funciona melhor em produção
+    }
+    
+    response.cookies.set('golffox-session', cookieValue, cookieOptions)
+    
+    console.log('✅ Cookie de sessão criado:', {
+      secure: isSecure,
+      sameSite: cookieOptions.sameSite,
+      maxAge: cookieOptions.maxAge,
+      hasValue: !!cookieValue,
+      isVercel: process.env.VERCEL === '1'
     })
 
     debug('Login API concluído', { role, emailHash: email.replace(/^(.{2}).+(@.*)$/, '$1***$2') }, 'AuthAPI')

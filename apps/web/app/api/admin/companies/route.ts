@@ -93,10 +93,18 @@ async function getCompaniesHandler(request: NextRequest) {
 async function createCompanyHandler(request: NextRequest) {
   try {
     // ✅ Validar autenticação (apenas admin)
+    console.log('🔍 createCompanyHandler - Validando autenticação...')
     const authErrorResponse = await requireAuth(request, 'admin')
     if (authErrorResponse) {
+      console.error('❌ createCompanyHandler - Autenticação falhou:', {
+        status: authErrorResponse.status,
+        path: request.nextUrl.pathname,
+        hasCookies: request.cookies.getAll().length > 0,
+        cookies: request.cookies.getAll().map(c => c.name)
+      })
       return authErrorResponse
     }
+    console.log('✅ createCompanyHandler - Autenticação OK')
 
     const supabaseAdmin = getSupabaseAdmin()
     const body = await request.json()

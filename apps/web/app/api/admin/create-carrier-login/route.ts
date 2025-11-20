@@ -49,21 +49,51 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    // Atualizar registro na tabela users
-    const { error: updateError } = await supabaseServiceRole
+    // Criar ou atualizar registro na tabela users (UPSERT)
+    // Usar upsert em vez de update para garantir que o registro seja criado se não existir
+    const { error: upsertError } = await supabaseServiceRole
       .from('users')
-      .update({
+      .upsert({
+        id: authData.user.id,
+        email: validated.email,
         name: validated.name,
         role: 'carrier',
         carrier_id: validated.carrier_id,
         updated_at: new Date().toISOString()
+      }, {
+        onConflict: 'id'
       })
-      .eq('id', authData.user.id)
 
-    if (updateError) {
-      console.error('Erro ao atualizar usuário:', updateError)
-      // Não retornar erro pois o usuário foi criado
+    if (upsertError) {
+      console.error('❌ Erro ao criar/atualizar usuário na tabela users:', {
+        message: upsertError.message,
+        code: upsertError.code,
+        details: upsertError.details,
+        hint: upsertError.hint
+      })
+      // Tentar remover usuário do Auth se possível
+      try {
+        await supabaseServiceRole.auth.admin.deleteUser(authData.user.id)
+        console.log('✅ Usuário removido do Auth após falha ao criar registro')
+      } catch (deleteError) {
+        console.error('❌ Erro ao remover usuário do Auth após falha:', deleteError)
+      }
+      return NextResponse.json(
+        { 
+          success: false, 
+          error: 'Erro ao criar registro do usuário', 
+          message: upsertError.message || 'Erro desconhecido',
+          details: process.env.NODE_ENV === 'development' ? {
+            code: upsertError.code,
+            details: upsertError.details,
+            hint: upsertError.hint
+          } : undefined
+        },
+        { status: 500 }
+      )
     }
+
+    console.log('✅ Registro criado/atualizado na tabela users para:', validated.email)
 
     return NextResponse.json({
       success: true,
