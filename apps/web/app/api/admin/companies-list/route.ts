@@ -30,43 +30,39 @@ export async function GET(request: NextRequest) {
     
     console.log('🔍 Buscando empresas no banco de dados...')
     
-    // Buscar empresas - tentar com filtro is_active, se falhar buscar todas
+    // Buscar TODAS as empresas primeiro (sem filtro)
+    console.log('🔍 Buscando todas as empresas...')
     let { data, error } = await supabaseAdmin
       .from('companies')
-      .select('id, name, is_active, created_at')
-      .eq('is_active', true)
-      .order('name', { ascending: true })
+      .select('id, name, is_active')
     
-    // Se houver erro relacionado a coluna is_active ou created_at, tentar sem filtro/ordenação
-    if (error && (error.message?.includes('is_active') || error.message?.includes('created_at') || error.message?.includes('column'))) {
-      console.warn('⚠️ Coluna is_active ou created_at não encontrada, buscando todas as empresas sem filtro')
+    // Se houver erro, tentar com seleção mínima
+    if (error) {
+      console.warn('⚠️ Erro na busca inicial, tentando com seleção mínima:', error.message)
       const result = await supabaseAdmin
         .from('companies')
         .select('id, name')
-        .order('name', { ascending: true })
       
       data = result.data
       error = result.error
+    }
+    
+    // Filtrar empresas inativas se a coluna existir (sem usar .eq() na query)
+    if (data && !error) {
+      // Tentar filtrar is_active se existir na resposta
+      const activeCompanies = data.filter((c: any) => {
+        // Se não tem campo is_active ou se is_active é true/null/undefined, incluir
+        return c.is_active !== false
+      })
       
-      // Se ainda houver erro com ordenação, tentar sem ordenação
-      if (error && error.message?.includes('column')) {
-        console.warn('⚠️ Erro com ordenação, tentando sem ordenação')
-        const resultNoOrder = await supabaseAdmin
-          .from('companies')
-          .select('id, name')
-        
-        data = resultNoOrder.data
-        error = resultNoOrder.error
-        
-        // Ordenar manualmente se necessário
-        if (data && !error) {
-          data.sort((a: any, b: any) => {
-            const nameA = (a.name || '').toLowerCase()
-            const nameB = (b.name || '').toLowerCase()
-            return nameA.localeCompare(nameB)
-          })
-        }
-      }
+      // Ordenar por nome manualmente
+      activeCompanies.sort((a: any, b: any) => {
+        const nameA = (a.name || '').toLowerCase()
+        const nameB = (b.name || '').toLowerCase()
+        return nameA.localeCompare(nameB)
+      })
+      
+      data = activeCompanies
     }
 
     if (error) {

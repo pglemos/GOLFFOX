@@ -108,7 +108,10 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
 
   useEffect(() => {
     if (isOpen) {
+      // Carregar empresas imediatamente ao abrir o modal
+      console.log("🔄 Modal aberto - carregando empresas...")
       loadCompanies()
+      
       loadGoogleMaps()
         .then(() => setMapLoaded(true))
         .catch((err) => {
@@ -149,95 +152,77 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
       loadCompanyAddress()
     }
   }, [formData.company_id])
+  
+  // Debug: Logar quando empresas mudarem
+  useEffect(() => {
+    console.log("📊 Estado de empresas atualizado:", {
+      count: companies.length,
+      companies: companies.map(c => ({ id: c.id, name: c.name })),
+      loading: loadingCompanies
+    })
+  }, [companies, loadingCompanies])
 
   const loadCompanies = async () => {
     setLoadingCompanies(true)
     try {
       console.log("🔄 Carregando empresas...")
       
-      // Usar API route (bypass RLS com service role)
-      try {
-        const response = await fetch('/api/admin/companies-list', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          credentials: 'include'
-        })
-        
-        if (response.ok) {
-          const result = await response.json()
-          console.log("📦 Resposta da API:", result)
-          
-          if (result.success && result.companies && Array.isArray(result.companies)) {
-            // Garantir que os dados estão no formato correto
-            const formattedCompanies = result.companies.map((c: any) => ({
-              id: c.id || c.company_id || c.ID,
-              name: c.name || c.nome || c.NAME || 'Sem nome'
-            })).filter((c: any) => c.id && c.name)
-            
-            console.log("✅ Empresas carregadas via API:", formattedCompanies.length, formattedCompanies)
-            setCompanies(formattedCompanies)
-            
-            if (formattedCompanies.length === 0) {
-              console.warn("⚠️ API retornou sucesso mas nenhuma empresa válida foi encontrada")
-            }
-            return
-          } else {
-            console.warn("⚠️ API retornou sucesso mas sem empresas válidas:", result)
-          }
-        } else {
-          const errorData = await response.json().catch(() => ({ error: 'Erro desconhecido' }))
-          console.warn("⚠️ Erro na API (status:", response.status, "), tentando direto:", errorData)
-        }
-      } catch (apiError) {
-        console.warn("⚠️ Erro ao chamar API, tentando direto:", apiError)
+      // Tentar via API route primeiro (mesmo padrão usado em outras páginas)
+      const response = await fetch('/api/admin/companies-list')
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
       }
       
-      // Fallback: tentar direto via Supabase
-      console.log("🔄 Tentando carregar empresas diretamente do Supabase...")
-      const { data, error } = await supabase
-        .from("companies")
-        .select("id, name")
-        .order("name", { ascending: true })
-
-      if (error) {
-        console.error("❌ Erro ao buscar empresas do Supabase:", error)
-        // Tentar sem ordenação
-        const { data: dataNoOrder, error: errorNoOrder } = await supabase
-          .from("companies")
-          .select("id, name")
-        
-        if (errorNoOrder) {
-          throw errorNoOrder
-        }
-        
-        const formatted = (dataNoOrder || []).map((c: any) => ({
+      const result = await response.json()
+      console.log("📦 Resposta da API:", result)
+      
+      if (result.success && result.companies && Array.isArray(result.companies)) {
+        // Filtrar empresas ativas e formatar (mesmo padrão da página de custos)
+        const companiesData = (result.companies || []).filter((c: any) => c.is_active !== false)
+        const formattedCompanies = companiesData.map((c: any) => ({
           id: c.id,
           name: c.name || 'Sem nome'
-        })).sort((a, b) => a.name.localeCompare(b.name))
+        })).filter((c: any) => c.id && c.name)
         
-        console.log("✅ Empresas carregadas (sem ordenação):", formatted.length, formatted)
-        setCompanies(formatted)
-        return
-      }
-      
-      // Garantir formato correto
-      const formatted = (data || []).map((c: any) => ({
-        id: c.id,
-        name: c.name || 'Sem nome'
-      }))
-      
-      console.log("✅ Empresas carregadas do Supabase:", formatted.length, formatted)
-      setCompanies(formatted)
-      
-      if (formatted.length === 0) {
-        console.warn("⚠️ Nenhuma empresa encontrada no banco de dados")
-        notifyError(new Error("Nenhuma empresa encontrada"), "Não há empresas cadastradas no sistema")
+        console.log("✅ Empresas carregadas via API:", formattedCompanies.length, formattedCompanies)
+        setCompanies(formattedCompanies)
+        
+        if (formattedCompanies.length === 0) {
+          console.warn("⚠️ Nenhuma empresa ativa encontrada")
+          notifyError(new Error("Nenhuma empresa encontrada"), "Não há empresas cadastradas ou ativas no sistema")
+        }
+      } else {
+        console.error("❌ Resposta inválida da API:", result)
+        throw new Error(result.error || 'Erro ao carregar empresas - resposta inválida')
       }
     } catch (error: any) {
       console.error("❌ Erro ao carregar empresas:", error)
-      notifyError(error, "Erro ao carregar empresas. Verifique o console para mais detalhes.")
+      
+      // Fallback: tentar direto via Supabase
+      try {
+        console.log("🔄 Tentando carregar empresas diretamente do Supabase...")
+        const { data, error: supabaseError } = await supabase
+          .from("companies")
+          .select("id, name")
+          .order("name", { ascending: true })
+
+        if (supabaseError) {
+          throw supabaseError
+        }
+        
+        const formatted = (data || []).map((c: any) => ({
+          id: c.id,
+          name: c.name || 'Sem nome'
+        })).filter((c: any) => c.id && c.name)
+        
+        console.log("✅ Empresas carregadas do Supabase (fallback):", formatted.length, formatted)
+        setCompanies(formatted)
+      } catch (fallbackError: any) {
+        console.error("❌ Erro no fallback também:", fallbackError)
+        notifyError(error, "Erro ao carregar empresas. Verifique o console para mais detalhes.")
+        setCompanies([])
+      }
     } finally {
       setLoadingCompanies(false)
     }
@@ -723,21 +708,26 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
                 <div className="grid gap-2.5">
                   <Label htmlFor="company" className="text-base font-medium">Empresa *</Label>
                   <Select
-                    key={`company-select-${companies.length}`}
+                    key={`company-select-${companies.length}-${loadingCompanies ? 'loading' : 'loaded'}`}
                     value={formData.company_id || ""}
-                    onValueChange={(value) =>
+                    onValueChange={(value) => {
+                      console.log("📌 Empresa selecionada:", value, companies.find(c => c.id === value)?.name)
                       setFormData((prev) => ({
                         ...prev,
                         company_id: value,
                         selected_employees: [],
                       }))
-                    }
+                    }}
                     disabled={loadingCompanies}
                   >
-                    <SelectTrigger id="company" className="text-base h-11 sm:h-12 px-4 py-3">
+                    <SelectTrigger 
+                      id="company" 
+                      className="text-base h-11 sm:h-12 px-4 py-3"
+                      aria-label="Selecione a empresa"
+                    >
                       <SelectValue placeholder={loadingCompanies ? "Carregando empresas..." : "Selecione a empresa"} />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="max-h-[300px]">
                       {loadingCompanies ? (
                         <div className="px-4 py-3 text-base text-gray-500 flex items-center gap-2">
                           <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
@@ -745,17 +735,32 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
                         </div>
                       ) : companies.length === 0 ? (
                         <div className="px-4 py-3 text-base text-gray-500">
-                          Nenhuma empresa encontrada
+                          <div>Nenhuma empresa encontrada</div>
+                          <div className="text-xs text-gray-400 mt-1">
+                            Verifique se há empresas cadastradas no sistema
+                          </div>
                         </div>
                       ) : (
-                        companies.map((c) => (
-                          <SelectItem key={c.id} value={c.id} className="text-base px-4 py-3">
-                            {c.name}
-                          </SelectItem>
-                        ))
+                        <>
+                          {companies.map((c) => (
+                            <SelectItem 
+                              key={c.id} 
+                              value={c.id} 
+                              className="text-base px-4 py-3 cursor-pointer"
+                            >
+                              {c.name}
+                            </SelectItem>
+                          ))}
+                        </>
                       )}
                     </SelectContent>
                   </Select>
+                  {/* Debug info */}
+                  {process.env.NODE_ENV === 'development' && (
+                    <div className="text-xs text-gray-400 mt-1">
+                      {loadingCompanies ? 'Carregando...' : `${companies.length} empresa(s) disponível(eis)`}
+                    </div>
+                  )}
                 </div>
               </div>
 

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { AppShell } from "@/components/app-shell"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -29,7 +29,8 @@ import { ThemeToggle } from "@/components/theme-toggle"
 
 export default function OperatorConfiguracoesPage() {
   const { user, loading } = useAuthFast()
-  const [saving, setSaving] = useState(false)
+  const [savingPersonal, setSavingPersonal] = useState(false)
+  const [savingSecurity, setSavingSecurity] = useState(false)
   const [showNewPassword, setShowNewPassword] = useState(false)
   
   const [formData, setFormData] = useState({
@@ -114,8 +115,19 @@ export default function OperatorConfiguracoesPage() {
         throw new Error(result.error || 'Erro ao fazer upload')
       }
 
-      setProfileImage(result.url)
-      notifySuccess('Foto de perfil atualizada com sucesso!')
+      // Atualizar a imagem de perfil com a URL retornada
+      const avatarUrl = result.url || result.publicUrl
+      if (avatarUrl) {
+        setProfileImage(avatarUrl)
+        notifySuccess('Foto de perfil atualizada com sucesso!')
+        
+        // Recarregar dados do usuário para garantir que a foto seja atualizada em todo o sistema
+        setTimeout(() => {
+          window.location.reload()
+        }, 1500)
+      } else {
+        throw new Error('URL da foto não foi retornada')
+      }
     } catch (error: any) {
       console.error('Erro ao fazer upload:', error)
       notifyError(error.message || 'Erro ao fazer upload da imagem')
@@ -124,48 +136,33 @@ export default function OperatorConfiguracoesPage() {
     }
   }
 
-  const handleSave = async () => {
+  const handleSavePersonal = async () => {
     if (!user) {
       notifyError('Usuário não encontrado. Por favor, faça login novamente.')
       return
     }
 
-    setSaving(true)
+    setSavingPersonal(true)
     try {
-      // Validar senhas se fornecidas
-      if (formData.newPassword && formData.newPassword.length >= 6) {
-        if (formData.newPassword !== formData.confirmPassword) {
-          throw new Error('As senhas não coincidem')
-        }
-      }
-
-      // Preparar dados para atualização
       const updateData: {
         name?: string
         email?: string
-        newPassword?: string
       } = {}
 
-      if (formData.name !== user.name) {
-        updateData.name = formData.name
+      if (formData.name !== user.name && formData.name.trim() !== '') {
+        updateData.name = formData.name.trim()
       }
 
-      if (formData.email !== user.email) {
-        updateData.email = formData.email
+      if (formData.email !== user.email && formData.email.trim() !== '') {
+        updateData.email = formData.email.trim()
       }
 
-      if (formData.newPassword && formData.newPassword.length >= 6) {
-        updateData.newPassword = formData.newPassword
-      }
-
-      // Se não há nada para atualizar
       if (Object.keys(updateData).length === 0) {
-        notifySuccess('Nenhuma alteração para salvar')
-        setSaving(false)
+        notifyError('Nenhuma alteração para salvar')
+        setSavingPersonal(false)
         return
       }
 
-      // Usar API route que valida via cookie
       const response = await fetch('/api/user/update-profile', {
         method: 'POST',
         headers: {
@@ -181,7 +178,61 @@ export default function OperatorConfiguracoesPage() {
         throw new Error(result.error || 'Erro ao salvar configurações')
       }
 
-      notifySuccess('Configurações salvas com sucesso!')
+      notifySuccess('Informações pessoais salvas com sucesso!')
+      
+      // Recarregar dados do usuário
+      setTimeout(() => {
+        window.location.reload()
+      }, 1000)
+    } catch (error: any) {
+      console.error('Erro ao salvar:', error)
+      notifyError(error.message || 'Erro ao salvar informações pessoais')
+    } finally {
+      setSavingPersonal(false)
+    }
+  }
+
+  const handleSaveSecurity = async () => {
+    if (!user) {
+      notifyError('Usuário não encontrado. Por favor, faça login novamente.')
+      return
+    }
+
+    if (formData.newPassword && formData.newPassword.length >= 6) {
+      if (formData.newPassword !== formData.confirmPassword) {
+        notifyError('As senhas não coincidem')
+        return
+      }
+    } else if (formData.newPassword && formData.newPassword.length < 6) {
+      notifyError('A senha deve ter no mínimo 6 caracteres')
+      return
+    }
+
+    if (!formData.newPassword || formData.newPassword.trim() === '') {
+      notifyError('Digite uma nova senha')
+      return
+    }
+
+    setSavingSecurity(true)
+    try {
+      const response = await fetch('/api/user/update-profile', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          newPassword: formData.newPassword
+        })
+      })
+
+      const result = await response.json()
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || 'Erro ao salvar senha')
+      }
+
+      notifySuccess('Senha alterada com sucesso!')
       
       // Limpar campos de senha
       setFormData(prev => ({
@@ -189,19 +240,60 @@ export default function OperatorConfiguracoesPage() {
         newPassword: "",
         confirmPassword: ""
       }))
-
-      // Recarregar dados do usuário se necessário
-      if (updateData.name || updateData.email) {
-        // Forçar reload da página para atualizar dados do usuário
-        window.location.reload()
-      }
     } catch (error: any) {
       console.error('Erro ao salvar:', error)
-      notifyError(error.message || 'Erro ao salvar configurações')
+      notifyError(error.message || 'Erro ao alterar senha')
     } finally {
-      setSaving(false)
+      setSavingSecurity(false)
     }
   }
+
+  // Auto-save para tema
+  const handleThemeChange = useCallback(async (theme: string) => {
+    setFormData(prev => ({ ...prev, theme }))
+    notifySuccess('Tema alterado')
+  }, [])
+
+  // Auto-save para notificações
+  const handleNotificationChange = useCallback(async (key: string, value: boolean) => {
+    setFormData(prev => ({
+      ...prev,
+      notifications: {
+        ...prev.notifications,
+        [key]: value
+      }
+    }))
+    try {
+      localStorage.setItem('golffox-notifications', JSON.stringify({
+        ...formData.notifications,
+        [key]: value
+      }))
+      notifySuccess('Preferência de notificação salva')
+    } catch (error) {
+      console.error('Erro ao salvar notificação:', error)
+    }
+  }, [formData.notifications])
+
+  // Auto-save para preferências gerais
+  const handleLanguageChange = useCallback(async (language: string) => {
+    setFormData(prev => ({ ...prev, language }))
+    try {
+      localStorage.setItem('golffox-language', language)
+      notifySuccess('Idioma alterado')
+    } catch (error) {
+      console.error('Erro ao salvar idioma:', error)
+    }
+  }, [])
+
+  const handleTimezoneChange = useCallback(async (timezone: string) => {
+    setFormData(prev => ({ ...prev, timezone }))
+    try {
+      localStorage.setItem('golffox-timezone', timezone)
+      notifySuccess('Fuso horário alterado')
+    } catch (error) {
+      console.error('Erro ao salvar fuso horário:', error)
+    }
+  }, [])
 
   if (loading) {
     return (
@@ -234,24 +326,6 @@ export default function OperatorConfiguracoesPage() {
               Gerencie suas informações pessoais e preferências
             </p>
           </div>
-          <Button 
-            onClick={handleSave} 
-            disabled={saving}
-            className="w-full sm:w-auto flex items-center gap-2"
-            size="lg"
-          >
-            {saving ? (
-              <>
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                Salvando...
-              </>
-            ) : (
-              <>
-                <Save className="h-4 w-4" />
-                Salvar Alterações
-              </>
-            )}
-          </Button>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -310,9 +384,28 @@ export default function OperatorConfiguracoesPage() {
 
           <div className="lg:col-span-2 space-y-6">
             <Card className="p-6">
-              <div className="flex items-center gap-2 mb-6">
-                <User className="h-5 w-5 text-orange-500" />
-                <h2 className="text-xl font-semibold">Informações Pessoais</h2>
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-2">
+                  <User className="h-5 w-5 text-orange-500" />
+                  <h2 className="text-xl font-semibold">Informações Pessoais</h2>
+                </div>
+                <Button 
+                  onClick={handleSavePersonal} 
+                  disabled={savingPersonal}
+                  size="sm"
+                >
+                  {savingPersonal ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                      Salvando...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="h-4 w-4 mr-2" />
+                      Salvar
+                    </>
+                  )}
+                </Button>
               </div>
               
               <div className="space-y-4">
@@ -345,9 +438,28 @@ export default function OperatorConfiguracoesPage() {
             </Card>
 
             <Card className="p-6">
-              <div className="flex items-center gap-2 mb-6">
-                <Shield className="h-5 w-5 text-orange-500" />
-                <h2 className="text-xl font-semibold">Segurança</h2>
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-2">
+                  <Shield className="h-5 w-5 text-orange-500" />
+                  <h2 className="text-xl font-semibold">Segurança</h2>
+                </div>
+                <Button 
+                  onClick={handleSaveSecurity} 
+                  disabled={savingSecurity}
+                  size="sm"
+                >
+                  {savingSecurity ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                      Salvando...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="h-4 w-4 mr-2" />
+                      Salvar
+                    </>
+                  )}
+                </Button>
               </div>
               
               <div className="space-y-4">
@@ -406,21 +518,21 @@ export default function OperatorConfiguracoesPage() {
                   <div className="flex gap-2">
                     <Button
                       variant={formData.theme === "light" ? "default" : "outline"}
-                      onClick={() => setFormData(prev => ({ ...prev, theme: "light" }))}
+                      onClick={() => handleThemeChange("light")}
                       className="flex-1"
                     >
                       Claro
                     </Button>
                     <Button
                       variant={formData.theme === "dark" ? "default" : "outline"}
-                      onClick={() => setFormData(prev => ({ ...prev, theme: "dark" }))}
+                      onClick={() => handleThemeChange("dark")}
                       className="flex-1"
                     >
                       Escuro
                     </Button>
                     <Button
                       variant={formData.theme === "auto" ? "default" : "outline"}
-                      onClick={() => setFormData(prev => ({ ...prev, theme: "auto" }))}
+                      onClick={() => handleThemeChange("auto")}
                       className="flex-1"
                     >
                       Automático
@@ -457,13 +569,7 @@ export default function OperatorConfiguracoesPage() {
                       <p className="text-sm text-[var(--ink-muted)]">{desc}</p>
                     </div>
                     <button
-                      onClick={() => setFormData(prev => ({
-                        ...prev,
-                        notifications: {
-                          ...prev.notifications,
-                          [key]: !prev.notifications[key as keyof typeof prev.notifications]
-                        }
-                      }))}
+                      onClick={() => handleNotificationChange(key, !formData.notifications[key as keyof typeof formData.notifications])}
                       className={`relative w-12 h-6 rounded-full transition-colors ml-4 ${
                         formData.notifications[key as keyof typeof formData.notifications]
                           ? 'bg-orange-500' 
@@ -495,7 +601,7 @@ export default function OperatorConfiguracoesPage() {
                   <select
                     id="language"
                     value={formData.language}
-                    onChange={(e) => setFormData(prev => ({ ...prev, language: e.target.value }))}
+                    onChange={(e) => handleLanguageChange(e.target.value)}
                     className="w-full px-3 py-2 border border-[var(--border)] rounded-lg bg-[var(--bg)] focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-opacity-20"
                   >
                     <option value="pt-BR">Português (Brasil)</option>
@@ -511,7 +617,7 @@ export default function OperatorConfiguracoesPage() {
                     <select
                       id="timezone"
                       value={formData.timezone}
-                      onChange={(e) => setFormData(prev => ({ ...prev, timezone: e.target.value }))}
+                      onChange={(e) => handleTimezoneChange(e.target.value)}
                       className="w-full pl-10 pr-3 py-2 border border-[var(--border)] rounded-lg bg-[var(--bg)] focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-opacity-20"
                     >
                       <option value="America/Sao_Paulo">Brasília (GMT-3)</option>

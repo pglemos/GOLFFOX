@@ -80,19 +80,27 @@ export async function POST(req: NextRequest) {
       .from('avatars')
       .getPublicUrl(filePath)
 
-    // Atualizar no banco de dados
-    const { error: updateError } = await supabase
+    // Atualizar no banco de dados usando service role para garantir que funcione
+    const { data: updateData, error: updateError } = await supabase
       .from('users')
       .update({ avatar_url: publicUrl })
       .eq('id', userId)
+      .select()
 
     if (updateError) {
+      console.error('Erro ao atualizar avatar_url no banco:', updateError)
       throw updateError
+    }
+
+    // Verificar se a atualização foi bem-sucedida
+    if (!updateData || updateData.length === 0) {
+      throw new Error('Não foi possível atualizar a foto de perfil no banco de dados')
     }
 
     return NextResponse.json({
       success: true,
       url: publicUrl,
+      publicUrl: publicUrl, // Garantir que ambos os campos estão presentes
       message: 'Foto de perfil atualizada com sucesso'
     })
   } catch (error: any) {
