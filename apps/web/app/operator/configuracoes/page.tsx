@@ -89,7 +89,8 @@ export default function OperatorConfiguracoesPage() {
       }))
       loadProfileImage(false)
     }
-  }, [user, loadProfileImage])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id])
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
