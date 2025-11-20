@@ -195,7 +195,7 @@ async function loginHandler(req: NextRequest) {
       email: data.user.email || email,
       role,
       companyId: companyId || undefined,
-      carrier_id: role === 'transportadora' ? carrierId : undefined,
+      carrier_id: (role === 'transportadora' || role === 'carrier') ? carrierId : undefined,
     }
 
     const response = NextResponse.json({ 

@@ -10,6 +10,7 @@ const ROLE_MAP: RoleMapping[] = [
   { email: 'transportadora@trans.com', role: 'carrier' },
   { email: 'motorista@trans.com', role: 'driver' },
   { email: 'passageiro@empresa.com', role: 'passenger' },
+  { email: 'teste@transportadora.com', role: 'carrier' },
 
   // Conjunto alternativo (inglês)
   { email: 'admin@golffox.com', role: 'admin' },

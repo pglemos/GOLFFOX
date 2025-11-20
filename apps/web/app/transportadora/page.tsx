@@ -49,7 +49,7 @@ export default function CarrierDashboard() {
               const meData = await meResponse.json()
               console.log('✅ [Transportadora] Resposta da API /api/auth/me:', { success: meData.success, hasUser: !!meData.user, role: meData.user?.role })
               
-              if (meData.success && meData.user && (meData.user.role === 'transportadora' || meData.user.role === 'admin')) {
+              if (meData.success && meData.user && (meData.user.role === 'transportadora' || meData.user.role === 'carrier' || meData.user.role === 'admin')) {
                 console.log('✅ [Transportadora] Usuário transportadora autenticado via API /api/auth/me, definindo usuário...')
                 setUser(meData.user)
                 setUserData(meData.user)
@@ -87,7 +87,7 @@ export default function CarrierDashboard() {
               console.warn('⚠️ Erro ao buscar dados do usuário:', dbError)
             }
 
-            if (data && (data.role === 'transportadora' || data.role === 'admin')) {
+            if (data && (data.role === 'transportadora' || data.role === 'carrier' || data.role === 'admin')) {
               console.log('✅ Usuário transportadora autenticado via Supabase Auth')
               setUser({ ...session.user, ...data })
               setUserData(data)
