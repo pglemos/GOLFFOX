@@ -34,7 +34,9 @@ interface ChangeRoleModalProps {
 const ROLES = [
   { value: 'admin', label: 'Administrador' },
   { value: 'operator', label: 'Operador' },
+  { value: 'carrier', label: 'Transportadora' },
   { value: 'driver', label: 'Motorista' },
+  { value: 'passenger', label: 'Passageiro' },
 ]
 
 export function ChangeRoleModal({
