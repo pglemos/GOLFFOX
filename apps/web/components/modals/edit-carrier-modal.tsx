@@ -19,6 +19,10 @@ export function EditCarrierModal({ carrier, isOpen, onClose, onSave }: EditCarri
   const [address, setAddress] = useState("")
   const [phone, setPhone] = useState("")
   const [contactPerson, setContactPerson] = useState("")
+  const [email, setEmail] = useState("")
+  const [cnpj, setCnpj] = useState("")
+  const [stateRegistration, setStateRegistration] = useState("")
+  const [municipalRegistration, setMunicipalRegistration] = useState("")
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
@@ -27,8 +31,12 @@ export function EditCarrierModal({ carrier, isOpen, onClose, onSave }: EditCarri
       setAddress(carrier.address || "")
       setPhone(carrier.phone || "")
       setContactPerson(carrier.contact_person || "")
+      setEmail(carrier.email || "")
+      setCnpj(carrier.cnpj || "")
+      setStateRegistration(carrier.state_registration || "")
+      setMunicipalRegistration(carrier.municipal_registration || "")
     }
-  }, [carrier])
+  }, [carrier, isOpen])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -42,7 +50,11 @@ export function EditCarrierModal({ carrier, isOpen, onClose, onSave }: EditCarri
           name,
           address: address || null,
           phone: phone || null,
-          contact_person: contactPerson || null
+          contact_person: contactPerson || null,
+          email: email || null,
+          cnpj: cnpj || null,
+          state_registration: stateRegistration || null,
+          municipal_registration: municipalRegistration || null
         })
       })
 
@@ -70,47 +82,95 @@ export function EditCarrierModal({ carrier, isOpen, onClose, onSave }: EditCarri
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="w-[95vw] sm:w-[90vw] max-w-md max-h-[90vh] overflow-y-auto p-4 sm:p-6 mx-auto">
+      <DialogContent className="w-[95vw] sm:w-[90vw] max-w-3xl max-h-[90vh] overflow-y-auto p-4 sm:p-6 mx-auto">
         <DialogHeader className="pb-4 sm:pb-6">
           <DialogTitle className="text-xl sm:text-2xl font-bold">Editar Transportadora</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
-          <div>
-            <Label htmlFor="name" className="text-base font-medium">Nome da Transportadora *</Label>
-            <Input
-              id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-              className="text-base h-11 sm:h-12 px-4 py-3"
-            />
-          </div>
-          <div>
-            <Label htmlFor="contactPerson" className="text-base font-medium">Pessoa de Contato</Label>
-            <Input
-              id="contactPerson"
-              value={contactPerson}
-              onChange={(e) => setContactPerson(e.target.value)}
-              className="text-base h-11 sm:h-12 px-4 py-3"
-            />
-          </div>
-          <div>
-            <Label htmlFor="phone" className="text-base font-medium">Telefone</Label>
-            <Input
-              id="phone"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              className="text-base h-11 sm:h-12 px-4 py-3"
-            />
-          </div>
-          <div>
-            <Label htmlFor="address" className="text-base font-medium">Endereço</Label>
-            <Input
-              id="address"
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-              className="text-base h-11 sm:h-12 px-4 py-3"
-            />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+            <div className="col-span-1 sm:col-span-2">
+              <Label htmlFor="name" className="text-base font-medium">Nome da Transportadora *</Label>
+              <Input
+                id="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+                placeholder="Ex: Transportes XYZ Ltda"
+                className="text-base h-11 sm:h-12 px-4 py-3"
+              />
+            </div>
+            <div>
+              <Label htmlFor="cnpj" className="text-base font-medium">CNPJ</Label>
+              <Input
+                id="cnpj"
+                value={cnpj}
+                onChange={(e) => setCnpj(e.target.value)}
+                placeholder="00.000.000/0000-00"
+                maxLength={18}
+                className="text-base h-11 sm:h-12 px-4 py-3"
+              />
+            </div>
+            <div>
+              <Label htmlFor="stateRegistration" className="text-base font-medium">Inscrição Estadual</Label>
+              <Input
+                id="stateRegistration"
+                value={stateRegistration}
+                onChange={(e) => setStateRegistration(e.target.value)}
+                placeholder="123456789"
+                className="text-base h-11 sm:h-12 px-4 py-3"
+              />
+            </div>
+            <div>
+              <Label htmlFor="municipalRegistration" className="text-base font-medium">Inscrição Municipal</Label>
+              <Input
+                id="municipalRegistration"
+                value={municipalRegistration}
+                onChange={(e) => setMunicipalRegistration(e.target.value)}
+                placeholder="987654321"
+                className="text-base h-11 sm:h-12 px-4 py-3"
+              />
+            </div>
+            <div>
+              <Label htmlFor="contactPerson" className="text-base font-medium">Pessoa de Contato</Label>
+              <Input
+                id="contactPerson"
+                value={contactPerson}
+                onChange={(e) => setContactPerson(e.target.value)}
+                placeholder="Nome do responsável"
+                className="text-base h-11 sm:h-12 px-4 py-3"
+              />
+            </div>
+            <div>
+              <Label htmlFor="phone" className="text-base font-medium">Telefone</Label>
+              <Input
+                id="phone"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="(11) 98765-4321"
+                className="text-base h-11 sm:h-12 px-4 py-3"
+              />
+            </div>
+            <div>
+              <Label htmlFor="email" className="text-base font-medium">E-mail</Label>
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="contato@transportadora.com"
+                className="text-base h-11 sm:h-12 px-4 py-3"
+              />
+            </div>
+            <div className="col-span-1 sm:col-span-2">
+              <Label htmlFor="address" className="text-base font-medium">Endereço Completo</Label>
+              <Input
+                id="address"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                placeholder="Rua, número, bairro, cidade - UF, CEP"
+                className="text-base h-11 sm:h-12 px-4 py-3"
+              />
+            </div>
           </div>
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-2 justify-end pt-4 sm:pt-6 border-t mt-4 sm:mt-6">
             <Button 

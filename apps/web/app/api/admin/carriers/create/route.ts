@@ -10,6 +10,10 @@ const carrierSchema = z.object({
   address: z.string().optional().nullable(),
   phone: z.string().optional().nullable(),
   contact_person: z.string().optional().nullable(),
+  email: z.string().email().optional().nullable().or(z.literal('')),
+  cnpj: z.string().optional().nullable(),
+  state_registration: z.string().optional().nullable(),
+  municipal_registration: z.string().optional().nullable(),
 })
 
 export async function OPTIONS() {
@@ -38,6 +42,10 @@ export async function POST(req: NextRequest) {
         address: validated.address || null,
         phone: validated.phone || null,
         contact_person: validated.contact_person || null,
+        email: validated.email || null,
+        cnpj: validated.cnpj || null,
+        state_registration: validated.state_registration || null,
+        municipal_registration: validated.municipal_registration || null,
       })
       .select()
       .single()
