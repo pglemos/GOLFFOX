@@ -92,7 +92,7 @@ export default function CarrierVeiculosPage() {
 
   const loadVehicleDocuments = async (vehicleId: string) => {
     try {
-      const res = await fetch(`/api/carrier/vehicles/${vehicleId}/documents`)
+      const res = await fetch(`/api/transportadora/vehicles/${vehicleId}/documents`)
       if (res.ok) {
         const data = await res.json()
         setDocuments(data || [])
@@ -104,7 +104,7 @@ export default function CarrierVeiculosPage() {
 
   const loadVehicleMaintenances = async (vehicleId: string) => {
     try {
-      const res = await fetch(`/api/carrier/vehicles/${vehicleId}/maintenances`)
+      const res = await fetch(`/api/transportadora/vehicles/${vehicleId}/maintenances`)
       if (res.ok) {
         const data = await res.json()
         setMaintenances(data || [])
@@ -118,7 +118,7 @@ export default function CarrierVeiculosPage() {
     if (!selectedVehicle || !maintenanceForm.description) return
 
     try {
-      const res = await fetch(`/api/carrier/vehicles/${selectedVehicle}/maintenances`, {
+      const res = await fetch(`/api/transportadora/vehicles/${selectedVehicle}/maintenances`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(maintenanceForm)

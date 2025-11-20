@@ -114,7 +114,7 @@ export default function CarrierRelatoriosPage() {
       // Buscar dados da API
       switch (report.id) {
         case 'fleet':
-          apiUrl = `/api/carrier/reports/fleet-usage?carrier_id=${userData.carrier_id}&start_date=${dateStart}&end_date=${dateEnd}`
+          apiUrl = `/api/transportadora/reports/fleet-usage?carrier_id=${userData.carrier_id}&start_date=${dateStart}&end_date=${dateEnd}`
           const fleetRes = await fetch(apiUrl)
           const fleetData = await fleetRes.json()
           if (fleetData.success) {
@@ -131,7 +131,7 @@ export default function CarrierRelatoriosPage() {
           }
           break
         case 'drivers':
-          apiUrl = `/api/carrier/reports/driver-performance?carrier_id=${userData.carrier_id}&start_date=${dateStart}&end_date=${dateEnd}`
+          apiUrl = `/api/transportadora/reports/driver-performance?carrier_id=${userData.carrier_id}&start_date=${dateStart}&end_date=${dateEnd}`
           const driversRes = await fetch(apiUrl)
           const driversData = await driversRes.json()
           if (driversData.success) {
@@ -149,7 +149,7 @@ export default function CarrierRelatoriosPage() {
           }
           break
         case 'trips':
-          apiUrl = `/api/carrier/reports/trips?carrier_id=${userData.carrier_id}&start_date=${dateStart}&end_date=${dateEnd}`
+          apiUrl = `/api/transportadora/reports/trips?carrier_id=${userData.carrier_id}&start_date=${dateStart}&end_date=${dateEnd}`
           const tripsRes = await fetch(apiUrl)
           const tripsData = await tripsRes.json()
           if (tripsData.success) {
@@ -169,8 +169,8 @@ export default function CarrierRelatoriosPage() {
         case 'costs':
           // Buscar custos de veículos e rotas
           const [costsVehicleRes, costsRouteRes] = await Promise.all([
-            fetch(`/api/carrier/costs/vehicle?start_date=${dateStart}&end_date=${dateEnd}`),
-            fetch(`/api/carrier/costs/route?start_date=${dateStart}&end_date=${dateEnd}`)
+            fetch(`/api/transportadora/costs/vehicle?start_date=${dateStart}&end_date=${dateEnd}`),
+            fetch(`/api/transportadora/costs/route?start_date=${dateStart}&end_date=${dateEnd}`)
           ])
           const costsVehicleData = costsVehicleRes.ok ? await costsVehicleRes.json() : []
           const costsRouteData = costsRouteRes.ok ? await costsRouteRes.json() : []

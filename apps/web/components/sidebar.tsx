@@ -185,43 +185,43 @@ const carrierMenuItems = [
   { 
     icon: MapPin, 
     label: "Mapa", 
-    href: "/carrier/mapa",
+    href: "/transportadora/mapa",
     description: "Frota em tempo real"
   },
   { 
     icon: Truck, 
     label: "Veículos", 
-    href: "/carrier/veiculos",
+    href: "/transportadora/veiculos",
     description: "Frota da transportadora"
   },
   { 
     icon: Users, 
     label: "Motoristas", 
-    href: "/carrier/motoristas",
+    href: "/transportadora/motoristas",
     description: "Motoristas da transportadora"
   },
   { 
     icon: AlertTriangle, 
     label: "Alertas", 
-    href: "/carrier/alertas",
+    href: "/transportadora/alertas",
     description: "Notificações"
   },
   { 
     icon: DollarSign, 
     label: "Custos", 
-    href: "/carrier/custos",
+    href: "/transportadora/custos",
     description: "Controle de custos"
   },
   { 
     icon: BarChart3, 
     label: "Relatórios", 
-    href: "/carrier/relatorios",
+    href: "/transportadora/relatorios",
     description: "Relatórios da transportadora"
   },
   { 
     icon: HelpCircle, 
     label: "Ajuda", 
-    href: "/carrier/ajuda",
+    href: "/transportadora/ajuda",
     description: "Central de ajuda"
   }
 ]
@@ -265,7 +265,7 @@ export function Sidebar({ isOpen = true, isMobile = false, panel = 'admin' }: Si
               {menuItems.map((item, _i) => {
                 const Icon = item.icon
                 const isActive = isSidebarItemActive(item.href)
-                const showOperationalAlerts = (item.href === "/admin/alertas" || item.href === "/operator/alertas" || item.href === "/carrier/alertas")
+                const showOperationalAlerts = (item.href === "/admin/alertas" || item.href === "/operator/alertas" || item.href === "/transportadora/alertas")
                 
                 return (
                   <motion.div

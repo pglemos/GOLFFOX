@@ -62,7 +62,7 @@ export default function CarrierCustosPage() {
   const loadCosts = async () => {
     try {
       // Buscar custos de veículos
-      const vehicleRes = await fetch(`/api/carrier/costs/vehicle?start_date=${dateStart}&end_date=${dateEnd}`)
+      const vehicleRes = await fetch(`/api/transportadora/costs/vehicle?start_date=${dateStart}&end_date=${dateEnd}`)
       if (vehicleRes.ok) {
         const vehicleData = await vehicleRes.json()
         setVehicleCosts(vehicleData || [])
@@ -87,7 +87,7 @@ export default function CarrierCustosPage() {
       }
 
       // Buscar custos de rotas
-      const routeRes = await fetch(`/api/carrier/costs/route?start_date=${dateStart}&end_date=${dateEnd}`)
+      const routeRes = await fetch(`/api/transportadora/costs/route?start_date=${dateStart}&end_date=${dateEnd}`)
       if (routeRes.ok) {
         const routeData = await routeRes.json()
         setRouteCosts(routeData || [])
@@ -107,8 +107,8 @@ export default function CarrierCustosPage() {
         const previousMonthEnd = new Date(dateStart)
 
         const [prevVehicleRes, prevRouteRes] = await Promise.all([
-          fetch(`/api/carrier/costs/vehicle?start_date=${previousMonthStart.toISOString().split('T')[0]}&end_date=${previousMonthEnd.toISOString().split('T')[0]}`),
-          fetch(`/api/carrier/costs/route?start_date=${previousMonthStart.toISOString().split('T')[0]}&end_date=${previousMonthEnd.toISOString().split('T')[0]}`)
+          fetch(`/api/transportadora/costs/vehicle?start_date=${previousMonthStart.toISOString().split('T')[0]}&end_date=${previousMonthEnd.toISOString().split('T')[0]}`),
+          fetch(`/api/transportadora/costs/route?start_date=${previousMonthStart.toISOString().split('T')[0]}&end_date=${previousMonthEnd.toISOString().split('T')[0]}`)
         ])
 
         let previousMonthTotal = 0
