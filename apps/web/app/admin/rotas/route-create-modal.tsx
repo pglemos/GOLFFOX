@@ -90,6 +90,7 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
   })
 
   const [companies, setCompanies] = useState<Array<{ id: string; name: string }>>([])
+  const [loadingCompanies, setLoadingCompanies] = useState(false)
   const [employees, setEmployees] = useState<EmployeeLite[]>([])
   const [loadingEmployees, setLoadingEmployees] = useState(false)
   const [searchEmployee, setSearchEmployee] = useState("")
@@ -150,52 +151,95 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
   }, [formData.company_id])
 
   const loadCompanies = async () => {
+    setLoadingCompanies(true)
     try {
       console.log("🔄 Carregando empresas...")
       
       // Usar API route (bypass RLS com service role)
-      const response = await fetch('/api/admin/companies-list', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        credentials: 'include' // Incluir cookies
-      })
-      
-      if (response.ok) {
-        const result = await response.json()
-        if (result.success && result.companies) {
-          console.log("✅ Empresas carregadas via API:", result.companies.length, result.companies)
-          setCompanies(result.companies)
-          return
+      try {
+        const response = await fetch('/api/admin/companies-list', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          credentials: 'include'
+        })
+        
+        if (response.ok) {
+          const result = await response.json()
+          console.log("📦 Resposta da API:", result)
+          
+          if (result.success && result.companies && Array.isArray(result.companies)) {
+            // Garantir que os dados estão no formato correto
+            const formattedCompanies = result.companies.map((c: any) => ({
+              id: c.id || c.company_id || c.ID,
+              name: c.name || c.nome || c.NAME || 'Sem nome'
+            })).filter((c: any) => c.id && c.name)
+            
+            console.log("✅ Empresas carregadas via API:", formattedCompanies.length, formattedCompanies)
+            setCompanies(formattedCompanies)
+            
+            if (formattedCompanies.length === 0) {
+              console.warn("⚠️ API retornou sucesso mas nenhuma empresa válida foi encontrada")
+            }
+            return
+          } else {
+            console.warn("⚠️ API retornou sucesso mas sem empresas válidas:", result)
+          }
         } else {
-          console.warn("⚠️ API retornou sucesso mas sem empresas:", result)
+          const errorData = await response.json().catch(() => ({ error: 'Erro desconhecido' }))
+          console.warn("⚠️ Erro na API (status:", response.status, "), tentando direto:", errorData)
         }
-      } else {
-        const errorData = await response.json().catch(() => ({ error: 'Erro desconhecido' }))
-        console.warn("⚠️ Erro na API, tentando direto:", errorData)
+      } catch (apiError) {
+        console.warn("⚠️ Erro ao chamar API, tentando direto:", apiError)
       }
       
       // Fallback: tentar direto via Supabase
+      console.log("🔄 Tentando carregar empresas diretamente do Supabase...")
       const { data, error } = await supabase
         .from("companies")
         .select("id, name")
-        .order("name")
+        .order("name", { ascending: true })
 
       if (error) {
-        console.error("❌ Erro ao buscar empresas:", error)
-        throw error
+        console.error("❌ Erro ao buscar empresas do Supabase:", error)
+        // Tentar sem ordenação
+        const { data: dataNoOrder, error: errorNoOrder } = await supabase
+          .from("companies")
+          .select("id, name")
+        
+        if (errorNoOrder) {
+          throw errorNoOrder
+        }
+        
+        const formatted = (dataNoOrder || []).map((c: any) => ({
+          id: c.id,
+          name: c.name || 'Sem nome'
+        })).sort((a, b) => a.name.localeCompare(b.name))
+        
+        console.log("✅ Empresas carregadas (sem ordenação):", formatted.length, formatted)
+        setCompanies(formatted)
+        return
       }
       
-      console.log("✅ Empresas carregadas:", data?.length || 0, data)
-      setCompanies(data || [])
+      // Garantir formato correto
+      const formatted = (data || []).map((c: any) => ({
+        id: c.id,
+        name: c.name || 'Sem nome'
+      }))
       
-      if (!data || data.length === 0) {
+      console.log("✅ Empresas carregadas do Supabase:", formatted.length, formatted)
+      setCompanies(formatted)
+      
+      if (formatted.length === 0) {
         console.warn("⚠️ Nenhuma empresa encontrada no banco de dados")
+        notifyError(new Error("Nenhuma empresa encontrada"), "Não há empresas cadastradas no sistema")
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("❌ Erro ao carregar empresas:", error)
-      notifyError(error, "Erro ao carregar empresas")
+      notifyError(error, "Erro ao carregar empresas. Verifique o console para mais detalhes.")
+    } finally {
+      setLoadingCompanies(false)
     }
   }
 
@@ -688,12 +732,18 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
                         selected_employees: [],
                       }))
                     }
+                    disabled={loadingCompanies}
                   >
                     <SelectTrigger id="company" className="text-base h-11 sm:h-12 px-4 py-3">
-                      <SelectValue placeholder="Selecione a empresa" />
+                      <SelectValue placeholder={loadingCompanies ? "Carregando empresas..." : "Selecione a empresa"} />
                     </SelectTrigger>
                     <SelectContent>
-                      {companies.length === 0 ? (
+                      {loadingCompanies ? (
+                        <div className="px-4 py-3 text-base text-gray-500 flex items-center gap-2">
+                          <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+                          Carregando empresas...
+                        </div>
+                      ) : companies.length === 0 ? (
                         <div className="px-4 py-3 text-base text-gray-500">
                           Nenhuma empresa encontrada
                         </div>

@@ -131,53 +131,55 @@ export default function AdminConfiguracoesPage() {
       return
     }
 
-    // Verificar sessão antes de salvar
-    const { data: { session }, error: sessionError } = await supabase.auth.getSession()
-    
-    if (sessionError || !session) {
-      notifyError('Sessão expirada. Por favor, faça login novamente.')
-      return
-    }
-
     setSaving(true)
     try {
-      // Atualizar nome
-      if (formData.name !== user.name) {
-        const { error: nameError } = await supabase
-          .from('users')
-          .update({ name: formData.name })
-          .eq('id', user.id)
-
-        if (nameError) {
-          console.error('Erro ao atualizar nome:', nameError)
-          throw new Error('Erro ao atualizar nome: ' + nameError.message)
-        }
-      }
-
-      // Atualizar email (se mudou)
-      if (formData.email !== user.email) {
-        const { error: emailError } = await supabase.auth.updateUser({
-          email: formData.email
-        })
-        if (emailError) {
-          console.error('Erro ao atualizar email:', emailError)
-          throw new Error('Erro ao atualizar email: ' + emailError.message)
-        }
-      }
-
-      // Atualizar senha (se fornecida)
+      // Validar senhas se fornecidas
       if (formData.newPassword && formData.newPassword.length >= 6) {
         if (formData.newPassword !== formData.confirmPassword) {
           throw new Error('As senhas não coincidem')
         }
+      }
 
-        const { error: passwordError } = await supabase.auth.updateUser({
-          password: formData.newPassword
-        })
-        if (passwordError) {
-          console.error('Erro ao atualizar senha:', passwordError)
-          throw new Error('Erro ao atualizar senha: ' + passwordError.message)
-        }
+      // Preparar dados para atualização
+      const updateData: {
+        name?: string
+        email?: string
+        newPassword?: string
+      } = {}
+
+      if (formData.name !== user.name) {
+        updateData.name = formData.name
+      }
+
+      if (formData.email !== user.email) {
+        updateData.email = formData.email
+      }
+
+      if (formData.newPassword && formData.newPassword.length >= 6) {
+        updateData.newPassword = formData.newPassword
+      }
+
+      // Se não há nada para atualizar
+      if (Object.keys(updateData).length === 0) {
+        notifySuccess('Nenhuma alteração para salvar')
+        setSaving(false)
+        return
+      }
+
+      // Usar API route que valida via cookie
+      const response = await fetch('/api/user/update-profile', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(updateData)
+      })
+
+      const result = await response.json()
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || 'Erro ao salvar configurações')
       }
 
       notifySuccess('Configurações salvas com sucesso!')
@@ -188,6 +190,12 @@ export default function AdminConfiguracoesPage() {
         newPassword: "",
         confirmPassword: ""
       }))
+
+      // Recarregar dados do usuário se necessário
+      if (updateData.name || updateData.email) {
+        // Forçar reload da página para atualizar dados do usuário
+        window.location.reload()
+      }
     } catch (error: any) {
       console.error('Erro ao salvar:', error)
       notifyError(error.message || 'Erro ao salvar configurações')
