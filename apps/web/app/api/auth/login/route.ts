@@ -187,11 +187,15 @@ async function loginHandler(req: NextRequest) {
       }
     }
 
+    // ✅ Incluir carrier_id se o usuário for uma transportadora
+    const carrierId = existingUser?.carrier_id || null
+
     const userPayload = {
       id: data.user.id,
       email: data.user.email || email,
       role,
       companyId: companyId || undefined,
+      carrier_id: role === 'carrier' ? carrierId : undefined,
     }
 
     const response = NextResponse.json({ 

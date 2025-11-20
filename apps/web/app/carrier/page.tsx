@@ -41,29 +41,46 @@ export default function CarrierDashboard() {
 
         if (meResponse.ok) {
           const meData = await meResponse.json()
-          if (meData.user && meData.user.role === 'carrier') {
+          console.log('✅ Resposta da API /api/auth/me:', { success: meData.success, hasUser: !!meData.user, role: meData.user?.role })
+          
+          if (meData.success && meData.user && meData.user.role === 'carrier') {
+            console.log('✅ Usuário carrier autenticado via API /api/auth/me')
             setUser(meData.user)
             setUserData(meData.user)
             setLoading(false)
             return
+          } else {
+            console.warn('⚠️ API /api/auth/me retornou OK mas sem usuário carrier:', meData)
           }
+        } else {
+          console.warn('⚠️ API /api/auth/me retornou erro:', meResponse.status, await meResponse.text())
         }
 
         // Fallback: tentar Supabase Auth session (compatibilidade)
-        const { data: { session } } = await supabase.auth.getSession()
-        if (session) {
-          const { data } = await supabase
-            .from("users")
-            .select("*")
-            .eq("id", session.user.id)
-            .single()
+        try {
+          const { data: { session } } = await supabase.auth.getSession()
+          if (session) {
+            console.log('✅ Sessão Supabase encontrada, buscando dados do usuário')
+            const { data } = await supabase
+              .from("users")
+              .select("*")
+              .eq("id", session.user.id)
+              .single()
 
-          if (data && data.role === 'carrier') {
-            setUser({ ...session.user, ...data })
-            setUserData(data)
-            setLoading(false)
-            return
+            if (data && data.role === 'carrier') {
+              console.log('✅ Usuário carrier autenticado via Supabase Auth')
+              setUser({ ...session.user, ...data })
+              setUserData(data)
+              setLoading(false)
+              return
+            } else {
+              console.warn('⚠️ Usuário não tem role carrier:', data?.role)
+            }
+          } else {
+            console.warn('⚠️ Nenhuma sessão Supabase encontrada')
           }
+        } catch (supabaseError) {
+          console.warn('⚠️ Erro ao verificar sessão Supabase:', supabaseError)
         }
 
         // Se chegou aqui, não há autenticação válida
