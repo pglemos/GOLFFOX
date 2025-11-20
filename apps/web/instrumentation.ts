@@ -10,3 +10,14 @@ export async function register() {
     environment: process.env.NODE_ENV || 'development',
   })
 }
+
+export async function onRequestError(err: Error, requestInfo: { path: string; method: string }) {
+  if (process.env.SENTRY_DSN) {
+    Sentry.captureRequestError(err, {
+      request: {
+        url: requestInfo.path,
+        method: requestInfo.method,
+      },
+    })
+  }
+}
