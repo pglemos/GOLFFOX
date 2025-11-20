@@ -30,7 +30,6 @@ import {
 } from "lucide-react"
 import { useNavigation } from "@/hooks/use-navigation"
 import { useEffect } from "react"
-import { SyncAlertBadge } from "@/components/sync-alert-badge"
 import { OperationalAlertsBadge } from "@/components/operational-alerts-badge"
 import { cn } from "@/lib/utils"
 import { motion, AnimatePresence } from "framer-motion"
@@ -96,12 +95,6 @@ const adminMenuItems = [
     label: "Custos", 
     href: "/admin/custos",
     description: "Gestão financeira"
-  },
-  { 
-    icon: Settings, 
-    label: "Sincronização", 
-    href: "/admin/sincronizacao",
-    description: "Monitoramento de sincronização"
   },
   { 
     icon: HelpCircle, 
@@ -268,7 +261,6 @@ const CustomSidebarLink = ({
     ? pathname === item.href 
     : pathname === item.href || pathname?.startsWith(item.href + "/")
   
-  const showSyncAlert = item.href === "/admin/sincronizacao"
   const showOperationalAlerts = (item.href === "/admin/alertas" || item.href === "/operator/alertas" || item.href === "/carrier/alertas")
   
   return (
@@ -306,9 +298,8 @@ const CustomSidebarLink = ({
                 : (panel === 'operator' ? "text-gray-500 group-hover:text-orange-500" : "text-gray-500 group-hover:text-[#F97316]")
             )} 
           />
-          {(showSyncAlert || showOperationalAlerts) && open && (
+          {showOperationalAlerts && open && (
             <div className="absolute -top-1 -right-1 flex gap-1">
-              {showSyncAlert && <SyncAlertBadge />}
               {showOperationalAlerts && <OperationalAlertsBadge />}
             </div>
           )}

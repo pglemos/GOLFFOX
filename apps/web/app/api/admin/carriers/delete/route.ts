@@ -28,14 +28,117 @@ export async function DELETE(req: NextRequest) {
       )
     }
 
-    const { error } = await supabaseServiceRole
+    // Verificar se a transportadora existe
+    const { data: carrier, error: carrierError } = await supabaseServiceRole
+      .from('carriers')
+      .select('id, name')
+      .eq('id', carrierId)
+      .single()
+
+    if (carrierError || !carrier) {
+      return NextResponse.json(
+        { success: false, error: 'Transportadora não encontrada', message: carrierError?.message },
+        { status: 404 }
+      )
+    }
+
+    // 1. Remover referências de users (setar carrier_id como NULL)
+    const { error: usersError } = await supabaseServiceRole
+      .from('users')
+      .update({ carrier_id: null })
+      .eq('carrier_id', carrierId)
+
+    if (usersError) {
+      console.error('Erro ao atualizar users:', usersError)
+      return NextResponse.json(
+        { 
+          success: false, 
+          error: 'Erro ao remover referências de usuários', 
+          message: usersError.message,
+          details: 'Não foi possível atualizar os usuários relacionados à transportadora'
+        },
+        { status: 500 }
+      )
+    }
+
+    // 2. Remover referências de vehicles (setar carrier_id como NULL)
+    const { error: vehiclesError } = await supabaseServiceRole
+      .from('vehicles')
+      .update({ carrier_id: null })
+      .eq('carrier_id', carrierId)
+
+    if (vehiclesError) {
+      console.error('Erro ao atualizar vehicles:', vehiclesError)
+      return NextResponse.json(
+        { 
+          success: false, 
+          error: 'Erro ao remover referências de veículos', 
+          message: vehiclesError.message,
+          details: 'Não foi possível atualizar os veículos relacionados à transportadora'
+        },
+        { status: 500 }
+      )
+    }
+
+    // 3. Excluir rotas relacionadas (routes.carrier_id é NOT NULL, então precisamos excluir)
+    const { error: routesError } = await supabaseServiceRole
+      .from('routes')
+      .delete()
+      .eq('carrier_id', carrierId)
+
+    if (routesError) {
+      console.error('Erro ao excluir routes:', routesError)
+      return NextResponse.json(
+        { 
+          success: false, 
+          error: 'Erro ao excluir rotas relacionadas', 
+          message: routesError.message,
+          details: 'Não foi possível excluir as rotas relacionadas à transportadora'
+        },
+        { status: 500 }
+      )
+    }
+
+    // 4. Verificar se há outras tabelas com referências (ex: costs, se existir)
+    try {
+      const { data: costsData, error: costsCheckError } = await supabaseServiceRole
+        .from('costs')
+        .select('id')
+        .eq('carrier_id', carrierId)
+        .limit(1)
+
+      // Se a tabela existir e houver registros, remover referências
+      if (!costsCheckError && costsData && costsData.length > 0) {
+        const { error: costsError } = await supabaseServiceRole
+          .from('costs')
+          .update({ carrier_id: null })
+          .eq('carrier_id', carrierId)
+
+        if (costsError) {
+          console.warn('Aviso ao atualizar costs (pode não existir):', costsError)
+          // Não falhar se a tabela não existir ou não tiver a coluna
+        }
+      }
+    } catch (costsError: any) {
+      // Ignorar erros relacionados à tabela costs (pode não existir)
+      console.warn('Tabela costs não encontrada ou sem coluna carrier_id, continuando...')
+    }
+
+    // 5. Agora podemos excluir a transportadora
+    const { error: deleteError } = await supabaseServiceRole
       .from('carriers')
       .delete()
       .eq('id', carrierId)
 
-    if (error) {
+    if (deleteError) {
+      console.error('Erro ao excluir carrier:', deleteError)
       return NextResponse.json(
-        { success: false, error: 'Erro ao excluir transportadora', message: error.message },
+        { 
+          success: false, 
+          error: 'Erro ao excluir transportadora', 
+          message: deleteError.message,
+          details: 'As referências foram removidas, mas houve erro ao excluir a transportadora'
+        },
         { status: 500 }
       )
     }
@@ -45,6 +148,7 @@ export async function DELETE(req: NextRequest) {
       message: 'Transportadora excluída com sucesso'
     })
   } catch (error: any) {
+    console.error('Erro ao processar exclusão de transportadora:', error)
     return NextResponse.json(
       { success: false, error: 'Erro ao processar requisição', message: error.message },
       { status: 500 }

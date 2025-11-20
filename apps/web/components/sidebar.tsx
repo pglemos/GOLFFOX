@@ -22,7 +22,6 @@ import {
 import { cn } from "@/lib/utils"
 import { listItem, staggerContainer, sidebarHighlight } from "@/lib/animations"
 import { useNavigation } from "@/hooks/use-navigation"
-import { SyncAlertBadge } from "@/components/sync-alert-badge"
 import { OperationalAlertsBadge } from "@/components/operational-alerts-badge"
 
 // Menus por painel
@@ -92,12 +91,6 @@ const adminMenuItems = [
     label: "Custos", 
     href: "/admin/custos",
     description: "Gestão financeira"
-  },
-  { 
-    icon: Settings, 
-    label: "Sincronização", 
-    href: "/admin/sincronizacao",
-    description: "Monitoramento de sincronização"
   },
   { 
     icon: HelpCircle, 
@@ -272,7 +265,6 @@ export function Sidebar({ isOpen = true, isMobile = false, panel = 'admin' }: Si
               {menuItems.map((item, _i) => {
                 const Icon = item.icon
                 const isActive = isSidebarItemActive(item.href)
-                const showSyncAlert = item.href === "/admin/sincronizacao"
                 const showOperationalAlerts = (item.href === "/admin/alertas" || item.href === "/operator/alertas" || item.href === "/carrier/alertas")
                 
                 return (
@@ -315,7 +307,6 @@ export function Sidebar({ isOpen = true, isMobile = false, panel = 'admin' }: Si
                           {item.label}
                         </span>
                         <div className="flex items-center gap-1">
-                          {showSyncAlert && <SyncAlertBadge />}
                           {showOperationalAlerts && <OperationalAlertsBadge />}
                         </div>
                       </div>

@@ -56,6 +56,32 @@ export function Topbar({
   const { isTopbarItemActive: _isTopbarItemActive } = useNavigation()
   const [isLoggingOut, setIsLoggingOut] = useState(false)
 
+  // Determinar painel atual e rotas correspondentes
+  const getPanelRoutes = () => {
+    if (pathname?.startsWith('/operator')) {
+      return {
+        preferences: '/operator/preferencias',
+        profile: '/operator/preferencias',
+        settings: '/operator/preferencias'
+      }
+    }
+    if (pathname?.startsWith('/carrier')) {
+      return {
+        preferences: '/carrier/preferencias',
+        profile: '/carrier/preferencias',
+        settings: '/carrier/preferencias'
+      }
+    }
+    // Admin (padrão)
+    return {
+      preferences: '/admin/preferences',
+      profile: '/admin/preferences',
+      settings: '/admin/preferences'
+    }
+  }
+
+  const panelRoutes = getPanelRoutes()
+
   const handleLogout = async () => {
     try {
       setIsLoggingOut(true)
@@ -229,23 +255,20 @@ export function Topbar({
             variant="outline"
             size="sm"
             className="hidden xl:flex items-center gap-2 rounded-full border-[var(--border)] hover:bg-[var(--brand-light)] hover:text-[var(--brand)] hover:border-[var(--brand)] transition-all duration-200"
-            asChild
+            onClick={() => router.push(panelRoutes.preferences)}
           >
-            <a href="/admin/preferences">
-              <Settings2 className="h-4 w-4" />
-              Preferências
-            </a>
+            <Settings2 className="h-4 w-4" />
+            Preferências
           </Button>
           
           <Button
             variant="ghost"
             size="icon"
-            className="xl:hidden hover:bg-[var(--bg-hover)]"
-            asChild
+            className="xl:hidden hover:bg-[var(--bg-hover)] min-w-[44px] min-h-[44px] touch-manipulation"
+            onClick={() => router.push(panelRoutes.preferences)}
+            aria-label="Preferências"
           >
-            <a href="/admin/preferences">
-              <Settings2 className="h-5 w-5" />
-            </a>
+            <Settings2 className="h-5 w-5" />
           </Button>
 
           {/* User Menu */}
@@ -272,11 +295,17 @@ export function Topbar({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56 bg-white border-[var(--border)] shadow-lg">
-              <DropdownMenuItem className="focus:bg-[var(--bg-hover)] cursor-pointer">
+              <DropdownMenuItem 
+                className="focus:bg-[var(--bg-hover)] cursor-pointer"
+                onClick={() => router.push(panelRoutes.profile)}
+              >
                 <User className="h-4 w-4 mr-2" />
                 Meu Perfil
               </DropdownMenuItem>
-              <DropdownMenuItem className="focus:bg-[var(--bg-hover)] cursor-pointer">
+              <DropdownMenuItem 
+                className="focus:bg-[var(--bg-hover)] cursor-pointer"
+                onClick={() => router.push(panelRoutes.settings)}
+              >
                 <Settings2 className="h-4 w-4 mr-2" />
                 Configurações
               </DropdownMenuItem>
