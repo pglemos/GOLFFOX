@@ -33,34 +33,38 @@ export default function CarrierDashboard() {
 
   useEffect(() => {
     const getUser = async () => {
+      console.log('🔍 [Carrier] Iniciando verificação de autenticação...')
       try {
         // ✅ PRIMEIRO: Tentar obter do cookie de sessão customizado (mais rápido e confiável)
         // Nota: Se o cookie for httpOnly, isso não funcionará, mas tentaremos mesmo assim
         if (typeof document !== 'undefined') {
           try {
+            console.log('🔍 [Carrier] Chamando API /api/auth/me...')
             const meResponse = await fetch('/api/auth/me', {
               credentials: 'include'
             })
+            console.log('🔍 [Carrier] Resposta da API /api/auth/me:', { status: meResponse.status, ok: meResponse.ok })
 
             if (meResponse.ok) {
               const meData = await meResponse.json()
-              console.log('✅ Resposta da API /api/auth/me:', { success: meData.success, hasUser: !!meData.user, role: meData.user?.role })
+              console.log('✅ [Carrier] Resposta da API /api/auth/me:', { success: meData.success, hasUser: !!meData.user, role: meData.user?.role })
               
               if (meData.success && meData.user && (meData.user.role === 'carrier' || meData.user.role === 'admin')) {
-                console.log('✅ Usuário carrier autenticado via API /api/auth/me')
+                console.log('✅ [Carrier] Usuário carrier autenticado via API /api/auth/me, definindo usuário...')
                 setUser(meData.user)
                 setUserData(meData.user)
                 setLoading(false)
+                console.log('✅ [Carrier] Autenticação concluída com sucesso')
                 return
               } else {
-                console.warn('⚠️ API /api/auth/me retornou OK mas sem usuário carrier:', meData)
+                console.warn('⚠️ [Carrier] API /api/auth/me retornou OK mas sem usuário carrier:', meData)
               }
             } else {
               const errorText = await meResponse.text()
-              console.warn('⚠️ API /api/auth/me retornou erro:', meResponse.status, errorText)
+              console.warn('⚠️ [Carrier] API /api/auth/me retornou erro:', meResponse.status, errorText)
             }
           } catch (apiError) {
-            console.warn('⚠️ Erro ao chamar API /api/auth/me:', apiError)
+            console.warn('⚠️ [Carrier] Erro ao chamar API /api/auth/me:', apiError)
           }
         }
 
