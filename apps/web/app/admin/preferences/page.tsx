@@ -4,11 +4,13 @@ import { AppShell } from "@/components/app-shell"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Settings2 } from "lucide-react"
-import { useAuth } from "@/hooks/use-auth"
+import { useAuthFast } from "@/hooks/use-auth-fast"
 
 export default function AdminPreferencesPage() {
-  const { user, loading } = useAuth()
+  const { user, loading } = useAuthFast()
 
+  // Mostrar loading apenas enquanto está carregando
+  // Se não houver usuário após carregar, o AppShell ou middleware vai lidar com isso
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[var(--bg)]">
@@ -17,12 +19,19 @@ export default function AdminPreferencesPage() {
     )
   }
 
+  // Se não houver usuário, mostrar uma mensagem ou deixar o AppShell lidar
   if (!user) {
-    return null // useAuth já redireciona
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[var(--bg)]">
+        <div className="text-center">
+          <p className="text-[var(--ink-muted)]">Carregando informações do usuário...</p>
+        </div>
+      </div>
+    )
   }
 
   return (
-    <AppShell user={{ id: user.id, name: user.name || "Admin", email: user.email, role: user.role || "admin" }}>
+    <AppShell user={{ id: user.id, name: user.name || "Admin", email: user.email, role: user.role || "admin" }} panel="admin">
       <div className="space-y-6">
         <div className="flex items-center gap-2">
           <Settings2 className="h-6 w-6 text-[var(--brand)]" />

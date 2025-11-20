@@ -13,8 +13,22 @@ export default function PreferenciasCarrierPage() {
   const router = useRouter()
   const { user, loading: authLoading } = useAuthFast()
 
-  if (authLoading || !user) {
-    return <div className="min-h-screen flex items-center justify-center"><div className="w-16 h-16 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin" /></div>
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="w-16 h-16 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin" />
+      </div>
+    )
+  }
+
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-[var(--ink-muted)]">Carregando informações do usuário...</p>
+        </div>
+      </div>
+    )
   }
 
   return (

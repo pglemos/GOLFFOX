@@ -82,6 +82,19 @@ export function Topbar({
 
   const panelRoutes = getPanelRoutes()
 
+  // Função para navegar com tratamento de erro
+  const handleNavigate = (path: string) => {
+    try {
+      router.push(path)
+    } catch (error) {
+      console.error('Erro ao navegar:', error)
+      // Fallback: usar window.location se router.push falhar
+      if (typeof window !== 'undefined') {
+        window.location.href = path
+      }
+    }
+  }
+
   const handleLogout = async () => {
     try {
       setIsLoggingOut(true)
@@ -255,7 +268,7 @@ export function Topbar({
             variant="outline"
             size="sm"
             className="hidden xl:flex items-center gap-2 rounded-full border-[var(--border)] hover:bg-[var(--brand-light)] hover:text-[var(--brand)] hover:border-[var(--brand)] transition-all duration-200"
-            onClick={() => router.push(panelRoutes.preferences)}
+            onClick={() => handleNavigate(panelRoutes.preferences)}
           >
             <Settings2 className="h-4 w-4" />
             Preferências
@@ -265,7 +278,7 @@ export function Topbar({
             variant="ghost"
             size="icon"
             className="xl:hidden hover:bg-[var(--bg-hover)] min-w-[44px] min-h-[44px] touch-manipulation"
-            onClick={() => router.push(panelRoutes.preferences)}
+            onClick={() => handleNavigate(panelRoutes.preferences)}
             aria-label="Preferências"
           >
             <Settings2 className="h-5 w-5" />
@@ -297,14 +310,14 @@ export function Topbar({
             <DropdownMenuContent align="end" className="w-56 bg-white border-[var(--border)] shadow-lg">
               <DropdownMenuItem 
                 className="focus:bg-[var(--bg-hover)] cursor-pointer"
-                onClick={() => router.push(panelRoutes.profile)}
+                onClick={() => handleNavigate(panelRoutes.profile)}
               >
                 <User className="h-4 w-4 mr-2" />
                 Meu Perfil
               </DropdownMenuItem>
               <DropdownMenuItem 
                 className="focus:bg-[var(--bg-hover)] cursor-pointer"
-                onClick={() => router.push(panelRoutes.settings)}
+                onClick={() => handleNavigate(panelRoutes.settings)}
               >
                 <Settings2 className="h-4 w-4 mr-2" />
                 Configurações
