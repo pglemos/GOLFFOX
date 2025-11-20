@@ -209,7 +209,14 @@ export default function TransportadorasPage() {
         <div className="space-y-4 sm:space-y-6 w-full max-w-full min-w-0">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 w-full">
             <div className="min-w-0 flex-1 w-full sm:w-auto">
-              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-1 sm:mb-2 break-words leading-tight">Transportadoras</h1>
+              <div className="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-2">
+                <h1 className="text-xl sm:text-2xl md:text-3xl font-bold break-words leading-tight">Transportadoras</h1>
+                {!loadingCarriers && !errorCarriers && Array.isArray(carriers) && carriers.length > 0 && (
+                  <span className="px-2.5 py-0.5 rounded-full text-xs sm:text-sm font-semibold bg-[var(--brand)]/10 text-[var(--brand)]">
+                    {carriers.length}
+                  </span>
+                )}
+              </div>
               <p className="text-xs sm:text-sm md:text-base text-[var(--ink-muted)] break-words leading-relaxed">Gerencie transportadoras e motoristas</p>
             </div>
             <Button 
@@ -244,27 +251,44 @@ export default function TransportadorasPage() {
           )}
 
           {!loadingCarriers && !errorCarriers && Array.isArray(carriers) && carriers.length > 0 && (
-            <div className="grid gap-3 sm:gap-4 w-full max-w-full">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 w-full max-w-full">
               {carriers.map((carrier: any) => (
-                <Card key={carrier.id} className="p-3 sm:p-4 md:p-5 overflow-hidden w-full max-w-full border border-[var(--border)]">
-                  <div className="flex flex-col gap-3 sm:gap-4 w-full">
-                    <div className="flex-1 min-w-0 w-full">
-                      <div className="flex items-start gap-2 sm:gap-3 mb-2 w-full">
-                        <Truck className="h-4 w-4 sm:h-5 sm:w-5 text-[var(--brand)] flex-shrink-0 mt-0.5" />
-                        <h3 className="font-bold text-sm sm:text-base md:text-lg break-words flex-1 min-w-0 leading-tight">{carrier.name}</h3>
+                <Card key={carrier.id} className="p-4 sm:p-5 overflow-hidden w-full border border-[var(--border)] hover:shadow-lg transition-shadow duration-200 flex flex-col">
+                  <div className="flex-1 flex flex-col gap-3 w-full">
+                    {/* Header com ícone e nome */}
+                    <div className="flex items-start gap-3 mb-1">
+                      <div className="p-2 rounded-lg bg-[var(--brand)]/10 flex-shrink-0">
+                        <Truck className="h-5 w-5 text-[var(--brand)]" />
                       </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-bold text-base sm:text-lg break-words leading-tight text-[var(--ink)]">
+                          {carrier.name}
+                        </h3>
+                      </div>
+                    </div>
+
+                    {/* Informações da transportadora */}
+                    <div className="space-y-2 flex-1">
                       {carrier.address && (
-                        <p className="text-xs sm:text-sm text-[var(--ink-muted)] break-words pl-6 sm:pl-7 md:pl-8 w-full mt-1 leading-relaxed" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
-                          {carrier.address}
-                        </p>
+                        <div className="flex items-start gap-2">
+                          <span className="text-xs text-[var(--ink-muted)] font-medium min-w-[60px]">Endereço:</span>
+                          <p className="text-xs sm:text-sm text-[var(--ink-muted)] break-words flex-1 leading-relaxed" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
+                            {carrier.address}
+                          </p>
+                        </div>
                       )}
                       {carrier.phone && (
-                        <p className="text-xs sm:text-sm text-[var(--ink-muted)] mt-1 break-words pl-6 sm:pl-7 md:pl-8 w-full leading-relaxed" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
-                          {carrier.phone}
-                        </p>
+                        <div className="flex items-start gap-2">
+                          <span className="text-xs text-[var(--ink-muted)] font-medium min-w-[60px]">Telefone:</span>
+                          <p className="text-xs sm:text-sm text-[var(--ink-muted)] break-words flex-1 leading-relaxed" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
+                            {carrier.phone}
+                          </p>
+                        </div>
                       )}
                     </div>
-                    <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2 sm:gap-2 w-full">
+
+                    {/* Botões de ação */}
+                    <div className="grid grid-cols-2 gap-2 pt-2 border-t border-[var(--border)]">
                       <Button 
                         variant="outline" 
                         size="sm"
@@ -273,10 +297,11 @@ export default function TransportadorasPage() {
                           setSelectedCarrierForEdit(carrier)
                           setIsEditModalOpen(true)
                         }}
-                        className="w-full min-h-[44px] h-auto text-xs sm:text-sm px-3 sm:px-4 py-2.5 sm:py-2 flex items-center justify-center gap-1.5 sm:gap-2"
+                        className="w-full min-h-[36px] h-auto text-xs px-2 py-1.5 flex items-center justify-center gap-1.5"
+                        title="Editar transportadora"
                       >
-                        <Edit className="h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0" />
-                        <span className="truncate">Editar</span>
+                        <Edit className="h-3.5 w-3.5 flex-shrink-0" />
+                        <span className="truncate hidden sm:inline">Editar</span>
                       </Button>
                       <Button 
                         variant="outline" 
@@ -286,10 +311,11 @@ export default function TransportadorasPage() {
                           setSelectedCarrierForUsers({ id: carrier.id, name: carrier.name })
                           setIsUsersModalOpen(true)
                         }}
-                        className="w-full min-h-[44px] h-auto text-xs sm:text-sm px-3 sm:px-4 py-2.5 sm:py-2 flex items-center justify-center gap-1.5 sm:gap-2"
+                        className="w-full min-h-[36px] h-auto text-xs px-2 py-1.5 flex items-center justify-center gap-1.5"
+                        title="Gerenciar usuários"
                       >
-                        <UserPlus className="h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0" />
-                        <span className="truncate">Login</span>
+                        <UserPlus className="h-3.5 w-3.5 flex-shrink-0" />
+                        <span className="truncate hidden sm:inline">Login</span>
                       </Button>
                       <Button 
                         variant="outline" 
@@ -299,10 +325,11 @@ export default function TransportadorasPage() {
                           setSelectedCarrierForDrivers({ id: carrier.id, name: carrier.name })
                           setIsDriversModalOpen(true)
                         }}
-                        className="w-full min-h-[44px] h-auto text-xs sm:text-sm px-3 sm:px-4 py-2.5 sm:py-2 flex items-center justify-center gap-1.5 sm:gap-2"
+                        className="w-full min-h-[36px] h-auto text-xs px-2 py-1.5 flex items-center justify-center gap-1.5"
+                        title="Gerenciar motoristas"
                       >
-                        <Users className="h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0" />
-                        <span className="truncate">Motoristas</span>
+                        <Users className="h-3.5 w-3.5 flex-shrink-0" />
+                        <span className="truncate hidden sm:inline">Motoristas</span>
                       </Button>
                       <Button 
                         variant="outline" 
@@ -312,10 +339,11 @@ export default function TransportadorasPage() {
                           setSelectedCarrierForVehicles({ id: carrier.id, name: carrier.name })
                           setIsVehiclesModalOpen(true)
                         }}
-                        className="w-full min-h-[44px] h-auto text-xs sm:text-sm px-3 sm:px-4 py-2.5 sm:py-2 flex items-center justify-center gap-1.5 sm:gap-2"
+                        className="w-full min-h-[36px] h-auto text-xs px-2 py-1.5 flex items-center justify-center gap-1.5"
+                        title="Gerenciar veículos"
                       >
-                        <Truck className="h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0" />
-                        <span className="truncate">Veículos</span>
+                        <Truck className="h-3.5 w-3.5 flex-shrink-0" />
+                        <span className="truncate hidden sm:inline">Veículos</span>
                       </Button>
                       <Button 
                         variant="destructive" 
@@ -324,9 +352,10 @@ export default function TransportadorasPage() {
                           e.stopPropagation()
                           handleDeleteCarrier(carrier.id, carrier.name)
                         }}
-                        className="w-full col-span-2 sm:col-span-1 min-h-[44px] h-auto text-xs sm:text-sm px-3 sm:px-4 py-2.5 sm:py-2 flex items-center justify-center gap-1.5 sm:gap-2"
+                        className="w-full col-span-2 min-h-[36px] h-auto text-xs px-2 py-1.5 flex items-center justify-center gap-1.5"
+                        title="Excluir transportadora"
                       >
-                        <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0" />
+                        <Trash2 className="h-3.5 w-3.5 flex-shrink-0" />
                         <span className="truncate">Excluir</span>
                       </Button>
                     </div>

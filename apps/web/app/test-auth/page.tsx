@@ -63,6 +63,24 @@ export default function TestAuth() {
     window.location.href = '/admin'
   }
 
+  const quickLoginCookies = () => {
+    const fakeUser = {
+      id: 'local-user',
+      email: 'admin@local.test',
+      name: 'Admin Local',
+      role: 'admin'
+    }
+    const cookieOptions = 'path=/; max-age=3600; SameSite=Lax'
+    const sessionCookie = btoa(JSON.stringify(fakeUser))
+    document.cookie = `golffox-session=${sessionCookie}; ${cookieOptions}`
+    document.cookie = `golffox-user=${JSON.stringify(fakeUser)}; ${cookieOptions}`
+    window.localStorage.setItem('golffox-user', JSON.stringify(fakeUser))
+    window.localStorage.setItem('golffox-auth', JSON.stringify(fakeUser))
+    setCookies(document.cookie)
+    setLocalStorageValue(JSON.stringify(fakeUser))
+    setUser(fakeUser)
+  }
+
   return (
     <div className="p-8">
       <h1 className="text-2xl font-bold mb-4">Teste de Autenticação</h1>
@@ -94,6 +112,12 @@ export default function TestAuth() {
           className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
         >
           Fazer Login
+        </button>
+        <button 
+          onClick={quickLoginCookies}
+          className="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600"
+        >
+          Login rápido (cookies)
         </button>
         
         <button 
