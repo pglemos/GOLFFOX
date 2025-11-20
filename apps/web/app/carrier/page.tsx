@@ -34,40 +34,56 @@ export default function CarrierDashboard() {
   useEffect(() => {
     const getUser = async () => {
       try {
-        // Primeiro, tentar verificar através da API /api/auth/me (que verifica cookie)
-        const meResponse = await fetch('/api/auth/me', {
-          credentials: 'include'
-        })
+        // ✅ PRIMEIRO: Tentar obter do cookie de sessão customizado (mais rápido e confiável)
+        // Nota: Se o cookie for httpOnly, isso não funcionará, mas tentaremos mesmo assim
+        if (typeof document !== 'undefined') {
+          try {
+            const meResponse = await fetch('/api/auth/me', {
+              credentials: 'include'
+            })
 
-        if (meResponse.ok) {
-          const meData = await meResponse.json()
-          console.log('✅ Resposta da API /api/auth/me:', { success: meData.success, hasUser: !!meData.user, role: meData.user?.role })
-          
-          if (meData.success && meData.user && meData.user.role === 'carrier') {
-            console.log('✅ Usuário carrier autenticado via API /api/auth/me')
-            setUser(meData.user)
-            setUserData(meData.user)
-            setLoading(false)
-            return
-          } else {
-            console.warn('⚠️ API /api/auth/me retornou OK mas sem usuário carrier:', meData)
+            if (meResponse.ok) {
+              const meData = await meResponse.json()
+              console.log('✅ Resposta da API /api/auth/me:', { success: meData.success, hasUser: !!meData.user, role: meData.user?.role })
+              
+              if (meData.success && meData.user && (meData.user.role === 'carrier' || meData.user.role === 'admin')) {
+                console.log('✅ Usuário carrier autenticado via API /api/auth/me')
+                setUser(meData.user)
+                setUserData(meData.user)
+                setLoading(false)
+                return
+              } else {
+                console.warn('⚠️ API /api/auth/me retornou OK mas sem usuário carrier:', meData)
+              }
+            } else {
+              const errorText = await meResponse.text()
+              console.warn('⚠️ API /api/auth/me retornou erro:', meResponse.status, errorText)
+            }
+          } catch (apiError) {
+            console.warn('⚠️ Erro ao chamar API /api/auth/me:', apiError)
           }
-        } else {
-          console.warn('⚠️ API /api/auth/me retornou erro:', meResponse.status, await meResponse.text())
         }
 
-        // Fallback: tentar Supabase Auth session (compatibilidade)
+        // ✅ FALLBACK: Tentar obter sessão do Supabase Auth
         try {
-          const { data: { session } } = await supabase.auth.getSession()
+          const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+          if (sessionError) {
+            console.error('Erro ao verificar sessão Supabase:', sessionError)
+          }
+          
           if (session) {
             console.log('✅ Sessão Supabase encontrada, buscando dados do usuário')
-            const { data } = await supabase
+            const { data, error: dbError } = await supabase
               .from("users")
               .select("*")
               .eq("id", session.user.id)
               .single()
 
-            if (data && data.role === 'carrier') {
+            if (dbError) {
+              console.warn('⚠️ Erro ao buscar dados do usuário:', dbError)
+            }
+
+            if (data && (data.role === 'carrier' || data.role === 'admin')) {
               console.log('✅ Usuário carrier autenticado via Supabase Auth')
               setUser({ ...session.user, ...data })
               setUserData(data)
