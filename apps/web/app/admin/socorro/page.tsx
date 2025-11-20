@@ -15,6 +15,14 @@ import { notifySuccess, notifyError } from "@/lib/toast"
 import { useAuthFast } from "@/hooks/use-auth-fast"
 import { EditAssistanceModal } from "@/components/modals/edit-assistance-modal"
 import { Edit } from "lucide-react"
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { Label } from "@/components/ui/label"
 
 export default function SocorroPage() {
   const router = useRouter()
@@ -30,6 +38,16 @@ export default function SocorroPage() {
   const [selectedRequestForEdit, setSelectedRequestForEdit] = useState<any>(null)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
 
+  // Estados para o formulário de despacho
+  const [routesWithProblems, setRoutesWithProblems] = useState<any[]>([])
+  const [availableDrivers, setAvailableDrivers] = useState<any[]>([])
+  const [availableVehicles, setAvailableVehicles] = useState<any[]>([])
+  const [selectedRouteId, setSelectedRouteId] = useState<string>("")
+  const [selectedDriverId, setSelectedDriverId] = useState<string>("")
+  const [selectedVehicleId, setSelectedVehicleId] = useState<string>("")
+  const [dispatching, setDispatching] = useState(false)
+  const [loadingResources, setLoadingResources] = useState(false)
+
   const handleSaveFilters = () => {
     setFilterStatus(tempFilterStatus)
     setFiltersExpanded(false)
@@ -44,9 +62,85 @@ export default function SocorroPage() {
   useEffect(() => {
     if (user && !authLoading) {
       loadOcorrencias()
+      loadEmergencyResources()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, authLoading, filterStatus])
+
+  const loadEmergencyResources = async () => {
+    try {
+      setLoadingResources(true)
+      
+      // Carregar rotas com problemas
+      const routesResponse = await fetch('/api/admin/emergency/routes-with-problems')
+      const routesResult = await routesResponse.json()
+      if (routesResult.success) {
+        setRoutesWithProblems(routesResult.routes || [])
+      }
+
+      // Carregar motoristas disponíveis
+      const driversResponse = await fetch('/api/admin/emergency/available-drivers')
+      const driversResult = await driversResponse.json()
+      if (driversResult.success) {
+        setAvailableDrivers(driversResult.drivers || [])
+      }
+
+      // Carregar veículos disponíveis
+      const vehiclesResponse = await fetch('/api/admin/emergency/available-vehicles')
+      const vehiclesResult = await vehiclesResponse.json()
+      if (vehiclesResult.success) {
+        setAvailableVehicles(vehiclesResult.vehicles || [])
+      }
+    } catch (error) {
+      console.error('Erro ao carregar recursos de emergência:', error)
+    } finally {
+      setLoadingResources(false)
+    }
+  }
+
+  const handleDispatchEmergency = async () => {
+    if (!selectedRouteId || !selectedDriverId || !selectedVehicleId) {
+      notifyError('Por favor, preencha todos os campos obrigatórios')
+      return
+    }
+
+    setDispatching(true)
+    try {
+      const response = await fetch('/api/admin/emergency/dispatch', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          routeId: selectedRouteId,
+          driverId: selectedDriverId,
+          vehicleId: selectedVehicleId
+        })
+      })
+
+      const result = await response.json()
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || 'Erro ao despachar socorro')
+      }
+
+      notifySuccess('Socorro despachado com sucesso!')
+      
+      // Limpar formulário
+      setSelectedRouteId("")
+      setSelectedDriverId("")
+      setSelectedVehicleId("")
+      
+      // Recarregar recursos e ocorrências
+      await loadEmergencyResources()
+      await loadOcorrencias()
+    } catch (error: any) {
+      console.error('Erro ao despachar socorro:', error)
+      notifyError(error.message || 'Erro ao despachar socorro')
+    } finally {
+      setDispatching(false)
+    }
+  }
 
   const loadOcorrencias = async () => {
     try {
@@ -116,8 +210,11 @@ export default function SocorroPage() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold mb-2">Socorro</h1>
-            <p className="text-[var(--ink-muted)]">Gerencie ocorrências e emergências</p>
+            <h1 className="text-3xl font-bold mb-2 flex items-center gap-2">
+              <LifeBuoy className="h-8 w-8 text-[var(--error)]" />
+              Despacho de Socorro
+            </h1>
+            <p className="text-[var(--ink-muted)]">Utilize este painel para enviar um motorista e veículo de socorro para uma rota que apresentou problemas.</p>
           </div>
           <Button onClick={() => {
             setSelectedRequest(null)
@@ -126,6 +223,121 @@ export default function SocorroPage() {
             <Plus className="h-4 w-4 mr-2" />
             Nova Ocorrência
           </Button>
+        </div>
+
+        {/* Formulário de Despacho de Socorro */}
+        <Card className="border-2">
+          <CardContent className="pt-6">
+            <div className="space-y-6">
+              {/* 1. Selecione a Rota com Problema */}
+              <div className="space-y-2">
+                <Label className="text-base font-semibold flex items-center gap-2">
+                  <span className="bg-[var(--brand)] text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold">1</span>
+                  Selecione a Rota com Problema
+                </Label>
+                <Select 
+                  value={selectedRouteId} 
+                  onValueChange={setSelectedRouteId}
+                  disabled={loadingResources}
+                >
+                  <SelectTrigger className={`h-12 text-base ${!selectedRouteId ? 'border-red-300' : ''}`}>
+                    <SelectValue placeholder="Selecione uma rota com problema" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {routesWithProblems.length === 0 ? (
+                      <SelectItem value="none" disabled>
+                        {loadingResources ? 'Carregando rotas...' : 'Nenhuma rota com problema encontrada'}
+                      </SelectItem>
+                    ) : (
+                      routesWithProblems.map((route) => (
+                        <SelectItem key={route.id} value={route.id}>
+                          {route.displayName}
+                        </SelectItem>
+                      ))
+                    )}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* 2. Escolha o Motorista de Socorro */}
+              <div className="space-y-2">
+                <Label className="text-base font-semibold flex items-center gap-2">
+                  <span className="bg-[var(--brand)] text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold">2</span>
+                  Escolha o Motorista de Socorro
+                </Label>
+                <Select 
+                  value={selectedDriverId} 
+                  onValueChange={setSelectedDriverId}
+                  disabled={loadingResources}
+                >
+                  <SelectTrigger className="h-12 text-base">
+                    <SelectValue placeholder="Selecione um motorista de socorro" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {availableDrivers.length === 0 ? (
+                      <SelectItem value="none" disabled>
+                        {loadingResources ? 'Carregando motoristas...' : 'Nenhum motorista disponível'}
+                      </SelectItem>
+                    ) : (
+                      availableDrivers.map((driver) => (
+                        <SelectItem key={driver.id} value={driver.id}>
+                          {driver.displayName}
+                        </SelectItem>
+                      ))
+                    )}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* 3. Escolha o Veículo de Socorro */}
+              <div className="space-y-2">
+                <Label className="text-base font-semibold flex items-center gap-2">
+                  <span className="bg-[var(--brand)] text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold">3</span>
+                  Escolha o Veículo de Socorro
+                </Label>
+                <Select 
+                  value={selectedVehicleId} 
+                  onValueChange={setSelectedVehicleId}
+                  disabled={loadingResources}
+                >
+                  <SelectTrigger className="h-12 text-base">
+                    <SelectValue placeholder="Selecione um veículo de socorro" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {availableVehicles.length === 0 ? (
+                      <SelectItem value="none" disabled>
+                        {loadingResources ? 'Carregando veículos...' : 'Nenhum veículo disponível'}
+                      </SelectItem>
+                    ) : (
+                      availableVehicles.map((vehicle) => (
+                        <SelectItem key={vehicle.id} value={vehicle.id}>
+                          {vehicle.displayName}
+                        </SelectItem>
+                      ))
+                    )}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Botão de Despacho */}
+              <div className="pt-4">
+                <Button
+                  onClick={handleDispatchEmergency}
+                  disabled={dispatching || !selectedRouteId || !selectedDriverId || !selectedVehicleId || loadingResources}
+                  className="w-full bg-[var(--error)] hover:bg-[var(--error)]/90 h-12 text-base font-semibold"
+                  size="lg"
+                >
+                  <Send className="h-5 w-5 mr-2" />
+                  {dispatching ? 'Despachando...' : 'Despachar Socorro Agora'}
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Separador */}
+        <div className="border-t border-[var(--border)] pt-6">
+          <h2 className="text-2xl font-bold mb-4">Ocorrências de Socorro</h2>
         </div>
 
         {/* Filtros */}
