@@ -49,8 +49,17 @@ export default function EmpresasPage() {
     setLoadingEmpresas(true)
     setErrorEmpresas(null)
     try {
+      // ✅ Obter token do Supabase para autenticação
+      const { data: { session } } = await supabase.auth.getSession()
+      
+      const headers: HeadersInit = {}
+      if (session?.access_token) {
+        headers['Authorization'] = `Bearer ${session.access_token}`
+      }
+      
       const response = await fetch('/api/admin/companies-list', {
-        credentials: 'include', // ✅ Garantir que cookies sejam enviados
+        headers,
+        credentials: 'include',
       })
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
@@ -76,9 +85,18 @@ export default function EmpresasPage() {
     }
 
     try {
+      // ✅ Obter token do Supabase para autenticação
+      const { data: { session } } = await supabase.auth.getSession()
+      
+      const headers: HeadersInit = {}
+      if (session?.access_token) {
+        headers['Authorization'] = `Bearer ${session.access_token}`
+      }
+      
       const response = await fetch(`/api/admin/companies/delete?id=${empresaId}`, {
         method: 'DELETE',
-        credentials: 'include', // ✅ Garantir que cookies sejam enviados
+        headers,
+        credentials: 'include',
       })
       
       const result = await response.json()

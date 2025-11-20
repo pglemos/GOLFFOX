@@ -179,7 +179,7 @@ const carrierMenuItems = [
   { 
     icon: LayoutDashboard, 
     label: "Dashboard", 
-    href: "/carrier",
+    href: "/transportadora",
     description: "Visão geral da transportadora"
   },
   { 

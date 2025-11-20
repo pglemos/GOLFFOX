@@ -167,8 +167,19 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
     try {
       console.log("🔄 Carregando empresas...")
       
+      // ✅ Obter token do Supabase para autenticação
+      const { data: { session } } = await supabase.auth.getSession()
+      
+      const headers: HeadersInit = {}
+      if (session?.access_token) {
+        headers['Authorization'] = `Bearer ${session.access_token}`
+      }
+      
       // Tentar via API route primeiro (mesmo padrão usado em outras páginas)
-      const response = await fetch('/api/admin/companies-list')
+      const response = await fetch('/api/admin/companies-list', {
+        headers,
+        credentials: 'include',
+      })
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)

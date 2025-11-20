@@ -154,7 +154,7 @@ export function EditUserModal({
                 <SelectContent>
                   <SelectItem value="admin">Administrador</SelectItem>
                   <SelectItem value="operator">Operador</SelectItem>
-                  <SelectItem value="carrier">Transportadora</SelectItem>
+                  <SelectItem value="transportadora">Transportadora</SelectItem>
                   <SelectItem value="driver">Motorista</SelectItem>
                   <SelectItem value="passenger">Passageiro</SelectItem>
                 </SelectContent>

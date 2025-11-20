@@ -29,7 +29,7 @@ export const AppShell = memo(function AppShell({ user, children, panel }: AppShe
   const detectedPanel: 'admin' | 'operator' | 'carrier' = useMemo(() => 
     panel || 
     (pathname?.startsWith('/operator') ? 'operator' : 
-     pathname?.startsWith('/carrier') ? 'carrier' : 'admin'),
+     pathname?.startsWith('/transportadora') ? 'transportadora' : 'admin'),
     [panel, pathname]
   )
   
@@ -43,9 +43,9 @@ export const AppShell = memo(function AppShell({ user, children, panel }: AppShe
       branding: 'Operador',
       homeUrl: '/operator'
     },
-    carrier: {
+    transportadora: {
       branding: 'Transportadora',
-      homeUrl: '/carrier'
+      homeUrl: '/transportadora'
     }
   }[detectedPanel]), [detectedPanel])
 

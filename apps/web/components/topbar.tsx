@@ -62,7 +62,7 @@ export function Topbar({
         settings: '/operator/configuracoes'
       }
     }
-    if (pathname?.startsWith('/carrier')) {
+    if (pathname?.startsWith('/transportadora')) {
       return {
         settings: '/carrier/configuracoes'
       }

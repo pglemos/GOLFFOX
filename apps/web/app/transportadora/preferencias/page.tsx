@@ -32,7 +32,7 @@ export default function PreferenciasCarrierPage() {
   }
 
   return (
-    <AppShell user={{ id: user.id, name: user.name || "Transportadora", email: user.email, role: user.role || "carrier" }} panel="carrier">
+    <AppShell user={{ id: user.id, name: user.name || "Transportadora", email: user.email, role: user.role || "transportadora" }} panel="transportadora">
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>

@@ -86,8 +86,8 @@ export class AuthManager {
     if (requiredRole === 'operator') {
       return ['admin', 'operator'].includes(user.role)
     }
-    if (requiredRole === 'carrier') {
-      return ['admin', 'carrier'].includes(user.role)
+    if (requiredRole === 'transportadora' || requiredRole === 'carrier') {
+      return ['admin', 'transportadora', 'carrier'].includes(user.role)
     }
 
     return true
@@ -99,8 +99,9 @@ export class AuthManager {
         return '/admin'
       case 'operator':
         return '/operator'
+      case 'transportadora':
       case 'carrier':
-        return '/carrier'
+        return '/transportadora'
       default:
         return '/dashboard'
     }

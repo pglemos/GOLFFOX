@@ -39,32 +39,32 @@ export default function CarrierDashboard() {
         // Nota: Se o cookie for httpOnly, isso não funcionará, mas tentaremos mesmo assim
         if (typeof document !== 'undefined') {
           try {
-            console.log('🔍 [Carrier] Chamando API /api/auth/me...')
+            console.log('🔍 [Transportadora] Chamando API /api/auth/me...')
             const meResponse = await fetch('/api/auth/me', {
               credentials: 'include'
             })
-            console.log('🔍 [Carrier] Resposta da API /api/auth/me:', { status: meResponse.status, ok: meResponse.ok })
+            console.log('🔍 [Transportadora] Resposta da API /api/auth/me:', { status: meResponse.status, ok: meResponse.ok })
 
             if (meResponse.ok) {
               const meData = await meResponse.json()
-              console.log('✅ [Carrier] Resposta da API /api/auth/me:', { success: meData.success, hasUser: !!meData.user, role: meData.user?.role })
+              console.log('✅ [Transportadora] Resposta da API /api/auth/me:', { success: meData.success, hasUser: !!meData.user, role: meData.user?.role })
               
-              if (meData.success && meData.user && (meData.user.role === 'carrier' || meData.user.role === 'admin')) {
-                console.log('✅ [Carrier] Usuário carrier autenticado via API /api/auth/me, definindo usuário...')
+              if (meData.success && meData.user && (meData.user.role === 'transportadora' || meData.user.role === 'admin')) {
+                console.log('✅ [Transportadora] Usuário transportadora autenticado via API /api/auth/me, definindo usuário...')
                 setUser(meData.user)
                 setUserData(meData.user)
                 setLoading(false)
-                console.log('✅ [Carrier] Autenticação concluída com sucesso')
+                console.log('✅ [Transportadora] Autenticação concluída com sucesso')
                 return
               } else {
-                console.warn('⚠️ [Carrier] API /api/auth/me retornou OK mas sem usuário carrier:', meData)
+                console.warn('⚠️ [Transportadora] API /api/auth/me retornou OK mas sem usuário transportadora:', meData)
               }
             } else {
               const errorText = await meResponse.text()
-              console.warn('⚠️ [Carrier] API /api/auth/me retornou erro:', meResponse.status, errorText)
+              console.warn('⚠️ [Transportadora] API /api/auth/me retornou erro:', meResponse.status, errorText)
             }
           } catch (apiError) {
-            console.warn('⚠️ [Carrier] Erro ao chamar API /api/auth/me:', apiError)
+            console.warn('⚠️ [Transportadora] Erro ao chamar API /api/auth/me:', apiError)
           }
         }
 
@@ -87,14 +87,14 @@ export default function CarrierDashboard() {
               console.warn('⚠️ Erro ao buscar dados do usuário:', dbError)
             }
 
-            if (data && (data.role === 'carrier' || data.role === 'admin')) {
-              console.log('✅ Usuário carrier autenticado via Supabase Auth')
+            if (data && (data.role === 'transportadora' || data.role === 'admin')) {
+              console.log('✅ Usuário transportadora autenticado via Supabase Auth')
               setUser({ ...session.user, ...data })
               setUserData(data)
               setLoading(false)
               return
             } else {
-              console.warn('⚠️ Usuário não tem role carrier:', data?.role)
+              console.warn('⚠️ Usuário não tem role transportadora:', data?.role)
             }
           } else {
             console.warn('⚠️ Nenhuma sessão Supabase encontrada')
@@ -104,7 +104,7 @@ export default function CarrierDashboard() {
         }
 
         // Se chegou aqui, não há autenticação válida
-        console.warn('⚠️ Usuário não autenticado ou sem role carrier, redirecionando para login')
+        console.warn('⚠️ Usuário não autenticado ou sem role transportadora, redirecionando para login')
         router.push("/")
       } catch (error) {
         console.error('❌ Erro ao verificar autenticação:', error)
@@ -519,7 +519,7 @@ export default function CarrierDashboard() {
       id: user?.id || "",
       name: user?.name || "Carrier",
       email: user?.email || "",
-      role: "carrier"
+      role: "transportadora"
     }}>
       <div className="space-y-4 sm:space-y-6 lg:space-y-8 w-full">
         {/* Header */}

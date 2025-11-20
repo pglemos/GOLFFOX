@@ -14,313 +14,120 @@ export interface AuthenticatedUser {
 }
 
 /**
- * Valida autenticação via cookie ou header Authorization
+ * Valida autenticação SEMPRE buscando dados do Supabase
+ * NUNCA usa cookies customizados - apenas Supabase session
  * Retorna usuário autenticado ou null
  */
 export async function validateAuth(request: NextRequest): Promise<AuthenticatedUser | null> {
   try {
-    // Tentar obter do cookie primeiro
-    const sessionCookie = request.cookies.get('golffox-session')?.value
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
     
-    console.log('🔍 validateAuth - Verificando autenticação', {
-      hasCookie: !!sessionCookie,
-      cookieLength: sessionCookie?.length || 0,
+    if (!supabaseUrl || !supabaseAnonKey) {
+      console.error('❌ Supabase não configurado')
+      return null
+    }
+    
+    console.log('🔍 validateAuth - Verificando autenticação (SEMPRE do Supabase)', {
       path: request.nextUrl.pathname,
       method: request.method
     })
     
-    if (sessionCookie) {
-      try {
-        // Tentar decodificar como base64 primeiro (formato do /api/auth/login)
-        let decoded: string
-        try {
-          decoded = Buffer.from(sessionCookie, 'base64').toString('utf-8')
-          console.log('✅ Cookie decodificado como base64')
-        } catch (base64Error) {
-          // Se falhar, tentar como URI encoded (formato do /api/auth/set-session)
-          try {
-            decoded = decodeURIComponent(sessionCookie)
-            console.log('✅ Cookie decodificado como URI encoded')
-          } catch (uriError) {
-            // Tentar decodificar diretamente (pode já estar em formato JSON)
-            decoded = sessionCookie
-            console.log('✅ Usando cookie diretamente (já está em formato texto)')
-          }
-        }
-        
-        const userData = JSON.parse(decoded)
-        
-        console.log('📦 Dados do cookie:', {
-          hasId: !!userData?.id,
-          hasRole: !!userData?.role,
-          role: userData?.role,
-          hasEmail: !!userData?.email,
-          hasCompanyId: !!userData?.companyId
-        })
-        
-        if (userData?.id && userData?.role) {
-          // Buscar email e companyId do banco se não estiverem no cookie
-          const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-          const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-          
-          if (supabaseUrl && serviceKey && (!userData.email || !userData.companyId)) {
-            try {
-              const supabaseAdmin = createClient(supabaseUrl, serviceKey, {
-                auth: { persistSession: false, autoRefreshToken: false }
-              })
-              
-              const { data: userFromDb } = await supabaseAdmin
-                .from('users')
-                .select('email, company_id')
-                .eq('id', userData.id)
-                .maybeSingle()
-              
-              const authenticatedUser = {
-                id: userData.id,
-                email: userData.email || userFromDb?.email || '',
-                role: userData.role,
-                companyId: userData.companyId || userFromDb?.company_id || null
-              }
-              
-              console.log('✅ Usuário autenticado via cookie (com busca no banco):', {
-                id: authenticatedUser.id,
-                role: authenticatedUser.role
-              })
-              
-              return authenticatedUser
-            } catch (dbError) {
-              // Se falhar ao buscar do banco, usar dados do cookie mesmo
-              console.warn('⚠️ Erro ao buscar dados do usuário do banco:', dbError)
-            }
-          }
-          
-          const authenticatedUser = {
-            id: userData.id,
-            email: userData.email || '',
-            role: userData.role,
-            companyId: userData.companyId || null
-          }
-          
-          console.log('✅ Usuário autenticado via cookie:', {
-            id: authenticatedUser.id,
-            role: authenticatedUser.role
-          })
-          
-          return authenticatedUser
-        } else {
-          console.warn('⚠️ Cookie encontrado mas dados inválidos:', {
-            hasId: !!userData?.id,
-            hasRole: !!userData?.role
-          })
-        }
-      } catch (parseError) {
-        console.error('❌ Erro ao decodificar cookie de sessão:', parseError)
-        // Continuar para tentar outros métodos de autenticação
-      }
-    } else {
-      console.warn('⚠️ Cookie de sessão não encontrado')
-    }
+    let accessToken: string | null = null
     
-    // Fallback: tentar validar sessão Supabase diretamente via cookies
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-    
-    if (supabaseUrl && supabaseAnonKey) {
-      // Procurar por cookies de sessão do Supabase
-      const supabaseCookies = [
-        ...request.cookies.getAll().map(c => c.name).filter(name => 
-          name.includes('sb-') && name.includes('-auth-token')
-        )
-      ]
-      
-      if (supabaseCookies.length > 0) {
-        try {
-          // Tentar usar o cliente Supabase para validar a sessão
-          const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-            auth: { persistSession: false, autoRefreshToken: false }
-          })
-          
-          // Verificar se há um access token nos cookies
-          const accessTokenCookie = request.cookies.get(`sb-${supabaseUrl.split('//')[1]?.split('.')[0]}-auth-token`)?.value
-          
-          if (accessTokenCookie) {
-            try {
-              const tokenData = JSON.parse(accessTokenCookie)
-              const accessToken = tokenData?.access_token || tokenData?.accessToken
-              
-              if (accessToken) {
-                const { data: { user }, error: userError } = await supabase.auth.getUser(accessToken)
-                
-                if (!userError && user) {
-                  // Buscar role do usuário
-                  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-                  let userData = null
-                  
-                  if (serviceKey) {
-                    const supabaseAdmin = createClient(supabaseUrl, serviceKey, {
-                      auth: { persistSession: false, autoRefreshToken: false }
-                    })
-                    
-                    const { data } = await supabaseAdmin
-                      .from('users')
-                      .select('role, company_id')
-                      .eq('id', user.id)
-                      .maybeSingle()
-                    
-                    userData = data
-                  }
-                  
-                  const role = userData?.role || user.user_metadata?.role || user.app_metadata?.role || 'passenger'
-                  const companyId = userData?.company_id || user.user_metadata?.company_id || user.app_metadata?.company_id || null
-                  
-                  return {
-                    id: user.id,
-                    email: user.email || '',
-                    role,
-                    companyId
-                  }
-                }
-              }
-            } catch (tokenError) {
-              // Ignorar erro e continuar
-              console.warn('Erro ao processar token do Supabase:', tokenError)
-            }
-          }
-        } catch (supabaseError) {
-          // Ignorar erro e continuar para outros métodos
-          console.warn('Erro ao validar sessão Supabase:', supabaseError)
-        }
-      }
-    }
-    
-    // Fallback: tentar header Authorization (Bearer token ou HTTP Basic Auth)
+    // 1. Tentar obter token do header Authorization (Bearer token)
     const authHeader = request.headers.get('authorization')
-    if (authHeader) {
-      // HTTP Basic Auth (para compatibilidade com testes)
-      if (authHeader.startsWith('Basic ')) {
-        const basicAuth = authHeader.substring(6)
-        const decoded = Buffer.from(basicAuth, 'base64').toString('utf-8')
-        const [username, password] = decoded.split(':')
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      accessToken = authHeader.substring(7)
+      console.log('✅ Token encontrado no header Authorization')
+    }
+    
+    // 2. Se não houver no header, tentar obter do cookie do Supabase
+    if (!accessToken) {
+      // Procurar cookie de sessão do Supabase
+      const projectRef = supabaseUrl.split('//')[1]?.split('.')[0]
+      if (projectRef) {
+        const supabaseCookieName = `sb-${projectRef}-auth-token`
+        const supabaseCookie = request.cookies.get(supabaseCookieName)?.value
         
-        // Validar credenciais via login - usar anon key para autenticação
-        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-        const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-        const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-        
-        if (supabaseUrl && supabaseAnonKey) {
-          const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-            auth: { persistSession: false, autoRefreshToken: false }
-          })
-          
-          // Tentar fazer login com as credenciais usando anon key
-          const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-            email: username,
-            password: password
-          })
-          
-          if (authError || !authData?.user) return null
-          
-          // Buscar role do usuário - usar service role para bypass RLS se disponível
-          let userData = null
-          if (serviceKey) {
-            const supabaseAdmin = createClient(supabaseUrl, serviceKey, {
-              auth: { persistSession: false, autoRefreshToken: false }
-            })
-            
-            const { data } = await supabaseAdmin
-              .from('users')
-              .select('role, company_id')
-              .eq('id', authData.user.id)
-              .maybeSingle()
-            
-            userData = data
-          } else {
-            // Tentar com anon key (pode falhar devido a RLS)
-            const { data } = await supabase
-              .from('users')
-              .select('role, company_id')
-              .eq('id', authData.user.id)
-              .maybeSingle()
-            
-            userData = data
-          }
-          
-          const role = userData?.role || authData.user.user_metadata?.role || authData.user.app_metadata?.role || 'passenger'
-          const companyId = userData?.company_id || authData.user.user_metadata?.company_id || authData.user.app_metadata?.company_id || null
-          
-          return {
-            id: authData.user.id,
-            email: authData.user.email || username,
-            role,
-            companyId
-          }
-        }
-      }
-      
-      // Bearer token
-      if (authHeader.startsWith('Bearer ')) {
-        const token = authHeader.substring(7)
-        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-        const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-        const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-        
-        if (supabaseUrl && supabaseAnonKey) {
-          // Primeiro, validar o token com Supabase Auth
-          const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-            auth: { persistSession: false, autoRefreshToken: false }
-          })
-          
-          const { data: { user }, error } = await supabase.auth.getUser(token)
-          if (error || !user) return null
-          
-          // Buscar role do usuário - usar service role para bypass RLS se disponível
-          let userData = null
-          if (serviceKey) {
-            // Usar service role para bypass RLS
-            const supabaseAdmin = createClient(supabaseUrl, serviceKey, {
-              auth: { persistSession: false, autoRefreshToken: false }
-            })
-            
-            const { data } = await supabaseAdmin
-              .from('users')
-              .select('role, company_id')
-              .eq('id', user.id)
-              .maybeSingle()
-            
-            userData = data
-          } else {
-            // Tentar com anon key (pode falhar devido a RLS)
-            const { data } = await supabase
-              .from('users')
-              .select('role, company_id')
-              .eq('id', user.id)
-              .maybeSingle()
-            
-            userData = data
-          }
-          
-          // Se não encontrou na tabela users, usar metadados do auth como fallback
-          if (!userData) {
-            const role = user.user_metadata?.role || user.app_metadata?.role || 'passenger'
-            return {
-              id: user.id,
-              email: user.email || '',
-              role,
-              companyId: user.user_metadata?.company_id || user.app_metadata?.company_id || null
+        if (supabaseCookie) {
+          try {
+            const tokenData = JSON.parse(supabaseCookie)
+            accessToken = tokenData?.access_token || tokenData?.accessToken || null
+            if (accessToken) {
+              console.log('✅ Token encontrado no cookie do Supabase')
             }
-          }
-          
-          return {
-            id: user.id,
-            email: user.email || '',
-            role: userData.role,
-            companyId: userData.company_id || null
+          } catch (error) {
+            console.warn('⚠️ Erro ao processar cookie do Supabase:', error)
           }
         }
       }
     }
     
-    return null
+    // 3. Se ainda não encontrou token, retornar null
+    if (!accessToken) {
+      console.warn('⚠️ Token de acesso não encontrado')
+      return null
+    }
+    
+    // 4. Validar token com Supabase Auth
+    const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+      auth: { persistSession: false, autoRefreshToken: false }
+    })
+    
+    const { data: { user }, error: authError } = await supabase.auth.getUser(accessToken)
+    
+    if (authError || !user) {
+      console.error('❌ Erro ao validar token com Supabase:', authError)
+      return null
+    }
+    
+    console.log('✅ Token validado com Supabase, user ID:', user.id)
+    
+    // 5. SEMPRE buscar dados completos do usuário no banco de dados
+    if (!serviceKey) {
+      console.error('❌ Service role key não configurada')
+      return null
+    }
+    
+    const supabaseAdmin = createClient(supabaseUrl, serviceKey, {
+      auth: { persistSession: false, autoRefreshToken: false }
+    })
+    
+    // Buscar TODOS os dados do usuário do banco
+    const { data: userData, error: dbError } = await supabaseAdmin
+      .from('users')
+      .select('id, email, role, company_id, carrier_id')
+      .eq('id', user.id)
+      .maybeSingle()
+    
+    if (dbError) {
+      console.error('❌ Erro ao buscar dados do usuário no banco:', dbError)
+      return null
+    }
+    
+    if (!userData) {
+      console.error('❌ Usuário não encontrado na tabela users:', user.id)
+      return null
+    }
+    
+    // Usar dados do banco (sempre atualizados)
+    const authenticatedUser: AuthenticatedUser = {
+      id: userData.id,
+      email: userData.email || user.email || '',
+      role: userData.role || user.user_metadata?.role || user.app_metadata?.role || 'passenger',
+      companyId: userData.company_id || null
+    }
+    
+    console.log('✅ Usuário autenticado e dados obtidos do banco:', {
+      id: authenticatedUser.id,
+      email: authenticatedUser.email,
+      role: authenticatedUser.role,
+      companyId: authenticatedUser.companyId
+    })
+    
+    return authenticatedUser
   } catch (error) {
     return null
   }
@@ -343,7 +150,7 @@ export function hasRole(user: AuthenticatedUser | null, requiredRole: string | s
   }
   
   if (roles.includes('carrier')) {
-    return ['admin', 'carrier'].includes(user.role)
+    return ['admin', 'transportadora'].includes(user.role)
   }
   
   return roles.includes(user.role)

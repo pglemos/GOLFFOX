@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
       email_confirm: true,
       user_metadata: {
         name: validated.name,
-        role: 'carrier'
+        role: 'transportadora'
       }
     })
 
@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
         id: authData.user.id,
         email: validated.email,
         name: validated.name,
-        role: 'carrier',
+        role: 'transportadora',
         carrier_id: validated.carrier_id,
         updated_at: new Date().toISOString()
       }, {

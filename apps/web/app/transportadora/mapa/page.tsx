@@ -72,7 +72,7 @@ function CarrierMapaContent() {
   }
 
   return (
-    <AppShell user={{ id: user?.id || "", name: user?.name || "Transportadora", email: user?.email || "", role: "carrier" }}>
+    <AppShell user={{ id: user?.id || "", name: user?.name || "Transportadora", email: user?.email || "", role: "transportadora" }}>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>

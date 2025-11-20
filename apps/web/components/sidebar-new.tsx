@@ -183,7 +183,7 @@ const carrierMenuItems = [
   { 
     icon: LayoutDashboard, 
     label: "Dashboard", 
-    href: "/carrier",
+    href: "/transportadora",
     description: "Visão geral da transportadora"
   },
   { 
@@ -256,7 +256,7 @@ const CustomSidebarLink = ({
   
   // Verificar se o item está ativo
   // Para dashboards, apenas rota exata
-  const isDashboard = item.href === "/admin" || item.href === "/operator" || item.href === "/carrier"
+  const isDashboard = item.href === "/admin" || item.href === "/operator" || item.href === "/transportadora"
   const isActive = isDashboard 
     ? pathname === item.href 
     : pathname === item.href || pathname?.startsWith(item.href + "/")
@@ -342,7 +342,7 @@ const SidebarLogo = ({ panel }: { panel: 'admin' | 'operator' | 'carrier' }) => 
   
   return (
       <a
-        href={panel === 'operator' ? '/operator' : panel === 'carrier' ? '/carrier' : '/admin'}
+        href={panel === 'operator' ? '/operator' : panel === 'transportadora' ? '/transportadora' : '/admin'}
         className="font-normal flex space-x-2 items-center text-sm text-black dark:text-white py-1 relative z-20 mb-6"
       >
       <div className={cn(

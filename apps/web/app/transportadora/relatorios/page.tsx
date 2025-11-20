@@ -317,7 +317,7 @@ export default function CarrierRelatoriosPage() {
   }
 
   return (
-    <AppShell user={{ id: user?.id || "", name: user?.name || "Transportadora", email: user?.email || "", role: "carrier" }}>
+    <AppShell user={{ id: user?.id || "", name: user?.name || "Transportadora", email: user?.email || "", role: "transportadora" }}>
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold mb-2">Relatórios</h1>

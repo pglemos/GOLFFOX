@@ -195,7 +195,7 @@ async function loginHandler(req: NextRequest) {
       email: data.user.email || email,
       role,
       companyId: companyId || undefined,
-      carrier_id: role === 'carrier' ? carrierId : undefined,
+      carrier_id: role === 'transportadora' ? carrierId : undefined,
     }
 
     const response = NextResponse.json({ 
@@ -217,32 +217,12 @@ async function loginHandler(req: NextRequest) {
       }
     }, { status: 200 })
 
-    const cookieValue = Buffer.from(JSON.stringify(userPayload)).toString('base64')
-    
-    // ✅ Configuração otimizada para produção (Vercel)
-    const isSecure = isSecureRequest(req)
-    const cookieOptions: any = {
-      httpOnly: true,
-      maxAge: 60 * 60 * 24 * 7, // 7 dias (aumentado de 1 dia)
-      sameSite: 'lax' as const,
-      secure: isSecure,
-      path: '/',
-    }
-    
-    // ✅ Em produção Vercel, garantir que cookie seja acessível
-    if (process.env.VERCEL === '1') {
-      cookieOptions.domain = undefined // Não definir domain explicitamente (usar padrão)
-      cookieOptions.sameSite = 'lax' as const // Lax funciona melhor em produção
-    }
-    
-    response.cookies.set('golffox-session', cookieValue, cookieOptions)
-    
-    console.log('✅ Cookie de sessão criado:', {
-      secure: isSecure,
-      sameSite: cookieOptions.sameSite,
-      maxAge: cookieOptions.maxAge,
-      hasValue: !!cookieValue,
-      isVercel: process.env.VERCEL === '1'
+    // ✅ Removido: Não criar cookie customizado - usar apenas sessão Supabase
+    // O frontend deve enviar o token do Supabase no header Authorization
+    console.log('✅ Login bem-sucedido - usando apenas sessão Supabase:', {
+      userId: userPayload.id,
+      email: userPayload.email,
+      role: userPayload.role
     })
 
     debug('Login API concluído', { role, emailHash: email.replace(/^(.{2}).+(@.*)$/, '$1***$2') }, 'AuthAPI')

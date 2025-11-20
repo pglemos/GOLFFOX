@@ -137,13 +137,13 @@ function LoginContent() {
           const isAllowedForRole = (role: string, path: string): boolean => {
             if (path.startsWith('/admin')) return role === 'admin'
             if (path.startsWith('/operator')) return ['admin', 'operator'].includes(role)
-            if (path.startsWith('/carrier')) return ['admin', 'carrier'].includes(role)
+            if (path.startsWith('/transportadora') || path.startsWith('/carrier')) return ['admin', 'transportadora', 'carrier'].includes(role)
             return true
           }
 
           let redirectUrl = userRole === 'admin' ? '/admin' :
                             userRole === 'operator' ? '/operator' :
-                            userRole === 'carrier' ? '/carrier' : '/dashboard'
+                            (userRole === 'transportadora' || userRole === 'carrier') ? '/transportadora' : '/dashboard'
 
           if (safeNext && isAllowedForRole(userRole, safeNext)) {
             redirectUrl = safeNext
@@ -270,7 +270,7 @@ function LoginContent() {
   const isAllowedForRole = (role: string, path: string): boolean => {
     if (path.startsWith('/admin')) return role === 'admin'
     if (path.startsWith('/operator')) return ['admin', 'operator'].includes(role)
-    if (path.startsWith('/carrier')) return ['admin', 'carrier'].includes(role)
+    if (path.startsWith('/transportadora')) return ['admin', 'transportadora'].includes(role)
     return true
   }
 

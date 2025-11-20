@@ -41,54 +41,36 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(rootUrl)
   }
 
-  // ✅ Proteger rotas /operator, /admin e /carrier com autenticação (OTIMIZADO)
-  if (pathname.startsWith('/operator') || pathname.startsWith('/admin') || pathname.startsWith('/carrier')) {
-    // Verificar cookie de sessão customizado (golffox-session) - validação rápida
-    const sessionCookie = request.cookies.get('golffox-session')?.value
+  // ✅ Redirecionar /carrier para /transportadora (compatibilidade)
+  if (pathname.startsWith('/carrier')) {
+    const transportadoraUrl = new URL(pathname.replace('/carrier', '/transportadora'), request.url)
+    transportadoraUrl.search = request.nextUrl.search
+    return NextResponse.redirect(transportadoraUrl)
+  }
+
+  // ✅ Proteger rotas /operator, /admin e /transportadora com autenticação
+  // A validação completa será feita no lado do cliente e nas rotas API
+  // O middleware apenas verifica se há sessão Supabase ativa
+  if (pathname.startsWith('/operator') || pathname.startsWith('/admin') || pathname.startsWith('/transportadora')) {
+    // Verificar se há cookie de sessão do Supabase (validação rápida)
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+    let hasSupabaseSession = false
     
-    // Se não há cookie, redirecionar imediatamente (sem validação pesada)
-    if (!sessionCookie) {
+    if (supabaseUrl) {
+      const projectRef = supabaseUrl.split('//')[1]?.split('.')[0]
+      if (projectRef) {
+        const supabaseCookieName = `sb-${projectRef}-auth-token`
+        const supabaseCookie = request.cookies.get(supabaseCookieName)?.value
+        hasSupabaseSession = !!supabaseCookie
+      }
+    }
+    
+    // Se não há sessão Supabase, redirecionar para login
+    // A validação completa será feita no cliente e nas APIs
+    if (!hasSupabaseSession) {
       const loginUrl = new URL('/', request.url)
       loginUrl.searchParams.set('next', pathname)
       return NextResponse.redirect(loginUrl)
-    }
-
-    // Validação rápida do cookie (sem chamada ao Supabase em desenvolvimento)
-    try {
-      // Decodificar cookie (base64) em ambiente Edge (sem Buffer)
-      const decoded = typeof atob === 'function'
-        ? atob(sessionCookie)
-        : Buffer.from(sessionCookie, 'base64').toString('utf-8')
-      const userData = JSON.parse(decoded)
-
-      if (!userData?.id || !userData?.role) {
-        throw new Error('Invalid session data')
-      }
-
-      // ✅ Validar role do usuário (validação rápida)
-      if (pathname.startsWith('/operator') && !['operator', 'admin'].includes(userData.role)) {
-        return NextResponse.redirect(new URL('/unauthorized', request.url))
-      }
-
-      if (pathname.startsWith('/admin') && userData.role !== 'admin') {
-        return NextResponse.redirect(new URL('/unauthorized', request.url))
-      }
-
-      if (pathname.startsWith('/carrier') && !['carrier', 'admin'].includes(userData.role)) {
-        return NextResponse.redirect(new URL('/unauthorized', request.url))
-      }
-
-      // ✅ Em desenvolvimento, pular validação do token Supabase (muito lenta)
-      // A validação completa será feita no lado do cliente se necessário
-      // Isso acelera significativamente a navegação
-      
-    } catch (err) {
-      // Cookie inválido, redirecionar para login e limpar cookie
-      const loginUrl = new URL('/', request.url)
-      loginUrl.searchParams.set('next', pathname)
-      const res = NextResponse.redirect(loginUrl)
-      res.cookies.set('golffox-session', '', { maxAge: 0, path: '/' })
-      return res
     }
   }
 
@@ -99,33 +81,26 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  // ✅ Redirecionar raiz com ?next= quando há sessão válida
+  // ✅ Redirecionar raiz com ?next= quando há sessão Supabase válida
+  // A validação completa será feita no cliente
   if (pathname === '/' && searchParams.has('next')) {
     const nextRaw = searchParams.get('next') || ''
-    const sessionCookie = request.cookies.get('golffox-session')?.value
-    if (sessionCookie && nextRaw.startsWith('/')) {
-      try {
-        const decoded = typeof atob === 'function'
-          ? atob(sessionCookie)
-          : Buffer.from(sessionCookie, 'base64').toString('utf-8')
-        const userData = JSON.parse(decoded)
-        if (userData?.role) {
-          const nextPath = new URL(nextRaw, request.url)
-          const pathOnly = nextPath.pathname
-          const isAllowed = (
-            (pathOnly.startsWith('/admin') && userData.role === 'admin') ||
-            (pathOnly.startsWith('/operator') && ['admin', 'operator'].includes(userData.role)) ||
-            (pathOnly.startsWith('/carrier') && ['admin', 'carrier'].includes(userData.role)) ||
-            (!pathOnly.startsWith('/admin') && !pathOnly.startsWith('/operator') && !pathOnly.startsWith('/carrier'))
-          )
-          const defaultHome = userData.role === 'admin' ? '/admin'
-            : userData.role === 'operator' ? '/operator'
-            : userData.role === 'carrier' ? '/carrier' : '/'
-          const destination = isAllowed ? pathOnly : defaultHome
-          return NextResponse.redirect(new URL(destination, request.url))
-        }
-      } catch (_) {
-        // Ignorar erros de decodificação e seguir fluxo normal
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+    let hasSupabaseSession = false
+    
+    if (supabaseUrl && nextRaw.startsWith('/')) {
+      const projectRef = supabaseUrl.split('//')[1]?.split('.')[0]
+      if (projectRef) {
+        const supabaseCookieName = `sb-${projectRef}-auth-token`
+        const supabaseCookie = request.cookies.get(supabaseCookieName)?.value
+        hasSupabaseSession = !!supabaseCookie
+      }
+      
+      // Se há sessão Supabase, permitir redirecionamento
+      // A validação completa será feita no cliente
+      if (hasSupabaseSession) {
+        const nextPath = new URL(nextRaw, request.url)
+        return NextResponse.redirect(nextPath)
       }
     }
   }
@@ -141,6 +116,7 @@ export const config = {
     '/operator',
     '/operator/:path*',
     '/carrier/:path*',
+    '/transportadora/:path*',
     /*
      * Match all request paths except for the ones starting with:
      * - api (API routes)

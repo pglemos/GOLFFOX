@@ -224,7 +224,7 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
         } else if (formData.company_id) {
           vehicleDataRaw.company_id = formData.company_id
         }
-      } else if (userInfo.role === 'carrier') {
+      } else if (userInfo.role === 'transportadora') {
         // Carrier deve usar seu próprio carrier_id
         if (userInfo.carrier_id) {
           vehicleDataRaw.carrier_id = userInfo.carrier_id

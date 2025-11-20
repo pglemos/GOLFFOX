@@ -80,37 +80,6 @@ export function CreateOperatorModal({
       setProgress("Criando empresa...")
       setStep(2)
 
-      // Tentar obter token de autenticação de múltiplas fontes
-      let authToken: string | null = null
-      
-      // 1. Tentar obter da sessão do Supabase
-      try {
-        const { data: { session } } = await supabase.auth.getSession()
-        if (session?.access_token) {
-          authToken = session.access_token
-        }
-      } catch (error) {
-        console.warn('Erro ao obter sessão do Supabase:', error)
-      }
-
-      // 2. Não usar cookie para token — manter apenas sessão Supabase
-
-      // 3. Em desenvolvimento, permitir continuar sem token (a API permite)
-      // Em Next.js, NODE_ENV está disponível no cliente
-      const isDevelopment = typeof window !== 'undefined' && (process.env.NODE_ENV === 'development' || window.location.hostname === 'localhost')
-      const headers: Record<string, string> = {
-        'Content-Type': 'application/json',
-      }
-      
-      if (authToken) {
-        headers['Authorization'] = `Bearer ${authToken}`
-      } else if (!isDevelopment) {
-        // Em produção, bloquear se não houver token
-        notifyError(new Error('Usuário não autenticado'), 'Usuário não autenticado. Faça login novamente.')
-        setLoading(false)
-        return
-      }
-
       // Montar endereço completo
       const fullAddress = [
         formData.address,
@@ -148,11 +117,23 @@ export function CreateOperatorModal({
         requestBody.operatorName = formData.responsibleName
       }
 
+      // ✅ Obter token do Supabase e fazer requisição autenticada
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+      
+      if (sessionError || !session?.access_token) {
+        notifyError(new Error('Usuário não autenticado'), 'Usuário não autenticado. Faça login novamente.')
+        setLoading(false)
+        return
+      }
+
       const response = await fetch('/api/admin/create-operator', {
         method: 'POST',
-        headers,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+        },
         body: JSON.stringify(requestBody),
-        credentials: 'include', // ✅ Garantir que cookies sejam enviados
+        credentials: 'include',
       })
 
       if (!response.ok) {
