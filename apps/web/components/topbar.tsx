@@ -27,7 +27,6 @@ import {
 import { supabase } from "@/lib/supabase"
 import { useNavigation } from "@/hooks/use-navigation"
 import { OperatorLogoSection } from "@/components/operator/operator-logo-section"
-import { SyncAlertNotification } from "@/components/sync-alert-notification"
 import { OperationalAlertsNotification } from "@/components/operational-alerts-notification"
 import { ThemeToggle } from "@/components/theme-toggle"
 
@@ -241,9 +240,6 @@ export function Topbar({
           >
             <Search className="h-5 w-5" />
           </Button>
-
-          {/* Sync Alerts */}
-          <SyncAlertNotification />
 
           {/* Operational Alerts */}
           <OperationalAlertsNotification />
