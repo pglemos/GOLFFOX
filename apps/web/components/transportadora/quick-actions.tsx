@@ -33,37 +33,37 @@ const defaultActions: QuickAction[] = [
     id: "vehicles",
     label: "Ver Veículos",
     icon: Truck,
-    href: "/carrier/veiculos"
+    href: "/transportadora/veiculos"
   },
   {
     id: "drivers",
     label: "Ver Motoristas",
     icon: Users,
-    href: "/carrier/motoristas"
+    href: "/transportadora/motoristas"
   },
   {
     id: "alerts",
     label: "Ver Alertas",
     icon: AlertCircle,
-    href: "/carrier/alertas"
+    href: "/transportadora/alertas"
   },
   {
     id: "map",
     label: "Ver Mapa",
     icon: MapPin,
-    href: "/carrier/mapa"
+    href: "/transportadora/mapa"
   },
   {
     id: "reports",
     label: "Relatórios",
     icon: FileText,
-    href: "/carrier/relatorios"
+    href: "/transportadora/relatorios"
   },
   {
     id: "costs",
     label: "Custos",
     icon: Download,
-    href: "/carrier/custos"
+    href: "/transportadora/custos"
   }
 ]
 

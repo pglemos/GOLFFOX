@@ -261,7 +261,7 @@ const CustomSidebarLink = ({
     ? pathname === item.href 
     : pathname === item.href || pathname?.startsWith(item.href + "/")
   
-  const showOperationalAlerts = (item.href === "/admin/alertas" || item.href === "/operator/alertas" || item.href === "/carrier/alertas")
+  const showOperationalAlerts = (item.href === "/admin/alertas" || item.href === "/operator/alertas" || item.href === "/transportadora/alertas")
   
   return (
     <div className="relative group">

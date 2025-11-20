@@ -64,7 +64,7 @@ export function Topbar({
     }
     if (pathname?.startsWith('/transportadora')) {
       return {
-        settings: '/carrier/configuracoes'
+        settings: '/transportadora/configuracoes'
       }
     }
     // Admin (padrão)
