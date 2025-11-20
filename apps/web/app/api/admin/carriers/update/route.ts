@@ -43,19 +43,30 @@ export async function PUT(req: NextRequest) {
     const body = await req.json()
     const validated = carrierUpdateSchema.parse(body)
 
+    const updateData: any = {
+      name: validated.name,
+      address: validated.address || null,
+      phone: validated.phone || null,
+      contact_person: validated.contact_person || null,
+      updated_at: new Date().toISOString()
+    }
+
+    if (validated.email) {
+      updateData.email = validated.email
+    }
+    if (validated.cnpj) {
+      updateData.cnpj = validated.cnpj
+    }
+    if (validated.state_registration) {
+      updateData.state_registration = validated.state_registration
+    }
+    if (validated.municipal_registration) {
+      updateData.municipal_registration = validated.municipal_registration
+    }
+
     const { data, error } = await supabaseServiceRole
       .from('carriers')
-      .update({
-        name: validated.name,
-        address: validated.address || null,
-        phone: validated.phone || null,
-        contact_person: validated.contact_person || null,
-        email: validated.email || null,
-        cnpj: validated.cnpj || null,
-        state_registration: validated.state_registration || null,
-        municipal_registration: validated.municipal_registration || null,
-        updated_at: new Date().toISOString()
-      })
+      .update(updateData)
       .eq('id', carrierId)
       .select()
       .single()

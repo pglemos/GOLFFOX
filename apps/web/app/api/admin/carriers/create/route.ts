@@ -35,18 +35,29 @@ export async function POST(req: NextRequest) {
     const body = await req.json()
     const validated = carrierSchema.parse(body)
 
+    const insertData: any = {
+      name: validated.name,
+      address: validated.address || null,
+      phone: validated.phone || null,
+      contact_person: validated.contact_person || null,
+    }
+
+    if (validated.email) {
+      insertData.email = validated.email
+    }
+    if (validated.cnpj) {
+      insertData.cnpj = validated.cnpj
+    }
+    if (validated.state_registration) {
+      insertData.state_registration = validated.state_registration
+    }
+    if (validated.municipal_registration) {
+      insertData.municipal_registration = validated.municipal_registration
+    }
+
     const { data, error } = await supabaseServiceRole
       .from('carriers')
-      .insert({
-        name: validated.name,
-        address: validated.address || null,
-        phone: validated.phone || null,
-        contact_person: validated.contact_person || null,
-        email: validated.email || null,
-        cnpj: validated.cnpj || null,
-        state_registration: validated.state_registration || null,
-        municipal_registration: validated.municipal_registration || null,
-      })
+      .insert(insertData)
       .select()
       .single()
 
