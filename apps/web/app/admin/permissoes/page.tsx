@@ -134,54 +134,56 @@ export default function PermissoesPage() {
 
   return (
     <AppShell user={{ id: user.id, name: user.name || "Admin", email: user.email, role: user.role || "admin" }}>
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold mb-2">Permissões</h1>
-          <p className="text-[var(--ink-muted)]">Gerencie permissões e papéis dos usuários</p>
+      <div className="space-y-4 sm:space-y-6 w-full overflow-x-hidden">
+        <div className="min-w-0">
+          <h1 className="text-2xl sm:text-3xl font-bold mb-2 break-words">Permissões</h1>
+          <p className="text-sm sm:text-base text-[var(--ink-muted)] break-words">Gerencie permissões e papéis dos usuários</p>
         </div>
 
         {/* Filtros */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Filter className="h-5 w-5 text-[var(--brand)]" />
-                <CardTitle className="text-lg">Filtros</CardTitle>
+        <Card className="overflow-hidden">
+          <CardHeader className="p-3 sm:p-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
+              <div className="flex items-center gap-2 min-w-0">
+                <Filter className="h-4 w-4 sm:h-5 sm:w-5 text-[var(--brand)] flex-shrink-0" />
+                <CardTitle className="text-base sm:text-lg font-semibold break-words">Filtros</CardTitle>
               </div>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setFiltersExpanded(!filtersExpanded)}
-                className="gap-2"
+                className="gap-2 w-full sm:w-auto min-h-[44px] touch-manipulation"
               >
                 {filtersExpanded ? (
                   <>
                     <ChevronUp className="h-4 w-4" />
-                    Minimizar
+                    <span className="hidden sm:inline">Minimizar</span>
+                    <span className="sm:hidden">Fechar</span>
                   </>
                 ) : (
                   <>
                     <ChevronDown className="h-4 w-4" />
-                    Expandir
+                    <span className="hidden sm:inline">Expandir</span>
+                    <span className="sm:hidden">Abrir</span>
                   </>
                 )}
               </Button>
             </div>
           </CardHeader>
           {filtersExpanded && (
-            <CardContent>
-              <div className="flex flex-wrap gap-4 mb-4">
-                <div className="relative flex-1 min-w-[200px]">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--ink-muted)]" />
+            <CardContent className="p-3 sm:p-6 pt-0">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-4">
+                <div className="relative w-full sm:flex-1 min-w-0">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--ink-muted)] pointer-events-none" />
                   <Input
                     placeholder="Buscar por nome ou email..."
-                    className="pl-10"
+                    className="pl-10 w-full"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />
                 </div>
                 <Select value={tempFilterRole} onValueChange={setTempFilterRole}>
-                  <SelectTrigger className="w-[180px]">
+                  <SelectTrigger className="w-full sm:w-[180px] min-h-[44px]">
                     <SelectValue placeholder="Todos os papéis" />
                   </SelectTrigger>
                   <SelectContent>
@@ -194,7 +196,7 @@ export default function PermissoesPage() {
                   </SelectContent>
                 </Select>
                 <Select value={tempFilterStatus} onValueChange={setTempFilterStatus}>
-                  <SelectTrigger className="w-[180px]">
+                  <SelectTrigger className="w-full sm:w-[180px] min-h-[44px]">
                     <SelectValue placeholder="Todos os status" />
                   </SelectTrigger>
                   <SelectContent>
@@ -204,12 +206,12 @@ export default function PermissoesPage() {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="flex items-center justify-end gap-2 pt-4 border-t border-[var(--border)]">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2 sm:gap-2 pt-4 border-t border-[var(--border)]">
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={handleResetFilters}
-                  className="gap-2"
+                  className="gap-2 w-full sm:w-auto min-h-[44px] touch-manipulation"
                 >
                   <X className="h-4 w-4" />
                   Limpar
@@ -217,7 +219,7 @@ export default function PermissoesPage() {
                 <Button
                   size="sm"
                   onClick={handleSaveFilters}
-                  className="gap-2"
+                  className="gap-2 w-full sm:w-auto min-h-[44px] touch-manipulation"
                 >
                   <Save className="h-4 w-4" />
                   Salvar Filtros
@@ -228,40 +230,40 @@ export default function PermissoesPage() {
         </Card>
 
         {/* Tabela de Usuários */}
-        <Card>
-          <div className="overflow-x-auto">
-            <table className="w-full">
+        <Card className="overflow-hidden">
+          <div className="overflow-x-auto -webkit-overflow-scrolling-touch">
+            <table className="w-full min-w-[640px]">
               <thead>
                 <tr className="border-b">
-                  <th className="text-left p-4 font-semibold">Nome</th>
-                  <th className="text-left p-4 font-semibold">Email</th>
-                  <th className="text-left p-4 font-semibold">Papel</th>
-                  <th className="text-left p-4 font-semibold">Status</th>
-                  <th className="text-left p-4 font-semibold">Ações</th>
+                  <th className="text-left p-2 sm:p-4 font-semibold text-xs sm:text-sm">Nome</th>
+                  <th className="text-left p-2 sm:p-4 font-semibold text-xs sm:text-sm">Email</th>
+                  <th className="text-left p-2 sm:p-4 font-semibold text-xs sm:text-sm">Papel</th>
+                  <th className="text-left p-2 sm:p-4 font-semibold text-xs sm:text-sm">Status</th>
+                  <th className="text-left p-2 sm:p-4 font-semibold text-xs sm:text-sm">Ações</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredUsers.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="p-8 text-center text-[var(--ink-muted)]">
+                    <td colSpan={5} className="p-6 sm:p-8 text-center text-[var(--ink-muted)] text-sm sm:text-base">
                       Nenhum usuário encontrado
                     </td>
                   </tr>
                 ) : (
                   filteredUsers.map((usuario) => (
                     <tr key={usuario.id} className="border-b hover:bg-[var(--bg-hover)]">
-                      <td className="p-4">{usuario.name || "N/A"}</td>
-                      <td className="p-4">{usuario.email}</td>
-                      <td className="p-4">
-                        <Badge variant="outline">{usuario.role || "N/A"}</Badge>
+                      <td className="p-2 sm:p-4 text-xs sm:text-sm break-words">{usuario.name || "N/A"}</td>
+                      <td className="p-2 sm:p-4 text-xs sm:text-sm break-words">{usuario.email}</td>
+                      <td className="p-2 sm:p-4">
+                        <Badge variant="outline" className="text-xs whitespace-nowrap">{usuario.role || "N/A"}</Badge>
                       </td>
-                      <td className="p-4">
-                        <Badge variant={usuario.is_active ? "default" : "secondary"}>
+                      <td className="p-2 sm:p-4">
+                        <Badge variant={usuario.is_active ? "default" : "secondary"} className="text-xs whitespace-nowrap">
                           {usuario.is_active ? "Ativo" : "Inativo"}
                         </Badge>
                       </td>
-                      <td className="p-4">
-                        <div className="flex gap-2">
+                      <td className="p-2 sm:p-4">
+                        <div className="flex flex-col sm:flex-row gap-1 sm:gap-2">
                           <Button
                             variant="outline"
                             size="sm"
@@ -269,9 +271,10 @@ export default function PermissoesPage() {
                               setSelectedUserForEdit(usuario)
                               setIsEditModalOpen(true)
                             }}
+                            className="min-h-[44px] touch-manipulation text-xs"
                           >
-                            <Edit className="h-4 w-4 mr-2" />
-                            Editar
+                            <Edit className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-2" />
+                            <span className="hidden sm:inline">Editar</span>
                           </Button>
                           <Button
                             variant="outline"
@@ -280,17 +283,19 @@ export default function PermissoesPage() {
                               setSelectedUserForRoleChange(usuario)
                               setIsChangeRoleModalOpen(true)
                             }}
+                            className="min-h-[44px] touch-manipulation text-xs"
                           >
-                            <Shield className="h-4 w-4 mr-2" />
-                            Trocar Papel
+                            <Shield className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-2" />
+                            <span className="hidden sm:inline">Trocar Papel</span>
                           </Button>
                           <Button
                             variant="destructive"
                             size="sm"
                             onClick={() => handleDeleteUsuario(usuario.id, usuario.name || usuario.email || 'Usuário')}
+                            className="min-h-[44px] touch-manipulation text-xs"
                           >
-                            <Trash2 className="h-4 w-4 mr-2" />
-                            Excluir
+                            <Trash2 className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-2" />
+                            <span className="hidden sm:inline">Excluir</span>
                           </Button>
                         </div>
                       </td>

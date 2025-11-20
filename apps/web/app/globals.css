@@ -461,6 +461,8 @@
       opacity: 1;
       width: auto;
       height: auto;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
     }
     
     /* Garantir que elementos motion.div sejam visíveis */
@@ -575,6 +577,170 @@
       word-break: break-word !important;
       overflow-wrap: anywhere !important;
       hyphens: auto !important;
+    }
+    
+    /* Tabelas responsivas - scroll horizontal quando necessário */
+    table {
+      width: 100%;
+      display: block;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    
+    thead, tbody, tr {
+      display: table;
+      width: 100%;
+      table-layout: fixed;
+    }
+    
+    /* Garantir que tabelas não ultrapassem a largura */
+    .overflow-x-auto {
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+    }
+    
+    /* Modais responsivos */
+    [role="dialog"], [data-radix-portal] > div {
+      max-width: 95vw !important;
+      margin: 1rem !important;
+      padding: 1rem !important;
+    }
+    
+    /* Ícones responsivos */
+    svg {
+      max-width: 100%;
+      height: auto;
+      flex-shrink: 0;
+    }
+    
+    /* Garantir que badges e chips sejam responsivos */
+    [class*="badge"], [class*="Badge"], [class*="chip"] {
+      font-size: 0.75rem !important;
+      padding: 0.25rem 0.5rem !important;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+    }
+    
+    /* Tabs responsivas */
+    [role="tablist"] {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    
+    [role="tablist"]::-webkit-scrollbar {
+      display: none;
+    }
+    
+    /* Select dropdowns responsivos */
+    [role="combobox"] {
+      min-width: 0;
+      width: 100%;
+      max-width: 100%;
+    }
+    
+    /* Input groups responsivos */
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    
+    /* Stack buttons verticalmente em mobile */
+    .button-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    
+    .button-group button {
+      width: 100%;
+    }
+    
+    /* Garantir que textos longos quebrem */
+    p, span, div, a, label {
+      word-break: break-word;
+      overflow-wrap: break-word;
+      hyphens: auto;
+    }
+    
+    /* Headings responsivos */
+    h1 {
+      font-size: 1.875rem !important; /* 30px */
+      line-height: 2.25rem !important;
+    }
+    
+    h2 {
+      font-size: 1.5rem !important; /* 24px */
+      line-height: 2rem !important;
+    }
+    
+    h3 {
+      font-size: 1.25rem !important; /* 20px */
+      line-height: 1.75rem !important;
+    }
+    
+    /* Espaçamento reduzido em mobile */
+    .space-y-6 > * + * {
+      margin-top: 1rem !important;
+    }
+    
+    .space-y-8 > * + * {
+      margin-top: 1.5rem !important;
+    }
+    
+    /* Padding reduzido em cards */
+    [class*="Card"] [class*="CardHeader"],
+    [class*="card"] [class*="card-header"] {
+      padding: 0.75rem 1rem !important;
+    }
+    
+    [class*="Card"] [class*="CardContent"],
+    [class*="card"] [class*="card-content"] {
+      padding: 0.75rem 1rem !important;
+    }
+  }
+  
+  /* Melhorias adicionais para telas muito pequenas (mobile pequeno) */
+  @media (max-width: 640px) {
+    /* Reduzir ainda mais o tamanho de fonte */
+    h1 {
+      font-size: 1.5rem !important; /* 24px */
+      line-height: 2rem !important;
+    }
+    
+    h2 {
+      font-size: 1.25rem !important; /* 20px */
+      line-height: 1.75rem !important;
+    }
+    
+    h3 {
+      font-size: 1.125rem !important; /* 18px */
+      line-height: 1.5rem !important;
+    }
+    
+    /* Botões full-width em mobile pequeno */
+    button:not(.no-full-width) {
+      width: 100% !important;
+      max-width: 100% !important;
+    }
+    
+    /* Padding ainda mais reduzido */
+    .p-6 {
+      padding: 1rem !important;
+    }
+    
+    .px-6 {
+      padding-left: 1rem !important;
+      padding-right: 1rem !important;
+    }
+    
+    .py-6 {
+      padding-top: 1rem !important;
+      padding-bottom: 1rem !important;
     }
   }
   

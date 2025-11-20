@@ -297,7 +297,7 @@ export default function TransportadorasPage() {
                           setSelectedCarrierForEdit(carrier)
                           setIsEditModalOpen(true)
                         }}
-                        className="w-full min-h-[36px] h-auto text-xs px-2 py-1.5 flex items-center justify-center gap-1.5"
+                        className="w-full min-h-[44px] h-auto text-xs px-2 py-1.5 flex items-center justify-center gap-1.5 touch-manipulation"
                         title="Editar transportadora"
                       >
                         <Edit className="h-3.5 w-3.5 flex-shrink-0" />
@@ -311,7 +311,7 @@ export default function TransportadorasPage() {
                           setSelectedCarrierForUsers({ id: carrier.id, name: carrier.name })
                           setIsUsersModalOpen(true)
                         }}
-                        className="w-full min-h-[36px] h-auto text-xs px-2 py-1.5 flex items-center justify-center gap-1.5"
+                        className="w-full min-h-[44px] h-auto text-xs px-2 py-1.5 flex items-center justify-center gap-1.5 touch-manipulation"
                         title="Gerenciar usuários"
                       >
                         <UserPlus className="h-3.5 w-3.5 flex-shrink-0" />
@@ -325,7 +325,7 @@ export default function TransportadorasPage() {
                           setSelectedCarrierForDrivers({ id: carrier.id, name: carrier.name })
                           setIsDriversModalOpen(true)
                         }}
-                        className="w-full min-h-[36px] h-auto text-xs px-2 py-1.5 flex items-center justify-center gap-1.5"
+                        className="w-full min-h-[44px] h-auto text-xs px-2 py-1.5 flex items-center justify-center gap-1.5 touch-manipulation"
                         title="Gerenciar motoristas"
                       >
                         <Users className="h-3.5 w-3.5 flex-shrink-0" />
@@ -339,7 +339,7 @@ export default function TransportadorasPage() {
                           setSelectedCarrierForVehicles({ id: carrier.id, name: carrier.name })
                           setIsVehiclesModalOpen(true)
                         }}
-                        className="w-full min-h-[36px] h-auto text-xs px-2 py-1.5 flex items-center justify-center gap-1.5"
+                        className="w-full min-h-[44px] h-auto text-xs px-2 py-1.5 flex items-center justify-center gap-1.5 touch-manipulation"
                         title="Gerenciar veículos"
                       >
                         <Truck className="h-3.5 w-3.5 flex-shrink-0" />
@@ -352,7 +352,7 @@ export default function TransportadorasPage() {
                           e.stopPropagation()
                           handleDeleteCarrier(carrier.id, carrier.name)
                         }}
-                        className="w-full col-span-2 min-h-[36px] h-auto text-xs px-2 py-1.5 flex items-center justify-center gap-1.5"
+                        className="w-full col-span-2 min-h-[44px] h-auto text-xs px-2 py-1.5 flex items-center justify-center gap-1.5 touch-manipulation"
                         title="Excluir transportadora"
                       >
                         <Trash2 className="h-3.5 w-3.5 flex-shrink-0" />

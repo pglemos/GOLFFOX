@@ -32,33 +32,33 @@ export default function AdminPreferencesPage() {
 
   return (
     <AppShell user={{ id: user.id, name: user.name || "Admin", email: user.email, role: user.role || "admin" }} panel="admin">
-      <div className="space-y-6">
-        <div className="flex items-center gap-2">
-          <Settings2 className="h-6 w-6 text-[var(--brand)]" />
-          <h1 className="text-3xl font-bold">Preferências</h1>
+      <div className="space-y-4 sm:space-y-6 w-full overflow-x-hidden">
+        <div className="flex items-center gap-2 min-w-0">
+          <Settings2 className="h-5 w-5 sm:h-6 sm:w-6 text-[var(--brand)] flex-shrink-0" />
+          <h1 className="text-2xl sm:text-3xl font-bold break-words">Preferências</h1>
         </div>
-        <p className="text-[var(--ink-muted)]">Configurações pessoais e preferências do painel admin.</p>
+        <p className="text-sm sm:text-base text-[var(--ink-muted)] break-words">Configurações pessoais e preferências do painel admin.</p>
 
-        <Card className="p-6 space-y-4">
-          <div>
-            <h2 className="text-xl font-semibold">Tema</h2>
-            <p className="text-sm text-[var(--ink-muted)]">Ajuste o tema e aparência da interface.</p>
+        <Card className="p-4 sm:p-6 space-y-4">
+          <div className="min-w-0">
+            <h2 className="text-lg sm:text-xl font-semibold break-words">Tema</h2>
+            <p className="text-xs sm:text-sm text-[var(--ink-muted)] break-words">Ajuste o tema e aparência da interface.</p>
           </div>
-          <div className="flex gap-2">
-            <Button variant="outline">Claro</Button>
-            <Button variant="outline">Escuro</Button>
-            <Button variant="default">Automático</Button>
+          <div className="flex flex-col sm:flex-row gap-2">
+            <Button variant="outline" className="w-full sm:w-auto min-h-[44px] touch-manipulation">Claro</Button>
+            <Button variant="outline" className="w-full sm:w-auto min-h-[44px] touch-manipulation">Escuro</Button>
+            <Button variant="default" className="w-full sm:w-auto min-h-[44px] touch-manipulation">Automático</Button>
           </div>
         </Card>
 
-        <Card className="p-6 space-y-4">
-          <div>
-            <h2 className="text-xl font-semibold">Notificações</h2>
-            <p className="text-sm text-[var(--ink-muted)]">Habilite alertas críticos e emails de sistema.</p>
+        <Card className="p-4 sm:p-6 space-y-4">
+          <div className="min-w-0">
+            <h2 className="text-lg sm:text-xl font-semibold break-words">Notificações</h2>
+            <p className="text-xs sm:text-sm text-[var(--ink-muted)] break-words">Habilite alertas críticos e emails de sistema.</p>
           </div>
-          <div className="flex gap-2">
-            <Button variant="outline">Silenciar</Button>
-            <Button variant="default">Habilitar</Button>
+          <div className="flex flex-col sm:flex-row gap-2">
+            <Button variant="outline" className="w-full sm:w-auto min-h-[44px] touch-manipulation">Silenciar</Button>
+            <Button variant="default" className="w-full sm:w-auto min-h-[44px] touch-manipulation">Habilitar</Button>
           </div>
         </Card>
       </div>

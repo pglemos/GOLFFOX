@@ -236,29 +236,51 @@ export default function CustosAdminPage() {
 
   return (
     <AppShell user={{ id: user.id, name: user.name || "Admin", email: user.email, role: user.role || "admin" }}>
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6 w-full overflow-x-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between flex-wrap gap-4">
-          <div>
-            <h1 className="text-3xl font-bold mb-2">Custos</h1>
-            <p className="text-gray-600">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
+          <div className="min-w-0 flex-1">
+            <h1 className="text-2xl sm:text-3xl font-bold mb-2 break-words">Custos</h1>
+            <p className="text-sm sm:text-base text-gray-600 break-words">
               Gestão completa de custos - Visão Administrativa
             </p>
           </div>
-          <div className="flex gap-2 flex-wrap">
-            <Button variant="outline" onClick={() => setIsImportModalOpen(true)} disabled={!selectedCompanyId}>
+          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+            <Button 
+              variant="outline" 
+              onClick={() => setIsImportModalOpen(true)} 
+              disabled={!selectedCompanyId}
+              className="w-full sm:w-auto min-h-[44px] touch-manipulation"
+            >
               <Upload className="h-4 w-4 mr-2" />
-              Importar CSV
+              <span className="hidden sm:inline">Importar CSV</span>
+              <span className="sm:hidden">Importar</span>
             </Button>
-            <Button variant="outline" onClick={() => handleExport('csv')} disabled={!selectedCompanyId}>
+            <Button 
+              variant="outline" 
+              onClick={() => handleExport('csv')} 
+              disabled={!selectedCompanyId}
+              className="w-full sm:w-auto min-h-[44px] touch-manipulation"
+            >
               <Download className="h-4 w-4 mr-2" />
-              Exportar CSV
+              <span className="hidden sm:inline">Exportar CSV</span>
+              <span className="sm:hidden">CSV</span>
             </Button>
-            <Button variant="outline" onClick={() => handleExport('excel')} disabled={!selectedCompanyId}>
+            <Button 
+              variant="outline" 
+              onClick={() => handleExport('excel')} 
+              disabled={!selectedCompanyId}
+              className="w-full sm:w-auto min-h-[44px] touch-manipulation"
+            >
               <Download className="h-4 w-4 mr-2" />
-              Exportar Excel
+              <span className="hidden sm:inline">Exportar Excel</span>
+              <span className="sm:hidden">Excel</span>
             </Button>
-            <Button onClick={() => setIsManualFormOpen(true)} disabled={!selectedCompanyId}>
+            <Button 
+              onClick={() => setIsManualFormOpen(true)} 
+              disabled={!selectedCompanyId}
+              className="w-full sm:w-auto min-h-[44px] touch-manipulation"
+            >
               <Plus className="h-4 w-4 mr-2" />
               Adicionar Custo
             </Button>
@@ -267,13 +289,13 @@ export default function CustosAdminPage() {
 
         {/* Seletor de Empresa */}
         {companies.length > 0 && (
-          <Card className="p-4">
-            <div className="flex items-center gap-4">
-              <Building2 className="h-5 w-5 text-gray-600" />
-              <div className="flex-1">
-                <label className="text-sm font-medium text-gray-700">Empresa</label>
+          <Card className="p-3 sm:p-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
+              <Building2 className="h-5 w-5 text-gray-600 flex-shrink-0" />
+              <div className="flex-1 w-full min-w-0">
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Empresa</label>
                 <select
-                  className="w-full mt-1 px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm"
+                  className="w-full px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm min-h-[44px]"
                   value={selectedCompanyId || ''}
                   onChange={(e) => setSelectedCompanyId(e.target.value)}
                 >
@@ -309,20 +331,23 @@ export default function CustosAdminPage() {
 
             {/* Tabs */}
             <Tabs defaultValue="overview" className="w-full">
-              <TabsList className="grid w-full grid-cols-6">
-                <TabsTrigger value="overview">Visão Geral</TabsTrigger>
-                <TabsTrigger 
-                  value="detail"
-                  onMouseEnter={() => { if (selectedCompanyId) loadCosts(true) }}
-                  onFocus={() => { if (selectedCompanyId) loadCosts(true) }}
-                >
-                  Detalhamento
-                </TabsTrigger>
-                <TabsTrigger value="reconciliation">Conciliação</TabsTrigger>
-                <TabsTrigger value="cost-centers">Centros de Custo</TabsTrigger>
-                <TabsTrigger value="budget">Orçamento</TabsTrigger>
-                <TabsTrigger value="audit">Auditoria</TabsTrigger>
-              </TabsList>
+              <div className="overflow-x-auto -webkit-overflow-scrolling-touch">
+                <TabsList className="grid w-full grid-cols-3 sm:grid-cols-6 min-w-[600px] sm:min-w-0">
+                  <TabsTrigger value="overview" className="text-xs sm:text-sm min-h-[44px] touch-manipulation">Visão Geral</TabsTrigger>
+                  <TabsTrigger 
+                    value="detail"
+                    onMouseEnter={() => { if (selectedCompanyId) loadCosts(true) }}
+                    onFocus={() => { if (selectedCompanyId) loadCosts(true) }}
+                    className="text-xs sm:text-sm min-h-[44px] touch-manipulation"
+                  >
+                    Detalhamento
+                  </TabsTrigger>
+                  <TabsTrigger value="reconciliation" className="text-xs sm:text-sm min-h-[44px] touch-manipulation">Conciliação</TabsTrigger>
+                  <TabsTrigger value="cost-centers" className="text-xs sm:text-sm min-h-[44px] touch-manipulation">Centros de Custo</TabsTrigger>
+                  <TabsTrigger value="budget" className="text-xs sm:text-sm min-h-[44px] touch-manipulation">Orçamento</TabsTrigger>
+                  <TabsTrigger value="audit" className="text-xs sm:text-sm min-h-[44px] touch-manipulation">Auditoria</TabsTrigger>
+                </TabsList>
+              </div>
 
               {/* Visão Geral */}
               <TabsContent value="overview" className="mt-6">
