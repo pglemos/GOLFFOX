@@ -210,65 +210,69 @@ export default function CarrierMotoristasPage() {
 
   return (
     <AppShell user={{ id: user?.id || "", name: user?.name || "Transportadora", email: user?.email || "", role: "carrier" }}>
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold mb-2">Motoristas</h1>
-            <p className="text-[var(--ink-muted)]">Gerencie os motoristas da transportadora</p>
+      <div className="space-y-4 sm:space-y-6 w-full overflow-x-hidden">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
+          <div className="min-w-0 flex-1">
+            <h1 className="text-2xl sm:text-3xl font-bold mb-2 break-words">Motoristas</h1>
+            <p className="text-sm sm:text-base text-[var(--ink-muted)] break-words">Gerencie os motoristas da transportadora</p>
           </div>
         </div>
 
         <Tabs defaultValue="list" value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="list">Lista</TabsTrigger>
-            <TabsTrigger value="documents">Documentos</TabsTrigger>
-            <TabsTrigger value="exams">Exames</TabsTrigger>
-            <TabsTrigger value="alerts">
-              Alertas
-              {alerts.length > 0 && (
-                <Badge variant="destructive" className="ml-2">
-                  {alerts.filter((a: any) => a.alert_level === 'critical' || a.alert_level === 'expired').length}
-                </Badge>
-              )}
-            </TabsTrigger>
-          </TabsList>
+          <div className="overflow-x-auto -webkit-overflow-scrolling-touch">
+            <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 min-w-[400px] sm:min-w-0">
+              <TabsTrigger value="list" className="text-xs sm:text-sm min-h-[44px] touch-manipulation">Lista</TabsTrigger>
+              <TabsTrigger value="documents" className="text-xs sm:text-sm min-h-[44px] touch-manipulation">Documentos</TabsTrigger>
+              <TabsTrigger value="exams" className="text-xs sm:text-sm min-h-[44px] touch-manipulation">Exames</TabsTrigger>
+              <TabsTrigger value="alerts" className="text-xs sm:text-sm min-h-[44px] touch-manipulation">
+                Alertas
+                {alerts.length > 0 && (
+                  <Badge variant="destructive" className="ml-2 text-xs whitespace-nowrap">
+                    {alerts.filter((a: any) => a.alert_level === 'critical' || a.alert_level === 'expired').length}
+                  </Badge>
+                )}
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
           <TabsContent value="list" className="space-y-6">
             {/* Filtros e Busca */}
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <div className="relative flex-1">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <Card className="overflow-hidden">
+              <CardContent className="pt-4 sm:pt-6 p-3 sm:p-6">
+                <div className="flex flex-col gap-3 sm:gap-4">
+                  <div className="relative w-full">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4 pointer-events-none" />
                     <Input
                       placeholder="Buscar motoristas por nome, email..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-10"
+                      className="pl-10 w-full min-h-[44px]"
                     />
                   </div>
-                  <Select value={statusFilter} onValueChange={setStatusFilter}>
-                    <SelectTrigger className="w-full sm:w-48">
-                      <Filter className="h-4 w-4 mr-2" />
-                      <SelectValue placeholder="Status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Todos</SelectItem>
-                      <SelectItem value="active">Ativos</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Select value={ratingFilter} onValueChange={setRatingFilter}>
-                    <SelectTrigger className="w-full sm:w-48">
-                      <Star className="h-4 w-4 mr-2" />
-                      <SelectValue placeholder="Avaliação" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Todas</SelectItem>
-                      <SelectItem value="high">Alta (≥4.0)</SelectItem>
-                      <SelectItem value="medium">Média (3.0-4.0)</SelectItem>
-                      <SelectItem value="low">Baixa (&lt;3.0)</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+                    <Select value={statusFilter} onValueChange={setStatusFilter}>
+                      <SelectTrigger className="w-full sm:w-48 min-h-[44px] touch-manipulation">
+                        <Filter className="h-4 w-4 mr-2" />
+                        <SelectValue placeholder="Status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Todos</SelectItem>
+                        <SelectItem value="active">Ativos</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Select value={ratingFilter} onValueChange={setRatingFilter}>
+                      <SelectTrigger className="w-full sm:w-48 min-h-[44px] touch-manipulation">
+                        <Star className="h-4 w-4 mr-2" />
+                        <SelectValue placeholder="Avaliação" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Todas</SelectItem>
+                        <SelectItem value="high">Alta (≥4.0)</SelectItem>
+                        <SelectItem value="medium">Média (3.0-4.0)</SelectItem>
+                        <SelectItem value="low">Baixa (&lt;3.0)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -376,7 +380,7 @@ export default function CarrierMotoristasPage() {
                             </div>
                           </div>
                         </div>
-                        <div className="flex flex-col gap-2">
+                        <div className="flex flex-col gap-2 w-full sm:w-auto">
                           <Button 
                             variant="outline" 
                             size="sm"
@@ -385,11 +389,12 @@ export default function CarrierMotoristasPage() {
                               loadDriverDocuments(motorista.id)
                               setActiveTab('documents')
                             }}
+                            className="min-h-[44px] touch-manipulation text-xs sm:text-sm"
                           >
                             <FileText className="h-4 w-4 mr-2" />
                             Documentos
                           </Button>
-                          <Button variant="outline" size="sm">
+                          <Button variant="outline" size="sm" className="min-h-[44px] touch-manipulation text-xs sm:text-sm">
                             <Award className="h-4 w-4 mr-2" />
                             Detalhes
                           </Button>
@@ -411,29 +416,30 @@ export default function CarrierMotoristasPage() {
             </div>
           </TabsContent>
 
-          <TabsContent value="documents" className="space-y-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold">Documentos dos Motoristas</h2>
+          <TabsContent value="documents" className="space-y-4 sm:space-y-6 mt-3 sm:mt-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
+              <h2 className="text-xl sm:text-2xl font-bold break-words">Documentos dos Motoristas</h2>
               {selectedDriver && (
                 <Button onClick={() => {
                   setIsUploadModalOpen(true)
                   setUploadType('document')
-                }}>
+                }} className="w-full sm:w-auto min-h-[44px] touch-manipulation">
                   <Upload className="h-4 w-4 mr-2" />
-                  Upload Documento
+                  <span className="hidden sm:inline">Upload Documento</span>
+                  <span className="sm:hidden">Upload</span>
                 </Button>
               )}
             </div>
 
             {selectedDriver ? (
               <div className="space-y-4">
-                <div className="flex items-center gap-4 mb-4">
-                  <Label>Motorista:</Label>
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 mb-4">
+                  <Label className="text-sm sm:text-base">Motorista:</Label>
                   <Select value={selectedDriver} onValueChange={(value) => {
                     setSelectedDriver(value)
                     loadDriverDocuments(value)
                   }}>
-                    <SelectTrigger className="w-64">
+                    <SelectTrigger className="w-full sm:w-64 min-h-[44px] touch-manipulation">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -457,7 +463,7 @@ export default function CarrierMotoristasPage() {
                       <Button onClick={() => {
                         setIsUploadModalOpen(true)
                         setUploadType('document')
-                      }}>
+                      }} className="min-h-[44px] touch-manipulation">
                         <Upload className="h-4 w-4 mr-2" />
                         Fazer Upload
                       </Button>
@@ -519,29 +525,30 @@ export default function CarrierMotoristasPage() {
             )}
           </TabsContent>
 
-          <TabsContent value="exams" className="space-y-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold">Exames Médicos</h2>
+          <TabsContent value="exams" className="space-y-4 sm:space-y-6 mt-3 sm:mt-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
+              <h2 className="text-xl sm:text-2xl font-bold break-words">Exames Médicos</h2>
               {selectedDriver && (
                 <Button onClick={() => {
                   setIsUploadModalOpen(true)
                   setUploadType('exam')
-                }}>
+                }} className="w-full sm:w-auto min-h-[44px] touch-manipulation">
                   <Upload className="h-4 w-4 mr-2" />
-                  Adicionar Exame
+                  <span className="hidden sm:inline">Adicionar Exame</span>
+                  <span className="sm:hidden">Adicionar</span>
                 </Button>
               )}
             </div>
 
             {selectedDriver ? (
               <div className="space-y-4">
-                <div className="flex items-center gap-4 mb-4">
-                  <Label>Motorista:</Label>
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 mb-4">
+                  <Label className="text-sm sm:text-base">Motorista:</Label>
                   <Select value={selectedDriver} onValueChange={(value) => {
                     setSelectedDriver(value)
                     loadDriverExams(value)
                   }}>
-                    <SelectTrigger className="w-64">
+                    <SelectTrigger className="w-full sm:w-64 min-h-[44px] touch-manipulation">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>

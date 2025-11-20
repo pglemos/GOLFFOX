@@ -274,54 +274,56 @@ export default function AlertasPage() {
             <h1 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2 break-words">Alertas</h1>
             <p className="text-sm sm:text-base text-[var(--ink-muted)] break-words">Monitoramento e gestão de alertas do sistema</p>
           </div>
-          <Button variant="outline" onClick={handleExport} className="w-full sm:w-auto flex-shrink-0">
+          <Button variant="outline" onClick={handleExport} className="w-full sm:w-auto flex-shrink-0 min-h-[44px] touch-manipulation">
             <Download className="h-4 w-4 mr-2" />
             Exportar
           </Button>
         </div>
 
         {/* Filtros */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Filter className="h-5 w-5 text-[var(--brand)]" />
-                <CardTitle className="text-lg">Filtros</CardTitle>
+        <Card className="overflow-hidden">
+          <CardHeader className="p-3 sm:p-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
+              <div className="flex items-center gap-2 min-w-0">
+                <Filter className="h-4 w-4 sm:h-5 sm:w-5 text-[var(--brand)] flex-shrink-0" />
+                <CardTitle className="text-base sm:text-lg font-semibold break-words">Filtros</CardTitle>
               </div>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setFiltersExpanded(!filtersExpanded)}
-                className="gap-2"
+                className="gap-2 w-full sm:w-auto min-h-[44px] touch-manipulation"
               >
                 {filtersExpanded ? (
                   <>
                     <ChevronUp className="h-4 w-4" />
-                    Minimizar
+                    <span className="hidden sm:inline">Minimizar</span>
+                    <span className="sm:hidden">Fechar</span>
                   </>
                 ) : (
                   <>
                     <ChevronDown className="h-4 w-4" />
-                    Expandir
+                    <span className="hidden sm:inline">Expandir</span>
+                    <span className="sm:hidden">Abrir</span>
                   </>
                 )}
               </Button>
             </div>
           </CardHeader>
           {filtersExpanded && (
-            <CardContent>
-              <div className="flex flex-wrap gap-4 mb-4">
-                <div className="relative flex-1 min-w-[200px]">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--ink-muted)]" />
+            <CardContent className="p-3 sm:p-6 pt-0">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-4">
+                <div className="relative w-full sm:flex-1 min-w-0">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--ink-muted)] pointer-events-none" />
                   <Input 
                     placeholder="Buscar alertas..." 
-                    className="pl-10"
+                    className="pl-10 w-full min-h-[44px]"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />
                 </div>
                 <select 
-                  className="px-3 py-2 rounded-lg border border-[var(--border)] bg-white text-sm"
+                  className="px-3 py-2 rounded-lg border border-[var(--border)] bg-white text-sm w-full sm:w-auto min-h-[44px] touch-manipulation"
                   value={tempFilterSeverity}
                   onChange={(e) => setTempFilterSeverity(e.target.value)}
                 >
@@ -331,7 +333,7 @@ export default function AlertasPage() {
                   <option value="info">Info</option>
                 </select>
                 <select 
-                  className="px-3 py-2 rounded-lg border border-[var(--border)] bg-white text-sm"
+                  className="px-3 py-2 rounded-lg border border-[var(--border)] bg-white text-sm w-full sm:w-auto min-h-[44px] touch-manipulation"
                   value={tempFilterStatus}
                   onChange={(e) => setTempFilterStatus(e.target.value)}
                 >
@@ -341,12 +343,12 @@ export default function AlertasPage() {
                   <option value="resolved">Resolvido</option>
                 </select>
               </div>
-              <div className="flex items-center justify-end gap-2 pt-4 border-t border-[var(--border)]">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2 sm:gap-2 pt-4 border-t border-[var(--border)]">
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={handleResetFilters}
-                  className="gap-2"
+                  className="gap-2 w-full sm:w-auto min-h-[44px] touch-manipulation"
                 >
                   <X className="h-4 w-4" />
                   Limpar
@@ -354,7 +356,7 @@ export default function AlertasPage() {
                 <Button
                   size="sm"
                   onClick={handleSaveFilters}
-                  className="gap-2"
+                  className="gap-2 w-full sm:w-auto min-h-[44px] touch-manipulation"
                 >
                   <Save className="h-4 w-4" />
                   Salvar Filtros
@@ -438,7 +440,7 @@ export default function AlertasPage() {
                           setSelectedAlertForEdit(alerta)
                           setIsEditModalOpen(true)
                         }}
-                        className="text-xs sm:text-sm"
+                        className="text-xs sm:text-sm min-h-[44px] touch-manipulation"
                       >
                         <Edit className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                         <span className="truncate">Editar</span>
@@ -447,7 +449,7 @@ export default function AlertasPage() {
                         variant="destructive"
                         size="sm"
                         onClick={() => handleDeleteAlerta(alerta.id)}
-                        className="text-xs sm:text-sm"
+                        className="text-xs sm:text-sm min-h-[44px] touch-manipulation"
                       >
                         <Trash2 className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                         <span className="truncate">Excluir</span>
@@ -458,7 +460,7 @@ export default function AlertasPage() {
                             size="sm" 
                             variant="outline"
                             onClick={() => handleResolve(alerta.id)}
-                            className="col-span-2 sm:col-span-1 text-xs sm:text-sm"
+                            className="col-span-2 sm:col-span-1 text-xs sm:text-sm min-h-[44px] touch-manipulation"
                           >
                             <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                             <span className="truncate">Resolver</span>
@@ -472,7 +474,7 @@ export default function AlertasPage() {
                                 await handleAssign(alerta.id, session.user.id)
                               }
                             }}
-                            className="col-span-2 sm:col-span-1 text-xs sm:text-sm"
+                            className="col-span-2 sm:col-span-1 text-xs sm:text-sm min-h-[44px] touch-manipulation"
                           >
                             <User className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                             <span className="truncate">Atribuir</span>

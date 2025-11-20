@@ -287,14 +287,40 @@ export function AdminMap({
           streetViewControl: false,
           fullscreenControl: true,
           zoomControl: true,
+          disableDefaultUI: false,
         })
 
         mapInstanceRef.current = map
         
+        // Garantir que o mapa seja renderizado
+        debug('Mapa do Google Maps criado com sucesso', {
+          center: map.getCenter()?.toJSON(),
+          zoom: map.getZoom()
+        }, 'AdminMap')
+        
+        // Forçar resize do mapa após um pequeno delay para garantir renderização
+        setTimeout(() => {
+          if (map && window.google?.maps) {
+            window.google.maps.event.trigger(map, 'resize')
+            debug('Resize do mapa disparado', {}, 'AdminMap')
+          }
+        }, 100)
+        
         // Listener para lazy loading de rotas quando viewport muda (será configurado após loadInitialData)
         
         // Carregar dados iniciais
-        await loadInitialData()
+        debug('Iniciando carregamento de dados iniciais', {}, 'AdminMap')
+        try {
+          await loadInitialData()
+          debug('Dados iniciais carregados com sucesso', {
+            vehicles: vehicles.length,
+            routes: routes.length,
+            alerts: alerts.length
+          }, 'AdminMap')
+        } catch (error: any) {
+          logError('Erro ao carregar dados iniciais', { error }, 'AdminMap')
+          notifyError(error, 'Erro ao carregar dados do mapa')
+        }
         
         // Configurar listener para lazy loading após dados iniciais
         let boundsListenerTimeout: NodeJS.Timeout | null = null
@@ -309,12 +335,20 @@ export function AdminMap({
         
         // Inicializar realtime ou playback baseado no modo
         if (mode === 'live') {
+          debug('Inicializando modo realtime', {}, 'AdminMap')
           initRealtime()
         } else {
+          debug('Inicializando modo playback', {}, 'AdminMap')
           initPlayback()
         }
         
         setLoading(false)
+        debug('Mapa inicializado com sucesso', {
+          vehicles: vehicles.length,
+          routes: routes.length,
+          alerts: alerts.length,
+          mode
+        }, 'AdminMap')
         
         // Cleanup
         return () => {
@@ -1593,7 +1627,7 @@ export function AdminMap({
   }, [filters, mode, router])
 
   return (
-    <div className="relative w-full h-[calc(100vh-200px)]">
+    <div className="relative w-full h-[calc(100vh-200px)] min-h-[600px]">
       {/* Filtros na topbar */}
       <div className="absolute top-4 left-4 right-4 z-20">
         <MapFilters
@@ -1618,7 +1652,24 @@ export function AdminMap({
       </div>
 
       {/* Mapa */}
-      <div id="map-container" ref={mapRef} className="w-full h-full" />
+      {!listMode ? (
+        <div 
+          id="map-container" 
+          ref={mapRef} 
+          className="w-full h-full min-h-[600px] bg-gray-100"
+          style={{ 
+            minHeight: '600px',
+            position: 'relative'
+          }}
+        />
+      ) : (
+        <div className="w-full h-full min-h-[600px] bg-gray-50 flex items-center justify-center">
+          <div className="text-center p-6">
+            <MapIcon className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+            <p className="text-gray-600">Mapa não disponível - Modo Lista Ativo</p>
+          </div>
+        </div>
+      )}
 
       {/* Controles de Playback (quando em modo histórico) */}
       {mode === 'history' && (
@@ -1856,8 +1907,26 @@ export function AdminMap({
       {loading && (
         <div className="absolute inset-0 z-40 flex items-center justify-center bg-white/70 backdrop-blur-sm">
           <div className="text-center">
-            <div className="loader-spinner mx-auto"></div>
+            <div className="w-12 h-12 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin mx-auto"></div>
             <p className="mt-4 text-[var(--ink-muted)]">Carregando mapa...</p>
+            {mapError && (
+              <p className="mt-2 text-sm text-red-600">{mapError}</p>
+            )}
+          </div>
+        </div>
+      )}
+      
+      {/* Mensagem de erro se o mapa não carregou */}
+      {mapError && !loading && !listMode && (
+        <div className="absolute inset-0 z-30 flex items-center justify-center bg-white/90">
+          <div className="text-center p-6">
+            <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold mb-2">Erro ao carregar mapa</h3>
+            <p className="text-[var(--ink-muted)] mb-4">{mapError}</p>
+            <Button onClick={() => window.location.reload()}>
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Recarregar Página
+            </Button>
           </div>
         </div>
       )}

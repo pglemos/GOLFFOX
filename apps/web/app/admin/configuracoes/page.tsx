@@ -20,8 +20,7 @@ import {
   Globe,
   Clock,
   Shield,
-  Download,
-  Upload
+  Download
 } from "lucide-react"
 import { useAuthFast } from "@/hooks/use-auth-fast"
 import { supabase } from "@/lib/supabase"
@@ -33,11 +32,9 @@ export default function AdminConfiguracoesPage() {
   const [saving, setSaving] = useState(false)
   const [showNewPassword, setShowNewPassword] = useState(false)
   
-  // Estados do formulário
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    currentPassword: "",
     newPassword: "",
     confirmPassword: "",
     theme: "auto",
@@ -61,7 +58,6 @@ export default function AdminConfiguracoesPage() {
         name: user.name || "",
         email: user.email || ""
       }))
-      // Carregar foto de perfil se existir
       loadProfileImage()
     }
   }, [user])
@@ -69,11 +65,16 @@ export default function AdminConfiguracoesPage() {
   const loadProfileImage = async () => {
     if (!user?.id) return
     try {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('users')
         .select('avatar_url')
         .eq('id', user.id)
-        .single()
+        .maybeSingle()
+      
+      if (error) {
+        console.error('Erro ao carregar foto:', error)
+        return
+      }
       
       if (data?.avatar_url) {
         setProfileImage(data.avatar_url)
@@ -87,7 +88,6 @@ export default function AdminConfiguracoesPage() {
     const file = e.target.files?.[0]
     if (!file || !user?.id) return
 
-    // Validar tipo e tamanho
     if (!file.type.startsWith('image/')) {
       notifyError('Por favor, selecione uma imagem válida')
       return
@@ -99,42 +99,45 @@ export default function AdminConfiguracoesPage() {
 
     setUploadingImage(true)
     try {
-      // Upload para Supabase Storage
-      const fileExt = file.name.split('.').pop()
-      const fileName = `${user.id}-${Date.now()}.${fileExt}`
-      const filePath = `avatars/${fileName}`
+      // Usar API route para upload seguro
+      const formData = new FormData()
+      formData.append('file', file)
+      formData.append('userId', user.id)
 
-      const { error: uploadError } = await supabase.storage
-        .from('avatars')
-        .upload(filePath, file, { upsert: true })
+      const response = await fetch('/api/user/upload-avatar', {
+        method: 'POST',
+        body: formData
+      })
 
-      if (uploadError) throw uploadError
+      const result = await response.json()
 
-      // Obter URL pública
-      const { data: { publicUrl } } = supabase.storage
-        .from('avatars')
-        .getPublicUrl(filePath)
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || 'Erro ao fazer upload')
+      }
 
-      // Atualizar no banco
-      const { error: updateError } = await supabase
-        .from('users')
-        .update({ avatar_url: publicUrl })
-        .eq('id', user.id)
-
-      if (updateError) throw updateError
-
-      setProfileImage(publicUrl)
+      setProfileImage(result.url)
       notifySuccess('Foto de perfil atualizada com sucesso!')
     } catch (error: any) {
       console.error('Erro ao fazer upload:', error)
-      notifyError('Erro ao fazer upload da imagem')
+      notifyError(error.message || 'Erro ao fazer upload da imagem')
     } finally {
       setUploadingImage(false)
     }
   }
 
   const handleSave = async () => {
-    if (!user) return
+    if (!user) {
+      notifyError('Usuário não encontrado. Por favor, faça login novamente.')
+      return
+    }
+
+    // Verificar sessão antes de salvar
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+    
+    if (sessionError || !session) {
+      notifyError('Sessão expirada. Por favor, faça login novamente.')
+      return
+    }
 
     setSaving(true)
     try {
@@ -145,7 +148,10 @@ export default function AdminConfiguracoesPage() {
           .update({ name: formData.name })
           .eq('id', user.id)
 
-        if (nameError) throw nameError
+        if (nameError) {
+          console.error('Erro ao atualizar nome:', nameError)
+          throw new Error('Erro ao atualizar nome: ' + nameError.message)
+        }
       }
 
       // Atualizar email (se mudou)
@@ -153,7 +159,10 @@ export default function AdminConfiguracoesPage() {
         const { error: emailError } = await supabase.auth.updateUser({
           email: formData.email
         })
-        if (emailError) throw emailError
+        if (emailError) {
+          console.error('Erro ao atualizar email:', emailError)
+          throw new Error('Erro ao atualizar email: ' + emailError.message)
+        }
       }
 
       // Atualizar senha (se fornecida)
@@ -165,16 +174,17 @@ export default function AdminConfiguracoesPage() {
         const { error: passwordError } = await supabase.auth.updateUser({
           password: formData.newPassword
         })
-        if (passwordError) throw passwordError
+        if (passwordError) {
+          console.error('Erro ao atualizar senha:', passwordError)
+          throw new Error('Erro ao atualizar senha: ' + passwordError.message)
+        }
       }
 
-      // Salvar preferências (pode criar uma tabela de user_preferences)
       notifySuccess('Configurações salvas com sucesso!')
       
       // Limpar campos de senha
       setFormData(prev => ({
         ...prev,
-        currentPassword: "",
         newPassword: "",
         confirmPassword: ""
       }))
@@ -206,22 +216,23 @@ export default function AdminConfiguracoesPage() {
 
   return (
     <AppShell user={{ id: user.id, name: user.name || "Admin", email: user.email, role: user.role || "admin" }} panel="admin">
-      <div className="space-y-6 max-w-4xl">
+      <div className="w-full max-w-5xl mx-auto space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-[var(--border)]">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-2">
+            <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-2 mb-2">
               <Settings2 className="h-6 w-6 sm:h-7 sm:w-7 text-[var(--brand)]" />
               Configurações
             </h1>
-            <p className="text-sm sm:text-base text-[var(--ink-muted)] mt-1">
+            <p className="text-sm sm:text-base text-[var(--ink-muted)]">
               Gerencie suas informações pessoais e preferências
             </p>
           </div>
           <Button 
             onClick={handleSave} 
             disabled={saving}
-            className="flex items-center gap-2"
+            className="w-full sm:w-auto flex items-center gap-2"
+            size="lg"
           >
             {saving ? (
               <>
@@ -237,282 +248,287 @@ export default function AdminConfiguracoesPage() {
           </Button>
         </div>
 
-        {/* Foto de Perfil */}
-        <Card className="p-4 sm:p-6">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-            <div className="relative">
-              <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full gradient-brand flex items-center justify-center shadow-lg overflow-hidden">
-                {profileImage ? (
-                  <img 
-                    src={profileImage} 
-                    alt="Foto de perfil" 
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <span className="text-white text-3xl sm:text-4xl font-bold">
-                    {user.name?.charAt(0).toUpperCase() || "A"}
-                  </span>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Coluna Esquerda - Perfil */}
+          <div className="lg:col-span-1 space-y-6">
+            {/* Foto de Perfil */}
+            <Card className="p-6">
+              <div className="flex flex-col items-center text-center">
+                <div className="relative mb-4">
+                  <div className="w-32 h-32 rounded-full gradient-brand flex items-center justify-center shadow-lg overflow-hidden">
+                    {profileImage ? (
+                      <img 
+                        src={profileImage} 
+                        alt="Foto de perfil" 
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <span className="text-white text-5xl font-bold">
+                        {user.name?.charAt(0).toUpperCase() || "A"}
+                      </span>
+                    )}
+                  </div>
+                  <label className="absolute bottom-0 right-0 bg-[var(--brand)] text-white p-3 rounded-full cursor-pointer hover:bg-[var(--brand-dark)] transition-colors shadow-lg">
+                    <Camera className="h-5 w-5" />
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="hidden"
+                      disabled={uploadingImage}
+                    />
+                  </label>
+                </div>
+                <h2 className="text-lg font-semibold mb-1">Foto de Perfil</h2>
+                <p className="text-sm text-[var(--ink-muted)] mb-3">
+                  Formatos: JPG, PNG (máx. 5MB)
+                </p>
+                {uploadingImage && (
+                  <p className="text-sm text-[var(--brand)] font-medium">Fazendo upload...</p>
                 )}
               </div>
-              <label className="absolute bottom-0 right-0 bg-[var(--brand)] text-white p-2 rounded-full cursor-pointer hover:bg-[var(--brand-dark)] transition-colors shadow-lg">
-                <Camera className="h-4 w-4" />
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  className="hidden"
-                  disabled={uploadingImage}
-                />
-              </label>
-            </div>
-            <div className="flex-1">
-              <h2 className="text-lg sm:text-xl font-semibold mb-1">Foto de Perfil</h2>
-              <p className="text-sm text-[var(--ink-muted)] mb-3">
-                Clique no ícone da câmera para alterar sua foto de perfil. Formatos aceitos: JPG, PNG (máx. 5MB)
-              </p>
-              {uploadingImage && (
-                <p className="text-sm text-[var(--brand)]">Fazendo upload...</p>
-              )}
-            </div>
-          </div>
-        </Card>
+            </Card>
 
-        {/* Informações Pessoais */}
-        <Card className="p-4 sm:p-6 space-y-4">
-          <div className="flex items-center gap-2 mb-4">
-            <User className="h-5 w-5 text-[var(--brand)]" />
-            <h2 className="text-lg sm:text-xl font-semibold">Informações Pessoais</h2>
-          </div>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="name">Nome Completo</Label>
-              <Input
-                id="name"
-                value={formData.name}
-                onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                placeholder="Seu nome completo"
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="email">Email (Login)</Label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--ink-muted)]" />
-                <Input
-                  id="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                  placeholder="seu@email.com"
-                  className="pl-10"
-                />
-              </div>
-            </div>
-          </div>
-        </Card>
-
-        {/* Segurança */}
-        <Card className="p-4 sm:p-6 space-y-4">
-          <div className="flex items-center gap-2 mb-4">
-            <Shield className="h-5 w-5 text-[var(--brand)]" />
-            <h2 className="text-lg sm:text-xl font-semibold">Segurança</h2>
-          </div>
-          
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="newPassword">Nova Senha</Label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--ink-muted)]" />
-                <Input
-                  id="newPassword"
-                  type={showNewPassword ? "text" : "password"}
-                  value={formData.newPassword}
-                  onChange={(e) => setFormData(prev => ({ ...prev, newPassword: e.target.value }))}
-                  placeholder="Mínimo 6 caracteres"
-                  className="pl-10 pr-10"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowNewPassword(!showNewPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--ink-muted)] hover:text-[var(--ink-strong)]"
-                >
-                  {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </button>
-              </div>
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirmar Nova Senha</Label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--ink-muted)]" />
-                <Input
-                  id="confirmPassword"
-                  type={showNewPassword ? "text" : "password"}
-                  value={formData.confirmPassword}
-                  onChange={(e) => setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                  placeholder="Digite a senha novamente"
-                  className="pl-10"
-                />
-              </div>
-            </div>
-            
-            <p className="text-xs text-[var(--ink-muted)]">
-              Deixe em branco se não deseja alterar a senha
-            </p>
-          </div>
-        </Card>
-
-        {/* Aparência */}
-        <Card className="p-4 sm:p-6 space-y-4">
-          <div className="flex items-center gap-2 mb-4">
-            <Palette className="h-5 w-5 text-[var(--brand)]" />
-            <h2 className="text-lg sm:text-xl font-semibold">Aparência</h2>
-          </div>
-          
-          <div className="space-y-4">
-            <div>
-              <Label>Tema</Label>
-              <div className="flex gap-2 mt-2">
-                <Button
-                  variant={formData.theme === "light" ? "default" : "outline"}
-                  onClick={() => setFormData(prev => ({ ...prev, theme: "light" }))}
-                  className="flex-1"
-                >
-                  Claro
-                </Button>
-                <Button
-                  variant={formData.theme === "dark" ? "default" : "outline"}
-                  onClick={() => setFormData(prev => ({ ...prev, theme: "dark" }))}
-                  className="flex-1"
-                >
-                  Escuro
-                </Button>
-                <Button
-                  variant={formData.theme === "auto" ? "default" : "outline"}
-                  onClick={() => setFormData(prev => ({ ...prev, theme: "auto" }))}
-                  className="flex-1"
-                >
-                  Automático
+            {/* Exportar Dados */}
+            <Card className="p-6">
+              <div className="text-center">
+                <Download className="h-8 w-8 text-[var(--brand)] mx-auto mb-3" />
+                <h2 className="text-lg font-semibold mb-1">Exportar Dados</h2>
+                <p className="text-sm text-[var(--ink-muted)] mb-4">
+                  Baixe uma cópia dos seus dados pessoais
+                </p>
+                <Button variant="outline" className="w-full">
+                  <Download className="h-4 w-4 mr-2" />
+                  Exportar
                 </Button>
               </div>
-            </div>
-            
-            <div className="flex items-center justify-between pt-2 border-t border-[var(--border)]">
-              <div>
-                <p className="font-medium">Alternância Rápida</p>
-                <p className="text-sm text-[var(--ink-muted)]">Alterne o tema rapidamente</p>
-              </div>
-              <ThemeToggle />
-            </div>
+            </Card>
           </div>
-        </Card>
 
-        {/* Notificações */}
-        <Card className="p-4 sm:p-6 space-y-4">
-          <div className="flex items-center gap-2 mb-4">
-            <Bell className="h-5 w-5 text-[var(--brand)]" />
-            <h2 className="text-lg sm:text-xl font-semibold">Notificações</h2>
-          </div>
-          
-          <div className="space-y-3">
-            {[
-              { key: 'email', label: 'Notificações por Email', desc: 'Receba alertas importantes por email' },
-              { key: 'push', label: 'Notificações Push', desc: 'Receba notificações no navegador' },
-              { key: 'alerts', label: 'Alertas Críticos', desc: 'Alertas urgentes do sistema' },
-              { key: 'reports', label: 'Relatórios Semanais', desc: 'Resumo semanal de atividades' }
-            ].map(({ key, label, desc }) => (
-              <div key={key} className="flex items-center justify-between p-3 rounded-lg border border-[var(--border)]">
-                <div>
-                  <p className="font-medium">{label}</p>
-                  <p className="text-sm text-[var(--ink-muted)]">{desc}</p>
-                </div>
-                <button
-                  onClick={() => setFormData(prev => ({
-                    ...prev,
-                    notifications: {
-                      ...prev.notifications,
-                      [key]: !prev.notifications[key as keyof typeof prev.notifications]
-                    }
-                  }))}
-                  className={`relative w-12 h-6 rounded-full transition-colors ${
-                    formData.notifications[key as keyof typeof formData.notifications]
-                      ? 'bg-[var(--brand)]' 
-                      : 'bg-gray-300'
-                  }`}
-                >
-                  <span
-                    className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${
-                      formData.notifications[key as keyof typeof formData.notifications]
-                        ? 'translate-x-6' 
-                        : 'translate-x-0'
-                    }`}
+          {/* Coluna Direita - Configurações */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Informações Pessoais */}
+            <Card className="p-6">
+              <div className="flex items-center gap-2 mb-6">
+                <User className="h-5 w-5 text-[var(--brand)]" />
+                <h2 className="text-xl font-semibold">Informações Pessoais</h2>
+              </div>
+              
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="name">Nome Completo</Label>
+                  <Input
+                    id="name"
+                    value={formData.name}
+                    onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                    placeholder="Seu nome completo"
+                    className="w-full"
                   />
-                </button>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email (Login)</Label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--ink-muted)]" />
+                    <Input
+                      id="email"
+                      type="email"
+                      value={formData.email}
+                      onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                      placeholder="seu@email.com"
+                      className="pl-10 w-full"
+                    />
+                  </div>
+                </div>
               </div>
-            ))}
-          </div>
-        </Card>
+            </Card>
 
-        {/* Preferências Gerais */}
-        <Card className="p-4 sm:p-6 space-y-4">
-          <div className="flex items-center gap-2 mb-4">
-            <Globe className="h-5 w-5 text-[var(--brand)]" />
-            <h2 className="text-lg sm:text-xl font-semibold">Preferências Gerais</h2>
-          </div>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="language">Idioma</Label>
-              <select
-                id="language"
-                value={formData.language}
-                onChange={(e) => setFormData(prev => ({ ...prev, language: e.target.value }))}
-                className="w-full px-3 py-2 border border-[var(--border)] rounded-lg bg-[var(--bg)]"
-              >
-                <option value="pt-BR">Português (Brasil)</option>
-                <option value="en-US">English (US)</option>
-                <option value="es-ES">Español</option>
-              </select>
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="timezone">Fuso Horário</Label>
-              <div className="relative">
-                <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--ink-muted)]" />
-                <select
-                  id="timezone"
-                  value={formData.timezone}
-                  onChange={(e) => setFormData(prev => ({ ...prev, timezone: e.target.value }))}
-                  className="w-full pl-10 pr-3 py-2 border border-[var(--border)] rounded-lg bg-[var(--bg)]"
-                >
-                  <option value="America/Sao_Paulo">Brasília (GMT-3)</option>
-                  <option value="America/Manaus">Manaus (GMT-4)</option>
-                  <option value="America/Rio_Branco">Rio Branco (GMT-5)</option>
-                  <option value="UTC">UTC (GMT+0)</option>
-                </select>
+            {/* Segurança */}
+            <Card className="p-6">
+              <div className="flex items-center gap-2 mb-6">
+                <Shield className="h-5 w-5 text-[var(--brand)]" />
+                <h2 className="text-xl font-semibold">Segurança</h2>
               </div>
-            </div>
-          </div>
-        </Card>
+              
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="newPassword">Nova Senha</Label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--ink-muted)]" />
+                    <Input
+                      id="newPassword"
+                      type={showNewPassword ? "text" : "password"}
+                      value={formData.newPassword}
+                      onChange={(e) => setFormData(prev => ({ ...prev, newPassword: e.target.value }))}
+                      placeholder="Mínimo 6 caracteres"
+                      className="pl-10 pr-10 w-full"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowNewPassword(!showNewPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--ink-muted)] hover:text-[var(--ink-strong)]"
+                    >
+                      {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="confirmPassword">Confirmar Nova Senha</Label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--ink-muted)]" />
+                    <Input
+                      id="confirmPassword"
+                      type={showNewPassword ? "text" : "password"}
+                      value={formData.confirmPassword}
+                      onChange={(e) => setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                      placeholder="Digite a senha novamente"
+                      className="pl-10 w-full"
+                    />
+                  </div>
+                </div>
+                
+                <p className="text-xs text-[var(--ink-muted)]">
+                  Deixe em branco se não deseja alterar a senha
+                </p>
+              </div>
+            </Card>
 
-        {/* Exportar Dados */}
-        <Card className="p-4 sm:p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-lg sm:text-xl font-semibold mb-1">Exportar Dados</h2>
-              <p className="text-sm text-[var(--ink-muted)]">
-                Baixe uma cópia dos seus dados pessoais
-              </p>
-            </div>
-            <Button variant="outline" className="flex items-center gap-2">
-              <Download className="h-4 w-4" />
-              Exportar
-            </Button>
+            {/* Aparência */}
+            <Card className="p-6">
+              <div className="flex items-center gap-2 mb-6">
+                <Palette className="h-5 w-5 text-[var(--brand)]" />
+                <h2 className="text-xl font-semibold">Aparência</h2>
+              </div>
+              
+              <div className="space-y-4">
+                <div>
+                  <Label className="mb-3 block">Tema</Label>
+                  <div className="flex gap-2">
+                    <Button
+                      variant={formData.theme === "light" ? "default" : "outline"}
+                      onClick={() => setFormData(prev => ({ ...prev, theme: "light" }))}
+                      className="flex-1"
+                    >
+                      Claro
+                    </Button>
+                    <Button
+                      variant={formData.theme === "dark" ? "default" : "outline"}
+                      onClick={() => setFormData(prev => ({ ...prev, theme: "dark" }))}
+                      className="flex-1"
+                    >
+                      Escuro
+                    </Button>
+                    <Button
+                      variant={formData.theme === "auto" ? "default" : "outline"}
+                      onClick={() => setFormData(prev => ({ ...prev, theme: "auto" }))}
+                      className="flex-1"
+                    >
+                      Automático
+                    </Button>
+                  </div>
+                </div>
+                
+                <div className="flex items-center justify-between pt-4 border-t border-[var(--border)]">
+                  <div>
+                    <p className="font-medium">Alternância Rápida</p>
+                    <p className="text-sm text-[var(--ink-muted)]">Alterne o tema rapidamente</p>
+                  </div>
+                  <ThemeToggle />
+                </div>
+              </div>
+            </Card>
+
+            {/* Notificações */}
+            <Card className="p-6">
+              <div className="flex items-center gap-2 mb-6">
+                <Bell className="h-5 w-5 text-[var(--brand)]" />
+                <h2 className="text-xl font-semibold">Notificações</h2>
+              </div>
+              
+              <div className="space-y-3">
+                {[
+                  { key: 'email', label: 'Notificações por Email', desc: 'Receba alertas importantes por email' },
+                  { key: 'push', label: 'Notificações Push', desc: 'Receba notificações no navegador' },
+                  { key: 'alerts', label: 'Alertas Críticos', desc: 'Alertas urgentes do sistema' },
+                  { key: 'reports', label: 'Relatórios Semanais', desc: 'Resumo semanal de atividades' }
+                ].map(({ key, label, desc }) => (
+                  <div key={key} className="flex items-center justify-between p-4 rounded-lg border border-[var(--border)] hover:bg-[var(--bg-soft)] transition-colors">
+                    <div className="flex-1">
+                      <p className="font-medium mb-1">{label}</p>
+                      <p className="text-sm text-[var(--ink-muted)]">{desc}</p>
+                    </div>
+                    <button
+                      onClick={() => setFormData(prev => ({
+                        ...prev,
+                        notifications: {
+                          ...prev.notifications,
+                          [key]: !prev.notifications[key as keyof typeof prev.notifications]
+                        }
+                      }))}
+                      className={`relative w-12 h-6 rounded-full transition-colors ml-4 ${
+                        formData.notifications[key as keyof typeof formData.notifications]
+                          ? 'bg-[var(--brand)]' 
+                          : 'bg-gray-300'
+                      }`}
+                    >
+                      <span
+                        className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform shadow-sm ${
+                          formData.notifications[key as keyof typeof formData.notifications]
+                            ? 'translate-x-6' 
+                            : 'translate-x-0'
+                        }`}
+                      />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </Card>
+
+            {/* Preferências Gerais */}
+            <Card className="p-6">
+              <div className="flex items-center gap-2 mb-6">
+                <Globe className="h-5 w-5 text-[var(--brand)]" />
+                <h2 className="text-xl font-semibold">Preferências Gerais</h2>
+              </div>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="language">Idioma</Label>
+                  <select
+                    id="language"
+                    value={formData.language}
+                    onChange={(e) => setFormData(prev => ({ ...prev, language: e.target.value }))}
+                    className="w-full px-3 py-2 border border-[var(--border)] rounded-lg bg-[var(--bg)] focus:outline-none focus:ring-2 focus:ring-[var(--brand)] focus:ring-opacity-20"
+                  >
+                    <option value="pt-BR">Português (Brasil)</option>
+                    <option value="en-US">English (US)</option>
+                    <option value="es-ES">Español</option>
+                  </select>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="timezone">Fuso Horário</Label>
+                  <div className="relative">
+                    <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--ink-muted)]" />
+                    <select
+                      id="timezone"
+                      value={formData.timezone}
+                      onChange={(e) => setFormData(prev => ({ ...prev, timezone: e.target.value }))}
+                      className="w-full pl-10 pr-3 py-2 border border-[var(--border)] rounded-lg bg-[var(--bg)] focus:outline-none focus:ring-2 focus:ring-[var(--brand)] focus:ring-opacity-20"
+                    >
+                      <option value="America/Sao_Paulo">Brasília (GMT-3)</option>
+                      <option value="America/Manaus">Manaus (GMT-4)</option>
+                      <option value="America/Rio_Branco">Rio Branco (GMT-5)</option>
+                      <option value="UTC">UTC (GMT+0)</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </Card>
           </div>
-        </Card>
+        </div>
       </div>
     </AppShell>
   )
 }
-

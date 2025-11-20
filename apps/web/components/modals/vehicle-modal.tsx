@@ -496,7 +496,7 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
                     onChange={handleFileChange}
                     className="hidden"
                   />
-                  <Button type="button" variant="outline" size="sm" asChild>
+                  <Button type="button" variant="outline" size="sm" asChild className="min-h-[44px] touch-manipulation">
                     <span>
                       <Upload className="h-4 w-4 mr-2" />
                       {photoPreview ? "Trocar Foto" : "Upload Foto"}

@@ -232,15 +232,15 @@ function FuncionariosPageContent() {
               {totalCount > 0 && ` • ${totalCount} funcionário${totalCount !== 1 ? 's' : ''}`}
             </p>
           </div>
-          <div className="flex flex-wrap gap-2 w-full sm:w-auto">
-            <Button onClick={() => router.push('/operator')} variant="outline" className="flex-1 sm:flex-initial text-xs sm:text-sm">
+          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+            <Button onClick={() => router.push('/operator')} variant="outline" className="w-full sm:w-auto min-h-[44px] touch-manipulation text-xs sm:text-sm">
               Voltar
             </Button>
-            <Button variant="outline" onClick={() => setIsCsvModalOpen(true)} className="flex-1 sm:flex-initial text-xs sm:text-sm">
+            <Button variant="outline" onClick={() => setIsCsvModalOpen(true)} className="w-full sm:w-auto min-h-[44px] touch-manipulation text-xs sm:text-sm">
               <span className="hidden sm:inline">Importar CSV</span>
               <span className="sm:hidden">CSV</span>
             </Button>
-            <Button variant="default" onClick={handleNew} className="flex-1 sm:flex-initial text-xs sm:text-sm">
+            <Button variant="default" onClick={handleNew} className="w-full sm:w-auto min-h-[44px] touch-manipulation text-xs sm:text-sm">
               <Plus className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
               <span className="hidden sm:inline">Novo Funcionário</span>
               <span className="sm:hidden">Novo</span>
@@ -324,18 +324,18 @@ function FuncionariosPageContent() {
                     </div>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm" className="self-start sm:self-auto">
+                        <Button variant="ghost" size="sm" className="self-start sm:self-auto min-h-[44px] min-w-[44px] touch-manipulation">
                           <MoreVertical className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => handleEdit(funcionario)}>
+                      <DropdownMenuContent align="end" className="min-w-[160px]">
+                        <DropdownMenuItem onClick={() => handleEdit(funcionario)} className="min-h-[44px] touch-manipulation">
                           <Edit className="h-4 w-4 mr-2" />
                           Editar
                         </DropdownMenuItem>
                         <DropdownMenuItem 
                           onClick={() => handleDelete(funcionario)}
-                          className="text-red-600"
+                          className="text-red-600 min-h-[44px] touch-manipulation"
                         >
                           <Trash2 className="h-4 w-4 mr-2" />
                           Desativar
@@ -367,7 +367,7 @@ function FuncionariosPageContent() {
                     : "Nenhum funcionário cadastrado para esta empresa"}
                 </p>
                 {!debouncedSearch && (
-                  <Button onClick={() => setIsCsvModalOpen(true)}>
+                  <Button onClick={() => setIsCsvModalOpen(true)} className="min-h-[44px] touch-manipulation">
                     <Plus className="h-4 w-4 mr-2" />
                     Importar Funcionários
                   </Button>

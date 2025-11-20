@@ -177,7 +177,7 @@ export default function EmpresasPage() {
           </div>
           <Button 
             onClick={() => setIsCreateOperatorModalOpen(true)}
-            className="w-full sm:w-auto flex-shrink-0 min-h-[44px] h-auto text-sm sm:text-base px-4 sm:px-6 py-2.5 sm:py-2.5 whitespace-nowrap"
+            className="w-full sm:w-auto flex-shrink-0 min-h-[44px] h-auto text-sm sm:text-base px-4 sm:px-6 py-2.5 sm:py-2.5 whitespace-nowrap touch-manipulation"
           >
             <Plus className="h-4 w-4 mr-2 flex-shrink-0" />
             <span className="hidden sm:inline">Criar Empresa</span>
@@ -265,7 +265,7 @@ export default function EmpresasPage() {
                         setSelectedCompanyForEdit(empresa)
                         setIsEditModalOpen(true)
                       }}
-                      className="w-full min-h-[36px] h-auto text-xs px-2 py-1.5 flex items-center justify-center gap-1.5"
+                      className="w-full min-h-[44px] h-auto text-xs px-2 py-1.5 flex items-center justify-center gap-1.5 touch-manipulation"
                       title="Editar empresa"
                     >
                       <Edit className="h-3.5 w-3.5 flex-shrink-0" />
@@ -279,7 +279,7 @@ export default function EmpresasPage() {
                         setSelectedCompanyForOperators({ id: empresa.id, name: empresa.name })
                         setIsOperatorsModalOpen(true)
                       }}
-                      className="w-full min-h-[36px] h-auto text-xs px-2 py-1.5 flex items-center justify-center gap-1.5"
+                      className="w-full min-h-[44px] h-auto text-xs px-2 py-1.5 flex items-center justify-center gap-1.5 touch-manipulation"
                       title="Gerenciar operadores"
                     >
                       <UserPlus className="h-3.5 w-3.5 flex-shrink-0" />
@@ -292,7 +292,7 @@ export default function EmpresasPage() {
                         e.stopPropagation()
                         loadFuncionarios(empresa.id)
                       }}
-                      className="w-full min-h-[36px] h-auto text-xs px-2 py-1.5 flex items-center justify-center gap-1.5"
+                      className="w-full min-h-[44px] h-auto text-xs px-2 py-1.5 flex items-center justify-center gap-1.5 touch-manipulation"
                       title="Ver funcionários"
                     >
                       <Users className="h-3.5 w-3.5 flex-shrink-0" />
@@ -305,7 +305,7 @@ export default function EmpresasPage() {
                         e.stopPropagation()
                         handleDeleteEmpresa(empresa.id, empresa.name)
                       }}
-                      className="w-full col-span-2 min-h-[36px] h-auto text-xs px-2 py-1.5 flex items-center justify-center gap-1.5"
+                      className="w-full col-span-2 min-h-[44px] h-auto text-xs px-2 py-1.5 flex items-center justify-center gap-1.5 touch-manipulation"
                       title="Excluir empresa"
                     >
                       <Trash2 className="h-3.5 w-3.5 flex-shrink-0" />

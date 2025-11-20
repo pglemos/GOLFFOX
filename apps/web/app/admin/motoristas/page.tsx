@@ -215,7 +215,7 @@ export default function MotoristasPage() {
               setSelectedDriver(null)
               setIsModalOpen(true)
             }}
-            className="w-full sm:w-auto flex-shrink-0"
+            className="w-full sm:w-auto flex-shrink-0 min-h-[44px] touch-manipulation"
           >
             <Plus className="h-4 w-4 mr-2" />
             <span className="hidden sm:inline">Cadastrar Motorista</span>
@@ -266,7 +266,7 @@ export default function MotoristasPage() {
                         setSelectedDriver(motorista)
                         setIsModalOpen(true)
                       }}
-                      className="text-xs sm:text-sm"
+                      className="text-xs sm:text-sm min-h-[44px] touch-manipulation"
                     >
                       <Edit className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                       <span className="truncate">Editar</span>
@@ -275,7 +275,7 @@ export default function MotoristasPage() {
                       variant="outline" 
                       size="sm"
                       onClick={() => handleViewDriver(motorista)}
-                      className="text-xs sm:text-sm"
+                      className="text-xs sm:text-sm min-h-[44px] touch-manipulation"
                     >
                       <span className="truncate hidden sm:inline">Ver Detalhes</span>
                       <span className="truncate sm:hidden">Detalhes</span>
@@ -284,7 +284,7 @@ export default function MotoristasPage() {
                       variant="destructive" 
                       size="sm"
                       onClick={() => handleDeleteMotorista(motorista.id, motorista.name || motorista.email || 'Motorista')}
-                      className="col-span-2 sm:col-span-1 text-xs sm:text-sm"
+                      className="col-span-2 sm:col-span-1 text-xs sm:text-sm min-h-[44px] touch-manipulation"
                     >
                       <Trash2 className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                       <span className="truncate">Excluir</span>
@@ -311,7 +311,7 @@ export default function MotoristasPage() {
                 <Button onClick={() => {
                   setSelectedDriver(null)
                   setIsModalOpen(true)
-                }}>
+                }} className="min-h-[44px] touch-manipulation">
                   <Plus className="h-4 w-4 mr-2" />
                   Cadastrar Motorista
                 </Button>
@@ -339,28 +339,30 @@ export default function MotoristasPage() {
             setDocuments([])
             setRanking(null)
           }}>
-            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle className="flex items-center gap-2">
-                  <Users className="h-5 w-5" />
-                  {selectedDriver.name} - {selectedDriver.email}
+            <DialogContent className="max-w-[95vw] sm:max-w-4xl max-h-[90vh] overflow-y-auto p-3 sm:p-6">
+              <DialogHeader className="p-0 sm:p-0 mb-3 sm:mb-6">
+                <DialogTitle className="flex items-center gap-2 text-lg sm:text-xl break-words">
+                  <Users className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
+                  <span className="break-words">{selectedDriver.name} - {selectedDriver.email}</span>
                 </DialogTitle>
               </DialogHeader>
 
               <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                <TabsList className="grid w-full grid-cols-3">
-                  <TabsTrigger value="dados">Dados</TabsTrigger>
-                  <TabsTrigger value="documentos">
-                    Documentos
-                    {documents.some(d => d.status === 'expiring_soon' || d.status === 'expired') && (
-                      <AlertTriangle className="h-3 w-3 ml-1 text-orange-500" />
-                    )}
-                  </TabsTrigger>
-                  <TabsTrigger value="ranking">Ranking</TabsTrigger>
-                </TabsList>
+                <div className="overflow-x-auto -webkit-overflow-scrolling-touch">
+                  <TabsList className="grid w-full grid-cols-3 min-w-[240px]">
+                    <TabsTrigger value="dados" className="text-xs sm:text-sm min-h-[44px] touch-manipulation">Dados</TabsTrigger>
+                    <TabsTrigger value="documentos" className="text-xs sm:text-sm min-h-[44px] touch-manipulation">
+                      Documentos
+                      {documents.some(d => d.status === 'expiring_soon' || d.status === 'expired') && (
+                        <AlertTriangle className="h-3 w-3 ml-1 text-orange-500 flex-shrink-0" />
+                      )}
+                    </TabsTrigger>
+                    <TabsTrigger value="ranking" className="text-xs sm:text-sm min-h-[44px] touch-manipulation">Ranking</TabsTrigger>
+                  </TabsList>
+                </div>
 
-                <TabsContent value="dados" className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
+                <TabsContent value="dados" className="space-y-4 mt-3 sm:mt-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     <div>
                       <Label className="text-sm font-medium">Nome</Label>
                       <p className="text-sm">{selectedDriver.name}</p>

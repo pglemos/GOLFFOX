@@ -41,8 +41,8 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(rootUrl)
   }
 
-  // ✅ Proteger rotas /operator e /admin com autenticação (OTIMIZADO)
-  if (pathname.startsWith('/operator') || pathname.startsWith('/admin')) {
+  // ✅ Proteger rotas /operator, /admin e /carrier com autenticação (OTIMIZADO)
+  if (pathname.startsWith('/operator') || pathname.startsWith('/admin') || pathname.startsWith('/carrier')) {
     // Verificar cookie de sessão customizado (golffox-session) - validação rápida
     const sessionCookie = request.cookies.get('golffox-session')?.value
     
@@ -71,6 +71,10 @@ export async function middleware(request: NextRequest) {
       }
 
       if (pathname.startsWith('/admin') && userData.role !== 'admin') {
+        return NextResponse.redirect(new URL('/unauthorized', request.url))
+      }
+
+      if (pathname.startsWith('/carrier') && !['carrier', 'admin'].includes(userData.role)) {
         return NextResponse.redirect(new URL('/unauthorized', request.url))
       }
 
@@ -136,6 +140,7 @@ export const config = {
     '/admin/:path*',
     '/operator',
     '/operator/:path*',
+    '/carrier/:path*',
     /*
      * Match all request paths except for the ones starting with:
      * - api (API routes)

@@ -76,12 +76,12 @@ export function CreateCarrierModal({ isOpen, onClose, onSave }: CreateCarrierMod
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="w-[95vw] sm:w-[90vw] max-w-3xl max-h-[90vh] overflow-y-auto p-4 sm:p-6 mx-auto">
-        <DialogHeader className="pb-4 sm:pb-6">
-          <DialogTitle className="text-xl sm:text-2xl font-bold">Criar Nova Transportadora</DialogTitle>
+      <DialogContent className="w-[95vw] sm:w-[90vw] max-w-3xl max-h-[90vh] overflow-y-auto p-3 sm:p-6 mx-auto">
+        <DialogHeader className="pb-3 sm:pb-6">
+          <DialogTitle className="text-lg sm:text-2xl font-bold break-words">Criar Nova Transportadora</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+        <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-6">
             <div className="col-span-1 sm:col-span-2">
               <Label htmlFor="name" className="text-base font-medium">Nome da Transportadora *</Label>
               <Input
@@ -90,7 +90,7 @@ export function CreateCarrierModal({ isOpen, onClose, onSave }: CreateCarrierMod
                 onChange={(e) => setName(e.target.value)}
                 required
                 placeholder="Ex: Transportes XYZ Ltda"
-                className="text-base h-11 sm:h-12 px-4 py-3"
+                className="text-base min-h-[44px] h-11 sm:h-12 px-4 py-3 touch-manipulation"
               />
             </div>
             <div>
@@ -101,7 +101,7 @@ export function CreateCarrierModal({ isOpen, onClose, onSave }: CreateCarrierMod
                 onChange={(e) => setCnpj(e.target.value)}
                 placeholder="00.000.000/0000-00"
                 maxLength={18}
-                className="text-base h-11 sm:h-12 px-4 py-3"
+                className="text-base min-h-[44px] h-11 sm:h-12 px-4 py-3 touch-manipulation"
               />
             </div>
             <div>
@@ -111,7 +111,7 @@ export function CreateCarrierModal({ isOpen, onClose, onSave }: CreateCarrierMod
                 value={stateRegistration}
                 onChange={(e) => setStateRegistration(e.target.value)}
                 placeholder="123456789"
-                className="text-base h-11 sm:h-12 px-4 py-3"
+                className="text-base min-h-[44px] h-11 sm:h-12 px-4 py-3 touch-manipulation"
               />
             </div>
             <div>
@@ -121,7 +121,7 @@ export function CreateCarrierModal({ isOpen, onClose, onSave }: CreateCarrierMod
                 value={municipalRegistration}
                 onChange={(e) => setMunicipalRegistration(e.target.value)}
                 placeholder="987654321"
-                className="text-base h-11 sm:h-12 px-4 py-3"
+                className="text-base min-h-[44px] h-11 sm:h-12 px-4 py-3 touch-manipulation"
               />
             </div>
             <div>
@@ -131,7 +131,7 @@ export function CreateCarrierModal({ isOpen, onClose, onSave }: CreateCarrierMod
                 value={contactPerson}
                 onChange={(e) => setContactPerson(e.target.value)}
                 placeholder="Nome do responsável"
-                className="text-base h-11 sm:h-12 px-4 py-3"
+                className="text-base min-h-[44px] h-11 sm:h-12 px-4 py-3 touch-manipulation"
               />
             </div>
             <div>
@@ -141,7 +141,7 @@ export function CreateCarrierModal({ isOpen, onClose, onSave }: CreateCarrierMod
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="(11) 98765-4321"
-                className="text-base h-11 sm:h-12 px-4 py-3"
+                className="text-base min-h-[44px] h-11 sm:h-12 px-4 py-3 touch-manipulation"
               />
             </div>
             <div>
@@ -152,7 +152,7 @@ export function CreateCarrierModal({ isOpen, onClose, onSave }: CreateCarrierMod
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="contato@transportadora.com"
-                className="text-base h-11 sm:h-12 px-4 py-3"
+                className="text-base min-h-[44px] h-11 sm:h-12 px-4 py-3 touch-manipulation"
               />
             </div>
             <div className="col-span-1 sm:col-span-2">
@@ -162,7 +162,7 @@ export function CreateCarrierModal({ isOpen, onClose, onSave }: CreateCarrierMod
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
                 placeholder="Rua, número, bairro, cidade - UF, CEP"
-                className="text-base h-11 sm:h-12 px-4 py-3"
+                className="text-base min-h-[44px] h-11 sm:h-12 px-4 py-3 touch-manipulation"
               />
             </div>
           </div>
@@ -172,14 +172,14 @@ export function CreateCarrierModal({ isOpen, onClose, onSave }: CreateCarrierMod
               variant="outline" 
               onClick={onClose} 
               disabled={loading}
-              className="w-full sm:w-auto order-2 sm:order-1 min-h-[44px] text-base font-medium"
+              className="w-full sm:w-auto order-2 sm:order-1 min-h-[44px] text-base font-medium touch-manipulation"
             >
               Cancelar
             </Button>
             <Button 
               type="submit" 
               disabled={loading || !name}
-              className="w-full sm:w-auto order-1 sm:order-2 bg-orange-500 hover:bg-orange-600 min-h-[44px] text-base font-medium"
+              className="w-full sm:w-auto order-1 sm:order-2 bg-orange-500 hover:bg-orange-600 min-h-[44px] text-base font-medium touch-manipulation"
             >
               {loading ? 'Criando...' : 'Salvar Transportadora'}
             </Button>

@@ -220,8 +220,8 @@ export function DriverModal({ driver, isOpen, onClose, onSave }: DriverModalProp
 
         <Tabs defaultValue="dados" className="w-full">
           <TabsList className="grid w-full grid-cols-2 gap-1 sm:gap-2">
-            <TabsTrigger value="dados" className="text-xs sm:text-sm min-h-[44px]">Dados Pessoais</TabsTrigger>
-            <TabsTrigger value="documentos" className="text-xs sm:text-sm min-h-[44px]">Documentos</TabsTrigger>
+            <TabsTrigger value="dados"                     className="text-xs sm:text-sm min-h-[44px] touch-manipulation">Dados Pessoais</TabsTrigger>
+            <TabsTrigger value="documentos" className="text-xs sm:text-sm min-h-[44px] touch-manipulation">Documentos</TabsTrigger>
           </TabsList>
 
           <TabsContent value="dados">
@@ -234,6 +234,7 @@ export function DriverModal({ driver, isOpen, onClose, onSave }: DriverModalProp
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     required
+                    className="min-h-[44px] touch-manipulation"
                   />
                 </div>
 
@@ -275,14 +276,14 @@ export function DriverModal({ driver, isOpen, onClose, onSave }: DriverModalProp
                   type="button" 
                   variant="outline" 
                   onClick={onClose}
-                  className="w-full sm:w-auto order-2 sm:order-1 min-h-[44px] text-base font-medium"
+                  className="w-full sm:w-auto order-2 sm:order-1 min-h-[44px] text-base font-medium touch-manipulation"
                 >
                   Cancelar
                 </Button>
                 <Button 
                   type="submit" 
                   disabled={loading}
-                  className="w-full sm:w-auto order-1 sm:order-2 bg-orange-500 hover:bg-orange-600 min-h-[44px] text-base font-medium"
+                  className="w-full sm:w-auto order-1 sm:order-2 bg-orange-500 hover:bg-orange-600 min-h-[44px] text-base font-medium touch-manipulation"
                 >
                   {loading ? "Salvando..." : driver ? "Atualizar" : "Cadastrar"}
                 </Button>
@@ -348,7 +349,7 @@ export function DriverModal({ driver, isOpen, onClose, onSave }: DriverModalProp
                             className="hidden"
                             disabled={!driver?.id}
                           />
-                          <Button type="button" variant="outline" size="sm" className="w-full min-h-[44px] text-xs sm:text-sm" disabled={!driver?.id}>
+                          <Button type="button" variant="outline" size="sm" className="w-full min-h-[44px] text-xs sm:text-sm touch-manipulation" disabled={!driver?.id}>
                             <Upload className="h-4 w-4 mr-2 flex-shrink-0" />
                             {driver?.id ? "Enviar" : "Salve o motorista primeiro"}
                           </Button>
