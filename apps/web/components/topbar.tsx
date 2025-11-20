@@ -60,23 +60,17 @@ export function Topbar({
   const getPanelRoutes = () => {
     if (pathname?.startsWith('/operator')) {
       return {
-        preferences: '/operator/preferencias',
-        profile: '/operator/preferencias',
-        settings: '/operator/preferencias'
+        settings: '/operator/configuracoes'
       }
     }
     if (pathname?.startsWith('/carrier')) {
       return {
-        preferences: '/carrier/preferencias',
-        profile: '/carrier/preferencias',
-        settings: '/carrier/preferencias'
+        settings: '/carrier/configuracoes'
       }
     }
     // Admin (padrão)
     return {
-      preferences: '/admin/preferences',
-      profile: '/admin/preferences',
-      settings: '/admin/preferences'
+      settings: '/admin/configuracoes'
     }
   }
 
@@ -263,23 +257,23 @@ export function Topbar({
           {/* Theme Toggle */}
           <ThemeToggle />
 
-          {/* Preferências */}
+          {/* Configurações */}
           <Button
             variant="outline"
             size="sm"
             className="hidden xl:flex items-center gap-2 rounded-full border-[var(--border)] hover:bg-[var(--brand-light)] hover:text-[var(--brand)] hover:border-[var(--brand)] transition-all duration-200"
-            onClick={() => handleNavigate(panelRoutes.preferences)}
+            onClick={() => handleNavigate(panelRoutes.settings)}
           >
             <Settings2 className="h-4 w-4" />
-            Preferências
+            Configurações
           </Button>
           
           <Button
             variant="ghost"
             size="icon"
             className="xl:hidden hover:bg-[var(--bg-hover)] min-w-[44px] min-h-[44px] touch-manipulation"
-            onClick={() => handleNavigate(panelRoutes.preferences)}
-            aria-label="Preferências"
+            onClick={() => handleNavigate(panelRoutes.settings)}
+            aria-label="Configurações"
           >
             <Settings2 className="h-5 w-5" />
           </Button>
@@ -308,13 +302,6 @@ export function Topbar({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56 bg-white border-[var(--border)] shadow-lg">
-              <DropdownMenuItem 
-                className="focus:bg-[var(--bg-hover)] cursor-pointer"
-                onClick={() => handleNavigate(panelRoutes.profile)}
-              >
-                <User className="h-4 w-4 mr-2" />
-                Meu Perfil
-              </DropdownMenuItem>
               <DropdownMenuItem 
                 className="focus:bg-[var(--bg-hover)] cursor-pointer"
                 onClick={() => handleNavigate(panelRoutes.settings)}
