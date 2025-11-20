@@ -23,15 +23,128 @@ export async function validateAuth(request: NextRequest): Promise<AuthenticatedU
     const sessionCookie = request.cookies.get('golffox-session')?.value
     
     if (sessionCookie) {
-      const decoded = Buffer.from(sessionCookie, 'base64').toString('utf-8')
-      const userData = JSON.parse(decoded)
+      try {
+        // Tentar decodificar como base64 primeiro (formato do /api/auth/login)
+        let decoded: string
+        try {
+          decoded = Buffer.from(sessionCookie, 'base64').toString('utf-8')
+        } catch {
+          // Se falhar, tentar como URI encoded (formato do /api/auth/set-session)
+          decoded = decodeURIComponent(sessionCookie)
+        }
+        
+        const userData = JSON.parse(decoded)
+        
+        if (userData?.id && userData?.role) {
+          // Buscar email e companyId do banco se não estiverem no cookie
+          const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+          const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+          
+          if (supabaseUrl && serviceKey && (!userData.email || !userData.companyId)) {
+            try {
+              const supabaseAdmin = createClient(supabaseUrl, serviceKey, {
+                auth: { persistSession: false, autoRefreshToken: false }
+              })
+              
+              const { data: userFromDb } = await supabaseAdmin
+                .from('users')
+                .select('email, company_id')
+                .eq('id', userData.id)
+                .maybeSingle()
+              
+              return {
+                id: userData.id,
+                email: userData.email || userFromDb?.email || '',
+                role: userData.role,
+                companyId: userData.companyId || userFromDb?.company_id || null
+              }
+            } catch (dbError) {
+              // Se falhar ao buscar do banco, usar dados do cookie mesmo
+              console.warn('Erro ao buscar dados do usuário do banco:', dbError)
+            }
+          }
+          
+          return {
+            id: userData.id,
+            email: userData.email || '',
+            role: userData.role,
+            companyId: userData.companyId || null
+          }
+        }
+      } catch (parseError) {
+        console.warn('Erro ao decodificar cookie de sessão:', parseError)
+        // Continuar para tentar outros métodos de autenticação
+      }
+    }
+    
+    // Fallback: tentar validar sessão Supabase diretamente via cookies
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    
+    if (supabaseUrl && supabaseAnonKey) {
+      // Procurar por cookies de sessão do Supabase
+      const supabaseCookies = [
+        ...request.cookies.getAll().map(c => c.name).filter(name => 
+          name.includes('sb-') && name.includes('-auth-token')
+        )
+      ]
       
-      if (userData?.id && userData?.role) {
-        return {
-          id: userData.id,
-          email: userData.email || '',
-          role: userData.role,
-          companyId: userData.companyId || null
+      if (supabaseCookies.length > 0) {
+        try {
+          // Tentar usar o cliente Supabase para validar a sessão
+          const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+            auth: { persistSession: false, autoRefreshToken: false }
+          })
+          
+          // Verificar se há um access token nos cookies
+          const accessTokenCookie = request.cookies.get(`sb-${supabaseUrl.split('//')[1]?.split('.')[0]}-auth-token`)?.value
+          
+          if (accessTokenCookie) {
+            try {
+              const tokenData = JSON.parse(accessTokenCookie)
+              const accessToken = tokenData?.access_token || tokenData?.accessToken
+              
+              if (accessToken) {
+                const { data: { user }, error: userError } = await supabase.auth.getUser(accessToken)
+                
+                if (!userError && user) {
+                  // Buscar role do usuário
+                  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+                  let userData = null
+                  
+                  if (serviceKey) {
+                    const supabaseAdmin = createClient(supabaseUrl, serviceKey, {
+                      auth: { persistSession: false, autoRefreshToken: false }
+                    })
+                    
+                    const { data } = await supabaseAdmin
+                      .from('users')
+                      .select('role, company_id')
+                      .eq('id', user.id)
+                      .maybeSingle()
+                    
+                    userData = data
+                  }
+                  
+                  const role = userData?.role || user.user_metadata?.role || user.app_metadata?.role || 'passenger'
+                  const companyId = userData?.company_id || user.user_metadata?.company_id || user.app_metadata?.company_id || null
+                  
+                  return {
+                    id: user.id,
+                    email: user.email || '',
+                    role,
+                    companyId
+                  }
+                }
+              }
+            } catch (tokenError) {
+              // Ignorar erro e continuar
+              console.warn('Erro ao processar token do Supabase:', tokenError)
+            }
+          }
+        } catch (supabaseError) {
+          // Ignorar erro e continuar para outros métodos
+          console.warn('Erro ao validar sessão Supabase:', supabaseError)
         }
       }
     }
@@ -200,19 +313,35 @@ export async function requireAuth(
   request: NextRequest,
   requiredRole?: string | string[]
 ): Promise<NextResponse | null> {
+  // ✅ NUNCA pular validação em produção - apenas em testes explícitos
   const isTestMode = request.headers.get('x-test-mode') === 'true'
   const isDevelopment = process.env.NODE_ENV === 'development'
-  if (isTestMode || isDevelopment) {
+  const isVercelProduction = process.env.VERCEL === '1' && process.env.VERCEL_ENV === 'production'
+  
+  // Permitir bypass APENAS em desenvolvimento local (não em Vercel)
+  if ((isTestMode || isDevelopment) && !isVercelProduction) {
+    console.log('⚠️ Bypass de autenticação ativo (modo desenvolvimento/teste)')
     return null
   }
+  
   const user = await validateAuth(request)
   
   if (!user) {
+    // Log detalhado para debug em produção
+    const sessionCookie = request.cookies.get('golffox-session')?.value
+    console.error('❌ Autenticação falhou', {
+      hasCookie: !!sessionCookie,
+      cookieLength: sessionCookie?.length || 0,
+      isVercel: process.env.VERCEL === '1',
+      env: process.env.VERCEL_ENV || 'development',
+      path: request.nextUrl.pathname
+    })
+    
     return NextResponse.json(
       { 
         error: 'Não autorizado', 
-        message: 'Autenticação necessária. Faça login antes de acessar este endpoint.',
-        hint: 'Envie um token Bearer no header Authorization (ex: Authorization: Bearer <token>) ou faça login via POST /api/auth/login para obter um token'
+        message: 'Usuário não autenticado',
+        details: 'Faça login antes de acessar este endpoint. Se você já fez login, tente fazer logout e login novamente.'
       },
       { status: 401 }
     )

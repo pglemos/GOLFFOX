@@ -152,6 +152,7 @@ export function CreateOperatorModal({
         method: 'POST',
         headers,
         body: JSON.stringify(requestBody),
+        credentials: 'include', // ✅ Garantir que cookies sejam enviados
       })
 
       if (!response.ok) {

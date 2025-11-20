@@ -15,15 +15,20 @@ function getSupabaseAdmin() {
 
 export async function GET(request: NextRequest) {
   try {
-    // Validar autenticação (apenas admin) - mas permitir em desenvolvimento
+    // Validar autenticação (apenas admin)
     const isDevelopment = process.env.NODE_ENV === 'development'
+    const isVercelProduction = process.env.VERCEL === '1' && process.env.VERCEL_ENV === 'production'
+    
+    // ✅ NUNCA pular autenticação em produção (Vercel)
     const authErrorResponse = await requireAuth(request, 'admin')
-    if (authErrorResponse && !isDevelopment) {
+    if (authErrorResponse) {
+      // Em desenvolvimento local, apenas logar aviso (mas retornar erro em produção)
+      if (isDevelopment && !isVercelProduction) {
+        console.warn('⚠️ Autenticação falhou em desenvolvimento, mas continuando...')
+        // Ainda assim retornar erro para forçar correção
+        return authErrorResponse
+      }
       return authErrorResponse
-    }
-    // Em desenvolvimento, apenas logar aviso
-    if (authErrorResponse && isDevelopment) {
-      console.warn('⚠️ Autenticação falhou em desenvolvimento, mas continuando...')
     }
 
     const supabaseAdmin = getSupabaseAdmin()

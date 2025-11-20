@@ -59,13 +59,15 @@ export default function CarrierConfiguracoesPage() {
         name: user.name || "",
         email: user.email || ""
       }))
-      loadProfileImage()
+      loadProfileImage(false)
     }
-  }, [user])
+  }, [user, loadProfileImage])
 
-  const loadProfileImage = async () => {
+  const loadProfileImage = useCallback(async (forceRefresh = false) => {
     if (!user?.id) return
     try {
+      // Adicionar timestamp para evitar cache
+      const timestamp = forceRefresh ? `?t=${Date.now()}` : ''
       const { data, error } = await supabase
         .from('users')
         .select('avatar_url')
@@ -78,12 +80,16 @@ export default function CarrierConfiguracoesPage() {
       }
       
       if (data?.avatar_url) {
-        setProfileImage(data.avatar_url)
+        // Adicionar timestamp para evitar cache do navegador
+        const urlWithCache = `${data.avatar_url}${timestamp || `?t=${Date.now()}`}`
+        setProfileImage(urlWithCache)
+      } else {
+        setProfileImage(null)
       }
     } catch (error) {
       console.error('Erro ao carregar foto de perfil:', error)
     }
-  }
+  }, [user?.id])
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -118,13 +124,14 @@ export default function CarrierConfiguracoesPage() {
       // Atualizar a imagem de perfil com a URL retornada
       const avatarUrl = result.url || result.publicUrl
       if (avatarUrl) {
+        // Atualizar estado imediatamente
         setProfileImage(avatarUrl)
         notifySuccess('Foto de perfil atualizada com sucesso!')
         
-        // Recarregar dados do usuário para garantir que a foto seja atualizada em todo o sistema
-        setTimeout(() => {
-          window.location.reload()
-        }, 1500)
+        // Aguardar um pouco e recarregar a imagem do banco para garantir sincronização
+        setTimeout(async () => {
+          await loadProfileImage(true)
+        }, 500)
       } else {
         throw new Error('URL da foto não foi retornada')
       }

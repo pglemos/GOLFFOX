@@ -75,17 +75,20 @@ export async function POST(req: NextRequest) {
       throw uploadError
     }
 
-    // Obter URL pública
+    // Obter URL pública com timestamp para evitar cache
     const { data: { publicUrl } } = supabase.storage
       .from('avatars')
       .getPublicUrl(filePath)
+
+    // Adicionar timestamp à URL para evitar cache do navegador
+    const publicUrlWithCache = `${publicUrl}?t=${Date.now()}`
 
     // Atualizar no banco de dados usando service role para garantir que funcione
     const { data: updateData, error: updateError } = await supabase
       .from('users')
       .update({ avatar_url: publicUrl })
       .eq('id', userId)
-      .select()
+      .select('id, avatar_url')
 
     if (updateError) {
       console.error('Erro ao atualizar avatar_url no banco:', updateError)
@@ -97,10 +100,24 @@ export async function POST(req: NextRequest) {
       throw new Error('Não foi possível atualizar a foto de perfil no banco de dados')
     }
 
+    // Verificar se o avatar_url foi realmente atualizado
+    const updatedUser = updateData[0]
+    if (updatedUser.avatar_url !== publicUrl) {
+      console.error('Avatar URL não corresponde ao esperado:', {
+        expected: publicUrl,
+        actual: updatedUser.avatar_url
+      })
+      throw new Error('A foto de perfil não foi atualizada corretamente no banco de dados')
+    }
+
+    // Aguardar um pouco para garantir que a atualização foi propagada
+    await new Promise(resolve => setTimeout(resolve, 100))
+
     return NextResponse.json({
       success: true,
-      url: publicUrl,
-      publicUrl: publicUrl, // Garantir que ambos os campos estão presentes
+      url: publicUrlWithCache,
+      publicUrl: publicUrlWithCache,
+      avatar_url: publicUrl, // URL sem cache para salvar no banco
       message: 'Foto de perfil atualizada com sucesso'
     })
   } catch (error: any) {

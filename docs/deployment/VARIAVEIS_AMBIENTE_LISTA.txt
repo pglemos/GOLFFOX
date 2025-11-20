@@ -1,19 +1,15 @@
 # =============================================================================
-# VARIÁVEIS DE AMBIENTE PARA CONFIGURAR NO VERCEL
+# GOLFFOX - LISTA COMPLETA DE VARIÁVEIS DE AMBIENTE
 # =============================================================================
+# Copie e cole estas variáveis no Vercel Dashboard > Settings > Environment Variables
 # 
-# Copie e cole estas variáveis no painel do Vercel:
-# 1. Acesse: https://vercel.com/dashboard
-# 2. Selecione seu projeto GOLFFOX
-# 3. Vá em Settings > Environment Variables
-# 4. Adicione cada variável abaixo:
-#
-# Para documentação completa, consulte:
-# docs/deployment/VARIAVEIS_AMBIENTE_COMPLETO.md
+# IMPORTANTE: Substitua os valores de exemplo pelos valores reais
+# Marque variáveis sensíveis como "Sensitive" no Vercel
+# =============================================================================
 
-# -----------------------------------------------------------------------------
-# SUPABASE (OBRIGATÓRIO)
-# -----------------------------------------------------------------------------
+# =============================================================================
+# 🔵 SUPABASE - Obrigatórias
+# =============================================================================
 NEXT_PUBLIC_SUPABASE_URL=https://vmoxzesvjcfmrebagcwo.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZtb3h6ZXN2amNmbXJlYmFnY3dvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE1MTQyMTMsImV4cCI6MjA3NzA5MDIxM30.QKRKu1bIPhsyDPFuBKEIjseC5wNC35RKbOxQ7FZmEvU
 SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZtb3h6ZXN2amNmbXJlYmFnY3dvIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2MTUxNDIxMywiZXhwIjoyMDc3MDkwMjEzfQ.EJylgYksLGJ7icYf77dPULYZNA4u35JRg-gkoGgMI_A
@@ -33,15 +29,15 @@ POSTGRES_HOST=db.vmoxzesvjcfmrebagcwo.supabase.co
 POSTGRES_DATABASE=postgres
 SUPABASE_JWT_SECRET=Hzwu2WUkjLPfPnb6yb07RT0bM6TU+YTr+BzNkAp8/o7ZdfZfYYqzPrm0o7Vu+PmoSfVyf3j0eMYQzPnV0YJQDg==
 
-# -----------------------------------------------------------------------------
-# GOOGLE MAPS (OBRIGATÓRIO)
-# -----------------------------------------------------------------------------
+# =============================================================================
+# 🗺️ GOOGLE MAPS - Obrigatória
+# =============================================================================
 NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=AIzaSyD79t05YxpU2RnEczY-NSDxhdbY9OvigsM
 GOOGLE_MAPS_API_KEY=AIzaSyD79t05YxpU2RnEczY-NSDxhdbY9OvigsM
 
-# -----------------------------------------------------------------------------
-# SENTRY (OPCIONAL mas RECOMENDADO - Monitoramento de Erros)
-# -----------------------------------------------------------------------------
+# =============================================================================
+# 🔴 SENTRY - Opcional mas Recomendado
+# =============================================================================
 SENTRY_DSN=__SET_IN_PRODUCTION__
 NEXT_PUBLIC_SENTRY_DSN=https://097523959da2cf11865ab78e4b6730a1@o4510370625880064.ingest.us.sentry.io/4510370638790656
 SENTRY_TRACES_SAMPLE_RATE=0.2
@@ -51,27 +47,33 @@ SENTRY_ORG=synvolt
 SENTRY_PROJECT=golffox-web
 SENTRY_AUTH_TOKEN=73d06d441ebfe82b0d6f0422bec531f7900374ed1337e8d0657d9c0fec9b4d35
 
-# -----------------------------------------------------------------------------
-# EMAIL (RESEND) - OPCIONAL (para envio de relatórios automáticos)
-# -----------------------------------------------------------------------------
+# =============================================================================
+# 📧 EMAIL (RESEND) - Opcional
+# =============================================================================
 RESEND_API_KEY=re_xxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 REPORTS_FROM_EMAIL=noreply@golffox.com.br
 REPORTS_BCC=admin@golffox.com.br
 
-# -----------------------------------------------------------------------------
-# RATE LIMITING (UPSTASH) - OPCIONAL mas RECOMENDADO para produção
-# -----------------------------------------------------------------------------
+# SMTP Alternativo (opcional)
+# SMTP_HOST=smtp.gmail.com
+# SMTP_PORT=587
+# SMTP_USER=seu-email@gmail.com
+# SMTP_PASS=sua-senha-app
+
+# =============================================================================
+# ⚡ RATE LIMITING (UPSTASH) - Opcional mas Recomendado
+# =============================================================================
 UPSTASH_REDIS_REST_URL=https://xxxxx.upstash.io
 UPSTASH_REDIS_REST_TOKEN=xxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-# -----------------------------------------------------------------------------
-# CRON JOBS - OBRIGATÓRIO para produção
-# -----------------------------------------------------------------------------
+# =============================================================================
+# ⏰ CRON JOBS - Obrigatório para Produção
+# =============================================================================
 CRON_SECRET=e830db45672f9a1c0216de1e4783c9b1f2e2588a9553235c4c4ed3c39f643a69336cc823c9147b73
 
-# -----------------------------------------------------------------------------
-# APLICAÇÃO - OPCIONAIS
-# -----------------------------------------------------------------------------
+# =============================================================================
+# 🚀 APLICAÇÃO - Opcionais
+# =============================================================================
 NEXT_PUBLIC_BASE_URL=https://golffox.vercel.app
 NEXT_PUBLIC_AUTH_ENDPOINT=/api/auth/login
 NEXT_PUBLIC_LOGGED_URL=/operator
@@ -81,34 +83,22 @@ NEXT_PUBLIC_STOPS_DEBOUNCE_MS=500
 NEXT_PUBLIC_EMPLOYEE_PAGE_SIZE=200
 NEXT_PUBLIC_REALTIME_RETRIES=3
 
-# -----------------------------------------------------------------------------
-# AUTENTICAÇÃO - OPCIONAL
-# -----------------------------------------------------------------------------
+# =============================================================================
+# 🔐 AUTENTICAÇÃO - Opcional
+# =============================================================================
 NEXTAUTH_SECRET=golffox-production-secret-2024-change-this
 
-# -----------------------------------------------------------------------------
-# NODE.JS - Automático (geralmente)
-# -----------------------------------------------------------------------------
+# =============================================================================
+# 🌍 NODE.JS - Automático (geralmente)
+# =============================================================================
 NODE_ENV=production
 
-# -----------------------------------------------------------------------------
-# INSTRUÇÕES:
-# -----------------------------------------------------------------------------
-# 1. No Vercel Dashboard, vá em Settings > Environment Variables
-# 2. Para cada variável acima:
-#    - Name: nome da variável (ex: NEXT_PUBLIC_SUPABASE_URL)
-#    - Value: valor da variável (ex: https://vmoxzesvjcfmrebagcwo.supabase.co)
-#    - Environment: Production, Preview, Development (marque conforme necessário)
-#    - Sensitive: marque variáveis sensíveis (service_role, passwords, tokens)
-# 3. Clique em "Save" para cada variável
-# 4. Faça um novo deploy para aplicar as mudanças
-#
-# IMPORTANTE: 
-# - Nunca compartilhe estas chaves publicamente
-# - As chaves NEXT_PUBLIC_* são expostas no cliente
-# - As outras chaves ficam apenas no servidor
-# - Marque variáveis sensíveis como "Sensitive" no Vercel
-# - Use valores diferentes para cada ambiente (dev/preview/prod)
-#
-# Para documentação completa e detalhada, consulte:
-# docs/deployment/VARIAVEIS_AMBIENTE_COMPLETO.md
+# =============================================================================
+# ☁️ VERCEL - Automáticas (NÃO CONFIGURAR MANUALMENTE)
+# =============================================================================
+# VERCEL=1
+# VERCEL_ENV=production
+# VERCEL_URL=seu-projeto.vercel.app
+# VERCEL_GIT_COMMIT_SHA=hash-do-commit
+# =============================================================================
+

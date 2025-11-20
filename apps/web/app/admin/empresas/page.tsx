@@ -49,7 +49,9 @@ export default function EmpresasPage() {
     setLoadingEmpresas(true)
     setErrorEmpresas(null)
     try {
-      const response = await fetch('/api/admin/companies-list')
+      const response = await fetch('/api/admin/companies-list', {
+        credentials: 'include', // ✅ Garantir que cookies sejam enviados
+      })
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
@@ -75,7 +77,8 @@ export default function EmpresasPage() {
 
     try {
       const response = await fetch(`/api/admin/companies/delete?id=${empresaId}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        credentials: 'include', // ✅ Garantir que cookies sejam enviados
       })
       
       const result = await response.json()
