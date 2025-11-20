@@ -33,21 +33,46 @@ export default function CarrierDashboard() {
 
   useEffect(() => {
     const getUser = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (!session) {
+      try {
+        // Primeiro, tentar verificar através da API /api/auth/me (que verifica cookie)
+        const meResponse = await fetch('/api/auth/me', {
+          credentials: 'include'
+        })
+
+        if (meResponse.ok) {
+          const meData = await meResponse.json()
+          if (meData.user && meData.user.role === 'carrier') {
+            setUser(meData.user)
+            setUserData(meData.user)
+            setLoading(false)
+            return
+          }
+        }
+
+        // Fallback: tentar Supabase Auth session (compatibilidade)
+        const { data: { session } } = await supabase.auth.getSession()
+        if (session) {
+          const { data } = await supabase
+            .from("users")
+            .select("*")
+            .eq("id", session.user.id)
+            .single()
+
+          if (data && data.role === 'carrier') {
+            setUser({ ...session.user, ...data })
+            setUserData(data)
+            setLoading(false)
+            return
+          }
+        }
+
+        // Se chegou aqui, não há autenticação válida
+        console.warn('⚠️ Usuário não autenticado ou sem role carrier, redirecionando para login')
         router.push("/")
-        return
+      } catch (error) {
+        console.error('❌ Erro ao verificar autenticação:', error)
+        router.push("/")
       }
-
-      const { data } = await supabase
-        .from("users")
-        .select("*")
-        .eq("id", session.user.id)
-        .single()
-
-      setUser({ ...session.user, ...data })
-      setUserData(data)
-      setLoading(false)
     }
 
     getUser()

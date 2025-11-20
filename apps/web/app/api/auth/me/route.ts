@@ -25,10 +25,52 @@ export async function GET(request: NextRequest) {
   if (!userData || !userData.id || !userData.role) {
     return NextResponse.json({ success: false }, { status: 401 })
   }
-  return NextResponse.json({ success: true, user: {
-    id: userData.id,
-    email: userData.email || '',
-    role: userData.role,
-    companyId: userData.companyId ?? null,
-  }})
+
+  // Buscar dados completos do usuário no banco para incluir carrier_id, company_id, etc.
+  try {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL
+    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY
+    
+    if (supabaseUrl && supabaseAnonKey) {
+      const { createClient } = await import('@supabase/supabase-js')
+      const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+        auth: { autoRefreshToken: false, persistSession: false }
+      })
+
+      const { data: dbUser } = await supabase
+        .from('users')
+        .select('id, email, name, role, company_id, carrier_id')
+        .eq('id', userData.id)
+        .maybeSingle()
+
+      if (dbUser) {
+        return NextResponse.json({
+          success: true,
+          user: {
+            id: dbUser.id,
+            email: dbUser.email || userData.email || '',
+            name: dbUser.name || userData.name || '',
+            role: dbUser.role || userData.role,
+            companyId: dbUser.company_id || userData.companyId || null,
+            carrier_id: dbUser.carrier_id || userData.carrier_id || null,
+          }
+        })
+      }
+    }
+  } catch (error) {
+    console.error('Erro ao buscar dados do usuário no banco:', error)
+  }
+
+  // Fallback para dados do cookie
+  return NextResponse.json({
+    success: true,
+    user: {
+      id: userData.id,
+      email: userData.email || '',
+      name: userData.name || '',
+      role: userData.role,
+      companyId: userData.companyId ?? null,
+      carrier_id: userData.carrier_id ?? null,
+    }
+  })
 }
