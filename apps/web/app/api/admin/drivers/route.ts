@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerClient } from '@/lib/supabase-server'
+import { supabaseServiceRole } from '@/lib/supabase-server'
 
 // POST /api/admin/drivers - Criar motorista
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createServerClient()
+    const supabase = supabaseServiceRole
     const body = await request.json()
 
     const {

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerClient } from '@/lib/supabase-server'
+import { supabaseServiceRole } from '@/lib/supabase-server'
 
 // PUT /api/admin/drivers/[driverId] - Editar motorista
 export async function PUT(
@@ -7,7 +7,7 @@ export async function PUT(
   { params }: { params: { driverId: string } }
 ) {
   try {
-    const supabase = createServerClient()
+    const supabase = supabaseServiceRole
     const { driverId } = params
     const body = await request.json()
 
@@ -73,7 +73,7 @@ export async function GET(
   { params }: { params: { driverId: string } }
 ) {
   try {
-    const supabase = createServerClient()
+    const supabase = supabaseServiceRole
     const { driverId } = params
 
     const { data: driver, error } = await supabase

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerClient } from '@/lib/supabase-server'
+import { supabaseServiceRole } from '@/lib/supabase-server'
 
 // POST /api/admin/carriers/[carrierId]/vehicles
 export async function POST(
@@ -7,7 +7,7 @@ export async function POST(
   { params }: { params: { carrierId: string } }
 ) {
   try {
-    const supabase = createServerClient()
+    const supabase = supabaseServiceRole
     const { carrierId } = params
     const body = await request.json()
 

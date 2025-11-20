@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerClient } from '@/lib/supabase-server'
+import { supabaseServiceRole } from '@/lib/supabase-server'
 
 // GET /api/admin/carriers/[carrierId]/drivers
 export async function GET(
@@ -7,7 +7,7 @@ export async function GET(
   { params }: { params: { carrierId: string } }
 ) {
   try {
-    const supabase = createServerClient()
+    const supabase = supabaseServiceRole
     const { carrierId } = params
 
     const { data: drivers, error } = await supabase
@@ -40,7 +40,7 @@ export async function POST(
   { params }: { params: { carrierId: string } }
 ) {
   try {
-    const supabase = createServerClient()
+    const supabase = supabaseServiceRole
     const { carrierId } = params
     const body = await request.json()
 

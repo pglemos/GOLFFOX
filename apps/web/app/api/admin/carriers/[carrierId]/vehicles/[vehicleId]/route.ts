@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerClient } from '@/lib/supabase-server'
+import { supabaseServiceRole } from '@/lib/supabase-server'
 
 // PUT /api/admin/carriers/[carrierId]/vehicles/[vehicleId]
 export async function PUT(
@@ -7,7 +7,7 @@ export async function PUT(
   { params }: { params: { carrierId: string; vehicleId: string } }
 ) {
   try {
-    const supabase = createServerClient()
+    const supabase = supabaseServiceRole
     const { carrierId, vehicleId } = params
     const body = await request.json()
 
@@ -74,7 +74,7 @@ export async function DELETE(
   { params }: { params: { carrierId: string; vehicleId: string } }
 ) {
   try {
-    const supabase = createServerClient()
+    const supabase = supabaseServiceRole
     const { carrierId, vehicleId } = params
 
     const { error } = await supabase
