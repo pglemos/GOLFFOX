@@ -52,17 +52,6 @@ export default function OperatorConfiguracoesPage() {
   const [profileImage, setProfileImage] = useState<string | null>(null)
   const [uploadingImage, setUploadingImage] = useState(false)
 
-  useEffect(() => {
-    if (user) {
-      setFormData(prev => ({
-        ...prev,
-        name: user.name || "",
-        email: user.email || ""
-      }))
-      loadProfileImage(false)
-    }
-  }, [user, loadProfileImage])
-
   const loadProfileImage = useCallback(async (forceRefresh = false) => {
     if (!user?.id) return
     try {
@@ -90,6 +79,17 @@ export default function OperatorConfiguracoesPage() {
       console.error('Erro ao carregar foto de perfil:', error)
     }
   }, [user?.id])
+
+  useEffect(() => {
+    if (user) {
+      setFormData(prev => ({
+        ...prev,
+        name: user.name || "",
+        email: user.email || ""
+      }))
+      loadProfileImage(false)
+    }
+  }, [user, loadProfileImage])
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
