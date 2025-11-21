@@ -9,7 +9,7 @@ import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 import { useAuthFast } from "@/hooks/use-auth-fast"
 
-export default function PreferenciasCarrierPage() {
+export default function PreferenciasTransportadoraPage() {
   const router = useRouter()
   const { user, loading: authLoading } = useAuthFast()
 
