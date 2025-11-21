@@ -130,6 +130,7 @@ CREATE POLICY "Transportadoras can manage their vehicle documents"
 -- 4. Vehicle Maintenances Policies
 -- ========================================
 DROP POLICY IF EXISTS "Carriers can manage their vehicle maintenances" ON public.vehicle_maintenances;
+DROP POLICY IF EXISTS "Transportadoras can manage their vehicle maintenances" ON public.vehicle_maintenances;
 
 CREATE POLICY "Transportadoras can manage their vehicle maintenances"
   ON public.vehicle_maintenances FOR ALL
@@ -145,6 +146,7 @@ CREATE POLICY "Transportadoras can manage their vehicle maintenances"
 -- 5. Vehicle Costs Policies
 -- ========================================
 DROP POLICY IF EXISTS "Carriers can manage their vehicle costs" ON public.vehicle_costs;
+DROP POLICY IF EXISTS "Transportadoras can manage their vehicle costs" ON public.vehicle_costs;
 
 CREATE POLICY "Transportadoras can manage their vehicle costs"
   ON public.vehicle_costs FOR ALL
@@ -160,6 +162,7 @@ CREATE POLICY "Transportadoras can manage their vehicle costs"
 -- 6. Route Costs Policies
 -- ========================================
 DROP POLICY IF EXISTS "Carriers can manage their route costs" ON public.route_costs;
+DROP POLICY IF EXISTS "Transportadoras can manage their route costs" ON public.route_costs;
 
 CREATE POLICY "Transportadoras can manage their route costs"
   ON public.route_costs FOR ALL
