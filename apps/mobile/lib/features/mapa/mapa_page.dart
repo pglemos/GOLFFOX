@@ -3,11 +3,12 @@
 // Pagina principal do mapa interativo com status em tempo real
 // ========================================
 
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_map/flutter_map.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:latlong2/latlong.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/i18n/i18n.dart';
@@ -28,7 +29,6 @@ import '../../ui/widgets/map/bus_stops_panel.dart';
 import '../../ui/widgets/map/map_filters.dart';
 import '../../ui/widgets/map/map_legend.dart' show MapLegend, CompactMapLegend;
 import '../../ui/widgets/map/vehicle_info_panel.dart';
-import '../../ui/widgets/map/vehicle_marker.dart';
 
 class MapaPage extends ConsumerStatefulWidget {
   const MapaPage({super.key});
@@ -38,10 +38,11 @@ class MapaPage extends ConsumerStatefulWidget {
 }
 
 class _MapaPageState extends ConsumerState<MapaPage> {
-  final MapController _mapController = MapController();
+  GoogleMapController? _mapController;
   VehiclePosition? _selectedVehicle;
   // Usa o enum simples de status do modelo VehiclePosition para filtro
-  List<VehicleStatus> _selectedStatuses = []; // VehicleStatus de vehicle_position.dart
+  List<VehicleStatus> _selectedStatuses =
+      []; // VehicleStatus de vehicle_position.dart
   String? _selectedRoute;
   bool _isTracking = false;
   bool _isLegendExpanded = true;
@@ -63,6 +64,7 @@ class _MapaPageState extends ConsumerState<MapaPage> {
   void dispose() {
     ref.read(realtimeServiceProvider).dispose();
     ref.read(vehicleStatusServiceProvider).dispose();
+    _mapController?.dispose();
     super.dispose();
   }
 
@@ -230,49 +232,48 @@ class _MapaPageState extends ConsumerState<MapaPage> {
 
   Widget _buildMap(List<VehiclePosition> vehicles) {
     final filteredVehicles = _filterVehicles(vehicles);
-    final vehicleStatusService = ref.read(vehicleStatusServiceProvider);
+    // final vehicleStatusService = ref.read(vehicleStatusServiceProvider);
 
-    return FlutterMap(
-      mapController: _mapController,
-      options: const MapOptions(
-        initialCenter: LatLng(-23.5505, -46.6333), // Sao Paulo
-        initialZoom: 12,
-        minZoom: 8,
-        maxZoom: 18,
+    final markers = filteredVehicles.map((vehicle) {
+      // Obter status calculado do veiculo
+      // final vehicleStatus = vehicleStatusService.getVehicleStatus(vehicle.id);
+      // final lastPosition = vehicleStatusService.getLastPosition(vehicle.id);
+
+      // Mapear status para cor do marker (hue)
+      double hue = BitmapDescriptor.hueRed;
+      if (vehicle.status == VehicleStatus.moving) {
+        hue = BitmapDescriptor.hueGreen;
+      } else if (vehicle.status == VehicleStatus.stopped) {
+        hue = BitmapDescriptor.hueOrange;
+      } else if (vehicle.status == VehicleStatus.offline) {
+        hue = BitmapDescriptor.hueAzure; // ou cinza se tivesse
+      }
+
+      return Marker(
+        markerId: MarkerId(vehicle.id),
+        position: LatLng(vehicle.position.latitude, vehicle.position.longitude),
+        icon: BitmapDescriptor.defaultMarkerWithHue(hue),
+        infoWindow: InfoWindow(
+          title: vehicle.licensePlate,
+          snippet: vehicle.driverName,
+        ),
+        onTap: () => _selectVehicle(vehicle),
+      );
+    }).toSet();
+
+    return GoogleMap(
+      initialCameraPosition: const CameraPosition(
+        target: LatLng(-23.5505, -46.6333), // Sao Paulo
+        zoom: 12,
       ),
-      children: [
-        // Camada do mapa
-        TileLayer(
-          urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-          userAgentPackageName: 'com.golffox.app',
-        ),
-
-        // Camada de marcadores (sem cluster para evitar dependência externa)
-        MarkerLayer(
-          markers: filteredVehicles.map((vehicle) {
-            // Obter status calculado do veiculo
-            final vehicleStatus =
-                vehicleStatusService.getVehicleStatus(vehicle.id);
-            final lastPosition =
-                vehicleStatusService.getLastPosition(vehicle.id);
-
-            return Marker(
-              point: vehicle.position,
-              width: 60,
-              height: 60,
-              child: GestureDetector(
-                onTap: () => _selectVehicle(vehicle),
-                child: VehicleMarker(
-                  vehicle: vehicle,
-                  isSelected: _selectedVehicle?.id == vehicle.id,
-                  vehicleStatus: vehicleStatus?.status,
-                  lastPosition: lastPosition,
-                ),
-              ),
-            );
-          }).toList(),
-        ),
-      ],
+      onMapCreated: (controller) {
+        _mapController = controller;
+      },
+      markers: markers,
+      myLocationEnabled: true,
+      myLocationButtonEnabled: false,
+      zoomControlsEnabled: false,
+      mapToolbarEnabled: false,
     );
   }
 
@@ -408,7 +409,12 @@ class _MapaPageState extends ConsumerState<MapaPage> {
       _isTracking = true;
     });
 
-    _mapController.move(vehicle.position, 16);
+    _mapController?.animateCamera(
+      CameraUpdate.newLatLngZoom(
+        LatLng(vehicle.position.latitude, vehicle.position.longitude),
+        16,
+      ),
+    );
 
     // Parar tracking apos 10 segundos
     Future<void>.delayed(const Duration(seconds: 10), () {
@@ -433,12 +439,14 @@ class _MapaPageState extends ConsumerState<MapaPage> {
             ),
             const SizedBox(height: 16),
             ListTile(
-              leading: const Icon(Icons.phone, color: Color(GfTokens.colorPrimary)),
+              leading:
+                  const Icon(Icons.phone, color: Color(GfTokens.colorPrimary)),
               title: const Text('Ligar'),
               onTap: () => Navigator.of(context).pop('call'),
             ),
             ListTile(
-              leading: const Icon(Icons.message, color: Color(GfTokens.colorPrimary)),
+              leading: const Icon(Icons.message,
+                  color: Color(GfTokens.colorPrimary)),
               title: const Text('Enviar Mensagem'),
               onTap: () => Navigator.of(context).pop('message'),
             ),
@@ -460,7 +468,8 @@ class _MapaPageState extends ConsumerState<MapaPage> {
     String? phoneNumber;
     try {
       final drivers = ref.read(driversListProvider);
-      final matchingDrivers = drivers.where((d) => d.name == vehicle.driverName);
+      final matchingDrivers =
+          drivers.where((d) => d.name == vehicle.driverName);
       if (matchingDrivers.isNotEmpty) {
         phoneNumber = matchingDrivers.first.phone;
       }
@@ -471,7 +480,7 @@ class _MapaPageState extends ConsumerState<MapaPage> {
         debugPrint('Erro ao buscar telefone do motorista: $e');
       }
     }
-    
+
     if (phoneNumber == null || phoneNumber.isEmpty) {
       if (!mounted) return;
       SnackBarService.errorText(
@@ -488,7 +497,8 @@ class _MapaPageState extends ConsumerState<MapaPage> {
           await launchUrl(uri);
         } else {
           if (!mounted) return;
-          SnackBarService.errorText(context, 'Não foi possível fazer a ligação');
+          SnackBarService.errorText(
+              context, 'Não foi possível fazer a ligação');
         }
       } else if (result == 'message') {
         final uri = Uri.parse('sms:$phoneNumber');
@@ -496,7 +506,8 @@ class _MapaPageState extends ConsumerState<MapaPage> {
           await launchUrl(uri);
         } else {
           if (!mounted) return;
-          SnackBarService.errorText(context, 'Não foi possível abrir o aplicativo de mensagens');
+          SnackBarService.errorText(
+              context, 'Não foi possível abrir o aplicativo de mensagens');
         }
       }
     } on Exception catch (e, stack) {
@@ -516,7 +527,12 @@ class _MapaPageState extends ConsumerState<MapaPage> {
   }
 
   void _focusOnBusStop(BusStop stop) {
-    _mapController.move(stop.position, 16);
+    _mapController?.animateCamera(
+      CameraUpdate.newLatLngZoom(
+        LatLng(stop.position.latitude, stop.position.longitude),
+        16,
+      ),
+    );
 
     // Mostrar informacoes da parada
     final title = I18n.t(context, 'mapa.stop.title',
@@ -546,11 +562,8 @@ class _MapaPageState extends ConsumerState<MapaPage> {
             final filteredVehicles = _filterVehicles(vehicles);
             if (filteredVehicles.isNotEmpty) {
               final bounds = _calculateBounds(filteredVehicles);
-              _mapController.fitCamera(
-                CameraFit.bounds(
-                  bounds: bounds,
-                  padding: const EdgeInsets.all(50),
-                ),
+              _mapController?.animateCamera(
+                CameraUpdate.newLatLngBounds(bounds, 50),
               );
             }
           },
@@ -561,9 +574,10 @@ class _MapaPageState extends ConsumerState<MapaPage> {
 
   LatLngBounds _calculateBounds(List<VehiclePosition> vehicles) {
     if (vehicles.isEmpty) {
+      // Retorna bounds padrao se vazio
       return LatLngBounds(
-        const LatLng(-23.5505, -46.6333),
-        const LatLng(-23.5505, -46.6333),
+        southwest: const LatLng(-23.5505, -46.6333),
+        northeast: const LatLng(-23.5505, -46.6333),
       );
     }
 
@@ -588,8 +602,8 @@ class _MapaPageState extends ConsumerState<MapaPage> {
     }
 
     return LatLngBounds(
-      LatLng(minLat, minLng),
-      LatLng(maxLat, maxLng),
+      southwest: LatLng(minLat, minLng),
+      northeast: LatLng(maxLat, maxLng),
     );
   }
 

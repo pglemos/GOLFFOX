@@ -1,12 +1,11 @@
 // lib/models/route_stop.dart
 import 'package:flutter/foundation.dart';
-import 'package:latlong2/latlong.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 typedef Json = Map<String, dynamic>;
 
 @immutable
 class RouteStopModel {
-
   const RouteStopModel({
     required this.id,
     required this.routeId,
@@ -26,8 +25,7 @@ class RouteStopModel {
     this.landmark,
   });
 
-  factory RouteStopModel.fromJson(Map<String, dynamic> json) =>
-      RouteStopModel(
+  factory RouteStopModel.fromJson(Map<String, dynamic> json) => RouteStopModel(
         id: json[RouteStopFields.id] as String,
         routeId: json[RouteStopFields.routeId] as String,
         name: json[RouteStopFields.name] as String,
@@ -137,24 +135,25 @@ class RouteStopModel {
     String? landmark,
     DateTime? createdAt,
     DateTime? updatedAt,
-  }) => RouteStopModel(
-      id: id ?? this.id,
-      routeId: routeId ?? this.routeId,
-      name: name ?? this.name,
-      description: description ?? this.description,
-      latitude: latitude ?? this.latitude,
-      longitude: longitude ?? this.longitude,
-      order: order ?? this.order,
-      type: type ?? this.type,
-      scheduledTime: scheduledTime ?? this.scheduledTime,
-      estimatedDuration: estimatedDuration ?? this.estimatedDuration,
-      estimatedPassengers: estimatedPassengers ?? this.estimatedPassengers,
-      isActive: isActive ?? this.isActive,
-      address: address ?? this.address,
-      landmark: landmark ?? this.landmark,
-      createdAt: createdAt ?? this.createdAt,
-      updatedAt: updatedAt ?? this.updatedAt,
-    );
+  }) =>
+      RouteStopModel(
+        id: id ?? this.id,
+        routeId: routeId ?? this.routeId,
+        name: name ?? this.name,
+        description: description ?? this.description,
+        latitude: latitude ?? this.latitude,
+        longitude: longitude ?? this.longitude,
+        order: order ?? this.order,
+        type: type ?? this.type,
+        scheduledTime: scheduledTime ?? this.scheduledTime,
+        estimatedDuration: estimatedDuration ?? this.estimatedDuration,
+        estimatedPassengers: estimatedPassengers ?? this.estimatedPassengers,
+        isActive: isActive ?? this.isActive,
+        address: address ?? this.address,
+        landmark: landmark ?? this.landmark,
+        createdAt: createdAt ?? this.createdAt,
+        updatedAt: updatedAt ?? this.updatedAt,
+      );
 
   @override
   bool operator ==(Object other) =>

@@ -4,7 +4,8 @@
 // ========================================
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:latlong2/latlong.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../core/services/logger_service.dart';
 import '../models/bus_stop.dart';
@@ -12,7 +13,6 @@ import 'map_service.dart';
 import 'supabase_service.dart';
 
 class BusStopService {
-
   BusStopService(this._supabaseService);
   final SupabaseService _supabaseService;
 
@@ -44,11 +44,15 @@ class BusStopService {
     try {
       // Implementacao com PostGIS seria ideal, mas por enquanto usamos dados mock
       final allStops = await getAllBusStops();
-      const distance = Distance();
 
       return allStops.where((stop) {
-        final distanceKm =
-            distance.as(LengthUnit.Kilometer, position, stop.position);
+        final distanceKm = Geolocator.distanceBetween(
+              position.latitude,
+              position.longitude,
+              stop.position.latitude,
+              stop.position.longitude,
+            ) /
+            1000.0;
         return distanceKm <= radiusKm;
       }).toList();
     } on Exception {
@@ -226,17 +230,19 @@ class BusStopService {
     ];
   }
 
-  List<BusStop> _getMockNearbyStops(LatLng position) => _getAllMockBusStops().take(3).toList();
+  List<BusStop> _getMockNearbyStops(LatLng position) =>
+      _getAllMockBusStops().take(3).toList();
 
   List<BusStop> _getAllMockBusStops() => [
-      ..._getMockBusStops('route_1'),
-      ..._getMockBusStops('route_2'),
-      ..._getMockBusStops('route_3'),
-      ..._getMockBusStops('route_4'),
-      ..._getMockBusStops('route_5'),
-    ];
+        ..._getMockBusStops('route_1'),
+        ..._getMockBusStops('route_2'),
+        ..._getMockBusStops('route_3'),
+        ..._getMockBusStops('route_4'),
+        ..._getMockBusStops('route_5'),
+      ];
 
-  BusStop? _getMockBusStop(String stopId) => _getAllMockBusStops().where((stop) => stop.id == stopId).firstOrNull;
+  BusStop? _getMockBusStop(String stopId) =>
+      _getAllMockBusStops().where((stop) => stop.id == stopId).firstOrNull;
 
   String _getRouteNameByNumber(String routeNumber) {
     switch (routeNumber) {

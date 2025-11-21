@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:latlong2/latlong.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../core/services/logger_service.dart';
@@ -10,7 +10,6 @@ import '../models/vehicle_position.dart';
 /// Servico de real-time que combina dados mock para desenvolvimento
 /// e funcionalidade real-time via Supabase para producao
 class RealtimeService {
-
   RealtimeService._();
   static final RealtimeService instance = RealtimeService._();
 
@@ -244,7 +243,8 @@ class RealtimeService {
 
   /// Manipula atualizacoes real-time do Supabase
   void _handleRealtimeUpdate(PostgresChangePayload payload) {
-    LoggerService.instance.info('Atualizacao real-time recebida: ${payload.eventType}');
+    LoggerService.instance
+        .info('Atualizacao real-time recebida: ${payload.eventType}');
 
     switch (payload.eventType) {
       case PostgresChangeEvent.insert:
@@ -252,11 +252,11 @@ class RealtimeService {
         final vehicleData = payload.newRecord;
         final vehicle = _vehiclePositionFromSupabase(vehicleData);
         _updateVehicleInList(vehicle);
-              break;
+        break;
       case PostgresChangeEvent.delete:
         final vehicleData = payload.oldRecord;
         _removeVehicleFromList(vehicleData['id'] as String);
-              break;
+        break;
       case PostgresChangeEvent.all:
         // Caso para eventos gerais - nao precisamos fazer nada especifico
         LoggerService.instance.info('Evento geral recebido');
@@ -299,8 +299,7 @@ class RealtimeService {
       speed: (json['speed'] as num?)?.toDouble(),
       heading: (json['heading'] as num?)?.toDouble(),
       lastUpdate: DateTime.parse(
-        json['updated_at'] as String? ??
-            DateTime.now().toIso8601String(),
+        json['updated_at'] as String? ?? DateTime.now().toIso8601String(),
       ),
       routeId: json['route_id'] as String?,
       routeName: json['route_name'] as String?,

@@ -6,7 +6,8 @@
 import 'dart:math';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:latlong2/latlong.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../core/services/logger_service.dart';
 import '../models/route.dart';
@@ -14,18 +15,21 @@ import '../services/map_service.dart';
 import '../services/supabase_service.dart';
 
 // Providers
-final routeServiceProvider = Provider<RouteService>((ref) => RouteService(ref.read(supabaseServiceProvider)));
+final routeServiceProvider = Provider<RouteService>(
+    (ref) => RouteService(ref.read(supabaseServiceProvider)));
 
-final routesStreamProvider = StreamProvider<List<BusRoute>>((ref) => ref.read(routeServiceProvider).getRoutesStream());
+final routesStreamProvider = StreamProvider<List<BusRoute>>(
+    (ref) => ref.read(routeServiceProvider).getRoutesStream());
 
-final activeRoutesProvider = Provider<AsyncValue<List<BusRoute>>>((ref) => ref.watch(routesStreamProvider).whenData(
-        (routes) => routes.where((route) => route.isActive).toList(),
-      ));
+final activeRoutesProvider = Provider<AsyncValue<List<BusRoute>>>(
+    (ref) => ref.watch(routesStreamProvider).whenData(
+          (routes) => routes.where((route) => route.isActive).toList(),
+        ));
 
-final routeByIdProvider = FutureProvider.family<BusRoute?, String>((ref, id) async => ref.read(routeServiceProvider).getRouteById(id));
+final routeByIdProvider = FutureProvider.family<BusRoute?, String>(
+    (ref, id) async => ref.read(routeServiceProvider).getRouteById(id));
 
 class RouteOptimizationResult {
-
   const RouteOptimizationResult({
     required this.optimizedStops,
     required this.totalDistance,
@@ -39,15 +43,12 @@ class RouteOptimizationResult {
 }
 
 class RouteService {
-
   RouteService(this._supabaseService);
   final SupabaseService _supabaseService;
-  final Distance _distance = const Distance();
 
   // Stream de rotas
-  Stream<List<BusRoute>> getRoutesStream() => _supabaseService.client
-      .from('routes')
-      .stream(primaryKey: ['id']).map(
+  Stream<List<BusRoute>> getRoutesStream() =>
+      _supabaseService.client.from('routes').stream(primaryKey: ['id']).map(
         (data) => data.map(BusRoute.fromJson).toList(),
       );
 
@@ -249,8 +250,7 @@ class RouteService {
     final optimizedOrder = <LatLng>[];
 
     // Comecar do ponto mais ao norte (ou criterio personalizado)
-    var current =
-        unvisited.reduce((a, b) => a.latitude > b.latitude ? a : b);
+    var current = unvisited.reduce((a, b) => a.latitude > b.latitude ? a : b);
 
     optimizedOrder.add(current);
     unvisited.remove(current);
@@ -261,10 +261,22 @@ class RouteService {
     // Algoritmo do vizinho mais proximo
     while (unvisited.isNotEmpty) {
       var nearest = unvisited.first;
-      var minDistance = _distance.as(LengthUnit.Kilometer, current, nearest);
+      var minDistance = Geolocator.distanceBetween(
+            current.latitude,
+            current.longitude,
+            nearest.latitude,
+            nearest.longitude,
+          ) /
+          1000.0; // km
 
       for (final point in unvisited) {
-        final dist = _distance.as(LengthUnit.Kilometer, current, point);
+        final dist = Geolocator.distanceBetween(
+              current.latitude,
+              current.longitude,
+              point.latitude,
+              point.longitude,
+            ) /
+            1000.0; // km
         if (dist < minDistance) {
           minDistance = dist;
           nearest = point;
@@ -284,13 +296,17 @@ class RouteService {
       );
 
     // Converter para RouteStop
-    final optimizedStops = optimizedOrder.asMap().entries.map((entry) => RouteStop(
-        id: 'optimized_${entry.key}',
-        name: 'Parada Otimizada ${entry.key + 1}',
-        position: entry.value,
-        type: StopType.waypoint,
-        order: entry.key,
-      )).toList();
+    final optimizedStops = optimizedOrder
+        .asMap()
+        .entries
+        .map((entry) => RouteStop(
+              id: 'optimized_${entry.key}',
+              name: 'Parada Otimizada ${entry.key + 1}',
+              position: entry.value,
+              type: StopType.waypoint,
+              order: entry.key,
+            ))
+        .toList();
 
     // Estimar duracao (velocidade media de 30 km/h + tempo de parada)
     final travelTime = Duration(minutes: (totalDistance / 30 * 60).round());
@@ -379,11 +395,13 @@ class RouteService {
     final nextStop = route.nextStop;
     if (nextStop == null) return null;
 
-    final distance = _distance.as(
-      LengthUnit.Kilometer,
-      currentPosition,
-      nextStop.position,
-    );
+    final distance = Geolocator.distanceBetween(
+          currentPosition.latitude,
+          currentPosition.longitude,
+          nextStop.position.latitude,
+          nextStop.position.longitude,
+        ) /
+        1000.0; // km
 
     // Velocidade media estimada de 25 km/h no transito urbano
     final travelTimeMinutes = (distance / 25 * 60).round();

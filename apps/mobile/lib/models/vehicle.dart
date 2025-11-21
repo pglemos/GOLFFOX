@@ -3,7 +3,7 @@
 // Modelo de dados para veiculos
 // ========================================
 
-import 'package:latlong2/latlong.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../core/theme/gf_tokens.dart';
 
 enum VehicleType {
@@ -147,7 +147,6 @@ extension FuelTypeExtension on FuelType {
 }
 
 class VehicleSpecifications {
-
   const VehicleSpecifications({
     required this.capacity,
     required this.engineSize,
@@ -190,18 +189,18 @@ class VehicleSpecifications {
   final double height;
 
   Map<String, dynamic> toJson() => {
-      'capacity': capacity,
-      'engine_size': engineSize,
-      'year': year,
-      'manufacturer': manufacturer,
-      'model': model,
-      'color': color,
-      'fuel_tank_capacity': fuelTankCapacity,
-      'weight': weight,
-      'length': length,
-      'width': width,
-      'height': height,
-    };
+        'capacity': capacity,
+        'engine_size': engineSize,
+        'year': year,
+        'manufacturer': manufacturer,
+        'model': model,
+        'color': color,
+        'fuel_tank_capacity': fuelTankCapacity,
+        'weight': weight,
+        'length': length,
+        'width': width,
+        'height': height,
+      };
 
   VehicleSpecifications copyWith({
     int? capacity,
@@ -215,23 +214,23 @@ class VehicleSpecifications {
     double? length,
     double? width,
     double? height,
-  }) => VehicleSpecifications(
-      capacity: capacity ?? this.capacity,
-      engineSize: engineSize ?? this.engineSize,
-      year: year ?? this.year,
-      manufacturer: manufacturer ?? this.manufacturer,
-      model: model ?? this.model,
-      color: color ?? this.color,
-      fuelTankCapacity: fuelTankCapacity ?? this.fuelTankCapacity,
-      weight: weight ?? this.weight,
-      length: length ?? this.length,
-      width: width ?? this.width,
-      height: height ?? this.height,
-    );
+  }) =>
+      VehicleSpecifications(
+        capacity: capacity ?? this.capacity,
+        engineSize: engineSize ?? this.engineSize,
+        year: year ?? this.year,
+        manufacturer: manufacturer ?? this.manufacturer,
+        model: model ?? this.model,
+        color: color ?? this.color,
+        fuelTankCapacity: fuelTankCapacity ?? this.fuelTankCapacity,
+        weight: weight ?? this.weight,
+        length: length ?? this.length,
+        width: width ?? this.width,
+        height: height ?? this.height,
+      );
 }
 
 class VehicleDocuments {
-
   const VehicleDocuments({
     this.licensePlate,
     this.chassisNumber,
@@ -255,13 +254,11 @@ class VehicleDocuments {
             (json['inspection_expiry_date'] as String?) != null
                 ? DateTime.parse(json['inspection_expiry_date'] as String)
                 : null,
-        insuranceExpiryDate:
-            (json['insurance_expiry_date'] as String?) != null
-                ? DateTime.parse(json['insurance_expiry_date'] as String)
-                : null,
+        insuranceExpiryDate: (json['insurance_expiry_date'] as String?) != null
+            ? DateTime.parse(json['insurance_expiry_date'] as String)
+            : null,
         insuranceCompany: json['insurance_company'] as String?,
-        insurancePolicyNumber:
-            json['insurance_policy_number'] as String?,
+        insurancePolicyNumber: json['insurance_policy_number'] as String?,
       );
   final String? licensePlate;
   final String? chassisNumber;
@@ -273,15 +270,15 @@ class VehicleDocuments {
   final String? insurancePolicyNumber;
 
   Map<String, dynamic> toJson() => {
-      'license_plate': licensePlate,
-      'chassis_number': chassisNumber,
-      'renavam': renavam,
-      'license_expiry_date': licenseExpiryDate?.toIso8601String(),
-      'inspection_expiry_date': inspectionExpiryDate?.toIso8601String(),
-      'insurance_expiry_date': insuranceExpiryDate?.toIso8601String(),
-      'insurance_company': insuranceCompany,
-      'insurance_policy_number': insurancePolicyNumber,
-    };
+        'license_plate': licensePlate,
+        'chassis_number': chassisNumber,
+        'renavam': renavam,
+        'license_expiry_date': licenseExpiryDate?.toIso8601String(),
+        'inspection_expiry_date': inspectionExpiryDate?.toIso8601String(),
+        'insurance_expiry_date': insuranceExpiryDate?.toIso8601String(),
+        'insurance_company': insuranceCompany,
+        'insurance_policy_number': insurancePolicyNumber,
+      };
 
   VehicleDocuments copyWith({
     String? licensePlate,
@@ -292,17 +289,18 @@ class VehicleDocuments {
     DateTime? insuranceExpiryDate,
     String? insuranceCompany,
     String? insurancePolicyNumber,
-  }) => VehicleDocuments(
-      licensePlate: licensePlate ?? this.licensePlate,
-      chassisNumber: chassisNumber ?? this.chassisNumber,
-      renavam: renavam ?? this.renavam,
-      licenseExpiryDate: licenseExpiryDate ?? this.licenseExpiryDate,
-      inspectionExpiryDate: inspectionExpiryDate ?? this.inspectionExpiryDate,
-      insuranceExpiryDate: insuranceExpiryDate ?? this.insuranceExpiryDate,
-      insuranceCompany: insuranceCompany ?? this.insuranceCompany,
-      insurancePolicyNumber:
-          insurancePolicyNumber ?? this.insurancePolicyNumber,
-    );
+  }) =>
+      VehicleDocuments(
+        licensePlate: licensePlate ?? this.licensePlate,
+        chassisNumber: chassisNumber ?? this.chassisNumber,
+        renavam: renavam ?? this.renavam,
+        licenseExpiryDate: licenseExpiryDate ?? this.licenseExpiryDate,
+        inspectionExpiryDate: inspectionExpiryDate ?? this.inspectionExpiryDate,
+        insuranceExpiryDate: insuranceExpiryDate ?? this.insuranceExpiryDate,
+        insuranceCompany: insuranceCompany ?? this.insuranceCompany,
+        insurancePolicyNumber:
+            insurancePolicyNumber ?? this.insurancePolicyNumber,
+      );
 
   // Getters para verificar vencimentos
   bool get isLicenseExpired =>
@@ -361,7 +359,6 @@ class VehicleDocuments {
 }
 
 class Vehicle {
-
   const Vehicle({
     required this.id,
     required this.name,
@@ -388,8 +385,8 @@ class Vehicle {
   factory Vehicle.fromJson(Map<String, dynamic> json) {
     final specs = (json['specifications'] as Map<String, dynamic>?) ??
         <String, dynamic>{};
-    final documents = (json['documents'] as Map<String, dynamic>?) ??
-        <String, dynamic>{};
+    final documents =
+        (json['documents'] as Map<String, dynamic>?) ?? <String, dynamic>{};
     final position = json['current_position'];
     LatLng? currentPosition;
     if (position is Map) {
@@ -432,20 +429,17 @@ class Vehicle {
       nextMaintenanceDate: (json['next_maintenance_date'] as String?) != null
           ? DateTime.parse(json['next_maintenance_date'] as String)
           : null,
-      maintenanceOdometer:
-          (json['maintenance_odometer'] as num?)?.toDouble(),
+      maintenanceOdometer: (json['maintenance_odometer'] as num?)?.toDouble(),
       features: (json['features'] as List?)
               ?.map((feature) => feature.toString())
               .toList() ??
           const [],
       notes: json['notes'] as String?,
       createdAt: DateTime.parse(
-        json['created_at'] as String? ??
-            DateTime.now().toIso8601String(),
+        json['created_at'] as String? ?? DateTime.now().toIso8601String(),
       ),
       updatedAt: DateTime.parse(
-        json['updated_at'] as String? ??
-            DateTime.now().toIso8601String(),
+        json['updated_at'] as String? ?? DateTime.now().toIso8601String(),
       ),
       companyId: json['company_id'] as String? ?? '',
     );
@@ -472,32 +466,32 @@ class Vehicle {
   final String companyId;
 
   Map<String, dynamic> toJson() => {
-      'id': id,
-      'name': name,
-      'type': type.name,
-      'status': status.name,
-      'fuel_type': fuelType.name,
-      'specifications': specifications.toJson(),
-      'documents': documents.toJson(),
-      'current_driver_id': currentDriverId,
-      'current_route_id': currentRouteId,
-      'current_position': currentPosition != null
-          ? {
-              'lat': currentPosition!.latitude,
-              'lng': currentPosition!.longitude,
-            }
-          : null,
-      'current_fuel_level': currentFuelLevel,
-      'odometer': odometer,
-      'last_maintenance_date': lastMaintenanceDate?.toIso8601String(),
-      'next_maintenance_date': nextMaintenanceDate?.toIso8601String(),
-      'maintenance_odometer': maintenanceOdometer,
-      'features': features,
-      'notes': notes,
-      'created_at': createdAt.toIso8601String(),
-      'updated_at': updatedAt.toIso8601String(),
-      'company_id': companyId,
-    };
+        'id': id,
+        'name': name,
+        'type': type.name,
+        'status': status.name,
+        'fuel_type': fuelType.name,
+        'specifications': specifications.toJson(),
+        'documents': documents.toJson(),
+        'current_driver_id': currentDriverId,
+        'current_route_id': currentRouteId,
+        'current_position': currentPosition != null
+            ? {
+                'lat': currentPosition!.latitude,
+                'lng': currentPosition!.longitude,
+              }
+            : null,
+        'current_fuel_level': currentFuelLevel,
+        'odometer': odometer,
+        'last_maintenance_date': lastMaintenanceDate?.toIso8601String(),
+        'next_maintenance_date': nextMaintenanceDate?.toIso8601String(),
+        'maintenance_odometer': maintenanceOdometer,
+        'features': features,
+        'notes': notes,
+        'created_at': createdAt.toIso8601String(),
+        'updated_at': updatedAt.toIso8601String(),
+        'company_id': companyId,
+      };
 
   Vehicle copyWith({
     String? id,
@@ -520,28 +514,29 @@ class Vehicle {
     DateTime? createdAt,
     DateTime? updatedAt,
     String? companyId,
-  }) => Vehicle(
-      id: id ?? this.id,
-      name: name ?? this.name,
-      type: type ?? this.type,
-      status: status ?? this.status,
-      fuelType: fuelType ?? this.fuelType,
-      specifications: specifications ?? this.specifications,
-      documents: documents ?? this.documents,
-      currentDriverId: currentDriverId ?? this.currentDriverId,
-      currentRouteId: currentRouteId ?? this.currentRouteId,
-      currentPosition: currentPosition ?? this.currentPosition,
-      currentFuelLevel: currentFuelLevel ?? this.currentFuelLevel,
-      odometer: odometer ?? this.odometer,
-      lastMaintenanceDate: lastMaintenanceDate ?? this.lastMaintenanceDate,
-      nextMaintenanceDate: nextMaintenanceDate ?? this.nextMaintenanceDate,
-      maintenanceOdometer: maintenanceOdometer ?? this.maintenanceOdometer,
-      features: features ?? this.features,
-      notes: notes ?? this.notes,
-      createdAt: createdAt ?? this.createdAt,
-      updatedAt: updatedAt ?? this.updatedAt,
-      companyId: companyId ?? this.companyId,
-    );
+  }) =>
+      Vehicle(
+        id: id ?? this.id,
+        name: name ?? this.name,
+        type: type ?? this.type,
+        status: status ?? this.status,
+        fuelType: fuelType ?? this.fuelType,
+        specifications: specifications ?? this.specifications,
+        documents: documents ?? this.documents,
+        currentDriverId: currentDriverId ?? this.currentDriverId,
+        currentRouteId: currentRouteId ?? this.currentRouteId,
+        currentPosition: currentPosition ?? this.currentPosition,
+        currentFuelLevel: currentFuelLevel ?? this.currentFuelLevel,
+        odometer: odometer ?? this.odometer,
+        lastMaintenanceDate: lastMaintenanceDate ?? this.lastMaintenanceDate,
+        nextMaintenanceDate: nextMaintenanceDate ?? this.nextMaintenanceDate,
+        maintenanceOdometer: maintenanceOdometer ?? this.maintenanceOdometer,
+        features: features ?? this.features,
+        notes: notes ?? this.notes,
+        createdAt: createdAt ?? this.createdAt,
+        updatedAt: updatedAt ?? this.updatedAt,
+        companyId: companyId ?? this.companyId,
+      );
 
   // Getters uteis
   bool get isActive => status == VehicleStatus.active;

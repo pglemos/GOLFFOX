@@ -3,7 +3,7 @@
 // Modelo de dados para rotas e pontos de parada
 // ========================================
 
-import 'package:latlong2/latlong.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 enum RouteStatus {
   active,
@@ -81,7 +81,6 @@ extension StopTypeExtension on StopType {
 }
 
 class RouteStop {
-
   const RouteStop({
     required this.id,
     required this.name,
@@ -140,21 +139,21 @@ class RouteStop {
   final String? notes;
 
   Map<String, dynamic> toJson() => {
-      'id': id,
-      'name': name,
-      'description': description,
-      'latitude': position.latitude,
-      'longitude': position.longitude,
-      'type': type.name,
-      'scheduled_time': scheduledTime?.toIso8601String(),
-      'actual_time': actualTime?.toIso8601String(),
-      'order': order,
-      'estimated_passengers': estimatedPassengers,
-      'actual_passengers': actualPassengers,
-      'estimated_duration': estimatedDuration?.inSeconds,
-      'is_completed': isCompleted,
-      'notes': notes,
-    };
+        'id': id,
+        'name': name,
+        'description': description,
+        'latitude': position.latitude,
+        'longitude': position.longitude,
+        'type': type.name,
+        'scheduled_time': scheduledTime?.toIso8601String(),
+        'actual_time': actualTime?.toIso8601String(),
+        'order': order,
+        'estimated_passengers': estimatedPassengers,
+        'actual_passengers': actualPassengers,
+        'estimated_duration': estimatedDuration?.inSeconds,
+        'is_completed': isCompleted,
+        'notes': notes,
+      };
 
   RouteStop copyWith({
     String? id,
@@ -170,21 +169,22 @@ class RouteStop {
     Duration? estimatedDuration,
     bool? isCompleted,
     String? notes,
-  }) => RouteStop(
-      id: id ?? this.id,
-      name: name ?? this.name,
-      description: description ?? this.description,
-      position: position ?? this.position,
-      type: type ?? this.type,
-      scheduledTime: scheduledTime ?? this.scheduledTime,
-      actualTime: actualTime ?? this.actualTime,
-      order: order ?? this.order,
-      estimatedPassengers: estimatedPassengers ?? this.estimatedPassengers,
-      actualPassengers: actualPassengers ?? this.actualPassengers,
-      estimatedDuration: estimatedDuration ?? this.estimatedDuration,
-      isCompleted: isCompleted ?? this.isCompleted,
-      notes: notes ?? this.notes,
-    );
+  }) =>
+      RouteStop(
+        id: id ?? this.id,
+        name: name ?? this.name,
+        description: description ?? this.description,
+        position: position ?? this.position,
+        type: type ?? this.type,
+        scheduledTime: scheduledTime ?? this.scheduledTime,
+        actualTime: actualTime ?? this.actualTime,
+        order: order ?? this.order,
+        estimatedPassengers: estimatedPassengers ?? this.estimatedPassengers,
+        actualPassengers: actualPassengers ?? this.actualPassengers,
+        estimatedDuration: estimatedDuration ?? this.estimatedDuration,
+        isCompleted: isCompleted ?? this.isCompleted,
+        notes: notes ?? this.notes,
+      );
 
   bool get isDelayed {
     if (scheduledTime == null || actualTime == null) return false;
@@ -208,7 +208,6 @@ class RouteStop {
 }
 
 class BusRoute {
-
   const BusRoute({
     required this.id,
     required this.name,
@@ -239,7 +238,8 @@ class BusRoute {
           orElse: () => RouteStatus.planned,
         ),
         stops: (json['stops'] as List<dynamic>?)
-                ?.map((stop) => RouteStop.fromJson(stop as Map<String, dynamic>))
+                ?.map(
+                    (stop) => RouteStop.fromJson(stop as Map<String, dynamic>))
                 .toList() ??
             [],
         vehicleId: json['vehicle_id'] as String?,
@@ -286,24 +286,24 @@ class BusRoute {
   final DateTime updatedAt;
 
   Map<String, dynamic> toJson() => {
-      'id': id,
-      'name': name,
-      'description': description,
-      'status': status.name,
-      'stops': stops.map((stop) => stop.toJson()).toList(),
-      'vehicle_id': vehicleId,
-      'driver_id': driverId,
-      'start_time': startTime?.toIso8601String(),
-      'end_time': endTime?.toIso8601String(),
-      'estimated_duration': estimatedDuration?.inSeconds,
-      'actual_duration': actualDuration?.inSeconds,
-      'estimated_distance': estimatedDistance,
-      'actual_distance': actualDistance,
-      'max_passengers': maxPassengers,
-      'notes': notes,
-      'created_at': createdAt.toIso8601String(),
-      'updated_at': updatedAt.toIso8601String(),
-    };
+        'id': id,
+        'name': name,
+        'description': description,
+        'status': status.name,
+        'stops': stops.map((stop) => stop.toJson()).toList(),
+        'vehicle_id': vehicleId,
+        'driver_id': driverId,
+        'start_time': startTime?.toIso8601String(),
+        'end_time': endTime?.toIso8601String(),
+        'estimated_duration': estimatedDuration?.inSeconds,
+        'actual_duration': actualDuration?.inSeconds,
+        'estimated_distance': estimatedDistance,
+        'actual_distance': actualDistance,
+        'max_passengers': maxPassengers,
+        'notes': notes,
+        'created_at': createdAt.toIso8601String(),
+        'updated_at': updatedAt.toIso8601String(),
+      };
 
   BusRoute copyWith({
     String? id,
@@ -324,36 +324,36 @@ class BusRoute {
     String? notes,
     DateTime? createdAt,
     DateTime? updatedAt,
-  }) => BusRoute(
-      id: id ?? this.id,
-      name: name ?? this.name,
-      description: description ?? this.description,
-      status: status ?? this.status,
-      stops: stops ?? this.stops,
-      vehicleId: vehicleId ?? this.vehicleId,
-      driverId: driverId ?? this.driverId,
-      scheduledStartTime: scheduledStartTime ?? this.scheduledStartTime,
-      startTime: startTime ?? this.startTime,
-      endTime: endTime ?? this.endTime,
-      estimatedDuration: estimatedDuration ?? this.estimatedDuration,
-      actualDuration: actualDuration ?? this.actualDuration,
-      estimatedDistance: estimatedDistance ?? this.estimatedDistance,
-      actualDistance: actualDistance ?? this.actualDistance,
-      maxPassengers: maxPassengers ?? this.maxPassengers,
-      notes: notes ?? this.notes,
-      createdAt: createdAt ?? this.createdAt,
-      updatedAt: updatedAt ?? this.updatedAt,
-    );
+  }) =>
+      BusRoute(
+        id: id ?? this.id,
+        name: name ?? this.name,
+        description: description ?? this.description,
+        status: status ?? this.status,
+        stops: stops ?? this.stops,
+        vehicleId: vehicleId ?? this.vehicleId,
+        driverId: driverId ?? this.driverId,
+        scheduledStartTime: scheduledStartTime ?? this.scheduledStartTime,
+        startTime: startTime ?? this.startTime,
+        endTime: endTime ?? this.endTime,
+        estimatedDuration: estimatedDuration ?? this.estimatedDuration,
+        actualDuration: actualDuration ?? this.actualDuration,
+        estimatedDistance: estimatedDistance ?? this.estimatedDistance,
+        actualDistance: actualDistance ?? this.actualDistance,
+        maxPassengers: maxPassengers ?? this.maxPassengers,
+        notes: notes ?? this.notes,
+        createdAt: createdAt ?? this.createdAt,
+        updatedAt: updatedAt ?? this.updatedAt,
+      );
 
   // Getters uteis
   List<RouteStop> get orderedStops =>
-      List<RouteStop>.from(stops)
-        ..sort((a, b) => a.order.compareTo(b.order));
+      List<RouteStop>.from(stops)..sort((a, b) => a.order.compareTo(b.order));
 
   RouteStop? get currentStop => orderedStops.firstWhere(
-      (stop) => !stop.isCompleted,
-      orElse: () => orderedStops.last,
-    );
+        (stop) => !stop.isCompleted,
+        orElse: () => orderedStops.last,
+      );
 
   RouteStop? get nextStop {
     final current = currentStop;
@@ -373,8 +373,9 @@ class BusRoute {
     return (completedStopsCount / stops.length) * 100;
   }
 
-  bool get isCompleted => status == RouteStatus.completed ||
-        stops.isNotEmpty && stops.every((stop) => stop.isCompleted);
+  bool get isCompleted =>
+      status == RouteStatus.completed ||
+      stops.isNotEmpty && stops.every((stop) => stop.isCompleted);
 
   bool get isActive => status == RouteStatus.active;
 
