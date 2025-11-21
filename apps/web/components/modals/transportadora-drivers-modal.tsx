@@ -81,7 +81,7 @@ export function CarrierDriversModal({ carrier, isOpen, onClose }: CarrierDrivers
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...formData,
-          carrier_id: carrier.id
+          transportadora_id: carrier.id
         })
       })
 
