@@ -252,6 +252,8 @@ export async function requireAuth(
     const sessionCookie = request.cookies.get('golffox-session')?.value
     const authHeader = request.headers.get('authorization')
     const allCookies = request.cookies.getAll().map(c => c.name)
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
     
     console.error('❌ Autenticação falhou', {
       hasCookie: !!sessionCookie,
@@ -266,7 +268,7 @@ export async function requireAuth(
     })
     
     // Em desenvolvimento, tentar usar cookie diretamente
-    if (isDevelopment && sessionCookie && serviceKey) {
+    if (isDevelopment && sessionCookie && serviceKey && supabaseUrl) {
       try {
         const decoded = Buffer.from(sessionCookie, 'base64').toString('utf-8')
         const sessionData = JSON.parse(decoded)
@@ -274,44 +276,41 @@ export async function requireAuth(
         
         if (userId) {
           console.log('⚠️ Tentando autenticação via cookie em desenvolvimento...')
-          const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-          if (supabaseUrl) {
-            const supabaseAdmin = createClient(supabaseUrl, serviceKey, {
-              auth: { persistSession: false, autoRefreshToken: false }
-            })
-            
-            const { data: userData, error: dbError } = await supabaseAdmin
-              .from('users')
-              .select('id, email, role, company_id, transportadora_id')
-              .eq('id', userId)
-              .maybeSingle()
-            
-            if (!dbError && userData) {
-              console.log('✅ Autenticação via cookie bem-sucedida em desenvolvimento')
-              // Retornar null para continuar (não é erro)
-              const authenticatedUser: AuthenticatedUser = {
-                id: userData.id,
-                email: userData.email || '',
-                role: userData.role || 'passenger',
-                companyId: userData.company_id || null
-              }
-              
-              // Verificar role se necessário
-              if (requiredRole && !hasRole(authenticatedUser, requiredRole)) {
-                const roles = Array.isArray(requiredRole) ? requiredRole : [requiredRole]
-                return NextResponse.json(
-                  { 
-                    error: 'Acesso negado', 
-                    message: `Acesso permitido apenas para: ${roles.join(', ')}. Seu role atual: ${authenticatedUser.role}`,
-                    allowedRoles: roles,
-                    currentRole: authenticatedUser.role
-                  },
-                  { status: 403 }
-                )
-              }
-              
-              return null // Autenticação OK
+          const supabaseAdmin = createClient(supabaseUrl, serviceKey, {
+            auth: { persistSession: false, autoRefreshToken: false }
+          })
+          
+          const { data: userData, error: dbError } = await supabaseAdmin
+            .from('users')
+            .select('id, email, role, company_id, transportadora_id')
+            .eq('id', userId)
+            .maybeSingle()
+          
+          if (!dbError && userData) {
+            console.log('✅ Autenticação via cookie bem-sucedida em desenvolvimento')
+            // Retornar null para continuar (não é erro)
+            const authenticatedUser: AuthenticatedUser = {
+              id: userData.id,
+              email: userData.email || '',
+              role: userData.role || 'passenger',
+              companyId: userData.company_id || null
             }
+            
+            // Verificar role se necessário
+            if (requiredRole && !hasRole(authenticatedUser, requiredRole)) {
+              const roles = Array.isArray(requiredRole) ? requiredRole : [requiredRole]
+              return NextResponse.json(
+                { 
+                  error: 'Acesso negado', 
+                  message: `Acesso permitido apenas para: ${roles.join(', ')}. Seu role atual: ${authenticatedUser.role}`,
+                  allowedRoles: roles,
+                  currentRole: authenticatedUser.role
+                },
+                { status: 403 }
+              )
+            }
+            
+            return null // Autenticação OK
           }
         }
       } catch (cookieError) {
