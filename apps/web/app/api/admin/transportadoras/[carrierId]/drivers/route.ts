@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseServiceRole } from '@/lib/supabase-server'
 
-// GET /api/admin/carriers/[carrierId]/drivers
+// GET /api/admin/transportadoras/[transportadoraId]/drivers
 export async function GET(
   request: NextRequest,
   { params }: { params: { transportadoraId: string } }
@@ -34,7 +34,7 @@ export async function GET(
   }
 }
 
-// POST /api/admin/carriers/[carrierId]/drivers
+// POST /api/admin/transportadoras/[transportadoraId]/drivers
 export async function POST(
   request: NextRequest,
   { params }: { params: { transportadoraId: string } }

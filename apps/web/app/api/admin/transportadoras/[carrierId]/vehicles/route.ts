@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseServiceRole } from '@/lib/supabase-server'
 
-// POST /api/admin/carriers/[carrierId]/vehicles
+// POST /api/admin/transportadoras/[transportadoraId]/vehicles
 export async function POST(
   request: NextRequest,
   { params }: { params: { transportadoraId: string } }

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseServiceRole } from '@/lib/supabase-server'
 
-// PUT /api/admin/carriers/[carrierId]/vehicles/[vehicleId]
+// PUT /api/admin/transportadoras/[transportadoraId]/vehicles/[vehicleId]
 export async function PUT(
   request: NextRequest,
   { params }: { params: { transportadoraId: string; vehicleId: string } }
@@ -69,7 +69,7 @@ export async function PUT(
   }
 }
 
-// DELETE /api/admin/carriers/[carrierId]/vehicles/[vehicleId]
+// DELETE /api/admin/transportadoras/[transportadoraId]/vehicles/[vehicleId]
 export async function DELETE(
   request: NextRequest,
   { params }: { params: { transportadoraId: string; vehicleId: string } }
