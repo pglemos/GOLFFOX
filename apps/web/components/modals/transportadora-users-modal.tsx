@@ -54,7 +54,7 @@ export function CarrierUsersModal({ carrier, isOpen, onClose, onSave }: CarrierU
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          carrier_id: carrier.id,
+          transportadora_id: carrier.id,
           email: newUserEmail,
           name: newUserName,
           password: newUserPassword,
