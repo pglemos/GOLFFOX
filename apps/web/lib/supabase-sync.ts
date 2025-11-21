@@ -292,7 +292,7 @@ async function executeSyncWithRetry(
       maintenance: 'gf_vehicle_maintenance',
       checklist: 'gf_vehicle_checklists',
       document: 'gf_driver_documents',
-      operator: 'users',
+      operador: 'users',
       company: 'companies',
       invoice: 'gf_invoices',
       schedule: 'gf_report_schedules',

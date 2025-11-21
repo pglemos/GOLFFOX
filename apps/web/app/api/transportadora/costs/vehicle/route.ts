@@ -107,7 +107,7 @@ export async function POST(req: NextRequest) {
     // Verificar se o veículo pertence à transportadora do usuário
     const { data: vehicle } = await supabaseServiceRole
       .from('vehicles')
-      .select('carrier_id')
+      .select('transportadora_id')
       .eq('id', validated.vehicle_id)
       .single()
 
@@ -120,11 +120,11 @@ export async function POST(req: NextRequest) {
 
     const { data: userData } = await supabaseServiceRole
       .from('users')
-      .select('carrier_id')
+      .select('transportadora_id')
       .eq('id', user.id)
       .single()
 
-    if (userData?.carrier_id !== vehicle.carrier_id) {
+    if (userData?.transportadora_id !== vehicle.transportadora_id) {
       return NextResponse.json(
         { error: 'Acesso negado: veículo não pertence à sua transportadora' },
         { status: 403 }

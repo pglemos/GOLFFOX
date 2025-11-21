@@ -223,7 +223,7 @@ async function loginHandler(req: NextRequest) {
     const refreshToken = data.session.refresh_token
 
     let companyId: string | null = finalUser.company_id || null
-    if (role === 'operador' || role === 'operator') {
+    if (role === 'operador') {
       try {
         const { data: mapping } = await supabase
           .from('gf_user_company_map')
