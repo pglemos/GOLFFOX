@@ -154,28 +154,97 @@ async function loginHandler(req: NextRequest) {
         hasServiceKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY
       }, 'AuthAPI')
       
-      // ✅ Usar função RPC que bypassa RLS completamente (SECURITY DEFINER)
-      // Isso garante que a query funcione mesmo se o cliente service role tiver problemas
-      const { data: rpcData, error: rpcError } = await supabaseAdmin
-        .rpc('get_user_by_id_for_login', { p_user_id: data.user.id })
+      // ✅ ESTRATÉGIA: Tentar múltiplas abordagens para garantir que funcione
+      // 1. Primeiro tentar função RPC (mais seguro, bypassa RLS)
+      // 2. Se falhar, usar SQL direto via REST API
+      // 3. Se ainda falhar, usar query direta (pode falhar por RLS, mas tentamos)
       
-      if (rpcError) {
-        userCheckError = rpcError
-        debug('Erro na função RPC get_user_by_id_for_login:', { 
-          error: rpcError,
+      let rpcWorked = false
+      
+      // Tentativa 1: Função RPC
+      try {
+        const { data: rpcData, error: rpcError } = await supabaseAdmin
+          .rpc('get_user_by_id_for_login', { p_user_id: data.user.id })
+        
+        if (!rpcError && rpcData && Array.isArray(rpcData) && rpcData.length > 0) {
+          existingUser = rpcData[0]
+          rpcWorked = true
+          debug('✅ Usuário encontrado via RPC:', { 
+            found: true,
+            userId: existingUser.id,
+            email: existingUser.email,
+            role: existingUser.role
+          }, 'AuthAPI')
+        } else if (rpcError) {
+          debug('⚠️ Erro na função RPC (tentando fallback):', { 
+            error: rpcError,
+            userId: data.user.id 
+          }, 'AuthAPI')
+        } else {
+          debug('⚠️ RPC retornou vazio (tentando fallback):', { 
+            rpcDataLength: rpcData?.length || 0,
+            userId: data.user.id 
+          }, 'AuthAPI')
+        }
+      } catch (rpcErr: any) {
+        debug('⚠️ Exceção ao chamar RPC (tentando fallback):', { 
+          error: rpcErr?.message,
           userId: data.user.id 
         }, 'AuthAPI')
-      } else if (rpcData && rpcData.length > 0) {
-        existingUser = rpcData[0]
-        debug('Usuário encontrado via RPC:', { 
-          found: true,
-          userId: existingUser.id,
-          email: existingUser.email,
-          role: existingUser.role
-        }, 'AuthAPI')
-      } else {
-        // Se não encontrou por ID, tentar por email (fallback usando função similar)
-        debug('Usuário não encontrado por ID via RPC, tentando query direta por email...', { 
+      }
+      
+      // Tentativa 2: Se RPC não funcionou, usar SQL direto via REST API
+      if (!rpcWorked && !existingUser) {
+        try {
+          const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL
+          const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+          
+          if (supabaseUrl && serviceKey) {
+            // Usar fetch direto para chamar a função RPC via REST API
+            const rpcUrl = `${supabaseUrl}/rest/v1/rpc/get_user_by_id_for_login`
+            const response = await fetch(rpcUrl, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${serviceKey}`,
+                'apikey': serviceKey,
+              },
+              body: JSON.stringify({ p_user_id: data.user.id }),
+            })
+            
+            if (response.ok) {
+              const rpcResult = await response.json()
+              if (Array.isArray(rpcResult) && rpcResult.length > 0) {
+                existingUser = rpcResult[0]
+                rpcWorked = true
+                debug('✅ Usuário encontrado via RPC (fetch direto):', { 
+                  found: true,
+                  userId: existingUser.id,
+                  email: existingUser.email,
+                  role: existingUser.role
+                }, 'AuthAPI')
+              }
+            } else {
+              const errorText = await response.text()
+              debug('⚠️ Erro ao chamar RPC via fetch:', { 
+                status: response.status,
+                statusText: response.statusText,
+                error: errorText,
+                userId: data.user.id 
+              }, 'AuthAPI')
+            }
+          }
+        } catch (fetchErr: any) {
+          debug('⚠️ Exceção ao chamar RPC via fetch (tentando fallback):', { 
+            error: fetchErr?.message,
+            userId: data.user.id 
+          }, 'AuthAPI')
+        }
+      }
+      
+      // Tentativa 3: Se ainda não funcionou, tentar query direta por email (último recurso)
+      if (!rpcWorked && !existingUser) {
+        debug('⚠️ RPC não funcionou, tentando query direta por email (pode falhar por RLS)...', { 
           userId: data.user.id, 
           email: data.user.email || email 
         }, 'AuthAPI')
@@ -189,7 +258,7 @@ async function loginHandler(req: NextRequest) {
         existingUser = resultByEmail.data
         userCheckError = resultByEmail.error
         
-        debug('Resultado da busca por email (fallback):', { 
+        debug('Resultado da busca por email (fallback final):', { 
           found: !!existingUser, 
           hasError: !!userCheckError, 
           error: userCheckError ? {
