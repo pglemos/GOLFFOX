@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, useMemo } from "react"
+import { useEffect, useState } from "react"
 import { AppShell } from "@/components/app-shell"
 import { Button } from "@/components/ui/button"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { FleetMap } from "@/components/fleet-map"
 import { KpiCardEnhanced } from "@/components/transportadora/kpi-card-enhanced"
-import { DataTable, Column } from "@/components/transportadora/data-table"
+import { DataTable } from "@/components/transportadora/data-table"
 import { ChartContainer } from "@/components/transportadora/chart-container"
 import { QuickActions } from "@/components/transportadora/quick-actions"
 import { RecentActivities } from "@/components/transportadora/recent-activities"
@@ -23,7 +23,7 @@ import {
 } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
-import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts"
+import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts"
 
 export default function TransportadoraDashboard() {
   const router = useRouter()
@@ -239,40 +239,31 @@ export default function TransportadoraDashboard() {
     }
   }, [user, userData?.transportadora_id])
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin mx-auto"></div>
-          <p className="mt-4 text-[var(--ink-muted)]">Carregando...</p>
-        </div>
-      </div>
-    )
-  }
-
   const loadFleetData = async () => {
     try {
       // Buscar dados da transportadora
-      const { data: userData } = await supabase
+      const { data: transportadoraData } = await supabase
         .from('users')
         .select('transportadora_id')
         .eq('id', user?.id)
         .single()
 
-      if (!userData?.transportadora_id) {
+      if (!transportadoraData?.transportadora_id) {
         console.error("Usuário não está associado a uma transportadora")
         return
       }
+
+      const transportadoraId = transportadoraData.transportadora_id
 
       // Carregar veículos
       const { data: vehicles } = await supabase
         .from('vehicles')
         .select('*')
-        .eq('transportadora_id', userData.transportadora_id)
+        .eq('transportadora_id', transportadoraId)
 
       // Carregar posições dos veículos usando RPC do mapa
       const { data: mapData } = await supabase.rpc('gf_map_snapshot_full', {
-        p_transportadora_id: userData.transportadora_id,
+        p_transportadora_id: transportadoraId,
         p_company_id: null,
         p_route_id: null
       })
@@ -333,9 +324,11 @@ export default function TransportadoraDashboard() {
         .from('users')
         .select('*')
         .eq('role', 'driver')
-        .eq('transportadora_id', userData.transportadora_id)
+        .eq('transportadora_id', transportadoraId)
 
-      if (driversData) {
+      let driversWithStats: any[] = []
+
+      if (driversData?.length) {
         // Buscar dados de ranking/gamificação
         const driverIds = driversData.map((d: any) => d.id)
         const { data: rankings } = await supabase
@@ -343,7 +336,7 @@ export default function TransportadoraDashboard() {
           .select('*')
           .in('driver_id', driverIds)
 
-        const driversWithStats = (driversData || []).map((driver: any) => {
+        driversWithStats = (driversData || []).map((driver: any) => {
           const ranking = rankings?.find((r: any) => r.driver_id === driver.id)
           return {
             id: driver.id,
@@ -353,15 +346,15 @@ export default function TransportadoraDashboard() {
             status: 'active'
           }
         })
-
-        setDrivers(driversWithStats)
       }
+
+      setDrivers(driversWithStats)
 
       // Buscar alertas críticos de vencimento
       const { data: alerts } = await supabase
         .from('v_carrier_expiring_documents')
         .select('*')
-        .eq('transportadora_id', userData.transportadora_id)
+        .eq('transportadora_id', transportadoraId)
         .in('alert_level', ['expired', 'critical'])
 
       // Buscar custos do mês atual
@@ -374,14 +367,14 @@ export default function TransportadoraDashboard() {
       const { data: vehicleCosts } = await supabase
         .from('v_carrier_vehicle_costs_summary')
         .select('total_cost_brl')
-        .eq('transportadora_id', userData.transportadora_id)
+        .eq('transportadora_id', transportadoraId)
         .gte('month', currentMonthStart.toISOString())
         .lt('month', currentMonthEnd.toISOString())
 
       const { data: routeCosts } = await supabase
         .from('v_carrier_route_costs_summary')
         .select('total_cost_brl')
-        .eq('transportadora_id', userData.transportadora_id)
+        .eq('transportadora_id', transportadoraId)
         .gte('month', currentMonthStart.toISOString())
         .lt('month', currentMonthEnd.toISOString())
 
@@ -389,16 +382,21 @@ export default function TransportadoraDashboard() {
       const { data: routes } = await supabase
         .from('routes')
         .select('id')
-        .eq('transportadora_id', userData.transportadora_id)
+        .eq('transportadora_id', transportadoraId)
 
       const routeIds = routes?.map((r: any) => r.id) || []
       
       // Buscar total de viagens do mês (já temos currentMonthStart definido acima)
-      const { count: tripsCount } = await supabase
-        .from('trips')
-        .select('*', { count: 'exact', head: true })
-        .in('route_id', routeIds)
-        .gte('created_at', currentMonthStart.toISOString())
+      let tripsCount = 0
+      if (routeIds.length > 0) {
+        const { count } = await supabase
+          .from('trips')
+          .select('*', { count: 'exact', head: true })
+          .in('route_id', routeIds)
+          .gte('created_at', currentMonthStart.toISOString())
+
+        tripsCount = count || 0
+      }
 
       // Calcular custos totais
       const vehicleCostsTotal = vehicleCosts?.reduce((sum: number, item: any) => sum + (parseFloat(item.total_cost_brl) || 0), 0) || 0
@@ -428,21 +426,23 @@ export default function TransportadoraDashboard() {
         supabase
           .from('v_carrier_vehicle_costs_summary')
           .select('total_cost_brl')
-          .eq('transportadora_id', userData.transportadora_id)
+          .eq('transportadora_id', transportadoraId)
           .gte('month', previousMonthStart.toISOString())
           .lt('month', previousMonthEnd.toISOString()),
         supabase
           .from('v_carrier_route_costs_summary')
           .select('total_cost_brl')
-          .eq('transportadora_id', userData.transportadora_id)
+          .eq('transportadora_id', transportadoraId)
           .gte('month', previousMonthStart.toISOString())
           .lt('month', previousMonthEnd.toISOString()),
-        supabase
-          .from('trips')
-          .select('*', { count: 'exact', head: true })
-          .in('route_id', routeIds)
-          .gte('created_at', previousMonthStart.toISOString())
-          .lt('created_at', previousMonthEnd.toISOString())
+        routeIds.length > 0
+          ? supabase
+              .from('trips')
+              .select('*', { count: 'exact', head: true })
+              .in('route_id', routeIds)
+              .gte('created_at', previousMonthStart.toISOString())
+              .lt('created_at', previousMonthEnd.toISOString())
+          : Promise.resolve({ count: 0 })
       ])
 
       const prevVehicleCostsTotal = prevVehicleCosts.data?.reduce((sum: number, item: any) => sum + (parseFloat(item.total_cost_brl) || 0), 0) || 0
@@ -508,10 +508,24 @@ export default function TransportadoraDashboard() {
       setRecentActivities(activities)
 
       // Atualizar userData para usar no FleetMap
-      setUserData(userData)
+      setUserData((prev: any) => ({
+        ...prev,
+        ...transportadoraData,
+      }))
     } catch (error) {
       console.error("Erro ao carregar dados da frota:", error)
     }
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <p className="mt-4 text-[var(--ink-muted)]">Carregando...</p>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -529,12 +543,10 @@ export default function TransportadoraDashboard() {
             <p className="text-xs sm:text-sm md:text-base text-[var(--ink-muted)]">Monitore veículos e motoristas em tempo real</p>
           </div>
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
-            <Select value={period} onValueChange={(value: any) => {
-              // #region agent log
-              fetch('http://127.0.0.1:7242/ingest/802544c4-70d0-43c7-a57c-6692b28ca17d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'transportadora/page.tsx:532',message:'Select period changed',data:{oldValue:period,newValue:value},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-              // #endregion
-              setPeriod(value)
-            }}>
+            <Select
+              value={period}
+              onValueChange={(value: "today" | "week" | "month" | "custom") => setPeriod(value)}
+            >
               <SelectTrigger className="w-full sm:w-40 min-h-[44px] touch-manipulation">
                 <Calendar className="h-4 w-4 mr-2" />
                 <SelectValue />
@@ -565,12 +577,7 @@ export default function TransportadoraDashboard() {
             formatValue={(v) => v.toString()}
             iconColor="var(--brand)"
             iconBgColor="var(--brand-light)"
-            onClick={() => {
-              // #region agent log
-              fetch('http://127.0.0.1:7242/ingest/802544c4-70d0-43c7-a57c-6692b28ca17d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'transportadora/page.tsx:563',message:'KPI card clicked - Total da Frota',data:{target:'/transportadora/veiculos'},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
-              // #endregion
-              router.push('/transportadora/veiculos')
-            }}
+            onClick={() => router.push('/transportadora/veiculos')}
           />
           <KpiCardEnhanced
             icon={Navigation}
@@ -589,7 +596,17 @@ export default function TransportadoraDashboard() {
             formatValue={(v) => v.toString()}
             iconColor="#10B981"
             iconBgColor="rgba(16, 185, 129, 0.1)"
-            onClick={() => router.push('/transportadora/motoristas')}
+            onClick={(e) => {
+              console.log('🔵 [DEBUG] KPI Motoristas clicked', e)
+              e.preventDefault()
+              e.stopPropagation()
+              try {
+                router.push('/transportadora/motoristas')
+              } catch (err) {
+                console.error('❌ Router.push failed, using window.location:', err)
+                window.location.href = '/transportadora/motoristas'
+              }
+            }}
           />
           <KpiCardEnhanced
             icon={AlertCircle}
@@ -599,7 +616,17 @@ export default function TransportadoraDashboard() {
             formatValue={(v) => v.toString()}
             iconColor="#EF4444"
             iconBgColor="rgba(239, 68, 68, 0.1)"
-            onClick={() => router.push('/transportadora/alertas')}
+            onClick={(e) => {
+              console.log('🔵 [DEBUG] KPI Alertas clicked', e)
+              e.preventDefault()
+              e.stopPropagation()
+              try {
+                router.push('/transportadora/alertas')
+              } catch (err) {
+                console.error('❌ Router.push failed, using window.location:', err)
+                window.location.href = '/transportadora/alertas'
+              }
+            }}
           />
         </div>
 
@@ -613,7 +640,17 @@ export default function TransportadoraDashboard() {
             formatValue={(v) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 0 }).format(v)}
             iconColor="#9333EA"
             iconBgColor="rgba(147, 51, 234, 0.1)"
-            onClick={() => router.push('/transportadora/custos')}
+            onClick={(e) => {
+              console.log('🔵 [DEBUG] KPI Custos clicked', e)
+              e.preventDefault()
+              e.stopPropagation()
+              try {
+                router.push('/transportadora/custos')
+              } catch (err) {
+                console.error('❌ Router.push failed, using window.location:', err)
+                window.location.href = '/transportadora/custos'
+              }
+            }}
           />
           <KpiCardEnhanced
             icon={Navigation}
@@ -633,7 +670,17 @@ export default function TransportadoraDashboard() {
             iconColor="#F59E0B"
             iconBgColor="rgba(245, 158, 11, 0.1)"
             hint="Clique para ver detalhes"
-            onClick={() => router.push('/transportadora/alertas')}
+            onClick={(e) => {
+              console.log('🔵 [DEBUG] KPI Alertas clicked', e)
+              e.preventDefault()
+              e.stopPropagation()
+              try {
+                router.push('/transportadora/alertas')
+              } catch (err) {
+                console.error('❌ Router.push failed, using window.location:', err)
+                window.location.href = '/transportadora/alertas'
+              }
+            }}
           />
         </div>
 
@@ -756,12 +803,7 @@ export default function TransportadoraDashboard() {
                   size="sm" 
                   variant="outline" 
                   className="flex-shrink-0 w-full sm:w-auto min-h-[44px] touch-manipulation"
-                  onClick={() => {
-                    // #region agent log
-                    fetch('http://127.0.0.1:7242/ingest/802544c4-70d0-43c7-a57c-6692b28ca17d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'transportadora/page.tsx:749',message:'Button clicked - Expandir mapa',data:{target:'/transportadora/mapa'},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
-                    // #endregion
-                    router.push('/transportadora/mapa')
-                  }}
+                  onClick={() => router.push('/transportadora/mapa')}
                 >
                   Expandir
                 </Button>
@@ -770,7 +812,7 @@ export default function TransportadoraDashboard() {
             <CardContent className="pt-0 px-3 sm:px-6">
               <div className="h-48 sm:h-64 md:h-80 lg:h-96 rounded-lg overflow-hidden border border-[var(--border)] shadow-inner bg-gray-50 dark:bg-gray-900">
                 <FleetMap 
-                  carrierId={userData?.carrier_id}
+                  transportadoraId={userData?.transportadora_id}
                 />
               </div>
               <div className="mt-3 flex flex-wrap gap-2 text-xs text-[var(--ink-muted)]">
@@ -811,7 +853,17 @@ export default function TransportadoraDashboard() {
                   size="sm" 
                   variant="outline" 
                   className="flex-shrink-0 w-full sm:w-auto min-h-[44px] touch-manipulation"
-                  onClick={() => router.push('/transportadora/motoristas')}
+                  onClick={(e) => {
+                    console.log('🔵 [DEBUG] Button Ver todos motoristas clicked', e)
+                    e.preventDefault()
+                    e.stopPropagation()
+                    try {
+                      router.push('/transportadora/motoristas')
+                    } catch (err) {
+                      console.error('❌ Router.push failed, using window.location:', err)
+                      window.location.href = '/transportadora/motoristas'
+                    }
+                  }}
                 >
                   Ver todos
                 </Button>
@@ -913,7 +965,15 @@ export default function TransportadoraDashboard() {
               searchPlaceholder="Buscar veículos..."
               pagination={true}
               pageSize={10}
-              onRowClick={(row) => router.push(`/transportadora/veiculos?vehicleId=${row.id}`)}
+              onRowClick={(row) => {
+                console.log('🔵 [DEBUG] Table row clicked', row)
+                try {
+                  router.push(`/transportadora/veiculos?vehicleId=${row.id}`)
+                } catch (err) {
+                  console.error('❌ Router.push failed, using window.location:', err)
+                  window.location.href = `/transportadora/veiculos?vehicleId=${row.id}`
+                }
+              }}
             />
           </div>
 

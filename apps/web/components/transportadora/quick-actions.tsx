@@ -70,10 +70,11 @@ const defaultActions: QuickAction[] = [
 export function QuickActions({ className }: QuickActionsProps) {
   const router = useRouter()
 
-  const handleAction = (action: QuickAction) => {
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/802544c4-70d0-43c7-a57c-6692b28ca17d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'quick-actions.tsx:73',message:'Quick action clicked',data:{actionId:action.id,hasOnClick:!!action.onClick,hasHref:!!action.href,href:action.href},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
-    // #endregion
+  const handleAction = (action: QuickAction, e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault()
+      e.stopPropagation()
+    }
     if (action.onClick) {
       action.onClick()
     } else if (action.href) {
@@ -101,7 +102,7 @@ export function QuickActions({ className }: QuickActionsProps) {
                 <Button
                   variant={action.variant || "outline"}
                   className="w-full h-auto flex flex-col items-center gap-1.5 sm:gap-2 p-3 sm:p-4 min-h-[80px] sm:min-h-[100px] touch-manipulation"
-                  onClick={() => handleAction(action)}
+                  onClick={(e) => handleAction(action, e)}
                 >
                   <Icon className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
                   <span className="text-xs sm:text-sm text-center leading-tight">{action.label}</span>

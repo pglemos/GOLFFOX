@@ -65,12 +65,10 @@ export function KpiCardEnhanced({
       transition={{ duration: 0.2, ease: "easeOut" }}
       className={cn("group cursor-pointer", onClick && "cursor-pointer", className)}
       onClick={(e) => {
-        // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/802544c4-70d0-43c7-a57c-6692b28ca17d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'kpi-card-enhanced.tsx:67',message:'KPI card clicked',data:{label,hasOnClick:!!onClick},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
-        // #endregion
-        if (onClick) {
-          onClick()
-        }
+        if (!onClick) return
+        e.preventDefault()
+        e.stopPropagation()
+        onClick()
       }}
     >
       <Card className="overflow-hidden hover:shadow-lg transition-shadow touch-manipulation">
@@ -127,9 +125,11 @@ export function KpiCardEnhanced({
           {previousValue !== undefined && (
             <div className="mt-2 sm:mt-3 pt-2 sm:pt-3 border-t border-[var(--border)]">
               <p className="text-xs text-[var(--ink-muted)] truncate">
-                {trend !== undefined && trend > 0 && "↑ "}
-                {trend !== undefined && trend < 0 && "↓ "}
-                {trend !== undefined && trend === 0 && "→ "}
+                {trend !== undefined && (
+                  <span className="mr-1">
+                    {trend > 0 ? "↑" : trend < 0 ? "↓" : "→"}
+                  </span>
+                )}
                 <span className="hidden sm:inline">Período anterior: </span>
                 <span className="sm:hidden">Anterior: </span>
                 {formatValue(previousValue)}
