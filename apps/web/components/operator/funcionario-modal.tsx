@@ -130,7 +130,7 @@ export function FuncionarioModal({ funcionario, isOpen, onClose, onSave, empresa
         })
       } else {
         // Create new employee user via API route
-        const res = await fetch('/api/operator/create-employee', {
+        const res = await fetch('/api/operador/create-employee', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

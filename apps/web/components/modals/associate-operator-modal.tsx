@@ -44,7 +44,7 @@ export function AssociateOperatorModal({
       const { data, error: queryError } = await supabase
         .from("users")
         .select("id, email, name, role")
-        .in("role", ["operator", "operador"])
+        .in("role", ["operador", "operator"])
         .order("email")
 
       if (queryError) {
@@ -84,7 +84,7 @@ export function AssociateOperatorModal({
     setError(null)
 
     try {
-      const response = await fetch("/api/operator/associate-company", {
+      const response = await fetch("/api/operador/associate-company", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

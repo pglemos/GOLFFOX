@@ -271,7 +271,7 @@ export async function importEmployees(
         }
       } else {
         // Criar novo usuário via API
-        const userRes = await fetch('/api/operator/create-employee', {
+        const userRes = await fetch('/api/operador/create-employee', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

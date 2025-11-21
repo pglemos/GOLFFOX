@@ -124,7 +124,7 @@ export function DriverModal({ driver, isOpen, onClose, onSave }: DriverModalProp
         await auditLogs.update('driver', driver.id, { name: driverData.name, email: driverData.email })
       } else {
         // Criar motorista via API com Service Role (respeita RLS e políticas)
-        const resp = await fetch('/api/operator/create-employee', {
+        const resp = await fetch('/api/operador/create-employee', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
