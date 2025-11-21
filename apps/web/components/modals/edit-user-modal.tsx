@@ -43,7 +43,7 @@ export function EditUserModal({
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    role: "operator",
+    role: "operador",
     is_active: true,
     phone: "",
   })

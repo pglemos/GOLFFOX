@@ -63,7 +63,7 @@ export function CompanyOperatorsModal({
 
     setLoading(true)
     try {
-      const response = await fetch(`/api/admin/users-list?company_id=${company.id}&role=operator`)
+      const response = await fetch(`/api/admin/users-list?company_id=${company.id}&role=operador`)
       if (!response.ok) {
         throw new Error('Erro ao carregar usuários')
       }

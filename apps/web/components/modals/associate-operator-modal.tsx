@@ -44,7 +44,7 @@ export function AssociateOperatorModal({
       const { data, error: queryError } = await supabase
         .from("users")
         .select("id, email, name, role")
-        .in("role", ["operador", "operator"])
+        .eq("role", "operador")
         .order("email")
 
       if (queryError) {
