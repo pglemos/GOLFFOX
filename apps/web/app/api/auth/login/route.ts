@@ -147,9 +147,6 @@ async function loginHandler(req: NextRequest) {
       // ✅ Criar um cliente service role FRESCO a cada vez (sem cache de sessão)
       const supabaseAdmin = getSupabaseAdmin()
       
-      // ✅ Garantir que não há nenhuma sessão de usuário ativa no cliente
-      await supabaseAdmin.auth.signOut()
-      
       debug('Buscando usuário na tabela users com service role...', { 
         userId: data.user.id, 
         email: data.user.email || email,
@@ -157,35 +154,28 @@ async function loginHandler(req: NextRequest) {
         hasServiceKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY
       }, 'AuthAPI')
       
-      // ✅ Buscar usuário diretamente com todas as colunas necessárias
-      // Não fazer múltiplas queries - apenas uma com todas as colunas
-      const result = await supabaseAdmin
-        .from('users')
-        .select('id, email, role, company_id, transportadora_id')
-        .eq('id', data.user.id)
-        .maybeSingle()
+      // ✅ Usar função RPC que bypassa RLS completamente (SECURITY DEFINER)
+      // Isso garante que a query funcione mesmo se o cliente service role tiver problemas
+      const { data: rpcData, error: rpcError } = await supabaseAdmin
+        .rpc('get_user_by_id_for_login', { p_user_id: data.user.id })
       
-      existingUser = result.data
-      userCheckError = result.error
-      
-      debug('Resultado da busca por ID (service role):', { 
-        found: !!existingUser, 
-        hasError: !!userCheckError, 
-        error: userCheckError ? {
-          message: userCheckError.message,
-          code: userCheckError.code,
-          details: userCheckError.details,
-          hint: userCheckError.hint
-        } : null,
-        userId: data.user.id,
-        foundUserId: existingUser?.id,
-        foundEmail: existingUser?.email,
-        foundRole: existingUser?.role
-      }, 'AuthAPI')
-      
-      // Se não encontrou por ID, tentar por email (fallback)
-      if (!existingUser && !userCheckError) {
-        debug('Usuário não encontrado por ID, tentando por email...', { 
+      if (rpcError) {
+        userCheckError = rpcError
+        debug('Erro na função RPC get_user_by_id_for_login:', { 
+          error: rpcError,
+          userId: data.user.id 
+        }, 'AuthAPI')
+      } else if (rpcData && rpcData.length > 0) {
+        existingUser = rpcData[0]
+        debug('Usuário encontrado via RPC:', { 
+          found: true,
+          userId: existingUser.id,
+          email: existingUser.email,
+          role: existingUser.role
+        }, 'AuthAPI')
+      } else {
+        // Se não encontrou por ID, tentar por email (fallback usando função similar)
+        debug('Usuário não encontrado por ID via RPC, tentando query direta por email...', { 
           userId: data.user.id, 
           email: data.user.email || email 
         }, 'AuthAPI')
@@ -199,7 +189,7 @@ async function loginHandler(req: NextRequest) {
         existingUser = resultByEmail.data
         userCheckError = resultByEmail.error
         
-        debug('Resultado da busca por email (service role):', { 
+        debug('Resultado da busca por email (fallback):', { 
           found: !!existingUser, 
           hasError: !!userCheckError, 
           error: userCheckError ? {
