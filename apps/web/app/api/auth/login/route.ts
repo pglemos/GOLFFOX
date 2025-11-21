@@ -157,11 +157,20 @@ async function loginHandler(req: NextRequest) {
           userId: data.user.id, 
           email: data.user.email || email 
         }, 'AuthAPI')
-        const result2 = await supabaseAdmin
+        let result2 = await supabaseAdmin
           .from('users')
           .select('id, email, role, company_id, transportadora_id')
           .eq('email', (data.user.email || email).toLowerCase().trim())
           .maybeSingle()
+        
+        // Se der erro, tentar sem transportadora_id
+        if (result2.error && (result2.error.message?.includes('transportadora_id') || result2.error.message?.includes('column'))) {
+          result2 = await supabaseAdmin
+            .from('users')
+            .select('id, email, role, company_id')
+            .eq('email', (data.user.email || email).toLowerCase().trim())
+            .maybeSingle()
+        }
         existingUser = result2.data
         userCheckError = result2.error
         
