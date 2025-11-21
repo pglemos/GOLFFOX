@@ -45,7 +45,7 @@ function OperatorMapaPageInner() {
   }
 
   return (
-    <AppShell user={{ id: user?.id || "", name: user?.name || "Operador", email: user?.email || "", role: "operator" }}>
+    <AppShell user={{ id: user?.id || "", name: user?.name || "Operador", email: user?.email || "", role: "operador" }}>
       <div className="h-[calc(100vh-8rem)]">
         <FleetMap 
           companyId={tenantCompanyId || undefined} 
