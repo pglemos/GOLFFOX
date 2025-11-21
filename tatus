@@ -1,0 +1,5 @@
+[33m77bb654[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m refactor: remover todas as referências a 'carrier' e 'operator' como roles, atualizar componentes e imports
+[33m66582dd[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m fix: corrigir erros de build - caminhos de importação e exports de componentes
+[33mb8da155[m fix: implementar múltiplas estratégias para buscar usuário no login (RPC + fetch direto + fallback)
+[33md53cb2b[m docs: atualizar comentário para usar transportadoraId
+[33m3ce9063[m fix: atualizar referência carriers-list para transportadoras-list
