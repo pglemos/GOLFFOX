@@ -128,24 +128,30 @@ async function loginHandler(req: NextRequest) {
     let existingUser, userCheckError
     try {
       const supabaseAdmin = getSupabaseAdmin()
-      debug('Buscando usuário na tabela users...', { 
+      debug('Buscando usuário na tabela users com service role...', { 
         userId: data.user.id, 
         email: data.user.email || email 
       }, 'AuthAPI')
       
-      const result = await supabaseAdmin
+      // Primeiro, tentar buscar por ID com colunas básicas (mais seguro)
+      let result = await supabaseAdmin
         .from('users')
-        .select('id, email, role, company_id, transportadora_id')
+        .select('id, email, role')
         .eq('id', data.user.id)
         .maybeSingle()
       
       existingUser = result.data
       userCheckError = result.error
       
-      debug('Resultado da busca por ID:', { 
+      debug('Resultado da busca por ID (colunas básicas):', { 
         found: !!existingUser, 
         hasError: !!userCheckError, 
-        error: userCheckError,
+        error: userCheckError ? {
+          message: userCheckError.message,
+          code: userCheckError.code,
+          details: userCheckError.details,
+          hint: userCheckError.hint
+        } : null,
         userId: data.user.id,
         foundUserId: existingUser?.id,
         foundEmail: existingUser?.email
@@ -157,46 +163,49 @@ async function loginHandler(req: NextRequest) {
           userId: data.user.id, 
           email: data.user.email || email 
         }, 'AuthAPI')
-        let result2 = await supabaseAdmin
+        result = await supabaseAdmin
           .from('users')
-          .select('id, email, role, company_id, transportadora_id')
+          .select('id, email, role')
           .eq('email', (data.user.email || email).toLowerCase().trim())
           .maybeSingle()
         
-        // Se der erro, tentar sem transportadora_id
-        if (result2.error && (result2.error.message?.includes('transportadora_id') || result2.error.message?.includes('column'))) {
-          result2 = await supabaseAdmin
-            .from('users')
-            .select('id, email, role, company_id')
-            .eq('email', (data.user.email || email).toLowerCase().trim())
-            .maybeSingle()
-        }
-        existingUser = result2.data
-        userCheckError = result2.error
+        existingUser = result.data
+        userCheckError = result.error
         
         debug('Resultado da busca por email:', { 
           found: !!existingUser, 
           hasError: !!userCheckError, 
-          error: userCheckError,
+          error: userCheckError ? {
+            message: userCheckError.message,
+            code: userCheckError.code,
+            details: userCheckError.details
+          } : null,
           foundUserId: existingUser?.id,
           foundEmail: existingUser?.email
         }, 'AuthAPI')
       }
       
-      // Se ainda erro com colunas, tentar sem colunas extras
-      if (userCheckError && (userCheckError.message?.includes('column') || userCheckError.message?.includes('does not exist'))) {
-        debug('Erro com colunas, tentando query simplificada...', { error: userCheckError }, 'AuthAPI')
-        const result3 = await supabaseAdmin
+      // Se encontrou o usuário, buscar colunas adicionais se necessário
+      if (existingUser && !userCheckError) {
+        const resultExtended = await supabaseAdmin
           .from('users')
-          .select('id, email, role')
-          .eq('id', data.user.id)
+          .select('id, email, role, company_id, transportadora_id')
+          .eq('id', existingUser.id)
           .maybeSingle()
-        existingUser = result3.data
-        userCheckError = result3.error
+        
+        if (resultExtended.data && !resultExtended.error) {
+          existingUser = resultExtended.data
+        }
       }
     } catch (err: any) {
       userCheckError = err
-      logError('Erro ao buscar usuário na tabela users', { error: err, userId: data.user.id, email: data.user.email || email }, 'AuthAPI')
+      logError('Erro ao buscar usuário na tabela users', { 
+        error: err, 
+        errorMessage: err?.message,
+        errorCode: err?.code,
+        userId: data.user.id, 
+        email: data.user.email || email 
+      }, 'AuthAPI')
     }
     
     if (userCheckError) {
