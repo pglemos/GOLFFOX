@@ -49,7 +49,7 @@ export function CarrierVehiclesModal({ carrier, isOpen, onClose }: CarrierVehicl
   const loadVehicles = async () => {
     try {
       setLoading(true)
-      const response = await fetch(`/api/admin/transportadoras/${carrier.id}/vehicles`)
+      const response = await fetch(`/api/admin/transportadora/${carrier.id}/vehicles`)
       if (response.ok) {
         const result = await response.json()
         setVehicles(result.vehicles || [])
@@ -84,7 +84,7 @@ export function CarrierVehiclesModal({ carrier, isOpen, onClose }: CarrierVehicl
     setLoading(true)
 
     try {
-      const response = await fetch(`/api/admin/transportadoras/${carrier.id}/vehicles`, {
+      const response = await fetch(`/api/admin/transportadora/${carrier.id}/vehicles`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -118,7 +118,7 @@ export function CarrierVehiclesModal({ carrier, isOpen, onClose }: CarrierVehicl
     setLoading(true)
 
     try {
-      const response = await fetch(`/api/admin/transportadoras/${carrier.id}/vehicles/${editingVehicle.id}`, {
+      const response = await fetch(`/api/admin/transportadora/${carrier.id}/vehicles/${editingVehicle.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -152,7 +152,7 @@ export function CarrierVehiclesModal({ carrier, isOpen, onClose }: CarrierVehicl
     setLoading(true)
 
     try {
-      const response = await fetch(`/api/admin/transportadoras/${carrier.id}/vehicles/${vehicleId}`, {
+      const response = await fetch(`/api/admin/transportadora/${carrier.id}/vehicles/${vehicleId}`, {
         method: 'DELETE'
       })
 
