@@ -125,7 +125,7 @@ export async function POST(request: NextRequest) {
       authenticatedUser = {
         id: 'test-user-id',
         email: 'test@example.com',
-        role: 'operator',
+        role: 'operador',
         companyId: defaultCompanyId
       }
     }

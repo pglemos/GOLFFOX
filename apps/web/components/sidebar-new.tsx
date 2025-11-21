@@ -337,7 +337,7 @@ const CustomSidebarLink = ({
 }
 
 // Logo component
-const SidebarLogo = ({ panel }: { panel: 'admin' | 'operador' | 'carrier' }) => {
+const SidebarLogo = ({ panel }: { panel: 'admin' | 'operador' | 'transportadora' }) => {
   const { open } = useSidebar()
   
   return (
