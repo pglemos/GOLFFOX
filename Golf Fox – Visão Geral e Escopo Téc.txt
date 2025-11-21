@@ -1,0 +1,228 @@
+Golf Fox – Visão Geral e Escopo Técnico Resumido
+1. Visão geral
+
+Golf Fox é uma plataforma SaaS de gestão completa de fretamento corporativo porta-a-porta, que centraliza toda a operação de transporte de colaboradores — do planejamento de rotas ao controle operacional, financeiro e de qualidade do serviço.
+
+A solução conecta três pilares principais:
+
+Golf Fox – atua como operadora master: fecha contrato com as empresas que precisam de fretamento, contrata e gerencia as transportadoras terceirizadas, controla toda a operação, custos, manutenção, incidentes e indicadores.
+
+Empresas contratantes – utilizam o transporte para seus funcionários e contam com um painel próprio para cadastro de colaboradores, acompanhamento da operação e relatórios.
+
+Transportadoras terceirizadas – executam as rotas com seus veículos e motoristas, utilizando um painel próprio e o aplicativo do motorista para operar em campo.
+
+A Golf Fox faz a ponte entre empresa contratante e transportadora, concentrando em um único sistema:
+
+contratos,
+
+planejamento de rotas,
+
+check-in/check-out de passageiros (NFC, QR Code ou manual),
+
+rastreamento em tempo real de motoristas e veículos,
+
+controle de frota, custos e manutenções,
+
+incidentes, avaliações e comunicação,
+
+relatórios operacionais e financeiros para todos os envolvidos.
+
+2. Modelo operacional (alto nível)
+
+A empresa contratante fecha o serviço de fretamento com a Golf Fox.
+
+A Golf Fox, por sua vez, contrata uma ou mais transportadoras terceirizadas para executar as rotas daquela empresa ou região.
+
+Cada ator possui um ambiente específico dentro da plataforma:
+
+Painel Golf Fox (Admin/Operação Master)
+
+Painel da Empresa Contratante
+
+Painel da Transportadora
+
+App do Motorista
+
+App do Passageiro (colaborador)
+
+A Golf Fox mantém a visão global de toda a operação (todas as empresas, todas as transportadoras, todos os veículos, motoristas e rotas) e garante transparência, rastreabilidade e controle para ambos os lados: empresa e transportadora.
+
+3. Escopo funcional – visão macro
+3.1. Planejamento e execução de rotas
+
+Criação e gestão de rotas corporativas com:
+
+pontos de embarque e desembarque,
+
+turnos e horários,
+
+definição de veículos e motoristas responsáveis.
+
+Rotas para levar colaboradores de múltiplos endereços até a empresa e, no retorno, da empresa até os pontos de desembarque cadastrados.
+
+3.2. Check-in / check-out de passageiros
+
+Embarque e desembarque dos colaboradores com:
+
+NFC,
+
+QR Code,
+
+ou registro manual pelo app do motorista ou do passageiro (quando aplicável).
+
+Registro de presença por passageiro, por viagem e por rota, visível para Golf Fox, empresas e transportadoras.
+
+3.3. Rastreamento e monitoramento em tempo real
+
+Rastreamento GPS de todos os veículos e motoristas em operação.
+
+Mapas em tempo real:
+
+Golf Fox: visão global da operação (todas as empresas, todas as transportadoras).
+
+Empresa contratante: veículos e rotas que atendem aquela empresa.
+
+Transportadora: todos os veículos da própria frota, em rota ou em garagem.
+
+Visualização em tempo real de:
+
+pontos de embarque/desembarque pendentes e concluídos,
+
+quantidade de passageiros embarcados / pendentes por rota.
+
+3.4. Gestão de frota, custos e manutenção
+
+Cadastro de veículos por transportadora:
+
+capacidade,
+
+documentos,
+
+status,
+
+histórico de uso.
+
+Controle de manutenções programadas e realizadas.
+
+Registro de custos operacionais por veículo e por rota (combustível, manutenção, etc.), gerando base para relatórios financeiros.
+
+3.5. Gestão de motoristas
+
+Cadastro completo dos motoristas:
+
+dados pessoais,
+
+documentos,
+
+exames obrigatórios e vencimentos.
+
+Associação de motoristas a veículos e rotas.
+
+Histórico de rotas e viagens por motorista.
+
+3.6. Gestão de incidentes, qualidade e comunicação
+
+Registro e acompanhamento de incidentes em tempo real:
+
+por veículo, rota, empresa e passageiro.
+
+Canal para comentários, dúvidas, elogios e reclamações dos passageiros em relação à viagem e à transportadora.
+
+Acesso da transportadora e da Golf Fox a todo o histórico de incidentes e feedbacks.
+
+Avaliação das viagens pelos passageiros após o desembarque.
+
+3.7. Relatórios e dashboards
+
+Painéis com KPIs operacionais (viagens realizadas, pontualidade, ocupação, incidentes, etc.).
+
+Relatórios operacionais e financeiros segmentados por:
+
+empresa contratante,
+
+transportadora,
+
+rota,
+
+veículo,
+
+motorista.
+
+Exportação de dados para análise externa (ex.: uso por RH, financeiro, diretoria).
+
+4. Perfis e módulos
+4.1. Painel Golf Fox (Admin / Operação Master)
+
+Gestão de empresas, transportadoras, frota, motoristas, contratos, rotas, permissões de usuários, socorro e alertas, cada um em uma aba dedicada.
+
+Planejamento centralizado de todas as rotas da operação.
+
+Mapa global da operação em tempo real.
+
+Controle de custos, manutenções, incidentes e contratos.
+
+Relatórios operacionais e financeiros consolidados.
+
+4.2. Painel da Empresa Contratante (Operador da Empresa)
+
+Cadastro e gestão de colaboradores (dados completos, endereço, turno, horários e status de ativo/inativo).
+
+Acesso ao monitoramento GPS em tempo real dos veículos que atendem aquela empresa, a partir do momento em que o motorista designado para aquela rota e veículo inicia a rota no aplicativo.
+
+Acompanhamento em tempo real de embarques e desembarques dos colaboradores (via NFC, QR Code ou registro manual).
+
+Visão em tempo real dos incidentes relacionados às rotas da empresa.
+
+Geração de relatórios operacionais e financeiros da empresa.
+
+4.3. Painel da Transportadora
+
+Gestão de motoristas (cadastro, exames, documentos e vencimentos).
+
+Gestão de frota (veículos, documentos e manutenções).
+
+Mapa em tempo real de todos os veículos (em rota ou em garagem), com visão de:
+
+pontos de embarque/desembarque por veículo e por rota; à medida que os embarques vão sendo realizados ao longo da rota, os pontos vão desaparecendo do mapa em tempo real;
+
+quantidade de passageiros por rota em tempo real; à medida que os embarques vão sendo realizados ao longo da rota, o número de passageiros pendentes vai diminuindo em tempo real.
+
+Controle de custos por veículo e por rota.
+
+Acompanhamento de incidentes em tempo real.
+
+Relatórios operacionais e financeiros.
+
+Acesso às avaliações, comentários e reclamações dos passageiros.
+
+4.4. App do Motorista
+
+Visualização de todo o percurso designado; para iniciar a rota é obrigatório realizar o checklist do veículo.
+
+Após o checklist obrigatório, visualização da rota designada com todos os pontos de embarque/desembarque no mapa.
+
+Navegação GPS integrada.
+
+Registro de embarque/desembarque (check-in/check-out) dos passageiros via NFC, QR Code ou manualmente.
+
+Comunicação com a central (transportadora) integrada ao painel da transportadora.
+
+Acesso ao histórico de viagens realizadas.
+
+4.5. App do Passageiro (Colaborador)
+
+Visualização dos pontos de embarque da sua rota (endereços, sem exibir os nomes de outros passageiros).
+
+Rastreamento em tempo real do ônibus da sua rota, após o motorista designado iniciar a rota.
+
+Acesso às informações e horários da rota.
+
+Notificações de início de rota e de aproximação do ônibus ao ponto de embarque.
+
+Confirmação manual de embarque e desembarque pelo aplicativo (quando aplicável).
+
+Uso de cartão NFC ou QR Code (quando fornecido pela empresa) para validação de embarque no app do motorista.
+
+Canal para envio de comentários, dúvidas, elogios e reclamações à transportadora.
+
+Avaliação da viagem ao final do percurso.
