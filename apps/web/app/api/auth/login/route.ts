@@ -90,7 +90,8 @@ async function loginHandler(req: NextRequest) {
     return NextResponse.json({ error: 'missing_supabase_env' }, { status: 500 })
   }
 
-  const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  // ✅ Criar cliente separado para autenticação (usa anon key)
+  const supabaseAuth = createClient(supabaseUrl, supabaseAnonKey, {
     auth: {
       autoRefreshToken: false,
       persistSession: false,
@@ -98,7 +99,7 @@ async function loginHandler(req: NextRequest) {
   })
 
   try {
-    const { data, error: authError } = await supabase.auth.signInWithPassword({
+    const { data, error: authError } = await supabaseAuth.auth.signInWithPassword({
       email,
       password,
     })
