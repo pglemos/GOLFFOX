@@ -146,6 +146,7 @@ export const AppShell = memo(function AppShell({ user, children, panel }: AppShe
             transition={{ duration: 0.2 }}
             className="fixed inset-0 bg-black/50 z-40 lg:hidden"
             onClick={() => setIsSidebarOpen(false)}
+            style={{ pointerEvents: 'auto' }}
           />
         )}
 
@@ -164,7 +165,7 @@ export const AppShell = memo(function AppShell({ user, children, panel }: AppShe
             "overflow-y-auto overflow-x-hidden bg-[var(--bg)]",
             !isMobile ? "flex-1 lg:ml-[60px]" : "w-full ml-0 flex-shrink-0",
             "max-w-full w-full",
-            "relative z-10"
+            "relative z-50"
           )}
           style={{
             backgroundImage: 'none',
