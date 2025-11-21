@@ -8,7 +8,7 @@ export async function GET(
 ) {
   try {
     const supabase = supabaseServiceRole
-    const transportadoraId = params.transportadoraId || params.carrierId
+    const transportadoraId = params.transportadoraId
 
     const { data: drivers, error } = await supabase
       .from('drivers')
@@ -41,7 +41,7 @@ export async function POST(
 ) {
   try {
     const supabase = supabaseServiceRole
-    const transportadoraId = params.transportadoraId || params.carrierId
+    const transportadoraId = params.transportadoraId
     const body = await request.json()
 
     const { name, email, phone, cpf, cnh, cnh_category } = body

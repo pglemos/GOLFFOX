@@ -8,7 +8,7 @@ export async function PUT(
 ) {
   try {
     const supabase = supabaseServiceRole
-    const transportadoraId = params.transportadoraId || params.carrierId
+    const transportadoraId = params.transportadoraId
     const { driverId } = params
     const body = await request.json()
 
@@ -61,7 +61,7 @@ export async function DELETE(
 ) {
   try {
     const supabase = supabaseServiceRole
-    const transportadoraId = params.transportadoraId || params.carrierId
+    const transportadoraId = params.transportadoraId
     const { driverId } = params
 
     const { error } = await supabase
