@@ -53,7 +53,7 @@ export function EditUserModal({
       setFormData({
         name: user.name || "",
         email: user.email || "",
-        role: user.role || "operator",
+        role: user.role || "operador",
         is_active: user.is_active ?? true,
         phone: user.phone || "",
       })

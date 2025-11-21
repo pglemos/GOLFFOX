@@ -169,7 +169,7 @@ export function CreateOperatorModal({
         globalSyncManager.triggerSync('user.created', {
           id: result.userId || result.operatorId,
           email: result.email || formData.responsibleEmail || '',
-          role: 'operator',
+          role: 'operador',
           company_id: result.companyId
         })
       }
