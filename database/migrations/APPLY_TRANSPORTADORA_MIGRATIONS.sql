@@ -83,7 +83,7 @@ SELECT
   c.date AS date
 FROM public.gf_costs c
 JOIN public.companies comp ON comp.id = c.company_id
-LEFT JOIN public.carriers car ON car.id = COALESCE(c.transportadora_id, c.carrier_id)  -- Suporta ambos durante migração
+LEFT JOIN public.carriers car ON car.id = c.transportadora_id  -- Usa apenas transportadora_id (carrier_id já foi removido na v63)
 LEFT JOIN public.routes r ON r.id = c.route_id
 LEFT JOIN public.vehicles v ON v.id = c.vehicle_id
 LEFT JOIN public.users u ON u.id = c.driver_id
@@ -91,7 +91,7 @@ JOIN public.gf_cost_categories cat ON cat.id = c.cost_category_id
 LEFT JOIN public.gf_cost_centers cc ON cc.id = c.cost_center_id
 WHERE cat.is_active = true;
 
-COMMENT ON VIEW public.v_costs_secure IS 'View segura de custos com joins para nomes (RLS aplicado via tabela base). Suporta tanto transportadora_id quanto carrier_id durante migração.';
+COMMENT ON VIEW public.v_costs_secure IS 'View segura de custos com joins para nomes (RLS aplicado via tabela base). Usa transportadora_id (carrier_id foi removido na migração v63).';
 
 DO $$ 
 BEGIN
