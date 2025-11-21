@@ -256,7 +256,7 @@ const CustomSidebarLink = ({
   
   // Verificar se o item está ativo
   // Para dashboards, apenas rota exata
-  const isDashboard = item.href === "/admin" || item.href === "/operator" || item.href === "/transportadora"
+  const isDashboard = item.href === "/admin" || item.href === "/operador" || item.href === "/transportadora"
   const isActive = isDashboard 
     ? pathname === item.href 
     : pathname === item.href || pathname?.startsWith(item.href + "/")

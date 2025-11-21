@@ -184,7 +184,7 @@ function FuncionariosPageContent() {
             <p className="text-gray-600 mb-4">
               Selecione uma empresa para continuar.
             </p>
-            <Button onClick={() => router.push('/operator')} variant="default">
+            <Button onClick={() => router.push('/operador')} variant="default">
               Voltar para Dashboard
             </Button>
           </Card>
@@ -206,7 +206,7 @@ function FuncionariosPageContent() {
               <Button onClick={() => window.location.reload()} variant="default">
                 Tentar Novamente
               </Button>
-              <Button onClick={() => router.push('/operator')} variant="outline">
+              <Button onClick={() => router.push('/operador')} variant="outline">
                 Voltar
               </Button>
             </div>
@@ -233,7 +233,7 @@ function FuncionariosPageContent() {
             </p>
           </div>
           <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-            <Button onClick={() => router.push('/operator')} variant="outline" className="w-full sm:w-auto min-h-[44px] touch-manipulation text-xs sm:text-sm">
+            <Button onClick={() => router.push('/operador')} variant="outline" className="w-full sm:w-auto min-h-[44px] touch-manipulation text-xs sm:text-sm">
               Voltar
             </Button>
             <Button variant="outline" onClick={() => setIsCsvModalOpen(true)} className="w-full sm:w-auto min-h-[44px] touch-manipulation text-xs sm:text-sm">

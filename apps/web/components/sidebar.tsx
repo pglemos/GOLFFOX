@@ -175,7 +175,7 @@ const operadorMenuItems = [
   }
 ]
 
-const carrierMenuItems = [
+const transportadoraMenuItems = [
   { 
     icon: LayoutDashboard, 
     label: "Dashboard", 
@@ -229,7 +229,7 @@ const carrierMenuItems = [
 interface SidebarProps {
   isOpen?: boolean
   isMobile?: boolean
-  panel?: 'admin' | 'operador' | 'carrier'
+  panel?: 'admin' | 'operador' | 'transportadora'
 }
 
 export function Sidebar({ isOpen = true, isMobile = false, panel = 'admin' }: SidebarProps) {

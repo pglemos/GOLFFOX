@@ -217,7 +217,7 @@ export default function CustosOperatorPage() {
             <Building2 className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <h2 className="text-xl font-bold mb-2">Nenhuma empresa selecionada</h2>
             <p className="text-gray-600 mb-4">Selecione uma empresa para continuar</p>
-            <Button onClick={() => router.push('/operator')} variant="default">
+            <Button onClick={() => router.push('/operador')} variant="default">
               Voltar para Dashboard
             </Button>
           </Card>

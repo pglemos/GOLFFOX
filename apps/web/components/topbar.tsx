@@ -187,7 +187,7 @@ export function Topbar({
         </Button>
 
         {/* Logo / Empresa */}
-        {(pathname?.startsWith('/operator')) ? (
+        {(pathname?.startsWith('/operador') || pathname?.startsWith('/operator')) ? (
           <OperatorLogoSection panelHomeUrl={panelHomeUrl} panelBranding={panelBranding} />
         ) : (
           <a href={panelHomeUrl} className="flex items-center gap-2 sm:gap-3 flex-shrink-0 group">

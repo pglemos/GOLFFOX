@@ -125,7 +125,7 @@ export default function OperatorRotasPage() {
           <Card className="p-8 max-w-md w-full text-center">
             <h2 className="text-xl font-bold mb-2">Nenhuma empresa selecionada</h2>
             <p className="text-gray-600 mb-4">Selecione uma empresa para continuar</p>
-            <Button onClick={() => router.push('/operator')} variant="default">
+            <Button onClick={() => router.push('/operador')} variant="default">
               Voltar para Dashboard
             </Button>
           </Card>

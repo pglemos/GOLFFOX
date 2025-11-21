@@ -35,7 +35,7 @@ export default function Error({
           <Button onClick={reset} variant="default" className="bg-orange-500 hover:bg-orange-600">
             Tentar Novamente
           </Button>
-          <Button onClick={() => window.location.href = '/operator'} variant="outline">
+          <Button onClick={() => window.location.href = '/operador'} variant="outline">
             Ir para Dashboard
           </Button>
         </div>

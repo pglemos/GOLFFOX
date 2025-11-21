@@ -57,7 +57,7 @@ export class FuncionariosErrorBoundary extends Component<Props, State> {
                 Tentar Novamente
               </Button>
               <Button 
-                onClick={() => window.location.href = '/operator'} 
+                onClick={() => window.location.href = '/operador'} 
                 variant="outline"
               >
                 Voltar

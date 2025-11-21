@@ -126,7 +126,7 @@ export function FuncionarioModal({ funcionario, isOpen, onClose, onSave, empresa
         }
 
         notifySuccess("Funcionário atualizado com sucesso!", {
-          i18n: { ns: 'operator', key: 'employees.updated' }
+          i18n: { ns: 'operador', key: 'employees.updated' }
         })
       } else {
         // Create new employee user via API route
@@ -165,7 +165,7 @@ export function FuncionarioModal({ funcionario, isOpen, onClose, onSave, empresa
         if (error) throw error
 
         notifySuccess("Funcionário cadastrado com sucesso!", {
-          i18n: { ns: 'operator', key: 'employees.created' }
+          i18n: { ns: 'operador', key: 'employees.created' }
         })
       }
 
@@ -174,7 +174,7 @@ export function FuncionarioModal({ funcionario, isOpen, onClose, onSave, empresa
     } catch (error: any) {
       logError("Erro ao salvar funcionário", { error }, 'FuncionarioModal')
       notifyError(`Erro ao salvar funcionário: ${error.message}`, undefined, {
-        i18n: { ns: 'operator', key: 'employees.saveError' }
+        i18n: { ns: 'operador', key: 'employees.saveError' }
       })
     } finally {
       setLoading(false)

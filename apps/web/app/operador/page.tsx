@@ -27,7 +27,7 @@ export default function OperatorDashboard() {
       // Se tem parâmetro ?company=, redirecionar para URL limpa
       if (url.searchParams.has('company')) {
         console.log('⚠️ Removendo parâmetro ?company= da URL')
-        router.replace('/operator')
+        router.replace('/operador')
         return
       }
     }

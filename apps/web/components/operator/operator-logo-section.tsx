@@ -14,7 +14,7 @@ interface OperatorLogoSectionProps {
 
 export function OperatorLogoSection({ panelHomeUrl, panelBranding }: OperatorLogoSectionProps) {
   const pathname = usePathname()
-  const isOperatorPanel = pathname?.startsWith('/operator') ?? false
+  const isOperatorPanel = (pathname?.startsWith('/operador') || pathname?.startsWith('/operator')) ?? false
   const isAdminPanel = pathname?.startsWith('/admin') ?? false
   const { companyName, logoUrl } = useOperatorTenant()
   const [imgFailed, setImgFailed] = useState(false)
