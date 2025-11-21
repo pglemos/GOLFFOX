@@ -457,14 +457,13 @@ export function Sidebar({ isOpen = true, isMobile = false, panel = 'admin', user
   // Em mobile, passar ambos para controle externo
   return (
     <UISidebar 
-      open={isMobile ? internalOpen : undefined} 
-      setOpen={isMobile ? setInternalOpen : undefined} 
+      {...(isMobile ? { open: internalOpen, setOpen: setInternalOpen } : {})}
       animate={true}
       isMobile={isMobile}
     >
       <SidebarBody className={cn(
         "justify-between gap-4 bg-white dark:bg-neutral-900 border-r border-[var(--border)]",
-        !isMobile && "fixed top-16 sm:top-18 left-0 h-[calc(100vh-4rem)] sm:h-[calc(100vh-4.5rem)] z-50",
+        !isMobile && "top-16 sm:top-18 left-0 h-[calc(100vh-4rem)] sm:h-[calc(100vh-4.5rem)] z-50",
         isMobile && "w-[280px] sm:w-[300px]",
         "!px-0 !py-0"
       )}>
