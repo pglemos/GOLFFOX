@@ -4,11 +4,11 @@ import { supabaseServiceRole } from '@/lib/supabase-server'
 // POST /api/admin/carriers/[carrierId]/vehicles
 export async function POST(
   request: NextRequest,
-  { params }: { params: { carrierId: string } }
+  { params }: { params: { transportadoraId: string } }
 ) {
   try {
     const supabase = supabaseServiceRole
-    const { carrierId } = params
+    const transportadoraId = params.transportadoraId || params.carrierId
     const body = await request.json()
 
     const {
@@ -35,7 +35,7 @@ export async function POST(
       .from('vehicles')
       .insert([
         {
-          carrier_id: carrierId,
+          transportadora_id: transportadoraId,
           plate,
           prefix: prefix || null,
           manufacturer: manufacturer || null,
