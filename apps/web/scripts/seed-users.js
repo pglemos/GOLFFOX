@@ -88,7 +88,7 @@ async function seedUsers() {
       console.log(`✅ Empresa encontrada: ${companyId}`)
       // Atualizar company_id para operator e passenger
       testUsers.forEach(user => {
-        if (user.role === 'operator' || user.role === 'passenger') {
+        if (user.role === 'operador' || user.role === 'operator' || user.role === 'passenger') {
           user.company_id = companyId
         }
       })

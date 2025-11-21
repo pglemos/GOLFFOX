@@ -238,8 +238,8 @@ export function Sidebar({ isOpen = true, isMobile = false, panel = 'admin' }: Si
   // Selecionar menu baseado no painel
   const menuItems = (panel === 'operador' || panel === 'operator')
     ? operadorMenuItems 
-    : panel === 'carrier' 
-    ? carrierMenuItems 
+    : panel === 'transportadora' 
+    ? transportadoraMenuItems 
     : adminMenuItems
 
   return (

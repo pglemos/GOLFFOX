@@ -224,7 +224,7 @@ export async function POST(request: NextRequest) {
         email_confirm: true,
         user_metadata: {
           name: operatorEmail.split('@')[0],
-          role: 'operator',
+          role: 'operador',
         }
       })
       
@@ -264,7 +264,7 @@ export async function POST(request: NextRequest) {
               userId: existingUser.id,
               created: false,
               email: operatorEmail,
-              role: 'operator',
+              role: 'operador',
               companyId: company.id,
               company,
               operator: {
@@ -283,7 +283,7 @@ export async function POST(request: NextRequest) {
           userId: 'test-operator-' + Date.now(),
           created: true,
           email: operatorEmail,
-          role: 'operator',
+          role: 'operador',
           companyId: company.id,
           company,
           operator: {

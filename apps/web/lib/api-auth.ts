@@ -145,8 +145,8 @@ export function hasRole(user: AuthenticatedUser | null, requiredRole: string | s
     return user.role === 'admin'
   }
   
-  if (roles.includes('operator')) {
-    return ['admin', 'operator'].includes(user.role)
+  if (roles.includes('operador') || roles.includes('operator')) {
+    return ['admin', 'operador', 'operator'].includes(user.role)
   }
   
   if (roles.includes('carrier') || roles.includes('transportadora')) {

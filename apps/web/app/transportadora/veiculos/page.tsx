@@ -20,7 +20,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Textarea } from "@/components/ui/textarea"
 
-export default function CarrierVeiculosPage() {
+export default function TransportadoraVeiculosPage() {
   const router = useRouter()
   const routerNext = useRouterNext()
   const [user, setUser] = useState<any>(null)

@@ -210,7 +210,7 @@ function CarrierMapaContent() {
   )
 }
 
-export default function CarrierMapaPage() {
+export default function TransportadoraMapaPage() {
   return (
     <Suspense fallback={
       <div className="flex items-center justify-center min-h-screen">

@@ -217,7 +217,7 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
         if (formData.company_id) {
           vehicleDataRaw.company_id = formData.company_id
         }
-      } else if (userInfo.role === 'operator') {
+      } else if (userInfo.role === 'operador' || userInfo.role === 'operator') {
         // Operator deve usar seu próprio company_id
         if (userInfo.company_id) {
           vehicleDataRaw.company_id = userInfo.company_id

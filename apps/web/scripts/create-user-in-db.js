@@ -79,8 +79,8 @@ async function createUserInDatabase() {
     
     // Determinar role baseado no email
     let role = 'admin'
-    if (TEST_EMAIL.includes('operator')) {
-      role = 'operator'
+    if (TEST_EMAIL.includes('operator') || TEST_EMAIL.includes('operador')) {
+      role = 'operador'
     } else if (TEST_EMAIL.includes('carrier')) {
       role = 'transportadora'
     } else if (TEST_EMAIL.includes('driver')) {
@@ -101,7 +101,7 @@ async function createUserInDatabase() {
     }
     
     // Adicionar company_id se existir e o role for operator
-    if (companies && (role === 'operator' || role === 'admin')) {
+    if (companies && (role === 'operador' || role === 'operator' || role === 'admin')) {
       userData.company_id = companies.id
     }
     
