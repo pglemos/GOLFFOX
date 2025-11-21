@@ -3,7 +3,7 @@ import { NextRequest } from 'next/server'
 import { DELETE as transportadoraDeleteDELETE } from '../../../transportadoras/delete/route'
 
 export async function DELETE(req: NextRequest) {
-  // A rota de delete também aceita carrierId, então podemos chamar diretamente
+  // A rota de delete aceita transportadoraId, então podemos chamar diretamente
   return transportadoraDeleteDELETE(req)
 }
 
