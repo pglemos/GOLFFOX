@@ -123,37 +123,48 @@ async function loginHandler(req: NextRequest) {
       return NextResponse.json({ error: 'Falha na autenticação - sessão não criada' }, { status: 401 })
     }
     
+    // ✅ IMPORTANTE: Usar service role para buscar usuário na tabela users
+    // Isso bypassa o RLS e permite verificar se o usuário está cadastrado
     let existingUser, userCheckError
     try {
-      const result = await supabase
+      const supabaseAdmin = getSupabaseAdmin()
+      const result = await supabaseAdmin
         .from('users')
-        .select('id, email, role, company_id')
+        .select('id, email, role, company_id, transportadora_id')
         .eq('id', data.user.id)
         .maybeSingle()
       existingUser = result.data
       userCheckError = result.error
       
-      if (userCheckError && (userCheckError.message?.includes('column') || userCheckError.message?.includes('does not exist'))) {
-        const result2 = await supabase
+      // Se não encontrou por ID, tentar por email (fallback)
+      if (!existingUser && !userCheckError) {
+        debug('Usuário não encontrado por ID, tentando por email...', { 
+          userId: data.user.id, 
+          email: data.user.email || email 
+        }, 'AuthAPI')
+        const result2 = await supabaseAdmin
           .from('users')
-          .select('id, email, role')
-          .eq('id', data.user.id)
+          .select('id, email, role, company_id, transportadora_id')
+          .eq('email', (data.user.email || email).toLowerCase().trim())
           .maybeSingle()
         existingUser = result2.data
         userCheckError = result2.error
       }
-    } catch (err) {
-      try {
-        const result = await supabase
+      
+      // Se ainda erro com colunas, tentar sem colunas extras
+      if (userCheckError && (userCheckError.message?.includes('column') || userCheckError.message?.includes('does not exist'))) {
+        debug('Erro com colunas, tentando query simplificada...', { error: userCheckError }, 'AuthAPI')
+        const result3 = await supabaseAdmin
           .from('users')
           .select('id, email, role')
-          .eq('email', email.toLowerCase().trim())
+          .eq('id', data.user.id)
           .maybeSingle()
-        existingUser = result.data
-        userCheckError = result.error
-      } catch (err2) {
-        userCheckError = err2
+        existingUser = result3.data
+        userCheckError = result3.error
       }
+    } catch (err: any) {
+      userCheckError = err
+      logError('Erro ao buscar usuário na tabela users', { error: err, userId: data.user.id, email: data.user.email || email }, 'AuthAPI')
     }
     
     if (userCheckError) {
