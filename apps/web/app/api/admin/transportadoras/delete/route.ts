@@ -111,7 +111,7 @@ export async function DELETE(req: NextRequest) {
       if (!costsCheckError && costsData && costsData.length > 0) {
         const { error: costsError } = await supabaseServiceRole
           .from('costs')
-          .update({ carrier_id: null })
+          .update({ transportadora_id: null })
           .eq('transportadora_id', carrierId)
 
         if (costsError) {
