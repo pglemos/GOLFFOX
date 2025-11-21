@@ -10,11 +10,11 @@ import { useRouter } from "next/navigation"
 import { useAuthFast } from "@/hooks/use-auth-fast"
 import { useGlobalSync } from "@/hooks/use-global-sync"
 import { notifySuccess, notifyError } from "@/lib/toast"
-import { CreateCarrierModal } from "@/components/modals/create-carrier-modal"
-import { CarrierUsersModal } from "@/components/modals/carrier-users-modal"
-import { CarrierDriversModal } from "@/components/modals/carrier-drivers-modal"
-import { CarrierVehiclesModal } from "@/components/modals/carrier-vehicles-modal"
-import { EditCarrierModal } from "@/components/modals/edit-carrier-modal"
+import { CreateTransportadoraModal } from "@/components/modals/create-transportadora-modal"
+import { TransportadoraUsersModal } from "@/components/modals/transportadora-users-modal"
+import { TransportadoraDriversModal } from "@/components/modals/transportadora-drivers-modal"
+import { TransportadoraVehiclesModal } from "@/components/modals/transportadora-vehicles-modal"
+import { EditTransportadoraModal } from "@/components/modals/edit-transportadora-modal"
 
 export default function TransportadorasPage() {
   const router = useRouter()
@@ -367,7 +367,7 @@ export default function TransportadorasPage() {
         </div>
 
         {/* Modal Criar Transportadora */}
-        <CreateCarrierModal
+        <CreateTransportadoraModal
           isOpen={isCreateModalOpen}
           onClose={() => setIsCreateModalOpen(false)}
           onSave={async () => {
@@ -379,7 +379,7 @@ export default function TransportadorasPage() {
 
         {/* Modal Usuários de Acesso */}
         {selectedCarrierForUsers && (
-          <CarrierUsersModal
+          <TransportadoraUsersModal
             carrier={selectedCarrierForUsers}
             isOpen={isUsersModalOpen}
             onClose={() => {
@@ -394,7 +394,7 @@ export default function TransportadorasPage() {
 
         {/* Modal Motoristas */}
         {selectedCarrierForDrivers && (
-          <CarrierDriversModal
+          <TransportadoraDriversModal
             carrier={selectedCarrierForDrivers}
             isOpen={isDriversModalOpen}
             onClose={() => {
@@ -417,7 +417,7 @@ export default function TransportadorasPage() {
         )}
 
         {/* Modal Editar Transportadora */}
-        <EditCarrierModal
+        <EditTransportadoraModal
           carrier={selectedCarrierForEdit}
           isOpen={isEditModalOpen}
           onClose={() => {

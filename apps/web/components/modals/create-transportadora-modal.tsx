@@ -190,3 +190,6 @@ export function CreateCarrierModal({ isOpen, onClose, onSave }: CreateCarrierMod
   )
 }
 
+// Export com nome alternativo para compatibilidade
+export const CreateTransportadoraModal = CreateCarrierModal
+

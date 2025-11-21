@@ -9,14 +9,14 @@ import { Card } from "@/components/ui/card"
 import { UserPlus, Trash2 } from "lucide-react"
 import { notifySuccess, notifyError } from "@/lib/toast"
 
-interface CarrierUsersModalProps {
+interface TransportadoraUsersModalProps {
   carrier: { id: string; name: string }
   isOpen: boolean
   onClose: () => void
   onSave: () => void
 }
 
-export function CarrierUsersModal({ carrier, isOpen, onClose, onSave }: CarrierUsersModalProps) {
+export function TransportadoraUsersModal({ carrier, isOpen, onClose, onSave }: TransportadoraUsersModalProps) {
   const [users, setUsers] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
   const [showCreateForm, setShowCreateForm] = useState(false)

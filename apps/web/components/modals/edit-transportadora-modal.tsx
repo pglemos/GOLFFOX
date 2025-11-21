@@ -196,3 +196,6 @@ export function EditCarrierModal({ carrier, isOpen, onClose, onSave }: EditCarri
   )
 }
 
+// Export com nome alternativo para compatibilidade
+export const EditTransportadoraModal = EditCarrierModal
+
