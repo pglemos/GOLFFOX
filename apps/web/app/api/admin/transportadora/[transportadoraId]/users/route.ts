@@ -4,8 +4,7 @@ import { GET as transportadoraUsersGET } from '../../../transportadoras/[transpo
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { carrierId: string } }
+  { params }: { params: { transportadoraId: string } }
 ) {
-  // Chamar a rota nova passando carrierId como transportadoraId
-  return transportadoraUsersGET(req, { params: { transportadoraId: params.carrierId } } as any)
+  return transportadoraUsersGET(req, { params: { transportadoraId: params.transportadoraId } } as any)
 }

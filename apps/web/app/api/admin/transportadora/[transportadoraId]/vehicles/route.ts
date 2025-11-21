@@ -4,7 +4,7 @@ import { POST as transportadoraVehiclesPOST } from '../../../transportadoras/[tr
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { carrierId: string } }
+  { params }: { params: { transportadoraId: string } }
 ) {
-  return transportadoraVehiclesPOST(req, { params: { transportadoraId: params.carrierId } } as any)
+  return transportadoraVehiclesPOST(req, { params: { transportadoraId: params.transportadoraId } } as any)
 }

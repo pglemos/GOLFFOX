@@ -43,7 +43,7 @@ export function EditCarrierModal({ carrier, isOpen, onClose, onSave }: EditCarri
     setLoading(true)
 
     try {
-      const response = await fetch(`/api/admin/transportadoras/update?id=${carrier.id}`, {
+      const response = await fetch(`/api/admin/transportadora/update?id=${carrier.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
