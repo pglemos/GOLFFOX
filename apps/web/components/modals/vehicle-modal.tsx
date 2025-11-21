@@ -211,7 +211,7 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
       // Incluir company_id ou transportadora_id baseado no papel do usuário
       // Para admin: pode definir qualquer company_id
       // Para operator: deve usar o company_id do usuário
-      // Para carrier: deve usar o carrier_id do usuário
+      // Para transportadora: deve usar o transportadora_id do usuário
       if (userInfo.role === 'admin') {
         // Admin pode definir company_id manualmente se fornecido no formData
         if (formData.company_id) {
