@@ -1,0 +1,1030 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "GolfFox API - Documentação Completa",
+    "version": "1.0.0",
+    "description": "API completa do sistema GolfFox - Gestão de Transporte Urbano. Inclui autenticação, gerenciamento de veículos, rotas, custos, relatórios e muito mais.",
+    "contact": {
+      "email": "suporte@golffox.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Servidor de desenvolvimento local"
+    },
+    {
+      "url": "https://golffox.vercel.app",
+      "description": "Servidor de produção"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    },
+    {
+      "cookieAuth": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "Autenticação",
+      "description": "Endpoints de autenticação e gerenciamento de sessão"
+    },
+    {
+      "name": "Admin",
+      "description": "Endpoints administrativos para gerenciamento do sistema"
+    },
+    {
+      "name": "Operador",
+      "description": "Endpoints para operadores"
+    },
+    {
+      "name": "Transportadora",
+      "description": "Endpoints para transportadoras"
+    },
+    {
+      "name": "Custos",
+      "description": "Gerenciamento de custos e orçamentos"
+    },
+    {
+      "name": "Relatórios",
+      "description": "Geração e agendamento de relatórios"
+    },
+    {
+      "name": "Sistema",
+      "description": "Endpoints de sistema (health check, analytics, etc.)"
+    }
+  ],
+  "paths": {
+    "/api/auth/csrf": {
+      "get": {
+        "tags": ["Autenticação"],
+        "summary": "Obter token CSRF",
+        "description": "Retorna um token CSRF necessário para requisições mutantes (POST, PUT, DELETE, PATCH)",
+        "responses": {
+          "200": {
+            "description": "Token CSRF obtido com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "csrfToken": {
+                      "type": "string",
+                      "description": "Token CSRF"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "tags": ["Autenticação"],
+        "summary": "Login e autenticação",
+        "description": "Autentica um usuário e cria uma sessão. Requer token CSRF no header 'x-csrf-token' (pode ser ignorado em modo de teste com header 'x-test-mode: true')",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "password"],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "golffox@admin.com",
+                    "description": "Email do usuário"
+                  },
+                  "password": {
+                    "type": "string",
+                    "format": "password",
+                    "example": "senha123",
+                    "description": "Senha do usuário"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login bem-sucedido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "string",
+                      "description": "Token de acesso JWT"
+                    },
+                    "refreshToken": {
+                      "type": "string",
+                      "description": "Token de refresh"
+                    },
+                    "user": {
+                      "type": "object",
+                      "properties": {
+                        "id": {"type": "string"},
+                        "email": {"type": "string"},
+                        "role": {
+                          "type": "string",
+                          "enum": ["admin", "operator", "carrier", "driver", "passenger"]
+                        },
+                        "companyId": {"type": "string"},
+                        "transportadoraId": {"type": "string"}
+                      }
+                    },
+                    "session": {
+                      "type": "object",
+                      "description": "Dados da sessão"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Credenciais faltando ou payload inválido"
+          },
+          "401": {
+            "description": "Credenciais inválidas ou erro de autenticação"
+          },
+          "403": {
+            "description": "CSRF inválido, usuário não cadastrado, sem perfil ou empresa inativa"
+          },
+          "422": {
+            "description": "Email em formato inválido"
+          },
+          "429": {
+            "description": "Rate limit excedido"
+          },
+          "500": {
+            "description": "Erro interno do servidor"
+          }
+        }
+      }
+    },
+    "/api/auth/me": {
+      "get": {
+        "tags": ["Autenticação"],
+        "summary": "Obter informações do usuário atual",
+        "description": "Retorna informações do usuário autenticado baseado na sessão",
+        "responses": {
+          "200": {
+            "description": "Informações do usuário",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "user": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autenticado"
+          }
+        }
+      }
+    },
+    "/api/health": {
+      "get": {
+        "tags": ["Sistema"],
+        "summary": "Health check do sistema",
+        "description": "Verifica o status da aplicação e conexão com Supabase",
+        "responses": {
+          "200": {
+            "description": "Status do sistema",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": ["ok", "error"],
+                      "example": "ok"
+                    },
+                    "ok": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "supabase": {
+                      "type": "string",
+                      "enum": ["ok", "error", "unconfigured"],
+                      "example": "ok"
+                    },
+                    "error": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  }
+                },
+                "example": {
+                  "status": "ok",
+                  "ok": true,
+                  "supabase": "ok",
+                  "error": null,
+                  "timestamp": "2025-11-21T18:18:21.187Z"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro no sistema"
+          }
+        }
+      }
+    },
+    "/api/admin/vehicles/{vehicleId}": {
+      "delete": {
+        "tags": ["Admin"],
+        "summary": "Excluir ou arquivar veículo",
+        "description": "Exclui um veículo ou o arquiva (marca como inativo) se houver viagens associadas. Valida formato UUID e verifica dependências.",
+        "parameters": [
+          {
+            "name": "vehicleId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "ID do veículo (UUID v4)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Veículo excluído ou arquivado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "archived": {
+                      "type": "boolean",
+                      "description": "true se foi arquivado (tem viagens), false se foi excluído"
+                    },
+                    "tripsCount": {
+                      "type": "number",
+                      "description": "Número de viagens associadas"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "ID inválido ou formato UUID inválido"
+          },
+          "404": {
+            "description": "Veículo não encontrado"
+          },
+          "409": {
+            "description": "Veículo em uso (não pode ser excluído)"
+          },
+          "500": {
+            "description": "Erro interno"
+          }
+        }
+      },
+      "patch": {
+        "tags": ["Admin"],
+        "summary": "Atualizar veículo",
+        "description": "Atualiza informações de um veículo",
+        "parameters": [
+          {
+            "name": "vehicleId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "plate": {"type": "string"},
+                  "model": {"type": "string"},
+                  "year": {"type": "number"},
+                  "capacity": {"type": "number"},
+                  "prefix": {"type": "string"},
+                  "company_id": {"type": "string", "format": "uuid"},
+                  "carrier_id": {"type": "string", "format": "uuid"},
+                  "is_active": {"type": "boolean"},
+                  "photo_url": {"type": "string"}
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Veículo atualizado"
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "500": {
+            "description": "Erro ao atualizar"
+          }
+        }
+      }
+    },
+    "/api/admin/generate-stops": {
+      "post": {
+        "tags": ["Admin"],
+        "summary": "Gerar paradas otimizadas para rota",
+        "description": "Gera paradas otimizadas para uma rota usando Google Maps API",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["route_id"],
+                "properties": {
+                  "route_id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "description": "ID da rota (aceita route_id ou routeId)"
+                  },
+                  "routeId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "description": "ID da rota (formato alternativo)"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Paradas geradas com sucesso"
+          },
+          "400": {
+            "description": "route_id faltando ou inválido"
+          },
+          "500": {
+            "description": "Erro ao gerar paradas"
+          }
+        }
+      }
+    },
+    "/api/admin/optimize-route": {
+      "post": {
+        "tags": ["Admin"],
+        "summary": "Otimizar rota",
+        "description": "Otimiza uma rota usando Google Maps Directions API",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["route_id"],
+                "properties": {
+                  "route_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Rota otimizada com sucesso"
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "500": {
+            "description": "Erro ao otimizar"
+          }
+        }
+      }
+    },
+    "/api/admin/create-operator": {
+      "post": {
+        "tags": ["Admin"],
+        "summary": "Criar novo operador",
+        "description": "Cria um novo usuário operador e associa a uma empresa",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "company_id"],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "operador@empresa.com"
+                  },
+                  "company_id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "description": "ID da empresa"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Operador criado com sucesso"
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "500": {
+            "description": "Erro ao criar operador"
+          }
+        }
+      }
+    },
+    "/api/costs/manual": {
+      "post": {
+        "tags": ["Custos"],
+        "summary": "Criar entrada de custo manual",
+        "description": "Cria uma nova entrada de custo manual. Em modo de teste (header 'x-test-mode: true'), permite bypass de autenticação.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["company_id", "cost_category_id", "amount"],
+                "properties": {
+                  "company_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "carrier_id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "nullable": true
+                  },
+                  "route_id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "nullable": true
+                  },
+                  "vehicle_id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "nullable": true
+                  },
+                  "driver_id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "nullable": true
+                  },
+                  "cost_category_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "cost_center_id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "nullable": true
+                  },
+                  "date": {
+                    "type": "string",
+                    "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+                    "description": "Data do custo (formato YYYY-MM-DD)"
+                  },
+                  "cost_date": {
+                    "type": "string",
+                    "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+                    "description": "Data do custo (formato alternativo)"
+                  },
+                  "amount": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "qty": {
+                    "type": "number",
+                    "nullable": true
+                  },
+                  "unit": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "currency": {
+                    "type": "string",
+                    "default": "BRL"
+                  },
+                  "notes": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "source": {
+                    "type": "string",
+                    "enum": ["manual", "import", "invoice", "calc"],
+                    "default": "manual"
+                  }
+                }
+              },
+              "example": {
+                "company_id": "550e8400-e29b-41d4-a716-446655440000",
+                "cost_category_id": "650e8400-e29b-41d4-a716-446655440000",
+                "date": "2025-11-21",
+                "amount": 1500.50,
+                "notes": "Custo de combustível",
+                "source": "manual"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Custo criado com sucesso"
+          },
+          "400": {
+            "description": "Dados inválidos ou faltando campos obrigatórios"
+          },
+          "401": {
+            "description": "Não autorizado"
+          },
+          "500": {
+            "description": "Erro ao criar custo"
+          }
+        }
+      },
+      "get": {
+        "tags": ["Custos"],
+        "summary": "Listar custos manuais",
+        "description": "Lista custos com filtros opcionais",
+        "parameters": [
+          {
+            "name": "company_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "route_id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "vehicle_id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "start_date",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            }
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            }
+          },
+          {
+            "name": "category_id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "number",
+              "default": 100
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "schema": {
+              "type": "number",
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de custos"
+          },
+          "400": {
+            "description": "company_id faltando"
+          },
+          "500": {
+            "description": "Erro ao buscar custos"
+          }
+        }
+      }
+    },
+    "/api/operator/create-employee": {
+      "post": {
+        "tags": ["Operador"],
+        "summary": "Criar funcionário (operador)",
+        "description": "Operadores podem criar funcionários (passageiros) associados à sua empresa",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email"],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "phone": {
+                    "type": "string"
+                  },
+                  "role": {
+                    "type": "string",
+                    "enum": ["admin", "operator", "carrier", "driver", "passenger"],
+                    "default": "passenger"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Funcionário já existe"
+          },
+          "201": {
+            "description": "Funcionário criado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "userId": {"type": "string"},
+                    "created": {"type": "boolean"},
+                    "email": {"type": "string"},
+                    "role": {"type": "string"},
+                    "companyId": {"type": "string"}
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Não autorizado"
+          },
+          "500": {
+            "description": "Erro ao criar funcionário"
+          }
+        }
+      }
+    },
+    "/api/operator/optimize-route": {
+      "post": {
+        "tags": ["Operador"],
+        "summary": "Otimizar rota (operador)",
+        "description": "Otimiza uma rota para operadores",
+        "responses": {
+          "200": {
+            "description": "Rota otimizada com sucesso"
+          }
+        }
+      }
+    },
+    "/api/reports/run": {
+      "post": {
+        "tags": ["Relatórios"],
+        "summary": "Gerar relatório sob demanda",
+        "description": "Gera um relatório no formato especificado (PDF, Excel, CSV)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["report_type", "company_id"],
+                "properties": {
+                  "report_type": {
+                    "type": "string",
+                    "description": "Tipo de relatório (monthly, weekly, daily, etc.)"
+                  },
+                  "company_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "format": {
+                    "type": "string",
+                    "enum": ["pdf", "excel", "csv"],
+                    "default": "pdf"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Relatório gerado"
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "500": {
+            "description": "Erro ao gerar relatório"
+          }
+        }
+      }
+    },
+    "/api/reports/schedule": {
+      "post": {
+        "tags": ["Relatórios"],
+        "summary": "Agendar relatório",
+        "description": "Agenda um relatório para geração automática",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["report_type"],
+                "properties": {
+                  "report_type": {
+                    "type": "string"
+                  },
+                  "schedule": {
+                    "type": "string",
+                    "description": "Expressão cron ou frequência"
+                  },
+                  "email_recipients": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "email"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Relatório agendado"
+          },
+          "400": {
+            "description": "Dados inválidos"
+          }
+        }
+      },
+      "get": {
+        "tags": ["Relatórios"],
+        "summary": "Listar agendamentos",
+        "responses": {
+          "200": {
+            "description": "Lista de agendamentos"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Relatórios"],
+        "summary": "Remover agendamento",
+        "responses": {
+          "200": {
+            "description": "Agendamento removido"
+          }
+        }
+      }
+    },
+    "/api/cron/dispatch-reports": {
+      "post": {
+        "tags": ["Relatórios"],
+        "summary": "Despachar relatórios agendados (Cron Job)",
+        "description": "Job cron para enviar relatórios agendados por email. Requer header 'x-cron-secret' com valor do CRON_SECRET.",
+        "security": [
+          {
+            "cronSecret": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Relatórios despachados com sucesso"
+          },
+          "401": {
+            "description": "CRON_SECRET inválido"
+          },
+          "500": {
+            "description": "Erro ao despachar relatórios"
+          }
+        }
+      }
+    },
+    "/api/cron/refresh-costs-mv": {
+      "post": {
+        "tags": ["Sistema"],
+        "summary": "Atualizar materialized view de custos (Cron Job)",
+        "description": "Job cron para atualizar a materialized view de custos. Requer CRON_SECRET.",
+        "security": [
+          {
+            "cronSecret": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Materialized view atualizada"
+          },
+          "401": {
+            "description": "CRON_SECRET inválido"
+          }
+        }
+      }
+    },
+    "/api/cron/refresh-kpis": {
+      "post": {
+        "tags": ["Sistema"],
+        "summary": "Atualizar KPIs (Cron Job)",
+        "description": "Job cron para atualizar KPIs do sistema. Requer CRON_SECRET.",
+        "security": [
+          {
+            "cronSecret": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "KPIs atualizados"
+          },
+          "401": {
+            "description": "CRON_SECRET inválido"
+          }
+        }
+      }
+    },
+    "/api/analytics/web-vitals": {
+      "post": {
+        "tags": ["Sistema"],
+        "summary": "Enviar métricas Web Vitals",
+        "description": "Registra métricas de performance web (CLS, LCP, FID, TTFB)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "metric_name": {
+                    "type": "string",
+                    "enum": ["CLS", "LCP", "FID", "TTFB"]
+                  },
+                  "value": {
+                    "type": "number"
+                  },
+                  "rating": {
+                    "type": "string",
+                    "enum": ["good", "needs-improvement", "poor"]
+                  },
+                  "pathname": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Métrica registrada"
+          }
+        }
+      },
+      "get": {
+        "tags": ["Sistema"],
+        "summary": "Obter informações Web Vitals",
+        "responses": {
+          "200": {
+            "description": "Informações sobre Web Vitals"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Token JWT obtido no endpoint /api/auth/login"
+      },
+      "cookieAuth": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "golffox-session",
+        "description": "Cookie de sessão criado após login"
+      },
+      "cronSecret": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-cron-secret",
+        "description": "Secret para autenticação de cron jobs"
+      }
+    },
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Mensagem de erro"
+          },
+          "code": {
+            "type": "string",
+            "description": "Código de erro"
+          },
+          "message": {
+            "type": "string",
+            "description": "Mensagem descritiva"
+          }
+        }
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "role": {
+            "type": "string",
+            "enum": ["admin", "operator", "carrier", "driver", "passenger"]
+          },
+          "companyId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "transportadoraId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          }
+        }
+      }
+    }
+  }
+}
+

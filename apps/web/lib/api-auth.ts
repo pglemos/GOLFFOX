@@ -53,6 +53,13 @@ export async function validateAuth(request: NextRequest): Promise<AuthenticatedU
           const decoded = Buffer.from(golffoxSession, 'base64').toString('utf-8')
           const sessionData = JSON.parse(decoded)
           
+          console.log('🔍 Cookie customizado decodificado:', {
+            hasAccessToken: !!sessionData.access_token,
+            hasId: !!sessionData.id,
+            hasUser: !!sessionData.user,
+            role: sessionData.role
+          })
+          
           // Tentar obter access_token do cookie customizado
           if (sessionData.access_token) {
             accessToken = sessionData.access_token
@@ -61,6 +68,8 @@ export async function validateAuth(request: NextRequest): Promise<AuthenticatedU
         } catch (error) {
           console.warn('⚠️ Erro ao processar cookie customizado:', error)
         }
+      } else {
+        console.warn('⚠️ Cookie golffox-session não encontrado na requisição')
       }
     }
     
@@ -241,13 +250,74 @@ export async function requireAuth(
   if (!user) {
     // Log detalhado para debug em produção
     const sessionCookie = request.cookies.get('golffox-session')?.value
+    const authHeader = request.headers.get('authorization')
+    const allCookies = request.cookies.getAll().map(c => c.name)
+    
     console.error('❌ Autenticação falhou', {
       hasCookie: !!sessionCookie,
       cookieLength: sessionCookie?.length || 0,
+      hasAuthHeader: !!authHeader,
+      authHeaderLength: authHeader?.length || 0,
+      allCookies,
       isVercel: process.env.VERCEL === '1',
       env: process.env.VERCEL_ENV || 'development',
-      path: request.nextUrl.pathname
+      path: request.nextUrl.pathname,
+      method: request.method
     })
+    
+    // Em desenvolvimento, tentar usar cookie diretamente
+    if (isDevelopment && sessionCookie && serviceKey) {
+      try {
+        const decoded = Buffer.from(sessionCookie, 'base64').toString('utf-8')
+        const sessionData = JSON.parse(decoded)
+        const userId = sessionData.id || sessionData.user?.id
+        
+        if (userId) {
+          console.log('⚠️ Tentando autenticação via cookie em desenvolvimento...')
+          const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+          if (supabaseUrl) {
+            const supabaseAdmin = createClient(supabaseUrl, serviceKey, {
+              auth: { persistSession: false, autoRefreshToken: false }
+            })
+            
+            const { data: userData, error: dbError } = await supabaseAdmin
+              .from('users')
+              .select('id, email, role, company_id, transportadora_id')
+              .eq('id', userId)
+              .maybeSingle()
+            
+            if (!dbError && userData) {
+              console.log('✅ Autenticação via cookie bem-sucedida em desenvolvimento')
+              // Retornar null para continuar (não é erro)
+              const authenticatedUser: AuthenticatedUser = {
+                id: userData.id,
+                email: userData.email || '',
+                role: userData.role || 'passenger',
+                companyId: userData.company_id || null
+              }
+              
+              // Verificar role se necessário
+              if (requiredRole && !hasRole(authenticatedUser, requiredRole)) {
+                const roles = Array.isArray(requiredRole) ? requiredRole : [requiredRole]
+                return NextResponse.json(
+                  { 
+                    error: 'Acesso negado', 
+                    message: `Acesso permitido apenas para: ${roles.join(', ')}. Seu role atual: ${authenticatedUser.role}`,
+                    allowedRoles: roles,
+                    currentRole: authenticatedUser.role
+                  },
+                  { status: 403 }
+                )
+              }
+              
+              return null // Autenticação OK
+            }
+          }
+        }
+      } catch (cookieError) {
+        console.warn('⚠️ Erro ao tentar autenticação via cookie em desenvolvimento:', cookieError)
+      }
+    }
     
     return NextResponse.json(
       { 
