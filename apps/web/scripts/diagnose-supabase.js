@@ -119,11 +119,11 @@ async function diagnoseSupabase() {
   // HIPÓTESE B: Colunas críticas faltando ou renomeadas
   log('B', 'Verificando colunas críticas')
   try {
-    // Verificar colunas críticas uma por uma
-    const requiredColumns = ['id', 'email', 'role', 'company_id', 'transportadora_id']
-    const missingColumns = []
+    // Verificar colunas críticas da tabela users uma por uma
+    const requiredColumnsUsers = ['id', 'email', 'role', 'company_id', 'transportadora_id']
+    const missingColumnsUsers = []
     
-    for (const col of requiredColumns) {
+    for (const col of requiredColumnsUsers) {
       try {
         const { error } = await supabase
           .from('users')
@@ -131,20 +131,20 @@ async function diagnoseSupabase() {
           .limit(1)
         
         if (error && error.code === '42703') {
-          missingColumns.push(col)
+          missingColumnsUsers.push(col)
           log('B', `❌ Coluna ${col} não existe na tabela users`, { error: error.message })
         } else if (error) {
           log('B', `⚠️ Erro ao verificar coluna ${col}`, { error: error.message, code: error.code })
         } else {
-          log('B', `✅ Coluna ${col} existe`)
+          log('B', `✅ Coluna ${col} existe na tabela users`)
         }
       } catch (err) {
-        missingColumns.push(col)
+        missingColumnsUsers.push(col)
         log('B', `❌ Exceção ao verificar coluna ${col}`, { error: err.message })
       }
     }
     
-    // Verificar se carrier_id ainda existe (não deveria)
+    // Verificar se carrier_id ainda existe na tabela users (não deveria)
     try {
       const { error: carrierError } = await supabase
         .from('users')
@@ -152,20 +152,80 @@ async function diagnoseSupabase() {
         .limit(1)
       
       if (carrierError && carrierError.code === '42703') {
-        log('B', '✅ Coluna carrier_id não existe (migração completa)')
+        log('B', '✅ Coluna carrier_id não existe na tabela users (migração completa)')
       } else if (!carrierError) {
-        issues.push({ hypothesis: 'B', severity: 'warning', column: 'carrier_id', error: 'Coluna antiga ainda existe - migração incompleta' })
-        log('B', '⚠️ Coluna carrier_id ainda existe (migração pode estar incompleta)', {})
+        issues.push({ hypothesis: 'B', severity: 'warning', table: 'users', column: 'carrier_id', error: 'Coluna antiga ainda existe - migração incompleta' })
+        log('B', '⚠️ Coluna carrier_id ainda existe na tabela users (migração pode estar incompleta)', {})
       }
     } catch (err) {
       // Ignorar erros ao verificar coluna antiga
     }
     
-    if (missingColumns.length > 0) {
-      issues.push({ hypothesis: 'B', severity: 'critical', table: 'users', missingColumns, error: 'Colunas críticas não existem' })
-      log('B', '❌ Colunas críticas faltando', { missingColumns })
+    // Verificar colunas críticas da tabela gf_costs
+    log('B', 'Verificando colunas críticas da tabela gf_costs')
+    try {
+      const { error: costsError } = await supabase
+        .from('gf_costs')
+        .select('id, company_id, route_id, vehicle_id, date, amount')
+        .limit(1)
+      
+      if (costsError && costsError.code === '42P01') {
+        issues.push({ hypothesis: 'B', severity: 'warning', table: 'gf_costs', error: 'Tabela não existe' })
+        log('B', '⚠️ Tabela gf_costs não existe', {})
+      } else if (costsError) {
+        log('B', '⚠️ Erro ao acessar tabela gf_costs', { error: costsError.message, code: costsError.code })
+      } else {
+        log('B', '✅ Tabela gf_costs existe e é acessível')
+        
+        // Verificar se gf_costs usa transportadora_id ou carrier_id
+        try {
+          const { error: transportadoraError } = await supabase
+            .from('gf_costs')
+            .select('transportadora_id')
+            .limit(1)
+          
+          if (transportadoraError && transportadoraError.code === '42703') {
+            // transportadora_id não existe, verificar carrier_id
+            const { error: carrierError } = await supabase
+              .from('gf_costs')
+              .select('carrier_id')
+              .limit(1)
+            
+            if (carrierError && carrierError.code === '42703') {
+              log('B', '⚠️ Tabela gf_costs não tem nem transportadora_id nem carrier_id', {})
+            } else if (!carrierError) {
+              issues.push({ hypothesis: 'B', severity: 'warning', table: 'gf_costs', error: 'Ainda usa carrier_id - migração pendente' })
+              log('B', '⚠️ Tabela gf_costs ainda usa carrier_id (migração pendente)', {})
+            }
+          } else if (!transportadoraError) {
+            log('B', '✅ Tabela gf_costs usa transportadora_id')
+            
+            // Verificar se carrier_id ainda existe (não deveria)
+            const { error: carrierError } = await supabase
+              .from('gf_costs')
+              .select('carrier_id')
+              .limit(1)
+            
+            if (carrierError && carrierError.code === '42703') {
+              log('B', '✅ Tabela gf_costs não tem carrier_id (migração completa)')
+            } else if (!carrierError) {
+              issues.push({ hypothesis: 'B', severity: 'warning', table: 'gf_costs', error: 'Tem tanto transportadora_id quanto carrier_id - migração incompleta' })
+              log('B', '⚠️ Tabela gf_costs tem tanto transportadora_id quanto carrier_id (migração incompleta)', {})
+            }
+          }
+        } catch (err) {
+          log('B', '⚠️ Erro ao verificar colunas de gf_costs', { error: err.message })
+        }
+      }
+    } catch (err) {
+      log('B', '⚠️ Exceção ao verificar tabela gf_costs', { error: err.message })
+    }
+    
+    if (missingColumnsUsers.length > 0) {
+      issues.push({ hypothesis: 'B', severity: 'critical', table: 'users', missingColumns: missingColumnsUsers, error: 'Colunas críticas não existem' })
+      log('B', '❌ Colunas críticas faltando na tabela users', { missingColumns: missingColumnsUsers })
     } else {
-      log('B', '✅ Todas as colunas críticas existem')
+      log('B', '✅ Todas as colunas críticas da tabela users existem')
     }
   } catch (err) {
     issues.push({ hypothesis: 'B', severity: 'critical', error: err.message })
