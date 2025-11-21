@@ -1,12 +1,11 @@
 // lib/models/route_model.dart
 import 'package:flutter/foundation.dart';
-import 'package:latlong2/latlong.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 typedef Json = Map<String, dynamic>;
 
 @immutable
 class RouteModel {
-
   const RouteModel({
     required this.id,
     required this.name,
@@ -27,15 +26,13 @@ class RouteModel {
   factory RouteModel.fromJson(Map<String, dynamic> json) {
     final polylineSource =
         json[RouteModelFields.polyline] as List<dynamic>? ?? [];
-    final polylinePoints = polylineSource
-        .map((point) {
-          final data = point as Map<String, dynamic>;
-          return LatLng(
-            (data['lat'] as num).toDouble(),
-            (data['lng'] as num).toDouble(),
-          );
-        })
-        .toList();
+    final polylinePoints = polylineSource.map((point) {
+      final data = point as Map<String, dynamic>;
+      return LatLng(
+        (data['lat'] as num).toDouble(),
+        (data['lng'] as num).toDouble(),
+      );
+    }).toList();
 
     return RouteModel(
       id: json[RouteModelFields.id] as String,
@@ -135,22 +132,23 @@ class RouteModel {
     bool? isActive,
     DateTime? createdAt,
     DateTime? updatedAt,
-  }) => RouteModel(
-      id: id ?? this.id,
-      name: name ?? this.name,
-      description: description ?? this.description,
-      companyId: companyId ?? this.companyId,
-      transporterId: transporterId ?? this.transporterId,
-      polyline: polyline ?? this.polyline,
-      polylineEncoded: polylineEncoded ?? this.polylineEncoded,
-      totalDistance: totalDistance ?? this.totalDistance,
-      estimatedDuration: estimatedDuration ?? this.estimatedDuration,
-      status: status ?? this.status,
-      color: color ?? this.color,
-      isActive: isActive ?? this.isActive,
-      createdAt: createdAt ?? this.createdAt,
-      updatedAt: updatedAt ?? this.updatedAt,
-    );
+  }) =>
+      RouteModel(
+        id: id ?? this.id,
+        name: name ?? this.name,
+        description: description ?? this.description,
+        companyId: companyId ?? this.companyId,
+        transporterId: transporterId ?? this.transporterId,
+        polyline: polyline ?? this.polyline,
+        polylineEncoded: polylineEncoded ?? this.polylineEncoded,
+        totalDistance: totalDistance ?? this.totalDistance,
+        estimatedDuration: estimatedDuration ?? this.estimatedDuration,
+        status: status ?? this.status,
+        color: color ?? this.color,
+        isActive: isActive ?? this.isActive,
+        createdAt: createdAt ?? this.createdAt,
+        updatedAt: updatedAt ?? this.updatedAt,
+      );
 
   @override
   bool operator ==(Object other) =>

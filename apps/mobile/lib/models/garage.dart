@@ -1,12 +1,12 @@
 // lib/models/garage.dart
 import 'package:flutter/foundation.dart';
-import 'package:latlong2/latlong.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 typedef Json = Map<String, dynamic>;
 
 @immutable
 class Garage {
-
   const Garage({
     required this.id,
     required this.name,
@@ -26,15 +26,13 @@ class Garage {
     List<LatLng>? polygonPoints;
     if (json['polygon'] != null) {
       final polygonData = json['polygon'] as List<dynamic>;
-      polygonPoints = polygonData
-          .map((p) {
-            final point = p as Map<String, dynamic>;
-            return LatLng(
-              (point['lat'] as num).toDouble(),
-              (point['lng'] as num).toDouble(),
-            );
-          })
-          .toList();
+      polygonPoints = polygonData.map((p) {
+        final point = p as Map<String, dynamic>;
+        return LatLng(
+          (point['lat'] as num).toDouble(),
+          (point['lng'] as num).toDouble(),
+        );
+      }).toList();
     }
 
     return Garage(
@@ -77,9 +75,12 @@ class Garage {
       return _isPointInPolygon(position, polygon!);
     } else {
       // Usar raio circular
-      const distance = Distance();
-      final distanceInMeters =
-          distance.as(LengthUnit.Meter, this.position, position);
+      final distanceInMeters = Geolocator.distanceBetween(
+        this.position.latitude,
+        this.position.longitude,
+        position.latitude,
+        position.longitude,
+      );
       return distanceInMeters <= (radius ?? 100.0);
     }
   }
@@ -144,20 +145,21 @@ class Garage {
     String? companyId,
     DateTime? createdAt,
     DateTime? updatedAt,
-  }) => Garage(
-      id: id ?? this.id,
-      name: name ?? this.name,
-      description: description ?? this.description,
-      address: address ?? this.address,
-      latitude: latitude ?? this.latitude,
-      longitude: longitude ?? this.longitude,
-      radius: radius ?? this.radius,
-      polygon: polygon ?? this.polygon,
-      isActive: isActive ?? this.isActive,
-      companyId: companyId ?? this.companyId,
-      createdAt: createdAt ?? this.createdAt,
-      updatedAt: updatedAt ?? this.updatedAt,
-    );
+  }) =>
+      Garage(
+        id: id ?? this.id,
+        name: name ?? this.name,
+        description: description ?? this.description,
+        address: address ?? this.address,
+        latitude: latitude ?? this.latitude,
+        longitude: longitude ?? this.longitude,
+        radius: radius ?? this.radius,
+        polygon: polygon ?? this.polygon,
+        isActive: isActive ?? this.isActive,
+        companyId: companyId ?? this.companyId,
+        createdAt: createdAt ?? this.createdAt,
+        updatedAt: updatedAt ?? this.updatedAt,
+      );
 
   @override
   bool operator ==(Object other) =>

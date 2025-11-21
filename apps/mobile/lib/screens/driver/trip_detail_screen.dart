@@ -3,8 +3,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_map/flutter_map.dart' as flutter_map;
-import 'package:latlong2/latlong.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../../core/services/snackbar_service.dart';
 import '../../core/theme/gf_tokens.dart';
@@ -31,7 +30,7 @@ class _TripDetailScreenState extends State<TripDetailScreen>
     with SingleTickerProviderStateMixin {
   final _svc = SupabaseService.instance;
   final _tracking = TrackingService();
-  final _mapCtrl = flutter_map.MapController();
+  GoogleMapController? _mapCtrl;
 
   late Trip _trip;
 
@@ -69,6 +68,7 @@ class _TripDetailScreenState extends State<TripDetailScreen>
     _posSub?.cancel();
     _tripSub?.cancel();
     _anim.dispose();
+    _mapCtrl?.dispose();
     super.dispose();
   }
 
@@ -117,7 +117,7 @@ class _TripDetailScreenState extends State<TripDetailScreen>
   /* =================== MAPA =================== */
 
   void _smartCenter({bool live = false}) {
-    if (_positions.isEmpty) return;
+    if (_positions.isEmpty || _mapCtrl == null) return;
 
     final latest = _positions.last;
     final latestLL = LatLng(latest.latitude, latest.longitude);
@@ -127,24 +127,44 @@ class _TripDetailScreenState extends State<TripDetailScreen>
       _fittingBoundsOnce = true;
       final points =
           _positions.map((p) => LatLng(p.latitude, p.longitude)).toList();
-      final bounds = flutter_map.LatLngBounds.fromPoints(points);
-      _mapCtrl.fitCamera(
-        flutter_map.CameraFit.bounds(
-          bounds: bounds,
-          padding: const EdgeInsets.all(36),
-        ),
+      final bounds = _calculateBounds(points);
+      _mapCtrl?.animateCamera(
+        CameraUpdate.newLatLngBounds(bounds, 36),
       );
       return;
     }
 
     // Ao vivo: segue veiculo suavemente
     if (live && _follow) {
-      _mapCtrl.move(latestLL, max(_mapCtrl.camera.zoom, 15));
+      _mapCtrl?.animateCamera(
+        CameraUpdate.newLatLngZoom(latestLL, 15),
+      );
       return;
     }
 
     // Fallback: centraliza no ultimo ponto
-    _mapCtrl.move(latestLL, max(_mapCtrl.camera.zoom, 14));
+    _mapCtrl?.animateCamera(
+      CameraUpdate.newLatLngZoom(latestLL, 14),
+    );
+  }
+
+  LatLngBounds _calculateBounds(List<LatLng> points) {
+    double minLat = points.first.latitude;
+    double maxLat = points.first.latitude;
+    double minLng = points.first.longitude;
+    double maxLng = points.first.longitude;
+
+    for (final point in points) {
+      if (point.latitude < minLat) minLat = point.latitude;
+      if (point.latitude > maxLat) maxLat = point.latitude;
+      if (point.longitude < minLng) minLng = point.longitude;
+      if (point.longitude > maxLng) maxLng = point.longitude;
+    }
+
+    return LatLngBounds(
+      southwest: LatLng(minLat, minLng),
+      northeast: LatLng(maxLat, maxLng),
+    );
   }
 
   /* =================== ACOES =================== */
@@ -329,13 +349,51 @@ class _TripDetailScreenState extends State<TripDetailScreen>
     );
   }
 
-  Widget _buildMapCard(ThemeData t) => Container(
+  Widget _buildMapCard(ThemeData t) {
+    final Set<Polyline> polylines = {};
+    final Set<Marker> markers = {};
+
+    if (_positions.isNotEmpty) {
+      // Rota
+      polylines.add(
+        Polyline(
+          polylineId: const PolylineId('route'),
+          points:
+              _positions.map((p) => LatLng(p.latitude, p.longitude)).toList(),
+          width: 4,
+          color: t.colorScheme.primary,
+        ),
+      );
+
+      // Marcadores (inicio e atual)
+      markers.add(
+        Marker(
+          markerId: const MarkerId('start'),
+          position:
+              LatLng(_positions.first.latitude, _positions.first.longitude),
+          icon:
+              BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+          infoWindow: const InfoWindow(title: 'Início'),
+        ),
+      );
+
+      markers.add(
+        Marker(
+          markerId: const MarkerId('current'),
+          position: LatLng(_positions.last.latitude, _positions.last.longitude),
+          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+          infoWindow: const InfoWindow(title: 'Atual'),
+        ),
+      );
+    }
+
+    return Container(
       height: 420,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(14),
         boxShadow: [
           BoxShadow(
-    color: Colors.black.withValues(alpha: 0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 14,
             offset: const Offset(0, 4),
           ),
@@ -344,53 +402,18 @@ class _TripDetailScreenState extends State<TripDetailScreen>
       clipBehavior: Clip.antiAlias,
       child: Stack(
         children: [
-          flutter_map.FlutterMap(
-            mapController: _mapCtrl,
-            options: const flutter_map.MapOptions(
-              initialCenter: LatLng(-23.5505, -46.6333), // Sao Paulo
-              initialZoom: 12.5,
+          GoogleMap(
+            initialCameraPosition: const CameraPosition(
+              target: LatLng(-23.5505, -46.6333), // Sao Paulo
+              zoom: 12.5,
             ),
-            children: [
-              flutter_map.TileLayer(
-                urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                userAgentPackageName: 'com.example.clarityflow',
-              ),
-              if (_positions.isNotEmpty) ...[
-                // Rota
-                flutter_map.PolylineLayer(
-                  polylines: [
-                    flutter_map.Polyline(
-                      points: _positions
-                          .map((p) => LatLng(p.latitude, p.longitude))
-                          .toList(),
-                      strokeWidth: 4,
-                      color: t.colorScheme.primary,
-                    ),
-                  ],
-                ),
-                // Marcadores (inicio e atual)
-                flutter_map.MarkerLayer(
-                  markers: [
-                    // inicio
-                    flutter_map.Marker(
-                      point: LatLng(_positions.first.latitude,
-                          _positions.first.longitude),
-                      width: 36,
-                      height: 36,
-                      child: _dot(t.colorScheme.tertiary),
-                    ),
-                    // atual
-                    flutter_map.Marker(
-                      point: LatLng(
-                          _positions.last.latitude, _positions.last.longitude),
-                      width: 44,
-                      height: 44,
-                      child: _carBubble(t),
-                    ),
-                  ],
-                ),
-              ],
-            ],
+            onMapCreated: (controller) => _mapCtrl = controller,
+            polylines: polylines,
+            markers: markers,
+            myLocationEnabled: true,
+            myLocationButtonEnabled: false,
+            zoomControlsEnabled: false,
+            mapToolbarEnabled: false,
           ),
 
           // Overlay: metricas e controles
@@ -447,20 +470,21 @@ class _TripDetailScreenState extends State<TripDetailScreen>
         ],
       ),
     );
+  }
 
   Widget _buildInfoColumn(ThemeData t) => Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        ScaleTransition(
-          scale: CurvedAnimation(parent: _anim, curve: Curves.easeOutBack),
-          child: _TripStatusCard(trip: _trip),
-        ),
-        const SizedBox(height: 12),
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          ScaleTransition(
+            scale: CurvedAnimation(parent: _anim, curve: Curves.easeOutBack),
+            child: _TripStatusCard(trip: _trip),
+          ),
+          const SizedBox(height: 12),
 
-        // Acoes contextuais
-        _buildActions(t),
-      ],
-    );
+          // Acoes contextuais
+          _buildActions(t),
+        ],
+      );
 
   Widget _buildActions(ThemeData t) {
     final status = _trip.status.toLowerCase();
@@ -517,7 +541,7 @@ class _TripDetailScreenState extends State<TripDetailScreen>
             Text(
               'Nenhuma acao disponivel para o status atual.',
               style: t.textTheme.bodySmall?.copyWith(
-    color: t.colorScheme.onSurface.withValues(alpha: 0.7),
+                color: t.colorScheme.onSurface.withValues(alpha: 0.7),
               ),
             ),
         ],
@@ -527,33 +551,13 @@ class _TripDetailScreenState extends State<TripDetailScreen>
 
   /* =================== Helpers UI =================== */
 
-  Widget _dot(Color c) => Container(
-        decoration: BoxDecoration(color: c, shape: BoxShape.circle),
-      );
-
-  Widget _carBubble(ThemeData t) => DecoratedBox(
-        decoration: BoxDecoration(
-          color: t.colorScheme.secondary,
-          shape: BoxShape.circle,
-          border: Border.all(color: t.colorScheme.surface, width: 3),
-          boxShadow: [
-            BoxShadow(
-    color: Colors.black.withValues(alpha: 0.18),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Icon(Icons.directions_car,
-            color: t.colorScheme.onSecondary, size: 22),
-      );
-
   Widget _glass(ThemeData t, {required Widget child}) => Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
         decoration: BoxDecoration(
-    color: t.colorScheme.surface.withValues(alpha: 0.85),
+          color: t.colorScheme.surface.withValues(alpha: 0.85),
           borderRadius: BorderRadius.circular(10),
-    border: Border.all(color: t.colorScheme.outline.withValues(alpha: 0.12)),
+          border:
+              Border.all(color: t.colorScheme.outline.withValues(alpha: 0.12)),
         ),
         child: child,
       );
@@ -594,7 +598,7 @@ class _TripStatusCard extends StatelessWidget {
         label = 'Cancelada';
         break;
       default:
-    c = t.colorScheme.onSurface.withValues(alpha: 0.5);
+        c = t.colorScheme.onSurface.withValues(alpha: 0.5);
         i = Icons.help_outline;
         label = trip.status;
     }
@@ -610,7 +614,7 @@ class _TripStatusCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             decoration: BoxDecoration(
-    color: c.withValues(alpha: 0.12),
+              color: c.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -629,12 +633,13 @@ class _TripStatusCard extends StatelessWidget {
           if (trip.scheduledStartTime != null)
             Row(children: [
               Icon(Icons.access_time,
-    size: 16, color: t.colorScheme.onSurface.withValues(alpha: 0.7)),
+                  size: 16,
+                  color: t.colorScheme.onSurface.withValues(alpha: 0.7)),
               const SizedBox(width: 6),
               Text(
                 _fmt(trip.scheduledStartTime!),
                 style: t.textTheme.labelMedium?.copyWith(
-    color: t.colorScheme.onSurface.withValues(alpha: 0.7),
+                  color: t.colorScheme.onSurface.withValues(alpha: 0.7),
                 ),
               ),
             ]),
@@ -643,9 +648,9 @@ class _TripStatusCard extends StatelessWidget {
           const SizedBox(height: 10),
           Text(
             trip.notes!,
-              style: t.textTheme.bodySmall?.copyWith(
-    color: t.colorScheme.onSurface.withValues(alpha: 0.8),
-              ),
+            style: t.textTheme.bodySmall?.copyWith(
+              color: t.colorScheme.onSurface.withValues(alpha: 0.8),
+            ),
           ),
         ],
       ]),
@@ -656,4 +661,3 @@ class _TripStatusCard extends StatelessWidget {
       '${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')}/${d.year} '
       'as ${d.hour.toString().padLeft(2, '0')}:${d.minute.toString().padLeft(2, '0')}';
 }
-

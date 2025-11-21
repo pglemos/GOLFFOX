@@ -8,7 +8,7 @@ import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:latlong2/latlong.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../core/services/logger_service.dart';
@@ -18,7 +18,6 @@ import 'vehicle_position_simulator.dart';
 import 'vehicle_status_service.dart';
 
 class MapService {
-
   MapService(this._supabaseService);
   final SupabaseService _supabaseService;
   Timer? _updateTimer;
@@ -94,27 +93,29 @@ class MapService {
           .select()
           .order('last_update', ascending: false);
 
-      final positions = response.map<VehiclePosition>((json) => VehiclePosition(
-          id: json['id'] as String,
-          vehicleId: json['vehicle_id'] as String,
-          licensePlate: json['license_plate'] as String,
-          driverName: json['driver_name'] as String,
-          position: LatLng(
-            (json['latitude'] as num).toDouble(),
-            (json['longitude'] as num).toDouble(),
-          ),
-          status: VehicleStatus.values.firstWhere(
-            (s) => s.name == json['status'],
-            orElse: () => VehicleStatus.active,
-          ),
-          speed: (json['speed'] as num?)?.toDouble() ?? 0.0,
-          heading: (json['heading'] as num?)?.toDouble() ?? 0.0,
-          lastUpdate: DateTime.parse(json['last_update'] as String),
-          routeId: json['route_id'] as String?,
-          routeName: json['route_name'] as String?,
-          passengerCount: json['passenger_count'] as int? ?? 0,
-          capacity: json['capacity'] as int? ?? 30,
-        )).toList();
+      final positions = response
+          .map<VehiclePosition>((json) => VehiclePosition(
+                id: json['id'] as String,
+                vehicleId: json['vehicle_id'] as String,
+                licensePlate: json['license_plate'] as String,
+                driverName: json['driver_name'] as String,
+                position: LatLng(
+                  (json['latitude'] as num).toDouble(),
+                  (json['longitude'] as num).toDouble(),
+                ),
+                status: VehicleStatus.values.firstWhere(
+                  (s) => s.name == json['status'],
+                  orElse: () => VehicleStatus.active,
+                ),
+                speed: (json['speed'] as num?)?.toDouble() ?? 0.0,
+                heading: (json['heading'] as num?)?.toDouble() ?? 0.0,
+                lastUpdate: DateTime.parse(json['last_update'] as String),
+                routeId: json['route_id'] as String?,
+                routeName: json['route_name'] as String?,
+                passengerCount: json['passenger_count'] as int? ?? 0,
+                capacity: json['capacity'] as int? ?? 30,
+              ))
+          .toList();
 
       return _applyLocalFilters(
         positions,
@@ -201,9 +202,12 @@ class MapService {
     if (query.isEmpty) return allPositions;
 
     final lowerQuery = query.toLowerCase();
-    return allPositions.where((vehicle) => vehicle.licensePlate.toLowerCase().contains(lowerQuery) ||
-          vehicle.driverName.toLowerCase().contains(lowerQuery) ||
-          (vehicle.routeName?.toLowerCase().contains(lowerQuery) ?? false)).toList();
+    return allPositions
+        .where((vehicle) =>
+            vehicle.licensePlate.toLowerCase().contains(lowerQuery) ||
+            vehicle.driverName.toLowerCase().contains(lowerQuery) ||
+            (vehicle.routeName?.toLowerCase().contains(lowerQuery) ?? false))
+        .toList();
   }
 
   Future<VehiclePosition?> getVehicleById(String vehicleId) async {
@@ -277,7 +281,8 @@ class MapService {
 
     if (statusFilter != null && statusFilter.isNotEmpty) {
       final allowedStatuses = statusFilter.toSet();
-      filtered = filtered.where((position) => allowedStatuses.contains(position.status));
+      filtered = filtered
+          .where((position) => allowedStatuses.contains(position.status));
     }
 
     if (routeFilter != null && routeFilter.isNotEmpty) {
@@ -289,7 +294,8 @@ class MapService {
 }
 
 // Provider para o SupabaseService
-final supabaseServiceProvider = Provider<SupabaseService>((ref) => SupabaseService.instance);
+final supabaseServiceProvider =
+    Provider<SupabaseService>((ref) => SupabaseService.instance);
 
 // Provider para o MapService
 final mapServiceProvider = Provider<MapService>((ref) {

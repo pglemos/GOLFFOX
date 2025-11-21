@@ -3,7 +3,7 @@
 // Modelo para posicoes de veiculos no mapa
 // ========================================
 
-import 'package:latlong2/latlong.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 enum VehicleStatus {
   active,
@@ -46,7 +46,6 @@ extension VehicleStatusExtension on VehicleStatus {
 }
 
 class VehiclePosition {
-
   const VehiclePosition({
     required this.id,
     required this.vehicleId,
@@ -69,18 +68,18 @@ class VehiclePosition {
         vehicleId: json['vehicle_id'] as String,
         licensePlate: json['license_plate'] as String,
         driverName: json['driver_name'] as String,
-      position: LatLng(
-        (json['latitude'] as num).toDouble(),
-        (json['longitude'] as num).toDouble(),
-      ),
-      status: VehicleStatus.values.firstWhere(
-        (e) => e.name == json['status'],
-        orElse: () => VehicleStatus.offline,
-      ),
-      speed: json['speed'] as double?,
-      heading: json['heading'] as double?,
-      lastUpdate: DateTime.parse(json['last_update'] as String),
-      routeId: json['route_id'] as String?,
+        position: LatLng(
+          (json['latitude'] as num).toDouble(),
+          (json['longitude'] as num).toDouble(),
+        ),
+        status: VehicleStatus.values.firstWhere(
+          (e) => e.name == json['status'],
+          orElse: () => VehicleStatus.offline,
+        ),
+        speed: json['speed'] as double?,
+        heading: json['heading'] as double?,
+        lastUpdate: DateTime.parse(json['last_update'] as String),
+        routeId: json['route_id'] as String?,
         routeName: json['route_name'] as String?,
         passengerCount: json['passenger_count'] as int?,
         capacity: json['capacity'] as int?,
@@ -100,21 +99,21 @@ class VehiclePosition {
   final int? capacity;
 
   Map<String, dynamic> toJson() => {
-      'id': id,
-      'vehicle_id': vehicleId,
-      'license_plate': licensePlate,
-      'driver_name': driverName,
-      'latitude': position.latitude,
-      'longitude': position.longitude,
-      'status': status.name,
-      'speed': speed,
-      'heading': heading,
-      'last_update': lastUpdate.toIso8601String(),
-      'route_id': routeId,
-      'route_name': routeName,
-      'passenger_count': passengerCount,
-      'capacity': capacity,
-    };
+        'id': id,
+        'vehicle_id': vehicleId,
+        'license_plate': licensePlate,
+        'driver_name': driverName,
+        'latitude': position.latitude,
+        'longitude': position.longitude,
+        'status': status.name,
+        'speed': speed,
+        'heading': heading,
+        'last_update': lastUpdate.toIso8601String(),
+        'route_id': routeId,
+        'route_name': routeName,
+        'passenger_count': passengerCount,
+        'capacity': capacity,
+      };
 
   VehiclePosition copyWith({
     String? id,
@@ -130,21 +129,22 @@ class VehiclePosition {
     String? routeName,
     int? passengerCount,
     int? capacity,
-  }) => VehiclePosition(
-      id: id ?? this.id,
-      vehicleId: vehicleId ?? this.vehicleId,
-      licensePlate: licensePlate ?? this.licensePlate,
-      driverName: driverName ?? this.driverName,
-      position: position ?? this.position,
-      status: status ?? this.status,
-      speed: speed ?? this.speed,
-      heading: heading ?? this.heading,
-      lastUpdate: lastUpdate ?? this.lastUpdate,
-      routeId: routeId ?? this.routeId,
-      routeName: routeName ?? this.routeName,
-      passengerCount: passengerCount ?? this.passengerCount,
-      capacity: capacity ?? this.capacity,
-    );
+  }) =>
+      VehiclePosition(
+        id: id ?? this.id,
+        vehicleId: vehicleId ?? this.vehicleId,
+        licensePlate: licensePlate ?? this.licensePlate,
+        driverName: driverName ?? this.driverName,
+        position: position ?? this.position,
+        status: status ?? this.status,
+        speed: speed ?? this.speed,
+        heading: heading ?? this.heading,
+        lastUpdate: lastUpdate ?? this.lastUpdate,
+        routeId: routeId ?? this.routeId,
+        routeName: routeName ?? this.routeName,
+        passengerCount: passengerCount ?? this.passengerCount,
+        capacity: capacity ?? this.capacity,
+      );
 
   bool get isOnline => DateTime.now().difference(lastUpdate).inMinutes < 5;
 

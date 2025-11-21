@@ -7,7 +7,7 @@ import 'dart:async';
 import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:latlong2/latlong.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../models/fuel_record.dart';
 import '../models/maintenance.dart';
@@ -40,7 +40,6 @@ final vehicleFuelRecordsProvider =
 );
 
 class VehicleFilters {
-
   const VehicleFilters({
     this.statuses,
     this.types,
@@ -71,23 +70,26 @@ class VehicleFilters {
     Object? hasLowFuel = _unset,
     Object? hasExpiringDocuments = _unset,
     Object? companyId = _unset,
-  }) => VehicleFilters(
-      statuses:
-          statuses == _unset ? this.statuses : statuses as List<VehicleStatus>?,
-      types: types == _unset ? this.types : types as List<VehicleType>?,
-      fuelTypes:
-          fuelTypes == _unset ? this.fuelTypes : fuelTypes as List<FuelType>?,
-      searchQuery:
-          searchQuery == _unset ? this.searchQuery : searchQuery as String?,
-      needsMaintenance: needsMaintenance == _unset
-          ? this.needsMaintenance
-          : needsMaintenance as bool?,
-      hasLowFuel: hasLowFuel == _unset ? this.hasLowFuel : hasLowFuel as bool?,
-      hasExpiringDocuments: hasExpiringDocuments == _unset
-          ? this.hasExpiringDocuments
-          : hasExpiringDocuments as bool?,
-      companyId: companyId == _unset ? this.companyId : companyId as String?,
-    );
+  }) =>
+      VehicleFilters(
+        statuses: statuses == _unset
+            ? this.statuses
+            : statuses as List<VehicleStatus>?,
+        types: types == _unset ? this.types : types as List<VehicleType>?,
+        fuelTypes:
+            fuelTypes == _unset ? this.fuelTypes : fuelTypes as List<FuelType>?,
+        searchQuery:
+            searchQuery == _unset ? this.searchQuery : searchQuery as String?,
+        needsMaintenance: needsMaintenance == _unset
+            ? this.needsMaintenance
+            : needsMaintenance as bool?,
+        hasLowFuel:
+            hasLowFuel == _unset ? this.hasLowFuel : hasLowFuel as bool?,
+        hasExpiringDocuments: hasExpiringDocuments == _unset
+            ? this.hasExpiringDocuments
+            : hasExpiringDocuments as bool?,
+        companyId: companyId == _unset ? this.companyId : companyId as String?,
+      );
 
   bool get hasActiveFilters =>
       (statuses?.isNotEmpty ?? false) ||
@@ -101,7 +103,6 @@ class VehicleFilters {
 }
 
 class VehicleService {
-
   VehicleService() {
     _startRealTimeUpdates();
   }

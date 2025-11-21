@@ -1,6 +1,6 @@
 // lib/models/vehicle_status.dart
 import 'package:flutter/material.dart';
-import 'package:latlong2/latlong.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'driver_position.dart';
 import 'garage.dart';
 
@@ -160,7 +160,6 @@ class VehicleStatusCalculator {
 
 /// Classe para representar o status completo do veiculo
 class VehicleStatus {
-
   const VehicleStatus({
     required this.vehicleId,
     required this.status,

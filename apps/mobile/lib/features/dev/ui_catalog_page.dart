@@ -1,6 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:latlong2/latlong.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../../widgets/charts/gx_donut.dart';
 import '../../widgets/charts/gx_line_chart.dart';
@@ -110,16 +110,8 @@ class UiCatalogPage extends StatelessWidget {
           const GxTable(
             columns: ['ID', 'Status', 'Notas'],
             rows: [
-              [
-                Text('TR-001'),
-                Text('inProgress'),
-                Text('Rota Centro')
-              ],
-              [
-                Text('TR-002'),
-                Text('scheduled'),
-                Text('Rota Sul')
-              ],
+              [Text('TR-001'), Text('inProgress'), Text('Rota Centro')],
+              [Text('TR-002'), Text('scheduled'), Text('Rota Sul')],
             ],
           ),
           const SizedBox(height: 12),

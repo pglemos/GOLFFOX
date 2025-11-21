@@ -3,7 +3,7 @@
 // Modelo para pontos de parada dos onibus
 // ========================================
 
-import 'package:latlong2/latlong.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 enum BusStopType {
   regular,
@@ -21,7 +21,6 @@ enum BusStopStatus {
 }
 
 class BusStop {
-
   const BusStop({
     required this.id,
     required this.name,
@@ -75,9 +74,10 @@ class BusStop {
         hasSeating: json['has_seating'] as bool? ?? false,
         address: json['address'] as String?,
         landmark: json['landmark'] as String?,
-        amenities:
-            (json['amenities'] as List<dynamic>?)?.map((e) => e as String).toList() ??
-                [],
+        amenities: (json['amenities'] as List<dynamic>?)
+                ?.map((e) => e as String)
+                .toList() ??
+            [],
         updatedAt: json['updated_at'] != null
             ? DateTime.parse(json['updated_at'] as String)
             : null,
@@ -103,27 +103,27 @@ class BusStop {
   final DateTime? updatedAt;
 
   Map<String, dynamic> toJson() => {
-      'id': id,
-      'name': name,
-      'description': description,
-      'latitude': position.latitude,
-      'longitude': position.longitude,
-      'type': type.name,
-      'status': status.name,
-      'route_id': routeId,
-      'route_name': routeName,
-      'sequence': sequence,
-      'estimated_arrival': estimatedArrival?.toIso8601String(),
-      'last_visit': lastVisit?.toIso8601String(),
-      'has_accessibility': hasAccessibility,
-      'has_shelter': hasShelter,
-      'has_seating': hasSeating,
-      'address': address,
-      'landmark': landmark,
-      'amenities': amenities,
-      'created_at': createdAt.toIso8601String(),
-      'updated_at': updatedAt?.toIso8601String(),
-    };
+        'id': id,
+        'name': name,
+        'description': description,
+        'latitude': position.latitude,
+        'longitude': position.longitude,
+        'type': type.name,
+        'status': status.name,
+        'route_id': routeId,
+        'route_name': routeName,
+        'sequence': sequence,
+        'estimated_arrival': estimatedArrival?.toIso8601String(),
+        'last_visit': lastVisit?.toIso8601String(),
+        'has_accessibility': hasAccessibility,
+        'has_shelter': hasShelter,
+        'has_seating': hasSeating,
+        'address': address,
+        'landmark': landmark,
+        'amenities': amenities,
+        'created_at': createdAt.toIso8601String(),
+        'updated_at': updatedAt?.toIso8601String(),
+      };
 
   BusStop copyWith({
     String? id,
@@ -145,27 +145,28 @@ class BusStop {
     List<String>? amenities,
     DateTime? createdAt,
     DateTime? updatedAt,
-  }) => BusStop(
-      id: id ?? this.id,
-      name: name ?? this.name,
-      description: description ?? this.description,
-      position: position ?? this.position,
-      type: type ?? this.type,
-      status: status ?? this.status,
-      routeId: routeId ?? this.routeId,
-      routeName: routeName ?? this.routeName,
-      sequence: sequence ?? this.sequence,
-      estimatedArrival: estimatedArrival ?? this.estimatedArrival,
-      lastVisit: lastVisit ?? this.lastVisit,
-      hasAccessibility: hasAccessibility ?? this.hasAccessibility,
-      hasShelter: hasShelter ?? this.hasShelter,
-      hasSeating: hasSeating ?? this.hasSeating,
-      address: address ?? this.address,
-      landmark: landmark ?? this.landmark,
-      amenities: amenities ?? this.amenities,
-      createdAt: createdAt ?? this.createdAt,
-      updatedAt: updatedAt ?? this.updatedAt,
-    );
+  }) =>
+      BusStop(
+        id: id ?? this.id,
+        name: name ?? this.name,
+        description: description ?? this.description,
+        position: position ?? this.position,
+        type: type ?? this.type,
+        status: status ?? this.status,
+        routeId: routeId ?? this.routeId,
+        routeName: routeName ?? this.routeName,
+        sequence: sequence ?? this.sequence,
+        estimatedArrival: estimatedArrival ?? this.estimatedArrival,
+        lastVisit: lastVisit ?? this.lastVisit,
+        hasAccessibility: hasAccessibility ?? this.hasAccessibility,
+        hasShelter: hasShelter ?? this.hasShelter,
+        hasSeating: hasSeating ?? this.hasSeating,
+        address: address ?? this.address,
+        landmark: landmark ?? this.landmark,
+        amenities: amenities ?? this.amenities,
+        createdAt: createdAt ?? this.createdAt,
+        updatedAt: updatedAt ?? this.updatedAt,
+      );
 
   @override
   bool operator ==(Object other) {
@@ -177,7 +178,8 @@ class BusStop {
   int get hashCode => id.hashCode;
 
   @override
-  String toString() => 'BusStop(id: $id, name: $name, position: $position, type: $type, status: $status)';
+  String toString() =>
+      'BusStop(id: $id, name: $name, position: $position, type: $type, status: $status)';
 }
 
 extension BusStopTypeExtension on BusStopType {

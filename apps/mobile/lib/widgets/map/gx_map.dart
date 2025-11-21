@@ -1,42 +1,40 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_map/flutter_map.dart' as flutter_map;
-import 'package:latlong2/latlong.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class GxMap extends StatelessWidget {
-
   const GxMap({
     required this.center,
     this.zoom = 12,
-    this.markers = const [],
-    this.polylines = const [],
-    this.polygons = const [],
+    this.markers = const {},
+    this.polylines = const {},
+    this.polygons = const {},
     this.legend,
     super.key,
   });
+
   final LatLng center;
   final double zoom;
-  final List<flutter_map.Marker> markers;
-  final List<flutter_map.Polyline> polylines;
-  final List<flutter_map.Polygon> polygons;
+  final Set<Marker> markers;
+  final Set<Polyline> polylines;
+  final Set<Polygon> polygons;
   final Widget? legend;
 
   @override
-  Widget build(BuildContext context) => Stack(
+  Widget build(BuildContext context) {
+    return Stack(
       children: [
-        flutter_map.FlutterMap(
-          options:
-              flutter_map.MapOptions(initialCenter: center, initialZoom: zoom),
-          children: [
-            flutter_map.TileLayer(
-              urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-              userAgentPackageName: 'com.golffox.app',
-            ),
-            if (polylines.isNotEmpty)
-              flutter_map.PolylineLayer(polylines: polylines),
-            if (polygons.isNotEmpty)
-              flutter_map.PolygonLayer(polygons: polygons),
-            if (markers.isNotEmpty) flutter_map.MarkerLayer(markers: markers),
-          ],
+        GoogleMap(
+          initialCameraPosition: CameraPosition(
+            target: center,
+            zoom: zoom,
+          ),
+          markers: markers,
+          polylines: polylines,
+          polygons: polygons,
+          myLocationEnabled: true,
+          myLocationButtonEnabled: false,
+          zoomControlsEnabled: false,
+          mapToolbarEnabled: false,
         ),
         if (legend != null)
           Positioned(
@@ -46,4 +44,5 @@ class GxMap extends StatelessWidget {
           ),
       ],
     );
+  }
 }
