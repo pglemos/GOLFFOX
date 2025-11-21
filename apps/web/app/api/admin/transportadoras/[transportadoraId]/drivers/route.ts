@@ -4,11 +4,17 @@ import { supabaseServiceRole } from '@/lib/supabase-server'
 // GET /api/admin/transportadoras/[transportadoraId]/drivers
 export async function GET(
   request: NextRequest,
-  { params }: { params: { transportadoraId: string } }
+  { params }: { params: { transportadoraId?: string; carrierId?: string } }
 ) {
   try {
     const supabase = supabaseServiceRole
-    const transportadoraId = params.transportadoraId
+    const transportadoraId = params.transportadoraId || params.carrierId
+    if (!transportadoraId) {
+      return NextResponse.json(
+        { success: false, error: 'ID da transportadora não fornecido' },
+        { status: 400 }
+      )
+    }
 
     const { data: drivers, error } = await supabase
       .from('drivers')
@@ -37,11 +43,17 @@ export async function GET(
 // POST /api/admin/transportadoras/[transportadoraId]/drivers
 export async function POST(
   request: NextRequest,
-  { params }: { params: { transportadoraId: string } }
+  { params }: { params: { transportadoraId?: string; carrierId?: string } }
 ) {
   try {
     const supabase = supabaseServiceRole
-    const transportadoraId = params.transportadoraId
+    const transportadoraId = params.transportadoraId || params.carrierId
+    if (!transportadoraId) {
+      return NextResponse.json(
+        { success: false, error: 'ID da transportadora não fornecido' },
+        { status: 400 }
+      )
+    }
     const body = await request.json()
 
     const { name, email, phone, cpf, cnh, cnh_category } = body

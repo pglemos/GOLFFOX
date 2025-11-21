@@ -4,12 +4,18 @@ import { supabaseServiceRole } from '@/lib/supabase-server'
 // PUT /api/admin/transportadoras/[transportadoraId]/vehicles/[vehicleId]
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { transportadoraId: string; vehicleId: string } }
+  { params }: { params: { transportadoraId?: string; carrierId?: string; vehicleId: string } }
 ) {
   try {
     const supabase = supabaseServiceRole
-    const transportadoraId = params.transportadoraId
+    const transportadoraId = params.transportadoraId || params.carrierId
     const { vehicleId } = params
+    if (!transportadoraId) {
+      return NextResponse.json(
+        { success: false, error: 'ID da transportadora não fornecido' },
+        { status: 400 }
+      )
+    }
     const body = await request.json()
 
     const {
@@ -72,12 +78,18 @@ export async function PUT(
 // DELETE /api/admin/transportadoras/[transportadoraId]/vehicles/[vehicleId]
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { transportadoraId: string; vehicleId: string } }
+  { params }: { params: { transportadoraId?: string; carrierId?: string; vehicleId: string } }
 ) {
   try {
     const supabase = supabaseServiceRole
-    const transportadoraId = params.transportadoraId
+    const transportadoraId = params.transportadoraId || params.carrierId
     const { vehicleId } = params
+    if (!transportadoraId) {
+      return NextResponse.json(
+        { success: false, error: 'ID da transportadora não fornecido' },
+        { status: 400 }
+      )
+    }
 
     const { error } = await supabase
       .from('vehicles')
