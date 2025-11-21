@@ -43,10 +43,10 @@ export async function GET(req: NextRequest) {
     const startDate = req.nextUrl.searchParams.get('start_date')
     const endDate = req.nextUrl.searchParams.get('end_date')
 
-    // Buscar carrier_id do usuário
+    // Buscar transportadora_id do usuário
     const { data: userData } = await supabaseServiceRole
       .from('users')
-      .select('carrier_id')
+      .select('transportadora_id')
       .eq('id', user.id)
       .single()
 
@@ -54,7 +54,7 @@ export async function GET(req: NextRequest) {
       .from('vehicle_costs')
       .select(`
         *,
-        vehicles(plate, model, carrier_id)
+        vehicles(plate, model, transportadora_id)
       `)
 
     // Filtrar apenas veículos da transportadora do usuário
@@ -76,10 +76,10 @@ export async function GET(req: NextRequest) {
 
     // Filtrar apenas veículos da transportadora do usuário após buscar
     const filteredData = (data || []).filter((cost: any) => {
-      if (!userData?.carrier_id) return false
+      if (!userData?.transportadora_id) return false
       const vehicle = cost.vehicles
       if (!vehicle) return false
-      return vehicle.carrier_id === userData.carrier_id
+      return vehicle.transportadora_id === userData.transportadora_id
     })
 
     return NextResponse.json(filteredData)

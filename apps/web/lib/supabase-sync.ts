@@ -169,7 +169,7 @@ function validateSyncData(
       if (!data.type) errors.push('Tipo de documento é obrigatório')
       break
 
-    case 'operator':
+    case 'operador':
       if (!data.email) errors.push('Email é obrigatório')
       if (data.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
         errors.push('Email inválido')

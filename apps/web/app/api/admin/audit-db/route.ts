@@ -15,7 +15,7 @@ export async function GET() {
       },
       mobile: {
         stack: "flutter3.24",
-        features: ["driver", "passenger", "operator", "admin"],
+        features: ["driver", "passenger", "operador", "admin"],
         tem_tracking_service: false // precisa verificar
       },
       db: {
