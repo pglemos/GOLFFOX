@@ -1,4 +1,4 @@
-// Rota de compatibilidade: chama a rota /api/admin/transportadoras/[transportadoraId]/vehicles/[vehicleId]
+// Rota de compatibilidade: chama a rota /api/admin/transportadoras/[transportadoraId]/vehicles/[vehicleId] (mantém plural para compatibilidade com rotas principais)
 import { NextRequest } from 'next/server'
 import { PUT as transportadoraVehiclePUT, DELETE as transportadoraVehicleDELETE } from '../../../../transportadoras/[transportadoraId]/vehicles/[vehicleId]/route'
 

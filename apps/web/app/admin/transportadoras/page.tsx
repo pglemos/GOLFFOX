@@ -61,7 +61,7 @@ export default function TransportadorasPage() {
     }
 
     try {
-      const response = await fetch(`/api/admin/carriers/delete?id=${carrierId}`, {
+      const response = await fetch(`/api/admin/transportadora/delete?id=${carrierId}`, {
         method: 'DELETE'
       })
       
