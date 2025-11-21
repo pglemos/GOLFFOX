@@ -27,7 +27,7 @@ import { supabase } from "@/lib/supabase"
 import { notifySuccess, notifyError } from "@/lib/toast"
 import { ThemeToggle } from "@/components/theme-toggle"
 
-export default function CarrierConfiguracoesPage() {
+export default function TransportadoraConfiguracoesPage() {
   const { user, loading } = useAuthFast()
   const [savingPersonal, setSavingPersonal] = useState(false)
   const [savingSecurity, setSavingSecurity] = useState(false)
