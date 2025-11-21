@@ -1,0 +1,17 @@
+{
+  "status": "init",
+  "scope": "codebase",
+  "type": "frontend",
+  "localEndpoint": "http://localhost:3000/",
+  "serverPort": 58696,
+  "executionArgs": {
+    "projectName": "GOLFFOX",
+    "projectPath": "F:\\GOLFFOX",
+    "testIds": [],
+    "additionalInstruction": "",
+    "envs": {
+      "API_KEY": "sk-user-JvoulgHcjfFf7A3Ymy7K-KXNGwqErvWX6kMaPalpZmkLXnVdRSb9AFDL-dK4UJzvrxIc4w6ySO6brigsoIs-nTtb96rz92IeCSpMYHEb6UtiZKcGLACTwN6kidusNWKnkiM"
+    }
+  },
+  "proxy": "http://8c79761a-2b69-4de3-a56f-ed32936a2aab:zGKuGjEFKJ2UYzacN0SsN9XFYUlscQxY@tun.testsprite.com:8080"
+}
