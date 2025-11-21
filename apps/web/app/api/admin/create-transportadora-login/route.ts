@@ -6,10 +6,13 @@ import { z } from 'zod'
 export const runtime = 'nodejs'
 
 const carrierLoginSchema = z.object({
-  carrier_id: z.string().uuid('ID da transportadora inválido'),
+  transportadora_id: z.string().uuid('ID da transportadora inválido').optional(),
+  carrier_id: z.string().uuid('ID da transportadora inválido').optional(),
   email: z.string().email('Email inválido'),
   name: z.string().min(1, 'Nome é obrigatório'),
   password: z.string().min(6, 'Senha deve ter no mínimo 6 caracteres'),
+}).refine(data => data.transportadora_id || data.carrier_id, {
+  message: 'ID da transportadora é obrigatório'
 })
 
 export async function OPTIONS() {
@@ -58,7 +61,7 @@ export async function POST(req: NextRequest) {
         email: validated.email,
         name: validated.name,
         role: 'transportadora',
-        carrier_id: validated.carrier_id,
+        transportadora_id: validated.transportadora_id || validated.carrier_id,
         updated_at: new Date().toISOString()
       }, {
         onConflict: 'id'

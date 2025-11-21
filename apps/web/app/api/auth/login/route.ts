@@ -128,13 +128,28 @@ async function loginHandler(req: NextRequest) {
     let existingUser, userCheckError
     try {
       const supabaseAdmin = getSupabaseAdmin()
+      debug('Buscando usuário na tabela users...', { 
+        userId: data.user.id, 
+        email: data.user.email || email 
+      }, 'AuthAPI')
+      
       const result = await supabaseAdmin
         .from('users')
         .select('id, email, role, company_id, transportadora_id')
         .eq('id', data.user.id)
         .maybeSingle()
+      
       existingUser = result.data
       userCheckError = result.error
+      
+      debug('Resultado da busca por ID:', { 
+        found: !!existingUser, 
+        hasError: !!userCheckError, 
+        error: userCheckError,
+        userId: data.user.id,
+        foundUserId: existingUser?.id,
+        foundEmail: existingUser?.email
+      }, 'AuthAPI')
       
       // Se não encontrou por ID, tentar por email (fallback)
       if (!existingUser && !userCheckError) {
@@ -149,6 +164,14 @@ async function loginHandler(req: NextRequest) {
           .maybeSingle()
         existingUser = result2.data
         userCheckError = result2.error
+        
+        debug('Resultado da busca por email:', { 
+          found: !!existingUser, 
+          hasError: !!userCheckError, 
+          error: userCheckError,
+          foundUserId: existingUser?.id,
+          foundEmail: existingUser?.email
+        }, 'AuthAPI')
       }
       
       // Se ainda erro com colunas, tentar sem colunas extras
@@ -168,7 +191,7 @@ async function loginHandler(req: NextRequest) {
     }
     
     if (userCheckError) {
-      debug('Erro ao verificar usuário no banco', { error: userCheckError }, 'AuthAPI')
+      logError('Erro ao verificar usuário no banco', { error: userCheckError, userId: data.user.id, email: data.user.email || email }, 'AuthAPI')
     }
     
     // ✅ Verificar se o usuário existe na tabela users
