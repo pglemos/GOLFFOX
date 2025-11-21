@@ -50,7 +50,7 @@ export function CarrierUsersModal({ carrier, isOpen, onClose, onSave }: CarrierU
     setLoading(true)
 
     try {
-      const response = await fetch('/api/admin/create-carrier-login', {
+      const response = await fetch('/api/admin/create-transportadora-login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
