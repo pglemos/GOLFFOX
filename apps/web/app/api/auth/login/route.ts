@@ -20,10 +20,21 @@ function getSupabaseAdmin() {
   if (!url || !serviceKey) {
     throw new Error('Supabase não configurado: defina NEXT_PUBLIC_SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY')
   }
+  // ✅ CRÍTICO: Criar cliente service role com opções específicas para garantir que não seja afetado por sessões de usuário
+  // Não usar persistSession e não permitir que funções de auth substituam a service key
   return createClient(url, serviceKey, {
     auth: {
       autoRefreshToken: false,
       persistSession: false,
+      detectSessionInUrl: false,
+      flowType: 'pkce',
+    },
+    global: {
+      headers: {
+        // Forçar uso da service key no header Authorization
+        'Authorization': `Bearer ${serviceKey}`,
+        'apikey': serviceKey,
+      },
     },
   })
 }
