@@ -409,9 +409,28 @@ async function loginHandler(req: NextRequest) {
       }
     }, { status: 200 })
 
-    // ✅ Removido: Não criar cookie customizado - usar apenas sessão Supabase
-    // O frontend deve enviar o token do Supabase no header Authorization
-    console.log('✅ Login bem-sucedido - usando apenas sessão Supabase:', {
+    // ✅ Criar cookie customizado no servidor para autenticação nas rotas API
+    const sessionCookieValue = Buffer.from(JSON.stringify({
+      id: userPayload.id,
+      email: userPayload.email,
+      role: userPayload.role,
+      companyId: userPayload.companyId,
+      transportadoraId: userPayload.transportadoraId,
+      access_token: token
+    })).toString('base64')
+
+    const isSecure = isSecureRequest(req)
+    const cookieOptions = [
+      `golffox-session=${sessionCookieValue}`,
+      'path=/',
+      'max-age=3600',
+      'SameSite=Lax',
+      ...(isSecure ? ['Secure'] : [])
+    ].join('; ')
+
+    response.headers.set('Set-Cookie', cookieOptions)
+
+    console.log('✅ Login bem-sucedido - cookie customizado criado:', {
       userId: userPayload.id,
       email: userPayload.email,
       role: userPayload.role
