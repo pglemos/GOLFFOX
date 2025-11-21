@@ -24,45 +24,8 @@ export async function validateAuth(request: NextRequest): Promise<AuthenticatedU
     const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
     const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
     
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/802544c4-70d0-43c7-a57c-6692b28ca17d', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        location: 'lib/api-auth.ts:validateAuth:entry',
-        message: 'validateAuth iniciado',
-        data: { 
-          hasSupabaseUrl: !!supabaseUrl, 
-          hasAnonKey: !!supabaseAnonKey, 
-          hasServiceKey: !!serviceKey,
-          path: request.nextUrl.pathname,
-          method: request.method
-        },
-        timestamp: Date.now(),
-        sessionId: 'debug-session',
-        runId: 'debug-run',
-        hypothesisId: 'AUTH_1'
-      })
-    }).catch(() => {})
-    // #endregion
-    
     if (!supabaseUrl || !supabaseAnonKey) {
       console.error('❌ Supabase não configurado')
-      // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/802544c4-70d0-43c7-a57c-6692b28ca17d', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          location: 'lib/api-auth.ts:validateAuth:config-error',
-          message: 'Supabase não configurado',
-          data: { hasSupabaseUrl: !!supabaseUrl, hasAnonKey: !!supabaseAnonKey },
-          timestamp: Date.now(),
-          sessionId: 'debug-session',
-          runId: 'debug-run',
-          hypothesisId: 'AUTH_1'
-        })
-      }).catch(() => {})
-      // #endregion
       return null
     }
     
@@ -203,93 +166,19 @@ export async function validateAuth(request: NextRequest): Promise<AuthenticatedU
     })
     
     // Buscar TODOS os dados do usuário do banco
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/802544c4-70d0-43c7-a57c-6692b28ca17d', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        location: 'lib/api-auth.ts:validateAuth:before-user-query',
-        message: 'Antes de buscar usuário no banco',
-        data: { userId: user.id },
-        timestamp: Date.now(),
-        sessionId: 'debug-session',
-        runId: 'debug-run',
-        hypothesisId: 'SUPABASE_QUERY_1'
-      })
-    }).catch(() => {})
-    // #endregion
-    
     const { data: userData, error: dbError } = await supabaseAdmin
       .from('users')
       .select('id, email, role, company_id, transportadora_id')
       .eq('id', user.id)
       .maybeSingle()
     
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/802544c4-70d0-43c7-a57c-6692b28ca17d', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        location: 'lib/api-auth.ts:validateAuth:after-user-query',
-        message: 'Depois de buscar usuário no banco',
-        data: { 
-          hasUserData: !!userData, 
-          hasError: !!dbError,
-          errorCode: dbError?.code,
-          errorMessage: dbError?.message,
-          userId: user.id
-        },
-        timestamp: Date.now(),
-        sessionId: 'debug-session',
-        runId: 'debug-run',
-        hypothesisId: 'SUPABASE_QUERY_1'
-      })
-    }).catch(() => {})
-    // #endregion
-    
     if (dbError) {
       console.error('❌ Erro ao buscar dados do usuário no banco:', dbError)
-      // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/802544c4-70d0-43c7-a57c-6692b28ca17d', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          location: 'lib/api-auth.ts:validateAuth:user-query-error',
-          message: 'Erro ao buscar usuário no banco',
-          data: { 
-            errorCode: dbError.code,
-            errorMessage: dbError.message,
-            errorDetails: dbError.details,
-            errorHint: dbError.hint,
-            userId: user.id
-          },
-          timestamp: Date.now(),
-          sessionId: 'debug-session',
-          runId: 'debug-run',
-          hypothesisId: 'SUPABASE_QUERY_1'
-        })
-      }).catch(() => {})
-      // #endregion
       return null
     }
     
     if (!userData) {
       console.error('❌ Usuário não encontrado na tabela users:', user.id)
-      // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/802544c4-70d0-43c7-a57c-6692b28ca17d', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          location: 'lib/api-auth.ts:validateAuth:user-not-found',
-          message: 'Usuário não encontrado na tabela users',
-          data: { userId: user.id },
-          timestamp: Date.now(),
-          sessionId: 'debug-session',
-          runId: 'debug-run',
-          hypothesisId: 'SUPABASE_QUERY_1'
-        })
-      }).catch(() => {})
-      // #endregion
       return null
     }
     
