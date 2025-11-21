@@ -46,7 +46,8 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY, {
   auth: { persistSession: false, autoRefreshToken: false }
 })
 
-const projectRoot = path.join(__dirname, '../..')
+// Caminho correto: database está na raiz, não em apps/web
+const projectRoot = path.resolve(__dirname, '../../..')
 
 // Mapeamento de migrações (ordem de aplicação)
 const migrations = [

@@ -45,6 +45,7 @@ import { VehiclePickerModal } from "@/components/admin/vehicle-picker-modal"
 import { AddressAutocomplete } from "@/components/address-autocomplete"
 import { z } from "zod"
 import React from "react"
+import { useRouteCreate } from "./use-route-create"
 
 const routeSchema = z.object({
   name: z.string().min(1, "Nome é obrigatório"),
@@ -71,386 +72,40 @@ interface RouteCreateModalProps {
 }
 
 export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalProps) {
-  const [formData, setFormData] = useState<Partial<RouteFormData>>({
-    name: "",
-    company_id: "",
-    description: "",
-    origin_address: "",
-    origin_lat: 0,
-    origin_lng: 0,
-    destination_address: "",
-    destination_lat: 0,
-    destination_lng: 0,
-    scheduled_time: "",
-    shift: "manha",
-    days_of_week: [],
-    exceptions: [],
-    is_active: true,
-    selected_employees: [],
-  })
+  const {
+    formData, setFormData,
+    companies, loadingCompanies,
+    employees, loadingEmployees, loadEmployees,
+    searchEmployee, setSearchEmployee, filteredEmployees,
+    selectedDriver, setSelectedDriver,
+    selectedVehicle, setSelectedVehicle,
+    optimizationResult, setOptimizationResult,
+    optimizing, setOptimizing,
+    saving, setSaving,
+    warnings, setWarnings,
+    newException, setNewException,
+    addException, removeException, toggleEmployee
+  } = useRouteCreate(isOpen)
 
-  const [companies, setCompanies] = useState<Array<{ id: string; name: string }>>([])
-  const [loadingCompanies, setLoadingCompanies] = useState(false)
-  const [employees, setEmployees] = useState<EmployeeLite[]>([])
-  const [loadingEmployees, setLoadingEmployees] = useState(false)
-  const [searchEmployee, setSearchEmployee] = useState("")
-  const [selectedDriver, setSelectedDriver] = useState<{ id: string; name: string; documents_valid?: boolean } | null>(null)
-  const [selectedVehicle, setSelectedVehicle] = useState<{ id: string; plate: string; capacity: number } | null>(null)
   const [isDriverModalOpen, setIsDriverModalOpen] = useState(false)
   const [isVehicleModalOpen, setIsVehicleModalOpen] = useState(false)
-  const [optimizationResult, setOptimizationResult] = useState<OptimizeRouteResponse | null>(null)
-  const [optimizing, setOptimizing] = useState(false)
-  const [saving, setSaving] = useState(false)
   const [mapLoaded, setMapLoaded] = useState(false)
   const [mapError, setMapError] = useState<string | null>(null)
-  const [warnings, setWarnings] = useState<string[]>([])
-  const [newException, setNewException] = useState("")
 
   useEffect(() => {
     if (isOpen) {
-      // Carregar empresas imediatamente ao abrir o modal
-      console.log("🔄 Modal aberto - carregando empresas...")
-      loadCompanies()
-      
       loadGoogleMaps()
         .then(() => setMapLoaded(true))
         .catch((err) => {
           setMapError("Erro ao carregar Google Maps")
           console.error(err)
         })
-    } else {
-      // Reset form when closing
-      setFormData({
-        name: "",
-        company_id: "",
-        description: "",
-        origin_address: "",
-        origin_lat: 0,
-        origin_lng: 0,
-        destination_address: "",
-        destination_lat: 0,
-        destination_lng: 0,
-        scheduled_time: "",
-        shift: "manha",
-        days_of_week: [],
-        exceptions: [],
-        is_active: true,
-        selected_employees: [],
-      })
-      setSelectedDriver(null)
-      setSelectedVehicle(null)
-      setOptimizationResult(null)
-      setWarnings([])
-      setNewException("")
-      setSearchEmployee("")
     }
   }, [isOpen])
 
-  useEffect(() => {
-    if (formData.company_id) {
-      loadEmployees()
-      loadCompanyAddress()
-    }
-  }, [formData.company_id])
-  
-  // Debug: Logar quando empresas mudarem
-  useEffect(() => {
-    console.log("📊 Estado de empresas atualizado:", {
-      count: companies.length,
-      companies: companies.map(c => ({ id: c.id, name: c.name })),
-      loading: loadingCompanies
-    })
-  }, [companies, loadingCompanies])
-
-  const loadCompanies = async () => {
-    setLoadingCompanies(true)
-    try {
-      console.log("🔄 Carregando empresas...")
-      
-      // ✅ Obter token do Supabase para autenticação
-      const { data: { session } } = await supabase.auth.getSession()
-      
-      const headers: HeadersInit = {}
-      if (session?.access_token) {
-        headers['Authorization'] = `Bearer ${session.access_token}`
-      }
-      
-      // Tentar via API route primeiro (mesmo padrão usado em outras páginas)
-      const response = await fetch('/api/admin/companies-list', {
-        headers,
-        credentials: 'include',
-      })
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-      
-      const result = await response.json()
-      console.log("📦 Resposta da API:", result)
-      
-      if (result.success && result.companies && Array.isArray(result.companies)) {
-        // Filtrar empresas ativas e formatar (mesmo padrão da página de custos)
-        const companiesData = (result.companies || []).filter((c: any) => c.is_active !== false)
-        const formattedCompanies = companiesData.map((c: any) => ({
-          id: c.id,
-          name: c.name || 'Sem nome'
-        })).filter((c: any) => c.id && c.name)
-        
-        console.log("✅ Empresas carregadas via API:", formattedCompanies.length, formattedCompanies)
-        setCompanies(formattedCompanies)
-        
-        if (formattedCompanies.length === 0) {
-          console.warn("⚠️ Nenhuma empresa ativa encontrada")
-          notifyError(new Error("Nenhuma empresa encontrada"), "Não há empresas cadastradas ou ativas no sistema")
-        }
-      } else {
-        console.error("❌ Resposta inválida da API:", result)
-        throw new Error(result.error || 'Erro ao carregar empresas - resposta inválida')
-      }
-    } catch (error: any) {
-      console.error("❌ Erro ao carregar empresas:", error)
-      
-      // Fallback: tentar direto via Supabase
-      try {
-        console.log("🔄 Tentando carregar empresas diretamente do Supabase...")
-        const { data, error: supabaseError } = await supabase
-          .from("companies")
-          .select("id, name")
-          .order("name", { ascending: true })
-
-        if (supabaseError) {
-          throw supabaseError
-        }
-        
-        const formatted = (data || []).map((c: any) => ({
-          id: c.id,
-          name: c.name || 'Sem nome'
-        })).filter((c: any) => c.id && c.name)
-        
-        console.log("✅ Empresas carregadas do Supabase (fallback):", formatted.length, formatted)
-        setCompanies(formatted)
-      } catch (fallbackError: any) {
-        console.error("❌ Erro no fallback também:", fallbackError)
-        notifyError(error, "Erro ao carregar empresas. Verifique o console para mais detalhes.")
-        setCompanies([])
-      }
-    } finally {
-      setLoadingCompanies(false)
-    }
-  }
-
-  const loadEmployees = async () => {
-    if (!formData.company_id) return
-
-    setLoadingEmployees(true)
-    try {
-      console.log("🔍 Carregando funcionários para company_id:", formData.company_id)
-      // Tentar usar a view primeiro, se não existir usar a tabela diretamente
-      let { data, error } = await supabase
-        .from("v_company_employees_secure")
-        .select("*")
-        .eq("company_id", formData.company_id)
-
-      // Fallback: usar API route (bypass RLS com service role)
-      if (error && (error.message?.includes("does not exist") || (error as any).code === "PGRST205")) {
-        console.log("🔄 Usando API route para carregar funcionários (bypass RLS)")
-        console.log("🔍 Buscando funcionários com company_id:", formData.company_id)
-        
-        try {
-          const response = await fetch(`/api/admin/employees-list?company_id=${formData.company_id}`, {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            credentials: 'include'
-          })
-
-          if (response.ok) {
-            const result = await response.json()
-            if (result.success && result.employees) {
-              console.log(`✅ Funcionários carregados via API: ${result.employees.length}`)
-              setEmployees(result.employees as EmployeeLite[])
-              return
-            } else {
-              console.warn("⚠️ API retornou sucesso mas sem funcionários:", result)
-            }
-          } else {
-            const errorData = await response.json().catch(() => ({ error: 'Erro desconhecido' }))
-            console.warn("⚠️ Erro na API de funcionários:", errorData)
-          }
-        } catch (apiError) {
-          console.error("❌ Erro ao chamar API de funcionários:", apiError)
-        }
-
-        // Fallback final: tentar direto da tabela (pode falhar por RLS)
-        console.log("🔄 Tentando fallback final: carregando diretamente da tabela")
-        const { data: empData, error: empError } = await supabase
-          .from("gf_employee_company")
-          .select("id, company_id, name, cpf, address, latitude, longitude")
-          .eq("company_id", formData.company_id)
-        
-        console.log("📊 Resultado da consulta direta:", { empData, empError, count: empData?.length || 0 })
-
-        if (empError) {
-          console.error("❌ Erro ao carregar da tabela:", empError)
-          throw empError
-        }
-
-        // Transformar dados da tabela para o formato EmployeeLite
-        data = (empData || []).map((emp: any) => ({
-          employee_id: emp.id,
-          company_id: emp.company_id,
-          first_name: emp.name?.split(" ")[0] || "",
-          last_name: emp.name?.split(" ").slice(1).join(" ") || "",
-          cpf: emp.cpf || "",
-          address: emp.address || "",
-          city: "",
-          state: "",
-          zipcode: "",
-          lat: emp.latitude ? parseFloat(emp.latitude.toString()) : null,
-          lng: emp.longitude ? parseFloat(emp.longitude.toString()) : null,
-        })) as any
-        console.log(`✅ Funcionários carregados via fallback: ${data?.length || 0}`)
-        setEmployees((data || []) as EmployeeLite[])
-        return
-      } else if (error) {
-        throw error
-      }
-
-      setEmployees((data || []) as EmployeeLite[])
-    } catch (error: any) {
-      console.error("Erro ao carregar funcionários:", error)
-      // Se o erro for PGRST205, tentar fallback novamente
-      if ((error as any)?.code === "PGRST205" || error?.message?.includes("does not exist")) {
-        console.log("🔄 Tentando fallback novamente após catch...")
-        try {
-          const { data: empData, error: empError } = await supabase
-            .from("gf_employee_company")
-            .select("id, company_id, name, cpf, address, latitude, longitude")
-            .eq("company_id", formData.company_id)
-
-          if (empError) throw empError
-
-          const transformedData = (empData || []).map((emp: any) => ({
-            employee_id: emp.id,
-            company_id: emp.company_id,
-            first_name: emp.name?.split(" ")[0] || "",
-            last_name: emp.name?.split(" ").slice(1).join(" ") || "",
-            cpf: emp.cpf || "",
-            address: emp.address || "",
-            city: "",
-            state: "",
-            zipcode: "",
-            lat: emp.latitude ? parseFloat(emp.latitude.toString()) : null,
-            lng: emp.longitude ? parseFloat(emp.longitude.toString()) : null,
-          })) as EmployeeLite[]
-
-          console.log(`✅ Funcionários carregados via fallback (catch): ${transformedData.length}`)
-          setEmployees(transformedData)
-          return
-        } catch (fallbackError) {
-          console.error("❌ Erro no fallback:", fallbackError)
-          notifyError(fallbackError, "Erro ao carregar funcionários")
-        }
-      } else {
-        notifyError(error, "Erro ao carregar funcionários")
-      }
-    } finally {
-      setLoadingEmployees(false)
-    }
-  }
-
-  const loadCompanyAddress = async () => {
-    if (!formData.company_id) return
-
-    try {
-      const { data } = await supabase
-        .from("companies")
-        .select("address")
-        .eq("id", formData.company_id)
-        .maybeSingle()
-
-      if (data && typeof data === 'object' && (data as any).address) {
-        const address = (data as any).address
-        if (address) {
-          const geocoded = await geocodeAddress(address)
-          if (geocoded) {
-            setFormData((prev) => ({
-              ...prev,
-              destination_address: geocoded.formatted_address,
-              destination_lat: geocoded.lat,
-              destination_lng: geocoded.lng,
-            }))
-          } else {
-            setFormData((prev) => ({
-              ...prev,
-              destination_address: address,
-            }))
-          }
-        }
-      }
-    } catch (error) {
-      console.error("Erro ao carregar endereço da empresa:", error)
-    }
-  }
-
-  const filteredEmployees = useMemo(() => {
-    if (!searchEmployee) return employees
-
-    const query = searchEmployee.toLowerCase().trim()
-    const queryNumbers = query.replace(/\D/g, "")
-    
-    return employees.filter(
-      (e) => {
-        const fullName = `${e.first_name} ${e.last_name}`.toLowerCase()
-        const cpfNumbers = e.cpf.replace(/\D/g, "")
-        
-        return (
-          fullName.includes(query) ||
-          fullName.startsWith(query) ||
-          cpfNumbers.includes(queryNumbers) ||
-          cpfNumbers.startsWith(queryNumbers)
-        )
-      }
-    )
-  }, [employees, searchEmployee])
-
-  const addException = () => {
-    if (!newException) return
-    
-    // Converter formato dd/mm/aaaa para YYYY-MM-DD
-    let dateStr = newException.trim()
-    const parts = dateStr.split('/')
-    
-    if (parts.length === 3) {
-      // Formato dd/mm/aaaa
-      const day = parts[0].padStart(2, '0')
-      const month = parts[1].padStart(2, '0')
-      const year = parts[2]
-      dateStr = `${year}-${month}-${day}`
-    }
-    
-    const exceptions = formData.exceptions || []
-    if (!exceptions.includes(dateStr)) {
-      setFormData((prev) => ({ ...prev, exceptions: [...exceptions, dateStr] }))
-      setNewException("")
-    }
-  }
-
-  const removeException = (date: string) => {
-    const exceptions = formData.exceptions || []
-    setFormData((prev) => ({ ...prev, exceptions: exceptions.filter(e => e !== date) }))
-  }
-
-  const toggleEmployee = (employeeId: string) => {
-    setFormData((prev) => {
-      const selected = prev.selected_employees || []
-      const newSelected = selected.includes(employeeId)
-        ? selected.filter((id) => id !== employeeId)
-        : [...selected, employeeId]
-      return { ...prev, selected_employees: newSelected }
-    })
-  }
+  const selectedEmployeesData = useMemo(() => {
+    return employees.filter((e) => formData.selected_employees?.includes(e.employee_id))
+  }, [employees, formData.selected_employees])
 
   const handleOptimize = async () => {
     if (!formData.company_id || !formData.selected_employees || formData.selected_employees.length === 0) {
@@ -463,21 +118,21 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
 
     if (missingCoords.length > 0) {
       setWarnings([`${missingCoords.length} funcionário(s) sem coordenadas. Geocodificando...`])
-      
-      for (const emp of missingCoords) {
+
+      await Promise.all(missingCoords.map(async (emp) => {
         const geocoded = await geocodeAddress(emp.address)
         if (geocoded) {
-          const updatePayload: { latitude: number; longitude: number } = { 
-            latitude: geocoded.lat, 
-            longitude: geocoded.lng 
+          const updatePayload: { latitude: number; longitude: number } = {
+            latitude: geocoded.lat,
+            longitude: geocoded.lng
           }
           // @ts-ignore - Supabase types are too strict for dynamic updates
           const updateQuery = (supabase.from("gf_employee_company").update(updatePayload as any) as any)
           const { error: updateError } = await updateQuery.eq("id", emp.employee_id)
           if (updateError) console.warn("Erro ao atualizar coordenadas:", updateError)
         }
-      }
-      
+      }))
+
       await loadEmployees()
     }
 
@@ -553,25 +208,25 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
       })
 
       setOptimizationResult(result)
-      
+
       const newWarnings: string[] = []
-      
+
       if (selectedVehicle && selectedVehicle.capacity < waypoints.length) {
         newWarnings.push(`⚠️ Capacidade do veículo (${selectedVehicle.capacity}) menor que número de passageiros (${waypoints.length})`)
       }
-      
+
       if (!selectedDriver) {
         newWarnings.push("⚠️ Motorista não selecionado")
       }
-      
+
       if (!selectedVehicle) {
         newWarnings.push("⚠️ Veículo não selecionado")
       }
-      
+
       if (selectedDriver && selectedDriver.documents_valid === false) {
         newWarnings.push("⚠️ Motorista com documentos pendentes")
       }
-      
+
       setWarnings([...(result.warnings || []), ...newWarnings])
     } catch (error: any) {
       notifyError(error, error.message || "Erro ao otimizar rota")
@@ -601,7 +256,7 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
       const orderedEmployees = optimizationResult
         ? optimizationResult.ordered.map((o) => o.id)
         : formData.selected_employees || []
-      
+
       if (selectedVehicle.capacity < orderedEmployees.length) {
         const confirm = window.confirm(
           `Atenção: O veículo selecionado tem capacidade de ${selectedVehicle.capacity} passageiros, mas ${orderedEmployees.length} foram selecionados. Deseja continuar mesmo assim?`
@@ -677,10 +332,6 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
     }
   }
 
-  const selectedEmployeesData = useMemo(() => {
-    return employees.filter((e) => formData.selected_employees?.includes(e.employee_id))
-  }, [employees, formData.selected_employees])
-
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
@@ -731,8 +382,8 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
                     }}
                     disabled={loadingCompanies}
                   >
-                    <SelectTrigger 
-                      id="company" 
+                    <SelectTrigger
+                      id="company"
                       className="text-base h-11 sm:h-12 px-4 py-3"
                       aria-label="Selecione a empresa"
                     >
@@ -754,9 +405,9 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
                       ) : (
                         <>
                           {companies.map((c) => (
-                            <SelectItem 
-                              key={c.id} 
-                              value={c.id} 
+                            <SelectItem
+                              key={c.id}
+                              value={c.id}
                               className="text-base px-4 py-3 cursor-pointer"
                             >
                               {c.name}
@@ -805,9 +456,8 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
                           return (
                             <div
                               key={emp.employee_id}
-                              className={`flex items-start gap-3 p-2 rounded-lg border cursor-pointer transition-colors ${
-                                isSelected ? "bg-orange-50 border-orange-200" : "hover:bg-gray-50"
-                              }`}
+                              className={`flex items-start gap-3 p-2 rounded-lg border cursor-pointer transition-colors ${isSelected ? "bg-orange-50 border-orange-200" : "hover:bg-gray-50"
+                                }`}
                               onClick={() => toggleEmployee(emp.employee_id)}
                               role="button"
                               tabIndex={0}
@@ -819,8 +469,8 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
                               }}
                               aria-label={`${isSelected ? "Desmarcar" : "Selecionar"} funcionário ${emp.first_name} ${emp.last_name}`}
                             >
-                              <Checkbox 
-                                checked={isSelected} 
+                              <Checkbox
+                                checked={isSelected}
                                 onCheckedChange={() => toggleEmployee(emp.employee_id)}
                                 aria-label={`${isSelected ? "Desmarcar" : "Selecionar"} ${emp.first_name} ${emp.last_name}`}
                               />
@@ -1080,9 +730,9 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
           </Tabs>
 
           <DialogFooter className="flex-shrink-0 flex-col sm:flex-row gap-3 pt-6 border-t mt-6">
-            <Button 
-              variant="outline" 
-              onClick={onClose} 
+            <Button
+              variant="outline"
+              onClick={onClose}
               disabled={saving}
               aria-label="Cancelar criação de rota"
               className="w-full sm:w-auto order-3 sm:order-1 text-base font-medium h-11 sm:h-12"
@@ -1099,8 +749,8 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
               {optimizing ? "Otimizando..." : <span className="hidden sm:inline">Pré-visualizar & Otimizar</span>}
               <span className="sm:hidden">Otimizar</span>
             </Button>
-            <Button 
-              onClick={handleSave} 
+            <Button
+              onClick={handleSave}
               disabled={saving}
               className="bg-orange-500 hover:bg-orange-600 text-white w-full sm:w-auto order-1 sm:order-3 text-base font-medium h-11 sm:h-12"
               aria-label="Salvar rota"
@@ -1114,10 +764,10 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
       <DriverPickerModal
         isOpen={isDriverModalOpen}
         onClose={() => setIsDriverModalOpen(false)}
-        onSelect={(driver) => setSelectedDriver({ 
-          id: driver.id, 
+        onSelect={(driver) => setSelectedDriver({
+          id: driver.id,
           name: driver.name,
-          documents_valid: driver.documents_valid 
+          documents_valid: driver.documents_valid
         })}
         companyId={formData.company_id}
       />
@@ -1325,4 +975,3 @@ function RoutePreviewMap({
     </div>
   )
 }
-

@@ -12,7 +12,6 @@ import 'supabase_service.dart';
 
 /// Evento de status para a UI
 class TrackingStatus {
-
   const TrackingStatus({
     required this.tracking,
     required this.queued,
@@ -35,19 +34,19 @@ class TrackingStatus {
     int? queued,
     Position? lastPosition,
     String? lastError,
-  }) => TrackingStatus(
-      tracking: tracking ?? this.tracking,
-      tripId: tripId ?? this.tripId,
-      driverId: driverId ?? this.driverId,
-      queued: queued ?? this.queued,
-      lastPosition: lastPosition ?? this.lastPosition,
-      lastError: lastError,
-    );
+  }) =>
+      TrackingStatus(
+        tracking: tracking ?? this.tracking,
+        tripId: tripId ?? this.tripId,
+        driverId: driverId ?? this.driverId,
+        queued: queued ?? this.queued,
+        lastPosition: lastPosition ?? this.lastPosition,
+        lastError: lastError,
+      );
 }
 
 /// Config de rastreamento (ajuste conforme o cenario)
 class TrackingConfig {
-
   const TrackingConfig({
     this.streamInterval = const Duration(seconds: 8),
     this.distanceFilterMeters = 10,
@@ -158,12 +157,14 @@ class TrackingService {
               ? AppleSettings(
                   accuracy: _config.accuracy,
                   distanceFilter: _config.distanceFilterMeters,
-                  pauseLocationUpdatesAutomatically: true,
+                  pauseLocationUpdatesAutomatically: false,
+                  activityType: ActivityType.automotiveNavigation,
+                  showBackgroundLocationIndicator: true,
                 )
               : settings;
 
-      _posSub = Geolocator.getPositionStream(locationSettings: locSettings)
-          .listen(
+      _posSub =
+          Geolocator.getPositionStream(locationSettings: locSettings).listen(
         _onPosition,
         onError: (Object e, StackTrace st) => _emitError(e.toString()),
       );
@@ -216,8 +217,7 @@ class TrackingService {
   Future<void> _pollPosition() async {
     try {
       final settings = LocationSettings(accuracy: _config.accuracy);
-      final p =
-          await Geolocator.getCurrentPosition(locationSettings: settings);
+      final p = await Geolocator.getCurrentPosition(locationSettings: settings);
       _onPosition(p);
     } on Exception catch (e) {
       _emitError('Erro ao obter posicao: $e');
