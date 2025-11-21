@@ -133,7 +133,7 @@ async function runReportHandler(request: NextRequest) {
         }
       } else {
         // Se não há companyId, validar apenas autenticação
-        const authError = await requireAuth(request, ['admin', 'operator'])
+        const authError = await requireAuth(request, ['admin', 'operador'])
         if (authError) {
           return NextResponse.json(
             {

@@ -45,17 +45,17 @@ export async function POST(req: NextRequest) {
       // Verificar se o motorista pertence à transportadora
       const { data: driver } = await supabaseServiceRole
         .from('users')
-        .select('carrier_id')
+        .select('transportadora_id')
         .eq('id', entityId)
         .single()
 
       const { data: userData } = await supabaseServiceRole
         .from('users')
-        .select('carrier_id')
+        .select('transportadora_id')
         .eq('id', user.id)
         .single()
 
-      if (!driver || userData?.carrier_id !== driver.carrier_id) {
+      if (!driver || userData?.transportadora_id !== driver.transportadora_id) {
         return NextResponse.json(
           { error: 'Acesso negado' },
           { status: 403 }
@@ -65,17 +65,17 @@ export async function POST(req: NextRequest) {
       // Verificar se o veículo pertence à transportadora
       const { data: vehicle } = await supabaseServiceRole
         .from('vehicles')
-        .select('carrier_id')
+        .select('transportadora_id')
         .eq('id', entityId)
         .single()
 
       const { data: userData } = await supabaseServiceRole
         .from('users')
-        .select('carrier_id')
+        .select('transportadora_id')
         .eq('id', user.id)
         .single()
 
-      if (!vehicle || userData?.carrier_id !== vehicle.carrier_id) {
+      if (!vehicle || userData?.transportadora_id !== vehicle.transportadora_id) {
         return NextResponse.json(
           { error: 'Acesso negado' },
           { status: 403 }

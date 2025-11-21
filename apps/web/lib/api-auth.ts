@@ -98,7 +98,7 @@ export async function validateAuth(request: NextRequest): Promise<AuthenticatedU
     // Buscar TODOS os dados do usuário do banco
     const { data: userData, error: dbError } = await supabaseAdmin
       .from('users')
-      .select('id, email, role, company_id, transportadora_id')
+      .select('id, email, role, company_id, carrier_id')
       .eq('id', user.id)
       .maybeSingle()
     

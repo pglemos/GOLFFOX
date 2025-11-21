@@ -14,6 +14,20 @@ function sanitize(value: unknown): string {
   return value.replace(/[<>"'`;()]/g, '').trim()
 }
 
+function getSupabaseAdmin() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+  if (!url || !serviceKey) {
+    throw new Error('Supabase não configurado: defina NEXT_PUBLIC_SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY')
+  }
+  return createClient(url, serviceKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
+  })
+}
+
 function isSecureRequest(req: NextRequest): boolean {
   const protoHeader = req.headers.get('x-forwarded-proto')
   if (protoHeader) {
@@ -146,10 +160,7 @@ async function loginHandler(req: NextRequest) {
       debug('Erro ao verificar usuário no banco', { error: userCheckError }, 'AuthAPI')
     }
     
-    if (!existingUser) {
-      return NextResponse.json({ error: 'Usuário não cadastrado no sistema', code: 'user_not_in_db' }, { status: 403 })
-    }
-    
+    // Se usuário não existe na tabela users, criar automaticamente
     let role = existingUser?.role
     if (!role) {
       role = data.user.user_metadata?.role || data.user.app_metadata?.role
@@ -159,11 +170,60 @@ async function loginHandler(req: NextRequest) {
       role = getUserRoleByEmail(data.user.email || email)
     }
     
+    // Se não encontrou role, usar 'passenger' como padrão
+    if (!role) {
+      role = 'passenger'
+    }
+    
+    // Se usuário não existe na tabela users, criar registro automaticamente
+    if (!existingUser) {
+      try {
+        const supabaseAdmin = getSupabaseAdmin()
+        const { error: insertError } = await supabaseAdmin
+          .from('users')
+          .insert({
+            id: data.user.id,
+            email: data.user.email || email,
+            role: role,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          })
+        
+        if (insertError) {
+          debug('Erro ao criar registro do usuário no banco', { error: insertError }, 'AuthAPI')
+          // Continuar mesmo se falhar a inserção (pode ser problema de RLS ou duplicação)
+        } else {
+          debug('Registro do usuário criado automaticamente no banco', { userId: data.user.id, role }, 'AuthAPI')
+          // Buscar o registro recém-criado
+          const { data: newUser } = await supabaseAdmin
+            .from('users')
+            .select('id, email, role, company_id')
+            .eq('id', data.user.id)
+            .maybeSingle()
+          
+          if (newUser) {
+            existingUser = newUser
+          }
+        }
+      } catch (createError) {
+        debug('Erro ao criar registro do usuário', { error: createError }, 'AuthAPI')
+        // Continuar com login mesmo se falhar a criação do registro
+      }
+    }
+    
+    // Usar dados do usuário encontrado ou criado
+    const finalUser = existingUser || {
+      id: data.user.id,
+      email: data.user.email || email,
+      role: role,
+      company_id: null
+    }
+    
     const token = data.session.access_token
     const refreshToken = data.session.refresh_token
 
-    let companyId: string | null = existingUser?.company_id || null
-    if (role === 'operador') {
+    let companyId: string | null = finalUser.company_id || null
+    if (role === 'operador' || role === 'operator') {
       try {
         const { data: mapping } = await supabase
           .from('gf_user_company_map')
@@ -187,15 +247,15 @@ async function loginHandler(req: NextRequest) {
       }
     }
 
-    // ✅ Incluir transportadora_id se o usuário for uma transportadora
-    const transportadoraId = existingUser?.transportadora_id || null
+    // ✅ Incluir carrier_id se o usuário for uma transportadora
+    const carrierId = finalUser?.carrier_id || null
 
     const userPayload = {
       id: data.user.id,
       email: data.user.email || email,
       role,
       companyId: companyId || undefined,
-      transportadora_id: role === 'transportadora' ? transportadoraId : undefined,
+      carrier_id: role === 'transportadora' ? carrierId : undefined,
     }
 
     const response = NextResponse.json({ 

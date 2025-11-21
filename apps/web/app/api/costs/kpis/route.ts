@@ -11,7 +11,7 @@ async function getCostsKpisHandler(request: NextRequest) {
 
     // ✅ Validar autenticação primeiro
     const isDevelopment = process.env.NODE_ENV === 'development'
-    const authError = await requireAuth(request, ['admin', 'operator'])
+    const authError = await requireAuth(request, ['admin', 'operador'])
     if (authError) {
       if (isDevelopment) {
         console.warn('⚠️ Auth falhou em desenvolvimento, continuando KPIs')

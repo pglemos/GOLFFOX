@@ -225,19 +225,19 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
           vehicleDataRaw.company_id = formData.company_id
         }
       } else if (userInfo.role === 'transportadora') {
-        // Carrier deve usar seu próprio carrier_id
-        if (userInfo.carrier_id) {
-          vehicleDataRaw.carrier_id = userInfo.carrier_id
+        // Transportadora deve usar seu próprio transportadora_id
+        if (userInfo.transportadora_id) {
+          vehicleDataRaw.transportadora_id = userInfo.transportadora_id
         }
       }
       
-      // Se for update, manter company_id/carrier_id existente se não foi alterado
+      // Se for update, manter company_id/transportadora_id existente se não foi alterado
       if (vehicleId && vehicle) {
         if (!vehicleDataRaw.company_id && vehicle.company_id) {
           vehicleDataRaw.company_id = vehicle.company_id
         }
-        if (!vehicleDataRaw.carrier_id && (vehicle as any).carrier_id) {
-          vehicleDataRaw.carrier_id = (vehicle as any).carrier_id
+        if (!vehicleDataRaw.transportadora_id && (vehicle as any).transportadora_id) {
+          vehicleDataRaw.transportadora_id = (vehicle as any).transportadora_id
         }
       }
 
