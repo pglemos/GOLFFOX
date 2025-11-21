@@ -142,7 +142,7 @@ export default function TransportadoraDashboard() {
   const [recentActivities, setRecentActivities] = useState<any[]>([])
 
   useEffect(() => {
-    if (user && userData?.carrier_id) {
+    if (user && userData?.transportadora_id) {
       loadFleetData()
 
       // Configurar Realtime subscription para atualização automática
@@ -237,7 +237,7 @@ export default function TransportadoraDashboard() {
         clearInterval(interval)
       }
     }
-  }, [user, userData?.carrier_id])
+  }, [user, userData?.transportadora_id])
 
   if (loading) {
     return (
@@ -255,11 +255,11 @@ export default function TransportadoraDashboard() {
       // Buscar dados da transportadora
       const { data: userData } = await supabase
         .from('users')
-        .select('carrier_id')
+        .select('transportadora_id')
         .eq('id', user?.id)
         .single()
 
-      if (!userData?.carrier_id) {
+      if (!userData?.transportadora_id) {
         console.error("Usuário não está associado a uma transportadora")
         return
       }
@@ -268,11 +268,11 @@ export default function TransportadoraDashboard() {
       const { data: vehicles } = await supabase
         .from('vehicles')
         .select('*')
-        .eq('carrier_id', userData.carrier_id)
+        .eq('transportadora_id', userData.transportadora_id)
 
       // Carregar posições dos veículos usando RPC do mapa
       const { data: mapData } = await supabase.rpc('gf_map_snapshot_full', {
-        p_carrier_id: userData.carrier_id,
+        p_transportadora_id: userData.transportadora_id,
         p_company_id: null,
         p_route_id: null
       })
@@ -333,7 +333,7 @@ export default function TransportadoraDashboard() {
         .from('users')
         .select('*')
         .eq('role', 'driver')
-        .eq('carrier_id', userData.carrier_id)
+        .eq('transportadora_id', userData.transportadora_id)
 
       if (driversData) {
         // Buscar dados de ranking/gamificação
@@ -361,7 +361,7 @@ export default function TransportadoraDashboard() {
       const { data: alerts } = await supabase
         .from('v_carrier_expiring_documents')
         .select('*')
-        .eq('carrier_id', userData.carrier_id)
+        .eq('transportadora_id', userData.transportadora_id)
         .in('alert_level', ['expired', 'critical'])
 
       // Buscar custos do mês atual
@@ -374,14 +374,14 @@ export default function TransportadoraDashboard() {
       const { data: vehicleCosts } = await supabase
         .from('v_carrier_vehicle_costs_summary')
         .select('total_cost_brl')
-        .eq('carrier_id', userData.carrier_id)
+        .eq('transportadora_id', userData.transportadora_id)
         .gte('month', currentMonthStart.toISOString())
         .lt('month', currentMonthEnd.toISOString())
 
       const { data: routeCosts } = await supabase
         .from('v_carrier_route_costs_summary')
         .select('total_cost_brl')
-        .eq('carrier_id', userData.carrier_id)
+        .eq('transportadora_id', userData.transportadora_id)
         .gte('month', currentMonthStart.toISOString())
         .lt('month', currentMonthEnd.toISOString())
 
@@ -389,7 +389,7 @@ export default function TransportadoraDashboard() {
       const { data: routes } = await supabase
         .from('routes')
         .select('id')
-        .eq('carrier_id', userData.carrier_id)
+        .eq('transportadora_id', userData.transportadora_id)
 
       const routeIds = routes?.map((r: any) => r.id) || []
       
@@ -428,13 +428,13 @@ export default function TransportadoraDashboard() {
         supabase
           .from('v_carrier_vehicle_costs_summary')
           .select('total_cost_brl')
-          .eq('carrier_id', userData.carrier_id)
+          .eq('transportadora_id', userData.transportadora_id)
           .gte('month', previousMonthStart.toISOString())
           .lt('month', previousMonthEnd.toISOString()),
         supabase
           .from('v_carrier_route_costs_summary')
           .select('total_cost_brl')
-          .eq('carrier_id', userData.carrier_id)
+          .eq('transportadora_id', userData.transportadora_id)
           .gte('month', previousMonthStart.toISOString())
           .lt('month', previousMonthEnd.toISOString()),
         supabase

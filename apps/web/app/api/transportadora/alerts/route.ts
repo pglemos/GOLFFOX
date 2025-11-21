@@ -25,14 +25,14 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
     }
 
-    // Buscar carrier_id do usuário
+    // Buscar transportadora_id do usuário
     const { data: userData } = await supabaseServiceRole
       .from('users')
-      .select('carrier_id')
+      .select('transportadora_id')
       .eq('id', user.id)
       .single()
 
-    if (!userData?.carrier_id) {
+    if (!userData?.transportadora_id) {
       return NextResponse.json(
         { error: 'Usuário não está associado a uma transportadora' },
         { status: 403 }
@@ -46,7 +46,7 @@ export async function GET(req: NextRequest) {
     const { data, error } = await supabaseServiceRole
       .from('v_carrier_expiring_documents')
       .select('*')
-      .eq('carrier_id', userData.carrier_id)
+      .eq('transportadora_id', userData.transportadora_id)
       .in('alert_level', alertLevels)
       .order('days_to_expiry', { ascending: true })
 

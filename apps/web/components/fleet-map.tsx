@@ -71,13 +71,13 @@ interface Route {
 
 interface FleetMapProps {
   companyId?: string
-  carrierId?: string
+  transportadoraId?: string
   routeId?: string
   initialCenter?: { lat: number; lng: number }
   initialZoom?: number
 }
 
-export const FleetMap = memo(function FleetMap({ companyId, carrierId, routeId, initialCenter, initialZoom }: FleetMapProps) {
+export const FleetMap = memo(function FleetMap({ companyId, transportadoraId, routeId, initialCenter, initialZoom }: FleetMapProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const mapRef = useRef<HTMLDivElement>(null)
@@ -101,7 +101,7 @@ export const FleetMap = memo(function FleetMap({ companyId, carrierId, routeId, 
   // Filtros persistidos na URL
   const [filters, setFilters] = useState({
     company: companyId || searchParams?.get('company') || '',
-    carrier: carrierId || searchParams?.get('carrier') || '',
+    transportadora: transportadoraId || searchParams?.get('transportadora') || '',
     route: routeId || searchParams?.get('route') || '',
     status: searchParams?.get('status') || ''
   })
@@ -156,7 +156,7 @@ export const FleetMap = memo(function FleetMap({ companyId, carrierId, routeId, 
     try {
       const { data, error } = await (supabase as any).rpc('gf_map_snapshot_full', {
         p_company_id: filters.company || null,
-        p_carrier_id: filters.carrier || null,
+        p_transportadora_id: filters.transportadora || null,
         p_route_id: filters.route || null
       })
 
@@ -179,7 +179,7 @@ export const FleetMap = memo(function FleetMap({ companyId, carrierId, routeId, 
       setStops([])
       setRoutes([])
     }
-  }, [filters.company, filters.carrier, filters.route])
+  }, [filters.company, filters.transportadora, filters.route])
 
   // Função para obter a API Key
   const getGoogleMapsApiKey = () => {

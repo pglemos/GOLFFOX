@@ -17,7 +17,7 @@ export async function OPTIONS() {
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { carrierId: string } }
+  { params }: { params: { transportadoraId: string } }
 ) {
   try {
     const authErrorResponse = await requireAuth(req, 'admin')
@@ -26,7 +26,7 @@ export async function GET(
     const { data, error } = await supabaseServiceRole
       .from('users')
       .select('*')
-      .eq('carrier_id', params.carrierId)
+      .eq('transportadora_id', params.transportadoraId)
       .eq('role', 'transportadora')
       .order('name', { ascending: true })
 

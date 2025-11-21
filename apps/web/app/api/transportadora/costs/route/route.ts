@@ -45,10 +45,10 @@ export async function GET(req: NextRequest) {
     const startDate = req.nextUrl.searchParams.get('start_date')
     const endDate = req.nextUrl.searchParams.get('end_date')
 
-    // Buscar carrier_id do usuário
+    // Buscar transportadora_id do usuário
     const { data: userData } = await supabaseServiceRole
       .from('users')
-      .select('carrier_id')
+      .select('transportadora_id')
       .eq('id', user.id)
       .single()
 
@@ -56,7 +56,7 @@ export async function GET(req: NextRequest) {
       .from('route_costs')
       .select(`
         *,
-        routes(name, carrier_id)
+        routes(name, transportadora_id)
       `)
 
     // Nota: O filtro será feito após o join através da relação route_id
@@ -78,10 +78,10 @@ export async function GET(req: NextRequest) {
 
     // Filtrar apenas rotas da transportadora do usuário após buscar
     const filteredData = (data || []).filter((cost: any) => {
-      if (!userData?.carrier_id) return false
+      if (!userData?.transportadora_id) return false
       const route = cost.routes
       if (!route) return false
-      return route.carrier_id === userData.carrier_id
+      return route.transportadora_id === userData.transportadora_id
     })
 
     return NextResponse.json(filteredData)
@@ -109,7 +109,7 @@ export async function POST(req: NextRequest) {
     // Verificar se a rota pertence à transportadora do usuário
     const { data: route } = await supabaseServiceRole
       .from('routes')
-      .select('carrier_id')
+      .select('transportadora_id')
       .eq('id', validated.route_id)
       .single()
 
@@ -122,11 +122,11 @@ export async function POST(req: NextRequest) {
 
     const { data: userData } = await supabaseServiceRole
       .from('users')
-      .select('carrier_id')
+      .select('transportadora_id')
       .eq('id', user.id)
       .single()
 
-    if (userData?.carrier_id !== route.carrier_id) {
+    if (userData?.transportadora_id !== route.transportadora_id) {
       return NextResponse.json(
         { error: 'Acesso negado: rota não pertence à sua transportadora' },
         { status: 403 }
