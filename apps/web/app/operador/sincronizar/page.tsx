@@ -147,7 +147,7 @@ export default function SincronizarPage() {
   }
 
   return (
-    <AppShell user={{ id: user?.id || "", name: user?.name || "Operador", email: user?.email || "", role: "operator" }}>
+    <AppShell user={{ id: user?.id || "", name: user?.name || "Operador", email: user?.email || "", role: "operador" }}>
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold mb-2">Sincronizar Pontos de Parada</h1>

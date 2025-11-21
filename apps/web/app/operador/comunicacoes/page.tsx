@@ -72,7 +72,7 @@ function ComunicacoesOperatorPageInner() {
   if (loading) return <div className="min-h-screen flex items-center justify-center"><div className="w-16 h-16 border-4 border-orange-500 border-t-transparent rounded-full animate-spin" /></div>
 
   return (
-    <AppShell user={{ id: user?.id || "", name: user?.name || "Operador", email: user?.email || "", role: "operator" }}>
+    <AppShell user={{ id: user?.id || "", name: user?.name || "Operador", email: user?.email || "", role: "operador" }}>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>

@@ -135,7 +135,7 @@ export default function OperatorRotasPage() {
   }
 
   return (
-    <AppShell user={{ id: user?.id || "", name: user?.name || "Operador", email: user?.email || "", role: "operator" }}>
+    <AppShell user={{ id: user?.id || "", name: user?.name || "Operador", email: user?.email || "", role: "operador" }}>
       <div className="space-y-4 sm:space-y-6 w-full overflow-x-hidden">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
           <div className="min-w-0 flex-1">
@@ -143,14 +143,14 @@ export default function OperatorRotasPage() {
             <p className="text-sm sm:text-base text-gray-600 break-words">{operatorI18n.routes_subtitle || "Gerencie as rotas da sua empresa"}</p>
           </div>
           <div className="flex flex-wrap gap-2 w-full sm:w-auto">
-            <a href="/operator/rotas/mapa" className="flex-1 sm:flex-initial">
+            <a href="/operador/rotas/mapa" className="flex-1 sm:flex-initial">
               <Button variant="outline" className="w-full sm:w-auto text-xs sm:text-sm">
                 <Map className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                 <span className="hidden sm:inline">Ver no Mapa</span>
                 <span className="sm:hidden">Mapa</span>
               </Button>
             </a>
-            <a href="/operator/solicitacoes">
+            <a href="/operador/solicitacoes">
               <Button className="bg-orange-500 hover:bg-orange-600">
                 <Plus className="h-4 w-4 mr-2" />
                 Nova Rota
@@ -167,7 +167,7 @@ export default function OperatorRotasPage() {
               <p className="text-sm text-gray-500 mb-4">
                 Comece criando uma nova rota ou solicitação
               </p>
-              <a href="/operator/solicitacoes">
+              <a href="/operador/solicitacoes">
                 <Button>
                   <Plus className="h-4 w-4 mr-2" />
                   Criar Primeira Rota
@@ -204,7 +204,7 @@ export default function OperatorRotasPage() {
                     )}
                   </div>
                 </div>
-                <a href={`/operator/rotas/mapa?route_id=${rota.id}`}>
+                <a href={`/operador/rotas/mapa?route_id=${rota.id}`}>
                   <Button variant="outline" size="sm" className="flex-shrink-0">
                     <MapPin className="h-4 w-4 mr-2" />
                     Ver no Mapa

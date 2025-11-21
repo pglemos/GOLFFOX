@@ -179,7 +179,7 @@ function AlertasOperatorPageInner() {
   }
 
   return (
-    <AppShell user={{ id: user?.id || "", name: user?.name || "Operador", email: user?.email || "", role: "operator" }}>
+    <AppShell user={{ id: user?.id || "", name: user?.name || "Operador", email: user?.email || "", role: "operador" }}>
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold mb-2">Alertas</h1>
@@ -298,7 +298,7 @@ function AlertasOperatorPageInner() {
                 {debouncedSearch ? "Tente ajustar sua busca" : "Não há alertas no momento"}
               </p>
               {!debouncedSearch && (
-                <Button onClick={() => router.push('/operator/solicitacoes')}>
+                <Button onClick={() => router.push('/operador/solicitacoes')}>
                   <Plus className="h-4 w-4 mr-2" />
                   Criar Solicitação
                 </Button>

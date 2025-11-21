@@ -42,7 +42,7 @@ export default function PreferenciasOperatorPage() {
   }
 
   return (
-    <AppShell user={{ id: user.id, name: user.name || "Operador", email: user.email, role: user.role || "operator" }} panel="operator">
+    <AppShell user={{ id: user.id, name: user.name || "Operador", email: user.email, role: user.role || "operador" }} panel="operador">
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>

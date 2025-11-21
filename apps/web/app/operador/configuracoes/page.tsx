@@ -335,7 +335,7 @@ export default function OperatorConfiguracoesPage() {
   }
 
   return (
-    <AppShell user={{ id: user.id, name: user.name || "Operador", email: user.email, role: user.role || "operator" }} panel="operator">
+    <AppShell user={{ id: user.id, name: user.name || "Operador", email: user.email, role: user.role || "operador" }} panel="operador">
       <div className="w-full max-w-5xl mx-auto space-y-6">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-[var(--border)]">
           <div>
