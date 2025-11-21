@@ -11,7 +11,8 @@ export async function POST(request: NextRequest) {
       name,
       email,
       phone,
-      carrier_id,
+      transportadora_id,
+      carrier_id, // Compatibilidade
       cpf,
       cnh,
       cnh_category,
@@ -26,7 +27,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    if (!carrier_id) {
+    const transportadoraId = transportadora_id || carrier_id // Compatibilidade
+    if (!transportadoraId) {
       return NextResponse.json(
         { success: false, error: 'Transportadora é obrigatória' },
         { status: 400 }
@@ -41,7 +43,7 @@ export async function POST(request: NextRequest) {
           name,
           email: email || null,
           phone: phone || null,
-          carrier_id,
+          transportadora_id: transportadoraId,
           cpf: cpf || null,
           cnh: cnh || null,
           cnh_category: cnh_category || null,
