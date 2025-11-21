@@ -399,7 +399,7 @@ export async function POST(request: NextRequest) {
         email: sanitizedEmail,
         name: sanitizedName,
         phone: sanitizedPhone,
-        role: 'operator',
+        role: 'operador',
         company_id: company_id,
         is_active: true
       }, {

@@ -33,7 +33,7 @@ export default function TransportadoraDashboard() {
 
   useEffect(() => {
     const getUser = async () => {
-      console.log('🔍 [Carrier] Iniciando verificação de autenticação...')
+      console.log('🔍 [Transportadora] Iniciando verificação de autenticação...')
       try {
         // ✅ PRIMEIRO: Tentar obter do cookie de sessão customizado (mais rápido e confiável)
         // Nota: Se o cookie for httpOnly, isso não funcionará, mas tentaremos mesmo assim

@@ -308,7 +308,7 @@ export async function POST(request: NextRequest) {
     const userData: any = {
       id: authData.user.id,
       email: operatorEmail,
-      role: 'operator',
+      role: 'operador',
       company_id: company.id,
     }
     
@@ -513,7 +513,7 @@ export async function POST(request: NextRequest) {
       userId: authData.user.id,
       created: true,
       email: operatorEmail,
-      role: 'operator',
+      role: 'operador',
       companyId: company.id,
       company,
       operator: {

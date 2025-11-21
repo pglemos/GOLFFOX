@@ -113,7 +113,7 @@ export async function POST(request: NextRequest) {
       .upsert({
         id: operatorUser.id,
         email: operatorUser.email,
-        role: 'operator',
+        role: 'operador',
         company_id: finalCompanyId,
         is_active: true
       }, {
