@@ -36,7 +36,7 @@ export default function TransportadorasPage() {
     setLoadingCarriers(true)
     setErrorCarriers(null)
     try {
-      const response = await fetch('/api/admin/carriers-list')
+      const response = await fetch('/api/admin/transportadoras-list')
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
