@@ -31,7 +31,7 @@ export async function OPTIONS() {
 
 export async function GET(req: NextRequest) {
   try {
-    const authErrorResponse = await requireAuth(req, 'carrier')
+    const authErrorResponse = await requireAuth(req, 'transportadora')
     if (authErrorResponse) return authErrorResponse
 
     const user = await validateAuth(req)
@@ -93,7 +93,7 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const authErrorResponse = await requireAuth(req, 'carrier')
+    const authErrorResponse = await requireAuth(req, 'transportadora')
     if (authErrorResponse) return authErrorResponse
 
     const user = await validateAuth(req)

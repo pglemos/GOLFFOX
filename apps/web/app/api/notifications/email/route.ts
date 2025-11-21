@@ -16,7 +16,7 @@ export async function OPTIONS() {
 
 export async function POST(req: NextRequest) {
   try {
-    const authErrorResponse = await requireAuth(req, ['carrier', 'admin'])
+    const authErrorResponse = await requireAuth(req, ['transportadora', 'admin'])
     if (authErrorResponse) return authErrorResponse
 
     const body = await req.json()

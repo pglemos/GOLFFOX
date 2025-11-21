@@ -81,7 +81,7 @@ async function createUserInDatabase() {
     let role = 'admin'
     if (TEST_EMAIL.includes('operator') || TEST_EMAIL.includes('operador')) {
       role = 'operador'
-    } else if (TEST_EMAIL.includes('carrier')) {
+    } else if (TEST_EMAIL.includes('carrier') || TEST_EMAIL.includes('transportadora')) {
       role = 'transportadora'
     } else if (TEST_EMAIL.includes('driver')) {
       role = 'driver'

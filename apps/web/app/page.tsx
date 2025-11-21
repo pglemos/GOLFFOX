@@ -270,7 +270,7 @@ function LoginContent() {
   const isAllowedForRole = (role: string, path: string): boolean => {
     if (path.startsWith('/admin')) return role === 'admin'
     if (path.startsWith('/operador') || path.startsWith('/operator')) return ['admin', 'operador', 'operator'].includes(role)
-    if (path.startsWith('/transportadora') || path.startsWith('/carrier')) return ['admin', 'transportadora', 'carrier'].includes(role)
+    if (path.startsWith('/transportadora') || path.startsWith('/carrier')) return ['admin', 'transportadora'].includes(role)
     return true
   }
 

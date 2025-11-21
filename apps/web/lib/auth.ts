@@ -86,7 +86,7 @@ export class AuthManager {
     if (requiredRole === 'operador' || requiredRole === 'operator') {
       return ['admin', 'operador', 'operator'].includes(user.role)
     }
-    if (requiredRole === 'transportadora' || requiredRole === 'carrier') {
+    if (requiredRole === 'transportadora') {
       return ['admin', 'transportadora'].includes(user.role)
     }
 

@@ -33,7 +33,7 @@ export async function GET(
   { params }: { params: { driverId: string } }
 ) {
   try {
-    const authErrorResponse = await requireAuth(request, 'carrier')
+    const authErrorResponse = await requireAuth(request, 'transportadora')
     if (authErrorResponse) return authErrorResponse
 
     const { data, error } = await supabaseServiceRole
@@ -63,7 +63,7 @@ export async function POST(
   { params }: { params: { driverId: string } }
 ) {
   try {
-    const authErrorResponse = await requireAuth(request, 'carrier')
+    const authErrorResponse = await requireAuth(request, 'transportadora')
     if (authErrorResponse) return authErrorResponse
 
     const body = await request.json()
