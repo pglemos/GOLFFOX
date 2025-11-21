@@ -4,16 +4,16 @@ import { supabaseServiceRole } from '@/lib/supabase-server'
 // GET /api/admin/carriers/[carrierId]/drivers
 export async function GET(
   request: NextRequest,
-  { params }: { params: { carrierId: string } }
+  { params }: { params: { transportadoraId: string } }
 ) {
   try {
     const supabase = supabaseServiceRole
-    const { carrierId } = params
+    const transportadoraId = params.transportadoraId || params.carrierId
 
     const { data: drivers, error } = await supabase
       .from('drivers')
       .select('*')
-      .eq('carrier_id', carrierId)
+      .eq('transportadora_id', transportadoraId)
       .order('name', { ascending: true })
 
     if (error) {
@@ -37,11 +37,11 @@ export async function GET(
 // POST /api/admin/carriers/[carrierId]/drivers
 export async function POST(
   request: NextRequest,
-  { params }: { params: { carrierId: string } }
+  { params }: { params: { transportadoraId: string } }
 ) {
   try {
     const supabase = supabaseServiceRole
-    const { carrierId } = params
+    const transportadoraId = params.transportadoraId || params.carrierId
     const body = await request.json()
 
     const { name, email, phone, cpf, cnh, cnh_category } = body
@@ -57,7 +57,7 @@ export async function POST(
       .from('drivers')
       .insert([
         {
-          carrier_id: carrierId,
+          transportadora_id: transportadoraId,
           name,
           email: email || null,
           phone: phone || null,

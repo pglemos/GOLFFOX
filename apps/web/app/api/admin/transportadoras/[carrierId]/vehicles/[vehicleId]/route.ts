@@ -4,11 +4,12 @@ import { supabaseServiceRole } from '@/lib/supabase-server'
 // PUT /api/admin/carriers/[carrierId]/vehicles/[vehicleId]
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { carrierId: string; vehicleId: string } }
+  { params }: { params: { transportadoraId: string; vehicleId: string } }
 ) {
   try {
     const supabase = supabaseServiceRole
-    const { carrierId, vehicleId } = params
+    const transportadoraId = params.transportadoraId || params.carrierId
+    const { vehicleId } = params
     const body = await request.json()
 
     const {
@@ -46,7 +47,7 @@ export async function PUT(
         chassis: chassis || null
       })
       .eq('id', vehicleId)
-      .eq('carrier_id', carrierId)
+      .eq('transportadora_id', transportadoraId)
       .select()
       .single()
 
@@ -71,17 +72,18 @@ export async function PUT(
 // DELETE /api/admin/carriers/[carrierId]/vehicles/[vehicleId]
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { carrierId: string; vehicleId: string } }
+  { params }: { params: { transportadoraId: string; vehicleId: string } }
 ) {
   try {
     const supabase = supabaseServiceRole
-    const { carrierId, vehicleId } = params
+    const transportadoraId = params.transportadoraId || params.carrierId
+    const { vehicleId } = params
 
     const { error } = await supabase
       .from('vehicles')
       .delete()
       .eq('id', vehicleId)
-      .eq('carrier_id', carrierId)
+      .eq('transportadora_id', transportadoraId)
 
     if (error) {
       console.error('Erro ao excluir veículo:', error)
