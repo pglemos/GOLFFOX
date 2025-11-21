@@ -25,7 +25,7 @@ export async function GET(req: NextRequest) {
     // Buscar veículos ativos
     const { data: vehicles, error: vehiclesError } = await supabase
       .from('vehicles')
-      .select('id, plate, model, brand, is_active, carrier_id')
+      .select('id, plate, model, brand, is_active, transportadora_id')
       .eq('is_active', true)
       .order('plate', { ascending: true })
 
