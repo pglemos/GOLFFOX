@@ -83,33 +83,20 @@ function LoginContent() {
   useEffect(() => {
     const nextParam = searchParams.get('next')
     
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/802544c4-70d0-43c7-a57c-6692b28ca17d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'page.tsx:82',message:'Session check useEffect triggered',data:{hasRedirectingFlag:!!(typeof window !== 'undefined' && (window as any).__golffox_redirecting),hasSessionCheck:sessionCheckRef.current,hasRedirecting:redirectingRef.current,searchParams:searchParams.toString(),hasNext:!!nextParam},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-    // #endregion
-    
     // Se há ?next= na URL, significa que o middleware redirecionou aqui
     // Neste caso, NÃO verificar sessão para evitar loops
     // O middleware já verificou e redirecionou, então apenas mostrar a página de login
     if (nextParam) {
-      // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/802544c4-70d0-43c7-a57c-6692b28ca17d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'page.tsx:90',message:'Has next param, skipping session check to avoid loop',data:{nextParam},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-      // #endregion
       return
     }
     
     // Evitar múltiplas verificações - verificar apenas uma vez
     if (sessionCheckRef.current) {
-      // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/802544c4-70d0-43c7-a57c-6692b28ca17d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'page.tsx:97',message:'Session check already performed, skipping',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-      // #endregion
       return
     }
 
     // Evitar interferência durante redirecionamentos explícitos pós-login
     if (typeof window !== 'undefined' && (window as any).__golffox_redirecting) {
-      // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/802544c4-70d0-43c7-a57c-6692b28ca17d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'page.tsx:102',message:'Redirecting flag set, skipping session check',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-      // #endregion
       return
     }
 
@@ -128,22 +115,12 @@ function LoginContent() {
         
         const hasSessionCookie = document.cookie.includes('golffox-session')
         
-        // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/802544c4-70d0-43c7-a57c-6692b28ca17d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'page.tsx:125',message:'Checking session cookie',data:{hasSessionCookie,currentUrl:typeof window !== 'undefined' ? window.location.href : 'N/A'},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
-        // #endregion
-        
         if (!hasSessionCookie) {
-          // #region agent log
-          fetch('http://127.0.0.1:7242/ingest/802544c4-70d0-43c7-a57c-6692b28ca17d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'page.tsx:112',message:'No session cookie found, staying on login page',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
-          // #endregion
           return
         }
 
         // Verificar se já estamos redirecionando para evitar loops
         if (redirectingRef.current) {
-          // #region agent log
-          fetch('http://127.0.0.1:7242/ingest/802544c4-70d0-43c7-a57c-6692b28ca17d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'page.tsx:118',message:'Already redirecting, preventing loop',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
-          // #endregion
           return
         }
 
@@ -152,9 +129,6 @@ function LoginContent() {
           const cookieMatch = document.cookie.match(/golffox-session=([^;]+)/)
           if (!cookieMatch) {
             // Cookie malformado, limpar e continuar na página de login
-            // #region agent log
-            fetch('http://127.0.0.1:7242/ingest/802544c4-70d0-43c7-a57c-6692b28ca17d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'page.tsx:127',message:'Malformed cookie, clearing',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
-            // #endregion
             document.cookie = 'golffox-session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT'
             return
           }
@@ -162,15 +136,8 @@ function LoginContent() {
           const decoded = atob(cookieMatch[1])
           const userData = JSON.parse(decoded)
           
-          // #region agent log
-          fetch('http://127.0.0.1:7242/ingest/802544c4-70d0-43c7-a57c-6692b28ca17d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'page.tsx:135',message:'Cookie decoded successfully',data:{hasUserData:!!userData,hasRole:!!userData?.role,role:userData?.role},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
-          // #endregion
-          
           if (!userData || !userData.role) {
             // Dados inválidos, limpar cookie
-            // #region agent log
-            fetch('http://127.0.0.1:7242/ingest/802544c4-70d0-43c7-a57c-6692b28ca17d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'page.tsx:141',message:'Invalid user data, clearing cookie',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
-            // #endregion
             document.cookie = 'golffox-session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT'
             return
           }
@@ -180,19 +147,6 @@ function LoginContent() {
           // Não usar nextParam aqui pois já verificamos acima que não há nextParam
           // Se houvesse nextParam, não teríamos chegado aqui
           const safeNext = null
-          // (function sanitizePath(raw: string | null): string | null {
-            if (!raw) return null
-            try {
-              const decoded = decodeURIComponent(raw)
-              if (/^https?:\/:\/\//i.test(decoded)) return null
-              if (!decoded.startsWith('/')) return null
-              const url = new URL(decoded, window.location.origin)
-              url.searchParams.delete('company')
-              return url.pathname
-            } catch {
-              return null
-            }
-          })(rawNext)
 
           const isAllowedForRole = (role: string, path: string): boolean => {
             if (path.startsWith('/admin')) return role === 'admin'
@@ -209,10 +163,6 @@ function LoginContent() {
             redirectUrl = safeNext
           }
 
-          // #region agent log
-          fetch('http://127.0.0.1:7242/ingest/802544c4-70d0-43c7-a57c-6692b28ca17d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'page.tsx:168',message:'Preparing redirect',data:{userRole,redirectUrl,currentUrl:window.location.href},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'F'})}).catch(()=>{});
-          // #endregion
-
           // Verificar se já estamos na URL de destino para evitar loops
           if (typeof window !== 'undefined') {
             const currentPath = window.location.pathname
@@ -220,9 +170,6 @@ function LoginContent() {
             
             // Se já estamos na URL de destino (com ou sem query params), não redirecionar
             if (currentPath === redirectUrl || (currentPath === redirectUrl && !currentSearch.includes('next='))) {
-              // #region agent log
-              fetch('http://127.0.0.1:7242/ingest/802544c4-70d0-43c7-a57c-6692b28ca17d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'page.tsx:172',message:'Already on target URL, preventing redirect loop',data:{redirectUrl,currentPath,currentSearch},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
-              // #endregion
               return
             }
             
@@ -231,9 +178,6 @@ function LoginContent() {
             if (currentPath === '/' && !currentSearch && redirectUrl !== '/') {
               // OK para redirecionar
             } else if (currentPath === redirectUrl) {
-              // #region agent log
-              fetch('http://127.0.0.1:7242/ingest/802544c4-70d0-43c7-a57c-6692b28ca17d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'page.tsx:185',message:'Already on target URL, preventing redirect',data:{redirectUrl,currentPath},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
-              // #endregion
               return
             }
           }
@@ -243,10 +187,6 @@ function LoginContent() {
           if (typeof window !== 'undefined') {
             (window as any).__golffox_redirecting = true
           }
-
-          // #region agent log
-          fetch('http://127.0.0.1:7242/ingest/802544c4-70d0-43c7-a57c-6692b28ca17d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'page.tsx:230',message:'Executing redirect with router.push',data:{redirectUrl,userRole},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'F'})}).catch(()=>{});
-          // #endregion
           
           if (userRole) {
             // Usar router.push para evitar reload completo e manter estado
@@ -261,9 +201,6 @@ function LoginContent() {
           }
         } catch (err) {
           // Erro ao decodificar cookie - limpar e continuar na página de login
-          // #region agent log
-          fetch('http://127.0.0.1:7242/ingest/802544c4-70d0-43c7-a57c-6692b28ca17d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'page.tsx:195',message:'Error decoding cookie',data:{error:err instanceof Error ? err.message : String(err)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
-          // #endregion
           console.warn('⚠️ Erro ao decodificar cookie:', err)
           try {
             document.cookie = 'golffox-session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT'
@@ -271,9 +208,6 @@ function LoginContent() {
         }
       } catch (err) {
         // Erro geral - apenas logar e continuar na página de login
-        // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/802544c4-70d0-43c7-a57c-6692b28ca17d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'page.tsx:203',message:'General error in session check',data:{error:err instanceof Error ? err.message : String(err)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-        // #endregion
         console.error('❌ Erro ao verificar sessão:', err)
       }
     }, 300) // Aguardar 300ms antes de verificar (aumentado de 100ms)
