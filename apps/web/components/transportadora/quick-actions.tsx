@@ -71,6 +71,9 @@ export function QuickActions({ className }: QuickActionsProps) {
   const router = useRouter()
 
   const handleAction = (action: QuickAction) => {
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/802544c4-70d0-43c7-a57c-6692b28ca17d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'quick-actions.tsx:73',message:'Quick action clicked',data:{actionId:action.id,hasOnClick:!!action.onClick,hasHref:!!action.href,href:action.href},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+    // #endregion
     if (action.onClick) {
       action.onClick()
     } else if (action.href) {

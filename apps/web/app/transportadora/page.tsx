@@ -529,7 +529,12 @@ export default function TransportadoraDashboard() {
             <p className="text-xs sm:text-sm md:text-base text-[var(--ink-muted)]">Monitore veículos e motoristas em tempo real</p>
           </div>
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
-            <Select value={period} onValueChange={(value: any) => setPeriod(value)}>
+            <Select value={period} onValueChange={(value: any) => {
+              // #region agent log
+              fetch('http://127.0.0.1:7242/ingest/802544c4-70d0-43c7-a57c-6692b28ca17d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'transportadora/page.tsx:532',message:'Select period changed',data:{oldValue:period,newValue:value},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+              // #endregion
+              setPeriod(value)
+            }}>
               <SelectTrigger className="w-full sm:w-40 min-h-[44px] touch-manipulation">
                 <Calendar className="h-4 w-4 mr-2" />
                 <SelectValue />
@@ -560,7 +565,12 @@ export default function TransportadoraDashboard() {
             formatValue={(v) => v.toString()}
             iconColor="var(--brand)"
             iconBgColor="var(--brand-light)"
-            onClick={() => router.push('/transportadora/veiculos')}
+            onClick={() => {
+              // #region agent log
+              fetch('http://127.0.0.1:7242/ingest/802544c4-70d0-43c7-a57c-6692b28ca17d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'transportadora/page.tsx:563',message:'KPI card clicked - Total da Frota',data:{target:'/transportadora/veiculos'},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+              // #endregion
+              router.push('/transportadora/veiculos')
+            }}
           />
           <KpiCardEnhanced
             icon={Navigation}
@@ -746,7 +756,12 @@ export default function TransportadoraDashboard() {
                   size="sm" 
                   variant="outline" 
                   className="flex-shrink-0 w-full sm:w-auto min-h-[44px] touch-manipulation"
-                  onClick={() => router.push('/transportadora/mapa')}
+                  onClick={() => {
+                    // #region agent log
+                    fetch('http://127.0.0.1:7242/ingest/802544c4-70d0-43c7-a57c-6692b28ca17d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'transportadora/page.tsx:749',message:'Button clicked - Expandir mapa',data:{target:'/transportadora/mapa'},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+                    // #endregion
+                    router.push('/transportadora/mapa')
+                  }}
                 >
                   Expandir
                 </Button>

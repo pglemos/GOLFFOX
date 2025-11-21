@@ -64,7 +64,14 @@ export function KpiCardEnhanced({
       whileHover={{ scale: 1.02, y: -4 }}
       transition={{ duration: 0.2, ease: "easeOut" }}
       className={cn("group cursor-pointer", onClick && "cursor-pointer", className)}
-      onClick={onClick}
+      onClick={(e) => {
+        // #region agent log
+        fetch('http://127.0.0.1:7242/ingest/802544c4-70d0-43c7-a57c-6692b28ca17d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'kpi-card-enhanced.tsx:67',message:'KPI card clicked',data:{label,hasOnClick:!!onClick},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+        // #endregion
+        if (onClick) {
+          onClick()
+        }
+      }}
     >
       <Card className="overflow-hidden hover:shadow-lg transition-shadow touch-manipulation">
         <CardContent className="p-3 sm:p-4 md:p-6">
