@@ -406,7 +406,7 @@ export default function TransportadorasPage() {
 
         {/* Modal Veículos */}
         {selectedCarrierForVehicles && (
-          <CarrierVehiclesModal
+          <TransportadoraVehiclesModal
             carrier={selectedCarrierForVehicles}
             isOpen={isVehiclesModalOpen}
             onClose={() => {
