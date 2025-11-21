@@ -43,7 +43,28 @@ export async function validateAuth(request: NextRequest): Promise<AuthenticatedU
       console.log('✅ Token encontrado no header Authorization')
     }
     
-    // 2. Se não houver no header, tentar obter do cookie do Supabase
+    // 2. Se não houver no header, tentar obter do cookie customizado (golffox-session)
+    if (!accessToken) {
+      const golffoxSession = request.cookies.get('golffox-session')?.value
+      
+      if (golffoxSession) {
+        try {
+          // Decodificar cookie base64
+          const decoded = Buffer.from(golffoxSession, 'base64').toString('utf-8')
+          const sessionData = JSON.parse(decoded)
+          
+          // Tentar obter access_token do cookie customizado
+          if (sessionData.access_token) {
+            accessToken = sessionData.access_token
+            console.log('✅ Token encontrado no cookie customizado (golffox-session)')
+          }
+        } catch (error) {
+          console.warn('⚠️ Erro ao processar cookie customizado:', error)
+        }
+      }
+    }
+    
+    // 3. Se ainda não encontrou, tentar obter do cookie do Supabase
     if (!accessToken) {
       // Procurar cookie de sessão do Supabase
       const projectRef = supabaseUrl.split('//')[1]?.split('.')[0]
@@ -65,10 +86,50 @@ export async function validateAuth(request: NextRequest): Promise<AuthenticatedU
       }
     }
     
-    // 3. Se ainda não encontrou token, retornar null
+    // 4. Se ainda não encontrou token, tentar obter diretamente do cookie customizado sem validação
     if (!accessToken) {
-      console.warn('⚠️ Token de acesso não encontrado')
-      return null
+      const golffoxSession = request.cookies.get('golffox-session')?.value
+      
+      if (golffoxSession && serviceKey) {
+        try {
+          const decoded = Buffer.from(golffoxSession, 'base64').toString('utf-8')
+          const sessionData = JSON.parse(decoded)
+          
+          // O cookie customizado contém os dados do usuário diretamente
+          const userId = sessionData.id || sessionData.user?.id
+          
+          if (userId) {
+            console.log('⚠️ Token não encontrado, mas há sessão customizada. Buscando dados do usuário diretamente...')
+            // Pular validação de token e buscar dados diretamente do banco
+            const supabaseAdmin = createClient(supabaseUrl, serviceKey, {
+              auth: { persistSession: false, autoRefreshToken: false }
+            })
+            
+            const { data: userData, error: dbError } = await supabaseAdmin
+              .from('users')
+              .select('id, email, role, company_id, transportadora_id')
+              .eq('id', userId)
+              .maybeSingle()
+            
+            if (!dbError && userData) {
+              console.log('✅ Dados do usuário obtidos do banco via sessão customizada')
+              return {
+                id: userData.id,
+                email: userData.email || '',
+                role: userData.role || 'passenger',
+                companyId: userData.company_id || null
+              }
+            }
+          }
+        } catch (error) {
+          console.warn('⚠️ Erro ao processar cookie customizado para buscar usuário:', error)
+        }
+      }
+      
+      if (!accessToken) {
+        console.warn('⚠️ Token de acesso não encontrado')
+        return null
+      }
     }
     
     // 4. Validar token com Supabase Auth

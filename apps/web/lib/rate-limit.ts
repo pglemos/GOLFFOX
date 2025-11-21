@@ -3,44 +3,50 @@ import { Redis } from "@upstash/redis";
 import { NextRequest, NextResponse } from "next/server";
 
 const upstashEnabled = Boolean(process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN)
-const redis = new Redis({
-  url: process.env.UPSTASH_REDIS_REST_URL || "",
-  token: process.env.UPSTASH_REDIS_REST_TOKEN || "",
-});
+
+// Criar Redis apenas se as variáveis de ambiente estiverem definidas
+let redis: Redis | null = null
+if (upstashEnabled) {
+  redis = new Redis({
+    url: process.env.UPSTASH_REDIS_REST_URL!,
+    token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+  })
+}
 
 // Rate limiters para diferentes tipos de endpoints
+// Criar apenas se Redis estiver disponível
 export const ratelimit = {
   // Auth endpoints: 5 requests per minute
-  auth: new Ratelimit({
+  auth: redis ? new Ratelimit({
     redis,
     limiter: Ratelimit.slidingWindow(5, "1 m"),
     analytics: true,
     prefix: "@upstash/ratelimit/auth",
-  }),
+  }) : null,
 
   // General API endpoints: 100 requests per minute
-  api: new Ratelimit({
+  api: redis ? new Ratelimit({
     redis,
     limiter: Ratelimit.slidingWindow(100, "1 m"),
     analytics: true,
     prefix: "@upstash/ratelimit/api",
-  }),
+  }) : null,
 
   // Sensitive operations: 10 requests per minute
-  sensitive: new Ratelimit({
+  sensitive: redis ? new Ratelimit({
     redis,
     limiter: Ratelimit.slidingWindow(10, "1 m"),
     analytics: true,
     prefix: "@upstash/ratelimit/sensitive",
-  }),
+  }) : null,
 
   // Public endpoints: 50 requests per minute
-  public: new Ratelimit({
+  public: redis ? new Ratelimit({
     redis,
     limiter: Ratelimit.slidingWindow(50, "1 m"),
     analytics: true,
     prefix: "@upstash/ratelimit/public",
-  }),
+  }) : null,
 };
 
 // Tipos de rate limiting
@@ -66,8 +72,13 @@ export async function applyRateLimit(
     // Criar identificador único
     const id = identifier || `${ip}:${sessionId.substring(0, 20)}:${userAgent.substring(0, 20)}`;
     
+    // Verificar se o rate limiter existe
+    if (!ratelimit[type]) {
+      return null // Se não houver rate limiter, permitir
+    }
+
     // Aplicar rate limit
-    const { success, limit, reset, remaining } = await ratelimit[type].limit(id);
+    const { success, limit, reset, remaining } = await ratelimit[type]!.limit(id);
     
     if (!success) {
       return NextResponse.json(
