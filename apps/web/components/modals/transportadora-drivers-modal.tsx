@@ -11,13 +11,13 @@ import { Badge } from "@/components/ui/badge"
 import { notifySuccess, notifyError } from "@/lib/toast"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
-interface CarrierDriversModalProps {
+interface TransportadoraDriversModalProps {
   carrier: { id: string; name: string }
   isOpen: boolean
   onClose: () => void
 }
 
-export function CarrierDriversModal({ carrier, isOpen, onClose }: CarrierDriversModalProps) {
+export function TransportadoraDriversModal({ carrier, isOpen, onClose }: TransportadoraDriversModalProps) {
   const [drivers, setDrivers] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
   const [activeTab, setActiveTab] = useState("list")

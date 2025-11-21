@@ -13,13 +13,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Checkbox } from "@/components/ui/checkbox"
 
-interface CarrierVehiclesModalProps {
+interface TransportadoraVehiclesModalProps {
   carrier: { id: string; name: string }
   isOpen: boolean
   onClose: () => void
 }
 
-export function CarrierVehiclesModal({ carrier, isOpen, onClose }: CarrierVehiclesModalProps) {
+export function TransportadoraVehiclesModal({ carrier, isOpen, onClose }: TransportadoraVehiclesModalProps) {
   const [vehicles, setVehicles] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
   const [activeTab, setActiveTab] = useState("list")
