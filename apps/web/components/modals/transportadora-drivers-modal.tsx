@@ -43,7 +43,7 @@ export function CarrierDriversModal({ carrier, isOpen, onClose }: CarrierDrivers
   const loadDrivers = async () => {
     try {
       setLoading(true)
-      const response = await fetch(`/api/admin/carriers/${carrier.id}/drivers`)
+      const response = await fetch(`/api/admin/transportadoras/${carrier.id}/drivers`)
       if (response.ok) {
         const result = await response.json()
         setDrivers(result.drivers || [])
@@ -76,7 +76,7 @@ export function CarrierDriversModal({ carrier, isOpen, onClose }: CarrierDrivers
     setLoading(true)
 
     try {
-      const response = await fetch(`/api/admin/carriers/${carrier.id}/drivers`, {
+      const response = await fetch(`/api/admin/transportadoras/${carrier.id}/drivers`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -108,7 +108,7 @@ export function CarrierDriversModal({ carrier, isOpen, onClose }: CarrierDrivers
     setLoading(true)
 
     try {
-      const response = await fetch(`/api/admin/carriers/${carrier.id}/drivers/${editingDriver.id}`, {
+      const response = await fetch(`/api/admin/transportadoras/${carrier.id}/drivers/${editingDriver.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
@@ -138,7 +138,7 @@ export function CarrierDriversModal({ carrier, isOpen, onClose }: CarrierDrivers
     setLoading(true)
 
     try {
-      const response = await fetch(`/api/admin/carriers/${carrier.id}/drivers/${driverId}`, {
+      const response = await fetch(`/api/admin/transportadoras/${carrier.id}/drivers/${driverId}`, {
         method: 'DELETE'
       })
 

@@ -33,7 +33,7 @@ export function CarrierUsersModal({ carrier, isOpen, onClose, onSave }: CarrierU
   const loadUsers = async () => {
     try {
       setLoading(true)
-      const response = await fetch(`/api/admin/carriers/${carrier.id}/users`)
+      const response = await fetch(`/api/admin/transportadoras/${carrier.id}/users`)
       if (response.ok) {
         const result = await response.json()
         setUsers(result.users || [])

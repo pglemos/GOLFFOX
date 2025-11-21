@@ -4,12 +4,18 @@ import { supabaseServiceRole } from '@/lib/supabase-server'
 // PUT /api/admin/transportadoras/[transportadoraId]/drivers/[driverId]
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { transportadoraId: string; driverId: string } }
+  { params }: { params: { transportadoraId?: string; carrierId?: string; driverId: string } }
 ) {
   try {
     const supabase = supabaseServiceRole
-    const transportadoraId = params.transportadoraId
+    const transportadoraId = params.transportadoraId || params.carrierId
     const { driverId } = params
+    if (!transportadoraId) {
+      return NextResponse.json(
+        { success: false, error: 'ID da transportadora não fornecido' },
+        { status: 400 }
+      )
+    }
     const body = await request.json()
 
     const { name, email, phone, cpf, cnh, cnh_category } = body
@@ -57,12 +63,18 @@ export async function PUT(
 // DELETE /api/admin/transportadoras/[transportadoraId]/drivers/[driverId]
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { transportadoraId: string; driverId: string } }
+  { params }: { params: { transportadoraId?: string; carrierId?: string; driverId: string } }
 ) {
   try {
     const supabase = supabaseServiceRole
-    const transportadoraId = params.transportadoraId
+    const transportadoraId = params.transportadoraId || params.carrierId
     const { driverId } = params
+    if (!transportadoraId) {
+      return NextResponse.json(
+        { success: false, error: 'ID da transportadora não fornecido' },
+        { status: 400 }
+      )
+    }
 
     const { error } = await supabase
       .from('drivers')

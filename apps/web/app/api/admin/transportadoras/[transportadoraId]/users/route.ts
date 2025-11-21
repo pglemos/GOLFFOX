@@ -17,16 +17,24 @@ export async function OPTIONS() {
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { transportadoraId: string } }
+  { params }: { params: { transportadoraId?: string; carrierId?: string } }
 ) {
   try {
     const authErrorResponse = await requireAuth(req, 'admin')
     if (authErrorResponse) return authErrorResponse
 
+    const transportadoraId = params.transportadoraId || params.carrierId
+    if (!transportadoraId) {
+      return NextResponse.json(
+        { success: false, error: 'ID da transportadora não fornecido' },
+        { status: 400 }
+      )
+    }
+
     const { data, error } = await supabaseServiceRole
       .from('users')
       .select('*')
-      .eq('transportadora_id', params.transportadoraId)
+      .eq('transportadora_id', transportadoraId)
       .eq('role', 'transportadora')
       .order('name', { ascending: true })
 
