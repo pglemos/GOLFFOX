@@ -457,8 +457,8 @@ export function Sidebar({ isOpen = true, isMobile = false, panel = 'admin', user
   // Em mobile, passar ambos para controle externo
   return (
     <UISidebar 
-      open={internalOpen} 
-      setOpen={setInternalOpen} 
+      open={isMobile ? internalOpen : undefined} 
+      setOpen={isMobile ? setInternalOpen : undefined} 
       animate={true}
       isMobile={isMobile}
     >
