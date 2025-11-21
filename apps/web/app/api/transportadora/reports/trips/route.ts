@@ -9,10 +9,10 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url)
     const startDate = searchParams.get('start_date')
     const endDate = searchParams.get('end_date')
-    const carrierId = searchParams.get('carrier_id')
+    const transportadoraId = searchParams.get('transportadora_id') || searchParams.get('carrier_id') // Compatibilidade
 
-    if (!carrierId) {
-      return NextResponse.json({ error: 'carrier_id é obrigatório' }, { status: 400 })
+    if (!transportadoraId) {
+      return NextResponse.json({ error: 'transportadora_id é obrigatório' }, { status: 400 })
     }
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
@@ -20,8 +20,8 @@ export async function GET(req: NextRequest) {
     // Buscar rotas da transportadora
     const { data: routes, error: routesError } = await supabase
       .from('routes')
-      .select('id, name, carrier_id')
-      .eq('carrier_id', carrierId)
+      .select('id, name, transportadora_id')
+      .eq('transportadora_id', transportadoraId)
 
     if (routesError) throw routesError
 

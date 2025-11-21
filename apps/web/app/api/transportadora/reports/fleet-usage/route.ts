@@ -9,10 +9,10 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url)
     const startDate = searchParams.get('start_date')
     const endDate = searchParams.get('end_date')
-    const carrierId = searchParams.get('carrier_id')
+    const transportadoraId = searchParams.get('transportadora_id') || searchParams.get('carrier_id') // Compatibilidade
 
-    if (!carrierId) {
-      return NextResponse.json({ error: 'carrier_id é obrigatório' }, { status: 400 })
+    if (!transportadoraId) {
+      return NextResponse.json({ error: 'transportadora_id é obrigatório' }, { status: 400 })
     }
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
@@ -20,8 +20,8 @@ export async function GET(req: NextRequest) {
     // Buscar veículos da transportadora
     const { data: vehicles, error: vehiclesError } = await supabase
       .from('vehicles')
-      .select('id, plate, model, is_active, carrier_id')
-      .eq('carrier_id', carrierId)
+      .select('id, plate, model, is_active, transportadora_id')
+      .eq('transportadora_id', transportadoraId)
 
     if (vehiclesError) throw vehiclesError
 
@@ -34,9 +34,9 @@ export async function GET(req: NextRequest) {
         id,
         route_id,
         created_at,
-        routes!inner(carrier_id)
+        routes!inner(transportadora_id)
       `)
-      .eq('routes.carrier_id', carrierId)
+      .eq('routes.transportadora_id', transportadoraId)
 
     if (startDate) {
       tripsQuery = tripsQuery.gte('created_at', startDate)

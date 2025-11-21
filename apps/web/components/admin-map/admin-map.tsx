@@ -515,7 +515,7 @@ export function AdminMap({
           is_active,
           photo_url,
           company_id,
-          carrier_id,
+          transportadora_id,
           companies(name)
         `)
         .eq('is_active', true)
@@ -573,7 +573,7 @@ export function AdminMap({
               plate: v.plate,
               is_active: v.is_active,
               company_id: v.company_id,
-              carrier_id: v.carrier_id
+              transportadora_id: v.transportadora_id
             }))
           }, 'AdminMap')
         } else {

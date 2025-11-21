@@ -9,10 +9,10 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url)
     const startDate = searchParams.get('start_date')
     const endDate = searchParams.get('end_date')
-    const carrierId = searchParams.get('carrier_id')
+    const transportadoraId = searchParams.get('transportadora_id') || searchParams.get('carrier_id') // Compatibilidade
 
-    if (!carrierId) {
-      return NextResponse.json({ error: 'carrier_id é obrigatório' }, { status: 400 })
+    if (!transportadoraId) {
+      return NextResponse.json({ error: 'transportadora_id é obrigatório' }, { status: 400 })
     }
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
@@ -20,9 +20,9 @@ export async function GET(req: NextRequest) {
     // Buscar motoristas da transportadora
     const { data: drivers, error: driversError } = await supabase
       .from('users')
-      .select('id, name, email, phone, carrier_id')
+      .select('id, name, email, phone, transportadora_id')
       .eq('role', 'driver')
-      .eq('carrier_id', carrierId)
+      .eq('transportadora_id', transportadoraId)
 
     if (driversError) throw driversError
 
@@ -44,9 +44,9 @@ export async function GET(req: NextRequest) {
         driver_id,
         route_id,
         created_at,
-        routes!inner(carrier_id)
+        routes!inner(transportadora_id)
       `)
-      .eq('routes.carrier_id', carrierId)
+      .eq('routes.transportadora_id', transportadoraId)
       .in('driver_id', driverIds)
 
     if (startDate) {

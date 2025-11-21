@@ -87,19 +87,20 @@ export default function TransportadoraRelatoriosPage() {
 
       const { data } = await supabase
         .from("users")
-        .select("carrier_id")
+        .select("transportadora_id")
         .eq("id", session.user.id)
         .single()
 
       setUser({ ...session.user })
-      setUserData(data)
+      setUserData(data ? { ...data, carrier_id: data.transportadora_id } : null)
       setLoading(false)
     }
     getUser()
   }, [router])
 
   const handleExport = async (report: ReportConfig, format: 'csv' | 'excel' | 'pdf') => {
-    if (!userData?.carrier_id) {
+    const transportadoraId = userData?.transportadora_id || userData?.carrier_id
+    if (!transportadoraId) {
       notifyError(null, 'Erro: Transportadora não encontrada', {})
       return
     }
@@ -114,7 +115,7 @@ export default function TransportadoraRelatoriosPage() {
       // Buscar dados da API
       switch (report.id) {
         case 'fleet':
-          apiUrl = `/api/transportadora/reports/fleet-usage?carrier_id=${userData.carrier_id}&start_date=${dateStart}&end_date=${dateEnd}`
+          apiUrl = `/api/transportadora/reports/fleet-usage?transportadora_id=${transportadoraId}&start_date=${dateStart}&end_date=${dateEnd}`
           const fleetRes = await fetch(apiUrl)
           const fleetData = await fleetRes.json()
           if (fleetData.success) {
@@ -131,7 +132,7 @@ export default function TransportadoraRelatoriosPage() {
           }
           break
         case 'drivers':
-          apiUrl = `/api/transportadora/reports/driver-performance?carrier_id=${userData.carrier_id}&start_date=${dateStart}&end_date=${dateEnd}`
+          apiUrl = `/api/transportadora/reports/driver-performance?transportadora_id=${transportadoraId}&start_date=${dateStart}&end_date=${dateEnd}`
           const driversRes = await fetch(apiUrl)
           const driversData = await driversRes.json()
           if (driversData.success) {
@@ -149,7 +150,7 @@ export default function TransportadoraRelatoriosPage() {
           }
           break
         case 'trips':
-          apiUrl = `/api/transportadora/reports/trips?carrier_id=${userData.carrier_id}&start_date=${dateStart}&end_date=${dateEnd}`
+          apiUrl = `/api/transportadora/reports/trips?transportadora_id=${transportadoraId}&start_date=${dateStart}&end_date=${dateEnd}`
           const tripsRes = await fetch(apiUrl)
           const tripsData = await tripsRes.json()
           if (tripsData.success) {
@@ -209,9 +210,9 @@ export default function TransportadoraRelatoriosPage() {
             .from('vehicle_maintenances')
             .select(`
               *,
-              vehicles!inner(carrier_id, plate)
+              vehicles!inner(transportadora_id, plate)
             `)
-            .eq('vehicles.carrier_id', userData.carrier_id)
+            .eq('vehicles.transportadora_id', transportadoraId)
             .gte('scheduled_date', dateStart)
             .lte('scheduled_date', dateEnd)
           
@@ -240,7 +241,7 @@ export default function TransportadoraRelatoriosPage() {
           const { data: documentsData } = await supabase
             .from('v_carrier_expiring_documents')
             .select('*')
-            .eq('carrier_id', userData.carrier_id)
+            .eq('transportadora_id', transportadoraId)
             .gte('expiry_date', dateStart)
             .lte('expiry_date', dateEnd)
           
