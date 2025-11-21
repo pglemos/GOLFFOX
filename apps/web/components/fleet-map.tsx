@@ -106,6 +106,15 @@ export const FleetMap = memo(function FleetMap({ companyId, transportadoraId, ro
     status: searchParams?.get('status') || ''
   })
 
+  useEffect(() => {
+    setFilters((prev) => ({
+      ...prev,
+      company: companyId ?? prev.company,
+      transportadora: transportadoraId ?? prev.transportadora,
+      route: routeId ?? prev.route,
+    }))
+  }, [companyId, transportadoraId, routeId])
+
   // Atualizar URL quando filtros mudarem (debounce)
   const updateUrlFilters = useCallback((newFilters: typeof filters) => {
     if (debounceTimerRef.current) {
