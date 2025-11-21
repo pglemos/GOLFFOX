@@ -1,17 +1,11 @@
-// Rota de compatibilidade: redireciona para /api/admin/transportadoras/[transportadoraId]/users
-import { NextRequest, NextResponse } from 'next/server'
+// Rota de compatibilidade: chama a rota /api/admin/transportadoras/[transportadoraId]/users
+import { NextRequest } from 'next/server'
+import { GET as transportadoraUsersGET } from '../../transportadoras/[transportadoraId]/users/route'
 
 export async function GET(
   req: NextRequest,
   { params }: { params: { carrierId: string } }
 ) {
-  // Redirecionar internamente para a nova rota
-  const newUrl = new URL(`/api/admin/transportadoras/${params.carrierId}/users`, req.url)
-  const response = await fetch(newUrl.toString(), {
-    method: req.method,
-    headers: Object.fromEntries(req.headers.entries()),
-  })
-  
-  const data = await response.json()
-  return NextResponse.json(data, { status: response.status })
+  // Chamar a rota nova passando carrierId como transportadoraId
+  return transportadoraUsersGET(req, { params: { transportadoraId: params.carrierId } } as any)
 }
