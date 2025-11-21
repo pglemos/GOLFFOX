@@ -22,7 +22,8 @@ function getSupabaseAdmin() {
   }
   // ✅ CRÍTICO: Criar cliente service role com opções específicas para garantir que não seja afetado por sessões de usuário
   // Não usar persistSession e não permitir que funções de auth substituam a service key
-  return createClient(url, serviceKey, {
+  // IMPORTANTE: O segundo parâmetro é a service key, não a anon key
+  const client = createClient(url, serviceKey, {
     auth: {
       autoRefreshToken: false,
       persistSession: false,
@@ -37,6 +38,10 @@ function getSupabaseAdmin() {
       },
     },
   })
+  
+  // ✅ Garantir que o cliente não tenha nenhuma sessão ativa que possa interferir
+  // Limpar qualquer sessão que possa ter sido estabelecida anteriormente
+  return client
 }
 
 function isSecureRequest(req: NextRequest): boolean {
@@ -139,23 +144,31 @@ async function loginHandler(req: NextRequest) {
     // Isso bypassa o RLS e permite verificar se o usuário está cadastrado
     let existingUser, userCheckError
     try {
+      // ✅ Criar um cliente service role FRESCO a cada vez (sem cache de sessão)
       const supabaseAdmin = getSupabaseAdmin()
+      
+      // ✅ Garantir que não há nenhuma sessão de usuário ativa no cliente
+      await supabaseAdmin.auth.signOut()
+      
       debug('Buscando usuário na tabela users com service role...', { 
         userId: data.user.id, 
-        email: data.user.email || email 
+        email: data.user.email || email,
+        supabaseUrl: (process.env.NEXT_PUBLIC_SUPABASE_URL || '').substring(0, 30) + '...',
+        hasServiceKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY
       }, 'AuthAPI')
       
-      // Primeiro, tentar buscar por ID com colunas básicas (mais seguro)
-      let result = await supabaseAdmin
+      // ✅ Buscar usuário diretamente com todas as colunas necessárias
+      // Não fazer múltiplas queries - apenas uma com todas as colunas
+      const result = await supabaseAdmin
         .from('users')
-        .select('id, email, role')
+        .select('id, email, role, company_id, transportadora_id')
         .eq('id', data.user.id)
         .maybeSingle()
       
       existingUser = result.data
       userCheckError = result.error
       
-      debug('Resultado da busca por ID (colunas básicas):', { 
+      debug('Resultado da busca por ID (service role):', { 
         found: !!existingUser, 
         hasError: !!userCheckError, 
         error: userCheckError ? {
@@ -166,7 +179,8 @@ async function loginHandler(req: NextRequest) {
         } : null,
         userId: data.user.id,
         foundUserId: existingUser?.id,
-        foundEmail: existingUser?.email
+        foundEmail: existingUser?.email,
+        foundRole: existingUser?.role
       }, 'AuthAPI')
       
       // Se não encontrou por ID, tentar por email (fallback)
@@ -175,16 +189,17 @@ async function loginHandler(req: NextRequest) {
           userId: data.user.id, 
           email: data.user.email || email 
         }, 'AuthAPI')
-        result = await supabaseAdmin
+        
+        const resultByEmail = await supabaseAdmin
           .from('users')
-          .select('id, email, role')
+          .select('id, email, role, company_id, transportadora_id')
           .eq('email', (data.user.email || email).toLowerCase().trim())
           .maybeSingle()
         
-        existingUser = result.data
-        userCheckError = result.error
+        existingUser = resultByEmail.data
+        userCheckError = resultByEmail.error
         
-        debug('Resultado da busca por email:', { 
+        debug('Resultado da busca por email (service role):', { 
           found: !!existingUser, 
           hasError: !!userCheckError, 
           error: userCheckError ? {
@@ -193,21 +208,9 @@ async function loginHandler(req: NextRequest) {
             details: userCheckError.details
           } : null,
           foundUserId: existingUser?.id,
-          foundEmail: existingUser?.email
+          foundEmail: existingUser?.email,
+          foundRole: existingUser?.role
         }, 'AuthAPI')
-      }
-      
-      // Se encontrou o usuário, buscar colunas adicionais se necessário
-      if (existingUser && !userCheckError) {
-        const resultExtended = await supabaseAdmin
-          .from('users')
-          .select('id, email, role, company_id, transportadora_id')
-          .eq('id', existingUser.id)
-          .maybeSingle()
-        
-        if (resultExtended.data && !resultExtended.error) {
-          existingUser = resultExtended.data
-        }
       }
     } catch (err: any) {
       userCheckError = err
@@ -215,6 +218,7 @@ async function loginHandler(req: NextRequest) {
         error: err, 
         errorMessage: err?.message,
         errorCode: err?.code,
+        errorStack: err?.stack?.substring(0, 500),
         userId: data.user.id, 
         email: data.user.email || email 
       }, 'AuthAPI')
@@ -267,7 +271,9 @@ async function loginHandler(req: NextRequest) {
     let companyId: string | null = finalUser.company_id || null
     if (role === 'operador') {
       try {
-        const { data: mapping } = await supabase
+        // ✅ Usar supabaseAdmin para bypassar RLS
+        const supabaseAdminForCheck = getSupabaseAdmin()
+        const { data: mapping } = await supabaseAdminForCheck
           .from('gf_user_company_map')
           .select('company_id')
           .eq('user_id', data.user.id)
@@ -276,7 +282,7 @@ async function loginHandler(req: NextRequest) {
         if (!companyId) {
           return NextResponse.json({ error: 'Usuário operador sem empresa associada', code: 'no_company_mapping' }, { status: 403 })
         }
-        const { data: company } = await supabase
+        const { data: company } = await supabaseAdminForCheck
           .from('companies')
           .select('id, is_active')
           .eq('id', companyId)
@@ -285,19 +291,20 @@ async function loginHandler(req: NextRequest) {
           return NextResponse.json({ error: 'Empresa associada inativa', code: 'company_inactive' }, { status: 403 })
         }
       } catch (checkErr) {
+        logError('Erro ao validar empresa do operador', { error: checkErr, userId: data.user.id }, 'AuthAPI')
         return NextResponse.json({ error: 'Falha ao validar empresa do operador', code: 'company_check_failed' }, { status: 500 })
       }
     }
 
-    // ✅ Incluir carrier_id se o usuário for uma transportadora
-    const carrierId = finalUser?.carrier_id || null
+    // ✅ Incluir transportadora_id se o usuário for uma transportadora
+    const transportadoraId = finalUser?.transportadora_id || null
 
     const userPayload = {
       id: data.user.id,
       email: data.user.email || email,
       role,
       companyId: companyId || undefined,
-      carrier_id: role === 'transportadora' ? carrierId : undefined,
+      transportadoraId: role === 'transportadora' ? transportadoraId : undefined,
     }
 
     const response = NextResponse.json({ 

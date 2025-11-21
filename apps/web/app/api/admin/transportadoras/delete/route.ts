@@ -42,11 +42,11 @@ export async function DELETE(req: NextRequest) {
       )
     }
 
-    // 1. Remover referências de users (setar carrier_id como NULL)
+    // 1. Remover referências de users (setar transportadora_id como NULL)
     const { error: usersError } = await supabaseServiceRole
       .from('users')
-      .update({ carrier_id: null })
-      .eq('carrier_id', carrierId)
+      .update({ transportadora_id: null })
+      .eq('transportadora_id', carrierId)
 
     if (usersError) {
       console.error('Erro ao atualizar users:', usersError)
@@ -61,11 +61,11 @@ export async function DELETE(req: NextRequest) {
       )
     }
 
-    // 2. Remover referências de vehicles (setar carrier_id como NULL)
+    // 2. Remover referências de vehicles (setar transportadora_id como NULL)
     const { error: vehiclesError } = await supabaseServiceRole
       .from('vehicles')
-      .update({ carrier_id: null })
-      .eq('carrier_id', carrierId)
+      .update({ transportadora_id: null })
+      .eq('transportadora_id', carrierId)
 
     if (vehiclesError) {
       console.error('Erro ao atualizar vehicles:', vehiclesError)
@@ -80,11 +80,11 @@ export async function DELETE(req: NextRequest) {
       )
     }
 
-    // 3. Excluir rotas relacionadas (routes.carrier_id é NOT NULL, então precisamos excluir)
+    // 3. Excluir rotas relacionadas (routes.transportadora_id é NOT NULL, então precisamos excluir)
     const { error: routesError } = await supabaseServiceRole
       .from('routes')
       .delete()
-      .eq('carrier_id', carrierId)
+      .eq('transportadora_id', carrierId)
 
     if (routesError) {
       console.error('Erro ao excluir routes:', routesError)
@@ -104,7 +104,7 @@ export async function DELETE(req: NextRequest) {
       const { data: costsData, error: costsCheckError } = await supabaseServiceRole
         .from('costs')
         .select('id')
-        .eq('carrier_id', carrierId)
+        .eq('transportadora_id', carrierId)
         .limit(1)
 
       // Se a tabela existir e houver registros, remover referências
@@ -112,7 +112,7 @@ export async function DELETE(req: NextRequest) {
         const { error: costsError } = await supabaseServiceRole
           .from('costs')
           .update({ carrier_id: null })
-          .eq('carrier_id', carrierId)
+          .eq('transportadora_id', carrierId)
 
         if (costsError) {
           console.warn('Aviso ao atualizar costs (pode não existir):', costsError)
@@ -121,7 +121,7 @@ export async function DELETE(req: NextRequest) {
       }
     } catch (costsError: any) {
       // Ignorar erros relacionados à tabela costs (pode não existir)
-      console.warn('Tabela costs não encontrada ou sem coluna carrier_id, continuando...')
+      console.warn('Tabela costs não encontrada ou sem coluna transportadora_id, continuando...')
     }
 
     // 5. Agora podemos excluir a transportadora
