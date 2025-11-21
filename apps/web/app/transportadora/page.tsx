@@ -517,7 +517,7 @@ export default function TransportadoraDashboard() {
   return (
     <AppShell user={{
       id: user?.id || "",
-      name: user?.name || "Carrier",
+      name: user?.name || "Transportadora",
       email: user?.email || "",
       role: "transportadora"
     }}>

@@ -159,7 +159,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Validar role
-    const validRoles = ['admin', 'operator', 'carrier', 'driver', 'passenger']
+    const validRoles = ['admin', 'operator', 'operador', 'transportadora', 'driver', 'passenger']
     if (!validRoles.includes(role)) {
       return NextResponse.json(
         { error: `Role inválido. Roles válidos: ${validRoles.join(', ')}` },

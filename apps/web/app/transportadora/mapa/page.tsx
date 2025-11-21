@@ -13,7 +13,7 @@ import { supabase } from "@/lib/supabase"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Map, Filter, Layers, Navigation, RefreshCw, Maximize2 } from "lucide-react"
 
-function CarrierMapaContent() {
+function TransportadoraMapaContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [user, setUser] = useState<any>(null)
@@ -217,7 +217,7 @@ export default function TransportadoraMapaPage() {
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
       </div>
     }>
-      <CarrierMapaContent />
+      <TransportadoraMapaContent />
     </Suspense>
   )
 }
