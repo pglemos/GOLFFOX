@@ -93,7 +93,7 @@ function AlertasOperatorPageInner() {
   }
 
   const handleCreateRequest = (alerta: any) => {
-    router.push(`/operator/solicitacoes?type=socorro&alert_id=${alerta.id}`)
+    router.push(`/operador/solicitacoes?type=socorro&alert_id=${alerta.id}`)
   }
 
   if (loading || tenantLoading) {
