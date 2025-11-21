@@ -190,8 +190,22 @@ async function loginHandler(req: NextRequest) {
           })
         
         if (insertError) {
-          debug('Erro ao criar registro do usuário no banco', { error: insertError }, 'AuthAPI')
-          // Continuar mesmo se falhar a inserção (pode ser problema de RLS ou duplicação)
+          // Se o erro for de duplicação ou constraint, tentar buscar o registro novamente
+          if (insertError.code === '23505' || insertError.message?.includes('duplicate') || insertError.message?.includes('unique')) {
+            debug('Usuário já existe (duplicação ignorada), buscando registro...', { userId: data.user.id }, 'AuthAPI')
+            const { data: existingUserAfterError } = await supabaseAdmin
+              .from('users')
+              .select('id, email, role, company_id')
+              .eq('id', data.user.id)
+              .maybeSingle()
+            
+            if (existingUserAfterError) {
+              existingUser = existingUserAfterError
+            }
+          } else {
+            debug('Erro ao criar registro do usuário no banco', { error: insertError }, 'AuthAPI')
+            // Continuar mesmo se falhar a inserção (pode ser problema de RLS)
+          }
         } else {
           debug('Registro do usuário criado automaticamente no banco', { userId: data.user.id, role }, 'AuthAPI')
           // Buscar o registro recém-criado
@@ -205,10 +219,32 @@ async function loginHandler(req: NextRequest) {
             existingUser = newUser
           }
         }
-      } catch (createError) {
+      } catch (createError: any) {
         debug('Erro ao criar registro do usuário', { error: createError }, 'AuthAPI')
-        // Continuar com login mesmo se falhar a criação do registro
+        // Se erro de duplicação, tentar buscar novamente
+        if (createError?.code === '23505' || createError?.message?.includes('duplicate')) {
+          try {
+            const { data: existingUserAfterError } = await supabaseAdmin
+              .from('users')
+              .select('id, email, role, company_id')
+              .eq('id', data.user.id)
+              .maybeSingle()
+            
+            if (existingUserAfterError) {
+              existingUser = existingUserAfterError
+            }
+          } catch (lookupError) {
+            debug('Erro ao buscar usuário após erro de duplicação', { error: lookupError }, 'AuthAPI')
+          }
+        }
+        // Continuar com login mesmo se falhar a criação do registro - usar dados do Supabase Auth
       }
+    }
+    
+    // ✅ IMPORTANTE: Se ainda não temos existingUser, criar um objeto temporário
+    // Isso permite que o login continue mesmo se não conseguirmos criar o registro no banco
+    if (!existingUser) {
+      debug('Usando dados temporários do usuário (registro não criado no banco)', { userId: data.user.id, role }, 'AuthAPI')
     }
     
     // Usar dados do usuário encontrado ou criado
