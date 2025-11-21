@@ -78,9 +78,7 @@ SELECT
   cat.group_name,
   cat.category,
   cat.subcategory,
-  cc.name AS cost_center_name,
-  -- Adicionar campo date como alias para compatibilidade (a tabela já tem date)
-  c.date AS date
+  cc.name AS cost_center_name
 FROM public.gf_costs c
 JOIN public.companies comp ON comp.id = c.company_id
 LEFT JOIN public.carriers car ON car.id = c.transportadora_id  -- Usa apenas transportadora_id (carrier_id já foi removido na v63)
