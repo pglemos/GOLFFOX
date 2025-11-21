@@ -145,7 +145,20 @@ async function loginHandler(req: NextRequest) {
     let existingUser, userCheckError
     try {
       // ✅ Criar um cliente service role FRESCO a cada vez (sem cache de sessão)
-      const supabaseAdmin = getSupabaseAdmin()
+      let supabaseAdmin
+      try {
+        supabaseAdmin = getSupabaseAdmin()
+      } catch (adminErr: any) {
+        logError('Erro ao criar cliente Supabase Admin', { 
+          error: adminErr?.message || adminErr,
+          hasUrl: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
+          hasServiceKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY
+        }, 'AuthAPI')
+        return NextResponse.json({ 
+          error: 'Erro de configuração do servidor. Entre em contato com o suporte.', 
+          code: 'server_config_error' 
+        }, { status: 500 })
+      }
       
       debug('Buscando usuário na tabela users com service role...', { 
         userId: data.user.id, 
@@ -331,7 +344,18 @@ async function loginHandler(req: NextRequest) {
     if (role === 'operador') {
       try {
         // ✅ Usar supabaseAdmin para bypassar RLS
-        const supabaseAdminForCheck = getSupabaseAdmin()
+        let supabaseAdminForCheck
+        try {
+          supabaseAdminForCheck = getSupabaseAdmin()
+        } catch (adminErr: any) {
+          logError('Erro ao criar cliente Supabase Admin para verificar empresa', { 
+            error: adminErr?.message || adminErr
+          }, 'AuthAPI')
+          return NextResponse.json({ 
+            error: 'Erro de configuração do servidor. Entre em contato com o suporte.', 
+            code: 'server_config_error' 
+          }, { status: 500 })
+        }
         const { data: mapping } = await supabaseAdminForCheck
           .from('gf_user_company_map')
           .select('company_id')
@@ -395,9 +419,23 @@ async function loginHandler(req: NextRequest) {
 
     debug('Login API concluído', { role, emailHash: email.replace(/^(.{2}).+(@.*)$/, '$1***$2') }, 'AuthAPI')
     return response
-  } catch (err) {
-    logError('Falha inesperada no login API', { error: err }, 'AuthAPI')
-    return NextResponse.json({ error: 'internal_error' }, { status: 500 })
+  } catch (err: any) {
+    const errorMessage = err?.message || 'Erro interno do servidor'
+    const errorStack = err?.stack ? err.stack.substring(0, 500) : undefined
+    logError('Falha inesperada no login API', { 
+      error: errorMessage,
+      stack: errorStack,
+      errorName: err?.name,
+      errorCode: err?.code
+    }, 'AuthAPI')
+    
+    // Retornar mensagem de erro mais informativa em desenvolvimento
+    const isDev = process.env.NODE_ENV === 'development'
+    return NextResponse.json({ 
+      error: isDev ? errorMessage : 'Erro interno do servidor. Tente novamente mais tarde.',
+      code: 'internal_error',
+      ...(isDev && errorStack ? { stack: errorStack } : {})
+    }, { status: 500 })
   }
 }
 
