@@ -62,7 +62,7 @@ export default function TransportadoraMotoristasPage() {
       // Buscar motoristas da transportadora
       const { data: userData } = await supabase
         .from('users')
-        .select('carrier_id')
+        .select('transportadora_id')
         .eq('id', user?.id)
         .single()
 
@@ -71,8 +71,8 @@ export default function TransportadoraMotoristasPage() {
         .select('*')
         .eq('role', 'driver')
 
-      if (userData?.carrier_id) {
-        query = query.eq('carrier_id', userData.carrier_id)
+      if (userData?.transportadora_id) {
+        query = query.eq('transportadora_id', userData.transportadora_id)
       }
 
       const { data, error } = await query

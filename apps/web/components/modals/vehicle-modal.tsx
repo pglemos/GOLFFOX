@@ -28,7 +28,7 @@ interface Vehicle {
   capacity: number | string
   prefix?: string
   company_id?: string
-  carrier_id?: string
+  transportadora_id?: string
   is_active?: boolean
   photo_url?: string | null
 }
@@ -52,10 +52,10 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
   const [loading, setLoading] = useState(false)
   const [photoFile, setPhotoFile] = useState<File | null>(null)
   const [photoPreview, setPhotoPreview] = useState<string>("")
-  const [userInfo, setUserInfo] = useState<{role?: string, company_id?: string, carrier_id?: string}>({})
+  const [userInfo, setUserInfo] = useState<{role?: string, company_id?: string, transportadora_id?: string}>({})
   const { sync } = useSupabaseSync({ showToast: false }) // Toast já é mostrado no modal
 
-  // Carregar informações do usuário para determinar company_id/carrier_id
+  // Carregar informações do usuário para determinar company_id/transportadora_id
   useEffect(() => {
     const loadUserInfo = async () => {
       try {
@@ -63,7 +63,7 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
         if (session?.user) {
           const { data: userData, error } = await (supabase as any)
             .from('users')
-            .select('role, company_id, carrier_id')
+            .select('role, company_id, transportadora_id')
             .eq('id', session.user.id)
             .single()
           
@@ -71,7 +71,7 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
             setUserInfo({
               role: (userData as any).role,
               company_id: (userData as any).company_id,
-              carrier_id: (userData as any).carrier_id
+              transportadora_id: (userData as any).transportadora_id
             })
           }
         }
@@ -208,7 +208,7 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
         vehicleDataRaw.photo_url = photoUrl
       }
 
-      // Incluir company_id ou carrier_id baseado no papel do usuário
+      // Incluir company_id ou transportadora_id baseado no papel do usuário
       // Para admin: pode definir qualquer company_id
       // Para operator: deve usar o company_id do usuário
       // Para carrier: deve usar o carrier_id do usuário

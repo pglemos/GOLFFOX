@@ -163,7 +163,7 @@ async function loginHandler(req: NextRequest) {
     const refreshToken = data.session.refresh_token
 
     let companyId: string | null = existingUser?.company_id || null
-    if (role === 'operador' || role === 'operator') {
+    if (role === 'operador') {
       try {
         const { data: mapping } = await supabase
           .from('gf_user_company_map')
@@ -187,15 +187,15 @@ async function loginHandler(req: NextRequest) {
       }
     }
 
-    // ✅ Incluir carrier_id se o usuário for uma transportadora
-    const carrierId = existingUser?.carrier_id || null
+    // ✅ Incluir transportadora_id se o usuário for uma transportadora
+    const transportadoraId = existingUser?.transportadora_id || null
 
     const userPayload = {
       id: data.user.id,
       email: data.user.email || email,
       role,
       companyId: companyId || undefined,
-      carrier_id: role === 'transportadora' ? carrierId : undefined,
+      transportadora_id: role === 'transportadora' ? transportadoraId : undefined,
     }
 
     const response = NextResponse.json({ 

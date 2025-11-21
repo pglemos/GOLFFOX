@@ -28,7 +28,7 @@ function TransportadoraMapaContent() {
   const latParam = searchParams.get('lat')
   const lngParam = searchParams.get('lng')
   const zoomParam = searchParams.get('zoom')
-  const [carrierId, setCarrierId] = useState<string | null>(null)
+  const [transportadoraId, setTransportadoraId] = useState<string | null>(null)
 
   const initialCenter = latParam && lngParam 
     ? { lat: parseFloat(latParam), lng: parseFloat(lngParam) }
@@ -44,23 +44,23 @@ function TransportadoraMapaContent() {
         return
       }
       
-      // Buscar carrier_id do usuário
+      // Buscar transportadora_id do usuário
       const { data: userData } = await supabase
         .from('users')
-        .select('carrier_id')
+        .select('transportadora_id')
         .eq('id', session.user.id)
         .single()
       
       setUser({ ...session.user })
-      setCarrierId(userData?.carrier_id || null)
+      setTransportadoraId(userData?.transportadora_id || null)
       setLoading(false)
 
       // Carregar rotas da transportadora
-      if (userData?.carrier_id) {
+      if (userData?.transportadora_id) {
         const { data: routesData } = await supabase
           .from('routes')
           .select('id, name')
-          .eq('carrier_id', userData.carrier_id)
+          .eq('transportadora_id', userData.transportadora_id)
         setRoutes(routesData || [])
       }
     }
@@ -159,7 +159,7 @@ function TransportadoraMapaContent() {
 
         <div className="h-[calc(100vh-400px)] min-h-[600px] rounded-lg overflow-hidden border border-[var(--border)] relative">
           <FleetMap 
-            carrierId={carrierId || undefined}
+            transportadoraId={transportadoraId || undefined}
             routeId={routeId || undefined}
             initialCenter={initialCenter}
             initialZoom={initialZoom}

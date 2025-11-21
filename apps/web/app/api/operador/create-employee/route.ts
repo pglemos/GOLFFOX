@@ -159,7 +159,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Validar role
-    const validRoles = ['admin', 'operator', 'operador', 'transportadora', 'driver', 'passenger']
+    const validRoles = ['admin', 'operador', 'transportadora', 'driver', 'passenger']
     if (!validRoles.includes(role)) {
       return NextResponse.json(
         { error: `Role inválido. Roles válidos: ${validRoles.join(', ')}` },
@@ -188,7 +188,7 @@ export async function POST(request: NextRequest) {
     let companyId = authenticatedUser.companyId || null
     
     // Se é operator e não tem company_id, tentar buscar da tabela users (mas só se não for usuário mock)
-    if ((authenticatedUser.role === 'operador' || authenticatedUser.role === 'operator') && !companyId && authenticatedUser.id !== 'test-user-id') {
+    if (authenticatedUser.role === 'operador' && !companyId && authenticatedUser.id !== 'test-user-id') {
       try {
         const { data: userData } = await supabase
           .from('users')
@@ -205,7 +205,7 @@ export async function POST(request: NextRequest) {
     }
     
     // Se ainda não tem company_id e é operator (e não é usuário mock), retornar erro
-    if ((authenticatedUser.role === 'operador' || authenticatedUser.role === 'operator') && !companyId && authenticatedUser.id !== 'test-user-id') {
+    if (authenticatedUser.role === 'operador' && !companyId && authenticatedUser.id !== 'test-user-id') {
       return NextResponse.json(
         { 
           error: 'Operador deve estar associado a uma empresa',

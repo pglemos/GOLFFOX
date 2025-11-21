@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ success: false }, { status: 401 })
   }
 
-  // Buscar dados completos do usuário no banco para incluir carrier_id, company_id, etc.
+  // Buscar dados completos do usuário no banco para incluir transportadora_id, company_id, etc.
   try {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL
     const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY
@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
 
       const { data: dbUser } = await supabase
         .from('users')
-        .select('id, email, name, role, company_id, carrier_id')
+        .select('id, email, name, role, company_id, transportadora_id')
         .eq('id', userData.id)
         .maybeSingle()
 
@@ -52,7 +52,7 @@ export async function GET(request: NextRequest) {
             name: dbUser.name || userData.name || '',
             role: dbUser.role || userData.role,
             companyId: dbUser.company_id || userData.companyId || null,
-            carrier_id: dbUser.carrier_id || userData.carrier_id || null,
+            transportadora_id: dbUser.transportadora_id || userData.transportadora_id || null,
           }
         })
       }
@@ -70,7 +70,7 @@ export async function GET(request: NextRequest) {
       name: userData.name || '',
       role: userData.role,
       companyId: userData.companyId ?? null,
-      carrier_id: userData.carrier_id ?? null,
+      transportadora_id: userData.transportadora_id ?? null,
     }
   })
 }

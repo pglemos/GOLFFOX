@@ -98,7 +98,7 @@ export async function validateAuth(request: NextRequest): Promise<AuthenticatedU
     // Buscar TODOS os dados do usuário do banco
     const { data: userData, error: dbError } = await supabaseAdmin
       .from('users')
-      .select('id, email, role, company_id, carrier_id')
+      .select('id, email, role, company_id, transportadora_id')
       .eq('id', user.id)
       .maybeSingle()
     
@@ -145,8 +145,8 @@ export function hasRole(user: AuthenticatedUser | null, requiredRole: string | s
     return user.role === 'admin'
   }
   
-  if (roles.includes('operador') || roles.includes('operator')) {
-    return ['admin', 'operador', 'operator'].includes(user.role)
+  if (roles.includes('operador')) {
+    return ['admin', 'operador'].includes(user.role)
   }
   
   if (roles.includes('transportadora')) {
