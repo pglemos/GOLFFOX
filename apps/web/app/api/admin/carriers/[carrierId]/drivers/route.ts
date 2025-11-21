@@ -1,33 +1,17 @@
-// Rota de compatibilidade: redireciona para /api/admin/transportadoras/[transportadoraId]/drivers
-import { NextRequest, NextResponse } from 'next/server'
+// Rota de compatibilidade: chama a rota /api/admin/transportadoras/[transportadoraId]/drivers
+import { NextRequest } from 'next/server'
+import { GET as transportadoraDriversGET, POST as transportadoraDriversPOST } from '../../../transportadoras/[transportadoraId]/drivers/route'
 
 export async function GET(
   req: NextRequest,
   { params }: { params: { carrierId: string } }
 ) {
-  const newUrl = new URL(`/api/admin/transportadoras/${params.carrierId}/drivers`, req.url)
-  const response = await fetch(newUrl.toString(), {
-    method: req.method,
-    headers: Object.fromEntries(req.headers.entries()),
-  })
-  
-  const data = await response.json()
-  return NextResponse.json(data, { status: response.status })
+  return transportadoraDriversGET(req, { params: { transportadoraId: params.carrierId } } as any)
 }
 
 export async function POST(
   req: NextRequest,
   { params }: { params: { carrierId: string } }
 ) {
-  const newUrl = new URL(`/api/admin/transportadoras/${params.carrierId}/drivers`, req.url)
-  const body = await req.json()
-  const response = await fetch(newUrl.toString(), {
-    method: req.method,
-    headers: Object.fromEntries(req.headers.entries()),
-    body: JSON.stringify(body),
-  })
-  
-  const data = await response.json()
-  return NextResponse.json(data, { status: response.status })
+  return transportadoraDriversPOST(req, { params: { transportadoraId: params.carrierId } } as any)
 }
-
