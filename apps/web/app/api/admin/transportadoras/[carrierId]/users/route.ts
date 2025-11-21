@@ -26,7 +26,7 @@ export async function GET(
     const { data, error } = await supabaseServiceRole
       .from('users')
       .select('*')
-      .eq('transportadora_id', params.transportadoraId || params.carrierId)
+      .eq('transportadora_id', params.transportadoraId)
       .eq('role', 'transportadora')
       .order('name', { ascending: true })
 
