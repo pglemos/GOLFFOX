@@ -4,14 +4,14 @@ import { GET as transportadoraDriversGET, POST as transportadoraDriversPOST } fr
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { carrierId: string } }
+  { params }: { params: { transportadoraId: string } }
 ) {
-  return transportadoraDriversGET(req, { params: { transportadoraId: params.carrierId } } as any)
+  return transportadoraDriversGET(req, { params: { transportadoraId: params.transportadoraId } } as any)
 }
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { carrierId: string } }
+  { params }: { params: { transportadoraId: string } }
 ) {
-  return transportadoraDriversPOST(req, { params: { transportadoraId: params.carrierId } } as any)
+  return transportadoraDriversPOST(req, { params: { transportadoraId: params.transportadoraId } } as any)
 }

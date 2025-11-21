@@ -31,7 +31,7 @@ export function CreateCarrierModal({ isOpen, onClose, onSave }: CreateCarrierMod
     setLoading(true)
 
     try {
-      const response = await fetch('/api/admin/carriers/create', {
+      const response = await fetch('/api/admin/transportadora/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

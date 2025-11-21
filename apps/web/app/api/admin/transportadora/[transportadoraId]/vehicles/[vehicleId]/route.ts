@@ -4,14 +4,14 @@ import { PUT as transportadoraVehiclePUT, DELETE as transportadoraVehicleDELETE 
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { carrierId: string; vehicleId: string } }
+  { params }: { params: { transportadoraId: string; vehicleId: string } }
 ) {
-  return transportadoraVehiclePUT(req, { params: { transportadoraId: params.carrierId, vehicleId: params.vehicleId } } as any)
+  return transportadoraVehiclePUT(req, { params: { transportadoraId: params.transportadoraId, vehicleId: params.vehicleId } } as any)
 }
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { carrierId: string; vehicleId: string } }
+  { params }: { params: { transportadoraId: string; vehicleId: string } }
 ) {
-  return transportadoraVehicleDELETE(req, { params: { transportadoraId: params.carrierId, vehicleId: params.vehicleId } } as any)
+  return transportadoraVehicleDELETE(req, { params: { transportadoraId: params.transportadoraId, vehicleId: params.vehicleId } } as any)
 }
