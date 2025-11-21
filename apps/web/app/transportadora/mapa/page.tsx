@@ -115,9 +115,9 @@ function CarrierMapaContent() {
                 <Label className="mb-2 block">Filtrar por Rota</Label>
                 <Select value={routeId || "all"} onValueChange={(value) => {
                   if (value !== "all") {
-                    router.push(`/carrier/mapa?rota_id=${value}`)
+                    router.push(`/transportadora/mapa?rota_id=${value}`)
                   } else {
-                    router.push('/carrier/mapa')
+                    router.push('/transportadora/mapa')
                   }
                 }}>
                   <SelectTrigger>

@@ -104,82 +104,82 @@ const adminMenuItems = [
   }
 ]
 
-const operatorMenuItems = [
+const operadorMenuItems = [
   { 
     icon: LayoutDashboard, 
     label: "Dashboard", 
-    href: "/operator",
+    href: "/operador",
     description: "Visão geral do operador"
   },
   { 
     icon: Users, 
     label: "Funcionários", 
-    href: "/operator/funcionarios",
+    href: "/operador/funcionarios",
     description: "Gerencie seus funcionários"
   },
   { 
     icon: Navigation, 
     label: "Rotas", 
-    href: "/operator/rotas",
+    href: "/operador/rotas",
     description: "Solicitar e acompanhar rotas"
   },
   { 
     icon: Building2, 
     label: "Prestadores", 
-    href: "/operator/prestadores",
+    href: "/operador/prestadores",
     description: "Transportadoras alocadas pela GOLF FOX"
   },
   { 
     icon: FileText, 
     label: "Solicitações", 
-    href: "/operator/solicitacoes",
+    href: "/operador/solicitacoes",
     description: "Solicitações e mudanças para GOLF FOX"
   },
   { 
     icon: DollarSign, 
     label: "Custos", 
-    href: "/operator/custos",
+    href: "/operador/custos",
     description: "Faturas e conciliação GOLF FOX"
   },
   { 
     icon: AlertTriangle, 
     label: "Alertas", 
-    href: "/operator/alertas",
+    href: "/operador/alertas",
     description: "Notificações do sistema"
   },
   { 
     icon: BarChart3, 
     label: "Relatórios", 
-    href: "/operator/relatorios",
+    href: "/operador/relatorios",
     description: "Análise e exportação"
   },
   { 
     icon: Shield, 
     label: "Conformidade", 
-    href: "/operator/conformidade",
+    href: "/operador/conformidade",
     description: "Incidentes e segurança"
   },
   { 
     icon: MessageSquare, 
     label: "Comunicações", 
-    href: "/operator/comunicacoes",
+    href: "/operador/comunicacoes",
     description: "Broadcasts e mensagens"
   },
   { 
     icon: Settings, 
     label: "Preferências", 
-    href: "/operator/preferencias",
+    href: "/operador/preferencias",
     description: "Configurações e integrações"
   },
   { 
     icon: HelpCircle, 
     label: "Ajuda", 
-    href: "/operator/ajuda",
+    href: "/operador/ajuda",
     description: "Central de ajuda"
   }
 ]
 
-const carrierMenuItems = [
+const transportadoraMenuItems = [
   { 
     icon: LayoutDashboard, 
     label: "Dashboard", 
@@ -233,7 +233,7 @@ const carrierMenuItems = [
 interface SidebarProps {
   isOpen?: boolean
   isMobile?: boolean
-  panel?: 'admin' | 'operator' | 'carrier'
+  panel?: 'admin' | 'operador' | 'transportadora'
   user?: {
     id: string
     name: string
@@ -247,7 +247,7 @@ const CustomSidebarLink = ({
   panel
 }: { 
   item: typeof adminMenuItems[0]
-  panel: 'admin' | 'operator' | 'carrier'
+  panel: 'admin' | 'operador' | 'transportadora'
 }) => {
   const pathname = usePathname()
   const router = useRouter()
@@ -261,7 +261,7 @@ const CustomSidebarLink = ({
     ? pathname === item.href 
     : pathname === item.href || pathname?.startsWith(item.href + "/")
   
-  const showOperationalAlerts = (item.href === "/admin/alertas" || item.href === "/operator/alertas" || item.href === "/transportadora/alertas")
+  const showOperationalAlerts = (item.href === "/admin/alertas" || item.href === "/operador/alertas" || item.href === "/transportadora/alertas")
   
   return (
     <div className="relative group">
@@ -272,7 +272,7 @@ const CustomSidebarLink = ({
           "flex items-center justify-start gap-2 py-2.5 sm:py-2 px-2 sm:px-3 rounded-lg transition-colors relative",
           "min-h-[44px] sm:min-h-[40px] touch-manipulation",
           isActive 
-            ? (panel === 'operator' 
+            ? ((panel === 'operador' || panel === 'operator')
                 ? "bg-orange-50 dark:bg-orange-900/20 text-orange-500" 
                 : "bg-[#FFF7ED] text-[#F97316]")
             : "hover:bg-gray-100 dark:hover:bg-gray-800 active:bg-gray-200"
@@ -294,8 +294,8 @@ const CustomSidebarLink = ({
               "h-5 w-5 transition-colors flex-shrink-0",
               "stroke-[1.5px]",
               isActive 
-                ? (panel === 'operator' ? "text-orange-500" : "text-[#F97316]")
-                : (panel === 'operator' ? "text-gray-500 group-hover:text-orange-500" : "text-gray-500 group-hover:text-[#F97316]")
+                ? ((panel === 'operador' || panel === 'operator') ? "text-orange-500" : "text-[#F97316]")
+                : ((panel === 'operador' || panel === 'operator') ? "text-gray-500 group-hover:text-orange-500" : "text-gray-500 group-hover:text-[#F97316]")
             )} 
           />
           {showOperationalAlerts && open && (
@@ -316,7 +316,7 @@ const CustomSidebarLink = ({
           className={cn(
             "text-sm sm:text-base transition-colors whitespace-nowrap font-medium",
             isActive 
-              ? (panel === 'operator' ? "text-orange-500 font-semibold" : "text-[#F97316] font-semibold")
+              ? ((panel === 'operador' || panel === 'operator') ? "text-orange-500 font-semibold" : "text-[#F97316] font-semibold")
               : "text-gray-600 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-gray-100"
           )}
           style={{
@@ -329,7 +329,7 @@ const CustomSidebarLink = ({
       {isActive && (
         <div className={cn(
           "absolute left-0 top-0 bottom-0 w-1 rounded-r",
-          panel === 'operator' ? "bg-orange-500" : "bg-[#F97316]"
+          (panel === 'operador' || panel === 'operator') ? "bg-orange-500" : "bg-[#F97316]"
         )} />
       )}
     </div>
@@ -337,17 +337,17 @@ const CustomSidebarLink = ({
 }
 
 // Logo component
-const SidebarLogo = ({ panel }: { panel: 'admin' | 'operator' | 'carrier' }) => {
+const SidebarLogo = ({ panel }: { panel: 'admin' | 'operador' | 'carrier' }) => {
   const { open } = useSidebar()
   
   return (
       <a
-        href={panel === 'operator' ? '/operator' : panel === 'transportadora' ? '/transportadora' : '/admin'}
+        href={(panel === 'operador' || panel === 'operator') ? '/operador' : panel === 'transportadora' ? '/transportadora' : '/admin'}
         className="font-normal flex space-x-2 items-center text-sm text-black dark:text-white py-1 relative z-20 mb-6"
       >
       <div className={cn(
         "h-8 w-8 rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm",
-        panel === 'operator' ? "bg-orange-500" : "gradient-brand"
+        (panel === 'operador' || panel === 'operator') ? "bg-orange-500" : "gradient-brand"
       )}>
         <span className="text-white text-xs font-bold">GF</span>
       </div>
@@ -375,7 +375,7 @@ const SidebarLogo = ({ panel }: { panel: 'admin' | 'operator' | 'carrier' }) => 
 // User profile component
 const SidebarUser = ({ user, panel }: { 
   user?: { id: string; name: string; email: string }
-  panel: 'admin' | 'operator' | 'carrier'
+  panel: 'admin' | 'operador' | 'transportadora'
 }) => {
   const { open } = useSidebar()
   
@@ -397,7 +397,7 @@ const SidebarUser = ({ user, panel }: {
       >
         <div className={cn(
           "h-8 w-8 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-semibold text-white",
-          panel === 'operator' ? "bg-orange-500" : "gradient-brand"
+          (panel === 'operador' || panel === 'operator') ? "bg-orange-500" : "gradient-brand"
         )}>
           {initials}
         </div>
@@ -423,10 +423,10 @@ export function Sidebar({ isOpen = true, isMobile = false, panel = 'admin', user
   const { isSidebarItemActive } = useNavigation()
   
   // Selecionar menu baseado no painel
-  const menuItems = panel === 'operator' 
-    ? operatorMenuItems 
-    : panel === 'carrier' 
-    ? carrierMenuItems 
+  const menuItems = (panel === 'operador' || panel === 'operator')
+    ? operadorMenuItems 
+    : panel === 'transportadora' 
+    ? transportadoraMenuItems 
     : adminMenuItems
 
   // Estado interno para controle de hover no desktop
@@ -440,7 +440,7 @@ export function Sidebar({ isOpen = true, isMobile = false, panel = 'admin', user
   const router = useRouter()
 
   useEffect(() => {
-    const items = panel === 'operator' ? operatorMenuItems : panel === 'carrier' ? carrierMenuItems : adminMenuItems
+    const items = (panel === 'operador' || panel === 'operator') ? operadorMenuItems : panel === 'transportadora' ? transportadoraMenuItems : adminMenuItems
     for (const item of items) {
       router.prefetch(item.href)
     }

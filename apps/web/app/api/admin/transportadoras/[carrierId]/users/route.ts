@@ -27,7 +27,7 @@ export async function GET(
       .from('users')
       .select('*')
       .eq('carrier_id', params.carrierId)
-      .eq('role', 'carrier')
+      .eq('role', 'transportadora')
       .order('name', { ascending: true })
 
     if (error) {

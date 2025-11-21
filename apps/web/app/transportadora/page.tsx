@@ -7,11 +7,11 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { FleetMap } from "@/components/fleet-map"
-import { KpiCardEnhanced } from "@/components/carrier/kpi-card-enhanced"
-import { DataTable, Column } from "@/components/carrier/data-table"
-import { ChartContainer } from "@/components/carrier/chart-container"
-import { QuickActions } from "@/components/carrier/quick-actions"
-import { RecentActivities } from "@/components/carrier/recent-activities"
+import { KpiCardEnhanced } from "@/components/transportadora/kpi-card-enhanced"
+import { DataTable, Column } from "@/components/transportadora/data-table"
+import { ChartContainer } from "@/components/transportadora/chart-container"
+import { QuickActions } from "@/components/transportadora/quick-actions"
+import { RecentActivities } from "@/components/transportadora/recent-activities"
 import { 
   Truck, 
   Map, 
@@ -25,7 +25,7 @@ import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts"
 
-export default function CarrierDashboard() {
+export default function TransportadoraDashboard() {
   const router = useRouter()
   const [user, setUser] = useState<any>(null)
   const [userData, setUserData] = useState<any>(null)
@@ -49,7 +49,7 @@ export default function CarrierDashboard() {
               const meData = await meResponse.json()
               console.log('✅ [Transportadora] Resposta da API /api/auth/me:', { success: meData.success, hasUser: !!meData.user, role: meData.user?.role })
               
-              if (meData.success && meData.user && (meData.user.role === 'transportadora' || meData.user.role === 'carrier' || meData.user.role === 'admin')) {
+              if (meData.success && meData.user && (meData.user.role === 'transportadora' || meData.user.role === 'admin')) {
                 console.log('✅ [Transportadora] Usuário transportadora autenticado via API /api/auth/me, definindo usuário...')
                 setUser(meData.user)
                 setUserData(meData.user)
@@ -87,7 +87,7 @@ export default function CarrierDashboard() {
               console.warn('⚠️ Erro ao buscar dados do usuário:', dbError)
             }
 
-            if (data && (data.role === 'transportadora' || data.role === 'carrier' || data.role === 'admin')) {
+            if (data && (data.role === 'transportadora' || data.role === 'admin')) {
               console.log('✅ Usuário transportadora autenticado via Supabase Auth')
               setUser({ ...session.user, ...data })
               setUserData(data)
@@ -147,7 +147,7 @@ export default function CarrierDashboard() {
 
       // Configurar Realtime subscription para atualização automática
       const channel = supabase
-        .channel('carrier-dashboard-realtime')
+        .channel('transportadora-dashboard-realtime')
         .on(
           'postgres_changes',
           {
@@ -542,7 +542,7 @@ export default function CarrierDashboard() {
               </SelectContent>
             </Select>
             <Button asChild className="flex-shrink-0 w-full sm:w-auto min-h-[44px] touch-manipulation">
-              <a href="/carrier/relatorios">
+              <a href="/transportadora/relatorios">
                 <Truck className="h-4 w-4 mr-2" />
                 Relatórios
               </a>
@@ -560,7 +560,7 @@ export default function CarrierDashboard() {
             formatValue={(v) => v.toString()}
             iconColor="var(--brand)"
             iconBgColor="var(--brand-light)"
-            onClick={() => router.push('/carrier/veiculos')}
+            onClick={() => router.push('/transportadora/veiculos')}
           />
           <KpiCardEnhanced
             icon={Navigation}
@@ -579,7 +579,7 @@ export default function CarrierDashboard() {
             formatValue={(v) => v.toString()}
             iconColor="#10B981"
             iconBgColor="rgba(16, 185, 129, 0.1)"
-            onClick={() => router.push('/carrier/motoristas')}
+            onClick={() => router.push('/transportadora/motoristas')}
           />
           <KpiCardEnhanced
             icon={AlertCircle}
@@ -589,7 +589,7 @@ export default function CarrierDashboard() {
             formatValue={(v) => v.toString()}
             iconColor="#EF4444"
             iconBgColor="rgba(239, 68, 68, 0.1)"
-            onClick={() => router.push('/carrier/alertas')}
+            onClick={() => router.push('/transportadora/alertas')}
           />
         </div>
 
@@ -603,7 +603,7 @@ export default function CarrierDashboard() {
             formatValue={(v) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 0 }).format(v)}
             iconColor="#9333EA"
             iconBgColor="rgba(147, 51, 234, 0.1)"
-            onClick={() => router.push('/carrier/custos')}
+            onClick={() => router.push('/transportadora/custos')}
           />
           <KpiCardEnhanced
             icon={Navigation}
@@ -623,7 +623,7 @@ export default function CarrierDashboard() {
             iconColor="#F59E0B"
             iconBgColor="rgba(245, 158, 11, 0.1)"
             hint="Clique para ver detalhes"
-            onClick={() => router.push('/carrier/alertas')}
+            onClick={() => router.push('/transportadora/alertas')}
           />
         </div>
 
@@ -746,7 +746,7 @@ export default function CarrierDashboard() {
                   size="sm" 
                   variant="outline" 
                   className="flex-shrink-0 w-full sm:w-auto min-h-[44px] touch-manipulation"
-                  onClick={() => router.push('/carrier/mapa')}
+                  onClick={() => router.push('/transportadora/mapa')}
                 >
                   Expandir
                 </Button>
@@ -796,7 +796,7 @@ export default function CarrierDashboard() {
                   size="sm" 
                   variant="outline" 
                   className="flex-shrink-0 w-full sm:w-auto min-h-[44px] touch-manipulation"
-                  onClick={() => router.push('/carrier/motoristas')}
+                  onClick={() => router.push('/transportadora/motoristas')}
                 >
                   Ver todos
                 </Button>
@@ -898,7 +898,7 @@ export default function CarrierDashboard() {
               searchPlaceholder="Buscar veículos..."
               pagination={true}
               pageSize={10}
-              onRowClick={(row) => router.push(`/carrier/veiculos?vehicleId=${row.id}`)}
+              onRowClick={(row) => router.push(`/transportadora/veiculos?vehicleId=${row.id}`)}
             />
           </div>
 

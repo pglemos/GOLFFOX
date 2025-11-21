@@ -14,7 +14,7 @@ import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import { useRouter as useRouterNext } from "next/navigation"
-import { DocumentUpload } from "@/components/carrier/document-upload"
+import { DocumentUpload } from "@/components/transportadora/document-upload"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
@@ -428,7 +428,7 @@ export default function CarrierVeiculosPage() {
                             className="flex-1"
                             onClick={(e) => {
                               e.stopPropagation()
-                              routerNext.push(`/carrier/mapa?vehicle_id=${veiculo.id}`)
+                              routerNext.push(`/transportadora/mapa?vehicle_id=${veiculo.id}`)
                             }}
                           >
                             <MapPin className="h-4 w-4 mr-1" />
@@ -513,7 +513,7 @@ export default function CarrierVeiculosPage() {
                             size="sm"
                             onClick={(e) => {
                               e.stopPropagation()
-                              routerNext.push(`/carrier/mapa?vehicle_id=${veiculo.id}`)
+                              routerNext.push(`/transportadora/mapa?vehicle_id=${veiculo.id}`)
                             }}
                           >
                             <MapPin className="h-4 w-4 mr-2" />

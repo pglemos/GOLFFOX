@@ -13,12 +13,12 @@ describe('RBAC - hasRole', () => {
   it('operator deve acessar operator', () => {
     expect(hasRole({ id: '4', email: 'x@y', role: 'operator' }, 'operator')).toBe(true)
   })
-  it('carrier não deve acessar operator', () => {
-    expect(hasRole({ id: '5', email: 'x@y', role: 'carrier' }, 'operator')).toBe(false)
+  it('transportadora não deve acessar operator', () => {
+    expect(hasRole({ id: '5', email: 'x@y', role: 'transportadora' }, 'operator')).toBe(false)
   })
   it('lista de roles - any match', () => {
-    expect(hasRole({ id: '6', email: 'x@y', role: 'carrier' }, ['admin','carrier'])).toBe(true)
-    expect(hasRole({ id: '7', email: 'x@y', role: 'passenger' }, ['admin','carrier'])).toBe(false)
+    expect(hasRole({ id: '6', email: 'x@y', role: 'transportadora' }, ['admin','transportadora'])).toBe(true)
+    expect(hasRole({ id: '7', email: 'x@y', role: 'passenger' }, ['admin','transportadora'])).toBe(false)
   })
 })
 

@@ -100,77 +100,77 @@ const adminMenuItems = [
   }
 ]
 
-const operatorMenuItems = [
+const operadorMenuItems = [
   { 
     icon: LayoutDashboard, 
     label: "Dashboard", 
-    href: "/operator",
+    href: "/operador",
     description: "Visão geral do operador"
   },
   { 
     icon: Users, 
     label: "Funcionários", 
-    href: "/operator/funcionarios",
+    href: "/operador/funcionarios",
     description: "Gerencie seus funcionários"
   },
   { 
     icon: Navigation, 
     label: "Rotas", 
-    href: "/operator/rotas",
+    href: "/operador/rotas",
     description: "Solicitar e acompanhar rotas"
   },
   { 
     icon: Building2, 
     label: "Prestadores", 
-    href: "/operator/prestadores",
+    href: "/operador/prestadores",
     description: "Transportadoras alocadas pela GOLF FOX"
   },
   { 
     icon: FileText, 
     label: "Solicitações", 
-    href: "/operator/solicitacoes",
+    href: "/operador/solicitacoes",
     description: "Solicitações e mudanças para GOLF FOX"
   },
   { 
     icon: DollarSign, 
     label: "Custos", 
-    href: "/operator/custos",
+    href: "/operador/custos",
     description: "Faturas e conciliação GOLF FOX"
   },
   { 
     icon: AlertTriangle, 
     label: "Alertas", 
-    href: "/operator/alertas",
+    href: "/operador/alertas",
     description: "Notificações do sistema"
   },
   { 
     icon: BarChart3, 
     label: "Relatórios", 
-    href: "/operator/relatorios",
+    href: "/operador/relatorios",
     description: "Análise e exportação"
   },
   { 
     icon: Shield, 
     label: "Conformidade", 
-    href: "/operator/conformidade",
+    href: "/operador/conformidade",
     description: "Incidentes e segurança"
   },
   { 
     icon: MessageSquare, 
     label: "Comunicações", 
-    href: "/operator/comunicacoes",
+    href: "/operador/comunicacoes",
     description: "Broadcasts e mensagens"
   },
   { 
     icon: Settings, 
     label: "Preferências", 
-    href: "/operator/preferencias",
+    href: "/operador/preferencias",
     description: "Configurações e integrações"
   },
   { 
     icon: HelpCircle, 
     label: "Ajuda", 
-    href: "/operator/ajuda",
+    href: "/operador/ajuda",
     description: "Central de ajuda"
   }
 ]
@@ -229,15 +229,15 @@ const carrierMenuItems = [
 interface SidebarProps {
   isOpen?: boolean
   isMobile?: boolean
-  panel?: 'admin' | 'operator' | 'carrier'
+  panel?: 'admin' | 'operador' | 'carrier'
 }
 
 export function Sidebar({ isOpen = true, isMobile = false, panel = 'admin' }: SidebarProps) {
   const { isSidebarItemActive } = useNavigation()
   
   // Selecionar menu baseado no painel
-  const menuItems = panel === 'operator' 
-    ? operatorMenuItems 
+  const menuItems = (panel === 'operador' || panel === 'operator')
+    ? operadorMenuItems 
     : panel === 'carrier' 
     ? carrierMenuItems 
     : adminMenuItems
@@ -265,7 +265,7 @@ export function Sidebar({ isOpen = true, isMobile = false, panel = 'admin' }: Si
               {menuItems.map((item, _i) => {
                 const Icon = item.icon
                 const isActive = isSidebarItemActive(item.href)
-                const showOperationalAlerts = (item.href === "/admin/alertas" || item.href === "/operator/alertas" || item.href === "/transportadora/alertas")
+                const showOperationalAlerts = (item.href === "/admin/alertas" || item.href === "/operador/alertas" || item.href === "/transportadora/alertas")
                 
                 return (
                   <motion.div
@@ -285,7 +285,7 @@ export function Sidebar({ isOpen = true, isMobile = false, panel = 'admin' }: Si
                         whileHover="hover"
                         className={cn(
                           "absolute left-0 top-0 bottom-0 w-1 rounded-r opacity-0 group-hover:opacity-100 transition-opacity",
-                          panel === 'operator' ? "bg-orange-500" : "bg-[var(--brand)]"
+                          (panel === 'operador' || panel === 'operator') ? "bg-orange-500" : "bg-[var(--brand)]"
                         )}
                       />
                       <Icon 
@@ -293,15 +293,15 @@ export function Sidebar({ isOpen = true, isMobile = false, panel = 'admin' }: Si
                           "h-5 w-5 transition-colors flex-shrink-0",
                           "stroke-[1.5px]",
                           isActive 
-                            ? (panel === 'operator' ? "text-orange-500" : "text-[var(--brand)]")
-                            : (panel === 'operator' ? "text-[var(--ink-muted)] group-hover:text-orange-500" : "text-[var(--ink-muted)] group-hover:text-[var(--brand)]")
+                            ? ((panel === 'operador' || panel === 'operator') ? "text-orange-500" : "text-[var(--brand)]")
+                            : ((panel === 'operador' || panel === 'operator') ? "text-[var(--ink-muted)] group-hover:text-orange-500" : "text-[var(--ink-muted)] group-hover:text-[var(--brand)]")
                         )} 
                       />
                       <div className="flex-1 min-w-0 flex items-center justify-between gap-2">
                         <span className={cn(
                           "block transition-colors",
                           isActive 
-                            ? (panel === 'operator' ? "text-orange-500 font-semibold" : "text-[var(--brand)] font-semibold")
+                            ? ((panel === 'operador' || panel === 'operator') ? "text-orange-500 font-semibold" : "text-[var(--brand)] font-semibold")
                             : "group-hover:text-[var(--ink-strong)]"
                         )}>
                           {item.label}
@@ -331,7 +331,7 @@ export function Sidebar({ isOpen = true, isMobile = false, panel = 'admin' }: Si
               <div className="flex items-center gap-3 px-4 py-2">
                 <div className={cn(
                   "w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm",
-                  panel === 'operator' ? "bg-orange-500" : "gradient-brand"
+                  (panel === 'operador' || panel === 'operator') ? "bg-orange-500" : "gradient-brand"
                 )}>
                   <span className="text-white text-xs font-bold">GF</span>
                 </div>

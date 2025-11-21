@@ -82,7 +82,7 @@ async function createUserInDatabase() {
     if (TEST_EMAIL.includes('operator')) {
       role = 'operator'
     } else if (TEST_EMAIL.includes('carrier')) {
-      role = 'carrier'
+      role = 'transportadora'
     } else if (TEST_EMAIL.includes('driver')) {
       role = 'driver'
     }

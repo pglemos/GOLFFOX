@@ -48,10 +48,17 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(transportadoraUrl)
   }
 
-  // ✅ Proteger rotas /operator, /admin e /transportadora com autenticação
+  // ✅ Redirecionar /operator para /operador (compatibilidade)
+  if (pathname.startsWith('/operator')) {
+    const operadorUrl = new URL(pathname.replace('/operator', '/operador'), request.url)
+    operadorUrl.search = request.nextUrl.search
+    return NextResponse.redirect(operadorUrl)
+  }
+
+  // ✅ Proteger rotas /operador, /admin e /transportadora com autenticação
   // A validação completa será feita no lado do cliente e nas rotas API
   // O middleware apenas verifica se há sessão Supabase ativa
-  if (pathname.startsWith('/operator') || pathname.startsWith('/admin') || pathname.startsWith('/transportadora')) {
+  if (pathname.startsWith('/operador') || pathname.startsWith('/admin') || pathname.startsWith('/transportadora')) {
     // Verificar se há cookie de sessão do Supabase (validação rápida)
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
     let hasSupabaseSession = false
@@ -75,7 +82,7 @@ export async function middleware(request: NextRequest) {
   }
 
   // Limpar query param ?company (mantido)
-  if (pathname === '/operator' && searchParams.has('company')) {
+  if (pathname === '/operador' && searchParams.has('company')) {
     const url = request.nextUrl.clone()
     url.searchParams.delete('company')
     return NextResponse.redirect(url)
@@ -113,8 +120,9 @@ export const config = {
     '/login',
     '/login/:path*',
     '/admin/:path*',
-    '/operator',
     '/operator/:path*',
+    '/operador',
+    '/operador/:path*',
     '/carrier/:path*',
     '/transportadora/:path*',
     /*

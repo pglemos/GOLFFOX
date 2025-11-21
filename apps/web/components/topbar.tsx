@@ -57,9 +57,9 @@ export function Topbar({
 
   // Determinar painel atual e rotas correspondentes
   const getPanelRoutes = () => {
-    if (pathname?.startsWith('/operator')) {
+    if (pathname?.startsWith('/operador') || pathname?.startsWith('/operator')) {
       return {
-        settings: '/operator/configuracoes'
+        settings: '/operador/configuracoes'
       }
     }
     if (pathname?.startsWith('/transportadora')) {

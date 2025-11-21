@@ -16,7 +16,7 @@ interface AppShellProps {
     role: string
   }
   children: React.ReactNode
-  panel?: 'admin' | 'operator' | 'carrier'
+  panel?: 'admin' | 'operador' | 'transportadora'
 }
 
 // Named export for AppShell component
@@ -26,10 +26,10 @@ export const AppShell = memo(function AppShell({ user, children, panel }: AppShe
   const [isMobile, setIsMobile] = useState(false)
   
   // Detectar painel automaticamente se não fornecido (memoizado)
-  const detectedPanel: 'admin' | 'operator' | 'carrier' = useMemo(() => 
+  const detectedPanel: 'admin' | 'operador' | 'transportadora' = useMemo(() => 
     panel || 
-    (pathname?.startsWith('/operator') ? 'operator' : 
-     (pathname?.startsWith('/transportadora') || pathname?.startsWith('/carrier')) ? 'carrier' : 'admin'),
+    ((pathname?.startsWith('/operador') || pathname?.startsWith('/operator')) ? 'operador' : 
+     (pathname?.startsWith('/transportadora') || pathname?.startsWith('/carrier')) ? 'transportadora' : 'admin'),
     [panel, pathname]
   )
   
@@ -39,11 +39,11 @@ export const AppShell = memo(function AppShell({ user, children, panel }: AppShe
       branding: 'Administrativo',
       homeUrl: '/admin'
     },
-    operator: {
+    operador: {
       branding: 'Operador',
-      homeUrl: '/operator'
+      homeUrl: '/operador'
     },
-    carrier: {
+    transportadora: {
       branding: 'Transportadora',
       homeUrl: '/transportadora'
     }

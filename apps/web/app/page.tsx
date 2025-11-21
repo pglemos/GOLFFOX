@@ -17,7 +17,7 @@ const EMAIL_REGEX =
 const PASSWORD_REGEX = /^(?=.*[A-Z])(?=.*\d).{8,}$/
 
 const AUTH_ENDPOINT = process.env.NEXT_PUBLIC_AUTH_ENDPOINT ?? "/api/auth/login"
-const DEFAULT_LOGGED_URL = process.env.NEXT_PUBLIC_LOGGED_URL ?? "/operator"
+const DEFAULT_LOGGED_URL = process.env.NEXT_PUBLIC_LOGGED_URL ?? "/operador"
 
 const sanitizeInput = (value: string) => value.replace(/[<>"'`;()]/g, "").trim()
 
@@ -136,14 +136,14 @@ function LoginContent() {
 
           const isAllowedForRole = (role: string, path: string): boolean => {
             if (path.startsWith('/admin')) return role === 'admin'
-            if (path.startsWith('/operator')) return ['admin', 'operator'].includes(role)
+            if (path.startsWith('/operador') || path.startsWith('/operator')) return ['admin', 'operador', 'operator'].includes(role)
             if (path.startsWith('/transportadora') || path.startsWith('/carrier')) return ['admin', 'transportadora', 'carrier'].includes(role)
             return true
           }
 
           let redirectUrl = userRole === 'admin' ? '/admin' :
-                            userRole === 'operator' ? '/operator' :
-                            (userRole === 'transportadora' || userRole === 'carrier') ? '/transportadora' : '/dashboard'
+                            (userRole === 'operador' || userRole === 'operator') ? '/operador' :
+                            userRole === 'transportadora' ? '/transportadora' : '/dashboard'
 
           if (safeNext && isAllowedForRole(userRole, safeNext)) {
             redirectUrl = safeNext
@@ -269,7 +269,7 @@ function LoginContent() {
 
   const isAllowedForRole = (role: string, path: string): boolean => {
     if (path.startsWith('/admin')) return role === 'admin'
-    if (path.startsWith('/operator')) return ['admin', 'operator'].includes(role)
+    if (path.startsWith('/operador') || path.startsWith('/operator')) return ['admin', 'operador', 'operator'].includes(role)
     if (path.startsWith('/transportadora') || path.startsWith('/carrier')) return ['admin', 'transportadora', 'carrier'].includes(role)
     return true
   }

@@ -163,7 +163,7 @@ async function loginHandler(req: NextRequest) {
     const refreshToken = data.session.refresh_token
 
     let companyId: string | null = existingUser?.company_id || null
-    if (role === 'operator') {
+    if (role === 'operador' || role === 'operator') {
       try {
         const { data: mapping } = await supabase
           .from('gf_user_company_map')
@@ -195,7 +195,7 @@ async function loginHandler(req: NextRequest) {
       email: data.user.email || email,
       role,
       companyId: companyId || undefined,
-      carrier_id: (role === 'transportadora' || role === 'carrier') ? carrierId : undefined,
+      carrier_id: role === 'transportadora' ? carrierId : undefined,
     }
 
     const response = NextResponse.json({ 

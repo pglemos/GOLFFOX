@@ -1,7 +1,7 @@
 export function normalizeOperatorUrl(urlString: string): string {
   try {
     const url = new URL(urlString, typeof window !== 'undefined' ? window.location.origin : 'http://localhost')
-    if (url.pathname.startsWith('/operator') && url.searchParams.has('company')) {
+    if ((url.pathname.startsWith('/operador') || url.pathname.startsWith('/operator')) && url.searchParams.has('company')) {
       url.searchParams.delete('company')
     }
     return url.pathname + (url.search || '')

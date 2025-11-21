@@ -14,7 +14,7 @@ const DATABASE_URL = process.env.DATABASE_URL || process.env.SUPABASE_DB_URL || 
 const COMPANIES = [
   { name: 'Transporte Expresso', role: 'operator' },
   { name: 'Logística Rápida', role: 'operator' },
-  { name: 'Fretamento Premium', role: 'carrier' },
+  { name: 'Fretamento Premium', role: 'transportadora' },
 ]
 
 const ROUTES_PER_COMPANY = 4

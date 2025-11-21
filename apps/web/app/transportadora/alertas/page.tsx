@@ -13,7 +13,7 @@ import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 
-export default function CarrierAlertasPage() {
+export default function TransportadoraAlertasPage() {
   const router = useRouter()
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
@@ -44,7 +44,7 @@ export default function CarrierAlertasPage() {
 
   const loadAlerts = async () => {
     try {
-      const res = await fetch('/api/carrier/alerts?alert_level=critical,warning,expired')
+      const res = await fetch('/api/transportadora/alerts?alert_level=critical,warning,expired')
       if (res.ok) {
         const data = await res.json()
         setAlerts(data.alerts || [])
@@ -332,9 +332,9 @@ export default function CarrierAlertasPage() {
                             variant="outline"
                             onClick={() => {
                               if (alert.item_type === 'driver_document' || alert.item_type === 'driver_exam') {
-                                router.push(`/carrier/motoristas?driverId=${alert.entity_id}`)
+                                router.push(`/transportadora/motoristas?driverId=${alert.entity_id}`)
                               } else if (alert.item_type === 'vehicle_document') {
-                                router.push(`/carrier/veiculos?vehicleId=${alert.entity_id}`)
+                                router.push(`/transportadora/veiculos?vehicleId=${alert.entity_id}`)
                               }
                             }}
                             className="w-full min-h-[44px] text-xs sm:text-sm"

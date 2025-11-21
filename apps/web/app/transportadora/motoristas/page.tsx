@@ -12,14 +12,14 @@ import { Users, Search, Award, Phone, Mail, FileText, Stethoscope, AlertCircle, 
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
-import { DocumentUpload } from "@/components/carrier/document-upload"
+import { DocumentUpload } from "@/components/transportadora/document-upload"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { ChartContainer } from "@/components/carrier/chart-container"
+import { ChartContainer } from "@/components/transportadora/chart-container"
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from "recharts"
 
-export default function CarrierMotoristasPage() {
+export default function TransportadoraMotoristasPage() {
   const router = useRouter()
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
@@ -129,7 +129,7 @@ export default function CarrierMotoristasPage() {
 
   const loadDriverDocuments = async (driverId: string) => {
     try {
-      const res = await fetch(`/api/carrier/drivers/${driverId}/documents`)
+      const res = await fetch(`/api/transportadora/drivers/${driverId}/documents`)
       if (res.ok) {
         const data = await res.json()
         setDocuments(data || [])
@@ -141,7 +141,7 @@ export default function CarrierMotoristasPage() {
 
   const loadDriverExams = async (driverId: string) => {
     try {
-      const res = await fetch(`/api/carrier/drivers/${driverId}/exams`)
+      const res = await fetch(`/api/transportadora/drivers/${driverId}/exams`)
       if (res.ok) {
         const data = await res.json()
         setExams(data || [])
@@ -153,7 +153,7 @@ export default function CarrierMotoristasPage() {
 
   const loadAlerts = async () => {
     try {
-      const res = await fetch('/api/carrier/alerts?alert_level=critical,warning,expired')
+      const res = await fetch('/api/transportadora/alerts?alert_level=critical,warning,expired')
       if (res.ok) {
         const data = await res.json()
         setAlerts(data.alerts || [])

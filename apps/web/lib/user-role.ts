@@ -6,21 +6,21 @@ export interface RoleMapping {
 const ROLE_MAP: RoleMapping[] = [
   // Conjunto principal (PT-BR)
   { email: 'golffox@admin.com', role: 'admin' },
-  { email: 'operador@empresa.com', role: 'operator' },
-  { email: 'transportadora@trans.com', role: 'carrier' },
+  { email: 'operador@empresa.com', role: 'operador' },
+  { email: 'transportadora@trans.com', role: 'transportadora' },
   { email: 'motorista@trans.com', role: 'driver' },
   { email: 'passageiro@empresa.com', role: 'passenger' },
-  { email: 'teste@transportadora.com', role: 'carrier' },
+  { email: 'teste@transportadora.com', role: 'transportadora' },
 
   // Conjunto alternativo (inglês)
   { email: 'admin@golffox.com', role: 'admin' },
-  { email: 'operator@golffox.com', role: 'operator' },
-  { email: 'carrier@golffox.com', role: 'carrier' },
+  { email: 'operator@golffox.com', role: 'operador' },
+  { email: 'carrier@golffox.com', role: 'transportadora' },
   { email: 'driver@golffox.com', role: 'driver' },
 
   // Variantes antigas
-  { email: 'transportadora@golffox.com', role: 'carrier' },
-  { email: 'operador@golffox.com', role: 'operator' },
+  { email: 'transportadora@golffox.com', role: 'transportadora' },
+  { email: 'operador@golffox.com', role: 'operador' },
 ]
 
 export function getUserRoleByEmail(email: string): string {

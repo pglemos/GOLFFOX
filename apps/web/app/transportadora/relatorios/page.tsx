@@ -29,7 +29,7 @@ interface ReportConfig {
   icon: typeof FileText
 }
 
-export default function CarrierRelatoriosPage() {
+export default function TransportadoraRelatoriosPage() {
   const router = useRouter()
   const [user, setUser] = useState<any>(null)
   const [userData, setUserData] = useState<any>(null)
