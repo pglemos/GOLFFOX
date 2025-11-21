@@ -465,7 +465,7 @@ export async function POST(request: NextRequest) {
         id: userId,
         email: sanitizedEmail,
         name: sanitizedName,
-        role: 'operator',
+        role: 'operador',
         company_id: company_id
       }
     })
