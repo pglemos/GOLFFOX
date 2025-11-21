@@ -56,25 +56,28 @@ export async function middleware(request: NextRequest) {
   }
 
   // ✅ Proteger rotas /operador, /admin e /transportadora com autenticação
-  // A validação completa será feita no lado do cliente e nas rotas API
-  // O middleware apenas verifica se há sessão Supabase ativa
+  // Verificar tanto cookie golffox-session quanto Supabase para compatibilidade
   if (pathname.startsWith('/operador') || pathname.startsWith('/admin') || pathname.startsWith('/transportadora')) {
-    // Verificar se há cookie de sessão do Supabase (validação rápida)
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-    let hasSupabaseSession = false
+    // Verificar cookie golffox-session primeiro (sistema principal)
+    const golffoxSession = request.cookies.get('golffox-session')?.value
+    let hasSession = !!golffoxSession
     
-    if (supabaseUrl) {
-      const projectRef = supabaseUrl.split('//')[1]?.split('.')[0]
-      if (projectRef) {
-        const supabaseCookieName = `sb-${projectRef}-auth-token`
-        const supabaseCookie = request.cookies.get(supabaseCookieName)?.value
-        hasSupabaseSession = !!supabaseCookie
+    // Se não há golffox-session, verificar Supabase como fallback
+    if (!hasSession) {
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+      if (supabaseUrl) {
+        const projectRef = supabaseUrl.split('//')[1]?.split('.')[0]
+        if (projectRef) {
+          const supabaseCookieName = `sb-${projectRef}-auth-token`
+          const supabaseCookie = request.cookies.get(supabaseCookieName)?.value
+          hasSession = !!supabaseCookie
+        }
       }
     }
     
-    // Se não há sessão Supabase, redirecionar para login
+    // Se não há nenhuma sessão, redirecionar para login
     // A validação completa será feita no cliente e nas APIs
-    if (!hasSupabaseSession) {
+    if (!hasSession) {
       const loginUrl = new URL('/', request.url)
       loginUrl.searchParams.set('next', pathname)
       return NextResponse.redirect(loginUrl)
@@ -88,28 +91,12 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  // ✅ Redirecionar raiz com ?next= quando há sessão Supabase válida
-  // A validação completa será feita no cliente
-  if (pathname === '/' && searchParams.has('next')) {
-    const nextRaw = searchParams.get('next') || ''
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-    let hasSupabaseSession = false
-    
-    if (supabaseUrl && nextRaw.startsWith('/')) {
-      const projectRef = supabaseUrl.split('//')[1]?.split('.')[0]
-      if (projectRef) {
-        const supabaseCookieName = `sb-${projectRef}-auth-token`
-        const supabaseCookie = request.cookies.get(supabaseCookieName)?.value
-        hasSupabaseSession = !!supabaseCookie
-      }
-      
-      // Se há sessão Supabase, permitir redirecionamento
-      // A validação completa será feita no cliente
-      if (hasSupabaseSession) {
-        const nextPath = new URL(nextRaw, request.url)
-        return NextResponse.redirect(nextPath)
-      }
-    }
+  // ✅ Permitir que a página de login (raiz) gerencie seus próprios redirecionamentos
+  // Não interferir na raiz para evitar loops de redirecionamento
+  // A página de login verifica o cookie golffox-session e redireciona apropriadamente
+  if (pathname === '/') {
+    // Não fazer nada na raiz - deixar a página de login gerenciar
+    return NextResponse.next()
   }
 
   return response
