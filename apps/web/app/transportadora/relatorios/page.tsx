@@ -92,7 +92,7 @@ export default function TransportadoraRelatoriosPage() {
         .single()
 
       setUser({ ...session.user })
-      setUserData(data ? { ...data, carrier_id: data.transportadora_id } : null)
+      setUserData(data || null)
       setLoading(false)
     }
     getUser()
