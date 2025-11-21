@@ -429,13 +429,13 @@ export function Sidebar({ isOpen = true, isMobile = false, panel = 'admin', user
     ? transportadoraMenuItems 
     : adminMenuItems
 
-  // Estado interno para controle de hover no desktop
-  const [internalOpen, setInternalOpen] = React.useState(false)
-  
-  // Em mobile, usar o estado controlado externamente (isOpen)
-  // Em desktop, usar estado interno para animação de hover (não passar isOpen)
-  const open = isMobile ? (isOpen ?? false) : internalOpen
-  const setOpen = isMobile ? (() => {}) : setInternalOpen
+  // Estado interno para controle de hover (desktop) e toggle (mobile)
+  const [internalOpen, setInternalOpen] = React.useState(isOpen)
+
+  // Sincronização com controle externo (mobile)
+  useEffect(() => {
+    setInternalOpen(isOpen)
+  }, [isOpen])
 
   const router = useRouter()
 
@@ -457,8 +457,8 @@ export function Sidebar({ isOpen = true, isMobile = false, panel = 'admin', user
   // Em mobile, passar ambos para controle externo
   return (
     <UISidebar 
-      open={isMobile ? open : undefined} 
-      setOpen={isMobile ? setOpen : undefined} 
+      open={internalOpen} 
+      setOpen={setInternalOpen} 
       animate={true}
       isMobile={isMobile}
     >
