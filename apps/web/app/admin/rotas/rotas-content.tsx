@@ -249,114 +249,127 @@ export function RotasPageContent() {
                         variant="outline"
                         size="sm"
                         className="flex-1"
-                        notifyError(error, `Erro: ${error.message}`, {i18n: {ns: 'common', key: 'errors.generatePoints' } })
+                        onClick={async () => {
+                          try {
+                            const resp = await fetch('/api/admin/generate-stops', {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({ routeId: rota.id, dbSave: true }),
+                              credentials: 'include'
+                            })
+                            const data = await resp.json()
+                            if (!resp.ok) throw new Error(data?.error || 'Erro ao gerar pontos')
+                            notifySuccess('', { i18n: { ns: 'common', key: 'success.pointsGeneratedSaved' } })
+                            await loadRotas()
+                          } catch (error: any) {
+                            notifyError(error, `Erro: ${error.message}`, { i18n: { ns: 'common', key: 'errors.generatePoints' } })
                           }
                         }}
                       >
-                      <Sparkles className="h-4 w-4 mr-2" />
-                      Gerar Pontos
-                    </Button>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="flex-1"
-                      onClick={async () => {
-                        try {
-                          const response = await fetch(`/api/admin/optimize-route?routeId=${rota.id}`, {
-                            method: 'POST'
+                        <Sparkles className="h-4 w-4 mr-2" />
+                        Gerar Pontos
+                      </Button>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="flex-1"
+                        onClick={async () => {
+                          try {
+                            const response = await fetch(`/api/admin/optimize-route?routeId=${rota.id}`, {
+                              method: 'POST'
+                            })
+                            if (!response.ok) throw new Error('Erro ao otimizar')
+                            notifySuccess('', { i18n: { ns: 'common', key: 'success.routeOptimized' } })
+                            loadRotas()
+                          } catch (error: any) {
+                            notifyError(error, `Erro: ${error.message}`, { i18n: { ns: 'common', key: 'errors.optimizeRoute' } })
+                          }
+                        }}
+                      >
+                        <Navigation className="h-4 w-4 mr-2" />
+                        Otimizar
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="flex-1"
+                        onClick={() => {
+                          // Buscar coordenadas da rota para deep-link
+                          const center = rota.origin_lat && rota.origin_lng
+                            ? { lat: rota.origin_lat, lng: rota.origin_lng }
+                            : null
+                          const zoom = 14
+
+                          const params = new URLSearchParams({
+                            route: rota.id,
+                            ...(center ? { lat: center.lat.toString(), lng: center.lng.toString(), zoom: zoom.toString() } : {})
                           })
-                          if (!response.ok) throw new Error('Erro ao otimizar')
-                          notifySuccess('', { i18n: { ns: 'common', key: 'success.routeOptimized' } })
-                          loadRotas()
-                        } catch (error: any) {
-                          notifyError(error, `Erro: ${error.message}`, { i18n: { ns: 'common', key: 'errors.optimizeRoute' } })
-                        }
-                      }}
-                    >
-                      <Navigation className="h-4 w-4 mr-2" />
-                      Otimizar
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="flex-1"
-                      onClick={() => {
-                        // Buscar coordenadas da rota para deep-link
-                        const center = rota.origin_lat && rota.origin_lng
-                          ? { lat: rota.origin_lat, lng: rota.origin_lng }
-                          : null
-                        const zoom = 14
 
-                        const params = new URLSearchParams({
-                          route: rota.id,
-                          ...(center ? { lat: center.lat.toString(), lng: center.lng.toString(), zoom: zoom.toString() } : {})
-                        })
-
-                        router.push(`/admin/mapa?${params.toString()}`)
-                      }}
-                    >
-                      <MapPin className="h-4 w-4 mr-2" />
-                      Ver no Mapa
-                    </Button>
+                          router.push(`/admin/mapa?${params.toString()}`)
+                        }}
+                      >
+                        <MapPin className="h-4 w-4 mr-2" />
+                        Ver no Mapa
+                      </Button>
+                    </div>
+                    <div className="mt-2">
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        className="w-full"
+                        onClick={() => handleDeleteRota(rota.id, rota.name || 'Rota')}
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Excluir
+                      </Button>
+                    </div>
                   </div>
-                  <div className="mt-2">
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      className="w-full"
-                      onClick={() => handleDeleteRota(rota.id, rota.name || 'Rota')}
-                    >
-                      <Trash2 className="h-4 w-4 mr-2" />
-                      Excluir
-                    </Button>
-                  </div>
-                </div>
-              </Card>
+                </Card>
               </motion.div>
             ))}
+          </div>
+
+          {filteredRotas.length === 0 && (
+            <div className="text-center py-12">
+              <Route className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 mb-2">Nenhuma rota encontrada</h3>
+              <p className="text-gray-600 mb-4">
+                {searchQuery ? "Tente ajustar sua busca" : "Comece criando sua primeira rota"}
+              </p>
+              <Button onClick={() => {
+                setSelectedRoute(null)
+                setIsModalOpen(true)
+              }}>
+                <Plus className="h-4 w-4 mr-2" />
+                Nova Rota
+              </Button>
+            </div>
+          )}
         </div>
 
-        {filteredRotas.length === 0 && (
-          <div className="text-center py-12">
-            <Route className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">Nenhuma rota encontrada</h3>
-            <p className="text-gray-600 mb-4">
-              {searchQuery ? "Tente ajustar sua busca" : "Comece criando sua primeira rota"}
-            </p>
-            <Button onClick={() => {
-              setSelectedRoute(null)
-              setIsModalOpen(true)
-            }}>
-              <Plus className="h-4 w-4 mr-2" />
-              Nova Rota
-            </Button>
-          </div>
-        )}
-      </div>
-
-      {/* Modal de Rota */}
-      <RouteModal
-        route={selectedRoute}
-        isOpen={isModalOpen}
-        onClose={() => {
-          setIsModalOpen(false)
-          setSelectedRoute(null)
-        }}
-        onSave={() => {
-          loadRotas()
-          setIsModalOpen(false)
-          setSelectedRoute(null)
-        }}
-        onGenerateStops={async (routeId) => {
-          await loadRotas()
-        }}
-        onOptimize={async (routeId) => {
-          await loadRotas()
-        }}
-      />
-    </TransitionOverlay>
+        {/* Modal de Rota */}
+        <RouteModal
+          route={selectedRoute}
+          isOpen={isModalOpen}
+          onClose={() => {
+            setIsModalOpen(false)
+            setSelectedRoute(null)
+          }}
+          onSave={() => {
+            loadRotas()
+            setIsModalOpen(false)
+            setSelectedRoute(null)
+          }}
+          onGenerateStops={async (routeId) => {
+            await loadRotas()
+          }}
+          onOptimize={async (routeId) => {
+            await loadRotas()
+          }}
+        />
+      </TransitionOverlay>
     </AppShell >
   )
 }
