@@ -140,11 +140,11 @@ export function CreateTransportadoraModal({ isOpen, onClose, onSave }: CreateTra
             </div>
             <div>
               <Label htmlFor="email" className="text-base font-medium">E-mail</Label>
-              <Input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="contato@transportadora.com" className="text-base min_h-[44px] h-11 sm:h-12 px-4 py-3" />
+              <Input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="contato@transportadora.com" className="text-base min-h-[44px] h-11 sm:h-12 px-4 py-3" />
             </div>
             <div className="col-span-1 sm:col-span-2">
               <Label htmlFor="address" className="text-base font-medium">Endereço Completo</Label>
-              <Input id="address" value={address} onChange={e => setAddress(e.target.value)} placeholder="Rua, número, bairro, cidade - UF, CEP" className="text-base min_h-[44px] h-11 sm:h-12 px-4 py-3" />
+              <Input id="address" value={address} onChange={e => setAddress(e.target.value)} placeholder="Rua, número, bairro, cidade - UF, CEP" className="text-base min-h-[44px] h-11 sm:h-12 px-4 py-3" />
             </div>
           </div>
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-2 justify-end pt-4 sm:pt-6 border-t mt-4 sm:mt-6">
@@ -158,6 +158,3 @@ export function CreateTransportadoraModal({ isOpen, onClose, onSave }: CreateTra
     </Dialog>
   )
 }
-
-// Export com nome alternativo para compatibilidade
-export const CreateTransportadoraModal = CreateTransportadoraModal;
