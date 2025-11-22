@@ -3,6 +3,7 @@ import { Stat } from "@/components/ui/Stat"
 import { Users, Truck, Navigation, AlertCircle, Target, Gauge } from "lucide-react"
 import { formatCount } from "@/lib/kpi-utils"
 import { staggerContainer, listItem } from "@/lib/animations"
+import { t } from '@/lib/i18n'
 
 interface DashboardKPIsProps {
     kpis: {
@@ -26,49 +27,55 @@ export function DashboardKPIs({ kpis }: DashboardKPIsProps) {
             <motion.div variants={listItem}>
                 <Stat
                     icon={Users}
-                    label="Colaboradores em Trânsito"
+                    label={t('admin', 'dashboard.kpis.employeesInTransit')}
                     value={formatCount(kpis.employees_in_transit)}
-                    hint="Ativo agora"
+                    hint={t('admin', 'dashboard.kpis.activeNow')}
                 />
             </motion.div>
             <motion.div variants={listItem}>
                 <Stat
                     icon={Truck}
-                    label="Veículos Ativos"
+                    label={t('admin', 'dashboard.kpis.activeVehicles')}
                     value={formatCount(kpis.vehicles_active)}
-                    hint="Em rota"
+                    hint={t('admin', 'dashboard.kpis.onRoute')}
                 />
             </motion.div>
             <motion.div variants={listItem}>
                 <Stat
                     icon={Navigation}
-                    label="Rotas do Dia"
+                    label={t('admin', 'dashboard.kpis.routesToday')}
                     value={formatCount(kpis.routes_today)}
-                    hint="Hoje"
+                    hint={t('admin', 'dashboard.kpis.today')}
                 />
             </motion.div>
             <motion.div variants={listItem}>
                 <Stat
                     icon={AlertCircle}
-                    label="Alertas Críticos"
+                    label={t('admin', 'dashboard.kpis.criticalAlerts')}
                     value={formatCount(kpis.critical_alerts)}
-                    hint="Atenção necessária"
+                    hint={t('admin', 'dashboard.kpis.attentionNeeded')}
                 />
             </motion.div>
             <motion.div variants={listItem}>
                 <Stat
                     icon={Target}
-                    label="Eficiência de Rotas"
+                    label={t('admin', 'dashboard.kpis.routeEfficiency')}
                     value={`${kpis.routeEfficiency}%`}
-                    hint="Taxa de conclusão"
+                    hint={t('admin', 'dashboard.kpis.completionRate')}
                 />
             </motion.div>
             <motion.div variants={listItem}>
                 <Stat
                     icon={Gauge}
-                    label="Saúde do Sistema"
+                    label={t('admin', 'dashboard.kpis.systemHealth')}
                     value={`${kpis.systemHealth}%`}
-                    hint={kpis.systemHealth >= 80 ? "Ótimo" : kpis.systemHealth >= 60 ? "Bom" : "Atenção"}
+                    hint={
+                        kpis.systemHealth >= 80
+                            ? t('admin', 'dashboard.kpis.great')
+                            : kpis.systemHealth >= 60
+                                ? t('admin', 'dashboard.kpis.good')
+                                : t('admin', 'dashboard.kpis.attention')
+                    }
                 />
             </motion.div>
         </motion.div>
