@@ -1,12 +1,14 @@
 import common from '@/i18n/common.json'
 import operator from '@/i18n/operator.json'
+import admin from '@/i18n/admin.json'
 
-type Namespace = 'common' | 'operator'
+type Namespace = 'common' | 'operator' | 'admin'
 
 // Aceitar objetos aninhados vindos dos JSONs
 const dictionaries: Record<Namespace, Record<string, unknown>> = {
   common: common as Record<string, unknown>,
   operator: operator as Record<string, unknown>,
+  admin: admin as Record<string, unknown>,
 }
 
 function interpolate(template: string, params?: Record<string, string | number>): string {

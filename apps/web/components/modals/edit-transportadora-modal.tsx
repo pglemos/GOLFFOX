@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { notifySuccess, notifyError } from "@/lib/toast"
+import { supabase } from "@/lib/supabase"
 
 interface EditCarrierModalProps {
   carrier: any
@@ -43,9 +44,22 @@ export function EditCarrierModal({ carrier, isOpen, onClose, onSave }: EditCarri
     setLoading(true)
 
     try {
+      // ✅ BUG #4 FIX: Adicionar autenticação via token
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+
+      if (sessionError || !session?.access_token) {
+        notifyError(new Error('Sessão expirada'), 'Sessão expirada. Por favor, faça login novamente.')
+        setLoading(false)
+        return
+      }
+
       const response = await fetch(`/api/admin/transportadora/update?id=${carrier.id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+        },
+        credentials: 'include',
         body: JSON.stringify({
           name,
           address: address || null,
@@ -58,21 +72,61 @@ export function EditCarrierModal({ carrier, isOpen, onClose, onSave }: EditCarri
         })
       })
 
-      const result = await response.json()
-
+      // ✅ BUG #4 FIX: Melhorar feedback de erros
       if (!response.ok) {
-        throw new Error(result.error || 'Erro ao atualizar transportadora')
+        let errorMessage = 'Erro ao atualizar transportadora'
+        let errorDetails = ''
+
+        try {
+          const errorData = await response.json()
+          errorMessage = errorData.error || errorData.message || errorMessage
+          errorDetails = errorData.details ? JSON.stringify(errorData.details) : ''
+
+          console.error('❌ Erro da API update-transportadora:', {
+            status: response.status,
+            statusText: response.statusText,
+            errorData
+          })
+        } catch (parseError) {
+          console.error('❌ Erro da API (sem JSON):', {
+            status: response.status,
+            statusText: response.statusText
+          })
+        }
+
+        // Mensagens específicas por status code
+        if (response.status === 401) {
+          errorMessage = 'Sessão expirada. Por favor, faça login novamente.'
+        } else if (response.status === 403) {
+          errorMessage = 'Você não tem permissão para editar transportadoras. Contacte o administrador.'
+        } else if (response.status === 404) {
+          errorMessage = 'Transportadora não encontrada.'
+        } else if (response.status === 400) {
+          errorMessage = errorDetails ? `Dados inválidos: ${errorDetails}` : errorMessage
+        } else if (response.status === 500) {
+          errorMessage = errorDetails ? `Erro no servidor: ${errorMessage}\n\n${errorDetails}` : `Erro no servidor: ${errorMessage}`
+        }
+
+        notifyError(new Error(errorMessage), errorMessage)
+        setLoading(false)
+        // ❌ NÃO fechar modal - deixar usuário ver erro
+        return
       }
 
+      const result = await response.json()
+
       if (result.success) {
-        notifySuccess('Transportadora atualizada com sucesso')
+        notifySuccess('Transportadora atualizada com sucesso!')
         onSave()
+        // Fechar modal apenas em sucesso
+        setTimeout(() => onClose(), 1500)
       } else {
         throw new Error(result.error || 'Erro ao atualizar transportadora')
       }
     } catch (error: any) {
-      console.error('Erro ao atualizar transportadora:', error)
+      console.error('❌ Exceção ao atualizar transportadora:', error)
       notifyError(error, error.message || 'Erro ao atualizar transportadora')
+      //❌ NÃO fechar modal em erro
     } finally {
       setLoading(false)
     }
@@ -173,17 +227,17 @@ export function EditCarrierModal({ carrier, isOpen, onClose, onSave }: EditCarri
             </div>
           </div>
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-2 justify-end pt-4 sm:pt-6 border-t mt-4 sm:mt-6">
-            <Button 
-              type="button" 
-              variant="outline" 
-              onClick={onClose} 
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onClose}
               disabled={loading}
               className="w-full sm:w-auto order-2 sm:order-1 min-h-[44px] text-base font-medium"
             >
               Cancelar
             </Button>
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
               disabled={loading || !name}
               className="w-full sm:w-auto order-1 sm:order-2 bg-orange-500 hover:bg-orange-600 min-h-[44px] text-base font-medium"
             >

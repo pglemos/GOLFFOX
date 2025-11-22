@@ -61,59 +61,92 @@ export function ChangeRoleModal({
 
     try {
       if (!newRole || newRole === user.role) {
-        notifyError("Selecione um papel diferente")
+        notifyError(new Error("Papel inválido"), "Selecione um papel diferente")
+        setLoading(false)
         return
       }
 
-      // Validação: admin não pode perder papel admin (ou apenas outro admin pode)
-      if (user.role === 'admin' && newRole !== 'admin') {
-        const { data: { session } } = await supabase.auth.getSession()
-        const currentUser = session?.user
-        // Verificar se o usuário atual é admin
-        const { data: currentUserData } = await (supabase as any)
-          .from('users')
-          .select('role')
-          .eq('id', currentUser?.id || '')
-          .single()
+      // ✅ BUG #5 FIX: Usar API route em vez de client-side Supabase
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession()
 
-        if (currentUserData?.role !== 'admin') {
-          notifyError("Apenas administradores podem alterar o papel de outros administradores")
-          return
-        }
+      if (sessionError || !session?.access_token) {
+        notifyError(new Error('Sessão expirada'), 'Sessão expirada. Por favor, faça login novamente.')
+        setLoading(false)
+        return
       }
 
-      const { error } = await (supabase as any)
-        .from("users")
-        .update({ role: newRole })
-        .eq("id", user.id)
-
-      if (error) throw error
-
-      // Sincronização com Supabase (garantia adicional)
-      await sync({
-        resourceType: 'driver', // ou 'operator' dependendo do papel
-        resourceId: user.id,
-        action: 'update',
-        data: {
-          role: newRole,
-          email: user.email,
-          name: user.name,
+      const response = await fetch('/api/admin/users/change-role', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
         },
+        credentials: 'include',
+        body: JSON.stringify({
+          userId: user.id,
+          newRole: newRole,
+          oldRole: user.role
+        })
       })
 
-      // Log de auditoria
-      await auditLogs.update('user', user.id, {
-        old_role: user.role,
-        new_role: newRole,
-        user_email: user.email,
-      })
+      // Melhor tratamento de erros
+      if (!response.ok) {
+        let errorMessage = 'Erro ao alterar papel'
 
-      notifySuccess("Papel alterado com sucesso!")
-      onSave()
-      onClose()
+        try {
+          const errorData = await response.json()
+          errorMessage = errorData.error || errorData.message || errorMessage
+
+          console.error('❌ Erro da API change-role:', {
+            status: response.status,
+            statusText: response.statusText,
+            errorData
+          })
+        } catch (parseError) {
+          console.error('❌ Erro da API (sem JSON):', response.status)
+        }
+
+        // Mensagens específicas
+        if (response.status === 401) {
+          errorMessage = 'Sessão expirada. Por favor, faça login novamente.'
+        } else if (response.status === 403) {
+          errorMessage = 'Você não tem permissão para alterar papéis. Apenas administradores.'
+        } else if (response.status === 404) {
+          errorMessage = 'Usuário não encontrado.'
+        } else if (response.status === 400) {
+          errorMessage = errorMessage // Já vem da API
+        }
+
+        notifyError(new Error(errorMessage), errorMessage)
+        setLoading(false)
+        return
+      }
+
+      const result = await response.json()
+
+      if (result.success) {
+        notifySuccess(result.message || "Papel alterado com sucesso!")
+
+        // Sincronização com Supabase (garantia adicional)
+        await sync({
+          resourceType: 'driver',
+          resourceId: user.id,
+          action: 'update',
+          data: {
+            role: newRole,
+            email: user.email,
+            name: user.name,
+          },
+        })
+
+        onSave()
+        setTimeout(() => onClose(), 1500)
+      } else {
+        throw new Error(result.error || 'Erro ao alterar papel')
+      }
     } catch (error: any) {
-      console.error("Erro ao alterar papel:", error)
-      notifyError(formatError(error, "Erro ao alterar papel"))
+      console.error("❌ Exceção ao alterar papel:", error)
+      notifyError(error, error.message || "Erro ao alterar papel")
     } finally {
       setLoading(false)
     }
@@ -159,24 +192,24 @@ export function ChangeRoleModal({
             <div className="flex items-start gap-2 p-3 bg-orange-50 border border-orange-200 rounded-lg">
               <AlertTriangle className="h-4 w-4 text-orange-600 mt-0.5" />
               <p className="text-sm text-orange-800">
-                Atenção: Você está removendo o papel de administrador deste usuário. 
+                Atenção: Você está removendo o papel de administrador deste usuário.
                 Esta ação requer privilégios de administrador.
               </p>
             </div>
           )}
 
           <DialogFooter className="flex-col sm:flex-row gap-3 pt-4 sm:pt-6 border-t mt-4 sm:mt-6">
-            <Button 
-              type="button" 
-              variant="outline" 
-              onClick={onClose} 
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onClose}
               disabled={loading}
               className="w-full sm:w-auto order-2 sm:order-1 min-h-[44px] text-base font-medium"
             >
               Cancelar
             </Button>
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
               disabled={loading || newRole === user?.role}
               className="w-full sm:w-auto order-1 sm:order-2 bg-orange-500 hover:bg-orange-600 min-h-[44px] text-base font-medium"
             >

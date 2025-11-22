@@ -1,45 +1,25 @@
 "use client"
 
-import { useEffect, useState, useMemo, useCallback } from "react"
+import { useEffect, useState, useMemo } from "react"
 import { AppShell } from "@/components/app-shell"
-import { Stat } from "@/components/ui/Stat"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
-import { 
-  Users, 
-  Truck, 
-  Navigation,
-  AlertCircle,
+import {
   ArrowUpRight,
   MapPin,
   Filter,
   Calendar,
-  Activity,
-  TrendingUp,
-  Plus,
-  Edit,
-  Trash2,
-  Settings,
-  UserPlus,
-  FileText,
-  CheckCircle,
-  XCircle,
-  Clock,
   ChevronDown,
   ChevronUp,
   Save,
   X,
-  Gauge,
-  Target
 } from "lucide-react"
-import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
-import { staggerContainer, listItem } from "@/lib/animations"
-import { formatCount, formatRelativeTime } from "@/lib/kpi-utils"
 import { useAuthFast } from "@/hooks/use-auth-fast"
+import { DashboardKPIs } from "@/components/admin/dashboard/dashboard-kpis"
+import { DashboardAuditLog } from "@/components/admin/dashboard/dashboard-audit-log"
 
 interface KpiData {
   company_id: string
@@ -49,6 +29,8 @@ interface KpiData {
   employees_in_transit: number
   critical_alerts: number
   routes_today: number
+  trips_completed: number
+  trips_in_progress: number
 }
 
 interface AuditLog {
@@ -109,23 +91,23 @@ export default function AdminDashboard() {
         trips_completed: acc.trips_completed + (kpi.trips_completed || 0),
         trips_in_progress: acc.trips_in_progress + (kpi.trips_in_progress || 0),
       }
-    }, { 
-      trips_today: 0, 
-      vehicles_active: 0, 
-      employees_in_transit: 0, 
-      critical_alerts: 0, 
+    }, {
+      trips_today: 0,
+      vehicles_active: 0,
+      employees_in_transit: 0,
+      critical_alerts: 0,
       routes_today: 0,
       trips_completed: 0,
       trips_in_progress: 0,
     })
 
     // Calcular métricas derivadas
-    const routeEfficiency = base.routes_today > 0 
-      ? Math.round((base.trips_completed / base.routes_today) * 100) 
+    const routeEfficiency = base.routes_today > 0
+      ? Math.round((base.trips_completed / base.routes_today) * 100)
       : 0
-    
-    const systemHealth = base.critical_alerts === 0 
-      ? 100 
+
+    const systemHealth = base.critical_alerts === 0
+      ? 100
       : Math.max(0, 100 - (base.critical_alerts * 10))
 
     return {
@@ -198,38 +180,6 @@ export default function AdminDashboard() {
       loadActivities()
     }
   }, [loading])
-
-  // Função para obter ícone por action_type
-  const getActionIcon = (actionType: string) => {
-    const iconMap: Record<string, any> = {
-      'create': Plus,
-      'update': Edit,
-      'delete': Trash2,
-      'approve': CheckCircle,
-      'reject': XCircle,
-      'configure': Settings,
-      'invite': UserPlus,
-      'export': FileText,
-      'login': Activity,
-      'logout': Activity,
-    }
-    return iconMap[actionType.toLowerCase()] || Activity
-  }
-
-  // Função para obter cor por action_type
-  const getActionColor = (actionType: string) => {
-    const colorMap: Record<string, string> = {
-      'create': 'bg-[var(--success)]',
-      'update': 'bg-[var(--brand)]',
-      'delete': 'bg-[var(--error)]',
-      'approve': 'bg-[var(--success)]',
-      'reject': 'bg-[var(--error)]',
-      'configure': 'bg-[var(--brand)]',
-      'invite': 'bg-[var(--brand)]',
-      'export': 'bg-[var(--brand)]',
-    }
-    return colorMap[actionType.toLowerCase()] || 'bg-[var(--brand)]'
-  }
 
   // useAuthFast já cuida da autenticação
 
@@ -368,61 +318,7 @@ export default function AdminDashboard() {
         </Card>
 
         {/* KPIs */}
-        <motion.div
-          variants={staggerContainer}
-          initial="hidden"
-          animate="visible"
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-3 sm:gap-4 lg:gap-6"
-        >
-          <motion.div variants={listItem}>
-            <Stat
-              icon={Users}
-              label="Colaboradores em Trânsito"
-              value={formatCount(aggregatedKpis.employees_in_transit)}
-              hint="Ativo agora"
-            />
-          </motion.div>
-          <motion.div variants={listItem}>
-            <Stat
-              icon={Truck}
-              label="Veículos Ativos"
-              value={formatCount(aggregatedKpis.vehicles_active)}
-              hint="Em rota"
-            />
-          </motion.div>
-          <motion.div variants={listItem}>
-            <Stat
-              icon={Navigation}
-              label="Rotas do Dia"
-              value={formatCount(aggregatedKpis.routes_today)}
-              hint="Hoje"
-            />
-          </motion.div>
-          <motion.div variants={listItem}>
-            <Stat
-              icon={AlertCircle}
-              label="Alertas Críticos"
-              value={formatCount(aggregatedKpis.critical_alerts)}
-              hint="Atenção necessária"
-            />
-          </motion.div>
-          <motion.div variants={listItem}>
-            <Stat
-              icon={Target}
-              label="Eficiência de Rotas"
-              value={`${aggregatedKpis.routeEfficiency}%`}
-              hint="Taxa de conclusão"
-            />
-          </motion.div>
-          <motion.div variants={listItem}>
-            <Stat
-              icon={Gauge}
-              label="Saúde do Sistema"
-              value={`${aggregatedKpis.systemHealth}%`}
-              hint={aggregatedKpis.systemHealth >= 80 ? "Ótimo" : aggregatedKpis.systemHealth >= 60 ? "Bom" : "Atenção"}
-            />
-          </motion.div>
-        </motion.div>
+        <DashboardKPIs kpis={aggregatedKpis} />
 
         {/* Cards de Ação Rápida */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 lg:gap-6">
@@ -432,7 +328,7 @@ export default function AdminDashboard() {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.5 }}
           >
-              <a href="/admin/mapa" className="block h-full">
+            <a href="/admin/mapa" className="block h-full">
               <Card hover className="card-glass cursor-pointer h-full overflow-hidden">
                 <CardHeader className="pb-4 px-3 sm:px-6">
                   <div className="flex items-start justify-between gap-2">
@@ -492,64 +388,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* Atividades Recentes */}
-        <div>
-          <Card className="overflow-hidden">
-            <CardHeader className="pb-4 px-3 sm:px-6">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
-                <div className="flex-1 min-w-0">
-                  <CardTitle className="text-lg sm:text-xl font-semibold mb-1.5">Atividades Recentes</CardTitle>
-                  <p className="text-xs sm:text-sm text-[var(--ink-muted)]">Histórico de ações do sistema</p>
-                </div>
-                <Button variant="ghost" size="sm" className="w-full sm:w-auto min-h-[44px] touch-manipulation">
-                  Ver todas
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent className="pt-0 px-3 sm:px-6">
-              {activitiesLoading ? (
-                <div className="p-12 text-center text-[var(--ink-muted)]">
-                  <div className="w-8 h-8 border-2 border-[var(--brand)] border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
-                  <p className="text-sm">Carregando atividades...</p>
-                </div>
-              ) : auditLogs.length === 0 ? (
-                <div className="p-12 text-center text-[var(--ink-muted)]">
-                  <p className="text-sm">Nenhuma atividade recente</p>
-                </div>
-              ) : (
-                <div className="divide-y divide-[var(--border)]">
-                  {auditLogs.map((log) => {
-                    const ActionIcon = getActionIcon(log.action_type)
-                    const actionColor = getActionColor(log.action_type)
-                    const resourceName = log.resource_type 
-                      ? `${log.resource_type}${log.resource_id ? ` #${log.resource_id.slice(0, 8)}` : ''}`
-                      : 'Sistema'
-                    const actionText = log.action_type 
-                      ? log.action_type.charAt(0).toUpperCase() + log.action_type.slice(1).toLowerCase()
-                      : 'Ação'
-                    
-                    return (
-                      <div key={log.id} className="p-3 sm:p-4 hover:bg-[var(--bg-hover)] active:bg-[var(--bg-hover)] transition-colors flex items-center gap-2 sm:gap-4 group touch-manipulation">
-                        <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg ${actionColor} flex items-center justify-center flex-shrink-0 shadow-sm group-hover:scale-105 transition-transform`}>
-                          <ActionIcon className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="font-semibold text-xs sm:text-sm text-[var(--ink-strong)] truncate">
-                            {actionText}: {resourceName}
-                          </p>
-                          <p className="text-xs text-[var(--ink-muted)] truncate mt-0.5">
-                            {formatRelativeTime(log.created_at)}
-                            {log.details?.companyId && ` • Empresa: ${log.details.companyId.slice(0, 8)}`}
-                          </p>
-                        </div>
-                        <Badge variant="outline" className="text-xs flex-shrink-0 hidden sm:inline-flex">{log.action_type}</Badge>
-                      </div>
-                    )
-                  })}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
+        <DashboardAuditLog logs={auditLogs} loading={activitiesLoading} />
       </div>
     </AppShell>
   )

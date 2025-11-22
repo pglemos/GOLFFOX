@@ -1,0 +1,57 @@
+{
+    "dashboard": {
+        "kpis": {
+            "employeesInTransit": "Colaboradores em Trânsito",
+            "activeNow": "Ativo agora",
+            "activeVehicles": "Veículos Ativos",
+            "onRoute": "Em rota",
+            "routesToday": "Rotas do Dia",
+            "today": "Hoje",
+            "criticalAlerts": "Alertas Críticos",
+            "attentionNeeded": "Atenção necessária",
+            "routeEfficiency": "Eficiência de Rotas",
+            "completionRate": "Taxa de conclusão",
+            "systemHealth": "Saúde do Sistema",
+            "great": "Ótimo",
+            "good": "Bom",
+            "attention": "Atenção"
+        },
+        "auditLog": {
+            "title": "Atividades Recentes",
+            "subtitle": "Histórico de ações do sistema",
+            "viewAll": "Ver todas",
+            "loading": "Carregando atividades...",
+            "empty": "Nenhuma atividade recente",
+            "system": "Sistema",
+            "action": "Ação",
+            "company": "Empresa"
+        },
+        "notifications": {
+            "title": "Notificações Recentes",
+            "subtitle": "Últimas atualizações do sistema",
+            "alertPrefix": "Alerta #{id}",
+            "timeAgo": "Há {time}"
+        },
+        "map": {
+            "title": "Mapa da Frota",
+            "subtitle": "Visualize veículos em tempo real"
+        },
+        "filters": {
+            "title": "Filtros",
+            "minimize": "Minimizar",
+            "close": "Fechar",
+            "expand": "Expandir",
+            "open": "Abrir",
+            "companyLabel": "Empresa",
+            "companyPlaceholder": "Todas as empresas",
+            "dateLabel": "Data",
+            "shiftLabel": "Turno",
+            "allShifts": "Todos os turnos",
+            "morning": "Manhã",
+            "afternoon": "Tarde",
+            "night": "Noite",
+            "clear": "Limpar",
+            "save": "Salvar Filtros"
+        }
+    }
+}

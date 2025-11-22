@@ -7,16 +7,16 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { 
-  AlertTriangle, 
-  Search, 
+import {
+  AlertTriangle,
+  Search,
   Filter,
   ChevronDown,
   ChevronUp,
   Save,
   X,
-  CheckCircle, 
-  User, 
+  CheckCircle,
+  User,
   Download,
   XCircle,
   Trash2
@@ -109,7 +109,7 @@ export default function AlertasPage() {
       if (filterStatus !== "all") {
         params.append('status', filterStatus)
       }
-      
+
       const response = await fetch(`/api/admin/alerts-list?${params.toString()}`)
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
@@ -134,7 +134,7 @@ export default function AlertasPage() {
     let filtered = alertas
     if (debouncedSearchQuery) {
       const query = debouncedSearchQuery.toLowerCase()
-      filtered = filtered.filter(a => 
+      filtered = filtered.filter(a =>
         a.message?.toLowerCase().includes(query) ||
         a.description?.toLowerCase().includes(query) ||
         a.type?.toLowerCase().includes(query) ||
@@ -154,9 +154,9 @@ export default function AlertasPage() {
       const response = await fetch(`/api/admin/alerts/delete?id=${alertaId}`, {
         method: 'DELETE'
       })
-      
+
       const result = await response.json()
-      
+
       if (!response.ok) {
         const errorMessage = result.message || result.error || 'Erro ao excluir alerta'
         const errorDetails = result.details ? ` (${result.details})` : ''
@@ -182,49 +182,52 @@ export default function AlertasPage() {
       const { data: { session } } = await supabase.auth.getSession()
       if (!session) throw new Error('Não autenticado')
 
-      const { error } = await supabase
-        .from("gf_incidents")
-        .update({ 
+      const response = await fetch('/api/admin/alerts/update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: alertaId,
           status: 'resolved',
           resolved_at: new Date().toISOString(),
           resolved_by: session.user.id
         })
-        .eq("id", alertaId)
-
-      if (error) throw error
-
-      // Log de auditoria
-      await supabase.from('gf_audit_log').insert({
-        actor_id: session.user.id,
-        action_type: 'resolve',
-        resource_type: 'incident',
-        resource_id: alertaId,
-        details: { severity: 'resolved' }
       })
+
+      const result = await response.json()
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Erro ao resolver alerta')
+      }
 
       notifySuccess('', { i18n: { ns: 'common', key: 'success.alertResolved' } })
       loadAlertas()
     } catch (error: any) {
-      notifyError(error, 'Erro inesperado')
+      notifyError(error, 'Erro ao resolver alerta')
     }
   }
 
   const handleAssign = async (alertaId: string, userId: string) => {
     try {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (!session) throw new Error('Não autenticado')
+      const response = await fetch('/api/admin/alerts/update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: alertaId,
+          assigned_to: userId,
+          status: 'assigned' // Opcional: mudar status para assigned automaticamente
+        })
+      })
 
-      const { error } = await supabase
-        .from("gf_incidents")
-        .update({ assigned_to: userId })
-        .eq("id", alertaId)
+      const result = await response.json()
 
-      if (error) throw error
+      if (!response.ok) {
+        throw new Error(result.error || 'Erro ao atribuir alerta')
+      }
 
       notifySuccess('', { i18n: { ns: 'common', key: 'success.alertAssigned' } })
       loadAlertas()
     } catch (error: any) {
-      notifyError(error, 'Erro inesperado')
+      notifyError(error, 'Erro ao atribuir alerta')
     }
   }
 
@@ -315,14 +318,14 @@ export default function AlertasPage() {
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-4">
                 <div className="relative w-full sm:flex-1 min-w-0">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--ink-muted)] pointer-events-none" />
-                  <Input 
-                    placeholder="Buscar alertas..." 
+                  <Input
+                    placeholder="Buscar alertas..."
                     className="pl-10 w-full min-h-[44px]"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />
                 </div>
-                <select 
+                <select
                   className="px-3 py-2 rounded-lg border border-[var(--border)] bg-white text-sm w-full sm:w-auto min-h-[44px] touch-manipulation"
                   value={tempFilterSeverity}
                   onChange={(e) => setTempFilterSeverity(e.target.value)}
@@ -332,7 +335,7 @@ export default function AlertasPage() {
                   <option value="warning">Aviso</option>
                   <option value="info">Info</option>
                 </select>
-                <select 
+                <select
                   className="px-3 py-2 rounded-lg border border-[var(--border)] bg-white text-sm w-full sm:w-auto min-h-[44px] touch-manipulation"
                   value={tempFilterStatus}
                   onChange={(e) => setTempFilterStatus(e.target.value)}
@@ -387,29 +390,28 @@ export default function AlertasPage() {
                 <Card className="p-3 sm:p-4 hover:shadow-lg transition-shadow overflow-hidden">
                   <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
                     <div className="flex gap-3 sm:gap-4 flex-1 min-w-0">
-                      <AlertTriangle 
-                        className={`h-5 w-5 mt-1 flex-shrink-0 ${
-                          alerta.severity === 'critical' ? 'text-red-500' : 
-                          alerta.severity === 'warning' ? 'text-orange-500' : 
-                          'text-blue-500'
-                        }`} 
+                      <AlertTriangle
+                        className={`h-5 w-5 mt-1 flex-shrink-0 ${alerta.severity === 'critical' ? 'text-red-500' :
+                            alerta.severity === 'warning' ? 'text-orange-500' :
+                              'text-blue-500'
+                          }`}
                       />
                       <div className="flex-1 min-w-0">
                         <div className="flex flex-wrap items-center gap-2 mb-2">
-                          <Badge 
+                          <Badge
                             variant={
-                              alerta.severity === 'critical' ? 'destructive' : 
-                              alerta.severity === 'warning' ? 'default' : 
-                              'secondary'
+                              alerta.severity === 'critical' ? 'destructive' :
+                                alerta.severity === 'warning' ? 'default' :
+                                  'secondary'
                             }
                             className="text-xs"
                           >
                             {alerta.severity}
                           </Badge>
                           <Badge variant={alerta.status === 'resolved' ? 'secondary' : 'outline'} className="text-xs">
-                            {alerta.status === 'open' ? 'Aberto' : 
-                             alerta.status === 'assigned' ? 'Atribuído' : 
-                             'Resolvido'}
+                            {alerta.status === 'open' ? 'Aberto' :
+                              alerta.status === 'assigned' ? 'Atribuído' :
+                                'Resolvido'}
                           </Badge>
                           <span className="text-xs sm:text-sm text-[var(--ink-muted)] break-words">
                             {new Date(alerta.created_at).toLocaleString('pt-BR')}
@@ -433,7 +435,7 @@ export default function AlertasPage() {
                       </div>
                     </div>
                     <div className="grid grid-cols-2 sm:flex sm:flex-col gap-2 w-full sm:w-auto">
-                      <Button 
+                      <Button
                         variant="outline"
                         size="sm"
                         onClick={() => {
@@ -445,7 +447,7 @@ export default function AlertasPage() {
                         <Edit className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                         <span className="truncate">Editar</span>
                       </Button>
-                      <Button 
+                      <Button
                         variant="destructive"
                         size="sm"
                         onClick={() => handleDeleteAlerta(alerta.id)}
@@ -456,8 +458,8 @@ export default function AlertasPage() {
                       </Button>
                       {alerta.status !== 'resolved' && (
                         <>
-                          <Button 
-                            size="sm" 
+                          <Button
+                            size="sm"
                             variant="outline"
                             onClick={() => handleResolve(alerta.id)}
                             className="col-span-2 sm:col-span-1 text-xs sm:text-sm min-h-[44px] touch-manipulation"
@@ -465,8 +467,8 @@ export default function AlertasPage() {
                             <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                             <span className="truncate">Resolver</span>
                           </Button>
-                          <Button 
-                            size="sm" 
+                          <Button
+                            size="sm"
                             variant="outline"
                             onClick={async () => {
                               const { data: { session } } = await supabase.auth.getSession()
