@@ -123,7 +123,9 @@ export default function AdminDashboard() {
       try {
         setKpisLoading(true)
         // Usar API route para bypass RLS
-        const response = await fetch('/api/admin/kpis')
+        const response = await fetch('/api/admin/kpis', {
+          credentials: 'include'
+        })
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`)
         }
@@ -158,7 +160,9 @@ export default function AdminDashboard() {
       try {
         setActivitiesLoading(true)
         // Usar API route para bypass RLS
-        const response = await fetch('/api/admin/audit-log?limit=50')
+        const response = await fetch('/api/admin/audit-log?limit=50', {
+          credentials: 'include'
+        })
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`)
         }

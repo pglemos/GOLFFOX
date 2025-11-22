@@ -52,7 +52,7 @@ export default function MotoristasPage() {
   const filteredMotoristas = useMemo(() => {
     if (!debouncedSearchQuery) return motoristas
     const query = debouncedSearchQuery.toLowerCase()
-    return motoristas.filter(m => 
+    return motoristas.filter(m =>
       m.name?.toLowerCase().includes(query) ||
       m.email?.toLowerCase().includes(query) ||
       m.phone?.toLowerCase().includes(query) ||
@@ -76,7 +76,9 @@ export default function MotoristasPage() {
     try {
       setDataLoading(true)
       // Usar API route para bypass RLS
-      const response = await fetch('/api/admin/drivers-list')
+      const response = await fetch('/api/admin/drivers-list', {
+        credentials: 'include'
+      })
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
@@ -113,9 +115,9 @@ export default function MotoristasPage() {
       const response = await fetch(`/api/admin/drivers/delete?id=${motoristaId}`, {
         method: 'DELETE'
       })
-      
+
       const result = await response.json()
-      
+
       if (!response.ok) {
         const errorMessage = result.message || result.error || 'Erro ao excluir motorista'
         const errorDetails = result.details ? ` (${result.details})` : ''
@@ -146,11 +148,11 @@ export default function MotoristasPage() {
         .order("expires_at", { ascending: true })
 
       if (error) throw error
-      
+
       // Calcular status automaticamente
       const now = new Date()
       const thirtyDaysFromNow = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000)
-      
+
       const documentsWithStatus = (data || []).map((doc: any) => {
         let status = 'valid'
         if (doc.expires_at) {
@@ -163,7 +165,7 @@ export default function MotoristasPage() {
         }
         return { ...doc, status }
       })
-      
+
       setDocuments(documentsWithStatus)
     } catch (error) {
       console.error("Erro ao carregar documentos:", error)
@@ -210,7 +212,7 @@ export default function MotoristasPage() {
             <h1 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2 break-words">Motoristas</h1>
             <p className="text-sm sm:text-base text-[var(--muted)] break-words">Gerencie os motoristas do sistema</p>
           </div>
-          <Button 
+          <Button
             onClick={() => {
               setSelectedDriver(null)
               setIsModalOpen(true)
@@ -239,60 +241,60 @@ export default function MotoristasPage() {
         ) : (
           <div className="grid gap-3 sm:gap-4 w-full">
             {filteredMotoristas.map((motorista) => (
-            <motion.div
-              key={motorista.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              <Card className="p-3 sm:p-4 hover:shadow-lg transition-shadow overflow-hidden">
-                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start gap-2 mb-2 flex-wrap">
-                      <Users className="h-5 w-5 text-[var(--brand)] flex-shrink-0 mt-0.5" />
-                      <h3 className="font-bold text-base sm:text-lg break-words flex-1">{motorista.name}</h3>
-                      <Badge variant="outline" className="text-xs flex-shrink-0">{motorista.role || "driver"}</Badge>
+              <motion.div
+                key={motorista.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <Card className="p-3 sm:p-4 hover:shadow-lg transition-shadow overflow-hidden">
+                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start gap-2 mb-2 flex-wrap">
+                        <Users className="h-5 w-5 text-[var(--brand)] flex-shrink-0 mt-0.5" />
+                        <h3 className="font-bold text-base sm:text-lg break-words flex-1">{motorista.name}</h3>
+                        <Badge variant="outline" className="text-xs flex-shrink-0">{motorista.role || "driver"}</Badge>
+                      </div>
+                      <p className="text-sm text-[var(--ink-muted)] mb-1 break-words pl-7">{motorista.email}</p>
+                      {motorista.phone && (
+                        <p className="text-xs text-[var(--ink-muted)] break-words pl-7">{motorista.phone}</p>
+                      )}
                     </div>
-                    <p className="text-sm text-[var(--ink-muted)] mb-1 break-words pl-7">{motorista.email}</p>
-                    {motorista.phone && (
-                      <p className="text-xs text-[var(--ink-muted)] break-words pl-7">{motorista.phone}</p>
-                    )}
+                    <div className="grid grid-cols-2 sm:flex gap-2 w-full sm:w-auto">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setSelectedDriver(motorista)
+                          setIsModalOpen(true)
+                        }}
+                        className="text-xs sm:text-sm min-h-[44px] touch-manipulation"
+                      >
+                        <Edit className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                        <span className="truncate">Editar</span>
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleViewDriver(motorista)}
+                        className="text-xs sm:text-sm min-h-[44px] touch-manipulation"
+                      >
+                        <span className="truncate hidden sm:inline">Ver Detalhes</span>
+                        <span className="truncate sm:hidden">Detalhes</span>
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => handleDeleteMotorista(motorista.id, motorista.name || motorista.email || 'Motorista')}
+                        className="col-span-2 sm:col-span-1 text-xs sm:text-sm min-h-[44px] touch-manipulation"
+                      >
+                        <Trash2 className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                        <span className="truncate">Excluir</span>
+                      </Button>
+                    </div>
                   </div>
-                  <div className="grid grid-cols-2 sm:flex gap-2 w-full sm:w-auto">
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => {
-                        setSelectedDriver(motorista)
-                        setIsModalOpen(true)
-                      }}
-                      className="text-xs sm:text-sm min-h-[44px] touch-manipulation"
-                    >
-                      <Edit className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-                      <span className="truncate">Editar</span>
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => handleViewDriver(motorista)}
-                      className="text-xs sm:text-sm min-h-[44px] touch-manipulation"
-                    >
-                      <span className="truncate hidden sm:inline">Ver Detalhes</span>
-                      <span className="truncate sm:hidden">Detalhes</span>
-                    </Button>
-                    <Button 
-                      variant="destructive" 
-                      size="sm"
-                      onClick={() => handleDeleteMotorista(motorista.id, motorista.name || motorista.email || 'Motorista')}
-                      className="col-span-2 sm:col-span-1 text-xs sm:text-sm min-h-[44px] touch-manipulation"
-                    >
-                      <Trash2 className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-                      <span className="truncate">Excluir</span>
-                    </Button>
-                  </div>
-                </div>
-              </Card>
-            </motion.div>
+                </Card>
+              </motion.div>
             ))}
             {filteredMotoristas.length === 0 && motoristas.length > 0 && (
               <Card className="p-12 text-center">
@@ -404,7 +406,7 @@ export default function MotoristasPage() {
                       documents.map((doc) => {
                         const isExpiring = doc.status === 'expiring_soon'
                         const isExpired = doc.status === 'expired'
-                        
+
                         return (
                           <Card key={doc.id} className={`p-4 ${isExpired ? 'border-red-300 bg-red-50' : isExpiring ? 'border-orange-300 bg-orange-50' : ''}`}>
                             <div className="flex items-start justify-between">
@@ -412,7 +414,7 @@ export default function MotoristasPage() {
                                 <div className="flex items-center gap-2 mb-2">
                                   <Badge variant={
                                     isExpired ? 'destructive' :
-                                    isExpiring ? 'default' : 'secondary'
+                                      isExpiring ? 'default' : 'secondary'
                                   }>
                                     {doc.type}
                                   </Badge>
