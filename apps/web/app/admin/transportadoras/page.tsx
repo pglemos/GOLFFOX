@@ -36,7 +36,9 @@ export default function TransportadorasPage() {
     setLoadingCarriers(true)
     setErrorCarriers(null)
     try {
-      const response = await fetch('/api/admin/transportadoras-list')
+      const response = await fetch('/api/admin/transportadoras-list', {
+        credentials: 'include'
+      })
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
@@ -64,9 +66,9 @@ export default function TransportadorasPage() {
       const response = await fetch(`/api/admin/transportadora/delete?id=${carrierId}`, {
         method: 'DELETE'
       })
-      
+
       const result = await response.json()
-      
+
       if (!response.ok) {
         const errorMessage = result.message || result.error || 'Erro ao excluir transportadora'
         const errorDetails = result.details ? ` (${result.details})` : ''
@@ -90,7 +92,7 @@ export default function TransportadorasPage() {
   useEffect(() => {
     loadCarriers()
   }, [loadCarriers])
-  
+
   // Remover padrão de grid em mobile - FORÇA BRUTA (sempre executa)
   useEffect(() => {
     if (typeof window !== 'undefined' && window.innerWidth < 1024) {
@@ -135,7 +137,7 @@ export default function TransportadorasPage() {
           existingStyle.remove()
         }
         document.head.appendChild(style)
-        
+
         // Também tentar remover diretamente do body via JavaScript
         const bodyElement = document.body
         if (bodyElement) {
@@ -144,10 +146,10 @@ export default function TransportadorasPage() {
           bodyElement.style.setProperty('background-image', 'none', 'important')
         }
       }
-      
+
       // Executar imediatamente
       removeGridPattern()
-      
+
       // Executar após delays para garantir que seja aplicado
       const timeouts = [
         setTimeout(removeGridPattern, 50),
@@ -155,15 +157,15 @@ export default function TransportadorasPage() {
         setTimeout(removeGridPattern, 300),
         setTimeout(removeGridPattern, 500)
       ]
-      
+
       // Executar quando a janela redimensionar
       window.addEventListener('resize', removeGridPattern)
-      
+
       // Executar quando o DOM estiver completamente carregado
       if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', removeGridPattern)
       }
-      
+
       return () => {
         timeouts.forEach(clearTimeout)
         window.removeEventListener('resize', removeGridPattern)
@@ -199,7 +201,7 @@ export default function TransportadorasPage() {
 
   return (
     <AppShell user={{ id: user.id, name: user.name || "Admin", email: user.email, role: user.role || "admin" }}>
-      <div 
+      <div
         className="w-full max-w-full overflow-x-hidden min-w-0 box-border"
         style={{
           backgroundImage: 'none',
@@ -219,7 +221,7 @@ export default function TransportadorasPage() {
               </div>
               <p className="text-xs sm:text-sm md:text-base text-[var(--ink-muted)] break-words leading-relaxed">Gerencie transportadoras e motoristas</p>
             </div>
-            <Button 
+            <Button
               onClick={() => setIsCreateModalOpen(true)}
               className="w-full sm:w-auto flex-shrink-0 min-h-[44px] h-auto text-sm sm:text-base px-4 sm:px-6 py-2.5 sm:py-2.5 whitespace-nowrap"
             >
@@ -289,8 +291,8 @@ export default function TransportadorasPage() {
 
                     {/* Botões de ação */}
                     <div className="grid grid-cols-2 gap-2 pt-2 border-t border-[var(--border)]">
-                      <Button 
-                        variant="outline" 
+                      <Button
+                        variant="outline"
                         size="sm"
                         onClick={(e) => {
                           e.stopPropagation()
@@ -303,8 +305,8 @@ export default function TransportadorasPage() {
                         <Edit className="h-3.5 w-3.5 flex-shrink-0" />
                         <span className="truncate hidden sm:inline">Editar</span>
                       </Button>
-                      <Button 
-                        variant="outline" 
+                      <Button
+                        variant="outline"
                         size="sm"
                         onClick={(e) => {
                           e.stopPropagation()
@@ -317,8 +319,8 @@ export default function TransportadorasPage() {
                         <UserPlus className="h-3.5 w-3.5 flex-shrink-0" />
                         <span className="truncate hidden sm:inline">Login</span>
                       </Button>
-                      <Button 
-                        variant="outline" 
+                      <Button
+                        variant="outline"
                         size="sm"
                         onClick={(e) => {
                           e.stopPropagation()
@@ -331,8 +333,8 @@ export default function TransportadorasPage() {
                         <Users className="h-3.5 w-3.5 flex-shrink-0" />
                         <span className="truncate hidden sm:inline">Motoristas</span>
                       </Button>
-                      <Button 
-                        variant="outline" 
+                      <Button
+                        variant="outline"
                         size="sm"
                         onClick={(e) => {
                           e.stopPropagation()
@@ -345,8 +347,8 @@ export default function TransportadorasPage() {
                         <Truck className="h-3.5 w-3.5 flex-shrink-0" />
                         <span className="truncate hidden sm:inline">Veículos</span>
                       </Button>
-                      <Button 
-                        variant="destructive" 
+                      <Button
+                        variant="destructive"
                         size="sm"
                         onClick={(e) => {
                           e.stopPropagation()

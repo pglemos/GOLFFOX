@@ -44,7 +44,7 @@ export async function validateAuth(request: NextRequest): Promise<AuthenticatedU
     const authHeader = request.headers.get('authorization')
     if (authHeader && authHeader.startsWith('Bearer ')) {
       accessToken = authHeader.substring(7)
-      if (isDevelopment) console.log('✅ Token encontrado no header Authorization')
+      console.log('[AUTH] Token encontrado no header Authorization')
     }
 
     // 2. Se não houver no header, tentar obter do cookie customizado (golffox-session)
@@ -57,22 +57,18 @@ export async function validateAuth(request: NextRequest): Promise<AuthenticatedU
           const decoded = Buffer.from(golffoxSession, 'base64').toString('utf-8')
           const sessionData = JSON.parse(decoded)
 
-          if (isDevelopment) {
-            console.log('🔍 Cookie customizado decodificado:', {
-              hasAccessToken: !!sessionData.access_token,
-              hasId: !!sessionData.id,
-              role: sessionData.role
-            })
-          }
-
           // Tentar obter access_token do cookie customizado
           if (sessionData.access_token) {
             accessToken = sessionData.access_token
-            if (isDevelopment) console.log('✅ Token encontrado no cookie customizado (golffox-session)')
+            console.log('[AUTH] Token encontrado no cookie customizado (golffox-session)')
+          } else {
+            console.warn('[AUTH] Cookie customizado encontrado mas sem access_token')
           }
         } catch (error) {
-          if (isDevelopment) console.warn('⚠️ Erro ao processar cookie customizado:', error)
+          console.error('[AUTH] Erro ao processar cookie customizado:', error)
         }
+      } else {
+        console.log('[AUTH] Cookie golffox-session não encontrado. Cookies disponíveis:', request.cookies.getAll().map(c => c.name).join(', '))
       }
     }
 
@@ -88,18 +84,18 @@ export async function validateAuth(request: NextRequest): Promise<AuthenticatedU
           try {
             const tokenData = JSON.parse(supabaseCookie)
             accessToken = tokenData?.access_token || tokenData?.accessToken || null
-            if (accessToken && isDevelopment) {
-              console.log('✅ Token encontrado no cookie do Supabase')
+            if (accessToken) {
+              console.log('[AUTH] Token encontrado no cookie do Supabase')
             }
           } catch (error) {
-            if (isDevelopment) console.warn('⚠️ Erro ao processar cookie do Supabase:', error)
+            console.warn('[AUTH] Erro ao processar cookie do Supabase:', error)
           }
         }
       }
     }
 
     if (!accessToken) {
-      if (isDevelopment) console.warn('⚠️ Token de acesso não encontrado')
+      console.warn('[AUTH] Token de acesso não encontrado em nenhum lugar')
       return null
     }
 
@@ -111,15 +107,13 @@ export async function validateAuth(request: NextRequest): Promise<AuthenticatedU
     const { data: { user }, error: authError } = await supabase.auth.getUser(accessToken)
 
     if (authError || !user) {
-      console.error('❌ Erro ao validar token com Supabase:', authError)
+      console.error('[AUTH] Erro ao validar token com Supabase:', authError?.message || 'Usuário nulo')
       return null
     }
 
-    if (isDevelopment) console.log('✅ Token validado com Supabase, user ID:', user.id)
-
     // 5. SEMPRE buscar dados completos do usuário no banco de dados
     if (!serviceKey) {
-      console.error('❌ Service role key não configurada')
+      console.error('[AUTH] Service role key não configurada')
       return null
     }
 
@@ -135,12 +129,12 @@ export async function validateAuth(request: NextRequest): Promise<AuthenticatedU
       .maybeSingle()
 
     if (dbError) {
-      console.error('❌ Erro ao buscar dados do usuário no banco:', dbError)
+      console.error('[AUTH] Erro ao buscar dados do usuário no banco:', dbError)
       return null
     }
 
     if (!userData) {
-      console.error('❌ Usuário não encontrado na tabela users:', user.id)
+      console.error('[AUTH] Usuário não encontrado na tabela users:', user.id)
       return null
     }
 
