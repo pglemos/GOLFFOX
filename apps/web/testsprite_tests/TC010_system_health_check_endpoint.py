@@ -1,39 +1,36 @@
 import requests
 from requests.auth import HTTPBasicAuth
-from datetime import datetime
-
-BASE_URL = "http://localhost:3000"
-AUTH_USERNAME = "golffox@admin.com"
-AUTH_PASSWORD = "senha123"
-TIMEOUT = 30
 
 def test_system_health_check_endpoint():
-    url = f"{BASE_URL}/api/health"
+    base_url = "http://localhost:3000"
+    endpoint = "/api/health"
+    url = base_url + endpoint
+    auth = HTTPBasicAuth("golffox@admin.com", "senha123")
+    headers = {
+        "Accept": "application/json"
+    }
     try:
-        response = requests.get(url, auth=HTTPBasicAuth(AUTH_USERNAME, AUTH_PASSWORD), timeout=TIMEOUT)
+        response = requests.get(url, headers=headers, auth=auth, timeout=30)
     except requests.RequestException as e:
-        assert False, f"Request failed: {e}"
+        assert False, f"Request to health endpoint failed: {e}"
 
     assert response.status_code == 200, f"Expected status code 200, got {response.status_code}"
-
     try:
-        data = response.json()
+        json_response = response.json()
     except ValueError:
         assert False, "Response is not valid JSON"
 
-    assert isinstance(data, dict), "Response JSON is not an object"
-
-    assert "status" in data, "Response JSON missing 'status' key"
-    assert isinstance(data["status"], str), "'status' should be a string"
-    assert data["status"].lower() == "ok", f"Expected 'status' to be 'ok', got {data['status']}"
-
-    assert "timestamp" in data, "Response JSON missing 'timestamp' key"
-    assert isinstance(data["timestamp"], str), "'timestamp' should be a string"
-
-    # Validate timestamp format (ISO 8601 date-time)
+    assert isinstance(json_response, dict), "Response JSON is not an object"
+    assert "status" in json_response, "Response JSON missing 'status' field"
+    assert "timestamp" in json_response, "Response JSON missing 'timestamp' field"
+    assert isinstance(json_response["status"], str), "'status' field is not a string"
+    assert json_response["status"].lower() == "ok", f"Expected status 'ok', got '{json_response['status']}'"
+    assert isinstance(json_response["timestamp"], str), "'timestamp' field is not a string"
+    # Optionally, validate timestamp format (ISO8601)
+    import datetime
     try:
-        datetime.fromisoformat(data["timestamp"].replace("Z", "+00:00"))
+        datetime.datetime.fromisoformat(json_response["timestamp"].replace("Z", "+00:00"))
     except ValueError:
-        assert False, f"Timestamp '{data['timestamp']}' is not a valid ISO 8601 date-time string"
+        assert False, "timestamp field is not a valid ISO 8601 date-time string"
 
 test_system_health_check_endpoint()
