@@ -1,0 +1,231 @@
+{
+    "dashboard": {
+        "kpis": {
+            "employeesInTransit": "Employees in Transit",
+            "activeNow": "Active now",
+            "activeVehicles": "Active Vehicles",
+            "onRoute": "On route",
+            "routesToday": "Routes Today",
+            "today": "Today",
+            "criticalAlerts": "Critical Alerts",
+            "attentionNeeded": "Attention needed",
+            "routeEfficiency": "Route Efficiency",
+            "completionRate": "Completion rate",
+            "systemHealth": "System Health",
+            "great": "Great",
+            "good": "Good",
+            "attention": "Attention"
+        },
+        "auditLog": {
+            "title": "Recent Activity",
+            "subtitle": "System action history",
+            "viewAll": "View all",
+            "loading": "Loading activity...",
+            "empty": "No recent activity",
+            "system": "System",
+            "action": "Action",
+            "company": "Company"
+        },
+        "notifications": {
+            "title": "Recent Notifications",
+            "subtitle": "Latest system updates",
+            "alertPrefix": "Alert #{id}",
+            "timeAgo": "{time} ago"
+        },
+        "map": {
+            "title": "Fleet Map",
+            "subtitle": "View vehicles in real-time"
+        },
+        "filters": {
+            "title": "Filters",
+            "minimize": "Minimize",
+            "close": "Close",
+            "expand": "Expand",
+            "open": "Open",
+            "companyLabel": "Company",
+            "companyPlaceholder": "All companies",
+            "dateLabel": "Date",
+            "shiftLabel": "Shift",
+            "allShifts": "All shifts",
+            "morning": "Morning",
+            "afternoon": "Afternoon",
+            "night": "Night",
+            "clear": "Clear",
+            "save": "Save Filters"
+        }
+    },
+    "companies": {
+        "title": "Companies",
+        "subtitle": "Manage companies and their operators",
+        "createButton": "Create Company",
+        "loading": "Loading companies...",
+        "noCompanies": "No companies registered",
+        "searchPlaceholder": "Search company...",
+        "table": {
+            "name": "Name",
+            "email": "Email",
+            "phone": "Phone",
+            "status": "Status",
+            "actions": "Actions",
+            "active": "Active",
+            "inactive": "Inactive"
+        },
+        "actions": {
+            "edit": "Edit",
+            "delete": "Delete",
+            "createOperator": "Create Operator",
+            "viewDetails": "View Details"
+        },
+        "success": {
+            "created": "Company created successfully!",
+            "updated": "Company updated successfully!",
+            "deleted": "Company deleted successfully!"
+        },
+        "errors": {
+            "loadFailed": "Error loading companies",
+            "createFailed": "Error creating company",
+            "updateFailed": "Error updating company",
+            "deleteFailed": "Error deleting company"
+        }
+    },
+    "transportadoras": {
+        "title": "Carriers",
+        "subtitle": "Manage carriers and their vehicles",
+        "createButton": "Create Carrier",
+        "loading": "Loading carriers...",
+        "noTransportadoras": "No carriers registered",
+        "searchPlaceholder": "Search carrier...",
+        "table": {
+            "name": "Name",
+            "cnpj": "Tax ID",
+            "email": "Email",
+            "phone": "Phone",
+            "vehicles": "Vehicles",
+            "status": "Status",
+            "actions": "Actions"
+        },
+        "actions": {
+            "edit": "Edit",
+            "delete": "Delete",
+            "manageVehicles": "Manage Vehicles"
+        },
+        "success": {
+            "created": "Carrier created successfully!",
+            "updated": "Carrier updated successfully!",
+            "deleted": "Carrier deleted successfully!"
+        },
+        "errors": {
+            "loadFailed": "Error loading carriers",
+            "createFailed": "Error creating carrier",
+            "updateFailed": "Error updating carrier",
+            "deleteFailed": "Error deleting carrier"
+        }
+    },
+    "permissions": {
+        "title": "Permissions",
+        "subtitle": "Manage user roles and permissions",
+        "searchPlaceholder": "Search user...",
+        "table": {
+            "user": "User",
+            "email": "Email",
+            "role": "Role",
+            "lastLogin": "Last Login",
+            "actions": "Actions"
+        },
+        "roles": {
+            "admin": "Administrator",
+            "operator": "Operator",
+            "transportadora": "Carrier",
+            "driver": "Driver",
+            "passenger": "Passenger"
+        },
+        "actions": {
+            "changeRole": "Change Role",
+            "viewDetails": "View Details",
+            "suspend": "Suspend"
+        },
+        "success": {
+            "roleChanged": "Role changed successfully!",
+            "userSuspended": "User suspended successfully!"
+        },
+        "errors": {
+            "loadFailed": "Error loading users",
+            "roleChangeFailed": "Error changing role",
+            "suspendFailed": "Error suspending user"
+        }
+    },
+    "alerts": {
+        "title": "Alerts",
+        "subtitle": "Monitor and resolve system alerts",
+        "filterAll": "All",
+        "filterCritical": "Critical",
+        "filterWarning": "Warnings",
+        "filterResolved": "Resolved",
+        "searchPlaceholder": "Search alert...",
+        "noAlerts": "No alerts found",
+        "table": {
+            "type": "Type",
+            "description": "Description",
+            "severity": "Severity",
+            "status": "Status",
+            "createdAt": "Created at",
+            "actions": "Actions"
+        },
+        "severity": {
+            "critical": "Critical",
+            "warning": "Warning",
+            "info": "Information"
+        },
+        "status": {
+            "open": "Open",
+            "inProgress": "In Progress",
+            "resolved": "Resolved"
+        },
+        "actions": {
+            "resolve": "Resolve",
+            "assign": "Assign",
+            "viewDetails": "View Details"
+        },
+        "success": {
+            "resolved": "Alert resolved successfully!",
+            "assigned": "Alert assigned successfully!"
+        },
+        "errors": {
+            "loadFailed": "Error loading alerts",
+            "resolveFailed": "Error resolving alert",
+            "assignFailed": "Error assigning alert"
+        }
+    },
+    "common": {
+        "loading": "Loading...",
+        "saving": "Saving...",
+        "deleting": "Deleting...",
+        "save": "Save",
+        "cancel": "Cancel",
+        "delete": "Delete",
+        "edit": "Edit",
+        "create": "Create",
+        "search": "Search",
+        "filter": "Filter",
+        "export": "Export",
+        "import": "Import",
+        "refresh": "Refresh",
+        "back": "Back",
+        "next": "Next",
+        "previous": "Previous",
+        "confirm": "Confirm",
+        "yes": "Yes",
+        "no": "No",
+        "ok": "OK",
+        "apply": "Apply",
+        "reset": "Reset",
+        "close": "Close",
+        "required": "Required",
+        "optional": "Optional",
+        "noData": "No data available",
+        "error": "Error",
+        "success": "Success",
+        "warning": "Warning",
+        "info": "Information"
+    }
+}

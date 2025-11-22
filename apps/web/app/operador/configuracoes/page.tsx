@@ -6,13 +6,13 @@ import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { 
-  Settings2, 
-  User, 
-  Mail, 
-  Lock, 
-  Palette, 
-  Bell, 
+import {
+  Settings2,
+  User,
+  Mail,
+  Lock,
+  Palette,
+  Bell,
   Camera,
   Save,
   Eye,
@@ -32,7 +32,7 @@ export default function OperatorConfiguracoesPage() {
   const [savingPersonal, setSavingPersonal] = useState(false)
   const [savingSecurity, setSavingSecurity] = useState(false)
   const [showNewPassword, setShowNewPassword] = useState(false)
-  
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -62,12 +62,12 @@ export default function OperatorConfiguracoesPage() {
         .select('avatar_url')
         .eq('id', user.id)
         .maybeSingle()
-      
+
       if (error) {
         console.error('Erro ao carregar foto:', error)
         return
       }
-      
+
       if (data?.avatar_url) {
         // Adicionar timestamp para evitar cache do navegador
         const urlWithCache = `${data.avatar_url}${timestamp || `?t=${Date.now()}`}`
@@ -128,7 +128,7 @@ export default function OperatorConfiguracoesPage() {
         // Atualizar estado imediatamente
         setProfileImage(avatarUrl)
         notifySuccess('Foto de perfil atualizada com sucesso!')
-        
+
         // Aguardar um pouco e recarregar a imagem do banco para garantir sincronização
         setTimeout(async () => {
           if (!user?.id) return
@@ -138,7 +138,7 @@ export default function OperatorConfiguracoesPage() {
               .select('avatar_url')
               .eq('id', user.id)
               .maybeSingle()
-            
+
             if (!error && data?.avatar_url) {
               setProfileImage(`${data.avatar_url}?t=${Date.now()}`)
             }
@@ -200,11 +200,8 @@ export default function OperatorConfiguracoesPage() {
       }
 
       notifySuccess('Informações pessoais salvas com sucesso!')
-      
-      // Recarregar dados do usuário
-      setTimeout(() => {
-        window.location.reload()
-      }, 1000)
+
+      // Não recarregar a página - as mudanças já estão no estado local
     } catch (error: any) {
       console.error('Erro ao salvar:', error)
       notifyError(error.message || 'Erro ao salvar informações pessoais')
@@ -254,7 +251,7 @@ export default function OperatorConfiguracoesPage() {
       }
 
       notifySuccess('Senha alterada com sucesso!')
-      
+
       // Limpar campos de senha
       setFormData(prev => ({
         ...prev,
@@ -356,9 +353,9 @@ export default function OperatorConfiguracoesPage() {
                 <div className="relative mb-4">
                   <div className="w-32 h-32 rounded-full bg-orange-500 flex items-center justify-center shadow-lg overflow-hidden">
                     {profileImage ? (
-                      <img 
-                        src={profileImage} 
-                        alt="Foto de perfil" 
+                      <img
+                        src={profileImage}
+                        alt="Foto de perfil"
                         className="w-full h-full object-cover"
                       />
                     ) : (
@@ -410,8 +407,8 @@ export default function OperatorConfiguracoesPage() {
                   <User className="h-5 w-5 text-orange-500" />
                   <h2 className="text-xl font-semibold">Informações Pessoais</h2>
                 </div>
-                <Button 
-                  onClick={handleSavePersonal} 
+                <Button
+                  onClick={handleSavePersonal}
                   disabled={savingPersonal}
                   size="sm"
                 >
@@ -428,7 +425,7 @@ export default function OperatorConfiguracoesPage() {
                   )}
                 </Button>
               </div>
-              
+
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="name">Nome Completo</Label>
@@ -440,7 +437,7 @@ export default function OperatorConfiguracoesPage() {
                     className="w-full"
                   />
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="email">Email (Login)</Label>
                   <div className="relative">
@@ -464,8 +461,8 @@ export default function OperatorConfiguracoesPage() {
                   <Shield className="h-5 w-5 text-orange-500" />
                   <h2 className="text-xl font-semibold">Segurança</h2>
                 </div>
-                <Button 
-                  onClick={handleSaveSecurity} 
+                <Button
+                  onClick={handleSaveSecurity}
                   disabled={savingSecurity}
                   size="sm"
                 >
@@ -482,7 +479,7 @@ export default function OperatorConfiguracoesPage() {
                   )}
                 </Button>
               </div>
-              
+
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="newPassword">Nova Senha</Label>
@@ -505,7 +502,7 @@ export default function OperatorConfiguracoesPage() {
                     </button>
                   </div>
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="confirmPassword">Confirmar Nova Senha</Label>
                   <div className="relative">
@@ -520,7 +517,7 @@ export default function OperatorConfiguracoesPage() {
                     />
                   </div>
                 </div>
-                
+
                 <p className="text-xs text-[var(--ink-muted)]">
                   Deixe em branco se não deseja alterar a senha
                 </p>
@@ -532,7 +529,7 @@ export default function OperatorConfiguracoesPage() {
                 <Palette className="h-5 w-5 text-orange-500" />
                 <h2 className="text-xl font-semibold">Aparência</h2>
               </div>
-              
+
               <div className="space-y-4">
                 <div>
                   <Label className="mb-3 block">Tema</Label>
@@ -560,7 +557,7 @@ export default function OperatorConfiguracoesPage() {
                     </Button>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center justify-between pt-4 border-t border-[var(--border)]">
                   <div>
                     <p className="font-medium">Alternância Rápida</p>
@@ -576,7 +573,7 @@ export default function OperatorConfiguracoesPage() {
                 <Bell className="h-5 w-5 text-orange-500" />
                 <h2 className="text-xl font-semibold">Notificações</h2>
               </div>
-              
+
               <div className="space-y-3">
                 {[
                   { key: 'email', label: 'Notificações por Email', desc: 'Receba alertas importantes por email' },
@@ -591,18 +588,16 @@ export default function OperatorConfiguracoesPage() {
                     </div>
                     <button
                       onClick={() => handleNotificationChange(key, !formData.notifications[key as keyof typeof formData.notifications])}
-                      className={`relative w-12 h-6 rounded-full transition-colors ml-4 ${
-                        formData.notifications[key as keyof typeof formData.notifications]
-                          ? 'bg-orange-500' 
+                      className={`relative w-12 h-6 rounded-full transition-colors ml-4 ${formData.notifications[key as keyof typeof formData.notifications]
+                          ? 'bg-orange-500'
                           : 'bg-gray-300'
-                      }`}
+                        }`}
                     >
                       <span
-                        className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform shadow-sm ${
-                          formData.notifications[key as keyof typeof formData.notifications]
-                            ? 'translate-x-6' 
+                        className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform shadow-sm ${formData.notifications[key as keyof typeof formData.notifications]
+                            ? 'translate-x-6'
                             : 'translate-x-0'
-                        }`}
+                          }`}
                       />
                     </button>
                   </div>
@@ -615,7 +610,7 @@ export default function OperatorConfiguracoesPage() {
                 <Globe className="h-5 w-5 text-orange-500" />
                 <h2 className="text-xl font-semibold">Preferências Gerais</h2>
               </div>
-              
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="language">Idioma</Label>
@@ -630,7 +625,7 @@ export default function OperatorConfiguracoesPage() {
                     <option value="es-ES">Español</option>
                   </select>
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="timezone">Fuso Horário</Label>
                   <div className="relative">

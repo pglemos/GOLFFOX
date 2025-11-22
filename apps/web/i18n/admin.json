@@ -53,5 +53,179 @@
             "clear": "Limpar",
             "save": "Salvar Filtros"
         }
+    },
+    "companies": {
+        "title": "Empresas",
+        "subtitle": "Gerencie empresas e seus operadores",
+        "createButton": "Criar Empresa",
+        "loading": "Carregando empresas...",
+        "noCompanies": "Nenhuma empresa cadastrada",
+        "searchPlaceholder": "Buscar empresa...",
+        "table": {
+            "name": "Nome",
+            "email": "Email",
+            "phone": "Telefone",
+            "status": "Status",
+            "actions": "Ações",
+            "active": "Ativa",
+            "inactive": "Inativa"
+        },
+        "actions": {
+            "edit": "Editar",
+            "delete": "Excluir",
+            "createOperator": "Criar Operador",
+            "viewDetails": "Ver Detalhes"
+        },
+        "success": {
+            "created": "Empresa criada com sucesso!",
+            "updated": "Empresa atualizada com sucesso!",
+            "deleted": "Empresa excluída com sucesso!"
+        },
+        "errors": {
+            "loadFailed": "Erro ao carregar empresas",
+            "createFailed": "Erro ao criar empresa",
+            "updateFailed": "Erro ao atualizar empresa",
+            "deleteFailed": "Erro ao excluir empresa"
+        }
+    },
+    "transportadoras": {
+        "title": "Transportadoras",
+        "subtitle": "Gerencie transportadoras e seus veículos",
+        "createButton": "Criar Transportadora",
+        "loading": "Carregando transportadoras...",
+        "noTransportadoras": "Nenhuma transportadora cadastrada",
+        "searchPlaceholder": "Buscar transportadora...",
+        "table": {
+            "name": "Nome",
+            "cnpj": "CNPJ",
+            "email": "Email",
+            "phone": "Telefone",
+            "vehicles": "Veículos",
+            "status": "Status",
+            "actions": "Ações"
+        },
+        "actions": {
+            "edit": "Editar",
+            "delete": "Excluir",
+            "manageVehicles": "Gerenciar Veículos"
+        },
+        "success": {
+            "created": "Transportadora criada com sucesso!",
+            "updated": "Transportadora atualizada com sucesso!",
+            "deleted": "Transportadora excluída com sucesso!"
+        },
+        "errors": {
+            "loadFailed": "Erro ao carregar transportadoras",
+            "createFailed": "Erro ao criar transportadora",
+            "updateFailed": "Erro ao atualizar transportadora",
+            "deleteFailed": "Erro ao excluir transportadora"
+        }
+    },
+    "permissions": {
+        "title": "Permissões",
+        "subtitle": "Gerencie papéis e permissões de usuários",
+        "searchPlaceholder": "Buscar usuário...",
+        "table": {
+            "user": "Usuário",
+            "email": "Email",
+            "role": "Papel",
+            "lastLogin": "Último Acesso",
+            "actions": "Ações"
+        },
+        "roles": {
+            "admin": "Administrador",
+            "operator": "Operador",
+            "transportadora": "Transportadora",
+            "driver": "Motorista",
+            "passenger": "Passageiro"
+        },
+        "actions": {
+            "changeRole": "Trocar Papel",
+            "viewDetails": "Ver Detalhes",
+            "suspend": "Suspender"
+        },
+        "success": {
+            "roleChanged": "Papel alterado com sucesso!",
+            "userSuspended": "Usuário suspenso com sucesso!"
+        },
+        "errors": {
+            "loadFailed": "Erro ao carregar usuários",
+            "roleChangeFailed": "Erro ao alterar papel",
+            "suspendFailed": "Erro ao suspender usuário"
+        }
+    },
+    "alerts": {
+        "title": "Alertas",
+        "subtitle": "Monitore e resolva alertas do sistema",
+        "filterAll": "Todos",
+        "filterCritical": "Críticos",
+        "filterWarning": "Avisos",
+        "filterResolved": "Resolvidos",
+        "searchPlaceholder": "Buscar alerta...",
+        "noAlerts": "Nenhum alerta encontrado",
+        "table": {
+            "type": "Tipo",
+            "description": "Descrição",
+            "severity": "Gravidade",
+            "status": "Status",
+            "createdAt": "Criado em",
+            "actions": "Ações"
+        },
+        "severity": {
+            "critical": "Crítico",
+            "warning": "Aviso",
+            "info": "Informação"
+        },
+        "status": {
+            "open": "Aberto",
+            "inProgress": "Em Andamento",
+            "resolved": "Resolvido"
+        },
+        "actions": {
+            "resolve": "Resolver",
+            "assign": "Atribuir",
+            "viewDetails": "Ver Detalhes"
+        },
+        "success": {
+            "resolved": "Alerta resolvido com sucesso!",
+            "assigned": "Alerta atribuído com sucesso!"
+        },
+        "errors": {
+            "loadFailed": "Erro ao carregar alertas",
+            "resolveFailed": "Erro ao resolver alerta",
+            "assignFailed": "Erro ao atribuir alerta"
+        }
+    },
+    "common": {
+        "loading": "Carregando...",
+        "saving": "Salvando...",
+        "deleting": "Excluindo...",
+        "save": "Salvar",
+        "cancel": "Cancelar",
+        "delete": "Excluir",
+        "edit": "Editar",
+        "create": "Criar",
+        "search": "Buscar",
+        "filter": "Filtrar",
+        "export": "Exportar",
+        "import": "Importar",
+        "refresh": "Atualizar",
+        "back": "Voltar",
+        "next": "Próximo",
+        "previous": "Anterior",
+        "confirm": "Confirmar",
+        "yes": "Sim",
+        "no": "Não",
+        "ok": "OK",
+        "apply": "Aplicar",
+        "reset": "Resetar",
+        "close": "Fechar",
+        "required": "Obrigatório",
+        "optional": "Opcional",
+        "noData": "Nenhum dado disponível",
+        "error": "Erro",
+        "success": "Sucesso",
+        "warning": "Aviso",
+        "info": "Informação"
     }
 }

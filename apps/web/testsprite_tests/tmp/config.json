@@ -8,12 +8,12 @@
   "backendPassword": "senha123",
   "executionArgs": {
     "projectName": "GOLFFOX",
-    "projectPath": "F:\\GOLFFOX\\web-app",
+    "projectPath": "F:\\GOLFFOX\\apps\\web",
     "testIds": [],
     "additionalInstruction": "",
     "envs": {
       "API_KEY": "sk-user-lWIhMTwxagN3geBdJXFBCQaet4j0wSM7UJoeJ2omXlPFA3cE7V0iEOzykf4Ld1JOCv3VeHfoqlPG0uELvubjHZiF-7gNPkBacPhux-_t5whTGoTAFWr_UEOHcyCri4gNagc"
     }
   },
-  "proxy": "http://6b04e276-1306-4b1a-849d-35f529b637a7:6pzfN6Ou6Xi88dkKKIeHpFuovdJAH5Oq@tun.testsprite.com:8080"
+  "proxy": "http://88024bc0-0ce0-43ec-ac15-f456c9bf8152:XMP1ZiZ4dnfq2YrLvK64Vo932989927c@tun.testsprite.com:8080"
 }
