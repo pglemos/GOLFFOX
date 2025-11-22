@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseServiceRole } from '@/lib/supabase-server'
 import { requireAuth } from '@/lib/api-auth'
+import { applyRateLimit } from '@/lib/rate-limit'
 import { z } from 'zod'
 
 export const runtime = 'nodejs'
@@ -29,6 +30,10 @@ export async function OPTIONS() {
 
 export async function POST(req: NextRequest) {
   try {
+    // ✅ Rate Limit (Sensitive operation)
+    const rateLimitResponse = await applyRateLimit(req, 'sensitive')
+    if (rateLimitResponse) return rateLimitResponse
+
     const authErrorResponse = await requireAuth(req, 'admin')
     if (authErrorResponse) return authErrorResponse
 

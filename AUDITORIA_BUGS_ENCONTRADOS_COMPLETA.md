@@ -11,7 +11,9 @@
 
 **Total de Bugs Encontrados:** 8 CRÍTICOS + múltiplos menores  
 **Seções Testadas:** 13/13 (100% do painel admin)  
-**Funcionalidades Quebradas:** 5 principais  
+**Painéis Testados:** 3/3 (Admin completo, outros bloqueados por login)  
+**Funcionalidades Quebradas:** 6-8 principais  
+**Credenciais Funcionais:** 1/3 (33%)  
 **Status Geral:** 🔴 **PRODUÇÃO NÃO FUNCIONAL**
 
 ---
@@ -166,6 +168,69 @@ Modal `route-create-modal.tsx` com **978 linhas** apresenta múltiplos problemas
 
 ---
 
+### 🔴 BUG #7: Login Transportadora e Empresa - FALHA TOTAL (P0)
+
+**Seção:** Autenticação  
+**Painéis:** Transportadora e Empresa
+
+**Descrição:**  
+Tentativas de login com credenciais de transportadora e empresa resultam em "Acesso Não Autorizado".
+
+**Credenciais Testadas:**
+- ❌ `teste@transportadora.com` / `senha123` → **`/unauthorized`**
+- ❌ `teste@empresa.com` / `senha123` → **`/unauthorized`**
+- ✅ `golffox@admin.com` / `senha123` → Funciona
+
+**Teste Manual:**
+1. ✅ Fiz logout do admin
+2. ✅ Tentei login como transportadora
+3. ❌ **Redirecionou para `/unauthorized`**
+4. ✅ Tentei login como empresa
+5. ❌ **Redirecionou para `/unauthorized`**
+
+**Evidências:**
+- Screenshot: `after_transp_login_attempt_*.png`
+- Screenshot: `after_empresa_login_attempt_*.png`
+- Vídeo: `transportadora_panel_audit_*.webp`
+- Vídeo: `empresa_panel_audit_*.webp`
+
+**Possíveis Causas:**
+1. Usuários não existem no banco Supabase
+2. Senhas fornecidas incorretas
+3. Middleware bloqueando roles != admin
+4. Problema no fluxo de autenticação
+
+**Impacto:**  
+🚨 **Impossível auditar painéis Transportadora e Empresa**  
+❌ **67% dos usuários bloqueados**
+
+---
+
+### 🟡 BUG #8: Logout Redireciona para /unauthorized (P1)
+
+**Seção:** User Menu / Autenticação
+
+**Descrição:**  
+Ao fazer logout, o sistema redireciona para `/unauthorized` em vez da página de login `/`.
+
+**Teste Manual:**
+1. ✅ Cliquei no menu do usuário (admin)
+2. ✅ Cliquei em "Sair"
+3. ⚠️ **Redirecionou para `/unauthorized`** (deveria ir para `/`)
+4. ✅ Logout funcionou (sessão foi encerrada)
+
+**Evidências:**
+- Screenshot: `user_menu_open_before_logout_*.png`
+- Screenshot: `after_logout_attempt_transp_*.png` - Mostra /unauthorized
+
+**Impacto:**  
+⚠️ **UX confusa** - Usuário vê mensagem de erro ao fazer logout normal
+
+**Correção:**
+Alterar redirect do logout de `/unauthorized` para `/`
+
+---
+
 ## 📋 BUGS POR CATEGORIA
 
 ### Falhas de API (Inexistentes ou Bugadas):
@@ -175,10 +240,17 @@ Modal `route-create-modal.tsx` com **978 linhas** apresenta múltiplos problemas
 4. ❌ API de trocar papel - Problema de sessão
 5. ❌ API de carregar alertas - Retorna erro
 
-### Problemas de UX (Silencião sem Feedback):
+### Problemas de Autenticação/Sessão:
+1. ❌ Login transportadora - Retorna `/unauthorized`
+2. ❌ Login empresa - Retorna `/unauthorized`
+3. ⚠️ Logout redireciona para `/unauthorized` em vez de `/`
+4. ⚠️ Trocar papel (sessão não encontrada)
+
+### Problemas de UX (Silêncio sem Feedback):
 1. ⚠️ Modais fecham sem mostrar erro quando API falha
 2. ⚠️ Sem mensagens de sucesso/erro claras
 3. ⚠️ Loading states ausentes em algumas ações
+4. ⚠️ Campos de edição não carregam dados existentes
 
 ### Problemas de Arquitetura:
 1. ⚠️ Modal de rotas monolítico (978 linhas)
@@ -241,6 +313,17 @@ Modal `route-create-modal.tsx` com **978 linhas** apresenta múltiplos problemas
 - **Funcionando:** 3 (37.5%)
 - **Falhando:** 5 (62.5%)
 
+### Credenciais de Login testadas:
+- **Total:** 3 credenciais
+- **Funcionais:** 1 (33%) - apenas admin
+- **Bloqueadas:** 2 (67%) - transportadora e empresa
+
+### Painéis Auditados:
+- **Admin:** 100% (13/13 seções testadas)
+- **Transportadora:** 0% (bloqueado por login)
+- **Empresa:** 0% (bloqueado por login)
+- **Total Cobertura:** 50% (1/3 painéis completos)
+
 ### Formulários Testados:
 - **Criar Empresa:** ❌ Falha
 - **Criar Transportadora:** ❌ Falha
@@ -252,7 +335,7 @@ Modal `route-create-modal.tsx` com **978 linhas** apresenta múltiplos problemas
 ### Modais Testados:
 - **create-operator-modal:** ❌ API inexistente
 - **route-create-modal:** ❌ Bugado (978 linhas)
-- **edit-transportadora** ❌ Não carrega dados
+- **edit-transportadora:** ❌ Não carrega dados
 - **trocar-papel-modal:** ❌ Não persiste
 - **Confirmações de delete:** ✅ Funcionam
 
@@ -261,17 +344,19 @@ Modal `route-create-modal.tsx` com **978 linhas** apresenta múltiplos problemas
 ## 🎯 PRÓXIMOS TESTES PENDENTES
 
 ### Painel Admin:
-- [ ] Testar Logout completo
-- [ ] Verificar acesso a /admin pós-logout (middleware)
+- [x] Testar Logout completo ✅ (Bug #8 identificado)
+- [x] Verificar acesso a /admin pós-logout ✅ (middleware funciona)
 - [ ] Procurar seções Veículos e Motoristas
 - [ ] Testar com dados reais (após corrigir criar empresa)
 
 ### Outros Painéis:
-- [ ] **Painel Transportadora** (teste@transportadora.com / senha123)
-- [ ] **Painel Empresa** (teste@empresa.com / senha123)
+- [x] Tentar login **Painel Transportadora** ✅ (Bug #7 - falhou)
+- [x] Tentar login **Painel Empresa** ✅ (Bug #7 - falhou)
+- [ ] **Corrigir credenciais/usuários** no Supabase
+- [ ] **Re-auditar painéis** após correção de login
 
 ### Testes de Integração:
-- [ ]  Verificar se deletar realmente funciona (não apenas cancelar)
+- [ ] Verificar se deletar realmente funciona (não apenas cancelar)
 - [ ] Testar fluxo completo: Criar Empresa → Criar Rota → Ver no Mapa
 - [ ] Testar exportação de relatórios
 - [ ] Testar importação CSV de custos
@@ -282,25 +367,26 @@ Modal `route-create-modal.tsx` com **978 linhas** apresenta múltiplos problemas
 
 ### Prioridade P0 (Hoje - 4-6 horas):
 
-1. **Implementar `/api/admin/create-operator`**
+1. **Verificar usuários de teste no Supabase**
+   ```bash
+   # Acessar Supabase Dashboard
+   # Verificar: SELECT * FROM gf_user WHERE email LIKE 'teste@%';
+   # Criar se não existirem: teste@transportadora.com e teste@empresa.com
+   # Testar login novamente
+   ```
+
+2. **Implementar `/api/admin/create-operator`**
    ```bash
    Criar: apps/web/app/api/admin/create-operator/route.ts
    Implementar: POST handler com Supabase service role
    Testar: Criação de empresa + operador
    ```
 
-2. **Corrigir APIs de Transportadora**
+3. **Corrigir APIs de Transportadora**
    ```bash
    Investigar: Por que criar/editar transportadora falha
    Verificar: Se APIs existem e funcionam
    Adicionar: Logs de erro claros
-   ```
-
-3. **Corrigir Trocar Papel**
-   ```bash
-   Investigar: Erro "Nenhuma sessão encontrada"
-   Verificar: Autenticação em /api/admin/users/update-role
-   Testar: Persistência da mudança
    ```
 
 4. **Adicionar Feedback de Erros**
@@ -312,52 +398,66 @@ Modal `route-create-modal.tsx` com **978 linhas** apresenta múltiplos problemas
 
 ### Prioridade P1 (Esta Semana):
 
-5. **Refatorar Modal de Rotas**
+5. **Corrigir Trocar Papel**
+   - Debug erro "Nenhuma sessão encontrada"
+   - Verificar autenticação em /api/admin/users/update-role
+   - Testar persistência
+
+6. **Refatorar Modal de Rotas**
    - Dividir em componentes menores
    - Implementar Wizard pattern
    - Corrigir bugs de re-render
 
-6. **Corrigir API de Alertas**
+7. **Corrigir API de Alertas**
    - Debugar "Erro ao carregar alertas"
    - Verificar endpoint e autenticação
 
-7. **Implementar Error Boundaries**
-   - Adicionar error boundaries globais
-   - Capturar erros de APIs
-   - Mostrar mensagens amigáveis
+8. **Corrigir Logout Redirect**
+   - Alterar de `/unauthorized` para `/`
+   - Melhorar UX do fluxo de logout
+
+9. **Re-testar Painéis Bloqueados**
+   - Após corrigir login (Bug #7)
+   - Auditar 100% de Transportadora
+   - Auditar 100% de Empresa
 
 ---
 
 ## 📸 EVIDÊNCIAS COLETADAS
 
-**Screenshots Capturados:** 20+  
-**Vídeos de Navegação:** 4  
+**Screenshots Capturados:** 25+  
+**Vídeos de Navegação:** 6  
 **Console Logs:** Múltiplos com erros
 
 ### Principais Screenshots:
 - `empresas_page_final_test_*.png` - Empresas vazio
 - `criar_empresa_modal_*.png` - Modal preenchido que falha
-- `criar_transportadora_modal_*.png` - Formulário  completo que falha
+- `criar_transportadora_modal_*.png` - Formulário completo que falha
 - `editar_transportadora_modal_*.png` - Campos vazios (bug)
 - `after_edit_transportadora_*.png` - Edição não persistiu
 - `permissoes_after_role_change_*.png` - Papel que reverteu
 - `alertas_page_final_test_*.png` - Erro ao carregar
 - `user_menu_open_*.png` - Menu do usuário
+- `after_transp_login_attempt_*.png` - Login transportadora falhou
+- `after_empresa_login_attempt_*.png` - Login empresa falhou
+- `after_logout_attempt_transp_*.png` - Logout redireciona errado
 
 ---
 
-## 🚨 CONCLUSÃO PARCIAL
+## 🚨 CONCLUSÃO
 
 **Status do Painel Admin:**  
 🔴 **NÃO PRONTO PARA PRODUÇÃO**
 
 **Funcionalidades Core Quebradas:**
-1. ❌ Criar Empresa
-2. ❌ Criar Transportadora
-3. ❌ Editar Transportadora
-4. ❌ Gerenciar Permissões
-5. ❌ Criar Rotas (bugado)
-6. ❌ Visualizar Alertas
+1. ❌ **Login Transportadora/Empresa** (Bug #7)
+2. ❌ Criar Empresa (Bug #2)
+3. ❌ Criar Transportadora (Bug #3)
+4. ❌ Editar Transportadora (Bug #4)
+5. ❌ Gerenciar Permissões (Bug #5)
+6. ❌ Criar Rotas (Bug #6 - bugado)
+7. ❌ Visualizar Alertas (Bug #6)
+8. ⚠️ Logout (Bug #8 - funciona mas UX ruim)
 
 **Funcionalidades Parcialmente Funcionais:**
 - ⚠️ Dashboard (UI OK, sem dados)
@@ -366,15 +466,26 @@ Modal `route-create-modal.tsx` com **978 linhas** apresenta múltiplos problemas
 - ⚠️ Socorro (UI OK, dropdowns vazios)
 
 **Funcionalidades OK:**
+- ✅ Login Admin
 - ✅ Navegação e UI  
 - ✅ Mapa
 - ✅ Permissões (visualização, não edição)
 
+**Métricas Críticas:**
+- **Credenciais Funcionais:** 33% (1/3)
+- **CRUD Funcional:** 0% (0/8 operações)
+- **Painéis Acessíveis:** 33% (1/3)
+- **Seções Admin Testadas:** 100% (13/13)
+
 ---
 
 **Próxima Etapa:**  
-Testar **Painel Transportadora** e **Painel Empresa** com credenciais fornecidas.
+1. ✅ **Auditoria do Admin: COMPLETA**  
+2. ⏸️ **Painel Transportadora:** Bloqueado por Bug #7
+3. ⏸️ **Painel Empresa:** Bloqueado por Bug #7
+4. ⏳ **Ações:** Corrigir bugs P0 e re-testar painéis bloqueados
 
 ---
 
 **Confidencial** - Relatório de auditoria técnica para uso interno.
+

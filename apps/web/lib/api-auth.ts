@@ -13,9 +13,11 @@ export interface AuthenticatedUser {
   companyId?: string | null
 }
 
+const isDevelopment = process.env.NODE_ENV === 'development'
+
 /**
  * Valida autenticação SEMPRE buscando dados do Supabase
- * NUNCA usa cookies customizados - apenas Supabase session
+ * NUNCA usa cookies customizados sem validar token
  * Retorna usuário autenticado ou null
  */
 export async function validateAuth(request: NextRequest): Promise<AuthenticatedUser | null> {
@@ -23,56 +25,57 @@ export async function validateAuth(request: NextRequest): Promise<AuthenticatedU
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
     const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
     const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-    
+
     if (!supabaseUrl || !supabaseAnonKey) {
       console.error('❌ Supabase não configurado')
       return null
     }
-    
-    console.log('🔍 validateAuth - Verificando autenticação (SEMPRE do Supabase)', {
-      path: request.nextUrl.pathname,
-      method: request.method
-    })
-    
+
+    if (isDevelopment) {
+      console.log('🔍 validateAuth - Verificando autenticação', {
+        path: request.nextUrl.pathname,
+        method: request.method
+      })
+    }
+
     let accessToken: string | null = null
-    
+
     // 1. Tentar obter token do header Authorization (Bearer token)
     const authHeader = request.headers.get('authorization')
     if (authHeader && authHeader.startsWith('Bearer ')) {
       accessToken = authHeader.substring(7)
-      console.log('✅ Token encontrado no header Authorization')
+      if (isDevelopment) console.log('✅ Token encontrado no header Authorization')
     }
-    
+
     // 2. Se não houver no header, tentar obter do cookie customizado (golffox-session)
     if (!accessToken) {
       const golffoxSession = request.cookies.get('golffox-session')?.value
-      
+
       if (golffoxSession) {
         try {
           // Decodificar cookie base64
           const decoded = Buffer.from(golffoxSession, 'base64').toString('utf-8')
           const sessionData = JSON.parse(decoded)
-          
-          console.log('🔍 Cookie customizado decodificado:', {
-            hasAccessToken: !!sessionData.access_token,
-            hasId: !!sessionData.id,
-            hasUser: !!sessionData.user,
-            role: sessionData.role
-          })
-          
+
+          if (isDevelopment) {
+            console.log('🔍 Cookie customizado decodificado:', {
+              hasAccessToken: !!sessionData.access_token,
+              hasId: !!sessionData.id,
+              role: sessionData.role
+            })
+          }
+
           // Tentar obter access_token do cookie customizado
           if (sessionData.access_token) {
             accessToken = sessionData.access_token
-            console.log('✅ Token encontrado no cookie customizado (golffox-session)')
+            if (isDevelopment) console.log('✅ Token encontrado no cookie customizado (golffox-session)')
           }
         } catch (error) {
-          console.warn('⚠️ Erro ao processar cookie customizado:', error)
+          if (isDevelopment) console.warn('⚠️ Erro ao processar cookie customizado:', error)
         }
-      } else {
-        console.warn('⚠️ Cookie golffox-session não encontrado na requisição')
       }
     }
-    
+
     // 3. Se ainda não encontrou, tentar obter do cookie do Supabase
     if (!accessToken) {
       // Procurar cookie de sessão do Supabase
@@ -80,108 +83,67 @@ export async function validateAuth(request: NextRequest): Promise<AuthenticatedU
       if (projectRef) {
         const supabaseCookieName = `sb-${projectRef}-auth-token`
         const supabaseCookie = request.cookies.get(supabaseCookieName)?.value
-        
+
         if (supabaseCookie) {
           try {
             const tokenData = JSON.parse(supabaseCookie)
             accessToken = tokenData?.access_token || tokenData?.accessToken || null
-            if (accessToken) {
+            if (accessToken && isDevelopment) {
               console.log('✅ Token encontrado no cookie do Supabase')
             }
           } catch (error) {
-            console.warn('⚠️ Erro ao processar cookie do Supabase:', error)
+            if (isDevelopment) console.warn('⚠️ Erro ao processar cookie do Supabase:', error)
           }
         }
       }
     }
-    
-    // 4. Se ainda não encontrou token, tentar obter diretamente do cookie customizado sem validação
+
     if (!accessToken) {
-      const golffoxSession = request.cookies.get('golffox-session')?.value
-      
-      if (golffoxSession && serviceKey) {
-        try {
-          const decoded = Buffer.from(golffoxSession, 'base64').toString('utf-8')
-          const sessionData = JSON.parse(decoded)
-          
-          // O cookie customizado contém os dados do usuário diretamente
-          const userId = sessionData.id || sessionData.user?.id
-          
-          if (userId) {
-            console.log('⚠️ Token não encontrado, mas há sessão customizada. Buscando dados do usuário diretamente...')
-            // Pular validação de token e buscar dados diretamente do banco
-            const supabaseAdmin = createClient(supabaseUrl, serviceKey, {
-              auth: { persistSession: false, autoRefreshToken: false }
-            })
-            
-            const { data: userData, error: dbError } = await supabaseAdmin
-              .from('users')
-              .select('id, email, role, company_id, transportadora_id')
-              .eq('id', userId)
-              .maybeSingle()
-            
-            if (!dbError && userData) {
-              console.log('✅ Dados do usuário obtidos do banco via sessão customizada')
-              return {
-                id: userData.id,
-                email: userData.email || '',
-                role: userData.role || 'passenger',
-                companyId: userData.company_id || null
-              }
-            }
-          }
-        } catch (error) {
-          console.warn('⚠️ Erro ao processar cookie customizado para buscar usuário:', error)
-        }
-      }
-      
-      if (!accessToken) {
-        console.warn('⚠️ Token de acesso não encontrado')
-        return null
-      }
+      if (isDevelopment) console.warn('⚠️ Token de acesso não encontrado')
+      return null
     }
-    
+
     // 4. Validar token com Supabase Auth
     const supabase = createClient(supabaseUrl, supabaseAnonKey, {
       auth: { persistSession: false, autoRefreshToken: false }
     })
-    
+
     const { data: { user }, error: authError } = await supabase.auth.getUser(accessToken)
-    
+
     if (authError || !user) {
       console.error('❌ Erro ao validar token com Supabase:', authError)
       return null
     }
-    
-    console.log('✅ Token validado com Supabase, user ID:', user.id)
-    
+
+    if (isDevelopment) console.log('✅ Token validado com Supabase, user ID:', user.id)
+
     // 5. SEMPRE buscar dados completos do usuário no banco de dados
     if (!serviceKey) {
       console.error('❌ Service role key não configurada')
       return null
     }
-    
+
     const supabaseAdmin = createClient(supabaseUrl, serviceKey, {
       auth: { persistSession: false, autoRefreshToken: false }
     })
-    
+
     // Buscar TODOS os dados do usuário do banco
     const { data: userData, error: dbError } = await supabaseAdmin
       .from('users')
       .select('id, email, role, company_id, transportadora_id')
       .eq('id', user.id)
       .maybeSingle()
-    
+
     if (dbError) {
       console.error('❌ Erro ao buscar dados do usuário no banco:', dbError)
       return null
     }
-    
+
     if (!userData) {
       console.error('❌ Usuário não encontrado na tabela users:', user.id)
       return null
     }
-    
+
     // Usar dados do banco (sempre atualizados)
     const authenticatedUser: AuthenticatedUser = {
       id: userData.id,
@@ -189,16 +151,17 @@ export async function validateAuth(request: NextRequest): Promise<AuthenticatedU
       role: userData.role || user.user_metadata?.role || user.app_metadata?.role || 'passenger',
       companyId: userData.company_id || null
     }
-    
-    console.log('✅ Usuário autenticado e dados obtidos do banco:', {
-      id: authenticatedUser.id,
-      email: authenticatedUser.email,
-      role: authenticatedUser.role,
-      companyId: authenticatedUser.companyId
-    })
-    
+
+    if (isDevelopment) {
+      console.log('✅ Usuário autenticado e dados obtidos do banco:', {
+        id: authenticatedUser.id,
+        role: authenticatedUser.role
+      })
+    }
+
     return authenticatedUser
   } catch (error) {
+    console.error('❌ Erro inesperado na autenticação:', error)
     return null
   }
 }
@@ -208,21 +171,21 @@ export async function validateAuth(request: NextRequest): Promise<AuthenticatedU
  */
 export function hasRole(user: AuthenticatedUser | null, requiredRole: string | string[]): boolean {
   if (!user) return false
-  
+
   const roles = Array.isArray(requiredRole) ? requiredRole : [requiredRole]
-  
+
   if (roles.includes('admin')) {
     return user.role === 'admin'
   }
-  
+
   if (roles.includes('operador')) {
     return ['admin', 'operador'].includes(user.role)
   }
-  
+
   if (roles.includes('transportadora')) {
     return ['admin', 'transportadora'].includes(user.role)
   }
-  
+
   return roles.includes(user.role)
 }
 
@@ -234,105 +197,30 @@ export async function requireAuth(
   request: NextRequest,
   requiredRole?: string | string[]
 ): Promise<NextResponse | null> {
-  // ✅ NUNCA pular validação em produção - apenas em testes explícitos
-  const isTestMode = request.headers.get('x-test-mode') === 'true'
-  const isDevelopment = process.env.NODE_ENV === 'development'
-  const isVercelProduction = process.env.VERCEL === '1' && process.env.VERCEL_ENV === 'production'
-  
-  // Permitir bypass APENAS em desenvolvimento local (não em Vercel)
-  if ((isTestMode || isDevelopment) && !isVercelProduction) {
-    console.log('⚠️ Bypass de autenticação ativo (modo desenvolvimento/teste)')
-    return null
-  }
-  
+  // ❌ REMOVIDO BYPASS DE DESENVOLVIMENTO INSEGURO
+
   const user = await validateAuth(request)
-  
+
   if (!user) {
-    // Log detalhado para debug em produção
-    const sessionCookie = request.cookies.get('golffox-session')?.value
-    const authHeader = request.headers.get('authorization')
-    const allCookies = request.cookies.getAll().map(c => c.name)
-    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-    
-    console.error('❌ Autenticação falhou', {
-      hasCookie: !!sessionCookie,
-      cookieLength: sessionCookie?.length || 0,
-      hasAuthHeader: !!authHeader,
-      authHeaderLength: authHeader?.length || 0,
-      allCookies,
-      isVercel: process.env.VERCEL === '1',
-      env: process.env.VERCEL_ENV || 'development',
-      path: request.nextUrl.pathname,
-      method: request.method
-    })
-    
-    // Em desenvolvimento, tentar usar cookie diretamente
-    if (isDevelopment && sessionCookie && serviceKey && supabaseUrl) {
-      try {
-        const decoded = Buffer.from(sessionCookie, 'base64').toString('utf-8')
-        const sessionData = JSON.parse(decoded)
-        const userId = sessionData.id || sessionData.user?.id
-        
-        if (userId) {
-          console.log('⚠️ Tentando autenticação via cookie em desenvolvimento...')
-          const supabaseAdmin = createClient(supabaseUrl, serviceKey, {
-            auth: { persistSession: false, autoRefreshToken: false }
-          })
-          
-          const { data: userData, error: dbError } = await supabaseAdmin
-            .from('users')
-            .select('id, email, role, company_id, transportadora_id')
-            .eq('id', userId)
-            .maybeSingle()
-          
-          if (!dbError && userData) {
-            console.log('✅ Autenticação via cookie bem-sucedida em desenvolvimento')
-            // Retornar null para continuar (não é erro)
-            const authenticatedUser: AuthenticatedUser = {
-              id: userData.id,
-              email: userData.email || '',
-              role: userData.role || 'passenger',
-              companyId: userData.company_id || null
-            }
-            
-            // Verificar role se necessário
-            if (requiredRole && !hasRole(authenticatedUser, requiredRole)) {
-              const roles = Array.isArray(requiredRole) ? requiredRole : [requiredRole]
-              return NextResponse.json(
-                { 
-                  error: 'Acesso negado', 
-                  message: `Acesso permitido apenas para: ${roles.join(', ')}. Seu role atual: ${authenticatedUser.role}`,
-                  allowedRoles: roles,
-                  currentRole: authenticatedUser.role
-                },
-                { status: 403 }
-              )
-            }
-            
-            return null // Autenticação OK
-          }
-        }
-      } catch (cookieError) {
-        console.warn('⚠️ Erro ao tentar autenticação via cookie em desenvolvimento:', cookieError)
-      }
+    if (isDevelopment) {
+      console.error('❌ Autenticação falhou para:', request.nextUrl.pathname)
     }
-    
+
     return NextResponse.json(
-      { 
-        error: 'Não autorizado', 
+      {
+        error: 'Não autorizado',
         message: 'Usuário não autenticado',
-        details: 'Faça login antes de acessar este endpoint. Se você já fez login, tente fazer logout e login novamente.'
+        details: 'Faça login antes de acessar este endpoint.'
       },
       { status: 401 }
     )
   }
-  
+
   if (requiredRole && !hasRole(user, requiredRole)) {
     const roles = Array.isArray(requiredRole) ? requiredRole : [requiredRole]
     return NextResponse.json(
-      { 
-        error: 'Acesso negado', 
+      {
+        error: 'Acesso negado',
         message: `Acesso permitido apenas para: ${roles.join(', ')}. Seu role atual: ${user.role}`,
         allowedRoles: roles,
         currentRole: user.role
@@ -340,7 +228,7 @@ export async function requireAuth(
       { status: 403 }
     )
   }
-  
+
   return null
 }
 
@@ -351,56 +239,40 @@ export async function requireCompanyAccess(
   request: NextRequest,
   companyId: string
 ): Promise<{ user: AuthenticatedUser; error: NextResponse | null }> {
-  const isTestMode = request.headers.get('x-test-mode') === 'true'
-  const isDevelopment = process.env.NODE_ENV === 'development'
-  if (isTestMode || isDevelopment) {
-    return {
-      user: {
-        id: 'test-user',
-        email: 'test@golffox.local',
-        role: 'admin',
-        companyId,
-      },
-      error: null,
-    }
-  }
+  // ❌ REMOVIDO BYPASS DE DESENVOLVIMENTO INSEGURO
+
   const user = await validateAuth(request)
-  
+
   if (!user) {
     return {
       user: null as any,
       error: NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
   }
-  
+
   // Admin tem acesso a todas as empresas
   if (user.role === 'admin') {
     return { user, error: null }
   }
-  
+
   // Verificar se usuário tem acesso à empresa via gf_user_company_map
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-  
+
   if (supabaseUrl && supabaseAnonKey) {
-    const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-      auth: { persistSession: false, autoRefreshToken: false }
-    })
-    
-    // Usar service role para verificar mapeamento (bypass RLS)
     const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
     if (serviceKey) {
       const supabaseAdmin = createClient(supabaseUrl, serviceKey, {
         auth: { persistSession: false, autoRefreshToken: false }
       })
-      
+
       const { data: mapping } = await supabaseAdmin
         .from('gf_user_company_map')
         .select('company_id')
         .eq('user_id', user.id)
         .eq('company_id', companyId)
         .single()
-      
+
       if (!mapping) {
         return {
           user: null as any,
@@ -412,7 +284,6 @@ export async function requireCompanyAccess(
       }
     }
   }
-  
+
   return { user, error: null }
 }
-

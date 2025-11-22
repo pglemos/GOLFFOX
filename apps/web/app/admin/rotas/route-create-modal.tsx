@@ -1,7 +1,6 @@
 "use client"
 
-import { useState, useEffect, useMemo } from "react"
-import { motion } from "framer-motion"
+import { useState, useMemo } from "react"
 import {
   Dialog,
   DialogContent,
@@ -11,41 +10,21 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import {
-  Route,
-  MapPin,
-  Clock,
-  Calendar,
-  Building2,
-  Users,
-  Truck,
-  User,
-  Search,
-  X,
-  Navigation,
-  AlertTriangle,
-  CheckCircle2,
-} from "lucide-react"
+import { Route } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { notifySuccess, notifyError } from "@/lib/toast"
-import { maskCPF } from "@/lib/geocoding"
 import { optimizeRoute } from "@/lib/route-optimization"
-import { loadGoogleMaps } from "@/lib/google-maps-loader"
 import { geocodeAddress } from "@/lib/geocoding"
-import type { EmployeeLite, OptimizeRouteResponse, RouteFormData } from "@/types/routes"
 import { DriverPickerModal } from "@/components/admin/driver-picker-modal"
 import { VehiclePickerModal } from "@/components/admin/vehicle-picker-modal"
-import { AddressAutocomplete } from "@/components/address-autocomplete"
 import { z } from "zod"
 import React from "react"
 import { useRouteCreate } from "./use-route-create"
+import { RouteForm } from "@/components/modals/route-create/route-form"
+import { EmployeeSelector } from "@/components/modals/route-create/employee-selector"
+import { RoutePreviewMap } from "@/components/modals/route-create/route-preview-map"
+import { useGoogleMapsLoader } from "@/components/modals/route-create/use-google-maps-loader"
 
 const routeSchema = z.object({
   name: z.string().min(1, "Nome é obrigatório"),
@@ -54,16 +33,6 @@ const routeSchema = z.object({
   shift: z.enum(["manha", "tarde", "noite"]),
   selected_employees: z.array(z.string()).min(1, "Selecione pelo menos um funcionário"),
 })
-
-const DAYS_OF_WEEK = [
-  { value: 0, label: "Dom" },
-  { value: 1, label: "Seg" },
-  { value: 2, label: "Ter" },
-  { value: 3, label: "Qua" },
-  { value: 4, label: "Qui" },
-  { value: 5, label: "Sex" },
-  { value: 6, label: "Sáb" },
-]
 
 interface RouteCreateModalProps {
   isOpen: boolean
@@ -76,7 +45,7 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
     formData, setFormData,
     companies, loadingCompanies,
     employees, loadingEmployees, loadEmployees,
-    searchEmployee, setSearchEmployee, filteredEmployees,
+    searchEmployee, setSearchEmployee,
     selectedDriver, setSelectedDriver,
     selectedVehicle, setSelectedVehicle,
     optimizationResult, setOptimizationResult,
@@ -89,19 +58,9 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
 
   const [isDriverModalOpen, setIsDriverModalOpen] = useState(false)
   const [isVehicleModalOpen, setIsVehicleModalOpen] = useState(false)
-  const [mapLoaded, setMapLoaded] = useState(false)
-  const [mapError, setMapError] = useState<string | null>(null)
 
-  useEffect(() => {
-    if (isOpen) {
-      loadGoogleMaps()
-        .then(() => setMapLoaded(true))
-        .catch((err) => {
-          setMapError("Erro ao carregar Google Maps")
-          console.error(err)
-        })
-    }
-  }, [isOpen])
+  // Use the new hook for Google Maps loading
+  const { isLoaded: mapLoaded, error: mapError } = useGoogleMapsLoader(isOpen)
 
   const selectedEmployeesData = useMemo(() => {
     return employees.filter((e) => formData.selected_employees?.includes(e.employee_id))
@@ -354,361 +313,31 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="form" className="flex-1 overflow-y-auto space-y-6 pt-2">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="grid gap-2.5">
-                  <Label htmlFor="name" className="text-base font-medium">Nome da Rota *</Label>
-                  <Input
-                    id="name"
-                    value={formData.name || ""}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
-                    placeholder="Ex: Linha 101 - Rota Centro"
-                    className="text-base h-11 sm:h-12 px-4 py-3"
-                  />
-                </div>
-
-                <div className="grid gap-2.5">
-                  <Label htmlFor="company" className="text-base font-medium">Empresa *</Label>
-                  <Select
-                    key={`company-select-${companies.length}-${loadingCompanies ? 'loading' : 'loaded'}`}
-                    value={formData.company_id || ""}
-                    onValueChange={(value) => {
-                      console.log("📌 Empresa selecionada:", value, companies.find(c => c.id === value)?.name)
-                      setFormData((prev) => ({
-                        ...prev,
-                        company_id: value,
-                        selected_employees: [],
-                      }))
-                    }}
-                    disabled={loadingCompanies}
-                  >
-                    <SelectTrigger
-                      id="company"
-                      className="text-base h-11 sm:h-12 px-4 py-3"
-                      aria-label="Selecione a empresa"
-                    >
-                      <SelectValue placeholder={loadingCompanies ? "Carregando empresas..." : "Selecione a empresa"} />
-                    </SelectTrigger>
-                    <SelectContent className="max-h-[300px]">
-                      {loadingCompanies ? (
-                        <div className="px-4 py-3 text-base text-gray-500 flex items-center gap-2">
-                          <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
-                          Carregando empresas...
-                        </div>
-                      ) : companies.length === 0 ? (
-                        <div className="px-4 py-3 text-base text-gray-500">
-                          <div>Nenhuma empresa encontrada</div>
-                          <div className="text-xs text-gray-400 mt-1">
-                            Verifique se há empresas cadastradas no sistema
-                          </div>
-                        </div>
-                      ) : (
-                        <>
-                          {companies.map((c) => (
-                            <SelectItem
-                              key={c.id}
-                              value={c.id}
-                              className="text-base px-4 py-3 cursor-pointer"
-                            >
-                              {c.name}
-                            </SelectItem>
-                          ))}
-                        </>
-                      )}
-                    </SelectContent>
-                  </Select>
-                  {/* Debug info */}
-                  {process.env.NODE_ENV === 'development' && (
-                    <div className="text-xs text-gray-400 mt-1">
-                      {loadingCompanies ? 'Carregando...' : `${companies.length} empresa(s) disponível(eis)`}
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {formData.company_id && (
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between flex-wrap gap-3">
-                    <Label className="text-base font-medium">Funcionários *</Label>
-                    <Badge variant="outline" className="text-sm px-3 py-1">
-                      Selecionados: {formData.selected_employees?.length || 0} / {employees.length}
-                    </Badge>
-                  </div>
-                  <div className="relative">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-                    <Input
-                      placeholder="Buscar por nome ou CPF..."
-                      value={searchEmployee}
-                      onChange={(e) => setSearchEmployee(e.target.value)}
-                      className="pl-12 text-base h-11 sm:h-12 px-4 py-3"
-                      aria-label="Buscar funcionários por nome ou CPF"
-                    />
-                  </div>
-                  <ScrollArea className="h-[250px] sm:h-[350px] border rounded-lg p-4">
-                    {loadingEmployees ? (
-                      <div className="text-center py-8 text-gray-500">Carregando...</div>
-                    ) : filteredEmployees.length === 0 ? (
-                      <div className="text-center py-8 text-gray-500">Nenhum funcionário encontrado</div>
-                    ) : (
-                      <div className="space-y-2">
-                        {filteredEmployees.map((emp) => {
-                          const isSelected = formData.selected_employees?.includes(emp.employee_id)
-                          return (
-                            <div
-                              key={emp.employee_id}
-                              className={`flex items-start gap-3 p-2 rounded-lg border cursor-pointer transition-colors ${isSelected ? "bg-orange-50 border-orange-200" : "hover:bg-gray-50"
-                                }`}
-                              onClick={() => toggleEmployee(emp.employee_id)}
-                              role="button"
-                              tabIndex={0}
-                              onKeyDown={(e) => {
-                                if (e.key === "Enter" || e.key === " ") {
-                                  e.preventDefault()
-                                  toggleEmployee(emp.employee_id)
-                                }
-                              }}
-                              aria-label={`${isSelected ? "Desmarcar" : "Selecionar"} funcionário ${emp.first_name} ${emp.last_name}`}
-                            >
-                              <Checkbox
-                                checked={isSelected}
-                                onCheckedChange={() => toggleEmployee(emp.employee_id)}
-                                aria-label={`${isSelected ? "Desmarcar" : "Selecionar"} ${emp.first_name} ${emp.last_name}`}
-                              />
-                              <div className="flex-1 min-w-0">
-                                <div className="font-medium">
-                                  {emp.first_name} {emp.last_name}
-                                </div>
-                                <div className="text-sm text-gray-600 truncate">{emp.address}</div>
-                                {emp.cpf && (
-                                  <div className="text-xs text-gray-400">{maskCPF(emp.cpf)}</div>
-                                )}
-                                {(!emp.lat || !emp.lng) && (
-                                  <Badge variant="destructive" className="mt-1 text-xs">
-                                    <AlertTriangle className="h-3 w-3 mr-1" />
-                                    Sem coordenadas
-                                  </Badge>
-                                )}
-                              </div>
-                            </div>
-                          )
-                        })}
-                      </div>
-                    )}
-                  </ScrollArea>
-                </div>
-              )}
-
-              <div className="grid gap-2.5">
-                <Label htmlFor="description" className="text-base font-medium">Descrição</Label>
-                <Input
-                  id="description"
-                  value={formData.description || ""}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
-                  placeholder="Descrição opcional da rota (ex: Rota principal do centro)"
-                  className="text-base h-11 sm:h-12 px-4 py-3"
+            <TabsContent value="form" className="flex-1 overflow-y-auto">
+              <RouteForm
+                formData={formData}
+                setFormData={setFormData}
+                companies={companies}
+                loadingCompanies={loadingCompanies}
+                selectedDriver={selectedDriver}
+                selectedVehicle={selectedVehicle}
+                onOpenDriverModal={() => setIsDriverModalOpen(true)}
+                onOpenVehicleModal={() => setIsVehicleModalOpen(true)}
+                newException={newException}
+                setNewException={setNewException}
+                addException={addException}
+                removeException={removeException}
+                warnings={warnings}
+              >
+                <EmployeeSelector
+                  employees={employees}
+                  selectedEmployees={formData.selected_employees || []}
+                  loading={loadingEmployees}
+                  searchQuery={searchEmployee}
+                  onSearchChange={setSearchEmployee}
+                  onToggleEmployee={toggleEmployee}
                 />
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <AddressAutocomplete
-                  value={formData.origin_address || ""}
-                  onChange={(address, lat, lng) => {
-                    setFormData((prev) => ({
-                      ...prev,
-                      origin_address: address,
-                      origin_lat: lat || 0,
-                      origin_lng: lng || 0,
-                    }))
-                    if (address && lat && lng) {
-                      notifySuccess("Origem geocodificada automaticamente!")
-                    }
-                  }}
-                  label="Origem (Garagem)"
-                  placeholder="Digite o endereço completo da garagem"
-                  onGeocodeError={(error) => {
-                    notifyError(error, "Erro no autocomplete")
-                  }}
-                  className="w-full"
-                />
-                <AddressAutocomplete
-                  value={formData.destination_address || ""}
-                  onChange={(address, lat, lng) => {
-                    setFormData((prev) => ({
-                      ...prev,
-                      destination_address: address,
-                      destination_lat: lat || 0,
-                      destination_lng: lng || 0,
-                    }))
-                    if (address && lat && lng) {
-                      notifySuccess("Destino geocodificado automaticamente!")
-                    }
-                  }}
-                  label="Destino (Empresa)"
-                  placeholder="Digite o endereço completo da empresa"
-                  onGeocodeError={(error) => {
-                    notifyError(error, "Erro no autocomplete")
-                  }}
-                  className="w-full"
-                />
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="grid gap-2.5">
-                  <Label htmlFor="time" className="text-base font-medium flex items-center gap-2">
-                    <Clock className="h-4 w-4" />
-                    Horário *
-                  </Label>
-                  <Input
-                    id="time"
-                    type="time"
-                    value={formData.scheduled_time || ""}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, scheduled_time: e.target.value }))}
-                    className="text-base h-11 sm:h-12 px-4 py-3"
-                  />
-                </div>
-                <div className="grid gap-2.5">
-                  <Label htmlFor="shift" className="text-base font-medium">Turno *</Label>
-                  <Select
-                    value={formData.shift || "manha"}
-                    onValueChange={(value: "manha" | "tarde" | "noite") =>
-                      setFormData((prev) => ({ ...prev, shift: value }))
-                    }
-                  >
-                    <SelectTrigger id="shift" className="text-base h-11 sm:h-12 px-4 py-3">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="manha" className="text-base px-4 py-3">Manhã</SelectItem>
-                      <SelectItem value="tarde" className="text-base px-4 py-3">Tarde</SelectItem>
-                      <SelectItem value="noite" className="text-base px-4 py-3">Noite</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              <div className="grid gap-2.5">
-                <Label className="text-base font-medium flex items-center gap-2">
-                  <Calendar className="h-5 w-5" />
-                  Dias da Semana
-                </Label>
-                <div className="flex flex-wrap gap-3 mt-2">
-                  {DAYS_OF_WEEK.map((day) => {
-                    const isSelected = formData.days_of_week?.includes(day.value)
-                    return (
-                      <Badge
-                        key={day.value}
-                        variant={isSelected ? "default" : "outline"}
-                        className="cursor-pointer text-sm px-4 py-2 h-auto font-medium hover:opacity-80 transition-opacity"
-                        onClick={() => {
-                          setFormData((prev) => {
-                            const days = prev.days_of_week || []
-                            return {
-                              ...prev,
-                              days_of_week: isSelected
-                                ? days.filter((d) => d !== day.value)
-                                : [...days, day.value],
-                            }
-                          })
-                        }}
-                      >
-                        {day.label}
-                      </Badge>
-                    )
-                  })}
-                </div>
-              </div>
-
-              <div className="grid gap-2.5">
-                <Label className="flex items-center gap-2 text-base font-medium">
-                  <Calendar className="h-5 w-5" />
-                  Exceções (Datas sem rota)
-                </Label>
-                <div className="flex flex-col sm:flex-row gap-3">
-                  <Input
-                    type="text"
-                    value={newException}
-                    onChange={(e) => setNewException(e.target.value)}
-                    placeholder="dd/mm/aaaa"
-                    className="flex-1 text-base h-11 sm:h-12 px-4 py-3"
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        e.preventDefault()
-                        addException()
-                      }
-                    }}
-                  />
-                  <Button type="button" onClick={addException} className="w-full sm:w-auto h-11 sm:h-12 text-base font-medium">
-                    Adicionar
-                  </Button>
-                </div>
-                <div className="flex flex-wrap gap-2 mt-2">
-                  {(formData.exceptions || []).map((date) => (
-                    <Badge key={date} variant="secondary" className="flex items-center gap-2 text-sm px-3 py-1.5">
-                      {new Date(date).toLocaleDateString('pt-BR')}
-                      <X
-                        className="h-4 w-4 cursor-pointer hover:text-red-600"
-                        onClick={() => removeException(date)}
-                      />
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="grid gap-2.5">
-                  <Label className="text-base font-medium flex items-center gap-2">
-                    <User className="h-5 w-5" />
-                    Motorista
-                  </Label>
-                  <Button
-                    variant="outline"
-                    className="w-full justify-start text-base h-11 sm:h-12 px-4 py-3"
-                    onClick={() => setIsDriverModalOpen(true)}
-                    aria-label="Selecionar motorista"
-                  >
-                    <User className="h-5 w-5 mr-3" />
-                    <span className="truncate">{selectedDriver ? selectedDriver.name : "Selecionar Motorista"}</span>
-                  </Button>
-                </div>
-                <div className="grid gap-2.5">
-                  <Label className="text-base font-medium flex items-center gap-2">
-                    <Truck className="h-5 w-5" />
-                    Veículo
-                  </Label>
-                  <Button
-                    variant="outline"
-                    className="w-full justify-start text-base h-11 sm:h-12 px-4 py-3"
-                    onClick={() => setIsVehicleModalOpen(true)}
-                    aria-label="Selecionar veículo"
-                  >
-                    <Truck className="h-5 w-5 mr-3" />
-                    <span className="truncate">{selectedVehicle ? `${selectedVehicle.plate} (Cap: ${selectedVehicle.capacity})` : "Selecionar Veículo"}</span>
-                  </Button>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-3 py-3">
-                <Checkbox
-                  id="is_active"
-                  checked={formData.is_active ?? true}
-                  onCheckedChange={(checked) =>
-                    setFormData((prev) => ({ ...prev, is_active: checked as boolean }))
-                  }
-                  className="w-5 h-5 cursor-pointer"
-                />
-                <Label htmlFor="is_active" className="text-base font-medium cursor-pointer">Rota ativa</Label>
-              </div>
-
-              {warnings.length > 0 && (
-                <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                  {warnings.map((w, i) => (
-                    <div key={i} className="text-sm text-yellow-800 flex items-center gap-2">
-                      <AlertTriangle className="h-4 w-4" />
-                      {w}
-                    </div>
-                  ))}
-                </div>
-              )}
+              </RouteForm>
             </TabsContent>
 
             <TabsContent value="preview" className="flex-1 overflow-hidden flex flex-col">

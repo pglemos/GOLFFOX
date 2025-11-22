@@ -68,7 +68,7 @@ export function CreateOperatorModal({
         setLoading(false)
         return
       }
-      
+
       // Validar email apenas se fornecido (opcional)
       if (formData.responsibleEmail.trim() && !validateEmail(formData.responsibleEmail)) {
         notifyError(new Error('Email inválido'), 'Email do responsável inválido')
@@ -105,7 +105,7 @@ export function CreateOperatorModal({
         companyEmail: formData.companyEmail || null,
         companyWebsite: formData.companyWebsite || null,
       }
-      
+
       // Adicionar dados do responsável apenas se fornecidos (opcional)
       if (formData.responsibleEmail.trim()) {
         requestBody.operatorEmail = formData.responsibleEmail
@@ -119,7 +119,7 @@ export function CreateOperatorModal({
 
       // ✅ Obter token do Supabase e fazer requisição autenticada
       const { data: { session }, error: sessionError } = await supabase.auth.getSession()
-      
+
       if (sessionError || !session?.access_token) {
         notifyError(new Error('Usuário não autenticado'), 'Usuário não autenticado. Faça login novamente.')
         setLoading(false)
@@ -136,19 +136,65 @@ export function CreateOperatorModal({
         credentials: 'include',
       })
 
+      // ✅ BUG #2 FIX: Melhorar feedback de erros - não fechar modal silenciosamente
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ error: 'Erro desconhecido' }))
-        const errorMessage = errorData.error || errorData.message || 'Erro ao criar empresa'
-        throw new Error(errorMessage)
+        let errorMessage = 'Erro ao criar empresa'
+        let errorDetails = ''
+
+        try {
+          const errorData = await response.json()
+          errorMessage = errorData.error || errorData.message || errorMessage
+          errorDetails = errorData.details || ''
+
+          // Log detalhado para debugging
+          console.error('❌ Erro da API create-operator:', {
+            status: response.status,
+            statusText: response.statusText,
+            errorData
+          })
+        } catch (parseError) {
+          // Se não conseguir parsear JSON, mostrar status code
+          console.error('❌ Erro da API create-operator (sem JSON):', {
+            status: response.status,
+            statusText: response.statusText
+          })
+        }
+
+        // Mensagens específicas por status code
+        if (response.status === 401) {
+          errorMessage = 'Sessão expirada. Por favor, faça login novamente.'
+        } else if (response.status === 403) {
+          errorMessage = 'Você não tem permissão para criar empresas. Contacte o administrador.'
+        } else if (response.status === 404) {
+          errorMessage = 'API não encontrada. Por favor, contacte o suporte técnico.'
+        } else if (response.status === 500) {
+          errorMessage = errorDetails ? `Erro no servidor: ${errorMessage}\n\nDetalhes: ${errorDetails}` : `Erro no servidor: ${errorMessage}`
+        } else if (response.status >= 400) {
+          errorMessage = errorDetails ? `${errorMessage}\n\nDetalhes: ${errorDetails}` : errorMessage
+        }
+
+        // Mostrar erro ao usuário (NÃO lançar exceção)
+        notifyError(new Error(errorMessage), errorMessage)
+        setLoading(false)
+        setProgress('')
+        setStep(1) // Voltar para o início
+        // ❌ NÃO fecharModal - deixar usuário ver erro e tentar novamente
+        return
       }
 
       const result = await response.json()
-      
+
       // Verificar se a resposta tem companyId (obrigatório)
-      if (!result.companyId) {
-        throw new Error('Resposta inválida da API: companyId não encontrado')
+      if (!result.companyId && !result.company_id) {
+        const errorMsg = 'Resposta inválida da API: companyId não encontrado'
+        console.error('❌ Resposta da API create-operator:', result)
+        notifyError(new Error(errorMsg), errorMsg)
+        setLoading(false)
+        setProgress('')
+        setStep(1)
+        return
       }
-      
+
       // Normalizar campos da resposta (userId/operatorId são opcionais se não houver senha)
       const operatorId = result.userId || result.operatorId
 
@@ -193,7 +239,7 @@ export function CreateOperatorModal({
         responsibleEmail: "",
         responsiblePhone: "",
       })
-      
+
       onSave()
       setTimeout(() => {
         onClose()
@@ -248,7 +294,7 @@ export function CreateOperatorModal({
                 <Briefcase className="h-5 w-5" />
                 Dados da Empresa
               </h3>
-              
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                 <div className="space-y-2 sm:col-span-2">
                   <Label htmlFor="companyName" className="text-base font-medium">Nome da Empresa *</Label>
@@ -409,7 +455,7 @@ export function CreateOperatorModal({
               <p className="text-sm text-[var(--ink-muted)] mb-4">
                 Você pode preencher os dados do responsável agora ou criar os operadores depois através do botão "Usuário Operador" na lista de empresas.
               </p>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2 md:col-span-2">
                   <Label htmlFor="responsibleName">Nome do Responsável</Label>
@@ -450,17 +496,17 @@ export function CreateOperatorModal({
           </div>
 
           <DialogFooter className="flex-col sm:flex-row gap-3 pt-4 sm:pt-6 border-t mt-4 sm:mt-6">
-            <Button 
-              type="button" 
-              variant="outline" 
-              onClick={onClose} 
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onClose}
               disabled={loading}
               className="w-full sm:w-auto order-2 sm:order-1 min-h-[44px] text-base font-medium"
             >
               Cancelar
             </Button>
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
               disabled={loading}
               className="w-full sm:w-auto order-1 sm:order-2 bg-orange-500 hover:bg-orange-600 min-h-[44px] text-base font-medium"
             >
