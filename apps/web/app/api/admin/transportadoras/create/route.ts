@@ -11,7 +11,7 @@ const carrierSchema = z.object({
   address: z.string().optional().nullable(),
   phone: z.string().optional().nullable(),
   contact_person: z.string().optional().nullable(),
-  email: z.string().email().optional().nullable().or(z.literal('')),
+  email: z.string().email().optional().or(z.literal('').transform(() => null)).nullable(),
   cnpj: z.string().optional().nullable(),
   state_registration: z.string().optional().nullable(),
   municipal_registration: z.string().optional().nullable(),
@@ -35,10 +35,16 @@ export async function POST(req: NextRequest) {
     if (rateLimitResponse) return rateLimitResponse
 
     const authErrorResponse = await requireAuth(req, 'admin')
-    if (authErrorResponse) return authErrorResponse
+    if (authErrorResponse) {
+      console.error('[CREATE CARRIER] Auth failed:', authErrorResponse.status)
+      return authErrorResponse
+    }
 
     const body = await req.json()
+    console.log('[CREATE CARRIER] Request body received:', JSON.stringify(body, null, 2))
+
     const validated = carrierSchema.parse(body)
+    console.log('[CREATE CARRIER] Validation passed:', JSON.stringify(validated, null, 2))
 
     const insertData: any = {
       name: validated.name,
@@ -60,6 +66,8 @@ export async function POST(req: NextRequest) {
       insertData.municipal_registration = validated.municipal_registration
     }
 
+    console.log('[CREATE CARRIER] Attempting insert...', JSON.stringify(insertData, null, 2))
+
     const { data, error } = await supabaseServiceRole
       .from('carriers')
       .insert(insertData)
@@ -67,11 +75,14 @@ export async function POST(req: NextRequest) {
       .single()
 
     if (error) {
+      console.error('[CREATE CARRIER] Database error:', error.code, error.message, error.details)
       return NextResponse.json(
         { success: false, error: 'Erro ao criar transportadora', message: error.message },
         { status: 500 }
       )
     }
+
+    console.log('[CREATE CARRIER] Success! Carrier created:', data.id)
 
     return NextResponse.json({
       success: true,
