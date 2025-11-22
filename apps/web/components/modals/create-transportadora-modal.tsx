@@ -7,7 +7,6 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { supabase } from "@/lib/supabase"
 import { notifySuccess, notifyError } from "@/lib/toast"
-import cnpjValidator from "@fnando/cnpj"
 
 interface CreateTransportadoraModalProps {
   isOpen: boolean
@@ -29,13 +28,6 @@ export function CreateTransportadoraModal({ isOpen, onClose, onSave }: CreateTra
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
-
-    // Validação de CNPJ (se informado)
-    if (cnpj && !cnpjValidator.isValid(cnpj)) {
-      notifyError(new Error("CNPJ inválido"), "Por favor, insira um CNPJ válido")
-      setLoading(false)
-      return
-    }
 
     try {
       // Autenticação via token (service role)
