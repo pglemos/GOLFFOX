@@ -106,8 +106,24 @@ export class AuthManager {
     }
   }
 
-  static persistSession(userData: UserData, options?: { storage?: 'local' | 'session' | 'both'; token?: string }) {
+  static async persistSession(userData: UserData, options?: { storage?: 'local' | 'session' | 'both'; token?: string }) {
     if (typeof window === 'undefined') return
+
+    // ✅ Sincronizar com Supabase Auth client-side
+    if (options?.token) {
+      try {
+        // Não aguardar para não bloquear a UI
+        supabase.auth.setSession({
+          access_token: options.token,
+          refresh_token: options.token // Usar mesmo token se não tiver refresh
+        }).then(({ error }) => {
+          if (error) console.warn('Erro ao sincronizar sessão Supabase:', error)
+          else console.log('✅ Sessão Supabase sincronizada')
+        })
+      } catch (e) {
+        console.warn('Falha ao setar sessão Supabase:', e)
+      }
+    }
 
     const storageMode = options?.storage ?? 'both'
     const payload = JSON.stringify(userData)
