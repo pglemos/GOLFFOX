@@ -24,7 +24,7 @@ interface CreateOperatorLoginModalProps {
   companyName: string
 }
 
-export function CreateOperatorLoginModal({
+export function CreateUserModal({
   isOpen,
   onClose,
   onSave,
@@ -37,6 +37,7 @@ export function CreateOperatorLoginModal({
     password: "",
     name: "",
     phone: "",
+    role: "operador",
   })
   const [error, setError] = useState<string | null>(null)
 
@@ -70,8 +71,8 @@ export function CreateOperatorLoginModal({
         return
       }
 
-      // Chamar API para criar login de operador
-      const response = await fetch("/api/admin/create-operator-login", {
+      // Chamar API para criar usuário
+      const response = await fetch("/api/admin/create-user", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -82,31 +83,32 @@ export function CreateOperatorLoginModal({
           password: formData.password,
           name: formData.name,
           phone: formData.phone || null,
+          role: formData.role,
         }),
       })
 
       const result = await response.json()
 
       if (!response.ok) {
-        throw new Error(result.error || result.message || "Erro ao criar login de operador")
+        throw new Error(result.error || result.message || "Erro ao criar usuário")
       }
 
       if (result.success) {
-        notifySuccess(`Login de operador criado com sucesso para ${companyName}!`)
-        
+        notifySuccess(`Usuário criado com sucesso para ${companyName}!`)
+
         // Trigger global sync
         globalSyncManager.triggerSync('user.created', { companyId })
         globalSyncManager.triggerSync('company.updated', { companyId })
-        
+
         onSave()
         onClose()
-        setFormData({ email: "", password: "", name: "", phone: "" })
+        setFormData({ email: "", password: "", name: "", phone: "", role: "operador" })
         setError(null)
       } else {
-        throw new Error(result.error || "Erro ao criar login de operador")
+        throw new Error(result.error || "Erro ao criar usuário")
       }
     } catch (err: any) {
-      const errorMessage = err.message || "Erro ao criar login de operador"
+      const errorMessage = err.message || "Erro ao criar usuário"
       setError(errorMessage)
       notifyError(err, errorMessage)
     } finally {
@@ -118,9 +120,9 @@ export function CreateOperatorLoginModal({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="w-[95vw] sm:w-[90vw] max-w-[500px] max-h-[90vh] overflow-y-auto p-4 sm:p-6 mx-auto">
         <DialogHeader className="pb-4 sm:pb-6">
-          <DialogTitle className="text-xl sm:text-2xl font-bold break-words">Criar Login Operador</DialogTitle>
+          <DialogTitle className="text-xl sm:text-2xl font-bold break-words">Criar Novo Usuário</DialogTitle>
           <DialogDescription className="text-sm sm:text-base break-words">
-            Crie um novo login de operador para a empresa {companyName}. Este login dará acesso ao painel do operador.
+            Crie um novo usuário para a empresa {companyName}. Defina o papel para controlar as permissões.
           </DialogDescription>
         </DialogHeader>
 
@@ -132,12 +134,30 @@ export function CreateOperatorLoginModal({
             </div>
 
             <div>
-              <Label htmlFor="operator-name" className="text-base font-medium">Nome do Operador *</Label>
+              <Label htmlFor="user-role" className="text-base font-medium">Papel *</Label>
+              <select
+                id="user-role"
+                value={formData.role}
+                onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                className="flex h-11 sm:h-12 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                disabled={loading}
+                required
+              >
+                <option value="operador">Operador</option>
+                <option value="admin">Administrador</option>
+                <option value="transportadora">Transportadora</option>
+                <option value="driver">Motorista</option>
+                <option value="passenger">Passageiro</option>
+              </select>
+            </div>
+
+            <div>
+              <Label htmlFor="operator-name" className="text-base font-medium">Nome *</Label>
               <Input
                 id="operator-name"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                placeholder="Nome completo do operador"
+                placeholder="Nome completo"
                 disabled={loading}
                 required
                 className="h-11 sm:h-12 text-base"
@@ -151,7 +171,7 @@ export function CreateOperatorLoginModal({
                 type="email"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                placeholder="operador@empresa.com"
+                placeholder="usuario@empresa.com"
                 disabled={loading}
                 required
                 className="h-11 sm:h-12 text-base"
@@ -194,17 +214,17 @@ export function CreateOperatorLoginModal({
           </div>
 
           <DialogFooter className="flex-col sm:flex-row gap-3 pt-4 sm:pt-6 border-t mt-4 sm:mt-6">
-            <Button 
-              variant="outline" 
-              onClick={onClose} 
-              disabled={loading} 
+            <Button
+              variant="outline"
+              onClick={onClose}
+              disabled={loading}
               type="button"
               className="w-full sm:w-auto order-2 sm:order-1 min-h-[44px] text-base font-medium"
             >
               Cancelar
             </Button>
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
               disabled={loading}
               className="w-full sm:w-auto order-1 sm:order-2 bg-orange-500 hover:bg-orange-600 min-h-[44px] text-base font-medium"
             >
@@ -216,7 +236,7 @@ export function CreateOperatorLoginModal({
               ) : (
                 <>
                   <Key className="h-4 w-4 mr-2 flex-shrink-0" />
-                  Criar Login
+                  Criar Usuário
                 </>
               )}
             </Button>

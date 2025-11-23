@@ -43,6 +43,7 @@ export function EditUserModal({
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    password: "",
     role: "operador",
     is_active: true,
     phone: "",
@@ -53,6 +54,7 @@ export function EditUserModal({
       setFormData({
         name: user.name || "",
         email: user.email || "",
+        password: "",
         role: user.role || "operador",
         is_active: user.is_active ?? true,
         phone: user.phone || "",
@@ -72,6 +74,7 @@ export function EditUserModal({
         body: JSON.stringify({
           name: formData.name.trim() || null,
           email: formData.email.trim(),
+          password: formData.password.trim() || undefined,
           role: formData.role,
           is_active: formData.is_active,
           phone: formData.phone.trim() || null,
@@ -140,6 +143,20 @@ export function EditUserModal({
             />
           </div>
 
+          <div className="space-y-2">
+            <Label htmlFor="password">Nova Senha (opcional)</Label>
+            <Input
+              id="password"
+              type="password"
+              value={formData.password}
+              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+              placeholder="Deixe em branco para manter a atual"
+              disabled={loading}
+              minLength={6}
+            />
+            <p className="text-xs text-[var(--ink-muted)]">Mínimo de 6 caracteres</p>
+          </div>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
             <div className="space-y-2">
               <Label htmlFor="role">Papel *</Label>
@@ -191,17 +208,17 @@ export function EditUserModal({
           </div>
 
           <DialogFooter className="flex-col sm:flex-row gap-3 pt-4 sm:pt-6 border-t mt-4 sm:mt-6">
-            <Button 
-              type="button" 
-              variant="outline" 
-              onClick={onClose} 
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onClose}
               disabled={loading}
               className="w-full sm:w-auto order-2 sm:order-1 min-h-[44px] text-base font-medium"
             >
               Cancelar
             </Button>
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
               disabled={loading}
               className="w-full sm:w-auto order-1 sm:order-2 bg-orange-500 hover:bg-orange-600 min-h-[44px] text-base font-medium"
             >
