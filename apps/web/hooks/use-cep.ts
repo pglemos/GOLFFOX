@@ -24,15 +24,16 @@ export function useCep() {
 
         setLoading(true)
         try {
-            const response = await fetch(`https://viacep.com.br/ws/${cleanCep}/json/`)
-            const data = await response.json()
+            // Use our API route instead of calling ViaCEP directly
+            const response = await fetch(`/api/cep?cep=${cleanCep}`)
+            const result = await response.json()
 
-            if (data.erro) {
-                notifyError('CEP não encontrado')
+            if (!response.ok || !result.success) {
+                notifyError(result.error || 'CEP não encontrado')
                 return null
             }
 
-            return data
+            return result.address
         } catch (error) {
             console.error('Erro ao buscar CEP:', error)
             notifyError('Erro ao buscar endereço pelo CEP')
