@@ -1,14 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseServiceRole } from '@/lib/supabase-server'
+import { createClient } from '@supabase/supabase-js'
+
+// Helper para criar cliente admin
+function getSupabaseAdmin() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+  if (!url || !serviceKey) {
+    throw new Error('Supabase não configurado')
+  }
+  return createClient(url, serviceKey)
+}
 
 // POST /api/admin/transportadoras/[transportadoraId]/vehicles
 export async function POST(
   request: NextRequest,
-  { params }: { params: { transportadoraId?: string; carrierId?: string } }
+  { params }: { params: Promise<{ transportadoraId?: string; carrierId?: string }> }
 ) {
   try {
-    const supabase = supabaseServiceRole
-    const transportadoraId = params.transportadoraId || params.carrierId
+    const { transportadoraId: tId, carrierId: cId } = await params
+    const transportadoraId = tId || cId
+
     if (!transportadoraId) {
       return NextResponse.json(
         { success: false, error: 'ID da transportadora não fornecido' },
@@ -36,6 +47,8 @@ export async function POST(
         { status: 400 }
       )
     }
+
+    const supabase = getSupabaseAdmin()
 
     const { data: vehicle, error } = await supabase
       .from('vehicles')

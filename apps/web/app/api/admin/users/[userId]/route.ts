@@ -68,6 +68,14 @@ export async function PUT(
     if (body.is_active !== undefined) updateData.is_active = body.is_active
     if (body.company_id !== undefined) updateData.company_id = body.company_id || null
     if (body.phone !== undefined) updateData.phone = body.phone?.trim() || null
+    if (body.cpf !== undefined) updateData.cpf = body.cpf?.replace(/\D/g, '') || null
+    if (body.address_zip_code !== undefined) updateData.address_zip_code = body.address_zip_code
+    if (body.address_street !== undefined) updateData.address_street = body.address_street
+    if (body.address_number !== undefined) updateData.address_number = body.address_number
+    if (body.address_neighborhood !== undefined) updateData.address_neighborhood = body.address_neighborhood
+    if (body.address_complement !== undefined) updateData.address_complement = body.address_complement
+    if (body.address_city !== undefined) updateData.address_city = body.address_city
+    if (body.address_state !== undefined) updateData.address_state = body.address_state
 
     // Atualizar usuário
     const { data: updatedUser, error: updateError } = await supabaseAdmin

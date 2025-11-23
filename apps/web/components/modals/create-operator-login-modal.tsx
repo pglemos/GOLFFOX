@@ -1,5 +1,3 @@
-"use client"
-
 import { useState } from "react"
 import {
   Dialog,
@@ -12,9 +10,10 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Loader2, UserPlus, Key } from "lucide-react"
+import { Loader2, UserPlus, Key, Search } from "lucide-react"
 import { notifySuccess, notifyError } from "@/lib/toast"
 import { globalSyncManager } from "@/lib/global-sync"
+import { useCep } from "@/hooks/use-cep"
 
 interface CreateOperatorLoginModalProps {
   isOpen: boolean
@@ -32,18 +31,42 @@ export function CreateUserModal({
   companyName,
 }: CreateOperatorLoginModalProps) {
   const [loading, setLoading] = useState(false)
+  const { fetchCep, loading: loadingCep } = useCep()
   const [formData, setFormData] = useState({
     email: "",
     password: "",
     name: "",
     phone: "",
+    cpf: "",
     role: "operador",
+    address_zip_code: "",
+    address_street: "",
+    address_number: "",
+    address_neighborhood: "",
+    address_complement: "",
+    address_city: "",
+    address_state: "",
   })
   const [error, setError] = useState<string | null>(null)
 
   const validateEmail = (email: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     return emailRegex.test(email)
+  }
+
+  const handleCepBlur = async () => {
+    if (formData.address_zip_code.length >= 8) {
+      const address = await fetchCep(formData.address_zip_code)
+      if (address) {
+        setFormData(prev => ({
+          ...prev,
+          address_street: address.logradouro,
+          address_neighborhood: address.bairro,
+          address_city: address.localidade,
+          address_state: address.uf,
+        }))
+      }
+    }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -54,21 +77,23 @@ export function CreateUserModal({
     try {
       // Validações
       if (!formData.email.trim() || !validateEmail(formData.email)) {
-        setError("Email válido é obrigatório")
-        setLoading(false)
-        return
+        throw new Error("Email válido é obrigatório")
       }
 
       if (!formData.password.trim() || formData.password.length < 6) {
-        setError("Senha deve ter no mínimo 6 caracteres")
-        setLoading(false)
-        return
+        throw new Error("Senha deve ter no mínimo 6 caracteres")
       }
 
       if (!formData.name.trim()) {
-        setError("Nome é obrigatório")
-        setLoading(false)
-        return
+        throw new Error("Nome é obrigatório")
+      }
+
+      if (!formData.cpf.trim()) {
+        throw new Error("CPF é obrigatório")
+      }
+
+      if (!formData.address_street.trim() || !formData.address_number.trim() || !formData.address_neighborhood.trim() || !formData.address_zip_code.trim()) {
+        throw new Error("Endereço completo é obrigatório (CEP, Rua, Número, Bairro)")
       }
 
       // Chamar API para criar usuário
@@ -79,11 +104,7 @@ export function CreateUserModal({
         },
         body: JSON.stringify({
           company_id: companyId,
-          email: formData.email,
-          password: formData.password,
-          name: formData.name,
-          phone: formData.phone || null,
-          role: formData.role,
+          ...formData
         }),
       })
 
@@ -102,7 +123,21 @@ export function CreateUserModal({
 
         onSave()
         onClose()
-        setFormData({ email: "", password: "", name: "", phone: "", role: "operador" })
+        setFormData({
+          email: "",
+          password: "",
+          name: "",
+          phone: "",
+          cpf: "",
+          role: "operador",
+          address_zip_code: "",
+          address_street: "",
+          address_number: "",
+          address_neighborhood: "",
+          address_complement: "",
+          address_city: "",
+          address_state: "",
+        })
         setError(null)
       } else {
         throw new Error(result.error || "Erro ao criar usuário")
@@ -118,96 +153,198 @@ export function CreateUserModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="w-[95vw] sm:w-[90vw] max-w-[500px] max-h-[90vh] overflow-y-auto p-4 sm:p-6 mx-auto">
+      <DialogContent className="w-[95vw] sm:w-[90vw] max-w-[600px] max-h-[90vh] overflow-y-auto p-4 sm:p-6 mx-auto">
         <DialogHeader className="pb-4 sm:pb-6">
           <DialogTitle className="text-xl sm:text-2xl font-bold break-words">Criar Novo Usuário</DialogTitle>
           <DialogDescription className="text-sm sm:text-base break-words">
-            Crie um novo usuário para a empresa {companyName}. Defina o papel para controlar as permissões.
+            Crie um novo funcionário para a empresa {companyName}. Preencha todos os dados obrigatórios.
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit}>
-          <div className="space-y-4 sm:space-y-6 py-2 sm:py-4">
-            <div>
-              <Label htmlFor="company-name">Empresa</Label>
-              <p className="text-sm text-gray-600 mt-1">{companyName}</p>
-            </div>
+          <div className="space-y-4 py-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="col-span-1 sm:col-span-2">
+                <Label htmlFor="user-role" className="text-base font-medium">Perfil de Permissão *</Label>
+                <select
+                  id="user-role"
+                  value={formData.role}
+                  onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                  className="flex h-11 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  disabled={loading}
+                  required
+                >
+                  <option value="operador">Operador</option>
+                  <option value="passenger">Passageiro</option>
+                </select>
+              </div>
 
-            <div>
-              <Label htmlFor="user-role" className="text-base font-medium">Papel *</Label>
-              <select
-                id="user-role"
-                value={formData.role}
-                onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                className="flex h-11 sm:h-12 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                disabled={loading}
-                required
-              >
-                <option value="operador">Operador</option>
-                <option value="admin">Administrador</option>
-                <option value="transportadora">Transportadora</option>
-                <option value="driver">Motorista</option>
-                <option value="passenger">Passageiro</option>
-              </select>
-            </div>
+              <div className="col-span-1 sm:col-span-2">
+                <Label htmlFor="operator-name" className="text-base font-medium">Nome Completo *</Label>
+                <Input
+                  id="operator-name"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  placeholder="Nome completo"
+                  disabled={loading}
+                  required
+                  className="h-11"
+                />
+              </div>
 
-            <div>
-              <Label htmlFor="operator-name" className="text-base font-medium">Nome *</Label>
-              <Input
-                id="operator-name"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                placeholder="Nome completo"
-                disabled={loading}
-                required
-                className="h-11 sm:h-12 text-base"
-              />
-            </div>
+              <div>
+                <Label htmlFor="operator-cpf" className="text-base font-medium">CPF *</Label>
+                <Input
+                  id="operator-cpf"
+                  value={formData.cpf}
+                  onChange={(e) => setFormData({ ...formData, cpf: e.target.value })}
+                  placeholder="000.000.000-00"
+                  disabled={loading}
+                  required
+                  className="h-11"
+                />
+              </div>
 
-            <div>
-              <Label htmlFor="operator-email" className="text-base font-medium">Email *</Label>
-              <Input
-                id="operator-email"
-                type="email"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                placeholder="usuario@empresa.com"
-                disabled={loading}
-                required
-                className="h-11 sm:h-12 text-base"
-              />
-            </div>
+              <div>
+                <Label htmlFor="operator-phone" className="text-base font-medium">Telefone</Label>
+                <Input
+                  id="operator-phone"
+                  type="tel"
+                  value={formData.phone}
+                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  placeholder="(11) 99999-9999"
+                  disabled={loading}
+                  className="h-11"
+                />
+              </div>
 
-            <div>
-              <Label htmlFor="operator-password" className="text-base font-medium">Senha *</Label>
-              <Input
-                id="operator-password"
-                type="password"
-                value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                placeholder="Mínimo 6 caracteres"
-                disabled={loading}
-                required
-                minLength={6}
-                className="h-11 sm:h-12 text-base"
-              />
-            </div>
+              <div className="col-span-1 sm:col-span-2">
+                <Label htmlFor="operator-email" className="text-base font-medium">Email (Login) *</Label>
+                <Input
+                  id="operator-email"
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  placeholder="usuario@empresa.com"
+                  disabled={loading}
+                  required
+                  className="h-11"
+                />
+              </div>
 
-            <div>
-              <Label htmlFor="operator-phone" className="text-base font-medium">Telefone (opcional)</Label>
-              <Input
-                id="operator-phone"
-                type="tel"
-                value={formData.phone}
-                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                placeholder="+55 11 99999-9999"
-                disabled={loading}
-                className="h-11 sm:h-12 text-base"
-              />
+              <div className="col-span-1 sm:col-span-2">
+                <Label htmlFor="operator-password" className="text-base font-medium">Senha *</Label>
+                <Input
+                  id="operator-password"
+                  type="password"
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  placeholder="Mínimo 6 caracteres"
+                  disabled={loading}
+                  required
+                  minLength={6}
+                  className="h-11"
+                />
+              </div>
+
+              {/* Endereço */}
+              <div className="col-span-1 sm:col-span-2 border-t pt-4 mt-2">
+                <h3 className="font-semibold mb-3">Endereço</h3>
+              </div>
+
+              <div className="col-span-1 sm:col-span-2">
+                <Label htmlFor="cep" className="text-base font-medium">CEP *</Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="cep"
+                    value={formData.address_zip_code}
+                    onChange={(e) => setFormData({ ...formData, address_zip_code: e.target.value })}
+                    onBlur={handleCepBlur}
+                    placeholder="00000-000"
+                    disabled={loading}
+                    required
+                    className="h-11"
+                  />
+                  <Button type="button" variant="outline" onClick={handleCepBlur} disabled={loading || loadingCep} className="h-11 px-4">
+                    {loadingCep ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
+                  </Button>
+                </div>
+              </div>
+
+              <div className="col-span-1 sm:col-span-2">
+                <Label htmlFor="street" className="text-base font-medium">Rua/Avenida *</Label>
+                <Input
+                  id="street"
+                  value={formData.address_street}
+                  onChange={(e) => setFormData({ ...formData, address_street: e.target.value })}
+                  placeholder="Rua Exemplo"
+                  disabled={loading}
+                  required
+                  className="h-11"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="number" className="text-base font-medium">Número *</Label>
+                <Input
+                  id="number"
+                  value={formData.address_number}
+                  onChange={(e) => setFormData({ ...formData, address_number: e.target.value })}
+                  placeholder="123"
+                  disabled={loading}
+                  required
+                  className="h-11"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="neighborhood" className="text-base font-medium">Bairro *</Label>
+                <Input
+                  id="neighborhood"
+                  value={formData.address_neighborhood}
+                  onChange={(e) => setFormData({ ...formData, address_neighborhood: e.target.value })}
+                  placeholder="Centro"
+                  disabled={loading}
+                  required
+                  className="h-11"
+                />
+              </div>
+
+              <div className="col-span-1 sm:col-span-2">
+                <Label htmlFor="complement" className="text-base font-medium">Complemento</Label>
+                <Input
+                  id="complement"
+                  value={formData.address_complement}
+                  onChange={(e) => setFormData({ ...formData, address_complement: e.target.value })}
+                  placeholder="Apto 101"
+                  disabled={loading}
+                  className="h-11"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="city" className="text-base font-medium">Cidade</Label>
+                <Input
+                  id="city"
+                  value={formData.address_city}
+                  readOnly
+                  className="h-11 bg-gray-50"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="state" className="text-base font-medium">Estado</Label>
+                <Input
+                  id="state"
+                  value={formData.address_state}
+                  readOnly
+                  className="h-11 bg-gray-50"
+                />
+              </div>
             </div>
 
             {error && (
-              <div className="p-3 bg-red-50 border border-red-200 rounded-md text-sm text-red-700">
+              <div className="p-3 bg-red-50 border border-red-200 rounded-md text-sm text-red-700 mt-4">
                 {error}
               </div>
             )}

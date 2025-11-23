@@ -25,7 +25,22 @@ export async function POST(request: NextRequest) {
         }
 
         const body = await request.json()
-        const { company_id, email, password, name, phone, role } = body
+        const {
+            company_id,
+            email,
+            password,
+            name,
+            phone,
+            role,
+            cpf,
+            address_zip_code,
+            address_street,
+            address_number,
+            address_neighborhood,
+            address_complement,
+            address_city,
+            address_state
+        } = body
 
         // Validar e sanitizar dados
         const sanitizedEmail = email?.toString().toLowerCase().trim()
@@ -33,6 +48,7 @@ export async function POST(request: NextRequest) {
         const sanitizedName = name?.toString().trim()
         const sanitizedPhone = phone?.toString().trim() || null
         const targetRole = role || 'operador'
+        const sanitizedCpf = cpf?.toString().replace(/\D/g, '') || null
 
         // Validações
         if (!company_id) {
@@ -54,6 +70,14 @@ export async function POST(request: NextRequest) {
 
         if (!sanitizedName) {
             return NextResponse.json({ error: 'Nome é obrigatório' }, { status: 400 })
+        }
+
+        if (!sanitizedCpf) {
+            return NextResponse.json({ error: 'CPF é obrigatório' }, { status: 400 })
+        }
+
+        if (!address_zip_code || !address_street || !address_number || !address_neighborhood) {
+            return NextResponse.json({ error: 'Endereço completo é obrigatório' }, { status: 400 })
         }
 
         if (sanitizedPassword.length > 72) {
@@ -82,6 +106,19 @@ export async function POST(request: NextRequest) {
 
         if (existingUser) {
             return NextResponse.json({ error: 'Este email já está cadastrado na tabela de usuários' }, { status: 400 })
+        }
+
+        // Verificar se CPF já existe (opcional, mas recomendado)
+        if (sanitizedCpf) {
+            const { data: existingCpf } = await supabaseAdmin
+                .from('users')
+                .select('id')
+                .eq('cpf', sanitizedCpf)
+                .maybeSingle()
+
+            if (existingCpf) {
+                return NextResponse.json({ error: 'Este CPF já está cadastrado' }, { status: 400 })
+            }
         }
 
         // Verificar se email já existe no Auth
@@ -161,7 +198,15 @@ export async function POST(request: NextRequest) {
                 phone: sanitizedPhone,
                 role: targetRole,
                 company_id: company_id,
-                is_active: true
+                is_active: true,
+                cpf: sanitizedCpf,
+                address_zip_code,
+                address_street,
+                address_number,
+                address_neighborhood,
+                address_complement,
+                address_city,
+                address_state
             }, { onConflict: 'id' })
 
         if (userError) {
