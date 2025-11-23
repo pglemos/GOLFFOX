@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge"
 import { notifySuccess, notifyError } from "@/lib/toast"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useCep } from "@/hooks/use-cep"
+import { formatCPF, formatPhone, formatCEP, unformatNumber } from "@/lib/format-utils"
 
 interface TransportadoraDriversModalProps {
   carrier: { id: string; name: string }
@@ -334,21 +335,6 @@ export function TransportadoraDriversModal({ carrier, isOpen, onClose }: Transpo
           <TabsContent value="form" className="flex-1 overflow-y-auto mt-4">
             <form onSubmit={editingDriver ? handleUpdateDriver : handleCreateDriver} className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-                <div className="col-span-1 sm:col-span-2">
-                  <Label htmlFor="role" className="text-base font-medium">Perfil de Permissão *</Label>
-                  <select
-                    id="role"
-                    value={formData.role}
-                    onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                    className="flex h-11 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                    disabled={loading}
-                    required
-                  >
-                    <option value="driver">Motorista</option>
-                    <option value="transportadora">Transportadora</option>
-                  </select>
-                </div>
-
                 <div className="col-span-2">
                   <Label htmlFor="name">Nome Completo *</Label>
                   <Input
@@ -375,8 +361,9 @@ export function TransportadoraDriversModal({ carrier, isOpen, onClose }: Transpo
                   <Input
                     id="phone"
                     value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    onChange={(e) => setFormData({ ...formData, phone: formatPhone(e.target.value) })}
                     placeholder="(11) 98765-4321"
+                    maxLength={15}
                   />
                 </div>
                 <div>
@@ -384,7 +371,7 @@ export function TransportadoraDriversModal({ carrier, isOpen, onClose }: Transpo
                   <Input
                     id="cpf"
                     value={formData.cpf}
-                    onChange={(e) => setFormData({ ...formData, cpf: e.target.value })}
+                    onChange={(e) => setFormData({ ...formData, cpf: formatCPF(e.target.value) })}
                     placeholder="000.000.000-00"
                     maxLength={14}
                     required
@@ -435,11 +422,12 @@ export function TransportadoraDriversModal({ carrier, isOpen, onClose }: Transpo
                     <Input
                       id="cep"
                       value={formData.address_zip_code}
-                      onChange={(e) => setFormData({ ...formData, address_zip_code: e.target.value })}
+                      onChange={(e) => setFormData({ ...formData, address_zip_code: formatCEP(e.target.value) })}
                       onBlur={handleCepBlur}
                       placeholder="00000-000"
                       disabled={loading}
                       required
+                      maxLength={9}
                       className="h-11"
                     />
                     <Button type="button" variant="outline" onClick={handleCepBlur} disabled={loading || loadingCep} className="h-11 px-4">

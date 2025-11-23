@@ -129,6 +129,11 @@ export default function AdminConfiguracoesPage() {
         setProfileImage(avatarUrl)
         notifySuccess('Foto de perfil atualizada com sucesso!')
 
+        // Disparar evento de atualização global
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new Event('auth:update'))
+        }
+
         // Aguardar um pouco e recarregar a imagem do banco para garantir sincronização
         setTimeout(async () => {
           if (!user?.id) return
@@ -201,6 +206,11 @@ export default function AdminConfiguracoesPage() {
 
       notifySuccess('Informações pessoais salvas com sucesso!')
 
+      // Disparar evento de atualização global
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new Event('auth:update'))
+      }
+
       // Não recarregar a página - as mudanças já estão no estado local
       // O hook useAuthFast irá sincronizar os dados quando necessário
     } catch (error: any) {
@@ -252,6 +262,11 @@ export default function AdminConfiguracoesPage() {
       }
 
       notifySuccess('Senha alterada com sucesso!')
+
+      // Disparar evento de atualização global
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new Event('auth:update'))
+      }
 
       // Limpar campos de senha
       setFormData(prev => ({
@@ -597,14 +612,14 @@ export default function AdminConfiguracoesPage() {
                     <button
                       onClick={() => handleNotificationChange(key, !formData.notifications[key as keyof typeof formData.notifications])}
                       className={`relative w-12 h-6 rounded-full transition-colors ml-4 ${formData.notifications[key as keyof typeof formData.notifications]
-                          ? 'bg-[var(--brand)]'
-                          : 'bg-gray-300'
+                        ? 'bg-[var(--brand)]'
+                        : 'bg-gray-300'
                         }`}
                     >
                       <span
                         className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform shadow-sm ${formData.notifications[key as keyof typeof formData.notifications]
-                            ? 'translate-x-6'
-                            : 'translate-x-0'
+                          ? 'translate-x-6'
+                          : 'translate-x-0'
                           }`}
                       />
                     </button>

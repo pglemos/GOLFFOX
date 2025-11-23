@@ -1,5 +1,3 @@
-"use client"
-
 import { useState, useEffect } from "react"
 import {
   Dialog,
@@ -17,6 +15,7 @@ import { User, Loader2, Search } from "lucide-react"
 import { notifySuccess, notifyError } from "@/lib/toast"
 import { globalSyncManager } from "@/lib/global-sync"
 import { useCep } from "@/hooks/use-cep"
+import { formatCPF, formatPhone, formatCEP } from "@/lib/format-utils"
 
 interface UserData {
   id: string
@@ -199,7 +198,7 @@ export function EditUserModal({
               <Input
                 id="cpf"
                 value={formData.cpf}
-                onChange={(e) => setFormData({ ...formData, cpf: e.target.value })}
+                onChange={(e) => setFormData({ ...formData, cpf: formatCPF(e.target.value) })}
                 placeholder="000.000.000-00"
                 maxLength={14}
                 disabled={loading}
@@ -245,8 +244,9 @@ export function EditUserModal({
                 id="phone"
                 type="tel"
                 value={formData.phone}
-                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                onChange={(e) => setFormData({ ...formData, phone: formatPhone(e.target.value) })}
                 placeholder="(00) 00000-0000"
+                maxLength={15}
                 disabled={loading}
               />
             </div>
@@ -261,9 +261,10 @@ export function EditUserModal({
                   <Input
                     id="cep"
                     value={formData.address_zip_code}
-                    onChange={(e) => setFormData({ ...formData, address_zip_code: e.target.value })}
+                    onChange={(e) => setFormData({ ...formData, address_zip_code: formatCEP(e.target.value) })}
                     onBlur={handleCepBlur}
                     placeholder="00000-000"
+                    maxLength={9}
                     disabled={loading}
                   />
                   <Button type="button" variant="outline" onClick={handleCepBlur} disabled={loading || loadingCep}>
