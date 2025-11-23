@@ -58,11 +58,14 @@ export async function validateAuth(request: NextRequest): Promise<AuthenticatedU
           const sessionData = JSON.parse(decoded)
 
           // Tentar obter access_token do cookie customizado
-          if (sessionData.access_token) {
-            accessToken = sessionData.access_token
+          // Suportar tanto access_token (server-side) quanto accessToken (client-side AuthManager)
+          const token = sessionData.access_token || sessionData.accessToken
+
+          if (token) {
+            accessToken = token
             console.log('[AUTH] Token encontrado no cookie customizado (golffox-session)')
           } else {
-            console.warn('[AUTH] Cookie customizado encontrado mas sem access_token')
+            console.warn('[AUTH] Cookie customizado encontrado mas sem access_token. Chaves disponíveis:', Object.keys(sessionData).join(', '))
           }
         } catch (error) {
           console.error('[AUTH] Erro ao processar cookie customizado:', error)
