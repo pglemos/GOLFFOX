@@ -1,395 +1,375 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState, useEffect } from "react"
 import { AppShell } from "@/components/app-shell"
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Badge } from "@/components/ui/badge"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { AlertCircle, Calendar, FileText, Stethoscope, Truck, Clock, ExternalLink, Bell, Mail, Filter, Download, RefreshCw } from "lucide-react"
-import { supabase } from "@/lib/supabase"
-import { useRouter } from "next/navigation"
+import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Badge } from "@/components/ui/badge"
+import {
+  AlertTriangle,
+  AlertCircle,
+  Info,
+  TruckIcon,
+  Search,
+  Filter,
+  Calendar,
+  CheckCircle2,
+  XCircle,
+  Clock
+} from "lucide-react"
+import { notifyError, notifySuccess } from "@/lib/toast"
+import { cn } from "@/lib/utils"
 
-export default function TransportadoraAlertasPage() {
-  const router = useRouter()
-  const [user, setUser] = useState<any>(null)
+interface Alert {
+  id: string
+  type: 'veiculo_parado' | 'critico' | 'aviso' | 'informativo'
+  title: string
+  description: string
+  timestamp: Date
+  vehicle?: string
+  driver?: string
+  location?: string
+  status: 'pending' | 'acknowledged' | 'resolved'
+}
+
+export default function AlertasPage() {
+  const [alerts, setAlerts] = useState<Alert[]>([])
   const [loading, setLoading] = useState(true)
-  const [alerts, setAlerts] = useState<any[]>([])
-  const [stats, setStats] = useState({
-    total: 0,
-    critical: 0,
-    warning: 0,
-    expired: 0
-  })
-  const [activeTab, setActiveTab] = useState('all')
-  const [documentTypeFilter, setDocumentTypeFilter] = useState<string>("all")
-  const [entityTypeFilter, setEntityTypeFilter] = useState<string>("all")
+  const [searchTerm, setSearchTerm] = useState("")
+  const [selectedType, setSelectedType] = useState<string>("all")
+  const [showOnlyUnread, setShowOnlyUnread] = useState(false)
+
+  // Contadores por tipo
+  const alertCounts = {
+    veiculo_parado: alerts.filter(a => a.type === 'veiculo_parado' && a.status === 'pending').length,
+    critico: alerts.filter(a => a.type === 'critico' && a.status === 'pending').length,
+    aviso: alerts.filter(a => a.type === 'aviso' && a.status === 'pending').length,
+    informativo: alerts.filter(a => a.type === 'informativo' && a.status === 'pending').length,
+  }
 
   useEffect(() => {
-    const getUser = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (!session) {
-        router.push("/")
-        return
-      }
-      setUser({ ...session.user })
-      setLoading(false)
-      loadAlerts()
-    }
-    getUser()
-  }, [router])
+    loadAlerts()
+  }, [])
 
   const loadAlerts = async () => {
     try {
-      const res = await fetch('/api/transportadora/alerts?alert_level=critical,warning,expired')
-      if (res.ok) {
-        const data = await res.json()
-        setAlerts(data.alerts || [])
-        setStats(data.stats || { total: 0, critical: 0, warning: 0, expired: 0 })
-      }
+      setLoading(true)
+      // TODO: Implementar chamada real à API
+      // Dados mockados
+      const mockAlerts: Alert[] = []
+
+      setAlerts(mockAlerts)
     } catch (error) {
-      console.error("Erro ao carregar alertas:", error)
+      notifyError(error, "Erro ao carregar alertas")
+    } finally {
+      setLoading(false)
     }
   }
 
-  const formatDate = (dateString: string) => {
-    if (!dateString) return 'N/A'
-    const date = new Date(dateString)
-    return date.toLocaleDateString('pt-BR')
-  }
-
-  const getAlertIcon = (itemType: string) => {
-    switch (itemType) {
-      case 'driver_document':
-      case 'driver_exam':
-        return <FileText className="h-5 w-5" />
-      case 'vehicle_document':
-        return <Truck className="h-5 w-5" />
-      default:
-        return <AlertCircle className="h-5 w-5" />
+  const handleAcknowledge = async (alertId: string) => {
+    try {
+      // TODO: Implementar chamada à API
+      setAlerts(prev => prev.map(a =>
+        a.id === alertId ? { ...a, status: 'acknowledged' } : a
+      ))
+      notifySuccess("Alerta marcado como lido")
+    } catch (error) {
+      notifyError(error, "Erro ao marcar alerta")
     }
   }
 
-  const getAlertTypeLabel = (itemType: string) => {
-    switch (itemType) {
-      case 'driver_document':
-        return 'Documento do Motorista'
-      case 'driver_exam':
-        return 'Exame Médico'
-      case 'vehicle_document':
-        return 'Documento do Veículo'
-      default:
-        return 'Alerta'
+  const handleResolve = async (alertId: string) => {
+    try {
+      // TODO: Implementar chamada à API
+      setAlerts(prev => prev.map(a =>
+        a.id === alertId ? { ...a, status: 'resolved' } : a
+      ))
+      notifySuccess("Alerta resolvido")
+    } catch (error) {
+      notifyError(error, "Erro ao resolver alerta")
+    }
+  }
+
+  const getAlertTypeConfig = (type: Alert['type']) => {
+    switch (type) {
+      case 'veiculo_parado':
+        return {
+          icon: TruckIcon,
+          color: 'text-red-600',
+          bg: 'bg-red-50',
+          border: 'border-red-200',
+          label: 'Veículo Parado'
+        }
+      case 'critico':
+        return {
+          icon: XCircle,
+          color: 'text-red-600',
+          bg: 'bg-red-50',
+          border: 'border-red-200',
+          label: 'Crítico'
+        }
+      case 'aviso':
+        return {
+          icon: AlertTriangle,
+          color: 'text-yellow-600',
+          bg: 'bg-yellow-50',
+          border: 'border-yellow-200',
+          label: 'Aviso'
+        }
+      case 'informativo':
+        return {
+          icon: Info,
+          color: 'text-blue-600',
+          bg: 'bg-blue-50',
+          border: 'border-blue-200',
+          label: 'Informativo'
+        }
     }
   }
 
   const filteredAlerts = alerts.filter(alert => {
-    // Filtro por nível de alerta
-    let matchesLevel = true
-    if (activeTab === 'critical') matchesLevel = alert.alert_level === 'critical'
-    else if (activeTab === 'expired') matchesLevel = alert.alert_level === 'expired'
-    else if (activeTab === 'warning') matchesLevel = alert.alert_level === 'warning'
+    const matchesSearch =
+      alert.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      alert.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      alert.vehicle?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      alert.driver?.toLowerCase().includes(searchTerm.toLowerCase())
 
-    // Filtro por tipo de documento
-    const matchesDocumentType = documentTypeFilter === 'all' || alert.document_type === documentTypeFilter
+    const matchesType = selectedType === "all" || alert.type === selectedType
+    const matchesUnread = !showOnlyUnread || alert.status === 'pending'
 
-    // Filtro por tipo de entidade
-    const matchesEntityType = entityTypeFilter === 'all' || alert.item_type === entityTypeFilter
-
-    return matchesLevel && matchesDocumentType && matchesEntityType
+    return matchesSearch && matchesType && matchesUnread
   })
 
-  const uniqueDocumentTypes = Array.from(new Set(alerts.map(a => a.document_type))).filter(Boolean)
-  const uniqueEntityTypes = Array.from(new Set(alerts.map(a => a.item_type))).filter(Boolean)
-
-  const handleExportAlerts = () => {
-    const csv = [
-      ['Tipo', 'Entidade', 'Documento', 'Nível', 'Vencimento', 'Dias Restantes'].join(','),
-      ...filteredAlerts.map(a => [
-        a.item_type,
-        a.entity_name,
-        a.document_type,
-        a.alert_level,
-        a.expiry_date ? new Date(a.expiry_date).toLocaleDateString('pt-BR') : 'N/A',
-        a.days_to_expiry || 0
-      ].join(','))
-    ].join('\n')
-    const blob = new Blob([csv], { type: 'text/csv' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `alertas-${new Date().toISOString().split('T')[0]}.csv`
-    a.click()
-  }
-
-  if (loading) {
-    return <div className="min-h-screen flex items-center justify-center"><div className="w-16 h-16 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin mx-auto"></div></div>
-  }
-
   return (
-    <AppShell user={{ id: user?.id || "", name: user?.name || "Transportadora", email: user?.email || "", role: "transportadora" }}>
-      <div className="space-y-4 sm:space-y-6 w-full overflow-x-hidden">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
-          <div className="min-w-0 flex-1">
-            <h1 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2 break-words">Alertas de Vencimento</h1>
-            <p className="text-sm sm:text-base text-[var(--ink-muted)] break-words">Monitore documentos e exames próximos do vencimento</p>
+    <AppShell panel="transportadora">
+      <div className="p-4 sm:p-6 lg:p-8 space-y-6">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold">Sistema de Alertas</h1>
+            <p className="text-sm text-[var(--ink-muted)] mt-1">
+              Monitore e gerencie alertas operacionais em tempo real
+            </p>
           </div>
-          <div className="flex flex-wrap gap-2 w-full sm:w-auto">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={loadAlerts}
-              className="flex-1 sm:flex-initial min-h-[44px] text-xs sm:text-sm"
-            >
-              <RefreshCw className="h-4 w-4 mr-2 flex-shrink-0" />
-              <span className="hidden sm:inline">Atualizar</span>
-              <span className="sm:hidden">Atualizar</span>
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleExportAlerts}
-              disabled={filteredAlerts.length === 0}
-              className="flex-1 sm:flex-initial min-h-[44px] text-xs sm:text-sm"
-            >
-              <Download className="h-4 w-4 mr-2 flex-shrink-0" />
-              <span className="hidden sm:inline">Exportar</span>
-              <span className="sm:hidden">Exportar</span>
-            </Button>
-          </div>
+          <Button className="bg-orange-500 hover:bg-orange-600">
+            <AlertCircle className="h-4 w-4 mr-2" />
+            Criar Alerta
+          </Button>
         </div>
 
-        {/* Estatísticas */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-[var(--ink-muted)]">Total de Alertas</p>
-                  <p className="text-2xl font-bold">{stats.total}</p>
-                </div>
-                <Bell className="h-8 w-8 text-[var(--brand)]" />
+        {/* Contadores de Alertas */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <Card
+            className={cn(
+              "p-4 cursor-pointer transition-all hover:shadow-md",
+              selectedType === "veiculo_parado" && "ring-2 ring-red-500"
+            )}
+            onClick={() => setSelectedType(selectedType === "veiculo_parado" ? "all" : "veiculo_parado")}
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs font-medium text-gray-600 mb-1">Veículos Parados</p>
+                <p className="text-3xl font-bold text-red-600">{alertCounts.veiculo_parado}</p>
               </div>
-            </CardContent>
+              <div className="h-12 w-12 rounded-full bg-red-100 flex items-center justify-center">
+                <TruckIcon className="h-6 w-6 text-red-600" />
+              </div>
+            </div>
           </Card>
 
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-[var(--ink-muted)]">Críticos</p>
-                  <p className="text-2xl font-bold text-red-600">{stats.critical}</p>
-                </div>
-                <AlertCircle className="h-8 w-8 text-red-600" />
+          <Card
+            className={cn(
+              "p-4 cursor-pointer transition-all hover:shadow-md",
+              selectedType === "critico" && "ring-2 ring-red-500"
+            )}
+            onClick={() => setSelectedType(selectedType === "critico" ? "all" : "critico")}
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs font-medium text-gray-600 mb-1">Críticos</p>
+                <p className="text-3xl font-bold text-red-600">{alertCounts.critico}</p>
               </div>
-            </CardContent>
+              <div className="h-12 w-12 rounded-full bg-red-100 flex items-center justify-center">
+                <XCircle className="h-6 w-6 text-red-600" />
+              </div>
+            </div>
           </Card>
 
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-[var(--ink-muted)]">Vencidos</p>
-                  <p className="text-2xl font-bold text-red-800">{stats.expired}</p>
-                </div>
-                <Clock className="h-8 w-8 text-red-800" />
+          <Card
+            className={cn(
+              "p-4 cursor-pointer transition-all hover:shadow-md",
+              selectedType === "aviso" && "ring-2 ring-yellow-500"
+            )}
+            onClick={() => setSelectedType(selectedType === "aviso" ? "all" : "aviso")}
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs font-medium text-gray-600 mb-1">Avisos</p>
+                <p className="text-3xl font-bold text-yellow-600">{alertCounts.aviso}</p>
               </div>
-            </CardContent>
+              <div className="h-12 w-12 rounded-full bg-yellow-100 flex items-center justify-center">
+                <AlertTriangle className="h-6 w-6 text-yellow-600" />
+              </div>
+            </div>
           </Card>
 
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-[var(--ink-muted)]">Atenção</p>
-                  <p className="text-2xl font-bold text-yellow-600">{stats.warning}</p>
-                </div>
-                <AlertCircle className="h-8 w-8 text-yellow-600" />
+          <Card
+            className={cn(
+              "p-4 cursor-pointer transition-all hover:shadow-md",
+              selectedType === "informativo" && "ring-2 ring-blue-500"
+            )}
+            onClick={() => setSelectedType(selectedType === "informativo" ? "all" : "informativo")}
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs font-medium text-gray-600 mb-1">Informativos</p>
+                <p className="text-3xl font-bold text-blue-600">{alertCounts.informativo}</p>
               </div>
-            </CardContent>
+              <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
+                <Info className="h-6 w-6 text-blue-600" />
+              </div>
+            </div>
           </Card>
         </div>
 
-        {/* Filtros Avançados */}
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-2 mb-4">
-              <Filter className="h-5 w-5 text-[var(--brand)]" />
-              <h3 className="font-semibold">Filtros</h3>
+        {/* Filtros */}
+        <Card className="p-4">
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Input
+                placeholder="Buscar em todos os alertas..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label>Tipo de Documento</Label>
-                <Select value={documentTypeFilter} onValueChange={setDocumentTypeFilter}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Todos</SelectItem>
-                    {uniqueDocumentTypes.map(type => (
-                      <SelectItem key={type} value={type}>
-                        {type.replace('_', ' ').toUpperCase()}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label>Tipo de Entidade</Label>
-                <Select value={entityTypeFilter} onValueChange={setEntityTypeFilter}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Todos</SelectItem>
-                    <SelectItem value="driver_document">Documento do Motorista</SelectItem>
-                    <SelectItem value="driver_exam">Exame do Motorista</SelectItem>
-                    <SelectItem value="vehicle_document">Documento do Veículo</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+            <div className="flex gap-2">
+              <Button
+                variant={showOnlyUnread ? "default" : "outline"}
+                size="sm"
+                onClick={() => setShowOnlyUnread(!showOnlyUnread)}
+                className={showOnlyUnread ? "bg-orange-500 hover:bg-orange-600" : ""}
+              >
+                <Filter className="h-4 w-4 mr-2" />
+                Apenas não lidos
+              </Button>
+              <Button variant="outline" size="sm">
+                <Calendar className="h-4 w-4 mr-2" />
+                Hoje
+              </Button>
             </div>
-          </CardContent>
+          </div>
         </Card>
 
-        <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 gap-1 sm:gap-2">
-            <TabsTrigger value="all" className="text-xs sm:text-sm min-h-[44px]">
-              <span className="hidden sm:inline">Todos</span>
-              <span className="sm:hidden">Todos</span>
-              <span className="ml-1">({alerts.length})</span>
-            </TabsTrigger>
-            <TabsTrigger value="critical" className="text-xs sm:text-sm min-h-[44px]">
-              <span className="hidden sm:inline">Críticos</span>
-              <span className="sm:hidden">Críticos</span>
-              <span className="ml-1">({stats.critical})</span>
-            </TabsTrigger>
-            <TabsTrigger value="expired" className="text-xs sm:text-sm min-h-[44px]">
-              <span className="hidden sm:inline">Vencidos</span>
-              <span className="sm:hidden">Vencidos</span>
-              <span className="ml-1">({stats.expired})</span>
-            </TabsTrigger>
-            <TabsTrigger value="warning" className="text-xs sm:text-sm min-h-[44px]">
-              <span className="hidden sm:inline">Atenção</span>
-              <span className="sm:hidden">Atenção</span>
-              <span className="ml-1">({stats.warning})</span>
-            </TabsTrigger>
-          </TabsList>
+        {/* Lista de Alertas */}
+        {loading ? (
+          <div className="text-center py-12">
+            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-orange-500 border-r-transparent"></div>
+            <p className="mt-4 text-[var(--ink-muted)]">Carregando alertas...</p>
+          </div>
+        ) : filteredAlerts.length === 0 ? (
+          <Card className="p-12 text-center">
+            <AlertCircle className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+            <p className="text-lg font-medium text-[var(--ink-muted)]">
+              Nenhum alerta encontrado
+            </p>
+            <p className="text-sm text-[var(--ink-muted)] mt-1">
+              Não há alertas no momento.
+            </p>
+          </Card>
+        ) : (
+          <div className="space-y-3">
+            {filteredAlerts.map((alert) => {
+              const config = getAlertTypeConfig(alert.type)
+              const Icon = config.icon
 
-          <TabsContent value={activeTab} className="space-y-4">
-            {filteredAlerts.length === 0 ? (
-              <Card className="p-12 text-center">
-                <AlertCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium mb-2">Nenhum alerta encontrado</h3>
-                <p className="text-sm text-[var(--ink-muted)]">
-                  Todos os documentos e exames estão em dia
-                </p>
-              </Card>
-            ) : (
-              filteredAlerts.map((alert) => (
-                <Alert 
-                  key={alert.id} 
-                  variant={alert.alert_level === 'critical' || alert.alert_level === 'expired' ? 'destructive' : 'warning'}
+              return (
+                <Card
+                  key={alert.id}
+                  className={cn(
+                    "p-4 transition-all",
+                    config.border,
+                    alert.status === 'pending' && config.bg
+                  )}
                 >
-                  <div className="flex items-start gap-4">
-                    <div className="mt-0.5">
-                      {getAlertIcon(alert.item_type)}
+                  <div className="flex gap-4">
+                    <div className={cn("h-10 w-10 rounded-full flex items-center justify-center flex-shrink-0", config.bg)}>
+                      <Icon className={cn("h-5 w-5", config.color)} />
                     </div>
-                    <div className="flex-1">
-                      <AlertTitle className="flex items-center gap-2">
-                        {getAlertTypeLabel(alert.item_type)}: {alert.entity_name}
-                        <Badge variant={alert.alert_level === 'expired' ? 'destructive' : alert.alert_level === 'critical' ? 'destructive' : 'warning'}>
-                          {alert.alert_level === 'expired' ? 'Vencido' : 
-                           alert.alert_level === 'critical' ? 'Crítico' : 
-                           'Atenção'}
-                        </Badge>
-                      </AlertTitle>
-                      <AlertDescription className="mt-2 space-y-1">
-                        <div className="flex items-center gap-2">
-                          <FileText className="h-4 w-4" />
-                          <span className="font-medium capitalize">{alert.document_type.replace('_', ' ')}</span>
+
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between gap-4 mb-2">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <h3 className="font-semibold">{alert.title}</h3>
+                            <Badge variant="outline" className={cn("text-xs", config.color)}>
+                              {config.label}
+                            </Badge>
+                            {alert.status === 'resolved' && (
+                              <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                                Resolvido
+                              </Badge>
+                            )}
+                          </div>
+                          <p className="text-sm text-[var(--ink-muted)]">{alert.description}</p>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <Calendar className="h-4 w-4" />
-                          <span>Vencimento: {formatDate(alert.expiry_date)}</span>
+
+                        <div className="flex gap-2 flex-shrink-0">
+                          {alert.status === 'pending' && (
+                            <>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => handleAcknowledge(alert.id)}
+                              >
+                                <CheckCircle2 className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => handleResolve(alert.id)}
+                                className="text-green-600 hover:bg-green-50"
+                              >
+                                Resolver
+                              </Button>
+                            </>
+                          )}
                         </div>
-                        <div className="flex items-center gap-2">
-                          <Clock className="h-4 w-4" />
-                          <span>
-                            {alert.alert_level === 'expired' 
-                              ? `Vencido há ${Math.abs(alert.days_to_expiry || 0)} dias`
-                              : alert.alert_level === 'critical'
-                              ? `Vence em ${alert.days_to_expiry || 0} dias - Ação urgente necessária!`
-                              : `Vence em ${alert.days_to_expiry || 0} dias - Renovação recomendada`}
+                      </div>
+
+                      <div className="flex flex-wrap gap-4 text-xs text-[var(--ink-muted)]">
+                        {alert.vehicle && (
+                          <span className="flex items-center gap-1">
+                            <TruckIcon className="h-3 w-3" />
+                            {alert.vehicle}
                           </span>
-                        </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-3 pt-3 border-t border-current/20">
-                          <Button 
-                            size="sm" 
-                            variant="outline"
-                            onClick={() => {
-                              if (alert.item_type === 'driver_document' || alert.item_type === 'driver_exam') {
-                                router.push(`/transportadora/motoristas?driverId=${alert.entity_id}`)
-                              } else if (alert.item_type === 'vehicle_document') {
-                                router.push(`/transportadora/veiculos?vehicleId=${alert.entity_id}`)
-                              }
-                            }}
-                            className="w-full min-h-[44px] text-xs sm:text-sm"
-                          >
-                            Ver Detalhes
-                          </Button>
-                          <Button 
-                            size="sm" 
-                            variant="outline"
-                            onClick={async () => {
-                              // Marcar como visualizado ou agendar renovação
-                              // Implementar ação rápida
-                            }}
-                            className="w-full min-h-[44px] text-xs sm:text-sm"
-                          >
-                            <Calendar className="h-4 w-4 mr-2 flex-shrink-0" />
-                            <span className="hidden sm:inline">Agendar</span>
-                            <span className="sm:hidden">Agendar</span>
-                          </Button>
-                          <Button 
-                            size="sm" 
-                            variant="outline"
-                            onClick={async () => {
-                              try {
-                                const res = await fetch('/api/notifications/email', {
-                                  method: 'POST',
-                                  headers: { 'Content-Type': 'application/json' },
-                                  body: JSON.stringify({
-                                    to: user?.email,
-                                    subject: `Alerta: ${alert.document_type} vencendo`,
-                                    body: `O documento ${alert.document_type} de ${alert.entity_name} vence em ${alert.days_to_expiry} dias.`
-                                  })
-                                })
-                                if (res.ok) {
-                                  alert('Email de alerta enviado com sucesso!')
-                                }
-                              } catch (error) {
-                                console.error('Erro ao enviar email:', error)
-                              }
-                            }}
-                            className="w-full min-h-[44px] text-xs sm:text-sm"
-                          >
-                            <Mail className="h-4 w-4 mr-2 flex-shrink-0" />
-                            <span className="hidden sm:inline">Enviar Email</span>
-                            <span className="sm:hidden">Email</span>
-                          </Button>
-                        </div>
-                      </AlertDescription>
+                        )}
+                        {alert.driver && (
+                          <span className="flex items-center gap-1">
+                            <users className="h-3 w-3" />
+                            {alert.driver}
+                          </span>
+                        )}
+                        {alert.location && (
+                          <span className="flex items-center gap-1">
+                            <mapPin className="h-3 w-3" />
+                            {alert.location}
+                          </span>
+                        )}
+                        <span className="flex items-center gap-1">
+                          <Clock className="h-3 w-3" />
+                          {new Date(alert.timestamp).toLocaleString('pt-BR')}
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </Alert>
-              ))
-            )}
-          </TabsContent>
-        </Tabs>
+                </Card>
+              )
+            })}
+          </div>
+        )}
       </div>
     </AppShell>
   )
