@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import {
   Dialog,
   DialogContent,
@@ -14,24 +14,28 @@ import { Loader2, UserPlus, Key, Search } from "lucide-react"
 import { notifySuccess, notifyError } from "@/lib/toast"
 import { globalSyncManager } from "@/lib/global-sync"
 import { useCep } from "@/hooks/use-cep"
+import { formatCPF, formatPhone, formatCEP } from "@/lib/format-utils"
 
 interface CreateOperatorLoginModalProps {
   isOpen: boolean
   onClose: () => void
   onSave: () => void
-  companyId: string
-  companyName: string
+  companyId?: string
+  companyName?: string
 }
 
 export function CreateUserModal({
   isOpen,
   onClose,
   onSave,
-  companyId,
-  companyName,
+  companyId: initialCompanyId,
+  companyName: initialCompanyName,
 }: CreateOperatorLoginModalProps) {
   const [loading, setLoading] = useState(false)
   const { fetchCep, loading: loadingCep } = useCep()
+  const [companies, setCompanies] = useState<any[]>([])
+  const [loadingCompanies, setLoadingCompanies] = useState(false)
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -39,6 +43,7 @@ export function CreateUserModal({
     phone: "",
     cpf: "",
     role: "operador",
+    company_id: initialCompanyId || "",
     address_zip_code: "",
     address_street: "",
     address_number: "",
@@ -48,6 +53,33 @@ export function CreateUserModal({
     address_state: "",
   })
   const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (isOpen && !initialCompanyId) {
+      loadCompanies()
+    }
+  }, [isOpen, initialCompanyId])
+
+  useEffect(() => {
+    if (initialCompanyId) {
+      setFormData(prev => ({ ...prev, company_id: initialCompanyId }))
+    }
+  }, [initialCompanyId])
+
+  const loadCompanies = async () => {
+    try {
+      setLoadingCompanies(true)
+      const response = await fetch('/api/admin/companies-list')
+      const result = await response.json()
+      if (result.success) {
+        setCompanies(result.companies || [])
+      }
+    } catch (error) {
+      console.error('Erro ao carregar empresas:', error)
+    } finally {
+      setLoadingCompanies(false)
+    }
+  }
 
   const validateEmail = (email: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -96,6 +128,11 @@ export function CreateUserModal({
         throw new Error("Endereço completo é obrigatório (CEP, Rua, Número, Bairro)")
       }
 
+      // Validar empresa se não for admin
+      if (formData.role !== 'admin' && !formData.company_id) {
+        throw new Error("Selecione uma empresa para este usuário")
+      }
+
       // Chamar API para criar usuário
       const response = await fetch("/api/admin/create-user", {
         method: "POST",
@@ -103,8 +140,8 @@ export function CreateUserModal({
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          company_id: companyId,
-          ...formData
+          ...formData,
+          company_id: formData.role === 'admin' ? null : formData.company_id
         }),
       })
 
@@ -115,11 +152,15 @@ export function CreateUserModal({
       }
 
       if (result.success) {
-        notifySuccess(`Usuário criado com sucesso para ${companyName}!`)
+        notifySuccess(`Usuário criado com sucesso!`)
 
         // Trigger global sync
-        globalSyncManager.triggerSync('user.created', { companyId })
-        globalSyncManager.triggerSync('company.updated', { companyId })
+        if (formData.company_id) {
+          globalSyncManager.triggerSync('user.created', { companyId: formData.company_id })
+          globalSyncManager.triggerSync('company.updated', { companyId: formData.company_id })
+        } else {
+          globalSyncManager.triggerSync('user.created', {})
+        }
 
         onSave()
         onClose()
@@ -130,6 +171,7 @@ export function CreateUserModal({
           phone: "",
           cpf: "",
           role: "operador",
+          company_id: initialCompanyId || "",
           address_zip_code: "",
           address_street: "",
           address_number: "",
@@ -157,7 +199,9 @@ export function CreateUserModal({
         <DialogHeader className="pb-4 sm:pb-6">
           <DialogTitle className="text-xl sm:text-2xl font-bold break-words">Criar Novo Usuário</DialogTitle>
           <DialogDescription className="text-sm sm:text-base break-words">
-            Crie um novo funcionário para a empresa {companyName}. Preencha todos os dados obrigatórios.
+            {initialCompanyName
+              ? `Crie um novo funcionário para a empresa ${initialCompanyName}.`
+              : "Crie um novo usuário no sistema."}
           </DialogDescription>
         </DialogHeader>
 
@@ -176,8 +220,30 @@ export function CreateUserModal({
                 >
                   <option value="operador">Operador</option>
                   <option value="passenger">Passageiro</option>
+                  <option value="admin">Administrador</option>
+                  <option value="transportadora">Transportadora</option>
+                  <option value="driver">Motorista</option>
                 </select>
               </div>
+
+              {!initialCompanyId && formData.role !== 'admin' && (
+                <div className="col-span-1 sm:col-span-2">
+                  <Label htmlFor="company-select" className="text-base font-medium">Empresa *</Label>
+                  <select
+                    id="company-select"
+                    value={formData.company_id}
+                    onChange={(e) => setFormData({ ...formData, company_id: e.target.value })}
+                    className="flex h-11 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    disabled={loading || loadingCompanies}
+                    required={formData.role !== 'admin'}
+                  >
+                    <option value="">Selecione uma empresa</option>
+                    {companies.map(company => (
+                      <option key={company.id} value={company.id}>{company.name}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
 
               <div className="col-span-1 sm:col-span-2">
                 <Label htmlFor="operator-name" className="text-base font-medium">Nome Completo *</Label>
@@ -197,10 +263,11 @@ export function CreateUserModal({
                 <Input
                   id="operator-cpf"
                   value={formData.cpf}
-                  onChange={(e) => setFormData({ ...formData, cpf: e.target.value })}
+                  onChange={(e) => setFormData({ ...formData, cpf: formatCPF(e.target.value) })}
                   placeholder="000.000.000-00"
                   disabled={loading}
                   required
+                  maxLength={14}
                   className="h-11"
                 />
               </div>
@@ -211,9 +278,10 @@ export function CreateUserModal({
                   id="operator-phone"
                   type="tel"
                   value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  onChange={(e) => setFormData({ ...formData, phone: formatPhone(e.target.value) })}
                   placeholder="(11) 99999-9999"
                   disabled={loading}
+                  maxLength={15}
                   className="h-11"
                 />
               </div>
@@ -258,11 +326,12 @@ export function CreateUserModal({
                   <Input
                     id="cep"
                     value={formData.address_zip_code}
-                    onChange={(e) => setFormData({ ...formData, address_zip_code: e.target.value })}
+                    onChange={(e) => setFormData({ ...formData, address_zip_code: formatCEP(e.target.value) })}
                     onBlur={handleCepBlur}
                     placeholder="00000-000"
                     disabled={loading}
                     required
+                    maxLength={9}
                     className="h-11"
                   />
                   <Button type="button" variant="outline" onClick={handleCepBlur} disabled={loading || loadingCep} className="h-11 px-4">
@@ -383,4 +452,3 @@ export function CreateUserModal({
     </Dialog>
   )
 }
-

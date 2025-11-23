@@ -3,11 +3,11 @@ import React from "react"
 import { usePathname } from "next/navigation"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { 
-  Sidebar as UISidebar, 
-  SidebarBody, 
+import {
+  Sidebar as UISidebar,
+  SidebarBody,
   SidebarLink as UISidebarLink,
-  useSidebar 
+  useSidebar
 } from "@/components/ui/sidebar"
 import {
   LayoutDashboard,
@@ -36,195 +36,179 @@ import { motion, AnimatePresence } from "framer-motion"
 
 // Menus por painel
 const adminMenuItems = [
-  { 
-    icon: LayoutDashboard, 
-    label: "Dashboard", 
+  {
+    icon: LayoutDashboard,
+    label: "Dashboard",
     href: "/admin",
     description: "Visão geral do sistema"
   },
-  { 
-    icon: MapPin, 
-    label: "Mapa", 
+  {
+    icon: MapPin,
+    label: "Mapa",
     href: "/admin/mapa",
     description: "Frota em tempo real"
   },
-  { 
-    icon: Navigation, 
-    label: "Rotas", 
+  {
+    icon: Navigation,
+    label: "Rotas",
     href: "/admin/rotas",
     description: "Gerenciar itinerários"
   },
-  { 
-    icon: Building, 
-    label: "Transportadoras", 
+  {
+    icon: Building,
+    label: "Transportadoras",
     href: "/admin/transportadoras",
     description: "Gestão de transportadoras"
   },
-  { 
-    icon: Briefcase, 
-    label: "Empresas", 
-    href: "/admin/empresas",
-    description: "Operadores"
+  description: "Despache de emergência"
   },
-  { 
-    icon: Shield, 
-    label: "Permissões", 
-    href: "/admin/permissoes",
-    description: "Controle de acesso"
-  },
-  { 
-    icon: LifeBuoy, 
-    label: "Socorro", 
-    href: "/admin/socorro",
-    description: "Despache de emergência"
-  },
-  { 
-    icon: AlertTriangle, 
-    label: "Alertas", 
-    href: "/admin/alertas",
-    description: "Notificações do sistema"
-  },
-  { 
-    icon: BarChart3, 
+{
+  icon: AlertTriangle,
+    label: "Alertas",
+      href: "/admin/alertas",
+        description: "Notificações do sistema"
+},
+{
+  icon: BarChart3,
     label: "Relatórios",
-    href: "/admin/relatorios",
-    description: "Análise operacional"
-  },
-  { 
-    icon: DollarSign, 
-    label: "Custos", 
-    href: "/admin/custos",
-    description: "Gestão financeira"
-  },
-  { 
-    icon: HelpCircle, 
-    label: "Ajuda & Suporte", 
-    href: "/admin/ajuda-suporte",
-    description: "Central de ajuda"
-  }
+      href: "/admin/relatorios",
+        description: "Análise operacional"
+},
+{
+  icon: DollarSign,
+    label: "Custos",
+      href: "/admin/custos",
+        description: "Gestão financeira"
+},
+{
+  icon: HelpCircle,
+    label: "Ajuda & Suporte",
+      href: "/admin/ajuda-suporte",
+        description: "Central de ajuda"
+}
 ]
 
 const operadorMenuItems = [
-  { 
-    icon: LayoutDashboard, 
-    label: "Dashboard", 
+  {
+    icon: LayoutDashboard,
+    label: "Dashboard",
     href: "/operador",
     description: "Visão geral do operador"
   },
-  { 
-    icon: Users, 
-    label: "Funcionários", 
+  {
+    icon: Users,
+    label: "Funcionários",
     href: "/operador/funcionarios",
     description: "Gerencie seus funcionários"
   },
-  { 
-    icon: Navigation, 
-    label: "Rotas", 
+  {
+    icon: Navigation,
+    label: "Rotas",
     href: "/operador/rotas",
     description: "Solicitar e acompanhar rotas"
   },
-  { 
-    icon: Building2, 
-    label: "Prestadores", 
+  {
+    icon: Building2,
+    label: "Prestadores",
     href: "/operador/prestadores",
     description: "Transportadoras alocadas pela GOLF FOX"
   },
-  { 
-    icon: FileText, 
-    label: "Solicitações", 
+  {
+    icon: FileText,
+    label: "Solicitações",
     href: "/operador/solicitacoes",
     description: "Solicitações e mudanças para GOLF FOX"
   },
-  { 
-    icon: DollarSign, 
-    label: "Custos", 
+  {
+    icon: DollarSign,
+    label: "Custos",
     href: "/operador/custos",
     description: "Faturas e conciliação GOLF FOX"
   },
-  { 
-    icon: AlertTriangle, 
-    label: "Alertas", 
+  {
+    icon: AlertTriangle,
+    label: "Alertas",
     href: "/operador/alertas",
     description: "Notificações do sistema"
   },
-  { 
-    icon: BarChart3, 
-    label: "Relatórios", 
+  {
+    icon: BarChart3,
+    label: "Relatórios",
     href: "/operador/relatorios",
     description: "Análise e exportação"
   },
-  { 
-    icon: Shield, 
-    label: "Conformidade", 
+  {
+    icon: Shield,
+    label: "Conformidade",
     href: "/operador/conformidade",
     description: "Incidentes e segurança"
   },
-  { 
-    icon: MessageSquare, 
-    label: "Comunicações", 
+  {
+    icon: MessageSquare,
+    label: "Comunicações",
     href: "/operador/comunicacoes",
     description: "Broadcasts e mensagens"
   },
-  { 
-    icon: Settings, 
-    label: "Preferências", 
+  {
+    icon: Settings,
+    label: "Preferências",
     href: "/operador/preferencias",
     description: "Configurações e integrações"
   },
-  { 
-    icon: HelpCircle, 
-    label: "Ajuda", 
+  {
+    icon: HelpCircle,
+    label: "Ajuda",
     href: "/operador/ajuda",
     description: "Central de ajuda"
   }
 ]
 
 const transportadoraMenuItems = [
-  { 
-    icon: LayoutDashboard, 
-    label: "Dashboard", 
+  {
+    icon: LayoutDashboard,
+    label: "Dashboard",
     href: "/transportadora",
     description: "Visão geral da transportadora"
   },
-  { 
-    icon: MapPin, 
-    label: "Mapa", 
+  {
+    icon: MapPin,
+    label: "Mapa",
     href: "/transportadora/mapa",
     description: "Frota em tempo real"
   },
-  { 
-    icon: Truck, 
-    label: "Veículos", 
+  {
+    icon: Truck,
+    label: "Veículos",
     href: "/transportadora/veiculos",
     description: "Frota da transportadora"
   },
-  { 
-    icon: Users, 
-    label: "Motoristas", 
+  {
+    icon: Users,
+    label: "Motoristas",
     href: "/transportadora/motoristas",
     description: "Motoristas da transportadora"
   },
-  { 
-    icon: AlertTriangle, 
-    label: "Alertas", 
+  {
+    icon: AlertTriangle,
+    label: "Alertas",
     href: "/transportadora/alertas",
     description: "Notificações"
   },
-  { 
-    icon: DollarSign, 
-    label: "Custos", 
+  {
+    icon: DollarSign,
+    label: "Custos",
     href: "/transportadora/custos",
     description: "Controle de custos"
   },
-  { 
-    icon: BarChart3, 
-    label: "Relatórios", 
+  {
+    icon: BarChart3,
+    label: "Relatórios",
     href: "/transportadora/relatorios",
     description: "Relatórios da transportadora"
   },
-  { 
-    icon: HelpCircle, 
-    label: "Ajuda", 
+  {
+    icon: HelpCircle,
+    label: "Ajuda",
     href: "/transportadora/ajuda",
     description: "Central de ajuda"
   }
@@ -242,10 +226,10 @@ interface SidebarProps {
 }
 
 // Componente de Link customizado com badges e estados ativos
-const CustomSidebarLink = ({ 
-  item, 
+const CustomSidebarLink = ({
+  item,
   panel
-}: { 
+}: {
   item: typeof adminMenuItems[0]
   panel: 'admin' | 'operador' | 'transportadora'
 }) => {
@@ -253,16 +237,16 @@ const CustomSidebarLink = ({
   const router = useRouter()
   const { open } = useSidebar()
   const Icon = item.icon
-  
+
   // Verificar se o item está ativo
   // Para dashboards, apenas rota exata
   const isDashboard = item.href === "/admin" || item.href === "/operador" || item.href === "/transportadora"
-  const isActive = isDashboard 
-    ? pathname === item.href 
+  const isActive = isDashboard
+    ? pathname === item.href
     : pathname === item.href || pathname?.startsWith(item.href + "/")
-  
+
   const showOperationalAlerts = (item.href === "/admin/alertas" || item.href === "/operador/alertas" || item.href === "/transportadora/alertas")
-  
+
   return (
     <div className="relative group">
       <Link
@@ -271,14 +255,14 @@ const CustomSidebarLink = ({
         className={cn(
           "flex items-center justify-start gap-2 py-2.5 sm:py-2 px-2 sm:px-3 rounded-lg transition-colors relative",
           "min-h-[44px] sm:min-h-[40px] touch-manipulation",
-          isActive 
+          isActive
             ? ((panel === 'operador' || panel === 'operator')
-                ? "bg-orange-50 dark:bg-orange-900/20 text-orange-500" 
-                : "bg-[#FFF7ED] text-[#F97316]")
+              ? "bg-orange-50 dark:bg-orange-900/20 text-orange-500"
+              : "bg-[#FFF7ED] text-[#F97316]")
             : "hover:bg-gray-100 dark:hover:bg-gray-800 active:bg-gray-200"
         )}
         onMouseEnter={() => router.prefetch(item.href)}
-        onClick={(e) => { 
+        onClick={(e) => {
           e.preventDefault()
           router.push(item.href)
           // Fechar sidebar no mobile após clicar
@@ -289,14 +273,14 @@ const CustomSidebarLink = ({
         }}
       >
         <div className="relative">
-          <Icon 
+          <Icon
             className={cn(
               "h-5 w-5 transition-colors flex-shrink-0",
               "stroke-[1.5px]",
-              isActive 
+              isActive
                 ? ((panel === 'operador' || panel === 'operator') ? "text-orange-500" : "text-[#F97316]")
                 : ((panel === 'operador' || panel === 'operator') ? "text-gray-500 group-hover:text-orange-500" : "text-gray-500 group-hover:text-[#F97316]")
-            )} 
+            )}
           />
           {showOperationalAlerts && open && (
             <div className="absolute -top-1 -right-1 flex gap-1">
@@ -315,7 +299,7 @@ const CustomSidebarLink = ({
           }}
           className={cn(
             "text-sm sm:text-base transition-colors whitespace-nowrap font-medium",
-            isActive 
+            isActive
               ? ((panel === 'operador' || panel === 'operator') ? "text-orange-500 font-semibold" : "text-[#F97316] font-semibold")
               : "text-gray-600 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-gray-100"
           )}
@@ -339,12 +323,12 @@ const CustomSidebarLink = ({
 // Logo component
 const SidebarLogo = ({ panel }: { panel: 'admin' | 'operador' | 'transportadora' }) => {
   const { open } = useSidebar()
-  
+
   return (
-      <a
-        href={(panel === 'operador' || panel === 'operator') ? '/operador' : panel === 'transportadora' ? '/transportadora' : '/admin'}
-        className="font-normal flex space-x-2 items-center text-sm text-black dark:text-white py-1 relative z-20 mb-6"
-      >
+    <a
+      href={(panel === 'operador' || panel === 'operator') ? '/operador' : panel === 'transportadora' ? '/transportadora' : '/admin'}
+      className="font-normal flex space-x-2 items-center text-sm text-black dark:text-white py-1 relative z-20 mb-6"
+    >
       <div className={cn(
         "h-8 w-8 rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm",
         (panel === 'operador' || panel === 'operator') ? "bg-orange-500" : "gradient-brand"
@@ -373,14 +357,14 @@ const SidebarLogo = ({ panel }: { panel: 'admin' | 'operador' | 'transportadora'
 }
 
 // User profile component
-const SidebarUser = ({ user, panel }: { 
+const SidebarUser = ({ user, panel }: {
   user?: { id: string; name: string; email: string }
   panel: 'admin' | 'operador' | 'transportadora'
 }) => {
   const { open } = useSidebar()
-  
+
   if (!user) return null
-  
+
   // Usar iniciais do nome como fallback
   const initials = user.name
     .split(' ')
@@ -388,7 +372,7 @@ const SidebarUser = ({ user, panel }: {
     .join('')
     .toUpperCase()
     .slice(0, 2)
-  
+
   return (
     <div className="border-t border-[var(--border)] pt-4 mt-auto">
       <a
@@ -421,13 +405,13 @@ const SidebarUser = ({ user, panel }: {
 
 export function Sidebar({ isOpen = true, isMobile = false, panel = 'admin', user }: SidebarProps) {
   const { isSidebarItemActive } = useNavigation()
-  
+
   // Selecionar menu baseado no painel
   const menuItems = (panel === 'operador' || panel === 'operator')
-    ? operadorMenuItems 
-    : panel === 'transportadora' 
-    ? transportadoraMenuItems 
-    : adminMenuItems
+    ? operadorMenuItems
+    : panel === 'transportadora'
+      ? transportadoraMenuItems
+      : adminMenuItems
 
   // Estado interno para controle de hover (desktop) e toggle (mobile)
   const [internalOpen, setInternalOpen] = React.useState(isOpen)
@@ -456,7 +440,7 @@ export function Sidebar({ isOpen = true, isMobile = false, panel = 'admin', user
   // Em desktop, não passar isOpen nem setOpen para permitir controle interno (hover)
   // Em mobile, passar ambos para controle externo
   return (
-    <UISidebar 
+    <UISidebar
       {...(isMobile ? { open: internalOpen, setOpen: setInternalOpen } : {})}
       animate={true}
       isMobile={isMobile}
@@ -477,8 +461,6 @@ export function Sidebar({ isOpen = true, isMobile = false, panel = 'admin', user
             ))}
           </div>
         </div>
-        
-        <SidebarUser user={user} panel={panel} />
       </SidebarBody>
     </UISidebar>
   )

@@ -61,31 +61,44 @@ export async function POST(req: NextRequest) {
           { status: 500 }
         )
       }
-      
+
       if (data && data.length > 0) {
         updated = true
+        userData.name = name.trim() // Atualizar objeto local para o cookie
         updates.push('nome')
       }
     }
 
     // Atualizar email se fornecido (requer sessão Supabase válida)
     if (email !== undefined && email !== null && email.trim() !== '' && email !== userData.email) {
-      // Atualizar email usando admin API
+      // 1. Atualizar email no Supabase Auth
       const { data: updateData, error: updateError } = await supabaseServiceRole.auth.admin.updateUserById(
         userId,
         { email: email.trim() }
       )
 
       if (updateError) {
-        console.error('Erro ao atualizar email:', updateError)
+        console.error('Erro ao atualizar email no Auth:', updateError)
         return NextResponse.json(
           { success: false, error: 'Erro ao atualizar email: ' + updateError.message },
           { status: 500 }
         )
       }
-      
+
+      // 2. Atualizar email na tabela users para manter sincronia
+      const { error: dbError } = await supabaseServiceRole
+        .from('users')
+        .update({ email: email.trim() })
+        .eq('id', userId)
+
+      if (dbError) {
+        console.error('Erro ao atualizar email no banco:', dbError)
+        // Não falhar completamente se o Auth passou, mas logar erro
+      }
+
       if (updateData) {
         updated = true
+        userData.email = email.trim() // Atualizar objeto local para o cookie
         updates.push('email')
       }
     }
@@ -105,7 +118,7 @@ export async function POST(req: NextRequest) {
           { status: 500 }
         )
       }
-      
+
       if (updateData) {
         updated = true
         updates.push('senha')
@@ -119,21 +132,36 @@ export async function POST(req: NextRequest) {
       }, { status: 400 })
     }
 
-    return NextResponse.json({
+    // Criar nova resposta com sucesso
+    const response = NextResponse.json({
       success: true,
       message: 'Perfil atualizado com sucesso',
       updated: updates
     })
+
+    // Atualizar o cookie de sessão com os novos dados
+    // Isso garante que o AppShell e useAuthFast peguem as mudanças imediatamente
+    const newSessionPayload = JSON.stringify(userData)
+    const encodedSession = Buffer.from(newSessionPayload).toString('base64')
+
+    response.cookies.set('golffox-session', encodedSession, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 60 * 60 * 24 * 7 // 7 dias
+    })
+
+    return response
   } catch (error: any) {
     console.error('Erro ao atualizar perfil:', error)
     return NextResponse.json(
-      { 
-        success: false, 
+      {
+        success: false,
         error: 'Erro ao atualizar perfil',
-        message: error.message 
+        message: error.message
       },
       { status: 500 }
     )
   }
 }
-
