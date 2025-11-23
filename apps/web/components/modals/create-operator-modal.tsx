@@ -16,6 +16,7 @@ import { Briefcase, UserPlus, Loader2 } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { notifySuccess, notifyError } from "@/lib/toast"
 import { globalSyncManager } from "@/lib/global-sync"
+import { formatPhone, formatCEP, formatCPF } from "@/lib/format-utils"
 
 interface CreateOperatorModalProps {
   isOpen: boolean
@@ -62,25 +63,22 @@ export function CreateOperatorModal({
     setLoading(true)
 
     try {
-      // Validações - apenas nome da empresa é obrigatório
+      // Validações
       if (!formData.companyName.trim()) {
         notifyError(new Error('Nome da empresa é obrigatório'), 'Nome da empresa é obrigatório')
         setLoading(false)
         return
       }
 
-      // Validar email apenas se fornecido (opcional)
       if (formData.responsibleEmail.trim() && !validateEmail(formData.responsibleEmail)) {
         notifyError(new Error('Email inválido'), 'Email do responsável inválido')
         setLoading(false)
         return
       }
 
-      // Usar API route para criar empresa
       setProgress("Criando empresa...")
       setStep(2)
 
-      // Montar endereço completo
       const fullAddress = [
         formData.address,
         formData.addressNumber ? `Nº ${formData.addressNumber}` : '',
@@ -90,9 +88,7 @@ export function CreateOperatorModal({
         formData.zipCode ? `CEP: ${formData.zipCode}` : ''
       ].filter(Boolean).join(', ')
 
-      // Preparar dados do responsável (opcionais - apenas se fornecidos)
       const requestBody: any = {
-        // Dados da Empresa
         companyName: formData.companyName,
         cnpj: formData.cnpj || null,
         stateRegistration: formData.stateRegistration || null,
@@ -106,7 +102,6 @@ export function CreateOperatorModal({
         companyWebsite: formData.companyWebsite || null,
       }
 
-      // Adicionar dados do responsável apenas se fornecidos (opcional)
       if (formData.responsibleEmail.trim()) {
         requestBody.operatorEmail = formData.responsibleEmail
       }
@@ -117,7 +112,6 @@ export function CreateOperatorModal({
         requestBody.operatorName = formData.responsibleName
       }
 
-      // ✅ Obter token do Supabase e fazer requisição autenticada
       const { data: { session }, error: sessionError } = await supabase.auth.getSession()
 
       if (sessionError || !session?.access_token) {
@@ -136,7 +130,6 @@ export function CreateOperatorModal({
         credentials: 'include',
       })
 
-      // ✅ BUG #2 FIX: Melhorar feedback de erros - não fechar modal silenciosamente
       if (!response.ok) {
         let errorMessage = 'Erro ao criar empresa'
         let errorDetails = ''
@@ -145,22 +138,18 @@ export function CreateOperatorModal({
           const errorData = await response.json()
           errorMessage = errorData.error || errorData.message || errorMessage
           errorDetails = errorData.details || ''
-
-          // Log detalhado para debugging
           console.error('❌ Erro da API create-operator:', {
             status: response.status,
             statusText: response.statusText,
             errorData
           })
         } catch (parseError) {
-          // Se não conseguir parsear JSON, mostrar status code
           console.error('❌ Erro da API create-operator (sem JSON):', {
             status: response.status,
             statusText: response.statusText
           })
         }
 
-        // Mensagens específicas por status code
         if (response.status === 401) {
           errorMessage = 'Sessão expirada. Por favor, faça login novamente.'
         } else if (response.status === 403) {
@@ -173,18 +162,15 @@ export function CreateOperatorModal({
           errorMessage = errorDetails ? `${errorMessage}\n\nDetalhes: ${errorDetails}` : errorMessage
         }
 
-        // Mostrar erro ao usuário (NÃO lançar exceção)
         notifyError(new Error(errorMessage), errorMessage)
         setLoading(false)
         setProgress('')
-        setStep(1) // Voltar para o início
-        // ❌ NÃO fecharModal - deixar usuário ver erro e tentar novamente
+        setStep(1)
         return
       }
 
       const result = await response.json()
 
-      // Verificar se a resposta tem companyId (obrigatório)
       if (!result.companyId && !result.company_id) {
         const errorMsg = 'Resposta inválida da API: companyId não encontrado'
         console.error('❌ Resposta da API create-operator:', result)
@@ -195,22 +181,12 @@ export function CreateOperatorModal({
         return
       }
 
-      // Normalizar campos da resposta (userId/operatorId são opcionais se não houver senha)
-      const operatorId = result.userId || result.operatorId
-
-      // NOTA: A API já cria o usuário e empresa usando service role (bypass RLS)
-      // Não é necessário fazer sincronização adicional aqui, pois causaria erro de RLS
-      // A sincronização é apenas para casos onde a API não foi usada
-
-      // Sucesso
       setStep(7)
       notifySuccess('Empresa criada com sucesso!')
 
-      // Notificar sincronização global
       if (result.company) {
         globalSyncManager.triggerSync('company.created', result.company)
       }
-      // Sincronizar usuário apenas se foi criado (quando há senha)
       if (result.operator || result.userId) {
         globalSyncManager.triggerSync('user.created', {
           id: result.userId || result.operatorId,
@@ -220,7 +196,6 @@ export function CreateOperatorModal({
         })
       }
 
-      // Reset form
       setFormData({
         companyName: "",
         cnpj: "",
@@ -270,7 +245,6 @@ export function CreateOperatorModal({
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Progress Steps */}
           {loading && (
             <div className="space-y-2">
               <div className="flex items-center gap-2 text-sm text-[var(--ink-muted)]">
@@ -286,9 +260,7 @@ export function CreateOperatorModal({
             </div>
           )}
 
-          {/* Campos do Formulário */}
           <div className="space-y-4">
-            {/* Seção: Dados da Empresa */}
             <div className="space-y-4 border-b pb-4">
               <h3 className="font-semibold text-lg flex items-center gap-2">
                 <Briefcase className="h-5 w-5" />
@@ -313,7 +285,7 @@ export function CreateOperatorModal({
                   <Input
                     id="cnpj"
                     value={formData.cnpj}
-                    onChange={(e) => setFormData({ ...formData, cnpj: e.target.value })}
+                    onChange={(e) => setFormData({ ...formData, cnpj: formatCPF(e.target.value) })}
                     placeholder="00.000.000/0000-00"
                     disabled={loading}
                   />
@@ -325,8 +297,8 @@ export function CreateOperatorModal({
                     id="companyPhone"
                     type="tel"
                     value={formData.companyPhone}
-                    onChange={(e) => setFormData({ ...formData, companyPhone: e.target.value })}
-                    placeholder="(00) 0000-0000"
+                    onChange={(e) => setFormData({ ...formData, companyPhone: formatPhone(e.target.value) })}
+                    placeholder="(00) 00000-0000"
                     disabled={loading}
                   />
                 </div>
@@ -438,7 +410,7 @@ export function CreateOperatorModal({
                   <Input
                     id="zipCode"
                     value={formData.zipCode}
-                    onChange={(e) => setFormData({ ...formData, zipCode: e.target.value })}
+                    onChange={(e) => setFormData({ ...formData, zipCode: formatCEP(e.target.value) })}
                     placeholder="00000-000"
                     disabled={loading}
                   />
@@ -446,7 +418,6 @@ export function CreateOperatorModal({
               </div>
             </div>
 
-            {/* Seção: Dados do Responsável (Opcional) */}
             <div className="space-y-4 pt-4 border-t">
               <h3 className="font-semibold text-lg flex items-center gap-2">
                 <UserPlus className="h-5 w-5" />
@@ -486,7 +457,7 @@ export function CreateOperatorModal({
                     id="responsiblePhone"
                     type="tel"
                     value={formData.responsiblePhone}
-                    onChange={(e) => setFormData({ ...formData, responsiblePhone: e.target.value })}
+                    onChange={(e) => setFormData({ ...formData, responsiblePhone: formatPhone(e.target.value) })}
                     placeholder="(00) 00000-0000 (opcional)"
                     disabled={loading}
                   />
@@ -525,4 +496,3 @@ export function CreateOperatorModal({
     </Dialog>
   )
 }
-

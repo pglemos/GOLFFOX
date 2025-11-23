@@ -157,7 +157,6 @@ class TrackingService {
               ? AppleSettings(
                   accuracy: _config.accuracy,
                   distanceFilter: _config.distanceFilterMeters,
-                  pauseLocationUpdatesAutomatically: false,
                   activityType: ActivityType.automotiveNavigation,
                   showBackgroundLocationIndicator: true,
                 )

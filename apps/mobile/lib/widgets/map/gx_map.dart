@@ -20,29 +20,27 @@ class GxMap extends StatelessWidget {
   final Widget? legend;
 
   @override
-  Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        GoogleMap(
-          initialCameraPosition: CameraPosition(
-            target: center,
-            zoom: zoom,
+  Widget build(BuildContext context) => Stack(
+        children: [
+          GoogleMap(
+            initialCameraPosition: CameraPosition(
+              target: center,
+              zoom: zoom,
+            ),
+            markers: markers,
+            polylines: polylines,
+            polygons: polygons,
+            myLocationEnabled: true,
+            myLocationButtonEnabled: false,
+            zoomControlsEnabled: false,
+            mapToolbarEnabled: false,
           ),
-          markers: markers,
-          polylines: polylines,
-          polygons: polygons,
-          myLocationEnabled: true,
-          myLocationButtonEnabled: false,
-          zoomControlsEnabled: false,
-          mapToolbarEnabled: false,
-        ),
-        if (legend != null)
-          Positioned(
-            bottom: 12,
-            right: 12,
-            child: legend!,
-          ),
-      ],
-    );
-  }
+          if (legend != null)
+            Positioned(
+              bottom: 12,
+              right: 12,
+              child: legend!,
+            ),
+        ],
+      );
 }
