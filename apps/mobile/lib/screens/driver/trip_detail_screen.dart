@@ -149,10 +149,10 @@ class _TripDetailScreenState extends State<TripDetailScreen>
   }
 
   LatLngBounds _calculateBounds(List<LatLng> points) {
-    double minLat = points.first.latitude;
-    double maxLat = points.first.latitude;
-    double minLng = points.first.longitude;
-    double maxLng = points.first.longitude;
+    var minLat = points.first.latitude;
+    var maxLat = points.first.latitude;
+    var minLng = points.first.longitude;
+    var maxLng = points.first.longitude;
 
     for (final point in points) {
       if (point.latitude < minLat) minLat = point.latitude;
@@ -350,8 +350,8 @@ class _TripDetailScreenState extends State<TripDetailScreen>
   }
 
   Widget _buildMapCard(ThemeData t) {
-    final Set<Polyline> polylines = {};
-    final Set<Marker> markers = {};
+    final polylines = <Polyline>{};
+    final markers = <Marker>{};
 
     if (_positions.isNotEmpty) {
       // Rota
@@ -366,25 +366,27 @@ class _TripDetailScreenState extends State<TripDetailScreen>
       );
 
       // Marcadores (inicio e atual)
-      markers.add(
-        Marker(
-          markerId: const MarkerId('start'),
-          position:
-              LatLng(_positions.first.latitude, _positions.first.longitude),
-          icon:
-              BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
-          infoWindow: const InfoWindow(title: 'Início'),
-        ),
-      );
-
-      markers.add(
-        Marker(
-          markerId: const MarkerId('current'),
-          position: LatLng(_positions.last.latitude, _positions.last.longitude),
-          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
-          infoWindow: const InfoWindow(title: 'Atual'),
-        ),
-      );
+      markers
+        ..add(
+          Marker(
+            markerId: const MarkerId('start'),
+            position:
+                LatLng(_positions.first.latitude, _positions.first.longitude),
+            icon: BitmapDescriptor.defaultMarkerWithHue(
+                BitmapDescriptor.hueGreen),
+            infoWindow: const InfoWindow(title: 'Início'),
+          ),
+        )
+        ..add(
+          Marker(
+            markerId: const MarkerId('current'),
+            position:
+                LatLng(_positions.last.latitude, _positions.last.longitude),
+            icon:
+                BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+            infoWindow: const InfoWindow(title: 'Atual'),
+          ),
+        );
     }
 
     return Container(

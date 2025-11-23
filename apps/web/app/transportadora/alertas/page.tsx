@@ -10,42 +10,45 @@ import {
   AlertTriangle,
   AlertCircle,
   Info,
-  TruckIcon,
+  Truck,
+  Users,
   Search,
   Filter,
   Calendar,
   CheckCircle2,
   XCircle,
-  Clock
+  Clock,
 } from "lucide-react"
 import { notifyError, notifySuccess } from "@/lib/toast"
 import { cn } from "@/lib/utils"
+import { useAuth } from "@/hooks/use-auth"
 
 interface Alert {
   id: string
-  type: 'veiculo_parado' | 'critico' | 'aviso' | 'informativo'
+  type: "veiculo_parado" | "critico" | "aviso" | "informativo"
   title: string
   description: string
-  timestamp: Date
+  timestamp: string // ISO string
   vehicle?: string
   driver?: string
   location?: string
-  status: 'pending' | 'acknowledged' | 'resolved'
+  status: "pending" | "acknowledged" | "resolved"
 }
 
 export default function AlertasPage() {
+  const { user } = useAuth()
   const [alerts, setAlerts] = useState<Alert[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedType, setSelectedType] = useState<string>("all")
   const [showOnlyUnread, setShowOnlyUnread] = useState(false)
 
-  // Contadores por tipo
+  // Contadores por tipo (apenas pendentes)
   const alertCounts = {
-    veiculo_parado: alerts.filter(a => a.type === 'veiculo_parado' && a.status === 'pending').length,
-    critico: alerts.filter(a => a.type === 'critico' && a.status === 'pending').length,
-    aviso: alerts.filter(a => a.type === 'aviso' && a.status === 'pending').length,
-    informativo: alerts.filter(a => a.type === 'informativo' && a.status === 'pending').length,
+    veiculo_parado: alerts.filter(a => a.type === "veiculo_parado" && a.status === "pending").length,
+    critico: alerts.filter(a => a.type === "critico" && a.status === "pending").length,
+    aviso: alerts.filter(a => a.type === "aviso" && a.status === "pending").length,
+    informativo: alerts.filter(a => a.type === "informativo" && a.status === "pending").length,
   }
 
   useEffect(() => {
@@ -55,11 +58,10 @@ export default function AlertasPage() {
   const loadAlerts = async () => {
     try {
       setLoading(true)
-      // TODO: Implementar chamada real à API
-      // Dados mockados
-      const mockAlerts: Alert[] = []
-
-      setAlerts(mockAlerts)
+      const response = await fetch("/api/transportadora/alertas")
+      const data = await response.json()
+      const apiAlerts: Alert[] = data.alerts
+      setAlerts(apiAlerts)
     } catch (error) {
       notifyError(error, "Erro ao carregar alertas")
     } finally {
@@ -69,10 +71,10 @@ export default function AlertasPage() {
 
   const handleAcknowledge = async (alertId: string) => {
     try {
-      // TODO: Implementar chamada à API
-      setAlerts(prev => prev.map(a =>
-        a.id === alertId ? { ...a, status: 'acknowledged' } : a
-      ))
+      // Simular API call – replace with real request later
+      setAlerts(prev =>
+        prev.map(a => (a.id === alertId ? { ...a, status: "acknowledged" } : a))
+      )
       notifySuccess("Alerta marcado como lido")
     } catch (error) {
       notifyError(error, "Erro ao marcar alerta")
@@ -81,50 +83,25 @@ export default function AlertasPage() {
 
   const handleResolve = async (alertId: string) => {
     try {
-      // TODO: Implementar chamada à API
-      setAlerts(prev => prev.map(a =>
-        a.id === alertId ? { ...a, status: 'resolved' } : a
-      ))
+      setAlerts(prev =>
+        prev.map(a => (a.id === alertId ? { ...a, status: "resolved" } : a))
+      )
       notifySuccess("Alerta resolvido")
     } catch (error) {
       notifyError(error, "Erro ao resolver alerta")
     }
   }
 
-  const getAlertTypeConfig = (type: Alert['type']) => {
+  const getAlertTypeConfig = (type: Alert["type"]) => {
     switch (type) {
-      case 'veiculo_parado':
-        return {
-          icon: TruckIcon,
-          color: 'text-red-600',
-          bg: 'bg-red-50',
-          border: 'border-red-200',
-          label: 'Veículo Parado'
-        }
-      case 'critico':
-        return {
-          icon: XCircle,
-          color: 'text-red-600',
-          bg: 'bg-red-50',
-          border: 'border-red-200',
-          label: 'Crítico'
-        }
-      case 'aviso':
-        return {
-          icon: AlertTriangle,
-          color: 'text-yellow-600',
-          bg: 'bg-yellow-50',
-          border: 'border-yellow-200',
-          label: 'Aviso'
-        }
-      case 'informativo':
-        return {
-          icon: Info,
-          color: 'text-blue-600',
-          bg: 'bg-blue-50',
-          border: 'border-blue-200',
-          label: 'Informativo'
-        }
+      case "veiculo_parado":
+        return { icon: Truck, color: "text-red-600", bg: "bg-red-50", border: "border-red-200", label: "Veículo Parado" }
+      case "critico":
+        return { icon: XCircle, color: "text-red-600", bg: "bg-red-50", border: "border-red-200", label: "Crítico" }
+      case "aviso":
+        return { icon: AlertTriangle, color: "text-yellow-600", bg: "bg-yellow-50", border: "border-yellow-200", label: "Aviso" }
+      case "informativo":
+        return { icon: Info, color: "text-blue-600", bg: "bg-blue-50", border: "border-blue-200", label: "Informativo" }
     }
   }
 
@@ -134,15 +111,13 @@ export default function AlertasPage() {
       alert.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
       alert.vehicle?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       alert.driver?.toLowerCase().includes(searchTerm.toLowerCase())
-
     const matchesType = selectedType === "all" || alert.type === selectedType
-    const matchesUnread = !showOnlyUnread || alert.status === 'pending'
-
+    const matchesUnread = !showOnlyUnread || alert.status === "pending"
     return matchesSearch && matchesType && matchesUnread
   })
 
   return (
-    <AppShell panel="transportadora">
+    <AppShell panel="transportadora" user={user || { id: 'mock', name: 'Transportadora', email: 'transp@golffox.com', role: 'transportadora' }}>
       <div className="p-4 sm:p-6 lg:p-8 space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -158,7 +133,7 @@ export default function AlertasPage() {
           </Button>
         </div>
 
-        {/* Contadores de Alertas */}
+        {/* Contadores */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <Card
             className={cn(
@@ -173,11 +148,10 @@ export default function AlertasPage() {
                 <p className="text-3xl font-bold text-red-600">{alertCounts.veiculo_parado}</p>
               </div>
               <div className="h-12 w-12 rounded-full bg-red-100 flex items-center justify-center">
-                <TruckIcon className="h-6 w-6 text-red-600" />
+                <Truck className="h-6 w-6 text-red-600" />
               </div>
             </div>
           </Card>
-
           <Card
             className={cn(
               "p-4 cursor-pointer transition-all hover:shadow-md",
@@ -195,7 +169,6 @@ export default function AlertasPage() {
               </div>
             </div>
           </Card>
-
           <Card
             className={cn(
               "p-4 cursor-pointer transition-all hover:shadow-md",
@@ -213,7 +186,6 @@ export default function AlertasPage() {
               </div>
             </div>
           </Card>
-
           <Card
             className={cn(
               "p-4 cursor-pointer transition-all hover:shadow-md",
@@ -241,7 +213,7 @@ export default function AlertasPage() {
               <Input
                 placeholder="Buscar em todos os alertas..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={e => setSearchTerm(e.target.value)}
                 className="pl-10"
               />
             </div>
@@ -266,104 +238,75 @@ export default function AlertasPage() {
         {/* Lista de Alertas */}
         {loading ? (
           <div className="text-center py-12">
-            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-orange-500 border-r-transparent"></div>
+            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-orange-500 border-r-transparent" />
             <p className="mt-4 text-[var(--ink-muted)]">Carregando alertas...</p>
           </div>
         ) : filteredAlerts.length === 0 ? (
           <Card className="p-12 text-center">
             <AlertCircle className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-            <p className="text-lg font-medium text-[var(--ink-muted)]">
-              Nenhum alerta encontrado
-            </p>
-            <p className="text-sm text-[var(--ink-muted)] mt-1">
-              Não há alertas no momento.
-            </p>
+            <p className="text-lg font-medium text-[var(--ink-muted)]">Nenhum alerta encontrado</p>
+            <p className="text-sm text-[var(--ink-muted)] mt-1">Não há alertas no momento.</p>
           </Card>
         ) : (
           <div className="space-y-3">
-            {filteredAlerts.map((alert) => {
-              const config = getAlertTypeConfig(alert.type)
-              const Icon = config.icon
-
+            {filteredAlerts.map(alert => {
+              const cfg = getAlertTypeConfig(alert.type)
+              const Icon = cfg.icon
               return (
                 <Card
                   key={alert.id}
-                  className={cn(
-                    "p-4 transition-all",
-                    config.border,
-                    alert.status === 'pending' && config.bg
-                  )}
+                  className={cn("p-4 transition-all", cfg.border, alert.status === "pending" && cfg.bg)}
                 >
                   <div className="flex gap-4">
-                    <div className={cn("h-10 w-10 rounded-full flex items-center justify-center flex-shrink-0", config.bg)}>
-                      <Icon className={cn("h-5 w-5", config.color)} />
+                    <div className={cn("h-10 w-10 rounded-full flex items-center justify-center flex-shrink-0", cfg.bg)}>
+                      <Icon className={cn("h-5 w-5", cfg.color)} />
                     </div>
-
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-4 mb-2">
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">
                             <h3 className="font-semibold">{alert.title}</h3>
-                            <Badge variant="outline" className={cn("text-xs", config.color)}>
-                              {config.label}
-                            </Badge>
-                            {alert.status === 'resolved' && (
-                              <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
-                                Resolvido
-                              </Badge>
+                            <Badge variant="outline" className={cn("text-xs", cfg.color)}>{cfg.label}</Badge>
+                            {alert.status === "resolved" && (
+                              <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">Resolvido</Badge>
                             )}
                           </div>
                           <p className="text-sm text-[var(--ink-muted)]">{alert.description}</p>
                         </div>
-
-                        <div className="flex gap-2 flex-shrink-0">
-                          {alert.status === 'pending' && (
-                            <>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => handleAcknowledge(alert.id)}
-                              >
-                                <CheckCircle2 className="h-4 w-4" />
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => handleResolve(alert.id)}
-                                className="text-green-600 hover:bg-green-50"
-                              >
-                                Resolver
-                              </Button>
-                            </>
-                          )}
-                        </div>
                       </div>
-
-                      <div className="flex flex-wrap gap-4 text-xs text-[var(--ink-muted)]">
-                        {alert.vehicle && (
-                          <span className="flex items-center gap-1">
-                            <TruckIcon className="h-3 w-3" />
-                            {alert.vehicle}
-                          </span>
+                      <div className="flex gap-2 flex-shrink-0">
+                        {alert.status === "pending" && (
+                          <>
+                            <Button size="sm" variant="outline" onClick={() => handleAcknowledge(alert.id)}>
+                              <CheckCircle2 className="h-4 w-4" />
+                            </Button>
+                            <Button size="sm" variant="outline" className="text-green-600 hover:bg-green-50" onClick={() => handleResolve(alert.id)}>
+                              Resolver
+                            </Button>
+                          </>
                         )}
-                        {alert.driver && (
-                          <span className="flex items-center gap-1">
-                            <users className="h-3 w-3" />
-                            {alert.driver}
-                          </span>
-                        )}
-                        {alert.location && (
-                          <span className="flex items-center gap-1">
-                            <mapPin className="h-3 w-3" />
-                            {alert.location}
-                          </span>
-                        )}
-                        <span className="flex items-center gap-1">
-                          <Clock className="h-3 w-3" />
-                          {new Date(alert.timestamp).toLocaleString('pt-BR')}
-                        </span>
                       </div>
                     </div>
+                  </div>
+                  <div className="flex flex-wrap gap-4 text-xs text-[var(--ink-muted)] mt-2">
+                    {alert.vehicle && (
+                      <span className="flex items-center gap-1">
+                        <Truck className="h-3 w-3" /> {alert.vehicle}
+                      </span>
+                    )}
+                    {alert.driver && (
+                      <span className="flex items-center gap-1">
+                        <Users className="h-3 w-3" /> {alert.driver}
+                      </span>
+                    )}
+                    {alert.location && (
+                      <span className="flex items-center gap-1">
+                        <Clock className="h-3 w-3" /> {alert.location}
+                      </span>
+                    )}
+                    <span className="flex items-center gap-1">
+                      <Clock className="h-3 w-3" /> {new Date(alert.timestamp).toLocaleString('pt-BR')}
+                    </span>
                   </div>
                 </Card>
               )

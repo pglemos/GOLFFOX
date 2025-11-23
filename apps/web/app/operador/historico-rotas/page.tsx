@@ -5,26 +5,12 @@ import { AppShell } from "@/components/app-shell"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select"
-import {
-    Navigation,
-    Calendar,
-    MapPin,
-    Users,
-    Clock,
-    TrendingUp,
-    DollarSign,
-    Search
-} from "lucide-react"
+import { Calendar, Clock, MapPin, Navigation, Search, Filter, ArrowUpDown, CheckCircle2, AlertCircle, XCircle } from "lucide-react"
 import { notifyError } from "@/lib/toast"
 import { cn } from "@/lib/utils"
+import { useAuth } from "@/hooks/use-auth"
 
 interface RouteExecution {
     id: string
@@ -41,29 +27,32 @@ interface RouteExecution {
     status: 'completed' | 'in_progress' | 'cancelled'
 }
 
-type FilterPeriod = 'last7' | 'last30' | 'last90' | 'custom'
-type SortBy = 'date_recent' | 'date_old' | 'punctuality' | 'efficiency' | 'cost'
-
 export default function HistoricoRotasPage() {
+    const { user } = useAuth()
     const [executions, setExecutions] = useState<RouteExecution[]>([])
     const [loading, setLoading] = useState(true)
     const [searchTerm, setSearchTerm] = useState("")
-
-    // Filtros
-    const [period, setPeriod] = useState<FilterPeriod>('last30')
-    const [municipality, setMunicipality] = useState('all')
-    const [sortBy, setSortBy] = useState<SortBy>('date_recent')
+    const [statusFilter, setStatusFilter] = useState<string>("all")
+    const [sortBy, setSortBy] = useState<keyof RouteExecution>("date")
+    const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc")
 
     useEffect(() => {
         loadExecutions()
-    }, [period, municipality, sortBy])
+    }, [])
 
     const loadExecutions = async () => {
         try {
             setLoading(true)
-            // TODO: Implementar chamada real à API
-            // Dados mockados por enquanto
-            setExecutions([])
+            const response = await fetch('/api/operador/historico-rotas')
+            const data = await response.json()
+
+            // Convert strings to Date objects
+            const apiExecutions = data.executions.map((exec: any) => ({
+                ...exec,
+                date: new Date(exec.date)
+            }))
+
+            setExecutions(apiExecutions)
         } catch (error) {
             notifyError(error, "Erro ao carregar histórico")
         } finally {
@@ -71,251 +60,191 @@ export default function HistoricoRotasPage() {
         }
     }
 
-    const filteredExecutions = executions.filter(exec =>
-        exec.route.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        exec.motorista.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        exec.municipality.toLowerCase().includes(searchTerm.toLowerCase())
-    )
-
-    const getStatusBadge = (status: RouteExecution['status']) => {
-        switch (status) {
-            case 'completed':
-                return <Badge className="bg-green-100 text-green-700 border-green-200">Concluída</Badge>
-            case 'in_progress':
-                return <Badge className="bg-blue-100 text-blue-700 border-blue-200">Em Andamento</Badge>
-            case 'cancelled':
-                return <Badge className="bg-red-100 text-red-700 border-red-200">Cancelada</Badge>
+    const handleSort = (field: keyof RouteExecution) => {
+        if (sortBy === field) {
+            setSortOrder(sortOrder === "asc" ? "desc" : "asc")
+        } else {
+            setSortBy(field)
+            setSortOrder("desc") // Default to desc for new field
         }
     }
 
-    const getSortLabel = (sort: SortBy) => {
-        switch (sort) {
-            case 'date_recent': return 'Data (mais recente)'
-            case 'date_old': return 'Data (mais antiga)'
-            case 'punctuality': return 'Pontualidade'
-            case 'efficiency': return 'Eficiência'
-            case 'cost': return 'Custo'
+    const filteredExecutions = executions
+        .filter(exec => {
+            const matchesSearch =
+                exec.route.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                exec.municipality.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                exec.motorista.toLowerCase().includes(searchTerm.toLowerCase())
+
+            const matchesStatus = statusFilter === "all" || exec.status === statusFilter
+
+            return matchesSearch && matchesStatus
+        })
+        .sort((a, b) => {
+            const aValue = a[sortBy]
+            const bValue = b[sortBy]
+
+            if (aValue < bValue) return sortOrder === "asc" ? -1 : 1
+            if (aValue > bValue) return sortOrder === "asc" ? 1 : -1
+            return 0
+        })
+
+    const getStatusBadge = (status: string) => {
+        switch (status) {
+            case 'completed':
+                return <Badge className="bg-green-100 text-green-700 hover:bg-green-200 border-green-200">Concluída</Badge>
+            case 'in_progress':
+                return <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-200 border-blue-200">Em Andamento</Badge>
+            case 'cancelled':
+                return <Badge className="bg-red-100 text-red-700 hover:bg-red-200 border-red-200">Cancelada</Badge>
+            default:
+                return <Badge variant="outline">{status}</Badge>
         }
     }
 
     return (
-        <AppShell panel="operador">
+        <AppShell panel="operador" user={user || { id: 'mock', name: 'Operador', email: 'op@golffox.com', role: 'operador' }}>
             <div className="p-4 sm:p-6 lg:p-8 space-y-6">
                 {/* Header */}
-                <div>
-                    <h1 className="text-2xl sm:text-3xl font-bold mb-2">Histórico de Rotas</h1>
-                    <p className="text-sm text-[var(--ink-muted)]">
-                        Acompanhe e desempenho e métricas das rotas executadas
-                    </p>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <div>
+                        <h1 className="text-2xl sm:text-3xl font-bold">Histórico de Rotas</h1>
+                        <p className="text-sm text-[var(--ink-muted)] mt-1">
+                            Consulte o histórico detalhado de execução das rotas
+                        </p>
+                    </div>
+                    <div className="flex gap-2">
+                        <Button variant="outline">
+                            <Calendar className="h-4 w-4 mr-2" />
+                            Exportar Relatório
+                        </Button>
+                    </div>
                 </div>
 
-                {/* Filtros */}
+                {/* Filters */}
                 <Card className="p-4">
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        {/* Período */}
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700">Período</label>
-                            <Select value={period} onValueChange={(v) => setPeriod(v as FilterPeriod)}>
+                    <div className="flex flex-col sm:flex-row gap-4">
+                        <div className="relative flex-1">
+                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                            <Input
+                                placeholder="Buscar por rota, município ou motorista..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="pl-10"
+                            />
+                        </div>
+                        <div className="w-full sm:w-48">
+                            <Select value={statusFilter} onValueChange={setStatusFilter}>
                                 <SelectTrigger>
-                                    <SelectValue />
+                                    <SelectValue placeholder="Status" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="last7">Últimos 7 dias</SelectItem>
-                                    <SelectItem value="last30">Últimos 30 dias</SelectItem>
-                                    <SelectItem value="last90">Últimos 90 dias</SelectItem>
-                                    <SelectItem value="custom">Personalizado</SelectItem>
+                                    <SelectItem value="all">Todos os Status</SelectItem>
+                                    <SelectItem value="completed">Concluída</SelectItem>
+                                    <SelectItem value="in_progress">Em Andamento</SelectItem>
+                                    <SelectItem value="cancelled">Cancelada</SelectItem>
                                 </SelectContent>
                             </Select>
-                        </div>
-
-                        {/* Município */}
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700">Município</label>
-                            <Select value={municipality} onValueChange={setMunicipality}>
-                                <SelectTrigger>
-                                    <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="all">Todos os municípios</SelectItem>
-                                    <SelectItem value="belo_horizonte">Belo Horizonte</SelectItem>
-                                    <SelectItem value="contagem">Contagem</SelectItem>
-                                    <SelectItem value="betim">Betim</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-
-                        {/* Ordenar por */}
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700">Ordenar por</label>
-                            <Select value={sortBy} onValueChange={(v) => setSortBy(v as SortBy)}>
-                                <SelectTrigger>
-                                    <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="date_recent">Data (mais recente)</SelectItem>
-                                    <SelectItem value="date_old">Data (mais antiga)</SelectItem>
-                                    <SelectItem value="punctuality">Pontualidade</SelectItem>
-                                    <SelectItem value="efficiency">Eficiência</SelectItem>
-                                    <SelectItem value="cost">Custo</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-
-                        {/* Busca */}
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700">Buscar</label>
-                            <div className="relative">
-                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                                <Input
-                                    placeholder="Rota, motorista..."
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="pl-10"
-                                />
-                            </div>
                         </div>
                     </div>
                 </Card>
 
-                {/* Execuções de Rotas */}
-                <div>
-                    <h2 className="text-lg font-semibold mb-4">Execuções de Rotas</h2>
-
+                {/* Table/List */}
+                <div className="space-y-4">
                     {loading ? (
                         <div className="text-center py-12">
-                            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-orange-500 border-r-transparent"></div>
+                            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-orange-500 border-r-transparent" />
                             <p className="mt-4 text-[var(--ink-muted)]">Carregando histórico...</p>
                         </div>
                     ) : filteredExecutions.length === 0 ? (
                         <Card className="p-12 text-center">
                             <Navigation className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-                            <p className="text-lg font-medium text-[var(--ink-muted)]">
-                                Nenhuma rota encontrada
-                            </p>
-                            <p className="text-sm text-[var(--ink-muted)] mt-1">
-                                Não há execuções de rotas para os filtros selecionados.
-                            </p>
+                            <p className="text-lg font-medium text-[var(--ink-muted)]">Nenhuma rota encontrada</p>
+                            <p className="text-sm text-[var(--ink-muted)] mt-1">Tente ajustar os filtros de busca.</p>
                         </Card>
                     ) : (
-                        <div className="space-y-3">
-                            {/* Table Header - Desktop Only */}
-                            <div className="hidden lg:grid grid-cols-12 gap-4 px-4 py-2 bg-gray-50 rounded-lg text-xs font-medium text-gray-600">
-                                <div className="col-span-1">DATA/HORA</div>
-                                <div className="col-span-2">MUNICÍPIO</div>
-                                <div className="col-span-2">MOTORISTA</div>
-                                <div className="col-span-1">DURAÇÃO</div>
-                                <div className="col-span-1">DISTÂNCIA</div>
-                                <div className="col-span-1">PASSAGEIROS</div>
-                                <div className="col-span-1">PONTUALIDADE</div>
-                                <div className="col-span-1">OTIMIZAÇÃO</div>
-                                <div className="col-span-1">CUSTO</div>
-                                <div className="col-span-1"></div>
-                            </div>
-
-                            {/* Table Rows */}
+                        <div className="grid gap-4">
                             {filteredExecutions.map((exec) => (
                                 <Card key={exec.id} className="p-4 hover:shadow-md transition-shadow">
-                                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
-                                        {/* Data/Hora */}
-                                        <div className="lg:col-span-1">
-                                            <p className="lg:hidden text-xs text-gray-500 mb-1">Data/Hora</p>
-                                            <div className="flex items-center gap-2">
-                                                <Calendar className="h-4 w-4 text-gray-400 lg:hidden" />
-                                                <div className="text-sm">
-                                                    <p className="font-medium">{new Date(exec.date).toLocaleDateString('pt-BR')}</p>
-                                                    <p className="text-xs text-gray-500">{new Date(exec.date).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</p>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        {/* Município */}
-                                        <div className="lg:col-span-2">
-                                            <p className="lg:hidden text-xs text-gray-500 mb-1">Município</p>
-                                            <div className="flex items-center gap-2">
-                                                <MapPin className="h-4 w-4 text-gray-400 lg:hidden" />
-                                                <p className="font-medium text-sm">{exec.municipality}</p>
-                                            </div>
-                                        </div>
-
-                                        {/* Motorista */}
-                                        <div className="lg:col-span-2">
-                                            <p className="lg:hidden text-xs text-gray-500 mb-1">Motorista</p>
-                                            <div className="flex items-center gap-2">
-                                                <Users className="h-4 w-4 text-gray-400 lg:hidden" />
+                                    <div className="flex flex-col lg:flex-row gap-4 lg:items-center">
+                                        {/* Main Info */}
+                                        <div className="flex-1 space-y-2">
+                                            <div className="flex items-start justify-between">
                                                 <div>
-                                                    <p className="font-medium text-sm">{exec.motorista}</p>
-                                                    <p className="text-xs text-gray-500">{exec.route}</p>
+                                                    <h3 className="font-semibold text-lg">{exec.route}</h3>
+                                                    <div className="flex items-center gap-2 text-sm text-[var(--ink-muted)]">
+                                                        <MapPin className="h-3 w-3" />
+                                                        {exec.municipality}
+                                                    </div>
+                                                </div>
+                                                <div className="lg:hidden">
+                                                    {getStatusBadge(exec.status)}
+                                                </div>
+                                            </div>
+
+                                            <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm">
+                                                <div className="flex items-center gap-2">
+                                                    <Calendar className="h-4 w-4 text-gray-400" />
+                                                    {exec.date.toLocaleDateString('pt-BR')}
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <Clock className="h-4 w-4 text-gray-400" />
+                                                    {exec.date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <Navigation className="h-4 w-4 text-gray-400" />
+                                                    {exec.motorista}
                                                 </div>
                                             </div>
                                         </div>
 
-                                        {/* Duração */}
-                                        <div className="lg:col-span-1">
-                                            <p className="lg:hidden text-xs text-gray-500 mb-1">Duração</p>
-                                            <div className="flex items-center gap-2">
-                                                <Clock className="h-4 w-4 text-gray-400 lg:hidden" />
-                                                <p className="text-sm font-medium">{exec.duration}</p>
+                                        {/* Metrics */}
+                                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 lg:w-auto lg:flex-shrink-0 bg-gray-50 p-3 rounded-lg">
+                                            <div className="text-center">
+                                                <p className="text-xs text-[var(--ink-muted)]">Duração</p>
+                                                <p className="font-medium">{exec.duration}</p>
+                                            </div>
+                                            <div className="text-center">
+                                                <p className="text-xs text-[var(--ink-muted)]">Distância</p>
+                                                <p className="font-medium">{exec.distance} km</p>
+                                            </div>
+                                            <div className="text-center">
+                                                <p className="text-xs text-[var(--ink-muted)]">Passageiros</p>
+                                                <p className="font-medium">{exec.passengers}</p>
+                                            </div>
+                                            <div className="text-center">
+                                                <p className="text-xs text-[var(--ink-muted)]">Custo</p>
+                                                <p className="font-medium text-green-600">R$ {exec.cost.toFixed(2)}</p>
                                             </div>
                                         </div>
 
-                                        {/* Distância */}
-                                        <div className="lg:col-span-1">
-                                            <p className="lg:hidden text-xs text-gray-500 mb-1">Distância</p>
-                                            <div className="flex items-center gap-2">
-                                                <Navigation className="h-4 w-4 text-gray-400 lg:hidden" />
-                                                <p className="text-sm font-medium">{exec.distance} km</p>
+                                        {/* Scores */}
+                                        <div className="flex gap-4 lg:w-48 lg:flex-shrink-0 justify-center lg:justify-end">
+                                            <div className="text-center">
+                                                <div className="relative inline-flex items-center justify-center">
+                                                    <svg className="w-10 h-10 transform -rotate-90">
+                                                        <circle cx="20" cy="20" r="16" stroke="currentColor" strokeWidth="3" fill="transparent" className="text-gray-200" />
+                                                        <circle cx="20" cy="20" r="16" stroke="currentColor" strokeWidth="3" fill="transparent" className="text-blue-500" strokeDasharray={100} strokeDashoffset={100 - exec.punctuality} />
+                                                    </svg>
+                                                    <span className="absolute text-xs font-medium">{exec.punctuality}%</span>
+                                                </div>
+                                                <p className="text-[10px] text-[var(--ink-muted)] mt-1">Pontualidade</p>
+                                            </div>
+                                            <div className="text-center">
+                                                <div className="relative inline-flex items-center justify-center">
+                                                    <svg className="w-10 h-10 transform -rotate-90">
+                                                        <circle cx="20" cy="20" r="16" stroke="currentColor" strokeWidth="3" fill="transparent" className="text-gray-200" />
+                                                        <circle cx="20" cy="20" r="16" stroke="currentColor" strokeWidth="3" fill="transparent" className="text-green-500" strokeDasharray={100} strokeDashoffset={100 - exec.optimization} />
+                                                    </svg>
+                                                    <span className="absolute text-xs font-medium">{exec.optimization}%</span>
+                                                </div>
+                                                <p className="text-[10px] text-[var(--ink-muted)] mt-1">Otimização</p>
                                             </div>
                                         </div>
 
-                                        {/* Passageiros */}
-                                        <div className="lg:col-span-1">
-                                            <p className="lg:hidden text-xs text-gray-500 mb-1">Passageiros</p>
-                                            <div className="flex items-center gap-2">
-                                                <Users className="h-4 w-4 text-gray-400 lg:hidden" />
-                                                <p className="text-sm font-medium">{exec.passengers}</p>
-                                            </div>
-                                        </div>
-
-                                        {/* Pontualidade */}
-                                        <div className="lg:col-span-1">
-                                            <p className="lg:hidden text-xs text-gray-500 mb-1">Pontualidade</p>
-                                            <div className={cn(
-                                                "text-sm font-bold",
-                                                exec.punctuality >= 90 ? "text-green-600" :
-                                                    exec.punctuality >= 70 ? "text-yellow-600" : "text-red-600"
-                                            )}>
-                                                {exec.punctuality}%
-                                            </div>
-                                        </div>
-
-                                        {/* Otimização */}
-                                        <div className="lg:col-span-1">
-                                            <p className="lg:hidden text-xs text-gray-500 mb-1">Otimização</p>
-                                            <div className={cn(
-                                                "text-sm font-bold",
-                                                exec.optimization >= 90 ? "text-green-600" :
-                                                    exec.optimization >= 70 ? "text-yellow-600" : "text-red-600"
-                                            )}>
-                                                {exec.optimization}%
-                                            </div>
-                                        </div>
-
-                                        {/* Custo */}
-                                        <div className="lg:col-span-1">
-                                            <p className="lg:hidden text-xs text-gray-500 mb-1">Custo</p>
-                                            <div className="flex items-center gap-2">
-                                                <DollarSign className="h-4 w-4 text-gray-400 lg:hidden" />
-                                                <p className="text-sm font-medium text-green-600">
-                                                    R$ {exec.cost.toFixed(2)}
-                                                </p>
-                                            </div>
-                                        </div>
-
-                                        {/* Actions */}
-                                        <div className="lg:col-span-1 flex items-center justify-end">
-                                            <Button variant="ghost" size="sm">
-                                                Detalhes
-                                            </Button>
+                                        {/* Status Badge (Desktop) */}
+                                        <div className="hidden lg:block w-32 text-right">
+                                            {getStatusBadge(exec.status)}
                                         </div>
                                     </div>
                                 </Card>

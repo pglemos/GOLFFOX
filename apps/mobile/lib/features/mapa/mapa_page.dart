@@ -7,8 +7,8 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/i18n/i18n.dart';
@@ -240,13 +240,15 @@ class _MapaPageState extends ConsumerState<MapaPage> {
       // final lastPosition = vehicleStatusService.getLastPosition(vehicle.id);
 
       // Mapear status para cor do marker (hue)
-      double hue = BitmapDescriptor.hueRed;
-      if (vehicle.status == VehicleStatus.moving) {
+      var hue = BitmapDescriptor.hueRed;
+      if (vehicle.status == VehicleStatus.active) {
         hue = BitmapDescriptor.hueGreen;
-      } else if (vehicle.status == VehicleStatus.stopped) {
+      } else if (vehicle.status == VehicleStatus.maintenance) {
         hue = BitmapDescriptor.hueOrange;
-      } else if (vehicle.status == VehicleStatus.offline) {
-        hue = BitmapDescriptor.hueAzure; // ou cinza se tivesse
+      } else if (vehicle.status == VehicleStatus.emergency) {
+        hue = BitmapDescriptor.hueRed;
+      } else {
+        hue = BitmapDescriptor.hueAzure; // offline, inactive
       }
 
       return Marker(

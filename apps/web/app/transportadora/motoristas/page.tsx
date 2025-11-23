@@ -17,9 +17,10 @@ import {
   Clock,
   Fuel,
   AlertCircle,
-  UserPlus
+  UserPlus,
 } from "lucide-react"
 import { notifyError } from "@/lib/toast"
+import { useAuth } from "@/hooks/use-auth"
 
 interface DriverMetrics {
   id: string
@@ -38,6 +39,7 @@ interface DriverMetrics {
 }
 
 export default function MotoristasPage() {
+  const { user } = useAuth()
   const [drivers, setDrivers] = useState<DriverMetrics[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
@@ -48,7 +50,7 @@ export default function MotoristasPage() {
     activeDrivers: 0,
     totalRevenue: 0,
     todayTrips: 0,
-    avgRating: 0
+    avgRating: 0,
   })
 
   useEffect(() => {
@@ -58,75 +60,16 @@ export default function MotoristasPage() {
   const loadDrivers = async () => {
     try {
       setLoading(true)
-      // TODO: Implementar chamada real à API
-      // Por enquanto, dados mockados
-      const mockDrivers: DriverMetrics[] = [
-        {
-          id: "1",
-          name: "Carlos Silva",
-          email: "carlos@example.com",
-          phone: "(31) 98765-4321",
-          score: 91.7,
-          punctualityScore: 95,
-          economyScore: 88,
-          safetyScore: 92,
-          totalTrips: 156,
-          totalEarnings: 8675.15,
-          avgRating: 4.8,
-          rank: 1
-        },
-        {
-          id: "2",
-          name: "João Nunes",
-          email: "joao@example.com",
-          phone: "(31) 98765-4322",
-          score: 91.7,
-          punctualityScore: 94,
-          economyScore: 90,
-          safetyScore: 91,
-          totalTrips: 142,
-          totalEarnings: 7890.45,
-          avgRating: 4.7,
-          rank: 2
-        },
-        {
-          id: "3",
-          name: "Roberto Silva",
-          email: "roberto@example.com",
-          phone: "(31) 98765-4323",
-          score: 88.7,
-          punctualityScore: 92,
-          economyScore: 85,
-          safetyScore: 89,
-          totalTrips: 138,
-          totalEarnings: 6960.70,
-          avgRating: 4.6,
-          rank: 3
-        },
-        {
-          id: "4",
-          name: "Maria Oliveira",
-          email: "maria@example.com",
-          phone: "(31) 98765-4324",
-          score: 87.3,
-          punctualityScore: 89,
-          economyScore: 86,
-          safetyScore: 87,
-          totalTrips: 108,
-          totalEarnings: 5175.40,
-          avgRating: 4.5,
-          rank: 4
-        }
-      ]
+      const response = await fetch('/api/transportadora/motoristas')
+      const result = await response.json()
+      const apiDrivers: DriverMetrics[] = result.drivers
+      setDrivers(apiDrivers)
 
-      setDrivers(mockDrivers)
-
-      // Calcular métricas gerais
       setMetrics({
-        activeDrivers: mockDrivers.length,
-        totalRevenue: mockDrivers.reduce((sum, d) => sum + d.totalEarnings, 0),
-        todayTrips: 560,
-        avgRating: mockDrivers.reduce((sum, d) => sum + d.avgRating, 0) / mockDrivers.length
+        activeDrivers: apiDrivers.length,
+        totalRevenue: apiDrivers.reduce((sum, d) => sum + d.totalEarnings, 0),
+        todayTrips: 560, // TODO: replace with real calculation
+        avgRating: apiDrivers.reduce((sum, d) => sum + d.avgRating, 0) / apiDrivers.length,
       })
     } catch (error) {
       notifyError(error, "Erro ao carregar motoristas")
@@ -135,22 +78,26 @@ export default function MotoristasPage() {
     }
   }
 
-  const filteredDrivers = drivers.filter(driver =>
+  const filteredDrivers = drivers.filter((driver) =>
     driver.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     driver.email.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
   const getRankBadgeColor = (rank: number) => {
     switch (rank) {
-      case 1: return "bg-gradient-to-r from-yellow-400 to-yellow-600 text-white"
-      case 2: return "bg-gradient-to-r from-gray-300 to-gray-500 text-white"
-      case 3: return "bg-gradient-to-r from-orange-400 to-orange-600 text-white"
-      default: return "bg-gray-100 text-gray-700"
+      case 1:
+        return "bg-gradient-to-r from-yellow-400 to-yellow-600 text-white"
+      case 2:
+        return "bg-gradient-to-r from-gray-300 to-gray-500 text-white"
+      case 3:
+        return "bg-gradient-to-r from-orange-400 to-orange-600 text-white"
+      default:
+        return "bg-gray-100 text-gray-700"
     }
   }
 
   return (
-    <AppShell panel="transportadora">
+    <AppShell panel="transportadora" user={user || { id: 'mock', name: 'Transportadora', email: 'transp@golffox.com', role: 'transportadora' }}>
       <div className="p-4 sm:p-6 lg:p-8 space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -179,7 +126,6 @@ export default function MotoristasPage() {
               </div>
             </div>
           </Card>
-
           <Card className="p-4 bg-gradient-to-br from-green-50 to-green-100 border-green-200">
             <div className="flex items-center justify-between">
               <div>
@@ -193,7 +139,6 @@ export default function MotoristasPage() {
               </div>
             </div>
           </Card>
-
           <Card className="p-4 bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
             <div className="flex items-center justify-between">
               <div>
@@ -205,7 +150,6 @@ export default function MotoristasPage() {
               </div>
             </div>
           </Card>
-
           <Card className="p-4 bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
             <div className="flex items-center justify-between">
               <div>
@@ -225,11 +169,8 @@ export default function MotoristasPage() {
             <Button variant="default" className="bg-orange-500 hover:bg-orange-600">
               Lista de Motoristas
             </Button>
-            <Button variant="outline">
-              Ranking de Desempenho
-            </Button>
+            <Button variant="outline">Ranking de Desempenho</Button>
           </div>
-
           <div className="relative w-full sm:w-64">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
             <Input
@@ -255,17 +196,13 @@ export default function MotoristasPage() {
               {filteredDrivers.map((driver) => (
                 <Card
                   key={driver.id}
-                  className={`p-4 transition-all cursor-pointer hover:shadow-lg ${selectedDriver === driver.id ? 'ring-2 ring-orange-500' : ''
-                    }`}
+                  className={`p-4 transition-all cursor-pointer hover:shadow-lg ${selectedDriver === driver.id ? 'ring-2 ring-orange-500' : ''}`}
                   onClick={() => setSelectedDriver(selectedDriver === driver.id ? null : driver.id)}
                 >
                   <div className="flex flex-col lg:flex-row gap-4">
                     {/* Rank Badge e Info */}
                     <div className="flex items-center gap-4 flex-1">
-                      <div className={`h-12 w-12 rounded-lg flex items-center justify-center font-bold text-lg ${getRankBadgeColor(driver.rank)}`}>
-                        #{driver.rank}
-                      </div>
-
+                      <div className={`h-12 w-12 rounded-lg flex items-center justify-center font-bold text-lg ${getRankBadgeColor(driver.rank)}`}>#{driver.rank}</div>
                       <div className="flex items-center gap-3 flex-1">
                         <div className="h-12 w-12 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center text-white font-bold text-lg">
                           {driver.name.charAt(0)}
@@ -276,7 +213,6 @@ export default function MotoristasPage() {
                         </div>
                       </div>
                     </div>
-
                     {/* Score */}
                     <div className="flex items-center gap-6 flex-wrap lg:flex-nowrap">
                       <div className="text-center">
@@ -284,7 +220,6 @@ export default function MotoristasPage() {
                         <p className="text-2xl font-bold text-orange-500">{driver.score}</p>
                         <p className="text-xs text-[var(--ink-muted)]">/100</p>
                       </div>
-
                       {/* Progress Bars */}
                       <div className="space-y-2 flex-1 min-w-[200px]">
                         <div>
@@ -293,10 +228,7 @@ export default function MotoristasPage() {
                             <span className="font-medium">{driver.punctualityScore}%</span>
                           </div>
                           <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                            <div
-                              className="h-full bg-gradient-to-r from-blue-400 to-blue-600 rounded-full transition-all"
-                              style={{ width: `${driver.punctualityScore}%` }}
-                            />
+                            <div className="h-full bg-gradient-to-r from-blue-400 to-blue-600 rounded-full transition-all" style={{ width: `${driver.punctualityScore}%` }} />
                           </div>
                         </div>
                         <div>
@@ -305,10 +237,7 @@ export default function MotoristasPage() {
                             <span className="font-medium">{driver.economyScore}%</span>
                           </div>
                           <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                            <div
-                              className="h-full bg-gradient-to-r from-green-400 to-green-600 rounded-full transition-all"
-                              style={{ width: `${driver.economyScore}%` }}
-                            />
+                            <div className="h-full bg-gradient-to-r from-green-400 to-green-600 rounded-full transition-all" style={{ width: `${driver.economyScore}%` }} />
                           </div>
                         </div>
                         <div>
@@ -317,14 +246,10 @@ export default function MotoristasPage() {
                             <span className="font-medium">{driver.safetyScore}%</span>
                           </div>
                           <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                            <div
-                              className="h-full bg-gradient-to-r from-purple-400 to-purple-600 rounded-full transition-all"
-                              style={{ width: `${driver.safetyScore}%` }}
-                            />
+                            <div className="h-full bg-gradient-to-r from-purple-400 to-purple-600 rounded-full transition-all" style={{ width: `${driver.safetyScore}%` }} />
                           </div>
                         </div>
                       </div>
-
                       {/* Stats */}
                       <div className="flex gap-6">
                         <div className="text-center">
@@ -338,49 +263,31 @@ export default function MotoristasPage() {
                           </p>
                         </div>
                       </div>
-
                       {/* Actions */}
                       <div className="flex gap-2">
-                        <Button size="sm" variant="outline" className="h-8">
-                          <Award className="h-4 w-4" />
-                        </Button>
-                        <Button size="sm" variant="outline" className="h-8">
-                          <Star className="h-4 w-4" />
-                        </Button>
+                        <Button size="sm" variant="outline" className="h-8"><Award className="h-4 w-4" /></Button>
+                        <Button size="sm" variant="outline" className="h-8"><Star className="h-4 w-4" /></Button>
                       </div>
                     </div>
                   </div>
-
                   {/* Expanded Details */}
                   {selectedDriver === driver.id && (
                     <div className="mt-4 pt-4 border-t grid grid-cols-2 sm:grid-cols-4 gap-4">
                       <div className="space-y-1">
                         <p className="text-xs text-[var(--ink-muted)]">Pontualidade</p>
-                        <p className="text-sm font-medium flex items-center gap-1">
-                          {driver.punctualityScore}%
-                          <Clock className="h-3 w-3 text-blue-500" />
-                        </p>
+                        <p className="text-sm font-medium flex items-center gap-1">{driver.punctualityScore}%<Clock className="h-3 w-3 text-blue-500" /></p>
                       </div>
                       <div className="space-y-1">
                         <p className="text-xs text-[var(--ink-muted)]">Economia</p>
-                        <p className="text-sm font-medium flex items-center gap-1">
-                          {driver.economyScore}%
-                          <Fuel className="h-3 w-3 text-green-500" />
-                        </p>
+                        <p className="text-sm font-medium flex items-center gap-1">{driver.economyScore}%<Fuel className="h-3 w-3 text-green-500" /></p>
                       </div>
                       <div className="space-y-1">
                         <p className="text-xs text-[var(--ink-muted)]">Conformidade</p>
-                        <p className="text-sm font-medium flex items-center gap-1">
-                          {driver.safetyScore}%
-                          <AlertCircle className="h-3 w-3 text-purple-500" />
-                        </p>
+                        <p className="text-sm font-medium flex items-center gap-1">{driver.safetyScore}%<AlertCircle className="h-3 w-3 text-purple-500" /></p>
                       </div>
                       <div className="space-y-1">
                         <p className="text-xs text-[var(--ink-muted)]">Avaliação</p>
-                        <p className="text-sm font-medium flex items-center gap-1">
-                          {driver.avgRating.toFixed(1)}
-                          <Star className="h-3 w-3 text-yellow-500 fill-yellow-500" />
-                        </p>
+                        <p className="text-sm font-medium flex items-center gap-1">{driver.avgRating.toFixed(1)}<Star className="h-3 w-3 text-yellow-500 fill-yellow-500" /></p>
                       </div>
                     </div>
                   )}

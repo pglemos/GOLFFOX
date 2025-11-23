@@ -6,23 +6,25 @@ class SentrySetup {
 
   static Future<void> initialize() async {
     if (_initialized) return;
-    final dsn = const String.fromEnvironment('SENTRY_DSN_MOBILE', defaultValue: '');
+    const dsn = String.fromEnvironment('SENTRY_DSN_MOBILE');
     if (dsn.isEmpty) {
       // Opt-out silently when DSN not configured
       return;
     }
     await SentryFlutter.init(
       (options) {
-        options.dsn = dsn;
-        options.tracesSampleRate = double.tryParse(const String.fromEnvironment('SENTRY_TRACES_RATE', defaultValue: '0.1')) ?? 0.1;
-        options.reportPackages = true;
-        options.enableNativeFramesTracking = true;
-        options.environment = kReleaseMode ? 'production' : 'development';
-        options.sendDefaultPii = false;
+        options
+          ..dsn = dsn
+          ..tracesSampleRate = double.tryParse(const String.fromEnvironment(
+                  'SENTRY_TRACES_RATE',
+                  defaultValue: '0.1')) ??
+              0.1
+          ..reportPackages = true
+          ..environment = kReleaseMode ? 'production' : 'development'
+          ..sendDefaultPii = false;
       },
       appRunner: () {},
     );
     _initialized = true;
   }
 }
-

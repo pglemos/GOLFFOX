@@ -5,9 +5,9 @@ import 'package:flutter/services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../config/env_config.dart';
+import '../error/sentry_setup.dart';
 import '../services/error_service.dart';
 import '../services/logger_service.dart';
-import '../error/sentry_setup.dart';
 
 /// Comprehensive bootstrap system for GolfFox
 ///
@@ -242,7 +242,6 @@ class AppBootstrap {
 
 /// Custom exception for bootstrap errors
 class BootstrapException implements Exception {
-
   const BootstrapException(this.message);
   final String message;
 

@@ -1,8 +1,12 @@
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:golffox/models/user.dart' as app_user;
 import 'package:golffox/services/supabase_service.dart';
 
-enum AuthErrorCode { invalidCredentials, emailNotVerified, profileMissing, unknown }
+enum AuthErrorCode {
+  invalidCredentials,
+  emailNotVerified,
+  profileMissing,
+  unknown
+}
 
 class AuthFailure implements Exception {
   final AuthErrorCode code;
@@ -27,13 +31,16 @@ class AuthService {
     final user = resp.user;
     final session = resp.session;
     if (user == null) {
-      throw const AuthFailure(AuthErrorCode.invalidCredentials, 'invalid credentials');
+      throw const AuthFailure(
+          AuthErrorCode.invalidCredentials, 'invalid credentials');
     }
     if (user.emailConfirmedAt == null) {
-      throw const AuthFailure(AuthErrorCode.emailNotVerified, 'email not verified');
+      throw const AuthFailure(
+          AuthErrorCode.emailNotVerified, 'email not verified');
     }
     if (session == null) {
-      throw const AuthFailure(AuthErrorCode.invalidCredentials, 'invalid credentials');
+      throw const AuthFailure(
+          AuthErrorCode.invalidCredentials, 'invalid credentials');
     }
     final profile = await supabaseService.getCurrentUserProfile();
     if (profile == null) {
@@ -50,8 +57,10 @@ class AuthService {
     throw UnimplementedError();
   }
 
-  Future<dynamic> createAccountWithEmail(dynamic context, String email, String password) async {
-    final resp = await supabaseService.client.auth.signUp(email: email, password: password);
+  Future<dynamic> createAccountWithEmail(
+      dynamic context, String email, String password) async {
+    final resp = await supabaseService.client.auth
+        .signUp(email: email, password: password);
     if (resp.user == null) {
       throw const AuthFailure(AuthErrorCode.unknown, 'user creation failed');
     }
