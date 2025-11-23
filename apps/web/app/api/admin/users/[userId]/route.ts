@@ -80,7 +80,7 @@ export async function PUT(
     if (updateError) {
       console.error('Erro ao atualizar usuário:', updateError)
       return NextResponse.json(
-        { 
+        {
           error: 'Erro ao atualizar usuário',
           message: updateError.message || 'Erro desconhecido',
         },
@@ -89,14 +89,22 @@ export async function PUT(
     }
 
     // Se o email foi alterado, atualizar também no Supabase Auth
-    if (body.email && body.email !== existingUser.email) {
+    if ((body.email && body.email !== existingUser.email) || body.password) {
       try {
-        await supabaseAdmin.auth.admin.updateUserById(userId, {
-          email: body.email
-        })
+        const authUpdates: any = {}
+        if (body.email && body.email !== existingUser.email) {
+          authUpdates.email = body.email
+        }
+        if (body.password && body.password.length >= 6) {
+          authUpdates.password = body.password
+        }
+
+        if (Object.keys(authUpdates).length > 0) {
+          await supabaseAdmin.auth.admin.updateUserById(userId, authUpdates)
+        }
       } catch (authError: any) {
-        console.warn('Aviso: não foi possível atualizar email no Auth:', authError)
-        // Não falhar a operação se apenas o Auth falhar
+        console.warn('Aviso: não foi possível atualizar dados no Auth:', authError)
+        // Não falhar a operação se apenas o Auth falhar, mas idealmente deveria notificar
       }
     }
 
@@ -107,7 +115,7 @@ export async function PUT(
   } catch (error: any) {
     console.error('Erro ao atualizar usuário:', error)
     return NextResponse.json(
-      { 
+      {
         error: 'Erro ao atualizar usuário',
         message: error.message || 'Erro desconhecido',
       },

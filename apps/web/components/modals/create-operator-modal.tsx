@@ -287,7 +287,7 @@ export function CreateOperatorModal({
           )}
 
           {/* Campos do Formulário */}
-          <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-2">
+          <div className="space-y-4">
             {/* Seção: Dados da Empresa */}
             <div className="space-y-4 border-b pb-4">
               <h3 className="font-semibold text-lg flex items-center gap-2">

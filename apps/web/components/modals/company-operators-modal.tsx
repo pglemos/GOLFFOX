@@ -15,7 +15,7 @@ import { Label } from "@/components/ui/label"
 import { Users, Plus, Edit, Trash2, Loader2 } from "lucide-react"
 import { notifySuccess, notifyError } from "@/lib/toast"
 import { globalSyncManager } from "@/lib/global-sync"
-import { CreateOperatorLoginModal } from "./create-operator-login-modal"
+import { CreateUserModal } from "./create-operator-login-modal"
 import { EditUserModal } from "./edit-user-modal"
 
 interface Company {
@@ -32,19 +32,19 @@ interface Operator {
   phone: string | null
 }
 
-interface CompanyOperatorsModalProps {
+interface CompanyUsersModalProps {
   company: Company | null
   isOpen: boolean
   onClose: () => void
   onSave: () => void
 }
 
-export function CompanyOperatorsModal({
+export function CompanyUsersModal({
   company,
   isOpen,
   onClose,
   onSave,
-}: CompanyOperatorsModalProps) {
+}: CompanyUsersModalProps) {
   const [loading, setLoading] = useState(false)
   const [operators, setOperators] = useState<Operator[]>([])
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
@@ -63,7 +63,8 @@ export function CompanyOperatorsModal({
 
     setLoading(true)
     try {
-      const response = await fetch(`/api/admin/users-list?company_id=${company.id}&role=operador`)
+      // Fetch all users for the company (no role filter)
+      const response = await fetch(`/api/admin/users-list?company_id=${company.id}`)
       if (!response.ok) {
         throw new Error('Erro ao carregar usuários')
       }
@@ -74,8 +75,8 @@ export function CompanyOperatorsModal({
         throw new Error(result.error || 'Erro ao carregar usuários')
       }
     } catch (error: any) {
-      console.error('Erro ao carregar operadores:', error)
-      notifyError(error, error.message || 'Erro ao carregar operadores')
+      console.error('Erro ao carregar usuários:', error)
+      notifyError(error, error.message || 'Erro ao carregar usuários')
     } finally {
       setLoading(false)
     }
@@ -90,9 +91,9 @@ export function CompanyOperatorsModal({
       const response = await fetch(`/api/admin/users/delete?id=${operatorId}`, {
         method: 'DELETE'
       })
-      
+
       const result = await response.json()
-      
+
       if (!response.ok) {
         throw new Error(result.error || result.message || 'Erro ao excluir usuário')
       }
@@ -114,17 +115,17 @@ export function CompanyOperatorsModal({
           <DialogHeader className="pb-4 sm:pb-6">
             <DialogTitle className="text-xl sm:text-2xl font-bold flex items-center gap-2 break-words">
               <Users className="h-5 w-5 flex-shrink-0" />
-              Usuários Operadores - {company?.name}
+              Funcionários - {company?.name}
             </DialogTitle>
             <DialogDescription className="text-sm sm:text-base break-words">
-              Gerencie os logins e senhas dos operadores desta empresa
+              Gerencie todos os funcionários e usuários desta empresa
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 sm:space-y-6">
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
               <p className="text-sm sm:text-base text-[var(--ink-muted)] break-words">
-                {operators.length} {operators.length === 1 ? 'operador cadastrado' : 'operadores cadastrados'}
+                {operators.length} {operators.length === 1 ? 'usuário cadastrado' : 'usuários cadastrados'}
               </p>
               <Button
                 onClick={() => setIsCreateModalOpen(true)}
@@ -132,22 +133,22 @@ export function CompanyOperatorsModal({
                 className="w-full sm:w-auto min-h-[44px] text-xs sm:text-sm"
               >
                 <Plus className="h-4 w-4 mr-2 flex-shrink-0" />
-                <span className="hidden sm:inline">Criar Novo Login</span>
-                <span className="sm:hidden">Criar Login</span>
+                <span className="hidden sm:inline">Criar Novo Usuário</span>
+                <span className="sm:hidden">Criar Usuário</span>
               </Button>
             </div>
 
             {loading ? (
               <div className="flex items-center justify-center py-12">
                 <Loader2 className="h-8 w-8 animate-spin text-[var(--brand)]" />
-                <span className="ml-3 text-[var(--ink-muted)]">Carregando operadores...</span>
+                <span className="ml-3 text-[var(--ink-muted)]">Carregando usuários...</span>
               </div>
             ) : operators.length === 0 ? (
               <div className="text-center py-12">
                 <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium mb-2">Nenhum operador cadastrado</h3>
+                <h3 className="text-lg font-medium mb-2">Nenhum usuário cadastrado</h3>
                 <p className="text-sm text-[var(--ink-muted)] mb-4">
-                  Clique em "Criar Novo Login" para adicionar um operador
+                  Clique em "Criar Novo Usuário" para adicionar um funcionário
                 </p>
               </div>
             ) : (
@@ -161,12 +162,14 @@ export function CompanyOperatorsModal({
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2">
                           <h3 className="font-semibold">{operator.name || 'Sem nome'}</h3>
-                          <span className={`px-2 py-1 rounded text-xs ${
-                            operator.is_active 
-                              ? 'bg-green-100 text-green-800' 
+                          <span className={`px-2 py-1 rounded text-xs ${operator.is_active
+                              ? 'bg-green-100 text-green-800'
                               : 'bg-gray-100 text-gray-800'
-                          }`}>
+                            }`}>
                             {operator.is_active ? 'Ativo' : 'Inativo'}
+                          </span>
+                          <span className="px-2 py-1 rounded text-xs bg-blue-100 text-blue-800 capitalize">
+                            {operator.role || 'Sem papel'}
                           </span>
                         </div>
                         <div className="space-y-1 text-sm">
@@ -180,12 +183,6 @@ export function CompanyOperatorsModal({
                               <span>{operator.phone}</span>
                             </div>
                           )}
-                          <div className="flex items-center gap-2">
-                            <span className="text-[var(--ink-muted)] w-20">Senha:</span>
-                            <span className="text-xs text-[var(--ink-muted)] italic">
-                              (Senha não pode ser exibida por segurança)
-                            </span>
-                          </div>
                         </div>
                       </div>
                       <div className="flex flex-col sm:flex-row gap-2 ml-0 sm:ml-4 mt-3 sm:mt-0 w-full sm:w-auto">
@@ -219,9 +216,9 @@ export function CompanyOperatorsModal({
           </div>
 
           <DialogFooter className="pt-4 sm:pt-6 border-t mt-4 sm:mt-6">
-            <Button 
-              type="button" 
-              variant="outline" 
+            <Button
+              type="button"
+              variant="outline"
               onClick={onClose}
               className="w-full sm:w-auto min-h-[44px] text-base font-medium"
             >
@@ -231,9 +228,9 @@ export function CompanyOperatorsModal({
         </DialogContent>
       </Dialog>
 
-      {/* Modal Criar Novo Login */}
+      {/* Modal Criar Novo Usuário */}
       {company && (
-        <CreateOperatorLoginModal
+        <CreateUserModal
           isOpen={isCreateModalOpen}
           onClose={() => {
             setIsCreateModalOpen(false)
