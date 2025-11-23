@@ -25,8 +25,7 @@ import {
   FileText,
   Building2,
   Settings,
-  MessageSquare,
-  Building
+  MessageSquare
 } from "lucide-react"
 import { useNavigation } from "@/hooks/use-navigation"
 import { useEffect } from "react"
@@ -55,37 +54,53 @@ const adminMenuItems = [
     description: "Gerenciar itinerários"
   },
   {
-    icon: Building,
+    icon: Building2,
     label: "Transportadoras",
     href: "/admin/transportadoras",
     description: "Gestão de transportadoras"
   },
-  description: "Despache de emergência"
+  {
+    icon: Briefcase,
+    label: "Empresas",
+    href: "/admin/empresas",
+    description: "Operadores"
   },
-{
-  icon: AlertTriangle,
+  {
+    icon: Users,
+    label: "Usuários",
+    href: "/admin/usuarios",
+    description: "Gestão de usuários"
+  },
+  {
+    icon: LifeBuoy,
+    label: "Socorro",
+    href: "/admin/socorro",
+    description: "Despache de emergência"
+  },
+  {
+    icon: AlertTriangle,
     label: "Alertas",
-      href: "/admin/alertas",
-        description: "Notificações do sistema"
-},
-{
-  icon: BarChart3,
+    href: "/admin/alertas",
+    description: "Notificações do sistema"
+  },
+  {
+    icon: BarChart3,
     label: "Relatórios",
-      href: "/admin/relatorios",
-        description: "Análise operacional"
-},
-{
-  icon: DollarSign,
+    href: "/admin/relatorios",
+    description: "Análise operacional"
+  },
+  {
+    icon: DollarSign,
     label: "Custos",
-      href: "/admin/custos",
-        description: "Gestão financeira"
-},
-{
-  icon: HelpCircle,
+    href: "/admin/custos",
+    description: "Gestão financeira"
+  },
+  {
+    icon: HelpCircle,
     label: "Ajuda & Suporte",
-      href: "/admin/ajuda-suporte",
-        description: "Central de ajuda"
-}
+    href: "/admin/ajuda-suporte",
+    description: "Central de ajuda"
+  }
 ]
 
 const operadorMenuItems = [
@@ -356,53 +371,6 @@ const SidebarLogo = ({ panel }: { panel: 'admin' | 'operador' | 'transportadora'
   )
 }
 
-// User profile component
-const SidebarUser = ({ user, panel }: {
-  user?: { id: string; name: string; email: string }
-  panel: 'admin' | 'operador' | 'transportadora'
-}) => {
-  const { open } = useSidebar()
-
-  if (!user) return null
-
-  // Usar iniciais do nome como fallback
-  const initials = user.name
-    .split(' ')
-    .map(n => n[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2)
-
-  return (
-    <div className="border-t border-[var(--border)] pt-4 mt-auto">
-      <a
-        href="#"
-        className="flex items-center justify-start gap-2 py-2 px-3 rounded-lg transition-colors hover:bg-gray-100 dark:hover:bg-gray-800"
-      >
-        <div className={cn(
-          "h-8 w-8 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-semibold text-white",
-          (panel === 'operador' || panel === 'operator') ? "bg-orange-500" : "gradient-brand"
-        )}>
-          {initials}
-        </div>
-        <motion.span
-          animate={{
-            opacity: open ? 1 : 0,
-            display: open ? "inline-block" : "none",
-          }}
-          transition={{
-            duration: 0.2,
-            ease: "easeInOut",
-          }}
-          className="text-sm text-gray-700 dark:text-gray-200 whitespace-nowrap overflow-hidden"
-        >
-          {user.name}
-        </motion.span>
-      </a>
-    </div>
-  )
-}
-
 export function Sidebar({ isOpen = true, isMobile = false, panel = 'admin', user }: SidebarProps) {
   const { isSidebarItemActive } = useNavigation()
 
@@ -465,4 +433,3 @@ export function Sidebar({ isOpen = true, isMobile = false, panel = 'admin', user
     </UISidebar>
   )
 }
-
