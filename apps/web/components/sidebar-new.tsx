@@ -123,6 +123,12 @@ const operadorMenuItems = [
     description: "Solicitar e acompanhar rotas"
   },
   {
+    icon: FileText,
+    label: "Histórico de Rotas",
+    href: "/operador/historico-rotas",
+    description: "Histórico e métricas das rotas"
+  },
+  {
     icon: Building2,
     label: "Prestadores",
     href: "/operador/prestadores",
