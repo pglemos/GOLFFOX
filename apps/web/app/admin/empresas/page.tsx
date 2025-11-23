@@ -277,7 +277,7 @@ export default function EmpresasPage() {
                         title="Ver funcionários"
                       >
                         <Users className="h-3.5 w-3.5 flex-shrink-0" />
-                        <span className="truncate hidden sm:inline">Funcionários</span>
+                        <span className="truncate hidden sm:inline">Logins</span>
                       </Button>
                       <Button
                         variant="destructive"

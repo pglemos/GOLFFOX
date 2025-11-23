@@ -6,10 +6,11 @@ import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Users, Mail, Phone, Plus, Edit, Trash2, X, CreditCard } from "lucide-react"
+import { Users, Mail, Phone, Plus, Edit, Trash2, X, CreditCard, Search, Loader2 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { notifySuccess, notifyError } from "@/lib/toast"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { useCep } from "@/hooks/use-cep"
 
 interface TransportadoraDriversModalProps {
   carrier: { id: string; name: string }
@@ -21,7 +22,8 @@ export function TransportadoraDriversModal({ carrier, isOpen, onClose }: Transpo
   const [drivers, setDrivers] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
   const [activeTab, setActiveTab] = useState("list")
-  
+  const { fetchCep, loading: loadingCep } = useCep()
+
   // Form states
   const [editingDriver, setEditingDriver] = useState<any>(null)
   const [formData, setFormData] = useState({
@@ -30,7 +32,16 @@ export function TransportadoraDriversModal({ carrier, isOpen, onClose }: Transpo
     phone: "",
     cpf: "",
     cnh: "",
-    cnh_category: ""
+    cnh_category: "",
+    password: "",
+    role: "driver",
+    address_zip_code: "",
+    address_street: "",
+    address_number: "",
+    address_neighborhood: "",
+    address_complement: "",
+    address_city: "",
+    address_state: "",
   })
 
   useEffect(() => {
@@ -65,10 +76,34 @@ export function TransportadoraDriversModal({ carrier, isOpen, onClose }: Transpo
       phone: "",
       cpf: "",
       cnh: "",
-      cnh_category: ""
+      cnh_category: "",
+      password: "",
+      role: "driver",
+      address_zip_code: "",
+      address_street: "",
+      address_number: "",
+      address_neighborhood: "",
+      address_complement: "",
+      address_city: "",
+      address_state: "",
     })
     setEditingDriver(null)
     setActiveTab("list")
+  }
+
+  const handleCepBlur = async () => {
+    if (formData.address_zip_code.length >= 8) {
+      const address = await fetchCep(formData.address_zip_code)
+      if (address) {
+        setFormData(prev => ({
+          ...prev,
+          address_street: address.logradouro,
+          address_neighborhood: address.bairro,
+          address_city: address.localidade,
+          address_state: address.uf,
+        }))
+      }
+    }
   }
 
   const handleCreateDriver = async (e: React.FormEvent) => {
@@ -76,6 +111,10 @@ export function TransportadoraDriversModal({ carrier, isOpen, onClose }: Transpo
     setLoading(true)
 
     try {
+      if (!formData.address_street.trim() || !formData.address_number.trim() || !formData.address_neighborhood.trim() || !formData.address_zip_code.trim()) {
+        throw new Error("Endereço completo é obrigatório")
+      }
+
       const response = await fetch(`/api/admin/transportadora/${carrier.id}/drivers`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -165,7 +204,16 @@ export function TransportadoraDriversModal({ carrier, isOpen, onClose }: Transpo
       phone: driver.phone || "",
       cpf: driver.cpf || "",
       cnh: driver.cnh || "",
-      cnh_category: driver.cnh_category || ""
+      cnh_category: driver.cnh_category || "",
+      password: "",
+      role: driver.role || "driver",
+      address_zip_code: driver.address_zip_code || "",
+      address_street: driver.address_street || "",
+      address_number: driver.address_number || "",
+      address_neighborhood: driver.address_neighborhood || "",
+      address_complement: driver.address_complement || "",
+      address_city: driver.address_city || "",
+      address_state: driver.address_state || "",
     })
     setActiveTab("form")
   }
@@ -286,6 +334,21 @@ export function TransportadoraDriversModal({ carrier, isOpen, onClose }: Transpo
           <TabsContent value="form" className="flex-1 overflow-y-auto mt-4">
             <form onSubmit={editingDriver ? handleUpdateDriver : handleCreateDriver} className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                <div className="col-span-1 sm:col-span-2">
+                  <Label htmlFor="role" className="text-base font-medium">Perfil de Permissão *</Label>
+                  <select
+                    id="role"
+                    value={formData.role}
+                    onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                    className="flex h-11 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    disabled={loading}
+                    required
+                  >
+                    <option value="driver">Motorista</option>
+                    <option value="transportadora">Transportadora</option>
+                  </select>
+                </div>
+
                 <div className="col-span-2">
                   <Label htmlFor="name">Nome Completo *</Label>
                   <Input
@@ -297,13 +360,14 @@ export function TransportadoraDriversModal({ carrier, isOpen, onClose }: Transpo
                   />
                 </div>
                 <div>
-                  <Label htmlFor="email">E-mail</Label>
+                  <Label htmlFor="email">E-mail (Login) *</Label>
                   <Input
                     id="email"
                     type="email"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     placeholder="joao@exemplo.com"
+                    required
                   />
                 </div>
                 <div>
@@ -316,13 +380,14 @@ export function TransportadoraDriversModal({ carrier, isOpen, onClose }: Transpo
                   />
                 </div>
                 <div>
-                  <Label htmlFor="cpf">CPF</Label>
+                  <Label htmlFor="cpf">CPF *</Label>
                   <Input
                     id="cpf"
                     value={formData.cpf}
                     onChange={(e) => setFormData({ ...formData, cpf: e.target.value })}
                     placeholder="000.000.000-00"
                     maxLength={14}
+                    required
                   />
                 </div>
                 <div>
@@ -344,12 +409,121 @@ export function TransportadoraDriversModal({ carrier, isOpen, onClose }: Transpo
                     maxLength={2}
                   />
                 </div>
+                {!editingDriver && (
+                  <div className="col-span-2 sm:col-span-1">
+                    <Label htmlFor="password">Senha *</Label>
+                    <Input
+                      id="password"
+                      type="password"
+                      value={formData.password}
+                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                      placeholder="Senha de acesso"
+                      required
+                      minLength={6}
+                    />
+                  </div>
+                )}
+
+                {/* Endereço */}
+                <div className="col-span-1 sm:col-span-2 border-t pt-4 mt-2">
+                  <h3 className="font-semibold mb-3">Endereço</h3>
+                </div>
+
+                <div className="col-span-1 sm:col-span-2">
+                  <Label htmlFor="cep" className="text-base font-medium">CEP *</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      id="cep"
+                      value={formData.address_zip_code}
+                      onChange={(e) => setFormData({ ...formData, address_zip_code: e.target.value })}
+                      onBlur={handleCepBlur}
+                      placeholder="00000-000"
+                      disabled={loading}
+                      required
+                      className="h-11"
+                    />
+                    <Button type="button" variant="outline" onClick={handleCepBlur} disabled={loading || loadingCep} className="h-11 px-4">
+                      {loadingCep ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="col-span-1 sm:col-span-2">
+                  <Label htmlFor="street" className="text-base font-medium">Rua/Avenida *</Label>
+                  <Input
+                    id="street"
+                    value={formData.address_street}
+                    onChange={(e) => setFormData({ ...formData, address_street: e.target.value })}
+                    placeholder="Rua Exemplo"
+                    disabled={loading}
+                    required
+                    className="h-11"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="number" className="text-base font-medium">Número *</Label>
+                  <Input
+                    id="number"
+                    value={formData.address_number}
+                    onChange={(e) => setFormData({ ...formData, address_number: e.target.value })}
+                    placeholder="123"
+                    disabled={loading}
+                    required
+                    className="h-11"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="neighborhood" className="text-base font-medium">Bairro *</Label>
+                  <Input
+                    id="neighborhood"
+                    value={formData.address_neighborhood}
+                    onChange={(e) => setFormData({ ...formData, address_neighborhood: e.target.value })}
+                    placeholder="Centro"
+                    disabled={loading}
+                    required
+                    className="h-11"
+                  />
+                </div>
+
+                <div className="col-span-1 sm:col-span-2">
+                  <Label htmlFor="complement" className="text-base font-medium">Complemento</Label>
+                  <Input
+                    id="complement"
+                    value={formData.address_complement}
+                    onChange={(e) => setFormData({ ...formData, address_complement: e.target.value })}
+                    placeholder="Apto 101"
+                    disabled={loading}
+                    className="h-11"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="city" className="text-base font-medium">Cidade</Label>
+                  <Input
+                    id="city"
+                    value={formData.address_city}
+                    readOnly
+                    className="h-11 bg-gray-50"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="state" className="text-base font-medium">Estado</Label>
+                  <Input
+                    id="state"
+                    value={formData.address_state}
+                    readOnly
+                    className="h-11 bg-gray-50"
+                  />
+                </div>
               </div>
-              
+
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-2 justify-end pt-4 sm:pt-6 border-t mt-4 sm:mt-6">
-                <Button 
-                  type="button" 
-                  variant="outline" 
+                <Button
+                  type="button"
+                  variant="outline"
                   onClick={resetForm}
                   disabled={loading}
                   className="w-full sm:w-auto order-2 sm:order-1 min-h-[44px] text-base font-medium"
@@ -357,8 +531,8 @@ export function TransportadoraDriversModal({ carrier, isOpen, onClose }: Transpo
                   <X className="h-4 w-4 mr-2 flex-shrink-0" />
                   Cancelar
                 </Button>
-                <Button 
-                  type="submit" 
+                <Button
+                  type="submit"
                   disabled={loading || !formData.name}
                   className="w-full sm:w-auto order-1 sm:order-2 bg-orange-500 hover:bg-orange-600 min-h-[44px] text-base font-medium"
                 >

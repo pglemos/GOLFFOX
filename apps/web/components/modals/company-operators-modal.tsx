@@ -30,6 +30,7 @@ interface Operator {
   role: string
   is_active: boolean
   phone: string | null
+  cpf?: string | null
 }
 
 interface CompanyUsersModalProps {
@@ -163,8 +164,8 @@ export function CompanyUsersModal({
                         <div className="flex items-center gap-2 mb-2">
                           <h3 className="font-semibold">{operator.name || 'Sem nome'}</h3>
                           <span className={`px-2 py-1 rounded text-xs ${operator.is_active
-                              ? 'bg-green-100 text-green-800'
-                              : 'bg-gray-100 text-gray-800'
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-gray-100 text-gray-800'
                             }`}>
                             {operator.is_active ? 'Ativo' : 'Inativo'}
                           </span>
@@ -181,6 +182,12 @@ export function CompanyUsersModal({
                             <div className="flex items-center gap-2">
                               <span className="text-[var(--ink-muted)] w-20">Telefone:</span>
                               <span>{operator.phone}</span>
+                            </div>
+                          )}
+                          {operator.cpf && (
+                            <div className="flex items-center gap-2">
+                              <span className="text-[var(--ink-muted)] w-20">CPF:</span>
+                              <span>{operator.cpf}</span>
                             </div>
                           )}
                         </div>

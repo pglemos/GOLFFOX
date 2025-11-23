@@ -1,9 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseServiceRole } from '@/lib/supabase-server'
+import { createClient } from '@supabase/supabase-js'
 import { requireAuth } from '@/lib/api-auth'
 import { z } from 'zod'
 
 export const runtime = 'nodejs'
+
+// Helper para criar cliente admin
+function getSupabaseAdmin() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+  if (!url || !serviceKey) {
+    throw new Error('Supabase não configurado')
+  }
+  return createClient(url, serviceKey)
+}
 
 const carrierLoginSchema = z.object({
   transportadora_id: z.string().uuid('ID da transportadora inválido').optional(),
@@ -33,9 +43,12 @@ export async function POST(req: NextRequest) {
 
     const body = await req.json()
     const validated = carrierLoginSchema.parse(body)
+    const transportadoraId = validated.transportadora_id || validated.carrier_id
+
+    const supabaseAdmin = getSupabaseAdmin()
 
     // Criar usuário no Supabase Auth
-    const { data: authData, error: authError } = await supabaseServiceRole.auth.admin.createUser({
+    const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
       email: validated.email,
       password: validated.password,
       email_confirm: true,
@@ -52,16 +65,24 @@ export async function POST(req: NextRequest) {
       )
     }
 
+    if (!authData.user) {
+      return NextResponse.json(
+        { success: false, error: 'Erro ao criar usuário (sem dados)' },
+        { status: 500 }
+      )
+    }
+
     // Criar ou atualizar registro na tabela users (UPSERT)
     // Usar upsert em vez de update para garantir que o registro seja criado se não existir
-    const { error: upsertError } = await supabaseServiceRole
+    const { error: upsertError } = await supabaseAdmin
       .from('users')
       .upsert({
         id: authData.user.id,
         email: validated.email,
         name: validated.name,
         role: 'transportadora',
-        transportadora_id: validated.transportadora_id || validated.carrier_id,
+        transportadora_id: transportadoraId,
+        is_active: true,
         updated_at: new Date().toISOString()
       }, {
         onConflict: 'id'
@@ -76,15 +97,15 @@ export async function POST(req: NextRequest) {
       })
       // Tentar remover usuário do Auth se possível
       try {
-        await supabaseServiceRole.auth.admin.deleteUser(authData.user.id)
+        await supabaseAdmin.auth.admin.deleteUser(authData.user.id)
         console.log('✅ Usuário removido do Auth após falha ao criar registro')
       } catch (deleteError) {
         console.error('❌ Erro ao remover usuário do Auth após falha:', deleteError)
       }
       return NextResponse.json(
-        { 
-          success: false, 
-          error: 'Erro ao criar registro do usuário', 
+        {
+          success: false,
+          error: 'Erro ao criar registro do usuário',
           message: upsertError.message || 'Erro desconhecido',
           details: process.env.NODE_ENV === 'development' ? {
             code: upsertError.code,
@@ -113,10 +134,10 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       )
     }
+    console.error('Erro ao criar login transportadora:', error)
     return NextResponse.json(
       { success: false, error: 'Erro ao processar requisição', message: error.message },
       { status: 500 }
     )
   }
 }
-
