@@ -1,726 +1,395 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState, useEffect } from "react"
 import { AppShell } from "@/components/app-shell"
+import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Users, Search, Award, Phone, Mail, FileText, Stethoscope, AlertCircle, Calendar, ExternalLink, Upload, Filter, Trophy, Medal, Star } from "lucide-react"
-import { supabase } from "@/lib/supabase"
-import { useRouter } from "next/navigation"
-import { motion } from "framer-motion"
-import { DocumentUpload } from "@/components/transportadora/document-upload"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { ChartContainer } from "@/components/transportadora/chart-container"
-import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from "recharts"
+import {
+  Users,
+  DollarSign,
+  Navigation,
+  Star,
+  Search,
+  TrendingUp,
+  TrendingDown,
+  Award,
+  Clock,
+  Fuel,
+  AlertCircle,
+  UserPlus
+} from "lucide-react"
+import { notifyError } from "@/lib/toast"
 
-export default function TransportadoraMotoristasPage() {
-  const router = useRouter()
-  const [user, setUser] = useState<any>(null)
+interface DriverMetrics {
+  id: string
+  name: string
+  email: string
+  phone: string
+  avatar_url?: string
+  score: number // 0-100
+  punctualityScore: number // 0-100
+  economyScore: number // 0-100
+  safetyScore: number // 0-100
+  totalTrips: number
+  totalEarnings: number
+  avgRating: number
+  rank: number
+}
+
+export default function MotoristasPage() {
+  const [drivers, setDrivers] = useState<DriverMetrics[]>([])
   const [loading, setLoading] = useState(true)
-  const [motoristas, setMotoristas] = useState<any[]>([])
-  const [motoristasWithStats, setMotoristasWithStats] = useState<any[]>([])
-  const [searchQuery, setSearchQuery] = useState("")
-  const [statusFilter, setStatusFilter] = useState<string>("all")
-  const [ratingFilter, setRatingFilter] = useState<string>("all")
-  const [activeTab, setActiveTab] = useState("list")
+  const [searchTerm, setSearchTerm] = useState("")
   const [selectedDriver, setSelectedDriver] = useState<string | null>(null)
-  const [documents, setDocuments] = useState<any[]>([])
-  const [exams, setExams] = useState<any[]>([])
-  const [alerts, setAlerts] = useState<any[]>([])
-  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false)
-  const [uploadType, setUploadType] = useState<'document' | 'exam'>('document')
-  const [documentType, setDocumentType] = useState<string>('cnh')
 
-  useEffect(() => {
-    const getUser = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (!session) {
-        router.push("/")
-        return
-      }
-      setUser({ ...session.user })
-      setLoading(false)
-      loadMotoristas()
-    }
-    getUser()
-  }, [router])
-
-  useEffect(() => {
-    if (user && activeTab === 'alerts') {
-      loadAlerts()
-    }
-  }, [user, activeTab])
-
-  const loadMotoristas = async () => {
-    try {
-      // Buscar motoristas da transportadora
-      const { data: userData } = await supabase
-        .from('users')
-        .select('transportadora_id')
-        .eq('id', user?.id)
-        .single()
-
-      let query = supabase
-        .from('users')
-        .select('*')
-        .eq('role', 'driver')
-
-      if (userData?.transportadora_id) {
-        query = query.eq('transportadora_id', userData.transportadora_id)
-      }
-
-      const { data, error } = await query
-
-      if (error) throw error
-      setMotoristas(data || [])
-
-      // Buscar dados de ranking/gamificação
-      if (data && data.length > 0) {
-        const driverIds = data.map((d: any) => d.id)
-        const { data: rankings } = await supabase
-          .from('gf_gamification_scores')
-          .select('*')
-          .in('driver_id', driverIds)
-
-        // Buscar viagens dos motoristas
-        const { data: trips } = await supabase
-          .from('trips')
-          .select('driver_id')
-          .in('driver_id', driverIds)
-
-        const tripsByDriver = trips?.reduce((acc: any, t) => {
-          acc[t.driver_id] = (acc[t.driver_id] || 0) + 1
-          return acc
-        }, {}) || {}
-
-        const driversWithStats = data.map((driver: any) => {
-          const ranking = rankings?.find((r: any) => r.driver_id === driver.id)
-          const tripsCount = tripsByDriver[driver.id] || 0
-          return {
-            ...driver,
-            trips: ranking?.trips_completed || tripsCount,
-            rating: ranking?.total_points ? (ranking.total_points / 100).toFixed(1) : '0.0',
-            total_points: ranking?.total_points || 0,
-            on_time_percentage: ranking?.on_time_percentage || 0,
-            safety_score: ranking?.safety_score || 0,
-            status: 'active' // Simplificado
-          }
-        })
-
-        // Ordenar por performance
-        driversWithStats.sort((a, b) => {
-          const scoreA = a.total_points + (a.trips * 10)
-          const scoreB = b.total_points + (b.trips * 10)
-          return scoreB - scoreA
-        })
-
-        setMotoristasWithStats(driversWithStats)
-      }
-    } catch (error) {
-      console.error("Erro ao carregar motoristas:", error)
-    }
-  }
-
-  const loadDriverDocuments = async (driverId: string) => {
-    try {
-      const res = await fetch(`/api/transportadora/drivers/${driverId}/documents`)
-      if (res.ok) {
-        const data = await res.json()
-        setDocuments(data || [])
-      }
-    } catch (error) {
-      console.error("Erro ao carregar documentos:", error)
-    }
-  }
-
-  const loadDriverExams = async (driverId: string) => {
-    try {
-      const res = await fetch(`/api/transportadora/drivers/${driverId}/exams`)
-      if (res.ok) {
-        const data = await res.json()
-        setExams(data || [])
-      }
-    } catch (error) {
-      console.error("Erro ao carregar exames:", error)
-    }
-  }
-
-  const loadAlerts = async () => {
-    try {
-      const res = await fetch('/api/transportadora/alerts?alert_level=critical,warning,expired')
-      if (res.ok) {
-        const data = await res.json()
-        setAlerts(data.alerts || [])
-      }
-    } catch (error) {
-      console.error("Erro ao carregar alertas:", error)
-    }
-  }
-
-  const formatDate = (dateString: string) => {
-    if (!dateString) return 'N/A'
-    const date = new Date(dateString)
-    return date.toLocaleDateString('pt-BR')
-  }
-
-  const getDaysToExpiry = (dateString: string) => {
-    if (!dateString) return null
-    const expiry = new Date(dateString)
-    const today = new Date()
-    const diffTime = expiry.getTime() - today.getTime()
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-    return diffDays
-  }
-
-  if (loading) {
-    return <div className="min-h-screen flex items-center justify-center"><div className="w-16 h-16 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin mx-auto"></div></div>
-  }
-
-  const getRankIcon = (index: number) => {
-    if (index === 0) return <Trophy className="h-5 w-5 text-yellow-500" />
-    if (index === 1) return <Medal className="h-5 w-5 text-gray-400" />
-    if (index === 2) return <Medal className="h-5 w-5 text-amber-600" />
-    return null
-  }
-
-  const filteredMotoristas = motoristasWithStats.filter(m => {
-    // Filtro de busca
-    const matchesSearch = searchQuery === "" || 
-      m.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      m.email?.toLowerCase().includes(searchQuery.toLowerCase())
-
-    // Filtro de status (simplificado - todos são ativos por padrão)
-    const matchesStatus = statusFilter === "all" || statusFilter === "active"
-
-    // Filtro de avaliação
-    const rating = parseFloat(m.rating || '0')
-    const matchesRating = ratingFilter === "all" ||
-      (ratingFilter === "high" && rating >= 4.0) ||
-      (ratingFilter === "medium" && rating >= 3.0 && rating < 4.0) ||
-      (ratingFilter === "low" && rating < 3.0)
-
-    return matchesSearch && matchesStatus && matchesRating
+  // Métricas gerais
+  const [metrics, setMetrics] = useState({
+    activeDrivers: 0,
+    totalRevenue: 0,
+    todayTrips: 0,
+    avgRating: 0
   })
 
+  useEffect(() => {
+    loadDrivers()
+  }, [])
+
+  const loadDrivers = async () => {
+    try {
+      setLoading(true)
+      // TODO: Implementar chamada real à API
+      // Por enquanto, dados mockados
+      const mockDrivers: DriverMetrics[] = [
+        {
+          id: "1",
+          name: "Carlos Silva",
+          email: "carlos@example.com",
+          phone: "(31) 98765-4321",
+          score: 91.7,
+          punctualityScore: 95,
+          economyScore: 88,
+          safetyScore: 92,
+          totalTrips: 156,
+          totalEarnings: 8675.15,
+          avgRating: 4.8,
+          rank: 1
+        },
+        {
+          id: "2",
+          name: "João Nunes",
+          email: "joao@example.com",
+          phone: "(31) 98765-4322",
+          score: 91.7,
+          punctualityScore: 94,
+          economyScore: 90,
+          safetyScore: 91,
+          totalTrips: 142,
+          totalEarnings: 7890.45,
+          avgRating: 4.7,
+          rank: 2
+        },
+        {
+          id: "3",
+          name: "Roberto Silva",
+          email: "roberto@example.com",
+          phone: "(31) 98765-4323",
+          score: 88.7,
+          punctualityScore: 92,
+          economyScore: 85,
+          safetyScore: 89,
+          totalTrips: 138,
+          totalEarnings: 6960.70,
+          avgRating: 4.6,
+          rank: 3
+        },
+        {
+          id: "4",
+          name: "Maria Oliveira",
+          email: "maria@example.com",
+          phone: "(31) 98765-4324",
+          score: 87.3,
+          punctualityScore: 89,
+          economyScore: 86,
+          safetyScore: 87,
+          totalTrips: 108,
+          totalEarnings: 5175.40,
+          avgRating: 4.5,
+          rank: 4
+        }
+      ]
+
+      setDrivers(mockDrivers)
+
+      // Calcular métricas gerais
+      setMetrics({
+        activeDrivers: mockDrivers.length,
+        totalRevenue: mockDrivers.reduce((sum, d) => sum + d.totalEarnings, 0),
+        todayTrips: 560,
+        avgRating: mockDrivers.reduce((sum, d) => sum + d.avgRating, 0) / mockDrivers.length
+      })
+    } catch (error) {
+      notifyError(error, "Erro ao carregar motoristas")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const filteredDrivers = drivers.filter(driver =>
+    driver.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    driver.email.toLowerCase().includes(searchTerm.toLowerCase())
+  )
+
+  const getRankBadgeColor = (rank: number) => {
+    switch (rank) {
+      case 1: return "bg-gradient-to-r from-yellow-400 to-yellow-600 text-white"
+      case 2: return "bg-gradient-to-r from-gray-300 to-gray-500 text-white"
+      case 3: return "bg-gradient-to-r from-orange-400 to-orange-600 text-white"
+      default: return "bg-gray-100 text-gray-700"
+    }
+  }
+
   return (
-    <AppShell user={{ id: user?.id || "", name: user?.name || "Transportadora", email: user?.email || "", role: "transportadora" }}>
-      <div className="space-y-4 sm:space-y-6 w-full overflow-x-hidden">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
-          <div className="min-w-0 flex-1">
-            <h1 className="text-2xl sm:text-3xl font-bold mb-2 break-words">Motoristas</h1>
-            <p className="text-sm sm:text-base text-[var(--ink-muted)] break-words">Gerencie os motoristas da transportadora</p>
+    <AppShell panel="transportadora">
+      <div className="p-4 sm:p-6 lg:p-8 space-y-6">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold">Gestão de Motoristas</h1>
+            <p className="text-sm text-[var(--ink-muted)] mt-1">
+              Classificação baseada em performance e indicadores
+            </p>
+          </div>
+          <Button className="bg-orange-500 hover:bg-orange-600">
+            <UserPlus className="h-4 w-4 mr-2" />
+            Adicionar Motorista
+          </Button>
+        </div>
+
+        {/* Métricas Gerais */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <Card className="p-4 bg-gradient-to-br from-yellow-50 to-yellow-100 border-yellow-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs font-medium text-yellow-700 mb-1">Motoristas Ativos</p>
+                <p className="text-2xl font-bold text-yellow-900">{metrics.activeDrivers}</p>
+              </div>
+              <div className="h-12 w-12 rounded-full bg-yellow-500 flex items-center justify-center">
+                <Users className="h-6 w-6 text-white" />
+              </div>
+            </div>
+          </Card>
+
+          <Card className="p-4 bg-gradient-to-br from-green-50 to-green-100 border-green-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs font-medium text-green-700 mb-1">Faturamento Total</p>
+                <p className="text-2xl font-bold text-green-900">
+                  R$ {metrics.totalRevenue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                </p>
+              </div>
+              <div className="h-12 w-12 rounded-full bg-green-500 flex items-center justify-center">
+                <DollarSign className="h-6 w-6 text-white" />
+              </div>
+            </div>
+          </Card>
+
+          <Card className="p-4 bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs font-medium text-blue-700 mb-1">Corridas do Dia</p>
+                <p className="text-2xl font-bold text-blue-900">{metrics.todayTrips}</p>
+              </div>
+              <div className="h-12 w-12 rounded-full bg-blue-500 flex items-center justify-center">
+                <Navigation className="h-6 w-6 text-white" />
+              </div>
+            </div>
+          </Card>
+
+          <Card className="p-4 bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs font-medium text-purple-700 mb-1">Avaliação Média</p>
+                <p className="text-2xl font-bold text-purple-900">{metrics.avgRating.toFixed(1)}</p>
+              </div>
+              <div className="h-12 w-12 rounded-full bg-purple-500 flex items-center justify-center">
+                <Star className="h-6 w-6 text-white" />
+              </div>
+            </div>
+          </Card>
+        </div>
+
+        {/* Tabs e Busca */}
+        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+          <div className="flex gap-2">
+            <Button variant="default" className="bg-orange-500 hover:bg-orange-600">
+              Lista de Motoristas
+            </Button>
+            <Button variant="outline">
+              Ranking de Desempenho
+            </Button>
+          </div>
+
+          <div className="relative w-full sm:w-64">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Input
+              placeholder="Buscar motorista..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10"
+            />
           </div>
         </div>
 
-        <Tabs defaultValue="list" value={activeTab} onValueChange={setActiveTab}>
-          <div className="overflow-x-auto -webkit-overflow-scrolling-touch">
-            <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 min-w-[400px] sm:min-w-0">
-              <TabsTrigger value="list" className="text-xs sm:text-sm min-h-[44px] touch-manipulation">Lista</TabsTrigger>
-              <TabsTrigger value="documents" className="text-xs sm:text-sm min-h-[44px] touch-manipulation">Documentos</TabsTrigger>
-              <TabsTrigger value="exams" className="text-xs sm:text-sm min-h-[44px] touch-manipulation">Exames</TabsTrigger>
-              <TabsTrigger value="alerts" className="text-xs sm:text-sm min-h-[44px] touch-manipulation">
-                Alertas
-                {alerts.length > 0 && (
-                  <Badge variant="destructive" className="ml-2 text-xs whitespace-nowrap">
-                    {alerts.filter((a: any) => a.alert_level === 'critical' || a.alert_level === 'expired').length}
-                  </Badge>
-                )}
-              </TabsTrigger>
-            </TabsList>
-          </div>
+        {/* Ranking de Desempenho */}
+        <div className="space-y-4">
+          <h2 className="text-lg font-semibold">Classificação de Desempenho</h2>
+          <p className="text-sm text-[var(--ink-muted)] -mt-2">
+            Classificação baseada em performance e indicadores de condução
+          </p>
 
-          <TabsContent value="list" className="space-y-6">
-            {/* Filtros e Busca */}
-            <Card className="overflow-hidden">
-              <CardContent className="pt-4 sm:pt-6 p-3 sm:p-6">
-                <div className="flex flex-col gap-3 sm:gap-4">
-                  <div className="relative w-full">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4 pointer-events-none" />
-                    <Input
-                      placeholder="Buscar motoristas por nome, email..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-10 w-full min-h-[44px]"
-                    />
-                  </div>
-                  <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-                    <Select value={statusFilter} onValueChange={setStatusFilter}>
-                      <SelectTrigger className="w-full sm:w-48 min-h-[44px] touch-manipulation">
-                        <Filter className="h-4 w-4 mr-2" />
-                        <SelectValue placeholder="Status" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">Todos</SelectItem>
-                        <SelectItem value="active">Ativos</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <Select value={ratingFilter} onValueChange={setRatingFilter}>
-                      <SelectTrigger className="w-full sm:w-48 min-h-[44px] touch-manipulation">
-                        <Star className="h-4 w-4 mr-2" />
-                        <SelectValue placeholder="Avaliação" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">Todas</SelectItem>
-                        <SelectItem value="high">Alta (≥4.0)</SelectItem>
-                        <SelectItem value="medium">Média (3.0-4.0)</SelectItem>
-                        <SelectItem value="low">Baixa (&lt;3.0)</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+          {loading ? (
+            <div className="text-center py-8">Carregando...</div>
+          ) : (
+            <div className="space-y-3">
+              {filteredDrivers.map((driver) => (
+                <Card
+                  key={driver.id}
+                  className={`p-4 transition-all cursor-pointer hover:shadow-lg ${selectedDriver === driver.id ? 'ring-2 ring-orange-500' : ''
+                    }`}
+                  onClick={() => setSelectedDriver(selectedDriver === driver.id ? null : driver.id)}
+                >
+                  <div className="flex flex-col lg:flex-row gap-4">
+                    {/* Rank Badge e Info */}
+                    <div className="flex items-center gap-4 flex-1">
+                      <div className={`h-12 w-12 rounded-lg flex items-center justify-center font-bold text-lg ${getRankBadgeColor(driver.rank)}`}>
+                        #{driver.rank}
+                      </div>
 
-            {/* Gráfico de Performance */}
-            {filteredMotoristas.length > 0 && (
-              <ChartContainer
-                title="Performance dos Motoristas"
-                description="Top 10 motoristas por número de viagens"
-                height={300}
-              >
-                <BarChart data={filteredMotoristas.slice(0, 10)}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-                  <XAxis 
-                    dataKey="name" 
-                    stroke="var(--ink-muted)"
-                    style={{ fontSize: '12px' }}
-                    angle={-45}
-                    textAnchor="end"
-                    height={100}
-                  />
-                  <YAxis stroke="var(--ink-muted)" style={{ fontSize: '12px' }} />
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: 'var(--bg)', 
-                      border: '1px solid var(--border)',
-                      borderRadius: '8px'
-                    }}
-                  />
-                  <Bar dataKey="trips" fill="var(--brand)" radius={[8, 8, 0, 0]} />
-                </BarChart>
-              </ChartContainer>
-            )}
-
-            <div className="grid gap-4">
-              {filteredMotoristas.map((motorista, index) => {
-                const rankIcon = getRankIcon(index)
-                return (
-                  <motion.div
-                    key={motorista.id || index}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.05 }}
-                  >
-                    <Card className="p-4 hover:shadow-lg transition-shadow">
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="flex items-start gap-4 flex-1">
-                          {/* Ranking */}
-                          <div className="flex flex-col items-center justify-center min-w-[60px]">
-                            {rankIcon ? (
-                              rankIcon
-                            ) : (
-                              <div className="w-10 h-10 rounded-full bg-[var(--brand-light)] flex items-center justify-center">
-                                <span className="font-bold text-[var(--brand)]">#{index + 1}</span>
-                              </div>
-                            )}
-                          </div>
-
-                          {/* Avatar */}
-                          <div className="w-16 h-16 rounded-full bg-[var(--brand-light)] flex items-center justify-center flex-shrink-0">
-                            <Users className="h-8 w-8 text-[var(--brand)]" />
-                          </div>
-
-                          {/* Informações */}
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 mb-2 flex-wrap">
-                              <h3 className="font-bold text-lg">{motorista.name}</h3>
-                              <Badge variant="outline">Motorista</Badge>
-                              <Badge variant="default" className="flex items-center gap-1">
-                                <Star className="h-3 w-3 fill-current" />
-                                {motorista.rating}
-                              </Badge>
-                            </div>
-                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-sm">
-                              <div>
-                                <span className="text-[var(--ink-muted)]">Viagens:</span>
-                                <span className="font-semibold ml-1">{motorista.trips}</span>
-                              </div>
-                              <div>
-                                <span className="text-[var(--ink-muted)]">Pontos:</span>
-                                <span className="font-semibold ml-1">{motorista.total_points}</span>
-                              </div>
-                              <div>
-                                <span className="text-[var(--ink-muted)]">Pontualidade:</span>
-                                <span className="font-semibold ml-1">{motorista.on_time_percentage.toFixed(0)}%</span>
-                              </div>
-                              <div>
-                                <span className="text-[var(--ink-muted)]">Segurança:</span>
-                                <span className="font-semibold ml-1">{motorista.safety_score.toFixed(1)}</span>
-                              </div>
-                            </div>
-                            <div className="space-y-1 text-sm text-[var(--ink-muted)] mt-2">
-                              {motorista.email && (
-                                <div className="flex items-center gap-2">
-                                  <Mail className="h-4 w-4" />
-                                  <span className="truncate">{motorista.email}</span>
-                                </div>
-                              )}
-                              {motorista.phone && (
-                                <div className="flex items-center gap-2">
-                                  <Phone className="h-4 w-4" />
-                                  <span>{motorista.phone}</span>
-                                </div>
-                              )}
-                            </div>
-                          </div>
+                      <div className="flex items-center gap-3 flex-1">
+                        <div className="h-12 w-12 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center text-white font-bold text-lg">
+                          {driver.name.charAt(0)}
                         </div>
-                        <div className="flex flex-col gap-2 w-full sm:w-auto">
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            onClick={() => {
-                              setSelectedDriver(motorista.id)
-                              loadDriverDocuments(motorista.id)
-                              setActiveTab('documents')
-                            }}
-                            className="min-h-[44px] touch-manipulation text-xs sm:text-sm"
-                          >
-                            <FileText className="h-4 w-4 mr-2" />
-                            Documentos
-                          </Button>
-                          <Button variant="outline" size="sm" className="min-h-[44px] touch-manipulation text-xs sm:text-sm">
-                            <Award className="h-4 w-4 mr-2" />
-                            Detalhes
-                          </Button>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-semibold text-base truncate">{driver.name}</p>
+                          <p className="text-xs text-[var(--ink-muted)] truncate">{driver.email}</p>
                         </div>
                       </div>
-                    </Card>
-                  </motion.div>
-                )
-              })}
-              {filteredMotoristas.length === 0 && (
-                <Card className="p-12 text-center">
-                  <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium mb-2">Nenhum motorista encontrado</h3>
-                  <p className="text-sm text-[var(--ink-muted)]">
-                    {searchQuery ? "Tente ajustar sua busca" : "Não há motoristas cadastrados"}
-                  </p>
-                </Card>
-              )}
-            </div>
-          </TabsContent>
+                    </div>
 
-          <TabsContent value="documents" className="space-y-4 sm:space-y-6 mt-3 sm:mt-4">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
-              <h2 className="text-xl sm:text-2xl font-bold break-words">Documentos dos Motoristas</h2>
-              {selectedDriver && (
-                <Button onClick={() => {
-                  setIsUploadModalOpen(true)
-                  setUploadType('document')
-                }} className="w-full sm:w-auto min-h-[44px] touch-manipulation">
-                  <Upload className="h-4 w-4 mr-2" />
-                  <span className="hidden sm:inline">Upload Documento</span>
-                  <span className="sm:hidden">Upload</span>
-                </Button>
-              )}
-            </div>
+                    {/* Score */}
+                    <div className="flex items-center gap-6 flex-wrap lg:flex-nowrap">
+                      <div className="text-center">
+                        <p className="text-xs text-[var(--ink-muted)] mb-1">Pontuação</p>
+                        <p className="text-2xl font-bold text-orange-500">{driver.score}</p>
+                        <p className="text-xs text-[var(--ink-muted)]">/100</p>
+                      </div>
 
-            {selectedDriver ? (
-              <div className="space-y-4">
-                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 mb-4">
-                  <Label className="text-sm sm:text-base">Motorista:</Label>
-                  <Select value={selectedDriver} onValueChange={(value) => {
-                    setSelectedDriver(value)
-                    loadDriverDocuments(value)
-                  }}>
-                    <SelectTrigger className="w-full sm:w-64 min-h-[44px] touch-manipulation">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {motoristas.map((m) => (
-                        <SelectItem key={m.id} value={m.id}>
-                          {m.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="grid gap-4">
-                  {documents.length === 0 ? (
-                    <Card className="p-12 text-center">
-                      <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                      <h3 className="text-lg font-medium mb-2">Nenhum documento encontrado</h3>
-                      <p className="text-sm text-[var(--ink-muted)] mb-4">
-                        Faça upload dos documentos do motorista
-                      </p>
-                      <Button onClick={() => {
-                        setIsUploadModalOpen(true)
-                        setUploadType('document')
-                      }} className="min-h-[44px] touch-manipulation">
-                        <Upload className="h-4 w-4 mr-2" />
-                        Fazer Upload
-                      </Button>
-                    </Card>
-                  ) : (
-                    documents.map((doc) => (
-                      <Card key={doc.id} className="p-4">
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-2">
-                              <FileText className="h-5 w-5 text-[var(--brand)]" />
-                              <h3 className="font-bold">{doc.document_type.toUpperCase()}</h3>
-                              <Badge variant={doc.status === 'valid' ? 'default' : 'destructive'}>
-                                {doc.status === 'valid' ? 'Válido' : doc.status === 'expired' ? 'Vencido' : 'Pendente'}
-                              </Badge>
-                            </div>
-                            <div className="space-y-1 text-sm text-[var(--ink-muted)]">
-                              {doc.document_number && (
-                                <p>Número: {doc.document_number}</p>
-                              )}
-                              {doc.expiry_date && (
-                                <div className="flex items-center gap-2">
-                                  <Calendar className="h-4 w-4" />
-                                  <span>Vence em: {formatDate(doc.expiry_date)}</span>
-                                  {getDaysToExpiry(doc.expiry_date) !== null && getDaysToExpiry(doc.expiry_date)! < 30 && (
-                                    <Badge variant={getDaysToExpiry(doc.expiry_date)! < 0 ? 'destructive' : 'warning'}>
-                                      {getDaysToExpiry(doc.expiry_date)! < 0 
-                                        ? `Vencido há ${Math.abs(getDaysToExpiry(doc.expiry_date)!)} dias`
-                                        : `${getDaysToExpiry(doc.expiry_date)} dias restantes`}
-                                    </Badge>
-                                  )}
-                                </div>
-                              )}
-                              {doc.file_url && (
-                                <a href={doc.file_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-[var(--brand)] hover:underline">
-                                  <ExternalLink className="h-4 w-4" />
-                                  Ver documento
-                                </a>
-                              )}
-                            </div>
+                      {/* Progress Bars */}
+                      <div className="space-y-2 flex-1 min-w-[200px]">
+                        <div>
+                          <div className="flex justify-between text-xs mb-1">
+                            <span className="text-[var(--ink-muted)]">Pontualidade</span>
+                            <span className="font-medium">{driver.punctualityScore}%</span>
+                          </div>
+                          <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-gradient-to-r from-blue-400 to-blue-600 rounded-full transition-all"
+                              style={{ width: `${driver.punctualityScore}%` }}
+                            />
                           </div>
                         </div>
-                      </Card>
-                    ))
-                  )}
-                </div>
-              </div>
-            ) : (
-              <Card className="p-12 text-center">
-                <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium mb-2">Selecione um motorista</h3>
-                <p className="text-sm text-[var(--ink-muted)] mb-4">
-                  Escolha um motorista da lista para visualizar seus documentos
-                </p>
-                <Button onClick={() => setActiveTab('list')}>
-                  Ver Lista de Motoristas
-                </Button>
-              </Card>
-            )}
-          </TabsContent>
-
-          <TabsContent value="exams" className="space-y-4 sm:space-y-6 mt-3 sm:mt-4">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
-              <h2 className="text-xl sm:text-2xl font-bold break-words">Exames Médicos</h2>
-              {selectedDriver && (
-                <Button onClick={() => {
-                  setIsUploadModalOpen(true)
-                  setUploadType('exam')
-                }} className="w-full sm:w-auto min-h-[44px] touch-manipulation">
-                  <Upload className="h-4 w-4 mr-2" />
-                  <span className="hidden sm:inline">Adicionar Exame</span>
-                  <span className="sm:hidden">Adicionar</span>
-                </Button>
-              )}
-            </div>
-
-            {selectedDriver ? (
-              <div className="space-y-4">
-                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 mb-4">
-                  <Label className="text-sm sm:text-base">Motorista:</Label>
-                  <Select value={selectedDriver} onValueChange={(value) => {
-                    setSelectedDriver(value)
-                    loadDriverExams(value)
-                  }}>
-                    <SelectTrigger className="w-full sm:w-64 min-h-[44px] touch-manipulation">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {motoristas.map((m) => (
-                        <SelectItem key={m.id} value={m.id}>
-                          {m.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="grid gap-4">
-                  {exams.length === 0 ? (
-                    <Card className="p-12 text-center">
-                      <Stethoscope className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                      <h3 className="text-lg font-medium mb-2">Nenhum exame encontrado</h3>
-                      <p className="text-sm text-[var(--ink-muted)] mb-4">
-                        Adicione exames médicos do motorista
-                      </p>
-                      <Button onClick={() => {
-                        setIsUploadModalOpen(true)
-                        setUploadType('exam')
-                      }}>
-                        <Upload className="h-4 w-4 mr-2" />
-                        Adicionar Exame
-                      </Button>
-                    </Card>
-                  ) : (
-                    exams.map((exam) => (
-                      <Card key={exam.id} className="p-4">
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-2">
-                              <Stethoscope className="h-5 w-5 text-[var(--brand)]" />
-                              <h3 className="font-bold capitalize">{exam.exam_type.replace('_', ' ')}</h3>
-                              <Badge variant={exam.result === 'apto' ? 'default' : 'destructive'}>
-                                {exam.result === 'apto' ? 'Apto' : exam.result === 'inapto' ? 'Inapto' : 'Apto com Restrições'}
-                              </Badge>
-                            </div>
-                            <div className="space-y-1 text-sm text-[var(--ink-muted)]">
-                              <p>Data do exame: {formatDate(exam.exam_date)}</p>
-                              <div className="flex items-center gap-2">
-                                <Calendar className="h-4 w-4" />
-                                <span>Vence em: {formatDate(exam.expiry_date)}</span>
-                                {getDaysToExpiry(exam.expiry_date) !== null && getDaysToExpiry(exam.expiry_date)! < 30 && (
-                                  <Badge variant={getDaysToExpiry(exam.expiry_date)! < 0 ? 'destructive' : 'warning'}>
-                                    {getDaysToExpiry(exam.expiry_date)! < 0 
-                                      ? `Vencido há ${Math.abs(getDaysToExpiry(exam.expiry_date)!)} dias`
-                                      : `${getDaysToExpiry(exam.expiry_date)} dias restantes`}
-                                  </Badge>
-                                )}
-                              </div>
-                              {exam.clinic_name && <p>Clínica: {exam.clinic_name}</p>}
-                              {exam.doctor_name && <p>Médico: {exam.doctor_name} {exam.doctor_crm && `(CRM: ${exam.doctor_crm})`}</p>}
-                              {exam.file_url && (
-                                <a href={exam.file_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-[var(--brand)] hover:underline">
-                                  <ExternalLink className="h-4 w-4" />
-                                  Ver laudo
-                                </a>
-                              )}
-                            </div>
+                        <div>
+                          <div className="flex justify-between text-xs mb-1">
+                            <span className="text-[var(--ink-muted)]">Economia</span>
+                            <span className="font-medium">{driver.economyScore}%</span>
+                          </div>
+                          <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-gradient-to-r from-green-400 to-green-600 rounded-full transition-all"
+                              style={{ width: `${driver.economyScore}%` }}
+                            />
                           </div>
                         </div>
-                      </Card>
-                    ))
+                        <div>
+                          <div className="flex justify-between text-xs mb-1">
+                            <span className="text-[var(--ink-muted)]">Segurança</span>
+                            <span className="font-medium">{driver.safetyScore}%</span>
+                          </div>
+                          <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-gradient-to-r from-purple-400 to-purple-600 rounded-full transition-all"
+                              style={{ width: `${driver.safetyScore}%` }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Stats */}
+                      <div className="flex gap-6">
+                        <div className="text-center">
+                          <p className="text-xs text-[var(--ink-muted)] mb-1">Corridas</p>
+                          <p className="text-lg font-bold">{driver.totalTrips}</p>
+                        </div>
+                        <div className="text-center">
+                          <p className="text-xs text-[var(--ink-muted)] mb-1">Ganhos</p>
+                          <p className="text-lg font-bold text-green-600">
+                            R$ {driver.totalEarnings.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Actions */}
+                      <div className="flex gap-2">
+                        <Button size="sm" variant="outline" className="h-8">
+                          <Award className="h-4 w-4" />
+                        </Button>
+                        <Button size="sm" variant="outline" className="h-8">
+                          <Star className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Expanded Details */}
+                  {selectedDriver === driver.id && (
+                    <div className="mt-4 pt-4 border-t grid grid-cols-2 sm:grid-cols-4 gap-4">
+                      <div className="space-y-1">
+                        <p className="text-xs text-[var(--ink-muted)]">Pontualidade</p>
+                        <p className="text-sm font-medium flex items-center gap-1">
+                          {driver.punctualityScore}%
+                          <Clock className="h-3 w-3 text-blue-500" />
+                        </p>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-xs text-[var(--ink-muted)]">Economia</p>
+                        <p className="text-sm font-medium flex items-center gap-1">
+                          {driver.economyScore}%
+                          <Fuel className="h-3 w-3 text-green-500" />
+                        </p>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-xs text-[var(--ink-muted)]">Conformidade</p>
+                        <p className="text-sm font-medium flex items-center gap-1">
+                          {driver.safetyScore}%
+                          <AlertCircle className="h-3 w-3 text-purple-500" />
+                        </p>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-xs text-[var(--ink-muted)]">Avaliação</p>
+                        <p className="text-sm font-medium flex items-center gap-1">
+                          {driver.avgRating.toFixed(1)}
+                          <Star className="h-3 w-3 text-yellow-500 fill-yellow-500" />
+                        </p>
+                      </div>
+                    </div>
                   )}
-                </div>
-              </div>
-            ) : (
-              <Card className="p-12 text-center">
-                <Stethoscope className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium mb-2">Selecione um motorista</h3>
-                <p className="text-sm text-[var(--ink-muted)] mb-4">
-                  Escolha um motorista da lista para visualizar seus exames
-                </p>
-                <Button onClick={() => setActiveTab('list')}>
-                  Ver Lista de Motoristas
-                </Button>
-              </Card>
-            )}
-          </TabsContent>
-
-          <TabsContent value="alerts" className="space-y-6">
-            <h2 className="text-2xl font-bold">Alertas de Vencimento</h2>
-
-            <div className="grid gap-4">
-              {alerts.length === 0 ? (
-                <Card className="p-12 text-center">
-                  <AlertCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium mb-2">Nenhum alerta encontrado</h3>
-                  <p className="text-sm text-[var(--ink-muted)]">
-                    Todos os documentos e exames estão em dia
-                  </p>
                 </Card>
-              ) : (
-                alerts.map((alert) => (
-                  <Alert 
-                    key={alert.id} 
-                    variant={alert.alert_level === 'critical' || alert.alert_level === 'expired' ? 'destructive' : 'warning'}
-                  >
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertTitle>
-                      {alert.entity_name} - {alert.document_type}
-                    </AlertTitle>
-                    <AlertDescription>
-                      {alert.alert_level === 'expired' 
-                        ? `Vencido há ${Math.abs(alert.days_to_expiry || 0)} dias`
-                        : alert.alert_level === 'critical'
-                        ? `Vence em ${alert.days_to_expiry || 0} dias - Ação urgente necessária!`
-                        : `Vence em ${alert.days_to_expiry || 0} dias - Renovação recomendada`}
-                    </AlertDescription>
-                  </Alert>
-                ))
-              )}
+              ))}
             </div>
-          </TabsContent>
-        </Tabs>
-
-        {/* Modal de Upload */}
-        <Dialog open={isUploadModalOpen} onOpenChange={setIsUploadModalOpen}>
-          <DialogContent className="max-w-2xl">
-            <DialogHeader>
-              <DialogTitle>
-                {uploadType === 'document' ? 'Upload de Documento' : 'Adicionar Exame Médico'}
-              </DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4">
-              {uploadType === 'document' && (
-                <div>
-                  <Label>Tipo de Documento</Label>
-                  <Select value={documentType} onValueChange={setDocumentType}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="cnh">CNH</SelectItem>
-                      <SelectItem value="cpf">CPF</SelectItem>
-                      <SelectItem value="rg">RG</SelectItem>
-                      <SelectItem value="comprovante_residencia">Comprovante de Residência</SelectItem>
-                      <SelectItem value="foto_3x4">Foto 3x4</SelectItem>
-                      <SelectItem value="certidao_criminal">Certidão Criminal</SelectItem>
-                      <SelectItem value="certidao_civil">Certidão Cível</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
-              
-              {selectedDriver && (
-                <DocumentUpload
-                  driverId={selectedDriver}
-                  folder={uploadType === 'document' ? 'driver-documents' : 'medical-exams'}
-                  documentType={uploadType === 'document' ? documentType : 'periodico'}
-                  onSuccess={() => {
-                    setIsUploadModalOpen(false)
-                    if (uploadType === 'document') {
-                      loadDriverDocuments(selectedDriver)
-                    } else {
-                      loadDriverExams(selectedDriver)
-                    }
-                    loadAlerts()
-                  }}
-                  onError={(error) => {
-                    console.error('Erro no upload:', error)
-                  }}
-                />
-              )}
-            </div>
-          </DialogContent>
-        </Dialog>
+          )}
+        </div>
       </div>
     </AppShell>
   )
 }
-
