@@ -1,13 +1,14 @@
 # 🔐 RELATÓRIO DE CORREÇÃO DE AUTENTICAÇÃO
 
-**Data:** 2025-11-22 15:00  
-**Status:** ✅ **CORREÇÕES APLICADAS E DEPLOYED**
+**Data:** 2025-11-22 15:15  
+**Status:** ✅ **CORREÇÕES APLICADAS E DEPLOYED** (Build corrigido)
 
 ---
 
 ## 🚨 O PROBLEMA
 
 Os logs mostravam que o login estava funcionando (`200 OK`), mas todas as chamadas subsequentes para a API falhavam com `401 Unauthorized`.
+Além disso, houve um erro de build temporário devido a um erro de sintaxe em `rotas-content.tsx`, que já foi corrigido.
 
 **Causa Raiz Identificada:**
 1. **Frontend não enviava cookies:** As chamadas `fetch` no dashboard não tinham `credentials: 'include'`, então o cookie de sessão não era enviado para o servidor.

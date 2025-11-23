@@ -116,7 +116,7 @@ export class AuthManager {
         supabase.auth.setSession({
           access_token: options.token,
           refresh_token: options.token // Usar mesmo token se não tiver refresh
-        }).then(({ error }) => {
+        }).then(({ error }: { error: any }) => {
           if (error) console.warn('Erro ao sincronizar sessão Supabase:', error)
           else console.log('✅ Sessão Supabase sincronizada')
         })
@@ -126,7 +126,13 @@ export class AuthManager {
     }
 
     const storageMode = options?.storage ?? 'both'
-    const payload = JSON.stringify(userData)
+
+    // ✅ Garantir compatibilidade com backend (api-auth.ts espera access_token)
+    const payloadObj = {
+      ...userData,
+      access_token: userData.accessToken || options?.token
+    }
+    const payload = JSON.stringify(payloadObj)
 
     try {
       if (storageMode === 'local' || storageMode === 'both') {

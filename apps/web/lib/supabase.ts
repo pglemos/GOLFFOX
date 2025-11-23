@@ -32,6 +32,7 @@ type MockSupabaseClient = {
     signInWithPassword: () => Promise<{ data: null; error: Error }>
     signOut: () => Promise<{ error: null }>
     getUser: (token?: string) => Promise<{ data: { user: null }; error: Error }>
+    setSession: (session: any) => Promise<{ data: { session: null }; error: null }>
   }
   from: (table: string) => {
     select: (columns?: string, options?: { count?: 'exact' | 'planned' | 'estimated'; head?: boolean }) => MockQueryBuilder
@@ -70,7 +71,7 @@ if (envUrl && envAnon) {
   // Fallback seguro: permite que a UI funcione sem backend configurado
   // Supabase não configurado. Defina NEXT_PUBLIC_SUPABASE_URL e NEXT_PUBLIC_SUPABASE_ANON_KEY no ambiente.
   const mockError = new Error('Supabase não configurado')
-  
+
   // Criar builder mock recursivo
   const createMockBuilder = (): MockQueryBuilder => {
     const builder = {
@@ -93,13 +94,14 @@ if (envUrl && envAnon) {
     }
     return builder
   }
-  
+
   supabase = {
     auth: {
       getSession: async () => ({ data: { session: null }, error: null }),
       signInWithPassword: async () => ({ data: null, error: mockError }),
       signOut: async () => ({ error: null }),
       getUser: async () => ({ data: { user: null }, error: mockError }),
+      setSession: async () => ({ data: { session: null }, error: null }),
     },
     from: () => ({
       select: () => createMockBuilder(),
