@@ -59,6 +59,9 @@ class AuthService {
 
   Future<app_user.User> createAccountWithEmail(
       dynamic context, String email, String password) async {
+    // A criação de usuários continua sendo disparada pelos painéis (admin,
+    // transportadora e operador); este método apenas executa o fluxo de
+    // cadastro via e-mail quando solicitado por esses pontos de entrada.
     final resp = await supabaseService.client.auth
         .signUp(email: email, password: password);
     final createdUser = resp.user;
