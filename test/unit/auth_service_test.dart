@@ -176,6 +176,7 @@ void main() {
         final mockSession = MockSession();
         when(mockAuthResponse.user).thenReturn(mockUser);
         when(mockAuthResponse.session).thenReturn(mockSession);
+        when(mockSession.accessToken).thenReturn('token');
 
         when(mockUser.id).thenReturn('new-id');
         when(mockUser.email).thenReturn(email);
@@ -218,6 +219,71 @@ void main() {
         final mockAuthResponse = MockAuthResponse();
         when(mockAuthResponse.user).thenReturn(mockUser);
         when(mockAuthResponse.session).thenReturn(null);
+
+        when(mockUser.id).thenReturn('new-id');
+        when(mockUser.email).thenReturn(email);
+
+        final mockGoTrueClient = MockGoTrueClient();
+        when(mockSupabaseService.client).thenReturn(mockSupabaseClient);
+        when(mockSupabaseClient.auth).thenReturn(mockGoTrueClient);
+        when(mockGoTrueClient.signUp(email: email, password: password))
+            .thenAnswer((_) async => mockAuthResponse);
+
+        // Act
+        final result =
+            await authService.createAccountWithEmail(mockContext, email, password);
+
+        // Assert
+        expect(result.id, equals('new-id'));
+        expect(result.email, equals(email));
+        verifyNever(mockSupabaseService.upsertUserProfile(any));
+      });
+
+      test(
+          'should return generated profile without upserting when session lacks access token',
+          () async {
+        // Arrange
+        const email = 'newuser@example.com';
+        const password = 'password123';
+
+        final mockUser = MockUser();
+        final mockAuthResponse = MockAuthResponse();
+        final mockSession = MockSession();
+        when(mockAuthResponse.user).thenReturn(mockUser);
+        when(mockAuthResponse.session).thenReturn(mockSession);
+
+        when(mockUser.id).thenReturn('new-id');
+        when(mockUser.email).thenReturn(email);
+
+        final mockGoTrueClient = MockGoTrueClient();
+        when(mockSupabaseService.client).thenReturn(mockSupabaseClient);
+        when(mockSupabaseClient.auth).thenReturn(mockGoTrueClient);
+        when(mockGoTrueClient.signUp(email: email, password: password))
+            .thenAnswer((_) async => mockAuthResponse);
+
+        // Act
+        final result =
+            await authService.createAccountWithEmail(mockContext, email, password);
+
+        // Assert
+        expect(result.id, equals('new-id'));
+        expect(result.email, equals(email));
+        verifyNever(mockSupabaseService.upsertUserProfile(any));
+      });
+
+      test('should skip upsert when session access token is empty string',
+          () async {
+        // Arrange
+        const email = 'newuser@example.com';
+        const password = 'password123';
+
+        final mockUser = MockUser();
+        final mockAuthResponse = MockAuthResponse();
+        final mockSession = MockSession();
+
+        when(mockAuthResponse.user).thenReturn(mockUser);
+        when(mockAuthResponse.session).thenReturn(mockSession);
+        when(mockSession.accessToken).thenReturn('');
 
         when(mockUser.id).thenReturn('new-id');
         when(mockUser.email).thenReturn(email);
