@@ -178,14 +178,17 @@ void main() {
     });
 
     group('createAccountWithEmail', () {
-      test('should return null on successful account creation', () async {
+      test('should upsert profile and return created user', () async {
         // Arrange
         const email = 'newuser@example.com';
         const password = 'password123';
-        
+
         final mockUser = MockUser();
         final mockAuthResponse = MockAuthResponse();
         when(mockAuthResponse.user).thenReturn(mockUser);
+
+        when(mockUser.id).thenReturn('new-id');
+        when(mockUser.email).thenReturn(email);
 
         final mockGoTrueClient = MockGoTrueClient();
         when(mockSupabaseService.client).thenReturn(mockSupabaseClient);
@@ -193,19 +196,32 @@ void main() {
         when(mockGoTrueClient.signUp(email: email, password: password))
             .thenAnswer((_) async => mockAuthResponse);
 
+        final createdProfile = app_user.User(
+          id: 'new-id',
+          email: email,
+          role: 'user',
+          name: null,
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+        );
+
+        when(mockSupabaseService.upsertUserProfile(any))
+            .thenAnswer((_) async => createdProfile);
+
         // Act
         final result = await authService.createAccountWithEmail(mockContext, email, password);
 
         // Assert
-        expect(result, isNull);
+        expect(result, equals(createdProfile));
         verify(mockGoTrueClient.signUp(email: email, password: password)).called(1);
+        verify(mockSupabaseService.upsertUserProfile(any)).called(1);
       });
 
       test('should throw AuthFailure when user creation fails', () async {
         // Arrange
         const email = 'newuser@example.com';
         const password = 'password123';
-        
+
         final mockAuthResponse = MockAuthResponse();
         when(mockAuthResponse.user).thenReturn(null);
 
@@ -224,6 +240,8 @@ void main() {
             AuthErrorCode.unknown,
           )),
         );
+
+        verifyNever(mockSupabaseService.upsertUserProfile(any));
       });
     });
 
