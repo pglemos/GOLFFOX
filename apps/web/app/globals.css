@@ -24,6 +24,16 @@
     word-wrap: break-word;
     overflow-wrap: break-word;
   }
+
+  img,
+  picture,
+  video,
+  canvas,
+  svg {
+    max-width: 100%;
+    height: auto;
+    display: block;
+  }
   
   /* Prevent text overflow issues */
   p, span, div, h1, h2, h3, h4, h5, h6 {
@@ -128,6 +138,12 @@
     --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
     --transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
     --transition-bounce: 500ms cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+    /* Safe area (mobile) */
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-right: env(safe-area-inset-right, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+    --safe-left: env(safe-area-inset-left, 0px);
     
     /* Z-Index Scale */
     --z-dropdown: 1000;
@@ -1625,6 +1641,111 @@
    UTILITÁRIOS MOBILE-FIRST
    ======================================== */
 
+/* Formularios totalmente responsivos */
+.form-responsive {
+  width: 100%;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.form-responsive .form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+@media (min-width: 640px) {
+  .form-responsive .form-row.two-col {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .form-responsive .form-row.two-col > * {
+    flex: 1 1 calc(50% - 0.75rem);
+    min-width: 0;
+  }
+}
+
+.panel-responsive {
+  @apply rounded-[var(--radius-lg)] border border-[var(--border)];
+  @apply bg-[var(--bg-elevated)] shadow-[var(--shadow-sm)];
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+@media (min-width: 640px) {
+  .panel-responsive {
+    padding: 1.25rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .panel-responsive {
+    padding: 1.5rem;
+  }
+}
+
+.stack-responsive {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+  min-width: 0;
+}
+
+@media (min-width: 640px) {
+  .stack-responsive {
+    gap: 1.25rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .stack-responsive {
+    gap: 1.5rem;
+  }
+}
+
+/* Tabelas com rolagem horizontal suave no mobile */
+.table-responsive-wrapper {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: max(0.75rem, var(--safe-bottom));
+  padding-left: max(0.5rem, var(--safe-left));
+  padding-right: max(0.5rem, var(--safe-right));
+  margin-left: -0.5rem;
+  margin-right: -0.5rem;
+  scrollbar-gutter: stable both-edges;
+  overscroll-behavior-x: contain;
+}
+
+@media (min-width: 640px) {
+  .table-responsive-wrapper {
+    margin-left: 0;
+    margin-right: 0;
+  }
+}
+
+.table-responsive-wrapper table {
+  min-width: 640px;
+}
+
+@media (max-width: 640px) {
+  .table-responsive-wrapper table {
+    min-width: 540px;
+  }
+}
+
 /* Texto responsivo */
 .text-responsive-sm {
   font-size: 0.875rem;
@@ -1665,5 +1786,53 @@
   .space-responsive {
     margin-bottom: 2rem;
   }
+}
+
+/* ========================================
+   AJUSTES SEGUROS PARA MOBILE
+   ======================================== */
+
+.safe-area-page {
+  padding-left: max(1rem, var(--safe-left));
+  padding-right: max(1rem, var(--safe-right));
+  padding-bottom: max(1rem, var(--safe-bottom));
+}
+
+@media (min-width: 640px) {
+  .safe-area-page {
+    padding-left: max(1.5rem, var(--safe-left));
+    padding-right: max(1.5rem, var(--safe-right));
+  }
+}
+
+.mobile-scroll-region {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable both-edges;
+}
+
+.responsive-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+}
+
+.responsive-toolbar > * {
+  min-width: 0;
+  flex-shrink: 1;
+}
+
+@media (min-width: 768px) {
+  .responsive-toolbar {
+    gap: 1rem;
+  }
+}
+
+.input-block {
+  width: 100%;
+  min-width: 0;
 }
 
