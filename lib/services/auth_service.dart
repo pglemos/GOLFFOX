@@ -81,10 +81,14 @@ class AuthService {
       updatedAt: now,
     );
 
-    if (session == null) {
-      // Quando o fluxo de confirmacao de e-mail esta ativo, nao ha sessao
-      // imediata; o cliente nao possui token para gravar o perfil. Retornamos
-      // o perfil gerado para que a UI possa orientar o usuario sem falhar.
+    final accessToken = session?.accessToken;
+    final hasAccessToken = accessToken != null && accessToken.isNotEmpty;
+
+    if (!hasAccessToken) {
+      // Quando o fluxo de confirmacao de e-mail esta ativo (ou o Supabase nao
+      // retorna access token), nao ha sessao imediata; o cliente nao possui
+      // token para gravar o perfil. Retornamos o perfil gerado para que a UI
+      // possa orientar o usuario sem falhar.
       return profile;
     }
 
