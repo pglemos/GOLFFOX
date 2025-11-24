@@ -148,7 +148,13 @@ void main() {
         // Act & Assert
         await expectLater(
           authService.signInWithEmail(invalidEmail, password),
-          throwsA(isA<AuthFailure>()),
+          throwsA(
+            isA<AuthFailure>().having(
+              (e) => e.code,
+              'code',
+              AuthErrorCode.unknown,
+            ),
+          ),
         );
       });
 
@@ -160,7 +166,13 @@ void main() {
         // Act & Assert
         await expectLater(
           authService.signInWithEmail(email, weakPassword),
-          throwsA(isA<AuthFailure>()),
+          throwsA(
+            isA<AuthFailure>().having(
+              (e) => e.code,
+              'code',
+              AuthErrorCode.unknown,
+            ),
+          ),
         );
       });
     });
