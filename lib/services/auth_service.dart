@@ -57,13 +57,26 @@ class AuthService {
     throw UnimplementedError();
   }
 
-  Future<dynamic> createAccountWithEmail(
+  Future<app_user.User> createAccountWithEmail(
       dynamic context, String email, String password) async {
     final resp = await supabaseService.client.auth
         .signUp(email: email, password: password);
-    if (resp.user == null) {
+    final createdUser = resp.user;
+
+    if (createdUser == null) {
       throw const AuthFailure(AuthErrorCode.unknown, 'user creation failed');
     }
-    return null;
+
+    final now = DateTime.now();
+    final profile = app_user.User(
+      id: createdUser.id,
+      email: createdUser.email ?? email,
+      role: 'user',
+      name: createdUser.userMetadata?['name']?.toString(),
+      createdAt: now,
+      updatedAt: now,
+    );
+
+    return supabaseService.upsertUserProfile(profile);
   }
 }
