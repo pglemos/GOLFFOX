@@ -65,6 +65,7 @@ class AuthService {
     final resp = await supabaseService.client.auth
         .signUp(email: email, password: password);
     final createdUser = resp.user;
+    final session = resp.session;
 
     if (createdUser == null) {
       throw const AuthFailure(AuthErrorCode.unknown, 'user creation failed');
@@ -79,6 +80,13 @@ class AuthService {
       createdAt: now,
       updatedAt: now,
     );
+
+    if (session == null) {
+      // Quando o fluxo de confirmacao de e-mail esta ativo, nao ha sessao
+      // imediata; o cliente nao possui token para gravar o perfil. Retornamos
+      // o perfil gerado para que a UI possa orientar o usuario sem falhar.
+      return profile;
+    }
 
     return supabaseService.upsertUserProfile(profile);
   }
