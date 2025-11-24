@@ -166,14 +166,16 @@ void main() {
     });
 
     group('createAccountWithEmail', () {
-      test('should upsert profile and return created user', () async {
+      test('should upsert profile and return created user when session is available', () async {
         // Arrange
         const email = 'newuser@example.com';
         const password = 'password123';
 
         final mockUser = MockUser();
         final mockAuthResponse = MockAuthResponse();
+        final mockSession = MockSession();
         when(mockAuthResponse.user).thenReturn(mockUser);
+        when(mockAuthResponse.session).thenReturn(mockSession);
 
         when(mockUser.id).thenReturn('new-id');
         when(mockUser.email).thenReturn(email);
@@ -203,6 +205,37 @@ void main() {
         expect(result, equals(createdProfile));
         verify(mockGoTrueClient.signUp(email: email, password: password)).called(1);
         verify(mockSupabaseService.upsertUserProfile(any)).called(1);
+      });
+
+      test(
+          'should return generated profile without upserting when session is null',
+          () async {
+        // Arrange
+        const email = 'newuser@example.com';
+        const password = 'password123';
+
+        final mockUser = MockUser();
+        final mockAuthResponse = MockAuthResponse();
+        when(mockAuthResponse.user).thenReturn(mockUser);
+        when(mockAuthResponse.session).thenReturn(null);
+
+        when(mockUser.id).thenReturn('new-id');
+        when(mockUser.email).thenReturn(email);
+
+        final mockGoTrueClient = MockGoTrueClient();
+        when(mockSupabaseService.client).thenReturn(mockSupabaseClient);
+        when(mockSupabaseClient.auth).thenReturn(mockGoTrueClient);
+        when(mockGoTrueClient.signUp(email: email, password: password))
+            .thenAnswer((_) async => mockAuthResponse);
+
+        // Act
+        final result =
+            await authService.createAccountWithEmail(mockContext, email, password);
+
+        // Assert
+        expect(result.id, equals('new-id'));
+        expect(result.email, equals(email));
+        verifyNever(mockSupabaseService.upsertUserProfile(any));
       });
 
       test('should throw AuthFailure when user creation fails', () async {
