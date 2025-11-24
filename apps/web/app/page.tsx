@@ -908,7 +908,7 @@ function LoginContent() {
                     handleLogin()
                   }
                 }}
-                className="space-y-4 sm:space-y-5 md:space-y-6"
+                className="form-responsive space-y-4 sm:space-y-5 md:space-y-6"
               >
                 {/* Campo Email */}
                 <div className="space-y-1.5 sm:space-y-2">
