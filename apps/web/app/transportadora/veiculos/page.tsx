@@ -940,7 +940,7 @@ export default function TransportadoraVeiculosPage() {
 
         {/* Modal de Upload de Documento */}
         <Dialog open={isUploadModalOpen} onOpenChange={setIsUploadModalOpen}>
-          <DialogContent className="max-w-2xl">
+          <DialogContent className="w-[95vw] sm:w-[90vw] max-w-2xl p-4 sm:p-6 mx-auto">
             <DialogHeader>
               <DialogTitle>Upload de Documento do Veículo</DialogTitle>
             </DialogHeader>
@@ -981,7 +981,7 @@ export default function TransportadoraVeiculosPage() {
 
         {/* Modal de Nova Manutenção */}
         <Dialog open={isMaintenanceModalOpen} onOpenChange={setIsMaintenanceModalOpen}>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="w-[95vw] sm:w-[90vw] max-w-2xl max-h-[90vh] overflow-y-auto p-4 sm:p-6 mx-auto">
             <DialogHeader>
               <DialogTitle>Nova Manutenção</DialogTitle>
             </DialogHeader>
