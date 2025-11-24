@@ -438,7 +438,7 @@ export default function VeiculosPage() {
             setMaintenances([])
             setChecklists([])
           }}>
-            <DialogContent className="max-w-[95vw] sm:max-w-4xl max-h-[90vh] overflow-y-auto p-3 sm:p-6">
+            <DialogContent className="w-[95vw] sm:w-[90vw] max-w-[95vw] sm:max-w-4xl max-h-[90vh] overflow-y-auto p-3 sm:p-6 mx-auto">
               <DialogHeader className="p-0 sm:p-0 mb-3 sm:mb-6">
                 <DialogTitle className="flex items-center gap-2 text-lg sm:text-xl break-words">
                   <Truck className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
@@ -644,7 +644,7 @@ export default function VeiculosPage() {
             })
           }
         >
-          <DialogContent className="max-w-md">
+          <DialogContent className="w-[95vw] sm:w-[90vw] max-w-md p-4 sm:p-6 mx-auto">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2 text-red-600">
                 <AlertTriangle className="h-5 w-5" />
