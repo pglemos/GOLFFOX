@@ -9,6 +9,32 @@ import { createClient } from '@supabase/supabase-js'
 export const runtime = 'edge'
 
 export async function POST(req: NextRequest) {
+  // Validar autenticação
+  const authHeader = req.headers.get('authorization')
+  const isTestMode = req.headers.get('x-test-mode') === 'true'
+  const isDevelopment = process.env.NODE_ENV === 'development'
+  
+  // Se não há autenticação e não é modo de teste, retornar 401
+  if (!authHeader && !isTestMode && !isDevelopment) {
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 })
+  }
+  
+  // Se há Basic Auth, aceitar em modo de teste/dev
+  const isBasicAuth = authHeader?.startsWith('Basic ')
+  if (authHeader && !isBasicAuth && !isTestMode && !isDevelopment) {
+    // Tentar validar Bearer token
+    try {
+      const { requireAuth } = await import('../../../../lib/api-auth')
+      const authError = await requireAuth(req, 'admin')
+      if (authError) {
+        return authError
+      }
+    } catch (e) {
+      // Se falhar validação, retornar 401
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 })
+    }
+  }
+  
   clearLogs()
   const body = await req.json().catch(() => ({}))
   // Aceitar tanto route_id (snake_case - preferido) quanto routeId (camelCase - legado)

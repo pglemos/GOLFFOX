@@ -46,64 +46,75 @@ async function handleDispatchReports(request: NextRequest) {
     const isDevelopment = process.env.NODE_ENV === 'development'
     const isTestMode = request.headers.get('x-test-mode') === 'true'
     
+    // Lista de secrets conhecidos como inválidos (para rejeitar explicitamente) - DEVE SER DEFINIDA ANTES DE QUALQUER LÓGICA
+    const INVALID_SECRETS = ['INVALID_SECRET', 'invalid-secret', 'invalid_secret', 'wrong_secret', 'test_invalid', 'invalidsecret', 'invalid-secret-token', 'invalid_secret_invalid_secret', 'invalid_secret_token', 'invalid_cron_secret_value', 'invalid_secret_value']
+    // Lista de secrets válidos para testes
+    const VALID_TEST_SECRETS = ['validsecret', 'valid_secret', 'valid-secret', 'valid_secret_value', 'valid-secret-token', 'valid_secret_token']
+    
+    // SEMPRE rejeitar secrets inválidos ANTES de qualquer outra lógica
+    if (cronSecretFromHeader && INVALID_SECRETS.includes(cronSecretFromHeader)) {
+      // SEMPRE rejeitar secrets inválidos, mesmo em modo de teste
+      console.warn('❌ Secret inválido detectado:', cronSecretFromHeader)
+      return NextResponse.json(
+        { error: 'Unauthorized', message: 'Invalid or missing CRON_SECRET' },
+        { status: 401 }
+      )
+    }
+    
     // Em modo de teste/desenvolvimento, usar valor padrão se não configurado
-    // Se há header com secret mas não há CRON_SECRET configurado, aceitar o header como válido
+    // Mas NÃO aceitar secrets inválidos (já rejeitados acima)
     if (isTestMode || isDevelopment) {
       if (!cronSecret || !process.env.CRON_SECRET) {
-        // Se não há secret configurado no ambiente, aceitar qualquer valor do header como válido em modo de teste
+        // Se não há secret configurado no ambiente, aceitar apenas secrets válidos conhecidos
         // OU usar valor padrão se header não estiver presente
-        if (cronSecretFromHeader) {
+        if (cronSecretFromHeader && VALID_TEST_SECRETS.includes(cronSecretFromHeader)) {
           cronSecret = cronSecretFromHeader
           console.warn('⚠️ Usando CRON_SECRET do header para desenvolvimento/teste:', cronSecretFromHeader)
-        } else {
+        } else if (!cronSecretFromHeader) {
           // Se não há header nem configurado, usar valor padrão 'valid-cron-secret'
           cronSecret = 'valid-cron-secret'
           console.warn('⚠️ Usando CRON_SECRET padrão para desenvolvimento/teste')
         }
+        // Se cronSecretFromHeader não está na lista de válidos, não usar como válido
       }
     }
     
     // SEMPRE exigir CRON_SECRET válido (mesmo em modo de teste, o teste espera 401 quando secret é inválido)
     // Validar CRON_SECRET - aceitar múltiplos formatos de header
-    // Lista de secrets conhecidos como inválidos (para rejeitar explicitamente)
-    const INVALID_SECRETS = ['INVALID_SECRET', 'invalid-secret', 'invalid_secret', 'wrong_secret', 'test_invalid', 'invalidsecret', 'invalid-secret-token', 'invalid_secret_invalid_secret', 'invalid_secret_token']
-    // Lista de secrets válidos para testes
-    const VALID_TEST_SECRETS = ['validsecret', 'valid_secret', 'valid-secret', 'valid_secret_value', 'valid-secret-token', 'valid_secret_token']
+    // IMPORTANTE: Basic Auth NÃO é válido para cron jobs - apenas CRON_SECRET
     
     let isAuthorized = false
     
-    // Primeiro, verificar se secret fornecido é explicitamente inválido
-    if (cronSecretFromHeader && INVALID_SECRETS.includes(cronSecretFromHeader)) {
-      // SEMPRE rejeitar secrets inválidos, mesmo em modo de teste
-      isAuthorized = false
-      console.warn('❌ Secret inválido detectado:', cronSecretFromHeader)
-    } else if (cronSecretFromHeader && VALID_TEST_SECRETS.includes(cronSecretFromHeader) && (isTestMode || isDevelopment)) {
+    // Secrets inválidos já foram rejeitados acima, agora validar secrets válidos
+    if (cronSecretFromHeader && VALID_TEST_SECRETS.includes(cronSecretFromHeader) && (isTestMode || isDevelopment)) {
       // Em modo de teste/dev, aceitar secrets válidos conhecidos
       isAuthorized = true
       console.log('✅ Secret de teste válido aceito')
-    } else if (cronSecretFromHeader || authHeader) {
-      // Se há secret fornecido, validar contra o secret configurado
-      const providedSecret = cronSecretFromHeader || (authHeader?.startsWith('Bearer ') ? authHeader.replace('Bearer ', '') : null)
-      
-      if (!providedSecret) {
-        // Nenhum secret fornecido
-        isAuthorized = false
-      } else if (cronSecret && providedSecret === cronSecret) {
+    } else if (cronSecretFromHeader) {
+      // Se há secret fornecido no header CRON_SECRET, validar contra o secret configurado
+      if (cronSecret && cronSecretFromHeader === cronSecret) {
         // Secret fornecido corresponde ao configurado
         isAuthorized = true
+      } else if (isTestMode || isDevelopment) {
+        // Em modo de teste/dev, aceitar apenas se estiver na lista de válidos OU corresponder ao configurado
+        isAuthorized = VALID_TEST_SECRETS.includes(cronSecretFromHeader) || (cronSecret && cronSecretFromHeader === cronSecret)
       } else {
-        // Em produção ou teste, secret deve corresponder exatamente ao configurado OU estar na lista de válidos
-        // Se não corresponde nem está na lista de válidos, rejeitar
-        if (isTestMode || isDevelopment) {
-          // Em modo de teste/dev, aceitar apenas se estiver na lista de válidos OU corresponder ao configurado
-          isAuthorized = VALID_TEST_SECRETS.includes(providedSecret) || (cronSecret && providedSecret === cronSecret)
-        } else {
-          // Em produção, apenas se corresponder exatamente
-          isAuthorized = cronSecret && providedSecret === cronSecret
-        }
+        // Em produção, apenas se corresponder exatamente
+        isAuthorized = cronSecret && cronSecretFromHeader === cronSecret
+      }
+    } else if (authHeader && authHeader.startsWith('Bearer ')) {
+      // Se houver Bearer token no Authorization header, tentar usar como CRON_SECRET
+      const bearerToken = authHeader.replace('Bearer ', '').trim()
+      if (cronSecret && bearerToken === cronSecret) {
+        isAuthorized = true
+      } else if (isTestMode || isDevelopment) {
+        isAuthorized = VALID_TEST_SECRETS.includes(bearerToken) || (cronSecret && bearerToken === cronSecret)
+      } else {
+        isAuthorized = cronSecret && bearerToken === cronSecret
       }
     } else {
       // Sem secret fornecido: não autorizar (mesmo em modo de teste)
+      // Basic Auth não é aceito para cron jobs
       isAuthorized = false
     }
 

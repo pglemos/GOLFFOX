@@ -3,72 +3,80 @@ from requests.auth import HTTPBasicAuth
 import uuid
 
 BASE_URL = "http://localhost:3000"
-ENDPOINT = "/api/admin/create-operator"
-USERNAME = "golffox@admin.com"
-PASSWORD = "senha123"
-TIMEOUT = 30
+CREATE_OPERATOR_ENDPOINT = "/api/admin/create-operator"
+DELETE_OPERATOR_ENDPOINT_TEMPLATE = "/api/admin/operators/{operator_id}"
+
+AUTH_USERNAME = "golffox@admin.com"
+AUTH_PASSWORD = "senha123"
+
 
 def test_create_new_operator_user():
-    auth = HTTPBasicAuth(USERNAME, PASSWORD)
+    # Generate unique test email and a dummy UUID for company_id for testing
+    test_email = f"test-operator-{uuid.uuid4()}@example.com"
+    test_company_id = str(uuid.uuid4())
+
+    url = BASE_URL + CREATE_OPERATOR_ENDPOINT
     headers = {
         "Content-Type": "application/json"
     }
-
-    # Prepare valid payload with unique email and a dummy company_id (UUID4)
-    email = f"operator_{uuid.uuid4().hex[:8]}@example.com"
-    # For company_id, provide a valid UUID format, simulate a company Id for the test
-    # As no company create endpoint data provided, use a random UUID here.
-    company_id = str(uuid.uuid4())
-
     payload = {
-        "email": email,
-        "company_id": company_id
+        "email": test_email,
+        "company_id": test_company_id
     }
 
-    # Test success case: create operator with valid data
-    response = requests.post(
-        BASE_URL + ENDPOINT,
-        auth=auth,
-        headers=headers,
-        json=payload,
-        timeout=TIMEOUT
-    )
+    auth = HTTPBasicAuth(AUTH_USERNAME, AUTH_PASSWORD)
+    operator_id = None
 
-    assert response.status_code == 201, f"Expected status code 201 but got {response.status_code}, response: {response.text}"
-
-    # Additional validation of response content if JSON
+    # Create operator with valid data
     try:
-        data = response.json()
-    except Exception:
-        data = None
-    
-    assert data is None or isinstance(data, dict), "Response is not valid JSON object"
+        response = requests.post(url, json=payload, headers=headers, auth=auth, timeout=30)
+        # Status code 201 means created successfully
+        assert response.status_code == 201, f"Expected status code 201, got {response.status_code}"
+        response_json = response.json()
+        # Validate response includes operator info (assumed response structure)
+        # At minimum we expect the created operator's ID or some identifier in response.
+        assert isinstance(response_json, dict), "Response JSON is not a dictionary"
+        # We expect operator id or similar key, but since PRD does not specify response body,
+        # We'll check email and company_id is returned or infer id from location header if exists.
+        # For safety, try to extract operator_id from response if present:
+        operator_id = response_json.get("id") or response_json.get("operator_id") or response_json.get("userId")
+        if operator_id is None:
+            # No id in response, try from Location header
+            location = response.headers.get("Location")
+            if location and location.startswith(CREATE_OPERATOR_ENDPOINT):
+                operator_id = location.split("/")[-1]
+        # operator_id may be None if not returned, so no assertion here
+        # Also confirm email and company_id match in response if present
+        if "email" in response_json:
+            assert response_json["email"] == test_email
+        if "company_id" in response_json:
+            assert response_json["company_id"] == test_company_id
 
-    # Test error case: invalid email
-    invalid_payload = {
-        "email": "invalid-email",
-        "company_id": company_id
-    }
-    error_response = requests.post(
-        BASE_URL + ENDPOINT,
-        auth=auth,
-        headers=headers,
-        json=invalid_payload,
-        timeout=TIMEOUT
-    )
-    assert error_response.status_code == 400, f"Expected 400 for invalid email but got {error_response.status_code}, response: {error_response.text}"
+        # Test invalid data (missing email)
+        invalid_payload = {
+            "company_id": test_company_id
+        }
+        resp_invalid = requests.post(url, json=invalid_payload, headers=headers, auth=auth, timeout=30)
+        assert resp_invalid.status_code == 400, f"Expected 400 for missing email, got {resp_invalid.status_code}"
 
-    # Test error case: missing company_id (should get 400)
-    missing_company_payload = {
-        "email": f"operator_{uuid.uuid4().hex[:8]}@example.com"
-    }
-    missing_company_resp = requests.post(
-        BASE_URL + ENDPOINT,
-        auth=auth,
-        headers=headers,
-        json=missing_company_payload,
-        timeout=TIMEOUT
-    )
-    assert missing_company_resp.status_code == 400, f"Expected 400 for missing company_id but got {missing_company_resp.status_code}, response: {missing_company_resp.text}"
+        # Test invalid data (invalid email format)
+        invalid_email_payload = {
+            "email": "invalid-email-format",
+            "company_id": test_company_id
+        }
+        resp_invalid_email = requests.post(url, json=invalid_email_payload, headers=headers, auth=auth, timeout=30)
+        assert resp_invalid_email.status_code == 400, f"Expected 400 for invalid email format, got {resp_invalid_email.status_code}"
+
+    finally:
+        # Clean up: delete the created operator if operator_id is available
+        if operator_id:
+            try:
+                delete_url = BASE_URL + DELETE_OPERATOR_ENDPOINT_TEMPLATE.format(operator_id=operator_id)
+                del_resp = requests.delete(delete_url, auth=auth, timeout=30)
+                # Accept 200 or 204 as success for deletion
+                assert del_resp.status_code in (200, 204), f"Failed to delete operator with id {operator_id}"
+            except Exception:
+                pass
+
 
 test_create_new_operator_user()
