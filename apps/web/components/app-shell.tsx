@@ -113,8 +113,8 @@ export const AppShell = memo(function AppShell({ user, children, panel }: AppShe
   }, [])
 
   return (
-    <div 
-      className="min-h-screen bg-[var(--bg)] text-[var(--ink)] overflow-x-hidden w-full max-w-full"
+    <div
+      className="min-h-screen min-h-[100dvh] min-h-[100svh] bg-[var(--bg)] text-[var(--ink)] overflow-x-hidden w-full max-w-full"
       style={{
         backgroundImage: 'none',
         background: 'var(--bg)'
@@ -159,12 +159,15 @@ export const AppShell = memo(function AppShell({ user, children, panel }: AppShe
         />
 
         {/* Main Content */}
-        <main 
+        <main
           className={cn(
-            "min-h-[calc(100vh-4rem)] sm:min-h-[calc(100vh-4.5rem)] transition-all duration-300 ease-in-out",                                                     
-              "overflow-y-auto overflow-x-hidden bg-[var(--bg)] pb-12 sm:pb-14 safe-area-shell",
+            "min-h-[calc(100vh-4rem)] min-h-[calc(100svh-4rem)] min-h-[calc(100dvh-4rem)]",
+            "sm:min-h-[calc(100vh-4.5rem)] sm:min-h-[calc(100svh-4.5rem)] sm:min-h-[calc(100dvh-4.5rem)]",
+            "transition-all duration-300 ease-in-out",
+
+            "overflow-y-auto overflow-x-hidden bg-[var(--bg)] pb-12 sm:pb-14 safe-area-shell",
             !isMobile ? "flex-1 lg:ml-[60px]" : "w-full ml-0 flex-shrink-0",
-            "max-w-full w-full",
+            "max-w-full w-full min-w-0 min-h-0",
             "relative z-50 mobile-scroll-region"
           )}
           style={{

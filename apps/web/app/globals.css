@@ -17,12 +17,21 @@
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
     overflow-x: hidden;
+    min-height: 100%;
+    min-height: 100dvh;
+    min-height: 100svh;
+    width: 100%;
   }
-  
+
   body {
     overflow-x: hidden;
     word-wrap: break-word;
     overflow-wrap: break-word;
+    min-height: 100%;
+    min-height: 100dvh;
+    min-height: 100svh;
+    width: 100%;
+    max-width: 100%;
   }
 
   img,
@@ -1718,6 +1727,8 @@
 .table-responsive-wrapper {
   width: 100%;
   max-width: 100%;
+  min-width: 0;
+  min-height: 0;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   padding-bottom: max(0.75rem, var(--safe-bottom));
@@ -1810,6 +1821,10 @@
   padding-left: max(1rem, var(--safe-left));
   padding-right: max(1rem, var(--safe-right));
   padding-bottom: max(1rem, var(--safe-bottom));
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 @media (min-width: 640px) {
@@ -1823,6 +1838,12 @@
 .safe-area-shell {
   padding-top: max(1rem, var(--safe-top));
   padding-bottom: max(1.25rem, var(--safe-bottom));
+  width: 100%;
+  max-width: 100%;
+  min-height: 100%;
+  min-height: 100dvh;
+  min-height: 100svh;
+  box-sizing: border-box;
 }
 
 @media (min-width: 768px) {
@@ -1838,6 +1859,10 @@
   scrollbar-gutter: stable both-edges;
   padding-left: max(0px, var(--safe-left));
   padding-right: max(0px, var(--safe-right));
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  min-height: 0;
 }
 
 .responsive-toolbar {
