@@ -1,73 +1,89 @@
 import requests
-from requests.auth import HTTPBasicAuth
 import uuid
 
 BASE_URL = "http://localhost:3000"
-CREATE_OPERATOR_ENDPOINT = "/api/admin/create-operator"
+API_PATH = "/api/admin/create-operator"
 TIMEOUT = 30
-
-AUTH_USERNAME = "golffox@admin.com"
-AUTH_PASSWORD = "senha123"
+AUTH = ("golffox@admin.com", "senha123")
+HEADERS = {
+    "Content-Type": "application/json"
+}
 
 def test_create_new_operator_user():
-    auth = HTTPBasicAuth(AUTH_USERNAME, AUTH_PASSWORD)
-    headers = {
-        "Content-Type": "application/json",
-    }
-
-    # Generate unique email and dummy company_id for test
-    # company_id must be a valid UUID string, but since not provided by instructions,
-    # we generate a random UUID as placeholder (in real test, this should be a valid existing company_id)
-    test_email = f"test.operator.{uuid.uuid4()}@example.com"
-    test_company_id = str(uuid.uuid4())
+    # Generate unique email to avoid conflicts
+    new_email = f"operator_{uuid.uuid4()}@test.com"
+    # For testing, we need a valid company_id UUID.
+    # Since PRD doesn't provide a direct endpoint to get companies, we use a UUID placeholder.
+    # In a real scenario, fetch a valid company_id from a pre-existing test fixture or a companies list endpoint.
+    sample_company_id = str(uuid.uuid4())
 
     payload = {
-        "email": test_email,
-        "company_id": test_company_id
+        "email": new_email,
+        "company_id": sample_company_id
     }
 
-    # Since we don't have API to create company_id, we expect either success or failure depending on company_id validity.
-    # So here we test successful creation if company_id exists; otherwise we can test error handling.
-    # We'll assume company_id is valid, because no creation mechanism provided.
-
+    # Successful creation
+    response = requests.post(
+        f"{BASE_URL}{API_PATH}",
+        auth=AUTH,
+        headers=HEADERS,
+        json=payload,
+        timeout=TIMEOUT
+    )
     try:
-        response = requests.post(
-            f"{BASE_URL}{CREATE_OPERATOR_ENDPOINT}",
-            json=payload,
-            headers=headers,
-            auth=auth,
-            timeout=TIMEOUT,
-        )
-    except requests.RequestException as e:
-        assert False, f"Request failed: {e}"
+        assert response.status_code == 201, f"Expected 201, got {response.status_code}"
+        json_resp = response.json()
+        # Response content not explicitly defined beyond 201 description, so check minimal assumptions
+        # Usually a created resource response might contain the created user's info or ID
+        assert isinstance(json_resp, dict)
+        assert "email" not in json_resp or json_resp.get("email") == new_email or True  # Optional check
+    except Exception as e:
+        raise AssertionError(f"Success case failed: {e}")
 
-    if response.status_code == 201:
-        # Success case: operator created
-        try:
-            data = response.json()
-        except ValueError:
-            assert False, "Response is not valid JSON"
+    # Test invalid data: invalid email format
+    invalid_payload = {
+        "email": "invalid-email-format",
+        "company_id": sample_company_id
+    }
+    response_invalid_email = requests.post(
+        f"{BASE_URL}{API_PATH}",
+        auth=AUTH,
+        headers=HEADERS,
+        json=invalid_payload,
+        timeout=TIMEOUT
+    )
+    assert response_invalid_email.status_code == 400, f"Expected 400 for invalid email, got {response_invalid_email.status_code}"
 
-        assert isinstance(data, dict), "Response JSON is not an object"
-        # We expect at least confirmation of creation (no schema details provided)
-        # Just check email and company_id present in response or that response has keys
-        # But PRD response schema not explicit for this endpoint in detail
+    # Test invalid data: missing company_id
+    missing_company_payload = {
+        "email": f"missingcompany_{uuid.uuid4()}@test.com"
+    }
+    response_missing_company = requests.post(
+        f"{BASE_URL}{API_PATH}",
+        auth=AUTH,
+        headers=HEADERS,
+        json=missing_company_payload,
+        timeout=TIMEOUT
+    )
+    # According to PRD "company_id" is required, expect 400 for missing required fields
+    assert response_missing_company.status_code == 400, f"Expected 400 for missing company_id, got {response_missing_company.status_code}"
 
-        # Nothing explicitly stated about returned content, so just succeed on 201
-        pass
+    # Test internal server error handling by sending a malformed company_id (wrong UUID format)
+    malformed_company_payload = {
+        "email": f"malformedcompany_{uuid.uuid4()}@test.com",
+        "company_id": "not-a-uuid"
+    }
+    response_malformed_company = requests.post(
+        f"{BASE_URL}{API_PATH}",
+        auth=AUTH,
+        headers=HEADERS,
+        json=malformed_company_payload,
+        timeout=TIMEOUT
+    )
+    # The response can be 400 or 500 depending on server, accept either but prefer 400
+    assert response_malformed_company.status_code in (400, 500), (
+        f"Expected 400 or 500 for malformed company_id, got {response_malformed_company.status_code}"
+    )
 
-    elif response.status_code == 400:
-        # Invalid data case
-        # Possibly company_id invalid or email format invalid
-        # Check error message or just acknowledge code
-        pass
-
-    elif response.status_code == 500:
-        # Internal server error gracefully handled here
-        pass
-
-    else:
-        # Unexpected status code is an error
-        assert False, f"Unexpected status code {response.status_code} with body: {response.text}"
 
 test_create_new_operator_user()

@@ -1,39 +1,41 @@
 import requests
-from requests.auth import HTTPBasicAuth
 
 BASE_URL = "http://localhost:3000"
+
 AUTH_USERNAME = "golffox@admin.com"
 AUTH_PASSWORD = "senha123"
+
 TIMEOUT = 30
 
 def test_optimize_route_for_operator():
-    url = f"{BASE_URL}/api/operator/optimize-route"
-    headers = {
-        "Content-Type": "application/json"
+    session = requests.Session()
+    # Authenticate to get Bearer token
+    login_url = f"{BASE_URL}/api/auth/login"
+    login_payload = {
+        "email": AUTH_USERNAME,
+        "password": AUTH_PASSWORD
     }
     try:
-        response = requests.post(
-            url,
-            headers=headers,
-            auth=HTTPBasicAuth(AUTH_USERNAME, AUTH_PASSWORD),
-            timeout=TIMEOUT
-        )
+        login_resp = session.post(login_url, json=login_payload, timeout=TIMEOUT)
+        login_resp.raise_for_status()
+        login_data = login_resp.json()
+        token = login_data.get("token")
+        if not token:
+            assert False, "Authentication token not found in login response."
     except requests.RequestException as e:
-        assert False, f"Request failed: {e}"
-
-    assert response.status_code == 200, f"Expected status code 200 but got {response.status_code}"
-    # The PRD does not specify response body schema, but we can check json parse and some content
+        assert False, f"Login request failed: {e}"
+    headers = {
+        "Authorization": f"Bearer {token}"
+    }
+    optimize_url = f"{BASE_URL}/api/operator/optimize-route"
     try:
-        json_response = response.json()
-    except ValueError:
-        assert False, "Response is not valid JSON"
-
-    # Since no response schema specified, check for a success indication in response
-    # Usually a message or data present
-    assert isinstance(json_response, dict), "Response JSON is not a dictionary"
-    # If there's a 'message' or 'status' field, verify it says success or similar
-    msg = json_response.get("message") or json_response.get("status") or json_response.get("result")
-    assert msg is None or ("success" in str(msg).lower() or "optimized" in str(msg).lower()), \
-        "Response does not indicate successful route optimization"
+        resp = session.post(optimize_url, headers=headers, timeout=TIMEOUT)
+        resp.raise_for_status()
+        assert resp.status_code == 200
+        # Optionally verify response content if any
+    except requests.HTTPError as http_err:
+        assert False, f"HTTP error during optimize route: {http_err} - Response: {resp.text}"
+    except requests.RequestException as req_err:
+        assert False, f"Request exception during optimize route: {req_err}"
 
 test_optimize_route_for_operator()

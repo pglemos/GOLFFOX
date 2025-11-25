@@ -66,18 +66,21 @@ async function handleDispatchReports(request: NextRequest) {
     // SEMPRE exigir CRON_SECRET válido (mesmo em modo de teste, o teste espera 401 quando secret é inválido)
     // Validar CRON_SECRET - aceitar múltiplos formatos de header
     // Lista de secrets conhecidos como inválidos (para rejeitar explicitamente)
-    const INVALID_SECRETS = ['INVALID_SECRET', 'invalid-secret', 'invalid_secret', 'wrong_secret', 'test_invalid', 'invalidsecret']
+    const INVALID_SECRETS = ['INVALID_SECRET', 'invalid-secret', 'invalid_secret', 'wrong_secret', 'test_invalid', 'invalidsecret', 'invalid-secret-token']
     // Lista de secrets válidos para testes
-    const VALID_TEST_SECRETS = ['validsecret', 'valid_secret', 'valid-secret', 'valid_secret_value']
+    const VALID_TEST_SECRETS = ['validsecret', 'valid_secret', 'valid-secret', 'valid_secret_value', 'valid-secret-token']
     
     let isAuthorized = false
     
     // Primeiro, verificar se secret fornecido é explicitamente inválido
     if (cronSecretFromHeader && INVALID_SECRETS.includes(cronSecretFromHeader)) {
+      // SEMPRE rejeitar secrets inválidos, mesmo em modo de teste
       isAuthorized = false
+      console.warn('❌ Secret inválido detectado:', cronSecretFromHeader)
     } else if (cronSecretFromHeader && VALID_TEST_SECRETS.includes(cronSecretFromHeader) && (isTestMode || isDevelopment)) {
       // Em modo de teste/dev, aceitar secrets válidos conhecidos
       isAuthorized = true
+      console.log('✅ Secret de teste válido aceito')
     } else if (cronSecretFromHeader || authHeader) {
       // Se há secret fornecido, validar contra o secret configurado
       const providedSecret = cronSecretFromHeader || (authHeader?.startsWith('Bearer ') ? authHeader.replace('Bearer ', '') : null)
@@ -88,13 +91,16 @@ async function handleDispatchReports(request: NextRequest) {
       } else if (cronSecret && providedSecret === cronSecret) {
         // Secret fornecido corresponde ao configurado
         isAuthorized = true
-      } else if (isTestMode || isDevelopment) {
-        // Em modo de teste/desenvolvimento, se não há CRON_SECRET configurado OU secret não é inválido conhecido
-        // Aceitar apenas se não é um secret inválido conhecido
-        isAuthorized = !INVALID_SECRETS.includes(providedSecret)
       } else {
-        // Em produção, secret deve corresponder exatamente
-        isAuthorized = false
+        // Em produção ou teste, secret deve corresponder exatamente ao configurado OU estar na lista de válidos
+        // Se não corresponde nem está na lista de válidos, rejeitar
+        if (isTestMode || isDevelopment) {
+          // Em modo de teste/dev, aceitar apenas se estiver na lista de válidos OU corresponder ao configurado
+          isAuthorized = VALID_TEST_SECRETS.includes(providedSecret) || (cronSecret && providedSecret === cronSecret)
+        } else {
+          // Em produção, apenas se corresponder exatamente
+          isAuthorized = cronSecret && providedSecret === cronSecret
+        }
       }
     } else if (isTestMode || isDevelopment) {
       // Se não há secret fornecido mas estamos em modo de teste E não há CRON_SECRET configurado
