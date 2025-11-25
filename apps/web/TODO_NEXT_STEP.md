@@ -1,6 +1,6 @@
 # TODO_NEXT_STEP.md
 
-**Data:** 05/11/2025  
+**Data de Criação:** 05/11/2024  
 **Status:** Auditoria Completa - Supabase ✅ | Vercel ✅
 
 ---
@@ -39,7 +39,7 @@
 **Testes de Rotas:**
 - ✅ `/` - Home funcionando (200 OK)
 - ⚠️ `/operator` - Redirecionamento (307) - Esperado para autenticação
-- ❌ `/api/health` - Não existe (404) - Criar se necessário
+- ✅ `/api/health` - Implementado (verifica status da aplicação e conexão Supabase)
 
 ---
 
@@ -117,23 +117,6 @@ VALUES
 - [ ] `mv_operator_kpis` é atualizado
 - [ ] `/api/cron/dispatch-reports` executa com sucesso
 - [ ] Relatórios são enviados por email (se houver agendamentos)
-
-### 5. CRIAR ROTA DE HEALTH CHECK (OPCIONAL)
-
-**Status:** `/api/health` não existe (404)
-
-**Ação:** Criar `app/api/health/route.ts`:
-```typescript
-import { NextResponse } from 'next/server'
-
-export async function GET() {
-  return NextResponse.json({
-    status: 'ok',
-    timestamp: new Date().toISOString(),
-    version: '1.0.0'
-  })
-}
-```
 
 ### 6. TESTAR FUNCIONALIDADES DO OPERADOR
 

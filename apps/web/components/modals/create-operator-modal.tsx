@@ -16,7 +16,7 @@ import { Briefcase, UserPlus, Loader2 } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { notifySuccess, notifyError } from "@/lib/toast"
 import { globalSyncManager } from "@/lib/global-sync"
-import { formatPhone, formatCEP, formatCPF } from "@/lib/format-utils"
+import { formatPhone, formatCEP, formatCPF, formatCNPJ } from "@/lib/format-utils"
 
 interface CreateOperatorModalProps {
   isOpen: boolean
@@ -285,7 +285,7 @@ export function CreateOperatorModal({
                   <Input
                     id="cnpj"
                     value={formData.cnpj}
-                    onChange={(e) => setFormData({ ...formData, cnpj: formatCPF(e.target.value) })}
+                    onChange={(e) => setFormData({ ...formData, cnpj: formatCNPJ(e.target.value) })}
                     placeholder="00.000.000/0000-00"
                     disabled={loading}
                   />
