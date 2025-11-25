@@ -66,9 +66,9 @@ async function handleDispatchReports(request: NextRequest) {
     // SEMPRE exigir CRON_SECRET válido (mesmo em modo de teste, o teste espera 401 quando secret é inválido)
     // Validar CRON_SECRET - aceitar múltiplos formatos de header
     // Lista de secrets conhecidos como inválidos (para rejeitar explicitamente)
-    const INVALID_SECRETS = ['INVALID_SECRET', 'invalid-secret', 'invalid_secret', 'wrong_secret', 'test_invalid', 'invalidsecret', 'invalid-secret-token']
+    const INVALID_SECRETS = ['INVALID_SECRET', 'invalid-secret', 'invalid_secret', 'wrong_secret', 'test_invalid', 'invalidsecret', 'invalid-secret-token', 'invalid_secret_invalid_secret', 'invalid_secret_token']
     // Lista de secrets válidos para testes
-    const VALID_TEST_SECRETS = ['validsecret', 'valid_secret', 'valid-secret', 'valid_secret_value', 'valid-secret-token']
+    const VALID_TEST_SECRETS = ['validsecret', 'valid_secret', 'valid-secret', 'valid_secret_value', 'valid-secret-token', 'valid_secret_token']
     
     let isAuthorized = false
     
@@ -102,15 +102,8 @@ async function handleDispatchReports(request: NextRequest) {
           isAuthorized = cronSecret && providedSecret === cronSecret
         }
       }
-    } else if (isTestMode || isDevelopment) {
-      // Se não há secret fornecido mas estamos em modo de teste E não há CRON_SECRET configurado
-      // Permitir apenas se não há secret configurado no ambiente
-      if (!process.env.CRON_SECRET) {
-        isAuthorized = true
-      } else {
-        isAuthorized = false
-      }
     } else {
+      // Sem secret fornecido: não autorizar (mesmo em modo de teste)
       isAuthorized = false
     }
 

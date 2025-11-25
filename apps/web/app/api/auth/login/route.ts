@@ -402,6 +402,7 @@ async function loginHandler(req: NextRequest) {
       email: data.user.email || email,
       role,
       companyId: companyId || undefined,
+      company_id: companyId || undefined, // Adicionar snake_case para compatibilidade com testes
       transportadoraId: role === 'transportadora' ? transportadoraId : undefined,
     }
 

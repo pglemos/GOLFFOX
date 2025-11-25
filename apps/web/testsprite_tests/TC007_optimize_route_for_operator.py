@@ -1,41 +1,41 @@
 import requests
 
 BASE_URL = "http://localhost:3000"
-
-AUTH_USERNAME = "golffox@admin.com"
-AUTH_PASSWORD = "senha123"
-
+LOGIN_URL = f"{BASE_URL}/api/auth/login"
+OPTIMIZE_ROUTE_URL = f"{BASE_URL}/api/operator/optimize-route"
 TIMEOUT = 30
 
+USERNAME = "golffox@admin.com"
+PASSWORD = "senha123"
+
 def test_optimize_route_for_operator():
-    session = requests.Session()
-    # Authenticate to get Bearer token
-    login_url = f"{BASE_URL}/api/auth/login"
+    # Login to get token for authorization
     login_payload = {
-        "email": AUTH_USERNAME,
-        "password": AUTH_PASSWORD
+        "email": USERNAME,
+        "password": PASSWORD
     }
+
     try:
-        login_resp = session.post(login_url, json=login_payload, timeout=TIMEOUT)
-        login_resp.raise_for_status()
-        login_data = login_resp.json()
-        token = login_data.get("token")
-        if not token:
-            assert False, "Authentication token not found in login response."
-    except requests.RequestException as e:
-        assert False, f"Login request failed: {e}"
+        login_response = requests.post(LOGIN_URL, json=login_payload, timeout=TIMEOUT)
+        assert login_response.status_code == 200, f"Login failed with status code {login_response.status_code}"
+        login_data = login_response.json()
+        assert "token" in login_data, "Login response missing token"
+        token = login_data["token"]
+    except (requests.RequestException, AssertionError) as e:
+        raise AssertionError(f"Login failed: {e}")
+
     headers = {
-        "Authorization": f"Bearer {token}"
+        "Authorization": f"Bearer {token}",
+        "Content-Type": "application/json"
     }
-    optimize_url = f"{BASE_URL}/api/operator/optimize-route"
+
     try:
-        resp = session.post(optimize_url, headers=headers, timeout=TIMEOUT)
-        resp.raise_for_status()
-        assert resp.status_code == 200
-        # Optionally verify response content if any
-    except requests.HTTPError as http_err:
-        assert False, f"HTTP error during optimize route: {http_err} - Response: {resp.text}"
-    except requests.RequestException as req_err:
-        assert False, f"Request exception during optimize route: {req_err}"
+        optimize_response = requests.post(OPTIMIZE_ROUTE_URL, headers=headers, timeout=TIMEOUT)
+        assert optimize_response.status_code == 200, f"Optimize route failed with status code {optimize_response.status_code}"
+        # The spec does not mandate specific response body; checking presence of success message or similar
+        resp_json = optimize_response.json()
+        assert resp_json is not None, "Optimize route response is empty or not JSON"
+    except (requests.RequestException, AssertionError) as e:
+        raise AssertionError(f"Optimize route request failed: {e}")
 
 test_optimize_route_for_operator()
