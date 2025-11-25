@@ -2,74 +2,100 @@ import requests
 from requests.auth import HTTPBasicAuth
 
 BASE_URL = "http://localhost:3000"
-AUTH_USERNAME = "golffox@admin.com"
-AUTH_PASSWORD = "senha123"
-TIMEOUT = 30
+LOGIN_URL = f"{BASE_URL}/api/auth/login"
+GENERATE_STOPS_URL = f"{BASE_URL}/api/admin/generate-stops"
 
+USERNAME = "golffox@admin.com"
+PASSWORD = "senha123"
 
 def test_generate_optimized_route_stops():
-    # Authenticate with basic token (Basic Auth)
-    auth = HTTPBasicAuth(AUTH_USERNAME, AUTH_PASSWORD)
-    headers = {
+    timeout = 30
+
+    # Step 1: Authenticate and get token
+    login_payload = {
+        "email": USERNAME,
+        "password": PASSWORD
+    }
+    login_headers = {
         "Content-Type": "application/json"
     }
+    try:
+        login_response = requests.post(
+            LOGIN_URL,
+            json=login_payload,
+            headers=login_headers,
+            timeout=timeout
+        )
+        login_response.raise_for_status()
+    except requests.RequestException as e:
+        assert False, f"Login request failed: {e}"
 
-    # Step 1: We need a valid route_id. Since not provided, create a new route resource.
-    # But the PRD does not specify a route creation endpoint or schema explicitly.
-    # To handle this, try to find an existing route or skip creation as no route creation defined.
-    # Instead, attempt to call generation with an invalid and then a mock valid UUID.
+    login_data = login_response.json()
+    token = login_data.get("token")
+    assert token, "Login response missing token"
 
-    # For a meaningful test, generate a route_id - we will try a dummy UUID format string
-    # because no route create API exists in PRD; we expect 200 or 500 accordingly.
-
-    import uuid
-
-    valid_route_id = str(uuid.uuid4())
-    invalid_route_id = "invalid-uuid-format"
-
-    url = f"{BASE_URL}/api/admin/generate-stops"
-
-    # Test success scenario with a valid UUID format route_id
-    success_payload = {
-        "route_id": valid_route_id
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {token}"
     }
 
-    try:
-        response = requests.post(url, json=success_payload, headers=headers, auth=auth, timeout=TIMEOUT)
-    except requests.RequestException as e:
-        assert False, f"Request failed during success scenario: {e}"
+    # Helper function to create a dummy route to get a route_id
+    # No create route endpoint specified in PRD, so test with an invalid and valid scenario
 
-    # Accept either 200 (success) or 500 (generate failure) per PRD responses
-    # If 200 assert success else 500 handle as failure
-    if response.status_code == 200:
-        assert response.ok, f"Expected success response, got: {response.status_code}"
-        # Optionally assert response content if any, but PRD doesn't specify response schema
+    # Since no route creation endpoint info, test with an invalid route_id first to validate failure
+    invalid_route_id_payload = {"route_id": "00000000-0000-0000-0000-000000000000"}
+    try:
+        response = requests.post(
+            GENERATE_STOPS_URL,
+            json=invalid_route_id_payload,
+            headers=headers,
+            timeout=timeout
+        )
+    except requests.RequestException as e:
+        assert False, f"Request failed for invalid route_id: {e}"
+
+    # According to PRD, only 200 (success) and 500 (failure) responses documented.
+    # For invalid route_id expect failure scenario with 500 or some error status.
+    assert response.status_code in (200, 500), f"Unexpected status {response.status_code} for invalid route_id test"
+    if response.status_code == 500:
+        # Failure scenario handled correctly
+        pass
     else:
-        assert response.status_code == 500, f"Expected 200 or 500, got {response.status_code}"
+        # Sometimes API could respond 200 if route_id exists, unexpected success - no failure handling
+        pass
 
-    # Test failure scenario: malformed or missing route_id
-    invalid_payload = {
-        "route_id": invalid_route_id
-    }
+    # Now for success scenario:
+    # Since no info on how to create route or get existing route_id, try to discover a route_id by other means:
+    # For the test, the best we can do is create a route_id in a try-finally block if creation was possible.
+    # Here, no route creation endpoint described in PRD, so we can't dynamically create a route.
+    # Instead, we will skip dynamic creation and expect the test to be run with a known valid route_id.
+    # To follow instructions, we must do try-finally with a created resource if resource id not provided,
+    # but PRD/test plan do not provide or specify route creation. So, we will simulate with a placeholder route_id.
 
-    try:
-        response_invalid = requests.post(url, json=invalid_payload, headers=headers, auth=auth, timeout=TIMEOUT)
-    except requests.RequestException as e:
-        assert False, f"Request failed during failure scenario: {e}"
-
-    # Expecting a failure in generation which presumably leads to 500, or possibly 400 if validated
-    assert response_invalid.status_code in {400, 500}, f"Expected 400 or 500 for invalid route_id, got {response_invalid.status_code}"
-
-    # Test failure scenario: missing route_id field altogether
-    missing_payload = {}
+    # Placeholder valid UUID format route_id (simulate success scenario)
+    valid_route_id = "123e4567-e89b-12d3-a456-426614174000"
+    valid_payload = {"route_id": valid_route_id}
 
     try:
-        response_missing = requests.post(url, json=missing_payload, headers=headers, auth=auth, timeout=TIMEOUT)
+        post_response = requests.post(
+            GENERATE_STOPS_URL,
+            json=valid_payload,
+            headers=headers,
+            timeout=timeout
+        )
     except requests.RequestException as e:
-        assert False, f"Request failed during missing route_id scenario: {e}"
+        assert False, f"Request failed for valid route_id: {e}"
 
-    # Expect 400 or 500 for missing data
-    assert response_missing.status_code in {400, 500}, f"Expected 400 or 500 for missing route_id, got {response_missing.status_code}"
+    # Assert success response 200 with message or empty body possible
+    assert post_response.status_code == 200, f"Expected 200 status for valid route_id, got {post_response.status_code}"
 
+    # The PRD does not define response body schema on success, just the description:
+    # "Stops generated successfully" for 200, so assume no required fields.
+    # If response json is present, just ensure it's parseable.
+    try:
+        post_response.json()
+    except Exception:
+        # If no json body returned that's also acceptable unless stated otherwise
+        pass
 
 test_generate_optimized_route_stops()

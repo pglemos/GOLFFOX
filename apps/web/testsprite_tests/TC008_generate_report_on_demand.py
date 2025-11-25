@@ -1,63 +1,39 @@
 import requests
-from requests.auth import HTTPBasicAuth
-
-BASE_URL = "http://localhost:3000"
-LOGIN_ENDPOINT = "/api/auth/login"
-REPORT_RUN_ENDPOINT = "/api/reports/run"
-TIMEOUT = 30
-
-USERNAME = "golffox@admin.com"
-PASSWORD = "senha123"
 
 def test_generate_report_on_demand():
-    session = requests.Session()
-    try:
-        # Step 1: Authenticate and get token
-        login_resp = session.post(
-            BASE_URL + LOGIN_ENDPOINT,
-            json={"email": USERNAME, "password": PASSWORD},
-            timeout=TIMEOUT
-        )
-        assert login_resp.status_code == 200, f"Login failed with status {login_resp.status_code}"
-        login_data = login_resp.json()
-        token = login_data.get("token")
-        assert token and isinstance(token, str), "Token missing or invalid in login response"
+    base_url = "http://localhost:3000"
+    url = f"{base_url}/api/reports/run"
+    headers = {
+        "Content-Type": "application/json"
+    }
+    # Example valid report types and a dummy company_id for testing
+    report_types = ["daily-summary", "fleet-performance", "cost-analysis"]
+    formats = ["pdf", "excel", "csv"]
+    company_id = "00000000-0000-0000-0000-000000000001"
 
-        headers = {
-            "Authorization": f"Bearer {token}",
-            "Content-Type": "application/json"
-        }
-
-        # We need valid report_type and company_id
-        # Since these are not provided by the test plan or PRD, 
-        # we will attempt to create a placeholder report_type and company_id.
-        # But datamodel is absent, so we test with dummy values.
-        # Testing multiple formats as per test description
-
-        report_type = "fleet_summary"
-        company_id = "00000000-0000-0000-0000-000000000001"  # Dummy UUID for test
-
-        formats = ["pdf", "excel", "csv"]
-
+    for report_type in report_types:
         for fmt in formats:
             payload = {
                 "report_type": report_type,
                 "company_id": company_id,
                 "format": fmt
             }
-            resp = session.post(
-                BASE_URL + REPORT_RUN_ENDPOINT,
-                json=payload,
-                headers=headers,
-                timeout=TIMEOUT
-            )
-            assert resp.status_code == 200, f"Report generation failed for format {fmt} with status {resp.status_code}"
+            try:
+                response = requests.post(url, json=payload, headers=headers, timeout=30)
+            except requests.RequestException as e:
+                assert False, f"Request failed: {e}"
+            assert response.status_code == 200, f"Expected HTTP 200, got {response.status_code} for report_type: {report_type}, format: {fmt}"
+            # For a report generated response, content-type might be application/pdf, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, or text/csv
+            content_type = response.headers.get("Content-Type", "")
+            if fmt == "pdf":
+                assert "pdf" in content_type.lower(), f"Expected PDF content type for format pdf, got {content_type}"
+            elif fmt == "excel":
+                # Check for Excel MIME types
+                assert ("spreadsheetml" in content_type.lower() or "excel" in content_type.lower()), f"Expected Excel content type for format excel, got {content_type}"
+            elif fmt == "csv":
+                assert "csv" in content_type.lower() or "text/plain" in content_type.lower(), f"Expected CSV content type for format csv, got {content_type}"
+            # Assert some content is returned
+            assert response.content is not None and len(response.content) > 0, f"Empty content for report_type: {report_type}, format: {fmt}"
 
-            # Verify response content type matches expected report output type if any
-            # Since API doc doesn't specify content type, just check non-empty content
-            assert resp.content, f"Empty response content for format {fmt}"
-
-    finally:
-        session.close()
 
 test_generate_report_on_demand()
