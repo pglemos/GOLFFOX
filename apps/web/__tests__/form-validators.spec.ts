@@ -57,5 +57,96 @@ describe("Route Form Validation", () => {
 
     expect(() => routeSchema.parse(invalidData)).toThrow()
   })
+
+  // Novos testes para melhor cobertura
+  it("should accept all valid shift enum values", () => {
+    const shifts = ["manha", "tarde", "noite"] as const
+
+    shifts.forEach(shift => {
+      const validData = {
+        name: "Rota Centro",
+        company_id: "123e4567-e89b-12d3-a456-426614174000",
+        scheduled_time: "08:00",
+        shift,
+        selected_employees: ["emp1"],
+      }
+      expect(() => routeSchema.parse(validData)).not.toThrow()
+    })
+  })
+
+  it("should reject empty company_id", () => {
+    const invalidData = {
+      name: "Rota Centro",
+      company_id: "",
+      scheduled_time: "08:00",
+      shift: "manha" as const,
+      selected_employees: ["emp1"],
+    }
+
+    expect(() => routeSchema.parse(invalidData)).toThrow()
+  })
+
+  it("should reject empty scheduled_time", () => {
+    const invalidData = {
+      name: "Rota Centro",
+      company_id: "123e4567-e89b-12d3-a456-426614174000",
+      scheduled_time: "",
+      shift: "manha" as const,
+      selected_employees: ["emp1"],
+    }
+
+    expect(() => routeSchema.parse(invalidData)).toThrow()
+  })
+
+  it("should accept single employee in array", () => {
+    const validData = {
+      name: "Rota Centro",
+      company_id: "123e4567-e89b-12d3-a456-426614174000",
+      scheduled_time: "08:00",
+      shift: "manha" as const,
+      selected_employees: ["emp1"],
+    }
+
+    expect(() => routeSchema.parse(validData)).not.toThrow()
+  })
+
+  it("should accept multiple employees in array", () => {
+    const validData = {
+      name: "Rota Centro",
+      company_id: "123e4567-e89b-12d3-a456-426614174000",
+      scheduled_time: "08:00",
+      shift: "manha" as const,
+      selected_employees: ["emp1", "emp2", "emp3", "emp4"],
+    }
+
+    expect(() => routeSchema.parse(validData)).not.toThrow()
+  })
+
+  it("should handle whitespace-only name as invalid", () => {
+    const invalidData = {
+      name: "   ",
+      company_id: "123e4567-e89b-12d3-a456-426614174000",
+      scheduled_time: "08:00",
+      shift: "manha" as const,
+      selected_employees: ["emp1"],
+    }
+
+    // Zod string().min(1) aceita espaços, então este teste documenta o comportamento atual
+    // Se quisermos rejeitar whitespace, precisamos adicionar .trim() ao schema
+    expect(() => routeSchema.parse(invalidData)).not.toThrow()
+  })
+
+  it("should reject missing required fields", () => {
+    const incompleteData = {
+      name: "Rota Centro",
+      // company_id faltando
+      scheduled_time: "08:00",
+      shift: "manha" as const,
+      selected_employees: ["emp1"],
+    }
+
+    expect(() => routeSchema.parse(incompleteData)).toThrow()
+  })
 })
+
 

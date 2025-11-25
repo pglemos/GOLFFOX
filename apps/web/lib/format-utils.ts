@@ -92,3 +92,35 @@ export function isValidCEPFormat(cep: string): boolean {
     const pattern = /^\d{5}-\d{3}$/
     return pattern.test(cep)
 }
+
+/**
+ * Formats a CNPJ string to XX.XXX.XXX/XXXX-XX pattern
+ */
+export function formatCNPJ(value: string): string {
+    // Remove all non-digits
+    const numbers = value.replace(/\D/g, '')
+
+    // Limit to 14 digits
+    const limited = numbers.slice(0, 14)
+
+    // Apply formatting
+    if (limited.length <= 2) {
+        return limited
+    } else if (limited.length <= 5) {
+        return `${limited.slice(0, 2)}.${limited.slice(2)}`
+    } else if (limited.length <= 8) {
+        return `${limited.slice(0, 2)}.${limited.slice(2, 5)}.${limited.slice(5)}`
+    } else if (limited.length <= 12) {
+        return `${limited.slice(0, 2)}.${limited.slice(2, 5)}.${limited.slice(5, 8)}/${limited.slice(8)}`
+    } else {
+        return `${limited.slice(0, 2)}.${limited.slice(2, 5)}.${limited.slice(5, 8)}/${limited.slice(8, 12)}-${limited.slice(12)}`
+    }
+}
+
+/**
+ * Validates if a CNPJ is in the correct format (XX.XXX.XXX/XXXX-XX)
+ */
+export function isValidCNPJFormat(cnpj: string): boolean {
+    const pattern = /^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/
+    return pattern.test(cnpj)
+}
