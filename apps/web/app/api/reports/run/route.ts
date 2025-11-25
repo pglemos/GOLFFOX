@@ -96,10 +96,13 @@ async function runReportHandler(request: NextRequest) {
                   'fleet': 'efficiency', // Mapear fleet para efficiency
                   'fleet-performance': 'efficiency', // Mapear fleet-performance para efficiency
                   'fleet_performance': 'efficiency', // Mapear fleet_performance para efficiency
+                  'fleet_status': 'efficiency', // Mapear fleet_status para efficiency
                   'vehicles': 'efficiency', // Mapear vehicles para efficiency
                   'routes': 'efficiency', // Mapear routes para efficiency
                   'cost-analysis': 'efficiency', // Mapear cost-analysis para efficiency
                   'cost_analysis': 'efficiency', // Mapear cost_analysis para efficiency
+                  'cost_summary': 'efficiency', // Mapear cost_summary para efficiency
+                  'driver_performance': 'driver_ranking', // Mapear driver_performance para driver_ranking
                 }
 
     // Normalizar reportKey (case-insensitive)
@@ -161,6 +164,12 @@ async function runReportHandler(request: NextRequest) {
       }
     } else {
       console.log('⚠️ Modo de teste/desenvolvimento: bypass de autenticação ativado para relatórios')
+      
+      // Em modo de teste, se não há companyId nos filtros, usar um padrão
+      if (!filters.companyId && !companyIdFromBody) {
+        filters.companyId = '00000000-0000-0000-0000-000000000001'
+        console.log(`⚠️ Usando company_id padrão para teste: ${filters.companyId}`)
+      }
     }
 
     const config = REPORT_CONFIGS[finalReportKey]
@@ -469,7 +478,7 @@ function generateCSV(data: any[], columns: string[], reportKey: string) {
 
   return new NextResponse(csvWithBOM, {
     headers: {
-      'Content-Type': 'text/csv; charset=utf-8',
+      'Content-Type': 'text/csv',
       'Content-Disposition': `attachment; filename="${filename}"`
     }
   })
@@ -524,7 +533,7 @@ async function generateCSVStream(
   })
   return new Response(stream, {
     headers: {
-      'Content-Type': 'text/csv; charset=utf-8',
+      'Content-Type': 'text/csv',
       'Content-Disposition': `attachment; filename="${filename}"`
     }
   })

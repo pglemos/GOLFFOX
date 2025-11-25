@@ -54,15 +54,8 @@ export async function POST(request: NextRequest) {
         // Token inválido ou ausente: retornar 401
         return authErrorResponse
       }
-    } else if (!hasAuth && !isTestMode && !isDevelopment) {
-      // Sem autenticação: retornar 401 (mas só se não for modo de teste)
-      // Em modo de teste, o proxy pode causar 407, então vamos garantir que retornamos 401 antes
-      return NextResponse.json(
-        { error: 'Unauthorized', message: 'Token de autenticação não fornecido' },
-        { status: 401 }
-      )
     } else if (!hasAuth) {
-      // Em modo de teste/dev sem auth, também retornar 401
+      // Sem autenticação: retornar 401 (evitar 407 do proxy)
       return NextResponse.json(
         { error: 'Unauthorized', message: 'Token de autenticação não fornecido' },
         { status: 401 }
