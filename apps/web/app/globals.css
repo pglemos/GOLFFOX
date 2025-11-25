@@ -1746,6 +1746,19 @@
   }
 }
 
+/* Login safe-area adjustments */
+.safe-area-login {
+  padding-top: calc(var(--safe-top) + 1rem);
+  padding-bottom: calc(var(--safe-bottom) + 1.25rem);
+}
+
+@media (min-width: 640px) {
+  .safe-area-login {
+    padding-top: calc(var(--safe-top) + 1.5rem);
+    padding-bottom: calc(var(--safe-bottom) + 1.5rem);
+  }
+}
+
 /* Texto responsivo */
 .text-responsive-sm {
   font-size: 0.875rem;

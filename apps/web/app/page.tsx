@@ -618,7 +618,7 @@ function LoginContent() {
   )
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row relative overflow-hidden bg-black w-full max-w-full">
+    <div className="min-h-[100dvh] flex flex-col lg:flex-row relative overflow-hidden bg-black w-full max-w-full">
       {/* Background com efeitos sutis */}
       <FloatingOrbs />
       
@@ -756,7 +756,7 @@ function LoginContent() {
       </motion.div>
 
       {/* Seção Direita - Formulário Minimalista */}
-      <div className="flex-1 lg:w-1/2 bg-white flex flex-col min-h-screen relative w-full max-w-full overflow-x-hidden">
+      <div className="flex-1 lg:w-1/2 bg-white flex flex-col min-h-[100dvh] relative w-full max-w-full overflow-x-hidden safe-area-login">
         {/* Barra superior minimalista (apenas desktop) */}
         <div className="hidden lg:flex justify-end items-center p-8 relative z-10">
           <motion.div
@@ -770,14 +770,14 @@ function LoginContent() {
             </div>
 
         {/* Formulário de Login Minimalista */}
-        <div className="flex-1 flex items-center justify-center px-4 sm:px-6 md:px-8 lg:px-16 py-6 sm:py-8 md:py-12 relative z-10 w-full max-w-full overflow-x-hidden">
+        <div className="flex-1 flex items-center justify-center px-4 sm:px-6 md:px-8 lg:px-16 py-6 sm:py-8 md:py-12 relative z-10 w-full max-w-full overflow-x-hidden min-h-[calc(100dvh-var(--safe-top)-var(--safe-bottom))]">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-            className="w-full max-w-md mx-auto min-w-0"
+            className="w-full max-w-lg mx-auto min-w-0 px-1 sm:px-0"
           >
-            <div className="relative w-full min-w-0">
+            <div className="relative w-full min-w-0 bg-white/90 border border-gray-100 shadow-xl shadow-orange-500/5 rounded-3xl sm:rounded-[32px] px-4 sm:px-6 md:px-8 py-6 sm:py-8">
               {/* Logo mobile com destaque */}
               <motion.div 
                 initial={{ opacity: 0, scale: 0.8 }}
