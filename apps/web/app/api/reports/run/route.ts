@@ -86,6 +86,10 @@ async function runReportHandler(request: NextRequest) {
                   'daily': 'delays',
                   'weekly': 'efficiency',
                   'annual': 'efficiency',
+                  'fleet_summary': 'efficiency', // Mapear fleet_summary para efficiency
+                  'fleet': 'efficiency', // Mapear fleet para efficiency
+                  'vehicles': 'efficiency', // Mapear vehicles para efficiency
+                  'routes': 'efficiency', // Mapear routes para efficiency
                 }
 
     // Normalizar reportKey (case-insensitive)
