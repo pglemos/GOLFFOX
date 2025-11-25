@@ -2,60 +2,62 @@ import requests
 from requests.auth import HTTPBasicAuth
 
 BASE_URL = "http://localhost:3000"
-LOGIN_URL = f"{BASE_URL}/api/auth/login"
-REPORT_RUN_URL = f"{BASE_URL}/api/reports/run"
+LOGIN_ENDPOINT = "/api/auth/login"
+REPORT_RUN_ENDPOINT = "/api/reports/run"
+TIMEOUT = 30
 
 USERNAME = "golffox@admin.com"
 PASSWORD = "senha123"
-TIMEOUT = 30
 
-def get_auth_token():
+def test_generate_report_on_demand():
+    session = requests.Session()
     try:
-        response = requests.post(
-            LOGIN_URL,
+        # Step 1: Authenticate and get token
+        login_resp = session.post(
+            BASE_URL + LOGIN_ENDPOINT,
             json={"email": USERNAME, "password": PASSWORD},
             timeout=TIMEOUT
         )
-        response.raise_for_status()
-        data = response.json()
-        token = data.get("token")
-        if not token:
-            raise ValueError("No auth token returned in login response")
-        return token
-    except Exception as e:
-        raise RuntimeError(f"Authentication failed: {e}")
+        assert login_resp.status_code == 200, f"Login failed with status {login_resp.status_code}"
+        login_data = login_resp.json()
+        token = login_data.get("token")
+        assert token and isinstance(token, str), "Token missing or invalid in login response"
 
-def test_generate_report_on_demand():
-    token = get_auth_token()
-    headers = {
-        "Authorization": f"Bearer {token}",
-        "Content-Type": "application/json",
-    }
-
-    # We need valid report_type and company_id - since not provided,
-    # typically the test must create or obtain these.
-    # Here we assume minimal sample placeholder values:
-    report_type = "summary"   # Assuming "summary" is a valid report_type
-    company_id = "00000000-0000-0000-0000-000000000001"  # Placeholder UUID
-
-    formats = ["pdf", "excel", "csv"]
-
-    for fmt in formats:
-        payload = {
-            "report_type": report_type,
-            "company_id": company_id,
-            "format": fmt
+        headers = {
+            "Authorization": f"Bearer {token}",
+            "Content-Type": "application/json"
         }
-        try:
-            response = requests.post(REPORT_RUN_URL, json=payload, headers=headers, timeout=TIMEOUT)
-            response.raise_for_status()
-            # Response code 200 indicates report generated successfully
-            assert response.status_code == 200
-            # Content-Type can vary but typically should reflect the format; we check presence of data
-            assert response.content is not None and len(response.content) > 0
-        except requests.RequestException as e:
-            raise AssertionError(f"Request failed for format '{fmt}': {e}")
-        except AssertionError as ae:
-            raise AssertionError(f"Assertion failed for format '{fmt}': {ae}")
+
+        # We need valid report_type and company_id
+        # Since these are not provided by the test plan or PRD, 
+        # we will attempt to create a placeholder report_type and company_id.
+        # But datamodel is absent, so we test with dummy values.
+        # Testing multiple formats as per test description
+
+        report_type = "fleet_summary"
+        company_id = "00000000-0000-0000-0000-000000000001"  # Dummy UUID for test
+
+        formats = ["pdf", "excel", "csv"]
+
+        for fmt in formats:
+            payload = {
+                "report_type": report_type,
+                "company_id": company_id,
+                "format": fmt
+            }
+            resp = session.post(
+                BASE_URL + REPORT_RUN_ENDPOINT,
+                json=payload,
+                headers=headers,
+                timeout=TIMEOUT
+            )
+            assert resp.status_code == 200, f"Report generation failed for format {fmt} with status {resp.status_code}"
+
+            # Verify response content type matches expected report output type if any
+            # Since API doc doesn't specify content type, just check non-empty content
+            assert resp.content, f"Empty response content for format {fmt}"
+
+    finally:
+        session.close()
 
 test_generate_report_on_demand()

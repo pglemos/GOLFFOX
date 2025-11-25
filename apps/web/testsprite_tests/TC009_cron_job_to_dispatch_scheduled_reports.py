@@ -1,45 +1,54 @@
 import requests
 
 BASE_URL = "http://localhost:3000"
-CRON_DISPATCH_ENDPOINT = f"{BASE_URL}/api/cron/dispatch-reports"
+CRON_DISPATCH_ENDPOINT = "/api/cron/dispatch-reports"
 TIMEOUT = 30
 
 
 def test_cron_dispatch_reports():
-    headers_valid = {
-        "CRON_SECRET": "valid_cron_secret_placeholder"
+    # Test with invalid cronSecret header (expect 401)
+    invalid_headers = {
+        "x-cron-secret": "invalidsecret"
     }
-    headers_invalid = {
-        "CRON_SECRET": "invalid_cron_secret"
-    }
-
-    # Attempt dispatch with valid CRON_SECRET header
     try:
-        response = requests.post(
-            CRON_DISPATCH_ENDPOINT,
-            headers=headers_valid,
+        response_invalid = requests.post(
+            BASE_URL + CRON_DISPATCH_ENDPOINT,
+            headers=invalid_headers,
             timeout=TIMEOUT
         )
-        assert response.status_code == 200, f"Expected 200 for valid CRON_SECRET but got {response.status_code}"
-        # Optionally check response content if specified
-        try:
-            json_data = response.json()
-            assert isinstance(json_data, (dict, list)) or json_data is None
-        except ValueError:
-            pass
+        assert response_invalid.status_code == 401, f"Expected 401 for invalid cronSecret, got {response_invalid.status_code}"
     except requests.RequestException as e:
-        assert False, f"Request failed with exception: {e}"
+        assert False, f"Request with invalid cronSecret failed: {e}"
 
-    # Attempt dispatch with invalid CRON_SECRET header to trigger 401
+    # Test without cronSecret header (expect 401)
     try:
-        response = requests.post(
-            CRON_DISPATCH_ENDPOINT,
-            headers=headers_invalid,
+        response_no_secret = requests.post(
+            BASE_URL + CRON_DISPATCH_ENDPOINT,
             timeout=TIMEOUT
         )
-        assert response.status_code == 401, f"Expected 401 for invalid CRON_SECRET but got {response.status_code}"
+        assert response_no_secret.status_code == 401, f"Expected 401 without cronSecret, got {response_no_secret.status_code}"
     except requests.RequestException as e:
-        assert False, f"Request failed with exception: {e}"
+        assert False, f"Request without cronSecret failed: {e}"
+
+    # Test with a placeholder valid cronSecret header (expect 200)
+    valid_cron_secret = "validsecret"  # Replace with actual secret if known
+    valid_headers = {
+        "x-cron-secret": valid_cron_secret
+    }
+    try:
+        response_valid = requests.post(
+            BASE_URL + CRON_DISPATCH_ENDPOINT,
+            headers=valid_headers,
+            timeout=TIMEOUT
+        )
+        assert response_valid.status_code == 200, f"Expected 200 for valid cronSecret, got {response_valid.status_code}"
+        json_resp = response_valid.json()
+        # We expect a success message or indication of dispatch success
+        assert isinstance(json_resp, dict), "Response should be a JSON object"
+    except requests.RequestException as e:
+        assert False, f"Request with valid cronSecret failed: {e}"
+    except ValueError:
+        assert False, "Response is not valid JSON"
 
 
 test_cron_dispatch_reports()
