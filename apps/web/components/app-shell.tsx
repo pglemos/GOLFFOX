@@ -162,7 +162,7 @@ export const AppShell = memo(function AppShell({ user, children, panel }: AppShe
         <main 
           className={cn(
             "min-h-[calc(100vh-4rem)] sm:min-h-[calc(100vh-4.5rem)] transition-all duration-300 ease-in-out",                                                     
-            "overflow-y-auto overflow-x-hidden bg-[var(--bg)] pb-12 sm:pb-14",
+              "overflow-y-auto overflow-x-hidden bg-[var(--bg)] pb-12 sm:pb-14 safe-area-shell",
             !isMobile ? "flex-1 lg:ml-[60px]" : "w-full ml-0 flex-shrink-0",
             "max-w-full w-full",
             "relative z-50 mobile-scroll-region"

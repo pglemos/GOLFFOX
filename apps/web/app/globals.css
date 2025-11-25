@@ -1793,6 +1793,7 @@
    ======================================== */
 
 .safe-area-page {
+  padding-top: max(0.75rem, var(--safe-top));
   padding-left: max(1rem, var(--safe-left));
   padding-right: max(1rem, var(--safe-right));
   padding-bottom: max(1rem, var(--safe-bottom));
@@ -1800,8 +1801,21 @@
 
 @media (min-width: 640px) {
   .safe-area-page {
+    padding-top: max(1rem, var(--safe-top));
     padding-left: max(1.5rem, var(--safe-left));
     padding-right: max(1.5rem, var(--safe-right));
+  }
+}
+
+.safe-area-shell {
+  padding-top: max(1rem, var(--safe-top));
+  padding-bottom: max(1.25rem, var(--safe-bottom));
+}
+
+@media (min-width: 768px) {
+  .safe-area-shell {
+    padding-top: max(1.25rem, var(--safe-top));
+    padding-bottom: max(1.5rem, var(--safe-bottom));
   }
 }
 
@@ -1809,6 +1823,8 @@
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
   scrollbar-gutter: stable both-edges;
+  padding-left: max(0px, var(--safe-left));
+  padding-right: max(0px, var(--safe-right));
 }
 
 .responsive-toolbar {
