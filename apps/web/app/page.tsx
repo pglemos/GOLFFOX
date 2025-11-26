@@ -31,8 +31,8 @@ const FloatingOrbs = () => {
           className="absolute w-[500px] h-[500px] rounded-full"
           style={{
             background: `radial-gradient(circle, ${i === 0 ? 'rgba(249, 115, 22, 0.15)' :
-                i === 1 ? 'rgba(139, 92, 246, 0.1)' :
-                  'rgba(59, 130, 246, 0.1)'
+              i === 1 ? 'rgba(139, 92, 246, 0.1)' :
+                'rgba(59, 130, 246, 0.1)'
               } 0%, transparent 70%)`,
             filter: 'blur(60px)',
           }}
@@ -932,8 +932,8 @@ function LoginContent() {
                       }}
                       autoComplete="email"
                       className={`w-full h-12 sm:h-14 px-3 sm:px-4 bg-gray-50 border ${fieldErrors.email
-                          ? "border-red-300 focus:border-red-500 focus:ring-red-200"
-                          : "border-gray-200 focus:border-[#F97316] focus:ring-orange-100"
+                        ? "border-red-300 focus:border-red-500 focus:ring-red-200"
+                        : "border-gray-200 focus:border-[#F97316] focus:ring-orange-100"
                         } rounded-xl sm:rounded-2xl text-base transition-all focus:ring-2 focus:bg-white placeholder:text-gray-400`}
                     />
                     {fieldErrors.email && (
@@ -964,9 +964,9 @@ function LoginContent() {
                       }}
                       ref={passwordInputRef}
                       autoComplete="current-password"
-                      className={`w-full h-12 sm:h-14 px-3 sm:px-4 pr-10 sm:pr-12 bg-gray-50 border ${fieldErrors.password
-                          ? "border-red-300 focus:border-red-500 focus:ring-red-200"
-                          : "border-gray-200 focus:border-[#F97316] focus:ring-orange-100"
+                      className={`w-full h-12 sm:h-14 px-3 sm:px-4 pr-12 sm:pr-14 bg-gray-50 border ${fieldErrors.password
+                        ? "border-red-300 focus:border-red-500 focus:ring-red-200"
+                        : "border-gray-200 focus:border-[#F97316] focus:ring-orange-100"
                         } rounded-xl sm:rounded-2xl text-base transition-all focus:ring-2 focus:bg-white placeholder:text-gray-400`}
                     />
                     <button
@@ -986,22 +986,22 @@ function LoginContent() {
                 </div>
 
                 {/* Opções extras */}
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0 text-xs sm:text-sm">
-                  <label className="flex items-center gap-2 cursor-pointer group touch-manipulation">
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-0 text-xs sm:text-sm w-full">
+                  <label className="flex items-center gap-2 cursor-pointer group touch-manipulation flex-nowrap">
                     <Checkbox
                       id="remember-me"
                       checked={rememberMe}
                       onCheckedChange={(checked) => setRememberMe(checked === true)}
                       className="h-4 w-4 rounded border-gray-300 data-[state=checked]:bg-[#F97316] data-[state=checked]:border-[#F97316]"
                     />
-                    <span className="text-gray-600 group-hover:text-gray-900 transition-colors">
+                    <span className="whitespace-nowrap text-gray-600 group-hover:text-gray-900 transition-colors">
                       Lembrar-me
                     </span>
                   </label>
                   <button
                     type="button"
                     onClick={() => setError("Funcionalidade em desenvolvimento")}
-                    className="text-gray-600 hover:text-gray-900 transition-colors touch-manipulation text-xs sm:text-sm"
+                    className="text-gray-600 hover:text-gray-900 transition-colors touch-manipulation text-xs sm:text-sm whitespace-nowrap"
                   >
                     Esqueceu a senha?
                   </button>
