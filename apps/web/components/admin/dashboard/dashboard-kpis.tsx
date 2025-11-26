@@ -1,6 +1,6 @@
 import { motion } from "framer-motion"
 import { Stat } from "@/components/ui/Stat"
-import { Users, Truck, Navigation, AlertCircle, Target, Gauge } from "lucide-react"
+import { Users, Truck, Navigation, AlertCircle, TrendingUp, Gauge } from "lucide-react"
 import { formatCount } from "@/lib/kpi-utils"
 import { staggerContainer, listItem } from "@/lib/animations"
 import { t } from '@/lib/i18n'
@@ -22,7 +22,7 @@ export function DashboardKPIs({ kpis }: DashboardKPIsProps) {
             variants={staggerContainer}
             initial="hidden"
             animate="visible"
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-3 sm:gap-4 lg:gap-6"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 lg:gap-6"
         >
             <motion.div variants={listItem}>
                 <Stat
@@ -58,7 +58,7 @@ export function DashboardKPIs({ kpis }: DashboardKPIsProps) {
             </motion.div>
             <motion.div variants={listItem}>
                 <Stat
-                    icon={Target}
+                    icon={TrendingUp}
                     label={t('admin', 'dashboard.kpis.routeEfficiency')}
                     value={`${kpis.routeEfficiency}%`}
                     hint={t('admin', 'dashboard.kpis.completionRate')}

@@ -1,0 +1,134 @@
+/* ============================================================
+   PERFORMANCE & ACESSIBILIDADE - Mobile Otimizações
+   ============================================================ */
+
+/* Reduzir animações para usuários que preferem movimento reduzido */
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+
+    /* Desabilitar animações do Framer Motion */
+    [class*="motion"] {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+/* Otimizações de imagem para performance */
+img {
+    /* Prevenir layout shift */
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
+
+/* Lazy loading indicator */
+img[loading="lazy"] {
+    /* Placeholder durante carregamento */
+    background: var(--bg-soft);
+}
+
+/* Otimização de scroll em mobile */
+.table-responsive-wrapper {
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+}
+
+.table-responsive-wrapper::-webkit-scrollbar {
+    height: 8px;
+}
+
+.table-responsive-wrapper::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.table-responsive-wrapper::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 4px;
+}
+
+.table-responsive-wrapper::-webkit-scrollbar-thumb:hover {
+    background: var(--border-strong);
+}
+
+/* Performance: usar will-change apenas em elementos que animam */
+.stat-card:hover,
+[class*="motion"]:hover {
+    will-change: transform;
+}
+
+.stat-card:not(:hover),
+[class*="motion"]:not(:hover) {
+    will-change: auto;
+}
+
+/* Skeleton loading states */
+.skeleton {
+    position: relative;
+    overflow: hidden;
+    background: var(--bg-soft);
+    border-radius: var(--radius-md);
+}
+
+.skeleton::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background: linear-gradient(90deg,
+            transparent,
+            rgba(255, 255, 255, 0.4),
+            transparent);
+    animation: skeleton-loading 1.5s ease-in-out infinite;
+}
+
+@keyframes skeleton-loading {
+    0% {
+        transform: translateX(-100%);
+    }
+
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+/* Dark mode skeleton */
+.dark .skeleton::after {
+    background: linear-gradient(90deg,
+            transparent,
+            rgba(255, 255, 255, 0.1),
+            transparent);
+}
+
+/* Otimização de GPU para animações */
+@media (min-width: 768px) {
+
+    .stat-card,
+    [class*="motion"],
+    .card-glass {
+        transform: translateZ(0);
+        backface-visibility: hidden;
+        perspective: 1000px;
+    }
+}
+
+/* Mobile: desabilitar hover effects para economizar performance */
+@media (hover: none) and (pointer: coarse) {
+
+    .stat-card:hover,
+    .card-glass:hover,
+    button:hover:not(:active) {
+        transform: none;
+        box-shadow: var(--shadow-sm);
+    }
+}

@@ -30,11 +30,10 @@ const FloatingOrbs = () => {
           key={i}
           className="absolute w-[500px] h-[500px] rounded-full"
           style={{
-            background: `radial-gradient(circle, ${
-              i === 0 ? 'rgba(249, 115, 22, 0.15)' : 
-              i === 1 ? 'rgba(139, 92, 246, 0.1)' : 
-              'rgba(59, 130, 246, 0.1)'
-            } 0%, transparent 70%)`,
+            background: `radial-gradient(circle, ${i === 0 ? 'rgba(249, 115, 22, 0.15)' :
+                i === 1 ? 'rgba(139, 92, 246, 0.1)' :
+                  'rgba(59, 130, 246, 0.1)'
+              } 0%, transparent 70%)`,
             filter: 'blur(60px)',
           }}
           initial={{
@@ -82,14 +81,14 @@ function LoginContent() {
   // Verificar sessão apenas uma vez no mount, com tratamento de erro robusto
   useEffect(() => {
     const nextParam = searchParams.get('next')
-    
+
     // Se há ?next= na URL, significa que o middleware redirecionou aqui
     // Neste caso, NÃO verificar sessão para evitar loops
     // O middleware já verificou e redirecionou, então apenas mostrar a página de login
     if (nextParam) {
       return
     }
-    
+
     // Evitar múltiplas verificações - verificar apenas uma vez
     if (sessionCheckRef.current) {
       return
@@ -112,9 +111,9 @@ function LoginContent() {
         // ✅ Usar apenas verificação de cookie - não usar Supabase auth na página de login
         // para evitar conflitos e erros de logout automático
         if (typeof window === 'undefined') return
-        
+
         const hasSessionCookie = document.cookie.includes('golffox-session')
-        
+
         if (!hasSessionCookie) {
           return
         }
@@ -135,13 +134,13 @@ function LoginContent() {
 
           const decoded = atob(cookieMatch[1])
           const userData = JSON.parse(decoded)
-          
+
           if (!userData || !userData.role) {
             // Dados inválidos, limpar cookie
             document.cookie = 'golffox-session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT'
             return
           }
-          
+
           const userRole = userData.role || getUserRoleByEmail(userData.email || '')
 
           // Não usar nextParam aqui pois já verificamos acima que não há nextParam
@@ -156,8 +155,8 @@ function LoginContent() {
           }
 
           let redirectUrl = userRole === 'admin' ? '/admin' :
-                            userRole === 'operador' ? '/operador' :
-                            userRole === 'transportadora' ? '/transportadora' : '/dashboard'
+            userRole === 'operador' ? '/operador' :
+              userRole === 'transportadora' ? '/transportadora' : '/dashboard'
 
           if (safeNext && isAllowedForRole(userRole, safeNext)) {
             redirectUrl = safeNext
@@ -167,12 +166,12 @@ function LoginContent() {
           if (typeof window !== 'undefined') {
             const currentPath = window.location.pathname
             const currentSearch = window.location.search
-            
+
             // Se já estamos na URL de destino (com ou sem query params), não redirecionar
             if (currentPath === redirectUrl || (currentPath === redirectUrl && !currentSearch.includes('next='))) {
               return
             }
-            
+
             // Se estamos na raiz sem query params e temos sessão válida, redirecionar
             // Mas apenas se não estivermos já redirecionando
             if (currentPath === '/' && !currentSearch && redirectUrl !== '/') {
@@ -187,7 +186,7 @@ function LoginContent() {
           if (typeof window !== 'undefined') {
             (window as any).__golffox_redirecting = true
           }
-          
+
           if (userRole) {
             // Usar router.push para evitar reload completo e manter estado
             // Isso evita que o middleware seja executado novamente antes do cookie ser processado
@@ -204,7 +203,7 @@ function LoginContent() {
           console.warn('⚠️ Erro ao decodificar cookie:', err)
           try {
             document.cookie = 'golffox-session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT'
-          } catch {}
+          } catch { }
         }
       } catch (err) {
         // Erro geral - apenas logar e continuar na página de login
@@ -221,7 +220,7 @@ function LoginContent() {
   useEffect(() => {
     const fetchCsrf = async () => {
       try {
-        const res = await fetch('/api/auth/csrf', { 
+        const res = await fetch('/api/auth/csrf', {
           method: 'GET',
           credentials: 'include' // Incluir cookies na requisição
         })
@@ -284,7 +283,7 @@ function LoginContent() {
         if (typeof data?.failedAttempts === 'number') setFailedAttempts(data.failedAttempts)
         if (typeof data?.blockedUntil === 'number') setBlockedUntil(data.blockedUntil)
       }
-    } catch {}
+    } catch { }
   }, [])
 
   // Persistir estado de tentativas
@@ -292,7 +291,7 @@ function LoginContent() {
     if (typeof window === 'undefined') return
     try {
       localStorage.setItem('golffox-login-attempts', JSON.stringify({ failedAttempts, blockedUntil }))
-    } catch {}
+    } catch { }
   }, [failedAttempts, blockedUntil])
 
   // Auxiliares de segurança e navegação
@@ -362,7 +361,7 @@ function LoginContent() {
       setLoading(true)
       setTransitioning(true)
       setError(null)
-      
+
       const prevCursor = typeof document !== "undefined" ? document.body.style.cursor : ""
       if (typeof document !== "undefined") {
         document.body.style.cursor = "progress"
@@ -376,17 +375,17 @@ function LoginContent() {
 
       try {
         debug("Iniciando autenticação", { email: maskedEmail }, "LoginPage")
-        
+
         let token: string | undefined
         let user: { id: string; email: string; role?: string } | undefined
-        
+
         // ✅ OBRIGATÓRIO: Usar apenas a API que verifica o banco de dados do Supabase
         // A API /api/auth/login verifica:
         // 1. Se o usuário existe na tabela users
         // 2. Se o usuário está ativo
         // 3. Obtém o role do banco de dados
         // 4. Autentica com Supabase Auth
-        
+
         if (!csrfToken) {
           console.error('❌ CSRF token não encontrado')
           setError("Erro de segurança. Por favor, recarregue a página.")
@@ -395,7 +394,7 @@ function LoginContent() {
           if (typeof document !== "undefined") document.body.style.cursor = prevCursor
           return
         }
-        
+
         const response = await fetch(AUTH_ENDPOINT, {
           method: "POST",
           headers: {
@@ -414,7 +413,7 @@ function LoginContent() {
           const message = String(apiError?.error || "Falha ao autenticar")
           const normalized = message.toLowerCase()
           const code = String(apiError?.code || '')
-          
+
           console.error('❌ Erro na API de login:', {
             status: response.status,
             message,
@@ -422,7 +421,7 @@ function LoginContent() {
             email: maskedEmail,
             body: apiError
           })
-          
+
           // Processar erros específicos
           if (normalized.includes("usuário não encontrado") || normalized.includes("não encontrado")) {
             setError("Usuário não encontrado no banco de dados. Verifique se o email está correto ou entre em contato com o administrador.")
@@ -448,7 +447,7 @@ function LoginContent() {
           } else {
             setError(message || "Erro ao fazer login")
           }
-          
+
           setLoading(false)
           setTransitioning(false)
           if (typeof document !== "undefined") document.body.style.cursor = prevCursor
@@ -464,8 +463,8 @@ function LoginContent() {
           user.email = sessionData.user.email
         }
 
-        console.log('✅ Login via API bem-sucedido (banco de dados verificado):', { 
-          hasToken: !!token, 
+        console.log('✅ Login via API bem-sucedido (banco de dados verificado):', {
+          hasToken: !!token,
           hasUser: !!user,
           hasSession: !!sessionData,
           userRole: user?.role,
@@ -474,8 +473,8 @@ function LoginContent() {
         })
 
         if (!token || !user?.email || !user?.id) {
-          console.error('❌ Resposta inválida da API:', { 
-            token: !!token, 
+          console.error('❌ Resposta inválida da API:', {
+            token: !!token,
             user: !!user,
             hasEmail: !!user?.email,
             hasId: !!user?.id
@@ -490,7 +489,7 @@ function LoginContent() {
         // ✅ IMPORTANTE: O role vem do banco de dados (tabela users) via API
         // A API já verificou se o usuário existe no banco e obteve o role
         const userRoleFromDatabase = user.role
-        
+
         if (!userRoleFromDatabase) {
           console.error('❌ Role não encontrado na resposta da API')
           setError("Erro ao determinar permissões do usuário")
@@ -530,7 +529,7 @@ function LoginContent() {
         const rawNext = searchParams.get("next")
         const safeNext = sanitizePath(rawNext)
         let redirectUrl: string
-        
+
         // Se houver parâmetro ?next= e for permitido para o role, usar ele
         if (safeNext && isAllowedForRole(userRoleFromDatabase, safeNext)) {
           redirectUrl = safeNext
@@ -538,31 +537,31 @@ function LoginContent() {
           // Caso contrário, usar o role do banco para determinar o painel
           redirectUrl = AuthManager.getRedirectUrl(userRoleFromDatabase)
         }
-        
+
         // Limpar query params da URL de redirecionamento
         redirectUrl = redirectUrl.split("?")[0]
 
-        debug("Login bem-sucedido", { 
-          redirectUrl, 
-          email: maskedEmail, 
+        debug("Login bem-sucedido", {
+          redirectUrl,
+          email: maskedEmail,
           role: userRoleFromDatabase,
           source: 'database'
         }, "LoginPage")
-        
+
         // ✅ REDIRECIONAMENTO IMEDIATO - sem delays desnecessários
         // O cookie já foi definido pelo servidor na resposta HTTP
         // O navegador processa o Set-Cookie header automaticamente
         if (typeof window !== "undefined") {
           // Definir flag para evitar interferência do useEffect
           (window as any).__golffox_redirecting = true
-          
+
           // Redirecionar IMEDIATAMENTE - sem esperar
           // O cookie será enviado automaticamente na próxima requisição
           window.location.href = redirectUrl
         } else {
           router.replace(redirectUrl)
         }
-        
+
         return
       } catch (err) {
         clearTimeout(timeoutId)
@@ -604,7 +603,7 @@ function LoginContent() {
       transition={{ duration: 0.6, delay, ease: [0.16, 1, 0.3, 1] }}
       className="text-center"
     >
-      <motion.div 
+      <motion.div
         className="text-4xl md:text-5xl font-bold bg-gradient-to-br from-white via-white to-white/70 bg-clip-text text-transparent mb-2"
         whileHover={{ scale: 1.05 }}
         transition={{ type: "spring", stiffness: 400, damping: 10 }}
@@ -621,10 +620,10 @@ function LoginContent() {
     <div className="min-h-screen flex flex-col lg:flex-row relative overflow-hidden bg-black w-full max-w-full">
       {/* Background com efeitos sutis */}
       <FloatingOrbs />
-      
+
       {/* Grid pattern sutil (estilo Apple) */}
       <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_at_center,black_20%,transparent_80%)]" />
-      
+
       {/* Seção Esquerda - Hero Minimalista */}
       <motion.div
         initial={{ opacity: 0 }}
@@ -662,7 +661,7 @@ function LoginContent() {
                   ease: "easeInOut",
                 }}
               />
-              
+
               {/* Border gradient animado */}
               <div className="relative w-32 h-32 rounded-[40px] bg-gradient-to-br from-[#F97316] via-[#FB923C] to-[#EA580C] p-[3px] shadow-2xl shadow-orange-500/50">
                 <div className="w-full h-full rounded-[37px] bg-black flex items-center justify-center relative overflow-hidden">
@@ -679,11 +678,11 @@ function LoginContent() {
                       ease: "easeInOut",
                     }}
                   />
-                  
+
                   {/* Logo */}
-                  <motion.img 
-                    src="/icons/golf_fox_logo.svg" 
-                    alt="Golf Fox" 
+                  <motion.img
+                    src="/icons/golf_fox_logo.svg"
+                    alt="Golf Fox"
                     className="w-20 h-20 relative z-10 drop-shadow-2xl"
                     animate={{
                       filter: [
@@ -767,7 +766,7 @@ function LoginContent() {
           >
             Novo por aqui? <span className="text-gray-900 font-medium cursor-not-allowed">Fale com vendas</span>
           </motion.div>
-            </div>
+        </div>
 
         {/* Formulário de Login Minimalista */}
         <div className="flex-1 flex items-center justify-center px-4 sm:px-6 md:px-8 lg:px-16 py-6 sm:py-8 md:py-12 relative z-10 w-full max-w-full overflow-x-hidden">
@@ -779,7 +778,7 @@ function LoginContent() {
           >
             <div className="relative w-full min-w-0">
               {/* Logo mobile com destaque */}
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
@@ -802,7 +801,7 @@ function LoginContent() {
                       ease: "easeInOut",
                     }}
                   />
-                  
+
                   <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-3xl bg-gradient-to-br from-[#F97316] via-[#FB923C] to-[#EA580C] p-[2.5px] shadow-xl shadow-orange-500/30">
                     <div className="w-full h-full rounded-[22px] bg-white flex items-center justify-center relative overflow-hidden">
                       {/* Shine effect mobile */}
@@ -818,16 +817,18 @@ function LoginContent() {
                           ease: "easeInOut",
                         }}
                       />
-                      <img 
-                        src="/icons/golf_fox_logo.svg" 
-                        alt="Golf Fox" 
+                      <img
+                        src="/icons/golf_fox_logo.svg"
+                        alt="Golf Fox Logo"
+                        width="56"
+                        height="56"
                         className="w-12 h-12 sm:w-14 sm:h-14 relative z-10"
                       />
                     </div>
                   </div>
                 </div>
-                
-                <motion.h2 
+
+                <motion.h2
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.3 }}
@@ -840,18 +841,18 @@ function LoginContent() {
               {/* Loading overlay minimalista */}
               <AnimatePresence>
                 {loading && (
-                  <motion.div 
+                  <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white/98 backdrop-blur-sm rounded-3xl"
                   >
-                    <motion.div 
+                    <motion.div
                       animate={{ rotate: 360 }}
                       transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
                       className="w-10 h-10 border-2 border-gray-200 border-t-[#F97316] rounded-full"
                     />
-                    <motion.p 
+                    <motion.p
                       initial={{ y: 10, opacity: 0 }}
                       animate={{ y: 0, opacity: 1 }}
                       transition={{ delay: 0.1 }}
@@ -875,7 +876,7 @@ function LoginContent() {
 
               {/* Mensagens minimalistas */}
               <AnimatePresence mode="wait">
-                    {error && (
+                {error && (
                   <motion.div
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -929,12 +930,11 @@ function LoginContent() {
                           passwordInputRef.current?.focus()
                         }
                       }}
-                    autoComplete="email"
-                    className={`w-full h-12 sm:h-14 px-3 sm:px-4 bg-gray-50 border ${
-                        fieldErrors.email
+                      autoComplete="email"
+                      className={`w-full h-12 sm:h-14 px-3 sm:px-4 bg-gray-50 border ${fieldErrors.email
                           ? "border-red-300 focus:border-red-500 focus:ring-red-200"
                           : "border-gray-200 focus:border-[#F97316] focus:ring-orange-100"
-                      } rounded-xl sm:rounded-2xl text-base transition-all focus:ring-2 focus:bg-white placeholder:text-gray-400`}
+                        } rounded-xl sm:rounded-2xl text-base transition-all focus:ring-2 focus:bg-white placeholder:text-gray-400`}
                     />
                     {fieldErrors.email && (
                       <p className="mt-2 text-xs text-red-600" aria-live="assertive">
@@ -964,11 +964,10 @@ function LoginContent() {
                       }}
                       ref={passwordInputRef}
                       autoComplete="current-password"
-                      className={`w-full h-12 sm:h-14 px-3 sm:px-4 pr-10 sm:pr-12 bg-gray-50 border ${
-                        fieldErrors.password
+                      className={`w-full h-12 sm:h-14 px-3 sm:px-4 pr-10 sm:pr-12 bg-gray-50 border ${fieldErrors.password
                           ? "border-red-300 focus:border-red-500 focus:ring-red-200"
                           : "border-gray-200 focus:border-[#F97316] focus:ring-orange-100"
-                      } rounded-xl sm:rounded-2xl text-base transition-all focus:ring-2 focus:bg-white placeholder:text-gray-400`}
+                        } rounded-xl sm:rounded-2xl text-base transition-all focus:ring-2 focus:bg-white placeholder:text-gray-400`}
                     />
                     <button
                       type="button"
@@ -1017,7 +1016,7 @@ function LoginContent() {
                   >
                     {loading || transitioning ? (
                       <span className="flex items-center justify-center gap-2">
-                        <motion.span 
+                        <motion.span
                           animate={{ rotate: 360 }}
                           transition={{ duration: 0.8, repeat: Infinity, ease: "linear" }}
                           className="rounded-full h-4 w-4 border-2 border-white/30 border-t-white"
@@ -1058,7 +1057,7 @@ function LoginContent() {
 export default function LoginPage() {
   return (
     <LoginErrorBoundary>
-      <Suspense fallback={<div />}> 
+      <Suspense fallback={<div />}>
         <LoginContent />
       </Suspense>
     </LoginErrorBoundary>

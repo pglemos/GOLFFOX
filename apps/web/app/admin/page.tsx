@@ -269,25 +269,25 @@ export default function AdminDashboard() {
                     placeholder="Todas as empresas"
                     value={tempFilters.empresa}
                     onChange={(e) => setTempFilters({ ...tempFilters, empresa: e.target.value })}
-                    className="w-full"
+                    className="w-full min-h-[44px]"
                   />
                 </div>
                 <div className="space-y-2">
                   <label className="block text-sm font-medium text-[var(--ink-strong)]">Data</label>
                   <div className="relative">
-                    <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--ink-muted)] pointer-events-none" />
+                    <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--ink-muted)] pointer-events-none z-10" />
                     <Input
                       type="date"
                       value={tempFilters.data}
                       onChange={(e) => setTempFilters({ ...tempFilters, data: e.target.value })}
-                      className="pl-10 w-full"
+                      className="pl-10 w-full min-h-[44px]"
                     />
                   </div>
                 </div>
                 <div className="space-y-2">
                   <label className="block text-sm font-medium text-[var(--ink-strong)]">Turno</label>
                   <select
-                    className="w-full px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--bg-soft)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand)] focus:ring-opacity-20 transition-all"
+                    className="w-full min-h-[44px] px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--bg-soft)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand)] focus:ring-opacity-20 transition-all touch-manipulation"
                     value={tempFilters.turno}
                     onChange={(e) => setTempFilters({ ...tempFilters, turno: e.target.value })}
                   >
