@@ -56,8 +56,8 @@ const PERIOD_PRESETS = {
   }
 }
 
-export function CostFilters({ 
-  onFiltersChange, 
+export function CostFilters({
+  onFiltersChange,
   routes = [],
   vehicles = [],
   drivers = [],
@@ -110,194 +110,196 @@ export function CostFilters({
           <div className="flex items-center gap-2">
             <Filter className="h-5 w-5 text-[var(--brand)]" />
             <CardTitle className="text-lg">Filtros</CardTitle>
-          {hasActiveFilters && (
-            <span className="px-2 py-1 bg-orange-100 text-orange-700 rounded-full text-xs font-medium">
-              {Object.keys(appliedFilters).length} ativo(s)
-            </span>
-          )}
+            {hasActiveFilters && (
+              <span className="px-2 py-1 bg-orange-100 text-orange-700 rounded-full text-xs font-medium">
+                {Object.keys(appliedFilters).length} ativo(s)
+              </span>
+            )}
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setFiltersExpanded(!filtersExpanded)}
+            className="gap-2"
+          >
+            {filtersExpanded ? (
+              <>
+                <ChevronUp className="h-4 w-4" />
+                Minimizar
+              </>
+            ) : (
+              <>
+                <ChevronDown className="h-4 w-4" />
+                Expandir
+              </>
+            )}
+          </Button>
         </div>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setFiltersExpanded(!filtersExpanded)}
-          className="gap-2"
-        >
-          {filtersExpanded ? (
-            <>
-              <ChevronUp className="h-4 w-4" />
-              Minimizar
-            </>
-          ) : (
-            <>
-              <ChevronDown className="h-4 w-4" />
-              Expandir
-            </>
-          )}
-        </Button>
-      </div>
-    </CardHeader>
-    {filtersExpanded && (
-      <CardContent>
-        {/* Presets de Período */}
-        <div className="flex flex-wrap gap-2 mb-4">
-          {Object.entries(PERIOD_PRESETS).map(([key, preset]) => (
-            <Button
-              key={key}
-              variant={tempFilters.start_date === preset.start ? "default" : "outline"}
-              size="sm"
-              onClick={() => handlePreset(key as keyof typeof PERIOD_PRESETS)}
-            >
-              <Calendar className="h-3 w-3 mr-1" />
-              {preset.label}
-            </Button>
-          ))}
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
-          {/* Período Customizado */}
-          <div className="space-y-2">
-            <Label>Data Início</Label>
-            <Input
-              type="date"
-              value={tempFilters.start_date || ''}
-              onChange={(e) => handleTempFilterChange('start_date', e.target.value || undefined)}
-            />
+      </CardHeader>
+      {filtersExpanded && (
+        <CardContent>
+          {/* Presets de Período */}
+          <div className="flex flex-wrap gap-2 mb-4">
+            {Object.entries(PERIOD_PRESETS).map(([key, preset]) => (
+              <Button
+                key={key}
+                variant={tempFilters.start_date === preset.start ? "default" : "outline"}
+                size="sm"
+                onClick={() => handlePreset(key as keyof typeof PERIOD_PRESETS)}
+              >
+                <Calendar className="h-3 w-3 mr-1" />
+                {preset.label}
+              </Button>
+            ))}
           </div>
 
-          <div className="space-y-2">
-            <Label>Data Fim</Label>
-            <Input
-              type="date"
-              value={tempFilters.end_date || ''}
-              onChange={(e) => handleTempFilterChange('end_date', e.target.value || undefined)}
-            />
-          </div>
-
-          {/* Rota */}
-          {routes.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+            {/* Período Customizado */}
             <div className="space-y-2">
-              <Label>Rota</Label>
-              <select
-                className="w-full px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm"
-                value={tempFilters.route_id || ''}
-                onChange={(e) => handleTempFilterChange('route_id', e.target.value || undefined)}
-              >
-                <option value="">Todas as rotas</option>
-                {routes.map(route => (
-                  <option key={route.id} value={route.id}>{route.name}</option>
-                ))}
-              </select>
+              <Label>Data Início</Label>
+              <Input
+                type="date"
+                value={tempFilters.start_date || ''}
+                onChange={(e) => handleTempFilterChange('start_date', e.target.value || undefined)}
+                className="min-h-[44px]"
+              />
             </div>
-          )}
 
-          {/* Veículo */}
-          {vehicles.length > 0 && (
             <div className="space-y-2">
-              <Label>Veículo</Label>
-              <select
-                className="w-full px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm"
-                value={tempFilters.vehicle_id || ''}
-                onChange={(e) => handleTempFilterChange('vehicle_id', e.target.value || undefined)}
-              >
-                <option value="">Todos os veículos</option>
-                {vehicles.map(vehicle => (
-                  <option key={vehicle.id} value={vehicle.id}>{vehicle.plate}</option>
-                ))}
-              </select>
+              <Label>Data Fim</Label>
+              <Input
+                type="date"
+                value={tempFilters.end_date || ''}
+                onChange={(e) => handleTempFilterChange('end_date', e.target.value || undefined)}
+                className="min-h-[44px]"
+              />
             </div>
-          )}
 
-          {/* Motorista */}
-          {drivers.length > 0 && (
-            <div className="space-y-2">
-              <Label>Motorista</Label>
-              <select
-                className="w-full px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm"
-                value={tempFilters.driver_id || ''}
-                onChange={(e) => handleTempFilterChange('driver_id', e.target.value || undefined)}
-              >
-                <option value="">Todos os motoristas</option>
-                {drivers.map(driver => (
-                  <option key={driver.id} value={driver.id}>{driver.email}</option>
-                ))}
-              </select>
-            </div>
-          )}
-
-          {/* Grupo de Custo */}
-          {categories.length > 0 && (
-            <div className="space-y-2">
-              <Label>Grupo de Custo</Label>
-              <select
-                className="w-full px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm"
-                value={tempFilters.group_name || ''}
-                onChange={(e) => handleTempFilterChange('group_name', e.target.value || undefined)}
-              >
-                <option value="">Todos os grupos</option>
-                {Array.from(new Set(categories.map(c => c.group_name))).map(group => (
-                  <option key={group} value={group}>{group}</option>
-                ))}
-              </select>
-            </div>
-          )}
-
-          {/* Categoria */}
-          {categories.length > 0 && tempFilters.group_name && (
-            <div className="space-y-2">
-              <Label>Categoria</Label>
-              <select
-                className="w-full px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm"
-                value={tempFilters.category_id || ''}
-                onChange={(e) => handleTempFilterChange('category_id', e.target.value || undefined)}
-              >
-                <option value="">Todas as categorias</option>
-                {categories
-                  .filter(c => c.group_name === tempFilters.group_name)
-                  .map(cat => (
-                    <option key={cat.id} value={cat.id}>{cat.category}</option>
+            {/* Rota */}
+            {routes.length > 0 && (
+              <div className="space-y-2">
+                <Label>Rota</Label>
+                <select
+                  className="w-full min-h-[44px] px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm touch-manipulation"
+                  value={tempFilters.route_id || ''}
+                  onChange={(e) => handleTempFilterChange('route_id', e.target.value || undefined)}
+                >
+                  <option value="">Todas as rotas</option>
+                  {routes.map(route => (
+                    <option key={route.id} value={route.id}>{route.name}</option>
                   ))}
-              </select>
-            </div>
-          )}
+                </select>
+              </div>
+            )}
 
-          {/* Transportadora */}
-          {carriers.length > 0 && (
-            <div className="space-y-2">
-              <Label>Transportadora</Label>
-              <select
-                className="w-full px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm"
-                value={tempFilters.carrier_id || ''}
-                onChange={(e) => handleTempFilterChange('carrier_id', e.target.value || undefined)}
-              >
-                <option value="">Todas as transportadoras</option>
-                {carriers.map(carrier => (
-                  <option key={carrier.id} value={carrier.id}>{carrier.name}</option>
-                ))}
-              </select>
-            </div>
-          )}
-        </div>
-        <div className="flex items-center justify-end gap-2 pt-4 border-t border-[var(--border)]">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleResetFilters}
-            className="gap-2"
-          >
-            <X className="h-4 w-4" />
-            Limpar
-          </Button>
-          <Button
-            size="sm"
-            onClick={handleSaveFilters}
-            className="gap-2"
-          >
-            <Save className="h-4 w-4" />
-            Salvar Filtros
-          </Button>
-        </div>
-      </CardContent>
-    )}
+            {/* Veículo */}
+            {vehicles.length > 0 && (
+              <div className="space-y-2">
+                <Label>Veículo</Label>
+                <select
+                  className="w-full px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm"
+                  value={tempFilters.vehicle_id || ''}
+                  onChange={(e) => handleTempFilterChange('vehicle_id', e.target.value || undefined)}
+                >
+                  <option value="">Todos os veículos</option>
+                  {vehicles.map(vehicle => (
+                    <option key={vehicle.id} value={vehicle.id}>{vehicle.plate}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            {/* Motorista */}
+            {drivers.length > 0 && (
+              <div className="space-y-2">
+                <Label>Motorista</Label>
+                <select
+                  className="w-full px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm"
+                  value={tempFilters.driver_id || ''}
+                  onChange={(e) => handleTempFilterChange('driver_id', e.target.value || undefined)}
+                >
+                  <option value="">Todos os motoristas</option>
+                  {drivers.map(driver => (
+                    <option key={driver.id} value={driver.id}>{driver.email}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            {/* Grupo de Custo */}
+            {categories.length > 0 && (
+              <div className="space-y-2">
+                <Label>Grupo de Custo</Label>
+                <select
+                  className="w-full px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm"
+                  value={tempFilters.group_name || ''}
+                  onChange={(e) => handleTempFilterChange('group_name', e.target.value || undefined)}
+                >
+                  <option value="">Todos os grupos</option>
+                  {Array.from(new Set(categories.map(c => c.group_name))).map(group => (
+                    <option key={group} value={group}>{group}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            {/* Categoria */}
+            {categories.length > 0 && tempFilters.group_name && (
+              <div className="space-y-2">
+                <Label>Categoria</Label>
+                <select
+                  className="w-full px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm"
+                  value={tempFilters.category_id || ''}
+                  onChange={(e) => handleTempFilterChange('category_id', e.target.value || undefined)}
+                >
+                  <option value="">Todas as categorias</option>
+                  {categories
+                    .filter(c => c.group_name === tempFilters.group_name)
+                    .map(cat => (
+                      <option key={cat.id} value={cat.id}>{cat.category}</option>
+                    ))}
+                </select>
+              </div>
+            )}
+
+            {/* Transportadora */}
+            {carriers.length > 0 && (
+              <div className="space-y-2">
+                <Label>Transportadora</Label>
+                <select
+                  className="w-full px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm"
+                  value={tempFilters.carrier_id || ''}
+                  onChange={(e) => handleTempFilterChange('carrier_id', e.target.value || undefined)}
+                >
+                  <option value="">Todas as transportadoras</option>
+                  {carriers.map(carrier => (
+                    <option key={carrier.id} value={carrier.id}>{carrier.name}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+          </div>
+          <div className="flex items-center justify-end gap-2 pt-4 border-t border-[var(--border)]">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleResetFilters}
+              className="gap-2"
+            >
+              <X className="h-4 w-4" />
+              Limpar
+            </Button>
+            <Button
+              size="sm"
+              onClick={handleSaveFilters}
+              className="gap-2"
+            >
+              <Save className="h-4 w-4" />
+              Salvar Filtros
+            </Button>
+          </div>
+        </CardContent>
+      )}
     </Card>
   )
 }
