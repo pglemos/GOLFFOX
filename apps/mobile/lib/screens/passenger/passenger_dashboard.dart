@@ -1,19 +1,13 @@
 import 'dart:async';
 import 'dart:math' as math;
-import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../core/routing/app_router.dart';
-import '../../core/services/snackbar_service.dart';
-import '../../core/theme/gf_tokens.dart';
 import '../../models/driver_position.dart';
 import '../../models/trip.dart';
 import '../../models/user.dart' as app_user;
-import '../../services/auth_service.dart';
 import '../../services/supabase_service.dart';
 
 class PassengerDashboard extends StatefulWidget {
@@ -27,14 +21,12 @@ class PassengerDashboard extends StatefulWidget {
 class _PassengerDashboardState extends State<PassengerDashboard>
     with TickerProviderStateMixin {
   final _supabaseService = SupabaseService.instance;
-  final _authService = AuthService();
   GoogleMapController? _mapController;
 
   // Removed unused trips cache
   Trip? _activeTrip;
   List<DriverPosition> _driverPositions = [];
   bool _isLoading = true;
-  String? _errorMessage;
   RealtimeChannel? _positionChannel;
   StreamSubscription<List<DriverPosition>>? _positionSubscription;
 
@@ -42,9 +34,6 @@ class _PassengerDashboardState extends State<PassengerDashboard>
   late final AnimationController _shimmerCtrl =
       AnimationController(vsync: this, duration: const Duration(seconds: 2))
         ..repeat();
-
-  // Bottom card slide
-  bool _showBottomCard = true;
 
   @override
   void initState() {
@@ -64,7 +53,6 @@ class _PassengerDashboardState extends State<PassengerDashboard>
   Future<void> _loadTrips() async {
     setState(() {
       _isLoading = true;
-      _errorMessage = null;
     });
 
     try {
@@ -95,7 +83,7 @@ class _PassengerDashboardState extends State<PassengerDashboard>
       }
     } on Exception catch (error) {
       setState(() {
-        _errorMessage = 'Erro ao carregar viagens: $error';
+        debugPrint('Erro ao carregar viagens: $error');
         _isLoading = false;
       });
     }
@@ -196,32 +184,19 @@ class _PassengerDashboardState extends State<PassengerDashboard>
       myLocationButtonEnabled: false,
       zoomControlsEnabled: false,
       mapToolbarEnabled: false,
-    );
+
+    final dLng = toLng - fromLng;
+    final y = math.sin(dLng) * math.cos(toLat);
+    final x = math.cos(fromLat) * math.sin(toLat) -
+        math.sin(fromLat) * math.cos(toLat) * math.cos(dLng);
+    final bearing = math.atan2(y, x);
+
+    return (_toDegrees(bearing) + 360) % 360;
   }
 
-  // ... (omitted parts)
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final base = Paint()..color = Colors.white.withValues(alpha: 0.14);
-    final shimmer = Paint()
-      ..shader = LinearGradient(
-        begin: Alignment(-1 + progress * 2, 0),
-        end: Alignment(1 + progress * 2, 0),
-        colors: [
-          Colors.white.withValues(alpha: 0.10),
-          Colors.white.withValues(alpha: 0.35),
-          Colors.white.withValues(alpha: 0.10),
-        ],
-        stops: const [0.2, 0.5, 0.8],
-      ).createShader(Offset.zero & size);
-
-    canvas
-      ..drawRect(Offset.zero & size, base)
-      ..drawRect(Offset.zero & size, shimmer);
-  }
-
-  // ...
+  double _toRadians(double degrees) => degrees * (math.pi / 180);
+  double _toDegrees(double radians) => radians * (180 / math.pi);
+}
 
 class _MapShimmerOverlay extends StatelessWidget {
   const _MapShimmerOverlay({required this.animation});
@@ -247,61 +222,4 @@ class _MapShimmerOverlay extends StatelessWidget {
           ),
         ),
       );
-}
-
-class _GradientFab extends StatelessWidget {
-  const _GradientFab({
-    required this.icon,
-    required this.label,
-    required this.onPressed,
-  });
-
-  final IconData icon;
-  final String label;
-  final VoidCallback onPressed;
-
-  @override
-  Widget build(BuildContext context) => DecoratedBox(
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFFFF8C00), Color(0xFFFF5F00)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFFFF5F00).withValues(alpha: 0.4),
-            blurRadius: 12,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(16),
-          onTap: onPressed,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(icon, color: Colors.white),
-                const SizedBox(width: 8),
-                Text(
-                  label,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
 }

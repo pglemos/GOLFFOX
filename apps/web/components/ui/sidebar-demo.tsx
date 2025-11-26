@@ -10,28 +10,28 @@ export function SidebarDemo() {
   const links = [
     {
       label: "Dashboard",
-      href: "#",
+      href: "/dashboard",
       icon: (
         <LayoutDashboard className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
       ),
     },
     {
       label: "Profile",
-      href: "#",
+      href: "/profile",
       icon: (
         <UserCog className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
       ),
     },
     {
       label: "Settings",
-      href: "#",
+      href: "/settings",
       icon: (
         <Settings className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
       ),
     },
     {
       label: "Logout",
-      href: "#",
+      href: "/logout",
       icon: (
         <LogOut className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
       ),
@@ -82,10 +82,10 @@ export function SidebarDemo() {
 // Componente que mostra logo completo ou ícone baseado no estado do sidebar
 const SidebarLogo = () => {
   const { open } = useSidebar();
-  
+
   return (
     <a
-      href="#"
+      href="/"
       className="font-normal flex space-x-2 items-center text-sm text-black dark:text-white py-1 relative z-20"
     >
       <div className="h-5 w-6 bg-black dark:bg-white rounded-br-lg rounded-tr-sm rounded-tl-lg rounded-bl-sm flex-shrink-0" />

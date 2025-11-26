@@ -1,0 +1,19 @@
+Analyzing mobile...                                             
+
+warning - Unused import: 'dart:math' - lib\screens\passenger\passenger_dashboard.dart:2:8 - unused_import
+   info - The import of 'dart:ui' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart' - lib\screens\passenger\passenger_dashboard.dart:3:8 - unnecessary_import
+   info - The import of 'package:flutter/services.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart' - lib\screens\passenger\passenger_dashboard.dart:6:8 - unnecessary_import
+warning - Unused import: '../../core/routing/app_router.dart' - lib\screens\passenger\passenger_dashboard.dart:10:8 - unused_import
+warning - Unused import: '../../core/services/snackbar_service.dart' - lib\screens\passenger\passenger_dashboard.dart:11:8 - unused_import
+warning - Unused import: '../../core/theme/gf_tokens.dart' - lib\screens\passenger\passenger_dashboard.dart:12:8 - unused_import
+warning - The value of the field '_authService' isn't used - lib\screens\passenger\passenger_dashboard.dart:30:9 - unused_field
+warning - The value of the field '_errorMessage' isn't used - lib\screens\passenger\passenger_dashboard.dart:37:11 - unused_field
+   info - The private field _showBottomCard could be 'final' - lib\screens\passenger\passenger_dashboard.dart:47:8 - prefer_final_fields
+  error - The method '_bearingDegrees' isn't defined for the type '_PassengerDashboardState' - lib\screens\passenger\passenger_dashboard.dart:171:19 - undefined_method
+   info - Unnecessary use of a block function body - lib\screens\passenger\passenger_dashboard.dart:205:38 - prefer_expression_function_bodies
+   info - To-do comment doesn't follow the Flutter style - lib\screens\passenger\passenger_dashboard.dart:206:5 - flutter_style_todos
+warning - The declaration '_GradientFab' isn't referenced - lib\screens\passenger\passenger_dashboard.dart:258:7 - unused_element
+  error - Expected a method, getter, setter or operator declaration - lib\screens\passenger\passenger_dashboard.dart:313:1 - expected_executable
+   info - Dependencies not sorted alphabetically - pubspec.yaml:13:3 - sort_pub_dependencies
+
+15 issues found. (ran in 3.9s)
