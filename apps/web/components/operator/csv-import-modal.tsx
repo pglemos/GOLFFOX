@@ -9,7 +9,7 @@ import { notifySuccess, notifyError, notifyInfo, notifyWarning } from "@/lib/toa
 import { useState, useRef } from "react"
 import { warn, error as logError } from "@/lib/logger"
 
-let operatorI18n: any = {
+const operatorI18n: any = {
   csv_import: {
     title: 'Importar Funcionários via CSV',
     select_file: 'Selecionar Arquivo',

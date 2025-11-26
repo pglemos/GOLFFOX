@@ -69,7 +69,7 @@ async function schedulePostHandler(request: NextRequest) {
     const isDevelopment = process.env.NODE_ENV === 'development'
     const allowAuthBypass = isTestMode || isDevelopment
 
-    let authenticatedUser = await validateAuth(request)
+    const authenticatedUser = await validateAuth(request)
     
     if (!authenticatedUser && !allowAuthBypass) {
       return NextResponse.json(

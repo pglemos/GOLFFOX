@@ -1,0 +1,7 @@
+Analyzing mobile...                                             
+
+   info - Unnecessary use of a block function body - lib\screens\passenger\passenger_dashboard.dart:193:38 - prefer_expression_function_bodies
+   info - To-do comment doesn't follow the Flutter style - lib\screens\passenger\passenger_dashboard.dart:194:5 - flutter_style_todos
+   info - Dependencies not sorted alphabetically - pubspec.yaml:45:3 - sort_pub_dependencies
+
+3 issues found. (ran in 10.3s)
