@@ -503,9 +503,9 @@ export default function TransportadoraConfiguracoesPage() {
                     <button
                       type="button"
                       onClick={() => setShowNewPassword(!showNewPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--ink-muted)] hover:text-[var(--ink-strong)]"
+                      className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 text-[var(--ink-muted)] hover:text-[var(--ink-strong)] p-0.5"
                     >
-                      {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      {showNewPassword ? <EyeOff className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> : <Eye className="h-3.5 w-3.5 sm:h-4 sm:w-4" />}
                     </button>
                   </div>
                 </div>
@@ -594,14 +594,14 @@ export default function TransportadoraConfiguracoesPage() {
                     <button
                       onClick={() => handleNotificationChange(key, !formData.notifications[key as keyof typeof formData.notifications])}
                       className={`relative w-12 h-6 rounded-full transition-colors ml-4 ${formData.notifications[key as keyof typeof formData.notifications]
-                          ? 'bg-[var(--brand)]'
-                          : 'bg-gray-300'
+                        ? 'bg-[var(--brand)]'
+                        : 'bg-gray-300'
                         }`}
                     >
                       <span
                         className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform shadow-sm ${formData.notifications[key as keyof typeof formData.notifications]
-                            ? 'translate-x-6'
-                            : 'translate-x-0'
+                          ? 'translate-x-6'
+                          : 'translate-x-0'
                           }`}
                       />
                     </button>
