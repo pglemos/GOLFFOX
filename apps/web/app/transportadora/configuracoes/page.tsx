@@ -10,7 +10,7 @@ import {
   Settings2,
   User,
   Mail,
-  Lock,
+  LockKeyhole as Lock,
   Palette,
   Bell,
   Camera,
@@ -68,9 +68,9 @@ export default function TransportadoraConfiguracoesPage() {
         return
       }
 
-      if (data?.avatar_url) {
+      if ((data as any)?.avatar_url) {
         // Adicionar timestamp para evitar cache do navegador
-        const urlWithCache = `${data.avatar_url}${timestamp || `?t=${Date.now()}`}`
+        const urlWithCache = `${(data as any).avatar_url}${timestamp || `?t=${Date.now()}`}`
         setProfileImage(urlWithCache)
       } else {
         setProfileImage(null)
@@ -139,8 +139,8 @@ export default function TransportadoraConfiguracoesPage() {
               .eq('id', user.id)
               .maybeSingle()
 
-            if (!error && data?.avatar_url) {
-              setProfileImage(`${data.avatar_url}?t=${Date.now()}`)
+            if (!error && (data as any)?.avatar_url) {
+              setProfileImage(`${(data as any).avatar_url}?t=${Date.now()}`)
             }
           } catch (err) {
             console.error('Erro ao recarregar foto:', err)
