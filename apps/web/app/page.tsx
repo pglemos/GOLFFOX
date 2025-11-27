@@ -972,10 +972,10 @@ function LoginContent() {
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 transition-colors p-0.5 rounded-lg hover:bg-gray-100"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 transition-colors h-8 w-8 flex items-center justify-center rounded-lg hover:bg-gray-100 z-10"
                       aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
                     >
-                      {showPassword ? <EyeOff className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> : <Eye className="h-3.5 w-3.5 sm:h-4 sm:w-4" />}
+                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
                     {fieldErrors.password && (
                       <p className="mt-2 text-xs text-red-600" aria-live="assertive">
@@ -992,7 +992,7 @@ function LoginContent() {
                       id="remember-me"
                       checked={rememberMe}
                       onCheckedChange={(checked) => setRememberMe(checked === true)}
-                      className="h-4 w-4 rounded border-gray-300 data-[state=checked]:bg-[#F97316] data-[state=checked]:border-[#F97316]"
+                      className="h-5 w-5 rounded border-gray-300 data-[state=checked]:bg-[#F97316] data-[state=checked]:border-[#F97316]"
                     />
                     <span className="whitespace-nowrap text-gray-600 group-hover:text-gray-900 transition-colors">
                       Lembrar-me
