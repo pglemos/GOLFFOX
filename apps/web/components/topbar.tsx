@@ -182,6 +182,8 @@ export function Topbar({
           onClick={onToggleSidebar}
           className="lg:hidden hover:bg-[var(--bg-hover)] active:bg-[var(--bg-hover)] flex-shrink-0 min-w-[44px] min-h-[44px] touch-manipulation"
           aria-label="Toggle menu"
+          aria-controls="app-sidebar-mobile"
+          aria-expanded={_isSidebarOpen}
         >
           <Menu className="h-5 w-5" />
         </Button>

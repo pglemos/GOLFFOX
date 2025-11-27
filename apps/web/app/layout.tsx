@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import "./mobile-optimizations.css";
 import { Toaster } from "react-hot-toast";
 import { WebVitalsInit } from "@/components/web-vitals-init";
 import { ErrorBoundary } from "@/components/error-boundary";

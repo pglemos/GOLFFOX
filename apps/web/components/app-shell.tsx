@@ -77,6 +77,22 @@ export const AppShell = memo(function AppShell({ user, children, panel }: AppShe
       window.removeEventListener('close-sidebar', handleCloseSidebar as EventListener)
     }
   }, [isMobile])
+
+  // Bloquear scroll do body quando o menu mobile estiver aberto
+  useEffect(() => {
+    if (!isMobile) {
+      document.body.style.removeProperty('overflow')
+      return
+    }
+    if (isSidebarOpen) {
+      document.body.style.setProperty('overflow', 'hidden')
+    } else {
+      document.body.style.removeProperty('overflow')
+    }
+    return () => {
+      document.body.style.removeProperty('overflow')
+    }
+  }, [isMobile, isSidebarOpen])
   
   // Remover padrão de grid em mobile via JavaScript (camada extra de proteção)
   useEffect(() => {
@@ -144,7 +160,7 @@ export const AppShell = memo(function AppShell({ user, children, panel }: AppShe
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+            className="fixed inset-0 bg-black/60 z-[90] lg:hidden"
             onClick={() => setIsSidebarOpen(false)}
             style={{ pointerEvents: 'auto' }}
           />
@@ -161,16 +177,18 @@ export const AppShell = memo(function AppShell({ user, children, panel }: AppShe
         {/* Main Content */}
         <main 
           className={cn(
-            "min-h-[calc(100vh-4rem)] sm:min-h-[calc(100vh-4.5rem)] transition-all duration-300 ease-in-out",                                                     
-            "overflow-y-auto overflow-x-hidden bg-[var(--bg)] pb-12 sm:pb-14",
+            "min-h-[calc(100vh-4rem)] sm:min-h-[calc(100vh-4.5rem)] transition-all duration-300 ease-in-out",
+            isMobile ? "overflow-visible" : "overflow-y-auto",
+            "overflow-x-hidden bg-[var(--bg)] pb-12 sm:pb-14",
             !isMobile ? "flex-1 lg:ml-[60px]" : "w-full ml-0 flex-shrink-0",
             "max-w-full w-full",
-            "relative z-50"
+            "relative z-10"
           )}
           style={{
             backgroundImage: 'none',
             background: 'var(--bg)'
           } as React.CSSProperties}
+          data-mobile={isMobile ? 'true' : undefined}
         >
           <div className="mx-auto max-w-[1600px] px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 w-full max-w-full min-w-0">                                                     
             <div className="w-full max-w-full min-w-0 overflow-x-hidden break-words stack-responsive">
