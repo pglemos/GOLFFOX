@@ -755,7 +755,7 @@ function LoginContent() {
       </motion.div>
 
       {/* Seção Direita - Formulário Minimalista */}
-      <div className="flex-1 lg:w-1/2 bg-white flex flex-col min-h-screen relative w-full max-w-full overflow-x-hidden">
+      <div className="flex-1 lg:w-1/2 flex flex-col min-h-screen relative w-full max-w-full overflow-x-hidden lg:bg-white bg-gray-100">
         {/* Barra superior minimalista (apenas desktop) */}
         <div className="hidden lg:flex justify-end items-center p-8 relative z-10">
           <motion.div
@@ -776,68 +776,273 @@ function LoginContent() {
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
             className="w-full max-w-md mx-auto min-w-0"
           >
-            <div className="relative w-full min-w-0">
-              {/* Logo mobile com destaque */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                className="lg:hidden mb-8 sm:mb-12 text-center"
-              >
-                <div className="relative inline-block mb-4">
-                  {/* Glow mobile */}
-                  <motion.div
-                    className="absolute inset-0 rounded-3xl blur-2xl"
-                    animate={{
-                      background: [
-                        "radial-gradient(circle, rgba(249,115,22,0.3) 0%, transparent 70%)",
-                        "radial-gradient(circle, rgba(249,115,22,0.5) 0%, transparent 70%)",
-                        "radial-gradient(circle, rgba(249,115,22,0.3) 0%, transparent 70%)",
-                      ],
-                    }}
-                    transition={{
-                      duration: 2,
-                      repeat: Infinity,
-                      ease: "easeInOut",
-                    }}
-                  />
-
-                  <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-3xl bg-gradient-to-br from-[#F97316] via-[#FB923C] to-[#EA580C] p-[2.5px] shadow-xl shadow-orange-500/30">
-                    <div className="w-full h-full rounded-[22px] bg-white flex items-center justify-center relative overflow-hidden">
-                      {/* Shine effect mobile */}
-                      <motion.div
-                        className="absolute inset-0 bg-gradient-to-r from-transparent via-orange-100 to-transparent"
-                        animate={{
-                          x: ['-200%', '200%'],
-                        }}
-                        transition={{
-                          duration: 2.5,
-                          repeat: Infinity,
-                          repeatDelay: 1,
-                          ease: "easeInOut",
-                        }}
-                      />
-                      <img
-                        src="/icons/golf_fox_logo.svg"
-                        alt="Golf Fox Logo"
-                        width="56"
-                        height="56"
-                        className="w-12 h-12 sm:w-14 sm:h-14 relative z-10"
-                      />
-                    </div>
+            {/* Mobile: Card wrapper */}
+            <div className="lg:hidden bg-white rounded-3xl shadow-xl p-8 mb-8">
+              <div className="relative w-full min-w-0">
+                {/* Logo mobile - novo design baseado no mockup */}
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                  className="lg:hidden mb-6 flex items-center gap-3"
+                >
+                  {/* Logo Icon */}
+                  <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-[#F97316] to-[#EA580C] flex items-center justify-center">
+                    <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z" />
+                    </svg>
                   </div>
+
+                  {/* Brand Text */}
+                  <h2 className="text-2xl font-bold text-gray-900">
+                    GOLF FOX
+                  </h2>
+                </motion.div>
+
+                {/* Mobile: Loading overlay */}
+                <AnimatePresence>
+                  {loading && (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="lg:hidden absolute inset-0 z-50 flex flex-col items-center justify-center bg-white/98 backdrop-blur-sm rounded-3xl"
+                    >
+                      <motion.div
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                        className="w-10 h-10 border-2 border-gray-200 border-t-[#F97316] rounded-full"
+                      />
+                      <motion.p
+                        initial={{ y: 10, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        transition={{ delay: 0.1 }}
+                        className="mt-4 text-sm text-gray-500 font-medium"
+                      >
+                        {transitioning ? "Entrando..." : "Autenticando"}
+                      </motion.p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {/* Mobile: Título */}
+                <div className="lg:hidden mb-6">
+                  <h1 className="text-3xl font-bold text-gray-900 mb-2 tracking-tight">
+                    Entre em sua conta
+                  </h1>
+                  <p className="text-base text-gray-600 leading-relaxed">
+                    Acesse sua frota com inteligência e controle total.
+                  </p>
                 </div>
 
-                <motion.h2
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.3 }}
-                  className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-[#F97316] to-[#EA580C] bg-clip-text text-transparent"
-                >
-                  Golf Fox
-                </motion.h2>
-              </motion.div>
+                {/* Mobile: Mensagens */}
+                <div className="lg:hidden">
+                  <AnimatePresence mode="wait">
+                    {/* Password requirement warning (from mockup) - shown when no errors */}
+                    {!error && !success && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700"
+                      >
+                        Senha deve ter ao menos 8 caracteres, com número e letra maiúscula
+                      </motion.div>
+                    )}
 
+                    {error && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        className="mb-6 p-4 bg-red-50/50 border border-red-100 rounded-xl text-sm text-red-600"
+                        role="alert"
+                      >
+                        {error}
+                      </motion.div>
+                    )}
+
+                    {success && !error && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        className="mb-6 p-4 bg-green-50/50 border border-green-100 rounded-xl text-sm text-green-600 flex items-center gap-2"
+                      >
+                        <Sparkles className="w-4 h-4 flex-shrink-0" />
+                        <span>Login realizado com sucesso!</span>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+
+                {/* Mobile: Formulário */}
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault()
+                    if (!loading && !transitioning) {
+                      handleLogin()
+                    }
+                  }}
+                  className="lg:hidden space-y-4"
+                >
+                  {/* Campo Email */}
+                  <div className="space-y-2">
+                    <label className="block text-sm font-medium text-gray-700" htmlFor="login-email">
+                      E-mail
+                    </label>
+                    <div className="relative">
+                      {/* Mail Icon */}
+                      <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
+                        <Mail className="h-5 w-5" />
+                      </div>
+
+                      <Input
+                        id="login-email"
+                        ref={emailInputRef}
+                        type="email"
+                        placeholder="golffox@admin.com"
+                        value={email}
+                        onChange={(e) => setEmail(sanitizeInput(e.target.value))}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' && !loading && !transitioning && password.trim().length > 0) {
+                            e.preventDefault()
+                            passwordInputRef.current?.focus()
+                          }
+                        }}
+                        autoComplete="email"
+                        className={`w-full h-12 pl-11 pr-3 bg-blue-50/50 border ${fieldErrors.email
+                          ? "border-red-300 focus:border-red-500 focus:ring-red-200"
+                          : "border-blue-100 focus:border-[#F97316] focus:ring-orange-100"
+                          } rounded-xl text-base transition-all focus:ring-2 focus:bg-white placeholder:text-gray-400`}
+                      />
+                      {fieldErrors.email && (
+                        <p className="mt-2 text-xs text-red-600" aria-live="assertive">
+                          {fieldErrors.email}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Campo Senha */}
+                  <div className="space-y-2">
+                    <label className="block text-sm font-medium text-gray-700" htmlFor="login-password">
+                      Senha
+                    </label>
+                    <div className="relative">
+                      {/* Lock Icon */}
+                      <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none z-10">
+                        <Lock className="h-5 w-5" />
+                      </div>
+
+                      <Input
+                        id="login-password"
+                        type={showPassword ? "text" : "password"}
+                        placeholder="senha123"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' && !loading && !transitioning) {
+                            e.preventDefault()
+                            handleLogin()
+                          }
+                        }}
+                        ref={passwordInputRef}
+                        autoComplete="current-password"
+                        className={`w-full h-12 pl-11 pr-12 bg-blue-50/50 border ${fieldErrors.password
+                          ? "border-red-300 focus:border-red-500 focus:ring-red-200"
+                          : "border-blue-100 focus:border-[#F97316] focus:ring-orange-100"
+                          } rounded-xl text-base transition-all focus:ring-2 focus:bg-white placeholder:text-gray-400`}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 transition-colors h-8 w-8 flex items-center justify-center rounded-lg hover:bg-gray-100 z-10"
+                        aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
+                      >
+                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </button>
+                      {fieldErrors.password && (
+                        <p className="mt-2 text-xs text-red-600" aria-live="assertive">
+                          {fieldErrors.password}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Password requirement hint (from mockup) */}
+                    {password && !fieldErrors.password && (
+                      <p className="text-xs text-red-600 mt-1">
+                        Senha precisa conter 8 caracteres, incluindo número e letra maiúscula
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Opções extras */}
+                  <div className="flex items-center justify-between text-sm w-full">
+                    <label className="flex items-center gap-2 cursor-pointer group touch-manipulation flex-nowrap">
+                      <Checkbox
+                        id="remember-me"
+                        checked={rememberMe}
+                        onCheckedChange={(checked) => setRememberMe(checked === true)}
+                        className="h-5 w-5 rounded border-gray-300 data-[state=checked]:bg-[#F97316] data-[state=checked]:border-[#F97316]"
+                      />
+                      <span className="whitespace-nowrap text-gray-600 group-hover:text-gray-900 transition-colors">
+                        Manter conectado
+                      </span>
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => setError("Funcionalidade em desenvolvimento")}
+                      className="text-[#F97316] hover:text-[#EA580C] font-medium transition-colors touch-manipulation text-sm whitespace-nowrap"
+                    >
+                      Esqueceu sua senha?
+                    </button>
+                  </div>
+
+                  {/* Botão de Login Premium */}
+                  <motion.div whileHover={{ scale: loading || transitioning ? 1 : 1.01 }} whileTap={{ scale: loading || transitioning ? 1 : 0.99 }}>
+                    <Button
+                      type="submit"
+                      disabled={loading || transitioning}
+                      className="w-full h-12 bg-gradient-to-r from-[#F97316] to-[#EA580C] hover:from-[#EA580C] hover:to-[#F97316] text-white font-semibold text-base shadow-lg shadow-orange-500/20 hover:shadow-xl hover:shadow-orange-500/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl relative overflow-hidden group touch-manipulation"
+                    >
+                      {loading || transitioning ? (
+                        <span className="flex items-center justify-center gap-2">
+                          <motion.span
+                            animate={{ rotate: 360 }}
+                            transition={{ duration: 0.8, repeat: Infinity, ease: "linear" }}
+                            className="rounded-full h-4 w-4 border-2 border-white/30 border-t-white"
+                          />
+                          {transitioning ? "Entrando..." : "Autenticando"}
+                        </span>
+                      ) : (
+                        <span className="flex items-center justify-center gap-2">
+                          Entrar
+                          <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                        </span>
+                      )}
+                    </Button>
+                  </motion.div>
+                </form>
+
+                {/* Footer */}
+                <div className="mt-8 sm:mt-10 md:mt-12 text-center">
+                  <p className="text-xs sm:text-sm text-gray-500">
+                    Protegido por{" "}
+                    <span className="text-gray-700 font-medium">Golf Fox Security</span>
+                  </p>
+                </div>
+
+                <noscript>
+                  <p className="mt-6 text-xs text-center text-gray-500">
+                    Ative o JavaScript para utilizar o login.
+                  </p>
+                </noscript>
+              </div>
+            </div>
+
+            {/* Desktop: No card wrapper */}
+            <div className="hidden lg:block relative w-full min-w-0">
               {/* Loading overlay minimalista */}
               <AnimatePresence>
                 {loading && (
@@ -911,15 +1116,14 @@ function LoginContent() {
                 }}
                 className="form-responsive space-y-4 sm:space-y-5 md:space-y-6"
               >
-                {/* Campo Email */}
+                {/* Campo Email - Desktop */}
                 <div className="space-y-1.5 sm:space-y-2">
-                  <label className="block text-xs sm:text-sm font-medium text-gray-700" htmlFor="login-email">
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700" htmlFor="login-email-desktop">
                     E-mail
                   </label>
                   <div className="relative">
                     <Input
-                      id="login-email"
-                      ref={emailInputRef}
+                      id="login-email-desktop"
                       type="email"
                       placeholder="nome@empresa.com"
                       value={email}
@@ -944,14 +1148,14 @@ function LoginContent() {
                   </div>
                 </div>
 
-                {/* Campo Senha */}
+                {/* Campo Senha - Desktop */}
                 <div className="space-y-1.5 sm:space-y-2">
-                  <label className="block text-xs sm:text-sm font-medium text-gray-700" htmlFor="login-password">
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700" htmlFor="login-password-desktop">
                     Senha
                   </label>
                   <div className="relative">
                     <Input
-                      id="login-password"
+                      id="login-password-desktop"
                       type={showPassword ? "text" : "password"}
                       placeholder="Digite sua senha"
                       value={password}
@@ -962,7 +1166,6 @@ function LoginContent() {
                           handleLogin()
                         }
                       }}
-                      ref={passwordInputRef}
                       autoComplete="current-password"
                       className={`w-full h-12 sm:h-14 px-3 sm:px-4 pr-12 sm:pr-14 bg-gray-50 border ${fieldErrors.password
                         ? "border-red-300 focus:border-red-500 focus:ring-red-200"
@@ -985,11 +1188,11 @@ function LoginContent() {
                   </div>
                 </div>
 
-                {/* Opções extras */}
+                {/* Opções extras - Desktop */}
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-0 text-xs sm:text-sm w-full">
                   <label className="flex items-center gap-2 cursor-pointer group touch-manipulation flex-nowrap">
                     <Checkbox
-                      id="remember-me"
+                      id="remember-me-desktop"
                       checked={rememberMe}
                       onCheckedChange={(checked) => setRememberMe(checked === true)}
                       className="h-5 w-5 rounded border-gray-300 data-[state=checked]:bg-[#F97316] data-[state=checked]:border-[#F97316]"
@@ -1007,7 +1210,7 @@ function LoginContent() {
                   </button>
                 </div>
 
-                {/* Botão de Login Premium */}
+                {/* Botão de Login Premium - Desktop */}
                 <motion.div whileHover={{ scale: loading || transitioning ? 1 : 1.01 }} whileTap={{ scale: loading || transitioning ? 1 : 0.99 }}>
                   <Button
                     type="submit"
