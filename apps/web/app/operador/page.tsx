@@ -193,12 +193,12 @@ export default function OperatorDashboard() {
               {companyName ? `Empresa: ${companyName}` : "Acompanhe sua operação em tempo real"}
             </p>
           </div>
-          <a href="/operador/rotas" className="flex-shrink-0 w-full sm:w-auto">
-            <Button className="bg-orange-500 hover:bg-orange-600 text-white w-full sm:w-auto min-h-[44px] touch-manipulation">
+          <Button asChild className="bg-orange-500 hover:bg-orange-600 text-white w-full sm:w-auto min-h-[44px] touch-manipulation">
+            <a href="/operador/rotas" className="flex items-center justify-center">
               <MapPin className="h-4 w-4 mr-2" />
               Ver Rotas
-            </Button>
-          </a>
+            </a>
+          </Button>
         </div>
 
         {/* Filtros de Período */}
@@ -249,12 +249,12 @@ export default function OperatorDashboard() {
                   <CardTitle className="text-lg sm:text-xl font-semibold mb-1.5">Visualização de Rotas</CardTitle>
                   <p className="text-xs sm:text-sm text-[var(--ink-muted)]">Visualize todas as rotas ativas no mapa interativo</p>
                 </div>
-                <a href="/operador/rotas/mapa" className="flex-shrink-0 w-full sm:w-auto">
-                  <Button variant="outline" size="sm" className="w-full sm:w-auto min-h-[44px] touch-manipulation">
+                <Button asChild variant="outline" size="sm" className="w-full sm:w-auto min-h-[44px] touch-manipulation">
+                  <a href="/operador/rotas/mapa" className="flex items-center justify-center">
                     <MapPin className="h-4 w-4 mr-2" />
                     Ver Mapa
-                  </Button>
-                </a>
+                  </a>
+                </Button>
               </div>
             </CardHeader>
             <CardContent className="pt-0 px-3 sm:px-6">

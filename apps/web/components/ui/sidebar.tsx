@@ -97,13 +97,15 @@ export const Sidebar = ({
   );
 };
 
-export const SidebarBody = (props: React.ComponentProps<typeof motion.div>) => {
+export const SidebarBody = ({ className, children, ...rest }: React.ComponentProps<typeof motion.div>) => {
   const { open } = useSidebar();
   const { isMobile } = useSidebarBody();
   
   return (
     <>
-      <DesktopSidebar {...props} />
+      <DesktopSidebar className={className} {...rest}>
+        {children}
+      </DesktopSidebar>
       {/* Sidebar Mobile - renderizado quando aberto */}
       <AnimatePresence>
         {isMobile && open && (
@@ -115,10 +117,13 @@ export const SidebarBody = (props: React.ComponentProps<typeof motion.div>) => {
             className={cn(
               "md:hidden fixed top-16 sm:top-18 left-0 h-[calc(100vh-4rem)] sm:h-[calc(100vh-4.5rem)] z-50 w-[280px] sm:w-[300px] bg-white dark:bg-neutral-900 border-r border-[var(--border)] overflow-y-auto",
               "shadow-xl",
-              props.className
+              className
             )}
+            id="app-sidebar-mobile"
+            role="dialog"
+            aria-modal="true"
           >
-            {props.children}
+            {children}
           </motion.div>
         )}
       </AnimatePresence>
@@ -167,9 +172,11 @@ export const DesktopSidebar = ({
 
 export const MobileSidebar = ({
   className,
-  children,
-  ...props
-}: React.ComponentProps<'div'>) => {
+  children
+}: {
+  className?: string
+  children?: React.ReactNode
+}) => {
   const { open, setOpen } = useSidebar();
   return (
     <>
@@ -178,7 +185,6 @@ export const MobileSidebar = ({
           "h-10 px-4 py-4 flex flex-row md:hidden items-center justify-between bg-neutral-100 dark:bg-neutral-800 w-full"
         )}
         transition={{ duration: 0.2, ease: "easeOut" }}
-        {...props}
       >
         <div className="flex justify-end z-20 w-full">
           <Menu

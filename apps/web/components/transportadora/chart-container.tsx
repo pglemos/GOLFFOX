@@ -17,10 +17,12 @@ export function ChartContainer({
   title,
   description,
   children,
-  height = 400,
+  height = 360,
   className,
   action
 }: ChartContainerProps) {
+  const shellHeight = `clamp(240px, ${height}px, 70vh)`
+
   return (
     <Card className={className}>
       <CardHeader>
@@ -33,9 +35,16 @@ export function ChartContainer({
         </div>
       </CardHeader>
       <CardContent>
-        <ResponsiveContainer width="100%" height={height}>
-          {children}
-        </ResponsiveContainer>
+        <div
+          className="w-full"
+          style={{
+            height: shellHeight
+          }}
+        >
+          <ResponsiveContainer width="100%" height="100%">
+            {children}
+          </ResponsiveContainer>
+        </div>
       </CardContent>
     </Card>
   )
