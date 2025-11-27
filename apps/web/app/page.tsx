@@ -617,12 +617,12 @@ function LoginContent() {
   )
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row relative overflow-hidden bg-black w-full max-w-full">
-      {/* Background com efeitos sutis */}
-      <FloatingOrbs />
-
-      {/* Grid pattern sutil (estilo Apple) */}
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_at_center,black_20%,transparent_80%)]" />
+    <div className="min-h-screen flex flex-col lg:flex-row relative overflow-hidden bg-gray-100 lg:bg-black w-full max-w-full">
+      {/* Background com efeitos sutis (somente desktop) */}
+      <div className="absolute inset-0 hidden lg:block">
+        <FloatingOrbs />
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_at_center,black_20%,transparent_80%)]" />
+      </div>
 
       {/* Seção Esquerda - Hero Minimalista */}
       <motion.div
@@ -779,21 +779,13 @@ function LoginContent() {
             {/* Mobile: Card wrapper */}
             <div className="lg:hidden bg-white rounded-3xl shadow-xl p-8 mb-8">
               <div className="relative w-full min-w-0">
-                {/* Logo mobile - novo design baseado no mockup */}
+                {/* Logo mobile - apenas texto GOLF FOX */}
                 <motion.div
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                  className="lg:hidden mb-6 flex items-center gap-3"
+                  className="lg:hidden mb-8 text-center"
                 >
-                  {/* Logo Icon */}
-                  <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-[#F97316] to-[#EA580C] flex items-center justify-center">
-                    <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z" />
-                    </svg>
-                  </div>
-
-                  {/* Brand Text */}
                   <h2 className="text-2xl font-bold text-gray-900">
                     GOLF FOX
                   </h2>
