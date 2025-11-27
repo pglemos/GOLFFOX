@@ -133,8 +133,6 @@ class _PassengerDashboardState extends State<PassengerDashboard>
     );
   }
 
-  // ... (omitted parts)
-
   Widget _buildMap(ThemeData theme) {
     final polylines = <Polyline>{};
     final markers = <Marker>{};
@@ -184,6 +182,14 @@ class _PassengerDashboardState extends State<PassengerDashboard>
       myLocationButtonEnabled: false,
       zoomControlsEnabled: false,
       mapToolbarEnabled: false,
+    );
+  }
+
+  double _bearingDegrees(LatLng from, LatLng to) {
+    final fromLat = _toRadians(from.latitude);
+    final fromLng = _toRadians(from.longitude);
+    final toLat = _toRadians(to.latitude);
+    final toLng = _toRadians(to.longitude);
 
     final dLng = toLng - fromLng;
     final y = math.sin(dLng) * math.cos(toLat);
@@ -196,6 +202,23 @@ class _PassengerDashboardState extends State<PassengerDashboard>
 
   double _toRadians(double degrees) => degrees * (math.pi / 180);
   double _toDegrees(double radians) => radians * (180 / math.pi);
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Scaffold(
+      appBar: AppBar(title: const Text('Painel do Passageiro')),
+      body: Stack(
+        children: [
+          _buildMap(theme),
+          if (_isLoading)
+            Positioned.fill(
+              child: _MapShimmerOverlay(animation: _shimmerCtrl),
+            ),
+        ],
+      ),
+    );
+  }
 }
 
 class _MapShimmerOverlay extends StatelessWidget {
