@@ -603,7 +603,7 @@ function LoginContent() {
       transition={{ duration: 0.6, delay, ease: [0.16, 1, 0.3, 1] }}
       className="text-center"
     >
-      <motion.div
+      <motion div?
         className="text-4xl md:text-5xl font-bold bg-gradient-to-br from-white via-white to-white/70 bg-clip-text text-transparent mb-2"
         whileHover={{ scale: 1.05 }}
         transition={{ type: "spring", stiffness: 400, damping: 10 }}
@@ -629,7 +629,7 @@ function LoginContent() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1, ease: "easeOut" }}
-        className="hidden lg:flex lg:w-1/2 relative overflow-hidden items-center justify-center"
+        className="hidden lg:flex lg:w-1/2 relative overflow-hidden items-center justify-center bg-black"
       >
         <div className="relative z-10 max-w-2xl mx-auto text-center px-8">
           {/* Logo com destaque PREMIUM */}
