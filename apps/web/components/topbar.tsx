@@ -54,6 +54,7 @@ export function Topbar({
   const pathname = usePathname()
   const { isTopbarItemActive: _isTopbarItemActive } = useNavigation()
   const [isLoggingOut, setIsLoggingOut] = useState(false)
+  const [isCompactLayout, setIsCompactLayout] = useState(false)
 
   // Determinar painel atual e rotas correspondentes
   const getPanelRoutes = () => {
@@ -154,6 +155,17 @@ export function Topbar({
   const [searchQuery, setSearchQuery] = useState("")
   const [isSearchFocused, setIsSearchFocused] = useState(false)
 
+  // Ajusta ações visíveis em telas muito estreitas
+  useEffect(() => {
+    const handleResize = () => {
+      if (typeof window === 'undefined') return
+      setIsCompactLayout(window.innerWidth < 420)
+    }
+    handleResize()
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
   // Atalho Cmd+K para search
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -192,7 +204,7 @@ export function Topbar({
         {(pathname?.startsWith('/operador') || pathname?.startsWith('/operator')) ? (
           <OperatorLogoSection panelHomeUrl={panelHomeUrl} panelBranding={panelBranding} />
         ) : (
-          <a href={panelHomeUrl} className="flex items-center gap-2 sm:gap-3 flex-shrink-0 group">
+          <a href={panelHomeUrl} className="flex items-center gap-2 sm:gap-3 group min-w-0 sm:flex-shrink-0">
             <motion.div
               whileHover={{ scale: 1.05, rotate: 5 }}
               whileTap={{ scale: 0.95 }}
@@ -233,7 +245,7 @@ export function Topbar({
 
 
         {/* Right Actions */}
-        <div className="flex items-center gap-1 sm:gap-2 ml-auto flex-shrink-0">{/* Mobile search button */}
+        <div className="flex items-center gap-1 sm:gap-2 ml-auto min-w-0 justify-end flex-wrap sm:flex-nowrap">{/* Mobile search button */}
           <Button
             variant="ghost"
             size="icon"
@@ -253,28 +265,32 @@ export function Topbar({
           </Button>
 
           {/* Theme Toggle */}
-          <ThemeToggle />
+          {!isCompactLayout && <ThemeToggle />}
 
           {/* Configurações */}
-          <Button
-            variant="outline"
-            size="sm"
-            className="hidden xl:flex items-center gap-2 rounded-full border-[var(--border)] hover:bg-[var(--brand-light)] hover:text-[var(--brand)] hover:border-[var(--brand)] transition-all duration-200"
-            onClick={() => handleNavigate(panelRoutes.settings)}
-          >
-            <Settings2 className="h-4 w-4" />
-            Configurações
-          </Button>
+          {!isCompactLayout && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="hidden xl:flex items-center gap-2 rounded-full border-[var(--border)] hover:bg-[var(--brand-light)] hover:text-[var(--brand)] hover:border-[var(--brand)] transition-all duration-200"
+              onClick={() => handleNavigate(panelRoutes.settings)}
+            >
+              <Settings2 className="h-4 w-4" />
+              Configurações
+            </Button>
+          )}
           
-          <Button
-            variant="ghost"
-            size="icon"
-            className="xl:hidden hover:bg-[var(--bg-hover)] min-w-[44px] min-h-[44px] touch-manipulation"
-            onClick={() => handleNavigate(panelRoutes.settings)}
-            aria-label="Configurações"
-          >
-            <Settings2 className="h-5 w-5" />
-          </Button>
+          {!isCompactLayout && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="xl:hidden hover:bg-[var(--bg-hover)] min-w-[44px] min-h-[44px] touch-manipulation"
+              onClick={() => handleNavigate(panelRoutes.settings)}
+              aria-label="Configurações"
+            >
+              <Settings2 className="h-5 w-5" />
+            </Button>
+          )}
 
           {/* User Menu */}
           <DropdownMenu>
