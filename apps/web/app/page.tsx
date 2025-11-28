@@ -13,7 +13,7 @@ import { debug, error as logError } from "@/lib/logger"
 import { LoginErrorBoundary } from "./login-error-boundary"
 
 const EMAIL_REGEX =
-  /^(?:[a-zA-Z0-9_'^&/+\-])+(?:\.(?:[a-zA-Z0-9_'^&/+\-])+)*@(?:(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,})$/
+  /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
 const PASSWORD_REGEX = /^(?=.*[A-Z])(?=.*\d).{8,}$/
 
 const AUTH_ENDPOINT = process.env.NEXT_PUBLIC_AUTH_ENDPOINT ?? "/api/auth/login"
@@ -1256,3 +1256,4 @@ export default function LoginPage() {
   )
 }
 
+\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n  /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$/
