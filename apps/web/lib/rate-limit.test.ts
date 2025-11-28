@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+﻿import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { applyRateLimit } from './rate-limit'
 import { NextRequest } from 'next/server'
 
@@ -17,7 +17,7 @@ vi.mock('@upstash/ratelimit', () => ({
     Ratelimit: class {
         static slidingWindow() { return {} }
         constructor() {
-            // @ts-ignore
+            // @ts-expect-error Legacy: valid em ambiente sem tipagem
             this.limit = mockLimit
         }
         limit = mockLimit
@@ -65,3 +65,4 @@ describe('rate-limit', () => {
         expect(res?.status).toBe(429)
     })
 })
+

@@ -376,9 +376,6 @@ function LoginContent() {
       try {
         debug("Iniciando autenticação", { email: maskedEmail }, "LoginPage")
 
-        let token: string | undefined
-        let user: { id: string; email: string; role?: string } | undefined
-
         // ✅ OBRIGATÓRIO: Usar apenas a API que verifica o banco de dados do Supabase
         // A API /api/auth/login verifica:
         // 1. Se o usuário existe na tabela users
@@ -456,8 +453,8 @@ function LoginContent() {
 
         // ✅ Resposta bem-sucedida - obter dados do usuário
         const data = await response.json()
-        token = data?.token
-        user = data?.user
+        const token = data?.token
+        const user = data?.user
         const sessionData = data?.session
         if (user && !user.email && sessionData?.user?.email) {
           user.email = sessionData.user.email
@@ -603,7 +600,7 @@ function LoginContent() {
       transition={{ duration: 0.6, delay, ease: [0.16, 1, 0.3, 1] }}
       className="text-center"
     >
-      <motion div?
+      <motion.div
         className="text-4xl md:text-5xl font-bold bg-gradient-to-br from-white via-white to-white/70 bg-clip-text text-transparent mb-2"
         whileHover={{ scale: 1.05 }}
         transition={{ type: "spring", stiffness: 400, damping: 10 }}
@@ -1258,3 +1255,4 @@ export default function LoginPage() {
     </LoginErrorBoundary>
   )
 }
+

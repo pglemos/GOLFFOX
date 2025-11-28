@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { AppShell } from "@/components/app-shell"
 import { Card } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { HelpCircle, MessageCircle, FileText, ExternalLink, Search, BookOpen, Video, Mail } from "lucide-react"
 import { Input } from "@/components/ui/input"
@@ -15,6 +16,8 @@ export default function TransportadoraAjudaPage() {
   const router = useRouter()
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
+  const [searchQuery, setSearchQuery] = useState("")
+  const [selectedCategory, setSelectedCategory] = useState<string>("all")
 
   useEffect(() => {
     const getUser = async () => {
@@ -32,9 +35,6 @@ export default function TransportadoraAjudaPage() {
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center"><div className="w-16 h-16 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin mx-auto"></div></div>
   }
-
-  const [searchQuery, setSearchQuery] = useState("")
-  const [selectedCategory, setSelectedCategory] = useState<string>("all")
 
   const faqCategories = {
     all: "Todas",

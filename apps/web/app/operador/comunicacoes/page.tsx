@@ -1,17 +1,17 @@
-"use client"
+﻿"use client"
 
 import { Suspense, useEffect, useState } from "react"
-// @ts-ignore
+// @ts-expect-error Legacy: valid em ambiente sem tipagem
 import { AppShell } from "@/components/app-shell"
-// @ts-ignore
+// @ts-expect-error Legacy: valid em ambiente sem tipagem
 import { Card } from "@/components/ui/card"
-// @ts-ignore
+// @ts-expect-error Legacy: valid em ambiente sem tipagem
 import { Button } from "@/components/ui/button"
 import { Send } from "lucide-react"
-// @ts-ignore
+// @ts-expect-error Legacy: valid em ambiente sem tipagem
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
-// @ts-ignore
+// @ts-expect-error Legacy: valid em ambiente sem tipagem
 import { BroadcastModal } from "@/components/operator/broadcast-modal"
 
 function ComunicacoesOperatorPageInner() {
@@ -65,7 +65,7 @@ function ComunicacoesOperatorPageInner() {
       if (error) throw error
       setItems(data || [])
     } catch (error) {
-      console.error("Erro ao carregar comunicações:", error)
+      console.error("Erro ao carregar comunicaÃ§Ãµes:", error)
     }
   }
 
@@ -76,8 +76,8 @@ function ComunicacoesOperatorPageInner() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold mb-2">Comunicações</h1>
-            <p className="text-[var(--ink-muted)]">Broadcasts internos e histórico</p>
+            <h1 className="text-3xl font-bold mb-2">ComunicaÃ§Ãµes</h1>
+            <p className="text-[var(--ink-muted)]">Broadcasts internos e histÃ³rico</p>
           </div>
           <Button className="bg-orange-500 hover:bg-orange-600" onClick={() => setIsModalOpen(true)}>
             <Send className="h-4 w-4 mr-2" /> Novo Broadcast
@@ -93,7 +93,7 @@ function ComunicacoesOperatorPageInner() {
             </Card>
           ))}
           {items.length === 0 && (
-            <Card className="p-12 text-center text-sm text-[var(--ink-muted)]">Nenhuma comunicação ainda.</Card>
+            <Card className="p-12 text-center text-sm text-[var(--ink-muted)]">Nenhuma comunicaÃ§Ã£o ainda.</Card>
           )}
         </div>
 
@@ -120,3 +120,4 @@ export default function ComunicacoesOperatorPage() {
     </Suspense>
   )
 }
+

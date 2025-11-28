@@ -149,7 +149,7 @@ export function CompanyUsersModal({
                 <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                 <h3 className="text-lg font-medium mb-2">Nenhum usuário cadastrado</h3>
                 <p className="text-sm text-[var(--ink-muted)] mb-4">
-                  Clique em "Criar Novo Usuário" para adicionar um funcionário
+                  Clique em &quot;Criar Novo Usuário&quot; para adicionar um funcionário
                 </p>
               </div>
             ) : (

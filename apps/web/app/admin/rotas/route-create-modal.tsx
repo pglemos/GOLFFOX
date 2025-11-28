@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState, useMemo } from "react"
 import {
@@ -10,8 +10,9 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Route } from "lucide-react"
+import { Route, Navigation } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { notifySuccess, notifyError } from "@/lib/toast"
 import { optimizeRoute } from "@/lib/route-optimization"
@@ -27,11 +28,11 @@ import { RoutePreviewMap } from "@/components/modals/route-create/route-preview-
 import { useGoogleMapsLoader } from "@/components/modals/route-create/use-google-maps-loader"
 
 const routeSchema = z.object({
-  name: z.string().min(1, "Nome é obrigatório"),
-  company_id: z.string().min(1, "Empresa é obrigatória"),
-  scheduled_time: z.string().min(1, "Horário é obrigatório"),
+  name: z.string().min(1, "Nome Ã© obrigatÃ³rio"),
+  company_id: z.string().min(1, "Empresa Ã© obrigatÃ³ria"),
+  scheduled_time: z.string().min(1, "HorÃ¡rio Ã© obrigatÃ³rio"),
   shift: z.enum(["manha", "tarde", "noite"]),
-  selected_employees: z.array(z.string()).min(1, "Selecione pelo menos um funcionário"),
+  selected_employees: z.array(z.string()).min(1, "Selecione pelo menos um funcionÃ¡rio"),
 })
 
 interface RouteCreateModalProps {
@@ -68,7 +69,7 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
 
   const handleOptimize = async () => {
     if (!formData.company_id || !formData.selected_employees || formData.selected_employees.length === 0) {
-      notifyError(new Error("Selecione pelo menos um funcionário"), "Selecione funcionários")
+      notifyError(new Error("Selecione pelo menos um funcionÃ¡rio"), "Selecione funcionÃ¡rios")
       return
     }
 
@@ -76,7 +77,7 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
     const missingCoords = selectedEmps.filter((e) => !e.lat || !e.lng)
 
     if (missingCoords.length > 0) {
-      setWarnings([`${missingCoords.length} funcionário(s) sem coordenadas. Geocodificando...`])
+      setWarnings([`${missingCoords.length} funcionÃ¡rio(s) sem coordenadas. Geocodificando...`])
 
       await Promise.all(missingCoords.map(async (emp) => {
         const geocoded = await geocodeAddress(emp.address)
@@ -85,7 +86,7 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
             latitude: geocoded.lat,
             longitude: geocoded.lng
           }
-          // @ts-ignore - Supabase types are too strict for dynamic updates
+          // @ts-expect-error - Supabase types are too strict for dynamic updates
           const updateQuery = (supabase.from("gf_employee_company").update(updatePayload as any) as any)
           const { error: updateError } = await updateQuery.eq("id", emp.employee_id)
           if (updateError) console.warn("Erro ao atualizar coordenadas:", updateError)
@@ -104,11 +105,11 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
       }))
 
     if (waypoints.length === 0) {
-      notifyError(new Error("Nenhum funcionário com coordenadas válidas"), "Erro")
+      notifyError(new Error("Nenhum funcionÃ¡rio com coordenadas vÃ¡lidas"), "Erro")
       return
     }
 
-    // Se origem não tiver coordenadas, usar primeiro funcionário como origem
+    // Se origem nÃ£o tiver coordenadas, usar primeiro funcionÃ¡rio como origem
     let originLat = formData.origin_lat
     let originLng = formData.origin_lng
     if (!originLat || !originLng) {
@@ -122,12 +123,12 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
           origin_address: prev.origin_address || "Primeiro ponto",
         }))
       } else {
-        notifyError(new Error("Defina a origem (garagem) ou selecione funcionários"), "Erro")
+        notifyError(new Error("Defina a origem (garagem) ou selecione funcionÃ¡rios"), "Erro")
         return
       }
     }
 
-    // Se destino não tiver coordenadas, usar último funcionário como destino
+    // Se destino nÃ£o tiver coordenadas, usar Ãºltimo funcionÃ¡rio como destino
     let destLat = formData.destination_lat
     let destLng = formData.destination_lng
     if (!destLat || !destLng) {
@@ -139,17 +140,17 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
           ...prev,
           destination_lat: lastWaypoint.lat,
           destination_lng: lastWaypoint.lng,
-          destination_address: prev.destination_address || "Último ponto",
+          destination_address: prev.destination_address || "Ãšltimo ponto",
         }))
       } else {
-        notifyError(new Error("Defina o destino (empresa) ou selecione funcionários"), "Erro")
+        notifyError(new Error("Defina o destino (empresa) ou selecione funcionÃ¡rios"), "Erro")
         return
       }
     }
 
     setOptimizing(true)
     try {
-      // Criar timestamp ISO para o horário agendado (hoje + horário)
+      // Criar timestamp ISO para o horÃ¡rio agendado (hoje + horÃ¡rio)
       let departureTimeIso: string | undefined
       if (formData.scheduled_time) {
         const [hours, minutes] = formData.scheduled_time.split(":")
@@ -171,19 +172,19 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
       const newWarnings: string[] = []
 
       if (selectedVehicle && selectedVehicle.capacity < waypoints.length) {
-        newWarnings.push(`⚠️ Capacidade do veículo (${selectedVehicle.capacity}) menor que número de passageiros (${waypoints.length})`)
+        newWarnings.push(`âš ï¸ Capacidade do veÃ­culo (${selectedVehicle.capacity}) menor que nÃºmero de passageiros (${waypoints.length})`)
       }
 
       if (!selectedDriver) {
-        newWarnings.push("⚠️ Motorista não selecionado")
+        newWarnings.push("âš ï¸ Motorista nÃ£o selecionado")
       }
 
       if (!selectedVehicle) {
-        newWarnings.push("⚠️ Veículo não selecionado")
+        newWarnings.push("âš ï¸ VeÃ­culo nÃ£o selecionado")
       }
 
       if (selectedDriver && selectedDriver.documents_valid === false) {
-        newWarnings.push("⚠️ Motorista com documentos pendentes")
+        newWarnings.push("âš ï¸ Motorista com documentos pendentes")
       }
 
       setWarnings([...(result.warnings || []), ...newWarnings])
@@ -200,25 +201,25 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
       setSaving(true)
 
       if (!selectedDriver) {
-        notifyError(new Error("Selecione um motorista"), "Motorista obrigatório")
+        notifyError(new Error("Selecione um motorista"), "Motorista obrigatÃ³rio")
         setSaving(false)
         return
       }
 
       if (!selectedVehicle) {
-        notifyError(new Error("Selecione um veículo"), "Veículo obrigatório")
+        notifyError(new Error("Selecione um veÃ­culo"), "VeÃ­culo obrigatÃ³rio")
         setSaving(false)
         return
       }
 
-      // Validar capacidade do veículo
+      // Validar capacidade do veÃ­culo
       const orderedEmployees = optimizationResult
         ? optimizationResult.ordered.map((o) => o.id)
         : formData.selected_employees || []
 
       if (selectedVehicle.capacity < orderedEmployees.length) {
         const confirm = window.confirm(
-          `Atenção: O veículo selecionado tem capacidade de ${selectedVehicle.capacity} passageiros, mas ${orderedEmployees.length} foram selecionados. Deseja continuar mesmo assim?`
+          `AtenÃ§Ã£o: O veÃ­culo selecionado tem capacidade de ${selectedVehicle.capacity} passageiros, mas ${orderedEmployees.length} foram selecionados. Deseja continuar mesmo assim?`
         )
         if (!confirm) {
           setSaving(false)
@@ -250,17 +251,17 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
 
       if (routeError) throw routeError
 
-      // .single() retorna o objeto diretamente, não um array
+      // .single() retorna o objeto diretamente, nÃ£o um array
       const routeId = (routeData as any)?.id
       if (!routeId) {
         console.error("Route data:", routeData)
-        throw new Error("Erro ao criar rota: ID não retornado")
+        throw new Error("Erro ao criar rota: ID nÃ£o retornado")
       }
 
       const stops = orderedEmployees.map((employeeId, index) => {
         const emp = employees.find((e) => e.employee_id === employeeId)
         if (!emp || !emp.lat || !emp.lng) {
-          throw new Error(`Funcionário ${emp?.first_name || employeeId} sem coordenadas válidas`)
+          throw new Error(`FuncionÃ¡rio ${emp?.first_name || employeeId} sem coordenadas vÃ¡lidas`)
         }
         return {
           route_id: routeId,
@@ -301,15 +302,15 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
               Nova Rota
             </DialogTitle>
             <DialogDescription className="text-base text-gray-600 mt-2">
-              Preencha os dados da rota, selecione os funcionários e otimize o trajeto
+              Preencha os dados da rota, selecione os funcionÃ¡rios e otimize o trajeto
             </DialogDescription>
           </DialogHeader>
 
           <Tabs defaultValue="form" className="flex-1 flex flex-col overflow-hidden min-h-0">
             <TabsList className="grid w-full grid-cols-2 h-12 mb-6">
-              <TabsTrigger value="form" className="text-base font-medium">Formulário</TabsTrigger>
+              <TabsTrigger value="form" className="text-base font-medium">FormulÃ¡rio</TabsTrigger>
               <TabsTrigger value="preview" disabled={!optimizationResult} className="text-base font-medium">
-                Pré-visualização
+                PrÃ©-visualizaÃ§Ã£o
               </TabsTrigger>
             </TabsList>
 
@@ -352,7 +353,7 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
                 <div className="text-center py-8 text-red-600">{mapError}</div>
               ) : (
                 <div className="text-center py-8 text-gray-500">
-                  Clique em "Pré-visualizar & Otimizar" para ver o mapa
+                  Clique em &quot;Pre-visualizar &amp; Otimizar&quot; para ver o mapa
                 </div>
               )}
             </TabsContent>
@@ -363,7 +364,7 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
               variant="outline"
               onClick={onClose}
               disabled={saving}
-              aria-label="Cancelar criação de rota"
+              aria-label="Cancelar criaÃ§Ã£o de rota"
               className="w-full sm:w-auto order-3 sm:order-1 text-base font-medium h-11 sm:h-12"
             >
               Cancelar
@@ -373,9 +374,9 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
               disabled={optimizing || !formData.company_id || !formData.selected_employees?.length}
               variant="outline"
               className="bg-orange-500 hover:bg-orange-600 text-white w-full sm:w-auto order-2 sm:order-2 text-base font-medium h-11 sm:h-12"
-              aria-label="Pré-visualizar e otimizar rota"
+              aria-label="PrÃ©-visualizar e otimizar rota"
             >
-              {optimizing ? "Otimizando..." : <span className="hidden sm:inline">Pré-visualizar & Otimizar</span>}
+              {optimizing ? "Otimizando..." : <span className="hidden sm:inline">PrÃ©-visualizar & Otimizar</span>}
               <span className="sm:hidden">Otimizar</span>
             </Button>
             <Button
@@ -434,13 +435,13 @@ function RoutePreviewMap({
     setManualOrder(result.ordered)
   }, [result])
 
-  // Função para mover item na lista
+  // FunÃ§Ã£o para mover item na lista
   const moveItem = React.useCallback((fromIndex: number, toIndex: number) => {
     setManualOrder((prev) => {
       const newOrder = [...prev]
       const [movedItem] = newOrder.splice(fromIndex, 1)
       newOrder.splice(toIndex, 0, movedItem)
-      // Atualizar ordem numérica
+      // Atualizar ordem numÃ©rica
       return newOrder.map((item, index) => ({
         ...item,
         order: index + 1
@@ -514,7 +515,7 @@ function RoutePreviewMap({
     <div className="space-y-3 sm:space-y-4 h-full flex flex-col">
       <div className="grid grid-cols-3 gap-2 sm:gap-4">
         <div className="p-2 sm:p-3 bg-gray-50 rounded-lg">
-          <div className="text-xs sm:text-sm text-gray-600">Distância Total</div>
+          <div className="text-xs sm:text-sm text-gray-600">DistÃ¢ncia Total</div>
           <div className="text-lg sm:text-2xl font-bold">{totalKm} km</div>
         </div>
         <div className="p-2 sm:p-3 bg-gray-50 rounded-lg">
@@ -604,3 +605,4 @@ function RoutePreviewMap({
     </div>
   )
 }
+

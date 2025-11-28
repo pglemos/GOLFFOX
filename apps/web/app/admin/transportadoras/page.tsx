@@ -248,7 +248,7 @@ export default function TransportadorasPage() {
             <Card className="p-4 sm:p-6 md:p-8 text-center w-full max-w-full overflow-hidden">
               <Truck className="h-10 w-10 sm:h-12 sm:w-12 text-[var(--ink-muted)] mx-auto mb-3 sm:mb-4 flex-shrink-0" />
               <h3 className="text-sm sm:text-base md:text-lg font-semibold mb-2 break-words px-2">Nenhuma transportadora cadastrada</h3>
-              <p className="text-xs sm:text-sm md:text-base text-[var(--ink-muted)] mb-4 break-words px-2">Clique em "Criar Transportadora" para criar uma nova transportadora.</p>
+              <p className="text-xs sm:text-sm md:text-base text-[var(--ink-muted)] mb-4 break-words px-2">Clique em &quot;Criar Transportadora&quot; para criar uma nova transportadora.</p>
             </Card>
           )}
 

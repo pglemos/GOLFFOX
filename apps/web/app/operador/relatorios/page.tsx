@@ -1,20 +1,20 @@
-"use client"
+﻿"use client"
 
-// @ts-ignore
+// @ts-expect-error Legacy: valid em ambiente sem tipagem
 import { AppShell } from "@/components/app-shell"
-// @ts-ignore
+// @ts-expect-error Legacy: valid em ambiente sem tipagem
 import { Card } from "@/components/ui/card"
-// @ts-ignore
+// @ts-expect-error Legacy: valid em ambiente sem tipagem
 import { Button } from "@/components/ui/button"
 import { FileText, Download, BarChart3 } from "lucide-react"
 import { useEffect, useState } from "react"
-// @ts-ignore
+// @ts-expect-error Legacy: valid em ambiente sem tipagem
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 import { notifySuccess, notifyError } from "@/lib/toast"
-// @ts-ignore
+// @ts-expect-error Legacy: valid em ambiente sem tipagem
 import { exportToCSV, exportToExcel, exportToPDF, formatDelaysReport, formatOccupancyReport, formatNotBoardedReport, type ReportData } from "@/lib/export-utils"
-// @ts-ignore
+// @ts-expect-error Legacy: valid em ambiente sem tipagem
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -49,9 +49,9 @@ export default function RelatoriosOperatorPage() {
         rows: []
       }
 
-      // Tentar buscar dados de views seguras se disponíveis
+      // Tentar buscar dados de views seguras se disponÃ­veis
       if (report.viewName) {
-        // Views seguras já filtram por company_id via RLS
+        // Views seguras jÃ¡ filtram por company_id via RLS
         const { data, error } = await supabase
           .from(report.viewName)
           .select('*')
@@ -62,12 +62,12 @@ export default function RelatoriosOperatorPage() {
         if (report.formatter && data) {
           reportData = report.formatter(data)
         } else {
-          // Formato genérico
+          // Formato genÃ©rico
           reportData.headers = Object.keys(data[0] || {})
           reportData.rows = data.map((row: any) => Object.values(row))
         }
       } else {
-        // Dados mockados para relatórios sem view
+        // Dados mockados para relatÃ³rios sem view
         reportData.headers = ['Data', 'Valor', 'Status']
         reportData.rows = [['2024-01-01', 'Exemplo', 'Ativo']]
       }
@@ -82,7 +82,7 @@ export default function RelatoriosOperatorPage() {
 
       notifySuccess('', { i18n: { ns: 'operator', key: 'reports.exportSuccess', params: { title: report.title } } })
     } catch (error: any) {
-      console.error("Erro ao exportar relatório:", error)
+      console.error("Erro ao exportar relatÃ³rio:", error)
       notifyError('Erro ao exportar', undefined, { i18n: { ns: 'operator', key: 'reports.exportError', params: { message: error.message || 'Erro desconhecido' } } })
     }
   }
@@ -100,23 +100,23 @@ export default function RelatoriosOperatorPage() {
     },
     { 
       id: 'ocupacao', 
-      title: 'Ocupação', 
-      desc: 'Ocupação por horário/rota',
+      title: 'OcupaÃ§Ã£o', 
+      desc: 'OcupaÃ§Ã£o por horÃ¡rio/rota',
       icon: BarChart3,
       viewName: 'v_reports_occupancy',
       formatter: formatOccupancyReport
     },
     { 
       id: 'nao-embarcados', 
-      title: 'Não embarcados', 
-      desc: 'Motivos e frequência',
+      title: 'NÃ£o embarcados', 
+      desc: 'Motivos e frequÃªncia',
       icon: FileText,
       viewName: 'v_reports_not_boarded',
       formatter: formatNotBoardedReport
     },
     { 
       id: 'eficiencia', 
-      title: 'Eficiência', 
+      title: 'EficiÃªncia', 
       desc: 'Planejado vs realizado',
       icon: BarChart3
     },
@@ -139,8 +139,8 @@ export default function RelatoriosOperatorPage() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold mb-2">Relatórios</h1>
-            <p className="text-[var(--ink-muted)]">Geração e exportação de relatórios</p>
+            <h1 className="text-3xl font-bold mb-2">RelatÃ³rios</h1>
+            <p className="text-[var(--ink-muted)]">GeraÃ§Ã£o e exportaÃ§Ã£o de relatÃ³rios</p>
           </div>
         </div>
 
@@ -184,3 +184,4 @@ export default function RelatoriosOperatorPage() {
     </AppShell>
   )
 }
+

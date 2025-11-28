@@ -10,15 +10,11 @@ import { useRouter } from "next/navigation"
 import { notifyError } from "@/lib/toast"
 import { Button } from "@/components/ui/button"
 import { useOperatorTenant } from "@/components/providers/operator-tenant-provider"
+import operatorI18nData from "@/i18n/operator.json"
 
-let operatorI18n: any = {
+const operatorI18n: any = operatorI18nData ?? {
   routes_title: "Rotas",
   routes_subtitle: "Gerencie as rotas da sua empresa"
-}
-try {
-  operatorI18n = require('@/i18n/operator.json')
-} catch (err) {
-  // Usar valores padrão
 }
 
 export default function OperatorRotasPage() {

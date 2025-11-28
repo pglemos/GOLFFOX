@@ -1,17 +1,17 @@
-"use client"
+﻿"use client"
 
 import { useEffect, useState } from "react"
-// @ts-ignore
+// @ts-expect-error Legacy: valid em ambiente sem tipagem
 import { AppShell } from "@/components/app-shell"
-// @ts-ignore
+// @ts-expect-error Legacy: valid em ambiente sem tipagem
 import { Button } from "@/components/ui/button"
-// @ts-ignore
+// @ts-expect-error Legacy: valid em ambiente sem tipagem
 import { Card } from "@/components/ui/card"
 import { RefreshCw, CheckCircle, AlertCircle } from "lucide-react"
-// @ts-ignore
+// @ts-expect-error Legacy: valid em ambiente sem tipagem
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
-// @ts-ignore
+// @ts-expect-error Legacy: valid em ambiente sem tipagem
 import { geocodeAddress, optimizeRoute } from "@/lib/google-maps"
 
 export default function SincronizarPage() {
@@ -52,7 +52,7 @@ export default function SincronizarPage() {
 
       for (const rota of rotas || []) {
         try {
-          // Buscar funcionários da empresa da rota
+          // Buscar funcionÃ¡rios da empresa da rota
           const { data: funcionarios, error: funcError } = await supabase
             .from("gf_employee_company")
             .select("*")
@@ -61,7 +61,7 @@ export default function SincronizarPage() {
 
           if (funcError) throw funcError
 
-          // Geocodificar endereços sem lat/lng
+          // Geocodificar endereÃ§os sem lat/lng
           const pontos: Array<{ lat: number; lng: number; address?: string }> = []
           
           for (const func of funcionarios || []) {
@@ -74,13 +74,13 @@ export default function SincronizarPage() {
                 lat = location.lat
                 lng = location.lng
 
-                // Atualizar funcionário com coordenadas
+                // Atualizar funcionÃ¡rio com coordenadas
                 await supabase
                   .from("gf_employee_company")
                   .update({ latitude: lat, longitude: lng })
                   .eq("id", func.id)
               } else {
-                console.warn(`Não foi possível geocodificar: ${func.address}`)
+                console.warn(`NÃ£o foi possÃ­vel geocodificar: ${func.address}`)
                 continue
               }
             }
@@ -157,11 +157,11 @@ export default function SincronizarPage() {
         <Card className="p-6">
           <div className="space-y-4">
             <p className="text-sm text-[var(--muted)]">
-              Este processo irá:
+              Este processo irÃ¡:
             </p>
             <ul className="list-disc list-inside space-y-2 text-sm text-[var(--muted)]">
-              <li>Buscar todos os funcionários cadastrados</li>
-              <li>Geocodificar endereços que não possuem coordenadas</li>
+              <li>Buscar todos os funcionÃ¡rios cadastrados</li>
+              <li>Geocodificar endereÃ§os que nÃ£o possuem coordenadas</li>
               <li>Otimizar a ordem dos pontos usando Google Directions API</li>
               <li>Atualizar os planos de rota no sistema</li>
             </ul>
@@ -201,4 +201,5 @@ export default function SincronizarPage() {
     </AppShell>
   )
 }
+
 
