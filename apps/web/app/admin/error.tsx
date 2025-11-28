@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
 
 export default function Error({ error, reset }: { error: Error; reset: () => void }) {
@@ -11,11 +12,10 @@ export default function Error({ error, reset }: { error: Error; reset: () => voi
         <div className="mt-4 flex items-center justify-center gap-2">
           <Button onClick={reset}>Tentar novamente</Button>
           <Button variant="outline" asChild>
-            <a href="/">Ir para início</a>
+            <Link href="/">Ir para início</Link>
           </Button>
         </div>
       </div>
     </div>
   )
 }
-

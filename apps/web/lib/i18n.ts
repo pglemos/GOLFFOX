@@ -1,4 +1,4 @@
-import common from '@/i18n/common.json'
+﻿import common from '@/i18n/common.json'
 import operator from '@/i18n/operator.json'
 import admin from '@/i18n/admin.json'
 
@@ -23,7 +23,7 @@ function resolveKey(dict: Record<string, unknown>, key: string): unknown {
   // Suporta dot-path: ex. "success.exportGenerated"
   return key.split('.').reduce<unknown>((acc: unknown, part: string) => {
     if (acc && typeof acc === 'object') {
-      // @ts-ignore indexer dinâmico
+      // @ts-expect-error indexer dinÃ¢mico
       return (acc as Record<string, unknown>)[part]
     }
     return undefined
@@ -38,3 +38,4 @@ export function t(ns: Namespace, key: string, params?: Record<string, string | n
 }
 
 export type I18nKey = { ns: Namespace; key: string; params?: Record<string, string | number> }
+

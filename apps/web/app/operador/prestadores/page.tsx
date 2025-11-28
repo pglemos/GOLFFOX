@@ -1,12 +1,12 @@
-"use client"
+﻿"use client"
 
-// @ts-ignore
+// @ts-expect-error Legacy: valid em ambiente sem tipagem
 import { AppShell } from "@/components/app-shell"
-// @ts-ignore
+// @ts-expect-error Legacy: valid em ambiente sem tipagem
 import { Card } from "@/components/ui/card"
 import { Building2 } from "lucide-react"
 import { useEffect, useState } from "react"
-// @ts-ignore
+// @ts-expect-error Legacy: valid em ambiente sem tipagem
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 
@@ -66,7 +66,7 @@ export default function PrestadoresOperatorPage() {
                 <Building2 className="h-5 w-5 text-orange-500 flex-shrink-0" />
                 <div className="flex-1 min-w-0 w-full">
                   <p className="font-semibold text-sm sm:text-base break-words">{p.carrier_name || 'Transportadora'}</p>
-                  <p className="text-xs text-[var(--ink-muted)] mt-1 break-words">Período: {p.period_start} — {p.period_end || 'atual'}</p>
+                  <p className="text-xs text-[var(--ink-muted)] mt-1 break-words">PerÃ­odo: {p.period_start} â€” {p.period_end || 'atual'}</p>
                 </div>
                 <div className="text-xs sm:text-sm text-left sm:text-right w-full sm:w-auto mt-2 sm:mt-0">
                   <p className="break-words">SLA (Pontualidade): {(p.avg_punctuality || 0).toFixed(1)}%</p>
@@ -85,3 +85,4 @@ export default function PrestadoresOperatorPage() {
     </AppShell>
   )
 }
+

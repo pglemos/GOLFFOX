@@ -1,12 +1,12 @@
-"use client"
+﻿"use client"
 
-// @ts-ignore
+// @ts-expect-error Legacy: valid em ambiente sem tipagem
 import { AppShell } from "@/components/app-shell"
-// @ts-ignore
+// @ts-expect-error Legacy: valid em ambiente sem tipagem
 import { Card } from "@/components/ui/card"
 import { Shield, FileWarning } from "lucide-react"
 import { useEffect, useState } from "react"
-// @ts-ignore
+// @ts-expect-error Legacy: valid em ambiente sem tipagem
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 
@@ -64,7 +64,7 @@ export default function ConformidadeOperatorPage() {
     <AppShell user={{ id: user?.id || "", name: user?.name || "Operador", email: user?.email || "", role: "operador" }}>
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold mb-2">Conformidade & Segurança</h1>
+          <h1 className="text-3xl font-bold mb-2">Conformidade & SeguranÃ§a</h1>
           <p className="text-[var(--ink-muted)]">Incidentes, auditorias e documentos</p>
         </div>
 
@@ -74,7 +74,7 @@ export default function ConformidadeOperatorPage() {
               <div className="flex items-center gap-3">
                 <FileWarning className="h-5 w-5 text-orange-500" />
                 <div className="flex-1">
-                  <p className="font-semibold">{i.tipo} • {i.severidade}</p>
+                  <p className="font-semibold">{i.tipo} â€¢ {i.severidade}</p>
                   <p className="text-xs text-[var(--ink-muted)]">{new Date(i.created_at).toLocaleString('pt-BR')}</p>
                 </div>
                 <span className="text-xs px-2 py-1 rounded bg-[var(--bg-soft)] border border-[var(--border)]">{i.status}</span>
@@ -89,3 +89,4 @@ export default function ConformidadeOperatorPage() {
     </AppShell>
   )
 }
+

@@ -240,7 +240,7 @@ export function CreateOperatorModal({
             Criar Empresa
           </DialogTitle>
           <DialogDescription className="text-sm sm:text-base break-words">
-            Preencha os dados da empresa. Os operadores podem ser criados posteriormente através do botão "Usuário Operador" na lista de empresas.
+            Preencha os dados da empresa. Os operadores podem ser criados posteriormente através do botão &quot;Usu?rio Operador&quot; na lista de empresas.
           </DialogDescription>
         </DialogHeader>
 
@@ -424,7 +424,7 @@ export function CreateOperatorModal({
                 Dados do Responsável (Opcional)
               </h3>
               <p className="text-sm text-[var(--ink-muted)] mb-4">
-                Você pode preencher os dados do responsável agora ou criar os operadores depois através do botão "Usuário Operador" na lista de empresas.
+                Você pode preencher os dados do responsável agora ou criar os operadores depois através do botão &quot;Usu?rio Operador&quot; na lista de empresas.
               </p>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

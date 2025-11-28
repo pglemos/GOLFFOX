@@ -1,13 +1,13 @@
-"use client"
+﻿"use client"
 
 import { useSearchParams } from "next/navigation"
 import { Suspense } from "react"
-// @ts-ignore
+// @ts-expect-error Legacy: valid em ambiente sem tipagem
 import { AppShell } from "@/components/app-shell"
-// @ts-ignore
+// @ts-expect-error Legacy: valid em ambiente sem tipagem
 import { FleetMap } from "@/components/fleet-map"
 import { useEffect, useState } from "react"
-// @ts-ignore
+// @ts-expect-error Legacy: valid em ambiente sem tipagem
 import { supabase } from "@/lib/supabase"
 import { useOperatorTenant } from "@/components/providers/operator-tenant-provider"
 
@@ -69,3 +69,4 @@ export default function OperatorMapaPage() {
     </Suspense>
   )
 }
+

@@ -1,4 +1,4 @@
-import React from 'react'
+﻿import React from 'react'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import { RouteModal } from '../components/modals/route-modal'
@@ -31,7 +31,7 @@ jest.mock('../lib/supabase', () => ({
 
 describe('RouteModal generator integration', () => {
   beforeEach(() => {
-    // @ts-ignore
+    // @ts-expect-error
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
       json: async () => ({ stops: [], gfRoutePlan: [] })
@@ -60,4 +60,5 @@ describe('RouteModal generator integration', () => {
     expect(global.fetch).toHaveBeenCalledWith('/api/admin/generate-stops', expect.objectContaining({ method: 'POST' }))
   })
 })
+
 
