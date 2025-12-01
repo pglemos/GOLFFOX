@@ -3,7 +3,7 @@
 import { useState, useEffect, memo, useMemo } from "react"
 import { usePathname } from "next/navigation"
 import { Topbar } from "./topbar"
-import { Sidebar } from "./sidebar-new"
+import { Sidebar } from "./sidebar"
 import { EnvVarsBanner } from "./env-vars-banner"
 import { cn } from "@/lib/utils"
 import { motion } from "framer-motion"
@@ -24,15 +24,15 @@ export const AppShell = memo(function AppShell({ user, children, panel }: AppShe
   const pathname = usePathname()
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
   const [isMobile, setIsMobile] = useState(false)
-  
+
   // Detectar painel automaticamente se não fornecido (memoizado)
-  const detectedPanel: 'admin' | 'operador' | 'transportadora' = useMemo(() => 
-    panel || 
-    ((pathname?.startsWith('/operador') || pathname?.startsWith('/operator')) ? 'operador' : 
-     (pathname?.startsWith('/transportadora') || pathname?.startsWith('/carrier')) ? 'transportadora' : 'admin'),
+  const detectedPanel: 'admin' | 'operador' | 'transportadora' = useMemo(() =>
+    panel ||
+    ((pathname?.startsWith('/operador') || pathname?.startsWith('/operator')) ? 'operador' :
+      (pathname?.startsWith('/transportadora') || pathname?.startsWith('/carrier')) ? 'transportadora' : 'admin'),
     [panel, pathname]
   )
-  
+
   // Configurações de branding por painel (memoizado)
   const panelConfig = useMemo(() => ({
     admin: {
@@ -63,7 +63,7 @@ export const AppShell = memo(function AppShell({ user, children, panel }: AppShe
 
     checkScreenSize()
     window.addEventListener('resize', checkScreenSize)
-    
+
     // Listener para fechar sidebar no mobile
     const handleCloseSidebar = () => {
       if (isMobile) {
@@ -71,7 +71,7 @@ export const AppShell = memo(function AppShell({ user, children, panel }: AppShe
       }
     }
     window.addEventListener('close-sidebar', handleCloseSidebar as EventListener)
-    
+
     return () => {
       window.removeEventListener('resize', checkScreenSize)
       window.removeEventListener('close-sidebar', handleCloseSidebar as EventListener)
@@ -93,7 +93,7 @@ export const AppShell = memo(function AppShell({ user, children, panel }: AppShe
       document.body.style.removeProperty('overflow')
     }
   }, [isMobile, isSidebarOpen])
-  
+
   // Remover padrão de grid em mobile via JavaScript (camada extra de proteção)
   useEffect(() => {
     if (typeof window !== 'undefined' && window.innerWidth < 1024) {
@@ -121,7 +121,7 @@ export const AppShell = memo(function AppShell({ user, children, panel }: AppShe
         }
       `
       document.head.appendChild(style)
-      
+
       return () => {
         document.head.removeChild(style)
       }
@@ -129,7 +129,7 @@ export const AppShell = memo(function AppShell({ user, children, panel }: AppShe
   }, [])
 
   return (
-    <div 
+    <div
       className="min-h-screen bg-[var(--bg)] text-[var(--ink)] overflow-x-hidden w-full max-w-full"
       style={{
         backgroundImage: 'none',
@@ -138,7 +138,7 @@ export const AppShell = memo(function AppShell({ user, children, panel }: AppShe
     >
       {/* Banner de Variáveis de Ambiente */}
       <EnvVarsBanner />
-      
+
       {/* Topbar Fixa */}
       <Topbar
         user={user}
@@ -175,7 +175,7 @@ export const AppShell = memo(function AppShell({ user, children, panel }: AppShe
         />
 
         {/* Main Content */}
-        <main 
+        <main
           className={cn(
             "min-h-[calc(100vh-4rem)] sm:min-h-[calc(100vh-4.5rem)] transition-all duration-300 ease-in-out",
             isMobile ? "overflow-visible" : "overflow-y-auto",
@@ -190,7 +190,7 @@ export const AppShell = memo(function AppShell({ user, children, panel }: AppShe
           } as React.CSSProperties}
           data-mobile={isMobile ? 'true' : undefined}
         >
-          <div className="mx-auto max-w-[1600px] px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 w-full max-w-full min-w-0">                                                     
+          <div className="mx-auto max-w-[1600px] px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 w-full max-w-full min-w-0">
             <div className="w-full max-w-full min-w-0 overflow-x-hidden break-words stack-responsive">
               {children}
             </div>

@@ -1,8 +1,8 @@
 "use client"
 
 import { useEffect, useState, useCallback, useRef } from "react"
-import { setOptions, importLibrary } from "@googlemaps/js-api-loader"
 import { Map as MapIcon } from "lucide-react"
+import { loadGoogleMapsAPI } from "@/lib/google-maps-loader"
 
 interface Vehicle {
   id: string
@@ -50,24 +50,20 @@ export function CarrierMap({ vehicles, className = "" }: CarrierMapProps) {
   useEffect(() => {
     const initMap = async () => {
       const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
-      if (!apiKey || !mapRef.current) {
+      if (!apiKey) {
         setError('API key do Google Maps não configurada')
         setLoading(false)
         return
       }
 
+      if (!mapRef.current) return
+
       try {
-        // Configurar API do Google Maps
-        setOptions({
-          key: apiKey,
-          v: 'weekly',
-          libraries: ['places']
-        })
-        
-        const { Map } = await importLibrary('maps')
-        
+        // Usar o loader compartilhado
+        await loadGoogleMapsAPI(apiKey)
+
         // Criar mapa centrado no Brasil
-        const map = new Map(mapRef.current, {
+        const map = new google.maps.Map(mapRef.current, {
           center: { lat: -14.235, lng: -51.9253 }, // Centro do Brasil
           zoom: 5,
           mapTypeId: 'roadmap',
@@ -104,7 +100,7 @@ export function CarrierMap({ vehicles, className = "" }: CarrierMapProps) {
 
     // Adicionar novos marcadores
     const bounds = new google.maps.LatLngBounds()
-    
+
     vehicles.forEach(vehicle => {
       const icon = getVehicleIcon(vehicle.status)
       const marker = new google.maps.Marker({
