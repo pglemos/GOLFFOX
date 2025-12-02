@@ -39,10 +39,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Usuário não encontrado' }, { status: 404 })
     }
 
-    // 2. Verificar se já existe mapeamento
+    // 2. Verificar se já existe mapeamento (selecionar apenas colunas necessárias)
     const { data: existingMapping } = await supabaseAdmin
       .from('gf_user_company_map')
-      .select('*')
+      .select('user_id,company_id')
       .eq('user_id', operatorUser.id)
       .limit(1)
       .single()
@@ -125,9 +125,10 @@ export async function POST(request: NextRequest) {
       message: 'Operador associado à empresa com sucesso',
       companyId: finalCompanyId
     })
-  } catch (error: any) {
-    console.error('Erro ao associar operador:', error)
-    return NextResponse.json({ error: error.message || 'Erro interno' }, { status: 500 })
+  } catch (err) {
+    console.error('Erro ao associar operador:', err)
+    const errorMessage = err instanceof Error ? err.message : 'Erro interno'
+    return NextResponse.json({ error: errorMessage }, { status: 500 })
   }
 }
 

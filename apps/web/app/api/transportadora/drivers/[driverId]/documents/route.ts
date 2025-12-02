@@ -38,9 +38,11 @@ export async function GET(
     const authErrorResponse = await requireAuth(request, 'transportadora')
     if (authErrorResponse) return authErrorResponse
 
+    // Selecionar apenas colunas necessárias para listagem (otimização de performance)
+    const documentColumns = 'id,driver_id,document_type,document_number,file_url,file_name,file_size_bytes,issue_date,expiry_date,status,notes,created_at,updated_at'
     const { data, error } = await supabaseServiceRole
       .from('driver_documents')
-      .select('*')
+      .select(documentColumns)
       .eq('driver_id', params.driverId)
       .order('created_at', { ascending: false })
 
@@ -52,9 +54,10 @@ export async function GET(
     }
 
     return NextResponse.json(data || [])
-  } catch (error: any) {
+  } catch (err) {
+    const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
     return NextResponse.json(
-      { error: 'Erro ao processar requisição', message: error.message },
+      { error: 'Erro ao processar requisição', message: errorMessage },
       { status: 500 }
     )
   }
@@ -92,15 +95,16 @@ export async function POST(
     }
 
     return NextResponse.json(data, { status: 201 })
-  } catch (error: any) {
-    if (error instanceof z.ZodError) {
+  } catch (err) {
+    if (err instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Dados inválidos', details: error.errors },
+        { error: 'Dados inválidos', details: err.errors },
         { status: 400 }
       )
     }
+    const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
     return NextResponse.json(
-      { error: 'Erro ao processar requisição', message: error.message },
+      { error: 'Erro ao processar requisição', message: errorMessage },
       { status: 500 }
     )
   }

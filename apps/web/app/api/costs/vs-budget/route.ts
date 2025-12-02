@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // Buscar dados da view v_costs_vs_budget
+    // Buscar dados da view v_costs_vs_budget (view materializada - selecionar todas as colunas)
     const { data, error } = await supabaseServiceRole
       .from('v_costs_vs_budget')
       .select('*')
@@ -30,10 +30,11 @@ export async function GET(request: NextRequest) {
     }
 
     return NextResponse.json({ data: data || [] })
-  } catch (error: any) {
-    console.error('Erro ao buscar dados de orçamento vs realizado:', error)
+  } catch (err) {
+    console.error('Erro ao buscar dados de orçamento vs realizado:', err)
+    const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
     return NextResponse.json(
-      { error: error.message || 'Erro desconhecido' },
+      { error: errorMessage },
       { status: 500 }
     )
   }
