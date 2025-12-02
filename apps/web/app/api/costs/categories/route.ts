@@ -4,9 +4,11 @@ import { supabaseServiceRole } from '@/lib/supabase-server'
 export async function GET(request: NextRequest) {
   try {
     // Verificar se a tabela existe antes de fazer a query
+    // Selecionar apenas colunas necessárias para listagem
+    const categoryColumns = 'id,group_name,category,subcategory,description,is_active,created_at,updated_at'
     const { data, error } = await supabaseServiceRole
       .from('gf_cost_categories')
-      .select('*')
+      .select(categoryColumns)
 
     if (error) {
       console.error('Erro ao buscar categorias:', error)
@@ -32,8 +34,8 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    const filtered = (data || []).filter((cat: any) => (cat.is_active === undefined ? true : cat.is_active === true))
-    const sorted = filtered.sort((a: any, b: any) => {
+    const filtered = (data || []).filter((cat: { is_active?: boolean }) => (cat.is_active === undefined ? true : cat.is_active === true))
+    const sorted = filtered.sort((a: { group_name?: string; category?: string; subcategory?: string }, b: { group_name?: string; category?: string; subcategory?: string }) => {
       const gA = (a.group_name || '').localeCompare(b.group_name || '')
       if (gA !== 0) return gA
       const cA = (a.category || '').localeCompare(b.category || '')
@@ -42,11 +44,12 @@ export async function GET(request: NextRequest) {
     })
 
     return NextResponse.json(sorted)
-  } catch (error: any) {
-    console.error('Erro ao buscar categorias:', error)
+  } catch (err) {
+    console.error('Erro ao buscar categorias:', err)
+    const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
     return NextResponse.json(
       { 
-        error: error.message || 'Erro desconhecido',
+        error: errorMessage,
         data: [] // Retornar array vazio para não quebrar a UI
       },
       { status: 200 } // Retornar 200 com array vazio para não quebrar a UI

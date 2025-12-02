@@ -28,10 +28,11 @@ export async function GET(req: NextRequest) {
 
     const driverIds = drivers?.map(d => d.id) || []
 
-    // Buscar dados de gamificação/ranking
+    // Buscar dados de gamificação/ranking (selecionar apenas colunas necessárias)
+    const rankingColumns = 'id,driver_id,trips_completed,total_points,average_rating,on_time_percentage,safety_score,created_at,updated_at'
     const { data: rankings, error: rankingsError } = await supabase
       .from('gf_gamification_scores')
-      .select('*')
+      .select(rankingColumns)
       .in('driver_id', driverIds)
 
     if (rankingsError) throw rankingsError
@@ -97,10 +98,11 @@ export async function GET(req: NextRequest) {
         top_performer: driverPerformance[0] || null
       }
     })
-  } catch (error: any) {
-    console.error('Erro ao gerar relatório de performance:', error)
+  } catch (err) {
+    console.error('Erro ao gerar relatório de performance:', err)
+    const errorMessage = err instanceof Error ? err.message : 'Erro ao gerar relatório'
     return NextResponse.json(
-      { error: error.message || 'Erro ao gerar relatório' },
+      { error: errorMessage },
       { status: 500 }
     )
   }

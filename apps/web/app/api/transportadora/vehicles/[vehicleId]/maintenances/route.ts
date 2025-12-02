@@ -41,9 +41,11 @@ export async function GET(
     const authErrorResponse = await requireAuth(request, 'transportadora')
     if (authErrorResponse) return authErrorResponse
 
+    // Selecionar apenas colunas necessárias para listagem (otimização de performance)
+    const maintenanceColumns = 'id,vehicle_id,maintenance_type,scheduled_date,completed_date,next_maintenance_date,odometer_km,description,cost_parts_brl,cost_labor_brl,workshop_name,mechanic_name,status,notes,created_at,updated_at'
     const { data, error } = await supabaseServiceRole
       .from('vehicle_maintenances')
-      .select('*')
+      .select(maintenanceColumns)
       .eq('vehicle_id', params.vehicleId)
       .order('created_at', { ascending: false })
 
@@ -55,9 +57,10 @@ export async function GET(
     }
 
     return NextResponse.json(data || [])
-  } catch (error: any) {
+  } catch (err) {
+    const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
     return NextResponse.json(
-      { error: 'Erro ao processar requisição', message: error.message },
+      { error: 'Erro ao processar requisição', message: errorMessage },
       { status: 500 }
     )
   }
@@ -96,15 +99,16 @@ export async function POST(
     }
 
     return NextResponse.json(data, { status: 201 })
-  } catch (error: any) {
-    if (error instanceof z.ZodError) {
+  } catch (err) {
+    if (err instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Dados inválidos', details: error.errors },
+        { error: 'Dados inválidos', details: err.errors },
         { status: 400 }
       )
     }
+    const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
     return NextResponse.json(
-      { error: 'Erro ao processar requisição', message: error.message },
+      { error: 'Erro ao processar requisição', message: errorMessage },
       { status: 500 }
     )
   }

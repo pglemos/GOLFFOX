@@ -24,13 +24,13 @@ const SMTP_FROM = process.env.SMTP_FROM || 'noreply@golffox.com'
 
 interface ReportData {
   headers: string[]
-  rows: any[][]
+  rows: unknown[][]
 }
 
 /**
  * Formata dados de relatório de atrasos
  */
-function formatDelaysReport(data: any[]): ReportData {
+function formatDelaysReport(data: Record<string, unknown>[]): ReportData {
   return {
     headers: ['Data', 'Rota', 'Viagem', 'Atraso (min)', 'Motivo'],
     rows: data.map(row => [
@@ -46,7 +46,7 @@ function formatDelaysReport(data: any[]): ReportData {
 /**
  * Formata dados de relatório de ocupação
  */
-function formatOccupancyReport(data: any[]): ReportData {
+function formatOccupancyReport(data: Record<string, unknown>[]): ReportData {
   return {
     headers: ['Data', 'Horário', 'Rota', 'Ocupação Média', 'Capacidade'],
     rows: data.map(row => [
@@ -62,7 +62,7 @@ function formatOccupancyReport(data: any[]): ReportData {
 /**
  * Formata dados de relatório de não embarcados
  */
-function formatNotBoardedReport(data: any[]): ReportData {
+function formatNotBoardedReport(data: Record<string, unknown>[]): ReportData {
   return {
     headers: ['Data', 'Passageiro', 'Rota', 'Motivo', 'Frequência'],
     rows: data.map(row => [
@@ -188,10 +188,11 @@ async function dispatchPostHandler(request: NextRequest) {
       return authError
     }
 
-    // Buscar configuração do schedule (se houver)
+    // Buscar configuração do schedule (se houver) - selecionar apenas colunas necessárias
+    const scheduleColumns = 'id,company_id,report_key,cron,recipients,is_active'
     const { data: schedule } = await supabase
       .from('gf_report_schedules')
-      .select('*')
+      .select(scheduleColumns)
       .eq('company_id', companyId)
       .eq('report_key', reportKey)
       .eq('is_active', true)
@@ -214,7 +215,7 @@ async function dispatchPostHandler(request: NextRequest) {
       )
     }
 
-    // Buscar dados da view segura
+    // Buscar dados da view segura (view materializada - selecionar todas as colunas)
     const { data, error } = await supabase
       .from(viewName)
       .select('*')
@@ -224,7 +225,7 @@ async function dispatchPostHandler(request: NextRequest) {
     if (error) throw error
 
     // Formatar dados
-    const formatters: Record<string, (data: any[]) => ReportData> = {
+    const formatters: Record<string, (data: Record<string, unknown>[]) => ReportData> = {
       'delays': formatDelaysReport,
       'occupancy': formatOccupancyReport,
       'not_boarded': formatNotBoardedReport,
@@ -278,7 +279,7 @@ async function dispatchPostHandler(request: NextRequest) {
             }
           )
         }
-      } catch (emailError: any) {
+      } catch (emailError) {
         console.error('Erro ao enviar email:', emailError)
         // Não falhar a operação se email falhar
       }
@@ -303,10 +304,11 @@ async function dispatchPostHandler(request: NextRequest) {
       recipients_sent: recipients.length,
       generated_at: new Date().toISOString()
     })
-  } catch (error: any) {
-    console.error('Erro ao gerar/dispatch relatório:', error)
+  } catch (err) {
+    console.error('Erro ao gerar/dispatch relatório:', err)
+    const errorMessage = err instanceof Error ? err.message : 'Erro ao gerar relatório'
     return NextResponse.json(
-      { error: error.message || 'Erro ao gerar relatório' },
+      { error: errorMessage },
       { status: 500 }
     )
   }
@@ -336,10 +338,11 @@ async function dispatchGetHandler(request: NextRequest) {
     if (error) throw error
 
     return NextResponse.json({ schedules: data || [] })
-  } catch (error: any) {
-    console.error('Erro ao listar schedules:', error)
+  } catch (err) {
+    console.error('Erro ao listar schedules:', err)
+    const errorMessage = err instanceof Error ? err.message : 'Erro ao listar schedules'
     return NextResponse.json(
-      { error: error.message || 'Erro ao listar schedules' },
+      { error: errorMessage },
       { status: 500 }
     )
   }
