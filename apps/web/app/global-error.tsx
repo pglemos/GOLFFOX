@@ -3,12 +3,8 @@
 import * as React from "react"
 
 export default function GlobalError({ error, reset }: { error: Error; reset: () => void }) {
-  ;(async () => {
-    try {
-      const Sentry = await import("@sentry/nextjs")
-      Sentry.captureException(error)
-    } catch (_) {}
-  })()
+  // Log error to console for debugging
+  console.error('Global error:', error)
 
   return (
     <html>
@@ -22,4 +18,3 @@ export default function GlobalError({ error, reset }: { error: Error; reset: () 
     </html>
   )
 }
-
