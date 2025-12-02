@@ -47,7 +47,9 @@ async function getCompaniesHandler(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '100')
     const offset = parseInt(searchParams.get('offset') || '0')
 
-    let query = supabaseAdmin.from('companies').select('*', { count: 'exact' })
+    // Selecionar apenas colunas necessárias para listagem (otimização de performance)
+    const companyColumns = 'id,name,cnpj,address,phone,email,is_active,created_at,updated_at'
+    let query = supabaseAdmin.from('companies').select(companyColumns, { count: 'exact' })
 
     // Aplicar filtros
     if (isActive !== null) {
@@ -77,10 +79,11 @@ async function getCompaniesHandler(request: NextRequest) {
       limit,
       offset
     })
-  } catch (error: any) {
-    console.error('Erro ao listar empresas:', error)
+  } catch (err) {
+    console.error('Erro ao listar empresas:', err)
+    const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
     return NextResponse.json(
-      { error: 'Erro ao listar empresas', message: error.message },
+      { error: 'Erro ao listar empresas', message: errorMessage },
       { status: 500 }
     )
   }
@@ -162,10 +165,11 @@ async function createCompanyHandler(request: NextRequest) {
     }
 
     return NextResponse.json({ data }, { status: 201 })
-  } catch (error: any) {
-    console.error('Erro ao criar empresa:', error)
+  } catch (err) {
+    console.error('Erro ao criar empresa:', err)
+    const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
     return NextResponse.json(
-      { error: 'Erro ao criar empresa', message: error.message },
+      { error: 'Erro ao criar empresa', message: errorMessage },
       { status: 500 }
     )
   }

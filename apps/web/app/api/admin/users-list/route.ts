@@ -30,9 +30,11 @@ export async function GET(request: NextRequest) {
     const status = searchParams.get('status')
     const companyId = searchParams.get('company_id')
     
+    // Selecionar apenas colunas necessárias para listagem (otimização de performance)
+    const userColumns = 'id,email,name,role,company_id,transportadora_id,is_active,created_at,updated_at'
     let query = supabaseAdmin
       .from('users')
-      .select('*')
+      .select(userColumns)
       .order('created_at', { ascending: false })
 
     if (role && role !== 'all') {
@@ -62,10 +64,11 @@ export async function GET(request: NextRequest) {
       success: true,
       users: data || []
     })
-  } catch (error: any) {
-    console.error('Erro ao listar usuários:', error)
+  } catch (err) {
+    console.error('Erro ao listar usuários:', err)
+    const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
     return NextResponse.json(
-      { success: false, error: 'Erro ao listar usuários', message: error.message },
+      { success: false, error: 'Erro ao listar usuários', message: errorMessage },
       { status: 500 }
     )
   }

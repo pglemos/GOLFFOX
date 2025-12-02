@@ -31,9 +31,11 @@ export async function GET(request: NextRequest) {
     const authErrorResponse = await requireAuth(request, 'admin')
     if (authErrorResponse) return authErrorResponse
 
+    // Selecionar apenas colunas necessárias para listagem (otimização de performance)
+    const vehicleColumns = 'id,plate,model,brand,year,capacity,company_id,is_active,created_at,updated_at'
     const { data, error } = await supabaseServiceRole
       .from('vehicles')
-      .select('*')
+      .select(vehicleColumns)
       .order('created_at', { ascending: false })
 
     if (error) {
@@ -44,9 +46,10 @@ export async function GET(request: NextRequest) {
     }
 
     return NextResponse.json(data || [])
-  } catch (error: any) {
+  } catch (err) {
+    const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
     return NextResponse.json(
-      { error: 'Erro ao processar requisição', message: error.message },
+      { error: 'Erro ao processar requisição', message: errorMessage },
       { status: 500 }
     )
   }
@@ -183,15 +186,16 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json(newVehicle, { status: 201 })
-  } catch (error: any) {
-    if (error instanceof z.ZodError) {
+  } catch (err) {
+    if (err instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Dados inválidos', details: error.errors },
+        { error: 'Dados inválidos', details: err.errors },
         { status: 400 }
       )
     }
+    const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
     return NextResponse.json(
-      { error: 'Erro ao processar requisição', message: error.message },
+      { error: 'Erro ao processar requisição', message: errorMessage },
       { status: 500 }
     )
   }

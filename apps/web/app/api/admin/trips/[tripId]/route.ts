@@ -75,7 +75,7 @@ export async function PUT(
     }
 
     // Preparar dados para atualização
-    const updateData: any = {}
+    const updateData: Record<string, unknown> = {}
     
     // Aceitar tanto snake_case quanto camelCase
     if (body.route_id !== undefined || body.routeId !== undefined) {
@@ -135,13 +135,14 @@ export async function PUT(
       success: true,
       trip: updatedTrip
     })
-  } catch (error: any) {
-    console.error('Erro ao atualizar viagem:', error)
+  } catch (err) {
+    console.error('Erro ao atualizar viagem:', err)
+    const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
     return NextResponse.json(
       { 
         error: 'Erro ao atualizar viagem',
-        message: error.message || 'Erro desconhecido',
-        details: process.env.NODE_ENV === 'development' ? error : undefined
+        message: errorMessage,
+        details: process.env.NODE_ENV === 'development' ? String(err) : undefined
       },
       { status: 500 }
     )
@@ -183,10 +184,10 @@ export async function DELETE(
 
     const supabaseAdmin = getSupabaseAdmin()
 
-    // Verificar se viagem existe
+    // Verificar se viagem existe (selecionar apenas id para verificação)
     const { data: existingTrip, error: fetchError } = await supabaseAdmin
       .from('trips')
-      .select('*')
+      .select('id')
       .eq('id', tripId)
       .single()
 
@@ -216,10 +217,11 @@ export async function DELETE(
       deleted: true,
       message: 'Viagem excluída com sucesso'
     })
-  } catch (error: any) {
-    console.error('Erro ao excluir viagem:', error)
+  } catch (err) {
+    console.error('Erro ao excluir viagem:', err)
+    const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
     return NextResponse.json(
-      { error: 'Erro ao excluir viagem', message: error.message },
+      { error: 'Erro ao excluir viagem', message: errorMessage },
       { status: 500 }
     )
   }

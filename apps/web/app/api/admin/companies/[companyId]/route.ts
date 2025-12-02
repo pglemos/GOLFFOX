@@ -64,10 +64,10 @@ export async function PUT(
     const supabaseAdmin = getSupabaseAdmin()
     const body = await request.json()
 
-    // Verificar se empresa existe
+    // Verificar se empresa existe e buscar cnpj para validação
     const { data: existingCompany, error: fetchError } = await supabaseAdmin
       .from('companies')
-      .select('*')
+      .select('id,cnpj')
       .eq('id', companyId)
       .single()
 
@@ -141,13 +141,14 @@ export async function PUT(
       success: true,
       company: updatedCompany
     })
-  } catch (error: any) {
-    console.error('Erro ao atualizar empresa:', error)
+  } catch (err) {
+    console.error('Erro ao atualizar empresa:', err)
+    const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
     return NextResponse.json(
       { 
         error: 'Erro ao atualizar empresa',
-        message: error.message || 'Erro desconhecido',
-        details: process.env.NODE_ENV === 'development' ? error : undefined
+        message: errorMessage,
+        details: process.env.NODE_ENV === 'development' ? String(err) : undefined
       },
       { status: 500 }
     )
@@ -193,10 +194,10 @@ export async function DELETE(
 
     const supabaseAdmin = getSupabaseAdmin()
 
-    // Verificar se empresa existe
+    // Verificar se empresa existe (selecionar apenas id para verificação)
     const { data: existingCompany, error: fetchError } = await supabaseAdmin
       .from('companies')
-      .select('*')
+      .select('id')
       .eq('id', companyId)
       .single()
 

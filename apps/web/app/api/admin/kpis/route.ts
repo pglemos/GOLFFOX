@@ -33,17 +33,19 @@ export async function GET(request: NextRequest) {
       'v_operator_kpis'
     ]
 
-    let kpisData: any[] = []
-    let lastError: any = null
+    let kpisData: unknown[] = []
+    let lastError: unknown = null
 
     for (const viewName of views) {
       try {
+        // Views de KPIs geralmente têm colunas específicas, mas como são views materializadas,
+        // selecionar todas as colunas é aceitável (já são agregadas)
         const { data, error } = await supabaseAdmin
-          .from(viewName as any)
+          .from(viewName)
           .select('*')
         
         if (error) {
-          const code = (error as any)?.code
+          const code = (error as { code?: string })?.code
           if (code === 'PGRST205') {
             // View não existe, tentar próxima
             continue
@@ -70,10 +72,11 @@ export async function GET(request: NextRequest) {
       success: true,
       kpis: kpisData
     })
-  } catch (error: any) {
-    console.error('Erro ao buscar KPIs:', error)
+  } catch (err) {
+    console.error('Erro ao buscar KPIs:', err)
+    const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
     return NextResponse.json(
-      { error: 'Erro ao buscar KPIs', message: error.message },
+      { error: 'Erro ao buscar KPIs', message: errorMessage },
       { status: 500 }
     )
   }

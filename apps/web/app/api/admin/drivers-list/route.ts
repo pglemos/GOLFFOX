@@ -26,9 +26,11 @@ export async function GET(request: NextRequest) {
 
     const supabaseAdmin = getSupabaseAdmin()
     
+    // Selecionar apenas colunas necessárias para listagem (otimização de performance)
+    const driverColumns = 'id,email,name,role,company_id,transportadora_id,is_active,created_at,updated_at'
     const { data, error } = await supabaseAdmin
       .from('users')
-      .select('*')
+      .select(driverColumns)
       .eq('role', 'driver')
       .order('created_at', { ascending: false })
 
@@ -42,10 +44,11 @@ export async function GET(request: NextRequest) {
 
     // Retornar array diretamente para compatibilidade
     return NextResponse.json(data || [])
-  } catch (error: any) {
-    console.error('Erro ao listar motoristas:', error)
+  } catch (err) {
+    console.error('Erro ao listar motoristas:', err)
+    const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
     return NextResponse.json(
-      { error: 'Erro ao listar motoristas', message: error.message },
+      { error: 'Erro ao listar motoristas', message: errorMessage },
       { status: 500 }
     )
   }

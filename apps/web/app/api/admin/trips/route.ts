@@ -51,7 +51,9 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '100')
     const offset = parseInt(searchParams.get('offset') || '0')
 
-    let query = supabaseAdmin.from('trips').select('*', { count: 'exact' })
+    // Selecionar apenas colunas necessárias para listagem (otimização de performance)
+    const tripColumns = 'id,route_id,vehicle_id,driver_id,status,scheduled_date,scheduled_start_time,start_time,end_time,actual_start_time,actual_end_time,distance_km,notes,created_at,updated_at'
+    let query = supabaseAdmin.from('trips').select(tripColumns, { count: 'exact' })
 
     // Aplicar filtros
     if (vehicleId) {
@@ -100,10 +102,11 @@ export async function GET(request: NextRequest) {
       limit,
       offset
     })
-  } catch (error: any) {
-    console.error('Erro ao listar viagens:', error)
+  } catch (err) {
+    console.error('Erro ao listar viagens:', err)
+    const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
     return NextResponse.json(
-      { error: 'Erro ao listar viagens', message: error.message },
+      { error: 'Erro ao listar viagens', message: errorMessage },
       { status: 500 }
     )
   }

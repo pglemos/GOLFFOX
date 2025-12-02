@@ -68,9 +68,13 @@ export default function AdminConfiguracoesPage() {
         return
       }
 
-      if ((data as any)?.avatar_url) {
+      interface UserAvatarData {
+        avatar_url?: string | null;
+      }
+      const userData = data as UserAvatarData | null;
+      if (userData?.avatar_url) {
         // Adicionar timestamp para evitar cache do navegador
-        const urlWithCache = `${(data as any).avatar_url}${timestamp || `?t=${Date.now()}`}`
+        const urlWithCache = `${userData.avatar_url}${timestamp || `?t=${Date.now()}`}`
         setProfileImage(urlWithCache)
       } else {
         setProfileImage(null)
@@ -144,8 +148,12 @@ export default function AdminConfiguracoesPage() {
               .eq('id', user.id)
               .maybeSingle()
 
-            if (!error && (data as any)?.avatar_url) {
-              setProfileImage(`${(data as any).avatar_url}?t=${Date.now()}`)
+            interface UserAvatarData {
+              avatar_url?: string | null;
+            }
+            const userData = data as UserAvatarData | null;
+            if (!error && userData?.avatar_url) {
+              setProfileImage(`${userData.avatar_url}?t=${Date.now()}`)
             }
           } catch (err) {
             console.error('Erro ao recarregar foto:', err)
@@ -154,9 +162,10 @@ export default function AdminConfiguracoesPage() {
       } else {
         throw new Error('URL da foto não foi retornada')
       }
-    } catch (error: any) {
-      console.error('Erro ao fazer upload:', error)
-      notifyError(error.message || 'Erro ao fazer upload da imagem')
+    } catch (err) {
+      console.error('Erro ao fazer upload:', err)
+      const errorMessage = err instanceof Error ? err.message : 'Erro ao fazer upload da imagem'
+      notifyError(errorMessage)
     } finally {
       setUploadingImage(false)
     }
@@ -213,9 +222,10 @@ export default function AdminConfiguracoesPage() {
 
       // Não recarregar a página - as mudanças já estão no estado local
       // O hook useAuthFast irá sincronizar os dados quando necessário
-    } catch (error: any) {
-      console.error('Erro ao salvar:', error)
-      notifyError(error.message || 'Erro ao salvar informações pessoais')
+    } catch (err) {
+      console.error('Erro ao salvar:', err)
+      const errorMessage = err instanceof Error ? err.message : 'Erro ao salvar informações pessoais'
+      notifyError(errorMessage)
     } finally {
       setSavingPersonal(false)
     }
@@ -274,9 +284,10 @@ export default function AdminConfiguracoesPage() {
         newPassword: "",
         confirmPassword: ""
       }))
-    } catch (error: any) {
-      console.error('Erro ao salvar:', error)
-      notifyError(error.message || 'Erro ao alterar senha')
+    } catch (err) {
+      console.error('Erro ao salvar:', err)
+      const errorMessage = err instanceof Error ? err.message : 'Erro ao alterar senha'
+      notifyError(errorMessage)
     } finally {
       setSavingSecurity(false)
     }

@@ -28,9 +28,11 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const limit = parseInt(searchParams.get('limit') || '50')
     
+    // Selecionar apenas colunas necessárias para listagem (otimização de performance)
+    const auditColumns = 'id,user_id,action,table_name,record_id,old_data,new_data,ip_address,user_agent,created_at'
     const { data, error } = await supabaseAdmin
       .from('gf_audit_log')
-      .select('*')
+      .select(auditColumns)
       .order('created_at', { ascending: false })
       .limit(limit)
 
@@ -46,10 +48,11 @@ export async function GET(request: NextRequest) {
       success: true,
       logs: data || []
     })
-  } catch (error: any) {
-    console.error('Erro ao listar audit log:', error)
+  } catch (err) {
+    console.error('Erro ao listar audit log:', err)
+    const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
     return NextResponse.json(
-      { error: 'Erro ao listar audit log', message: error.message },
+      { error: 'Erro ao listar audit log', message: errorMessage },
       { status: 500 }
     )
   }

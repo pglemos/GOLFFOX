@@ -20,9 +20,11 @@ export async function GET(req: NextRequest) {
     const authErrorResponse = await requireAuth(req, 'admin')
     if (authErrorResponse) return authErrorResponse
 
+    // Selecionar apenas colunas necessárias para listagem (otimização de performance)
+    const carrierColumns = 'id,name,cnpj,address,phone,email,is_active,created_at,updated_at'
     const { data, error } = await supabaseServiceRole
       .from('carriers')
-      .select('*')
+      .select(carrierColumns)
       .order('name', { ascending: true })
 
     if (error) {
@@ -36,9 +38,10 @@ export async function GET(req: NextRequest) {
       success: true,
       carriers: data || []
     })
-  } catch (error: any) {
+  } catch (err) {
+    const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
     return NextResponse.json(
-      { success: false, error: 'Erro ao processar requisição', message: error.message },
+      { success: false, error: 'Erro ao processar requisição', message: errorMessage },
       { status: 500 }
     )
   }
