@@ -21,11 +21,11 @@ function isValidUUID(uuid: string): boolean {
 
 export async function DELETE(
   _req: NextRequest,
-  context: { params: Promise<Promise<{ vehicleId: string }>> }
+  context: { params: Promise<{ vehicleId: string }> }
 ) {
   const params = await context.params
 
-  const { vehicleId: vehicleIdParam } = await params
+  const { vehicleId: vehicleIdParam  } = params
   const vehicleId = sanitizeId(vehicleIdParam)
 
   if (!vehicleId) {
@@ -166,11 +166,11 @@ export async function DELETE(
 
 export async function PATCH(
   req: NextRequest,
-  context: { params: Promise<Promise<{ vehicleId: string }>> }
+  context: { params: Promise<{ vehicleId: string }> }
 ) {
   const params = await context.params
 
-  const { vehicleId: vehicleIdParam } = await params
+  const { vehicleId: vehicleIdParam  } = params
   const vehicleId = sanitizeId(vehicleIdParam)
 
   if (!vehicleId) {

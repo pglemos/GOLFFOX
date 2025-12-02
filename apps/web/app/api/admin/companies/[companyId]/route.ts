@@ -30,11 +30,11 @@ function sanitizeId(id: string | undefined | null): string | null {
  */
 export async function PUT(
   request: NextRequest,
-  context: { params: Promise<Promise<{ companyId: string }>> }
+  context: { params: Promise<{ companyId: string }> }
 ) {
   const params = await context.params
 
-  const { companyId: companyIdParam } = await params
+  const { companyId: companyIdParam  } = params
   try {
     // ✅ Validar autenticação (apenas admin) - permitir em desenvolvimento
     const isDevelopment = process.env.NODE_ENV === 'development'
@@ -160,11 +160,11 @@ export async function PUT(
  */
 export async function DELETE(
   request: NextRequest,
-  context: { params: Promise<Promise<{ companyId: string }>> }
+  context: { params: Promise<{ companyId: string }> }
 ) {
   const params = await context.params
 
-  const { companyId: companyIdParam } = await params
+  const { companyId: companyIdParam  } = params
   try {
     // ✅ Validar autenticação (apenas admin) - permitir em desenvolvimento
     const isDevelopment = process.env.NODE_ENV === 'development'
