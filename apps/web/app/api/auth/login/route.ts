@@ -426,13 +426,15 @@ async function loginHandler(req: NextRequest) {
     }, { status: 200 })
 
     // ✅ Criar cookie customizado no servidor para autenticação nas rotas API
+    // Payload mínimo (SEM access_token por segurança)
+    // O access_token deve ser enviado via header Authorization ou cookie do Supabase
     const sessionCookieValue = Buffer.from(JSON.stringify({
       id: userPayload.id,
       email: userPayload.email,
       role: userPayload.role,
       companyId: userPayload.companyId,
-      transportadoraId: userPayload.transportadoraId,
-      access_token: token
+      transportadoraId: userPayload.transportadoraId
+      // access_token removido por segurança - usar header Authorization ou cookie Supabase
     })).toString('base64')
 
     const isSecure = isSecureRequest(req)
