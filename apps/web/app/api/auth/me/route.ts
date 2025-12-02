@@ -39,9 +39,13 @@ export async function GET(request: NextRequest) {
 
       const { data: dbUser } = await supabase
         .from('users')
-        .select('id, email, name, role, company_id, transportadora_id')
+        .select('id, email, name, role, company_id, transportadora_id, avatar_url')
         .eq('id', userData.id)
         .maybeSingle()
+
+      // #region agent log
+      console.log('[DEBUG H2] /api/auth/me - dbUser from database:', JSON.stringify({ hasDbUser: !!dbUser, avatar_url: dbUser?.avatar_url, keys: dbUser ? Object.keys(dbUser) : [] }));
+      // #endregion
 
       if (dbUser) {
         return NextResponse.json({
@@ -53,6 +57,7 @@ export async function GET(request: NextRequest) {
             role: dbUser.role || userData.role,
             companyId: dbUser.company_id || userData.companyId || null,
             transportadora_id: dbUser.transportadora_id || userData.transportadora_id || null,
+            avatar_url: dbUser.avatar_url || null,
           }
         })
       }

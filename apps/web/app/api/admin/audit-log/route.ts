@@ -27,9 +27,9 @@ export async function GET(request: NextRequest) {
     const supabaseAdmin = getSupabaseAdmin()
     const { searchParams } = new URL(request.url)
     const limit = parseInt(searchParams.get('limit') || '50')
-    
+
     // Selecionar apenas colunas necessárias para listagem (otimização de performance)
-    const auditColumns = 'id,user_id,action,table_name,record_id,old_data,new_data,ip_address,user_agent,created_at'
+    const auditColumns = 'id,actor_id,action_type,resource_type,resource_id,details,created_at'
     const { data, error } = await supabaseAdmin
       .from('gf_audit_log')
       .select(auditColumns)

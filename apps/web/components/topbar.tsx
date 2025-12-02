@@ -36,6 +36,7 @@ interface TopbarProps {
     name: string
     email: string
     role: string
+    avatar_url?: string
   }
   onToggleSidebar?: () => void
   isSidebarOpen?: boolean
@@ -55,6 +56,13 @@ export function Topbar({
   const { isTopbarItemActive: _isTopbarItemActive } = useNavigation()
   const [isLoggingOut, setIsLoggingOut] = useState(false)
   const [isCompactLayout, setIsCompactLayout] = useState(false)
+
+  // #region agent log
+  useEffect(() => {
+    console.log('[DEBUG TOPBAR] User props received:', { userId: user?.id, userName: user?.name, hasAvatarUrl: !!user?.avatar_url, avatarUrl: user?.avatar_url, userKeys: user ? Object.keys(user) : [] });
+    fetch('http://127.0.0.1:7242/ingest/802544c4-70d0-43c7-a57c-6692b28ca17d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'topbar.tsx:userProps',message:'H4/H5: User props received in Topbar',data:{userId:user?.id,userName:user?.name,hasAvatarUrl:!!user?.avatar_url,avatarUrl:user?.avatar_url,userKeys:user?Object.keys(user):[]},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H4-H5'})}).catch(()=>{});
+  }, [user]);
+  // #endregion
 
   // Determinar painel atual e rotas correspondentes
   const getPanelRoutes = () => {
@@ -299,7 +307,20 @@ export function Topbar({
                 variant="ghost"
                 className="flex items-center gap-1 sm:gap-2 pl-1 sm:pl-2 hover:bg-[var(--bg-hover)] active:bg-[var(--bg-hover)] rounded-full min-h-[44px] touch-manipulation"
               >
-                <div className="w-8 h-8 rounded-full gradient-brand flex items-center justify-center shadow-md flex-shrink-0">
+                {user?.avatar_url ? (
+                  <img 
+                    src={user.avatar_url} 
+                    alt={user?.name || "Avatar"} 
+                    className="w-8 h-8 rounded-full object-cover shadow-md flex-shrink-0"
+                    onError={(e) => {
+                      // Fallback para inicial se a imagem falhar
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = 'none';
+                      target.nextElementSibling?.classList.remove('hidden');
+                    }}
+                  />
+                ) : null}
+                <div className={`w-8 h-8 rounded-full gradient-brand flex items-center justify-center shadow-md flex-shrink-0 ${user?.avatar_url ? 'hidden' : ''}`}>
                   <span className="text-white text-sm font-bold">
                     {user?.name?.charAt(0).toUpperCase() || "A"}
                   </span>

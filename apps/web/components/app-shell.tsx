@@ -14,6 +14,7 @@ interface AppShellProps {
     name: string
     email: string
     role: string
+    avatar_url?: string
   }
   children: React.ReactNode
   panel?: 'admin' | 'operador' | 'transportadora'

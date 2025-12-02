@@ -141,7 +141,7 @@ export default function OperatorDashboard() {
 
   if (loading || tenantLoading || kpisLoading || controlTowerLoading) {
     return (
-      <AppShell user={{ id: user?.id || "", name: user?.name || "Operador", email: user?.email || "", role: "operador" }}>
+      <AppShell user={{ id: user?.id || "", name: user?.name || "Operador", email: user?.email || "", role: "operador", avatar_url: (user as any)?.avatar_url }}>
         <DashboardSkeleton />
       </AppShell>
     )
@@ -149,7 +149,7 @@ export default function OperatorDashboard() {
 
   if (tenantError || error) {
     return (
-      <AppShell user={{ id: user?.id || "", name: user?.name || "Operador", email: user?.email || "", role: "operador" }}>
+      <AppShell user={{ id: user?.id || "", name: user?.name || "Operador", email: user?.email || "", role: "operador", avatar_url: (user as any)?.avatar_url }}>
         <div className="min-h-screen flex items-center justify-center p-4">
           <Card className="p-8 max-w-md w-full text-center">
             <h2 className="text-xl font-bold mb-2 text-red-600">Erro ao carregar</h2>
@@ -165,7 +165,7 @@ export default function OperatorDashboard() {
 
   if (!tenantCompanyId) {
     return (
-      <AppShell user={{ id: user?.id || "", name: user?.name || "Operador", email: user?.email || "", role: "operador" }}>
+      <AppShell user={{ id: user?.id || "", name: user?.name || "Operador", email: user?.email || "", role: "operador", avatar_url: (user as any)?.avatar_url }}>
         <div className="min-h-screen flex items-center justify-center p-4">
           <Card className="p-8 max-w-md w-full text-center">
             <h2 className="text-xl font-bold mb-2">Nenhuma empresa selecionada</h2>
@@ -182,7 +182,8 @@ export default function OperatorDashboard() {
       id: user?.id || "",
       name: user?.name || "Operador",
       email: user?.email || "",
-      role: "operador"
+      role: "operador",
+      avatar_url: (user as any)?.avatar_url
     }}>
       <div className="space-y-4 sm:space-y-6 lg:space-y-8 w-full">
         {/* Header */}
