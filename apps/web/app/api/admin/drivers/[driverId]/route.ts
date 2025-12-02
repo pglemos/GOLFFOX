@@ -4,11 +4,11 @@ import { supabaseServiceRole } from '@/lib/supabase-server'
 // PUT /api/admin/drivers/[driverId] - Editar motorista
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { driverId: string } }
+  context: { params: Promise<{ driverId: string }> }
 ) {
   try {
     const supabase = supabaseServiceRole
-    const { driverId } = params
+    const { driverId } = await context.params
     const body = await request.json()
 
     const {
@@ -73,11 +73,11 @@ export async function PUT(
 // GET /api/admin/drivers/[driverId] - Obter motorista específico
 export async function GET(
   request: NextRequest,
-  { params }: { params: { driverId: string } }
+  context: { params: Promise<{ driverId: string }> }
 ) {
   try {
     const supabase = supabaseServiceRole
-    const { driverId } = params
+    const { driverId } = await context.params
 
     const { data: driver, error } = await supabase
       .from('drivers')
