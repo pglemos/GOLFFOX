@@ -4,7 +4,9 @@ import { POST as transportadoraVehiclesPOST } from '../../../transportadoras/[tr
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { transportadoraId: string } }
+  context: { params: Promise<{ transportadoraId: string }> }
 ) {
+  const params = await context.params
+
   return transportadoraVehiclesPOST(req, { params: { transportadoraId: params.transportadoraId } } as any)
 }

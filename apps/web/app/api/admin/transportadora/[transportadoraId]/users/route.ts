@@ -4,7 +4,9 @@ import { GET as transportadoraUsersGET } from '../../../transportadoras/[transpo
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { transportadoraId: string } }
+  context: { params: Promise<{ transportadoraId: string }> }
 ) {
+  const params = await context.params
+
   return transportadoraUsersGET(req, { params: { transportadoraId: params.transportadoraId } } as any)
 }

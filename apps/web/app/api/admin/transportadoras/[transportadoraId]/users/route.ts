@@ -17,8 +17,10 @@ export async function OPTIONS() {
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { transportadoraId?: string; carrierId?: string } }
+  context: { params: Promise<{ transportadoraId?: string; carrierId?: string }> }
 ) {
+  const params = await context.params
+
   try {
     const authErrorResponse = await requireAuth(req, 'admin')
     if (authErrorResponse) return authErrorResponse

@@ -4,8 +4,10 @@ import { supabaseServiceRole } from '@/lib/supabase-server'
 // PUT /api/admin/transportadoras/[transportadoraId]/vehicles/[vehicleId]
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { transportadoraId?: string; carrierId?: string; vehicleId: string } }
+  context: { params: Promise<{ transportadoraId?: string; carrierId?: string; vehicleId: string }> }
 ) {
+  const params = await context.params
+
   try {
     const supabase = supabaseServiceRole
     const transportadoraId = params.transportadoraId || params.carrierId
@@ -78,8 +80,10 @@ export async function PUT(
 // DELETE /api/admin/transportadoras/[transportadoraId]/vehicles/[vehicleId]
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { transportadoraId?: string; carrierId?: string; vehicleId: string } }
+  context: { params: Promise<{ transportadoraId?: string; carrierId?: string; vehicleId: string }> }
 ) {
+  const params = await context.params
+
   try {
     const supabase = supabaseServiceRole
     const transportadoraId = params.transportadoraId || params.carrierId
