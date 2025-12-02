@@ -33,8 +33,10 @@ export async function OPTIONS() {
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { vehicleId: string } }
+  context: { params: Promise<{ vehicleId: string }> }
 ) {
+  const params = await context.params
+
   try {
     const authErrorResponse = await requireAuth(request, 'transportadora')
     if (authErrorResponse) return authErrorResponse
@@ -63,8 +65,10 @@ export async function GET(
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { vehicleId: string } }
+  context: { params: Promise<{ vehicleId: string }> }
 ) {
+  const params = await context.params
+
   try {
     const authErrorResponse = await requireAuth(request, 'transportadora')
     if (authErrorResponse) return authErrorResponse

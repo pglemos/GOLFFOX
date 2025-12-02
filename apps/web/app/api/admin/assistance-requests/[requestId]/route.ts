@@ -17,8 +17,10 @@ const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ requestId: string }> }
+  context: { params: Promise<Promise<{ requestId: string }>> }
 ) {
+  const params = await context.params
+
   const { requestId: requestIdParam } = await params
   try {
     const authErrorResponse = await requireAuth(request, 'admin')

@@ -4,14 +4,18 @@ import { PUT as transportadoraDriverPUT, DELETE as transportadoraDriverDELETE } 
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { transportadoraId: string; driverId: string } }
+  context: { params: Promise<{ transportadoraId: string; driverId: string }> }
 ) {
+  const params = await context.params
+
   return transportadoraDriverPUT(req, { params: { transportadoraId: params.transportadoraId, driverId: params.driverId } } as any)
 }
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { transportadoraId: string; driverId: string } }
+  context: { params: Promise<{ transportadoraId: string; driverId: string }> }
 ) {
+  const params = await context.params
+
   return transportadoraDriverDELETE(req, { params: { transportadoraId: params.transportadoraId, driverId: params.driverId } } as any)
 }

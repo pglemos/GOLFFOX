@@ -30,8 +30,10 @@ function sanitizeId(id: string | undefined | null): string | null {
  */
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ companyId: string }> }
+  context: { params: Promise<Promise<{ companyId: string }>> }
 ) {
+  const params = await context.params
+
   const { companyId: companyIdParam } = await params
   try {
     // ✅ Validar autenticação (apenas admin) - permitir em desenvolvimento
@@ -158,8 +160,10 @@ export async function PUT(
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ companyId: string }> }
+  context: { params: Promise<Promise<{ companyId: string }>> }
 ) {
+  const params = await context.params
+
   const { companyId: companyIdParam } = await params
   try {
     // ✅ Validar autenticação (apenas admin) - permitir em desenvolvimento
