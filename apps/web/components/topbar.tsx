@@ -59,8 +59,12 @@ export function Topbar({
 
   // #region agent log
   useEffect(() => {
-    console.log('[DEBUG TOPBAR] User props received:', { userId: user?.id, userName: user?.name, hasAvatarUrl: !!user?.avatar_url, avatarUrl: user?.avatar_url, userKeys: user ? Object.keys(user) : [] });
-    fetch('http://127.0.0.1:7242/ingest/802544c4-70d0-43c7-a57c-6692b28ca17d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'topbar.tsx:userProps',message:'H4/H5: User props received in Topbar',data:{userId:user?.id,userName:user?.name,hasAvatarUrl:!!user?.avatar_url,avatarUrl:user?.avatar_url,userKeys:user?Object.keys(user):[]},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H4-H5'})}).catch(()=>{});
+    console.log('[DEBUG TOPBAR] 📦 User object received:', JSON.stringify(user, null, 2));
+    console.log('[DEBUG TOPBAR] 🖼️ Avatar status:', {
+      hasAvatarUrl: !!user?.avatar_url,
+      avatarUrl: user?.avatar_url,
+      avatarUrlType: typeof user?.avatar_url
+    });
   }, [user]);
   // #endregion
 
