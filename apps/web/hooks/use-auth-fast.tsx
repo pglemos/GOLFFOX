@@ -8,6 +8,7 @@ interface User {
   email: string
   name?: string
   role?: string
+  avatar_url?: string
 }
 
 /**
@@ -30,12 +31,16 @@ export function useAuthFast() {
         if (cookieMatch) {
           const decoded = atob(cookieMatch[1])
           const u = JSON.parse(decoded)
+          // #region agent log
+          fetch('http://127.0.0.1:7242/ingest/802544c4-70d0-43c7-a57c-6692b28ca17d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'use-auth-fast.tsx:getCookieUser',message:'H3: Cookie data parsed',data:{hasAvatarUrl:!!u?.avatar_url,avatarUrl:u?.avatar_url,cookieKeys:u?Object.keys(u):[]},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H3'})}).catch(()=>{});
+          // #endregion
           if (u?.id && u?.email) {
             return {
               id: u.id,
               email: u.email,
               name: u.name || u.email.split('@')[0],
-              role: u.role || 'admin'
+              role: u.role || 'admin',
+              avatar_url: u.avatar_url
             }
           }
         }
@@ -49,6 +54,9 @@ export function useAuthFast() {
       // Primeiro, tentar cookie (instantâneo)
       const cookieUser = getCookieUser()
       if (cookieUser && mounted) {
+        // #region agent log
+        fetch('http://127.0.0.1:7242/ingest/802544c4-70d0-43c7-a57c-6692b28ca17d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'use-auth-fast.tsx:checkAuth:cookieUser',message:'H1: User from cookie',data:{userId:cookieUser.id,hasAvatarUrl:!!cookieUser.avatar_url,avatarUrl:cookieUser.avatar_url},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H1'})}).catch(()=>{});
+        // #endregion
         setUser(cookieUser)
         setLoading(false)
         return
@@ -61,8 +69,11 @@ export function useAuthFast() {
           if (res.ok) {
             const data = await res.json().catch(() => null)
             const u = data?.user
+            // #region agent log
+            fetch('http://127.0.0.1:7242/ingest/802544c4-70d0-43c7-a57c-6692b28ca17d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'use-auth-fast.tsx:checkAuth:apiMe',message:'H2: API /api/auth/me response',data:{hasUser:!!u,hasAvatarUrl:!!u?.avatar_url,avatarUrl:u?.avatar_url,userKeys:u?Object.keys(u):[]},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H2'})}).catch(()=>{});
+            // #endregion
             if (u?.id && u?.role) {
-              setUser({ id: u.id, email: u.email || '', name: u.email?.split('@')[0] || '', role: u.role })
+              setUser({ id: u.id, email: u.email || '', name: u.name || u.email?.split('@')[0] || '', role: u.role, avatar_url: u.avatar_url })
               setLoading(false)
               return
             }
@@ -83,7 +94,8 @@ export function useAuthFast() {
               id: session.user.id,
               email: session.user.email || '',
               name: session.user.user_metadata?.name || session.user.email?.split('@')[0] || '',
-              role: session.user.user_metadata?.role || 'admin'
+              role: session.user.user_metadata?.role || 'admin',
+              avatar_url: session.user.user_metadata?.avatar_url
             })
           }
           setLoading(false)

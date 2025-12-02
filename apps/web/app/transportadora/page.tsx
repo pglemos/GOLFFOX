@@ -533,7 +533,8 @@ export default function TransportadoraDashboard() {
       id: user?.id || "",
       name: user?.name || "Transportadora",
       email: user?.email || "",
-      role: "transportadora"
+      role: "transportadora",
+      avatar_url: (user as any)?.avatar_url
     }}>
       <div className="space-y-4 sm:space-y-6 lg:space-y-8 w-full">
         {/* Header */}

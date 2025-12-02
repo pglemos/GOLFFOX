@@ -193,7 +193,8 @@ export default function AdminDashboard() {
         id: user?.id || "",
         name: user?.name || "Admin",
         email: user?.email || "",
-        role: user?.role || "admin"
+        role: user?.role || "admin",
+        avatar_url: (user as any)?.avatar_url
       }}>
         <div className="space-y-6 lg:space-y-8">
           <div className="grid-responsive-cards">
@@ -227,7 +228,8 @@ export default function AdminDashboard() {
       id: user.id || "",
       name: user.name || "Admin",
       email: user.email || "",
-      role: user.role || "admin"
+      role: user.role || "admin",
+      avatar_url: (user as any).avatar_url
     }}>
       <div className="space-y-4 sm:space-y-6 lg:space-y-8 animate-fade-in w-full">
         {/* Filtros */}

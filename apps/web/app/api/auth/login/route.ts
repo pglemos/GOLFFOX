@@ -279,7 +279,7 @@ async function loginHandler(req: NextRequest) {
         
         const resultByEmail = await supabaseAdmin
           .from('users')
-          .select('id, email, role, company_id, transportadora_id')
+          .select('id, email, name, role, company_id, transportadora_id, avatar_url')
           .eq('email', (data.user.email || email).toLowerCase().trim())
           .maybeSingle()
         
@@ -350,7 +350,31 @@ async function loginHandler(req: NextRequest) {
     }
     
     // Usar dados do usuário encontrado
-    const finalUser = existingUser
+    let finalUser = existingUser
+    
+    // ✅ Se a RPC não retornou name ou avatar_url, buscar do banco
+    if (finalUser && (!finalUser.name || !finalUser.avatar_url)) {
+      try {
+        const supabaseAdminForProfile = getSupabaseAdmin()
+        const { data: profileData } = await supabaseAdminForProfile
+          .from('users')
+          .select('name, avatar_url')
+          .eq('id', data.user.id)
+          .maybeSingle()
+        
+        if (profileData) {
+          finalUser = { ...finalUser, name: profileData.name, avatar_url: profileData.avatar_url }
+          debug('✅ Dados de perfil (name, avatar_url) carregados do banco', { 
+            name: profileData.name, 
+            hasAvatar: !!profileData.avatar_url 
+          }, 'AuthAPI')
+        }
+      } catch (profileErr: any) {
+        debug('⚠️ Erro ao buscar dados de perfil (name, avatar_url)', { 
+          error: profileErr?.message 
+        }, 'AuthAPI')
+      }
+    }
     
     const token = data.session.access_token
     const refreshToken = data.session.refresh_token
@@ -400,10 +424,12 @@ async function loginHandler(req: NextRequest) {
     const userPayload = {
       id: data.user.id,
       email: data.user.email || email,
+      name: finalUser?.name || data.user.user_metadata?.name || (data.user.email || email).split('@')[0],
       role,
       companyId: companyId || undefined,
       company_id: companyId || undefined, // Adicionar snake_case para compatibilidade com testes
       transportadoraId: role === 'transportadora' ? transportadoraId : undefined,
+      avatar_url: finalUser?.avatar_url || null,
     }
 
     const response = NextResponse.json({ 
@@ -431,9 +457,11 @@ async function loginHandler(req: NextRequest) {
     const sessionCookieValue = Buffer.from(JSON.stringify({
       id: userPayload.id,
       email: userPayload.email,
+      name: userPayload.name,
       role: userPayload.role,
       companyId: userPayload.companyId,
-      transportadoraId: userPayload.transportadoraId
+      transportadoraId: userPayload.transportadoraId,
+      avatar_url: userPayload.avatar_url
       // access_token removido por segurança - usar header Authorization ou cookie Supabase
     })).toString('base64')
 
@@ -451,7 +479,9 @@ async function loginHandler(req: NextRequest) {
     console.log('✅ Login bem-sucedido - cookie customizado criado:', {
       userId: userPayload.id,
       email: userPayload.email,
-      role: userPayload.role
+      name: userPayload.name,
+      role: userPayload.role,
+      hasAvatarUrl: !!userPayload.avatar_url
     })
 
     debug('Login API concluído', { role, emailHash: email.replace(/^(.{2}).+(@.*)$/, '$1***$2') }, 'AuthAPI')
