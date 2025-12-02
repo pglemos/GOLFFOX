@@ -377,7 +377,7 @@ export async function POST(request: NextRequest) {
           )
         }
       }
-    } catch (e: any) {
+    } catch (e) {
       // Se der erro, tentar inserir apenas com campos essenciais
       try {
         const { error: profileError } = await supabaseAdmin
