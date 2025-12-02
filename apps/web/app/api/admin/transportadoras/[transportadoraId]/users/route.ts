@@ -33,9 +33,11 @@ export async function GET(
       )
     }
 
+    // Selecionar apenas colunas necessárias para listagem (otimização de performance)
+    const userColumns = 'id,email,name,role,transportadora_id,is_active,created_at,updated_at'
     const { data, error } = await supabaseServiceRole
       .from('users')
-      .select('*')
+      .select(userColumns)
       .eq('transportadora_id', transportadoraId)
       .eq('role', 'transportadora')
       .order('name', { ascending: true })
@@ -51,9 +53,10 @@ export async function GET(
       success: true,
       users: data || []
     })
-  } catch (error: any) {
+  } catch (err) {
+    const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
     return NextResponse.json(
-      { success: false, error: 'Erro ao processar requisição', message: error.message },
+      { success: false, error: 'Erro ao processar requisição', message: errorMessage },
       { status: 500 }
     )
   }

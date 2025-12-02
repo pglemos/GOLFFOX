@@ -43,6 +43,8 @@ export async function GET(req: NextRequest) {
     const alertLevel = req.nextUrl.searchParams.get('alert_level') || 'critical,warning'
     const alertLevels = alertLevel.split(',')
 
+    // View materializada - selecionar todas as colunas (já são otimizadas pela view)
+    // Mas podemos especificar colunas se necessário para documentação
     const { data, error } = await supabaseServiceRole
       .from('v_carrier_expiring_documents')
       .select('*')
@@ -69,9 +71,10 @@ export async function GET(req: NextRequest) {
       alerts: data || [],
       stats
     })
-  } catch (error: any) {
+  } catch (err) {
+    const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
     return NextResponse.json(
-      { error: 'Erro ao processar requisição', message: error.message },
+      { error: 'Erro ao processar requisição', message: errorMessage },
       { status: 500 }
     )
   }
