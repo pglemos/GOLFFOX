@@ -32,8 +32,13 @@ export function useAuthFast() {
           const decoded = atob(cookieMatch[1])
           const u = JSON.parse(decoded)
           // #region agent log
-          console.log('[DEBUG useAuthFast] Cookie data parsed:', { hasAvatarUrl: !!u?.avatar_url, avatarUrl: u?.avatar_url, cookieKeys: u ? Object.keys(u) : [], name: u?.name });
-          fetch('http://127.0.0.1:7242/ingest/802544c4-70d0-43c7-a57c-6692b28ca17d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'use-auth-fast.tsx:getCookieUser',message:'H3: Cookie data parsed',data:{hasAvatarUrl:!!u?.avatar_url,avatarUrl:u?.avatar_url,cookieKeys:u?Object.keys(u):[]},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H3'})}).catch(()=>{});
+          console.log('[DEBUG useAuthFast] 🍪 Cookie RAW data:', JSON.stringify(u, null, 2));
+          console.log('[DEBUG useAuthFast] 🖼️ avatar_url status:', { 
+            hasAvatarUrl: !!u?.avatar_url, 
+            avatarUrl: u?.avatar_url,
+            avatarUrlType: typeof u?.avatar_url,
+            cookieKeys: u ? Object.keys(u) : []
+          });
           // #endregion
           if (u?.id && u?.email) {
             return {
