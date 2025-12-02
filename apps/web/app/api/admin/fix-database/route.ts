@@ -34,10 +34,10 @@ export async function POST(request: NextRequest) {
 
     // Tentar executar via RPC (se disponível) ou usar query direta
     try {
-      // Verificar se a coluna já existe
+      // Verificar se a coluna já existe (selecionar apenas id e updated_at para verificação)
       const { data: company } = await supabaseAdmin
         .from('companies')
-        .select('*')
+        .select('id,updated_at')
         .limit(1)
         .single()
 
@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
           message: 'Coluna updated_at já existe'
         })
       }
-    } catch (error: any) {
+    } catch (err) {
       // Se não conseguir executar, retornar SQL para execução manual
       return NextResponse.json({
         success: false,
@@ -75,10 +75,11 @@ export async function POST(request: NextRequest) {
         sql: sql
       })
     }
-  } catch (error: any) {
-    console.error('Erro ao corrigir banco:', error)
+  } catch (err) {
+    console.error('Erro ao corrigir banco:', err)
+    const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
     return NextResponse.json(
-      { error: 'Erro ao corrigir banco', message: error.message },
+      { error: 'Erro ao corrigir banco', message: errorMessage },
       { status: 500 }
     )
   }
