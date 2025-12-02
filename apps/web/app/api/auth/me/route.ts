@@ -76,6 +76,7 @@ export async function GET(request: NextRequest) {
       role: userData.role,
       companyId: userData.companyId ?? null,
       transportadora_id: userData.transportadora_id ?? null,
+      avatar_url: userData.avatar_url ?? null,
     }
   })
 }

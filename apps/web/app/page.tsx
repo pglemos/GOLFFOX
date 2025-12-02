@@ -502,12 +502,15 @@ function LoginContent() {
 
         // ✅ OTIMIZADO: Processar sessão de forma síncrona e rápida
         // O cookie já foi definido pelo servidor, então apenas persistir no cliente
+        // ✅ Incluir name e avatar_url para exibição no Topbar
         AuthManager.persistSession(
           {
             id: user.id,
             email: user.email,
             role: userRoleFromDatabase,
             accessToken: token,
+            name: user.name || user.email.split('@')[0],
+            avatar_url: user.avatar_url || null,
           },
           { token, storage: rememberMe ? "both" : "session" }
         )
