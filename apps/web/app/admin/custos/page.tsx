@@ -51,7 +51,7 @@ export default function CustosPage() {
 
   if (loading || !data) {
     return (
-      <AppShell panel="admin" user={user || { id: 'mock', name: 'Admin', email: 'admin@golffox.com', role: 'admin' }}>
+      <AppShell panel="admin" user={user ? { id: user.id, name: user.name || 'Admin', email: user.email, role: user.role || 'admin' } : { id: 'mock', name: 'Admin', email: 'admin@golffox.com', role: 'admin' }}>
         <div className="flex items-center justify-center h-full">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500" />
         </div>
@@ -62,7 +62,7 @@ export default function CustosPage() {
   const { kpis, distribution, monthlyTrend } = data
 
   return (
-    <AppShell panel="admin" user={user || { id: 'mock', name: 'Admin', email: 'admin@golffox.com', role: 'admin' }}>
+    <AppShell panel="admin" user={user ? { id: user.id, name: user.name || 'Admin', email: user.email, role: user.role || 'admin' } : { id: 'mock', name: 'Admin', email: 'admin@golffox.com', role: 'admin' }}>
       <div className="p-4 sm:p-6 lg:p-8 space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
