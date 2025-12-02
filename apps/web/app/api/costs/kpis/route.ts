@@ -44,7 +44,7 @@ async function getCostsKpisHandler(request: NextRequest) {
     }
 
     // ✅ Validar acesso à empresa se company_id fornecido
-    let userCtx: any = null
+    let userCtx: { role: string; id?: string; companyId?: string } | null = null
     if (isDevelopment) {
       userCtx = { role: 'admin' }
     } else {
@@ -55,7 +55,7 @@ async function getCostsKpisHandler(request: NextRequest) {
       userCtx = user
     }
 
-    // Buscar KPIs da view
+    // Buscar KPIs da view (view materializada - selecionar todas as colunas)
     const { data, error } = await supabaseServiceRole
       .from('v_costs_kpis')
       .select('*')
@@ -133,10 +133,11 @@ async function getCostsKpisHandler(request: NextRequest) {
     }
 
     return NextResponse.json(response)
-  } catch (error: any) {
-    console.error('Erro ao buscar KPIs de custos:', error)
+  } catch (err) {
+    console.error('Erro ao buscar KPIs de custos:', err)
+    const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
     return NextResponse.json(
-      { error: error.message || 'Erro desconhecido' },
+      { error: errorMessage },
       { status: 500 }
     )
   }

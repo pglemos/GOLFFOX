@@ -24,7 +24,7 @@ async function reconcileHandler(request: NextRequest) {
     const body = await request.json()
     const validated = reconcileSchema.parse(body)
 
-    // Buscar dados de conciliação
+    // Buscar dados de conciliação (view materializada - selecionar todas as colunas)
     const { data: conciliation, error: conciliationError } = await supabaseServiceRole
       .from('v_costs_conciliation')
       .select('*')
@@ -55,7 +55,7 @@ async function reconcileHandler(request: NextRequest) {
       .eq('invoice_id', validated.invoice_id)
       .limit(1)
       .single()
-      .then((r: any) => r.data)
+      .then((r: { data: unknown }) => r.data)
 
     if (!conciliationData) {
       return NextResponse.json(
@@ -79,7 +79,7 @@ async function reconcileHandler(request: NextRequest) {
       status = 'pending' // Mantém pendente para revisão
     }
 
-    const updateData: any = {
+    const updateData: Record<string, unknown> = {
       reconciliation_status: status,
       notes: validated.notes || conciliationData.notes
     }
@@ -113,16 +113,17 @@ async function reconcileHandler(request: NextRequest) {
         action: validated.action
       }
     })
-  } catch (error: any) {
-    if (error instanceof z.ZodError) {
+  } catch (err) {
+    if (err instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Dados inválidos', details: error.errors },
+        { error: 'Dados inválidos', details: err.errors },
         { status: 400 }
       )
     }
-    console.error('Erro ao conciliar custo:', error)
+    console.error('Erro ao conciliar custo:', err)
+    const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
     return NextResponse.json(
-      { error: error.message || 'Erro desconhecido' },
+      { error: errorMessage },
       { status: 500 }
     )
   }
