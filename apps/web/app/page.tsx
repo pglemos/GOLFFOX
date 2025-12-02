@@ -1255,5 +1255,3 @@ export default function LoginPage() {
     </LoginErrorBoundary>
   )
 }
-
-\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n  /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$/
