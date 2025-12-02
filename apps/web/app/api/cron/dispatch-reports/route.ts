@@ -127,10 +127,11 @@ async function handleDispatchReports(request: NextRequest) {
       )
     }
 
-    // Buscar agendamentos ativos
+    // Buscar agendamentos ativos (selecionar apenas colunas necessárias)
+    const scheduleColumns = 'id,company_id,report_key,cron,recipients,is_active'
     const { data: schedules, error: schedulesError } = await supabase
       .from('gf_report_schedules')
-      .select('*')
+      .select(scheduleColumns)
       .eq('is_active', true)
 
     if (schedulesError) throw schedulesError
@@ -157,20 +158,21 @@ async function handleDispatchReports(request: NextRequest) {
           status: reportResult.success ? 'completed' : 'failed',
           error: reportResult.error
         })
-      } catch (error: any) {
-        console.error(`Erro ao processar agendamento ${schedule.id}:`, error)
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
+        console.error(`Erro ao processar agendamento ${schedule.id}:`, err)
         
         // Registrar alerta operacional
         await alertCronFailure(
           `dispatch-reports-${schedule.id}`,
-          error.message,
+          errorMessage,
           { schedule_id: schedule.id, report_key: schedule.report_key }
         )
         
         results.push({
           scheduleId: schedule.id,
           status: 'failed',
-          error: error.message
+          error: errorMessage
         })
       }
     }
@@ -180,14 +182,15 @@ async function handleDispatchReports(request: NextRequest) {
       processed: results.length,
       results
     })
-  } catch (error: any) {
-    console.error('Erro no cron de relatórios:', error)
+  } catch (err) {
+    const errorMessage = err instanceof Error ? err.message : 'Erro ao processar agendamentos'
+    console.error('Erro no cron de relatórios:', err)
     
     // Registrar alerta crítico
-    await alertCronFailure('dispatch-reports', error.message || 'Erro ao processar agendamentos')
+    await alertCronFailure('dispatch-reports', errorMessage)
     
     return NextResponse.json(
-      { error: error.message || 'Erro ao processar agendamentos' },
+      { error: errorMessage },
       { status: 500 }
     )
   }
@@ -227,7 +230,10 @@ function shouldExecuteCron(cron: string, now: Date): boolean {
 /**
  * Gera relatório e envia por email
  */
-async function generateAndDispatchReport(supabase: ReturnType<typeof getSupabaseAdmin>, schedule: any) {
+async function generateAndDispatchReport(
+  supabase: ReturnType<typeof getSupabaseAdmin>, 
+  schedule: { id: string; company_id: string | null; report_key: string; recipients: string[] }
+) {
   try {
     // Gerar relatório via API interna
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
@@ -322,7 +328,8 @@ async function generateAndDispatchReport(supabase: ReturnType<typeof getSupabase
     }
 
     return { success: true, historyId: historyData?.id }
-  } catch (error: any) {
+  } catch (err) {
+    const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
     // Registrar erro no histórico
     await supabase
       .from('gf_report_history')
@@ -331,11 +338,11 @@ async function generateAndDispatchReport(supabase: ReturnType<typeof getSupabase
         company_id: schedule.company_id,
         report_key: schedule.report_key,
         status: 'failed',
-        error_message: error.message,
+        error_message: errorMessage,
         recipients: schedule.recipients
       })
 
-    return { success: false, error: error.message }
+    return { success: false, error: errorMessage }
   }
 }
 

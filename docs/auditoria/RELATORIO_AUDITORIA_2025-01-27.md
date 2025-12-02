@@ -127,6 +127,10 @@ Auditoria completa do sistema GolfFox realizada conforme plano de trabalho. Foco
 - `apps/web/app/api/admin/transportadoras/[transportadoraId]/drivers/route.ts` - Otimizado `.select('*')` para 12 colunas específicas e corrigido `any`
 - `apps/web/app/api/admin/create-operator/route.ts` - Otimizado `.select('*')` para colunas específicas e corrigido múltiplos `any`
 - `apps/web/app/api/admin/fix-database/route.ts` - Otimizado `.select('*')` para `id,updated_at` e corrigido `any`
+- `apps/web/app/api/admin/transportadoras/[transportadoraId]/users/route.ts` - Otimizado `.select('*')` para 8 colunas específicas e corrigido `any`
+- `apps/web/app/api/reports/schedule/route.ts` - Otimizado `.select('*')` para 9 colunas específicas e corrigido múltiplos `any`
+- `apps/web/app/api/cron/dispatch-reports/route.ts` - Otimizado `.select('*')` para 6 colunas específicas e corrigido `any` (incluindo tipagem de função)
+- `apps/web/app/api/transportadora/alerts/route.ts` - Corrigido `any` (view materializada mantém `*`)
 
 ---
 
@@ -244,7 +248,7 @@ Auditoria completa do sistema GolfFox realizada conforme plano de trabalho. Foco
 1. Executar `flutter analyze` e `flutter test` (requer Flutter no PATH)
 2. Validar RLS no Supabase (requer acesso ao dashboard)
 3. Testar fluxos de usuários (requer ambiente rodando)
-4. Revisar uso de `.select('*')` em ~15 arquivos restantes para otimização (já otimizados: trips, routes, companies, vehicles, users-list, drivers-list, transportadoras-list, audit-log, assistance-requests, transportadoras/drivers, create-operator, fix-database)
+4. Revisar uso de `.select('*')` em ~10 arquivos restantes para otimização (já otimizados: trips, routes, companies, vehicles, users-list, drivers-list, transportadoras-list, audit-log, assistance-requests, transportadoras/drivers, create-operator, fix-database, transportadoras/users, reports/schedule, cron/dispatch-reports)
 
 ## Status Final
 
@@ -259,11 +263,11 @@ Auditoria completa do sistema GolfFox realizada conforme plano de trabalho. Foco
 
 ### Resumo de Otimizações Realizadas
 
-**Total de arquivos otimizados:** 12 arquivos críticos
-- 8 arquivos de listagem (trips, routes, companies, vehicles, users-list, drivers-list, transportadoras-list, audit-log)
-- 4 arquivos de operações (assistance-requests, transportadoras/drivers, create-operator, fix-database)
+**Total de arquivos otimizados:** 16 arquivos críticos
+- 10 arquivos de listagem (trips, routes, companies, vehicles, users-list, drivers-list, transportadoras-list, audit-log, transportadoras/users, reports/schedule)
+- 6 arquivos de operações (assistance-requests, transportadoras/drivers, create-operator, fix-database, cron/dispatch-reports, transportadora/alerts)
 
-**Total de correções TypeScript:** ~50+ substituições de `any` por tipos seguros
+**Total de correções TypeScript:** ~60+ substituições de `any` por tipos seguros
 - Substituído `error: any` por `err instanceof Error` em todos os catch blocks
 - Substituído `any` por `Record<string, unknown>` em objetos dinâmicos
 - Melhorada type safety em handlers de erro e validações

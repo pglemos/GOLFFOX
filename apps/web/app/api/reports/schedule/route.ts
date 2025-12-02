@@ -195,7 +195,7 @@ async function schedulePostHandler(request: NextRequest) {
 
     if (scheduleId) {
       // Atualizar agendamento existente
-      const updateData: any = {
+      const updateData: Record<string, unknown> = {
         report_key: finalReportKeyNormalized,
         cron: finalCron,
         recipients,
@@ -234,7 +234,7 @@ async function schedulePostHandler(request: NextRequest) {
       return NextResponse.json({ schedule: data })
     } else {
       // Criar novo agendamento
-      const insertData: any = {
+      const insertData: Record<string, unknown> = {
         report_key: finalReportKeyNormalized,
         cron: finalCron,
         recipients,
@@ -352,12 +352,13 @@ async function schedulePostHandler(request: NextRequest) {
 
       return NextResponse.json({ schedule: data }, { status: 201 })
     }
-  } catch (error: any) {
-    console.error('Erro ao agendar relatório:', error)
+  } catch (err) {
+    console.error('Erro ao agendar relatório:', err)
+    const errorMessage = err instanceof Error ? err.message : 'Erro ao agendar relatório'
     return NextResponse.json(
       { 
-        error: error.message || 'Erro ao agendar relatório',
-        details: process.env.NODE_ENV === 'development' ? error : undefined
+        error: errorMessage,
+        details: process.env.NODE_ENV === 'development' ? String(err) : undefined
       },
       { status: 500 }
     )
@@ -374,9 +375,11 @@ async function scheduleGetHandler(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams
     const companyId = searchParams.get('companyId')
 
+    // Selecionar apenas colunas necessárias para listagem (otimização de performance)
+    const scheduleColumns = 'id,company_id,report_key,cron,recipients,is_active,created_by,created_at,updated_at'
     let query = supabase
       .from('gf_report_schedules')
-      .select('*')
+      .select(scheduleColumns)
       .order('created_at', { ascending: false })
 
     if (companyId) {
@@ -388,10 +391,11 @@ async function scheduleGetHandler(request: NextRequest) {
     if (error) throw error
 
     return NextResponse.json({ schedules: data || [] })
-  } catch (error: any) {
-    console.error('Erro ao listar agendamentos:', error)
+  } catch (err) {
+    console.error('Erro ao listar agendamentos:', err)
+    const errorMessage = err instanceof Error ? err.message : 'Erro ao listar agendamentos'
     return NextResponse.json(
-      { error: error.message || 'Erro ao listar agendamentos' },
+      { error: errorMessage },
       { status: 500 }
     )
   }
@@ -422,10 +426,11 @@ async function scheduleDeleteHandler(request: NextRequest) {
     if (error) throw error
 
     return NextResponse.json({ success: true })
-  } catch (error: any) {
-    console.error('Erro ao deletar agendamento:', error)
+  } catch (err) {
+    console.error('Erro ao deletar agendamento:', err)
+    const errorMessage = err instanceof Error ? err.message : 'Erro ao deletar agendamento'
     return NextResponse.json(
-      { error: error.message || 'Erro ao deletar agendamento' },
+      { error: errorMessage },
       { status: 500 }
     )
   }
