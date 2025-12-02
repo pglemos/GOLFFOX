@@ -116,7 +116,27 @@ export function useAuthFast() {
 
     const handleAuthUpdate = () => {
       setLoading(true)
-      checkAuth()
+      // Forçar busca no servidor (ignorar cookie desatualizado)
+      fetch('/api/auth/me', { credentials: 'include' })
+        .then(async (res) => {
+          if (!mounted) return
+          if (res.ok) {
+            const data = await res.json().catch(() => null)
+            const u = data?.user
+            console.log('[DEBUG useAuthFast] 🔄 auth:update - Server response:', { hasAvatarUrl: !!u?.avatar_url, name: u?.name });
+            if (u?.id && u?.role) {
+              setUser({ id: u.id, email: u.email || '', name: u.name || u.email?.split('@')[0] || '', role: u.role, avatar_url: u.avatar_url })
+              setLoading(false)
+              return
+            }
+          }
+          // Fallback para cookie se servidor falhar
+          checkAuth()
+        })
+        .catch(() => {
+          if (!mounted) return
+          checkAuth()
+        })
     }
 
     window.addEventListener('auth:update', handleAuthUpdate)

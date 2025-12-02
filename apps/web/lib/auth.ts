@@ -7,6 +7,8 @@ export interface UserData {
   email: string
   role: string
   accessToken: string
+  name?: string
+  avatar_url?: string | null
 }
 
 export class AuthManager {
@@ -128,8 +130,13 @@ export class AuthManager {
     const storageMode = options?.storage ?? 'both'
 
     // ✅ Garantir compatibilidade com backend (api-auth.ts espera access_token)
+    // ✅ Incluir name e avatar_url para exibição no Topbar
     const payloadObj = {
-      ...userData,
+      id: userData.id,
+      email: userData.email,
+      role: userData.role,
+      name: userData.name || userData.email.split('@')[0],
+      avatar_url: userData.avatar_url || null,
       access_token: userData.accessToken || options?.token
     }
     const payload = JSON.stringify(payloadObj)

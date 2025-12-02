@@ -309,3 +309,126 @@ Foi criado um script SQL completo para validação RLS:
 **Relatórios detalhados:**
 - `docs/auditoria/VALIDACAO_RLS_2025-01-27.md` - Análise baseada em migrations
 - `docs/auditoria/VALIDACAO_RLS_RESULTADOS_2025-01-27.md` - Resultados da validação executada
+
+---
+
+## Correções Supabase Linter (2025-01-27)
+
+### ✅ RLS Habilitado em Tabelas Faltantes
+
+| Tabela | Status Anterior | Status Atual | Políticas |
+|--------|-----------------|--------------|-----------|
+| `route_stops` | ❌ RLS Desabilitado | ✅ RLS Habilitado | 5 políticas |
+| `trip_passengers` | ❌ RLS Desabilitado | ✅ RLS Habilitado | 6 políticas |
+| `gf_web_vitals` | ❌ RLS Desabilitado | ✅ RLS Habilitado | 3 políticas |
+
+**Migrations aplicadas:**
+- `enable_rls_route_stops` - Políticas para admin, operator, transportadora, driver
+- `enable_rls_trip_passengers` - Políticas para admin, operator, transportadora, driver, passenger
+- `enable_rls_gf_web_vitals` - Insert público (analytics), select apenas admin
+
+### ✅ Índices Duplicados Removidos
+
+| Tabela | Índice Removido | Índice Mantido |
+|--------|-----------------|----------------|
+| `routes` | `routes_company_idx` | `idx_routes_company_id` |
+| `trips` | `trips_route_idx` | `idx_trips_route_id` |
+| `trips` | `trips_driver_idx` | `idx_trips_driver_id` |
+
+**Migration aplicada:** `remove_duplicate_indexes`
+
+### ✅ Views SECURITY DEFINER Corrigidas
+
+**Todas as 38 views** recriadas com `security_invoker = true`:
+
+| Grupo | Views |
+|-------|-------|
+| Básicas | `profiles`, `v_trip_overview`, `v_trip_latest_position`, `v_driver_last_position`, `v_my_companies` |
+| Operator | `v_operator_alerts`, `v_operator_alerts_secure`, `v_operator_employees`, `v_operator_employees_secure`, `v_operator_costs`, `v_operator_costs_secure`, `v_operator_routes`, `v_operator_routes_secure`, `v_operator_requests`, `v_operator_sla`, `v_operator_dashboard_kpis`, `v_operator_dashboard_kpis_secure` |
+| Admin | `v_admin_dashboard_kpis`, `v_active_trips` |
+| Custos | `v_costs_breakdown`, `v_costs_secure`, `v_costs_kpis`, `v_costs_conciliation`, `v_costs_vs_budget` |
+| Carrier | `v_carrier_expiring_documents`, `v_carrier_route_costs_summary`, `v_carrier_vehicle_costs_summary`, `v_route_stops` |
+| Reports | `v_reports_delays`, `v_reports_delays_secure`, `v_reports_efficiency`, `v_reports_efficiency_secure`, `v_reports_not_boarded`, `v_reports_not_boarded_secure`, `v_reports_occupancy`, `v_reports_occupancy_secure`, `v_reports_roi_sla_secure`, `v_reports_driver_ranking` |
+
+**Migrations aplicadas:**
+- `fix_security_definer_views` (4 views iniciais)
+- `fix_all_security_definer_views_part1` (9 views)
+- `fix_all_security_definer_views_part2` (6 views)
+- `fix_all_security_definer_views_part3` (3 views)
+- `fix_all_security_definer_views_part4` (5 views)
+- `fix_all_security_definer_views_part5` (6 views)
+- `fix_all_security_definer_views_part6` (5 views)
+
+### ⚠️ Warnings Não-Críticos (Info/Performance)
+
+Os seguintes warnings do linter são **informativos** e não representam vulnerabilidades:
+
+1. **Auth RLS Initplan (28 warnings)** - Políticas usando `auth.uid()` podem ter re-execução. Impacto mínimo em performance.
+
+2. **Multiple Permissive Policies (8 casos)** - Múltiplas políticas permissivas para mesmo role/action. Não é erro, pode indicar redundância aceitável.
+
+---
+
+## Resumo Final de Correções
+
+| Categoria | Itens | Status |
+|-----------|-------|--------|
+| RLS Desabilitado | 3 tabelas | ✅ Corrigido |
+| Índices Duplicados | 3 índices | ✅ Removidos |
+| Views SECURITY DEFINER | **38 views** | ✅ Corrigidas |
+| Warnings Performance | 28 políticas | ⚠️ Info (não crítico) |
+| Políticas Redundantes | 8 casos | ⚠️ Info (não crítico) |
+
+**Total de correções críticas aplicadas:** 76 (3 RLS + 3 índices + 38 views + 29 funções + 3 materialized views)
+
+**Migrations aplicadas nesta sessão:**
+1. `enable_rls_route_stops`
+2. `enable_rls_trip_passengers`
+3. `enable_rls_gf_web_vitals`
+4. `remove_duplicate_indexes`
+5. `fix_security_definer_views`
+6. `fix_all_security_definer_views_part1`
+7. `fix_all_security_definer_views_part2`
+8. `fix_all_security_definer_views_part3`
+9. `fix_all_security_definer_views_part4`
+10. `fix_all_security_definer_views_part5`
+11. `fix_all_security_definer_views_part6`
+12. `fix_function_search_path_part1`
+13. `fix_function_search_path_part2`
+14. `fix_function_search_path_part3`
+15. `fix_function_search_path_part4`
+16. `fix_function_search_path_part5`
+17. `fix_function_search_path_part6`
+18. `fix_materialized_views_api_access`
+
+---
+
+### ✅ Functions Search Path Corrigido
+
+**29 funções** corrigidas com `SET search_path = ''`:
+
+| Categoria | Funções |
+|-----------|---------|
+| Triggers | `update_carriers_updated_at`, `update_gf_operator_settings_updated_at`, `update_gf_vehicle_checklists_updated_at`, `update_gf_service_requests_updated_at`, `update_gf_company_branding_updated_at`, `update_gf_report_schedules_updated_at`, `update_updated_at_column`, `recalculate_trip_summary_on_position` |
+| Helpers | `get_user_carrier_id`, `current_carrier_id`, `get_trip_passenger_count`, `get_driver_position_lat`, `get_driver_position_lng`, `get_user_name`, `company_ownership`, `get_user_role`, `get_user_company_id`, `get_user_transportadora_id` |
+| RLS Core | `is_admin`, `current_role`, `current_company_id`, `refresh_mv_operator_kpis` |
+| RPCs | `rpc_raise_incident`, `rpc_request_route_change`, `rpc_request_service`, `rpc_invoice_reconcile`, `rpc_carrier_monthly_score`, `safe_create_user_profile`, `gf_map_snapshot_full` |
+
+### ✅ Materialized Views API Access Restringido
+
+**3 materialized views** com acesso revogado de `anon` e `authenticated`:
+- `mv_operator_kpis`
+- `mv_costs_monthly`
+- `mv_admin_kpis`
+
+Agora acessíveis apenas via `service_role` (backend).
+
+### ⚠️ Ação Manual Necessária: Leaked Password Protection
+
+O warning **"Leaked Password Protection Disabled"** requer ação manual no Supabase Dashboard:
+
+1. Acesse **Authentication** → **Providers** → **Email**
+2. Habilite **"Enable Leaked Password Protection"**
+3. Esta opção verifica senhas contra o banco de dados HaveIBeenPwned.org
+
+**Link:** https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection
