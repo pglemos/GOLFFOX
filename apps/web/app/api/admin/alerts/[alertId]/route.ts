@@ -54,7 +54,7 @@ export async function PUT(
     }
 
     // Preparar dados para atualização
-    const updateData: any = {}
+    const updateData: Record<string, unknown> = {}
     if (body.description !== undefined) updateData.description = body.description?.trim() || null
     if (body.severity !== undefined) updateData.severity = body.severity
     if (body.status !== undefined) updateData.status = body.status
@@ -84,12 +84,13 @@ export async function PUT(
       success: true,
       alert: updatedAlert
     })
-  } catch (error: any) {
-    console.error('Erro ao atualizar alerta:', error)
+  } catch (err) {
+    console.error('Erro ao atualizar alerta:', err)
+    const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
     return NextResponse.json(
       { 
         error: 'Erro ao atualizar alerta',
-        message: error.message || 'Erro desconhecido',
+        message: errorMessage,
       },
       { status: 500 }
     )

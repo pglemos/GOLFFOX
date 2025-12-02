@@ -192,13 +192,14 @@ export async function POST(request: NextRequest) {
       route: newRoute,
       id: newRoute.id
     }, { status: 201 })
-  } catch (error: any) {
-    console.error('Erro ao criar rota:', error)
+  } catch (err) {
+    console.error('Erro ao criar rota:', err)
+    const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
     return NextResponse.json(
       { 
         error: 'Erro ao criar rota',
-        message: error.message || 'Erro desconhecido',
-        details: process.env.NODE_ENV === 'development' ? error : undefined
+        message: errorMessage,
+        details: process.env.NODE_ENV === 'development' ? String(err) : undefined
       },
       { status: 500 }
     )
@@ -224,7 +225,9 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '100')
     const offset = parseInt(searchParams.get('offset') || '0')
 
-    let query = supabaseAdmin.from('routes').select('*', { count: 'exact' })
+    // Selecionar apenas colunas necessárias para listagem (otimização de performance)
+    const routeColumns = 'id,name,company_id,carrier_id,origin,destination,origin_lat,origin_lng,destination_lat,destination_lng,polyline,is_active,created_at,updated_at'
+    let query = supabaseAdmin.from('routes').select(routeColumns, { count: 'exact' })
 
     if (companyId) {
       query = query.eq('company_id', companyId)

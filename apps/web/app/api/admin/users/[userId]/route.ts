@@ -39,10 +39,10 @@ export async function PUT(
     const supabaseAdmin = getSupabaseAdmin()
     const body = await request.json()
 
-    // Verificar se usuário existe
+    // Verificar se usuário existe e buscar email para validação de mudança
     const { data: existingUser, error: fetchError } = await supabaseAdmin
       .from('users')
-      .select('*')
+      .select('id,email')
       .eq('id', userId)
       .single()
 
@@ -54,7 +54,7 @@ export async function PUT(
     }
 
     // Preparar dados para atualização
-    const updateData: any = {}
+    const updateData: Record<string, unknown> = {}
     if (body.name !== undefined) updateData.name = body.name?.trim() || null
     if (body.email !== undefined) {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -101,7 +101,7 @@ export async function PUT(
     // Se o email foi alterado, atualizar também no Supabase Auth
     if ((body.email && body.email !== existingUser.email) || body.password) {
       try {
-        const authUpdates: any = {}
+        const authUpdates: Record<string, unknown> = {}
         if (body.email && body.email !== existingUser.email) {
           authUpdates.email = body.email
         }
@@ -112,8 +112,8 @@ export async function PUT(
         if (Object.keys(authUpdates).length > 0) {
           await supabaseAdmin.auth.admin.updateUserById(userId, authUpdates)
         }
-      } catch (authError: any) {
-        console.warn('Aviso: não foi possível atualizar dados no Auth:', authError)
+      } catch (authErr) {
+        console.warn('Aviso: não foi possível atualizar dados no Auth:', authErr)
         // Não falhar a operação se apenas o Auth falhar, mas idealmente deveria notificar
       }
     }
@@ -122,12 +122,13 @@ export async function PUT(
       success: true,
       user: updatedUser
     })
-  } catch (error: any) {
-    console.error('Erro ao atualizar usuário:', error)
+  } catch (err) {
+    console.error('Erro ao atualizar usuário:', err)
+    const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
     return NextResponse.json(
       {
         error: 'Erro ao atualizar usuário',
-        message: error.message || 'Erro desconhecido',
+        message: errorMessage,
       },
       { status: 500 }
     )

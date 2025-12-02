@@ -153,10 +153,11 @@ async function handleDelete(request: NextRequest) {
       success: true,
       message: 'Empresa excluída com sucesso'
     })
-  } catch (error: any) {
-    console.error('Erro ao excluir empresa:', error)
+  } catch (err) {
+    console.error('Erro ao excluir empresa:', err)
+    const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
     return NextResponse.json(
-      { error: 'Erro ao excluir empresa', message: error.message },
+      { error: 'Erro ao excluir empresa', message: errorMessage },
       { status: 500 }
     )
   }

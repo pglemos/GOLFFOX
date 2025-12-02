@@ -18,10 +18,8 @@ import {
   CheckCircle,
   User,
   Download,
-  XCircle,
   Trash2
 } from "lucide-react"
-import { useRouter } from "next/navigation"
 import { notifySuccess, notifyError } from "@/lib/toast"
 import { motion } from "framer-motion"
 import { useAuthFast } from "@/hooks/use-auth-fast"
@@ -37,29 +35,34 @@ const EditAlertModal = dynamic(
   { ssr: false, loading: () => null }
 )
 
-const ALERT_TYPES = {
-  route_delayed: { label: 'Rota Atrasada', severity: 'warning' },
-  bus_stopped: { label: 'Ônibus Parado', severity: 'critical' },
-  route_deviation: { label: 'Desvio de Rota', severity: 'warning' },
-  incident: { label: 'Incidente', severity: 'critical' },
-  checklist_fail: { label: 'Checklist Falhou', severity: 'warning' }
-}
+// ALERT_TYPES removido - não utilizado
 
 export default function AlertasPage() {
-  const router = useRouter()
   const { user, loading: authLoading } = useAuthFast()
   const [dataLoading, setDataLoading] = useState(true)
-  const [alertas, setAlertas] = useState<any[]>([])
+  const [alertas, setAlertas] = useState<Array<{
+    id: string;
+    message?: string;
+    description?: string;
+    type?: string;
+    vehicle_plate?: string;
+    route_name?: string;
+    severity?: string;
+    status?: string;
+    created_at: string;
+    companies?: { name: string };
+    routes?: { name: string };
+    vehicles?: { plate: string };
+    drivers?: { name?: string; email: string };
+  }>>([])
   const [searchQuery, setSearchQuery] = useState("")
   const debouncedSearchQuery = useDebounce(searchQuery, 300)
   const [filtersExpanded, setFiltersExpanded] = useState(false)
-  const [tempFilterType, setTempFilterType] = useState<string>("all")
   const [tempFilterSeverity, setTempFilterSeverity] = useState<string>("all")
   const [tempFilterStatus, setTempFilterStatus] = useState<string>("all")
-  const [filterType, setFilterType] = useState<string>("all")
   const [filterSeverity, setFilterSeverity] = useState<string>("all")
   const [filterStatus, setFilterStatus] = useState<string>("all")
-  const [selectedAlertForEdit, setSelectedAlertForEdit] = useState<any>(null)
+  const [selectedAlertForEdit, setSelectedAlertForEdit] = useState<typeof alertas[0] | null>(null)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
 
   const handleSaveFilters = () => {
@@ -70,10 +73,8 @@ export default function AlertasPage() {
   }
 
   const handleResetFilters = () => {
-    setTempFilterType("all")
     setTempFilterSeverity("all")
     setTempFilterStatus("all")
-    setFilterType("all")
     setFilterSeverity("all")
     setFilterStatus("all")
     setFiltersExpanded(false)
@@ -170,10 +171,10 @@ export default function AlertasPage() {
       } else {
         throw new Error(result.error || 'Erro ao excluir alerta')
       }
-    } catch (error: any) {
-      console.error('Erro ao excluir alerta:', error)
-      const errorMessage = error.message || 'Erro desconhecido ao excluir alerta'
-      notifyError(error, errorMessage)
+    } catch (err) {
+      console.error('Erro ao excluir alerta:', err)
+      const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido ao excluir alerta'
+      notifyError(err, errorMessage)
     }
   }
 
@@ -201,8 +202,8 @@ export default function AlertasPage() {
 
       notifySuccess('', { i18n: { ns: 'common', key: 'success.alertResolved' } })
       loadAlertas()
-    } catch (error: any) {
-      notifyError(error, 'Erro ao resolver alerta')
+    } catch (err) {
+      notifyError(err, 'Erro ao resolver alerta')
     }
   }
 
@@ -226,8 +227,8 @@ export default function AlertasPage() {
 
       notifySuccess('', { i18n: { ns: 'common', key: 'success.alertAssigned' } })
       loadAlertas()
-    } catch (error: any) {
-      notifyError(error, 'Erro ao atribuir alerta')
+    } catch (err) {
+      notifyError(err, 'Erro ao atribuir alerta')
     }
   }
 
@@ -256,7 +257,7 @@ export default function AlertasPage() {
       window.URL.revokeObjectURL(url)
 
       notifySuccess('', { i18n: { ns: 'common', key: 'success.exportCsv' } })
-    } catch (error: any) {
+    } catch {
       notifyError('Erro ao exportar', undefined, { i18n: { ns: 'common', key: 'errors.export' } })
     }
   }
