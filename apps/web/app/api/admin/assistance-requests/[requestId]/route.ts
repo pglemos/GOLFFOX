@@ -39,10 +39,10 @@ export async function PUT(
     const supabaseAdmin = getSupabaseAdmin()
     const body = await request.json()
 
-    // Verificar se ocorrência existe
+    // Verificar se ocorrência existe (selecionar apenas id para verificação)
     const { data: existingRequest, error: fetchError } = await supabaseAdmin
       .from('gf_service_requests')
-      .select('*')
+      .select('id')
       .eq('id', requestId)
       .single()
 
@@ -54,7 +54,7 @@ export async function PUT(
     }
 
     // Preparar dados para atualização
-    const updateData: any = {}
+    const updateData: Record<string, unknown> = {}
     if (body.description !== undefined) updateData.description = body.description?.trim() || null
     if (body.status !== undefined) updateData.status = body.status
     if (body.request_type !== undefined) updateData.request_type = body.request_type
@@ -86,12 +86,13 @@ export async function PUT(
       success: true,
       request: updatedRequest
     })
-  } catch (error: any) {
-    console.error('Erro ao atualizar ocorrência:', error)
+  } catch (err) {
+    console.error('Erro ao atualizar ocorrência:', err)
+    const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
     return NextResponse.json(
       { 
         error: 'Erro ao atualizar ocorrência',
-        message: error.message || 'Erro desconhecido',
+        message: errorMessage,
       },
       { status: 500 }
     )

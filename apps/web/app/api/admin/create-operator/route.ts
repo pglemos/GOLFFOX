@@ -115,13 +115,15 @@ export async function POST(request: NextRequest) {
       console.warn('⚠️ Autenticação falhou em desenvolvimento, mas continuando...')
     }
 
-    let company: any
+    let company: { id: string; name: string; [key: string]: unknown } | null = null
 
     // Se company_id foi fornecido, usar empresa existente
     if (companyId) {
+      // Verificar se empresa existe (selecionar apenas colunas necessárias)
+      const companyColumns = 'id,name,cnpj,address,phone,email,is_active,created_at,updated_at'
       const { data: existingCompany, error: companyFetchError } = await supabaseAdmin
         .from('companies')
-        .select('*')
+        .select(companyColumns)
         .eq('id', companyId)
         .single()
 
@@ -180,7 +182,7 @@ export async function POST(request: NextRequest) {
       }
 
       // Passo 2: Criar empresa com dados completos
-      const companyData: any = {
+      const companyData: Record<string, unknown> = {
         name: companyName,
         is_active: true,
       }
@@ -215,8 +217,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Passo 3: Criar usuário no Supabase Auth (apenas se senha for fornecida)
-    let authData: any = null
-    let createUserError: any = null
+    let authData: { user: { id: string; email?: string } } | null = null
+    let createUserError: { message?: string } | null = null
     
     if (shouldCreateUser && operatorEmail) {
       const createUserResult = await supabaseAdmin.auth.admin.createUser({
@@ -239,7 +241,7 @@ export async function POST(request: NextRequest) {
     // Se não houver senha, retornar apenas empresa criada
     // Mas o teste espera email na resposta, então incluir se fornecido
     if (!shouldCreateUser) {
-      const responseData: any = {
+      const responseData: Record<string, unknown> = {
         success: true,
         companyId: company.id,
         company,
@@ -264,7 +266,7 @@ export async function POST(request: NextRequest) {
         if (createUserError.message?.includes('already registered') || createUserError.message?.includes('User already registered')) {
           // Buscar usuário existente
           const { data: existingUsers } = await supabaseAdmin.auth.admin.listUsers()
-          const existingUser = existingUsers?.users?.find((u: any) => u.email === operatorEmail)
+          const existingUser = existingUsers?.users?.find((u: { email?: string }) => u.email === operatorEmail)
           
           if (existingUser) {
             console.warn('⚠️ Usuário já existe, retornando dados do usuário existente')
@@ -314,7 +316,7 @@ export async function POST(request: NextRequest) {
 
     // Passo 5: Atualizar perfil do usuário
     // Construir objeto de dados com apenas campos essenciais
-    const userData: any = {
+    const userData: Record<string, unknown> = {
       id: authData.user.id,
       email: operatorEmail,
       role: 'operador',
@@ -398,7 +400,7 @@ export async function POST(request: NextRequest) {
             { status: 500 }
           )
         }
-      } catch (e2: any) {
+      } catch (e2) {
         // Erro inesperado - fazer rollback completo
         console.error('Erro ao atualizar perfil (fallback também falhou):', e2)
         try {
@@ -458,7 +460,7 @@ export async function POST(request: NextRequest) {
           mapError = null // Não falhar - company_id na tabela users é suficiente
         }
       }
-    } catch (e: any) {
+    } catch (e) {
       console.warn('Erro ao mapear usuário-empresa (catch, não crítico):', e)
       // Não falhar se erro ao mapear, o company_id na tabela users é suficiente
       mapError = null
@@ -506,7 +508,7 @@ export async function POST(request: NextRequest) {
             console.warn('Erro ao registrar log de auditoria (não crítico):', auditError)
           }
         }
-      } catch (auditError: any) {
+      } catch (auditError) {
         // Não falhar se log falhar - é opcional
         if (auditError.message?.includes('does not exist') || 
             auditError.message?.includes('relation')) {
@@ -530,14 +532,14 @@ export async function POST(request: NextRequest) {
         email: operatorEmail,
       },
     }, { status: 201 })
-  } catch (error: any) {
-    console.error('Erro ao criar operador:', error)
+  } catch (err) {
+    console.error('Erro ao criar operador:', err)
     // Retornar mensagem de erro mais descritiva
-    const errorMessage = error.message || 'Erro ao criar operador'
+    const errorMessage = err instanceof Error ? err.message : 'Erro ao criar operador'
     const errorDetails = process.env.NODE_ENV === 'development' ? {
       message: errorMessage,
-      stack: error.stack,
-      details: error
+      stack: err instanceof Error ? err.stack : undefined,
+      details: String(err)
     } : { message: errorMessage }
     
     return NextResponse.json(

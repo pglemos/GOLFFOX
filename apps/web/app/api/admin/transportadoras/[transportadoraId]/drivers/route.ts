@@ -31,10 +31,11 @@ export async function GET(
 
     const supabase = getSupabaseAdmin()
 
-    // Buscar motoristas na tabela users
+    // Buscar motoristas na tabela users (selecionar apenas colunas necessárias)
+    const driverColumns = 'id,email,name,phone,cpf,cnh,cnh_category,role,transportadora_id,is_active,created_at,updated_at'
     const { data: drivers, error } = await supabase
       .from('users')
-      .select('*')
+      .select(driverColumns)
       .eq('role', 'driver')
       .eq('transportadora_id', transportadoraId)
       .order('name', { ascending: true })
@@ -48,10 +49,11 @@ export async function GET(
     }
 
     return NextResponse.json({ success: true, drivers })
-  } catch (error: any) {
-    console.error('Erro na API de motoristas:', error)
+  } catch (err) {
+    console.error('Erro na API de motoristas:', err)
+    const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
     return NextResponse.json(
-      { success: false, error: error.message || 'Erro desconhecido' },
+      { success: false, error: errorMessage },
       { status: 500 }
     )
   }
@@ -189,10 +191,11 @@ export async function POST(
     }
 
     return NextResponse.json({ success: true, driver })
-  } catch (error: any) {
-    console.error('Erro na API de criar motorista:', error)
+  } catch (err) {
+    console.error('Erro na API de criar motorista:', err)
+    const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
     return NextResponse.json(
-      { success: false, error: error.message || 'Erro desconhecido' },
+      { success: false, error: errorMessage },
       { status: 500 }
     )
   }

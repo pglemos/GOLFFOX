@@ -123,6 +123,10 @@ Auditoria completa do sistema GolfFox realizada conforme plano de trabalho. Foco
 - `apps/web/app/api/admin/audit-log/route.ts` - Otimizado `.select('*')` e corrigido `any`
 - `apps/web/app/api/admin/users/[userId]/route.ts` - Otimizado `.select('*')` para `id,email` e corrigido `any`
 - `apps/web/app/api/admin/alerts/[alertId]/route.ts` - Otimizado `.select('*')` para apenas `id` e corrigido `any`
+- `apps/web/app/api/admin/assistance-requests/[requestId]/route.ts` - Otimizado `.select('*')` para apenas `id` e corrigido `any`
+- `apps/web/app/api/admin/transportadoras/[transportadoraId]/drivers/route.ts` - Otimizado `.select('*')` para 12 colunas específicas e corrigido `any`
+- `apps/web/app/api/admin/create-operator/route.ts` - Otimizado `.select('*')` para colunas específicas e corrigido múltiplos `any`
+- `apps/web/app/api/admin/fix-database/route.ts` - Otimizado `.select('*')` para `id,updated_at` e corrigido `any`
 
 ---
 
@@ -240,7 +244,7 @@ Auditoria completa do sistema GolfFox realizada conforme plano de trabalho. Foco
 1. Executar `flutter analyze` e `flutter test` (requer Flutter no PATH)
 2. Validar RLS no Supabase (requer acesso ao dashboard)
 3. Testar fluxos de usuários (requer ambiente rodando)
-4. Revisar uso de `.select('*')` em ~20 arquivos restantes para otimização (já otimizados: trips, routes, companies, vehicles, users-list, drivers-list, transportadoras-list, audit-log)
+4. Revisar uso de `.select('*')` em ~15 arquivos restantes para otimização (já otimizados: trips, routes, companies, vehicles, users-list, drivers-list, transportadoras-list, audit-log, assistance-requests, transportadoras/drivers, create-operator, fix-database)
 
 ## Status Final
 
