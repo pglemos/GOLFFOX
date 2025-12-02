@@ -14,12 +14,12 @@ function getSupabaseAdmin() {
 // POST /api/admin/transportadoras/[transportadoraId]/vehicles
 export async function POST(
   request: NextRequest,
-  context: { params: Promise<Promise<{ transportadoraId?: string; carrierId?: string }>> }
+  context: { params: Promise<{ transportadoraId?: string; carrierId?: string }> }
 ) {
   const params = await context.params
 
   try {
-    const { transportadoraId: tId, carrierId: cId } = await params
+    const { transportadoraId: tId, carrierId: cId  } = params
     const transportadoraId = tId || cId
 
     if (!transportadoraId) {
