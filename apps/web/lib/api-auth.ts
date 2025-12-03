@@ -39,15 +39,56 @@ export async function validateAuth(request: NextRequest): Promise<AuthenticatedU
     }
 
     let accessToken: string | null = null
+    let tokenSource: string = 'none'
 
-    // 1. Tentar obter token do header Authorization (Bearer token)
+    // 1. Tentar obter token do header Authorization (Bearer token) - PRIORIDADE MÁXIMA
     const authHeader = request.headers.get('authorization')
     if (authHeader && authHeader.startsWith('Bearer ')) {
       accessToken = authHeader.substring(7)
+      tokenSource = 'header'
       console.log('[AUTH] Token encontrado no header Authorization')
     }
 
-    // 2. Se não houver no header, tentar obter do cookie customizado (golffox-session)
+    // 2. Tentar obter do cookie do Supabase - PRIORIDADE ALTA (token sempre válido)
+    if (!accessToken) {
+      const projectRef = supabaseUrl.split('//')[1]?.split('.')[0]
+      if (projectRef) {
+        const supabaseCookieName = `sb-${projectRef}-auth-token`
+        
+        if (isDevelopment) {
+          const allCookies = request.cookies.getAll().map(c => c.name)
+          console.log('[AUTH] Cookies disponíveis:', allCookies.join(', '))
+          console.log('[AUTH] Procurando cookie do Supabase:', supabaseCookieName)
+        }
+        
+        const supabaseCookie = request.cookies.get(supabaseCookieName)?.value
+
+        if (supabaseCookie) {
+          try {
+            const tokenData = JSON.parse(supabaseCookie)
+            const token = tokenData?.access_token || tokenData?.accessToken || null
+            if (token) {
+              accessToken = token
+              tokenSource = 'supabase-cookie'
+              console.log('[AUTH] ✅ Token encontrado no cookie do Supabase')
+            } else {
+              if (isDevelopment) {
+                console.warn('[AUTH] Cookie do Supabase encontrado mas sem access_token. Chaves:', Object.keys(tokenData).join(', '))
+              }
+            }
+          } catch (error) {
+            console.warn('[AUTH] Erro ao processar cookie do Supabase:', error)
+          }
+        } else {
+          if (isDevelopment) {
+            console.log('[AUTH] Cookie do Supabase não encontrado:', supabaseCookieName)
+          }
+        }
+      }
+    }
+
+    // 3. Como último recurso, tentar obter do cookie customizado (golffox-session)
+    // Mas apenas se não encontrou em outros lugares
     if (!accessToken) {
       const golffoxSession = request.cookies.get('golffox-session')?.value
 
@@ -63,6 +104,7 @@ export async function validateAuth(request: NextRequest): Promise<AuthenticatedU
 
           if (token) {
             accessToken = token
+            tokenSource = 'custom-cookie'
             console.log('[AUTH] Token encontrado no cookie customizado (golffox-session)')
           } else {
             console.warn('[AUTH] Cookie customizado encontrado mas sem access_token. Chaves disponíveis:', Object.keys(sessionData).join(', '))
@@ -71,28 +113,8 @@ export async function validateAuth(request: NextRequest): Promise<AuthenticatedU
           console.error('[AUTH] Erro ao processar cookie customizado:', error)
         }
       } else {
-        console.log('[AUTH] Cookie golffox-session não encontrado. Cookies disponíveis:', request.cookies.getAll().map(c => c.name).join(', '))
-      }
-    }
-
-    // 3. Se ainda não encontrou, tentar obter do cookie do Supabase
-    if (!accessToken) {
-      // Procurar cookie de sessão do Supabase
-      const projectRef = supabaseUrl.split('//')[1]?.split('.')[0]
-      if (projectRef) {
-        const supabaseCookieName = `sb-${projectRef}-auth-token`
-        const supabaseCookie = request.cookies.get(supabaseCookieName)?.value
-
-        if (supabaseCookie) {
-          try {
-            const tokenData = JSON.parse(supabaseCookie)
-            accessToken = tokenData?.access_token || tokenData?.accessToken || null
-            if (accessToken) {
-              console.log('[AUTH] Token encontrado no cookie do Supabase')
-            }
-          } catch (error) {
-            console.warn('[AUTH] Erro ao processar cookie do Supabase:', error)
-          }
+        if (isDevelopment) {
+          console.log('[AUTH] Cookie golffox-session não encontrado. Cookies disponíveis:', request.cookies.getAll().map(c => c.name).join(', '))
         }
       }
     }
@@ -107,10 +129,20 @@ export async function validateAuth(request: NextRequest): Promise<AuthenticatedU
       auth: { persistSession: false, autoRefreshToken: false }
     })
 
+    if (isDevelopment) {
+      console.log('[AUTH] Tentando validar token do Supabase. Fonte:', tokenSource, 'Token length:', accessToken?.length || 0)
+    }
+
     const { data: { user }, error: authError } = await supabase.auth.getUser(accessToken)
 
     if (authError || !user) {
-      console.error('[AUTH] Erro ao validar token com Supabase:', authError?.message || 'Usuário nulo')
+      console.error('[AUTH] Erro ao validar token com Supabase:', {
+        message: authError?.message || 'Usuário nulo',
+        status: authError?.status,
+        name: authError?.name,
+        tokenSource,
+        tokenLength: accessToken?.length || 0
+      })
       return null
     }
 

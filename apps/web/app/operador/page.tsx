@@ -15,6 +15,7 @@ import { DashboardCharts } from "@/components/operator/dashboard-charts"
 import { PeriodFilter, type PeriodFilter as PeriodFilterType } from "@/components/operator/period-filter"
 import { useOperatorKPIs, useControlTower } from "@/hooks/use-operator-data"
 import { useRealtimeKPIs, useRealtimeAlerts } from "@/hooks/use-realtime-updates"
+import { t } from "@/lib/i18n"
 
 export default function OperatorDashboard() {
   const router = useRouter()
@@ -23,7 +24,7 @@ export default function OperatorDashboard() {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const url = new URL(window.location.href)
-      
+
       // Se tem parâmetro ?company=, redirecionar para URL limpa
       if (url.searchParams.has('company')) {
         console.log('⚠️ Removendo parâmetro ?company= da URL')
@@ -36,15 +37,15 @@ export default function OperatorDashboard() {
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [period, setPeriod] = useState<PeriodFilterType>("today")
-  
+
   // Usar React Query para KPIs e Control Tower
   const { data: kpisData, isLoading: kpisLoading } = useOperatorKPIs(tenantCompanyId)
   const { data: controlTowerData, isLoading: controlTowerLoading } = useControlTower(tenantCompanyId)
-  
+
   // Atualização em tempo real
   useRealtimeKPIs(tenantCompanyId)
   useRealtimeAlerts(tenantCompanyId)
-  
+
   const kpis = kpisData || {
     trips_today: 0,
     trips_in_progress: 0,
@@ -54,14 +55,14 @@ export default function OperatorDashboard() {
     daily_cost: 0,
     sla_d0: 0
   }
-  
+
   const controlTower = controlTowerData || {
     delays: 0,
     stoppedVehicles: 0,
     routeDeviations: 0,
     openAssistance: 0
   }
-  
+
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
@@ -75,10 +76,10 @@ export default function OperatorDashboard() {
               const decoded = atob(cookieMatch[1])
               const userData = JSON.parse(decoded)
               if (userData?.id && userData?.email && userData?.role) {
-                console.log('✅ Usuário obtido do cookie:', { 
-                  id: userData.id, 
-                  email: userData.email, 
-                  role: userData.role 
+                console.log('✅ Usuário obtido do cookie:', {
+                  id: userData.id,
+                  email: userData.email,
+                  role: userData.role
                 })
                 setUser(userData)
                 setLoading(false)
@@ -96,7 +97,7 @@ export default function OperatorDashboard() {
           console.error('Erro ao verificar sessão Supabase:', sessionError)
           // Não definir erro imediatamente - pode ser apenas falta de sessão Supabase
         }
-        
+
         if (!session) {
           // Se não há sessão Supabase e não há cookie, redirecionar para login
           if (typeof document !== 'undefined' && !document.cookie.includes('golffox-session')) {
@@ -189,15 +190,15 @@ export default function OperatorDashboard() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 pb-2">
           <div className="flex-1 min-w-0">
-            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-2 text-[var(--ink-strong)]">Painel do Operador</h1>
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-2 text-[var(--ink-strong)]">{t('operator', 'header_title')}</h1>
             <p className="text-xs sm:text-sm md:text-base text-[var(--ink-muted)] truncate">
-              {companyName ? `Empresa: ${companyName}` : "Acompanhe sua operação em tempo real"}
+              {companyName ? `Empresa: ${companyName}` : t('operator', 'dashboard_subtitle')}
             </p>
           </div>
           <Button asChild className="bg-orange-500 hover:bg-orange-600 text-white w-full sm:w-auto min-h-[44px] touch-manipulation">
             <a href="/operador/rotas" className="flex items-center justify-center">
               <MapPin className="h-4 w-4 mr-2" />
-              Ver Rotas
+              {t('operator', 'actions.view_routes')}
             </a>
           </Button>
         </div>
@@ -205,8 +206,8 @@ export default function OperatorDashboard() {
         {/* Filtros de Período */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
           <div className="flex-1 min-w-0">
-            <h2 className="text-base sm:text-lg font-semibold text-[var(--ink-strong)]">KPIs do Dia</h2>
-            <p className="text-xs sm:text-sm text-[var(--ink-muted)] mt-1">Métricas principais da operação</p>
+            <h2 className="text-base sm:text-lg font-semibold text-[var(--ink-strong)]">{t('operator', 'kpi_title')}</h2>
+            <p className="text-xs sm:text-sm text-[var(--ink-muted)] mt-1">{t('operator', 'kpi_subtitle')}</p>
           </div>
           <div className="w-full sm:w-auto">
             <PeriodFilter value={period} onChange={setPeriod} />
@@ -221,10 +222,10 @@ export default function OperatorDashboard() {
         {/* Control Tower */}
         <div>
           <div className="mb-3 sm:mb-4">
-            <h2 className="text-base sm:text-lg font-semibold text-[var(--ink-strong)]">Torre de Controle</h2>
-            <p className="text-xs sm:text-sm text-[var(--ink-muted)] mt-1">Monitoramento em tempo real</p>
+            <h2 className="text-base sm:text-lg font-semibold text-[var(--ink-strong)]">{t('operator', 'control_tower_title')}</h2>
+            <p className="text-xs sm:text-sm text-[var(--ink-muted)] mt-1">{t('operator', 'control_tower_subtitle')}</p>
           </div>
-          <ControlTowerCards 
+          <ControlTowerCards
             delays={controlTower.delays}
             stoppedVehicles={controlTower.stoppedVehicles}
             routeDeviations={controlTower.routeDeviations}
@@ -235,8 +236,8 @@ export default function OperatorDashboard() {
         {/* Gráficos */}
         <div>
           <div className="mb-3 sm:mb-4">
-            <h2 className="text-base sm:text-lg font-semibold text-[var(--ink-strong)]">Análises e Tendências</h2>
-            <p className="text-xs sm:text-sm text-[var(--ink-muted)] mt-1">Visualizações detalhadas da operação</p>
+            <h2 className="text-base sm:text-lg font-semibold text-[var(--ink-strong)]">{t('operator', 'charts_title')}</h2>
+            <p className="text-xs sm:text-sm text-[var(--ink-muted)] mt-1">{t('operator', 'charts_subtitle')}</p>
           </div>
           <DashboardCharts kpis={kpis} period={period} />
         </div>
@@ -247,13 +248,13 @@ export default function OperatorDashboard() {
             <CardHeader className="pb-4 px-3 sm:px-6">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
                 <div className="flex-1 min-w-0 pr-2 sm:pr-4">
-                  <CardTitle className="text-lg sm:text-xl font-semibold mb-1.5">Visualização de Rotas</CardTitle>
-                  <p className="text-xs sm:text-sm text-[var(--ink-muted)]">Visualize todas as rotas ativas no mapa interativo</p>
+                  <CardTitle className="text-lg sm:text-xl font-semibold mb-1.5">{t('operator', 'map_title')}</CardTitle>
+                  <p className="text-xs sm:text-sm text-[var(--ink-muted)]">{t('operator', 'map_subtitle')}</p>
                 </div>
                 <Button asChild variant="outline" size="sm" className="w-full sm:w-auto min-h-[44px] touch-manipulation">
                   <a href="/operador/rotas/mapa" className="flex items-center justify-center">
                     <MapPin className="h-4 w-4 mr-2" />
-                    Ver Mapa
+                    {t('operator', 'actions.view_map')}
                   </a>
                 </Button>
               </div>

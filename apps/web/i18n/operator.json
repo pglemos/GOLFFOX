@@ -25,87 +25,61 @@
   "alertas_title": "Alertas",
   "conformidade_title": "Conformidade",
   "comunicacoes_title": "Comunicações",
-  "preferencias_title": "Preferências",
-  "loading": "Carregando...",
-  "error_loading": "Erro ao carregar dados",
-  "no_data": "Nenhum dado disponível",
-  "actions": {
-    "add": "Adicionar",
-    "edit": "Editar",
-    "delete": "Excluir",
-    "save": "Salvar",
-    "cancel": "Cancelar",
-    "close": "Fechar",
-    "export": "Exportar",
-    "import": "Importar",
-    "filter": "Filtrar",
-    "refresh": "Atualizar",
-    "optimize": "Otimizar",
-    "view_map": "Ver no Mapa"
-  },
-  "reconciliation": {
-    "title": "Conciliação de Fatura",
-    "approve": "Aprovar",
-    "reject": "Rejeitar",
-    "request_revision": "Solicitar Revisão",
-    "discrepancies_found": "divergências encontradas",
-    "approved": "Fatura aprovada",
-    "rejected": "Fatura rejeitada"
-  },
+  "approved": "Fatura aprovada",
+  "rejected": "Fatura rejeitada",
   "csv_import": {
-    "title": "Importar Funcionários via CSV",
-    "select_file": "Selecionar arquivo CSV",
-    "preview": "Pré-visualização",
-    "import": "Importar",
-    "geocoding": "Geocodificando endereços",
-    "importing": "Importando funcionários",
-    "success": "Importação concluída com sucesso",
-    "errors": "Erros encontrados",
-    "unresolved_addresses": "Endereços não resolvidos",
-    "summary": "Importação concluída: {success} sucessos{errorsSuffix}{unresolvedSuffix}",
-    "error": "Erro na importação: {message}"
-  },
-  "dashboard_subtitle": "Visão geral da sua operação"
-,
-  "employees": {
-    "created": "Funcionário cadastrado com sucesso!",
-    "updated": "Funcionário atualizado com sucesso!",
-    "saveError": "Erro ao salvar funcionário"
-  },
-  "reports": {
-    "exportSuccess": "Relatório {title} exportado com sucesso!",
-    "exportError": "Erro ao exportar: {message}",
-    "schedule": {
-      "successCreated": "Agendamento criado com sucesso!",
-      "successUpdated": "Agendamento atualizado com sucesso!",
-      "validation": {
-        "selectReport": "Selecione um relatório",
-        "selectCompany": "Selecione uma empresa"
-      },
-      "errors": {
-        "createSchedule": "Erro ao criar agendamento"
-      }
-    }
-  },
-  "admin": {
-    "reports": {
-      "schedule": {
-        "successDeleted": "Agendamento deletado com sucesso!"
-      }
-    },
-    "operators": {
-      "createSuccess": "Operador criado com sucesso! Senha temporária: {tempPassword}"
-    }
-  },
-  "broadcast": {
+  "title": "Importar Funcionários via CSV",
+  "select_file": "Selecionar arquivo CSV",
+  "preview": "Pré-visualização",
+  "import": "Importar",
+  "geocoding": "Geocodificando endereços",
+  "importing": "Importando funcionários",
+  "success": "Importação concluída com sucesso",
+  "errors": "Erros encontrados",
+  "unresolved_addresses": "Endereços não resolvidos",
+  "summary": "Importação concluída: {success} sucessos{errorsSuffix}{unresolvedSuffix}",
+  "error": "Erro na importação: {message}"
+},
+"dashboard_subtitle": "Visão geral da sua operação",
+"employees": {
+  "created": "Funcionário cadastrado com sucesso!",
+  "updated": "Funcionário atualizado com sucesso!",
+  "saveError": "Erro ao salvar funcionário"
+},
+"reports": {
+  "exportSuccess": "Relatório {title} exportado com sucesso!",
+  "exportError": "Erro ao exportar: {message}",
+  "schedule": {
+    "successCreated": "Agendamento criado com sucesso!",
+    "successUpdated": "Agendamento atualizado com sucesso!",
     "validation": {
-      "titleMessageRequired": "Preencha título e mensagem"
-    },
-    "success": {
-      "sent": "Broadcast enviado com sucesso!"
+      "selectReport": "Selecione um relatório",
+      "selectCompany": "Selecione uma empresa"
     },
     "errors": {
-      "send": "Erro ao enviar broadcast: {message}"
+      "createSchedule": "Erro ao criar agendamento"
     }
   }
+},
+"admin": {
+  "reports": {
+    "schedule": {
+      "successDeleted": "Agendamento deletado com sucesso!"
+    }
+  },
+  "operators": {
+    "createSuccess": "Operador criado com sucesso! Senha temporária: {tempPassword}"
+  }
+},
+"broadcast": {
+  "validation": {
+    "titleMessageRequired": "Preencha título e mensagem"
+  },
+  "success": {
+    "sent": "Broadcast enviado com sucesso!"
+  },
+  "errors": {
+    "send": "Erro ao enviar broadcast: {message}"
+  }
+}
 }

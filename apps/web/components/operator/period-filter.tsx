@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button"
 import { Calendar, CalendarDays, CalendarRange } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { t } from "@/lib/i18n"
 
 export type PeriodFilter = "today" | "week" | "month" | "custom"
 
@@ -14,9 +15,9 @@ interface PeriodFilterProps {
 
 export function PeriodFilter({ value, onChange, className }: PeriodFilterProps) {
   const options: { value: PeriodFilter; label: string; icon: typeof Calendar }[] = [
-    { value: "today", label: "Hoje", icon: Calendar },
-    { value: "week", label: "Semana", icon: CalendarDays },
-    { value: "month", label: "Mês", icon: CalendarRange },
+    { value: "today", label: t('operator', 'charts.today'), icon: Calendar },
+    { value: "week", label: t('operator', 'charts.week'), icon: CalendarDays },
+    { value: "month", label: t('operator', 'charts.month'), icon: CalendarRange },
   ]
 
   return (

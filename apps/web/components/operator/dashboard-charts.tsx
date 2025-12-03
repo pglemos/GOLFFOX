@@ -4,6 +4,7 @@ import { useMemo } from "react"
 import dynamic from "next/dynamic"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { TrendingUp, Users, DollarSign } from "lucide-react"
+import { t } from "@/lib/i18n"
 
 // Lazy load dos gráficos
 const LineChart = dynamic(() => import("recharts").then((mod) => mod.LineChart), { ssr: false })
@@ -38,7 +39,7 @@ export function DashboardCharts({ kpis, period = "today" }: DashboardChartsProps
   const tripsData = useMemo(() => {
     const days = period === "today" ? 24 : period === "week" ? 7 : 30
     return Array.from({ length: days }, (_, i) => ({
-      name: period === "today" ? `${i}h` : `Dia ${i + 1}`,
+      name: period === "today" ? `${i}h` : `${t('operator', 'charts.day')} ${i + 1}`,
       viagens: Math.floor(Math.random() * 50) + 20,
       concluidas: Math.floor(Math.random() * 45) + 15,
     }))
@@ -54,16 +55,16 @@ export function DashboardCharts({ kpis, period = "today" }: DashboardChartsProps
 
   const costComparison = useMemo(() => {
     return [
-      { name: "Hoje", valor: kpis.daily_cost },
-      { name: "Ontem", valor: kpis.daily_cost * 0.95 },
+      { name: t('operator', 'charts.today'), valor: kpis.daily_cost },
+      { name: t('operator', 'charts.yesterday'), valor: kpis.daily_cost * 0.95 },
     ]
   }, [kpis.daily_cost])
 
   const tripsStatusData = useMemo(() => {
     return [
-      { name: "Concluídas", value: kpis.trips_completed, color: "#10b981" },
-      { name: "Em Andamento", value: kpis.trips_in_progress, color: "#f59e0b" },
-      { name: "Atrasadas", value: kpis.delays_over_5min, color: "#ef4444" },
+      { name: t('operator', 'kpi_done'), value: kpis.trips_completed, color: "#10b981" },
+      { name: t('operator', 'kpi_in_progress'), value: kpis.trips_in_progress, color: "#f59e0b" },
+      { name: t('operator', 'charts.delayed'), value: kpis.delays_over_5min, color: "#ef4444" },
     ]
   }, [kpis])
 
@@ -76,7 +77,7 @@ export function DashboardCharts({ kpis, period = "today" }: DashboardChartsProps
         <CardHeader>
           <div className="flex items-center gap-2">
             <TrendingUp className="h-5 w-5 text-blue-500" />
-            <CardTitle>Viagens ao Longo do Tempo</CardTitle>
+            <CardTitle>{t('operator', 'charts.trips_over_time')}</CardTitle>
           </div>
         </CardHeader>
         <CardContent>
@@ -101,7 +102,7 @@ export function DashboardCharts({ kpis, period = "today" }: DashboardChartsProps
         <CardHeader>
           <div className="flex items-center gap-2">
             <Users className="h-5 w-5 text-purple-500" />
-            <CardTitle>Ocupação Média por Horário</CardTitle>
+            <CardTitle>{t('operator', 'charts.occupancy_by_hour')}</CardTitle>
           </div>
         </CardHeader>
         <CardContent>
@@ -124,7 +125,7 @@ export function DashboardCharts({ kpis, period = "today" }: DashboardChartsProps
         <CardHeader>
           <div className="flex items-center gap-2">
             <DollarSign className="h-5 w-5 text-emerald-500" />
-            <CardTitle>Comparativo de Custos</CardTitle>
+            <CardTitle>{t('operator', 'charts.cost_comparison')}</CardTitle>
           </div>
         </CardHeader>
         <CardContent>
@@ -145,7 +146,7 @@ export function DashboardCharts({ kpis, period = "today" }: DashboardChartsProps
       {/* Distribuição de Viagens por Status */}
       <Card>
         <CardHeader>
-          <CardTitle>Distribuição de Viagens</CardTitle>
+          <CardTitle>{t('operator', 'charts.trips_distribution')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="h-[300px]">

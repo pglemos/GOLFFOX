@@ -129,7 +129,11 @@ export function FuncionarioModal({ funcionario, isOpen, onClose, onSave, empresa
           i18n: { ns: 'operador', key: 'employees.updated' }
         })
       } else {
-        // Create new employee user via API route
+        // #region agent log
+        fetch('http://127.0.0.1:7242/ingest/802544c4-70d0-43c7-a57c-6692b28ca17d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'funcionario-modal.tsx:CREATE',message:'Starting create employee',data:{email:formData.email,name:formData.name,empresaId},timestamp:Date.now(),sessionId:'debug-session'})}).catch(()=>{});
+        // #endregion
+
+        // Create new employee user via API route (includes gf_employee_company insertion)
         const res = await fetch('/api/operador/create-employee', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -137,32 +141,34 @@ export function FuncionarioModal({ funcionario, isOpen, onClose, onSave, empresa
             email: formData.email,
             name: formData.name,
             phone: formData.phone,
-            role: 'passenger'
-          })
-        })
-
-        if (!res.ok) {
-          const error = await res.json()
-          throw new Error(error.error || 'Erro ao criar funcionário')
-        }
-
-        const { userId } = await res.json()
-
-        // Create employee_company entry
-        const { error } = await (supabase as any)
-          .from("gf_employee_company")
-          .insert({
-            employee_id: userId,
+            role: 'passenger',
+            // Dados para gf_employee_company (inserção feita server-side para evitar RLS)
             company_id: empresaId,
             cpf: formData.cpf,
             address: formData.address,
             latitude: lat,
             longitude: lng,
-            cost_center_id: formData.cost_center_id,
             is_active: formData.is_active
           })
+        })
 
-        if (error) throw error
+        // #region agent log
+        fetch('http://127.0.0.1:7242/ingest/802544c4-70d0-43c7-a57c-6692b28ca17d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'funcionario-modal.tsx:API_RESPONSE',message:'API response received',data:{status:res.status,ok:res.ok},timestamp:Date.now(),sessionId:'debug-session'})}).catch(()=>{});
+        // #endregion
+
+        const responseData = await res.json()
+        
+        // #region agent log
+        fetch('http://127.0.0.1:7242/ingest/802544c4-70d0-43c7-a57c-6692b28ca17d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'funcionario-modal.tsx:API_DATA',message:'API response data',data:{responseData,hasUserId:!!responseData?.userId,employeeCompanyCreated:responseData?.employeeCompanyCreated},timestamp:Date.now(),sessionId:'debug-session'})}).catch(()=>{});
+        // #endregion
+
+        if (!res.ok) {
+          throw new Error(responseData.error || responseData.message || 'Erro ao criar funcionário')
+        }
+
+        if (!responseData.userId) {
+          throw new Error('API não retornou userId')
+        }
 
         notifySuccess("Funcionário cadastrado com sucesso!", {
           i18n: { ns: 'operador', key: 'employees.created' }
@@ -172,8 +178,11 @@ export function FuncionarioModal({ funcionario, isOpen, onClose, onSave, empresa
       onSave()
       onClose()
     } catch (error: any) {
+      // #region agent log
+      fetch('http://127.0.0.1:7242/ingest/802544c4-70d0-43c7-a57c-6692b28ca17d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'funcionario-modal.tsx:CATCH',message:'Error caught',data:{errorMessage:error?.message,errorName:error?.name,errorStack:error?.stack?.slice(0,500)},timestamp:Date.now(),sessionId:'debug-session'})}).catch(()=>{});
+      // #endregion
       logError("Erro ao salvar funcionário", { error }, 'FuncionarioModal')
-      notifyError(`Erro ao salvar funcionário: ${error.message}`, undefined, {
+      notifyError(`Erro ao salvar funcionário: ${error?.message || 'Erro desconhecido'}`, undefined, {
         i18n: { ns: 'operador', key: 'employees.saveError' }
       })
     } finally {

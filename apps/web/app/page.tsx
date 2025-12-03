@@ -157,7 +157,7 @@ function LoginContent() {
           // Normalizar roles (aceitar inglês e português)
           const normalizedRole = userRole === 'operator' || userRole === 'empresa' ? 'operador' :
             userRole === 'carrier' ? 'transportadora' : userRole
-          
+
           let redirectUrl = normalizedRole === 'admin' ? '/admin' :
             normalizedRole === 'operador' ? '/operador' :
               normalizedRole === 'transportadora' ? '/transportadora' : '/operador'
@@ -835,16 +835,7 @@ function LoginContent() {
                 <div className="lg:hidden">
                   <AnimatePresence mode="wait">
                     {/* Password requirement warning (from mockup) - shown when no errors */}
-                    {!error && !success && (
-                      <motion.div
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
-                        className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700"
-                      >
-                        Senha deve ter ao menos 8 caracteres, com número e letra maiúscula
-                      </motion.div>
-                    )}
+
 
                     {error && (
                       <motion.div
@@ -966,11 +957,7 @@ function LoginContent() {
                     </div>
 
                     {/* Password requirement hint (from mockup) */}
-                    {password && !fieldErrors.password && (
-                      <p className="text-xs text-red-600 mt-1">
-                        Senha precisa conter 8 caracteres, incluindo número e letra maiúscula
-                      </p>
-                    )}
+
                   </div>
 
                   {/* Opções extras */}
