@@ -62,14 +62,14 @@ export default function SolicitacoesOperatorPage() {
         setItems(data || [])
       }
     } catch (error) {
-      console.error("Erro ao carregar solicitaÃ§Ãµes:", error)
+      console.error("Erro ao carregar solicitações:", error)
     }
   }
 
   const columns = [
     { key: 'rascunho', label: 'Rascunho' },
     { key: 'enviado', label: 'Enviado' },
-    { key: 'em_analise', label: 'Em AnÃ¡lise' },
+    { key: 'em_analise', label: 'Em Análise' },
     { key: 'aprovado', label: 'Aprovado' },
     { key: 'reprovado', label: 'Reprovado' },
   ]
@@ -81,15 +81,15 @@ export default function SolicitacoesOperatorPage() {
       <div className="space-y-4 sm:space-y-6 w-full overflow-x-hidden">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
           <div className="min-w-0 flex-1">
-            <h1 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2 break-words">SolicitaÃ§Ãµes & MudanÃ§as</h1>
-            <p className="text-sm sm:text-base text-[var(--ink-muted)] break-words">Abra solicitaÃ§Ãµes para a GOLF FOX e acompanhe o status</p>
+            <h1 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2 break-words">Solicitações & Mudanças</h1>
+            <p className="text-sm sm:text-base text-[var(--ink-muted)] break-words">Abra solicitações para a GOLF FOX e acompanhe o status</p>
           </div>
           <Button 
             className="bg-orange-500 hover:bg-orange-600 w-full sm:w-auto flex-shrink-0 min-h-[44px] text-sm sm:text-base px-4 sm:px-6 py-2 sm:py-2.5" 
             onClick={() => setIsModalOpen(true)}
           >
             <Plus className="h-4 w-4 mr-2 flex-shrink-0" /> 
-            <span className="hidden sm:inline">Nova SolicitaÃ§Ã£o</span>
+            <span className="hidden sm:inline">Nova Solicitação</span>
             <span className="sm:hidden">Nova</span>
           </Button>
         </div>

@@ -67,6 +67,18 @@ export async function GET(request: NextRequest) {
 
     const supabase = getSupabaseAdmin()
 
+    // Debug: Verificar todos os registros na tabela
+    const { data: allEmployees, error: debugError } = await supabase
+      .from('gf_employee_company')
+      .select('id, company_id, name, email')
+      .limit(10)
+    
+    console.log('🔍 [API /api/operador/employees] Debug - Todos os registros na tabela:', {
+      totalFound: allEmployees?.length || 0,
+      employees: allEmployees,
+      error: debugError?.message
+    })
+
     let query = supabase
       .from('gf_employee_company')
       .select('id, company_id, name, cpf, email, phone, is_active, address', { count: 'exact' })
