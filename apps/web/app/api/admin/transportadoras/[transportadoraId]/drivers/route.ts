@@ -31,11 +31,10 @@ export async function GET(
 
     const supabase = getSupabaseAdmin()
 
-    // Buscar motoristas na tabela users (selecionar apenas colunas necessárias)
-    const driverColumns = 'id,email,name,phone,cpf,cnh,cnh_category,role,transportadora_id,is_active,created_at,updated_at'
+    // Buscar motoristas na tabela users (selecionar todas as colunas para evitar erros)
     const { data: drivers, error } = await supabase
       .from('users')
-      .select(driverColumns)
+      .select('*')
       .eq('role', 'driver')
       .eq('transportadora_id', transportadoraId)
       .order('name', { ascending: true })
@@ -110,9 +109,9 @@ export async function POST(
       )
     }
 
-    if (!address_zip_code || !address_street || !address_number || !address_neighborhood) {
+    if (!address_zip_code || !address_street || !address_number || !address_neighborhood || !address_city || !address_state) {
       return NextResponse.json(
-        { success: false, error: 'Endereço completo é obrigatório' },
+        { success: false, error: 'Endereço completo é obrigatório (CEP, rua, número, bairro, cidade e estado)' },
         { status: 400 }
       )
     }
@@ -129,66 +128,111 @@ export async function POST(
     // Gerar email se não fornecido (para auth)
     const driverEmail = email || `driver.${Date.now()}@temp.golffox.com`
 
-    // 1. Criar usuário no Auth
-    const { data: authData, error: authError } = await supabase.auth.admin.createUser({
-      email: driverEmail,
-      password: password,
-      email_confirm: true,
-      user_metadata: { name, role: role || 'driver' }
-    })
+    // 1. Verificar se usuário já existe no Auth
+    let authUserId: string | null = null
+    let existingAuthUser = false
 
-    if (authError) {
-      console.error('Erro ao criar usuário Auth para motorista:', authError)
+    try {
+      const { data: authUsers } = await supabase.auth.admin.listUsers()
+      const found = authUsers?.users?.find((u: any) => u.email?.toLowerCase() === driverEmail.toLowerCase())
+      if (found) {
+        authUserId = found.id
+        existingAuthUser = true
+        console.log('Motorista já existe no Auth, usando ID existente:', authUserId)
+      }
+    } catch (listErr) {
+      console.warn('Não foi possível verificar usuários existentes no Auth:', listErr)
+    }
+
+    // 2. Criar usuário no Auth se não existir
+    if (!authUserId) {
+      const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+        email: driverEmail,
+        password: password,
+        email_confirm: true,
+        user_metadata: { name, role: role || 'driver' }
+      })
+
+      if (authError) {
+        // Se erro for "user already registered", tentar buscar o ID
+        if (authError.message?.includes('already') || authError.message?.includes('registered')) {
+          try {
+            const { data: authUsers } = await supabase.auth.admin.listUsers()
+            const found = authUsers?.users?.find((u: any) => u.email?.toLowerCase() === driverEmail.toLowerCase())
+            if (found) {
+              authUserId = found.id
+              existingAuthUser = true
+            }
+          } catch (e) { /* ignore */ }
+        }
+
+        if (!authUserId) {
+          console.error('Erro ao criar usuário Auth para motorista:', authError)
+          return NextResponse.json(
+            { success: false, error: 'Erro ao criar autenticação do motorista: ' + authError.message },
+            { status: 500 }
+          )
+        }
+      } else if (authData?.user) {
+        authUserId = authData.user.id
+      }
+    }
+
+    if (!authUserId) {
       return NextResponse.json(
-        { success: false, error: 'Erro ao criar autenticação do motorista: ' + authError.message },
+        { success: false, error: 'Erro ao criar usuário Auth (sem ID)' },
         { status: 500 }
       )
     }
 
-    if (!authData.user) {
-      return NextResponse.json(
-        { success: false, error: 'Erro ao criar usuário Auth (sem dados)' },
-        { status: 500 }
-      )
-    }
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/802544c4-70d0-43c7-a57c-6692b28ca17d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'drivers/route.ts:POST',message:'Before UPSERT driver',data:{authUserId,driverEmail,existingAuthUser,transportadoraId},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix'})}).catch(()=>{});
+    // #endregion
 
-    // 2. Inserir na tabela users
+    // 3. Usar UPSERT na tabela users para evitar erro de chave duplicada
     const { data: driver, error } = await supabase
       .from('users')
-      .insert([
-        {
-          id: authData.user.id,
-          transportadora_id: transportadoraId,
-          name,
-          email: driverEmail,
-          phone: phone || null,
-          cpf: cpf || null,
-          cnh: cnh || null,
-          cnh_category: cnh_category || null,
-          role: role || 'driver',
-          is_active: true,
-          address_zip_code,
-          address_street,
-          address_number,
-          address_neighborhood,
-          address_complement,
-          address_city,
-          address_state
-        }
-      ])
+      .upsert({
+        id: authUserId,
+        transportadora_id: transportadoraId,
+        name,
+        email: driverEmail,
+        phone: phone || null,
+        cpf,
+        cnh: cnh || null,
+        cnh_category: cnh_category || null,
+        role: role || 'driver',
+        is_active: true,
+        address_zip_code,
+        address_street,
+        address_number,
+        address_neighborhood,
+        address_complement: address_complement || null,
+        address_city,
+        address_state
+      }, { onConflict: 'id' })
       .select()
       .single()
 
     if (error) {
+      // #region agent log
+      fetch('http://127.0.0.1:7242/ingest/802544c4-70d0-43c7-a57c-6692b28ca17d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'drivers/route.ts:POST',message:'UPSERT ERROR',data:{authUserId,errorMessage:error.message,errorCode:error.code},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix'})}).catch(()=>{});
+      // #endregion
       console.error('Erro ao criar motorista na tabela users:', error)
-      // Rollback auth user
-      await supabase.auth.admin.deleteUser(authData.user.id)
+      // Só deleta do Auth se não era um usuário existente
+      if (!existingAuthUser) {
+        await supabase.auth.admin.deleteUser(authUserId)
+      }
 
       return NextResponse.json(
         { success: false, error: error.message },
         { status: 500 }
       )
     }
+
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/802544c4-70d0-43c7-a57c-6692b28ca17d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'drivers/route.ts:POST',message:'UPSERT SUCCESS',data:{driverId:driver?.id,driverName:driver?.name},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix'})}).catch(()=>{});
+    // #endregion
 
     return NextResponse.json({ success: true, driver })
   } catch (err) {

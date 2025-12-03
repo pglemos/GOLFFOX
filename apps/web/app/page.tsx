@@ -154,9 +154,13 @@ function LoginContent() {
             return true
           }
 
-          let redirectUrl = userRole === 'admin' ? '/admin' :
-            userRole === 'operador' ? '/operador' :
-              userRole === 'transportadora' ? '/transportadora' : '/dashboard'
+          // Normalizar roles (aceitar inglês e português)
+          const normalizedRole = userRole === 'operator' || userRole === 'empresa' ? 'operador' :
+            userRole === 'carrier' ? 'transportadora' : userRole
+          
+          let redirectUrl = normalizedRole === 'admin' ? '/admin' :
+            normalizedRole === 'operador' ? '/operador' :
+              normalizedRole === 'transportadora' ? '/transportadora' : '/operador'
 
           if (safeNext && isAllowedForRole(userRole, safeNext)) {
             redirectUrl = safeNext

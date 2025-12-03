@@ -26,11 +26,10 @@ export async function GET(request: NextRequest) {
 
     const supabaseAdmin = getSupabaseAdmin()
     
-    // Selecionar apenas colunas necessárias para listagem (otimização de performance)
-    const driverColumns = 'id,email,name,role,company_id,transportadora_id,is_active,created_at,updated_at'
+    // Selecionar todas as colunas para evitar erros de colunas inexistentes
     const { data, error } = await supabaseAdmin
       .from('users')
-      .select(driverColumns)
+      .select('*')
       .eq('role', 'driver')
       .order('created_at', { ascending: false })
 

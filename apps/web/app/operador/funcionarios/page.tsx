@@ -70,11 +70,11 @@ function FuncionariosPageContent() {
   useEffect(() => {
     const getUser = async () => {
       try {
-        debug('Verificando sessão do usuário', undefined, 'FuncionariosPage')
+        console.log('[FuncionariosPage] Verificando sessão do usuário')
         const { data: { session }, error: sessionError } = await supabase.auth.getSession()
         
         if (sessionError) {
-          error('Erro ao obter sessão', { error: sessionError }, 'FuncionariosPage')
+          console.error('[FuncionariosPage] Erro ao obter sessão:', sessionError)
           setError('Erro ao carregar sessão')
           setLoading(false)
           return
@@ -86,11 +86,11 @@ function FuncionariosPageContent() {
           return
         }
         
-        debug('Usuário autenticado', { email: session.user.email }, 'FuncionariosPage')
+        console.log('[FuncionariosPage] Usuário autenticado:', session.user.email)
         setUser(session.user)
         setLoading(false)
       } catch (err) {
-        error('Erro ao obter usuário', { error: err }, 'FuncionariosPage')
+        console.error('[FuncionariosPage] Erro ao obter usuário:', err)
         setError('Erro ao carregar dados do usuário')
         setLoading(false)
       }
