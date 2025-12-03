@@ -14,6 +14,13 @@ const carrierUpdateSchema = z.object({
   cnpj: z.string().optional().nullable(),
   state_registration: z.string().optional().nullable(),
   municipal_registration: z.string().optional().nullable(),
+  address_zip_code: z.string().optional().nullable(),
+  address_street: z.string().optional().nullable(),
+  address_number: z.string().optional().nullable(),
+  address_neighborhood: z.string().optional().nullable(),
+  address_complement: z.string().optional().nullable(),
+  address_city: z.string().optional().nullable(),
+  address_state: z.string().optional().nullable(),
 })
 
 export async function OPTIONS() {
@@ -48,7 +55,14 @@ export async function PUT(req: NextRequest) {
       address: validated.address || null,
       phone: validated.phone || null,
       contact_person: validated.contact_person || null,
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
+      address_zip_code: validated.address_zip_code || null,
+      address_street: validated.address_street || null,
+      address_number: validated.address_number || null,
+      address_neighborhood: validated.address_neighborhood || null,
+      address_complement: validated.address_complement || null,
+      address_city: validated.address_city || null,
+      address_state: validated.address_state || null
     }
 
     if (validated.email) {

@@ -1,3 +1,6 @@
+/// <reference types="jest" />
+/// <reference types="@testing-library/jest-dom" />
+
 /**
  * Testes para o serviço de sincronização com Supabase
  */
@@ -10,6 +13,7 @@ import {
   getSyncStatus,
   clearFailedSync,
 } from '../supabase-sync'
+import { supabase } from '../supabase'
 
 // Mock do Supabase
 const mockInsert = jest.fn()
@@ -18,15 +22,9 @@ const mockDelete = jest.fn()
 const mockSelect = jest.fn()
 const mockSingle = jest.fn()
 
-
 jest.mock('../supabase', () => ({
   supabase: {
-    from: jest.fn(() => ({
-      insert: mockInsert,
-      update: mockUpdate,
-      delete: mockDelete,
-      select: mockSelect,
-    })),
+    from: jest.fn(),
   },
 }))
 
@@ -35,6 +33,14 @@ describe('Supabase Sync Service', () => {
     // Limpar localStorage antes de cada teste
     localStorage.clear()
     jest.clearAllMocks()
+
+      // Configurar o mock do Supabase
+      ; (supabase.from as jest.Mock).mockReturnValue({
+        insert: mockInsert,
+        update: mockUpdate,
+        delete: mockDelete,
+        select: mockSelect,
+      })
   })
 
   describe('syncToSupabase', () => {
@@ -133,6 +139,8 @@ describe('Supabase Sync Service', () => {
 
       // Avançar timers para simular o delay
       jest.advanceTimersByTime(2000)
+      await Promise.resolve() // Flush microtasks
+      await Promise.resolve()
 
       const result = await resultPromise
 
@@ -167,6 +175,7 @@ describe('Supabase Sync Service', () => {
       // Avançar todos os delays de retry
       for (let i = 0; i < 5; i++) {
         jest.advanceTimersByTime(1000 * Math.pow(2, i))
+        await Promise.resolve()
       }
 
       const result = await resultPromise
@@ -299,6 +308,7 @@ describe('Supabase Sync Service', () => {
       // Avançar todos os delays
       for (let i = 0; i < 5; i++) {
         jest.advanceTimersByTime(1000 * Math.pow(2, i))
+        await Promise.resolve()
       }
       jest.useRealTimers()
 
@@ -346,6 +356,7 @@ describe('Supabase Sync Service', () => {
       await syncToSupabase(operation)
       for (let i = 0; i < 5; i++) {
         jest.advanceTimersByTime(1000 * Math.pow(2, i))
+        await Promise.resolve()
       }
       jest.useRealTimers()
 
@@ -390,4 +401,3 @@ describe('Supabase Sync Service', () => {
     })
   })
 })
-

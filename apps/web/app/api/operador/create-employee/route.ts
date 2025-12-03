@@ -160,7 +160,15 @@ export async function POST(request: NextRequest) {
       address,
       latitude,
       longitude,
-      is_active = true
+      is_active = true,
+      // Campos de endereço separados
+      address_zip_code,
+      address_street,
+      address_number,
+      address_neighborhood,
+      address_complement,
+      address_city,
+      address_state
     } = body
 
     if (!email) {
@@ -235,7 +243,14 @@ export async function POST(request: NextRequest) {
             address: address || null,
             latitude: latitude || null,
             longitude: longitude || null,
-            is_active: is_active ?? true
+            is_active: is_active ?? true,
+            address_zip_code: address_zip_code || null,
+            address_street: address_street || null,
+            address_number: address_number || null,
+            address_neighborhood: address_neighborhood || null,
+            address_complement: address_complement || null,
+            address_city: address_city || null,
+            address_state: address_state || null
           }
 
           let insertedData: any = null
@@ -396,7 +411,14 @@ export async function POST(request: NextRequest) {
                       address: address || null,
                       latitude: latitude || null,
                       longitude: longitude || null,
-                      is_active: is_active ?? true
+                      is_active: is_active ?? true,
+                      address_zip_code: address_zip_code || null,
+                      address_street: address_street || null,
+                      address_number: address_number || null,
+                      address_neighborhood: address_neighborhood || null,
+                      address_complement: address_complement || null,
+                      address_city: address_city || null,
+                      address_state: address_state || null
                     }, { onConflict: 'company_id,email' })
                     .select()
                   
@@ -529,7 +551,14 @@ export async function POST(request: NextRequest) {
                   address: address || null,
                   latitude: latitude || null,
                   longitude: longitude || null,
-                  is_active: is_active ?? true
+                  is_active: is_active ?? true,
+                  address_zip_code: address_zip_code || null,
+                  address_street: address_street || null,
+                  address_number: address_number || null,
+                  address_neighborhood: address_neighborhood || null,
+                  address_complement: address_complement || null,
+                  address_city: address_city || null,
+                  address_state: address_state || null
                 }, { onConflict: 'company_id,email' })
                 .select()
               
@@ -673,7 +702,14 @@ export async function POST(request: NextRequest) {
             address: address || null,
             latitude: latitude || null,
             longitude: longitude || null,
-            is_active: is_active ?? true
+            is_active: is_active ?? true,
+            address_zip_code: address_zip_code || null,
+            address_street: address_street || null,
+            address_number: address_number || null,
+            address_neighborhood: address_neighborhood || null,
+            address_complement: address_complement || null,
+            address_city: address_city || null,
+            address_state: address_state || null
           }, { onConflict: 'company_id,email' })
           .select()
         

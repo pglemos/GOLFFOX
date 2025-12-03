@@ -1,4 +1,4 @@
-// "use client"
+"use client"
 
 import { useState } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { supabase } from "@/lib/supabase"
 import { notifySuccess, notifyError } from "@/lib/toast"
+import { AddressForm, AddressData } from "@/components/address-form"
 
 interface CreateTransportadoraModalProps {
   isOpen: boolean
@@ -24,6 +25,15 @@ export function CreateTransportadoraModal({ isOpen, onClose, onSave }: CreateTra
   const [stateRegistration, setStateRegistration] = useState("")
   const [municipalRegistration, setMunicipalRegistration] = useState("")
   const [loading, setLoading] = useState(false)
+  const [addressData, setAddressData] = useState<AddressData>({
+    cep: "",
+    street: "",
+    number: "",
+    neighborhood: "",
+    complement: "",
+    city: "",
+    state: ""
+  })
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -54,6 +64,13 @@ export function CreateTransportadoraModal({ isOpen, onClose, onSave }: CreateTra
           cnpj: cnpj || null,
           state_registration: stateRegistration || null,
           municipal_registration: municipalRegistration || null,
+          address_zip_code: addressData.cep || null,
+          address_street: addressData.street || null,
+          address_number: addressData.number || null,
+          address_neighborhood: addressData.neighborhood || null,
+          address_complement: addressData.complement || null,
+          address_city: addressData.city || null,
+          address_state: addressData.state || null
         }),
       })
 
@@ -83,6 +100,15 @@ export function CreateTransportadoraModal({ isOpen, onClose, onSave }: CreateTra
         setCnpj("")
         setStateRegistration("")
         setMunicipalRegistration("")
+        setAddressData({
+          cep: "",
+          street: "",
+          number: "",
+          neighborhood: "",
+          complement: "",
+          city: "",
+          state: ""
+        })
         onSave()
         setTimeout(() => onClose(), 1500)
       } else {
@@ -135,8 +161,24 @@ export function CreateTransportadoraModal({ isOpen, onClose, onSave }: CreateTra
               <Input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="contato@transportadora.com" className="text-base min-h-[44px] h-11 sm:h-12 px-4 py-3" />
             </div>
             <div className="col-span-1 sm:col-span-2">
-              <Label htmlFor="address" className="text-base font-medium">Endereço Completo</Label>
-              <Input id="address" value={address} onChange={e => setAddress(e.target.value)} placeholder="Rua, número, bairro, cidade - UF, CEP" className="text-base min-h-[44px] h-11 sm:h-12 px-4 py-3" />
+              <AddressForm
+                value={addressData}
+                onChange={(data) => {
+                  setAddressData(data)
+                  // Construir endereço completo para compatibilidade
+                  setAddress([
+                    data.street,
+                    data.number ? `Nº ${data.number}` : '',
+                    data.neighborhood,
+                    data.city,
+                    data.state,
+                    data.cep
+                  ].filter(Boolean).join(', '))
+                }}
+                required={false}
+                disabled={loading}
+                showTitle={true}
+              />
             </div>
           </div>
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-2 justify-end pt-4 sm:pt-6 border-t mt-4 sm:mt-6">

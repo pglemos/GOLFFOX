@@ -111,8 +111,20 @@ export async function PUT(
     if (body.name !== undefined) updateData.name = body.name.trim()
     if (body.cnpj !== undefined) updateData.cnpj = body.cnpj?.trim() || null
     if (body.address !== undefined) updateData.address = body.address?.trim() || null
-    // Nota: city, state, zip_code podem não existir na tabela companies
-    // Vamos tentar apenas se não der erro
+    // Campos de endereço separados
+    if (body.address_zip_code !== undefined) updateData.address_zip_code = body.address_zip_code?.trim() || null
+    if (body.address_street !== undefined) updateData.address_street = body.address_street?.trim() || null
+    if (body.address_number !== undefined) updateData.address_number = body.address_number?.trim() || null
+    if (body.address_neighborhood !== undefined) updateData.address_neighborhood = body.address_neighborhood?.trim() || null
+    if (body.address_complement !== undefined) updateData.address_complement = body.address_complement?.trim() || null
+    if (body.address_city !== undefined) updateData.address_city = body.address_city?.trim() || null
+    if (body.address_state !== undefined) updateData.address_state = body.address_state?.trim() || null
+    // Campos legados (para compatibilidade)
+    if (body.city !== undefined) updateData.address_city = body.city?.trim() || null
+    if (body.state !== undefined) updateData.address_state = body.state?.trim() || null
+    if (body.zip_code !== undefined) updateData.address_zip_code = body.zip_code?.trim() || null
+    if (body.address_number !== undefined) updateData.address_number = body.address_number?.trim() || null
+    if (body.address_complement !== undefined) updateData.address_complement = body.address_complement?.trim() || null
     if (body.phone !== undefined) updateData.phone = body.phone?.trim() || null
     if (body.email !== undefined) updateData.email = body.email?.trim() || null
     if (body.is_active !== undefined) updateData.is_active = body.is_active
