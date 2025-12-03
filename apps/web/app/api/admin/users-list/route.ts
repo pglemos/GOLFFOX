@@ -30,11 +30,10 @@ export async function GET(request: NextRequest) {
     const status = searchParams.get('status')
     const companyId = searchParams.get('company_id')
     
-    // Selecionar apenas colunas necessárias para listagem (otimização de performance)
-    const userColumns = 'id,email,name,role,company_id,transportadora_id,is_active,created_at,updated_at'
+    // Selecionar todas as colunas para evitar erros de colunas inexistentes
     let query = supabaseAdmin
       .from('users')
-      .select(userColumns)
+      .select('*')
       .order('created_at', { ascending: false })
 
     if (role && role !== 'all') {

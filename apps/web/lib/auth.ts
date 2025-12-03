@@ -100,11 +100,16 @@ export class AuthManager {
       case 'admin':
         return '/admin'
       case 'operador':
+      case 'operator':
+      case 'empresa':
         return '/operador'
       case 'transportadora':
+      case 'carrier':
         return '/transportadora'
       default:
-        return '/dashboard'
+        // Fallback para operador se role não for reconhecido
+        console.warn(`[AuthManager] Role não reconhecido: ${role}, redirecionando para /operador`)
+        return '/operador'
     }
   }
 

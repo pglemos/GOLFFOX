@@ -11,6 +11,52 @@ function getSupabaseAdmin() {
   return createClient(url, serviceKey)
 }
 
+// GET /api/admin/transportadoras/[transportadoraId]/vehicles
+export async function GET(
+  request: NextRequest,
+  context: { params: Promise<{ transportadoraId?: string; carrierId?: string }> }
+) {
+  const params = await context.params
+
+  try {
+    const { transportadoraId: tId, carrierId: cId } = params
+    const transportadoraId = tId || cId
+
+    if (!transportadoraId) {
+      return NextResponse.json(
+        { success: false, error: 'ID da transportadora não fornecido' },
+        { status: 400 }
+      )
+    }
+
+    const supabase = getSupabaseAdmin()
+
+    // Buscar veículos da transportadora
+    const { data: vehicles, error } = await supabase
+      .from('vehicles')
+      .select('*')
+      .eq('transportadora_id', transportadoraId)
+      .order('created_at', { ascending: false })
+
+    if (error) {
+      console.error('Erro ao buscar veículos:', error)
+      return NextResponse.json(
+        { success: false, error: error.message },
+        { status: 500 }
+      )
+    }
+
+    return NextResponse.json({ success: true, vehicles: vehicles || [] })
+  } catch (err) {
+    console.error('Erro na API de veículos:', err)
+    const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
+    return NextResponse.json(
+      { success: false, error: errorMessage },
+      { status: 500 }
+    )
+  }
+}
+
 // POST /api/admin/transportadoras/[transportadoraId]/vehicles
 export async function POST(
   request: NextRequest,

@@ -20,14 +20,14 @@ export async function GET(req: NextRequest) {
     const authErrorResponse = await requireAuth(req, 'admin')
     if (authErrorResponse) return authErrorResponse
 
-    // Selecionar apenas colunas necessárias para listagem (otimização de performance)
-    const carrierColumns = 'id,name,cnpj,address,phone,email,is_active,created_at,updated_at'
+    // Selecionar todas as colunas para evitar erros de colunas inexistentes
     const { data, error } = await supabaseServiceRole
       .from('carriers')
-      .select(carrierColumns)
+      .select('*')
       .order('name', { ascending: true })
 
     if (error) {
+      console.error('[DEBUG] Erro ao buscar carriers:', error)
       return NextResponse.json(
         { success: false, error: 'Erro ao buscar transportadoras', message: error.message },
         { status: 500 }

@@ -31,11 +31,10 @@ export async function GET(request: NextRequest) {
     const authErrorResponse = await requireAuth(request, 'admin')
     if (authErrorResponse) return authErrorResponse
 
-    // Selecionar apenas colunas necessárias para listagem (otimização de performance)
-    const vehicleColumns = 'id,plate,model,brand,year,capacity,company_id,is_active,created_at,updated_at'
+    // Selecionar todas as colunas para evitar erros de colunas inexistentes
     const { data, error } = await supabaseServiceRole
       .from('vehicles')
-      .select(vehicleColumns)
+      .select('*')
       .order('created_at', { ascending: false })
 
     if (error) {
