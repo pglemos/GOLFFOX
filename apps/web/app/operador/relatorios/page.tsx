@@ -135,7 +135,7 @@ export default function RelatoriosOperatorPage() {
   ]
 
   return (
-    <AppShell user={{ id: user?.id || "", name: user?.name || "Operador", email: user?.email || "", role: "operador" }}>
+    <AppShell user={{ id: user?.id || "", name: user?.name || "Operador", email: user?.email || "", role: "operador", avatar_url: user?.avatar_url }}>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>

@@ -211,7 +211,7 @@ export default function TransportadoraCustosPage() {
   }
 
   return (
-    <AppShell user={{ id: user?.id || "", name: user?.name || "Transportadora", email: user?.email || "", role: "transportadora" }}>
+    <AppShell user={{ id: user?.id || "", name: user?.name || "Transportadora", email: user?.email || "", role: "transportadora", avatar_url: user?.avatar_url }}>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>

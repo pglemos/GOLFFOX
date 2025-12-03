@@ -36,7 +36,7 @@ function OperatorMapaPageInner() {
 
   if (loading || tenantLoading) {
     return (
-      <AppShell user={{ id: user?.id || "", name: user?.name || "Operador", email: user?.email || "", role: "operador" }}>
+      <AppShell user={{ id: user?.id || "", name: user?.name || "Operador", email: user?.email || "", role: "operador", avatar_url: user?.avatar_url }}>
         <div className="h-[calc(100vh-8rem)] flex items-center justify-center">
           <div className="w-16 h-16 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin mx-auto"></div>
         </div>
@@ -45,7 +45,7 @@ function OperatorMapaPageInner() {
   }
 
   return (
-    <AppShell user={{ id: user?.id || "", name: user?.name || "Operador", email: user?.email || "", role: "operador" }}>
+    <AppShell user={{ id: user?.id || "", name: user?.name || "Operador", email: user?.email || "", role: "operador", avatar_url: user?.avatar_url }}>
       <div className="h-[calc(100vh-8rem)]">
         <FleetMap 
           companyId={tenantCompanyId || undefined} 

@@ -31,7 +31,7 @@ export default function AdminPreferencesPage() {
   }
 
   return (
-    <AppShell user={{ id: user.id, name: user.name || "Admin", email: user.email, role: user.role || "admin" }} panel="admin">
+    <AppShell user={{ id: user.id, name: user.name || "Admin", email: user.email, role: user.role || "admin", avatar_url: user.avatar_url }} panel="admin">
       <div className="space-y-4 sm:space-y-6 w-full overflow-x-hidden">
         <div className="flex items-center gap-2 min-w-0">
           <Settings2 className="h-5 w-5 sm:h-6 sm:w-6 text-[var(--brand)] flex-shrink-0" />

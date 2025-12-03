@@ -157,7 +157,8 @@ function FuncionariosPageContent() {
     id: user?.id || "guest",
     name: getUserName(),
     email: user?.email || "guest@demo.com",
-    role: "operador" as const
+    role: "operador" as const,
+    avatar_url: user?.user_metadata?.avatar_url || undefined
   }
 
   // Se ainda está carregando o usuário (primeira vez), mostra loading simples

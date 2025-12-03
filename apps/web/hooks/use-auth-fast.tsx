@@ -114,29 +114,54 @@ export function useAuthFast() {
 
     checkAuth()
 
-    const handleAuthUpdate = () => {
+    const handleAuthUpdate = (event?: Event) => {
+      console.log('[DEBUG useAuthFast] 🔄 auth:update EVENT RECEIVED at', new Date().toISOString());
       setLoading(true)
-      // Forçar busca no servidor (ignorar cookie desatualizado)
-      fetch('/api/auth/me', { credentials: 'include' })
-        .then(async (res) => {
-          if (!mounted) return
-          if (res.ok) {
-            const data = await res.json().catch(() => null)
-            const u = data?.user
-            console.log('[DEBUG useAuthFast] 🔄 auth:update - Server response:', { hasAvatarUrl: !!u?.avatar_url, name: u?.name });
-            if (u?.id && u?.role) {
-              setUser({ id: u.id, email: u.email || '', name: u.name || u.email?.split('@')[0] || '', role: u.role, avatar_url: u.avatar_url })
-              setLoading(false)
-              return
-            }
+      
+      // Adicionar delay para garantir que o banco foi atualizado
+      setTimeout(() => {
+        // Forçar busca no servidor (ignorar cookie desatualizado)
+        fetch('/api/auth/me', { 
+          credentials: 'include',
+          // Forçar sem cache
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache'
           }
-          // Fallback para cookie se servidor falhar
-          checkAuth()
         })
-        .catch(() => {
-          if (!mounted) return
-          checkAuth()
-        })
+          .then(async (res) => {
+            if (!mounted) return
+            console.log('[DEBUG useAuthFast] 🔄 /api/auth/me response status:', res.status);
+            if (res.ok) {
+              const data = await res.json().catch(() => null)
+              const u = data?.user
+              console.log('[DEBUG useAuthFast] 🔄 auth:update - FULL Server response:', JSON.stringify(u, null, 2));
+              console.log('[DEBUG useAuthFast] 🔄 auth:update - Avatar URL received:', u?.avatar_url);
+              if (u?.id && u?.role) {
+                const newUser = { 
+                  id: u.id, 
+                  email: u.email || '', 
+                  name: u.name || u.email?.split('@')[0] || '', 
+                  role: u.role, 
+                  avatar_url: u.avatar_url 
+                }
+                console.log('[DEBUG useAuthFast] 🔄 Setting NEW user state:', JSON.stringify(newUser, null, 2));
+                setUser(newUser)
+                setLoading(false)
+                return
+              }
+            }
+            // Fallback para cookie se servidor falhar
+            console.log('[DEBUG useAuthFast] ⚠️ Falling back to cookie (server failed)');
+            checkAuth()
+          })
+          .catch((err) => {
+            console.error('[DEBUG useAuthFast] ❌ Error fetching /api/auth/me:', err);
+            if (!mounted) return
+            checkAuth()
+          })
+      }, 200) // Pequeno delay para garantir propagação no banco
     }
 
     window.addEventListener('auth:update', handleAuthUpdate)
