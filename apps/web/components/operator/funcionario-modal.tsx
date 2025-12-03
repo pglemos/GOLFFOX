@@ -9,7 +9,7 @@ import { supabase } from "@/lib/supabase"
 import { notifySuccess, notifyError } from "@/lib/toast"
 import { error as logError } from "@/lib/logger"
 import { useState, useEffect } from "react"
-import { AddressAutocomplete } from "@/components/address-autocomplete"
+import { AddressForm, AddressData } from "@/components/address-form"
 
 interface FuncionarioModalProps {
   funcionario: any | null
@@ -30,7 +30,16 @@ export function FuncionarioModal({ funcionario, isOpen, onClose, onSave, empresa
     latitude: null as number | null,
     longitude: null as number | null,
     cost_center_id: null as string | null,
-    is_active: true
+    is_active: true,
+    addressData: {
+      cep: "",
+      street: "",
+      number: "",
+      neighborhood: "",
+      complement: "",
+      city: "",
+      state: ""
+    } as AddressData
   })
 
   useEffect(() => {
@@ -45,7 +54,16 @@ export function FuncionarioModal({ funcionario, isOpen, onClose, onSave, empresa
         latitude: funcionario.latitude || null,
         longitude: funcionario.longitude || null,
         cost_center_id: funcionario.cost_center_id || null,
-        is_active: funcionario.is_active ?? true
+        is_active: funcionario.is_active ?? true,
+        addressData: {
+          cep: funcionario.address_zip_code || "",
+          street: funcionario.address_street || "",
+          number: funcionario.address_number || "",
+          neighborhood: funcionario.address_neighborhood || "",
+          complement: funcionario.address_complement || "",
+          city: funcionario.address_city || "",
+          state: funcionario.address_state || ""
+        }
       })
     } else if (!funcionario && isOpen) {
       // Reset para novo funcionário
@@ -58,7 +76,16 @@ export function FuncionarioModal({ funcionario, isOpen, onClose, onSave, empresa
         latitude: null,
         longitude: null,
         cost_center_id: null,
-        is_active: true
+        is_active: true,
+        addressData: {
+          cep: "",
+          street: "",
+          number: "",
+          neighborhood: "",
+          complement: "",
+          city: "",
+          state: ""
+        }
       })
     }
   }, [funcionario, isOpen])
@@ -107,7 +134,14 @@ export function FuncionarioModal({ funcionario, isOpen, onClose, onSave, empresa
             latitude: lat,
             longitude: lng,
             cost_center_id: formData.cost_center_id,
-            is_active: formData.is_active
+            is_active: formData.is_active,
+            address_zip_code: formData.addressData.cep || null,
+            address_street: formData.addressData.street || null,
+            address_number: formData.addressData.number || null,
+            address_neighborhood: formData.addressData.neighborhood || null,
+            address_complement: formData.addressData.complement || null,
+            address_city: formData.addressData.city || null,
+            address_state: formData.addressData.state || null
           })
           .eq("id", funcionario.id)
 
@@ -148,7 +182,14 @@ export function FuncionarioModal({ funcionario, isOpen, onClose, onSave, empresa
             address: formData.address,
             latitude: lat,
             longitude: lng,
-            is_active: formData.is_active
+            is_active: formData.is_active,
+            address_zip_code: formData.addressData.cep || null,
+            address_street: formData.addressData.street || null,
+            address_number: formData.addressData.number || null,
+            address_neighborhood: formData.addressData.neighborhood || null,
+            address_complement: formData.addressData.complement || null,
+            address_city: formData.addressData.city || null,
+            address_state: formData.addressData.state || null
           })
         })
 
@@ -244,26 +285,27 @@ export function FuncionarioModal({ funcionario, isOpen, onClose, onSave, empresa
             />
           </div>
 
-          <div className="grid gap-2.5">
-            <AddressAutocomplete
-              value={formData.address}
-              onChange={(address, lat, lng) => {
-                setFormData(prev => ({
-                  ...prev,
-                  address,
-                  latitude: lat,
-                  longitude: lng
-                }))
-              }}
-              label="Endereço"
-              placeholder="Digite o endereço completo para busca automática"
-              onGeocodeError={(error) => {
-                logError("Erro no autocomplete", { error }, 'FuncionarioModal')
-                notifyError(error)
-              }}
-              className="w-full"
-            />
-          </div>
+          <AddressForm
+            value={formData.addressData}
+            onChange={(addressData) => {
+              setFormData(prev => ({
+                ...prev,
+                addressData,
+                // Construir endereço completo para compatibilidade
+                address: [
+                  addressData.street,
+                  addressData.number ? `Nº ${addressData.number}` : '',
+                  addressData.neighborhood,
+                  addressData.city,
+                  addressData.state,
+                  addressData.cep
+                ].filter(Boolean).join(', ')
+              }))
+            }}
+            required={false}
+            disabled={loading}
+            showTitle={true}
+          />
 
           <div className="flex items-center gap-3 py-2">
             <input

@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label"
 import { Briefcase, Loader2 } from "lucide-react"
 import { notifySuccess, notifyError } from "@/lib/toast"
 import { globalSyncManager } from "@/lib/global-sync"
+import { AddressForm, AddressData } from "@/components/address-form"
 
 interface Company {
   id: string
@@ -57,6 +58,15 @@ export function EditCompanyModal({
     phone: "",
     email: "",
     is_active: true,
+    addressData: {
+      cep: "",
+      street: "",
+      number: "",
+      neighborhood: "",
+      complement: "",
+      city: "",
+      state: ""
+    } as AddressData
   })
 
   useEffect(() => {
@@ -74,6 +84,15 @@ export function EditCompanyModal({
         phone: company.phone || "",
         email: company.email || "",
         is_active: company.is_active ?? true,
+        addressData: {
+          cep: company.zip_code || "",
+          street: company.address || "",
+          number: company.address_number || "",
+          neighborhood: "",
+          complement: company.address_complement || "",
+          city: company.city || "",
+          state: company.state || ""
+        }
       })
     } else if (!isOpen) {
       // Resetar formulário quando modal fecha
@@ -89,6 +108,15 @@ export function EditCompanyModal({
         phone: "",
         email: "",
         is_active: true,
+        addressData: {
+          cep: "",
+          street: "",
+          number: "",
+          neighborhood: "",
+          complement: "",
+          city: "",
+          state: ""
+        }
       })
     }
   }, [company, isOpen])
@@ -106,14 +134,17 @@ export function EditCompanyModal({
           name: formData.name.trim(),
           cnpj: formData.cnpj.trim() || null,
           address: formData.address.trim() || null,
-          address_number: formData.addressNumber.trim() || null,
-          address_complement: formData.addressComplement.trim() || null,
-          city: formData.city.trim() || null,
-          state: formData.state.trim() || null,
-          zip_code: formData.zipCode.trim() || null,
+          address_number: formData.addressData.number.trim() || null,
+          address_complement: formData.addressData.complement.trim() || null,
+          city: formData.addressData.city.trim() || null,
+          state: formData.addressData.state.trim() || null,
+          zip_code: formData.addressData.cep.trim() || null,
           phone: formData.phone.trim() || null,
           email: formData.email.trim() || null,
           is_active: formData.is_active,
+          address_zip_code: formData.addressData.cep.trim() || null,
+          address_street: formData.addressData.street.trim() || null,
+          address_neighborhood: formData.addressData.neighborhood.trim() || null,
         }),
       })
 
@@ -202,72 +233,20 @@ export function EditCompanyModal({
               />
             </div>
 
-            <div className="space-y-2 md:col-span-2">
-              <Label htmlFor="address">Endereço</Label>
-              <Input
-                id="address"
-                value={formData.address}
-                onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                placeholder="Rua, Avenida, etc."
-                disabled={loading}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="addressNumber">Número</Label>
-              <Input
-                id="addressNumber"
-                value={formData.addressNumber}
-                onChange={(e) => setFormData({ ...formData, addressNumber: e.target.value })}
-                placeholder="123"
-                disabled={loading}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="addressComplement">Complemento</Label>
-              <Input
-                id="addressComplement"
-                value={formData.addressComplement}
-                onChange={(e) => setFormData({ ...formData, addressComplement: e.target.value })}
-                placeholder="Sala, Andar, etc."
-                disabled={loading}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="city">Cidade</Label>
-              <Input
-                id="city"
-                value={formData.city}
-                onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                placeholder="Cidade"
-                disabled={loading}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="state">Estado</Label>
-              <Input
-                id="state"
-                value={formData.state}
-                onChange={(e) => setFormData({ ...formData, state: e.target.value })}
-                placeholder="UF"
-                maxLength={2}
-                disabled={loading}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="zipCode">CEP</Label>
-              <Input
-                id="zipCode"
-                value={formData.zipCode}
-                onChange={(e) => setFormData({ ...formData, zipCode: e.target.value })}
-                placeholder="00000-000"
-                disabled={loading}
-              />
-            </div>
+            <AddressForm
+              value={formData.addressData}
+              onChange={(addressData) => {
+                setFormData(prev => ({
+                  ...prev,
+                  addressData,
+                  // Construir endereço completo para compatibilidade
+                  address: addressData.street || prev.address
+                }))
+              }}
+              required={false}
+              disabled={loading}
+              showTitle={true}
+            />
 
             <div className="space-y-2 md:col-span-2">
               <div className="flex items-center gap-2">

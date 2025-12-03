@@ -48,6 +48,14 @@ export async function POST(request: NextRequest) {
     const zipCode = body?.zip_code || body?.zipCode || null
     const companyPhone = body?.company_phone || body?.companyPhone || null
     const companyEmail = body?.company_email || body?.companyEmail || null
+    // Campos de endereço separados
+    const address_zip_code = body?.address_zip_code || zipCode || null
+    const address_street = body?.address_street || address || null
+    const address_number = body?.address_number || null
+    const address_neighborhood = body?.address_neighborhood || null
+    const address_complement = body?.address_complement || null
+    const address_city = body?.address_city || city || null
+    const address_state = body?.address_state || state || null
 
     // Permitir bypass em modo de teste/desenvolvimento
     const isTestMode = request.headers.get('x-test-mode') === 'true'
@@ -190,8 +198,18 @@ export async function POST(request: NextRequest) {
       // Adicionar campos opcionais se fornecidos (apenas se existirem na tabela)
       if (cnpj) companyData.cnpj = cnpj
       if (address) companyData.address = address
-      // Nota: city, state, zip_code podem não existir na tabela companies
-      // Vamos tentar inserir apenas se não der erro
+      // Campos de endereço separados
+      if (address_zip_code) companyData.address_zip_code = address_zip_code
+      if (address_street) companyData.address_street = address_street
+      if (address_number) companyData.address_number = address_number
+      if (address_neighborhood) companyData.address_neighborhood = address_neighborhood
+      if (address_complement) companyData.address_complement = address_complement
+      if (address_city) companyData.address_city = address_city
+      if (address_state) companyData.address_state = address_state
+      // Campos legados (para compatibilidade)
+      if (city) companyData.address_city = city
+      if (state) companyData.address_state = state
+      if (zipCode) companyData.address_zip_code = zipCode
       if (companyPhone) companyData.phone = companyPhone
       if (companyEmail) companyData.email = companyEmail
       

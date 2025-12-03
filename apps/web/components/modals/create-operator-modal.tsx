@@ -17,6 +17,7 @@ import { supabase } from "@/lib/supabase"
 import { notifySuccess, notifyError } from "@/lib/toast"
 import { globalSyncManager } from "@/lib/global-sync"
 import { formatPhone, formatCEP, formatCPF, formatCNPJ } from "@/lib/format-utils"
+import { AddressForm, AddressData } from "@/components/address-form"
 
 interface CreateOperatorModalProps {
   isOpen: boolean
@@ -50,6 +51,15 @@ export function CreateOperatorModal({
     responsibleName: "",
     responsibleEmail: "",
     responsiblePhone: "",
+    addressData: {
+      cep: "",
+      street: "",
+      number: "",
+      neighborhood: "",
+      complement: "",
+      city: "",
+      state: ""
+    } as AddressData
   })
   const [progress, setProgress] = useState("")
 
@@ -80,12 +90,12 @@ export function CreateOperatorModal({
       setStep(2)
 
       const fullAddress = [
-        formData.address,
-        formData.addressNumber ? `Nº ${formData.addressNumber}` : '',
-        formData.addressComplement || '',
-        formData.city ? `${formData.city}` : '',
-        formData.state ? `- ${formData.state}` : '',
-        formData.zipCode ? `CEP: ${formData.zipCode}` : ''
+        formData.addressData.street,
+        formData.addressData.number ? `Nº ${formData.addressData.number}` : '',
+        formData.addressData.complement || '',
+        formData.addressData.city ? `${formData.addressData.city}` : '',
+        formData.addressData.state ? `- ${formData.addressData.state}` : '',
+        formData.addressData.cep ? `CEP: ${formData.addressData.cep}` : ''
       ].filter(Boolean).join(', ')
 
       const requestBody: any = {
@@ -94,12 +104,19 @@ export function CreateOperatorModal({
         stateRegistration: formData.stateRegistration || null,
         municipalRegistration: formData.municipalRegistration || null,
         address: fullAddress || formData.address || null,
-        city: formData.city || null,
-        state: formData.state || null,
-        zipCode: formData.zipCode || null,
+        city: formData.addressData.city || null,
+        state: formData.addressData.state || null,
+        zipCode: formData.addressData.cep || null,
         companyPhone: formData.companyPhone || null,
         companyEmail: formData.companyEmail || null,
         companyWebsite: formData.companyWebsite || null,
+        address_zip_code: formData.addressData.cep || null,
+        address_street: formData.addressData.street || null,
+        address_number: formData.addressData.number || null,
+        address_neighborhood: formData.addressData.neighborhood || null,
+        address_complement: formData.addressData.complement || null,
+        address_city: formData.addressData.city || null,
+        address_state: formData.addressData.state || null
       }
 
       if (formData.responsibleEmail.trim()) {
@@ -207,6 +224,15 @@ export function CreateOperatorModal({
         city: "",
         state: "",
         zipCode: "",
+        addressData: {
+          cep: "",
+          street: "",
+          number: "",
+          neighborhood: "",
+          complement: "",
+          city: "",
+          state: ""
+        },
         companyPhone: "",
         companyEmail: "",
         companyWebsite: "",
@@ -349,72 +375,19 @@ export function CreateOperatorModal({
                   />
                 </div>
 
-                <div className="space-y-2 md:col-span-2">
-                  <Label htmlFor="address">Endereço</Label>
-                  <Input
-                    id="address"
-                    value={formData.address}
-                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                    placeholder="Rua, Avenida, etc."
-                    disabled={loading}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="addressNumber">Número</Label>
-                  <Input
-                    id="addressNumber"
-                    value={formData.addressNumber}
-                    onChange={(e) => setFormData({ ...formData, addressNumber: e.target.value })}
-                    placeholder="123"
-                    disabled={loading}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="addressComplement">Complemento</Label>
-                  <Input
-                    id="addressComplement"
-                    value={formData.addressComplement}
-                    onChange={(e) => setFormData({ ...formData, addressComplement: e.target.value })}
-                    placeholder="Sala, Andar, etc."
-                    disabled={loading}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="city">Cidade</Label>
-                  <Input
-                    id="city"
-                    value={formData.city}
-                    onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                    placeholder="São Paulo"
-                    disabled={loading}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="state">Estado</Label>
-                  <Input
-                    id="state"
-                    value={formData.state}
-                    onChange={(e) => setFormData({ ...formData, state: e.target.value })}
-                    placeholder="SP"
-                    maxLength={2}
-                    disabled={loading}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="zipCode">CEP</Label>
-                  <Input
-                    id="zipCode"
-                    value={formData.zipCode}
-                    onChange={(e) => setFormData({ ...formData, zipCode: formatCEP(e.target.value) })}
-                    placeholder="00000-000"
-                    disabled={loading}
-                  />
-                </div>
+                <AddressForm
+                  value={formData.addressData}
+                  onChange={(addressData) => {
+                    setFormData(prev => ({
+                      ...prev,
+                      addressData,
+                      address: addressData.street || prev.address
+                    }))
+                  }}
+                  required={false}
+                  disabled={loading}
+                  showTitle={true}
+                />
               </div>
             </div>
 

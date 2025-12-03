@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { notifySuccess, notifyError } from "@/lib/toast"
 import { supabase } from "@/lib/supabase"
+import { AddressForm, AddressData } from "@/components/address-form"
 
 interface EditCarrierModalProps {
   carrier: any
@@ -25,6 +26,15 @@ export function EditCarrierModal({ carrier, isOpen, onClose, onSave }: EditCarri
   const [stateRegistration, setStateRegistration] = useState("")
   const [municipalRegistration, setMunicipalRegistration] = useState("")
   const [loading, setLoading] = useState(false)
+  const [addressData, setAddressData] = useState<AddressData>({
+    cep: "",
+    street: "",
+    number: "",
+    neighborhood: "",
+    complement: "",
+    city: "",
+    state: ""
+  })
 
   useEffect(() => {
     if (carrier) {
@@ -36,6 +46,15 @@ export function EditCarrierModal({ carrier, isOpen, onClose, onSave }: EditCarri
       setCnpj(carrier.cnpj || "")
       setStateRegistration(carrier.state_registration || "")
       setMunicipalRegistration(carrier.municipal_registration || "")
+      setAddressData({
+        cep: carrier.address_zip_code || "",
+        street: carrier.address_street || "",
+        number: carrier.address_number || "",
+        neighborhood: carrier.address_neighborhood || "",
+        complement: carrier.address_complement || "",
+        city: carrier.address_city || "",
+        state: carrier.address_state || ""
+      })
     }
   }, [carrier, isOpen])
 
@@ -68,7 +87,14 @@ export function EditCarrierModal({ carrier, isOpen, onClose, onSave }: EditCarri
           email: email || null,
           cnpj: cnpj || null,
           state_registration: stateRegistration || null,
-          municipal_registration: municipalRegistration || null
+          municipal_registration: municipalRegistration || null,
+          address_zip_code: addressData.cep || null,
+          address_street: addressData.street || null,
+          address_number: addressData.number || null,
+          address_neighborhood: addressData.neighborhood || null,
+          address_complement: addressData.complement || null,
+          address_city: addressData.city || null,
+          address_state: addressData.state || null
         })
       })
 
@@ -216,13 +242,23 @@ export function EditCarrierModal({ carrier, isOpen, onClose, onSave }: EditCarri
               />
             </div>
             <div className="col-span-1 sm:col-span-2">
-              <Label htmlFor="address" className="text-base font-medium">Endereço Completo</Label>
-              <Input
-                id="address"
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
-                placeholder="Rua, número, bairro, cidade - UF, CEP"
-                className="text-base h-11 sm:h-12 px-4 py-3"
+              <AddressForm
+                value={addressData}
+                onChange={(data) => {
+                  setAddressData(data)
+                  // Construir endereço completo para compatibilidade
+                  setAddress([
+                    data.street,
+                    data.number ? `Nº ${data.number}` : '',
+                    data.neighborhood,
+                    data.city,
+                    data.state,
+                    data.cep
+                  ].filter(Boolean).join(', '))
+                }}
+                required={false}
+                disabled={loading}
+                showTitle={true}
               />
             </div>
           </div>
