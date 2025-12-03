@@ -99,7 +99,7 @@ export default function TransportadoraRelatoriosPage() {
   }, [router])
 
   const handleExport = async (report: ReportConfig, format: 'csv' | 'excel' | 'pdf') => {
-    const transportadoraId = userData?.transportadora_id || userData?.carrier_id
+    const transportadoraId = userData?.transportadora_id
     if (!transportadoraId) {
       notifyError(null, 'Erro: Transportadora não encontrada', {})
       return
