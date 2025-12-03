@@ -129,6 +129,11 @@ export default function OperatorConfiguracoesPage() {
         setProfileImage(avatarUrl)
         notifySuccess('Foto de perfil atualizada com sucesso!')
 
+        // Disparar evento de atualização global para sincronizar Topbar
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new Event('auth:update'))
+        }
+
         // Aguardar um pouco e recarregar a imagem do banco para garantir sincronização
         setTimeout(async () => {
           if (!user?.id) return
@@ -332,7 +337,7 @@ export default function OperatorConfiguracoesPage() {
   }
 
   return (
-    <AppShell user={{ id: user.id, name: user.name || "Operador", email: user.email, role: user.role || "operador" }} panel="operador">
+    <AppShell user={{ id: user.id, name: user.name || "Operador", email: user.email, role: user.role || "operador", avatar_url: user.avatar_url }} panel="operador">
       <div className="w-full max-w-5xl mx-auto space-y-6">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-[var(--border)]">
           <div>

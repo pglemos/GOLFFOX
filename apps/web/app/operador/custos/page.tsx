@@ -194,7 +194,7 @@ export default function CustosOperatorPage() {
 
   if (tenantError || error) {
     return (
-      <AppShell user={{ id: user?.id || "", name: user?.name || "Operador", email: user?.email || "", role: "operador" }}>
+      <AppShell user={{ id: user?.id || "", name: user?.name || "Operador", email: user?.email || "", role: "operador", avatar_url: user?.avatar_url }}>
         <div className="min-h-screen flex items-center justify-center p-4">
           <Card className="p-8 max-w-md w-full text-center">
             <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
@@ -211,7 +211,7 @@ export default function CustosOperatorPage() {
 
   if (!tenantCompanyId) {
     return (
-      <AppShell user={{ id: user?.id || "", name: user?.name || "Operador", email: user?.email || "", role: "operador" }}>
+      <AppShell user={{ id: user?.id || "", name: user?.name || "Operador", email: user?.email || "", role: "operador", avatar_url: user?.avatar_url }}>
         <div className="min-h-screen flex items-center justify-center p-4">
           <Card className="p-8 max-w-md w-full text-center">
             <Building2 className="h-12 w-12 text-gray-400 mx-auto mb-4" />
@@ -227,7 +227,7 @@ export default function CustosOperatorPage() {
   }
 
   return (
-    <AppShell user={{ id: user?.id || "", name: user?.name || "Operador", email: user?.email || "", role: "operador" }}>
+    <AppShell user={{ id: user?.id || "", name: user?.name || "Operador", email: user?.email || "", role: "operador", avatar_url: user?.avatar_url }}>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between flex-wrap gap-4">

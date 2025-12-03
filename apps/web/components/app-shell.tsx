@@ -26,6 +26,13 @@ export const AppShell = memo(function AppShell({ user, children, panel }: AppShe
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
   const [isMobile, setIsMobile] = useState(false)
 
+  // #region agent log
+  useEffect(() => {
+    console.log('[DEBUG APPSHELL] 📦 User prop received:', JSON.stringify(user, null, 2));
+    console.log('[DEBUG APPSHELL] 🖼️ Avatar URL:', user?.avatar_url);
+  }, [user]);
+  // #endregion
+
   // Detectar painel automaticamente se não fornecido (memoizado)
   const detectedPanel: 'admin' | 'operador' | 'transportadora' = useMemo(() =>
     panel ||

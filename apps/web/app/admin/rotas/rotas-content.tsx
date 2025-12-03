@@ -146,7 +146,7 @@ export function RotasPageContent() {
   }
 
   return (
-    <AppShell user={{ id: user.id, name: user.name || "Admin", email: user.email, role: user.role || "admin" }}>
+    <AppShell user={{ id: user.id, name: user.name || "Admin", email: user.email, role: user.role || "admin", avatar_url: user.avatar_url }}>
       <TransitionOverlay>
         <div className="p-6 space-y-6">
           {/* Header */}

@@ -59,12 +59,21 @@ export function Topbar({
 
   // #region agent log
   useEffect(() => {
-    console.log('[DEBUG TOPBAR] 📦 User object received:', JSON.stringify(user, null, 2));
+    const timestamp = new Date().toISOString();
+    console.log(`[DEBUG TOPBAR] 📦 User props UPDATED at ${timestamp}:`, JSON.stringify(user, null, 2));
     console.log('[DEBUG TOPBAR] 🖼️ Avatar status:', {
       hasAvatarUrl: !!user?.avatar_url,
       avatarUrl: user?.avatar_url,
-      avatarUrlType: typeof user?.avatar_url
+      avatarUrlLength: user?.avatar_url?.length || 0,
+      userKeys: user ? Object.keys(user) : []
     });
+    
+    // Visual alert for debugging
+    if (user?.avatar_url) {
+      console.log('[DEBUG TOPBAR] ✅ AVATAR URL IS PRESENT! Will render image.');
+    } else {
+      console.log('[DEBUG TOPBAR] ⚠️ NO avatar_url. Will render initial letter:', user?.name?.charAt(0) || 'A');
+    }
   }, [user]);
   // #endregion
 

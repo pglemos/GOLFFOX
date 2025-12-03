@@ -27,24 +27,36 @@ export async function GET(request: NextRequest) {
   }
 
   // Buscar dados completos do usuário no banco para incluir transportadora_id, company_id, etc.
+  // IMPORTANTE: Usar service_role_key para bypassar RLS
   try {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL
-    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY
+    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
     
-    if (supabaseUrl && supabaseAnonKey) {
+    // #region agent log
+    console.log('[DEBUG H2] /api/auth/me - Query params:', { 
+      userId: userData.id, 
+      hasServiceKey: !!supabaseServiceKey,
+      hasUrl: !!supabaseUrl 
+    });
+    // #endregion
+    
+    if (supabaseUrl && supabaseServiceKey) {
       const { createClient } = await import('@supabase/supabase-js')
-      const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+      // Usar service_role_key para bypassar RLS na tabela users
+      const supabase = createClient(supabaseUrl, supabaseServiceKey, {
         auth: { autoRefreshToken: false, persistSession: false }
       })
 
-      const { data: dbUser } = await supabase
+      const { data: dbUser, error: dbError } = await supabase
         .from('users')
         .select('id, email, name, role, company_id, transportadora_id, avatar_url')
         .eq('id', userData.id)
         .maybeSingle()
 
       // #region agent log
-      console.log('[DEBUG H2] /api/auth/me - dbUser from database:', JSON.stringify({ hasDbUser: !!dbUser, avatar_url: dbUser?.avatar_url, keys: dbUser ? Object.keys(dbUser) : [] }));
+      console.log('[DEBUG H2] /api/auth/me - FULL dbUser from database:', JSON.stringify(dbUser, null, 2));
+      console.log('[DEBUG H2] /api/auth/me - avatar_url specifically:', dbUser?.avatar_url);
+      if (dbError) console.log('[DEBUG H2] /api/auth/me - DB ERROR:', JSON.stringify(dbError));
       // #endregion
 
       if (dbUser) {
@@ -61,6 +73,10 @@ export async function GET(request: NextRequest) {
           }
         })
       }
+    } else {
+      // #region agent log
+      console.log('[DEBUG H2] /api/auth/me - MISSING service key, falling back to cookie data');
+      // #endregion
     }
   } catch (error) {
     console.error('Erro ao buscar dados do usuário no banco:', error)

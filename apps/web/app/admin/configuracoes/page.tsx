@@ -30,6 +30,13 @@ import { ThemeToggle } from "@/components/theme-toggle"
 export default function AdminConfiguracoesPage() {
   const { user, loading } = useAuthFast()
   const [savingPersonal, setSavingPersonal] = useState(false)
+  
+  // #region agent log
+  useEffect(() => {
+    console.log('[DEBUG CONFIG PAGE] 📦 User from useAuthFast UPDATED:', JSON.stringify(user, null, 2));
+    console.log('[DEBUG CONFIG PAGE] 🖼️ Avatar URL from hook:', user?.avatar_url);
+  }, [user]);
+  // #endregion
   const [savingSecurity, setSavingSecurity] = useState(false)
   const [showNewPassword, setShowNewPassword] = useState(false)
 
@@ -128,13 +135,21 @@ export default function AdminConfiguracoesPage() {
 
       // Atualizar a imagem de perfil com a URL retornada
       const avatarUrl = result.url || result.publicUrl
+      console.log('[DEBUG UPLOAD] Avatar upload SUCCESS. URL:', avatarUrl);
+      console.log('[DEBUG UPLOAD] Full API response:', JSON.stringify(result, null, 2));
+      
       if (avatarUrl) {
         // Atualizar estado imediatamente
         setProfileImage(avatarUrl)
         notifySuccess('Foto de perfil atualizada com sucesso!')
 
+        // Aguardar um pouco para garantir que o banco foi atualizado
+        console.log('[DEBUG UPLOAD] Waiting 300ms before dispatching auth:update...');
+        await new Promise(resolve => setTimeout(resolve, 300))
+        
         // Disparar evento de atualização global
         if (typeof window !== 'undefined') {
+          console.log('[DEBUG UPLOAD] Dispatching auth:update event NOW');
           window.dispatchEvent(new Event('auth:update'))
         }
 
@@ -360,8 +375,12 @@ export default function AdminConfiguracoesPage() {
     )
   }
 
+  // #region agent log
+  console.log('[DEBUG CONFIG PAGE] 🔄 RENDER with user avatar_url:', user.avatar_url);
+  // #endregion
+
   return (
-    <AppShell user={{ id: user.id, name: user.name || "Admin", email: user.email, role: user.role || "admin", avatar_url: (user as any).avatar_url }} panel="admin">
+    <AppShell user={{ id: user.id, name: user.name || "Admin", email: user.email, role: user.role || "admin", avatar_url: user.avatar_url }} panel="admin">
       <div className="w-full max-w-5xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-[var(--border)]">

@@ -20,7 +20,7 @@ export default function AjudaSuportePage() {
   }
 
   return (
-    <AppShell user={{ id: user.id || "", name: user.name || "Admin", email: user.email || "", role: user.role || "admin" }}>
+    <AppShell user={{ id: user.id || "", name: user.name || "Admin", email: user.email || "", role: user.role || "admin", avatar_url: user.avatar_url }}>
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold mb-2">Ajuda & Suporte</h1>

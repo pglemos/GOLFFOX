@@ -129,6 +129,11 @@ export default function TransportadoraConfiguracoesPage() {
         setProfileImage(avatarUrl)
         notifySuccess('Foto de perfil atualizada com sucesso!')
 
+        // Disparar evento de atualização global para sincronizar Topbar
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new Event('auth:update'))
+        }
+
         // Aguardar um pouco e recarregar a imagem do banco para garantir sincronização
         setTimeout(async () => {
           if (!user?.id) return
@@ -332,7 +337,7 @@ export default function TransportadoraConfiguracoesPage() {
   }
 
   return (
-    <AppShell user={{ id: user.id, name: user.name || "Transportadora", email: user.email, role: user.role || "transportadora" }} panel="transportadora">
+    <AppShell user={{ id: user.id, name: user.name || "Transportadora", email: user.email, role: user.role || "transportadora", avatar_url: user.avatar_url }} panel="transportadora">
       <div className="w-full max-w-5xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-[var(--border)]">

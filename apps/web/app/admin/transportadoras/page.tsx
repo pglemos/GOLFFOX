@@ -200,7 +200,7 @@ export default function TransportadorasPage() {
   }
 
   return (
-    <AppShell user={{ id: user.id, name: user.name || "Admin", email: user.email, role: user.role || "admin" }}>
+    <AppShell user={{ id: user.id, name: user.name || "Admin", email: user.email, role: user.role || "admin", avatar_url: user.avatar_url }}>
       <div
         className="w-full max-w-full overflow-x-hidden min-w-0 box-border"
         style={{
