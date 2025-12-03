@@ -18,22 +18,40 @@ export default function PrestadoresOperatorPage() {
 
   useEffect(() => {
     const run = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (!session) { router.push("/"); return }
-      setUser({ ...session.user })
-      setLoading(false)
-      loadPrestadores()
+      try {
+        const { data: { session } } = await supabase.auth.getSession()
+        if (!session) { 
+          router.push("/"); 
+          return 
+        }
+        const currentUser = { ...session.user }
+        setUser(currentUser)
+        
+        // Carregar prestadores após definir o usuário
+        if (currentUser?.id) {
+          await loadPrestadores(currentUser.id)
+        }
+      } catch (error) {
+        console.error("Erro ao carregar sessão:", error)
+      } finally {
+        setLoading(false)
+      }
     }
     run()
-  }, [router, user?.id])
+  }, [router])
 
-  const loadPrestadores = async () => {
+  const loadPrestadores = async (userId: string) => {
     try {
-      const { data: userData } = await supabase
+      const { data: userData, error: userError } = await supabase
         .from('users')
         .select('company_id')
-        .eq('id', user?.id)
+        .eq('id', userId)
         .single()
+
+      if (userError) {
+        console.error("Erro ao buscar usuário:", userError)
+        return
+      }
 
       if (userData?.company_id) {
         const { data, error } = await supabase
@@ -41,7 +59,10 @@ export default function PrestadoresOperatorPage() {
           .select('*')
           .eq('empresa_id', userData.company_id)
         
-        if (error) throw error
+        if (error) {
+          console.error("Erro ao buscar prestadores:", error)
+          return
+        }
         setPrestadores(data || [])
       }
     } catch (error) {
@@ -66,7 +87,7 @@ export default function PrestadoresOperatorPage() {
                 <Building2 className="h-5 w-5 text-orange-500 flex-shrink-0" />
                 <div className="flex-1 min-w-0 w-full">
                   <p className="font-semibold text-sm sm:text-base break-words">{p.carrier_name || 'Transportadora'}</p>
-                  <p className="text-xs text-[var(--ink-muted)] mt-1 break-words">PerÃ­odo: {p.period_start} â€” {p.period_end || 'atual'}</p>
+                  <p className="text-xs text-[var(--ink-muted)] mt-1 break-words">Período: {p.period_start} — {p.period_end || 'atual'}</p>
                 </div>
                 <div className="text-xs sm:text-sm text-left sm:text-right w-full sm:w-auto mt-2 sm:mt-0">
                   <p className="break-words">SLA (Pontualidade): {(p.avg_punctuality || 0).toFixed(1)}%</p>

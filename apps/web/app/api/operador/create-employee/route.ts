@@ -251,15 +251,31 @@ export async function POST(request: NextRequest) {
               .select()
             insertedData = result.data
             ecError = result.error
+            console.log('📝 [CREATE-EMPLOYEE] Resultado do update:', {
+              hasData: !!insertedData,
+              dataLength: insertedData?.length,
+              error: ecError?.message,
+              errorCode: ecError?.code
+            })
           } else {
             // Insert new
             console.log('📝 [CREATE-EMPLOYEE] Inserindo novo registro em gf_employee_company')
+            console.log('📝 [CREATE-EMPLOYEE] Dados a inserir:', JSON.stringify(employeeData, null, 2))
             const result = await supabase
               .from('gf_employee_company')
               .insert(employeeData)
               .select()
             insertedData = result.data
             ecError = result.error
+            console.log('📝 [CREATE-EMPLOYEE] Resultado do insert:', {
+              hasData: !!insertedData,
+              dataLength: insertedData?.length,
+              insertedId: insertedData?.[0]?.id,
+              error: ecError?.message,
+              errorCode: ecError?.code,
+              errorDetails: ecError?.details,
+              errorHint: ecError?.hint
+            })
           }
           
           if (ecError) {

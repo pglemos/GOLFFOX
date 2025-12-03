@@ -223,47 +223,63 @@ function LoginContent() {
   // Buscar CSRF token
   useEffect(() => {
     const fetchCsrf = async () => {
+      console.log('🔍 [CSRF] Iniciando busca do CSRF token...')
       try {
         const res = await fetch('/api/auth/csrf', {
           method: 'GET',
           credentials: 'include' // Incluir cookies na requisição
         })
+        console.log('🔍 [CSRF] Resposta da API:', { status: res.status, ok: res.ok })
         if (res.ok) {
           const data = await res.json()
+          console.log('🔍 [CSRF] Dados recebidos:', { hasCsrfToken: !!data?.csrfToken, hasToken: !!data?.token, keys: Object.keys(data) })
           // Aceitar tanto 'token' quanto 'csrfToken' para compatibilidade
           const token = data?.csrfToken || data?.token
           if (token) {
             setCsrfToken(token)
-            console.log('✅ CSRF token obtido:', token.substring(0, 10) + '...')
+            console.log('✅ [CSRF] Token obtido e definido:', token.substring(0, 10) + '...')
           } else {
-            console.warn('⚠️ CSRF token não encontrado na resposta:', data)
+            console.warn('⚠️ [CSRF] Token não encontrado na resposta:', data)
+            // Tentar ler do cookie
+            const cookieMatch = document.cookie.match(/golffox-csrf=([^;]+)/)
+            if (cookieMatch) {
+              setCsrfToken(cookieMatch[1])
+              console.log('✅ [CSRF] Token obtido do cookie após resposta vazia')
+            }
           }
         } else {
-          console.error('❌ Erro ao obter CSRF token:', res.status, res.statusText)
+          const errorText = await res.text().catch(() => '')
+          console.error('❌ [CSRF] Erro ao obter CSRF token:', res.status, res.statusText, errorText)
           // Tentar ler do cookie se a API falhar
           const cookieMatch = document.cookie.match(/golffox-csrf=([^;]+)/)
           if (cookieMatch) {
             setCsrfToken(cookieMatch[1])
-            console.log('✅ CSRF token obtido do cookie')
+            console.log('✅ [CSRF] Token obtido do cookie após erro da API')
+          } else {
+            // Gerar token local como fallback
+            const token = Math.random().toString(36).slice(2) + Date.now().toString(36)
+            document.cookie = `golffox-csrf=${token}; path=/; SameSite=Lax; max-age=900`
+            setCsrfToken(token)
+            console.log('✅ [CSRF] Token gerado localmente após erro da API')
           }
         }
-      } catch (e) {
-        console.error('❌ Erro ao buscar CSRF token:', e)
+      } catch (e: any) {
+        console.error('❌ [CSRF] Erro ao buscar CSRF token:', e?.message || e)
         // Tentar ler do cookie como fallback
         try {
           const cookieMatch = document.cookie.match(/golffox-csrf=([^;]+)/)
           if (cookieMatch) {
             setCsrfToken(cookieMatch[1])
-            console.log('✅ CSRF token obtido do cookie (fallback)')
+            console.log('✅ [CSRF] Token obtido do cookie (fallback)')
           } else {
             // Último recurso: gerar token local
             const token = Math.random().toString(36).slice(2) + Date.now().toString(36)
             document.cookie = `golffox-csrf=${token}; path=/; SameSite=Lax; max-age=900`
             setCsrfToken(token)
-            console.log('✅ CSRF token gerado localmente (fallback)')
+            console.log('✅ [CSRF] Token gerado localmente (fallback)')
           }
         } catch (cookieErr) {
-          console.error('❌ Erro ao gerar CSRF token local:', cookieErr)
+          console.error('❌ [CSRF] Erro ao gerar CSRF token local:', cookieErr)
         }
       }
     }
@@ -387,25 +403,101 @@ function LoginContent() {
         // 3. Obtém o role do banco de dados
         // 4. Autentica com Supabase Auth
 
-        if (!csrfToken) {
-          console.error('❌ CSRF token não encontrado')
+        // Obter CSRF token (do estado ou buscar se não estiver disponível)
+        let finalCsrfToken = csrfToken
+        
+        if (!finalCsrfToken) {
+          console.log('🔍 [CSRF] Token não encontrado no estado, tentando obter...')
+          // Tentar ler do cookie primeiro
+          const cookieMatch = document.cookie.match(/golffox-csrf=([^;]+)/)
+          if (cookieMatch) {
+            finalCsrfToken = cookieMatch[1]
+            setCsrfToken(finalCsrfToken)
+            console.log('✅ [CSRF] Token obtido do cookie')
+          } else {
+            // Tentar buscar da API
+            try {
+              const res = await fetch('/api/auth/csrf', {
+                method: 'GET',
+                credentials: 'include'
+              })
+              if (res.ok) {
+                const data = await res.json()
+                const token = data?.csrfToken || data?.token
+                if (token) {
+                  finalCsrfToken = token
+                  setCsrfToken(token)
+                  console.log('✅ [CSRF] Token obtido da API')
+                } else {
+                  console.error('❌ [CSRF] Token não encontrado na resposta da API')
+                  setError("Erro de segurança. Por favor, recarregue a página.")
+                  setLoading(false)
+                  setTransitioning(false)
+                  if (typeof document !== "undefined") document.body.style.cursor = prevCursor
+                  return
+                }
+              } else {
+                console.error('❌ [CSRF] Erro ao obter token da API:', res.status, res.statusText)
+                setError("Erro de segurança. Por favor, recarregue a página.")
+                setLoading(false)
+                setTransitioning(false)
+                if (typeof document !== "undefined") document.body.style.cursor = prevCursor
+                return
+              }
+            } catch (e: any) {
+              console.error('❌ [CSRF] Erro ao buscar token:', e?.message || e)
+              setError("Erro de segurança. Por favor, recarregue a página.")
+              setLoading(false)
+              setTransitioning(false)
+              if (typeof document !== "undefined") document.body.style.cursor = prevCursor
+              return
+            }
+          }
+        }
+        
+        if (!finalCsrfToken) {
+          console.error('❌ [CSRF] Token não encontrado após todas as tentativas')
           setError("Erro de segurança. Por favor, recarregue a página.")
           setLoading(false)
           setTransitioning(false)
           if (typeof document !== "undefined") document.body.style.cursor = prevCursor
           return
         }
-
-        const response = await fetch(AUTH_ENDPOINT, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-csrf-token": csrfToken,
-          },
-          body: JSON.stringify({ email: sanitizedEmail, password: sanitizedPassword }),
-          signal: controller.signal,
-          credentials: "include",
+        
+        console.log('✅ [CSRF] Token final obtido:', finalCsrfToken.substring(0, 10) + '...')
+        console.log('🔍 [LOGIN] Preparando requisição:', {
+          endpoint: AUTH_ENDPOINT,
+          hasEmail: !!sanitizedEmail,
+          hasPassword: !!sanitizedPassword,
+          emailLength: sanitizedEmail?.length,
+          hasCsrfToken: !!finalCsrfToken
         })
+
+        let response: Response
+        try {
+          response = await fetch(AUTH_ENDPOINT, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "x-csrf-token": finalCsrfToken,
+            },
+            body: JSON.stringify({ email: sanitizedEmail, password: sanitizedPassword }),
+            signal: controller.signal,
+            credentials: "include",
+          })
+          console.log('✅ [LOGIN] Resposta recebida:', {
+            status: response.status,
+            ok: response.ok,
+            statusText: response.statusText
+          })
+        } catch (fetchError: any) {
+          console.error('❌ [LOGIN] Erro na requisição fetch:', {
+            name: fetchError?.name,
+            message: fetchError?.message,
+            stack: fetchError?.stack?.substring(0, 500)
+          })
+          throw fetchError
+        }
         clearTimeout(timeoutId)
 
         // ✅ Processar resposta da API
@@ -456,7 +548,24 @@ function LoginContent() {
         }
 
         // ✅ Resposta bem-sucedida - obter dados do usuário
-        const data = await response.json()
+        let data: any
+        try {
+          const responseText = await response.text()
+          console.log('🔍 [LOGIN] Resposta texto (primeiros 200 chars):', responseText.substring(0, 200))
+          data = JSON.parse(responseText)
+          console.log('✅ [LOGIN] JSON parseado com sucesso:', {
+            hasToken: !!data?.token,
+            hasUser: !!data?.user,
+            hasSession: !!data?.session
+          })
+        } catch (parseError: any) {
+          console.error('❌ [LOGIN] Erro ao fazer parse do JSON:', {
+            message: parseError?.message,
+            stack: parseError?.stack?.substring(0, 500)
+          })
+          throw new Error(`Erro ao processar resposta do servidor: ${parseError?.message || 'JSON inválido'}`)
+        }
+        
         const token = data?.token
         const user = data?.user
         const sessionData = data?.session
@@ -567,17 +676,33 @@ function LoginContent() {
         }
 
         return
-      } catch (err) {
+      } catch (err: any) {
         clearTimeout(timeoutId)
-        if ((err as Error).name === "AbortError") {
+        
+        console.error('❌ [LOGIN] Erro capturado no catch:', {
+          name: err?.name,
+          message: err?.message,
+          stack: err?.stack?.substring(0, 500),
+          type: typeof err,
+          keys: err ? Object.keys(err) : []
+        })
+        
+        if (err?.name === "AbortError") {
           setError("Tempo limite excedido. Verifique sua conexão.")
         } else {
-          setError("Erro inesperado durante o login")
+          const errorMessage = err?.message || 'Erro desconhecido'
+          console.error('❌ [LOGIN] Mensagem de erro:', errorMessage)
+          setError(`Erro inesperado durante o login: ${errorMessage}`)
         }
         setFieldErrors((prev) => ({ ...prev, password: "Não foi possível autenticar" }))
         setPassword("")
         passwordInputRef.current?.focus()
-        logError("Erro inesperado no login", { error: err }, "LoginPage")
+        logError("Erro inesperado no login", { 
+          error: err,
+          errorName: err?.name,
+          errorMessage: err?.message,
+          errorStack: err?.stack?.substring(0, 500)
+        }, "LoginPage")
       } finally {
         // Não resetar loading/transitioning se o redirecionamento está ocorrendo
         // Isso evita flicker antes do redirecionamento

@@ -38,16 +38,16 @@ export default function AjudaOperatorPage() {
 
   const faqItems = [
     {
-      question: "Como adicionar funcionÃ¡rios?",
-      answer: "Acesse a pÃ¡gina de FuncionÃ¡rios e clique em 'Adicionar FuncionÃ¡rio'. Preencha os dados necessÃ¡rios."
+      question: "Como adicionar funcionários?",
+      answer: "Acesse a página de Funcionários e clique em 'Adicionar Funcionário'. Preencha os dados necessários."
     },
     {
-      question: "Como visualizar rotas atribuÃ­das?",
-      answer: "Acesse a pÃ¡gina de Rotas para ver todas as rotas atribuÃ­das Ã  sua empresa."
+      question: "Como visualizar rotas atribuídas?",
+      answer: "Acesse a página de Rotas para ver todas as rotas atribuídas à sua empresa."
     },
     {
       question: "Como interpretar os alertas?",
-      answer: "Os alertas sÃ£o notificaÃ§Ãµes do sistema. Alertas vermelhos sÃ£o erros crÃ­ticos, amarelos sÃ£o avisos e azuis sÃ£o informativos."
+      answer: "Os alertas são notificações do sistema. Alertas vermelhos são erros críticos, amarelos são avisos e azuis são informativos."
     }
   ]
 
@@ -60,7 +60,7 @@ export default function AjudaOperatorPage() {
           <p className="text-[var(--ink-muted)]">Central de ajuda para operadores</p>
         </div>
 
-        {/* Cards de AÃ§Ã£o RÃ¡pida */}
+        {/* Cards de Ação Rápida */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer">
             <div className="flex items-center gap-4">
@@ -86,13 +86,13 @@ export default function AjudaOperatorPage() {
                 <FileText className="h-6 w-6 text-[var(--accent)]" />
               </div>
               <div>
-                <h3 className="font-semibold mb-1">DocumentaÃ§Ã£o</h3>
+                <h3 className="font-semibold mb-1">Documentação</h3>
                 <p className="text-sm text-[var(--ink-muted)]">Guia completo do sistema</p>
               </div>
             </div>
             <Button className="w-full mt-4" variant="outline" asChild>
               <a href="/docs" target="_blank">
-                Ver DocumentaÃ§Ã£o
+                Ver Documentação
                 <ExternalLink className="h-4 w-4 ml-2" />
               </a>
             </Button>

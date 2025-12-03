@@ -84,7 +84,8 @@ async function loginHandler(req: NextRequest) {
   
   // Verificar se há header CSRF presente (mesmo em modo de teste, se fornecido, deve ser válido)
   const csrfHeader = req.headers.get('x-csrf-token')
-  const csrfCookie = cookies().get('golffox-csrf')?.value
+  const cookieStore = await cookies()
+  const csrfCookie = cookieStore.get('golffox-csrf')?.value
   
   // Se há header CSRF fornecido, SEMPRE validar (mesmo em modo de teste)
   // O teste espera 403 ou 400 quando CSRF token é inválido
@@ -452,8 +453,7 @@ async function loginHandler(req: NextRequest) {
     }, { status: 200 })
 
     // ✅ Criar cookie customizado no servidor para autenticação nas rotas API
-    // Payload mínimo (SEM access_token por segurança)
-    // O access_token deve ser enviado via header Authorization ou cookie do Supabase
+    // Incluir access_token do Supabase para validação sempre com Supabase Auth
     const sessionCookieValue = Buffer.from(JSON.stringify({
       id: userPayload.id,
       email: userPayload.email,
@@ -461,8 +461,8 @@ async function loginHandler(req: NextRequest) {
       role: userPayload.role,
       companyId: userPayload.companyId,
       transportadoraId: userPayload.transportadoraId,
-      avatar_url: userPayload.avatar_url
-      // access_token removido por segurança - usar header Authorization ou cookie Supabase
+      avatar_url: userPayload.avatar_url,
+      access_token: data.session.access_token // Incluir token do Supabase para validação
     })).toString('base64')
 
     const isSecure = isSecureRequest(req)

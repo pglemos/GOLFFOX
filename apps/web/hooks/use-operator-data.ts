@@ -10,23 +10,13 @@ export function useOperatorKPIs(companyId: string | null) {
     queryFn: async () => {
       if (!companyId) return null
 
-      // Tentar usar materialized view primeiro, fallback para view segura
-      let { data, error: kpiError } = await supabase
-        .from("mv_operator_kpis")
+      // Usar view segura diretamente (materialized views não suportam RLS)
+      // A view segura já tem RLS configurado e funciona corretamente
+      const { data, error: kpiError } = await supabase
+        .from("v_operator_dashboard_kpis_secure")
         .select("*")
         .eq("company_id", companyId)
         .single()
-
-      // Se materialized view falhar, usar view segura
-      if (kpiError) {
-        const result = await supabase
-          .from("v_operator_dashboard_kpis_secure")
-          .select("*")
-          .eq("company_id", companyId)
-          .single()
-        data = result.data
-        kpiError = result.error
-      }
 
       if (kpiError) throw kpiError
 

@@ -65,7 +65,7 @@ function ComunicacoesOperatorPageInner() {
       if (error) throw error
       setItems(data || [])
     } catch (error) {
-      console.error("Erro ao carregar comunicaÃ§Ãµes:", error)
+      console.error("Erro ao carregar comunicações:", error)
     }
   }
 
@@ -76,8 +76,8 @@ function ComunicacoesOperatorPageInner() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold mb-2">ComunicaÃ§Ãµes</h1>
-            <p className="text-[var(--ink-muted)]">Broadcasts internos e histÃ³rico</p>
+            <h1 className="text-3xl font-bold mb-2">Comunicações</h1>
+            <p className="text-[var(--ink-muted)]">Broadcasts internos e histórico</p>
           </div>
           <Button className="bg-orange-500 hover:bg-orange-600" onClick={() => setIsModalOpen(true)}>
             <Send className="h-4 w-4 mr-2" /> Novo Broadcast
@@ -93,7 +93,7 @@ function ComunicacoesOperatorPageInner() {
             </Card>
           ))}
           {items.length === 0 && (
-            <Card className="p-12 text-center text-sm text-[var(--ink-muted)]">Nenhuma comunicaÃ§Ã£o ainda.</Card>
+            <Card className="p-12 text-center text-sm text-[var(--ink-muted)]">Nenhuma comunicação ainda.</Card>
           )}
         </div>
 
