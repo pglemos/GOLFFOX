@@ -17,7 +17,7 @@ const mockUpdate = jest.fn()
 const mockDelete = jest.fn()
 const mockSelect = jest.fn()
 const mockSingle = jest.fn()
-const mockEq = jest.fn()
+
 
 jest.mock('../supabase', () => ({
   supabase: {

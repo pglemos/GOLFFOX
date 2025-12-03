@@ -39,12 +39,13 @@ interface AuditLog {
   action_type: string
   resource_type: string | null
   resource_id: string | null
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   details: any
   created_at: string
 }
 
 export default function AdminDashboard() {
-  const router = useRouter()
+  // const router = useRouter() // Não usado por enquanto
   const { user, loading } = useAuthFast()
   const [kpisData, setKpisData] = useState<KpiData[]>([])
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([])
@@ -194,6 +195,7 @@ export default function AdminDashboard() {
         name: user?.name || "Admin",
         email: user?.email || "",
         role: user?.role || "admin",
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         avatar_url: (user as any)?.avatar_url
       }}>
         <div className="space-y-6 lg:space-y-8">
@@ -214,12 +216,13 @@ export default function AdminDashboard() {
   }
 
   if (!user) {
-    router.replace('/?next=/admin')
+    // router.replace('/?next=/admin') // useAuthFast já cuida do redirect
     return null
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   if ((user as any).role && (user as any).role !== 'admin') {
-    router.replace('/unauthorized')
+    // router.replace('/unauthorized') // useAuthFast já cuida do redirect
     return null
   }
 
@@ -229,6 +232,7 @@ export default function AdminDashboard() {
       name: user.name || "Admin",
       email: user.email || "",
       role: user.role || "admin",
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       avatar_url: (user as any).avatar_url
     }}>
       <div className="space-y-4 sm:space-y-6 lg:space-y-8 animate-fade-in w-full">

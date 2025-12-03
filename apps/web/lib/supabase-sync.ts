@@ -1,16 +1,20 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Serviço centralizado de sincronização com Supabase
  * Implementa retry com backoff exponencial, logging estruturado e fallback local
  */
 
 import { supabase } from './supabase'
+import { SupabaseClient } from '@supabase/supabase-js'
 
 export interface SyncOperation {
   id?: string
   resourceType: string
   resourceId: string
   action: 'create' | 'update' | 'delete'
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data: Record<string, any>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   metadata?: Record<string, any>
 }
 
@@ -212,7 +216,7 @@ function mapDataToSupabase(
       // Garantir que campos numéricos sejam números
       if (mapped.year) mapped.year = parseInt(mapped.year) || null
       if (mapped.capacity) mapped.capacity = parseInt(mapped.capacity) || null
-      
+
       // Garantir boolean
       if (typeof mapped.is_active !== 'boolean') {
         mapped.is_active = mapped.is_active !== false
@@ -308,8 +312,11 @@ async function executeSyncWithRetry(
     // Executar operação no Supabase
     let response: any
 
+    // Cast seguro para permitir tabelas dinâmicas
+    const client = supabase as SupabaseClient<any, 'public', any>
+
     if (operation.action === 'create') {
-      const { data, error, status } = await (supabase as any)
+      const { data, error, status } = await client
         .from(table)
         .insert(mappedData)
         .select()
@@ -322,7 +329,7 @@ async function executeSyncWithRetry(
         throw new Error('ID do recurso é obrigatório para atualização')
       }
 
-      const { data, error, status } = await (supabase as any)
+      const { data, error, status } = await client
         .from(table)
         .update(mappedData)
         .eq('id', operation.resourceId)
@@ -336,7 +343,7 @@ async function executeSyncWithRetry(
         throw new Error('ID do recurso é obrigatório para deleção')
       }
 
-      const { error, status } = await (supabase as any)
+      const { error, status } = await client
         .from(table)
         .delete()
         .eq('id', operation.resourceId)
