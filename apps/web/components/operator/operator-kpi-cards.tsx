@@ -4,6 +4,7 @@ import { memo } from "react"
 import { Card } from "@/components/ui/card"
 import { MapPin, Clock, AlertTriangle, TrendingUp, DollarSign, CheckCircle } from "lucide-react"
 import { motion } from "framer-motion"
+import { t } from "@/lib/i18n"
 
 interface KPICardsProps {
   kpis: {
@@ -36,42 +37,42 @@ export const OperatorKPICards = memo(function OperatorKPICards({ kpis, loading =
 
   const cards = [
     {
-      label: "Viagens Hoje",
+      label: t('operator', 'kpi_trips_today'),
       value: kpis.trips_today,
       icon: MapPin,
       color: "text-blue-500",
       bgColor: "bg-blue-50"
     },
     {
-      label: "Em Andamento",
+      label: t('operator', 'kpi_in_progress'),
       value: kpis.trips_in_progress,
       icon: Clock,
       color: "text-orange-500",
       bgColor: "bg-orange-50"
     },
     {
-      label: "Concluídas",
+      label: t('operator', 'kpi_done'),
       value: kpis.trips_completed,
       icon: CheckCircle,
       color: "text-green-500",
       bgColor: "bg-green-50"
     },
     {
-      label: "Atrasos > 5min",
+      label: t('operator', 'kpi_delays'),
       value: kpis.delays_over_5min,
       icon: AlertTriangle,
       color: "text-red-500",
       bgColor: "bg-red-50"
     },
     {
-      label: "Ocupação Média",
+      label: t('operator', 'kpi_occupancy'),
       value: `${(kpis.avg_occupancy * 100).toFixed(1)}%`,
       icon: TrendingUp,
       color: "text-purple-500",
       bgColor: "bg-purple-50"
     },
     {
-      label: "SLA D+0",
+      label: t('operator', 'kpi_sla_d0_company'),
       value: `${kpis.sla_d0.toFixed(1)}%`,
       icon: CheckCircle,
       color: "text-indigo-500",
@@ -79,7 +80,7 @@ export const OperatorKPICards = memo(function OperatorKPICards({ kpis, loading =
       subtitle: "GOLF FOX → Operador"
     },
     {
-      label: "Custo/Dia",
+      label: t('operator', 'kpi_daily_cost_company'),
       value: new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(kpis.daily_cost || 0),
       icon: DollarSign,
       color: "text-emerald-500",

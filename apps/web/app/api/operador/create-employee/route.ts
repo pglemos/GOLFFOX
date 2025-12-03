@@ -149,7 +149,19 @@ export async function POST(request: NextRequest) {
       )
     }
     
-    const { email, name, phone, role = 'passenger' } = body
+    const { 
+      email, 
+      name, 
+      phone, 
+      role = 'passenger',
+      // Dados adicionais para gf_employee_company
+      company_id,
+      cpf,
+      address,
+      latitude,
+      longitude,
+      is_active = true
+    } = body
 
     if (!email) {
       return NextResponse.json(
@@ -175,11 +187,104 @@ export async function POST(request: NextRequest) {
       .maybeSingle()
 
     if (existingUser) {
+      // Mesmo se usuário existe, criar/atualizar registro em gf_employee_company
+      // Buscar company_id do operador autenticado se não fornecido
+      let operatorCompanyId = authenticatedUser?.companyId
+      if (!operatorCompanyId && authenticatedUser?.id && authenticatedUser.id !== 'test-user-id') {
+        const { data: operatorData } = await supabase
+          .from('users')
+          .select('company_id')
+          .eq('id', authenticatedUser.id)
+          .single()
+        operatorCompanyId = operatorData?.company_id
+      }
+      
+      const finalCompanyId = company_id || operatorCompanyId
+      console.log('🔍 [CREATE-EMPLOYEE] Usuário existente - company_id debug:', {
+        company_id_from_body: company_id,
+        authenticatedUser_companyId: authenticatedUser?.companyId,
+        operatorCompanyId,
+        finalCompanyId,
+        existingUserId: existingUser.id
+      })
+      
+      let employeeCompanyCreated = false
+      
+      if (finalCompanyId) {
+        try {
+          console.log('📝 [CREATE-EMPLOYEE] Inserindo em gf_employee_company:', {
+            company_id: finalCompanyId,
+            name: name || email.split('@')[0],
+            email: email.toLowerCase()
+          })
+          
+          // Verificar se já existe registro
+          const { data: existingEmployee, error: checkError } = await supabase
+            .from('gf_employee_company')
+            .select('id')
+            .eq('company_id', finalCompanyId)
+            .eq('email', email.toLowerCase())
+            .maybeSingle()
+          
+          const employeeData: any = {
+            company_id: finalCompanyId,
+            name: name || email.split('@')[0],
+            email: email.toLowerCase(),
+            phone: phone || null,
+            cpf: cpf || null,
+            address: address || null,
+            latitude: latitude || null,
+            longitude: longitude || null,
+            is_active: is_active ?? true
+          }
+
+          let insertedData: any = null
+          let ecError: any = null
+
+          if (existingEmployee?.id) {
+            // Update existing
+            console.log('📝 [CREATE-EMPLOYEE] Atualizando registro existente em gf_employee_company:', existingEmployee.id)
+            const result = await supabase
+              .from('gf_employee_company')
+              .update(employeeData)
+              .eq('id', existingEmployee.id)
+              .select()
+            insertedData = result.data
+            ecError = result.error
+          } else {
+            // Insert new
+            console.log('📝 [CREATE-EMPLOYEE] Inserindo novo registro em gf_employee_company')
+            const result = await supabase
+              .from('gf_employee_company')
+              .insert(employeeData)
+              .select()
+            insertedData = result.data
+            ecError = result.error
+          }
+          
+          if (ecError) {
+            console.warn('⚠️ Erro ao criar/atualizar gf_employee_company para usuário existente:', {
+              message: ecError.message,
+              code: ecError.code,
+              details: ecError.details,
+              hint: ecError.hint
+            })
+          } else {
+            employeeCompanyCreated = true
+            console.log('✅ Registro criado/atualizado em gf_employee_company:', { insertedData })
+          }
+        } catch (ecException: any) {
+          console.warn('⚠️ Exceção ao criar gf_employee_company para usuário existente:', ecException.message)
+        }
+      }
+      
       return NextResponse.json({
         userId: existingUser.id,
         created: false,
         email: email.toLowerCase(),
         role,
+        companyId: finalCompanyId,
+        employeeCompanyCreated,
         message: 'Usuário já existe'
       }, { status: 200 })
     }
@@ -249,13 +354,54 @@ export async function POST(request: NextRequest) {
             const user = existingUser?.users?.find((u: any) => u.email === email.toLowerCase())
             
             if (user) {
-              console.warn('⚠️ Usuário já existe, retornando dados do usuário existente')
+              console.warn('⚠️ Usuário já existe no Auth, retornando dados do usuário existente')
+              
+              // Garantir que está em gf_employee_company
+              const finalCompanyId = company_id || companyId || authenticatedUser?.companyId
+              let employeeCompanyCreated = false
+              
+              if (finalCompanyId && finalCompanyId !== '00000000-0000-0000-0000-000000000001') {
+                try {
+                  console.log('📝 [CREATE-EMPLOYEE] Inserindo em gf_employee_company (Auth já existe):', {
+                    company_id: finalCompanyId,
+                    name: name || email.split('@')[0],
+                    email: email.toLowerCase(),
+                    userId: user.id
+                  })
+                  
+                  const { data: insertedData, error: ecError } = await supabase
+                    .from('gf_employee_company')
+                    .upsert({
+                      company_id: finalCompanyId,
+                      name: name || email.split('@')[0],
+                      email: email.toLowerCase(),
+                      phone: phone || null,
+                      cpf: cpf || null,
+                      address: address || null,
+                      latitude: latitude || null,
+                      longitude: longitude || null,
+                      is_active: is_active ?? true
+                    }, { onConflict: 'company_id,email' })
+                    .select()
+                  
+                  if (ecError) {
+                    console.warn('⚠️ Erro ao criar/atualizar gf_employee_company (Auth já existe):', ecError.message, ecError.code, ecError.details)
+                  } else {
+                    employeeCompanyCreated = true
+                    console.log('✅ Registro criado/atualizado em gf_employee_company (Auth já existe):', { insertedData })
+                  }
+                } catch (ecException: any) {
+                  console.warn('⚠️ Exceção ao criar gf_employee_company (Auth já existe):', ecException.message)
+                }
+              }
+              
               return NextResponse.json({
                 userId: user.id,
                 created: false,
                 email: email.toLowerCase(),
                 role,
-                companyId: companyId || authenticatedUser?.companyId || '00000000-0000-0000-0000-000000000001'
+                companyId: finalCompanyId || '00000000-0000-0000-0000-000000000001',
+                employeeCompanyCreated
               }, { status: 200 })
             }
           }
@@ -342,12 +488,53 @@ export async function POST(request: NextRequest) {
         // Se já existe registro com mesma PK, considerar sucesso idempotente
         if (userError.code === '23505' || (userError.message?.toLowerCase().includes('duplicate key') && userError.message?.toLowerCase().includes('users_pkey'))) {
           console.warn('⚠️ Registro de usuário já existe, retornando sucesso idempotente')
+          
+          // Mesmo se usuário já existe, garantir que está em gf_employee_company
+          const finalCompanyId = company_id || companyId || authenticatedUser?.companyId
+          let employeeCompanyCreated = false
+          
+          if (finalCompanyId && finalCompanyId !== '00000000-0000-0000-0000-000000000001') {
+            try {
+              console.log('📝 [CREATE-EMPLOYEE] Inserindo em gf_employee_company (duplicate key):', {
+                company_id: finalCompanyId,
+                name: name || email.split('@')[0],
+                email: email.toLowerCase(),
+                userId: authData.user.id
+              })
+              
+              const { data: insertedData, error: ecError } = await supabase
+                .from('gf_employee_company')
+                .upsert({
+                  company_id: finalCompanyId,
+                  name: name || email.split('@')[0],
+                  email: email.toLowerCase(),
+                  phone: phone || null,
+                  cpf: cpf || null,
+                  address: address || null,
+                  latitude: latitude || null,
+                  longitude: longitude || null,
+                  is_active: is_active ?? true
+                }, { onConflict: 'company_id,email' })
+                .select()
+              
+              if (ecError) {
+                console.warn('⚠️ Erro ao criar/atualizar gf_employee_company (duplicate key):', ecError.message, ecError.code, ecError.details)
+              } else {
+                employeeCompanyCreated = true
+                console.log('✅ Registro criado/atualizado em gf_employee_company (duplicate key):', { insertedData })
+              }
+            } catch (ecException: any) {
+              console.warn('⚠️ Exceção ao criar gf_employee_company (duplicate key):', ecException.message)
+            }
+          }
+          
           return NextResponse.json({
             userId: authData.user.id,
             created: false,
             email: email.toLowerCase(),
             role,
-            companyId: companyId || undefined
+            companyId: finalCompanyId || undefined,
+            employeeCompanyCreated
           }, { status: 200 })
         }
         
@@ -446,14 +633,52 @@ export async function POST(request: NextRequest) {
 
     // Garantir que companyId seja sempre uma string válida (não null)
     // Se não há companyId, usar um UUID padrão para testes
-    const finalCompanyId = companyId || authenticatedUser?.companyId || '00000000-0000-0000-0000-000000000001'
+    const finalCompanyId = company_id || companyId || authenticatedUser?.companyId || '00000000-0000-0000-0000-000000000001'
+    
+    // Criar registro em gf_employee_company se company_id foi fornecido
+    let employeeCompanyCreated = false
+    if (finalCompanyId && finalCompanyId !== '00000000-0000-0000-0000-000000000001') {
+      try {
+        console.log('📝 [CREATE-EMPLOYEE] Inserindo novo em gf_employee_company:', {
+          company_id: finalCompanyId,
+          name: name || email.split('@')[0],
+          email: email.toLowerCase()
+        })
+        
+        // gf_employee_company armazena dados diretamente (não é tabela de mapeamento)
+        const { data: insertedData, error: ecError } = await supabase
+          .from('gf_employee_company')
+          .upsert({
+            company_id: finalCompanyId,
+            name: name || email.split('@')[0],
+            email: email.toLowerCase(),
+            phone: phone || null,
+            cpf: cpf || null,
+            address: address || null,
+            latitude: latitude || null,
+            longitude: longitude || null,
+            is_active: is_active ?? true
+          }, { onConflict: 'company_id,email' })
+          .select()
+        
+        if (ecError) {
+          console.warn('⚠️ Erro ao criar registro em gf_employee_company (não crítico):', ecError.message, ecError.code, ecError.details)
+        } else {
+          employeeCompanyCreated = true
+          console.log('✅ Registro criado em gf_employee_company:', { insertedData })
+        }
+      } catch (ecException: any) {
+        console.warn('⚠️ Exceção ao criar gf_employee_company (não crítico):', ecException.message)
+      }
+    }
     
     return NextResponse.json({
       userId: authData.user.id,
       created: true,
       email: email.toLowerCase(),
       role,
-      companyId: finalCompanyId // Sempre retornar companyId como string válida
+      companyId: finalCompanyId,
+      employeeCompanyCreated
     }, { status: 201 })
   } catch (error: any) {
     console.error('Erro ao criar funcionário:', error)

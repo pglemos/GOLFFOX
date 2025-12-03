@@ -3,6 +3,7 @@
 import { memo } from 'react'
 import { motion } from 'framer-motion'
 import { AlertCircle, Truck, Route, HelpCircle } from 'lucide-react'
+import { t } from '@/lib/i18n'
 
 interface ControlTowerCardsProps {
   delays: number
@@ -19,36 +20,36 @@ export const ControlTowerCards = memo(function ControlTowerCards({
 }: ControlTowerCardsProps) {
   const cards = [
     {
-      label: 'Atrasos',
+      label: t('operator', 'control_tower_delays'),
       value: delays,
       icon: AlertCircle,
       color: 'text-red-500',
       bgColor: 'bg-red-50',
-      href: '/operator/alertas?type=route_delayed'
+      href: '/operador/alertas?type=route_delayed'
     },
     {
-      label: 'Veículos Parados',
+      label: t('operator', 'control_tower_stopped'),
       value: stoppedVehicles,
       icon: Truck,
       color: 'text-orange-500',
       bgColor: 'bg-orange-50',
-      href: '/operator/alertas?type=bus_stopped'
+      href: '/operador/alertas?type=bus_stopped'
     },
     {
-      label: 'Desvios de Rota',
+      label: t('operator', 'control_tower_deviations'),
       value: routeDeviations,
       icon: Route,
       color: 'text-yellow-500',
       bgColor: 'bg-yellow-50',
-      href: '/operator/alertas?type=route_deviation'
+      href: '/operador/alertas?type=deviation'
     },
     {
-      label: 'Socorros Abertos',
+      label: t('operator', 'control_tower_assistance'),
       value: openAssistance,
       icon: HelpCircle,
       color: 'text-blue-500',
       bgColor: 'bg-blue-50',
-      href: '/operator/alertas?type=assistance_open'
+      href: '/operador/alertas?type=assistance_open'
     }
   ]
 
@@ -56,9 +57,9 @@ export const ControlTowerCards = memo(function ControlTowerCards({
     <div className="w-full">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {cards.map((card) => (
-          <motion.div 
-            key={card.label} 
-            whileHover={{ y: -2, scale: 1.01 }} 
+          <motion.div
+            key={card.label}
+            whileHover={{ y: -2, scale: 1.01 }}
             whileTap={{ scale: 0.98 }}
             transition={{ duration: 0.15, ease: 'easeOut' }}
             className="touch-manipulation"

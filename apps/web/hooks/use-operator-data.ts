@@ -31,13 +31,13 @@ export function useOperatorKPIs(companyId: string | null) {
       if (kpiError) throw kpiError
 
       return {
-        trips_today: Number(data?.trips_today || 0),
-        trips_in_progress: Number(data?.trips_in_progress || 0),
-        trips_completed: Number(data?.trips_completed || 0),
-        delays_over_5min: Number(data?.delays_over_5min || 0),
-        avg_occupancy: Number(data?.avg_occupancy || 0),
-        daily_cost: Number(data?.daily_cost || 0),
-        sla_d0: Number(data?.sla_d0 || 0),
+        trips_today: Number((data as any)?.trips_today || 0),
+        trips_in_progress: Number((data as any)?.trips_in_progress || 0),
+        trips_completed: Number((data as any)?.trips_completed || 0),
+        delays_over_5min: Number((data as any)?.delays_over_5min || 0),
+        avg_occupancy: Number((data as any)?.avg_occupancy || 0),
+        daily_cost: Number((data as any)?.daily_cost || 0),
+        sla_d0: Number((data as any)?.sla_d0 || 0),
       }
     },
     enabled: !!companyId,
@@ -54,21 +54,21 @@ export function useControlTower(companyId: string | null) {
 
       const [delaysRes, stoppedRes, deviationsRes, assistanceRes] = await Promise.all([
         supabase
-          .from("gf_alerts")
+          .from("v_operator_alerts_secure")
           .select("id", { count: "exact", head: true })
-          .eq("alert_type", "route_delayed")
+          .eq("type", "route_delayed")
           .eq("severity", "critical")
           .eq("company_id", companyId),
         supabase
-          .from("gf_alerts")
+          .from("v_operator_alerts_secure")
           .select("id", { count: "exact", head: true })
-          .eq("alert_type", "bus_stopped")
+          .eq("type", "bus_stopped")
           .eq("is_resolved", false)
           .eq("company_id", companyId),
         supabase
-          .from("gf_alerts")
+          .from("v_operator_alerts_secure")
           .select("id", { count: "exact", head: true })
-          .eq("alert_type", "deviation")
+          .eq("type", "deviation")
           .eq("is_resolved", false)
           .eq("company_id", companyId),
         supabase
@@ -101,29 +101,45 @@ export function useEmployees(
   return useQuery({
     queryKey: ["employees", companyId, page, pageSize, searchQuery],
     queryFn: async () => {
-      if (!companyId) return { data: [], count: 0 }
-
-      let query = supabase
-        .from("gf_employee_company")
-        .select("id, company_id, name, cpf, email, phone, is_active, address", { count: "exact" })
-        .eq("company_id", companyId)
-        .order("name", { ascending: true })
-        .range((page - 1) * pageSize, page * pageSize - 1)
-
-      if (searchQuery) {
-        query = query.or(
-          `name.ilike.%${searchQuery}%,email.ilike.%${searchQuery}%,cpf.ilike.%${searchQuery}%`
-        )
+      console.log('🔍 [useEmployees] Buscando funcionários via API:', { companyId, page, pageSize, searchQuery })
+      if (!companyId) {
+        console.log('🔍 [useEmployees] Sem companyId, retornando vazio')
+        return { data: [], count: 0 }
       }
 
-      const { data, error, count } = await query
+      // Usar API route para contornar problemas de RLS
+      const params = new URLSearchParams({
+        company_id: companyId,
+        page: page.toString(),
+        pageSize: pageSize.toString()
+      })
+      if (searchQuery) {
+        params.append('search', searchQuery)
+      }
 
-      if (error) throw error
+      const response = await fetch(`/api/operador/employees?${params.toString()}`, {
+        credentials: 'include'
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'Erro desconhecido' }))
+        console.error('❌ [useEmployees] Erro na API:', errorData)
+        throw new Error(errorData.error || 'Erro ao buscar funcionários')
+      }
+
+      const result = await response.json()
+
+      console.log('🔍 [useEmployees] Resultado da API:', { 
+        dataLength: result.data?.length, 
+        count: result.count,
+        companyId,
+        firstItem: result.data?.[0]
+      })
 
       return {
-        data: data || [],
-        count: count || 0,
-        totalPages: Math.ceil((count || 0) / pageSize),
+        data: result.data || [],
+        count: result.count || 0,
+        totalPages: result.totalPages || 0,
       }
     },
     enabled: !!companyId,
@@ -172,7 +188,7 @@ export function useAlerts(
         .range((pageParam - 1) * pageSize, pageParam * pageSize - 1)
 
       if (filters?.type) {
-        query = query.eq("alert_type", filters.type)
+        query = query.eq("type", filters.type)
       }
       if (filters?.severity) {
         query = query.eq("severity", filters.severity)
@@ -208,7 +224,7 @@ export function useResolveAlert() {
     mutationFn: async ({ alertId, resolved }: { alertId: string; resolved: boolean }) => {
       const { error } = await supabase
         .from("gf_alerts")
-        .update({ is_resolved: resolved, resolved_at: resolved ? new Date().toISOString() : null })
+        .update({ is_resolved: resolved, resolved_at: resolved ? new Date().toISOString() : null } as any)
         .eq("id", alertId)
 
       if (error) throw error
