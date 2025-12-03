@@ -36,6 +36,7 @@ AND column_name LIKE 'address_%';`
 export default function MigratePage() {
   const [copied, setCopied] = useState(false)
   const [checking, setChecking] = useState(false)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [status, setStatus] = useState<any>(null)
 
   const copyToClipboard = async () => {
@@ -44,7 +45,7 @@ export default function MigratePage() {
       setCopied(true)
       notifySuccess("SQL copiado para a área de transferência!")
       setTimeout(() => setCopied(false), 3000)
-    } catch (err) {
+    } catch {
       notifyError("Erro ao copiar SQL")
     }
   }
@@ -55,7 +56,8 @@ export default function MigratePage() {
       const response = await fetch("/api/admin/run-migration")
       const data = await response.json()
       setStatus(data)
-      
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const needsCreation = data.results?.filter((r: any) => r.status === "needs_creation") || []
       if (needsCreation.length === 0) {
         notifySuccess("Todas as colunas já existem! ✅")
@@ -77,7 +79,7 @@ export default function MigratePage() {
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold mb-6">🔧 Migração do Banco de Dados</h1>
-        
+
         <Card className="p-6 mb-6">
           <h2 className="text-xl font-semibold mb-4">Status da Migração</h2>
           <div className="flex gap-4 mb-4">
@@ -88,17 +90,17 @@ export default function MigratePage() {
               Abrir Supabase Dashboard
             </Button>
           </div>
-          
+
           {status && (
             <div className="mt-4 p-4 bg-gray-100 rounded-lg">
               <h3 className="font-semibold mb-2">Resultado:</h3>
               <div className="grid grid-cols-2 gap-2 text-sm">
+                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                 {status.results?.map((r: any, i: number) => (
-                  <div key={i} className={`p-2 rounded ${
-                    r.status === "exists" ? "bg-green-100 text-green-800" : 
-                    r.status === "needs_creation" ? "bg-yellow-100 text-yellow-800" : 
-                    "bg-red-100 text-red-800"
-                  }`}>
+                  <div key={i} className={`p-2 rounded ${r.status === "exists" ? "bg-green-100 text-green-800" :
+                      r.status === "needs_creation" ? "bg-yellow-100 text-yellow-800" :
+                        "bg-red-100 text-red-800"
+                    }`}>
                     {r.table}.{r.column}: {r.status === "exists" ? "✅" : r.status === "needs_creation" ? "⚠️ Criar" : "❌"}
                   </div>
                 ))}
@@ -114,11 +116,11 @@ export default function MigratePage() {
               {copied ? "✅ Copiado!" : "📋 Copiar SQL"}
             </Button>
           </div>
-          
+
           <pre className="bg-gray-900 text-green-400 p-4 rounded-lg overflow-x-auto text-sm whitespace-pre-wrap">
             {MIGRATION_SQL}
           </pre>
-          
+
           <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
             <h3 className="font-semibold text-blue-800 mb-2">📌 Instruções:</h3>
             <ol className="list-decimal list-inside text-blue-700 space-y-2">

@@ -44,12 +44,14 @@ class RealtimeService {
       _useSupabase = true;
       LoggerService.instance.info('RealtimeService: Conectado ao Supabase');
     } on Exception catch (error) {
-      // Fallback para dados mock
-      _useSupabase = false;
-      LoggerService.instance.warning(
-        'RealtimeService: Usando dados mock',
-        'error: $error',
+      LoggerService.instance.error(
+        'RealtimeService: Erro ao conectar Supabase',
+        error,
       );
+      // Em produção, não devemos usar mock data silenciosamente
+      // _useSupabase = false;
+      // _loadMockData();
+      rethrow; // Propagar erro para UI tratar
     }
 
     // Carregar dados iniciais

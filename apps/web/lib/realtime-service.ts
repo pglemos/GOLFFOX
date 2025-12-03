@@ -1,10 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Serviço de Realtime para o Mapa Admin
  * Gerencia conexões Supabase Realtime com fallback para polling
  */
 
 import { supabase } from './supabase'
-import { RealtimeChannel } from '@supabase/supabase-js'
+import { RealtimeChannel, RealtimePostgresChangesPayload } from '@supabase/supabase-js'
 import { debug, warn, error } from './logger'
 
 export interface VehiclePositionUpdate {
@@ -44,7 +45,7 @@ export interface AlertUpdate {
   created_at: string
 }
 
-export type RealtimeUpdateType = 
+export type RealtimeUpdateType =
   | { type: 'position'; data: VehiclePositionUpdate }
   | { type: 'trip'; data: TripUpdate }
   | { type: 'alert'; data: AlertUpdate }
@@ -66,6 +67,7 @@ export class RealtimeService {
   private updateQueue: RealtimeUpdateType[] = []
   private debounceTimer: NodeJS.Timeout | null = null
   private readonly DEBOUNCE_MS = 300
+  private tripCache: Map<string, any> = new Map()
 
   constructor(options: RealtimeServiceOptions = {}) {
     this.options = {
@@ -82,10 +84,10 @@ export class RealtimeService {
     try {
       // Canal para driver_positions
       await this.subscribeToDriverPositions()
-      
+
       // Canal para trips
       await this.subscribeToTrips()
-      
+
       // Canal para alerts
       await this.subscribeToAlerts()
 
@@ -99,7 +101,7 @@ export class RealtimeService {
     } catch (err: unknown) {
       error('Erro ao conectar realtime', { error: err }, 'RealtimeService')
       this.options.onError?.(err as Error)
-      
+
       // Se realtime falhar, usar apenas polling
       if (this.options.enablePolling) {
         this.startPolling()
@@ -137,8 +139,7 @@ export class RealtimeService {
    * Inscreve no canal de driver_positions
    */
   private async subscribeToDriverPositions(): Promise<void> {
-    const channel = (supabase as any)
-      .channel('map:driver_positions')
+    const channel = (supabase.channel('map:driver_positions') as unknown as RealtimeChannel)
       .on(
         'postgres_changes',
         {
@@ -146,22 +147,29 @@ export class RealtimeService {
           schema: 'public',
           table: 'driver_positions',
         },
-        async (payload: any) => {
+        async (payload: RealtimePostgresChangesPayload<any>) => {
           try {
             // Buscar dados completos diretamente das tabelas (view v_live_vehicles não existe)
             const position = payload.new as any
-            
-            // driver_positions tem trip_id, não vehicle_id diretamente
-            // Buscar trip para obter vehicle_id
-            const { data: tripData, error: tripError } = await supabase
-              .from('trips')
-              .select('id, vehicle_id, route_id, driver_id, status')
-              .eq('id', position.trip_id)
-              .single()
 
-            if (tripError || !tripData) {
-              warn('Erro ao buscar trip para posição', { error: tripError }, 'RealtimeService')
-              return
+            // driver_positions tem trip_id, não vehicle_id diretamente
+            // Buscar trip no cache ou no banco
+            let tripData = this.tripCache.get(position.trip_id)
+
+            if (!tripData) {
+              const { data, error: tripError } = await supabase
+                .from('trips')
+                .select('id, vehicle_id, route_id, driver_id, status')
+                .eq('id', position.trip_id)
+                .single()
+
+              if (tripError || !data) {
+                warn('Erro ao buscar trip para posição', { error: tripError }, 'RealtimeService')
+                return
+              }
+
+              tripData = data
+              this.tripCache.set(tripData.id, tripData)
             }
 
             if (!position.lat || !position.lng) {
@@ -199,7 +207,7 @@ export class RealtimeService {
           // Não disparamos onError aqui para evitar ruído de logs;
           // o polling já está habilitado como fallback em connect().
         }
-      })
+      }) as unknown as RealtimeChannel
 
     this.channels.set('driver_positions', channel)
   }
@@ -208,8 +216,7 @@ export class RealtimeService {
    * Inscreve no canal de trips
    */
   private async subscribeToTrips(): Promise<void> {
-    const channel = (supabase as any)
-      .channel('map:trips')
+    const channel = (supabase.channel('map:trips') as unknown as RealtimeChannel)
       .on(
         'postgres_changes',
         {
@@ -217,8 +224,12 @@ export class RealtimeService {
           schema: 'public',
           table: 'trips',
         },
-        (payload: any) => {
+        (payload: RealtimePostgresChangesPayload<any>) => {
           const trip = payload.new as any
+
+          // Atualizar cache
+          this.tripCache.set(trip.id, trip)
+
           this.queueUpdate({
             type: 'trip',
             data: {
@@ -239,7 +250,7 @@ export class RealtimeService {
         } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
           warn('Canal trips indisponível, usando polling', undefined, 'RealtimeService')
         }
-      })
+      }) as unknown as RealtimeChannel
 
     this.channels.set('trips', channel)
   }
@@ -252,8 +263,7 @@ export class RealtimeService {
     // Vamos escutar ambas as tabelas
 
     // Canal para gf_incidents
-    const channelIncidents = (supabase as any)
-      .channel('map:incidents')
+    const channelIncidents = (supabase.channel('map:incidents') as unknown as RealtimeChannel)
       .on(
         'postgres_changes',
         {
@@ -262,7 +272,7 @@ export class RealtimeService {
           table: 'gf_incidents',
           filter: 'status=eq.open',
         },
-        (payload: any) => {
+        (payload: RealtimePostgresChangesPayload<any>) => {
           const incident = payload.new as any
           this.queueUpdate({
             type: 'alert',
@@ -281,13 +291,12 @@ export class RealtimeService {
           })
         }
       )
-      .subscribe()
+      .subscribe() as unknown as RealtimeChannel
 
     this.channels.set('incidents', channelIncidents)
 
     // Canal para gf_service_requests (socorro)
-    const channelAssistance = (supabase as any)
-      .channel('map:assistance')
+    const channelAssistance = (supabase.channel('map:assistance') as unknown as RealtimeChannel)
       .on(
         'postgres_changes',
         {
@@ -296,7 +305,7 @@ export class RealtimeService {
           table: 'gf_service_requests',
           filter: 'tipo=eq.socorro',
         },
-        (payload: any) => {
+        (payload: RealtimePostgresChangesPayload<any>) => {
           const request = payload.new as any
           const lat = request.payload?.latitude
           const lng = request.payload?.longitude
@@ -307,8 +316,8 @@ export class RealtimeService {
               alert_id: request.id,
               alert_type: 'assistance',
               company_id: request.empresa_id,
-              severity: request.priority === 'urgente' ? 'critical' : 
-                       request.priority === 'alta' ? 'high' : 'medium',
+              severity: request.priority === 'urgente' ? 'critical' :
+                request.priority === 'alta' ? 'high' : 'medium',
               lat: lat ? parseFloat(lat) : undefined,
               lng: lng ? parseFloat(lng) : undefined,
               description: request.notes || 'Solicitação de socorro',
@@ -317,7 +326,7 @@ export class RealtimeService {
           })
         }
       )
-      .subscribe()
+      .subscribe() as unknown as RealtimeChannel
 
     this.channels.set('assistance', channelAssistance)
   }

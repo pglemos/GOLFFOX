@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, Suspense } from "react"
+import { useEffect, useState } from "react"
 import { AppShell } from "@/components/app-shell"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -44,7 +44,8 @@ const isValidUUID = (id: string) => {
 function FuncionariosPageContent() {
   const router = useRouter()
   const { tenantCompanyId, companyName, loading: tenantLoading, error: tenantError } = useOperatorTenant()
-  
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
@@ -54,10 +55,10 @@ function FuncionariosPageContent() {
   const [isFuncionarioModalOpen, setIsFuncionarioModalOpen] = useState(false)
   const [selectedFuncionario, setSelectedFuncionario] = useState<Funcionario | null>(null)
   const queryClient = useQueryClient()
-  
+
   const debouncedSearch = useDebounce(searchQuery, 300)
   const pageSize = 50
-  
+
   // Usar React Query para carregar funcionários
   const { data: employeesData, isLoading: employeesLoading, refetch } = useEmployees(
     tenantCompanyId,
@@ -72,20 +73,20 @@ function FuncionariosPageContent() {
       try {
         console.log('[FuncionariosPage] Verificando sessão do usuário')
         const { data: { session }, error: sessionError } = await supabase.auth.getSession()
-        
+
         if (sessionError) {
           console.error('[FuncionariosPage] Erro ao obter sessão:', sessionError)
           setError('Erro ao carregar sessão')
           setLoading(false)
           return
         }
-        
+
         if (!session) {
           // Sem sessão - redirecionando
           router.push("/")
           return
         }
-        
+
         console.log('[FuncionariosPage] Usuário autenticado:', session.user.email)
         setUser(session.user)
         setLoading(false)
@@ -95,13 +96,13 @@ function FuncionariosPageContent() {
         setLoading(false)
       }
     }
-    
+
     // Timeout de segurança
     const timeout = setTimeout(() => {
       console.warn('⚠️  Timeout ao carregar usuário')
       setLoading(false)
     }, 5000)
-    
+
     getUser().finally(() => clearTimeout(timeout))
   }, [router])
 
@@ -124,6 +125,7 @@ function FuncionariosPageContent() {
       queryClient.invalidateQueries({ queryKey: ["employees", tenantCompanyId] })
       notifySuccess("Funcionário desativado com sucesso")
     },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
       notifyError(`Erro ao desativar funcionário: ${error.message}`)
     },
@@ -275,79 +277,79 @@ function FuncionariosPageContent() {
               <>
                 <div className="grid gap-3 sm:gap-4">
                   {funcionarios.map((funcionario) => (
-                <Card key={funcionario.id} className="p-3 sm:p-4 hover:shadow-lg transition-shadow overflow-hidden">
-                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-start gap-2 mb-2">
-                        <Users className="h-5 w-5 text-orange-500 flex-shrink-0 mt-0.5" />
+                    <Card key={funcionario.id} className="p-3 sm:p-4 hover:shadow-lg transition-shadow overflow-hidden">
+                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <h3 className="font-bold text-base sm:text-lg break-words flex-1 min-w-0">
-                              {funcionario.name || "Nome não disponível"}
-                            </h3>
-                            {funcionario.is_active ? (
-                              <Badge variant="outline" className="bg-green-50 text-green-700 text-xs flex-shrink-0">
-                                Ativo
-                              </Badge>
-                            ) : (
-                              <Badge variant="outline" className="bg-gray-50 text-gray-700 text-xs flex-shrink-0">
-                                Inativo
-                              </Badge>
+                          <div className="flex items-start gap-2 mb-2">
+                            <Users className="h-5 w-5 text-orange-500 flex-shrink-0 mt-0.5" />
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <h3 className="font-bold text-base sm:text-lg break-words flex-1 min-w-0">
+                                  {funcionario.name || "Nome não disponível"}
+                                </h3>
+                                {funcionario.is_active ? (
+                                  <Badge variant="outline" className="bg-green-50 text-green-700 text-xs flex-shrink-0">
+                                    Ativo
+                                  </Badge>
+                                ) : (
+                                  <Badge variant="outline" className="bg-gray-50 text-gray-700 text-xs flex-shrink-0">
+                                    Inativo
+                                  </Badge>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="space-y-1 text-sm text-gray-600 pl-7">
+                            {funcionario.email && (
+                              <div className="flex items-start gap-2">
+                                <Mail className="h-4 w-4 flex-shrink-0 mt-0.5" />
+                                <span className="break-words">{funcionario.email}</span>
+                              </div>
+                            )}
+                            {funcionario.phone && (
+                              <div className="flex items-center gap-2">
+                                <Phone className="h-4 w-4 flex-shrink-0" />
+                                <span className="break-words">{funcionario.phone}</span>
+                              </div>
+                            )}
+                            {funcionario.cpf && (
+                              <div className="flex items-center gap-2">
+                                <span className="text-xs text-gray-500 break-words">CPF: {funcionario.cpf}</span>
+                              </div>
+                            )}
+                            {funcionario.address && (
+                              <div className="flex items-start gap-2">
+                                <Building className="h-4 w-4 flex-shrink-0 mt-0.5" />
+                                <span className="text-xs text-gray-500 break-words">{funcionario.address}</span>
+                              </div>
                             )}
                           </div>
                         </div>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="sm" className="self-start sm:self-auto min-h-[44px] min-w-[44px] touch-manipulation">
+                              <MoreVertical className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="min-w-[160px]">
+                            <DropdownMenuItem onClick={() => handleEdit(funcionario)} className="min-h-[44px] touch-manipulation">
+                              <Edit className="h-4 w-4 mr-2" />
+                              Editar
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => handleDelete(funcionario)}
+                              className="text-red-600 min-h-[44px] touch-manipulation"
+                            >
+                              <Trash2 className="h-4 w-4 mr-2" />
+                              Desativar
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </div>
-                      <div className="space-y-1 text-sm text-gray-600 pl-7">
-                        {funcionario.email && (
-                          <div className="flex items-start gap-2">
-                            <Mail className="h-4 w-4 flex-shrink-0 mt-0.5" />
-                            <span className="break-words">{funcionario.email}</span>
-                          </div>
-                        )}
-                        {funcionario.phone && (
-                          <div className="flex items-center gap-2">
-                            <Phone className="h-4 w-4 flex-shrink-0" />
-                            <span className="break-words">{funcionario.phone}</span>
-                          </div>
-                        )}
-                        {funcionario.cpf && (
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs text-gray-500 break-words">CPF: {funcionario.cpf}</span>
-                          </div>
-                        )}
-                        {funcionario.address && (
-                          <div className="flex items-start gap-2">
-                            <Building className="h-4 w-4 flex-shrink-0 mt-0.5" />
-                            <span className="text-xs text-gray-500 break-words">{funcionario.address}</span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm" className="self-start sm:self-auto min-h-[44px] min-w-[44px] touch-manipulation">
-                          <MoreVertical className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="min-w-[160px]">
-                        <DropdownMenuItem onClick={() => handleEdit(funcionario)} className="min-h-[44px] touch-manipulation">
-                          <Edit className="h-4 w-4 mr-2" />
-                          Editar
-                        </DropdownMenuItem>
-                        <DropdownMenuItem 
-                          onClick={() => handleDelete(funcionario)}
-                          className="text-red-600 min-h-[44px] touch-manipulation"
-                        >
-                          <Trash2 className="h-4 w-4 mr-2" />
-                          Desativar
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-                  </Card>
+                    </Card>
                   ))}
                 </div>
-                
+
                 {/* Paginação */}
                 {totalPages > 1 && (
                   <Pagination
@@ -363,8 +365,8 @@ function FuncionariosPageContent() {
                 <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                 <h3 className="text-lg font-medium mb-2">Nenhum funcionário encontrado</h3>
                 <p className="text-sm text-gray-500 mb-4">
-                  {debouncedSearch 
-                    ? "Tente ajustar sua busca" 
+                  {debouncedSearch
+                    ? "Tente ajustar sua busca"
                     : "Nenhum funcionário cadastrado para esta empresa"}
                 </p>
                 {!debouncedSearch && (
@@ -378,34 +380,34 @@ function FuncionariosPageContent() {
           </div>
         )}
       </div>
-        {/* Modal de Importação CSV */}
-        <CSVImportModal
-          isOpen={isCsvModalOpen}
-          onClose={() => setIsCsvModalOpen(false)}
-          onSave={() => {
-            setIsCsvModalOpen(false)
-            refetch()
-          }}
-          empresaId={tenantCompanyId || undefined}
-        />
+      {/* Modal de Importação CSV */}
+      <CSVImportModal
+        isOpen={isCsvModalOpen}
+        onClose={() => setIsCsvModalOpen(false)}
+        onSave={() => {
+          setIsCsvModalOpen(false)
+          refetch()
+        }}
+        empresaId={tenantCompanyId || undefined}
+      />
 
-        {/* Modal de CRUD de Funcionário */}
-        {tenantCompanyId && (
-          <FuncionarioModal
-            funcionario={selectedFuncionario}
-            isOpen={isFuncionarioModalOpen}
-            onClose={() => {
-              setIsFuncionarioModalOpen(false)
-              setSelectedFuncionario(null)
-            }}
-            onSave={() => {
-              refetch()
-              setIsFuncionarioModalOpen(false)
-              setSelectedFuncionario(null)
-            }}
-            empresaId={tenantCompanyId}
-          />
-        )}
+      {/* Modal de CRUD de Funcionário */}
+      {tenantCompanyId && (
+        <FuncionarioModal
+          funcionario={selectedFuncionario}
+          isOpen={isFuncionarioModalOpen}
+          onClose={() => {
+            setIsFuncionarioModalOpen(false)
+            setSelectedFuncionario(null)
+          }}
+          onSave={() => {
+            refetch()
+            setIsFuncionarioModalOpen(false)
+            setSelectedFuncionario(null)
+          }}
+          empresaId={tenantCompanyId}
+        />
+      )}
     </AppShell>
   )
 }
@@ -413,16 +415,8 @@ function FuncionariosPageContent() {
 export default function FuncionariosPage() {
   return (
     <FuncionariosErrorBoundary>
-      <Suspense fallback={
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="text-center">
-            <div className="w-16 h-16 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-gray-600">Carregando...</p>
-          </div>
-        </div>
-      }>
-        <FuncionariosPageContent />
-      </Suspense>
+      {/* Suspense removido - não necessário */}
+      <FuncionariosPageContent />
     </FuncionariosErrorBoundary>
   )
 }

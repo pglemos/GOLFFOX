@@ -40,6 +40,10 @@ type MockSupabaseClient = {
     update: (values: unknown) => MockQueryBuilder
     delete: () => MockQueryBuilder
   }
+  channel: (name: string) => {
+    on: (event: any, filter: any, callback: (payload: any) => void) => { subscribe: (callback?: (status: string) => void) => void }
+    subscribe: (callback?: (status: string) => void) => void
+  }
 }
 
 let supabase: SupabaseClientType | MockSupabaseClient
@@ -109,6 +113,17 @@ if (envUrl && envAnon) {
       update: () => createMockBuilder(),
       delete: () => createMockBuilder(),
     }),
+    channel: () => {
+      const ch: any = {
+        on: (_event: any, _filter: any, _callback: (payload: any) => void) => ch,
+        subscribe: (cb?: (status: string) => void) => {
+          if (cb) cb('SUBSCRIBED')
+          return ch
+        },
+        unsubscribe: async () => { return Promise.resolve('ok') },
+      }
+      return ch
+    },
   } as MockSupabaseClient
 }
 
