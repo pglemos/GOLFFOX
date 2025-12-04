@@ -26,7 +26,7 @@ Todos os painéis e apps compartilham o mesmo projeto Supabase.
 ## Pré-requisitos
 
 - Conta Vercel com acesso ao projeto `golffox`
-- Node.js 18.17.0 ou superior
+- Node.js 22.x ou superior
 - npm 9.0.0 ou superior
 - Acesso ao projeto Supabase
 

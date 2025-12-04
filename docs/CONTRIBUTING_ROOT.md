@@ -51,7 +51,7 @@ Para sugerir uma nova funcionalidade:
 ### Pré-requisitos
 
 - **Flutter SDK**: 3.24+
-- **Node.js**: 18+
+- **Node.js**: 22+
 - **Git**: Última versão
 - **VS Code**: Recomendado
 

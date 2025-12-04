@@ -167,7 +167,7 @@ export function useRouteCreate(isOpen: boolean) {
 
                 if (empError) throw empError
 
-                data = (empData || []).map((emp: any) => ({
+                const mappedData = (empData || []).map((emp: any) => ({
                     employee_id: emp.id,
                     company_id: emp.company_id,
                     first_name: emp.name?.split(" ")[0] || "",
@@ -181,7 +181,7 @@ export function useRouteCreate(isOpen: boolean) {
                     lng: emp.longitude ? parseFloat(emp.longitude.toString()) : null,
                 })) as any
 
-                setEmployees((data || []) as EmployeeLite[])
+                setEmployees((mappedData || []) as EmployeeLite[])
                 return
             } else if (error) {
                 throw error

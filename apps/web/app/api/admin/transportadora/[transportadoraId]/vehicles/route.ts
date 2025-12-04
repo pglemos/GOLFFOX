@@ -8,7 +8,7 @@ export async function GET(
 ) {
   const params = await context.params
 
-  return transportadoraVehiclesGET(req, { params: { transportadoraId: params.transportadoraId } } as any)
+  return transportadoraVehiclesGET(req, { params: Promise.resolve({ transportadoraId: params.transportadoraId, carrierId: params.transportadoraId }) } as any)
 }
 
 export async function POST(
@@ -17,5 +17,5 @@ export async function POST(
 ) {
   const params = await context.params
 
-  return transportadoraVehiclesPOST(req, { params: { transportadoraId: params.transportadoraId } } as any)
+  return transportadoraVehiclesPOST(req, { params: Promise.resolve({ transportadoraId: params.transportadoraId, carrierId: params.transportadoraId }) } as any)
 }

@@ -11,8 +11,6 @@ let nextConfig = {
     // ✅ Ignorar erros de tipo durante o build para permitir deploy
     ignoreBuildErrors: true,
   },
-  // Next.js 16: Empty turbopack config allows webpack to run in production
-  turbopack: {},
   async headers() {
     return [
       {
