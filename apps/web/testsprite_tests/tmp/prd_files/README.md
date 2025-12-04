@@ -324,7 +324,7 @@ O middleware (`web-app/middleware.ts`) protege automaticamente:
 ### Pré-requisitos
 
 - **Flutter SDK**: 3.24+
-- **Node.js**: 18.17.0+
+- **Node.js**: 22.x+
 - **npm**: 9.0.0+
 - **Git**: Última versão
 - **Supabase**: Conta e projeto criado

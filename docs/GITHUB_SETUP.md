@@ -127,7 +127,7 @@ CODECOV_TOKEN=your_codecov_token
 Em **Variables**, adicione:
 ```
 FLUTTER_VERSION=3.24.0
-NODE_VERSION=18
+NODE_VERSION=22
 ```
 
 ## 🔒 Configurações de Segurança

@@ -4,7 +4,7 @@ Este documento descreve como configurar e executar testes no projeto GolfFox usa
 
 ## 📋 Pré-requisitos
 
-1. **Node.js** instalado (versão 18 ou superior)
+1. **Node.js** instalado (versão 22 ou superior)
 2. **Supabase** configurado com projeto criado
 3. **Variáveis de ambiente** configuradas no `.env.local`
 4. **Servidor Next.js** rodando na porta 3000
