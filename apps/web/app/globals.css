@@ -48,45 +48,74 @@
        ======================================== */
 
     /* Backgrounds - Muito Branco Premium */
-    --bg: #FFFFFF;
-    --bg-soft: #F8FAFC;
-    --bg-elevated: #FFFFFF;
-    --bg-hover: #F1F5F9;
-    --bg-pattern: #FAFBFC;
+    --bg: 0 0% 100%;
+    /* #FFFFFF */
+    --bg-soft: 210 40% 98%;
+    /* #F8FAFC */
+    --bg-elevated: 0 0% 100%;
+    /* #FFFFFF */
+    --bg-hover: 214 32% 96%;
+    /* #F1F5F9 */
+    --bg-pattern: 210 25% 98%;
+    /* #FAFBFC */
 
     /* Text - Alta Contraste */
-    --ink: #0F172A;
-    --ink-strong: #020617;
-    --ink-muted: #64748B;
-    --ink-light: #94A3B8;
-    --ink-disabled: #CBD5E1;
+    --ink: 222 47% 11%;
+    /* #0F172A */
+    --ink-strong: 240 33% 4%;
+    /* #020617 */
+    --ink-muted: 215 14% 46%;
+    /* #64748B */
+    --ink-light: 215 16% 59%;
+    /* #94A3B8 */
+    --ink-disabled: 214 20% 80%;
+    /* #CBD5E1 */
 
     /* Brand - Laranja Assinatura */
-    --brand: #F97316;
-    --brand-hover: #FB923C;
-    --brand-light: #FFF7ED;
-    --brand-soft: #FFEDD5;
+    --brand: 25 95% 53%;
+    /* #F97316 */
+    --brand-hover: 27 96% 61%;
+    /* #FB923C */
+    --brand-light: 33 100% 96%;
+    /* #FFF7ED */
+    --brand-soft: 34 100% 92%;
+    /* #FFEDD5 */
 
     /* Accent - Azul Petróleo Profundo */
-    --accent: #1E3A5F;
-    --accent-dark: #0A2540;
-    --accent-soft: #2D4A6B;
-    --accent-light: #E8EFF7;
+    --accent: 208 52% 24%;
+    /* #1E3A5F */
+    --accent-dark: 211 75% 15%;
+    /* #0A2540 */
+    --accent-soft: 210 40% 30%;
+    /* #2D4A6B */
+    --accent-light: 213 56% 93%;
+    /* #E8EFF7 */
 
     /* Status Colors */
-    --success: #10B981;
-    --success-light: #D1FAE5;
-    --warning: #F59E0B;
-    --warning-light: #FEF3C7;
-    --error: #EF4444;
-    --error-light: #FEE2E2;
-    --info: #3B82F6;
-    --info-light: #DBEAFE;
+    --success: 158 64% 52%;
+    /* #10B981 */
+    --success-light: 152 69% 89%;
+    /* #D1FAE5 */
+    --warning: 38 92% 50%;
+    /* #F59E0B */
+    --warning-light: 48 97% 88%;
+    /* #FEF3C7 */
+    --error: 0 84% 60%;
+    /* #EF4444 */
+    --error-light: 0 93% 94%;
+    /* #FEE2E2 */
+    --info: 217 91% 60%;
+    /* #3B82F6 */
+    --info-light: 214 95% 93%;
+    /* #DBEAFE */
 
     /* Borders & Dividers */
-    --border: #E2E8F0;
-    --border-strong: #CBD5E1;
-    --border-light: #F1F5F9;
+    --border: 214 32% 91%;
+    /* #E2E8F0 */
+    --border-strong: 214 20% 80%;
+    /* #CBD5E1 */
+    --border-light: 214 32% 96%;
+    /* #F1F5F9 */
 
     /* Shadows - Premium Depth */
     --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.05);
@@ -148,50 +177,81 @@
   }
 
   .dark {
-    /* Backgrounds - Dark Mode */
-    --bg: #0B1220;
-    --bg-soft: #1E293B;
-    --bg-elevated: #1E293B;
-    --bg-hover: #334155;
-    --bg-pattern: #0F172A;
+    /* Backgrounds - Premium Dark Mode (Zinc-950 based) */
+    --bg: 240 10% 3.9%;
+    /* #09090B (Zinc-950) */
+    --bg-soft: 240 4% 16%;
+    /* #27272A (Zinc-800) */
+    --bg-elevated: 240 6% 10%;
+    /* #18181B (Zinc-900) */
+    --bg-hover: 240 5% 26%;
+    /* #3F3F46 (Zinc-700) */
+    --bg-pattern: 240 10% 3.9%;
+    /* #09090B */
 
     /* Text - Light for Dark */
-    --ink: #F1F5F9;
-    --ink-strong: #FFFFFF;
-    --ink-muted: #94A3B8;
-    --ink-light: #64748B;
-    --ink-disabled: #475569;
+    --ink: 0 0% 98%;
+    /* #FAFAFA (Zinc-50) */
+    --ink-strong: 0 0% 100%;
+    /* #FFFFFF */
+    --ink-muted: 240 5% 65%;
+    /* #A1A1AA (Zinc-400) */
+    --ink-light: 240 5% 41%;
+    /* #71717A (Zinc-500) */
+    --ink-disabled: 240 4% 46%;
+    /* #52525B (Zinc-600) */
 
-    /* Brand - Laranja mantém */
-    --brand: #F97316;
-    --brand-hover: #FB923C;
-    --brand-light: #1E293B;
-    --brand-soft: #334155;
+    /* Brand - Laranja mantém vibrante */
+    --brand: 25 95% 53%;
+    /* #F97316 */
+    --brand-hover: 27 96% 61%;
+    /* #FB923C */
+    --brand-light: 240 6% 10%;
+    /* #18181B (darker for dark mode) */
+    --brand-soft: 240 4% 16%;
+    /* #27272A */
 
-    /* Accent - Azul Petróleo mantém */
-    --accent: #1E3A5F;
-    --accent-dark: #0A2540;
-    --accent-soft: #2D4A6B;
-    --accent-light: #1E293B;
+    /* Accent - Azul Petróleo mais suave para dark */
+    --accent: 208 52% 35%;
+    /* Lighter blue for dark mode */
+    --accent-dark: 211 75% 20%;
+    /* #1A3B5C */
+    --accent-soft: 210 40% 40%;
+    /* Softer blue */
+    --accent-light: 240 6% 10%;
+    /* #18181B */
 
-    /* Status Colors mantém */
-    --success: #10B981;
-    --success-light: #064E3B;
-    --warning: #F59E0B;
-    --warning-light: #78350F;
-    --error: #EF4444;
-    --error-light: #7F1D1D;
-    --info: #3B82F6;
-    --info-light: #1E3A8A;
+    /* Status Colors - ajustados para dark mode */
+    --success: 158 64% 52%;
+    /* #10B981 */
+    --success-light: 158 30% 20%;
+    /* Darker green bg */
+    --warning: 38 92% 50%;
+    /* #F59E0B */
+    --warning-light: 38 50% 25%;
+    /* Darker yellow bg */
+    --error: 0 84% 60%;
+    /* #EF4444 */
+    --error-light: 0 50% 30%;
+    /* Darker red bg */
+    --info: 217 91% 60%;
+    /* #3B82F6 */
+    --info-light: 217 50% 25%;
+    /* Darker blue bg */
 
-    /* Borders & Dividers */
-    --border: #334155;
-    --border-strong: #475569;
-    --border-light: #1E293B;
+    /* Borders & Dividers - Subtle para dark mode */
+    --border: 240 4% 16%;
+    /* #27272A (Zinc-800) */
+    --border-strong: 240 5% 26%;
+    /* #3F3F46 (Zinc-700) */
+    --border-light: 240 6% 10%;
+    /* #18181B (Zinc-900) */
 
-    /* Glassmorphism Dark */
-    --glass-bg: rgba(30, 41, 59, 0.85);
-    --glass-border: rgba(51, 65, 85, 0.5);
+    /* Glassmorphism Dark - Premium */
+    --glass-bg: 240 10% 3.9% / 0.85;
+    /* rgba(9, 9, 11, 0.85) */
+    --glass-border: 240 4% 16% / 0.5;
+    /* rgba(39, 39, 42, 0.5) */
   }
 
   * {
