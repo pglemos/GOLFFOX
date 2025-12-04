@@ -64,6 +64,24 @@ export interface TestCompany {
   updated_at: string
 }
 
+export interface TestTrip {
+  id: string
+  route_id: string
+  vehicle_id?: string | null
+  driver_id?: string | null
+  status: string
+  scheduled_date?: string
+  scheduled_start_time?: string | null
+  start_time?: string | null
+  end_time?: string | null
+  actual_start_time?: string | null
+  actual_end_time?: string | null
+  distance_km?: number | null
+  notes?: string | null
+  created_at: string
+  updated_at: string
+}
+
 /**
  * Factory para criar usuários de teste
  */
@@ -169,6 +187,37 @@ export function createTestCompany(overrides: Partial<TestCompany> = {}): TestCom
     name: overrides.name || 'Empresa Teste',
     cnpj: overrides.cnpj || '12345678000190',
     is_active: overrides.is_active !== undefined ? overrides.is_active : true,
+    created_at: overrides.created_at || new Date().toISOString(),
+    updated_at: overrides.updated_at || new Date().toISOString(),
+    ...overrides,
+  }
+}
+
+/**
+ * Factory para criar viagem de teste
+ */
+export function createTestTrip(
+  routeId: string,
+  vehicleId?: string | null,
+  driverId?: string | null,
+  overrides: Partial<TestTrip> = {}
+): TestTrip {
+  const id = overrides.id || `trip-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+  
+  return {
+    id,
+    route_id: routeId,
+    vehicle_id: vehicleId || overrides.vehicle_id || null,
+    driver_id: driverId || overrides.driver_id || null,
+    status: overrides.status || 'scheduled',
+    scheduled_date: overrides.scheduled_date || new Date().toISOString().split('T')[0],
+    scheduled_start_time: overrides.scheduled_start_time || null,
+    start_time: overrides.start_time || null,
+    end_time: overrides.end_time || null,
+    actual_start_time: overrides.actual_start_time || null,
+    actual_end_time: overrides.actual_end_time || null,
+    distance_km: overrides.distance_km || null,
+    notes: overrides.notes || null,
     created_at: overrides.created_at || new Date().toISOString(),
     updated_at: overrides.updated_at || new Date().toISOString(),
     ...overrides,

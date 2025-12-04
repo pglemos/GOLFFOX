@@ -302,7 +302,7 @@ export async function POST(request: NextRequest) {
           })
         } else {
           // Usuário não encontrado na lista, mas erro diz que já existe
-          console.warn('⚠️ Erro indica que usuário existe, mas não foi encontrado na lista')
+          logger.warn('⚠️ Erro indica que usuário existe, mas não foi encontrado na lista')
           return NextResponse.json(
             { 
               error: 'Este email já está cadastrado no sistema de autenticação, mas não foi possível localizá-lo',
@@ -317,13 +317,13 @@ export async function POST(request: NextRequest) {
       // Se o erro for "Database error", pode ser que o usuário foi criado mas o trigger falhou
       // Vamos verificar se o usuário existe e tentar criar o perfil mesmo assim
       if (createUserError.message?.includes('Database error')) {
-        console.warn('⚠️ Erro de banco detectado, verificando se usuário foi criado...')
+        logger.warn('⚠️ Erro de banco detectado, verificando se usuário foi criado...')
         try {
           const { data: authUsers } = await supabaseAdmin.auth.admin.listUsers()
           const foundUser = authUsers?.users?.find((u: any) => u.email?.toLowerCase() === sanitizedEmail)
           
           if (foundUser) {
-            console.log('   ✅ Usuário encontrado apesar do erro de banco, continuando...')
+            logger.log('   ✅ Usuário encontrado apesar do erro de banco, continuando...')
             authData = { user: foundUser }
             createUserError = null
           } else {
@@ -385,10 +385,10 @@ export async function POST(request: NextRequest) {
     }
 
     const userId = authData.user.id
-    console.log(`✅ Usuário criado no Auth: ${userId}`)
+    logger.log(`✅ Usuário criado no Auth: ${userId}`)
 
     // 2. Criar registro na tabela users
-    console.log(`   Criando registro na tabela users para: ${userId}`)
+    logger.log(`   Criando registro na tabela users para: ${userId}`)
     const { error: userError } = await supabaseAdmin
       .from('users')
       .upsert({
@@ -413,7 +413,7 @@ export async function POST(request: NextRequest) {
       // Tentar remover usuário do Auth se possível
       try {
         await supabaseAdmin.auth.admin.deleteUser(userId)
-        console.log('✅ Usuário removido do Auth após falha')
+        logger.log('✅ Usuário removido do Auth após falha')
       } catch (deleteError) {
         console.error('❌ Erro ao remover usuário do Auth após falha:', deleteError)
       }
@@ -431,7 +431,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    console.log(`✅ Registro criado na tabela users para: ${sanitizedEmail}`)
+    logger.log(`✅ Registro criado na tabela users para: ${sanitizedEmail}`)
 
     // 3. Criar mapeamento na tabela gf_user_company_map (se existir)
     try {
@@ -445,15 +445,15 @@ export async function POST(request: NextRequest) {
 
       if (mapError && mapError.code !== '42P01') {
         // Se tabela não existir (42P01), ignorar
-        console.warn('⚠️ Erro ao criar mapeamento (pode não existir):', mapError.message)
+        logger.warn('⚠️ Erro ao criar mapeamento (pode não existir):', mapError.message)
       } else {
-        console.log(`✅ Mapeamento criado em gf_user_company_map`)
+        logger.log(`✅ Mapeamento criado em gf_user_company_map`)
       }
     } catch (mapErr) {
-      console.warn('⚠️ Erro ao criar mapeamento (ignorado):', mapErr)
+      logger.warn('⚠️ Erro ao criar mapeamento (ignorado):', mapErr)
     }
 
-    console.log(`✅ Login de operador criado com sucesso: ${sanitizedEmail} para empresa ${company.name}`)
+    logger.log(`✅ Login de operador criado com sucesso: ${sanitizedEmail} para empresa ${company.name}`)
 
     return NextResponse.json({
       success: true,

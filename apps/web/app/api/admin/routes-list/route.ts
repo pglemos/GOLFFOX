@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requireAuth } from '@/lib/api-auth'
+import { logger } from '@/lib/logger'
 
 export const runtime = 'nodejs'
 
@@ -16,14 +17,9 @@ function getSupabaseAdmin() {
 export async function GET(request: NextRequest) {
   try {
     // Validar autenticação (apenas admin) - mas permitir em desenvolvimento
-    const isDevelopment = process.env.NODE_ENV === 'development'
     const authErrorResponse = await requireAuth(request, 'admin')
-    if (authErrorResponse && !isDevelopment) {
+    if (authErrorResponse) {
       return authErrorResponse
-    }
-    // Em desenvolvimento, apenas logar aviso
-    if (authErrorResponse && isDevelopment) {
-      console.warn('⚠️ Autenticação falhou em desenvolvimento, mas continuando...')
     }
 
     const supabaseAdmin = getSupabaseAdmin()

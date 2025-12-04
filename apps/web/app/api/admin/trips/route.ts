@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requireAuth } from '@/lib/api-auth'
+import { logger } from '@/lib/logger'
 
 export const runtime = 'nodejs'
 
@@ -219,7 +220,7 @@ export async function POST(request: NextRequest) {
           
           if (!createRouteError && newRoute) {
             route = newRoute
-            console.log(`✅ Rota criada automaticamente para teste: ${routeId}`)
+            logger.log(`✅ Rota criada automaticamente para teste: ${routeId}`)
           }
         }
       }

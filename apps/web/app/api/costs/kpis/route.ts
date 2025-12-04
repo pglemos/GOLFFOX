@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabaseServiceRole } from '@/lib/supabase-server'
 import { requireAuth, validateAuth, requireCompanyAccess } from '@/lib/api-auth'
 import { withRateLimit } from '@/lib/rate-limit'
+import { logger } from '@/lib/logger'
 
 async function getCostsKpisHandler(request: NextRequest) {
   try {
@@ -14,7 +15,7 @@ async function getCostsKpisHandler(request: NextRequest) {
     const authError = await requireAuth(request, ['admin', 'operador'])
     if (authError) {
       if (isDevelopment) {
-        console.warn('⚠️ Auth falhou em desenvolvimento, continuando KPIs')
+        logger.warn('⚠️ Auth falhou em desenvolvimento, continuando KPIs')
       } else {
         return authError
       }
@@ -118,7 +119,7 @@ async function getCostsKpisHandler(request: NextRequest) {
     
     // Se view não existe, não é erro crítico, apenas não teremos dados de budget
     if (budgetError && !budgetError.message?.includes('does not exist') && !budgetError.message?.includes('relation')) {
-      console.warn('Erro ao buscar dados de budget:', budgetError)
+      logger.warn('Erro ao buscar dados de budget:', budgetError)
     }
 
     const response = {

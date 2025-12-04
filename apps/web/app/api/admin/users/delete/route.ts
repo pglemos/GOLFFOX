@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requireAuth } from '@/lib/api-auth'
+import { logger } from '@/lib/logger'
 
 export const runtime = 'nodejs'
 
@@ -24,13 +25,9 @@ export async function POST(request: NextRequest) {
 
 async function handleDelete(request: NextRequest) {
   try {
-    const isDevelopment = process.env.NODE_ENV === 'development'
     const authErrorResponse = await requireAuth(request, 'admin')
-    if (authErrorResponse && !isDevelopment) {
+    if (authErrorResponse) {
       return authErrorResponse
-    }
-    if (authErrorResponse && isDevelopment) {
-      console.warn('⚠️ Autenticação falhou em desenvolvimento, mas continuando...')
     }
 
     // Aceitar tanto query param quanto body
@@ -61,7 +58,7 @@ async function handleDelete(request: NextRequest) {
     // então excluir da tabela users também excluirá do Auth automaticamente
     // As foreign keys com ON DELETE CASCADE vão excluir automaticamente dados relacionados
     
-    console.log(`🗑️ Tentando excluir usuário: ${userId}`)
+    logger.log(`🗑️ Tentando excluir usuário: ${userId}`)
     
     // Primeiro, setar driver_id para NULL em trips se o usuário for motorista
     await supabaseAdmin
@@ -90,7 +87,7 @@ async function handleDelete(request: NextRequest) {
       )
     }
 
-    console.log(`✅ Usuário excluído com sucesso: ${userId}`, data)
+    logger.log(`✅ Usuário excluído com sucesso: ${userId}`, data)
 
     return NextResponse.json({
       success: true,

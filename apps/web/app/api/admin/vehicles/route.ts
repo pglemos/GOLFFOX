@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabaseServiceRole } from '@/lib/supabase-server'
 import { requireAuth } from '@/lib/api-auth'
 import { z } from 'zod'
+import { logger } from '@/lib/logger'
 
 export const runtime = 'nodejs'
 
@@ -110,16 +111,16 @@ export async function POST(request: NextRequest) {
           
           if (!createCompanyError && newCompany) {
             finalCompanyId = newCompany.id
-            console.log(`✅ Empresa de teste criada automaticamente: ${finalCompanyId}`)
+            logger.log(`✅ Empresa de teste criada automaticamente: ${finalCompanyId}`)
           } else if (createCompanyError && createCompanyError.code !== '23505') {
             // Se erro não for de duplicação, logar
-            console.warn('⚠️ Erro ao criar empresa de teste:', createCompanyError)
+            logger.warn('⚠️ Erro ao criar empresa de teste:', createCompanyError)
           } else {
             // Se erro for de duplicação, usar o ID padrão
             finalCompanyId = testCompanyId
           }
         } catch (e) {
-          console.warn('⚠️ Erro ao criar empresa de teste:', e)
+          logger.warn('⚠️ Erro ao criar empresa de teste:', e)
         }
       }
     }
@@ -153,7 +154,7 @@ export async function POST(request: NextRequest) {
     if (createError) {
       // Em modo de teste/desenvolvimento, retornar resposta simulada para qualquer erro
       if (isTestMode || isDevelopment) {
-        console.warn('⚠️ Erro ao criar veículo em modo de teste/desenvolvimento, retornando resposta simulada:', createError.message)
+        logger.warn('⚠️ Erro ao criar veículo em modo de teste/desenvolvimento, retornando resposta simulada:', createError.message)
         // Gerar ID único baseado na placa
         const mockId = `mock-vehicle-${validated.plate.replace(/[^a-zA-Z0-9]/g, '-')}-${Date.now()}`
         return NextResponse.json({

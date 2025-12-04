@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { logger } from '@/lib/logger'
 
 // Helper para criar cliente admin
 function getSupabaseAdmin() {
@@ -138,10 +139,10 @@ export async function POST(
       if (found) {
         authUserId = found.id
         existingAuthUser = true
-        console.log('Motorista já existe no Auth, usando ID existente:', authUserId)
+        logger.log('Motorista já existe no Auth, usando ID existente:', authUserId)
       }
     } catch (listErr) {
-      console.warn('Não foi possível verificar usuários existentes no Auth:', listErr)
+      logger.warn('Não foi possível verificar usuários existentes no Auth:', listErr)
     }
 
     // 2. Criar usuário no Auth se não existir

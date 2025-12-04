@@ -14,6 +14,8 @@ export class MockSupabaseClient {
   private data: Map<string, any[]> = new Map()
   private rpcHandlers: Map<string, Function> = new Map()
   private authHandlers: Map<string, Function> = new Map()
+  private authUsers: Map<string, any> = new Map() // auth.users mock
+  private storageFiles: Map<string, Map<string, Buffer>> = new Map() // bucket -> path -> file
 
   from(table: string) {
     return new MockSupabaseQueryBuilder(this, table)
@@ -86,6 +88,217 @@ export class MockSupabaseClient {
         error: null,
       }
     }),
+    admin: {
+      createUser: jest.fn(async (options: { email: string; password?: string; user_metadata?: any; email_confirm?: boolean }) => {
+        const handler = this.authHandlers.get('admin.createUser')
+        if (handler) return handler(options)
+        
+        const userId = `auth-user-${Date.now()}-${Math.random()}`
+        const user = {
+          id: userId,
+          email: options.email,
+          email_confirmed_at: options.email_confirm ? new Date().toISOString() : null,
+          user_metadata: options.user_metadata || {},
+          app_metadata: {},
+          created_at: new Date().toISOString(),
+        }
+        this.authUsers.set(userId, user)
+        this.authUsers.set(options.email.toLowerCase(), user) // Index by email
+        
+        return {
+          data: { user },
+          error: null,
+        }
+      }),
+      updateUserById: jest.fn(async (userId: string, updates: { email?: string; password?: string; user_metadata?: any; email_confirm?: boolean }) => {
+        const handler = this.authHandlers.get('admin.updateUserById')
+        if (handler) return handler(userId, updates)
+        
+        const user = this.authUsers.get(userId)
+        if (!user) {
+          return {
+            data: { user: null },
+            error: { message: 'User not found', status: 404 },
+          }
+        }
+        
+        const updated = {
+          ...user,
+          ...(updates.email && { email: updates.email }),
+          ...(updates.user_metadata && { user_metadata: { ...user.user_metadata, ...updates.user_metadata } }),
+          ...(updates.email_confirm && { email_confirmed_at: new Date().toISOString() }),
+          updated_at: new Date().toISOString(),
+        }
+        this.authUsers.set(userId, updated)
+        if (updates.email) {
+          this.authUsers.delete(user.email.toLowerCase())
+          this.authUsers.set(updates.email.toLowerCase(), updated)
+        }
+        
+        return {
+          data: { user: updated },
+          error: null,
+        }
+      }),
+      deleteUser: jest.fn(async (userId: string) => {
+        const handler = this.authHandlers.get('admin.deleteUser')
+        if (handler) return handler(userId)
+        
+        const user = this.authUsers.get(userId)
+        if (!user) {
+          return {
+            data: { user: null },
+            error: { message: 'User not found', status: 404 },
+          }
+        }
+        
+        this.authUsers.delete(userId)
+        this.authUsers.delete(user.email.toLowerCase())
+        
+        return {
+          data: { user },
+          error: null,
+        }
+      }),
+      listUsers: jest.fn(async (options?: { page?: number; perPage?: number }) => {
+        const handler = this.authHandlers.get('admin.listUsers')
+        if (handler) return handler(options)
+        
+        const users = Array.from(this.authUsers.values()).filter(u => u.id && !u.email.includes('@')) // Filter out email-indexed entries
+        const page = options?.page || 1
+        const perPage = options?.perPage || 1000
+        const start = (page - 1) * perPage
+        const end = start + perPage
+        
+        return {
+          data: {
+            users: users.slice(start, end),
+            total: users.length,
+          },
+          error: null,
+        }
+      }),
+      getUserById: jest.fn(async (userId: string) => {
+        const handler = this.authHandlers.get('admin.getUserById')
+        if (handler) return handler(userId)
+        
+        const user = this.authUsers.get(userId)
+        if (!user) {
+          return {
+            data: { user: null },
+            error: { message: 'User not found', status: 404 },
+          }
+        }
+        
+        return {
+          data: { user },
+          error: null,
+        }
+      }),
+      getUserByEmail: jest.fn(async (email: string) => {
+        const handler = this.authHandlers.get('admin.getUserByEmail')
+        if (handler) return handler(email)
+        
+        const user = this.authUsers.get(email.toLowerCase())
+        if (!user) {
+          return {
+            data: { user: null },
+            error: { message: 'User not found', status: 404 },
+          }
+        }
+        
+        return {
+          data: { user },
+          error: null,
+        }
+      }),
+    },
+  }
+
+  storage = {
+    from: (bucket: string) => ({
+      upload: jest.fn(async (path: string, file: Buffer | File, options?: { contentType?: string; upsert?: boolean; cacheControl?: string }) => {
+        const handler = this.authHandlers.get(`storage.${bucket}.upload`)
+        if (handler) return handler(path, file, options)
+        
+        if (!this.storageFiles.has(bucket)) {
+          this.storageFiles.set(bucket, new Map())
+        }
+        const bucketFiles = this.storageFiles.get(bucket)!
+        
+        const buffer = file instanceof File ? Buffer.from(await file.arrayBuffer()) : file
+        
+        if (!options?.upsert && bucketFiles.has(path)) {
+          return {
+            data: null,
+            error: { message: 'File already exists', status: 409 },
+          }
+        }
+        
+        bucketFiles.set(path, buffer)
+        
+        return {
+          data: { path },
+          error: null,
+        }
+      }),
+      createSignedUrl: jest.fn(async (path: string, expiresIn: number) => {
+        const handler = this.authHandlers.get(`storage.${bucket}.createSignedUrl`)
+        if (handler) return handler(path, expiresIn)
+        
+        const bucketFiles = this.storageFiles.get(bucket)
+        if (!bucketFiles || !bucketFiles.has(path)) {
+          return {
+            data: null,
+            error: { message: 'File not found', status: 404 },
+          }
+        }
+        
+        const baseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://mock.supabase.co'
+        const signedUrl = `${baseUrl}/storage/v1/object/sign/${bucket}/${path}?expires=${Date.now() + expiresIn * 1000}`
+        
+        return {
+          data: { signedUrl },
+          error: null,
+        }
+      }),
+      getPublicUrl: jest.fn((path: string) => {
+        const handler = this.authHandlers.get(`storage.${bucket}.getPublicUrl`)
+        if (handler) return handler(path)
+        
+        const baseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://mock.supabase.co'
+        const publicUrl = `${baseUrl}/storage/v1/object/public/${bucket}/${path}`
+        
+        return {
+          data: { publicUrl },
+        }
+      }),
+      remove: jest.fn(async (paths: string[]) => {
+        const handler = this.authHandlers.get(`storage.${bucket}.remove`)
+        if (handler) return handler(paths)
+        
+        const bucketFiles = this.storageFiles.get(bucket)
+        if (!bucketFiles) {
+          return {
+            data: [],
+            error: null,
+          }
+        }
+        
+        const removed = paths.filter(path => {
+          if (bucketFiles.has(path)) {
+            bucketFiles.delete(path)
+            return true
+          }
+          return false
+        })
+        
+        return {
+          data: removed.map(path => ({ path })),
+          error: null,
+        }
+      }),
+    }),
   }
 
   rpc(functionName: string, params?: any) {
@@ -116,10 +329,23 @@ export class MockSupabaseClient {
     this.authHandlers.set(method, handler)
   }
 
+  setAuthUser(userId: string, user: any) {
+    this.authUsers.set(userId, user)
+    if (user.email) {
+      this.authUsers.set(user.email.toLowerCase(), user)
+    }
+  }
+
+  getAuthUser(userId: string) {
+    return this.authUsers.get(userId)
+  }
+
   clear() {
     this.data.clear()
     this.rpcHandlers.clear()
     this.authHandlers.clear()
+    this.authUsers.clear()
+    this.storageFiles.clear()
   }
 }
 

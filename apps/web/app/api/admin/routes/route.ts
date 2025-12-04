@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requireAuth } from '@/lib/api-auth'
+import { logger } from '@/lib/logger'
 
 export const runtime = 'nodejs'
 
@@ -77,16 +78,16 @@ export async function POST(request: NextRequest) {
           
           if (!createCompanyError && newCompany) {
             finalCompanyId = newCompany.id
-            console.log(`✅ Empresa de teste criada automaticamente: ${finalCompanyId}`)
+            logger.log(`✅ Empresa de teste criada automaticamente: ${finalCompanyId}`)
           } else if (createCompanyError && createCompanyError.code !== '23505') {
             // Se erro não for de duplicação, logar
-            console.warn('⚠️ Erro ao criar empresa de teste:', createCompanyError)
+            logger.warn('⚠️ Erro ao criar empresa de teste:', createCompanyError)
           } else {
             // Se erro for de duplicação, usar o ID padrão
             finalCompanyId = testCompanyId
           }
         } catch (e) {
-          console.warn('⚠️ Erro ao criar empresa de teste:', e)
+          logger.warn('⚠️ Erro ao criar empresa de teste:', e)
         }
       } else {
         return NextResponse.json(
@@ -131,7 +132,7 @@ export async function POST(request: NextRequest) {
 
     // Se erro por coluna destination não existir, tentar sem destination
     if (createError && (createError.message?.includes('destination') || createError.code === 'PGRST204')) {
-      console.warn('⚠️ Coluna destination não existe, tentando criar rota sem destination')
+      logger.warn('⚠️ Coluna destination não existe, tentando criar rota sem destination')
       const routeDataWithoutDestination: Record<string, any> = {
         name: name,
         company_id: finalCompanyId,
@@ -163,7 +164,7 @@ export async function POST(request: NextRequest) {
         createError.message?.includes('table') ||
         createError.code === '42P01'
       )) {
-        console.warn('⚠️ Tabela routes não existe, retornando resposta simulada em modo de teste')
+        logger.warn('⚠️ Tabela routes não existe, retornando resposta simulada em modo de teste')
         return NextResponse.json({
           success: true,
           route: {

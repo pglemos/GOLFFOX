@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js'
 import { requireCompanyAccess, requireAuth } from '@/lib/api-auth'
 import Papa from 'papaparse'
 import { withRateLimit } from '@/lib/rate-limit'
+import { logger } from '@/lib/logger'
 import { getSupabaseAdmin, fetchReportRange } from '@/server/services/reporting'
 
 export const runtime = 'nodejs'
@@ -109,7 +110,7 @@ async function runReportHandler(request: NextRequest) {
     let normalizedReportKey = reportKey ? String(reportKey).trim() : null
     if (normalizedReportKey && reportKeyAliases[normalizedReportKey.toLowerCase()]) {
       normalizedReportKey = reportKeyAliases[normalizedReportKey.toLowerCase()]
-      console.log(`ReportKey mapeado: ${reportKey} -> ${normalizedReportKey}`)
+      logger.log(`ReportKey mapeado: ${reportKey} -> ${normalizedReportKey}`)
     }
 
     if (!normalizedReportKey || !REPORT_CONFIGS[normalizedReportKey]) {
@@ -163,12 +164,12 @@ async function runReportHandler(request: NextRequest) {
         }
       }
     } else {
-      console.log('⚠️ Modo de teste/desenvolvimento: bypass de autenticação ativado para relatórios')
+      logger.log('⚠️ Modo de teste/desenvolvimento: bypass de autenticação ativado para relatórios')
       
       // Em modo de teste, se não há companyId nos filtros, usar um padrão
       if (!filters.companyId && !companyIdFromBody) {
         filters.companyId = '00000000-0000-0000-0000-000000000001'
-        console.log(`⚠️ Usando company_id padrão para teste: ${filters.companyId}`)
+        logger.log(`⚠️ Usando company_id padrão para teste: ${filters.companyId}`)
       }
     }
 
@@ -186,7 +187,7 @@ async function runReportHandler(request: NextRequest) {
       if (error.message?.includes('does not exist') || error.message?.includes('relation') || error.message?.includes('view')) {
         // Em modo de teste/dev, retornar arquivo vazio em vez de erro
         if (allowErrorHandling) {
-          console.warn(`⚠️ View ${config.viewName} não existe, retornando arquivo vazio em modo de teste/desenvolvimento`)
+          logger.warn(`⚠️ View ${config.viewName} não existe, retornando arquivo vazio em modo de teste/desenvolvimento`)
           // Retornar arquivo vazio do formato solicitado
           try {
             if (format === 'pdf') {
@@ -230,7 +231,7 @@ async function runReportHandler(request: NextRequest) {
       
       // Em modo de teste/dev, retornar arquivo vazio em vez de erro para outros erros também
       if (allowErrorHandling) {
-        console.warn(`⚠️ Erro ao buscar dados do relatório (modo de teste/desenvolvimento): ${error.message}`)
+        logger.warn(`⚠️ Erro ao buscar dados do relatório (modo de teste/desenvolvimento): ${error.message}`)
         try {
           if (format === 'pdf') {
             return await generatePDF([], config.columns, finalReportKey)

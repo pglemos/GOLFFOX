@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { logger } from '@/lib/logger'
 
 export const runtime = 'nodejs'
 
@@ -71,7 +72,7 @@ export async function GET(req: NextRequest) {
           transportadora_id: transportadoraId || null
         }, { onConflict: 'id' })
       if (upsertError) {
-        console.warn('Falha ao upsert users:', upsertError.message)
+        logger.warn('Falha ao upsert users:', upsertError.message)
       }
     }
 

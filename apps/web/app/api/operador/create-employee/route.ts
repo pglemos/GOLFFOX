@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requireAuth } from '@/lib/api-auth'
+import { logger } from '@/lib/logger'
 
 export const runtime = 'nodejs'
 
@@ -86,7 +87,7 @@ export async function POST(request: NextRequest) {
         
         // Se a tabela não existe, usar ID padrão para modo de teste
         if (companiesError && (companiesError.message?.includes('does not exist') || companiesError.message?.includes('relation') || companiesError.code === '42P01')) {
-          console.warn('⚠️ Tabela companies não existe, usando ID padrão em modo de teste')
+          logger.warn('⚠️ Tabela companies não existe, usando ID padrão em modo de teste')
           defaultCompanyId = '00000000-0000-0000-0000-000000000001' // ID padrão para teste
         } else if (companies && companies.length > 0) {
           defaultCompanyId = companies[0].id
@@ -106,18 +107,18 @@ export async function POST(request: NextRequest) {
               defaultCompanyId = newCompany.id
             } else if (createError && (createError.message?.includes('does not exist') || createError.message?.includes('relation') || createError.code === '42P01')) {
               // Se a tabela não existe, usar ID padrão
-              console.warn('⚠️ Tabela companies não existe, usando ID padrão em modo de teste')
+              logger.warn('⚠️ Tabela companies não existe, usando ID padrão em modo de teste')
               defaultCompanyId = '00000000-0000-0000-0000-000000000001'
             }
           } catch (createException: any) {
             // Se erro ao criar, usar ID padrão
-            console.warn('⚠️ Erro ao criar empresa padrão, usando ID padrão em modo de teste:', createException.message)
+            logger.warn('⚠️ Erro ao criar empresa padrão, usando ID padrão em modo de teste:', createException.message)
             defaultCompanyId = '00000000-0000-0000-0000-000000000001'
           }
         }
       } catch (e: any) {
         // Se erro inesperado, usar ID padrão
-        console.warn('⚠️ Erro ao buscar empresas, usando ID padrão em modo de teste:', e.message)
+        logger.warn('⚠️ Erro ao buscar empresas, usando ID padrão em modo de teste:', e.message)
         defaultCompanyId = '00000000-0000-0000-0000-000000000001'
       }
       
@@ -208,7 +209,7 @@ export async function POST(request: NextRequest) {
       }
       
       const finalCompanyId = company_id || operatorCompanyId
-      console.log('🔍 [CREATE-EMPLOYEE] Usuário existente - company_id debug:', {
+      logger.log('🔍 [CREATE-EMPLOYEE] Usuário existente - company_id debug:', {
         company_id_from_body: company_id,
         authenticatedUser_companyId: authenticatedUser?.companyId,
         operatorCompanyId,
@@ -220,7 +221,7 @@ export async function POST(request: NextRequest) {
       
       if (finalCompanyId) {
         try {
-          console.log('📝 [CREATE-EMPLOYEE] Inserindo em gf_employee_company:', {
+          logger.log('📝 [CREATE-EMPLOYEE] Inserindo em gf_employee_company:', {
             company_id: finalCompanyId,
             name: name || email.split('@')[0],
             email: email.toLowerCase()
@@ -258,7 +259,7 @@ export async function POST(request: NextRequest) {
 
           if (existingEmployee?.id) {
             // Update existing
-            console.log('📝 [CREATE-EMPLOYEE] Atualizando registro existente em gf_employee_company:', existingEmployee.id)
+            logger.log('📝 [CREATE-EMPLOYEE] Atualizando registro existente em gf_employee_company:', existingEmployee.id)
             const result = await supabase
               .from('gf_employee_company')
               .update(employeeData)
@@ -266,7 +267,7 @@ export async function POST(request: NextRequest) {
               .select()
             insertedData = result.data
             ecError = result.error
-            console.log('📝 [CREATE-EMPLOYEE] Resultado do update:', {
+            logger.log('📝 [CREATE-EMPLOYEE] Resultado do update:', {
               hasData: !!insertedData,
               dataLength: insertedData?.length,
               error: ecError?.message,
@@ -274,15 +275,15 @@ export async function POST(request: NextRequest) {
             })
           } else {
             // Insert new
-            console.log('📝 [CREATE-EMPLOYEE] Inserindo novo registro em gf_employee_company')
-            console.log('📝 [CREATE-EMPLOYEE] Dados a inserir:', JSON.stringify(employeeData, null, 2))
+            logger.log('📝 [CREATE-EMPLOYEE] Inserindo novo registro em gf_employee_company')
+            logger.log('📝 [CREATE-EMPLOYEE] Dados a inserir:', JSON.stringify(employeeData, null, 2))
             const result = await supabase
               .from('gf_employee_company')
               .insert(employeeData)
               .select()
             insertedData = result.data
             ecError = result.error
-            console.log('📝 [CREATE-EMPLOYEE] Resultado do insert:', {
+            logger.log('📝 [CREATE-EMPLOYEE] Resultado do insert:', {
               hasData: !!insertedData,
               dataLength: insertedData?.length,
               insertedId: insertedData?.[0]?.id,
@@ -294,7 +295,7 @@ export async function POST(request: NextRequest) {
           }
           
           if (ecError) {
-            console.warn('⚠️ Erro ao criar/atualizar gf_employee_company para usuário existente:', {
+            logger.warn('⚠️ Erro ao criar/atualizar gf_employee_company para usuário existente:', {
               message: ecError.message,
               code: ecError.code,
               details: ecError.details,
@@ -302,10 +303,10 @@ export async function POST(request: NextRequest) {
             })
           } else {
             employeeCompanyCreated = true
-            console.log('✅ Registro criado/atualizado em gf_employee_company:', { insertedData })
+            logger.log('✅ Registro criado/atualizado em gf_employee_company:', { insertedData })
           }
         } catch (ecException: any) {
-          console.warn('⚠️ Exceção ao criar gf_employee_company para usuário existente:', ecException.message)
+          logger.warn('⚠️ Exceção ao criar gf_employee_company para usuário existente:', ecException.message)
         }
       }
       
@@ -336,7 +337,7 @@ export async function POST(request: NextRequest) {
           companyId = userData.company_id
         }
       } catch (e) {
-        console.warn('Erro ao buscar company_id do usuário:', e)
+        logger.warn('Erro ao buscar company_id do usuário:', e)
       }
     }
     
@@ -385,7 +386,7 @@ export async function POST(request: NextRequest) {
             const user = existingUser?.users?.find((u: any) => u.email === email.toLowerCase())
             
             if (user) {
-              console.warn('⚠️ Usuário já existe no Auth, retornando dados do usuário existente')
+              logger.warn('⚠️ Usuário já existe no Auth, retornando dados do usuário existente')
               
               // Garantir que está em gf_employee_company
               const finalCompanyId = company_id || companyId || authenticatedUser?.companyId
@@ -393,7 +394,7 @@ export async function POST(request: NextRequest) {
               
               if (finalCompanyId && finalCompanyId !== '00000000-0000-0000-0000-000000000001') {
                 try {
-                  console.log('📝 [CREATE-EMPLOYEE] Inserindo em gf_employee_company (Auth já existe):', {
+                  logger.log('📝 [CREATE-EMPLOYEE] Inserindo em gf_employee_company (Auth já existe):', {
                     company_id: finalCompanyId,
                     name: name || email.split('@')[0],
                     email: email.toLowerCase(),
@@ -423,13 +424,13 @@ export async function POST(request: NextRequest) {
                     .select()
                   
                   if (ecError) {
-                    console.warn('⚠️ Erro ao criar/atualizar gf_employee_company (Auth já existe):', ecError.message, ecError.code, ecError.details)
+                    logger.warn('⚠️ Erro ao criar/atualizar gf_employee_company (Auth já existe):', ecError.message, ecError.code, ecError.details)
                   } else {
                     employeeCompanyCreated = true
-                    console.log('✅ Registro criado/atualizado em gf_employee_company (Auth já existe):', { insertedData })
+                    logger.log('✅ Registro criado/atualizado em gf_employee_company (Auth já existe):', { insertedData })
                   }
                 } catch (ecException: any) {
-                  console.warn('⚠️ Exceção ao criar gf_employee_company (Auth já existe):', ecException.message)
+                  logger.warn('⚠️ Exceção ao criar gf_employee_company (Auth já existe):', ecException.message)
                 }
               }
               
@@ -445,7 +446,7 @@ export async function POST(request: NextRequest) {
           }
           
           // Para outros erros em modo de teste, retornar resposta simulada
-          console.warn('⚠️ Erro ao criar usuário no Auth em modo de teste, retornando resposta simulada')
+          logger.warn('⚠️ Erro ao criar usuário no Auth em modo de teste, retornando resposta simulada')
           const finalCompanyId = companyId || authenticatedUser?.companyId || '00000000-0000-0000-0000-000000000001'
           return NextResponse.json({
             userId: 'test-user-' + Date.now(),
@@ -513,7 +514,7 @@ export async function POST(request: NextRequest) {
       if (userError) {
         // Em modo de teste/dev, se a tabela não existe, retornar resposta simulada
         if ((isTestMode || isDevelopment) && (userError.message?.includes('does not exist') || userError.message?.includes('relation') || userError.code === '42P01')) {
-          console.warn('⚠️ Tabela users não existe, retornando resposta simulada em modo de teste')
+          logger.warn('⚠️ Tabela users não existe, retornando resposta simulada em modo de teste')
           // Não deletar o usuário do Auth, pois foi criado com sucesso
           return NextResponse.json({
             userId: authData.user.id,
@@ -525,7 +526,7 @@ export async function POST(request: NextRequest) {
         }
         // Se já existe registro com mesma PK, considerar sucesso idempotente
         if (userError.code === '23505' || (userError.message?.toLowerCase().includes('duplicate key') && userError.message?.toLowerCase().includes('users_pkey'))) {
-          console.warn('⚠️ Registro de usuário já existe, retornando sucesso idempotente')
+          logger.warn('⚠️ Registro de usuário já existe, retornando sucesso idempotente')
           
           // Mesmo se usuário já existe, garantir que está em gf_employee_company
           const finalCompanyId = company_id || companyId || authenticatedUser?.companyId
@@ -533,7 +534,7 @@ export async function POST(request: NextRequest) {
           
           if (finalCompanyId && finalCompanyId !== '00000000-0000-0000-0000-000000000001') {
             try {
-              console.log('📝 [CREATE-EMPLOYEE] Inserindo em gf_employee_company (duplicate key):', {
+              logger.log('📝 [CREATE-EMPLOYEE] Inserindo em gf_employee_company (duplicate key):', {
                 company_id: finalCompanyId,
                 name: name || email.split('@')[0],
                 email: email.toLowerCase(),
@@ -563,13 +564,13 @@ export async function POST(request: NextRequest) {
                 .select()
               
               if (ecError) {
-                console.warn('⚠️ Erro ao criar/atualizar gf_employee_company (duplicate key):', ecError.message, ecError.code, ecError.details)
+                logger.warn('⚠️ Erro ao criar/atualizar gf_employee_company (duplicate key):', ecError.message, ecError.code, ecError.details)
               } else {
                 employeeCompanyCreated = true
-                console.log('✅ Registro criado/atualizado em gf_employee_company (duplicate key):', { insertedData })
+                logger.log('✅ Registro criado/atualizado em gf_employee_company (duplicate key):', { insertedData })
               }
             } catch (ecException: any) {
-              console.warn('⚠️ Exceção ao criar gf_employee_company (duplicate key):', ecException.message)
+              logger.warn('⚠️ Exceção ao criar gf_employee_company (duplicate key):', ecException.message)
             }
           }
           
@@ -597,7 +598,7 @@ export async function POST(request: NextRequest) {
           if (userError2) {
             // Em modo de teste/dev, se ainda falhar, retornar resposta simulada
             if ((isTestMode || isDevelopment) && (userError2.message?.includes('does not exist') || userError2.message?.includes('relation') || userError2.code === '42P01')) {
-              console.warn('⚠️ Tabela users não existe, retornando resposta simulada em modo de teste')
+              logger.warn('⚠️ Tabela users não existe, retornando resposta simulada em modo de teste')
               return NextResponse.json({
                 userId: authData.user.id,
                 created: true,
@@ -623,7 +624,7 @@ export async function POST(request: NextRequest) {
         } else {
           // Em modo de teste/dev, se a tabela não existe, retornar resposta simulada
           if ((isTestMode || isDevelopment) && (userError.message?.includes('does not exist') || userError.message?.includes('relation') || userError.code === '42P01')) {
-            console.warn('⚠️ Tabela users não existe, retornando resposta simulada em modo de teste')
+            logger.warn('⚠️ Tabela users não existe, retornando resposta simulada em modo de teste')
             return NextResponse.json({
               userId: authData.user.id,
               created: true,
@@ -652,7 +653,7 @@ export async function POST(request: NextRequest) {
       // Erro inesperado
       // Em modo de teste/dev, se a tabela não existe, retornar resposta simulada
       if ((isTestMode || isDevelopment) && authData?.user?.id && (e.message?.includes('does not exist') || e.message?.includes('relation') || e.code === '42P01')) {
-        console.warn('⚠️ Erro inesperado em modo de teste (tabela não existe), retornando resposta simulada')
+        logger.warn('⚠️ Erro inesperado em modo de teste (tabela não existe), retornando resposta simulada')
         return NextResponse.json({
           userId: authData.user.id,
           created: true,
@@ -684,7 +685,7 @@ export async function POST(request: NextRequest) {
     let employeeCompanyCreated = false
     if (finalCompanyId && finalCompanyId !== '00000000-0000-0000-0000-000000000001') {
       try {
-        console.log('📝 [CREATE-EMPLOYEE] Inserindo novo em gf_employee_company:', {
+        logger.log('📝 [CREATE-EMPLOYEE] Inserindo novo em gf_employee_company:', {
           company_id: finalCompanyId,
           name: name || email.split('@')[0],
           email: email.toLowerCase()
@@ -714,13 +715,13 @@ export async function POST(request: NextRequest) {
           .select()
         
         if (ecError) {
-          console.warn('⚠️ Erro ao criar registro em gf_employee_company (não crítico):', ecError.message, ecError.code, ecError.details)
+          logger.warn('⚠️ Erro ao criar registro em gf_employee_company (não crítico):', ecError.message, ecError.code, ecError.details)
         } else {
           employeeCompanyCreated = true
-          console.log('✅ Registro criado em gf_employee_company:', { insertedData })
+          logger.log('✅ Registro criado em gf_employee_company:', { insertedData })
         }
       } catch (ecException: any) {
-        console.warn('⚠️ Exceção ao criar gf_employee_company (não crítico):', ecException.message)
+        logger.warn('⚠️ Exceção ao criar gf_employee_company (não crítico):', ecException.message)
       }
     }
     

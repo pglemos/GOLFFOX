@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requireCompanyAccess, validateAuth } from '@/lib/api-auth'
 import { withRateLimit } from '@/lib/rate-limit'
+import { logger } from '@/lib/logger'
 
 export const runtime = 'nodejs'
 
@@ -88,7 +89,7 @@ async function schedulePostHandler(request: NextRequest) {
     // Se não há usuário autenticado mas está em modo de teste, criar usuário mock
     // Em modo de teste, não definir created_by (será null)
     if (!authenticatedUser && allowAuthBypass) {
-      console.log('⚠️ Modo de teste/desenvolvimento: usando usuário mock para agendamento de relatórios')
+      logger.log('⚠️ Modo de teste/desenvolvimento: usando usuário mock para agendamento de relatórios')
       // Não criar usuário mock com ID inválido - deixar authenticatedUser como null
       // O created_by será null em modo de teste
     }
@@ -103,7 +104,7 @@ async function schedulePostHandler(request: NextRequest) {
       } else {
         // Em modo de teste, permitir criar sem companyId
         if (allowAuthBypass) {
-          console.log('⚠️ Modo de teste: criando agendamento sem companyId')
+          logger.log('⚠️ Modo de teste: criando agendamento sem companyId')
           finalCompanyId = null
         } else {
           return NextResponse.json(
@@ -152,7 +153,7 @@ async function schedulePostHandler(request: NextRequest) {
     let normalizedReportKey = finalReportKey
     if (finalReportKey && reportKeyAliases[finalReportKey.toLowerCase()]) {
       normalizedReportKey = reportKeyAliases[finalReportKey.toLowerCase()]
-      console.log(`ReportKey mapeado: ${finalReportKey} -> ${normalizedReportKey}`)
+      logger.log(`ReportKey mapeado: ${finalReportKey} -> ${normalizedReportKey}`)
     }
 
     // Validar reportKey
@@ -255,7 +256,7 @@ async function schedulePostHandler(request: NextRequest) {
           
           if (!companiesError && companies) {
             insertData.company_id = companies.id
-            console.log(`⚠️ Modo de teste: usando companyId existente: ${companies.id}`)
+            logger.log(`⚠️ Modo de teste: usando companyId existente: ${companies.id}`)
           } else {
             // Se não há empresas, retornar erro informativo
             return NextResponse.json(
@@ -307,7 +308,7 @@ async function schedulePostHandler(request: NextRequest) {
         if (error.message?.includes('does not exist') || error.message?.includes('relation') || error.message?.includes('table') || error.message?.includes('column')) {
           // Se erro for sobre coluna created_by, tentar novamente sem ela
           if (error.message?.includes('created_by')) {
-            console.log('⚠️ Erro com created_by, tentando sem essa coluna...')
+            logger.log('⚠️ Erro com created_by, tentando sem essa coluna...')
             delete insertData.created_by
             const retryResult = await supabase
               .from('gf_report_schedules')

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { logger } from '@/lib/logger'
 
 function tryDecode(cookieValue: string): any | null {
   try {
@@ -33,7 +34,7 @@ export async function GET(request: NextRequest) {
     const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
     
     // #region agent log
-    console.log('[DEBUG H2] /api/auth/me - Query params:', { 
+    logger.log('[DEBUG H2] /api/auth/me - Query params:', { 
       userId: userData.id, 
       hasServiceKey: !!supabaseServiceKey,
       hasUrl: !!supabaseUrl 
@@ -54,9 +55,9 @@ export async function GET(request: NextRequest) {
         .maybeSingle()
 
       // #region agent log
-      console.log('[DEBUG H2] /api/auth/me - FULL dbUser from database:', JSON.stringify(dbUser, null, 2));
-      console.log('[DEBUG H2] /api/auth/me - avatar_url specifically:', dbUser?.avatar_url);
-      if (dbError) console.log('[DEBUG H2] /api/auth/me - DB ERROR:', JSON.stringify(dbError));
+      logger.log('[DEBUG H2] /api/auth/me - FULL dbUser from database:', JSON.stringify(dbUser, null, 2));
+      logger.log('[DEBUG H2] /api/auth/me - avatar_url specifically:', dbUser?.avatar_url);
+      if (dbError) logger.log('[DEBUG H2] /api/auth/me - DB ERROR:', JSON.stringify(dbError));
       // #endregion
 
       if (dbUser) {
@@ -75,7 +76,7 @@ export async function GET(request: NextRequest) {
       }
     } else {
       // #region agent log
-      console.log('[DEBUG H2] /api/auth/me - MISSING service key, falling back to cookie data');
+      logger.log('[DEBUG H2] /api/auth/me - MISSING service key, falling back to cookie data');
       // #endregion
     }
   } catch (error) {

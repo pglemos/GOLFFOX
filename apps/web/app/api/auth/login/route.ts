@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { createClient } from '@supabase/supabase-js'
 import { getUserRoleByEmail } from '@/lib/user-role'
+import { logger } from '@/lib/logger'
 import { debug, error as logError } from '@/lib/logger'
 import { withRateLimit } from '@/lib/rate-limit'
 
@@ -476,7 +477,7 @@ async function loginHandler(req: NextRequest) {
 
     response.headers.set('Set-Cookie', cookieOptions)
 
-    console.log('✅ Login bem-sucedido - cookie customizado criado:', {
+    logger.log('✅ Login bem-sucedido - cookie customizado criado:', {
       userId: userPayload.id,
       email: userPayload.email,
       name: userPayload.name,

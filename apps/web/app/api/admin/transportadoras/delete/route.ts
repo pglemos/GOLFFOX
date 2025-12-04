@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseServiceRole } from '@/lib/supabase-server'
 import { requireAuth } from '@/lib/api-auth'
+import { logger } from '@/lib/logger'
 
 export const runtime = 'nodejs'
 
@@ -115,13 +116,13 @@ export async function DELETE(req: NextRequest) {
           .eq('transportadora_id', carrierId)
 
         if (costsError) {
-          console.warn('Aviso ao atualizar costs (pode não existir):', costsError)
+          logger.warn('Aviso ao atualizar costs (pode não existir):', costsError)
           // Não falhar se a tabela não existir ou não tiver a coluna
         }
       }
     } catch (costsError: any) {
       // Ignorar erros relacionados à tabela costs (pode não existir)
-      console.warn('Tabela costs não encontrada ou sem coluna transportadora_id, continuando...')
+      logger.warn('Tabela costs não encontrada ou sem coluna transportadora_id, continuando...')
     }
 
     // 5. Agora podemos excluir a transportadora

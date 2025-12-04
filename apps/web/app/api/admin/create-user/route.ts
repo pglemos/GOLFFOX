@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requireAuth } from '@/lib/api-auth'
+import { logger } from '@/lib/logger'
 
 export const runtime = 'nodejs'
 
@@ -127,10 +128,10 @@ export async function POST(request: NextRequest) {
             const { data: authUsers } = await supabaseAdmin.auth.admin.listUsers()
             existingAuthUser = authUsers?.users?.find((u: any) => u.email?.toLowerCase() === sanitizedEmail)
         } catch (listError) {
-            console.warn('⚠️ Não foi possível verificar usuários no Auth (continuando):', listError)
+            logger.warn('⚠️ Não foi possível verificar usuários no Auth (continuando):', listError)
         }
 
-        console.log(`🔐 Criando usuário (${targetRole}) para empresa ${company.name}...`)
+        logger.log(`🔐 Criando usuário (${targetRole}) para empresa ${company.name}...`)
 
         let authData: any = null
         let createUserError: any = null
@@ -140,7 +141,7 @@ export async function POST(request: NextRequest) {
         // #endregion
 
         if (existingAuthUser) {
-            console.log('   Usando usuário existente no Auth')
+            logger.log('   Usando usuário existente no Auth')
             authData = { user: existingAuthUser }
             createUserError = null
         } else {
@@ -153,7 +154,7 @@ export async function POST(request: NextRequest) {
                 })
 
                 if (createResult.error && createResult.error.message?.includes('Database error')) {
-                    console.warn('⚠️ Erro de banco detectado, tentando abordagem alternativa...')
+                    logger.warn('⚠️ Erro de banco detectado, tentando abordagem alternativa...')
                     createResult = await supabaseAdmin.auth.admin.createUser({
                         email: sanitizedEmail,
                         password: sanitizedPassword,

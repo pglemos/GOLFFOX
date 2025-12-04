@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requireAuth } from '@/lib/api-auth'
+import { logger } from '@/lib/logger'
 
 export const runtime = 'nodejs'
 
@@ -15,13 +16,9 @@ function getSupabaseAdmin() {
 
 export async function DELETE(request: NextRequest) {
   try {
-    const isDevelopment = process.env.NODE_ENV === 'development'
     const authErrorResponse = await requireAuth(request, 'admin')
-    if (authErrorResponse && !isDevelopment) {
+    if (authErrorResponse) {
       return authErrorResponse
-    }
-    if (authErrorResponse && isDevelopment) {
-      console.warn('⚠️ Autenticação falhou em desenvolvimento, mas continuando...')
     }
 
     const { searchParams } = new URL(request.url)
@@ -44,7 +41,7 @@ export async function DELETE(request: NextRequest) {
     // - gf_driver_events (eventos do motorista)
     // - trips.driver_id tem ON DELETE SET NULL, então setamos manualmente
     
-    console.log(`🗑️ Tentando excluir motorista: ${driverId}`)
+    logger.log(`🗑️ Tentando excluir motorista: ${driverId}`)
     
     // Primeiro, setar driver_id para NULL em trips (mesmo que seja SET NULL, fazemos explicitamente)
     await supabaseAdmin
@@ -74,7 +71,7 @@ export async function DELETE(request: NextRequest) {
       )
     }
 
-    console.log(`✅ Motorista excluído com sucesso: ${driverId}`, data)
+    logger.log(`✅ Motorista excluído com sucesso: ${driverId}`, data)
 
     return NextResponse.json({
       success: true,

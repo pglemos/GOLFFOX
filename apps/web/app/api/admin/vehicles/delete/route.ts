@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requireAuth } from '@/lib/api-auth'
+import { logger } from '@/lib/logger'
 
 export const runtime = 'nodejs'
 
@@ -15,13 +16,9 @@ function getSupabaseAdmin() {
 
 export async function DELETE(request: NextRequest) {
   try {
-    const isDevelopment = process.env.NODE_ENV === 'development'
     const authErrorResponse = await requireAuth(request, 'admin')
-    if (authErrorResponse && !isDevelopment) {
+    if (authErrorResponse) {
       return authErrorResponse
-    }
-    if (authErrorResponse && isDevelopment) {
-      console.warn('⚠️ Autenticação falhou em desenvolvimento, mas continuando...')
     }
 
     const { searchParams } = new URL(request.url)
@@ -41,7 +38,7 @@ export async function DELETE(request: NextRequest) {
     // - trips.vehicle_id tem ON DELETE SET NULL, mas precisamos setar manualmente para evitar erro
     // - Outras tabelas com CASCADE serão excluídas automaticamente
     
-    console.log(`🗑️ Tentando excluir veículo: ${vehicleId}`)
+    logger.log(`🗑️ Tentando excluir veículo: ${vehicleId}`)
     
     // Primeiro, setar vehicle_id para NULL em trips (mesmo que seja SET NULL, fazemos explicitamente)
     await supabaseAdmin
@@ -70,7 +67,7 @@ export async function DELETE(request: NextRequest) {
       )
     }
 
-    console.log(`✅ Veículo excluído com sucesso: ${vehicleId}`, data)
+    logger.log(`✅ Veículo excluído com sucesso: ${vehicleId}`, data)
 
     return NextResponse.json({
       success: true,

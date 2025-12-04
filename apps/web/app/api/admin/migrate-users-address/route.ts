@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requireAuth } from '@/lib/api-auth'
+import { logger } from '@/lib/logger'
 
 export const runtime = 'nodejs'
 
@@ -69,7 +70,7 @@ export async function POST(request: NextRequest) {
 
     if (error) {
       // Se a função exec_sql não existir, tentar criar as colunas uma a uma
-      console.log('Tentando migração alternativa...')
+      logger.log('Tentando migração alternativa...')
       
       const columns = [
         { name: 'address_zip_code', type: 'VARCHAR(10)' },

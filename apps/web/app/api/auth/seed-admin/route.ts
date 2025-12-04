@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { logger } from '@/lib/logger'
 
 export const runtime = 'nodejs'
 
@@ -66,7 +67,7 @@ export async function GET(req: NextRequest) {
         }, { onConflict: 'id' })
       if (upsertError) {
         // Não falhar o endpoint por causa da tabela; apenas log
-        console.warn('Falha ao upsert users:', upsertError.message)
+        logger.warn('Falha ao upsert users:', upsertError.message)
       }
     }
 
