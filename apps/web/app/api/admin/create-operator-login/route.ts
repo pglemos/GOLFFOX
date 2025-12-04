@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requireAuth } from '@/lib/api-auth'
+import { logger } from '@/lib/logger'
 
 export const runtime = 'nodejs'
 
@@ -15,13 +16,9 @@ function getSupabaseAdmin() {
 
 export async function POST(request: NextRequest) {
   try {
-    const isDevelopment = process.env.NODE_ENV === 'development'
     const authErrorResponse = await requireAuth(request, 'admin')
-    if (authErrorResponse && !isDevelopment) {
+    if (authErrorResponse) {
       return authErrorResponse
-    }
-    if (authErrorResponse && isDevelopment) {
-      console.warn('⚠️ Autenticação falhou em desenvolvimento, mas continuando...')
     }
 
     const body = await request.json()
@@ -115,18 +112,18 @@ export async function POST(request: NextRequest) {
       existingAuthUser = authUsers?.users?.find((u: any) => u.email?.toLowerCase() === sanitizedEmail)
       
       if (existingAuthUser) {
-        console.warn('⚠️ Email já existe no Auth, mas não na tabela users')
+        logger.warn('⚠️ Email já existe no Auth, mas não na tabela users')
         // Vamos tentar usar o usuário existente
       }
     } catch (listError) {
-      console.warn('⚠️ Não foi possível verificar usuários no Auth (continuando):', listError)
+      logger.warn('⚠️ Não foi possível verificar usuários no Auth (continuando):', listError)
       // Não bloquear se não conseguir listar
     }
 
-    console.log(`🔐 Criando login de operador para empresa ${company.name}...`)
-    console.log(`   Email: ${sanitizedEmail}`)
-    console.log(`   Nome: ${sanitizedName}`)
-    console.log(`   Configuração Supabase:`, {
+    logger.log(`🔐 Criando login de operador para empresa ${company.name}...`)
+    logger.log(`   Email: ${sanitizedEmail}`)
+    logger.log(`   Nome: ${sanitizedName}`)
+    logger.log(`   Configuração Supabase:`, {
       url: process.env.NEXT_PUBLIC_SUPABASE_URL ? 'Configurado' : 'NÃO CONFIGURADO',
       serviceKey: process.env.SUPABASE_SERVICE_ROLE_KEY ? 'Configurado' : 'NÃO CONFIGURADO'
     })
@@ -136,13 +133,13 @@ export async function POST(request: NextRequest) {
     
     // Se usuário já existe no Auth, usar ele
     if (existingAuthUser) {
-      console.log('   Usando usuário existente no Auth')
+      logger.log('   Usando usuário existente no Auth')
       authData = { user: existingAuthUser }
       createUserError = null
     } else {
       // Tentar criar novo usuário com múltiplas estratégias
       try {
-        console.log('   Tentando criar novo usuário no Auth...')
+        logger.log('   Tentando criar novo usuário no Auth...')
         
         // Estratégia 1: Criar usuário básico sem metadata
         let createResult = await supabaseAdmin.auth.admin.createUser({
@@ -157,7 +154,7 @@ export async function POST(request: NextRequest) {
         // Se falhar com "Database error", pode ser problema de trigger
         // Tentar criar diretamente via SQL se possível, ou usar abordagem alternativa
         if (createResult.error && createResult.error.message?.includes('Database error')) {
-          console.warn('⚠️ Erro de banco detectado, tentando abordagem alternativa...')
+          logger.warn('⚠️ Erro de banco detectado, tentando abordagem alternativa...')
           
           // Tentar criar sem email_confirm e sem metadata
           createResult = await supabaseAdmin.auth.admin.createUser({
@@ -167,7 +164,7 @@ export async function POST(request: NextRequest) {
           
           // Se ainda falhar, tentar criar o usuário de forma mais básica possível
           if (createResult.error && createResult.error.message?.includes('Database error')) {
-            console.warn('⚠️ Erro persistente, tentando criar usuário sem confirmação de email...')
+            logger.warn('⚠️ Erro persistente, tentando criar usuário sem confirmação de email...')
             
             // Última tentativa: criar sem nenhuma opção adicional
             try {
@@ -178,7 +175,7 @@ export async function POST(request: NextRequest) {
               })
             } catch (e) {
               // Se ainda falhar, vamos tentar continuar e criar o perfil manualmente
-              console.warn('⚠️ Erro ao criar no auth, mas vamos tentar criar perfil manualmente')
+              logger.warn('⚠️ Erro ao criar no auth, mas vamos tentar criar perfil manualmente')
             }
           }
         }
@@ -189,18 +186,18 @@ export async function POST(request: NextRequest) {
         // Se houver erro mas o usuário foi criado mesmo assim (pode acontecer com Database error)
         if (createUserError && !authData?.user) {
           // Verificar se o usuário foi criado mesmo com erro
-          console.log('   Verificando se usuário foi criado apesar do erro...')
+          logger.log('   Verificando se usuário foi criado apesar do erro...')
           try {
             const { data: authUsers } = await supabaseAdmin.auth.admin.listUsers()
             const foundUser = authUsers?.users?.find((u: any) => u.email?.toLowerCase() === sanitizedEmail)
             
             if (foundUser) {
-              console.log('   ✅ Usuário encontrado apesar do erro, usando existente')
+              logger.log('   ✅ Usuário encontrado apesar do erro, usando existente')
               authData = { user: foundUser }
               createUserError = null
             }
           } catch (listErr) {
-            console.warn('   ⚠️ Não foi possível verificar usuários:', listErr)
+            logger.warn('   ⚠️ Não foi possível verificar usuários:', listErr)
           }
         }
         
@@ -214,18 +211,18 @@ export async function POST(request: NextRequest) {
           // Se o erro for de usuário já existente, tentar buscar
           if (createUserError.message?.toLowerCase().includes('already') || 
               createUserError.message?.toLowerCase().includes('exists')) {
-            console.log('   Erro indica que usuário já existe, buscando...')
+            logger.log('   Erro indica que usuário já existe, buscando...')
             const { data: authUsers } = await supabaseAdmin.auth.admin.listUsers()
             const foundUser = authUsers?.users?.find((u: any) => u.email?.toLowerCase() === sanitizedEmail)
             
             if (foundUser) {
-              console.log('   ✅ Usuário encontrado, usando existente')
+              logger.log('   ✅ Usuário encontrado, usando existente')
               authData = { user: foundUser }
               createUserError = null
             }
           }
         } else {
-          console.log('✅ Usuário criado com sucesso no Auth')
+          logger.log('✅ Usuário criado com sucesso no Auth')
         }
       } catch (err: any) {
         console.error('❌ Exceção ao chamar createUser:', err)
@@ -251,7 +248,7 @@ export async function POST(request: NextRequest) {
         (createUserError as any).code === 'user_already_registered'
       
       if (isAlreadyRegistered) {
-        console.log('🔍 Usuário já existe, tentando buscar e atualizar...')
+        logger.log('🔍 Usuário já existe, tentando buscar e atualizar...')
         // Buscar usuário existente
         const { data: existingUsers, error: listError } = await supabaseAdmin.auth.admin.listUsers()
         
@@ -262,7 +259,7 @@ export async function POST(request: NextRequest) {
         const existingUser = existingUsers?.users?.find((u: any) => u.email?.toLowerCase() === email.toLowerCase())
         
         if (existingUser) {
-          console.warn('⚠️ Usuário já existe, atualizando company_id')
+          logger.warn('⚠️ Usuário já existe, atualizando company_id')
           const userId = existingUser.id
           
           // Atualizar company_id na tabela users

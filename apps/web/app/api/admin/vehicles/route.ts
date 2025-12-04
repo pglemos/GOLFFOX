@@ -73,16 +73,9 @@ export async function POST(request: NextRequest) {
         if (authErrorResponse) return authErrorResponse
       }
     } else if (authHeader && authHeader.startsWith('Bearer ')) {
-      // Em desenvolvimento, ainda tentar validar se tem token (mas não bloquear se falhar)
-      try {
-        const authErrorResponse = await requireAuth(request, 'admin')
-        if (authErrorResponse && isDevelopment) {
-          console.warn('⚠️ Autenticação falhou em desenvolvimento, mas continuando...')
-        } else if (authErrorResponse) {
-          return authErrorResponse
-        }
-      } catch (e) {
-        console.warn('⚠️ Erro ao validar autenticação:', e)
+      const authErrorResponse = await requireAuth(request, 'admin')
+      if (authErrorResponse) {
+        return authErrorResponse
       }
     }
 
