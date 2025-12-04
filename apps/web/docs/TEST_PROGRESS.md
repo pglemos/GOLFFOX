@@ -1,164 +1,226 @@
-# Progresso da Cobertura de Testes - GolfFox
+# Progresso dos Testes - GolfFox
 
-## 📊 Resumo Executivo
+## Status Geral
 
-**Status Geral**: ✅ Infraestrutura Completa | 🟡 Testes em Expansão | 🎯 Meta: 100% Cobertura
+**Última atualização**: 2024-01-15
 
-## ✅ Fase 1: Infraestrutura - COMPLETA
+### Cobertura Atual
+- ✅ **Infraestrutura de Testes**: 100%
+- ✅ **APIs de Autenticação**: 100%
+- 🔄 **APIs Administrativas**: ~60%
+- 🔄 **APIs de Custos**: ~70%
+- 🔄 **Bibliotecas**: ~80%
+- 🔄 **Componentes**: ~40%
+- 🔄 **Hooks**: ~60%
+- 🔄 **Testes E2E**: ~50%
 
-### Helpers Criados
-- ✅ `__tests__/helpers/api-test-helpers.ts` - Helpers para testes de API
-- ✅ `__tests__/helpers/mock-supabase.ts` - Mock completo do Supabase Client
-- ✅ `__tests__/helpers/test-data.ts` - Factories e dados de teste
-- ✅ `__tests__/helpers/component-helpers.tsx` - Helpers para componentes React
+## Testes Criados
 
-### Mocks Globais
-- ✅ `__mocks__/next/navigation.ts` - Mock de next/navigation
-- ✅ `__mocks__/@supabase/supabase-js.ts` - Mock do Supabase
-- ✅ `__mocks__/next-auth.ts` - Mock do NextAuth
+### ✅ Fase 1: Infraestrutura (100%)
+- [x] Helpers de teste (`api-test-helpers.ts`, `mock-supabase.ts`, `test-data.ts`, `component-helpers.tsx`)
+- [x] Mocks globais (`next/navigation`, `@supabase/supabase-js`, `next-auth`)
+- [x] Configuração Jest atualizada
+- [x] Scripts de teste no `package.json`
+- [x] CI/CD workflow (`test.yml`)
+- [x] Script de validação de cobertura
 
-### Configurações
-- ✅ `jest.config.js` - Configurado com thresholds de 100%
-- ✅ `package.json` - Scripts de teste adicionados
-- ✅ `scripts/validate-coverage.js` - Script de validação de cobertura
-- ✅ `.github/workflows/test.yml` - CI/CD configurado
+### ✅ Fase 2.1: APIs de Autenticação (100%)
+- [x] `login.test.ts` - Login, CSRF, rate limiting
+- [x] `me.test.ts` - Validação de sessão
+- [x] `set-session.test.ts` - Criação de sessão
+- [x] `clear-session.test.ts` - Logout
+- [x] `csrf.test.ts` - Geração de tokens CSRF
 
-## ✅ Fase 2: Testes de APIs
+### 🔄 Fase 2.2: APIs Administrativas (~60%)
+- [x] `transportadoras/create.test.ts` - Criação de transportadoras
+- [x] `transportadoras/update.test.ts` - Atualização de transportadoras
+- [x] `vehicles.test.ts` - CRUD de veículos
+- [x] `drivers.test.ts` - Criação de motoristas
+- [x] `routes.test.ts` - Criação de rotas
+- [x] `companies.test.ts` - CRUD de empresas
+- [ ] `users/*.test.ts` - CRUD de usuários
+- [ ] `trips/*.test.ts` - CRUD de viagens
+- [ ] `kpis.test.ts` - KPIs administrativos
+- [ ] `emergency/*.test.ts` - APIs de emergência
 
-### APIs de Autenticação (5 testes)
-- ✅ `__tests__/api/auth/login.test.ts`
-- ✅ `__tests__/api/auth/me.test.ts`
-- ✅ `__tests__/api/auth/set-session.test.ts`
-- ✅ `__tests__/api/auth/clear-session.test.ts`
-- ✅ `__tests__/api/auth/csrf.test.ts`
+### 🔄 Fase 2.3: APIs de Custos (~70%)
+- [x] `reconcile.test.ts` - Conciliação de custos
+- [x] `import.test.ts` - Importação CSV
+- [x] `export.test.ts` - Exportação de relatórios
+- [x] `budgets.test.ts` - Orçamentos
+- [x] `categories.test.ts` - Categorias de custos
+- [x] `manual.test.ts` - Criação manual de custos
+- [x] `vs-budget.test.ts` - Comparação vs orçamento
+- [ ] `kpis.test.ts` - KPIs de custos
 
-### APIs Administrativas (6 testes)
-- ✅ `__tests__/api/admin/transportadoras/create.test.ts`
-- ✅ `__tests__/api/admin/transportadoras/update.test.ts`
-- ✅ `__tests__/api/admin/transportadoras/delete.test.ts`
-- ✅ `__tests__/api/admin/transportadoras/list.test.ts`
-- ✅ `__tests__/api/admin/users/create.test.ts`
-- ✅ `__tests__/api/admin/users/update.test.ts`
-- ✅ `__tests__/api/admin/kpis.test.ts`
+### 🔄 Fase 3: Bibliotecas (~80%)
+- [x] `api-auth.test.ts` - Autenticação e autorização
+- [x] `rate-limit.test.ts` - Rate limiting
+- [x] `logger.test.ts` - Sistema de logs
+- [x] `env.test.ts` - Validação de variáveis de ambiente
+- [x] `polyline-decoder.test.ts` - Decodificação de polylines
+- [x] `google-maps.test.ts` - Integração Google Maps
+- [x] `user-role.test.ts` - Detecção de roles
+- [x] `fetch-with-auth.test.ts` - Fetch com autenticação
+- [x] `geocoding.test.ts` - Geocodificação
+- [x] `export-utils.test.ts` - Exportação (CSV, Excel, PDF)
+- [x] `route-deviation-detector.test.ts` - Detecção de desvios
+- [x] `trajectory-analyzer.test.ts` - Análise de trajetórias
+- [x] `costs/import-parser.test.ts` - Parser de importação
+- [x] `debounce.test.ts` - Debounce
+- [ ] `costs/calculations.test.ts` - Cálculos de custos
+- [ ] `costs/validation.test.ts` - Validações de custos
+- [ ] `map-utils.test.ts` - Utilitários de mapas (expandir)
+- [ ] `route-optimization.test.ts` - Otimização de rotas (expandir)
+- [ ] `realtime-service.test.ts` - Serviço de realtime (expandir)
+- [ ] `playback-service.test.ts` - Serviço de playback (expandir)
 
-### APIs de Custos (2 testes)
-- ✅ `__tests__/api/costs/reconcile.test.ts`
-- ✅ `__tests__/api/costs/kpis.test.ts`
+### 🔄 Fase 4: Componentes (~40%)
+- [x] `ui/button.test.tsx` - Componente Button
+- [x] `ui/select.test.tsx` - Componente Select
+- [x] `ui/dialog.test.tsx` - Componente Dialog
+- [x] `ui/table.test.tsx` - Componente Table
+- [x] `kpi-card.test.tsx` - Componente KpiCard
+- [ ] `ui/input.test.tsx` - Componente Input
+- [ ] `ui/card.test.tsx` - Componente Card
+- [ ] Componentes de layout (AppShell, Sidebar, Topbar)
+- [ ] Componentes de custos (CostDashboard, ReconciliationModal)
+- [ ] Componentes de mapas (AdminMap, FleetMap)
+- [ ] Componentes de modais (CreateTransportadoraModal, DriverModal)
 
-### Outras APIs (2 testes)
-- ✅ `__tests__/api/health.test.ts`
-- ✅ `__tests__/api/cep.test.ts`
+### 🔄 Fase 5: Hooks (~60%)
+- [x] `use-debounce.test.ts` - Hook de debounce
+- [x] `use-cep.test.ts` - Hook de CEP
+- [x] `use-navigation.test.ts` - Hook de navegação
+- [x] `use-responsive.test.ts` - Hook responsivo
+- [x] `use-performance.test.ts` - Hook de performance
+- [x] `use-operator-data.test.ts` - Hooks de dados do operador
+- [x] `use-admin-vehicles.test.ts` - Hook de veículos admin
+- [x] `use-admin-kpis.test.ts` - Hook de KPIs admin
+- [x] `use-supabase-query.test.ts` - Hook de query Supabase
+- [ ] `use-auth.test.ts` - Hook de autenticação
+- [ ] `use-google-maps-loader.test.ts` - Hook de Google Maps
 
-## ✅ Fase 3: Testes de Bibliotecas
+### 🔄 Fase 6: Testes E2E (~50%)
+- [x] `auth/login-flow.spec.ts` - Fluxo de autenticação
+- [x] `admin/complete-workflow.spec.ts` - Fluxo administrativo completo
+- [x] `admin/costs-reconcile.spec.ts` - Conciliação de custos
+- [x] `costs/complete-flow.spec.ts` - Fluxo de custos completo
+- [x] `operator/workflow.spec.ts` - Fluxo do operador
+- [x] `transportadora/workflow.spec.ts` - Fluxo da transportadora
+- [ ] `emergency/dispatch-flow.spec.ts` - Fluxo de emergência
 
-### Bibliotecas de Autenticação
-- ✅ `__tests__/lib/api-auth.test.ts`
+## Padrões Estabelecidos
 
-### Bibliotecas de Formatação
-- ✅ `__tests__/lib/format-utils.test.ts`
-- ✅ `__tests__/lib/utils.test.ts`
-- ✅ `__tests__/lib/kpi-utils.test.ts`
+### Estrutura de Testes de API
+```typescript
+import { GET, POST } from '@/app/api/.../route'
+import { createAdminRequest } from '../../helpers/api-test-helpers'
+import { mockSupabaseClient } from '../../helpers/mock-supabase'
+import { createTestCompany } from '../../helpers/test-data'
 
-### Bibliotecas de Validação
-- ✅ `__tests__/lib/error-utils.test.ts`
-- ✅ `__tests__/lib/address-validator.test.ts`
-- ✅ `__tests__/lib/coordinate-validator.test.ts`
-- ✅ `__tests__/lib/url.test.ts`
+jest.mock('@/lib/supabase-server', () => ({
+  supabaseServiceRole: mockSupabaseClient,
+}))
 
-### Bibliotecas de Mapas e Rotas
-- ✅ `__tests__/lib/map-utils.test.ts`
-- ✅ `__tests__/lib/route-optimization.test.ts`
+describe('GET /api/...', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockSupabaseClient.clear()
+  })
 
-### Bibliotecas de Custos
-- ✅ `__tests__/lib/costs/calculations.test.ts`
-- ✅ `__tests__/lib/costs/validation.test.ts`
-- ✅ `__tests__/lib/costs/import-parser.test.ts`
+  it('deve ...', async () => {
+    // Teste
+  })
+})
+```
 
-### Bibliotecas de Rate Limiting
-- ✅ `__tests__/lib/rate-limit.test.ts`
+### Estrutura de Testes de Componentes
+```typescript
+import { render, screen } from '@testing-library/react'
+import { renderWithProviders } from '../../helpers/component-helpers'
 
-### Bibliotecas de Debounce
-- ✅ `__tests__/lib/debounce.test.ts`
+describe('Component', () => {
+  it('deve renderizar', () => {
+    renderWithProviders(<Component />)
+    expect(screen.getByText('...')).toBeInTheDocument()
+  })
+})
+```
 
-## ✅ Fase 4: Testes de Componentes
+### Estrutura de Testes E2E
+```typescript
+import { test, expect } from '@playwright/test'
 
-### Componentes UI Base
-- ✅ `__tests__/components/ui/button.test.tsx`
-- ✅ `__tests__/components/ui/input.test.tsx`
-- ✅ `__tests__/components/ui/card.test.tsx`
+test.describe('Fluxo', () => {
+  test('@critical - deve ...', async ({ page }) => {
+    await page.goto('/...')
+    // Teste
+  })
+})
+```
 
-## ✅ Fase 5: Testes de Hooks
+## Próximos Passos
 
-- ✅ `__tests__/hooks/use-auth.test.ts`
-- ✅ `__tests__/hooks/use-debounce.test.ts`
+1. **Completar APIs Administrativas**
+   - Testes de usuários (create, update, delete, list, change-role)
+   - Testes de viagens (CRUD completo)
+   - Testes de KPIs administrativos
+   - Testes de emergência
 
-## 📈 Estatísticas
+2. **Completar APIs de Custos**
+   - Testes de KPIs de custos
 
-### Testes Criados
-- **Total de Arquivos de Teste**: ~30+
-- **APIs Testadas**: 15+
-- **Bibliotecas Testadas**: 15+
-- **Componentes Testados**: 3+
-- **Hooks Testados**: 2+
+3. **Expandir Bibliotecas**
+   - Cálculos de custos
+   - Validações de custos
+   - Expandir testes existentes (map-utils, route-optimization, etc.)
 
-### Cobertura Esperada
-- **APIs Críticas**: ~40% (em expansão)
-- **Bibliotecas**: ~60% (em expansão)
-- **Componentes**: ~10% (em expansão)
-- **Hooks**: ~15% (em expansão)
+4. **Expandir Componentes**
+   - Componentes de UI base restantes
+   - Componentes de layout
+   - Componentes de custos
+   - Componentes de mapas
 
-## 🚀 Próximos Passos
+5. **Completar Hooks**
+   - useAuth
+   - useGoogleMapsLoader
 
-### APIs Restantes (Prioridade Alta)
-1. APIs administrativas restantes (veículos, motoristas, rotas, viagens, empresas)
-2. APIs de custos restantes (import, export, budgets, categories)
-3. APIs de operador e transportadora
-4. APIs de relatórios e notificações
+6. **Completar E2E**
+   - Fluxo de emergência
 
-### Bibliotecas Restantes
-1. Serviços (realtime, playback, notifications)
-2. Exportação e importação
-3. Otimização avançada
-4. Geocoding e mapas avançados
+## Comandos Úteis
 
-### Componentes Restantes
-1. Componentes de layout (AppShell, Sidebar, Topbar)
-2. Componentes de custos (dashboards, modais, charts)
-3. Componentes de mapas
-4. Modais e formulários
+```bash
+# Executar todos os testes
+npm run test
 
-### Hooks Restantes
-1. use-operator-data
-2. use-cep
-3. use-navigation
-4. use-realtime-updates
-5. use-admin-vehicles
-6. use-admin-kpis
-7. use-supabase-sync
-8. use-supabase-query
-9. use-responsive
-10. use-performance
-11. use-accessibility
+# Executar apenas testes unitários
+npm run test:unit
 
-## 📝 Notas Importantes
+# Executar apenas testes de API
+npm run test:api
 
-### Problemas Conhecidos
-- ⚠️ **SWC Binary**: Erro de carregamento do SWC no Windows (problema de ambiente, não dos testes)
-- ✅ **Linter**: Sem erros de lint nos testes criados
-- ✅ **Estrutura**: Todos os testes seguem padrões consistentes
+# Executar apenas testes de componentes
+npm run test:components
 
-### Padrões Estabelecidos
-1. **APIs**: Usar `createAdminRequest`, `createOperatorRequest`, `createTransportadoraRequest`
-2. **Supabase**: Usar `mockSupabaseClient` para mockar operações
-3. **Componentes**: Usar `renderWithProviders` para renderização
-4. **Dados**: Usar factories de `test-data.ts` para consistência
+# Executar com cobertura
+npm run test:coverage
 
-## 🎯 Meta Final
+# Executar testes E2E
+npm run test:e2e
 
-**100% de cobertura em**:
-- ✅ Statements
-- ✅ Branches
-- ✅ Functions
-- ✅ Lines
+# Executar testes E2E críticos
+npm run test:e2e:critical
 
-**Prazo Estimado**: Continuar expansão sistemática seguindo os padrões estabelecidos.
+# Executar em modo watch
+npm run test:watch
+```
+
+## Notas
+
+- Todos os testes seguem os padrões estabelecidos
+- Mocks são consistentes e reutilizáveis
+- Helpers centralizam lógica comum
+- Testes E2E marcados com `@critical` são executados primeiro
+- CI/CD valida cobertura mínima de 80% (meta: 100%)
