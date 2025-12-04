@@ -1,6 +1,6 @@
-# Estado Atual das Dependências - Antes da Atualização
+# Estado Atual das Dependências - Atualizado para React 19
 
-Data: $(Get-Date -Format "yyyy-MM-dd HH:mm:ss")
+Data: 2025-01-XX (Atualizado)
 
 ## Dependências Principais
 
@@ -14,15 +14,16 @@ Data: $(Get-Date -Format "yyyy-MM-dd HH:mm:ss")
 - `@radix-ui/react-popover`: ^1.1.2
 - `@radix-ui/react-progress`: ^1.1.0
 - `@radix-ui/react-radio-group`: ^1.2.1
-- `@radix-ui/react-scroll-area`: ^2.2.10
+- `@radix-ui/react-scroll-area`: ^1.2.10
 - `@radix-ui/react-select`: ^2.1.2
 - `@radix-ui/react-separator`: ^1.1.0
 - `@radix-ui/react-slider`: ^1.2.1
 - `@radix-ui/react-slot`: ^1.1.0
 - `@radix-ui/react-switch`: ^1.1.1
 - `@radix-ui/react-tabs`: ^1.1.1
-- `@radix-ui/react-toast`: ^2.2.2
+- `@radix-ui/react-toast`: ^1.2.2
 - `@radix-ui/react-tooltip`: ^1.1.3
+- `@radix-ui/react-label`: ^2.1.0
 
 ### Framer Motion
 - `framer-motion`: ^11.15.0
@@ -57,7 +58,9 @@ Data: $(Get-Date -Format "yyyy-MM-dd HH:mm:ss")
 
 ## Observações
 
-- Alguns pacotes Radix UI estão em versões diferentes (1.1.x, 1.2.x, 2.1.x, 2.2.x)
+- **React atualizado para 19.0.0** - Compatível com Next.js 15.5.7
+- Alguns pacotes Radix UI estão em versões diferentes (1.1.x, 1.2.x, 2.1.x, 2.2.x) - Isso é normal, cada pacote tem seu próprio ciclo de versão
 - O projeto usa `@react-google-maps/api`, não `@vis.gl/react-google-maps`
 - TanStack Query, Zustand e Web Vitals já estão em versões muito recentes
+- Todos os componentes UI agora usam Radix UI para consistência e acessibilidade
 

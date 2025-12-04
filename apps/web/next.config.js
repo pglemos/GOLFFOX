@@ -11,6 +11,8 @@ let nextConfig = {
     // ✅ Ignorar erros de tipo durante o build para permitir deploy
     ignoreBuildErrors: true,
   },
+  // ESLint config moved to next.config.js is no longer supported in Next.js 16
+  // Use next lint command or eslint.config.js instead
   async headers() {
     return [
       {
@@ -67,33 +69,12 @@ let nextConfig = {
       },
     ],
   },
-  webpack: (config, { dev, isServer }) => {
-    config.resolve.alias = {
-      ...config.resolve.alias,
+  // Turbopack configuration (Next.js 16 default)
+  turbopack: {
+    resolveAlias: {
       '@': path.resolve(__dirname),
       '@shared': path.resolve(__dirname, '../../shared'),
-    }
-
-    // Configurações básicas para cliente
-    if (!isServer) {
-      config.resolve.fallback = {
-        ...config.resolve.fallback,
-        fs: false,
-        net: false,
-        tls: false,
-      }
-    }
-
-    // Cache para desenvolvimento
-    if (dev) {
-      config.cache = {
-        type: 'filesystem',
-        buildDependencies: {
-          config: [__filename],
-        },
-      }
-    }
-    return config
+    },
   },
 }
 

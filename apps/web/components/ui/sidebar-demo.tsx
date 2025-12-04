@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { Link } from "next/link";
+import Link from "next/link";
 import { Sidebar, SidebarBody, SidebarLink, useSidebar } from "@/components/ui/sidebar";
 import { LayoutDashboard, UserCog, Settings, LogOut } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
