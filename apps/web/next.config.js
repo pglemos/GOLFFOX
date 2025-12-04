@@ -11,10 +11,8 @@ let nextConfig = {
     // ✅ Ignorar erros de tipo durante o build para permitir deploy
     ignoreBuildErrors: true,
   },
-  eslint: {
-    // ✅ Ignorar erros de ESLint durante o build para permitir deploy
-    ignoreDuringBuilds: true,
-  },
+  // Next.js 16: Empty turbopack config allows webpack to run in production
+  turbopack: {},
   async headers() {
     return [
       {
@@ -77,7 +75,7 @@ let nextConfig = {
       '@': path.resolve(__dirname),
       '@shared': path.resolve(__dirname, '../../shared'),
     }
-    
+
     // Configurações básicas para cliente
     if (!isServer) {
       config.resolve.fallback = {
@@ -87,7 +85,7 @@ let nextConfig = {
         tls: false,
       }
     }
-    
+
     // Cache para desenvolvimento
     if (dev) {
       config.cache = {
