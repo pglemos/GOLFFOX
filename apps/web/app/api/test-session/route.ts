@@ -6,13 +6,13 @@ import { cookies } from 'next/headers'
  * Acesse: /api/test-session
  */
 export async function GET(req: NextRequest) {
-  const cookieStore = cookies()
-  
+  const cookieStore = await cookies()
+
   // Obter todos os cookies
   const allCookies = req.cookies.getAll()
   const sessionCookie = cookieStore.get('golffox-session')
   const csrfCookie = cookieStore.get('golffox-csrf')
-  
+
   // Tentar decodificar o cookie de sessão
   let sessionData = null
   if (sessionCookie?.value) {
@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
       sessionData = { error: 'Falha ao decodificar', message: e.message }
     }
   }
-  
+
   const diagnostics = {
     timestamp: new Date().toISOString(),
     environment: {
@@ -62,8 +62,8 @@ export async function GET(req: NextRequest) {
       pathname: req.nextUrl.pathname,
     },
   }
-  
-  return NextResponse.json(diagnostics, { 
+
+  return NextResponse.json(diagnostics, {
     status: 200,
     headers: {
       'Content-Type': 'application/json',
