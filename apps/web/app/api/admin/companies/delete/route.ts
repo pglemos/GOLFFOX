@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requireAuth } from '@/lib/api-auth'
+import { logger } from '@/lib/logger'
 
 export const runtime = 'nodejs'
 
@@ -24,13 +25,9 @@ export async function POST(request: NextRequest) {
 
 async function handleDelete(request: NextRequest) {
   try {
-    const isDevelopment = process.env.NODE_ENV === 'development'
     const authErrorResponse = await requireAuth(request, 'admin')
-    if (authErrorResponse && !isDevelopment) {
+    if (authErrorResponse) {
       return authErrorResponse
-    }
-    if (authErrorResponse && isDevelopment) {
-      console.warn('⚠️ Autenticação falhou em desenvolvimento, mas continuando...')
     }
 
     // Aceitar tanto query param quanto body
@@ -56,11 +53,11 @@ async function handleDelete(request: NextRequest) {
 
     const supabaseAdmin = getSupabaseAdmin()
 
-    console.log(`🗑️ Tentando excluir empresa permanentemente: ${companyId}`)
+    logger.log(`🗑️ Tentando excluir empresa permanentemente: ${companyId}`)
 
     // ORDEM CRÍTICA DE EXCLUSÃO:
     // 1. Atualizar users para setar company_id = NULL (pode não ter ON DELETE SET NULL)
-    console.log('   1. Atualizando users (setando company_id para NULL)...')
+    logger.log('   1. Atualizando users (setando company_id para NULL)...')
     const { error: usersUpdateError } = await supabaseAdmin
       .from('users')
       .update({ company_id: null })
@@ -78,10 +75,10 @@ async function handleDelete(request: NextRequest) {
         { status: 500 }
       )
     }
-    console.log('   ✅ Users atualizados')
+    logger.log('   ✅ Users atualizados')
 
     // 2. Excluir dependências que podem ter CASCADE mas vamos excluir explicitamente para garantir
-    console.log('   2. Excluindo dependências...')
+    logger.log('   2. Excluindo dependências...')
     
     // Excluir routes (e suas dependências serão excluídas via CASCADE)
     const { error: routesError } = await supabaseAdmin
@@ -123,10 +120,10 @@ async function handleDelete(request: NextRequest) {
         // Não retornar erro fatal, algumas tabelas podem não existir
       }
     }
-    console.log('   ✅ Dependências excluídas')
+    logger.log('   ✅ Dependências excluídas')
 
     // 3. Excluir empresa permanentemente
-    console.log('   3. Excluindo empresa...')
+    logger.log('   3. Excluindo empresa...')
     const { data, error } = await supabaseAdmin
       .from('companies')
       .delete()
@@ -147,7 +144,7 @@ async function handleDelete(request: NextRequest) {
       )
     }
 
-    console.log(`✅ Empresa excluída com sucesso: ${companyId}`, data)
+    logger.log(`✅ Empresa excluída com sucesso: ${companyId}`, data)
 
     return NextResponse.json({
       success: true,

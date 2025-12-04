@@ -3,6 +3,7 @@ import { supabaseServiceRole } from '@/lib/supabase-server'
 import { requireCompanyAccess } from '@/lib/api-auth'
 import { z } from 'zod'
 import { withRateLimit } from '@/lib/rate-limit'
+import { logger } from '@/lib/logger'
 
 const costSchema = z.object({
   company_id: z.string().uuid(),
@@ -62,7 +63,7 @@ async function createManualCostHandler(request: NextRequest) {
     
     // Se for Basic Auth, aceitar (para testes automatizados)
     if (isBasicAuth) {
-      console.log('⚠️ Basic Auth detectado, aceitando para testes')
+      logger.log('⚠️ Basic Auth detectado, aceitando para testes')
       // Não validar autenticação adicional se for Basic Auth
     } else if (!isTestMode && !isDevelopment) {
       // Em produção, validar autenticação normalmente
@@ -81,10 +82,10 @@ async function createManualCostHandler(request: NextRequest) {
           }
         } catch (e) {
           // Ignorar erros de autenticação em modo de teste
-          console.log('⚠️ Modo de teste/desenvolvimento: bypass de autenticação ativado para custos manuais')
+          logger.log('⚠️ Modo de teste/desenvolvimento: bypass de autenticação ativado para custos manuais')
         }
       } else {
-        console.log('⚠️ Modo de teste/desenvolvimento: bypass de autenticação ativado para custos manuais')
+        logger.log('⚠️ Modo de teste/desenvolvimento: bypass de autenticação ativado para custos manuais')
       }
     }
 
@@ -107,12 +108,12 @@ async function createManualCostHandler(request: NextRequest) {
                         } as any)
           
           if (createCompanyError) {
-            console.warn('Erro ao criar empresa de teste:', createCompanyError)
+            logger.warn('Erro ao criar empresa de teste:', createCompanyError)
           } else {
-            console.log(`✅ Empresa criada automaticamente para teste: ${validated.company_id}`)
+            logger.log(`✅ Empresa criada automaticamente para teste: ${validated.company_id}`)
           }
         } catch (e) {
-          console.warn('Erro ao criar empresa de teste:', e)
+          logger.warn('Erro ao criar empresa de teste:', e)
         }
       }
     }
@@ -136,7 +137,7 @@ async function createManualCostHandler(request: NextRequest) {
           if (isTestMode || isDevelopment) {
             // Tentar criar a categoria mesmo que a tabela não exista oficialmente
             // (pode ser que a tabela exista mas tenha problemas de permissão)
-            console.warn('⚠️ Tabela gf_cost_categories pode não existir ou ter problemas de acesso')
+            logger.warn('⚠️ Tabela gf_cost_categories pode não existir ou ter problemas de acesso')
             // Continuar e tentar criar categoria de qualquer forma
             categoryExists = false
           } else {
@@ -157,7 +158,7 @@ async function createManualCostHandler(request: NextRequest) {
         categoryExists = true
       }
     } catch (e) {
-      console.warn('Erro ao verificar categoria:', e)
+      logger.warn('Erro ao verificar categoria:', e)
       categoryExists = false
     }
     
@@ -180,7 +181,7 @@ async function createManualCostHandler(request: NextRequest) {
                       .single()
                     
                     if (!upsertError && upsertedCategory) {
-                      console.log('✅ Categoria de teste criada/atualizada automaticamente')
+                      logger.log('✅ Categoria de teste criada/atualizada automaticamente')
                       finalCategory = upsertedCategory
                       categoryExists = true
                     } else {
@@ -192,7 +193,7 @@ async function createManualCostHandler(request: NextRequest) {
                         .single()
           
           if (!insertError && insertedCategory) {
-            console.log('✅ Categoria de teste criada automaticamente (insert)')
+            logger.log('✅ Categoria de teste criada automaticamente (insert)')
             finalCategory = insertedCategory
             categoryExists = true
           } else {
@@ -209,14 +210,14 @@ async function createManualCostHandler(request: NextRequest) {
             } else {
               // Se nada funcionou, em modo de teste, prosseguir sem validação de categoria
               // Criar objeto mock para permitir prosseguir
-              console.warn('⚠️ Não foi possível criar/verificar categoria, prosseguindo em modo de teste sem validação')
+              logger.warn('⚠️ Não foi possível criar/verificar categoria, prosseguindo em modo de teste sem validação')
               finalCategory = { id: validated.cost_category_id, is_active: true }
               categoryExists = true // Permitir prosseguir - a inserção pode falhar, mas tentaremos
             }
           }
         }
       } catch (e) {
-        console.warn('Erro ao criar categoria de teste:', e)
+        logger.warn('Erro ao criar categoria de teste:', e)
         // Em modo de teste, prosseguir mesmo com erro - criar objeto mock
         finalCategory = { id: validated.cost_category_id, is_active: true }
         categoryExists = true
@@ -265,7 +266,7 @@ async function createManualCostHandler(request: NextRequest) {
       
       // Em modo de teste ou desenvolvimento, se a tabela não existe ou há qualquer erro, retornar resposta simulada
       if (isTestMode || isDevelopment) {
-        console.warn('⚠️ Erro ao criar custo em modo de teste/desenvolvimento, retornando resposta simulada:', error.message)
+        logger.warn('⚠️ Erro ao criar custo em modo de teste/desenvolvimento, retornando resposta simulada:', error.message)
         // Retornar formato direto (sem wrapper success/data) para compatibilidade com testes
         const mockCostId = `00000000-0000-0000-0000-${Date.now().toString().slice(-12).padStart(12, '0')}`
         return NextResponse.json({
@@ -384,7 +385,7 @@ async function listManualCostsHandler(request: NextRequest) {
       
       // Em modo de teste, se a tabela não existe, retornar dados simulados
       if ((isTestMode || isDevelopment) && (error.message?.includes('does not exist') || error.message?.includes('relation') || error.code === '42P01')) {
-        console.warn('⚠️ Tabela gf_costs não existe, retornando dados simulados em modo de teste')
+        logger.warn('⚠️ Tabela gf_costs não existe, retornando dados simulados em modo de teste')
         // Retornar dados simulados que correspondam aos filtros (teste espera lista diretamente)
         if (companyId) {
           const today_str = startDate || endDate || new Date().toISOString().split('T')[0]

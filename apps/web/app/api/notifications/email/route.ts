@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAuth } from '@/lib/api-auth'
+import { logger } from '@/lib/logger'
 
 export const runtime = 'nodejs'
 
@@ -31,7 +32,7 @@ export async function POST(req: NextRequest) {
 
     // TODO: Implementar envio de email real via serviço de email (SendGrid, Resend, etc.)
     // Por enquanto, apenas retorna sucesso para não bloquear a funcionalidade
-    console.log('Email seria enviado:', { to, subject, body: emailBody })
+    logger.log('Email seria enviado:', { to, subject, body: emailBody })
 
     return NextResponse.json({
       success: true,

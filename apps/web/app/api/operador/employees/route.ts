@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requireAuth } from '@/lib/api-auth'
+import { logger } from '@/lib/logger'
 
 export const runtime = 'nodejs'
 
@@ -20,7 +21,7 @@ export async function GET(request: NextRequest) {
     const { validateAuth } = await import('@/lib/api-auth')
     const authenticatedUser = await validateAuth(request)
     
-    console.log('🔍 [API /api/operador/employees] validateAuth resultado:', {
+    logger.log('🔍 [API /api/operador/employees] validateAuth resultado:', {
       hasUser: !!authenticatedUser,
       userId: authenticatedUser?.id,
       role: authenticatedUser?.role,
@@ -28,7 +29,7 @@ export async function GET(request: NextRequest) {
     })
     
     if (!authenticatedUser) {
-      console.warn('⚠️ [API /api/operador/employees] Usuário não autenticado')
+      logger.warn('⚠️ [API /api/operador/employees] Usuário não autenticado')
       return NextResponse.json(
         { error: 'Não autorizado' },
         { status: 401 }
@@ -73,7 +74,7 @@ export async function GET(request: NextRequest) {
       .select('id, company_id, name, email')
       .limit(10)
     
-    console.log('🔍 [API /api/operador/employees] Debug - Todos os registros na tabela:', {
+    logger.log('🔍 [API /api/operador/employees] Debug - Todos os registros na tabela:', {
       totalFound: allEmployees?.length || 0,
       employees: allEmployees,
       error: debugError?.message
@@ -96,7 +97,7 @@ export async function GET(request: NextRequest) {
 
     const { data, error, count } = await query
 
-    console.log('🔍 [API /api/operador/employees] Resultado:', {
+    logger.log('🔍 [API /api/operador/employees] Resultado:', {
       companyId: finalCompanyId,
       dataLength: data?.length,
       count,

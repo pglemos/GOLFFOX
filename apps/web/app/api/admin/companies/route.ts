@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requireAuth } from '@/lib/api-auth'
 import { withRateLimit } from '@/lib/rate-limit'
+import { logger } from '@/lib/logger'
 
 export const runtime = 'nodejs'
 
@@ -96,7 +97,7 @@ async function getCompaniesHandler(request: NextRequest) {
 async function createCompanyHandler(request: NextRequest) {
   try {
     // ✅ Validar autenticação (apenas admin)
-    console.log('🔍 createCompanyHandler - Validando autenticação...')
+    logger.log('🔍 createCompanyHandler - Validando autenticação...')
     const authErrorResponse = await requireAuth(request, 'admin')
     if (authErrorResponse) {
       console.error('❌ createCompanyHandler - Autenticação falhou:', {
@@ -107,7 +108,7 @@ async function createCompanyHandler(request: NextRequest) {
       })
       return authErrorResponse
     }
-    console.log('✅ createCompanyHandler - Autenticação OK')
+    logger.log('✅ createCompanyHandler - Autenticação OK')
 
     const supabaseAdmin = getSupabaseAdmin()
     const body = await request.json()

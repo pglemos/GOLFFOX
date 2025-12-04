@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requireAuth } from '@/lib/api-auth'
+import { logger } from '@/lib/logger'
 
 export const runtime = 'nodejs'
 
@@ -15,13 +16,9 @@ function getSupabaseAdmin() {
 
 export async function DELETE(request: NextRequest) {
   try {
-    const isDevelopment = process.env.NODE_ENV === 'development'
     const authErrorResponse = await requireAuth(request, 'admin')
-    if (authErrorResponse && !isDevelopment) {
+    if (authErrorResponse) {
       return authErrorResponse
-    }
-    if (authErrorResponse && isDevelopment) {
-      console.warn('⚠️ Autenticação falhou em desenvolvimento, mas continuando...')
     }
 
     const { searchParams } = new URL(request.url)
@@ -36,7 +33,7 @@ export async function DELETE(request: NextRequest) {
 
     const supabaseAdmin = getSupabaseAdmin()
 
-    console.log(`🗑️ Tentando excluir solicitação de socorro: ${requestId}`)
+    logger.log(`🗑️ Tentando excluir solicitação de socorro: ${requestId}`)
     
     const { data, error } = await supabaseAdmin
       .from('gf_assistance_requests')
@@ -58,7 +55,7 @@ export async function DELETE(request: NextRequest) {
       )
     }
 
-    console.log(`✅ Solicitação de socorro excluída com sucesso: ${requestId}`, data)
+    logger.log(`✅ Solicitação de socorro excluída com sucesso: ${requestId}`, data)
 
     return NextResponse.json({
       success: true,

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requireAuth } from '@/lib/api-auth'
+import { logger } from '@/lib/logger'
 
 export const runtime = 'nodejs'
 
@@ -21,7 +22,7 @@ export async function DELETE(request: NextRequest) {
       return authErrorResponse
     }
     if (authErrorResponse && isDevelopment) {
-      console.warn('⚠️ Autenticação falhou em desenvolvimento, mas continuando...')
+      logger.warn('⚠️ Autenticação falhou em desenvolvimento, mas continuando...')
     }
 
     const { searchParams } = new URL(request.url)
@@ -36,7 +37,7 @@ export async function DELETE(request: NextRequest) {
 
     const supabaseAdmin = getSupabaseAdmin()
 
-    console.log(`🗑️ Tentando excluir rota permanentemente: ${routeId}`)
+    logger.log(`🗑️ Tentando excluir rota permanentemente: ${routeId}`)
 
     // Primeiro, buscar todos os trips relacionados para excluir dependências
     const { data: trips, error: tripsFetchError } = await supabaseAdmin
@@ -55,11 +56,11 @@ export async function DELETE(request: NextRequest) {
     const tripIds = trips?.map(t => t.id) || []
 
     if (tripIds.length > 0) {
-      console.log(`⚠️ Encontrados ${tripIds.length} trip(s) vinculado(s) à rota. Excluindo dependências...`)
+      logger.log(`⚠️ Encontrados ${tripIds.length} trip(s) vinculado(s) à rota. Excluindo dependências...`)
 
       // ORDEM CRÍTICA DE EXCLUSÃO (para evitar triggers que atualizam trip_summary):
       // 1. trip_summary PRIMEIRO (antes de qualquer trigger ser disparado)
-      console.log('   1. Excluindo trip_summary (primeiro para evitar constraint violation)...')
+      logger.log('   1. Excluindo trip_summary (primeiro para evitar constraint violation)...')
       const { error: tripSummaryError } = await supabaseAdmin
         .from('trip_summary')
         .delete()
@@ -68,7 +69,7 @@ export async function DELETE(request: NextRequest) {
       if (tripSummaryError) {
         // Se a tabela não existir, continuar (código 42P01 = tabela não existe)
         if (tripSummaryError.code === '42P01') {
-          console.log('   ⚠️ Tabela trip_summary não existe (OK)')
+          logger.log('   ⚠️ Tabela trip_summary não existe (OK)')
         } else {
           console.error('❌ Erro ao excluir trip_summary:', tripSummaryError)
           return NextResponse.json(
@@ -77,14 +78,14 @@ export async function DELETE(request: NextRequest) {
           )
         }
       } else {
-        console.log('   ✅ Trip_summary excluído')
+        logger.log('   ✅ Trip_summary excluído')
       }
 
       // 2. Excluir driver_positions
       // NOTA: O trigger trg_driver_positions_recalc_summary tentará chamar calculate_trip_summary()
       // que faz INSERT/UPDATE em trip_summary. Como trip_summary já foi excluído acima,
       // o trigger pode falhar, mas não deve bloquear a exclusão se tratarmos o erro corretamente
-      console.log('   2. Excluindo driver_positions...')
+      logger.log('   2. Excluindo driver_positions...')
       const { error: positionsError } = await supabaseAdmin
         .from('driver_positions')
         .delete()
@@ -94,20 +95,20 @@ export async function DELETE(request: NextRequest) {
       if (positionsError) {
         if (positionsError.code === '42P01' || positionsError.code === '42703') {
           // Tabela não existe ou coluna não existe - OK
-          console.log('   ⚠️ Tabela/coluna não existe (OK)')
+          logger.log('   ⚠️ Tabela/coluna não existe (OK)')
         } else if (positionsError.message?.includes('trip_summary') || positionsError.code === '23503') {
           // Erro de constraint relacionado a trip_summary - esperado, continuar
-          console.log('   ⚠️ Trigger tentou atualizar trip_summary (já excluído) - continuando...')
+          logger.log('   ⚠️ Trigger tentou atualizar trip_summary (já excluído) - continuando...')
         } else {
           // Outro erro - logar mas continuar
-          console.log(`   ⚠️ Aviso ao excluir driver_positions: ${positionsError.message}`)
+          logger.log(`   ⚠️ Aviso ao excluir driver_positions: ${positionsError.message}`)
         }
       } else {
-        console.log('   ✅ Driver_positions excluído')
+        logger.log('   ✅ Driver_positions excluído')
       }
 
       // 3. Outras dependências de trips
-      console.log('   3. Excluindo outras dependências de trips...')
+      logger.log('   3. Excluindo outras dependências de trips...')
       const dependentTables = [
         'trip_events',
         'trip_passengers',
@@ -133,10 +134,10 @@ export async function DELETE(request: NextRequest) {
           }
         }
       }
-      console.log('   ✅ Outras dependências excluídas')
+      logger.log('   ✅ Outras dependências excluídas')
 
       // 4. Agora excluir os trips (todas as dependências já foram excluídas)
-      console.log('   4. Excluindo trips...')
+      logger.log('   4. Excluindo trips...')
       const { error: tripsDeleteError } = await supabaseAdmin
         .from('trips')
         .delete()
@@ -150,7 +151,7 @@ export async function DELETE(request: NextRequest) {
         )
       }
 
-      console.log(`✅ ${tripIds.length} trip(s) e suas dependências excluídos com sucesso`)
+      logger.log(`✅ ${tripIds.length} trip(s) e suas dependências excluídos com sucesso`)
     }
 
     // Segundo, excluir explicitamente paradas da rota (route_stops)
@@ -188,7 +189,7 @@ export async function DELETE(request: NextRequest) {
       )
     }
 
-    console.log(`✅ Rota excluída com sucesso: ${routeId}`, data)
+    logger.log(`✅ Rota excluída com sucesso: ${routeId}`, data)
 
     return NextResponse.json({ success: true, message: 'Rota excluída com sucesso' })
   } catch (error: any) {

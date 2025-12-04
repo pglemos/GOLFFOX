@@ -140,5 +140,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "optionalDependencies": {
+    "@next/swc-win32-x64-msvc": "^16.0.7"
   }
 }

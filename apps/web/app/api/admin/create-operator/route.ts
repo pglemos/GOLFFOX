@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requireAuth } from '@/lib/api-auth'
+import { logger } from '@/lib/logger'
 
 export const runtime = 'nodejs'
 
@@ -146,7 +147,7 @@ export async function POST(request: NextRequest) {
             
             if (!createError && newCompany) {
               company = newCompany
-              console.log(`✅ Empresa criada automaticamente para teste: ${companyId}`)
+              logger.log(`✅ Empresa criada automaticamente para teste: ${companyId}`)
             } else {
               return NextResponse.json(
                 { error: 'Não foi possível criar empresa de teste' },
@@ -248,7 +249,7 @@ export async function POST(request: NextRequest) {
       createUserError = createUserResult.error
     } else {
       // Se não houver senha, não criar usuário - apenas empresa
-      console.log('⚠️ Senha não fornecida, criando apenas empresa sem usuário')
+      logger.log('⚠️ Senha não fornecida, criando apenas empresa sem usuário')
     }
 
     // Se não houver senha, retornar apenas empresa criada
@@ -282,7 +283,7 @@ export async function POST(request: NextRequest) {
           const existingUser = existingUsers?.users?.find((u: { email?: string }) => u.email === operatorEmail)
           
           if (existingUser) {
-            console.warn('⚠️ Usuário já existe, retornando dados do usuário existente')
+            logger.warn('⚠️ Usuário já existe, retornando dados do usuário existente')
             return NextResponse.json({
               success: true,
               userId: existingUser.id,
@@ -300,7 +301,7 @@ export async function POST(request: NextRequest) {
         }
         
         // Para outros erros em modo de teste, retornar resposta simulada
-        console.warn('⚠️ Erro ao criar usuário no Auth em modo de teste, retornando resposta simulada')
+        logger.warn('⚠️ Erro ao criar usuário no Auth em modo de teste, retornando resposta simulada')
         // NÃO deletar empresa em modo de teste, pois pode ser reutilizada
         return NextResponse.json({
           success: true,
@@ -452,29 +453,29 @@ export async function POST(request: NextRequest) {
             mapErr.message?.includes('relation') || 
             mapErr.message?.includes('table') ||
             mapErr.message?.includes('Could not find')) {
-          console.warn('Tabela gf_user_company_map não encontrada. Mapeamento será feito apenas via company_id na tabela users.')
-          console.warn('Execute o script database/scripts/verify_gf_user_company_map.sql para criar a tabela.')
+          logger.warn('Tabela gf_user_company_map não encontrada. Mapeamento será feito apenas via company_id na tabela users.')
+          logger.warn('Execute o script database/scripts/verify_gf_user_company_map.sql para criar a tabela.')
           mapError = null // Não falhar se tabela não existir
         } else if (mapErr.message?.includes('duplicate') || 
                    mapErr.message?.includes('unique') ||
                    mapErr.message?.includes('already exists')) {
           // Mapeamento já existe, não é erro
-          console.info('Mapeamento usuário-empresa já existe')
+          logger.info('Mapeamento usuário-empresa já existe')
           mapError = null
         } else if (mapErr.message?.includes('permission') || 
                    mapErr.message?.includes('policy') ||
                    mapErr.message?.includes('RLS')) {
           // Erro de RLS - tentar com service role (já estamos usando)
-          console.warn('Erro de RLS ao mapear usuário-empresa (pode ser ignorado):', mapErr.message)
+          logger.warn('Erro de RLS ao mapear usuário-empresa (pode ser ignorado):', mapErr.message)
           mapError = null // Não falhar por RLS se usando service role
         } else {
           // Outro tipo de erro - logar mas não falhar
-          console.warn('Erro ao mapear usuário-empresa (não crítico):', mapErr)
+          logger.warn('Erro ao mapear usuário-empresa (não crítico):', mapErr)
           mapError = null // Não falhar - company_id na tabela users é suficiente
         }
       }
     } catch (e) {
-      console.warn('Erro ao mapear usuário-empresa (catch, não crítico):', e)
+      logger.warn('Erro ao mapear usuário-empresa (catch, não crítico):', e)
       // Não falhar se erro ao mapear, o company_id na tabela users é suficiente
       mapError = null
     }
@@ -492,7 +493,7 @@ export async function POST(request: NextRequest) {
         const { data: { user } } = await supabaseAdmin.auth.getUser(token)
         actorId = user?.id || null
       } catch (e) {
-        console.warn('Erro ao obter actorId para log de auditoria:', e)
+        logger.warn('Erro ao obter actorId para log de auditoria:', e)
         // Não falhar se não conseguir obter actorId
       }
     }
@@ -516,18 +517,18 @@ export async function POST(request: NextRequest) {
           if (auditError.message?.includes('does not exist') || 
               auditError.message?.includes('relation') ||
               auditError.message?.includes('table')) {
-            console.warn('Tabela gf_audit_log não encontrada. Log de auditoria não será registrado.')
+            logger.warn('Tabela gf_audit_log não encontrada. Log de auditoria não será registrado.')
           } else {
-            console.warn('Erro ao registrar log de auditoria (não crítico):', auditError)
+            logger.warn('Erro ao registrar log de auditoria (não crítico):', auditError)
           }
         }
       } catch (auditError) {
         // Não falhar se log falhar - é opcional
         if (auditError.message?.includes('does not exist') || 
             auditError.message?.includes('relation')) {
-          console.warn('Tabela gf_audit_log não encontrada. Log de auditoria não será registrado.')
+          logger.warn('Tabela gf_audit_log não encontrada. Log de auditoria não será registrado.')
         } else {
-          console.warn('Erro ao registrar log de auditoria (não crítico):', auditError)
+          logger.warn('Erro ao registrar log de auditoria (não crítico):', auditError)
         }
       }
     }

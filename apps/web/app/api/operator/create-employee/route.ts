@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabaseServiceRole } from '@/lib/supabase-server'
 import { requireAuth } from '@/lib/api-auth'
 import { z } from 'zod'
+import { logger } from '@/lib/logger'
 
 export const runtime = 'nodejs'
 
@@ -41,7 +42,7 @@ export async function POST(request: NextRequest) {
       const tokenValue = authHeader.replace('Bearer ', '').trim()
       if ((isTestMode || isDevelopment) && VALID_TEST_TOKENS.includes(tokenValue)) {
         isTestToken = true
-        console.log('⚠️ Token de teste detectado, aceitando autenticação')
+        logger.log('⚠️ Token de teste detectado, aceitando autenticação')
       }
     }
     
@@ -85,7 +86,7 @@ export async function POST(request: NextRequest) {
         }
       } catch (e) {
         // Ignorar erros ao obter informações do usuário em modo de teste
-        console.warn('⚠️ Erro ao obter informações do usuário:', e)
+        logger.warn('⚠️ Erro ao obter informações do usuário:', e)
       }
     }
 

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { Resend } from 'resend'
 import { alertCronFailure } from '@/lib/operational-alerts'
+import { logger } from '@/lib/logger'
 
 function getSupabaseAdmin() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -54,7 +55,7 @@ async function handleDispatchReports(request: NextRequest) {
     // SEMPRE rejeitar secrets inválidos ANTES de qualquer outra lógica
     if (cronSecretFromHeader && INVALID_SECRETS.includes(cronSecretFromHeader)) {
       // SEMPRE rejeitar secrets inválidos, mesmo em modo de teste
-      console.warn('❌ Secret inválido detectado:', cronSecretFromHeader)
+      logger.warn('❌ Secret inválido detectado:', cronSecretFromHeader)
       return NextResponse.json(
         { error: 'Unauthorized', message: 'Invalid or missing CRON_SECRET' },
         { status: 401 }
@@ -69,11 +70,11 @@ async function handleDispatchReports(request: NextRequest) {
         // OU usar valor padrão se header não estiver presente
         if (cronSecretFromHeader && VALID_TEST_SECRETS.includes(cronSecretFromHeader)) {
           cronSecret = cronSecretFromHeader
-          console.warn('⚠️ Usando CRON_SECRET do header para desenvolvimento/teste:', cronSecretFromHeader)
+          logger.warn('⚠️ Usando CRON_SECRET do header para desenvolvimento/teste:', cronSecretFromHeader)
         } else if (!cronSecretFromHeader) {
           // Se não há header nem configurado, usar valor padrão 'valid-cron-secret'
           cronSecret = 'valid-cron-secret'
-          console.warn('⚠️ Usando CRON_SECRET padrão para desenvolvimento/teste')
+          logger.warn('⚠️ Usando CRON_SECRET padrão para desenvolvimento/teste')
         }
         // Se cronSecretFromHeader não está na lista de válidos, não usar como válido
       }
@@ -89,7 +90,7 @@ async function handleDispatchReports(request: NextRequest) {
     if (cronSecretFromHeader && VALID_TEST_SECRETS.includes(cronSecretFromHeader) && (isTestMode || isDevelopment)) {
       // Em modo de teste/dev, aceitar secrets válidos conhecidos
       isAuthorized = true
-      console.log('✅ Secret de teste válido aceito')
+      logger.log('✅ Secret de teste válido aceito')
     } else if (cronSecretFromHeader) {
       // Se há secret fornecido no header CRON_SECRET, validar contra o secret configurado
       if (cronSecret && cronSecretFromHeader === cronSecret) {
@@ -120,7 +121,7 @@ async function handleDispatchReports(request: NextRequest) {
 
     // Se não autorizado, retornar 401
     if (!isAuthorized) {
-      console.warn('❌ Acesso negado ao endpoint de cron - CRON_SECRET inválido ou ausente')
+      logger.warn('❌ Acesso negado ao endpoint de cron - CRON_SECRET inválido ou ausente')
       return NextResponse.json(
         { error: 'Unauthorized', message: 'Invalid or missing CRON_SECRET' },
         { status: 401 }
@@ -272,7 +273,7 @@ async function generateAndDispatchReport(
       })
 
     if (uploadError) {
-      console.warn('Erro ao salvar no Storage, continuando com email:', uploadError)
+      logger.warn('Erro ao salvar no Storage, continuando com email:', uploadError)
     }
 
     // Obter URL pública
@@ -324,7 +325,7 @@ async function generateAndDispatchReport(
         }]
       })
     } else if (!resend) {
-      console.warn('Resend não configurado, relatório salvo apenas no Storage')
+      logger.warn('Resend não configurado, relatório salvo apenas no Storage')
     }
 
     return { success: true, historyId: historyData?.id }

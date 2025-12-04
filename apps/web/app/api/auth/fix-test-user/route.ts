@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { logger } from '@/lib/logger'
 
 export const runtime = 'nodejs'
 
@@ -38,7 +39,7 @@ export async function GET(req: NextRequest) {
         existing = userData.user
       }
     } catch (err) {
-      console.log('Usuário não encontrado por ID, tentando por email...')
+      logger.log('Usuário não encontrado por ID, tentando por email...')
     }
 
     // Se não encontrou por ID, tentar por email
@@ -60,7 +61,7 @@ export async function GET(req: NextRequest) {
       })
       if (createError) throw createError
       existing = created.user
-      console.log('✅ Usuário criado no Supabase Auth')
+      logger.log('✅ Usuário criado no Supabase Auth')
     } else {
       // Atualizar senha e metadados
       const { data: updated, error: updateError } = await supabaseAdmin.auth.admin.updateUserById(existing.id, {
@@ -70,7 +71,7 @@ export async function GET(req: NextRequest) {
       })
       if (updateError) throw updateError
       existing = updated.user
-      console.log('✅ Senha do usuário atualizada no Supabase Auth')
+      logger.log('✅ Senha do usuário atualizada no Supabase Auth')
     }
 
     // Garantir que o usuário existe na tabela users com os dados corretos
@@ -85,9 +86,9 @@ export async function GET(req: NextRequest) {
       }, { onConflict: 'id' })
     
     if (upsertError) {
-      console.warn('⚠️ Falha ao upsert users:', upsertError.message)
+      logger.warn('⚠️ Falha ao upsert users:', upsertError.message)
     } else {
-      console.log('✅ Usuário garantido na tabela users')
+      logger.log('✅ Usuário garantido na tabela users')
     }
 
     // Garantir mapeamento com empresa
@@ -100,9 +101,9 @@ export async function GET(req: NextRequest) {
       }, { onConflict: 'user_id,company_id' })
     
     if (mapError) {
-      console.warn('⚠️ Falha ao garantir mapeamento empresa:', mapError.message)
+      logger.warn('⚠️ Falha ao garantir mapeamento empresa:', mapError.message)
     } else {
-      console.log('✅ Mapeamento com empresa garantido')
+      logger.log('✅ Mapeamento com empresa garantido')
     }
 
     return NextResponse.json({ 

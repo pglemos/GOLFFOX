@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requireAuth } from '@/lib/api-auth'
 import { z } from 'zod'
+import { logger } from '@/lib/logger'
 
 export const runtime = 'nodejs'
 
@@ -98,7 +99,7 @@ export async function POST(req: NextRequest) {
       // Tentar remover usuário do Auth se possível
       try {
         await supabaseAdmin.auth.admin.deleteUser(authData.user.id)
-        console.log('✅ Usuário removido do Auth após falha ao criar registro')
+        logger.log('✅ Usuário removido do Auth após falha ao criar registro')
       } catch (deleteError) {
         console.error('❌ Erro ao remover usuário do Auth após falha:', deleteError)
       }
@@ -117,7 +118,7 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    console.log('✅ Registro criado/atualizado na tabela users para:', validated.email)
+    logger.log('✅ Registro criado/atualizado na tabela users para:', validated.email)
 
     return NextResponse.json({
       success: true,

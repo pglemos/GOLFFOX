@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requireAuth } from '@/lib/api-auth'
+import { logger } from '@/lib/logger'
 
 export const runtime = 'nodejs'
 
@@ -113,7 +114,7 @@ export async function PUT(
           await supabaseAdmin.auth.admin.updateUserById(userId, authUpdates)
         }
       } catch (authErr) {
-        console.warn('Aviso: não foi possível atualizar dados no Auth:', authErr)
+        logger.warn('Aviso: não foi possível atualizar dados no Auth:', authErr)
         // Não falhar a operação se apenas o Auth falhar, mas idealmente deveria notificar
       }
     }

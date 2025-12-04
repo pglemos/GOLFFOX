@@ -3,6 +3,7 @@ import { supabaseServiceRole } from '@/lib/supabase-server'
 import { requireAuth } from '@/lib/api-auth'
 import { applyRateLimit } from '@/lib/rate-limit'
 import { z } from 'zod'
+import { logger } from '@/lib/logger'
 
 export const runtime = 'nodejs'
 
@@ -86,7 +87,7 @@ export async function POST(req: NextRequest) {
                     }
                 })
         } catch (auditError) {
-            console.warn('⚠️ Erro ao registrar log de auditoria:', auditError)
+            logger.warn('⚠️ Erro ao registrar log de auditoria:', auditError)
             // Não falhar a operação por causa de log
         }
 

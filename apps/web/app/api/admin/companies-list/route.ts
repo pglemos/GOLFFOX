@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requireAuth } from '@/lib/api-auth'
+import { logger } from '@/lib/logger'
 
 export const runtime = 'nodejs'
 
@@ -24,7 +25,7 @@ export async function GET(request: NextRequest) {
     if (authErrorResponse) {
       // Em desenvolvimento local, apenas logar aviso (mas retornar erro em produção)
       if (isDevelopment && !isVercelProduction) {
-        console.warn('⚠️ Autenticação falhou em desenvolvimento, mas continuando...')
+        logger.warn('⚠️ Autenticação falhou em desenvolvimento, mas continuando...')
         // Ainda assim retornar erro para forçar correção
         return authErrorResponse
       }
@@ -33,17 +34,17 @@ export async function GET(request: NextRequest) {
 
     const supabaseAdmin = getSupabaseAdmin()
     
-    console.log('🔍 Buscando empresas no banco de dados...')
+    logger.log('🔍 Buscando empresas no banco de dados...')
     
     // Buscar TODAS as empresas primeiro (sem filtro)
-    console.log('🔍 Buscando todas as empresas...')
+    logger.log('🔍 Buscando todas as empresas...')
     let { data, error } = await supabaseAdmin
       .from('companies')
       .select('id, name, is_active')
     
     // Se houver erro, tentar com seleção mínima
     if (error) {
-      console.warn('⚠️ Erro na busca inicial, tentando com seleção mínima:', error.message)
+      logger.warn('⚠️ Erro na busca inicial, tentando com seleção mínima:', error.message)
       const result = await supabaseAdmin
         .from('companies')
         .select('id, name')
@@ -84,7 +85,7 @@ export async function GET(request: NextRequest) {
       name: c.name || 'Sem nome'
     })).filter((c: any) => c.id && c.name)
 
-    console.log(`✅ ${formattedCompanies.length} empresas encontradas:`, formattedCompanies.map((c: any) => c.name))
+    logger.log(`✅ ${formattedCompanies.length} empresas encontradas:`, formattedCompanies.map((c: any) => c.name))
 
     // Retornar no formato esperado pelo frontend
     return NextResponse.json({

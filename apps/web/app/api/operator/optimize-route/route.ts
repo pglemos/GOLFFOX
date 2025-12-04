@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabaseServiceRole } from '@/lib/supabase-server'
 import { requireAuth } from '@/lib/api-auth'
 import { z } from 'zod'
+import { logger } from '@/lib/logger'
 
 export const runtime = 'nodejs'
 
@@ -141,7 +142,7 @@ export async function POST(request: NextRequest) {
             }
           }
         } catch (googleError: any) {
-          console.warn('Erro ao otimizar rota com Google Maps:', googleError)
+          logger.warn('Erro ao otimizar rota com Google Maps:', googleError)
           // Continuar com otimização básica mesmo se Google Maps falhar
         }
       }
