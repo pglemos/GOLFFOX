@@ -7,7 +7,8 @@
     "test": "cd apps/web && npm test"
   },
   "dependencies": {
-    "@fnando/cnpj": "^2.0.0"
+    "@fnando/cnpj": "^2.0.0",
+    "zod": "^4.1.12"
   },
   "devDependencies": {
     "@supabase/supabase-js": "^2.81.0",

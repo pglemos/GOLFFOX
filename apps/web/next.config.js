@@ -7,11 +7,6 @@ let nextConfig = {
   output: 'standalone',
   // Corrigir warning sobre múltiplos lockfiles
   outputFileTracingRoot: path.join(__dirname, '../../'),
-  // Forçar uso do SWC WASM como fallback se o binário nativo falhar
-  swcMinify: true,
-  compiler: {
-    // Usar SWC para compilação
-  },
   typescript: {
     // ✅ Ignorar erros de tipo durante o build para permitir deploy
     ignoreBuildErrors: true,
