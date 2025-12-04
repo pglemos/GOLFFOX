@@ -1,12 +1,3 @@
-/* ============================================================
-   GOLF FOX DESIGN SYSTEM - Premium UI v41.0
-   Identidade: golffox.com.br + Apple/Tesla/Stripe/Linear
-   ============================================================ */
-
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 /* Mobile optimizations */
 @layer base {
   * {
@@ -37,20 +28,6 @@
   h6 {
     word-wrap: break-word;
     overflow-wrap: break-word;
-    hyphens: auto;
-  }
-}
-
-@layer base {
-  :root {
-    /* ========================================
-       CORES OFICIAIS - GolfFox.com.br
-       ======================================== */
-
-    /* Backgrounds - Muito Branco Premium */
-    --bg: 0 0% 100%;
-    /* #FFFFFF */
-    --bg-soft: 210 40% 98%;
     /* #F8FAFC */
     --bg-elevated: 0 0% 100%;
     /* #FFFFFF */
