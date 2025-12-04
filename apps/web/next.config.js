@@ -5,6 +5,8 @@ const isProd = process.env.NODE_ENV === 'production'
 let nextConfig = {
   reactStrictMode: true,
   output: 'standalone',
+  // Corrigir warning sobre múltiplos lockfiles
+  outputFileTracingRoot: path.join(__dirname, '../../'),
   typescript: {
     // ✅ Ignorar erros de tipo durante o build para permitir deploy
     ignoreBuildErrors: true,
@@ -69,12 +71,24 @@ let nextConfig = {
       },
     ],
   },
-  webpack: (config, { dev }) => {
+  webpack: (config, { dev, isServer }) => {
     config.resolve.alias = {
       ...config.resolve.alias,
       '@': path.resolve(__dirname),
       '@shared': path.resolve(__dirname, '../../shared'),
     }
+    
+    // Configurações básicas para cliente
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        net: false,
+        tls: false,
+      }
+    }
+    
+    // Cache para desenvolvimento
     if (dev) {
       config.cache = {
         type: 'filesystem',

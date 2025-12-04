@@ -1,14 +1,13 @@
 {
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "lint": "echo Lint passed",
-    "test": "echo \"No tests\""
+    "dev": "npm --prefix apps/web run dev",
+    "build": "npm --prefix apps/web run build",
+    "start": "npm --prefix apps/web start",
+    "lint": "npm --prefix apps/web run lint",
+    "test": "npm --prefix apps/web test"
   },
   "dependencies": {
     "@fnando/cnpj": "^2.0.0",
-    "@sentry/nextjs": "^10.25.0",
-    "@vercel/speed-insights": "^1.2.0",
     "zod": "^4.1.12"
   },
   "devDependencies": {

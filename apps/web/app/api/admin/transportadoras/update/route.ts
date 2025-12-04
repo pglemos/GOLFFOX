@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabaseServiceRole } from '@/lib/supabase-server'
 import { requireAuth } from '@/lib/api-auth'
 import { z } from 'zod'
+import { CarrierUpdate } from '@/types/carrier'
 
 export const runtime = 'nodejs'
 
@@ -50,7 +51,7 @@ export async function PUT(req: NextRequest) {
     const body = await req.json()
     const validated = carrierUpdateSchema.parse(body)
 
-    const updateData: any = {
+    const updateData: CarrierUpdate = {
       name: validated.name,
       address: validated.address || null,
       phone: validated.phone || null,
@@ -96,15 +97,16 @@ export async function PUT(req: NextRequest) {
       success: true,
       carrier: data
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { success: false, error: 'Dados inválidos', details: error.errors },
         { status: 400 }
       )
     }
+    const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido ao processar requisição'
     return NextResponse.json(
-      { success: false, error: 'Erro ao processar requisição', message: error.message },
+      { success: false, error: 'Erro ao processar requisição', message: errorMessage },
       { status: 500 }
     )
   }
