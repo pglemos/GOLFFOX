@@ -1,10 +1,10 @@
 {
   "scripts": {
-    "dev": "npm --prefix apps/web run dev",
-    "build": "npm --prefix apps/web run build",
-    "start": "npm --prefix apps/web start",
-    "lint": "npm --prefix apps/web run lint",
-    "test": "npm --prefix apps/web test"
+    "dev": "cd apps/web && npm run dev",
+    "build": "cd apps/web && npm run build",
+    "start": "cd apps/web && npm start",
+    "lint": "cd apps/web && npm run lint",
+    "test": "cd apps/web && npm test"
   },
   "dependencies": {
     "@fnando/cnpj": "^2.0.0",
