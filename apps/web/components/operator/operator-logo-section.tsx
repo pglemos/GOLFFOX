@@ -2,7 +2,7 @@
 
 import { usePathname } from "next/navigation"
 import { useState } from "react"
-import Link from "next/link"
+import { Link } from "next/link"
 import { motion } from "framer-motion"
 import { CompanySelector } from "./company-selector"
 import { useOperatorTenant } from "@/components/providers/operator-tenant-provider"

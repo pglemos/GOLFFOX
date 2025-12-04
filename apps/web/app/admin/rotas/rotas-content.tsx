@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { default as Link } from "next/link"
+import { Link } from "next/link"
 import { motion } from "framer-motion"
 import {
   Route,
