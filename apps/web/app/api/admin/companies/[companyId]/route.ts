@@ -36,14 +36,10 @@ export async function PUT(
 
   const { companyId: companyIdParam  } = params
   try {
-    // ✅ Validar autenticação (apenas admin) - permitir em desenvolvimento
-    const isDevelopment = process.env.NODE_ENV === 'development'
+    // ✅ Validar autenticação (apenas admin)
     const authErrorResponse = await requireAuth(request, 'admin')
-    if (authErrorResponse && !isDevelopment) {
+    if (authErrorResponse) {
       return authErrorResponse
-    }
-    if (authErrorResponse && isDevelopment) {
-      console.warn('⚠️ Autenticação falhou em desenvolvimento, mas continuando...')
     }
 
     const companyId = sanitizeId(companyIdParam)
@@ -179,14 +175,10 @@ export async function DELETE(
 
   const { companyId: companyIdParam  } = params
   try {
-    // ✅ Validar autenticação (apenas admin) - permitir em desenvolvimento
-    const isDevelopment = process.env.NODE_ENV === 'development'
+    // ✅ Validar autenticação (apenas admin)
     const authErrorResponse = await requireAuth(request, 'admin')
-    if (authErrorResponse && !isDevelopment) {
+    if (authErrorResponse) {
       return authErrorResponse
-    }
-    if (authErrorResponse && isDevelopment) {
-      console.warn('⚠️ Autenticação falhou em desenvolvimento, mas continuando...')
     }
 
     const companyId = sanitizeId(companyIdParam)
