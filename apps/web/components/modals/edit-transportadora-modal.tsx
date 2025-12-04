@@ -8,9 +8,10 @@ import { Label } from "@/components/ui/label"
 import { notifySuccess, notifyError } from "@/lib/toast"
 import { supabase } from "@/lib/supabase"
 import { AddressForm, AddressData } from "@/components/address-form"
+import { Carrier } from "@/types/carrier"
 
 interface EditCarrierModalProps {
-  carrier: any
+  carrier: Carrier
   isOpen: boolean
   onClose: () => void
   onSave: () => void
@@ -149,9 +150,10 @@ export function EditCarrierModal({ carrier, isOpen, onClose, onSave }: EditCarri
       } else {
         throw new Error(result.error || 'Erro ao atualizar transportadora')
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido ao atualizar transportadora'
       console.error('❌ Exceção ao atualizar transportadora:', error)
-      notifyError(error, error.message || 'Erro ao atualizar transportadora')
+      notifyError(error instanceof Error ? error : new Error(errorMessage), errorMessage)
       //❌ NÃO fechar modal em erro
     } finally {
       setLoading(false)

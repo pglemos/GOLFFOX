@@ -3,6 +3,8 @@ import { supabaseServiceRole } from '@/lib/supabase-server'
 import { requireAuth } from '@/lib/api-auth'
 import { applyRateLimit } from '@/lib/rate-limit'
 import { z } from 'zod'
+import { CarrierInsert } from '@/types/carrier'
+import { logger } from '@/lib/logger'
 
 export const runtime = 'nodejs'
 
@@ -48,12 +50,12 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json()
-    console.log('[CREATE CARRIER] Request body received:', JSON.stringify(body, null, 2))
+    logger.debug('[CREATE CARRIER] Request body received:', JSON.stringify(body, null, 2))
 
     const validated = carrierSchema.parse(body)
-    console.log('[CREATE CARRIER] Validation passed:', JSON.stringify(validated, null, 2))
+    logger.debug('[CREATE CARRIER] Validation passed:', JSON.stringify(validated, null, 2))
 
-    const insertData: any = {
+    const insertData: CarrierInsert = {
       name: validated.name,
       address: validated.address || null,
       phone: validated.phone || null,
@@ -80,7 +82,7 @@ export async function POST(req: NextRequest) {
       insertData.municipal_registration = validated.municipal_registration
     }
 
-    console.log('[CREATE CARRIER] Attempting insert...', JSON.stringify(insertData, null, 2))
+    logger.debug('[CREATE CARRIER] Attempting insert...', JSON.stringify(insertData, null, 2))
 
     const { data, error } = await supabaseServiceRole
       .from('carriers')
@@ -96,21 +98,22 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    console.log('[CREATE CARRIER] Success! Carrier created:', data.id)
+    logger.debug('[CREATE CARRIER] Success! Carrier created:', data.id)
 
     return NextResponse.json({
       success: true,
       carrier: data
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { success: false, error: 'Dados inválidos', details: error.errors },
         { status: 400 }
       )
     }
+    const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido ao processar requisição'
     return NextResponse.json(
-      { success: false, error: 'Erro ao processar requisição', message: error.message },
+      { success: false, error: 'Erro ao processar requisição', message: errorMessage },
       { status: 500 }
     )
   }

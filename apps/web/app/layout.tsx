@@ -21,6 +21,10 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "GOLF FOX - Gestão de Frotas",
   description: "Plataforma de gestão de frotas e transporte",
+  icons: {
+    icon: '/favicon.ico',
+    apple: '/icon.png',
+  },
 };
 
 export const viewport = {
