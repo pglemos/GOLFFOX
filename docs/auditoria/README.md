@@ -11,13 +11,18 @@ Auditoria completa do sistema Golf Fox realizada conforme plano estabelecido. To
 
 ## 🚀 INÍCIO RÁPIDO
 
+**⭐ COMECE AQUI:**
+- **`INICIO_AQUI.md`** - Ponto de entrada principal
+- **`LEIA-ME-PRIMEIRO.md`** - Início rápido
+- **`INSTRUCOES_FINAIS.md`** - Passo a passo completo
+
 **Para aplicar as correções agora:**
 1. Abrir `apps/web/database/migrations/000_APPLY_ALL_MIGRATIONS.sql`
 2. Copiar todo o conteúdo
 3. Colar no Supabase SQL Editor
 4. Executar
 
-**Guia completo:** `docs/auditoria/INSTRUCOES_FINAIS.md` ⭐
+**Tempo estimado:** 2-5 minutos
 
 ---
 
