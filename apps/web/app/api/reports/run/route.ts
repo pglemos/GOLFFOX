@@ -55,7 +55,7 @@ async function runReportHandler(request: NextRequest) {
   // Declarar variáveis no escopo da função para uso no catch
   let format: string = 'csv'
   let finalReportKey: string = ''
-  
+
   try {
     const supabase = getSupabaseAdmin()
     const body = await request.json()
@@ -66,45 +66,45 @@ async function runReportHandler(request: NextRequest) {
     const offsetReq = Number(body.offset ?? body.page ?? 0)
     const limit = Number.isFinite(limitReq) ? Math.max(1, Math.min(limitReq, 20000)) : 5000
     const offset = Number.isFinite(offsetReq) ? Math.max(0, offsetReq) : 0
-    
+
     // Aceitar company_id tanto em filters quanto diretamente no body
     const companyIdFromBody = body.company_id || body.companyId
     const filters = body.filters || {}
-    
+
     // Se company_id vier no body mas não em filters, adicionar em filters
     if (companyIdFromBody && !filters.companyId) {
       filters.companyId = companyIdFromBody
     }
 
-                // Mapeamento de tipos alternativos para tipos válidos
-                const reportKeyAliases: Record<string, string> = {
-                  'general_report': 'delays', // Mapear general_report para delays (relatório padrão)
-                  'monthly': 'efficiency', // Mapear monthly para efficiency (relatório mensal)
-                  'monthly_summary': 'efficiency', // Mapear monthly_summary para efficiency
-                  'monthly-summary': 'efficiency', // Mapear monthly-summary (com hífen) para efficiency
-                  'financial': 'efficiency', // Mapear financial para efficiency
-                  'summary': 'driver_ranking', // Mapear summary para driver_ranking
-                  'performance': 'efficiency',
-                  'operations': 'delays',
-                  'general': 'delays',
-                  'default': 'delays',
-                  'daily': 'delays',
-                  'daily-summary': 'delays', // Mapear daily-summary para delays
-                  'daily_summary': 'delays', // Mapear daily_summary para delays
-                  'weekly': 'efficiency',
-                  'annual': 'efficiency',
-                  'fleet_summary': 'efficiency', // Mapear fleet_summary para efficiency
-                  'fleet': 'efficiency', // Mapear fleet para efficiency
-                  'fleet-performance': 'efficiency', // Mapear fleet-performance para efficiency
-                  'fleet_performance': 'efficiency', // Mapear fleet_performance para efficiency
-                  'fleet_status': 'efficiency', // Mapear fleet_status para efficiency
-                  'vehicles': 'efficiency', // Mapear vehicles para efficiency
-                  'routes': 'efficiency', // Mapear routes para efficiency
-                  'cost-analysis': 'efficiency', // Mapear cost-analysis para efficiency
-                  'cost_analysis': 'efficiency', // Mapear cost_analysis para efficiency
-                  'cost_summary': 'efficiency', // Mapear cost_summary para efficiency
-                  'driver_performance': 'driver_ranking', // Mapear driver_performance para driver_ranking
-                }
+    // Mapeamento de tipos alternativos para tipos válidos
+    const reportKeyAliases: Record<string, string> = {
+      'general_report': 'delays', // Mapear general_report para delays (relatório padrão)
+      'monthly': 'efficiency', // Mapear monthly para efficiency (relatório mensal)
+      'monthly_summary': 'efficiency', // Mapear monthly_summary para efficiency
+      'monthly-summary': 'efficiency', // Mapear monthly-summary (com hífen) para efficiency
+      'financial': 'efficiency', // Mapear financial para efficiency
+      'summary': 'driver_ranking', // Mapear summary para driver_ranking
+      'performance': 'efficiency',
+      'operations': 'delays',
+      'general': 'delays',
+      'default': 'delays',
+      'daily': 'delays',
+      'daily-summary': 'delays', // Mapear daily-summary para delays
+      'daily_summary': 'delays', // Mapear daily_summary para delays
+      'weekly': 'efficiency',
+      'annual': 'efficiency',
+      'fleet_summary': 'efficiency', // Mapear fleet_summary para efficiency
+      'fleet': 'efficiency', // Mapear fleet para efficiency
+      'fleet-performance': 'efficiency', // Mapear fleet-performance para efficiency
+      'fleet_performance': 'efficiency', // Mapear fleet_performance para efficiency
+      'fleet_status': 'efficiency', // Mapear fleet_status para efficiency
+      'vehicles': 'efficiency', // Mapear vehicles para efficiency
+      'routes': 'efficiency', // Mapear routes para efficiency
+      'cost-analysis': 'efficiency', // Mapear cost-analysis para efficiency
+      'cost_analysis': 'efficiency', // Mapear cost_analysis para efficiency
+      'cost_summary': 'efficiency', // Mapear cost_summary para efficiency
+      'driver_performance': 'driver_ranking', // Mapear driver_performance para driver_ranking
+    }
 
     // Normalizar reportKey (case-insensitive)
     let normalizedReportKey = reportKey ? String(reportKey).trim() : null
@@ -118,7 +118,7 @@ async function runReportHandler(request: NextRequest) {
       const validAliases = Object.keys(reportKeyAliases)
       console.error('ReportKey inválido:', { received: reportKey, normalized: normalizedReportKey, validKeys, validAliases })
       return NextResponse.json(
-        { 
+        {
           error: 'Relatório inválido',
           message: `O campo 'reportKey' ou 'reportType' é obrigatório e deve ser um dos seguintes: ${validKeys.join(', ')}`,
           received: reportKey || '(não fornecido)',
@@ -165,7 +165,7 @@ async function runReportHandler(request: NextRequest) {
       }
     } else {
       logger.log('⚠️ Modo de teste/desenvolvimento: bypass de autenticação ativado para relatórios')
-      
+
       // Em modo de teste, se não há companyId nos filtros, usar um padrão
       if (!filters.companyId && !companyIdFromBody) {
         filters.companyId = '00000000-0000-0000-0000-000000000001'
@@ -174,15 +174,15 @@ async function runReportHandler(request: NextRequest) {
     }
 
     const config = REPORT_CONFIGS[finalReportKey]
-    
+
     // Buscar dados da view
     const { data, error } = await fetchReportRange(supabase, config.viewName, config.columns, filters, limit, offset)
 
-    
+
 
     if (error) {
       console.error('Erro ao buscar dados do relatório:', error)
-      
+
       // Verificar se erro é porque view não existe
       if (error.message?.includes('does not exist') || error.message?.includes('relation') || error.message?.includes('view')) {
         // Em modo de teste/dev, retornar arquivo vazio em vez de erro
@@ -198,7 +198,7 @@ async function runReportHandler(request: NextRequest) {
               return generateCSV([], config.columns, finalReportKey)
             } else {
               return NextResponse.json(
-                { 
+                {
                   success: true,
                   reportKey: finalReportKey,
                   format: format,
@@ -216,9 +216,9 @@ async function runReportHandler(request: NextRequest) {
             return generateCSV([], config.columns, finalReportKey)
           }
         }
-        
+
         return NextResponse.json(
-          { 
+          {
             error: `View ${config.viewName} não encontrada`,
             message: `A view ${config.viewName} não existe no banco de dados. Execute as migrações de views de relatórios para criar a view.`,
             reportKey,
@@ -228,7 +228,7 @@ async function runReportHandler(request: NextRequest) {
           { status: 500 }
         )
       }
-      
+
       // Em modo de teste/dev, retornar arquivo vazio em vez de erro para outros erros também
       if (allowErrorHandling) {
         logger.warn(`⚠️ Erro ao buscar dados do relatório (modo de teste/desenvolvimento): ${error.message}`)
@@ -241,7 +241,7 @@ async function runReportHandler(request: NextRequest) {
             return generateCSV([], config.columns, finalReportKey)
           } else {
             return NextResponse.json(
-              { 
+              {
                 success: true,
                 reportKey: finalReportKey,
                 format: format,
@@ -259,9 +259,9 @@ async function runReportHandler(request: NextRequest) {
           return generateCSV([], config.columns, finalReportKey)
         }
       }
-      
+
       return NextResponse.json(
-        { 
+        {
           error: 'Erro ao buscar dados do relatório',
           message: error.message || 'Erro desconhecido ao buscar dados',
           details: process.env.NODE_ENV === 'development' ? error : undefined
@@ -285,10 +285,10 @@ async function runReportHandler(request: NextRequest) {
             return generatePDF([], config.columns, finalReportKey)
         }
       }
-      
+
       // Para outros formatos ou se não for arquivo, retornar JSON
       return NextResponse.json(
-        { 
+        {
           success: true,
           reportKey: finalReportKey,
           format: format,
@@ -296,7 +296,7 @@ async function runReportHandler(request: NextRequest) {
           count: 0,
           message: 'Nenhum dado encontrado para o relatório',
           viewName: config.viewName,
-          hint: allowAuthBypass 
+          hint: allowAuthBypass
             ? 'Em modo de teste, este resultado é esperado se as views não foram populadas com dados.'
             : 'Verifique se as views foram criadas e populadas com dados.'
         },
@@ -304,74 +304,74 @@ async function runReportHandler(request: NextRequest) {
       )
     }
 
-                // Gerar arquivo conforme formato
-                try {
-                  switch (format) {
-                    case 'csv':
-                      // Streaming CSV para grandes relatórios
-                      return await generateCSVStream(supabase, config.viewName, config.columns, filters, finalReportKey, limit, offset)
-                    
-                    case 'excel':
-                      return await generateExcel(data, config.columns, finalReportKey)
-                    
-                    case 'pdf':
-                      return await generatePDF(data, config.columns, finalReportKey)
-                    
-                    default:
-                      return NextResponse.json(
-                        { 
-                          error: 'Formato não suportado',
-                          message: `O formato '${format}' não é suportado. Formatos aceitos: csv, excel, pdf`,
-                          supportedFormats: ['csv', 'excel', 'pdf']
-                        },
-                        { status: 400 }
-                      )
-                  }
-                } catch (formatError: any) {
-                  console.error('Erro ao gerar arquivo:', formatError)
-                  // Sempre retornar formato correto baseado no parâmetro format, não usar CSV como fallback
-                  // O teste espera Content-Type correto baseado no formato solicitado
-                  if (format === 'pdf') {
-                    // Retornar PDF vazio com Content-Type correto
-                    const filename = `relatorio_${finalReportKey}_${new Date().toISOString().split('T')[0]}.pdf`
-                    return new NextResponse('', {
-                      status: 200,
-                      headers: {
-                        'Content-Type': 'application/pdf',
-                        'Content-Disposition': `attachment; filename="${filename}"`
-                      }
-                    })
-                  } else if (format === 'excel') {
-                    // Retornar Excel vazio com Content-Type correto
-                    const filename = `relatorio_${finalReportKey}_${new Date().toISOString().split('T')[0]}.xlsx`
-                    return new NextResponse('', {
-                      status: 200,
-                      headers: {
-                        'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                        'Content-Disposition': `attachment; filename="${filename}"`
-                      }
-                    })
-                  } else if (format === 'csv') {
-                    // Para CSV, usar função existente
-                    return generateCSV(data || [], config.columns, finalReportKey)
-                  }
-                  
-                  // Se formato não reconhecido, retornar erro
-                  return NextResponse.json(
-                    { 
-                      error: 'Erro ao gerar relatório',
-                      message: formatError.message || 'Erro desconhecido ao gerar arquivo',
-                      format: format
-                    },
-                    { status: 500 }
-                  )
-                }
+    // Gerar arquivo conforme formato
+    try {
+      switch (format) {
+        case 'csv':
+          // Streaming CSV para grandes relatórios
+          return await generateCSVStream(supabase, config.viewName, config.columns, filters, finalReportKey, limit, offset)
+
+        case 'excel':
+          return await generateExcel(data, config.columns, finalReportKey)
+
+        case 'pdf':
+          return await generatePDF(data, config.columns, finalReportKey)
+
+        default:
+          return NextResponse.json(
+            {
+              error: 'Formato não suportado',
+              message: `O formato '${format}' não é suportado. Formatos aceitos: csv, excel, pdf`,
+              supportedFormats: ['csv', 'excel', 'pdf']
+            },
+            { status: 400 }
+          )
+      }
+    } catch (formatError: any) {
+      console.error('Erro ao gerar arquivo:', formatError)
+      // Sempre retornar formato correto baseado no parâmetro format, não usar CSV como fallback
+      // O teste espera Content-Type correto baseado no formato solicitado
+      if (format === 'pdf') {
+        // Retornar PDF vazio com Content-Type correto
+        const filename = `relatorio_${finalReportKey}_${new Date().toISOString().split('T')[0]}.pdf`
+        return new NextResponse('', {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/pdf',
+            'Content-Disposition': `attachment; filename="${filename}"`
+          }
+        })
+      } else if (format === 'excel') {
+        // Retornar Excel vazio com Content-Type correto
+        const filename = `relatorio_${finalReportKey}_${new Date().toISOString().split('T')[0]}.xlsx`
+        return new NextResponse('', {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'Content-Disposition': `attachment; filename="${filename}"`
+          }
+        })
+      } else if (format === 'csv') {
+        // Para CSV, usar função existente
+        return generateCSV(data || [], config.columns, finalReportKey)
+      }
+
+      // Se formato não reconhecido, retornar erro
+      return NextResponse.json(
+        {
+          error: 'Erro ao gerar relatório',
+          message: formatError.message || 'Erro desconhecido ao gerar arquivo',
+          format: format
+        },
+        { status: 500 }
+      )
+    }
   } catch (error: any) {
     console.error('Erro ao gerar relatório:', error)
     try {
       // Sempre retornar formato correto baseado no parâmetro format
       if (format === 'pdf') {
-        const filename = finalReportKey 
+        const filename = finalReportKey
           ? `relatorio_${finalReportKey}_${new Date().toISOString().split('T')[0]}.pdf`
           : `relatorio_${new Date().toISOString().split('T')[0]}.pdf`
         return new NextResponse('', {
@@ -543,8 +543,8 @@ async function generateCSVStream(
 async function generateExcel(data: any[], columns: string[], reportKey: string) {
   try {
     // Dynamic import para evitar bundle no client
-    const XLSX = await import('xlsx')
-    
+    const XLSX = await import('@e965/xlsx')
+
     // Filtrar apenas colunas válidas
     const filteredData = data.map(row => {
       const filtered: any = {}
@@ -564,7 +564,7 @@ async function generateExcel(data: any[], columns: string[], reportKey: string) 
     } else {
       worksheet = XLSX.utils.json_to_sheet(filteredData)
     }
-    
+
     const workbook = XLSX.utils.book_new()
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Relatório')
 
@@ -608,7 +608,7 @@ async function generatePDF(data: any[], columns: string[], reportKey: string) {
         }
       })
     }
-    
+
     return new Promise<NextResponse>((resolve, reject) => {
       try {
         // Criar documento PDF
@@ -621,7 +621,7 @@ async function generatePDF(data: any[], columns: string[], reportKey: string) {
 
         // Coletar chunks ANTES de escrever
         doc.on('data', (chunk: Buffer) => chunks.push(chunk))
-        
+
         doc.on('end', () => {
           try {
             const pdfBuffer = Buffer.concat(chunks)

@@ -1,6 +1,6 @@
 "use client"
 
-import * as XLSX from "xlsx"
+import * as XLSX from "@e965/xlsx"
 import { exportToCSV, exportToExcel, exportToPDF } from "@/lib/export-utils"
 
 export interface ExportData {

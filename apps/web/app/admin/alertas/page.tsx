@@ -58,8 +58,10 @@ export default function AlertasPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const debouncedSearchQuery = useDebounce(searchQuery, 300)
   const [filtersExpanded, setFiltersExpanded] = useState(false)
+  const [tempFilterType, setTempFilterType] = useState<string>("all")
   const [tempFilterSeverity, setTempFilterSeverity] = useState<string>("all")
   const [tempFilterStatus, setTempFilterStatus] = useState<string>("all")
+  const [filterType, setFilterType] = useState<string>("all")
   const [filterSeverity, setFilterSeverity] = useState<string>("all")
   const [filterStatus, setFilterStatus] = useState<string>("all")
   const [selectedAlertForEdit, setSelectedAlertForEdit] = useState<typeof alertas[0] | null>(null)
@@ -73,8 +75,10 @@ export default function AlertasPage() {
   }
 
   const handleResetFilters = () => {
+    setTempFilterType("all")
     setTempFilterSeverity("all")
     setTempFilterStatus("all")
+    setFilterType("all")
     setFilterSeverity("all")
     setFilterStatus("all")
     setFiltersExpanded(false)
