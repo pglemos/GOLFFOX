@@ -98,10 +98,10 @@ async function handleDispatchReports(request: NextRequest) {
         isAuthorized = true
       } else if (isTestMode || isDevelopment) {
         // Em modo de teste/dev, aceitar apenas se estiver na lista de válidos OU corresponder ao configurado
-        isAuthorized = VALID_TEST_SECRETS.includes(cronSecretFromHeader) || (cronSecret && cronSecretFromHeader === cronSecret)
+        isAuthorized = VALID_TEST_SECRETS.includes(cronSecretFromHeader) || Boolean(cronSecret && cronSecretFromHeader === cronSecret)
       } else {
         // Em produção, apenas se corresponder exatamente
-        isAuthorized = cronSecret && cronSecretFromHeader === cronSecret
+        isAuthorized = Boolean(cronSecret && cronSecretFromHeader === cronSecret)
       }
     } else if (authHeader && authHeader.startsWith('Bearer ')) {
       // Se houver Bearer token no Authorization header, tentar usar como CRON_SECRET
@@ -109,7 +109,7 @@ async function handleDispatchReports(request: NextRequest) {
       if (cronSecret && bearerToken === cronSecret) {
         isAuthorized = true
       } else if (isTestMode || isDevelopment) {
-        isAuthorized = VALID_TEST_SECRETS.includes(bearerToken) || (cronSecret && bearerToken === cronSecret)
+        isAuthorized = VALID_TEST_SECRETS.includes(bearerToken) || Boolean(cronSecret && bearerToken === cronSecret)
       } else {
         isAuthorized = cronSecret && bearerToken === cronSecret
       }

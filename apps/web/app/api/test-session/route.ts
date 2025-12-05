@@ -10,8 +10,8 @@ export async function GET(req: NextRequest) {
   
   // Obter todos os cookies
   const allCookies = req.cookies.getAll()
-  const sessionCookie = cookieStore.get('golffox-session')
-  const csrfCookie = cookieStore.get('golffox-csrf')
+  const sessionCookie = (await cookieStore).get('golffox-session')
+  const csrfCookie = (await cookieStore).get('golffox-csrf')
   
   // Tentar decodificar o cookie de sessão
   let sessionData = null

@@ -69,7 +69,7 @@ export async function POST(req: NextRequest) {
 
     if (uploadError) {
       // Se o bucket não existir, informar ao usuário
-      if (uploadError.message.includes('Bucket not found') || uploadError.message.includes('not found') || uploadError.statusCode === '404') {
+      if (uploadError.message.includes('Bucket not found') || uploadError.message.includes('not found') || (uploadError as any).statusCode === '404') {
         throw new Error('Bucket de avatares não encontrado. Por favor, crie o bucket "avatars" no Supabase Storage primeiro.')
       }
       throw uploadError
