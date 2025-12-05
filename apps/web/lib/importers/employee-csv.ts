@@ -53,9 +53,7 @@ const EmployeeSchema = z.object({
     .refine((val) => !val || val.length === 8, 'CEP deve ter 8 dígitos')
     .optional(),
   centro_custo: z.string().max(100, 'Centro de custo muito longo').optional(),
-  turno: z.enum(['manha', 'tarde', 'noite', 'Manhã', 'Tarde', 'Noite', 'MANHA', 'TARDE', 'NOITE'], {
-    errorMap: () => ({ message: 'Turno deve ser: manhã, tarde ou noite' })
-  })
+  turno: z.enum(['manha', 'tarde', 'noite', 'Manhã', 'Tarde', 'Noite', 'MANHA', 'TARDE', 'NOITE'])
     .transform((val) => val.toLowerCase())
     .optional()
 })
@@ -119,7 +117,7 @@ export function parseCSV(file: File): Promise<ParseResult> {
           } else {
             errors.push({
               line: index + 2, // +2 porque header é linha 1 e índice começa em 0
-              errors: parsed.error.errors.map(e => `${e.path.join('.')}: ${e.message}`)
+              errors: parsed.error.issues.map((e: { path: (string | number)[]; message: string }) => `${e.path.join('.')}: ${e.message}`)
             })
           }
         })

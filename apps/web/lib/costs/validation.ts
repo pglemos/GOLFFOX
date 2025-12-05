@@ -17,9 +17,7 @@ export const costSchema = z.object({
   unit: z.string().optional().nullable(),
   currency: z.string().default('BRL'),
   notes: z.string().optional().nullable(),
-  source: z.enum(['manual', 'import', 'invoice', 'calc'], {
-    errorMap: () => ({ message: 'Origem deve ser: manual, import, invoice ou calc' })
-  }).default('manual')
+  source: z.enum(['manual', 'import', 'invoice', 'calc']).default('manual')
 })
 
 /**
@@ -40,9 +38,7 @@ export const budgetSchema = z.object({
 export const reconciliationSchema = z.object({
   invoice_id: z.string().uuid('ID da fatura inválido'),
   route_id: z.string().uuid('ID da rota inválido').optional().nullable(),
-  action: z.enum(['approve', 'reject', 'request_revision'], {
-    errorMap: () => ({ message: 'Ação deve ser: approve, reject ou request_revision' })
-  }),
+  action: z.enum(['approve', 'reject', 'request_revision']),
   notes: z.string().optional().nullable(),
   discrepancy_threshold_percent: z.number().default(5),
   discrepancy_threshold_amount: z.number().default(100)

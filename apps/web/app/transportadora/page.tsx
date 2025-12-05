@@ -597,10 +597,7 @@ export default function TransportadoraDashboard() {
             formatValue={(v) => v.toString()}
             iconColor="#10B981"
             iconBgColor="rgba(16, 185, 129, 0.1)"
-            onClick={(e) => {
-              console.log('🔵 [DEBUG] KPI Motoristas clicked', e)
-              e.preventDefault()
-              e.stopPropagation()
+            onClick={() => {
               try {
                 router.push('/transportadora/motoristas')
               } catch (err) {
@@ -617,10 +614,7 @@ export default function TransportadoraDashboard() {
             formatValue={(v) => v.toString()}
             iconColor="#EF4444"
             iconBgColor="rgba(239, 68, 68, 0.1)"
-            onClick={(e) => {
-              console.log('🔵 [DEBUG] KPI Alertas clicked', e)
-              e.preventDefault()
-              e.stopPropagation()
+            onClick={() => {
               try {
                 router.push('/transportadora/alertas')
               } catch (err) {
@@ -641,10 +635,7 @@ export default function TransportadoraDashboard() {
             formatValue={(v) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 0 }).format(v)}
             iconColor="#9333EA"
             iconBgColor="rgba(147, 51, 234, 0.1)"
-            onClick={(e) => {
-              console.log('🔵 [DEBUG] KPI Custos clicked', e)
-              e.preventDefault()
-              e.stopPropagation()
+            onClick={() => {
               try {
                 router.push('/transportadora/custos')
               } catch (err) {
@@ -671,10 +662,7 @@ export default function TransportadoraDashboard() {
             iconColor="#F59E0B"
             iconBgColor="rgba(245, 158, 11, 0.1)"
             hint="Clique para ver detalhes"
-            onClick={(e) => {
-              console.log('🔵 [DEBUG] KPI Alertas clicked', e)
-              e.preventDefault()
-              e.stopPropagation()
+            onClick={() => {
               try {
                 router.push('/transportadora/alertas')
               } catch (err) {
@@ -741,7 +729,7 @@ export default function TransportadoraDashboard() {
                 cx="50%"
                 cy="50%"
                 labelLine={false}
-                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                label={({ name, percent }) => `${name} ${percent ? (percent * 100).toFixed(0) : 0}%`}
                 outerRadius={100}
                 fill="#8884d8"
                 dataKey="value"

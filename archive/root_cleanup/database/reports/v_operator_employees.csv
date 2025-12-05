@@ -1,4 +1,0 @@
-id,empresa_id,name,cpf,email,phone,address,latitude,longitude,is_active,created_at
-2a1460ef-1edd-4c6d-a103-3ef3df210d45,bbe19a88-fb1b-4f73-907b-efe90a5dfafa,Ana Silva,11122233344,ana@example.com,,"Rua A, 100",,,True,2025-11-03 13:07:08.470176+00:00
-d883ea2b-2d36-4b7c-b88b-fc3749b816cc,bbe19a88-fb1b-4f73-907b-efe90a5dfafa,Bruno Souza,55566677788,bruno@example.com,,"Rua B, 200",,,True,2025-11-03 13:07:08.518689+00:00
-92094cd2-593f-4ead-99d8-9f093e639690,bbe19a88-fb1b-4f73-907b-efe90a5dfafa,Carla Lima,99900011122,carla@example.com,,"Rua C, 300",,,True,2025-11-03 13:07:08.558642+00:00

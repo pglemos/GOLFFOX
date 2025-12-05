@@ -3,7 +3,6 @@
   Usage: ts-node scripts/health-check-operator.ts
 */
 
-// @ts-expect-error
 import 'dotenv/config'
 import { createClient } from '@supabase/supabase-js'
 

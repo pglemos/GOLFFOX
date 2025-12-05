@@ -23,6 +23,7 @@
     "db:seed:demo": "node scripts/seed-demo.js"
   },
   "dependencies": {
+    "@e965/xlsx": "^0.20.3",
     "@fnando/cnpj": "^2.0.0",
     "@googlemaps/js-api-loader": "^2.0.2",
     "@hookform/resolvers": "^3.9.1",
@@ -79,7 +80,6 @@
     "swr": "^2.2.5",
     "tailwind-merge": "^2.5.4",
     "web-vitals": "^5.1.0",
-    "xlsx": "^0.18.5",
     "zod": "^3.25.76",
     "zustand": "^5.0.2"
   },
@@ -89,6 +89,7 @@
     "@next/bundle-analyzer": "^16.0.0",
     "@playwright/test": "^1.48.2",
     "@supabase/supabase-js": "^2.81.0",
+    "@tailwindcss/postcss": "^4.0.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.1.0",
     "@testing-library/user-event": "^14.5.2",
@@ -117,11 +118,11 @@
     "jest-environment-jsdom": "^29.7.0",
     "lint-staged": "^15.2.11",
     "pg": "^8.16.3",
-    "postcss": "^8.5.2",
+    "postcss": "^8.5.6",
     "prettier": "^3.4.2",
     "prettier-plugin-tailwindcss": "^0.6.9",
     "rimraf": "^6.0.1",
-    "tailwindcss": "^3.4.17",
+    "tailwindcss": "^4.0.0",
     "tailwindcss-animate": "^1.0.7",
     "typescript": "5.9.3"
   },

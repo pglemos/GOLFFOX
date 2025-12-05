@@ -3,9 +3,7 @@
    Identidade: golffox.com.br + Apple/Tesla/Stripe/Linear
    ============================================================ */
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 /* Mobile optimizations */
 @layer base {

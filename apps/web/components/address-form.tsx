@@ -145,7 +145,7 @@ export function AddressForm({
           />
           <Button
             type="button"
-            onClick={handleCepSearch}
+            onClick={() => handleCepSearch()}
             disabled={disabled || loadingCep || unformatNumber(value.cep).length !== 8}
             className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-[var(--radius-lg)] text-sm font-semibold ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] focus-visible:ring-opacity-20 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-[var(--border)] bg-transparent hover:bg-[var(--bg-hover)] hover:border-[var(--brand)] py-2 h-11 px-4"
           >

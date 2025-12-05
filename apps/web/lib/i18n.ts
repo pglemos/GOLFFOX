@@ -23,7 +23,6 @@ function resolveKey(dict: Record<string, unknown>, key: string): unknown {
   // Suporta dot-path: ex. "success.exportGenerated"
   return key.split('.').reduce<unknown>((acc: unknown, part: string) => {
     if (acc && typeof acc === 'object') {
-      // @ts-expect-error indexer dinÃ¢mico
       return (acc as Record<string, unknown>)[part]
     }
     return undefined
