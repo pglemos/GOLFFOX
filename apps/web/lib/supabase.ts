@@ -11,19 +11,28 @@ type MockQueryBuilder = {
   eq: (column: string, value: unknown) => MockQueryBuilder
   gte: (column: string, value: unknown) => MockQueryBuilder
   lte: (column: string, value: unknown) => MockQueryBuilder
+  lt: (column: string, value: unknown) => MockQueryBuilder
   neq: (column: string, value: unknown) => MockQueryBuilder
   like: (column: string, pattern: string) => MockQueryBuilder
   ilike: (column: string, pattern: string) => MockQueryBuilder
   is: (column: string, value: unknown) => MockQueryBuilder
   in: (column: string, values: unknown[]) => MockQueryBuilder
+  or: (filter: string) => MockQueryBuilder
   order: (column: string, options?: { ascending?: boolean }) => MockQueryBuilder
   limit: (count: number) => MockQueryBuilder
   range: (from: number, to: number) => MockQueryBuilder
+  select: (columns?: string, options?: { count?: 'exact' | 'planned' | 'estimated'; head?: boolean }) => MockQueryBuilder
   single: () => Promise<{ data: null; error: Error }>
   maybeSingle: () => Promise<{ data: null; error: Error }>
   data: null
   error: Error
   count: number
+}
+
+type MockRealtimeChannel = {
+  on: (event: 'postgres_changes' | 'presence', filter: any, callback: (payload: any) => void) => MockRealtimeChannel
+  subscribe: (callback?: (status: string) => void) => MockRealtimeChannel
+  unsubscribe: () => Promise<string>
 }
 
 type MockSupabaseClient = {
@@ -33,17 +42,18 @@ type MockSupabaseClient = {
     signOut: () => Promise<{ error: null }>
     getUser: (token?: string) => Promise<{ data: { user: null }; error: Error }>
     setSession: (session: any) => Promise<{ data: { session: null }; error: null }>
+    onAuthStateChange: (callback: (event: string, session: any) => void) => { data: { subscription: any }; error: null }
   }
   from: (table: string) => {
     select: (columns?: string, options?: { count?: 'exact' | 'planned' | 'estimated'; head?: boolean }) => MockQueryBuilder
-    insert: (values: unknown) => MockQueryBuilder
-    update: (values: unknown) => MockQueryBuilder
+    insert: (values: unknown) => MockQueryBuilder & { select: (columns?: string) => MockQueryBuilder }
+    update: (values: unknown) => MockQueryBuilder & { select: (columns?: string) => MockQueryBuilder }
+    upsert: (values: unknown, options?: { onConflict?: string }) => MockQueryBuilder & { select: (columns?: string) => MockQueryBuilder }
     delete: () => MockQueryBuilder
   }
-  channel: (name: string) => {
-    on: (event: any, filter: any, callback: (payload: any) => void) => { subscribe: (callback?: (status: string) => void) => void }
-    subscribe: (callback?: (status: string) => void) => void
-  }
+  rpc: (functionName: string, params?: Record<string, unknown>) => Promise<{ data: null; error: Error }>
+  channel: (name: string) => MockRealtimeChannel
+  removeChannel: (channel: MockRealtimeChannel) => void
 }
 
 let supabase: SupabaseClientType | MockSupabaseClient
@@ -82,14 +92,17 @@ if (envUrl && envAnon) {
       eq: () => builder,
       gte: () => builder,
       lte: () => builder,
+      lt: () => builder,
       neq: () => builder,
       like: () => builder,
       ilike: () => builder,
       is: () => builder,
       in: () => builder,
+      or: () => builder,
       order: () => builder,
       limit: () => builder,
       range: () => builder,
+      select: () => builder,
       single: async () => ({ data: null, error: mockError }),
       maybeSingle: async () => ({ data: null, error: mockError }),
       data: null,
@@ -99,6 +112,18 @@ if (envUrl && envAnon) {
     return builder
   }
 
+  const createMockChannel = (): MockRealtimeChannel => {
+    const ch: MockRealtimeChannel = {
+      on: (_event: 'postgres_changes' | 'presence', _filter: any, _callback: (payload: any) => void) => ch,
+      subscribe: (cb?: (status: string) => void) => {
+        if (cb) cb('SUBSCRIBED')
+        return ch
+      },
+      unsubscribe: async () => Promise.resolve('ok'),
+    }
+    return ch
+  }
+
   supabase = {
     auth: {
       getSession: async () => ({ data: { session: null }, error: null }),
@@ -106,24 +131,21 @@ if (envUrl && envAnon) {
       signOut: async () => ({ error: null }),
       getUser: async () => ({ data: { user: null }, error: mockError }),
       setSession: async () => ({ data: { session: null }, error: null }),
+      onAuthStateChange: () => ({ data: { subscription: null }, error: null }),
     },
-    from: () => ({
-      select: () => createMockBuilder(),
-      insert: () => createMockBuilder(),
-      update: () => createMockBuilder(),
-      delete: () => createMockBuilder(),
-    }),
-    channel: () => {
-      const ch: any = {
-        on: (_event: any, _filter: any, _callback: (payload: any) => void) => ch,
-        subscribe: (cb?: (status: string) => void) => {
-          if (cb) cb('SUBSCRIBED')
-          return ch
-        },
-        unsubscribe: async () => { return Promise.resolve('ok') },
+    from: () => {
+      const builder = createMockBuilder()
+      return {
+        select: () => builder,
+        insert: () => ({ ...builder, select: () => builder }),
+        update: () => ({ ...builder, select: () => builder }),
+        upsert: () => ({ ...builder, select: () => builder }),
+        delete: () => builder,
       }
-      return ch
     },
+    rpc: async () => ({ data: null, error: mockError }),
+    channel: createMockChannel,
+    removeChannel: () => {},
   } as MockSupabaseClient
 }
 

@@ -53,8 +53,8 @@ const EmployeeSchema = z.object({
     .refine((val) => !val || val.length === 8, 'CEP deve ter 8 dígitos')
     .optional(),
   centro_custo: z.string().max(100, 'Centro de custo muito longo').optional(),
-  turno: z.enum(['manha', 'tarde', 'noite', 'Manhã', 'Tarde', 'Noite', 'MANHA', 'TARDE', 'NOITE'], {
-    errorMap: () => ({ message: 'Turno deve ser: manhã, tarde ou noite' })
+  turno: z.enum(['manha', 'tarde', 'noite', 'Manhã', 'Tarde', 'Noite', 'MANHA', 'TARDE', 'NOITE'] as const, {
+    error: 'Turno deve ser: manhã, tarde ou noite'
   })
     .transform((val) => val.toLowerCase())
     .optional()
@@ -119,7 +119,7 @@ export function parseCSV(file: File): Promise<ParseResult> {
           } else {
             errors.push({
               line: index + 2, // +2 porque header é linha 1 e índice começa em 0
-              errors: parsed.error.errors.map(e => `${e.path.join('.')}: ${e.message}`)
+              errors: parsed.error.issues.map((e: { path: (string | number)[]; message: string }) => `${e.path.join('.')}: ${e.message}`)
             })
           }
         })
@@ -146,20 +146,20 @@ export async function geocodeBatch(
   const results = new Map<string, { lat: number; lng: number } | null>()
   const cache = new Map<string, { lat: number; lng: number } | null>()
   const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
-  
+
   // Remover duplicatas mantendo ordem
   const uniqueAddresses = Array.from(new Set(addresses))
-  
+
   for (let i = 0; i < uniqueAddresses.length; i++) {
     const address = uniqueAddresses[i]
-    
+
     // Verificar cache primeiro
     if (cache.has(address)) {
       results.set(address, cache.get(address)!)
       onProgress?.(i + 1, uniqueAddresses.length)
       continue
     }
-    
+
     let attempts = 0
     let coords: { lat: number; lng: number } | null = null
     const maxAttempts = 3
@@ -168,7 +168,7 @@ export async function geocodeBatch(
     while (attempts < maxAttempts && !coords) {
       try {
         coords = await geocodeAddress(address)
-        
+
         if (!coords && attempts < maxAttempts - 1) {
           // Aguardar antes de tentar novamente (exponential backoff)
           await delay(Math.pow(2, attempts) * 1000) // 1s, 2s, 4s
@@ -178,7 +178,7 @@ export async function geocodeBatch(
         }
       } catch (error: any) {
         console.warn(`Erro ao geocodificar endereço "${address}" (tentativa ${attempts + 1}/${maxAttempts}):`, error.message || error)
-        
+
         if (attempts < maxAttempts - 1) {
           await delay(Math.pow(2, attempts) * 1000)
           attempts++
@@ -232,7 +232,7 @@ export async function importEmployees(
 
   for (let i = 0; i < employees.length; i++) {
     const emp = employees[i]
-    
+
     try {
       // Validação de duplicatas no mesmo lote
       if (processedEmails.has(emp.email)) {
@@ -255,7 +255,7 @@ export async function importEmployees(
       if (existingEmployee?.employee_id) {
         // Funcionário já existe, usar employee_id existente
         userId = existingEmployee.employee_id
-        
+
         // Atualizar dados do usuário se necessário
         try {
           await supabase

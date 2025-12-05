@@ -1700,7 +1700,7 @@
 
 /* Overflow e scroll responsivos */
 .scroll-container {
-  @apply overflow-auto scrollbar-custom;
+  @apply overflow-auto;
   max-height: calc(100vh - 8rem);
 }
 

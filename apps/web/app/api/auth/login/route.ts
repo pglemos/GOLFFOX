@@ -79,11 +79,9 @@ async function loginHandler(req: NextRequest) {
   const isDevelopment = process.env.NODE_ENV === 'development'
   const userAgent = req.headers.get('user-agent') || ''
   const isTestSprite = userAgent.includes('TestSprite') || userAgent.includes('testsprite')
-  // ✅ FIX TEMPORÁRIO: Permitir bypass do CSRF na Vercel para diagnóstico
-  // TODO: Remover após identificar problema de cookies na Vercel
-  const isVercelProduction = process.env.VERCEL === '1' && process.env.VERCEL_ENV === 'production'
   
-  // Verificar se há header CSRF presente (mesmo em modo de teste, se fornecido, deve ser válido)
+  // ✅ CSRF Protection: Validar sempre em produção
+  // Em desenvolvimento/teste, permitir bypass apenas se explicitamente solicitado
   const csrfHeader = req.headers.get('x-csrf-token')
   const cookieStore = await cookies()
   const csrfCookie = cookieStore.get('golffox-csrf')?.value
@@ -103,8 +101,9 @@ async function loginHandler(req: NextRequest) {
       return NextResponse.json({ error: 'invalid_csrf' }, { status: 403 })
     }
   } else {
-    // Sem header CSRF - permitir bypass apenas em modo de teste/desenvolvimento
-    const allowCSRFBypass = isTestMode || isDevelopment || isTestSprite || isVercelProduction
+    // Sem header CSRF - permitir bypass apenas em modo de teste/desenvolvimento explícito
+    // REMOVIDO: bypass em produção Vercel (problema de segurança crítico)
+    const allowCSRFBypass = isTestMode || isDevelopment || isTestSprite
     if (!allowCSRFBypass && csrfCookie) {
       // Em produção, se há cookie mas não há header, rejeitar
       logError('CSRF validation failed - missing header', { 
@@ -397,12 +396,29 @@ async function loginHandler(req: NextRequest) {
             code: 'server_config_error' 
           }, { status: 500 })
         }
-        const { data: mapping } = await supabaseAdminForCheck
-          .from('gf_user_company_map')
-          .select('company_id')
-          .eq('user_id', data.user.id)
-          .maybeSingle()
-        companyId = mapping?.company_id || companyId || null
+        // ✅ Tentar buscar company_id via gf_user_company_map primeiro
+        // Se a tabela não existir ou não houver mapeamento, usar company_id direto da tabela users
+        try {
+          const { data: mapping } = await supabaseAdminForCheck
+            .from('gf_user_company_map')
+            .select('company_id')
+            .eq('user_id', data.user.id)
+            .maybeSingle()
+          companyId = mapping?.company_id || companyId || null
+        } catch (mapError: any) {
+          // Tabela gf_user_company_map pode não existir - usar company_id direto
+          debug('Tabela gf_user_company_map não encontrada ou erro ao buscar, usando company_id direto', {
+            error: mapError?.message,
+            userId: data.user.id
+          }, 'AuthAPI')
+          // companyId já foi definido acima do bloco try
+        }
+        
+        // Se ainda não tem companyId, tentar usar do usuário diretamente
+        if (!companyId && existingUser?.company_id) {
+          companyId = existingUser.company_id
+        }
+        
         if (!companyId) {
           return NextResponse.json({ error: 'Usuário operador sem empresa associada', code: 'no_company_mapping' }, { status: 403 })
         }
@@ -467,10 +483,13 @@ async function loginHandler(req: NextRequest) {
     })).toString('base64')
 
     const isSecure = isSecureRequest(req)
+    // ✅ CRÍTICO: Cookie deve ser httpOnly para prevenir XSS attacks
+    // O access_token não deve ser acessível via JavaScript
     const cookieOptions = [
       `golffox-session=${sessionCookieValue}`,
       'path=/',
       'max-age=3600',
+      'httpOnly', // ✅ Adicionado: Previne acesso via JavaScript (XSS protection)
       'SameSite=Lax',
       ...(isSecure ? ['Secure'] : [])
     ].join('; ')

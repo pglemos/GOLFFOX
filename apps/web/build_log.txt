@@ -21,3 +21,53 @@ inicializa´┐¢´┐¢o da biblioteca de v´┐¢nculo din´┐¢mico (DLL) fa
 c.win32-x64-msvc.node
  ÔÜá Attempted to load @next/swc-win32-x64-msvc, but it was not installed
    Skipping creating a lockfile at F:\GOLFFOX\apps\web\.next\lock because we're using WASM bindings
+   Ôû▓ Next.js 16.0.7 (Turbopack)
+   - Environments: .env.local
+
+ ÔÜá The "middleware" file convention is deprecated. Please use "proxy" instead. Learn 
+more: https://nextjs.org/docs/messages/middleware-to-proxy
+   Creating an optimized production build ...
+Error: Cannot apply unknown utility class `scrollbar-custom`
+    [2m[at onInvalidCandidate 
+(F:\GOLFFOX\apps\web\node_modules\tailwindcss\dist\lib.js:21:1511)][0m
+    [2m[at Te (F:\GOLFFOX\apps\web\node_modules\tailwindcss\dist\lib.js:16:36038)][0m
+    [2m[at F:\GOLFFOX\apps\web\node_modules\tailwindcss\dist\lib.js:21:355][0m
+    [2m[at Tr (F:\GOLFFOX\apps\web\node_modules\tailwindcss\dist\lib.js:3:1718)][0m
+    [2m[at _ (F:\GOLFFOX\apps\web\node_modules\tailwindcss\dist\lib.js:3:1377)][0m
+    [2m[at Se (F:\GOLFFOX\apps\web\node_modules\tailwindcss\dist\lib.js:21:172)][0m
+    [2m[at ln (F:\GOLFFOX\apps\web\node_modules\tailwindcss\dist\lib.js:38:294)][0m
+    [2m[at async sn (F:\GOLFFOX\apps\web\node_modules\tailwindcss\dist\lib.js:38:631)][0m
+    [2m[at async Qr 
+(F:\GOLFFOX\apps\web\node_modules\@tailwindcss\node\dist\index.js:10:3385)][0m
+    [2m[at async I 
+(F:\GOLFFOX\apps\web\node_modules\@tailwindcss\postcss\dist\index.js:10:3978)][0m
+
+> Build error occurred
+Error: Turbopack build failed with 1 errors:
+./apps/web/app/globals.css
+Error evaluating Node.js code
+CssSyntaxError: tailwindcss: F:\GOLFFOX\apps\web\app\globals.css:1:1: Cannot apply unknown 
+utility class `scrollbar-custom`
+    at Input.error (apps/web/node_modules/postcss/lib/input.js:135:16) 
+[F:\GOLFFOX\apps\web\.next\build\chunks\5bcb1_773c506d._.js:4651:22]
+    at Root.error (apps/web/node_modules/postcss/lib/node.js:146:32) 
+[F:\GOLFFOX\apps\web\.next\build\chunks\5bcb1_773c506d._.js:928:38]
+    [at Object.Once 
+(F:\GOLFFOX\apps\web\node_modules\@tailwindcss\postcss\dist\index.js:10:6912)]
+    at async LazyResult.runAsync (apps/web/node_modules/postcss/lib/lazy-result.js:293:11) 
+[F:\GOLFFOX\apps\web\.next\build\chunks\5bcb1_773c506d._.js:6206:21]
+    at async transform (turbopack:///[turbopack-node]/transforms/postcss.ts:70:34) 
+[F:\GOLFFOX\apps\web\.next\build\chunks\[root-of-the-server]__91cc9ddc._.js:172:36]
+    at async run (turbopack:///[turbopack-node]/ipc/evaluate.ts:92:23) 
+[F:\GOLFFOX\apps\web\.next\build\chunks\[root-of-the-server]__c8488333._.js:443:31]
+
+Import trace:
+  Client Component Browser:
+    ./apps/web/app/globals.css [Client Component Browser]
+    ./apps/web/app/layout.tsx [Server Component]
+
+
+    at async transform (turbopack:///[turbopack-node]/transforms/postcss.ts:70:34) 
+[F:\GOLFFOX\apps\web\.next\build\chunks\[root-of-the-server]__91cc9ddc._.js:172:36])
+    at async run (turbopack:///[turbopack-node]/ipc/evaluate.ts:92:23) 
+[F:\GOLFFOX\apps\web\.next\build\chunks\[root-of-the-server]__c8488333._.js:443:31])

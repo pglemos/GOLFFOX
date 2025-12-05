@@ -1,0 +1,108 @@
+﻿node.exe : npm warn config optional Use `--omit=optional` to exclude optional dependencies, 
+or
+No linha:1 caractere:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (npm warn config...ependencies, or:String) [],  
+   RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+npm warn config `--include=optional` to include them.
+npm warn config
+npm warn config       Default value does install optional deps unless otherwise omitted.
+
+> golffox-web@1.0.0 type-check
+> tsc --noEmit
+
+app/admin/alertas/page.tsx(69,5): error TS2304: Cannot find name 'setFilterType'.
+app/admin/alertas/page.tsx(69,19): error TS2304: Cannot find name 'tempFilterType'.
+app/admin/relatorios/page.tsx(409,69): error TS2345: Argument of type '{ i18n: { ns: string; key: string; }; }' is not assignable to parameter of type 'string'.
+app/admin/rotas/route-create-modal.tsx(286,34): error TS2339: Property 'errors' does not exist on type 'ZodError<unknown>'.
+app/admin/rotas/route-create-modal.tsx(319,17): error TS2322: Type 'Partial<RouteFormData>' is not assignable to type 'RouteFormData'.
+  Types of property 'name' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+app/admin/rotas/route-create-modal.tsx(320,17): error TS2322: Type 'Dispatch<SetStateAction<Partial<RouteFormData>>>' is not assignable to type 'Dispatch<SetStateAction<RouteFormData>>'.
+  Type 'SetStateAction<RouteFormData>' is not assignable to type 'SetStateAction<Partial<RouteFormData>>'.
+    Type '(prevState: RouteFormData) => RouteFormData' is not assignable to type 'SetStateAction<Partial<RouteFormData>>'.
+      Type '(prevState: RouteFormData) => RouteFormData' is not assignable to type '(prevState: Partial<RouteFormData>) => Partial<RouteFormData>'.
+        Types of parameters 'prevState' and 'prevState' are incompatible.
+          Type 'Partial<RouteFormData>' is not assignable to type 'RouteFormData'.
+            Types of property 'name' are incompatible.
+              Type 'string | undefined' is not assignable to type 'string'.
+                Type 'undefined' is not assignable to type 'string'.
+app/admin/rotas/route-create-modal.tsx(323,17): error TS2322: Type '{ id: string; name: string; documents_valid?: boolean | undefined; } | null' is not assignable to type '{ id: string; name: string; documents_valid: boolean; } | null'.
+  Type '{ id: string; name: string; documents_valid?: boolean | undefined; }' is not assignable to type '{ id: string; name: string; documents_valid: boolean; }'.
+    Types of property 'documents_valid' are incompatible.
+      Type 'boolean | undefined' is not assignable to type 'boolean'.
+        Type 'undefined' is not assignable to type 'boolean'.
+app/admin/socorro/page.tsx(516,67): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(values: never, options?: { count?: "exact" | "planned" | "estimated" | undefined; } | undefined): (MockQueryBuilder & { select: (columns?: string | undefined) => MockQueryBuilder; }) | PostgrestFilterBuilder<...>', gave the following error.
+    Argument of type '{ company_id: any; route_id: any; vehicle_id: any; driver_id: any; severity: string; status: string; description: string; }' is not assignable to parameter of type 'never'.
+  Overload 2 of 2, '(values: never[], options?: { count?: "exact" | "planned" | "estimated" | undefined; defaultToNull?: boolean | undefined; } | undefined): (MockQueryBuilder & { ...; }) | PostgrestFilterBuilder<...>', gave the following error.
+    Object literal may only specify known properties, and 'company_id' does not exist in type 'never[]'.
+app/admin/socorro/page.tsx(542,39): error TS2345: Argument of type '{ status: string; resolved_at: string; }' is not assignable to parameter of type 'never'.
+app/admin/transportadoras/page.tsx(182,6): error TS2820: Type '"carrier.created"' is not assignable to type 'SyncEventType'. Did you mean '"driver.created"'?
+app/admin/transportadoras/page.tsx(182,25): error TS2820: Type '"carrier.updated"' is not assignable to type 'SyncEventType'. Did you mean '"driver.updated"'?
+app/admin/transportadoras/page.tsx(182,44): error TS2820: Type '"carrier.deleted"' is not assignable to type 'SyncEventType'. Did you mean '"driver.deleted"'?
+app/api/admin/alerts/update/route.ts(40,21): error TS2345: Argument of type 'any' is not assignable to parameter of type 'never'.
+app/api/admin/alerts/update/route.ts(54,56): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(values: never, options?: { count?: "exact" | "planned" | "estimated" | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "gf_audit_log", never, "POST">', gave the following error.
+    Argument of type '{ actor_id: string | null; action_type: string; resource_type: string; resource_id: string; details: { changes: any; updated_by: string; }; }' is not assignable to parameter of type 'never'.
+  Overload 2 of 2, '(values: never[], options?: { count?: "exact" | "planned" | "estimated" | undefined; defaultToNull?: boolean | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "gf_audit_log", never, "POST">', gave the following error.
+    Object literal may only specify known properties, and 'actor_id' does not exist in type 'never[]'.
+app/api/admin/alerts/update/route.ts(72,76): error TS2339: Property 'errors' does not exist on type 'ZodError<unknown>'.
+app/api/admin/companies-list/route.ts(52,7): error TS2322: Type '{ id: any; name: any; }[] | null' is not assignable to type '{ id: any; name: any; is_active: any; }[] | null'.
+  Type '{ id: any; name: any; }[]' is not assignable to type '{ id: any; name: any; is_active: any; }[]'.
+    Property 'is_active' is missing in type '{ id: any; name: any; }' but required in type '{ id: any; name: any; is_active: any; }'.
+app/api/admin/create-operator/route.ts(252,7): error TS2322: Type '{ user: User; } | { user: null; }' is not assignable to type '{ user: { id: string; email?: string | undefined; }; } | null'.
+  Type '{ user: null; }' is not assignable to type '{ user: { id: string; email?: string | undefined; }; }'.
+    Types of property 'user' are incompatible.
+      Type 'null' is not assignable to type '{ id: string; email?: string | undefined; }'.
+app/api/admin/create-operator/route.ts(264,20): error TS18047: 'company' is possibly 'null'.
+app/api/admin/create-operator/route.ts(297,26): error TS18047: 'company' is possibly 'null'.
+app/api/admin/create-operator/route.ts(316,22): error TS18047: 'company' is possibly 'null'.
+app/api/admin/create-operator/route.ts(326,63): error TS18047: 'company' is possibly 'null'.
+app/api/admin/create-operator/route.ts(326,75): error TS2551: Property 'catch' does not exist on type 'PostgrestFilterBuilder<any, any, any, null, "companies", unknown, "DELETE">'. Did you mean 'match'?
+app/api/admin/create-operator/route.ts(331,63): error TS18047: 'company' is possibly 'null'.
+app/api/admin/create-operator/route.ts(341,19): error TS18047: 'company' is possibly 'null'.
+app/api/admin/create-operator/route.ts(351,26): error TS2339: Property 'phone' does not exist on type '{ name: any; }'.
+app/api/admin/create-operator/route.ts(373,69): error TS18047: 'company' is possibly 'null'.
+app/api/admin/create-operator/route.ts(387,67): error TS18047: 'company' is possibly 'null'.
+app/api/admin/create-operator/route.ts(411,67): error TS18047: 'company' is possibly 'null'.
+app/api/admin/create-operator/route.ts(426,67): error TS18047: 'company' is possibly 'null'.
+app/api/admin/create-operator/route.ts(433,22): error TS18046: 'e2' is of type 'unknown'.
+app/api/admin/create-operator/route.ts(450,23): error TS18047: 'company' is possibly 'null'.
+app/api/admin/create-operator/route.ts(511,24): error TS18047: 'company' is possibly 'null'.
+app/api/admin/create-operator/route.ts(531,13): error TS18046: 'auditError' is of type 'unknown'.
+app/api/admin/create-operator/route.ts(532,13): error TS18046: 'auditError' is of type 'unknown'.
+app/api/admin/create-operator/route.ts(546,18): error TS18047: 'company' is possibly 'null'.
+app/api/admin/create-transportadora-login/route.ts(134,68): error TS2339: Property 'errors' does not exist on type 'ZodError<unknown>'.
+app/api/admin/drivers/[driverId]/route.ts(39,15): error TS2345: Argument of type '{ name: any; email: any; phone: any; transportadora_id: any; cpf: any; cnh: any; cnh_category: any; cnh_expiry: any; is_active: any; updated_at: string; }' is not assignable to parameter of type 'never'.
+app/api/admin/drivers/route.ts(41,8): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(values: never, options?: { count?: "exact" | "planned" | "estimated" | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "drivers", never, "POST">', gave the following error.
+    Argument of type '{ name: any; email: any; phone: any; transportadora_id: any; cpf: any; cnh: any; cnh_category: any; cnh_expiry: any; is_active: any; role: string; }[]' is not assignable to parameter of type 'never'.
+  Overload 2 of 2, '(values: never[], options?: { count?: "exact" | "planned" | "estimated" | undefined; defaultToNull?: boolean | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "drivers", never, "POST">', gave the following error.
+    Type '{ name: any; email: any; phone: any; transportadora_id: any; cpf: any; cnh: any; cnh_category: any; cnh_expiry: any; is_active: any; role: string; }' is not assignable to type 'never'.
+app/api/admin/seed-cost-categories/route.ts(68,17): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(values: never, options?: { onConflict?: string | undefined; ignoreDuplicates?: boolean | undefined; count?: "exact" | "planned" | "estimated" | undefined; } | undefined): PostgrestFilterBuilder<{ ...; }, ... 5 more ..., "POST">', gave the following error.
+    Argument of type '{ id: string; name: string; description: string; is_active: boolean; }' is not assignable to parameter of type 'never'.
+  Overload 2 of 2, '(values: never[], options?: { onConflict?: string | undefined; ignoreDuplicates?: boolean | undefined; count?: "exact" | "planned" | "estimated" | undefined; defaultToNull?: boolean | undefined; } | undefined): PostgrestFilterBuilder<...>', gave the following error.
+    Argument of type '{ id: string; name: string; description: string; is_active: boolean; }' is not assignable to parameter of type 'never[]'.
+      Type '{ id: string; name: string; description: string; is_active: boolean; }' is missing the following properties from type 'never[]': length, pop, push, concat, and 35 more.
+app/api/admin/transportadoras/[transportadoraId]/drivers/[driverId]/route.ts(34,15): error TS2345: Argument of type '{ name: any; email: any; phone: any; cpf: any; cnh: any; cnh_category: any; }' is not assignable to parameter of type 'never'.
+app/api/admin/transportadoras/[transportadoraId]/vehicles/[vehicleId]/route.ts(45,15): error TS2345: Argument of type '{ plate: any; prefix: any; manufacturer: any; model: any; year: any; capacity: any; is_active: any; vehicle_type: any; renavam: any; chassis: any; }' is not assignable to parameter of type 'never'.
+app/api/admin/transportadoras/create/route.ts(89,15): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(values: never, options?: { count?: "exact" | "planned" | "estimated" | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "carriers", never, "POST">', gave the following error.
+    Argument of type 'CarrierInsert' is not assignable to parameter of type 'never'.
+  Overload 2 of 2, '(values: never[], options?: { count?: "exact" | "planned" | "estimated" | undefined; defaultToNull?: boolean | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "carriers", never, "POST">', gave the following error.
+    Argument of type 'CarrierInsert' is not assignable to parameter of type 'never[]'.
+      Type 'CarrierInsert' is missing the following properties from type 'never[]': length, pop, push, concat, and 35 more.
+app/api/admin/transportadoras/create/route.ts(101,69): error TS2339: Property 'id' does not exist on type 'never'.
+app/api/admin/transportadoras/create/route.ts(110,68): error TS2339: Property 'errors' does not exist on type 'ZodError<unknown>'.
+app/api/admin/transportadoras/delete/route.ts(49,15): error TS2345: Argument of type '{ transportadora_id: null; }' is not assignable to parameter of type 'never'.
+app/api/admin/transportadoras/delete/route.ts(68,15): error TS2345: Argument of type '{ transportadora_id: null; }' is not assignable to parameter of type 'never'.
+app/api/admin/transportadoras/delete/route.ts(115,19): error TS2345: Argument of type '{ transportadora_id: null; }' is not assignable to parameter of type 'never'.
+app/api/admin/transportadoras/update/route.ts(84,15): error TS2345: Argument of type 'CarrierUpdate' is not assignable to parameter of type 'never'.
+app/api/admin/transportadoras/update/route.ts(103,68): error TS2339: Property 'errors' does not exist on type 'ZodError<unknown>'.
+app/api/admin/trips/route.ts(81,9): error TS2345: Argument of type 'PostgrestFilterBuilder<any, any, any, { id: any; }[], "routes", unknown, "GET">' is not assignable to parameter of type 'readonly any[]'.

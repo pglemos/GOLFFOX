@@ -1,0 +1,216 @@
+﻿node.exe : npm warn config optional Use `--omit=optional` to exclude optional dependencies, 
+or
+No linha:1 caractere:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (npm warn config...ependencies, or:String) [],  
+   RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+npm warn config `--include=optional` to include them.
+npm warn config
+npm warn config       Default value does install optional deps unless otherwise omitted.
+
+> golffox-web@1.0.0 build
+> next build
+
+ ÔÜá Attempted to load F:\GOLFFOX\apps\web\node_modules\next\next-swc-fallback\@next\swc-win
+32-x64-msvc\next-swc.win32-x64-msvc.node, but an error occurred: Uma rotina de 
+inicializa´┐¢´┐¢o da biblioteca de v´┐¢nculo din´┐¢mico (DLL) falhou.
+\\?\F:\GOLFFOX\apps\web\node_modules\next\next-swc-fallback\@next\swc-win32-x64-msvc\next-sw
+c.win32-x64-msvc.node
+ ÔÜá Attempted to load @next/swc-win32-x64-msvc, but it was not installed
+   Skipping creating a lockfile at F:\GOLFFOX\apps\web\.next\lock because we're using WASM bindings
+   Ôû▓ Next.js 16.0.7 (Turbopack)
+   - Environments: .env.local
+
+ ÔÜá The "middleware" file convention is deprecated. Please use "proxy" instead. Learn 
+more: https://nextjs.org/docs/messages/middleware-to-proxy
+   Creating an optimized production build ...
+ Ô£ô Compiled successfully in 41s
+   Skipping validation of types
+   Collecting page data using 7 workers ...
+ ÔÜá Using edge runtime on a page currently disables static generation for that page
+   Generating static pages using 7 workers (0/147) ...
+   Generating static pages using 7 workers (36/147) 
+   Generating static pages using 7 workers (73/147) 
+   Generating static pages using 7 workers (110/147) 
+ Ô£ô Generating static pages using 7 workers (147/147) in 7.0s
+   Finalizing page optimization ...
+
+Route (app)
+Ôöî Ôùï /
+Ôö£ Ôùï /_not-found
+Ôö£ Ôùï /admin
+Ôö£ Ôùï /admin/ajuda-suporte
+Ôö£ Ôùï /admin/alertas
+Ôö£ Ôùï /admin/configuracoes
+Ôö£ Ôùï /admin/custos
+Ôö£ Ôùï /admin/empresas
+Ôö£ Ôùï /admin/mapa
+Ôö£ Ôùï /admin/migrate
+Ôö£ Ôùï /admin/min
+Ôö£ Ôùï /admin/motoristas
+Ôö£ Ôùï /admin/preferences
+Ôö£ Ôùï /admin/relatorios
+Ôö£ Ôùï /admin/rotas
+Ôö£ ãÆ /admin/rotas/gerar-pontos
+Ôö£ Ôùï /admin/socorro
+Ôö£ Ôùï /admin/transportadoras
+Ôö£ Ôùï /admin/usuarios
+Ôö£ Ôùï /admin/veiculos
+Ôö£ ãÆ /api/admin/alerts-list
+Ôö£ ãÆ /api/admin/alerts/[alertId]
+Ôö£ ãÆ /api/admin/alerts/delete
+Ôö£ ãÆ /api/admin/alerts/update
+Ôö£ ãÆ /api/admin/assistance-requests-list
+Ôö£ ãÆ /api/admin/assistance-requests/[requestId]
+Ôö£ ãÆ /api/admin/assistance-requests/delete
+Ôö£ ãÆ /api/admin/audit-db
+Ôö£ ãÆ /api/admin/audit-log
+Ôö£ ãÆ /api/admin/companies
+Ôö£ ãÆ /api/admin/companies-list
+Ôö£ ãÆ /api/admin/companies/[companyId]
+Ôö£ ãÆ /api/admin/companies/delete
+Ôö£ ãÆ /api/admin/costs-options
+Ôö£ ãÆ /api/admin/create-carrier-login
+Ôö£ ãÆ /api/admin/create-operator
+Ôö£ ãÆ /api/admin/create-operator-login
+Ôö£ ãÆ /api/admin/create-transportadora-login
+Ôö£ ãÆ /api/admin/create-user
+Ôö£ ãÆ /api/admin/custos
+Ôö£ ãÆ /api/admin/drivers
+Ôö£ ãÆ /api/admin/drivers-list
+Ôö£ ãÆ /api/admin/drivers/[driverId]
+Ôö£ ãÆ /api/admin/drivers/delete
+Ôö£ ãÆ /api/admin/emergency/available-drivers
+Ôö£ ãÆ /api/admin/emergency/available-vehicles
+Ôö£ ãÆ /api/admin/emergency/dispatch
+Ôö£ ãÆ /api/admin/emergency/routes-with-problems
+Ôö£ ãÆ /api/admin/employees-list
+Ôö£ ãÆ /api/admin/execute-sql-fix
+Ôö£ ãÆ /api/admin/fix-database
+Ôö£ ãÆ /api/admin/generate-stops
+Ôö£ ãÆ /api/admin/kpis
+Ôö£ ãÆ /api/admin/migrate-users-address
+Ôö£ ãÆ /api/admin/optimize-route
+Ôö£ ãÆ /api/admin/routes
+Ôö£ ãÆ /api/admin/routes-list
+Ôö£ ãÆ /api/admin/routes/delete
+Ôö£ ãÆ /api/admin/seed-cost-categories
+Ôö£ ãÆ /api/admin/transportadora/[transportadoraId]/drivers
+Ôö£ ãÆ /api/admin/transportadora/[transportadoraId]/drivers/[driverId]
+Ôö£ ãÆ /api/admin/transportadora/[transportadoraId]/users
+Ôö£ ãÆ /api/admin/transportadora/[transportadoraId]/vehicles
+Ôö£ ãÆ /api/admin/transportadora/[transportadoraId]/vehicles/[vehicleId]
+Ôö£ ãÆ /api/admin/transportadora/create
+Ôö£ ãÆ /api/admin/transportadora/delete
+Ôö£ ãÆ /api/admin/transportadora/update
+Ôö£ ãÆ /api/admin/transportadoras-list
+Ôö£ ãÆ /api/admin/transportadoras/[transportadoraId]/drivers
+Ôö£ ãÆ /api/admin/transportadoras/[transportadoraId]/drivers/[driverId]
+Ôö£ ãÆ /api/admin/transportadoras/[transportadoraId]/users
+Ôö£ ãÆ /api/admin/transportadoras/[transportadoraId]/vehicles
+Ôö£ ãÆ /api/admin/transportadoras/[transportadoraId]/vehicles/[vehicleId]
+Ôö£ ãÆ /api/admin/transportadoras/create
+Ôö£ ãÆ /api/admin/transportadoras/delete
+Ôö£ ãÆ /api/admin/transportadoras/update
+Ôö£ ãÆ /api/admin/trips
+Ôö£ ãÆ /api/admin/trips/[tripId]
+Ôö£ ãÆ /api/admin/users-list
+Ôö£ ãÆ /api/admin/users/[userId]
+Ôö£ ãÆ /api/admin/users/change-role
+Ôö£ ãÆ /api/admin/users/delete
+Ôö£ ãÆ /api/admin/vehicles
+Ôö£ ãÆ /api/admin/vehicles-list
+Ôö£ ãÆ /api/admin/vehicles/[vehicleId]
+Ôö£ ãÆ /api/admin/vehicles/delete
+Ôö£ ãÆ /api/analytics/web-vitals
+Ôö£ ãÆ /api/auth/clear-session
+Ôö£ ãÆ /api/auth/csrf
+Ôö£ ãÆ /api/auth/fix-test-user
+Ôö£ ãÆ /api/auth/fix-transportadora-user
+Ôö£ ãÆ /api/auth/login
+Ôö£ ãÆ /api/auth/me
+Ôö£ ãÆ /api/auth/seed-admin
+Ôö£ ãÆ /api/auth/set-session
+Ôö£ ãÆ /api/cep
+Ôö£ ãÆ /api/costs/budgets
+Ôö£ ãÆ /api/costs/categories
+Ôö£ ãÆ /api/costs/export
+Ôö£ ãÆ /api/costs/import
+Ôö£ ãÆ /api/costs/kpis
+Ôö£ ãÆ /api/costs/manual
+Ôö£ ãÆ /api/costs/reconcile
+Ôö£ ãÆ /api/costs/vs-budget
+Ôö£ ãÆ /api/cron/dispatch-reports
+Ôö£ ãÆ /api/cron/refresh-costs-mv
+Ôö£ ãÆ /api/cron/refresh-kpis
+Ôö£ ãÆ /api/docs/openapi
+Ôö£ ãÆ /api/health
+Ôö£ ãÆ /api/notifications/check-proximity
+Ôö£ ãÆ /api/notifications/email
+Ôö£ ãÆ /api/operador/associate-company
+Ôö£ ãÆ /api/operador/create-employee
+Ôö£ ãÆ /api/operador/employees
+Ôö£ ãÆ /api/operador/historico-rotas
+Ôö£ ãÆ /api/operador/optimize-route
+Ôö£ ãÆ /api/operator/create-employee
+Ôö£ ãÆ /api/operator/optimize-route
+Ôö£ ãÆ /api/reports/dispatch
+Ôö£ ãÆ /api/reports/run
+Ôö£ ãÆ /api/reports/schedule
+Ôö£ ãÆ /api/test-session
+Ôö£ ãÆ /api/transportadora/alertas
+Ôö£ ãÆ /api/transportadora/alerts
+Ôö£ ãÆ /api/transportadora/costs/route
+Ôö£ ãÆ /api/transportadora/costs/vehicle
+Ôö£ ãÆ /api/transportadora/drivers/[driverId]/documents
+Ôö£ ãÆ /api/transportadora/drivers/[driverId]/exams
+Ôö£ ãÆ /api/transportadora/motoristas
+Ôö£ ãÆ /api/transportadora/reports/driver-performance
+Ôö£ ãÆ /api/transportadora/reports/fleet-usage
+Ôö£ ãÆ /api/transportadora/reports/trips
+Ôö£ ãÆ /api/transportadora/storage/signed-url
+Ôö£ ãÆ /api/transportadora/upload
+Ôö£ ãÆ /api/transportadora/vehicles/[vehicleId]/documents
+Ôö£ ãÆ /api/transportadora/vehicles/[vehicleId]/maintenances
+Ôö£ ãÆ /api/user/update-profile
+Ôö£ ãÆ /api/user/upload-avatar
+Ôö£ Ôùï /diagnostico
+Ôö£ Ôùï /driver
+Ôö£ Ôùï /operador
+Ôö£ Ôùï /operador/ajuda
+Ôö£ Ôùï /operador/alertas
+Ôö£ Ôùï /operador/comunicacoes
+Ôö£ Ôùï /operador/configuracoes
+Ôö£ Ôùï /operador/conformidade
+Ôö£ Ôùï /operador/custos
+Ôö£ Ôùï /operador/funcionarios
+Ôö£ Ôùï /operador/historico-rotas
+Ôö£ Ôùï /operador/preferencias
+Ôö£ Ôùï /operador/prestadores
+Ôö£ Ôùï /operador/relatorios
+Ôö£ Ôùï /operador/rotas
+Ôö£ Ôùï /operador/rotas/mapa
+Ôö£ Ôùï /operador/sincronizar
+Ôö£ Ôùï /operador/solicitacoes
+Ôö£ Ôùï /passenger
+Ôö£ Ôùï /transportadora
+Ôö£ Ôùï /transportadora/ajuda
+Ôö£ Ôùï /transportadora/alertas
+Ôö£ Ôùï /transportadora/configuracoes
+Ôö£ Ôùï /transportadora/custos
+Ôö£ Ôùï /transportadora/mapa
+Ôö£ Ôùï /transportadora/motoristas
+Ôö£ Ôùï /transportadora/preferencias
+Ôö£ Ôùï /transportadora/relatorios
+Ôö£ Ôùï /transportadora/veiculos
+Ôöö Ôùï /unauthorized
+
+
+ãÆ Proxy (Middleware)
+
+Ôùï  (Static)   prerendered as static content
+ãÆ  (Dynamic)  server-rendered on demand
+

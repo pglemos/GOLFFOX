@@ -45,8 +45,8 @@ export function usePerformance(config: Partial<PerformanceConfig> = {}): {
 
   const frameCount = useRef(0)
   const lastTime = useRef(performance.now())
-  const animationFrame = useRef<number>()
-  const intervalRef = useRef<NodeJS.Timeout>()
+  const animationFrame = useRef<number | undefined>(undefined)
+  const intervalRef = useRef<NodeJS.Timeout | undefined>(undefined)
 
   // FPS Monitoring
   const measureFPS = useCallback(() => {
@@ -240,7 +240,7 @@ export function useThrottle<T extends (...args: any[]) => any>(
   delay: number
 ): T {
   const lastCall = useRef(0)
-  const timeoutRef = useRef<NodeJS.Timeout>()
+  const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined)
 
   return useCallback(
     ((...args: Parameters<T>) => {

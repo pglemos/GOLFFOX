@@ -20,11 +20,12 @@ export async function POST(req: NextRequest) {
     const res = NextResponse.json({ ok: true, cleared: true, user: userMeta || null })
 
     // Remover cookie de sessão da aplicação (lido no middleware)
+    // ✅ Manter httpOnly: true para consistência com criação do cookie
     res.cookies.set({
       name: "golffox-session",
       value: "",
       path: "/",
-      httpOnly: false,
+      httpOnly: true, // ✅ Corrigido: Manter httpOnly ao limpar
       sameSite: "lax",
       secure: isSecure,
       maxAge: 0,
@@ -35,7 +36,7 @@ export async function POST(req: NextRequest) {
       name: "golffox-auth",
       value: "",
       path: "/",
-      httpOnly: false,
+      httpOnly: true, // ✅ Corrigido: Manter httpOnly ao limpar
       sameSite: "lax",
       secure: isSecure,
       maxAge: 0,

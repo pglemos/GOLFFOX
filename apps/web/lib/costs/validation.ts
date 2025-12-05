@@ -17,8 +17,8 @@ export const costSchema = z.object({
   unit: z.string().optional().nullable(),
   currency: z.string().default('BRL'),
   notes: z.string().optional().nullable(),
-  source: z.enum(['manual', 'import', 'invoice', 'calc'], {
-    errorMap: () => ({ message: 'Origem deve ser: manual, import, invoice ou calc' })
+  source: z.enum(['manual', 'import', 'invoice', 'calc'] as const, {
+    error: 'Origem deve ser: manual, import, invoice ou calc'
   }).default('manual')
 })
 
@@ -40,8 +40,8 @@ export const budgetSchema = z.object({
 export const reconciliationSchema = z.object({
   invoice_id: z.string().uuid('ID da fatura inválido'),
   route_id: z.string().uuid('ID da rota inválido').optional().nullable(),
-  action: z.enum(['approve', 'reject', 'request_revision'], {
-    errorMap: () => ({ message: 'Ação deve ser: approve, reject ou request_revision' })
+  action: z.enum(['approve', 'reject', 'request_revision'] as const, {
+    error: 'Ação deve ser: approve, reject ou request_revision'
   }),
   notes: z.string().optional().nullable(),
   discrepancy_threshold_percent: z.number().default(5),
@@ -58,8 +58,8 @@ export function hasSignificantDiscrepancy(
   thresholdAmount: number = 100
 ): boolean {
   const discrepancyAbsolute = Math.abs(invoicedAmount - measuredAmount)
-  const discrepancyPercent = measuredAmount > 0 
-    ? (discrepancyAbsolute / measuredAmount) * 100 
+  const discrepancyPercent = measuredAmount > 0
+    ? (discrepancyAbsolute / measuredAmount) * 100
     : 0
 
   return discrepancyAbsolute > thresholdAmount || discrepancyPercent > thresholdPercent

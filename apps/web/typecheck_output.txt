@@ -1,0 +1,532 @@
+﻿node.exe : npm warn config optional Use `--omit=optional` to exclude optional dependencies, 
+or
+No linha:1 caractere:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (npm warn config...ependencies, or:String) [],  
+   RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+npm warn config `--include=optional` to include them.
+npm warn config
+npm warn config       Default value does install optional deps unless otherwise omitted.
+
+> golffox-web@1.0.0 type-check
+> tsc --noEmit
+
+app/admin/alertas/page.tsx(69,5): error TS2304: Cannot find name 'setFilterType'.
+app/admin/alertas/page.tsx(69,19): error TS2304: Cannot find name 'tempFilterType'.
+app/admin/relatorios/page.tsx(409,69): error TS2345: Argument of type '{ i18n: { ns: string; key: string; }; }' is not assignable to parameter of type 'string'.
+app/admin/rotas/route-create-modal.tsx(286,34): error TS2339: Property 'errors' does not exist on type 'ZodError<unknown>'.
+app/admin/rotas/route-create-modal.tsx(319,17): error TS2322: Type 'Partial<RouteFormData>' is not assignable to type 'RouteFormData'.
+  Types of property 'name' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+app/admin/rotas/route-create-modal.tsx(320,17): error TS2322: Type 'Dispatch<SetStateAction<Partial<RouteFormData>>>' is not assignable to type 'Dispatch<SetStateAction<RouteFormData>>'.
+  Type 'SetStateAction<RouteFormData>' is not assignable to type 'SetStateAction<Partial<RouteFormData>>'.
+    Type '(prevState: RouteFormData) => RouteFormData' is not assignable to type 'SetStateAction<Partial<RouteFormData>>'.
+      Type '(prevState: RouteFormData) => RouteFormData' is not assignable to type '(prevState: Partial<RouteFormData>) => Partial<RouteFormData>'.
+        Types of parameters 'prevState' and 'prevState' are incompatible.
+          Type 'Partial<RouteFormData>' is not assignable to type 'RouteFormData'.
+            Types of property 'name' are incompatible.
+              Type 'string | undefined' is not assignable to type 'string'.
+                Type 'undefined' is not assignable to type 'string'.
+app/admin/rotas/route-create-modal.tsx(323,17): error TS2322: Type '{ id: string; name: string; documents_valid?: boolean | undefined; } | null' is not assignable to type '{ id: string; name: string; documents_valid: boolean; } | null'.
+  Type '{ id: string; name: string; documents_valid?: boolean | undefined; }' is not assignable to type '{ id: string; name: string; documents_valid: boolean; }'.
+    Types of property 'documents_valid' are incompatible.
+      Type 'boolean | undefined' is not assignable to type 'boolean'.
+        Type 'undefined' is not assignable to type 'boolean'.
+app/admin/socorro/page.tsx(516,67): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(values: never, options?: { count?: "exact" | "planned" | "estimated" | undefined; } | undefined): MockQueryBuilder | PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, ... 4 more ..., "POST">', gave the following error.
+    Argument of type '{ company_id: any; route_id: any; vehicle_id: any; driver_id: any; severity: string; status: string; description: string; }' is not assignable to parameter of type 'never'.
+  Overload 2 of 2, '(values: never[], options?: { count?: "exact" | "planned" | "estimated" | undefined; defaultToNull?: boolean | undefined; } | undefined): MockQueryBuilder | PostgrestFilterBuilder<...>', gave the following error.
+    Object literal may only specify known properties, and 'company_id' does not exist in type 'never[]'.
+app/admin/socorro/page.tsx(542,39): error TS2345: Argument of type '{ status: string; resolved_at: string; }' is not assignable to parameter of type 'never'.
+app/admin/transportadoras/page.tsx(182,6): error TS2820: Type '"carrier.created"' is not assignable to type 'SyncEventType'. Did you mean '"driver.created"'?
+app/admin/transportadoras/page.tsx(182,25): error TS2820: Type '"carrier.updated"' is not assignable to type 'SyncEventType'. Did you mean '"driver.updated"'?
+app/admin/transportadoras/page.tsx(182,44): error TS2820: Type '"carrier.deleted"' is not assignable to type 'SyncEventType'. Did you mean '"driver.deleted"'?
+app/api/admin/alerts/update/route.ts(40,21): error TS2345: Argument of type 'any' is not assignable to parameter of type 'never'.
+app/api/admin/alerts/update/route.ts(54,56): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(values: never, options?: { count?: "exact" | "planned" | "estimated" | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "gf_audit_log", never, "POST">', gave the following error.
+    Argument of type '{ actor_id: string | null; action_type: string; resource_type: string; resource_id: string; details: { changes: any; updated_by: string; }; }' is not assignable to parameter of type 'never'.
+  Overload 2 of 2, '(values: never[], options?: { count?: "exact" | "planned" | "estimated" | undefined; defaultToNull?: boolean | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "gf_audit_log", never, "POST">', gave the following error.
+    Object literal may only specify known properties, and 'actor_id' does not exist in type 'never[]'.
+app/api/admin/alerts/update/route.ts(72,76): error TS2339: Property 'errors' does not exist on type 'ZodError<unknown>'.
+app/api/admin/companies-list/route.ts(52,7): error TS2322: Type '{ id: any; name: any; }[] | null' is not assignable to type '{ id: any; name: any; is_active: any; }[] | null'.
+  Type '{ id: any; name: any; }[]' is not assignable to type '{ id: any; name: any; is_active: any; }[]'.
+    Property 'is_active' is missing in type '{ id: any; name: any; }' but required in type '{ id: any; name: any; is_active: any; }'.
+app/api/admin/create-operator/route.ts(252,7): error TS2322: Type '{ user: User; } | { user: null; }' is not assignable to type '{ user: { id: string; email?: string | undefined; }; } | null'.
+  Type '{ user: null; }' is not assignable to type '{ user: { id: string; email?: string | undefined; }; }'.
+    Types of property 'user' are incompatible.
+      Type 'null' is not assignable to type '{ id: string; email?: string | undefined; }'.
+app/api/admin/create-operator/route.ts(264,20): error TS18047: 'company' is possibly 'null'.
+app/api/admin/create-operator/route.ts(297,26): error TS18047: 'company' is possibly 'null'.
+app/api/admin/create-operator/route.ts(316,22): error TS18047: 'company' is possibly 'null'.
+app/api/admin/create-operator/route.ts(326,63): error TS18047: 'company' is possibly 'null'.
+app/api/admin/create-operator/route.ts(326,75): error TS2551: Property 'catch' does not exist on type 'PostgrestFilterBuilder<any, any, any, null, "companies", unknown, "DELETE">'. Did you mean 'match'?
+app/api/admin/create-operator/route.ts(331,63): error TS18047: 'company' is possibly 'null'.
+app/api/admin/create-operator/route.ts(341,19): error TS18047: 'company' is possibly 'null'.
+app/api/admin/create-operator/route.ts(351,26): error TS2339: Property 'phone' does not exist on type '{ name: any; }'.
+app/api/admin/create-operator/route.ts(373,69): error TS18047: 'company' is possibly 'null'.
+app/api/admin/create-operator/route.ts(387,67): error TS18047: 'company' is possibly 'null'.
+app/api/admin/create-operator/route.ts(411,67): error TS18047: 'company' is possibly 'null'.
+app/api/admin/create-operator/route.ts(426,67): error TS18047: 'company' is possibly 'null'.
+app/api/admin/create-operator/route.ts(433,22): error TS18046: 'e2' is of type 'unknown'.
+app/api/admin/create-operator/route.ts(450,23): error TS18047: 'company' is possibly 'null'.
+app/api/admin/create-operator/route.ts(511,24): error TS18047: 'company' is possibly 'null'.
+app/api/admin/create-operator/route.ts(531,13): error TS18046: 'auditError' is of type 'unknown'.
+app/api/admin/create-operator/route.ts(532,13): error TS18046: 'auditError' is of type 'unknown'.
+app/api/admin/create-operator/route.ts(546,18): error TS18047: 'company' is possibly 'null'.
+app/api/admin/create-transportadora-login/route.ts(134,68): error TS2339: Property 'errors' does not exist on type 'ZodError<unknown>'.
+app/api/admin/drivers/[driverId]/route.ts(39,15): error TS2345: Argument of type '{ name: any; email: any; phone: any; transportadora_id: any; cpf: any; cnh: any; cnh_category: any; cnh_expiry: any; is_active: any; updated_at: string; }' is not assignable to parameter of type 'never'.
+app/api/admin/drivers/route.ts(41,8): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(values: never, options?: { count?: "exact" | "planned" | "estimated" | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "drivers", never, "POST">', gave the following error.
+    Argument of type '{ name: any; email: any; phone: any; transportadora_id: any; cpf: any; cnh: any; cnh_category: any; cnh_expiry: any; is_active: any; role: string; }[]' is not assignable to parameter of type 'never'.
+  Overload 2 of 2, '(values: never[], options?: { count?: "exact" | "planned" | "estimated" | undefined; defaultToNull?: boolean | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "drivers", never, "POST">', gave the following error.
+    Type '{ name: any; email: any; phone: any; transportadora_id: any; cpf: any; cnh: any; cnh_category: any; cnh_expiry: any; is_active: any; role: string; }' is not assignable to type 'never'.
+app/api/admin/seed-cost-categories/route.ts(68,17): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(values: never, options?: { onConflict?: string | undefined; ignoreDuplicates?: boolean | undefined; count?: "exact" | "planned" | "estimated" | undefined; } | undefined): PostgrestFilterBuilder<{ ...; }, ... 5 more ..., "POST">', gave the following error.
+    Argument of type '{ id: string; name: string; description: string; is_active: boolean; }' is not assignable to parameter of type 'never'.
+  Overload 2 of 2, '(values: never[], options?: { onConflict?: string | undefined; ignoreDuplicates?: boolean | undefined; count?: "exact" | "planned" | "estimated" | undefined; defaultToNull?: boolean | undefined; } | undefined): PostgrestFilterBuilder<...>', gave the following error.
+    Argument of type '{ id: string; name: string; description: string; is_active: boolean; }' is not assignable to parameter of type 'never[]'.
+      Type '{ id: string; name: string; description: string; is_active: boolean; }' is missing the following properties from type 'never[]': length, pop, push, concat, and 35 more.
+app/api/admin/transportadoras/[transportadoraId]/drivers/[driverId]/route.ts(34,15): error TS2345: Argument of type '{ name: any; email: any; phone: any; cpf: any; cnh: any; cnh_category: any; }' is not assignable to parameter of type 'never'.
+app/api/admin/transportadoras/[transportadoraId]/vehicles/[vehicleId]/route.ts(45,15): error TS2345: Argument of type '{ plate: any; prefix: any; manufacturer: any; model: any; year: any; capacity: any; is_active: any; vehicle_type: any; renavam: any; chassis: any; }' is not assignable to parameter of type 'never'.
+app/api/admin/transportadoras/create/route.ts(89,15): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(values: never, options?: { count?: "exact" | "planned" | "estimated" | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "carriers", never, "POST">', gave the following error.
+    Argument of type 'CarrierInsert' is not assignable to parameter of type 'never'.
+  Overload 2 of 2, '(values: never[], options?: { count?: "exact" | "planned" | "estimated" | undefined; defaultToNull?: boolean | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "carriers", never, "POST">', gave the following error.
+    Argument of type 'CarrierInsert' is not assignable to parameter of type 'never[]'.
+      Type 'CarrierInsert' is missing the following properties from type 'never[]': length, pop, push, concat, and 35 more.
+app/api/admin/transportadoras/create/route.ts(101,69): error TS2339: Property 'id' does not exist on type 'never'.
+app/api/admin/transportadoras/create/route.ts(110,68): error TS2339: Property 'errors' does not exist on type 'ZodError<unknown>'.
+app/api/admin/transportadoras/delete/route.ts(49,15): error TS2345: Argument of type '{ transportadora_id: null; }' is not assignable to parameter of type 'never'.
+app/api/admin/transportadoras/delete/route.ts(68,15): error TS2345: Argument of type '{ transportadora_id: null; }' is not assignable to parameter of type 'never'.
+app/api/admin/transportadoras/delete/route.ts(115,19): error TS2345: Argument of type '{ transportadora_id: null; }' is not assignable to parameter of type 'never'.
+app/api/admin/transportadoras/update/route.ts(84,15): error TS2345: Argument of type 'CarrierUpdate' is not assignable to parameter of type 'never'.
+app/api/admin/transportadoras/update/route.ts(103,68): error TS2339: Property 'errors' does not exist on type 'ZodError<unknown>'.
+app/api/admin/trips/route.ts(81,9): error TS2345: Argument of type 'PostgrestFilterBuilder<any, any, any, { id: any; }[], "routes", unknown, "GET">' is not assignable to parameter of type 'readonly any[]'.
+  Type 'PostgrestFilterBuilder<any, any, any, { id: any; }[], "routes", unknown, "GET">' is missing the following properties from type 'readonly any[]': length, concat, join, slice, and 25 more.
+app/api/admin/users/change-role/route.ts(12,16): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(values: readonly ["admin", "operator", "transportadora", "driver", "passenger"], params?: string | { error?: string | $ZodErrorMap<$ZodIssueInvalidValue<unknown>> | undefined; message?: string | undefined; } | undefined): ZodEnum<...>', gave the following error.
+    Object literal may only specify known properties, and 'errorMap' does not exist in type '{ error?: string | $ZodErrorMap<$ZodIssueInvalidValue<unknown>> | undefined; message?: string | undefined; }'.
+  Overload 2 of 2, '(entries: Readonly<Record<string, EnumValue>>, params?: string | { error?: string | $ZodErrorMap<$ZodIssueInvalidValue<unknown>> | undefined; message?: string | undefined; } | undefined): ZodEnum<...>', gave the following error.
+    Argument of type 'string[]' is not assignable to parameter of type 'Readonly<Record<string, EnumValue>>'.
+      Index signature for type 'string' is missing in type 'string[]'.
+app/api/admin/users/change-role/route.ts(46,24): error TS2339: Property 'role' does not exist on type 'never'.
+app/api/admin/users/change-role/route.ts(56,21): error TS2345: Argument of type '{ role: "operator" | "admin" | "transportadora" | "passenger" | "driver"; }' is not assignable to parameter of type 'never'.
+app/api/admin/users/change-role/route.ts(77,18): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(values: never, options?: { count?: "exact" | "planned" | "estimated" | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "audit_logs", never, "POST">', gave the following error.
+    Argument of type '{ user_id: string; action: string; resource_type: string; resource_id: string; details: { old_role: any; new_role: "operator" | "admin" | "transportadora" | "passenger" | "driver"; user_email: any; changed_by: string; }; }' is not assignable to parameter of type 'never'.
+  Overload 2 of 2, '(values: never[], options?: { count?: "exact" | "planned" | "estimated" | undefined; defaultToNull?: boolean | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "audit_logs", never, "POST">', gave the following error.
+    Object literal may only specify known properties, and 'user_id' does not exist in type 'never[]'.
+app/api/admin/users/change-role/route.ts(83,46): error TS2339: Property 'role' does not exist on type 'never'.
+app/api/admin/users/change-role/route.ts(85,48): error TS2339: Property 'email' does not exist on type 'never'.
+app/api/admin/users/change-role/route.ts(97,55): error TS2339: Property 'role' does not exist on type 'never'.
+app/api/admin/users/change-role/route.ts(104,76): error TS2339: Property 'errors' does not exist on type 'ZodError<unknown>'.
+app/api/admin/vehicles/[vehicleId]/route.ts(95,17): error TS2345: Argument of type '{ is_active: boolean; }' is not assignable to parameter of type 'never'.
+app/api/admin/vehicles/[vehicleId]/route.ts(145,19): error TS2345: Argument of type '{ is_active: boolean; }' is not assignable to parameter of type 'never'.
+app/api/admin/vehicles/[vehicleId]/route.ts(212,15): error TS2345: Argument of type 'Record<string, unknown>' is not assignable to parameter of type 'never'.
+app/api/admin/vehicles/route.ts(97,39): error TS2339: Property 'id' does not exist on type 'never'.
+app/api/admin/vehicles/route.ts(113,41): error TS2339: Property 'id' does not exist on type 'never'.
+app/api/admin/vehicles/route.ts(185,50): error TS2339: Property 'errors' does not exist on type 'ZodError<unknown>'.
+app/api/costs/budgets/route.ts(124,18): error TS2339: Property 'errors' does not exist on type 'ZodError<unknown>'.
+app/api/costs/budgets/route.ts(124,34): error TS7006: Parameter 'err' implicitly has an 'any' type.
+app/api/costs/budgets/route.ts(147,31): error TS2339: Property 'errors' does not exist on type 'ZodError<unknown>'.
+app/api/costs/budgets/route.ts(176,26): error TS2345: Argument of type 'string | null' is not assignable to parameter of type '{}'.
+  Type 'null' is not assignable to type '{}'.
+app/api/costs/budgets/route.ts(184,17): error TS2345: Argument of type '{ amount_budgeted: number; notes: string | null | undefined; updated_at: string; }' is not assignable to parameter of type 'never'.
+app/api/costs/budgets/route.ts(189,28): error TS2339: Property 'id' does not exist on type 'never'.
+app/api/costs/budgets/route.ts(212,10): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(values: never, options?: { count?: "exact" | "planned" | "estimated" | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "gf_budgets", never, "POST">', gave the following error.
+    Argument of type '{ company_id: string; period_month: number; period_year: number; category_id: string | null; amount_budgeted: number; notes: string | null; created_by: string; }' is not assignable to parameter of type 'never'.
+  Overload 2 of 2, '(values: never[], options?: { count?: "exact" | "planned" | "estimated" | undefined; defaultToNull?: boolean | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "gf_budgets", never, "POST">', gave the following error.
+    Object literal may only specify known properties, and 'company_id' does not exist in type 'never[]'.
+app/api/costs/budgets/route.ts(245,52): error TS2339: Property 'errors' does not exist on type 'ZodError<unknown>'.
+app/api/costs/budgets/route.ts(287,83): error TS2339: Property 'company_id' does not exist on type 'never'.
+app/api/costs/export/route.ts(98,34): error TS2339: Property 'name' does not exist on type 'never'.
+app/api/costs/export/route.ts(170,31): error TS2339: Property 'date' does not exist on type 'never'.
+app/api/costs/export/route.ts(171,22): error TS2339: Property 'group_name' does not exist on type 'never'.
+app/api/costs/export/route.ts(172,22): error TS2339: Property 'category' does not exist on type 'never'.
+app/api/costs/export/route.ts(173,22): error TS2339: Property 'subcategory' does not exist on type 'never'.
+app/api/costs/export/route.ts(174,22): error TS2339: Property 'route_name' does not exist on type 'never'.
+app/api/costs/export/route.ts(175,22): error TS2339: Property 'vehicle_plate' does not exist on type 'never'.
+app/api/costs/export/route.ts(176,22): error TS2339: Property 'driver_email' does not exist on type 'never'.
+app/api/costs/export/route.ts(177,100): error TS2339: Property 'amount' does not exist on type 'never'.
+app/api/costs/export/route.ts(178,22): error TS2339: Property 'qty' does not exist on type 'never'.
+app/api/costs/export/route.ts(179,22): error TS2339: Property 'unit' does not exist on type 'never'.
+app/api/costs/export/route.ts(180,22): error TS2339: Property 'source' does not exist on type 'never'.
+app/api/costs/export/route.ts(181,22): error TS2339: Property 'notes' does not exist on type 'never'.
+app/api/costs/export/route.ts(229,34): error TS2345: Argument of type '(request: NextRequest) => Promise<Response>' is not assignable to parameter of type '(req: NextRequest) => Promise<NextResponse<unknown>>'.
+  Type 'Promise<Response>' is not assignable to type 'Promise<NextResponse<unknown>>'.
+    Type 'Response' is missing the following properties from type 'NextResponse<unknown>': cookies, [INTERNALS]
+app/api/costs/import/route.ts(22,14): error TS2554: Expected 2-3 arguments, but got 1.
+app/api/costs/import/route.ts(169,15): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(values: never, options?: { count?: "exact" | "planned" | "estimated" | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "gf_costs", never, "POST">', gave the following error.
+    Argument of type '{ company_id: string; route_id: any; vehicle_id: any; driver_id: any; cost_category_id: any; date: string; amount: number; qty: number | null; unit: string | null; notes: string | null; source: string; created_by: string | null; }[]' is not assignable to parameter of type 'never'.
+  Overload 2 of 2, '(values: never[], options?: { count?: "exact" | "planned" | "estimated" | undefined; defaultToNull?: boolean | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "gf_costs", never, "POST">', gave the following error.
+    Argument of type '{ company_id: string; route_id: any; vehicle_id: any; driver_id: any; cost_category_id: any; date: string; amount: number; qty: number | null; unit: string | null; notes: string | null; source: string; created_by: string | null; }[]' is not assignable to parameter of type 'never[]'.
+      Type '{ company_id: string; route_id: any; vehicle_id: any; driver_id: any; cost_category_id: any; date: string; amount: number; qty: number | null; unit: string | null; notes: string | null; source: string; created_by: string | null; }' is not assignable to type 'never'.
+app/api/costs/kpis/route.ts(56,7): error TS2322: Type 'AuthenticatedUser' is not assignable to type '{ role: string; id?: string | undefined; companyId?: string | undefined; }'.
+  Types of property 'companyId' are incompatible.
+    Type 'string | null | undefined' is not assignable to type 'string | undefined'.
+      Type 'null' is not assignable to type 'string | undefined'.
+app/api/costs/kpis/route.ts(126,7): error TS2698: Spread types may only be created from object types.
+app/api/costs/kpis/route.ts(128,30): error TS2339: Property 'budgeted_amount' does not exist on type 'never'.
+app/api/costs/kpis/route.ts(129,28): error TS2339: Property 'actual_amount' does not exist on type 'never'.
+app/api/costs/kpis/route.ts(130,38): error TS2339: Property 'variance_percent' does not exist on type 'never'.
+app/api/costs/kpis/route.ts(131,40): error TS2339: Property 'actual_amount' does not exist on type 'never'.
+app/api/costs/kpis/route.ts(131,74): error TS2339: Property 'budgeted_amount' does not exist on type 'never'.
+app/api/costs/manual/route.ts(294,33): error TS2698: Spread types may only be created from object types.
+app/api/costs/manual/route.ts(303,52): error TS2339: Property 'errors' does not exist on type 'ZodError<unknown>'.
+app/api/costs/reconcile/route.ts(69,33): error TS2339: Property 'discrepancy_amount' does not exist on type '{}'.
+app/api/costs/reconcile/route.ts(70,25): error TS2339: Property 'discrepancy_percent' does not exist on type '{}'.
+app/api/costs/reconcile/route.ts(84,50): error TS2339: Property 'notes' does not exist on type '{}'.
+app/api/costs/reconcile/route.ts(94,15): error TS2345: Argument of type 'Record<string, unknown>' is not assignable to parameter of type 'never'.
+app/api/costs/reconcile/route.ts(119,50): error TS2339: Property 'errors' does not exist on type 'ZodError<unknown>'.
+app/api/cron/dispatch-reports/route.ts(101,9): error TS2322: Type 'string | boolean | undefined' is not assignable to type 'boolean'.
+  Type 'undefined' is not assignable to type 'boolean'.
+app/api/cron/dispatch-reports/route.ts(104,9): error TS2322: Type 'string | boolean | undefined' is not assignable to type 'boolean'.
+  Type 'undefined' is not assignable to type 'boolean'.
+app/api/cron/dispatch-reports/route.ts(112,9): error TS2322: Type 'string | boolean | undefined' is not assignable to type 'boolean'.
+  Type 'undefined' is not assignable to type 'boolean'.
+app/api/cron/dispatch-reports/route.ts(114,9): error TS2322: Type 'string | boolean | undefined' is not assignable to type 'boolean'.
+  Type 'undefined' is not assignable to type 'boolean'.
+app/api/operator/create-employee/route.ts(114,29): error TS2339: Property 'email' does not exist on type 'never'.
+app/api/operator/create-employee/route.ts(115,30): error TS2339: Property 'id' does not exist on type 'never'.
+app/api/operator/create-employee/route.ts(117,28): error TS2339: Property 'role' does not exist on type 'never'.
+app/api/operator/create-employee/route.ts(118,33): error TS2339: Property 'company_id' does not exist on type 'never'.
+app/api/operator/create-employee/route.ts(124,28): error TS2339: Property 'company_id' does not exist on type 'never'.
+app/api/operator/create-employee/route.ts(125,37): error TS2339: Property 'company_id' does not exist on type 'never'.
+app/api/operator/create-employee/route.ts(138,34): error TS2339: Property 'id' does not exist on type 'never'.
+app/api/operator/create-employee/route.ts(259,52): error TS2339: Property 'errors' does not exist on type 'ZodError<unknown>'.
+app/api/operator/optimize-route/route.ts(160,52): error TS2339: Property 'errors' does not exist on type 'ZodError<unknown>'.
+app/api/reports/dispatch/route.ts(5,24): error TS7016: Could not find a declaration file for module 'nodemailer'. 'F:/GOLFFOX/apps/web/node_modules/nodemailer/lib/nodemailer.js' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/nodemailer` if it exists or add a new declaration (.d.ts) file containing `declare module 'nodemailer';`
+app/api/reports/run/route.ts(427,35): error TS2345: Argument of type '(request: NextRequest) => Promise<Response>' is not assignable to parameter of type '(req: NextRequest) => Promise<NextResponse<unknown>>'.
+  Type 'Promise<Response>' is not assignable to type 'Promise<NextResponse<unknown>>'.
+    Type 'Response' is missing the following properties from type 'NextResponse<unknown>': cookies, [INTERNALS]
+app/api/reports/run/route.ts(519,27): error TS7015: Element implicitly has an 'any' type because index expression is not of type 'number'.
+app/api/reports/run/route.ts(599,34): error TS7016: Could not find a declaration file for module 'pdfkit'. 'F:/GOLFFOX/apps/web/node_modules/pdfkit/js/pdfkit.js' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/pdfkit` if it exists or add a new declaration (.d.ts) file containing `declare module 'pdfkit';`
+app/api/transportadora/alerts/route.ts(35,20): error TS2339: Property 'transportadora_id' does not exist on type 'never'.
+app/api/transportadora/alerts/route.ts(51,41): error TS2339: Property 'transportadora_id' does not exist on type 'never'.
+app/api/transportadora/alerts/route.ts(65,37): error TS2339: Property 'alert_level' does not exist on type 'never'.
+app/api/transportadora/alerts/route.ts(66,36): error TS2339: Property 'alert_level' does not exist on type 'never'.
+app/api/transportadora/alerts/route.ts(67,36): error TS2339: Property 'alert_level' does not exist on type 'never'.
+app/api/transportadora/costs/route/route.ts(81,22): error TS2339: Property 'transportadora_id' does not exist on type 'never'.
+app/api/transportadora/costs/route/route.ts(84,51): error TS2339: Property 'transportadora_id' does not exist on type 'never'.
+app/api/transportadora/costs/route/route.ts(129,19): error TS2339: Property 'transportadora_id' does not exist on type 'never'.
+app/api/transportadora/costs/route/route.ts(129,47): error TS2339: Property 'transportadora_id' does not exist on type 'never'.
+app/api/transportadora/costs/route/route.ts(138,15): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(values: never, options?: { count?: "exact" | "planned" | "estimated" | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "route_costs", never, "POST">', gave the following error.
+    Argument of type '{ route_id: string; cost_date: string; fuel_cost_brl: number; labor_cost_brl: number; maintenance_cost_brl: number; toll_cost_brl: number; fixed_cost_brl: number; passengers_transported: number; trip_id?: string | ... 1 more ... | undefined; distance_km?: number | ... 1 more ... | undefined; notes?: string | ... 1 m...' is not assignable to parameter of type 'never'.
+  Overload 2 of 2, '(values: never[], options?: { count?: "exact" | "planned" | "estimated" | undefined; defaultToNull?: boolean | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "route_costs", never, "POST">', gave the following error.
+    Argument of type '{ route_id: string; cost_date: string; fuel_cost_brl: number; labor_cost_brl: number; maintenance_cost_brl: number; toll_cost_brl: number; fixed_cost_brl: number; passengers_transported: number; trip_id?: string | ... 1 more ... | undefined; distance_km?: number | ... 1 more ... | undefined; notes?: string | ... 1 m...' is not assignable to parameter of type 'never[]'.
+      Type '{ route_id: string; cost_date: string; fuel_cost_brl: number; labor_cost_brl: number; maintenance_cost_brl: number; toll_cost_brl: number; fixed_cost_brl: number; passengers_transported: number; trip_id?: string | ... 1 more ... | undefined; distance_km?: number | ... 1 more ... | undefined; notes?: string | ... 1 m...' is missing the following properties from type 'never[]': length, pop, push, concat, and 35 more.
+app/api/transportadora/costs/route/route.ts(153,52): error TS2339: Property 'errors' does not exist on type 'ZodError<unknown>'.
+app/api/transportadora/costs/vehicle/route.ts(79,22): error TS2339: Property 'transportadora_id' does not exist on type 'never'.
+app/api/transportadora/costs/vehicle/route.ts(82,53): error TS2339: Property 'transportadora_id' does not exist on type 'never'.
+app/api/transportadora/costs/vehicle/route.ts(127,19): error TS2339: Property 'transportadora_id' does not exist on type 'never'.
+app/api/transportadora/costs/vehicle/route.ts(127,49): error TS2339: Property 'transportadora_id' does not exist on type 'never'.
+app/api/transportadora/costs/vehicle/route.ts(136,8): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(values: never, options?: { count?: "exact" | "planned" | "estimated" | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "vehicle_costs", never, "POST">', gave the following error.
+    Argument of type '{ created_by: string; vehicle_id: string; cost_category: "combustivel" | "manutencao" | "seguro" | "ipva" | "depreciacao" | "pneus" | "lavagem" | "pedagio" | "multas" | "outros"; ... 7 more ...; supplier?: string | ... 1 more ... | undefined; }' is not assignable to parameter of type 'never'.
+  Overload 2 of 2, '(values: never[], options?: { count?: "exact" | "planned" | "estimated" | undefined; defaultToNull?: boolean | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "vehicle_costs", never, "POST">', gave the following error.
+    Object literal may only specify known properties, and 'created_by' does not exist in type 'never[]'.
+app/api/transportadora/costs/vehicle/route.ts(154,52): error TS2339: Property 'errors' does not exist on type 'ZodError<unknown>'.
+app/api/transportadora/drivers/[driverId]/documents/route.ts(81,8): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(values: never, options?: { count?: "exact" | "planned" | "estimated" | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "driver_documents", never, "POST">', gave the following error.
+    Argument of type '{ issue_date: string | null; expiry_date: string | null; document_type: "cpf" | "cnh" | "rg" | "comprovante_residencia" | "foto_3x4" | "certidao_criminal" | "certidao_civil"; ... 6 more ...; driver_id: string; }' is not assignable to parameter of type 'never'.
+  Overload 2 of 2, '(values: never[], options?: { count?: "exact" | "planned" | "estimated" | undefined; defaultToNull?: boolean | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "driver_documents", never, "POST">', gave the following error.
+    Object literal may only specify known properties, and 'issue_date' does not exist in type 'never[]'.
+app/api/transportadora/drivers/[driverId]/documents/route.ts(101,50): error TS2339: Property 'errors' does not exist on type 'ZodError<unknown>'.
+app/api/transportadora/drivers/[driverId]/exams/route.ts(82,8): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(values: never, options?: { count?: "exact" | "planned" | "estimated" | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "driver_medical_exams", never, "POST">', gave the following error.
+    Argument of type '{ exam_type: "admissional" | "periodico" | "toxicologico" | "demissional" | "retorno_trabalho"; exam_date: string; expiry_date: string; result?: "apto" | "inapto" | "apto_com_restricoes" | undefined; ... 6 more ...; driver_id: string; }' is not assignable to parameter of type 'never'.
+  Overload 2 of 2, '(values: never[], options?: { count?: "exact" | "planned" | "estimated" | undefined; defaultToNull?: boolean | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "driver_medical_exams", never, "POST">', gave the following error.
+    Object literal may only specify known properties, and 'driver_id' does not exist in type 'never[]'.
+app/api/transportadora/drivers/[driverId]/exams/route.ts(100,50): error TS2339: Property 'errors' does not exist on type 'ZodError<unknown>'.
+app/api/transportadora/storage/signed-url/route.ts(58,32): error TS2339: Property 'transportadora_id' does not exist on type 'never'.
+app/api/transportadora/storage/signed-url/route.ts(58,61): error TS2339: Property 'transportadora_id' does not exist on type 'never'.
+app/api/transportadora/storage/signed-url/route.ts(78,33): error TS2339: Property 'transportadora_id' does not exist on type 'never'.
+app/api/transportadora/storage/signed-url/route.ts(78,63): error TS2339: Property 'transportadora_id' does not exist on type 'never'.
+app/api/transportadora/vehicles/[vehicleId]/documents/route.ts(83,8): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(values: never, options?: { count?: "exact" | "planned" | "estimated" | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "vehicle_documents", never, "POST">', gave the following error.
+    Argument of type '{ issue_date: string | null; expiry_date: string | null; document_type: "seguro" | "ipva" | "crlv" | "inspecao" | "alvara"; document_number?: string | null | undefined; file_url?: string | ... 1 more ... | undefined; ... 6 more ...; vehicle_id: string; }' is not assignable to parameter of type 'never'.
+  Overload 2 of 2, '(values: never[], options?: { count?: "exact" | "planned" | "estimated" | undefined; defaultToNull?: boolean | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "vehicle_documents", never, "POST">', gave the following error.
+    Object literal may only specify known properties, and 'issue_date' does not exist in type 'never[]'.
+app/api/transportadora/vehicles/[vehicleId]/documents/route.ts(103,50): error TS2339: Property 'errors' does not exist on type 'ZodError<unknown>'.
+app/api/transportadora/vehicles/[vehicleId]/maintenances/route.ts(84,8): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(values: never, options?: { count?: "exact" | "planned" | "estimated" | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "vehicle_maintenances", never, "POST">', gave the following error.
+    Argument of type '{ scheduled_date: string | null; completed_date: string | null; next_maintenance_date: string | null; maintenance_type: "pneus" | "preventiva" | "corretiva" | "revisao" | "troca_oleo" | "freios" | "suspensao" | "eletrica" | "outra"; ... 8 more ...; vehicle_id: string; }' is not assignable to parameter of type 'never'.
+  Overload 2 of 2, '(values: never[], options?: { count?: "exact" | "planned" | "estimated" | undefined; defaultToNull?: boolean | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "vehicle_maintenances", never, "POST">', gave the following error.
+    Object literal may only specify known properties, and 'scheduled_date' does not exist in type 'never[]'.
+app/api/transportadora/vehicles/[vehicleId]/maintenances/route.ts(105,50): error TS2339: Property 'errors' does not exist on type 'ZodError<unknown>'.
+app/api/user/update-profile/route.ts(53,17): error TS2345: Argument of type '{ name: any; }' is not assignable to parameter of type 'never'.
+app/api/user/update-profile/route.ts(91,17): error TS2345: Argument of type '{ email: any; }' is not assignable to parameter of type 'never'.
+app/api/user/upload-avatar/route.ts(72,120): error TS2339: Property 'statusCode' does not exist on type 'StorageError'.
+app/driver/page.tsx(38,34): error TS2698: Spread types may only be created from object types.
+app/operador/ajuda/page.tsx(6,1): error TS2578: Unused '@ts-expect-error' directive.
+app/operador/ajuda/page.tsx(8,1): error TS2578: Unused '@ts-expect-error' directive.
+app/operador/ajuda/page.tsx(10,1): error TS2578: Unused '@ts-expect-error' directive.
+app/operador/ajuda/page.tsx(13,1): error TS2578: Unused '@ts-expect-error' directive.
+app/operador/alertas/page.tsx(147,9): error TS2339: Property 'message' does not exist on type 'never'.
+app/operador/alertas/page.tsx(148,9): error TS2339: Property 'alert_type' does not exist on type 'never'.
+app/operador/alertas/page.tsx(218,27): error TS2339: Property 'id' does not exist on type 'never'.
+app/operador/alertas/page.tsx(227,81): error TS2339: Property 'severity' does not exist on type 'never'.
+app/operador/alertas/page.tsx(229,33): error TS2339: Property 'alert_type' does not exist on type 'never'.
+app/operador/alertas/page.tsx(231,65): error TS2339: Property 'severity' does not exist on type 'never'.
+app/operador/alertas/page.tsx(232,33): error TS2339: Property 'severity' does not exist on type 'never'.
+app/operador/alertas/page.tsx(236,31): error TS2339: Property 'message' does not exist on type 'never'.
+app/operador/alertas/page.tsx(238,29): error TS2339: Property 'created_at' does not exist on type 'never'.
+app/operador/alertas/page.tsx(241,48): error TS2339: Property 'created_at' does not exist on type 'never'.
+app/operador/alertas/page.tsx(246,30): error TS2339: Property 'is_resolved' does not exist on type 'never'.
+app/operador/alertas/page.tsx(251,63): error TS2339: Property 'id' does not exist on type 'never'.
+app/operador/alertas/page.tsx(267,29): error TS2339: Property 'is_resolved' does not exist on type 'never'.
+app/operador/alertas/page.tsx(271,61): error TS2339: Property 'id' does not exist on type 'never'.
+app/operador/comunicacoes/page.tsx(4,1): error TS2578: Unused '@ts-expect-error' directive.
+app/operador/comunicacoes/page.tsx(6,1): error TS2578: Unused '@ts-expect-error' directive.
+app/operador/comunicacoes/page.tsx(8,1): error TS2578: Unused '@ts-expect-error' directive.
+app/operador/comunicacoes/page.tsx(11,1): error TS2578: Unused '@ts-expect-error' directive.
+app/operador/comunicacoes/page.tsx(14,1): error TS2578: Unused '@ts-expect-error' directive.
+app/operador/comunicacoes/page.tsx(36,21): error TS2339: Property 'company_id' does not exist on type 'never'.
+app/operador/comunicacoes/page.tsx(37,31): error TS2339: Property 'company_id' does not exist on type 'never'.
+app/operador/conformidade/page.tsx(3,1): error TS2578: Unused '@ts-expect-error' directive.
+app/operador/conformidade/page.tsx(5,1): error TS2578: Unused '@ts-expect-error' directive.
+app/operador/conformidade/page.tsx(9,1): error TS2578: Unused '@ts-expect-error' directive.
+app/operador/conformidade/page.tsx(48,21): error TS2339: Property 'company_id' does not exist on type 'never'.
+app/operador/conformidade/page.tsx(49,49): error TS2339: Property 'company_id' does not exist on type 'never'.
+app/operador/custos/page.tsx(295,19): error TS2304: Cannot find name 'toast'.
+app/operador/custos/page.tsx(323,23): error TS2304: Cannot find name 'toast'.
+app/operador/funcionarios/error.tsx(4,1): error TS2578: Unused '@ts-expect-error' directive.
+app/operador/funcionarios/error.tsx(6,1): error TS2578: Unused '@ts-expect-error' directive.
+app/operador/funcionarios/page.tsx(119,17): error TS2345: Argument of type '{ is_active: boolean; }' is not assignable to parameter of type 'never'.
+app/operador/funcionarios/page.tsx(279,38): error TS7006: Parameter 'funcionario' implicitly has an 'any' type.
+app/operador/funcionarios/page.tsx(391,9): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+app/operador/historico-rotas/page.tsx(106,36): error TS2322: Type 'User' is not assignable to type '{ id: string; name: string; email: string; role: string; avatar_url?: string | undefined; }'.
+  Types of property 'name' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+app/operador/page.tsx(125,38): error TS2698: Spread types may only be created from object types.
+app/operador/page.tsx(242,40): error TS2322: Type 'PeriodFilter' is not assignable to type '"month" | "week" | "today" | undefined'.
+  Type '"custom"' is not assignable to type '"month" | "week" | "today" | undefined'.
+app/operador/prestadores/page.tsx(3,1): error TS2578: Unused '@ts-expect-error' directive.
+app/operador/prestadores/page.tsx(5,1): error TS2578: Unused '@ts-expect-error' directive.
+app/operador/prestadores/page.tsx(9,1): error TS2578: Unused '@ts-expect-error' directive.
+app/operador/prestadores/page.tsx(56,21): error TS2339: Property 'company_id' does not exist on type 'never'.
+app/operador/prestadores/page.tsx(60,38): error TS2339: Property 'company_id' does not exist on type 'never'.
+app/operador/relatorios/page.tsx(3,1): error TS2578: Unused '@ts-expect-error' directive.
+app/operador/relatorios/page.tsx(5,1): error TS2578: Unused '@ts-expect-error' directive.
+app/operador/relatorios/page.tsx(7,1): error TS2578: Unused '@ts-expect-error' directive.
+app/operador/relatorios/page.tsx(11,1): error TS2578: Unused '@ts-expect-error' directive.
+app/operador/relatorios/page.tsx(15,1): error TS2578: Unused '@ts-expect-error' directive.
+app/operador/relatorios/page.tsx(17,1): error TS2578: Unused '@ts-expect-error' directive.
+app/operador/rotas/mapa/page.tsx(5,1): error TS2578: Unused '@ts-expect-error' directive.
+app/operador/rotas/mapa/page.tsx(7,1): error TS2578: Unused '@ts-expect-error' directive.
+app/operador/rotas/mapa/page.tsx(10,1): error TS2578: Unused '@ts-expect-error' directive.
+app/operador/rotas/page.tsx(67,52): error TS2345: Argument of type '{ i18n: { ns: string; key: string; }; }' is not assignable to parameter of type 'string'.
+app/operador/rotas/page.tsx(78,44): error TS2345: Argument of type '{ i18n: { ns: string; key: string; }; }' is not assignable to parameter of type 'string'.
+app/operador/sincronizar/page.tsx(4,1): error TS2578: Unused '@ts-expect-error' directive.
+app/operador/sincronizar/page.tsx(6,1): error TS2578: Unused '@ts-expect-error' directive.
+app/operador/sincronizar/page.tsx(8,1): error TS2578: Unused '@ts-expect-error' directive.
+app/operador/sincronizar/page.tsx(11,1): error TS2578: Unused '@ts-expect-error' directive.
+app/operador/sincronizar/page.tsx(14,1): error TS2578: Unused '@ts-expect-error' directive.
+app/operador/sincronizar/page.tsx(59,36): error TS2339: Property 'company_id' does not exist on type 'never'.
+app/operador/sincronizar/page.tsx(68,28): error TS2339: Property 'latitude' does not exist on type 'never'.
+app/operador/sincronizar/page.tsx(69,28): error TS2339: Property 'longitude' does not exist on type 'never'.
+app/operador/sincronizar/page.tsx(72,58): error TS2339: Property 'address' does not exist on type 'never'.
+app/operador/sincronizar/page.tsx(80,27): error TS2345: Argument of type '{ latitude: any; longitude: any; }' is not assignable to parameter of type 'never'.
+app/operador/sincronizar/page.tsx(81,34): error TS2339: Property 'id' does not exist on type 'never'.
+app/operador/sincronizar/page.tsx(83,71): error TS2339: Property 'address' does not exist on type 'never'.
+app/operador/sincronizar/page.tsx(88,51): error TS2339: Property 'address' does not exist on type 'never'.
+app/operador/sincronizar/page.tsx(100,38): error TS2339: Property 'id' does not exist on type 'never'.
+app/operador/sincronizar/page.tsx(108,22): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(values: never, options?: { count?: "exact" | "planned" | "estimated" | undefined; } | undefined): MockQueryBuilder | PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, ... 4 more ..., "POST">', gave the following error.
+    Argument of type '{ route_id: any; stop_order: number; latitude: number; longitude: number; address: string | undefined; }' is not assignable to parameter of type 'never'.
+  Overload 2 of 2, '(values: never[], options?: { count?: "exact" | "planned" | "estimated" | undefined; defaultToNull?: boolean | undefined; } | undefined): MockQueryBuilder | PostgrestFilterBuilder<...>', gave the following error.
+    Object literal may only specify known properties, and 'route_id' does not exist in type 'never[]'.
+app/operador/sincronizar/page.tsx(109,38): error TS2339: Property 'id' does not exist on type 'never'.
+app/operador/sincronizar/page.tsx(124,56): error TS2339: Property 'id' does not exist on type 'never'.
+app/operador/solicitacoes/page.tsx(3,1): error TS2578: Unused '@ts-expect-error' directive.
+app/operador/solicitacoes/page.tsx(5,1): error TS2578: Unused '@ts-expect-error' directive.
+app/operador/solicitacoes/page.tsx(7,1): error TS2578: Unused '@ts-expect-error' directive.
+app/operador/solicitacoes/page.tsx(11,1): error TS2578: Unused '@ts-expect-error' directive.
+app/operador/solicitacoes/page.tsx(14,1): error TS2578: Unused '@ts-expect-error' directive.
+app/operador/solicitacoes/page.tsx(36,21): error TS2339: Property 'company_id' does not exist on type 'never'.
+app/operador/solicitacoes/page.tsx(37,31): error TS2339: Property 'company_id' does not exist on type 'never'.
+app/passenger/page.tsx(38,34): error TS2698: Spread types may only be created from object types.
+app/transportadora/alertas/page.tsx(120,38): error TS2322: Type 'User' is not assignable to type '{ id: string; name: string; email: string; role: string; avatar_url?: string | undefined; }'.
+  Types of property 'name' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+app/transportadora/custos/page.tsx(125,15): error TS2304: Cannot find name 'totalCostsThisMonth'.
+app/transportadora/custos/page.tsx(351,67): error TS18048: 'percent' is possibly 'undefined'.
+app/transportadora/mapa/page.tsx(55,37): error TS2339: Property 'transportadora_id' does not exist on type 'never'.
+app/transportadora/mapa/page.tsx(59,21): error TS2339: Property 'transportadora_id' does not exist on type 'never'.
+app/transportadora/mapa/page.tsx(63,45): error TS2339: Property 'transportadora_id' does not exist on type 'never'.
+app/transportadora/motoristas/page.tsx(100,38): error TS2322: Type 'User' is not assignable to type '{ id: string; name: string; email: string; role: string; avatar_url?: string | undefined; }'.
+  Types of property 'name' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+app/transportadora/page.tsx(90,31): error TS2339: Property 'role' does not exist on type 'never'.
+app/transportadora/page.tsx(90,65): error TS2339: Property 'role' does not exist on type 'never'.
+app/transportadora/page.tsx(92,42): error TS2698: Spread types may only be created from object types.
+app/transportadora/page.tsx(97,77): error TS2339: Property 'role' does not exist on type 'never'.
+app/transportadora/page.tsx(152,11): error TS2345: Argument of type '"postgres_changes"' is not assignable to parameter of type '"presence"'.
+app/transportadora/page.tsx(162,10): error TS2339: Property 'on' does not exist on type '{ subscribe: (callback?: ((status: string) => void) | undefined) => void; } | RealtimeChannel'.
+  Property 'on' does not exist on type '{ subscribe: (callback?: ((status: string) => void) | undefined) => void; }'.
+app/transportadora/page.tsx(236,18): error TS2339: Property 'removeChannel' does not exist on type 'SupabaseClientType | MockSupabaseClient'.
+  Property 'removeChannel' does not exist on type 'MockSupabaseClient'.
+app/transportadora/page.tsx(251,32): error TS2339: Property 'transportadora_id' does not exist on type 'never'.
+app/transportadora/page.tsx(256,51): error TS2339: Property 'transportadora_id' does not exist on type 'never'.
+app/transportadora/page.tsx(265,48): error TS2339: Property 'rpc' does not exist on type 'SupabaseClientType | MockSupabaseClient'.
+  Property 'rpc' does not exist on type 'MockSupabaseClient'.
+app/transportadora/page.tsx(344,29): error TS2339: Property 'trips_completed' does not exist on type 'never'.
+app/transportadora/page.tsx(345,30): error TS2339: Property 'total_points' does not exist on type 'never'.
+app/transportadora/page.tsx(345,54): error TS2339: Property 'total_points' does not exist on type 'never'.
+app/transportadora/page.tsx(372,10): error TS2339: Property 'lt' does not exist on type 'MockQueryBuilder | PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, never[], "v_carrier_vehicle_costs_summary", never, "GET">'.
+  Property 'lt' does not exist on type 'MockQueryBuilder'.
+app/transportadora/page.tsx(379,10): error TS2339: Property 'lt' does not exist on type 'MockQueryBuilder | PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, never[], "v_carrier_route_costs_summary", never, "GET">'.
+  Property 'lt' does not exist on type 'MockQueryBuilder'.
+app/transportadora/page.tsx(431,12): error TS2339: Property 'lt' does not exist on type 'MockQueryBuilder | PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, never[], "v_carrier_vehicle_costs_summary", never, "GET">'.
+  Property 'lt' does not exist on type 'MockQueryBuilder'.
+app/transportadora/page.tsx(437,12): error TS2339: Property 'lt' does not exist on type 'MockQueryBuilder | PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, never[], "v_carrier_route_costs_summary", never, "GET">'.
+  Property 'lt' does not exist on type 'MockQueryBuilder'.
+app/transportadora/page.tsx(444,16): error TS2339: Property 'lt' does not exist on type 'MockQueryBuilder | PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, never[], "trips", never, "GET">'.
+  Property 'lt' does not exist on type 'MockQueryBuilder'.
+app/transportadora/page.tsx(513,9): error TS2698: Spread types may only be created from object types.
+app/transportadora/page.tsx(600,13): error TS2322: Type '(e: any) => void' is not assignable to type '() => void'.
+  Target signature provides too few arguments. Expected 1 or more, but got 0.
+app/transportadora/page.tsx(600,23): error TS7006: Parameter 'e' implicitly has an 'any' type.
+app/transportadora/page.tsx(620,13): error TS2322: Type '(e: any) => void' is not assignable to type '() => void'.
+  Target signature provides too few arguments. Expected 1 or more, but got 0.
+app/transportadora/page.tsx(620,23): error TS7006: Parameter 'e' implicitly has an 'any' type.
+app/transportadora/page.tsx(644,13): error TS2322: Type '(e: any) => void' is not assignable to type '() => void'.
+  Target signature provides too few arguments. Expected 1 or more, but got 0.
+app/transportadora/page.tsx(644,23): error TS7006: Parameter 'e' implicitly has an 'any' type.
+app/transportadora/page.tsx(674,13): error TS2322: Type '(e: any) => void' is not assignable to type '() => void'.
+  Target signature provides too few arguments. Expected 1 or more, but got 0.
+app/transportadora/page.tsx(674,23): error TS7006: Parameter 'e' implicitly has an 'any' type.
+app/transportadora/page.tsx(744,59): error TS18048: 'percent' is possibly 'undefined'.
+app/transportadora/veiculos/page.tsx(80,21): error TS2339: Property 'transportadora_id' does not exist on type 'never'.
+app/transportadora/veiculos/page.tsx(81,56): error TS2339: Property 'transportadora_id' does not exist on type 'never'.
+components/address-form.tsx(148,13): error TS2322: Type '(cepToSearch?: string) => Promise<void>' is not assignable to type 'MouseEventHandler<HTMLButtonElement>'.
+  Types of parameters 'cepToSearch' and 'event' are incompatible.
+    Type 'MouseEvent<HTMLButtonElement, MouseEvent>' is not assignable to type 'string'.
+components/advanced-route-map.tsx(324,21): error TS2339: Property 'id' does not exist on type 'never'.
+components/advanced-route-map.tsx(325,23): error TS2339: Property 'name' does not exist on type 'never'.
+components/advanced-route-map.tsx(326,30): error TS2339: Property 'description' does not exist on type 'never'.
+components/advanced-route-map.tsx(327,32): error TS2339: Property 'distance' does not exist on type 'never'.
+components/advanced-route-map.tsx(328,36): error TS2339: Property 'estimated_duration' does not exist on type 'never'.
+components/costs/cost-charts.tsx(69,19): error TS2339: Property 'by_route' does not exist on type 'never'.
+components/costs/cost-charts.tsx(70,45): error TS2339: Property 'by_route' does not exist on type 'never'.
+components/costs/cost-charts.tsx(70,64): error TS2339: Property 'by_route' does not exist on type 'never'.
+components/costs/cost-charts.tsx(80,21): error TS2339: Property 'by_vehicle' does not exist on type 'never'.
+components/costs/cost-charts.tsx(81,49): error TS2339: Property 'by_vehicle' does not exist on type 'never'.
+components/costs/cost-charts.tsx(81,72): error TS2339: Property 'by_vehicle' does not exist on type 'never'.
+components/costs/cost-dashboard.tsx(298,64): error TS18048: 'percent' is possibly 'undefined'.
+components/costs/reconciliation-modal.tsx(179,17): error TS2345: Argument of type '{ status: string; approved_at: string; approved_by: string; reconciled_by: string; updated_at: string; }' is not assignable to parameter of type 'never'.
+components/costs/reconciliation-modal.tsx(213,17): error TS2345: Argument of type '{ status: string; approved_at: null; approved_by: string; reconciled_by: string; updated_at: string; }' is not assignable to parameter of type 'never'.
+components/costs/reconciliation-modal.tsx(247,17): error TS2345: Argument of type '{ status: string; notes: string; updated_at: string; }' is not assignable to parameter of type 'never'.
+components/fleet-map.tsx(517,9): error TS2345: Argument of type '"postgres_changes"' is not assignable to parameter of type '"presence"'.
+components/fleet-map.tsx(523,10): error TS7006: Parameter 'payload' implicitly has an 'any' type.
+components/fleet-map.tsx(528,8): error TS2339: Property 'on' does not exist on type '{ subscribe: (callback?: ((status: string) => void) | undefined) => void; } | RealtimeChannel'.
+  Property 'on' does not exist on type '{ subscribe: (callback?: ((status: string) => void) | undefined) => void; }'.
+components/fleet-map.tsx(535,10): error TS7006: Parameter 'payload' implicitly has an 'any' type.
+components/fleet-map.tsx(547,10): error TS7006: Parameter 'payload' implicitly has an 'any' type.
+components/fleet-map.tsx(560,16): error TS2339: Property 'removeChannel' does not exist on type 'SupabaseClientType | MockSupabaseClient'.
+  Property 'removeChannel' does not exist on type 'MockSupabaseClient'.
+components/modals/edit-assistance-modal.tsx(87,39): error TS2345: Argument of type '"assistance_request.updated"' is not assignable to parameter of type 'SyncEventType'.
+components/modals/route-modal.tsx(184,19): error TS2345: Argument of type 'any' is not assignable to parameter of type 'never'.
+components/modals/route-modal.tsx(206,12): error TS2339: Property 'select' does not exist on type 'MockQueryBuilder | PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "routes", never, "POST">'.
+  Property 'select' does not exist on type 'MockQueryBuilder'.
+components/operator/dashboard-charts.tsx(138,26): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: TooltipProps<ValueType, NameType>, context?: any): string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | ... 4 more ... | undefined', gave the following error.
+    Type '(value: number) => string' is not assignable to type 'Formatter<ValueType, NameType>'.
+      Types of parameters 'value' and 'value' are incompatible.
+        Type 'ValueType' is not assignable to type 'number'.
+          Type 'string' is not assignable to type 'number'.
+  Overload 2 of 2, '(props: TooltipProps<ValueType, NameType>): string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | ... 4 more ... | undefined', gave the following error.
+    Type '(value: number) => string' is not assignable to type 'Formatter<ValueType, NameType>'.
+      Types of parameters 'value' and 'value' are incompatible.
+        Type 'ValueType' is not assignable to type 'number'.
+          Type 'string' is not assignable to type 'number'.
+components/operator/dashboard-charts.tsx(160,62): error TS18048: 'percent' is possibly 'undefined'.
+components/operator/funcionario-modal.tsx(163,19): error TS2820: Type '"operador"' is not assignable to type 'Namespace'. Did you mean '"operator"'?
+components/operator/funcionario-modal.tsx(215,19): error TS2820: Type '"operador"' is not assignable to type 'Namespace'. Did you mean '"operator"'?
+components/operator/funcionario-modal.tsx(227,17): error TS2820: Type '"operador"' is not assignable to type 'Namespace'. Did you mean '"operator"'?
+components/sidebar.tsx(280,41): error TS2367: This comparison appears to be unintentional because the types '"admin" | "transportadora"' and '"operator"' have no overlap.
+components/sidebar.tsx(302,45): error TS2367: This comparison appears to be unintentional because the types '"admin" | "transportadora"' and '"operator"' have no overlap.
+components/sidebar.tsx(303,45): error TS2367: This comparison appears to be unintentional because the types '"admin" | "transportadora"' and '"operator"' have no overlap.
+components/sidebar.tsx(324,43): error TS2367: This comparison appears to be unintentional because the types '"admin" | "transportadora"' and '"operator"' have no overlap.
+components/sidebar.tsx(337,36): error TS2367: This comparison appears to be unintentional because the types '"admin" | "transportadora"' and '"operator"' have no overlap.
+components/sidebar.tsx(350,38): error TS2367: This comparison appears to be unintentional because the types '"admin" | "transportadora"' and '"operator"' have no overlap.
+components/sidebar.tsx(355,34): error TS2367: This comparison appears to be unintentional because the types '"admin" | "transportadora"' and '"operator"' have no overlap.
+components/sidebar.tsx(384,46): error TS2367: This comparison appears to be unintentional because the types '"admin" | "transportadora"' and '"operator"' have no overlap.
+components/sidebar.tsx(401,44): error TS2367: This comparison appears to be unintentional because the types '"admin" | "transportadora"' and '"operator"' have no overlap.
+hooks/use-advanced-navigation.tsx(34,32): error TS2554: Expected 1 arguments, but got 0.
+hooks/use-operator-data.ts(217,17): error TS2345: Argument of type 'any' is not assignable to parameter of type 'never'.
+hooks/use-performance.ts(48,26): error TS2554: Expected 1 arguments, but got 0.
+hooks/use-performance.ts(49,23): error TS2554: Expected 1 arguments, but got 0.
+hooks/use-performance.ts(217,42): error TS2322: Type 'RefObject<HTMLElement | null>' is not assignable to type 'RefObject<HTMLElement>'.
+  Type 'HTMLElement | null' is not assignable to type 'HTMLElement'.
+    Type 'null' is not assignable to type 'HTMLElement'.
+hooks/use-performance.ts(243,22): error TS2554: Expected 1 arguments, but got 0.
+hooks/use-realtime-updates.ts(14,11): error TS2322: Type 'void | RealtimeChannel' is not assignable to type 'RealtimeChannel'.
+  Type 'void' is not assignable to type 'RealtimeChannel'.
+hooks/use-realtime-updates.ts(17,9): error TS2345: Argument of type '"postgres_changes"' is not assignable to parameter of type '"presence"'.
+hooks/use-realtime-updates.ts(32,16): error TS2339: Property 'removeChannel' does not exist on type 'SupabaseClientType | MockSupabaseClient'.
+  Property 'removeChannel' does not exist on type 'MockSupabaseClient'.
+hooks/use-realtime-updates.ts(43,11): error TS2322: Type 'void | RealtimeChannel' is not assignable to type 'RealtimeChannel'.
+  Type 'void' is not assignable to type 'RealtimeChannel'.
+hooks/use-realtime-updates.ts(46,9): error TS2345: Argument of type '"postgres_changes"' is not assignable to parameter of type '"presence"'.
+hooks/use-realtime-updates.ts(61,16): error TS2339: Property 'removeChannel' does not exist on type 'SupabaseClientType | MockSupabaseClient'.
+  Property 'removeChannel' does not exist on type 'MockSupabaseClient'.
+hooks/use-realtime-updates.ts(72,11): error TS2322: Type 'void | RealtimeChannel' is not assignable to type 'RealtimeChannel'.
+  Type 'void' is not assignable to type 'RealtimeChannel'.
+hooks/use-realtime-updates.ts(75,9): error TS2345: Argument of type '"postgres_changes"' is not assignable to parameter of type '"presence"'.
+hooks/use-realtime-updates.ts(88,16): error TS2339: Property 'removeChannel' does not exist on type 'SupabaseClientType | MockSupabaseClient'.
+  Property 'removeChannel' does not exist on type 'MockSupabaseClient'.
+lib/audit-log.ts(96,31): error TS2339: Property 'company_id' does not exist on type 'never'.
+lib/costs/validation.ts(20,13): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(values: readonly ["manual", "import", "invoice", "calc"], params?: string | { error?: string | $ZodErrorMap<$ZodIssueInvalidValue<unknown>> | undefined; message?: string | undefined; } | undefined): ZodEnum<...>', gave the following error.
+    Object literal may only specify known properties, and 'errorMap' does not exist in type '{ error?: string | $ZodErrorMap<$ZodIssueInvalidValue<unknown>> | undefined; message?: string | undefined; }'.
+  Overload 2 of 2, '(entries: Readonly<Record<string, EnumValue>>, params?: string | { error?: string | $ZodErrorMap<$ZodIssueInvalidValue<unknown>> | undefined; message?: string | undefined; } | undefined): ZodEnum<...>', gave the following error.
+    Argument of type 'string[]' is not assignable to parameter of type 'Readonly<Record<string, EnumValue>>'.
+      Index signature for type 'string' is missing in type 'string[]'.
+lib/costs/validation.ts(43,13): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(values: readonly ["approve", "reject", "request_revision"], params?: string | { error?: string | $ZodErrorMap<$ZodIssueInvalidValue<unknown>> | undefined; message?: string | undefined; } | undefined): ZodEnum<...>', gave the following error.
+    Object literal may only specify known properties, and 'errorMap' does not exist in type '{ error?: string | $ZodErrorMap<$ZodIssueInvalidValue<unknown>> | undefined; message?: string | undefined; }'.
+  Overload 2 of 2, '(entries: Readonly<Record<string, EnumValue>>, params?: string | { error?: string | $ZodErrorMap<$ZodIssueInvalidValue<unknown>> | undefined; message?: string | undefined; } | undefined): ZodEnum<...>', gave the following error.
+    Argument of type 'string[]' is not assignable to parameter of type 'Readonly<Record<string, EnumValue>>'.
+      Index signature for type 'string' is missing in type 'string[]'.
+lib/i18n.ts(26,7): error TS2578: Unused '@ts-expect-error' directive.
+lib/importers/employee-csv.ts(56,12): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(values: readonly ["manha", "tarde", "noite", "Manh├ú", "Tarde", "Noite", "MANHA", "TARDE", "NOITE"], params?: string | { error?: string | $ZodErrorMap<$ZodIssueInvalidValue<unknown>> | undefined; message?: string | undefined; } | undefined): ZodEnum<...>', gave the following error.
+    Object literal may only specify known properties, and 'errorMap' does not exist in type '{ error?: string | $ZodErrorMap<$ZodIssueInvalidValue<unknown>> | undefined; message?: string | undefined; }'.
+  Overload 2 of 2, '(entries: Readonly<Record<string, EnumValue>>, params?: string | { error?: string | $ZodErrorMap<$ZodIssueInvalidValue<unknown>> | undefined; message?: string | undefined; } | undefined): ZodEnum<...>', gave the following error.
+    Argument of type 'string[]' is not assignable to parameter of type 'Readonly<Record<string, EnumValue>>'.
+      Index signature for type 'string' is missing in type 'string[]'.
+lib/importers/employee-csv.ts(122,36): error TS2339: Property 'errors' does not exist on type 'ZodError<{ nome: string; cpf: string; email: string; endereco: string; telefone?: string | undefined; bairro?: string | undefined; cidade?: string | undefined; cep?: string | undefined; centro_custo?: string | undefined; turno?: string | undefined; }>'.
+lib/importers/employee-csv.ts(122,47): error TS7006: Parameter 'e' implicitly has an 'any' type.
+lib/importers/employee-csv.ts(250,10): error TS2339: Property 'or' does not exist on type 'MockQueryBuilder | PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, never[], "gf_employee_company", never, "GET">'.
+  Property 'or' does not exist on type 'MockQueryBuilder'.
+lib/importers/employee-csv.ts(263,21): error TS2345: Argument of type '{ name: string; phone: string | null; }' is not assignable to parameter of type 'never'.
+lib/importers/employee-csv.ts(331,10): error TS2339: Property 'upsert' does not exist on type '{ select: (columns?: string | undefined, options?: { count?: "exact" | "planned" | "estimated" | undefined; head?: boolean | undefined; } | undefined) => MockQueryBuilder; insert: (values: unknown) => MockQueryBuilder; update: (values: unknown) => MockQueryBuilder; delete: () => MockQueryBuilder; } | PostgrestQueryB...'.
+  Property 'upsert' does not exist on type '{ select: (columns?: string | undefined, options?: { count?: "exact" | "planned" | "estimated" | undefined; head?: boolean | undefined; } | undefined) => MockQueryBuilder; insert: (values: unknown) => MockQueryBuilder; update: (values: unknown) => MockQueryBuilder; delete: () => MockQueryBuilder; }'.
+lib/importers/employee-csv.ts(341,21): error TS2345: Argument of type 'any' is not assignable to parameter of type 'never'.
+lib/operator-export.ts(22,19): error TS2345: Argument of type 'ExportData' is not assignable to parameter of type 'ReportData'.
+  Types of property 'title' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+lib/operator-export.ts(25,21): error TS2345: Argument of type 'ExportData' is not assignable to parameter of type 'ReportData'.
+  Types of property 'title' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+lib/operator-export.ts(28,19): error TS2345: Argument of type 'ExportData' is not assignable to parameter of type 'ReportData'.
+  Types of property 'title' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+scripts/health-check-operator.ts(6,1): error TS2578: Unused '@ts-expect-error' directive.

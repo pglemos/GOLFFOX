@@ -9,8 +9,8 @@ export const runtime = 'nodejs'
 
 const changeRoleSchema = z.object({
     userId: z.string().uuid('ID de usuário inválido'),
-    newRole: z.enum(['admin', 'operator', 'transportadora', 'driver', 'passenger'], {
-        errorMap: () => ({ message: 'Papel inválido' })
+    newRole: z.enum(['admin', 'operator', 'transportadora', 'driver', 'passenger'] as const, {
+        error: 'Papel inválido'
     }),
     oldRole: z.string().optional(),
 })
@@ -101,7 +101,7 @@ export async function POST(req: NextRequest) {
 
         if (error instanceof z.ZodError) {
             return NextResponse.json(
-                { success: false, error: 'Dados inválidos', details: error.errors },
+                { success: false, error: 'Dados inválidos', details: error.issues },
                 { status: 400 }
             )
         }
