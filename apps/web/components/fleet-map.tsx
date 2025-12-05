@@ -557,7 +557,7 @@ export const FleetMap = memo(function FleetMap({ companyId, transportadoraId, ro
     }, 30000) // 30 segundos como fallback
 
     return () => {
-      supabase.removeChannel(channel)
+      supabase.removeChannel(channel as any)
       clearInterval(interval)
     }
   }, [loadMapData])

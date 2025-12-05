@@ -51,10 +51,10 @@ export default function PrestadoresOperatorPage() {
       }
 
       if (userData?.company_id) {
-        const { data, error } = await supabase
+        const { data, error } = await (supabase
           .from('v_operator_assigned_carriers')
           .select('*')
-          .eq('empresa_id', userData.company_id)
+          .eq('empresa_id', userData.company_id) as any) as any
         
         if (error) {
           console.error("Erro ao buscar prestadores:", error)

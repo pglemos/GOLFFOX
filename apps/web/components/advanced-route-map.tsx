@@ -1170,7 +1170,7 @@ export const AdvancedRouteMap = memo(function AdvancedRouteMap({
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              onClick={(e) => e.stopPropagation()}
+              onClick={(e: any) => e.stopPropagation()}
             >
               <div className="flex items-start justify-between mb-4">
                 <h3 className="text-lg font-bold text-gray-900">

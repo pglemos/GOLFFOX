@@ -29,7 +29,7 @@ export async function PUT(
       )
     }
 
-    const { data: driver, error } = await supabase
+    const { data: driver, error } = await (supabase
       .from('drivers')
       .update({
         name,
@@ -38,7 +38,7 @@ export async function PUT(
         cpf: cpf || null,
         cnh: cnh || null,
         cnh_category: cnh_category || null
-      } as any)
+      } as any) as any)
       .eq('id', driverId)
       .eq('transportadora_id', transportadoraId)
       .select()

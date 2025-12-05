@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Criar motorista
-    const { data: driver, error: driverError } = await supabase
+    const { data: driver, error: driverError } = await (supabase
       .from('drivers')
       .insert([
         {
@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
           is_active: is_active ?? true,
           role: 'driver'
         }
-      ] as any)
+      ] as any) as any)
       .select()
       .single()
 
