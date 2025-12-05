@@ -121,8 +121,9 @@ export default function TransportadoraCustosPage() {
           previousMonthTotal += prevRouteData.reduce((sum: number, r: any) => sum + parseFloat(r.total_cost_brl?.toString() || '0'), 0)
         }
 
+        const totalCostsThisMonth = totalRouteCosts
         const trendPercentage = previousMonthTotal > 0
-          ? ((total - previousMonthTotal) / previousMonthTotal) * 100
+          ? ((totalCostsThisMonth - previousMonthTotal) / previousMonthTotal) * 100
           : 0
 
         setSummary(prev => ({

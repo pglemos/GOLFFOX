@@ -51,7 +51,7 @@ const REPORT_CONFIGS: Record<string, { viewName: string; columns: string[] }> = 
  * POST /api/reports/run
  * Body: { reportKey, format, filters: { companyId, periodStart, periodEnd } }
  */
-async function runReportHandler(request: NextRequest) {
+async function runReportHandler(request: NextRequest): Promise<NextResponse> {
   // Declarar variáveis no escopo da função para uso no catch
   let format: string = 'csv'
   let finalReportKey: string = ''

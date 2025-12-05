@@ -179,7 +179,7 @@ export const AppShell = memo(function AppShell({ user, children, panel }: AppShe
           isOpen={isSidebarOpen}
           isMobile={isMobile}
           panel={detectedPanel}
-          user={user}
+          user={user ? { id: user.id, name: user.name || '', email: user.email } : { id: '', name: '', email: '' }}
         />
 
         {/* Main Content */}

@@ -323,9 +323,9 @@ export const AdvancedRouteMap = memo(function AdvancedRouteMap({
         return {
           id: route.id,
           name: route.name,
-          description: route.description,
-          totalDistance: route.distance || 0,
-          estimatedDuration: route.estimated_duration || 0,
+          description: (route as any).description || '',
+          totalDistance: (route as any).distance || 0,
+          estimatedDuration: (route as any).estimated_duration || 0,
           stops: processedStops
         }
       })

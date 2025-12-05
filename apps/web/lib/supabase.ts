@@ -33,7 +33,7 @@ type MockQueryBuilder = {
 
 type MockRealtimeChannel = {
   on: (event: 'postgres_changes' | 'presence' | 'broadcast', filter: any, callback: (payload: any) => void) => MockRealtimeChannel
-  subscribe: (callback?: (status: string) => void) => void
+  subscribe: (callback?: (status: string) => void) => MockRealtimeChannel
   unsubscribe: () => Promise<void>
 }
 
@@ -64,7 +64,7 @@ let supabase: SupabaseClientUnion
 
 if (envUrl && envAnon) {
   // Criar cliente com configurações otimizadas
-  supabase = createClient<Record<string, unknown>>(envUrl, envAnon, {
+  supabase = createClient<Database>(envUrl, envAnon, {
     auth: {
       persistSession: true,
       autoRefreshToken: true,

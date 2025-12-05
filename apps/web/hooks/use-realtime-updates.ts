@@ -11,7 +11,7 @@ export function useRealtimeKPIs(companyId: string | null) {
   useEffect(() => {
     if (!companyId) return
 
-    const channel: RealtimeChannel = supabase
+    const channel = supabase
       .channel(`operator-kpis:${companyId}`)
       .on(
         "postgres_changes",
@@ -40,7 +40,7 @@ export function useRealtimeAlerts(companyId: string | null) {
   useEffect(() => {
     if (!companyId) return
 
-    const channel: RealtimeChannel = supabase
+    const channel = supabase
       .channel(`operator-alerts:${companyId}`)
       .on(
         "postgres_changes",
@@ -69,7 +69,7 @@ export function useRealtimeRoutes(companyId: string | null) {
   useEffect(() => {
     if (!companyId) return
 
-    const channel: RealtimeChannel = supabase
+    const channel = supabase
       .channel(`operator-routes:${companyId}`)
       .on(
         "postgres_changes",

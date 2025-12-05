@@ -66,8 +66,8 @@ export function CostCharts({ companyId, period = 'month' }: CostChartProps) {
         .limit(1)
         .single()
 
-      if (routes?.by_route) {
-        setByRouteData(Array.isArray(routes.by_route) ? routes.by_route : [])
+      if ((routes as any)?.by_route) {
+        setByRouteData(Array.isArray((routes as any).by_route) ? (routes as any).by_route : [])
       }
 
       // Dados por veículo
@@ -77,8 +77,8 @@ export function CostCharts({ companyId, period = 'month' }: CostChartProps) {
         .limit(1)
         .single()
 
-      if (vehicles?.by_vehicle) {
-        setByVehicleData(Array.isArray(vehicles.by_vehicle) ? vehicles.by_vehicle : [])
+      if ((vehicles as any)?.by_vehicle) {
+        setByVehicleData(Array.isArray((vehicles as any).by_vehicle) ? (vehicles as any).by_vehicle : [])
       }
 
       // Dados por motorista (usar v_reports_driver_ranking com custos)
