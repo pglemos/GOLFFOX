@@ -145,7 +145,7 @@ function AlertasOperatorPageInner() {
     
     const matchesSearch = !debouncedSearch || 
       a.message?.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
-      a.alert_type?.toLowerCase().includes(debouncedSearch.toLowerCase())
+      (a as any).alert_type?.toLowerCase().includes(debouncedSearch.toLowerCase())
 
     return matchesSearch
   })

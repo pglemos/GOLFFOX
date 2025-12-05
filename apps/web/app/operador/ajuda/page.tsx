@@ -3,14 +3,10 @@
 export const dynamic = 'force-dynamic'
 
 import { useEffect, useState, Suspense } from "react"
-// @ts-expect-error Legacy: valid em ambiente sem tipagem
 import { AppShell } from "@/components/app-shell"
-// @ts-expect-error Legacy: valid em ambiente sem tipagem
 import { Card } from "@/components/ui/card"
-// @ts-expect-error Legacy: valid em ambiente sem tipagem
 import { Button } from "@/components/ui/button"
 import { HelpCircle, MessageCircle, FileText, ExternalLink } from "lucide-react"
-// @ts-expect-error Legacy: valid em ambiente sem tipagem
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 

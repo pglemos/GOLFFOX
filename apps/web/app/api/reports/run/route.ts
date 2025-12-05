@@ -440,9 +440,9 @@ function generateCSV(data: any[], columns: string[], reportKey: string) {
   const filteredData = data.map(row => {
     const filtered: any = {}
     columns.forEach(col => {
-      if (row[col] !== undefined) {
+      if ((row as any)[col] !== undefined) {
         // Formatar números com vírgula decimal
-        const value = row[col]
+        const value = (row as any)[col]
         if (typeof value === 'number') {
           filtered[col] = formatNumberBR(value)
         } else {
@@ -516,7 +516,7 @@ async function generateCSVStream(
         }
         for (const row of page) {
           const cells = columns.map((col) => {
-            const v = row[col]
+            const v = (row as any)[col]
             if (typeof v === 'number') {
               return formatNumberBR(v)
             }
@@ -549,8 +549,8 @@ async function generateExcel(data: any[], columns: string[], reportKey: string) 
     const filteredData = data.map(row => {
       const filtered: any = {}
       columns.forEach(col => {
-        if (row[col] !== undefined) {
-          filtered[col] = row[col]
+        if ((row as any)[col] !== undefined) {
+          filtered[col] = (row as any)[col]
         }
       })
       return filtered
@@ -691,7 +691,7 @@ async function generatePDF(data: any[], columns: string[], reportKey: string) {
           }
           x = 50
           columns.slice(0, 4).forEach((col, i) => {
-            const value = String(row[col] || '')
+            const value = String((row as any)[col] || '')
             doc.text(value.substring(0, 30), x, doc.y, { width: colWidths[i] })
             x += colWidths[i]
           })
