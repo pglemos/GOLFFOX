@@ -331,10 +331,10 @@ export default function TransportadoraDashboard() {
       if (driversData?.length) {
         // Buscar dados de ranking/gamificação
         const driverIds = driversData.map((d: any) => d.id)
-        const { data: rankings } = await supabase
+        const { data: rankings } = await (supabase
           .from('gf_gamification_scores')
           .select('*')
-          .in('driver_id', driverIds)
+          .in('driver_id', driverIds) as any)
 
         driversWithStats = (driversData || []).map((driver: any) => {
           const ranking = rankings?.find((r: any) => r.driver_id === driver.id)

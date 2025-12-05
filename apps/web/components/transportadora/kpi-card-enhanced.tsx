@@ -33,14 +33,14 @@ export function KpiCardEnhanced({
 }: KpiCardEnhancedProps) {
   const [displayValue, setDisplayValue] = useState(0)
   const spring = useSpring(0, { stiffness: 50, damping: 30 })
-  const display = useTransform(spring, (current) => Math.round(current))
+  const display = useTransform(spring, (current: number) => Math.round(current))
 
   useEffect(() => {
     spring.set(value)
   }, [value, spring])
 
   useEffect(() => {
-    const unsubscribe = display.on("change", (latest) => {
+    const unsubscribe = display.on("change", (latest: number) => {
       setDisplayValue(latest)
     })
     return () => unsubscribe()
@@ -64,7 +64,7 @@ export function KpiCardEnhanced({
       whileHover={{ scale: 1.02, y: -4 }}
       transition={{ duration: 0.2, ease: "easeOut" }}
       className={cn("group cursor-pointer", onClick && "cursor-pointer", className)}
-      onClick={(e) => {
+      onClick={(e: any) => {
         if (!onClick) return
         e.preventDefault()
         e.stopPropagation()

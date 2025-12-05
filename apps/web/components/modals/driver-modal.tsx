@@ -84,7 +84,7 @@ export function DriverModal({ driver, isOpen, onClose, onSave }: DriverModalProp
         .eq("driver_id", driverId)
         .order("created_at", { ascending: false })
       
-      if (docs) setDocuments(docs)
+      if (docs) setDocuments(docs as any)
 
       
     } catch (error) {
