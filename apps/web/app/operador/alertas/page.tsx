@@ -226,9 +226,9 @@ function AlertasOperatorPageInner() {
                     <div className="flex items-center gap-2 mb-2 flex-wrap">
                       <AlertTriangle className={`h-5 w-5 ${getAlertColor(alerta.severity)} flex-shrink-0`} />
                       <h3 className="font-bold text-lg capitalize truncate">
-                        {alerta.alert_type?.replace(/_/g, ' ') || "Alerta"}
+                        {(alerta as any).alert_type?.replace(/_/g, ' ') || "Alerta"}
                       </h3>
-                      <Badge className={`${getBadgeColor(alerta.severity)} flex-shrink-0`}>
+                      <Badge className={`${getBadgeColor(alerta.severity || undefined)} flex-shrink-0`}>
                         {alerta.severity || "normal"}
                       </Badge>
                     </div>
@@ -248,7 +248,7 @@ function AlertasOperatorPageInner() {
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={() => handleResolve(alerta.id, true)}
+                          onClick={() => handleResolve(alerta.id || '', true)}
                           disabled={resolveAlert.isPending}
                         >
                           <CheckCircle className="h-4 w-4 mr-1" />
@@ -268,7 +268,7 @@ function AlertasOperatorPageInner() {
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => handleResolve(alerta.id, false)}
+                          onClick={() => handleResolve(alerta.id || '', false)}
                         disabled={resolveAlert.isPending}
                       >
                         <XCircle className="h-4 w-4 mr-1" />

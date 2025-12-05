@@ -276,7 +276,7 @@ function FuncionariosPageContent() {
             {funcionarios.length > 0 ? (
               <>
                 <div className="grid gap-3 sm:gap-4">
-                  {funcionarios.map((funcionario) => (
+                  {funcionarios.map((funcionario: any) => (
                     <Card key={funcionario.id} className="p-3 sm:p-4 hover:shadow-lg transition-shadow overflow-hidden">
                       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
                         <div className="flex-1 min-w-0">
@@ -388,7 +388,7 @@ function FuncionariosPageContent() {
           setIsCsvModalOpen(false)
           refetch()
         }}
-        empresaId={tenantCompanyId || undefined}
+        empresaId={tenantCompanyId ?? undefined}
       />
 
       {/* Modal de CRUD de Funcionário */}

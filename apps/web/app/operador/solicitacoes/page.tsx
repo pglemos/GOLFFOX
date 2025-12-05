@@ -1,17 +1,12 @@
 ﻿"use client"
 
-// @ts-expect-error Legacy: valid em ambiente sem tipagem
 import { AppShell } from "@/components/app-shell"
-// @ts-expect-error Legacy: valid em ambiente sem tipagem
 import { Card } from "@/components/ui/card"
-// @ts-expect-error Legacy: valid em ambiente sem tipagem
 import { Button } from "@/components/ui/button"
 import { Plus, Columns } from "lucide-react"
 import { useEffect, useState } from "react"
-// @ts-expect-error Legacy: valid em ambiente sem tipagem
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
-// @ts-expect-error Legacy: valid em ambiente sem tipagem
 import { SolicitacaoModal } from "@/components/operator/solicitacao-modal"
 
 export default function SolicitacoesOperatorPage() {

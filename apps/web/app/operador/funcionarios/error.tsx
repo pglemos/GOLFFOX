@@ -1,9 +1,7 @@
 ﻿'use client'
 
 import { useEffect } from 'react'
-// @ts-expect-error Legacy: valid em ambiente sem tipagem
 import { Button } from '@/components/ui/button'
-// @ts-expect-error Legacy: valid em ambiente sem tipagem
 import { Card } from '@/components/ui/card'
 
 export default function Error({
