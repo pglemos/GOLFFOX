@@ -520,7 +520,7 @@ export const FleetMap = memo(function FleetMap({ companyId, transportadoraId, ro
           schema: 'public',
           table: 'driver_positions'
         },
-        (payload) => {
+        (payload: any) => {
           // Recarregar dados ao receber mudança na posição
           loadMapData()
         }
@@ -532,7 +532,7 @@ export const FleetMap = memo(function FleetMap({ companyId, transportadoraId, ro
           schema: 'public',
           table: 'trips'
         },
-        (payload) => {
+        (payload: any) => {
           // Recarregar dados ao receber mudança no status da viagem
           loadMapData()
         }
@@ -544,7 +544,7 @@ export const FleetMap = memo(function FleetMap({ companyId, transportadoraId, ro
           schema: 'public',
           table: 'trip_passengers'
         },
-        (payload) => {
+        (payload: any) => {
           // Recarregar dados ao receber mudança nos passageiros
           loadMapData()
         }

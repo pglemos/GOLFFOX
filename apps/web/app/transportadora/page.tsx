@@ -264,14 +264,14 @@ export default function TransportadoraDashboard() {
       // Carregar posições dos veículos usando RPC do mapa
       const { data: mapData } = await supabase.rpc('gf_map_snapshot_full', {
         p_transportadora_id: transportadoraId,
-        p_company_id: null,
-        p_route_id: null
+        p_company_id: undefined,
+        p_route_id: undefined
       })
 
       // Mapear veículos com posições do RPC
       const fleetData = (vehicles || []).map((vehicle: any) => {
-        const bus = mapData?.buses?.find((b: any) => b.vehicle_id === vehicle.id)
-        const garage = mapData?.garages?.find((g: any) => g.vehicle_id === vehicle.id)
+        const bus = (mapData as any)?.buses?.find((b: any) => b.vehicle_id === vehicle.id)
+        const garage = (mapData as any)?.garages?.find((g: any) => g.vehicle_id === vehicle.id)
         
         if (bus) {
           return {
@@ -341,8 +341,8 @@ export default function TransportadoraDashboard() {
           return {
             id: driver.id,
             name: driver.name,
-            trips: ranking?.trips_completed || 0,
-            rating: ranking?.total_points ? (ranking.total_points / 100).toFixed(1) : '0.0',
+            trips: (ranking as any)?.trips_completed || 0,
+            rating: (ranking as any)?.total_points ? ((ranking as any).total_points / 100).toFixed(1) : '0.0',
             status: 'active'
           }
         })

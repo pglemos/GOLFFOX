@@ -64,9 +64,7 @@ export default function OperatorRotasPage() {
       if (queryError) {
         console.error("Erro ao carregar rotas:", queryError)
         setError(`Erro ao carregar rotas: ${queryError.message}`)
-        notifyError(`Erro: ${queryError.message}`, {
-          i18n: { ns: 'common', key: 'errors.generic' }
-        })
+        notifyError(`Erro: ${queryError.message}`)
         setRotas([])
         return
       }
@@ -75,9 +73,7 @@ export default function OperatorRotasPage() {
       console.error("Erro ao carregar rotas:", err)
       const errorMessage = err?.message || 'Erro desconhecido'
       setError(errorMessage)
-      notifyError(`Erro: ${errorMessage}`, {
-        i18n: { ns: 'common', key: 'errors.generic' }
-      })
+      notifyError(`Erro: ${errorMessage}`)
       setRotas([])
     } finally {
       setLoading(false)

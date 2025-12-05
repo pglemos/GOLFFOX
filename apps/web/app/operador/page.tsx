@@ -239,7 +239,7 @@ export default function OperatorDashboard() {
             <h2 className="text-base sm:text-lg font-semibold text-[var(--ink-strong)]">{t('operator', 'charts_title')}</h2>
             <p className="text-xs sm:text-sm text-[var(--ink-muted)] mt-1">{t('operator', 'charts_subtitle')}</p>
           </div>
-          <DashboardCharts kpis={kpis} period={period} />
+          <DashboardCharts kpis={kpis} period={period as "today" | "week" | "month" | undefined} />
         </div>
 
         {/* Mapa Preview */}
