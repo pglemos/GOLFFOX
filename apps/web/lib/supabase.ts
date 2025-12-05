@@ -1,4 +1,4 @@
-import { createClient, SupabaseClient } from '@supabase/supabase-js'
+import { createClient, SupabaseClient, RealtimeChannel } from '@supabase/supabase-js'
 import type { Database } from '@/types/supabase'
 
 const envUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -53,7 +53,7 @@ type MockSupabaseClient = {
     delete: () => MockQueryBuilder
   }
   channel: (name: string) => MockRealtimeChannel
-  removeChannel: (channel: MockRealtimeChannel) => void
+  removeChannel: (channel: MockRealtimeChannel | RealtimeChannel) => void
   rpc: (functionName: string, args?: Record<string, unknown>) => Promise<{ data: unknown; error: Error | null }>
 }
 
