@@ -11,7 +11,7 @@ import { motion } from "framer-motion"
 interface AppShellProps {
   user: {
     id: string
-    name: string
+    name?: string
     email: string
     role: string
     avatar_url?: string

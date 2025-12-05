@@ -3,30 +3,38 @@
 import { NextResponse } from "next/server"
 
 export async function GET() {
-    // Mock data for cost control
-    const kpis = {
-        totalRevenue: 1250000,
-        operationalCost: 820000,
-        profitMargin: 34.4,
-        totalKm: 185000,
+    try {
+        // Mock data for cost control
+        const kpis = {
+            totalRevenue: 1250000,
+            operationalCost: 820000,
+            profitMargin: 34.4,
+            totalKm: 185000,
+        }
+
+        const distribution = [
+            { name: 'Combustível', value: 35, color: '#ef4444' }, // red-500
+            { name: 'Manutenção', value: 25, color: '#f59e0b' }, // amber-500
+            { name: 'Motoristas', value: 30, color: '#3b82f6' }, // blue-500
+            { name: 'Outros', value: 10, color: '#6b7280' }, // gray-500
+        ]
+
+        // Monthly trend data for charts
+        const monthlyTrend = [
+            { month: 'Jan', revenue: 100000, cost: 70000 },
+            { month: 'Fev', revenue: 110000, cost: 75000 },
+            { month: 'Mar', revenue: 105000, cost: 72000 },
+            { month: 'Abr', revenue: 120000, cost: 80000 },
+            { month: 'Mai', revenue: 130000, cost: 85000 },
+            { month: 'Jun', revenue: 140000, cost: 90000 },
+        ]
+
+        return NextResponse.json({ kpis, distribution, monthlyTrend })
+    } catch (error) {
+        console.error('Erro na rota custos:', error)
+        return NextResponse.json(
+            { error: 'Erro ao processar requisição' },
+            { status: 500 }
+        )
     }
-
-    const distribution = [
-        { name: 'Combustível', value: 35, color: '#ef4444' }, // red-500
-        { name: 'Manutenção', value: 25, color: '#f59e0b' }, // amber-500
-        { name: 'Motoristas', value: 30, color: '#3b82f6' }, // blue-500
-        { name: 'Outros', value: 10, color: '#6b7280' }, // gray-500
-    ]
-
-    // Monthly trend data for charts
-    const monthlyTrend = [
-        { month: 'Jan', revenue: 100000, cost: 70000 },
-        { month: 'Fev', revenue: 110000, cost: 75000 },
-        { month: 'Mar', revenue: 105000, cost: 72000 },
-        { month: 'Abr', revenue: 120000, cost: 80000 },
-        { month: 'Mai', revenue: 130000, cost: 85000 },
-        { month: 'Jun', revenue: 140000, cost: 90000 },
-    ]
-
-    return NextResponse.json({ kpis, distribution, monthlyTrend })
 }

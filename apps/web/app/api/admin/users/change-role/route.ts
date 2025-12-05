@@ -9,9 +9,7 @@ export const runtime = 'nodejs'
 
 const changeRoleSchema = z.object({
     userId: z.string().uuid('ID de usuário inválido'),
-    newRole: z.enum(['admin', 'operator', 'transportadora', 'driver', 'passenger'], {
-        errorMap: () => ({ message: 'Papel inválido' })
-    }),
+    newRole: z.enum(['admin', 'operator', 'transportadora', 'driver', 'passenger']),
     oldRole: z.string().optional(),
 })
 

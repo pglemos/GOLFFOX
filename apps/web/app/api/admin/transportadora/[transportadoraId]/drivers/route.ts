@@ -6,16 +6,30 @@ export async function GET(
   req: NextRequest,
   context: { params: Promise<{ transportadoraId: string }> }
 ) {
-  const params = await context.params
-
-  return transportadoraDriversGET(req, { params: { transportadoraId: params.transportadoraId } } as any)
+  try {
+    const params = await context.params
+    return await transportadoraDriversGET(req, { params: { transportadoraId: params.transportadoraId } } as any)
+  } catch (error) {
+    console.error('Erro na rota transportadora/[transportadoraId]/drivers GET:', error)
+    return new Response(
+      JSON.stringify({ error: 'Erro ao processar requisição' }),
+      { status: 500, headers: { 'Content-Type': 'application/json' } }
+    )
+  }
 }
 
 export async function POST(
   req: NextRequest,
   context: { params: Promise<{ transportadoraId: string }> }
 ) {
-  const params = await context.params
-
-  return transportadoraDriversPOST(req, { params: { transportadoraId: params.transportadoraId } } as any)
+  try {
+    const params = await context.params
+    return await transportadoraDriversPOST(req, { params: { transportadoraId: params.transportadoraId } } as any)
+  } catch (error) {
+    console.error('Erro na rota transportadora/[transportadoraId]/drivers POST:', error)
+    return new Response(
+      JSON.stringify({ error: 'Erro ao processar requisição' }),
+      { status: 500, headers: { 'Content-Type': 'application/json' } }
+    )
+  }
 }

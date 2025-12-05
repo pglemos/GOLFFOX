@@ -1,7 +1,7 @@
 "use client"
 import React from "react"
 import { usePathname } from "next/navigation"
-import { Link } from "next/link"
+import Link from "next/link"
 import { useRouter } from "next/navigation"
 import {
   Sidebar as UISidebar,
@@ -277,7 +277,7 @@ const CustomSidebarLink = ({
           "flex items-center justify-start gap-2 py-2.5 sm:py-2 px-2 sm:px-3 rounded-lg transition-colors relative",
           "min-h-[44px] sm:min-h-[40px] touch-manipulation",
           isActive
-            ? ((panel === 'operador' || panel === 'operator')
+            ? (panel === 'operador'
               ? "bg-orange-50 dark:bg-orange-900/20 text-orange-500"
               : "bg-[#FFF7ED] text-[#F97316]")
             : "hover:bg-gray-100 dark:hover:bg-gray-800 active:bg-gray-200"
@@ -299,8 +299,8 @@ const CustomSidebarLink = ({
               "h-5 w-5 transition-colors flex-shrink-0",
               "stroke-[1.5px]",
               isActive
-                ? ((panel === 'operador' || panel === 'operator') ? "text-orange-500" : "text-[#F97316]")
-                : ((panel === 'operador' || panel === 'operator') ? "text-gray-500 group-hover:text-orange-500" : "text-gray-500 group-hover:text-[#F97316]")
+                ? (panel === 'operador' ? "text-orange-500" : "text-[#F97316]")
+                : (panel === 'operador' ? "text-gray-500 group-hover:text-orange-500" : "text-gray-500 group-hover:text-[#F97316]")
             )}
           />
           {showOperationalAlerts && open && (
@@ -321,7 +321,7 @@ const CustomSidebarLink = ({
           className={cn(
             "text-sm sm:text-base transition-colors whitespace-nowrap font-medium",
             isActive
-              ? ((panel === 'operador' || panel === 'operator') ? "text-orange-500 font-semibold" : "text-[#F97316] font-semibold")
+              ? (panel === 'operador' ? "text-orange-500 font-semibold" : "text-[#F97316] font-semibold")
               : "text-gray-600 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-gray-100"
           )}
           style={{
@@ -334,7 +334,7 @@ const CustomSidebarLink = ({
       {isActive && (
         <div className={cn(
           "absolute left-0 top-0 bottom-0 w-1 rounded-r",
-          (panel === 'operador' || panel === 'operator') ? "bg-orange-500" : "bg-[#F97316]"
+          panel === 'operador' ? "bg-orange-500" : "bg-[#F97316]"
         )} />
       )}
     </div>
@@ -347,12 +347,12 @@ const SidebarLogo = ({ panel }: { panel: 'admin' | 'operador' | 'transportadora'
 
   return (
     <a
-      href={(panel === 'operador' || panel === 'operator') ? '/operador' : panel === 'transportadora' ? '/transportadora' : '/admin'}
+      href={panel === 'operador' ? '/operador' : panel === 'transportadora' ? '/transportadora' : '/admin'}
       className="font-normal flex space-x-2 items-center text-sm text-black dark:text-white py-1 relative z-20 mb-6"
     >
       <div className={cn(
         "h-8 w-8 rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm",
-        (panel === 'operador' || panel === 'operator') ? "bg-orange-500" : "gradient-brand"
+        panel === 'operador' ? "bg-orange-500" : "gradient-brand"
       )}>
         <span className="text-white text-xs font-bold">GF</span>
       </div>
@@ -381,7 +381,7 @@ export function Sidebar({ isOpen = true, isMobile = false, panel = 'admin', user
   const { isSidebarItemActive } = useNavigation()
 
   // Selecionar menu baseado no painel
-  const menuItems = (panel === 'operador' || panel === 'operator')
+  const menuItems = panel === 'operador'
     ? operadorMenuItems
     : panel === 'transportadora'
       ? transportadoraMenuItems
@@ -398,7 +398,7 @@ export function Sidebar({ isOpen = true, isMobile = false, panel = 'admin', user
   const router = useRouter()
 
   useEffect(() => {
-    const items = (panel === 'operador' || panel === 'operator') ? operadorMenuItems : panel === 'transportadora' ? transportadoraMenuItems : adminMenuItems
+    const items = panel === 'operador' ? operadorMenuItems : panel === 'transportadora' ? transportadoraMenuItems : adminMenuItems
     for (const item of items) {
       router.prefetch(item.href)
     }

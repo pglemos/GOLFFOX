@@ -160,7 +160,7 @@ export function FuncionarioModal({ funcionario, isOpen, onClose, onSave, empresa
         }
 
         notifySuccess("Funcionário atualizado com sucesso!", {
-          i18n: { ns: 'operador', key: 'employees.updated' }
+          i18n: { ns: 'operator', key: 'employees.updated' }
         })
       } else {
         // #region agent log
@@ -212,7 +212,7 @@ export function FuncionarioModal({ funcionario, isOpen, onClose, onSave, empresa
         }
 
         notifySuccess("Funcionário cadastrado com sucesso!", {
-          i18n: { ns: 'operador', key: 'employees.created' }
+          i18n: { ns: 'operator', key: 'employees.created' }
         })
       }
 
@@ -224,7 +224,7 @@ export function FuncionarioModal({ funcionario, isOpen, onClose, onSave, empresa
       // #endregion
       logError("Erro ao salvar funcionário", { error }, 'FuncionarioModal')
       notifyError(`Erro ao salvar funcionário: ${error?.message || 'Erro desconhecido'}`, undefined, {
-        i18n: { ns: 'operador', key: 'employees.saveError' }
+        i18n: { ns: 'operator', key: 'employees.saveError' }
       })
     } finally {
       setLoading(false)

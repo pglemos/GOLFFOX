@@ -31,7 +31,7 @@ export function useAdvancedNavigation() {
   const [isTransitioning, setIsTransitioning] = useState(false)
   const [routeState, setRouteState] = useState<RouteState>({})
   const [preloadedAssets, setPreloadedAssets] = useState<Set<string>>(new Set())
-  const transitionTimeoutRef = useRef<NodeJS.Timeout>()
+  const transitionTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   // Transição animada com easing bezier personalizado
   const transitionConfig = {

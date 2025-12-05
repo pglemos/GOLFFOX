@@ -135,7 +135,12 @@ export function DashboardCharts({ kpis, period = "today" }: DashboardChartsProps
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
                 <YAxis />
-                <Tooltip formatter={(value: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)} />
+                <Tooltip formatter={(value: unknown) => {
+                  if (typeof value === 'number') {
+                    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)
+                  }
+                  return value
+                }} />
                 <Bar dataKey="valor" fill="#10b981" />
               </BarChart>
             </ResponsiveContainer>
@@ -157,7 +162,7 @@ export function DashboardCharts({ kpis, period = "today" }: DashboardChartsProps
                   cx="50%"
                   cy="50%"
                   labelLine={false}
-                  label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                  label={({ name, percent }) => `${name}: ${percent ? (percent * 100).toFixed(0) : 0}%`}
                   outerRadius={80}
                   fill="#8884d8"
                   dataKey="value"

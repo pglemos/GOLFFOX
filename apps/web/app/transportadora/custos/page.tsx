@@ -122,7 +122,7 @@ export default function TransportadoraCustosPage() {
         }
 
         const trendPercentage = previousMonthTotal > 0
-          ? ((totalCostsThisMonth - previousMonthTotal) / previousMonthTotal) * 100
+          ? ((total - previousMonthTotal) / previousMonthTotal) * 100
           : 0
 
         setSummary(prev => ({
@@ -348,7 +348,7 @@ export default function TransportadoraCustosPage() {
                         cx="50%"
                         cy="50%"
                         labelLine={false}
-                        label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                        label={({ name, percent }) => `${name} ${percent ? (percent * 100).toFixed(0) : 0}%`}
                         outerRadius={120}
                         fill="#8884d8"
                         dataKey="value"

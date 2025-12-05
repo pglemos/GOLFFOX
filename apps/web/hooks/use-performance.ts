@@ -45,8 +45,8 @@ export function usePerformance(config: Partial<PerformanceConfig> = {}): {
 
   const frameCount = useRef(0)
   const lastTime = useRef(performance.now())
-  const animationFrame = useRef<number>()
-  const intervalRef = useRef<NodeJS.Timeout>()
+  const animationFrame = useRef<number | null>(null)
+  const intervalRef = useRef<NodeJS.Timeout | null>(null)
 
   // FPS Monitoring
   const measureFPS = useCallback(() => {
@@ -172,12 +172,12 @@ export function useLazyImage(src: string, options: IntersectionObserverInit = {}
   imageSrc: string | null
   isLoaded: boolean
   isInView: boolean
-  ref: React.RefObject<HTMLElement>
+  ref: React.RefObject<HTMLElement | null>
 } {
   const [imageSrc, setImageSrc] = useState<string | null>(null)
   const [isLoaded, setIsLoaded] = useState(false)
   const [isInView, setIsInView] = useState(false)
-  const ref = useRef<HTMLElement>(null)
+  const ref = useRef<HTMLElement | null>(null)
 
   useEffect(() => {
     const element = ref.current
@@ -240,7 +240,7 @@ export function useThrottle<T extends (...args: any[]) => any>(
   delay: number
 ): T {
   const lastCall = useRef(0)
-  const timeoutRef = useRef<NodeJS.Timeout>()
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   return useCallback(
     ((...args: Parameters<T>) => {
