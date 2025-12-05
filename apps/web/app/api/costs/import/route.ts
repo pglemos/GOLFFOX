@@ -166,7 +166,7 @@ async function importHandler(request: NextRequest) {
     // Inserir em lote
     const { data: inserted, error: insertError } = await supabaseServiceRole
       .from('gf_costs')
-      .insert(costsToInsert)
+      .insert(costsToInsert as any)
       .select()
 
     if (insertError) {

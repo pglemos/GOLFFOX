@@ -38,7 +38,7 @@ export async function PUT(
         cpf: cpf || null,
         cnh: cnh || null,
         cnh_category: cnh_category || null
-      })
+      } as any)
       .eq('id', driverId)
       .eq('transportadora_id', transportadoraId)
       .select()

@@ -47,9 +47,9 @@ export async function GET(request: NextRequest) {
       logger.warn('⚠️ Erro na busca inicial, tentando com seleção mínima:', error.message)
       const result = await supabaseAdmin
         .from('companies')
-        .select('id, name')
+        .select('id, name, is_active')
       
-      data = result.data
+      data = result.data?.map((c: any) => ({ ...c, is_active: c.is_active ?? true })) || null
       error = result.error
     }
     

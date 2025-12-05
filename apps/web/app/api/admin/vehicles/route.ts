@@ -94,7 +94,7 @@ export async function POST(request: NextRequest) {
         .limit(1)
       
       if (companies && companies.length > 0) {
-        finalCompanyId = companies[0].id
+        finalCompanyId = (companies[0] as any).id
       } else if (isTestMode || isDevelopment) {
         // Criar empresa de teste automaticamente
         try {
@@ -110,7 +110,7 @@ export async function POST(request: NextRequest) {
             .single()
           
           if (!createCompanyError && newCompany) {
-            finalCompanyId = newCompany.id
+            finalCompanyId = (newCompany as any).id
             logger.log(`✅ Empresa de teste criada automaticamente: ${finalCompanyId}`)
           } else if (createCompanyError && createCompanyError.code !== '23505') {
             // Se erro não for de duplicação, logar

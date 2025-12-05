@@ -245,7 +245,7 @@ export async function POST(request: NextRequest) {
         }
       })
       
-      authData = createUserResult.data
+      authData = createUserResult.data?.user ? { user: { id: createUserResult.data.user.id, email: createUserResult.data.user.email } } : null
       createUserError = createUserResult.error
     } else {
       // Se não houver senha, não criar usuário - apenas empresa
@@ -255,6 +255,12 @@ export async function POST(request: NextRequest) {
     // Se não houver senha, retornar apenas empresa criada
     // Mas o teste espera email na resposta, então incluir se fornecido
     if (!shouldCreateUser) {
+      if (!company) {
+        return NextResponse.json(
+          { error: 'Empresa não foi criada' },
+          { status: 500 }
+        )
+      }
       const responseData: Record<string, unknown> = {
         success: true,
         companyId: company.id,
@@ -290,8 +296,8 @@ export async function POST(request: NextRequest) {
               created: false,
               email: operatorEmail,
               role: 'operador',
-              companyId: company.id,
-              company,
+              companyId: company?.id || companyId || '',
+              company: company || null,
               operator: {
                 id: existingUser.id,
                 email: operatorEmail,
@@ -309,8 +315,8 @@ export async function POST(request: NextRequest) {
           created: true,
           email: operatorEmail,
           role: 'operador',
-          companyId: company.id,
-          company,
+          companyId: company?.id || companyId || '',
+          company: company || null,
           operator: {
             id: 'test-operator-' + Date.now(),
             email: operatorEmail,
@@ -319,22 +325,40 @@ export async function POST(request: NextRequest) {
       }
       
       // Rollback: deletar empresa criada (apenas em produção)
-      await supabaseAdmin.from('companies').delete().eq('id', company.id).catch(() => {})
+      if (company) {
+        try {
+          await supabaseAdmin.from('companies').delete().eq('id', company.id)
+        } catch {}
+      }
       throw createUserError
     }
 
     if (!authData || !authData.user) {
-      await supabaseAdmin.from('companies').delete().eq('id', company.id)
+      if (company) {
+        try {
+          await supabaseAdmin.from('companies').delete().eq('id', company.id)
+        } catch {}
+      }
       throw new Error('Erro ao criar usuário')
     }
+    
+    // Type guard: após a verificação, authData.user está garantido
+    const userId = authData.user.id
+    if (!company) {
+      await supabaseAdmin.auth.admin.deleteUser(userId).catch(() => {})
+      throw new Error('Empresa não foi criada')
+    }
+    
+    // Type guard: após verificação, company não é null
+    const finalCompanyId = company.id
 
     // Passo 5: Atualizar perfil do usuário
     // Construir objeto de dados com apenas campos essenciais
     const userData: Record<string, unknown> = {
-      id: authData.user.id,
+      id: userId,
       email: operatorEmail,
       role: 'operador',
-      company_id: company.id,
+      company_id: finalCompanyId,
     }
     
     // Tentar adicionar campos opcionais (podem não existir na tabela)
@@ -342,7 +366,7 @@ export async function POST(request: NextRequest) {
     try {
       // Tentar inserir com name (usar operatorName se fornecido)
       const userName = operatorName || operatorEmail.split('@')[0]
-      const userDataWithName = { ...userData, name: userName }
+      const userDataWithName: Record<string, unknown> = { ...userData, name: userName }
       if (operatorPhone) {
         userDataWithName.phone = operatorPhone
       }
@@ -365,8 +389,8 @@ export async function POST(request: NextRequest) {
           if (profileError2) {
             // Se ainda falhar, fazer rollback completo
             console.error('Erro ao atualizar perfil (sem name):', profileError2)
-            await supabaseAdmin.auth.admin.deleteUser(authData.user.id)
-            await supabaseAdmin.from('companies').delete().eq('id', company.id)
+            await supabaseAdmin.auth.admin.deleteUser(userId)
+            await supabaseAdmin.from('companies').delete().eq('id', finalCompanyId)
             return NextResponse.json(
               { 
                 error: 'Erro ao criar perfil do usuário',
@@ -403,8 +427,8 @@ export async function POST(request: NextRequest) {
         if (profileError) {
           // Se falhar, fazer rollback completo
           console.error('Erro ao atualizar perfil (fallback):', profileError)
-          await supabaseAdmin.auth.admin.deleteUser(authData.user.id)
-          await supabaseAdmin.from('companies').delete().eq('id', company.id)
+          await supabaseAdmin.auth.admin.deleteUser(userId)
+          await supabaseAdmin.from('companies').delete().eq('id', companyId)
           return NextResponse.json(
             { 
               error: 'Erro ao criar perfil do usuário',
@@ -418,15 +442,15 @@ export async function POST(request: NextRequest) {
         // Erro inesperado - fazer rollback completo
         console.error('Erro ao atualizar perfil (fallback também falhou):', e2)
         try {
-          await supabaseAdmin.auth.admin.deleteUser(authData.user.id)
-          await supabaseAdmin.from('companies').delete().eq('id', company.id)
+          await supabaseAdmin.auth.admin.deleteUser(userId)
+          await supabaseAdmin.from('companies').delete().eq('id', finalCompanyId)
         } catch (cleanupError) {
           console.error('Erro ao fazer rollback:', cleanupError)
         }
         return NextResponse.json(
           { 
             error: 'Erro ao criar perfil do usuário',
-            message: e2.message || 'Erro inesperado ao inserir na tabela users',
+            message: (e2 instanceof Error ? e2.message : String(e2)) || 'Erro inesperado ao inserir na tabela users',
             details: process.env.NODE_ENV === 'development' ? { e2, originalError: e } : undefined
           },
           { status: 500 }
@@ -442,8 +466,8 @@ export async function POST(request: NextRequest) {
       const { error: mapErr } = await supabaseAdmin
         .from('gf_user_company_map')
         .insert({
-          user_id: authData.user.id,
-          company_id: company.id,
+          user_id: userId,
+          company_id: finalCompanyId,
         })
         .select()
 
@@ -504,11 +528,11 @@ export async function POST(request: NextRequest) {
           actor_id: actorId,
           action_type: 'create_operator',
           resource_type: 'company',
-          resource_id: company.id,
+          resource_id: finalCompanyId,
           details: {
             company_name: companyName,
             operator_email: operatorEmail,
-            operator_id: authData.user.id,
+            operator_id: userId,
           }
         })
         
@@ -522,10 +546,11 @@ export async function POST(request: NextRequest) {
             logger.warn('Erro ao registrar log de auditoria (não crítico):', auditError)
           }
         }
-      } catch (auditError) {
+      } catch (auditError: unknown) {
         // Não falhar se log falhar - é opcional
-        if (auditError.message?.includes('does not exist') || 
-            auditError.message?.includes('relation')) {
+        const errorMessage = auditError instanceof Error ? auditError.message : String(auditError)
+        if (errorMessage.includes('does not exist') || 
+            errorMessage.includes('relation')) {
           logger.warn('Tabela gf_audit_log não encontrada. Log de auditoria não será registrado.')
         } else {
           logger.warn('Erro ao registrar log de auditoria (não crítico):', auditError)
@@ -535,14 +560,14 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      userId: authData.user.id,
+      userId: userId,
       created: true,
       email: operatorEmail,
       role: 'operador',
-      companyId: company.id,
+      companyId: finalCompanyId,
       company,
       operator: {
-        id: authData.user.id,
+        id: userId,
         email: operatorEmail,
       },
     }, { status: 201 })

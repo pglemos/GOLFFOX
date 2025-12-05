@@ -1,10 +1,11 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js'
+import type { Database } from '@/types/supabase'
 
 const envUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 const envAnon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
 // Tipo para o cliente Supabase
-type SupabaseClientType = SupabaseClient<Record<string, unknown>>
+type SupabaseClientType = SupabaseClient<Database>
 
 // Tipo para o fallback mock - expandido para incluir métodos comuns
 type MockQueryBuilder = {

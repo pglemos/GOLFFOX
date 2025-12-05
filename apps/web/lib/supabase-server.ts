@@ -1,8 +1,9 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js'
+import type { Database } from '@/types/supabase'
 
 // Inicialização lazy para evitar falhas de build quando variáveis de ambiente não estão definidas.
 // Mantém API compatível: os módulos importam `supabaseServiceRole` e usam normalmente.
-type SupabaseClientType = SupabaseClient<Record<string, unknown>>
+type SupabaseClientType = SupabaseClient<Database>
 
 let _supabaseServiceRole: SupabaseClientType | null = null
 
@@ -14,7 +15,7 @@ function ensureSupabaseServiceRole(): SupabaseClientType {
   if (!url || !key) {
     throw new Error('Supabase service role não configurado: defina NEXT_PUBLIC_SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY')
   }
-  _supabaseServiceRole = createClient<Record<string, unknown>>(url, key, {
+  _supabaseServiceRole = createClient<Database>(url, key, {
     auth: {
       autoRefreshToken: false,
       persistSession: false,

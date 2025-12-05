@@ -53,7 +53,7 @@ export async function PUT(
         vehicle_type: vehicle_type || 'bus',
         renavam: renavam || null,
         chassis: chassis || null
-      })
+      } as any)
       .eq('id', vehicleId)
       .eq('transportadora_id', transportadoraId)
       .select()

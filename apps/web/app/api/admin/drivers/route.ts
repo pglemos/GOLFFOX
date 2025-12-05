@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
           is_active: is_active ?? true,
           role: 'driver'
         }
-      ])
+      ] as any)
       .select()
       .single()
 

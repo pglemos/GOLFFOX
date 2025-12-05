@@ -95,7 +95,7 @@ async function exportHandler(request: NextRequest) {
       .eq('id', companyId)
       .single()
 
-    const companyName = company?.name || 'Empresa'
+    const companyName = (company as any)?.name || 'Empresa'
 
     // Preparar dados para exportação
     const reportData = {
@@ -166,19 +166,20 @@ async function exportHandler(request: NextRequest) {
             }
 
             for (const cost of page) {
+              const costData = cost as any
               const cells = [
-                new Date(cost.date).toLocaleDateString('pt-BR'),
-                cost.group_name || '-',
-                cost.category || '-',
-                cost.subcategory || '-',
-                cost.route_name || '-',
-                cost.vehicle_plate || '-',
-                cost.driver_email || '-',
-                new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(cost.amount || 0),
-                cost.qty?.toString() || '-',
-                cost.unit || '-',
-                cost.source || 'manual',
-                cost.notes || '-'
+                new Date(costData.date).toLocaleDateString('pt-BR'),
+                costData.group_name || '-',
+                costData.category || '-',
+                costData.subcategory || '-',
+                costData.route_name || '-',
+                costData.vehicle_plate || '-',
+                costData.driver_email || '-',
+                new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(costData.amount || 0),
+                costData.qty?.toString() || '-',
+                costData.unit || '-',
+                costData.source || 'manual',
+                costData.notes || '-'
               ]
               const escaped = cells.map((cell) => {
                 const cellStr = String(cell || '')
@@ -195,7 +196,7 @@ async function exportHandler(request: NextRequest) {
         }
       })
 
-      return new Response(stream, {
+      return new NextResponse(stream, {
         headers: {
           'Content-Type': 'text/csv; charset=utf-8',
           'Content-Disposition': `attachment; filename="${filename}"`

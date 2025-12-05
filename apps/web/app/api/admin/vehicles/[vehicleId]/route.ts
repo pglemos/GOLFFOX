@@ -92,7 +92,7 @@ export async function DELETE(
     if ((tripsCount ?? 0) > 0) {
       const { error: archiveError } = await supabaseServiceRole
         .from("vehicles")
-        .update({ is_active: false })
+        .update({ is_active: false } as any)
         .eq("id", vehicleId)
 
       if (archiveError) {
@@ -142,7 +142,7 @@ export async function DELETE(
 
         const { error: archiveAfterFailure } = await supabaseServiceRole
           .from("vehicles")
-          .update({ is_active: false })
+          .update({ is_active: false } as any)
           .eq("id", vehicleId)
 
         if (archiveAfterFailure) {
@@ -209,7 +209,7 @@ export async function PATCH(
 
     const { data, error } = await supabaseServiceRole
       .from('vehicles')
-      .update(updateData)
+      .update(updateData as any)
       .eq('id', vehicleId)
       .select()
       .single()

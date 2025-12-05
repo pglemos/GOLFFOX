@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
     for (const category of ESSENTIAL_CATEGORIES) {
       const { data, error } = await supabase
         .from('gf_cost_categories')
-        .upsert(category, { onConflict: 'id' })
+        .upsert(category as any, { onConflict: 'id' })
         .select()
 
       if (error) {
