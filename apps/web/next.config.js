@@ -6,7 +6,7 @@ let nextConfig = {
   reactStrictMode: true,
   output: 'standalone',
   // Corrigir warning sobre múltiplos lockfiles
-  outputFileTracingRoot: path.join(__dirname, '../../'),
+  // outputFileTracingRoot: path.join(__dirname, '../../'),
   typescript: {
     // ✅ Ignorar erros de tipo durante o build para permitir deploy
     ignoreBuildErrors: true,
