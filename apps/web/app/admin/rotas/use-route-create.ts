@@ -139,7 +139,7 @@ export function useRouteCreate(isOpen: boolean) {
             let { data, error } = await supabase
                 .from("v_company_employees_secure")
                 .select("*")
-                .eq("company_id", formData.company_id)
+                .eq("company_id", formData.company_id) as any
 
             if (error && (error.message?.includes("does not exist") || (error as any).code === "PGRST205")) {
                 try {
@@ -181,13 +181,13 @@ export function useRouteCreate(isOpen: boolean) {
                     lng: emp.longitude ? parseFloat(emp.longitude.toString()) : null,
                 })) as any
 
-                setEmployees((data || []) as EmployeeLite[])
+                setEmployees((data || []) as unknown as EmployeeLite[])
                 return
             } else if (error) {
                 throw error
             }
 
-            setEmployees((data || []) as EmployeeLite[])
+            setEmployees((data || []) as unknown as EmployeeLite[])
         } catch (error: any) {
             console.error("Erro ao carregar funcionários:", error)
             notifyError(error, "Erro ao carregar funcionários")

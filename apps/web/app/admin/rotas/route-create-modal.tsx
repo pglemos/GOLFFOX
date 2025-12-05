@@ -86,7 +86,6 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
             latitude: geocoded.lat,
             longitude: geocoded.lng
           }
-          // @ts-expect-error - Supabase types are too strict for dynamic updates
           const updateQuery = (supabase.from("gf_employee_company").update(updatePayload as any) as any)
           const { error: updateError } = await updateQuery.eq("id", emp.employee_id)
           if (updateError) console.warn("Erro ao atualizar coordenadas:", updateError)

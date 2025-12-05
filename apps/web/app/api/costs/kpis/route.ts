@@ -127,8 +127,8 @@ async function getCostsKpisHandler(request: NextRequest) {
       budget_variance: budgetData ? {
         budgeted: (budgetData as any).budgeted_amount || 0,
         actual: (budgetData as any).actual_amount || 0,
-        variance_percent: budgetData.variance_percent || 0,
-        variance_absolute: (budgetData.actual_amount || 0) - (budgetData.budgeted_amount || 0)
+        variance_percent: (budgetData as any).variance_percent || 0,
+        variance_absolute: ((budgetData as any).actual_amount || 0) - ((budgetData as any).budgeted_amount || 0)
       } : null,
       period_days: parseInt(period)
     }
