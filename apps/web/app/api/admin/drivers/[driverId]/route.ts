@@ -34,7 +34,7 @@ export async function PUT(
     const transportadoraId = transportadora_id || carrier_id // Compatibilidade
 
     // Atualizar motorista
-    const { data: driver, error: driverError } = await supabase
+    const { data: driver, error: driverError } = await (supabase
       .from('drivers')
       .update({
         name,
@@ -47,7 +47,7 @@ export async function PUT(
         cnh_expiry: cnh_expiry || null,
         is_active: is_active ?? true,
         updated_at: new Date().toISOString()
-      } as any)
+      } as any) as any)
       .eq('id', driverId)
       .select()
       .single()
@@ -79,9 +79,9 @@ export async function GET(
     const supabase = supabaseServiceRole
     const { driverId } = await context.params
 
-    const { data: driver, error } = await supabase
+    const { data: driver, error } = await (supabase
       .from('drivers')
-      .select('*, carriers!inner(name)')
+      .select('*, carriers!inner(name)') as any)
       .eq('id', driverId)
       .single()
 

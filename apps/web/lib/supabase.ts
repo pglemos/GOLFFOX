@@ -32,10 +32,13 @@ type MockQueryBuilder = {
 }
 
 type MockRealtimeChannel = {
-  on: (event: 'postgres_changes' | 'presence' | 'broadcast', filter: any, callback: (payload: any) => void) => MockRealtimeChannel
-  subscribe: (callback?: (status: string) => void) => MockRealtimeChannel
+  on: (event: 'postgres_changes' | 'presence' | 'broadcast', filter: any, callback: (payload: any) => void) => MockRealtimeChannel & RealtimeChannel
+  subscribe: (callback?: (status: string) => void) => MockRealtimeChannel & RealtimeChannel
   unsubscribe: () => Promise<void>
 }
+
+// Type union para canais Realtime
+export type RealtimeChannelUnion = MockRealtimeChannel | RealtimeChannel
 
 type MockSupabaseClient = {
   auth: {
@@ -52,8 +55,8 @@ type MockSupabaseClient = {
     upsert: (values: unknown, options?: { onConflict?: string }) => MockQueryBuilder
     delete: () => MockQueryBuilder
   }
-  channel: (name: string) => MockRealtimeChannel
-  removeChannel: (channel: MockRealtimeChannel | RealtimeChannel) => void
+  channel: (name: string) => MockRealtimeChannel & RealtimeChannel
+  removeChannel: (channel: RealtimeChannelUnion) => void
   rpc: (functionName: string, args?: Record<string, unknown>) => Promise<{ data: unknown; error: Error | null }>
 }
 

@@ -233,7 +233,7 @@ export default function TransportadoraDashboard() {
       }, 60000)
 
       return () => {
-        supabase.removeChannel(channel)
+        supabase.removeChannel(channel as any)
         clearInterval(interval)
       }
     }
