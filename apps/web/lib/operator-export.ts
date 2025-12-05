@@ -19,13 +19,13 @@ export async function exportOperatorData(
 
   switch (format) {
     case "csv":
-      exportToCSV(data, filename || `${defaultFilename}.csv`)
+      exportToCSV(data as any, filename || `${defaultFilename}.csv`)
       break
     case "excel":
-      exportToExcel(data, filename || `${defaultFilename}.xlsx`)
+      exportToExcel(data as any, filename || `${defaultFilename}.xlsx`)
       break
     case "pdf":
-      exportToPDF(data, filename || `${defaultFilename}.pdf`)
+      exportToPDF(data as any, filename || `${defaultFilename}.pdf`)
       break
   }
 }

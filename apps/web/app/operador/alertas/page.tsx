@@ -224,7 +224,7 @@ function AlertasOperatorPageInner() {
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-2 flex-wrap">
-                      <AlertTriangle className={`h-5 w-5 ${getAlertColor(alerta.severity)} flex-shrink-0`} />
+                      <AlertTriangle className={`h-5 w-5 ${getAlertColor(alerta.severity || undefined)} flex-shrink-0`} />
                       <h3 className="font-bold text-lg capitalize truncate">
                         {(alerta as any).alert_type?.replace(/_/g, ' ') || "Alerta"}
                       </h3>

@@ -136,10 +136,11 @@ if (envUrl && envAnon) {
       delete: () => createMockBuilder(),
     }),
     channel: () => {
-      const ch: MockRealtimeChannel = {
-        on: (_event: 'postgres_changes' | 'presence' | 'broadcast', _filter: any, _callback: (payload: any) => void) => ch,
+      const ch: MockRealtimeChannel & RealtimeChannel = {
+        on: (_event: 'postgres_changes' | 'presence' | 'broadcast', _filter: any, _callback: (payload: any) => void) => ch as MockRealtimeChannel & RealtimeChannel,
         subscribe: (cb?: (status: string) => void) => {
           if (cb) cb('SUBSCRIBED')
+          return ch as MockRealtimeChannel & RealtimeChannel
         },
         unsubscribe: async () => { return Promise.resolve() },
       }
@@ -147,7 +148,7 @@ if (envUrl && envAnon) {
     },
     removeChannel: () => {},
     rpc: async () => ({ data: null, error: mockError }),
-  } as MockSupabaseClient
+  } as unknown as MockSupabaseClient
 }
 
 export { supabase }

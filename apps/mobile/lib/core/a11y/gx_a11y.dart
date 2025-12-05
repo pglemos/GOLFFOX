@@ -20,8 +20,9 @@ class GxA11y {
   }
 
   /// Announce to screen readers
-  static void announce(String message) {
-    SemanticsService.announce(message, TextDirection.ltr);
+  static void announce(BuildContext context, String message) {
+    SemanticsService.sendAnnouncement(
+        View.of(context), message, TextDirection.ltr);
   }
 
   /// Create semantic label for complex widgets
@@ -52,13 +53,14 @@ class GxA11y {
   static Widget ensureTouchTarget({
     required Widget child,
     double minSize = minTouchTarget,
-  }) => ConstrainedBox(
-      constraints: BoxConstraints(
-        minWidth: minSize,
-        minHeight: minSize,
-      ),
-      child: child,
-    );
+  }) =>
+      ConstrainedBox(
+        constraints: BoxConstraints(
+          minWidth: minSize,
+          minHeight: minSize,
+        ),
+        child: child,
+      );
 
   /// Create accessible button with proper semantics
   static Widget buttonSemantic({
@@ -151,18 +153,22 @@ class GxA11y {
   static void announceStateChange(BuildContext context, String message) {
     // Delay to ensure the UI has updated
     Future.delayed(GfTokens.durationFast, () {
-      announce(message);
+      if (context.mounted) {
+        announce(context, message);
+      }
     });
   }
 
   /// Check if reduce motion is enabled
-  static bool shouldReduceMotion(BuildContext context) => MediaQuery.of(context).disableAnimations;
+  static bool shouldReduceMotion(BuildContext context) =>
+      MediaQuery.of(context).disableAnimations;
 
   /// Get appropriate animation duration based on accessibility settings
   static Duration getAnimationDuration(
     BuildContext context,
     Duration defaultDuration,
-  ) => shouldReduceMotion(context) ? Duration.zero : defaultDuration;
+  ) =>
+      shouldReduceMotion(context) ? Duration.zero : defaultDuration;
 }
 
 /// Accessibility-focused widget extensions
@@ -177,21 +183,23 @@ extension GxA11yWidget on Widget {
     bool? selected,
     bool? enabled,
     VoidCallback? onTap,
-  }) => Semantics(
-      label: label,
-      hint: hint,
-      value: value,
-      button: button,
-      textField: textField,
-      selected: selected,
-      enabled: enabled,
-      onTap: onTap,
-      child: this,
-    );
+  }) =>
+      Semantics(
+        label: label,
+        hint: hint,
+        value: value,
+        button: button,
+        textField: textField,
+        selected: selected,
+        enabled: enabled,
+        onTap: onTap,
+        child: this,
+      );
 
   /// Exclude from semantics tree
   Widget excludeSemantics() => ExcludeSemantics(child: this);
 
   /// Ensure minimum touch target
-  Widget withTouchTarget({double minSize = GxA11y.minTouchTarget}) => GxA11y.ensureTouchTarget(child: this, minSize: minSize);
+  Widget withTouchTarget({double minSize = GxA11y.minTouchTarget}) =>
+      GxA11y.ensureTouchTarget(child: this, minSize: minSize);
 }
