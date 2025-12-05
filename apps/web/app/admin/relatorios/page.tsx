@@ -406,7 +406,7 @@ export default function RelatoriosPage() {
                               notifySuccess('Agendamento deletado com sucesso!')
                               loadSchedules()
                             } catch (error: any) {
-                              notifyError(`Erro: ${error.message}`, {
+                              notifyError(`Erro: ${error.message}`, undefined, {
                                 i18n: { ns: 'common', key: 'errors.generic' }
                               })
                             }
