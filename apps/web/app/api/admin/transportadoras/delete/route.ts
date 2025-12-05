@@ -46,7 +46,7 @@ export async function DELETE(req: NextRequest) {
     // 1. Remover referências de users (setar transportadora_id como NULL)
     const { error: usersError } = await supabaseServiceRole
       .from('users')
-      .update({ transportadora_id: null })
+      .update({ transportadora_id: null } as any)
       .eq('transportadora_id', carrierId)
 
     if (usersError) {
@@ -65,7 +65,7 @@ export async function DELETE(req: NextRequest) {
     // 2. Remover referências de vehicles (setar transportadora_id como NULL)
     const { error: vehiclesError } = await supabaseServiceRole
       .from('vehicles')
-      .update({ transportadora_id: null })
+      .update({ transportadora_id: null } as any)
       .eq('transportadora_id', carrierId)
 
     if (vehiclesError) {
@@ -112,7 +112,7 @@ export async function DELETE(req: NextRequest) {
       if (!costsCheckError && costsData && costsData.length > 0) {
         const { error: costsError } = await supabaseServiceRole
           .from('costs')
-          .update({ transportadora_id: null })
+          .update({ transportadora_id: null } as any)
           .eq('transportadora_id', carrierId)
 
         if (costsError) {

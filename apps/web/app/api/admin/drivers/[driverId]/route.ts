@@ -47,7 +47,7 @@ export async function PUT(
         cnh_expiry: cnh_expiry || null,
         is_active: is_active ?? true,
         updated_at: new Date().toISOString()
-      })
+      } as any)
       .eq('id', driverId)
       .select()
       .single()

@@ -53,7 +53,7 @@ async function getCostsKpisHandler(request: NextRequest) {
       if (companyError) {
         return companyError
       }
-      userCtx = user
+      userCtx = user as { role: string; id?: string; companyId?: string }
     }
 
     // Buscar KPIs da view (view materializada - selecionar todas as colunas)
@@ -123,10 +123,10 @@ async function getCostsKpisHandler(request: NextRequest) {
     }
 
     const response = {
-      ...data,
+      ...(data as any),
       budget_variance: budgetData ? {
-        budgeted: budgetData.budgeted_amount || 0,
-        actual: budgetData.actual_amount || 0,
+        budgeted: (budgetData as any).budgeted_amount || 0,
+        actual: (budgetData as any).actual_amount || 0,
         variance_percent: budgetData.variance_percent || 0,
         variance_absolute: (budgetData.actual_amount || 0) - (budgetData.budgeted_amount || 0)
       } : null,

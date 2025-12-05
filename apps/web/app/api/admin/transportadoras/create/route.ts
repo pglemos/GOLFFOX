@@ -86,7 +86,7 @@ export async function POST(req: NextRequest) {
 
     const { data, error } = await supabaseServiceRole
       .from('carriers')
-      .insert(insertData)
+      .insert(insertData as any)
       .select()
       .single()
 
@@ -98,7 +98,7 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    logger.debug('[CREATE CARRIER] Success! Carrier created:', data.id)
+    logger.debug('[CREATE CARRIER] Success! Carrier created:', (data as any).id)
 
     return NextResponse.json({
       success: true,

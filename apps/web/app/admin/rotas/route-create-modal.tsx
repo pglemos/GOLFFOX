@@ -25,7 +25,7 @@ import { useRouteCreate } from "./use-route-create"
 import { RouteForm } from "@/components/modals/route-create/route-form"
 import { EmployeeSelector } from "@/components/modals/route-create/employee-selector"
 import { useGoogleMapsLoader } from "@/components/modals/route-create/use-google-maps-loader"
-import type { OptimizeRouteResponse, EmployeeLite } from "@/types/routes"
+import type { OptimizeRouteResponse, EmployeeLite, RouteFormData } from "@/types/routes"
 
 const routeSchema = z.object({
   name: z.string().min(1, "Nome Ã© obrigatÃ³rio"),

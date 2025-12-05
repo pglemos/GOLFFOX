@@ -26,6 +26,9 @@ type SyncEventType =
   | 'alert.updated'
   | 'cost.created'
   | 'cost.updated'
+  | 'carrier.created'
+  | 'carrier.updated'
+  | 'carrier.deleted'
 
 type SyncCallback = (event: { type: SyncEventType; data: any }) => void
 

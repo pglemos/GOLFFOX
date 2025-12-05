@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
         }
 
         // Validação: não permitir mudar se role é a mesma
-        if (targetUser.role === validated.newRole) {
+        if ((targetUser as any).role === validated.newRole) {
             return NextResponse.json(
                 { success: false, error: 'O usuário já possui este papel' },
                 { status: 400 }
@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
         // Atualizar role usando service role (bypass RLS)
         const { data: updatedUser, error: updateError } = await supabaseServiceRole
             .from('users')
-            .update({ role: validated.newRole })
+            .update({ role: validated.newRole } as any)
             .eq('id', validated.userId)
             .select()
             .single()
@@ -78,12 +78,12 @@ export async function POST(req: NextRequest) {
                     resource_type: 'user',
                     resource_id: validated.userId,
                     details: {
-                        old_role: targetUser.role,
+                        old_role: (targetUser as any).role,
                         new_role: validated.newRole,
-                        user_email: targetUser.email,
+                        user_email: (targetUser as any).email,
                         changed_by: req.headers.get('user-email') || 'admin'
                     }
-                })
+                } as any)
         } catch (auditError) {
             logger.warn('⚠️ Erro ao registrar log de auditoria:', auditError)
             // Não falhar a operação por causa de log
@@ -92,7 +92,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({
             success: true,
             user: updatedUser,
-            message: `Papel alterado de "${targetUser.role}" para "${validated.newRole}" com sucesso`
+            message: `Papel alterado de "${(targetUser as any).role}" para "${validated.newRole}" com sucesso`
         })
     } catch (error: any) {
         console.error('❌ Erro ao processar mudança de papel:', error)

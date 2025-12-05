@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
 
         const { data, error } = await supabaseServiceRole
             .from('gf_incidents')
-            .update(updateData)
+            .update(updateData as any)
             .eq('id', validated.id)
             .select()
             .single()
@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
                 changes: updateData,
                 updated_by: userEmail
             }
-        })
+        } as any)
 
         return NextResponse.json({
             success: true,

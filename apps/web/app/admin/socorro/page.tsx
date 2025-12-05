@@ -521,7 +521,7 @@ export default function SocorroPage() {
                                 severity: 'critical',
                                 status: 'open',
                                 description: `Ocorrência de socorro: ${ocorrencia.request_type} - ${ocorrencia.description || ''}`
-                              })
+                              } as any)
                             }
                           } catch (error) {
                             console.error('Erro ao criar alerta:', error)
@@ -539,7 +539,7 @@ export default function SocorroPage() {
                           try {
                             const { error } = await supabase
                               .from('gf_assistance_requests')
-                              .update({ status: 'resolved', resolved_at: new Date().toISOString() })
+                              .update({ status: 'resolved', resolved_at: new Date().toISOString() } as any)
                               .eq('id', ocorrencia.id)
                             
                             if (error) throw error

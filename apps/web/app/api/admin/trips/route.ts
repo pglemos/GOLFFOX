@@ -77,9 +77,13 @@ export async function GET(request: NextRequest) {
     }
     if (companyId) {
       // Filtrar por company via route
-      query = query.in('route_id', 
-        supabaseAdmin.from('routes').select('id').eq('company_id', companyId)
-      )
+      const routesQuery = supabaseAdmin.from('routes').select('id').eq('company_id', companyId)
+      const { data: routes } = await routesQuery
+      if (routes && routes.length > 0) {
+        query = query.in('route_id', routes.map((r: any) => r.id))
+      } else {
+        query = query.eq('route_id', '00000000-0000-0000-0000-000000000000') // Never matches
+      }
     }
 
     // Paginação
