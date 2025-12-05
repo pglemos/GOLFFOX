@@ -149,8 +149,8 @@ Todos os testes foram **bem-sucedidos**:
 
 1. `web-app/app/page.tsx` - Otimizações de velocidade do login
 2. `web-app/app/layout.tsx` - Configuração da fonte Inter
-3. `web-app/app/globals.css` - Melhorias de renderização de fontes
-4. `web-app/tailwind.config.js` - Configuração da família de fontes
+3. `web-app/app/globals.css` - Melhorias de renderização de fontes e configuração Tailwind CSS v4 via @theme
+4. `web-app/postcss.config.js` - Configuração do PostCSS com @tailwindcss/postcss
 5. `web-app/next.config.js` - CSP para Google Fonts
 
 ### 🔍 Observações

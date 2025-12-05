@@ -1,5 +1,10 @@
 # 🚀 GolfFox Web App - COMECE AQUI
 
+## Pré-requisitos
+
+- **Node.js**: 22.x ou superior
+- **npm**: 9.0.0 ou superior
+
 ## ⚡ Execução Rápida (3 passos)
 
 ```powershell
@@ -103,8 +108,8 @@ web-app/
 
 ## 🛠️ Tecnologias
 
-- **Next.js 14** - App Router
-- **Tailwind CSS** - Estilização
+- **Next.js 16** - App Router
+- **Tailwind CSS v4** - Estilização
 - **Framer Motion** - Animações
 - **Lucide React** - Ícones
 - **Supabase** - Backend/Auth

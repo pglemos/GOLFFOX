@@ -8,7 +8,7 @@ export async function GET() {
     
     const audit = {
       web: {
-        stack: "next15",
+        stack: "next16",
         tem_12_abas: true,
         tem_mapa_google: true,
         usa_app_router: true

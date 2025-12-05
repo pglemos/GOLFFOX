@@ -32,8 +32,8 @@
   },
   
   "styles": {
-    "globals_css": "web-app/app/globals.css - Tokens CSS :root com --brand #FF6B00, --accent #0F172A, --bg #F5F5F7, --ink #1D1D1F, radius 8-24px, shadows xs-xl, transitions fast/base/slow, keyframes fade-in/slide-in/pulse-glow, utilities .glass, .scrollbar-hide, .loader-spinner",
-    "tailwind_config": "web-app/tailwind.config.js - Configurado com tailwindcss-animate, container max-width 1440px, extend colors primary/secondary/etc"
+    "globals_css": "web-app/app/globals.css - Tokens CSS :root com --brand #FF6B00, --accent #0F172A, --bg #F5F5F7, --ink #1D1D1F, radius 8-24px, shadows xs-xl, transitions fast/base/slow, keyframes fade-in/slide-in/pulse-glow, utilities .glass, .scrollbar-hide, .loader-spinner, configuração Tailwind CSS v4 via @theme",
+    "tailwind_config": "web-app/app/globals.css - Tailwind CSS v4 configurado via @theme com cores primary/secondary/etc, border-radius, container settings, keyframes accordion-down/up, postcss.config.js usa @tailwindcss/postcss"
   },
   
   "sql": {

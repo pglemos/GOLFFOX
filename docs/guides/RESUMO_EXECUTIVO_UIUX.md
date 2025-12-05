@@ -8,7 +8,7 @@ A infraestrutura web premium está **100% funcional** com:
 
 #### **1. Design System Completo**
 - ✅ Tokens CSS com variáveis dark/light
-- ✅ Tailwind config extendido
+- ✅ Tailwind CSS v4 com configuração @theme no globals.css
 - ✅ Tipografia Inter (Google Fonts)
 - ✅ Cores: Brand `#2563FF`, Accent `#FF6B35`
 - ✅ Espaçamento 8px base, grid 12 cols
@@ -169,7 +169,7 @@ components/gx_button.dart   → Componentes Gx*
 
 ## 📊 Arquitetura de Decisões
 
-### **Por que Next.js 14?**
+### **Por que Next.js 16?**
 - App Router moderno
 - SSR nativo
 - Code splitting automático

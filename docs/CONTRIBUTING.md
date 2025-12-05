@@ -71,6 +71,7 @@ Valorizamos todos os tipos de contribuição:
 
 - **Flutter SDK**: Versão 3.0 ou superior
 - **Dart SDK**: Versão 2.17 ou superior
+- **Node.js**: 22.x ou superior
 - **Git**: Para controle de versão
 - **IDE**: VS Code, Android Studio ou IntelliJ IDEA
 - **Emulador/Dispositivo**: Para testes

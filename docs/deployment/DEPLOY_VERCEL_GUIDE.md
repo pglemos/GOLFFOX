@@ -1,5 +1,14 @@
 # 🚀 Guia de Deploy na Vercel - GolfFox Web App
 
+## 📋 Pré-requisitos
+
+- **Node.js**: 22.x ou superior
+- **npm**: 9.0.0 ou superior
+- Variáveis de ambiente configuradas
+- Migrações SQL executadas no Supabase
+- Aplicação funcionando localmente
+- Arquivo `vercel.json` criado
+
 ## ✅ Pré-requisitos Concluídos
 
 - [x] Variáveis de ambiente configuradas

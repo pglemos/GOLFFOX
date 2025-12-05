@@ -9,6 +9,10 @@
 
 ## 📋 Pré-requisitos
 
+- **Node.js**: 22.x ou superior
+- **npm**: 9.0.0 ou superior
+- **Vercel CLI**: Instalado e autenticado
+
 ### 1. Vercel CLI Instalado
 ```bash
 npm install -g vercel

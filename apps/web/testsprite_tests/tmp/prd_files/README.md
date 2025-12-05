@@ -1,7 +1,7 @@
 # 🚌 GolfFox - Sistema de Gestão de Transporte Urbano
 
 [![Flutter](https://img.shields.io/badge/Flutter-3.24+-blue.svg)](https://flutter.dev/)
-[![Next.js](https://img.shields.io/badge/Next.js-15+-black.svg)](https://nextjs.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-16+-black.svg)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue.svg)](https://www.typescriptlang.org/)
 [![Supabase](https://img.shields.io/badge/Supabase-Latest-green.svg)](https://supabase.com/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
@@ -45,11 +45,11 @@ O **GolfFox** é uma plataforma completa de gestão de transporte urbano que ofe
 O projeto utiliza uma arquitetura híbrida moderna:
 
 - **Frontend Mobile**: Flutter 3.24+ (iOS/Android)
-- **Frontend Web**: Next.js 15 com TypeScript, App Router
+- **Frontend Web**: Next.js 16 com TypeScript, App Router
 - **Backend**: Supabase (PostgreSQL + Auth + Storage + Realtime)
 - **Arquitetura**: Clean Architecture + Domain Driven Design
 - **Estado**: Provider Pattern (Flutter) + React Hooks + Zustand (Next.js)
-- **Estilização**: Tailwind CSS + Framer Motion
+- **Estilização**: Tailwind CSS v4 + Framer Motion
 - **Mapas**: Google Maps API
 - **Deploy**: Vercel (Web) + GitHub Actions (CI/CD)
 
@@ -76,7 +76,7 @@ O projeto utiliza uma arquitetura híbrida moderna:
 │   └── 🎨 widgets/           # Componentes reutilizáveis
 │
 ├── 🌐 web-app/               # Next.js Web App
-│   ├── app/                  # App Router (Next.js 15)
+│   ├── app/                  # App Router (Next.js 16)
 │   │   ├── admin/            # Painel Administrativo
 │   │   ├── operator/         # Painel do Operador
 │   │   ├── carrier/          # Painel da Transportadora

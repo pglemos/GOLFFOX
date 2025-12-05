@@ -8,7 +8,7 @@
 - ✅ `app/globals.css` com todos os tokens do Design System
 - ✅ Variáveis CSS: `--bg`, `--brand`, `--accent`, `--ink`, etc.
 - ✅ Tema dark/light com `prefers-color-scheme`
-- ✅ Tailwind config estendido
+- ✅ Tailwind CSS v4 com configuração @theme no globals.css
 - ✅ Animações customizadas
 
 #### **F2 - AppShell**
@@ -70,8 +70,7 @@ web-app/
 │   ├── supabase.ts      ✅ Cliente Supabase
 │   └── utils.ts         ✅ cn() utility
 │
-├── tailwind.config.js   ✅ Config extendido
-├── postcss.config.js    ✅ PostCSS
+├── postcss.config.js    ✅ PostCSS com @tailwindcss/postcss
 ├── tsconfig.json        ✅ TypeScript
 └── package.json         ✅ Dependências
 ```
@@ -166,8 +165,8 @@ Abra: **http://localhost:3000**
 
 ## 🛠️ Stack Tecnológica
 
-- **Frontend:** Next.js 14 (App Router)
-- **Styling:** Tailwind CSS
+- **Frontend:** Next.js 16 (App Router)
+- **Styling:** Tailwind CSS v4
 - **Animation:** Framer Motion
 - **Icons:** Lucide React
 - **Backend:** Supabase
@@ -179,12 +178,12 @@ Abra: **http://localhost:3000**
 
 ```json
 {
-  "next": "^14.1.0",
-  "framer-motion": "^11.0.5",
-  "@supabase/supabase-js": "^2.39.3",
-  "lucide-react": "^0.309.0",
-  "recharts": "^2.10.4",
-  "tailwindcss": "^3.4.1"
+  "next": "^16.0.7",
+  "framer-motion": "^12.23.25",
+  "@supabase/supabase-js": "^2.81.0",
+  "lucide-react": "^0.555.0",
+  "recharts": "^3.5.1",
+  "@tailwindcss/postcss": "^4.1.17"
 }
 ```
 

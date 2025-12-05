@@ -12,7 +12,7 @@
 
 O projeto GOLF FOX é um sistema de gestão de transporte que consiste em:
 
-1. **Web App** (Next.js 14/15) - 3 painéis:
+1. **Web App** (Next.js 16) - 3 painéis:
    - `/admin` - Painel Administrativo
    - `/operator` - Painel do Operador
    - `/carrier` - Painel da Transportadora

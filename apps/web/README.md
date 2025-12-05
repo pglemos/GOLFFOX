@@ -2,12 +2,17 @@
 
 Sistema completo de gestão de transporte de funcionários com Painel Admin Web, Portal do Operador e Apps Flutter (Motorista + Passageiro).
 
+## Pré-requisitos
+
+- **Node.js**: 22.x ou superior
+- **npm**: 9.0.0 ou superior
+
 ## 🚀 Stack
 
 ### Web App
-- **Next.js 15** (App Router)
+- **Next.js 16** (App Router)
 - **React 18**
-- **Tailwind CSS**
+- **Tailwind CSS v4**
 - **Framer Motion**
 - **Google Maps API**
 - **Supabase JS** (browser)

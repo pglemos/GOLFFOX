@@ -55,8 +55,8 @@ npm rebuild
 npm install @lightningcss/win32-x64-msvc --save-optional
 npm install @next/swc-win32-x64-msvc@15.5.7 --save-optional
 
-# Opção 3: Usar versão anterior do Tailwind CSS v3 (se necessário)
-# npm install tailwindcss@^3.4.1 postcss@^8.5.2 autoprefixer@^10.4.20
+# Opção 3: Tailwind CSS v4 (versão atual)
+# npm install @tailwindcss/postcss@^4.1.17 postcss@^8.5.2
 ```
 
 **Nota:** Estes problemas são comuns após atualizações grandes de dependências no Windows e geralmente são resolvidos com limpeza e reinstalação.

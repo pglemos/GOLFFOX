@@ -1,6 +1,11 @@
 # 🚀 GolfFox Web App - Guia de Início Rápido
 
-Aplicação web premium criada com **Next.js 14**, **Tailwind CSS**, **Framer Motion** e **Supabase**.
+Aplicação web premium criada com **Next.js 16**, **Tailwind CSS v4**, **Framer Motion** e **Supabase**.
+
+## Pré-requisitos
+
+- **Node.js**: 22.x ou superior
+- **npm**: 9.0.0 ou superior
 
 ## 📦 Instalação
 
