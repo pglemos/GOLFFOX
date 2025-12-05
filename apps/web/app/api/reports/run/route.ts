@@ -309,7 +309,8 @@ async function runReportHandler(request: NextRequest): Promise<NextResponse> {
       switch (format) {
         case 'csv':
           // Streaming CSV para grandes relatórios
-          return await generateCSVStream(supabase, config.viewName, config.columns, filters, finalReportKey, limit, offset)
+          const result = await generateCSVStream(supabase, config.viewName, config.columns, filters, finalReportKey, limit, offset)
+          return result instanceof Response ? new NextResponse(result.body, { status: result.status, headers: result.headers }) : result
 
         case 'excel':
           return await generateExcel(data, config.columns, finalReportKey)
@@ -532,7 +533,7 @@ async function generateCSVStream(
       controller.close()
     }
   })
-  return new Response(stream, {
+  return new NextResponse(stream, {
     headers: {
       'Content-Type': 'text/csv',
       'Content-Disposition': `attachment; filename="${filename}"`

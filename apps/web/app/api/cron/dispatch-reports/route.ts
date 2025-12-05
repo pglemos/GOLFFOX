@@ -111,7 +111,7 @@ async function handleDispatchReports(request: NextRequest) {
       } else if (isTestMode || isDevelopment) {
         isAuthorized = VALID_TEST_SECRETS.includes(bearerToken) || Boolean(cronSecret && bearerToken === cronSecret)
       } else {
-        isAuthorized = cronSecret && bearerToken === cronSecret
+        isAuthorized = Boolean(cronSecret && bearerToken === cronSecret)
       }
     } else {
       // Sem secret fornecido: não autorizar (mesmo em modo de teste)

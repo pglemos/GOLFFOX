@@ -149,7 +149,7 @@ export const AppShell = memo(function AppShell({ user, children, panel }: AppShe
 
       {/* Topbar Fixa */}
       <Topbar
-        user={user}
+        user={user ? { id: user.id, name: user.name || '', email: user.email, role: user.role, avatar_url: user.avatar_url } : { id: '', name: '', email: '', role: 'passenger' }}
         onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
         isSidebarOpen={isSidebarOpen}
         panelBranding={panelConfig.branding}

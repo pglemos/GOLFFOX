@@ -228,7 +228,7 @@ function AlertasOperatorPageInner() {
                       <h3 className="font-bold text-lg capitalize truncate">
                         {(alerta as any).alert_type?.replace(/_/g, ' ') || "Alerta"}
                       </h3>
-                      <Badge className={`${getBadgeColor(alerta.severity || undefined)} flex-shrink-0`}>
+                      <Badge className={`${getBadgeColor(alerta.severity ?? undefined)} flex-shrink-0`}>
                         {alerta.severity || "normal"}
                       </Badge>
                     </div>
