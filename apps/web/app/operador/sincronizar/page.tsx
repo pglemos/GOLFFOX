@@ -1,17 +1,12 @@
 ﻿"use client"
 
 import { useEffect, useState } from "react"
-// @ts-expect-error Legacy: valid em ambiente sem tipagem
 import { AppShell } from "@/components/app-shell"
-// @ts-expect-error Legacy: valid em ambiente sem tipagem
 import { Button } from "@/components/ui/button"
-// @ts-expect-error Legacy: valid em ambiente sem tipagem
 import { Card } from "@/components/ui/card"
 import { RefreshCw, CheckCircle, AlertCircle } from "lucide-react"
-// @ts-expect-error Legacy: valid em ambiente sem tipagem
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
-// @ts-expect-error Legacy: valid em ambiente sem tipagem
 import { geocodeAddress, optimizeRoute } from "@/lib/google-maps"
 
 export default function SincronizarPage() {

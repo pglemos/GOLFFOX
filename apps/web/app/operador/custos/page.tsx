@@ -130,7 +130,7 @@ export default function CustosOperatorPage() {
       if (vehiclesRes.data) setVehicles(vehiclesRes.data)
       if (driversRes.data) setDrivers(driversRes.data)
       if (categoriesRes) setCategories(categoriesRes)
-      if (carriersRes.data) setCarriers(carriersRes.data)
+      if (carriersRes.data) setCarriers(carriersRes.data.filter((c: any) => c.id && c.name).map((c: any) => ({ id: c.id, name: c.name })))
     } catch (err) {
       console.error('Erro ao carregar opções:', err)
     }
@@ -292,7 +292,7 @@ export default function CustosOperatorPage() {
                   setSelectedInvoiceId(cost.invoice_id)
                   setIsReconciliationOpen(true)
                 } else {
-                  toast('Este custo não está vinculado a uma fatura')
+                      notifyError('Este custo não está vinculado a uma fatura')
                 }
               }}
               loading={loading}
@@ -320,7 +320,7 @@ export default function CustosOperatorPage() {
                       setSelectedInvoiceId(data.id)
                       setIsReconciliationOpen(true)
                     } else {
-                      toast('Nenhuma fatura pendente encontrada')
+                      notifyError('Nenhuma fatura pendente encontrada')
                     }
                   })
               }}>

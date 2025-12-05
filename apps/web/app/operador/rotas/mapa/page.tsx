@@ -2,12 +2,9 @@
 
 import { useSearchParams } from "next/navigation"
 import { Suspense } from "react"
-// @ts-expect-error Legacy: valid em ambiente sem tipagem
 import { AppShell } from "@/components/app-shell"
-// @ts-expect-error Legacy: valid em ambiente sem tipagem
 import { FleetMap } from "@/components/fleet-map"
 import { useEffect, useState } from "react"
-// @ts-expect-error Legacy: valid em ambiente sem tipagem
 import { supabase } from "@/lib/supabase"
 import { useOperatorTenant } from "@/components/providers/operator-tenant-provider"
 
