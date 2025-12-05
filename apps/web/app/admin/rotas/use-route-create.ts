@@ -136,7 +136,7 @@ export function useRouteCreate(isOpen: boolean) {
 
         setLoadingEmployees(true)
         try {
-            const { data, error } = await supabase
+            let { data, error } = await supabase
                 .from("v_company_employees_secure")
                 .select("*")
                 .eq("company_id", formData.company_id)

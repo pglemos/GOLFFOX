@@ -24,8 +24,8 @@ import React from "react"
 import { useRouteCreate } from "./use-route-create"
 import { RouteForm } from "@/components/modals/route-create/route-form"
 import { EmployeeSelector } from "@/components/modals/route-create/employee-selector"
-import { RoutePreviewMap } from "@/components/modals/route-create/route-preview-map"
 import { useGoogleMapsLoader } from "@/components/modals/route-create/use-google-maps-loader"
+import type { OptimizeRouteResponse, EmployeeLite } from "@/types/routes"
 
 const routeSchema = z.object({
   name: z.string().min(1, "Nome Ã© obrigatÃ³rio"),
@@ -316,11 +316,11 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
 
             <TabsContent value="form" className="flex-1 overflow-y-auto">
               <RouteForm
-                formData={formData}
-                setFormData={setFormData}
+                formData={formData as RouteFormData}
+                setFormData={setFormData as React.Dispatch<React.SetStateAction<RouteFormData>>}
                 companies={companies}
                 loadingCompanies={loadingCompanies}
-                selectedDriver={selectedDriver}
+                selectedDriver={selectedDriver ? { ...selectedDriver, documents_valid: selectedDriver.documents_valid ?? false } : null}
                 selectedVehicle={selectedVehicle}
                 onOpenDriverModal={() => setIsDriverModalOpen(true)}
                 onOpenVehicleModal={() => setIsVehicleModalOpen(true)}
@@ -343,7 +343,7 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
 
             <TabsContent value="preview" className="flex-1 overflow-hidden flex flex-col">
               {optimizationResult && mapLoaded ? (
-                <RoutePreviewMap
+                <LocalRoutePreviewMap
                   result={optimizationResult}
                   employees={selectedEmployeesData}
                   origin={formData.origin_address || ""}
@@ -415,7 +415,7 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
   )
 }
 
-function RoutePreviewMap({
+function LocalRoutePreviewMap({
   result,
   employees,
   origin,
@@ -475,7 +475,7 @@ function RoutePreviewMap({
     }
 
     // Paradas numeradas
-    result.ordered.forEach((point) => {
+    result.ordered.forEach((point: { id: string; lat: number; lng: number; order: number }) => {
       const emp = employees.find((e) => e.employee_id === point.id)
       new window.google.maps.Marker({
         position: { lat: point.lat, lng: point.lng },
