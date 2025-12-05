@@ -81,7 +81,7 @@ export async function GET(
 
     const { data: driver, error } = await supabase
       .from('drivers')
-      .select('*, carriers(name)')
+      .select('*, carriers!inner(name)')
       .eq('id', driverId)
       .single()
 

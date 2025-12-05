@@ -34,8 +34,8 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    const filtered = (data || []).filter((cat: { is_active?: boolean }) => (cat.is_active === undefined ? true : cat.is_active === true))
-    const sorted = filtered.sort((a: { group_name?: string; category?: string; subcategory?: string }, b: { group_name?: string; category?: string; subcategory?: string }) => {
+    const filtered = (data || []).filter((cat: any) => (cat.is_active === undefined ? true : cat.is_active === true))
+    const sorted = filtered.sort((a: any, b: any) => {
       const gA = (a.group_name || '').localeCompare(b.group_name || '')
       if (gA !== 0) return gA
       const cA = (a.category || '').localeCompare(b.category || '')

@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
 
   try {
     // Executar refresh da materialized view
-    const { error } = await supabaseServiceRole.rpc('refresh_mv_costs_monthly')
+    const { error } = await (supabaseServiceRole.rpc as any)('refresh_mv_costs_monthly')
     
     if (error) {
       console.error('Erro ao atualizar MV de custos:', error)

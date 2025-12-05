@@ -65,9 +65,10 @@ async function reconcileHandler(request: NextRequest) {
     }
 
     // Verificar se há divergência significativa
+    const conciliationDataTyped = conciliationData as any
     const hasSignificantDiscrepancy = 
-      Math.abs(conciliationData.discrepancy_amount || 0) > validated.discrepancy_threshold_amount ||
-      (conciliationData.discrepancy_percent || 0) > validated.discrepancy_threshold_percent
+      Math.abs(conciliationDataTyped.discrepancy_amount || 0) > validated.discrepancy_threshold_amount ||
+      (conciliationDataTyped.discrepancy_percent || 0) > validated.discrepancy_threshold_percent
 
     // Atualizar status da fatura
     let status = 'pending'
@@ -81,7 +82,7 @@ async function reconcileHandler(request: NextRequest) {
 
     const updateData: Record<string, unknown> = {
       reconciliation_status: status,
-      notes: validated.notes || conciliationData.notes
+      notes: validated.notes || (conciliationData as any).notes
     }
 
     if (validated.action === 'approve') {
