@@ -4,7 +4,7 @@
   "description": "GolfFox Web App - Premium UI/UX with Next.js",
   "scripts": {
     "dev": "next dev -p 3000",
-    "postinstall": "node scripts/patch-swc-helpers.js",
+    "postinstall": "node scripts/patch-swc-helpers.js && node scripts/ensure-native-binaries.js",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
@@ -86,7 +86,9 @@
     "zod": "^3.25.0",
     "zustand": "^5.0.2",
     "lightningcss-linux-x64-gnu": "^1.30.2",
-    "lightningcss-linux-x64-musl": "^1.30.2"
+    "lightningcss-linux-x64-musl": "^1.30.2",
+    "@tailwindcss/oxide-linux-x64-gnu": "^4.1.17",
+    "@tailwindcss/oxide-linux-x64-musl": "^4.1.17"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.6.0",
@@ -154,7 +156,11 @@
   "optionalDependencies": {
     "@next/swc-wasm-nodejs": "^16.0.0",
     "@next/swc-win32-x64-msvc": "^16.0.0",
-    "lightningcss-win32-x64-msvc": "^1.30.2"
+    "lightningcss-win32-x64-msvc": "^1.30.2",
+    "lightningcss-linux-x64-gnu": "^1.30.2",
+    "lightningcss-linux-x64-musl": "^1.30.2",
+    "@tailwindcss/oxide-linux-x64-gnu": "^4.1.17",
+    "@tailwindcss/oxide-linux-x64-musl": "^4.1.17"
   },
   "overrides": {
     "fontkit": {
