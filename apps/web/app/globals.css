@@ -5,8 +5,6 @@
 
 @import "tailwindcss";
 
-@source "../../**/*.{js,ts,jsx,tsx}";
-
 /* Mobile optimizations */
 @layer base {
   * {
