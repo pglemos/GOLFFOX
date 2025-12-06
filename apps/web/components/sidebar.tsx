@@ -274,7 +274,7 @@ const CustomSidebarLink = ({
         href={item.href}
         prefetch={true}
         className={cn(
-          "flex items-center justify-start gap-2 rounded-lg transition-colors relative",
+          "flex items-center justify-start gap-2 rounded-xl transition-colors relative",
           "min-h-[44px] sm:min-h-[40px] touch-manipulation",
           "py-2.5 sm:py-2 px-2 sm:px-3",
           isActive

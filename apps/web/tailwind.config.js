@@ -63,6 +63,12 @@ module.exports = {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
+      spacing: {
+        '18': '4.5rem', // 72px for topbar height
+      },
+      height: {
+        '18': '4.5rem', // 72px for topbar height
+      },
       keyframes: {
         "accordion-down": {
           from: { height: 0 },
