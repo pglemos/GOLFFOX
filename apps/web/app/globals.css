@@ -64,6 +64,107 @@
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
+
+    /* ============================================================
+       GOLF FOX CUSTOM VARIABLES - Design System
+       ============================================================ */
+    
+    /* Background Colors */
+    --bg: #FFFFFF;
+    --bg-soft: #F8FAFC;
+    --bg-elevated: #FFFFFF;
+    --bg-hover: #F1F5F9;
+    --bg-pattern: #FAFBFC;
+
+    /* Ink (Text) Colors */
+    --ink: #0F172A;
+    --ink-strong: #020617;
+    --ink-muted: #64748B;
+    --ink-light: #94A3B8;
+    --ink-disabled: #CBD5E1;
+
+    /* Brand Colors (Orange) */
+    --brand: #F97316;
+    --brand-hover: #FB923C;
+    --brand-light: #FFF7ED;
+    --brand-soft: #FFEDD5;
+
+    /* Accent Colors */
+    --accent: #1E3A5F;
+    --accent-dark: #0A2540;
+    --accent-soft: #2D4A6B;
+    --accent-light: #E8EFF7;
+
+    /* Status Colors */
+    --success: #10B981;
+    --success-light: #D1FAE5;
+    --warning: #F59E0B;
+    --warning-light: #FEF3C7;
+    --error: #EF4444;
+    --error-light: #FEE2E2;
+    --info: #3B82F6;
+    --info-light: #DBEAFE;
+
+    /* Border Colors */
+    --border: #E2E8F0;
+    --border-strong: #CBD5E1;
+    --border-light: #F1F5F9;
+
+    /* Shadows */
+    --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.08);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.08);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.08);
+    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+    --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.15);
+
+    /* Glass Effects */
+    --glass-bg: rgba(255, 255, 255, 0.85);
+    --glass-border: rgba(255, 255, 255, 0.5);
+    --glass-blur: blur(16px);
+
+    /* Radius Scale */
+    --radius-xs: 8px;
+    --radius-sm: 12px;
+    --radius-md: 16px;
+    --radius-lg: 20px;
+    --radius-xl: 24px;
+    --radius-2xl: 32px;
+    --radius-full: 9999px;
+
+    /* Spacing Scale */
+    --space-xs: 4px;
+    --space-sm: 8px;
+    --space-md: 16px;
+    --space-lg: 24px;
+    --space-xl: 32px;
+    --space-2xl: 48px;
+    --space-3xl: 64px;
+
+    /* Typography */
+    --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --font-mono: "SF Mono", Monaco, "Cascadia Code", "Roboto Mono", monospace;
+    --font-light: 300;
+    --font-normal: 400;
+    --font-medium: 500;
+    --font-semibold: 600;
+    --font-bold: 700;
+    --font-extrabold: 800;
+
+    /* Transitions */
+    --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: 500ms cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+    /* Z-Index Scale */
+    --z-dropdown: 1000;
+    --z-sticky: 1020;
+    --z-fixed: 1030;
+    --z-modal-backdrop: 1040;
+    --z-modal: 1050;
+    --z-popover: 1060;
+    --z-tooltip: 1070;
   }
 
   .dark {
@@ -113,6 +214,55 @@
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
+
+    /* ============================================================
+       GOLF FOX CUSTOM VARIABLES - Dark Mode
+       ============================================================ */
+    
+    /* Background Colors */
+    --bg: #0B1220;
+    --bg-soft: #1E293B;
+    --bg-elevated: #1E293B;
+    --bg-hover: #334155;
+    --bg-pattern: #0F172A;
+
+    /* Ink (Text) Colors */
+    --ink: #F1F5F9;
+    --ink-strong: #FFFFFF;
+    --ink-muted: #94A3B8;
+    --ink-light: #64748B;
+    --ink-disabled: #475569;
+
+    /* Brand Colors (Orange) */
+    --brand: #F97316;
+    --brand-hover: #FB923C;
+    --brand-light: #1E293B;
+    --brand-soft: #334155;
+
+    /* Accent Colors */
+    --accent: #1E3A5F;
+    --accent-dark: #0A2540;
+    --accent-soft: #2D4A6B;
+    --accent-light: #1E293B;
+
+    /* Status Colors */
+    --success: #10B981;
+    --success-light: #064E3B;
+    --warning: #F59E0B;
+    --warning-light: #78350F;
+    --error: #EF4444;
+    --error-light: #7F1D1D;
+    --info: #3B82F6;
+    --info-light: #1E3A8A;
+
+    /* Border Colors */
+    --border: #334155;
+    --border-strong: #475569;
+    --border-light: #1E293B;
+
+    /* Glass Effects */
+    --glass-bg: rgba(30, 41, 59, 0.85);
+    --glass-border: rgba(51, 65, 85, 0.5);
   }
 }
 
@@ -173,6 +323,11 @@
     -webkit-background-clip: text;
     color: transparent;
     background-image: linear-gradient(to right, hsl(var(--primary)), #ea580c);
+  }
+
+  /* Brand Gradient */
+  .gradient-brand {
+    background: linear-gradient(135deg, #F97316 0%, #FB923C 50%, #FDBA74 100%);
   }
 
   /* Animation Utilities */
