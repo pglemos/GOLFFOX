@@ -1275,7 +1275,7 @@ function LoginContent() {
                   </p>
                 </noscript>
               </div>
-            </div>
+            </motion.div>
 
             {/* Desktop: No card wrapper */}
             <div className="hidden lg:block relative w-full min-w-0">
