@@ -254,7 +254,7 @@ export function useThrottle<T extends (...args: any[]) => any>(
         timeoutRef.current = setTimeout(() => {
           lastCall.current = Date.now()
           callback(...args)
-        }, delay - (now - lastCall.current))
+        }, delay - (now - lastCall.current)) as any
       }
     }) as T,
     [callback, delay]

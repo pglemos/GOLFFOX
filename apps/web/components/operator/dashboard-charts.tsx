@@ -135,7 +135,7 @@ export function DashboardCharts({ kpis, period = "today" }: DashboardChartsProps
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
                 <YAxis />
-                <Tooltip formatter={(value: unknown) => {
+                <Tooltip formatter={(value: unknown, name: unknown) => {
                   if (typeof value === 'number') {
                     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)
                   }

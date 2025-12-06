@@ -26,6 +26,7 @@ type SyncEventType =
   | 'alert.updated'
   | 'cost.created'
   | 'cost.updated'
+  | 'assistance_request.updated'
 
 type SyncCallback = (event: { type: SyncEventType; data: any }) => void
 

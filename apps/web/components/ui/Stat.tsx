@@ -21,7 +21,7 @@ const Stat = ({ icon: Icon, label, value, hint, trend, trendLabel, className }: 
 
   const motionValue = useMotionValue(0)
   const springValue = useSpring(motionValue, { damping: 30, stiffness: 300 })
-  const display = useTransform(springValue, (latest) => Math.round(latest))
+  const display = useTransform(springValue, (latest: number) => Math.round(latest))
 
   React.useEffect(() => {
     if (typeof value === 'number') {
