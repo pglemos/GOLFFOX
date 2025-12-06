@@ -1147,7 +1147,7 @@ function LoginContent() {
                           : emailValid
                           ? "border-[var(--brand)] focus:border-[var(--brand)] focus:ring-2 focus:ring-[var(--brand)]/20 shadow-[var(--shadow-brand)]"
                           : "border-[var(--border)] focus:border-[var(--brand)] focus:ring-2 focus:ring-[var(--brand)]/20 hover:border-[var(--border-strong)]"
-                          } rounded-2xl text-base transition-all duration-300 focus:bg-white placeholder:text-[var(--ink-muted)] font-medium`}
+                          } rounded-2xl text-base focus:bg-white placeholder:text-[var(--ink-muted)] font-medium`}
                       />
                       {fieldErrors.email && (
                         <motion.p 
@@ -1193,7 +1193,7 @@ function LoginContent() {
                           : passwordValid
                           ? "border-[var(--brand)] focus:border-[var(--brand)] focus:ring-2 focus:ring-[var(--brand)]/20 shadow-[var(--shadow-brand)]"
                           : "border-[var(--border)] focus:border-[var(--brand)] focus:ring-2 focus:ring-[var(--brand)]/20 hover:border-[var(--border-strong)]"
-                          } rounded-2xl text-base transition-all duration-300 focus:bg-white placeholder:text-[var(--ink-muted)] font-medium`}
+                          } rounded-2xl text-base focus:bg-white placeholder:text-[var(--ink-muted)] font-medium`}
                       />
                       <motion.button
                         type="button"
