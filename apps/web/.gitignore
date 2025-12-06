@@ -37,3 +37,10 @@ next-env.d.ts
 
 # build outputs
 build_output.txt
+build_error*.log
+test_output.txt
+lint_output.txt
+
+# test reports
+playwright-report/
+test-results/

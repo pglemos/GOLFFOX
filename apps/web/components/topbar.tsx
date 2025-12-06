@@ -29,6 +29,7 @@ import { useNavigation } from "@/hooks/use-navigation"
 import { OperatorLogoSection } from "@/components/operator/operator-logo-section"
 import { OperationalAlertsNotification } from "@/components/operational-alerts-notification"
 import { ThemeToggle } from "@/components/theme-toggle"
+import { debug } from "@/lib/logger"
 
 interface TopbarProps {
   user?: {
@@ -57,25 +58,14 @@ export function Topbar({
   const [isLoggingOut, setIsLoggingOut] = useState(false)
   const [isCompactLayout, setIsCompactLayout] = useState(false)
 
-  // #region agent log
+  // Debug logging (apenas em desenvolvimento)
   useEffect(() => {
-    const timestamp = new Date().toISOString();
-    console.log(`[DEBUG TOPBAR] 📦 User props UPDATED at ${timestamp}:`, JSON.stringify(user, null, 2));
-    console.log('[DEBUG TOPBAR] 🖼️ Avatar status:', {
+    debug('Topbar user props updated', { 
       hasAvatarUrl: !!user?.avatar_url,
-      avatarUrl: user?.avatar_url,
       avatarUrlLength: user?.avatar_url?.length || 0,
       userKeys: user ? Object.keys(user) : []
-    });
-    
-    // Visual alert for debugging
-    if (user?.avatar_url) {
-      console.log('[DEBUG TOPBAR] ✅ AVATAR URL IS PRESENT! Will render image.');
-    } else {
-      console.log('[DEBUG TOPBAR] ⚠️ NO avatar_url. Will render initial letter:', user?.name?.charAt(0) || 'A');
-    }
-  }, [user]);
-  // #endregion
+    }, 'Topbar')
+  }, [user])
 
   // Determinar painel atual e rotas correspondentes
   const getPanelRoutes = () => {

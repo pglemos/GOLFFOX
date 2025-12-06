@@ -1,0 +1,77 @@
+{
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "search": "Search",
+    "filter": "Filter",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "confirm": "Confirm",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "all": "All",
+    "none": "None",
+    "active": "Active",
+    "inactive": "Inactive"
+  },
+  "auth": {
+    "login": "Login",
+    "logout": "Logout",
+    "email": "Email",
+    "password": "Password",
+    "forgotPassword": "Forgot my password",
+    "invalidCredentials": "Invalid credentials",
+    "unauthorized": "Unauthorized"
+  },
+  "admin": {
+    "dashboard": "Dashboard",
+    "companies": "Companies",
+    "users": "Users",
+    "drivers": "Drivers",
+    "vehicles": "Vehicles",
+    "routes": "Routes",
+    "reports": "Reports",
+    "alerts": "Alerts",
+    "costs": "Costs",
+    "carriers": "Carriers"
+  },
+  "operator": {
+    "dashboard": "Dashboard",
+    "employees": "Employees",
+    "routes": "Routes",
+    "reports": "Reports",
+    "alerts": "Alerts",
+    "costs": "Costs",
+    "employees": {
+      "title": "Employees",
+      "create": "Add Employee",
+      "edit": "Edit Employee",
+      "created": "Employee created successfully!",
+      "updated": "Employee updated successfully!",
+      "saveError": "Error saving employee"
+    }
+  },
+  "carrier": {
+    "dashboard": "Dashboard",
+    "drivers": "Drivers",
+    "vehicles": "Vehicles",
+    "reports": "Reports",
+    "alerts": "Alerts",
+    "costs": "Costs"
+  },
+  "errors": {
+    "generic": "An error occurred. Please try again.",
+    "network": "Connection error. Check your internet.",
+    "validation": "Invalid data. Check the fields.",
+    "notFound": "Resource not found",
+    "unauthorized": "You don't have permission for this action",
+    "serverError": "Server error. Please try again later."
+  }
+}
+

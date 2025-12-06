@@ -1,0 +1,77 @@
+{
+  "common": {
+    "save": "Salvar",
+    "cancel": "Cancelar",
+    "delete": "Excluir",
+    "edit": "Editar",
+    "create": "Criar",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "loading": "Carregando...",
+    "error": "Erro",
+    "success": "Sucesso",
+    "confirm": "Confirmar",
+    "close": "Fechar",
+    "back": "Voltar",
+    "next": "Próximo",
+    "previous": "Anterior",
+    "all": "Todos",
+    "none": "Nenhum",
+    "active": "Ativo",
+    "inactive": "Inativo"
+  },
+  "auth": {
+    "login": "Login",
+    "logout": "Logout",
+    "email": "Email",
+    "password": "Senha",
+    "forgotPassword": "Esqueci minha senha",
+    "invalidCredentials": "Credenciais inválidas",
+    "unauthorized": "Não autorizado"
+  },
+  "admin": {
+    "dashboard": "Dashboard",
+    "companies": "Empresas",
+    "users": "Usuários",
+    "drivers": "Motoristas",
+    "vehicles": "Veículos",
+    "routes": "Rotas",
+    "reports": "Relatórios",
+    "alerts": "Alertas",
+    "costs": "Custos",
+    "carriers": "Transportadoras"
+  },
+  "operator": {
+    "dashboard": "Dashboard",
+    "employees": "Funcionários",
+    "routes": "Rotas",
+    "reports": "Relatórios",
+    "alerts": "Alertas",
+    "costs": "Custos",
+    "employees": {
+      "title": "Funcionários",
+      "create": "Adicionar Funcionário",
+      "edit": "Editar Funcionário",
+      "created": "Funcionário cadastrado com sucesso!",
+      "updated": "Funcionário atualizado com sucesso!",
+      "saveError": "Erro ao salvar funcionário"
+    }
+  },
+  "carrier": {
+    "dashboard": "Dashboard",
+    "drivers": "Motoristas",
+    "vehicles": "Veículos",
+    "reports": "Relatórios",
+    "alerts": "Alertas",
+    "costs": "Custos"
+  },
+  "errors": {
+    "generic": "Ocorreu um erro. Tente novamente.",
+    "network": "Erro de conexão. Verifique sua internet.",
+    "validation": "Dados inválidos. Verifique os campos.",
+    "notFound": "Recurso não encontrado",
+    "unauthorized": "Você não tem permissão para esta ação",
+    "serverError": "Erro no servidor. Tente novamente mais tarde."
+  }
+}
+

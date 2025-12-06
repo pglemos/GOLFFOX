@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase-server'
+import { requireAuth } from '@/lib/api-auth'
+import { withRateLimit } from '@/lib/rate-limit'
+import { logger } from '@/lib/logger'
 
 /**
  * Endpoint para popular categorias de custo essenciais
  * Útil para testes e configuração inicial
+ * REQUER AUTENTICAÇÃO ADMIN
  */
 
 const ESSENTIAL_CATEGORIES = [
@@ -39,8 +43,14 @@ const ESSENTIAL_CATEGORIES = [
   },
 ]
 
-export async function POST(request: NextRequest) {
+async function seedCostCategoriesHandler(request: NextRequest) {
   try {
+    // Validar autenticação (apenas admin)
+    const authErrorResponse = await requireAuth(request, 'admin')
+    if (authErrorResponse) {
+      return authErrorResponse
+    }
+
     const supabase = getSupabaseAdmin()
 
     // Verificar se tabela existe
@@ -106,7 +116,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET() {
+async function getCostCategoriesHandler() {
   try {
     const supabase = getSupabaseAdmin()
 
@@ -128,7 +138,7 @@ export async function GET() {
       categories: data,
     })
   } catch (error: unknown) {
-    console.error('Erro ao buscar categorias:', error)
+    logger.error('Erro ao buscar categorias', { error })
     return NextResponse.json(
       {
         error: 'Erro ao buscar categorias',
@@ -138,4 +148,8 @@ export async function GET() {
     )
   }
 }
+
+// Exportar com rate limiting e autenticação
+export const POST = withRateLimit(seedCostCategoriesHandler, 'sensitive')
+export const GET = withRateLimit(getCostCategoriesHandler, 'api')
 

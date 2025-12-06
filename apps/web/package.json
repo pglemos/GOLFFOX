@@ -23,7 +23,9 @@
     "db:check": "node scripts/drift-check.js",
     "db:seed:demo": "node scripts/seed-demo.js",
     "db:migrate": "ts-node scripts/migrate.ts",
-    "test:auth": "node scripts/test-auth-middleware.js"
+    "test:auth": "node scripts/test-auth-middleware.js",
+    "audit:security": "ts-node scripts/audit-api-security.ts",
+    "health:check": "curl http://localhost:3000/api/health || echo 'Server not running'"
   },
   "dependencies": {
     "@e965/xlsx": "^0.20.3",

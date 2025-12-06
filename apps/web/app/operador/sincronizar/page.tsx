@@ -152,11 +152,11 @@ export default function SincronizarPage() {
         <Card className="p-6">
           <div className="space-y-4">
             <p className="text-sm text-[var(--muted)]">
-              Este processo irÃ¡:
+              Este processo irá:
             </p>
             <ul className="list-disc list-inside space-y-2 text-sm text-[var(--muted)]">
-              <li>Buscar todos os funcionÃ¡rios cadastrados</li>
-              <li>Geocodificar endereÃ§os que nÃ£o possuem coordenadas</li>
+              <li>Buscar todos os funcionários cadastrados</li>
+              <li>Geocodificar endereços que não possuem coordenadas</li>
               <li>Otimizar a ordem dos pontos usando Google Directions API</li>
               <li>Atualizar os planos de rota no sistema</li>
             </ul>

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requireAuth } from '@/lib/api-auth'
+import { withRateLimit } from '@/lib/rate-limit'
 import { logger } from '@/lib/logger'
 
 export const runtime = 'nodejs'
@@ -14,11 +15,27 @@ function getSupabaseAdmin() {
   return createClient(url, serviceKey)
 }
 
-export async function POST(request: NextRequest) {
+async function executeSqlFixHandler(request: NextRequest) {
   try {
+    // Validar autenticação (apenas admin)
     const authErrorResponse = await requireAuth(request, 'admin')
     if (authErrorResponse) {
       return authErrorResponse
+    }
+
+    // ⚠️ ROTA PERIGOSA: Adicionar validação adicional em produção
+    if (process.env.NODE_ENV === 'production') {
+      // Em produção, pode requerer secret adicional ou desabilitar completamente
+      const adminSecret = request.headers.get('x-admin-secret')
+      const requiredSecret = process.env.ADMIN_SECRET
+      
+      if (requiredSecret && adminSecret !== requiredSecret) {
+        logger.warn('Tentativa de acesso a rota perigosa sem secret', { path: request.nextUrl.pathname })
+        return NextResponse.json(
+          { error: 'Acesso negado', message: 'Secret adicional requerido para esta operação' },
+          { status: 403 }
+        )
+      }
     }
 
     const supabaseAdmin = getSupabaseAdmin()
@@ -99,4 +116,7 @@ export async function POST(request: NextRequest) {
     )
   }
 }
+
+// Exportar com rate limiting muito restritivo
+export const POST = withRateLimit(executeSqlFixHandler, 'sensitive')
 

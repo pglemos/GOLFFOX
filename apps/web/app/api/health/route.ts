@@ -1,55 +1,45 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { withRateLimit } from '@/lib/rate-limit'
+import { monitoring } from '@/lib/monitoring'
 
 /**
  * Health Check Endpoint
  * Verifica status da aplicação e conexão com Supabase
  */
 async function healthHandler() {
+  const startTime = Date.now()
+  
   try {
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    const healthCheck = await monitoring.performHealthCheck()
+    const duration = Date.now() - startTime
 
-    if (!supabaseUrl || !supabaseKey || supabaseKey === 'anon-placeholder') {
-      return NextResponse.json(
-        { 
-          status: 'ok',
-          ok: true, 
-          supabase: 'unconfigured',
-          error: null,
-          timestamp: new Date().toISOString() 
-        },
-        { status: 200 }
-      )
-    }
+    // Registrar métrica
+    monitoring.recordMetric('health_check.duration', duration, 'ms')
+    monitoring.recordMetric('health_check.status', healthCheck.status === 'healthy' ? 1 : 0)
 
-    const supabase = createClient(supabaseUrl, supabaseKey)
-    
-    // Teste simples de conexão
-    const { error } = await supabase
-      .from('companies')
-      .select('id')
-      .limit(1)
-
-    const isOk = !error
-    const httpStatus = isOk ? 200 : 500
+    const httpStatus = healthCheck.status === 'healthy' ? 200 : 
+                      healthCheck.status === 'degraded' ? 200 : 500
 
     return NextResponse.json({
-      status: isOk ? 'ok' : 'error',
-      ok: isOk,
-      supabase: error ? 'error' : 'ok',
-      error: error?.message || null,
-      timestamp: new Date().toISOString()
+      status: healthCheck.status,
+      ok: healthCheck.status === 'healthy',
+      checks: healthCheck.checks,
+      timestamp: healthCheck.timestamp.toISOString(),
+      duration: `${duration}ms`
     }, { status: httpStatus })
   } catch (error: any) {
+    const duration = Date.now() - startTime
+    monitoring.recordMetric('health_check.error', 1)
+    monitoring.recordMetric('health_check.duration', duration, 'ms')
+
     return NextResponse.json(
       { 
         status: 'error',
         ok: false, 
-        supabase: 'error',
         error: error?.message || 'Unknown error',
-        timestamp: new Date().toISOString() 
+        timestamp: new Date().toISOString(),
+        duration: `${duration}ms`
       },
       { status: 500 }
     )
