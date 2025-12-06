@@ -100,7 +100,7 @@ function extractAccessToken(request: NextRequest): string | null {
   return null
 }
 
-export async function proxy(request: NextRequest) {
+export const proxy = async (request: NextRequest) => {
   const { pathname, searchParams } = request.nextUrl
 
   // ✅ Permitir desabilitar autenticação via variável de ambiente (apenas em desenvolvimento)
@@ -196,6 +196,8 @@ export async function proxy(request: NextRequest) {
 
   return response
 }
+
+export default proxy
 
 export const config = {
   matcher: [
