@@ -79,9 +79,9 @@ export async function GET(
     const supabase = supabaseServiceRole
     const { driverId } = await context.params
 
-    const { data: driver, error } = await (supabase
+    const { data: driver, error } = await ((supabase
       .from('drivers')
-      .select('*, carriers!inner(name)') as any)
+      .select('*, carriers!inner(name)')) as any)
       .eq('id', driverId)
       .single()
 

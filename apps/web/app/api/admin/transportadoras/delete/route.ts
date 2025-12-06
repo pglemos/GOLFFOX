@@ -110,10 +110,10 @@ export async function DELETE(req: NextRequest) {
 
       // Se a tabela existir e houver registros, remover referências
       if (!costsCheckError && costsData && costsData.length > 0) {
-        const { error: costsError } = await supabaseServiceRole
+        const { error: costsError } = await (supabaseServiceRole
           .from('costs')
           .update({ transportadora_id: null } as any)
-          .eq('transportadora_id', carrierId)
+          .eq('transportadora_id', carrierId) as any)
 
         if (costsError) {
           logger.warn('Aviso ao atualizar costs (pode não existir):', costsError)
