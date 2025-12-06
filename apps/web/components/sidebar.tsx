@@ -311,27 +311,18 @@ const CustomSidebarLink = ({
             </div>
           )}
         </div>
-        <motion.span
-          animate={{
-            opacity: open ? 1 : 0,
-            display: open ? "inline-block" : "none",
-          }}
-          transition={{
-            duration: 0.2,
-            ease: "easeInOut",
-          }}
-          className={cn(
-            "text-sm sm:text-base transition-colors whitespace-nowrap font-medium",
-            isActive
-              ? (panel === 'operador' ? "text-orange-500 font-semibold" : "text-[#F97316] font-semibold")
-              : "text-gray-600 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-gray-100"
-          )}
-          style={{
-            overflow: "hidden",
-          }}
-        >
-          {item.label}
-        </motion.span>
+        {open && (
+          <span
+            className={cn(
+              "text-sm sm:text-base transition-colors whitespace-nowrap font-medium flex-shrink-0",
+              isActive
+                ? (panel === 'operador' ? "text-orange-500 font-semibold" : "text-[#F97316] font-semibold")
+                : "text-gray-600 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-gray-100"
+            )}
+          >
+            {item.label}
+          </span>
+        )}
       </Link>
       {isActive && (
         <motion.div

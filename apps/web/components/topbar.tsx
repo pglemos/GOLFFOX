@@ -222,8 +222,8 @@ export function Topbar({
               />
               <span className="text-white font-bold text-base sm:text-lg md:text-xl relative z-10 drop-shadow-md">G</span>
             </div>
-            <div className="flex items-center gap-1 sm:gap-2 min-w-0">
-              <span className="font-bold text-base sm:text-lg md:text-xl lg:text-2xl tracking-tight text-[var(--ink-strong)] truncate">
+            <div className="flex items-center gap-1 sm:gap-2 min-w-0 flex-shrink-0">
+              <span className="font-bold text-base sm:text-lg md:text-xl lg:text-2xl tracking-tight text-[var(--ink-strong)] whitespace-nowrap">
                 {pathname?.startsWith('/admin') ? (panelBranding || 'Administrativo') : (panelBranding || 'GOLF FOX')}
               </span>
             </div>
@@ -361,11 +361,11 @@ export function Topbar({
                     })()}
                   </span>
                 </div>
-                <div className="text-left hidden sm:block min-w-0">
-                  <p className="text-sm font-semibold leading-tight text-[var(--ink-strong)] truncate max-w-[140px]">
+                <div className="text-left hidden sm:block min-w-0 flex-shrink-0">
+                  <p className="text-sm font-semibold leading-tight text-[var(--ink-strong)] whitespace-nowrap overflow-hidden text-ellipsis max-w-[160px]">
                     {user?.name || (pathname?.startsWith('/admin') ? 'GOLF FOX' : "Admin")}
                   </p>
-                  <p className="text-xs text-[var(--ink-muted)] leading-tight capitalize truncate max-w-[140px]">
+                  <p className="text-xs text-[var(--ink-muted)] leading-tight capitalize whitespace-nowrap overflow-hidden text-ellipsis max-w-[160px]">
                     {user?.role || (pathname?.startsWith('/admin') ? 'admin' : "administrador")}
                   </p>
                 </div>
