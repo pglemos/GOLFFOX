@@ -36,7 +36,7 @@ export async function PUT(
     // Atualizar motorista
     // @ts-ignore - Supabase type inference issue
     const { data: driver, error: driverError } = await ((supabase
-      .from('drivers')
+      .from('drivers' as any)
       .update({
         name,
         email: email || null,
@@ -82,7 +82,7 @@ export async function GET(
 
     // @ts-ignore - Supabase type instantiation is excessively deep
     const { data: driver, error } = await (((supabase
-      .from('drivers')
+      .from('drivers' as any)
       .select('*, carriers!inner(name)')) as any)
       .eq('id', driverId)
       .single()) as any

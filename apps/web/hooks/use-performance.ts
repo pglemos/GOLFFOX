@@ -253,7 +253,7 @@ export function useThrottle<T extends (...args: any[]) => any>(
         if (timeoutRef.current) {
           clearTimeout(timeoutRef.current)
         }
-        // @ts-expect-error setTimeout return type incompatibility
+        // @ts-ignore - setTimeout return type incompatibility
         timeoutRef.current = setTimeout(() => {
           lastCall.current = Date.now()
           callback(...args)

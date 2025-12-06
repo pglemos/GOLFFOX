@@ -31,7 +31,7 @@ export async function PUT(
 
     // @ts-ignore - Supabase type inference issue
     const { data: driver, error } = await ((supabase
-      .from('drivers')
+      .from('drivers' as any)
       .update({
         name,
         email: email || null,
@@ -83,7 +83,7 @@ export async function DELETE(
 
     // @ts-ignore - Supabase type inference issue
     const { error } = await (supabase
-      .from('drivers')
+      .from('drivers' as any)
       .delete()
       .eq('id', driverId)
       .eq('transportadora_id', transportadoraId) as any)

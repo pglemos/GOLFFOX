@@ -138,7 +138,7 @@ export function useRouteCreate(isOpen: boolean) {
         try {
             // @ts-ignore - Supabase type inference issue with views
             let { data, error } = await ((supabase
-                .from("v_company_employees_secure")
+                .from("v_company_employees_secure" as any)
                 .select("*")
                 .eq("company_id", formData.company_id)) as any) as any
 
