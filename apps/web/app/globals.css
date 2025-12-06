@@ -180,6 +180,10 @@
     animation: fadeIn 0.5s ease-out forwards;
   }
 
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-out forwards;
+  }
+
   .animate-in-slide-up {
     animation: slideUp 0.5s ease-out forwards;
   }
