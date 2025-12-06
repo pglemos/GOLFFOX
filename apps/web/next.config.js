@@ -13,7 +13,9 @@ let nextConfig = {
     // ignoreBuildErrors removido - build agora valida tipos TypeScript
     ignoreBuildErrors: false,
   },
-  // Next.js 16: Empty turbopack config allows webpack to run in production
+  // Next.js 16: Turbopack é o bundler padrão - otimizado para produção
+  // Turbopack oferece performance superior com cache incremental
+  // Configuração explícita do Turbopack para silenciar warning
   turbopack: {},
   async headers() {
     return [
@@ -102,6 +104,8 @@ let nextConfig = {
       ...config.resolve.alias,
       '@': path.resolve(__dirname),
       '@shared': path.resolve(__dirname, '../../shared'),
+      // Resolver conflito @swc/helpers entre pdfkit/fontkit e projeto
+      '@swc/helpers': path.resolve(__dirname, 'node_modules/@swc/helpers'),
     }
 
     // Configurações básicas para cliente

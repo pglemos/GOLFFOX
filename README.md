@@ -1,9 +1,10 @@
 # 🚌 GolfFox - Sistema de Gestão de Transporte Urbano
 
 [![Flutter](https://img.shields.io/badge/Flutter-3.24.0+-blue.svg)](https://flutter.dev/)
-[![Next.js](https://img.shields.io/badge/Next.js-15.1.3-black.svg)](https://nextjs.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-16.1.0-black.svg)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9.3-blue.svg)](https://www.typescriptlang.org/)
-[![Supabase](https://img.shields.io/badge/Supabase%20JS-2.81.0-green.svg)](https://supabase.com/)
+[![Supabase](https://img.shields.io/badge/Supabase%20JS-2.82.0-green.svg)](https://supabase.com/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-4.0.0-38bdf8.svg)](https://tailwindcss.com/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Deploy](https://img.shields.io/badge/Deploy-Vercel-black.svg)](https://vercel.com/)
 
@@ -45,11 +46,11 @@ O **GolfFox** é uma plataforma completa de gestão de transporte urbano que ofe
 O projeto utiliza uma arquitetura híbrida moderna:
 
 - **Frontend Mobile**: Flutter 3.24+ (iOS/Android)
-- **Frontend Web**: Next.js 15 com TypeScript, App Router
+- **Frontend Web**: Next.js 16.1 com TypeScript, App Router, Turbopack
 - **Backend**: Supabase (PostgreSQL + Auth + Storage + Realtime)
 - **Arquitetura**: Clean Architecture + Domain Driven Design
 - **Estado**: Riverpod (Flutter) + React Hooks + Zustand + TanStack Query (Next.js)
-- **Estilização**: Tailwind CSS + Framer Motion + Radix UI
+- **Estilização**: Tailwind CSS 4.0 (LightningCSS) + Framer Motion + Radix UI
 - **Mapas**: Google Maps API + @react-google-maps/api
 - **Deploy**: Vercel (Web) + GitHub Actions (CI/CD)
 - **Monitoramento**: Sentry (Flutter + Next.js) + Vercel Speed Insights
@@ -85,7 +86,7 @@ O projeto utiliza uma arquitetura híbrida moderna:
 │   └── pubspec.yaml          # Dependências Flutter
 │
 ├── 🌐 apps/web/               # Next.js Web App
-│   ├── app/                   # App Router (Next.js 15)
+│   ├── app/                   # App Router (Next.js 16.1 + Turbopack)
 │   │   ├── admin/             # Painel Administrativo
 │   │   ├── operator/          # Painel do Operador
 │   │   ├── carrier/           # Painel da Transportadora

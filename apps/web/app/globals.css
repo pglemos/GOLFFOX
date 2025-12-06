@@ -1201,23 +1201,28 @@
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
+}
 
-  .scrollbar-custom::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-  }
+/* Scrollbar customizado - fora do @layer para evitar conflitos com Tailwind 4.0 */
+.scrollbar-custom::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
 
-  .scrollbar-custom::-webkit-scrollbar-track {
-    @apply bg-[var(--bg-soft)];
-  }
+.scrollbar-custom::-webkit-scrollbar-track {
+  background: hsl(var(--bg-soft));
+}
 
-  .scrollbar-custom::-webkit-scrollbar-thumb {
-    @apply bg-[var(--border-strong)] rounded-full;
-  }
+.scrollbar-custom::-webkit-scrollbar-thumb {
+  background: hsl(var(--border-strong));
+  border-radius: 9999px;
+}
 
-  .scrollbar-custom::-webkit-scrollbar-thumb:hover {
-    @apply bg-[var(--ink-muted)];
-  }
+.scrollbar-custom::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--ink-muted));
+}
+
+@layer utilities {
 
   /* Glass Effect */
   .glass {
@@ -1624,8 +1629,25 @@
 
 /* Overflow e scroll responsivos */
 .scroll-container {
-  @apply overflow-auto scrollbar-custom;
+  @apply overflow-auto;
   max-height: calc(100vh - 8rem);
+}
+
+.scroll-container::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.scroll-container::-webkit-scrollbar-track {
+  @apply bg-[var(--bg-soft)];
+}
+
+.scroll-container::-webkit-scrollbar-thumb {
+  @apply bg-[var(--border-strong)] rounded-full;
+}
+
+.scroll-container::-webkit-scrollbar-thumb:hover {
+  @apply bg-[var(--ink-muted)];
 }
 
 @media (max-width: 640px) {
