@@ -32,17 +32,24 @@ async function getCompaniesHandler(request: NextRequest) {
 
     const searchParams = request.nextUrl.searchParams
     
-    // Filtros opcionais
+    // Filtros opcionais com suporte a paginação
+    const page = parseInt(searchParams.get('page') || '1')
+    const limit = parseInt(searchParams.get('limit') || '100')
+    const offset = parseInt(searchParams.get('offset') || String((page - 1) * limit))
+    
     const filters: CompanyFilters = {
       isActive: searchParams.get('is_active') === 'true' ? true : searchParams.get('is_active') === 'false' ? false : undefined,
       search: searchParams.get('search') || undefined,
-      limit: parseInt(searchParams.get('limit') || '100'),
-      offset: parseInt(searchParams.get('offset') || '0')
+      limit,
+      offset
     }
 
     const result = await CompanyService.listCompanies(filters)
 
-    return NextResponse.json(result)
+    return NextResponse.json({
+      success: true,
+      ...result
+    })
   } catch (err) {
     const errorMessage = formatError(err, 'Erro ao listar empresas')
     return NextResponse.json(

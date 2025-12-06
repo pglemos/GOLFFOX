@@ -3,17 +3,9 @@
  * Lógica de negócio para gestão de empresas
  */
 
-import { createClient } from '@supabase/supabase-js'
 import { logger } from '@/lib/logger'
-
-function getSupabaseAdmin() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-  if (!url || !serviceKey) {
-    throw new Error('Supabase não configurado: defina NEXT_PUBLIC_SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY')
-  }
-  return createClient(url, serviceKey)
-}
+import { CompanyRepository, type Company as CompanyEntity } from '@/lib/repositories'
+import { withCache, cacheService } from '@/lib/cache/cache.service'
 
 export interface CompanyFilters {
   isActive?: boolean
@@ -30,25 +22,16 @@ export interface CreateCompanyData {
   email?: string
 }
 
-export interface Company {
-  id: string
-  name: string
-  cnpj?: string | null
-  address?: string | null
-  phone?: string | null
-  email?: string | null
-  is_active: boolean
-  created_at: string
-  updated_at: string
-}
+export type Company = CompanyEntity
+
+const companyRepository = new CompanyRepository()
 
 export class CompanyService {
   /**
-   * Listar empresas com filtros
+   * Listar empresas com filtros e paginação
    */
   static async listCompanies(filters: CompanyFilters = {}) {
     try {
-      const supabaseAdmin = getSupabaseAdmin()
       const {
         isActive,
         search,
@@ -56,32 +39,40 @@ export class CompanyService {
         offset = 0
       } = filters
 
-      const companyColumns = 'id,name,cnpj,address,phone,email,is_active,created_at,updated_at'
-      let query = supabaseAdmin.from('companies').select(companyColumns, { count: 'exact' })
+      const page = Math.floor(offset / limit) + 1
 
+      // Construir filtros para o repositório
+      const repoFilters: Record<string, unknown> = {}
       if (isActive !== undefined) {
-        query = query.eq('is_active', isActive)
+        repoFilters.is_active = isActive
       }
 
-      if (search) {
-        query = query.or(`name.ilike.%${search}%,cnpj.ilike.%${search}%`)
-      }
+      // Usar cache para listagens frequentes
+      const cacheKey = `companies:list:${JSON.stringify({ isActive, search, page, limit })}`
+      
+      return await withCache(cacheKey, async () => {
+        // Passar busca para o repositório ANTES da paginação
+        // Isso garante que count, totalPages, hasNext e hasPrev refletem os resultados filtrados
+        const result = await companyRepository.findAll({
+          page,
+          limit,
+          filters: repoFilters,
+          search: search?.trim() || undefined, // Busca aplicada no banco antes da paginação
+          orderBy: 'created_at',
+          orderDirection: 'desc'
+        })
 
-      query = query.order('created_at', { ascending: false }).range(offset, offset + limit - 1)
-
-      const { data, error, count } = await query
-
-      if (error) {
-        logger.error('Erro ao buscar empresas', { error })
-        throw new Error(`Erro ao buscar empresas: ${error.message}`)
-      }
-
-      return {
-        data: data || [],
-        count: count || 0,
-        limit,
-        offset
-      }
+        return {
+          data: result.data,
+          count: result.count,
+          limit: result.limit,
+          offset: (result.page - 1) * result.limit,
+          page: result.page,
+          totalPages: result.totalPages,
+          hasNext: result.hasNext,
+          hasPrev: result.hasPrev
+        }
+      }, 2 * 60 * 1000) // Cache de 2 minutos
     } catch (error) {
       logger.error('Erro ao listar empresas', { error })
       throw error
@@ -93,7 +84,6 @@ export class CompanyService {
    */
   static async createCompany(companyData: CreateCompanyData): Promise<Company> {
     try {
-      const supabaseAdmin = getSupabaseAdmin()
       const { name, cnpj, address, phone, email } = companyData
 
       if (!name || typeof name !== 'string' || name.trim().length === 0) {
@@ -102,44 +92,32 @@ export class CompanyService {
 
       // Validar CNPJ único se fornecido
       if (cnpj) {
-        const { data: existingCompany } = await supabaseAdmin
-          .from('companies')
-          .select('id')
-          .eq('cnpj', cnpj)
-          .single()
-
+        const existingCompany = await companyRepository.findByCnpj(cnpj)
         if (existingCompany) {
           throw new Error('Uma empresa com este CNPJ já existe')
         }
       }
 
-      const { data, error } = await supabaseAdmin
-        .from('companies')
-        .insert([
-          {
-            name: name.trim(),
-            cnpj: cnpj?.trim() || null,
-            address: address?.trim() || null,
-            phone: phone?.trim() || null,
-            email: email?.trim() || null,
-            is_active: true,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-          }
-        ])
-        .select()
-        .single()
+      const company = await companyRepository.create({
+        name: name.trim(),
+        cnpj: cnpj?.trim() || null,
+        address: address?.trim() || null,
+        phone: phone?.trim() || null,
+        email: email?.trim() || null,
+        is_active: true,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      } as Company)
 
-      if (error) {
-        logger.error('Erro ao criar empresa', { error })
-        throw new Error(`Erro ao criar empresa: ${error.message}`)
+      // Invalidar cache (não deve quebrar a operação se falhar)
+      try {
+        cacheService.invalidatePattern('companies:list:*')
+      } catch (cacheError) {
+        logger.warn('Erro ao invalidar cache após criar empresa', { error: cacheError, companyId: company.id })
+        // Não relança o erro - a operação principal foi bem-sucedida
       }
 
-      if (!data) {
-        throw new Error('Empresa criada mas dados não retornados')
-      }
-
-      return data
+      return company
     } catch (error) {
       logger.error('Erro ao criar empresa', { error })
       throw error
@@ -151,22 +129,10 @@ export class CompanyService {
    */
   static async getCompanyById(companyId: string): Promise<Company | null> {
     try {
-      const supabaseAdmin = getSupabaseAdmin()
-      const { data, error } = await supabaseAdmin
-        .from('companies')
-        .select('*')
-        .eq('id', companyId)
-        .single()
-
-      if (error) {
-        if (error.code === 'PGRST116') {
-          return null // Não encontrado
-        }
-        logger.error('Erro ao buscar empresa', { error, companyId })
-        throw new Error(`Erro ao buscar empresa: ${error.message}`)
-      }
-
-      return data
+      const cacheKey = `companies:${companyId}`
+      return await withCache(cacheKey, async () => {
+        return await companyRepository.findById(companyId)
+      }, 5 * 60 * 1000) // Cache de 5 minutos
     } catch (error) {
       logger.error('Erro ao buscar empresa por ID', { error, companyId })
       throw error
@@ -178,30 +144,18 @@ export class CompanyService {
    */
   static async updateCompany(companyId: string, updateData: Partial<CreateCompanyData & { is_active?: boolean }>): Promise<Company> {
     try {
-      const supabaseAdmin = getSupabaseAdmin()
-
       // Validar CNPJ único se fornecido e diferente do atual
       if (updateData.cnpj) {
-        const { data: existingCompany } = await supabaseAdmin
-          .from('companies')
-          .select('id,cnpj')
-          .eq('id', companyId)
-          .single()
-
+        const existingCompany = await companyRepository.findById(companyId)
         if (existingCompany && existingCompany.cnpj !== updateData.cnpj) {
-          const { data: duplicateCompany } = await supabaseAdmin
-            .from('companies')
-            .select('id')
-            .eq('cnpj', updateData.cnpj)
-            .single()
-
+          const duplicateCompany = await companyRepository.findByCnpj(updateData.cnpj)
           if (duplicateCompany) {
             throw new Error('Uma empresa com este CNPJ já existe')
           }
         }
       }
 
-      const updatePayload: Record<string, unknown> = {
+      const updatePayload: Partial<Company> = {
         updated_at: new Date().toISOString()
       }
 
@@ -212,23 +166,18 @@ export class CompanyService {
       if (updateData.email !== undefined) updatePayload.email = updateData.email?.trim() || null
       if (updateData.is_active !== undefined) updatePayload.is_active = updateData.is_active
 
-      const { data, error } = await supabaseAdmin
-        .from('companies')
-        .update(updatePayload)
-        .eq('id', companyId)
-        .select()
-        .single()
+      const company = await companyRepository.update(companyId, updatePayload)
 
-      if (error) {
-        logger.error('Erro ao atualizar empresa', { error, companyId })
-        throw new Error(`Erro ao atualizar empresa: ${error.message}`)
+      // Invalidar cache (não deve quebrar a operação se falhar)
+      try {
+        cacheService.invalidate(`companies:${companyId}`)
+        cacheService.invalidatePattern('companies:list:*')
+      } catch (cacheError) {
+        logger.warn('Erro ao invalidar cache após atualizar empresa', { error: cacheError, companyId })
+        // Não relança o erro - a operação principal foi bem-sucedida
       }
 
-      if (!data) {
-        throw new Error('Empresa atualizada mas dados não retornados')
-      }
-
-      return data
+      return company
     } catch (error) {
       logger.error('Erro ao atualizar empresa', { error, companyId })
       throw error
@@ -240,29 +189,15 @@ export class CompanyService {
    */
   static async deleteCompany(companyId: string, hardDelete: boolean = false): Promise<void> {
     try {
-      const supabaseAdmin = getSupabaseAdmin()
+      await companyRepository.delete(companyId, hardDelete)
 
-      if (hardDelete) {
-        const { error } = await supabaseAdmin
-          .from('companies')
-          .delete()
-          .eq('id', companyId)
-
-        if (error) {
-          logger.error('Erro ao deletar empresa (hard)', { error, companyId })
-          throw new Error(`Erro ao deletar empresa: ${error.message}`)
-        }
-      } else {
-        // Soft delete
-        const { error } = await supabaseAdmin
-          .from('companies')
-          .update({ is_active: false, updated_at: new Date().toISOString() })
-          .eq('id', companyId)
-
-        if (error) {
-          logger.error('Erro ao desativar empresa', { error, companyId })
-          throw new Error(`Erro ao desativar empresa: ${error.message}`)
-        }
+      // Invalidar cache (não deve quebrar a operação se falhar)
+      try {
+        cacheService.invalidate(`companies:${companyId}`)
+        cacheService.invalidatePattern('companies:list:*')
+      } catch (cacheError) {
+        logger.warn('Erro ao invalidar cache após deletar empresa', { error: cacheError, companyId })
+        // Não relança o erro - a operação principal foi bem-sucedida
       }
     } catch (error) {
       logger.error('Erro ao deletar empresa', { error, companyId })

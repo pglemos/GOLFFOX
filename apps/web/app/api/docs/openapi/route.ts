@@ -1,31 +1,32 @@
-import { NextRequest, NextResponse } from 'next/server'
+/**
+ * OpenAPI Documentation Endpoint
+ * Retorna a especificação OpenAPI da API
+ */
+
+import { NextResponse } from 'next/server'
+import { readFile } from 'fs/promises'
+import { join } from 'path'
 
 export const runtime = 'nodejs'
 
-export async function GET(request: NextRequest) {
-  const spec = {
-    openapi: '3.0.3',
-    info: {
-      title: 'GolfFox API',
-      version: '1.0.0',
-      description: 'Documentação básica dos endpoints GolfFox (parcial)'
-    },
-    servers: [{ url: process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000' }],
-    paths: {
-      '/api/auth/csrf': { get: { summary: 'Obter token CSRF' } },
-      '/api/auth/login': { post: { summary: 'Login e criar sessão' } },
-      '/api/health': { get: { summary: 'Health check' } },
-      '/api/reports/run': { post: { summary: 'Gerar relatório' } },
-      '/api/reports/dispatch': { post: { summary: 'Enviar relatório por email' }, get: { summary: 'Listar envios' } },
-      '/api/reports/schedule': { get: { summary: 'Listar agendamentos' }, post: { summary: 'Criar agendamento' }, delete: { summary: 'Remover agendamento' } },
-      '/api/costs/export': { get: { summary: 'Exportar custos' } },
-      '/api/costs/import': { post: { summary: 'Importar custos' } },
-      '/api/costs/manual': { get: { summary: 'Listar custos manuais' }, post: { summary: 'Criar custo manual' } },
-      '/api/costs/kpis': { get: { summary: 'KPIs de custos' } },
-      '/api/costs/reconcile': { post: { summary: 'Conciliação de faturas' } },
-      '/api/analytics/web-vitals': { get: { summary: 'Info Web Vitals' }, post: { summary: 'Enviar métricas Web Vitals' } }
-    }
+export async function GET() {
+  try {
+    const openApiPath = join(process.cwd(), 'apps/web/openapi.yaml')
+    const content = await readFile(openApiPath, 'utf-8')
+    
+    return new NextResponse(content, {
+      headers: {
+        'Content-Type': 'application/yaml',
+        'Cache-Control': 'public, max-age=3600'
+      }
+    })
+  } catch (error) {
+    return NextResponse.json(
+      { 
+        error: 'Erro ao carregar documentação OpenAPI',
+        message: error instanceof Error ? error.message : 'Erro desconhecido'
+      },
+      { status: 500 }
+    )
   }
-  return NextResponse.json(spec)
 }
-
