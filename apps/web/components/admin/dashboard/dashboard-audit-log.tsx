@@ -54,10 +54,10 @@ export function DashboardAuditLog({ logs, loading }: DashboardAuditLogProps) {
     }
 
     return (
-        <Card className="overflow-hidden">
+        <Card>
             <CardHeader className="pb-4 px-3 sm:px-6">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
-                    <div className="flex-1 min-w-0">
+                    <div className="flex-1">
                         <CardTitle className="text-lg sm:text-xl font-semibold mb-1.5">{t('admin', 'dashboard.auditLog.title')}</CardTitle>
                         <p className="text-xs sm:text-sm text-[var(--ink-muted)]">{t('admin', 'dashboard.auditLog.subtitle')}</p>
                     </div>
@@ -92,11 +92,11 @@ export function DashboardAuditLog({ logs, loading }: DashboardAuditLogProps) {
                                     <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg ${actionColor} flex items-center justify-center flex-shrink-0 shadow-sm group-hover:scale-105 transition-transform`}>
                                         <ActionIcon className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
                                     </div>
-                                    <div className="flex-1 min-w-0">
-                                        <p className="font-semibold text-xs sm:text-sm text-[var(--ink-strong)] truncate">
+                                    <div className="flex-1">
+                                        <p className="font-semibold text-xs sm:text-sm text-[var(--ink-strong)]">
                                             {actionText}: {resourceName}
                                         </p>
-                                        <p className="text-xs text-[var(--ink-muted)] truncate mt-0.5">
+                                        <p className="text-xs text-[var(--ink-muted)] mt-0.5">
                                             {formatRelativeTime(log.created_at)}
                                             {log.details?.companyId && ` • ${t('admin', 'dashboard.auditLog.company')}: ${log.details.companyId.slice(0, 8)}`}
                                         </p>

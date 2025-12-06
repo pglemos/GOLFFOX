@@ -425,6 +425,7 @@
     background: linear-gradient(90deg, transparent, var(--brand), transparent);
     opacity: 0;
     transition: opacity var(--transition-smooth);
+    z-index: 0;
   }
 
   .card-premium::after {
@@ -441,10 +442,6 @@
     opacity: 0;
     transition: opacity var(--transition-smooth);
     pointer-events: none;
-    z-index: 0;
-  }
-  
-  .card-premium::before {
     z-index: 0;
   }
 
@@ -498,6 +495,18 @@
     position: relative;
     overflow: visible;
     backdrop-filter: blur(10px);
+    margin: 6px;
+  }
+  
+  .card-premium {
+    margin: 6px;
+  }
+  
+  /* Grid containers precisam de padding para acomodar margens dos cards */
+  .grid.grid-cols-1,
+  .grid.grid-cols-2,
+  .grid.grid-cols-3 {
+    padding: 2px;
   }
   
   .stat-card > * {
@@ -517,6 +526,7 @@
     opacity: 0;
     transition: opacity var(--transition-smooth);
     animation: gradient-shift 3s ease infinite;
+    z-index: 0;
   }
 
   .stat-card::after {
@@ -530,10 +540,6 @@
     opacity: 0;
     transition: opacity var(--transition-smooth);
     pointer-events: none;
-    z-index: 0;
-  }
-  
-  .stat-card::before {
     z-index: 0;
   }
 
@@ -580,6 +586,7 @@
     display: flex;
     flex-direction: column;
     gap: var(--space-md);
+    width: 100%;
   }
 
   @media (min-width: 768px) {

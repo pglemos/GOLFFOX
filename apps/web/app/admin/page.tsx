@@ -237,7 +237,7 @@ export default function AdminDashboard() {
     }}>
       <div className="space-y-4 sm:space-y-6 lg:space-y-8 animate-fade-in w-full">
         {/* Filtros */}
-        <Card className="overflow-hidden">
+        <Card>
           <CardHeader className="pb-4 px-3 sm:px-6">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
               <div className="flex items-center gap-2">
@@ -342,9 +342,9 @@ export default function AdminDashboard() {
               <Card glass hover className="cursor-pointer h-full">
                 <CardHeader className="pb-4 px-3 sm:px-6">
                   <div className="flex items-start justify-between gap-2">
-                    <div className="flex-1 min-w-0 pr-2 sm:pr-4">
-                      <CardTitle className="text-lg sm:text-xl font-semibold mb-1.5 truncate">Mapa da Frota</CardTitle>
-                      <p className="text-xs sm:text-sm text-[var(--ink-muted)] line-clamp-2">Visualize veículos em tempo real</p>
+                    <div className="flex-1 pr-2 sm:pr-4">
+                      <CardTitle className="text-lg sm:text-xl font-semibold mb-1.5">Mapa da Frota</CardTitle>
+                      <p className="text-xs sm:text-sm text-[var(--ink-muted)]">Visualize veículos em tempo real</p>
                     </div>
                     <div className="relative flex-shrink-0 p-1">
                       <motion.div 
@@ -363,7 +363,7 @@ export default function AdminDashboard() {
                 </CardHeader>
                 <CardContent className="pt-0 px-3 sm:px-6">
                   <motion.div 
-                    className="h-40 bg-gradient-to-br from-[var(--brand)]/10 via-[var(--brand)]/5 to-[var(--accent)]/10 rounded-xl flex items-center justify-center group-hover:from-[var(--brand)]/25 group-hover:via-[var(--brand)]/15 group-hover:to-[var(--accent)]/25 transition-all duration-500 overflow-hidden relative"
+                    className="h-40 bg-gradient-to-br from-[var(--brand)]/10 via-[var(--brand)]/5 to-[var(--accent)]/10 rounded-xl flex items-center justify-center group-hover:from-[var(--brand)]/25 group-hover:via-[var(--brand)]/15 group-hover:to-[var(--accent)]/25 transition-all duration-500 relative overflow-visible"
                     whileHover={{ scale: 1.02 }}
                   >
                     <motion.div
@@ -386,9 +386,9 @@ export default function AdminDashboard() {
             <Card className="h-full">
               <CardHeader className="pb-4 px-3 sm:px-6">
                 <div className="flex items-start justify-between gap-2">
-                  <div className="flex-1 min-w-0 pr-2 sm:pr-4">
-                    <CardTitle className="text-lg sm:text-xl font-semibold mb-1.5 truncate">Notificações Recentes</CardTitle>
-                    <p className="text-xs sm:text-sm text-[var(--ink-muted)] line-clamp-2">Últimas atualizações do sistema</p>
+                  <div className="flex-1 pr-2 sm:pr-4">
+                    <CardTitle className="text-lg sm:text-xl font-semibold mb-1.5">Notificações Recentes</CardTitle>
+                    <p className="text-xs sm:text-sm text-[var(--ink-muted)]">Últimas atualizações do sistema</p>
                   </div>
                   <Button variant="ghost" size="sm" className="flex-shrink-0 min-h-[44px] min-w-[44px] touch-manipulation" asChild>
                     <a href="/admin/alertas">
@@ -420,9 +420,9 @@ export default function AdminDashboard() {
                           ease: "easeInOut"
                         }}
                       />
-                      <div className="flex-1 min-w-0 overflow-visible">
-                        <p className="text-sm font-semibold text-[var(--ink-strong)] line-clamp-1 group-hover:text-[var(--brand)] transition-colors">Alerta #{i}</p>
-                        <p className="text-xs text-[var(--ink-muted)] line-clamp-1">Há {i} minutos</p>
+                      <div className="flex-1 overflow-visible">
+                        <p className="text-sm font-semibold text-[var(--ink-strong)] group-hover:text-[var(--brand)] transition-colors">Alerta #{i}</p>
+                        <p className="text-xs text-[var(--ink-muted)]">Há {i} minutos</p>
                       </div>
                     </motion.div>
                   ))}

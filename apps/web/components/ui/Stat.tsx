@@ -50,10 +50,10 @@ const Stat = ({ icon: Icon, label, value, hint, trend, trendLabel, className }: 
         damping: 30,
         duration: 0.4
       }}
-      className={cn("stat-card group cursor-pointer touch-manipulation overflow-visible", className)}
+      className={cn("stat-card group cursor-pointer touch-manipulation", className)}
     >
       <div className="flex items-start justify-between gap-3 sm:gap-4">
-        <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
+        <div className="flex items-center gap-3 sm:gap-4 flex-1">
           {/* Icon Container - Ultra Premium */}
           <div className="relative flex-shrink-0 py-1">
             <motion.div 
@@ -79,12 +79,12 @@ const Stat = ({ icon: Icon, label, value, hint, trend, trendLabel, className }: 
           </div>
 
           {/* Content */}
-          <div className="flex-1 min-w-0 overflow-visible">
-            <p className="text-sm sm:text-sm font-medium text-[var(--ink-muted)] mb-1.5 sm:mb-2 line-clamp-1">
+          <div className="flex-1 overflow-visible">
+            <p className="text-sm sm:text-sm font-medium text-[var(--ink-muted)] mb-1.5 sm:mb-2">
               {label}
             </p>
             <motion.p 
-              className="text-3xl sm:text-3xl lg:text-4xl font-bold tabular-nums text-[var(--ink-strong)] break-words"
+              className="text-3xl sm:text-3xl lg:text-4xl font-bold tabular-nums text-[var(--ink-strong)]"
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.1, duration: 0.3 }}
@@ -92,7 +92,7 @@ const Stat = ({ icon: Icon, label, value, hint, trend, trendLabel, className }: 
               {typeof value === 'number' ? display : displayValue}
             </motion.p>
             {hint && (
-              <p className="text-xs sm:text-xs text-[var(--ink-muted)] mt-1.5 sm:mt-2 line-clamp-1">
+              <p className="text-xs sm:text-xs text-[var(--ink-muted)] mt-1.5 sm:mt-2">
                 {hint}
               </p>
             )}
