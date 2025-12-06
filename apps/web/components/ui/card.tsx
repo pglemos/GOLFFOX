@@ -11,7 +11,8 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
     <div
       ref={ref}
       className={cn(
-        glass ? "card-glass" : "card-premium",
+        "card-premium",
+        glass && "card-glass",
         !hover && "hover:shadow-[var(--shadow-sm)] hover:-translate-y-0",
         "w-full max-w-full min-w-0 overflow-hidden",
         className
