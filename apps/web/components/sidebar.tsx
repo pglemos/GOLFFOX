@@ -295,22 +295,16 @@ const CustomSidebarLink = ({
           }
         }}
       >
-        <div className="relative">
-          <motion.div
-            whileHover={{ scale: 1.15, rotate: [0, -5, 5, 0] }}
-            whileTap={{ scale: 0.95 }}
-            transition={{ type: "spring", stiffness: 400, damping: 17 }}
-          >
-            <Icon
-              className={cn(
-                "h-5 w-5 transition-all duration-300 flex-shrink-0 relative z-10",
-                "stroke-[1.8px]",
-                isActive
-                  ? (panel === 'operador' ? "text-orange-500 drop-shadow-sm" : "text-[#F97316] drop-shadow-sm")
-                  : (panel === 'operador' ? "text-gray-500 group-hover:text-orange-500 group-hover:drop-shadow-sm" : "text-gray-500 group-hover:text-[#F97316] group-hover:drop-shadow-sm")
-              )}
-            />
-          </motion.div>
+        <div className="relative flex-shrink-0">
+          <Icon
+            className={cn(
+              "h-5 w-5 transition-all duration-200 flex-shrink-0 relative z-10",
+              "stroke-[1.8px]",
+              isActive
+                ? (panel === 'operador' ? "text-orange-500 drop-shadow-sm" : "text-[#F97316] drop-shadow-sm")
+                : (panel === 'operador' ? "text-gray-500 group-hover:text-orange-500 group-hover:drop-shadow-sm" : "text-gray-500 group-hover:text-[#F97316] group-hover:drop-shadow-sm")
+            )}
+          />
           {showOperationalAlerts && open && (
             <div className="absolute -top-1 -right-1 flex gap-1">
               {showOperationalAlerts && <OperationalAlertsBadge />}
@@ -370,22 +364,17 @@ const SidebarLogo = ({ panel }: { panel: 'admin' | 'operador' | 'transportadora'
         open ? "space-x-2" : "justify-center w-full"
       )}
     >
-      <motion.div
+      <div
         className={cn(
-          "h-8 w-8 rounded-xl flex items-center justify-center flex-shrink-0 shadow-md relative overflow-hidden",
+          "h-8 w-8 rounded-xl flex items-center justify-center flex-shrink-0 shadow-md relative overflow-hidden transition-transform duration-200 hover:scale-105 active:scale-95",
           panel === 'operador' ? "bg-gradient-to-br from-orange-500 to-orange-600" : "gradient-brand"
         )}
-        whileHover={{ scale: 1.1, rotate: [0, -5, 5, 0] }}
-        whileTap={{ scale: 0.95 }}
-        transition={{ type: "spring", stiffness: 400, damping: 17 }}
       >
-        <motion.div
-          className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent"
-          animate={{ opacity: [0.5, 1, 0.5] }}
-          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+        <div
+          className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-50"
         />
         <span className="text-white text-xs font-bold relative z-10 drop-shadow-sm">GF</span>
-      </motion.div>
+      </div>
       <motion.div
         animate={{
           opacity: open ? 1 : 0,

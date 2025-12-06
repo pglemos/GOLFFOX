@@ -215,19 +215,13 @@ export function Topbar({
         {(pathname?.startsWith('/operador') || pathname?.startsWith('/operator')) ? (
           <OperatorLogoSection panelHomeUrl={panelHomeUrl} panelBranding={panelBranding} />
         ) : (
-          <a href={panelHomeUrl} className="flex items-center gap-2 sm:gap-3 group min-w-0 sm:flex-shrink-0">
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-xl bg-gradient-to-br from-[#1E3A5F] via-[#2D4A6B] to-[var(--brand)] flex items-center justify-center shadow-lg hover:shadow-[var(--shadow-brand-lg)] flex-shrink-0 relative overflow-hidden group/logo"
-              transition={{ type: "spring", stiffness: 400, damping: 17 }}
-            >
-              <motion.div
-                className="absolute inset-0 bg-gradient-to-br from-white/20 via-white/5 to-transparent opacity-0 group-hover/logo:opacity-100"
-                transition={{ duration: 0.3 }}
+          <a href={panelHomeUrl} className="flex items-center gap-2 sm:gap-3 group min-w-0 sm:flex-shrink-0 transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-xl bg-gradient-to-br from-[#1E3A5F] via-[#2D4A6B] to-[var(--brand)] flex items-center justify-center shadow-lg flex-shrink-0 relative overflow-hidden group/logo transition-shadow duration-200 hover:shadow-[var(--shadow-brand-lg)]">
+              <div
+                className="absolute inset-0 bg-gradient-to-br from-white/20 via-white/5 to-transparent opacity-0 group-hover/logo:opacity-100 transition-opacity duration-300"
               />
               <span className="text-white font-bold text-base sm:text-lg md:text-xl relative z-10 drop-shadow-md">G</span>
-            </motion.div>
+            </div>
             <div className="flex items-center gap-1 sm:gap-2 min-w-0">
               <span className="font-bold text-base sm:text-lg md:text-xl lg:text-2xl tracking-tight text-[var(--ink-strong)] truncate">
                 {pathname?.startsWith('/admin') ? (panelBranding || 'Administrativo') : (panelBranding || 'GOLF FOX')}
@@ -275,27 +269,26 @@ export function Topbar({
           <OperationalAlertsNotification />
 
           {/* Notifications */}
-          <motion.div
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            transition={{ type: "spring", stiffness: 400, damping: 17 }}
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="relative hover:bg-gradient-to-br hover:from-[var(--bg-hover)] hover:to-[var(--bg-soft)] active:bg-[var(--bg-hover)] min-w-[44px] min-h-[44px] touch-manipulation backdrop-blur-sm transition-transform duration-200 hover:scale-105 active:scale-95" 
+            aria-label="Notifications"
           >
-            <Button variant="ghost" size="icon" className="relative hover:bg-gradient-to-br hover:from-[var(--bg-hover)] hover:to-[var(--bg-soft)] active:bg-[var(--bg-hover)] min-w-[44px] min-h-[44px] touch-manipulation backdrop-blur-sm" aria-label="Notifications">
-              <Bell className="h-5 w-5 transition-all duration-300 group-hover:rotate-12" />
-              <motion.span 
-                className="absolute top-2 right-2 w-2.5 h-2.5 bg-[var(--brand)] rounded-full shadow-[var(--shadow-brand)]"
-                animate={{ 
-                  scale: [1, 1.2, 1],
-                  opacity: [1, 0.8, 1]
-                }}
-                transition={{ 
-                  duration: 2,
-                  repeat: Infinity,
-                  ease: "easeInOut"
-                }}
-              />
-            </Button>
-          </motion.div>
+            <Bell className="h-5 w-5 transition-all duration-300" />
+            <motion.span 
+              className="absolute top-2 right-2 w-2.5 h-2.5 bg-[var(--brand)] rounded-full shadow-[var(--shadow-brand)]"
+              animate={{ 
+                scale: [1, 1.2, 1],
+                opacity: [1, 0.8, 1]
+              }}
+              transition={{ 
+                duration: 2,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+            />
+          </Button>
 
           {/* Theme Toggle */}
           {!isCompactLayout && <ThemeToggle />}
@@ -330,33 +323,29 @@ export function Topbar({
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
-                className="flex items-center gap-1 sm:gap-2 pl-1 sm:pl-2 hover:bg-[var(--bg-hover)] active:bg-[var(--bg-hover)] rounded-full min-h-[44px] touch-manipulation"
+                className="flex items-center gap-1 sm:gap-2 pl-1 sm:pl-2 hover:bg-[var(--bg-hover)] active:bg-[var(--bg-hover)] rounded-full min-h-[44px] touch-manipulation transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]"
               >
                 {user?.avatar_url ? (
-                  <motion.img 
+                  <img 
                     src={user.avatar_url} 
                     alt={user?.name || "Avatar"} 
-                    className="w-8 h-8 rounded-full object-cover shadow-lg hover:shadow-[var(--shadow-brand-lg)] flex-shrink-0 border-2 border-white/50"
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.95 }}
-                    transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                    className="w-8 h-8 rounded-full object-cover shadow-lg flex-shrink-0 border-2 border-white/50 transition-shadow duration-200 hover:shadow-[var(--shadow-brand-lg)]"
                     onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
                       // Fallback para inicial se a imagem falhar
                       const target = e.currentTarget;
                       target.style.display = 'none';
-                      target.nextElementSibling?.classList.remove('hidden');
+                      const nextSibling = target.nextElementSibling as HTMLElement;
+                      if (nextSibling) {
+                        nextSibling.classList.remove('hidden');
+                      }
                     }}
                   />
                 ) : null}
-                <motion.div 
-                  className={`w-8 h-8 rounded-full bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg hover:shadow-[var(--shadow-brand-lg)] flex-shrink-0 relative overflow-hidden group/avatar ${user?.avatar_url ? 'hidden' : ''}`}
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.95 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                <div 
+                  className={`w-8 h-8 rounded-full bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg flex-shrink-0 relative overflow-hidden group/avatar transition-shadow duration-200 hover:shadow-[var(--shadow-brand-lg)] ${user?.avatar_url ? 'hidden' : ''}`}
                 >
-                  <motion.div
-                    className="absolute inset-0 bg-gradient-to-br from-white/30 via-white/10 to-transparent opacity-0 group-hover/avatar:opacity-100"
-                    transition={{ duration: 0.3 }}
+                  <div
+                    className="absolute inset-0 bg-gradient-to-br from-white/30 via-white/10 to-transparent opacity-0 group-hover/avatar:opacity-100 transition-opacity duration-300"
                   />
                   <span className="text-white text-sm font-bold relative z-10 drop-shadow-sm">
                     {(() => {
@@ -371,13 +360,13 @@ export function Topbar({
                       return name.charAt(0).toUpperCase() || 'A';
                     })()}
                   </span>
-                </motion.div>
+                </div>
                 <div className="text-left hidden sm:block min-w-0">
-                  <p className="text-sm font-semibold leading-tight text-[var(--ink-strong)] truncate max-w-[120px]">
-                    {pathname?.startsWith('/admin') ? 'GOLF FOX' : (user?.name || "Admin")}
+                  <p className="text-sm font-semibold leading-tight text-[var(--ink-strong)] truncate max-w-[140px]">
+                    {user?.name || (pathname?.startsWith('/admin') ? 'GOLF FOX' : "Admin")}
                   </p>
-                  <p className="text-xs text-[var(--ink-muted)] leading-tight capitalize truncate max-w-[120px]">
-                    {pathname?.startsWith('/admin') ? 'admin' : (user?.role || "administrador")}
+                  <p className="text-xs text-[var(--ink-muted)] leading-tight capitalize truncate max-w-[140px]">
+                    {user?.role || (pathname?.startsWith('/admin') ? 'admin' : "administrador")}
                   </p>
                 </div>
                 <ChevronDown className="h-4 w-4 text-[var(--ink-muted)] hidden sm:block flex-shrink-0" />
