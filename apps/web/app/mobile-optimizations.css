@@ -132,3 +132,88 @@ img[loading="lazy"] {
         box-shadow: var(--shadow-sm);
     }
 }
+
+/* Premium Responsive Enhancements */
+@media (max-width: 640px) {
+    /* Mobile-first: Ajustar espaçamentos */
+    .card-premium,
+    .stat-card {
+        padding: var(--space-md);
+    }
+
+    /* Melhorar toque em mobile */
+    button,
+    a,
+    [role="button"] {
+        min-height: 44px;
+        min-width: 44px;
+        touch-action: manipulation;
+    }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+    /* Tablet: Otimizações intermediárias */
+    .card-premium,
+    .stat-card {
+        padding: var(--space-lg);
+    }
+}
+
+@media (min-width: 1025px) {
+    /* Desktop: Efeitos premium completos */
+    .card-premium:hover,
+    .stat-card:hover {
+        transform: translateY(-4px);
+    }
+}
+
+/* Smooth Scrolling Premium */
+html {
+    scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+}
+
+/* Focus Visible - Acessibilidade Premium */
+*:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+}
+
+/* Loading States Premium */
+@keyframes pulse-subtle {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+}
+
+.animate-pulse-subtle {
+    animation: pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Gradient Text Premium */
+.text-gradient-premium {
+    background: linear-gradient(135deg, var(--brand) 0%, var(--brand-hover) 50%, #FB923C 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-size: 200% auto;
+    animation: gradient-shift 3s ease infinite;
+}
+
+@keyframes gradient-shift {
+    0%, 100% {
+        background-position: 0% center;
+    }
+    50% {
+        background-position: 100% center;
+    }
+}
