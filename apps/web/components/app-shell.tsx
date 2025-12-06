@@ -60,11 +60,14 @@ export const AppShell = memo(function AppShell({ user, children, panel }: AppShe
   // Detect mobile screen size
   useEffect(() => {
     const checkScreenSize = () => {
-      setIsMobile(window.innerWidth < 1024)
-      if (window.innerWidth < 1024) {
+      const isMobileWidth = window.innerWidth < 1024
+      setIsMobile(isMobileWidth)
+      if (isMobileWidth) {
         setIsSidebarOpen(false)
         document.body.setAttribute('data-mobile', 'true')
       } else {
+        // Em desktop, garantir que sidebar inicia fechada
+        setIsSidebarOpen(false)
         document.body.removeAttribute('data-mobile')
       }
     }
