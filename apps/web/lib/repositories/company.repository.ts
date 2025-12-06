@@ -83,9 +83,10 @@ export class CompanyRepository extends BaseRepository<Company> {
       // Aplicar busca textual no nível do banco ANTES da paginação
       // Isso garante que o count reflete os resultados filtrados
       if (search && search.trim()) {
-        const searchPattern = search.trim().replace(/%/g, '\\%') // Escapar % se houver
+        const searchPattern = search.trim()
         // Busca em name OU cnpj usando OR condition do Supabase/PostgREST
         // Formato: column.operator.pattern,column2.operator.pattern
+        // O % é usado como wildcard no padrão ilike do Postgres
         query = query.or(`name.ilike.%${searchPattern}%,cnpj.ilike.%${searchPattern}%`)
       }
 

@@ -3,9 +3,10 @@ import { withRateLimit } from '@/lib/rate-limit'
 import { logger } from '@/lib/logger'
 
 async function cepHandler(request: NextRequest) {
+    let cep: string | null = null
     try {
         const { searchParams } = new URL(request.url)
-        const cep = searchParams.get('cep')
+        cep = searchParams.get('cep')
 
         if (!cep) {
             return NextResponse.json(
