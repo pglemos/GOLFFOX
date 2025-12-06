@@ -166,7 +166,14 @@ export async function getUnresolvedAlerts(
     }
 
     if (error) throw error
-    return (data || []) as any
+    
+    // Mapear dados do banco para formato esperado (alert_type -> type)
+    const mappedData = (data || []).map((alert: any) => ({
+      ...alert,
+      type: alert.type || alert.alert_type || 'other'
+    }))
+    
+    return mappedData as any
   } catch (error) {
     console.error('Erro ao buscar alertas:', formatSupabaseError(error))
     return []
@@ -216,7 +223,8 @@ export async function hasCriticalAlerts(): Promise<boolean> {
     }
 
     if (error) throw error
-    return ((data as any)?.length || 0) > 0
+    // Retornar true se houver pelo menos um alerta
+    return Array.isArray(data) && data.length > 0
   } catch (error) {
     console.error('Erro ao verificar alertas críticos:', formatSupabaseError(error))
     return false

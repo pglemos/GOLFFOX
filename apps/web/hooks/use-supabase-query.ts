@@ -290,6 +290,7 @@ export function useSupabaseCount(
   const smartFallback = getSmartFallback(table, filters)
 
   const queryFn = useCallback(async () => {
+    // @ts-expect-error Supabase type inference issue with select options
     let query: any = (supabase.from(table).select('*', { count: 'exact', head: true }) as any)
     
     // Aplicar filtros

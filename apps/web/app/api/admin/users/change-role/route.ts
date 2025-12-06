@@ -70,6 +70,7 @@ export async function POST(req: NextRequest) {
 
         // Log de auditoria (opcional - se falhar não impede a operação)
         try {
+            // @ts-expect-error Supabase type inference issue
             await ((supabaseServiceRole
                 .from('audit_logs')) as any)
                 .insert({

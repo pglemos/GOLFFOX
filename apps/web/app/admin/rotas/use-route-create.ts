@@ -136,7 +136,7 @@ export function useRouteCreate(isOpen: boolean) {
 
         setLoadingEmployees(true)
         try {
-            // @ts-expect-error Supabase type inference issue with views
+            // @ts-ignore - Supabase type inference issue with views
             let { data, error } = await ((supabase
                 .from("v_company_employees_secure")
                 .select("*")
