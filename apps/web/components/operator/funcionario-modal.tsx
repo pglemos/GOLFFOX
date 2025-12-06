@@ -163,10 +163,6 @@ export function FuncionarioModal({ funcionario, isOpen, onClose, onSave, empresa
           i18n: { ns: 'operator', key: 'employees.updated' }
         })
       } else {
-        // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/802544c4-70d0-43c7-a57c-6692b28ca17d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'funcionario-modal.tsx:CREATE',message:'Starting create employee',data:{email:formData.email,name:formData.name,empresaId},timestamp:Date.now(),sessionId:'debug-session'})}).catch(()=>{});
-        // #endregion
-
         // Create new employee user via API route (includes gf_employee_company insertion)
         const res = await fetch('/api/operador/create-employee', {
           method: 'POST',

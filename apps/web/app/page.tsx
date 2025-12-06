@@ -1,12 +1,12 @@
 "use client"
 
-import { useEffect, useRef, useState, useCallback, Suspense } from "react"
+import { useEffect, useRef, useState, useCallback, Suspense, useMemo, memo } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Mail, Lock, Eye, EyeOff, ArrowRight, Sparkles } from "lucide-react"
-import { motion, AnimatePresence } from "framer-motion"
+import { Mail, Lock, Eye, EyeOff, ArrowRight, Sparkles, Shield, Zap } from "lucide-react"
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion"
 import { AuthManager } from "@/lib/auth"
 import { getUserRoleByEmail } from "@/lib/user-role"
 import { debug, error as logError } from "@/lib/logger"
@@ -21,31 +21,37 @@ const DEFAULT_LOGGED_URL = process.env.NEXT_PUBLIC_LOGGED_URL ?? "/operador"
 
 const sanitizeInput = (value: string) => value.replace(/[<>"'`;()]/g, "").trim()
 
-// Efeito de partículas minimalista (estilo Apple/Tesla)
-const FloatingOrbs = () => {
+// Efeito de partículas otimizado com memoização
+const FloatingOrbs = memo(() => {
+  const shouldReduceMotion = useReducedMotion()
+  const orbs = useMemo(() => [
+    { color: 'rgba(249, 115, 22, 0.12)', x: ['-25%', '-15%'], y: ['10%', '20%'], duration: 20 },
+    { color: 'rgba(139, 92, 246, 0.08)', x: ['75%', '85%'], y: ['60%', '70%'], duration: 25 },
+    { color: 'rgba(59, 130, 246, 0.08)', x: ['40%', '50%'], y: ['-10%', '0%'], duration: 30 },
+  ], [])
+
+  if (shouldReduceMotion) return null
+
   return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {[...Array(3)].map((_, i) => (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+      {orbs.map((orb, i) => (
         <motion.div
           key={i}
-          className="absolute w-[500px] h-[500px] rounded-full"
+          className="absolute w-[500px] h-[500px] rounded-full will-change-transform"
           style={{
-            background: `radial-gradient(circle, ${i === 0 ? 'rgba(249, 115, 22, 0.15)' :
-              i === 1 ? 'rgba(139, 92, 246, 0.1)' :
-                'rgba(59, 130, 246, 0.1)'
-              } 0%, transparent 70%)`,
+            background: `radial-gradient(circle, ${orb.color} 0%, transparent 70%)`,
             filter: 'blur(60px)',
           }}
           initial={{
-            x: i === 0 ? '-25%' : i === 1 ? '75%' : '40%',
-            y: i === 0 ? '10%' : i === 1 ? '60%' : '-10%',
+            x: orb.x[0],
+            y: orb.y[0],
           }}
           animate={{
-            x: i === 0 ? '-15%' : i === 1 ? '85%' : '50%',
-            y: i === 0 ? '20%' : i === 1 ? '70%' : '0%',
+            x: orb.x[1],
+            y: orb.y[1],
           }}
           transition={{
-            duration: 20 + i * 5,
+            duration: orb.duration,
             repeat: Infinity,
             repeatType: "reverse",
             ease: "easeInOut",
@@ -54,7 +60,8 @@ const FloatingOrbs = () => {
       ))}
     </div>
   )
-}
+})
+FloatingOrbs.displayName = "FloatingOrbs"
 
 function LoginContent() {
   const router = useRouter()
@@ -724,33 +731,45 @@ function LoginContent() {
     ]
   )
 
-  // Estatística animada (estilo Apple)
-  const StatItem = ({ value, label, delay }: { value: string, label: string, delay: number }) => (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, delay, ease: [0.16, 1, 0.3, 1] }}
-      className="text-center"
-    >
+  // Estatística animada otimizada (estilo Apple)
+  const StatItem = memo(({ value, label, delay }: { value: string, label: string, delay: number }) => {
+    const shouldReduceMotion = useReducedMotion()
+    return (
       <motion.div
-        className="text-4xl md:text-5xl font-bold bg-gradient-to-br from-white via-white to-white/70 bg-clip-text text-transparent mb-2"
-        whileHover={{ scale: 1.05 }}
-        transition={{ type: "spring", stiffness: 400, damping: 10 }}
+        initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: shouldReduceMotion ? 0 : 0.6, delay: shouldReduceMotion ? 0 : delay, ease: [0.16, 1, 0.3, 1] }}
+        className="text-center"
       >
-        {value}
+        <motion.div
+          className="text-4xl md:text-5xl font-bold bg-gradient-to-br from-white via-white to-white/70 bg-clip-text text-transparent mb-2"
+          whileHover={shouldReduceMotion ? {} : { scale: 1.05 }}
+          transition={{ type: "spring", stiffness: 400, damping: 10 }}
+        >
+          {value}
+        </motion.div>
+        <div className="text-sm md:text-base text-white/60 font-light tracking-wide">
+          {label}
+        </div>
       </motion.div>
-      <div className="text-sm md:text-base text-white/60 font-light tracking-wide">
-        {label}
-      </div>
-    </motion.div>
-  )
+    )
+  })
+  StatItem.displayName = "StatItem"
+
+  // Memoizar valores computados para performance
+  const isFormValid = useMemo(() => emailValid && passwordValid, [emailValid, passwordValid])
+  const canSubmit = useMemo(() => !loading && !transitioning && isFormValid, [loading, transitioning, isFormValid])
+  const shouldReduceMotion = useReducedMotion()
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row relative overflow-hidden bg-gray-100 lg:bg-black w-full max-w-full">
-      {/* Background com efeitos sutis (somente desktop) */}
-      <div className="absolute inset-0 hidden lg:block">
+      {/* Background com efeitos sutis otimizados (somente desktop) */}
+      <div className="absolute inset-0 hidden lg:block" aria-hidden="true">
         <FloatingOrbs />
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_at_center,black_20%,transparent_80%)]" />
+        <div 
+          className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_at_center,black_20%,transparent_80%)]"
+          style={{ willChange: 'auto' }}
+        />
       </div>
 
       {/* Seção Esquerda - Hero Minimalista */}
@@ -773,47 +792,53 @@ function LoginContent() {
               transition={{ duration: 0.6 }}
               className="relative inline-block"
             >
-              {/* Glow effect animado */}
-              <motion.div
-                className="absolute inset-0 rounded-[40px] blur-3xl"
-                animate={{
-                  background: [
-                    "radial-gradient(circle, rgba(249,115,22,0.4) 0%, transparent 70%)",
-                    "radial-gradient(circle, rgba(249,115,22,0.6) 0%, transparent 70%)",
-                    "radial-gradient(circle, rgba(249,115,22,0.4) 0%, transparent 70%)",
-                  ],
-                  scale: [1, 1.1, 1],
-                }}
-                transition={{
-                  duration: 3,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
-              />
+              {/* Glow effect animado otimizado */}
+              {!shouldReduceMotion && (
+                <motion.div
+                  className="absolute inset-0 rounded-[40px] blur-3xl will-change-transform"
+                  animate={{
+                    background: [
+                      "radial-gradient(circle, rgba(249,115,22,0.4) 0%, transparent 70%)",
+                      "radial-gradient(circle, rgba(249,115,22,0.6) 0%, transparent 70%)",
+                      "radial-gradient(circle, rgba(249,115,22,0.4) 0%, transparent 70%)",
+                    ],
+                    scale: [1, 1.1, 1],
+                  }}
+                  transition={{
+                    duration: 3,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
+                />
+              )}
 
               {/* Border gradient animado */}
               <div className="relative w-32 h-32 rounded-[40px] bg-gradient-to-br from-[#F97316] via-[#FB923C] to-[#EA580C] p-[3px] shadow-2xl shadow-orange-500/50">
                 <div className="w-full h-full rounded-[37px] bg-black flex items-center justify-center relative overflow-hidden">
-                  {/* Shine effect */}
-                  <motion.div
-                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                    animate={{
-                      x: ['-200%', '200%'],
-                    }}
-                    transition={{
-                      duration: 3,
-                      repeat: Infinity,
-                      repeatDelay: 1,
-                      ease: "easeInOut",
-                    }}
-                  />
+                  {/* Shine effect otimizado */}
+                  {!shouldReduceMotion && (
+                    <motion.div
+                      className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent will-change-transform"
+                      animate={{
+                        x: ['-200%', '200%'],
+                      }}
+                      transition={{
+                        duration: 3,
+                        repeat: Infinity,
+                        repeatDelay: 1,
+                        ease: "easeInOut",
+                      }}
+                    />
+                  )}
 
-                  {/* Logo */}
+                  {/* Logo otimizado */}
                   <motion.img
                     src="/icons/golf_fox_logo.svg"
                     alt="Golf Fox"
                     className="w-20 h-20 relative z-10 drop-shadow-2xl"
-                    animate={{
+                    loading="eager"
+                    fetchPriority="high"
+                    animate={shouldReduceMotion ? {} : {
                       filter: [
                         "drop-shadow(0 0 20px rgba(249,115,22,0.5))",
                         "drop-shadow(0 0 30px rgba(249,115,22,0.7))",
@@ -829,56 +854,58 @@ function LoginContent() {
                 </div>
               </div>
 
-              {/* Pulse ring effect */}
-              <motion.div
-                className="absolute inset-0 rounded-[40px] border-2 border-orange-500/30"
-                animate={{
-                  scale: [1, 1.2, 1],
-                  opacity: [0.5, 0, 0.5],
-                }}
-                transition={{
-                  duration: 2,
-                  repeat: Infinity,
-                  ease: "easeOut",
-                }}
-              />
+              {/* Pulse ring effect otimizado */}
+              {!shouldReduceMotion && (
+                <motion.div
+                  className="absolute inset-0 rounded-[40px] border-2 border-orange-500/30 will-change-transform"
+                  animate={{
+                    scale: [1, 1.2, 1],
+                    opacity: [0.5, 0, 0.5],
+                  }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: "easeOut",
+                  }}
+                />
+              )}
             </motion.div>
           </motion.div>
 
-          {/* Headline minimalista (estilo Apple) */}
+          {/* Headline ultra premium (estilo Apple) */}
           <motion.h1
-            initial={{ opacity: 0, y: 20 }}
+            initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: shouldReduceMotion ? 0 : 0.8, delay: shouldReduceMotion ? 0 : 0.2, ease: [0.16, 1, 0.3, 1] }}
             className="text-5xl xl:text-7xl font-bold mb-8 leading-[1.1] tracking-tight"
           >
             <span className="text-white">O futuro do</span>
             <br />
-            <span className="bg-gradient-to-r from-[#F97316] via-[#FB923C] to-[#FDBA74] bg-clip-text text-transparent">
+            <span className={`bg-gradient-to-r from-[#F97316] via-[#FB923C] to-[#FDBA74] bg-clip-text text-transparent ${!shouldReduceMotion ? 'bg-[length:200%_100%] animate-[gradient-shift_3s_ease_infinite]' : ''}`}>
               transporte corporativo
             </span>
           </motion.h1>
 
-          {/* Subtítulo clean */}
+          {/* Subtítulo premium */}
           <motion.p
-            initial={{ opacity: 0, y: 20 }}
+            initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            className="text-xl text-white/60 mb-16 font-light leading-relaxed max-w-xl mx-auto"
+            transition={{ duration: shouldReduceMotion ? 0 : 0.8, delay: shouldReduceMotion ? 0 : 0.3, ease: [0.16, 1, 0.3, 1] }}
+            className="text-xl text-white/70 mb-16 font-light leading-relaxed max-w-xl mx-auto"
           >
             Gerencie frotas, otimize rotas e monitore operações em tempo real com inteligência artificial.
           </motion.p>
 
-          {/* Estatísticas (estilo Nike/Tesla) */}
+          {/* Estatísticas premium (estilo Nike/Tesla) */}
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: shouldReduceMotion ? 0 : 0.8, delay: shouldReduceMotion ? 0 : 0.4, ease: [0.16, 1, 0.3, 1] }}
             className="grid grid-cols-3 gap-8 pt-12 border-t border-white/10"
           >
-            <StatItem value="24/7" label="Monitoramento" delay={0.5} />
-            <StatItem value="100%" label="Rastreável" delay={0.6} />
-            <StatItem value="< 1s" label="Tempo Real" delay={0.7} />
+            <StatItem value="24/7" label="Monitoramento" delay={shouldReduceMotion ? 0 : 0.5} />
+            <StatItem value="100%" label="Rastreável" delay={shouldReduceMotion ? 0 : 0.6} />
+            <StatItem value="< 1s" label="Tempo Real" delay={shouldReduceMotion ? 0 : 0.7} />
           </motion.div>
         </div>
       </motion.div>
@@ -905,19 +932,35 @@ function LoginContent() {
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
             className="w-full max-w-md mx-auto min-w-0"
           >
-            {/* Mobile: Card wrapper */}
-            <div className="lg:hidden bg-white rounded-3xl shadow-xl p-8 mb-8">
-              <div className="relative w-full min-w-0">
-                {/* Logo mobile - apenas texto GOLF FOX */}
+            {/* Mobile: Card wrapper Premium */}
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+              className="lg:hidden bg-gradient-to-br from-white via-white to-[var(--bg-soft)] rounded-3xl shadow-2xl border border-[var(--border)] p-6 sm:p-8 mb-8 relative overflow-hidden"
+            >
+              {/* Background pattern sutil */}
+              <div className="absolute inset-0 opacity-[0.02] bg-[radial-gradient(circle_at_1px_1px,rgb(0,0,0)_1px,transparent_0)] bg-[length:24px_24px]" />
+              
+              <div className="relative w-full min-w-0 z-10">
+                {/* Logo mobile Premium */}
                 <motion.div
-                  initial={{ opacity: 0, scale: 0.8 }}
+                  initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                  transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
                   className="lg:hidden mb-8 text-center"
                 >
-                  <h2 className="text-2xl font-bold text-gray-900">
-                    GOLF FOX
-                  </h2>
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    className="inline-flex items-center justify-center gap-3 mb-4"
+                  >
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#1E3A5F] via-[#2D4A6B] to-[var(--brand)] flex items-center justify-center shadow-lg">
+                      <span className="text-white font-bold text-xl">G</span>
+                    </div>
+                    <h2 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-[var(--ink-strong)] to-[var(--brand)] bg-clip-text text-transparent">
+                      GOLF FOX
+                    </h2>
+                  </motion.div>
                 </motion.div>
 
                 {/* Mobile: Loading overlay */}
@@ -946,49 +989,56 @@ function LoginContent() {
                   )}
                 </AnimatePresence>
 
-                {/* Mobile: Título */}
-                <div className="lg:hidden mb-6">
-                  <h1 className="text-3xl font-bold text-gray-900 mb-2 tracking-tight">
+                {/* Mobile: Título Premium */}
+                <motion.div 
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.1 }}
+                  className="lg:hidden mb-8"
+                >
+                  <h1 className="text-3xl sm:text-4xl font-bold text-[var(--ink-strong)] mb-3 tracking-tight">
                     Entre em sua conta
                   </h1>
-                  <p className="text-base text-gray-600 leading-relaxed">
+                  <p className="text-base sm:text-lg text-[var(--ink-muted)] leading-relaxed font-light">
                     Acesse sua frota com inteligência e controle total.
                   </p>
-                </div>
+                </motion.div>
 
-                {/* Mobile: Mensagens */}
-                <div className="lg:hidden">
+                {/* Mobile: Mensagens Premium */}
+                <div className="lg:hidden mb-6">
                   <AnimatePresence mode="wait">
-                    {/* Password requirement warning (from mockup) - shown when no errors */}
-
-
                     {error && (
                       <motion.div
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
-                        className="mb-6 p-4 bg-red-50/50 border border-red-100 rounded-xl text-sm text-red-600"
+                        initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                        className="p-4 bg-gradient-to-r from-[var(--error-light)] to-red-50/80 border-2 border-[var(--error)]/20 rounded-2xl text-sm text-[var(--error)] shadow-sm backdrop-blur-sm"
                         role="alert"
                       >
-                        {error}
+                        <div className="flex items-start gap-3">
+                          <div className="w-5 h-5 rounded-full bg-[var(--error)] flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <span className="text-white text-xs font-bold">!</span>
+                          </div>
+                          <p className="flex-1 font-medium">{error}</p>
+                        </div>
                       </motion.div>
                     )}
 
                     {success && !error && (
                       <motion.div
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
-                        className="mb-6 p-4 bg-green-50/50 border border-green-100 rounded-xl text-sm text-green-600 flex items-center gap-2"
+                        initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                        className="p-4 bg-gradient-to-r from-[var(--success-light)] to-green-50/80 border-2 border-[var(--success)]/20 rounded-2xl text-sm text-[var(--success)] shadow-sm backdrop-blur-sm flex items-center gap-3"
                       >
-                        <Sparkles className="w-4 h-4 flex-shrink-0" />
-                        <span>Login realizado com sucesso!</span>
+                        <Sparkles className="w-5 h-5 flex-shrink-0" />
+                        <span className="font-medium">Login realizado com sucesso!</span>
                       </motion.div>
                     )}
                   </AnimatePresence>
                 </div>
 
-                {/* Mobile: Formulário */}
+                {/* Mobile: Formulário Premium */}
                 <form
                   onSubmit={(e) => {
                     e.preventDefault()
@@ -996,18 +1046,26 @@ function LoginContent() {
                       handleLogin()
                     }
                   }}
-                  className="lg:hidden space-y-4"
+                  className="lg:hidden space-y-5"
                 >
-                  {/* Campo Email */}
-                  <div className="space-y-2">
-                    <label className="block text-sm font-medium text-gray-700" htmlFor="login-email">
+                  {/* Campo Email Premium */}
+                  <motion.div 
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.4, delay: 0.2 }}
+                    className="space-y-2"
+                  >
+                    <label className="block text-sm font-semibold text-[var(--ink-strong)] mb-2" htmlFor="login-email">
                       E-mail
                     </label>
-                    <div className="relative">
-                      {/* Mail Icon */}
-                      <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
+                    <div className="relative group">
+                      {/* Mail Icon Premium */}
+                      <motion.div 
+                        className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--ink-muted)] pointer-events-none z-10 transition-colors"
+                        animate={emailValid ? { color: 'var(--brand)' } : {}}
+                      >
                         <Mail className="h-5 w-5" />
-                      </div>
+                      </motion.div>
 
                       <Input
                         id="login-email"
@@ -1023,34 +1081,49 @@ function LoginContent() {
                           }
                         }}
                         autoComplete="email"
-                        className={`w-full h-12 pl-11 pr-3 bg-blue-50/50 border ${fieldErrors.email
-                          ? "border-red-300 focus:border-red-500 focus:ring-red-200"
-                          : "border-blue-100 focus:border-[#F97316] focus:ring-orange-100"
-                          } rounded-xl text-base transition-all focus:ring-2 focus:bg-white placeholder:text-gray-400`}
+                        className={`w-full h-14 pl-12 pr-4 bg-gradient-to-br from-[var(--bg-soft)] to-[var(--bg)] border-2 ${fieldErrors.email
+                          ? "border-[var(--error)] focus:border-[var(--error)] focus:ring-2 focus:ring-[var(--error)]/20 shadow-[0_0_0_4px_rgba(239,68,68,0.1)]"
+                          : emailValid
+                          ? "border-[var(--brand)] focus:border-[var(--brand)] focus:ring-2 focus:ring-[var(--brand)]/20 shadow-[var(--shadow-brand)]"
+                          : "border-[var(--border)] focus:border-[var(--brand)] focus:ring-2 focus:ring-[var(--brand)]/20 hover:border-[var(--border-strong)]"
+                          } rounded-2xl text-base transition-all duration-300 focus:bg-white placeholder:text-[var(--ink-muted)] font-medium`}
                       />
                       {fieldErrors.email && (
-                        <p className="mt-2 text-xs text-red-600" aria-live="assertive">
-                          {fieldErrors.email}
-                        </p>
+                        <motion.p 
+                          initial={{ opacity: 0, y: -5 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="mt-2 text-xs text-[var(--error)] font-medium flex items-center gap-1" 
+                          aria-live="assertive"
+                        >
+                          <span>⚠</span> {fieldErrors.email}
+                        </motion.p>
                       )}
                     </div>
-                  </div>
+                  </motion.div>
 
-                  {/* Campo Senha */}
-                  <div className="space-y-2">
-                    <label className="block text-sm font-medium text-gray-700" htmlFor="login-password">
+                  {/* Campo Senha Premium */}
+                  <motion.div 
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.4, delay: 0.3 }}
+                    className="space-y-2"
+                  >
+                    <label className="block text-sm font-semibold text-[var(--ink-strong)] mb-2" htmlFor="login-password">
                       Senha
                     </label>
-                    <div className="relative">
-                      {/* Lock Icon */}
-                      <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none z-10">
+                    <div className="relative group">
+                      {/* Lock Icon Premium */}
+                      <motion.div 
+                        className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--ink-muted)] pointer-events-none z-10 transition-colors"
+                        animate={passwordValid ? { color: 'var(--brand)' } : {}}
+                      >
                         <Lock className="h-5 w-5" />
-                      </div>
+                      </motion.div>
 
                       <Input
                         id="login-password"
                         type={showPassword ? "text" : "password"}
-                        placeholder="senha123"
+                        placeholder="Digite sua senha"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         onKeyDown={(e) => {
@@ -1061,85 +1134,140 @@ function LoginContent() {
                         }}
                         ref={passwordInputRef}
                         autoComplete="current-password"
-                        className={`w-full h-12 pl-11 pr-12 bg-blue-50/50 border ${fieldErrors.password
-                          ? "border-red-300 focus:border-red-500 focus:ring-red-200"
-                          : "border-blue-100 focus:border-[#F97316] focus:ring-orange-100"
-                          } rounded-xl text-base transition-all focus:ring-2 focus:bg-white placeholder:text-gray-400`}
+                        className={`w-full h-14 pl-12 pr-14 bg-gradient-to-br from-[var(--bg-soft)] to-[var(--bg)] border-2 ${fieldErrors.password
+                          ? "border-[var(--error)] focus:border-[var(--error)] focus:ring-2 focus:ring-[var(--error)]/20 shadow-[0_0_0_4px_rgba(239,68,68,0.1)]"
+                          : passwordValid
+                          ? "border-[var(--brand)] focus:border-[var(--brand)] focus:ring-2 focus:ring-[var(--brand)]/20 shadow-[var(--shadow-brand)]"
+                          : "border-[var(--border)] focus:border-[var(--brand)] focus:ring-2 focus:ring-[var(--brand)]/20 hover:border-[var(--border-strong)]"
+                          } rounded-2xl text-base transition-all duration-300 focus:bg-white placeholder:text-[var(--ink-muted)] font-medium`}
                       />
-                      <button
+                      <motion.button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 transition-colors h-8 w-8 flex items-center justify-center rounded-lg hover:bg-gray-100 z-10"
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--ink-muted)] hover:text-[var(--brand)] transition-colors h-9 w-9 flex items-center justify-center rounded-xl hover:bg-[var(--bg-hover)] z-10 touch-manipulation"
                         aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
                       >
-                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                      </button>
+                        {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                      </motion.button>
                       {fieldErrors.password && (
-                        <p className="mt-2 text-xs text-red-600" aria-live="assertive">
-                          {fieldErrors.password}
-                        </p>
+                        <motion.p 
+                          initial={{ opacity: 0, y: -5 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="mt-2 text-xs text-[var(--error)] font-medium flex items-center gap-1" 
+                          aria-live="assertive"
+                        >
+                          <span>⚠</span> {fieldErrors.password}
+                        </motion.p>
                       )}
                     </div>
+                  </motion.div>
 
-                    {/* Password requirement hint (from mockup) */}
-
-                  </div>
-
-                  {/* Opções extras */}
-                  <div className="flex items-center justify-between text-sm w-full">
-                    <label className="flex items-center gap-2 cursor-pointer group touch-manipulation flex-nowrap">
+                  {/* Opções extras Premium */}
+                  <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.4, delay: 0.4 }}
+                    className="flex items-center justify-between text-sm w-full"
+                  >
+                    <motion.label 
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      className="flex items-center gap-3 cursor-pointer group touch-manipulation flex-nowrap"
+                    >
                       <Checkbox
                         id="remember-me"
                         checked={rememberMe}
                         onCheckedChange={(checked) => setRememberMe(checked === true)}
-                        className="h-5 w-5 rounded border-gray-300 data-[state=checked]:bg-[#F97316] data-[state=checked]:border-[#F97316]"
+                        className="h-5 w-5 rounded-lg border-2 border-[var(--border)] data-[state=checked]:bg-[var(--brand)] data-[state=checked]:border-[var(--brand)] transition-all duration-200"
                       />
-                      <span className="whitespace-nowrap text-gray-600 group-hover:text-gray-900 transition-colors">
+                      <span className="whitespace-nowrap text-[var(--ink-muted)] group-hover:text-[var(--ink-strong)] transition-colors font-medium">
                         Manter conectado
                       </span>
-                    </label>
-                    <button
+                    </motion.label>
+                    <motion.button
                       type="button"
                       onClick={() => setError("Funcionalidade em desenvolvimento")}
-                      className="text-[#F97316] hover:text-[#EA580C] font-medium transition-colors touch-manipulation text-sm whitespace-nowrap"
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="text-[var(--brand)] hover:text-[var(--brand-hover)] font-semibold transition-colors touch-manipulation text-sm whitespace-nowrap"
                     >
                       Esqueceu sua senha?
-                    </button>
-                  </div>
+                    </motion.button>
+                  </motion.div>
 
-                  {/* Botão de Login Premium */}
-                  <motion.div whileHover={{ scale: loading || transitioning ? 1 : 1.01 }} whileTap={{ scale: loading || transitioning ? 1 : 0.99 }}>
+                  {/* Botão de Login Ultra Premium Otimizado */}
+                  <motion.div 
+                    initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: shouldReduceMotion ? 0 : 0.4, delay: shouldReduceMotion ? 0 : 0.5 }}
+                    whileHover={canSubmit && !shouldReduceMotion ? { scale: 1.02 } : {}} 
+                    whileTap={canSubmit && !shouldReduceMotion ? { scale: 0.98 } : {}}
+                  >
                     <Button
                       type="submit"
-                      disabled={loading || transitioning}
-                      className="w-full h-12 bg-gradient-to-r from-[#F97316] to-[#EA580C] hover:from-[#EA580C] hover:to-[#F97316] text-white font-semibold text-base shadow-lg shadow-orange-500/20 hover:shadow-xl hover:shadow-orange-500/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl relative overflow-hidden group touch-manipulation"
+                      disabled={!canSubmit}
+                      className="w-full h-14 bg-gradient-to-r from-[var(--brand)] via-[var(--brand-hover)] to-[var(--brand)] bg-[length:200%_100%] hover:bg-[position:100%_0] text-white font-bold text-base shadow-[var(--shadow-brand-lg)] hover:shadow-[var(--shadow-brand-lg)] transition-all duration-500 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none rounded-2xl relative overflow-hidden group touch-manipulation will-change-transform"
                     >
+                      {/* Shimmer effect otimizado */}
+                      {!shouldReduceMotion && !loading && !transitioning && (
+                        <motion.div
+                          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent will-change-transform"
+                          animate={{
+                            x: ['-200%', '200%'],
+                          }}
+                          transition={{
+                            duration: 2,
+                            repeat: Infinity,
+                            repeatDelay: 1,
+                            ease: "easeInOut",
+                          }}
+                        />
+                      )}
                       {loading || transitioning ? (
-                        <span className="flex items-center justify-center gap-2">
+                        <span className="flex items-center justify-center gap-3 relative z-10">
                           <motion.span
                             animate={{ rotate: 360 }}
                             transition={{ duration: 0.8, repeat: Infinity, ease: "linear" }}
-                            className="rounded-full h-4 w-4 border-2 border-white/30 border-t-white"
+                            className="rounded-full h-5 w-5 border-2 border-white/30 border-t-white"
                           />
-                          {transitioning ? "Entrando..." : "Autenticando"}
+                          <span className="font-semibold">{transitioning ? "Entrando..." : "Autenticando"}</span>
                         </span>
                       ) : (
-                        <span className="flex items-center justify-center gap-2">
-                          Entrar
-                          <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                        <span className="flex items-center justify-center gap-3 relative z-10">
+                          <span className="font-bold">Entrar</span>
+                          {!shouldReduceMotion && (
+                            <motion.div
+                              animate={{ x: [0, 4, 0] }}
+                              transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                            >
+                              <ArrowRight className="w-5 h-5" />
+                            </motion.div>
+                          )}
+                          {shouldReduceMotion && <ArrowRight className="w-5 h-5" />}
                         </span>
                       )}
                     </Button>
                   </motion.div>
                 </form>
 
-                {/* Footer */}
-                <div className="mt-8 sm:mt-10 md:mt-12 text-center">
-                  <p className="text-xs sm:text-sm text-gray-500">
-                    Protegido por{" "}
-                    <span className="text-gray-700 font-medium">Golf Fox Security</span>
-                  </p>
-                </div>
+                {/* Footer Ultra Premium */}
+                <motion.div 
+                  initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: shouldReduceMotion ? 0 : 0.4, delay: shouldReduceMotion ? 0 : 0.6 }}
+                  className="mt-8 sm:mt-10 md:mt-12 text-center"
+                >
+                  <div className="flex items-center justify-center gap-2 text-xs sm:text-sm text-[var(--ink-muted)]">
+                    <Shield className="h-3 w-3 sm:h-4 sm:w-4 text-[var(--brand)]" />
+                    <p>
+                      Protegido por{" "}
+                      <span className="text-[var(--brand)] font-semibold">Golf Fox Security</span>
+                    </p>
+                    <Zap className="h-3 w-3 sm:h-4 sm:w-4 text-[var(--brand)] opacity-60" />
+                  </div>
+                </motion.div>
 
                 <noscript>
                   <p className="mt-6 text-xs text-center text-gray-500">
@@ -1177,39 +1305,49 @@ function LoginContent() {
                 )}
               </AnimatePresence>
 
-              {/* Título minimalista */}
-              <div className="mb-8 sm:mb-10 md:mb-12">
-                <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-2 sm:mb-3 tracking-tight">
+              {/* Título Premium */}
+              <motion.div 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                className="mb-8 sm:mb-10 md:mb-12"
+              >
+                <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-[var(--ink-strong)] mb-2 sm:mb-3 tracking-tight">
                   Entrar
                 </h1>
-                <p className="text-base sm:text-lg text-gray-500 font-light">
+                <p className="text-base sm:text-lg text-[var(--ink-muted)] font-light">
                   Acesse sua conta Golf Fox
                 </p>
-              </div>
+              </motion.div>
 
-              {/* Mensagens minimalistas */}
+              {/* Mensagens Premium */}
               <AnimatePresence mode="wait">
                 {error && (
                   <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    className="mb-6 sm:mb-8 p-3 sm:p-4 bg-red-50/50 border border-red-100 rounded-xl sm:rounded-2xl text-xs sm:text-sm text-red-600"
+                    initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                    className="mb-6 sm:mb-8 p-4 bg-gradient-to-r from-[var(--error-light)] to-red-50/80 border-2 border-[var(--error)]/20 rounded-2xl text-xs sm:text-sm text-[var(--error)] shadow-sm backdrop-blur-sm"
                     role="alert"
                   >
-                    {error}
+                    <div className="flex items-start gap-3">
+                      <div className="w-5 h-5 rounded-full bg-[var(--error)] flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <span className="text-white text-xs font-bold">!</span>
+                      </div>
+                      <p className="flex-1 font-medium">{error}</p>
+                    </div>
                   </motion.div>
                 )}
 
                 {success && !error && (
                   <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    className="mb-6 sm:mb-8 p-3 sm:p-4 bg-green-50/50 border border-green-100 rounded-xl sm:rounded-2xl text-xs sm:text-sm text-green-600 flex items-center gap-2"
+                    initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                    className="mb-6 sm:mb-8 p-4 bg-gradient-to-r from-[var(--success-light)] to-green-50/80 border-2 border-[var(--success)]/20 rounded-2xl text-xs sm:text-sm text-[var(--success)] shadow-sm backdrop-blur-sm flex items-center gap-3"
                   >
-                    <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
-                    <span>Login realizado com sucesso!</span>
+                    <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+                    <span className="font-medium">Login realizado com sucesso!</span>
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -1224,14 +1362,26 @@ function LoginContent() {
                 }}
                 className="form-responsive space-y-4 sm:space-y-5 md:space-y-6"
               >
-                {/* Campo Email - Desktop */}
-                <div className="space-y-1.5 sm:space-y-2">
-                  <label className="block text-xs sm:text-sm font-medium text-gray-700" htmlFor="login-email-desktop">
+                {/* Campo Email - Desktop Premium */}
+                <motion.div 
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.4, delay: 0.2 }}
+                  className="space-y-2"
+                >
+                  <label className="block text-sm font-semibold text-[var(--ink-strong)] mb-2" htmlFor="login-email-desktop">
                     E-mail
                   </label>
-                  <div className="relative">
+                  <div className="relative group">
+                    <motion.div 
+                      className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--ink-muted)] pointer-events-none z-10 transition-colors"
+                      animate={emailValid ? { color: 'var(--brand)' } : {}}
+                    >
+                      <Mail className="h-5 w-5" />
+                    </motion.div>
                     <Input
                       id="login-email-desktop"
+                      ref={emailInputRef}
                       type="email"
                       placeholder="nome@empresa.com"
                       value={email}
@@ -1243,25 +1393,43 @@ function LoginContent() {
                         }
                       }}
                       autoComplete="email"
-                      className={`w-full h-12 sm:h-14 px-3 sm:px-4 bg-gray-50 border ${fieldErrors.email
-                        ? "border-red-300 focus:border-red-500 focus:ring-red-200"
-                        : "border-gray-200 focus:border-[#F97316] focus:ring-orange-100"
-                        } rounded-xl sm:rounded-2xl text-base transition-all focus:ring-2 focus:bg-white placeholder:text-gray-400`}
+                      className={`w-full h-14 pl-12 pr-4 bg-gradient-to-br from-[var(--bg-soft)] to-[var(--bg)] border-2 ${fieldErrors.email
+                        ? "border-[var(--error)] focus:border-[var(--error)] focus:ring-2 focus:ring-[var(--error)]/20 shadow-[0_0_0_4px_rgba(239,68,68,0.1)]"
+                        : emailValid
+                        ? "border-[var(--brand)] focus:border-[var(--brand)] focus:ring-2 focus:ring-[var(--brand)]/20 shadow-[var(--shadow-brand)]"
+                        : "border-[var(--border)] focus:border-[var(--brand)] focus:ring-2 focus:ring-[var(--brand)]/20 hover:border-[var(--border-strong)]"
+                        } rounded-2xl text-base transition-all duration-300 focus:bg-white placeholder:text-[var(--ink-muted)] font-medium`}
                     />
                     {fieldErrors.email && (
-                      <p className="mt-2 text-xs text-red-600" aria-live="assertive">
-                        {fieldErrors.email}
-                      </p>
+                      <motion.p 
+                        initial={{ opacity: 0, y: -5 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="mt-2 text-xs text-[var(--error)] font-medium flex items-center gap-1" 
+                        aria-live="assertive"
+                      >
+                        <span>⚠</span> {fieldErrors.email}
+                      </motion.p>
                     )}
                   </div>
-                </div>
+                </motion.div>
 
-                {/* Campo Senha - Desktop */}
-                <div className="space-y-1.5 sm:space-y-2">
-                  <label className="block text-xs sm:text-sm font-medium text-gray-700" htmlFor="login-password-desktop">
+                {/* Campo Senha - Desktop Premium */}
+                <motion.div 
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.4, delay: 0.3 }}
+                  className="space-y-2"
+                >
+                  <label className="block text-sm font-semibold text-[var(--ink-strong)] mb-2" htmlFor="login-password-desktop">
                     Senha
                   </label>
-                  <div className="relative">
+                  <div className="relative group">
+                    <motion.div 
+                      className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--ink-muted)] pointer-events-none z-10 transition-colors"
+                      animate={passwordValid ? { color: 'var(--brand)' } : {}}
+                    >
+                      <Lock className="h-5 w-5" />
+                    </motion.div>
                     <Input
                       id="login-password-desktop"
                       type={showPassword ? "text" : "password"}
@@ -1274,83 +1442,142 @@ function LoginContent() {
                           handleLogin()
                         }
                       }}
+                      ref={passwordInputRef}
                       autoComplete="current-password"
-                      className={`w-full h-12 sm:h-14 px-3 sm:px-4 pr-12 sm:pr-14 bg-gray-50 border ${fieldErrors.password
-                        ? "border-red-300 focus:border-red-500 focus:ring-red-200"
-                        : "border-gray-200 focus:border-[#F97316] focus:ring-orange-100"
-                        } rounded-xl sm:rounded-2xl text-base transition-all focus:ring-2 focus:bg-white placeholder:text-gray-400`}
+                      className={`w-full h-14 pl-12 pr-14 bg-gradient-to-br from-[var(--bg-soft)] to-[var(--bg)] border-2 ${fieldErrors.password
+                        ? "border-[var(--error)] focus:border-[var(--error)] focus:ring-2 focus:ring-[var(--error)]/20 shadow-[0_0_0_4px_rgba(239,68,68,0.1)]"
+                        : passwordValid
+                        ? "border-[var(--brand)] focus:border-[var(--brand)] focus:ring-2 focus:ring-[var(--brand)]/20 shadow-[var(--shadow-brand)]"
+                        : "border-[var(--border)] focus:border-[var(--brand)] focus:ring-2 focus:ring-[var(--brand)]/20 hover:border-[var(--border-strong)]"
+                        } rounded-2xl text-base transition-all duration-300 focus:bg-white placeholder:text-[var(--ink-muted)] font-medium`}
                     />
-                    <button
+                    <motion.button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 transition-colors h-8 w-8 flex items-center justify-center rounded-lg hover:bg-gray-100 z-10"
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--ink-muted)] hover:text-[var(--brand)] transition-colors h-9 w-9 flex items-center justify-center rounded-xl hover:bg-[var(--bg-hover)] z-10 touch-manipulation"
                       aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
                     >
-                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                    </button>
+                      {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                    </motion.button>
                     {fieldErrors.password && (
-                      <p className="mt-2 text-xs text-red-600" aria-live="assertive">
-                        {fieldErrors.password}
-                      </p>
+                      <motion.p 
+                        initial={{ opacity: 0, y: -5 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="mt-2 text-xs text-[var(--error)] font-medium flex items-center gap-1" 
+                        aria-live="assertive"
+                      >
+                        <span>⚠</span> {fieldErrors.password}
+                      </motion.p>
                     )}
                   </div>
-                </div>
+                </motion.div>
 
-                {/* Opções extras - Desktop */}
-                <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-0 text-xs sm:text-sm w-full">
-                  <label className="flex items-center gap-2 cursor-pointer group touch-manipulation flex-nowrap">
+                {/* Opções extras - Desktop Premium */}
+                <motion.div 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.4, delay: 0.4 }}
+                  className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-0 text-sm w-full"
+                >
+                  <motion.label 
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="flex items-center gap-3 cursor-pointer group touch-manipulation flex-nowrap"
+                  >
                     <Checkbox
                       id="remember-me-desktop"
                       checked={rememberMe}
                       onCheckedChange={(checked) => setRememberMe(checked === true)}
-                      className="h-5 w-5 rounded border-gray-300 data-[state=checked]:bg-[#F97316] data-[state=checked]:border-[#F97316]"
+                      className="h-5 w-5 rounded-lg border-2 border-[var(--border)] data-[state=checked]:bg-[var(--brand)] data-[state=checked]:border-[var(--brand)] transition-all duration-200"
                     />
-                    <span className="whitespace-nowrap text-gray-600 group-hover:text-gray-900 transition-colors">
+                    <span className="whitespace-nowrap text-[var(--ink-muted)] group-hover:text-[var(--ink-strong)] transition-colors font-medium">
                       Lembrar-me
                     </span>
-                  </label>
-                  <button
+                  </motion.label>
+                  <motion.button
                     type="button"
                     onClick={() => setError("Funcionalidade em desenvolvimento")}
-                    className="text-gray-600 hover:text-gray-900 transition-colors touch-manipulation text-xs sm:text-sm whitespace-nowrap"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="text-[var(--brand)] hover:text-[var(--brand-hover)] font-semibold transition-colors touch-manipulation text-sm whitespace-nowrap"
                   >
                     Esqueceu a senha?
-                  </button>
-                </div>
+                  </motion.button>
+                </motion.div>
 
-                {/* Botão de Login Premium - Desktop */}
-                <motion.div whileHover={{ scale: loading || transitioning ? 1 : 1.01 }} whileTap={{ scale: loading || transitioning ? 1 : 0.99 }}>
+                {/* Botão de Login Ultra Premium - Desktop Otimizado */}
+                <motion.div 
+                  initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: shouldReduceMotion ? 0 : 0.4, delay: shouldReduceMotion ? 0 : 0.5 }}
+                  whileHover={canSubmit && !shouldReduceMotion ? { scale: 1.02 } : {}} 
+                  whileTap={canSubmit && !shouldReduceMotion ? { scale: 0.98 } : {}}
+                >
                   <Button
                     type="submit"
-                    disabled={loading || transitioning}
-                    className="w-full h-12 sm:h-14 bg-gradient-to-r from-[#F97316] to-[#EA580C] hover:from-[#EA580C] hover:to-[#F97316] text-white font-semibold text-sm sm:text-base shadow-lg shadow-orange-500/20 hover:shadow-xl hover:shadow-orange-500/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl sm:rounded-2xl relative overflow-hidden group touch-manipulation"
+                    disabled={!canSubmit}
+                    className="w-full h-14 bg-gradient-to-r from-[var(--brand)] via-[var(--brand-hover)] to-[var(--brand)] bg-[length:200%_100%] hover:bg-[position:100%_0] text-white font-bold text-base shadow-[var(--shadow-brand-lg)] hover:shadow-[var(--shadow-brand-lg)] transition-all duration-500 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none rounded-2xl relative overflow-hidden group touch-manipulation will-change-transform"
                   >
+                    {/* Shimmer effect otimizado */}
+                    {!shouldReduceMotion && !loading && !transitioning && (
+                      <motion.div
+                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent will-change-transform"
+                        animate={{
+                          x: ['-200%', '200%'],
+                        }}
+                        transition={{
+                          duration: 2,
+                          repeat: Infinity,
+                          repeatDelay: 1,
+                          ease: "easeInOut",
+                        }}
+                      />
+                    )}
                     {loading || transitioning ? (
-                      <span className="flex items-center justify-center gap-2">
+                      <span className="flex items-center justify-center gap-3 relative z-10">
                         <motion.span
                           animate={{ rotate: 360 }}
                           transition={{ duration: 0.8, repeat: Infinity, ease: "linear" }}
-                          className="rounded-full h-4 w-4 border-2 border-white/30 border-t-white"
+                          className="rounded-full h-5 w-5 border-2 border-white/30 border-t-white"
                         />
-                        {transitioning ? "Entrando..." : "Autenticando"}
+                        <span className="font-semibold">{transitioning ? "Entrando..." : "Autenticando"}</span>
                       </span>
                     ) : (
-                      <span className="flex items-center justify-center gap-2">
-                        Entrar
-                        <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                      <span className="flex items-center justify-center gap-3 relative z-10">
+                        <span className="font-bold">Entrar</span>
+                        {!shouldReduceMotion && (
+                          <motion.div
+                            animate={{ x: [0, 4, 0] }}
+                            transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                          >
+                            <ArrowRight className="w-5 h-5" />
+                          </motion.div>
+                        )}
+                        {shouldReduceMotion && <ArrowRight className="w-5 h-5" />}
                       </span>
                     )}
                   </Button>
                 </motion.div>
               </form>
 
-              {/* Footer */}
-              <div className="mt-8 sm:mt-10 md:mt-12 text-center">
-                <p className="text-xs sm:text-sm text-gray-500">
-                  Protegido por{" "}
-                  <span className="text-gray-700 font-medium">Golf Fox Security</span>
-                </p>
-              </div>
+              {/* Footer Ultra Premium */}
+              <motion.div 
+                initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: shouldReduceMotion ? 0 : 0.4, delay: shouldReduceMotion ? 0 : 0.6 }}
+                className="mt-8 sm:mt-10 md:mt-12 text-center"
+              >
+                <div className="flex items-center justify-center gap-2 text-xs sm:text-sm text-[var(--ink-muted)]">
+                  <Shield className="h-3 w-3 sm:h-4 sm:w-4 text-[var(--brand)]" />
+                  <p>
+                    Protegido por{" "}
+                    <span className="text-[var(--brand)] font-semibold">Golf Fox Security</span>
+                  </p>
+                  <Zap className="h-3 w-3 sm:h-4 sm:w-4 text-[var(--brand)] opacity-60" />
+                </div>
+              </motion.div>
 
               <noscript>
                 <p className="mt-6 text-xs text-center text-gray-500">
