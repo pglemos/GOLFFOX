@@ -294,40 +294,16 @@ const CustomSidebarLink = ({
           }
         }}
       >
-        <div className={cn(
-          "relative flex items-center justify-center transition-all",
-          !open ? "w-10 h-10 rounded-full" : ""
-        )}>
-          {!open ? (
-            <div className={cn(
-              "w-10 h-10 rounded-full flex items-center justify-center transition-colors",
+        <div className="relative">
+          <Icon
+            className={cn(
+              "h-5 w-5 transition-colors flex-shrink-0",
+              "stroke-[1.5px]",
               isActive
-                ? (panel === 'operador' 
-                    ? "bg-orange-500 text-white" 
-                    : "bg-[#F97316] text-white")
-                : "bg-transparent hover:bg-gray-100 dark:hover:bg-gray-800"
-            )}>
-              <Icon
-                className={cn(
-                  "h-5 w-5 transition-colors flex-shrink-0",
-                  "stroke-[1.5px]",
-                  isActive
-                    ? "text-white"
-                    : (panel === 'operador' ? "text-gray-500 group-hover:text-orange-500" : "text-gray-500 group-hover:text-[#F97316]")
-                )}
-              />
-            </div>
-          ) : (
-            <Icon
-              className={cn(
-                "h-5 w-5 transition-colors flex-shrink-0",
-                "stroke-[1.5px]",
-                isActive
-                  ? (panel === 'operador' ? "text-orange-500" : "text-[#F97316]")
-                  : (panel === 'operador' ? "text-gray-500 group-hover:text-orange-500" : "text-gray-500 group-hover:text-[#F97316]")
-              )}
-            />
-          )}
+                ? (panel === 'operador' ? "text-orange-500" : "text-[#F97316]")
+                : (panel === 'operador' ? "text-gray-500 group-hover:text-orange-500" : "text-gray-500 group-hover:text-[#F97316]")
+            )}
+          />
           {showOperationalAlerts && open && (
             <div className="absolute -top-1 -right-1 flex gap-1">
               {showOperationalAlerts && <OperationalAlertsBadge />}
