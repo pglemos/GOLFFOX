@@ -922,7 +922,7 @@ function LoginContent() {
             initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: shouldReduceMotion ? 0 : 0.8, delay: shouldReduceMotion ? 0 : 0.4, ease: [0.16, 1, 0.3, 1] }}
-            className="grid grid-cols-3 gap-8 pt-12 border-t border-white/10"
+            className="grid grid-cols-3 gap-8 pt-12"
           >
             <StatItem value="24/7" label="Monitoramento" delay={shouldReduceMotion ? 0 : 0.5} />
             <StatItem value="100%" label="Rastreável" delay={shouldReduceMotion ? 0 : 0.6} />
@@ -984,27 +984,43 @@ function LoginContent() {
                   </motion.div>
                 </motion.div>
 
-                {/* Mobile: Loading overlay */}
+                {/* Mobile: Loading overlay moderno */}
                 <AnimatePresence>
                   {loading && (
                     <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      className="lg:hidden absolute inset-0 z-50 flex flex-col items-center justify-center bg-white/98 backdrop-blur-sm rounded-3xl"
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
+                      transition={{ duration: 0.2 }}
+                      className="lg:hidden absolute inset-0 z-50 flex flex-col items-center justify-center bg-gradient-to-br from-white via-white to-gray-50/80 backdrop-blur-md rounded-3xl shadow-2xl border border-gray-100"
                     >
-                      <motion.div
-                        animate={{ rotate: 360 }}
-                        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                        className="w-10 h-10 border-2 border-gray-200 border-t-[#F97316] rounded-full"
-                      />
+                      <div className="relative">
+                        <motion.div
+                          animate={{ rotate: 360 }}
+                          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                          className="w-14 h-14 border-[3px] border-gray-100 border-t-[#F97316] rounded-full shadow-lg"
+                        />
+                        <motion.div
+                          animate={{ scale: [1, 1.1, 1], opacity: [0.5, 1, 0.5] }}
+                          transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                          className="absolute inset-0 rounded-full bg-[#F97316]/10"
+                        />
+                      </div>
                       <motion.p
                         initial={{ y: 10, opacity: 0 }}
                         animate={{ y: 0, opacity: 1 }}
-                        transition={{ delay: 0.1 }}
-                        className="mt-4 text-sm text-gray-500 font-medium"
+                        transition={{ delay: 0.15 }}
+                        className="mt-6 text-base font-semibold bg-gradient-to-r from-gray-700 via-gray-900 to-gray-700 bg-clip-text text-transparent"
                       >
                         {transitioning ? "Entrando..." : "Autenticando"}
+                      </motion.p>
+                      <motion.p
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.3 }}
+                        className="mt-2 text-xs text-gray-400 font-medium"
+                      >
+                        Aguarde um momento
                       </motion.p>
                     </motion.div>
                   )}
@@ -1070,23 +1086,15 @@ function LoginContent() {
                   className="lg:hidden space-y-5"
                 >
                   {/* Campo Email Premium */}
-                  <motion.div 
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.4, delay: 0.2 }}
-                    className="space-y-2"
-                  >
+                  <div className="space-y-2">
                     <label className="block text-sm font-semibold text-[var(--ink-strong)] mb-2" htmlFor="login-email">
                       E-mail
                     </label>
                     <div className="relative group">
                       {/* Mail Icon Premium */}
-                      <motion.div 
-                        className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--ink-muted)] pointer-events-none z-10 transition-colors"
-                        animate={emailValid ? { color: 'var(--brand)' } : {}}
-                      >
+                      <div className={`absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none z-10 transition-colors ${emailValid ? 'text-[var(--brand)]' : 'text-[var(--ink-muted)]'}`}>
                         <Mail className="h-5 w-5" />
-                      </motion.div>
+                      </div>
 
                       <Input
                         id="login-email"
@@ -1123,23 +1131,15 @@ function LoginContent() {
                   </motion.div>
 
                   {/* Campo Senha Premium */}
-                  <motion.div 
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.4, delay: 0.3 }}
-                    className="space-y-2"
-                  >
+                  <div className="space-y-2">
                     <label className="block text-sm font-semibold text-[var(--ink-strong)] mb-2" htmlFor="login-password">
                       Senha
                     </label>
                     <div className="relative group">
                       {/* Lock Icon Premium */}
-                      <motion.div 
-                        className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--ink-muted)] pointer-events-none z-10 transition-colors"
-                        animate={passwordValid ? { color: 'var(--brand)' } : {}}
-                      >
+                      <div className={`absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none z-10 transition-colors ${passwordValid ? 'text-[var(--brand)]' : 'text-[var(--ink-muted)]'}`}>
                         <Lock className="h-5 w-5" />
-                      </motion.div>
+                      </div>
 
                       <Input
                         id="login-password"
@@ -1300,27 +1300,43 @@ function LoginContent() {
 
             {/* Desktop: No card wrapper */}
             <div className="hidden lg:block relative w-full min-w-0">
-              {/* Loading overlay minimalista */}
+              {/* Desktop: Loading overlay moderno */}
               <AnimatePresence>
                 {loading && (
                   <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white/98 backdrop-blur-sm rounded-3xl"
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    transition={{ duration: 0.2 }}
+                    className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-gradient-to-br from-white via-white to-gray-50/80 backdrop-blur-md rounded-3xl shadow-2xl border border-gray-100"
                   >
-                    <motion.div
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                      className="w-10 h-10 border-2 border-gray-200 border-t-[#F97316] rounded-full"
-                    />
+                    <div className="relative">
+                      <motion.div
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                        className="w-16 h-16 border-[3px] border-gray-100 border-t-[#F97316] rounded-full shadow-lg"
+                      />
+                      <motion.div
+                        animate={{ scale: [1, 1.15, 1], opacity: [0.4, 0.8, 0.4] }}
+                        transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                        className="absolute inset-0 rounded-full bg-[#F97316]/10"
+                      />
+                    </div>
                     <motion.p
                       initial={{ y: 10, opacity: 0 }}
                       animate={{ y: 0, opacity: 1 }}
-                      transition={{ delay: 0.1 }}
-                      className="mt-4 text-sm text-gray-500 font-medium"
+                      transition={{ delay: 0.15 }}
+                      className="mt-6 text-lg font-semibold bg-gradient-to-r from-gray-700 via-gray-900 to-gray-700 bg-clip-text text-transparent"
                     >
                       {transitioning ? "Entrando..." : "Autenticando"}
+                    </motion.p>
+                    <motion.p
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.3 }}
+                      className="mt-2 text-sm text-gray-400 font-medium"
+                    >
+                      Aguarde um momento
                     </motion.p>
                   </motion.div>
                 )}
@@ -1384,22 +1400,14 @@ function LoginContent() {
                 className="form-responsive space-y-4 sm:space-y-5 md:space-y-6"
               >
                 {/* Campo Email - Desktop Premium */}
-                <motion.div 
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.4, delay: 0.2 }}
-                  className="space-y-2"
-                >
+                <div className="space-y-2">
                   <label className="block text-sm font-semibold text-[var(--ink-strong)] mb-2" htmlFor="login-email-desktop">
                     E-mail
                   </label>
                   <div className="relative group">
-                    <motion.div 
-                      className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--ink-muted)] pointer-events-none z-10 transition-colors"
-                      animate={emailValid ? { color: 'var(--brand)' } : {}}
-                    >
+                    <div className={`absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none z-10 transition-colors ${emailValid ? 'text-[var(--brand)]' : 'text-[var(--ink-muted)]'}`}>
                       <Mail className="h-5 w-5" />
-                    </motion.div>
+                    </div>
                     <Input
                       id="login-email-desktop"
                       ref={emailInputRef}
@@ -1435,22 +1443,14 @@ function LoginContent() {
                 </motion.div>
 
                 {/* Campo Senha - Desktop Premium */}
-                <motion.div 
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.4, delay: 0.3 }}
-                  className="space-y-2"
-                >
+                <div className="space-y-2">
                   <label className="block text-sm font-semibold text-[var(--ink-strong)] mb-2" htmlFor="login-password-desktop">
                     Senha
                   </label>
                   <div className="relative group">
-                    <motion.div 
-                      className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--ink-muted)] pointer-events-none z-10 transition-colors"
-                      animate={passwordValid ? { color: 'var(--brand)' } : {}}
-                    >
+                    <div className={`absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none z-10 transition-colors ${passwordValid ? 'text-[var(--brand)]' : 'text-[var(--ink-muted)]'}`}>
                       <Lock className="h-5 w-5" />
-                    </motion.div>
+                    </div>
                     <Input
                       id="login-password-desktop"
                       type={showPassword ? "text" : "password"}
