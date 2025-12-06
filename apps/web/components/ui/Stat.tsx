@@ -50,38 +50,41 @@ const Stat = ({ icon: Icon, label, value, hint, trend, trendLabel, className }: 
         damping: 30,
         duration: 0.4
       }}
-      className={cn("stat-card group cursor-pointer touch-manipulation", className)}
+      className={cn("stat-card group cursor-pointer touch-manipulation overflow-visible", className)}
     >
       <div className="flex items-start justify-between gap-3 sm:gap-4">
         <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
           {/* Icon Container - Ultra Premium */}
-          <motion.div 
-            className="p-3 sm:p-3.5 rounded-xl bg-gradient-to-br from-[var(--brand-light)] to-[var(--brand-soft)] group-hover:from-[var(--brand)] group-hover:to-[var(--brand-hover)] transition-all duration-300 flex-shrink-0 relative overflow-hidden shadow-md group-hover:shadow-[var(--shadow-brand)]"
-            whileHover={{ 
-              rotate: [0, -8, 8, 0],
-              scale: 1.15
-            }}
-            whileTap={{ scale: 0.95 }}
-            transition={{ type: "spring", stiffness: 400, damping: 17 }}
-          >
+          <div className="relative flex-shrink-0 py-1">
+            <motion.div 
+              className="p-3 sm:p-3.5 rounded-xl bg-gradient-to-br from-[var(--brand-light)] to-[var(--brand-soft)] group-hover:from-[var(--brand)] group-hover:to-[var(--brand-hover)] transition-all duration-300 relative shadow-md group-hover:shadow-[var(--shadow-brand)]"
+              whileHover={{ 
+                rotate: [0, -8, 8, 0],
+                scale: 1.15
+              }}
+              whileTap={{ scale: 0.95 }}
+              transition={{ type: "spring", stiffness: 400, damping: 17 }}
+            >
+              <motion.div
+                className="absolute inset-0 rounded-xl bg-gradient-to-br from-white/30 via-white/10 to-transparent opacity-0 group-hover:opacity-100"
+                transition={{ duration: 0.4 }}
+              />
+              <Icon className="w-6 h-6 sm:w-7 sm:h-7 text-[var(--brand)] group-hover:text-white transition-all duration-300 relative z-10" style={{ filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1))' }} />
+            </motion.div>
             <motion.div
-              className="absolute inset-0 bg-gradient-to-br from-white/30 via-white/10 to-transparent opacity-0 group-hover:opacity-100"
+              className="absolute inset-0 rounded-xl bg-[var(--brand)] opacity-0 group-hover:opacity-20 blur-xl"
+              style={{ top: '-4px', right: '-4px', bottom: '-4px', left: '-4px', zIndex: -1 }}
               transition={{ duration: 0.4 }}
             />
-            <motion.div
-              className="absolute -inset-2 bg-[var(--brand)] opacity-0 group-hover:opacity-20 blur-xl"
-              transition={{ duration: 0.4 }}
-            />
-            <Icon className="w-6 h-6 sm:w-7 sm:h-7 text-[var(--brand)] group-hover:text-white transition-all duration-300 relative z-10 drop-shadow-sm group-hover:drop-shadow-md" />
-          </motion.div>
+          </div>
 
           {/* Content */}
-          <div className="flex-1 min-w-0">
-            <p className="text-sm sm:text-sm font-medium text-[var(--ink-muted)] mb-1.5 sm:mb-2 truncate">
+          <div className="flex-1 min-w-0 overflow-visible">
+            <p className="text-sm sm:text-sm font-medium text-[var(--ink-muted)] mb-1.5 sm:mb-2 line-clamp-1">
               {label}
             </p>
             <motion.p 
-              className="text-3xl sm:text-3xl lg:text-4xl font-bold tabular-nums text-[var(--ink-strong)] truncate"
+              className="text-3xl sm:text-3xl lg:text-4xl font-bold tabular-nums text-[var(--ink-strong)] break-words"
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.1, duration: 0.3 }}
@@ -89,7 +92,7 @@ const Stat = ({ icon: Icon, label, value, hint, trend, trendLabel, className }: 
               {typeof value === 'number' ? display : displayValue}
             </motion.p>
             {hint && (
-              <p className="text-xs sm:text-xs text-[var(--ink-muted)] mt-1.5 sm:mt-2 truncate">
+              <p className="text-xs sm:text-xs text-[var(--ink-muted)] mt-1.5 sm:mt-2 line-clamp-1">
                 {hint}
               </p>
             )}
