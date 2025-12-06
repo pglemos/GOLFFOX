@@ -6,16 +6,16 @@ import { motion } from "framer-motion"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-[var(--radius-lg)] text-sm font-semibold ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] focus-visible:ring-opacity-20 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-[var(--radius-lg)] text-sm font-semibold ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] focus-visible:ring-opacity-20 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 relative overflow-hidden",
   {
     variants: {
       variant: {
-        default: "bg-[var(--brand)] text-white hover:bg-[var(--brand-hover)] shadow-md hover:shadow-lg",
-        destructive: "bg-[var(--error)] text-white hover:bg-[var(--error)]/90 shadow-md hover:shadow-lg",
-        outline: "border border-[var(--border)] bg-transparent hover:bg-[var(--bg-hover)] hover:border-[var(--brand)]",
-        secondary: "bg-[var(--accent)] text-white hover:bg-[var(--accent-soft)]",
-        ghost: "hover:bg-[var(--bg-hover)]",
-        link: "text-[var(--brand)] underline-offset-4 hover:underline",
+        default: "bg-[var(--brand)] text-white hover:bg-[var(--brand-hover)] shadow-[var(--shadow-brand)] hover:shadow-[var(--shadow-brand-lg)] active:shadow-[var(--shadow-md)]",
+        destructive: "bg-[var(--error)] text-white hover:bg-[var(--error)]/90 shadow-md hover:shadow-lg active:shadow-sm",
+        outline: "border-2 border-[var(--border)] bg-transparent hover:bg-[var(--bg-hover)] hover:border-[var(--brand)] hover:text-[var(--brand)] active:bg-[var(--bg-soft)]",
+        secondary: "bg-[var(--accent)] text-white hover:bg-[var(--accent-soft)] shadow-md hover:shadow-lg active:shadow-sm",
+        ghost: "hover:bg-[var(--bg-hover)] active:bg-[var(--bg-soft)]",
+        link: "text-[var(--brand)] underline-offset-4 hover:underline hover:text-[var(--brand-hover)]",
       },
       size: {
         default: "h-11 px-4 py-2",
@@ -55,11 +55,31 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       <motion.button
         className={cn(buttonVariants({ variant, size, className }))}
         ref={ref}
-        whileHover={whileHover || { scale: 1.02 }}
-        whileTap={whileTap || { scale: 0.98 }}
-        transition={transition || { duration: 0.15 }}
+        whileHover={whileHover || { 
+          scale: 1.02,
+          transition: { duration: 0.2, ease: "easeOut" }
+        }}
+        whileTap={whileTap || { 
+          scale: 0.97,
+          transition: { duration: 0.1 }
+        }}
+        transition={transition || { 
+          type: "spring",
+          stiffness: 400,
+          damping: 17
+        }}
         {...(restProps as any)}
-      />
+      >
+        {props.children}
+        {variant === "default" && (
+          <motion.div
+            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+            initial={{ x: "-100%" }}
+            whileHover={{ x: "100%" }}
+            transition={{ duration: 0.6, ease: "easeInOut" }}
+          />
+        )}
+      </motion.button>
     )
   }
 )

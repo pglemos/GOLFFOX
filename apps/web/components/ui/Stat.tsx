@@ -32,26 +32,55 @@ const Stat = ({ icon: Icon, label, value, hint, trend, trendLabel, className }: 
   return (
     <motion.div
       layout
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      whileHover={{ y: -4, scale: 1.02 }}
+      initial={{ opacity: 0, y: 20, scale: 0.95 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      whileHover={{ 
+        y: -6, 
+        scale: 1.02,
+        transition: {
+          type: "spring",
+          stiffness: 400,
+          damping: 25
+        }
+      }}
       whileTap={{ scale: 0.98 }}
-      transition={{ duration: 0.2 }}
+      transition={{ 
+        type: "spring",
+        stiffness: 300,
+        damping: 30,
+        duration: 0.4
+      }}
       className={cn("stat-card group cursor-pointer touch-manipulation", className)}
     >
       <div className="flex items-start justify-between gap-3 sm:gap-4">
         <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
-          {/* Icon Container */}
-          <div className="p-2.5 sm:p-3 rounded-[var(--radius-lg)] bg-[var(--brand-light)] group-hover:bg-[var(--brand)] transition-colors duration-200 flex-shrink-0">
-            <Icon className="w-6 h-6 sm:w-7 sm:h-7 text-[var(--brand)] group-hover:text-white transition-colors duration-200" />
-          </div>
+          {/* Icon Container - Premium */}
+          <motion.div 
+            className="p-2.5 sm:p-3 rounded-[var(--radius-lg)] bg-[var(--brand-light)] group-hover:bg-[var(--brand)] transition-all duration-300 flex-shrink-0 relative overflow-hidden"
+            whileHover={{ 
+              rotate: [0, -5, 5, 0],
+              scale: 1.1
+            }}
+            transition={{ duration: 0.5 }}
+          >
+            <motion.div
+              className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100"
+              transition={{ duration: 0.3 }}
+            />
+            <Icon className="w-6 h-6 sm:w-7 sm:h-7 text-[var(--brand)] group-hover:text-white transition-all duration-300 relative z-10" />
+          </motion.div>
 
           {/* Content */}
           <div className="flex-1 min-w-0">
             <p className="text-sm sm:text-sm font-medium text-[var(--ink-muted)] mb-1.5 sm:mb-2 truncate">
               {label}
             </p>
-            <motion.p className="text-3xl sm:text-3xl lg:text-4xl font-bold tabular-nums text-[var(--ink-strong)] truncate">
+            <motion.p 
+              className="text-3xl sm:text-3xl lg:text-4xl font-bold tabular-nums text-[var(--ink-strong)] truncate"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.1, duration: 0.3 }}
+            >
               {typeof value === 'number' ? display : displayValue}
             </motion.p>
             {hint && (

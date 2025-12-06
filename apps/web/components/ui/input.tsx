@@ -1,20 +1,69 @@
 import * as React from "react"
+import { motion } from "framer-motion"
 import { cn } from "@/lib/utils"
 
-export type InputProps = React.InputHTMLAttributes<HTMLInputElement>
+export type InputProps = React.InputHTMLAttributes<HTMLInputElement> & {
+  error?: boolean
+  success?: boolean
+}
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, type, ...props }, ref) => {
+  ({ className, type, error, success, ...props }, ref) => {
+    const [isFocused, setIsFocused] = React.useState(false)
+    const [hasValue, setHasValue] = React.useState(false)
+
+    React.useEffect(() => {
+      if (props.value !== undefined) {
+        setHasValue(String(props.value).length > 0)
+      }
+    }, [props.value])
+
     return (
-      <input
-        type={type}
-        className={cn(
-          "flex h-11 w-full rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--bg-soft)] px-4 py-2 text-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-[var(--ink-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] focus-visible:ring-opacity-20 disabled:cursor-not-allowed disabled:opacity-50",
-          className
+      <div className="relative">
+        <motion.input
+          type={type}
+          className={cn(
+            "flex h-11 w-full rounded-[var(--radius-lg)] border px-4 py-2 text-sm",
+            "bg-[var(--bg-soft)] transition-all duration-200",
+            "file:border-0 file:bg-transparent file:text-sm file:font-medium",
+            "placeholder:text-[var(--ink-muted)]",
+            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1",
+            "disabled:cursor-not-allowed disabled:opacity-50",
+            // Border states
+            error
+              ? "border-[var(--error)] focus-visible:ring-[var(--error)] focus-visible:ring-opacity-20"
+              : success
+              ? "border-[var(--success)] focus-visible:ring-[var(--success)] focus-visible:ring-opacity-20"
+              : isFocused
+              ? "border-[var(--brand)] focus-visible:ring-[var(--brand)] focus-visible:ring-opacity-20 shadow-[var(--shadow-brand)]"
+              : "border-[var(--border)] hover:border-[var(--border-strong)]",
+            // Shadow on focus
+            isFocused && "shadow-[var(--shadow-brand)]",
+            className
+          )}
+          ref={ref}
+          onFocus={(e) => {
+            setIsFocused(true)
+            props.onFocus?.(e)
+          }}
+          onBlur={(e) => {
+            setIsFocused(false)
+            props.onBlur?.(e)
+          }}
+          whileFocus={{ scale: 1.01 }}
+          transition={{ duration: 0.2 }}
+          {...props}
+        />
+        {error && (
+          <motion.div
+            initial={{ opacity: 0, y: -5 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="absolute -bottom-5 left-0 text-xs text-[var(--error)] mt-1"
+          >
+            Campo inválido
+          </motion.div>
         )}
-        ref={ref}
-        {...props}
-      />
+      </div>
     )
   }
 )
