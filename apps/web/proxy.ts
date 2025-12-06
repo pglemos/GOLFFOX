@@ -100,7 +100,7 @@ function extractAccessToken(request: NextRequest): string | null {
   return null
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname, searchParams } = request.nextUrl
 
   // ✅ Permitir desabilitar autenticação via variável de ambiente (apenas em desenvolvimento)
@@ -217,3 +217,4 @@ export const config = {
     '/((?!api|_next/static|_next/image|favicon.ico).*)',
   ],
 }
+

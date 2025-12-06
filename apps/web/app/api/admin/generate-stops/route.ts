@@ -6,7 +6,7 @@ import { sortStops } from '../../../../lib/stops/stop-sorting'
 import { log, getLogs, clearLogs } from '../../../../lib/logger'
 import { createClient } from '@supabase/supabase-js'
 
-export const runtime = 'edge'
+export const runtime = 'nodejs'
 
 export async function POST(req: NextRequest) {
   // Validar autenticação
