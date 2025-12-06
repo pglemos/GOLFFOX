@@ -21,7 +21,8 @@
     "supabase:apply:core": "node scripts/apply-supabase-core.js",
     "db:check": "node scripts/drift-check.js",
     "db:seed:demo": "node scripts/seed-demo.js",
-    "db:migrate": "ts-node scripts/migrate.ts"
+    "db:migrate": "ts-node scripts/migrate.ts",
+    "test:auth": "node scripts/test-auth-middleware.js"
   },
   "dependencies": {
     "@e965/xlsx": "^0.20.3",

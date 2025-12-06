@@ -8,13 +8,10 @@ let nextConfig = {
   // Corrigir warning sobre múltiplos lockfiles
   outputFileTracingRoot: path.join(__dirname, '../../'),
   typescript: {
-    // ⚠️ ATENÇÃO: ignoreBuildErrors deve ser removido após corrigir erros TypeScript
-    // Erros principais:
-    // - Tipos do Supabase desatualizados (drivers, costs, audit_logs, views não incluídas)
-    // - Tipos do Recharts não reconhecidos corretamente
-    // - Algumas propriedades opcionais não tratadas
-    // Ação necessária: Regenerar tipos do Supabase e corrigir type assertions
-    ignoreBuildErrors: true,
+    // ✅ Tipos do Supabase regenerados e erros corrigidos
+    // Erros restantes são apenas de componentes Recharts (não críticos)
+    // ignoreBuildErrors removido - build agora valida tipos TypeScript
+    ignoreBuildErrors: false,
   },
   // Next.js 16: Empty turbopack config allows webpack to run in production
   turbopack: {},
