@@ -65,11 +65,34 @@ export default function MotoristasPage() {
       const apiDrivers: DriverMetrics[] = result.drivers
       setDrivers(apiDrivers)
 
+      // Calcular viagens do dia
+      const today = new Date()
+      today.setHours(0, 0, 0, 0)
+      const todayStart = today.toISOString()
+      const todayEnd = new Date(today.getTime() + 24 * 60 * 60 * 1000).toISOString()
+
+      // Buscar viagens do dia para os motoristas da transportadora
+      let todayTripsCount = 0
+      try {
+        const tripsResponse = await fetch(
+          `/api/transportadora/reports/trips?startDate=${todayStart}&endDate=${todayEnd}`
+        )
+        if (tripsResponse.ok) {
+          const tripsData = await tripsResponse.json()
+          todayTripsCount = tripsData.total || tripsData.trips?.length || 0
+        }
+      } catch (err) {
+        // Se falhar, usar soma das viagens dos motoristas como fallback
+        todayTripsCount = apiDrivers.reduce((sum, d) => sum + (d.totalTrips || 0), 0)
+      }
+
       setMetrics({
         activeDrivers: apiDrivers.length,
         totalRevenue: apiDrivers.reduce((sum, d) => sum + d.totalEarnings, 0),
-        todayTrips: 560, // TODO: replace with real calculation
-        avgRating: apiDrivers.reduce((sum, d) => sum + d.avgRating, 0) / apiDrivers.length,
+        todayTrips: todayTripsCount,
+        avgRating: apiDrivers.length > 0 
+          ? apiDrivers.reduce((sum, d) => sum + d.avgRating, 0) / apiDrivers.length 
+          : 0,
       })
     } catch (error) {
       notifyError(error, "Erro ao carregar motoristas")

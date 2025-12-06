@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { withRateLimit } from '@/lib/rate-limit'
+import { logger } from '@/lib/logger'
 
-export async function GET(request: NextRequest) {
+async function cepHandler(request: NextRequest) {
     try {
         const { searchParams } = new URL(request.url)
         const cep = searchParams.get('cep')
@@ -54,10 +56,12 @@ export async function GET(request: NextRequest) {
             }
         })
     } catch (error: any) {
-        console.error('Erro ao buscar CEP:', error)
+        logger.error('Erro ao buscar CEP', { error, cep })
         return NextResponse.json(
             { success: false, error: 'Erro ao buscar endereço pelo CEP' },
             { status: 500 }
         )
     }
 }
+
+export const GET = withRateLimit(cepHandler, 'public')

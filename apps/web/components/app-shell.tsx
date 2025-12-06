@@ -7,6 +7,7 @@ import { Sidebar } from "./sidebar"
 import { EnvVarsBanner } from "./env-vars-banner"
 import { cn } from "@/lib/utils"
 import { motion } from "framer-motion"
+import { debug } from "@/lib/logger"
 
 interface AppShellProps {
   user: {
@@ -26,12 +27,12 @@ export const AppShell = memo(function AppShell({ user, children, panel }: AppShe
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
 
-  // #region agent log
+  // Debug logging (apenas em desenvolvimento)
   useEffect(() => {
-    console.log('[DEBUG APPSHELL] 📦 User prop received:', JSON.stringify(user, null, 2));
-    console.log('[DEBUG APPSHELL] 🖼️ Avatar URL:', user?.avatar_url);
-  }, [user]);
-  // #endregion
+    debug('AppShell user prop received', { 
+      hasAvatarUrl: !!user?.avatar_url 
+    }, 'AppShell')
+  }, [user])
 
   // Detectar painel automaticamente se não fornecido (memoizado)
   const detectedPanel: 'admin' | 'operador' | 'transportadora' = useMemo(() =>

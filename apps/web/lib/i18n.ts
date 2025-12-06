@@ -1,14 +1,33 @@
 ﻿import common from '@/i18n/common.json'
 import operator from '@/i18n/operator.json'
 import admin from '@/i18n/admin.json'
+import ptBR from '@/i18n/pt-BR.json'
+import enUS from '@/i18n/en-US.json'
 
 type Namespace = 'common' | 'operator' | 'admin'
+
+type Locale = 'pt-BR' | 'en-US'
 
 // Aceitar objetos aninhados vindos dos JSONs
 const dictionaries: Record<Namespace, Record<string, unknown>> = {
   common: common as Record<string, unknown>,
   operator: operator as Record<string, unknown>,
   admin: admin as Record<string, unknown>,
+}
+
+// Dicionários por locale (para expansão futura)
+const localeDictionaries: Record<Locale, Record<string, unknown>> = {
+  'pt-BR': ptBR as Record<string, unknown>,
+  'en-US': enUS as Record<string, unknown>,
+}
+
+// Detectar locale do navegador ou usar padrão
+function getLocale(): Locale {
+  if (typeof window !== 'undefined') {
+    const browserLocale = navigator.language || 'pt-BR'
+    return browserLocale.startsWith('en') ? 'en-US' : 'pt-BR'
+  }
+  return 'pt-BR'
 }
 
 function interpolate(template: string, params?: Record<string, string | number>): string {
@@ -36,5 +55,19 @@ export function t(ns: Namespace, key: string, params?: Record<string, string | n
   return interpolate(text, params)
 }
 
+/**
+ * Tradução com suporte a locale
+ */
+export function translate(key: string, locale?: Locale, params?: Record<string, string | number>): string {
+  const currentLocale = locale || getLocale()
+  const dict = localeDictionaries[currentLocale]
+  const found = resolveKey(dict, key)
+  const text = typeof found === 'string' ? found : key
+  return interpolate(text, params)
+}
+
 export type I18nKey = { ns: Namespace; key: string; params?: Record<string, string | number> }
+
+export { getLocale }
+export type { Locale, Namespace }
 

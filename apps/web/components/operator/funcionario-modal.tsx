@@ -189,15 +189,7 @@ export function FuncionarioModal({ funcionario, isOpen, onClose, onSave, empresa
           })
         })
 
-        // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/802544c4-70d0-43c7-a57c-6692b28ca17d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'funcionario-modal.tsx:API_RESPONSE',message:'API response received',data:{status:res.status,ok:res.ok},timestamp:Date.now(),sessionId:'debug-session'})}).catch(()=>{});
-        // #endregion
-
         const responseData = await res.json()
-        
-        // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/802544c4-70d0-43c7-a57c-6692b28ca17d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'funcionario-modal.tsx:API_DATA',message:'API response data',data:{responseData,hasUserId:!!responseData?.userId,employeeCompanyCreated:responseData?.employeeCompanyCreated},timestamp:Date.now(),sessionId:'debug-session'})}).catch(()=>{});
-        // #endregion
 
         if (!res.ok) {
           throw new Error(responseData.error || responseData.message || 'Erro ao criar funcionário')
@@ -215,9 +207,6 @@ export function FuncionarioModal({ funcionario, isOpen, onClose, onSave, empresa
       onSave()
       onClose()
     } catch (error: any) {
-      // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/802544c4-70d0-43c7-a57c-6692b28ca17d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'funcionario-modal.tsx:CATCH',message:'Error caught',data:{errorMessage:error?.message,errorName:error?.name,errorStack:error?.stack?.slice(0,500)},timestamp:Date.now(),sessionId:'debug-session'})}).catch(()=>{});
-      // #endregion
       logError("Erro ao salvar funcionário", { error }, 'FuncionarioModal')
       notifyError(`Erro ao salvar funcionário: ${error?.message || 'Erro desconhecido'}`, undefined, {
         i18n: { ns: 'operator', key: 'employees.saveError' }

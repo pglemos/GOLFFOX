@@ -103,8 +103,9 @@ function extractAccessToken(request: NextRequest): string | null {
 export async function middleware(request: NextRequest) {
   const { pathname, searchParams } = request.nextUrl
 
-  // ✅ Permitir desabilitar autenticação via variável de ambiente (útil para testes locais)
-  if (process.env.NEXT_PUBLIC_DISABLE_MIDDLEWARE === 'true') {
+  // ✅ Permitir desabilitar autenticação via variável de ambiente (apenas em desenvolvimento)
+  // ⚠️ SEGURANÇA: Nunca permitir bypass em produção
+  if (process.env.NEXT_PUBLIC_DISABLE_MIDDLEWARE === 'true' && isDevelopment) {
     return NextResponse.next()
   }
   
