@@ -27,29 +27,64 @@ interface MigrationFile {
   name: string
   content: string
   order: number
+  version: string // Timestamp ou número de versão
+}
+
+/**
+ * Cria tabela schema_migrations se não existir
+ */
+async function ensureMigrationsTable(client: any): Promise<void> {
+  await client.query(`
+    CREATE TABLE IF NOT EXISTS schema_migrations (
+      version VARCHAR(255) PRIMARY KEY,
+      name VARCHAR(255) NOT NULL,
+      applied_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
+    )
+  `)
+}
+
+/**
+ * Obtém lista de migrations já aplicadas
+ */
+async function getAppliedMigrations(client: any): Promise<Set<string>> {
+  const result = await client.query('SELECT version FROM schema_migrations')
+  return new Set(result.rows.map((row: any) => row.version))
+}
+
+/**
+ * Registra migration como aplicada
+ */
+async function recordMigration(client: any, migration: MigrationFile): Promise<void> {
+  await client.query(
+    'INSERT INTO schema_migrations (version, name) VALUES ($1, $2) ON CONFLICT (version) DO NOTHING',
+    [migration.version, migration.name]
+  )
 }
 
 async function getMigrationFiles(): Promise<MigrationFile[]> {
-  const migrationsDir = join(process.cwd(), '..', 'database', 'migrations')
+  const migrationsDir = join(process.cwd(), 'database', 'migrations')
   const files = readdirSync(migrationsDir)
     .filter(f => f.endsWith('.sql'))
     .sort()
 
   return files.map((file, index) => {
     const content = readFileSync(join(migrationsDir, file), 'utf-8')
+    // Extrair versão do nome do arquivo (formato: YYYYMMDD_HHMMSS_description.sql ou 001_description.sql)
+    const versionMatch = file.match(/^(\d{8}_\d{6}|\d{3})_/)
+    const version = versionMatch ? versionMatch[1] : file.replace('.sql', '')
+    
     return {
       name: file,
       content,
       order: index,
+      version,
     }
   })
 }
 
-async function executeMigration(migration: MigrationFile): Promise<boolean> {
-  const client = await pool.connect()
-  
+async function executeMigration(migration: MigrationFile, client: any): Promise<boolean> {
   try {
-    console.log(`\n📄 Executando: ${migration.name}`)
+    console.log(`\n📄 Executando: ${migration.name} (versão: ${migration.version})`)
     
     await client.query('BEGIN')
     
@@ -74,44 +109,73 @@ async function executeMigration(migration: MigrationFile): Promise<boolean> {
       }
     }
     
+    // Registrar migration como aplicada
+    await recordMigration(client, migration)
+    
     await client.query('COMMIT')
-    console.log(`  ✅ ${migration.name} executado com sucesso`)
+    console.log(`  ✅ ${migration.name} executado e registrado com sucesso`)
     return true
   } catch (error: any) {
     await client.query('ROLLBACK')
     console.error(`  ❌ Erro em ${migration.name}:`, error.message)
     return false
-  } finally {
-    client.release()
   }
 }
 
 async function main() {
-  console.log('🚀 Iniciando migrations GolfFox v41.0...\n')
+  console.log('🚀 Iniciando migrations GolfFox com controle de versão...\n')
+  
+  const client = await pool.connect()
   
   try {
     // Testar conexão
-    const testResult = await pool.query('SELECT NOW()')
+    const testResult = await client.query('SELECT NOW()')
     console.log('✅ Conexão com banco estabelecida')
     console.log(`📍 Server time: ${testResult.rows[0].now}\n`)
 
-    // Obter lista de migrations
-    const migrations = await getMigrationFiles()
-    console.log(`📦 Encontradas ${migrations.length} migrations:`)
-    migrations.forEach((m, i) => console.log(`   ${i + 1}. ${m.name}`))
+    // Criar tabela de controle de migrations
+    await ensureMigrationsTable(client)
+    console.log('✅ Tabela schema_migrations verificada/criada\n')
 
-    // Executar migrations
+    // Obter migrations já aplicadas
+    const appliedMigrations = await getAppliedMigrations(client)
+    console.log(`📋 Migrations já aplicadas: ${appliedMigrations.size}`)
+    if (appliedMigrations.size > 0) {
+      appliedMigrations.forEach(version => console.log(`   - ${version}`))
+    }
+    console.log()
+
+    // Obter lista de migrations disponíveis
+    const migrations = await getMigrationFiles()
+    console.log(`📦 Encontradas ${migrations.length} migrations disponíveis:`)
+    migrations.forEach((m, i) => {
+      const status = appliedMigrations.has(m.version) ? '✅ (já aplicada)' : '⏳ (pendente)'
+      console.log(`   ${i + 1}. ${m.name} ${status}`)
+    })
+    console.log()
+
+    // Filtrar migrations pendentes
+    const pendingMigrations = migrations.filter(m => !appliedMigrations.has(m.version))
+    
+    if (pendingMigrations.length === 0) {
+      console.log('✅ Todas as migrations já foram aplicadas!\n')
+      return
+    }
+
+    console.log(`🔄 Aplicando ${pendingMigrations.length} migration(s) pendente(s)...\n`)
+
+    // Executar migrations pendentes
     let successCount = 0
     let failCount = 0
 
-    for (const migration of migrations) {
-      const success = await executeMigration(migration)
+    for (const migration of pendingMigrations) {
+      const success = await executeMigration(migration, client)
       if (success) {
         successCount++
       } else {
         failCount++
-        // Parar em caso de erro crítico?
-        // break
+        console.error(`\n⚠️  Parando execução devido a erro em ${migration.name}`)
+        break
       }
     }
 
@@ -126,6 +190,7 @@ async function main() {
     console.error('\n❌ Erro fatal:', error.message)
     process.exit(1)
   } finally {
+    client.release()
     await pool.end()
   }
 }

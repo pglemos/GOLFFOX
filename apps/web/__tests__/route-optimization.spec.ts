@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest"
+// Jest globals: describe, it, expect
 
 describe("Route Optimization Utils", () => {
   it("should calculate hash correctly", () => {

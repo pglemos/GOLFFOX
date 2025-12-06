@@ -34,6 +34,7 @@ export async function PUT(
     const transportadoraId = transportadora_id || carrier_id // Compatibilidade
 
     // Atualizar motorista
+    // @ts-expect-error Supabase type inference issue
     const { data: driver, error: driverError } = await ((supabase
       .from('drivers')
       .update({
@@ -79,11 +80,12 @@ export async function GET(
     const supabase = supabaseServiceRole
     const { driverId } = await context.params
 
+    // @ts-expect-error Supabase type instantiation is excessively deep
     const { data: driver, error } = await (((supabase
       .from('drivers')
       .select('*, carriers!inner(name)')) as any)
-      .eq('id', driverId)) as any
-      .single()
+      .eq('id', driverId)
+      .single()) as any
 
     if (error) {
       console.error('Erro ao buscar motorista:', error)

@@ -30,14 +30,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "invalid_user_payload" }, { status: 400 })
     }
 
-    // Payload mínimo no cookie (SEM access_token por segurança)
-    // O access_token deve ser enviado via header Authorization ou cookie do Supabase
+    // Payload no cookie (inclui access_token para validação no middleware)
+    // Cookie é HttpOnly, então não é acessível via JavaScript (proteção XSS)
     const sessionPayload = {
       id: user.id,
       email: user.email,
       role: user.role,
-      companyId: user.companyId ?? null
-      // access_token removido por segurança - usar header Authorization ou cookie Supabase
+      companyId: user.companyId ?? null,
+      access_token: accessToken // Incluído para validação no middleware (HttpOnly protege)
     }
 
     // Serializa como Base64 (padrão do sistema)

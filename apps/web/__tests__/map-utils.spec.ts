@@ -1,4 +1,5 @@
-import { describe, it, expect, vi } from 'vitest'
+// Jest globals: describe, it, expect
+// Use jest.fn() instead of vi.fn()
 
 // Mock de funções utilitárias do mapa
 const calculateDistance = (lat1: number, lng1: number, lat2: number, lng2: number): number => {
@@ -37,7 +38,7 @@ describe('Map Utils', () => {
 
   describe('debounce', () => {
     it('deve atrasar execução da função', async () => {
-      const mockFn = vi.fn()
+      const mockFn = jest.fn()
       const debouncedFn = debounce(mockFn, 100)
 
       debouncedFn()
@@ -48,7 +49,7 @@ describe('Map Utils', () => {
     })
 
     it('deve cancelar chamadas anteriores', async () => {
-      const mockFn = vi.fn()
+      const mockFn = jest.fn()
       const debouncedFn = debounce(mockFn, 100)
 
       debouncedFn()

@@ -1,19 +1,16 @@
-﻿import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { applyRateLimit } from './rate-limit'
+﻿import { applyRateLimit } from './rate-limit'
 import { NextRequest } from 'next/server'
 
 // Mock Redis and Ratelimit
-const { mockLimit } = vi.hoisted(() => ({
-    mockLimit: vi.fn()
-}))
+const mockLimit = jest.fn()
 
-vi.mock('@upstash/redis', () => ({
+jest.mock('@upstash/redis', () => ({
     Redis: class {
         constructor() { }
     }
 }))
 
-vi.mock('@upstash/ratelimit', () => ({
+jest.mock('@upstash/ratelimit', () => ({
     Ratelimit: class {
         static slidingWindow() { return {} }
         constructor() {
@@ -25,7 +22,7 @@ vi.mock('@upstash/ratelimit', () => ({
 }))
 
 // Mock NextRequest/Response
-vi.mock('next/server', () => {
+jest.mock('next/server', () => {
     return {
         NextRequest: class {
             cookies: any
@@ -36,14 +33,14 @@ vi.mock('next/server', () => {
             }
         },
         NextResponse: {
-            json: vi.fn((body, init) => ({ body, status: init?.status || 200 })),
+            json: jest.fn((body, init) => ({ body, status: init?.status || 200 })),
         },
     }
 })
 
 describe('rate-limit', () => {
     beforeEach(() => {
-        vi.clearAllMocks()
+        jest.clearAllMocks()
     })
 
     it('should allow request if limit not exceeded', async () => {

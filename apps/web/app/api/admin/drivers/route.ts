@@ -36,7 +36,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Criar motorista
-    const { data: driver, error: driverError } = await (((supabase
+    // @ts-expect-error Supabase type inference issue
+    const { data: driver, error: driverError } = await ((supabase
       .from('drivers')
       .insert([
         {

@@ -130,7 +130,12 @@ export default function CustosOperatorPage() {
       if (vehiclesRes.data) setVehicles(vehiclesRes.data)
       if (driversRes.data) setDrivers(driversRes.data)
       if (categoriesRes) setCategories(categoriesRes)
-      if (carriersRes.data) setCarriers(carriersRes.data.filter((c: any) => c.id && c.name).map((c: any) => ({ id: String(c.id || ''), name: String(c.name || '') })) as { id: string; name: string }[])
+      if (carriersRes.data) {
+        const filteredCarriers = carriersRes.data
+          .filter((c: any) => c.id && c.name)
+          .map((c: any) => ({ id: String(c.id || ''), name: String(c.name || '') })) as { id: string; name: string }[]
+        setCarriers(filteredCarriers)
+      }
     } catch (err) {
       console.error('Erro ao carregar opções:', err)
     }

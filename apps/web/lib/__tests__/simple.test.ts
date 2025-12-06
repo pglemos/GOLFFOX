@@ -1,8 +1,7 @@
-import { describe, it, expect, vi } from 'vitest'
 import { NextRequest } from 'next/server'
 
 // Mock NextRequest
-vi.mock('next/server', () => {
+jest.mock('next/server', () => {
     return {
         NextRequest: class {
             cookies: any
@@ -10,17 +9,17 @@ vi.mock('next/server', () => {
             nextUrl: any
             constructor(url: string, init?: any) {
                 this.cookies = {
-                    get: vi.fn(),
-                    getAll: vi.fn().mockReturnValue([]),
+                    get: jest.fn(),
+                    getAll: jest.fn().mockReturnValue([]),
                 }
                 this.headers = {
-                    get: vi.fn((key) => init?.headers?.[key]),
+                    get: jest.fn((key) => init?.headers?.[key]),
                 }
                 this.nextUrl = new URL(url)
             }
         },
         NextResponse: {
-            json: vi.fn((body, init) => ({ body, status: init?.status || 200 })),
+            json: jest.fn((body, init) => ({ body, status: init?.status || 200 })),
         },
     }
 })

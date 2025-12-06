@@ -167,14 +167,18 @@ async function createOrUpdateBudgetHandler(request: NextRequest) {
     }
 
     // Verificar se já existe orçamento para o mesmo período/categoria
-    const { data: existing } = await supabaseServiceRole
+    let query = supabaseServiceRole
       .from('gf_budgets')
       .select('id')
       .eq('company_id', validated.company_id)
       .eq('period_month', validated.period_month)
       .eq('period_year', validated.period_year)
-      .eq('category_id', validated.category_id || null)
-      .single()
+    if (validated.category_id) {
+      query = query.eq('category_id', validated.category_id)
+    } else {
+      query = query.is('category_id', null)
+    }
+    const { data: existing } = await query.single()
 
     let result
     if (existing) {

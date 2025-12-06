@@ -9,6 +9,7 @@ export interface UserData {
   accessToken: string
   name?: string
   avatar_url?: string | null
+  companyId?: string | null
 }
 
 export class AuthManager {
@@ -59,7 +60,19 @@ export class AuthManager {
     // Limpar dados locais
     if (typeof window !== 'undefined') {
       localStorage.removeItem(this.STORAGE_KEY)
-      document.cookie = `${this.COOKIE_NAME}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`
+      sessionStorage.removeItem(this.STORAGE_KEY)
+      sessionStorage.removeItem('golffox-auth-token')
+      
+      // Limpar cookie HttpOnly via API
+      try {
+        await fetch('/api/auth/clear-session', {
+          method: 'POST',
+          credentials: 'include'
+        })
+      } catch (err) {
+        error('Erro ao limpar cookie de sessão', { error: err }, 'AuthManager')
+        // Não bloquear logout se falhar - dados locais já foram limpos
+      }
     }
   }
 
@@ -134,40 +147,68 @@ export class AuthManager {
 
     const storageMode = options?.storage ?? 'both'
 
-    // ✅ Garantir compatibilidade com backend (api-auth.ts espera access_token)
-    // ✅ Incluir name e avatar_url para exibição no Topbar
-    const payloadObj = {
+    // ✅ Armazenar apenas dados não sensíveis no localStorage/sessionStorage
+    // access_token NÃO é armazenado no cliente por segurança
+    const safePayloadObj = {
       id: userData.id,
       email: userData.email,
       role: userData.role,
       name: userData.name || userData.email.split('@')[0],
-      avatar_url: userData.avatar_url || null,
-      access_token: userData.accessToken || options?.token
+      avatar_url: userData.avatar_url || null
+      // access_token removido - nunca armazenar no cliente
     }
-    const payload = JSON.stringify(payloadObj)
+    const safePayload = JSON.stringify(safePayloadObj)
 
     try {
       if (storageMode === 'local' || storageMode === 'both') {
-        localStorage.setItem(this.STORAGE_KEY, payload)
+        localStorage.setItem(this.STORAGE_KEY, safePayload)
       }
       if (storageMode === 'session' || storageMode === 'both') {
-        sessionStorage.setItem(this.STORAGE_KEY, payload)
+        sessionStorage.setItem(this.STORAGE_KEY, safePayload)
       }
-      if (options?.token) {
-        sessionStorage.setItem('golffox-auth-token', options.token)
-      }
+      // Removido: sessionStorage.setItem('golffox-auth-token') - não armazenar token no cliente
     } catch (storageErr) {
       error('Falha ao persistir sessão no storage', { error: storageErr }, 'AuthManager')
     }
 
+    // ✅ Definir cookie HttpOnly via API server-side (seguro contra XSS)
     try {
-      if (typeof document !== 'undefined') {
-        const cookieValue = btoa(payload)
-        const isSecure = window.location?.protocol === 'https:'
-        document.cookie = `${this.COOKIE_NAME}=${cookieValue}; path=/; max-age=3600; SameSite=Lax${isSecure ? '; Secure' : ''}`
+      // Obter CSRF token
+      const csrfResponse = await fetch('/api/auth/csrf', { method: 'GET', credentials: 'include' })
+      if (!csrfResponse.ok) {
+        throw new Error('Falha ao obter CSRF token')
       }
+      const csrfData = await csrfResponse.json()
+      const csrfToken = csrfData.token || csrfData.csrfToken
+
+      // Chamar API para definir cookie HttpOnly
+      const setSessionResponse = await fetch('/api/auth/set-session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-csrf-token': csrfToken
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          user: {
+            id: userData.id,
+            email: userData.email,
+            role: userData.role,
+            companyId: userData.companyId || null
+          },
+          access_token: options?.token || userData.accessToken
+        })
+      })
+
+      if (!setSessionResponse.ok) {
+        const errorData = await setSessionResponse.json().catch(() => ({}))
+        throw new Error(errorData.error || 'Falha ao definir cookie de sessão')
+      }
+
+      debug('Cookie de sessão definido via API (HttpOnly)', { role: userData.role }, 'AuthManager')
     } catch (cookieErr) {
-      error('Falha ao gravar cookie de sessão', { error: cookieErr }, 'AuthManager')
+      error('Falha ao definir cookie de sessão via API', { error: cookieErr }, 'AuthManager')
+      // Não bloquear o fluxo se falhar - o Supabase cookie ainda pode funcionar
     }
 
     if (typeof window !== 'undefined') {
