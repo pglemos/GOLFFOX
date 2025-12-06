@@ -339,24 +339,26 @@ export default function AdminDashboard() {
             transition={{ delay: 0.5 }}
           >
             <a href="/admin/mapa" className="block h-full">
-              <Card glass hover className="cursor-pointer h-full overflow-hidden">
+              <Card glass hover className="cursor-pointer h-full">
                 <CardHeader className="pb-4 px-3 sm:px-6">
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex-1 min-w-0 pr-2 sm:pr-4">
                       <CardTitle className="text-lg sm:text-xl font-semibold mb-1.5 truncate">Mapa da Frota</CardTitle>
                       <p className="text-xs sm:text-sm text-[var(--ink-muted)] line-clamp-2">Visualize veículos em tempo real</p>
                     </div>
-                    <motion.div 
-                      className="p-2.5 sm:p-3 rounded-xl bg-gradient-to-br from-[var(--brand-light)] to-[var(--brand-soft)] group-hover:from-[var(--brand)] group-hover:to-[var(--brand-hover)] transition-all duration-300 flex-shrink-0 shadow-md group-hover:shadow-[var(--shadow-brand-lg)] relative overflow-hidden"
-                      whileHover={{ scale: 1.1, rotate: [0, -5, 5, 0] }}
-                      transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                    >
-                      <motion.div
-                        className="absolute inset-0 bg-gradient-to-br from-white/30 via-white/10 to-transparent opacity-0 group-hover:opacity-100"
-                        transition={{ duration: 0.3 }}
-                      />
-                      <MapPin className="h-4 w-4 sm:h-5 sm:w-5 text-[var(--brand)] group-hover:text-white transition-all duration-300 relative z-10 drop-shadow-sm" />
-                    </motion.div>
+                    <div className="relative flex-shrink-0 p-1">
+                      <motion.div 
+                        className="p-2.5 sm:p-3 rounded-xl bg-gradient-to-br from-[var(--brand-light)] to-[var(--brand-soft)] group-hover:from-[var(--brand)] group-hover:to-[var(--brand-hover)] transition-all duration-300 shadow-md group-hover:shadow-[var(--shadow-brand-lg)] relative"
+                        whileHover={{ scale: 1.1, rotate: [0, -5, 5, 0] }}
+                        transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                      >
+                        <motion.div
+                          className="absolute inset-0 rounded-xl bg-gradient-to-br from-white/30 via-white/10 to-transparent opacity-0 group-hover:opacity-100"
+                          transition={{ duration: 0.3 }}
+                        />
+                        <MapPin className="h-4 w-4 sm:h-5 sm:w-5 text-[var(--brand)] group-hover:text-white transition-all duration-300 relative z-10" style={{ filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1))' }} />
+                      </motion.div>
+                    </div>
                   </div>
                 </CardHeader>
                 <CardContent className="pt-0 px-3 sm:px-6">
@@ -381,7 +383,7 @@ export default function AdminDashboard() {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.6 }}
           >
-            <Card className="h-full overflow-hidden">
+            <Card className="h-full">
               <CardHeader className="pb-4 px-3 sm:px-6">
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex-1 min-w-0 pr-2 sm:pr-4">
@@ -418,9 +420,9 @@ export default function AdminDashboard() {
                           ease: "easeInOut"
                         }}
                       />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-[var(--ink-strong)] truncate group-hover:text-[var(--brand)] transition-colors">Alerta #{i}</p>
-                        <p className="text-xs text-[var(--ink-muted)] truncate">Há {i} minutos</p>
+                      <div className="flex-1 min-w-0 overflow-visible">
+                        <p className="text-sm font-semibold text-[var(--ink-strong)] line-clamp-1 group-hover:text-[var(--brand)] transition-colors">Alerta #{i}</p>
+                        <p className="text-xs text-[var(--ink-muted)] line-clamp-1">Há {i} minutos</p>
                       </div>
                     </motion.div>
                   ))}

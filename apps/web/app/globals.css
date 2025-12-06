@@ -406,8 +406,13 @@
     box-shadow: var(--shadow-soft);
     transition: all var(--transition-smooth);
     position: relative;
-    overflow: hidden;
+    overflow: visible;
     backdrop-filter: blur(10px);
+  }
+  
+  .card-premium > * {
+    position: relative;
+    z-index: 1;
   }
 
   .card-premium::before {
@@ -436,6 +441,11 @@
     opacity: 0;
     transition: opacity var(--transition-smooth);
     pointer-events: none;
+    z-index: 0;
+  }
+  
+  .card-premium::before {
+    z-index: 0;
   }
 
   .card-premium:hover {
@@ -486,8 +496,13 @@
     box-shadow: var(--shadow-soft);
     transition: all var(--transition-smooth);
     position: relative;
-    overflow: hidden;
+    overflow: visible;
     backdrop-filter: blur(10px);
+  }
+  
+  .stat-card > * {
+    position: relative;
+    z-index: 1;
   }
 
   .stat-card::before {
@@ -515,6 +530,11 @@
     opacity: 0;
     transition: opacity var(--transition-smooth);
     pointer-events: none;
+    z-index: 0;
+  }
+  
+  .stat-card::before {
+    z-index: 0;
   }
 
   .stat-card:hover {
