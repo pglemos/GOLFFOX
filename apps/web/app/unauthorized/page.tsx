@@ -13,7 +13,7 @@ function UnauthorizedContent() {
   const reason = searchParams.get('reason') || 'unauthorized'
   const role = searchParams.get('role') || 'unknown'
 
-  const messages: Record<string, { title: string; description: string }> = {
+  const messages: Record<string, { title: string; description: string; showMobileInfo?: boolean }> = {
     admin_only: {
       title: "Acesso Restrito ao Administrador",
       description: "Esta área é exclusiva para administradores do sistema."
@@ -25,6 +25,13 @@ function UnauthorizedContent() {
     carrier_access_required: {
       title: "Acesso Restrito",
       description: "Você precisa ser uma transportadora ou administrador para acessar esta área."
+    },
+    mobile_only: {
+      title: "Acesso via Aplicativo Mobile",
+      description: role === 'driver' 
+        ? "Motoristas devem acessar o sistema através do aplicativo mobile GolfFox. Por favor, baixe o app no seu dispositivo móvel."
+        : "Passageiros devem acessar o sistema através do aplicativo mobile GolfFox. Por favor, baixe o app no seu dispositivo móvel.",
+      showMobileInfo: true
     },
     unauthorized: {
       title: "Acesso Não Autorizado",
@@ -49,6 +56,17 @@ function UnauthorizedContent() {
             </div>
             <h1 className="text-2xl font-bold mb-2">{message.title}</h1>
             <p className="text-[var(--ink-muted)] mb-6">{message.description}</p>
+            
+            {message.showMobileInfo && (
+              <div className="mb-6 p-4 bg-gradient-to-br from-[var(--brand)]/10 to-[var(--accent)]/10 border-2 border-[var(--brand)]/20 rounded-lg">
+                <p className="text-sm font-semibold text-[var(--ink-strong)] mb-2">
+                  📱 Aplicativo Mobile GolfFox
+                </p>
+                <p className="text-xs text-[var(--ink-muted)]">
+                  O aplicativo está disponível para iOS e Android. Entre em contato com o administrador do sistema para obter o link de download.
+                </p>
+              </div>
+            )}
             
             {role && role !== 'unknown' && (
               <div className="mb-6 p-3 bg-[var(--bg-soft)] rounded-lg">

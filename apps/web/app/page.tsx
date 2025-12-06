@@ -666,10 +666,28 @@ function LoginContent() {
           sessionStorage.setItem("golffox-last-login", new Date().toISOString())
         }
 
+        // ✅ Verificar se o role permite acesso web
+        // Driver e Passenger devem usar app mobile
+        if (userRoleFromDatabase === 'driver' || userRoleFromDatabase === 'passenger') {
+          setError(`Seu perfil (${userRoleFromDatabase}) deve acessar o sistema através do aplicativo mobile. Por favor, baixe o app GolfFox no seu dispositivo móvel.`)
+          setLoading(false)
+          setTransitioning(false)
+          if (typeof document !== "undefined") document.body.style.cursor = prevCursor
+          
+          // Limpar sessão se foi criada
+          try {
+            await AuthManager.logout()
+          } catch (err) {
+            console.warn('Erro ao limpar sessão:', err)
+          }
+          
+          return
+        }
+
         // ✅ Determinar URL de redirecionamento baseado no role do banco de dados
         const rawNext = searchParams.get("next")
         const safeNext = sanitizePath(rawNext)
-        let redirectUrl: string
+        let redirectUrl: string | null
 
         // Se houver parâmetro ?next= e for permitido para o role, usar ele
         if (safeNext && isAllowedForRole(userRoleFromDatabase, safeNext)) {
@@ -677,6 +695,23 @@ function LoginContent() {
         } else {
           // Caso contrário, usar o role do banco para determinar o painel
           redirectUrl = AuthManager.getRedirectUrl(userRoleFromDatabase)
+        }
+
+        // Se não houver URL de redirecionamento (driver/passenger), mostrar erro
+        if (!redirectUrl) {
+          setError(`Seu perfil (${userRoleFromDatabase}) deve acessar o sistema através do aplicativo mobile. Por favor, baixe o app GolfFox no seu dispositivo móvel.`)
+          setLoading(false)
+          setTransitioning(false)
+          if (typeof document !== "undefined") document.body.style.cursor = prevCursor
+          
+          // Limpar sessão se foi criada
+          try {
+            await AuthManager.logout()
+          } catch (err) {
+            console.warn('Erro ao limpar sessão:', err)
+          }
+          
+          return
         }
 
         // Limpar query params da URL de redirecionamento
@@ -984,41 +1019,47 @@ function LoginContent() {
                   </motion.div>
                 </motion.div>
 
-                {/* Mobile: Loading overlay moderno */}
+                {/* Mobile: Loading overlay ultra moderno */}
                 <AnimatePresence>
                   {loading && (
                     <motion.div
-                      initial={{ opacity: 0, scale: 0.95 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.95 }}
-                      transition={{ duration: 0.2 }}
-                      className="lg:hidden absolute inset-0 z-50 flex flex-col items-center justify-center bg-gradient-to-br from-white via-white to-gray-50/80 backdrop-blur-md rounded-3xl shadow-2xl border border-gray-100"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="lg:hidden absolute inset-0 z-50 flex flex-col items-center justify-center bg-gradient-to-br from-white/95 via-white/90 to-gray-50/95 backdrop-blur-xl rounded-3xl shadow-2xl border-2 border-gray-200/50"
                     >
-                      <div className="relative">
+                      <div className="relative w-20 h-20 mb-6">
+                        {/* Spinner principal com gradiente */}
                         <motion.div
                           animate={{ rotate: 360 }}
-                          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                          className="w-14 h-14 border-[3px] border-gray-100 border-t-[#F97316] rounded-full shadow-lg"
+                          transition={{ duration: 1.2, repeat: Infinity, ease: "linear" }}
+                          className="absolute inset-0 rounded-full border-4 border-transparent border-t-[#F97316] border-r-[#FB923C] shadow-lg"
                         />
+                        {/* Anel pulsante */}
                         <motion.div
-                          animate={{ scale: [1, 1.1, 1], opacity: [0.5, 1, 0.5] }}
-                          transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-                          className="absolute inset-0 rounded-full bg-[#F97316]/10"
+                          animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.6, 0.3] }}
+                          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                          className="absolute inset-0 rounded-full border-2 border-[#F97316]/30"
                         />
+                        {/* Centro com gradiente */}
+                        <div className="absolute inset-2 rounded-full bg-gradient-to-br from-[#F97316]/20 to-[#FB923C]/10 flex items-center justify-center">
+                          <div className="w-2 h-2 rounded-full bg-[#F97316] shadow-lg shadow-[#F97316]/50" />
+                        </div>
                       </div>
                       <motion.p
-                        initial={{ y: 10, opacity: 0 }}
+                        initial={{ y: 5, opacity: 0 }}
                         animate={{ y: 0, opacity: 1 }}
-                        transition={{ delay: 0.15 }}
-                        className="mt-6 text-base font-semibold bg-gradient-to-r from-gray-700 via-gray-900 to-gray-700 bg-clip-text text-transparent"
+                        transition={{ delay: 0.1 }}
+                        className="text-lg font-bold bg-gradient-to-r from-[#F97316] via-[#FB923C] to-[#F97316] bg-clip-text text-transparent bg-[length:200%_100%] animate-[gradient-shift_2s_ease_infinite]"
                       >
                         {transitioning ? "Entrando..." : "Autenticando"}
                       </motion.p>
                       <motion.p
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
-                        transition={{ delay: 0.3 }}
-                        className="mt-2 text-xs text-gray-400 font-medium"
+                        transition={{ delay: 0.2 }}
+                        className="mt-2 text-sm text-gray-500 font-medium"
                       >
                         Aguarde um momento
                       </motion.p>
@@ -1092,7 +1133,7 @@ function LoginContent() {
                     </label>
                     <div className="relative group">
                       {/* Mail Icon Premium */}
-                      <div className={`absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none z-10 transition-colors ${emailValid ? 'text-[var(--brand)]' : 'text-[var(--ink-muted)]'}`}>
+                      <div className={`absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none z-10 ${emailValid ? 'text-[var(--brand)]' : 'text-[var(--ink-muted)]'}`}>
                         <Mail className="h-5 w-5" />
                       </div>
 
@@ -1137,7 +1178,7 @@ function LoginContent() {
                     </label>
                     <div className="relative group">
                       {/* Lock Icon Premium */}
-                      <div className={`absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none z-10 transition-colors ${passwordValid ? 'text-[var(--brand)]' : 'text-[var(--ink-muted)]'}`}>
+                      <div className={`absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none z-10 ${passwordValid ? 'text-[var(--brand)]' : 'text-[var(--ink-muted)]'}`}>
                         <Lock className="h-5 w-5" />
                       </div>
 
@@ -1300,41 +1341,47 @@ function LoginContent() {
 
             {/* Desktop: No card wrapper */}
             <div className="hidden lg:block relative w-full min-w-0">
-              {/* Desktop: Loading overlay moderno */}
+              {/* Desktop: Loading overlay ultra moderno */}
               <AnimatePresence>
                 {loading && (
                   <motion.div
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.95 }}
-                    transition={{ duration: 0.2 }}
-                    className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-gradient-to-br from-white via-white to-gray-50/80 backdrop-blur-md rounded-3xl shadow-2xl border border-gray-100"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-gradient-to-br from-white/95 via-white/90 to-gray-50/95 backdrop-blur-xl rounded-3xl shadow-2xl border-2 border-gray-200/50"
                   >
-                    <div className="relative">
+                    <div className="relative w-24 h-24 mb-8">
+                      {/* Spinner principal com gradiente */}
                       <motion.div
                         animate={{ rotate: 360 }}
-                        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                        className="w-16 h-16 border-[3px] border-gray-100 border-t-[#F97316] rounded-full shadow-lg"
+                        transition={{ duration: 1.2, repeat: Infinity, ease: "linear" }}
+                        className="absolute inset-0 rounded-full border-4 border-transparent border-t-[#F97316] border-r-[#FB923C] shadow-lg"
                       />
+                      {/* Anel pulsante */}
                       <motion.div
-                        animate={{ scale: [1, 1.15, 1], opacity: [0.4, 0.8, 0.4] }}
-                        transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-                        className="absolute inset-0 rounded-full bg-[#F97316]/10"
+                        animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.6, 0.3] }}
+                        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                        className="absolute inset-0 rounded-full border-2 border-[#F97316]/30"
                       />
+                      {/* Centro com gradiente */}
+                      <div className="absolute inset-2 rounded-full bg-gradient-to-br from-[#F97316]/20 to-[#FB923C]/10 flex items-center justify-center">
+                        <div className="w-3 h-3 rounded-full bg-[#F97316] shadow-lg shadow-[#F97316]/50" />
+                      </div>
                     </div>
                     <motion.p
-                      initial={{ y: 10, opacity: 0 }}
+                      initial={{ y: 5, opacity: 0 }}
                       animate={{ y: 0, opacity: 1 }}
-                      transition={{ delay: 0.15 }}
-                      className="mt-6 text-lg font-semibold bg-gradient-to-r from-gray-700 via-gray-900 to-gray-700 bg-clip-text text-transparent"
+                      transition={{ delay: 0.1 }}
+                      className="text-xl font-bold bg-gradient-to-r from-[#F97316] via-[#FB923C] to-[#F97316] bg-clip-text text-transparent bg-[length:200%_100%] animate-[gradient-shift_2s_ease_infinite]"
                     >
                       {transitioning ? "Entrando..." : "Autenticando"}
                     </motion.p>
                     <motion.p
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
-                      transition={{ delay: 0.3 }}
-                      className="mt-2 text-sm text-gray-400 font-medium"
+                      transition={{ delay: 0.2 }}
+                      className="mt-2 text-sm text-gray-500 font-medium"
                     >
                       Aguarde um momento
                     </motion.p>
@@ -1405,7 +1452,7 @@ function LoginContent() {
                     E-mail
                   </label>
                   <div className="relative group">
-                    <div className={`absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none z-10 transition-colors ${emailValid ? 'text-[var(--brand)]' : 'text-[var(--ink-muted)]'}`}>
+                    <div className={`absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none z-10 ${emailValid ? 'text-[var(--brand)]' : 'text-[var(--ink-muted)]'}`}>
                       <Mail className="h-5 w-5" />
                     </div>
                     <Input
@@ -1448,7 +1495,7 @@ function LoginContent() {
                     Senha
                   </label>
                   <div className="relative group">
-                    <div className={`absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none z-10 transition-colors ${passwordValid ? 'text-[var(--brand)]' : 'text-[var(--ink-muted)]'}`}>
+                    <div className={`absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none z-10 ${passwordValid ? 'text-[var(--brand)]' : 'text-[var(--ink-muted)]'}`}>
                       <Lock className="h-5 w-5" />
                     </div>
                     <Input
