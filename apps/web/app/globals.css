@@ -4,6 +4,7 @@
    ============================================================ */
 
 @import "tailwindcss";
+@config "../tailwind.config.js";
 
 /* Mobile optimizations */
 @layer base {
