@@ -105,7 +105,24 @@ let nextConfig = {
       '@': path.resolve(__dirname),
       '@shared': path.resolve(__dirname, '../../shared'),
       // Resolver conflito @swc/helpers entre pdfkit/fontkit e projeto
-      '@swc/helpers': path.resolve(__dirname, 'node_modules/@swc/helpers'),
+      // Usar a versão do Next.js (0.5.15) que tem _apply_decorated_descriptor
+      '@swc/helpers': path.resolve(__dirname, 'node_modules/next/node_modules/@swc/helpers'),
+    }
+    
+    // Adicionar plugin para injetar compatibilidade
+    if (!isServer) {
+      config.plugins = config.plugins || []
+      config.plugins.push(
+        new (require('webpack').NormalModuleReplacementPlugin)(
+          /@swc\/helpers$/,
+          (resource) => {
+            // Para módulos ESM do fontkit, usar wrapper de compatibilidade
+            if (resource.context && resource.context.includes('fontkit')) {
+              resource.request = path.resolve(__dirname, 'lib/swc-helpers-patch.mjs')
+            }
+          }
+        )
+      )
     }
 
     // Configurações básicas para cliente
