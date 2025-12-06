@@ -65,7 +65,7 @@ export function useGlobalSync(
   }, [eventTypes.join(',')])
 
   return useCallback((eventType: SyncEventType, data: any) => {
-    globalSyncManager.triggerSync(eventType, data)
+    globalSyncManager.triggerSync(eventType as any, data)
   }, [])
 }
 

@@ -139,7 +139,7 @@ export function useRouteCreate(isOpen: boolean) {
             let { data, error } = await ((supabase
                 .from("v_company_employees_secure")
                 .select("*")
-                .eq("company_id", formData.company_id)) as any)
+                .eq("company_id", formData.company_id)) as any) as any
 
             if (error && (error.message?.includes("does not exist") || (error as any).code === "PGRST205")) {
                 try {

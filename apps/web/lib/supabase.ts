@@ -136,11 +136,11 @@ if (envUrl && envAnon) {
       delete: () => createMockBuilder(),
     }),
     channel: () => {
-      const ch: MockRealtimeChannel & RealtimeChannel = {
-        on: (_event: 'postgres_changes' | 'presence' | 'broadcast', _filter: any, _callback: (payload: any) => void) => ch as MockRealtimeChannel & RealtimeChannel,
+      const ch: any = {
+        on: (_event: 'postgres_changes' | 'presence' | 'broadcast', _filter: any, _callback: (payload: any) => void) => ch,
         subscribe: (cb?: (status: string) => void) => {
           if (cb) cb('SUBSCRIBED')
-          return ch as MockRealtimeChannel & RealtimeChannel
+          return ch
         },
         unsubscribe: async () => { return Promise.resolve() },
       }

@@ -388,7 +388,7 @@ function FuncionariosPageContent() {
           setIsCsvModalOpen(false)
           refetch()
         }}
-        empresaId={tenantCompanyId ? String(tenantCompanyId) : undefined}
+        empresaId={tenantCompanyId ? String(tenantCompanyId) : ''}
       />
 
       {/* Modal de CRUD de Funcionário */}
