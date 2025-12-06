@@ -14,7 +14,7 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
         "card-premium",
         glass && "card-glass",
         !hover && "hover:shadow-[var(--shadow-sm)] hover:-translate-y-0",
-        "w-full max-w-full min-w-0 overflow-visible",
+        "w-full overflow-visible",
         className
       )}
       {...props}
