@@ -151,11 +151,21 @@ npm run setup:env       # Configura variáveis de ambiente
 
 ### Migrations do Banco de Dados
 
-Execute os arquivos SQL em `database/migrations/` na seguinte ordem:
+O sistema agora usa migrations versionadas com controle automático. Execute:
 
-1. `gf_views.sql` - Cria views necessárias
-2. `gf_tables_auxiliares.sql` - Cria tabelas auxiliares
-3. `gf_rpc_map_snapshot.sql` - Cria RPC do mapa
+```bash
+npm run db:migrate
+```
+
+Isso aplicará automaticamente todas as migrations pendentes em ordem.
+
+**Migrations existentes:**
+- `000_schema_migrations.sql` - Sistema de controle de versão (aplicado automaticamente)
+- `001_initial_schema.sql` - Schema inicial
+- `002_missing_schema.sql` - Correções e adições
+- `fix_supabase_issues.sql` - Correções específicas do Supabase
+
+Para mais detalhes, consulte [database/migrations/README.md](database/migrations/README.md).
 
 ## 🚀 Deploy
 

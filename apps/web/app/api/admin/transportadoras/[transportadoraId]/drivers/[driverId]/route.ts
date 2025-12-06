@@ -29,7 +29,7 @@ export async function PUT(
       )
     }
 
-    // @ts-expect-error Supabase type inference issue
+    // @ts-ignore - Supabase type inference issue
     const { data: driver, error } = await ((supabase
       .from('drivers')
       .update({
@@ -81,7 +81,7 @@ export async function DELETE(
       )
     }
 
-    // @ts-expect-error Supabase type inference issue
+    // @ts-ignore - Supabase type inference issue
     const { error } = await (supabase
       .from('drivers')
       .delete()

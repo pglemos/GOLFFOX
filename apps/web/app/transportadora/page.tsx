@@ -331,6 +331,7 @@ export default function TransportadoraDashboard() {
       if (driversData?.length) {
         // Buscar dados de ranking/gamificação
         const driverIds = driversData.map((d: any) => d.id)
+        // @ts-expect-error Supabase type inference issue
         const { data: rankings } = await ((supabase
           .from('gf_gamification_scores')
           .select('*')

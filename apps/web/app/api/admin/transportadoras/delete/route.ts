@@ -102,7 +102,7 @@ export async function DELETE(req: NextRequest) {
 
     // 4. Verificar se há outras tabelas com referências (ex: costs, se existir)
     try {
-      // @ts-expect-error Supabase type inference issue
+      // @ts-ignore - Supabase type inference issue
       const { data: costsData, error: costsCheckError } = await (supabaseServiceRole
         .from('costs')
         .select('id')

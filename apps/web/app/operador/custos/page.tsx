@@ -126,9 +126,16 @@ export default function CustosOperatorPage() {
         supabase.from('carriers').select('id, name').order('name')
       ])
 
-      if (routesRes.data) setRoutes(routesRes.data)
-      if (vehiclesRes.data) setVehicles(vehiclesRes.data)
-      if (driversRes.data) setDrivers(driversRes.data)
+      if (routesRes.data) {
+        // Filtrar valores null e garantir tipos corretos
+        setRoutes(routesRes.data.filter((r: any): r is { id: string; name: string } => r.id !== null && r.name !== null))
+      }
+      if (vehiclesRes.data) {
+        setVehicles(vehiclesRes.data.filter((v: any): v is { id: string; plate: string } => v.id !== null && v.plate !== null))
+      }
+      if (driversRes.data) {
+        setDrivers(driversRes.data.filter((d: any): d is { id: string; email: string } => d.id !== null && d.email !== null))
+      }
       if (categoriesRes) setCategories(categoriesRes)
       if (carriersRes.data) {
         const filteredCarriers = carriersRes.data
