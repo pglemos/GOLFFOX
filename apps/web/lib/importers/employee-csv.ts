@@ -250,9 +250,9 @@ export async function importEmployees(
 
       let userId: string
 
-      if (existingEmployee?.employee_id) {
+      if ((existingEmployee as any)?.employee_id) {
         // Funcionário já existe, usar employee_id existente
-        userId = existingEmployee.employee_id
+        userId = (existingEmployee as any).employee_id
         
         // Atualizar dados do usuário se necessário
         try {
@@ -333,7 +333,7 @@ export async function importEmployees(
 
       if (upsertError) {
         // Se erro de constraint única, tentar update
-        if (upsertError.code === '23505' || upsertError.message?.includes('duplicate')) {
+        if ((upsertError as any).code === '23505' || upsertError.message?.includes('duplicate')) {
           const { error: updateError } = await supabase
             .from('gf_employee_company')
             .update(employeeData)

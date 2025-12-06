@@ -84,7 +84,7 @@ export function EditAssistanceModal({
 
       // Notificar sincronização global
       if (result.request) {
-        globalSyncManager.triggerSync("assistance_request.updated" as any, result.request)
+        globalSyncManager.triggerSync("assistance_request.updated", result.request)
       }
 
       onSave()

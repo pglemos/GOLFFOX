@@ -29,6 +29,7 @@ type SyncEventType =
   | 'carrier.created'
   | 'carrier.updated'
   | 'carrier.deleted'
+  | 'assistance_request.updated'
 
 type SyncCallback = (event: { type: SyncEventType; data: any }) => void
 
