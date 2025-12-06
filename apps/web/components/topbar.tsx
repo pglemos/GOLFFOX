@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import React, { useState, useEffect } from "react"
 // Substituir Link por <a> para evitar erro de export do next/link
 import { useRouter, usePathname } from "next/navigation"
 import { motion } from "framer-motion"
@@ -350,9 +350,9 @@ export function Topbar({
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.95 }}
                     transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                    onError={(e) => {
+                    onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
                       // Fallback para inicial se a imagem falhar
-                      const target = e.target as HTMLImageElement;
+                      const target = e.currentTarget;
                       target.style.display = 'none';
                       target.nextElementSibling?.classList.remove('hidden');
                     }}
