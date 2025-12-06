@@ -274,8 +274,9 @@ const CustomSidebarLink = ({
         href={item.href}
         prefetch={true}
         className={cn(
-          "flex items-center justify-start gap-2 py-2.5 sm:py-2 px-2 sm:px-3 rounded-lg transition-colors relative",
+          "flex items-center justify-start gap-2 rounded-lg transition-colors relative",
           "min-h-[44px] sm:min-h-[40px] touch-manipulation",
+          !open ? "justify-center px-0 py-2" : "py-2.5 sm:py-2 px-2 sm:px-3",
           isActive
             ? (panel === 'operador'
               ? "bg-orange-50 dark:bg-orange-900/20 text-orange-500"
@@ -293,16 +294,40 @@ const CustomSidebarLink = ({
           }
         }}
       >
-        <div className="relative">
-          <Icon
-            className={cn(
-              "h-5 w-5 transition-colors flex-shrink-0",
-              "stroke-[1.5px]",
+        <div className={cn(
+          "relative flex items-center justify-center transition-all",
+          !open ? "w-10 h-10 rounded-full" : ""
+        )}>
+          {!open ? (
+            <div className={cn(
+              "w-10 h-10 rounded-full flex items-center justify-center transition-colors",
               isActive
-                ? (panel === 'operador' ? "text-orange-500" : "text-[#F97316]")
-                : (panel === 'operador' ? "text-gray-500 group-hover:text-orange-500" : "text-gray-500 group-hover:text-[#F97316]")
-            )}
-          />
+                ? (panel === 'operador' 
+                    ? "bg-orange-500 text-white" 
+                    : "bg-[#F97316] text-white")
+                : "bg-transparent hover:bg-gray-100 dark:hover:bg-gray-800"
+            )}>
+              <Icon
+                className={cn(
+                  "h-5 w-5 transition-colors flex-shrink-0",
+                  "stroke-[1.5px]",
+                  isActive
+                    ? "text-white"
+                    : (panel === 'operador' ? "text-gray-500 group-hover:text-orange-500" : "text-gray-500 group-hover:text-[#F97316]")
+                )}
+              />
+            </div>
+          ) : (
+            <Icon
+              className={cn(
+                "h-5 w-5 transition-colors flex-shrink-0",
+                "stroke-[1.5px]",
+                isActive
+                  ? (panel === 'operador' ? "text-orange-500" : "text-[#F97316]")
+                  : (panel === 'operador' ? "text-gray-500 group-hover:text-orange-500" : "text-gray-500 group-hover:text-[#F97316]")
+              )}
+            />
+          )}
           {showOperationalAlerts && open && (
             <div className="absolute -top-1 -right-1 flex gap-1">
               {showOperationalAlerts && <OperationalAlertsBadge />}
@@ -348,7 +373,10 @@ const SidebarLogo = ({ panel }: { panel: 'admin' | 'operador' | 'transportadora'
   return (
     <a
       href={panel === 'operador' ? '/operador' : panel === 'transportadora' ? '/transportadora' : '/admin'}
-      className="font-normal flex space-x-2 items-center text-sm text-black dark:text-white py-1 relative z-20 mb-6"
+      className={cn(
+        "font-normal flex items-center text-sm text-black dark:text-white py-1 relative z-20 mb-6 transition-all",
+        open ? "space-x-2" : "justify-center w-full"
+      )}
     >
       <div className={cn(
         "h-8 w-8 rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm",

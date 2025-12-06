@@ -23,7 +23,7 @@ interface AppShellProps {
 // Named export for AppShell component
 export const AppShell = memo(function AppShell({ user, children, panel }: AppShellProps) {
   const pathname = usePathname()
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true)
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
 
   // #region agent log
