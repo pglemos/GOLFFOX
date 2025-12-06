@@ -4,6 +4,7 @@
   "description": "GolfFox Web App - Premium UI/UX with Next.js",
   "scripts": {
     "dev": "next dev -p 3000",
+    "postinstall": "node scripts/patch-swc-helpers.js",
     "build": "cross-env CSS_TRANSFORMER_WASM=1 next build",
     "start": "next start",
     "lint": "next lint",
@@ -122,6 +123,7 @@
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
     "lint-staged": "^15.2.11",
+    "patch-package": "^8.0.1",
     "pg": "^8.16.3",
     "postcss": "^8.5.6",
     "prettier": "^3.4.2",
