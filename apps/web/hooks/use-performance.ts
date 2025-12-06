@@ -254,7 +254,7 @@ export function useThrottle<T extends (...args: any[]) => any>(
         timeoutRef.current = setTimeout(() => {
           lastCall.current = Date.now()
           callback(...args)
-        }, delay - (now - lastCall.current)) as any
+        }, delay - (now - lastCall.current)) as unknown as NodeJS.Timeout
       }
     }) as T,
     [callback, delay]

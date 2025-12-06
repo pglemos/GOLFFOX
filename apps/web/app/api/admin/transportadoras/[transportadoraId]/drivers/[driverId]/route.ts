@@ -29,7 +29,7 @@ export async function PUT(
       )
     }
 
-    const { data: driver, error } = await (supabase
+    const { data: driver, error } = await (((supabase
       .from('drivers')
       .update({
         name,
@@ -42,7 +42,7 @@ export async function PUT(
       .eq('id', driverId)
       .eq('transportadora_id', transportadoraId)
       .select()
-      .single()
+      .single()) as any
 
     if (error) {
       console.error('Erro ao atualizar motorista:', error)
@@ -80,11 +80,11 @@ export async function DELETE(
       )
     }
 
-    const { error } = await supabase
+    const { error } = await (supabase
       .from('drivers')
       .delete()
       .eq('id', driverId)
-      .eq('transportadora_id', transportadoraId)
+      .eq('transportadora_id', transportadoraId) as any)
 
     if (error) {
       console.error('Erro ao excluir motorista:', error)

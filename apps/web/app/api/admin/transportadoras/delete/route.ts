@@ -102,11 +102,11 @@ export async function DELETE(req: NextRequest) {
 
     // 4. Verificar se há outras tabelas com referências (ex: costs, se existir)
     try {
-      const { data: costsData, error: costsCheckError } = await supabaseServiceRole
+      const { data: costsData, error: costsCheckError } = await (supabaseServiceRole
         .from('costs')
         .select('id')
         .eq('transportadora_id', carrierId)
-        .limit(1)
+        .limit(1) as any)
 
       // Se a tabela existir e houver registros, remover referências
       if (!costsCheckError && costsData && costsData.length > 0) {

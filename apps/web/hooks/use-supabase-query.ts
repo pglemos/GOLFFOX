@@ -290,7 +290,7 @@ export function useSupabaseCount(
   const smartFallback = getSmartFallback(table, filters)
 
   const queryFn = useCallback(async () => {
-    let query = (supabase.from(table).select('*', { count: 'exact', head: true }) as any)
+    let query: any = (supabase.from(table).select('*', { count: 'exact', head: true }) as any)
     
     // Aplicar filtros
     Object.entries(filters).forEach(([key, value]) => {

@@ -173,7 +173,7 @@ async function createOrUpdateBudgetHandler(request: NextRequest) {
       .eq('company_id', validated.company_id)
       .eq('period_month', validated.period_month)
       .eq('period_year', validated.period_year)
-      .eq('category_id', validated.category_id ?? null)
+      .eq('category_id', validated.category_id || null)
       .single()
 
     let result

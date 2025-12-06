@@ -70,8 +70,8 @@ export async function POST(req: NextRequest) {
 
         // Log de auditoria (opcional - se falhar não impede a operação)
         try {
-            await (supabaseServiceRole
-                .from('audit_logs') as any)
+            await ((supabaseServiceRole
+                .from('audit_logs')) as any)
                 .insert({
                     user_id: validated.userId,
                     action: 'change_role',
