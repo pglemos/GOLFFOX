@@ -205,7 +205,7 @@ export function Topbar({
       initial={{ y: -72 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.3, ease: "easeOut" }}
-      className="fixed top-0 left-0 right-0 h-16 sm:h-18 bg-gradient-to-b from-white/98 via-white/95 to-white/90 dark:from-neutral-900/98 dark:via-neutral-900/95 dark:to-neutral-900/90 backdrop-blur-2xl border-b-2 border-[var(--border)] shadow-[var(--shadow-sm)] z-[var(--z-fixed)] w-full"
+      className="fixed top-0 left-0 right-0 h-16 sm:h-18 bg-white/95 dark:bg-neutral-900/95 backdrop-blur-xl border-b border-[var(--border)] z-[var(--z-fixed)] w-full"
     >
       <div className="mx-auto max-w-[1600px] px-3 sm:px-4 md:px-6 h-full flex items-center gap-2 sm:gap-3 md:gap-4 w-full">
         {/* Mobile menu toggle */}
@@ -227,16 +227,16 @@ export function Topbar({
         ) : (
           <a href={panelHomeUrl} className="flex items-center gap-2 sm:gap-3 group min-w-0 sm:flex-shrink-0">
             <motion.div
-              whileHover={{ scale: 1.1, rotate: [0, -5, 5, 0] }}
+              whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-xl gradient-brand flex items-center justify-center shadow-lg hover:shadow-[var(--shadow-brand-lg)] flex-shrink-0 relative overflow-hidden group/logo"
+              className="w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-xl bg-gradient-to-br from-[#1E3A5F] via-[#2D4A6B] to-[var(--brand)] flex items-center justify-center shadow-lg hover:shadow-[var(--shadow-brand-lg)] flex-shrink-0 relative overflow-hidden group/logo"
               transition={{ type: "spring", stiffness: 400, damping: 17 }}
             >
               <motion.div
-                className="absolute inset-0 bg-gradient-to-br from-white/30 via-white/10 to-transparent opacity-0 group-hover/logo:opacity-100"
+                className="absolute inset-0 bg-gradient-to-br from-white/20 via-white/5 to-transparent opacity-0 group-hover/logo:opacity-100"
                 transition={{ duration: 0.3 }}
               />
-              <span className="text-white font-bold text-base sm:text-lg md:text-xl relative z-10 drop-shadow-sm">G</span>
+              <span className="text-white font-bold text-base sm:text-lg md:text-xl relative z-10 drop-shadow-md">G</span>
             </motion.div>
             <div className="flex items-center gap-1 sm:gap-2 min-w-0">
               <span className="font-bold text-base sm:text-lg md:text-xl lg:text-2xl tracking-tight text-[var(--ink-strong)] truncate">
@@ -359,7 +359,7 @@ export function Topbar({
                   />
                 ) : null}
                 <motion.div 
-                  className={`w-8 h-8 rounded-full gradient-brand flex items-center justify-center shadow-lg hover:shadow-[var(--shadow-brand-lg)] flex-shrink-0 relative overflow-hidden group/avatar ${user?.avatar_url ? 'hidden' : ''}`}
+                  className={`w-8 h-8 rounded-full bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg hover:shadow-[var(--shadow-brand-lg)] flex-shrink-0 relative overflow-hidden group/avatar ${user?.avatar_url ? 'hidden' : ''}`}
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.95 }}
                   transition={{ type: "spring", stiffness: 400, damping: 17 }}
@@ -369,7 +369,17 @@ export function Topbar({
                     transition={{ duration: 0.3 }}
                   />
                   <span className="text-white text-sm font-bold relative z-10 drop-shadow-sm">
-                    {user?.name?.charAt(0).toUpperCase() || "A"}
+                    {(() => {
+                      if (pathname?.startsWith('/admin')) {
+                        return 'GF';
+                      }
+                      const name = user?.name || '';
+                      const parts = name.split(' ');
+                      if (parts.length >= 2) {
+                        return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
+                      }
+                      return name.charAt(0).toUpperCase() || 'A';
+                    })()}
                   </span>
                 </motion.div>
                 <div className="text-left hidden sm:block min-w-0">
