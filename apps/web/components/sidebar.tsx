@@ -276,7 +276,7 @@ const CustomSidebarLink = ({
         className={cn(
           "flex items-center justify-start gap-2 rounded-lg transition-colors relative",
           "min-h-[44px] sm:min-h-[40px] touch-manipulation",
-          !open ? "justify-center px-0 py-2" : "py-2.5 sm:py-2 px-2 sm:px-3",
+          "py-2.5 sm:py-2 px-2 sm:px-3",
           isActive
             ? (panel === 'operador'
               ? "bg-orange-50 dark:bg-orange-900/20 text-orange-500"
