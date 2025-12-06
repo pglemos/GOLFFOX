@@ -1128,7 +1128,7 @@ function LoginContent() {
                         </motion.p>
                       )}
                     </div>
-                  </motion.div>
+                  </div>
 
                   {/* Campo Senha Premium */}
                   <div className="space-y-2">
@@ -1183,7 +1183,7 @@ function LoginContent() {
                         </motion.p>
                       )}
                     </div>
-                  </motion.div>
+                  </div>
 
                   {/* Opções extras Premium */}
                   <motion.div 
@@ -1440,7 +1440,7 @@ function LoginContent() {
                       </motion.p>
                     )}
                   </div>
-                </motion.div>
+                </div>
 
                 {/* Campo Senha - Desktop Premium */}
                 <div className="space-y-2">
@@ -1493,7 +1493,7 @@ function LoginContent() {
                       </motion.p>
                     )}
                   </div>
-                </motion.div>
+                </div>
 
                 {/* Opções extras - Desktop Premium */}
                 <motion.div 
