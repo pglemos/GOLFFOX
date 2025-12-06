@@ -72,7 +72,7 @@ export async function POST(req: NextRequest) {
         try {
             await ((supabaseServiceRole
                 // @ts-ignore - Supabase type inference issue
-                .from('audit_logs')) as any)
+                .from('audit_logs' as any)) as any)
                 .insert({
                     user_id: validated.userId,
                     action: 'change_role',
