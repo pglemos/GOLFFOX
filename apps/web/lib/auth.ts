@@ -108,7 +108,7 @@ export class AuthManager {
     return true
   }
 
-  static getRedirectUrl(role: string): string {
+  static getRedirectUrl(role: string): string | null {
     switch (role) {
       case 'admin':
         return '/admin'
@@ -119,6 +119,10 @@ export class AuthManager {
       case 'transportadora':
       case 'carrier':
         return '/transportadora'
+      case 'driver':
+      case 'passenger':
+        // Driver e Passenger devem usar app mobile, não painéis web
+        return null
       default:
         // Fallback para operador se role não for reconhecido
         console.warn(`[AuthManager] Role não reconhecido: ${role}, redirecionando para /operador`)
