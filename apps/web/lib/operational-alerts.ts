@@ -166,7 +166,7 @@ export async function getUnresolvedAlerts(
     }
 
     if (error) throw error
-    return (data || []) as unknown as { company_id: string | null; created_at: string | null; id: string | null; is_resolved: boolean | null; message: string | null; severity: string | null; type: string | null; }[]
+    return (data || []) as any
   } catch (error) {
     console.error('Erro ao buscar alertas:', formatSupabaseError(error))
     return []
@@ -216,7 +216,7 @@ export async function hasCriticalAlerts(): Promise<boolean> {
     }
 
     if (error) throw error
-    return (((data as any)?.length || 0) > 0) as unknown as boolean
+    return ((data as any)?.length || 0) > 0
   } catch (error) {
     console.error('Erro ao verificar alertas críticos:', formatSupabaseError(error))
     return false

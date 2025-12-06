@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+// Jest globals: describe, it, expect
 
 const calculateDiscrepancy = (measured: number | null, invoiced: number | null): {
   percentage: number

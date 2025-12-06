@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+// Jest globals: describe, it, expect
 
 describe('Env Vars', () => {
     it('should have env vars defined', () => {
