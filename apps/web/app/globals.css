@@ -330,6 +330,35 @@
     background: linear-gradient(135deg, #F97316 0%, #FB923C 50%, #FDBA74 100%);
   }
 
+  /* Card Premium */
+  .card-premium {
+    background-color: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    transition: all var(--transition-base);
+  }
+
+  .card-premium:hover {
+    box-shadow: var(--shadow-md);
+    border-color: var(--border-strong);
+  }
+
+  /* Stat Card */
+  .stat-card {
+    background-color: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-lg);
+    box-shadow: var(--shadow-sm);
+    transition: all var(--transition-base);
+  }
+
+  .stat-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+  }
+
   /* Animation Utilities */
   .animate-in-fade {
     animation: fadeIn 0.5s ease-out forwards;
@@ -341,6 +370,11 @@
 
   .animate-in-slide-up {
     animation: slideUp 0.5s ease-out forwards;
+  }
+
+  /* Pulse Glow Animation */
+  .animate-pulse-glow {
+    animation: pulseGlow 2s ease-in-out infinite;
   }
 }
 
@@ -364,6 +398,17 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    opacity: 1;
+    box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.7);
+  }
+  50% {
+    opacity: 0.8;
+    box-shadow: 0 0 0 4px rgba(249, 115, 22, 0);
   }
 }
 
