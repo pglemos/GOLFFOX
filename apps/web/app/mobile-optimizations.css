@@ -139,6 +139,7 @@ img[loading="lazy"] {
     .card-premium,
     .stat-card {
         padding: var(--space-md);
+        border-radius: var(--radius-lg);
     }
 
     /* Melhorar toque em mobile */
@@ -148,6 +149,18 @@ img[loading="lazy"] {
         min-height: 44px;
         min-width: 44px;
         touch-action: manipulation;
+    }
+
+    /* Reduzir sombras em mobile para performance */
+    .card-premium,
+    .stat-card {
+        box-shadow: var(--shadow-sm);
+    }
+
+    .card-premium:hover,
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
     }
 }
 
@@ -163,7 +176,15 @@ img[loading="lazy"] {
     /* Desktop: Efeitos premium completos */
     .card-premium:hover,
     .stat-card:hover {
-        transform: translateY(-4px);
+        transform: translateY(-6px) scale(1.01);
+    }
+}
+
+/* Ultra Premium Effects - Desktop Only */
+@media (min-width: 1280px) {
+    .card-premium::before,
+    .stat-card::before {
+        background-size: 300% 100%;
     }
 }
 

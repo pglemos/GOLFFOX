@@ -54,20 +54,25 @@ const Stat = ({ icon: Icon, label, value, hint, trend, trendLabel, className }: 
     >
       <div className="flex items-start justify-between gap-3 sm:gap-4">
         <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
-          {/* Icon Container - Premium */}
+          {/* Icon Container - Ultra Premium */}
           <motion.div 
-            className="p-2.5 sm:p-3 rounded-[var(--radius-lg)] bg-[var(--brand-light)] group-hover:bg-[var(--brand)] transition-all duration-300 flex-shrink-0 relative overflow-hidden"
+            className="p-3 sm:p-3.5 rounded-xl bg-gradient-to-br from-[var(--brand-light)] to-[var(--brand-soft)] group-hover:from-[var(--brand)] group-hover:to-[var(--brand-hover)] transition-all duration-300 flex-shrink-0 relative overflow-hidden shadow-md group-hover:shadow-[var(--shadow-brand)]"
             whileHover={{ 
-              rotate: [0, -5, 5, 0],
-              scale: 1.1
+              rotate: [0, -8, 8, 0],
+              scale: 1.15
             }}
-            transition={{ duration: 0.5 }}
+            whileTap={{ scale: 0.95 }}
+            transition={{ type: "spring", stiffness: 400, damping: 17 }}
           >
             <motion.div
-              className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100"
-              transition={{ duration: 0.3 }}
+              className="absolute inset-0 bg-gradient-to-br from-white/30 via-white/10 to-transparent opacity-0 group-hover:opacity-100"
+              transition={{ duration: 0.4 }}
             />
-            <Icon className="w-6 h-6 sm:w-7 sm:h-7 text-[var(--brand)] group-hover:text-white transition-all duration-300 relative z-10" />
+            <motion.div
+              className="absolute -inset-2 bg-[var(--brand)] opacity-0 group-hover:opacity-20 blur-xl"
+              transition={{ duration: 0.4 }}
+            />
+            <Icon className="w-6 h-6 sm:w-7 sm:h-7 text-[var(--brand)] group-hover:text-white transition-all duration-300 relative z-10 drop-shadow-sm group-hover:drop-shadow-md" />
           </motion.div>
 
           {/* Content */}

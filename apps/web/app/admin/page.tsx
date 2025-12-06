@@ -346,15 +346,30 @@ export default function AdminDashboard() {
                       <CardTitle className="text-lg sm:text-xl font-semibold mb-1.5 truncate">Mapa da Frota</CardTitle>
                       <p className="text-xs sm:text-sm text-[var(--ink-muted)] line-clamp-2">Visualize veículos em tempo real</p>
                     </div>
-                    <div className="p-2 sm:p-2.5 rounded-lg bg-[var(--brand-light)] group-hover:bg-[var(--brand)] transition-colors flex-shrink-0">
-                      <MapPin className="h-4 w-4 sm:h-5 sm:w-5 text-[var(--brand)] group-hover:text-white transition-colors" />
-                    </div>
+                    <motion.div 
+                      className="p-2.5 sm:p-3 rounded-xl bg-gradient-to-br from-[var(--brand-light)] to-[var(--brand-soft)] group-hover:from-[var(--brand)] group-hover:to-[var(--brand-hover)] transition-all duration-300 flex-shrink-0 shadow-md group-hover:shadow-[var(--shadow-brand-lg)] relative overflow-hidden"
+                      whileHover={{ scale: 1.1, rotate: [0, -5, 5, 0] }}
+                      transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                    >
+                      <motion.div
+                        className="absolute inset-0 bg-gradient-to-br from-white/30 via-white/10 to-transparent opacity-0 group-hover:opacity-100"
+                        transition={{ duration: 0.3 }}
+                      />
+                      <MapPin className="h-4 w-4 sm:h-5 sm:w-5 text-[var(--brand)] group-hover:text-white transition-all duration-300 relative z-10 drop-shadow-sm" />
+                    </motion.div>
                   </div>
                 </CardHeader>
                 <CardContent className="pt-0 px-3 sm:px-6">
-                  <div className="h-40 bg-gradient-to-br from-[var(--brand)]/10 to-[var(--accent)]/10 rounded-lg flex items-center justify-center group-hover:from-[var(--brand)]/20 group-hover:to-[var(--accent)]/20 transition-all overflow-hidden">
-                    <MapPin className="h-16 w-16 text-[var(--brand)] opacity-30 group-hover:opacity-50 transition-opacity" />
-                  </div>
+                  <motion.div 
+                    className="h-40 bg-gradient-to-br from-[var(--brand)]/10 via-[var(--brand)]/5 to-[var(--accent)]/10 rounded-xl flex items-center justify-center group-hover:from-[var(--brand)]/25 group-hover:via-[var(--brand)]/15 group-hover:to-[var(--accent)]/25 transition-all duration-500 overflow-hidden relative"
+                    whileHover={{ scale: 1.02 }}
+                  >
+                    <motion.div
+                      className="absolute inset-0 bg-gradient-to-br from-[var(--brand)]/20 to-transparent opacity-0 group-hover:opacity-100"
+                      transition={{ duration: 0.5 }}
+                    />
+                    <MapPin className="h-16 w-16 text-[var(--brand)] opacity-30 group-hover:opacity-70 transition-all duration-500 relative z-10 drop-shadow-lg" />
+                  </motion.div>
                 </CardContent>
               </Card>
             </a>
@@ -383,13 +398,31 @@ export default function AdminDashboard() {
               <CardContent className="pt-0 px-3 sm:px-6">
                 <div className="space-y-2">
                   {[1, 2, 3].map((i) => (
-                    <div key={i} className="flex items-center gap-3 p-3 rounded-lg hover:bg-[var(--bg-hover)] transition-colors border border-transparent hover:border-[var(--border)]">
-                      <div className="w-2 h-2 rounded-full bg-[var(--brand)] animate-pulse flex-shrink-0"></div>
+                    <motion.div 
+                      key={i} 
+                      className="flex items-center gap-3 p-3.5 rounded-xl hover:bg-gradient-to-r hover:from-[var(--bg-hover)] hover:to-[var(--bg-soft)] transition-all duration-300 border border-transparent hover:border-[var(--border)] hover:shadow-sm group/alert"
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.6 + i * 0.1 }}
+                      whileHover={{ x: 4, scale: 1.02 }}
+                    >
+                      <motion.div 
+                        className="w-2.5 h-2.5 rounded-full bg-gradient-to-br from-[var(--brand)] to-[var(--brand-hover)] shadow-[var(--shadow-brand)] flex-shrink-0"
+                        animate={{ 
+                          scale: [1, 1.3, 1],
+                          opacity: [1, 0.7, 1]
+                        }}
+                        transition={{ 
+                          duration: 2,
+                          repeat: Infinity,
+                          ease: "easeInOut"
+                        }}
+                      />
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-[var(--ink-strong)] truncate">Alerta #{i}</p>
+                        <p className="text-sm font-semibold text-[var(--ink-strong)] truncate group-hover:text-[var(--brand)] transition-colors">Alerta #{i}</p>
                         <p className="text-xs text-[var(--ink-muted)] truncate">Há {i} minutos</p>
                       </div>
-                    </div>
+                    </motion.div>
                   ))}
                 </div>
               </CardContent>

@@ -6,22 +6,22 @@ import { motion } from "framer-motion"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-[var(--radius-lg)] text-sm font-semibold ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] focus-visible:ring-opacity-20 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 relative overflow-hidden",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-[var(--radius-lg)] text-sm font-semibold ring-offset-background transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] focus-visible:ring-opacity-20 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 relative overflow-hidden group",
   {
     variants: {
       variant: {
-        default: "bg-[var(--brand)] text-white hover:bg-[var(--brand-hover)] shadow-[var(--shadow-brand)] hover:shadow-[var(--shadow-brand-lg)] active:shadow-[var(--shadow-md)]",
-        destructive: "bg-[var(--error)] text-white hover:bg-[var(--error)]/90 shadow-md hover:shadow-lg active:shadow-sm",
-        outline: "border-2 border-[var(--border)] bg-transparent hover:bg-[var(--bg-hover)] hover:border-[var(--brand)] hover:text-[var(--brand)] active:bg-[var(--bg-soft)]",
-        secondary: "bg-[var(--accent)] text-white hover:bg-[var(--accent-soft)] shadow-md hover:shadow-lg active:shadow-sm",
-        ghost: "hover:bg-[var(--bg-hover)] active:bg-[var(--bg-soft)]",
-        link: "text-[var(--brand)] underline-offset-4 hover:underline hover:text-[var(--brand-hover)]",
+        default: "bg-gradient-to-r from-[var(--brand)] to-[var(--brand-hover)] text-white hover:from-[var(--brand-hover)] hover:to-[var(--brand)] shadow-[var(--shadow-brand)] hover:shadow-[var(--shadow-brand-lg)] active:shadow-[var(--shadow-md)] hover:scale-105",
+        destructive: "bg-gradient-to-r from-[var(--error)] to-[#DC2626] text-white hover:from-[#DC2626] hover:to-[var(--error)] shadow-md hover:shadow-lg active:shadow-sm hover:scale-105",
+        outline: "border-2 border-[var(--border)] bg-transparent hover:bg-gradient-to-r hover:from-[var(--bg-hover)] hover:to-[var(--bg-soft)] hover:border-[var(--brand)] hover:text-[var(--brand)] active:bg-[var(--bg-soft)] hover:scale-105 backdrop-blur-sm",
+        secondary: "bg-gradient-to-r from-[var(--accent)] to-[var(--accent-soft)] text-white hover:from-[var(--accent-soft)] hover:to-[var(--accent)] shadow-md hover:shadow-lg active:shadow-sm hover:scale-105",
+        ghost: "hover:bg-gradient-to-r hover:from-[var(--bg-hover)] hover:to-[var(--bg-soft)] active:bg-[var(--bg-soft)] hover:scale-105",
+        link: "text-[var(--brand)] underline-offset-4 hover:underline hover:text-[var(--brand-hover)] hover:scale-105",
       },
       size: {
-        default: "h-11 px-4 py-2",
-        sm: "h-9 px-3 text-xs",
-        lg: "h-14 px-8 text-base",
-        icon: "h-10 w-10",
+        default: "h-11 px-5 py-2.5",
+        sm: "h-9 px-4 text-xs",
+        lg: "h-14 px-10 text-base",
+        icon: "h-11 w-11",
       },
     },
     defaultVariants: {
@@ -70,14 +70,20 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         }}
         {...(restProps as any)}
       >
-        {props.children}
+        <span className="relative z-10">{props.children}</span>
         {variant === "default" && (
-          <motion.div
-            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-            initial={{ x: "-100%" }}
-            whileHover={{ x: "100%" }}
-            transition={{ duration: 0.6, ease: "easeInOut" }}
-          />
+          <>
+            <motion.div
+              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
+              initial={{ x: "-100%" }}
+              whileHover={{ x: "100%" }}
+              transition={{ duration: 0.7, ease: "easeInOut" }}
+            />
+            <motion.div
+              className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-transparent opacity-0 group-hover:opacity-100"
+              transition={{ duration: 0.3 }}
+            />
+          </>
         )}
       </motion.button>
     )

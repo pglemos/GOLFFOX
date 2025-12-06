@@ -23,22 +23,22 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         <motion.input
           type={type}
           className={cn(
-            "flex h-11 w-full rounded-[var(--radius-lg)] border px-4 py-2 text-sm",
-            "bg-[var(--bg-soft)] transition-all duration-200",
+            "flex h-12 w-full rounded-[var(--radius-lg)] border-2 px-4 py-3 text-sm",
+            "bg-gradient-to-br from-[var(--bg-soft)] to-[var(--bg)] transition-all duration-300",
             "file:border-0 file:bg-transparent file:text-sm file:font-medium",
-            "placeholder:text-[var(--ink-muted)]",
-            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1",
+            "placeholder:text-[var(--ink-muted)] placeholder:font-normal",
+            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
             "disabled:cursor-not-allowed disabled:opacity-50",
             // Border states
             error
-              ? "border-[var(--error)] focus-visible:ring-[var(--error)] focus-visible:ring-opacity-20"
+              ? "border-[var(--error)] focus-visible:ring-[var(--error)] focus-visible:ring-opacity-30 shadow-[0_0_0_4px_rgba(239,68,68,0.1)]"
               : success
-              ? "border-[var(--success)] focus-visible:ring-[var(--success)] focus-visible:ring-opacity-20"
+              ? "border-[var(--success)] focus-visible:ring-[var(--success)] focus-visible:ring-opacity-30 shadow-[0_0_0_4px_rgba(16,185,129,0.1)]"
               : isFocused
-              ? "border-[var(--brand)] focus-visible:ring-[var(--brand)] focus-visible:ring-opacity-20 shadow-[var(--shadow-brand)]"
-              : "border-[var(--border)] hover:border-[var(--border-strong)]",
+              ? "border-[var(--brand)] focus-visible:ring-[var(--brand)] focus-visible:ring-opacity-30 shadow-[var(--shadow-brand)]"
+              : "border-[var(--border)] hover:border-[var(--border-strong)] hover:bg-[var(--bg-elevated)]",
             // Shadow on focus
-            isFocused && "shadow-[var(--shadow-brand)]",
+            isFocused && "shadow-[var(--shadow-brand)] backdrop-blur-sm",
             className
           )}
           ref={ref}
