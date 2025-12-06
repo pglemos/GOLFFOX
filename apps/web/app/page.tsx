@@ -314,12 +314,21 @@ function LoginContent() {
     fetchCsrf()
   }, [])
 
-  // Validação contínua dos campos (apenas email, senha será validada pelo Supabase)
+  // Validação apenas quando o campo perde o foco ou no submit (não durante digitação)
+  const [emailTouched, setEmailTouched] = useState(false)
+  const [passwordTouched, setPasswordTouched] = useState(false)
+
   useEffect(() => {
-    setEmailValid(EMAIL_REGEX.test(sanitizeInput(email)))
-    // Remover validação de formato de senha - apenas verificar se não está vazia
-    setPasswordValid(password.trim().length > 0)
-  }, [email, password])
+    if (emailTouched) {
+      setEmailValid(EMAIL_REGEX.test(sanitizeInput(email)))
+    }
+  }, [email, emailTouched])
+
+  useEffect(() => {
+    if (passwordTouched) {
+      setPasswordValid(password.trim().length > 0)
+    }
+  }, [password, passwordTouched])
 
   // Carregar estado de tentativas do localStorage
   useEffect(() => {
@@ -1019,50 +1028,31 @@ function LoginContent() {
                   </motion.div>
                 </motion.div>
 
-                {/* Mobile: Loading overlay ultra moderno */}
+                {/* Mobile: Loading overlay estilo Apple/Stripe */}
                 <AnimatePresence>
                   {loading && (
                     <motion.div
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
-                      transition={{ duration: 0.3 }}
-                      className="lg:hidden absolute inset-0 z-50 flex flex-col items-center justify-center bg-gradient-to-br from-white/95 via-white/90 to-gray-50/95 backdrop-blur-xl rounded-3xl shadow-2xl border-2 border-gray-200/50"
+                      transition={{ duration: 0.2 }}
+                      className="lg:hidden absolute inset-0 z-50 flex flex-col items-center justify-center bg-white/98 backdrop-blur-2xl rounded-3xl"
                     >
-                      <div className="relative w-20 h-20 mb-6">
-                        {/* Spinner principal com gradiente */}
+                      {/* Spinner minimalista estilo Apple */}
+                      <div className="relative w-12 h-12 mb-5">
                         <motion.div
                           animate={{ rotate: 360 }}
-                          transition={{ duration: 1.2, repeat: Infinity, ease: "linear" }}
-                          className="absolute inset-0 rounded-full border-4 border-transparent border-t-[#F97316] border-r-[#FB923C] shadow-lg"
+                          transition={{ duration: 0.8, repeat: Infinity, ease: "linear" }}
+                          className="absolute inset-0 rounded-full border-[3px] border-gray-200 border-t-[#F97316]"
                         />
-                        {/* Anel pulsante */}
-                        <motion.div
-                          animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.6, 0.3] }}
-                          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                          className="absolute inset-0 rounded-full border-2 border-[#F97316]/30"
-                        />
-                        {/* Centro com gradiente */}
-                        <div className="absolute inset-2 rounded-full bg-gradient-to-br from-[#F97316]/20 to-[#FB923C]/10 flex items-center justify-center">
-                          <div className="w-2 h-2 rounded-full bg-[#F97316] shadow-lg shadow-[#F97316]/50" />
-                        </div>
                       </div>
-                      <motion.p
-                        initial={{ y: 5, opacity: 0 }}
-                        animate={{ y: 0, opacity: 1 }}
-                        transition={{ delay: 0.1 }}
-                        className="text-lg font-bold bg-gradient-to-r from-[#F97316] via-[#FB923C] to-[#F97316] bg-clip-text text-transparent bg-[length:200%_100%] animate-[gradient-shift_2s_ease_infinite]"
-                      >
+                      {/* Texto minimalista */}
+                      <p className="text-base font-semibold text-gray-900 tracking-tight">
                         {transitioning ? "Entrando..." : "Autenticando"}
-                      </motion.p>
-                      <motion.p
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 0.2 }}
-                        className="mt-2 text-sm text-gray-500 font-medium"
-                      >
+                      </p>
+                      <p className="mt-1.5 text-xs text-gray-500 font-normal">
                         Aguarde um momento
-                      </motion.p>
+                      </p>
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -1133,7 +1123,7 @@ function LoginContent() {
                     </label>
                     <div className="relative group">
                       {/* Mail Icon Premium */}
-                      <div className={`absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none z-10 ${emailValid ? 'text-[var(--brand)]' : 'text-[var(--ink-muted)]'}`}>
+                      <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none z-10 text-[var(--ink-muted)]">
                         <Mail className="h-5 w-5" />
                       </div>
 
@@ -1144,6 +1134,7 @@ function LoginContent() {
                         placeholder="golffox@admin.com"
                         value={email}
                         onChange={(e) => setEmail(sanitizeInput(e.target.value))}
+                        onBlur={() => setEmailTouched(true)}
                         onKeyDown={(e) => {
                           if (e.key === 'Enter' && !loading && !transitioning && password.trim().length > 0) {
                             e.preventDefault()
@@ -1178,7 +1169,7 @@ function LoginContent() {
                     </label>
                     <div className="relative group">
                       {/* Lock Icon Premium */}
-                      <div className={`absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none z-10 ${passwordValid ? 'text-[var(--brand)]' : 'text-[var(--ink-muted)]'}`}>
+                      <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none z-10 text-[var(--ink-muted)]">
                         <Lock className="h-5 w-5" />
                       </div>
 
@@ -1188,6 +1179,7 @@ function LoginContent() {
                         placeholder="Digite sua senha"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
+                        onBlur={() => setPasswordTouched(true)}
                         onKeyDown={(e) => {
                           if (e.key === 'Enter' && !loading && !transitioning) {
                             e.preventDefault()
@@ -1341,50 +1333,31 @@ function LoginContent() {
 
             {/* Desktop: No card wrapper */}
             <div className="hidden lg:block relative w-full min-w-0">
-              {/* Desktop: Loading overlay ultra moderno */}
+              {/* Desktop: Loading overlay estilo Apple/Stripe */}
               <AnimatePresence>
                 {loading && (
                   <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-gradient-to-br from-white/95 via-white/90 to-gray-50/95 backdrop-blur-xl rounded-3xl shadow-2xl border-2 border-gray-200/50"
+                    transition={{ duration: 0.2 }}
+                    className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white/98 backdrop-blur-2xl rounded-3xl"
                   >
-                    <div className="relative w-24 h-24 mb-8">
-                      {/* Spinner principal com gradiente */}
+                    {/* Spinner minimalista estilo Apple */}
+                    <div className="relative w-14 h-14 mb-6">
                       <motion.div
                         animate={{ rotate: 360 }}
-                        transition={{ duration: 1.2, repeat: Infinity, ease: "linear" }}
-                        className="absolute inset-0 rounded-full border-4 border-transparent border-t-[#F97316] border-r-[#FB923C] shadow-lg"
+                        transition={{ duration: 0.8, repeat: Infinity, ease: "linear" }}
+                        className="absolute inset-0 rounded-full border-[3px] border-gray-200 border-t-[#F97316]"
                       />
-                      {/* Anel pulsante */}
-                      <motion.div
-                        animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.6, 0.3] }}
-                        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                        className="absolute inset-0 rounded-full border-2 border-[#F97316]/30"
-                      />
-                      {/* Centro com gradiente */}
-                      <div className="absolute inset-2 rounded-full bg-gradient-to-br from-[#F97316]/20 to-[#FB923C]/10 flex items-center justify-center">
-                        <div className="w-3 h-3 rounded-full bg-[#F97316] shadow-lg shadow-[#F97316]/50" />
-                      </div>
                     </div>
-                    <motion.p
-                      initial={{ y: 5, opacity: 0 }}
-                      animate={{ y: 0, opacity: 1 }}
-                      transition={{ delay: 0.1 }}
-                      className="text-xl font-bold bg-gradient-to-r from-[#F97316] via-[#FB923C] to-[#F97316] bg-clip-text text-transparent bg-[length:200%_100%] animate-[gradient-shift_2s_ease_infinite]"
-                    >
+                    {/* Texto minimalista */}
+                    <p className="text-lg font-semibold text-gray-900 tracking-tight">
                       {transitioning ? "Entrando..." : "Autenticando"}
-                    </motion.p>
-                    <motion.p
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: 0.2 }}
-                      className="mt-2 text-sm text-gray-500 font-medium"
-                    >
+                    </p>
+                    <p className="mt-2 text-sm text-gray-500 font-normal">
                       Aguarde um momento
-                    </motion.p>
+                    </p>
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -1452,7 +1425,7 @@ function LoginContent() {
                     E-mail
                   </label>
                   <div className="relative group">
-                    <div className={`absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none z-10 ${emailValid ? 'text-[var(--brand)]' : 'text-[var(--ink-muted)]'}`}>
+                    <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none z-10 text-[var(--ink-muted)]">
                       <Mail className="h-5 w-5" />
                     </div>
                     <Input
@@ -1462,6 +1435,7 @@ function LoginContent() {
                       placeholder="nome@empresa.com"
                       value={email}
                       onChange={(e) => setEmail(sanitizeInput(e.target.value))}
+                      onBlur={() => setEmailTouched(true)}
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' && !loading && !transitioning && password.trim().length > 0) {
                           e.preventDefault()
@@ -1495,7 +1469,7 @@ function LoginContent() {
                     Senha
                   </label>
                   <div className="relative group">
-                    <div className={`absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none z-10 ${passwordValid ? 'text-[var(--brand)]' : 'text-[var(--ink-muted)]'}`}>
+                    <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none z-10 text-[var(--ink-muted)]">
                       <Lock className="h-5 w-5" />
                     </div>
                     <Input
@@ -1504,6 +1478,7 @@ function LoginContent() {
                       placeholder="Digite sua senha"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
+                      onBlur={() => setPasswordTouched(true)}
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' && !loading && !transitioning) {
                           e.preventDefault()
