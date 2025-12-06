@@ -237,8 +237,14 @@ async function generateAndDispatchReport(
 ) {
   try {
     // Gerar relatório via API interna
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
-    const reportResponse = await fetch(`${baseUrl}/api/reports/run`, {
+    const baseUrl =
+      process.env.NEXT_PUBLIC_BASE_URL ||
+      (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null) ||
+      'http://localhost:3000'
+
+    const normalizedBaseUrl = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl
+
+    const reportResponse = await fetch(`${normalizedBaseUrl}/api/reports/run`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
