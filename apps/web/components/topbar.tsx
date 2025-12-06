@@ -340,10 +340,10 @@ export function Topbar({
                 </div>
                 <div className="text-left hidden sm:block min-w-0">
                   <p className="text-sm font-semibold leading-tight text-[var(--ink-strong)] truncate max-w-[120px]">
-                    {user?.name || "Admin"}
+                    {pathname?.startsWith('/admin') ? 'GOLF FOX' : (user?.name || "Admin")}
                   </p>
                   <p className="text-xs text-[var(--ink-muted)] leading-tight capitalize truncate max-w-[120px]">
-                    {user?.role || "administrador"}
+                    {pathname?.startsWith('/admin') ? 'admin' : (user?.role || "administrador")}
                   </p>
                 </div>
                 <ChevronDown className="h-4 w-4 text-[var(--ink-muted)] hidden sm:block flex-shrink-0" />
