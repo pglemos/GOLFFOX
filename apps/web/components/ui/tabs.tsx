@@ -15,11 +15,12 @@ const TabsList = React.forwardRef<
   <TabsPrimitive.List
     ref={ref}
     className={cn(
-      "inline-flex h-11 items-center justify-start rounded-[var(--radius-lg)] bg-[var(--bg-soft)] p-1.5 text-[var(--ink-muted)]",
+      "inline-flex h-12 items-center justify-start rounded-xl bg-gradient-to-br from-[var(--bg-soft)] to-[var(--bg)] p-1.5 text-[var(--ink-muted)]",
       "w-full max-w-full overflow-x-auto gap-1 sm:gap-2",
       "-mx-1 px-1 sm:mx-0 sm:px-1",
       "scroll-smooth",
-      "border border-[var(--border)]",
+      "border-2 border-[var(--border)] shadow-sm",
+      "backdrop-blur-sm",
       className
     )}
     {...props}
@@ -38,14 +39,14 @@ const TabsTrigger = React.forwardRef<
       ref={ref}
       onMouseEnter={() => !isActive && setIsActive(false)}
       className={cn(
-        "relative inline-flex items-center justify-center whitespace-nowrap rounded-lg px-4 py-2 text-sm font-semibold",
-        "transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] focus-visible:ring-opacity-20",
+        "relative inline-flex items-center justify-center whitespace-nowrap rounded-lg px-5 py-2.5 text-sm font-semibold",
+        "transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] focus-visible:ring-opacity-20",
         "disabled:pointer-events-none disabled:opacity-50",
-        "data-[state=active]:text-[var(--brand)] data-[state=active]:bg-white dark:data-[state=active]:bg-[var(--bg-elevated)]",
-        "data-[state=active]:shadow-md",
-        "hover:text-[var(--ink-strong)] hover:bg-[var(--bg-hover)]",
+        "data-[state=active]:text-[var(--brand)] data-[state=active]:bg-gradient-to-br data-[state=active]:from-white data-[state=active]:to-[var(--bg-soft)] dark:data-[state=active]:from-[var(--bg-elevated)] dark:data-[state=active]:to-[var(--bg)]",
+        "data-[state=active]:shadow-lg data-[state=active]:border data-[state=active]:border-[var(--brand)]/20",
+        "hover:text-[var(--ink-strong)] hover:bg-gradient-to-br hover:from-[var(--bg-hover)] hover:to-[var(--bg-soft)]",
         "min-w-[120px] sm:min-w-[0] flex-shrink-0",
-        "group",
+        "group backdrop-blur-sm",
         className
       )}
       {...props}

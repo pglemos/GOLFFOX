@@ -274,14 +274,15 @@ const CustomSidebarLink = ({
         href={item.href}
         prefetch={true}
         className={cn(
-          "flex items-center justify-start gap-2 rounded-lg transition-colors relative",
+          "flex items-center justify-start gap-2 rounded-xl transition-all duration-300 relative group",
           "min-h-[44px] sm:min-h-[40px] touch-manipulation",
-          "py-2.5 sm:py-2 px-2 sm:px-3",
+          "py-2.5 sm:py-2 px-3 sm:px-4",
+          "backdrop-blur-sm",
           isActive
             ? (panel === 'operador'
-              ? "bg-orange-50 dark:bg-orange-900/20 text-orange-500"
-              : "bg-[#FFF7ED] text-[#F97316]")
-            : "hover:bg-gray-100 dark:hover:bg-gray-800 active:bg-gray-200"
+              ? "bg-gradient-to-r from-orange-50 to-orange-100/50 dark:from-orange-900/20 dark:to-orange-900/10 text-orange-500 shadow-sm"
+              : "bg-gradient-to-r from-[#FFF7ED] to-[#FFF7ED]/80 text-[#F97316] shadow-sm")
+            : "hover:bg-gradient-to-r hover:from-gray-100/80 hover:to-gray-50/50 dark:hover:from-gray-800/80 dark:hover:to-gray-800/50 active:bg-gray-100 dark:active:bg-gray-700"
         )}
         onMouseEnter={() => router.prefetch(item.href)}
         onClick={(e) => {
@@ -295,15 +296,21 @@ const CustomSidebarLink = ({
         }}
       >
         <div className="relative">
-          <Icon
-            className={cn(
-              "h-5 w-5 transition-colors flex-shrink-0",
-              "stroke-[1.5px]",
-              isActive
-                ? (panel === 'operador' ? "text-orange-500" : "text-[#F97316]")
-                : (panel === 'operador' ? "text-gray-500 group-hover:text-orange-500" : "text-gray-500 group-hover:text-[#F97316]")
-            )}
-          />
+          <motion.div
+            whileHover={{ scale: 1.15, rotate: [0, -5, 5, 0] }}
+            whileTap={{ scale: 0.95 }}
+            transition={{ type: "spring", stiffness: 400, damping: 17 }}
+          >
+            <Icon
+              className={cn(
+                "h-5 w-5 transition-all duration-300 flex-shrink-0 relative z-10",
+                "stroke-[1.8px]",
+                isActive
+                  ? (panel === 'operador' ? "text-orange-500 drop-shadow-sm" : "text-[#F97316] drop-shadow-sm")
+                  : (panel === 'operador' ? "text-gray-500 group-hover:text-orange-500 group-hover:drop-shadow-sm" : "text-gray-500 group-hover:text-[#F97316] group-hover:drop-shadow-sm")
+              )}
+            />
+          </motion.div>
           {showOperationalAlerts && open && (
             <div className="absolute -top-1 -right-1 flex gap-1">
               {showOperationalAlerts && <OperationalAlertsBadge />}
@@ -333,10 +340,19 @@ const CustomSidebarLink = ({
         </motion.span>
       </Link>
       {isActive && (
-        <div className={cn(
-          "absolute left-0 top-0 bottom-0 w-1 rounded-r",
-          panel === 'operador' ? "bg-orange-500" : "bg-[#F97316]"
-        )} />
+        <motion.div
+          layoutId="activeIndicator"
+          className={cn(
+            "absolute left-0 top-0 bottom-0 w-1.5 rounded-r-full",
+            panel === 'operador' ? "bg-gradient-to-b from-orange-500 to-orange-400" : "bg-gradient-to-b from-[#F97316] to-[#FB923C]"
+          )}
+          initial={false}
+          transition={{
+            type: "spring",
+            stiffness: 500,
+            damping: 30
+          }}
+        />
       )}
     </div>
   )
@@ -354,12 +370,22 @@ const SidebarLogo = ({ panel }: { panel: 'admin' | 'operador' | 'transportadora'
         open ? "space-x-2" : "justify-center w-full"
       )}
     >
-      <div className={cn(
-        "h-8 w-8 rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm",
-        panel === 'operador' ? "bg-orange-500" : "gradient-brand"
-      )}>
-        <span className="text-white text-xs font-bold">GF</span>
-      </div>
+      <motion.div
+        className={cn(
+          "h-8 w-8 rounded-xl flex items-center justify-center flex-shrink-0 shadow-md relative overflow-hidden",
+          panel === 'operador' ? "bg-gradient-to-br from-orange-500 to-orange-600" : "gradient-brand"
+        )}
+        whileHover={{ scale: 1.1, rotate: [0, -5, 5, 0] }}
+        whileTap={{ scale: 0.95 }}
+        transition={{ type: "spring", stiffness: 400, damping: 17 }}
+      >
+        <motion.div
+          className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent"
+          animate={{ opacity: [0.5, 1, 0.5] }}
+          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <span className="text-white text-xs font-bold relative z-10 drop-shadow-sm">GF</span>
+      </motion.div>
       <motion.div
         animate={{
           opacity: open ? 1 : 0,
