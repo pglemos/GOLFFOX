@@ -279,6 +279,13 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
+  /* Font Smooth Utility */
+  .font-smooth {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
   /* Typography Enhancements */
   h1,
   h2,
@@ -344,6 +351,19 @@
     border-color: var(--border-strong);
   }
 
+  /* Card Glass */
+  .card-glass {
+    background-color: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(228, 228, 231, 0.5);
+  }
+
+  .dark .card-glass {
+    background-color: rgba(24, 24, 27, 0.5);
+    border-color: rgba(63, 63, 70, 0.5);
+  }
+
   /* Stat Card */
   .stat-card {
     background-color: var(--bg);
@@ -375,6 +395,39 @@
   /* Pulse Glow Animation */
   .animate-pulse-glow {
     animation: pulseGlow 2s ease-in-out infinite;
+  }
+
+  /* Stack Responsive */
+  .stack-responsive {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+
+  @media (min-width: 768px) {
+    .stack-responsive {
+      gap: var(--space-lg);
+    }
+  }
+
+  /* Grid Responsive Cards */
+  .grid-responsive-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--space-md);
+  }
+
+  @media (min-width: 640px) {
+    .grid-responsive-cards {
+      gap: var(--space-lg);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .grid-responsive-cards {
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: var(--space-xl);
+    }
   }
 }
 
