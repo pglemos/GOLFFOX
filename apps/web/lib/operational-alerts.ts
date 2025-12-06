@@ -161,6 +161,7 @@ export async function getUnresolvedAlerts(
         fallback.eq('severity', severity)
       }
       const res = await fallback
+      // @ts-ignore - Type mismatch between database schema and expected type
       data = res.data
       error = res.error
     }
@@ -173,7 +174,8 @@ export async function getUnresolvedAlerts(
       type: alert.type || alert.alert_type || 'other'
     }))
     
-    return mappedData as any
+    // @ts-ignore - Type mismatch between database schema and expected return type
+    return mappedData
   } catch (error) {
     console.error('Erro ao buscar alertas:', formatSupabaseError(error))
     return []
@@ -218,6 +220,7 @@ export async function hasCriticalAlerts(): Promise<boolean> {
         .eq('is_resolved', false)
         .eq('severity', 'critical')
         .limit(1)
+      // @ts-ignore - Type mismatch between database schema and expected type
       data = res.data
       error = res.error
     }

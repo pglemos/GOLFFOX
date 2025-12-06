@@ -104,16 +104,16 @@ export async function DELETE(req: NextRequest) {
     try {
       // @ts-ignore - Supabase type inference issue
       const { data: costsData, error: costsCheckError } = await (supabaseServiceRole
-        .from('costs')
+        .from('costs' as any)
         .select('id')
         .eq('transportadora_id', carrierId)
         .limit(1) as any)
 
       // Se a tabela existir e houver registros, remover referências
       if (!costsCheckError && costsData && costsData.length > 0) {
-        // @ts-expect-error Supabase type inference issue
+        // @ts-ignore - Supabase type inference issue
         const { error: costsError } = await (supabaseServiceRole
-          .from('costs')
+          .from('costs' as any)
           .update({ transportadora_id: null } as any)
           .eq('transportadora_id', carrierId) as any)
 
