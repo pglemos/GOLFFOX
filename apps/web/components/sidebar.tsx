@@ -405,7 +405,7 @@ const SidebarLogo = ({ panel }: { panel: 'admin' | 'operador' | 'transportadora'
   )
 }
 
-export function Sidebar({ isOpen = true, isMobile = false, panel = 'admin', user }: SidebarProps) {
+export function Sidebar({ isOpen = false, isMobile = false, panel = 'admin', user }: SidebarProps) {
   const { isSidebarItemActive } = useNavigation()
 
   // Selecionar menu baseado no painel
@@ -416,12 +416,18 @@ export function Sidebar({ isOpen = true, isMobile = false, panel = 'admin', user
       : adminMenuItems
 
   // Estado interno para controle de hover (desktop) e toggle (mobile)
-  const [internalOpen, setInternalOpen] = React.useState(isOpen)
+  // Em desktop, sempre começa fechado (false), em mobile usa o valor recebido
+  const [internalOpen, setInternalOpen] = React.useState(isMobile ? isOpen : false)
 
   // Sincronização com controle externo (mobile)
   useEffect(() => {
-    setInternalOpen(isOpen)
-  }, [isOpen])
+    if (isMobile) {
+      setInternalOpen(isOpen)
+    } else {
+      // Em desktop, sempre mantém fechado inicialmente
+      setInternalOpen(false)
+    }
+  }, [isOpen, isMobile])
 
   const router = useRouter()
 
@@ -432,12 +438,6 @@ export function Sidebar({ isOpen = true, isMobile = false, panel = 'admin', user
     }
   }, [panel, router])
 
-  // Em desktop, iniciar fechado (apenas ícones)
-  useEffect(() => {
-    if (!isMobile) {
-      setInternalOpen(false)
-    }
-  }, [isMobile])
 
   // Em desktop, não passar isOpen nem setOpen para permitir controle interno (hover)
   // Em mobile, passar ambos para controle externo
