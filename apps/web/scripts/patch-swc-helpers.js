@@ -34,4 +34,3 @@ export { _ as applyDecoratedDescriptor } from "./_apply_decorated_descriptor.js"
 } else {
   console.warn('⚠️  Arquivo @swc/helpers não encontrado. O patch será aplicado após npm install.');
 }
-
