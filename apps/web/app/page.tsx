@@ -1013,89 +1013,34 @@ function LoginContent() {
                   </motion.div>
                 </motion.div>
 
-                {/* Mobile: Loading overlay premium estilo Linear/Vercel */}
+                {/* Mobile: Loading overlay estilo Linear/Stripe - minimalista premium */}
                 <AnimatePresence>
                   {loading && (
                     <motion.div
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
-                      transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
-                      className="lg:hidden absolute inset-0 z-50 flex flex-col items-center justify-center rounded-3xl overflow-hidden"
+                      transition={{ duration: 0.2, ease: "easeOut" }}
+                      className="lg:hidden absolute inset-0 z-50 flex items-center justify-center rounded-3xl"
                     >
-                      {/* Background gradient premium */}
-                      <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" />
+                      {/* Backdrop blur elegante */}
+                      <div className="absolute inset-0 bg-white/80 backdrop-blur-xl" />
                       
-                      {/* Animated gradient overlay */}
-                      <motion.div 
-                        className="absolute inset-0 opacity-40"
-                        animate={{
-                          background: [
-                            "radial-gradient(circle at 20% 50%, rgba(249,115,22,0.3) 0%, transparent 50%)",
-                            "radial-gradient(circle at 80% 50%, rgba(249,115,22,0.3) 0%, transparent 50%)",
-                            "radial-gradient(circle at 20% 50%, rgba(249,115,22,0.3) 0%, transparent 50%)",
-                          ]
-                        }}
-                        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                      />
-                      
-                      {/* Grid pattern overlay */}
-                      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:32px_32px] opacity-50" />
-                      
-                      {/* Content */}
-                      <div className="relative z-10 flex flex-col items-center">
-                        {/* Logo container with glow */}
-                        <motion.div
-                          initial={{ scale: 0.8, opacity: 0 }}
-                          animate={{ scale: 1, opacity: 1 }}
-                          transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
-                          className="relative mb-8"
-                        >
-                          {/* Glow effect */}
-                          <div className="absolute inset-0 w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-500 to-orange-600 blur-xl opacity-60" />
-                          
-                          {/* Logo box */}
-                          <div className="relative w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-500 via-orange-500 to-orange-600 flex items-center justify-center shadow-2xl">
-                            <span className="text-white text-2xl font-bold tracking-tight">GF</span>
-                          </div>
-                          
-                          {/* Animated ring */}
+                      {/* Conteúdo centralizado minimalista */}
+                      <div className="relative z-10 flex flex-col items-center gap-4">
+                        {/* Spinner elegante estilo Linear */}
+                        <div className="relative w-8 h-8">
                           <motion.div
-                            className="absolute -inset-2 rounded-3xl border border-orange-500/30"
-                            animate={{ scale: [1, 1.1, 1], opacity: [0.5, 0, 0.5] }}
-                            transition={{ duration: 2, repeat: Infinity, ease: "easeOut" }}
+                            animate={{ rotate: 360 }}
+                            transition={{ duration: 0.8, repeat: Infinity, ease: "linear" }}
+                            className="absolute inset-0 rounded-full border-2 border-gray-200 border-t-[#F97316]"
                           />
-                        </motion.div>
-                        
-                        {/* Loading indicator - três pontos animados */}
-                        <div className="flex gap-1.5 mb-6">
-                          {[0, 1, 2].map((i) => (
-                            <motion.div
-                              key={i}
-                              className="w-2 h-2 rounded-full bg-orange-500"
-                              animate={{ opacity: [0.3, 1, 0.3], scale: [0.8, 1, 0.8] }}
-                              transition={{ duration: 1, repeat: Infinity, delay: i * 0.15, ease: "easeInOut" }}
-                            />
-                          ))}
                         </div>
                         
-                        {/* Text */}
-                        <motion.p
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: 0.2 }}
-                          className="text-base font-medium text-white/90 tracking-wide"
-                        >
-                          {transitioning ? "Entrando" : "Autenticando"}
-                        </motion.p>
-                        <motion.p
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          transition={{ delay: 0.3 }}
-                          className="mt-2 text-xs text-white/50 font-normal"
-                        >
-                          Verificando credenciais...
-                        </motion.p>
+                        {/* Texto discreto */}
+                        <p className="text-sm font-medium text-gray-700 tracking-tight">
+                          {transitioning ? "Entrando..." : "Autenticando"}
+                        </p>
                       </div>
                     </motion.div>
                   )}
@@ -1373,89 +1318,34 @@ function LoginContent() {
 
             {/* Desktop: No card wrapper */}
             <div className="hidden lg:block relative w-full min-w-0">
-              {/* Desktop: Loading overlay premium estilo Linear/Vercel */}
+              {/* Desktop: Loading overlay estilo Linear/Stripe - minimalista premium */}
               <AnimatePresence>
                 {loading && (
                   <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
-                    className="absolute inset-0 z-50 flex flex-col items-center justify-center rounded-3xl overflow-hidden"
+                    transition={{ duration: 0.2, ease: "easeOut" }}
+                    className="absolute inset-0 z-50 flex items-center justify-center rounded-3xl"
                   >
-                    {/* Background gradient premium */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" />
+                    {/* Backdrop blur elegante */}
+                    <div className="absolute inset-0 bg-white/80 backdrop-blur-xl" />
                     
-                    {/* Animated gradient overlay */}
-                    <motion.div 
-                      className="absolute inset-0 opacity-40"
-                      animate={{
-                        background: [
-                          "radial-gradient(circle at 20% 50%, rgba(249,115,22,0.3) 0%, transparent 50%)",
-                          "radial-gradient(circle at 80% 50%, rgba(249,115,22,0.3) 0%, transparent 50%)",
-                          "radial-gradient(circle at 20% 50%, rgba(249,115,22,0.3) 0%, transparent 50%)",
-                        ]
-                      }}
-                      transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                    />
-                    
-                    {/* Grid pattern overlay */}
-                    <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:32px_32px] opacity-50" />
-                    
-                    {/* Content */}
-                    <div className="relative z-10 flex flex-col items-center">
-                      {/* Logo container with glow */}
-                      <motion.div
-                        initial={{ scale: 0.8, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
-                        className="relative mb-10"
-                      >
-                        {/* Glow effect */}
-                        <div className="absolute inset-0 w-20 h-20 rounded-2xl bg-gradient-to-br from-orange-500 to-orange-600 blur-2xl opacity-60" />
-                        
-                        {/* Logo box */}
-                        <div className="relative w-20 h-20 rounded-2xl bg-gradient-to-br from-orange-500 via-orange-500 to-orange-600 flex items-center justify-center shadow-2xl">
-                          <span className="text-white text-3xl font-bold tracking-tight">GF</span>
-                        </div>
-                        
-                        {/* Animated ring */}
+                    {/* Conteúdo centralizado minimalista */}
+                    <div className="relative z-10 flex flex-col items-center gap-5">
+                      {/* Spinner elegante estilo Linear */}
+                      <div className="relative w-10 h-10">
                         <motion.div
-                          className="absolute -inset-3 rounded-3xl border border-orange-500/30"
-                          animate={{ scale: [1, 1.15, 1], opacity: [0.5, 0, 0.5] }}
-                          transition={{ duration: 2, repeat: Infinity, ease: "easeOut" }}
+                          animate={{ rotate: 360 }}
+                          transition={{ duration: 0.8, repeat: Infinity, ease: "linear" }}
+                          className="absolute inset-0 rounded-full border-2 border-gray-200 border-t-[#F97316]"
                         />
-                      </motion.div>
-                      
-                      {/* Loading indicator - três pontos animados */}
-                      <div className="flex gap-2 mb-8">
-                        {[0, 1, 2].map((i) => (
-                          <motion.div
-                            key={i}
-                            className="w-2.5 h-2.5 rounded-full bg-orange-500"
-                            animate={{ opacity: [0.3, 1, 0.3], scale: [0.8, 1, 0.8] }}
-                            transition={{ duration: 1, repeat: Infinity, delay: i * 0.15, ease: "easeInOut" }}
-                          />
-                        ))}
                       </div>
                       
-                      {/* Text */}
-                      <motion.p
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.2 }}
-                        className="text-xl font-medium text-white/90 tracking-wide"
-                      >
-                        {transitioning ? "Entrando" : "Autenticando"}
-                      </motion.p>
-                      <motion.p
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 0.3 }}
-                        className="mt-3 text-sm text-white/50 font-normal"
-                      >
-                        Verificando credenciais...
-                      </motion.p>
+                      {/* Texto discreto */}
+                      <p className="text-base font-medium text-gray-700 tracking-tight">
+                        {transitioning ? "Entrando..." : "Autenticando"}
+                      </p>
                     </div>
                   </motion.div>
                 )}
