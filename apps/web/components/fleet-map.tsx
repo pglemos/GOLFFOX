@@ -658,7 +658,7 @@ export const FleetMap = memo(function FleetMap({ companyId, transportadoraId, ro
         animate={{ opacity: 1, y: 0 }}
         className="absolute top-6 left-6 z-10"
       >
-        <Card className="p-4 glass shadow-xl">
+        <Card className="p-4 bg-card/50 backdrop-blur-sm border-[var(--border)] shadow-xl">
           <div className="flex flex-wrap gap-3">
             <Input
               placeholder="Empresa"
@@ -720,7 +720,7 @@ export const FleetMap = memo(function FleetMap({ companyId, transportadoraId, ro
             variants={modalContent}
             className="absolute top-2 right-2 sm:top-6 sm:right-6 w-[calc(100vw-1rem)] sm:w-80 z-20 max-w-sm"
           >
-            <Card className="p-4 sm:p-6 glass shadow-2xl">
+            <Card className="p-4 sm:p-6 bg-card/50 backdrop-blur-sm border-[var(--border)] shadow-2xl">
               <div className="flex items-start justify-between mb-4 sm:mb-6">
                 <div className="flex-1 min-w-0 pr-2">
                   <h3 className="font-bold text-lg sm:text-xl truncate">{selectedBus.vehicle_plate}</h3>
@@ -744,9 +744,9 @@ export const FleetMap = memo(function FleetMap({ companyId, transportadoraId, ro
                   <span className="text-[var(--ink-muted)] block mb-2">Status:</span>
                   <Badge 
                     variant={
-                      selectedBus.color === 'green' ? 'default' : 
+                      (selectedBus.color === 'green' ? 'default' : 
                       selectedBus.color === 'red' ? 'destructive' : 
-                      selectedBus.color === 'yellow' ? 'outline' : 'default'
+                      selectedBus.color === 'yellow' ? 'outline' : 'default') as 'default' | 'destructive' | 'outline' | 'secondary'
                     }
                     className={selectedBus.color === 'green' ? 'bg-green-500 text-white' : selectedBus.color === 'yellow' ? 'border-yellow-500 text-yellow-700' : ''}
                   >
@@ -782,7 +782,7 @@ export const FleetMap = memo(function FleetMap({ companyId, transportadoraId, ro
 
       {/* Legenda */}
       <div className="absolute bottom-2 left-2 sm:bottom-6 sm:left-6 z-10">
-        <Card className="p-2 sm:p-4 glass shadow-xl">
+        <Card className="p-2 sm:p-4 bg-card/50 backdrop-blur-sm border-[var(--border)] shadow-xl">
           <div className="space-y-1 sm:space-y-2 text-xs sm:text-sm font-medium">
             <div className="flex items-center gap-2 sm:gap-3">
               <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-full" style={{ backgroundColor: busColors.green }}></div>

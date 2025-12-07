@@ -37,7 +37,7 @@ export const VehiclePanel = memo(function VehiclePanel({
       variants={modalContent}
       className="absolute top-2 right-2 sm:top-6 sm:right-6 w-[calc(100vw-1rem)] sm:w-80 z-30 max-w-sm"
     >
-      <Card className="p-3 sm:p-6 glass shadow-lg sm:shadow-2xl">
+      <Card className="p-3 sm:p-6 bg-card/50 backdrop-blur-sm border-[var(--border)] shadow-lg sm:shadow-2xl">
         <div className="flex items-start justify-between mb-4 sm:mb-6">
           <div className="flex-1 min-w-0 pr-2">
             <h3 className="font-bold text-lg sm:text-xl truncate">{vehicle.plate}</h3>
@@ -68,11 +68,11 @@ export const VehiclePanel = memo(function VehiclePanel({
             <span className="text-[var(--ink-muted)] block mb-2">Status:</span>
             <Badge
               variant={
-                vehicle.vehicle_status === 'moving'
+                (vehicle.vehicle_status === 'moving'
                   ? 'default'
                   : vehicle.vehicle_status === 'stopped_long'
                   ? 'destructive'
-                  : 'outline'
+                  : 'outline') as 'default' | 'destructive' | 'outline' | 'secondary'
               }
               className={
                 vehicle.vehicle_status !== 'moving' && vehicle.vehicle_status !== 'stopped_long'
@@ -147,7 +147,7 @@ export const RoutePanel = memo(function RoutePanel({ route, onClose, onViewDetai
       variants={modalContent}
       className="absolute top-2 right-2 sm:top-6 sm:right-6 w-[calc(100vw-1rem)] sm:w-80 z-30 max-w-sm"
     >
-      <Card className="p-3 sm:p-6 glass shadow-lg sm:shadow-2xl">
+      <Card className="p-3 sm:p-6 bg-card/50 backdrop-blur-sm border-[var(--border)] shadow-lg sm:shadow-2xl">
         <div className="flex items-start justify-between mb-4 sm:mb-6">
           <div className="flex-1 min-w-0 pr-2">
             <h3 className="font-bold text-lg sm:text-xl truncate">{route.route_name}</h3>
@@ -210,7 +210,7 @@ export const AlertsPanel = memo(function AlertsPanel({ alerts, onClose }: Alerts
       variants={modalContent}
       className="absolute top-2 right-2 sm:top-6 sm:right-6 w-[calc(100vw-1rem)] sm:w-80 md:w-96 z-30 max-h-[calc(100vh-1rem)] sm:max-h-[600px] overflow-y-auto max-w-sm md:max-w-md"
     >
-      <Card className="p-3 sm:p-6 glass shadow-lg sm:shadow-2xl">
+      <Card className="p-3 sm:p-6 bg-card/50 backdrop-blur-sm border-[var(--border)] shadow-lg sm:shadow-2xl">
         <div className="flex items-start justify-between mb-4 sm:mb-6">
           <div className="flex-1 min-w-0 pr-2">
             <h3 className="font-bold text-lg sm:text-xl">Alertas Abertos</h3>
@@ -232,7 +232,7 @@ export const AlertsPanel = memo(function AlertsPanel({ alerts, onClose }: Alerts
             >
               <div className="flex items-start justify-between mb-1 sm:mb-2 gap-2">
                 <Badge
-                  variant={alert.severity === 'critical' ? 'destructive' : 'outline'}
+                  variant={(alert.severity === 'critical' ? 'destructive' : 'outline') as 'default' | 'destructive' | 'outline' | 'secondary'}
                   className={`text-xs ${alert.severity !== 'critical' ? 'border-yellow-500 text-yellow-700' : ''}`}
                 >
                   {alert.alert_type === 'incident' ? 'Incidente' : 'Socorro'}
