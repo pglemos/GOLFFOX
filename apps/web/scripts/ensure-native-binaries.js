@@ -13,6 +13,17 @@ const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
+// Forçar encoding UTF-8 para console e arquivos
+if (process.platform === 'win32') {
+  try {
+    // Configurar encoding UTF-8 no Windows
+    process.stdout.setDefaultEncoding('utf8');
+    process.stderr.setDefaultEncoding('utf8');
+  } catch (e) {
+    // Ignorar se não for possível configurar
+  }
+}
+
 const isLinux = process.platform === 'linux';
 const isWindows = process.platform === 'win32';
 
@@ -122,11 +133,16 @@ if (needsInstall && binariesToReinstall.length > 0) {
     execSync(installCommand, {
       cwd: path.join(__dirname, '..'),
       stdio: 'inherit',
+      encoding: 'utf8',
       env: { 
         ...process.env, 
         npm_config_optional: 'true',
         // Forçar instalação de dependências opcionais
-        npm_config_include: 'optional'
+        npm_config_include: 'optional',
+        // Forçar encoding UTF-8
+        PYTHONIOENCODING: 'utf-8',
+        LC_ALL: 'pt_BR.UTF-8',
+        LANG: 'pt_BR.UTF-8'
       }
     });
     
