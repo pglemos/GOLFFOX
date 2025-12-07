@@ -4,7 +4,7 @@ import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { MapPin, Building2 } from "lucide-react"
 import { fadeInUp } from "@/lib/animations"
-import Link from "next/link"
+import { useRouter } from "next/navigation"
 
 interface HeaderPremiumProps {
   title: string
@@ -21,6 +21,8 @@ export function HeaderPremium({
   actionLabel, 
   actionHref 
 }: HeaderPremiumProps) {
+  const router = useRouter()
+  
   return (
     <motion.div
       variants={fadeInUp}
@@ -71,13 +73,11 @@ export function HeaderPremium({
           transition={{ delay: 0.2, type: "spring" }}
         >
           <Button 
-            asChild 
+            onClick={() => router.push(actionHref)}
             className="bg-gradient-to-r from-[var(--brand)] to-[var(--brand-hover)] hover:from-[var(--brand-hover)] hover:to-[var(--brand)] text-white shadow-lg hover:shadow-xl transition-all duration-300 w-full sm:w-auto min-h-[44px] touch-manipulation"
           >
-            <Link href={actionHref} className="flex items-center justify-center">
-              <MapPin className="h-4 w-4 mr-2" />
-              {actionLabel}
-            </Link>
+            <MapPin className="h-4 w-4 mr-2" />
+            {actionLabel}
           </Button>
         </motion.div>
       </div>

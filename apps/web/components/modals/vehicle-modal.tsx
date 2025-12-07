@@ -489,20 +489,25 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
                 </div>
               )}
               <div>
-                <label className="cursor-pointer">
+                <div>
                   <input
+                    id="vehicle-photo-input"
                     type="file"
                     accept="image/*"
                     onChange={handleFileChange}
                     className="hidden"
                   />
-                  <Button type="button" variant="outline" size="sm" asChild className="min-h-[44px] touch-manipulation">
-                    <span>
-                      <Upload className="h-4 w-4 mr-2" />
-                      {photoPreview ? "Trocar Foto" : "Upload Foto"}
-                    </span>
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    size="sm" 
+                    className="min-h-[44px] touch-manipulation"
+                    onClick={() => document.getElementById('vehicle-photo-input')?.click()}
+                  >
+                    <Upload className="h-4 w-4 mr-2" />
+                    {photoPreview ? "Trocar Foto" : "Upload Foto"}
                   </Button>
-                </label>
+                </div>
                 <p className="text-xs text-[var(--ink-muted)] mt-1">
                   Máximo 5MB (JPG, PNG)
                 </p>
