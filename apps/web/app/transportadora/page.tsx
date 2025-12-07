@@ -560,11 +560,12 @@ export default function TransportadoraDashboard() {
                 <SelectItem value="custom">Personalizado</SelectItem>
               </SelectContent>
             </Select>
-            <Button asChild className="flex-shrink-0 w-full sm:w-auto min-h-[44px] touch-manipulation">
-              <a href="/transportadora/relatorios">
-                <Truck className="h-4 w-4 mr-2" />
-                Relatórios
-              </a>
+            <Button 
+              className="flex-shrink-0 w-full sm:w-auto min-h-[44px] touch-manipulation"
+              onClick={() => router.push("/transportadora/relatorios")}
+            >
+              <Truck className="h-4 w-4 mr-2" />
+              Relatórios
             </Button>
           </div>
         </div>

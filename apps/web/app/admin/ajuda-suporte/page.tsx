@@ -61,11 +61,13 @@ export default function AjudaSuportePage() {
             </div>
             <h3 className="font-bold text-lg mb-2">Contato WhatsApp</h3>
             <p className="text-sm text-[var(--muted)] mb-4">Fale com nosso suporte</p>
-            <Button variant="outline" size="sm" asChild>
-              <a href="https://wa.me/5531999999999" target="_blank" rel="noopener noreferrer">
-                <ExternalLink className="h-4 w-4 mr-2" />
-                Abrir WhatsApp
-              </a>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => window.open("https://wa.me/5531999999999", "_blank", "noopener,noreferrer")}
+            >
+              <ExternalLink className="h-4 w-4 mr-2" />
+              Abrir WhatsApp
             </Button>
           </Card>
           </motion.div>

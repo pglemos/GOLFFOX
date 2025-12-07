@@ -134,11 +134,13 @@ export default function TransportadoraAjudaPage() {
                 <p className="text-sm text-[var(--ink-muted)]">Entre em contato conosco</p>
               </div>
             </div>
-            <Button className="w-full" variant="outline" asChild>
-              <a href="https://wa.me/5511999999999" target="_blank" rel="noopener noreferrer">
-                Abrir WhatsApp
-                <ExternalLink className="h-4 w-4 ml-2" />
-              </a>
+            <Button 
+              className="w-full" 
+              variant="outline"
+              onClick={() => window.open("https://wa.me/5511999999999", "_blank", "noopener,noreferrer")}
+            >
+              Abrir WhatsApp
+              <ExternalLink className="h-4 w-4 ml-2" />
             </Button>
           </Card>
           </motion.div>
@@ -160,11 +162,13 @@ export default function TransportadoraAjudaPage() {
                 <p className="text-sm text-[var(--ink-muted)]">Guia completo do sistema</p>
               </div>
             </div>
-            <Button className="w-full" variant="outline" asChild>
-              <a href="/docs" target="_blank">
-                Ver Documentação
-                <ExternalLink className="h-4 w-4 ml-2" />
-              </a>
+            <Button 
+              className="w-full" 
+              variant="outline"
+              onClick={() => window.open("/docs", "_blank")}
+            >
+              Ver Documentação
+              <ExternalLink className="h-4 w-4 ml-2" />
             </Button>
           </Card>
           </motion.div>
@@ -186,11 +190,13 @@ export default function TransportadoraAjudaPage() {
                 <p className="text-sm text-[var(--ink-muted)]">Aprenda com vídeos</p>
               </div>
             </div>
-            <Button className="w-full" variant="outline" asChild>
-              <a href="/tutoriais" target="_blank">
-                Ver Tutoriais
-                <ExternalLink className="h-4 w-4 ml-2" />
-              </a>
+            <Button 
+              className="w-full" 
+              variant="outline"
+              onClick={() => window.open("/tutoriais", "_blank")}
+            >
+              Ver Tutoriais
+              <ExternalLink className="h-4 w-4 ml-2" />
             </Button>
           </Card>
           </motion.div>
@@ -212,11 +218,13 @@ export default function TransportadoraAjudaPage() {
                 <p className="text-sm text-[var(--ink-muted)]">Envie sua dúvida</p>
               </div>
             </div>
-            <Button className="w-full" variant="outline" asChild>
-              <a href="mailto:suporte@golffox.com">
-                Enviar Email
-                <ExternalLink className="h-4 w-4 ml-2" />
-              </a>
+            <Button 
+              className="w-full" 
+              variant="outline"
+              onClick={() => window.location.href = "mailto:suporte@golffox.com"}
+            >
+              Enviar Email
+              <ExternalLink className="h-4 w-4 ml-2" />
             </Button>
           </Card>
           </motion.div>
