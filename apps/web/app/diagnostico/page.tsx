@@ -1,6 +1,10 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { Card } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { motion } from "framer-motion"
+import { Search, RefreshCw, CheckCircle, AlertCircle, Cookie, Globe, Settings } from "lucide-react"
 
 export default function DiagnosticoPage() {
   const [resultado, setResultado] = useState<any>(null)
@@ -43,38 +47,69 @@ export default function DiagnosticoPage() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
+    <div className="min-h-screen bg-gradient-to-br from-[var(--bg)] via-[var(--bg-soft)] to-[var(--bg)] p-8">
       <div className="max-w-4xl mx-auto">
-        <div className="bg-white rounded-lg shadow-lg p-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            🔍 Diagnóstico Completo - GolfFox
-          </h1>
-          <p className="text-gray-600 mb-6">
-            Informações detalhadas sobre cookies, sessão e ambiente
-          </p>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="space-y-6"
+        >
+        <Card className="p-8 bg-card/50 backdrop-blur-sm border-[var(--border)] shadow-xl">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-3 rounded-lg bg-gradient-to-br from-[var(--brand-light)] to-[var(--brand-soft)]">
+              <Search className="h-6 w-6 text-[var(--brand)]" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold mb-2">
+                Diagnóstico Completo - GolfFox
+              </h1>
+              <p className="text-[var(--ink-muted)]">
+                Informações detalhadas sobre cookies, sessão e ambiente
+              </p>
+            </div>
+          </div>
 
-          <button
+          <Button
             onClick={executarDiagnostico}
             disabled={loading}
-            className="mb-6 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+            className="mb-6"
           >
-            {loading ? '🔄 Atualizando...' : '🔄 Atualizar Diagnóstico'}
-          </button>
+            <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+            {loading ? 'Atualizando...' : 'Atualizar Diagnóstico'}
+          </Button>
 
           {erro && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-red-800 font-semibold">❌ Erro:</p>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg"
+            >
+              <div className="flex items-center gap-2 mb-2">
+                <AlertCircle className="h-5 w-5 text-red-600" />
+                <p className="text-red-800 font-semibold">Erro:</p>
+              </div>
               <p className="text-red-600">{erro}</p>
-            </div>
+            </motion.div>
           )}
 
           {resultado && (
             <div className="space-y-6">
               {/* Sessão */}
-              <div className="border border-gray-200 rounded-lg p-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-4">
-                  🍪 Cookies e Sessão
-                </h2>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+              >
+              <Card className="p-6 bg-card/50 backdrop-blur-sm border-[var(--border)]">
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="p-2 rounded-lg bg-blue-100">
+                    <Cookie className="h-5 w-5 text-blue-600" />
+                  </div>
+                  <h2 className="text-xl font-bold">
+                    Cookies e Sessão
+                  </h2>
+                </div>
                 
                 <div className="space-y-4">
                   <div>

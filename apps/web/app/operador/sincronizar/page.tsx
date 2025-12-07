@@ -5,6 +5,7 @@ import { AppShell } from "@/components/app-shell"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { RefreshCw, CheckCircle, AlertCircle } from "lucide-react"
+import { motion } from "framer-motion"
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 import { geocodeAddress, optimizeRoute } from "@/lib/google-maps"
@@ -149,7 +150,12 @@ export default function SincronizarPage() {
           <p className="text-[var(--muted)]">Reprocessar e otimizar pontos de parada de todas as rotas</p>
         </div>
 
-        <Card className="p-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+        >
+        <Card className="p-6 bg-card/50 backdrop-blur-sm border-[var(--border)] hover:shadow-xl transition-all duration-300">
           <div className="space-y-4">
             <p className="text-sm text-[var(--muted)]">
               Este processo irá:
@@ -192,6 +198,7 @@ export default function SincronizarPage() {
             )}
           </div>
         </Card>
+        </motion.div>
       </div>
     </AppShell>
   )
