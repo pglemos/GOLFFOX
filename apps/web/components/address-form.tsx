@@ -52,11 +52,11 @@ export function AddressForm({
     setCepError(null)
 
     try {
-      const response = await fetch(`https://viacep.com.br/ws/${cepNumbers}/json/`)
-      const data = await response.json()
+      const response = await fetch(`/api/cep?cep=${cepNumbers}`)
+      const result = await response.json()
 
-      if (data.erro) {
-        setCepError("CEP não encontrado")
+      if (!response.ok || !result.success) {
+        setCepError(result.error || "CEP não encontrado")
         setLoadingCep(false)
         return
       }
@@ -64,10 +64,10 @@ export function AddressForm({
       onChange({
         ...value,
         cep: cepToUse,
-        street: data.logradouro || "",
-        neighborhood: data.bairro || "",
-        city: data.localidade || "",
-        state: data.uf || "",
+        street: result.address.logradouro || "",
+        neighborhood: result.address.bairro || "",
+        city: result.address.localidade || "",
+        state: result.address.uf || "",
       })
     } catch (error) {
       console.error("Erro ao buscar CEP:", error)

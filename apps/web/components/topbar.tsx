@@ -17,6 +17,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { 
   DropdownMenu,
   DropdownMenuContent,
@@ -319,26 +320,13 @@ export function Topbar({
                 variant="ghost"
                 className="h-11 px-4 py-2 flex items-center gap-1 sm:gap-2 pl-1 sm:pl-2 hover:bg-[var(--bg-hover)] active:bg-[var(--bg-hover)] rounded-full min-h-[44px] touch-manipulation transition-all duration-200"
               >
-                {user?.avatar_url ? (
-                  <img 
-                    src={user.avatar_url} 
-                    alt={user?.name || "Avatar"} 
-                    className="w-8 h-8 rounded-full object-cover shadow-md flex-shrink-0 border-2 border-white/50"
-                    onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-                      // Fallback para inicial se a imagem falhar
-                      const target = e.currentTarget;
-                      target.style.display = 'none';
-                      const nextSibling = target.nextElementSibling as HTMLElement;
-                      if (nextSibling) {
-                        nextSibling.classList.remove('hidden');
-                      }
-                    }}
+                <Avatar className="w-8 h-8 flex-shrink-0 shadow-md border-2 border-white/50">
+                  <AvatarImage 
+                    src={user?.avatar_url || undefined} 
+                    alt={user?.name || "Avatar"}
+                    className="object-cover"
                   />
-                ) : null}
-                <div 
-                  className={`w-8 h-8 rounded-full gradient-brand flex items-center justify-center shadow-md flex-shrink-0 ${user?.avatar_url ? 'hidden' : ''}`}
-                >
-                  <span className="text-white text-sm font-bold">
+                  <AvatarFallback className="gradient-brand text-white text-sm font-bold">
                     {(() => {
                       const name = user?.name || '';
                       const parts = name.split(' ');
@@ -347,8 +335,8 @@ export function Topbar({
                       }
                       return name.charAt(0).toUpperCase() || 'G';
                     })()}
-                  </span>
-                </div>
+                  </AvatarFallback>
+                </Avatar>
                 <div className="text-left hidden sm:block min-w-0">
                   <p className="text-sm font-semibold leading-tight text-[var(--ink-strong)] truncate max-w-[120px]">
                     {user?.name || (pathname?.startsWith('/admin') ? 'golffox' : "Admin")}
