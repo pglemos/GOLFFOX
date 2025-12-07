@@ -5,6 +5,7 @@ import { AppShell } from "@/components/app-shell"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Navigation, Users, MapPin, Plus, Map } from "lucide-react"
+import { motion } from "framer-motion"
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 import { notifyError } from "@/lib/toast"
@@ -168,13 +169,23 @@ export default function OperatorRotasPage() {
             </Card>
           )}
 
-          {rotas.map((rota) => (
-            <Card key={rota.id} className="p-4 hover:shadow-lg transition-shadow">
+          {rotas.map((rota, index) => (
+            <motion.div
+              key={rota.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.05 }}
+              whileHover={{ y: -4 }}
+              className="group"
+            >
+            <Card key={rota.id} className="p-4 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-[var(--border)] hover:border-[var(--brand)]/30">
               <div className="flex items-start justify-between gap-4 mb-4">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-2">
-                    <Navigation className="h-5 w-5 text-orange-500 flex-shrink-0" />
-                    <h3 className="font-bold text-lg truncate">{rota.name || "Rota sem nome"}</h3>
+                    <div className="p-1.5 rounded-lg bg-gradient-to-br from-[var(--brand-light)] to-[var(--brand-soft)]">
+                      <Navigation className="h-4 w-4 text-[var(--brand)] flex-shrink-0" />
+                    </div>
+                    <h3 className="font-bold text-lg truncate group-hover:text-[var(--brand)] transition-colors">{rota.name || "Rota sem nome"}</h3>
                     {rota.carrier_name && (
                       <Badge variant="outline" className="flex-shrink-0">{rota.carrier_name}</Badge>
                     )}
@@ -226,6 +237,7 @@ export default function OperatorRotasPage() {
                 </div>
               )}
             </Card>
+            </motion.div>
           ))}
         </div>
       </div>

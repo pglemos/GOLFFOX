@@ -15,7 +15,8 @@ import {
   Edit,
   Navigation,
   Sparkles,
-  Trash2
+  Trash2,
+  Building2
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -152,11 +153,13 @@ export function RotasPageContent() {
           {/* Header */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
-                <Route className="h-8 w-8 text-blue-600" />
+              <h1 className="text-3xl font-bold text-[var(--ink-strong)] flex items-center gap-2">
+                <div className="p-2 rounded-lg bg-gradient-to-br from-[var(--brand-light)] to-[var(--brand-soft)]">
+                  <Route className="h-6 w-6 text-[var(--brand)]" />
+                </div>
                 Rotas
               </h1>
-              <p className="text-gray-600 mt-1">Gerencie as rotas do sistema</p>
+              <p className="text-[var(--ink-muted)] mt-1">Gerencie as rotas do sistema</p>
             </div>
             <div className="flex gap-2">
               <RouteCreateModal
@@ -182,15 +185,17 @@ export function RotasPageContent() {
           </div>
 
           {/* Search */}
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-            <Input
-              placeholder="Buscar rotas..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
-            />
-          </div>
+          <Card className="p-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[var(--ink-muted)] h-4 w-4" />
+              <Input
+                placeholder="Buscar rotas por nome, descrição ou empresa..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 w-full"
+              />
+            </div>
+          </Card>
 
           {/* Routes Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -200,33 +205,40 @@ export function RotasPageContent() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
+                whileHover={{ y: -4 }}
               >
-                <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer">
+                <Card className="p-6 hover:shadow-xl transition-all duration-300 cursor-pointer group border-[var(--border)] hover:border-[var(--brand)]/50 bg-card/50 backdrop-blur-sm">
                   <div className="flex justify-between items-start mb-4">
-                    <div>
-                      <h3 className="font-semibold text-lg text-gray-900">{rota.name}</h3>
-                      <p className="text-sm text-gray-600">{rota.companies?.name}</p>
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-lg text-[var(--ink-strong)] group-hover:text-[var(--brand)] transition-colors flex items-center gap-2">
+                        <Route className="h-4 w-4 text-[var(--brand)]" />
+                        {rota.name}
+                      </h3>
+                      <p className="text-sm text-[var(--ink-muted)] mt-1 flex items-center gap-1">
+                        <Building2 className="h-3 w-3" />
+                        {rota.companies?.name}
+                      </p>
                     </div>
-                    <Badge variant={rota.is_active ? "default" : "secondary"}>
+                    <Badge variant={rota.is_active ? "default" : "secondary"} className="ml-2">
                       {rota.is_active ? "Ativa" : "Inativa"}
                     </Badge>
                   </div>
 
                   <div className="space-y-2 mb-4">
-                    <div className="flex items-center text-sm text-gray-600">
-                      <MapPin className="h-4 w-4 mr-2" />
-                      <span>{rota.description || "Sem descrição"}</span>
+                    <div className="flex items-center text-sm text-[var(--ink-muted)]">
+                      <MapPin className="h-4 w-4 mr-2 text-[var(--brand)]" />
+                      <span className="truncate">{rota.description || "Sem descrição"}</span>
                     </div>
-                    <div className="flex items-center text-sm text-gray-600">
-                      <Clock className="h-4 w-4 mr-2" />
+                    <div className="flex items-center text-sm text-[var(--ink-muted)]">
+                      <Clock className="h-4 w-4 mr-2 text-[var(--brand)]" />
                       <span>Duração: {rota.estimated_duration || "N/A"} min</span>
                     </div>
-                    <div className="flex items-center text-sm text-gray-600">
-                      <Users className="h-4 w-4 mr-2" />
+                    <div className="flex items-center text-sm text-[var(--ink-muted)]">
+                      <Users className="h-4 w-4 mr-2 text-[var(--brand)]" />
                       <span>Paradas: {rota.stops?.length || 0}</span>
                     </div>
-                    <div className="flex items-center text-sm text-gray-600">
-                      <Truck className="h-4 w-4 mr-2" />
+                    <div className="flex items-center text-sm text-[var(--ink-muted)]">
+                      <Truck className="h-4 w-4 mr-2 text-[var(--brand)]" />
                       <span>Distância: {rota.distance || "N/A"} km</span>
                     </div>
                   </div>

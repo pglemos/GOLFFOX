@@ -7,6 +7,7 @@ import { AppShell } from "@/components/app-shell"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { HelpCircle, MessageCircle, FileText, ExternalLink } from "lucide-react"
+import { motion } from "framer-motion"
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 
@@ -58,9 +59,16 @@ export default function AjudaOperatorPage() {
 
         {/* Cards de Ação Rápida */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            whileHover={{ y: -4 }}
+            className="group"
+          >
+          <Card className="p-6 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-[var(--border)] hover:border-[var(--brand)]/30 cursor-pointer">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-lg bg-[var(--brand)]/20 flex items-center justify-center">
+              <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-[var(--brand-light)] to-[var(--brand-soft)] flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                 <MessageCircle className="h-6 w-6 text-[var(--brand)]" />
               </div>
               <div>
@@ -75,10 +83,18 @@ export default function AjudaOperatorPage() {
               </a>
             </Button>
           </Card>
+          </motion.div>
 
-          <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            whileHover={{ y: -4 }}
+            className="group"
+          >
+          <Card className="p-6 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-[var(--border)] hover:border-[var(--accent)]/30 cursor-pointer">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-lg bg-[var(--accent)]/20 flex items-center justify-center">
+              <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-[var(--accent-light)] to-[var(--accent-soft)] flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                 <FileText className="h-6 w-6 text-[var(--accent)]" />
               </div>
               <div>
@@ -93,10 +109,18 @@ export default function AjudaOperatorPage() {
               </a>
             </Button>
           </Card>
+          </motion.div>
 
-          <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            whileHover={{ y: -4 }}
+            className="group"
+          >
+          <Card className="p-6 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-[var(--border)] hover:border-[var(--ok)]/30 cursor-pointer">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-lg bg-[var(--ok)]/20 flex items-center justify-center">
+              <div className="w-12 h-12 rounded-lg bg-green-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                 <HelpCircle className="h-6 w-6 text-[var(--ok)]" />
               </div>
               <div>
@@ -108,10 +132,16 @@ export default function AjudaOperatorPage() {
               Ver FAQ
             </Button>
           </Card>
+          </motion.div>
         </div>
 
         {/* FAQ */}
-        <Card className="p-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+        >
+        <Card className="p-6 bg-card/50 backdrop-blur-sm border-[var(--border)]">
           <h2 className="text-xl font-bold mb-4">Perguntas Frequentes</h2>
           <div className="space-y-4">
             {faqItems.map((item, index) => (
@@ -122,15 +152,22 @@ export default function AjudaOperatorPage() {
             ))}
           </div>
         </Card>
+        </motion.div>
 
         {/* Status do Sistema */}
-        <Card className="p-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+        >
+        <Card className="p-6 bg-card/50 backdrop-blur-sm border-[var(--border)]">
           <h2 className="text-xl font-bold mb-4">Status do Sistema</h2>
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full bg-[var(--ok)] animate-pulse"></div>
             <span className="text-sm">Todos os sistemas operacionais</span>
           </div>
         </Card>
+        </motion.div>
         </div>
       </AppShell>
     </Suspense>

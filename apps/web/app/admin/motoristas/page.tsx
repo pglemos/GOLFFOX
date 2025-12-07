@@ -246,18 +246,24 @@ export default function MotoristasPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3 }}
+                whileHover={{ y: -4 }}
+                className="group"
               >
-                <Card className="p-3 sm:p-4 hover:shadow-lg transition-shadow overflow-hidden">
+                <Card className="p-3 sm:p-4 hover:shadow-xl transition-all duration-300 overflow-hidden bg-card/50 backdrop-blur-sm border-[var(--border)] hover:border-[var(--brand)]/30">
                   <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start gap-2 mb-2 flex-wrap">
-                        <Users className="h-5 w-5 text-[var(--brand)] flex-shrink-0 mt-0.5" />
-                        <h3 className="font-bold text-base sm:text-lg break-words flex-1">{motorista.name}</h3>
+                        <div className="p-1.5 rounded-lg bg-gradient-to-br from-[var(--brand-light)] to-[var(--brand-soft)]">
+                          <Users className="h-4 w-4 text-[var(--brand)] flex-shrink-0" />
+                        </div>
+                        <h3 className="font-bold text-base sm:text-lg break-words flex-1 group-hover:text-[var(--brand)] transition-colors">{motorista.name}</h3>
                         <Badge variant="outline" className="text-xs flex-shrink-0">{motorista.role || "driver"}</Badge>
                       </div>
-                      <p className="text-sm text-[var(--ink-muted)] mb-1 break-words pl-7">{motorista.email}</p>
+                      <p className="text-sm text-[var(--ink-muted)] mb-1 break-words pl-9 flex items-center gap-1">
+                        <span>{motorista.email}</span>
+                      </p>
                       {motorista.phone && (
-                        <p className="text-xs text-[var(--ink-muted)] break-words pl-7">{motorista.phone}</p>
+                        <p className="text-xs text-[var(--ink-muted)] break-words pl-9">{motorista.phone}</p>
                       )}
                     </div>
                     <div className="grid grid-cols-2 sm:flex gap-2 w-full sm:w-auto">

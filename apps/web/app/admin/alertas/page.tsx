@@ -289,7 +289,7 @@ export default function AlertasPage() {
         </div>
 
         {/* Filtros */}
-        <Card className="overflow-hidden">
+        <Card className="overflow-hidden bg-card/50 backdrop-blur-sm border-[var(--border)]">
           <CardHeader className="p-3 sm:p-6">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
               <div className="flex items-center gap-2 min-w-0">
@@ -385,22 +385,31 @@ export default function AlertasPage() {
               </p>
             </Card>
           ) : (
-            filteredAlertas.map((alerta) => (
+            filteredAlertas.map((alerta, index) => (
               <motion.div
                 key={alerta.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3 }}
+                transition={{ delay: index * 0.05 }}
+                whileHover={{ y: -4 }}
+                className="group"
               >
-                <Card className="p-3 sm:p-4 hover:shadow-lg transition-shadow overflow-hidden">
+                <Card className="p-3 sm:p-4 hover:shadow-xl transition-all duration-300 overflow-hidden bg-card/50 backdrop-blur-sm border-[var(--border)] hover:border-[var(--brand)]/30">
                   <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
                     <div className="flex gap-3 sm:gap-4 flex-1 min-w-0">
-                      <AlertTriangle
-                        className={`h-5 w-5 mt-1 flex-shrink-0 ${alerta.severity === 'critical' ? 'text-red-500' :
+                      <div className={`p-1.5 rounded-lg flex-shrink-0 ${
+                        alerta.severity === 'critical' ? 'bg-red-100' :
+                        alerta.severity === 'warning' ? 'bg-orange-100' :
+                        'bg-blue-100'
+                      }`}>
+                        <AlertTriangle
+                          className={`h-4 w-4 ${
+                            alerta.severity === 'critical' ? 'text-red-500' :
                             alerta.severity === 'warning' ? 'text-orange-500' :
-                              'text-blue-500'
+                            'text-blue-500'
                           }`}
-                      />
+                        />
+                      </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex flex-wrap items-center gap-2 mb-2">
                           <Badge

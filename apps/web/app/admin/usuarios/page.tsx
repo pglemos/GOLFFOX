@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Shield, Edit, Search, Filter, ChevronDown, ChevronUp, Save, X, Trash2, UserPlus } from "lucide-react"
+import { motion } from "framer-motion"
 import { useRouter } from "next/navigation"
 import { Input } from "@/components/ui/input"
 import { ChangeRoleModal } from "@/components/modals/change-role-modal"
@@ -153,7 +154,7 @@ export default function UsuariosPage() {
                 </div>
 
                 {/* Filtros */}
-                <Card className="overflow-hidden">
+                <Card className="overflow-hidden bg-card/50 backdrop-blur-sm border-[var(--border)]">
                     <CardHeader className="p-3 sm:p-6">
                         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
                             <div className="flex items-center gap-2 min-w-0">
@@ -242,7 +243,7 @@ export default function UsuariosPage() {
                 </Card>
 
                 {/* Tabela de Usuários */}
-                <Card className="overflow-hidden">
+                <Card className="overflow-hidden bg-card/50 backdrop-blur-sm border-[var(--border)]">
                     <div className="overflow-x-auto -webkit-overflow-scrolling-touch">
                         <table className="w-full min-w-[640px]">
                             <thead>
@@ -263,8 +264,14 @@ export default function UsuariosPage() {
                                         </td>
                                     </tr>
                                 ) : (
-                                    filteredUsers.map((usuario) => (
-                                        <tr key={usuario.id} className="border-b hover:bg-[var(--bg-hover)]">
+                                    filteredUsers.map((usuario, index) => (
+                                        <motion.tr 
+                                            key={usuario.id} 
+                                            initial={{ opacity: 0, x: -20 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            transition={{ delay: index * 0.02 }}
+                                            className="border-b hover:bg-[var(--bg-hover)] transition-colors"
+                                        >
                                             <td className="p-2 sm:p-4 text-xs sm:text-sm break-words">{usuario.name || "N/A"}</td>
                                             <td className="p-2 sm:p-4 text-xs sm:text-sm break-words">{usuario.email}</td>
                                             <td className="p-2 sm:p-4 text-xs sm:text-sm break-words">{usuario.cpf || "-"}</td>
@@ -313,7 +320,7 @@ export default function UsuariosPage() {
                                                     </Button>
                                                 </div>
                                             </td>
-                                        </tr>
+                                        </motion.tr>
                                     ))
                                 )}
                             </tbody>

@@ -420,12 +420,16 @@ export default function TransportadoraRelatoriosPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.1 }}
+                whileHover={{ y: -4 }}
+                className="group"
               >
-                <Card className="p-6 hover:shadow-lg transition-shadow">
+                <Card className="p-6 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-[var(--border)] hover:border-[var(--brand)]/30">
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
-                      <Icon className="h-8 w-8 text-[var(--brand)] mb-2" />
-                      <h3 className="font-bold text-lg mb-1">{report.title}</h3>
+                      <div className="p-2 rounded-lg bg-gradient-to-br from-[var(--brand-light)] to-[var(--brand-soft)] w-fit mb-2">
+                        <Icon className="h-6 w-6 text-[var(--brand)]" />
+                      </div>
+                      <h3 className="font-bold text-lg mb-1 group-hover:text-[var(--brand)] transition-colors">{report.title}</h3>
                       <p className="text-sm text-[var(--ink-muted)]">{report.description}</p>
                     </div>
                   </div>

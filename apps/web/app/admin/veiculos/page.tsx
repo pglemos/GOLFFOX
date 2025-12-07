@@ -298,8 +298,9 @@ export default function VeiculosPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
+              whileHover={{ y: -4 }}
             >
-              <Card className="p-3 sm:p-4 hover:shadow-lg transition-shadow overflow-hidden">
+              <Card className="p-3 sm:p-4 hover:shadow-xl transition-all duration-300 overflow-hidden bg-card/50 backdrop-blur-sm border-[var(--border)] hover:border-[var(--brand)]/30 group">
                 <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
                   <div className="flex-1 flex gap-3 sm:gap-4 min-w-0">
                     {veiculo.photo_url && (
@@ -307,13 +308,15 @@ export default function VeiculosPage() {
                       <img 
                         src={veiculo.photo_url} 
                         alt={veiculo.plate}
-                        className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg object-cover border border-[var(--border)] flex-shrink-0"
+                        className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg object-cover border-2 border-[var(--border)] flex-shrink-0 shadow-md group-hover:shadow-lg transition-shadow"
                       />
                     )}
                     <div className="flex-1 min-w-0">
                       <div className="flex flex-wrap items-center gap-2 mb-2">
-                        <Truck className="h-5 w-5 text-[var(--brand)] flex-shrink-0" />
-                        <h3 className="font-bold text-base sm:text-lg break-words">{veiculo.plate}</h3>
+                        <div className="p-1 rounded-lg bg-gradient-to-br from-[var(--brand-light)] to-[var(--brand-soft)]">
+                          <Truck className="h-4 w-4 text-[var(--brand)] flex-shrink-0" />
+                        </div>
+                        <h3 className="font-bold text-base sm:text-lg break-words group-hover:text-[var(--brand)] transition-colors">{veiculo.plate}</h3>
                         {veiculo.prefix && (
                           <Badge variant="outline" className="text-xs">Prefixo: {veiculo.prefix}</Badge>
                         )}

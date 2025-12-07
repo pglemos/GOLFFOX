@@ -226,7 +226,7 @@ export default function SocorroPage() {
         </div>
 
         {/* Formulário de Despacho de Socorro */}
-        <Card className="border-2">
+        <Card className="border-2 bg-card/50 backdrop-blur-sm border-[var(--border)] shadow-lg">
           <CardContent className="pt-6">
             <div className="space-y-6">
               {/* 1. Selecione a Rota com Problema */}
@@ -423,19 +423,23 @@ export default function SocorroPage() {
               occ.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
               occ.address?.toLowerCase().includes(searchQuery.toLowerCase())
             )
-            .map((ocorrencia) => (
+            .map((ocorrencia, index) => (
             <motion.div
               key={ocorrencia.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
+              transition={{ delay: index * 0.05 }}
+              whileHover={{ y: -4 }}
+              className="group"
             >
-              <Card className="p-4 hover:shadow-lg transition-shadow">
+              <Card className="p-4 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-[var(--border)] hover:border-[var(--error)]/30">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
-                      <LifeBuoy className="h-5 w-5 text-[var(--error)]" />
-                      <h3 className="font-bold text-lg capitalize">{ocorrencia.request_type}</h3>
+                      <div className="p-1.5 rounded-lg bg-red-100">
+                        <LifeBuoy className="h-4 w-4 text-[var(--error)]" />
+                      </div>
+                      <h3 className="font-bold text-lg capitalize group-hover:text-[var(--error)] transition-colors">{ocorrencia.request_type}</h3>
                       <Badge 
                         variant={
                           ocorrencia.status === 'open' ? 'destructive' :

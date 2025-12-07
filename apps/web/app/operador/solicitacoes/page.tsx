@@ -4,6 +4,7 @@ import { AppShell } from "@/components/app-shell"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Plus, Columns } from "lucide-react"
+import { motion } from "framer-motion"
 import { useEffect, useState } from "react"
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
@@ -90,8 +91,16 @@ export default function SolicitacoesOperatorPage() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3 sm:gap-4 w-full">
-          {columns.map(col => (
-            <Card key={col.key} className="p-3 sm:p-4 overflow-hidden w-full">
+          {columns.map((col, index) => (
+            <motion.div
+              key={col.key}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1 }}
+              whileHover={{ y: -4 }}
+              className="group"
+            >
+            <Card key={col.key} className="p-3 sm:p-4 overflow-hidden w-full hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-[var(--border)] hover:border-[var(--brand)]/30">
               <div className="flex items-center justify-between mb-2 sm:mb-3">
                 <h3 className="font-semibold text-sm sm:text-base break-words flex-1">{col.label}</h3>
                 <Columns className="h-4 w-4 text-[var(--ink-muted)] flex-shrink-0 ml-2" />
@@ -108,6 +117,7 @@ export default function SolicitacoesOperatorPage() {
                 )}
               </div>
             </Card>
+            </motion.div>
           ))}
         </div>
 

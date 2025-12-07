@@ -1,4 +1,6 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+"use client"
+
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { formatRelativeTime } from "@/lib/kpi-utils"
@@ -6,6 +8,7 @@ import { t } from '@/lib/i18n'
 import {
     Plus, Edit, Trash2, CheckCircle, XCircle, Settings, UserPlus, FileText, Activity
 } from "lucide-react"
+import { motion } from "framer-motion"
 
 interface AuditLog {
     id: string
@@ -59,7 +62,7 @@ export function DashboardAuditLog({ logs, loading }: DashboardAuditLogProps) {
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
                     <div className="flex-1">
                         <CardTitle className="text-lg sm:text-xl font-semibold mb-1.5">{t('admin', 'dashboard.auditLog.title')}</CardTitle>
-                        <p className="text-xs sm:text-sm text-[var(--ink-muted)]">{t('admin', 'dashboard.auditLog.subtitle')}</p>
+                        <CardDescription className="text-xs sm:text-sm">{t('admin', 'dashboard.auditLog.subtitle')}</CardDescription>
                     </div>
                     <Button variant="ghost" size="sm" className="w-full sm:w-auto min-h-[44px] touch-manipulation">
                         {t('admin', 'dashboard.auditLog.viewAll')}
@@ -78,7 +81,7 @@ export function DashboardAuditLog({ logs, loading }: DashboardAuditLogProps) {
                     </div>
                 ) : (
                     <div className="divide-y divide-[var(--border)]">
-                        {logs.map((log) => {
+                        {logs.map((log, index) => {
                             const ActionIcon = getActionIcon(log.action_type)
                             const actionColor = getActionColor(log.action_type)
                             const resourceName = log.resource_type
@@ -88,10 +91,20 @@ export function DashboardAuditLog({ logs, loading }: DashboardAuditLogProps) {
                                 ? log.action_type.charAt(0).toUpperCase() + log.action_type.slice(1).toLowerCase()
                                 : t('admin', 'dashboard.auditLog.action')
                             return (
-                                <div key={log.id} className="p-3 sm:p-4 hover:bg-[var(--bg-hover)] active:bg-[var(--bg-hover)] transition-colors flex items-center gap-2 sm:gap-4 group touch-manipulation">
-                                    <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg ${actionColor} flex items-center justify-center flex-shrink-0 shadow-sm group-hover:scale-105 transition-transform`}>
+                                <motion.div 
+                                    key={log.id} 
+                                    initial={{ opacity: 0, x: -10 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ delay: index * 0.05 }}
+                                    className="p-3 sm:p-4 hover:bg-[var(--bg-hover)] active:bg-[var(--bg-hover)] transition-colors flex items-center gap-2 sm:gap-4 group touch-manipulation"
+                                >
+                                    <motion.div 
+                                        className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg ${actionColor} flex items-center justify-center flex-shrink-0 shadow-sm`}
+                                        whileHover={{ scale: 1.1, rotate: [0, -5, 5, 0] }}
+                                        transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                                    >
                                         <ActionIcon className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
-                                    </div>
+                                    </motion.div>
                                     <div className="flex-1">
                                         <p className="font-semibold text-xs sm:text-sm text-[var(--ink-strong)]">
                                             {actionText}: {resourceName}
@@ -102,7 +115,7 @@ export function DashboardAuditLog({ logs, loading }: DashboardAuditLogProps) {
                                         </p>
                                     </div>
                                     <Badge variant="outline" className="text-xs flex-shrink-0 hidden sm:inline-flex">{log.action_type}</Badge>
-                                </div>
+                                </motion.div>
                             )
                         })}
                     </div>

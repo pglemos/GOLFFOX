@@ -4,6 +4,7 @@ import { AppShell } from "@/components/app-shell"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Settings2 } from "lucide-react"
+import { motion } from "framer-motion"
 import { useAuthFast } from "@/hooks/use-auth-fast"
 
 export default function AdminPreferencesPage() {
@@ -39,7 +40,12 @@ export default function AdminPreferencesPage() {
         </div>
         <p className="text-sm sm:text-base text-[var(--ink-muted)] break-words">Configurações pessoais e preferências do painel admin.</p>
 
-        <Card className="p-4 sm:p-6 space-y-4">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+        >
+        <Card className="p-4 sm:p-6 space-y-4 bg-card/50 backdrop-blur-sm border-[var(--border)] hover:shadow-xl transition-all duration-300">
           <div className="min-w-0">
             <h2 className="text-lg sm:text-xl font-semibold break-words">Tema</h2>
             <p className="text-xs sm:text-sm text-[var(--ink-muted)] break-words">Ajuste o tema e aparência da interface.</p>
@@ -50,8 +56,14 @@ export default function AdminPreferencesPage() {
             <Button variant="default" className="w-full sm:w-auto min-h-[44px] touch-manipulation">Automático</Button>
           </div>
         </Card>
+        </motion.div>
 
-        <Card className="p-4 sm:p-6 space-y-4">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+        >
+        <Card className="p-4 sm:p-6 space-y-4 bg-card/50 backdrop-blur-sm border-[var(--border)] hover:shadow-xl transition-all duration-300">
           <div className="min-w-0">
             <h2 className="text-lg sm:text-xl font-semibold break-words">Notificações</h2>
             <p className="text-xs sm:text-sm text-[var(--ink-muted)] break-words">Habilite alertas críticos e emails de sistema.</p>
@@ -61,6 +73,7 @@ export default function AdminPreferencesPage() {
             <Button variant="default" className="w-full sm:w-auto min-h-[44px] touch-manipulation">Habilitar</Button>
           </div>
         </Card>
+        </motion.div>
       </div>
     </AppShell>
   )

@@ -3,6 +3,7 @@
 import { AppShell } from "@/components/app-shell"
 import { Card } from "@/components/ui/card"
 import { Building2 } from "lucide-react"
+import { motion } from "framer-motion"
 import { useEffect, useState } from "react"
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
@@ -80,11 +81,21 @@ export default function PrestadoresOperatorPage() {
 
         <div className="grid gap-3 sm:gap-4 w-full">
           {prestadores.map((p, i) => (
-            <Card key={i} className="p-3 sm:p-4 overflow-hidden w-full">
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.05 }}
+              whileHover={{ y: -4 }}
+              className="group"
+            >
+            <Card key={i} className="p-3 sm:p-4 overflow-hidden w-full hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-[var(--border)] hover:border-[var(--brand)]/30">
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full">
-                <Building2 className="h-5 w-5 text-orange-500 flex-shrink-0" />
+                <div className="p-1.5 rounded-lg bg-gradient-to-br from-[var(--brand-light)] to-[var(--brand-soft)]">
+                  <Building2 className="h-4 w-4 text-[var(--brand)] flex-shrink-0" />
+                </div>
                 <div className="flex-1 min-w-0 w-full">
-                  <p className="font-semibold text-sm sm:text-base break-words">{p.carrier_name || 'Transportadora'}</p>
+                  <p className="font-semibold text-sm sm:text-base break-words group-hover:text-[var(--brand)] transition-colors">{p.carrier_name || 'Transportadora'}</p>
                   <p className="text-xs text-[var(--ink-muted)] mt-1 break-words">Período: {p.period_start} — {p.period_end || 'atual'}</p>
                 </div>
                 <div className="text-xs sm:text-sm text-left sm:text-right w-full sm:w-auto mt-2 sm:mt-0">
@@ -93,6 +104,7 @@ export default function PrestadoresOperatorPage() {
                 </div>
               </div>
             </Card>
+            </motion.div>
           ))}
           {prestadores.length === 0 && (
             <Card className="p-6 sm:p-12 text-center text-sm text-[var(--ink-muted)] w-full">

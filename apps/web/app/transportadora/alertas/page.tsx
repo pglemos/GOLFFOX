@@ -22,6 +22,7 @@ import {
 import { notifyError, notifySuccess } from "@/lib/toast"
 import { cn } from "@/lib/utils"
 import { useAuth } from "@/hooks/use-auth"
+import { motion } from "framer-motion"
 
 interface Alert {
   id: string
@@ -249,13 +250,21 @@ export default function AlertasPage() {
           </Card>
         ) : (
           <div className="space-y-3">
-            {filteredAlerts.map(alert => {
+            {filteredAlerts.map((alert, index) => {
               const cfg = getAlertTypeConfig(alert.type)
               const Icon = cfg.icon
               return (
+                <motion.div
+                  key={alert.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.05 }}
+                  whileHover={{ y: -4 }}
+                  className="group"
+                >
                 <Card
                   key={alert.id}
-                  className={cn("p-4 transition-all", cfg.border, alert.status === "pending" && cfg.bg)}
+                  className={cn("p-4 transition-all hover:shadow-xl bg-card/50 backdrop-blur-sm border-[var(--border)] hover:border-[var(--brand)]/30", cfg.border, alert.status === "pending" && cfg.bg)}
                 >
                   <div className="flex gap-4">
                     <div className={cn("h-10 w-10 rounded-full flex items-center justify-center flex-shrink-0", cfg.bg)}>
@@ -309,6 +318,7 @@ export default function AlertasPage() {
                     </span>
                   </div>
                 </Card>
+                </motion.div>
               )
             })}
           </div>
