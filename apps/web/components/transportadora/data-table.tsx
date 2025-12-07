@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useMemo } from "react"
+import React, { useState, useMemo, useEffect } from "react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -108,29 +108,6 @@ export function DataTable<T extends Record<string, any>>({
     return result
   }, [data, searchQuery, filters, columns])
 
-  // Handle checkbox selection
-  const handleSelectAll = (checked: boolean) => {
-    if (checked) {
-      const allIndices = new Set(sortedData.map((_, index) => index))
-      setSelectedRows(allIndices)
-      setSelectAll(true)
-    } else {
-      setSelectedRows(new Set())
-      setSelectAll(false)
-    }
-  }
-
-  const handleSelectRow = (index: number, checked: boolean) => {
-    const newSelected = new Set(selectedRows)
-    if (checked) {
-      newSelected.add(index)
-    } else {
-      newSelected.delete(index)
-    }
-    setSelectedRows(newSelected)
-    setSelectAll(newSelected.size === sortedData.length && sortedData.length > 0)
-  }
-
   // Sort data
   const sortedData = useMemo(() => {
     if (!sortColumn) return filteredData
@@ -210,6 +187,60 @@ export function DataTable<T extends Record<string, any>>({
     }
     return <Badge variant="outline">{status}</Badge>
   }
+
+  // Handle checkbox selection
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      // Selecionar todos os itens da página atual
+      const pageStart = (currentPage - 1) * pageSize
+      const pageEnd = Math.min(pageStart + pageSize, sortedData.length)
+      const newSelected = new Set(selectedRows)
+      for (let i = pageStart; i < pageEnd; i++) {
+        newSelected.add(i)
+      }
+      setSelectedRows(newSelected)
+      setSelectAll(newSelected.size === sortedData.length && sortedData.length > 0)
+    } else {
+      // Desselecionar todos os itens da página atual
+      const pageStart = (currentPage - 1) * pageSize
+      const pageEnd = Math.min(pageStart + pageSize, sortedData.length)
+      const newSelected = new Set(selectedRows)
+      for (let i = pageStart; i < pageEnd; i++) {
+        newSelected.delete(i)
+      }
+      setSelectedRows(newSelected)
+      setSelectAll(false)
+    }
+  }
+
+  const handleSelectRow = (index: number, checked: boolean) => {
+    const newSelected = new Set(selectedRows)
+    if (checked) {
+      newSelected.add(index)
+    } else {
+      newSelected.delete(index)
+    }
+    setSelectedRows(newSelected)
+    setSelectAll(newSelected.size === sortedData.length && sortedData.length > 0)
+  }
+
+  // Check if all items on current page are selected
+  useEffect(() => {
+    if (sortedData.length === 0) {
+      setSelectAll(false)
+      return
+    }
+    const pageStart = (currentPage - 1) * pageSize
+    const pageEnd = Math.min(pageStart + pageSize, sortedData.length)
+    let allSelected = true
+    for (let i = pageStart; i < pageEnd; i++) {
+      if (!selectedRows.has(i)) {
+        allSelected = false
+        break
+      }
+    }
+    setSelectAll(allSelected)
+  }, [currentPage, pageSize, sortedData.length, selectedRows])
 
   return (
     <Card className={cn("bg-card", className)}>
@@ -348,7 +379,7 @@ export function DataTable<T extends Record<string, any>>({
                       >
                         {/* Checkbox cell */}
                         {columns.some(col => col.showCheckbox) && (
-                          <TableCell className="px-3 sm:px-6 py-3">
+                          <TableCell className="px-3 sm:px-6 py-3 bg-card">
                             <Checkbox
                               checked={isSelected}
                               onCheckedChange={(checked) => handleSelectRow(actualIndex, checked as boolean)}
