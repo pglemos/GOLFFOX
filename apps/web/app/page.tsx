@@ -1013,34 +1013,39 @@ function LoginContent() {
                   </motion.div>
                 </motion.div>
 
-                {/* Mobile: Loading overlay estilo Linear/Stripe - minimalista premium */}
+                {/* Mobile: Loading overlay estilo Linear premium - ultra minimalista */}
                 <AnimatePresence>
                   {loading && (
                     <motion.div
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
-                      transition={{ duration: 0.2, ease: "easeOut" }}
+                      transition={{ duration: 0.15, ease: [0.4, 0, 0.2, 1] }}
                       className="lg:hidden absolute inset-0 z-50 flex items-center justify-center rounded-3xl"
                     >
-                      {/* Backdrop blur elegante */}
-                      <div className="absolute inset-0 bg-white/80 backdrop-blur-xl" />
+                      {/* Backdrop blur premium estilo Vercel */}
+                      <div className="absolute inset-0 bg-white/95 backdrop-blur-2xl" />
                       
-                      {/* Conteúdo centralizado minimalista */}
-                      <div className="relative z-10 flex flex-col items-center gap-4">
-                        {/* Spinner elegante estilo Linear */}
-                        <div className="relative w-8 h-8">
+                      {/* Conteúdo centralizado ultra minimalista */}
+                      <div className="relative z-10 flex flex-col items-center gap-3">
+                        {/* Spinner ultra fino estilo Linear */}
+                        <div className="relative w-6 h-6">
                           <motion.div
                             animate={{ rotate: 360 }}
-                            transition={{ duration: 0.8, repeat: Infinity, ease: "linear" }}
-                            className="absolute inset-0 rounded-full border-2 border-gray-200 border-t-[#F97316]"
+                            transition={{ duration: 0.75, repeat: Infinity, ease: "linear" }}
+                            className="absolute inset-0 rounded-full border-[1.5px] border-gray-200/60 border-t-[#F97316]"
                           />
                         </div>
                         
-                        {/* Texto discreto */}
-                        <p className="text-sm font-medium text-gray-700 tracking-tight">
+                        {/* Texto ultra discreto */}
+                        <motion.p
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          transition={{ delay: 0.1 }}
+                          className="text-xs font-normal text-gray-500 tracking-tight"
+                        >
                           {transitioning ? "Entrando..." : "Autenticando"}
-                        </p>
+                        </motion.p>
                       </div>
                     </motion.div>
                   )}
@@ -1318,34 +1323,39 @@ function LoginContent() {
 
             {/* Desktop: No card wrapper */}
             <div className="hidden lg:block relative w-full min-w-0">
-              {/* Desktop: Loading overlay estilo Linear/Stripe - minimalista premium */}
+              {/* Desktop: Loading overlay estilo Linear premium - ultra minimalista */}
               <AnimatePresence>
                 {loading && (
                   <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    transition={{ duration: 0.2, ease: "easeOut" }}
+                    transition={{ duration: 0.15, ease: [0.4, 0, 0.2, 1] }}
                     className="absolute inset-0 z-50 flex items-center justify-center rounded-3xl"
                   >
-                    {/* Backdrop blur elegante */}
-                    <div className="absolute inset-0 bg-white/80 backdrop-blur-xl" />
+                    {/* Backdrop blur premium estilo Vercel */}
+                    <div className="absolute inset-0 bg-white/95 backdrop-blur-2xl" />
                     
-                    {/* Conteúdo centralizado minimalista */}
-                    <div className="relative z-10 flex flex-col items-center gap-5">
-                      {/* Spinner elegante estilo Linear */}
-                      <div className="relative w-10 h-10">
+                    {/* Conteúdo centralizado ultra minimalista */}
+                    <div className="relative z-10 flex flex-col items-center gap-4">
+                      {/* Spinner ultra fino estilo Linear */}
+                      <div className="relative w-7 h-7">
                         <motion.div
                           animate={{ rotate: 360 }}
-                          transition={{ duration: 0.8, repeat: Infinity, ease: "linear" }}
-                          className="absolute inset-0 rounded-full border-2 border-gray-200 border-t-[#F97316]"
+                          transition={{ duration: 0.75, repeat: Infinity, ease: "linear" }}
+                          className="absolute inset-0 rounded-full border-[1.5px] border-gray-200/60 border-t-[#F97316]"
                         />
                       </div>
                       
-                      {/* Texto discreto */}
-                      <p className="text-base font-medium text-gray-700 tracking-tight">
+                      {/* Texto ultra discreto */}
+                      <motion.p
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.1 }}
+                        className="text-sm font-normal text-gray-500 tracking-tight"
+                      >
                         {transitioning ? "Entrando..." : "Autenticando"}
-                      </p>
+                      </motion.p>
                     </div>
                   </motion.div>
                 )}
