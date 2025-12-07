@@ -796,27 +796,17 @@ function LoginContent() {
     ]
   )
 
-  // Estatística animada otimizada (estilo Apple)
-  const StatItem = memo(({ value, label, delay }: { value: string, label: string, delay: number }) => {
-    const shouldReduceMotion = useReducedMotion()
+  // Estatística sem animações (estilo minimalista)
+  const StatItem = memo(({ value, label }: { value: string, label: string }) => {
     return (
-      <motion.div
-        initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: shouldReduceMotion ? 0 : 0.6, delay: shouldReduceMotion ? 0 : delay, ease: [0.16, 1, 0.3, 1] }}
-        className="text-center"
-      >
-        <motion.div
-          className="text-4xl md:text-5xl font-bold bg-gradient-to-br from-white via-white to-white/70 bg-clip-text text-transparent mb-2"
-          whileHover={shouldReduceMotion ? {} : { scale: 1.05 }}
-          transition={{ type: "spring", stiffness: 400, damping: 10 }}
-        >
+      <div className="text-center">
+        <div className="text-4xl md:text-5xl font-bold bg-gradient-to-br from-white via-white to-white/70 bg-clip-text text-transparent mb-2">
           {value}
-        </motion.div>
+        </div>
         <div className="text-sm md:text-base text-white/60 font-light tracking-wide">
           {label}
         </div>
-      </motion.div>
+      </div>
     )
   })
   StatItem.displayName = "StatItem"
@@ -961,17 +951,12 @@ function LoginContent() {
             Gerencie frotas, otimize rotas e monitore operações em tempo real com inteligência artificial.
           </motion.p>
 
-          {/* Estatísticas premium (estilo Nike/Tesla) */}
-          <motion.div
-            initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: shouldReduceMotion ? 0 : 0.8, delay: shouldReduceMotion ? 0 : 0.4, ease: [0.16, 1, 0.3, 1] }}
-            className="grid grid-cols-3 gap-8 pt-12"
-          >
-            <StatItem value="24/7" label="Monitoramento" delay={shouldReduceMotion ? 0 : 0.5} />
-            <StatItem value="100%" label="Rastreável" delay={shouldReduceMotion ? 0 : 0.6} />
-            <StatItem value="< 1s" label="Tempo Real" delay={shouldReduceMotion ? 0 : 0.7} />
-          </motion.div>
+          {/* Estatísticas premium (estilo minimalista) */}
+          <div className="grid grid-cols-3 gap-8 pt-12">
+            <StatItem value="24/7" label="Monitoramento" />
+            <StatItem value="100%" label="Rastreável" />
+            <StatItem value="< 1s" label="Tempo Real" />
+          </div>
         </div>
       </motion.div>
 
@@ -1144,8 +1129,6 @@ function LoginContent() {
                         autoComplete="email"
                         className={`w-full h-14 pl-12 pr-4 bg-gradient-to-br from-[var(--bg-soft)] to-[var(--bg)] border-2 ${fieldErrors.email
                           ? "border-[var(--error)] focus:border-[var(--error)] focus:ring-2 focus:ring-[var(--error)]/20 shadow-[0_0_0_4px_rgba(239,68,68,0.1)]"
-                          : emailValid
-                          ? "border-[var(--brand)] focus:border-[var(--brand)] focus:ring-2 focus:ring-[var(--brand)]/20 shadow-[var(--shadow-brand)]"
                           : "border-[var(--border)] focus:border-[var(--brand)] focus:ring-2 focus:ring-[var(--brand)]/20 hover:border-[var(--border-strong)]"
                           } rounded-2xl text-base focus:bg-white placeholder:text-[var(--ink-muted)] font-medium`}
                       />
@@ -1188,12 +1171,10 @@ function LoginContent() {
                         }}
                         ref={passwordInputRef}
                         autoComplete="current-password"
-                        className={`w-full h-14 pl-12 pr-14 bg-gradient-to-br from-[var(--bg-soft)] to-[var(--bg)] border-2 ${fieldErrors.password
-                          ? "border-[var(--error)] focus:border-[var(--error)] focus:ring-2 focus:ring-[var(--error)]/20 shadow-[0_0_0_4px_rgba(239,68,68,0.1)]"
-                          : passwordValid
-                          ? "border-[var(--brand)] focus:border-[var(--brand)] focus:ring-2 focus:ring-[var(--brand)]/20 shadow-[var(--shadow-brand)]"
-                          : "border-[var(--border)] focus:border-[var(--brand)] focus:ring-2 focus:ring-[var(--brand)]/20 hover:border-[var(--border-strong)]"
-                          } rounded-2xl text-base focus:bg-white placeholder:text-[var(--ink-muted)] font-medium`}
+                          className={`w-full h-14 pl-12 pr-14 bg-gradient-to-br from-[var(--bg-soft)] to-[var(--bg)] border-2 ${fieldErrors.password
+                            ? "border-[var(--error)] focus:border-[var(--error)] focus:ring-2 focus:ring-[var(--error)]/20 shadow-[0_0_0_4px_rgba(239,68,68,0.1)]"
+                            : "border-[var(--border)] focus:border-[var(--brand)] focus:ring-2 focus:ring-[var(--brand)]/20 hover:border-[var(--border-strong)]"
+                            } rounded-2xl text-base focus:bg-white placeholder:text-[var(--ink-muted)] font-medium`}
                       />
                       <motion.button
                         type="button"
@@ -1445,10 +1426,8 @@ function LoginContent() {
                       autoComplete="email"
                       className={`w-full h-14 pl-12 pr-4 bg-gradient-to-br from-[var(--bg-soft)] to-[var(--bg)] border-2 ${fieldErrors.email
                         ? "border-[var(--error)] focus:border-[var(--error)] focus:ring-2 focus:ring-[var(--error)]/20 shadow-[0_0_0_4px_rgba(239,68,68,0.1)]"
-                        : emailValid
-                        ? "border-[var(--brand)] focus:border-[var(--brand)] focus:ring-2 focus:ring-[var(--brand)]/20 shadow-[var(--shadow-brand)]"
                         : "border-[var(--border)] focus:border-[var(--brand)] focus:ring-2 focus:ring-[var(--brand)]/20 hover:border-[var(--border-strong)]"
-                        } rounded-2xl text-base transition-all duration-300 focus:bg-white placeholder:text-[var(--ink-muted)] font-medium`}
+                        } rounded-2xl text-base focus:bg-white placeholder:text-[var(--ink-muted)] font-medium`}
                     />
                     {fieldErrors.email && (
                       <motion.p 
@@ -1489,10 +1468,8 @@ function LoginContent() {
                       autoComplete="current-password"
                       className={`w-full h-14 pl-12 pr-14 bg-gradient-to-br from-[var(--bg-soft)] to-[var(--bg)] border-2 ${fieldErrors.password
                         ? "border-[var(--error)] focus:border-[var(--error)] focus:ring-2 focus:ring-[var(--error)]/20 shadow-[0_0_0_4px_rgba(239,68,68,0.1)]"
-                        : passwordValid
-                        ? "border-[var(--brand)] focus:border-[var(--brand)] focus:ring-2 focus:ring-[var(--brand)]/20 shadow-[var(--shadow-brand)]"
                         : "border-[var(--border)] focus:border-[var(--brand)] focus:ring-2 focus:ring-[var(--brand)]/20 hover:border-[var(--border-strong)]"
-                        } rounded-2xl text-base transition-all duration-300 focus:bg-white placeholder:text-[var(--ink-muted)] font-medium`}
+                        } rounded-2xl text-base focus:bg-white placeholder:text-[var(--ink-muted)] font-medium`}
                     />
                     <motion.button
                       type="button"
