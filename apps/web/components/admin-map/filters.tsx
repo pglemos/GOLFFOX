@@ -165,7 +165,7 @@ export const MapFilters = memo(function MapFilters({
   }, [filters.search])
 
   return (
-    <Card className="p-3 sm:p-4 glass shadow-md sm:shadow-xl max-md:p-2">
+    <Card className="p-3 sm:p-4 bg-card/50 backdrop-blur-sm border-[var(--border)] shadow-md sm:shadow-xl max-md:p-2">
       <div className="flex flex-wrap items-center gap-3 max-md:gap-2">
         {/* Modo: Ao vivo | Histórico */}
         <div className="flex items-center gap-2 border-r pr-3">
