@@ -15,14 +15,14 @@ let nextConfig = {
   },
   // Next.js 16: Turbopack é o bundler padrão - otimizado para produção
   // Turbopack oferece performance superior com cache incremental
+  // NOTA: Turbopack requer binário nativo SWC. Se o binário falhar, Next.js usará webpack
   // Configuração explícita do Turbopack para silenciar warning
   turbopack: {},
   
-  // Configuração SWC: Fallback para WASM se binário nativo falhar
-  // Para forçar WASM, defina NEXT_SWC_WASM=true nas variáveis de ambiente
+  // Configuração SWC: Next.js automaticamente usa WASM como fallback se binário nativo falhar
   // O binário nativo (@next/swc-win32-x64-msvc) é preferido para melhor performance
   // WASM é mais lento mas funciona como fallback se o binário nativo não carregar
-  swcMinify: true,
+  // Turbopack não funciona com WASM - se SWC nativo falhar, Next.js usará webpack automaticamente
   async headers() {
     return [
       {

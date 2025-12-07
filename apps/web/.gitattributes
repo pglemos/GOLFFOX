@@ -1,0 +1,25 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# Force UTF-8 encoding for JSON files
+*.json text eol=lf charset=utf-8
+
+# Force UTF-8 encoding for TypeScript/JavaScript files
+*.ts text eol=lf charset=utf-8
+*.tsx text eol=lf charset=utf-8
+*.js text eol=lf charset=utf-8
+*.jsx text eol=lf charset=utf-8
+
+# Force UTF-8 encoding for configuration files
+*.config.js text eol=lf charset=utf-8
+*.config.ts text eol=lf charset=utf-8
+
+# Force UTF-8 encoding for markdown files
+*.md text eol=lf charset=utf-8
+
+# Force UTF-8 encoding for CSS files
+*.css text eol=lf charset=utf-8
+
+# Force UTF-8 encoding for HTML files
+*.html text eol=lf charset=utf-8
+
