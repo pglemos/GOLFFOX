@@ -61,7 +61,6 @@ export function HeroSection({
       </div>
 
       {/* Gradient Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
 
       {/* Content */}
       <div className="relative z-10">
