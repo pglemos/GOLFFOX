@@ -329,13 +329,15 @@ const MenuItem = ({ item, index }: { item: MenuItem; index: number }) => {
           "peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-hidden",
           "transition-[width,height,padding] focus-visible:ring-2",
           "group-has-[data-sidebar=menu-action]/menu-item:pr-8",
-          "h-8 text-sm relative",
+          item.badge && open && "pr-8",
+          "h-8 text-sm",
           "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
           "[&>svg]:size-4 [&>svg]:shrink-0",
           isActive && "bg-sidebar-accent text-sidebar-accent-foreground font-medium",
           !open && "justify-center [&>svg]:size-4"
         )}
         data-active={isActive}
+        data-size="default"
       >
         <Icon className="shrink-0" />
         <AnimatePresence initial={false}>
@@ -351,23 +353,23 @@ const MenuItem = ({ item, index }: { item: MenuItem; index: number }) => {
             </motion.span>
           )}
         </AnimatePresence>
-        
-        {/* Badge - Application Shell 08 style */}
-        {item.badge && open && (
-          <div className={cn(
-            "text-sidebar-foreground pointer-events-none absolute right-1 top-1.5 flex h-5 min-w-5 items-center justify-center px-1 text-xs font-medium tabular-nums select-none",
-            "bg-primary/10 rounded-full",
-            "peer-hover/menu-button:text-sidebar-accent-foreground",
-            "peer-data-[active=true]/menu-button:text-sidebar-accent-foreground"
-          )}>
-            {item.badge}
-          </div>
-        )}
       </Link>
+      
+      {/* Badge - Application Shell 08 style - fora do Link */}
+      {item.badge && open && (
+        <div className={cn(
+          "text-sidebar-foreground pointer-events-none absolute right-1 top-1.5 flex h-5 min-w-5 items-center justify-center px-1 text-xs font-medium tabular-nums select-none",
+          "bg-primary/10 rounded-full",
+          "peer-hover/menu-button:text-sidebar-accent-foreground",
+          "peer-data-[active=true]/menu-button:text-sidebar-accent-foreground"
+        )}>
+          {item.badge}
+        </div>
+      )}
       
       {/* Operational Alerts Badge */}
       {showOperationalAlerts && open && (
-        <div className="absolute -top-1 -right-1">
+        <div className="absolute -top-1 -right-1 z-10">
           <OperationalAlertsBadge />
         </div>
       )}
