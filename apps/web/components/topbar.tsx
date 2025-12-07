@@ -317,13 +317,13 @@ export function Topbar({
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
-                className="flex items-center gap-1 sm:gap-2 pl-1 sm:pl-2 hover:bg-[var(--bg-hover)] active:bg-[var(--bg-hover)] rounded-full min-h-[44px] touch-manipulation transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]"
+                className="h-11 px-4 py-2 flex items-center gap-1 sm:gap-2 pl-1 sm:pl-2 hover:bg-[var(--bg-hover)] active:bg-[var(--bg-hover)] rounded-full min-h-[44px] touch-manipulation transition-all duration-200"
               >
                 {user?.avatar_url ? (
                   <img 
                     src={user.avatar_url} 
                     alt={user?.name || "Avatar"} 
-                    className="w-8 h-8 rounded-full object-cover shadow-lg flex-shrink-0 border-2 border-white/50 transition-shadow duration-200 hover:shadow-[var(--shadow-brand-lg)]"
+                    className="w-8 h-8 rounded-full object-cover shadow-md flex-shrink-0 border-2 border-white/50"
                     onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
                       // Fallback para inicial se a imagem falhar
                       const target = e.currentTarget;
@@ -336,27 +336,24 @@ export function Topbar({
                   />
                 ) : null}
                 <div 
-                  className={`w-8 h-8 rounded-full bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg flex-shrink-0 relative overflow-hidden group/avatar transition-shadow duration-200 hover:shadow-[var(--shadow-brand-lg)] ${user?.avatar_url ? 'hidden' : ''}`}
+                  className={`w-8 h-8 rounded-full gradient-brand flex items-center justify-center shadow-md flex-shrink-0 ${user?.avatar_url ? 'hidden' : ''}`}
                 >
-                  <div
-                    className="absolute inset-0 bg-gradient-to-br from-white/30 via-white/10 to-transparent opacity-0 group-hover/avatar:opacity-100 transition-opacity duration-300"
-                  />
-                  <span className="text-white text-sm font-bold relative z-10 drop-shadow-sm">
+                  <span className="text-white text-sm font-bold">
                     {(() => {
                       const name = user?.name || '';
                       const parts = name.split(' ');
                       if (parts.length >= 2) {
                         return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
                       }
-                      return name.charAt(0).toUpperCase() || 'A';
+                      return name.charAt(0).toUpperCase() || 'G';
                     })()}
                   </span>
                 </div>
-                <div className="text-left hidden sm:block min-w-0 flex-shrink-0">
-                  <p className="text-sm font-semibold leading-tight text-[var(--ink-strong)] whitespace-nowrap overflow-hidden text-ellipsis max-w-[160px]">
-                    {user?.name || (pathname?.startsWith('/admin') ? 'GOLF FOX' : "Admin")}
+                <div className="text-left hidden sm:block min-w-0">
+                  <p className="text-sm font-semibold leading-tight text-[var(--ink-strong)] truncate max-w-[120px]">
+                    {user?.name || (pathname?.startsWith('/admin') ? 'golffox' : "Admin")}
                   </p>
-                  <p className="text-xs text-[var(--ink-muted)] leading-tight capitalize whitespace-nowrap overflow-hidden text-ellipsis max-w-[160px]">
+                  <p className="text-xs text-[var(--ink-muted)] leading-tight capitalize truncate max-w-[120px]">
                     {user?.role || (pathname?.startsWith('/admin') ? 'admin' : "administrador")}
                   </p>
                 </div>
