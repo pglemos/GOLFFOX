@@ -14,6 +14,7 @@ import {
 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
+import { t } from "@/lib/i18n"
 
 interface QuickAction {
   id: string
@@ -28,47 +29,47 @@ interface QuickActionsProps {
   className?: string
 }
 
-const defaultActions: QuickAction[] = [
-  {
-    id: "vehicles",
-    label: "Ver Veículos",
-    icon: Truck,
-    href: "/transportadora/veiculos"
-  },
-  {
-    id: "drivers",
-    label: "Ver Motoristas",
-    icon: Users,
-    href: "/transportadora/motoristas"
-  },
-  {
-    id: "alerts",
-    label: "Ver Alertas",
-    icon: AlertCircle,
-    href: "/transportadora/alertas"
-  },
-  {
-    id: "map",
-    label: "Ver Mapa",
-    icon: MapPin,
-    href: "/transportadora/mapa"
-  },
-  {
-    id: "reports",
-    label: "Relatórios",
-    icon: FileText,
-    href: "/transportadora/relatorios"
-  },
-  {
-    id: "costs",
-    label: "Custos",
-    icon: Download,
-    href: "/transportadora/custos"
-  }
-]
-
 export function QuickActions({ className }: QuickActionsProps) {
   const router = useRouter()
+  
+  const defaultActions: QuickAction[] = [
+    {
+      id: "vehicles",
+      label: t('transportadora', 'quick_actions_vehicles'),
+      icon: Truck,
+      href: "/transportadora/veiculos"
+    },
+    {
+      id: "drivers",
+      label: t('transportadora', 'quick_actions_drivers'),
+      icon: Users,
+      href: "/transportadora/motoristas"
+    },
+    {
+      id: "alerts",
+      label: t('transportadora', 'quick_actions_alerts'),
+      icon: AlertCircle,
+      href: "/transportadora/alertas"
+    },
+    {
+      id: "map",
+      label: t('transportadora', 'quick_actions_map'),
+      icon: MapPin,
+      href: "/transportadora/mapa"
+    },
+    {
+      id: "reports",
+      label: t('transportadora', 'quick_actions_reports'),
+      icon: FileText,
+      href: "/transportadora/relatorios"
+    },
+    {
+      id: "costs",
+      label: t('transportadora', 'quick_actions_costs'),
+      icon: Download,
+      href: "/transportadora/custos"
+    }
+  ]
 
   const handleAction = (action: QuickAction, e?: React.MouseEvent) => {
     if (e) {
@@ -85,7 +86,7 @@ export function QuickActions({ className }: QuickActionsProps) {
   return (
     <Card className={className}>
       <CardHeader className="px-3 sm:px-6 pb-3 sm:pb-4">
-        <CardTitle className="text-base sm:text-lg">Ações Rápidas</CardTitle>
+        <CardTitle className="text-base sm:text-lg">{t('transportadora', 'quick_actions_title')}</CardTitle>
       </CardHeader>
       <CardContent className="px-3 sm:px-6">
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
