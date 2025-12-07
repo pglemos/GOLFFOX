@@ -54,24 +54,6 @@ export function RotasPageContent() {
   })
   const [rotasLoading, setRotasLoading] = useState(false)
 
-  useEffect(() => {
-    if (!loading && user) {
-      loadRotas()
-    }
-  }, [loading, user])
-
-  // Escutar eventos de sincronização global (apenas após carregamento inicial)
-  useGlobalSync(
-    ['route.created', 'route.updated', 'route.deleted', 'company.created', 'company.updated'],
-    () => {
-      // Recarregar rotas quando houver mudanças (apenas se já tiver carregado)
-      if (!loading && user) {
-        loadRotas()
-      }
-    },
-    [loading, user]
-  )
-
   const loadRotas = async () => {
     try {
       setRotasLoading(true)
@@ -104,6 +86,25 @@ export function RotasPageContent() {
       setRotasLoading(false)
     }
   }
+
+  useEffect(() => {
+    if (!loading && user) {
+      void loadRotas()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading, user])
+
+  // Escutar eventos de sincronização global (apenas após carregamento inicial)
+  useGlobalSync(
+    ['route.created', 'route.updated', 'route.deleted', 'company.created', 'company.updated'],
+    () => {
+      // Recarregar rotas quando houver mudanças (apenas se já tiver carregado)
+      if (!loading && user) {
+        void loadRotas()
+      }
+    },
+    [loading, user]
+  )
 
   const handleDeleteRota = async (rotaId: string, rotaName: string) => {
     if (!confirm(`Tem certeza que deseja excluir a rota "${rotaName}"? Esta ação não pode ser desfeita.`)) {
