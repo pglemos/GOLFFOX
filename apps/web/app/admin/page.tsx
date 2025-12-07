@@ -26,7 +26,6 @@ import { motion } from "framer-motion"
 import { useAuthFast } from "@/hooks/use-auth-fast"
 import { DashboardKPIs } from "@/components/admin/dashboard/dashboard-kpis"
 import { DashboardAuditLog } from "@/components/admin/dashboard/dashboard-audit-log"
-import { HeroSection } from "@/components/admin/dashboard/hero-section"
 import { KPICardPremium } from "@/components/admin/dashboard/kpi-card-premium"
 import { QuickActionsGrid } from "@/components/admin/dashboard/quick-actions-grid"
 import { ActivityTimeline } from "@/components/admin/dashboard/activity-timeline"
@@ -246,14 +245,6 @@ export default function AdminDashboard() {
       avatar_url: (user as any).avatar_url
     }}>
       <div className="space-y-4 sm:space-y-6 lg:space-y-8 animate-fade-in w-full">
-        {/* Hero Section */}
-        <HeroSection
-          totalTrips={aggregatedKpis.trips_today}
-          activeVehicles={aggregatedKpis.vehicles_active}
-          employeesInTransit={aggregatedKpis.employees_in_transit}
-          criticalAlerts={aggregatedKpis.critical_alerts}
-        />
-
         {/* Filtros */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}

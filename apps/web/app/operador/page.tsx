@@ -15,7 +15,6 @@ import { PeriodFilter, type PeriodFilter as PeriodFilterType } from "@/component
 import { useOperatorKPIs, useControlTower } from "@/hooks/use-operator-data"
 import { useRealtimeKPIs, useRealtimeAlerts } from "@/hooks/use-realtime-updates"
 import { t } from "@/lib/i18n"
-import { HeaderPremium } from "@/components/operator/dashboard/header-premium"
 import { KPICardEnhanced } from "@/components/operator/dashboard/kpi-card-enhanced"
 import { ControlTowerVisual } from "@/components/operator/dashboard/control-tower-visual"
 import { MapPin, Clock, AlertTriangle, TrendingUp, DollarSign, CheckCircle } from "lucide-react"
@@ -190,15 +189,6 @@ export default function OperatorDashboard() {
       avatar_url: (user as any)?.avatar_url
     }}>
       <div className="space-y-4 sm:space-y-6 lg:space-y-8 w-full">
-        {/* Header Premium */}
-        <HeaderPremium
-          title={t('operator', 'header_title')}
-          subtitle={t('operator', 'dashboard_subtitle')}
-          companyName={companyName}
-          actionLabel={t('operator', 'actions.view_routes')}
-          actionHref="/operador/rotas"
-        />
-
         {/* Filtros de Período */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
           <div className="flex-1 min-w-0">
