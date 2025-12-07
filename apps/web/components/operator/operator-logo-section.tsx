@@ -2,7 +2,6 @@
 
 import { usePathname } from "next/navigation"
 import { useState } from "react"
-import { CompanySelector } from "./company-selector"
 import { useOperatorTenant } from "@/components/providers/operator-tenant-provider"
 
 interface OperatorLogoSectionProps {
@@ -18,7 +17,7 @@ export function OperatorLogoSection({ panelHomeUrl, panelBranding }: OperatorLog
   const [imgFailed, setImgFailed] = useState(false)
 
   if (isOperatorPanel) {
-    // ✅ Se há logo e não falhou, exibir; caso contrário, CompanySelector
+    // Se há logo e não falhou, exibir
     if (logoUrl && !imgFailed) {
       return (
         <a href={panelHomeUrl} className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
@@ -37,8 +36,14 @@ export function OperatorLogoSection({ panelHomeUrl, panelBranding }: OperatorLog
         </a>
       )
     }
-    // Se não há logo ou falhou, usar CompanySelector
-    return <CompanySelector />
+    // Se não há logo ou falhou, mostrar apenas o nome da empresa
+    return (
+      <a href={panelHomeUrl} className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+        <span className="font-bold text-lg sm:text-2xl tracking-tight text-[var(--ink-strong)]">
+          {companyName || 'Operador'}
+        </span>
+      </a>
+    )
   }
 
   // Determinar o texto do branding baseado no painel
