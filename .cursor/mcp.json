@@ -1,33 +1,5 @@
 {
   "mcpServers": {
-    "Puppeteer": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@modelcontextprotocol/server-puppeteer"
-      ],
-      "env": {}
-    },
-    "GitHub": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@modelcontextprotocol/server-github"
-      ],
-      "env": {
-        "GITHUB_PERSONAL_ACCESS_TOKEN": "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"
-      }
-    },
-    "Google Maps": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@modelcontextprotocol/server-google-maps"
-      ],
-      "env": {
-        "GOOGLE_MAPS_API_KEY": "AIzaSyD79t05YxpU2RnEczY-NSDxhdbY9OvigsM"
-      }
-    },
     "Memory": {
       "command": "npx",
       "args": [
@@ -45,25 +17,6 @@
         "@modelcontextprotocol/server-sequential-thinking"
       ],
       "env": {}
-    },
-    "shadcn-ui": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "shadcn@latest",
-        "mcp"
-      ],
-      "env": {}
-    },
-    "context7": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@upstash/context7-mcp@latest"
-      ],
-      "env": {
-        "DEFAULT_MINIMUM_TOKENS": "10000"
-      }
     },
     "PostgreSQL": {
       "command": "npx",
