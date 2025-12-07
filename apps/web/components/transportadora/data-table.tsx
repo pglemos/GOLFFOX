@@ -1,12 +1,16 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import React, { useState, useMemo } from "react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Search, ChevronLeft, ChevronRight, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Search, ChevronLeft, ChevronRight, ArrowUpDown, ArrowUp, ArrowDown, Eye, Trash2, MoreHorizontal } from "lucide-react"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { cn } from "@/lib/utils"
 import { t } from "@/lib/i18n"
 
@@ -18,6 +22,10 @@ export interface Column<T> {
   filterable?: boolean
   filterType?: "text" | "select" | "date"
   filterOptions?: { label: string; value: string }[]
+  showCheckbox?: boolean
+  isUserColumn?: boolean
+  isStatusColumn?: boolean
+  isActionsColumn?: boolean
 }
 
 interface DataTableProps<T> {
@@ -32,6 +40,15 @@ interface DataTableProps<T> {
   emptyMessage?: string
   onRowClick?: (row: T) => void
   className?: string
+  showFilters?: boolean
+  filterConfig?: {
+    role?: { label: string; options: { label: string; value: string }[] }
+    plan?: { label: string; options: { label: string; value: string }[] }
+    status?: { label: string; options: { label: string; value: string }[] }
+  }
+  onView?: (row: T) => void
+  onDelete?: (row: T) => void
+  onAction?: (action: string, row: T) => void
 }
 
 export function DataTable<T extends Record<string, any>>({
@@ -45,13 +62,24 @@ export function DataTable<T extends Record<string, any>>({
   description,
   emptyMessage = "Nenhum registro encontrado",
   onRowClick,
-  className
+  className,
+  showFilters = false,
+  filterConfig,
+  onView,
+  onDelete,
+  onAction
 }: DataTableProps<T>) {
   const [searchQuery, setSearchQuery] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
   const [sortColumn, setSortColumn] = useState<string | null>(null)
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc")
-  const [filters, setFilters] = useState<Record<string, string>>({})
+  const [filters, setFilters] = useState<Record<string, string>>({
+    role: "all",
+    plan: "all",
+    status: "all"
+  })
+  const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set())
+  const [selectAll, setSelectAll] = useState(false)
 
   // Filter data
   const filteredData = useMemo(() => {
@@ -69,7 +97,7 @@ export function DataTable<T extends Record<string, any>>({
 
     // Apply column filters
     Object.entries(filters).forEach(([key, value]) => {
-      if (value) {
+      if (value && value !== "all") {
         result = result.filter((row) => {
           const cellValue = row[key]?.toString().toLowerCase()
           return cellValue?.includes(value.toLowerCase())
@@ -79,6 +107,29 @@ export function DataTable<T extends Record<string, any>>({
 
     return result
   }, [data, searchQuery, filters, columns])
+
+  // Handle checkbox selection
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      const allIndices = new Set(sortedData.map((_, index) => index))
+      setSelectedRows(allIndices)
+      setSelectAll(true)
+    } else {
+      setSelectedRows(new Set())
+      setSelectAll(false)
+    }
+  }
+
+  const handleSelectRow = (index: number, checked: boolean) => {
+    const newSelected = new Set(selectedRows)
+    if (checked) {
+      newSelected.add(index)
+    } else {
+      newSelected.delete(index)
+    }
+    setSelectedRows(newSelected)
+    setSelectAll(newSelected.size === sortedData.length && sortedData.length > 0)
+  }
 
   // Sort data
   const sortedData = useMemo(() => {
@@ -136,30 +187,108 @@ export function DataTable<T extends Record<string, any>>({
     )
   }
 
+  const getUserInitials = (name?: string) => {
+    if (!name) return 'U'
+    return name
+      .split(' ')
+      .slice(0, 2)
+      .map(n => n[0])
+      .join('')
+      .toUpperCase()
+  }
+
+  const getStatusBadge = (status: string) => {
+    const statusLower = status?.toLowerCase() || ''
+    if (statusLower.includes('active') || statusLower.includes('ativo')) {
+      return <Badge className="bg-green-500 hover:bg-green-600 text-white">{status}</Badge>
+    }
+    if (statusLower.includes('pending') || statusLower.includes('pendente')) {
+      return <Badge className="bg-orange-500 hover:bg-orange-600 text-white">{status}</Badge>
+    }
+    if (statusLower.includes('inactive') || statusLower.includes('inativo')) {
+      return <Badge variant="secondary">{status}</Badge>
+    }
+    return <Badge variant="outline">{status}</Badge>
+  }
+
   return (
-    <Card className={className}>
+    <Card className={cn("bg-card", className)}>
       {(title || description || searchable) && (
-        <CardHeader className="px-3 sm:px-6">
+        <CardHeader className="px-3 sm:px-6 bg-card">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
             <div className="flex-1 min-w-0">
               {title && <CardTitle className="text-lg sm:text-xl">{title}</CardTitle>}
               {description && (
-                <p className="text-xs sm:text-sm text-[var(--ink-muted)] mt-1">{description}</p>
+                <CardDescription className="text-xs sm:text-sm mt-1">{description}</CardDescription>
               )}
             </div>
             {searchable && (
               <div className="relative w-full sm:w-64">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                 <Input
                   placeholder={searchPlaceholder}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 text-base h-11 sm:h-10 min-h-[44px] touch-manipulation"
+                  className="pl-10 text-base h-11 sm:h-10 min-h-[44px] touch-manipulation bg-card"
                 />
               </div>
             )}
           </div>
         </CardHeader>
+      )}
+
+      {/* Filtros conforme Datatable Component 04 */}
+      {showFilters && filterConfig && (
+        <div className="px-3 sm:px-6 pb-4 border-b border-border bg-card">
+          <h3 className="text-lg font-semibold mb-3">Filter</h3>
+          <div className="flex flex-col sm:flex-row gap-3">
+            {filterConfig.role && (
+              <Select value={filters.role || "all"} onValueChange={(value) => setFilters({ ...filters, role: value })}>
+                <SelectTrigger className="w-full sm:w-[180px] bg-card">
+                  <SelectValue placeholder={filterConfig.role.label} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All</SelectItem>
+                  {filterConfig.role.options.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+            {filterConfig.plan && (
+              <Select value={filters.plan || "all"} onValueChange={(value) => setFilters({ ...filters, plan: value })}>
+                <SelectTrigger className="w-full sm:w-[180px] bg-card">
+                  <SelectValue placeholder={filterConfig.plan.label} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All</SelectItem>
+                  {filterConfig.plan.options.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+            {filterConfig.status && (
+              <Select value={filters.status || "all"} onValueChange={(value) => setFilters({ ...filters, status: value })}>
+                <SelectTrigger className="w-full sm:w-[180px] bg-card">
+                  <SelectValue placeholder={filterConfig.status.label} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All</SelectItem>
+                  {filterConfig.status.options.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          </div>
+        </div>
       )}
 
       <CardContent className="p-0">
@@ -168,6 +297,16 @@ export function DataTable<T extends Record<string, any>>({
             <Table>
               <TableHeader>
                 <TableRow>
+                  {/* Checkbox column */}
+                  {columns.some(col => col.showCheckbox) && (
+                    <TableHead className="w-12 px-3 sm:px-6 py-3">
+                      <Checkbox
+                        checked={selectAll}
+                        onCheckedChange={handleSelectAll}
+                        aria-label="Select all"
+                      />
+                    </TableHead>
+                  )}
                   {columns.map((column) => (
                     <TableHead
                       key={column.key}
@@ -188,31 +327,147 @@ export function DataTable<T extends Record<string, any>>({
               <TableBody>
                 {paginatedData.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={columns.length} className="text-center py-12 px-3 sm:px-6">
-                      <p className="text-sm text-[var(--ink-muted)]">{emptyMessage}</p>
+                    <TableCell colSpan={columns.length + (columns.some(col => col.showCheckbox) ? 1 : 0)} className="text-center py-12 px-3 sm:px-6">
+                      <p className="text-sm text-muted-foreground">{emptyMessage}</p>
                     </TableCell>
                   </TableRow>
                 ) : (
-                  paginatedData.map((row, index) => (
-                    <TableRow
-                      key={index}
-                      className={cn(
-                        onRowClick ? "cursor-pointer touch-manipulation" : "",
-                        "hover:bg-[var(--bg-hover)] active:bg-[var(--bg-hover)]"
-                      )}
-                      onClick={() => onRowClick?.(row)}
-                    >
-                      {columns.map((column) => (
-                        <TableCell key={column.key} className="px-3 sm:px-6 py-3 text-xs sm:text-sm">
-                          <div className="truncate max-w-[200px] sm:max-w-none">
-                            {column.render
-                              ? column.render(row[column.key], row)
-                              : row[column.key]?.toString() || "-"}
-                          </div>
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  ))
+                  paginatedData.map((row, globalIndex) => {
+                    const actualIndex = (currentPage - 1) * pageSize + globalIndex
+                    const isSelected = selectedRows.has(actualIndex)
+                    
+                    return (
+                      <TableRow
+                        key={actualIndex}
+                        className={cn(
+                          onRowClick ? "cursor-pointer touch-manipulation" : "",
+                          "hover:bg-muted/50 transition-colors",
+                          isSelected && "bg-muted/30"
+                        )}
+                        onClick={() => onRowClick?.(row)}
+                      >
+                        {/* Checkbox cell */}
+                        {columns.some(col => col.showCheckbox) && (
+                          <TableCell className="px-3 sm:px-6 py-3">
+                            <Checkbox
+                              checked={isSelected}
+                              onCheckedChange={(checked) => handleSelectRow(actualIndex, checked as boolean)}
+                              onClick={(e) => e.stopPropagation()}
+                              aria-label={`Select row ${actualIndex + 1}`}
+                            />
+                          </TableCell>
+                        )}
+                        {columns.map((column) => {
+                          // User column with avatar
+                          if (column.isUserColumn) {
+                            const name = row.name || row.user_name || ''
+                            const email = row.email || row.user_email || ''
+                            const avatar = row.avatar_url || row.avatar || ''
+                            const initials = getUserInitials(name)
+                            
+                            return (
+                              <TableCell key={column.key} className="px-3 sm:px-6 py-3 text-xs sm:text-sm">
+                                <div className="flex items-center gap-3">
+                                  <Avatar className="h-8 w-8">
+                                    <AvatarImage src={avatar} alt={name} />
+                                    <AvatarFallback className="bg-primary text-primary-foreground text-xs">
+                                      {initials}
+                                    </AvatarFallback>
+                                  </Avatar>
+                                  <div className="flex flex-col min-w-0">
+                                    <span className="font-medium truncate">{name}</span>
+                                    <span className="text-xs text-muted-foreground truncate">{email}</span>
+                                  </div>
+                                </div>
+                              </TableCell>
+                            )
+                          }
+                          
+                          // Status column with badge
+                          if (column.isStatusColumn) {
+                            const status = row[column.key] || row.status || ''
+                            return (
+                              <TableCell key={column.key} className="px-3 sm:px-6 py-3 text-xs sm:text-sm">
+                                {getStatusBadge(status)}
+                              </TableCell>
+                            )
+                          }
+                          
+                          // Actions column with icons
+                          if (column.isActionsColumn) {
+                            return (
+                              <TableCell key={column.key} className="px-3 sm:px-6 py-3 text-xs sm:text-sm">
+                                <div className="flex items-center gap-2">
+                                  {onView && (
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      className="h-8 w-8"
+                                      onClick={(e) => {
+                                        e.stopPropagation()
+                                        onView(row)
+                                      }}
+                                      aria-label="View"
+                                    >
+                                      <Eye className="h-4 w-4" />
+                                    </Button>
+                                  )}
+                                  {onDelete && (
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      className="h-8 w-8 text-destructive hover:text-destructive"
+                                      onClick={(e) => {
+                                        e.stopPropagation()
+                                        onDelete(row)
+                                      }}
+                                      aria-label="Delete"
+                                    >
+                                      <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                  )}
+                                  {onAction && (
+                                    <DropdownMenu>
+                                      <DropdownMenuTrigger asChild>
+                                        <Button
+                                          variant="ghost"
+                                          size="icon"
+                                          className="h-8 w-8"
+                                          onClick={(e) => e.stopPropagation()}
+                                          aria-label="More actions"
+                                        >
+                                          <MoreHorizontal className="h-4 w-4" />
+                                        </Button>
+                                      </DropdownMenuTrigger>
+                                      <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
+                                        <DropdownMenuItem onClick={() => onAction('edit', row)}>
+                                          Editar
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem onClick={() => onAction('duplicate', row)}>
+                                          Duplicar
+                                        </DropdownMenuItem>
+                                      </DropdownMenuContent>
+                                    </DropdownMenu>
+                                  )}
+                                </div>
+                              </TableCell>
+                            )
+                          }
+                          
+                          // Regular column
+                          return (
+                            <TableCell key={column.key} className="px-3 sm:px-6 py-3 text-xs sm:text-sm">
+                              <div className="truncate max-w-[200px] sm:max-w-none">
+                                {column.render
+                                  ? column.render(row[column.key], row)
+                                  : row[column.key]?.toString() || "-"}
+                              </div>
+                            </TableCell>
+                          )
+                        })}
+                      </TableRow>
+                    )
+                  })
                 )}
               </TableBody>
             </Table>
@@ -220,10 +475,9 @@ export function DataTable<T extends Record<string, any>>({
         </div>
 
         {pagination && totalPages > 1 && (
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-0 px-3 sm:px-6 py-3 sm:py-4 border-t border-[var(--border)]">
-            <div className="text-xs sm:text-sm text-[var(--ink-muted)] text-center sm:text-left">
-              {t('transportadora', 'pagination_showing')} {(currentPage - 1) * pageSize + 1} {t('transportadora', 'pagination_to')}{" "}
-              {Math.min(currentPage * pageSize, sortedData.length)} {t('transportadora', 'pagination_of')} {sortedData.length} {t('transportadora', 'pagination_records')}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-0 px-3 sm:px-6 py-3 sm:py-4 border-t border-border bg-card">
+            <div className="text-xs sm:text-sm text-muted-foreground text-center sm:text-left">
+              Showing {(currentPage - 1) * pageSize + 1} to {Math.min(currentPage * pageSize, sortedData.length)} of {sortedData.length} entries
             </div>
             <div className="flex items-center justify-center gap-2">
               <Button
@@ -231,22 +485,67 @@ export function DataTable<T extends Record<string, any>>({
                 size="sm"
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                 disabled={currentPage === 1}
-                className="min-h-[44px] touch-manipulation"
+                className="min-h-[44px] touch-manipulation bg-card"
               >
                 <ChevronLeft className="w-4 h-4" />
-                <span className="hidden sm:inline">{t('transportadora', 'pagination_previous')}</span>
+                <span className="hidden sm:inline">Previous</span>
               </Button>
-              <div className="text-xs sm:text-sm text-[var(--ink-muted)] px-2">
-                {currentPage}/{totalPages}
+              <div className="flex items-center gap-1">
+                {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+                  let pageNum: number
+                  if (totalPages <= 5) {
+                    pageNum = i + 1
+                  } else if (currentPage <= 3) {
+                    pageNum = i + 1
+                  } else if (currentPage >= totalPages - 2) {
+                    pageNum = totalPages - 4 + i
+                  } else {
+                    pageNum = currentPage - 2 + i
+                  }
+                  
+                  if (i === 4 && totalPages > 5 && currentPage < totalPages - 2) {
+                    return (
+                      <React.Fragment key={`ellipsis-${i}`}>
+                        <span className="text-xs sm:text-sm text-muted-foreground px-2">...</span>
+                        <Button
+                          variant={currentPage === totalPages ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => setCurrentPage(totalPages)}
+                          className={cn(
+                            "min-h-[32px] h-8 px-3 bg-card",
+                            currentPage === totalPages && "bg-primary text-primary-foreground"
+                          )}
+                        >
+                          {totalPages}
+                        </Button>
+                      </React.Fragment>
+                    )
+                  }
+                  
+                  return (
+                    <Button
+                      key={pageNum}
+                      variant={currentPage === pageNum ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setCurrentPage(pageNum)}
+                      className={cn(
+                        "min-h-[32px] h-8 px-3 bg-card",
+                        currentPage === pageNum && "bg-primary text-primary-foreground"
+                      )}
+                    >
+                      {pageNum}
+                    </Button>
+                  )
+                })}
               </div>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                 disabled={currentPage === totalPages}
-                className="min-h-[44px] touch-manipulation"
+                className="min-h-[44px] touch-manipulation bg-card"
               >
-                <span className="hidden sm:inline">{t('transportadora', 'pagination_next')}</span>
+                <span className="hidden sm:inline">Next</span>
                 <ChevronRight className="w-4 h-4" />
               </Button>
             </div>

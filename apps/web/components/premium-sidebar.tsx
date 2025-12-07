@@ -306,10 +306,10 @@ const PremiumSidebarLogo = ({ panel }: { panel: 'admin' | 'operador' | 'transpor
               className="overflow-hidden"
             >
               <div className="flex flex-col">
-                <span className="font-bold text-lg text-gray-900 dark:text-white leading-tight">
+                <span className="font-bold text-lg text-foreground leading-tight">
                   {panelBranding.text}
                 </span>
-                <span className="text-xs text-gray-500 dark:text-gray-400 leading-tight">
+                <span className="text-xs text-muted-foreground leading-tight">
                   {panelBranding.subtitle}
                 </span>
               </div>
@@ -370,14 +370,14 @@ const PremiumSidebarLink = ({
         href={item.href}
         prefetch={true}
         onClick={handleClick}
-        className={cn(
-          "relative flex items-center gap-3 rounded-xl transition-all duration-300",
-          "min-h-[48px] touch-manipulation px-4 py-2.5",
-          "group/link",
-          isActive
-            ? "bg-gradient-to-r from-orange-50 to-orange-100/50 dark:from-orange-900/20 dark:to-orange-900/10 text-orange-600 dark:text-orange-400 shadow-sm shadow-orange-500/10"
-            : "text-gray-700 dark:text-gray-300 hover:bg-gray-100/80 dark:hover:bg-gray-800/50 active:bg-gray-200 dark:active:bg-gray-700"
-        )}
+                 className={cn(
+                   "relative flex items-center gap-3 rounded-xl transition-all duration-300",
+                   "min-h-[48px] touch-manipulation px-4 py-2.5",
+                   "group/link bg-card",
+                   isActive
+                     ? "bg-gradient-to-r from-orange-50 to-orange-100/50 dark:from-orange-900/20 dark:to-orange-900/10 text-orange-600 dark:text-orange-400 shadow-sm shadow-orange-500/10"
+                     : "text-foreground/80 hover:bg-muted/50 active:bg-muted"
+                 )}
         onMouseEnter={() => router.prefetch(item.href)}
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') {
@@ -451,18 +451,18 @@ const PremiumSidebarLink = ({
                 <span
                   className={cn(
                     "text-sm font-medium leading-tight transition-colors",
-                    isActive
-                      ? "text-orange-600 dark:text-orange-400"
-                      : "text-gray-900 dark:text-gray-100 group-hover/link:text-gray-950 dark:group-hover/link:text-white"
+                         isActive
+                           ? "text-orange-600 dark:text-orange-400"
+                           : "text-foreground group-hover/link:text-foreground"
                   )}
                 >
                   {item.label}
                 </span>
-                {item.description && (
-                  <span className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 line-clamp-1">
-                    {item.description}
-                  </span>
-                )}
+                         {item.description && (
+                           <span className="text-xs text-muted-foreground mt-0.5 line-clamp-1">
+                             {item.description}
+                           </span>
+                         )}
               </div>
             </motion.div>
           )}
@@ -514,7 +514,7 @@ const PremiumUserProfile = ({
   }
 
   return (
-    <div className="px-4 py-4 mt-auto border-t border-gray-200 dark:border-gray-800">
+    <div className="px-4 py-4 mt-auto border-t border-border bg-card">
       <AnimatePresence initial={false}>
         {open ? (
           <motion.div
@@ -522,10 +522,10 @@ const PremiumUserProfile = ({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 10 }}
             transition={{ duration: 0.2 }}
-            className="space-y-3"
+            className="space-y-3 bg-card"
           >
             {/* Informações do usuário */}
-            <div className="flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+            <div className="flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-muted/50 transition-colors bg-card">
               <Avatar className="h-10 w-10 border-2 border-orange-200 dark:border-orange-900">
                 <AvatarImage src={user?.avatar_url} alt={user?.name || 'User'} />
                 <AvatarFallback className="bg-gradient-to-br from-orange-500 to-orange-600 text-white font-semibold">
@@ -533,10 +533,10 @@ const PremiumUserProfile = ({
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                <p className="text-sm font-medium text-foreground truncate">
                   {user?.name || 'Usuário'}
                 </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                <p className="text-xs text-muted-foreground truncate">
                   {user?.email || 'email@exemplo.com'}
                 </p>
               </div>
@@ -548,7 +548,7 @@ const PremiumUserProfile = ({
               size="sm"
               onClick={handleLogout}
               disabled={isLoggingOut}
-              className="w-full justify-start text-gray-700 dark:text-gray-300 hover:text-orange-600 dark:hover:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-900/20"
+              className="w-full justify-start text-foreground/80 hover:text-orange-600 dark:hover:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-900/20 bg-card"
             >
               <LogOut className="h-4 w-4 mr-2" />
               {isLoggingOut ? 'Saindo...' : 'Sair'}
@@ -560,7 +560,7 @@ const PremiumUserProfile = ({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.15 }}
-            className="flex justify-center"
+            className="flex justify-center bg-card"
           >
             <Avatar className="h-10 w-10 border-2 border-orange-200 dark:border-orange-900">
               <AvatarImage src={user?.avatar_url} alt={user?.name || 'User'} />
@@ -624,7 +624,7 @@ export function PremiumSidebar({
     >
       <SidebarBody
         className={cn(
-          "flex flex-col bg-white dark:bg-neutral-900 border-r border-gray-200 dark:border-gray-800",
+          "flex flex-col bg-card border-r border-border",
           !isMobile && "top-16 sm:top-18 left-0 h-[calc(100vh-4rem)] sm:h-[calc(100vh-4.5rem)] z-50",
           isMobile && "w-[280px] sm:w-[300px]",
           "!px-0 !py-0"
