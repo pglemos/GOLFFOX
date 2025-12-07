@@ -261,6 +261,7 @@ export default function CustosPage() {
               </div>
             </div>
           </Card>
+          </motion.div>
         </div>
       </div>
     </AppShell>
