@@ -339,7 +339,7 @@ export default function AdminDashboard() {
             transition={{ delay: 0.5 }}
           >
             <a href="/admin/mapa" className="block h-full">
-              <Card glass hover className="cursor-pointer h-full">
+              <Card className="cursor-pointer h-full bg-card/50 backdrop-blur-sm border-[var(--border)] hover:shadow-xl transition-all duration-300 hover:border-[var(--brand)]/30">
                 <CardHeader className="pb-4 px-3 sm:px-6">
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex-1 pr-2 sm:pr-4">
