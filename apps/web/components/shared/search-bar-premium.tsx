@@ -1,6 +1,6 @@
 "use client"
 
-import { motion } from "framer-motion"
+import { motion, AnimatePresence } from "framer-motion"
 import { Input } from "@/components/ui/input"
 import { Search, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -35,23 +35,25 @@ export function SearchBarPremium({
           placeholder={placeholder}
           className="pl-10 pr-10 h-11 bg-card/50 backdrop-blur-sm border-[var(--border)] focus-visible:border-[var(--brand)] focus-visible:shadow-lg focus-visible:shadow-[var(--brand)]/10 transition-all duration-300"
         />
-        {value && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            className="absolute right-2 top-1/2 -translate-y-1/2"
-          >
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-7 w-7"
-              onClick={() => onChange("")}
+        <AnimatePresence>
+          {value && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              className="absolute right-2 top-1/2 -translate-y-1/2"
             >
-              <X className="h-4 w-4" />
-            </Button>
-          </motion.div>
-        )}
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-7 w-7"
+                onClick={() => onChange("")}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </motion.div>
   )

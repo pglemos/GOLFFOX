@@ -43,6 +43,7 @@ function Button({
   variant,
   size,
   asChild = false,
+  children,
   ...props
 }: React.ComponentProps<"button"> &
   VariantProps<typeof buttonVariants> & {
@@ -59,7 +60,7 @@ function Button({
       {variant === "shimmer" && (
         <span className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-white/20 to-transparent" />
       )}
-      {props.children}
+      {children}
     </Comp>
   )
 }
