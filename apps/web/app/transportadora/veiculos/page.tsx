@@ -618,7 +618,7 @@ export default function TransportadoraVeiculosPage() {
                                           {doc.status === 'valid' ? 'Válido' : doc.status === 'expired' ? 'Vencido' : doc.status === 'pending' ? 'Pendente' : 'Cancelado'}
                                         </Badge>
                                         {isExpiring && (
-                                          <Badge variant={daysToExpiry! < 0 ? 'destructive' : 'warning'}>
+                                          <Badge variant={daysToExpiry! < 0 ? 'destructive' : 'outline'} className={daysToExpiry! >= 0 ? 'border-yellow-500 text-yellow-700' : ''}>
                                             {daysToExpiry! < 0 
                                               ? `Vencido há ${Math.abs(daysToExpiry!)} dias`
                                               : `${daysToExpiry} dias restantes`}
