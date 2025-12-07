@@ -190,7 +190,7 @@ export const AppShell = memo(function AppShell({ user, children, panel }: AppShe
         <main
           className={cn(
             "min-h-screen transition-all duration-300 ease-in-out",
-            isMobile ? "overflow-visible pt-20" : "overflow-y-auto pt-28",
+            isMobile ? "overflow-visible pt-24" : "overflow-y-auto pt-32",
             "overflow-x-visible bg-[var(--bg)] pb-12 sm:pb-14",
             !isMobile ? "flex-1 md:ml-[64px]" : "w-full ml-0 flex-shrink-0",
             "w-full",
