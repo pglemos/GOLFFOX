@@ -3,7 +3,7 @@
 import { useState, useEffect, memo, useMemo } from "react"
 import { usePathname } from "next/navigation"
 import { Topbar } from "./topbar"
-import { Sidebar } from "./sidebar"
+import { PremiumSidebar } from "./premium-sidebar"
 import { EnvVarsBanner } from "./env-vars-banner"
 import { cn } from "@/lib/utils"
 import { motion } from "framer-motion"
@@ -178,12 +178,12 @@ export const AppShell = memo(function AppShell({ user, children, panel }: AppShe
           />
         )}
 
-        {/* Sidebar */}
-        <Sidebar
+        {/* Sidebar Premium */}
+        <PremiumSidebar
           isOpen={isSidebarOpen}
           isMobile={isMobile}
           panel={detectedPanel}
-          user={user ? { id: user.id, name: user.name || '', email: user.email } : { id: '', name: '', email: '' }}
+          user={user ? { id: user.id, name: user.name || '', email: user.email, avatar_url: user.avatar_url } : { id: '', name: '', email: '' }}
         />
 
         {/* Main Content */}
