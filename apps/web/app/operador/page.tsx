@@ -310,11 +310,9 @@ export default function OperatorDashboard() {
                   <CardTitle className="text-lg sm:text-xl font-semibold mb-1.5">{t('operator', 'map_title')}</CardTitle>
                   <p className="text-xs sm:text-sm text-[var(--ink-muted)]">{t('operator', 'map_subtitle')}</p>
                 </div>
-                <Button asChild variant="outline" size="sm" className="w-full sm:w-auto min-h-[44px] touch-manipulation">
-                  <a href="/operador/rotas/mapa" className="flex items-center justify-center">
-                    <MapPin className="h-4 w-4 mr-2" />
-                    {t('operator', 'actions.view_map')}
-                  </a>
+                <Button variant="outline" size="sm" className="w-full sm:w-auto min-h-[44px] touch-manipulation" onClick={() => router.push("/operador/rotas/mapa")}>
+                  <MapPin className="h-4 w-4 mr-2" />
+                  {t('operator', 'actions.view_map')}
                 </Button>
               </div>
             </CardHeader>
