@@ -14,12 +14,22 @@ import {
   ChevronUp,
   Save,
   X,
+  Users,
+  Truck,
+  Navigation,
+  AlertCircle,
+  TrendingUp,
+  Gauge,
 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import { useAuthFast } from "@/hooks/use-auth-fast"
 import { DashboardKPIs } from "@/components/admin/dashboard/dashboard-kpis"
 import { DashboardAuditLog } from "@/components/admin/dashboard/dashboard-audit-log"
+import { HeroSection } from "@/components/admin/dashboard/hero-section"
+import { KPICardPremium } from "@/components/admin/dashboard/kpi-card-premium"
+import { QuickActionsGrid } from "@/components/admin/dashboard/quick-actions-grid"
+import { ActivityTimeline } from "@/components/admin/dashboard/activity-timeline"
 
 interface KpiData {
   company_id: string
@@ -236,8 +246,21 @@ export default function AdminDashboard() {
       avatar_url: (user as any).avatar_url
     }}>
       <div className="space-y-4 sm:space-y-6 lg:space-y-8 animate-fade-in w-full">
+        {/* Hero Section */}
+        <HeroSection
+          totalTrips={aggregatedKpis.trips_today}
+          activeVehicles={aggregatedKpis.vehicles_active}
+          employeesInTransit={aggregatedKpis.employees_in_transit}
+          criticalAlerts={aggregatedKpis.critical_alerts}
+        />
+
         {/* Filtros */}
-        <Card>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+        >
+          <Card className="bg-card/50 backdrop-blur-sm border-[var(--border)] hover:shadow-xl transition-all duration-300">
           <CardHeader className="pb-4 px-3 sm:px-6">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
               <div className="flex items-center gap-2">
@@ -325,115 +348,86 @@ export default function AdminDashboard() {
               </div>
             </CardContent>
           )}
-        </Card>
+          </Card>
+        </motion.div>
 
-        {/* KPIs */}
-        <DashboardKPIs kpis={aggregatedKpis} />
-
-        {/* Cards de Ação Rápida */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 lg:gap-6">
-          {/* Mapa da Frota Preview */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.5 }}
-          >
-            <a href="/admin/mapa" className="block h-full">
-              <Card className="cursor-pointer h-full bg-card/50 backdrop-blur-sm border-[var(--border)] hover:shadow-xl transition-all duration-300 hover:border-[var(--brand)]/30">
-                <CardHeader className="pb-4 px-3 sm:px-6">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex-1 pr-2 sm:pr-4">
-                      <CardTitle className="text-lg sm:text-xl font-semibold mb-1.5">Mapa da Frota</CardTitle>
-                      <p className="text-xs sm:text-sm text-[var(--ink-muted)]">Visualize veículos em tempo real</p>
-                    </div>
-                    <div className="relative flex-shrink-0 p-1">
-                      <motion.div 
-                        className="p-2.5 sm:p-3 rounded-xl bg-gradient-to-br from-[var(--brand-light)] to-[var(--brand-soft)] group-hover:from-[var(--brand)] group-hover:to-[var(--brand-hover)] transition-all duration-300 shadow-md group-hover:shadow-[var(--shadow-brand-lg)] relative"
-                        whileHover={{ scale: 1.1, rotate: [0, -5, 5, 0] }}
-                        transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                      >
-                        <motion.div
-                          className="absolute inset-0 rounded-xl bg-gradient-to-br from-white/30 via-white/10 to-transparent opacity-0 group-hover:opacity-100"
-                          transition={{ duration: 0.3 }}
-                        />
-                        <MapPin className="h-4 w-4 sm:h-5 sm:w-5 text-[var(--brand)] group-hover:text-white transition-all duration-300 relative z-10" style={{ filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1))' }} />
-                      </motion.div>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="pt-0 px-3 sm:px-6">
-                  <motion.div 
-                    className="h-40 bg-gradient-to-br from-[var(--brand)]/10 via-[var(--brand)]/5 to-[var(--accent)]/10 rounded-xl flex items-center justify-center group-hover:from-[var(--brand)]/25 group-hover:via-[var(--brand)]/15 group-hover:to-[var(--accent)]/25 transition-all duration-500 relative overflow-visible"
-                    whileHover={{ scale: 1.02 }}
-                  >
-                    <motion.div
-                      className="absolute inset-0 bg-gradient-to-br from-[var(--brand)]/20 to-transparent opacity-0 group-hover:opacity-100"
-                      transition={{ duration: 0.5 }}
-                    />
-                    <MapPin className="h-16 w-16 text-[var(--brand)] opacity-30 group-hover:opacity-70 transition-all duration-500 relative z-10 drop-shadow-lg" />
-                  </motion.div>
-                </CardContent>
-              </Card>
-            </a>
-          </motion.div>
-
-          {/* Notificações Recentes */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.6 }}
-          >
-            <Card className="h-full">
-              <CardHeader className="pb-4 px-3 sm:px-6">
-                <div className="flex items-start justify-between gap-2">
-                  <div className="flex-1 pr-2 sm:pr-4">
-                    <CardTitle className="text-lg sm:text-xl font-semibold mb-1.5">Notificações Recentes</CardTitle>
-                    <p className="text-xs sm:text-sm text-[var(--ink-muted)]">Últimas atualizações do sistema</p>
-                  </div>
-                  <Button variant="ghost" size="sm" className="flex-shrink-0 min-h-[44px] min-w-[44px] touch-manipulation" asChild>
-                    <a href="/admin/alertas">
-                      <ArrowUpRight className="h-4 w-4" />
-                    </a>
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent className="pt-0 px-3 sm:px-6">
-                <div className="space-y-2">
-                  {[1, 2, 3].map((i) => (
-                    <motion.div 
-                      key={i} 
-                      className="flex items-center gap-3 p-3.5 rounded-xl hover:bg-gradient-to-r hover:from-[var(--bg-hover)] hover:to-[var(--bg-soft)] transition-all duration-300 border border-transparent hover:border-[var(--border)] hover:shadow-sm group/alert"
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 0.6 + i * 0.1 }}
-                      whileHover={{ x: 4, scale: 1.02 }}
-                    >
-                      <motion.div 
-                        className="w-2.5 h-2.5 rounded-full bg-gradient-to-br from-[var(--brand)] to-[var(--brand-hover)] shadow-[var(--shadow-brand)] flex-shrink-0"
-                        animate={{ 
-                          scale: [1, 1.3, 1],
-                          opacity: [1, 0.7, 1]
-                        }}
-                        transition={{ 
-                          duration: 2,
-                          repeat: Infinity,
-                          ease: "easeInOut"
-                        }}
-                      />
-                      <div className="flex-1 overflow-visible">
-                        <p className="text-sm font-semibold text-[var(--ink-strong)] group-hover:text-[var(--brand)] transition-colors">Alerta #{i}</p>
-                        <p className="text-xs text-[var(--ink-muted)]">Há {i} minutos</p>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
+        {/* KPIs Premium */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 lg:gap-6">
+          <KPICardPremium
+            icon={Users}
+            label="Funcionários em Trânsito"
+            value={aggregatedKpis.employees_in_transit}
+            hint="Ativos agora"
+            delay={0.1}
+          />
+          <KPICardPremium
+            icon={Truck}
+            label="Veículos Ativos"
+            value={aggregatedKpis.vehicles_active}
+            hint="Em rota"
+            delay={0.2}
+          />
+          <KPICardPremium
+            icon={Navigation}
+            label="Rotas Hoje"
+            value={aggregatedKpis.routes_today}
+            hint="Hoje"
+            delay={0.3}
+          />
+          <KPICardPremium
+            icon={AlertCircle}
+            label="Alertas Críticos"
+            value={aggregatedKpis.critical_alerts}
+            hint="Atenção necessária"
+            trend={aggregatedKpis.critical_alerts > 0 ? -1 : undefined}
+            delay={0.4}
+          />
+          <KPICardPremium
+            icon={TrendingUp}
+            label="Eficiência de Rotas"
+            value={`${aggregatedKpis.routeEfficiency}%`}
+            hint="Taxa de conclusão"
+            trend={aggregatedKpis.routeEfficiency >= 80 ? 1 : undefined}
+            delay={0.5}
+          />
+          <KPICardPremium
+            icon={Gauge}
+            label="Saúde do Sistema"
+            value={`${aggregatedKpis.systemHealth}%`}
+            hint={aggregatedKpis.systemHealth >= 80 ? "Excelente" : aggregatedKpis.systemHealth >= 60 ? "Bom" : "Atenção"}
+            trend={aggregatedKpis.systemHealth >= 80 ? 1 : aggregatedKpis.systemHealth >= 60 ? 0 : -1}
+            delay={0.6}
+          />
         </div>
 
+        {/* Cards de Ação Rápida */}
+        <QuickActionsGrid
+          actions={[
+            {
+              title: "Mapa da Frota",
+              description: "Visualize veículos em tempo real",
+              icon: MapPin,
+              href: "/admin/mapa",
+              gradient: "from-[var(--brand)] to-[var(--brand-hover)]",
+              bgGradient: "from-[var(--brand)]/10 to-[var(--brand-hover)]/5",
+            },
+            {
+              title: "Alertas e Notificações",
+              description: "Últimas atualizações do sistema",
+              icon: AlertCircle,
+              href: "/admin/alertas",
+              gradient: "from-red-500 to-orange-500",
+              bgGradient: "from-red-500/10 to-orange-500/5",
+            },
+          ]}
+        />
+
         {/* Atividades Recentes */}
-        <DashboardAuditLog logs={auditLogs} loading={activitiesLoading} />
+        <ActivityTimeline 
+          activities={auditLogs} 
+          loading={activitiesLoading}
+          onViewAll={() => window.location.href = '/admin/alertas'}
+        />
       </div>
     </AppShell>
   )
