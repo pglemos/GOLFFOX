@@ -217,9 +217,6 @@ export function Topbar({
         ) : (
           <a href={panelHomeUrl} className="flex items-center gap-2 sm:gap-3 group flex-shrink-0 transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98] min-w-fit">
             <div className="w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-xl bg-gradient-to-br from-[#1E3A5F] via-[#2D4A6B] to-[var(--brand)] flex items-center justify-center shadow-lg flex-shrink-0 relative overflow-hidden group/logo transition-shadow duration-200 hover:shadow-[var(--shadow-brand-lg)]">
-              <div
-                className="absolute inset-0 bg-gradient-to-br from-white/20 via-white/5 to-transparent opacity-0 group-hover/logo:opacity-100 transition-opacity duration-300"
-              />
               <span className="text-white font-bold text-base sm:text-lg md:text-xl relative z-10 drop-shadow-md">G</span>
             </div>
             <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0 min-w-fit">
