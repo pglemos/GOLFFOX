@@ -12,7 +12,7 @@ export default function Error({
   reset: () => void
 }) {
   useEffect(() => {
-    console.error('âŒ Erro na pÃ¡gina de funcionÃ¡rios:', error)
+    console.error('❌ Erro na página de funcionários:', error)
     console.error('Stack trace:', error.stack)
   }, [error])
 
@@ -21,11 +21,11 @@ export default function Error({
       <Card className="p-8 max-w-md w-full text-center shadow-lg">
         <h2 className="text-2xl font-bold mb-4 text-red-600">Algo deu errado!</h2>
         <p className="text-gray-600 mb-4">
-          {error.message || 'Ocorreu um erro inesperado ao carregar a pÃ¡gina de funcionÃ¡rios.'}
+          {error.message || 'Ocorreu um erro inesperado ao carregar a página de funcionários.'}
         </p>
         {process.env.NODE_ENV === 'development' && error.stack && (
           <details className="text-left text-xs text-gray-500 mb-6 bg-gray-100 p-4 rounded overflow-auto max-h-40">
-            <summary className="cursor-pointer font-semibold mb-2">Detalhes tÃ©cnicos</summary>
+            <summary className="cursor-pointer font-semibold mb-2">Detalhes técnicos</summary>
             <pre className="whitespace-pre-wrap">{error.stack}</pre>
           </details>
         )}
@@ -44,5 +44,3 @@ export default function Error({
     </div>
   )
 }
-
-

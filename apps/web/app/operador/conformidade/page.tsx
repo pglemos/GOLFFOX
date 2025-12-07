@@ -62,7 +62,7 @@ export default function ConformidadeOperatorPage() {
     <AppShell user={{ id: user?.id || "", name: user?.name || "Operador", email: user?.email || "", role: "operador", avatar_url: user?.avatar_url }}>
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold mb-2">Conformidade & SeguranÃ§a</h1>
+          <h1 className="text-3xl font-bold mb-2">Conformidade & Segurança</h1>
           <p className="text-[var(--ink-muted)]">Incidentes, auditorias e documentos</p>
         </div>
 

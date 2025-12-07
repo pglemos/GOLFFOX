@@ -48,7 +48,7 @@ export default function SincronizarPage() {
 
       for (const rota of rotas || []) {
         try {
-          // Buscar funcionÃ¡rios da empresa da rota
+          // Buscar funcionários da empresa da rota
           const { data: funcionarios, error: funcError } = await supabase
             .from("gf_employee_company")
             .select("*")
@@ -57,7 +57,7 @@ export default function SincronizarPage() {
 
           if (funcError) throw funcError
 
-          // Geocodificar endereÃ§os sem lat/lng
+          // Geocodificar endereços sem lat/lng
           const pontos: Array<{ lat: number; lng: number; address?: string }> = []
           
           for (const func of funcionarios || []) {
@@ -70,13 +70,13 @@ export default function SincronizarPage() {
                 lat = location.lat
                 lng = location.lng
 
-                // Atualizar funcionÃ¡rio com coordenadas
+                // Atualizar funcionário com coordenadas
                 await supabase
                   .from("gf_employee_company")
                   .update({ latitude: lat, longitude: lng })
                   .eq("id", func.id)
               } else {
-                console.warn(`NÃ£o foi possÃ­vel geocodificar: ${func.address}`)
+                console.warn(`Não foi possível geocodificar: ${func.address}`)
                 continue
               }
             }

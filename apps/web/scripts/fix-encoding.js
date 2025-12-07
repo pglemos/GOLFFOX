@@ -86,3 +86,4 @@ for (const file of i18nFiles) {
 console.log(`\n✅ ${fixedCount} arquivo(s) verificado(s) e corrigido(s) se necessário.`);
 console.log('✅ Encoding UTF-8 configurado para o projeto.');
 
+
