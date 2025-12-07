@@ -15,9 +15,18 @@ let nextConfig = {
   },
   // Next.js 16: Turbopack é o bundler padrão - otimizado para produção
   // Turbopack oferece performance superior com cache incremental
-  // NOTA: Turbopack requer binário nativo SWC. Se o binário falhar, Next.js usará webpack
-  // Configuração explícita do Turbopack para silenciar warning
-  turbopack: {},
+  // 
+  // IMPORTANTE: Turbopack requer binário nativo SWC funcionando
+  // Se o DLL do SWC não carregar, o Turbopack falhará
+  // 
+  // Para ativar o Turbopack:
+  // 1. Instale Visual C++ Redistributable 2015-2022: https://aka.ms/vs/17/release/vc_redist.x64.exe
+  // 2. REINICIE o computador (obrigatório para carregar as DLLs)
+  // 3. Verifique: node scripts/diagnose-swc-dll.js
+  // 4. Se o DLL carregar, descomente a linha abaixo:
+  // turbopack: {},
+  //
+  // Enquanto isso, o Next.js usa webpack automaticamente (funciona com WASM)
   
   // Configuração SWC: Next.js automaticamente usa WASM como fallback se binário nativo falhar
   // O binário nativo (@next/swc-win32-x64-msvc) é preferido para melhor performance
