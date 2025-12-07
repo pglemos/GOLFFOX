@@ -1,0 +1,5 @@
+[33m4e99324[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m refactor: remove background pattern from HeroSection and HeaderPremium components for cleaner design
+[33m105db85[m refactor: remove .editorconfig and scripts related to UTF-8 encoding, streamline Next.js configuration for Turbopack and SWC handling
+[33m5cb6e9d[m fix: Corrigir problemas de encoding UTF-8 em todo o repositório
+[33m19303e6[m refactor: remove build log file and update Next.js configuration for Turbopack, enhancing SWC binary handling with fallback support
+[33m2cd1e54[m refactor: enhance Next.js configuration for Turbopack and SWC handling, ensuring UTF-8 encoding in scripts
