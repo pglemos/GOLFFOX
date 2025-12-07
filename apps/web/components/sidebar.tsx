@@ -343,32 +343,6 @@ const CustomSidebarLink = ({
   )
 }
 
-// Logo component
-const SidebarLogo = ({ panel }: { panel: 'admin' | 'operador' | 'transportadora' }) => {
-  const { open } = useSidebar()
-
-  return (
-    <a
-      href={panel === 'operador' ? '/operador' : panel === 'transportadora' ? '/transportadora' : '/admin'}
-      className={cn(
-        "font-normal flex items-center text-sm text-black dark:text-white py-1 relative z-20 mb-6 transition-all",
-        open ? "space-x-2" : "justify-center w-full"
-      )}
-    >
-      <div
-        className={cn(
-          "h-8 w-8 rounded-xl flex items-center justify-center flex-shrink-0 shadow-md relative overflow-hidden transition-transform duration-200 hover:scale-105 active:scale-95",
-          panel === 'operador' ? "bg-gradient-to-br from-orange-500 to-orange-600" : "gradient-brand"
-        )}
-      >
-        <div
-          className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-50"
-        />
-        <span className="text-white text-xs font-bold relative z-10 drop-shadow-sm">GF</span>
-      </div>
-    </a>
-  )
-}
 
 export function Sidebar({ isOpen = false, isMobile = false, panel = 'admin', user }: SidebarProps) {
   const { isSidebarItemActive } = useNavigation()
@@ -419,7 +393,6 @@ export function Sidebar({ isOpen = false, isMobile = false, panel = 'admin', use
         "!px-0 !py-0"
       )}>
         <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden pt-4 sm:pt-6 px-3 sm:px-4 h-full">
-          <SidebarLogo panel={panel} />
           <div className="flex flex-col gap-1 mt-2">
             {menuItems.map((item) => (
               <motion.div key={item.href} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2, ease: 'easeOut' }}>
