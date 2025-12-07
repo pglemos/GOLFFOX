@@ -366,23 +366,6 @@ const SidebarLogo = ({ panel }: { panel: 'admin' | 'operador' | 'transportadora'
         />
         <span className="text-white text-xs font-bold relative z-10 drop-shadow-sm">GF</span>
       </div>
-      <motion.div
-        animate={{
-          opacity: open ? 1 : 0,
-          display: open ? "block" : "none",
-        }}
-        transition={{
-          duration: 0.2,
-          ease: "easeInOut",
-        }}
-        className="overflow-hidden"
-      >
-        <div>
-          <p className="text-xs font-semibold text-[var(--ink-strong)]">
-            GOLF FOX
-          </p>
-        </div>
-      </motion.div>
     </a>
   )
 }

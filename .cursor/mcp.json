@@ -1,32 +1,5 @@
 {
   "mcpServers": {
-    "Memory": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@modelcontextprotocol/server-memory"
-      ],
-      "env": {
-        "MEMORY_FILE_PATH": "C:\\Users\\Pedro\\.cursor\\memory.json"
-      }
-    },
-    "Sequential Thinking": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@modelcontextprotocol/server-sequential-thinking"
-      ],
-      "env": {}
-    },
-    "PostgreSQL": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@modelcontextprotocol/server-postgres",
-        "postgresql://postgres:Guigui1309%40@db.vmoxzesvjcfmrebagcwo.supabase.co:5432/postgres"
-      ],
-      "env": {}
-    },
     "Filesystem": {
       "command": "npx",
       "args": [
