@@ -337,3 +337,180 @@ export const pageTransition: Variants = {
   },
 }
 
+// Premium Loading Animations
+export const loadingPulse: Variants = {
+  hidden: { opacity: 0.5 },
+  visible: {
+    opacity: [0.5, 1, 0.5],
+    transition: {
+      duration: 1.5,
+      repeat: Infinity,
+      ease: "easeInOut"
+    }
+  },
+}
+
+export const loadingSpin: Variants = {
+  hidden: { rotate: 0 },
+  visible: {
+    rotate: 360,
+    transition: {
+      duration: 1,
+      repeat: Infinity,
+      ease: "linear"
+    }
+  },
+}
+
+export const loadingBounce: Variants = {
+  hidden: { y: 0 },
+  visible: {
+    y: [-10, 0, -10],
+    transition: {
+      duration: 1,
+      repeat: Infinity,
+      ease: "easeInOut"
+    }
+  },
+}
+
+// Premium Entrance Animations
+export const slideInUpPremium: Variants = {
+  hidden: { 
+    opacity: 0, 
+    y: 40,
+    scale: 0.95
+  },
+  visible: { 
+    opacity: 1, 
+    y: 0,
+    scale: 1,
+    transition: {
+      ...springTransition,
+      duration: 0.6
+    }
+  },
+}
+
+export const slideInDownPremium: Variants = {
+  hidden: { 
+    opacity: 0, 
+    y: -40,
+    scale: 0.95
+  },
+  visible: { 
+    opacity: 1, 
+    y: 0,
+    scale: 1,
+    transition: {
+      ...springTransition,
+      duration: 0.6
+    }
+  },
+}
+
+export const scaleInPremium: Variants = {
+  hidden: { 
+    opacity: 0, 
+    scale: 0.8,
+    rotate: -5
+  },
+  visible: { 
+    opacity: 1, 
+    scale: 1,
+    rotate: 0,
+    transition: {
+      ...bounceTransition,
+      duration: 0.5
+    }
+  },
+}
+
+// Premium Hover Animations
+export const hoverGlowPremium: Variants = {
+  rest: { 
+    boxShadow: "0 0 0 0 rgba(249, 115, 22, 0)"
+  },
+  hover: { 
+    boxShadow: "0 0 30px 10px rgba(249, 115, 22, 0.4)",
+    transition: smoothTransition
+  },
+}
+
+export const hoverLiftPremium: Variants = {
+  rest: { 
+    y: 0, 
+    scale: 1,
+    boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)"
+  },
+  hover: { 
+    y: -8, 
+    scale: 1.02,
+    boxShadow: "0 12px 24px rgba(0, 0, 0, 0.15)",
+    transition: springTransition
+  },
+}
+
+export const hoverScalePremium: Variants = {
+  rest: { scale: 1 },
+  hover: { 
+    scale: 1.05,
+    transition: smoothTransition
+  },
+}
+
+// Premium Transition Animations
+export const fadeInScale: Variants = {
+  hidden: { 
+    opacity: 0, 
+    scale: 0.9
+  },
+  visible: { 
+    opacity: 1, 
+    scale: 1,
+    transition: smoothTransition
+  },
+}
+
+export const rotateIn: Variants = {
+  hidden: { 
+    opacity: 0, 
+    rotate: -180,
+    scale: 0.5
+  },
+  visible: { 
+    opacity: 1, 
+    rotate: 0,
+    scale: 1,
+    transition: bounceTransition
+  },
+}
+
+export const slideInFromRightPremium: Variants = {
+  hidden: { 
+    opacity: 0, 
+    x: 50,
+    scale: 0.95
+  },
+  visible: { 
+    opacity: 1, 
+    x: 0,
+    scale: 1,
+    transition: springTransition
+  },
+}
+
+export const slideInFromLeftPremium: Variants = {
+  hidden: { 
+    opacity: 0, 
+    x: -50,
+    scale: 0.95
+  },
+  visible: { 
+    opacity: 1, 
+    x: 0,
+    scale: 1,
+    transition: springTransition
+  },
+}
+

@@ -129,6 +129,23 @@
     --glass-bg: rgba(255, 255, 255, 0.85);
     --glass-border: rgba(255, 255, 255, 0.5);
     --glass-blur: blur(16px);
+    --glass-bg-light: rgba(255, 255, 255, 0.3);
+    --glass-bg-medium: rgba(255, 255, 255, 0.5);
+    --glass-bg-strong: rgba(255, 255, 255, 0.7);
+    --glass-blur-light: blur(8px);
+    --glass-blur-medium: blur(12px);
+    --glass-blur-strong: blur(20px);
+
+    /* Premium Gradients */
+    --gradient-brand: linear-gradient(135deg, var(--brand) 0%, var(--brand-hover) 100%);
+    --gradient-brand-soft: linear-gradient(135deg, var(--brand-light) 0%, var(--brand-soft) 100%);
+    --gradient-accent: linear-gradient(135deg, var(--accent) 0%, var(--accent-soft) 100%);
+    --gradient-success: linear-gradient(135deg, var(--success) 0%, #34D399 100%);
+    --gradient-warning: linear-gradient(135deg, var(--warning) 0%, #FBBF24 100%);
+    --gradient-error: linear-gradient(135deg, var(--error) 0%, #F87171 100%);
+    --gradient-info: linear-gradient(135deg, var(--info) 0%, #60A5FA 100%);
+    --gradient-hero: linear-gradient(135deg, var(--brand) 0%, var(--brand-hover) 50%, var(--accent) 100%);
+    --gradient-card: linear-gradient(135deg, rgba(249, 115, 22, 0.1) 0%, rgba(30, 58, 95, 0.1) 100%);
 
     /* Ultra Premium Radius Scale */
     --radius-xs: 6px;
@@ -274,6 +291,23 @@
     /* Glass Effects */
     --glass-bg: rgba(30, 41, 59, 0.85);
     --glass-border: rgba(51, 65, 85, 0.5);
+    --glass-bg-light: rgba(30, 41, 59, 0.3);
+    --glass-bg-medium: rgba(30, 41, 59, 0.5);
+    --glass-bg-strong: rgba(30, 41, 59, 0.7);
+    --glass-blur-light: blur(8px);
+    --glass-blur-medium: blur(12px);
+    --glass-blur-strong: blur(20px);
+
+    /* Premium Gradients (Dark Mode) */
+    --gradient-brand: linear-gradient(135deg, var(--brand) 0%, var(--brand-hover) 100%);
+    --gradient-brand-soft: linear-gradient(135deg, var(--brand-light) 0%, var(--brand-soft) 100%);
+    --gradient-accent: linear-gradient(135deg, var(--accent) 0%, var(--accent-soft) 100%);
+    --gradient-success: linear-gradient(135deg, var(--success) 0%, #34D399 100%);
+    --gradient-warning: linear-gradient(135deg, var(--warning) 0%, #FBBF24 100%);
+    --gradient-error: linear-gradient(135deg, var(--error) 0%, #F87171 100%);
+    --gradient-info: linear-gradient(135deg, var(--info) 0%, #60A5FA 100%);
+    --gradient-hero: linear-gradient(135deg, var(--brand) 0%, var(--brand-hover) 50%, var(--accent) 100%);
+    --gradient-card: linear-gradient(135deg, rgba(249, 115, 22, 0.15) 0%, rgba(30, 58, 95, 0.15) 100%);
   }
 }
 
@@ -883,6 +917,84 @@
 
 .animate-fade-in-up {
   animation: fadeInUp 0.5s ease-out;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 2s infinite;
+}
+
+/* Premium Gradient Utilities */
+.gradient-brand {
+  background: var(--gradient-brand);
+}
+
+.gradient-brand-soft {
+  background: var(--gradient-brand-soft);
+}
+
+.gradient-accent {
+  background: var(--gradient-accent);
+}
+
+.gradient-hero {
+  background: var(--gradient-hero);
+}
+
+.text-gradient {
+  background: var(--gradient-brand);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gradient-accent {
+  background: var(--gradient-accent);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Premium Glass Utilities */
+.glass-light {
+  background: var(--glass-bg-light);
+  backdrop-filter: var(--glass-blur-light);
+  -webkit-backdrop-filter: var(--glass-blur-light);
+  border: 1px solid var(--glass-border);
+}
+
+.glass-medium {
+  background: var(--glass-bg-medium);
+  backdrop-filter: var(--glass-blur-medium);
+  -webkit-backdrop-filter: var(--glass-blur-medium);
+  border: 1px solid var(--glass-border);
+}
+
+.glass-strong {
+  background: var(--glass-bg-strong);
+  backdrop-filter: var(--glass-blur-strong);
+  -webkit-backdrop-filter: var(--glass-blur-strong);
+  border: 1px solid var(--glass-border);
+}
+
+.dark .glass-light {
+  background: var(--glass-bg-light);
+}
+
+.dark .glass-medium {
+  background: var(--glass-bg-medium);
+}
+
+.dark .glass-strong {
+  background: var(--glass-bg-strong);
 }
 
 /* Ultra Premium Scrollbar - Glassmorphism */

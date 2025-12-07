@@ -21,7 +21,7 @@ import {
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Card } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { AppShell } from "@/components/app-shell"
 import { AdvancedNavigationButton } from "@/components/advanced-navigation-button"
@@ -32,6 +32,10 @@ import { RouteCreateModal } from "./route-create-modal"
 import { notifySuccess, notifyError } from "@/lib/toast"
 import { useAuthFast } from "@/hooks/use-auth-fast"
 import { useGlobalSync } from "@/hooks/use-global-sync"
+import { SearchBarPremium } from "@/components/shared/search-bar-premium"
+import { FilterDrawer } from "@/components/shared/filter-drawer"
+import { EmptyState } from "@/components/shared/empty-state"
+import { LoadingSkeleton } from "@/components/shared/loading-skeleton"
 
 export function RotasPageContent() {
   const router = useRouter()
@@ -62,6 +66,7 @@ export function RotasPageContent() {
 
   const loadRotas = async () => {
     try {
+      setRotasLoading(true)
       const response = await fetch('/api/admin/routes-list', {
         credentials: 'include'
       })
@@ -87,6 +92,8 @@ export function RotasPageContent() {
     } catch (error) {
       console.error("Erro ao carregar rotas:", error)
       setRotas([])
+    } finally {
+      setRotasLoading(false)
     }
   }
 
@@ -125,14 +132,13 @@ export function RotasPageContent() {
     }
   }
 
-  if (loading) {
+  if (loading || rotasLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[var(--bg)]">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Carregando rotas...</p>
+      <AppShell user={{ id: user?.id || "", name: user?.name || "Admin", email: user?.email || "", role: user?.role || "admin", avatar_url: user?.avatar_url }}>
+        <div className="p-6 space-y-6">
+          <LoadingSkeleton type="card" count={6} />
         </div>
-      </div>
+      </AppShell>
     )
   }
 
@@ -184,22 +190,71 @@ export function RotasPageContent() {
             </div>
           </div>
 
-          {/* Search */}
-          <Card className="p-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[var(--ink-muted)] h-4 w-4" />
-              <Input
-                placeholder="Buscar rotas por nome, descrição ou empresa..."
+          {/* Search and Filters */}
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex-1">
+              <SearchBarPremium
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 w-full"
+                onChange={setSearchQuery}
+                placeholder="Buscar rotas por nome, descrição ou empresa..."
               />
             </div>
-          </Card>
+            <Button
+              variant="outline"
+              onClick={() => setFiltersOpen(true)}
+              className="min-h-[44px]"
+            >
+              <Filter className="h-4 w-4 mr-2" />
+              Filtros
+            </Button>
+          </div>
+
+          <FilterDrawer
+            open={filtersOpen}
+            onOpenChange={setFiltersOpen}
+            filters={filters}
+            onFiltersChange={setFilters}
+            fields={[
+              {
+                key: "company",
+                label: "Empresa",
+                type: "text",
+                placeholder: "Nome da empresa"
+              },
+              {
+                key: "status",
+                label: "Status",
+                type: "select",
+                options: [
+                  { label: "Todas", value: "" },
+                  { label: "Ativa", value: "active" },
+                  { label: "Inativa", value: "inactive" }
+                ]
+              },
+              {
+                key: "date",
+                label: "Data",
+                type: "date"
+              }
+            ]}
+            onReset={() => setFilters({ company: "", status: "", date: "" })}
+          />
 
           {/* Routes Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredRotas.map((rota, index) => (
+          {filteredRotas.length === 0 ? (
+            <EmptyState
+              icon={Route}
+              title="Nenhuma rota encontrada"
+              description={searchQuery ? "Tente ajustar sua busca ou filtros para encontrar rotas." : "Comece criando sua primeira rota no sistema."}
+              actionLabel={searchQuery ? undefined : "Criar Primeira Rota"}
+              onAction={searchQuery ? undefined : () => {
+                setSelectedRoute(null)
+                setIsModalOpen(true)
+              }}
+            />
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredRotas.map((rota, index) => (
               <motion.div
                 key={rota.id}
                 initial={{ opacity: 0, y: 20 }}
@@ -341,9 +396,8 @@ export function RotasPageContent() {
                 </Card>
               </motion.div>
             ))}
-          </div>
-
-          {filteredRotas.length === 0 && (
+            </div>
+          )}
             <div className="text-center py-12">
               <Route className="h-12 w-12 text-gray-400 mx-auto mb-4" />
               <h3 className="text-lg font-medium text-gray-900 mb-2">Nenhuma rota encontrada</h3>
