@@ -44,9 +44,9 @@ export default function RelatoriosOperatorPage() {
         rows: []
       }
 
-      // Tentar buscar dados de views seguras se disponÃ­veis
+      // Tentar buscar dados de views seguras se disponíveis
       if (report.viewName) {
-        // Views seguras jÃ¡ filtram por company_id via RLS
+        // Views seguras já filtram por company_id via RLS
         const { data, error } = await supabase
           .from(report.viewName)
           .select('*')
@@ -57,12 +57,12 @@ export default function RelatoriosOperatorPage() {
         if (report.formatter && data) {
           reportData = report.formatter(data)
         } else {
-          // Formato genÃ©rico
+          // Formato genérico
           reportData.headers = Object.keys(data[0] || {})
           reportData.rows = data.map((row: any) => Object.values(row))
         }
       } else {
-        // Dados mockados para relatÃ³rios sem view
+        // Dados mockados para relatórios sem view
         reportData.headers = ['Data', 'Valor', 'Status']
         reportData.rows = [['2024-01-01', 'Exemplo', 'Ativo']]
       }
@@ -77,7 +77,7 @@ export default function RelatoriosOperatorPage() {
 
       notifySuccess('', { i18n: { ns: 'operator', key: 'reports.exportSuccess', params: { title: report.title } } })
     } catch (error: any) {
-      console.error("Erro ao exportar relatÃ³rio:", error)
+      console.error("Erro ao exportar relatório:", error)
       notifyError('Erro ao exportar', undefined, { i18n: { ns: 'operator', key: 'reports.exportError', params: { message: error.message || 'Erro desconhecido' } } })
     }
   }
@@ -95,23 +95,23 @@ export default function RelatoriosOperatorPage() {
     },
     { 
       id: 'ocupacao', 
-      title: 'OcupaÃ§Ã£o', 
-      desc: 'OcupaÃ§Ã£o por horÃ¡rio/rota',
+      title: 'Ocupação', 
+      desc: 'Ocupação por horário/rota',
       icon: BarChart3,
       viewName: 'v_reports_occupancy',
       formatter: formatOccupancyReport
     },
     { 
       id: 'nao-embarcados', 
-      title: 'NÃ£o embarcados', 
-      desc: 'Motivos e frequÃªncia',
+      title: 'Não embarcados', 
+      desc: 'Motivos e frequência',
       icon: FileText,
       viewName: 'v_reports_not_boarded',
       formatter: formatNotBoardedReport
     },
     { 
       id: 'eficiencia', 
-      title: 'EficiÃªncia', 
+      title: 'Eficiência', 
       desc: 'Planejado vs realizado',
       icon: BarChart3
     },
@@ -134,8 +134,8 @@ export default function RelatoriosOperatorPage() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold mb-2">RelatÃ³rios</h1>
-            <p className="text-[var(--ink-muted)]">GeraÃ§Ã£o e exportaÃ§Ã£o de relatÃ³rios</p>
+            <h1 className="text-3xl font-bold mb-2">Relatórios</h1>
+            <p className="text-[var(--ink-muted)]">Geração e exportação de relatórios</p>
           </div>
         </div>
 

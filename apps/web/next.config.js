@@ -13,25 +13,19 @@ let nextConfig = {
     // ignoreBuildErrors removido - build agora valida tipos TypeScript
     ignoreBuildErrors: false,
   },
-  // Next.js 16: Turbopack é o bundler padrão - otimizado para produção
-  // Turbopack oferece performance superior com cache incremental
+  // Next.js 16: Turbopack é o bundler padrão
   // 
-  // IMPORTANTE: Turbopack requer binário nativo SWC funcionando
-  // Se o DLL do SWC não carregar, o Turbopack falhará
+  // PROBLEMA: DLL do SWC não carrega no Windows mesmo com Visual C++ Redistributable
+  // O Turbopack tenta usar o DLL nativo, falha, e impede o servidor de iniciar
   // 
-  // Para ativar o Turbopack:
-  // 1. Instale Visual C++ Redistributable 2015-2022: https://aka.ms/vs/17/release/vc_redist.x64.exe
-  // 2. REINICIE o computador (obrigatório para carregar as DLLs)
-  // 3. Verifique: node scripts/diagnose-swc-dll.js
-  // 4. Se o DLL carregar, descomente a linha abaixo:
-  // turbopack: {},
-  //
-  // Enquanto isso, o Next.js usa webpack automaticamente (funciona com WASM)
+  // SOLUÇÃO: Configurar turbopack vazio para silenciar warnings
+  // Quando Turbopack falhar (por causa do DLL), Next.js usará webpack automaticamente
+  // Webpack funciona perfeitamente com WASM fallback
+  turbopack: {},
   
   // Configuração SWC: Next.js automaticamente usa WASM como fallback se binário nativo falhar
   // O binário nativo (@next/swc-win32-x64-msvc) é preferido para melhor performance
   // WASM é mais lento mas funciona como fallback se o binário nativo não carregar
-  // Turbopack não funciona com WASM - se SWC nativo falhar, Next.js usará webpack automaticamente
   async headers() {
     return [
       {
@@ -117,6 +111,8 @@ let nextConfig = {
       },
     ],
   },
+  // Webpack config - usado quando Turbopack não está disponível
+  // No Next.js 16, Turbopack é padrão, mas webpack funciona como fallback
   webpack: (config, { dev, isServer }) => {
     config.resolve.alias = {
       ...config.resolve.alias,
