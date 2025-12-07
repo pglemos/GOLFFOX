@@ -4,6 +4,7 @@ import { AppShell } from "@/components/app-shell"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Settings } from "lucide-react"
+import { motion } from "framer-motion"
 import { useEffect, useState } from "react"
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
@@ -45,12 +46,18 @@ export default function PreferenciasTransportadoraPage() {
           </Button>
         </div>
 
-        <Card className="p-4 sm:p-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+        >
+        <Card className="p-4 sm:p-6 bg-card/50 backdrop-blur-sm border-[var(--border)] hover:shadow-xl transition-all duration-300">
           <h2 className="text-lg sm:text-xl font-semibold mb-4">Informações da Transportadora</h2>
           <p className="text-sm sm:text-base text-[var(--ink-muted)]">
             As configurações de preferências da transportadora estarão disponíveis em breve.
           </p>
         </Card>
+        </motion.div>
       </div>
     </AppShell>
   )

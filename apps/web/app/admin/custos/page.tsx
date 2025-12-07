@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { BarChart3, DollarSign, TrendingUp, TrendingDown, Calendar, Search, PieChart as PieChartIcon } from "lucide-react"
+import { motion } from "framer-motion"
 import { cn } from "@/lib/utils"
 import { notifyError } from "@/lib/toast"
 import { useAuth } from "@/hooks/use-auth"
@@ -85,40 +86,71 @@ export default function CustosPage() {
 
         {/* KPIs */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card className="p-4 bg-gradient-to-br from-green-50 to-green-100 border-green-200">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            whileHover={{ y: -4 }}
+            className="group"
+          >
+          <Card className="p-4 bg-gradient-to-br from-green-50 to-green-100 border-green-200 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs font-medium text-green-700 mb-1">Receita Total</p>
                 <p className="text-2xl font-bold text-green-900">R$ {kpis.totalRevenue.toLocaleString('pt-BR')}</p>
               </div>
-              <div className="h-10 w-10 rounded-full bg-green-200 flex items-center justify-center">
+              <div className="h-10 w-10 rounded-full bg-green-200 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                 <DollarSign className="h-6 w-6 text-green-700" />
               </div>
             </div>
           </Card>
-          <Card className="p-4 bg-gradient-to-br from-red-50 to-red-100 border-red-200">
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            whileHover={{ y: -4 }}
+            className="group"
+          >
+          <Card className="p-4 bg-gradient-to-br from-red-50 to-red-100 border-red-200 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs font-medium text-red-700 mb-1">Custo Operacional</p>
                 <p className="text-2xl font-bold text-red-900">R$ {kpis.operationalCost.toLocaleString('pt-BR')}</p>
               </div>
-              <div className="h-10 w-10 rounded-full bg-red-200 flex items-center justify-center">
+              <div className="h-10 w-10 rounded-full bg-red-200 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                 <TrendingDown className="h-6 w-6 text-red-700" />
               </div>
             </div>
           </Card>
-          <Card className="p-4 bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            whileHover={{ y: -4 }}
+            className="group"
+          >
+          <Card className="p-4 bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs font-medium text-blue-700 mb-1">Margem de Lucro</p>
                 <p className="text-2xl font-bold text-blue-900">{kpis.profitMargin}%</p>
               </div>
-              <div className="h-10 w-10 rounded-full bg-blue-200 flex items-center justify-center">
+              <div className="h-10 w-10 rounded-full bg-blue-200 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                 <TrendingUp className="h-6 w-6 text-blue-700" />
               </div>
             </div>
           </Card>
-          <Card className="p-4 bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            whileHover={{ y: -4 }}
+            className="group"
+          >
+          <Card className="p-4 bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs font-medium text-purple-700 mb-1">Quilometragem Total</p>
@@ -133,7 +165,13 @@ export default function CustosPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Gráfico de Tendência (Receita x Custo) */}
-          <Card className="p-6 lg:col-span-2">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            className="lg:col-span-2"
+          >
+          <Card className="p-6 bg-card/50 backdrop-blur-sm border-[var(--border)] hover:shadow-xl transition-all duration-300">
             <h2 className="text-lg font-semibold mb-6">Evolução Financeira</h2>
             <div className="h-[300px] w-full">
               <ResponsiveContainer width="100%" height="100%">
@@ -176,9 +214,15 @@ export default function CustosPage() {
               </ResponsiveContainer>
             </div>
           </Card>
+          </motion.div>
 
           {/* Gráfico de Distribuição */}
-          <Card className="p-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6 }}
+          >
+          <Card className="p-6 bg-card/50 backdrop-blur-sm border-[var(--border)] hover:shadow-xl transition-all duration-300">
             <h2 className="text-lg font-semibold mb-6">Distribuição de Custos</h2>
             <div className="h-[300px] w-full relative">
               <ResponsiveContainer width="100%" height="100%">
