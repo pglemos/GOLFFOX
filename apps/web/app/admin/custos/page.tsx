@@ -156,11 +156,12 @@ export default function CustosPage() {
                 <p className="text-xs font-medium text-purple-700 mb-1">Quilometragem Total</p>
                 <p className="text-2xl font-bold text-purple-900">{kpis.totalKm.toLocaleString('pt-BR')} km</p>
               </div>
-              <div className="h-10 w-10 rounded-full bg-purple-200 flex items-center justify-center">
+              <div className="h-10 w-10 rounded-full bg-purple-200 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                 <BarChart3 className="h-6 w-6 text-purple-700" />
               </div>
             </div>
           </Card>
+          </motion.div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

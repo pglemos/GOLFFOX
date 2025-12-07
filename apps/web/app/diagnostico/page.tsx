@@ -170,10 +170,16 @@ export default function DiagnosticoPage() {
                     </div>
                   </div>
                 </div>
-              </div>
+              </Card>
+              </motion.div>
 
               {/* Navegador */}
-              <div className="border border-gray-200 rounded-lg p-6">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+              >
+              <Card className="p-6 bg-card/50 backdrop-blur-sm border-[var(--border)]">
                 <h2 className="text-xl font-bold text-gray-900 mb-4">
                   🌐 Navegador
                 </h2>
@@ -198,10 +204,16 @@ export default function DiagnosticoPage() {
                     <p className="text-xs text-gray-600 break-all">{resultado.browser.userAgent}</p>
                   </div>
                 </div>
-              </div>
+              </Card>
+              </motion.div>
 
               {/* Ambiente */}
-              <div className="border border-gray-200 rounded-lg p-6">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+              >
+              <Card className="p-6 bg-card/50 backdrop-blur-sm border-[var(--border)]">
                 <h2 className="text-xl font-bold text-gray-900 mb-4">
                   ⚙️ Ambiente
                 </h2>
@@ -234,20 +246,33 @@ export default function DiagnosticoPage() {
                     </p>
                   </div>
                 </div>
-              </div>
+              </Card>
+              </motion.div>
 
               {/* JSON Completo */}
-              <div className="border border-gray-200 rounded-lg p-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-4">
-                  📄 JSON Completo
-                </h2>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+              >
+              <Card className="p-6 bg-card/50 backdrop-blur-sm border-[var(--border)]">
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="p-2 rounded-lg bg-gray-100">
+                    <Settings className="h-5 w-5 text-gray-600" />
+                  </div>
+                  <h2 className="text-xl font-bold">
+                    JSON Completo
+                  </h2>
+                </div>
                 <pre className="text-xs bg-gray-900 text-green-400 p-4 rounded overflow-x-auto">
                   {JSON.stringify(resultado, null, 2)}
                 </pre>
-              </div>
+              </Card>
+              </motion.div>
             </div>
           )}
-        </div>
+        </Card>
+        </motion.div>
       </div>
     </div>
   )
