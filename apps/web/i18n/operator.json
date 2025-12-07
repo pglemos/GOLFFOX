@@ -1,5 +1,8 @@
 {
   "header_title": "Painel do Operador",
+  "dashboard_subtitle": "Visão geral da sua operação",
+  "kpi_title": "Indicadores de Performance",
+  "kpi_subtitle": "Métricas principais da sua operação",
   "kpi_trips_today": "Viagens Hoje",
   "kpi_in_progress": "Em Andamento",
   "kpi_done": "Concluídas",
@@ -8,10 +11,17 @@
   "kpi_daily_cost_company": "Custo/Dia (sua empresa)",
   "kpi_sla_d0_company": "SLA D+0 (sua empresa)",
   "control_tower_title": "Torre de Controle",
+  "control_tower_subtitle": "Monitoramento em tempo real de incidentes",
   "control_tower_delays": "Atrasos",
   "control_tower_stopped": "Veículos Parados",
   "control_tower_deviations": "Desvios de Rota",
   "control_tower_assistance": "Socorros Abertos",
+  "charts_title": "Análises e Gráficos",
+  "charts_subtitle": "Visualizações detalhadas do desempenho",
+  "actions": {
+    "view_routes": "Ver Rotas",
+    "view_map": "Ver no Mapa"
+  },
   "employees_title": "Funcionários",
   "employees_subtitle": "Gerencie os funcionários da sua empresa",
   "routes_title": "Rotas",

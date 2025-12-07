@@ -24,6 +24,7 @@ import {
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts"
+import { t } from "@/lib/i18n"
 
 export default function TransportadoraDashboard() {
   const router = useRouter()
@@ -541,8 +542,8 @@ export default function TransportadoraDashboard() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 pb-2">
           <div className="flex-1 min-w-0">
-            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-2 text-[var(--ink-strong)]">Gestão de Frota</h1>
-            <p className="text-xs sm:text-sm md:text-base text-[var(--ink-muted)]">Monitore veículos e motoristas em tempo real</p>
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-2 text-[var(--ink-strong)]">{t('transportadora', 'header_title')}</h1>
+            <p className="text-xs sm:text-sm md:text-base text-[var(--ink-muted)]">{t('transportadora', 'header_subtitle')}</p>
           </div>
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
             <Select
@@ -554,10 +555,10 @@ export default function TransportadoraDashboard() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="today">Hoje</SelectItem>
-                <SelectItem value="week">Esta Semana</SelectItem>
-                <SelectItem value="month">Este Mês</SelectItem>
-                <SelectItem value="custom">Personalizado</SelectItem>
+                <SelectItem value="today">{t('transportadora', 'period_today')}</SelectItem>
+                <SelectItem value="week">{t('transportadora', 'period_week')}</SelectItem>
+                <SelectItem value="month">{t('transportadora', 'period_month')}</SelectItem>
+                <SelectItem value="custom">{t('transportadora', 'period_custom')}</SelectItem>
               </SelectContent>
             </Select>
             <Button 
@@ -565,7 +566,7 @@ export default function TransportadoraDashboard() {
               onClick={() => router.push("/transportadora/relatorios")}
             >
               <Truck className="h-4 w-4 mr-2" />
-              Relatórios
+              {t('transportadora', 'button_reports')}
             </Button>
           </div>
         </div>
@@ -574,7 +575,7 @@ export default function TransportadoraDashboard() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           <KpiCardEnhanced
             icon={Truck}
-            label="Total da Frota"
+            label={t('transportadora', 'kpi_total_fleet')}
             value={kpis.totalFleet}
             previousValue={previousKpis.totalFleet}
             formatValue={(v) => v.toString()}
@@ -584,7 +585,7 @@ export default function TransportadoraDashboard() {
           />
           <KpiCardEnhanced
             icon={Navigation}
-            label="Em Rota"
+            label={t('transportadora', 'kpi_on_route')}
             value={kpis.onRoute}
             previousValue={previousKpis.onRoute}
             formatValue={(v) => v.toString()}
@@ -593,7 +594,7 @@ export default function TransportadoraDashboard() {
           />
           <KpiCardEnhanced
             icon={Users}
-            label="Motoristas Ativos"
+            label={t('transportadora', 'kpi_active_drivers')}
             value={kpis.activeDrivers}
             previousValue={previousKpis.activeDrivers}
             formatValue={(v) => v.toString()}
@@ -610,7 +611,7 @@ export default function TransportadoraDashboard() {
           />
           <KpiCardEnhanced
             icon={AlertCircle}
-            label="Alertas Críticos"
+            label={t('transportadora', 'kpi_critical_alerts')}
             value={kpis.criticalAlerts}
             previousValue={previousKpis.criticalAlerts}
             formatValue={(v) => v.toString()}
@@ -631,7 +632,7 @@ export default function TransportadoraDashboard() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
           <KpiCardEnhanced
             icon={DollarSign}
-            label="Custos do Mês"
+            label={t('transportadora', 'kpi_monthly_costs')}
             value={kpis.totalCostsThisMonth}
             previousValue={previousKpis.totalCostsThisMonth}
             formatValue={(v) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 0 }).format(v)}
@@ -648,7 +649,7 @@ export default function TransportadoraDashboard() {
           />
           <KpiCardEnhanced
             icon={Navigation}
-            label="Viagens do Mês"
+            label={t('transportadora', 'kpi_monthly_trips')}
             value={kpis.totalTrips}
             previousValue={previousKpis.totalTrips}
             formatValue={(v) => v.toString()}
@@ -657,13 +658,13 @@ export default function TransportadoraDashboard() {
           />
           <KpiCardEnhanced
             icon={AlertCircle}
-            label="Documentos Vencendo"
+            label={t('transportadora', 'kpi_expiring_documents')}
             value={kpis.delayed}
             previousValue={previousKpis.delayed}
             formatValue={(v) => v.toString()}
             iconColor="#F59E0B"
             iconBgColor="rgba(245, 158, 11, 0.1)"
-            hint="Clique para ver detalhes"
+            hint={t('transportadora', 'hint_click_details')}
             onClick={() => {
               try {
                 router.push('/transportadora/alertas')
@@ -679,8 +680,8 @@ export default function TransportadoraDashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
           {/* Gráfico de Linha - Veículos em Rota */}
           <ChartContainer
-            title="Veículos em Rota (24h)"
-            description="Distribuição ao longo do dia"
+            title={t('transportadora', 'charts_vehicles_24h')}
+            description={t('transportadora', 'charts_vehicles_24h_desc')}
             height={300}
             className="lg:col-span-2"
           >
@@ -721,8 +722,8 @@ export default function TransportadoraDashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 lg:gap-6">
           {/* Gráfico de Pizza - Status da Frota */}
           <ChartContainer
-            title="Distribuição da Frota"
-            description="Status atual dos veículos"
+            title={t('transportadora', 'charts_fleet_distribution')}
+            description={t('transportadora', 'charts_fleet_distribution_desc')}
             height={300}
           >
             <PieChart>
@@ -747,8 +748,8 @@ export default function TransportadoraDashboard() {
 
           {/* Gráfico de Barras - Top Motoristas */}
           <ChartContainer
-            title="Top 5 Motoristas"
-            description="Performance por número de viagens"
+            title={t('transportadora', 'charts_top_drivers')}
+            description={t('transportadora', 'charts_top_drivers_desc')}
             height={300}
           >
             <BarChart data={topDrivers}>
@@ -786,9 +787,9 @@ export default function TransportadoraDashboard() {
                 <div className="flex-1 min-w-0 pr-2 sm:pr-4">
                   <CardTitle className="text-lg sm:text-xl font-semibold mb-1.5 flex items-center gap-2">
                     <Map className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
-                    <span className="truncate">Mapa da Frota</span>
+                    <span className="truncate">{t('transportadora', 'fleet_map_title')}</span>
                   </CardTitle>
-                  <p className="text-xs sm:text-sm text-[var(--ink-muted)]">Visualização em tempo real</p>
+                  <p className="text-xs sm:text-sm text-[var(--ink-muted)]">{t('transportadora', 'fleet_map_subtitle')}</p>
                 </div>
                 <Button 
                   size="sm" 
@@ -796,7 +797,7 @@ export default function TransportadoraDashboard() {
                   className="flex-shrink-0 w-full sm:w-auto min-h-[44px] touch-manipulation"
                   onClick={() => router.push('/transportadora/mapa')}
                 >
-                  Expandir
+                  {t('transportadora', 'fleet_map_expand')}
                 </Button>
               </div>
             </CardHeader>
@@ -809,21 +810,21 @@ export default function TransportadoraDashboard() {
               <div className="mt-3 flex flex-wrap gap-2 text-xs text-[var(--ink-muted)]">
                 <div className="flex items-center gap-1">
                   <div className="w-3 h-3 rounded-full bg-green-500 flex-shrink-0"></div>
-                  <span>Em movimento</span>
+                  <span>{t('transportadora', 'fleet_map_legend_moving')}</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <div className="w-3 h-3 rounded-full bg-yellow-500 flex-shrink-0"></div>
-                  <span className="hidden sm:inline">Parado (&lt;2min)</span>
-                  <span className="sm:hidden">Parado</span>
+                  <span className="hidden sm:inline">{t('transportadora', 'fleet_map_legend_stopped_short')}</span>
+                  <span className="sm:hidden">{t('transportadora', 'fleet_map_legend_stopped_short').split('(')[0].trim()}</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <div className="w-3 h-3 rounded-full bg-red-500 flex-shrink-0"></div>
-                  <span className="hidden sm:inline">Parado (&gt;3min)</span>
-                  <span className="sm:hidden">Parado</span>
+                  <span className="hidden sm:inline">{t('transportadora', 'fleet_map_legend_stopped_long')}</span>
+                  <span className="sm:hidden">{t('transportadora', 'fleet_map_legend_stopped_long').split('(')[0].trim()}</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <div className="w-3 h-3 rounded-full bg-blue-500 flex-shrink-0"></div>
-                  <span>Na garagem</span>
+                  <span>{t('transportadora', 'fleet_map_legend_garage')}</span>
                 </div>
               </div>
             </CardContent>
@@ -836,9 +837,9 @@ export default function TransportadoraDashboard() {
                 <div className="flex-1 min-w-0 pr-2 sm:pr-4">
                   <CardTitle className="text-lg sm:text-xl font-semibold mb-1.5 flex items-center gap-2">
                     <Users className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
-                    <span className="truncate">Motoristas Ativos</span>
+                    <span className="truncate">{t('transportadora', 'active_drivers_title')}</span>
                   </CardTitle>
-                  <p className="text-xs sm:text-sm text-[var(--ink-muted)]">Lista de motoristas em atividade</p>
+                  <p className="text-xs sm:text-sm text-[var(--ink-muted)]">{t('transportadora', 'active_drivers_subtitle')}</p>
                 </div>
                 <Button 
                   size="sm" 
@@ -856,7 +857,7 @@ export default function TransportadoraDashboard() {
                     }
                   }}
                 >
-                  Ver todos
+                  {t('transportadora', 'active_drivers_view_all')}
                 </Button>
               </div>
             </CardHeader>
@@ -864,7 +865,7 @@ export default function TransportadoraDashboard() {
               <div className="space-y-2 max-h-96 overflow-y-auto">
                 {drivers.length === 0 ? (
                   <div className="p-6 sm:p-8 text-center text-[var(--ink-muted)]">
-                    <p className="text-xs sm:text-sm">Nenhum motorista ativo</p>
+                    <p className="text-xs sm:text-sm">{t('transportadora', 'active_drivers_empty')}</p>
                   </div>
                 ) : (
                   drivers.map((driver, i) => (
@@ -881,7 +882,7 @@ export default function TransportadoraDashboard() {
                         </div>
                       </div>
                       <Badge variant={driver.status === "active" ? "default" : "secondary"} className="flex-shrink-0 text-xs">
-                        {driver.status === "active" ? "Ativo" : "Pausa"}
+                        {driver.status === "active" ? t('transportadora', 'status_active') : t('transportadora', 'status_pause')}
                       </Badge>
                     </div>
                   ))
@@ -900,7 +901,7 @@ export default function TransportadoraDashboard() {
               columns={[
                 {
                   key: 'plate',
-                  label: 'Veículo',
+                  label: t('transportadora', 'table_vehicle'),
                   sortable: true,
                   render: (value, row) => (
                     <div className="flex items-center gap-2">
@@ -911,12 +912,12 @@ export default function TransportadoraDashboard() {
                 },
                 {
                   key: 'driver',
-                  label: 'Motorista',
+                  label: t('transportadora', 'table_driver'),
                   sortable: true
                 },
                 {
                   key: 'status',
-                  label: 'Status',
+                  label: t('transportadora', 'table_status'),
                   sortable: true,
                   render: (value) => (
                     <Badge variant={
@@ -924,20 +925,20 @@ export default function TransportadoraDashboard() {
                       value === "available" ? "secondary" :
                       "destructive"
                     } className="text-xs">
-                      {value === "on-route" ? "Em Rota" :
-                       value === "available" ? "Disponível" : 
-                       value === "delayed" ? "Atrasado" : "Inativo"}
+                      {value === "on-route" ? t('transportadora', 'status_on_route') :
+                       value === "available" ? t('transportadora', 'status_available') : 
+                       value === "delayed" ? t('transportadora', 'status_delayed') : t('transportadora', 'status_inactive')}
                     </Badge>
                   )
                 },
                 {
                   key: 'route',
-                  label: 'Rota',
+                  label: t('transportadora', 'table_route'),
                   sortable: true
                 },
                 {
                   key: 'passengerCount',
-                  label: 'Passageiros',
+                  label: t('transportadora', 'table_passengers'),
                   sortable: true,
                   render: (value, row) => (
                     <Badge variant="outline" className="text-xs">
@@ -947,13 +948,14 @@ export default function TransportadoraDashboard() {
                 },
                 {
                   key: 'lastUpdate',
-                  label: 'Última Atualização',
+                  label: t('transportadora', 'table_last_update'),
                   sortable: true
                 }
               ]}
-              title="Status da Frota"
-              description="Detalhes de todos os veículos"
-              searchPlaceholder="Buscar veículos..."
+              title={t('transportadora', 'fleet_status_title')}
+              description={t('transportadora', 'fleet_status_desc')}
+              searchPlaceholder={t('transportadora', 'fleet_status_search')}
+              emptyMessage={t('transportadora', 'fleet_status_empty')}
               pagination={true}
               pageSize={10}
               onRowClick={(row) => {

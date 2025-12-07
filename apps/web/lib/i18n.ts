@@ -1,10 +1,11 @@
 ﻿import common from '@/i18n/common.json'
 import operator from '@/i18n/operator.json'
 import admin from '@/i18n/admin.json'
+import transportadora from '@/i18n/transportadora.json'
 import ptBR from '@/i18n/pt-BR.json'
 import enUS from '@/i18n/en-US.json'
 
-type Namespace = 'common' | 'operator' | 'admin'
+type Namespace = 'common' | 'operator' | 'admin' | 'transportadora'
 
 type Locale = 'pt-BR' | 'en-US'
 
@@ -13,6 +14,7 @@ const dictionaries: Record<Namespace, Record<string, unknown>> = {
   common: common as Record<string, unknown>,
   operator: operator as Record<string, unknown>,
   admin: admin as Record<string, unknown>,
+  transportadora: transportadora as Record<string, unknown>,
 }
 
 // Dicionários por locale (para expansão futura)
