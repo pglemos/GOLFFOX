@@ -1004,9 +1004,6 @@ function LoginContent() {
                     whileHover={{ scale: 1.05 }}
                     className="inline-flex items-center justify-center gap-3 mb-4"
                   >
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#1E3A5F] via-[#2D4A6B] to-[var(--brand)] flex items-center justify-center shadow-lg">
-                      <span className="text-white font-bold text-xl">G</span>
-                    </div>
                     <h2 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-[var(--ink-strong)] to-[var(--brand)] bg-clip-text text-transparent">
                       GOLF FOX
                     </h2>
