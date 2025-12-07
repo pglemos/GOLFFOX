@@ -437,7 +437,7 @@ export const hoverGlowPremium: Variants = {
   },
 }
 
-export const hoverLiftPremium: Variants = {
+export const hoverLiftPremiumEnhanced: Variants = {
   rest: { 
     y: 0, 
     scale: 1,

@@ -398,21 +398,6 @@ export function RotasPageContent() {
             ))}
             </div>
           )}
-            <div className="text-center py-12">
-              <Route className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Nenhuma rota encontrada</h3>
-              <p className="text-gray-600 mb-4">
-                {searchQuery ? "Tente ajustar sua busca" : "Comece criando sua primeira rota"}
-              </p>
-              <Button onClick={() => {
-                setSelectedRoute(null)
-                setIsModalOpen(true)
-              }}>
-                <Plus className="h-4 w-4 mr-2" />
-                Nova Rota
-              </Button>
-            </div>
-          )}
         </div>
 
         {/* Modal de Rota */}
