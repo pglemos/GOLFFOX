@@ -4,7 +4,6 @@ import { useEffect, useState, useCallback } from "react"
 import { AppShell } from "@/components/app-shell"
 import { Button } from "@/components/ui/button"
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card"
-import { MapPin } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 import { OperatorKPICards } from "@/components/operator/operator-kpi-cards"
@@ -16,6 +15,10 @@ import { PeriodFilter, type PeriodFilter as PeriodFilterType } from "@/component
 import { useOperatorKPIs, useControlTower } from "@/hooks/use-operator-data"
 import { useRealtimeKPIs, useRealtimeAlerts } from "@/hooks/use-realtime-updates"
 import { t } from "@/lib/i18n"
+import { HeaderPremium } from "@/components/operator/dashboard/header-premium"
+import { KPICardEnhanced } from "@/components/operator/dashboard/kpi-card-enhanced"
+import { ControlTowerVisual } from "@/components/operator/dashboard/control-tower-visual"
+import { MapPin, Clock, AlertTriangle, TrendingUp, DollarSign, CheckCircle } from "lucide-react"
 
 export default function OperatorDashboard() {
   const router = useRouter()
@@ -187,21 +190,14 @@ export default function OperatorDashboard() {
       avatar_url: (user as any)?.avatar_url
     }}>
       <div className="space-y-4 sm:space-y-6 lg:space-y-8 w-full">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 pb-2">
-          <div className="flex-1 min-w-0">
-            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-2 text-[var(--ink-strong)]">{t('operator', 'header_title')}</h1>
-            <p className="text-xs sm:text-sm md:text-base text-[var(--ink-muted)] truncate">
-              {companyName ? `Empresa: ${companyName}` : t('operator', 'dashboard_subtitle')}
-            </p>
-          </div>
-          <Button asChild className="bg-orange-500 hover:bg-orange-600 text-white w-full sm:w-auto min-h-[44px] touch-manipulation">
-            <a href="/operador/rotas" className="flex items-center justify-center">
-              <MapPin className="h-4 w-4 mr-2" />
-              {t('operator', 'actions.view_routes')}
-            </a>
-          </Button>
-        </div>
+        {/* Header Premium */}
+        <HeaderPremium
+          title={t('operator', 'header_title')}
+          subtitle={t('operator', 'dashboard_subtitle')}
+          companyName={companyName}
+          actionLabel={t('operator', 'actions.view_routes')}
+          actionHref="/operador/rotas"
+        />
 
         {/* Filtros de Período */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
@@ -214,30 +210,93 @@ export default function OperatorDashboard() {
           </div>
         </div>
 
-        {/* KPIs */}
-        <div>
-          <OperatorKPICards kpis={kpis} loading={kpisLoading} />
+        {/* KPIs Premium */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <KPICardEnhanced
+            label={t('operator', 'kpi_trips_today')}
+            value={kpis.trips_today}
+            icon={MapPin}
+            color="text-blue-600"
+            bgColor="bg-blue-50"
+            delay={0.1}
+          />
+          <KPICardEnhanced
+            label={t('operator', 'kpi_in_progress')}
+            value={kpis.trips_in_progress}
+            icon={Clock}
+            color="text-orange-600"
+            bgColor="bg-orange-50"
+            delay={0.2}
+          />
+          <KPICardEnhanced
+            label={t('operator', 'kpi_done')}
+            value={kpis.trips_completed}
+            icon={CheckCircle}
+            color="text-green-600"
+            bgColor="bg-green-50"
+            delay={0.3}
+          />
+          <KPICardEnhanced
+            label={t('operator', 'kpi_delays')}
+            value={kpis.delays_over_5min}
+            icon={AlertTriangle}
+            color="text-red-600"
+            bgColor="bg-red-50"
+            delay={0.4}
+          />
+          <KPICardEnhanced
+            label={t('operator', 'kpi_occupancy')}
+            value={`${(kpis.avg_occupancy * 100).toFixed(1)}%`}
+            icon={TrendingUp}
+            color="text-purple-600"
+            bgColor="bg-purple-50"
+            delay={0.5}
+          />
+          <KPICardEnhanced
+            label={t('operator', 'kpi_sla_d0_company')}
+            value={`${kpis.sla_d0.toFixed(1)}%`}
+            icon={CheckCircle}
+            color="text-indigo-600"
+            bgColor="bg-indigo-50"
+            subtitle="GOLF FOX → Operador"
+            delay={0.6}
+          />
+          <KPICardEnhanced
+            label={t('operator', 'kpi_daily_cost_company')}
+            value={new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(kpis.daily_cost || 0)}
+            icon={DollarSign}
+            color="text-emerald-600"
+            bgColor="bg-emerald-50"
+            subtitle="Faturado GOLF FOX"
+            delay={0.7}
+          />
         </div>
 
-        {/* Control Tower */}
+        {/* Control Tower Visual */}
         <div>
-          <div className="mb-3 sm:mb-4">
-            <h2 className="text-base sm:text-lg font-semibold text-[var(--ink-strong)]">{t('operator', 'control_tower_title')}</h2>
-            <p className="text-xs sm:text-sm text-[var(--ink-muted)] mt-1">{t('operator', 'control_tower_subtitle')}</p>
+          <div className="mb-4 sm:mb-6">
+            <h2 className="text-lg sm:text-xl font-semibold text-[var(--ink-strong)] mb-1">{t('operator', 'control_tower_title')}</h2>
+            <p className="text-xs sm:text-sm text-[var(--ink-muted)]">{t('operator', 'control_tower_subtitle')}</p>
           </div>
-          <ControlTowerCards
+          <ControlTowerVisual
             delays={controlTower.delays}
             stoppedVehicles={controlTower.stoppedVehicles}
             routeDeviations={controlTower.routeDeviations}
             openAssistance={controlTower.openAssistance}
+            labels={{
+              delays: t('operator', 'control_tower_delays'),
+              stopped: t('operator', 'control_tower_stopped'),
+              deviations: t('operator', 'control_tower_deviations'),
+              assistance: t('operator', 'control_tower_assistance')
+            }}
           />
         </div>
 
         {/* Gráficos */}
         <div>
-          <div className="mb-3 sm:mb-4">
-            <h2 className="text-base sm:text-lg font-semibold text-[var(--ink-strong)]">{t('operator', 'charts_title')}</h2>
-            <p className="text-xs sm:text-sm text-[var(--ink-muted)] mt-1">{t('operator', 'charts_subtitle')}</p>
+          <div className="mb-4 sm:mb-6">
+            <h2 className="text-lg sm:text-xl font-semibold text-[var(--ink-strong)] mb-1">{t('operator', 'charts_title')}</h2>
+            <p className="text-xs sm:text-sm text-[var(--ink-muted)]">{t('operator', 'charts_subtitle')}</p>
           </div>
           <DashboardCharts kpis={kpis} period={period as "today" | "week" | "month" | undefined} />
         </div>
