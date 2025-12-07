@@ -4,10 +4,8 @@
   "description": "GolfFox Web App - Premium UI/UX with Next.js",
   "scripts": {
     "dev": "next dev -p 3000",
-    "dev:webpack": "cross-env NEXT_PRIVATE_SKIP_TURBOPACK=1 next dev -p 3000",
-    "dev:turbopack": "next dev -p 3000 --turbopack",
-    "postinstall": "chcp 65001 >nul 2>&1 & node scripts/fix-encoding.js && node scripts/patch-swc-helpers.js && node scripts/ensure-native-binaries.js",
-    "build": "chcp 65001 >nul 2>&1 & next build",
+    "postinstall": "node scripts/patch-swc-helpers.js && node scripts/ensure-native-binaries.js",
+    "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
@@ -69,7 +67,7 @@
     "html2canvas": "^1.4.1",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.556.0",
-    "next": "16.0.7",
+    "next": "^16.0.7",
     "next-auth": "^4.24.13",
     "next-seo": "^6.6.0",
     "next-sitemap": "^4.2.3",
@@ -157,7 +155,7 @@
     ]
   },
   "optionalDependencies": {
-    "@next/swc-wasm-nodejs": "^16.0.7",
+    "@next/swc-wasm-nodejs": "^16.0.0",
     "@next/swc-win32-x64-msvc": "^16.0.7",
     "@tailwindcss/oxide-linux-x64-gnu": "^4.1.17",
     "@tailwindcss/oxide-linux-x64-musl": "^4.1.17",

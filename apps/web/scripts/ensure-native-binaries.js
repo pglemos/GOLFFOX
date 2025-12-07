@@ -13,17 +13,6 @@ const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
-// Forçar encoding UTF-8 para console e arquivos
-if (process.platform === 'win32') {
-  try {
-    // Configurar encoding UTF-8 no Windows
-    process.stdout.setDefaultEncoding('utf8');
-    process.stderr.setDefaultEncoding('utf8');
-  } catch (e) {
-    // Ignorar se não for possível configurar
-  }
-}
-
 const isLinux = process.platform === 'linux';
 const isWindows = process.platform === 'win32';
 
@@ -65,48 +54,10 @@ for (const binary of binariesToCheck) {
     const swcNodeFile = path.join(binaryPath, 'next-swc.win32-x64-msvc.node');
     const swcPackageJson = path.join(binaryPath, 'package.json');
     
-    // Verificar se existe no fallback do Next.js
-    const fallbackPath = path.join(__dirname, '../node_modules/next/next-swc-fallback/@next/swc-win32-x64-msvc');
-    const fallbackNodeFile = path.join(fallbackPath, 'next-swc.win32-x64-msvc.node');
-    
     if (!fs.existsSync(binaryPath)) {
-      // Tentar copiar do fallback primeiro
-      if (fs.existsSync(fallbackPath) && fs.existsSync(fallbackNodeFile)) {
-        console.log(`📦 Copiando SWC do fallback para local correto...`);
-        try {
-          // Criar diretório @next se não existir
-          const nextDir = path.join(__dirname, '../node_modules/@next');
-          if (!fs.existsSync(nextDir)) {
-            fs.mkdirSync(nextDir, { recursive: true });
-          }
-          
-          // Copiar do fallback
-          const { execSync } = require('child_process');
-          if (process.platform === 'win32') {
-            execSync(`xcopy /E /I /Y "${fallbackPath}" "${binaryPath}"`, { stdio: 'inherit' });
-          } else {
-            execSync(`cp -r "${fallbackPath}" "${binaryPath}"`, { stdio: 'inherit' });
-          }
-          
-          if (fs.existsSync(swcNodeFile)) {
-            const stats = fs.statSync(swcNodeFile);
-            console.log(`✅ SWC copiado do fallback: ${binary} (${(stats.size / 1024 / 1024).toFixed(2)} MB)`);
-          } else {
-            missingBinaries.push(binary);
-            needsInstall = true;
-            console.log(`⚠️  SWC binário não encontrado após cópia: ${binary}`);
-          }
-        } catch (err) {
-          console.warn(`⚠️  Erro ao copiar do fallback: ${err.message}`);
-          missingBinaries.push(binary);
-          needsInstall = true;
-          console.log(`⚠️  SWC binário não encontrado: ${binary}`);
-        }
-      } else {
-        missingBinaries.push(binary);
-        needsInstall = true;
-        console.log(`⚠️  SWC binário não encontrado: ${binary}`);
-      }
+      missingBinaries.push(binary);
+      needsInstall = true;
+      console.log(`⚠️  SWC binário não encontrado: ${binary}`);
     } else if (!fs.existsSync(swcNodeFile)) {
       corruptedBinaries.push(binary);
       needsInstall = true;
@@ -171,16 +122,11 @@ if (needsInstall && binariesToReinstall.length > 0) {
     execSync(installCommand, {
       cwd: path.join(__dirname, '..'),
       stdio: 'inherit',
-      encoding: 'utf8',
       env: { 
         ...process.env, 
         npm_config_optional: 'true',
         // Forçar instalação de dependências opcionais
-        npm_config_include: 'optional',
-        // Forçar encoding UTF-8
-        PYTHONIOENCODING: 'utf-8',
-        LC_ALL: 'pt_BR.UTF-8',
-        LANG: 'pt_BR.UTF-8'
+        npm_config_include: 'optional'
       }
     });
     
