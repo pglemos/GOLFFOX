@@ -316,11 +316,11 @@ export function Topbar({
           {/* User Menu */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                className="h-11 px-4 py-2 flex items-center gap-1 sm:gap-2 pl-1 sm:pl-2 hover:bg-[var(--bg-hover)] active:bg-[var(--bg-hover)] rounded-full min-h-[44px] touch-manipulation transition-all duration-200"
+              <button
+                type="button"
+                className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-[var(--radius-lg)] text-sm font-semibold ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] focus-visible:ring-opacity-20 disabled:pointer-events-none disabled:opacity-50 h-11 px-3 sm:px-4 flex items-center gap-2 sm:gap-3 hover:bg-[var(--bg-hover)] active:bg-[var(--bg-hover)] rounded-full min-h-[44px] touch-manipulation border border-transparent hover:border-[var(--border)]"
               >
-                <Avatar className="w-8 h-8 flex-shrink-0 shadow-md border-2 border-white/50">
+                <Avatar className="w-8 h-8 flex-shrink-0 shadow-md">
                   <AvatarImage 
                     src={user?.avatar_url || undefined} 
                     alt={user?.name || "Avatar"}
@@ -329,24 +329,25 @@ export function Topbar({
                   <AvatarFallback className="gradient-brand text-white text-sm font-bold">
                     {(() => {
                       const name = user?.name || '';
-                      const parts = name.split(' ');
+                      if (!name) return 'A';
+                      const parts = name.split(' ').filter(p => p.length > 0);
                       if (parts.length >= 2) {
                         return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
                       }
-                      return name.charAt(0).toUpperCase() || 'G';
+                      return name.charAt(0).toUpperCase() || 'A';
                     })()}
                   </AvatarFallback>
                 </Avatar>
                 <div className="text-left hidden sm:block min-w-0">
                   <p className="text-sm font-semibold leading-tight text-[var(--ink-strong)] truncate max-w-[120px]">
-                    {user?.name || (pathname?.startsWith('/admin') ? 'golffox' : "Admin")}
+                    {user?.name?.toLowerCase() || 'admin'}
                   </p>
                   <p className="text-xs text-[var(--ink-muted)] leading-tight capitalize truncate max-w-[120px]">
-                    {user?.role || (pathname?.startsWith('/admin') ? 'admin' : "administrador")}
+                    {user?.role || 'admin'}
                   </p>
                 </div>
                 <ChevronDown className="h-4 w-4 text-[var(--ink-muted)] hidden sm:block flex-shrink-0" />
-              </Button>
+              </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56 bg-gradient-to-br from-white to-[var(--bg-soft)] dark:from-neutral-900 dark:to-neutral-800 border-2 border-[var(--border)] shadow-xl backdrop-blur-xl">
               <DropdownMenuItem 
