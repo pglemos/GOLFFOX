@@ -744,10 +744,11 @@ export const FleetMap = memo(function FleetMap({ companyId, transportadoraId, ro
                   <span className="text-[var(--ink-muted)] block mb-2">Status:</span>
                   <Badge 
                     variant={
-                      selectedBus.color === 'green' ? 'success' : 
+                      selectedBus.color === 'green' ? 'default' : 
                       selectedBus.color === 'red' ? 'destructive' : 
-                      selectedBus.color === 'yellow' ? 'warning' : 'default'
+                      selectedBus.color === 'yellow' ? 'outline' : 'default'
                     }
+                    className={selectedBus.color === 'green' ? 'bg-green-500 text-white' : selectedBus.color === 'yellow' ? 'border-yellow-500 text-yellow-700' : ''}
                   >
                     {selectedBus.color === 'green' ? 'Em Movimento' : 
                      selectedBus.color === 'yellow' ? 'Parado' :

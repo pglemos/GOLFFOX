@@ -72,7 +72,12 @@ export const VehiclePanel = memo(function VehiclePanel({
                   ? 'default'
                   : vehicle.vehicle_status === 'stopped_long'
                   ? 'destructive'
-                  : 'warning'
+                  : 'outline'
+              }
+              className={
+                vehicle.vehicle_status !== 'moving' && vehicle.vehicle_status !== 'stopped_long'
+                  ? 'border-yellow-500 text-yellow-700'
+                  : ''
               }
             >
               {vehicle.vehicle_status === 'moving'
@@ -227,8 +232,8 @@ export const AlertsPanel = memo(function AlertsPanel({ alerts, onClose }: Alerts
             >
               <div className="flex items-start justify-between mb-1 sm:mb-2 gap-2">
                 <Badge
-                  variant={alert.severity === 'critical' ? 'destructive' : 'warning'}
-                  className="text-xs"
+                  variant={alert.severity === 'critical' ? 'destructive' : 'outline'}
+                  className={`text-xs ${alert.severity !== 'critical' ? 'border-yellow-500 text-yellow-700' : ''}`}
                 >
                   {alert.alert_type === 'incident' ? 'Incidente' : 'Socorro'}
                 </Badge>
