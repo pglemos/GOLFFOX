@@ -12,6 +12,7 @@ import {
 } from "lucide-react"
 import { formatRelativeTime } from "@/lib/kpi-utils"
 import { motion } from "framer-motion"
+import { t } from "@/lib/i18n"
 
 interface Activity {
   id: string
@@ -54,11 +55,11 @@ export function RecentActivities({
     return (
       <Card className={className}>
         <CardHeader className="px-3 sm:px-6 pb-3 sm:pb-4">
-          <CardTitle className="text-base sm:text-lg">Atividades Recentes</CardTitle>
+          <CardTitle className="text-base sm:text-lg">{t('transportadora', 'recent_activities_title')}</CardTitle>
         </CardHeader>
         <CardContent className="px-3 sm:px-6">
           <p className="text-xs sm:text-sm text-[var(--ink-muted)] text-center py-6 sm:py-8">
-            Nenhuma atividade recente
+            {t('transportadora', 'recent_activities_empty')}
           </p>
         </CardContent>
       </Card>
@@ -68,7 +69,7 @@ export function RecentActivities({
   return (
     <Card className={className}>
       <CardHeader className="px-3 sm:px-6 pb-3 sm:pb-4">
-        <CardTitle className="text-base sm:text-lg">Atividades Recentes</CardTitle>
+        <CardTitle className="text-base sm:text-lg">{t('transportadora', 'recent_activities_title')}</CardTitle>
       </CardHeader>
       <CardContent className="px-3 sm:px-6">
         <div className="space-y-2 sm:space-y-3 md:space-y-4">

@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Search, ChevronLeft, ChevronRight, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
+import { t } from "@/lib/i18n"
 
 export interface Column<T> {
   key: string
@@ -221,8 +222,8 @@ export function DataTable<T extends Record<string, any>>({
         {pagination && totalPages > 1 && (
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-0 px-3 sm:px-6 py-3 sm:py-4 border-t border-[var(--border)]">
             <div className="text-xs sm:text-sm text-[var(--ink-muted)] text-center sm:text-left">
-              Mostrando {(currentPage - 1) * pageSize + 1} a{" "}
-              {Math.min(currentPage * pageSize, sortedData.length)} de {sortedData.length} registros
+              {t('transportadora', 'pagination_showing')} {(currentPage - 1) * pageSize + 1} {t('transportadora', 'pagination_to')}{" "}
+              {Math.min(currentPage * pageSize, sortedData.length)} {t('transportadora', 'pagination_of')} {sortedData.length} {t('transportadora', 'pagination_records')}
             </div>
             <div className="flex items-center justify-center gap-2">
               <Button
@@ -233,7 +234,7 @@ export function DataTable<T extends Record<string, any>>({
                 className="min-h-[44px] touch-manipulation"
               >
                 <ChevronLeft className="w-4 h-4" />
-                <span className="hidden sm:inline">Anterior</span>
+                <span className="hidden sm:inline">{t('transportadora', 'pagination_previous')}</span>
               </Button>
               <div className="text-xs sm:text-sm text-[var(--ink-muted)] px-2">
                 {currentPage}/{totalPages}
@@ -245,7 +246,7 @@ export function DataTable<T extends Record<string, any>>({
                 disabled={currentPage === totalPages}
                 className="min-h-[44px] touch-manipulation"
               >
-                <span className="hidden sm:inline">Próxima</span>
+                <span className="hidden sm:inline">{t('transportadora', 'pagination_next')}</span>
                 <ChevronRight className="w-4 h-4" />
               </Button>
             </div>

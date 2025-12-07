@@ -493,15 +493,15 @@ export default function TransportadoraDashboard() {
         ...(alerts?.slice(0, 3).map((a: any) => ({
           id: `alert-${a.id}`,
           type: 'alert' as const,
-          title: `Alerta: ${a.document_type}`,
-          description: `${a.entity_name} - ${a.alert_level === 'expired' ? 'Vencido' : 'Vencendo'}`,
+          title: `${t('transportadora', 'activity_alert')}: ${a.document_type}`,
+          description: `${a.entity_name} - ${a.alert_level === 'expired' ? t('transportadora', 'activity_expired') : t('transportadora', 'activity_expiring')}`,
           timestamp: new Date().toISOString(),
           status: a.alert_level === 'expired' ? 'error' as const : 'warning' as const
         })) || []),
         ...fleetData.slice(0, 2).map((v: any) => ({
           id: `vehicle-${v.id}`,
           type: 'vehicle' as const,
-          title: `Veículo ${v.plate} ${v.status === 'on-route' ? 'em rota' : 'disponível'}`,
+          title: `${t('transportadora', 'activity_vehicle')} ${v.plate} ${v.status === 'on-route' ? t('transportadora', 'activity_on_route') : t('transportadora', 'activity_available')}`,
           description: v.route,
           timestamp: v.lastUpdate !== 'N/A' ? new Date(v.lastUpdate).toISOString() : new Date().toISOString(),
           status: 'info' as const
@@ -524,7 +524,7 @@ export default function TransportadoraDashboard() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin mx-auto"></div>
-          <p className="mt-4 text-[var(--ink-muted)]">Carregando...</p>
+          <p className="mt-4 text-[var(--ink-muted)]">{t('transportadora', 'loading')}</p>
         </div>
       </div>
     )
