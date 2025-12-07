@@ -12,7 +12,10 @@ import {
   LogOut,
   ChevronDown,
   User,
-  Loader2
+  Loader2,
+  Share2,
+  Star,
+  Zap
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -196,7 +199,7 @@ export function Topbar({
       initial={{ y: -72 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.3, ease: "easeOut" }}
-      className="fixed top-0 left-0 right-0 h-16 sm:h-18 bg-white/95 dark:bg-neutral-900/95 backdrop-blur-xl border-b border-[var(--border)] z-[var(--z-fixed)] w-full"
+      className="fixed top-0 left-0 right-0 h-16 sm:h-18 bg-card/95 backdrop-blur-xl border-b border-border z-[var(--z-fixed)] w-full"
     >
       <div className="mx-auto max-w-[1600px] px-3 sm:px-4 md:px-6 h-full flex items-center gap-2 sm:gap-3 md:gap-4 w-full">
         {/* Mobile menu toggle */}
@@ -225,21 +228,21 @@ export function Topbar({
           </a>
         )}
 
-        {/* Search - Hidden on small screens */}
+        {/* Search - Command Palette style */}
         <div className="hidden md:flex flex-1 max-w-md ml-auto">
           <div className="relative w-full">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--ink-muted)]" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               type="search"
-              placeholder="Buscar..."
+              placeholder="Type to search..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onFocus={() => setIsSearchFocused(true)}
               onBlur={() => setIsSearchFocused(false)}
-              className="pl-10 pr-24 border-[var(--border)] focus:border-[var(--brand)] focus:ring-2 focus:ring-[var(--brand)] focus:ring-opacity-20"
+              className="pl-10 pr-24 bg-card border-border focus:border-primary focus:ring-2 focus:ring-primary focus:ring-opacity-20"
             />
             {!isSearchFocused && (
-              <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1 text-xs text-[var(--ink-muted)] bg-[var(--bg-soft)] px-2 py-1 rounded-md border border-[var(--border)] pointer-events-none">
+              <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1 text-xs text-muted-foreground bg-muted px-2 py-1 rounded-md border border-border pointer-events-none">
                 <kbd className="px-1">⌘</kbd>
                 <kbd>K</kbd>
               </div>
@@ -260,6 +263,36 @@ export function Topbar({
             <Search className="h-5 w-5" />
           </Button>
 
+          {/* Share icon - Application Shell 08 */}
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="hover:bg-muted active:bg-muted min-w-[44px] min-h-[44px] touch-manipulation bg-card" 
+            aria-label="Share"
+          >
+            <Share2 className="h-5 w-5" />
+          </Button>
+
+          {/* Star icon - Application Shell 08 */}
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="hover:bg-muted active:bg-muted min-w-[44px] min-h-[44px] touch-manipulation bg-card" 
+            aria-label="Favorite"
+          >
+            <Star className="h-5 w-5" />
+          </Button>
+
+          {/* Lightning icon - Application Shell 08 */}
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="hover:bg-muted active:bg-muted min-w-[44px] min-h-[44px] touch-manipulation bg-card" 
+            aria-label="Quick actions"
+          >
+            <Zap className="h-5 w-5" />
+          </Button>
+
           {/* Operational Alerts */}
           <OperationalAlertsNotification />
 
@@ -267,12 +300,12 @@ export function Topbar({
           <Button 
             variant="ghost" 
             size="icon" 
-            className="relative hover:bg-gradient-to-br hover:from-[var(--bg-hover)] hover:to-[var(--bg-soft)] active:bg-[var(--bg-hover)] min-w-[44px] min-h-[44px] touch-manipulation backdrop-blur-sm transition-transform duration-200 hover:scale-105 active:scale-95" 
+            className="relative hover:bg-muted active:bg-muted min-w-[44px] min-h-[44px] touch-manipulation backdrop-blur-sm transition-transform duration-200 hover:scale-105 active:scale-95 bg-card" 
             aria-label="Notifications"
           >
             <Bell className="h-5 w-5 transition-all duration-300" />
             <motion.span 
-              className="absolute top-2 right-2 w-2.5 h-2.5 bg-[var(--brand)] rounded-full shadow-[var(--shadow-brand)]"
+              className="absolute top-2 right-2 w-2.5 h-2.5 bg-primary rounded-full shadow-lg"
               animate={{ 
                 scale: [1, 1.2, 1],
                 opacity: [1, 0.8, 1]
@@ -318,7 +351,7 @@ export function Topbar({
             <DropdownMenuTrigger asChild>
               <button
                 type="button"
-                className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-[var(--radius-lg)] text-sm font-semibold ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] focus-visible:ring-opacity-20 disabled:pointer-events-none disabled:opacity-50 h-11 px-3 sm:px-4 flex items-center gap-2 sm:gap-3 hover:bg-[var(--bg-hover)] active:bg-[var(--bg-hover)] rounded-full min-h-[44px] touch-manipulation border border-transparent hover:border-[var(--border)]"
+                className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-semibold ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-opacity-20 disabled:pointer-events-none disabled:opacity-50 h-11 px-3 sm:px-4 flex items-center gap-2 sm:gap-3 hover:bg-muted active:bg-muted rounded-full min-h-[44px] touch-manipulation border border-transparent hover:border-border bg-card"
               >
                 <Avatar className="w-8 h-8 flex-shrink-0 shadow-md">
                   <AvatarImage 
@@ -326,7 +359,7 @@ export function Topbar({
                     alt={user?.name || "Avatar"}
                     className="object-cover"
                   />
-                  <AvatarFallback className="gradient-brand text-white text-sm font-bold">
+                  <AvatarFallback className="bg-gradient-to-br from-orange-500 to-orange-600 text-white text-sm font-bold">
                     {(() => {
                       const name = user?.name || '';
                       if (!name) return 'A';
@@ -339,28 +372,28 @@ export function Topbar({
                   </AvatarFallback>
                 </Avatar>
                 <div className="text-left hidden sm:block min-w-0">
-                  <p className="text-sm font-semibold leading-tight text-[var(--ink-strong)] truncate max-w-[120px]">
+                  <p className="text-sm font-semibold leading-tight text-foreground truncate max-w-[120px]">
                     {user?.name?.toLowerCase() || 'admin'}
                   </p>
-                  <p className="text-xs text-[var(--ink-muted)] leading-tight capitalize truncate max-w-[120px]">
+                  <p className="text-xs text-muted-foreground leading-tight capitalize truncate max-w-[120px]">
                     {user?.role || 'admin'}
                   </p>
                 </div>
-                <ChevronDown className="h-4 w-4 text-[var(--ink-muted)] hidden sm:block flex-shrink-0" />
+                <ChevronDown className="h-4 w-4 text-muted-foreground hidden sm:block flex-shrink-0" />
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56 bg-gradient-to-br from-white to-[var(--bg-soft)] dark:from-neutral-900 dark:to-neutral-800 border-2 border-[var(--border)] shadow-xl backdrop-blur-xl">
+            <DropdownMenuContent align="end" className="w-56 bg-card border-2 border-border shadow-xl backdrop-blur-xl">
               <DropdownMenuItem 
-                className="focus:bg-[var(--bg-hover)] cursor-pointer"
+                className="focus:bg-muted cursor-pointer"
                 onClick={() => handleNavigate(panelRoutes.settings)}
               >
                 <Settings2 className="h-4 w-4 mr-2" />
                 Configurações
               </DropdownMenuItem>
-              <DropdownMenuSeparator className="bg-[var(--border)]" />
+              <DropdownMenuSeparator className="bg-border" />
               
               <DropdownMenuItem 
-                className="focus:bg-[var(--error-light)] text-[var(--error)] focus:text-[var(--error)] cursor-pointer"
+                className="focus:bg-destructive/10 text-destructive focus:text-destructive cursor-pointer"
                 onClick={handleLogout}
                 disabled={isLoggingOut}
               >

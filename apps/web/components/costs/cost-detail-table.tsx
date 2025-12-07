@@ -173,10 +173,10 @@ export function CostDetailTable({ costs, onReconcile, loading }: CostDetailTable
 
   if (loading) {
     return (
-      <Card className="p-6">
+      <Card className="p-6 bg-card">
         <div className="animate-pulse space-y-4">
           {[1, 2, 3, 4, 5].map(i => (
-            <div key={i} className="h-12 bg-gray-200 rounded"></div>
+            <div key={i} className="h-12 bg-muted rounded"></div>
           ))}
         </div>
       </Card>
@@ -185,8 +185,8 @@ export function CostDetailTable({ costs, onReconcile, loading }: CostDetailTable
 
   if (costs.length === 0) {
     return (
-      <Card className="p-12 text-center">
-        <p className="text-gray-500">Nenhum custo encontrado</p>
+      <Card className="p-12 text-center bg-card">
+        <p className="text-muted-foreground">Nenhum custo encontrado</p>
       </Card>
     )
   }
@@ -194,7 +194,7 @@ export function CostDetailTable({ costs, onReconcile, loading }: CostDetailTable
   const totalColSpan = grouping === 'none' ? 7 : (grouping === 'group' ? 7 : 8)
 
   return (
-    <Card className="p-4">
+    <Card className="p-4 bg-card">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <h3 className="font-semibold">Detalhamento de Custos</h3>
@@ -202,7 +202,7 @@ export function CostDetailTable({ costs, onReconcile, loading }: CostDetailTable
         </div>
         <div className="flex items-center gap-2">
           <select
-            className="px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm"
+            className="px-3 py-2 rounded-lg border border-border bg-card text-sm"
             value={grouping}
             onChange={(e) => setGrouping(e.target.value as GroupingLevel)}
           >
@@ -211,7 +211,7 @@ export function CostDetailTable({ costs, onReconcile, loading }: CostDetailTable
             <option value="category">Por Categoria</option>
           </select>
           <select
-            className="px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm"
+            className="px-3 py-2 rounded-lg border border-border bg-card text-sm"
             value={pageSize}
             onChange={(e) => { setPageSize(parseInt(e.target.value)); setPage(0) }}
           >
@@ -236,45 +236,45 @@ export function CostDetailTable({ costs, onReconcile, loading }: CostDetailTable
         </div>
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b">
-              {grouping === 'group' && <th className="text-left p-2">Grupo</th>}
-              {grouping === 'category' && <th className="text-left p-2">Categoria</th>}
+      <div className="overflow-x-auto rounded-lg border bg-card">
+        <table className="w-full text-sm bg-card">
+          <thead className="bg-card">
+            <tr className="border-b border-border">
+              {grouping === 'group' && <th className="text-left p-2 sm:p-4 bg-card">Grupo</th>}
+              {grouping === 'category' && <th className="text-left p-2 sm:p-4 bg-card">Categoria</th>}
               <th 
-                className="text-left p-2 cursor-pointer hover:bg-gray-50"
+                className="text-left p-2 sm:p-4 bg-card cursor-pointer hover:bg-muted/50 transition-colors"
                 onClick={() => handleSort('date')}
               >
                 Data {sortColumn === 'date' && (sortDirection === 'asc' ? '↑' : '↓')}
               </th>
-              {grouping === 'none' && <th className="text-left p-2">Grupo/Categoria</th>}
-              <th className="text-left p-2">Rota</th>
-              <th className="text-left p-2">Veículo</th>
+              {grouping === 'none' && <th className="text-left p-2 sm:p-4 bg-card">Grupo/Categoria</th>}
+              <th className="text-left p-2 sm:p-4 bg-card">Rota</th>
+              <th className="text-left p-2 sm:p-4 bg-card">Veículo</th>
               <th 
-                className="text-right p-2 cursor-pointer hover:bg-gray-50"
+                className="text-right p-2 sm:p-4 bg-card cursor-pointer hover:bg-muted/50 transition-colors"
                 onClick={() => handleSort('amount')}
               >
                 Valor {sortColumn === 'amount' && (sortDirection === 'asc' ? '↑' : '↓')}
               </th>
-              <th className="text-left p-2">Origem</th>
-              {onReconcile && <th className="text-center p-2">Ações</th>}
+              <th className="text-left p-2 sm:p-4 bg-card">Origem</th>
+              {onReconcile && <th className="text-center p-2 sm:p-4 bg-card">Ações</th>}
             </tr>
           </thead>
-          <tbody>
+          <tbody className="bg-card">
             {grouping === 'none' ? (
               paginatedCosts.map(cost => (
-                <tr key={cost.id} className="border-b hover:bg-gray-50">
-                  <td className="p-2">{new Date(cost.date).toLocaleDateString('pt-BR')}</td>
-                  <td className="p-2">{cost.group_name} {cost.category}{cost.subcategory ? ` - ${cost.subcategory}` : ''}</td>
-                  <td className="p-2">{cost.route_name || '-'}</td>
-                  <td className="p-2">{cost.vehicle_plate || '-'}</td>
-                  <td className="p-2 text-right font-semibold">{formatCurrency(cost.amount)}</td>
-                  <td className="p-2">
+                <tr key={cost.id} className="border-b border-border/50 hover:bg-muted/50 transition-colors bg-card">
+                  <td className="p-2 sm:p-4 bg-card">{new Date(cost.date).toLocaleDateString('pt-BR')}</td>
+                  <td className="p-2 sm:p-4 bg-card">{cost.group_name} {cost.category}{cost.subcategory ? ` - ${cost.subcategory}` : ''}</td>
+                  <td className="p-2 sm:p-4 bg-card">{cost.route_name || '-'}</td>
+                  <td className="p-2 sm:p-4 bg-card">{cost.vehicle_plate || '-'}</td>
+                  <td className="p-2 sm:p-4 text-right font-semibold bg-card">{formatCurrency(cost.amount)}</td>
+                  <td className="p-2 sm:p-4 bg-card">
                     <Badge variant="outline" className="text-xs">{cost.source}</Badge>
                   </td>
                   {onReconcile && (
-                    <td className="p-2 text-center">
+                    <td className="p-2 sm:p-4 text-center bg-card">
                       {cost.invoice_id && (
                         <Button variant="ghost" size="sm" onClick={() => onReconcile(cost)}>
                           Conciliar
@@ -288,10 +288,10 @@ export function CostDetailTable({ costs, onReconcile, loading }: CostDetailTable
               Object.entries(groupedData.groups).flatMap(([groupName, group]) => [
                 <tr 
                   key={`${groupName}-header`}
-                  className="border-b bg-gray-50 font-semibold cursor-pointer hover:bg-gray-100"
+                  className="border-b border-border bg-muted/30 font-semibold cursor-pointer hover:bg-muted/50 transition-colors"
                   onClick={() => toggleGroup(groupName)}
                 >
-                  <td className="p-2" colSpan={grouping === 'group' ? 1 : 1}>
+                  <td className="p-2 sm:p-4 bg-muted/30" colSpan={grouping === 'group' ? 1 : 1}>
                     <div className="flex items-center gap-2">
                       {expandedGroups.has(groupName) ? (
                         <ChevronDown className="h-4 w-4" />
@@ -302,22 +302,22 @@ export function CostDetailTable({ costs, onReconcile, loading }: CostDetailTable
                       <Badge variant="outline">{group.items.length}</Badge>
                     </div>
                   </td>
-                  <td className="p-2" colSpan={grouping === 'group' ? 4 : 4}></td>
-                  <td className="p-2 text-right">{formatCurrency(group.total)}</td>
-                  {onReconcile && <td></td>}
+                  <td className="p-2 sm:p-4 bg-muted/30" colSpan={grouping === 'group' ? 4 : 4}></td>
+                  <td className="p-2 sm:p-4 text-right bg-muted/30">{formatCurrency(group.total)}</td>
+                  {onReconcile && <td className="bg-muted/30"></td>}
                 </tr>,
                 ...(expandedGroups.has(groupName) ? group.items.map(cost => (
-                  <tr key={cost.id} className="border-b hover:bg-gray-50">
-                    <td className="p-2 pl-8">{new Date(cost.date).toLocaleDateString('pt-BR')}</td>
-                    <td className="p-2">{cost.category}{cost.subcategory ? ` - ${cost.subcategory}` : ''}</td>
-                    <td className="p-2">{cost.route_name || '-'}</td>
-                    <td className="p-2">{cost.vehicle_plate || '-'}</td>
-                    <td className="p-2 text-right font-semibold">{formatCurrency(cost.amount)}</td>
-                    <td className="p-2">
+                  <tr key={cost.id} className="border-b border-border/50 hover:bg-muted/50 transition-colors bg-card">
+                    <td className="p-2 sm:p-4 pl-8 bg-card">{new Date(cost.date).toLocaleDateString('pt-BR')}</td>
+                    <td className="p-2 sm:p-4 bg-card">{cost.category}{cost.subcategory ? ` - ${cost.subcategory}` : ''}</td>
+                    <td className="p-2 sm:p-4 bg-card">{cost.route_name || '-'}</td>
+                    <td className="p-2 sm:p-4 bg-card">{cost.vehicle_plate || '-'}</td>
+                    <td className="p-2 sm:p-4 text-right font-semibold bg-card">{formatCurrency(cost.amount)}</td>
+                    <td className="p-2 sm:p-4 bg-card">
                       <Badge variant="outline" className="text-xs">{cost.source}</Badge>
                     </td>
                     {onReconcile && (
-                      <td className="p-2 text-center">
+                      <td className="p-2 sm:p-4 text-center bg-card">
                         {cost.invoice_id && (
                           <Button variant="ghost" size="sm" onClick={() => onReconcile(cost)}>
                             Conciliar
@@ -330,17 +330,17 @@ export function CostDetailTable({ costs, onReconcile, loading }: CostDetailTable
               ])
             ) : null}
           </tbody>
-          <tfoot>
-            <tr className="border-t-2 font-bold bg-gray-100">
-              <td colSpan={totalColSpan - 1} className="p-2">Total</td>
-              <td className="p-2 text-right">{formatCurrency(costs.reduce((sum, c) => sum + c.amount, 0))}</td>
-              {onReconcile && <td></td>}
+          <tfoot className="bg-card">
+            <tr className="border-t-2 border-border font-bold bg-muted/30">
+              <td colSpan={totalColSpan - 1} className="p-2 sm:p-4 bg-muted/30">Total</td>
+              <td className="p-2 sm:p-4 text-right bg-muted/30">{formatCurrency(costs.reduce((sum, c) => sum + c.amount, 0))}</td>
+              {onReconcile && <td className="bg-muted/30"></td>}
             </tr>
           </tfoot>
         </table>
       </div>
       <div className="flex items-center justify-between mt-4">
-        <span className="text-sm text-gray-600">Página {currentPage + 1} de {pageCount}</span>
+        <span className="text-sm text-muted-foreground">Página {currentPage + 1} de {pageCount}</span>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" onClick={() => setPage(p => Math.max(0, p - 1))} disabled={currentPage === 0}>Anterior</Button>
           <Button variant="outline" size="sm" onClick={() => setPage(p => Math.min(pageCount - 1, p + 1))} disabled={currentPage >= pageCount - 1}>Próxima</Button>
