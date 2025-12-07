@@ -5,6 +5,7 @@ import { AppShell } from "@/components/app-shell"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Send } from "lucide-react"
+import { motion } from "framer-motion"
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 import { BroadcastModal } from "@/components/operator/broadcast-modal"
@@ -81,11 +82,20 @@ function ComunicacoesOperatorPageInner() {
 
         <div className="grid gap-4">
           {items.map((m, i) => (
-            <Card key={i} className="p-4">
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.05 }}
+              whileHover={{ y: -4 }}
+              className="group"
+            >
+            <Card key={i} className="p-4 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-[var(--border)] hover:border-[var(--brand)]/30">
               <p className="font-semibold">{m.title}</p>
               <p className="text-sm text-[var(--ink-muted)]">{m.message}</p>
               <p className="text-xs text-[var(--ink-muted)] mt-1">{new Date(m.created_at).toLocaleString('pt-BR')}</p>
             </Card>
+            </motion.div>
           ))}
           {items.length === 0 && (
             <Card className="p-12 text-center text-sm text-[var(--ink-muted)]">Nenhuma comunicação ainda.</Card>

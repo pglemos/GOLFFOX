@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Users, Search, Mail, Phone, Building, AlertCircle, Plus, MoreVertical, Edit, Trash2 } from "lucide-react"
+import { motion } from "framer-motion"
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 import { notifySuccess, notifyError } from "@/lib/toast"
@@ -276,15 +277,24 @@ function FuncionariosPageContent() {
             {funcionarios.length > 0 ? (
               <>
                 <div className="grid gap-3 sm:gap-4">
-                  {funcionarios.map((funcionario: any) => (
-                    <Card key={funcionario.id} className="p-3 sm:p-4 hover:shadow-lg transition-shadow overflow-hidden">
+                  {funcionarios.map((funcionario: any, index: number) => (
+                    <motion.div
+                      key={funcionario.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.05 }}
+                      whileHover={{ y: -4 }}
+                    >
+                    <Card className="p-3 sm:p-4 hover:shadow-xl transition-all duration-300 overflow-hidden bg-card/50 backdrop-blur-sm border-[var(--border)] hover:border-[var(--brand)]/30 group">
                       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-start gap-2 mb-2">
-                            <Users className="h-5 w-5 text-orange-500 flex-shrink-0 mt-0.5" />
+                            <div className="p-1.5 rounded-lg bg-gradient-to-br from-[var(--brand-light)] to-[var(--brand-soft)]">
+                              <Users className="h-4 w-4 text-[var(--brand)] flex-shrink-0" />
+                            </div>
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2 flex-wrap">
-                                <h3 className="font-bold text-base sm:text-lg break-words flex-1 min-w-0">
+                                <h3 className="font-bold text-base sm:text-lg break-words flex-1 min-w-0 group-hover:text-[var(--brand)] transition-colors">
                                   {funcionario.name || "Nome não disponível"}
                                 </h3>
                                 {funcionario.is_active ? (
@@ -347,6 +357,7 @@ function FuncionariosPageContent() {
                         </DropdownMenu>
                       </div>
                     </Card>
+                    </motion.div>
                   ))}
                 </div>
 

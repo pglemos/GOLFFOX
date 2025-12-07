@@ -19,6 +19,7 @@ import {
   AlertCircle,
   UserPlus,
 } from "lucide-react"
+import { motion } from "framer-motion"
 import { notifyError } from "@/lib/toast"
 import { useAuth } from "@/hooks/use-auth"
 
@@ -216,10 +217,18 @@ export default function MotoristasPage() {
             <div className="text-center py-8">Carregando...</div>
           ) : (
             <div className="space-y-3">
-              {filteredDrivers.map((driver) => (
+              {filteredDrivers.map((driver, index) => (
+                <motion.div
+                  key={driver.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.05 }}
+                  whileHover={{ y: -4 }}
+                  className="group"
+                >
                 <Card
                   key={driver.id}
-                  className={`p-4 transition-all cursor-pointer hover:shadow-lg ${selectedDriver === driver.id ? 'ring-2 ring-orange-500' : ''}`}
+                  className={`p-4 transition-all cursor-pointer hover:shadow-xl bg-card/50 backdrop-blur-sm border-[var(--border)] hover:border-[var(--brand)]/30 ${selectedDriver === driver.id ? 'ring-2 ring-orange-500' : ''}`}
                   onClick={() => setSelectedDriver(selectedDriver === driver.id ? null : driver.id)}
                 >
                   <div className="flex flex-col lg:flex-row gap-4">
@@ -315,6 +324,7 @@ export default function MotoristasPage() {
                     </div>
                   )}
                 </Card>
+                </motion.div>
               ))}
             </div>
           )}

@@ -6,6 +6,7 @@ import { AppShell } from "@/components/app-shell"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Briefcase, Plus, Users, UserPlus, Trash2 } from "lucide-react"
+import { motion } from "framer-motion"
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 import { useAuthFast } from "@/hooks/use-auth-fast"
@@ -202,16 +203,24 @@ export default function EmpresasPage() {
 
           {!loadingEmpresas && !errorEmpresas && Array.isArray(empresas) && empresas.length > 0 && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 w-full max-w-full">
-              {empresas.map((empresa: any) => (
-                <Card key={empresa.id} className="p-4 sm:p-5 overflow-hidden w-full border border-[var(--border)] hover:shadow-lg transition-shadow duration-200 flex flex-col">
+              {empresas.map((empresa: any, index: number) => (
+                <motion.div
+                  key={empresa.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.05 }}
+                  whileHover={{ y: -4 }}
+                  className="group"
+                >
+                <Card key={empresa.id} className="p-4 sm:p-5 overflow-hidden w-full border border-[var(--border)] hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm hover:border-[var(--brand)]/30 flex flex-col">
                   <div className="flex-1 flex flex-col gap-3 w-full">
                     {/* Header com ícone e nome */}
                     <div className="flex items-start gap-3 mb-1">
-                      <div className="p-2 rounded-lg bg-[var(--brand)]/10 flex-shrink-0">
+                      <div className="p-2 rounded-lg bg-gradient-to-br from-[var(--brand-light)] to-[var(--brand-soft)] flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
                         <Briefcase className="h-5 w-5 text-[var(--brand)]" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-bold text-base sm:text-lg break-words leading-tight text-[var(--ink)]">
+                        <h3 className="font-bold text-base sm:text-lg break-words leading-tight text-[var(--ink)] group-hover:text-[var(--brand)] transition-colors">
                           {empresa.name}
                         </h3>
                       </div>
@@ -295,6 +304,7 @@ export default function EmpresasPage() {
                     </div>
                   </div>
                 </Card>
+                </motion.div>
               ))}
             </div>
           )}

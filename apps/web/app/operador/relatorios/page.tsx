@@ -4,6 +4,7 @@ import { AppShell } from "@/components/app-shell"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { FileText, Download, BarChart3 } from "lucide-react"
+import { motion } from "framer-motion"
 import { useEffect, useState } from "react"
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
@@ -139,15 +140,25 @@ export default function RelatoriosOperatorPage() {
         </div>
 
         <div className="grid md:grid-cols-2 gap-4">
-          {reports.map(r => {
+          {reports.map((r, index) => {
             const Icon = r.icon || FileText
             return (
-              <Card key={r.id} className="p-6">
+              <motion.div
+                key={r.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                whileHover={{ y: -4 }}
+                className="group"
+              >
+              <Card key={r.id} className="p-6 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-[var(--border)] hover:border-[var(--brand)]/30">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
-                      <Icon className="h-5 w-5 text-orange-500" />
-                      <h3 className="font-semibold">{r.title}</h3>
+                      <div className="p-2 rounded-lg bg-gradient-to-br from-[var(--brand-light)] to-[var(--brand-soft)] group-hover:scale-110 transition-transform duration-300">
+                        <Icon className="h-5 w-5 text-[var(--brand)]" />
+                      </div>
+                      <h3 className="font-semibold group-hover:text-[var(--brand)] transition-colors">{r.title}</h3>
                     </div>
                     <p className="text-sm text-[var(--ink-muted)]">{r.desc}</p>
                   </div>
@@ -171,6 +182,7 @@ export default function RelatoriosOperatorPage() {
                   </DropdownMenu>
                 </div>
               </Card>
+              </motion.div>
             )
           })}
         </div>

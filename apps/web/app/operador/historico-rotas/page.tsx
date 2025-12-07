@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { Calendar, Clock, MapPin, Navigation, Search, Filter, ArrowUpDown, CheckCircle2, AlertCircle, XCircle } from "lucide-react"
+import { motion } from "framer-motion"
 import { notifyError } from "@/lib/toast"
 import { cn } from "@/lib/utils"
 import { useAuth } from "@/hooks/use-auth"
@@ -122,7 +123,7 @@ export default function HistoricoRotasPage() {
                 </div>
 
                 {/* Filters */}
-                <Card className="p-4">
+                <Card className="p-4 bg-card/50 backdrop-blur-sm border-[var(--border)]">
                     <div className="flex flex-col sm:flex-row gap-4">
                         <div className="relative flex-1">
                             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -164,8 +165,16 @@ export default function HistoricoRotasPage() {
                         </Card>
                     ) : (
                         <div className="grid gap-4">
-                            {filteredExecutions.map((exec) => (
-                                <Card key={exec.id} className="p-4 hover:shadow-md transition-shadow">
+                            {filteredExecutions.map((exec, index) => (
+                                <motion.div
+                                  key={exec.id}
+                                  initial={{ opacity: 0, y: 20 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  transition={{ delay: index * 0.05 }}
+                                  whileHover={{ y: -4 }}
+                                  className="group"
+                                >
+                                <Card key={exec.id} className="p-4 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-[var(--border)] hover:border-[var(--brand)]/30">
                                     <div className="flex flex-col lg:flex-row gap-4 lg:items-center">
                                         {/* Main Info */}
                                         <div className="flex-1 space-y-2">
@@ -248,6 +257,7 @@ export default function HistoricoRotasPage() {
                                         </div>
                                     </div>
                                 </Card>
+                                </motion.div>
                             ))}
                         </div>
                     )}

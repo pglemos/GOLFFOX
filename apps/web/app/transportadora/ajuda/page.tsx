@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { HelpCircle, MessageCircle, FileText, ExternalLink, Search, BookOpen, Video, Mail } from "lucide-react"
+import { motion } from "framer-motion"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -116,9 +117,16 @@ export default function TransportadoraAjudaPage() {
 
         {/* Cards de Ação Rápida */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            whileHover={{ y: -4 }}
+            className="group"
+          >
+          <Card className="p-6 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-[var(--border)] hover:border-[var(--brand)]/30 cursor-pointer">
             <div className="flex items-center gap-4 mb-4">
-              <div className="w-12 h-12 rounded-lg bg-[var(--brand)]/20 flex items-center justify-center">
+              <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-[var(--brand-light)] to-[var(--brand-soft)] flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                 <MessageCircle className="h-6 w-6 text-[var(--brand)]" />
               </div>
               <div>
@@ -133,10 +141,18 @@ export default function TransportadoraAjudaPage() {
               </a>
             </Button>
           </Card>
+          </motion.div>
 
-          <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            whileHover={{ y: -4 }}
+            className="group"
+          >
+          <Card className="p-6 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-[var(--border)] hover:border-[var(--accent)]/30 cursor-pointer">
             <div className="flex items-center gap-4 mb-4">
-              <div className="w-12 h-12 rounded-lg bg-[var(--accent)]/20 flex items-center justify-center">
+              <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-[var(--accent-light)] to-[var(--accent-soft)] flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                 <FileText className="h-6 w-6 text-[var(--accent)]" />
               </div>
               <div>
@@ -151,10 +167,18 @@ export default function TransportadoraAjudaPage() {
               </a>
             </Button>
           </Card>
+          </motion.div>
 
-          <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            whileHover={{ y: -4 }}
+            className="group"
+          >
+          <Card className="p-6 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-[var(--border)] hover:border-purple-500/30 cursor-pointer">
             <div className="flex items-center gap-4 mb-4">
-              <div className="w-12 h-12 rounded-lg bg-purple-100 dark:bg-purple-900/20 flex items-center justify-center">
+              <div className="w-12 h-12 rounded-lg bg-purple-100 dark:bg-purple-900/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                 <Video className="h-6 w-6 text-purple-600 dark:text-purple-400" />
               </div>
               <div>
@@ -169,10 +193,18 @@ export default function TransportadoraAjudaPage() {
               </a>
             </Button>
           </Card>
+          </motion.div>
 
-          <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            whileHover={{ y: -4 }}
+            className="group"
+          >
+          <Card className="p-6 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-[var(--border)] hover:border-green-500/30 cursor-pointer">
             <div className="flex items-center gap-4 mb-4">
-              <div className="w-12 h-12 rounded-lg bg-green-100 dark:bg-green-900/20 flex items-center justify-center">
+              <div className="w-12 h-12 rounded-lg bg-green-100 dark:bg-green-900/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                 <Mail className="h-6 w-6 text-green-600 dark:text-green-400" />
               </div>
               <div>
@@ -187,10 +219,16 @@ export default function TransportadoraAjudaPage() {
               </a>
             </Button>
           </Card>
+          </motion.div>
         </div>
 
         {/* FAQ */}
-        <Card className="p-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+        >
+        <Card className="p-6 bg-card/50 backdrop-blur-sm border-[var(--border)]">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-bold">Perguntas Frequentes</h2>
             <div className="flex items-center gap-4">
@@ -240,15 +278,22 @@ export default function TransportadoraAjudaPage() {
             )}
           </div>
         </Card>
+        </motion.div>
 
         {/* Status do Sistema */}
-        <Card className="p-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+        >
+        <Card className="p-6 bg-card/50 backdrop-blur-sm border-[var(--border)]">
           <h2 className="text-xl font-bold mb-4">Status do Sistema</h2>
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full bg-[var(--ok)] animate-pulse"></div>
             <span className="text-sm">Todos os sistemas operacionais</span>
           </div>
         </Card>
+        </motion.div>
       </div>
     </AppShell>
   )

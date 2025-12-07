@@ -210,7 +210,7 @@ export default function RelatoriosPage() {
         </div>
 
         {/* Filtros */}
-        <Card>
+        <Card className="bg-card/50 backdrop-blur-sm border-[var(--border)]">
           <CardHeader>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -307,11 +307,13 @@ export default function RelatoriosPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.1 }}
               >
-                <Card className="p-6 hover:shadow-lg transition-shadow">
+                <Card className="p-6 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-[var(--border)] hover:border-[var(--brand)]/30 group">
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
-                      <Icon className="h-8 w-8 text-[var(--brand)] mb-2" />
-                      <h3 className="font-bold text-lg mb-1">{report.title}</h3>
+                      <div className="p-2 rounded-lg bg-gradient-to-br from-[var(--brand-light)] to-[var(--brand-soft)] w-fit mb-2 group-hover:scale-110 transition-transform duration-300">
+                        <Icon className="h-6 w-6 text-[var(--brand)]" />
+                      </div>
+                      <h3 className="font-bold text-lg mb-1 group-hover:text-[var(--brand)] transition-colors">{report.title}</h3>
                       <p className="text-sm text-[var(--ink-muted)]">{report.description}</p>
                     </div>
                   </div>
