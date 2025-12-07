@@ -32,6 +32,7 @@ import { cn } from "@/lib/utils"
 import { motion, AnimatePresence } from "framer-motion"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
 import { supabase } from "@/lib/supabase"
 
 // Tipos para itens de menu
@@ -39,8 +40,12 @@ interface MenuItem {
   icon: React.ComponentType<{ className?: string }>
   label: string
   href: string
-  description?: string
-  badge?: React.ReactNode
+  badge?: number | string
+}
+
+interface MenuGroup {
+  label?: string
+  items: MenuItem[]
 }
 
 interface PremiumSidebarProps {
@@ -55,438 +60,364 @@ interface PremiumSidebarProps {
   }
 }
 
-// Menus por painel
-const adminMenuItems: MenuItem[] = [
+// Estrutura de menus agrupados conforme Application Shell 08
+const adminMenuGroups: MenuGroup[] = [
   {
-    icon: LayoutDashboard,
-    label: "Dashboard",
-    href: "/admin",
-    description: "Visão geral do sistema"
+    items: [
+      {
+        icon: LayoutDashboard,
+        label: "Dashboard",
+        href: "/admin",
+        badge: 5
+      }
+    ]
   },
   {
-    icon: MapPin,
-    label: "Mapa",
-    href: "/admin/mapa",
-    description: "Frota em tempo real"
+    label: "Core Pages",
+    items: [
+      {
+        icon: MapPin,
+        label: "Mapa",
+        href: "/admin/mapa"
+      },
+      {
+        icon: Navigation,
+        label: "Rotas",
+        href: "/admin/rotas"
+      },
+      {
+        icon: Building2,
+        label: "Transportadoras",
+        href: "/admin/transportadoras"
+      },
+      {
+        icon: Briefcase,
+        label: "Empresas",
+        href: "/admin/empresas"
+      },
+      {
+        icon: Users,
+        label: "Usuários",
+        href: "/admin/usuarios"
+      },
+      {
+        icon: LifeBuoy,
+        label: "Socorro",
+        href: "/admin/socorro"
+      },
+      {
+        icon: AlertTriangle,
+        label: "Alertas",
+        href: "/admin/alertas",
+        badge: 3
+      }
+    ]
   },
   {
-    icon: Navigation,
-    label: "Rotas",
-    href: "/admin/rotas",
-    description: "Gerenciar itinerários"
-  },
-  {
-    icon: Building2,
-    label: "Transportadoras",
-    href: "/admin/transportadoras",
-    description: "Gestão de transportadoras"
-  },
-  {
-    icon: Briefcase,
-    label: "Empresas",
-    href: "/admin/empresas",
-    description: "Operadores"
-  },
-  {
-    icon: Users,
-    label: "Usuários",
-    href: "/admin/usuarios",
-    description: "Gestão de usuários"
-  },
-  {
-    icon: LifeBuoy,
-    label: "Socorro",
-    href: "/admin/socorro",
-    description: "Despache de emergência"
-  },
-  {
-    icon: AlertTriangle,
-    label: "Alertas",
-    href: "/admin/alertas",
-    description: "Notificações do sistema"
-  },
-  {
-    icon: BarChart3,
-    label: "Relatórios",
-    href: "/admin/relatorios",
-    description: "Análise operacional"
-  },
-  {
-    icon: DollarSign,
-    label: "Custos",
-    href: "/admin/custos",
-    description: "Gestão financeira"
-  },
-  {
-    icon: HelpCircle,
-    label: "Ajuda & Suporte",
-    href: "/admin/ajuda-suporte",
-    description: "Central de ajuda"
+    label: "Visualization",
+    items: [
+      {
+        icon: BarChart3,
+        label: "Relatórios",
+        href: "/admin/relatorios"
+      },
+      {
+        icon: DollarSign,
+        label: "Custos",
+        href: "/admin/custos"
+      }
+    ]
   }
 ]
 
-const operadorMenuItems: MenuItem[] = [
+const operadorMenuGroups: MenuGroup[] = [
   {
-    icon: LayoutDashboard,
-    label: "Dashboard",
-    href: "/operador",
-    description: "Visão geral do operador"
+    items: [
+      {
+        icon: LayoutDashboard,
+        label: "Dashboard",
+        href: "/operador",
+        badge: 5
+      }
+    ]
   },
   {
-    icon: Users,
-    label: "Funcionários",
-    href: "/operador/funcionarios",
-    description: "Gerencie seus funcionários"
+    label: "Core Pages",
+    items: [
+      {
+        icon: Users,
+        label: "Funcionários",
+        href: "/operador/funcionarios"
+      },
+      {
+        icon: Navigation,
+        label: "Rotas",
+        href: "/operador/rotas"
+      },
+      {
+        icon: FileText,
+        label: "Histórico",
+        href: "/operador/historico-rotas"
+      },
+      {
+        icon: Building2,
+        label: "Prestadores",
+        href: "/operador/prestadores"
+      },
+      {
+        icon: FileText,
+        label: "Solicitações",
+        href: "/operador/solicitacoes"
+      },
+      {
+        icon: AlertTriangle,
+        label: "Alertas",
+        href: "/operador/alertas",
+        badge: 3
+      }
+    ]
   },
   {
-    icon: Navigation,
-    label: "Rotas",
-    href: "/operador/rotas",
-    description: "Solicitar e acompanhar rotas"
-  },
-  {
-    icon: FileText,
-    label: "Histórico de Rotas",
-    href: "/operador/historico-rotas",
-    description: "Histórico e métricas das rotas"
-  },
-  {
-    icon: Building2,
-    label: "Prestadores",
-    href: "/operador/prestadores",
-    description: "Transportadoras alocadas pela GOLF FOX"
-  },
-  {
-    icon: FileText,
-    label: "Solicitações",
-    href: "/operador/solicitacoes",
-    description: "Solicitações e mudanças para GOLF FOX"
-  },
-  {
-    icon: DollarSign,
-    label: "Custos",
-    href: "/operador/custos",
-    description: "Faturas e conciliação GOLF FOX"
-  },
-  {
-    icon: AlertTriangle,
-    label: "Alertas",
-    href: "/operador/alertas",
-    description: "Notificações do sistema"
-  },
-  {
-    icon: BarChart3,
-    label: "Relatórios",
-    href: "/operador/relatorios",
-    description: "Análise e exportação"
-  },
-  {
-    icon: Shield,
-    label: "Conformidade",
-    href: "/operador/conformidade",
-    description: "Incidentes e segurança"
-  },
-  {
-    icon: MessageSquare,
-    label: "Comunicações",
-    href: "/operador/comunicacoes",
-    description: "Broadcasts e mensagens"
-  },
-  {
-    icon: Settings,
-    label: "Preferências",
-    href: "/operador/preferencias",
-    description: "Configurações e integrações"
-  },
-  {
-    icon: HelpCircle,
-    label: "Ajuda",
-    href: "/operador/ajuda",
-    description: "Central de ajuda"
+    label: "Visualization",
+    items: [
+      {
+        icon: DollarSign,
+        label: "Custos",
+        href: "/operador/custos"
+      },
+      {
+        icon: BarChart3,
+        label: "Relatórios",
+        href: "/operador/relatorios"
+      }
+    ]
   }
 ]
 
-const transportadoraMenuItems: MenuItem[] = [
+const transportadoraMenuGroups: MenuGroup[] = [
   {
-    icon: LayoutDashboard,
-    label: "Dashboard",
-    href: "/transportadora",
-    description: "Visão geral da transportadora"
+    items: [
+      {
+        icon: LayoutDashboard,
+        label: "Dashboard",
+        href: "/transportadora",
+        badge: 5
+      }
+    ]
   },
   {
-    icon: MapPin,
-    label: "Mapa",
-    href: "/transportadora/mapa",
-    description: "Frota em tempo real"
+    label: "Core Pages",
+    items: [
+      {
+        icon: MapPin,
+        label: "Mapa",
+        href: "/transportadora/mapa"
+      },
+      {
+        icon: Truck,
+        label: "Veículos",
+        href: "/transportadora/veiculos"
+      },
+      {
+        icon: Users,
+        label: "Motoristas",
+        href: "/transportadora/motoristas"
+      },
+      {
+        icon: AlertTriangle,
+        label: "Alertas",
+        href: "/transportadora/alertas"
+      }
+    ]
   },
   {
-    icon: Truck,
-    label: "Veículos",
-    href: "/transportadora/veiculos",
-    description: "Frota da transportadora"
-  },
-  {
-    icon: Users,
-    label: "Motoristas",
-    href: "/transportadora/motoristas",
-    description: "Motoristas da transportadora"
-  },
-  {
-    icon: AlertTriangle,
-    label: "Alertas",
-    href: "/transportadora/alertas",
-    description: "Notificações"
-  },
-  {
-    icon: DollarSign,
-    label: "Custos",
-    href: "/transportadora/custos",
-    description: "Controle de custos"
-  },
-  {
-    icon: BarChart3,
-    label: "Relatórios",
-    href: "/transportadora/relatorios",
-    description: "Relatórios da transportadora"
-  },
-  {
-    icon: HelpCircle,
-    label: "Ajuda",
-    href: "/transportadora/ajuda",
-    description: "Central de ajuda"
+    label: "Visualization",
+    items: [
+      {
+        icon: DollarSign,
+        label: "Custos",
+        href: "/transportadora/custos"
+      },
+      {
+        icon: BarChart3,
+        label: "Relatórios",
+        href: "/transportadora/relatorios"
+      }
+    ]
   }
 ]
 
-// Componente de Logo Premium
-const PremiumSidebarLogo = ({ panel }: { panel: 'admin' | 'operador' | 'transportadora' }) => {
+// Logo no header do sidebar - Application Shell 08 style
+const SidebarHeader = ({ panel }: { panel: 'admin' | 'operador' | 'transportadora' }) => {
   const { open } = useSidebar()
   
-  const panelBranding = useMemo(() => {
+  const panelTitle = useMemo(() => {
     switch (panel) {
       case 'operador':
-        return { text: 'GOLF FOX', subtitle: 'Operador' }
+        return 'Operador'
       case 'transportadora':
-        return { text: 'GOLF FOX', subtitle: 'Transportadora' }
+        return 'Transportadora'
       default:
-        return { text: 'GOLF FOX', subtitle: 'Admin • Premium' }
+        return 'Administrativo'
     }
   }, [panel])
 
+  // Ícone grande estilo Application Shell 08 (usando Sparkles ou similar como placeholder)
+  const LogoIcon = () => (
+    <svg width="1em" height="1em" viewBox="0 0 328 329" fill="none" xmlns="http://www.w3.org/2000/svg" className="[&_rect]:fill-sidebar [&_rect:first-child]:fill-primary">
+      <rect y="0.5" width="328" height="328" rx="164" fill="currentColor" className="dark:fill-white fill-black" />
+      <path d="M165.018 72.3008V132.771C165.018 152.653 148.9 168.771 129.018 168.771H70.2288" stroke="white" strokeWidth="20" className="dark:stroke-black stroke-white" />
+      <path d="M166.627 265.241L166.627 204.771C166.627 184.889 182.744 168.771 202.627 168.771L261.416 168.771" stroke="white" strokeWidth="20" className="dark:stroke-black stroke-white" />
+      <line x1="238.136" y1="98.8184" x2="196.76" y2="139.707" stroke="white" strokeWidth="20" className="dark:stroke-black stroke-white" />
+      <line x1="135.688" y1="200.957" x2="94.3128" y2="241.845" stroke="white" strokeWidth="20" className="dark:stroke-black stroke-white" />
+      <line x1="133.689" y1="137.524" x2="92.5566" y2="96.3914" stroke="white" strokeWidth="20" className="dark:stroke-black stroke-white" />
+      <line x1="237.679" y1="241.803" x2="196.547" y2="200.671" stroke="white" strokeWidth="20" className="dark:stroke-black stroke-white" />
+    </svg>
+  )
+
   return (
-    <div className="px-4 py-4 mb-2">
-      <Link
-        href={panel === 'operador' ? '/operador' : panel === 'transportadora' ? '/transportadora' : '/admin'}
-        className="flex items-center gap-3 group/logo"
-        aria-label="GOLF FOX - Ir para página inicial"
-      >
-        <motion.div
-          className={cn(
-            "relative flex-shrink-0 rounded-xl flex items-center justify-center",
-            "bg-gradient-to-br from-[#F97316] to-[#FB923C]",
-            "shadow-lg shadow-orange-500/20",
-            open ? "w-12 h-12" : "w-10 h-10"
-          )}
-          animate={{
-            scale: open ? 1 : 0.9,
-          }}
-          transition={{ duration: 0.2, ease: "easeOut" }}
-          style={{ willChange: 'transform' }}
-          aria-hidden="true"
-        >
-          <span className="text-white font-bold text-lg">GF</span>
-        </motion.div>
-        
-        <AnimatePresence initial={false}>
-          {open && (
-            <motion.div
-              initial={{ opacity: 0, x: -10, width: 0 }}
-              animate={{ opacity: 1, x: 0, width: "auto" }}
-              exit={{ opacity: 0, x: -10, width: 0 }}
-              transition={{ duration: 0.2, ease: "easeOut" }}
-              className="overflow-hidden"
-            >
-              <div className="flex flex-col">
-                <span className="font-bold text-lg text-foreground leading-tight">
-                  {panelBranding.text}
-                </span>
-                <span className="text-xs text-muted-foreground leading-tight">
-                  {panelBranding.subtitle}
-                </span>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </Link>
+    <div className="flex flex-col gap-2 p-2">
+      <ul className="flex w-full min-w-0 flex-col gap-1">
+        <li className="group/menu-item relative">
+          <Link
+            href={panel === 'operador' ? '/operador' : panel === 'transportadora' ? '/transportadora' : '/admin'}
+            className={cn(
+              "peer/menu-button flex w-full items-center overflow-hidden rounded-md p-2 text-left outline-hidden",
+              "transition-[width,height,padding] focus-visible:ring-2",
+              "h-12 text-sm gap-2.5 !bg-transparent",
+              "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+              "[&>svg]:size-8",
+              open ? "gap-2.5" : "justify-center [&>svg]:size-8"
+            )}
+          >
+            <LogoIcon />
+            <AnimatePresence initial={false}>
+              {open && (
+                <motion.span
+                  initial={{ opacity: 0, width: 0 }}
+                  animate={{ opacity: 1, width: "auto" }}
+                  exit={{ opacity: 0, width: 0 }}
+                  transition={{ duration: 0.15 }}
+                  className="text-xl font-semibold text-sidebar-foreground truncate"
+                >
+                  {panelTitle}
+                </motion.span>
+              )}
+            </AnimatePresence>
+          </Link>
+        </li>
+      </ul>
     </div>
   )
 }
 
-// Componente de Link Premium com animações
-const PremiumSidebarLink = ({
-  item,
-  panel,
-  index
-}: {
-  item: MenuItem
-  panel: 'admin' | 'operador' | 'transportadora'
-  index: number
-}) => {
+// Item de menu individual
+const MenuItem = ({ item, index }: { item: MenuItem; index: number }) => {
   const pathname = usePathname()
   const router = useRouter()
   const { open } = useSidebar()
   const Icon = item.icon
-  const [isHovered, setIsHovered] = React.useState(false)
-
-  const isDashboard = item.href === "/admin" || item.href === "/operador" || item.href === "/transportadora"
-  const isActive = isDashboard
-    ? pathname === item.href
-    : pathname === item.href || pathname?.startsWith(item.href + "/")
-
+  
+  const isActive = pathname === item.href || pathname?.startsWith(item.href + "/")
   const showOperationalAlerts = item.href.includes("/alertas")
 
-  const handleClick = (e: React.MouseEvent | React.KeyboardEvent) => {
-    e.preventDefault()
-    router.push(item.href)
-    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
-      const event = new CustomEvent('close-sidebar')
-      window.dispatchEvent(event)
-    }
-  }
-
   return (
-    <motion.div
-      initial={{ opacity: 0, x: -20 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ 
-        duration: 0.3, 
-        delay: index * 0.03,
-        ease: [0.25, 0.46, 0.45, 0.94]
-      }}
-      onHoverStart={() => setIsHovered(true)}
-      onHoverEnd={() => setIsHovered(false)}
-      className="relative group/item"
-    >
+    <li className="group/menu-item relative">
       <Link
         href={item.href}
-        prefetch={true}
-        onClick={handleClick}
-                 className={cn(
-                   "relative flex items-center gap-3 rounded-xl transition-all duration-300",
-                   "min-h-[48px] touch-manipulation px-4 py-2.5",
-                   "group/link bg-card",
-                   isActive
-                     ? "bg-gradient-to-r from-orange-50 to-orange-100/50 dark:from-orange-900/20 dark:to-orange-900/10 text-orange-600 dark:text-orange-400 shadow-sm shadow-orange-500/10"
-                     : "text-foreground/80 hover:bg-muted/50 active:bg-muted"
-                 )}
-        onMouseEnter={() => router.prefetch(item.href)}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            handleClick(e)
-          }
-        }}
-        aria-current={isActive ? "page" : undefined}
-        aria-label={item.description ? `${item.label} - ${item.description}` : item.label}
-        role="menuitem"
-        tabIndex={0}
-      >
-        {/* Indicador de item ativo */}
-        {isActive && (
-          <motion.div
-            layoutId="activeIndicator"
-            className={cn(
-              "absolute left-0 top-0 bottom-0 w-1.5 rounded-r-full",
-              "bg-gradient-to-b from-orange-500 via-orange-500 to-orange-400",
-              "shadow-sm shadow-orange-500/50"
-            )}
-            initial={false}
-            transition={{
-              type: "spring",
-              stiffness: 500,
-              damping: 30
-            }}
-            style={{ willChange: 'transform' }}
-          />
+        className={cn(
+          "peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-hidden",
+          "transition-[width,height,padding] focus-visible:ring-2",
+          "group-has-[data-sidebar=menu-action]/menu-item:pr-8",
+          "h-8 text-sm relative",
+          "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+          "[&>svg]:size-4 [&>svg]:shrink-0",
+          isActive && "bg-sidebar-accent text-sidebar-accent-foreground font-medium",
+          !open && "justify-center [&>svg]:size-4"
         )}
-
-        {/* Ícone */}
-        <div className="relative flex-shrink-0">
-          <motion.div
-            animate={{
-              scale: isHovered && !isActive ? 1.1 : 1,
-              rotate: isHovered && !isActive ? 5 : 0,
-            }}
-            transition={{ duration: 0.2, ease: "easeOut" }}
-            style={{ willChange: 'transform' }}
-          >
-            <Icon
-              className={cn(
-                "h-5 w-5 transition-all duration-200 flex-shrink-0",
-                "stroke-[2px]",
-                isActive
-                  ? "text-orange-600 dark:text-orange-400 drop-shadow-sm"
-                  : "text-gray-500 dark:text-gray-400 group-hover/link:text-orange-500 dark:group-hover/link:text-orange-400"
-              )}
-            />
-          </motion.div>
-          
-          {/* Badge de alertas */}
-          {showOperationalAlerts && open && (
-            <div className="absolute -top-1 -right-1">
-              <OperationalAlertsBadge />
-            </div>
-          )}
-        </div>
-
-        {/* Label e descrição */}
+        data-active={isActive}
+      >
+        <Icon className="shrink-0" />
         <AnimatePresence initial={false}>
           {open && (
-            <motion.div
+            <motion.span
               initial={{ opacity: 0, width: 0 }}
               animate={{ opacity: 1, width: "auto" }}
               exit={{ opacity: 0, width: 0 }}
-              transition={{ duration: 0.15, ease: "easeOut" }}
-              className="flex-1 min-w-0 overflow-hidden"
+              transition={{ duration: 0.15 }}
+              className="truncate flex-1 [&:last-child]:truncate"
             >
-              <div className="flex flex-col">
-                <span
-                  className={cn(
-                    "text-sm font-medium leading-tight transition-colors",
-                         isActive
-                           ? "text-orange-600 dark:text-orange-400"
-                           : "text-foreground group-hover/link:text-foreground"
-                  )}
-                >
-                  {item.label}
-                </span>
-                         {item.description && (
-                           <span className="text-xs text-muted-foreground mt-0.5 line-clamp-1">
-                             {item.description}
-                           </span>
-                         )}
-              </div>
-            </motion.div>
+              {item.label}
+            </motion.span>
           )}
         </AnimatePresence>
-
-        {/* Indicador de hover */}
-        <motion.div
-          className="absolute inset-0 rounded-xl bg-gradient-to-r from-orange-500/5 to-transparent opacity-0 group-hover/link:opacity-100 transition-opacity duration-300"
-          initial={false}
-          aria-hidden="true"
-        />
+        
+        {/* Badge - Application Shell 08 style */}
+        {item.badge && open && (
+          <div className={cn(
+            "text-sidebar-foreground pointer-events-none absolute right-1 top-1.5 flex h-5 min-w-5 items-center justify-center px-1 text-xs font-medium tabular-nums select-none",
+            "bg-primary/10 rounded-full",
+            "peer-hover/menu-button:text-sidebar-accent-foreground",
+            "peer-data-[active=true]/menu-button:text-sidebar-accent-foreground"
+          )}>
+            {item.badge}
+          </div>
+        )}
       </Link>
-    </motion.div>
+      
+      {/* Operational Alerts Badge */}
+      {showOperationalAlerts && open && (
+        <div className="absolute -top-1 -right-1">
+          <OperationalAlertsBadge />
+        </div>
+      )}
+    </li>
   )
 }
 
-// Componente de Perfil do Usuário
-const PremiumUserProfile = ({ 
-  user, 
-  panel 
-}: { 
-  user?: PremiumSidebarProps['user']
-  panel: 'admin' | 'operador' | 'transportadora'
-}) => {
+// Grupo de menu com label
+const MenuGroup = ({ group }: { group: MenuGroup }) => {
+  const { open } = useSidebar()
+  
+  return (
+    <div className="relative flex w-full min-w-0 flex-col p-2">
+      {group.label && open && (
+        <div className="text-sidebar-foreground/70 flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-medium">
+          {group.label}
+        </div>
+      )}
+      <div className="w-full text-sm">
+        <ul className="flex w-full min-w-0 flex-col gap-1">
+          {group.items.map((item, index) => (
+            <MenuItem key={item.href} item={item} index={index} />
+          ))}
+        </ul>
+      </div>
+    </div>
+  )
+}
+
+// Footer com promoção Premium (opcional)
+const SidebarFooter = () => {
+  const { open } = useSidebar()
+  
+  return (
+    <div className={cn("flex flex-col gap-2 p-2", !open && "hidden")}>
+      <div className="flex flex-col items-start gap-4 overflow-hidden rounded-md p-2">
+        <p className="truncate text-xl font-semibold">Go to Premium</p>
+        <p className="line-clamp-2 text-sm text-sidebar-foreground/70">
+          Explore premium features and advanced analytics
+        </p>
+        <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90 h-9">
+          Upgrade
+        </Button>
+      </div>
+    </div>
+  )
+}
+
+// Perfil do usuário
+const UserProfile = ({ user }: { user?: PremiumSidebarProps['user'] }) => {
   const { open } = useSidebar()
   const router = useRouter()
   const [isLoggingOut, setIsLoggingOut] = React.useState(false)
@@ -513,94 +444,73 @@ const PremiumUserProfile = ({
       .toUpperCase()
   }
 
-  return (
-    <div className="px-4 py-4 mt-auto border-t border-border bg-card">
-      <AnimatePresence initial={false}>
-        {open ? (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 10 }}
-            transition={{ duration: 0.2 }}
-            className="space-y-3 bg-card"
-          >
-            {/* Informações do usuário */}
-            <div className="flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-muted/50 transition-colors bg-card">
-              <Avatar className="h-10 w-10 border-2 border-orange-200 dark:border-orange-900">
-                <AvatarImage src={user?.avatar_url} alt={user?.name || 'User'} />
-                <AvatarFallback className="bg-gradient-to-br from-orange-500 to-orange-600 text-white font-semibold">
-                  {getUserInitials(user?.name)}
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-foreground truncate">
-                  {user?.name || 'Usuário'}
-                </p>
-                <p className="text-xs text-muted-foreground truncate">
-                  {user?.email || 'email@exemplo.com'}
-                </p>
-              </div>
-            </div>
+  if (!open) {
+    return (
+      <div className="flex justify-center p-2">
+        <Avatar className="h-8 w-8 border-2 border-sidebar-border">
+          <AvatarImage src={user?.avatar_url} alt={user?.name || 'User'} />
+          <AvatarFallback className="bg-gradient-to-br from-orange-500 to-orange-600 text-white text-xs">
+            {getUserInitials(user?.name)}
+          </AvatarFallback>
+        </Avatar>
+      </div>
+    )
+  }
 
-            {/* Botão de logout */}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleLogout}
-              disabled={isLoggingOut}
-              className="w-full justify-start text-foreground/80 hover:text-orange-600 dark:hover:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-900/20 bg-card"
-            >
-              <LogOut className="h-4 w-4 mr-2" />
-              {isLoggingOut ? 'Saindo...' : 'Sair'}
-            </Button>
-          </motion.div>
-        ) : (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.15 }}
-            className="flex justify-center bg-card"
-          >
-            <Avatar className="h-10 w-10 border-2 border-orange-200 dark:border-orange-900">
-              <AvatarImage src={user?.avatar_url} alt={user?.name || 'User'} />
-              <AvatarFallback className="bg-gradient-to-br from-orange-500 to-orange-600 text-white font-semibold text-sm">
-                {getUserInitials(user?.name)}
-              </AvatarFallback>
-            </Avatar>
-          </motion.div>
-        )}
-      </AnimatePresence>
+  return (
+    <div className="flex flex-col gap-2 p-2 border-t border-sidebar-border">
+      <div className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-sidebar-accent transition-colors">
+        <Avatar className="h-8 w-8 border-2 border-sidebar-border">
+          <AvatarImage src={user?.avatar_url} alt={user?.name || 'User'} />
+          <AvatarFallback className="bg-gradient-to-br from-orange-500 to-orange-600 text-white text-xs">
+            {getUserInitials(user?.name)}
+          </AvatarFallback>
+        </Avatar>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-medium text-sidebar-foreground truncate">
+            {user?.name || 'Usuário'}
+          </p>
+          <p className="text-xs text-sidebar-foreground/70 truncate">
+            {user?.email || 'email@exemplo.com'}
+          </p>
+        </div>
+      </div>
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={handleLogout}
+        disabled={isLoggingOut}
+        className="w-full justify-start h-8 hover:bg-sidebar-accent"
+      >
+        <LogOut className="h-4 w-4 mr-2" />
+        {isLoggingOut ? 'Saindo...' : 'Sair'}
+      </Button>
     </div>
   )
 }
 
-// Componente principal Premium Sidebar
-export function PremiumSidebar({ 
-  isOpen = false, 
-  isMobile = false, 
-  panel = 'admin', 
-  user 
+// Componente principal
+export function PremiumSidebar({
+  isOpen = false,
+  isMobile = false,
+  panel = 'admin',
+  user
 }: PremiumSidebarProps) {
-  const pathname = usePathname()
   const router = useRouter()
   
-  // Selecionar menu baseado no painel
-  const menuItems = useMemo(() => {
+  const menuGroups = useMemo(() => {
     switch (panel) {
       case 'operador':
-        return operadorMenuItems
+        return operadorMenuGroups
       case 'transportadora':
-        return transportadoraMenuItems
+        return transportadoraMenuGroups
       default:
-        return adminMenuItems
+        return adminMenuGroups
     }
   }, [panel])
 
-  // Estado interno para controle
   const [internalOpen, setInternalOpen] = React.useState(isMobile ? isOpen : false)
 
-  // Sincronização com controle externo (mobile)
   useEffect(() => {
     if (isMobile) {
       setInternalOpen(isOpen)
@@ -609,12 +519,13 @@ export function PremiumSidebar({
     }
   }, [isOpen, isMobile])
 
-  // Prefetch das rotas
   useEffect(() => {
-    for (const item of menuItems) {
-      router.prefetch(item.href)
-    }
-  }, [menuItems, router])
+    menuGroups.forEach(group => {
+      group.items.forEach(item => {
+        router.prefetch(item.href)
+      })
+    })
+  }, [menuGroups, router])
 
   return (
     <UISidebar
@@ -624,7 +535,7 @@ export function PremiumSidebar({
     >
       <SidebarBody
         className={cn(
-          "flex flex-col bg-card border-r border-border",
+          "flex flex-col bg-sidebar border-r border-sidebar-border",
           !isMobile && "top-16 sm:top-18 left-0 h-[calc(100vh-4rem)] sm:h-[calc(100vh-4.5rem)] z-50",
           isMobile && "w-[280px] sm:w-[300px]",
           "!px-0 !py-0"
@@ -632,31 +543,22 @@ export function PremiumSidebar({
         role="complementary"
         aria-label="Barra lateral de navegação"
       >
-        {/* Logo */}
-        <PremiumSidebarLogo panel={panel} />
+        {/* Header */}
+        <SidebarHeader panel={panel} />
 
-        {/* Navegação */}
-        <div className="flex-1 overflow-y-auto overflow-x-hidden px-3 pb-4">
-          <nav 
-            className="flex flex-col gap-1" 
-            role="navigation" 
-            aria-label={`Menu de navegação - ${panel === 'operador' ? 'Operador' : panel === 'transportadora' ? 'Transportadora' : 'Administrativo'}`}
-          >
-            {menuItems.map((item, index) => (
-              <PremiumSidebarLink
-                key={item.href}
-                item={item}
-                panel={panel}
-                index={index}
-              />
-            ))}
-          </nav>
+        {/* Content */}
+        <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-auto">
+          {menuGroups.map((group, groupIndex) => (
+            <MenuGroup key={groupIndex} group={group} />
+          ))}
         </div>
 
-        {/* Perfil do usuário */}
-        <PremiumUserProfile user={user} panel={panel} />
+        {/* Footer Premium (opcional) */}
+        <SidebarFooter />
+
+        {/* User Profile */}
+        <UserProfile user={user} />
       </SidebarBody>
     </UISidebar>
   )
 }
-

@@ -163,7 +163,7 @@ export const AppShell = memo(function AppShell({ user, children, panel }: AppShe
       {/* Container Principal */}
       <div className={cn(
         "flex relative w-full",
-        isMobile ? "flex-col pt-16" : "flex-row pt-16 sm:pt-18"
+        isMobile ? "flex-col" : "flex-row"
       )}>
         {/* Mobile Overlay */}
         {isMobile && isSidebarOpen && (
@@ -189,10 +189,10 @@ export const AppShell = memo(function AppShell({ user, children, panel }: AppShe
         {/* Main Content */}
         <main
           className={cn(
-            "min-h-[calc(100vh-4rem)] sm:min-h-[calc(100vh-4.5rem)] transition-all duration-300 ease-in-out",
-            isMobile ? "overflow-visible" : "overflow-y-auto",
+            "min-h-screen transition-all duration-300 ease-in-out",
+            isMobile ? "overflow-visible pt-20" : "overflow-y-auto pt-28",
             "overflow-x-visible bg-[var(--bg)] pb-12 sm:pb-14",
-            !isMobile ? "flex-1 md:ml-[60px]" : "w-full ml-0 flex-shrink-0",
+            !isMobile ? "flex-1 md:ml-[64px]" : "w-full ml-0 flex-shrink-0",
             "w-full",
             "relative z-10"
           )}
