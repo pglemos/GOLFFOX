@@ -16,7 +16,8 @@ import {
   Navigation,
   Sparkles,
   Trash2,
-  Building2
+  Building2,
+  Filter
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -45,6 +46,13 @@ export function RotasPageContent() {
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedRoute, setSelectedRoute] = useState<any>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [filtersOpen, setFiltersOpen] = useState(false)
+  const [filters, setFilters] = useState<Record<string, string>>({
+    company: "",
+    status: "",
+    date: ""
+  })
+  const [rotasLoading, setRotasLoading] = useState(false)
 
   useEffect(() => {
     if (!loading && user) {
