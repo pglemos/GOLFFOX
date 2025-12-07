@@ -17,6 +17,12 @@ let nextConfig = {
   // Turbopack oferece performance superior com cache incremental
   // Configuração explícita do Turbopack para silenciar warning
   turbopack: {},
+  
+  // Configuração SWC: Fallback para WASM se binário nativo falhar
+  // Para forçar WASM, defina NEXT_SWC_WASM=true nas variáveis de ambiente
+  // O binário nativo (@next/swc-win32-x64-msvc) é preferido para melhor performance
+  // WASM é mais lento mas funciona como fallback se o binário nativo não carregar
+  swcMinify: true,
   async headers() {
     return [
       {
@@ -82,6 +88,9 @@ let nextConfig = {
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
     NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
     NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,
+    // SWC: Next.js automaticamente usa WASM como fallback se o binário nativo falhar
+    // Para forçar WASM (mais lento mas mais compatível), defina NEXT_SWC_WASM=true
+    // O binário nativo (@next/swc-win32-x64-msvc) é preferido para melhor performance
   },
   images: {
     remotePatterns: [
