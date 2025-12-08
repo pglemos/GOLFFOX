@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requireAuth } from '@/lib/api-auth'
+import { invalidateEntityCache } from '@/lib/next-cache'
 
 export const runtime = 'nodejs'
 
@@ -79,6 +80,9 @@ export async function PUT(
         { status: 500 }
       )
     }
+
+    // Invalidar cache após atualização
+    await invalidateEntityCache('alert', alertId)
 
     return NextResponse.json({
       success: true,

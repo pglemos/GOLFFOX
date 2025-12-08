@@ -6,6 +6,7 @@
 import { logger } from '@/lib/logger'
 import { CompanyRepository, type Company as CompanyEntity } from '@/lib/repositories'
 import { withCache, cacheService } from '@/lib/cache/cache.service'
+import { cacheDataFetch } from '@/lib/react-cache'
 
 export interface CompanyFilters {
   isActive?: boolean
@@ -126,13 +127,30 @@ export class CompanyService {
 
   /**
    * Buscar empresa por ID
+   * Usa cache() do React para memoização automática por request
    */
+  private static getCompanyByIdCached = cacheDataFetch(
+    async (companyId: string): Promise<Company | null> => {
+      return await companyRepository.findById(companyId)
+    },
+    'getCompanyById'
+  )
+
   static async getCompanyById(companyId: string): Promise<Company | null> {
     try {
+      // Usar cache do React para memoização por request
+      // Também manter cache em memória para requests subsequentes
       const cacheKey = `companies:${companyId}`
-      return await withCache(cacheKey, async () => {
-        return await companyRepository.findById(companyId)
-      }, 5 * 60 * 1000) // Cache de 5 minutos
+      const cached = cacheService.get<Company | null>(cacheKey)
+      if (cached !== null) {
+        return cached
+      }
+
+      const company = await this.getCompanyByIdCached(companyId)
+      if (company) {
+        cacheService.set(cacheKey, company, 5 * 60 * 1000) // Cache de 5 minutos
+      }
+      return company
     } catch (error) {
       logger.error('Erro ao buscar empresa por ID', { error, companyId })
       throw error

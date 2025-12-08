@@ -1,9 +1,14 @@
 /**
  * Cache Service
  * Camada de cache para otimizar rotas pesadas
+ * 
+ * NOTA: Este serviço mantém cache em memória para casos específicos.
+ * Para cache persistente entre requests, use unstable_cache do Next.js
+ * através do wrapper createNextCache().
  */
 
 import { logger } from '@/lib/logger'
+import { unstable_cache } from 'next/cache'
 
 interface CacheEntry<T> {
   data: T
@@ -142,6 +147,7 @@ export function cached(key: string, ttl: number = 5 * 60 * 1000) {
 
 /**
  * Helper para cachear resultado de função assíncrona
+ * Usa cache em memória (apenas durante o request)
  */
 export async function withCache<T>(
   key: string,
@@ -159,4 +165,56 @@ export async function withCache<T>(
 
   return result
 }
+
+/**
+ * Criar função cacheada usando unstable_cache do Next.js
+ * Use para cache persistente entre requests (server-side)
+ * 
+ * @example
+ * const getCachedData = createNextCache(
+ *   async (id: string) => {
+ *     return await fetchData(id)
+ *   },
+ *   ['data'],
+ *   { revalidate: 3600 }
+ * )
+ */
+export function createNextCache<T extends (...args: any[]) => Promise<any>>(
+  fn: T,
+  tags: string[] = [],
+  options: {
+    revalidate?: number | false
+  } = {}
+): T {
+  return ((...args: Parameters<T>) => {
+    const cacheKey = `${fn.name || 'cached'}:${JSON.stringify(args)}`
+    return unstable_cache(
+      async () => fn(...args),
+      [cacheKey],
+      {
+        tags,
+        revalidate: options.revalidate ?? 3600, // 1 hora padrão
+      }
+    )()
+  }) as T
+}
+
+/**
+ * Quando usar cada abordagem de cache:
+ * 
+ * 1. withCache() - Cache em memória durante o request
+ *    - Use para evitar chamadas duplicadas dentro do mesmo request
+ *    - Não persiste entre requests
+ *    - Ideal para: Server Components, Route Handlers
+ * 
+ * 2. createNextCache() - Cache persistente do Next.js
+ *    - Use para cache que deve persistir entre requests
+ *    - Integrado com revalidateTag() e revalidatePath()
+ *    - Ideal para: Dados que mudam raramente, queries de banco pesadas
+ * 
+ * 3. cache() do React - Memoização por request
+ *    - Use em Server Components para evitar work duplicado
+ *    - Automático, não precisa de chaves
+ *    - Ideal para: Funções de fetch em Server Components
+ */
 

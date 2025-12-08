@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requireAuth } from '@/lib/api-auth'
+import { invalidateEntityCache } from '@/lib/next-cache'
 
 export const runtime = 'nodejs'
 
@@ -145,6 +146,9 @@ export async function PUT(
       )
     }
 
+    // Invalidar cache após atualização
+    await invalidateEntityCache('company', companyId)
+
     return NextResponse.json({
       success: true,
       company: updatedCompany
@@ -245,6 +249,9 @@ export async function DELETE(
         )
       }
 
+      // Invalidar cache após arquivamento
+      await invalidateEntityCache('company', companyId)
+
       return NextResponse.json({
         success: true,
         archived: true,
@@ -269,6 +276,9 @@ export async function DELETE(
           { status: 500 }
         )
       }
+
+      // Invalidar cache após exclusão
+      await invalidateEntityCache('company', companyId)
 
       return NextResponse.json({
         success: true,

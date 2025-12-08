@@ -49,6 +49,9 @@ export const viewport = {
   viewportFit: "cover", // Para dispositivos com notch
 };
 
+// Next.js 16: Partial Pre-Rendering (PPR) habilitado via cacheComponents no next.config.js
+// Renderização incremental para melhor performance e navegação instantânea
+
 export default function RootLayout({
   children,
 }: Readonly<{

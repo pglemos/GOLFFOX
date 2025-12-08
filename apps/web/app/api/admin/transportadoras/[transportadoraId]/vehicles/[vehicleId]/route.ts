@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseServiceRole } from '@/lib/supabase-server'
+import { invalidateEntityCache } from '@/lib/next-cache'
 
 // PUT /api/admin/transportadoras/[transportadoraId]/vehicles/[vehicleId]
 export async function PUT(
@@ -67,6 +68,9 @@ export async function PUT(
       )
     }
 
+    // Invalidar cache após atualização
+    await invalidateEntityCache('vehicle', vehicleId)
+
     return NextResponse.json({ success: true, vehicle })
   } catch (error: any) {
     console.error('Erro na API de atualizar veículo:', error)
@@ -108,6 +112,9 @@ export async function DELETE(
         { status: 500 }
       )
     }
+
+    // Invalidar cache após exclusão
+    await invalidateEntityCache('vehicle', vehicleId)
 
     return NextResponse.json({ success: true })
   } catch (error: any) {

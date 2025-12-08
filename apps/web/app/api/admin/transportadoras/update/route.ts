@@ -3,6 +3,7 @@ import { supabaseServiceRole } from '@/lib/supabase-server'
 import { requireAuth } from '@/lib/api-auth'
 import { z } from 'zod'
 import { CarrierUpdate } from '@/types/carrier'
+import { invalidateEntityCache } from '@/lib/next-cache'
 
 export const runtime = 'nodejs'
 
@@ -92,6 +93,9 @@ export async function PUT(req: NextRequest) {
         { status: 500 }
       )
     }
+
+    // Invalidar cache após atualização
+    await invalidateEntityCache('carrier', carrierId)
 
     return NextResponse.json({
       success: true,
