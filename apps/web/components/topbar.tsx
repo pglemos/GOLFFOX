@@ -208,7 +208,7 @@ export function Topbar({
 
   return (
     <header className={cn(
-      "before:bg-background/60 sticky top-0 z-50 before:absolute before:inset-0 before:mask-[linear-gradient(var(--card),var(--card)_18%,transparent_100%)] before:backdrop-blur-md",
+      "before:bg-background/60 sticky top-0 z-50 before:absolute before:inset-0 before:mask-[linear-gradient(var(--card),var(--card)_18%,transparent_100%)] before:backdrop-blur-md before:z-[-1]",
       // Mobile: header compacto sem backdrop blur
       isMobile && "before:hidden bg-card border-b shadow-sm safe-top"
     )}>
