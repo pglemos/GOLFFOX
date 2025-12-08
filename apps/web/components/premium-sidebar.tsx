@@ -280,19 +280,7 @@ const SidebarHeader = ({ panel }: { panel: 'admin' | 'operador' | 'transportador
             )}
           >
             <LogoIcon />
-            <AnimatePresence initial={false}>
-              {open && (
-                <motion.span
-                  initial={{ opacity: 0, width: 0 }}
-                  animate={{ opacity: 1, width: "auto" }}
-                  exit={{ opacity: 0, width: 0 }}
-                  transition={{ duration: 0.15 }}
-                  className="text-xl font-semibold truncate"
-                >
-                  Analytics
-                </motion.span>
-              )}
-            </AnimatePresence>
+            <span className="text-xl font-semibold">Analytics</span>
           </Link>
         </li>
       </ul>
