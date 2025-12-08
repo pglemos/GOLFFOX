@@ -208,68 +208,51 @@ export function Topbar({
   }, [setIsCommandPaletteOpen])
 
   return (
-    <header className={cn(
-      "before:bg-background/60 sticky top-0 z-50 before:absolute before:inset-0 before:mask-[linear-gradient(var(--card),var(--card)_18%,transparent_100%)] before:backdrop-blur-md",
-      // Mobile: header compacto sem backdrop blur
-      isMobile && "before:hidden bg-card border-b shadow-sm safe-top"
-    )}>
+    <header 
+      className={cn(
+        "before:bg-background/60 sticky top-0 z-50 before:absolute before:inset-0 before:mask-[linear-gradient(var(--card),var(--card)_18%,transparent_100%)] before:backdrop-blur-md",
+        // Mobile: header compacto sem backdrop blur
+        isMobile && "before:hidden bg-card border-b shadow-sm"
+      )}
+    >
       <div className={cn(
-        "bg-card relative z-51 flex items-center justify-between",
+        "bg-card relative z-51 mx-auto mt-6 flex w-[calc(100%-2rem)] items-center justify-between rounded-xl border px-6 py-2 shadow-sm sm:w-[calc(100%-3rem)]",
         // Mobile: full width, padding menor, altura fixa 56px
-        isMobile 
-          ? "w-full px-3 py-2 h-14 border-b" 
-          : "mx-auto mt-6 w-[calc(100%-2rem)] rounded-xl border px-6 py-2 shadow-sm sm:w-[calc(100%-3rem)]"
+        isMobile && "w-full px-3 py-2 h-14 border-b mt-0"
       )}>
         {/* Left Section - Exatamente como Application Shell 08 */}
         <div className="flex items-center gap-1.5 sm:gap-4">
-          {/* SidebarTrigger - Application Shell 08 style */}
-          {sidebarControl ? (
-            <button
-              onClick={() => sidebarControl.toggle()}
-              data-sidebar="trigger"
-              data-slot="sidebar-trigger"
-              className={cn(
-                "inline-flex shrink-0 items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap transition-all outline-none focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
-                "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
-                isMobile ? "size-10" : "size-7 [&_svg]:!size-5"
-              )}
-            >
-              <PanelLeft className={isMobile ? "h-6 w-6" : "h-5 w-5"} />
-              <span className="sr-only">Toggle Sidebar</span>
-            </button>
-          ) : (
-            <button
-              onClick={() => {
-                if (onToggleSidebar) {
-                  onToggleSidebar()
-                }
-              }}
-              data-sidebar="trigger"
-              data-slot="sidebar-trigger"
-              className={cn(
-                "inline-flex shrink-0 items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap transition-all outline-none focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
-                "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
-                "touch-manipulation",
-                isMobile 
-                  ? "size-10" 
-                  : "size-7 [&_svg]:!size-5"
-              )}
-              aria-label="Toggle Sidebar"
-            >
-              <PanelLeft className={isMobile ? "h-6 w-6" : "h-5 w-5"} />
-              <span className="sr-only">Toggle Sidebar</span>
-            </button>
-          )}
+          {/* SidebarTrigger - EXATAMENTE como Application Shell 08 */}
+          <button
+            onClick={() => {
+              if (sidebarControl) {
+                sidebarControl.toggle()
+              } else if (onToggleSidebar) {
+                onToggleSidebar()
+              }
+            }}
+            data-slot="sidebar-trigger"
+            className={cn(
+              "focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive inline-flex shrink-0 items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap transition-all outline-none focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
+              isMobile ? "size-10" : "size-7 [&_svg]:!size-5"
+            )}
+            data-sidebar="trigger"
+          >
+            <PanelLeft className={isMobile ? "h-6 w-6" : "h-5 w-5"} />
+            <span className="sr-only">Toggle Sidebar</span>
+          </button>
 
-          {/* Separator vertical - Application Shell 08 style */}
+          {/* Separator vertical - EXATAMENTE como Application Shell 08 */}
           {!isMobile && (
-            <Separator 
-              orientation="vertical" 
-              className="hidden !h-4 sm:block md:max-lg:hidden" 
+            <div 
+              data-orientation="vertical" 
+              role="none" 
+              data-slot="separator" 
+              className="bg-border shrink-0 data-[orientation=horizontal]:h-px data-[orientation=horizontal]:w-full data-[orientation=vertical]:h-full data-[orientation=vertical]:w-px hidden !h-4 sm:block md:max-lg:hidden"
             />
           )}
 
-          {/* Command Palette - Application Shell 08 structure */}
+          {/* Command Palette - EXATAMENTE como Application Shell 08 */}
           {!isMobile && (
             <div>
               <Dialog open={isCommandPaletteOpen} onOpenChange={setIsCommandPaletteOpen}>
@@ -277,7 +260,8 @@ export function Topbar({
                   {/* Desktop: Button com texto "Type to search..." */}
                   <DialogTrigger asChild>
                     <button
-                      className="shrink-0 items-center justify-center gap-2 rounded-md text-sm whitespace-nowrap transition-all outline-none focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50 h-9 has-[>svg]:px-3 hidden !bg-transparent px-1 py-0 font-normal sm:block md:max-lg:hidden"
+                      data-slot="button"
+                      className="focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive shrink-0 items-center justify-center gap-2 rounded-md text-sm whitespace-nowrap transition-all outline-none focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50 h-9 has-[>svg]:px-3 hidden !bg-transparent px-1 py-0 font-normal sm:block md:max-lg:hidden"
                     >
                       <div className="text-muted-foreground hidden items-center gap-1.5 text-sm sm:flex md:max-lg:hidden">
                         <Search className="h-4 w-4" />
@@ -288,7 +272,8 @@ export function Topbar({
                   {/* Tablet: Button apenas com ícone */}
                   <DialogTrigger asChild>
                     <button
-                      className="inline-flex shrink-0 items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap transition-all outline-none focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50 size-9 sm:hidden md:max-lg:inline-flex"
+                      data-slot="button"
+                      className="focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive inline-flex shrink-0 items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap transition-all outline-none focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50 size-9 sm:hidden md:max-lg:inline-flex"
                       aria-label="Search"
                     >
                       <Search className="h-4 w-4" />
@@ -297,10 +282,10 @@ export function Topbar({
                   </DialogTrigger>
                 </div>
                 <DialogContent className="max-w-lg">
-                  <DialogHeader className="sr-only">
-                    <DialogTitle>Command Palette</DialogTitle>
-                    <DialogDescription>Search for a command to run...</DialogDescription>
-                  </DialogHeader>
+                  <div data-slot="dialog-header" className="flex flex-col gap-2 text-center sm:text-left sr-only">
+                    <DialogTitle data-slot="dialog-title" className="text-lg leading-none font-semibold">Command Palette</DialogTitle>
+                    <DialogDescription data-slot="dialog-description" className="text-muted-foreground text-sm">Search for a command to run...</DialogDescription>
+                  </div>
                   <div className="mt-4">
                     <Input
                       type="search"
@@ -319,70 +304,62 @@ export function Topbar({
 
         {/* Right Actions - Mobile: Menu compacto */}
         <div className="flex items-center gap-1 sm:gap-1.5">
-          {/* Desktop: Ações completas */}
+          {/* Desktop: Ações completas - EXATAMENTE como Application Shell 08 */}
           {!isMobile && (
             <>
-              <Button 
-                variant="ghost" 
-                size="icon"
-                className="size-9 hover:bg-accent hover:text-accent-foreground" 
+              <button 
+                data-slot="button"
+                type="button"
+                className="focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive inline-flex shrink-0 items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap transition-all outline-none focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50 size-9"
                 aria-label="Share"
               >
                 <Share2 className="h-4 w-4" />
-              </Button>
-              <Button 
-                variant="ghost" 
-                size="icon"
-                className="size-9 hover:bg-accent hover:text-accent-foreground" 
+              </button>
+              <button 
+                data-slot="button"
+                type="button"
+                className="focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive inline-flex shrink-0 items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap transition-all outline-none focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50 size-9"
                 aria-label="Languages"
               >
                 <Languages className="h-4 w-4" />
-              </Button>
-              <Button 
-                variant="ghost" 
-                size="icon"
-                className="size-9 hover:bg-accent hover:text-accent-foreground" 
+              </button>
+              <button 
+                data-slot="button"
+                type="button"
+                aria-haspopup="dialog"
+                className="focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive inline-flex shrink-0 items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap transition-all outline-none focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50 size-9"
                 aria-label="Activity"
               >
                 <Activity className="h-4 w-4" />
-              </Button>
+              </button>
             </>
           )}
 
           {/* Operational Alerts - Sempre visível */}
           <OperationalAlertsNotification />
 
-          {/* Notifications - Sempre visível */}
-          <Button 
-            variant="ghost" 
-            size="icon"
+          {/* Notifications - EXATAMENTE como Application Shell 08 */}
+          <button 
+            data-slot="button"
+            type="button"
             className={cn(
-              "touch-manipulation relative",
-              isMobile ? "size-10" : "size-9 hover:bg-accent hover:text-accent-foreground"
+              "focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive inline-flex shrink-0 items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap transition-all outline-none focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50 relative",
+              isMobile ? "size-10" : "size-9"
             )}
             aria-label="Notifications"
           >
             <Bell className={isMobile ? "h-5 w-5" : "h-4 w-4"} />
-            <motion.span 
-              className="absolute top-2 right-2.5 size-2 bg-destructive rounded-full"
-              animate={{ 
-                scale: [1, 1.2, 1],
-                opacity: [1, 0.8, 1]
-              }}
-              transition={{ 
-                duration: 2,
-                repeat: Infinity,
-                ease: "easeInOut"
-              }}
-            />
-          </Button>
+            <span className="bg-destructive absolute top-2 right-2.5 size-2 rounded-full"></span>
+          </button>
 
-          {/* User Menu - Sempre visível */}
+          {/* User Menu - EXATAMENTE como Application Shell 08 */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
+                data-slot="button"
+                type="button"
                 className={cn(
-                  "inline-flex shrink-0 items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap transition-all outline-none focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
+                  "focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive inline-flex shrink-0 items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap transition-all outline-none focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
                   isMobile ? "size-10" : "size-9.5"
                 )}
                 aria-label="User menu"
@@ -397,9 +374,17 @@ export function Topbar({
                 </span>
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56 bg-card border shadow-xl">
+            <DropdownMenuContent 
+              align="end" 
+              className={cn(
+                "w-56 bg-card border shadow-xl",
+                isMobile && "w-[calc(100vw-2rem)] max-w-[280px]"
+              )}
+              side={isMobile ? "bottom" : "bottom"}
+              alignOffset={isMobile ? 0 : undefined}
+            >
               <DropdownMenuItem 
-                className="focus:bg-accent cursor-pointer touch-manipulation min-h-[44px]"
+                className="focus:bg-accent cursor-pointer touch-manipulation min-h-[44px] text-base"
                 onClick={() => handleNavigate(panelRoutes.settings)}
               >
                 <Settings2 className="h-4 w-4 mr-2" />
@@ -407,7 +392,7 @@ export function Topbar({
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem 
-                className="focus:bg-destructive/10 text-destructive focus:text-destructive cursor-pointer touch-manipulation min-h-[44px]"
+                className="focus:bg-destructive/10 text-destructive focus:text-destructive cursor-pointer touch-manipulation min-h-[44px] text-base"
                 onClick={handleLogout}
                 disabled={isLoggingOut}
               >
