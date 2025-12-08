@@ -18,6 +18,7 @@ const SelectTrigger = React.forwardRef<
     ref={ref}
     className={cn(
       "flex h-9 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs ring-offset-background placeholder:text-muted-foreground transition-all duration-300 focus:outline-none focus:ring-[var(--brand)]/50 focus:ring-[3px] focus:border-[var(--brand)] focus:shadow-lg focus:shadow-[var(--brand)]/10 hover:border-[var(--border-strong)] disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1",
+      "min-h-[44px] touch-manipulation", // Mobile-friendly touch targets
       className
     )}
     {...props}
@@ -109,7 +110,9 @@ const SelectItem = React.forwardRef<
   <SelectPrimitive.Item
     ref={ref}
     className={cn(
-      "relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none transition-colors duration-200 focus:bg-[var(--brand)]/10 focus:text-[var(--brand)] data-[disabled]:pointer-events-none data-[disabled]:opacity-50 hover:bg-accent/50",
+      "relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none transition-colors duration-200",
+      "focus:bg-[var(--brand)]/10 focus:text-[var(--brand)] data-[disabled]:pointer-events-none data-[disabled]:opacity-50 hover:bg-accent/50",
+      "min-h-[44px] touch-manipulation", // Mobile-friendly touch targets
       className
     )}
     {...props}

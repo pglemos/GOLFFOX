@@ -184,7 +184,7 @@ export const AppShell = memo(function AppShell({ user, children, panel }: AppShe
           className={cn(
             "min-h-screen transition-all duration-300 ease-in-out",
             // Mobile: padding-top para header fixo (56px + safe area)
-            isMobile ? "overflow-visible pt-[56px] safe-top" : "overflow-y-auto pt-32",
+            isMobile ? "overflow-visible pt-14 safe-top" : "overflow-y-auto pt-28",
             "overflow-x-hidden bg-[var(--bg)]",
             // Mobile: padding bottom com safe area
             isMobile ? "pb-4 safe-bottom" : "pb-12 sm:pb-14",
