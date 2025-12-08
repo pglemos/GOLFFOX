@@ -247,31 +247,20 @@ const transportadoraMenuGroups: MenuGroup[] = [
   }
 ]
 
-// Logo no header do sidebar - Application Shell 08 style
+// Logo no header do sidebar - Application Shell 08 style (exatamente como original)
 const SidebarHeader = ({ panel }: { panel: 'admin' | 'operador' | 'transportadora' }) => {
   const { open } = useSidebar()
-  
-  const panelTitle = useMemo(() => {
-    switch (panel) {
-      case 'operador':
-        return 'Operador'
-      case 'transportadora':
-        return 'Transportadora'
-      default:
-        return 'Administrativo'
-    }
-  }, [panel])
 
-  // Ícone grande estilo Application Shell 08 (usando Sparkles ou similar como placeholder)
+  // Ícone grande estilo Application Shell 08
   const LogoIcon = () => (
     <svg width="1em" height="1em" viewBox="0 0 328 329" fill="none" xmlns="http://www.w3.org/2000/svg" className="[&_rect]:fill-sidebar [&_rect:first-child]:fill-primary">
-      <rect y="0.5" width="328" height="328" rx="164" fill="currentColor" className="dark:fill-white fill-black" />
-      <path d="M165.018 72.3008V132.771C165.018 152.653 148.9 168.771 129.018 168.771H70.2288" stroke="white" strokeWidth="20" className="dark:stroke-black stroke-white" />
-      <path d="M166.627 265.241L166.627 204.771C166.627 184.889 182.744 168.771 202.627 168.771L261.416 168.771" stroke="white" strokeWidth="20" className="dark:stroke-black stroke-white" />
-      <line x1="238.136" y1="98.8184" x2="196.76" y2="139.707" stroke="white" strokeWidth="20" className="dark:stroke-black stroke-white" />
-      <line x1="135.688" y1="200.957" x2="94.3128" y2="241.845" stroke="white" strokeWidth="20" className="dark:stroke-black stroke-white" />
-      <line x1="133.689" y1="137.524" x2="92.5566" y2="96.3914" stroke="white" strokeWidth="20" className="dark:stroke-black stroke-white" />
-      <line x1="237.679" y1="241.803" x2="196.547" y2="200.671" stroke="white" strokeWidth="20" className="dark:stroke-black stroke-white" />
+      <rect y="0.5" width="328" height="328" rx="164" fill="black" className="dark:fill-white" />
+      <path d="M165.018 72.3008V132.771C165.018 152.653 148.9 168.771 129.018 168.771H70.2288" stroke="white" strokeWidth="20" className="dark:stroke-black" />
+      <path d="M166.627 265.241L166.627 204.771C166.627 184.889 182.744 168.771 202.627 168.771L261.416 168.771" stroke="white" strokeWidth="20" className="dark:stroke-black" />
+      <line x1="238.136" y1="98.8184" x2="196.76" y2="139.707" stroke="white" strokeWidth="20" className="dark:stroke-black" />
+      <line x1="135.688" y1="200.957" x2="94.3128" y2="241.845" stroke="white" strokeWidth="20" className="dark:stroke-black" />
+      <line x1="133.689" y1="137.524" x2="92.5566" y2="96.3914" stroke="white" strokeWidth="20" className="dark:stroke-black" />
+      <line x1="237.679" y1="241.803" x2="196.547" y2="200.671" stroke="white" strokeWidth="20" className="dark:stroke-black" />
     </svg>
   )
 
@@ -282,11 +271,10 @@ const SidebarHeader = ({ panel }: { panel: 'admin' | 'operador' | 'transportador
           <Link
             href={panel === 'operador' ? '/operador' : panel === 'transportadora' ? '/transportadora' : '/admin'}
             className={cn(
-              "peer/menu-button flex w-full items-center overflow-hidden rounded-md p-2 text-left outline-hidden",
+              "peer/menu-button flex w-full items-center overflow-hidden rounded-md text-left outline-hidden",
               "transition-[width,height,padding] focus-visible:ring-2",
-              "h-12 text-sm gap-2.5 !bg-transparent",
+              "gap-2.5 !bg-transparent [&>svg]:size-8",
               "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-              "[&>svg]:size-8",
               open ? "gap-2.5" : "justify-center [&>svg]:size-8"
             )}
           >
@@ -298,9 +286,9 @@ const SidebarHeader = ({ panel }: { panel: 'admin' | 'operador' | 'transportador
                   animate={{ opacity: 1, width: "auto" }}
                   exit={{ opacity: 0, width: 0 }}
                   transition={{ duration: 0.15 }}
-                  className="text-xl font-semibold text-sidebar-foreground truncate"
+                  className="text-xl font-semibold truncate"
                 >
-                  {panelTitle}
+                  Analytics
                 </motion.span>
               )}
             </AnimatePresence>
@@ -401,18 +389,18 @@ const MenuGroup = ({ group }: { group: MenuGroup }) => {
   )
 }
 
-// Footer com promoção Premium (opcional)
+// Footer com promoção Premium - Application Shell 08 style
 const SidebarFooter = () => {
   const { open } = useSidebar()
   
   return (
-    <div className={cn("flex flex-col gap-2 p-2", !open && "hidden")}>
+    <div className={cn("flex flex-col gap-2 p-2", !open && "hidden", "[&[data-state=collapsed]]:hidden")}>
       <div className="flex flex-col items-start gap-4 overflow-hidden rounded-md p-2">
         <p className="truncate text-xl font-semibold">Go to Premium</p>
-        <p className="line-clamp-2 text-sm text-sidebar-foreground/70">
-          Explore premium features and advanced analytics
+        <p className="line-clamp-2 text-sm">
+          Explore 600+ courses with lifetime membership
         </p>
-        <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90 min-h-[48px] h-auto p-3 sm:min-h-0 sm:h-9 sm:p-2 touch-manipulation">
+        <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90 min-h-[48px] h-auto p-3 sm:min-h-0 sm:h-9 sm:p-2 touch-manipulation truncate">
           Upgrade
         </Button>
       </div>
