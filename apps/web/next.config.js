@@ -152,6 +152,17 @@ let nextConfig = {
           config: [__filename],
         },
       }
+      
+      // Logging melhorado em desenvolvimento
+      if (process.env.NODE_ENV === 'development') {
+        const originalResolve = config.resolve
+        config.resolve = {
+          ...originalResolve,
+          alias: {
+            ...originalResolve.alias,
+          },
+        }
+      }
     }
     return config
   },

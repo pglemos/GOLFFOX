@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseServiceRole } from '@/lib/supabase-server'
+import { invalidateEntityCache } from '@/lib/next-cache'
 
 // PUT /api/admin/drivers/[driverId] - Editar motorista
 export async function PUT(
@@ -60,6 +61,9 @@ export async function PUT(
         { status: 500 }
       )
     }
+
+    // Invalidar cache após atualização
+    await invalidateEntityCache('driver', driverId)
 
     return NextResponse.json({ success: true, driver })
   } catch (error: any) {

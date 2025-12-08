@@ -2,6 +2,7 @@ export const runtime = 'nodejs'
 import { NextRequest, NextResponse } from "next/server"
 import { supabaseServiceRole } from "@/lib/supabase-server"
 import { debug, error as logError } from "@/lib/logger"
+import { invalidateEntityCache } from '@/lib/next-cache'
 
 const CONTEXT = "AdminVehiclesAPI"
 
@@ -100,6 +101,9 @@ export async function DELETE(
         return NextResponse.json({ error: "vehicle_archive_failed", tripsCount: tripsCount ?? 0, archived: false }, { status: 500 })
       }
 
+      // Invalidar cache após arquivamento
+      await invalidateEntityCache('vehicle', vehicleId)
+
       debug("Veículo marcado como inativo devido a viagens associadas", { vehicleId, tripsCount }, CONTEXT)
       return NextResponse.json({ success: true, archived: true, tripsCount: tripsCount ?? 0 }, { status: 200 })
     }
@@ -155,6 +159,9 @@ export async function DELETE(
       }
       return NextResponse.json({ error: "vehicle_delete_failed", tripsCount: 0, archived: false }, { status: 500 })
     }
+
+    // Invalidar cache após exclusão
+    await invalidateEntityCache('vehicle', vehicleId)
 
     debug("Veículo excluído com sucesso", { vehicleId }, CONTEXT)
     return NextResponse.json({ success: true, tripsCount: 0, archived: false }, { status: 200 })
@@ -218,6 +225,9 @@ export async function PATCH(
       logError('Erro ao atualizar veículo', { vehicleId, error }, CONTEXT)
       return NextResponse.json({ error: 'vehicle_update_failed', message: error.message }, { status: 500 })
     }
+
+    // Invalidar cache após atualização
+    await invalidateEntityCache('vehicle', vehicleId)
 
     return NextResponse.json(data, { status: 200 })
   } catch (error: unknown) {

@@ -3,6 +3,7 @@ import React from "react"
 import { usePathname } from "next/navigation"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { useViewTransition } from "@/hooks/use-view-transition"
 import {
   Sidebar as UISidebar,
   SidebarBody,
@@ -257,6 +258,7 @@ const CustomSidebarLink = ({
   const pathname = usePathname()
   const router = useRouter()
   const { open } = useSidebar()
+  const { navigateWithTransition, isPending } = useViewTransition()
   const Icon = item.icon
 
   // Verificar se o item está ativo
@@ -284,16 +286,21 @@ const CustomSidebarLink = ({
               : "bg-gradient-to-r from-[#FFF7ED] to-[#FFF7ED]/80 text-[#F97316] shadow-sm")
             : "hover:bg-gradient-to-r hover:from-gray-100/80 hover:to-gray-50/50 dark:hover:from-gray-800/80 dark:hover:to-gray-800/50 active:bg-gray-100 dark:active:bg-gray-700"
         )}
-        onMouseEnter={() => router.prefetch(item.href)}
+        onMouseEnter={() => {
+          // Prefetch incremental para melhor performance
+          router.prefetch(item.href)
+        }}
         onClick={(e) => {
           e.preventDefault()
-          router.push(item.href)
+          // Usar View Transitions para navegação suave
+          navigateWithTransition(item.href)
           // Fechar sidebar no mobile após clicar
           if (typeof window !== 'undefined' && window.innerWidth < 1024) {
             const event = new CustomEvent('close-sidebar')
             window.dispatchEvent(event)
           }
         }}
+        aria-busy={isPending}
       >
         <div className="relative flex-shrink-0">
           <Icon

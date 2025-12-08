@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requireAuth } from '@/lib/api-auth'
 import { logger } from '@/lib/logger'
+import { invalidateEntityCache } from '@/lib/next-cache'
 
 export const runtime = 'nodejs'
 
@@ -143,6 +144,9 @@ async function handleDelete(request: NextRequest) {
         { status: 500 }
       )
     }
+
+    // Invalidar cache após exclusão
+    await invalidateEntityCache('company', companyId)
 
     logger.log(`✅ Empresa excluída com sucesso: ${companyId}`, data)
 
