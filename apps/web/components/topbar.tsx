@@ -203,21 +203,21 @@ export function Topbar({
         : "before:bg-background/60 before:absolute before:inset-0 before:mask-[linear-gradient(var(--card),var(--card)_18%,transparent_100%)] before:backdrop-blur-md"
     )}>
       <div className={cn(
-        "bg-card relative z-[51] flex items-center justify-between border-b lg:border-0",
+        "bg-card relative z-[51] flex items-center justify-between",
         // Mobile: full width, padding menor, altura fixa 56px
         isMobile 
-          ? "w-full px-3 py-2 h-14" 
+          ? "w-full px-3 py-2 h-14 border-b" 
           : "mx-auto mt-6 w-[calc(100%-2rem)] rounded-xl border px-6 py-2 shadow-sm sm:w-[calc(100%-3rem)]"
       )}>
-        {/* Left Section */}
-        <div className="flex items-center gap-2 sm:gap-4">
-          {/* Toggle Sidebar - Sempre visível */}
+        {/* Left Section - Exatamente como Application Shell 08 */}
+        <div className="flex items-center gap-1.5 sm:gap-4">
+          {/* SidebarTrigger - Menu button */}
           <Button
             variant="ghost"
             size="icon"
             onClick={onToggleSidebar}
             className={cn(
-              "touch-manipulation",
+              "touch-manipulation [&>svg]:!size-5",
               isMobile ? "size-10" : "size-7 hover:bg-accent hover:text-accent-foreground"
             )}
             aria-label="Toggle Sidebar"
@@ -225,68 +225,69 @@ export function Topbar({
             <Menu className={isMobile ? "h-6 w-6" : "h-5 w-5"} />
           </Button>
 
-          {/* Separator - Oculto em mobile */}
+          {/* Separator vertical - hidden em mobile, visível sm, hidden md:max-lg */}
           {!isMobile && (
-            <div className="bg-border shrink-0 h-4 w-px hidden sm:block md:max-lg:hidden" />
+            <div className="bg-border shrink-0 h-4 w-px hidden !h-4 sm:block md:max-lg:hidden" />
           )}
 
-          {/* Command Palette - Oculto em mobile, apenas ícone em tablet */}
+          {/* Command Palette - Exatamente como Application Shell 08 */}
           {!isMobile && (
-            <div>
-              <Dialog open={isCommandPaletteOpen} onOpenChange={setIsCommandPaletteOpen}>
-                <DialogTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    className="hidden !bg-transparent px-1 py-0 font-normal sm:block md:max-lg:hidden h-9"
-                  >
-                    <div className="text-muted-foreground hidden items-center gap-1.5 text-sm sm:flex md:max-lg:hidden">
-                      <Search className="h-4 w-4" />
-                      <span>Type to search...</span>
-                    </div>
-                  </Button>
-                </DialogTrigger>
-                <DialogTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="size-9 sm:hidden md:max-lg:inline-flex"
-                    aria-label="Search"
-                  >
+            <Dialog open={isCommandPaletteOpen} onOpenChange={setIsCommandPaletteOpen}>
+              {/* Desktop: Button com texto "Type to search..." */}
+              <DialogTrigger asChild>
+                <Button
+                  variant="ghost"
+                  className="hidden !bg-transparent px-1 py-0 font-normal sm:block md:max-lg:hidden h-9 shrink-0 items-center justify-center gap-2 rounded-md text-sm whitespace-nowrap transition-all outline-none focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50 has-[:svg]:px-3"
+                >
+                  <div className="text-muted-foreground hidden items-center gap-1.5 text-sm sm:flex md:max-lg:hidden">
                     <Search className="h-4 w-4" />
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-lg">
-                  <DialogHeader>
-                    <DialogTitle>Command Palette</DialogTitle>
-                    <DialogDescription>Search for a command to run...</DialogDescription>
-                  </DialogHeader>
-                  <div className="mt-4">
-                    <Input
-                      type="search"
-                      placeholder="Type to search..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full"
-                      autoFocus
-                    />
-                    <div className="mt-4 text-sm text-muted-foreground">
-                      <div className="flex items-center justify-between mb-2">
-                        <span>esc</span>
-                        <span>To close</span>
-                      </div>
-                      <div className="flex items-center justify-between mb-2">
-                        <span>↑↓</span>
-                        <span>To Navigate</span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span>Enter</span>
-                        <span>To Select</span>
-                      </div>
+                    <span>Type to search...</span>
+                  </div>
+                </Button>
+              </DialogTrigger>
+              {/* Tablet/Mobile: Button apenas com ícone */}
+              <DialogTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="size-9 sm:hidden md:max-lg:inline-flex hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50"
+                  aria-label="Search"
+                >
+                  <Search className="h-4 w-4" />
+                  <span className="sr-only">Search</span>
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-lg">
+                <DialogHeader>
+                  <DialogTitle>Command Palette</DialogTitle>
+                  <DialogDescription>Search for a command to run...</DialogDescription>
+                </DialogHeader>
+                <div className="mt-4">
+                  <Input
+                    type="search"
+                    placeholder="Type to search..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full"
+                    autoFocus
+                  />
+                  <div className="mt-4 text-sm text-muted-foreground">
+                    <div className="flex items-center justify-between mb-2">
+                      <span>esc</span>
+                      <span>To close</span>
+                    </div>
+                    <div className="flex items-center justify-between mb-2">
+                      <span>↑↓</span>
+                      <span>To Navigate</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span>Enter</span>
+                      <span>To Select</span>
                     </div>
                   </div>
-                </DialogContent>
-              </Dialog>
-            </div>
+                </div>
+              </DialogContent>
+            </Dialog>
           )}
         </div>
 
