@@ -12,9 +12,23 @@ module.exports = {
     './components/**/*.{js,jsx}',
   ],
   theme: {
+    screens: {
+      'xs': '475px',
+      'sm': '640px',
+      'md': '768px',
+      'lg': '1024px',
+      'xl': '1280px',
+      '2xl': '1400px',
+    },
     container: {
       center: true,
-      padding: "2rem",
+      padding: {
+        DEFAULT: '1rem',
+        sm: '1.5rem',
+        lg: '2rem',
+        xl: '2.5rem',
+        '2xl': '3rem',
+      },
       screens: {
         "2xl": "1400px",
       },
@@ -65,9 +79,26 @@ module.exports = {
       },
       spacing: {
         '18': '4.5rem', // 72px for topbar height
+        'safe-top': 'env(safe-area-inset-top)',
+        'safe-bottom': 'env(safe-area-inset-bottom)',
+        'safe-left': 'env(safe-area-inset-left)',
+        'safe-right': 'env(safe-area-inset-right)',
       },
       height: {
         '18': '4.5rem', // 72px for topbar height
+        'safe-top': 'env(safe-area-inset-top)',
+        'safe-bottom': 'env(safe-area-inset-bottom)',
+      },
+      minHeight: {
+        'touch': '44px', // Minimum touch target
+      },
+      minWidth: {
+        'touch': '44px', // Minimum touch target
+      },
+      fontSize: {
+        'xs-mobile': ['0.75rem', { lineHeight: '1.5', letterSpacing: '0.01em' }],
+        'sm-mobile': ['0.875rem', { lineHeight: '1.5', letterSpacing: '0.01em' }],
+        'base-mobile': ['1rem', { lineHeight: '1.5', letterSpacing: '0' }],
       },
       keyframes: {
         "accordion-down": {

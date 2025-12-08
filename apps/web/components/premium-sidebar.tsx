@@ -326,12 +326,14 @@ const MenuItem = ({ item, index }: { item: MenuItem; index: number }) => {
       <Link
         href={item.href}
         className={cn(
-          "peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-hidden",
-          "transition-[width,height,padding] focus-visible:ring-2",
+          "peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md text-left outline-hidden",
+          "transition-[width,height,padding] focus-visible:ring-2 touch-manipulation",
           "group-has-[data-sidebar=menu-action]/menu-item:pr-8",
           item.badge && open && "pr-8",
-          "h-8 text-sm",
+          // Mobile: touch targets maiores (48x48px conforme plano), Desktop: menor (h-8)
+          "min-h-[48px] p-3 text-sm sm:min-h-0 sm:h-8 sm:p-2",
           "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+          "active:bg-sidebar-accent active:text-sidebar-accent-foreground", // Active state para mobile
           "[&>svg]:size-4 [&>svg]:shrink-0",
           isActive && "bg-sidebar-accent text-sidebar-accent-foreground font-medium",
           !open && "justify-center [&>svg]:size-4"
@@ -410,7 +412,7 @@ const SidebarFooter = () => {
         <p className="line-clamp-2 text-sm text-sidebar-foreground/70">
           Explore premium features and advanced analytics
         </p>
-        <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90 h-9">
+        <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90 min-h-[48px] h-auto p-3 sm:min-h-0 sm:h-9 sm:p-2 touch-manipulation">
           Upgrade
         </Button>
       </div>
@@ -482,7 +484,7 @@ const UserProfile = ({ user }: { user?: PremiumSidebarProps['user'] }) => {
         size="sm"
         onClick={handleLogout}
         disabled={isLoggingOut}
-        className="w-full justify-start h-8 hover:bg-sidebar-accent"
+        className="w-full justify-start min-h-[48px] h-auto p-3 sm:min-h-0 sm:h-8 sm:p-2 hover:bg-sidebar-accent touch-manipulation"
       >
         <LogOut className="h-4 w-4 mr-2" />
         {isLoggingOut ? 'Saindo...' : 'Sair'}

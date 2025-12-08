@@ -11,7 +11,12 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       <input
         type={type}
         className={cn(
-          "flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-xs transition-all duration-300 placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-[var(--brand)]/50 focus-visible:ring-[3px] focus-visible:border-[var(--brand)] focus-visible:shadow-lg focus-visible:shadow-[var(--brand)]/10 hover:border-[var(--border-strong)] disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
+          // Mobile-first: altura mínima 44px, font-size 16px (previne zoom iOS)
+          "flex min-h-[44px] w-full rounded-md border border-input bg-background px-3 py-2 text-base shadow-xs transition-all duration-300 placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-[var(--brand)]/50 focus-visible:ring-[3px] focus-visible:border-[var(--brand)] focus-visible:shadow-lg focus-visible:shadow-[var(--brand)]/10 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive touch-manipulation",
+          // Desktop: altura menor, font-size menor
+          "sm:h-9 sm:text-sm sm:py-1",
+          // Desktop: hover states
+          "lg:hover:border-[var(--border-strong)]",
           className
         )}
         ref={ref}

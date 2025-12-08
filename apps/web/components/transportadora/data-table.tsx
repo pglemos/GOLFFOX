@@ -13,6 +13,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { cn } from "@/lib/utils"
 import { t } from "@/lib/i18n"
+import { useMobile } from "@/hooks/use-mobile"
 
 export interface Column<T> {
   key: string
@@ -69,6 +70,7 @@ export function DataTable<T extends Record<string, any>>({
   onDelete,
   onAction
 }: DataTableProps<T>) {
+  const isMobile = useMobile() // Hook mobile-first
   const [searchQuery, setSearchQuery] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
   const [sortColumn, setSortColumn] = useState<string | null>(null)
@@ -323,9 +325,135 @@ export function DataTable<T extends Record<string, any>>({
       )}
 
       <CardContent className="p-0">
-        <div className="overflow-x-auto -mx-3 sm:mx-0">
-          <div className="inline-block min-w-full align-middle">
-            <Table>
+        {/* Mobile: Cards Layout */}
+        {isMobile ? (
+          <div className="p-3 space-y-3">
+            {paginatedData.length === 0 ? (
+              <div className="text-center py-12">
+                <p className="text-sm text-muted-foreground">{emptyMessage}</p>
+              </div>
+            ) : (
+              paginatedData.map((row, globalIndex) => {
+                const actualIndex = (currentPage - 1) * pageSize + globalIndex
+                const isSelected = selectedRows.has(actualIndex)
+                
+                return (
+                  <Card
+                    key={actualIndex}
+                    className={cn(
+                      "mobile-table-card cursor-pointer touch-manipulation",
+                      isSelected && "ring-2 ring-primary"
+                    )}
+                    onClick={() => onRowClick?.(row)}
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      {/* Checkbox */}
+                      {columns.some(col => col.showCheckbox) && (
+                        <Checkbox
+                          checked={isSelected}
+                          onCheckedChange={(checked) => handleSelectRow(actualIndex, checked as boolean)}
+                          onClick={(e) => e.stopPropagation()}
+                          className="mt-1"
+                        />
+                      )}
+                      
+                      {/* Content */}
+                      <div className="flex-1 min-w-0 space-y-2">
+                        {columns.map((column) => {
+                          // User column
+                          if (column.isUserColumn) {
+                            const name = row.name || row.user_name || ''
+                            const email = row.email || row.user_email || ''
+                            const avatar = row.avatar_url || row.avatar || ''
+                            const initials = getUserInitials(name)
+                            
+                            return (
+                              <div key={column.key} className="flex items-center gap-3">
+                                <Avatar className="h-10 w-10">
+                                  <AvatarImage src={avatar} alt={name} />
+                                  <AvatarFallback className="bg-primary text-primary-foreground">
+                                    {initials}
+                                  </AvatarFallback>
+                                </Avatar>
+                                <div className="flex flex-col min-w-0 flex-1">
+                                  <span className="font-semibold text-sm truncate">{name}</span>
+                                  <span className="text-xs text-muted-foreground truncate">{email}</span>
+                                </div>
+                              </div>
+                            )
+                          }
+                          
+                          // Status column
+                          if (column.isStatusColumn) {
+                            const status = row[column.key] || row.status || ''
+                            return (
+                              <div key={column.key} className="flex items-center justify-between">
+                                <span className="text-xs font-medium text-muted-foreground uppercase">{column.label}</span>
+                                {getStatusBadge(status)}
+                              </div>
+                            )
+                          }
+                          
+                          // Actions column
+                          if (column.isActionsColumn) {
+                            return (
+                              <div key={column.key} className="flex items-center justify-end gap-2 pt-2 border-t">
+                                {onView && (
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="min-h-[44px] touch-manipulation"
+                                    onClick={(e) => {
+                                      e.stopPropagation()
+                                      onView(row)
+                                    }}
+                                  >
+                                    <Eye className="h-4 w-4 mr-2" />
+                                    Ver
+                                  </Button>
+                                )}
+                                {onDelete && (
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="min-h-[44px] touch-manipulation text-destructive"
+                                    onClick={(e) => {
+                                      e.stopPropagation()
+                                      onDelete(row)
+                                    }}
+                                  >
+                                    <Trash2 className="h-4 w-4 mr-2" />
+                                    Excluir
+                                  </Button>
+                                )}
+                              </div>
+                            )
+                          }
+                          
+                          // Regular column
+                          return (
+                            <div key={column.key} className="flex items-center justify-between">
+                              <span className="text-xs font-medium text-muted-foreground uppercase">{column.label}</span>
+                              <span className="text-sm font-medium text-right flex-1 ml-2">
+                                {column.render
+                                  ? column.render(row[column.key], row)
+                                  : row[column.key]?.toString() || "-"}
+                              </span>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  </Card>
+                )
+              })
+            )}
+          </div>
+        ) : (
+          /* Desktop: Table Layout */
+          <div className="overflow-x-auto -mx-3 sm:mx-0">
+            <div className="inline-block min-w-full align-middle">
+              <Table>
               <TableHeader>
                 <TableRow>
                   {/* Checkbox column */}
@@ -504,6 +632,7 @@ export function DataTable<T extends Record<string, any>>({
             </Table>
           </div>
         </div>
+        )}
 
         {pagination && totalPages > 1 && (
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-0 px-3 sm:px-6 py-3 sm:py-4 border-t border-border bg-card">

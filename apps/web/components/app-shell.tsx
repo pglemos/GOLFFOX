@@ -8,6 +8,7 @@ import { EnvVarsBanner } from "./env-vars-banner"
 import { cn } from "@/lib/utils"
 import { motion } from "framer-motion"
 import { debug } from "@/lib/logger"
+import { useMobile } from "@/hooks/use-mobile"
 
 interface AppShellProps {
   user: {
@@ -25,7 +26,7 @@ interface AppShellProps {
 export const AppShell = memo(function AppShell({ user, children, panel }: AppShellProps) {
   const pathname = usePathname()
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
-  const [isMobile, setIsMobile] = useState(false)
+  const isMobile = useMobile() // Usar hook mobile-first
 
   // Debug logging (apenas em desenvolvimento)
   useEffect(() => {
@@ -58,34 +59,26 @@ export const AppShell = memo(function AppShell({ user, children, panel }: AppShe
     }
   }[detectedPanel]), [detectedPanel])
 
-  // Detect mobile screen size
+  // Fechar sidebar quando mudar para mobile ou quando navegar
   useEffect(() => {
-    const checkScreenSize = () => {
-      const isMobileWidth = window.innerWidth < 1024
-      setIsMobile(isMobileWidth)
-      if (isMobileWidth) {
-        setIsSidebarOpen(false)
-        document.body.setAttribute('data-mobile', 'true')
-      } else {
-        // Em desktop, garantir que sidebar inicia fechada
-        setIsSidebarOpen(false)
-        document.body.removeAttribute('data-mobile')
-      }
+    if (isMobile) {
+      setIsSidebarOpen(false)
+      document.body.setAttribute('data-mobile', 'true')
+    } else {
+      setIsSidebarOpen(false)
+      document.body.removeAttribute('data-mobile')
     }
+  }, [isMobile])
 
-    checkScreenSize()
-    window.addEventListener('resize', checkScreenSize)
-
-    // Listener para fechar sidebar no mobile
+  // Listener para fechar sidebar no mobile
+  useEffect(() => {
     const handleCloseSidebar = () => {
       if (isMobile) {
         setIsSidebarOpen(false)
       }
     }
     window.addEventListener('close-sidebar', handleCloseSidebar as EventListener)
-
     return () => {
-      window.removeEventListener('resize', checkScreenSize)
       window.removeEventListener('close-sidebar', handleCloseSidebar as EventListener)
     }
   }, [isMobile])
@@ -186,12 +179,16 @@ export const AppShell = memo(function AppShell({ user, children, panel }: AppShe
           user={user ? { id: user.id, name: user.name || '', email: user.email, avatar_url: user.avatar_url } : { id: '', name: '', email: '' }}
         />
 
-        {/* Main Content */}
+        {/* Main Content - Mobile-first */}
         <main
           className={cn(
             "min-h-screen transition-all duration-300 ease-in-out",
-            isMobile ? "overflow-visible pt-24" : "overflow-y-auto pt-32",
-            "overflow-x-visible bg-[var(--bg)] pb-12 sm:pb-14",
+            // Mobile: padding-top para header fixo (56px + safe area)
+            isMobile ? "overflow-visible pt-[56px] safe-top" : "overflow-y-auto pt-32",
+            "overflow-x-hidden bg-[var(--bg)]",
+            // Mobile: padding bottom com safe area
+            isMobile ? "pb-4 safe-bottom" : "pb-12 sm:pb-14",
+            // Desktop: margin-left para sidebar colapsada
             !isMobile ? "flex-1 md:ml-[64px]" : "w-full ml-0 flex-shrink-0",
             "w-full",
             "relative z-10"
@@ -202,7 +199,11 @@ export const AppShell = memo(function AppShell({ user, children, panel }: AppShe
           } as React.CSSProperties}
           data-mobile={isMobile ? 'true' : undefined}
         >
-          <div className="mx-auto max-w-[1600px] px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 w-full">
+          <div className={cn(
+            "mx-auto w-full",
+            // Mobile: padding menor
+            isMobile ? "px-3 py-3" : "max-w-[1600px] px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 lg:py-8"
+          )}>
             <div className="w-full break-words stack-responsive">
               {children}
             </div>
