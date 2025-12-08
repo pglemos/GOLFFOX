@@ -10,6 +10,12 @@ import {
   useSidebar
 } from "@/components/ui/sidebar"
 import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet"
+import {
   LayoutDashboard,
   MapPin,
   Navigation,
@@ -271,16 +277,24 @@ const SidebarHeader = ({ panel }: { panel: 'admin' | 'operador' | 'transportador
         <li data-slot="sidebar-menu-item" data-sidebar="menu-item" className="group/menu-item relative">
           <Link
             href={panel === 'operador' ? '/operador' : panel === 'transportadora' ? '/transportadora' : '/admin'}
+            data-slot="sidebar-menu-button"
+            data-sidebar="menu-button"
+            data-size="lg"
+            data-active="false"
             className={cn(
-              "peer/menu-button flex w-full items-center overflow-hidden rounded-md text-left outline-hidden",
-              "transition-[width,height,padding] focus-visible:ring-2",
-              "h-12 text-sm gap-2.5 !bg-transparent [&>svg]:size-8 p-2",
-              "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-              open ? "gap-2.5" : "justify-center [&>svg]:size-8"
+              "peer/menu-button ring-sidebar-ring active:bg-sidebar-accent active:text-sidebar-accent-foreground",
+              "data-[active=true]:bg-sidebar-accent data-[active=true]:text-sidebar-accent-foreground",
+              "data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground",
+              "flex w-full items-center overflow-hidden rounded-md p-2 text-left outline-hidden",
+              "transition-[width,height,padding] group-has-data-[sidebar=menu-action]/menu-item:pr-8",
+              "group-data-[collapsible=icon]:size-8! focus-visible:ring-2 disabled:pointer-events-none disabled:opacity-50",
+              "aria-disabled:pointer-events-none aria-disabled:opacity-50",
+              "data-[active=true]:font-medium [&>span:last-child]:truncate [&>svg]:shrink-0",
+              "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-12 text-sm group-data-[collapsible=icon]:p-0! gap-2.5 !bg-transparent [&>svg]:size-8"
             )}
           >
             <LogoIcon />
-            <span className="text-xl font-semibold truncate">Analytics</span>
+            <span className="text-xl font-semibold">Analytics</span>
           </Link>
         </li>
       </ul>
@@ -387,7 +401,7 @@ const SidebarFooter = () => {
   const { open } = useSidebar()
   
   return (
-    <div data-slot="sidebar-footer" data-sidebar="footer" className={cn("flex flex-col gap-2 p-2", !open && "hidden", "[&[data-state=collapsed]]:hidden")}>
+    <div data-slot="sidebar-footer" data-sidebar="footer" className={cn("flex flex-col gap-2 p-2", !open && "hidden", "[[data-state=collapsed]_&]:hidden")}>
       <div className="flex flex-col items-start gap-4 overflow-hidden rounded-md p-2">
         <p className="truncate text-xl font-semibold">Go to Premium</p>
         <p className="line-clamp-2 text-sm">
@@ -474,6 +488,33 @@ const UserProfile = ({ user }: { user?: PremiumSidebarProps['user'] }) => {
   )
 }
 
+// Conteúdo da sidebar (reutilizável para Sheet e Sidebar)
+const SidebarContentInner = ({ panel, menuGroups, user }: { 
+  panel: 'admin' | 'operador' | 'transportadora'
+  menuGroups: MenuGroup[]
+  user?: PremiumSidebarProps['user']
+}) => {
+  return (
+    <>
+      {/* Header */}
+      <SidebarHeader panel={panel} />
+
+      {/* Content */}
+      <div data-slot="sidebar-content" data-sidebar="content" className="flex min-h-0 flex-1 flex-col gap-2 overflow-auto group-data-[collapsible=icon]:overflow-hidden">
+        {menuGroups.map((group, groupIndex) => (
+          <MenuGroup key={groupIndex} group={group} />
+        ))}
+      </div>
+
+      {/* Footer Premium (opcional) */}
+      <SidebarFooter />
+
+      {/* User Profile */}
+      <UserProfile user={user} />
+    </>
+  )
+}
+
 // Componente principal
 export function PremiumSidebar({
   isOpen = false,
@@ -502,40 +543,52 @@ export function PremiumSidebar({
     })
   }, [menuGroups, router])
 
-  // Em mobile, usar controle completo via props isOpen
-  // Em desktop, não passar open (undefined) para permitir hover automático + toggle manual via useSidebar() hook
+  // Em mobile, usar Sheet (drawer)
+  if (isMobile) {
+    return (
+      <Sheet 
+        open={isOpen} 
+        onOpenChange={(open) => {
+          // Disparar evento customizado para fechar sidebar
+          if (!open) {
+            window.dispatchEvent(new CustomEvent('close-sidebar'))
+          }
+        }}
+      >
+        <SheetContent 
+          side="left" 
+          className="w-[280px] sm:w-[300px] p-0 bg-sidebar border-r border-sidebar-border overflow-y-auto scroll-smooth-touch"
+          style={{
+            paddingTop: 'max(0.5rem, env(safe-area-inset-top))',
+            paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom))',
+          }}
+        >
+          <div className="flex flex-col h-full">
+            <SidebarContentInner panel={panel} menuGroups={menuGroups} user={user} />
+          </div>
+        </SheetContent>
+      </Sheet>
+    )
+  }
+
+  // Em desktop, usar Sidebar normal
+  // Não passar open (undefined) para permitir hover automático + toggle manual via useSidebar() hook
   // Isso permite que o SidebarTrigger no topbar controle o sidebar em desktop usando useSidebar()
   return (
     <UISidebar
-      {...(isMobile && isOpen !== undefined ? { open: isOpen } : {})}
       animate={true}
-      isMobile={isMobile}
+      isMobile={false}
     >
       <SidebarBody
         className={cn(
           "flex flex-col bg-sidebar border-r border-sidebar-border",
-          !isMobile && "top-16 sm:top-18 left-0 h-[calc(100vh-4rem)] sm:h-[calc(100vh-4.5rem)] z-50",
-          isMobile && "w-[280px] sm:w-[300px]",
+          "top-16 sm:top-18 left-0 h-[calc(100vh-4rem)] sm:h-[calc(100vh-4.5rem)] z-50",
           "!px-0 !py-0"
         )}
         role="complementary"
         aria-label="Barra lateral de navegação"
       >
-        {/* Header */}
-        <SidebarHeader panel={panel} />
-
-        {/* Content */}
-        <div data-slot="sidebar-content" data-sidebar="content" className="flex min-h-0 flex-1 flex-col gap-2 overflow-auto">
-          {menuGroups.map((group, groupIndex) => (
-            <MenuGroup key={groupIndex} group={group} />
-          ))}
-        </div>
-
-        {/* Footer Premium (opcional) */}
-        <SidebarFooter />
-
-        {/* User Profile */}
-        <UserProfile user={user} />
+        <SidebarContentInner panel={panel} menuGroups={menuGroups} user={user} />
       </SidebarBody>
     </UISidebar>
   )

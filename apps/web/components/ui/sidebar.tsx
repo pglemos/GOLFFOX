@@ -149,8 +149,10 @@ export const DesktopSidebar = ({
   
   return (
     <motion.div
+      data-sidebar="sidebar"
+      data-slot="sidebar-inner"
       className={cn(
-        "h-full hidden md:flex md:flex-col bg-sidebar flex-shrink-0 !px-0 !py-0",
+        "h-full hidden md:flex md:flex-col bg-sidebar group-data-[variant=floating]:border-sidebar-border flex-shrink-0 !px-0 !py-0 flex w-full flex-col group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:shadow-sm",
         className
       )}
       animate={{
