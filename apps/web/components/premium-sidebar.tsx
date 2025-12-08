@@ -3,6 +3,7 @@
 import React, { useEffect, useMemo } from "react"
 import { usePathname, useRouter } from "next/navigation"
 import Link from "next/link"
+import { useViewTransition } from "@/hooks/use-view-transition"
 import {
   Sidebar as UISidebar,
   SidebarBody,
@@ -304,55 +305,52 @@ const MenuItem = ({ item, index }: { item: MenuItem; index: number }) => {
   const pathname = usePathname()
   const router = useRouter()
   const { open } = useSidebar()
+  const { navigateWithTransition, isPending } = useViewTransition()
   const Icon = item.icon
   
   const isActive = pathname === item.href || pathname?.startsWith(item.href + "/")
   const showOperationalAlerts = item.href.includes("/alertas")
 
   return (
-    <li className="group/menu-item relative">
+    <li data-slot="sidebar-menu-item" data-sidebar="menu-item" className="group/menu-item relative">
       <Link
         href={item.href}
-        className={cn(
-          "peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md text-left outline-hidden",
-          "transition-[width,height,padding] focus-visible:ring-2 touch-manipulation",
-          "group-has-[data-sidebar=menu-action]/menu-item:pr-8",
-          item.badge && open && "pr-8",
-          // Mobile: touch targets maiores (48x48px conforme plano), Desktop: menor (h-8)
-          "min-h-[48px] p-3 text-sm sm:min-h-0 sm:h-8 sm:p-2",
-          "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-          "active:bg-sidebar-accent active:text-sidebar-accent-foreground", // Active state para mobile
-          "[&>svg]:size-4 [&>svg]:shrink-0",
-          isActive && "bg-sidebar-accent text-sidebar-accent-foreground font-medium",
-          !open && "justify-center [&>svg]:size-4"
-        )}
-        data-active={isActive}
+        data-slot="sidebar-menu-button"
+        data-sidebar="menu-button"
         data-size="default"
+        data-active={isActive ? "true" : "false"}
+        data-state="closed"
+        className={cn(
+          "peer/menu-button ring-sidebar-ring active:bg-sidebar-accent active:text-sidebar-accent-foreground",
+          "data-[active=true]:bg-sidebar-accent data-[active=true]:text-sidebar-accent-foreground",
+          "data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground",
+          "flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-hidden",
+          "transition-[width,height,padding] group-has-data-[sidebar=menu-action]/menu-item:pr-8",
+          "group-data-[collapsible=icon]:size-8! group-data-[collapsible=icon]:p-2!",
+          "focus-visible:ring-2 disabled:pointer-events-none disabled:opacity-50",
+          "aria-disabled:pointer-events-none aria-disabled:opacity-50",
+          "data-[active=true]:font-medium [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0",
+          "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm",
+          !open && "justify-center"
+        )}
       >
         <Icon className="shrink-0" />
-        <AnimatePresence initial={false}>
-          {open && (
-            <motion.span
-              initial={{ opacity: 0, width: 0 }}
-              animate={{ opacity: 1, width: "auto" }}
-              exit={{ opacity: 0, width: 0 }}
-              transition={{ duration: 0.15 }}
-              className="truncate flex-1 [&:last-child]:truncate"
-            >
-              {item.label}
-            </motion.span>
-          )}
-        </AnimatePresence>
+        {open && <span>{item.label}</span>}
       </Link>
       
-      {/* Badge - Application Shell 08 style - fora do Link */}
-      {item.badge && open && (
-        <div className={cn(
-          "text-sidebar-foreground pointer-events-none absolute right-1 top-1.5 flex h-5 min-w-5 items-center justify-center px-1 text-xs font-medium tabular-nums select-none",
-          "bg-primary/10 rounded-full",
-          "peer-hover/menu-button:text-sidebar-accent-foreground",
-          "peer-data-[active=true]/menu-button:text-sidebar-accent-foreground"
-        )}>
+      {/* Badge - Application Shell 08 style */}
+      {item.badge && (
+        <div 
+          data-slot="sidebar-menu-badge" 
+          data-sidebar="menu-badge"
+          className={cn(
+            "text-sidebar-foreground pointer-events-none absolute right-1 flex h-5 min-w-5 items-center justify-center px-1 text-xs font-medium tabular-nums select-none",
+            "peer-hover/menu-button:text-sidebar-accent-foreground peer-data-[active=true]/menu-button:text-sidebar-accent-foreground",
+            "peer-data-[size=sm]/menu-button:top-1 peer-data-[size=default]/menu-button:top-1.5 peer-data-[size=lg]/menu-button:top-2.5",
+            "group-data-[collapsible=icon]:hidden bg-primary/10 rounded-full",
+            !open && "hidden"
+          )}
+        >
           {item.badge}
         </div>
       )}
@@ -367,19 +365,26 @@ const MenuItem = ({ item, index }: { item: MenuItem; index: number }) => {
   )
 }
 
-// Grupo de menu com label
+// Grupo de menu com label - Application Shell 08 style
 const MenuGroup = ({ group }: { group: MenuGroup }) => {
   const { open } = useSidebar()
   
   return (
-    <div className="relative flex w-full min-w-0 flex-col p-2">
-      {group.label && open && (
-        <div className="text-sidebar-foreground/70 flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-medium">
+    <div data-slot="sidebar-group" data-sidebar="group" className="relative flex w-full min-w-0 flex-col p-2">
+      {group.label && (
+        <div 
+          data-slot="sidebar-group-label" 
+          data-sidebar="group-label"
+          className={cn(
+            "text-sidebar-foreground/70 ring-sidebar-ring flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-medium outline-hidden transition-[margin,opacity] duration-200 ease-linear focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0",
+            !open && "group-data-[collapsible=icon]:-mt-8 group-data-[collapsible=icon]:opacity-0"
+          )}
+        >
           {group.label}
         </div>
       )}
-      <div className="w-full text-sm">
-        <ul className="flex w-full min-w-0 flex-col gap-1">
+      <div data-slot="sidebar-group-content" data-sidebar="group-content" className="w-full text-sm">
+        <ul data-slot="sidebar-menu" data-sidebar="menu" className="flex w-full min-w-0 flex-col gap-1">
           {group.items.map((item, index) => (
             <MenuItem key={item.href} item={item} index={index} />
           ))}
@@ -394,7 +399,7 @@ const SidebarFooter = () => {
   const { open } = useSidebar()
   
   return (
-    <div className={cn("flex flex-col gap-2 p-2", !open && "hidden", "[&[data-state=collapsed]]:hidden")}>
+    <div data-slot="sidebar-footer" data-sidebar="footer" className={cn("flex flex-col gap-2 p-2", !open && "hidden", "[&[data-state=collapsed]]:hidden")}>
       <div className="flex flex-col items-start gap-4 overflow-hidden rounded-md p-2">
         <p className="truncate text-xl font-semibold">Go to Premium</p>
         <p className="line-clamp-2 text-sm">

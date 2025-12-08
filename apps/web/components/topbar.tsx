@@ -14,8 +14,9 @@ import {
   User,
   Loader2,
   Share2,
-  Star,
-  Zap
+  Languages,
+  Activity,
+  PanelLeft
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -208,12 +209,12 @@ export function Topbar({
 
   return (
     <header className={cn(
-      "before:bg-background/60 sticky top-0 z-50 before:absolute before:inset-0 before:mask-[linear-gradient(var(--card),var(--card)_18%,transparent_100%)] before:backdrop-blur-md before:z-[-1]",
+      "before:bg-background/60 sticky top-0 z-50 before:absolute before:inset-0 before:mask-[linear-gradient(var(--card),var(--card)_18%,transparent_100%)] before:backdrop-blur-md",
       // Mobile: header compacto sem backdrop blur
       isMobile && "before:hidden bg-card border-b shadow-sm safe-top"
     )}>
       <div className={cn(
-        "bg-card relative z-[51] flex items-center justify-between",
+        "bg-card relative z-51 flex items-center justify-between",
         // Mobile: full width, padding menor, altura fixa 56px
         isMobile 
           ? "w-full px-3 py-2 h-14 border-b" 
@@ -221,28 +222,41 @@ export function Topbar({
       )}>
         {/* Left Section - Exatamente como Application Shell 08 */}
         <div className="flex items-center gap-1.5 sm:gap-4">
-          {/* SidebarTrigger - Menu button */}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => {
-              // Em desktop, usar useSidebar se disponível; em mobile, usar onToggleSidebar
-              if (sidebarControl) {
-                sidebarControl.toggle()
-              } else if (onToggleSidebar) {
-                onToggleSidebar()
-              }
-            }}
-            className={cn(
-              "touch-manipulation",
-              isMobile 
-                ? "size-10" 
-                : "size-7 hover:bg-accent hover:text-accent-foreground [&>svg]:!size-5"
-            )}
-            aria-label="Toggle Sidebar"
-          >
-            <Menu className={isMobile ? "h-6 w-6" : "h-5 w-5"} />
-          </Button>
+          {/* SidebarTrigger - Application Shell 08 style */}
+          {sidebarControl ? (
+            <button
+              onClick={() => sidebarControl.toggle()}
+              data-sidebar="trigger"
+              data-slot="sidebar-trigger"
+              className={cn(
+                "inline-flex shrink-0 items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap transition-all outline-none focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+                "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
+                isMobile ? "size-10" : "size-7 [&_svg]:!size-5"
+              )}
+            >
+              <PanelLeft className={isMobile ? "h-6 w-6" : "h-5 w-5"} />
+              <span className="sr-only">Toggle Sidebar</span>
+            </button>
+          ) : (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => {
+                if (onToggleSidebar) {
+                  onToggleSidebar()
+                }
+              }}
+              className={cn(
+                "touch-manipulation",
+                isMobile 
+                  ? "size-10" 
+                  : "size-7 hover:bg-accent hover:text-accent-foreground [&>svg]:!size-5"
+              )}
+              aria-label="Toggle Sidebar"
+            >
+              <Menu className={isMobile ? "h-6 w-6" : "h-5 w-5"} />
+            </Button>
+          )}
 
           {/* Separator vertical - Application Shell 08 style */}
           {!isMobile && (
@@ -252,62 +266,51 @@ export function Topbar({
             />
           )}
 
-          {/* Command Palette - Exatamente como Application Shell 08 */}
+          {/* Command Palette - Application Shell 08 structure */}
           {!isMobile && (
-            <Dialog open={isCommandPaletteOpen} onOpenChange={setIsCommandPaletteOpen}>
-              {/* Desktop: Button com texto "Type to search..." */}
-              <DialogTrigger asChild>
-                <Button
-                  variant="ghost"
-                  className="shrink-0 items-center justify-center gap-2 rounded-md text-sm whitespace-nowrap transition-all outline-none focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50 h-9 has-[>svg]:px-3 hidden !bg-transparent px-1 py-0 font-normal sm:block md:max-lg:hidden"
-                >
-                  <Search className="h-4 w-4" />
-                  <span>Type to search...</span>
-                </Button>
-              </DialogTrigger>
-              {/* Tablet/Mobile: Button apenas com ícone */}
-              <DialogTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="size-9 sm:hidden md:max-lg:inline-flex hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50"
-                  aria-label="Search"
-                >
-                  <Search className="h-4 w-4" />
-                  <span className="sr-only">Search</span>
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-lg">
-                <DialogHeader>
-                  <DialogTitle>Command Palette</DialogTitle>
-                  <DialogDescription>Search for a command to run...</DialogDescription>
-                </DialogHeader>
-                <div className="mt-4">
-                  <Input
-                    type="search"
-                    placeholder="Type to search..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full"
-                    autoFocus
-                  />
-                  <div className="mt-4 text-sm text-muted-foreground">
-                    <div className="flex items-center justify-between mb-2">
-                      <span>esc</span>
-                      <span>To close</span>
-                    </div>
-                    <div className="flex items-center justify-between mb-2">
-                      <span>↑↓</span>
-                      <span>To Navigate</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span>Enter</span>
-                      <span>To Select</span>
-                    </div>
-                  </div>
+            <div>
+              <Dialog open={isCommandPaletteOpen} onOpenChange={setIsCommandPaletteOpen}>
+                <div>
+                  {/* Desktop: Button com texto "Type to search..." */}
+                  <DialogTrigger asChild>
+                    <button
+                      className="shrink-0 items-center justify-center gap-2 rounded-md text-sm whitespace-nowrap transition-all outline-none focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50 h-9 has-[>svg]:px-3 hidden !bg-transparent px-1 py-0 font-normal sm:block md:max-lg:hidden"
+                    >
+                      <div className="text-muted-foreground hidden items-center gap-1.5 text-sm sm:flex md:max-lg:hidden">
+                        <Search className="h-4 w-4" />
+                        <span>Type to search...</span>
+                      </div>
+                    </button>
+                  </DialogTrigger>
+                  {/* Tablet: Button apenas com ícone */}
+                  <DialogTrigger asChild>
+                    <button
+                      className="inline-flex shrink-0 items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap transition-all outline-none focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50 size-9 sm:hidden md:max-lg:inline-flex"
+                      aria-label="Search"
+                    >
+                      <Search className="h-4 w-4" />
+                      <span className="sr-only">Search</span>
+                    </button>
+                  </DialogTrigger>
                 </div>
-              </DialogContent>
-            </Dialog>
+                <DialogContent className="max-w-lg">
+                  <DialogHeader className="sr-only">
+                    <DialogTitle>Command Palette</DialogTitle>
+                    <DialogDescription>Search for a command to run...</DialogDescription>
+                  </DialogHeader>
+                  <div className="mt-4">
+                    <Input
+                      type="search"
+                      placeholder="Type to search..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-full"
+                      autoFocus
+                    />
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </div>
           )}
         </div>
 
@@ -328,17 +331,17 @@ export function Topbar({
                 variant="ghost" 
                 size="icon"
                 className="size-9 hover:bg-accent hover:text-accent-foreground" 
-                aria-label="Favorite"
+                aria-label="Languages"
               >
-                <Star className="h-4 w-4" />
+                <Languages className="h-4 w-4" />
               </Button>
               <Button 
                 variant="ghost" 
                 size="icon"
                 className="size-9 hover:bg-accent hover:text-accent-foreground" 
-                aria-label="Quick actions"
+                aria-label="Activity"
               >
-                <Zap className="h-4 w-4" />
+                <Activity className="h-4 w-4" />
               </Button>
             </>
           )}
@@ -358,7 +361,7 @@ export function Topbar({
           >
             <Bell className={isMobile ? "h-5 w-5" : "h-4 w-4"} />
             <motion.span 
-              className="absolute top-1.5 right-1.5 w-2 h-2 bg-primary rounded-full"
+              className="absolute top-2 right-2.5 size-2 bg-destructive rounded-full"
               animate={{ 
                 scale: [1, 1.2, 1],
                 opacity: [1, 0.8, 1]
