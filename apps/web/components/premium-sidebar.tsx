@@ -319,7 +319,7 @@ const MenuItem = ({ item, index }: { item: MenuItem; index: number }) => {
           "aria-disabled:pointer-events-none aria-disabled:opacity-50",
           "data-[active=true]:font-medium [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0",
           "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm",
-          !open && "justify-center"
+          !open && "justify-center [&>svg]:size-4"
         )}
       >
         <Icon className="shrink-0" />
@@ -525,7 +525,7 @@ export function PremiumSidebar({
         <SidebarHeader panel={panel} />
 
         {/* Content */}
-        <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-auto">
+        <div data-slot="sidebar-content" data-sidebar="content" className="flex min-h-0 flex-1 flex-col gap-2 overflow-auto">
           {menuGroups.map((group, groupIndex) => (
             <MenuGroup key={groupIndex} group={group} />
           ))}
