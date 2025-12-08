@@ -18,9 +18,13 @@ import { t } from "@/lib/i18n"
 import { KPICardEnhanced } from "@/components/operator/dashboard/kpi-card-enhanced"
 import { ControlTowerVisual } from "@/components/operator/dashboard/control-tower-visual"
 import { MapPin, Clock, AlertTriangle, TrendingUp, DollarSign, CheckCircle } from "lucide-react"
+import { useMobile } from "@/hooks/use-mobile"
+import { cn } from "@/lib/utils"
+import { ResponsiveChart } from "@/components/shared/responsive-chart"
 
 export default function OperatorDashboard() {
   const router = useRouter()
+  const isMobile = useMobile()
 
   // Limpar parâmetros indesejados da URL
   useEffect(() => {
@@ -200,8 +204,11 @@ export default function OperatorDashboard() {
           </div>
         </div>
 
-        {/* KPIs Premium */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        {/* KPIs Premium - Mobile: 1 col, Tablet: 2 cols, Desktop: 3-4 cols */}
+        <div className={cn(
+          "grid gap-4",
+          isMobile ? "grid-cols-1" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+        )}>
           <KPICardEnhanced
             label={t('operator', 'kpi_trips_today')}
             value={kpis.trips_today}
@@ -307,7 +314,10 @@ export default function OperatorDashboard() {
               </div>
             </CardHeader>
             <CardContent className="pt-0 px-3 sm:px-6">
-              <div className="h-40 sm:h-48 bg-gradient-to-br from-orange-500/10 to-orange-600/10 rounded-lg flex items-center justify-center border border-orange-200/50">
+              <div className={cn(
+                "bg-gradient-to-br from-orange-500/10 to-orange-600/10 rounded-lg flex items-center justify-center border border-orange-200/50",
+                isMobile ? "h-48" : "h-40 sm:h-48"
+              )}>
                 <MapPin className="h-10 w-10 sm:h-12 sm:w-12 text-orange-500 opacity-40" />
               </div>
             </CardContent>

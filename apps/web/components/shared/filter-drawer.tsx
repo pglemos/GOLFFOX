@@ -1,12 +1,21 @@
 "use client"
 
-import { motion } from "framer-motion"
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription, DrawerFooter } from "@/components/ui/drawer"
+import React from "react"
+import { useMobile } from "@/hooks/use-mobile"
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { X, Filter, RotateCcw } from "lucide-react"
-import { modalContent } from "@/lib/animations"
+import { Filter, X } from "lucide-react"
+import { cn } from "@/lib/utils"
 
 interface FilterOption {
   label: string
@@ -22,137 +31,163 @@ interface FilterField {
 }
 
 interface FilterDrawerProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  filters: Record<string, string>
-  onFiltersChange: (filters: Record<string, string>) => void
-  fields: FilterField[]
-  onReset?: () => void
+  filters: FilterField[]
+  values: Record<string, string>
+  onFilterChange: (key: string, value: string) => void
+  onReset: () => void
+  trigger?: React.ReactNode
+  title?: string
+  description?: string
 }
 
+/**
+ * Componente de filtros que usa Drawer em mobile e pode ser usado inline em desktop
+ */
 export function FilterDrawer({
-  open,
-  onOpenChange,
   filters,
-  onFiltersChange,
-  fields,
-  onReset
+  values,
+  onFilterChange,
+  onReset,
+  trigger,
+  title = "Filtros",
+  description = "Aplique filtros para refinar os resultados"
 }: FilterDrawerProps) {
-  const handleFilterChange = (key: string, value: string) => {
-    onFiltersChange({ ...filters, [key]: value })
-  }
+  const isMobile = useMobile()
+  const [open, setOpen] = React.useState(false)
 
-  const handleReset = () => {
-    const resetFilters: Record<string, string> = {}
-    fields.forEach(field => {
-      resetFilters[field.key] = ""
-    })
-    onFiltersChange(resetFilters)
-    if (onReset) onReset()
-  }
+  const hasActiveFilters = Object.values(values).some(v => v && v !== "" && v !== "all")
 
-  return (
-    <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent className="bg-card/95 backdrop-blur-lg border-t border-[var(--border)]">
-        <motion.div
-          variants={modalContent}
-          initial="hidden"
-          animate="visible"
+  const content = (
+    <div className="space-y-4">
+      {filters.map((filter) => (
+        <div key={filter.key} className="space-y-2">
+          <Label htmlFor={filter.key} className="text-sm font-medium">
+            {filter.label}
+          </Label>
+          {filter.type === "text" && (
+            <Input
+              id={filter.key}
+              type="text"
+              placeholder={filter.placeholder || `Filtrar por ${filter.label.toLowerCase()}`}
+              value={values[filter.key] || ""}
+              onChange={(e) => onFilterChange(filter.key, e.target.value)}
+              className="min-h-[44px] text-base"
+            />
+          )}
+          {filter.type === "select" && (
+            <Select
+              value={values[filter.key] || "all"}
+              onValueChange={(value) => onFilterChange(filter.key, value)}
+            >
+              <SelectTrigger id={filter.key} className="min-h-[44px] text-base">
+                <SelectValue placeholder={`Selecione ${filter.label.toLowerCase()}`} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todos</SelectItem>
+                {filter.options?.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+          {filter.type === "date" && (
+            <Input
+              id={filter.key}
+              type="date"
+              value={values[filter.key] || ""}
+              onChange={(e) => onFilterChange(filter.key, e.target.value)}
+              className="min-h-[44px] text-base"
+            />
+          )}
+        </div>
+      ))}
+      <div className="flex gap-2 pt-4">
+        <Button
+          variant="outline"
+          onClick={onReset}
+          className="flex-1 min-h-[44px] touch-manipulation"
         >
-          <DrawerHeader className="border-b border-[var(--border)]">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-gradient-to-br from-[var(--brand-light)] to-[var(--brand-soft)]">
-                  <Filter className="h-5 w-5 text-[var(--brand)]" />
-                </div>
-                <div>
-                  <DrawerTitle className="text-lg font-semibold">Filtros</DrawerTitle>
-                  <DrawerDescription className="text-sm text-[var(--ink-muted)]">
-                    Aplique filtros para refinar sua busca
-                  </DrawerDescription>
-                </div>
-              </div>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => onOpenChange(false)}
-                className="h-9 w-9"
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-          </DrawerHeader>
+          Limpar
+        </Button>
+        {isMobile && (
+          <Button
+            onClick={() => setOpen(false)}
+            className="flex-1 min-h-[44px] touch-manipulation"
+          >
+            Aplicar
+          </Button>
+        )}
+      </div>
+    </div>
+  )
 
-          <div className="p-6 space-y-4 max-h-[60vh] overflow-y-auto">
-            {fields.map((field, index) => (
-              <motion.div
-                key={field.key}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.05 }}
-                className="space-y-2"
-              >
-                <label className="text-sm font-medium text-[var(--ink-strong)]">
-                  {field.label}
-                </label>
-                {field.type === "text" && (
-                  <Input
-                    value={filters[field.key] || ""}
-                    onChange={(e) => handleFilterChange(field.key, e.target.value)}
-                    placeholder={field.placeholder || `Digite ${field.label.toLowerCase()}`}
-                    className="bg-card/50 backdrop-blur-sm"
-                  />
-                )}
-                {field.type === "select" && (
-                  <Select
-                    value={filters[field.key] || ""}
-                    onValueChange={(value) => handleFilterChange(field.key, value)}
-                  >
-                    <SelectTrigger className="bg-card/50 backdrop-blur-sm">
-                      <SelectValue placeholder={field.placeholder || `Selecione ${field.label.toLowerCase()}`} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {field.options?.map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-                {field.type === "date" && (
-                  <Input
-                    type="date"
-                    value={filters[field.key] || ""}
-                    onChange={(e) => handleFilterChange(field.key, e.target.value)}
-                    className="bg-card/50 backdrop-blur-sm"
-                  />
-                )}
-              </motion.div>
-            ))}
+  if (isMobile) {
+    return (
+      <Sheet open={open} onOpenChange={setOpen}>
+        <SheetTrigger asChild>
+          {trigger || (
+            <Button
+              variant="outline"
+              className={cn(
+                "min-h-[44px] touch-manipulation",
+                hasActiveFilters && "border-primary bg-primary/5"
+              )}
+            >
+              <Filter className="h-4 w-4 mr-2" />
+              Filtros
+              {hasActiveFilters && (
+                <span className="ml-2 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground">
+                  {Object.values(values).filter(v => v && v !== "" && v !== "all").length}
+                </span>
+              )}
+            </Button>
+          )}
+        </SheetTrigger>
+        <SheetContent 
+          side="right" 
+          className="w-[90vw] max-w-sm overflow-y-auto scroll-smooth-touch"
+          style={{
+            paddingTop: 'max(1rem, env(safe-area-inset-top))',
+            paddingBottom: 'max(1rem, env(safe-area-inset-bottom))',
+          }}
+        >
+          <SheetHeader>
+            <SheetTitle>{title}</SheetTitle>
+            <SheetDescription>{description}</SheetDescription>
+          </SheetHeader>
+          <div className="mt-6">
+            {content}
           </div>
+        </SheetContent>
+      </Sheet>
+    )
+  }
 
-          <DrawerFooter className="border-t border-[var(--border)]">
-            <div className="flex gap-3">
-              <Button
-                variant="outline"
-                onClick={handleReset}
-                className="flex-1"
-              >
-                <RotateCcw className="h-4 w-4 mr-2" />
-                Limpar
-              </Button>
-              <Button
-                onClick={() => onOpenChange(false)}
-                className="flex-1 bg-gradient-to-r from-[var(--brand)] to-[var(--brand-hover)]"
-              >
-                Aplicar Filtros
-              </Button>
-            </div>
-          </DrawerFooter>
-        </motion.div>
-      </DrawerContent>
-    </Drawer>
+  // Desktop: renderizar inline
+  return (
+    <div className="space-y-4 p-4 border rounded-lg bg-card">
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-sm font-semibold">{title}</h3>
+          {description && (
+            <p className="text-xs text-muted-foreground mt-1">{description}</p>
+          )}
+        </div>
+        {hasActiveFilters && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onReset}
+            className="h-8"
+          >
+            <X className="h-4 w-4 mr-1" />
+            Limpar
+          </Button>
+        )}
+      </div>
+      {content}
+    </div>
   )
 }
-

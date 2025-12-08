@@ -6,12 +6,25 @@ import { Button } from "@/components/ui/button"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { FleetMap } from "@/components/fleet-map"
 import { KpiCardEnhanced } from "@/components/transportadora/kpi-card-enhanced"
 import { DataTable } from "@/components/transportadora/data-table"
-import { ChartContainer } from "@/components/transportadora/chart-container"
 import { QuickActions } from "@/components/transportadora/quick-actions"
 import { RecentActivities } from "@/components/transportadora/recent-activities"
+import { FilterDrawer } from "@/components/shared/filter-drawer"
+import { ResponsiveChart } from "@/components/shared/responsive-chart"
+import { LazyWrapper } from "@/components/shared/lazy-wrapper"
+import { useMobile } from "@/hooks/use-mobile"
+import dynamic from "next/dynamic"
+
+// Lazy load componentes pesados
+const FleetMap = dynamic(() => import("@/components/fleet-map"), {
+  loading: () => (
+    <div className="flex items-center justify-center h-full min-h-[200px]">
+      <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+    </div>
+  ),
+  ssr: false
+})
 import { 
   Truck, 
   Map, 
@@ -25,9 +38,11 @@ import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts"
 import { t } from "@/lib/i18n"
+import { cn } from "@/lib/utils"
 
 export default function TransportadoraDashboard() {
   const router = useRouter()
+  const isMobile = useMobile()
   const [user, setUser] = useState<any>(null)
   const [userData, setUserData] = useState<any>(null)
   const [loading, setLoading] = useState(true)
@@ -540,7 +555,7 @@ export default function TransportadoraDashboard() {
     }}>
       <div className="space-y-4 sm:space-y-6 lg:space-y-8 w-full">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 pb-2">
+        <div className="flex flex-col gap-3 sm:gap-4 pb-2">
           <div className="flex-1 min-w-0">
             <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-2 text-[var(--ink-strong)]">{t('transportadora', 'header_title')}</h1>
             <p className="text-xs sm:text-sm md:text-base text-[var(--ink-muted)]">{t('transportadora', 'header_subtitle')}</p>
@@ -550,7 +565,7 @@ export default function TransportadoraDashboard() {
               value={period}
               onValueChange={(value: "today" | "week" | "month" | "custom") => setPeriod(value)}
             >
-              <SelectTrigger className="w-full sm:w-40 min-h-[44px] touch-manipulation">
+              <SelectTrigger className="w-full sm:w-40 min-h-[44px] touch-manipulation text-base">
                 <Calendar className="h-4 w-4 mr-2" />
                 <SelectValue />
               </SelectTrigger>
@@ -571,8 +586,11 @@ export default function TransportadoraDashboard() {
           </div>
         </div>
 
-        {/* Stats - KPIs Melhorados */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        {/* Stats - KPIs Melhorados - Mobile: 1 col, Tablet: 2 cols, Desktop: 4 cols */}
+        <div className={cn(
+          "grid gap-3 sm:gap-4",
+          isMobile ? "grid-cols-1" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
+        )}>
           <KpiCardEnhanced
             icon={Truck}
             label={t('transportadora', 'kpi_total_fleet')}
@@ -628,8 +646,11 @@ export default function TransportadoraDashboard() {
           />
         </div>
 
-        {/* Additional KPIs Row */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+        {/* Additional KPIs Row - Mobile: 1 col, Tablet: 2 cols, Desktop: 3 cols */}
+        <div className={cn(
+          "grid gap-3 sm:gap-4",
+          isMobile ? "grid-cols-1" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+        )}>
           <KpiCardEnhanced
             icon={DollarSign}
             label={t('transportadora', 'kpi_monthly_costs')}
@@ -677,13 +698,17 @@ export default function TransportadoraDashboard() {
         </div>
 
         {/* Gráficos e Ações Rápidas */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
+        <div className={cn(
+          "grid gap-3 sm:gap-4 lg:gap-6",
+          isMobile ? "grid-cols-1" : "grid-cols-1 lg:grid-cols-3"
+        )}>
           {/* Gráfico de Linha - Veículos em Rota */}
-          <ChartContainer
+          <ResponsiveChart
             title={t('transportadora', 'charts_vehicles_24h')}
             description={t('transportadora', 'charts_vehicles_24h_desc')}
             height={300}
-            className="lg:col-span-2"
+            mobileHeight={250}
+            className={cn(isMobile ? "w-full" : "lg:col-span-2")}
           >
             <LineChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
@@ -712,19 +737,23 @@ export default function TransportadoraDashboard() {
                 activeDot={{ r: 6 }}
               />
             </LineChart>
-          </ChartContainer>
+          </ResponsiveChart>
 
           {/* Ações Rápidas */}
           <QuickActions />
         </div>
 
         {/* Gráficos de Distribuição */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 lg:gap-6">
+        <div className={cn(
+          "grid gap-3 sm:gap-4 lg:gap-6",
+          isMobile ? "grid-cols-1" : "grid-cols-1 lg:grid-cols-2"
+        )}>
           {/* Gráfico de Pizza - Status da Frota */}
-          <ChartContainer
+          <ResponsiveChart
             title={t('transportadora', 'charts_fleet_distribution')}
             description={t('transportadora', 'charts_fleet_distribution_desc')}
             height={300}
+            mobileHeight={250}
           >
             <PieChart>
               <Pie
@@ -744,13 +773,14 @@ export default function TransportadoraDashboard() {
               </Pie>
               <Tooltip />
             </PieChart>
-          </ChartContainer>
+          </ResponsiveChart>
 
           {/* Gráfico de Barras - Top Motoristas */}
-          <ChartContainer
+          <ResponsiveChart
             title={t('transportadora', 'charts_top_drivers')}
             description={t('transportadora', 'charts_top_drivers_desc')}
             height={300}
+            mobileHeight={250}
           >
             <BarChart data={topDrivers}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
@@ -775,11 +805,14 @@ export default function TransportadoraDashboard() {
               />
               <Bar dataKey="trips" fill="var(--brand)" radius={[8, 8, 0, 0]} />
             </BarChart>
-          </ChartContainer>
+          </ResponsiveChart>
         </div>
 
-        {/* Fleet Status */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 lg:gap-6">
+        {/* Fleet Status - Mobile: 1 col, Desktop: 2 cols */}
+        <div className={cn(
+          "grid gap-3 sm:gap-4 lg:gap-6",
+          isMobile ? "grid-cols-1" : "grid-cols-1 lg:grid-cols-2"
+        )}>
           {/* Fleet Map */}
           <Card className="overflow-hidden">
             <CardHeader className="pb-4 px-3 sm:px-6">
@@ -802,10 +835,15 @@ export default function TransportadoraDashboard() {
               </div>
             </CardHeader>
             <CardContent className="pt-0 px-3 sm:px-6">
-              <div className="h-48 sm:h-64 md:h-80 lg:h-96 rounded-lg overflow-hidden border border-[var(--border)] shadow-inner bg-gray-50 dark:bg-gray-900">
-                <FleetMap 
-                  transportadoraId={userData?.transportadora_id}
-                />
+              <div className={cn(
+                "rounded-lg overflow-hidden border border-[var(--border)] shadow-inner bg-gray-50 dark:bg-gray-900",
+                isMobile ? "h-64" : "h-48 sm:h-64 md:h-80 lg:h-96"
+              )}>
+                <LazyWrapper>
+                  <FleetMap 
+                    transportadoraId={userData?.transportadora_id}
+                  />
+                </LazyWrapper>
               </div>
               <div className="mt-3 flex flex-wrap gap-2 text-xs text-[var(--ink-muted)]">
                 <div className="flex items-center gap-1">
@@ -892,10 +930,13 @@ export default function TransportadoraDashboard() {
           </Card>
         </div>
 
-        {/* Fleet Status Table e Atividades Recentes */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
+        {/* Fleet Status Table e Atividades Recentes - Mobile: stack, Desktop: side by side */}
+        <div className={cn(
+          "grid gap-3 sm:gap-4 lg:gap-6",
+          isMobile ? "grid-cols-1" : "grid-cols-1 lg:grid-cols-3"
+        )}>
           {/* Tabela de Status da Frota */}
-          <div className="lg:col-span-2">
+          <div className={cn(isMobile ? "w-full" : "lg:col-span-2")}>
             <DataTable
               data={fleet}
               columns={[

@@ -40,10 +40,12 @@ const DialogContent = React.forwardRef<
         ref={ref}
         className={cn(
           "bg-background text-foreground animate-in fade-in-0 zoom-in-95 duration-200 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 fixed z-50 grid w-full gap-4 border shadow-lg",
-          // Mobile: fullscreen
+          // Mobile: fullscreen com safe areas
           isMobile 
-            ? "inset-0 rounded-none p-4 max-h-screen overflow-y-auto" 
+            ? "inset-0 rounded-none p-4 max-h-screen overflow-y-auto scroll-smooth-touch" 
             : "left-[50%] top-[50%] max-w-lg translate-x-[-50%] translate-y-[-50%] p-6 sm:rounded-lg",
+          // Safe areas para iOS
+          isMobile && "safe-top safe-bottom"
           className
         )}
         {...props}

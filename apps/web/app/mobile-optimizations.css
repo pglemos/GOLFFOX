@@ -22,6 +22,23 @@ label {
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
 }
 
+/* Espaçamento mínimo entre elementos clicáveis (8px conforme guidelines) */
+button + button,
+a[role="button"] + button,
+[role="button"] + button,
+button + a[role="button"],
+a[role="button"] + a[role="button"] {
+  margin-left: 8px;
+}
+
+/* Garantir espaçamento adequado em grupos de botões */
+.flex.gap-2 > button,
+.flex.gap-2 > a[role="button"],
+.flex.gap-3 > button,
+.flex.gap-3 > a[role="button"] {
+  /* Gap já fornece espaçamento adequado */
+}
+
 /* Prevenir zoom no iOS ao focar inputs */
 input[type="text"],
 input[type="email"],
