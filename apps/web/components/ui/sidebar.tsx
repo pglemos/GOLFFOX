@@ -257,3 +257,24 @@ export const SidebarLink = ({
   );
 };
 
+// SidebarTrigger - Componente para toggle do sidebar
+export const SidebarTrigger = React.forwardRef<
+  HTMLButtonElement,
+  React.ComponentPropsWithoutRef<"button">
+>(({ className, onClick, ...props }, ref) => {
+  const { setOpen, open } = useSidebar();
+  
+  return (
+    <button
+      ref={ref}
+      onClick={(e) => {
+        setOpen(!open);
+        onClick?.(e);
+      }}
+      className={className}
+      {...props}
+    />
+  );
+});
+SidebarTrigger.displayName = "SidebarTrigger";
+

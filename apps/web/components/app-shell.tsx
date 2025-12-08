@@ -59,12 +59,14 @@ export const AppShell = memo(function AppShell({ user, children, panel }: AppShe
     }
   }[detectedPanel]), [detectedPanel])
 
-  // Fechar sidebar quando mudar para mobile ou quando navegar
+  // Em desktop, começar com sidebar fechado (pode abrir com hover ou toggle)
+  // Em mobile, sempre começar fechado
   useEffect(() => {
     if (isMobile) {
       setIsSidebarOpen(false)
       document.body.setAttribute('data-mobile', 'true')
     } else {
+      // Desktop: começar fechado, pode abrir com toggle ou hover
       setIsSidebarOpen(false)
       document.body.removeAttribute('data-mobile')
     }
@@ -171,9 +173,9 @@ export const AppShell = memo(function AppShell({ user, children, panel }: AppShe
           />
         )}
 
-        {/* Sidebar Premium */}
+        {/* Sidebar Premium - Em mobile controla via isOpen, em desktop permite hover + toggle */}
         <PremiumSidebar
-          isOpen={isSidebarOpen}
+          isOpen={isMobile ? isSidebarOpen : undefined}
           isMobile={isMobile}
           panel={detectedPanel}
           user={user ? { id: user.id, name: user.name || '', email: user.email, avatar_url: user.avatar_url } : { id: '', name: '', email: '' }}
