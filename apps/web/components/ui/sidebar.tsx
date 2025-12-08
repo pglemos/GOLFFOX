@@ -5,6 +5,7 @@ import React, { useState, createContext, useContext } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { Menu, X } from "lucide-react";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
 
 interface Links {
   label: string;
@@ -98,7 +99,7 @@ export const Sidebar = ({
 };
 
 export const SidebarBody = ({ className, children, ...rest }: React.ComponentProps<typeof motion.div>) => {
-  const { open } = useSidebar();
+  const { open, setOpen } = useSidebar();
   const { isMobile } = useSidebarBody();
   
   return (
@@ -106,27 +107,22 @@ export const SidebarBody = ({ className, children, ...rest }: React.ComponentPro
       <DesktopSidebar className={className} {...rest}>
         {children}
       </DesktopSidebar>
-      {/* Sidebar Mobile - renderizado quando aberto */}
-      <AnimatePresence>
-        {isMobile && open && (
-          <motion.div
-            initial={{ x: -280, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            exit={{ x: -280, opacity: 0 }}
-            transition={{ duration: 0.2, ease: "easeOut" }}
+      {/* Sidebar Mobile - usando Sheet para melhor UX */}
+      {isMobile && (
+        <Sheet open={open} onOpenChange={setOpen}>
+          <SheetContent 
+            side="left"
             className={cn(
-              "md:hidden fixed top-16 sm:top-18 left-0 h-[calc(100vh-4rem)] sm:h-[calc(100vh-4.5rem)] z-50 w-[280px] sm:w-[300px] bg-white dark:bg-neutral-900 border-r border-[var(--border)] overflow-y-auto",
-              "shadow-xl",
+              "w-[280px] sm:w-[300px] p-0 bg-sidebar border-r border-sidebar-border",
+              "inset-y-0 top-[56px] h-[calc(100vh-56px-env(safe-area-inset-top))]",
+              "overflow-y-auto scroll-smooth-touch",
               className
             )}
-            id="app-sidebar-mobile"
-            role="dialog"
-            aria-modal="true"
           >
             {children}
-          </motion.div>
-        )}
-      </AnimatePresence>
+          </SheetContent>
+        </Sheet>
+      )}
     </>
   );
 };

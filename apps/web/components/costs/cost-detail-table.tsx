@@ -11,6 +11,8 @@ import {
 } from "lucide-react"
 import { formatCurrency } from "@/lib/kpi-utils"
 import { exportToCSV, exportToExcel, exportToPDF } from "@/lib/export-utils"
+import { useMobile } from "@/hooks/use-mobile"
+import { cn } from "@/lib/utils"
 
 interface CostDetail {
   id: string
@@ -38,12 +40,13 @@ interface CostDetailTableProps {
 type GroupingLevel = 'group' | 'category' | 'none'
 
 export function CostDetailTable({ costs, onReconcile, loading }: CostDetailTableProps) {
+  const isMobile = useMobile() // Hook mobile-first
   const [grouping, setGrouping] = useState<GroupingLevel>('group')
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set())
   const [sortColumn, setSortColumn] = useState<keyof CostDetail | null>(null)
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
   const [page, setPage] = useState(0)
-  const [pageSize, setPageSize] = useState(50)
+  const [pageSize, setPageSize] = useState(isMobile ? 20 : 50) // Menos itens por página em mobile
 
   const toggleGroup = (group: string) => {
     const newExpanded = new Set(expandedGroups)
@@ -194,15 +197,24 @@ export function CostDetailTable({ costs, onReconcile, loading }: CostDetailTable
   const totalColSpan = grouping === 'none' ? 7 : (grouping === 'group' ? 7 : 8)
 
   return (
-    <Card className="p-4 bg-card">
-      <div className="flex items-center justify-between mb-4">
+    <Card className={cn("bg-card", isMobile ? "p-3" : "p-4")}>
+      <div className={cn(
+        "mb-4",
+        isMobile ? "flex flex-col gap-3" : "flex items-center justify-between"
+      )}>
         <div className="flex items-center gap-2">
-          <h3 className="font-semibold">Detalhamento de Custos</h3>
+          <h3 className={cn("font-semibold", isMobile ? "text-base" : "text-lg")}>Detalhamento de Custos</h3>
           <Badge variant="outline">{costs.length} registros</Badge>
         </div>
-        <div className="flex items-center gap-2">
+        <div className={cn(
+          "flex items-center gap-2",
+          isMobile ? "flex-wrap w-full" : ""
+        )}>
           <select
-            className="px-3 py-2 rounded-lg border border-border bg-card text-sm"
+            className={cn(
+              "rounded-lg border border-border bg-card text-sm touch-manipulation",
+              isMobile ? "flex-1 min-h-[44px] px-3 py-2" : "px-3 py-2"
+            )}
             value={grouping}
             onChange={(e) => setGrouping(e.target.value as GroupingLevel)}
           >
@@ -210,34 +222,153 @@ export function CostDetailTable({ costs, onReconcile, loading }: CostDetailTable
             <option value="group">Por Grupo</option>
             <option value="category">Por Categoria</option>
           </select>
-          <select
-            className="px-3 py-2 rounded-lg border border-border bg-card text-sm"
-            value={pageSize}
-            onChange={(e) => { setPageSize(parseInt(e.target.value)); setPage(0) }}
-          >
-            <option value={25}>25</option>
-            <option value={50}>50</option>
-            <option value={100}>100</option>
-          </select>
-          <div className="flex gap-1">
-            <Button variant="outline" size="sm" onClick={() => handleExport('csv')}>
-              <Download className="h-4 w-4 mr-1" />
-              CSV
-            </Button>
-            <Button variant="outline" size="sm" onClick={() => handleExport('excel')}>
-              <Download className="h-4 w-4 mr-1" />
-              Excel
-            </Button>
-            <Button variant="outline" size="sm" onClick={() => handleExport('pdf')}>
-              <Download className="h-4 w-4 mr-1" />
-              PDF
-            </Button>
-          </div>
+          {!isMobile && (
+            <select
+              className="px-3 py-2 rounded-lg border border-border bg-card text-sm"
+              value={pageSize}
+              onChange={(e) => { setPageSize(parseInt(e.target.value)); setPage(0) }}
+            >
+              <option value={25}>25</option>
+              <option value={50}>50</option>
+              <option value={100}>100</option>
+            </select>
+          )}
+          {!isMobile && (
+            <div className="flex gap-1">
+              <Button variant="outline" size="sm" onClick={() => handleExport('csv')}>
+                <Download className="h-4 w-4 mr-1" />
+                CSV
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => handleExport('excel')}>
+                <Download className="h-4 w-4 mr-1" />
+                Excel
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => handleExport('pdf')}>
+                <Download className="h-4 w-4 mr-1" />
+                PDF
+              </Button>
+            </div>
+          )}
         </div>
       </div>
 
-      <div className="overflow-x-auto rounded-lg border bg-card">
-        <table className="w-full text-sm bg-card">
+      {isMobile ? (
+        /* Mobile: Cards Layout */
+        <div className="p-3 space-y-3">
+          {grouping === 'none' ? (
+            paginatedCosts.map(cost => (
+              <Card key={cost.id} className="mobile-table-card p-4">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-medium text-muted-foreground uppercase">Data</span>
+                    <span className="text-sm font-semibold">{new Date(cost.date).toLocaleDateString('pt-BR')}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-medium text-muted-foreground uppercase">Grupo/Categoria</span>
+                    <span className="text-sm text-right flex-1 ml-2">{cost.group_name} {cost.category}{cost.subcategory ? ` - ${cost.subcategory}` : ''}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-medium text-muted-foreground uppercase">Rota</span>
+                    <span className="text-sm">{cost.route_name || '-'}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-medium text-muted-foreground uppercase">Veículo</span>
+                    <span className="text-sm">{cost.vehicle_plate || '-'}</span>
+                  </div>
+                  <div className="flex items-center justify-between pt-2 border-t">
+                    <span className="text-xs font-medium text-muted-foreground uppercase">Valor</span>
+                    <span className="text-base font-bold text-primary">{formatCurrency(cost.amount)}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-medium text-muted-foreground uppercase">Origem</span>
+                    <Badge variant="outline" className="text-xs">{cost.source}</Badge>
+                  </div>
+                  {onReconcile && cost.invoice_id && (
+                    <div className="pt-2 border-t">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => onReconcile(cost)}
+                        className="w-full min-h-[44px] touch-manipulation"
+                      >
+                        Conciliar
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </Card>
+            ))
+          ) : (grouping === 'group' || grouping === 'category') && groupedData.groups ? (
+            Object.entries(groupedData.groups).flatMap(([groupName, group]) => [
+              <Card 
+                key={`${groupName}-header`}
+                className="mobile-table-card p-4 bg-muted/30"
+                onClick={() => toggleGroup(groupName)}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    {expandedGroups.has(groupName) ? (
+                      <ChevronDown className="h-4 w-4" />
+                    ) : (
+                      <ChevronRight className="h-4 w-4" />
+                    )}
+                    <span className="font-semibold">{groupName}</span>
+                    <Badge variant="outline">{group.items.length}</Badge>
+                  </div>
+                  <span className="text-sm font-bold">{formatCurrency(group.total)}</span>
+                </div>
+              </Card>,
+              ...(expandedGroups.has(groupName) ? group.items.map(cost => (
+                <Card key={cost.id} className="mobile-table-card p-4 ml-4">
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-medium text-muted-foreground uppercase">Data</span>
+                      <span className="text-sm font-semibold">{new Date(cost.date).toLocaleDateString('pt-BR')}</span>
+                    </div>
+                    {grouping === 'group' && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-medium text-muted-foreground uppercase">Categoria</span>
+                        <span className="text-sm">{cost.category}{cost.subcategory ? ` - ${cost.subcategory}` : ''}</span>
+                      </div>
+                    )}
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-medium text-muted-foreground uppercase">Rota</span>
+                      <span className="text-sm">{cost.route_name || '-'}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-medium text-muted-foreground uppercase">Veículo</span>
+                      <span className="text-sm">{cost.vehicle_plate || '-'}</span>
+                    </div>
+                    <div className="flex items-center justify-between pt-2 border-t">
+                      <span className="text-xs font-medium text-muted-foreground uppercase">Valor</span>
+                      <span className="text-base font-bold text-primary">{formatCurrency(cost.amount)}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-medium text-muted-foreground uppercase">Origem</span>
+                      <Badge variant="outline" className="text-xs">{cost.source}</Badge>
+                    </div>
+                    {onReconcile && cost.invoice_id && (
+                      <div className="pt-2 border-t">
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => onReconcile(cost)}
+                          className="w-full min-h-[44px] touch-manipulation"
+                        >
+                          Conciliar
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </Card>
+              )) : [])
+            ])
+          ) : null}
+        </div>
+      ) : (
+        /* Desktop: Table Layout */
+        <div className="overflow-x-auto rounded-lg border bg-card">
+          <table className="w-full text-sm bg-card">
           <thead className="bg-card">
             <tr className="border-b border-border">
               {grouping === 'group' && <th className="text-left p-2 sm:p-4 bg-card">Grupo</th>}
@@ -339,11 +470,38 @@ export function CostDetailTable({ costs, onReconcile, loading }: CostDetailTable
           </tfoot>
         </table>
       </div>
-      <div className="flex items-center justify-between mt-4">
-        <span className="text-sm text-muted-foreground">Página {currentPage + 1} de {pageCount}</span>
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={() => setPage(p => Math.max(0, p - 1))} disabled={currentPage === 0}>Anterior</Button>
-          <Button variant="outline" size="sm" onClick={() => setPage(p => Math.min(pageCount - 1, p + 1))} disabled={currentPage >= pageCount - 1}>Próxima</Button>
+      )}
+      <div className={cn(
+        "flex items-center justify-between mt-4",
+        isMobile ? "flex-col gap-3 px-3" : "flex-row"
+      )}>
+        <span className="text-sm text-muted-foreground text-center">{isMobile ? `Página ${currentPage + 1}/${pageCount}` : `Página ${currentPage + 1} de ${pageCount}`}</span>
+        <div className={cn(
+          "flex gap-2",
+          isMobile ? "w-full" : ""
+        )}>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => setPage(p => Math.max(0, p - 1))} 
+            disabled={currentPage === 0}
+            className={cn(
+              isMobile ? "flex-1 min-h-[44px] touch-manipulation" : ""
+            )}
+          >
+            Anterior
+          </Button>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => setPage(p => Math.min(pageCount - 1, p + 1))} 
+            disabled={currentPage >= pageCount - 1}
+            className={cn(
+              isMobile ? "flex-1 min-h-[44px] touch-manipulation" : ""
+            )}
+          >
+            Próxima
+          </Button>
         </div>
       </div>
     </Card>

@@ -42,6 +42,8 @@ import { OperatorLogoSection } from "@/components/operator/operator-logo-section
 import { OperationalAlertsNotification } from "@/components/operational-alerts-notification"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { debug } from "@/lib/logger"
+import { useMobile } from "@/hooks/use-mobile"
+import { cn } from "@/lib/utils"
 
 interface TopbarProps {
   user?: {
@@ -67,8 +69,8 @@ export function Topbar({
   const router = useRouter()
   const pathname = usePathname()
   const { isTopbarItemActive: _isTopbarItemActive } = useNavigation()
+  const isMobile = useMobile() // Hook mobile-first
   const [isLoggingOut, setIsLoggingOut] = useState(false)
-  const [isCompactLayout, setIsCompactLayout] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false)
 
@@ -178,16 +180,7 @@ export function Topbar({
     }
   }
 
-  // Ajusta ações visíveis em telas muito estreitas
-  useEffect(() => {
-    const handleResize = () => {
-      if (typeof window === 'undefined') return
-      setIsCompactLayout(window.innerWidth < 420)
-    }
-    handleResize()
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
-  }, [])
+  // Removido: useMobile hook já cuida da detecção
 
   // Atalho Cmd+K para Command Palette
   useEffect(() => {
@@ -202,124 +195,147 @@ export function Topbar({
   }, [setIsCommandPaletteOpen])
 
   return (
-    <header className="before:bg-background/60 sticky top-0 z-50 before:absolute before:inset-0 before:mask-[linear-gradient(var(--card),var(--card)_18%,transparent_100%)] before:backdrop-blur-md">
-      <div className="bg-card relative z-[51] mx-auto mt-6 flex w-[calc(100%-2rem)] items-center justify-between rounded-xl border px-6 py-2 shadow-sm sm:w-[calc(100%-3rem)]">
-        <div className="flex items-center gap-1.5 sm:gap-4">
-          {/* Toggle Sidebar */}
+    <header className={cn(
+      "sticky top-0 z-50",
+      // Mobile: header compacto sem backdrop blur
+      isMobile 
+        ? "bg-card border-b shadow-sm safe-top" 
+        : "before:bg-background/60 before:absolute before:inset-0 before:mask-[linear-gradient(var(--card),var(--card)_18%,transparent_100%)] before:backdrop-blur-md"
+    )}>
+      <div className={cn(
+        "bg-card relative z-[51] flex items-center justify-between border-b lg:border-0",
+        // Mobile: full width, padding menor, altura fixa 56px
+        isMobile 
+          ? "w-full px-3 py-2 h-14" 
+          : "mx-auto mt-6 w-[calc(100%-2rem)] rounded-xl border px-6 py-2 shadow-sm sm:w-[calc(100%-3rem)]"
+      )}>
+        {/* Left Section */}
+        <div className="flex items-center gap-2 sm:gap-4">
+          {/* Toggle Sidebar - Sempre visível */}
           <Button
             variant="ghost"
             size="icon"
             onClick={onToggleSidebar}
-            className="size-7 hover:bg-accent hover:text-accent-foreground"
+            className={cn(
+              "touch-manipulation",
+              isMobile ? "size-10" : "size-7 hover:bg-accent hover:text-accent-foreground"
+            )}
             aria-label="Toggle Sidebar"
           >
-            <Menu className="h-5 w-5" />
+            <Menu className={isMobile ? "h-6 w-6" : "h-5 w-5"} />
           </Button>
 
-          {/* Separator */}
-          <div className="bg-border shrink-0 h-4 w-px hidden sm:block md:max-lg:hidden" />
+          {/* Separator - Oculto em mobile */}
+          {!isMobile && (
+            <div className="bg-border shrink-0 h-4 w-px hidden sm:block md:max-lg:hidden" />
+          )}
 
-          {/* Command Palette Trigger */}
-          <div>
-            <Dialog open={isCommandPaletteOpen} onOpenChange={setIsCommandPaletteOpen}>
-              <DialogTrigger asChild>
-                <Button
-                  variant="ghost"
-                  className="hidden !bg-transparent px-1 py-0 font-normal sm:block md:max-lg:hidden h-9"
-                >
-                  <div className="text-muted-foreground hidden items-center gap-1.5 text-sm sm:flex md:max-lg:hidden">
+          {/* Command Palette - Oculto em mobile, apenas ícone em tablet */}
+          {!isMobile && (
+            <div>
+              <Dialog open={isCommandPaletteOpen} onOpenChange={setIsCommandPaletteOpen}>
+                <DialogTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className="hidden !bg-transparent px-1 py-0 font-normal sm:block md:max-lg:hidden h-9"
+                  >
+                    <div className="text-muted-foreground hidden items-center gap-1.5 text-sm sm:flex md:max-lg:hidden">
+                      <Search className="h-4 w-4" />
+                      <span>Type to search...</span>
+                    </div>
+                  </Button>
+                </DialogTrigger>
+                <DialogTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="size-9 sm:hidden md:max-lg:inline-flex"
+                    aria-label="Search"
+                  >
                     <Search className="h-4 w-4" />
-                    <span>Type to search...</span>
-                  </div>
-                </Button>
-              </DialogTrigger>
-              <DialogTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="size-9 sm:hidden md:max-lg:inline-flex"
-                  aria-label="Search"
-                >
-                  <Search className="h-4 w-4" />
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-lg">
-                <DialogHeader>
-                  <DialogTitle>Command Palette</DialogTitle>
-                  <DialogDescription>Search for a command to run...</DialogDescription>
-                </DialogHeader>
-                <div className="mt-4">
-                  <Input
-                    type="search"
-                    placeholder="Type to search..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full"
-                    autoFocus
-                  />
-                  <div className="mt-4 text-sm text-muted-foreground">
-                    <div className="flex items-center justify-between mb-2">
-                      <span>esc</span>
-                      <span>To close</span>
-                    </div>
-                    <div className="flex items-center justify-between mb-2">
-                      <span>↑↓</span>
-                      <span>To Navigate</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span>Enter</span>
-                      <span>To Select</span>
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-lg">
+                  <DialogHeader>
+                    <DialogTitle>Command Palette</DialogTitle>
+                    <DialogDescription>Search for a command to run...</DialogDescription>
+                  </DialogHeader>
+                  <div className="mt-4">
+                    <Input
+                      type="search"
+                      placeholder="Type to search..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-full"
+                      autoFocus
+                    />
+                    <div className="mt-4 text-sm text-muted-foreground">
+                      <div className="flex items-center justify-between mb-2">
+                        <span>esc</span>
+                        <span>To close</span>
+                      </div>
+                      <div className="flex items-center justify-between mb-2">
+                        <span>↑↓</span>
+                        <span>To Navigate</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span>Enter</span>
+                        <span>To Select</span>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </DialogContent>
-            </Dialog>
-          </div>
-
-
-
+                </DialogContent>
+              </Dialog>
+            </div>
+          )}
         </div>
 
-        {/* Right Actions */}
-        <div className="flex items-center gap-1.5">
-          <Button 
-            variant="ghost" 
-            size="icon"
-            className="size-9 hover:bg-accent hover:text-accent-foreground" 
-            aria-label="Share"
-          >
-            <Share2 className="h-4 w-4" />
-          </Button>
+        {/* Right Actions - Mobile: Menu compacto */}
+        <div className="flex items-center gap-1 sm:gap-1.5">
+          {/* Desktop: Ações completas */}
+          {!isMobile && (
+            <>
+              <Button 
+                variant="ghost" 
+                size="icon"
+                className="size-9 hover:bg-accent hover:text-accent-foreground" 
+                aria-label="Share"
+              >
+                <Share2 className="h-4 w-4" />
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="icon"
+                className="size-9 hover:bg-accent hover:text-accent-foreground" 
+                aria-label="Favorite"
+              >
+                <Star className="h-4 w-4" />
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="icon"
+                className="size-9 hover:bg-accent hover:text-accent-foreground" 
+                aria-label="Quick actions"
+              >
+                <Zap className="h-4 w-4" />
+              </Button>
+            </>
+          )}
 
-          <Button 
-            variant="ghost" 
-            size="icon"
-            className="size-9 hover:bg-accent hover:text-accent-foreground" 
-            aria-label="Favorite"
-          >
-            <Star className="h-4 w-4" />
-          </Button>
-
-          <Button 
-            variant="ghost" 
-            size="icon"
-            className="size-9 hover:bg-accent hover:text-accent-foreground" 
-            aria-label="Quick actions"
-          >
-            <Zap className="h-4 w-4" />
-          </Button>
-
-          {/* Operational Alerts */}
+          {/* Operational Alerts - Sempre visível */}
           <OperationalAlertsNotification />
 
-          {/* Notifications */}
+          {/* Notifications - Sempre visível */}
           <Button 
             variant="ghost" 
             size="icon"
-            className="size-9 hover:bg-accent hover:text-accent-foreground relative" 
+            className={cn(
+              "touch-manipulation relative",
+              isMobile ? "size-10" : "size-9 hover:bg-accent hover:text-accent-foreground"
+            )}
             aria-label="Notifications"
           >
-            <Bell className="h-4 w-4" />
+            <Bell className={isMobile ? "h-5 w-5" : "h-4 w-4"} />
             <motion.span 
               className="absolute top-1.5 right-1.5 w-2 h-2 bg-primary rounded-full"
               animate={{ 
@@ -334,16 +350,19 @@ export function Topbar({
             />
           </Button>
 
-          {/* User Menu */}
+          {/* User Menu - Sempre visível */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
                 size="icon"
-                className="size-9 hover:bg-accent hover:text-accent-foreground"
+                className={cn(
+                  "touch-manipulation",
+                  isMobile ? "size-10" : "size-9 hover:bg-accent hover:text-accent-foreground"
+                )}
                 aria-label="User menu"
               >
-                <Avatar className="h-7 w-7">
+                <Avatar className={isMobile ? "h-8 w-8" : "h-7 w-7"}>
                   <AvatarImage src={user?.avatar_url} alt={user?.name || "Avatar"} />
                   <AvatarFallback className="bg-gradient-to-br from-orange-500 to-orange-600 text-white text-xs">
                     {(() => {
@@ -361,7 +380,7 @@ export function Topbar({
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56 bg-card border shadow-xl">
               <DropdownMenuItem 
-                className="focus:bg-accent cursor-pointer"
+                className="focus:bg-accent cursor-pointer touch-manipulation min-h-[44px]"
                 onClick={() => handleNavigate(panelRoutes.settings)}
               >
                 <Settings2 className="h-4 w-4 mr-2" />
@@ -369,7 +388,7 @@ export function Topbar({
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem 
-                className="focus:bg-destructive/10 text-destructive focus:text-destructive cursor-pointer"
+                className="focus:bg-destructive/10 text-destructive focus:text-destructive cursor-pointer touch-manipulation min-h-[44px]"
                 onClick={handleLogout}
                 disabled={isLoggingOut}
               >

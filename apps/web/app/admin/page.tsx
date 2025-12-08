@@ -29,6 +29,8 @@ import { DashboardAuditLog } from "@/components/admin/dashboard/dashboard-audit-
 import { KPICardPremium } from "@/components/admin/dashboard/kpi-card-premium"
 import { QuickActionsGrid } from "@/components/admin/dashboard/quick-actions-grid"
 import { ActivityTimeline } from "@/components/admin/dashboard/activity-timeline"
+import { useMobile } from "@/hooks/use-mobile"
+import { cn } from "@/lib/utils"
 
 interface KpiData {
   company_id: string
@@ -55,6 +57,7 @@ interface AuditLog {
 
 export default function AdminDashboard() {
   // const router = useRouter() // Não usado por enquanto
+  const isMobile = useMobile() // Hook mobile-first
   const { user, loading } = useAuthFast()
   const [kpisData, setKpisData] = useState<KpiData[]>([])
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([])
@@ -342,8 +345,11 @@ export default function AdminDashboard() {
           </Card>
         </motion.div>
 
-        {/* KPIs Premium */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 lg:gap-6">
+        {/* KPIs Premium - Mobile: 1 coluna, Tablet: 2 colunas, Desktop: 3 colunas */}
+        <div className={cn(
+          "grid gap-4",
+          isMobile ? "grid-cols-1" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 sm:gap-5 lg:gap-6"
+        )}>
           <KPICardPremium
             icon={Users}
             label="Funcionários em Trânsito"

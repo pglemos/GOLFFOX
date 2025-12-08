@@ -21,9 +21,12 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 import { useAuthFast } from "@/hooks/use-auth-fast"
+import { useMobile } from "@/hooks/use-mobile"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 export default function UsuariosPage() {
     const router = useRouter()
+    const isMobile = useMobile() // Hook mobile-first
     const { user, loading: authLoading } = useAuthFast()
     const [usuarios, setUsuarios] = useState<any[]>([])
     const [dataLoading, setDataLoading] = useState(true)
@@ -242,10 +245,92 @@ export default function UsuariosPage() {
                     )}
                 </Card>
 
-                {/* Tabela de Usuários */}
+                {/* Tabela de Usuários - Mobile: Cards, Desktop: Tabela */}
                 <Card className="overflow-hidden bg-card border-[var(--border)]">
-                    <div className="overflow-x-auto -webkit-overflow-scrolling-touch rounded-lg border bg-card">
-                        <table className="w-full min-w-[640px] bg-card">
+                    {isMobile ? (
+                        /* Mobile: Cards Layout */
+                        <div className="p-3 space-y-3">
+                            {filteredUsers.length === 0 ? (
+                                <div className="text-center py-12">
+                                    <p className="text-sm text-muted-foreground">Nenhum usuário encontrado</p>
+                                </div>
+                            ) : (
+                                filteredUsers.map((usuario, index) => (
+                                    <Card
+                                        key={usuario.id}
+                                        className="mobile-table-card p-4"
+                                    >
+                                        <div className="flex items-start gap-3">
+                                            <Avatar className="h-12 w-12 flex-shrink-0">
+                                                <AvatarImage src={usuario.avatar_url} alt={usuario.name} />
+                                                <AvatarFallback className="bg-primary text-primary-foreground">
+                                                    {(usuario.name || 'U').charAt(0).toUpperCase()}
+                                                </AvatarFallback>
+                                            </Avatar>
+                                            <div className="flex-1 min-w-0 space-y-2">
+                                                <div>
+                                                    <p className="font-semibold text-sm truncate">{usuario.name || "N/A"}</p>
+                                                    <p className="text-xs text-muted-foreground truncate">{usuario.email}</p>
+                                                </div>
+                                                <div className="flex items-center justify-between">
+                                                    <span className="text-xs text-muted-foreground">CPF:</span>
+                                                    <span className="text-xs font-medium">{usuario.cpf || "-"}</span>
+                                                </div>
+                                                <div className="flex items-center justify-between">
+                                                    <span className="text-xs text-muted-foreground">Papel:</span>
+                                                    <Badge variant="outline" className="text-xs">{usuario.role || "N/A"}</Badge>
+                                                </div>
+                                                <div className="flex items-center justify-between">
+                                                    <span className="text-xs text-muted-foreground">Status:</span>
+                                                    <Badge variant={usuario.is_active ? "default" : "secondary"} className="text-xs">
+                                                        {usuario.is_active ? "Ativo" : "Inativo"}
+                                                    </Badge>
+                                                </div>
+                                                <div className="flex flex-col gap-2 pt-2 border-t">
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        onClick={() => {
+                                                            setSelectedUserForEdit(usuario)
+                                                            setIsEditModalOpen(true)
+                                                        }}
+                                                        className="w-full min-h-[44px] touch-manipulation"
+                                                    >
+                                                        <Edit className="h-4 w-4 mr-2" />
+                                                        Editar
+                                                    </Button>
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        onClick={() => {
+                                                            setSelectedUserForRoleChange(usuario)
+                                                            setIsChangeRoleModalOpen(true)
+                                                        }}
+                                                        className="w-full min-h-[44px] touch-manipulation"
+                                                    >
+                                                        <Shield className="h-4 w-4 mr-2" />
+                                                        Alterar Papel
+                                                    </Button>
+                                                    <Button
+                                                        variant="destructive"
+                                                        size="sm"
+                                                        onClick={() => handleDeleteUsuario(usuario.id, usuario.name || usuario.email || 'Usuário')}
+                                                        className="w-full min-h-[44px] touch-manipulation"
+                                                    >
+                                                        <Trash2 className="h-4 w-4 mr-2" />
+                                                        Excluir
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </Card>
+                                ))
+                            )}
+                        </div>
+                    ) : (
+                        /* Desktop: Table Layout */
+                        <div className="overflow-x-auto -webkit-overflow-scrolling-touch rounded-lg border bg-card">
+                            <table className="w-full min-w-[640px] bg-card">
                             <thead className="bg-card">
                                 <tr className="border-b border-border">
                                     <th className="text-left p-2 sm:p-4 font-semibold text-xs sm:text-sm bg-card">Nome</th>
@@ -326,6 +411,7 @@ export default function UsuariosPage() {
                             </tbody>
                         </table>
                     </div>
+                    )}
                 </Card>
 
                 {/* Modal Trocar Papel */}
