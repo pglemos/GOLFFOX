@@ -273,7 +273,7 @@ const SidebarHeader = ({ panel }: { panel: 'admin' | 'operador' | 'transportador
             className={cn(
               "peer/menu-button flex w-full items-center overflow-hidden rounded-md text-left outline-hidden",
               "transition-[width,height,padding] focus-visible:ring-2",
-              "gap-2.5 !bg-transparent [&>svg]:size-8",
+              "h-12 text-sm gap-2.5 !bg-transparent [&>svg]:size-8 p-2",
               "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
               open ? "gap-2.5" : "justify-center [&>svg]:size-8"
             )}

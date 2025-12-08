@@ -45,6 +45,7 @@ import { debug } from "@/lib/logger"
 import { useMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
 import { useSidebar } from "@/components/ui/sidebar"
+import { Separator } from "@/components/ui/separator"
 
 interface TopbarProps {
   user?: {
@@ -207,11 +208,9 @@ export function Topbar({
 
   return (
     <header className={cn(
-      "sticky top-0 z-50",
+      "before:bg-background/60 sticky top-0 z-50 before:absolute before:inset-0 before:mask-[linear-gradient(var(--card),var(--card)_18%,transparent_100%)] before:backdrop-blur-md",
       // Mobile: header compacto sem backdrop blur
-      isMobile 
-        ? "bg-card border-b shadow-sm safe-top" 
-        : "before:bg-background/60 before:absolute before:inset-0 before:mask-[linear-gradient(var(--card),var(--card)_18%,transparent_100%)] before:backdrop-blur-md before:z-[-1]"
+      isMobile && "before:hidden bg-card border-b shadow-sm safe-top"
     )}>
       <div className={cn(
         "bg-card relative z-[51] flex items-center justify-between",
@@ -235,17 +234,22 @@ export function Topbar({
               }
             }}
             className={cn(
-              "touch-manipulation [&>svg]:!size-5",
-              isMobile ? "size-10" : "size-7 hover:bg-accent hover:text-accent-foreground"
+              "touch-manipulation",
+              isMobile 
+                ? "size-10" 
+                : "size-7 hover:bg-accent hover:text-accent-foreground [&>svg]:!size-5"
             )}
             aria-label="Toggle Sidebar"
           >
             <Menu className={isMobile ? "h-6 w-6" : "h-5 w-5"} />
           </Button>
 
-          {/* Separator vertical - hidden em mobile, visível sm, hidden md:max-lg */}
+          {/* Separator vertical - Application Shell 08 style */}
           {!isMobile && (
-            <div className="bg-border shrink-0 h-4 w-px hidden !h-4 sm:block md:max-lg:hidden" />
+            <Separator 
+              orientation="vertical" 
+              className="hidden !h-4 sm:block md:max-lg:hidden" 
+            />
           )}
 
           {/* Command Palette - Exatamente como Application Shell 08 */}
@@ -255,12 +259,10 @@ export function Topbar({
               <DialogTrigger asChild>
                 <Button
                   variant="ghost"
-                  className="hidden !bg-transparent px-1 py-0 font-normal sm:block md:max-lg:hidden h-9 shrink-0 items-center justify-center gap-2 rounded-md text-sm whitespace-nowrap transition-all outline-none focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50 [&:has(svg)]:px-3"
+                  className="shrink-0 items-center justify-center gap-2 rounded-md text-sm whitespace-nowrap transition-all outline-none focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50 h-9 has-[>svg]:px-3 hidden !bg-transparent px-1 py-0 font-normal sm:block md:max-lg:hidden"
                 >
-                  <div className="text-muted-foreground hidden items-center gap-1.5 text-sm sm:flex md:max-lg:hidden">
-                    <Search className="h-4 w-4" />
-                    <span>Type to search...</span>
-                  </div>
+                  <Search className="h-4 w-4" />
+                  <span>Type to search...</span>
                 </Button>
               </DialogTrigger>
               {/* Tablet/Mobile: Button apenas com ícone */}
