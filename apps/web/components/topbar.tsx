@@ -377,30 +377,22 @@ export function Topbar({
           {/* User Menu - Sempre visível */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
+              <button
                 className={cn(
-                  "touch-manipulation",
-                  isMobile ? "size-10" : "size-9 hover:bg-accent hover:text-accent-foreground"
+                  "inline-flex shrink-0 items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap transition-all outline-none focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
+                  isMobile ? "size-10" : "size-9.5"
                 )}
                 aria-label="User menu"
               >
-                <Avatar className={isMobile ? "h-8 w-8" : "h-7 w-7"}>
-                  <AvatarImage src={user?.avatar_url} alt={user?.name || "Avatar"} />
-                  <AvatarFallback className="bg-gradient-to-br from-orange-500 to-orange-600 text-white text-xs">
-                    {(() => {
-                      const name = user?.name || '';
-                      if (!name) return 'A';
-                      const parts = name.split(' ').filter(p => p.length > 0);
-                      if (parts.length >= 2) {
-                        return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
-                      }
-                      return name.charAt(0).toUpperCase() || 'A';
-                    })()}
-                  </AvatarFallback>
-                </Avatar>
-              </Button>
+                <span data-slot="avatar" className={cn("relative flex shrink-0 overflow-hidden rounded-md", isMobile ? "size-10" : "size-9.5")}>
+                  <img 
+                    data-slot="avatar-image" 
+                    className="aspect-square size-full" 
+                    src={user?.avatar_url || "https://cdn.shadcnstudio.com/ss-assets/avatar/avatar-1.png"} 
+                    alt={user?.name || "User"}
+                  />
+                </span>
+              </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56 bg-card border shadow-xl">
               <DropdownMenuItem 
