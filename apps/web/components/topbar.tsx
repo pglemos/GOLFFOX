@@ -238,24 +238,27 @@ export function Topbar({
               <span className="sr-only">Toggle Sidebar</span>
             </button>
           ) : (
-            <Button
-              variant="ghost"
-              size="icon"
+            <button
               onClick={() => {
                 if (onToggleSidebar) {
                   onToggleSidebar()
                 }
               }}
+              data-sidebar="trigger"
+              data-slot="sidebar-trigger"
               className={cn(
+                "inline-flex shrink-0 items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap transition-all outline-none focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+                "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
                 "touch-manipulation",
                 isMobile 
                   ? "size-10" 
-                  : "size-7 hover:bg-accent hover:text-accent-foreground [&>svg]:!size-5"
+                  : "size-7 [&_svg]:!size-5"
               )}
               aria-label="Toggle Sidebar"
             >
-              <Menu className={isMobile ? "h-6 w-6" : "h-5 w-5"} />
-            </Button>
+              <PanelLeft className={isMobile ? "h-6 w-6" : "h-5 w-5"} />
+              <span className="sr-only">Toggle Sidebar</span>
+            </button>
           )}
 
           {/* Separator vertical - Application Shell 08 style */}
