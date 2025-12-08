@@ -266,9 +266,9 @@ const SidebarHeader = ({ panel }: { panel: 'admin' | 'operador' | 'transportador
   )
 
   return (
-    <div className="flex flex-col gap-2 p-2">
-      <ul className="flex w-full min-w-0 flex-col gap-1">
-        <li className="group/menu-item relative">
+    <div data-slot="sidebar-header" data-sidebar="header" className="flex flex-col gap-2 p-2">
+      <ul data-slot="sidebar-menu" data-sidebar="menu" className="flex w-full min-w-0 flex-col gap-1">
+        <li data-slot="sidebar-menu-item" data-sidebar="menu-item" className="group/menu-item relative">
           <Link
             href={panel === 'operador' ? '/operador' : panel === 'transportadora' ? '/transportadora' : '/admin'}
             className={cn(
@@ -280,7 +280,7 @@ const SidebarHeader = ({ panel }: { panel: 'admin' | 'operador' | 'transportador
             )}
           >
             <LogoIcon />
-            <span className="text-xl font-semibold">Analytics</span>
+            <span className="text-xl font-semibold truncate">Analytics</span>
           </Link>
         </li>
       </ul>
