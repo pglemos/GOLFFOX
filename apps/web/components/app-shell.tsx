@@ -140,7 +140,12 @@ export const AppShell = memo(function AppShell({ user, children, panel }: AppShe
       className="min-h-screen bg-[var(--bg)] text-[var(--ink)] overflow-x-hidden w-full max-w-full"
       style={{
         backgroundImage: 'none',
-        background: 'var(--bg)'
+        background: 'var(--bg)',
+        // Safe areas para iOS
+        paddingTop: isMobile ? 'env(safe-area-inset-top)' : undefined,
+        paddingBottom: isMobile ? 'env(safe-area-inset-bottom)' : undefined,
+        paddingLeft: isMobile ? 'env(safe-area-inset-left)' : undefined,
+        paddingRight: isMobile ? 'env(safe-area-inset-right)' : undefined,
       } as React.CSSProperties}
     >
       {/* Banner de Variáveis de Ambiente */}
@@ -186,10 +191,10 @@ export const AppShell = memo(function AppShell({ user, children, panel }: AppShe
           className={cn(
             "min-h-screen transition-all duration-300 ease-in-out",
             // Mobile: padding-top para header fixo (56px + safe area)
-            isMobile ? "overflow-visible pt-14 safe-top" : "overflow-y-auto pt-28",
+            isMobile ? "overflow-visible pt-[56px]" : "overflow-y-auto pt-28",
             "overflow-x-hidden bg-[var(--bg)]",
             // Mobile: padding bottom com safe area
-            isMobile ? "pb-4 safe-bottom" : "pb-12 sm:pb-14",
+            isMobile ? "pb-4" : "pb-12 sm:pb-14",
             // Desktop: margin-left para sidebar colapsada
             !isMobile ? "flex-1 md:ml-[64px]" : "w-full ml-0 flex-shrink-0",
             "w-full",
@@ -197,16 +202,18 @@ export const AppShell = memo(function AppShell({ user, children, panel }: AppShe
           )}
           style={{
             backgroundImage: 'none',
-            background: 'var(--bg)'
+            background: 'var(--bg)',
+            // Adicionar safe area bottom no mobile
+            paddingBottom: isMobile ? 'calc(1rem + env(safe-area-inset-bottom))' : undefined,
           } as React.CSSProperties}
           data-mobile={isMobile ? 'true' : undefined}
         >
           <div className={cn(
             "mx-auto w-full",
-            // Mobile: padding menor
-            isMobile ? "px-3 py-3" : "max-w-[1600px] px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 lg:py-8"
+            // Mobile: padding otimizado para touch (mínimo 16px, ideal 20px)
+            isMobile ? "px-4 py-4" : "max-w-[1600px] px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 lg:py-8"
           )}>
-            <div className="w-full break-words stack-responsive">
+            <div className="w-full break-words">
               {children}
             </div>
           </div>

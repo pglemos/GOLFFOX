@@ -23,6 +23,7 @@ import {
 import { useAuthFast } from "@/hooks/use-auth-fast"
 import { useMobile } from "@/hooks/use-mobile"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { FilterDrawer } from "@/components/shared/filter-drawer"
 
 export default function UsuariosPage() {
     const router = useRouter()
@@ -156,94 +157,138 @@ export default function UsuariosPage() {
                     </Button>
                 </div>
 
-                {/* Filtros */}
-                <Card className="overflow-hidden bg-card border-[var(--border)]">
-                    <CardHeader className="p-3 sm:p-6">
-                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
-                            <div className="flex items-center gap-2 min-w-0">
-                                <Filter className="h-4 w-4 sm:h-5 sm:w-5 text-[var(--brand)] flex-shrink-0" />
-                                <CardTitle className="text-base sm:text-lg font-semibold break-words">Filtros</CardTitle>
-                            </div>
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => setFiltersExpanded(!filtersExpanded)}
-                                className="gap-2 w-full sm:w-auto min-h-[44px] touch-manipulation"
-                            >
-                                {filtersExpanded ? (
-                                    <>
-                                        <ChevronUp className="h-4 w-4" />
-                                        <span className="hidden sm:inline">Minimizar</span>
-                                        <span className="sm:hidden">Fechar</span>
-                                    </>
-                                ) : (
-                                    <>
-                                        <ChevronDown className="h-4 w-4" />
-                                        <span className="hidden sm:inline">Expandir</span>
-                                        <span className="sm:hidden">Abrir</span>
-                                    </>
-                                )}
-                            </Button>
-                        </div>
-                    </CardHeader>
-                    {filtersExpanded && (
-                        <CardContent className="p-3 sm:p-6 pt-0">
-                            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-4">
-                                <div className="relative w-full sm:flex-1 min-w-0">
-                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--ink-muted)] pointer-events-none" />
-                                    <Input
-                                        placeholder="Buscar por nome, email ou CPF..."
-                                        className="pl-10 w-full"
-                                        value={searchQuery}
-                                        onChange={(e) => setSearchQuery(e.target.value)}
-                                    />
+                {/* Busca - Sempre visível */}
+                <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground pointer-events-none z-10" />
+                    <Input
+                        placeholder="Buscar por nome, email ou CPF..."
+                        className="pl-10 w-full min-h-[44px] text-base"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                </div>
+
+                {/* Filtros - Mobile: Drawer, Desktop: Card */}
+                {isMobile ? (
+                    <FilterDrawer
+                        filters={[
+                            {
+                                key: "role",
+                                label: "Papel",
+                                type: "select",
+                                options: [
+                                    { label: "Administrador", value: "admin" },
+                                    { label: "Operador", value: "operator" },
+                                    { label: "Transportadora", value: "transportadora" },
+                                    { label: "Motorista", value: "driver" },
+                                    { label: "Passageiro", value: "passenger" }
+                                ]
+                            },
+                            {
+                                key: "status",
+                                label: "Status",
+                                type: "select",
+                                options: [
+                                    { label: "Ativo", value: "active" },
+                                    { label: "Inativo", value: "inactive" }
+                                ]
+                            }
+                        ]}
+                        values={{
+                            role: tempFilterRole,
+                            status: tempFilterStatus
+                        }}
+                        onFilterChange={(key, value) => {
+                            if (key === "role") {
+                                setTempFilterRole(value)
+                            } else if (key === "status") {
+                                setTempFilterStatus(value)
+                            }
+                        }}
+                        onReset={handleResetFilters}
+                        title="Filtros"
+                        description="Filtre os usuários por papel e status"
+                    />
+                ) : (
+                    <Card className="overflow-hidden bg-card border-[var(--border)]">
+                        <CardHeader className="p-3 sm:p-6">
+                            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
+                                <div className="flex items-center gap-2 min-w-0">
+                                    <Filter className="h-4 w-4 sm:h-5 sm:w-5 text-[var(--brand)] flex-shrink-0" />
+                                    <CardTitle className="text-base sm:text-lg font-semibold break-words">Filtros</CardTitle>
                                 </div>
-                                <Select value={tempFilterRole} onValueChange={setTempFilterRole}>
-                                    <SelectTrigger className="w-full sm:w-[180px] min-h-[44px]">
-                                        <SelectValue placeholder="Todos os papéis" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="all">Todos os papéis</SelectItem>
-                                        <SelectItem value="admin">Administrador</SelectItem>
-                                        <SelectItem value="operator">Operador</SelectItem>
-                                        <SelectItem value="transportadora">Transportadora</SelectItem>
-                                        <SelectItem value="driver">Motorista</SelectItem>
-                                        <SelectItem value="passenger">Passageiro</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                                <Select value={tempFilterStatus} onValueChange={setTempFilterStatus}>
-                                    <SelectTrigger className="w-full sm:w-[180px] min-h-[44px]">
-                                        <SelectValue placeholder="Todos os status" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="all">Todos os status</SelectItem>
-                                        <SelectItem value="active">Ativo</SelectItem>
-                                        <SelectItem value="inactive">Inativo</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2 sm:gap-2 pt-4 border-t border-[var(--border)]">
                                 <Button
-                                    variant="outline"
+                                    variant="ghost"
                                     size="sm"
-                                    onClick={handleResetFilters}
+                                    onClick={() => setFiltersExpanded(!filtersExpanded)}
                                     className="gap-2 w-full sm:w-auto min-h-[44px] touch-manipulation"
                                 >
-                                    <X className="h-4 w-4" />
-                                    Limpar
-                                </Button>
-                                <Button
-                                    size="sm"
-                                    onClick={handleSaveFilters}
-                                    className="gap-2 w-full sm:w-auto min-h-[44px] touch-manipulation"
-                                >
-                                    <Save className="h-4 w-4" />
-                                    Salvar Filtros
+                                    {filtersExpanded ? (
+                                        <>
+                                            <ChevronUp className="h-4 w-4" />
+                                            <span className="hidden sm:inline">Minimizar</span>
+                                            <span className="sm:hidden">Fechar</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <ChevronDown className="h-4 w-4" />
+                                            <span className="hidden sm:inline">Expandir</span>
+                                            <span className="sm:hidden">Abrir</span>
+                                        </>
+                                    )}
                                 </Button>
                             </div>
-                        </CardContent>
-                    )}
-                </Card>
+                        </CardHeader>
+                        {filtersExpanded && (
+                            <CardContent className="p-3 sm:p-6 pt-0">
+                                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-4">
+                                    <Select value={tempFilterRole} onValueChange={setTempFilterRole}>
+                                        <SelectTrigger className="w-full sm:w-[180px] min-h-[44px]">
+                                            <SelectValue placeholder="Todos os papéis" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="all">Todos os papéis</SelectItem>
+                                            <SelectItem value="admin">Administrador</SelectItem>
+                                            <SelectItem value="operator">Operador</SelectItem>
+                                            <SelectItem value="transportadora">Transportadora</SelectItem>
+                                            <SelectItem value="driver">Motorista</SelectItem>
+                                            <SelectItem value="passenger">Passageiro</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    <Select value={tempFilterStatus} onValueChange={setTempFilterStatus}>
+                                        <SelectTrigger className="w-full sm:w-[180px] min-h-[44px]">
+                                            <SelectValue placeholder="Todos os status" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="all">Todos os status</SelectItem>
+                                            <SelectItem value="active">Ativo</SelectItem>
+                                            <SelectItem value="inactive">Inativo</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2 sm:gap-2 pt-4 border-t border-[var(--border)]">
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={handleResetFilters}
+                                        className="gap-2 w-full sm:w-auto min-h-[44px] touch-manipulation"
+                                    >
+                                        <X className="h-4 w-4" />
+                                        Limpar
+                                    </Button>
+                                    <Button
+                                        size="sm"
+                                        onClick={handleSaveFilters}
+                                        className="gap-2 w-full sm:w-auto min-h-[44px] touch-manipulation"
+                                    >
+                                        <Save className="h-4 w-4" />
+                                        Salvar Filtros
+                                    </Button>
+                                </div>
+                            </CardContent>
+                        )}
+                    </Card>
+                )}
 
                 {/* Tabela de Usuários - Mobile: Cards, Desktop: Tabela */}
                 <Card className="overflow-hidden bg-card border-[var(--border)]">
