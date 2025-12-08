@@ -44,6 +44,7 @@ import { ThemeToggle } from "@/components/theme-toggle"
 import { debug } from "@/lib/logger"
 import { useMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
+import { useSidebar } from "@/components/ui/sidebar"
 
 interface TopbarProps {
   user?: {
@@ -73,6 +74,16 @@ export function Topbar({
   const [isLoggingOut, setIsLoggingOut] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false)
+  
+  // Tentar usar useSidebar se disponível (desktop), caso contrário usar onToggleSidebar (mobile)
+  let sidebarControl: { toggle: () => void } | null = null
+  try {
+    const sidebar = useSidebar()
+    sidebarControl = { toggle: () => sidebar.setOpen(!sidebar.open) }
+  } catch {
+    // useSidebar não disponível (fora do provider), usar onToggleSidebar como fallback
+    sidebarControl = null
+  }
 
   // Debug logging (apenas em desenvolvimento)
   useEffect(() => {
@@ -200,7 +211,7 @@ export function Topbar({
       // Mobile: header compacto sem backdrop blur
       isMobile 
         ? "bg-card border-b shadow-sm safe-top" 
-        : "before:bg-background/60 before:absolute before:inset-0 before:mask-[linear-gradient(var(--card),var(--card)_18%,transparent_100%)] before:backdrop-blur-md"
+        : "before:bg-background/60 before:absolute before:inset-0 before:mask-[linear-gradient(var(--card),var(--card)_18%,transparent_100%)] before:backdrop-blur-md before:z-[-1]"
     )}>
       <div className={cn(
         "bg-card relative z-[51] flex items-center justify-between",
@@ -215,7 +226,14 @@ export function Topbar({
           <Button
             variant="ghost"
             size="icon"
-            onClick={onToggleSidebar}
+            onClick={() => {
+              // Em desktop, usar useSidebar se disponível; em mobile, usar onToggleSidebar
+              if (sidebarControl) {
+                sidebarControl.toggle()
+              } else if (onToggleSidebar) {
+                onToggleSidebar()
+              }
+            }}
             className={cn(
               "touch-manipulation [&>svg]:!size-5",
               isMobile ? "size-10" : "size-7 hover:bg-accent hover:text-accent-foreground"
@@ -237,7 +255,7 @@ export function Topbar({
               <DialogTrigger asChild>
                 <Button
                   variant="ghost"
-                  className="hidden !bg-transparent px-1 py-0 font-normal sm:block md:max-lg:hidden h-9 shrink-0 items-center justify-center gap-2 rounded-md text-sm whitespace-nowrap transition-all outline-none focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50 has-[:svg]:px-3"
+                  className="hidden !bg-transparent px-1 py-0 font-normal sm:block md:max-lg:hidden h-9 shrink-0 items-center justify-center gap-2 rounded-md text-sm whitespace-nowrap transition-all outline-none focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50 [&:has(svg)]:px-3"
                 >
                   <div className="text-muted-foreground hidden items-center gap-1.5 text-sm sm:flex md:max-lg:hidden">
                     <Search className="h-4 w-4" />

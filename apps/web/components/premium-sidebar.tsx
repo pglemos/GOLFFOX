@@ -501,16 +501,6 @@ export function PremiumSidebar({
     }
   }, [panel])
 
-  const [internalOpen, setInternalOpen] = React.useState(isMobile ? isOpen : false)
-
-  useEffect(() => {
-    if (isMobile) {
-      setInternalOpen(isOpen)
-    } else {
-      setInternalOpen(false)
-    }
-  }, [isOpen, isMobile])
-
   useEffect(() => {
     menuGroups.forEach(group => {
       group.items.forEach(item => {
@@ -519,9 +509,12 @@ export function PremiumSidebar({
     })
   }, [menuGroups, router])
 
+  // Em mobile, usar controle completo via props isOpen
+  // Em desktop, não passar open (undefined) para permitir hover automático + toggle manual via useSidebar() hook
+  // Isso permite que o SidebarTrigger no topbar controle o sidebar em desktop usando useSidebar()
   return (
     <UISidebar
-      {...(isMobile ? { open: internalOpen, setOpen: setInternalOpen } : {})}
+      {...(isMobile && isOpen !== undefined ? { open: isOpen } : {})}
       animate={true}
       isMobile={isMobile}
     >
