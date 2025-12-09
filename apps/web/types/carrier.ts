@@ -20,6 +20,20 @@ export interface Carrier {
   address_complement?: string | null
   address_city?: string | null
   address_state?: string | null
+  // Banking Information
+  bank_name?: string | null
+  bank_code?: string | null
+  bank_agency?: string | null
+  bank_account?: string | null
+  bank_account_type?: 'corrente' | 'poupanca' | null
+  pix_key?: string | null
+  pix_key_type?: 'cpf' | 'cnpj' | 'email' | 'telefone' | 'aleatoria' | null
+  // Legal Representative
+  legal_rep_name?: string | null
+  legal_rep_cpf?: string | null
+  legal_rep_rg?: string | null
+  legal_rep_email?: string | null
+  legal_rep_phone?: string | null
   created_at?: string
   updated_at?: string
 }
