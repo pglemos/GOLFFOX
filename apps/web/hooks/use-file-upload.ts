@@ -131,50 +131,44 @@ export function useFileUpload(options: UseFileUploadOptions): UseFileUploadRetur
         setError(null)
 
         try {
-            // Gerar nome único para o arquivo
-            const ext = file.name.split('.').pop()?.toLowerCase() || 'bin'
-            const timestamp = Date.now()
-            const randomStr = Math.random().toString(36).substring(2, 8)
-            const fileName = `${entityId}-${timestamp}-${randomStr}.${ext}`
-
-            // Montar caminho completo
-            const targetFolder = customFolder || folder
-            const filePath = targetFolder ? `${targetFolder}/${fileName}` : fileName
+            const formData = new FormData()
+            formData.append('file', file)
+            formData.append('bucket', bucket)
+            if (folder) formData.append('folder', folder)
+            if (customFolder) formData.append('folder', customFolder)
+            if (entityId) formData.append('entityId', entityId)
 
             setProgress(10)
 
-            // Fazer upload
-            const { error: uploadError } = await (supabase as any).storage
-                .from(bucket)
-                .upload(filePath, file, {
-                    cacheControl: '3600',
-                    upsert: false,
-                })
+            const response = await fetch('/api/upload', {
+                method: 'POST',
+                body: formData,
+            })
 
-            if (uploadError) {
-                throw uploadError
+            setProgress(50)
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}))
+                throw new Error(errorData.error || errorData.details || 'Erro ao enviar arquivo')
             }
 
-            setProgress(80)
+            const result = await response.json()
 
-            // Obter URL pública
-            const { data: urlData } = (supabase as any).storage
-                .from(bucket)
-                .getPublicUrl(filePath)
+            if (!result.success) {
+                throw new Error(result.error || 'Erro desconhecido no upload')
+            }
 
             setProgress(100)
 
-            const result: UploadResult = {
-                url: urlData.publicUrl,
-                path: filePath,
-                size: file.size,
-                name: file.name,
-                type: file.type,
-            }
-
             notifySuccess('Arquivo enviado com sucesso!')
 
-            return result
+            return {
+                url: result.url,
+                path: result.path,
+                size: result.size,
+                name: result.name,
+                type: result.type,
+            }
         } catch (err) {
             const errorMsg = err instanceof Error ? err.message : 'Erro ao enviar arquivo'
             setError(errorMsg)
