@@ -36,10 +36,8 @@ import {
 } from "lucide-react"
 import { OperationalAlertsBadge } from "@/components/operational-alerts-badge"
 import { cn } from "@/lib/utils"
-import { motion, AnimatePresence } from "framer-motion"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { supabase } from "@/lib/supabase"
 
 // Tipos para itens de menu

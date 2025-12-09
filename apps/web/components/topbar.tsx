@@ -7,10 +7,7 @@ import {
   Search, 
   Settings2,
   Bell, 
-  Menu, 
   LogOut,
-  ChevronDown,
-  User,
   Loader2,
   Share2,
   Languages,
@@ -19,8 +16,6 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { 
   DropdownMenu,
   DropdownMenuContent,
@@ -38,14 +33,11 @@ import {
 } from "@/components/ui/dialog"
 import { supabase } from "@/lib/supabase"
 import { useNavigation } from "@/hooks/use-navigation"
-import { OperatorLogoSection } from "@/components/operator/operator-logo-section"
 import { OperationalAlertsNotification } from "@/components/operational-alerts-notification"
-import { ThemeToggle } from "@/components/theme-toggle"
 import { debug } from "@/lib/logger"
 import { useMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
 import { useSidebar } from "@/components/ui/sidebar"
-import { Separator } from "@/components/ui/separator"
 
 interface TopbarProps {
   user?: {
