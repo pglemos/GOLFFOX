@@ -100,8 +100,8 @@ export function CarrierBankingSection({
 
         setSaving(true)
         try {
-            const response = await fetch(`/api/admin/carriers/${carrierId}`, {
-                method: "PATCH",
+            const response = await fetch(`/api/admin/transportadoras/update?id=${carrierId}`, {
+                method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(formData),
             })

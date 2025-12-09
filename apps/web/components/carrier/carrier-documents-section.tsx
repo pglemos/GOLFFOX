@@ -144,7 +144,8 @@ export function CarrierDocumentsSection({
         return documents.find((d) => d.document_type === type)
     }
 
-    const documentTypes = Object.keys(CARRIER_DOCUMENT_LABELS) as CarrierDocumentType[]
+    const documentTypes = (Object.keys(CARRIER_DOCUMENT_LABELS) as CarrierDocumentType[])
+        .filter(t => t !== 'legal_rep_cnh')
 
     if (!isEditing || !carrierId) {
         return (

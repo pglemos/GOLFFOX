@@ -89,7 +89,7 @@ export const CARRIER_DOCUMENT_LABELS: Record<CarrierDocumentType, string> = {
     service_contract: 'Contrato de Prestação de Serviços',
     cnpj_card: 'Cartão CNPJ',
     social_contract: 'Contrato Social da Empresa',
-    art_certificate: 'Certificado ART (Registro de Fretamento)',
+    art_certificate: 'Registro de Fretamento',
     insurance_certificate: 'Certificado de Seguros',
     operating_license: 'Alvará de Funcionamento',
     cnd: 'CND - Certidão Negativa de Débitos',
