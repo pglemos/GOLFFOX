@@ -97,18 +97,32 @@ turbopack: {},
 3. **TypeScript validado**: Sem erros de tipo ✅
 4. **Rotas geradas**: 146 páginas estáticas + rotas dinâmicas ✅
 
-### ⚠️ Warnings (Não críticos)
+### ⚠️ Warnings (Não Críticos)
 
 - Alguns `themeColor` em `metadata` devem ser movidos para `viewport` (Next.js 16)
 - SWC binário usando fallback WASM (funcional, mas mais lento)
+
+### 🔧 Correções Aplicadas
+
+1. **Turbopack/Webpack**: Script `dev` corrigido para usar webpack por padrão (`--webpack`) ✅
+   - **Problema**: Flag `--no-turbo` não existe no Next.js 16
+   - **Solução**: Usar flag `--webpack` (correta)
+   - Turbopack requer binário nativo SWC que não está carregando corretamente
+   - Webpack funciona perfeitamente como alternativa
+   - Script `dev:turbo` disponível para tentar Turbopack quando o binário estiver funcionando
+   - **Status**: ✅ Servidor de desenvolvimento funcionando corretamente
 
 ### 📋 Próximos Passos Recomendados
 
 1. **Testar desenvolvimento**:
    ```bash
    cd apps/web
-   npm run dev
+   npm run dev  # Usa webpack (--no-turbo) por padrão
+   # ou
+   npm run dev:turbo  # Tenta usar Turbopack (se binário nativo estiver funcionando)
    ```
+   
+   **Nota**: O script `dev` padrão agora usa webpack para evitar problemas com o binário nativo do SWC. Veja `docs/TURBOPACK_TROUBLESHOOTING.md` para mais detalhes.
 
 2. **Validar em produção**:
    - View Transitions na navegação
