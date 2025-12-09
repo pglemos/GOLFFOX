@@ -17,14 +17,17 @@ import { useMobile } from "@/hooks/use-mobile"
 import dynamic from "next/dynamic"
 
 // Lazy load componentes pesados
-const FleetMap = dynamic(() => import("@/components/fleet-map"), {
-  loading: () => (
-    <div className="flex items-center justify-center h-full min-h-[200px]">
-      <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-    </div>
-  ),
-  ssr: false
-})
+const FleetMap = dynamic(
+  () => import("@/components/fleet-map").then((mod) => ({ default: mod.FleetMap })),
+  {
+    loading: () => (
+      <div className="flex items-center justify-center h-full min-h-[200px]">
+        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    ),
+    ssr: false
+  }
+)
 import { 
   Truck, 
   Map, 

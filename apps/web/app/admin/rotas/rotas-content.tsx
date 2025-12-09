@@ -46,12 +46,35 @@ export function RotasPageContent() {
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedRoute, setSelectedRoute] = useState<any>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [filtersOpen, setFiltersOpen] = useState(false)
-  const [filters, setFilters] = useState<Record<string, string>>({
+  const [filterValues, setFilterValues] = useState<Record<string, string>>({
     company: "",
     status: "",
     date: ""
   })
+  
+  const filterFields = [
+    {
+      key: "company",
+      label: "Empresa",
+      type: "text" as const,
+      placeholder: "Nome da empresa"
+    },
+    {
+      key: "status",
+      label: "Status",
+      type: "select" as const,
+      options: [
+        { label: "Todas", value: "" },
+        { label: "Ativa", value: "active" },
+        { label: "Inativa", value: "inactive" }
+      ]
+    },
+    {
+      key: "date",
+      label: "Data",
+      type: "date" as const
+    }
+  ]
   const [rotasLoading, setRotasLoading] = useState(false)
 
   const loadRotas = async () => {
@@ -151,11 +174,27 @@ export function RotasPageContent() {
     )
   }
 
-  const filteredRotas = rotas.filter(rota =>
-    rota.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    rota.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    rota.companies?.name?.toLowerCase().includes(searchQuery.toLowerCase())
-  )
+  const filteredRotas = rotas.filter(rota => {
+    // Filtro por busca
+    const matchesSearch = 
+      rota.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      rota.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      rota.companies?.name?.toLowerCase().includes(searchQuery.toLowerCase())
+    
+    // Filtro por empresa
+    const matchesCompany = !filterValues.company || 
+      rota.companies?.name?.toLowerCase().includes(filterValues.company.toLowerCase())
+    
+    // Filtro por status
+    const matchesStatus = !filterValues.status || 
+      (filterValues.status === "active" && rota.status === "active") ||
+      (filterValues.status === "inactive" && rota.status === "inactive")
+    
+    // Filtro por data (simplificado - pode ser melhorado)
+    const matchesDate = !filterValues.date || true // TODO: implementar filtro de data
+    
+    return matchesSearch && matchesCompany && matchesStatus && matchesDate
+  })
 
   if (!user) {
     return null // useAuth já redireciona
@@ -208,46 +247,15 @@ export function RotasPageContent() {
                 placeholder="Buscar rotas por nome, descrição ou empresa..."
               />
             </div>
-            <Button
-              variant="outline"
-              onClick={() => setFiltersOpen(true)}
-              className="min-h-[44px]"
-            >
-              <Filter className="h-4 w-4 mr-2" />
-              Filtros
-            </Button>
+            <FilterDrawer
+              filters={filterFields}
+              values={filterValues}
+              onFilterChange={(key, value) => {
+                setFilterValues(prev => ({ ...prev, [key]: value }))
+              }}
+              onReset={() => setFilterValues({ company: "", status: "", date: "" })}
+            />
           </div>
-
-          <FilterDrawer
-            open={filtersOpen}
-            onOpenChange={setFiltersOpen}
-            filters={filters}
-            onFiltersChange={setFilters}
-            fields={[
-              {
-                key: "company",
-                label: "Empresa",
-                type: "text",
-                placeholder: "Nome da empresa"
-              },
-              {
-                key: "status",
-                label: "Status",
-                type: "select",
-                options: [
-                  { label: "Todas", value: "" },
-                  { label: "Ativa", value: "active" },
-                  { label: "Inativa", value: "inactive" }
-                ]
-              },
-              {
-                key: "date",
-                label: "Data",
-                type: "date"
-              }
-            ]}
-            onReset={() => setFilters({ company: "", status: "", date: "" })}
-          />
 
           {/* Routes Grid */}
           {filteredRotas.length === 0 ? (
