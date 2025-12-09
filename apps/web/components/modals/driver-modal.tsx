@@ -223,26 +223,31 @@ export function DriverModal({ driver, isOpen, onClose, onSave }: DriverModalProp
     }
 
     try {
-      const fileExt = file.name.split('.').pop()
-      const fileName = `${driver.id}-${type}-${Date.now()}.${fileExt}`
-      const filePath = `driver-documents/${fileName}`
+      const form = new FormData()
+      form.append('file', file)
+      form.append('bucket', 'driver-documents')
+      form.append('folder', 'driver-documents')
+      form.append('entityId', driver.id)
 
-      const { error: uploadError } = await (supabase as any).storage
-        .from('driver-documents')
-        .upload(filePath, file)
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: form
+      })
 
-      if (uploadError) throw uploadError
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}))
+        throw new Error(err.error || 'Erro ao fazer upload')
+      }
 
-      const { data } = (supabase as any).storage
-        .from('driver-documents')
-        .getPublicUrl(filePath)
+      const result = await response.json()
+      const publicUrl = result.url
 
       const { error: docError } = await (supabase as any)
         .from("gf_driver_documents")
         .insert({
           driver_id: driver.id,
           document_type: type,
-          file_url: data.publicUrl,
+          file_url: publicUrl,
           file_name: file.name
         })
 

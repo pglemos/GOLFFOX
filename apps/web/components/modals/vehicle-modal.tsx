@@ -128,24 +128,24 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
     if (!photoFile) return formData.photo_url || null
 
     try {
-      const fileExt = photoFile.name.split('.').pop()
-      const fileName = `${vehicleId}-${Date.now()}.${fileExt}`
-      const filePath = `vehicles/${fileName}`
+      const form = new FormData()
+      form.append('file', photoFile)
+      form.append('bucket', 'vehicle-photos')
+      form.append('folder', 'vehicles')
+      form.append('entityId', vehicleId)
 
-      const { error: uploadError } = await (supabase as any).storage
-        .from('vehicle-photos')
-        .upload(filePath, photoFile, {
-          cacheControl: '3600',
-          upsert: false
-        })
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: form
+      })
 
-      if (uploadError) throw uploadError
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}))
+        throw new Error(err.error || 'Erro ao fazer upload')
+      }
 
-      const { data } = (supabase as any).storage
-        .from('vehicle-photos')
-        .getPublicUrl(filePath)
-
-      return data.publicUrl
+      const result = await response.json()
+      return result.url
     } catch (error: any) {
       console.error("Erro ao fazer upload:", error)
       notifyError(formatError(error, "Erro ao fazer upload da foto"))
