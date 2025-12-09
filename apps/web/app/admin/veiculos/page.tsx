@@ -36,6 +36,10 @@ const VehicleChecklistModal = dynamic(
   () => import("@/components/modals/vehicle-checklist-modal").then(m => ({ default: m.VehicleChecklistModal })),
   { ssr: false, loading: () => null }
 )
+const VehicleDocumentsSection = dynamic(
+  () => import("@/components/vehicle/vehicle-documents-section").then(m => ({ default: m.VehicleDocumentsSection })),
+  { ssr: false, loading: () => null }
+)
 
 export default function VeiculosPage() {
   const router = useRouter()
@@ -72,7 +76,7 @@ export default function VeiculosPage() {
   const filteredVeiculos = useMemo(() => {
     if (!debouncedSearchQuery) return veiculos
     const query = debouncedSearchQuery.toLowerCase()
-    return veiculos.filter(v => 
+    return veiculos.filter(v =>
       v.plate?.toLowerCase().includes(query) ||
       v.model?.toLowerCase().includes(query) ||
       v.brand?.toLowerCase().includes(query) ||
@@ -135,9 +139,9 @@ export default function VeiculosPage() {
       const response = await fetch(`/api/admin/vehicles/delete?id=${veiculoId}`, {
         method: 'DELETE'
       })
-      
+
       const result = await response.json()
-      
+
       if (!response.ok) {
         const errorMessage = result.message || result.error || 'Erro ao excluir veículo'
         const errorDetails = result.details ? ` (${result.details})` : ''
@@ -264,7 +268,7 @@ export default function VeiculosPage() {
             <h1 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2 break-words">Veículos</h1>
             <p className="text-sm sm:text-base text-[var(--muted)] break-words">Gerencie a frota de veículos</p>
           </div>
-          <Button 
+          <Button
             onClick={() => {
               setSelectedVehicle(null)
               setIsModalOpen(true)
@@ -293,96 +297,96 @@ export default function VeiculosPage() {
         ) : (
           <div className="grid gap-3 sm:gap-4 w-full">
             {filteredVeiculos.map((veiculo) => (
-            <motion.div
-              key={veiculo.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-              whileHover={{ y: -4 }}
-            >
-              <Card className="p-3 sm:p-4 hover:shadow-xl transition-all duration-300 overflow-hidden bg-card/50 backdrop-blur-sm border-[var(--border)] hover:border-[var(--brand)]/30 group">
-                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
-                  <div className="flex-1 flex gap-3 sm:gap-4 min-w-0">
-                    {veiculo.photo_url && (
-                      /* eslint-disable-next-line @next/next/no-img-element */
-                      <img 
-                        src={veiculo.photo_url} 
-                        alt={veiculo.plate}
-                        className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg object-cover border-2 border-[var(--border)] flex-shrink-0 shadow-md group-hover:shadow-lg transition-shadow"
-                      />
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex flex-wrap items-center gap-2 mb-2">
-                        <div className="p-1 rounded-lg bg-gradient-to-br from-[var(--brand-light)] to-[var(--brand-soft)]">
-                          <Truck className="h-4 w-4 text-[var(--brand)] flex-shrink-0" />
+              <motion.div
+                key={veiculo.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+                whileHover={{ y: -4 }}
+              >
+                <Card className="p-3 sm:p-4 hover:shadow-xl transition-all duration-300 overflow-hidden bg-card/50 backdrop-blur-sm border-[var(--border)] hover:border-[var(--brand)]/30 group">
+                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
+                    <div className="flex-1 flex gap-3 sm:gap-4 min-w-0">
+                      {veiculo.photo_url && (
+                        /* eslint-disable-next-line @next/next/no-img-element */
+                        <img
+                          src={veiculo.photo_url}
+                          alt={veiculo.plate}
+                          className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg object-cover border-2 border-[var(--border)] flex-shrink-0 shadow-md group-hover:shadow-lg transition-shadow"
+                        />
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex flex-wrap items-center gap-2 mb-2">
+                          <div className="p-1 rounded-lg bg-gradient-to-br from-[var(--brand-light)] to-[var(--brand-soft)]">
+                            <Truck className="h-4 w-4 text-[var(--brand)] flex-shrink-0" />
+                          </div>
+                          <h3 className="font-bold text-base sm:text-lg break-words group-hover:text-[var(--brand)] transition-colors">{veiculo.plate}</h3>
+                          {veiculo.prefix && (
+                            <Badge variant="outline" className="text-xs">Prefixo: {veiculo.prefix}</Badge>
+                          )}
+                          <Badge variant={veiculo.is_active ? "default" : "secondary"} className="text-xs">
+                            {veiculo.is_active ? "Ativo" : "Inativo"}
+                          </Badge>
                         </div>
-                        <h3 className="font-bold text-base sm:text-lg break-words group-hover:text-[var(--brand)] transition-colors">{veiculo.plate}</h3>
-                        {veiculo.prefix && (
-                          <Badge variant="outline" className="text-xs">Prefixo: {veiculo.prefix}</Badge>
-                        )}
-                        <Badge variant={veiculo.is_active ? "default" : "secondary"} className="text-xs">
-                          {veiculo.is_active ? "Ativo" : "Inativo"}
-                        </Badge>
-                      </div>
-                      <p className="font-medium mb-1 break-words text-sm sm:text-base">{veiculo.model || "Sem modelo"}</p>
-                      <div className="flex flex-wrap gap-2 sm:gap-4 text-xs sm:text-sm text-[var(--ink-muted)]">
-                        <span className="break-words">Ano: {veiculo.year || "N/A"}</span>
-                        {veiculo.capacity && <span className="break-words">Capacidade: {veiculo.capacity} lugares</span>}
+                        <p className="font-medium mb-1 break-words text-sm sm:text-base">{veiculo.model || "Sem modelo"}</p>
+                        <div className="flex flex-wrap gap-2 sm:gap-4 text-xs sm:text-sm text-[var(--ink-muted)]">
+                          <span className="break-words">Ano: {veiculo.year || "N/A"}</span>
+                          {veiculo.capacity && <span className="break-words">Capacidade: {veiculo.capacity} lugares</span>}
+                        </div>
                       </div>
                     </div>
+                    <div className="grid grid-cols-2 sm:flex gap-2 w-full sm:w-auto">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setSelectedVehicle(veiculo)
+                          setIsModalOpen(true)
+                        }}
+                        className="text-xs sm:text-sm min-h-[44px] touch-manipulation"
+                      >
+                        <Edit className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                        <span className="truncate">Editar</span>
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleViewVehicle(veiculo)}
+                        className="text-xs sm:text-sm min-h-[44px] touch-manipulation"
+                      >
+                        <span className="truncate hidden sm:inline">Ver Detalhes</span>
+                        <span className="truncate sm:hidden">Detalhes</span>
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => handleDeleteVeiculo(veiculo.id, veiculo.plate || 'Veículo')}
+                        className="col-span-2 sm:col-span-1 text-xs sm:text-sm min-h-[44px] touch-manipulation"
+                      >
+                        <Trash2 className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                        <span className="truncate">Excluir</span>
+                      </Button>
+                    </div>
                   </div>
-                  <div className="grid grid-cols-2 sm:flex gap-2 w-full sm:w-auto">
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => {
-                        setSelectedVehicle(veiculo)
-                        setIsModalOpen(true)
-                      }}
-                      className="text-xs sm:text-sm min-h-[44px] touch-manipulation"
-                    >
-                      <Edit className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-                      <span className="truncate">Editar</span>
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => handleViewVehicle(veiculo)}
-                      className="text-xs sm:text-sm min-h-[44px] touch-manipulation"
-                    >
-                      <span className="truncate hidden sm:inline">Ver Detalhes</span>
-                      <span className="truncate sm:hidden">Detalhes</span>
-                    </Button>
-                    <Button 
-                      variant="destructive" 
-                      size="sm"
-                      onClick={() => handleDeleteVeiculo(veiculo.id, veiculo.plate || 'Veículo')}
-                      className="col-span-2 sm:col-span-1 text-xs sm:text-sm min-h-[44px] touch-manipulation"
-                    >
-                      <Trash2 className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-                      <span className="truncate">Excluir</span>
-                    </Button>
-                  </div>
-                </div>
+                </Card>
+              </motion.div>
+            ))}
+            {veiculos.length === 0 && (
+              <Card className="p-12 text-center">
+                <Truck className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-lg font-medium mb-2">Nenhum veículo encontrado</h3>
+                <p className="text-sm text-[var(--ink-muted)] mb-4">
+                  {searchQuery ? "Tente ajustar sua busca" : "Comece cadastrando seu primeiro veículo"}
+                </p>
+                <Button onClick={() => {
+                  setSelectedVehicle(null)
+                  setIsModalOpen(true)
+                }} className="min-h-[44px] touch-manipulation">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Cadastrar Veículo
+                </Button>
               </Card>
-            </motion.div>
-          ))}
-          {veiculos.length === 0 && (
-            <Card className="p-12 text-center">
-              <Truck className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium mb-2">Nenhum veículo encontrado</h3>
-              <p className="text-sm text-[var(--ink-muted)] mb-4">
-                {searchQuery ? "Tente ajustar sua busca" : "Comece cadastrando seu primeiro veículo"}
-              </p>
-              <Button onClick={() => {
-                setSelectedVehicle(null)
-                setIsModalOpen(true)
-              }} className="min-h-[44px] touch-manipulation">
-                <Plus className="h-4 w-4 mr-2" />
-                Cadastrar Veículo
-              </Button>
-            </Card>
-          )}
+            )}
           </div>
         )}
 
@@ -451,8 +455,9 @@ export default function VeiculosPage() {
 
               <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                 <div className="overflow-x-auto -webkit-overflow-scrolling-touch">
-                  <TabsList className="grid w-full grid-cols-3 min-w-[240px]">
+                  <TabsList className="grid w-full grid-cols-4 min-w-[320px]">
                     <TabsTrigger value="dados" className="text-xs sm:text-sm min-h-[44px] touch-manipulation">Dados</TabsTrigger>
+                    <TabsTrigger value="documentos" className="text-xs sm:text-sm min-h-[44px] touch-manipulation">Documentos</TabsTrigger>
                     <TabsTrigger value="manutencao" className="text-xs sm:text-sm min-h-[44px] touch-manipulation">Manutenção</TabsTrigger>
                     <TabsTrigger value="checklist" className="text-xs sm:text-sm min-h-[44px] touch-manipulation">Checklist</TabsTrigger>
                   </TabsList>
@@ -493,6 +498,13 @@ export default function VeiculosPage() {
                   </div>
                 </TabsContent>
 
+                <TabsContent value="documentos" className="space-y-4 mt-3 sm:mt-4">
+                  <VehicleDocumentsSection
+                    vehicleId={viewingVehicle}
+                    isEditing={true}
+                  />
+                </TabsContent>
+
                 <TabsContent value="manutencao" className="space-y-4">
                   <div className="flex items-center justify-between">
                     <h3 className="font-semibold">Histórico de Manutenções</h3>
@@ -522,12 +534,12 @@ export default function VeiculosPage() {
                                 <Badge variant="outline">{maintenance.type}</Badge>
                                 <Badge variant={
                                   maintenance.status === 'completed' ? 'default' :
-                                  maintenance.status === 'scheduled' ? 'secondary' :
-                                  maintenance.status === 'cancelled' ? 'outline' : 'destructive'
+                                    maintenance.status === 'scheduled' ? 'secondary' :
+                                      maintenance.status === 'cancelled' ? 'outline' : 'destructive'
                                 }>
                                   {maintenance.status === 'pending' ? 'Pendente' :
-                                   maintenance.status === 'scheduled' ? 'Agendada' :
-                                   maintenance.status === 'completed' ? 'Concluída' : 'Cancelada'}
+                                    maintenance.status === 'scheduled' ? 'Agendada' :
+                                      maintenance.status === 'completed' ? 'Concluída' : 'Cancelada'}
                                 </Badge>
                               </div>
                               <p className="text-sm text-[var(--ink-muted)]">
@@ -582,10 +594,10 @@ export default function VeiculosPage() {
                               <div className="flex items-center gap-2 mb-2">
                                 <Badge variant={
                                   checklist.status === 'completed' ? 'default' :
-                                  checklist.status === 'failed' ? 'destructive' : 'secondary'
+                                    checklist.status === 'failed' ? 'destructive' : 'secondary'
                                 }>
                                   {checklist.status === 'pending' ? 'Pendente' :
-                                   checklist.status === 'completed' ? 'Concluído' : 'Falhou'}
+                                    checklist.status === 'completed' ? 'Concluído' : 'Falhou'}
                                 </Badge>
                                 <span className="text-sm text-[var(--ink-muted)]">
                                   {new Date(checklist.filled_at).toLocaleDateString('pt-BR')}
@@ -670,8 +682,8 @@ export default function VeiculosPage() {
               </p>
             </div>
             <div className="flex gap-2 justify-end">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 onClick={() =>
                   setDeleteConfirm({
                     isOpen: false,
@@ -683,7 +695,7 @@ export default function VeiculosPage() {
               >
                 Cancelar
               </Button>
-              <Button 
+              <Button
                 variant="destructive"
                 onClick={() => deleteConfirm.vehicle && handleDeleteVehicle(deleteConfirm.vehicle.id)}
                 disabled={deleteConfirm.isDeleting}
