@@ -150,11 +150,11 @@ export const AppShell = memo(function AppShell({ user, children, panel }: AppShe
           {children}
         </main>
 
-        {/* Footer - 44px (h-11), flex justify-between, padding responsivo */}
+        {/* Footer - 20px (h-5), flex justify-between, padding responsivo */}
         <footer className={cn(
           "flex items-center justify-between gap-3",
-          "h-11",  // 44px
-          "px-4 pb-6 sm:px-6",
+          "h-5",   // 20px
+          "px-4 pb-2 sm:px-6",
           "lg:gap-6",
           // Responsivo - empilha em mobile
           "max-lg:flex-col"

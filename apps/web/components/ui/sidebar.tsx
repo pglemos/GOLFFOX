@@ -206,7 +206,7 @@ function Sidebar({
           "group-data-[collapsible=offcanvas]:w-0",
           "group-data-[side=right]:rotate-180",
           variant === "floating" || variant === "inset"
-            ? "group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+(--spacing(4)))]"
+            ? "group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+(--spacing(2)))]"
             : "group-data-[collapsible=icon]:w-(--sidebar-width-icon)"
         )}
       />
@@ -219,7 +219,7 @@ function Sidebar({
             ? "left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)]"
             : "right-0 group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)]",
           variant === "floating" || variant === "inset"
-            ? "p-6 pr-0 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+(--spacing(4))+2px)] group-data-[side=right]:pl-0 group-data-[side=right]:pr-6 [&>[data-slot=sidebar-inner]]:group-data-[variant=floating]:rounded-xl"
+            ? "p-2 pr-0 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+(--spacing(2))+2px)] group-data-[side=right]:pl-0 group-data-[side=right]:pr-2 [&>[data-slot=sidebar-inner]]:group-data-[variant=floating]:rounded-xl"
             : "group-data-[collapsible=icon]:w-(--sidebar-width-icon)",
           className
         )}
@@ -228,7 +228,7 @@ function Sidebar({
         <div
           data-sidebar="sidebar"
           data-slot="sidebar-inner"
-          className="bg-sidebar group-data-[variant=floating]:border-sidebar-border flex h-full w-full flex-col group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:shadow-sm"
+          className="bg-sidebar group-data-[variant=floating]:border-sidebar-border flex h-full w-full flex-col group-data-[variant=floating]:rounded-xl group-data-[variant=floating]:border group-data-[variant=floating]:shadow-sm"
         >
           {children}
         </div>
