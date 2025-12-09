@@ -22,23 +22,15 @@ import {
   Truck,
   Users,
   Briefcase,
-  Shield,
   LifeBuoy,
   AlertTriangle,
   BarChart3,
   DollarSign,
-  HelpCircle,
   FileText,
-  Building2,
-  Settings,
-  MessageSquare,
-  LogOut
+  Building2
 } from "lucide-react"
 import { OperationalAlertsBadge } from "@/components/operational-alerts-badge"
 import { cn } from "@/lib/utils"
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
-import { supabase } from "@/lib/supabase"
 
 // Tipos para itens de menu
 interface MenuItem {
@@ -307,7 +299,7 @@ const MenuItem = ({ item, index }: { item: MenuItem; index: number }) => {
   const { open } = useSidebar()
   const { navigateWithTransition, isPending } = useViewTransition()
   const Icon = item.icon
-  
+
   const isActive = pathname === item.href || pathname?.startsWith(item.href + "/")
   const showOperationalAlerts = item.href.includes("/alertas")
 
@@ -337,11 +329,11 @@ const MenuItem = ({ item, index }: { item: MenuItem; index: number }) => {
         <Icon className="shrink-0" />
         {open && <span>{item.label}</span>}
       </Link>
-      
+
       {/* Badge - Application Shell 08 style */}
       {item.badge && (
-        <div 
-          data-slot="sidebar-menu-badge" 
+        <div
+          data-slot="sidebar-menu-badge"
           data-sidebar="menu-badge"
           className={cn(
             "text-sidebar-foreground pointer-events-none absolute right-1 flex h-5 min-w-5 items-center justify-center px-1 text-xs font-medium tabular-nums select-none",
@@ -354,7 +346,7 @@ const MenuItem = ({ item, index }: { item: MenuItem; index: number }) => {
           {item.badge}
         </div>
       )}
-      
+
       {/* Operational Alerts Badge */}
       {showOperationalAlerts && open && (
         <div className="absolute -top-1 -right-1 z-10">
@@ -368,12 +360,12 @@ const MenuItem = ({ item, index }: { item: MenuItem; index: number }) => {
 // Grupo de menu com label - Application Shell 08 style
 const MenuGroup = ({ group }: { group: MenuGroup }) => {
   const { open } = useSidebar()
-  
+
   return (
     <div data-slot="sidebar-group" data-sidebar="group" className="relative flex w-full min-w-0 flex-col p-2">
       {group.label && (
-        <div 
-          data-slot="sidebar-group-label" 
+        <div
+          data-slot="sidebar-group-label"
           data-sidebar="group-label"
           className={cn(
             "text-sidebar-foreground/70 ring-sidebar-ring flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-medium outline-hidden transition-[margin,opacity] duration-200 ease-linear focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0",
@@ -394,100 +386,12 @@ const MenuGroup = ({ group }: { group: MenuGroup }) => {
   )
 }
 
-// Footer com promoção Premium - Application Shell 08 style
-const SidebarFooter = () => {
-  const { open } = useSidebar()
-  
-  return (
-    <div data-slot="sidebar-footer" data-sidebar="footer" className={cn("flex flex-col gap-2 p-2", !open && "hidden", "[[data-state=collapsed]_&]:hidden")}>
-      <div className="flex flex-col items-start gap-4 overflow-hidden rounded-md p-2">
-        <p className="truncate text-xl font-semibold">Go to Premium</p>
-        <p className="line-clamp-2 text-sm">
-          Explore 600+ courses with lifetime membership
-        </p>
-        <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90 min-h-[48px] h-auto p-3 sm:min-h-0 sm:h-9 sm:p-2 touch-manipulation truncate">
-          Upgrade
-        </Button>
-      </div>
-    </div>
-  )
-}
 
-// Perfil do usuário
-const UserProfile = ({ user }: { user?: PremiumSidebarProps['user'] }) => {
-  const { open } = useSidebar()
-  const router = useRouter()
-  const [isLoggingOut, setIsLoggingOut] = React.useState(false)
 
-  const handleLogout = async () => {
-    setIsLoggingOut(true)
-    try {
-      await supabase.auth.signOut()
-      router.push('/login')
-    } catch (error) {
-      console.error('Erro ao fazer logout:', error)
-    } finally {
-      setIsLoggingOut(false)
-    }
-  }
 
-  const getUserInitials = (name?: string) => {
-    if (!name) return 'U'
-    return name
-      .split(' ')
-      .slice(0, 2)
-      .map(n => n[0])
-      .join('')
-      .toUpperCase()
-  }
-
-  if (!open) {
-    return (
-      <div className="flex justify-center p-2">
-        <Avatar className="h-8 w-8 border-2 border-sidebar-border">
-          <AvatarImage src={user?.avatar_url} alt={user?.name || 'User'} />
-          <AvatarFallback className="bg-gradient-to-br from-orange-500 to-orange-600 text-white text-xs">
-            {getUserInitials(user?.name)}
-          </AvatarFallback>
-        </Avatar>
-      </div>
-    )
-  }
-
-  return (
-    <div className="flex flex-col gap-2 p-2 border-t border-sidebar-border">
-      <div className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-sidebar-accent transition-colors">
-        <Avatar className="h-8 w-8 border-2 border-sidebar-border">
-          <AvatarImage src={user?.avatar_url} alt={user?.name || 'User'} />
-          <AvatarFallback className="bg-gradient-to-br from-orange-500 to-orange-600 text-white text-xs">
-            {getUserInitials(user?.name)}
-          </AvatarFallback>
-        </Avatar>
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium text-sidebar-foreground truncate">
-            {user?.name || 'Usuário'}
-          </p>
-          <p className="text-xs text-sidebar-foreground/70 truncate">
-            {user?.email || 'email@exemplo.com'}
-          </p>
-        </div>
-      </div>
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={handleLogout}
-        disabled={isLoggingOut}
-        className="w-full justify-start min-h-[48px] h-auto p-3 sm:min-h-0 sm:h-8 sm:p-2 hover:bg-sidebar-accent touch-manipulation"
-      >
-        <LogOut className="h-4 w-4 mr-2" />
-        {isLoggingOut ? 'Saindo...' : 'Sair'}
-      </Button>
-    </div>
-  )
-}
 
 // Conteúdo da sidebar (reutilizável para Sheet e Sidebar)
-const SidebarContentInner = ({ panel, menuGroups, user }: { 
+const SidebarContentInner = ({ panel, menuGroups, user }: {
   panel: 'admin' | 'operador' | 'transportadora'
   menuGroups: MenuGroup[]
   user?: PremiumSidebarProps['user']
@@ -504,11 +408,7 @@ const SidebarContentInner = ({ panel, menuGroups, user }: {
         ))}
       </div>
 
-      {/* Footer Premium (opcional) */}
-      <SidebarFooter />
 
-      {/* User Profile */}
-      <UserProfile user={user} />
     </>
   )
 }
@@ -521,7 +421,7 @@ export function PremiumSidebar({
   user
 }: PremiumSidebarProps) {
   const router = useRouter()
-  
+
   const menuGroups = useMemo(() => {
     switch (panel) {
       case 'operador':
@@ -544,8 +444,8 @@ export function PremiumSidebar({
   // Em mobile, usar Sheet (drawer)
   if (isMobile) {
     return (
-      <Sheet 
-        open={isOpen} 
+      <Sheet
+        open={isOpen}
         onOpenChange={(open) => {
           // Disparar evento customizado para fechar sidebar
           if (!open) {
@@ -553,8 +453,8 @@ export function PremiumSidebar({
           }
         }}
       >
-        <SheetContent 
-          side="left" 
+        <SheetContent
+          side="left"
           className="w-[280px] sm:w-[300px] p-0 bg-sidebar border-r border-sidebar-border overflow-y-auto scroll-smooth-touch"
           style={{
             paddingTop: 'max(0.5rem, env(safe-area-inset-top))',
