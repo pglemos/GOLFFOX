@@ -14,6 +14,10 @@ export interface FileUploadProps {
     onUpload: (file: File) => Promise<string | null>
     /** Função chamada quando o arquivo é removido */
     onRemove?: () => void
+    /** Modo manual (não faz upload automático) */
+    manual?: boolean
+    /** Função chamada quando um arquivo é selecionado (modo manual) */
+    onFileSelect?: (file: File) => void
     /** URL atual do arquivo (para modo de edição) */
     currentUrl?: string | null
     /** Nome do arquivo atual */
@@ -36,23 +40,12 @@ export interface FileUploadProps {
 
 /**
  * Componente de upload de arquivos com drag & drop
- * 
- * @example
- * ```tsx
- * <FileUpload
- *   onUpload={async (file) => {
- *     const result = await uploadFile(file)
- *     return result?.url || null
- *   }}
- *   currentUrl={document.file_url}
- *   accept={{ 'application/pdf': [], 'image/*': [] }}
- *   maxSize={5}
- * />
- * ```
  */
 export function FileUpload({
     onUpload,
     onRemove,
+    manual = false,
+    onFileSelect,
     currentUrl,
     currentFileName,
     accept = {
@@ -112,19 +105,31 @@ export function FileUpload({
     const handleFile = useCallback(async (file: File) => {
         if (!validateFile(file)) return
 
-        setUploading(true)
         setError(null)
 
-        // Preview local para imagens
-        if (showPreview && file.type.startsWith('image/')) {
-            const reader = new FileReader()
-            reader.onload = (e) => {
-                setPreview(e.target?.result as string)
+        // Preview local
+        if (showPreview) {
+            if (file.type.startsWith('image/')) {
+                const reader = new FileReader()
+                reader.onload = (e) => {
+                    setPreview(e.target?.result as string)
+                }
+                reader.readAsDataURL(file)
+            } else {
+                setPreview(null) // Para PDFs e outros, o renderPreview lida com fileName
             }
-            reader.readAsDataURL(file)
         }
 
         setFileName(file.name)
+
+        if (manual) {
+            if (onFileSelect) onFileSelect(file)
+            return
+        }
+
+        if (!onUpload) return
+
+        setUploading(true)
 
         try {
             const url = await onUpload(file)
@@ -147,7 +152,7 @@ export function FileUpload({
         } finally {
             setUploading(false)
         }
-    }, [onUpload, validateFile, showPreview, currentUrl])
+    }, [onUpload, validateFile, showPreview, currentUrl, manual, onFileSelect])
 
     const handleDrop = useCallback((e: React.DragEvent<HTMLDivElement>) => {
         e.preventDefault()

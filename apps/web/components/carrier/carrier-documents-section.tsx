@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
-import { Loader2, FileText, RefreshCw, Building2 } from "lucide-react"
+import { Loader2, FileText, RefreshCw, Building2, Save } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
@@ -43,6 +43,7 @@ export function CarrierDocumentsSection({
     const [selectedType, setSelectedType] = useState<CarrierDocumentType>("cnpj_card")
     const [expiryDate, setExpiryDate] = useState("")
     const [documentNumber, setDocumentNumber] = useState("")
+    const [fileToUpload, setFileToUpload] = useState<File | null>(null)
     const [uploading, setUploading] = useState(false)
 
     const { upload } = useFileUpload({
@@ -75,16 +76,21 @@ export function CarrierDocumentsSection({
     }, [carrierId, isEditing, loadDocuments])
 
     // Fazer upload de documento
-    const handleUpload = async (file: File): Promise<string | null> => {
+    const handleManualSave = async () => {
         if (!carrierId) {
             notifyError(new Error("Salve a transportadora primeiro"), "Erro")
-            return null
+            return
+        }
+
+        if (!fileToUpload) {
+            notifyError(new Error("Selecione um arquivo"), "Erro")
+            return
         }
 
         setUploading(true)
         try {
-            const result = await upload(file, carrierId, selectedType)
-            if (!result) return null
+            const result = await upload(fileToUpload, carrierId, selectedType)
+            if (!result) return
 
             const response = await fetch(`/api/admin/carriers/${carrierId}/documents`, {
                 method: "POST",
@@ -109,11 +115,9 @@ export function CarrierDocumentsSection({
             await loadDocuments()
             setDocumentNumber("")
             setExpiryDate("")
-
-            return result.url
+            setFileToUpload(null)
         } catch (error) {
             notifyError(error, "Erro ao enviar documento")
-            return null
         } finally {
             setUploading(false)
         }
@@ -251,11 +255,28 @@ export function CarrierDocumentsSection({
                 </div>
 
                 <FileUpload
-                    onUpload={handleUpload}
+                    manual
+                    onFileSelect={setFileToUpload}
+                    onUpload={async () => null}
                     disabled={uploading}
-                    label="Arraste o documento ou clique para enviar"
+                    label="Arraste o documento ou clique para selecionar"
                     maxSize={10}
+                    currentFileName={fileToUpload?.name}
                 />
+
+                <div className="flex justify-end">
+                    <Button
+                        onClick={handleManualSave}
+                        disabled={!fileToUpload || uploading}
+                    >
+                        {uploading ? (
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        ) : (
+                            <Save className="h-4 w-4 mr-2" />
+                        )}
+                        Salvar Documento
+                    </Button>
+                </div>
             </div>
 
             {/* Lista de Documentos */}

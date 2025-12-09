@@ -17,8 +17,12 @@ const ALLOWED_BUCKETS = [
 function getSupabaseAdmin() {
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL
     const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+
+    if (!url) console.error('CRITICAL: NEXT_PUBLIC_SUPABASE_URL is missing')
+    if (!serviceKey) console.error('CRITICAL: SUPABASE_SERVICE_ROLE_KEY is missing')
+
     if (!url || !serviceKey) {
-        throw new Error('Supabase não configurado')
+        throw new Error('Supabase não configurado corretamente no servidor')
     }
     return createClient(url, serviceKey, {
         auth: { autoRefreshToken: false, persistSession: false }

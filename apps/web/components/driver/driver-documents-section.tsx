@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
-import { Loader2, FileText, RefreshCw, User } from "lucide-react"
+import { Loader2, FileText, RefreshCw, User, Save } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
@@ -43,6 +43,7 @@ export function DriverDocumentsSection({
     const [selectedType, setSelectedType] = useState<DriverDocumentType>("cnh")
     const [expiryDate, setExpiryDate] = useState("")
     const [documentNumber, setDocumentNumber] = useState("")
+    const [fileToUpload, setFileToUpload] = useState<File | null>(null)
     const [uploading, setUploading] = useState(false)
 
     const { upload } = useFileUpload({
@@ -73,16 +74,21 @@ export function DriverDocumentsSection({
         }
     }, [driverId, isEditing, loadDocuments])
 
-    const handleUpload = async (file: File): Promise<string | null> => {
+    const handleManualSave = async () => {
         if (!driverId) {
             notifyError(new Error("Salve o motorista primeiro"), "Erro")
-            return null
+            return
+        }
+
+        if (!fileToUpload) {
+            notifyError(new Error("Selecione um arquivo"), "Erro")
+            return
         }
 
         setUploading(true)
         try {
-            const result = await upload(file, driverId, selectedType)
-            if (!result) return null
+            const result = await upload(fileToUpload, driverId, selectedType)
+            if (!result) return
 
             const response = await fetch(`/api/admin/drivers/${driverId}/documents`, {
                 method: "POST",
@@ -107,11 +113,9 @@ export function DriverDocumentsSection({
             await loadDocuments()
             setDocumentNumber("")
             setExpiryDate("")
-
-            return result.url
+            setFileToUpload(null)
         } catch (error) {
             notifyError(error, "Erro ao enviar documento")
-            return null
         } finally {
             setUploading(false)
         }
@@ -243,11 +247,28 @@ export function DriverDocumentsSection({
                 </div>
 
                 <FileUpload
-                    onUpload={handleUpload}
+                    manual
+                    onFileSelect={setFileToUpload}
+                    onUpload={async () => null}
                     disabled={uploading}
-                    label="Arraste o documento ou clique para enviar"
+                    label="Arraste o documento ou clique para selecionar"
                     maxSize={10}
+                    currentFileName={fileToUpload?.name}
                 />
+
+                <div className="flex justify-end mt-4">
+                    <Button
+                        onClick={handleManualSave}
+                        disabled={!fileToUpload || uploading}
+                    >
+                        {uploading ? (
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        ) : (
+                            <Save className="h-4 w-4 mr-2" />
+                        )}
+                        Salvar Documento
+                    </Button>
+                </div>
             </div>
 
             {/* Lista de Documentos */}
