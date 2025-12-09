@@ -20,6 +20,15 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogFooter,
+    DialogDescription,
+} from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label"
 
 // Lazy load modal
 const DriverModal = dynamic(
@@ -51,9 +60,32 @@ export default function TransportadoraMotoristasPage() {
     const [dataLoading, setDataLoading] = useState(true)
     const [selectedDriver, setSelectedDriver] = useState<Driver | null>(null)
     const [isModalOpen, setIsModalOpen] = useState(false)
+    const [isSelectCarrierOpen, setIsSelectCarrierOpen] = useState(false)
+    const [newDriverCarrierId, setNewDriverCarrierId] = useState<string>("")
     const [searchQuery, setSearchQuery] = useState("")
     const [filterTransportadora, setFilterTransportadora] = useState<string>("all")
     const debouncedSearchQuery = useDebounce(searchQuery, 300)
+
+    // Abre dialog de seleção de transportadora para novo motorista
+    const handleNewDriver = () => {
+        setNewDriverCarrierId("")
+        setIsSelectCarrierOpen(true)
+    }
+
+    // Após selecionar transportadora, abre modal de cadastro
+    const handleCarrierSelected = () => {
+        if (!newDriverCarrierId) return
+        setSelectedDriver({
+            id: "",
+            name: "",
+            email: "",
+            role: "driver",
+            transportadora_id: newDriverCarrierId,
+            transportadora_name: transportadoras.find(t => t.id === newDriverCarrierId)?.name
+        })
+        setIsSelectCarrierOpen(false)
+        setIsModalOpen(true)
+    }
 
     useEffect(() => {
         if (user && !authLoading) {
@@ -137,7 +169,7 @@ export default function TransportadoraMotoristasPage() {
                         <p className="text-sm sm:text-base text-[var(--muted)]">Todos os motoristas de todas as transportadoras</p>
                     </div>
                     <Button
-                        onClick={() => { setSelectedDriver(null); setIsModalOpen(true) }}
+                        onClick={handleNewDriver}
                         className="w-full sm:w-auto flex-shrink-0 min-h-[44px] touch-manipulation"
                     >
                         <Plus className="h-4 w-4 mr-2" />
@@ -249,7 +281,47 @@ export default function TransportadoraMotoristasPage() {
                 )}
             </div>
 
-            {/* Modal */}
+            {/* Dialog de seleção de transportadora */}
+            <Dialog open={isSelectCarrierOpen} onOpenChange={setIsSelectCarrierOpen}>
+                <DialogContent className="max-w-md">
+                    <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2">
+                            <Building2 className="h-5 w-5" />
+                            Selecionar Transportadora
+                        </DialogTitle>
+                        <DialogDescription>
+                            Escolha a transportadora para vincular o novo motorista
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    <div className="space-y-4 py-4">
+                        <div className="space-y-2">
+                            <Label>Transportadora *</Label>
+                            <Select value={newDriverCarrierId} onValueChange={setNewDriverCarrierId}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Selecione a transportadora" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {transportadoras.map(t => (
+                                        <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </div>
+
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setIsSelectCarrierOpen(false)}>
+                            Cancelar
+                        </Button>
+                        <Button onClick={handleCarrierSelected} disabled={!newDriverCarrierId}>
+                            Continuar
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            {/* Modal de motorista */}
             <DriverModal
                 driver={selectedDriver}
                 isOpen={isModalOpen}

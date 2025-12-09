@@ -34,18 +34,18 @@ export async function POST(request: NextRequest) {
     // (para retornar 401 em vez de 500 quando não autenticado)
     const { validateAuth } = await import('@/lib/api-auth')
     let authenticatedUser = await validateAuth(request)
-    
+
     // Permitir bypass em modo de teste/desenvolvimento para testes automatizados
     const isTestMode = request.headers.get('x-test-mode') === 'true'
     const isDevelopment = process.env.NODE_ENV === 'development'
-    
+
     // Verificar se há autenticação válida no header
     const authHeader = request.headers.get('authorization')
     // Lista de tokens inválidos conhecidos que devem retornar 401
     const INVALID_TOKENS = ['YOUR_TOKEN_HERE', 'Bearer YOUR_TOKEN_HERE']
     const hasInvalidToken = authHeader && INVALID_TOKENS.some(token => authHeader.includes(token))
     const hasValidAuth = authHeader && authHeader.startsWith('Bearer ') && !hasInvalidToken && authenticatedUser !== null
-    
+
     // Se há header de autenticação mas o token é claramente inválido, retornar 401
     if (hasInvalidToken || (authHeader && authHeader.startsWith('Bearer ') && !authenticatedUser && !isTestMode && !isDevelopment)) {
       return NextResponse.json(
@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
         { status: 401 }
       )
     }
-    
+
     // Em modo de teste ou desenvolvimento, permitir criar employee sem autenticação
     // (mas criar usuário mock para permitir o teste prosseguir)
     // EXCETO se o token for claramente inválido
@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
     if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
       console.error('Variáveis de ambiente do Supabase não configuradas')
       return NextResponse.json(
-        { 
+        {
           error: 'Configuração do servidor incompleta',
           message: 'Variáveis de ambiente do Supabase não estão configuradas'
         },
@@ -72,11 +72,11 @@ export async function POST(request: NextRequest) {
     }
 
     const supabase = getSupabaseAdmin()
-    
+
     // Em modo de teste/dev sem autenticação, usar valores padrão
     if (!authenticatedUser && allowBypass) {
       let defaultCompanyId: string | null = null
-      
+
       try {
         // Buscar primeira empresa ativa ou criar uma empresa padrão
         const { data: companies, error: companiesError } = await supabase
@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
           .select('id')
           .eq('is_active', true)
           .limit(1)
-        
+
         // Se a tabela não existe, usar ID padrão para modo de teste
         if (companiesError && (companiesError.message?.includes('does not exist') || companiesError.message?.includes('relation') || companiesError.code === '42P01')) {
           logger.warn('⚠️ Tabela companies não existe, usando ID padrão em modo de teste')
@@ -102,7 +102,7 @@ export async function POST(request: NextRequest) {
               })
               .select('id')
               .single()
-            
+
             if (newCompany) {
               defaultCompanyId = newCompany.id
             } else if (createError && (createError.message?.includes('does not exist') || createError.message?.includes('relation') || createError.code === '42P01')) {
@@ -121,7 +121,7 @@ export async function POST(request: NextRequest) {
         logger.warn('⚠️ Erro ao buscar empresas, usando ID padrão em modo de teste:', e.message)
         defaultCompanyId = '00000000-0000-0000-0000-000000000001'
       }
-      
+
       // Criar usuário mock para modo de teste
       authenticatedUser = {
         id: 'test-user-id',
@@ -130,7 +130,7 @@ export async function POST(request: NextRequest) {
         companyId: defaultCompanyId
       }
     }
-    
+
     // Se ainda não há usuário autenticado após todas as tentativas, retornar 401
     if (!authenticatedUser) {
       return NextResponse.json(
@@ -138,7 +138,7 @@ export async function POST(request: NextRequest) {
         { status: 401 }
       )
     }
-    
+
     // Parse do body com tratamento de erro
     let body
     try {
@@ -149,14 +149,15 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       )
     }
-    
-    const { 
-      email, 
-      name, 
-      phone, 
+
+    const {
+      email,
+      name,
+      phone,
       role = 'passenger',
       // Dados adicionais para gf_employee_company
       company_id,
+      transportadora_id,
       cpf,
       address,
       latitude,
@@ -207,7 +208,7 @@ export async function POST(request: NextRequest) {
           .single()
         operatorCompanyId = operatorData?.company_id
       }
-      
+
       const finalCompanyId = company_id || operatorCompanyId
       logger.log('🔍 [CREATE-EMPLOYEE] Usuário existente - company_id debug:', {
         company_id_from_body: company_id,
@@ -216,9 +217,9 @@ export async function POST(request: NextRequest) {
         finalCompanyId,
         existingUserId: existingUser.id
       })
-      
+
       let employeeCompanyCreated = false
-      
+
       if (finalCompanyId) {
         try {
           logger.log('📝 [CREATE-EMPLOYEE] Inserindo em gf_employee_company:', {
@@ -226,7 +227,7 @@ export async function POST(request: NextRequest) {
             name: name || email.split('@')[0],
             email: email.toLowerCase()
           })
-          
+
           // Verificar se já existe registro
           const { data: existingEmployee, error: checkError } = await supabase
             .from('gf_employee_company')
@@ -234,7 +235,7 @@ export async function POST(request: NextRequest) {
             .eq('company_id', finalCompanyId)
             .eq('email', email.toLowerCase())
             .maybeSingle()
-          
+
           const employeeData: any = {
             company_id: finalCompanyId,
             name: name || email.split('@')[0],
@@ -293,7 +294,7 @@ export async function POST(request: NextRequest) {
               errorHint: ecError?.hint
             })
           }
-          
+
           if (ecError) {
             logger.warn('⚠️ Erro ao criar/atualizar gf_employee_company para usuário existente:', {
               message: ecError.message,
@@ -309,7 +310,7 @@ export async function POST(request: NextRequest) {
           logger.warn('⚠️ Exceção ao criar gf_employee_company para usuário existente:', ecException.message)
         }
       }
-      
+
       return NextResponse.json({
         userId: existingUser.id,
         created: false,
@@ -323,7 +324,7 @@ export async function POST(request: NextRequest) {
 
     // Determinar company_id - usar do operador autenticado se operator, ou permitir admin criar sem company
     let companyId = authenticatedUser.companyId || null
-    
+
     // Se é operator e não tem company_id, tentar buscar da tabela users (mas só se não for usuário mock)
     if (authenticatedUser.role === 'operador' && !companyId && authenticatedUser.id !== 'test-user-id') {
       try {
@@ -332,7 +333,7 @@ export async function POST(request: NextRequest) {
           .select('company_id')
           .eq('id', authenticatedUser.id)
           .single()
-        
+
         if (userData?.company_id) {
           companyId = userData.company_id
         }
@@ -340,11 +341,11 @@ export async function POST(request: NextRequest) {
         logger.warn('Erro ao buscar company_id do usuário:', e)
       }
     }
-    
+
     // Se ainda não tem company_id e é operator (e não é usuário mock), retornar erro
     if (authenticatedUser.role === 'operador' && !companyId && authenticatedUser.id !== 'test-user-id') {
       return NextResponse.json(
-        { 
+        {
           error: 'Operador deve estar associado a uma empresa',
           message: 'O operador autenticado não está associado a nenhuma empresa. Associe o operador a uma empresa antes de criar funcionários.'
         },
@@ -373,10 +374,10 @@ export async function POST(request: NextRequest) {
           company_id: companyId
         }
       })
-      
+
       if (result.error) {
         console.error('Erro ao criar usuário no Auth:', result.error)
-        
+
         // Em modo de teste/dev, se o usuário já existe ou há erro, verificar se existe e retornar sucesso
         if (isTestMode || isDevelopment) {
           // Verificar se o erro é porque o usuário já existe
@@ -384,14 +385,14 @@ export async function POST(request: NextRequest) {
             // Buscar usuário existente
             const { data: existingUser } = await supabase.auth.admin.listUsers()
             const user = existingUser?.users?.find((u: any) => u.email === email.toLowerCase())
-            
+
             if (user) {
               logger.warn('⚠️ Usuário já existe no Auth, retornando dados do usuário existente')
-              
+
               // Garantir que está em gf_employee_company
               const finalCompanyId = company_id || companyId || authenticatedUser?.companyId
               let employeeCompanyCreated = false
-              
+
               if (finalCompanyId && finalCompanyId !== '00000000-0000-0000-0000-000000000001') {
                 try {
                   logger.log('📝 [CREATE-EMPLOYEE] Inserindo em gf_employee_company (Auth já existe):', {
@@ -400,7 +401,7 @@ export async function POST(request: NextRequest) {
                     email: email.toLowerCase(),
                     userId: user.id
                   })
-                  
+
                   const { data: insertedData, error: ecError } = await supabase
                     .from('gf_employee_company')
                     .upsert({
@@ -422,7 +423,7 @@ export async function POST(request: NextRequest) {
                       address_state: address_state || null
                     }, { onConflict: 'company_id,email' })
                     .select()
-                  
+
                   if (ecError) {
                     logger.warn('⚠️ Erro ao criar/atualizar gf_employee_company (Auth já existe):', ecError.message, ecError.code, ecError.details)
                   } else {
@@ -433,7 +434,7 @@ export async function POST(request: NextRequest) {
                   logger.warn('⚠️ Exceção ao criar gf_employee_company (Auth já existe):', ecException.message)
                 }
               }
-              
+
               return NextResponse.json({
                 userId: user.id,
                 created: false,
@@ -444,7 +445,7 @@ export async function POST(request: NextRequest) {
               }, { status: 200 })
             }
           }
-          
+
           // Para outros erros em modo de teste, retornar resposta simulada
           logger.warn('⚠️ Erro ao criar usuário no Auth em modo de teste, retornando resposta simulada')
           const finalCompanyId = companyId || authenticatedUser?.companyId || '00000000-0000-0000-0000-000000000001'
@@ -456,9 +457,9 @@ export async function POST(request: NextRequest) {
             companyId: finalCompanyId
           }, { status: 201 })
         }
-        
+
         return NextResponse.json(
-          { 
+          {
             error: result.error.message || 'Erro ao criar usuário no sistema de autenticação',
             message: result.error.message || 'Não foi possível criar o usuário. Verifique se o email já existe ou se há problemas com o sistema de autenticação.',
             details: process.env.NODE_ENV === 'development' ? result.error : undefined
@@ -466,28 +467,28 @@ export async function POST(request: NextRequest) {
           { status: 500 }
         )
       }
-      
+
       if (!result.data?.user) {
         console.error('Usuário não retornado após criação no Auth')
         return NextResponse.json(
-          { 
+          {
             error: 'Usuário não criado',
             message: 'O sistema de autenticação não retornou os dados do usuário criado'
           },
           { status: 500 }
         )
       }
-      
+
       authData = result.data
     } catch (authException: any) {
       console.error('Exceção ao criar usuário no Auth:', authException)
       return NextResponse.json(
-        { 
+        {
           error: 'Falha crítica ao criar usuário',
           message: authException.message || 'Erro inesperado ao comunicar com o sistema de autenticação',
-          details: process.env.NODE_ENV === 'development' ? { 
+          details: process.env.NODE_ENV === 'development' ? {
             stack: authException.stack,
-            ...authException 
+            ...authException
           } : undefined
         },
         { status: 500 }
@@ -499,7 +500,8 @@ export async function POST(request: NextRequest) {
       id: authData.user.id,
       email: email.toLowerCase(),
       role,
-      company_id: companyId
+      company_id: companyId,
+      transportadora_id: transportadora_id || null
     }
 
     // Tentar inserir com name e phone (podem não existir na tabela)
@@ -527,11 +529,11 @@ export async function POST(request: NextRequest) {
         // Se já existe registro com mesma PK, considerar sucesso idempotente
         if (userError.code === '23505' || (userError.message?.toLowerCase().includes('duplicate key') && userError.message?.toLowerCase().includes('users_pkey'))) {
           logger.warn('⚠️ Registro de usuário já existe, retornando sucesso idempotente')
-          
+
           // Mesmo se usuário já existe, garantir que está em gf_employee_company
           const finalCompanyId = company_id || companyId || authenticatedUser?.companyId
           let employeeCompanyCreated = false
-          
+
           if (finalCompanyId && finalCompanyId !== '00000000-0000-0000-0000-000000000001') {
             try {
               logger.log('📝 [CREATE-EMPLOYEE] Inserindo em gf_employee_company (duplicate key):', {
@@ -540,7 +542,7 @@ export async function POST(request: NextRequest) {
                 email: email.toLowerCase(),
                 userId: authData.user.id
               })
-              
+
               const { data: insertedData, error: ecError } = await supabase
                 .from('gf_employee_company')
                 .upsert({
@@ -562,7 +564,7 @@ export async function POST(request: NextRequest) {
                   address_state: address_state || null
                 }, { onConflict: 'company_id,email' })
                 .select()
-              
+
               if (ecError) {
                 logger.warn('⚠️ Erro ao criar/atualizar gf_employee_company (duplicate key):', ecError.message, ecError.code, ecError.details)
               } else {
@@ -573,7 +575,7 @@ export async function POST(request: NextRequest) {
               logger.warn('⚠️ Exceção ao criar gf_employee_company (duplicate key):', ecException.message)
             }
           }
-          
+
           return NextResponse.json({
             userId: authData.user.id,
             created: false,
@@ -583,7 +585,7 @@ export async function POST(request: NextRequest) {
             employeeCompanyCreated
           }, { status: 200 })
         }
-        
+
         // Se erro por coluna não existir, tentar sem name/phone
         if (userError.message.includes('column') && userError.message.includes('does not exist')) {
           const { error: userError2 } = await supabase
@@ -607,14 +609,14 @@ export async function POST(request: NextRequest) {
                 companyId: companyId || authenticatedUser?.companyId || '00000000-0000-0000-0000-000000000001'
               }, { status: 201 })
             }
-            
+
             // Limpar usuário do auth se falhar (apenas se não for modo de teste)
             if (!isTestMode && !isDevelopment) {
-              await supabase.auth.admin.deleteUser(authData.user.id).catch(() => {})
+              await supabase.auth.admin.deleteUser(authData.user.id).catch(() => { })
             }
             console.error('Erro ao criar registro de usuário (sem campos opcionais):', userError2)
             return NextResponse.json(
-              { 
+              {
                 error: userError2.message || 'Erro ao criar registro de usuário',
                 details: userError2
               },
@@ -633,15 +635,15 @@ export async function POST(request: NextRequest) {
               companyId: companyId || undefined
             }, { status: 201 })
           }
-          
+
           // Outro tipo de erro
           // Limpar usuário do auth se falhar (apenas se não for modo de teste)
           if (!isTestMode && !isDevelopment) {
-            await supabase.auth.admin.deleteUser(authData.user.id).catch(() => {})
+            await supabase.auth.admin.deleteUser(authData.user.id).catch(() => { })
           }
           console.error('Erro ao criar registro de usuário:', userError)
           return NextResponse.json(
-            { 
+            {
               error: userError.message || 'Erro ao criar registro de usuário',
               details: userError
             },
@@ -662,14 +664,14 @@ export async function POST(request: NextRequest) {
           companyId: companyId || undefined
         }, { status: 201 })
       }
-      
+
       // Limpar usuário do auth se falhar (apenas se não for modo de teste e se authData existir)
       if (authData?.user?.id && !isTestMode && !isDevelopment) {
-        await supabase.auth.admin.deleteUser(authData.user.id).catch(() => {})
+        await supabase.auth.admin.deleteUser(authData.user.id).catch(() => { })
       }
       console.error('Erro inesperado ao criar funcionário:', e)
       return NextResponse.json(
-        { 
+        {
           error: e.message || 'Erro desconhecido ao criar funcionário',
           details: e
         },
@@ -680,7 +682,7 @@ export async function POST(request: NextRequest) {
     // Garantir que companyId seja sempre uma string válida (não null)
     // Se não há companyId, usar um UUID padrão para testes
     const finalCompanyId = company_id || companyId || authenticatedUser?.companyId || '00000000-0000-0000-0000-000000000001'
-    
+
     // Criar registro em gf_employee_company se company_id foi fornecido
     let employeeCompanyCreated = false
     if (finalCompanyId && finalCompanyId !== '00000000-0000-0000-0000-000000000001') {
@@ -690,7 +692,7 @@ export async function POST(request: NextRequest) {
           name: name || email.split('@')[0],
           email: email.toLowerCase()
         })
-        
+
         // gf_employee_company armazena dados diretamente (não é tabela de mapeamento)
         const { data: insertedData, error: ecError } = await supabase
           .from('gf_employee_company')
@@ -713,7 +715,7 @@ export async function POST(request: NextRequest) {
             address_state: address_state || null
           }, { onConflict: 'company_id,email' })
           .select()
-        
+
         if (ecError) {
           logger.warn('⚠️ Erro ao criar registro em gf_employee_company (não crítico):', ecError.message, ecError.code, ecError.details)
         } else {
@@ -724,7 +726,7 @@ export async function POST(request: NextRequest) {
         logger.warn('⚠️ Exceção ao criar gf_employee_company (não crítico):', ecException.message)
       }
     }
-    
+
     return NextResponse.json({
       userId: authData.user.id,
       created: true,
@@ -736,7 +738,7 @@ export async function POST(request: NextRequest) {
   } catch (error: any) {
     console.error('Erro ao criar funcionário:', error)
     return NextResponse.json(
-      { 
+      {
         error: error.message || 'Erro desconhecido',
         details: process.env.NODE_ENV === 'development' ? error.stack : undefined
       },

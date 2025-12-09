@@ -33,6 +33,7 @@ interface Driver {
   phone?: string
   cpf?: string
   role: string
+  transportadora_id?: string
 }
 
 interface DriverDocument {
@@ -137,6 +138,7 @@ export function DriverModal({ driver, isOpen, onClose, onSave }: DriverModalProp
             name: driverData.name,
             phone: driverData.phone,
             role: 'driver',
+            transportadora_id: formData.transportadora_id,
           })
         })
 
