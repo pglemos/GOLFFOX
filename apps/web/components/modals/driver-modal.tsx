@@ -1,17 +1,17 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
-  DialogTitle, 
-  DialogFooter 
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Users, Upload, X } from "lucide-react"
+import { Users, Upload, X, DollarSign } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { notifySuccess, notifyError } from "@/lib/toast"
 import { t } from "@/lib/i18n"
@@ -20,6 +20,10 @@ import { auditLogs } from "@/lib/audit-log"
 import { useSupabaseSync } from "@/hooks/use-supabase-sync"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
+import dynamic from "next/dynamic"
+
+// Lazy load seções pesadas
+const DriverCompensationSection = dynamic(() => import("@/components/driver/driver-compensation-section"), { ssr: false })
 
 interface Driver {
   id?: string
@@ -83,10 +87,10 @@ export function DriverModal({ driver, isOpen, onClose, onSave }: DriverModalProp
         .select("*")
         .eq("driver_id", driverId)
         .order("created_at", { ascending: false })
-      
+
       if (docs) setDocuments(docs as any)
 
-      
+
     } catch (error) {
       console.error("Erro ao carregar dados do motorista:", error)
     }
@@ -109,7 +113,7 @@ export function DriverModal({ driver, isOpen, onClose, onSave }: DriverModalProp
           .eq("id", driver.id)
 
         if (error) throw error
-        
+
         // Sincronização com Supabase (garantia adicional)
         await sync({
           resourceType: 'driver',
@@ -117,9 +121,9 @@ export function DriverModal({ driver, isOpen, onClose, onSave }: DriverModalProp
           action: 'update',
           data: driverData,
         })
-        
+
         notifySuccess('', { i18n: { ns: 'common', key: 'success.driverUpdated' } })
-        
+
         // Log de auditoria
         await auditLogs.update('driver', driver.id, { name: driverData.name, email: driverData.email })
       } else {
@@ -219,9 +223,12 @@ export function DriverModal({ driver, isOpen, onClose, onSave }: DriverModalProp
         </DialogHeader>
 
         <Tabs defaultValue="dados" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 gap-1 sm:gap-2">
-            <TabsTrigger value="dados"                     className="text-xs sm:text-sm min-h-[44px] touch-manipulation">Dados Pessoais</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-3 gap-1 sm:gap-2">
+            <TabsTrigger value="dados" className="text-xs sm:text-sm min-h-[44px] touch-manipulation">Dados</TabsTrigger>
             <TabsTrigger value="documentos" className="text-xs sm:text-sm min-h-[44px] touch-manipulation">Documentos</TabsTrigger>
+            <TabsTrigger value="salario" className="text-xs sm:text-sm min-h-[44px] touch-manipulation">
+              <DollarSign className="h-3 w-3 mr-1" />Salário
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="dados">
@@ -272,16 +279,16 @@ export function DriverModal({ driver, isOpen, onClose, onSave }: DriverModalProp
               </div>
 
               <DialogFooter className="flex-col sm:flex-row gap-3 pt-4 sm:pt-6 border-t mt-4 sm:mt-6">
-                <Button 
-                  type="button" 
-                  variant="outline" 
+                <Button
+                  type="button"
+                  variant="outline"
                   onClick={onClose}
                   className="w-full sm:w-auto order-2 sm:order-1 min-h-[44px] text-base font-medium touch-manipulation"
                 >
                   Cancelar
                 </Button>
-                <Button 
-                  type="submit" 
+                <Button
+                  type="submit"
                   disabled={loading}
                   className="w-full sm:w-auto order-1 sm:order-2 bg-orange-500 hover:bg-orange-600 min-h-[44px] text-base font-medium touch-manipulation"
                 >
@@ -325,9 +332,9 @@ export function DriverModal({ driver, isOpen, onClose, onSave }: DriverModalProp
                             </p>
                           )}
                           {existingDoc.file_url && (
-                            <a 
-                              href={existingDoc.file_url} 
-                              target="_blank" 
+                            <a
+                              href={existingDoc.file_url}
+                              target="_blank"
                               rel="noopener noreferrer"
                               className="text-xs text-[var(--brand)] hover:underline"
                             >
@@ -362,7 +369,12 @@ export function DriverModal({ driver, isOpen, onClose, onSave }: DriverModalProp
             </div>
           </TabsContent>
 
-          
+          <TabsContent value="salario">
+            <DriverCompensationSection
+              driverId={driver?.id ?? formData.id}
+              isEditing={!!driver?.id || !!formData.id}
+            />
+          </TabsContent>
         </Tabs>
       </DialogContent>
     </Dialog>
