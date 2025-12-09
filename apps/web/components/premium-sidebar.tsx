@@ -30,7 +30,8 @@ import {
   DollarSign,
   FileText,
   Building2,
-  ChevronRight
+  ChevronRight,
+  Wrench
 } from "lucide-react"
 import { OperationalAlertsBadge } from "@/components/operational-alerts-badge"
 import { cn } from "@/lib/utils"
@@ -42,6 +43,7 @@ interface MenuItem {
   href: string
   badge?: number | string
   showOperationalAlerts?: boolean
+  children?: MenuItem[]  // Sub-menus
 }
 
 interface MenuGroup {
@@ -89,12 +91,31 @@ const adminMenuGroups: MenuGroup[] = [
       {
         icon: Building2,
         label: "Transportadoras",
-        href: "/admin/transportadoras"
+        href: "/admin/transportadoras",
+        children: [
+          {
+            icon: Users,
+            label: "Motoristas",
+            href: "/admin/transportadoras/motoristas"
+          },
+          {
+            icon: Truck,
+            label: "Veículos",
+            href: "/admin/transportadoras/veiculos"
+          }
+        ]
       },
       {
         icon: Briefcase,
         label: "Empresas",
-        href: "/admin/empresas"
+        href: "/admin/empresas",
+        children: [
+          {
+            icon: Users,
+            label: "Funcionários",
+            href: "/admin/empresas/funcionarios"
+          }
+        ]
       },
       {
         icon: Users,
@@ -161,6 +182,11 @@ const operadorMenuGroups: MenuGroup[] = [
         href: "/operador/rotas"
       },
       {
+        icon: Users,
+        label: "Funcionários",
+        href: "/operador/funcionarios"
+      },
+      {
         icon: AlertTriangle,
         label: "Alertas",
         href: "/operador/alertas",
@@ -207,12 +233,24 @@ const transportadoraMenuGroups: MenuGroup[] = [
       {
         icon: Truck,
         label: "Veículos",
-        href: "/transportadora/veiculos"
+        href: "/transportadora/veiculos",
+        children: [
+          {
+            icon: Wrench,
+            label: "Manutenção",
+            href: "/transportadora/veiculos/manutencao"
+          }
+        ]
       },
       {
         icon: Users,
         label: "Motoristas",
         href: "/transportadora/motoristas"
+      },
+      {
+        icon: Navigation,
+        label: "Rotas",
+        href: "/transportadora/rotas"
       },
       {
         icon: AlertTriangle,
@@ -343,36 +381,68 @@ export function PremiumSidebar({
                   const Icon = item.icon
 
                   return (
-                    <SidebarMenuItem key={item.href}>
-                      <SidebarMenuButton
-                        asChild
-                        isActive={isActive}
-                        tooltip={item.label}
-                      >
-                        <Link
-                          href={item.href}
-                          onClick={(e) => {
-                            e.preventDefault()
-                            navigateWithTransition(item.href)
-                          }}
+                    <React.Fragment key={item.href}>
+                      <SidebarMenuItem>
+                        <SidebarMenuButton
+                          asChild
+                          isActive={isActive}
+                          tooltip={item.label}
                         >
-                          <Icon className="size-4" />
-                          <span>{item.label}</span>
-                        </Link>
-                      </SidebarMenuButton>
-                      {/* Badge */}
-                      {item.badge && (
-                        <SidebarMenuBadge className="bg-primary/10 rounded-full">
-                          {item.badge}
-                        </SidebarMenuBadge>
-                      )}
-                      {/* Operational Alerts Badge */}
-                      {item.showOperationalAlerts && (
-                        <div className="absolute -top-1 -right-1 z-10">
-                          <OperationalAlertsBadge />
+                          <Link
+                            href={item.href}
+                            onClick={(e) => {
+                              e.preventDefault()
+                              navigateWithTransition(item.href)
+                            }}
+                          >
+                            <Icon className="size-4" />
+                            <span>{item.label}</span>
+                          </Link>
+                        </SidebarMenuButton>
+                        {/* Badge */}
+                        {item.badge && (
+                          <SidebarMenuBadge className="bg-primary/10 rounded-full">
+                            {item.badge}
+                          </SidebarMenuBadge>
+                        )}
+                        {/* Operational Alerts Badge */}
+                        {item.showOperationalAlerts && (
+                          <div className="absolute -top-1 -right-1 z-10">
+                            <OperationalAlertsBadge />
+                          </div>
+                        )}
+                      </SidebarMenuItem>
+                      {/* Sub-menus hierárquicos */}
+                      {item.children && item.children.length > 0 && (
+                        <div className="ml-6 border-l border-border/50 pl-2 space-y-1">
+                          {item.children.map((child) => {
+                            const isChildActive = isItemActive(child.href)
+                            const ChildIcon = child.icon
+                            return (
+                              <SidebarMenuItem key={child.href}>
+                                <SidebarMenuButton
+                                  asChild
+                                  isActive={isChildActive}
+                                  tooltip={child.label}
+                                  className="h-8 text-sm"
+                                >
+                                  <Link
+                                    href={child.href}
+                                    onClick={(e) => {
+                                      e.preventDefault()
+                                      navigateWithTransition(child.href)
+                                    }}
+                                  >
+                                    <ChildIcon className="size-3.5" />
+                                    <span>{child.label}</span>
+                                  </Link>
+                                </SidebarMenuButton>
+                              </SidebarMenuItem>
+                            )
+                          })}
                         </div>
                       )}
-                    </SidebarMenuItem>
+                    </React.Fragment>
                   )
                 })}
               </SidebarMenu>
