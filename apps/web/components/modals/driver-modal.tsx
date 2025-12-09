@@ -24,6 +24,7 @@ import dynamic from "next/dynamic"
 
 // Lazy load seções pesadas
 const DriverCompensationSection = dynamic(() => import("@/components/driver/driver-compensation-section"), { ssr: false })
+const DriverDocumentsSection = dynamic(() => import("@/components/driver/driver-documents-section"), { ssr: false })
 
 interface Driver {
   id?: string
@@ -299,74 +300,10 @@ export function DriverModal({ driver, isOpen, onClose, onSave }: DriverModalProp
           </TabsContent>
 
           <TabsContent value="documentos">
-            <div className="space-y-4 sm:space-y-6">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-                {[
-                  { type: 'cnh' as const, label: 'CNH', required: true },
-                  { type: 'certificado_transporte' as const, label: 'Certificado de Transporte', required: true },
-                  { type: 'toxico' as const, label: 'Toxicológico', required: true },
-                  { type: 'residencia' as const, label: 'Comprovante de Residência', required: false },
-                  { type: 'selfie' as const, label: 'Selfie', required: false },
-                ].map(({ type, label, required }) => {
-                  const existingDoc = documents.find(d => d.document_type === type)
-                  return (
-                    <div key={type} className="border rounded-lg p-4 space-y-2">
-                      <div className="flex items-center justify-between">
-                        <Label>
-                          {label} {required && <span className="text-red-500">*</span>}
-                        </Label>
-                        {existingDoc && (
-                          <Badge variant={existingDoc.is_valid ? "default" : "destructive"}>
-                            {existingDoc.is_valid ? "Válido" : "Inválido"}
-                          </Badge>
-                        )}
-                      </div>
-                      {existingDoc ? (
-                        <div className="space-y-2">
-                          <p className="text-sm text-[var(--ink-muted)]">
-                            {existingDoc.file_name || "Documento anexado"}
-                          </p>
-                          {existingDoc.expiry_date && (
-                            <p className="text-xs text-[var(--ink-muted)]">
-                              Vencimento: {new Date(existingDoc.expiry_date).toLocaleDateString('pt-BR')}
-                            </p>
-                          )}
-                          {existingDoc.file_url && (
-                            <a
-                              href={existingDoc.file_url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-xs text-[var(--brand)] hover:underline"
-                            >
-                              Ver documento
-                            </a>
-                          )}
-                        </div>
-                      ) : (
-                        <label className="cursor-pointer">
-                          <input
-                            type="file"
-                            accept="image/*,.pdf"
-                            onChange={(e) => {
-                              const file = e.target.files?.[0]
-                              if (file && driver?.id) {
-                                handleDocumentUpload(type, file)
-                              }
-                            }}
-                            className="hidden"
-                            disabled={!driver?.id}
-                          />
-                          <Button type="button" variant="outline" size="sm" className="w-full min-h-[44px] text-xs sm:text-sm touch-manipulation" disabled={!driver?.id}>
-                            <Upload className="h-4 w-4 mr-2 flex-shrink-0" />
-                            {driver?.id ? "Enviar" : "Salve o motorista primeiro"}
-                          </Button>
-                        </label>
-                      )}
-                    </div>
-                  )
-                })}
-              </div>
-            </div>
+            <DriverDocumentsSection
+              driverId={driver?.id ?? formData.id}
+              isEditing={!!driver?.id || !!formData.id}
+            />
           </TabsContent>
 
           <TabsContent value="salario">

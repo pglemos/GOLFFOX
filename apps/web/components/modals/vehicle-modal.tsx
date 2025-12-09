@@ -2,23 +2,28 @@
 
 import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
-  DialogTitle, 
-  DialogFooter 
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Truck, Upload, X, Calendar, Wrench, ClipboardCheck } from "lucide-react"
+import { Truck, Upload, X, Calendar, Wrench, ClipboardCheck, FileText } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { notifySuccess, notifyError } from "@/lib/toast"
 import { t } from "@/lib/i18n"
 import { formatError } from "@/lib/error-utils"
 import { auditLogs } from "@/lib/audit-log"
 import { useSupabaseSync } from "@/hooks/use-supabase-sync"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import dynamic from "next/dynamic"
+
+// Lazy load seção de documentos
+const VehicleDocumentsSection = dynamic(() => import("@/components/vehicle/vehicle-documents-section"), { ssr: false })
 
 interface Vehicle {
   id?: string
@@ -52,7 +57,7 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
   const [loading, setLoading] = useState(false)
   const [photoFile, setPhotoFile] = useState<File | null>(null)
   const [photoPreview, setPhotoPreview] = useState<string>("")
-  const [userInfo, setUserInfo] = useState<{role?: string, company_id?: string, transportadora_id?: string}>({})
+  const [userInfo, setUserInfo] = useState<{ role?: string, company_id?: string, transportadora_id?: string }>({})
   const { sync } = useSupabaseSync({ showToast: false }) // Toast já é mostrado no modal
 
   // Carregar informações do usuário para determinar company_id/transportadora_id
@@ -66,7 +71,7 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
             .select('role, company_id, transportadora_id')
             .eq('id', session.user.id)
             .single()
-          
+
           if (!error && userData) {
             setUserInfo({
               role: (userData as any).role,
@@ -79,7 +84,7 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
         console.error('Erro ao carregar informações do usuário:', error)
       }
     }
-    
+
     if (isOpen) {
       loadUserInfo()
     }
@@ -157,16 +162,16 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
 
       // Preparar dados do veículo com validação rigorosa
       let photoUrl: string | null = formData.photo_url ?? null
-      
+
       // Upload da foto ANTES se for update (já temos o ID)
       // Com timeout para evitar travamento
       if (photoFile && vehicleId) {
         try {
           const uploadPromise = uploadPhoto(vehicleId)
-          const timeoutPromise = new Promise<never>((_, reject) => 
+          const timeoutPromise = new Promise<never>((_, reject) =>
             setTimeout(() => reject(new Error('Timeout no upload da foto (30s)')), 30000)
           )
-          
+
           const uploadedUrl = await Promise.race([uploadPromise, timeoutPromise]) as string | null
           if (uploadedUrl) {
             photoUrl = uploadedUrl
@@ -230,7 +235,7 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
           vehicleDataRaw.transportadora_id = userInfo.transportadora_id
         }
       }
-      
+
       // Se for update, manter company_id/transportadora_id existente se não foi alterado
       if (vehicleId && vehicle) {
         if (!vehicleDataRaw.company_id && vehicle.company_id) {
@@ -281,15 +286,15 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
           }
         }
       })
-      
+
       // Validar que há dados para salvar
       if (Object.keys(finalVehicleData).length === 0) {
         throw new Error('Nenhum dado para salvar. Verifique os campos preenchidos.')
       }
-      
+
       console.log('📤 Dados a serem salvos:', finalVehicleData)
       console.log('📊 Total de campos:', Object.keys(finalVehicleData).length)
-      
+
       if (vehicleId) {
         // ATUALIZAR via API service role (evita RLS)
         if (!vehicleId || vehicleId.trim() === '') {
@@ -318,7 +323,7 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
 
         if (!resp.ok) {
           let errBody: any = null
-          try { errBody = await resp.json() } catch {}
+          try { errBody = await resp.json() } catch { }
           const message = errBody?.message || 'Erro ao atualizar veículo'
           throw new Error(message)
         }
@@ -326,13 +331,13 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
         const data = await resp.json()
         console.log('✅ Veículo atualizado com sucesso:', data)
         notifySuccess(t('common', 'success.vehicleUpdated'))
-        
+
         // Log de auditoria (não bloquear em caso de erro)
         try {
           await Promise.race([
-            auditLogs.update('vehicle', vehicleId, { 
-              plate: finalVehicleData.plate, 
-              model: finalVehicleData.model 
+            auditLogs.update('vehicle', vehicleId, {
+              plate: finalVehicleData.plate,
+              model: finalVehicleData.model
             }),
             new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 5000))
           ])
@@ -361,7 +366,7 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
 
         if (!resp.ok) {
           let errBody: any = null
-          try { errBody = await resp.json() } catch {}
+          try { errBody = await resp.json() } catch { }
           const message = errBody?.message || 'Erro ao cadastrar veículo'
           throw new Error(message)
         }
@@ -393,13 +398,13 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
         }
 
         notifySuccess(t('common', 'success.vehicleCreated'))
-        
+
         // Log de auditoria (não bloquear em caso de erro)
         try {
           if (vehicleId) {
-            await auditLogs.create('vehicle', vehicleId, { 
-              plate: finalVehicleData.plate || '', 
-              model: finalVehicleData.model || '' 
+            await auditLogs.create('vehicle', vehicleId, {
+              plate: finalVehicleData.plate || '',
+              model: finalVehicleData.model || ''
             })
           }
         } catch (auditError) {
@@ -409,12 +414,12 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
 
       // Aguardar um pouco antes de fechar para garantir que tudo foi salvo
       await new Promise(resolve => setTimeout(resolve, 100))
-      
+
       onSave()
       onClose()
     } catch (error: any) {
       console.error("❌ Erro ao salvar veículo:", error)
-      
+
       // Extrair mensagem de erro de forma mais robusta
       let errorMessage = "Erro ao salvar veículo"
       if (error?.message) {
@@ -424,7 +429,7 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
       } else if (error?.toString) {
         errorMessage = error.toString()
       }
-      
+
       // Log completo do erro para debug
       console.error("Detalhes completos do erro:", {
         error,
@@ -432,7 +437,7 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
         stack: error?.stack,
         name: error?.name
       })
-      
+
       notifyError(formatError(error, errorMessage), undefined, {
         duration: 5000,
         style: {
@@ -445,7 +450,7 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
     } finally {
       // SEMPRE resetar loading, mesmo se houver erro não capturado
       setLoading(false)
-      
+
       // Garantir que o loading seja resetado após um tempo máximo
       setTimeout(() => {
         setLoading(false)
@@ -463,149 +468,169 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
           </DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Foto do Veículo */}
-          <div className="space-y-2">
-            <Label>Foto do Veículo</Label>
-            <div className="flex items-center gap-4">
-              {photoPreview && (
-                <div className="relative w-32 h-32 rounded-lg overflow-hidden border border-[var(--border)]">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img 
-                    src={photoPreview} 
-                    alt="Preview" 
-                    className="w-full h-full object-cover" 
-                  />
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setPhotoPreview("")
-                      setPhotoFile(null)
-                    }}
-                    className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
-                  >
-                    <X className="h-3 w-3" />
-                  </button>
+        <Tabs defaultValue="dados" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 gap-1 mb-4">
+            <TabsTrigger value="dados" className="text-sm min-h-[40px]">
+              <Truck className="h-4 w-4 mr-2" />Dados
+            </TabsTrigger>
+            <TabsTrigger value="documentos" className="text-sm min-h-[40px]">
+              <FileText className="h-4 w-4 mr-2" />Documentos
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="dados">
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Foto do Veículo */}
+              <div className="space-y-2">
+                <Label>Foto do Veículo</Label>
+                <div className="flex items-center gap-4">
+                  {photoPreview && (
+                    <div className="relative w-32 h-32 rounded-lg overflow-hidden border border-[var(--border)]">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={photoPreview}
+                        alt="Preview"
+                        className="w-full h-full object-cover"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setPhotoPreview("")
+                          setPhotoFile(null)
+                        }}
+                        className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </div>
+                  )}
+                  <div>
+                    <div>
+                      <input
+                        id="vehicle-photo-input"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleFileChange}
+                        className="hidden"
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="min-h-[44px] touch-manipulation"
+                        onClick={() => document.getElementById('vehicle-photo-input')?.click()}
+                      >
+                        <Upload className="h-4 w-4 mr-2" />
+                        {photoPreview ? "Trocar Foto" : "Upload Foto"}
+                      </Button>
+                    </div>
+                    <p className="text-xs text-[var(--ink-muted)] mt-1">
+                      Máximo 5MB (JPG, PNG)
+                    </p>
+                  </div>
                 </div>
-              )}
-              <div>
-                <div>
-                  <input
-                    id="vehicle-photo-input"
-                    type="file"
-                    accept="image/*"
-                    onChange={handleFileChange}
-                    className="hidden"
-                  />
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    size="sm" 
-                    className="min-h-[44px] touch-manipulation"
-                    onClick={() => document.getElementById('vehicle-photo-input')?.click()}
-                  >
-                    <Upload className="h-4 w-4 mr-2" />
-                    {photoPreview ? "Trocar Foto" : "Upload Foto"}
-                  </Button>
-                </div>
-                <p className="text-xs text-[var(--ink-muted)] mt-1">
-                  Máximo 5MB (JPG, PNG)
-                </p>
               </div>
-            </div>
-          </div>
 
-          {/* Grid de Campos */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-            <div className="space-y-2">
-              <Label htmlFor="plate">Placa *</Label>
-              <Input
-                id="plate"
-                value={formData.plate}
-                onChange={(e) => setFormData({ ...formData, plate: e.target.value.toUpperCase() })}
-                placeholder="ABC-1234"
-                required
-              />
-            </div>
+              {/* Grid de Campos */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                <div className="space-y-2">
+                  <Label htmlFor="plate">Placa *</Label>
+                  <Input
+                    id="plate"
+                    value={formData.plate}
+                    onChange={(e) => setFormData({ ...formData, plate: e.target.value.toUpperCase() })}
+                    placeholder="ABC-1234"
+                    required
+                  />
+                </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="prefix">Prefixo</Label>
-              <Input
-                id="prefix"
-                value={formData.prefix || ""}
-                onChange={(e) => setFormData({ ...formData, prefix: e.target.value })}
-                placeholder="001"
-              />
-            </div>
+                <div className="space-y-2">
+                  <Label htmlFor="prefix">Prefixo</Label>
+                  <Input
+                    id="prefix"
+                    value={formData.prefix || ""}
+                    onChange={(e) => setFormData({ ...formData, prefix: e.target.value })}
+                    placeholder="001"
+                  />
+                </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="model">Modelo *</Label>
-              <Input
-                id="model"
-                value={formData.model}
-                onChange={(e) => setFormData({ ...formData, model: e.target.value })}
-                placeholder="Mercedes-Benz O500U"
-                required
-              />
-            </div>
+                <div className="space-y-2">
+                  <Label htmlFor="model">Modelo *</Label>
+                  <Input
+                    id="model"
+                    value={formData.model}
+                    onChange={(e) => setFormData({ ...formData, model: e.target.value })}
+                    placeholder="Mercedes-Benz O500U"
+                    required
+                  />
+                </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="year">Ano</Label>
-              <Input
-                id="year"
-                type="number"
-                value={formData.year}
-                onChange={(e) => setFormData({ ...formData, year: e.target.value })}
-                placeholder="2023"
-                min="1900"
-                max={new Date().getFullYear() + 1}
-              />
-            </div>
+                <div className="space-y-2">
+                  <Label htmlFor="year">Ano</Label>
+                  <Input
+                    id="year"
+                    type="number"
+                    value={formData.year}
+                    onChange={(e) => setFormData({ ...formData, year: e.target.value })}
+                    placeholder="2023"
+                    min="1900"
+                    max={new Date().getFullYear() + 1}
+                  />
+                </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="capacity">Capacidade</Label>
-              <Input
-                id="capacity"
-                type="number"
-                value={formData.capacity || ""}
-                onChange={(e) => setFormData({ ...formData, capacity: e.target.value || "" })}
-                placeholder="40"
-                min="1"
-              />
-            </div>
+                <div className="space-y-2">
+                  <Label htmlFor="capacity">Capacidade</Label>
+                  <Input
+                    id="capacity"
+                    type="number"
+                    value={formData.capacity || ""}
+                    onChange={(e) => setFormData({ ...formData, capacity: e.target.value || "" })}
+                    placeholder="40"
+                    min="1"
+                  />
+                </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="status">Status</Label>
-              <select
-                id="status"
-                value={formData.is_active ? "active" : "inactive"}
-                onChange={(e) => setFormData({ ...formData, is_active: e.target.value === "active" })}
-                className="w-full px-3 py-2 rounded-lg border border-[var(--border)] bg-white"
-              >
-                <option value="active">Ativo</option>
-                <option value="inactive">Inativo</option>
-              </select>
-            </div>
-          </div>
+                <div className="space-y-2">
+                  <Label htmlFor="status">Status</Label>
+                  <select
+                    id="status"
+                    value={formData.is_active ? "active" : "inactive"}
+                    onChange={(e) => setFormData({ ...formData, is_active: e.target.value === "active" })}
+                    className="w-full px-3 py-2 rounded-lg border border-[var(--border)] bg-white"
+                  >
+                    <option value="active">Ativo</option>
+                    <option value="inactive">Inativo</option>
+                  </select>
+                </div>
+              </div>
 
-          <DialogFooter className="flex-col sm:flex-row gap-3 pt-4 sm:pt-6 border-t mt-4 sm:mt-6">
-            <Button 
-              type="button" 
-              variant="outline" 
-              onClick={onClose}
-              className="w-full sm:w-auto order-2 sm:order-1 min-h-[44px] text-base font-medium"
-            >
-              Cancelar
-            </Button>
-            <Button 
-              type="submit" 
-              disabled={loading}
-              className="w-full sm:w-auto order-1 sm:order-2 bg-orange-500 hover:bg-orange-600 min-h-[44px] text-base font-medium"
-            >
-              {loading ? "Salvando..." : vehicle ? "Atualizar" : "Cadastrar"}
-            </Button>
-          </DialogFooter>
-        </form>
+              <DialogFooter className="flex-col sm:flex-row gap-3 pt-4 sm:pt-6 border-t mt-4 sm:mt-6">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={onClose}
+                  className="w-full sm:w-auto order-2 sm:order-1 min-h-[44px] text-base font-medium"
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full sm:w-auto order-1 sm:order-2 bg-orange-500 hover:bg-orange-600 min-h-[44px] text-base font-medium"
+                >
+                  {loading ? "Salvando..." : vehicle ? "Atualizar" : "Cadastrar"}
+                </Button>
+              </DialogFooter>
+            </form>
+          </TabsContent>
+
+          <TabsContent value="documentos">
+            <VehicleDocumentsSection
+              vehicleId={vehicle?.id ?? formData.id}
+              isEditing={!!vehicle?.id || !!formData.id}
+            />
+          </TabsContent>
+        </Tabs>
       </DialogContent>
     </Dialog>
   )
