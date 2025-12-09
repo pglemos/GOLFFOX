@@ -51,7 +51,7 @@ export function RotasPageContent() {
     status: "",
     date: ""
   })
-  
+
   const filterFields = [
     {
       key: "company",
@@ -64,7 +64,7 @@ export function RotasPageContent() {
       label: "Status",
       type: "select" as const,
       options: [
-        { label: "Todas", value: "" },
+        { label: "Todas", value: "all" },
         { label: "Ativa", value: "active" },
         { label: "Inativa", value: "inactive" }
       ]
@@ -176,23 +176,23 @@ export function RotasPageContent() {
 
   const filteredRotas = rotas.filter(rota => {
     // Filtro por busca
-    const matchesSearch = 
+    const matchesSearch =
       rota.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       rota.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       rota.companies?.name?.toLowerCase().includes(searchQuery.toLowerCase())
-    
+
     // Filtro por empresa
-    const matchesCompany = !filterValues.company || 
+    const matchesCompany = !filterValues.company ||
       rota.companies?.name?.toLowerCase().includes(filterValues.company.toLowerCase())
-    
+
     // Filtro por status
-    const matchesStatus = !filterValues.status || 
+    const matchesStatus = !filterValues.status || filterValues.status === "all" ||
       (filterValues.status === "active" && rota.status === "active") ||
       (filterValues.status === "inactive" && rota.status === "inactive")
-    
+
     // Filtro por data (simplificado - pode ser melhorado)
     const matchesDate = !filterValues.date || true // TODO: implementar filtro de data
-    
+
     return matchesSearch && matchesCompany && matchesStatus && matchesDate
   })
 
@@ -272,147 +272,147 @@ export function RotasPageContent() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredRotas.map((rota, index) => (
-              <motion.div
-                key={rota.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                whileHover={{ y: -4 }}
-              >
-                <Card className="p-6 hover:shadow-xl transition-all duration-300 cursor-pointer group border-[var(--border)] hover:border-[var(--brand)]/50 bg-card/50 backdrop-blur-sm">
-                  <div className="flex justify-between items-start mb-4">
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-lg text-[var(--ink-strong)] group-hover:text-[var(--brand)] transition-colors flex items-center gap-2">
-                        <Route className="h-4 w-4 text-[var(--brand)]" />
-                        {rota.name}
-                      </h3>
-                      <p className="text-sm text-[var(--ink-muted)] mt-1 flex items-center gap-1">
-                        <Building2 className="h-3 w-3" />
-                        {rota.companies?.name}
-                      </p>
+                <motion.div
+                  key={rota.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  whileHover={{ y: -4 }}
+                >
+                  <Card className="p-6 hover:shadow-xl transition-all duration-300 cursor-pointer group border-[var(--border)] hover:border-[var(--brand)]/50 bg-card/50 backdrop-blur-sm">
+                    <div className="flex justify-between items-start mb-4">
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-lg text-[var(--ink-strong)] group-hover:text-[var(--brand)] transition-colors flex items-center gap-2">
+                          <Route className="h-4 w-4 text-[var(--brand)]" />
+                          {rota.name}
+                        </h3>
+                        <p className="text-sm text-[var(--ink-muted)] mt-1 flex items-center gap-1">
+                          <Building2 className="h-3 w-3" />
+                          {rota.companies?.name}
+                        </p>
+                      </div>
+                      <Badge variant={rota.is_active ? "default" : "secondary"} className="ml-2">
+                        {rota.is_active ? "Ativa" : "Inativa"}
+                      </Badge>
                     </div>
-                    <Badge variant={rota.is_active ? "default" : "secondary"} className="ml-2">
-                      {rota.is_active ? "Ativa" : "Inativa"}
-                    </Badge>
-                  </div>
 
-                  <div className="space-y-2 mb-4">
-                    <div className="flex items-center text-sm text-[var(--ink-muted)]">
-                      <MapPin className="h-4 w-4 mr-2 text-[var(--brand)]" />
-                      <span className="truncate">{rota.description || "Sem descrição"}</span>
+                    <div className="space-y-2 mb-4">
+                      <div className="flex items-center text-sm text-[var(--ink-muted)]">
+                        <MapPin className="h-4 w-4 mr-2 text-[var(--brand)]" />
+                        <span className="truncate">{rota.description || "Sem descrição"}</span>
+                      </div>
+                      <div className="flex items-center text-sm text-[var(--ink-muted)]">
+                        <Clock className="h-4 w-4 mr-2 text-[var(--brand)]" />
+                        <span>Duração: {rota.estimated_duration || "N/A"} min</span>
+                      </div>
+                      <div className="flex items-center text-sm text-[var(--ink-muted)]">
+                        <Users className="h-4 w-4 mr-2 text-[var(--brand)]" />
+                        <span>Paradas: {rota.stops?.length || 0}</span>
+                      </div>
+                      <div className="flex items-center text-sm text-[var(--ink-muted)]">
+                        <Truck className="h-4 w-4 mr-2 text-[var(--brand)]" />
+                        <span>Distância: {rota.distance || "N/A"} km</span>
+                      </div>
                     </div>
-                    <div className="flex items-center text-sm text-[var(--ink-muted)]">
-                      <Clock className="h-4 w-4 mr-2 text-[var(--brand)]" />
-                      <span>Duração: {rota.estimated_duration || "N/A"} min</span>
-                    </div>
-                    <div className="flex items-center text-sm text-[var(--ink-muted)]">
-                      <Users className="h-4 w-4 mr-2 text-[var(--brand)]" />
-                      <span>Paradas: {rota.stops?.length || 0}</span>
-                    </div>
-                    <div className="flex items-center text-sm text-[var(--ink-muted)]">
-                      <Truck className="h-4 w-4 mr-2 text-[var(--brand)]" />
-                      <span>Distância: {rota.distance || "N/A"} km</span>
-                    </div>
-                  </div>
 
-                  <div className="flex flex-col gap-2">
-                    <div className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="flex-1"
-                        onClick={() => {
-                          setSelectedRoute(rota)
-                          setIsModalOpen(true)
-                        }}
-                      >
-                        <Edit className="h-4 w-4 mr-2" />
-                        Editar
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="flex-1"
-                        onClick={async () => {
-                          try {
-                            const resp = await fetch('/api/admin/generate-stops', {
-                              method: 'POST',
-                              headers: { 'Content-Type': 'application/json' },
-                              body: JSON.stringify({ routeId: rota.id, dbSave: true }),
-                              credentials: 'include'
+                    <div className="flex flex-col gap-2">
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="flex-1"
+                          onClick={() => {
+                            setSelectedRoute(rota)
+                            setIsModalOpen(true)
+                          }}
+                        >
+                          <Edit className="h-4 w-4 mr-2" />
+                          Editar
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="flex-1"
+                          onClick={async () => {
+                            try {
+                              const resp = await fetch('/api/admin/generate-stops', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ routeId: rota.id, dbSave: true }),
+                                credentials: 'include'
+                              })
+                              const data = await resp.json()
+                              if (!resp.ok) throw new Error(data?.error || 'Erro ao gerar pontos')
+                              notifySuccess('', { i18n: { ns: 'common', key: 'success.pointsGeneratedSaved' } })
+                              await loadRotas()
+                            } catch (error: any) {
+                              notifyError(error, `Erro: ${error.message}`, { i18n: { ns: 'common', key: 'errors.generatePoints' } })
+                            }
+                          }}
+                        >
+                          <Sparkles className="h-4 w-4 mr-2" />
+                          Gerar Pontos
+                        </Button>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="flex-1"
+                          onClick={async () => {
+                            try {
+                              const response = await fetch(`/api/admin/optimize-route?routeId=${rota.id}`, {
+                                method: 'POST'
+                              })
+                              if (!response.ok) throw new Error('Erro ao otimizar')
+                              notifySuccess('', { i18n: { ns: 'common', key: 'success.routeOptimized' } })
+                              loadRotas()
+                            } catch (error: any) {
+                              notifyError(error, `Erro: ${error.message}`, { i18n: { ns: 'common', key: 'errors.optimizeRoute' } })
+                            }
+                          }}
+                        >
+                          <Navigation className="h-4 w-4 mr-2" />
+                          Otimizar
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="flex-1"
+                          onClick={() => {
+                            // Buscar coordenadas da rota para deep-link
+                            const center = rota.origin_lat && rota.origin_lng
+                              ? { lat: rota.origin_lat, lng: rota.origin_lng }
+                              : null
+                            const zoom = 14
+
+                            const params = new URLSearchParams({
+                              route: rota.id,
+                              ...(center ? { lat: center.lat.toString(), lng: center.lng.toString(), zoom: zoom.toString() } : {})
                             })
-                            const data = await resp.json()
-                            if (!resp.ok) throw new Error(data?.error || 'Erro ao gerar pontos')
-                            notifySuccess('', { i18n: { ns: 'common', key: 'success.pointsGeneratedSaved' } })
-                            await loadRotas()
-                          } catch (error: any) {
-                            notifyError(error, `Erro: ${error.message}`, { i18n: { ns: 'common', key: 'errors.generatePoints' } })
-                          }
-                        }}
-                      >
-                        <Sparkles className="h-4 w-4 mr-2" />
-                        Gerar Pontos
-                      </Button>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="flex-1"
-                        onClick={async () => {
-                          try {
-                            const response = await fetch(`/api/admin/optimize-route?routeId=${rota.id}`, {
-                              method: 'POST'
-                            })
-                            if (!response.ok) throw new Error('Erro ao otimizar')
-                            notifySuccess('', { i18n: { ns: 'common', key: 'success.routeOptimized' } })
-                            loadRotas()
-                          } catch (error: any) {
-                            notifyError(error, `Erro: ${error.message}`, { i18n: { ns: 'common', key: 'errors.optimizeRoute' } })
-                          }
-                        }}
-                      >
-                        <Navigation className="h-4 w-4 mr-2" />
-                        Otimizar
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="flex-1"
-                        onClick={() => {
-                          // Buscar coordenadas da rota para deep-link
-                          const center = rota.origin_lat && rota.origin_lng
-                            ? { lat: rota.origin_lat, lng: rota.origin_lng }
-                            : null
-                          const zoom = 14
 
-                          const params = new URLSearchParams({
-                            route: rota.id,
-                            ...(center ? { lat: center.lat.toString(), lng: center.lng.toString(), zoom: zoom.toString() } : {})
-                          })
-
-                          router.push(`/admin/mapa?${params.toString()}`)
-                        }}
-                      >
-                        <MapPin className="h-4 w-4 mr-2" />
-                        Ver no Mapa
-                      </Button>
+                            router.push(`/admin/mapa?${params.toString()}`)
+                          }}
+                        >
+                          <MapPin className="h-4 w-4 mr-2" />
+                          Ver no Mapa
+                        </Button>
+                      </div>
+                      <div className="mt-2">
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          className="w-full"
+                          onClick={() => handleDeleteRota(rota.id, rota.name || 'Rota')}
+                        >
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          Excluir
+                        </Button>
+                      </div>
                     </div>
-                    <div className="mt-2">
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        className="w-full"
-                        onClick={() => handleDeleteRota(rota.id, rota.name || 'Rota')}
-                      >
-                        <Trash2 className="h-4 w-4 mr-2" />
-                        Excluir
-                      </Button>
-                    </div>
-                  </div>
-                </Card>
-              </motion.div>
-            ))}
+                  </Card>
+                </motion.div>
+              ))}
             </div>
           )}
         </div>

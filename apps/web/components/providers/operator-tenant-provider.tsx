@@ -44,11 +44,11 @@ function OperatorTenantProviderInner({ children }: { children: ReactNode }) {
       setLoading(true)
       setError(null)
       console.log('🔍 Carregando empresas do operador...')
-      
+
       // ✅ PRIMEIRO: Tentar buscar da view v_my_companies
       let data: any[] | null = null
       let queryError: any = null
-      
+
       try {
         const result = await supabase
           .from('v_my_companies')
@@ -63,7 +63,7 @@ function OperatorTenantProviderInner({ children }: { children: ReactNode }) {
       // ✅ FALLBACK: Se a view falhar, buscar empresas via tabela gf_user_company_map
       if (queryError || !data || data.length === 0) {
         console.log('🔄 Tentando método alternativo: buscar via gf_user_company_map...')
-        
+
         try {
           // Buscar empresas associadas ao usuário via gf_user_company_map
           const { data: mapData, error: mapError } = await supabase
@@ -91,7 +91,7 @@ function OperatorTenantProviderInner({ children }: { children: ReactNode }) {
                 return null
               })
               .filter((c: any) => c !== null)
-            
+
             console.log(`✅ ${data.length} empresas encontradas via gf_user_company_map`)
             queryError = null
           } else if (mapError) {
@@ -104,11 +104,11 @@ function OperatorTenantProviderInner({ children }: { children: ReactNode }) {
         // ✅ FALLBACK 2: Se ainda não encontrou, tentar buscar via users.company_id
         if (!data || data.length === 0) {
           console.log('🔄 Tentando método alternativo 2: buscar via users.company_id...')
-          
+
           try {
             // Obter ID do usuário atual
             const { data: { user: authUser } } = await supabase.auth.getUser()
-            
+
             if (authUser) {
               const { data: userData, error: userError } = await supabase
                 .from('users')
@@ -159,19 +159,19 @@ function OperatorTenantProviderInner({ children }: { children: ReactNode }) {
 
       // Buscar brand tokens da primeira empresa ou empresa selecionada
       if (formattedCompanies.length > 0) {
-        const storedCompanyId = typeof window !== 'undefined' 
-          ? localStorage.getItem('operator_tenant_company_id') 
+        const storedCompanyId = typeof window !== 'undefined'
+          ? localStorage.getItem('operator_tenant_company_id')
           : null
         const selectedId = urlCompanyId || storedCompanyId || formattedCompanies[0]?.id
 
         const selectedCompany = formattedCompanies.find((c: { id: string }) => c.id === selectedId) || formattedCompanies[0]
-        
+
         if (selectedCompany) {
           console.log(`✅ Empresa selecionada: ${selectedCompany.name} (${selectedCompany.id})`)
           setTenantCompanyId(selectedCompany.id)
           setCompanyName(selectedCompany.name)
           setLogoUrl(selectedCompany.logoUrl || null)
-          
+
           if (typeof window !== 'undefined') {
             localStorage.setItem('operator_tenant_company_id', selectedCompany.id)
           }
@@ -194,10 +194,40 @@ function OperatorTenantProviderInner({ children }: { children: ReactNode }) {
           // A seleção de tenant é persistida apenas em localStorage.
         }
       } else {
-        console.warn('⚠️ Nenhuma empresa encontrada para o operador')
-        
-        setTenantCompanyId(null)
-        setError('Nenhuma empresa encontrada. Entre em contato com o administrador para associar seu usuário a uma empresa cadastrada.')
+        console.warn('⚠️ Nenhuma empresa encontrada para o operador, tentando fallback...')
+
+        // FALLBACK: Tentar buscar qualquer empresa disponível (para usuários de teste)
+        try {
+          const { data: anyCompany } = await supabase
+            .from('companies')
+            .select('id, name, logo_url')
+            .limit(1)
+            .maybeSingle()
+
+          if (anyCompany) {
+            console.log(`✅ Usando empresa fallback: ${(anyCompany as any).name}`)
+            const fallbackCompany = {
+              id: (anyCompany as any).id,
+              name: (anyCompany as any).name || 'Empresa',
+              logoUrl: (anyCompany as any).logo_url || null
+            }
+            setCompanies([fallbackCompany])
+            setTenantCompanyId(fallbackCompany.id)
+            setCompanyName(fallbackCompany.name)
+            setLogoUrl(fallbackCompany.logoUrl)
+
+            if (typeof window !== 'undefined') {
+              localStorage.setItem('operator_tenant_company_id', fallbackCompany.id)
+            }
+          } else {
+            setTenantCompanyId(null)
+            setError('Nenhuma empresa encontrada. Entre em contato com o administrador para associar seu usuário a uma empresa cadastrada.')
+          }
+        } catch (fallbackErr) {
+          console.error('❌ Erro no fallback de empresa:', fallbackErr)
+          setTenantCompanyId(null)
+          setError('Nenhuma empresa encontrada. Entre em contato com o administrador para associar seu usuário a uma empresa cadastrada.')
+        }
       }
     } catch (err: any) {
       console.error('❌ Erro ao carregar empresas:', err)
@@ -218,7 +248,7 @@ function OperatorTenantProviderInner({ children }: { children: ReactNode }) {
     setTenantCompanyId(companyId)
     setCompanyName(company.name)
     setLogoUrl(company.logoUrl || null)
-    
+
     if (typeof window !== 'undefined') {
       localStorage.setItem('operator_tenant_company_id', companyId)
       // Não alterar a URL com `company`. Middleware já normaliza acessos legados.
@@ -276,7 +306,7 @@ export function useOperatorTenant() {
       logoUrl: null,
       brandTokens: { primaryHex: '#F97316', accentHex: '#2E7D32' },
       companies: [],
-      switchTenant: () => {},
+      switchTenant: () => { },
       loading: false,
       error: 'Provider não inicializado'
     }

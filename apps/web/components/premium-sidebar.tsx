@@ -74,7 +74,7 @@ const adminMenuGroups: MenuGroup[] = [
     ]
   },
   {
-    label: "Core Pages",
+    label: "Páginas Principais",
     items: [
       {
         icon: MapPin,
@@ -115,7 +115,7 @@ const adminMenuGroups: MenuGroup[] = [
     ]
   },
   {
-    label: "Visualization",
+    label: "Visualização",
     items: [
       {
         icon: DollarSign,
@@ -148,7 +148,7 @@ const operadorMenuGroups: MenuGroup[] = [
     ]
   },
   {
-    label: "Core Pages",
+    label: "Páginas Principais",
     items: [
       {
         icon: MapPin,
@@ -169,7 +169,7 @@ const operadorMenuGroups: MenuGroup[] = [
     ]
   },
   {
-    label: "Visualization",
+    label: "Visualização",
     items: [
       {
         icon: BarChart3,
@@ -197,7 +197,7 @@ const transportadoraMenuGroups: MenuGroup[] = [
     ]
   },
   {
-    label: "Core Pages",
+    label: "Páginas Principais",
     items: [
       {
         icon: MapPin,
@@ -223,7 +223,7 @@ const transportadoraMenuGroups: MenuGroup[] = [
     ]
   },
   {
-    label: "Visualization",
+    label: "Visualização",
     items: [
       {
         icon: DollarSign,

@@ -260,7 +260,7 @@ export function Topbar({
                     >
                       <div className="text-muted-foreground hidden items-center gap-1.5 text-sm sm:flex md:max-lg:hidden">
                         <Search className="h-4 w-4" />
-                        <span>Type to search...</span>
+                        <span>Digite para buscar...</span>
                       </div>
                     </button>
                   </DialogTrigger>
@@ -272,7 +272,7 @@ export function Topbar({
                       aria-label="Search"
                     >
                       <Search className="h-4 w-4" />
-                      <span className="sr-only">Search</span>
+                      <span className="sr-only">Buscar</span>
                     </button>
                   </DialogTrigger>
                 </div>
