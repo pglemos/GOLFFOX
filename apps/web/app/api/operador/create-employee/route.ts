@@ -159,6 +159,9 @@ export async function POST(request: NextRequest) {
       company_id,
       transportadora_id,
       cpf,
+      rg,
+      cnh,
+      cnh_category,
       address,
       latitude,
       longitude,
@@ -504,10 +507,21 @@ export async function POST(request: NextRequest) {
       transportadora_id: transportadora_id || null
     }
 
-    // Tentar inserir com name e phone (podem não existir na tabela)
+    // Tentar inserir com name, phone e campos adicionais (podem não existir na tabela)
     try {
       if (name) userData.name = name
       if (phone) userData.phone = phone
+      if (cpf) userData.cpf = cpf
+      if (rg) userData.rg = rg
+      if (cnh) userData.cnh = cnh
+      if (cnh_category) userData.cnh_category = cnh_category
+      if (address_zip_code) userData.address_zip_code = address_zip_code
+      if (address_street) userData.address_street = address_street
+      if (address_number) userData.address_number = address_number
+      if (address_complement) userData.address_complement = address_complement
+      if (address_neighborhood) userData.address_neighborhood = address_neighborhood
+      if (address_city) userData.address_city = address_city
+      if (address_state) userData.address_state = address_state
 
       const { error: userError } = await supabase
         .from('users')
