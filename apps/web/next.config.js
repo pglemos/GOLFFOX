@@ -15,9 +15,9 @@ let nextConfig = {
   },
   // Next.js 16: Turbopack é o bundler padrão - otimizado para produção
   // Turbopack oferece performance superior com cache incremental
-  // NOTA: Turbopack requer binário nativo SWC. Se o binário falhar, use --no-turbo
-  // Removido turbopack: {} para permitir fallback automático para webpack quando necessário
-  
+  // Configuração vazia permite que Next.js use webpack ou turbopack conforme disponibilidade
+  turbopack: {},
+
   // Configuração SWC: Next.js automaticamente usa WASM como fallback se binário nativo falhar
   // O binário nativo (@next/swc-win32-x64-msvc) é preferido para melhor performance
   // WASM é mais lento mas funciona como fallback se o binário nativo não carregar
@@ -36,7 +36,7 @@ let nextConfig = {
                 "base-uri 'self'",
                 "form-action 'self'",
                 "object-src 'none'",
-                
+
                 // Scripts: 
                 // - 'unsafe-inline' necessário para Next.js (injection de scripts HMR, _next/static)
                 // - 'unsafe-eval' removido em produção (segurança XSS)
@@ -46,33 +46,33 @@ let nextConfig = {
                 isProd
                   ? "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' blob: https:"
                   : "script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' blob: https:",
-                
+
                 // Styles: 'unsafe-inline' necessário para estilos inline do Next.js e componentes
                 // Google Fonts permitido para fontes externas
                 "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
                 "style-src-elem 'self' 'unsafe-inline' https://fonts.googleapis.com",
-                
+
                 // Images: permitir data URIs (avatars, icons) e blob (previews)
                 "img-src 'self' data: blob: https:",
-                
+
                 // Fonts: Google Fonts e data URIs para ícones
                 "font-src 'self' data: https://fonts.gstatic.com https://fonts.googleapis.com",
-                
+
                 // Connect: APIs externas necessárias
                 "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.vercel.com https://*.googleapis.com https://*.vercel.app https://vitals.vercel-insights.com",
-                
+
                 // Workers: necessário para service workers e web workers
                 "worker-src 'self' blob:",
-                
+
                 // Frames: Google Maps e outros iframes necessários
                 "frame-src 'self' https://*.google.com https://*.gstatic.com",
               ]
-              
+
               // Em produção, forçar HTTPS
               if (isProd) {
                 directives.push('upgrade-insecure-requests')
               }
-              
+
               return directives.join('; ')
             })(),
           },
@@ -116,7 +116,7 @@ let nextConfig = {
       // Usar a versão do Next.js (0.5.15) que tem _apply_decorated_descriptor
       '@swc/helpers': path.resolve(__dirname, 'node_modules/next/node_modules/@swc/helpers'),
     }
-    
+
     // Adicionar plugin para injetar compatibilidade
     if (!isServer) {
       config.plugins = config.plugins || []
@@ -151,7 +151,7 @@ let nextConfig = {
           config: [__filename],
         },
       }
-      
+
       // Logging melhorado em desenvolvimento
       if (process.env.NODE_ENV === 'development') {
         const originalResolve = config.resolve
