@@ -83,7 +83,8 @@ export default function TransportadoraVeiculosPage() {
             const response = await fetch('/api/admin/transportadoras-list')
             if (!response.ok) return
             const data = await response.json()
-            setTransportadoras(Array.isArray(data) ? data : data.transportadoras || [])
+            // API retorna { success: true, carriers: [...] }
+            setTransportadoras(Array.isArray(data) ? data : data.carriers || data.transportadoras || [])
         } catch {
             setTransportadoras([])
         }
