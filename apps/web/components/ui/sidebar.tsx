@@ -156,9 +156,9 @@ export const DesktopSidebar = ({
         className
       )}
       animate={{
-        width: animate ? (open ? "240px" : "64px") : "240px",
+        width: animate ? (open ? "280px" : "72px") : "280px",
       }}
-      transition={{ duration: 0.12, ease: "easeOut" }}
+      transition={{ duration: 0.2, ease: "linear" }}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       {...props}
