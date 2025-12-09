@@ -45,7 +45,7 @@ const DialogContent = React.forwardRef<
             ? "inset-0 rounded-none p-4 max-h-screen overflow-y-auto scroll-smooth-touch" 
             : "left-[50%] top-[50%] max-w-lg translate-x-[-50%] translate-y-[-50%] p-6 sm:rounded-lg",
           // Safe areas para iOS
-          isMobile && "safe-top safe-bottom"
+          isMobile && "safe-top safe-bottom",
           className
         )}
         {...props}
