@@ -195,17 +195,18 @@
     --z-tooltip: 1070;
 
     /* Layout Variables - Application Shell 08 Style */
-    --sidebar-width: 17.5rem;
-    /* 280px expandido */
-    --sidebar-width-icon: 3.5rem;
-    /* 56px colapsado + padding = 72px total */
-    --sidebar-width-expanded: 280px;
-    --sidebar-width-collapsed: 72px;
+    --sidebar-width: 15.875rem;
+    /* 254px expandido */
+    --sidebar-width-icon: 3rem;
+    /* 48px colapsado */
+    --sidebar-width-expanded: 254px;
+    --sidebar-width-collapsed: 48px;
     --header-height: 80px;
     --header-z-index: 50;
     --footer-height: 44px;
     --layout-padding: 24px;
-    /* 1.5rem */
+    --spacing: 0.25rem;
+    /* 4px base para cálculos */
   }
 
   .dark {

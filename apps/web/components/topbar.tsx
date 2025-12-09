@@ -71,7 +71,7 @@ export function Topbar({
   let sidebarControl: { toggle: () => void } | null = null
   try {
     const sidebar = useSidebar()
-    sidebarControl = { toggle: () => sidebar.setOpen(!sidebar.open) }
+    sidebarControl = { toggle: sidebar.toggleSidebar }
   } catch {
     // useSidebar não disponível (fora do provider), usar onToggleSidebar como fallback
     sidebarControl = null

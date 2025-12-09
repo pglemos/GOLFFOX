@@ -13,6 +13,9 @@ export function useMobile(): boolean {
   return isMobile
 }
 
+// Alias para compatibilidade com shadcn/ui sidebar
+export const useIsMobile = useMobile
+
 /**
  * Hook para detectar se está em tablet
  * Considera tablet: 768px - 1023px

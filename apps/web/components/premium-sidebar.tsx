@@ -5,16 +5,18 @@ import { usePathname, useRouter } from "next/navigation"
 import Link from "next/link"
 import { useViewTransition } from "@/hooks/use-view-transition"
 import {
-  Sidebar as UISidebar,
-  SidebarBody,
+  Sidebar,
+  SidebarHeader,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupLabel,
+  SidebarGroupContent,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
+  SidebarMenuBadge,
   useSidebar
 } from "@/components/ui/sidebar"
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet"
 import {
   LayoutDashboard,
   MapPin,
@@ -27,7 +29,8 @@ import {
   BarChart3,
   DollarSign,
   FileText,
-  Building2
+  Building2,
+  ChevronRight
 } from "lucide-react"
 import { OperationalAlertsBadge } from "@/components/operational-alerts-badge"
 import { cn } from "@/lib/utils"
@@ -38,6 +41,7 @@ interface MenuItem {
   label: string
   href: string
   badge?: number | string
+  showOperationalAlerts?: boolean
 }
 
 interface MenuGroup {
@@ -98,15 +102,15 @@ const adminMenuGroups: MenuGroup[] = [
         href: "/admin/usuarios"
       },
       {
-        icon: LifeBuoy,
-        label: "Socorro",
-        href: "/admin/socorro"
+        icon: Truck,
+        label: "Veículos",
+        href: "/admin/veiculos"
       },
       {
         icon: AlertTriangle,
         label: "Alertas",
         href: "/admin/alertas",
-        badge: 3
+        showOperationalAlerts: true
       }
     ]
   },
@@ -114,14 +118,19 @@ const adminMenuGroups: MenuGroup[] = [
     label: "Visualization",
     items: [
       {
-        icon: BarChart3,
-        label: "Relatórios",
-        href: "/admin/relatorios"
-      },
-      {
         icon: DollarSign,
         label: "Custos",
         href: "/admin/custos"
+      },
+      {
+        icon: BarChart3,
+        label: "Analytics",
+        href: "/admin/analytics"
+      },
+      {
+        icon: FileText,
+        label: "Relatórios",
+        href: "/admin/relatorios"
       }
     ]
   }
@@ -142,9 +151,9 @@ const operadorMenuGroups: MenuGroup[] = [
     label: "Core Pages",
     items: [
       {
-        icon: Users,
-        label: "Funcionários",
-        href: "/operador/funcionarios"
+        icon: MapPin,
+        label: "Mapa",
+        href: "/operador/mapa"
       },
       {
         icon: Navigation,
@@ -152,25 +161,10 @@ const operadorMenuGroups: MenuGroup[] = [
         href: "/operador/rotas"
       },
       {
-        icon: FileText,
-        label: "Histórico",
-        href: "/operador/historico-rotas"
-      },
-      {
-        icon: Building2,
-        label: "Prestadores",
-        href: "/operador/prestadores"
-      },
-      {
-        icon: FileText,
-        label: "Solicitações",
-        href: "/operador/solicitacoes"
-      },
-      {
         icon: AlertTriangle,
         label: "Alertas",
         href: "/operador/alertas",
-        badge: 3
+        showOperationalAlerts: true
       }
     ]
   },
@@ -178,14 +172,14 @@ const operadorMenuGroups: MenuGroup[] = [
     label: "Visualization",
     items: [
       {
-        icon: DollarSign,
-        label: "Custos",
-        href: "/operador/custos"
-      },
-      {
         icon: BarChart3,
         label: "Relatórios",
         href: "/operador/relatorios"
+      },
+      {
+        icon: LifeBuoy,
+        label: "Suporte",
+        href: "/operador/suporte"
       }
     ]
   }
@@ -223,7 +217,8 @@ const transportadoraMenuGroups: MenuGroup[] = [
       {
         icon: AlertTriangle,
         label: "Alertas",
-        href: "/transportadora/alertas"
+        href: "/transportadora/alertas",
+        showOperationalAlerts: true
       }
     ]
   },
@@ -244,183 +239,62 @@ const transportadoraMenuGroups: MenuGroup[] = [
   }
 ]
 
-// Logo no header do sidebar - Application Shell 08 style (exatamente como original)
-const SidebarHeader = ({ panel }: { panel: 'admin' | 'operador' | 'transportadora' }) => {
-  const { open } = useSidebar()
+// Logo no header do sidebar
+const SidebarLogo = ({ panel }: { panel: 'admin' | 'operador' | 'transportadora' }) => {
+  const { state } = useSidebar()
+  const isCollapsed = state === "collapsed"
 
-  // Ícone grande estilo Application Shell 08
-  const LogoIcon = () => (
-    <svg width="1em" height="1em" viewBox="0 0 328 329" fill="none" xmlns="http://www.w3.org/2000/svg" className="[&_rect]:fill-sidebar [&_rect:first-child]:fill-primary">
-      <rect y="0.5" width="328" height="328" rx="164" fill="black" className="dark:fill-white" />
-      <path d="M165.018 72.3008V132.771C165.018 152.653 148.9 168.771 129.018 168.771H70.2288" stroke="white" strokeWidth="20" className="dark:stroke-black" />
-      <path d="M166.627 265.241L166.627 204.771C166.627 184.889 182.744 168.771 202.627 168.771L261.416 168.771" stroke="white" strokeWidth="20" className="dark:stroke-black" />
-      <line x1="238.136" y1="98.8184" x2="196.76" y2="139.707" stroke="white" strokeWidth="20" className="dark:stroke-black" />
-      <line x1="135.688" y1="200.957" x2="94.3128" y2="241.845" stroke="white" strokeWidth="20" className="dark:stroke-black" />
-      <line x1="133.689" y1="137.524" x2="92.5566" y2="96.3914" stroke="white" strokeWidth="20" className="dark:stroke-black" />
-      <line x1="237.679" y1="241.803" x2="196.547" y2="200.671" stroke="white" strokeWidth="20" className="dark:stroke-black" />
-    </svg>
-  )
+  const panelLabels = {
+    admin: 'Admin',
+    operador: 'Operador',
+    transportadora: 'Transport'
+  }
 
   return (
-    <div data-slot="sidebar-header" data-sidebar="header" className="flex flex-col gap-2 p-2">
-      <ul data-slot="sidebar-menu" data-sidebar="menu" className="flex w-full min-w-0 flex-col gap-1">
-        <li data-slot="sidebar-menu-item" data-sidebar="menu-item" className="group/menu-item relative">
-          <Link
-            href={panel === 'operador' ? '/operador' : panel === 'transportadora' ? '/transportadora' : '/admin'}
-            data-slot="sidebar-menu-button"
-            data-sidebar="menu-button"
-            data-size="lg"
-            data-active="false"
-            className={cn(
-              "peer/menu-button ring-sidebar-ring active:bg-sidebar-accent active:text-sidebar-accent-foreground",
-              "data-[active=true]:bg-sidebar-accent data-[active=true]:text-sidebar-accent-foreground",
-              "data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground",
-              "flex w-full items-center overflow-hidden rounded-md p-2 text-left outline-hidden",
-              "transition-[width,height,padding] group-has-data-[sidebar=menu-action]/menu-item:pr-8",
-              "group-data-[collapsible=icon]:size-8! focus-visible:ring-2 disabled:pointer-events-none disabled:opacity-50",
-              "aria-disabled:pointer-events-none aria-disabled:opacity-50",
-              "data-[active=true]:font-medium [&>span:last-child]:truncate [&>svg]:shrink-0",
-              "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-12 text-sm group-data-[collapsible=icon]:p-0! gap-2.5 !bg-transparent [&>svg]:size-8"
-            )}
-          >
-            <LogoIcon />
-            <span className="text-xl font-semibold">Analytics</span>
-          </Link>
-        </li>
-      </ul>
-    </div>
+    <SidebarHeader>
+      <SidebarMenu>
+        <SidebarMenuItem>
+          <SidebarMenuButton size="lg" asChild className="!bg-transparent">
+            <Link href={`/${panel === 'admin' ? 'admin' : panel}`}>
+              {/* Logo SVG - estilo Application Shell 08 */}
+              <svg
+                width="1em"
+                height="1em"
+                viewBox="0 0 328 329"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                className={cn(
+                  "[&_rect]:fill-sidebar [&_rect:first-child]:fill-primary",
+                  isCollapsed ? "size-8" : "size-8"
+                )}
+              >
+                <rect y="0.5" width="328" height="328" rx="164" fill="black" className="dark:fill-white" />
+                <path d="M165.018 72.3008V132.771C165.018 152.653 148.9 168.771 129.018 168.771H70.2288" stroke="white" strokeWidth="20" className="dark:stroke-black" />
+                <path d="M166.627 265.241L166.627 204.771C166.627 184.889 182.744 168.771 202.627 168.771L261.416 168.771" stroke="white" strokeWidth="20" className="dark:stroke-black" />
+                <line x1="238.136" y1="98.8184" x2="196.76" y2="139.707" stroke="white" strokeWidth="20" className="dark:stroke-black" />
+                <line x1="135.688" y1="200.957" x2="94.3128" y2="241.845" stroke="white" strokeWidth="20" className="dark:stroke-black" />
+                <line x1="133.689" y1="137.524" x2="92.5566" y2="96.3914" stroke="white" strokeWidth="20" className="dark:stroke-black" />
+                <line x1="237.679" y1="241.803" x2="196.547" y2="200.671" stroke="white" strokeWidth="20" className="dark:stroke-black" />
+              </svg>
+              <span className="text-xl font-semibold">Golf Fox</span>
+            </Link>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+      </SidebarMenu>
+    </SidebarHeader>
   )
 }
 
-// Item de menu individual
-const MenuItem = ({ item, index }: { item: MenuItem; index: number }) => {
-  const pathname = usePathname()
-  const router = useRouter()
-  const { open } = useSidebar()
-  const { navigateWithTransition, isPending } = useViewTransition()
-  const Icon = item.icon
-
-  const isActive = pathname === item.href || pathname?.startsWith(item.href + "/")
-  const showOperationalAlerts = item.href.includes("/alertas")
-
-  return (
-    <li data-slot="sidebar-menu-item" data-sidebar="menu-item" className="group/menu-item relative">
-      <Link
-        href={item.href}
-        data-slot="sidebar-menu-button"
-        data-sidebar="menu-button"
-        data-size="default"
-        data-active={isActive ? "true" : "false"}
-        data-state="closed"
-        className={cn(
-          "peer/menu-button ring-sidebar-ring active:bg-sidebar-accent active:text-sidebar-accent-foreground",
-          "data-[active=true]:bg-sidebar-accent data-[active=true]:text-sidebar-accent-foreground",
-          "data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground",
-          "flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-hidden",
-          "transition-[width,height,padding] group-has-data-[sidebar=menu-action]/menu-item:pr-8",
-          "group-data-[collapsible=icon]:size-8! group-data-[collapsible=icon]:p-2!",
-          "focus-visible:ring-2 disabled:pointer-events-none disabled:opacity-50",
-          "aria-disabled:pointer-events-none aria-disabled:opacity-50",
-          "data-[active=true]:font-medium [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0",
-          "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm",
-          !open && "justify-center [&>svg]:size-4"
-        )}
-      >
-        <Icon className="shrink-0" />
-        {open && <span>{item.label}</span>}
-      </Link>
-
-      {/* Badge - Application Shell 08 style */}
-      {item.badge && (
-        <div
-          data-slot="sidebar-menu-badge"
-          data-sidebar="menu-badge"
-          className={cn(
-            "text-sidebar-foreground pointer-events-none absolute right-1 flex h-5 min-w-5 items-center justify-center px-1 text-xs font-medium tabular-nums select-none",
-            "peer-hover/menu-button:text-sidebar-accent-foreground peer-data-[active=true]/menu-button:text-sidebar-accent-foreground",
-            "peer-data-[size=sm]/menu-button:top-1 peer-data-[size=default]/menu-button:top-1.5 peer-data-[size=lg]/menu-button:top-2.5",
-            "group-data-[collapsible=icon]:hidden bg-primary/10 rounded-full",
-            !open && "hidden"
-          )}
-        >
-          {item.badge}
-        </div>
-      )}
-
-      {/* Operational Alerts Badge */}
-      {showOperationalAlerts && open && (
-        <div className="absolute -top-1 -right-1 z-10">
-          <OperationalAlertsBadge />
-        </div>
-      )}
-    </li>
-  )
-}
-
-// Grupo de menu com label - Application Shell 08 style
-const MenuGroup = ({ group }: { group: MenuGroup }) => {
-  const { open } = useSidebar()
-
-  return (
-    <div data-slot="sidebar-group" data-sidebar="group" className="relative flex w-full min-w-0 flex-col p-2">
-      {group.label && (
-        <div
-          data-slot="sidebar-group-label"
-          data-sidebar="group-label"
-          className={cn(
-            "text-sidebar-foreground/70 ring-sidebar-ring flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-medium outline-hidden transition-[margin,opacity] duration-200 ease-linear focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0",
-            !open && "group-data-[collapsible=icon]:-mt-8 group-data-[collapsible=icon]:opacity-0"
-          )}
-        >
-          {group.label}
-        </div>
-      )}
-      <div data-slot="sidebar-group-content" data-sidebar="group-content" className="w-full text-sm">
-        <ul data-slot="sidebar-menu" data-sidebar="menu" className="flex w-full min-w-0 flex-col gap-1">
-          {group.items.map((item, index) => (
-            <MenuItem key={item.href} item={item} index={index} />
-          ))}
-        </ul>
-      </div>
-    </div>
-  )
-}
-
-
-
-
-
-// Conteúdo da sidebar (reutilizável para Sheet e Sidebar)
-const SidebarContentInner = ({ panel, menuGroups, user }: {
-  panel: 'admin' | 'operador' | 'transportadora'
-  menuGroups: MenuGroup[]
-  user?: PremiumSidebarProps['user']
-}) => {
-  return (
-    <>
-      {/* Header */}
-      <SidebarHeader panel={panel} />
-
-      {/* Content */}
-      <div data-slot="sidebar-content" data-sidebar="content" className="flex min-h-0 flex-1 flex-col gap-2 overflow-auto group-data-[collapsible=icon]:overflow-hidden">
-        {menuGroups.map((group, groupIndex) => (
-          <MenuGroup key={groupIndex} group={group} />
-        ))}
-      </div>
-
-
-    </>
-  )
-}
-
-// Componente principal
+// Componente principal PremiumSidebar
 export function PremiumSidebar({
-  isOpen = false,
+  isOpen,
   isMobile = false,
   panel = 'admin',
   user
 }: PremiumSidebarProps) {
   const router = useRouter()
+  const pathname = usePathname()
+  const { navigateWithTransition } = useViewTransition()
 
   const menuGroups = useMemo(() => {
     switch (panel) {
@@ -433,6 +307,7 @@ export function PremiumSidebar({
     }
   }, [panel])
 
+  // Prefetch de rotas
   useEffect(() => {
     menuGroups.forEach(group => {
       group.items.forEach(item => {
@@ -441,53 +316,70 @@ export function PremiumSidebar({
     })
   }, [menuGroups, router])
 
-  // Em mobile, usar Sheet (drawer)
-  if (isMobile) {
-    return (
-      <Sheet
-        open={isOpen}
-        onOpenChange={(open) => {
-          // Disparar evento customizado para fechar sidebar
-          if (!open) {
-            window.dispatchEvent(new CustomEvent('close-sidebar'))
-          }
-        }}
-      >
-        <SheetContent
-          side="left"
-          className="w-[280px] sm:w-[300px] p-0 bg-sidebar border-r border-sidebar-border overflow-y-auto scroll-smooth-touch"
-          style={{
-            paddingTop: 'max(0.5rem, env(safe-area-inset-top))',
-            paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom))',
-          }}
-        >
-          <div className="flex flex-col h-full">
-            <SidebarContentInner panel={panel} menuGroups={menuGroups} user={user} />
-          </div>
-        </SheetContent>
-      </Sheet>
-    )
+  // Verificar se um item está ativo
+  const isItemActive = (href: string) => {
+    if (href === `/${panel}` || href === '/admin') {
+      return pathname === href
+    }
+    return pathname?.startsWith(href) ?? false
   }
 
-  // Em desktop, usar Sidebar normal
-  // Não passar open (undefined) para permitir hover automático + toggle manual via useSidebar() hook
-  // Isso permite que o SidebarTrigger no topbar controle o sidebar em desktop usando useSidebar()
   return (
-    <UISidebar
-      animate={true}
-      isMobile={false}
-    >
-      <SidebarBody
-        className={cn(
-          "flex flex-col bg-sidebar border-r border-sidebar-border",
-          "top-16 sm:top-18 left-0 h-[calc(100vh-4rem)] sm:h-[calc(100vh-4.5rem)] z-50",
-          "!px-0 !py-0"
-        )}
-        role="complementary"
-        aria-label="Barra lateral de navegação"
-      >
-        <SidebarContentInner panel={panel} menuGroups={menuGroups} user={user} />
-      </SidebarBody>
-    </UISidebar>
+    <Sidebar variant="floating" collapsible="icon">
+      {/* Logo/Header */}
+      <SidebarLogo panel={panel} />
+
+      {/* Content */}
+      <SidebarContent>
+        {menuGroups.map((group, groupIndex) => (
+          <SidebarGroup key={groupIndex}>
+            {group.label && (
+              <SidebarGroupLabel>{group.label}</SidebarGroupLabel>
+            )}
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {group.items.map((item) => {
+                  const isActive = isItemActive(item.href)
+                  const Icon = item.icon
+
+                  return (
+                    <SidebarMenuItem key={item.href}>
+                      <SidebarMenuButton
+                        asChild
+                        isActive={isActive}
+                        tooltip={item.label}
+                      >
+                        <Link
+                          href={item.href}
+                          onClick={(e) => {
+                            e.preventDefault()
+                            navigateWithTransition(item.href)
+                          }}
+                        >
+                          <Icon className="size-4" />
+                          <span>{item.label}</span>
+                        </Link>
+                      </SidebarMenuButton>
+                      {/* Badge */}
+                      {item.badge && (
+                        <SidebarMenuBadge className="bg-primary/10 rounded-full">
+                          {item.badge}
+                        </SidebarMenuBadge>
+                      )}
+                      {/* Operational Alerts Badge */}
+                      {item.showOperationalAlerts && (
+                        <div className="absolute -top-1 -right-1 z-10">
+                          <OperationalAlertsBadge />
+                        </div>
+                      )}
+                    </SidebarMenuItem>
+                  )
+                })}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        ))}
+      </SidebarContent>
+    </Sidebar>
   )
 }
