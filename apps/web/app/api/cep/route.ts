@@ -25,37 +25,65 @@ async function cepHandler(request: NextRequest) {
             )
         }
 
-        // Call ViaCEP API from server-side
-        const response = await fetch(`https://viacep.com.br/ws/${cleanCep}/json/`, {
-            headers: {
-                'Accept': 'application/json',
-            },
-        })
+        // Primeiro: Tentar ViaCEP
+        try {
+            const viaCepResponse = await fetch(`https://viacep.com.br/ws/${cleanCep}/json/`, {
+                headers: { 'Accept': 'application/json' },
+            })
 
-        if (!response.ok) {
-            throw new Error('Erro ao consultar ViaCEP')
-        }
+            if (viaCepResponse.ok) {
+                const viaCepData = await viaCepResponse.json()
 
-        const data = await response.json()
-
-        if (data.erro) {
-            return NextResponse.json(
-                { success: false, error: 'CEP não encontrado' },
-                { status: 404 }
-            )
-        }
-
-        return NextResponse.json({
-            success: true,
-            address: {
-                cep: data.cep,
-                logradouro: data.logradouro,
-                complemento: data.complemento,
-                bairro: data.bairro,
-                localidade: data.localidade,
-                uf: data.uf,
+                // Se encontrou no ViaCEP
+                if (!viaCepData.erro) {
+                    return NextResponse.json({
+                        success: true,
+                        address: {
+                            cep: viaCepData.cep,
+                            logradouro: viaCepData.logradouro,
+                            complemento: viaCepData.complemento,
+                            bairro: viaCepData.bairro,
+                            localidade: viaCepData.localidade,
+                            uf: viaCepData.uf,
+                        }
+                    })
+                }
             }
-        })
+        } catch (viaCepError) {
+            logger.warn('ViaCEP falhou, tentando BrasilAPI', { cep: cleanCep, error: viaCepError })
+        }
+
+        // Fallback: Tentar BrasilAPI (especialmente útil para CEPs genéricos -000)
+        try {
+            const brasilApiResponse = await fetch(`https://brasilapi.com.br/api/cep/v2/${cleanCep}`, {
+                headers: { 'Accept': 'application/json' },
+            })
+
+            if (brasilApiResponse.ok) {
+                const brasilApiData = await brasilApiResponse.json()
+
+                // BrasilAPI encontrou
+                return NextResponse.json({
+                    success: true,
+                    address: {
+                        cep: brasilApiData.cep ? `${brasilApiData.cep.slice(0, 5)}-${brasilApiData.cep.slice(5)}` : cleanCep,
+                        logradouro: brasilApiData.street || '',
+                        complemento: '',
+                        bairro: brasilApiData.neighborhood || '',
+                        localidade: brasilApiData.city || '',
+                        uf: brasilApiData.state || '',
+                    }
+                })
+            }
+        } catch (brasilApiError) {
+            logger.warn('BrasilAPI também falhou', { cep: cleanCep, error: brasilApiError })
+        }
+
+        // Nenhuma API encontrou
+        return NextResponse.json(
+            { success: false, error: 'CEP não encontrado' },
+            { status: 404 }
+        )
     } catch (error: any) {
         logger.error('Erro ao buscar CEP', { error, cep })
         return NextResponse.json(
