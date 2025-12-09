@@ -25,6 +25,7 @@ import {
     DialogHeader,
     DialogTitle,
     DialogFooter,
+    DialogDescription,
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 
@@ -52,6 +53,8 @@ export default function EmpresasFuncionariosPage() {
     const [dataLoading, setDataLoading] = useState(true)
     const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null)
     const [isModalOpen, setIsModalOpen] = useState(false)
+    const [isSelectCompanyOpen, setIsSelectCompanyOpen] = useState(false)
+    const [newEmployeeCompanyId, setNewEmployeeCompanyId] = useState<string>("")
     const [searchQuery, setSearchQuery] = useState("")
     const [filterCompany, setFilterCompany] = useState<string>("all")
     const debouncedSearchQuery = useDebounce(searchQuery, 300)
@@ -64,6 +67,29 @@ export default function EmpresasFuncionariosPage() {
         role: "operador",
         company_id: "",
     })
+
+    // Abre dialog de seleção de empresa para novo funcionário
+    const handleNewEmployee = () => {
+        setNewEmployeeCompanyId("")
+        setIsSelectCompanyOpen(true)
+    }
+
+    // Após selecionar empresa, abre modal de cadastro
+    const handleCompanySelected = () => {
+        if (!newEmployeeCompanyId) return
+        const selectedCompany = companies.find(c => c.id === newEmployeeCompanyId)
+        setSelectedEmployee(null)
+        setFormData({
+            name: "",
+            email: "",
+            phone: "",
+            cpf: "",
+            role: "operador",
+            company_id: newEmployeeCompanyId,
+        })
+        setIsSelectCompanyOpen(false)
+        setIsModalOpen(true)
+    }
 
     useEffect(() => {
         if (user && !authLoading) {
@@ -201,7 +227,7 @@ export default function EmpresasFuncionariosPage() {
                         <p className="text-sm sm:text-base text-[var(--muted)]">Todos os funcionários de todas as empresas</p>
                     </div>
                     <Button
-                        onClick={() => { setSelectedEmployee(null); setIsModalOpen(true) }}
+                        onClick={handleNewEmployee}
                         className="w-full sm:w-auto flex-shrink-0 min-h-[44px] touch-manipulation"
                     >
                         <Plus className="h-4 w-4 mr-2" />
@@ -319,6 +345,46 @@ export default function EmpresasFuncionariosPage() {
                     </div>
                 )}
             </div>
+
+            {/* Dialog de seleção de empresa */}
+            <Dialog open={isSelectCompanyOpen} onOpenChange={setIsSelectCompanyOpen}>
+                <DialogContent className="max-w-md">
+                    <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2">
+                            <Briefcase className="h-5 w-5" />
+                            Selecionar Empresa
+                        </DialogTitle>
+                        <DialogDescription>
+                            Escolha a empresa para vincular o novo funcionário
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    <div className="space-y-4 py-4">
+                        <div className="space-y-2">
+                            <Label>Empresa *</Label>
+                            <Select value={newEmployeeCompanyId} onValueChange={setNewEmployeeCompanyId}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Selecione a empresa" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {companies.map(c => (
+                                        <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </div>
+
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setIsSelectCompanyOpen(false)}>
+                            Cancelar
+                        </Button>
+                        <Button onClick={handleCompanySelected} disabled={!newEmployeeCompanyId}>
+                            Continuar
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
 
             {/* Modal de Funcionário */}
             <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
