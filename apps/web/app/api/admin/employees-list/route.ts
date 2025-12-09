@@ -25,38 +25,58 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const companyId = searchParams.get('company_id')
 
-    if (!companyId) {
-      return NextResponse.json({ success: false, error: 'company_id é obrigatório' }, { status: 400 })
+    // Buscar funcionários (filtrado por empresa se company_id fornecido, senão todos)
+    let query = supabaseAdmin
+      .from('gf_employee_company')
+      .select(`
+        id, 
+        company_id, 
+        name, 
+        email, 
+        phone, 
+        cpf, 
+        address, 
+        latitude, 
+        longitude, 
+        is_active,
+        company:companies(name)
+      `)
+      .order('name')
+
+    if (companyId) {
+      query = query.eq('company_id', companyId)
     }
 
-    // Buscar funcionários da empresa usando service role (bypass RLS)
-    const { data, error } = await supabaseAdmin
-      .from('gf_employee_company')
-      .select('id, company_id, name, cpf, address, latitude, longitude')
-      .eq('company_id', companyId)
-      .order('name')
+    const { data, error } = await query
 
     if (error) {
       console.error('Erro ao buscar funcionários no admin API:', error)
       return NextResponse.json({ success: false, error: error.message }, { status: 500 })
     }
 
-    // Transformar para o formato EmployeeLite
+    // Transformar para o formato esperado pela página
     const employees = (data || []).map((emp: any) => ({
+      id: emp.id,
       employee_id: emp.id,
       company_id: emp.company_id,
+      company_name: emp.company?.name || '',
+      name: emp.name || '',
       first_name: emp.name?.split(' ')[0] || '',
       last_name: emp.name?.split(' ').slice(1).join(' ') || '',
+      email: emp.email || '',
+      phone: emp.phone || '',
       cpf: emp.cpf || '',
+      role: 'funcionario',
       address: emp.address || '',
       city: '',
       state: '',
       zipcode: '',
       lat: emp.latitude ? parseFloat(emp.latitude.toString()) : null,
       lng: emp.longitude ? parseFloat(emp.longitude.toString()) : null,
+      is_active: emp.is_active !== false,
     }))
 
-    return NextResponse.json({ success: true, employees })
+    return NextResponse.json(employees)
   } catch (error: any) {
     console.error('Erro inesperado no employees-list API:', error)
     return NextResponse.json({ success: false, error: error.message }, { status: 500 })
