@@ -57,8 +57,8 @@
     /* Brand Orange */
 
     /* Radius */
-    --radius: 0.75rem;
-    /* 12px - Modern Standard */
+    --radius: 0.5rem;
+    /* 8px - Standard shadcn */
 
     /* Chart/Data Colors */
     --chart-1: 12 76% 61%;
@@ -193,6 +193,11 @@
     --z-modal: 1050;
     --z-popover: 1060;
     --z-tooltip: 1070;
+
+    /* Layout Variables */
+    --sidebar-width-expanded: 240px;
+    --sidebar-width-collapsed: 64px;
+    --header-height: 64px;
   }
 
   .dark {
@@ -446,7 +451,7 @@
     backdrop-filter: blur(10px);
   }
 
-  .card-premium > * {
+  .card-premium>* {
     position: relative;
     z-index: 1;
   }
@@ -545,7 +550,7 @@
     padding: 2px;
   }
 
-  .stat-card > * {
+  .stat-card>* {
     position: relative;
     z-index: 1;
   }
@@ -796,10 +801,13 @@
 }
 
 @keyframes pulseGlow {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 1;
     box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.7), 0 0 20px rgba(249, 115, 22, 0.3);
   }
+
   50% {
     opacity: 0.9;
     box-shadow: 0 0 0 6px rgba(249, 115, 22, 0), 0 0 30px rgba(249, 115, 22, 0.2);
@@ -807,9 +815,12 @@
 }
 
 @keyframes gradient-shift {
-  0%, 100% {
+
+  0%,
+  100% {
     background-position: 0% 50%;
   }
+
   50% {
     background-position: 100% 50%;
   }
@@ -820,15 +831,19 @@
   0% {
     background-position: -1000px 0;
   }
+
   100% {
     background-position: 1000px 0;
   }
 }
 
 @keyframes float {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0px);
   }
+
   50% {
     transform: translateY(-10px);
   }
@@ -839,6 +854,7 @@
     opacity: 0;
     transform: scale(0.9);
   }
+
   to {
     opacity: 1;
     transform: scale(1);
@@ -850,6 +866,7 @@
     opacity: 0;
     transform: translateX(20px);
   }
+
   to {
     opacity: 1;
     transform: translateX(0);
@@ -861,6 +878,7 @@
     opacity: 0;
     transform: translateX(-20px);
   }
+
   to {
     opacity: 1;
     transform: translateX(0);
@@ -872,6 +890,7 @@
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -882,6 +901,7 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
@@ -890,12 +910,10 @@
 /* Animation Utilities */
 .animate-shimmer {
   animation: shimmer 2s infinite;
-  background: linear-gradient(
-    to right,
-    transparent 0%,
-    rgba(255, 255, 255, 0.1) 50%,
-    transparent 100%
-  );
+  background: linear-gradient(to right,
+      transparent 0%,
+      rgba(255, 255, 255, 0.1) 50%,
+      transparent 100%);
   background-size: 1000px 100%;
 }
 
@@ -923,6 +941,7 @@
   0% {
     background-position: -1000px 0;
   }
+
   100% {
     background-position: 1000px 0;
   }
@@ -1092,6 +1111,7 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }

@@ -396,11 +396,11 @@ export function Sidebar({ isOpen = false, isMobile = false, panel = 'admin', use
       <SidebarBody className={cn(
         "justify-between gap-4 bg-white dark:bg-neutral-900 border-r border-[var(--border)]",
         !isMobile && "top-16 sm:top-18 left-0 h-[calc(100vh-4rem)] sm:h-[calc(100vh-4.5rem)] z-50",
-        isMobile && "w-[280px] sm:w-[300px]",
+        isMobile && "w-[240px]",
         "!px-0 !py-0"
       )}>
         <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden pt-4 sm:pt-6 px-3 sm:px-4 h-full">
-          <div className="flex flex-col gap-1 mt-2">
+          <div className="flex flex-col gap-2 mt-2">
             {menuItems.map((item) => (
               <motion.div key={item.href} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2, ease: 'easeOut' }}>
                 <CustomSidebarLink item={item} panel={panel} />

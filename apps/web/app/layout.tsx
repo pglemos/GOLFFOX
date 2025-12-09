@@ -7,8 +7,9 @@ import { WebVitalsInit } from "@/components/web-vitals-init";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { ReactQueryProvider } from "@/lib/react-query-provider";
 import { ThemeProvider } from "next-themes";
-import { Analytics } from "@vercel/analytics/next";
-import { SpeedInsights } from "@vercel/speed-insights/next";
+// Comentado temporariamente - incompatibilidade com Next.js 16 (useParams não exportado)
+// import { Analytics } from "@vercel/analytics/next";
+// import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -73,8 +74,10 @@ export default function RootLayout({
               <WebVitalsInit />
               {children}
               <Toaster position="top-right" />
+              {/* Analytics e SpeedInsights desabilitados temporariamente - incompatibilidade com Next.js 16
               <Analytics />
               <SpeedInsights />
+              */}
             </ReactQueryProvider>
           </ThemeProvider>
         </ErrorBoundary>

@@ -3,10 +3,10 @@
 import React, { useState, useEffect } from "react"
 // Substituir Link por <a> para evitar erro de export do next/link
 import { useRouter, usePathname } from "next/navigation"
-import { 
-  Search, 
+import {
+  Search,
   Settings2,
-  Bell, 
+  Bell,
   LogOut,
   Loader2,
   Share2,
@@ -16,7 +16,7 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { 
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -53,9 +53,9 @@ interface TopbarProps {
   panelHomeUrl?: string
 }
 
-export function Topbar({ 
-  user, 
-  onToggleSidebar, 
+export function Topbar({
+  user,
+  onToggleSidebar,
   isSidebarOpen: _isSidebarOpen = true,
   panelBranding = "Admin • Premium",
   panelHomeUrl = "/admin"
@@ -67,7 +67,7 @@ export function Topbar({
   const [isLoggingOut, setIsLoggingOut] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false)
-  
+
   // Tentar usar useSidebar se disponível (desktop), caso contrário usar onToggleSidebar (mobile)
   let sidebarControl: { toggle: () => void } | null = null
   try {
@@ -80,7 +80,7 @@ export function Topbar({
 
   // Debug logging (apenas em desenvolvimento)
   useEffect(() => {
-    debug('Topbar user props updated', { 
+    debug('Topbar user props updated', {
       hasAvatarUrl: !!user?.avatar_url,
       avatarUrlLength: user?.avatar_url?.length || 0,
       userKeys: user ? Object.keys(user) : []
@@ -199,7 +199,7 @@ export function Topbar({
   }, [setIsCommandPaletteOpen])
 
   return (
-    <header 
+    <header
       className={cn(
         "before:bg-background/60 sticky top-0 z-50 before:absolute before:inset-0 before:mask-[linear-gradient(var(--card),var(--card)_18%,transparent_100%)] before:backdrop-blur-md",
         // Mobile: header compacto sem backdrop blur
@@ -207,9 +207,9 @@ export function Topbar({
       )}
     >
       <div className={cn(
-        "bg-card relative z-51 mx-auto mt-6 flex w-[calc(100%-2rem)] items-center justify-between rounded-xl border px-6 py-2 shadow-sm sm:w-[calc(100%-3rem)]",
-        // Mobile: full width, padding menor, altura fixa 56px
-        isMobile && "w-full px-3 py-2 h-14 border-b mt-0"
+        "bg-card relative z-51 mx-auto flex h-16 w-[calc(100%-2rem)] items-center justify-between rounded-xl border px-6 py-2 shadow-sm sm:w-[calc(100%-3rem)]",
+        // Mobile: full width, padding menor, altura fixa 64px
+        isMobile && "w-full px-3 py-0 h-16 border-b mt-0 rounded-none"
       )}>
         {/* Left Section - Exatamente como Application Shell 08 */}
         <div className="flex items-center gap-1.5 sm:gap-4">
@@ -235,10 +235,10 @@ export function Topbar({
 
           {/* Separator vertical - EXATAMENTE como Application Shell 08 */}
           {!isMobile && (
-            <div 
-              data-orientation="vertical" 
-              role="none" 
-              data-slot="separator" 
+            <div
+              data-orientation="vertical"
+              role="none"
+              data-slot="separator"
               className="bg-border shrink-0 data-[orientation=horizontal]:h-px data-[orientation=horizontal]:w-full data-[orientation=vertical]:h-full data-[orientation=vertical]:w-px hidden !h-4 sm:block md:max-lg:hidden"
             />
           )}
@@ -298,7 +298,7 @@ export function Topbar({
           {/* Desktop: Ações completas - EXATAMENTE como Application Shell 08 */}
           {!isMobile && (
             <>
-              <button 
+              <button
                 data-slot="button"
                 type="button"
                 className="focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive inline-flex shrink-0 items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap transition-all outline-none focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50 size-9"
@@ -306,7 +306,7 @@ export function Topbar({
               >
                 <Share2 className="h-4 w-4" />
               </button>
-              <button 
+              <button
                 data-slot="button"
                 type="button"
                 className="focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive inline-flex shrink-0 items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap transition-all outline-none focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50 size-9"
@@ -314,7 +314,7 @@ export function Topbar({
               >
                 <Languages className="h-4 w-4" />
               </button>
-              <button 
+              <button
                 data-slot="button"
                 type="button"
                 aria-haspopup="dialog"
@@ -330,7 +330,7 @@ export function Topbar({
           <OperationalAlertsNotification />
 
           {/* Notifications - EXATAMENTE como Application Shell 08 */}
-          <button 
+          <button
             data-slot="button"
             type="button"
             className={cn(
@@ -351,22 +351,22 @@ export function Topbar({
                 type="button"
                 className={cn(
                   "focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive inline-flex shrink-0 items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap transition-all outline-none focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
-                  isMobile ? "size-10" : "size-9.5"
+                  "size-9"
                 )}
                 aria-label="User menu"
               >
-                <span data-slot="avatar" className={cn("relative flex shrink-0 overflow-hidden rounded-md", isMobile ? "size-10" : "size-9.5")}>
-                  <img 
-                    data-slot="avatar-image" 
-                    className="aspect-square size-full" 
-                    src={user?.avatar_url || "https://cdn.shadcnstudio.com/ss-assets/avatar/avatar-1.png"} 
+                <span data-slot="avatar" className={cn("relative flex shrink-0 overflow-hidden rounded-md", isMobile ? "size-8" : "size-8")}>
+                  <img
+                    data-slot="avatar-image"
+                    className="aspect-square size-full"
+                    src={user?.avatar_url || "https://cdn.shadcnstudio.com/ss-assets/avatar/avatar-1.png"}
                     alt={user?.name || "User"}
                   />
                 </span>
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent 
-              align="end" 
+            <DropdownMenuContent
+              align="end"
               className={cn(
                 "w-56 bg-card border shadow-xl",
                 isMobile && "w-[calc(100vw-2rem)] max-w-[280px]"
@@ -374,7 +374,7 @@ export function Topbar({
               side={isMobile ? "bottom" : "bottom"}
               alignOffset={isMobile ? 0 : undefined}
             >
-              <DropdownMenuItem 
+              <DropdownMenuItem
                 className="focus:bg-accent cursor-pointer touch-manipulation min-h-[44px] text-base"
                 onClick={() => handleNavigate(panelRoutes.settings)}
               >
@@ -382,7 +382,7 @@ export function Topbar({
                 Configurações
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem 
+              <DropdownMenuItem
                 className="focus:bg-destructive/10 text-destructive focus:text-destructive cursor-pointer touch-manipulation min-h-[44px] text-base"
                 onClick={handleLogout}
                 disabled={isLoggingOut}

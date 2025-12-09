@@ -84,11 +84,11 @@ export const Sidebar = ({
   // Se ambos open e setOpen forem undefined, não está controlado (permite hover interno)
   // Se pelo menos um for definido, está controlado (mobile)
   const isControlled = open !== undefined || setOpen !== undefined;
-  
+
   return (
-    <SidebarProvider 
-      open={isControlled ? open : undefined} 
-      setOpen={isControlled ? setOpen : undefined} 
+    <SidebarProvider
+      open={isControlled ? open : undefined}
+      setOpen={isControlled ? setOpen : undefined}
       animate={animate}
     >
       <SidebarBodyContext.Provider value={{ isMobile: isMobile ?? false }}>
@@ -101,7 +101,7 @@ export const Sidebar = ({
 export const SidebarBody = ({ className, children, ...rest }: React.ComponentProps<typeof motion.div>) => {
   const { open, setOpen } = useSidebar();
   const { isMobile } = useSidebarBody();
-  
+
   return (
     <>
       <DesktopSidebar className={className} {...rest}>
@@ -110,7 +110,7 @@ export const SidebarBody = ({ className, children, ...rest }: React.ComponentPro
       {/* Sidebar Mobile - usando Sheet para melhor UX */}
       {isMobile && (
         <Sheet open={open} onOpenChange={setOpen}>
-          <SheetContent 
+          <SheetContent
             side="left"
             className={cn(
               "w-[280px] sm:w-[300px] p-0 bg-sidebar border-r border-sidebar-border",
@@ -133,20 +133,20 @@ export const DesktopSidebar = ({
   ...props
 }: React.ComponentProps<typeof motion.div>) => {
   const { open, setOpen, animate, isControlled } = useSidebar();
-  
+
   // Se não estiver controlado externamente, permitir hover
   const handleMouseEnter = () => {
     if (!isControlled) {
       setOpen(true)
     }
   }
-  
+
   const handleMouseLeave = () => {
     if (!isControlled) {
       setOpen(false)
     }
   }
-  
+
   return (
     <motion.div
       data-sidebar="sidebar"
@@ -156,7 +156,7 @@ export const DesktopSidebar = ({
         className
       )}
       animate={{
-        width: animate ? (open ? "256px" : "64px") : "256px",
+        width: animate ? (open ? "240px" : "64px") : "240px",
       }}
       transition={{ duration: 0.12, ease: "easeOut" }}
       onMouseEnter={handleMouseEnter}
@@ -228,7 +228,7 @@ export const SidebarLink = ({
 }) => {
   const { open, animate } = useSidebar();
   const router = useRouter();
-  
+
   return (
     <a
       href={link.href}
@@ -242,13 +242,13 @@ export const SidebarLink = ({
     >
       {link.icon}
       <motion.span
-          animate={{ opacity: animate ? (open ? 1 : 0) : 1 }}
-          transition={{ duration: 0.15, ease: "easeOut" }}
-          className={cn(
-            "text-neutral-700 dark:text-neutral-200 text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre",
-            "!p-0 !m-0"
-          )}
-          style={{
+        animate={{ opacity: animate ? (open ? 1 : 0) : 1 }}
+        transition={{ duration: 0.15, ease: "easeOut" }}
+        className={cn(
+          "text-neutral-700 dark:text-neutral-200 text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre",
+          "!p-0 !m-0"
+        )}
+        style={{
           display: animate ? (open ? "inline-block" : "none") : "inline-block",
           overflow: "hidden",
         }}
@@ -265,7 +265,7 @@ export const SidebarTrigger = React.forwardRef<
   React.ComponentPropsWithoutRef<"button">
 >(({ className, onClick, ...props }, ref) => {
   const { setOpen, open } = useSidebar();
-  
+
   return (
     <button
       ref={ref}
