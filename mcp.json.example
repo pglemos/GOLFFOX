@@ -1,0 +1,106 @@
+{
+  "mcpServers": {
+    "Puppeteer": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-puppeteer"
+      ],
+      "env": {}
+    },
+    "GitHub": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-github"
+      ],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "YOUR_GITHUB_PAT_HERE"
+      }
+    },
+    "Google Maps": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-google-maps"
+      ],
+      "env": {
+        "GOOGLE_MAPS_API_KEY": "YOUR_GOOGLE_MAPS_API_KEY_HERE"
+      }
+    },
+    "Memory": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "--package=@modelcontextprotocol/server-memory",
+        "mcp-server-memory"
+      ],
+      "env": {
+        "MEMORY_FILE_PATH": "C:/Users/YOUR_USER/.cursor/memory.json"
+      }
+    },
+    "Playwright": {
+      "command": "npx @playwright/mcp@latest",
+      "env": {},
+      "args": []
+    },
+    "Sequential Thinking": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "--package=@modelcontextprotocol/server-sequential-thinking",
+        "mcp-server-sequential-thinking"
+      ],
+      "env": {}
+    },
+    "shadcn-ui": {
+      "command": "shadcn",
+      "args": [
+        "mcp"
+      ],
+      "env": {}
+    },
+    "context7": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@upstash/context7-mcp@latest"
+      ],
+      "env": {
+        "DEFAULT_MINIMUM_TOKENS": "10000"
+      }
+    },
+    "PostgreSQL": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-postgres",
+        "YOUR_POSTGRESQL_CONNECTION_STRING_HERE"
+      ],
+      "env": {}
+    },
+    "Chrome DevTools MCP": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "--package=chrome-devtools-mcp@latest",
+        "chrome-devtools-mcp"
+      ],
+      "env": {}
+    },
+    "supabase": {
+      "url": "https://mcp.supabase.com/mcp?project_ref=YOUR_PROJECT_REF&features=docs%2Caccount%2Cdatabase%2Cdebugging%2Cdevelopment%2Cfunctions%2Cbranching%2Cstorage",
+      "headers": {}
+    },
+    "Filesystem": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "--package=@modelcontextprotocol/server-filesystem",
+        "mcp-server-filesystem",
+        "YOUR_PROJECT_PATH_HERE"
+      ],
+      "env": {}
+    }
+  }
+}

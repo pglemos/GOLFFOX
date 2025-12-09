@@ -140,3 +140,6 @@ out/
 sentry.properties
 
 sentry.properties
+
+# MCP Configuration (contains secrets)
+mcp.json
