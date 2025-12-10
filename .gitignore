@@ -133,6 +133,14 @@ out/
 *.tgz
 *.tar.gz
 .vercel
+*.tsbuildinfo
+
+# Scripts with credentials (never commit)
+scripts/verify_mcp_all.js
+scripts/check_and_fix_supabase.js
+scripts/check_supabase_status.js
+scripts/execute_sql_*.js
+scripts/overwrite_env.js
 
 # Sentry Config File
 .env.sentry-build-plugin
