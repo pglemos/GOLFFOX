@@ -8,7 +8,8 @@ import { invalidateEntityCache } from '@/lib/next-cache'
 export const runtime = 'nodejs'
 
 const carrierUpdateSchema = z.object({
-  name: z.string().min(1, 'Nome é obrigatório'),
+  // Name é opcional para permitir update parcial (ex: só dados bancários)
+  name: z.string().min(1, 'Nome é obrigatório').optional(),
   address: z.string().optional().nullable(),
   phone: z.string().optional().nullable(),
   contact_person: z.string().optional().nullable(),
@@ -37,7 +38,10 @@ const carrierUpdateSchema = z.object({
   bank_account_type: z.string().optional().nullable(),
   pix_key: z.string().optional().nullable(),
   pix_key_type: z.string().optional().nullable()
-})
+}).refine(data => {
+  // Pelo menos um campo deve ser fornecido para update
+  return Object.values(data).some(v => v !== undefined && v !== null && v !== '')
+}, { message: 'Pelo menos um campo deve ser fornecido para atualização' })
 
 export async function OPTIONS() {
   return new NextResponse(null, {
@@ -66,10 +70,14 @@ export async function PUT(req: NextRequest) {
     const body = await req.json()
     const validated = carrierUpdateSchema.parse(body)
 
-    // Tipagem explícita 'any' para permitir campos dinâmicos que talvez não estejam no tipo CarrierUpdate ainda
+    // Tipagem explícita 'any' para permitir campos dinâmicos
     const updateData: any = {
-      name: validated.name,
       updated_at: new Date().toISOString(),
+    }
+
+    // Adicionar name apenas se fornecido
+    if (validated.name) {
+      updateData.name = validated.name
     }
 
     // Mapeamento dinâmico de campos opcionais
@@ -88,8 +96,8 @@ export async function PUT(req: NextRequest) {
     fields.forEach(field => {
       // @ts-ignore
       if (validated[field] !== undefined) {
-        // @ts-ignore
-        updateData[field] = validated[field]
+        // @ts-ignore - Converter strings vazias para null para o banco
+        updateData[field] = validated[field] === '' ? null : validated[field]
       }
     })
 
