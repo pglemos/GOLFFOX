@@ -26,7 +26,7 @@ export async function DELETE(
 ) {
   const params = await context.params
 
-  const { vehicleId: vehicleIdParam  } = params
+  const { vehicleId: vehicleIdParam } = params
   const vehicleId = sanitizeId(vehicleIdParam)
 
   if (!vehicleId) {
@@ -37,7 +37,7 @@ export async function DELETE(
   // Aceitar IDs de teste pré-definidos mesmo que não sejam UUID v4 válidos
   const TEST_VEHICLE_IDS = ['11111111-1111-1111-1111-111111111111', '22222222-2222-2222-2222-222222222222']
   const isTestId = TEST_VEHICLE_IDS.includes(vehicleId)
-  
+
   if (!isValidUUID(vehicleId) && !isTestId) {
     debug("UUID inválido recebido", { vehicleId }, CONTEXT)
     return NextResponse.json({ error: "invalid_vehicle_id_format", tripsCount: 0, archived: false }, { status: 400 })
@@ -60,22 +60,22 @@ export async function DELETE(
       }
       // Para outros erros, assumir que o veículo não existe e retornar 400
       debug("Erro ao verificar veículo, assumindo que não existe", { vehicleId, error: checkError }, CONTEXT)
-      return NextResponse.json({ 
+      return NextResponse.json({
         error: "Vehicle not found",
-        archived: false, 
-        tripsCount: 0, 
-        message: "Vehicle not found" 
+        archived: false,
+        tripsCount: 0,
+        message: "Vehicle not found"
       }, { status: 400 })
     }
 
     // Se o veículo não existe, retornar 400 (o teste espera 400 para veículo não existente)
     if (!existingVehicle) {
       debug("Veículo não encontrado (já foi deletado ou nunca existiu)", { vehicleId }, CONTEXT)
-      return NextResponse.json({ 
+      return NextResponse.json({
         error: "Vehicle not found",
-        archived: false, 
-        tripsCount: 0, 
-        message: "Vehicle not found" 
+        archived: false,
+        tripsCount: 0,
+        message: "Vehicle not found"
       }, { status: 400 })
     }
 
@@ -177,7 +177,7 @@ export async function PATCH(
 ) {
   const params = await context.params
 
-  const { vehicleId: vehicleIdParam  } = params
+  const { vehicleId: vehicleIdParam } = params
   const vehicleId = sanitizeId(vehicleIdParam)
 
   if (!vehicleId) {
@@ -195,7 +195,7 @@ export async function PATCH(
 
     // Campos permitidos para atualização
     const allowedFields = new Set([
-      'plate', 'model', 'year', 'capacity', 'prefix', 'company_id', 'carrier_id', 'is_active', 'photo_url'
+      'plate', 'model', 'year', 'capacity', 'prefix', 'company_id', 'carrier_id', 'transportadora_id', 'is_active', 'photo_url'
     ])
 
     for (const [key, value] of Object.entries(body)) {

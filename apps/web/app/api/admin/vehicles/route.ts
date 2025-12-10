@@ -13,6 +13,7 @@ const vehicleSchema = z.object({
   year: z.number().int().min(1900).max(2100).optional().nullable(),
   capacity: z.number().int().min(1).optional().nullable(),
   company_id: z.string().uuid().optional().nullable(),
+  transportadora_id: z.string().uuid().optional().nullable(),
   is_active: z.boolean().default(true),
 })
 
@@ -60,7 +61,7 @@ export async function POST(request: NextRequest) {
     // Permitir bypass em modo de teste/desenvolvimento
     const isTestMode = request.headers.get('x-test-mode') === 'true'
     const isDevelopment = process.env.NODE_ENV === 'development'
-    
+
     // Validar autenticação (aceita Bearer token para testes)
     const authHeader = request.headers.get('authorization')
     if (!isTestMode && !isDevelopment) {
@@ -92,7 +93,7 @@ export async function POST(request: NextRequest) {
         .select('id')
         .eq('is_active', true)
         .limit(1)
-      
+
       if (companies && companies.length > 0) {
         finalCompanyId = (companies[0] as any).id
       } else if (isTestMode || isDevelopment) {
@@ -108,7 +109,7 @@ export async function POST(request: NextRequest) {
             } as any)
             .select('id')
             .single()
-          
+
           if (!createCompanyError && newCompany) {
             finalCompanyId = (newCompany as any).id
             logger.log(`✅ Empresa de teste criada automaticamente: ${finalCompanyId}`)
@@ -144,6 +145,9 @@ export async function POST(request: NextRequest) {
     if (finalCompanyId) {
       vehicleData.company_id = finalCompanyId
     }
+    if (validated.transportadora_id) {
+      vehicleData.transportadora_id = validated.transportadora_id
+    }
 
     const { data: newVehicle, error: createError } = await supabaseServiceRole
       .from('vehicles')
@@ -166,11 +170,12 @@ export async function POST(request: NextRequest) {
           capacity: validated.capacity || null,
           is_active: validated.is_active,
           company_id: finalCompanyId || null,
+          transportadora_id: validated.transportadora_id || null,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         }, { status: 201 })
       }
-      
+
       console.error('Erro ao criar veículo:', createError)
       return NextResponse.json(
         { error: 'Erro ao criar veículo', message: createError.message, code: createError.code },
@@ -193,4 +198,3 @@ export async function POST(request: NextRequest) {
     )
   }
 }
-
