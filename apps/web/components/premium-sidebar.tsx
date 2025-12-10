@@ -122,11 +122,7 @@ const adminMenuGroups: MenuGroup[] = [
         label: "Usuários",
         href: "/admin/usuarios"
       },
-      {
-        icon: Truck,
-        label: "Veículos",
-        href: "/admin/veiculos"
-      },
+
       {
         icon: AlertTriangle,
         label: "Alertas",
