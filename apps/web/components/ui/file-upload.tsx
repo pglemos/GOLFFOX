@@ -216,7 +216,7 @@ export function FileUpload({
     }, [preview])
 
     const renderPreview = () => {
-        if (!preview) return null
+        if (!preview && !fileName) return null
 
         if (isImageFile(preview)) {
             return (
@@ -272,7 +272,7 @@ export function FileUpload({
                         <Loader2 className="h-8 w-8 animate-spin text-primary" />
                         <span className="text-sm text-muted-foreground">Enviando...</span>
                     </div>
-                ) : preview && showPreview ? (
+                ) : (preview || fileName) && showPreview ? (
                     <div className="relative py-2">
                         {renderPreview()}
 
