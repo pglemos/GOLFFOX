@@ -14,7 +14,6 @@ import { DashboardCharts } from "@/components/operator/dashboard-charts"
 import { PeriodFilter, type PeriodFilter as PeriodFilterType } from "@/components/operator/period-filter"
 import { useOperatorKPIs, useControlTower } from "@/hooks/use-operator-data"
 import { useRealtimeKPIs, useRealtimeAlerts } from "@/hooks/use-realtime-updates"
-import { t } from "@/lib/i18n"
 import { KPICardEnhanced } from "@/components/operator/dashboard/kpi-card-enhanced"
 import { ControlTowerVisual } from "@/components/operator/dashboard/control-tower-visual"
 import { MapPin, Clock, AlertTriangle, TrendingUp, DollarSign, CheckCircle } from "lucide-react"
@@ -196,8 +195,8 @@ export default function OperatorDashboard() {
         {/* Filtros de Período */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
           <div className="flex-1 min-w-0">
-            <h2 className="text-base sm:text-lg font-semibold text-[var(--ink-strong)]">{t('operator', 'kpi_title')}</h2>
-            <p className="text-xs sm:text-sm text-[var(--ink-muted)] mt-1">{t('operator', 'kpi_subtitle')}</p>
+            <h2 className="text-base sm:text-lg font-semibold text-[var(--ink-strong)]">Indicadores de Performance</h2>
+            <p className="text-xs sm:text-sm text-[var(--ink-muted)] mt-1">Métricas principais da sua operação</p>
           </div>
           <div className="w-full sm:w-auto">
             <PeriodFilter value={period} onChange={setPeriod} />
@@ -210,7 +209,7 @@ export default function OperatorDashboard() {
           isMobile ? "grid-cols-1" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
         )}>
           <KPICardEnhanced
-            label={t('operator', 'kpi_trips_today')}
+            label="Viagens Hoje"
             value={kpis.trips_today}
             icon={MapPin}
             color="text-blue-600"
@@ -218,7 +217,7 @@ export default function OperatorDashboard() {
             delay={0.1}
           />
           <KPICardEnhanced
-            label={t('operator', 'kpi_in_progress')}
+            label="Em Andamento"
             value={kpis.trips_in_progress}
             icon={Clock}
             color="text-orange-600"
@@ -226,7 +225,7 @@ export default function OperatorDashboard() {
             delay={0.2}
           />
           <KPICardEnhanced
-            label={t('operator', 'kpi_done')}
+            label="Concluídas"
             value={kpis.trips_completed}
             icon={CheckCircle}
             color="text-green-600"
@@ -234,7 +233,7 @@ export default function OperatorDashboard() {
             delay={0.3}
           />
           <KPICardEnhanced
-            label={t('operator', 'kpi_delays')}
+            label="Atrasos > 5min"
             value={kpis.delays_over_5min}
             icon={AlertTriangle}
             color="text-red-600"
@@ -242,7 +241,7 @@ export default function OperatorDashboard() {
             delay={0.4}
           />
           <KPICardEnhanced
-            label={t('operator', 'kpi_occupancy')}
+            label="Ocupação Média"
             value={`${(kpis.avg_occupancy * 100).toFixed(1)}%`}
             icon={TrendingUp}
             color="text-purple-600"
@@ -250,7 +249,7 @@ export default function OperatorDashboard() {
             delay={0.5}
           />
           <KPICardEnhanced
-            label={t('operator', 'kpi_sla_d0_company')}
+            label="SLA D+0"
             value={`${kpis.sla_d0.toFixed(1)}%`}
             icon={CheckCircle}
             color="text-indigo-600"
@@ -259,7 +258,7 @@ export default function OperatorDashboard() {
             delay={0.6}
           />
           <KPICardEnhanced
-            label={t('operator', 'kpi_daily_cost_company')}
+            label="Custo Diário"
             value={new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(kpis.daily_cost || 0)}
             icon={DollarSign}
             color="text-emerald-600"
@@ -272,8 +271,8 @@ export default function OperatorDashboard() {
         {/* Control Tower Visual */}
         <div>
           <div className="mb-4 sm:mb-6">
-            <h2 className="text-lg sm:text-xl font-semibold text-[var(--ink-strong)] mb-1">{t('operator', 'control_tower_title')}</h2>
-            <p className="text-xs sm:text-sm text-[var(--ink-muted)]">{t('operator', 'control_tower_subtitle')}</p>
+            <h2 className="text-lg sm:text-xl font-semibold text-[var(--ink-strong)] mb-1">Torre de Controle</h2>
+            <p className="text-xs sm:text-sm text-[var(--ink-muted)]">Monitoramento em tempo real de incidentes</p>
           </div>
           <ControlTowerVisual
             delays={controlTower.delays}
@@ -281,10 +280,10 @@ export default function OperatorDashboard() {
             routeDeviations={controlTower.routeDeviations}
             openAssistance={controlTower.openAssistance}
             labels={{
-              delays: t('operator', 'control_tower_delays'),
-              stopped: t('operator', 'control_tower_stopped'),
-              deviations: t('operator', 'control_tower_deviations'),
-              assistance: t('operator', 'control_tower_assistance')
+              delays: "Atrasos",
+              stopped: "Veículos Parados",
+              deviations: "Desvios de Rota",
+              assistance: "Socorros Abertos"
             }}
           />
         </div>
@@ -292,8 +291,8 @@ export default function OperatorDashboard() {
         {/* Gráficos */}
         <div>
           <div className="mb-4 sm:mb-6">
-            <h2 className="text-lg sm:text-xl font-semibold text-[var(--ink-strong)] mb-1">{t('operator', 'charts_title')}</h2>
-            <p className="text-xs sm:text-sm text-[var(--ink-muted)]">{t('operator', 'charts_subtitle')}</p>
+            <h2 className="text-lg sm:text-xl font-semibold text-[var(--ink-strong)] mb-1">Análises e Gráficos</h2>
+            <p className="text-xs sm:text-sm text-[var(--ink-muted)]">Visualizações detalhadas do desempenho</p>
           </div>
           <DashboardCharts kpis={kpis} period={period as "today" | "week" | "month" | undefined} />
         </div>
@@ -304,12 +303,12 @@ export default function OperatorDashboard() {
             <CardHeader className="pb-4 px-3 sm:px-6">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
                 <div className="flex-1 min-w-0 pr-2 sm:pr-4">
-                  <CardTitle className="text-lg sm:text-xl font-semibold mb-1.5">{t('operator', 'map_title')}</CardTitle>
-                  <p className="text-xs sm:text-sm text-[var(--ink-muted)]">{t('operator', 'map_subtitle')}</p>
+                  <CardTitle className="text-lg sm:text-xl font-semibold mb-1.5">Mapa em Tempo Real</CardTitle>
+                  <p className="text-xs sm:text-sm text-[var(--ink-muted)]">Visualize todas as rotas ativas no mapa</p>
                 </div>
                 <Button variant="outline" size="sm" className="w-full sm:w-auto min-h-[44px] touch-manipulation" onClick={() => router.push("/operador/rotas/mapa")}>
                   <MapPin className="h-4 w-4 mr-2" />
-                  {t('operator', 'actions.view_map')}
+                  Ver no Mapa
                 </Button>
               </div>
             </CardHeader>
