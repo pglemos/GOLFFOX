@@ -420,9 +420,12 @@ export function PremiumSidebar({
                           </div>
                         )}
                       </SidebarMenuItem>
-                      {/* Sub-menus hierárquicos - esconder quando colapsado */}
-                      {!isCollapsed && item.children && item.children.length > 0 && (
-                        <div className="ml-6 border-l border-border/50 pl-2 space-y-1">
+                      {/* Sub-menus hierárquicos - ícones visíveis mesmo colapsado */}
+                      {item.children && item.children.length > 0 && (
+                        <div className={cn(
+                          "space-y-1",
+                          !isCollapsed && "ml-6 border-l border-border/50 pl-2"
+                        )}>
                           {item.children.map((child) => {
                             const isChildActive = isItemActive(child.href)
                             const ChildIcon = child.icon
@@ -432,7 +435,10 @@ export function PremiumSidebar({
                                   asChild
                                   isActive={isChildActive}
                                   tooltip={child.label}
-                                  className="h-8 text-sm"
+                                  className={cn(
+                                    "h-8 text-sm",
+                                    isCollapsed && "justify-center px-2"
+                                  )}
                                 >
                                   <Link
                                     href={child.href}
@@ -442,7 +448,7 @@ export function PremiumSidebar({
                                     }}
                                   >
                                     <ChildIcon className="size-4" />
-                                    <span>{child.label}</span>
+                                    {!isCollapsed && <span>{child.label}</span>}
                                   </Link>
                                 </SidebarMenuButton>
                               </SidebarMenuItem>
