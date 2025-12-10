@@ -4,17 +4,14 @@ import { useEffect, useState, useCallback } from "react"
 import { AppShell } from "@/components/app-shell"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { Truck, Plus, Users, UserPlus, Trash2, Edit } from "lucide-react"
+import { Truck, Plus, UserPlus, Trash2, Edit } from "lucide-react"
 import { motion } from "framer-motion"
-import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 import { useAuthFast } from "@/hooks/use-auth-fast"
 import { useGlobalSync } from "@/hooks/use-global-sync"
 import { notifySuccess, notifyError } from "@/lib/toast"
 import { CreateTransportadoraModal } from "@/components/modals/create-transportadora-modal"
 import { TransportadoraUsersModal } from "@/components/modals/transportadora-users-modal"
-import { TransportadoraDriversModal } from "@/components/modals/transportadora-drivers-modal"
-import { TransportadoraVehiclesModal } from "@/components/modals/transportadora-vehicles-modal"
 import { EditTransportadoraModal } from "@/components/modals/edit-transportadora-modal"
 
 export default function TransportadorasPage() {
@@ -26,10 +23,6 @@ export default function TransportadorasPage() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [selectedCarrierForUsers, setSelectedCarrierForUsers] = useState<{ id: string; name: string } | null>(null)
   const [isUsersModalOpen, setIsUsersModalOpen] = useState(false)
-  const [selectedCarrierForDrivers, setSelectedCarrierForDrivers] = useState<{ id: string; name: string } | null>(null)
-  const [isDriversModalOpen, setIsDriversModalOpen] = useState(false)
-  const [selectedCarrierForVehicles, setSelectedCarrierForVehicles] = useState<{ id: string; name: string } | null>(null)
-  const [isVehiclesModalOpen, setIsVehiclesModalOpen] = useState(false)
   const [selectedCarrierForEdit, setSelectedCarrierForEdit] = useState<any>(null)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
 
@@ -220,7 +213,7 @@ export default function TransportadorasPage() {
                   </span>
                 )}
               </div>
-              <p className="text-xs sm:text-sm md:text-base text-[var(--ink-muted)] break-words leading-relaxed">Gerencie transportadoras e motoristas</p>
+              <p className="text-xs sm:text-sm md:text-base text-[var(--ink-muted)] break-words leading-relaxed">Gerencie transportadoras</p>
             </div>
             <Button
               onClick={() => setIsCreateModalOpen(true)}
@@ -264,114 +257,86 @@ export default function TransportadorasPage() {
                   whileHover={{ y: -4 }}
                   className="group"
                 >
-                <Card key={carrier.id} className="p-4 sm:p-5 overflow-hidden w-full border border-[var(--border)] hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm hover:border-[var(--brand)]/30 flex flex-col">
-                  <div className="flex-1 flex flex-col gap-3 w-full">
-                    {/* Header com ícone e nome */}
-                    <div className="flex items-start gap-3 mb-1">
-                      <div className="p-2 rounded-lg bg-gradient-to-br from-[var(--brand-light)] to-[var(--brand-soft)] flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
-                        <Truck className="h-5 w-5 text-[var(--brand)]" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-bold text-base sm:text-lg break-words leading-tight text-[var(--ink)] group-hover:text-[var(--brand)] transition-colors">
-                          {carrier.name}
-                        </h3>
-                      </div>
-                    </div>
-
-                    {/* Informações da transportadora */}
-                    <div className="space-y-2 flex-1">
-                      {carrier.address && (
-                        <div className="flex items-start gap-2">
-                          <span className="text-xs text-[var(--ink-muted)] font-medium min-w-[60px]">Endereço:</span>
-                          <p className="text-xs sm:text-sm text-[var(--ink-muted)] break-words flex-1 leading-relaxed" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
-                            {carrier.address}
-                          </p>
+                  <Card key={carrier.id} className="p-4 sm:p-5 overflow-hidden w-full border border-[var(--border)] hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm hover:border-[var(--brand)]/30 flex flex-col">
+                    <div className="flex-1 flex flex-col gap-3 w-full">
+                      {/* Header com ícone e nome */}
+                      <div className="flex items-start gap-3 mb-1">
+                        <div className="p-2 rounded-lg bg-gradient-to-br from-[var(--brand-light)] to-[var(--brand-soft)] flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
+                          <Truck className="h-5 w-5 text-[var(--brand)]" />
                         </div>
-                      )}
-                      {carrier.phone && (
-                        <div className="flex items-start gap-2">
-                          <span className="text-xs text-[var(--ink-muted)] font-medium min-w-[60px]">Telefone:</span>
-                          <p className="text-xs sm:text-sm text-[var(--ink-muted)] break-words flex-1 leading-relaxed" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
-                            {carrier.phone}
-                          </p>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-bold text-base sm:text-lg break-words leading-tight text-[var(--ink)] group-hover:text-[var(--brand)] transition-colors">
+                            {carrier.name}
+                          </h3>
                         </div>
-                      )}
-                    </div>
+                      </div>
 
-                    {/* Botões de ação */}
-                    <div className="grid grid-cols-2 gap-2 pt-2 border-t border-[var(--border)]">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          setSelectedCarrierForEdit(carrier)
-                          setIsEditModalOpen(true)
-                        }}
-                        className="w-full min-h-[44px] h-auto text-xs px-2 py-1.5 flex items-center justify-center gap-1.5 touch-manipulation"
-                        title="Editar transportadora"
-                      >
-                        <Edit className="h-3.5 w-3.5 flex-shrink-0" />
-                        <span className="truncate hidden sm:inline">Editar</span>
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          setSelectedCarrierForUsers({ id: carrier.id, name: carrier.name })
-                          setIsUsersModalOpen(true)
-                        }}
-                        className="w-full min-h-[44px] h-auto text-xs px-2 py-1.5 flex items-center justify-center gap-1.5 touch-manipulation"
-                        title="Gerenciar usuários"
-                      >
-                        <UserPlus className="h-3.5 w-3.5 flex-shrink-0" />
-                        <span className="truncate hidden sm:inline">Login</span>
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          setSelectedCarrierForDrivers({ id: carrier.id, name: carrier.name })
-                          setIsDriversModalOpen(true)
-                        }}
-                        className="w-full min-h-[44px] h-auto text-xs px-2 py-1.5 flex items-center justify-center gap-1.5 touch-manipulation"
-                        title="Gerenciar motoristas"
-                      >
-                        <Users className="h-3.5 w-3.5 flex-shrink-0" />
-                        <span className="truncate hidden sm:inline">Motoristas</span>
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          setSelectedCarrierForVehicles({ id: carrier.id, name: carrier.name })
-                          setIsVehiclesModalOpen(true)
-                        }}
-                        className="w-full min-h-[44px] h-auto text-xs px-2 py-1.5 flex items-center justify-center gap-1.5 touch-manipulation"
-                        title="Gerenciar veículos"
-                      >
-                        <Truck className="h-3.5 w-3.5 flex-shrink-0" />
-                        <span className="truncate hidden sm:inline">Veículos</span>
-                      </Button>
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          handleDeleteCarrier(carrier.id, carrier.name)
-                        }}
-                        className="w-full col-span-2 min-h-[44px] h-auto text-xs px-2 py-1.5 flex items-center justify-center gap-1.5 touch-manipulation"
-                        title="Excluir transportadora"
-                      >
-                        <Trash2 className="h-3.5 w-3.5 flex-shrink-0" />
-                        <span className="truncate">Excluir</span>
-                      </Button>
+                      {/* Informações da transportadora */}
+                      <div className="space-y-2 flex-1">
+                        {carrier.address && (
+                          <div className="flex items-start gap-2">
+                            <span className="text-xs text-[var(--ink-muted)] font-medium min-w-[60px]">Endereço:</span>
+                            <p className="text-xs sm:text-sm text-[var(--ink-muted)] break-words flex-1 leading-relaxed" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
+                              {carrier.address}
+                            </p>
+                          </div>
+                        )}
+                        {carrier.phone && (
+                          <div className="flex items-start gap-2">
+                            <span className="text-xs text-[var(--ink-muted)] font-medium min-w-[60px]">Telefone:</span>
+                            <p className="text-xs sm:text-sm text-[var(--ink-muted)] break-words flex-1 leading-relaxed" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
+                              {carrier.phone}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Botões de ação */}
+                      <div className="grid grid-cols-2 gap-2 pt-2 border-t border-[var(--border)]">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            setSelectedCarrierForEdit(carrier)
+                            setIsEditModalOpen(true)
+                          }}
+                          className="w-full min-h-[44px] h-auto text-xs px-2 py-1.5 flex items-center justify-center gap-1.5 touch-manipulation"
+                          title="Editar transportadora"
+                        >
+                          <Edit className="h-3.5 w-3.5 flex-shrink-0" />
+                          <span className="truncate hidden sm:inline">Editar</span>
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            setSelectedCarrierForUsers({ id: carrier.id, name: carrier.name })
+                            setIsUsersModalOpen(true)
+                          }}
+                          className="w-full min-h-[44px] h-auto text-xs px-2 py-1.5 flex items-center justify-center gap-1.5 touch-manipulation"
+                          title="Gerenciar usuários"
+                        >
+                          <UserPlus className="h-3.5 w-3.5 flex-shrink-0" />
+                          <span className="truncate hidden sm:inline">Login</span>
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleDeleteCarrier(carrier.id, carrier.name)
+                          }}
+                          className="w-full col-span-2 min-h-[44px] h-auto text-xs px-2 py-1.5 flex items-center justify-center gap-1.5 touch-manipulation"
+                          title="Excluir transportadora"
+                        >
+                          <Trash2 className="h-3.5 w-3.5 flex-shrink-0" />
+                          <span className="truncate">Excluir</span>
+                        </Button>
+                      </div>
                     </div>
-                  </div>
-                </Card>
+                  </Card>
                 </motion.div>
               ))}
             </div>
@@ -404,30 +369,6 @@ export default function TransportadorasPage() {
           />
         )}
 
-        {/* Modal Motoristas */}
-        {selectedCarrierForDrivers && (
-          <TransportadoraDriversModal
-            carrier={selectedCarrierForDrivers}
-            isOpen={isDriversModalOpen}
-            onClose={() => {
-              setIsDriversModalOpen(false)
-              setSelectedCarrierForDrivers(null)
-            }}
-          />
-        )}
-
-        {/* Modal Veículos */}
-        {selectedCarrierForVehicles && (
-          <TransportadoraVehiclesModal
-            carrier={selectedCarrierForVehicles}
-            isOpen={isVehiclesModalOpen}
-            onClose={() => {
-              setIsVehiclesModalOpen(false)
-              setSelectedCarrierForVehicles(null)
-            }}
-          />
-        )}
-
         {/* Modal Editar Transportadora */}
         <EditTransportadoraModal
           carrier={selectedCarrierForEdit}
@@ -446,4 +387,3 @@ export default function TransportadorasPage() {
     </AppShell>
   )
 }
-
