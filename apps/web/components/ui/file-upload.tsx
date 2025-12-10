@@ -218,7 +218,7 @@ export function FileUpload({
     const renderPreview = () => {
         if (!preview && !fileName) return null
 
-        if (isImageFile(preview)) {
+        if (preview && isImageFile(preview)) {
             return (
                 <div className="relative">
                     <img
