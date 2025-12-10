@@ -230,7 +230,7 @@ export function FileUpload({
             )
         }
 
-        if (isPdfFile(preview) || isPdfFile(fileName || '')) {
+        if ((preview && isPdfFile(preview)) || isPdfFile(fileName || '')) {
             return (
                 <div className="flex flex-col items-center gap-2">
                     <FileText className="h-12 w-12 text-red-500" />
