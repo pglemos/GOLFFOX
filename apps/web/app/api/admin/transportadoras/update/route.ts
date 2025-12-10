@@ -23,6 +23,20 @@ const carrierUpdateSchema = z.object({
   address_complement: z.string().optional().nullable(),
   address_city: z.string().optional().nullable(),
   address_state: z.string().optional().nullable(),
+  // Campos do Representante Legal
+  legal_rep_name: z.string().optional().nullable(),
+  legal_rep_cpf: z.string().optional().nullable(),
+  legal_rep_rg: z.string().optional().nullable(),
+  legal_rep_email: z.string().optional().nullable(),
+  legal_rep_phone: z.string().optional().nullable(),
+  // Campos Bancários
+  bank_name: z.string().optional().nullable(),
+  bank_code: z.string().optional().nullable(),
+  bank_agency: z.string().optional().nullable(),
+  bank_account: z.string().optional().nullable(),
+  bank_account_type: z.string().optional().nullable(),
+  pix_key: z.string().optional().nullable(),
+  pix_key_type: z.string().optional().nullable()
 })
 
 export async function OPTIONS() {
@@ -52,33 +66,32 @@ export async function PUT(req: NextRequest) {
     const body = await req.json()
     const validated = carrierUpdateSchema.parse(body)
 
-    const updateData: CarrierUpdate = {
+    // Tipagem explícita 'any' para permitir campos dinâmicos que talvez não estejam no tipo CarrierUpdate ainda
+    const updateData: any = {
       name: validated.name,
-      address: validated.address || null,
-      phone: validated.phone || null,
-      contact_person: validated.contact_person || null,
       updated_at: new Date().toISOString(),
-      address_zip_code: validated.address_zip_code || null,
-      address_street: validated.address_street || null,
-      address_number: validated.address_number || null,
-      address_neighborhood: validated.address_neighborhood || null,
-      address_complement: validated.address_complement || null,
-      address_city: validated.address_city || null,
-      address_state: validated.address_state || null
     }
 
-    if (validated.email) {
-      updateData.email = validated.email
-    }
-    if (validated.cnpj) {
-      updateData.cnpj = validated.cnpj
-    }
-    if (validated.state_registration) {
-      updateData.state_registration = validated.state_registration
-    }
-    if (validated.municipal_registration) {
-      updateData.municipal_registration = validated.municipal_registration
-    }
+    // Mapeamento dinâmico de campos opcionais
+    const fields = [
+      'address', 'phone', 'contact_person', 'email', 'cnpj',
+      'state_registration', 'municipal_registration',
+      'address_zip_code', 'address_street', 'address_number',
+      'address_neighborhood', 'address_complement', 'address_city', 'address_state',
+      // Representante
+      'legal_rep_name', 'legal_rep_cpf', 'legal_rep_rg', 'legal_rep_email', 'legal_rep_phone',
+      // Bancários
+      'bank_name', 'bank_code', 'bank_agency', 'bank_account', 'bank_account_type',
+      'pix_key', 'pix_key_type'
+    ]
+
+    fields.forEach(field => {
+      // @ts-ignore
+      if (validated[field] !== undefined) {
+        // @ts-ignore
+        updateData[field] = validated[field]
+      }
+    })
 
     const { data, error } = await supabaseServiceRole
       .from('carriers')
@@ -115,4 +128,3 @@ export async function PUT(req: NextRequest) {
     )
   }
 }
-

@@ -43,7 +43,8 @@ export function CarrierLegalRepSection({
     const [loading, setLoading] = useState(false)
     const [saving, setSaving] = useState(false)
     const [cnhDocument, setCnhDocument] = useState<{ file_url?: string; file_name?: string } | null>(null)
-    const [uploading, setUploading] = useState(false)
+    const [fileToUpload, setFileToUpload] = useState<File | null>(null)
+    const [uploading, setUploading] = useState(false) // Mantido para compatibilidade visual, mas controlado pelo save
 
     const { upload } = useFileUpload({
         bucket: "carrier-documents",
@@ -99,43 +100,13 @@ export function CarrierLegalRepSection({
         }
     }, [initialData])
 
-    const handleSave = async () => {
-        if (!carrierId) {
-            notifyError(new Error("Salve a transportadora primeiro"), "Erro")
-            return
-        }
-
-        setSaving(true)
-        try {
-            const response = await fetch(`/api/admin/transportadoras/update?id=${carrierId}`, {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(formData),
-            })
-
-            if (!response.ok) {
-                throw new Error("Erro ao salvar dados do representante")
-            }
-
-            notifySuccess("Dados do representante salvos com sucesso!")
-            if (onSave) onSave(formData)
-        } catch (error) {
-            notifyError(error, "Erro ao salvar")
-        } finally {
-            setSaving(false)
-        }
-    }
-
-    const handleUploadCNH = async (file: File): Promise<string | null> => {
-        if (!carrierId) {
-            notifyError(new Error("Salve a transportadora primeiro"), "Erro")
-            return null
-        }
+    const processUpload = async (): Promise<boolean> => {
+        if (!fileToUpload || !carrierId) return true
 
         setUploading(true)
         try {
-            const result = await upload(file, carrierId, "legal_rep_cnh")
-            if (!result) return null
+            const result = await upload(fileToUpload, carrierId, "legal_rep_cnh")
+            if (!result) return false
 
             const response = await fetch(`/api/admin/carriers/${carrierId}/documents`, {
                 method: "POST",
@@ -151,18 +122,56 @@ export function CarrierLegalRepSection({
             })
 
             if (!response.ok) {
-                throw new Error("Erro ao salvar documento")
+                throw new Error("Erro ao salvar documento CNH")
             }
 
-            notifySuccess("CNH do representante salva com sucesso!")
             setCnhDocument({ file_url: result.url, file_name: result.name })
-
-            return result.url
+            setFileToUpload(null)
+            return true
         } catch (error) {
+            console.error(error)
             notifyError(error, "Erro ao enviar CNH")
-            return null
+            return false
         } finally {
             setUploading(false)
+        }
+    }
+
+    const handleSave = async () => {
+        if (!carrierId) {
+            notifyError(new Error("Salve a transportadora primeiro"), "Erro")
+            return
+        }
+
+        setSaving(true)
+        try {
+            // 1. Processar upload se houver
+            if (fileToUpload) {
+                const uploadSuccess = await processUpload()
+                if (!uploadSuccess) {
+                    setSaving(false)
+                    return // Para aqui se o upload falhar
+                }
+            }
+
+            // 2. Salvar dados cadastrais
+            const response = await fetch(`/api/admin/transportadoras/update?id=${carrierId}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(formData),
+            })
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}))
+                throw new Error(errorData.message || errorData.error || "Erro ao salvar dados do representante")
+            }
+
+            notifySuccess("Dados do representante salvos com sucesso!")
+            if (onSave) onSave(formData)
+        } catch (error) {
+            notifyError(error, "Erro ao salvar")
+        } finally {
+            setSaving(false)
         }
     }
 
@@ -267,20 +276,33 @@ export function CarrierLegalRepSection({
                 </h4>
 
                 {cnhDocument?.file_url ? (
-                    <DocumentCard
-                        documentType="legal_rep_cnh"
-                        documentLabel={CARRIER_DOCUMENT_LABELS.legal_rep_cnh}
-                        fileUrl={cnhDocument.file_url}
-                        fileName={cnhDocument.file_name}
-                        status="valid"
-                        required
-                    />
+                    <div className="space-y-4">
+                        <DocumentCard
+                            documentType="legal_rep_cnh"
+                            documentLabel={CARRIER_DOCUMENT_LABELS.legal_rep_cnh}
+                            fileUrl={cnhDocument.file_url}
+                            fileName={cnhDocument.file_name}
+                            status="valid"
+                            required
+                        />
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            className="text-destructive w-full sm:w-auto"
+                            onClick={() => setCnhDocument(null)}
+                        >
+                            Substituir CNH
+                        </Button>
+                    </div>
                 ) : (
                     <FileUpload
-                        onUpload={handleUploadCNH}
-                        disabled={uploading}
-                        label="Arraste a CNH ou clique para enviar"
+                        manual
+                        onFileSelect={setFileToUpload}
+                        onUpload={async () => null}
+                        disabled={uploading || saving}
+                        label="Arraste a CNH ou clique para selecionar"
                         maxSize={10}
+                        currentFileName={fileToUpload?.name}
                     />
                 )}
             </Card>
@@ -289,21 +311,21 @@ export function CarrierLegalRepSection({
                 <Button
                     variant="outline"
                     onClick={loadData}
-                    disabled={loading}
+                    disabled={loading || saving}
                 >
                     <RefreshCw className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`} />
                     Recarregar
                 </Button>
                 <Button
                     onClick={handleSave}
-                    disabled={saving}
+                    disabled={saving || (uploading && !fileToUpload)}
                 >
-                    {saving ? (
+                    {saving || uploading ? (
                         <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                     ) : (
                         <Save className="h-4 w-4 mr-2" />
                     )}
-                    Salvar
+                    {fileToUpload ? "Salvar Dados e Enviar CNH" : "Salvar Dados"}
                 </Button>
             </div>
         </div>
