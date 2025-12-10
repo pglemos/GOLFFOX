@@ -282,21 +282,21 @@ export function CarrierDocumentsSection({
             {/* Lista de Documentos */}
             <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                    <h4 className="font-medium">Documentos Enviados ({documents.length})</h4>
+                    <h4 className="font-medium">Documentos Enviados ({documents.filter(d => d.document_type !== 'legal_rep_cnh').length})</h4>
                     <Button size="sm" variant="ghost" onClick={loadDocuments} disabled={loading}>
                         <RefreshCw className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`} />
                         Atualizar
                     </Button>
                 </div>
 
-                {documents.length === 0 ? (
+                {documents.filter(d => d.document_type !== 'legal_rep_cnh').length === 0 ? (
                     <div className="text-center py-8 text-muted-foreground border-2 border-dashed rounded-lg">
                         <FileText className="h-8 w-8 mx-auto mb-2 opacity-50" />
                         <p>Nenhum documento enviado ainda</p>
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {documents.map((doc) => (
+                        {documents.filter(d => d.document_type !== 'legal_rep_cnh').map((doc) => (
                             <DocumentCard
                                 key={doc.id}
                                 documentType={doc.document_type}
