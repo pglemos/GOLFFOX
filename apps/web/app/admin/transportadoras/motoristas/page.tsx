@@ -328,6 +328,7 @@ export default function TransportadoraMotoristasPage() {
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 onSave={() => { setIsModalOpen(false); loadDrivers() }}
+                carriers={transportadoras}
             />
         </AppShell>
     )

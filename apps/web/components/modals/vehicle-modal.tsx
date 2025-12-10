@@ -553,7 +553,6 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave, carriers }: Veh
                     <Select
                       value={formData.transportadora_id || ""}
                       onValueChange={(value) => setFormData({ ...formData, transportadora_id: value })}
-                      disabled={!!vehicle?.transportadora_id} // Opcional: impedir mudança após criar? Ou permitir corrigir? Vou permitir.
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Selecione a transportadora" />

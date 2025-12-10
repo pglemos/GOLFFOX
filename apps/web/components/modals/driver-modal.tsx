@@ -11,7 +11,14 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Users, Upload, X, DollarSign } from "lucide-react"
+import { Users, Upload, X, DollarSign, Building2 } from "lucide-react"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { supabase } from "@/lib/supabase"
 import { notifySuccess, notifyError } from "@/lib/toast"
 import { t } from "@/lib/i18n"
@@ -57,14 +64,20 @@ interface DriverDocument {
   is_valid?: boolean
 }
 
+interface Carrier {
+  id: string
+  name: string
+}
+
 interface DriverModalProps {
   driver: Driver | null
   isOpen: boolean
   onClose: () => void
   onSave: () => void
+  carriers?: Carrier[]
 }
 
-export function DriverModal({ driver, isOpen, onClose, onSave }: DriverModalProps) {
+export function DriverModal({ driver, isOpen, onClose, onSave, carriers = [] }: DriverModalProps) {
   const [formData, setFormData] = useState<Driver>({
     name: "",
     email: "",
@@ -343,6 +356,31 @@ export function DriverModal({ driver, isOpen, onClose, onSave }: DriverModalProp
                     />
                     <p className="text-xs text-muted-foreground">Senha de acesso: últimos 6 dígitos do CPF</p>
                   </div>
+
+                  {/* Campo Transportadora (apenas se lista de carriers for fornecida) */}
+                  {carriers && carriers.length > 0 && (
+                    <div className="space-y-2 sm:col-span-2">
+                      <Label htmlFor="transportadora" className="flex items-center gap-1">
+                        <Building2 className="h-4 w-4" />
+                        Transportadora
+                      </Label>
+                      <Select
+                        value={formData.transportadora_id || ""}
+                        onValueChange={(value) => setFormData({ ...formData, transportadora_id: value })}
+                      >
+                        <SelectTrigger className="min-h-[44px]">
+                          <SelectValue placeholder="Selecione a transportadora" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {carriers.map((carrier) => (
+                            <SelectItem key={carrier.id} value={carrier.id}>
+                              {carrier.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
                 </div>
               </div>
 
