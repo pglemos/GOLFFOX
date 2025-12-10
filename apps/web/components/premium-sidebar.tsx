@@ -31,7 +31,8 @@ import {
   FileText,
   Building2,
   ChevronRight,
-  Wrench
+  Wrench,
+  Award
 } from "lucide-react"
 import { OperationalAlertsBadge } from "@/components/operational-alerts-badge"
 import { cn } from "@/lib/utils"
@@ -241,7 +242,14 @@ const transportadoraMenuGroups: MenuGroup[] = [
       {
         icon: Users,
         label: "Motoristas",
-        href: "/transportadora/motoristas"
+        href: "/transportadora/motoristas",
+        children: [
+          {
+            icon: Award,
+            label: "Ranking",
+            href: "/transportadora/motoristas/ranking"
+          }
+        ]
       },
       {
         icon: Navigation,
