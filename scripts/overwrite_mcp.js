@@ -1,0 +1,113 @@
+const fs = require('fs');
+const path = require('path');
+
+const mcpConfig = {
+    "mcpServers": {
+        "Puppeteer": {
+            "command": "npx",
+            "args": [
+                "-y",
+                "@modelcontextprotocol/server-puppeteer"
+            ],
+            "env": {}
+        },
+        "GitHub": {
+            "command": "npx",
+            "args": [
+                "-y",
+                "@modelcontextprotocol/server-github"
+            ],
+            "env": {
+                "GITHUB_PERSONAL_ACCESS_TOKEN": "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"
+            }
+        },
+        "Google Maps": {
+            "command": "npx",
+            "args": [
+                "-y",
+                "@modelcontextprotocol/server-google-maps"
+            ],
+            "env": {
+                "GOOGLE_MAPS_API_KEY": "AIzaSyD79t05YxpU2RnEczY-NSDxhdbY9OvigsM"
+            }
+        },
+        "Memory": {
+            "command": "npx",
+            "args": [
+                "-y",
+                "@modelcontextprotocol/server-memory"
+            ],
+            "env": {
+                "MEMORY_FILE_PATH": "C:\\Users\\Pedro\\.cursor\\memory.json"
+            }
+        },
+        "Playwright": {
+            "command": "npx",
+            "args": [
+                "-y",
+                "@executeautomation/playwright-mcp-server"
+            ],
+            "env": {}
+        },
+        "Sequential Thinking": {
+            "command": "npx",
+            "args": [
+                "-y",
+                "@modelcontextprotocol/server-sequential-thinking"
+            ],
+            "env": {}
+        },
+        "shadcn-ui": {
+            "command": "npx",
+            "args": [
+                "-y",
+                "shadcn@latest",
+                "mcp"
+            ],
+            "env": {}
+        },
+        "context7": {
+            "command": "npx",
+            "args": [
+                "-y",
+                "@upstash/context7-mcp@latest"
+            ],
+            "env": {
+                "DEFAULT_MINIMUM_TOKENS": "10000"
+            }
+        },
+        "PostgreSQL": {
+            "command": "npx",
+            "args": [
+                "-y",
+                "@modelcontextprotocol/server-postgres",
+                "postgresql://postgres:Guigui1309%40@db.vmoxzesvjcfmrebagcwo.supabase.co:5432/postgres"
+            ],
+            "env": {}
+        },
+        "Chrome DevTools MCP": {
+            "command": "npx",
+            "args": [
+                "-y",
+                "chrome-devtools-mcp@latest"
+            ],
+            "env": {}
+        },
+        "supabase": {
+            "url": "https://mcp.supabase.com/mcp?project_ref=vmoxzesvjcfmrebagcwo&features=docs%2Caccount%2Cdatabase%2Cdebugging%2Cdevelopment%2Cfunctions%2Cbranching%2Cstorage",
+            "headers": {}
+        },
+        "Filesystem": {
+            "command": "npx",
+            "args": [
+                "-y",
+                "@modelcontextprotocol/server-filesystem",
+                "F:\\GOLFFOX"
+            ],
+            "env": {}
+        }
+    }
+};
+
+fs.writeFileSync(path.join(process.cwd(), 'mcp.json'), JSON.stringify(mcpConfig, null, 2));
+console.log('✅ mcp.json updated successfully');
