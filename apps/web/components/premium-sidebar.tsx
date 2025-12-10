@@ -358,6 +358,10 @@ export function PremiumSidebar({
     return pathname?.startsWith(href) ?? false
   }
 
+  // Verificar estado do sidebar para esconder subitens quando colapsado
+  const { state } = useSidebar()
+  const isCollapsed = state === "collapsed"
+
   return (
     <Sidebar variant="floating" collapsible="icon">
       {/* Logo/Header */}
@@ -408,8 +412,8 @@ export function PremiumSidebar({
                           </div>
                         )}
                       </SidebarMenuItem>
-                      {/* Sub-menus hierárquicos */}
-                      {item.children && item.children.length > 0 && (
+                      {/* Sub-menus hierárquicos - esconder quando colapsado */}
+                      {!isCollapsed && item.children && item.children.length > 0 && (
                         <div className="ml-6 border-l border-border/50 pl-2 space-y-1">
                           {item.children.map((child) => {
                             const isChildActive = isItemActive(child.href)
