@@ -6,9 +6,10 @@ export const runtime = 'nodejs'
 
 export async function GET(
     request: NextRequest,
-    { params }: { params: { carrierId: string } }
+    props: { params: Promise<{ carrierId: string }> }
 ) {
     try {
+        const params = await props.params
         const authErrorResponse = await requireAuth(request, 'admin')
         if (authErrorResponse) {
             return authErrorResponse
