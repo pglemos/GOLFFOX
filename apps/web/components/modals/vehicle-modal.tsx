@@ -9,6 +9,13 @@ import {
   DialogTitle,
   DialogFooter
 } from "@/components/ui/dialog"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -42,10 +49,12 @@ interface VehicleModalProps {
   vehicle: Vehicle | null
   isOpen: boolean
   onClose: () => void
+
   onSave: () => void
+  carriers?: { id: string, name: string }[]
 }
 
-export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalProps) {
+export function VehicleModal({ vehicle, isOpen, onClose, onSave, carriers }: VehicleModalProps) {
   const [formData, setFormData] = useState<Vehicle>({
     plate: "",
     model: "",
@@ -221,6 +230,9 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
         // Admin pode definir company_id manualmente se fornecido no formData
         if (formData.company_id) {
           vehicleDataRaw.company_id = formData.company_id
+        }
+        if (formData.transportadora_id) {
+          vehicleDataRaw.transportadora_id = formData.transportadora_id
         }
       } else if (userInfo.role === 'operador') {
         // Operator deve usar seu próprio company_id
@@ -533,6 +545,29 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave }: VehicleModalP
 
               {/* Grid de Campos */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+
+                {/* Campo Transportadora (apenas se lista de carriers for fornecida) */}
+                {carriers && carriers.length > 0 && (
+                  <div className="space-y-2 sm:col-span-2">
+                    <Label htmlFor="transportadora">Transportadora</Label>
+                    <Select
+                      value={formData.transportadora_id || ""}
+                      onValueChange={(value) => setFormData({ ...formData, transportadora_id: value })}
+                      disabled={!!vehicle?.transportadora_id} // Opcional: impedir mudança após criar? Ou permitir corrigir? Vou permitir.
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione a transportadora" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {carriers.map((carrier) => (
+                          <SelectItem key={carrier.id} value={carrier.id}>
+                            {carrier.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
                 <div className="space-y-2">
                   <Label htmlFor="plate">Placa *</Label>
                   <Input
