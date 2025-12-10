@@ -1,14 +1,16 @@
 "use client"
 
-import { useEffect, useState, useCallback } from "react"
+import { useEffect, useState, useCallback, useMemo } from "react"
 import { AppShell } from "@/components/app-shell"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { Truck, Plus, UserPlus, Trash2, Edit } from "lucide-react"
+import { Input } from "@/components/ui/input"
+import { Truck, Plus, UserPlus, Trash2, Edit, Search } from "lucide-react"
 import { motion } from "framer-motion"
 import { useRouter } from "next/navigation"
 import { useAuthFast } from "@/hooks/use-auth-fast"
 import { useGlobalSync } from "@/hooks/use-global-sync"
+import { useDebounce } from "@/hooks/use-debounce"
 import { notifySuccess, notifyError } from "@/lib/toast"
 import { CreateTransportadoraModal } from "@/components/modals/create-transportadora-modal"
 import { TransportadoraUsersModal } from "@/components/modals/transportadora-users-modal"
@@ -25,6 +27,8 @@ export default function TransportadorasPage() {
   const [isUsersModalOpen, setIsUsersModalOpen] = useState(false)
   const [selectedCarrierForEdit, setSelectedCarrierForEdit] = useState<any>(null)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState("")
+  const debouncedSearchQuery = useDebounce(searchQuery, 300)
 
   const loadCarriers = useCallback(async () => {
     setLoadingCarriers(true)
@@ -189,6 +193,17 @@ export default function TransportadorasPage() {
     await loadCarriers()
   }, [loadCarriers])
 
+  // Filtrar transportadoras por busca
+  const filteredCarriers = useMemo(() => {
+    if (!debouncedSearchQuery) return carriers
+    const query = debouncedSearchQuery.toLowerCase()
+    return carriers.filter((c: any) =>
+      c.name?.toLowerCase().includes(query) ||
+      c.address?.toLowerCase().includes(query) ||
+      c.phone?.includes(query)
+    )
+  }, [carriers, debouncedSearchQuery])
+
   if (authLoading || !user) {
     return <div className="min-h-screen flex items-center justify-center"><div className="w-16 h-16 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin mx-auto"></div></div>
   }
@@ -225,6 +240,19 @@ export default function TransportadorasPage() {
             </Button>
           </div>
 
+          {/* Busca */}
+          <div className="flex flex-col sm:flex-row gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+              <Input
+                placeholder="Buscar transportadoras por nome, endereço ou telefone..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+          </div>
+
           {errorCarriers && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-3 sm:p-4 w-full">
               <p className="text-xs sm:text-sm text-red-800 break-words">Erro ao carregar transportadoras: {errorCarriers instanceof Error ? errorCarriers.message : String(errorCarriers)}</p>
@@ -238,17 +266,21 @@ export default function TransportadorasPage() {
             </div>
           )}
 
-          {!loadingCarriers && !errorCarriers && Array.isArray(carriers) && carriers.length === 0 && (
+          {!loadingCarriers && !errorCarriers && Array.isArray(filteredCarriers) && filteredCarriers.length === 0 && (
             <Card className="p-4 sm:p-6 md:p-8 text-center w-full max-w-full overflow-hidden">
               <Truck className="h-10 w-10 sm:h-12 sm:w-12 text-[var(--ink-muted)] mx-auto mb-3 sm:mb-4 flex-shrink-0" />
-              <h3 className="text-sm sm:text-base md:text-lg font-semibold mb-2 break-words px-2">Nenhuma transportadora cadastrada</h3>
-              <p className="text-xs sm:text-sm md:text-base text-[var(--ink-muted)] mb-4 break-words px-2">Clique em &quot;Criar Transportadora&quot; para criar uma nova transportadora.</p>
+              <h3 className="text-sm sm:text-base md:text-lg font-semibold mb-2 break-words px-2">
+                {debouncedSearchQuery ? "Nenhuma transportadora encontrada" : "Nenhuma transportadora cadastrada"}
+              </h3>
+              <p className="text-xs sm:text-sm md:text-base text-[var(--ink-muted)] mb-4 break-words px-2">
+                {debouncedSearchQuery ? "Tente buscar por outros termos." : "Clique em \"Criar Transportadora\" para criar uma nova transportadora."}
+              </p>
             </Card>
           )}
 
-          {!loadingCarriers && !errorCarriers && Array.isArray(carriers) && carriers.length > 0 && (
+          {!loadingCarriers && !errorCarriers && Array.isArray(filteredCarriers) && filteredCarriers.length > 0 && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 w-full max-w-full">
-              {carriers.map((carrier: any, index: number) => (
+              {filteredCarriers.map((carrier: any, index: number) => (
                 <motion.div
                   key={carrier.id}
                   initial={{ opacity: 0, y: 20 }}

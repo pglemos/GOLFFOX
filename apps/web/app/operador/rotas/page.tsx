@@ -1,16 +1,18 @@
 "use client"
 
-import { useEffect, useState, useCallback } from "react"
+import { useEffect, useState, useCallback, useMemo } from "react"
 import { AppShell } from "@/components/app-shell"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Navigation, Users, MapPin, Plus, Map } from "lucide-react"
+import { Input } from "@/components/ui/input"
+import { Navigation, Users, MapPin, Plus, Map, Search } from "lucide-react"
 import { motion } from "framer-motion"
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 import { notifyError } from "@/lib/toast"
 import { Button } from "@/components/ui/button"
 import { useOperatorTenant } from "@/components/providers/operator-tenant-provider"
+import { useDebounce } from "@/hooks/use-debounce"
 import operatorI18nData from "@/i18n/operator.json"
 
 const operatorI18n: any = operatorI18nData ?? {
@@ -25,6 +27,8 @@ export default function OperatorRotasPage() {
   const [loading, setLoading] = useState(true)
   const [rotas, setRotas] = useState<any[]>([])
   const [error, setError] = useState<string | null>(null)
+  const [searchQuery, setSearchQuery] = useState("")
+  const debouncedSearchQuery = useDebounce(searchQuery, 300)
 
   useEffect(() => {
     const getUser = async () => {
@@ -52,7 +56,7 @@ export default function OperatorRotasPage() {
 
   const loadRotas = useCallback(async () => {
     if (!tenantCompanyId) return
-    
+
     try {
       setLoading(true)
       setError(null)
@@ -152,93 +156,126 @@ export default function OperatorRotasPage() {
           </div>
         </div>
 
-        <div className="grid gap-4">
-          {rotas.length === 0 && !loading && (
-            <Card className="p-12 text-center">
-              <Navigation className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium mb-2">Nenhuma rota encontrada</h3>
-              <p className="text-sm text-gray-500 mb-4">
-                Comece criando uma nova rota ou solicitação
-              </p>
-              <a href="/operador/solicitacoes">
-                <Button>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Criar Primeira Rota
-                </Button>
-              </a>
-            </Card>
-          )}
+        {/* Busca */}
+        <div className="flex flex-col sm:flex-row gap-2">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <Input
+              placeholder="Buscar rotas por nome ou transportadora..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+        </div>
 
-          {rotas.map((rota, index) => (
-            <motion.div
-              key={rota.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.05 }}
-              whileHover={{ y: -4 }}
-              className="group"
-            >
-            <Card key={rota.id} className="p-4 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-[var(--border)] hover:border-[var(--brand)]/30">
-              <div className="flex items-start justify-between gap-4 mb-4">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className="p-1.5 rounded-lg bg-gradient-to-br from-[var(--brand-light)] to-[var(--brand-soft)]">
-                      <Navigation className="h-4 w-4 text-[var(--brand)] flex-shrink-0" />
-                    </div>
-                    <h3 className="font-bold text-lg truncate group-hover:text-[var(--brand)] transition-colors">{rota.name || "Rota sem nome"}</h3>
-                    {rota.carrier_name && (
-                      <Badge variant="outline" className="flex-shrink-0">{rota.carrier_name}</Badge>
-                    )}
-                  </div>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-3 text-sm">
-                    <div>
-                      <span className="text-gray-500">Total de Viagens:</span>
-                      <p className="font-semibold">{rota.total_trips || 0}</p>
-                    </div>
-                    <div>
-                      <span className="text-gray-500">Concluídas:</span>
-                      <p className="font-semibold text-green-600">{rota.completed_trips || 0}</p>
-                    </div>
-                    {rota.avg_delay_minutes && (
-                      <div>
-                        <span className="text-gray-500">Atraso Médio:</span>
-                        <p className="font-semibold">{Number(rota.avg_delay_minutes).toFixed(1)} min</p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-                <a href={`/operador/rotas/mapa?route_id=${rota.id}`}>
-                  <Button variant="outline" size="sm" className="flex-shrink-0">
-                    <MapPin className="h-4 w-4 mr-2" />
-                    Ver no Mapa
+        <div className="grid gap-4">
+          {rotas
+            .filter(rota => {
+              if (!debouncedSearchQuery) return true
+              const query = debouncedSearchQuery.toLowerCase()
+              return (
+                rota.name?.toLowerCase().includes(query) ||
+                rota.carrier_name?.toLowerCase().includes(query)
+              )
+            })
+            .length === 0 && !loading && (
+              <Card className="p-12 text-center">
+                <Navigation className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-lg font-medium mb-2">
+                  {debouncedSearchQuery ? "Nenhuma rota encontrada" : "Nenhuma rota encontrada"}
+                </h3>
+                <p className="text-sm text-gray-500 mb-4">
+                  {debouncedSearchQuery ? "Tente buscar por outros termos." : "Comece criando uma nova rota ou solicitação"}
+                </p>
+                <a href="/operador/solicitacoes">
+                  <Button>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Criar Primeira Rota
                   </Button>
                 </a>
-              </div>
+              </Card>
+            )}
 
-              {rota.gf_route_plan && Array.isArray(rota.gf_route_plan) && rota.gf_route_plan.length > 0 && (
-                <div className="mt-4 pt-4 border-t border-gray-200">
-                  <h4 className="font-semibold mb-2 text-sm text-gray-700">Funcionários nesta rota:</h4>
-                  <div className="space-y-2 max-h-40 overflow-y-auto">
-                    {rota.gf_route_plan
-                      .filter((stop: any) => stop && stop.gf_employee_company)
-                      .map((stop: any, idx: number) => (
-                        <div key={idx} className="p-2 bg-gray-50 rounded-lg flex items-center gap-2">
-                          <Users className="h-4 w-4 text-gray-400 flex-shrink-0" />
-                          <div className="min-w-0 flex-1">
-                            <p className="text-sm font-medium truncate">{stop.gf_employee_company?.name || "Nome não disponível"}</p>
-                            <p className="text-xs text-gray-500">
-                              {stop.gf_employee_company?.cpf && `CPF: ${stop.gf_employee_company.cpf} • `}
-                              Ordem: {stop.stop_order || idx + 1}
-                            </p>
-                          </div>
+          {rotas
+            .filter(rota => {
+              if (!debouncedSearchQuery) return true
+              const query = debouncedSearchQuery.toLowerCase()
+              return (
+                rota.name?.toLowerCase().includes(query) ||
+                rota.carrier_name?.toLowerCase().includes(query)
+              )
+            })
+            .map((rota, index) => (
+              <motion.div
+                key={rota.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.05 }}
+                whileHover={{ y: -4 }}
+                className="group"
+              >
+                <Card key={rota.id} className="p-4 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-[var(--border)] hover:border-[var(--brand)]/30">
+                  <div className="flex items-start justify-between gap-4 mb-4">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="p-1.5 rounded-lg bg-gradient-to-br from-[var(--brand-light)] to-[var(--brand-soft)]">
+                          <Navigation className="h-4 w-4 text-[var(--brand)] flex-shrink-0" />
                         </div>
-                      ))}
+                        <h3 className="font-bold text-lg truncate group-hover:text-[var(--brand)] transition-colors">{rota.name || "Rota sem nome"}</h3>
+                        {rota.carrier_name && (
+                          <Badge variant="outline" className="flex-shrink-0">{rota.carrier_name}</Badge>
+                        )}
+                      </div>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-3 text-sm">
+                        <div>
+                          <span className="text-gray-500">Total de Viagens:</span>
+                          <p className="font-semibold">{rota.total_trips || 0}</p>
+                        </div>
+                        <div>
+                          <span className="text-gray-500">Concluídas:</span>
+                          <p className="font-semibold text-green-600">{rota.completed_trips || 0}</p>
+                        </div>
+                        {rota.avg_delay_minutes && (
+                          <div>
+                            <span className="text-gray-500">Atraso Médio:</span>
+                            <p className="font-semibold">{Number(rota.avg_delay_minutes).toFixed(1)} min</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <a href={`/operador/rotas/mapa?route_id=${rota.id}`}>
+                      <Button variant="outline" size="sm" className="flex-shrink-0">
+                        <MapPin className="h-4 w-4 mr-2" />
+                        Ver no Mapa
+                      </Button>
+                    </a>
                   </div>
-                </div>
-              )}
-            </Card>
-            </motion.div>
-          ))}
+
+                  {rota.gf_route_plan && Array.isArray(rota.gf_route_plan) && rota.gf_route_plan.length > 0 && (
+                    <div className="mt-4 pt-4 border-t border-gray-200">
+                      <h4 className="font-semibold mb-2 text-sm text-gray-700">Funcionários nesta rota:</h4>
+                      <div className="space-y-2 max-h-40 overflow-y-auto">
+                        {rota.gf_route_plan
+                          .filter((stop: any) => stop && stop.gf_employee_company)
+                          .map((stop: any, idx: number) => (
+                            <div key={idx} className="p-2 bg-gray-50 rounded-lg flex items-center gap-2">
+                              <Users className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                              <div className="min-w-0 flex-1">
+                                <p className="text-sm font-medium truncate">{stop.gf_employee_company?.name || "Nome não disponível"}</p>
+                                <p className="text-xs text-gray-500">
+                                  {stop.gf_employee_company?.cpf && `CPF: ${stop.gf_employee_company.cpf} • `}
+                                  Ordem: {stop.stop_order || idx + 1}
+                                </p>
+                              </div>
+                            </div>
+                          ))}
+                      </div>
+                    </div>
+                  )}
+                </Card>
+              </motion.div>
+            ))}
         </div>
       </div>
     </AppShell>
