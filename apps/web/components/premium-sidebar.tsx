@@ -441,7 +441,7 @@ export function PremiumSidebar({
                                       navigateWithTransition(child.href)
                                     }}
                                   >
-                                    <ChildIcon className="size-3.5" />
+                                    <ChildIcon className="size-4" />
                                     <span>{child.label}</span>
                                   </Link>
                                 </SidebarMenuButton>
