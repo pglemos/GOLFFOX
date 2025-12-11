@@ -161,7 +161,7 @@ export async function GET(request: NextRequest) {
             amount: parseFloat(row.amount as string),
             costDate: row.cost_date as string,
             isRecurring: row.is_recurring as boolean,
-            recurringInterval: row.recurring_interval as string | null,
+            recurringInterval: row.recurring_interval as ManualCost['recurringInterval'],
             recurringEndDate: row.recurring_end_date as string | null,
             parentRecurringId: row.parent_recurring_id as string | null,
             vehicleId: row.vehicle_id as string | null,

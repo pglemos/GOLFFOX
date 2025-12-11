@@ -148,7 +148,7 @@ export async function GET(request: NextRequest) {
             contractReference: row.contract_reference as string | null,
             invoiceNumber: row.invoice_number as string | null,
             isRecurring: row.is_recurring as boolean,
-            recurringInterval: row.recurring_interval as string | null,
+            recurringInterval: row.recurring_interval as ManualRevenue['recurringInterval'],
             attachmentUrl: row.attachment_url as string | null,
             notes: row.notes as string | null,
             status: row.status as 'pending' | 'confirmed' | 'cancelled',

@@ -1,86 +1,300 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { AppShell } from "@/components/app-shell"
-import { Card } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { BarChart3, DollarSign, TrendingUp, TrendingDown, Calendar, Search, PieChart as PieChartIcon } from "lucide-react"
-import { motion } from "framer-motion"
-import { cn } from "@/lib/utils"
-import { notifyError } from "@/lib/toast"
-import { useAuth } from "@/hooks/use-auth"
+/**
+ * Página de Custos Financeiros - Admin
+ * Dashboard expandido com:
+ * - Visão consolidada multi-tenant
+ * - Abas: Visão Geral | Custos | Receitas | Orçamento
+ * - Lançamento de custos/receitas
+ * - Gráficos Orçado vs Real
+ */
+
+import { useState, useEffect, useMemo } from "react"
+import { motion, AnimatePresence } from "framer-motion"
 import {
+  DollarSign,
+  TrendingUp,
+  TrendingDown,
+  Calendar,
+  Plus,
+  Download,
+  RefreshCw,
+  ChevronRight,
+  AlertTriangle,
+  PieChart as PieChartIcon,
+  BarChart3,
+  FileText,
+  Filter,
+} from "lucide-react"
+import {
+  LineChart,
+  Line,
   BarChart,
   Bar,
+  PieChart,
+  Pie,
+  Cell,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend,
   ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
+  Legend,
   AreaChart,
-  Area
+  Area,
 } from 'recharts'
+import { AppShell } from "@/components/app-shell"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { Skeleton } from "@/components/ui/skeleton"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet"
+import { CostForm } from "@/components/costs/cost-form"
+import { useAuth } from "@/hooks/use-auth"
+import { notifyError, notifySuccess } from "@/lib/toast"
+import { formatCurrency } from "@/lib/kpi-utils"
+import type { ManualCost, ManualRevenue, Budget } from "@/types/financial"
+
+// Cores para gráficos
+const COLORS = ['#F97316', '#2563EB', '#059669', '#7C3AED', '#DC2626', '#0891B2', '#6366F1', '#64748B']
+
+// Componente de count-up animado
+function CountUp({ value, duration = 1500, prefix = "" }: { value: number; duration?: number; prefix?: string }) {
+  const [displayValue, setDisplayValue] = useState(0)
+
+  useEffect(() => {
+    let startTime: number
+    let animationFrame: number
+
+    const animate = (timestamp: number) => {
+      if (!startTime) startTime = timestamp
+      const progress = Math.min((timestamp - startTime) / duration, 1)
+      const easeOutQuart = 1 - Math.pow(1 - progress, 4)
+      setDisplayValue(Math.floor(easeOutQuart * value))
+
+      if (progress < 1) {
+        animationFrame = requestAnimationFrame(animate)
+      }
+    }
+
+    animationFrame = requestAnimationFrame(animate)
+    return () => cancelAnimationFrame(animationFrame)
+  }, [value, duration])
+
+  return <span>{prefix}{formatCurrency(displayValue)}</span>
+}
 
 export default function CustosPage() {
   const { user } = useAuth()
   const [loading, setLoading] = useState(true)
-  const [data, setData] = useState<any>(null)
+  const [activeTab, setActiveTab] = useState("overview")
+  const [showCostForm, setShowCostForm] = useState(false)
+  const [period, setPeriod] = useState(() => {
+    const now = new Date()
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
+  })
 
+  // Estados de dados
+  const [legacyData, setLegacyData] = useState<any>(null)
+  const [costs, setCosts] = useState<ManualCost[]>([])
+  const [revenues, setRevenues] = useState<ManualRevenue[]>([])
+  const [budgets, setBudgets] = useState<Budget[]>([])
+
+  // Carregar dados
   useEffect(() => {
     loadData()
-  }, [])
+  }, [period])
 
   const loadData = async () => {
     try {
       setLoading(true)
-      const response = await fetch('/api/admin/custos')
-      const result = await response.json()
-      setData(result)
+      const [year, month] = period.split('-')
+
+      // Carregar dados em paralelo - legado e novos
+      const [legacyRes, costsRes, revenuesRes, budgetsRes] = await Promise.all([
+        fetch('/api/admin/custos'),
+        fetch(`/api/costs/manual-v2?page=1&page_size=100&date_from=${year}-${month}-01&date_to=${year}-${month}-31`),
+        fetch(`/api/revenues?page=1&page_size=100&date_from=${year}-${month}-01&date_to=${year}-${month}-31`),
+        fetch(`/api/budgets?year=${year}&month=${month}`),
+      ])
+
+      const [legacyResult, costsData, revenuesData, budgetsData] = await Promise.all([
+        legacyRes.json(),
+        costsRes.json(),
+        revenuesRes.json(),
+        budgetsRes.json(),
+      ])
+
+      setLegacyData(legacyResult)
+      if (costsData.success) setCosts(costsData.data || [])
+      if (revenuesData.success) setRevenues(revenuesData.data || [])
+      if (budgetsData.success) setBudgets(budgetsData.data || [])
     } catch (error) {
-      notifyError(error, "Erro ao carregar dados de custos")
+      notifyError(error, "Erro ao carregar dados financeiros")
     } finally {
       setLoading(false)
     }
   }
 
-  if (loading || !data) {
+  // KPIs calculados
+  const kpis = useMemo(() => {
+    const totalCosts = costs.reduce((sum, c) => sum + c.amount, 0)
+    const totalRevenues = revenues.reduce((sum, r) => sum + r.amount, 0)
+    const margin = totalRevenues - totalCosts
+    const marginPercent = totalRevenues > 0 ? ((margin / totalRevenues) * 100).toFixed(1) : '0'
+    const recurringCount = costs.filter(c => c.isRecurring).length
+
+    return {
+      totalCosts,
+      totalRevenues,
+      margin,
+      marginPercent,
+      costEntries: costs.length,
+      revenueEntries: revenues.length,
+      recurringCount,
+    }
+  }, [costs, revenues])
+
+  // Dados para gráfico de categoria
+  const categoryData = useMemo(() => {
+    const byCategory: Record<string, number> = {}
+    costs.forEach(cost => {
+      const catName = cost.category?.name || 'Sem categoria'
+      byCategory[catName] = (byCategory[catName] || 0) + cost.amount
+    })
+    return Object.entries(byCategory)
+      .map(([name, value], index) => ({
+        name,
+        value,
+        color: COLORS[index % COLORS.length],
+      }))
+      .sort((a, b) => b.value - a.value)
+  }, [costs])
+
+  // Dados para gráfico Orçado vs Real
+  const budgetVsActualData = useMemo(() => {
+    return budgets.map(budget => {
+      const actual = costs
+        .filter(c => c.categoryId === budget.categoryId)
+        .reduce((sum, c) => sum + c.amount, 0)
+
+      return {
+        name: budget.category?.name || budget.categoryName || 'Categoria',
+        budgeted: budget.budgetedAmount,
+        actual,
+        variance: actual - budget.budgetedAmount,
+      }
+    })
+  }, [budgets, costs])
+
+  const userForShell = user ? {
+    id: user.id,
+    name: user.name || 'Admin',
+    email: user.email,
+    role: user.role || 'admin'
+  } : {
+    id: 'mock',
+    name: 'Admin',
+    email: 'admin@golffox.com',
+    role: 'admin'
+  }
+
+  if (loading) {
     return (
-      <AppShell panel="admin" user={user ? { id: user.id, name: user.name || 'Admin', email: user.email, role: user.role || 'admin' } : { id: 'mock', name: 'Admin', email: 'admin@golffox.com', role: 'admin' }}>
-        <div className="flex items-center justify-center h-full">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500" />
+      <AppShell panel="admin" user={userForShell}>
+        <div className="p-4 sm:p-6 lg:p-8 space-y-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {[...Array(4)].map((_, i) => (
+              <Card key={i}>
+                <CardHeader className="pb-2">
+                  <Skeleton className="h-4 w-24" />
+                </CardHeader>
+                <CardContent>
+                  <Skeleton className="h-8 w-32" />
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+          <Card>
+            <CardContent className="pt-6">
+              <Skeleton className="h-[300px] w-full" />
+            </CardContent>
+          </Card>
         </div>
       </AppShell>
     )
   }
 
-  const { kpis, distribution, monthlyTrend } = data
-
   return (
-    <AppShell panel="admin" user={user ? { id: user.id, name: user.name || 'Admin', email: user.email, role: user.role || 'admin' } : { id: 'mock', name: 'Admin', email: 'admin@golffox.com', role: 'admin' }}>
+    <AppShell panel="admin" user={userForShell}>
       <div className="p-4 sm:p-6 lg:p-8 space-y-6">
+        {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold">Controle de Custos</h1>
-            <p className="text-sm text-[var(--ink-muted)] mt-1">
-              Visão geral das finanças da operação
+            <h1 className="text-2xl font-bold">Painel Financeiro</h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              Visão consolidada de custos, receitas e orçamentos
             </p>
           </div>
-          <div className="flex gap-2">
-            <Button variant="outline">
-              <Calendar className="h-4 w-4 mr-2" />
-              Últimos 6 meses
-            </Button>
-            <Button className="bg-orange-500 hover:bg-orange-600">
-              <DollarSign className="h-4 w-4 mr-2" />
-              Exportar Relatório
-            </Button>
+          <div className="flex items-center gap-2">
+            <Select value={period} onValueChange={setPeriod}>
+              <SelectTrigger className="w-[180px]">
+                <Calendar className="h-4 w-4 mr-2" />
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {Array.from({ length: 12 }, (_, i) => {
+                  const d = new Date()
+                  d.setMonth(d.getMonth() - i)
+                  const value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+                  const label = d.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })
+                  return <SelectItem key={value} value={value}>{label}</SelectItem>
+                })}
+              </SelectContent>
+            </Select>
+
+            <Sheet open={showCostForm} onOpenChange={setShowCostForm}>
+              <SheetTrigger asChild>
+                <Button className="bg-orange-500 hover:bg-orange-600">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Novo Lançamento
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-full sm:max-w-xl overflow-y-auto">
+                <SheetHeader>
+                  <SheetTitle>Lançar Custo</SheetTitle>
+                  <SheetDescription>
+                    Preencha os dados do custo manual
+                  </SheetDescription>
+                </SheetHeader>
+                <div className="mt-6">
+                  <CostForm
+                    profileType="admin"
+                    onSuccess={() => {
+                      setShowCostForm(false)
+                      notifySuccess("Custo cadastrado com sucesso!")
+                      loadData()
+                    }}
+                    onCancel={() => setShowCostForm(false)}
+                  />
+                </div>
+              </SheetContent>
+            </Sheet>
           </div>
         </div>
 
@@ -89,180 +303,394 @@ export default function CustosPage() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            whileHover={{ y: -4 }}
-            className="group"
+            transition={{ delay: 0 }}
           >
-          <Card className="p-4 bg-gradient-to-br from-green-50 to-green-100 border-green-200 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-medium text-green-700 mb-1">Receita Total</p>
-                <p className="text-2xl font-bold text-green-900">R$ {kpis.totalRevenue.toLocaleString('pt-BR')}</p>
-              </div>
-              <div className="h-10 w-10 rounded-full bg-green-200 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                <DollarSign className="h-6 w-6 text-green-700" />
-              </div>
-            </div>
-          </Card>
+            <Card className="relative overflow-hidden bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200 dark:from-orange-950 dark:to-orange-900 dark:border-orange-800">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/10 rounded-bl-full" />
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-orange-700 dark:text-orange-300 flex items-center gap-2">
+                  <TrendingDown className="h-4 w-4" />
+                  Total de Custos
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-orange-900 dark:text-orange-100">
+                  <CountUp value={kpis.totalCosts} />
+                </div>
+                <p className="text-xs text-orange-600 dark:text-orange-400 mt-1">
+                  {kpis.costEntries} lançamentos no mês
+                </p>
+              </CardContent>
+            </Card>
           </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+          >
+            <Card className="relative overflow-hidden bg-gradient-to-br from-green-50 to-green-100 border-green-200 dark:from-green-950 dark:to-green-900 dark:border-green-800">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-green-500/10 rounded-bl-full" />
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-green-700 dark:text-green-300 flex items-center gap-2">
+                  <TrendingUp className="h-4 w-4" />
+                  Total de Receitas
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-green-900 dark:text-green-100">
+                  <CountUp value={kpis.totalRevenues} />
+                </div>
+                <p className="text-xs text-green-600 dark:text-green-400 mt-1">
+                  {kpis.revenueEntries} lançamentos no mês
+                </p>
+              </CardContent>
+            </Card>
+          </motion.div>
+
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            whileHover={{ y: -4 }}
-            className="group"
           >
-          <Card className="p-4 bg-gradient-to-br from-red-50 to-red-100 border-red-200 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-medium text-red-700 mb-1">Custo Operacional</p>
-                <p className="text-2xl font-bold text-red-900">R$ {kpis.operationalCost.toLocaleString('pt-BR')}</p>
-              </div>
-              <div className="h-10 w-10 rounded-full bg-red-200 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                <TrendingDown className="h-6 w-6 text-red-700" />
-              </div>
-            </div>
-          </Card>
+            <Card className={`relative overflow-hidden ${kpis.margin >= 0
+                ? 'bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 dark:from-blue-950 dark:to-blue-900 dark:border-blue-800'
+                : 'bg-gradient-to-br from-red-50 to-red-100 border-red-200 dark:from-red-950 dark:to-red-900 dark:border-red-800'
+              }`}>
+              <div className={`absolute top-0 right-0 w-32 h-32 ${kpis.margin >= 0 ? 'bg-blue-500/10' : 'bg-red-500/10'} rounded-bl-full`} />
+              <CardHeader className="pb-2">
+                <CardTitle className={`text-sm font-medium flex items-center gap-2 ${kpis.margin >= 0 ? 'text-blue-700 dark:text-blue-300' : 'text-red-700 dark:text-red-300'
+                  }`}>
+                  {kpis.margin >= 0 ? <TrendingUp className="h-4 w-4" /> : <TrendingDown className="h-4 w-4" />}
+                  Margem
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className={`text-2xl font-bold ${kpis.margin >= 0 ? 'text-blue-900 dark:text-blue-100' : 'text-red-900 dark:text-red-100'}`}>
+                  <CountUp value={Math.abs(kpis.margin)} prefix={kpis.margin < 0 ? '-' : ''} />
+                </div>
+                <p className={`text-xs mt-1 ${kpis.margin >= 0 ? 'text-blue-600 dark:text-blue-400' : 'text-red-600 dark:text-red-400'}`}>
+                  {kpis.marginPercent}% da receita
+                </p>
+              </CardContent>
+            </Card>
           </motion.div>
+
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            whileHover={{ y: -4 }}
-            className="group"
           >
-          <Card className="p-4 bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-medium text-blue-700 mb-1">Margem de Lucro</p>
-                <p className="text-2xl font-bold text-blue-900">{kpis.profitMargin}%</p>
-              </div>
-              <div className="h-10 w-10 rounded-full bg-blue-200 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                <TrendingUp className="h-6 w-6 text-blue-700" />
-              </div>
-            </div>
-          </Card>
-          </motion.div>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            whileHover={{ y: -4 }}
-            className="group"
-          >
-          <Card className="p-4 bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-medium text-purple-700 mb-1">Quilometragem Total</p>
-                <p className="text-2xl font-bold text-purple-900">{kpis.totalKm.toLocaleString('pt-BR')} km</p>
-              </div>
-              <div className="h-10 w-10 rounded-full bg-purple-200 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                <BarChart3 className="h-6 w-6 text-purple-700" />
-              </div>
-            </div>
-          </Card>
+            <Card className="relative overflow-hidden bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 dark:from-purple-950 dark:to-purple-900 dark:border-purple-800">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 rounded-bl-full" />
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-purple-700 dark:text-purple-300 flex items-center gap-2">
+                  <RefreshCw className="h-4 w-4" />
+                  Custos Recorrentes
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-purple-900 dark:text-purple-100">
+                  {kpis.recurringCount}
+                </div>
+                <p className="text-xs text-purple-600 dark:text-purple-400 mt-1">
+                  lançamentos automáticos ativos
+                </p>
+              </CardContent>
+            </Card>
           </motion.div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Gráfico de Tendência (Receita x Custo) */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-            className="lg:col-span-2"
-          >
-          <Card className="p-6 bg-card/50 backdrop-blur-sm border-[var(--border)] hover:shadow-xl transition-all duration-300">
-            <h2 className="text-lg font-semibold mb-6">Evolução Financeira</h2>
-            <div className="h-[300px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={monthlyTrend}>
-                  <defs>
-                    <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#22c55e" stopOpacity={0.1} />
-                      <stop offset="95%" stopColor="#22c55e" stopOpacity={0} />
-                    </linearGradient>
-                    <linearGradient id="colorCost" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#ef4444" stopOpacity={0.1} />
-                      <stop offset="95%" stopColor="#ef4444" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                  <XAxis dataKey="month" />
-                  <YAxis />
-                  <Tooltip
-                    formatter={(value: number) => [`R$ ${value.toLocaleString('pt-BR')}`, '']}
-                    contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                  />
-                  <Legend />
-                  <Area
-                    type="monotone"
-                    dataKey="revenue"
-                    name="Receita"
-                    stroke="#22c55e"
-                    fillOpacity={1}
-                    fill="url(#colorRevenue)"
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="cost"
-                    name="Custo"
-                    stroke="#ef4444"
-                    fillOpacity={1}
-                    fill="url(#colorCost)"
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
-          </Card>
-          </motion.div>
+        {/* Tabs de conteúdo */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="overview">Visão Geral</TabsTrigger>
+            <TabsTrigger value="costs">Custos</TabsTrigger>
+            <TabsTrigger value="revenues">Receitas</TabsTrigger>
+            <TabsTrigger value="budget">Orçamento</TabsTrigger>
+          </TabsList>
 
-          {/* Gráfico de Distribuição */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6 }}
-          >
-          <Card className="p-6 bg-card/50 backdrop-blur-sm border-[var(--border)] hover:shadow-xl transition-all duration-300">
-            <h2 className="text-lg font-semibold mb-6">Distribuição de Custos</h2>
-            <div className="h-[300px] w-full relative">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={distribution}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={80}
-                    paddingAngle={5}
-                    dataKey="value"
-                  >
-                    {distribution.map((entry: any, index: number) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    formatter={(value: number) => [`${value}%`, '']}
-                    contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-              {/* Legenda Customizada */}
-              <div className="mt-4 space-y-2">
-                {distribution.map((item: any) => (
-                  <div key={item.name} className="flex items-center justify-between text-sm">
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }} />
-                      <span className="text-gray-600">{item.name}</span>
-                    </div>
-                    <span className="font-medium">{item.value}%</span>
+          <TabsContent value="overview" className="space-y-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              {/* Gráfico de tendência - usa dados legados se disponíveis */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <BarChart3 className="h-5 w-5" />
+                    Evolução Financeira
+                  </CardTitle>
+                  <CardDescription>Receita vs Custo ao longo do tempo</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-[300px] w-full">
+                    {legacyData?.monthlyTrend ? (
+                      <ResponsiveContainer width="100%" height="100%">
+                        <AreaChart data={legacyData.monthlyTrend}>
+                          <defs>
+                            <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="5%" stopColor="#22c55e" stopOpacity={0.1} />
+                              <stop offset="95%" stopColor="#22c55e" stopOpacity={0} />
+                            </linearGradient>
+                            <linearGradient id="colorCost" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="5%" stopColor="#ef4444" stopOpacity={0.1} />
+                              <stop offset="95%" stopColor="#ef4444" stopOpacity={0} />
+                            </linearGradient>
+                          </defs>
+                          <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                          <XAxis dataKey="month" className="text-xs" />
+                          <YAxis tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} className="text-xs" />
+                          <Tooltip
+                            formatter={(value: number) => [formatCurrency(value), '']}
+                            contentStyle={{
+                              backgroundColor: 'hsl(var(--card))',
+                              border: '1px solid hsl(var(--border))',
+                              borderRadius: '8px',
+                            }}
+                          />
+                          <Legend />
+                          <Area
+                            type="monotone"
+                            dataKey="revenue"
+                            name="Receita"
+                            stroke="#22c55e"
+                            fillOpacity={1}
+                            fill="url(#colorRevenue)"
+                          />
+                          <Area
+                            type="monotone"
+                            dataKey="cost"
+                            name="Custo"
+                            stroke="#ef4444"
+                            fillOpacity={1}
+                            fill="url(#colorCost)"
+                          />
+                        </AreaChart>
+                      </ResponsiveContainer>
+                    ) : (
+                      <div className="flex items-center justify-center h-full text-muted-foreground">
+                        Dados de tendência não disponíveis
+                      </div>
+                    )}
                   </div>
-                ))}
-              </div>
+                </CardContent>
+              </Card>
+
+              {/* Gráfico de pizza por categoria */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <PieChartIcon className="h-5 w-5" />
+                    Distribuição de Custos
+                  </CardTitle>
+                  <CardDescription>Por categoria no período</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {categoryData.length > 0 ? (
+                    <div className="h-[300px] w-full">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                          <Pie
+                            data={categoryData}
+                            cx="50%"
+                            cy="50%"
+                            innerRadius={60}
+                            outerRadius={100}
+                            paddingAngle={5}
+                            dataKey="value"
+                          >
+                            {categoryData.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={entry.color} />
+                            ))}
+                          </Pie>
+                          <Tooltip formatter={(value: number) => formatCurrency(value)} />
+                        </PieChart>
+                      </ResponsiveContainer>
+                      {/* Legenda */}
+                      <div className="mt-4 space-y-2">
+                        {categoryData.slice(0, 5).map((item) => (
+                          <div key={item.name} className="flex items-center justify-between text-sm">
+                            <div className="flex items-center gap-2">
+                              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }} />
+                              <span className="text-muted-foreground truncate max-w-[150px]">{item.name}</span>
+                            </div>
+                            <span className="font-medium">{formatCurrency(item.value)}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="h-[300px] flex items-center justify-center text-muted-foreground">
+                      Nenhum custo lançado no período
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
             </div>
-          </Card>
-          </motion.div>
-        </div>
+          </TabsContent>
+
+          <TabsContent value="costs" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <div className="flex justify-between items-center">
+                  <CardTitle>Custos do Período</CardTitle>
+                  <Button variant="outline" size="sm">
+                    <Download className="h-4 w-4 mr-2" />
+                    Exportar
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                {costs.length > 0 ? (
+                  <div className="space-y-2">
+                    {costs.map((cost) => (
+                      <motion.div
+                        key={cost.id}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors cursor-pointer"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div
+                            className="w-2 h-2 rounded-full"
+                            style={{ backgroundColor: cost.category?.color || '#94A3B8' }}
+                          />
+                          <div>
+                            <p className="font-medium">{cost.description}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {cost.category?.name || 'Sem categoria'} • {new Date(cost.costDate).toLocaleDateString('pt-BR')}
+                              {cost.company?.name && ` • ${cost.company.name}`}
+                              {cost.carrier?.name && ` • ${cost.carrier.name}`}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {cost.isRecurring && (
+                            <Badge variant="outline" className="text-xs">
+                              <RefreshCw className="h-3 w-3 mr-1" />
+                              Recorrente
+                            </Badge>
+                          )}
+                          <span className="font-semibold text-orange-500">
+                            {formatCurrency(cost.amount)}
+                          </span>
+                          <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                    <p>Nenhum custo lançado no período</p>
+                    <Button
+                      variant="outline"
+                      className="mt-4"
+                      onClick={() => setShowCostForm(true)}
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      Lançar primeiro custo
+                    </Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="revenues" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <div className="flex justify-between items-center">
+                  <CardTitle>Receitas do Período</CardTitle>
+                  <Button variant="outline" size="sm">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Nova Receita
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                {revenues.length > 0 ? (
+                  <div className="space-y-2">
+                    {revenues.map((revenue) => (
+                      <motion.div
+                        key={revenue.id}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors cursor-pointer"
+                      >
+                        <div>
+                          <p className="font-medium">{revenue.description}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {revenue.category} • {new Date(revenue.revenueDate).toLocaleDateString('pt-BR')}
+                            {revenue.contractReference && ` • Contrato: ${revenue.contractReference}`}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="font-semibold text-green-500">
+                            {formatCurrency(revenue.amount)}
+                          </span>
+                          <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <DollarSign className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                    <p>Nenhuma receita lançada no período</p>
+                    <Button variant="outline" className="mt-4">
+                      <Plus className="h-4 w-4 mr-2" />
+                      Lançar primeira receita
+                    </Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="budget" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <BarChart3 className="h-5 w-5" />
+                  Orçado vs Realizado
+                </CardTitle>
+                <CardDescription>Comparativo por categoria</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {budgetVsActualData.length > 0 ? (
+                  <ResponsiveContainer width="100%" height={400}>
+                    <BarChart data={budgetVsActualData} layout="vertical">
+                      <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                      <XAxis type="number" tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} />
+                      <YAxis type="category" dataKey="name" width={120} className="text-xs" />
+                      <Tooltip
+                        formatter={(value: number) => formatCurrency(value)}
+                        contentStyle={{
+                          backgroundColor: 'hsl(var(--card))',
+                          border: '1px solid hsl(var(--border))',
+                          borderRadius: '8px',
+                        }}
+                      />
+                      <Legend />
+                      <Bar dataKey="budgeted" fill="#2563EB" name="Orçado" radius={[0, 4, 4, 0]} />
+                      <Bar dataKey="actual" fill="#F97316" name="Realizado" radius={[0, 4, 4, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <AlertTriangle className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                    <p>Nenhum orçamento definido para o período</p>
+                    <p className="text-sm mt-2">Configure orçamentos por categoria para acompanhar os gastos</p>
+                    <Button variant="outline" className="mt-4">
+                      <Plus className="h-4 w-4 mr-2" />
+                      Configurar Orçamento
+                    </Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </AppShell>
   )
