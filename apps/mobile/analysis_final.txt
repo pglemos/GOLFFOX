@@ -1,8 +1,0 @@
-Analyzing mobile...                                             
-
-   info - Unnecessary use of a block function body - lib\screens\passenger\passenger_dashboard.dart:193:38 - prefer_expression_function_bodies
-   info - To-do comment doesn't follow the Flutter style - lib\screens\passenger\passenger_dashboard.dart:194:5 - flutter_style_todos
-  error - Expected a method, getter, setter or operator declaration - lib\screens\passenger\passenger_dashboard.dart:237:1 - expected_executable
-   info - Dependencies not sorted alphabetically - pubspec.yaml:42:3 - sort_pub_dependencies
-
-4 issues found. (ran in 4.6s)

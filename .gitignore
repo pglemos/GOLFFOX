@@ -1,15 +1,16 @@
-# Flutter/Dart tool directories
-.dart_tool/
-.packages
-.pub-cache/
-build/
-.flutter-plugins
-.flutter-plugins-dependencies
+# React Native / Expo
+apps/mobile/node_modules/
+apps/mobile/.expo/
+apps/mobile/ios/Pods/
+apps/mobile/android/.gradle/
+apps/mobile/android/app/build/
+apps/mobile/*.jks
+apps/mobile/*.keystore
+apps/mobile/.env
+apps/mobile/.env.local
 
-# Generated files
-**/GeneratedPluginRegistrant.dart
-**/*.g.dart
-**/*.freezed.dart
+# Expo EAS
+apps/mobile/.eas/
 
 # IntelliJ / Android Studio
 *.iml
@@ -27,20 +28,17 @@ ehthumbs.db
 Desktop.ini
 CON
 
-# Android specific
-android/key.properties
-android/local.properties
-android/app/debug/
-android/app/profile/
-android/app/release/
+# Android specific (React Native)
+apps/mobile/android/key.properties
+apps/mobile/android/local.properties
+apps/mobile/android/app/debug/
+apps/mobile/android/app/profile/
+apps/mobile/android/app/release/
 
-# iOS specific
-ios/Flutter/Flutter.framework
-ios/Flutter/Generated.xcconfig
-ios/Flutter/flutter_export_environment.sh
-ios/Pods/
-ios/Runner.xcworkspace/xcuserdata/
-ios/Runner.xcodeproj/xcuserdata/
+# iOS specific (React Native)
+apps/mobile/ios/Pods/
+apps/mobile/ios/*.xcworkspace/xcuserdata/
+apps/mobile/ios/*.xcodeproj/xcuserdata/
 
 # Web App (Next.js/Node.js)
 web-app/node_modules/
@@ -144,10 +142,10 @@ scripts/overwrite_env.js
 
 # Sentry Config File
 .env.sentry-build-plugin
-
-sentry.properties
-
 sentry.properties
 
 # MCP Configuration (contains secrets)
 mcp.json
+
+# Flutter SDK (should not be in repo - remove if present)
+flutter/

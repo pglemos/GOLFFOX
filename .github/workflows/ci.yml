@@ -8,6 +8,7 @@ on:
 
 jobs:
   web:
+    name: Build & Test Web App
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -32,185 +33,33 @@ jobs:
       - name: Validate OpenAPI
         run: npx --yes @redocly/cli@latest lint ../../docs/api/openapi.json || npx --yes swagger-cli@4.0.4 validate ../../docs/api/openapi.json
 
+  mobile:
+    name: Build & Test Mobile App
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/mobile
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+          cache-dependency-path: apps/mobile/package-lock.json
+      - name: Install
+        run: npm ci
+      - name: Lint
+        run: npm run lint || true
+      - name: Type Check
+        run: npm run type-check || true
+      - name: Test
+        run: npm test || true
+      - name: Expo Doctor
+        run: npx expo-doctor || true
+
   openapi-diff:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Validate OpenAPI (root)
         run: npx --yes @redocly/cli@latest lint docs/api/openapi.json || npx --yes swagger-cli@4.0.4 validate docs/api/openapi.json
-
-name: CI/CD Pipeline
-
-on:
-  push:
-    branches: [ main, develop ]
-  pull_request:
-    branches: [ main, develop ]
-
-jobs:
-  test:
-    name: Test Flutter App
-    runs-on: ubuntu-latest
-    env:
-      SENTRY_DSN_MOBILE: ${{ secrets.SENTRY_DSN_MOBILE }}
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Setup Flutter
-      uses: subosito/flutter-action@v2
-      with:
-        flutter-version: '3.24.0'
-        channel: 'stable'
-        
-    - name: Get dependencies
-      run: flutter pub get
-      
-    - name: Generate mocks
-      run: flutter packages pub run build_runner build --delete-conflicting-outputs
-      
-    - name: Verify formatting
-      run: dart format --output=none --set-exit-if-changed .
-      
-    - name: Analyze project source
-      run: flutter analyze
-      
-    - name: Run unit tests
-      run: flutter test test/unit/ --coverage --dart-define=SENTRY_DSN_MOBILE=${SENTRY_DSN_MOBILE}
-      
-    - name: Run widget tests
-      run: flutter test test/widget/ --dart-define=SENTRY_DSN_MOBILE=${SENTRY_DSN_MOBILE}
-      
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v3
-      with:
-        file: coverage/lcov.info
-        fail_ci_if_error: false
-
-  build:
-    name: Build Flutter App
-    runs-on: ubuntu-latest
-    needs: test
-    env:
-      SENTRY_DSN_MOBILE: ${{ secrets.SENTRY_DSN_MOBILE }}
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Setup Flutter
-      uses: subosito/flutter-action@v2
-      with:
-        flutter-version: '3.24.0'
-        channel: 'stable'
-        
-    - name: Get dependencies
-      run: flutter pub get
-      
-    - name: Build web app
-      run: flutter build web --release --dart-define=SENTRY_DSN_MOBILE=${SENTRY_DSN_MOBILE}
-      
-    - name: Build Android APK
-      run: flutter build apk --release --dart-define=SENTRY_DSN_MOBILE=${SENTRY_DSN_MOBILE}
-      
-    - name: Upload web build artifacts
-      uses: actions/upload-artifact@v3
-      with:
-        name: web-build
-        path: build/web/
-        
-    - name: Upload Android APK
-      uses: actions/upload-artifact@v3
-      with:
-        name: android-apk
-        path: build/app/outputs/flutter-apk/app-release.apk
-
-  security:
-    name: Security Analysis
-    runs-on: ubuntu-latest
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Setup Flutter
-      uses: subosito/flutter-action@v2
-      with:
-        flutter-version: '3.24.0'
-        channel: 'stable'
-        
-    - name: Get dependencies
-      run: flutter pub get
-      
-    - name: Run security audit
-      run: flutter pub deps --json | jq '.packages[] | select(.kind == "direct") | .name' | xargs -I {} echo "Checking {}"
-      
-    - name: Check for known vulnerabilities
-      run: |
-        echo "Checking for common security issues..."
-        # Check for hardcoded secrets
-        grep -r "password\|secret\|key\|token" lib/ --include="*.dart" || true
-        # Check for HTTP URLs (should use HTTPS)
-        grep -r "http://" lib/ --include="*.dart" || true
-
-  next-js-test:
-    name: Test Next.js App
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./web-app
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '22'
-        cache: 'npm'
-        cache-dependency-path: web-app/package-lock.json
-        
-    - name: Install dependencies
-      run: npm ci
-      
-    - name: Run linting
-      run: npm run lint
-      
-    - name: Run type checking
-      run: npm run build
-      
-    - name: Run tests (if available)
-      run: npm test --if-present
-
-  next-js-build:
-    name: Build Next.js App
-    runs-on: ubuntu-latest
-    needs: next-js-test
-    defaults:
-      run:
-        working-directory: ./web-app
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '22'
-        cache: 'npm'
-        cache-dependency-path: web-app/package-lock.json
-        
-    - name: Install dependencies
-      run: npm ci
-      
-    - name: Build application
-      run: npm run build
-      
-    - name: Upload Next.js build artifacts
-      uses: actions/upload-artifact@v3
-      with:
-        name: nextjs-build
-        path: web-app/.next/

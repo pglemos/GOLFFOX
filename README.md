@@ -1,6 +1,6 @@
 # 🚌 GolfFox - Sistema de Gestão de Transporte Urbano
 
-[![Flutter](https://img.shields.io/badge/Flutter-3.24.0+-blue.svg)](https://flutter.dev/)
+[![React Native](https://img.shields.io/badge/React%20Native-Expo%2052-61DAFB.svg)](https://expo.dev/)
 [![Next.js](https://img.shields.io/badge/Next.js-16.1.0-black.svg)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9.3-blue.svg)](https://www.typescriptlang.org/)
 [![Supabase](https://img.shields.io/badge/Supabase%20JS-2.82.0-green.svg)](https://supabase.com/)
@@ -45,45 +45,48 @@ O **GolfFox** é uma plataforma completa de gestão de transporte urbano que ofe
 
 O projeto utiliza uma arquitetura híbrida moderna:
 
-- **Frontend Mobile**: Flutter 3.24+ (iOS/Android)
+- **Frontend Mobile**: React Native (Expo 52) + TypeScript (iOS/Android)
 - **Frontend Web**: Next.js 16.1 com TypeScript, App Router, Turbopack
 - **Backend**: Supabase (PostgreSQL + Auth + Storage + Realtime)
 - **Arquitetura**: Clean Architecture + Domain Driven Design
-- **Estado**: Riverpod (Flutter) + React Hooks + Zustand + TanStack Query (Next.js)
-- **Estilização**: Tailwind CSS 4.0 (LightningCSS) + Framer Motion + Radix UI
-- **Mapas**: Google Maps API + @react-google-maps/api
-- **Deploy**: Vercel (Web) + GitHub Actions (CI/CD)
-- **Monitoramento**: Sentry (Flutter + Next.js) + Vercel Speed Insights
+- **Estado**: React Hooks + Zustand + TanStack Query
+- **Estilização**: Tailwind CSS 4.0 (Web) + NativeWind (Mobile) + Radix UI
+- **Mapas**: Google Maps API + react-native-maps (Mobile) + @react-google-maps/api (Web)
+- **Deploy**: Vercel (Web) + EAS Build (Mobile) + GitHub Actions (CI/CD)
+- **Monitoramento**: Sentry + Vercel Speed Insights
 
 ### Estrutura do Projeto
 
 ```
 📁 GOLFFOX/
-├── 📱 apps/mobile/            # Flutter App (Mobile)
-│   ├── lib/
-│   │   ├── 🏗️ core/          # Camada Core (Shared)
-│   │   │   ├── auth/         # Sistema de autenticação
-│   │   │   ├── config/       # Configurações
-│   │   │   ├── error/        # Tratamento de erros
-│   │   │   ├── logging/      # Sistema de logging
-│   │   │   ├── routing/      # Roteamento
-│   │   │   ├── security/     # Segurança
-│   │   │   ├── theme/        # Temas e estilos
-│   │   │   ├── supabase/     # Cliente Supabase
-│   │   │   └── utils/        # Utilitários
-│   │   ├── 🎯 features/      # Features por domínio
-│   │   │   ├── auth/         # Autenticação
-│   │   │   ├── driver/       # App Motorista
-│   │   │   ├── passenger/    # App Passageiro
-│   │   │   ├── mapa/         # Mapa e rastreamento
-│   │   │   ├── routes/       # Rotas
-│   │   │   └── vehicles/     # Veículos
-│   │   ├── 📊 models/        # Modelos de dados
-│   │   ├── 🎨 widgets/       # Componentes reutilizáveis
-│   │   ├── 🖥️ screens/       # Telas da aplicação
-│   │   ├── 🔧 services/      # Serviços
-│   │   └── 🎛️ providers/     # Providers (Riverpod)
-│   └── pubspec.yaml          # Dependências Flutter
+├── 📱 apps/mobile/            # React Native App (Expo)
+│   ├── app/                   # Expo Router (File-based routing)
+│   │   ├── _layout.tsx        # Layout raiz (providers)
+│   │   ├── index.tsx          # Tela inicial (redirect)
+│   │   ├── login.tsx          # Tela de login
+│   │   ├── driver/            # Rotas do Motorista
+│   │   │   ├── _layout.tsx    # Stack do motorista
+│   │   │   ├── index.tsx      # Dashboard motorista
+│   │   │   ├── checklist.tsx  # Checklist pré-rota
+│   │   │   ├── route.tsx      # Mapa com rastreamento
+│   │   │   ├── scan.tsx       # Scanner QR/NFC
+│   │   │   └── history.tsx    # Histórico de viagens
+│   │   └── passenger/         # Rotas do Passageiro
+│   │       ├── _layout.tsx    # Stack do passageiro
+│   │       ├── index.tsx      # Dashboard passageiro
+│   │       ├── map.tsx        # Mapa tempo real
+│   │       ├── details.tsx    # Detalhes da rota
+│   │       └── feedback.tsx   # Avaliação
+│   ├── src/                   # Código-fonte
+│   │   ├── auth/              # Autenticação (hooks, context)
+│   │   ├── services/          # Supabase, geolocalização
+│   │   ├── components/        # UI compartilhado
+│   │   ├── features/          # Funcionalidades (checkin, tracking)
+│   │   └── utils/             # Utilitários
+│   ├── assets/                # Ícones e imagens
+│   ├── app.config.ts          # Configuração Expo
+│   ├── eas.json               # Configuração EAS Build
+│   └── package.json           # Dependências
 │
 ├── 🌐 apps/web/               # Next.js Web App
 │   ├── app/                   # App Router (Next.js 16.1 + Turbopack)
