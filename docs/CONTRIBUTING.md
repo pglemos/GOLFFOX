@@ -31,14 +31,6 @@ Exemplos de comportamento que contribuem para um ambiente positivo:
 - Focar no que é melhor para a comunidade
 - Mostrar empatia com outros membros da comunidade
 
-### Comportamentos Inaceitáveis
-
-- Uso de linguagem ou imagens sexualizadas
-- Trolling, comentários insultuosos/depreciativos e ataques pessoais ou políticos
-- Assédio público ou privado
-- Publicar informações privadas de outros sem permissão explícita
-- Outras condutas que poderiam ser consideradas inadequadas em um ambiente profissional
-
 ## Como Contribuir
 
 ### Tipos de Contribuição
@@ -69,70 +61,92 @@ Valorizamos todos os tipos de contribuição:
 
 ### Pré-requisitos
 
-- **Flutter SDK**: Versão 3.0 ou superior
-- **Dart SDK**: Versão 2.17 ou superior
+- **Node.js**: Versão 22.x (recomendado) ou 18.17+
+- **npm**: Versão 9.0.0 ou superior
 - **Git**: Para controle de versão
-- **IDE**: VS Code, Android Studio ou IntelliJ IDEA
-- **Emulador/Dispositivo**: Para testes
+- **IDE**: VS Code (recomendado)
+- **Expo Go**: App para testes mobile (iOS/Android)
 
 ### Instalação
 
 ```bash
 # 1. Clone o repositório
-git clone https://github.com/seu-usuario/golffox.git
-cd golffox
+git clone https://github.com/pglemos/GOLFFOX.git
+cd GOLFFOX
 
-# 2. Instale as dependências
-flutter pub get
+# 2. Instale as dependências Web
+cd apps/web
+npm install
 
-# 3. Configure as variáveis de ambiente
-cp .env.example .env
-# Edite o arquivo .env com suas configurações
+# 3. Instale as dependências Mobile
+cd ../mobile
+npm install
 
-# 4. Execute os testes
-flutter test
+# 4. Configure as variáveis de ambiente
+cd ../web
+cp .env.example .env.local
+# Edite o arquivo .env.local com suas configurações
 
-# 5. Execute a aplicação
-flutter run
+# 5. Execute a aplicação Web
+npm run dev
+
+# 6. Execute a aplicação Mobile (em outro terminal)
+cd ../mobile
+npx expo start
 ```
 
 ### Configuração do IDE
 
-#### VS Code
+#### VS Code (Recomendado)
 
 Instale as extensões recomendadas:
 
 ```json
 {
   "recommendations": [
-    "dart-code.dart-code",
-    "dart-code.flutter",
-    "ms-vscode.vscode-json",
-    "bradlc.vscode-tailwindcss"
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "bradlc.vscode-tailwindcss",
+    "dsznajder.es7-react-js-snippets",
+    "formulahendry.auto-rename-tag"
   ]
 }
 ```
 
-#### Android Studio
+Configurações recomendadas (`.vscode/settings.json`):
 
-1. Instale o plugin Flutter
-2. Configure o SDK do Flutter
-3. Configure o emulador Android
+```json
+{
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
+  "typescript.preferences.importModuleSpecifier": "relative"
+}
+```
 
 ### Verificação da Configuração
 
 ```bash
-# Verificar instalação do Flutter
-flutter doctor
+# Verificar instalação do Node.js
+node --version  # Deve mostrar v22.x.x
 
-# Verificar dependências do projeto
-flutter pub deps
+# Verificar npm
+npm --version  # Deve mostrar 9.x.x ou superior
 
-# Executar análise estática
-flutter analyze
+# Verificar dependências do projeto Web
+cd apps/web
+npm list --depth=0
+
+# Executar linting
+npm run lint
+
+# Executar type check
+npm run type-check
 
 # Executar testes
-flutter test
+npm test
 ```
 
 ## Processo de Desenvolvimento
@@ -225,76 +239,114 @@ test(routes): add unit tests for route calculation
 chore: update dependencies to latest versions
 ```
 
-### Code Review
-
-#### Checklist do Revisor
-
-- [ ] O código segue os padrões estabelecidos?
-- [ ] Os testes estão passando?
-- [ ] A funcionalidade está bem documentada?
-- [ ] Não há vazamentos de memória?
-- [ ] A performance está adequada?
-- [ ] A segurança foi considerada?
-- [ ] A acessibilidade foi considerada?
-
-#### Checklist do Autor
-
-- [ ] Código testado localmente
-- [ ] Testes unitários adicionados/atualizados
-- [ ] Documentação atualizada
-- [ ] Análise estática passou
-- [ ] Performance verificada
-- [ ] Acessibilidade verificada
-
 ## Padrões de Código
 
-### Linting
+### TypeScript
 
-Configure o `analysis_options.yaml`:
+#### Configuração ESLint
 
-```yaml
-include: package:flutter_lints/flutter.yaml
+O projeto usa ESLint com as seguintes regras principais:
 
-analyzer:
-  exclude:
-    - "**/*.g.dart"
-    - "**/*.freezed.dart"
-  
-linter:
-  rules:
-    # Estilo
-    - prefer_const_constructors
-    - prefer_const_literals_to_create_immutables
-    - prefer_final_locals
-    - prefer_single_quotes
-    
-    # Documentação
-    - public_member_api_docs
-    - comment_references
-    
-    # Segurança
-    - avoid_web_libraries_in_flutter
-    - secure_pubspec_urls
+```javascript
+// eslint.config.js
+export default [
+  {
+    rules: {
+      '@typescript-eslint/no-unused-vars': 'error',
+      '@typescript-eslint/no-explicit-any': 'warn',
+      'prefer-const': 'error',
+      'no-console': 'warn',
+    },
+  },
+];
 ```
 
 ### Formatação
 
 ```bash
 # Formatar código
-dart format lib/ test/
+npm run format
 
 # Verificar formatação
-dart format --set-exit-if-changed lib/ test/
+npm run format:check
 ```
 
 ### Análise Estática
 
 ```bash
-# Executar análise
-flutter analyze
+# Executar linting
+npm run lint
 
-# Análise com métricas
-dart run dart_code_metrics:metrics analyze lib/
+# Corrigir problemas automaticamente
+npm run lint:fix
+
+# Type check
+npm run type-check
+```
+
+### Convenções de Código
+
+#### Componentes React
+
+```typescript
+// ✅ Correto - Componente funcional com TypeScript
+interface Props {
+  title: string;
+  onPress: () => void;
+}
+
+export function MyComponent({ title, onPress }: Props) {
+  return (
+    <button onClick={onPress}>
+      {title}
+    </button>
+  );
+}
+
+// ❌ Evitar - Componente de classe ou sem tipos
+class MyComponent extends React.Component {
+  // ...
+}
+```
+
+#### Hooks Customizados
+
+```typescript
+// ✅ Correto - Hook com tipos e retorno claro
+export function useUser(userId: string) {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+
+  useEffect(() => {
+    fetchUser(userId)
+      .then(setUser)
+      .catch(setError)
+      .finally(() => setLoading(false));
+  }, [userId]);
+
+  return { user, loading, error };
+}
+```
+
+#### API Routes (Next.js)
+
+```typescript
+// ✅ Correto - API Route com tipos e tratamento de erros
+import { NextRequest, NextResponse } from 'next/server';
+
+export async function GET(request: NextRequest) {
+  try {
+    const data = await fetchData();
+    return NextResponse.json(data);
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    return NextResponse.json(
+      { error: 'Internal Server Error' },
+      { status: 500 }
+    );
+  }
+}
 ```
 
 ## Testes
@@ -302,172 +354,86 @@ dart run dart_code_metrics:metrics analyze lib/
 ### Estrutura de Testes
 
 ```
-test/
-├── unit/                   # Testes unitários
-│   ├── core/
-│   ├── features/
-│   └── shared/
-├── widget/                 # Testes de widget
-│   ├── pages/
-│   └── widgets/
-├── integration/            # Testes de integração
-│   ├── flows/
-│   └── scenarios/
-└── helpers/                # Utilitários de teste
-    ├── mocks/
-    └── fixtures/
+apps/web/
+├── __tests__/              # Testes unitários
+│   ├── components/
+│   ├── hooks/
+│   └── lib/
+├── e2e/                    # Testes E2E (Playwright)
+│   ├── auth.spec.ts
+│   └── admin.spec.ts
+└── jest.config.js          # Configuração Jest
+
+apps/mobile/
+└── __tests__/              # Testes unitários
+    └── components/
 ```
 
 ### Tipos de Teste
 
-#### Testes Unitários
+#### Testes Unitários (Jest + Testing Library)
 
-```dart
-// test/unit/core/validation/validators_test.dart
-import 'package:flutter_test/flutter_test.dart';
-import 'package:golffox/core/validation/validators.dart';
+```typescript
+// __tests__/components/Button.test.tsx
+import { render, screen, fireEvent } from '@testing-library/react';
+import { Button } from '@/components/ui/button';
 
-void main() {
-  group('Validators', () {
-    group('email', () {
-      test('should return null for valid email', () {
-        // Arrange
-        const email = 'test@example.com';
-        
-        // Act
-        final result = Validators.email(email);
-        
-        // Assert
-        expect(result, isNull);
-      });
-
-      test('should return error message for invalid email', () {
-        // Arrange
-        const email = 'invalid-email';
-        
-        // Act
-        final result = Validators.email(email);
-        
-        // Assert
-        expect(result, isNotNull);
-        expect(result, contains('email'));
-      });
-    });
+describe('Button', () => {
+  it('should render with correct text', () => {
+    render(<Button>Click me</Button>);
+    expect(screen.getByText('Click me')).toBeInTheDocument();
   });
-}
+
+  it('should call onClick when clicked', () => {
+    const handleClick = jest.fn();
+    render(<Button onClick={handleClick}>Click me</Button>);
+    
+    fireEvent.click(screen.getByText('Click me'));
+    
+    expect(handleClick).toHaveBeenCalledTimes(1);
+  });
+});
 ```
 
-#### Testes de Widget
+#### Testes E2E (Playwright)
 
-```dart
-// test/widget/pages/route_details_page_test.dart
-import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
-import 'package:golffox/features/routes/presentation/pages/route_details_page.dart';
+```typescript
+// e2e/auth.spec.ts
+import { test, expect } from '@playwright/test';
 
-void main() {
-  group('RouteDetailsPage', () {
-    testWidgets('should display route information', (tester) async {
-      // Arrange
-      final route = Route(
-        id: '1',
-        name: 'Test Route',
-        distance: 100,
-      );
-
-      // Act
-      await tester.pumpWidget(
-        MaterialApp(
-          home: RouteDetailsPage(route: route),
-        ),
-      );
-
-      // Assert
-      expect(find.text('Test Route'), findsOneWidget);
-      expect(find.text('100km'), findsOneWidget);
-    });
+test.describe('Authentication', () => {
+  test('should login successfully', async ({ page }) => {
+    await page.goto('/');
+    
+    await page.fill('input[name="email"]', 'admin@example.com');
+    await page.fill('input[name="password"]', 'password123');
+    await page.click('button[type="submit"]');
+    
+    await expect(page).toHaveURL('/admin');
+    await expect(page.locator('h1')).toContainText('Dashboard');
   });
-}
+});
 ```
 
-#### Testes de Integração
-
-```dart
-// test/integration/flows/route_creation_flow_test.dart
-import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
-import 'package:integration_test/integration_test.dart';
-import 'package:golffox/main.dart' as app;
-
-void main() {
-  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
-
-  group('Route Creation Flow', () {
-    testWidgets('should create route successfully', (tester) async {
-      // Arrange
-      app.main();
-      await tester.pumpAndSettle();
-
-      // Act
-      await tester.tap(find.byIcon(Icons.add));
-      await tester.pumpAndSettle();
-
-      await tester.enterText(find.byKey(Key('route_name_field')), 'Test Route');
-      await tester.enterText(find.byKey(Key('route_distance_field')), '100');
-
-      await tester.tap(find.text('Save'));
-      await tester.pumpAndSettle();
-
-      // Assert
-      expect(find.text('Route created successfully'), findsOneWidget);
-    });
-  });
-}
-```
-
-### Cobertura de Testes
+### Executando Testes
 
 ```bash
-# Executar testes com cobertura
-flutter test --coverage
+# Web - Testes unitários
+cd apps/web
+npm test
 
-# Gerar relatório HTML
-genhtml coverage/lcov.info -o coverage/html
+# Web - Testes com coverage
+npm run test:coverage
 
-# Visualizar relatório
-open coverage/html/index.html
-```
+# Web - Testes E2E
+npm run test:e2e
 
-### Mocks e Fixtures
+# Mobile - Type check
+cd apps/mobile
+npx tsc --noEmit
 
-```dart
-// test/helpers/mocks/route_repository_mock.dart
-import 'package:mockito/mockito.dart';
-import 'package:golffox/features/routes/domain/repositories/route_repository.dart';
-
-class MockRouteRepository extends Mock implements RouteRepository {}
-
-// test/helpers/fixtures/route_fixtures.dart
-import 'package:golffox/features/routes/domain/entities/route.dart';
-
-class RouteFixtures {
-  static Route get basicRoute => Route(
-    id: '1',
-    name: 'Test Route',
-    distance: 100,
-    createdAt: DateTime(2023, 1, 1),
-  );
-
-  static List<Route> get routeList => [
-    basicRoute,
-    Route(
-      id: '2',
-      name: 'Another Route',
-      distance: 200,
-      createdAt: DateTime(2023, 1, 2),
-    ),
-  ];
-}
+# Mobile - Expo Doctor
+npx expo-doctor
 ```
 
 ## Documentação
@@ -475,66 +441,40 @@ class RouteFixtures {
 ### Tipos de Documentação
 
 1. **README**: Visão geral e setup
-2. **API Docs**: Documentação da API
+2. **API Docs**: Documentação da API (OpenAPI)
 3. **Code Comments**: Comentários no código
 4. **Architecture**: Documentação da arquitetura
-5. **User Guide**: Guia do usuário
+5. **Guides**: Guias específicos em `docs/`
 
 ### Padrões de Documentação
 
 #### Comentários de Código
 
-```dart
-/// Calculates the total distance of a golf route.
-/// 
-/// This method takes into account the distance of each hole
-/// and the walking distance between holes.
-/// 
-/// Parameters:
-/// - [holes]: List of holes in the route
-/// - [includeWalking]: Whether to include walking distance
-/// 
-/// Returns the total distance in meters.
-/// 
-/// Throws [ArgumentError] if holes list is empty.
-/// 
-/// Example:
-/// ```dart
-/// final holes = [hole1, hole2, hole3];
-/// final distance = calculateTotalDistance(holes, true);
-/// print('Total distance: ${distance}m');
-/// ```
-double calculateTotalDistance(List<Hole> holes, bool includeWalking) {
-  if (holes.isEmpty) {
-    throw ArgumentError('Holes list cannot be empty');
+```typescript
+/**
+ * Calcula a distância total de uma rota.
+ * 
+ * @param stops - Lista de paradas na rota
+ * @param includeWalking - Se deve incluir distância a pé
+ * @returns A distância total em metros
+ * @throws Error se a lista de paradas estiver vazia
+ * 
+ * @example
+ * ```typescript
+ * const stops = [stop1, stop2, stop3];
+ * const distance = calculateTotalDistance(stops, true);
+ * console.log(`Total: ${distance}m`);
+ * ```
+ */
+function calculateTotalDistance(
+  stops: Stop[],
+  includeWalking: boolean
+): number {
+  if (stops.length === 0) {
+    throw new Error('Stops list cannot be empty');
   }
-  
   // Implementation...
 }
-```
-
-#### README Sections
-
-```markdown
-# Feature Name
-
-## Overview
-Brief description of the feature
-
-## Usage
-How to use the feature
-
-## API Reference
-Link to detailed API documentation
-
-## Examples
-Code examples
-
-## Testing
-How to test the feature
-
-## Contributing
-How to contribute to this feature
 ```
 
 ## Pull Requests
@@ -575,7 +515,7 @@ Fixes #(número da issue)
 
 ### Processo de Review
 
-1. **Automated Checks**: CI/CD deve passar
+1. **Automated Checks**: CI/CD deve passar (lint, type-check, tests, build)
 2. **Code Review**: Pelo menos um revisor
 3. **Testing**: Testes manuais se necessário
 4. **Documentation**: Documentação atualizada
@@ -603,10 +543,10 @@ Descrição clara do que você esperava que acontecesse.
 Se aplicável, adicione screenshots para ajudar a explicar o problema.
 
 ## Informações do Ambiente
-- OS: [ex: iOS 15.0, Android 12]
-- Dispositivo: [ex: iPhone 13, Samsung Galaxy S21]
+- OS: [ex: Windows 11, macOS Sonoma]
+- Browser: [ex: Chrome 120, Safari 17]
+- Node Version: [ex: 22.0.0]
 - Versão da App: [ex: 1.2.0]
-- Flutter Version: [ex: 3.0.0]
 
 ## Contexto Adicional
 Adicione qualquer outro contexto sobre o problema aqui.
@@ -653,12 +593,12 @@ Seguimos o [Semantic Versioning](https://semver.org/):
 
 ### Changelog
 
-Mantemos um `CHANGELOG.md` atualizado:
+Mantemos um `CHANGELOG.md` atualizado seguindo o formato [Keep a Changelog](https://keepachangelog.com/):
 
 ```markdown
 # Changelog
 
-## [1.2.0] - 2023-12-01
+## [1.2.0] - 2024-12-11
 
 ### Added
 - Nova funcionalidade de compartilhamento de rotas
@@ -670,43 +610,36 @@ Mantemos um `CHANGELOG.md` atualizado:
 
 ### Fixed
 - Corrigido bug no cálculo de distância
-- Resolvido problema de login em dispositivos Android
-
-### Deprecated
-- Método `oldCalculateDistance` será removido na v2.0.0
-
-### Removed
-- Removido suporte para Android API < 21
+- Resolvido problema de login
 
 ### Security
-- Corrigida vulnerabilidade de segurança no sistema de autenticação
+- Corrigida vulnerabilidade no sistema de autenticação
 ```
 
 ## Recursos Adicionais
 
 ### Links Úteis
 
-- [Flutter Documentation](https://flutter.dev/docs)
-- [Dart Style Guide](https://dart.dev/guides/language/effective-dart/style)
-- [Material Design Guidelines](https://material.io/design)
-- [Accessibility Guidelines](https://flutter.dev/docs/development/accessibility-and-localization/accessibility)
+- [React Documentation](https://react.dev/)
+- [Next.js Documentation](https://nextjs.org/docs)
+- [Expo Documentation](https://docs.expo.dev/)
+- [TypeScript Documentation](https://www.typescriptlang.org/docs/)
+- [Tailwind CSS Documentation](https://tailwindcss.com/docs)
+- [Supabase Documentation](https://supabase.com/docs)
 
 ### Comunidade
 
-- **Discord**: [Link do servidor Discord]
-- **Slack**: [Link do workspace Slack]
-- **Forum**: [Link do fórum]
-- **Stack Overflow**: Use a tag `golffox`
+- **GitHub Issues**: Para bugs e feature requests
+- **Pull Requests**: Para contribuições de código
 
 ### Suporte
 
 Se você precisar de ajuda:
 
-1. Verifique a documentação existente
+1. Verifique a documentação existente em `docs/`
 2. Procure em issues abertas e fechadas
 3. Abra uma nova issue com a label `question`
-4. Entre em contato através dos canais da comunidade
 
 ---
 
-Obrigado por contribuir com o GolfFox! Sua participação é fundamental para o sucesso do projeto. 🏌️‍♂️
+Obrigado por contribuir com o GolfFox! Sua participação é fundamental para o sucesso do projeto. 🚌

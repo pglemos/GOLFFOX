@@ -2,344 +2,365 @@
 
 ## Visão Geral
 
-O GolfFox é uma aplicação Flutter que segue os princípios de **Clean Architecture** e **Domain-Driven Design (DDD)**, proporcionando uma base sólida, escalável e maintível para o desenvolvimento de funcionalidades relacionadas ao golfe.
+O GolfFox é uma aplicação híbrida moderna que utiliza **React Native (Expo 54)** para mobile e **Next.js 16** para web, seguindo os princípios de **Clean Architecture** e **Domain-Driven Design (DDD)**. O backend é servido pelo **Supabase** (PostgreSQL + Auth + Storage + Realtime).
+
+## Stack Tecnológica
+
+### Frontend Mobile (React Native)
+| Tecnologia | Versão | Propósito |
+|------------|--------|-----------|
+| React Native | 0.81.5 | Framework mobile |
+| Expo | 54.0.27 | Build tool e runtime |
+| TypeScript | 5.9.2 | Linguagem |
+| Expo Router | 6.0.17 | Navegação file-based |
+| React Native Paper | 5.14.5 | Componentes UI |
+| react-native-maps | 1.26.20 | Mapas |
+| expo-location | 19.0.8 | Geolocalização |
+
+### Frontend Web (Next.js)
+| Tecnologia | Versão | Propósito |
+|------------|--------|-----------|
+| Next.js | 16.0.7 | Framework React |
+| React | 19.2.1 | UI Library |
+| TypeScript | 5.9.3 | Linguagem |
+| Tailwind CSS | 4.1.17 | Estilização |
+| Radix UI | Latest | Componentes acessíveis |
+| Zustand | 5.0.2 | Estado global |
+| TanStack Query | 5.90.12 | Cache e data fetching |
+
+### Backend
+| Tecnologia | Propósito |
+|------------|-----------|
+| Supabase | BaaS (Auth, Storage, Realtime) |
+| PostgreSQL | Banco de dados relacional |
+| Upstash Redis | Rate limiting |
 
 ## Estrutura do Projeto
 
 ```
-lib/
-├── core/                     # Núcleo da aplicação
-│   ├── auth/                # Sistema de autenticação
-│   ├── config/              # Configurações da aplicação
-│   ├── error/               # Tratamento de erros
-│   ├── logging/             # Sistema de logging
-│   ├── routing/             # Roteamento da aplicação
-│   ├── security/            # Sistemas de segurança
-│   ├── theme/               # Temas e estilos
-│   └── validation/          # Validações centralizadas
-├── features/                # Funcionalidades da aplicação
-│   ├── auth/               # Autenticação e autorização
-│   ├── routes/             # Gestão de rotas de golfe
-│   └── shared/             # Componentes compartilhados
-├── shared/                  # Recursos compartilhados
-│   ├── widgets/            # Widgets reutilizáveis
-│   ├── utils/              # Utilitários
-│   └── constants/          # Constantes
-└── main.dart               # Ponto de entrada da aplicação
+📁 GOLFFOX/
+├── 📱 apps/mobile/              # React Native App (Expo 54)
+│   ├── app/                     # Expo Router (File-based routing)
+│   │   ├── _layout.tsx          # Layout raiz (providers)
+│   │   ├── index.tsx            # Tela inicial (redirect)
+│   │   ├── login.tsx            # Tela de login
+│   │   ├── driver/              # Rotas do Motorista
+│   │   │   ├── _layout.tsx      # Stack do motorista
+│   │   │   ├── index.tsx        # Dashboard motorista
+│   │   │   ├── checklist.tsx    # Checklist pré-rota
+│   │   │   ├── route.tsx        # Mapa com rastreamento
+│   │   │   ├── scan.tsx         # Scanner QR/NFC
+│   │   │   └── history.tsx      # Histórico de viagens
+│   │   └── passenger/           # Rotas do Passageiro
+│   │       ├── _layout.tsx      # Stack do passageiro
+│   │       ├── index.tsx        # Dashboard passageiro
+│   │       ├── map.tsx          # Mapa tempo real
+│   │       ├── details.tsx      # Detalhes da rota
+│   │       └── feedback.tsx     # Avaliação
+│   ├── src/                     # Código-fonte
+│   │   ├── auth/                # Autenticação (hooks, context)
+│   │   ├── services/            # Supabase, geolocalização
+│   │   ├── components/          # UI compartilhado
+│   │   ├── features/            # Funcionalidades (checkin, tracking)
+│   │   └── utils/               # Utilitários
+│   ├── assets/                  # Ícones e imagens
+│   ├── app.config.ts            # Configuração Expo
+│   ├── eas.json                 # Configuração EAS Build
+│   └── package.json             # Dependências
+│
+├── 🌐 apps/web/                 # Next.js Web App
+│   ├── app/                     # App Router (Next.js 16 + Turbopack)
+│   │   ├── admin/               # Painel Administrativo
+│   │   ├── empresa/             # Painel da Empresa Contratante
+│   │   ├── transportadora/      # Painel da Transportadora
+│   │   ├── api/                 # API Routes
+│   │   ├── page.tsx             # Página de Login
+│   │   └── layout.tsx           # Layout Principal
+│   ├── components/              # Componentes React
+│   │   ├── ui/                  # Componentes UI base (Radix UI)
+│   │   ├── admin/               # Componentes Admin
+│   │   ├── empresa/             # Componentes Empresa
+│   │   ├── transportadora/      # Componentes Transportadora
+│   │   └── providers/           # Context Providers
+│   ├── lib/                     # Utilitários e Helpers
+│   │   ├── supabase.ts          # Cliente Supabase
+│   │   ├── auth.ts              # Gerenciamento de Auth
+│   │   └── logger.ts            # Sistema de Logging
+│   ├── hooks/                   # React Hooks customizados
+│   ├── middleware.ts            # Middleware Next.js
+│   └── package.json             # Dependências
+│
+├── 📚 database/                 # Banco de Dados
+│   ├── migrations/              # Migrations SQL
+│   ├── seeds/                   # Dados iniciais
+│   └── scripts/                 # Scripts SQL
+│
+├── 📚 docs/                     # Documentação técnica
+├── 🔧 scripts/                  # Scripts de automação
+└── 🏗️ supabase/                 # Configuração Supabase
 ```
 
 ## Camadas da Arquitetura
 
-### 1. Core Layer (Núcleo)
+### 1. Presentation Layer (Apresentação)
 
-O núcleo da aplicação contém todos os sistemas fundamentais que são utilizados por toda a aplicação:
+#### Mobile (React Native)
+- **Expo Router**: Navegação file-based em `app/`
+- **Componentes**: React Native Paper + componentes customizados
+- **Estado Local**: React useState/useReducer
 
-#### Auth (Autenticação)
-- **AuthManager**: Gerencia o estado de autenticação
-- **AuthService**: Serviços de autenticação
-- **AuthRepository**: Repositório de dados de autenticação
+```typescript
+// Exemplo: apps/mobile/app/driver/index.tsx
+import { View, Text } from 'react-native';
+import { useAuth } from '@/src/auth/useAuth';
 
-#### Config (Configuração)
-- **AppConfig**: Configurações centralizadas da aplicação
-- Gerenciamento de variáveis de ambiente
-- Validação de configurações essenciais
-
-#### Error (Tratamento de Erros)
-- **ErrorHandler**: Handler global de erros
-- **AppError**: Hierarquia de erros customizados
-- **ErrorFactory**: Factory para criação de erros
-
-#### Logging (Sistema de Logging)
-- **AppLogger**: Sistema de logging seguro
-- Mascaramento de dados sensíveis
-- Integração com serviços externos de monitoramento
-
-#### Security (Segurança)
-- **RateLimiter**: Sistema de rate limiting
-- **DataSanitizer**: Sanitização de dados
-- Prevenção contra ataques XSS, SQL Injection, etc.
-
-#### Validation (Validação)
-- **Validators**: Validadores centralizados
-- Expressões regulares para validação
-- Funções de validação compostas
-
-### 2. Features Layer (Funcionalidades)
-
-Cada feature segue a estrutura de Clean Architecture:
-
-```
-feature/
-├── data/
-│   ├── datasources/        # Fontes de dados (API, local)
-│   ├── models/             # Modelos de dados
-│   └── repositories/       # Implementação de repositórios
-├── domain/
-│   ├── entities/           # Entidades de domínio
-│   ├── repositories/       # Interfaces de repositórios
-│   └── usecases/          # Casos de uso
-└── presentation/
-    ├── pages/             # Páginas/Telas
-    ├── widgets/           # Widgets específicos da feature
-    └── providers/         # Gerenciamento de estado
+export default function DriverDashboard() {
+  const { user } = useAuth();
+  
+  return (
+    <View>
+      <Text>Bem-vindo, {user?.name}</Text>
+    </View>
+  );
+}
 ```
 
-### 3. Shared Layer (Compartilhado)
+#### Web (Next.js)
+- **App Router**: Navegação file-based em `app/`
+- **Componentes**: Radix UI + Tailwind CSS
+- **Estado Global**: Zustand para estado compartilhado
 
-Recursos que podem ser utilizados por múltiplas features:
+```typescript
+// Exemplo: apps/web/app/admin/page.tsx
+'use client';
+import { useAdminKPIs } from '@/hooks/useAdminKPIs';
 
-- **Widgets**: Componentes UI reutilizáveis
-- **Utils**: Funções utilitárias
-- **Constants**: Constantes da aplicação
+export default function AdminDashboard() {
+  const { data, isLoading } = useAdminKPIs();
+  
+  if (isLoading) return <LoadingSpinner />;
+  
+  return (
+    <div className="grid grid-cols-4 gap-4">
+      <KPICard title="Viagens" value={data.trips} />
+    </div>
+  );
+}
+```
 
-## Padrões Arquiteturais
+### 2. Application Layer (Aplicação)
 
-### Clean Architecture
+#### Hooks Customizados
+Encapsulam lógica de negócio e data fetching:
 
-A aplicação segue os princípios da Clean Architecture:
+```typescript
+// Exemplo: apps/web/hooks/useAdminKPIs.ts
+import { useQuery } from '@tanstack/react-query';
 
-1. **Independência de Frameworks**: O código de negócio não depende de frameworks específicos
-2. **Testabilidade**: Todas as camadas podem ser testadas independentemente
-3. **Independência de UI**: A UI pode ser alterada sem afetar o resto do sistema
-4. **Independência de Banco de Dados**: O banco de dados pode ser trocado sem afetar as regras de negócio
+export function useAdminKPIs() {
+  return useQuery({
+    queryKey: ['admin', 'kpis'],
+    queryFn: () => fetch('/api/admin/kpis').then(r => r.json()),
+    staleTime: 30 * 1000, // 30 segundos
+  });
+}
+```
 
-### Domain-Driven Design (DDD)
+#### Stores (Zustand)
+Gerenciamento de estado global:
 
-- **Entities**: Objetos com identidade única
-- **Value Objects**: Objetos imutáveis sem identidade
-- **Repositories**: Abstração para acesso a dados
-- **Use Cases**: Casos de uso específicos do domínio
+```typescript
+// Exemplo: apps/web/stores/useAuthStore.ts
+import { create } from 'zustand';
 
-### Dependency Injection
+interface AuthStore {
+  user: User | null;
+  setUser: (user: User | null) => void;
+  logout: () => void;
+}
 
-Utilizamos injeção de dependência para:
-- Facilitar testes unitários
-- Reduzir acoplamento
-- Melhorar a manutenibilidade
+export const useAuthStore = create<AuthStore>((set) => ({
+  user: null,
+  setUser: (user) => set({ user }),
+  logout: () => set({ user: null }),
+}));
+```
+
+### 3. Domain Layer (Domínio)
+
+Entidades e tipos compartilhados:
+
+```typescript
+// Exemplo: types/user.ts
+export interface User {
+  id: string;
+  email: string;
+  role: 'admin' | 'empresa' | 'operador' | 'motorista' | 'passageiro';
+  name: string;
+  isActive: boolean;
+}
+
+export interface Trip {
+  id: string;
+  routeId: string;
+  driverId: string;
+  vehicleId: string;
+  status: 'scheduled' | 'in_progress' | 'completed' | 'cancelled';
+  startTime: Date;
+  endTime?: Date;
+}
+```
+
+### 4. Infrastructure Layer (Infraestrutura)
+
+#### Cliente Supabase
+```typescript
+// Exemplo: apps/web/lib/supabase.ts
+import { createClient } from '@supabase/supabase-js';
+
+export const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
+```
+
+#### API Routes (Next.js)
+```typescript
+// Exemplo: apps/web/app/api/admin/kpis/route.ts
+import { NextResponse } from 'next/server';
+import { createServerClient } from '@/lib/supabase-server';
+
+export async function GET() {
+  const supabase = createServerClient();
+  const { data, error } = await supabase
+    .from('v_admin_kpis')
+    .select('*')
+    .single();
+    
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+  
+  return NextResponse.json(data);
+}
+```
 
 ## Gerenciamento de Estado
 
-### Provider Pattern
+### Web (Next.js)
 
-Utilizamos o padrão Provider para gerenciamento de estado:
+| Ferramenta | Uso |
+|------------|-----|
+| **Zustand** | Estado global (auth, UI, preferências) |
+| **TanStack Query** | Cache de dados do servidor |
+| **useState** | Estado local de componentes |
+| **React Context** | Providers (tema, toast, modais) |
 
-```dart
-// Exemplo de Provider
-class RouteProvider extends ChangeNotifier {
-  List<Route> _routes = [];
-  
-  List<Route> get routes => _routes;
-  
-  Future<void> loadRoutes() async {
-    // Lógica para carregar rotas
-    notifyListeners();
-  }
-}
-```
+### Mobile (React Native)
 
-### Estado Local vs Global
-
-- **Estado Local**: Gerenciado dentro do widget (StatefulWidget)
-- **Estado Global**: Gerenciado por Providers para compartilhamento entre widgets
+| Ferramenta | Uso |
+|------------|-----|
+| **React Context** | Autenticação, tema |
+| **useState/useReducer** | Estado local |
+| **expo-secure-store** | Armazenamento seguro (tokens) |
 
 ## Segurança
 
+### Autenticação
+- Supabase Auth com cookies `httpOnly`
+- JWT tokens com expiração de 1 hora
+- Refresh tokens seguros
+
 ### Rate Limiting
+```typescript
+// Implementado com Upstash Redis
+import { Ratelimit } from '@upstash/ratelimit';
+import { Redis } from '@upstash/redis';
 
-Sistema de rate limiting para prevenir ataques:
-
-```dart
-// Exemplo de uso
-if (!RateLimiter().isAllowed(userId, RateLimitConfig.login)) {
-  throw RateLimitException('Too many login attempts');
-}
+const ratelimit = new Ratelimit({
+  redis: Redis.fromEnv(),
+  limiter: Ratelimit.slidingWindow(10, '10 s'),
+});
 ```
 
-### Sanitização de Dados
-
-Todos os dados de entrada são sanitizados:
-
-```dart
-// Exemplo de sanitização
-final sanitizedInput = DataSanitizer.sanitizeText(userInput);
-```
-
-### Logging Seguro
-
-Sistema de logging que não expõe dados sensíveis:
-
-```dart
-// Exemplo de logging
-AppLogger.info('User logged in', tag: 'Auth');
-AppLogger.error('Login failed', error: error, tag: 'Auth');
-```
-
-## Tratamento de Erros
-
-### Hierarquia de Erros
-
-```dart
-abstract class AppError implements Exception {
-  final String message;
-  final AppErrorType type;
-  
-  const AppError(this.message, this.type);
-}
-
-class NetworkError extends AppError {
-  const NetworkError(String message) : super(message, AppErrorType.network);
-}
-```
-
-### Error Handler Global
-
-```dart
-// Inicialização no main.dart
-ErrorHandler.initialize();
-
-// Uso em widgets
-ErrorHandler.showError(context, error);
-```
+### Proteção de Rotas
+- **Middleware Next.js**: Valida sessão e redireciona baseado em roles
+- **RLS no Supabase**: Isolamento de dados por empresa
 
 ## Testes
 
-### Estrutura de Testes
+### Web
+| Tipo | Ferramenta |
+|------|------------|
+| Unit Tests | Jest + Testing Library |
+| E2E Tests | Playwright |
+| Type Check | TypeScript |
 
+### Mobile
+| Tipo | Ferramenta |
+|------|------------|
+| Lint | ESLint |
+| Type Check | TypeScript |
+| Doctor | expo-doctor |
+
+### Executando Testes
+
+```bash
+# Web - Testes unitários
+cd apps/web
+npm test
+
+# Web - E2E
+npm run test:e2e
+
+# Mobile - Verificação
+cd apps/mobile
+npx expo-doctor
 ```
-test/
-├── unit/                   # Testes unitários
-│   ├── core/
-│   ├── features/
-│   └── shared/
-├── widget/                 # Testes de widget
-└── integration/            # Testes de integração
+
+## Deploy
+
+### Web (Vercel)
+- Deploy automático via GitHub Actions
+- Preview deployments para PRs
+- Edge Functions para API routes
+
+### Mobile (EAS Build)
+- Build via Expo Application Services
+- Distribuição para TestFlight (iOS) e Play Store (Android)
+
+```bash
+# Build de produção
+eas build --platform all --profile production
+
+# Submit para lojas
+eas submit --platform all
 ```
-
-### Estratégia de Testes
-
-1. **Testes Unitários**: Para lógica de negócio e utilitários
-2. **Testes de Widget**: Para componentes UI
-3. **Testes de Integração**: Para fluxos completos
 
 ## Performance
 
 ### Otimizações Implementadas
 
-1. **Lazy Loading**: Carregamento sob demanda
-2. **Caching**: Cache de dados frequentemente acessados
-3. **Image Optimization**: Otimização de imagens
-4. **Bundle Splitting**: Divisão do bundle para carregamento eficiente
+1. **Turbopack**: Build mais rápido no desenvolvimento
+2. **React Server Components**: Redução de JavaScript no cliente
+3. **Image Optimization**: Next.js Image com sharp
+4. **Code Splitting**: Lazy loading automático
+5. **Caching**: TanStack Query + HTTP cache
 
 ### Monitoramento
 
-- **Performance Logging**: Medição de tempo de operações
-- **Memory Usage**: Monitoramento de uso de memória
-- **Network Monitoring**: Monitoramento de requisições de rede
-
-## Configuração de Ambiente
-
-### Variáveis de Ambiente
-
-```env
-# API Configuration
-API_BASE_URL=https://api.golffox.com
-API_TIMEOUT=30000
-
-# Security
-RATE_LIMIT_ENABLED=true
-DEBUG_MODE=false
-
-# Features
-ENABLE_ANALYTICS=true
-ENABLE_CRASH_REPORTING=true
-```
-
-### Configuração por Ambiente
-
-- **Development**: Configurações para desenvolvimento
-- **Staging**: Configurações para testes
-- **Production**: Configurações para produção
-
-## Deployment
-
-### Build Configuration
-
-```yaml
-# pubspec.yaml
-flutter:
-  assets:
-    - assets/images/
-    - assets/icons/
-  fonts:
-    - family: Roboto
-      fonts:
-        - asset: fonts/Roboto-Regular.ttf
-```
-
-### CI/CD Pipeline
-
-1. **Lint**: Verificação de código
-2. **Test**: Execução de testes
-3. **Build**: Compilação da aplicação
-4. **Deploy**: Deploy para ambiente de destino
-
-## Extensibilidade
-
-### Adicionando Novas Features
-
-1. Criar estrutura de pastas seguindo o padrão
-2. Implementar camadas (data, domain, presentation)
-3. Registrar dependências
-4. Adicionar testes
-
-### Adicionando Novos Providers
-
-```dart
-// 1. Criar o provider
-class NewFeatureProvider extends ChangeNotifier {
-  // Implementação
-}
-
-// 2. Registrar no main.dart
-MultiProvider(
-  providers: [
-    ChangeNotifierProvider(create: (_) => NewFeatureProvider()),
-  ],
-  child: MyApp(),
-)
-```
-
-## Melhores Práticas
-
-### Código
-
-1. **Single Responsibility**: Cada classe tem uma única responsabilidade
-2. **DRY (Don't Repeat Yourself)**: Evitar duplicação de código
-3. **SOLID Principles**: Seguir princípios SOLID
-4. **Clean Code**: Código limpo e legível
-
-### Segurança
-
-1. **Input Validation**: Validar todas as entradas
-2. **Data Sanitization**: Sanitizar dados antes do processamento
-3. **Error Handling**: Tratar erros adequadamente
-4. **Logging**: Log seguro sem exposição de dados sensíveis
-
-### Performance
-
-1. **Lazy Loading**: Carregar dados sob demanda
-2. **Caching**: Cache inteligente de dados
-3. **Optimization**: Otimizar operações custosas
-4. **Monitoring**: Monitorar performance continuamente
+- **Vercel Analytics**: Métricas de performance
+- **Vercel Speed Insights**: Core Web Vitals
+- **Sentry** (planejado): Error tracking
 
 ## Conclusão
 
 Esta arquitetura fornece uma base sólida para o desenvolvimento do GolfFox, garantindo:
 
-- **Escalabilidade**: Fácil adição de novas funcionalidades
-- **Manutenibilidade**: Código organizado e fácil de manter
-- **Testabilidade**: Estrutura que facilita a criação de testes
-- **Segurança**: Sistemas robustos de segurança
-- **Performance**: Otimizações para melhor experiência do usuário
+- **Escalabilidade**: Estrutura modular para fácil adição de features
+- **Manutenibilidade**: Separação clara de responsabilidades
+- **Testabilidade**: Camadas desacopladas facilitam testes
+- **Segurança**: Múltiplas camadas de proteção
+- **Performance**: Otimizações modernas implementadas
 
-Para mais informações sobre implementação específica, consulte os outros documentos de arquitetura e os comentários no código.
+Para mais detalhes sobre implementações específicas, consulte os demais documentos em `docs/`.

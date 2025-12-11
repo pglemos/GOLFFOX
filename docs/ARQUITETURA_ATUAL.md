@@ -1,7 +1,7 @@
 # Arquitetura Atual – GolfFox
 
 ## Visão Geral
-- Monorepo com módulos principais: web (Next.js 15), mobile (Flutter 3), banco (Supabase/Postgres), scripts/infra e documentação.
+- Monorepo com módulos principais: web (Next.js 16.0.7), mobile (React Native Expo 54), banco (Supabase/Postgres), scripts/infra e documentação.
 - Separação por camadas: domínio, aplicação, infra e apresentação.
 
 ### Resumo Executivo
@@ -25,11 +25,11 @@ GOLFFOX/
 │   │   ├── next.config.js
 │   │   ├── tsconfig.json
 │   │   └── vercel.json
-│   └── mobile/
-│       ├── android/
-│       ├── ios/
-│       ├── lib/                  # apps Flutter (driver/passenger) e shared
-│       └── flutter-web/          # build/web do Flutter (assets)
+│    └── mobile/
+        ├── app/                  # Expo Router (file-based routing)
+        ├── src/                  # Código-fonte (auth, services, components)
+        ├── assets/               # Ícones e imagens
+        └── app.config.ts         # Configuração Expo
 ├── shared/
 │   ├── domain/                  # entidades/DTOs
 │   ├── types/                   # tipos TS/JSON schemas

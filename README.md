@@ -1,10 +1,10 @@
 # 🚌 GolfFox - Sistema de Gestão de Transporte Urbano
 
-[![React Native](https://img.shields.io/badge/React%20Native-Expo%2052-61DAFB.svg)](https://expo.dev/)
-[![Next.js](https://img.shields.io/badge/Next.js-16.1.0-black.svg)](https://nextjs.org/)
+[![React Native](https://img.shields.io/badge/React%20Native-Expo%2054-61DAFB.svg)](https://expo.dev/)
+[![Next.js](https://img.shields.io/badge/Next.js-16.0.7-black.svg)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9.3-blue.svg)](https://www.typescriptlang.org/)
-[![Supabase](https://img.shields.io/badge/Supabase%20JS-2.82.0-green.svg)](https://supabase.com/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-4.0.0-38bdf8.svg)](https://tailwindcss.com/)
+[![Supabase](https://img.shields.io/badge/Supabase%20JS-2.87.1-green.svg)](https://supabase.com/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-4.1.17-38bdf8.svg)](https://tailwindcss.com/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Deploy](https://img.shields.io/badge/Deploy-Vercel-black.svg)](https://vercel.com/)
 
@@ -45,7 +45,7 @@ O **GolfFox** é uma plataforma completa de gestão de transporte urbano que ofe
 
 O projeto utiliza uma arquitetura híbrida moderna:
 
-- **Frontend Mobile**: React Native (Expo 52) + TypeScript (iOS/Android)
+- **Frontend Mobile**: React Native (Expo 54) + TypeScript (iOS/Android)
 - **Frontend Web**: Next.js 16.1 com TypeScript, App Router, Turbopack
 - **Backend**: Supabase (PostgreSQL + Auth + Storage + Realtime)
 - **Arquitetura**: Clean Architecture + Domain Driven Design
@@ -357,11 +357,11 @@ O middleware (`apps/web/middleware.ts`) protege automaticamente:
 
 ### Pré-requisitos
 
-- **Flutter SDK**: 3.24+
-- **Node.js**: 18.17.0+
+- **Node.js**: 22.x (recomendado) ou 18.17.0+
 - **npm**: 9.0.0+
 - **Git**: Última versão
 - **Supabase**: Conta e projeto criado
+- **Expo Go**: App para testes mobile (iOS/Android)
 
 ### 1️⃣ Clonagem e Setup Inicial
 
@@ -403,26 +403,23 @@ npm run dev
 # A aplicação estará disponível em http://localhost:3000
 ```
 
-### 4️⃣ Setup Flutter (Mobile)
+### 4️⃣ Setup React Native (Mobile)
 
 ```bash
 # Navegue para o diretório mobile
 cd apps/mobile
 
 # Instale as dependências
-flutter pub get
+npm install
 
-# Execute a análise de código
-flutter analyze
+# Execute o app em desenvolvimento
+npx expo start
 
-# Execute os testes
-flutter test
+# Para Android específico
+npx expo start --android
 
-# Execute o app (desenvolvimento web)
-flutter run -d web-server --web-port 8000
-
-# Execute o app (Android/iOS)
-flutter run
+# Para iOS específico
+npx expo start --ios
 ```
 
 ### 5️⃣ Primeiro Login
@@ -982,12 +979,13 @@ node scripts/test-rls.js
 3. Verifique se o role no cookie corresponde ao necessário
 4. Verifique os logs do middleware (em desenvolvimento)
 
-#### Flutter não compila
+#### React Native não inicia
 
 ```bash
-flutter clean
-flutter pub get
-flutter pub deps
+cd apps/mobile
+rm -rf node_modules
+npm install
+npx expo start --clear
 ```
 
 #### Erro de dependências Next.js
