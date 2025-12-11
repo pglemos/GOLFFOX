@@ -54,13 +54,13 @@ export async function validateAuth(request: NextRequest): Promise<AuthenticatedU
       const projectRef = supabaseUrl.split('//')[1]?.split('.')[0]
       if (projectRef) {
         const supabaseCookieName = `sb-${projectRef}-auth-token`
-        
+
         if (isDevelopment) {
           const allCookies = request.cookies.getAll().map(c => c.name)
           console.log('[AUTH] Cookies disponíveis:', allCookies.join(', '))
           console.log('[AUTH] Procurando cookie do Supabase:', supabaseCookieName)
         }
-        
+
         const supabaseCookie = request.cookies.get(supabaseCookieName)?.value
 
         if (supabaseCookie) {
@@ -177,7 +177,7 @@ export async function validateAuth(request: NextRequest): Promise<AuthenticatedU
     const authenticatedUser: AuthenticatedUser = {
       id: userData.id,
       email: userData.email || user.email || '',
-      role: userData.role || user.user_metadata?.role || user.app_metadata?.role || 'passenger',
+      role: userData.role || user.user_metadata?.role || user.app_metadata?.role || 'passageiro',
       companyId: userData.company_id || null
     }
 
@@ -207,16 +207,19 @@ export function hasRole(user: AuthenticatedUser | null, requiredRole: string | s
     return user.role === 'admin'
   }
 
-  if (roles.includes('operador')) {
-    return ['admin', 'operador'].includes(user.role)
+  // empresa = usuários da empresa contratante (antigo operator)
+  if (roles.includes('empresa')) {
+    return ['admin', 'empresa', 'operator'].includes(user.role) // Compatibilidade com role antiga
   }
 
-  if (roles.includes('transportadora')) {
-    return ['admin', 'transportadora'].includes(user.role)
+  // operador = gestor da transportadora (antigo carrier)
+  if (roles.includes('operador') || roles.includes('transportadora')) {
+    return ['admin', 'operador', 'carrier', 'transportadora'].includes(user.role) // Compatibilidade
   }
 
   return roles.includes(user.role)
 }
+
 
 /**
  * Middleware helper para rotas API que requerem autenticação

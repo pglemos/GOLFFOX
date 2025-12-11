@@ -62,7 +62,7 @@ export class AuthManager {
       localStorage.removeItem(this.STORAGE_KEY)
       sessionStorage.removeItem(this.STORAGE_KEY)
       sessionStorage.removeItem('golffox-auth-token')
-      
+
       // Limpar cookie HttpOnly via API
       try {
         await fetch('/api/auth/clear-session', {
@@ -98,11 +98,13 @@ export class AuthManager {
     if (requiredRole === 'admin') {
       return user.role === 'admin'
     }
-    if (requiredRole === 'operador') {
-      return ['admin', 'operador'].includes(user.role)
+    // empresa = usuários da empresa contratante (antigo operador)
+    if (requiredRole === 'empresa') {
+      return ['admin', 'empresa'].includes(user.role)
     }
-    if (requiredRole === 'transportadora') {
-      return ['admin', 'transportadora'].includes(user.role)
+    // operador = gestor da transportadora (antigo carrier)
+    if (requiredRole === 'operador' || requiredRole === 'transportadora') {
+      return ['admin', 'operador'].includes(user.role)
     }
 
     return true
@@ -112,23 +114,31 @@ export class AuthManager {
     switch (role) {
       case 'admin':
         return '/admin'
-      case 'operador':
-      case 'operator':
+      // Novas roles PT-BR
       case 'empresa':
-        return '/operador'
-      case 'transportadora':
+        return '/empresa'
+      case 'operador':
+        return '/transportadora'
+      case 'motorista':
+      case 'passageiro':
+        // Motorista e Passageiro devem usar app mobile, não painéis web
+        return null
+      // Compatibilidade com roles antigas (inglês) - Temporário durante migração
+      case 'operator':
+        return '/empresa'  // antigo operator → nova rota /empresa
       case 'carrier':
+      case 'transportadora':
         return '/transportadora'
       case 'driver':
       case 'passenger':
-        // Driver e Passenger devem usar app mobile, não painéis web
         return null
       default:
-        // Fallback para operador se role não for reconhecido
-        console.warn(`[AuthManager] Role não reconhecido: ${role}, redirecionando para /operador`)
-        return '/operador'
+        // Fallback para empresa se role não for reconhecido
+        console.warn(`[AuthManager] Role não reconhecido: ${role}, redirecionando para /empresa`)
+        return '/empresa'
     }
   }
+
 
   static async persistSession(userData: UserData, options?: { storage?: 'local' | 'session' | 'both'; token?: string }) {
     if (typeof window === 'undefined') return

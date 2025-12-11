@@ -4,29 +4,29 @@ export interface RoleMapping {
 }
 
 const ROLE_MAP: RoleMapping[] = [
-  // Conjunto principal (PT-BR)
+  // Conjunto principal (PT-BR) - Novo modelo de domínio
   { email: 'golffox@admin.com', role: 'admin' },
-  { email: 'operador@empresa.com', role: 'operador' },
-  { email: 'transportadora@trans.com', role: 'transportadora' },
-  { email: 'motorista@trans.com', role: 'driver' },
-  { email: 'passageiro@empresa.com', role: 'passenger' },
-  { email: 'teste@transportadora.com', role: 'transportadora' },
+  { email: 'teste@empresa.com', role: 'empresa' },       // Gestor/Admin da Empresa Contratante
+  { email: 'operador@empresa.com', role: 'empresa' },    // Antigo role operator → agora empresa
+  { email: 'transportadora@trans.com', role: 'operador' }, // Antigo carrier → agora operador
+  { email: 'teste@transportadora.com', role: 'operador' },
+  { email: 'motorista@trans.com', role: 'motorista' },   // Antigo driver → agora motorista
+  { email: 'passageiro@empresa.com', role: 'passageiro' }, // Antigo passenger → agora passageiro
 
-  // Conjunto alternativo (inglês)
+  // Conjunto alternativo (inglês) - Mapeamento para novas roles PT-BR
   { email: 'admin@golffox.com', role: 'admin' },
-  { email: 'operator@golffox.com', role: 'operador' },
-  { email: 'carrier@golffox.com', role: 'transportadora' },
-  { email: 'driver@golffox.com', role: 'driver' },
+  { email: 'operator@golffox.com', role: 'empresa' },    // operator → empresa
+  { email: 'carrier@golffox.com', role: 'operador' },    // carrier → operador
+  { email: 'driver@golffox.com', role: 'motorista' },    // driver → motorista
 
-  // Variantes antigas
-  { email: 'transportadora@golffox.com', role: 'transportadora' },
-  { email: 'operador@golffox.com', role: 'operador' },
+  // Variantes antigas (compatibilidade)
+  { email: 'transportadora@golffox.com', role: 'operador' },
+  { email: 'operador@golffox.com', role: 'empresa' },
 ]
 
 export function getUserRoleByEmail(email: string): string {
-  if (!email) return 'driver'
+  if (!email) return 'passageiro' // Default para passageiro
   const normalized = email.toLowerCase().trim()
   const match = ROLE_MAP.find((entry) => entry.email === normalized)
-  return match?.role ?? 'driver'
+  return match?.role ?? 'passageiro'
 }
-

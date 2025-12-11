@@ -177,18 +177,26 @@ function LoginContent() {
 
           const isAllowedForRole = (role: string, path: string): boolean => {
             if (path.startsWith('/admin')) return role === 'admin'
-            if (path.startsWith('/operador') || path.startsWith('/operator')) return ['admin', 'operador'].includes(role)
-            if (path.startsWith('/transportadora') || path.startsWith('/carrier')) return ['admin', 'transportadora'].includes(role)
+            // empresa = empresa contratante (antigo operator)
+            if (path.startsWith('/empresa')) return ['admin', 'empresa', 'operator'].includes(role)
+            // operador = transportadora
+            if (path.startsWith('/transportadora')) return ['admin', 'operador', 'carrier', 'transportadora'].includes(role)
             return true
           }
 
-          // Normalizar roles (aceitar inglês e português)
-          const normalizedRole = userRole === 'operator' || userRole === 'empresa' ? 'operador' :
-            userRole === 'carrier' ? 'transportadora' : userRole
+          // Normalizar roles para PT-BR
+          const normalizedRole =
+            userRole === 'operator' ? 'empresa' :  // antigo operator → empresa
+              userRole === 'carrier' ? 'operador' :  // antigo carrier → operador
+                userRole === 'driver' ? 'motorista' :
+                  userRole === 'passenger' ? 'passageiro' : userRole
 
-          let redirectUrl = normalizedRole === 'admin' ? '/admin' :
-            normalizedRole === 'operador' ? '/operador' :
-              normalizedRole === 'transportadora' ? '/transportadora' : '/operador'
+          // Redirect baseado na role normalizada
+          let redirectUrl =
+            normalizedRole === 'admin' ? '/admin' :
+              normalizedRole === 'empresa' ? '/empresa' :  // Empresa Contratante
+                normalizedRole === 'operador' || normalizedRole === 'transportadora' ? '/transportadora' :  // Operador da Transportadora
+                  '/empresa' // Default para empresa
 
           if (safeNext && isAllowedForRole(userRole, safeNext)) {
             redirectUrl = safeNext
@@ -368,8 +376,10 @@ function LoginContent() {
 
   const isAllowedForRole = (role: string, path: string): boolean => {
     if (path.startsWith('/admin')) return role === 'admin'
-    if (path.startsWith('/operador') || path.startsWith('/operator')) return ['admin', 'operador'].includes(role)
-    if (path.startsWith('/transportadora') || path.startsWith('/carrier')) return ['admin', 'transportadora'].includes(role)
+    // empresa = empresa contratante (antigo operator)
+    if (path.startsWith('/empresa')) return ['admin', 'empresa', 'operator'].includes(role)
+    // operador = gestor da transportadora
+    if (path.startsWith('/transportadora')) return ['admin', 'operador', 'carrier', 'transportadora'].includes(role)
     return true
   }
 
@@ -442,7 +452,7 @@ function LoginContent() {
 
         // Obter CSRF token (do estado ou buscar se não estiver disponível)
         let finalCsrfToken = csrfToken
-        
+
         if (!finalCsrfToken) {
           console.log('🔍 [CSRF] Token não encontrado no estado, tentando obter...')
           // Tentar ler do cookie primeiro
@@ -491,7 +501,7 @@ function LoginContent() {
             }
           }
         }
-        
+
         if (!finalCsrfToken) {
           console.error('❌ [CSRF] Token não encontrado após todas as tentativas')
           setError("Erro de segurança. Por favor, recarregue a página.")
@@ -500,7 +510,7 @@ function LoginContent() {
           if (typeof document !== "undefined") document.body.style.cursor = prevCursor
           return
         }
-        
+
         console.log('✅ [CSRF] Token final obtido:', finalCsrfToken.substring(0, 10) + '...')
         console.log('🔍 [LOGIN] Preparando requisição:', {
           endpoint: AUTH_ENDPOINT,
@@ -602,7 +612,7 @@ function LoginContent() {
           })
           throw new Error(`Erro ao processar resposta do servidor: ${parseError?.message || 'JSON inválido'}`)
         }
-        
+
         const token = data?.token
         const user = data?.user
         const sessionData = data?.session
@@ -682,14 +692,14 @@ function LoginContent() {
           setLoading(false)
           setTransitioning(false)
           if (typeof document !== "undefined") document.body.style.cursor = prevCursor
-          
+
           // Limpar sessão se foi criada
           try {
             await AuthManager.logout()
           } catch (err) {
             console.warn('Erro ao limpar sessão:', err)
           }
-          
+
           return
         }
 
@@ -712,14 +722,14 @@ function LoginContent() {
           setLoading(false)
           setTransitioning(false)
           if (typeof document !== "undefined") document.body.style.cursor = prevCursor
-          
+
           // Limpar sessão se foi criada
           try {
             await AuthManager.logout()
           } catch (err) {
             console.warn('Erro ao limpar sessão:', err)
           }
-          
+
           return
         }
 
@@ -750,7 +760,7 @@ function LoginContent() {
         return
       } catch (err: any) {
         clearTimeout(timeoutId)
-        
+
         console.error('❌ [LOGIN] Erro capturado no catch:', {
           name: err?.name,
           message: err?.message,
@@ -758,7 +768,7 @@ function LoginContent() {
           type: typeof err,
           keys: err ? Object.keys(err) : []
         })
-        
+
         if (err?.name === "AbortError") {
           setError("Tempo limite excedido. Verifique sua conexão.")
         } else {
@@ -769,7 +779,7 @@ function LoginContent() {
         setFieldErrors((prev) => ({ ...prev, password: "Não foi possível autenticar" }))
         setPassword("")
         passwordInputRef.current?.focus()
-        logError("Erro inesperado no login", { 
+        logError("Erro inesperado no login", {
           error: err,
           errorName: err?.name,
           errorMessage: err?.message,
@@ -821,7 +831,7 @@ function LoginContent() {
       {/* Background com efeitos sutis otimizados (somente desktop) */}
       <div className="absolute inset-0 hidden lg:block" aria-hidden="true">
         <FloatingOrbs />
-        <div 
+        <div
           className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_at_center,black_20%,transparent_80%)]"
           style={{ willChange: 'auto' }}
         />
@@ -983,7 +993,7 @@ function LoginContent() {
             className="w-full max-w-md mx-auto min-w-0"
           >
             {/* Mobile: Card wrapper Premium */}
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
@@ -991,7 +1001,7 @@ function LoginContent() {
             >
               {/* Background pattern sutil */}
               <div className="absolute inset-0 opacity-[0.02] bg-[radial-gradient(circle_at_1px_1px,rgb(0,0,0)_1px,transparent_0)] bg-[length:24px_24px]" />
-              
+
               <div className="relative w-full min-w-0 z-10">
                 {/* Logo mobile Premium */}
                 <motion.div
@@ -1022,7 +1032,7 @@ function LoginContent() {
                     >
                       {/* Backdrop blur premium estilo Vercel */}
                       <div className="absolute inset-0 bg-white/95 backdrop-blur-2xl" />
-                      
+
                       {/* Conteúdo centralizado ultra minimalista */}
                       <div className="relative z-10 flex flex-col items-center gap-3">
                         {/* Spinner ultra fino estilo Linear */}
@@ -1033,7 +1043,7 @@ function LoginContent() {
                             className="absolute inset-0 rounded-full border-[1.5px] border-gray-200/60 border-t-[#F97316]"
                           />
                         </div>
-                        
+
                         {/* Texto ultra discreto */}
                         <motion.p
                           initial={{ opacity: 0 }}
@@ -1049,7 +1059,7 @@ function LoginContent() {
                 </AnimatePresence>
 
                 {/* Mobile: Título Premium */}
-                <motion.div 
+                <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: 0.1 }}
@@ -1139,10 +1149,10 @@ function LoginContent() {
                           } rounded-2xl text-base focus:bg-white placeholder:text-[var(--ink-muted)] font-medium`}
                       />
                       {fieldErrors.email && (
-                        <motion.p 
+                        <motion.p
                           initial={{ opacity: 0, y: -5 }}
                           animate={{ opacity: 1, y: 0 }}
-                          className="mt-2 text-xs text-[var(--error)] font-medium flex items-center gap-1" 
+                          className="mt-2 text-xs text-[var(--error)] font-medium flex items-center gap-1"
                           aria-live="assertive"
                         >
                           <span>⚠</span> {fieldErrors.email}
@@ -1177,10 +1187,10 @@ function LoginContent() {
                         }}
                         ref={passwordInputRef}
                         autoComplete="current-password"
-                          className={`w-full h-14 pl-12 pr-14 bg-gradient-to-br from-[var(--bg-soft)] to-[var(--bg)] border-2 ${fieldErrors.password
-                            ? "border-[var(--error)] focus:border-[var(--error)] focus:ring-2 focus:ring-[var(--error)]/20 shadow-[0_0_0_4px_rgba(239,68,68,0.1)]"
-                            : "border-[var(--border)] focus:border-[var(--brand)] focus:ring-2 focus:ring-[var(--brand)]/20 hover:border-[var(--border-strong)]"
-                            } rounded-2xl text-base focus:bg-white placeholder:text-[var(--ink-muted)] font-medium`}
+                        className={`w-full h-14 pl-12 pr-14 bg-gradient-to-br from-[var(--bg-soft)] to-[var(--bg)] border-2 ${fieldErrors.password
+                          ? "border-[var(--error)] focus:border-[var(--error)] focus:ring-2 focus:ring-[var(--error)]/20 shadow-[0_0_0_4px_rgba(239,68,68,0.1)]"
+                          : "border-[var(--border)] focus:border-[var(--brand)] focus:ring-2 focus:ring-[var(--brand)]/20 hover:border-[var(--border-strong)]"
+                          } rounded-2xl text-base focus:bg-white placeholder:text-[var(--ink-muted)] font-medium`}
                       />
                       <motion.button
                         type="button"
@@ -1193,10 +1203,10 @@ function LoginContent() {
                         {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                       </motion.button>
                       {fieldErrors.password && (
-                        <motion.p 
+                        <motion.p
                           initial={{ opacity: 0, y: -5 }}
                           animate={{ opacity: 1, y: 0 }}
-                          className="mt-2 text-xs text-[var(--error)] font-medium flex items-center gap-1" 
+                          className="mt-2 text-xs text-[var(--error)] font-medium flex items-center gap-1"
                           aria-live="assertive"
                         >
                           <span>⚠</span> {fieldErrors.password}
@@ -1206,13 +1216,13 @@ function LoginContent() {
                   </div>
 
                   {/* Opções extras Premium */}
-                  <motion.div 
+                  <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ duration: 0.4, delay: 0.4 }}
                     className="flex items-center justify-between text-sm w-full"
                   >
-                    <motion.label 
+                    <motion.label
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       className="flex items-center gap-3 cursor-pointer group touch-manipulation flex-nowrap"
@@ -1239,11 +1249,11 @@ function LoginContent() {
                   </motion.div>
 
                   {/* Botão de Login Ultra Premium Otimizado */}
-                  <motion.div 
+                  <motion.div
                     initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: shouldReduceMotion ? 0 : 0.4, delay: shouldReduceMotion ? 0 : 0.5 }}
-                    whileHover={canSubmit && !shouldReduceMotion ? { scale: 1.02 } : {}} 
+                    whileHover={canSubmit && !shouldReduceMotion ? { scale: 1.02 } : {}}
                     whileTap={canSubmit && !shouldReduceMotion ? { scale: 0.98 } : {}}
                   >
                     <Button
@@ -1294,7 +1304,7 @@ function LoginContent() {
                 </form>
 
                 {/* Footer Ultra Premium */}
-                <motion.div 
+                <motion.div
                   initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ duration: shouldReduceMotion ? 0 : 0.4, delay: shouldReduceMotion ? 0 : 0.6 }}
@@ -1332,7 +1342,7 @@ function LoginContent() {
                   >
                     {/* Backdrop blur premium estilo Vercel */}
                     <div className="absolute inset-0 bg-white/95 backdrop-blur-2xl" />
-                    
+
                     {/* Conteúdo centralizado ultra minimalista */}
                     <div className="relative z-10 flex flex-col items-center gap-4">
                       {/* Spinner ultra fino estilo Linear */}
@@ -1343,7 +1353,7 @@ function LoginContent() {
                           className="absolute inset-0 rounded-full border-[1.5px] border-gray-200/60 border-t-[#F97316]"
                         />
                       </div>
-                      
+
                       {/* Texto ultra discreto */}
                       <motion.p
                         initial={{ opacity: 0 }}
@@ -1359,7 +1369,7 @@ function LoginContent() {
               </AnimatePresence>
 
               {/* Título Premium */}
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
@@ -1445,10 +1455,10 @@ function LoginContent() {
                         } rounded-2xl text-base focus:bg-white placeholder:text-[var(--ink-muted)] font-medium`}
                     />
                     {fieldErrors.email && (
-                      <motion.p 
+                      <motion.p
                         initial={{ opacity: 0, y: -5 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="mt-2 text-xs text-[var(--error)] font-medium flex items-center gap-1" 
+                        className="mt-2 text-xs text-[var(--error)] font-medium flex items-center gap-1"
                         aria-live="assertive"
                       >
                         <span>⚠</span> {fieldErrors.email}
@@ -1497,10 +1507,10 @@ function LoginContent() {
                       {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                     </motion.button>
                     {fieldErrors.password && (
-                      <motion.p 
+                      <motion.p
                         initial={{ opacity: 0, y: -5 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="mt-2 text-xs text-[var(--error)] font-medium flex items-center gap-1" 
+                        className="mt-2 text-xs text-[var(--error)] font-medium flex items-center gap-1"
                         aria-live="assertive"
                       >
                         <span>⚠</span> {fieldErrors.password}
@@ -1510,13 +1520,13 @@ function LoginContent() {
                 </div>
 
                 {/* Opções extras - Desktop Premium */}
-                <motion.div 
+                <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.4, delay: 0.4 }}
                   className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-0 text-sm w-full"
                 >
-                  <motion.label 
+                  <motion.label
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     className="flex items-center gap-3 cursor-pointer group touch-manipulation flex-nowrap"
@@ -1543,11 +1553,11 @@ function LoginContent() {
                 </motion.div>
 
                 {/* Botão de Login Ultra Premium - Desktop Otimizado */}
-                <motion.div 
+                <motion.div
                   initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: shouldReduceMotion ? 0 : 0.4, delay: shouldReduceMotion ? 0 : 0.5 }}
-                  whileHover={canSubmit && !shouldReduceMotion ? { scale: 1.02 } : {}} 
+                  whileHover={canSubmit && !shouldReduceMotion ? { scale: 1.02 } : {}}
                   whileTap={canSubmit && !shouldReduceMotion ? { scale: 0.98 } : {}}
                 >
                   <Button
@@ -1598,7 +1608,7 @@ function LoginContent() {
               </form>
 
               {/* Footer Ultra Premium */}
-              <motion.div 
+              <motion.div
                 initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: shouldReduceMotion ? 0 : 0.4, delay: shouldReduceMotion ? 0 : 0.6 }}

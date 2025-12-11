@@ -1,4 +1,4 @@
-﻿import { applyRateLimit } from './rate-limit'
+import { applyRateLimit } from './rate-limit'
 import { NextRequest } from 'next/server'
 
 // Mock Redis and Ratelimit

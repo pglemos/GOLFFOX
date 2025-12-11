@@ -1,4 +1,4 @@
-﻿/*
+/*
   Health Check - Operator Panel
   Usage: ts-node scripts/health-check-operator.ts
 */
@@ -11,7 +11,7 @@ function assertEnv(name: string) {
 }
 
 async function main() {
-  console.log('ðŸ”Ž Verificando variÃ¡veis de ambiente...')
+  console.log('🔎 Verificando variáveis de ambiente...')
   assertEnv('NEXT_PUBLIC_SUPABASE_URL')
   assertEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY')
 
@@ -19,11 +19,11 @@ async function main() {
   const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string
   const supabase = createClient(url, anon)
 
-  console.log('ðŸ”— Testando conexÃ£o com Supabase...')
+  console.log('🔗 Testando conexão com Supabase...')
   const { error: pingError } = await supabase.from('routes').select('id').limit(1)
   if (pingError) throw pingError
 
-  console.log('ðŸ“Š Lendo views do operador (se existirem)...')
+  console.log('📊 Lendo views do operador (se existirem)...')
   const viewChecks = [
     'v_operator_dashboard_kpis',
     'v_operator_routes',
@@ -36,17 +36,17 @@ async function main() {
   for (const view of viewChecks) {
     const { data, error } = await supabase.from(view as any).select('*').limit(1)
     if (error) {
-      console.warn(`âš  View ${view} indisponÃ­vel: ${error.message}`)
+      console.warn(`⚠ View ${view} indisponível: ${error.message}`)
     } else {
-      console.log(`âœ… View ${view}: OK (${data?.length || 0} linhas)`)    
+      console.log(`✅ View ${view}: OK (${data?.length || 0} linhas)`)    
     }
   }
 
-  console.log('âœ… Health-check concluÃ­do com sucesso.')
+  console.log('✅ Health-check concluído com sucesso.')
 }
 
 main().catch((e) => {
-  console.error('âŒ Health-check falhou:', e.message)
+  console.error('❌ Health-check falhou:', e.message)
   process.exit(1)
 })
 
