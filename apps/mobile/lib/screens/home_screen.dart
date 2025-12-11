@@ -1,36 +1,17 @@
 import 'package:flutter/material.dart';
 import '../core/theme/gf_tokens.dart';
+import '../domain/user_role.dart';
 import '../models/user.dart';
 import 'carrier/carrier_dashboard.dart';
 import 'driver/driver_dashboard.dart';
 import 'operator/operator_dashboard.dart';
 import 'passenger/passenger_dashboard.dart';
 
-/// Papeis suportados na plataforma.
-enum UserRole { operator, carrier, driver, passenger, unknown }
-
-/// Converte strings arbitrarias (inclui sinonimos pt-BR) para [UserRole].
+/// Converte strings arbitrarias (inclui sinonimos) para [UserRole].
+/// Usa a função parseRole do domain/user_role.dart
 extension UserRoleParsing on String {
-  UserRole toUserRole() {
-    final raw = trim().toLowerCase();
-    // normalizacao de sinonimos
-    final normalized = switch (raw) {
-      'motorista' => 'driver',
-      'passageiro' => 'passenger',
-      'operador' => 'operator',
-      'transportadora' => 'carrier',
-      _ => raw,
-    };
-    return switch (normalized) {
-      'operator' => UserRole.operator,
-      'carrier' => UserRole.carrier,
-      'driver' => UserRole.driver,
-      'passenger' => UserRole.passenger,
-      _ => UserRole.unknown,
-    };
-  }
+  UserRole? toUserRole() => parseRole(this);
 }
-
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({required this.user, super.key});
@@ -41,14 +22,17 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  late UserRole _role;
+  UserRole? _role;
 
   // Mapa centralizado com todos os destinos por papel.
+  // Usando roles PT-BR: empresa, operador, motorista, passageiro
   late final Map<UserRole, Widget Function(User)> _builders = {
-    UserRole.operator: (u) => OperatorDashboard(user: u),
-    UserRole.carrier: (u) => CarrierDashboard(user: u),
-    UserRole.driver: (u) => DriverDashboard(user: u),
-    UserRole.passenger: (u) => PassengerDashboard(user: u),
+    UserRole.empresa: (u) =>
+        OperatorDashboard(user: u), // Empresa usa OperatorDashboard
+    UserRole.operador: (u) => CarrierDashboard(
+        user: u), // Operador (transportadora) usa CarrierDashboard
+    UserRole.motorista: (u) => DriverDashboard(user: u),
+    UserRole.passageiro: (u) => PassengerDashboard(user: u),
   };
 
   @override
@@ -90,7 +74,7 @@ class _HomeScreenState extends State<HomeScreen> {
       },
       child: KeyedSubtree(
         // garante chave estavel por papel para animar corretamente
-        key: ValueKey<UserRole>(_role),
+        key: ValueKey<UserRole?>(_role),
         child: child,
       ),
     );
@@ -129,7 +113,7 @@ class _UnknownRoleScreen extends StatelessWidget {
                 Text(
                   'O papel do usuario "$role" nao e valido ou nao esta habilitado.',
                   style: theme.textTheme.bodyMedium?.copyWith(
-    color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -195,7 +179,7 @@ class _RoleInfoBadge extends StatelessWidget {
       ),
       child: DefaultTextStyle(
         style: theme.textTheme.bodySmall!.copyWith(
-    color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+          color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
         ),
         child: Column(
           children: [
