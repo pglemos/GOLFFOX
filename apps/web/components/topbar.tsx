@@ -207,13 +207,11 @@ export function Topbar({
     >
       <div className={cn(
         // Container flutuante com margem e border-radius - Application Shell 08
-        "bg-card relative z-51 mx-auto mt-2 flex items-center justify-between rounded-lg border px-6 py-2 shadow-sm",
+        "bg-card relative z-51 mx-auto mt-2 flex items-center justify-between rounded-lg border p-6 shadow-sm",
         // Desktop: w-[calc(100%-1rem)] = margin 8px cada lado
         "w-[calc(100%-1rem)]",
-        // Altura do container interno: 38px (h-10)
-        "h-10",
         // Mobile: full width, sem margin-top, sem border-radius
-        isMobile && "w-full h-14 rounded-none mt-0 border-x-0 border-t-0"
+        isMobile && "w-full rounded-none mt-0 border-x-0 border-t-0 p-4"
       )}>
         {/* Left Section - Exatamente como Application Shell 08 */}
         <div className="flex items-center gap-1.5 sm:gap-4">
