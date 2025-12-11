@@ -233,11 +233,11 @@ O projeto utiliza uma arquitetura híbrida moderna:
     - Configurações gerais
     - Preferências de exibição
 
-### Painel do Operador (`/operator`)
+### Painel da Empresa Contratante (`/empresa`)
 
-**Acesso**: Usuários com role `operator` ou `admin`
+**Acesso**: Usuários com role `empresa` ou `admin`
 
-**URL**: https://golffox.vercel.app/operator
+**URL**: https://golffox.vercel.app/empresa
 
 #### Módulos Implementados
 
@@ -251,46 +251,46 @@ O projeto utiliza uma arquitetura híbrida moderna:
    - SLA D0
    - Lista de viagens com filtros
 
-2. **Funcionários** (`/operator/funcionarios`) - Portal do Operador
+2. **Funcionários** (`/empresa/funcionarios`) - Portal da Empresa
    - Lista de funcionários da empresa
    - Busca e filtros
    - Cadastro de funcionários
    - Geocodificação automática de endereços
 
-3. **Rotas** (`/operator/rotas`) - Rotas atribuídas
+3. **Rotas** (`/empresa/rotas`) - Rotas atribuídas
    - Visualização de rotas
    - Status das rotas
-   - Mapa de rotas (`/operator/rotas/mapa`)
+   - Mapa de rotas (`/empresa/rotas/mapa`)
 
-4. **Alertas** (`/operator/alertas`) - Alertas específicos
+4. **Alertas** (`/empresa/alertas`) - Alertas específicos
    - Filtros por tipo (erro, aviso, info)
    - Busca
 
-5. **Comunicações** (`/operator/comunicacoes`) - Comunicação com funcionários
+5. **Comunicações** (`/empresa/comunicacoes`) - Comunicação com funcionários
 
-6. **Conformidade** (`/operator/conformidade`) - Conformidade regulatória
+6. **Conformidade** (`/empresa/conformidade`) - Conformidade regulatória
 
-7. **Custos** (`/operator/custos`) - Custos da empresa
+7. **Custos** (`/empresa/custos`) - Custos da empresa
 
-8. **Relatórios** (`/operator/relatorios`) - Relatórios da empresa
+8. **Relatórios** (`/empresa/relatorios`) - Relatórios da empresa
 
-9. **Solicitações** (`/operator/solicitacoes`) - Solicitações de funcionários
+9. **Solicitações** (`/empresa/solicitacoes`) - Solicitações de funcionários
 
-10. **Prestadores** (`/operator/prestadores`) - Gestão de prestadores
+10. **Prestadores** (`/empresa/prestadores`) - Gestão de prestadores
 
-11. **Ajuda** (`/operator/ajuda`) - Central de ajuda
+11. **Ajuda** (`/empresa/ajuda`) - Central de ajuda
     - FAQ
     - Suporte WhatsApp
     - Documentação
     - Status do sistema
 
-12. **Sincronizar** (`/operator/sincronizar`) - Sincronização de dados
+12. **Sincronizar** (`/empresa/sincronizar`) - Sincronização de dados
 
-13. **Preferências** (`/operator/preferencias`) - Configurações
+13. **Preferências** (`/empresa/preferencias`) - Configurações
 
-### Painel da Transportadora (`/carrier`)
+### Painel da Transportadora (`/transportadora`)
 
-**Acesso**: Usuários com role `carrier` ou `admin`
+**Acesso**: Usuários com role `operador` ou `admin`
 
 **URL**: https://golffox.vercel.app/carrier
 
@@ -331,18 +331,18 @@ O sistema utiliza autenticação baseada em cookies com verificação obrigatór
 3. **Redirecionamento**
    - Baseado no role do banco de dados:
      - `admin` → `/admin`
-     - `operator` → `/operator`
-     - `carrier` → `/carrier`
-     - `driver` → `/driver`
-     - `passenger` → `/passenger`
+     - `empresa` → `/empresa`
+     - `operador` → `/transportadora`
+     - `motorista` → `/motorista`
+     - `passageiro` → `/passageiro`
 
 ### Proteção de Rotas
 
 O middleware (`apps/web/middleware.ts`) protege automaticamente:
 
 - `/admin/*` - Apenas role `admin`
-- `/operator/*` - Roles `admin` ou `operator`
-- `/carrier/*` - Roles `admin` ou `carrier`
+- `/empresa/*` - Roles `admin` ou `empresa`
+- `/transportadora/*` - Roles `admin` ou `operador`
 
 ### CSRF Protection
 
@@ -427,7 +427,7 @@ flutter run
 1. Acesse http://localhost:3000
 2. Use as credenciais padrão:
    - **Admin**: `golffox@admin.com` / `senha123`
-   - **Operador**: `operador@empresa.com` / `senha123`
+   - **Empresa**: `teste@empresa.com` / `senha123`
 
 **⚠️ IMPORTANTE**: Certifique-se de que o usuário existe na tabela `users` do Supabase e está associado a uma empresa na tabela `gf_user_company_map`.
 
@@ -508,7 +508,7 @@ Execute os seeds para dados de desenvolvimento:
 
 ### Tabelas Principais
 
-- **`users`** - Usuários do sistema (admin, operator, carrier, driver, passenger)
+- **`users`** - Usuários do sistema (admin, empresa, operador, motorista, passageiro)
 - **`companies`** - Empresas operadoras
 - **`gf_user_company_map`** - Mapeamento usuário-empresa (multi-tenant)
 - **`vehicles`** - Veículos da frota
@@ -675,18 +675,18 @@ Todas as tabelas possuem políticas RLS configuradas:
 
 **Permissões**:
 - Gestão completa do sistema
-- Configuração de empresas e operadores
+- Configuração de empresas e transportadoras
 - Relatórios globais e analytics
 - Gerenciamento de permissões
 - Acesso a todos os dados
 
 **Credenciais padrão**: `golffox@admin.com` / `senha123`
 
-### 🏢 Operador (Empresa)
+### 🏢 Empresa Contratante
 
-**Role**: `operator`
+**Role**: `empresa`
 
-**Acesso**: Painel `/operator`
+**Acesso**: Painel `/empresa`
 
 **Permissões**:
 - Gestão de funcionários da empresa
@@ -695,15 +695,15 @@ Todas as tabelas possuem políticas RLS configuradas:
 - Alertas da empresa
 - Custos da empresa
 
-**Credenciais padrão**: `operador@empresa.com` / `senha123`
+**Credenciais padrão**: `teste@empresa.com` / `senha123`
 
-**⚠️ IMPORTANTE**: O operador precisa estar associado a uma empresa na tabela `gf_user_company_map`.
+**⚠️ IMPORTANTE**: O usuário precisa estar associado a uma empresa na tabela `gf_user_company_map`.
 
-### 🚛 Transportadora
+### 🚛 Transportadora (Operador)
 
-**Role**: `carrier`
+**Role**: `operador`
 
-**Acesso**: Painel `/carrier`
+**Acesso**: Painel `/transportadora`
 
 **Permissões**:
 - Gestão de frota
@@ -713,9 +713,9 @@ Todas as tabelas possuem políticas RLS configuradas:
 
 ### 🚗 Motorista
 
-**Role**: `driver`
+**Role**: `motorista`
 
-**Acesso**: App Flutter + Painel `/driver`
+**Acesso**: App Flutter + Painel `/motorista`
 
 **Permissões**:
 - App móvel para check-in/check-out
@@ -725,9 +725,9 @@ Todas as tabelas possuem políticas RLS configuradas:
 
 ### 🎫 Passageiro
 
-**Role**: `passenger`
+**Role**: `passageiro`
 
-**Acesso**: App Flutter + Painel `/passenger`
+**Acesso**: App Flutter + Painel `/passageiro`
 
 **Permissões**:
 - Rastreamento de ônibus em tempo real
