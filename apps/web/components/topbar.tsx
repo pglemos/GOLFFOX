@@ -206,10 +206,12 @@ export function Topbar({
       )}
     >
       <div className={cn(
-        // Container flutuante - Application Shell 08 EXATO
-        "bg-card relative z-51 mx-auto flex items-center justify-between border px-6 py-2 shadow-sm",
-        // Desktop: mt-6, rounded-xl, w-[calc(100%-3rem)]
-        "mt-6 rounded-xl w-[calc(100%-2rem)] sm:w-[calc(100%-3rem)]",
+        // Container flutuante - igual ao sidebar (border leve, rounded-lg)
+        "bg-card relative z-51 mx-auto flex items-center justify-between px-6 py-2",
+        // Border igual ao sidebar (border-sidebar-border, não bold)
+        "border border-sidebar-border shadow-sm",
+        // Desktop: mt-6, rounded-lg (igual sidebar), largura com margem
+        "mt-6 rounded-lg w-[calc(100%-2rem)] sm:w-[calc(100%-3rem)]",
         // Mobile: full width, sem margin-top, sem border-radius
         isMobile && "w-full h-14 rounded-none mt-0 border-x-0 border-t-0"
       )}>

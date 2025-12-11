@@ -35,6 +35,7 @@ import {
   Award
 } from "lucide-react"
 import { OperationalAlertsBadge } from "@/components/operational-alerts-badge"
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { cn } from "@/lib/utils"
 
 // Tipos para itens de menu
@@ -281,46 +282,45 @@ const transportadoraMenuGroups: MenuGroup[] = [
   }
 ]
 
-// Logo no header do sidebar
-const SidebarLogo = ({ panel }: { panel: 'admin' | 'operador' | 'transportadora' }) => {
+// Avatar no header do sidebar - 32x32
+const SidebarLogo = ({ panel, user }: { panel: 'admin' | 'operador' | 'transportadora', user?: { name: string, email: string, avatar_url?: string } }) => {
   const { state } = useSidebar()
   const isCollapsed = state === "collapsed"
 
-  const panelLabels = {
-    admin: 'Admin',
-    operador: 'Operador',
-    transportadora: 'Transport'
+  // Iniciais do nome para fallback
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(n => n[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2)
   }
 
   return (
     <SidebarHeader>
       <SidebarMenu>
         <SidebarMenuItem>
-          <SidebarMenuButton size="lg" asChild className="!bg-transparent">
-            <Link href={`/${panel === 'admin' ? 'admin' : panel}`}>
-              {/* Logo SVG - estilo Application Shell 08 */}
-              <svg
-                width="1em"
-                height="1em"
-                viewBox="0 0 328 329"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                className={cn(
-                  "[&_rect]:fill-sidebar [&_rect:first-child]:fill-primary",
-                  isCollapsed ? "size-8" : "size-8"
-                )}
-              >
-                <rect y="0.5" width="328" height="328" rx="164" fill="black" className="dark:fill-white" />
-                <path d="M165.018 72.3008V132.771C165.018 152.653 148.9 168.771 129.018 168.771H70.2288" stroke="white" strokeWidth="20" className="dark:stroke-black" />
-                <path d="M166.627 265.241L166.627 204.771C166.627 184.889 182.744 168.771 202.627 168.771L261.416 168.771" stroke="white" strokeWidth="20" className="dark:stroke-black" />
-                <line x1="238.136" y1="98.8184" x2="196.76" y2="139.707" stroke="white" strokeWidth="20" className="dark:stroke-black" />
-                <line x1="135.688" y1="200.957" x2="94.3128" y2="241.845" stroke="white" strokeWidth="20" className="dark:stroke-black" />
-                <line x1="133.689" y1="137.524" x2="92.5566" y2="96.3914" stroke="white" strokeWidth="20" className="dark:stroke-black" />
-                <line x1="237.679" y1="241.803" x2="196.547" y2="200.671" stroke="white" strokeWidth="20" className="dark:stroke-black" />
-              </svg>
-              <span className="text-xl font-semibold">Golf Fox</span>
-            </Link>
-          </SidebarMenuButton>
+          <button
+            type="button"
+            data-slot="button"
+            className={cn(
+              "focus-visible:border-ring focus-visible:ring-ring/50 inline-flex shrink-0 items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap transition-all outline-none focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50",
+              "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
+              "size-9",
+              isCollapsed ? "mx-auto" : "ml-1"
+            )}
+            aria-label="User menu"
+          >
+            <Avatar className="size-8 rounded-md">
+              {user?.avatar_url ? (
+                <AvatarImage src={user.avatar_url} alt={user?.name || 'User'} />
+              ) : null}
+              <AvatarFallback className="rounded-md text-xs">
+                {user?.name ? getInitials(user.name) : 'U'}
+              </AvatarFallback>
+            </Avatar>
+          </button>
         </SidebarMenuItem>
       </SidebarMenu>
     </SidebarHeader>
@@ -372,8 +372,8 @@ export function PremiumSidebar({
 
   return (
     <Sidebar variant="floating" collapsible="icon">
-      {/* Logo/Header */}
-      <SidebarLogo panel={panel} />
+      {/* Avatar/Header */}
+      <SidebarLogo panel={panel} user={user} />
 
       {/* Content */}
       <SidebarContent>
