@@ -139,15 +139,12 @@ export const AppShell = memo(function AppShell({ user, children, panel }: AppShe
           />
         </header>
 
-        {/* Main Content - Application Shell 08 style: card flutuante com margin */}
+        {/* Main Content - Application Shell 08 EXATO */}
         <main
           className={cn(
             "flex-1 size-full",
-            // Container flutuante como Application Shell 08
-            "m-4 ml-0 rounded-xl border shadow-sm",
-            "bg-muted/20",
-            // Padding interno
-            "p-4 sm:p-6"
+            // Padding exato do Application Shell 08
+            "px-4 py-6 sm:px-6"
           )}
         >
           {children}
