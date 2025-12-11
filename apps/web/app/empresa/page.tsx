@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card"
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
-import { OperatorKPICards } from "@/components/empresa/operator-kpi-cards"
+import { EmpresaKPICards } from "@/components/empresa/empresa-kpi-cards"
 import { ControlTowerCards } from "@/components/empresa/control-tower-cards"
 import { useEmpresaTenant } from "@/components/providers/empresa-tenant-provider"
 import { DashboardSkeleton } from "@/components/empresa/dashboard-skeleton"
@@ -21,7 +21,7 @@ import { useMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
 import { ResponsiveChart } from "@/components/shared/responsive-chart"
 
-export default function OperatorDashboard() {
+export default function EmpresaDashboard() {
   const router = useRouter()
   const isMobile = useMobile()
 
@@ -33,7 +33,7 @@ export default function OperatorDashboard() {
       // Se tem parâmetro ?company=, redirecionar para URL limpa
       if (url.searchParams.has('company')) {
         console.log('⚠️ Removendo parâmetro ?company= da URL')
-        router.replace('/operador')
+        router.replace('/empresa')
         return
       }
     }
@@ -147,7 +147,7 @@ export default function OperatorDashboard() {
 
   if (loading || tenantLoading || kpisLoading || controlTowerLoading) {
     return (
-      <AppShell user={{ id: user?.id || "", name: user?.name || "Operador", email: user?.email || "", role: "operador", avatar_url: (user as any)?.avatar_url }}>
+      <AppShell user={{ id: user?.id || "", name: user?.name || "Empresa", email: user?.email || "", role: "empresa", avatar_url: (user as any)?.avatar_url }}>
         <DashboardSkeleton />
       </AppShell>
     )
@@ -155,7 +155,7 @@ export default function OperatorDashboard() {
 
   if (tenantError || error) {
     return (
-      <AppShell user={{ id: user?.id || "", name: user?.name || "Operador", email: user?.email || "", role: "operador", avatar_url: (user as any)?.avatar_url }}>
+      <AppShell user={{ id: user?.id || "", name: user?.name || "Empresa", email: user?.email || "", role: "empresa", avatar_url: (user as any)?.avatar_url }}>
         <div className="min-h-screen flex items-center justify-center p-4">
           <Card className="p-8 max-w-md w-full text-center">
             <h2 className="text-xl font-bold mb-2 text-red-600">Erro ao carregar</h2>
@@ -171,7 +171,7 @@ export default function OperatorDashboard() {
 
   if (!tenantCompanyId) {
     return (
-      <AppShell user={{ id: user?.id || "", name: user?.name || "Operador", email: user?.email || "", role: "operador", avatar_url: (user as any)?.avatar_url }}>
+      <AppShell user={{ id: user?.id || "", name: user?.name || "Empresa", email: user?.email || "", role: "empresa", avatar_url: (user as any)?.avatar_url }}>
         <div className="min-h-screen flex items-center justify-center p-4">
           <Card className="p-8 max-w-md w-full text-center">
             <h2 className="text-xl font-bold mb-2">Nenhuma empresa selecionada</h2>
@@ -186,9 +186,9 @@ export default function OperatorDashboard() {
   return (
     <AppShell user={{
       id: user?.id || "",
-      name: user?.name || "Operador",
+      name: user?.name || "Empresa",
       email: user?.email || "",
-      role: "operador",
+      role: "empresa",
       avatar_url: (user as any)?.avatar_url
     }}>
       <div className="space-y-4 sm:space-y-6 lg:space-y-8 w-full">
@@ -254,7 +254,7 @@ export default function OperatorDashboard() {
             icon={CheckCircle}
             color="text-indigo-600"
             bgColor="bg-indigo-50"
-            subtitle="GOLF FOX → Operador"
+            subtitle="GOLF FOX → Empresa"
             delay={0.6}
           />
           <KPICardEnhanced
@@ -306,7 +306,7 @@ export default function OperatorDashboard() {
                   <CardTitle className="text-lg sm:text-xl font-semibold mb-1.5">Mapa em Tempo Real</CardTitle>
                   <p className="text-xs sm:text-sm text-[var(--ink-muted)]">Visualize todas as rotas ativas no mapa</p>
                 </div>
-                <Button variant="outline" size="sm" className="w-full sm:w-auto min-h-[44px] touch-manipulation" onClick={() => router.push("/operador/rotas/mapa")}>
+                <Button variant="outline" size="sm" className="w-full sm:w-auto min-h-[44px] touch-manipulation" onClick={() => router.push("/empresa/rotas/mapa")}>
                   <MapPin className="h-4 w-4 mr-2" />
                   Ver no Mapa
                 </Button>

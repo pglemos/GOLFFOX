@@ -70,16 +70,16 @@ class RouteGuard {
       case UserRole.admin:
         return _isAdminRoute(location) || _isSharedRoute(location);
 
-      case UserRole.operator:
+      case UserRole.empresa: // Empresa Contratante (antigo operator)
         return _isOperatorRoute(location) || _isSharedRoute(location);
 
-      case UserRole.carrier:
+      case UserRole.operador: // Transportadora (antigo carrier)
         return _isCarrierRoute(location) || _isSharedRoute(location);
 
-      case UserRole.driver:
+      case UserRole.motorista:
         return _isDriverRoute(location) || _isSharedRoute(location);
 
-      case UserRole.passenger:
+      case UserRole.passageiro:
         return _isPassengerRoute(location) || _isSharedRoute(location);
     }
   }
@@ -161,13 +161,13 @@ class RouteGuard {
     switch (role) {
       case UserRole.admin:
         return AppRoutes.adminHome;
-      case UserRole.operator:
+      case UserRole.empresa: // Empresa Contratante usa rotas operator
         return AppRoutes.operatorHome;
-      case UserRole.carrier:
+      case UserRole.operador: // Transportadora usa rotas carrier
         return AppRoutes.carrierHome;
-      case UserRole.driver:
+      case UserRole.motorista:
         return AppRoutes.driverHome;
-      case UserRole.passenger:
+      case UserRole.passageiro:
         return AppRoutes.passengerHome;
     }
   }
@@ -190,9 +190,8 @@ class RoleBasedNavigation {
     AuthManager authManager,
   ) async {
     // Obtém a localização atual via RouteInformationProvider
-    final currentLocation = AppRouter
-        .instance.router.routeInformationProvider.value.uri
-        .toString();
+    final currentLocation =
+        AppRouter.instance.router.routeInformationProvider.value.uri.toString();
     final redirectRoute = await RouteGuard.checkAccess(
       location: currentLocation,
       authManager: authManager,
@@ -215,7 +214,7 @@ class RoleBasedNavigation {
           AppRoutes.adminHome,
           // Adicione aqui subrotas de admin quando existirem
         ];
-      case UserRole.operator:
+      case UserRole.empresa: // Empresa Contratante (antigo operator)
         return [
           AppRoutes.operatorHome,
           AppRoutes.operatorTrips,
@@ -223,7 +222,7 @@ class RoleBasedNavigation {
           AppRoutes.operatorReports,
         ];
 
-      case UserRole.carrier:
+      case UserRole.operador: // Transportadora (antigo carrier)
         return [
           AppRoutes.carrierHome,
           AppRoutes.carrierFleet,
@@ -232,7 +231,7 @@ class RoleBasedNavigation {
           AppRoutes.carrierFinancials,
         ];
 
-      case UserRole.driver:
+      case UserRole.motorista:
         return [
           AppRoutes.driverHome,
           AppRoutes.driverTrips,
@@ -241,7 +240,7 @@ class RoleBasedNavigation {
           AppRoutes.driverDocuments,
         ];
 
-      case UserRole.passenger:
+      case UserRole.passageiro:
         return [
           AppRoutes.passengerHome,
           AppRoutes.passengerBooking,
@@ -311,13 +310,13 @@ class RouteTransitions {
             CurveTween(curve: curve),
           );
 
-        return ScaleTransition(
-          scale: animation.drive(tween),
-          child: FadeTransition(
-            opacity: animation,
-            child: child,
-          ),
-        );
-      },
-    );
+          return ScaleTransition(
+            scale: animation.drive(tween),
+            child: FadeTransition(
+              opacity: animation,
+              child: child,
+            ),
+          );
+        },
+      );
 }

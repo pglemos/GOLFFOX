@@ -44,7 +44,8 @@ class AuthManager extends ChangeNotifier {
     // Em modo dev/offline, se Supabase não estiver inicializado, evitamos
     // registrar listeners ou acessar o cliente para não bloquear o boot.
     if (!Supabase.instance.isInitialized) {
-      _logger.warning(' Supabase não inicializado (dev/offline). Pulando AuthManager.initialize.');
+      _logger.warning(
+          ' Supabase não inicializado (dev/offline). Pulando AuthManager.initialize.');
       _isInitialized = true;
       notifyListeners();
       return;
@@ -123,7 +124,7 @@ class AuthManager extends ChangeNotifier {
     required String email,
     required String password,
     required String fullName,
-    UserRole role = UserRole.passenger,
+    UserRole role = UserRole.passageiro,
     Map<String, dynamic>? additionalData,
   }) async {
     try {
@@ -237,11 +238,10 @@ class AuthManager extends ChangeNotifier {
 
   /// Check if user has any of the required roles
   bool hasAnyRole(List<UserRole> requiredRoles) =>
-      currentUserRole != null &&
-      requiredRoles.contains(currentUserRole);
+      currentUserRole != null && requiredRoles.contains(currentUserRole);
 
-  /// Check if user has operator privileges
-  bool get isOperator => hasRole(UserRole.operator);
+  /// Check if user has empresa privileges (antigo isOperator)
+  bool get isEmpresa => hasRole(UserRole.empresa);
 
   // Private methods
 
@@ -291,7 +291,7 @@ class AuthManager extends ChangeNotifier {
           id: userProfile.id,
           email: userProfile.email,
           fullName: userProfile.name,
-          role: parseRole(userProfile.role) ?? UserRole.passenger,
+          role: parseRole(userProfile.role) ?? UserRole.passageiro,
           createdAt: userProfile.createdAt,
           updatedAt: userProfile.updatedAt,
         );
@@ -306,16 +306,19 @@ class AuthManager extends ChangeNotifier {
 
         final currentUser = _supabase.currentUser;
         if (currentUser != null) {
-          var role = UserRole.passenger;
+          var role = UserRole.passageiro;
           final email = (currentUser.email ?? '').toLowerCase();
           bool contains(String text) => email.contains(text);
 
-          if (contains('operador') || contains('operator')) {
-            role = UserRole.operator;
+          // Detectar role pelo email (compatibilidade)
+          if (contains('empresa') ||
+              contains('operador') ||
+              contains('operator')) {
+            role = UserRole.empresa; // Gestor da Empresa Contratante
           } else if (contains('transportadora') || contains('carrier')) {
-            role = UserRole.carrier;
+            role = UserRole.operador; // Gestor da Transportadora
           } else if (contains('motorista') || contains('driver')) {
-            role = UserRole.driver;
+            role = UserRole.motorista;
           }
 
           await _createUserProfile(
@@ -336,7 +339,6 @@ class AuthManager extends ChangeNotifier {
       await _errorService.handleSupabaseError(error);
     }
   }
-
 
   Future<void> _createUserProfile({
     required String userId,
@@ -373,7 +375,6 @@ class AuthManager extends ChangeNotifier {
 
 /// User profile model
 class UserProfile {
-
   const UserProfile({
     required this.id,
     required this.email,
@@ -388,7 +389,7 @@ class UserProfile {
         id: json['id'] as String,
         email: json['email'] as String,
         fullName: (json['full_name'] as String?) ?? (json['email'] as String),
-        role: parseRole(json['role'] as String?) ?? UserRole.passenger,
+        role: parseRole(json['role'] as String?) ?? UserRole.passageiro,
         createdAt: DateTime.parse(json['created_at'] as String),
         updatedAt: DateTime.parse(json['updated_at'] as String),
         metadata: json['metadata'] as Map<String, dynamic>?,
@@ -414,7 +415,6 @@ class UserProfile {
 
 /// Authentication result
 class AuthResult {
-
   const AuthResult._({
     required this.isSuccess,
     this.user,

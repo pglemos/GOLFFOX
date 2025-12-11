@@ -93,7 +93,8 @@ class AppRouter {
   }
 
   /// Check if user can access route
-  Future<bool> canAccessRoute(String route, BuildContext context, GoRouterState state) async {
+  Future<bool> canAccessRoute(
+      String route, BuildContext context, GoRouterState state) async {
     final redirectRoute = await RouteGuard.checkAccess(
       location: route,
       authManager: _authManager,
@@ -149,131 +150,132 @@ class AppRouter {
   }
 
   List<RouteBase> _buildRoutes() => [
-      // Root route - redirects based on authentication status
-      GoRoute(
-        path: '/',
-        name: 'root',
-        redirect: (context, state) {
-          final isAuthenticated = _authManager.isAuthenticated;
-          final currentRole = _authManager.currentUserRole;
+        // Root route - redirects based on authentication status
+        GoRoute(
+          path: '/',
+          name: 'root',
+          redirect: (context, state) {
+            final isAuthenticated = _authManager.isAuthenticated;
+            final currentRole = _authManager.currentUserRole;
 
-          _logger.debug(
-              'Root redirect - authenticated: $isAuthenticated, role: $currentRole');
+            _logger.debug(
+                'Root redirect - authenticated: $isAuthenticated, role: $currentRole');
 
-          if (!isAuthenticated) {
-            _logger.info('User not authenticated, redirecting to login');
+            if (!isAuthenticated) {
+              _logger.info('User not authenticated, redirecting to login');
+              return AppRoutes.login;
+            }
+
+            if (currentRole != null) {
+              final homeRoute = _getHomeRouteForRole(currentRole);
+              _logger.info(
+                  'User authenticated with role $currentRole, redirecting to: $homeRoute');
+              return homeRoute;
+            }
+
+            _logger.warning(
+                'User authenticated but no role found, redirecting to login');
             return AppRoutes.login;
-          }
+          },
+        ),
 
-          if (currentRole != null) {
-            final homeRoute = _getHomeRouteForRole(currentRole);
-            _logger.info(
-                'User authenticated with role $currentRole, redirecting to: $homeRoute');
-            return homeRoute;
-          }
+        // Login route
+        GoRoute(
+          path: AppRoutes.login,
+          name: 'login',
+          builder: (context, state) => const LoginScreen(),
+        ),
 
-          _logger.warning(
-              'User authenticated but no role found, redirecting to login');
-          return AppRoutes.login;
-        },
-      ),
+        // Operator routes
+        GoRoute(
+          path: AppRoutes.adminHome,
+          name: 'admin-home',
+          builder: (context, state) => const admin.DashboardPage(),
+        ),
 
-      // Login route
-      GoRoute(
-        path: AppRoutes.login,
-        name: 'login',
-        builder: (context, state) => const LoginScreen(),
-      ),
+        // Operator route (separado do admin)
+        GoRoute(
+          path: AppRoutes.operatorHome,
+          name: 'operator-home',
+          builder: (context, state) => _buildOperatorHome(),
+        ),
 
-      // Operator routes
-      GoRoute(
-        path: AppRoutes.adminHome,
-        name: 'admin-home',
-        builder: (context, state) => const admin.DashboardPage(),
-      ),
+        // (Sem aliases: admin usa apenas '/admin')
 
-      // Operator route (separado do admin)
-      GoRoute(
-        path: AppRoutes.operatorHome,
-        name: 'operator-home',
-        builder: (context, state) => _buildOperatorHome(),
-      ),
+        // Carrier routes
+        GoRoute(
+          path: AppRoutes.carrierHome,
+          name: 'carrier-home',
+          builder: (context, state) => _buildCarrierHome(),
+        ),
 
-      // (Sem aliases: admin usa apenas '/admin')
+        // Driver routes
+        GoRoute(
+          path: AppRoutes.driverHome,
+          name: 'driver-home',
+          builder: (context, state) => _buildDriverHome(),
+        ),
 
-      // Carrier routes
-      GoRoute(
-        path: AppRoutes.carrierHome,
-        name: 'carrier-home',
-        builder: (context, state) => _buildCarrierHome(),
-      ),
+        // Passenger routes
+        GoRoute(
+          path: AppRoutes.passengerHome,
+          name: 'passenger-home',
+          builder: (context, state) => _buildPassengerHome(),
+        ),
 
-      // Driver routes
-      GoRoute(
-        path: AppRoutes.driverHome,
-        name: 'driver-home',
-        builder: (context, state) => _buildDriverHome(),
-      ),
+        // Development routes
+        GoRoute(
+          path: AppRoutes.devUiCatalog,
+          name: 'dev-ui-catalog',
+          builder: (context, state) => _buildUiCatalog(),
+        ),
 
-      // Passenger routes
-      GoRoute(
-        path: AppRoutes.passengerHome,
-        name: 'passenger-home',
-        builder: (context, state) => _buildPassengerHome(),
-      ),
+        // Map routes
+        GoRoute(
+          path: AppRoutes.map,
+          name: 'map',
+          builder: (context, state) => const MapaPage(),
+        ),
 
-      // Development routes
-      GoRoute(
-        path: AppRoutes.devUiCatalog,
-        name: 'dev-ui-catalog',
-        builder: (context, state) => _buildUiCatalog(),
-      ),
+        // Settings routes
+        GoRoute(
+          path: AppRoutes.settings,
+          name: 'settings',
+          builder: (context, state) => _buildSettings(),
+        ),
 
-      // Map routes
-      GoRoute(
-        path: AppRoutes.map,
-        name: 'map',
-        builder: (context, state) => const MapaPage(),
-      ),
+        // Profile routes
+        GoRoute(
+          path: AppRoutes.profile,
+          name: 'profile',
+          builder: (context, state) => _buildProfile(),
+        ),
 
-      // Settings routes
-      GoRoute(
-        path: AppRoutes.settings,
-        name: 'settings',
-        builder: (context, state) => _buildSettings(),
-      ),
+        // Error routes (explicit)
+        GoRoute(
+          path: AppRoutes.error,
+          name: 'error',
+          builder: _buildErrorPage,
+        ),
+        GoRoute(
+          path: AppRoutes.notFound,
+          name: 'not-found',
+          builder: _buildErrorPage,
+        ),
 
-      // Profile routes
-      GoRoute(
-        path: AppRoutes.profile,
-        name: 'profile',
-        builder: (context, state) => _buildProfile(),
-      ),
-
-      // Error routes (explicit)
-      GoRoute(
-        path: AppRoutes.error,
-        name: 'error',
-        builder: _buildErrorPage,
-      ),
-      GoRoute(
-        path: AppRoutes.notFound,
-        name: 'not-found',
-        builder: _buildErrorPage,
-      ),
-
-      // Feature routes
-      ...DriverRoutes.routes,
-    ];
+        // Feature routes
+        ...DriverRoutes.routes,
+      ];
 
   Widget _buildErrorPage(BuildContext context, GoRouterState state) {
     LoggerService.instance.error('Route error: ${state.error}');
 
-    final Object routeError = state.error ?? GxError(
-      code: 'routing.not_found',
-      message: 'Route not found: ${state.uri.path}',
-      userMessage: 'Página não encontrada: ${state.uri.path}',
-    );
+    final Object routeError = state.error ??
+        GxError(
+          code: 'routing.not_found',
+          message: 'Route not found: ${state.uri.path}',
+          userMessage: 'Página não encontrada: ${state.uri.path}',
+        );
 
     return Scaffold(
       appBar: AppBar(title: const Text('Erro')),
@@ -289,10 +291,12 @@ class AppRouter {
   String _getHomeRouteForRole(UserRole? role) {
     final homeRoute = switch (role) {
       UserRole.admin => AppRoutes.adminHome,
-      UserRole.operator => AppRoutes.operatorHome,
-      UserRole.carrier => AppRoutes.carrierHome,
-      UserRole.driver => AppRoutes.driverHome,
-      UserRole.passenger => AppRoutes.passengerHome,
+      UserRole.empresa =>
+        AppRoutes.operatorHome, // empresa usa rotas operator existentes
+      UserRole.operador =>
+        AppRoutes.carrierHome, // operador usa rotas carrier existentes
+      UserRole.motorista => AppRoutes.driverHome,
+      UserRole.passageiro => AppRoutes.passengerHome,
       null => AppRoutes.passengerHome,
     };
 
@@ -303,111 +307,117 @@ class AppRouter {
   // Page builders
 
   Widget _buildOperatorHome() => _buildDashboardWithUser(
-      (user) => OperatorDashboard(user: user),
-      fallbackRole: UserRole.operator,
-    );
+        (user) => OperatorDashboard(user: user),
+        fallbackRole:
+            UserRole.empresa, // empresa é o role para painel /operator
+      );
 
-  Widget _buildCarrierHome() => _buildDashboardWithUser((user) => CarrierDashboard(user: user));
+  Widget _buildCarrierHome() =>
+      _buildDashboardWithUser((user) => CarrierDashboard(user: user));
 
-  Widget _buildDriverHome() => _buildDashboardWithUser((user) => DriverDashboard(user: user));
+  Widget _buildDriverHome() =>
+      _buildDashboardWithUser((user) => DriverDashboard(user: user));
 
-  Widget _buildPassengerHome() => _buildDashboardWithUser((user) => PassengerDashboard(user: user));
+  Widget _buildPassengerHome() =>
+      _buildDashboardWithUser((user) => PassengerDashboard(user: user));
 
   Widget _buildDashboardWithUser(
     Widget Function(app_user.User) builder, {
     UserRole? fallbackRole,
-  }) => FutureBuilder<app_user.User?>(
-      future: _supabaseService.getCurrentUserProfile(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState != ConnectionState.done) {
-          return const Scaffold(
-            body: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  CircularProgressIndicator(),
-                  SizedBox(height: 16),
-                  Text('Carregando perfil do usuario...'),
-                ],
+  }) =>
+      FutureBuilder<app_user.User?>(
+        future: _supabaseService.getCurrentUserProfile(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState != ConnectionState.done) {
+            return const Scaffold(
+              body: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircularProgressIndicator(),
+                    SizedBox(height: 16),
+                    Text('Carregando perfil do usuario...'),
+                  ],
+                ),
               ),
-            ),
-          );
-        }
-        if (snapshot.hasError) {
-          return Scaffold(
-            body: Center(
-              child: GfErrorWidget.fromError(
-                error: snapshot.error!,
-                onRetry: () {
-                  // Força rebuild do FutureBuilder
-                  (context as Element).markNeedsBuild();
-                },
-              ),
-            ),
-          );
-        }
-        final user = snapshot.data;
-        if (user == null) {
-          // Fallback: cria um perfil mínimo se a rota exigir acesso (ex.: operador)
-          if (fallbackRole == UserRole.operator) {
-            final now = DateTime.now();
-            final fallback = app_user.User(
-              id: 'admin-fallback',
-              email: 'golffox@admin.com',
-              name: 'GolfFox Admin',
-              role: 'operator',
-              createdAt: now,
-              updatedAt: now,
             );
-            return builder(fallback);
           }
-          return Scaffold(
-            body: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.person_off, size: 64, color: Colors.orange),
-                  const SizedBox(height: 16),
-                  const Text(
-          'Perfil não encontrado',
-                    style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-          'Não foi possível encontrar o perfil do usuário.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.grey[600]),
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () {
-                      (context as Element).markNeedsBuild();
-                    },
-                    child: const Text('Tentar novamente'),
-                  ),
-                ],
+          if (snapshot.hasError) {
+            return Scaffold(
+              body: Center(
+                child: GfErrorWidget.fromError(
+                  error: snapshot.error!,
+                  onRetry: () {
+                    // Força rebuild do FutureBuilder
+                    (context as Element).markNeedsBuild();
+                  },
+                ),
               ),
-            ),
-          );
-        }
-        return builder(user);
-      },
-    );
+            );
+          }
+          final user = snapshot.data;
+          if (user == null) {
+            // Fallback: cria um perfil mínimo se a rota exigir acesso (ex.: empresa/operador)
+            if (fallbackRole == UserRole.empresa) {
+              final now = DateTime.now();
+              final fallback = app_user.User(
+                id: 'admin-fallback',
+                email: 'golffox@admin.com',
+                name: 'GolfFox Admin',
+                role: 'empresa',
+                createdAt: now,
+                updatedAt: now,
+              );
+              return builder(fallback);
+            }
+            return Scaffold(
+              body: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.person_off,
+                        size: 64, color: Colors.orange),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Perfil não encontrado',
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Não foi possível encontrar o perfil do usuário.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.grey[600]),
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: () {
+                        (context as Element).markNeedsBuild();
+                      },
+                      child: const Text('Tentar novamente'),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+          return builder(user);
+        },
+      );
 
   Widget _buildUiCatalog() => const UiCatalogPage();
 
   Widget _buildSettings() => const Scaffold(
-      body: Center(
-        child: Text('Settings - TODO'),
-      ),
-    );
+        body: Center(
+          child: Text('Settings - TODO'),
+        ),
+      );
 
   Widget _buildProfile() => const Scaffold(
-      body: Center(
-        child: Text('Profile - TODO'),
-      ),
-    );
+        body: Center(
+          child: Text('Profile - TODO'),
+        ),
+      );
 
   /// Basic role access check for redirect logic
   bool _hasBasicRoleAccess(String location, UserRole? role) {
@@ -417,14 +427,22 @@ class AppRouter {
     switch (role) {
       case UserRole.admin:
         return location.startsWith('/admin') || _isSharedRoute(location);
-      case UserRole.operator:
-        return location.startsWith('/operator') || _isSharedRoute(location);
-      case UserRole.carrier:
-        return location.startsWith('/carrier') || _isSharedRoute(location);
-      case UserRole.driver:
-        return location.startsWith('/driver') || _isSharedRoute(location);
-      case UserRole.passenger:
-        return location.startsWith('/passenger') || _isSharedRoute(location);
+      case UserRole.empresa: // Empresa usa rotas /operator
+        return location.startsWith('/operator') ||
+            location.startsWith('/empresa') ||
+            _isSharedRoute(location);
+      case UserRole.operador: // Operador (transportadora) usa rotas /carrier
+        return location.startsWith('/carrier') ||
+            location.startsWith('/transportadora') ||
+            _isSharedRoute(location);
+      case UserRole.motorista:
+        return location.startsWith('/driver') ||
+            location.startsWith('/motorista') ||
+            _isSharedRoute(location);
+      case UserRole.passageiro:
+        return location.startsWith('/passenger') ||
+            location.startsWith('/passageiro') ||
+            _isSharedRoute(location);
     }
   }
 
@@ -445,7 +463,6 @@ class AppRouter {
 
 /// Route configuration
 class RouteConfig {
-
   const RouteConfig({
     required this.requiredRoles,
     this.isPublic = false,

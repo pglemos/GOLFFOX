@@ -80,20 +80,20 @@ class _LoginScreenState extends State<LoginScreen> {
           case UserRole.admin:
             targetRoute = AppRoutes.adminHome;
             break;
-          case UserRole.operator:
+          case UserRole.empresa: // Empresa Contratante (antigo operator)
             targetRoute = AppRoutes.operatorHome;
             break;
-          case UserRole.carrier:
+          case UserRole.operador: // Transportadora (antigo carrier)
             targetRoute = AppRoutes.carrierHome;
             break;
-          case UserRole.driver:
+          case UserRole.motorista:
             targetRoute = AppRoutes.driverHome;
             break;
-          case UserRole.passenger:
+          case UserRole.passageiro:
             targetRoute = AppRoutes.passengerHome;
             break;
           case null:
-            // Para admin ou outros papéis não reconhecidos, usar operador como padrão
+            // Para admin ou outros papéis não reconhecidos, usar empresa como padrão
             targetRoute = AppRoutes.operatorHome;
             break;
         }
@@ -163,175 +163,186 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-      backgroundColor: Colors.grey[50],
-      body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 400),
-              child: Card(
-                elevation: 8,
-    shadowColor: Colors.black.withValues(alpha: 0.1),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(32),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        // Logo
-                        SizedBox(
-                          width: 120,
-                          height: 120,
-                        child: SvgPicture.asset(
-                          'assets/icons/golf_fox_logo.svg',
-                        ),
-                        ),
-                        const SizedBox(height: 24),
-
-                        // Título
-                        const Text(
-                          'GOLF FOX',
-                          style: TextStyle(
-                            fontSize: 32,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF2D3748),
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-
-                        // Subtítulo
-                        Text(
-                          I18n.t(context, 'app.subtitle', params: {}),
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                        const SizedBox(height: 32),
-
-                        // Campo E-mail
-                        TextFormField(
-                          controller: _emailController,
-                          keyboardType: TextInputType.emailAddress,
-                          textInputAction: TextInputAction.next,
-                          decoration: InputDecoration(
-                            labelText: I18n.t(context, 'auth.login.email.label'),
-                            hintText: I18n.t(context, 'auth.login.email.hint'),
-                            prefixIcon: const Icon(Icons.email_outlined),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide:
-                                  BorderSide(color: Colors.grey.shade300),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide:
-                                  const BorderSide(color: Color(0xFFFF6B35)),
+        backgroundColor: Colors.grey[50],
+        body: SafeArea(
+          child: Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(24),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 400),
+                child: Card(
+                  elevation: 8,
+                  shadowColor: Colors.black.withValues(alpha: 0.1),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(32),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          // Logo
+                          SizedBox(
+                            width: 120,
+                            height: 120,
+                            child: SvgPicture.asset(
+                              'assets/icons/golf_fox_logo.svg',
                             ),
                           ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return I18n.t(context, 'auth.login.email.required');
-                            }
-                            if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-                                .hasMatch(value)) {
-                              return I18n.t(context, 'auth.login.email.invalid');
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: 16),
+                          const SizedBox(height: 24),
 
-                        // Campo Senha
-                        TextFormField(
-                          controller: _passwordController,
-                          obscureText: _obscurePassword,
-                          textInputAction: TextInputAction.done,
-                          onFieldSubmitted: (_) => _handleLogin(),
-                          decoration: InputDecoration(
-                            labelText: I18n.t(context, 'auth.login.password.label'),
-                            hintText: I18n.t(context, 'auth.login.password.hint'),
-                            prefixIcon: const Icon(Icons.lock_outlined),
-                            suffixIcon: IconButton(
-                              icon: Icon(
-                                _obscurePassword
-                                    ? Icons.visibility
-                                    : Icons.visibility_off,
-                              ),
-                              onPressed: () {
-                                setState(() {
-                                  _obscurePassword = !_obscurePassword;
-                                });
-                              },
-                            ),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide:
-                                  BorderSide(color: Colors.grey.shade300),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide:
-                                  const BorderSide(color: Color(0xFFFF6B35)),
+                          // Título
+                          const Text(
+                            'GOLF FOX',
+                            style: TextStyle(
+                              fontSize: 32,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF2D3748),
                             ),
                           ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return I18n.t(context, 'auth.login.password.required');
-                            }
-                            if (value.length < 6) {
-                              return I18n.t(context, 'auth.login.password.min_length', params: {'min': '6'});
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: 24),
+                          const SizedBox(height: 8),
 
-                        // Botão Entrar
-                        SizedBox(
-                          width: double.infinity,
-                          height: 48,
-                          child: ElevatedButton(
-                            onPressed: _isLoading ? null : _handleLogin,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFFFF6B35),
-                              foregroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(
+                          // Subtítulo
+                          Text(
+                            I18n.t(context, 'app.subtitle', params: {}),
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                          const SizedBox(height: 32),
+
+                          // Campo E-mail
+                          TextFormField(
+                            controller: _emailController,
+                            keyboardType: TextInputType.emailAddress,
+                            textInputAction: TextInputAction.next,
+                            decoration: InputDecoration(
+                              labelText:
+                                  I18n.t(context, 'auth.login.email.label'),
+                              hintText:
+                                  I18n.t(context, 'auth.login.email.hint'),
+                              prefixIcon: const Icon(Icons.email_outlined),
+                              border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),
-                              elevation: 2,
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide:
+                                    BorderSide(color: Colors.grey.shade300),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide:
+                                    const BorderSide(color: Color(0xFFFF6B35)),
+                              ),
                             ),
-                            child: _isLoading
-                                ? const SizedBox(
-                                    width: 20,
-                                    height: 20,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      valueColor: AlwaysStoppedAnimation<Color>(
-                                          Colors.white),
-                                    ),
-                                  )
-                                : Text(
-                                    I18n.t(context, 'auth.login.submit'),
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return I18n.t(
+                                    context, 'auth.login.email.required');
+                              }
+                              if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                                  .hasMatch(value)) {
+                                return I18n.t(
+                                    context, 'auth.login.email.invalid');
+                              }
+                              return null;
+                            },
                           ),
-                        ),
-                      ],
+                          const SizedBox(height: 16),
+
+                          // Campo Senha
+                          TextFormField(
+                            controller: _passwordController,
+                            obscureText: _obscurePassword,
+                            textInputAction: TextInputAction.done,
+                            onFieldSubmitted: (_) => _handleLogin(),
+                            decoration: InputDecoration(
+                              labelText:
+                                  I18n.t(context, 'auth.login.password.label'),
+                              hintText:
+                                  I18n.t(context, 'auth.login.password.hint'),
+                              prefixIcon: const Icon(Icons.lock_outlined),
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  _obscurePassword
+                                      ? Icons.visibility
+                                      : Icons.visibility_off,
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    _obscurePassword = !_obscurePassword;
+                                  });
+                                },
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide:
+                                    BorderSide(color: Colors.grey.shade300),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide:
+                                    const BorderSide(color: Color(0xFFFF6B35)),
+                              ),
+                            ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return I18n.t(
+                                    context, 'auth.login.password.required');
+                              }
+                              if (value.length < 6) {
+                                return I18n.t(
+                                    context, 'auth.login.password.min_length',
+                                    params: {'min': '6'});
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 24),
+
+                          // Botão Entrar
+                          SizedBox(
+                            width: double.infinity,
+                            height: 48,
+                            child: ElevatedButton(
+                              onPressed: _isLoading ? null : _handleLogin,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFFFF6B35),
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                elevation: 2,
+                              ),
+                              child: _isLoading
+                                  ? const SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        valueColor:
+                                            AlwaysStoppedAnimation<Color>(
+                                                Colors.white),
+                                      ),
+                                    )
+                                  : Text(
+                                      I18n.t(context, 'auth.login.submit'),
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -339,6 +350,5 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
         ),
-      ),
-    );
+      );
 }
