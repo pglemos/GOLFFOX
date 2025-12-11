@@ -108,7 +108,7 @@ export const proxy = async (request: NextRequest) => {
   if (process.env.NEXT_PUBLIC_DISABLE_MIDDLEWARE === 'true' && isDevelopment) {
     return NextResponse.next()
   }
-  
+
   // ✅ Bypass para rotas de API - não aplicar middleware em rotas de API
   if (pathname.startsWith('/api')) {
     return NextResponse.next()
@@ -124,7 +124,7 @@ export const proxy = async (request: NextRequest) => {
   ) {
     return NextResponse.next()
   }
-  
+
   const response = NextResponse.next()
 
   // Redirecionar /login para / (raiz)
@@ -144,19 +144,26 @@ export const proxy = async (request: NextRequest) => {
     return NextResponse.redirect(transportadoraUrl)
   }
 
-  // ✅ Redirecionar /operator para /operador (compatibilidade)
+  // ✅ Redirecionar /operator para /empresa (compatibilidade - role antiga operator → nova role empresa)
   if (pathname.startsWith('/operator')) {
-    const operadorUrl = new URL(pathname.replace('/operator', '/operador'), request.url)
-    operadorUrl.search = request.nextUrl.search
-    return NextResponse.redirect(operadorUrl)
+    const empresaUrl = new URL(pathname.replace('/operator', '/empresa'), request.url)
+    empresaUrl.search = request.nextUrl.search
+    return NextResponse.redirect(empresaUrl)
   }
 
-  // ✅ Proteger rotas /operador, /admin e /transportadora com autenticação
+  // ✅ Redirecionar /operador para /transportadora (compatibilidade - nome confuso)
+  if (pathname.startsWith('/operador')) {
+    const transportadoraUrl = new URL(pathname.replace('/operador', '/transportadora'), request.url)
+    transportadoraUrl.search = request.nextUrl.search
+    return NextResponse.redirect(transportadoraUrl)
+  }
+
+  // ✅ Proteger rotas /empresa, /admin e /transportadora com autenticação
   // VALIDAR token com Supabase antes de liberar acesso
-  if (pathname.startsWith('/operador') || pathname.startsWith('/admin') || pathname.startsWith('/transportadora')) {
+  if (pathname.startsWith('/empresa') || pathname.startsWith('/admin') || pathname.startsWith('/transportadora')) {
     // Extrair access_token dos cookies
     const accessToken = extractAccessToken(request)
-    
+
     if (!accessToken) {
       if (isDevelopment) {
         console.log('[MIDDLEWARE] Nenhum token encontrado, redirecionando para login')
@@ -168,7 +175,7 @@ export const proxy = async (request: NextRequest) => {
 
     // Validar token com Supabase Auth
     const isValid = await validateAccessToken(accessToken)
-    
+
     if (!isValid) {
       if (isDevelopment) {
         console.log('[MIDDLEWARE] Token inválido, redirecionando para login')
@@ -180,7 +187,7 @@ export const proxy = async (request: NextRequest) => {
   }
 
   // Limpar query param ?company (mantido)
-  if (pathname === '/operador' && searchParams.has('company')) {
+  if (pathname === '/empresa' && searchParams.has('company')) {
     const url = request.nextUrl.clone()
     url.searchParams.delete('company')
     return NextResponse.redirect(url)
@@ -204,6 +211,8 @@ export const config = {
     '/login',
     '/login/:path*',
     '/admin/:path*',
+    '/empresa',
+    '/empresa/:path*',
     '/operator/:path*',
     '/operador',
     '/operador/:path*',

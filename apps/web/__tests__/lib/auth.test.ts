@@ -47,11 +47,11 @@ describe('AuthManager', () => {
         user: mockUser,
       }
 
-      ;(supabase.auth.signInWithPassword as jest.Mock).mockResolvedValue({
-        data: { user: mockUser, session: mockSession },
-        error: null,
-      })
-      ;(getUserRoleByEmail as jest.Mock).mockReturnValue('admin')
+        ; (supabase.auth.signInWithPassword as jest.Mock).mockResolvedValue({
+          data: { user: mockUser, session: mockSession },
+          error: null,
+        })
+        ; (getUserRoleByEmail as jest.Mock).mockReturnValue('admin')
 
       const result = await AuthManager.login('admin@test.com', 'password123')
 
@@ -64,7 +64,7 @@ describe('AuthManager', () => {
     })
 
     it('deve retornar erro quando credenciais são inválidas', async () => {
-      ;(supabase.auth.signInWithPassword as jest.Mock).mockResolvedValue({
+      ; (supabase.auth.signInWithPassword as jest.Mock).mockResolvedValue({
         data: { user: null, session: null },
         error: { message: 'Invalid credentials', status: 401 },
       })
@@ -82,10 +82,10 @@ describe('AuthManager', () => {
         email: 'admin@test.com',
       }
 
-      ;(supabase.auth.signInWithPassword as jest.Mock).mockResolvedValue({
-        data: { user: mockUser, session: null },
-        error: null,
-      })
+        ; (supabase.auth.signInWithPassword as jest.Mock).mockResolvedValue({
+          data: { user: mockUser, session: null },
+          error: null,
+        })
 
       const result = await AuthManager.login('admin@test.com', 'password123')
 
@@ -94,7 +94,7 @@ describe('AuthManager', () => {
     })
 
     it('deve lidar com exceções durante login', async () => {
-      ;(supabase.auth.signInWithPassword as jest.Mock).mockRejectedValue(
+      ; (supabase.auth.signInWithPassword as jest.Mock).mockRejectedValue(
         new Error('Network error')
       )
 
@@ -116,7 +116,7 @@ describe('AuthManager', () => {
       }
       AuthManager.persistSession(userData)
 
-      ;(supabase.auth.signOut as jest.Mock).mockResolvedValue({ error: null })
+        ; (supabase.auth.signOut as jest.Mock).mockResolvedValue({ error: null })
 
       await AuthManager.logout()
 
@@ -126,7 +126,7 @@ describe('AuthManager', () => {
     })
 
     it('deve lidar com erros durante logout', async () => {
-      ;(supabase.auth.signOut as jest.Mock).mockRejectedValue(
+      ; (supabase.auth.signOut as jest.Mock).mockRejectedValue(
         new Error('Logout error')
       )
 
@@ -263,29 +263,29 @@ describe('AuthManager', () => {
       expect(AuthManager.getRedirectUrl('admin')).toBe('/admin')
     })
 
-    it('deve retornar /operador para role operador', () => {
-      expect(AuthManager.getRedirectUrl('operador')).toBe('/operador')
+    it('deve retornar /transportadora para role operador', () => {
+      expect(AuthManager.getRedirectUrl('operador')).toBe('/transportadora')
     })
 
-    it('deve retornar /operador para role operator', () => {
-      expect(AuthManager.getRedirectUrl('operator')).toBe('/operador')
+    it('deve retornar /empresa para role operator (compat.)', () => {
+      expect(AuthManager.getRedirectUrl('operator')).toBe('/empresa')
     })
 
-    it('deve retornar /operador para role empresa', () => {
-      expect(AuthManager.getRedirectUrl('empresa')).toBe('/operador')
+    it('deve retornar /empresa para role empresa', () => {
+      expect(AuthManager.getRedirectUrl('empresa')).toBe('/empresa')
     })
 
     it('deve retornar /transportadora para role transportadora', () => {
       expect(AuthManager.getRedirectUrl('transportadora')).toBe('/transportadora')
     })
 
-    it('deve retornar /operador para role carrier', () => {
+    it('deve retornar /transportadora para role carrier (compat.)', () => {
       expect(AuthManager.getRedirectUrl('carrier')).toBe('/transportadora')
     })
 
-    it('deve retornar /operador como fallback para role desconhecido', () => {
+    it('deve retornar /empresa como fallback para role desconhecido', () => {
       const consoleSpy = jest.spyOn(console, 'warn').mockImplementation()
-      expect(AuthManager.getRedirectUrl('unknown')).toBe('/operador')
+      expect(AuthManager.getRedirectUrl('unknown')).toBe('/empresa')
       expect(consoleSpy).toHaveBeenCalled()
       consoleSpy.mockRestore()
     })
@@ -309,7 +309,7 @@ describe('AuthManager', () => {
         avatar_url: 'https://example.com/avatar.jpg',
       }
 
-      ;(supabase.auth.setSession as jest.Mock).mockResolvedValue({ error: null })
+        ; (supabase.auth.setSession as jest.Mock).mockResolvedValue({ error: null })
 
       AuthManager.persistSession(userData, { token: 'token-123' })
 

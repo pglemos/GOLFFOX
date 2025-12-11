@@ -32,13 +32,13 @@ jest.mock('@/lib/auth', () => ({
         user: {
           id: 'u1',
           email,
-          role: email.includes('admin') ? 'admin' : 'operator',
+          role: email.includes('admin') ? 'admin' : 'empresa',
           accessToken: 'eyJ.hbGci.Oi',
         },
       }
     }),
     getStoredUser: jest.fn(() => null),
-    getRedirectUrl: jest.fn((role: string) => (role === 'admin' ? '/admin' : '/operator')),
+    getRedirectUrl: jest.fn((role: string) => (role === 'admin' ? '/admin' : '/empresa')),
   },
 }))
 
