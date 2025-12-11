@@ -26,7 +26,7 @@ interface AppShellProps {
 // Named export for AppShell component - Application Shell 08 Style
 export const AppShell = memo(function AppShell({ user, children, panel }: AppShellProps) {
   const pathname = usePathname()
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true)
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false) // Sempre inicia colapsado
   const isMobile = useMobile()
 
   // Debug logging (apenas em desenvolvimento)
@@ -60,13 +60,14 @@ export const AppShell = memo(function AppShell({ user, children, panel }: AppShe
     }
   }[detectedPanel]), [detectedPanel])
 
-  // Em mobile, começar fechado
+  // Em mobile, começar fechado - em desktop também começa colapsado
   useEffect(() => {
     if (isMobile) {
       setIsSidebarOpen(false)
       document.body.setAttribute('data-mobile', 'true')
     } else {
-      setIsSidebarOpen(true)
+      // Desktop: inicia colapsado (false) - usuário expande se quiser
+      setIsSidebarOpen(false)
       document.body.removeAttribute('data-mobile')
     }
   }, [isMobile])
@@ -89,7 +90,7 @@ export const AppShell = memo(function AppShell({ user, children, panel }: AppShe
 
   return (
     <SidebarProvider
-      defaultOpen={!isMobile}
+      defaultOpen={false} // Sempre inicia colapsado
       open={isSidebarOpen}
       onOpenChange={setIsSidebarOpen}
     >
@@ -119,25 +120,14 @@ export const AppShell = memo(function AppShell({ user, children, panel }: AppShe
 
       {/* Content Area - flex-1 para ocupar resto do espaço */}
       <div className="flex flex-1 flex-col">
-        {/* Header Sticky - 80px height with floating card style */}
-        <header
-          className={cn(
-            "sticky top-0 z-50",
-            // Pseudo-element para blur background
-            "before:absolute before:inset-0",
-            "before:bg-background/60",
-            "before:mask-[linear-gradient(var(--card),var(--card)_18%,transparent_100%)]",
-            "before:backdrop-blur-md"
-          )}
-        >
-          <Topbar
-            user={user ? { id: user.id, name: user.name || '', email: user.email, role: user.role, avatar_url: user.avatar_url } : { id: '', name: '', email: '', role: 'operador' }}
-            onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
-            isSidebarOpen={isSidebarOpen}
-            panelBranding={panelConfig.branding}
-            panelHomeUrl={panelConfig.homeUrl}
-          />
-        </header>
+        {/* Topbar já retorna seu próprio header com os estilos corretos */}
+        <Topbar
+          user={user ? { id: user.id, name: user.name || '', email: user.email, role: user.role, avatar_url: user.avatar_url } : { id: '', name: '', email: '', role: 'operador' }}
+          onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
+          isSidebarOpen={isSidebarOpen}
+          panelBranding={panelConfig.branding}
+          panelHomeUrl={panelConfig.homeUrl}
+        />
 
         {/* Main Content - Application Shell 08 EXATO */}
         <main
