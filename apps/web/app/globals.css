@@ -194,17 +194,33 @@
     --z-popover: 1060;
     --z-tooltip: 1070;
 
-    /* Layout Variables - Application Shell 08 Style */
-    --sidebar-width: 15.875rem;
-    /* 254px expandido */
-    --sidebar-width-icon: 3rem;
-    /* 48px colapsado */
-    --sidebar-width-expanded: 254px;
-    --sidebar-width-collapsed: 48px;
-    --header-height: 80px;
+    /* Layout Variables - Application Shell Padronizado */
+    --sidebar-width: 17.5rem;
+    /* ~280px expandido */
+    --sidebar-width-icon: 3.5rem;
+    /* ~56px colapsado */
+    --sidebar-width-expanded: 280px;
+    --sidebar-width-collapsed: 56px;
+
+    /* Header */
+    --shell-header-height: 3.5rem;
+    /* ~56px */
+    --header-height: 3.5rem;
+    /* alias para compatibilidade */
     --header-z-index: 50;
+
+    /* Footer */
     --footer-height: 44px;
+
+    /* Padding horizontal/vertical */
+    --shell-padding-x: 1.25rem;
+    /* 20px base */
+    --shell-padding-y: 1rem;
+    /* 16px */
     --layout-padding: 24px;
+    /* alias para compatibilidade */
+
+    /* Spacing */
     --spacing: 0.25rem;
     /* 4px base para cálculos */
   }
@@ -322,6 +338,27 @@
     --gradient-info: linear-gradient(135deg, var(--info) 0%, #60A5FA 100%);
     --gradient-hero: linear-gradient(135deg, var(--brand) 0%, var(--brand-hover) 50%, var(--accent) 100%);
     --gradient-card: linear-gradient(135deg, rgba(249, 115, 22, 0.15) 0%, rgba(30, 58, 95, 0.15) 100%);
+  }
+}
+
+/* === Responsive Shell Variables === */
+/* sm >= 640px */
+@media (min-width: 640px) {
+  :root {
+    --shell-padding-x: 1.5rem;
+    /* 24px */
+  }
+}
+
+/* lg >= 1024px */
+@media (min-width: 1024px) {
+  :root {
+    --shell-header-height: 3.75rem;
+    /* 60px */
+    --header-height: 3.75rem;
+    /* alias para compatibilidade */
+    --shell-padding-x: 2rem;
+    /* 32px */
   }
 }
 
