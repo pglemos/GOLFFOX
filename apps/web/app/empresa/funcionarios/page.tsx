@@ -226,12 +226,12 @@ function FuncionariosPageContent() {
 
   return (
     <AppShell user={userObj}>
-      <div className="space-y-4 sm:space-y-6 p-3 sm:p-6 w-full overflow-x-hidden">
+      <div className="space-y-4 sm:space-y-6 w-full overflow-x-hidden">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
           <div className="min-w-0 flex-1">
             <h1 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2 break-words">Funcionários</h1>
-            <p className="text-sm sm:text-base text-gray-600 break-words">
+            <p className="text-sm sm:text-base text-[var(--muted)] break-words">
               {companyName ? `Empresa: ${companyName}` : "Gerencie seus funcionários"}
               {totalCount > 0 && ` • ${totalCount} funcionário${totalCount !== 1 ? 's' : ''}`}
             </p>
@@ -285,78 +285,78 @@ function FuncionariosPageContent() {
                       transition={{ delay: index * 0.05 }}
                       whileHover={{ y: -4 }}
                     >
-                    <Card className="p-3 sm:p-4 hover:shadow-xl transition-all duration-300 overflow-hidden bg-card/50 backdrop-blur-sm border-[var(--border)] hover:border-[var(--brand)]/30 group">
-                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-start gap-2 mb-2">
-                            <div className="p-1.5 rounded-lg bg-gradient-to-br from-[var(--brand-light)] to-[var(--brand-soft)]">
-                              <Users className="h-4 w-4 text-[var(--brand)] flex-shrink-0" />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-2 flex-wrap">
-                                <h3 className="font-bold text-base sm:text-lg break-words flex-1 min-w-0 group-hover:text-[var(--brand)] transition-colors">
-                                  {funcionario.name || "Nome não disponível"}
-                                </h3>
-                                {funcionario.is_active ? (
-                                  <Badge variant="outline" className="bg-green-50 text-green-700 text-xs flex-shrink-0">
-                                    Ativo
-                                  </Badge>
-                                ) : (
-                                  <Badge variant="outline" className="bg-gray-50 text-gray-700 text-xs flex-shrink-0">
-                                    Inativo
-                                  </Badge>
-                                )}
+                      <Card className="p-3 sm:p-4 hover:shadow-xl transition-all duration-300 overflow-hidden bg-card/50 backdrop-blur-sm border-[var(--border)] hover:border-[var(--brand)]/30 group">
+                        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-start gap-2 mb-2">
+                              <div className="p-1.5 rounded-lg bg-gradient-to-br from-[var(--brand-light)] to-[var(--brand-soft)]">
+                                <Users className="h-4 w-4 text-[var(--brand)] flex-shrink-0" />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <h3 className="font-bold text-base sm:text-lg break-words flex-1 min-w-0 group-hover:text-[var(--brand)] transition-colors">
+                                    {funcionario.name || "Nome não disponível"}
+                                  </h3>
+                                  {funcionario.is_active ? (
+                                    <Badge variant="outline" className="bg-green-50 text-green-700 text-xs flex-shrink-0">
+                                      Ativo
+                                    </Badge>
+                                  ) : (
+                                    <Badge variant="outline" className="bg-gray-50 text-gray-700 text-xs flex-shrink-0">
+                                      Inativo
+                                    </Badge>
+                                  )}
+                                </div>
                               </div>
                             </div>
+                            <div className="space-y-1 text-sm text-gray-600 pl-7">
+                              {funcionario.email && (
+                                <div className="flex items-start gap-2">
+                                  <Mail className="h-4 w-4 flex-shrink-0 mt-0.5" />
+                                  <span className="break-words">{funcionario.email}</span>
+                                </div>
+                              )}
+                              {funcionario.phone && (
+                                <div className="flex items-center gap-2">
+                                  <Phone className="h-4 w-4 flex-shrink-0" />
+                                  <span className="break-words">{funcionario.phone}</span>
+                                </div>
+                              )}
+                              {funcionario.cpf && (
+                                <div className="flex items-center gap-2">
+                                  <span className="text-xs text-gray-500 break-words">CPF: {funcionario.cpf}</span>
+                                </div>
+                              )}
+                              {funcionario.address && (
+                                <div className="flex items-start gap-2">
+                                  <Building className="h-4 w-4 flex-shrink-0 mt-0.5" />
+                                  <span className="text-xs text-gray-500 break-words">{funcionario.address}</span>
+                                </div>
+                              )}
+                            </div>
                           </div>
-                          <div className="space-y-1 text-sm text-gray-600 pl-7">
-                            {funcionario.email && (
-                              <div className="flex items-start gap-2">
-                                <Mail className="h-4 w-4 flex-shrink-0 mt-0.5" />
-                                <span className="break-words">{funcionario.email}</span>
-                              </div>
-                            )}
-                            {funcionario.phone && (
-                              <div className="flex items-center gap-2">
-                                <Phone className="h-4 w-4 flex-shrink-0" />
-                                <span className="break-words">{funcionario.phone}</span>
-                              </div>
-                            )}
-                            {funcionario.cpf && (
-                              <div className="flex items-center gap-2">
-                                <span className="text-xs text-gray-500 break-words">CPF: {funcionario.cpf}</span>
-                              </div>
-                            )}
-                            {funcionario.address && (
-                              <div className="flex items-start gap-2">
-                                <Building className="h-4 w-4 flex-shrink-0 mt-0.5" />
-                                <span className="text-xs text-gray-500 break-words">{funcionario.address}</span>
-                              </div>
-                            )}
-                          </div>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="sm" className="self-start sm:self-auto min-h-[44px] min-w-[44px] touch-manipulation">
+                                <MoreVertical className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="min-w-[160px]">
+                              <DropdownMenuItem onClick={() => handleEdit(funcionario)} className="min-h-[44px] touch-manipulation">
+                                <Edit className="h-4 w-4 mr-2" />
+                                Editar
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => handleDelete(funcionario)}
+                                className="text-red-600 min-h-[44px] touch-manipulation"
+                              >
+                                <Trash2 className="h-4 w-4 mr-2" />
+                                Desativar
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </div>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm" className="self-start sm:self-auto min-h-[44px] min-w-[44px] touch-manipulation">
-                              <MoreVertical className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="min-w-[160px]">
-                            <DropdownMenuItem onClick={() => handleEdit(funcionario)} className="min-h-[44px] touch-manipulation">
-                              <Edit className="h-4 w-4 mr-2" />
-                              Editar
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() => handleDelete(funcionario)}
-                              className="text-red-600 min-h-[44px] touch-manipulation"
-                            >
-                              <Trash2 className="h-4 w-4 mr-2" />
-                              Desativar
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </div>
-                    </Card>
+                      </Card>
                     </motion.div>
                   ))}
                 </div>

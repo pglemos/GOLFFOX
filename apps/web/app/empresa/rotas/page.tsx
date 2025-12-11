@@ -137,18 +137,18 @@ export default function OperatorRotasPage() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
           <div className="min-w-0 flex-1">
             <h1 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2 break-words">{operatorI18n.routes_title || "Rotas"}</h1>
-            <p className="text-sm sm:text-base text-gray-600 break-words">{operatorI18n.routes_subtitle || "Gerencie as rotas da sua empresa"}</p>
+            <p className="text-sm sm:text-base text-[var(--muted)] break-words">{operatorI18n.routes_subtitle || "Gerencie as rotas da sua empresa"}</p>
           </div>
           <div className="flex flex-wrap gap-2 w-full sm:w-auto">
             <a href="/operador/rotas/mapa" className="flex-1 sm:flex-initial">
-              <Button variant="outline" className="w-full sm:w-auto text-xs sm:text-sm">
+              <Button variant="outline" className="w-full sm:w-auto min-h-[44px] touch-manipulation text-xs sm:text-sm">
                 <Map className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                 <span className="hidden sm:inline">Ver no Mapa</span>
                 <span className="sm:hidden">Mapa</span>
               </Button>
             </a>
             <a href="/operador/solicitacoes">
-              <Button className="bg-orange-500 hover:bg-orange-600">
+              <Button className="min-h-[44px] touch-manipulation">
                 <Plus className="h-4 w-4 mr-2" />
                 Nova Rota
               </Button>
@@ -245,7 +245,7 @@ export default function OperatorRotasPage() {
                       </div>
                     </div>
                     <a href={`/operador/rotas/mapa?route_id=${rota.id}`}>
-                      <Button variant="outline" size="sm" className="flex-shrink-0">
+                      <Button variant="outline" size="sm" className="flex-shrink-0 min-h-[44px] touch-manipulation">
                         <MapPin className="h-4 w-4 mr-2" />
                         Ver no Mapa
                       </Button>

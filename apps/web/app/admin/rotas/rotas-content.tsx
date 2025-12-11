@@ -270,69 +270,67 @@ export function RotasPageContent() {
               }}
             />
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid gap-3 sm:gap-4 w-full">
               {filteredRotas.map((rota, index) => (
                 <motion.div
                   key={rota.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
+                  transition={{ delay: index * 0.05 }}
                   whileHover={{ y: -4 }}
                 >
-                  <Card className="p-6 hover:shadow-xl transition-all duration-300 cursor-pointer group border-[var(--border)] hover:border-[var(--brand)]/50 bg-card/50 backdrop-blur-sm">
-                    <div className="flex justify-between items-start mb-4">
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-lg text-[var(--ink-strong)] group-hover:text-[var(--brand)] transition-colors flex items-center gap-2">
-                          <Route className="h-4 w-4 text-[var(--brand)]" />
-                          {rota.name}
-                        </h3>
-                        <p className="text-sm text-[var(--ink-muted)] mt-1 flex items-center gap-1">
+                  <Card className="p-3 sm:p-4 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-[var(--border)] hover:border-[var(--brand)]/30 group">
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex flex-wrap items-center gap-2 mb-2">
+                          <div className="p-1 rounded-lg bg-gradient-to-br from-[var(--brand-light)] to-[var(--brand-soft)]">
+                            <Route className="h-4 w-4 text-[var(--brand)]" />
+                          </div>
+                          <h3 className="font-bold text-base sm:text-lg group-hover:text-[var(--brand)] transition-colors">{rota.name}</h3>
+                          <Badge variant={rota.is_active ? "default" : "secondary"}>
+                            {rota.is_active ? "Ativa" : "Inativa"}
+                          </Badge>
+                        </div>
+                        <p className="text-sm text-[var(--ink-muted)] mb-2 flex items-center gap-1">
                           <Building2 className="h-3 w-3" />
                           {rota.companies?.name}
                         </p>
+                        <div className="flex flex-wrap gap-2 sm:gap-4 text-xs sm:text-sm text-[var(--ink-muted)]">
+                          <span className="flex items-center gap-1">
+                            <MapPin className="h-3 w-3" />
+                            {rota.description || "Sem descrição"}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Clock className="h-3 w-3" />
+                            {rota.estimated_duration || "N/A"} min
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Users className="h-3 w-3" />
+                            {rota.stops?.length || 0} paradas
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Truck className="h-3 w-3" />
+                            {rota.distance || "N/A"} km
+                          </span>
+                        </div>
                       </div>
-                      <Badge variant={rota.is_active ? "default" : "secondary"} className="ml-2">
-                        {rota.is_active ? "Ativa" : "Inativa"}
-                      </Badge>
-                    </div>
-
-                    <div className="space-y-2 mb-4">
-                      <div className="flex items-center text-sm text-[var(--ink-muted)]">
-                        <MapPin className="h-4 w-4 mr-2 text-[var(--brand)]" />
-                        <span className="truncate">{rota.description || "Sem descrição"}</span>
-                      </div>
-                      <div className="flex items-center text-sm text-[var(--ink-muted)]">
-                        <Clock className="h-4 w-4 mr-2 text-[var(--brand)]" />
-                        <span>Duração: {rota.estimated_duration || "N/A"} min</span>
-                      </div>
-                      <div className="flex items-center text-sm text-[var(--ink-muted)]">
-                        <Users className="h-4 w-4 mr-2 text-[var(--brand)]" />
-                        <span>Paradas: {rota.stops?.length || 0}</span>
-                      </div>
-                      <div className="flex items-center text-sm text-[var(--ink-muted)]">
-                        <Truck className="h-4 w-4 mr-2 text-[var(--brand)]" />
-                        <span>Distância: {rota.distance || "N/A"} km</span>
-                      </div>
-                    </div>
-
-                    <div className="flex flex-col gap-2">
-                      <div className="flex gap-2">
+                      <div className="flex flex-wrap gap-2">
                         <Button
                           variant="outline"
                           size="sm"
-                          className="flex-1"
+                          className="min-h-[44px] touch-manipulation"
                           onClick={() => {
                             setSelectedRoute(rota)
                             setIsModalOpen(true)
                           }}
                         >
-                          <Edit className="h-4 w-4 mr-2" />
+                          <Edit className="h-4 w-4 mr-1" />
                           Editar
                         </Button>
                         <Button
                           variant="outline"
                           size="sm"
-                          className="flex-1"
+                          className="min-h-[44px] touch-manipulation"
                           onClick={async () => {
                             try {
                               const resp = await fetch('/api/admin/generate-stops', {
@@ -350,63 +348,35 @@ export function RotasPageContent() {
                             }
                           }}
                         >
-                          <Sparkles className="h-4 w-4 mr-2" />
-                          Gerar Pontos
-                        </Button>
-                      </div>
-                      <div className="flex gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="flex-1"
-                          onClick={async () => {
-                            try {
-                              const response = await fetch(`/api/admin/optimize-route?routeId=${rota.id}`, {
-                                method: 'POST'
-                              })
-                              if (!response.ok) throw new Error('Erro ao otimizar')
-                              notifySuccess('', { i18n: { ns: 'common', key: 'success.routeOptimized' } })
-                              loadRotas()
-                            } catch (error: any) {
-                              notifyError(error, `Erro: ${error.message}`, { i18n: { ns: 'common', key: 'errors.optimizeRoute' } })
-                            }
-                          }}
-                        >
-                          <Navigation className="h-4 w-4 mr-2" />
-                          Otimizar
+                          <Sparkles className="h-4 w-4 mr-1" />
+                          Gerar
                         </Button>
                         <Button
                           variant="outline"
                           size="sm"
-                          className="flex-1"
+                          className="min-h-[44px] touch-manipulation"
                           onClick={() => {
-                            // Buscar coordenadas da rota para deep-link
                             const center = rota.origin_lat && rota.origin_lng
                               ? { lat: rota.origin_lat, lng: rota.origin_lng }
                               : null
                             const zoom = 14
-
                             const params = new URLSearchParams({
                               route: rota.id,
                               ...(center ? { lat: center.lat.toString(), lng: center.lng.toString(), zoom: zoom.toString() } : {})
                             })
-
                             router.push(`/admin/mapa?${params.toString()}`)
                           }}
                         >
-                          <MapPin className="h-4 w-4 mr-2" />
-                          Ver no Mapa
+                          <MapPin className="h-4 w-4 mr-1" />
+                          Mapa
                         </Button>
-                      </div>
-                      <div className="mt-2">
                         <Button
-                          variant="destructive"
+                          variant="outline"
                           size="sm"
-                          className="w-full"
                           onClick={() => handleDeleteRota(rota.id, rota.name || 'Rota')}
+                          className="min-h-[44px] touch-manipulation text-destructive hover:bg-destructive/10"
                         >
-                          <Trash2 className="h-4 w-4 mr-2" />
-                          Excluir
+                          <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
                     </div>

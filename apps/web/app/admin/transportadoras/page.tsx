@@ -279,7 +279,7 @@ export default function TransportadorasPage() {
           )}
 
           {!loadingCarriers && !errorCarriers && Array.isArray(filteredCarriers) && filteredCarriers.length > 0 && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 w-full max-w-full">
+            <div className="grid gap-3 sm:gap-4 w-full">
               {filteredCarriers.map((carrier: any, index: number) => (
                 <motion.div
                   key={carrier.id}
@@ -287,44 +287,32 @@ export default function TransportadorasPage() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.05 }}
                   whileHover={{ y: -4 }}
-                  className="group"
                 >
-                  <Card key={carrier.id} className="p-4 sm:p-5 overflow-hidden w-full border border-[var(--border)] hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm hover:border-[var(--brand)]/30 flex flex-col">
-                    <div className="flex-1 flex flex-col gap-3 w-full">
-                      {/* Header com ícone e nome */}
-                      <div className="flex items-start gap-3 mb-1">
-                        <div className="p-2 rounded-lg bg-gradient-to-br from-[var(--brand-light)] to-[var(--brand-soft)] flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
-                          <Truck className="h-5 w-5 text-[var(--brand)]" />
-                        </div>
+                  <Card className="p-3 sm:p-4 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-[var(--border)] hover:border-[var(--brand)]/30 group">
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
+                      <div className="flex-1 flex gap-3 sm:gap-4 min-w-0">
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-bold text-base sm:text-lg break-words leading-tight text-[var(--ink)] group-hover:text-[var(--brand)] transition-colors">
-                            {carrier.name}
-                          </h3>
+                          <div className="flex flex-wrap items-center gap-2 mb-2">
+                            <div className="p-1 rounded-lg bg-gradient-to-br from-[var(--brand-light)] to-[var(--brand-soft)]">
+                              <Truck className="h-4 w-4 text-[var(--brand)]" />
+                            </div>
+                            <h3 className="font-bold text-base sm:text-lg group-hover:text-[var(--brand)] transition-colors">{carrier.name}</h3>
+                          </div>
+                          <div className="flex flex-wrap gap-2 sm:gap-4 text-xs sm:text-sm text-[var(--ink-muted)]">
+                            {carrier.address && (
+                              <span className="flex items-center gap-1">
+                                Endereço: {carrier.address}
+                              </span>
+                            )}
+                            {carrier.phone && (
+                              <span className="flex items-center gap-1">
+                                Tel: {carrier.phone}
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </div>
-
-                      {/* Informações da transportadora */}
-                      <div className="space-y-2 flex-1">
-                        {carrier.address && (
-                          <div className="flex items-start gap-2">
-                            <span className="text-xs text-[var(--ink-muted)] font-medium min-w-[60px]">Endereço:</span>
-                            <p className="text-xs sm:text-sm text-[var(--ink-muted)] break-words flex-1 leading-relaxed" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
-                              {carrier.address}
-                            </p>
-                          </div>
-                        )}
-                        {carrier.phone && (
-                          <div className="flex items-start gap-2">
-                            <span className="text-xs text-[var(--ink-muted)] font-medium min-w-[60px]">Telefone:</span>
-                            <p className="text-xs sm:text-sm text-[var(--ink-muted)] break-words flex-1 leading-relaxed" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
-                              {carrier.phone}
-                            </p>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Botões de ação */}
-                      <div className="grid grid-cols-2 gap-2 pt-2 border-t border-[var(--border)]">
+                      <div className="flex gap-2">
                         <Button
                           variant="outline"
                           size="sm"
@@ -333,11 +321,10 @@ export default function TransportadorasPage() {
                             setSelectedCarrierForEdit(carrier)
                             setIsEditModalOpen(true)
                           }}
-                          className="w-full min-h-[44px] h-auto text-xs px-2 py-1.5 flex items-center justify-center gap-1.5 touch-manipulation"
-                          title="Editar transportadora"
+                          className="min-h-[44px] touch-manipulation"
                         >
-                          <Edit className="h-3.5 w-3.5 flex-shrink-0" />
-                          <span className="truncate hidden sm:inline">Editar</span>
+                          <Edit className="h-4 w-4 mr-1" />
+                          Editar
                         </Button>
                         <Button
                           variant="outline"
@@ -347,24 +334,21 @@ export default function TransportadorasPage() {
                             setSelectedCarrierForUsers({ id: carrier.id, name: carrier.name })
                             setIsUsersModalOpen(true)
                           }}
-                          className="w-full min-h-[44px] h-auto text-xs px-2 py-1.5 flex items-center justify-center gap-1.5 touch-manipulation"
-                          title="Gerenciar usuários"
+                          className="min-h-[44px] touch-manipulation"
                         >
-                          <UserPlus className="h-3.5 w-3.5 flex-shrink-0" />
-                          <span className="truncate hidden sm:inline">Login</span>
+                          <UserPlus className="h-4 w-4 mr-1" />
+                          Login
                         </Button>
                         <Button
-                          variant="destructive"
+                          variant="outline"
                           size="sm"
                           onClick={(e) => {
                             e.stopPropagation()
                             handleDeleteCarrier(carrier.id, carrier.name)
                           }}
-                          className="w-full col-span-2 min-h-[44px] h-auto text-xs px-2 py-1.5 flex items-center justify-center gap-1.5 touch-manipulation"
-                          title="Excluir transportadora"
+                          className="min-h-[44px] touch-manipulation text-destructive hover:bg-destructive/10"
                         >
-                          <Trash2 className="h-3.5 w-3.5 flex-shrink-0" />
-                          <span className="truncate">Excluir</span>
+                          <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
                     </div>
