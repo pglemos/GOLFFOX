@@ -166,6 +166,11 @@ const adminMenuGroups: MenuGroup[] = [
         icon: BarChart3,
         label: "Monitoramento",
         href: "/admin/monitoramento"
+      },
+      {
+        icon: AlertTriangle,
+        label: "Escalonamento",
+        href: "/admin/escalonamento"
       }
     ]
   }
@@ -313,6 +318,11 @@ const transportadoraMenuGroups: MenuGroup[] = [
         icon: FileText,
         label: "Relatórios",
         href: "/transportadora/relatorios"
+      },
+      {
+        icon: LayoutDashboard,
+        label: "Mensagens",
+        href: "/transportadora/mensagens"
       }
     ]
   }
@@ -371,6 +381,11 @@ const empresaMenuGroups: MenuGroup[] = [
         icon: BarChart3,
         label: "Relatórios",
         href: "/empresa/relatorios"
+      },
+      {
+        icon: Award,
+        label: "Satisfação",
+        href: "/empresa/satisfacao"
       },
       {
         icon: LifeBuoy,
