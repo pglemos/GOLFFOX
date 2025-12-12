@@ -38,7 +38,7 @@ export function useResolveTransportadoraAlert() {
                     // resolved_by: user_id (pego trigger ou RLS)
                 })
                 .eq("id", alertId)
-                .eq("transportadora_id", transportadoraId) // Segurança extra
+                .eq("transportadora_id", transportadoraId || '') // Segurança extra
 
             if (error) throw error
         },

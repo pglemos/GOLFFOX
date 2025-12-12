@@ -31,7 +31,7 @@ export default function AdminContratosPage() {
         async function loadContracts() {
             setLoading(true)
             try {
-                const { data, error } = await supabase
+                const { data, error } = await (supabase as any)
                     .from('gf_contracts')
                     .select('id, name, value_amount, status, start_date, end_date, company_id')
                     .order('created_at', { ascending: false })
@@ -45,7 +45,7 @@ export default function AdminContratosPage() {
                         { id: '3', name: 'Contrato Tech Ltd', value_amount: 8500, status: 'pending', start_date: '2024-06-01', end_date: '2025-05-31', company_name: 'Tech Ltd' },
                     ])
                 } else {
-                    setContracts((data || []).map(c => ({ ...c, company_name: 'Empresa' })))
+                    setContracts((data || []).map((c: any) => ({ ...c, company_name: 'Empresa' })))
                 }
             } catch (err) {
                 console.error('Error:', err)
