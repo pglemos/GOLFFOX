@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import "./mobile-optimizations.css";
+// import "./mobile-optimizations.css"; // Temporariamente desabilitado - problema com lightningcss
 import { ToasterProvider } from "@/components/providers/toaster-provider";
 import { WebVitalsInit } from "@/components/web-vitals-init";
 import { ErrorBoundary } from "@/components/error-boundary";
