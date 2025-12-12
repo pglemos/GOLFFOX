@@ -66,6 +66,11 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="GOLF FOX" />
         <meta name="format-detection" content="telephone=no" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `if (typeof window !== 'undefined' && !window.exports) { window.exports = {}; }`,
+          }}
+        />
       </head>
       <body className={`${inter.className} font-smooth antialiased`} suppressHydrationWarning>
         <ErrorBoundary>
