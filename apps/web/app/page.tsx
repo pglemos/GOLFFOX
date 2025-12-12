@@ -847,7 +847,7 @@ function LoginContent() {
         <div className="relative z-10 max-w-2xl mx-auto text-center px-8">
           {/* Logo com destaque PREMIUM */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.8, y: -20 }}
+            initial={{ opacity: 1, scale: 1, y: 0 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
             className="mb-20"
@@ -939,7 +939,7 @@ function LoginContent() {
 
           {/* Headline ultra premium (estilo Apple) */}
           <motion.h1
-            initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 20 }}
+            initial={{ opacity: 1, y: 0 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: shouldReduceMotion ? 0 : 0.8, delay: shouldReduceMotion ? 0 : 0.2, ease: [0.16, 1, 0.3, 1] }}
             className="text-5xl xl:text-7xl font-bold mb-8 leading-[1.1] tracking-tight"
@@ -953,7 +953,7 @@ function LoginContent() {
 
           {/* Subtítulo premium */}
           <motion.p
-            initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 20 }}
+            initial={{ opacity: 1, y: 0 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: shouldReduceMotion ? 0 : 0.8, delay: shouldReduceMotion ? 0 : 0.3, ease: [0.16, 1, 0.3, 1] }}
             className="text-xl text-white/70 mb-16 font-light leading-relaxed max-w-xl mx-auto"
@@ -975,12 +975,12 @@ function LoginContent() {
         {/* Barra superior minimalista (apenas desktop) */}
         <div className="hidden lg:flex justify-end items-center p-8 relative z-10">
           <motion.div
-            initial={{ opacity: 0 }}
+            initial={{ opacity: 1 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5 }}
             className="text-sm text-gray-400"
           >
-            Novo por aqui? <span className="text-gray-900 font-medium cursor-not-allowed">Fale com vendas</span>
+            Novo por aqui? <span className="text-gray-900 font-medium cursor-pointer hover:text-[var(--brand)] transition-colors">Fale com vendas</span>
           </motion.div>
         </div>
 
@@ -1215,9 +1215,8 @@ function LoginContent() {
                     </div>
                   </div>
 
-                  {/* Opções extras Premium */}
                   <motion.div
-                    initial={{ opacity: 0 }}
+                    initial={{ opacity: 1 }}
                     animate={{ opacity: 1 }}
                     transition={{ duration: 0.4, delay: 0.4 }}
                     className="flex items-center justify-between text-sm w-full"
@@ -1239,7 +1238,7 @@ function LoginContent() {
                     </motion.label>
                     <motion.button
                       type="button"
-                      onClick={() => setError("Funcionalidade em desenvolvimento")}
+                      onClick={() => console.log("Forgot password clicked")}
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       className="text-[var(--brand)] hover:text-[var(--brand-hover)] font-semibold transition-colors touch-manipulation text-sm whitespace-nowrap"
@@ -1519,9 +1518,8 @@ function LoginContent() {
                   </div>
                 </div>
 
-                {/* Opções extras - Desktop Premium */}
                 <motion.div
-                  initial={{ opacity: 0 }}
+                  initial={{ opacity: 1 }}
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.4, delay: 0.4 }}
                   className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-0 text-sm w-full"
@@ -1543,7 +1541,7 @@ function LoginContent() {
                   </motion.label>
                   <motion.button
                     type="button"
-                    onClick={() => setError("Funcionalidade em desenvolvimento")}
+                    onClick={() => console.log("Forgot password clicked")}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     className="text-[var(--brand)] hover:text-[var(--brand-hover)] font-semibold transition-colors touch-manipulation text-sm whitespace-nowrap"
@@ -1557,12 +1555,12 @@ function LoginContent() {
                   initial={{ opacity: 1, y: 0 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: shouldReduceMotion ? 0 : 0.4, delay: shouldReduceMotion ? 0 : 0.5 }}
-                  whileHover={canSubmit && !shouldReduceMotion ? { scale: 1.02 } : {}}
-                  whileTap={canSubmit && !shouldReduceMotion ? { scale: 0.98 } : {}}
+                  whileHover={!loading && !transitioning ? { scale: 1.02 } : {}}
+                  whileTap={!loading && !transitioning ? { scale: 0.98 } : {}}
                 >
                   <Button
                     type="submit"
-                    disabled={!canSubmit}
+                    disabled={loading || transitioning}
                     className="w-full h-14 bg-gradient-to-r from-[var(--brand)] via-[var(--brand-hover)] to-[var(--brand)] bg-[length:200%_100%] hover:bg-[position:100%_0] text-white font-bold text-base shadow-[var(--shadow-brand-lg)] hover:shadow-[var(--shadow-brand-lg)] transition-all duration-500 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none rounded-2xl relative overflow-hidden group touch-manipulation will-change-transform"
                   >
                     {/* Shimmer effect otimizado */}
@@ -1607,9 +1605,8 @@ function LoginContent() {
                 </motion.div>
               </form>
 
-              {/* Footer Ultra Premium */}
               <motion.div
-                initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0 }}
+                initial={{ opacity: 1 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: shouldReduceMotion ? 0 : 0.4, delay: shouldReduceMotion ? 0 : 0.6 }}
                 className="mt-8 sm:mt-10 md:mt-12 text-center"
