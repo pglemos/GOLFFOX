@@ -839,7 +839,7 @@ function LoginContent() {
 
       {/* Seção Esquerda - Hero Minimalista */}
       <motion.div
-        initial={{ opacity: 0 }}
+        initial={{ opacity: 1 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1, ease: "easeOut" }}
         className="hidden lg:flex lg:w-1/2 relative overflow-hidden items-center justify-center bg-black"
@@ -987,14 +987,14 @@ function LoginContent() {
         {/* Formulário de Login Minimalista */}
         <div className="flex-1 flex items-center justify-center px-4 sm:px-6 md:px-8 lg:px-16 py-6 sm:py-8 md:py-12 relative z-10 w-full max-w-full overflow-x-hidden">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 1, y: 0 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
             className="w-full max-w-md mx-auto min-w-0"
           >
             {/* Mobile: Card wrapper Premium */}
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 1, y: 0 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
               className="lg:hidden bg-gradient-to-br from-white via-white to-[var(--bg-soft)] rounded-3xl shadow-2xl border border-[var(--border)] p-6 sm:p-8 mb-8 relative overflow-hidden"
@@ -1305,7 +1305,7 @@ function LoginContent() {
 
                 {/* Footer Ultra Premium */}
                 <motion.div
-                  initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0 }}
+                  initial={{ opacity: 1 }}
                   animate={{ opacity: 1 }}
                   transition={{ duration: shouldReduceMotion ? 0 : 0.4, delay: shouldReduceMotion ? 0 : 0.6 }}
                   className="mt-8 sm:mt-10 md:mt-12 text-center"
@@ -1370,7 +1370,7 @@ function LoginContent() {
 
               {/* Título Premium */}
               <motion.div
-                initial={{ opacity: 0, y: 10 }}
+                initial={{ opacity: 1, y: 0 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
                 className="mb-8 sm:mb-10 md:mb-12"
@@ -1554,7 +1554,7 @@ function LoginContent() {
 
                 {/* Botão de Login Ultra Premium - Desktop Otimizado */}
                 <motion.div
-                  initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 10 }}
+                  initial={{ opacity: 1, y: 0 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: shouldReduceMotion ? 0 : 0.4, delay: shouldReduceMotion ? 0 : 0.5 }}
                   whileHover={canSubmit && !shouldReduceMotion ? { scale: 1.02 } : {}}
