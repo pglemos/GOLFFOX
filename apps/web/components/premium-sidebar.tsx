@@ -152,6 +152,16 @@ const adminMenuGroups: MenuGroup[] = [
         href: "/admin/relatorios"
       }
     ]
+  },
+  {
+    label: "Sistema",
+    items: [
+      {
+        icon: BarChart3,
+        label: "Monitoramento",
+        href: "/admin/monitoramento"
+      }
+    ]
   }
 ]
 

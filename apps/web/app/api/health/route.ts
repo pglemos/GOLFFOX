@@ -1,50 +1,35 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
-import { withRateLimit } from '@/lib/rate-limit'
-import { monitoring } from '@/lib/monitoring'
+import { supabase } from '@/lib/supabase'
 
-/**
- * Health Check Endpoint
- * Verifica status da aplicação e conexão com Supabase
- */
-async function healthHandler() {
-  const startTime = Date.now()
-  
+export async function GET() {
+  const start = Date.now()
+  let dbStatus = 'unknown'
+  let dbError: string | null = null
+
   try {
-    const healthCheck = await monitoring.performHealthCheck()
-    const duration = Date.now() - startTime
-
-    // Registrar métrica
-    monitoring.recordMetric('health_check.duration', duration, 'ms')
-    monitoring.recordMetric('health_check.status', healthCheck.status === 'healthy' ? 1 : 0)
-
-    const httpStatus = healthCheck.status === 'healthy' ? 200 : 
-                      healthCheck.status === 'degraded' ? 200 : 500
-
-    return NextResponse.json({
-      status: healthCheck.status,
-      ok: healthCheck.status === 'healthy',
-      checks: healthCheck.checks,
-      timestamp: healthCheck.timestamp.toISOString(),
-      duration: `${duration}ms`
-    }, { status: httpStatus })
-  } catch (error: any) {
-    const duration = Date.now() - startTime
-    monitoring.recordMetric('health_check.error', 1)
-    monitoring.recordMetric('health_check.duration', duration, 'ms')
-
-    return NextResponse.json(
-      { 
-        status: 'error',
-        ok: false, 
-        error: error?.message || 'Unknown error',
-        timestamp: new Date().toISOString(),
-        duration: `${duration}ms`
-      },
-      { status: 500 }
-    )
+    const { error } = await supabase.from('users').select('*', { count: 'exact', head: true })
+    if (error) throw error
+    dbStatus = 'healthy'
+  } catch (err: unknown) {
+    dbStatus = 'unhealthy'
+    dbError = err instanceof Error ? err.message : 'Unknown error'
   }
+
+  const duration = Date.now() - start
+
+  return NextResponse.json(
+    {
+      status: dbStatus === 'healthy' ? 'ok' : 'error',
+      timestamp: new Date().toISOString(),
+      services: {
+        database: {
+          status: dbStatus,
+          latency: `${duration}ms`,
+          error: dbError
+        }
+      },
+      version: '1.0.0'
+    },
+    { status: dbStatus === 'healthy' ? 200 : 503 }
+  )
 }
-
-export const GET = withRateLimit(healthHandler, 'public')
-

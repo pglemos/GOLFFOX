@@ -49,7 +49,7 @@ async function test() {
     console.log('📋 TESTE 1: Health Check');
     const health = await makeRequest('/api/health');
     const healthData = health.json();
-    
+
     if (health.status === 200 && healthData.status === 'ok') {
       console.log('✅ Servidor online');
       console.log('✅ Supabase:', healthData.supabase);
@@ -57,29 +57,29 @@ async function test() {
       console.log('❌ Servidor com problemas');
       return;
     }
-    
+
     console.log('');
-    
+
     // Teste 2: CSRF
     console.log('📋 TESTE 2: CSRF Token');
     const csrf = await makeRequest('/api/auth/csrf');
     const csrfData = csrf.json();
     const token = csrfData?.csrfToken || csrfData?.token;
-    
+
     if (token) {
       console.log('✅ CSRF token obtido:', token.substring(0, 20) + '...');
     } else {
       console.log('❌ Falha ao obter CSRF token');
       return;
     }
-    
+
     console.log('');
-    
+
     // Teste 3: Login
     console.log('📋 TESTE 3: Login');
     console.log('📧 Email:', EMAIL);
     console.log('🔑 Senha: ********');
-    
+
     const body = JSON.stringify({ email: EMAIL, password: PASSWORD });
     const login = await makeRequest('/api/auth/login', {
       method: 'POST',
@@ -90,12 +90,12 @@ async function test() {
       },
       body
     });
-    
+
     const loginData = login.json();
-    
+
     console.log('📊 Status:', login.status);
     console.log('');
-    
+
     if (login.status === 200 && loginData.token) {
       console.log('✅ LOGIN BEM-SUCEDIDO!');
       console.log('✅ Token recebido:', loginData.token.substring(0, 30) + '...');
@@ -108,18 +108,17 @@ async function test() {
       console.log('');
       console.log('📊 Resultado Final:');
       console.log('✅ CSRF: Corrigido');
-      console.log('✅ Sentry: Corrigido');
       console.log('✅ Supabase: Configurado e funcionando');
       console.log('✅ Login: Funcionando perfeitamente');
       console.log('');
       console.log('🌐 Acesse: https://golffox.vercel.app');
-      
+
     } else {
       console.log('❌ LOGIN FALHOU');
       console.log('Erro:', loginData?.error || 'Erro desconhecido');
       console.log('Código:', loginData?.code || 'N/A');
       console.log('');
-      
+
       if (loginData?.code === 'user_not_in_db') {
         console.log('💡 SOLUÇÃO: Usuário não existe na tabela users do Supabase');
         console.log('Execute no Supabase SQL Editor:');
@@ -131,7 +130,7 @@ async function test() {
         console.log('ON CONFLICT (id) DO UPDATE SET is_active = true;');
       }
     }
-    
+
   } catch (error) {
     console.log('❌ ERRO:', error.message);
   }
