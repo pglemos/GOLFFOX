@@ -15,7 +15,7 @@ let nextConfig = {
   // Next.js 16: Turbopack é o bundler padrão - otimizado para produção
   // Turbopack oferece performance superior com cache incremental
   // Configuração vazia permite que Next.js use webpack ou turbopack conforme disponibilidade
-  turbopack: {},
+  // turbopack: {},
 
   // Configuração SWC: Next.js automaticamente usa WASM como fallback se binário nativo falhar
   // O binário nativo (@next/swc-win32-x64-msvc) é preferido para melhor performance
@@ -106,6 +106,7 @@ let nextConfig = {
       },
     ],
   },
+  /*
   webpack: (config, { dev, isServer }) => {
     config.resolve.alias = {
       ...config.resolve.alias,
@@ -119,17 +120,18 @@ let nextConfig = {
     // Adicionar plugin para injetar compatibilidade
     if (!isServer) {
       config.plugins = config.plugins || []
-      config.plugins.push(
-        new (require('webpack').NormalModuleReplacementPlugin)(
-          /@swc\/helpers$/,
-          (resource) => {
-            // Para módulos ESM do fontkit, usar wrapper de compatibilidade
-            if (resource.context && resource.context.includes('fontkit')) {
-              resource.request = path.resolve(__dirname, 'lib/swc-helpers-patch.mjs')
-            }
-          }
-        )
-      )
+      // FIXME: This patch might be causing "exports is not defined" errors. Disabling to test stability.
+      // config.plugins.push(
+      //   new (require('webpack').NormalModuleReplacementPlugin)(
+      //     /@swc\/helpers$/,
+      //     (resource) => {
+      //       // Para módulos ESM do fontkit, usar wrapper de compatibilidade
+      //       if (resource.context && resource.context.includes('fontkit')) {
+      //         resource.request = path.resolve(__dirname, 'lib/swc-helpers-patch.mjs')
+      //       }
+      //     }
+      //   )
+      // )
     }
 
     // Configurações básicas para cliente
@@ -164,6 +166,7 @@ let nextConfig = {
     }
     return config
   },
+  */
 }
 
 module.exports = nextConfig
