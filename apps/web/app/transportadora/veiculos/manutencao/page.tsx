@@ -33,13 +33,18 @@ import { Textarea } from "@/components/ui/textarea"
 interface Maintenance {
     id: string
     vehicle_id: string
-    type: string
+    maintenance_type: string
     description?: string
-    status: 'pending' | 'in_progress' | 'completed' | 'cancelled'
-    due_at: string
-    completed_at?: string
-    cost?: number
+    status: 'scheduled' | 'in_progress' | 'completed' | 'cancelled'
+    scheduled_date: string
+    completed_date?: string
+    cost_parts_brl?: number
+    cost_labor_brl?: number
+    total_cost_brl?: number
     notes?: string
+    workshop_name?: string
+    mechanic_name?: string
+    odometer_km?: number
     vehicle?: {
         plate: string
         model: string
@@ -63,7 +68,7 @@ const MAINTENANCE_TYPES = [
 ]
 
 const STATUS_CONFIG = {
-    pending: { label: 'Pendente', icon: Clock, variant: 'secondary' as const, color: 'text-yellow-500' },
+    scheduled: { label: 'Agendada', icon: Clock, variant: 'secondary' as const, color: 'text-yellow-500' },
     in_progress: { label: 'Em Andamento', icon: Wrench, variant: 'default' as const, color: 'text-blue-500' },
     completed: { label: 'Concluída', icon: CheckCircle, variant: 'outline' as const, color: 'text-green-500' },
     cancelled: { label: 'Cancelada', icon: AlertTriangle, variant: 'destructive' as const, color: 'text-red-500' },
@@ -84,11 +89,13 @@ export default function ManutencaoPage() {
     const [saving, setSaving] = useState(false)
     const [formData, setFormData] = useState({
         vehicle_id: "",
-        type: "preventive",
+        maintenance_type: "preventive",
         description: "",
-        status: "pending",
-        due_at: "",
-        cost: "",
+        status: "scheduled",
+        scheduled_date: "",
+        cost_parts_brl: "",
+        cost_labor_brl: "",
+        workshop_name: "",
         notes: "",
     })
 
@@ -103,15 +110,17 @@ export default function ManutencaoPage() {
         if (selectedMaintenance) {
             setFormData({
                 vehicle_id: selectedMaintenance.vehicle_id || "",
-                type: selectedMaintenance.type || "preventive",
+                maintenance_type: selectedMaintenance.maintenance_type || "preventive",
                 description: selectedMaintenance.description || "",
-                status: selectedMaintenance.status || "pending",
-                due_at: selectedMaintenance.due_at?.split('T')[0] || "",
-                cost: selectedMaintenance.cost?.toString() || "",
+                status: selectedMaintenance.status || "scheduled",
+                scheduled_date: selectedMaintenance.scheduled_date?.split('T')[0] || "",
+                cost_parts_brl: selectedMaintenance.cost_parts_brl?.toString() || "",
+                cost_labor_brl: selectedMaintenance.cost_labor_brl?.toString() || "",
+                workshop_name: selectedMaintenance.workshop_name || "",
                 notes: selectedMaintenance.notes || "",
             })
         } else {
-            setFormData({ vehicle_id: "", type: "preventive", description: "", status: "pending", due_at: "", cost: "", notes: "" })
+            setFormData({ vehicle_id: "", maintenance_type: "preventive", description: "", status: "scheduled", scheduled_date: "", cost_parts_brl: "", cost_labor_brl: "", workshop_name: "", notes: "" })
         }
     }, [selectedMaintenance])
 
@@ -124,7 +133,7 @@ export default function ManutencaoPage() {
           *,
           vehicle:vehicles(plate, model)
         `)
-                .order('due_at', { ascending: false })
+                .order('scheduled_date', { ascending: false })
 
             if (error) throw error
             setMaintenances((data as any) || [])
@@ -164,7 +173,7 @@ export default function ManutencaoPage() {
             const query = debouncedSearchQuery.toLowerCase()
             result = result.filter(m =>
                 m.description?.toLowerCase().includes(query) ||
-                m.type?.toLowerCase().includes(query) ||
+                m.maintenance_type?.toLowerCase().includes(query) ||
                 m.vehicle?.plate?.toLowerCase().includes(query) ||
                 m.vehicle?.model?.toLowerCase().includes(query)
             )
@@ -174,7 +183,7 @@ export default function ManutencaoPage() {
     }, [maintenances, debouncedSearchQuery, filterStatus, filterVehicle])
 
     const handleSave = async () => {
-        if (!formData.vehicle_id || !formData.due_at) {
+        if (!formData.vehicle_id || !formData.scheduled_date) {
             notifyError(new Error("Campos obrigatórios"), "Selecione veículo e data")
             return
         }
@@ -183,13 +192,15 @@ export default function ManutencaoPage() {
         try {
             const payload = {
                 vehicle_id: formData.vehicle_id,
-                type: formData.type,
+                maintenance_type: formData.maintenance_type,
                 description: formData.description || null,
                 status: formData.status,
-                due_at: formData.due_at,
-                cost: formData.cost ? parseFloat(formData.cost) : null,
+                scheduled_date: formData.scheduled_date,
+                cost_parts_brl: formData.cost_parts_brl ? parseFloat(formData.cost_parts_brl) : null,
+                cost_labor_brl: formData.cost_labor_brl ? parseFloat(formData.cost_labor_brl) : null,
+                workshop_name: formData.workshop_name || null,
                 notes: formData.notes || null,
-                completed_at: formData.status === 'completed' ? new Date().toISOString() : null,
+                completed_date: formData.status === 'completed' ? new Date().toISOString().split('T')[0] : null,
             }
 
             if (selectedMaintenance) {
@@ -324,10 +335,10 @@ export default function ManutencaoPage() {
                             </Card>
                         ) : (
                             filteredMaintenances.map((maintenance) => {
-                                const statusConfig = STATUS_CONFIG[maintenance.status] || STATUS_CONFIG.pending
+                                const statusConfig = STATUS_CONFIG[maintenance.status] || STATUS_CONFIG.scheduled
                                 const StatusIcon = statusConfig.icon
-                                const typeLabel = MAINTENANCE_TYPES.find(t => t.value === maintenance.type)?.label || maintenance.type
-                                const isOverdue = new Date(maintenance.due_at) < new Date() && maintenance.status === 'pending'
+                                const typeLabel = MAINTENANCE_TYPES.find(t => t.value === maintenance.maintenance_type)?.label || maintenance.maintenance_type
+                                const isOverdue = new Date(maintenance.scheduled_date) < new Date() && maintenance.status === 'scheduled'
 
                                 return (
                                     <motion.div
@@ -366,10 +377,10 @@ export default function ManutencaoPage() {
                                                     <div className="flex flex-wrap gap-2 sm:gap-4 text-xs sm:text-sm text-[var(--ink-muted)]">
                                                         <span className="flex items-center gap-1">
                                                             <Calendar className="h-3 w-3" />
-                                                            Prevista: {new Date(maintenance.due_at).toLocaleDateString('pt-BR')}
+                                                            Prevista: {new Date(maintenance.scheduled_date).toLocaleDateString('pt-BR')}
                                                         </span>
-                                                        {maintenance.cost && (
-                                                            <span>Custo: R$ {maintenance.cost.toFixed(2)}</span>
+                                                        {maintenance.total_cost_brl && (
+                                                            <span>Custo: R$ {maintenance.total_cost_brl.toFixed(2)}</span>
                                                         )}
                                                     </div>
                                                 </div>
@@ -423,12 +434,12 @@ export default function ManutencaoPage() {
                                             >
                                                 <div className="flex justify-between items-start mb-2">
                                                     <span className="font-bold text-sm">{maintenance.vehicle?.plate}</span>
-                                                    <Badge variant="outline" className="text-[10px] h-5">{maintenance.type}</Badge>
+                                                    <Badge variant="outline" className="text-[10px] h-5">{maintenance.maintenance_type}</Badge>
                                                 </div>
                                                 <p className="text-xs text-muted-foreground line-clamp-2 mb-2">{maintenance.description || 'Sem descrição'}</p>
                                                 <div className="flex items-center justify-between text-xs text-muted-foreground">
-                                                    <span>{new Date(maintenance.due_at).toLocaleDateString('pt-BR')}</span>
-                                                    {maintenance.cost && <span>R$ {maintenance.cost}</span>}
+                                                    <span>{new Date(maintenance.scheduled_date).toLocaleDateString('pt-BR')}</span>
+                                                    {maintenance.total_cost_brl && <span>R$ {maintenance.total_cost_brl}</span>}
                                                 </div>
                                             </Card>
                                         ))}
@@ -470,7 +481,7 @@ export default function ManutencaoPage() {
                             </div>
                             <div className="space-y-2">
                                 <Label>Tipo</Label>
-                                <Select value={formData.type} onValueChange={(v) => setFormData({ ...formData, type: v })}>
+                                <Select value={formData.maintenance_type} onValueChange={(v) => setFormData({ ...formData, maintenance_type: v })}>
                                     <SelectTrigger>
                                         <SelectValue />
                                     </SelectTrigger>
@@ -498,17 +509,27 @@ export default function ManutencaoPage() {
                                 <Label>Data Prevista *</Label>
                                 <Input
                                     type="date"
-                                    value={formData.due_at}
-                                    onChange={(e) => setFormData({ ...formData, due_at: e.target.value })}
+                                    value={formData.scheduled_date}
+                                    onChange={(e) => setFormData({ ...formData, scheduled_date: e.target.value })}
                                 />
                             </div>
                             <div className="space-y-2">
-                                <Label>Custo (R$)</Label>
+                                <Label>Custo Peças (R$)</Label>
                                 <Input
                                     type="number"
                                     step="0.01"
-                                    value={formData.cost}
-                                    onChange={(e) => setFormData({ ...formData, cost: e.target.value })}
+                                    value={formData.cost_parts_brl}
+                                    onChange={(e) => setFormData({ ...formData, cost_parts_brl: e.target.value })}
+                                    placeholder="0.00"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label>Custo Mão de Obra (R$)</Label>
+                                <Input
+                                    type="number"
+                                    step="0.01"
+                                    value={formData.cost_labor_brl}
+                                    onChange={(e) => setFormData({ ...formData, cost_labor_brl: e.target.value })}
                                     placeholder="0.00"
                                 />
                             </div>
