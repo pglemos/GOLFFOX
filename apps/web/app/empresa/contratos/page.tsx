@@ -8,7 +8,7 @@ import { Loader2 } from "lucide-react"
 import { useOperatorTenant } from "@/components/providers/empresa-tenant-provider"
 
 export default function ContratosEmpresaPage() {
-    const { user, isLoading } = useAuth()
+    const { user, loading: isLoading } = useAuth()
     const { tenantCompanyId } = useOperatorTenant()
 
     if (isLoading) {

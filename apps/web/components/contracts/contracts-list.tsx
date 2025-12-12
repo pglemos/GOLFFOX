@@ -8,6 +8,9 @@ import { formatCurrency } from "@/lib/kpi-utils"
 import { FileText, Calendar, AlertTriangle, Plus } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { SkeletonList } from "@/components/ui/skeleton"
+import { DataTablePremium } from "@/components/ui/data-table-premium"
+import { ColumnDef } from "@tanstack/react-table"
+import { ArrowUpDown, MoreHorizontal } from "lucide-react"
 
 interface Contract {
     id: string
@@ -50,6 +53,46 @@ export function ContractsList({ companyId }: ContractsListProps) {
 
     if (loading) return <SkeletonList count={3} />
 
+    const columns: ColumnDef<Contract>[] = [
+        {
+            accessorKey: "name",
+            header: "Nome do Contrato",
+        },
+        {
+            accessorKey: "start_date",
+            header: "Início",
+            cell: ({ row }) => new Date(row.getValue("start_date")).toLocaleDateString('pt-BR'),
+        },
+        {
+            accessorKey: "end_date",
+            header: "Fim",
+            cell: ({ row }) => {
+                const date = row.getValue("end_date") as string
+                return date ? new Date(date).toLocaleDateString('pt-BR') : '-'
+            }
+        },
+        {
+            accessorKey: "value_amount",
+            header: "Valor",
+            cell: ({ row }) => {
+                const amount = parseFloat(row.getValue("value_amount"))
+                return isNaN(amount) ? '-' : formatCurrency(amount)
+            }
+        },
+        {
+            accessorKey: "status",
+            header: "Status",
+            cell: ({ row }) => {
+                const status = row.getValue("status") as string
+                return (
+                    <Badge variant={status === 'active' ? 'default' : status === 'expired' ? 'destructive' : 'secondary'}>
+                        {status === 'active' ? 'Ativo' : status === 'expired' ? 'Expirado' : status === 'pending' ? 'Pendente' : 'Cancelado'}
+                    </Badge>
+                )
+            }
+        },
+    ]
+
     return (
         <div className="space-y-4">
             <div className="flex justify-between items-center">
@@ -60,53 +103,12 @@ export function ContractsList({ companyId }: ContractsListProps) {
                 </Button>
             </div>
 
-            {contracts.length === 0 ? (
-                <Card className="border-dashed">
-                    <CardContent className="flex flex-col items-center justify-center py-8 text-muted-foreground">
-                        <FileText className="h-12 w-12 mb-4 opacity-50" />
-                        <p>Nenhum contrato encontrado</p>
-                    </CardContent>
-                </Card>
-            ) : (
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                    {contracts.map(contract => (
-                        <Card key={contract.id}>
-                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                <CardTitle className="text-sm font-medium">
-                                    {contract.name}
-                                </CardTitle>
-                                <Badge
-                                    variant={
-                                        contract.status === 'active' ? 'default' :
-                                            contract.status === 'expired' ? 'destructive' : 'secondary'
-                                    }
-                                >
-                                    {contract.status === 'active' ? 'Ativo' :
-                                        contract.status === 'expired' ? 'Expirado' :
-                                            contract.status === 'pending' ? 'Pendente' : 'Cancelado'}
-                                </Badge>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="text-2xl font-bold">
-                                    {contract.value_amount ? formatCurrency(contract.value_amount) : 'R$ -'}
-                                </div>
-                                <div className="text-xs text-muted-foreground mt-2 space-y-1">
-                                    <div className="flex items-center gap-1">
-                                        <Calendar className="h-3 w-3" />
-                                        Início: {new Date(contract.start_date).toLocaleDateString('pt-BR')}
-                                    </div>
-                                    {contract.end_date && (
-                                        <div className="flex items-center gap-1 text-orange-600">
-                                            <AlertTriangle className="h-3 w-3" />
-                                            Fim: {new Date(contract.end_date).toLocaleDateString('pt-BR')}
-                                        </div>
-                                    )}
-                                </div>
-                            </CardContent>
-                        </Card>
-                    ))}
-                </div>
-            )}
+            <DataTablePremium
+                columns={columns}
+                data={contracts}
+                searchKey="name"
+                placeholder="Filtrar contratos..."
+            />
         </div>
     )
 }

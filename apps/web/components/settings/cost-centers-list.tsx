@@ -11,6 +11,9 @@ import { Building2, Plus, Edit, Trash2 } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { notifySuccess, notifyError } from "@/lib/toast"
 import { SkeletonList } from "@/components/ui/skeleton"
+import { DataTablePremium } from "@/components/ui/data-table-premium"
+import { ColumnDef } from "@tanstack/react-table"
+import { Badge } from "@/components/ui/badge"
 
 interface CostCenter {
     id: string
@@ -129,6 +132,46 @@ export function CostCentersList({ companyId }: CostCentersListProps) {
 
     if (loading) return <SkeletonList count={3} />
 
+    const columns: ColumnDef<CostCenter>[] = [
+        {
+            accessorKey: "code",
+            header: "Código",
+        },
+        {
+            accessorKey: "name",
+            header: "Nome",
+        },
+        {
+            accessorKey: "is_active",
+            header: "Status",
+            cell: ({ row }) => {
+                const isActive = row.getValue("is_active") as boolean
+                return (
+                    <Badge variant={isActive ? 'default' : 'secondary'}>
+                        {isActive ? 'Ativo' : 'Inativo'}
+                    </Badge>
+                )
+            }
+        },
+        {
+            id: "actions",
+            enableHiding: false,
+            cell: ({ row }) => {
+                const center = row.original
+                return (
+                    <div className="flex gap-2 justify-end">
+                        <Button variant="ghost" size="icon" onClick={() => openEdit(center)}>
+                            <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDelete(center.id)}>
+                            <Trash2 className="h-4 w-4" />
+                        </Button>
+                    </div>
+                )
+            },
+        },
+    ]
+
     return (
         <div className="space-y-4">
             <div className="flex justify-between items-center">
@@ -176,39 +219,12 @@ export function CostCentersList({ companyId }: CostCentersListProps) {
                 </Dialog>
             </div>
 
-            {costCenters.length === 0 ? (
-                <Card className="border-dashed">
-                    <CardContent className="flex flex-col items-center justify-center py-8 text-muted-foreground">
-                        <Building2 className="h-12 w-12 mb-4 opacity-50" />
-                        <p>Nenhum centro de custo cadastrado</p>
-                    </CardContent>
-                </Card>
-            ) : (
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                    {costCenters.map(center => (
-                        <Card key={center.id} className={!center.is_active ? 'opacity-60' : ''}>
-                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                <div className="space-y-1">
-                                    <CardTitle className="text-base">
-                                        {center.code}
-                                    </CardTitle>
-                                    <p className="text-sm font-normal text-muted-foreground">
-                                        {center.name}
-                                    </p>
-                                </div>
-                                <div className="flex gap-2">
-                                    <Button variant="ghost" size="icon" onClick={() => openEdit(center)}>
-                                        <Edit className="h-4 w-4" />
-                                    </Button>
-                                    <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDelete(center.id)}>
-                                        <Trash2 className="h-4 w-4" />
-                                    </Button>
-                                </div>
-                            </CardHeader>
-                        </Card>
-                    ))}
-                </div>
-            )}
+            <DataTablePremium
+                columns={columns}
+                data={costCenters}
+                searchKey="name"
+                placeholder="Filtrar por nome..."
+            />
         </div>
     )
 }

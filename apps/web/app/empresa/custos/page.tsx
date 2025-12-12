@@ -8,7 +8,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Loader2 } from "lucide-react"
 
 export default function CustosEmpresaPage() {
-  const { user, isLoading } = useAuth()
+  const { user, loading: isLoading } = useAuth()
   // No contexto da Empresa, o companyId é obtido via token no backend/API
   // Mas podemos passar se tivermos disponível no perfil
   const [profile, setProfile] = useState<any>(null)

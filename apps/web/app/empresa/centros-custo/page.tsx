@@ -7,7 +7,7 @@ import { useAuth } from "@/hooks/use-auth"
 import { Loader2 } from "lucide-react"
 
 export default function CentrosCustoEmpresaPage() {
-    const { user, isLoading } = useAuth()
+    const { user, loading: isLoading } = useAuth()
     const { tenantCompanyId } = useOperatorTenant()
 
     if (isLoading) {
