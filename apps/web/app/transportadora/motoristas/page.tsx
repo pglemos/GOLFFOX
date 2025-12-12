@@ -3,6 +3,7 @@
 import { useEffect, useState, useMemo, useCallback } from "react"
 import dynamic from "next/dynamic"
 import { AppShell } from "@/components/app-shell"
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -117,6 +118,18 @@ export default function TransportadoraMotoristasListPage() {
                         <span className="hidden sm:inline">Cadastrar Motorista</span>
                         <span className="sm:hidden">Cadastrar</span>
                     </Button>
+                </div>
+
+                {/* Tabs */}
+                <div className="flex gap-2">
+                    <Button variant="default" className="bg-orange-500 hover:bg-orange-600 cursor-default">
+                        Lista de Motoristas
+                    </Button>
+                    <Link href="/transportadora/motoristas/ranking">
+                        <Button variant="outline">
+                            Ranking de Desempenho
+                        </Button>
+                    </Link>
                 </div>
 
                 {/* Search */}

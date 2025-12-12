@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import { useState, useEffect } from "react"
 import { AppShell } from "@/components/app-shell"
 import { Card } from "@/components/ui/card"
@@ -91,8 +92,8 @@ export default function MotoristasPage() {
         activeDrivers: apiDrivers.length,
         totalRevenue: apiDrivers.reduce((sum, d) => sum + d.totalEarnings, 0),
         todayTrips: todayTripsCount,
-        avgRating: apiDrivers.length > 0 
-          ? apiDrivers.reduce((sum, d) => sum + d.avgRating, 0) / apiDrivers.length 
+        avgRating: apiDrivers.length > 0
+          ? apiDrivers.reduce((sum, d) => sum + d.avgRating, 0) / apiDrivers.length
           : 0,
       })
     } catch (error) {
@@ -190,10 +191,14 @@ export default function MotoristasPage() {
         {/* Tabs e Busca */}
         <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
           <div className="flex gap-2">
-            <Button variant="default" className="bg-orange-500 hover:bg-orange-600">
-              Lista de Motoristas
+            <Link href="/transportadora/motoristas">
+              <Button variant="outline">
+                Lista de Motoristas
+              </Button>
+            </Link>
+            <Button variant="default" className="bg-orange-500 hover:bg-orange-600 cursor-default">
+              Ranking de Desempenho
             </Button>
-            <Button variant="outline">Ranking de Desempenho</Button>
           </div>
           <div className="relative w-full sm:w-64">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -226,104 +231,104 @@ export default function MotoristasPage() {
                   whileHover={{ y: -4 }}
                   className="group"
                 >
-                <Card
-                  key={driver.id}
-                  className={`p-4 transition-all cursor-pointer hover:shadow-xl bg-card/50 backdrop-blur-sm border-[var(--border)] hover:border-[var(--brand)]/30 ${selectedDriver === driver.id ? 'ring-2 ring-orange-500' : ''}`}
-                  onClick={() => setSelectedDriver(selectedDriver === driver.id ? null : driver.id)}
-                >
-                  <div className="flex flex-col lg:flex-row gap-4">
-                    {/* Rank Badge e Info */}
-                    <div className="flex items-center gap-4 flex-1">
-                      <div className={`h-12 w-12 rounded-lg flex items-center justify-center font-bold text-lg ${getRankBadgeColor(driver.rank)}`}>#{driver.rank}</div>
-                      <div className="flex items-center gap-3 flex-1">
-                        <div className="h-12 w-12 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center text-white font-bold text-lg">
-                          {driver.name.charAt(0)}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="font-semibold text-base truncate">{driver.name}</p>
-                          <p className="text-xs text-[var(--ink-muted)] truncate">{driver.email}</p>
-                        </div>
-                      </div>
-                    </div>
-                    {/* Score */}
-                    <div className="flex items-center gap-6 flex-wrap lg:flex-nowrap">
-                      <div className="text-center">
-                        <p className="text-xs text-[var(--ink-muted)] mb-1">Pontuação</p>
-                        <p className="text-2xl font-bold text-orange-500">{driver.score}</p>
-                        <p className="text-xs text-[var(--ink-muted)]">/100</p>
-                      </div>
-                      {/* Progress Bars */}
-                      <div className="space-y-2 flex-1 min-w-[200px]">
-                        <div>
-                          <div className="flex justify-between text-xs mb-1">
-                            <span className="text-[var(--ink-muted)]">Pontualidade</span>
-                            <span className="font-medium">{driver.punctualityScore}%</span>
+                  <Card
+                    key={driver.id}
+                    className={`p-4 transition-all cursor-pointer hover:shadow-xl bg-card/50 backdrop-blur-sm border-[var(--border)] hover:border-[var(--brand)]/30 ${selectedDriver === driver.id ? 'ring-2 ring-orange-500' : ''}`}
+                    onClick={() => setSelectedDriver(selectedDriver === driver.id ? null : driver.id)}
+                  >
+                    <div className="flex flex-col lg:flex-row gap-4">
+                      {/* Rank Badge e Info */}
+                      <div className="flex items-center gap-4 flex-1">
+                        <div className={`h-12 w-12 rounded-lg flex items-center justify-center font-bold text-lg ${getRankBadgeColor(driver.rank)}`}>#{driver.rank}</div>
+                        <div className="flex items-center gap-3 flex-1">
+                          <div className="h-12 w-12 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center text-white font-bold text-lg">
+                            {driver.name.charAt(0)}
                           </div>
-                          <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                            <div className="h-full bg-gradient-to-r from-blue-400 to-blue-600 rounded-full transition-all" style={{ width: `${driver.punctualityScore}%` }} />
-                          </div>
-                        </div>
-                        <div>
-                          <div className="flex justify-between text-xs mb-1">
-                            <span className="text-[var(--ink-muted)]">Economia</span>
-                            <span className="font-medium">{driver.economyScore}%</span>
-                          </div>
-                          <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                            <div className="h-full bg-gradient-to-r from-green-400 to-green-600 rounded-full transition-all" style={{ width: `${driver.economyScore}%` }} />
-                          </div>
-                        </div>
-                        <div>
-                          <div className="flex justify-between text-xs mb-1">
-                            <span className="text-[var(--ink-muted)]">Segurança</span>
-                            <span className="font-medium">{driver.safetyScore}%</span>
-                          </div>
-                          <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                            <div className="h-full bg-gradient-to-r from-purple-400 to-purple-600 rounded-full transition-all" style={{ width: `${driver.safetyScore}%` }} />
+                          <div className="flex-1 min-w-0">
+                            <p className="font-semibold text-base truncate">{driver.name}</p>
+                            <p className="text-xs text-[var(--ink-muted)] truncate">{driver.email}</p>
                           </div>
                         </div>
                       </div>
-                      {/* Stats */}
-                      <div className="flex gap-6">
+                      {/* Score */}
+                      <div className="flex items-center gap-6 flex-wrap lg:flex-nowrap">
                         <div className="text-center">
-                          <p className="text-xs text-[var(--ink-muted)] mb-1">Corridas</p>
-                          <p className="text-lg font-bold">{driver.totalTrips}</p>
+                          <p className="text-xs text-[var(--ink-muted)] mb-1">Pontuação</p>
+                          <p className="text-2xl font-bold text-orange-500">{driver.score}</p>
+                          <p className="text-xs text-[var(--ink-muted)]">/100</p>
                         </div>
-                        <div className="text-center">
-                          <p className="text-xs text-[var(--ink-muted)] mb-1">Ganhos</p>
-                          <p className="text-lg font-bold text-green-600">
-                            R$ {driver.totalEarnings.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                          </p>
+                        {/* Progress Bars */}
+                        <div className="space-y-2 flex-1 min-w-[200px]">
+                          <div>
+                            <div className="flex justify-between text-xs mb-1">
+                              <span className="text-[var(--ink-muted)]">Pontualidade</span>
+                              <span className="font-medium">{driver.punctualityScore}%</span>
+                            </div>
+                            <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                              <div className="h-full bg-gradient-to-r from-blue-400 to-blue-600 rounded-full transition-all" style={{ width: `${driver.punctualityScore}%` }} />
+                            </div>
+                          </div>
+                          <div>
+                            <div className="flex justify-between text-xs mb-1">
+                              <span className="text-[var(--ink-muted)]">Economia</span>
+                              <span className="font-medium">{driver.economyScore}%</span>
+                            </div>
+                            <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                              <div className="h-full bg-gradient-to-r from-green-400 to-green-600 rounded-full transition-all" style={{ width: `${driver.economyScore}%` }} />
+                            </div>
+                          </div>
+                          <div>
+                            <div className="flex justify-between text-xs mb-1">
+                              <span className="text-[var(--ink-muted)]">Segurança</span>
+                              <span className="font-medium">{driver.safetyScore}%</span>
+                            </div>
+                            <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                              <div className="h-full bg-gradient-to-r from-purple-400 to-purple-600 rounded-full transition-all" style={{ width: `${driver.safetyScore}%` }} />
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                      {/* Actions */}
-                      <div className="flex gap-2">
-                        <Button size="sm" variant="outline" className="h-8"><Award className="h-4 w-4" /></Button>
-                        <Button size="sm" variant="outline" className="h-8"><Star className="h-4 w-4" /></Button>
+                        {/* Stats */}
+                        <div className="flex gap-6">
+                          <div className="text-center">
+                            <p className="text-xs text-[var(--ink-muted)] mb-1">Corridas</p>
+                            <p className="text-lg font-bold">{driver.totalTrips}</p>
+                          </div>
+                          <div className="text-center">
+                            <p className="text-xs text-[var(--ink-muted)] mb-1">Ganhos</p>
+                            <p className="text-lg font-bold text-green-600">
+                              R$ {driver.totalEarnings.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                            </p>
+                          </div>
+                        </div>
+                        {/* Actions */}
+                        <div className="flex gap-2">
+                          <Button size="sm" variant="outline" className="h-8"><Award className="h-4 w-4" /></Button>
+                          <Button size="sm" variant="outline" className="h-8"><Star className="h-4 w-4" /></Button>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  {/* Expanded Details */}
-                  {selectedDriver === driver.id && (
-                    <div className="mt-4 pt-4 border-t grid grid-cols-2 sm:grid-cols-4 gap-4">
-                      <div className="space-y-1">
-                        <p className="text-xs text-[var(--ink-muted)]">Pontualidade</p>
-                        <p className="text-sm font-medium flex items-center gap-1">{driver.punctualityScore}%<Clock className="h-3 w-3 text-blue-500" /></p>
+                    {/* Expanded Details */}
+                    {selectedDriver === driver.id && (
+                      <div className="mt-4 pt-4 border-t grid grid-cols-2 sm:grid-cols-4 gap-4">
+                        <div className="space-y-1">
+                          <p className="text-xs text-[var(--ink-muted)]">Pontualidade</p>
+                          <p className="text-sm font-medium flex items-center gap-1">{driver.punctualityScore}%<Clock className="h-3 w-3 text-blue-500" /></p>
+                        </div>
+                        <div className="space-y-1">
+                          <p className="text-xs text-[var(--ink-muted)]">Economia</p>
+                          <p className="text-sm font-medium flex items-center gap-1">{driver.economyScore}%<Fuel className="h-3 w-3 text-green-500" /></p>
+                        </div>
+                        <div className="space-y-1">
+                          <p className="text-xs text-[var(--ink-muted)]">Conformidade</p>
+                          <p className="text-sm font-medium flex items-center gap-1">{driver.safetyScore}%<AlertCircle className="h-3 w-3 text-purple-500" /></p>
+                        </div>
+                        <div className="space-y-1">
+                          <p className="text-xs text-[var(--ink-muted)]">Avaliação</p>
+                          <p className="text-sm font-medium flex items-center gap-1">{driver.avgRating.toFixed(1)}<Star className="h-3 w-3 text-yellow-500 fill-yellow-500" /></p>
+                        </div>
                       </div>
-                      <div className="space-y-1">
-                        <p className="text-xs text-[var(--ink-muted)]">Economia</p>
-                        <p className="text-sm font-medium flex items-center gap-1">{driver.economyScore}%<Fuel className="h-3 w-3 text-green-500" /></p>
-                      </div>
-                      <div className="space-y-1">
-                        <p className="text-xs text-[var(--ink-muted)]">Conformidade</p>
-                        <p className="text-sm font-medium flex items-center gap-1">{driver.safetyScore}%<AlertCircle className="h-3 w-3 text-purple-500" /></p>
-                      </div>
-                      <div className="space-y-1">
-                        <p className="text-xs text-[var(--ink-muted)]">Avaliação</p>
-                        <p className="text-sm font-medium flex items-center gap-1">{driver.avgRating.toFixed(1)}<Star className="h-3 w-3 text-yellow-500 fill-yellow-500" /></p>
-                      </div>
-                    </div>
-                  )}
-                </Card>
+                    )}
+                  </Card>
                 </motion.div>
               ))}
             </div>
