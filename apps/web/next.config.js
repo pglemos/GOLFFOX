@@ -58,7 +58,7 @@ let nextConfig = {
                 "font-src 'self' data: https://fonts.gstatic.com https://fonts.googleapis.com",
 
                 // Connect: APIs externas necessárias
-                "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.vercel.com https://*.googleapis.com https://*.vercel.app https://vitals.vercel-insights.com",
+                "connect-src 'self' http://127.0.0.1:* ws://127.0.0.1:* http://localhost:* ws://localhost:* https://*.supabase.co wss://*.supabase.co https://*.vercel.com https://*.googleapis.com https://*.vercel.app https://vitals.vercel-insights.com",
 
                 // Workers: necessário para service workers e web workers
                 "worker-src 'self' blob:",

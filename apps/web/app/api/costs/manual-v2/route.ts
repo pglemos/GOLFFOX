@@ -250,13 +250,21 @@ export async function POST(request: NextRequest) {
         let carrierId = body.carrierId
 
         if (profile?.role === 'empresa') {
-            companyId = profile.company_id
+            companyId = profile.company_id || body.companyId
             carrierId = null
         } else if (profile?.role === 'transportadora' || profile?.role === 'operador') {
-            carrierId = profile.carrier_id
+            carrierId = profile.carrier_id || body.carrierId
             companyId = null
         }
         // Admin pode especificar qualquer tenant
+
+        // Validar constraint chk_tenant: deve ter company_id OU carrier_id
+        if (!companyId && !carrierId) {
+            return NextResponse.json(
+                { success: false, error: 'É necessário especificar uma empresa ou transportadora' },
+                { status: 400 }
+            )
+        }
 
         // Inserir custo
         const { data, error } = await supabaseAdmin
