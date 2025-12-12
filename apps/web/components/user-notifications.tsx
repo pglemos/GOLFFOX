@@ -93,7 +93,7 @@ export function UserNotifications() {
                 <div className="flex items-center justify-between p-4 border-b">
                     <h4 className="font-semibold text-sm">Notificações</h4>
                     {unreadCount > 0 && (
-                        <Button variant="ghost" size="xs" className="h-auto text-xs text-muted-foreground hover:text-primary" onClick={() => markAllRead.mutate()}>
+                        <Button variant="ghost" size="sm" className="h-auto text-xs text-muted-foreground hover:text-primary" onClick={() => markAllRead.mutate()}>
                             Marcar todas como lidas
                         </Button>
                     )}
