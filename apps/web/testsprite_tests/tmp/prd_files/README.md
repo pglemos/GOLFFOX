@@ -1,9 +1,10 @@
 # 🚌 GolfFox - Sistema de Gestão de Transporte Urbano
 
-[![Flutter](https://img.shields.io/badge/Flutter-3.24+-blue.svg)](https://flutter.dev/)
-[![Next.js](https://img.shields.io/badge/Next.js-15+-black.svg)](https://nextjs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue.svg)](https://www.typescriptlang.org/)
-[![Supabase](https://img.shields.io/badge/Supabase-Latest-green.svg)](https://supabase.com/)
+[![React Native](https://img.shields.io/badge/React%20Native-Expo%2054-61DAFB.svg)](https://expo.dev/)
+[![Next.js](https://img.shields.io/badge/Next.js-16.0.7-black.svg)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.9.3-blue.svg)](https://www.typescriptlang.org/)
+[![Supabase](https://img.shields.io/badge/Supabase%20JS-2.87.1-green.svg)](https://supabase.com/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-4.1.17-38bdf8.svg)](https://tailwindcss.com/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Deploy](https://img.shields.io/badge/Deploy-Vercel-black.svg)](https://vercel.com/)
 
@@ -44,74 +45,93 @@ O **GolfFox** é uma plataforma completa de gestão de transporte urbano que ofe
 
 O projeto utiliza uma arquitetura híbrida moderna:
 
-- **Frontend Mobile**: Flutter 3.24+ (iOS/Android)
-- **Frontend Web**: Next.js 15 com TypeScript, App Router
+- **Frontend Mobile**: React Native (Expo 54) + TypeScript (iOS/Android)
+- **Frontend Web**: Next.js 16.1 com TypeScript, App Router, Turbopack
 - **Backend**: Supabase (PostgreSQL + Auth + Storage + Realtime)
 - **Arquitetura**: Clean Architecture + Domain Driven Design
-- **Estado**: Provider Pattern (Flutter) + React Hooks + Zustand (Next.js)
-- **Estilização**: Tailwind CSS + Framer Motion
-- **Mapas**: Google Maps API
-- **Deploy**: Vercel (Web) + GitHub Actions (CI/CD)
+- **Estado**: React Hooks + Zustand + TanStack Query
+- **Estilização**: Tailwind CSS 4.0 (Web) + NativeWind (Mobile) + Radix UI
+- **Mapas**: Google Maps API + react-native-maps (Mobile) + @react-google-maps/api (Web)
+- **Deploy**: Vercel (Web) + EAS Build (Mobile) + GitHub Actions (CI/CD)
+- **Monitoramento**: Sentry + Vercel Speed Insights
 
 ### Estrutura do Projeto
 
 ```
 📁 GOLFFOX/
-├── 📱 lib/                    # Flutter App (Mobile)
-│   ├── 🏗️ core/              # Camada Core (Shared)
-│   │   ├── auth/             # Sistema de autenticação
-│   │   ├── config/           # Configurações
-│   │   ├── error/             # Tratamento de erros
-│   │   ├── logging/           # Sistema de logging
-│   │   ├── routing/           # Roteamento
-│   │   ├── security/          # Segurança
-│   │   └── theme/             # Temas e estilos
-│   ├── 🎯 features/          # Features por domínio
-│   │   ├── auth/             # Autenticação
-│   │   ├── drivers/          # Motoristas
-│   │   ├── mapa/             # Mapa e rastreamento
-│   │   ├── routes/           # Rotas
-│   │   └── vehicles/         # Veículos
-│   ├── 📊 models/            # Modelos de dados
-│   └── 🎨 widgets/           # Componentes reutilizáveis
+├── 📱 apps/mobile/            # React Native App (Expo)
+│   ├── app/                   # Expo Router (File-based routing)
+│   │   ├── _layout.tsx        # Layout raiz (providers)
+│   │   ├── index.tsx          # Tela inicial (redirect)
+│   │   ├── login.tsx          # Tela de login
+│   │   ├── driver/            # Rotas do Motorista
+│   │   │   ├── _layout.tsx    # Stack do motorista
+│   │   │   ├── index.tsx      # Dashboard motorista
+│   │   │   ├── checklist.tsx  # Checklist pré-rota
+│   │   │   ├── route.tsx      # Mapa com rastreamento
+│   │   │   ├── scan.tsx       # Scanner QR/NFC
+│   │   │   └── history.tsx    # Histórico de viagens
+│   │   └── passenger/         # Rotas do Passageiro
+│   │       ├── _layout.tsx    # Stack do passageiro
+│   │       ├── index.tsx      # Dashboard passageiro
+│   │       ├── map.tsx        # Mapa tempo real
+│   │       ├── details.tsx    # Detalhes da rota
+│   │       └── feedback.tsx   # Avaliação
+│   ├── src/                   # Código-fonte
+│   │   ├── auth/              # Autenticação (hooks, context)
+│   │   ├── services/          # Supabase, geolocalização
+│   │   ├── components/        # UI compartilhado
+│   │   ├── features/          # Funcionalidades (checkin, tracking)
+│   │   └── utils/             # Utilitários
+│   ├── assets/                # Ícones e imagens
+│   ├── app.config.ts          # Configuração Expo
+│   ├── eas.json               # Configuração EAS Build
+│   └── package.json           # Dependências
 │
-├── 🌐 web-app/               # Next.js Web App
-│   ├── app/                  # App Router (Next.js 15)
-│   │   ├── admin/            # Painel Administrativo
-│   │   ├── operator/         # Painel do Operador
-│   │   ├── carrier/          # Painel da Transportadora
-│   │   ├── driver/           # Painel do Motorista
-│   │   ├── passenger/        # Painel do Passageiro
-│   │   ├── api/              # API Routes
-│   │   │   ├── auth/         # Autenticação
-│   │   │   ├── admin/        # Endpoints Admin
+├── 🌐 apps/web/               # Next.js Web App
+│   ├── app/                   # App Router (Next.js 16.1 + Turbopack)
+│   │   ├── admin/             # Painel Administrativo
+│   │   ├── operator/          # Painel do Operador
+│   │   ├── carrier/           # Painel da Transportadora
+│   │   ├── driver/            # Painel do Motorista
+│   │   ├── passenger/         # Painel do Passageiro
+│   │   ├── api/               # API Routes
+│   │   │   ├── auth/          # Autenticação
+│   │   │   ├── admin/         # Endpoints Admin
 │   │   │   ├── operator/      # Endpoints Operador
-│   │   │   ├── costs/        # Gestão de Custos
-│   │   │   ├── reports/      # Relatórios
-│   │   │   └── cron/         # Cron Jobs
-│   │   ├── page.tsx          # Página de Login
-│   │   └── layout.tsx        # Layout Principal
-│   ├── components/           # Componentes React
-│   │   ├── ui/               # Componentes UI base
-│   │   ├── admin/            # Componentes Admin
-│   │   ├── operator/         # Componentes Operador
-│   │   └── modals/           # Modais
-│   ├── lib/                  # Utilitários e Helpers
-│   │   ├── supabase.ts       # Cliente Supabase
-│   │   ├── auth.ts           # Gerenciamento de Auth
-│   │   ├── api-auth.ts       # Helpers de autenticação API
-│   │   └── logger.ts         # Sistema de Logging
-│   ├── middleware.ts        # Middleware Next.js
-│   └── scripts/              # Scripts utilitários
+│   │   │   ├── carrier/       # Endpoints Transportadora
+│   │   │   ├── costs/         # Gestão de Custos
+│   │   │   ├── reports/       # Relatórios
+│   │   │   ├── cron/          # Cron Jobs
+│   │   │   ├── analytics/     # Analytics
+│   │   │   └── notifications/ # Notificações
+│   │   ├── page.tsx           # Página de Login
+│   │   └── layout.tsx         # Layout Principal
+│   ├── components/            # Componentes React
+│   │   ├── ui/                # Componentes UI base (Radix UI)
+│   │   ├── admin/             # Componentes Admin
+│   │   ├── operator/          # Componentes Operador
+│   │   ├── carrier/           # Componentes Transportadora
+│   │   ├── modals/            # Modais
+│   │   └── providers/         # Context Providers
+│   ├── lib/                   # Utilitários e Helpers
+│   │   ├── supabase.ts        # Cliente Supabase
+│   │   ├── auth.ts            # Gerenciamento de Auth
+│   │   ├── api-auth.ts        # Helpers de autenticação API
+│   │   └── logger.ts          # Sistema de Logging
+│   ├── hooks/                 # React Hooks customizados
+│   ├── middleware.ts          # Middleware Next.js
+│   └── package.json           # Dependências Node.js
 │
-├── 📚 database/              # Banco de Dados
-│   ├── migrations/           # Migrations SQL (v1-v49+)
-│   ├── seeds/                # Dados iniciais
-│   └── scripts/              # Scripts SQL
+├── 📚 database/               # Banco de Dados
+│   ├── migrations/            # Migrations SQL (v41-v74)
+│   ├── seeds/                 # Dados iniciais
+│   └── scripts/               # Scripts SQL
 │
 ├── 📚 docs/                   # Documentação técnica
 ├── 🧪 test/                   # Testes automatizados
-└── 🔧 scripts/                # Scripts de automação
+├── 🔧 scripts/                # Scripts de automação
+└── 🏗️ infra/                  # Infraestrutura (Docker, etc.)
 ```
 
 ## 🎯 Funcionalidades
@@ -207,11 +227,20 @@ O projeto utiliza uma arquitetura híbrida moderna:
     - Reprocessamento de falhas
     - Status em tempo real
 
-### Painel do Operador (`/operator`)
+14. **Transportadoras** (`/admin/transportadoras`) - Gestão de transportadoras
+    - CRUD completo de transportadoras
+    - Associação de veículos e motoristas
+    - Configurações de frota
 
-**Acesso**: Usuários com role `operator` ou `admin`
+15. **Preferências** (`/admin/preferences`) - Configurações do sistema
+    - Configurações gerais
+    - Preferências de exibição
 
-**URL**: https://golffox.vercel.app/operator
+### Painel da Empresa Contratante (`/empresa`)
+
+**Acesso**: Usuários com role `empresa` ou `admin`
+
+**URL**: https://golffox.vercel.app/empresa
 
 #### Módulos Implementados
 
@@ -225,46 +254,46 @@ O projeto utiliza uma arquitetura híbrida moderna:
    - SLA D0
    - Lista de viagens com filtros
 
-2. **Funcionários** (`/operator/funcionarios`) - Portal do Operador
+2. **Funcionários** (`/empresa/funcionarios`) - Portal da Empresa
    - Lista de funcionários da empresa
    - Busca e filtros
    - Cadastro de funcionários
    - Geocodificação automática de endereços
 
-3. **Rotas** (`/operator/rotas`) - Rotas atribuídas
+3. **Rotas** (`/empresa/rotas`) - Rotas atribuídas
    - Visualização de rotas
    - Status das rotas
-   - Mapa de rotas (`/operator/rotas/mapa`)
+   - Mapa de rotas (`/empresa/rotas/mapa`)
 
-4. **Alertas** (`/operator/alertas`) - Alertas específicos
+4. **Alertas** (`/empresa/alertas`) - Alertas específicos
    - Filtros por tipo (erro, aviso, info)
    - Busca
 
-5. **Comunicações** (`/operator/comunicacoes`) - Comunicação com funcionários
+5. **Comunicações** (`/empresa/comunicacoes`) - Comunicação com funcionários
 
-6. **Conformidade** (`/operator/conformidade`) - Conformidade regulatória
+6. **Conformidade** (`/empresa/conformidade`) - Conformidade regulatória
 
-7. **Custos** (`/operator/custos`) - Custos da empresa
+7. **Custos** (`/empresa/custos`) - Custos da empresa
 
-8. **Relatórios** (`/operator/relatorios`) - Relatórios da empresa
+8. **Relatórios** (`/empresa/relatorios`) - Relatórios da empresa
 
-9. **Solicitações** (`/operator/solicitacoes`) - Solicitações de funcionários
+9. **Solicitações** (`/empresa/solicitacoes`) - Solicitações de funcionários
 
-10. **Prestadores** (`/operator/prestadores`) - Gestão de prestadores
+10. **Prestadores** (`/empresa/prestadores`) - Gestão de prestadores
 
-11. **Ajuda** (`/operator/ajuda`) - Central de ajuda
+11. **Ajuda** (`/empresa/ajuda`) - Central de ajuda
     - FAQ
     - Suporte WhatsApp
     - Documentação
     - Status do sistema
 
-12. **Sincronizar** (`/operator/sincronizar`) - Sincronização de dados
+12. **Sincronizar** (`/empresa/sincronizar`) - Sincronização de dados
 
-13. **Preferências** (`/operator/preferencias`) - Configurações
+13. **Preferências** (`/empresa/preferencias`) - Configurações
 
-### Painel da Transportadora (`/carrier`)
+### Painel da Transportadora (`/transportadora`)
 
-**Acesso**: Usuários com role `carrier` ou `admin`
+**Acesso**: Usuários com role `operador` ou `admin`
 
 **URL**: https://golffox.vercel.app/carrier
 
@@ -276,7 +305,12 @@ O projeto utiliza uma arquitetura híbrida moderna:
 4. **Motoristas** (`/carrier/motoristas`) - Gestão de motoristas
 5. **Relatórios** (`/carrier/relatorios`) - Relatórios
 6. **Alertas** (`/carrier/alertas`) - Alertas
-7. **Ajuda** (`/carrier/ajuda`) - Central de ajuda
+7. **Custos** (`/carrier/custos`) - Gestão de custos da transportadora
+    - Custos por rota
+    - Custos por veículo
+    - Relatórios financeiros
+
+8. **Ajuda** (`/carrier/ajuda`) - Central de ajuda
 
 ## 🔐 Sistema de Autenticação
 
@@ -300,18 +334,18 @@ O sistema utiliza autenticação baseada em cookies com verificação obrigatór
 3. **Redirecionamento**
    - Baseado no role do banco de dados:
      - `admin` → `/admin`
-     - `operator` → `/operator`
-     - `carrier` → `/carrier`
-     - `driver` → `/driver`
-     - `passenger` → `/passenger`
+     - `empresa` → `/empresa`
+     - `operador` → `/transportadora`
+     - `motorista` → `/motorista`
+     - `passageiro` → `/passageiro`
 
 ### Proteção de Rotas
 
-O middleware (`web-app/middleware.ts`) protege automaticamente:
+O middleware (`apps/web/middleware.ts`) protege automaticamente:
 
 - `/admin/*` - Apenas role `admin`
-- `/operator/*` - Roles `admin` ou `operator`
-- `/carrier/*` - Roles `admin` ou `carrier`
+- `/empresa/*` - Roles `admin` ou `empresa`
+- `/transportadora/*` - Roles `admin` ou `operador`
 
 ### CSRF Protection
 
@@ -323,11 +357,11 @@ O middleware (`web-app/middleware.ts`) protege automaticamente:
 
 ### Pré-requisitos
 
-- **Flutter SDK**: 3.24+
-- **Node.js**: 22.x+
+- **Node.js**: 22.x (recomendado) ou 18.17.0+
 - **npm**: 9.0.0+
 - **Git**: Última versão
 - **Supabase**: Conta e projeto criado
+- **Expo Go**: App para testes mobile (iOS/Android)
 
 ### 1️⃣ Clonagem e Setup Inicial
 
@@ -337,7 +371,7 @@ git clone https://github.com/pglemos/GOLFFOX.git
 cd GOLFFOX
 
 # Configure as variáveis de ambiente
-cd web-app
+cd apps/web
 cp .env.example .env.local
 # Edite o arquivo .env.local com suas configurações
 ```
@@ -358,7 +392,7 @@ cp .env.example .env.local
 
 ```bash
 # Navegue para o diretório web
-cd web-app
+cd apps/web
 
 # Instale as dependências
 npm install
@@ -369,23 +403,23 @@ npm run dev
 # A aplicação estará disponível em http://localhost:3000
 ```
 
-### 4️⃣ Setup Flutter (Mobile)
+### 4️⃣ Setup React Native (Mobile)
 
 ```bash
-# Na raiz do projeto
-flutter pub get
+# Navegue para o diretório mobile
+cd apps/mobile
 
-# Execute a análise de código
-flutter analyze
+# Instale as dependências
+npm install
 
-# Execute os testes
-flutter test
+# Execute o app em desenvolvimento
+npx expo start
 
-# Execute o app (desenvolvimento web)
-flutter run -d web-server --web-port 8000
+# Para Android específico
+npx expo start --android
 
-# Execute o app (Android/iOS)
-flutter run
+# Para iOS específico
+npx expo start --ios
 ```
 
 ### 5️⃣ Primeiro Login
@@ -393,7 +427,7 @@ flutter run
 1. Acesse http://localhost:3000
 2. Use as credenciais padrão:
    - **Admin**: `golffox@admin.com` / `senha123`
-   - **Operador**: `operador@empresa.com` / `senha123`
+   - **Empresa**: `teste@empresa.com` / `senha123`
 
 **⚠️ IMPORTANTE**: Certifique-se de que o usuário existe na tabela `users` do Supabase e está associado a uma empresa na tabela `gf_user_company_map`.
 
@@ -401,7 +435,7 @@ flutter run
 
 ### Variáveis de Ambiente Essenciais
 
-Crie o arquivo `web-app/.env.local`:
+Crie o arquivo `apps/web/.env.local`:
 
 ```env
 # Supabase
@@ -438,13 +472,20 @@ Execute as migrations na ordem no SQL Editor do Supabase:
 
 ```bash
 # As migrations estão em database/migrations/
-# Execute na ordem numérica: v1, v2, v3, ..., v49
+# Execute na ordem numérica: v41, v42, v43, ..., v74
 ```
 
 Principais migrations:
-- `v1_initial_schema.sql` - Schema inicial
-- `v47_rls_fixes.sql` - Correções RLS
+- `v41_gamification.sql` - Sistema de gamificação
+- `v43_admin_core.sql` - Core do painel admin
+- `v43_gf_user_company_map.sql` - Multi-tenant
+- `v44_costs_taxonomy.sql` - Gestão de custos
+- `v46_map_advanced_features.sql` - Funcionalidades avançadas do mapa
+- `v47_add_vehicle_columns.sql` - Extensão de veículos
+- `v48_fix_auth_user_creation.sql` - Correções de autenticação
 - `v49_protect_user_company_map.sql` - Proteção de mapeamento
+- `v50_to_v54_carrier_complete.sql` - Painel transportadora completo
+- `v74_canonical.sql` - Migração canônica final
 
 #### 3. Configurar RLS (Row Level Security)
 
@@ -467,7 +508,7 @@ Execute os seeds para dados de desenvolvimento:
 
 ### Tabelas Principais
 
-- **`users`** - Usuários do sistema (admin, operator, carrier, driver, passenger)
+- **`users`** - Usuários do sistema (admin, empresa, operador, motorista, passageiro)
 - **`companies`** - Empresas operadoras
 - **`gf_user_company_map`** - Mapeamento usuário-empresa (multi-tenant)
 - **`vehicles`** - Veículos da frota
@@ -478,6 +519,12 @@ Execute os seeds para dados de desenvolvimento:
 - **`gf_costs`** - Custos operacionais
 - **`gf_report_schedules`** - Agendamentos de relatórios
 - **`audit_logs`** - Log de auditoria
+- **`carriers`** - Transportadoras
+- **`gf_carrier_driver_map`** - Mapeamento motorista-transportadora
+- **`gf_carrier_vehicle_map`** - Mapeamento veículo-transportadora
+- **`gf_cost_categories`** - Categorias de custos
+- **`gf_cost_budgets`** - Orçamentos de custos
+- **`gf_notifications`** - Notificações do sistema
 
 ### Views Principais
 
@@ -505,17 +552,74 @@ Todas as tabelas possuem políticas RLS configuradas:
 
 ### Admin
 
+- `GET /api/admin/kpis` - KPIs do dashboard admin
+- `GET /api/admin/alerts-list` - Lista de alertas
+- `GET /api/admin/alerts/[alertId]` - Detalhes de alerta
+- `DELETE /api/admin/alerts/delete` - Deletar alerta
+- `GET /api/admin/assistance-requests-list` - Lista de solicitações de socorro
+- `GET /api/admin/assistance-requests/[requestId]` - Detalhes de solicitação
+- `DELETE /api/admin/assistance-requests/delete` - Deletar solicitação
+- `GET /api/admin/audit-db` - Auditoria do banco
+- `GET /api/admin/audit-log` - Log de auditoria
+- `POST /api/admin/carriers/create` - Criar transportadora
+- `PUT /api/admin/carriers/update` - Atualizar transportadora
+- `DELETE /api/admin/carriers/delete` - Deletar transportadora
+- `GET /api/admin/carriers-list` - Lista de transportadoras
+- `GET /api/admin/carriers/[carrierId]/drivers` - Motoristas da transportadora
+- `GET /api/admin/carriers/[carrierId]/vehicles` - Veículos da transportadora
+- `GET /api/admin/carriers/[carrierId]/users` - Usuários da transportadora
+- `POST /api/admin/companies` - Criar empresa
+- `GET /api/admin/companies-list` - Lista de empresas
+- `GET /api/admin/companies/[companyId]` - Detalhes da empresa
+- `DELETE /api/admin/companies/delete` - Deletar empresa
 - `POST /api/admin/create-operator` - Criar operador
+- `POST /api/admin/create-operator-login` - Criar login para operador
+- `POST /api/admin/create-carrier-login` - Criar login para transportadora
+- `GET /api/admin/costs-options` - Opções de custos
+- `GET /api/admin/drivers-list` - Lista de motoristas
+- `POST /api/admin/drivers` - Criar motorista
+- `GET /api/admin/drivers/[driverId]` - Detalhes do motorista
+- `DELETE /api/admin/drivers/delete` - Deletar motorista
+- `GET /api/admin/employees-list` - Lista de funcionários
+- `POST /api/admin/execute-sql-fix` - Executar correção SQL
+- `POST /api/admin/fix-database` - Corrigir banco de dados
 - `POST /api/admin/generate-stops` - Gerar pontos de parada
 - `POST /api/admin/optimize-route` - Otimizar rota
-- `GET /api/admin/audit-db` - Auditoria do banco
-- `GET/PUT/DELETE /api/admin/vehicles/[vehicleId]` - CRUD de veículos
+- `GET /api/admin/routes-list` - Lista de rotas
+- `POST /api/admin/routes` - Criar rota
+- `DELETE /api/admin/routes/delete` - Deletar rota
+- `POST /api/admin/seed-cost-categories` - Seed de categorias de custo
+- `GET /api/admin/trips` - Lista de viagens
+- `GET /api/admin/trips/[tripId]` - Detalhes da viagem
+- `GET /api/admin/users-list` - Lista de usuários
+- `GET /api/admin/users/[userId]` - Detalhes do usuário
+- `DELETE /api/admin/users/delete` - Deletar usuário
+- `GET /api/admin/vehicles-list` - Lista de veículos
+- `POST /api/admin/vehicles` - Criar veículo
+- `GET /api/admin/vehicles/[vehicleId]` - Detalhes do veículo
+- `PUT /api/admin/vehicles/[vehicleId]` - Atualizar veículo
+- `DELETE /api/admin/vehicles/delete` - Deletar veículo
 
 ### Operador
 
 - `POST /api/operator/associate-company` - Associar operador a empresa
 - `POST /api/operator/create-employee` - Criar funcionário
 - `POST /api/operator/optimize-route` - Otimizar rota
+
+### Transportadora (Carrier)
+
+- `GET /api/carrier/alerts` - Alertas da transportadora
+- `GET /api/carrier/costs/route` - Custos por rota
+- `GET /api/carrier/costs/vehicle` - Custos por veículo
+- `GET /api/carrier/drivers/[driverId]/documents` - Documentos do motorista
+- `GET /api/carrier/drivers/[driverId]/exams` - Exames do motorista
+- `GET /api/carrier/reports/driver-performance` - Relatório de performance de motoristas
+- `GET /api/carrier/reports/fleet-usage` - Relatório de uso da frota
+- `GET /api/carrier/reports/trips` - Relatório de viagens
+- `POST /api/carrier/storage/signed-url` - URL assinada para storage
+- `POST /api/carrier/upload` - Upload de arquivos
+- `GET /api/carrier/vehicles/[vehicleId]/documents` - Documentos do veículo
+- `GET /api/carrier/vehicles/[vehicleId]/maintenances` - Manutenções do veículo
 
 ### Custos
 
@@ -547,9 +651,19 @@ Todas as tabelas possuem políticas RLS configuradas:
 
 - `POST /api/analytics/web-vitals` - Métricas de performance
 
-### Health
+### Notificações
+
+- `POST /api/notifications/check-proximity` - Verificar proximidade
+- `POST /api/notifications/email` - Enviar email
+
+### Documentação
+
+- `GET /api/docs/openapi` - Documentação OpenAPI
+
+### Health & Test
 
 - `GET /api/health` - Health check
+- `GET /api/test-session` - Testar sessão (desenvolvimento)
 
 ## 👥 Perfis de Usuário
 
@@ -561,18 +675,18 @@ Todas as tabelas possuem políticas RLS configuradas:
 
 **Permissões**:
 - Gestão completa do sistema
-- Configuração de empresas e operadores
+- Configuração de empresas e transportadoras
 - Relatórios globais e analytics
 - Gerenciamento de permissões
 - Acesso a todos os dados
 
 **Credenciais padrão**: `golffox@admin.com` / `senha123`
 
-### 🏢 Operador (Empresa)
+### 🏢 Empresa Contratante
 
-**Role**: `operator`
+**Role**: `empresa`
 
-**Acesso**: Painel `/operator`
+**Acesso**: Painel `/empresa`
 
 **Permissões**:
 - Gestão de funcionários da empresa
@@ -581,15 +695,15 @@ Todas as tabelas possuem políticas RLS configuradas:
 - Alertas da empresa
 - Custos da empresa
 
-**Credenciais padrão**: `operador@empresa.com` / `senha123`
+**Credenciais padrão**: `teste@empresa.com` / `senha123`
 
-**⚠️ IMPORTANTE**: O operador precisa estar associado a uma empresa na tabela `gf_user_company_map`.
+**⚠️ IMPORTANTE**: O usuário precisa estar associado a uma empresa na tabela `gf_user_company_map`.
 
-### 🚛 Transportadora
+### 🚛 Transportadora (Operador)
 
-**Role**: `carrier`
+**Role**: `operador`
 
-**Acesso**: Painel `/carrier`
+**Acesso**: Painel `/transportadora`
 
 **Permissões**:
 - Gestão de frota
@@ -599,9 +713,9 @@ Todas as tabelas possuem políticas RLS configuradas:
 
 ### 🚗 Motorista
 
-**Role**: `driver`
+**Role**: `motorista`
 
-**Acesso**: App Flutter + Painel `/driver`
+**Acesso**: App Flutter + Painel `/motorista`
 
 **Permissões**:
 - App móvel para check-in/check-out
@@ -611,9 +725,9 @@ Todas as tabelas possuem políticas RLS configuradas:
 
 ### 🎫 Passageiro
 
-**Role**: `passenger`
+**Role**: `passageiro`
 
-**Acesso**: App Flutter + Painel `/passenger`
+**Acesso**: App Flutter + Painel `/passageiro`
 
 **Permissões**:
 - Rastreamento de ônibus em tempo real
@@ -680,7 +794,7 @@ WHERE m.user_id = auth.uid();
 ### Next.js (Web)
 
 ```bash
-cd web-app
+cd apps/web
 
 # Build para produção
 npm run build
@@ -694,6 +808,35 @@ vercel deploy --prod
 
 ### Flutter (Mobile)
 
+Os apps móveis serão desenvolvidos exclusivamente em Flutter (Dart), contemplando Passageiro e Motorista, com publicação nas lojas Google Play (Android) e Apple App Store (iOS). Abaixo, as diretrizes técnicas e de processo:
+
+- Aplicativo do Passageiro (mobile)
+  - Desenvolvido em Dart com Flutter SDK
+  - Publicado em Google Play e App Store
+  - Implementa todas as funcionalidades para passageiros
+  - Design consistente entre plataformas (iOS e Android)
+  - Atende requisitos específicos de cada loja
+
+- Aplicativo do Motorista (mobile)
+  - Desenvolvido em Dart com Flutter SDK
+  - Publicado em Google Play e App Store
+  - Implementa todas as funcionalidades para motoristas
+  - Mantém consistência visual com o app do passageiro
+  - Cumpre guidelines de publicação de cada plataforma
+
+- Gate de início dos projetos Flutter
+  - Conclusão e aprovação dos protótipos de design
+  - Definição completa dos requisitos funcionais e não‑funcionais
+  - Arquitetura técnica e padrões de código estabelecidos
+
+- Qualidade, segurança e desempenho
+  - Testes rigorosos em dispositivos reais
+  - Conformidade com políticas de segurança e privacidade
+  - Monitoramento de desempenho implementado
+  - Compatibilidade com versões anteriores do sistema
+
+Builds usuais para distribuição:
+
 ```bash
 # Android APK
 flutter build apk --release
@@ -703,15 +846,16 @@ flutter build appbundle --release
 
 # iOS
 flutter build ios --release
-
-# Web
-flutter build web --release
 ```
+
+#### Referências técnicas
+
+- `docs/ERROR_HANDLING.md`: diretrizes de tratamento de erros, conectividade e UX assíncrona em Flutter.
 
 ### Deploy no Vercel
 
 1. **Instalar CLI**: `npm i -g vercel`
-2. **Link do projeto**: `cd web-app && vercel link`
+2. **Link do projeto**: `cd apps/web && vercel link`
 3. **Configurar variáveis**: Vercel Dashboard → Settings → Environment Variables
 4. **Deploy**: `vercel deploy --prod`
 
@@ -757,7 +901,7 @@ flutter test
 flutter test integration_test/
 
 # Next.js - Testes
-cd web-app
+cd apps/web
 npm test
 npm run test:e2e
 ```
@@ -770,7 +914,7 @@ flutter test --coverage
 genhtml coverage/lcov.info -o coverage/html
 
 # Next.js - Cobertura
-cd web-app
+cd apps/web
 npm run test:coverage
 ```
 
@@ -778,7 +922,7 @@ npm run test:coverage
 
 ```bash
 # Testar fluxo de login
-cd web-app
+cd apps/web
 node scripts/test-login-flow.js
 
 # Testar autenticação de API
@@ -835,18 +979,19 @@ node scripts/test-rls.js
 3. Verifique se o role no cookie corresponde ao necessário
 4. Verifique os logs do middleware (em desenvolvimento)
 
-#### Flutter não compila
+#### React Native não inicia
 
 ```bash
-flutter clean
-flutter pub get
-flutter pub deps
+cd apps/mobile
+rm -rf node_modules
+npm install
+npx expo start --clear
 ```
 
 #### Erro de dependências Next.js
 
 ```bash
-cd web-app
+cd apps/web
 rm -rf node_modules package-lock.json
 npm install
 ```
@@ -943,7 +1088,7 @@ O projeto utiliza `@vercel/speed-insights` para monitoramento de performance em 
 ./scripts/dev/run_android.ps1
 
 # Next.js Dev
-cd web-app && npm run dev
+cd apps/web && npm run dev
 ```
 
 ### Deploy
@@ -966,10 +1111,10 @@ cd web-app && npm run dev
 ./scripts/setup/setup_env.ps1
 
 # Testar login flow
-cd web-app && node scripts/test-login-flow.js
+cd apps/web && node scripts/test-login-flow.js
 
 # Associar operador a empresa
-cd web-app && node scripts/associate-operator-to-company.js
+cd apps/web && node scripts/associate-operator-to-company.js
 ```
 
 ## 📚 Documentação Adicional
@@ -980,6 +1125,7 @@ cd web-app && node scripts/associate-operator-to-company.js
 - **[API Documentation](docs/api/)**: Documentação da API
 - **[Guias](docs/guides/)**: Tutoriais e guias específicos
 - **[Deploy Guide](docs/deployment/)**: Guias de deploy
+- **[Fluxograma Arquitetural](docs/diagrams/)**: Diagrama completo do sistema (formato .drawio/.vsdx)
 
 ## 🤝 Contribuindo
 
@@ -1012,16 +1158,25 @@ chore: manutenção
 
 ```bash
 # Execute os testes
+cd apps/mobile
 flutter test
-cd web-app && npm test
+
+cd ../web
+npm test
 
 # Verifique a formatação
+cd apps/mobile
 flutter format --set-exit-if-changed .
-cd web-app && npm run lint
+
+cd ../web
+npm run lint
 
 # Execute a análise
+cd apps/mobile
 flutter analyze
-cd web-app && npm run type-check
+
+cd ../web
+npm run type-check
 ```
 
 ## 📊 Status do Projeto
@@ -1031,10 +1186,15 @@ cd web-app && npm run type-check
 - [x] **v1.2**: Sistema de autenticação completo
 - [x] **v1.3**: Multi-tenant implementado
 - [x] **v1.4**: Relatórios automatizados
+- [x] **v1.5**: Painel Transportadora completo
+- [x] **v1.6**: Sistema de custos avançado
+- [x] **v1.7**: Notificações e alertas em tempo real
+- [x] **v1.8**: Gamificação para motoristas
 - [ ] **v2.0**: Integração com sistemas de pagamento
 - [ ] **v2.1**: IA para otimização de rotas
 - [ ] **v2.2**: App para tablets (operadores)
 - [ ] **v2.3**: Integração com IoT (sensores de ônibus)
+- [ ] **v2.4**: Apps móveis (Driver e Passenger) em produção
 - [ ] **v3.0**: Plataforma white-label
 
 ## 📄 Licença

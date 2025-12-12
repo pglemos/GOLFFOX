@@ -1,19 +1,8 @@
 {
   "status": "commited",
-  "type": "backend",
+  "type": "frontend",
   "scope": "codebase",
   "localEndpoint": "http://localhost:3000",
-  "backendAuthType": "basic token",
-  "backendUsername": "golffox@admin.com",
-  "backendPassword": "senha123",
-  "executionArgs": {
-    "projectName": "GOLFFOX",
-    "projectPath": "F:\\GOLFFOX\\apps\\web",
-    "testIds": [],
-    "additionalInstruction": "",
-    "envs": {
-      "API_KEY": "sk-user-cDySoZ3nibe_1cVesU66HurpbRaipXCeOzdKpjyNCJM5aweif8popj7hVIMCByRnbi3rY6DJjJm8oIyEvseV66EihI_CLhqO5ieUsZuhP3Hc08YmFZAyUlc4KXUmpRLtfZk"
-    }
-  },
-  "proxy": "http://a69c1bcb-358c-4a64-a9bd-6d1c3f996a6c:Bkgroy3jzMUGLVWUwGds2YqvDajzqkcz@tun.testsprite.com:8080"
+  "loginUser": "golffox@admin.com",
+  "loginPassword": "senha123"
 }
