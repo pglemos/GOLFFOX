@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
         const targetRole = role || 'operador'
         const sanitizedCpf = cpf?.toString().replace(/\D/g, '') || null
 
-        // Validações
+        // Validações - Apenas email e nome são obrigatórios
         if (!company_id) {
             return NextResponse.json({ error: 'company_id é obrigatório' }, { status: 400 })
         }
@@ -61,23 +61,25 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Email inválido' }, { status: 400 })
         }
 
-        if (!sanitizedPassword || sanitizedPassword.length < 6) {
-            return NextResponse.json({ error: 'Senha deve ter no mínimo 6 caracteres' }, { status: 400 })
-        }
+        // Se senha não fornecida, gerar uma senha temporária
+        const finalPassword = sanitizedPassword && sanitizedPassword.length >= 6
+            ? sanitizedPassword
+            : `GolfFox${Math.random().toString(36).substring(2, 10)}!`
 
         if (!sanitizedName) {
             return NextResponse.json({ error: 'Nome é obrigatório' }, { status: 400 })
         }
 
-        if (!sanitizedCpf) {
-            return NextResponse.json({ error: 'CPF é obrigatório' }, { status: 400 })
-        }
+        // CPF e endereço são opcionais para funcionários
+        // if (!sanitizedCpf) {
+        //     return NextResponse.json({ error: 'CPF é obrigatório' }, { status: 400 })
+        // }
 
-        if (!address_zip_code || !address_street || !address_number || !address_neighborhood || !address_city || !address_state) {
-            return NextResponse.json({ error: 'Endereço completo é obrigatório (CEP, rua, número, bairro, cidade e estado)' }, { status: 400 })
-        }
+        // if (!address_zip_code || !address_street || !address_number || !address_neighborhood || !address_city || !address_state) {
+        //     return NextResponse.json({ error: 'Endereço completo é obrigatório (CEP, rua, número, bairro, cidade e estado)' }, { status: 400 })
+        // }
 
-        if (sanitizedPassword.length > 72) {
+        if (finalPassword.length > 72) {
             return NextResponse.json({ error: 'Senha muito longa (máximo 72 caracteres)' }, { status: 400 })
         }
 
@@ -102,7 +104,7 @@ export async function POST(request: NextRequest) {
             .maybeSingle()
 
         // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/802544c4-70d0-43c7-a57c-6692b28ca17d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'create-user/route.ts:H4',message:'Check existing user by email',data:{email:sanitizedEmail,existingUser,existingUserError:existingUserError?.message},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H4'})}).catch(()=>{});
+        fetch('http://127.0.0.1:7242/ingest/802544c4-70d0-43c7-a57c-6692b28ca17d', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'create-user/route.ts:H4', message: 'Check existing user by email', data: { email: sanitizedEmail, existingUser, existingUserError: existingUserError?.message }, timestamp: Date.now(), sessionId: 'debug-session', hypothesisId: 'H4' }) }).catch(() => { });
         // #endregion
 
         if (existingUser) {
@@ -137,7 +139,7 @@ export async function POST(request: NextRequest) {
         let createUserError: any = null
 
         // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/802544c4-70d0-43c7-a57c-6692b28ca17d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'create-user/route.ts:H2',message:'Check existing auth user',data:{email:sanitizedEmail,existingAuthUserId:existingAuthUser?.id,existingAuthUserEmail:existingAuthUser?.email},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H2'})}).catch(()=>{});
+        fetch('http://127.0.0.1:7242/ingest/802544c4-70d0-43c7-a57c-6692b28ca17d', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'create-user/route.ts:H2', message: 'Check existing auth user', data: { email: sanitizedEmail, existingAuthUserId: existingAuthUser?.id, existingAuthUserEmail: existingAuthUser?.email }, timestamp: Date.now(), sessionId: 'debug-session', hypothesisId: 'H2' }) }).catch(() => { });
         // #endregion
 
         if (existingAuthUser) {
@@ -148,7 +150,7 @@ export async function POST(request: NextRequest) {
             try {
                 let createResult = await supabaseAdmin.auth.admin.createUser({
                     email: sanitizedEmail,
-                    password: sanitizedPassword,
+                    password: finalPassword,
                     email_confirm: true,
                     user_metadata: { name: sanitizedName }
                 })
@@ -157,7 +159,7 @@ export async function POST(request: NextRequest) {
                     logger.warn('⚠️ Erro de banco detectado, tentando abordagem alternativa...')
                     createResult = await supabaseAdmin.auth.admin.createUser({
                         email: sanitizedEmail,
-                        password: sanitizedPassword,
+                        password: finalPassword,
                         email_confirm: false
                     })
                 }
@@ -194,7 +196,7 @@ export async function POST(request: NextRequest) {
         const userId = authData.user.id
 
         // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/802544c4-70d0-43c7-a57c-6692b28ca17d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'create-user/route.ts:H1-H3',message:'Before upsert to users table',data:{userId,email:sanitizedEmail,authUserCreatedAt:authData.user.created_at},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H1-H3'})}).catch(()=>{});
+        fetch('http://127.0.0.1:7242/ingest/802544c4-70d0-43c7-a57c-6692b28ca17d', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'create-user/route.ts:H1-H3', message: 'Before upsert to users table', data: { userId, email: sanitizedEmail, authUserCreatedAt: authData.user.created_at }, timestamp: Date.now(), sessionId: 'debug-session', hypothesisId: 'H1-H3' }) }).catch(() => { });
         // #endregion
 
         // Verificar se o ID já existe na tabela users (para diagnóstico)
@@ -205,7 +207,7 @@ export async function POST(request: NextRequest) {
             .maybeSingle()
 
         // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/802544c4-70d0-43c7-a57c-6692b28ca17d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'create-user/route.ts:H1-H2',message:'Check if user ID already exists in users table',data:{userId,existingById,existingByIdError:existingByIdError?.message},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H1-H2'})}).catch(()=>{});
+        fetch('http://127.0.0.1:7242/ingest/802544c4-70d0-43c7-a57c-6692b28ca17d', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'create-user/route.ts:H1-H2', message: 'Check if user ID already exists in users table', data: { userId, existingById, existingByIdError: existingByIdError?.message }, timestamp: Date.now(), sessionId: 'debug-session', hypothesisId: 'H1-H2' }) }).catch(() => { });
         // #endregion
 
         // Criar registro na tabela users com colunas de endereço obrigatórias
@@ -231,7 +233,7 @@ export async function POST(request: NextRequest) {
 
         if (userError) {
             // #region agent log
-            fetch('http://127.0.0.1:7242/ingest/802544c4-70d0-43c7-a57c-6692b28ca17d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'create-user/route.ts:H1-H5',message:'UPSERT ERROR',data:{userId,email:sanitizedEmail,errorMessage:userError.message,errorCode:userError.code,errorDetails:userError.details,errorHint:userError.hint},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H1-H5'})}).catch(()=>{});
+            fetch('http://127.0.0.1:7242/ingest/802544c4-70d0-43c7-a57c-6692b28ca17d', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'create-user/route.ts:H1-H5', message: 'UPSERT ERROR', data: { userId, email: sanitizedEmail, errorMessage: userError.message, errorCode: userError.code, errorDetails: userError.details, errorHint: userError.hint }, timestamp: Date.now(), sessionId: 'debug-session', hypothesisId: 'H1-H5' }) }).catch(() => { });
             // #endregion
             console.error('❌ Erro ao criar registro na tabela users:', userError)
             try { await supabaseAdmin.auth.admin.deleteUser(userId) } catch (e) { }
