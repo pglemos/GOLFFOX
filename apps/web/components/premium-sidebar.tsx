@@ -56,7 +56,7 @@ interface MenuGroup {
 interface PremiumSidebarProps {
   isOpen?: boolean
   isMobile?: boolean
-  panel?: 'admin' | 'operador' | 'transportadora'
+  panel?: 'admin' | 'operador' | 'transportadora' | 'empresa'
   user?: {
     id: string
     name: string
@@ -282,8 +282,71 @@ const transportadoraMenuGroups: MenuGroup[] = [
   }
 ]
 
+const empresaMenuGroups: MenuGroup[] = [
+  {
+    items: [
+      {
+        icon: LayoutDashboard,
+        label: "Dashboard",
+        href: "/empresa",
+        badge: 5
+      }
+    ]
+  },
+  {
+    label: "Páginas Principais",
+    items: [
+      {
+        icon: MapPin,
+        label: "Mapa",
+        href: "/empresa/rotas/mapa"
+      },
+      {
+        icon: Navigation,
+        label: "Rotas",
+        href: "/empresa/rotas"
+      },
+      {
+        icon: Users,
+        label: "Funcionários",
+        href: "/empresa/funcionarios"
+      },
+      {
+        icon: FileText,
+        label: "Contratos",
+        href: "/empresa/contratos"
+      },
+      {
+        icon: Building2,
+        label: "Centros de Custo",
+        href: "/empresa/centros-custo"
+      }
+    ]
+  },
+  {
+    label: "Visualização",
+    items: [
+      {
+        icon: DollarSign,
+        label: "Custos",
+        href: "/empresa/custos"
+      },
+      {
+        icon: BarChart3,
+        label: "Relatórios",
+        href: "/empresa/relatorios"
+      },
+      {
+        icon: LifeBuoy,
+        label: "Suporte",
+        href: "/empresa/suporte"
+      }
+    ]
+  }
+]
+
 // Avatar no header do sidebar - 32x32
-const SidebarLogo = ({ panel, user }: { panel: 'admin' | 'operador' | 'transportadora', user?: { name: string, email: string, avatar_url?: string } }) => {
+const SidebarLogo = ({ panel, user }: { panel: 'admin' | 'operador' | 'transportadora' | 'empresa', user?: { name: string, email: string, avatar_url?: string } }) => {
   const { state } = useSidebar()
   const isCollapsed = state === "collapsed"
 
@@ -344,6 +407,8 @@ export function PremiumSidebar({
         return operadorMenuGroups
       case 'transportadora':
         return transportadoraMenuGroups
+      case 'empresa':
+        return empresaMenuGroups
       default:
         return adminMenuGroups
     }

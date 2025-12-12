@@ -50,10 +50,10 @@ export default function RelatoriosOperatorPage() {
         const { data, error } = await supabase
           .from(report.viewName)
           .select('*')
-          .limit(100)
-        
+          .limit(1000)
+
         if (error) throw error
-        
+
         if (report.formatter && data) {
           reportData = report.formatter(data)
         } else {
@@ -85,45 +85,45 @@ export default function RelatoriosOperatorPage() {
   if (loading) return <div className="min-h-screen flex items-center justify-center"><div className="w-16 h-16 border-4 border-orange-500 border-t-transparent rounded-full animate-spin" /></div>
 
   const reports = [
-    { 
-      id: 'atrasos', 
-      title: 'Atrasos', 
+    {
+      id: 'atrasos',
+      title: 'Atrasos',
       desc: 'Atrasos por rota/turno',
       icon: BarChart3,
       viewName: 'v_reports_delays',
       formatter: formatDelaysReport
     },
-    { 
-      id: 'ocupacao', 
-      title: 'Ocupação', 
+    {
+      id: 'ocupacao',
+      title: 'Ocupação',
       desc: 'Ocupação por horário/rota',
       icon: BarChart3,
       viewName: 'v_reports_occupancy',
       formatter: formatOccupancyReport
     },
-    { 
-      id: 'nao-embarcados', 
-      title: 'Não embarcados', 
+    {
+      id: 'nao-embarcados',
+      title: 'Não embarcados',
       desc: 'Motivos e frequência',
       icon: FileText,
       viewName: 'v_reports_not_boarded',
       formatter: formatNotBoardedReport
     },
-    { 
-      id: 'eficiencia', 
-      title: 'Eficiência', 
+    {
+      id: 'eficiencia',
+      title: 'Eficiência',
       desc: 'Planejado vs realizado',
       icon: BarChart3
     },
-    { 
-      id: 'sla', 
-      title: 'SLA GOLF FOX', 
+    {
+      id: 'sla',
+      title: 'SLA GOLF FOX',
       desc: 'Pontualidade de resposta',
       icon: FileText
     },
-    { 
-      id: 'roi', 
-      title: 'ROI', 
+    {
+      id: 'roi',
+      title: 'ROI',
       desc: 'Custo por colaborador e tempo economizado',
       icon: BarChart3
     },
@@ -151,37 +151,37 @@ export default function RelatoriosOperatorPage() {
                 whileHover={{ y: -4 }}
                 className="group"
               >
-              <Card key={r.id} className="p-6 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-[var(--border)] hover:border-[var(--brand)]/30">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <div className="p-2 rounded-lg bg-gradient-to-br from-[var(--brand-light)] to-[var(--brand-soft)] group-hover:scale-110 transition-transform duration-300">
-                        <Icon className="h-5 w-5 text-[var(--brand)]" />
+                <Card key={r.id} className="p-6 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-[var(--border)] hover:border-[var(--brand)]/30">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="p-2 rounded-lg bg-gradient-to-br from-[var(--brand-light)] to-[var(--brand-soft)] group-hover:scale-110 transition-transform duration-300">
+                          <Icon className="h-5 w-5 text-[var(--brand)]" />
+                        </div>
+                        <h3 className="font-semibold group-hover:text-[var(--brand)] transition-colors">{r.title}</h3>
                       </div>
-                      <h3 className="font-semibold group-hover:text-[var(--brand)] transition-colors">{r.title}</h3>
+                      <p className="text-sm text-[var(--ink-muted)]">{r.desc}</p>
                     </div>
-                    <p className="text-sm text-[var(--ink-muted)]">{r.desc}</p>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="outline">
+                          <Download className="h-4 w-4 mr-2" /> Exportar
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => handleExport(r, 'csv')}>
+                          Exportar CSV
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleExport(r, 'excel')}>
+                          Exportar Excel
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleExport(r, 'pdf')}>
+                          Exportar PDF
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="outline">
-                        <Download className="h-4 w-4 mr-2" /> Exportar
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => handleExport(r, 'csv')}>
-                        Exportar CSV
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleExport(r, 'excel')}>
-                        Exportar Excel
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleExport(r, 'pdf')}>
-                        Exportar PDF
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              </Card>
+                </Card>
               </motion.div>
             )
           })}

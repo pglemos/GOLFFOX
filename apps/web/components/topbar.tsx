@@ -37,6 +37,7 @@ import { debug } from "@/lib/logger"
 import { useMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
 import { useSidebar } from "@/components/ui/sidebar"
+import { UserNotifications } from "@/components/user-notifications"
 
 interface TopbarProps {
   user?: {
@@ -326,18 +327,8 @@ export function Topbar({
           <OperationalAlertsNotification />
 
           {/* Notifications - EXATAMENTE como Application Shell 08 */}
-          <button
-            data-slot="button"
-            type="button"
-            className={cn(
-              "focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive inline-flex shrink-0 items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap transition-all outline-none focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50 relative",
-              isMobile ? "size-10" : "size-9"
-            )}
-            aria-label="Notifications"
-          >
-            <Bell className={isMobile ? "h-5 w-5" : "h-4 w-4"} />
-            <span className="bg-destructive absolute top-2 right-2.5 size-2 rounded-full"></span>
-          </button>
+          {/* Notifications - Integrado com backend */}
+          <UserNotifications />
 
           {/* User Menu - EXATAMENTE como Application Shell 08 */}
           <DropdownMenu>

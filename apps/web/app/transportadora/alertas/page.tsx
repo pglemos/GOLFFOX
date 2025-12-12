@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { AppShell } from "@/components/app-shell"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -19,140 +19,89 @@ import {
   XCircle,
   Clock,
 } from "lucide-react"
-import { notifyError, notifySuccess } from "@/lib/toast"
 import { cn } from "@/lib/utils"
 import { useAuth } from "@/hooks/use-auth"
 import { motion } from "framer-motion"
-
-interface Alert {
-  id: string
-  type: "veiculo_parado" | "critico" | "aviso" | "informativo"
-  title: string
-  description: string
-  timestamp: string // ISO string
-  vehicle?: string
-  driver?: string
-  location?: string
-  status: "pending" | "acknowledged" | "resolved"
-}
+import { useTransportadoraAlerts, useResolveTransportadoraAlert } from "@/hooks/use-transportadora-data"
+import { useTransportadoraTenant } from "@/components/providers/transportadora-tenant-provider"
 
 export default function AlertasPage() {
   const { user } = useAuth()
-  const [alerts, setAlerts] = useState<Alert[]>([])
-  const [loading, setLoading] = useState(true)
+  const { transportadoraName } = useTransportadoraTenant()
+  const { data: alerts = [], isLoading: loading } = useTransportadoraAlerts()
+  const { mutate: resolveAlert } = useResolveTransportadoraAlert()
+
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedType, setSelectedType] = useState<string>("all")
   const [showOnlyUnread, setShowOnlyUnread] = useState(false)
 
-  // Contadores por tipo (apenas pendentes)
+  // Contadores
   const alertCounts = {
-    veiculo_parado: alerts.filter(a => a.type === "veiculo_parado" && a.status === "pending").length,
-    critico: alerts.filter(a => a.type === "critico" && a.status === "pending").length,
-    aviso: alerts.filter(a => a.type === "aviso" && a.status === "pending").length,
-    informativo: alerts.filter(a => a.type === "informativo" && a.status === "pending").length,
+    veiculo_parado: alerts.filter((a: any) => a.alert_type === "veiculo_parado" && !a.is_resolved).length,
+    critico: alerts.filter((a: any) => a.severity === "critical" && !a.is_resolved).length,
+    aviso: alerts.filter((a: any) => a.severity === "warning" && !a.is_resolved).length,
+    informativo: alerts.filter((a: any) => a.severity === "info" && !a.is_resolved).length,
   }
 
-  useEffect(() => {
-    loadAlerts()
-  }, [])
-
-  const loadAlerts = async () => {
-    try {
-      setLoading(true)
-      const response = await fetch("/api/transportadora/alertas")
-      const data = await response.json()
-      const apiAlerts: Alert[] = data.alerts
-      setAlerts(apiAlerts)
-    } catch (error) {
-      notifyError(error, "Erro ao carregar alertas")
-    } finally {
-      setLoading(false)
-    }
+  const handleResolve = (alertId: string) => {
+    resolveAlert(alertId)
   }
 
-  const handleAcknowledge = async (alertId: string) => {
-    try {
-      // Simular API call – replace with real request later
-      setAlerts(prev =>
-        prev.map(a => (a.id === alertId ? { ...a, status: "acknowledged" } : a))
-      )
-      notifySuccess("Alerta marcado como lido")
-    } catch (error) {
-      notifyError(error, "Erro ao marcar alerta")
-    }
-  }
+  const getAlertTypeConfig = (type: string, severity: string) => {
+    // Mapear tipos sistema para UI
+    if (type === 'veiculo_parado') return { icon: Truck, color: "text-red-600", bg: "bg-red-50", border: "border-red-200", label: "Veículo Parado" }
 
-  const handleResolve = async (alertId: string) => {
-    try {
-      setAlerts(prev =>
-        prev.map(a => (a.id === alertId ? { ...a, status: "resolved" } : a))
-      )
-      notifySuccess("Alerta resolvido")
-    } catch (error) {
-      notifyError(error, "Erro ao resolver alerta")
-    }
-  }
-
-  const getAlertTypeConfig = (type: Alert["type"]) => {
-    switch (type) {
-      case "veiculo_parado":
-        return { icon: Truck, color: "text-red-600", bg: "bg-red-50", border: "border-red-200", label: "Veículo Parado" }
-      case "critico":
+    // Fallback por severidade
+    switch (severity) {
+      case "critical":
         return { icon: XCircle, color: "text-red-600", bg: "bg-red-50", border: "border-red-200", label: "Crítico" }
-      case "aviso":
+      case "warning":
         return { icon: AlertTriangle, color: "text-yellow-600", bg: "bg-yellow-50", border: "border-yellow-200", label: "Aviso" }
-      case "informativo":
+      case "info":
+      default:
         return { icon: Info, color: "text-blue-600", bg: "bg-blue-50", border: "border-blue-200", label: "Informativo" }
     }
   }
 
-  const filteredAlerts = alerts.filter(alert => {
-    const matchesSearch =
-      alert.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      alert.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      alert.vehicle?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      alert.driver?.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesType = selectedType === "all" || alert.type === selectedType
-    const matchesUnread = !showOnlyUnread || alert.status === "pending"
-    return matchesSearch && matchesType && matchesUnread
+  const filteredAlerts = alerts.filter((alert: any) => {
+    const meta = alert.metadata || {}
+    const searchString = `${alert.message} ${alert.alert_type} ${meta.driver_name || ''} ${meta.plate || ''}`.toLowerCase()
+
+    const matchesSearch = searchString.includes(searchTerm.toLowerCase())
+
+    // Mapeamento simples de filtro por tipo (poderia ser melhorado)
+    let matchesType = true
+    if (selectedType !== 'all') {
+      if (selectedType === 'critico') matchesType = alert.severity === 'critical'
+      else if (selectedType === 'aviso') matchesType = alert.severity === 'warning'
+      else if (selectedType === 'informativo') matchesType = alert.severity === 'info'
+      else if (selectedType === 'veiculo_parado') matchesType = alert.alert_type === 'veiculo_parado'
+    }
+
+    const matchesUnread = !showOnlyUnread || !alert.is_read // Assumindo is_read ou is_resolved? O filtro UI diz "Apenas não lidos", mas logicamente seria "Não resolvidos".
+    // Vou usar !is_resolved para simplificar pois resolucao remove da lista padrao do hook.
+    // Espere, o hook filtra is_resolved=false por padrao? Sim.
+    // Então todos aqui sao nao resolvidos.
+
+    return matchesSearch && matchesType
   })
 
   return (
-    <AppShell panel="transportadora" user={user ? { id: user.id, name: user.name || 'Transportadora', email: user.email || 'transp@golffox.com', role: user.role || 'transportadora', avatar_url: (user as any).avatar_url } : { id: 'mock', name: 'Transportadora', email: 'transp@golffox.com', role: 'transportadora' }}>
+    <AppShell panel="transportadora" user={user ? { id: user.id, name: transportadoraName, email: user.email || '', role: 'transportadora', avatar_url: (user as any).avatar_url } : undefined}>
       <div className="p-4 sm:p-6 lg:p-8 space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold">Sistema de Alertas</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold">Alertas Operacionais</h1>
             <p className="text-sm text-[var(--ink-muted)] mt-1">
-              Monitore e gerencie alertas operacionais em tempo real
+              Monitore a saúde da sua frota e motoristas
             </p>
           </div>
-          <Button className="bg-orange-500 hover:bg-orange-600">
-            <AlertCircle className="h-4 w-4 mr-2" />
-            Criar Alerta
-          </Button>
         </div>
 
         {/* Contadores */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card
-            className={cn(
-              "p-4 cursor-pointer transition-all hover:shadow-md",
-              selectedType === "veiculo_parado" && "ring-2 ring-red-500"
-            )}
-            onClick={() => setSelectedType(selectedType === "veiculo_parado" ? "all" : "veiculo_parado")}
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-medium text-gray-600 mb-1">Veículos Parados</p>
-                <p className="text-3xl font-bold text-red-600">{alertCounts.veiculo_parado}</p>
-              </div>
-              <div className="h-12 w-12 rounded-full bg-red-100 flex items-center justify-center">
-                <Truck className="h-6 w-6 text-red-600" />
-              </div>
-            </div>
-          </Card>
+          {/* Cards de contadores (mantidos da lógica anterior) */}
           <Card
             className={cn(
               "p-4 cursor-pointer transition-all hover:shadow-md",
@@ -170,6 +119,7 @@ export default function AlertasPage() {
               </div>
             </div>
           </Card>
+
           <Card
             className={cn(
               "p-4 cursor-pointer transition-all hover:shadow-md",
@@ -187,56 +137,23 @@ export default function AlertasPage() {
               </div>
             </div>
           </Card>
-          <Card
-            className={cn(
-              "p-4 cursor-pointer transition-all hover:shadow-md",
-              selectedType === "informativo" && "ring-2 ring-blue-500"
-            )}
-            onClick={() => setSelectedType(selectedType === "informativo" ? "all" : "informativo")}
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-medium text-gray-600 mb-1">Informativos</p>
-                <p className="text-3xl font-bold text-blue-600">{alertCounts.informativo}</p>
-              </div>
-              <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
-                <Info className="h-6 w-6 text-blue-600" />
-              </div>
-            </div>
-          </Card>
         </div>
 
-        {/* Filtros */}
+        {/* Filtros e Lista */}
         <Card className="p-4">
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
               <Input
-                placeholder="Buscar em todos os alertas..."
+                placeholder="Buscar por placa, motorista ou mensagem..."
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
                 className="pl-10"
               />
             </div>
-            <div className="flex gap-2">
-              <Button
-                variant={showOnlyUnread ? "default" : "outline"}
-                size="sm"
-                onClick={() => setShowOnlyUnread(!showOnlyUnread)}
-                className={showOnlyUnread ? "bg-orange-500 hover:bg-orange-600" : ""}
-              >
-                <Filter className="h-4 w-4 mr-2" />
-                Apenas não lidos
-              </Button>
-              <Button variant="outline" size="sm">
-                <Calendar className="h-4 w-4 mr-2" />
-                Hoje
-              </Button>
-            </div>
           </div>
         </Card>
 
-        {/* Lista de Alertas */}
         {loading ? (
           <div className="text-center py-12">
             <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-orange-500 border-r-transparent" />
@@ -244,15 +161,17 @@ export default function AlertasPage() {
           </div>
         ) : filteredAlerts.length === 0 ? (
           <Card className="p-12 text-center">
-            <AlertCircle className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-            <p className="text-lg font-medium text-[var(--ink-muted)]">Nenhum alerta encontrado</p>
-            <p className="text-sm text-[var(--ink-muted)] mt-1">Não há alertas no momento.</p>
+            <CheckCircle2 className="h-16 w-16 text-green-500 mx-auto mb-4" />
+            <p className="text-lg font-medium text-[var(--ink-muted)]">Tudo certo por aqui!</p>
+            <p className="text-sm text-[var(--ink-muted)] mt-1">Nenhum alerta pendente.</p>
           </Card>
         ) : (
           <div className="space-y-3">
-            {filteredAlerts.map((alert, index) => {
-              const cfg = getAlertTypeConfig(alert.type)
+            {filteredAlerts.map((alert: any, index: number) => {
+              const cfg = getAlertTypeConfig(alert.alert_type, alert.severity)
               const Icon = cfg.icon
+              const meta = alert.metadata || {}
+
               return (
                 <motion.div
                   key={alert.id}
@@ -262,62 +181,54 @@ export default function AlertasPage() {
                   whileHover={{ y: -4 }}
                   className="group"
                 >
-                <Card
-                  key={alert.id}
-                  className={cn("p-4 transition-all hover:shadow-xl bg-card/50 backdrop-blur-sm border-[var(--border)] hover:border-[var(--brand)]/30", cfg.border, alert.status === "pending" && cfg.bg)}
-                >
-                  <div className="flex gap-4">
-                    <div className={cn("h-10 w-10 rounded-full flex items-center justify-center flex-shrink-0", cfg.bg)}>
-                      <Icon className={cn("h-5 w-5", cfg.color)} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between gap-4 mb-2">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
-                            <h3 className="font-semibold">{alert.title}</h3>
-                            <Badge variant="outline" className={cn("text-xs", cfg.color)}>{cfg.label}</Badge>
-                            {alert.status === "resolved" && (
-                              <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">Resolvido</Badge>
-                            )}
+                  <Card
+                    key={alert.id}
+                    className={cn("p-4 transition-all hover:shadow-xl bg-card/50 backdrop-blur-sm border-[var(--border)] hover:border-[var(--brand)]/30", cfg.border, cfg.bg)}
+                  >
+                    <div className="flex gap-4">
+                      <div className={cn("h-10 w-10 rounded-full flex items-center justify-center flex-shrink-0", cfg.bg)}>
+                        <Icon className={cn("h-5 w-5", cfg.color)} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between gap-4 mb-2">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              {/* Titulo baseado no tipo ou mensagem */}
+                              <h3 className="font-semibold capitalize">{alert.alert_type.replace(/_/g, ' ')}</h3>
+                              <Badge variant="outline" className={cn("text-xs", cfg.color)}>{cfg.label}</Badge>
+                            </div>
+                            <p className="text-sm text-[var(--ink-muted)]">{alert.message}</p>
                           </div>
-                          <p className="text-sm text-[var(--ink-muted)]">{alert.description}</p>
+                        </div>
+                        <div className="flex gap-2 flex-shrink-0 mt-2">
+                          <Button size="sm" variant="outline" className="text-green-600 hover:bg-green-50" onClick={() => handleResolve(alert.id)}>
+                            Resolver / Marcar Visto
+                          </Button>
                         </div>
                       </div>
-                      <div className="flex gap-2 flex-shrink-0">
-                        {alert.status === "pending" && (
-                          <>
-                            <Button size="sm" variant="outline" onClick={() => handleAcknowledge(alert.id)}>
-                              <CheckCircle2 className="h-4 w-4" />
-                            </Button>
-                            <Button size="sm" variant="outline" className="text-green-600 hover:bg-green-50" onClick={() => handleResolve(alert.id)}>
-                              Resolver
-                            </Button>
-                          </>
-                        )}
-                      </div>
                     </div>
-                  </div>
-                  <div className="flex flex-wrap gap-4 text-xs text-[var(--ink-muted)] mt-2">
-                    {alert.vehicle && (
-                      <span className="flex items-center gap-1">
-                        <Truck className="h-3 w-3" /> {alert.vehicle}
+                    <div className="flex flex-wrap gap-4 text-xs text-[var(--ink-muted)] mt-2 border-t pt-2 border-dashed border-gray-200">
+                      {meta.plate && (
+                        <span className="flex items-center gap-1">
+                          <Truck className="h-3 w-3" /> {meta.plate}
+                        </span>
+                      )}
+                      {meta.driver_name && (
+                        <span className="flex items-center gap-1">
+                          <Users className="h-3 w-3" /> {meta.driver_name}
+                        </span>
+                      )}
+                      {/* Data expiry se houver */}
+                      {meta.expiry_date && (
+                        <span className="flex items-center gap-1 text-red-500 font-semibold">
+                          Vencimento: {new Date(meta.expiry_date).toLocaleDateString()}
+                        </span>
+                      )}
+                      <span className="flex items-center gap-1 ml-auto">
+                        <Clock className="h-3 w-3" /> {new Date(alert.created_at).toLocaleString('pt-BR')}
                       </span>
-                    )}
-                    {alert.driver && (
-                      <span className="flex items-center gap-1">
-                        <Users className="h-3 w-3" /> {alert.driver}
-                      </span>
-                    )}
-                    {alert.location && (
-                      <span className="flex items-center gap-1">
-                        <Clock className="h-3 w-3" /> {alert.location}
-                      </span>
-                    )}
-                    <span className="flex items-center gap-1">
-                      <Clock className="h-3 w-3" /> {new Date(alert.timestamp).toLocaleString('pt-BR')}
-                    </span>
-                  </div>
-                </Card>
+                    </div>
+                  </Card>
                 </motion.div>
               )
             })}

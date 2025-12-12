@@ -20,7 +20,7 @@ interface AppShellProps {
     avatar_url?: string
   }
   children: React.ReactNode
-  panel?: 'admin' | 'operador' | 'transportadora'
+  panel?: 'admin' | 'operador' | 'transportadora' | 'empresa'
 }
 
 // Named export for AppShell component - Application Shell 08 Style
@@ -37,10 +37,11 @@ export const AppShell = memo(function AppShell({ user, children, panel }: AppShe
   }, [user])
 
   // Detectar painel automaticamente se não fornecido (memoizado)
-  const detectedPanel: 'admin' | 'operador' | 'transportadora' = useMemo(() =>
+  const detectedPanel: 'admin' | 'operador' | 'transportadora' | 'empresa' = useMemo(() =>
     panel ||
     ((pathname?.startsWith('/operador') || pathname?.startsWith('/operator')) ? 'operador' :
-      (pathname?.startsWith('/transportadora') || pathname?.startsWith('/carrier')) ? 'transportadora' : 'admin'),
+      (pathname?.startsWith('/transportadora') || pathname?.startsWith('/carrier')) ? 'transportadora' :
+        (pathname?.startsWith('/empresa') || pathname?.startsWith('/company')) ? 'empresa' : 'admin'),
     [panel, pathname]
   )
 
@@ -57,6 +58,10 @@ export const AppShell = memo(function AppShell({ user, children, panel }: AppShe
     transportadora: {
       branding: 'Transportadora',
       homeUrl: '/transportadora'
+    },
+    empresa: {
+      branding: 'Corporativo',
+      homeUrl: '/empresa'
     }
   }[detectedPanel]), [detectedPanel])
 

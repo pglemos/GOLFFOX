@@ -80,6 +80,7 @@ export default function ManutencaoPage() {
     const [filterStatus, setFilterStatus] = useState<string>("all")
     const [filterVehicle, setFilterVehicle] = useState<string>("all")
     const debouncedSearchQuery = useDebounce(searchQuery, 300)
+    const [viewMode, setViewMode] = useState<'list' | 'kanban'>('list')
     const [saving, setSaving] = useState(false)
     const [formData, setFormData] = useState({
         vehicle_id: "",
@@ -289,10 +290,32 @@ export default function ManutencaoPage() {
                     </Select>
                 </div>
 
-                {/* Grid */}
+                {/* View Toggle */}
+                <div className="flex justify-end mb-4">
+                    <div className="flex items-center space-x-2 bg-muted p-1 rounded-md">
+                        <Button
+                            variant={viewMode === 'list' ? 'secondary' : 'ghost'}
+                            size="sm"
+                            onClick={() => setViewMode('list')}
+                            className="h-8 px-2"
+                        >
+                            <Calendar className="h-4 w-4 mr-1" /> Lista
+                        </Button>
+                        <Button
+                            variant={viewMode === 'kanban' ? 'secondary' : 'ghost'}
+                            size="sm"
+                            onClick={() => setViewMode('kanban')}
+                            className="h-8 px-2"
+                        >
+                            <ArrowUpRight className="h-4 w-4 mr-1" /> Quadro
+                        </Button>
+                    </div>
+                </div>
+
+                {/* Grid vs Kanban */}
                 {dataLoading && maintenances.length === 0 ? (
                     <SkeletonList count={5} />
-                ) : (
+                ) : viewMode === 'list' ? (
                     <div className="grid gap-3 sm:gap-4 w-full">
                         {filteredMaintenances.length === 0 ? (
                             <Card className="p-8 text-center">
@@ -375,6 +398,47 @@ export default function ManutencaoPage() {
                                 )
                             })
                         )}
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 overflow-x-auto pb-4">
+                        {['pending', 'in_progress', 'completed'].map(status => {
+                            const config = STATUS_CONFIG[status as keyof typeof STATUS_CONFIG]
+                            const items = filteredMaintenances.filter(m =>
+                                status === 'completed' ? (m.status === 'completed' || m.status === 'cancelled') : m.status === status
+                            )
+
+                            return (
+                                <div key={status} className="bg-muted/30 rounded-lg p-3 min-w-[280px]">
+                                    <div className={`flex items-center gap-2 mb-3 pb-2 border-b border-border font-semibold ${config.color}`}>
+                                        <config.icon className="h-4 w-4" />
+                                        {config.label}
+                                        <Badge variant="secondary" className="ml-auto">{items.length}</Badge>
+                                    </div>
+                                    <div className="space-y-3">
+                                        {items.map(maintenance => (
+                                            <Card
+                                                key={maintenance.id}
+                                                className="p-3 cursor-pointer hover:shadow-md transition-all bg-card"
+                                                onClick={() => { setSelectedMaintenance(maintenance); setIsModalOpen(true) }}
+                                            >
+                                                <div className="flex justify-between items-start mb-2">
+                                                    <span className="font-bold text-sm">{maintenance.vehicle?.plate}</span>
+                                                    <Badge variant="outline" className="text-[10px] h-5">{maintenance.type}</Badge>
+                                                </div>
+                                                <p className="text-xs text-muted-foreground line-clamp-2 mb-2">{maintenance.description || 'Sem descrição'}</p>
+                                                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                                                    <span>{new Date(maintenance.due_at).toLocaleDateString('pt-BR')}</span>
+                                                    {maintenance.cost && <span>R$ {maintenance.cost}</span>}
+                                                </div>
+                                            </Card>
+                                        ))}
+                                        {items.length === 0 && (
+                                            <div className="text-center py-4 text-xs text-muted-foreground border-2 border-dashed rounded-md">Vazio</div>
+                                        )}
+                                    </div>
+                                </div>
+                            )
+                        })}
                     </div>
                 )}
             </div>

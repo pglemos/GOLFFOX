@@ -38,7 +38,7 @@ export function exportToCSV(data: ReportData, filename: string = 'relatorio.csv'
           cellStr = formatNumberBR(parseFloat(cellStr))
         }
       }
-      
+
       // Escapar vírgulas e aspas
       if (cellStr.includes(',') || cellStr.includes('"') || cellStr.includes('\n')) {
         return `"${cellStr.replace(/"/g, '""')}"`
@@ -51,7 +51,7 @@ export function exportToCSV(data: ReportData, filename: string = 'relatorio.csv'
   const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' })
   const link = document.createElement('a')
   const url = URL.createObjectURL(blob)
-  
+
   link.setAttribute('href', url)
   link.setAttribute('download', filename)
   link.style.visibility = 'hidden'
@@ -177,16 +177,15 @@ export function formatDelaysReport(rows: any[]): ReportData {
 export function formatOccupancyReport(rows: any[]): ReportData {
   return {
     title: 'Relatório de Ocupação',
-    description: 'Análise de ocupação por horário',
-    headers: ['Data', 'Hora', 'Total de Viagens', 'Veículos em Uso', 'Passageiros', 'Capacidade Média', 'Ocupação (%)'],
+    description: 'Análise de ocupação por rota e horário',
+    headers: ['Data', 'Horário', 'Rota', 'Passageiros', 'Capacidade', 'Ocupação (%)'],
     rows: rows.map(row => [
-      new Date(row.date).toLocaleDateString('pt-BR'),
-      `${String(row.hour).padStart(2, '0')}:00`,
-      row.total_trips || '0',
-      row.vehicles_in_use || '0',
+      row.trip_date ? new Date(row.trip_date).toLocaleDateString('pt-BR') : '-',
+      row.time_slot || '-',
+      row.route_name || '-',
       row.total_passengers || '0',
-      row.avg_vehicle_capacity ? row.avg_vehicle_capacity.toFixed(1) : '-',
-      row.occupancy_percentage ? `${row.occupancy_percentage}%` : '-'
+      row.capacity || '0',
+      row.occupancy_rate ? `${row.occupancy_percentage || row.occupancy_rate}%` : '0%' // Fallback compatibilidade
     ])
   }
 }

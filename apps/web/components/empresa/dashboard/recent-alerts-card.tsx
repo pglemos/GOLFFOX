@@ -1,0 +1,92 @@
+"use client"
+
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { AlertTriangle, Clock, MapPin, CheckCircle } from "lucide-react"
+import { useQuery } from "@tanstack/react-query"
+import { supabase } from "@/lib/supabase"
+import { formatDistanceToNow } from "date-fns"
+import { ptBR } from "date-fns/locale"
+import { Button } from "@/components/ui/button"
+import { useRouter } from "next/navigation"
+
+interface RecentAlertsCardProps {
+    companyId: string
+}
+
+export function RecentAlertsCard({ companyId }: RecentAlertsCardProps) {
+    const router = useRouter()
+
+    const { data: alerts = [], isLoading } = useQuery({
+        queryKey: ['empresa-recent-alerts', companyId],
+        queryFn: async () => {
+            const { data, error } = await supabase
+                .from('gf_alerts')
+                .select('*')
+                .eq('company_id', companyId)
+                .eq('is_resolved', false) // Apenas não resolvidos
+                .order('created_at', { ascending: false })
+                .limit(5)
+
+            if (error) throw error
+            return data
+        },
+        enabled: !!companyId,
+        refetchInterval: 30000
+    })
+
+    return (
+        <Card className="h-full bg-white/50 backdrop-blur-sm border-orange-100/50">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                    <AlertTriangle className="h-5 w-5 text-orange-500" />
+                    Alertas Recentes
+                </CardTitle>
+                <Button variant="ghost" size="sm" onClick={() => router.push('/empresa/alertas')} className="text-xs">
+                    Ver todos
+                </Button>
+            </CardHeader>
+            <CardContent>
+                {isLoading ? (
+                    <div className="space-y-4">
+                        {[1, 2, 3].map(i => <div key={i} className="h-16 bg-gray-100 animate-pulse rounded-md" />)}
+                    </div>
+                ) : alerts.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
+                        <CheckCircle className="h-8 w-8 mb-2 text-green-500 opacity-50" />
+                        <p className="text-sm">Tudo operando normalmente</p>
+                    </div>
+                ) : (
+                    <div className="space-y-3">
+                        {alerts.map((alert: any) => (
+                            <div key={alert.id} className="p-3 bg-white rounded-lg border border-gray-100 shadow-sm flex items-start gap-3">
+                                <div className={`mt-0.5 p-1.5 rounded-full flex-shrink-0 ${alert.severity === 'critical' ? 'bg-red-100 text-red-600' :
+                                        alert.severity === 'warning' ? 'bg-orange-100 text-orange-600' : 'bg-blue-100 text-blue-600'
+                                    }`}>
+                                    <AlertTriangle className="h-3.5 w-3.5" />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <p className="text-sm font-medium text-gray-900 truncate pr-2" title={alert.message}>
+                                        {alert.message}
+                                    </p>
+                                    <div className="flex items-center gap-3 mt-1 text-xs text-gray-500">
+                                        <span className="flex items-center gap-1">
+                                            <Clock className="h-3 w-3" />
+                                            {formatDistanceToNow(new Date(alert.created_at), { addSuffix: true, locale: ptBR })}
+                                        </span>
+                                        {alert.metadata?.route_name && (
+                                            <span className="flex items-center gap-1 truncate max-w-[120px]">
+                                                <MapPin className="h-3 w-3" />
+                                                {alert.metadata.route_name}
+                                            </span>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </CardContent>
+        </Card>
+    )
+}

@@ -144,7 +144,8 @@ export default function AlertasPage() {
         a.description?.toLowerCase().includes(query) ||
         a.type?.toLowerCase().includes(query) ||
         a.vehicle_plate?.toLowerCase().includes(query) ||
-        a.route_name?.toLowerCase().includes(query)
+        a.route_name?.toLowerCase().includes(query) ||
+        a.companies?.name?.toLowerCase().includes(query)
       )
     }
     return filtered
@@ -397,17 +398,15 @@ export default function AlertasPage() {
                 <Card className="p-3 sm:p-4 hover:shadow-xl transition-all duration-300 overflow-hidden bg-card/50 backdrop-blur-sm border-[var(--border)] hover:border-[var(--brand)]/30">
                   <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
                     <div className="flex gap-3 sm:gap-4 flex-1 min-w-0">
-                      <div className={`p-1.5 rounded-lg flex-shrink-0 ${
-                        alerta.severity === 'critical' ? 'bg-red-100' :
-                        alerta.severity === 'warning' ? 'bg-orange-100' :
-                        'bg-blue-100'
-                      }`}>
+                      <div className={`p-1.5 rounded-lg flex-shrink-0 ${alerta.severity === 'critical' ? 'bg-red-100' :
+                          alerta.severity === 'warning' ? 'bg-orange-100' :
+                            'bg-blue-100'
+                        }`}>
                         <AlertTriangle
-                          className={`h-4 w-4 ${
-                            alerta.severity === 'critical' ? 'text-red-500' :
-                            alerta.severity === 'warning' ? 'text-orange-500' :
-                            'text-blue-500'
-                          }`}
+                          className={`h-4 w-4 ${alerta.severity === 'critical' ? 'text-red-500' :
+                              alerta.severity === 'warning' ? 'text-orange-500' :
+                                'text-blue-500'
+                            }`}
                         />
                       </div>
                       <div className="flex-1 min-w-0">
