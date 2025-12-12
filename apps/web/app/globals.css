@@ -3,13 +3,10 @@
    Palette: Zinc (Neutral) + Orange (Brand) + Slate (Accent)
    ============================================================ */
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-/* Tailwind v4 directives - comentados pois lightningcss não os suporta */
-/* @custom-variant dark (&:is(.dark *)); */
-/* @config "../tailwind.config.js"; */
+@custom-variant dark (&:is(.dark *));
+@config "../tailwind.config.js";
 
 @layer base {
   :root {
@@ -1145,8 +1142,7 @@
   --sidebar-ring: hsl(217.2 91.2% 59.8%);
 }
 
-/* @theme inline - convertido para CSS padrão */
-:root {
+@theme inline {
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
