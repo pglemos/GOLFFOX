@@ -64,7 +64,7 @@ export default function AdminContratosPage() {
 
     const { data: contracts = [], isLoading } = useQuery({
         queryKey: ['admin-contracts'],
-        queryFn: async () => {
+        queryFn: async (): Promise<any[]> => {
             const { data, error } = await supabase
                 .from('gf_contracts')
                 .select(`
@@ -74,7 +74,7 @@ export default function AdminContratosPage() {
                 .order('created_at', { ascending: false })
 
             if (error) throw error
-            return data
+            return data || []
         },
         enabled: !!user
     })
