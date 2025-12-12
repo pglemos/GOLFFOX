@@ -3,7 +3,9 @@
    Palette: Zinc (Neutral) + Orange (Brand) + Slate (Accent)
    ============================================================ */
 
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 /* Tailwind v4 directives - comentados pois lightningcss não os suporta */
 /* @custom-variant dark (&:is(.dark *)); */
