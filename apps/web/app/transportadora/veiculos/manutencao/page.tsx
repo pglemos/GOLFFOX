@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { Wrench, Plus, Search, Edit, Trash2, Truck, Calendar, AlertTriangle, CheckCircle, Clock } from "lucide-react"
+import { Wrench, Plus, Search, Edit, Trash2, Truck, Calendar, AlertTriangle, CheckCircle, Clock, ArrowUpRight } from "lucide-react"
 import { notifySuccess, notifyError } from "@/lib/toast"
 import { motion } from "framer-motion"
 import { useAuthFast } from "@/hooks/use-auth-fast"
@@ -119,10 +119,10 @@ export default function ManutencaoPage() {
         try {
             setDataLoading(true)
             const { data, error } = await (supabase as any)
-                .from('gf_vehicle_maintenance')
+                .from('vehicle_maintenances')
                 .select(`
           *,
-          vehicle:gf_vehicles(plate, model)
+          vehicle:vehicles(plate, model)
         `)
                 .order('due_at', { ascending: false })
 
@@ -139,7 +139,7 @@ export default function ManutencaoPage() {
     const loadVehicles = useCallback(async () => {
         try {
             const { data } = await (supabase as any)
-                .from('gf_vehicles')
+                .from('vehicles')
                 .select('id, plate, model')
                 .eq('is_active', true)
                 .order('plate')
@@ -194,13 +194,13 @@ export default function ManutencaoPage() {
 
             if (selectedMaintenance) {
                 const { error } = await (supabase as any)
-                    .from('gf_vehicle_maintenance')
+                    .from('vehicle_maintenances')
                     .update(payload)
                     .eq('id', selectedMaintenance.id)
                 if (error) throw error
             } else {
                 const { error } = await (supabase as any)
-                    .from('gf_vehicle_maintenance')
+                    .from('vehicle_maintenances')
                     .insert(payload)
                 if (error) throw error
             }
@@ -220,7 +220,7 @@ export default function ManutencaoPage() {
 
         try {
             const { error } = await (supabase as any)
-                .from('gf_vehicle_maintenance')
+                .from('vehicle_maintenances')
                 .delete()
                 .eq('id', id)
             if (error) throw error
