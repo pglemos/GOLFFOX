@@ -9,6 +9,7 @@ interface User {
   email: string
   name?: string
   role?: string
+  avatar_url?: string
 }
 
 // Cache global do usuário (compartilhado entre componentes)
@@ -42,9 +43,10 @@ export function useAuth() {
                 id: userData.id,
                 email: userData.email,
                 name: userData.name || userData.email.split('@')[0],
-                role: userData.role
+                role: userData.role,
+                avatar_url: userData.avatar_url
               }
-              
+
               // Atualizar cache
               cachedUser = userObj
               cacheTimestamp = Date.now()
@@ -60,11 +62,11 @@ export function useAuth() {
 
       // ✅ FALLBACK: Tentar obter sessão do Supabase Auth (mais lento)
       const { data: { session }, error: sessionError } = await supabase.auth.getSession()
-      
+
       if (sessionError) {
         console.error('Erro ao verificar sessão Supabase:', sessionError)
       }
-      
+
       if (!session) {
         // Se não há sessão Supabase e não há cookie, redirecionar para login
         if (typeof document !== 'undefined' && !document.cookie.includes('golffox-session')) {

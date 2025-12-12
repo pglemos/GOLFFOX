@@ -34,13 +34,13 @@ export function CostCentersList({ companyId }: CostCentersListProps) {
     const loadCostCenters = async () => {
         try {
             const { data, error } = await supabase
-                .from('gf_cost_centers')
+                .from('gf_cost_centers' as any)
                 .select('*')
                 .eq('company_id', companyId)
                 .order('code')
 
             if (error) throw error
-            setCostCenters(data as CostCenter[])
+            setCostCenters(data as any as CostCenter[])
         } catch (error) {
             console.error('Erro ao carregar centros de custo:', error)
             notifyError('Erro ao carregar dados')
@@ -58,7 +58,7 @@ export function CostCentersList({ companyId }: CostCentersListProps) {
             if (editingCenter) {
                 // Update
                 const { error } = await supabase
-                    .from('gf_cost_centers')
+                    .from('gf_cost_centers' as any)
                     .update({
                         code: formData.code,
                         name: formData.name,
@@ -71,7 +71,7 @@ export function CostCentersList({ companyId }: CostCentersListProps) {
             } else {
                 // Insert
                 const { error } = await supabase
-                    .from('gf_cost_centers')
+                    .from('gf_cost_centers' as any)
                     .insert({
                         company_id: companyId,
                         code: formData.code,
@@ -98,7 +98,7 @@ export function CostCentersList({ companyId }: CostCentersListProps) {
 
         try {
             const { error } = await supabase
-                .from('gf_cost_centers')
+                .from('gf_cost_centers' as any)
                 .delete()
                 .eq('id', id)
 

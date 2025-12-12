@@ -26,7 +26,7 @@ import { motion } from "framer-motion"
 import { useAuthFast } from "@/hooks/use-auth-fast"
 import { DashboardKPIs } from "@/components/admin/dashboard/dashboard-kpis"
 import { DashboardAuditLog } from "@/components/admin/dashboard/dashboard-audit-log"
-import { KPICardPremium } from "@/components/admin/dashboard/kpi-card-premium"
+import { KpiCard } from "@/components/kpi-card"
 import { QuickActionsGrid } from "@/components/admin/dashboard/quick-actions-grid"
 import { ActivityTimeline } from "@/components/admin/dashboard/activity-timeline"
 import { useMobile } from "@/hooks/use-mobile"
@@ -390,50 +390,41 @@ export default function AdminDashboard() {
           "grid gap-4",
           isMobile ? "grid-cols-1" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 sm:gap-5 lg:gap-6"
         )}>
-          <KPICardPremium
+          <KpiCard
             icon={Users}
             label="Funcionários em Trânsito"
-            value={aggregatedKpis.employees_in_transit}
+            value={aggregatedKpis.employees_in_transit.toString()}
             hint="Ativos agora"
-            delay={0.1}
           />
-          <KPICardPremium
+          <KpiCard
             icon={Truck}
             label="Veículos Ativos"
-            value={aggregatedKpis.vehicles_active}
+            value={aggregatedKpis.vehicles_active.toString()}
             hint="Em rota"
-            delay={0.2}
           />
-          <KPICardPremium
+          <KpiCard
             icon={Navigation}
             label="Rotas Hoje"
-            value={aggregatedKpis.routes_today}
+            value={aggregatedKpis.routes_today.toString()}
             hint="Hoje"
-            delay={0.3}
           />
-          <KPICardPremium
+          <KpiCard
             icon={AlertCircle}
             label="Alertas Críticos"
-            value={aggregatedKpis.critical_alerts}
+            value={aggregatedKpis.critical_alerts.toString()}
             hint="Atenção necessária"
-            trend={aggregatedKpis.critical_alerts > 0 ? -1 : undefined}
-            delay={0.4}
           />
-          <KPICardPremium
+          <KpiCard
             icon={TrendingUp}
             label="Eficiência de Rotas"
             value={`${aggregatedKpis.routeEfficiency}%`}
             hint="Taxa de conclusão"
-            trend={aggregatedKpis.routeEfficiency >= 80 ? 1 : undefined}
-            delay={0.5}
           />
-          <KPICardPremium
+          <KpiCard
             icon={Gauge}
             label="Saúde do Sistema"
             value={`${aggregatedKpis.systemHealth}%`}
             hint={aggregatedKpis.systemHealth >= 80 ? "Excelente" : aggregatedKpis.systemHealth >= 60 ? "Bom" : "Atenção"}
-            trend={aggregatedKpis.systemHealth >= 80 ? 1 : aggregatedKpis.systemHealth >= 60 ? 0 : -1}
-            delay={0.6}
           />
         </div>
 
@@ -460,8 +451,8 @@ export default function AdminDashboard() {
         />
 
         {/* Atividades Recentes */}
-        <ActivityTimeline 
-          activities={auditLogs} 
+        <ActivityTimeline
+          activities={auditLogs}
           loading={activitiesLoading}
           onViewAll={() => window.location.href = '/admin/alertas'}
         />

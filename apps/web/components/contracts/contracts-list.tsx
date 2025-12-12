@@ -31,13 +31,13 @@ export function ContractsList({ companyId }: ContractsListProps) {
         const loadContracts = async () => {
             try {
                 const { data, error } = await supabase
-                    .from('gf_contracts')
+                    .from('gf_contracts' as any)
                     .select('*')
                     .eq('company_id', companyId)
                     .order('created_at', { ascending: false })
 
                 if (error) throw error
-                setContracts(data as Contract[])
+                setContracts(data as any as Contract[])
             } catch (error) {
                 console.error('Erro ao carregar contratos:', error)
             } finally {
