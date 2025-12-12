@@ -31,23 +31,55 @@ export default function ChecklistScreen() {
     const router = useRouter();
     const theme = useTheme();
 
-    const toggleItem = (id: string) => {
+    const toggleItem = (id: string, currentStatus: boolean) => {
         setItems(prev =>
             prev.map(item =>
-                item.id === id ? { ...item, checked: !item.checked } : item
+                item.id === id ? { ...item, checked: !currentStatus } : item
             )
         );
+    };
+
+    const toggleAll = () => {
+        const anyUnchecked = items.some(i => !i.checked);
+        setItems(prev => prev.map(i => ({ ...i, checked: anyUnchecked })));
     };
 
     const allChecked = items.every(item => item.checked);
     const checkedCount = items.filter(item => item.checked).length;
 
+    // Grouping
+    const groups = {
+        'Veículo e Mecânica': ['freios', 'farois', 'pneus', 'oleo', 'combustivel'],
+        'Segurança': ['extintores', 'cintos', 'saidas'],
+        'Geral': ['documentos', 'limpeza']
+    };
+
+    const renderGroup = (title: string, itemIds: string[]) => (
+        <View key={title} style={styles.groupContainer}>
+            <Text variant="titleSmall" style={styles.groupTitle}>{title}</Text>
+            {itemIds.map(id => {
+                const item = items.find(i => i.id === id);
+                if (!item) return null;
+                return (
+                    <Checkbox.Item
+                        key={item.id}
+                        label={item.label}
+                        status={item.checked ? 'checked' : 'unchecked'}
+                        onPress={() => toggleItem(item.id, item.checked)}
+                        style={styles.checkboxItem}
+                        labelStyle={item.checked ? styles.checkedLabel : undefined}
+                    />
+                );
+            })}
+        </View>
+    );
+
     const handleSubmit = async () => {
+        // ... (existing submit logic)
         if (!allChecked) return;
 
         setIsSubmitting(true);
         try {
-            // Salvar checklist no Supabase
             const checklistData = items.reduce((acc, item) => ({
                 ...acc,
                 [item.id]: item.checked,
@@ -55,17 +87,13 @@ export default function ChecklistScreen() {
 
             const { error } = await supabase.from('vehicle_checklist').insert({
                 driver_id: profile?.id,
-                // route_id: currentRoute?.id, // TODO: vincular à rota atual
                 ...checklistData,
                 timestamp: new Date().toISOString(),
             });
 
             if (error) {
                 console.error('Error saving checklist:', error);
-                // Continuar mesmo com erro para não bloquear o motorista
             }
-
-            // Navegar para a tela de rota
             router.push('/driver/route');
         } finally {
             setIsSubmitting(false);
@@ -75,42 +103,37 @@ export default function ChecklistScreen() {
     return (
         <ScrollView style={styles.container}>
             <Surface style={styles.card} elevation={1}>
-                <Text variant="titleMedium" style={styles.title}>
-                    Verificação Pré-Rota
-                </Text>
-                <Text variant="bodySmall" style={styles.subtitle}>
-                    Complete todos os itens antes de iniciar
-                </Text>
-                <Divider style={styles.divider} />
-
-                <View style={styles.progressContainer}>
-                    <Text variant="bodyMedium">
-                        {checkedCount} de {items.length} itens verificados
-                    </Text>
-                    <View style={styles.progressBar}>
-                        <View
-                            style={[
-                                styles.progressFill,
-                                {
-                                    width: `${(checkedCount / items.length) * 100}%`,
-                                    backgroundColor: allChecked ? '#10B981' : theme.colors.primary,
-                                }
-                            ]}
-                        />
+                {/* Header and Progress */}
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <View>
+                        <Text variant="titleMedium" style={styles.title}>
+                            Verificação Pré-Rota
+                        </Text>
+                        <Text variant="bodySmall" style={styles.subtitle}>
+                            {checkedCount}/{items.length} itens verificados
+                        </Text>
                     </View>
+                    <Button mode="text" onPress={toggleAll} compact>
+                        {allChecked ? 'Desmarcar' : 'Marcar Todos'}
+                    </Button>
                 </View>
 
+                <View style={styles.progressBar}>
+                    <View
+                        style={[
+                            styles.progressFill,
+                            {
+                                width: `${(checkedCount / items.length) * 100}%`,
+                                backgroundColor: allChecked ? '#10B981' : theme.colors.primary,
+                            }
+                        ]}
+                    />
+                </View>
+                <Divider style={styles.divider} />
+
+                {/* Groups */}
                 <View style={styles.checklistContainer}>
-                    {items.map(item => (
-                        <Checkbox.Item
-                            key={item.id}
-                            label={item.label}
-                            status={item.checked ? 'checked' : 'unchecked'}
-                            onPress={() => toggleItem(item.id)}
-                            style={styles.checkboxItem}
-                            labelStyle={item.checked ? styles.checkedLabel : undefined}
-                        />
-                    ))}
+                    {Object.entries(groups).map(([title, ids]) => renderGroup(title, ids))}
                 </View>
 
                 <Button
@@ -184,5 +207,14 @@ const styles = StyleSheet.create({
     },
     buttonContent: {
         paddingVertical: 8,
+    },
+    groupContainer: {
+        marginBottom: 16,
+    },
+    groupTitle: {
+        color: '#64748B',
+        fontWeight: '600',
+        marginBottom: 8,
+        marginLeft: 8,
     },
 });

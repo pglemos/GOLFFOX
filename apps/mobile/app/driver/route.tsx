@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { View, StyleSheet, Dimensions } from 'react-native';
-import { Text, FAB, useTheme, Portal } from 'react-native-paper';
+import { Text, FAB, useTheme, Portal, Dialog, Button, Paragraph } from 'react-native-paper';
 import MapView, { Marker, Polyline, PROVIDER_GOOGLE } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { useRouter } from 'expo-router';
@@ -28,6 +28,8 @@ export default function RouteScreen() {
     const [stops, setStops] = useState<RouteStop[]>(mockStops);
     const [routeStatus, setRouteStatus] = useState<'active' | 'paused' | 'completed'>('active');
     const [fabOpen, setFabOpen] = useState(false);
+    const [sosDialogVisible, setSosDialogVisible] = useState(false);
+    const [sendingSos, setSendingSos] = useState(false);
     const { profile } = useAuth();
     const router = useRouter();
     const theme = useTheme();
@@ -103,6 +105,31 @@ export default function RouteScreen() {
         router.replace('/driver');
     };
 
+    const handleSOS = async () => {
+        setSendingSos(true);
+        try {
+            const { error } = await supabase.from('alertsv2').insert({
+                company_id: profile?.current_company_id, // Assumindo que profile tem current_company_id ou similar
+                type: 'SOS',
+                severity: 'critical',
+                status: 'open',
+                title: 'SOS MOTORISTA',
+                message: `Pedido de socorro de ${profile?.name || 'Motorista'} na rota.`,
+                latitude: location?.coords.latitude,
+                longitude: location?.coords.longitude,
+                metadata: { driver_id: profile?.id, phone: profile?.phone }
+            });
+
+            if (error) throw error;
+            setSosDialogVisible(false);
+            // Poderia mostrar um feedback visual de sucesso ou instrução
+        } catch (err) {
+            console.error('Erro ao enviar SOS', err);
+        } finally {
+            setSendingSos(false);
+        }
+    };
+
     return (
         <View style={styles.container}>
             <MapView
@@ -112,6 +139,7 @@ export default function RouteScreen() {
                 showsUserLocation
                 showsMyLocationButton
                 followsUserLocation
+                showsTraffic
             >
                 {/* Marcadores das paradas */}
                 {stops.map(stop => (
@@ -162,6 +190,15 @@ export default function RouteScreen() {
                     icon={fabOpen ? 'close' : 'menu'}
                     actions={[
                         {
+                            icon: 'alert-octagon',
+                            label: 'SOS',
+                            onPress: () => setSosDialogVisible(true),
+                            color: '#EF4444',
+                            style: { backgroundColor: '#EF4444' }, // Red background
+                            containerStyle: { backgroundColor: '#FEE2E2' },
+                            labelStyle: { color: '#EF4444', fontWeight: 'bold' }
+                        },
+                        {
                             icon: 'qrcode-scan',
                             label: 'Check-in/out',
                             onPress: handleScan,
@@ -175,6 +212,21 @@ export default function RouteScreen() {
                     onStateChange={({ open }) => setFabOpen(open)}
                     fabStyle={styles.fab}
                 />
+
+                <Dialog visible={sosDialogVisible} onDismiss={() => setSosDialogVisible(false)}>
+                    <Dialog.Title style={{ color: '#EF4444' }}>⚠️ EMERGÊNCIA SOS</Dialog.Title>
+                    <Dialog.Content>
+                        <Paragraph>
+                            Você está prestes a enviar um pedido de socorro para a central.
+                            Sua localização atual será compartilhada imediatamente.
+                        </Paragraph>
+                        <Paragraph style={{ fontWeight: 'bold', marginTop: 10 }}>Confirmar envio?</Paragraph>
+                    </Dialog.Content>
+                    <Dialog.Actions>
+                        <Button onPress={() => setSosDialogVisible(false)}>Cancelar</Button>
+                        <Button onPress={handleSOS} loading={sendingSos} textColor="#EF4444">ENVIAR SOS</Button>
+                    </Dialog.Actions>
+                </Dialog>
             </Portal>
         </View>
     );

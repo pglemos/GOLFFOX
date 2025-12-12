@@ -1,12 +1,18 @@
+import { useState } from 'react';
 import { View, StyleSheet, ScrollView } from 'react-native';
-import { Card, Text, Button, Avatar, Divider, useTheme, Chip } from 'react-native-paper';
+import { Card, Text, Button, Avatar, Divider, useTheme, Chip, Portal, Dialog, RadioButton } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../../src/auth/AuthProvider';
+import { supabase } from '../../src/services/supabase';
 
 export default function PassengerDashboard() {
     const { profile, logout } = useAuth();
     const router = useRouter();
     const theme = useTheme();
+    const [cancelDialogVisible, setCancelDialogVisible] = useState(false);
+    const [cancelReason, setCancelReason] = useState('remote_work');
+    const [submittingCancel, setSubmittingCancel] = useState(false);
+    const [cancelledToday, setCancelledToday] = useState(false);
 
     const handleTrackBus = () => {
         router.push('/passenger/map');
@@ -25,12 +31,40 @@ export default function PassengerDashboard() {
         router.replace('/login');
     };
 
+    const handleSubmitCancel = async () => {
+        setSubmittingCancel(true);
+        try {
+            // Registrar cancelamento no Supabase
+            // Utilizando alertsv2 como log operacional por enquanto
+            await supabase.from('alertsv2').insert({
+                company_id: profile?.current_company_id,
+                type: 'passenger_cancellation',
+                severity: 'info',
+                status: 'resolved',
+                title: 'Passageiro não utilizará transporte',
+                message: `Passageiro ${profile?.name} informou que não utilizará o transporte hoje. Motivo: ${cancelReason}`,
+                metadata: {
+                    passenger_id: profile?.id,
+                    reason: cancelReason,
+                    date: new Date().toISOString().split('T')[0]
+                }
+            });
+
+            setCancelledToday(true);
+            setCancelDialogVisible(false);
+        } catch (error) {
+            console.error('Erro ao cancelar', error);
+        } finally {
+            setSubmittingCancel(false);
+        }
+    };
+
     // Mock data - em produção viria do Supabase
     const routeInfo = {
         name: 'Rota Centro-Shopping',
-        busStatus: 'Em andamento',
+        busStatus: cancelledToday ? 'Cancelado por você' : 'Em andamento',
         nextStop: 'Ponto B - Centro',
-        eta: '5 min',
+        eta: cancelledToday ? '--' : '5 min',
         busPlate: 'ABC-1234',
         driverName: 'João Silva',
     };
@@ -56,8 +90,8 @@ export default function PassengerDashboard() {
                         <Chip
                             mode="flat"
                             compact
-                            style={{ backgroundColor: '#D1FAE5' }}
-                            textStyle={{ color: '#059669', fontSize: 12 }}
+                            style={{ backgroundColor: cancelledToday ? '#FEE2E2' : '#D1FAE5' }}
+                            textStyle={{ color: cancelledToday ? '#EF4444' : '#059669', fontSize: 12 }}
                         >
                             {routeInfo.busStatus}
                         </Chip>
@@ -71,21 +105,30 @@ export default function PassengerDashboard() {
                         </View>
                         <View style={styles.infoItem}>
                             <Text variant="labelSmall" style={styles.infoLabel}>Chegada Estimada</Text>
-                            <Text variant="titleMedium" style={styles.etaText}>⏱️ {routeInfo.eta}</Text>
+                            <Text variant="titleMedium" style={styles.etaText}>
+                                {cancelledToday ? '🚫' : '⏱️'} {routeInfo.eta}
+                            </Text>
                         </View>
                     </View>
 
-                    <View style={styles.driverInfo}>
-                        <Avatar.Icon size={32} icon="steering" style={{ backgroundColor: theme.colors.primary }} />
-                        <View>
-                            <Text variant="bodySmall" style={styles.driverLabel}>Motorista</Text>
-                            <Text variant="bodyMedium">{routeInfo.driverName}</Text>
+                    {!cancelledToday && (
+                        <View style={styles.driverInfo}>
+                            <Avatar.Icon size={32} icon="steering" style={{ backgroundColor: theme.colors.primary }} />
+                            <View>
+                                <Text variant="bodySmall" style={styles.driverLabel}>Motorista</Text>
+                                <Text variant="bodyMedium">{routeInfo.driverName}</Text>
+                            </View>
+                            <Text variant="bodySmall" style={styles.plateText}>🚐 {routeInfo.busPlate}</Text>
                         </View>
-                        <Text variant="bodySmall" style={styles.plateText}>🚐 {routeInfo.busPlate}</Text>
-                    </View>
+                    )}
                 </Card.Content>
                 <Card.Actions>
-                    <Button mode="contained" onPress={handleTrackBus} icon="map-marker">
+                    <Button
+                        mode="contained"
+                        onPress={handleTrackBus}
+                        icon="map-marker"
+                        disabled={cancelledToday}
+                    >
                         Acompanhar no Mapa
                     </Button>
                 </Card.Actions>
@@ -100,38 +143,49 @@ export default function PassengerDashboard() {
                     </Card.Content>
                 </Card>
 
+                <Card
+                    style={[styles.actionCard, cancelledToday && { opacity: 0.5 }]}
+                    onPress={() => !cancelledToday && setCancelDialogVisible(true)}
+                >
+                    <Card.Content style={styles.actionContent}>
+                        <Avatar.Icon
+                            size={40}
+                            icon={cancelledToday ? "check" : "close-circle"}
+                            style={{ backgroundColor: cancelledToday ? '#94A3B8' : '#EF4444' }}
+                        />
+                        <Text variant="bodySmall" style={styles.actionTitle}>
+                            {cancelledToday ? 'Não Utilizarei' : 'Não vou hoje'}
+                        </Text>
+                    </Card.Content>
+                </Card>
+
                 <Card style={styles.actionCard} onPress={handleFeedback}>
                     <Card.Content style={styles.actionContent}>
                         <Avatar.Icon size={40} icon="star" style={{ backgroundColor: '#F59E0B' }} />
                         <Text variant="bodySmall" style={styles.actionTitle}>Avaliar</Text>
                     </Card.Content>
                 </Card>
-
-                <Card style={styles.actionCard}>
-                    <Card.Content style={styles.actionContent}>
-                        <Avatar.Icon size={40} icon="bell" style={{ backgroundColor: '#10B981' }} />
-                        <Text variant="bodySmall" style={styles.actionTitle}>Alertas</Text>
-                    </Card.Content>
-                </Card>
             </View>
 
             {/* Check-in Manual */}
-            <Card style={styles.card}>
-                <Card.Content>
-                    <Text variant="titleMedium" style={styles.cardTitle}>📍 Check-in</Text>
-                    <Text variant="bodyMedium" style={styles.checkinText}>
-                        Confirme seu embarque quando entrar no ônibus
-                    </Text>
-                </Card.Content>
-                <Card.Actions>
-                    <Button mode="outlined" icon="qrcode-scan">
-                        Escanear QR
-                    </Button>
-                    <Button mode="contained">
-                        Confirmar Embarque
-                    </Button>
-                </Card.Actions>
-            </Card>
+            {!cancelledToday && (
+                <Card style={styles.card}>
+                    <Card.Content>
+                        <Text variant="titleMedium" style={styles.cardTitle}>📍 Check-in</Text>
+                        <Text variant="bodyMedium" style={styles.checkinText}>
+                            Confirme seu embarque quando entrar no ônibus
+                        </Text>
+                    </Card.Content>
+                    <Card.Actions>
+                        <Button mode="outlined" icon="qrcode-scan">
+                            Escanear QR
+                        </Button>
+                        <Button mode="contained">
+                            Confirmar Embarque
+                        </Button>
+                    </Card.Actions>
+                </Card>
+            )}
 
             {/* Logout */}
             <Button
@@ -142,6 +196,25 @@ export default function PassengerDashboard() {
             >
                 Sair da Conta
             </Button>
+
+            <Portal>
+                <Dialog visible={cancelDialogVisible} onDismiss={() => setCancelDialogVisible(false)}>
+                    <Dialog.Title>Não vou utilizar hoje</Dialog.Title>
+                    <Dialog.Content>
+                        <Text style={{ marginBottom: 10 }}>Por favor, informe o motivo:</Text>
+                        <RadioButton.Group onValueChange={value => setCancelReason(value)} value={cancelReason}>
+                            <RadioButton.Item label="Trabalho Remoto (Home Office)" value="remote_work" />
+                            <RadioButton.Item label="Dia de Folga / Férias" value="vacation" />
+                            <RadioButton.Item label="Doença / Médico" value="sick" />
+                            <RadioButton.Item label="Veículo Próprio / Outro" value="own_transport" />
+                        </RadioButton.Group>
+                    </Dialog.Content>
+                    <Dialog.Actions>
+                        <Button onPress={() => setCancelDialogVisible(false)}>Voltar</Button>
+                        <Button onPress={handleSubmitCancel} loading={submittingCancel}>Confirmar</Button>
+                    </Dialog.Actions>
+                </Dialog>
+            </Portal>
         </ScrollView>
     );
 }
@@ -226,7 +299,9 @@ const styles = StyleSheet.create({
         paddingVertical: 8,
     },
     actionTitle: {
+        fontSize: 10,
         textAlign: 'center',
+        lineHeight: 12,
     },
     cardTitle: {
         marginBottom: 8,
