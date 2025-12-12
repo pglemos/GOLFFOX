@@ -32,7 +32,8 @@ import {
   Building2,
   ChevronRight,
   Wrench,
-  Award
+  Award,
+  TrendingUp
 } from "lucide-react"
 import { OperationalAlertsBadge } from "@/components/operational-alerts-badge"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
@@ -140,6 +141,11 @@ const adminMenuGroups: MenuGroup[] = [
         icon: DollarSign,
         label: "Custos",
         href: "/admin/custos"
+      },
+      {
+        icon: TrendingUp,
+        label: "Projeções",
+        href: "/admin/projecoes"
       },
       {
         icon: BarChart3,
@@ -259,6 +265,11 @@ const transportadoraMenuGroups: MenuGroup[] = [
             icon: Award,
             label: "Ranking",
             href: "/transportadora/motoristas/ranking"
+          },
+          {
+            icon: BarChart3,
+            label: "SLA",
+            href: "/transportadora/motoristas/sla"
           }
         ]
       },
@@ -276,7 +287,7 @@ const transportadoraMenuGroups: MenuGroup[] = [
     ]
   },
   {
-    label: "Visualização",
+    label: "Financeiro",
     items: [
       {
         icon: DollarSign,
@@ -284,7 +295,22 @@ const transportadoraMenuGroups: MenuGroup[] = [
         href: "/transportadora/custos"
       },
       {
+        icon: TrendingUp,
+        label: "Receitas",
+        href: "/transportadora/receitas"
+      },
+      {
         icon: BarChart3,
+        label: "Margens",
+        href: "/transportadora/margens"
+      }
+    ]
+  },
+  {
+    label: "Visualização",
+    items: [
+      {
+        icon: FileText,
         label: "Relatórios",
         href: "/transportadora/relatorios"
       }
