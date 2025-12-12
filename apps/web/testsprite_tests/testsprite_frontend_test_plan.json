@@ -1,0 +1,503 @@
+[
+  {
+    "id": "TC001",
+    "title": "Login Success for All User Roles",
+    "description": "Check that users with valid credentials can successfully authenticate and are redirected to the correct dashboard or mobile app area based on their role (admin, company, carrier, driver, passenger).",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to login page"
+      },
+      {
+        "type": "action",
+        "description": "Input valid username/email and password for admin user"
+      },
+      {
+        "type": "action",
+        "description": "Click login button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify admin user is authenticated and redirected to /admin panel"
+      },
+      {
+        "type": "action",
+        "description": "Log out"
+      },
+      {
+        "type": "action",
+        "description": "Repeat login with valid company user credentials"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify company user is authenticated and redirected to /empresa panel"
+      },
+      {
+        "type": "action",
+        "description": "Log out"
+      },
+      {
+        "type": "action",
+        "description": "Repeat login with valid carrier user credentials"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify carrier user is authenticated and redirected to /transportadora panel"
+      },
+      {
+        "type": "action",
+        "description": "Log out"
+      },
+      {
+        "type": "action",
+        "description": "Repeat login with valid driver user credentials"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify driver user is authenticated and redirected to mobile driver app"
+      },
+      {
+        "type": "action",
+        "description": "Log out"
+      },
+      {
+        "type": "action",
+        "description": "Repeat login with valid passenger user credentials"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify passenger user is authenticated and redirected to mobile passenger app"
+      }
+    ]
+  },
+  {
+    "id": "TC002",
+    "title": "Login Failure with Incorrect Credentials",
+    "description": "Verify that login attempts with invalid username or password fail with appropriate error messages without authentication.",
+    "category": "error handling",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to login page"
+      },
+      {
+        "type": "action",
+        "description": "Input invalid username/email and password"
+      },
+      {
+        "type": "action",
+        "description": "Click login button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify login failed message is shown and user is not authenticated"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify no redirection occurs"
+      }
+    ]
+  },
+  {
+    "id": "TC003",
+    "title": "Role-Based Access Control Enforcement",
+    "description": "Confirm that protected routes and API endpoints restrict access based on user roles and prevent unauthorized access.",
+    "category": "security",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Login as company user"
+      },
+      {
+        "type": "action",
+        "description": "Attempt to access /admin route"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify access is denied or redirected to company dashboard"
+      },
+      {
+        "type": "action",
+        "description": "Attempt to call admin-only API endpoint"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify API returns unauthorized error"
+      },
+      {
+        "type": "action",
+        "description": "Repeat above steps with driver user attempting access to company and admin routes"
+      }
+    ]
+  },
+  {
+    "id": "TC004",
+    "title": "Real-time Fleet Tracking Updates",
+    "description": "Verify real-time retrieval and display of GPS locations updates for vehicles and routes on admin and carrier dashboards within 1 second delay.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Login as admin"
+      },
+      {
+        "type": "action",
+        "description": "Open fleet map with route visualization"
+      },
+      {
+        "type": "action",
+        "description": "Simulate vehicle location updates via Supabase subscription"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify map updates vehicle locations on screen within 1 second after update is pushed"
+      },
+      {
+        "type": "action",
+        "description": "Repeat the test logged in as carrier user on the carrier panel"
+      }
+    ]
+  },
+  {
+    "id": "TC005",
+    "title": "CRUD Operations for Company Management",
+    "description": "Test creating, reading, updating, and deleting companies, ensuring persistence of data and UI updates.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Login as admin"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to companies management page"
+      },
+      {
+        "type": "action",
+        "description": "Create a new company with valid data"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify company is saved and appears in list immediately"
+      },
+      {
+        "type": "action",
+        "description": "Edit existing company data with valid changes"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify changes persist and are reflected in UI"
+      },
+      {
+        "type": "action",
+        "description": "Delete a company"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify company is removed from database and no longer shown"
+      }
+    ]
+  },
+  {
+    "id": "TC006",
+    "title": "Operational Alert Trigger and Notification",
+    "description": "Verify alerts trigger correctly on route deviations, emergencies, or operational issues and appropriate notifications are sent to intended users.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Login as admin"
+      },
+      {
+        "type": "action",
+        "description": "Simulate a route deviation event from a vehicle"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an operational alert is generated and visible on alerts badge"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify notification is sent to the admin and carrier panels"
+      },
+      {
+        "type": "action",
+        "description": "Trigger an emergency assistance request from driver app"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify emergency alert is dispatched and communication channel is opened between driver and admin"
+      }
+    ]
+  },
+  {
+    "id": "TC007",
+    "title": "Mobile App Checklist and Boarding via QR/NFC",
+    "description": "Test driver and passenger mobile app flows for completing checklists, scanning QR/NFC codes for embarkation, including offline fallback functionality.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Login to driver mobile app"
+      },
+      {
+        "type": "action",
+        "description": "Complete pre-route checklist"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify checklist completion is saved and synchronized"
+      },
+      {
+        "type": "action",
+        "description": "Scan passenger QR code for embarkation"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify passenger boarding is recorded successfully"
+      },
+      {
+        "type": "action",
+        "description": "Turn off internet connection"
+      },
+      {
+        "type": "action",
+        "description": "Attempt QR/NFC scan again"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify offline data is stored locally and syncs when connection is restored"
+      }
+    ]
+  },
+  {
+    "id": "TC008",
+    "title": "Report Generation and Export",
+    "description": "Validate that financial and operational reports generate correct aggregated data and export properly in PDF, Excel, and CSV formats.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Login as admin"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to reports section"
+      },
+      {
+        "type": "action",
+        "description": "Generate financial report for selected period"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify displayed data matches expected aggregated values"
+      },
+      {
+        "type": "action",
+        "description": "Export the report as PDF"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify downloaded PDF file content is correct and properly formatted"
+      },
+      {
+        "type": "action",
+        "description": "Export the report as Excel"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify downloaded Excel file contains accurate report data"
+      },
+      {
+        "type": "action",
+        "description": "Export as CSV when available"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify CSV file correctness"
+      }
+    ]
+  },
+  {
+    "id": "TC009",
+    "title": "Multi-Tenant Data Isolation Validation",
+    "description": "Ensure users cannot access or query data belonging to other tenants, verifying row-level security policies and data segregation.",
+    "category": "security",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Login as user from Company A"
+      },
+      {
+        "type": "action",
+        "description": "Attempt to query or access records belonging to Company B"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify access is denied or no data returned"
+      },
+      {
+        "type": "action",
+        "description": "Simulate API calls or UI navigation to cross-tenant data"
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm data isolation maintained across all entry points"
+      }
+    ]
+  },
+  {
+    "id": "TC010",
+    "title": "Performance and Uptime Monitoring",
+    "description": "Verify the system maintains above 99.9% uptime and p95 API response times are below 500ms under normal load.",
+    "category": "performance",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Monitor system for uptime using monitoring tools"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify uptime is 99.9% or higher over monitoring period"
+      },
+      {
+        "type": "action",
+        "description": "Execute API load tests simulating normal user traffic"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify 95th percentile API response time is under 500ms"
+      },
+      {
+        "type": "action",
+        "description": "Check recorded web vitals metrics and error logs"
+      },
+      {
+        "type": "assertion",
+        "description": "Ensure no critical errors or performance degradations reported"
+      }
+    ]
+  },
+  {
+    "id": "TC011",
+    "title": "Address Autocomplete and Geocoding Validations",
+    "description": "Validate that address inputs provide autocomplete suggestions, CEP lookup works correctly, and geocoding returns accurate coordinates.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Focus an address input field"
+      },
+      {
+        "type": "action",
+        "description": "Type partial address or CEP"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify address autocomplete suggestions appear"
+      },
+      {
+        "type": "action",
+        "description": "Select suggested address"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify full address is populated in form fields"
+      },
+      {
+        "type": "action",
+        "description": "Trigger geocoding operation"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify latitude and longitude coordinates returned and displayed correctly"
+      }
+    ]
+  },
+  {
+    "id": "TC012",
+    "title": "Security Controls Verification - CSRF, Rate Limiting, Encryption",
+    "description": "Confirm implementation of CSRF protections on forms, rate limiting on APIs, and encryption of sensitive data in transit and at rest.",
+    "category": "security",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Submit forms such as login and CRUD with missing or invalid CSRF token"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify form submission is rejected due to CSRF protection"
+      },
+      {
+        "type": "action",
+        "description": "Simulate rapid API calls exceeding rate limits"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify API requests are throttled or blocked with appropriate error"
+      },
+      {
+        "type": "action",
+        "description": "Inspect network traffic for encrypted transmission (e.g. HTTPS)"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify sensitive information is not sent in plain text"
+      },
+      {
+        "type": "action",
+        "description": "Verify database storage encrypts sensitive user data"
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm encryption at rest is applied according to specifications"
+      }
+    ]
+  },
+  {
+    "id": "TC013",
+    "title": "UI Components Render and Interaction",
+    "description": "Validate that key reusable UI components such as buttons, dialogs, dropdowns, tables, and toasts render correctly and interactions function as expected.",
+    "category": "ui",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Render UI components in isolation and inside pages"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify visual appearance matches design specifications"
+      },
+      {
+        "type": "action",
+        "description": "Interact with components: click buttons, open dialogs, select dropdown items, interact with tables"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify expected behaviors trigger and no visual or functional defects occur"
+      },
+      {
+        "type": "action",
+        "description": "Trigger toasts by actions"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify toasts appear and dismiss properly"
+      }
+    ]
+  }
+]

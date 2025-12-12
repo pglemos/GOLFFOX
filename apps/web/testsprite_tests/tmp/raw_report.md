@@ -5,7 +5,7 @@
 
 ## 1️⃣ Document Metadata
 - **Project Name:** GOLFFOX
-- **Date:** 2025-11-25
+- **Date:** 2025-12-12
 - **Prepared by:** TestSprite AI Team
 
 ---
@@ -13,123 +13,182 @@
 ## 2️⃣ Requirement Validation Summary
 
 #### Test TC001
-- **Test Name:** user login endpoint validation
-- **Test Code:** [TC001_user_login_endpoint_validation.py](./TC001_user_login_endpoint_validation.py)
-- **Test Error:** Traceback (most recent call last):
-  File "/var/task/handler.py", line 258, in run_with_retry
-    exec(code, exec_env)
-  File "<string>", line 101, in <module>
-  File "<string>", line 26, in test_user_login_endpoint_validation
-AssertionError: Expected 200, got 500
-
-- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/58f4c138-0ebd-48b1-87a6-c3abe1b5b245/b353f571-5402-4e06-9dd9-0339ea3c20ad
+- **Test Name:** Login Success for All User Roles
+- **Test Code:** [TC001_Login_Success_for_All_User_Roles.py](./TC001_Login_Success_for_All_User_Roles.py)
+- **Test Error:** The login page is not accessible at the expected URLs on localhost:3000. All attempts to reach the login page returned 'Cannot GET' errors with no login form or interactive elements. Therefore, it was not possible to perform authentication and redirection tests for any user roles. The issue has been reported. Please verify the server and routing configuration to ensure the login page is available before retrying the tests.
+Browser Console Logs:
+[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at http://localhost:3000/:0:0)
+[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at http://localhost:3000/login:0:0)
+[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at http://localhost:3000/auth/login:0:0)
+- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/c958b032-d1b9-4bcc-bed6-61e2b0cc305f/4e5f8e55-1a8a-42b8-964a-0ca1527b39e7
 - **Status:** ❌ Failed
 - **Analysis / Findings:** {{TODO:AI_ANALYSIS}}.
 ---
 
 #### Test TC002
-- **Test Name:** vehicle deletion or archival with trip validation
-- **Test Code:** [TC002_vehicle_deletion_or_archival_with_trip_validation.py](./TC002_vehicle_deletion_or_archival_with_trip_validation.py)
-- **Test Error:** Traceback (most recent call last):
-  File "/var/task/handler.py", line 258, in run_with_retry
-    exec(code, exec_env)
-  File "<string>", line 82, in <module>
-  File "<string>", line 23, in test_vehicle_deletion_or_archival_with_trip_validation
-AssertionError: Login failed: <!DOCTYPE html><html><head><style data-next-hide-fouc="true">body{display:none}</style><noscript data-next-hide-fouc="true"><style>body{display:block}</style></noscript><meta charSet="utf-8" data-next-head=""/><meta name="viewport" content="width=device-width" data-next-head=""/><noscript data-n-css=""></noscript><script defer="" nomodule="" src="/_next/static/chunks/polyfills.js"></script><script src="/_next/static/chunks/fallback/webpack.js" defer=""></script><script src="/_next/static/chunks/fallback/main.js" defer=""></script><script src="/_next/static/chunks/fallback/pages/_app.js" defer=""></script><script src="/_next/static/chunks/fallback/pages/_error.js" defer=""></script><noscript id="__next_css__DO_NOT_USE__"></noscript></head><body><div id="__next"></div><script src="/_next/static/chunks/fallback/react-refresh.js"></script><script id="__NEXT_DATA__" type="application/json">{"props":{"pageProps":{"statusCode":500,"hostname":"localhost"}},"page":"/_error","query":{},"buildId":"development","isFallback":false,"err":{"name":"ModuleBuildError","source":"server","message":"Module build failed (from ./node_modules/next/dist/build/webpack/loaders/next-swc-loader.js):\nError:   x Expected a semicolon\n    ,-[F:\\GOLFFOX\\apps\\web\\app\\api\\cron\\dispatch-reports\\route.ts:89:1]\n 86 |     let isAuthorized = false\n 87 |     \n 88 |     // Secrets inválidos já foram rejeitados acima\n 89 |     } else if (cronSecretFromHeader \u0026\u0026 VALID_TEST_SECRETS.includes(cronSecretFromHeader) \u0026\u0026 (isTestMode || isDevelopment)) {\n    :       ^\n 90 |       // Em modo de teste/dev, aceitar secrets válidos conhecidos\n 91 |       isAuthorized = true\n 91 |       console.log('✅ Secret de teste válido aceito')\r\n    `----\n  x Expression expected\n    ,-[F:\\GOLFFOX\\apps\\web\\app\\api\\cron\\dispatch-reports\\route.ts:89:1]\n 86 |     let isAuthorized = false\n 87 |     \n 88 |     // Secrets inválidos já foram rejeitados acima\n 89 |     } else if (cronSecretFromHeader \u0026\u0026 VALID_TEST_SECRETS.includes(cronSecretFromHeader) \u0026\u0026 (isTestMode || isDevelopment)) {\n    :       ^^^^\n 90 |       // Em modo de teste/dev, aceitar secrets válidos conhecidos\n 91 |       isAuthorized = true\n 91 |       console.log('✅ Secret de teste válido aceito')\r\n    `----\n\n\nCaused by:\n    0: failed to process js file\n    1: Syntax Error\n    at module.exports.__wbindgen_error_new (F:\\GOLFFOX\\apps\\web\\node_modules\\next\\wasm\\@next\\swc-wasm-nodejs\\wasm.js:647:17)\n    at wasm.wasm.__wbindgen_error_new externref shim (wasm://wasm/wasm.wasm-06c8cba6:wasm-function[22169]:0x14dae26)\n    at wasm.wasm.wasm::transform_sync::h853606eb67eb903b (wasm://wasm/wasm.wasm-06c8cba6:wasm-function[2061]:0xb46b0f)\n    at wasm.wasm.wasm_bindgen_futures::future_to_promise::{{closure}}::{{closure}}::he6d9058065a921fb (wasm://wasm/wasm.wasm-06c8cba6:wasm-function[10536]:0x12ed2a3)\n    at wasm.wasm.wasm_bindgen_futures::queue::QueueState::run_all::hc42d8332a12422d4 (wasm://wasm/wasm.wasm-06c8cba6:wasm-function[8897]:0x123b19f)\n    at wasm.wasm.wasm_bindgen_futures::queue::Queue::new::{{closure}}::hec499be7695f83fd (wasm://wasm/wasm.wasm-06c8cba6:wasm-function[21842]:0x14d886b)\n    at wasm.wasm.\u003cdyn core::ops::function::FnMut\u003c(A,)\u003e+Output = R as wasm_bindgen::closure::WasmClosure\u003e::describe::invoke::h7cc0545dfcf63eed (wasm://wasm/wasm.wasm-06c8cba6:wasm-function[21840]:0x14d883b)\n    at wasm.wasm.closure1130 externref shim (wasm://wasm/wasm.wasm-06c8cba6:wasm-function[22694]:0x14de1ac)\n    at __wbg_adapter_50 (F:\\GOLFFOX\\apps\\web\\node_modules\\next\\wasm\\@next\\swc-wasm-nodejs\\wasm.js:349:10)\n    at real (F:\\GOLFFOX\\apps\\web\\node_modules\\next\\wasm\\@next\\swc-wasm-nodejs\\wasm.js:140:20)\n    at node:internal/process/task_queues:140:7\n    at AsyncResource.runInAsyncScope (node:async_hooks:206:9)\n    at AsyncResource.runMicrotask (node:internal/process/task_queues:137:8)","stack":"ModuleBuildError: Module build failed (from ./node_modules/next/dist/build/webpack/loaders/next-swc-loader.js):\nError:   x Expected a semicolon\n    ,-[F:\\GOLFFOX\\apps\\web\\app\\api\\cron\\dispatch-reports\\route.ts:89:1]\n 86 |     let isAuthorized = false\n 87 |     \n 88 |     // Secrets inválidos já foram rejeitados acima\n 89 |     } else if (cronSecretFromHeader \u0026\u0026 VALID_TEST_SECRETS.includes(cronSecretFromHeader) \u0026\u0026 (isTestMode || isDevelopment)) {\n    :       ^\n 90 |       // Em modo de teste/dev, aceitar secrets válidos conhecidos\n 91 |       isAuthorized = true\n 91 |       console.log('✅ Secret de teste válido aceito')\r\n    `----\n  x Expression expected\n    ,-[F:\\GOLFFOX\\apps\\web\\app\\api\\cron\\dispatch-reports\\route.ts:89:1]\n 86 |     let isAuthorized = false\n 87 |     \n 88 |     // Secrets inválidos já foram rejeitados acima\n 89 |     } else if (cronSecretFromHeader \u0026\u0026 VALID_TEST_SECRETS.includes(cronSecretFromHeader) \u0026\u0026 (isTestMode || isDevelopment)) {\n    :       ^^^^\n 90 |       // Em modo de teste/dev, aceitar secrets válidos conhecidos\n 91 |       isAuthorized = true\n 91 |       console.log('✅ Secret de teste válido aceito')\r\n    `----\n\n\nCaused by:\n    0: failed to process js file\n    1: Syntax Error\n    at module.exports.__wbindgen_error_new (F:\\GOLFFOX\\apps\\web\\node_modules\\next\\wasm\\@next\\swc-wasm-nodejs\\wasm.js:647:17)\n    at wasm.wasm.__wbindgen_error_new externref shim (wasm://wasm/wasm.wasm-06c8cba6:wasm-function[22169]:0x14dae26)\n    at wasm.wasm.wasm::transform_sync::h853606eb67eb903b (wasm://wasm/wasm.wasm-06c8cba6:wasm-function[2061]:0xb46b0f)\n    at wasm.wasm.wasm_bindgen_futures::future_to_promise::{{closure}}::{{closure}}::he6d9058065a921fb (wasm://wasm/wasm.wasm-06c8cba6:wasm-function[10536]:0x12ed2a3)\n    at wasm.wasm.wasm_bindgen_futures::queue::QueueState::run_all::hc42d8332a12422d4 (wasm://wasm/wasm.wasm-06c8cba6:wasm-function[8897]:0x123b19f)\n    at wasm.wasm.wasm_bindgen_futures::queue::Queue::new::{{closure}}::hec499be7695f83fd (wasm://wasm/wasm.wasm-06c8cba6:wasm-function[21842]:0x14d886b)\n    at wasm.wasm.\u003cdyn core::ops::function::FnMut\u003c(A,)\u003e+Output = R as wasm_bindgen::closure::WasmClosure\u003e::describe::invoke::h7cc0545dfcf63eed (wasm://wasm/wasm.wasm-06c8cba6:wasm-function[21840]:0x14d883b)\n    at wasm.wasm.closure1130 externref shim (wasm://wasm/wasm.wasm-06c8cba6:wasm-function[22694]:0x14de1ac)\n    at __wbg_adapter_50 (F:\\GOLFFOX\\apps\\web\\node_modules\\next\\wasm\\@next\\swc-wasm-nodejs\\wasm.js:349:10)\n    at real (F:\\GOLFFOX\\apps\\web\\node_modules\\next\\wasm\\@next\\swc-wasm-nodejs\\wasm.js:140:20)\n    at node:internal/process/task_queues:140:7\n    at AsyncResource.runInAsyncScope (node:async_hooks:206:9)\n    at AsyncResource.runMicrotask (node:internal/process/task_queues:137:8)\n    at processResult (F:\\GOLFFOX\\apps\\web\\node_modules\\next\\dist\\compiled\\webpack\\bundle5.js:29:407086)\n    at F:\\GOLFFOX\\apps\\web\\node_modules\\next\\dist\\compiled\\webpack\\bundle5.js:29:408881\n    at F:\\GOLFFOX\\apps\\web\\node_modules\\next\\dist\\compiled\\loader-runner\\LoaderRunner.js:1:8645\n    at F:\\GOLFFOX\\apps\\web\\node_modules\\next\\dist\\compiled\\loader-runner\\LoaderRunner.js:1:5828\n    at r.callback (F:\\GOLFFOX\\apps\\web\\node_modules\\next\\dist\\compiled\\loader-runner\\LoaderRunner.js:1:4039)\n    at F:\\GOLFFOX\\apps\\web\\node_modules\\next\\dist\\build\\webpack\\loaders\\next-swc-loader.js:233:9"},"gip":true,"scriptLoader":[]}</script></body></html>
-
-- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/58f4c138-0ebd-48b1-87a6-c3abe1b5b245/b04164d8-4267-4054-adba-3c3ed44a0f48
+- **Test Name:** Login Failure with Incorrect Credentials
+- **Test Code:** [TC002_Login_Failure_with_Incorrect_Credentials.py](./TC002_Login_Failure_with_Incorrect_Credentials.py)
+- **Test Error:** The login page is not accessible at the provided URL (http://localhost:3000/) or common login paths. The application shows a 'Cannot GET /' error with no login form or interactive elements. Therefore, it is not possible to perform the login failure test with invalid credentials as requested. Please ensure the application server is running and the login page is correctly served before retrying the test.
+Browser Console Logs:
+[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at http://localhost:3000/:0:0)
+[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at http://localhost:3000/login:0:0)
+[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at http://localhost:3000/home:0:0)
+[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at http://localhost:3000/:0:0)
+- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/c958b032-d1b9-4bcc-bed6-61e2b0cc305f/1ddacafb-18e6-4ce5-a920-5eed1b083201
 - **Status:** ❌ Failed
 - **Analysis / Findings:** {{TODO:AI_ANALYSIS}}.
 ---
 
 #### Test TC003
-- **Test Name:** generate optimized route stops
-- **Test Code:** [TC003_generate_optimized_route_stops.py](./TC003_generate_optimized_route_stops.py)
-- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/58f4c138-0ebd-48b1-87a6-c3abe1b5b245/681e957d-7a33-420e-87db-147a23340654
-- **Status:** ✅ Passed
+- **Test Name:** Role-Based Access Control Enforcement
+- **Test Code:** [TC003_Role_Based_Access_Control_Enforcement.py](./TC003_Role_Based_Access_Control_Enforcement.py)
+- **Test Error:** Unable to proceed with role-based access testing because the application is not accessible at the expected URLs. All attempts to reach the login page or main page returned 'Cannot GET' errors. Please verify the server status, correct URL, or provide alternative access instructions.
+Browser Console Logs:
+[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at http://localhost:3000/:0:0)
+[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at http://localhost:3000/login:0:0)
+[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at http://localhost:3000/auth/login:0:0)
+[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at http://localhost:3000/login.html:0:0)
+[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at http://localhost:3000/:0:0)
+- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/c958b032-d1b9-4bcc-bed6-61e2b0cc305f/cb70c7e9-c011-4fc2-9a89-41d120826a85
+- **Status:** ❌ Failed
 - **Analysis / Findings:** {{TODO:AI_ANALYSIS}}.
 ---
 
 #### Test TC004
-- **Test Name:** create new operator user
-- **Test Code:** [TC004_create_new_operator_user.py](./TC004_create_new_operator_user.py)
-- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/58f4c138-0ebd-48b1-87a6-c3abe1b5b245/aea05b14-d505-4cb9-b332-77f8457593e4
-- **Status:** ✅ Passed
+- **Test Name:** Real-time Fleet Tracking Updates
+- **Test Code:** [TC004_Real_time_Fleet_Tracking_Updates.py](./TC004_Real_time_Fleet_Tracking_Updates.py)
+- **Test Error:** Unable to proceed with the task because the app at localhost:3000 is not serving the expected pages. All tested URLs return 'Cannot GET' errors. Please verify the app server is running and accessible at the correct URL.
+Browser Console Logs:
+[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at http://localhost:3000/:0:0)
+[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at http://localhost:3000/login:0:0)
+[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at http://localhost:3000/home:0:0)
+- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/c958b032-d1b9-4bcc-bed6-61e2b0cc305f/c11f8c6d-12dd-4793-9e8a-ed36a84dd545
+- **Status:** ❌ Failed
 - **Analysis / Findings:** {{TODO:AI_ANALYSIS}}.
 ---
 
 #### Test TC005
-- **Test Name:** manual cost entry creation and retrieval
-- **Test Code:** [TC005_manual_cost_entry_creation_and_retrieval.py](./TC005_manual_cost_entry_creation_and_retrieval.py)
-- **Test Error:** Traceback (most recent call last):
-  File "/var/task/handler.py", line 258, in run_with_retry
-    exec(code, exec_env)
-  File "<string>", line 103, in <module>
-  File "<string>", line 46, in test_manual_cost_entry_creation_and_retrieval
-AssertionError: Expected 201 Created, got 500
-
-- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/58f4c138-0ebd-48b1-87a6-c3abe1b5b245/ab993e09-707f-499f-9a3d-7d012a29e33c
+- **Test Name:** CRUD Operations for Company Management
+- **Test Code:** [TC005_CRUD_Operations_for_Company_Management.py](./TC005_CRUD_Operations_for_Company_Management.py)
+- **Test Error:** Testing cannot proceed because the application server is not serving the expected pages at localhost:3000. All attempts to access login and root pages failed with 'Cannot GET' errors. Please ensure the backend server is running and accessible before retrying.
+Browser Console Logs:
+[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at http://localhost:3000/:0:0)
+[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at http://localhost:3000/login:0:0)
+[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at http://localhost:3000/admin/login:0:0)
+[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at http://localhost:3000/:0:0)
+- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/c958b032-d1b9-4bcc-bed6-61e2b0cc305f/a90206b0-44ea-42ed-a6f1-00945e4fcbf5
 - **Status:** ❌ Failed
 - **Analysis / Findings:** {{TODO:AI_ANALYSIS}}.
 ---
 
 #### Test TC006
-- **Test Name:** create employee as operator
-- **Test Code:** [TC006_create_employee_as_operator.py](./TC006_create_employee_as_operator.py)
-- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/58f4c138-0ebd-48b1-87a6-c3abe1b5b245/ca7493ba-486e-48c9-a1ff-b07e5422e337
-- **Status:** ✅ Passed
+- **Test Name:** Operational Alert Trigger and Notification
+- **Test Code:** [TC006_Operational_Alert_Trigger_and_Notification.py](./TC006_Operational_Alert_Trigger_and_Notification.py)
+- **Test Error:** The application at http://localhost:3000 is not accessible and returns a 'Cannot GET /' error on both root and /login paths. Due to this, it was not possible to perform the required verification of alerts triggering on route deviations, emergencies, or operational issues, nor to verify notifications sent to intended users. The issue has been reported. Please resolve the app accessibility problem to enable further testing.
+Browser Console Logs:
+[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at http://localhost:3000/:0:0)
+[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at http://localhost:3000/login:0:0)
+[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at http://localhost:3000/:0:0)
+- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/c958b032-d1b9-4bcc-bed6-61e2b0cc305f/e2d5b3a5-8291-40f0-842b-40d75d6a7c79
+- **Status:** ❌ Failed
 - **Analysis / Findings:** {{TODO:AI_ANALYSIS}}.
 ---
 
 #### Test TC007
-- **Test Name:** optimize route for operator
-- **Test Code:** [TC007_optimize_route_for_operator.py](./TC007_optimize_route_for_operator.py)
-- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/58f4c138-0ebd-48b1-87a6-c3abe1b5b245/8a328a85-9fd6-49ae-8f49-b63c3b88f546
-- **Status:** ✅ Passed
+- **Test Name:** Mobile App Checklist and Boarding via QR/NFC
+- **Test Code:** [TC007_Mobile_App_Checklist_and_Boarding_via_QRNFC.py](./TC007_Mobile_App_Checklist_and_Boarding_via_QRNFC.py)
+- **Test Error:** The app is not accessible at the provided URLs including /, /login, /driver-login, and /app. All attempts resulted in 'Cannot GET' errors with no interactive elements to proceed. Please verify the app server is running and the correct URLs are provided for the driver and passenger mobile app. Testing cannot continue without access to the app interface.
+Browser Console Logs:
+[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at http://localhost:3000/:0:0)
+[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at http://localhost:3000/login:0:0)
+[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at http://localhost:3000/driver-login:0:0)
+[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at http://localhost:3000/app:0:0)
+- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/c958b032-d1b9-4bcc-bed6-61e2b0cc305f/a6809cdf-9482-4b87-a5e7-f734e5f30133
+- **Status:** ❌ Failed
 - **Analysis / Findings:** {{TODO:AI_ANALYSIS}}.
 ---
 
 #### Test TC008
-- **Test Name:** generate report on demand
-- **Test Code:** [TC008_generate_report_on_demand.py](./TC008_generate_report_on_demand.py)
-- **Test Error:** Traceback (most recent call last):
-  File "/var/task/handler.py", line 258, in run_with_retry
-    exec(code, exec_env)
-  File "<string>", line 39, in <module>
-  File "<string>", line 33, in test_generate_report_on_demand
-AssertionError: Expected 200 OK, got 500 for format pdf and report_type monthly_summary
-
-- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/58f4c138-0ebd-48b1-87a6-c3abe1b5b245/e3f84fd5-6a10-43e1-b6da-ae6ce6558771
+- **Test Name:** Report Generation and Export
+- **Test Code:** [TC008_Report_Generation_and_Export.py](./TC008_Report_Generation_and_Export.py)
+- **Test Error:** The application on localhost:3000 is not accessible. All attempts to reach login or home pages result in 'Cannot GET' errors. Unable to proceed with login, report generation, or export validation. Please ensure the application server is running and accessible at the correct URL before retrying the task.
+Browser Console Logs:
+[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at http://localhost:3000/:0:0)
+[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at http://localhost:3000/login:0:0)
+[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at http://localhost:3000/auth:0:0)
+[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at http://localhost:3000/home:0:0)
+- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/c958b032-d1b9-4bcc-bed6-61e2b0cc305f/a5d6c927-f937-41fb-9cd6-c30fcefe54d2
 - **Status:** ❌ Failed
 - **Analysis / Findings:** {{TODO:AI_ANALYSIS}}.
 ---
 
 #### Test TC009
-- **Test Name:** cron job to dispatch scheduled reports
-- **Test Code:** [TC009_cron_job_to_dispatch_scheduled_reports.py](./TC009_cron_job_to_dispatch_scheduled_reports.py)
-- **Test Error:** Traceback (most recent call last):
-  File "/var/task/handler.py", line 258, in run_with_retry
-    exec(code, exec_env)
-  File "<string>", line 37, in <module>
-  File "<string>", line 27, in test_cron_dispatch_reports
-AssertionError: Expected 200 OK but got 500
-
-- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/58f4c138-0ebd-48b1-87a6-c3abe1b5b245/89c0bc2b-6657-4cb8-8860-013196f20d7c
+- **Test Name:** Multi-Tenant Data Isolation Validation
+- **Test Code:** [TC009_Multi_Tenant_Data_Isolation_Validation.py](./TC009_Multi_Tenant_Data_Isolation_Validation.py)
+- **Test Error:** The application is not accessible at the expected URLs including /, /login, /home, /dashboard, and /admin. All return 'Cannot GET' errors. Without access to the login page or main app interface, it is impossible to perform the tenant data access tests. Please verify the application server is running and the correct URLs are provided.
+Browser Console Logs:
+[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at http://localhost:3000/:0:0)
+[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at http://localhost:3000/login:0:0)
+[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at http://localhost:3000/home:0:0)
+[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at http://localhost:3000/dashboard:0:0)
+[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at http://localhost:3000/admin:0:0)
+- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/c958b032-d1b9-4bcc-bed6-61e2b0cc305f/fcc4f54a-47d7-4a2e-8856-522b525c3c9d
 - **Status:** ❌ Failed
 - **Analysis / Findings:** {{TODO:AI_ANALYSIS}}.
 ---
 
 #### Test TC010
-- **Test Name:** system health check endpoint
-- **Test Code:** [TC010_system_health_check_endpoint.py](./TC010_system_health_check_endpoint.py)
-- **Test Error:** Traceback (most recent call last):
-  File "/var/task/handler.py", line 258, in run_with_retry
-    exec(code, exec_env)
-  File "<string>", line 32, in <module>
-  File "<string>", line 16, in test_system_health_check_endpoint
-AssertionError: Expected status code 200, got 500
+- **Test Name:** Performance and Uptime Monitoring
+- **Test Code:** [TC010_Performance_and_Uptime_Monitoring.py](./TC010_Performance_and_Uptime_Monitoring.py)
+- **Test Error:** The application is currently inaccessible at all tested endpoints including /admin/login. This prevents any verification of uptime or API response times. Please ensure the application server is running and properly configured. Once accessible, I can proceed with monitoring uptime, executing API load tests, and checking performance metrics as requested.
+Browser Console Logs:
+[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at http://localhost:3000/:0:0)
+[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at http://localhost:3000/login:0:0)
+[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at http://localhost:3000/api/health:0:0)
+[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at http://localhost:3000/admin/login:0:0)
+- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/c958b032-d1b9-4bcc-bed6-61e2b0cc305f/d48f9642-f699-4286-a110-b3428c9a53fb
+- **Status:** ❌ Failed
+- **Analysis / Findings:** {{TODO:AI_ANALYSIS}}.
+---
 
-- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/58f4c138-0ebd-48b1-87a6-c3abe1b5b245/46ac5dcd-921b-4410-81eb-a4b6e458aa7f
+#### Test TC011
+- **Test Name:** Address Autocomplete and Geocoding Validations
+- **Test Code:** [TC011_Address_Autocomplete_and_Geocoding_Validations.py](./TC011_Address_Autocomplete_and_Geocoding_Validations.py)
+- **Test Error:** The application is not accessible at the expected URLs including /login, showing 'Cannot GET /login' errors. Therefore, it is not possible to perform the address input autocomplete, CEP lookup, or geocoding validation tests. Please ensure the application server is running and accessible at the correct URLs before retrying the tests.
+Browser Console Logs:
+[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at http://localhost:3000/:0:0)
+[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at http://localhost:3000/login:0:0)
+[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at http://localhost:3000/admin:0:0)
+[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at http://localhost:3000/login:0:0)
+- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/c958b032-d1b9-4bcc-bed6-61e2b0cc305f/a481943a-90b6-4932-901d-cc05a2672fbb
+- **Status:** ❌ Failed
+- **Analysis / Findings:** {{TODO:AI_ANALYSIS}}.
+---
+
+#### Test TC012
+- **Test Name:** Security Controls Verification - CSRF, Rate Limiting, Encryption
+- **Test Code:** [TC012_Security_Controls_Verification___CSRF_Rate_Limiting_Encryption.py](./TC012_Security_Controls_Verification___CSRF_Rate_Limiting_Encryption.py)
+- **Test Error:** The application is not accessible at the provided URLs including /empresa/login. No forms or APIs are available to test CSRF protections, rate limiting, or encryption of sensitive data. Please verify the application server is running and serving the correct routes or provide correct access details to proceed with the security testing.
+Browser Console Logs:
+[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at http://localhost:3000/:0:0)
+[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at http://localhost:3000/login:0:0)
+[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at http://localhost:3000/admin/login:0:0)
+[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at http://localhost:3000/empresa/login:0:0)
+- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/c958b032-d1b9-4bcc-bed6-61e2b0cc305f/c992a9ac-95a3-43cb-a596-f6ae2a5e8cca
+- **Status:** ❌ Failed
+- **Analysis / Findings:** {{TODO:AI_ANALYSIS}}.
+---
+
+#### Test TC013
+- **Test Name:** UI Components Render and Interaction
+- **Test Code:** [TC013_UI_Components_Render_and_Interaction.py](./TC013_UI_Components_Render_and_Interaction.py)
+- **Test Error:** Unable to proceed with UI component validation because the app routes are not accessible and the server returns 'Cannot GET' errors. Please ensure the app is running and accessible at the provided URL or provide a working environment URL. Task cannot continue without access to the app UI.
+Browser Console Logs:
+[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at http://localhost:3000/:0:0)
+[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at http://localhost:3000/login:0:0)
+[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at http://localhost:3000/admin/login:0:0)
+[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) (at http://localhost:3000/app:0:0)
+- **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/c958b032-d1b9-4bcc-bed6-61e2b0cc305f/491b309b-550b-411d-a328-bc3909fae6fa
 - **Status:** ❌ Failed
 - **Analysis / Findings:** {{TODO:AI_ANALYSIS}}.
 ---
@@ -137,7 +196,7 @@ AssertionError: Expected status code 200, got 500
 
 ## 3️⃣ Coverage & Matching Metrics
 
-- **40.00** of tests passed
+- **0.00** of tests passed
 
 | Requirement        | Total Tests | ✅ Passed | ❌ Failed  |
 |--------------------|-------------|-----------|------------|

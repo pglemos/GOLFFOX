@@ -4,5 +4,15 @@
   "scope": "codebase",
   "localEndpoint": "http://localhost:3000",
   "loginUser": "golffox@admin.com",
-  "loginPassword": "senha123"
+  "loginPassword": "senha123",
+  "executionArgs": {
+    "projectName": "GOLFFOX",
+    "projectPath": "F:\\GOLFFOX\\apps\\web",
+    "testIds": [],
+    "additionalInstruction": "Use the credentials: admin@golffox.com / Admin123! for admin login, empresa@golffox.com / Empresa123! for company login, transportadora@golffox.com / Transportadora123! for carrier login. The app runs on localhost:3000.",
+    "envs": {
+      "API_KEY": "sk-user-QSb1WyBxhEsDuDPMVHN1YnKL-PvBLASIO9FkQMyEbyE4pV1RA-l12OS4HyvNZR4DYWJPloZM1dkKnChQzydCDORW-hDbwqcGxLQlewmnKfaVDbVI_yxkyZKr7M_nZf4Mqrk"
+    }
+  },
+  "proxy": "http://f532ae06-f5ff-4875-aeaf-24208dc145c6:mOFpmCQiGeodquTfrtvtq0Irirc9Ovoe@tun.testsprite.com:8080"
 }
