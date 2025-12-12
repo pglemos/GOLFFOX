@@ -217,7 +217,25 @@ export async function POST(request: NextRequest) {
             )
         }
 
-        return NextResponse.json({ success: true, data }, { status: 201 })
+        // Mapear retorno para camelCase
+        const newBudget: Budget = {
+            id: data.id,
+            companyId: data.company_id,
+            carrierId: data.carrier_id,
+            categoryId: data.category_id,
+            categoryName: data.category_name,
+            periodYear: data.period_year,
+            periodMonth: data.period_month,
+            budgetedAmount: parseFloat(data.budgeted_amount),
+            alertThresholdPercent: data.alert_threshold_percent,
+            notes: data.notes,
+            createdBy: data.created_by,
+            createdAt: data.created_at,
+            updatedAt: data.updated_at,
+            category: data.category,
+        }
+
+        return NextResponse.json({ success: true, data: newBudget }, { status: 201 })
     } catch (error) {
         console.error('[API] Erro interno:', error)
         return NextResponse.json(
