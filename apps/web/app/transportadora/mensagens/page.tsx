@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { useAuthFast } from "@/hooks/use-auth-fast"
+import { useAuth } from "@/hooks/use-auth"
 import { MessageSquare, Send, User, Clock } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -29,7 +29,7 @@ interface Driver {
 }
 
 export default function MensagensPage() {
-    const { user, carrier } = useAuthFast()
+    const { user } = useAuth()
     const [drivers, setDrivers] = useState<Driver[]>([])
     const [selectedDriver, setSelectedDriver] = useState<Driver | null>(null)
     const [messages, setMessages] = useState<Message[]>([])
@@ -47,7 +47,7 @@ export default function MensagensPage() {
         ]
         setDrivers(mockDrivers)
         setLoading(false)
-    }, [carrier])
+    }, [])
 
     useEffect(() => {
         if (selectedDriver) {

@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { useAuthFast } from "@/hooks/use-auth-fast"
+import { useAuth } from "@/hooks/use-auth"
 import { DollarSign, Plus, ArrowUpRight, Search, Edit, Trash2 } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { notifySuccess, notifyError } from "@/lib/toast"
@@ -36,7 +36,7 @@ interface Revenue {
 }
 
 export default function ReceitasPage() {
-    const { user, carrier } = useAuthFast()
+    const { user } = useAuth()
     const [revenues, setRevenues] = useState<Revenue[]>([])
     const [loading, setLoading] = useState(true)
     const [search, setSearch] = useState("")
@@ -48,18 +48,21 @@ export default function ReceitasPage() {
         reference_month: new Date().toISOString().slice(0, 7)
     })
 
+    // Mock carrier ID for now - in production, get from user profile
+    const carrierId = user?.id || 'mock-carrier'
+
     useEffect(() => {
         loadRevenues()
-    }, [carrier])
+    }, [carrierId])
 
     const loadRevenues = async () => {
-        if (!carrier?.id) return
+        if (!carrierId) return
         setLoading(true)
         try {
             const { data, error } = await supabase
                 .from('gf_manual_revenues')
                 .select('*')
-                .eq('carrier_id', carrier.id)
+                .eq('carrier_id', carrierId)
                 .order('created_at', { ascending: false })
 
             if (error) throw error
@@ -72,10 +75,10 @@ export default function ReceitasPage() {
     }
 
     const handleSubmit = async () => {
-        if (!carrier?.id) return
+        if (!carrierId) return
         try {
             const { error } = await supabase.from('gf_manual_revenues').insert({
-                carrier_id: carrier.id,
+                carrier_id: carrierId,
                 description: formData.description,
                 amount: parseFloat(formData.amount),
                 type: formData.type,
@@ -109,7 +112,7 @@ export default function ReceitasPage() {
     }
 
     return (
-        <AppShell panel="transportadora" user={user ? { id: user.id, name: user.name || 'Operador', email: user.email || '', role: 'operador' } : undefined}>
+        <AppShell panel="transportadora" user={user ? { id: user.id, name: user.name || 'Operador', email: user.email || '', role: user.role || 'operador' } : { id: 'mock', name: 'Operador', email: 'operador@golffox.com', role: 'operador' }}>
             <div className="p-4 sm:p-6 lg:p-8 space-y-6">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div>

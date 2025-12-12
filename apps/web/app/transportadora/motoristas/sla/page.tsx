@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { AppShell } from "@/components/app-shell"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { useAuthFast } from "@/hooks/use-auth-fast"
+import { useAuth } from "@/hooks/use-auth"
 import { Gauge, Clock, AlertTriangle, CheckCircle, TrendingUp, Users } from "lucide-react"
 import { Progress } from "@/components/ui/progress"
 
@@ -19,7 +19,7 @@ interface DriverSLA {
 }
 
 export default function SLAMotoristaPage() {
-    const { user, carrier } = useAuthFast()
+    const { user } = useAuth()
     const [drivers, setDrivers] = useState<DriverSLA[]>([])
     const [loading, setLoading] = useState(true)
 
@@ -34,7 +34,7 @@ export default function SLAMotoristaPage() {
         ]
         setDrivers(mockDrivers)
         setLoading(false)
-    }, [carrier])
+    }, [])
 
     const avgOnTimeRate = drivers.length > 0
         ? drivers.reduce((sum, d) => sum + d.on_time_rate, 0) / drivers.length
@@ -49,7 +49,7 @@ export default function SLAMotoristaPage() {
     }
 
     return (
-        <AppShell panel="transportadora" user={user ? { id: user.id, name: user.name || 'Operador', email: user.email || '', role: 'operador' } : undefined}>
+        <AppShell panel="transportadora" user={user ? { id: user.id, name: user.name || 'Operador', email: user.email || '', role: user.role || 'operador' } : { id: 'mock', name: 'Operador', email: 'operador@golffox.com', role: 'operador' }}>
             <div className="p-4 sm:p-6 lg:p-8 space-y-6">
                 <div>
                     <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-2">
