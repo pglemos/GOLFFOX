@@ -3,6 +3,7 @@
 import { Suspense } from 'react'
 export const dynamic = 'force-dynamic'
 import { EmpresaTenantProvider } from '@/components/providers/empresa-tenant-provider'
+import { RealtimeProvider } from '@/components/providers/realtime-provider'
 
 function LoadingFallback() {
   return (
@@ -23,7 +24,9 @@ export default function EmpresaLayout({
   return (
     <Suspense fallback={<LoadingFallback />}>
       <EmpresaTenantProvider>
-        {children}
+        <RealtimeProvider>
+          {children}
+        </RealtimeProvider>
       </EmpresaTenantProvider>
     </Suspense>
   )

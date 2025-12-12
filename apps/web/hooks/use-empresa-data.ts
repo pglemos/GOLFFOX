@@ -229,3 +229,26 @@ export function useResolveAlert() {
   })
 }
 
+export function useActiveTrips(companyId: string | null) {
+  return useQuery({
+    queryKey: ["active-trips", companyId],
+    queryFn: async () => {
+      if (!companyId) return []
+
+      const { data, error } = await supabase
+        .from("v_active_trips")
+        .select("*")
+        .eq("company_id", companyId)
+        // We ensure we only get truly active statuses
+        .in("status", ["in_progress", "delayed"])
+
+      if (error) throw error
+      return data || []
+    },
+    enabled: !!companyId,
+    refetchInterval: 10000, // Polling every 10 seconds for "near-realtime" status
+  })
+}
+
+
+

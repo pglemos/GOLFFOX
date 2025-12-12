@@ -1,18 +1,19 @@
 ﻿"use client"
 
-import { useEffect, useState, useCallback, useMemo } from "react"
+import { useEffect, useState, useMemo } from "react"
 import { AppShell } from "@/components/app-shell"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
-import { Navigation, Users, MapPin, Plus, Map, Search } from "lucide-react"
+import { Navigation, Users, MapPin, Plus, Map as MapIcon, Search } from "lucide-react"
 import { motion } from "framer-motion"
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
-import { notifyError } from "@/lib/toast"
 import { Button } from "@/components/ui/button"
 import { useOperatorTenant } from "@/components/providers/empresa-tenant-provider"
 import { useDebounce } from "@/hooks/use-debounce"
+import { useQuery } from "@tanstack/react-query"
+import { useActiveTrips } from "@/hooks/use-empresa-data"
 import operatorI18nData from "@/i18n/operator.json"
 
 const operatorI18n: any = operatorI18nData ?? {
@@ -24,74 +25,59 @@ export default function OperatorRotasPage() {
   const router = useRouter()
   const { tenantCompanyId, companyName, loading: tenantLoading, error: tenantError } = useOperatorTenant()
   const [user, setUser] = useState<any>(null)
-  const [loading, setLoading] = useState(true)
-  const [rotas, setRotas] = useState<any[]>([])
-  const [error, setError] = useState<string | null>(null)
+  const [authLoading, setAuthLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
   const debouncedSearchQuery = useDebounce(searchQuery, 300)
+
+  // Fetch das rotas usando React Query
+  const { data: rotas = [], isLoading: rotasLoading, error: rotasError } = useQuery({
+    queryKey: ["operator-routes", tenantCompanyId],
+    queryFn: async () => {
+      if (!tenantCompanyId) return []
+      const { data, error } = await supabase
+        .from("v_operator_routes_secure")
+        .select("*")
+        .order("name", { ascending: true })
+
+      if (error) throw error
+      return (data as any[]) || []
+    },
+    enabled: !!tenantCompanyId
+  })
+
+  // Hook de viagens ativas (Live Status)
+  const { data: activeTrips = [] } = useActiveTrips(tenantCompanyId)
+
+  // Mapeia quais rotas estão ativas para acesso O(1)
+  const activeRouteIds = useMemo(() => {
+    const ids = new Set<string>()
+    activeTrips.forEach((trip: any) => {
+      if (trip.route_id) ids.add(trip.route_id)
+    })
+    return ids
+  }, [activeTrips])
 
   useEffect(() => {
     const getUser = async () => {
       try {
         const { data: { session }, error: sessionError } = await supabase.auth.getSession()
-        if (sessionError) {
-          console.error('Erro ao verificar sessão:', sessionError)
-          setError('Erro ao verificar autenticação')
-          return
-        }
+        if (sessionError) throw sessionError
         if (!session) {
           router.push("/")
           return
         }
         setUser({ ...session.user })
-      } catch (err: any) {
-        console.error('Erro ao obter usuário:', err)
-        setError('Erro ao carregar dados do usuário')
+      } catch (err) {
+        console.error(err)
       } finally {
-        setLoading(false)
+        setAuthLoading(false)
       }
     }
     getUser()
   }, [router])
 
-  const loadRotas = useCallback(async () => {
-    if (!tenantCompanyId) return
 
-    try {
-      setLoading(true)
-      setError(null)
-      // Usar view segura que já filtra por tenantCompanyId via RLS
-      const { data, error: queryError } = await supabase
-        .from("v_operator_routes_secure")
-        .select("*")
-        .order("name", { ascending: true })
-
-      if (queryError) {
-        console.error("Erro ao carregar rotas:", queryError)
-        setError(`Erro ao carregar rotas: ${queryError.message}`)
-        notifyError(`Erro: ${queryError.message}`)
-        setRotas([])
-        return
-      }
-      setRotas(data || [])
-    } catch (err: any) {
-      console.error("Erro ao carregar rotas:", err)
-      const errorMessage = err?.message || 'Erro desconhecido'
-      setError(errorMessage)
-      notifyError(`Erro: ${errorMessage}`)
-      setRotas([])
-    } finally {
-      setLoading(false)
-    }
-  }, [tenantCompanyId])
-
-  useEffect(() => {
-    if (tenantCompanyId && !tenantLoading) {
-      loadRotas()
-    }
-  }, [tenantCompanyId, tenantLoading, loadRotas])
-
-  if (loading || tenantLoading) {
+  if (authLoading || tenantLoading || rotasLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="w-16 h-16 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
@@ -99,13 +85,13 @@ export default function OperatorRotasPage() {
     )
   }
 
-  if (tenantError || error) {
+  if (tenantError || rotasError) {
     return (
       <AppShell user={{ id: user?.id || "", name: user?.name || "Operador", email: user?.email || "", role: "operador", avatar_url: user?.avatar_url }}>
         <div className="min-h-screen flex items-center justify-center p-4">
           <Card className="p-8 max-w-md w-full text-center">
             <h2 className="text-xl font-bold mb-2 text-red-600">Erro ao carregar</h2>
-            <p className="text-gray-600 mb-4">{tenantError || error}</p>
+            <p className="text-gray-600 mb-4">{tenantError || (rotasError as any)?.message}</p>
             <Button onClick={() => window.location.reload()} variant="default">
               Tentar Novamente
             </Button>
@@ -142,7 +128,7 @@ export default function OperatorRotasPage() {
           <div className="flex flex-wrap gap-2 w-full sm:w-auto">
             <a href="/operador/rotas/mapa" className="flex-1 sm:flex-initial">
               <Button variant="outline" className="w-full sm:w-auto min-h-[44px] touch-manipulation text-xs sm:text-sm">
-                <Map className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                <MapIcon className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                 <span className="hidden sm:inline">Ver no Mapa</span>
                 <span className="sm:hidden">Mapa</span>
               </Button>
@@ -179,7 +165,7 @@ export default function OperatorRotasPage() {
                 rota.carrier_name?.toLowerCase().includes(query)
               )
             })
-            .length === 0 && !loading && (
+            .length === 0 && !rotasLoading && (
               <Card className="p-12 text-center">
                 <Navigation className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                 <h3 className="text-lg font-medium mb-2">
@@ -223,6 +209,12 @@ export default function OperatorRotasPage() {
                           <Navigation className="h-4 w-4 text-[var(--brand)] flex-shrink-0" />
                         </div>
                         <h3 className="font-bold text-lg truncate group-hover:text-[var(--brand)] transition-colors">{rota.name || "Rota sem nome"}</h3>
+                        {activeRouteIds.has(rota.id) && (
+                          <Badge className="bg-green-500 hover:bg-green-600 animate-pulse text-white border-0 flex items-center gap-1">
+                            <span className="w-2 h-2 rounded-full bg-white block"></span>
+                            AO VIVO
+                          </Badge>
+                        )}
                         {rota.carrier_name && (
                           <Badge variant="outline" className="flex-shrink-0">{rota.carrier_name}</Badge>
                         )}
