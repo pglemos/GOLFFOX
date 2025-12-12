@@ -92,10 +92,18 @@ export default function TransportadoraVeiculosPage() {
 
   const loadVehicleDocuments = async (vehicleId: string) => {
     try {
-      const res = await fetch(`/api/transportadora/vehicles/${vehicleId}/documents`)
+      const { data: { session } } = await supabase.auth.getSession()
+      const res = await fetch(`/api/transportadora/vehicles/${vehicleId}/documents`, {
+        credentials: 'include',
+        headers: session?.access_token ? {
+          'Authorization': `Bearer ${session.access_token}`
+        } : {}
+      })
       if (res.ok) {
         const data = await res.json()
         setDocuments(data || [])
+      } else {
+        console.error("Erro ao carregar documentos:", res.status, await res.text())
       }
     } catch (error) {
       console.error("Erro ao carregar documentos:", error)
@@ -104,10 +112,18 @@ export default function TransportadoraVeiculosPage() {
 
   const loadVehicleMaintenances = async (vehicleId: string) => {
     try {
-      const res = await fetch(`/api/transportadora/vehicles/${vehicleId}/maintenances`)
+      const { data: { session } } = await supabase.auth.getSession()
+      const res = await fetch(`/api/transportadora/vehicles/${vehicleId}/maintenances`, {
+        credentials: 'include',
+        headers: session?.access_token ? {
+          'Authorization': `Bearer ${session.access_token}`
+        } : {}
+      })
       if (res.ok) {
         const data = await res.json()
         setMaintenances(data || [])
+      } else {
+        console.error("Erro ao carregar manutenções:", res.status, await res.text())
       }
     } catch (error) {
       console.error("Erro ao carregar manutenções:", error)
@@ -118,9 +134,14 @@ export default function TransportadoraVeiculosPage() {
     if (!selectedVehicle || !maintenanceForm.description) return
 
     try {
+      const { data: { session } } = await supabase.auth.getSession()
       const res = await fetch(`/api/transportadora/vehicles/${selectedVehicle}/maintenances`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(session?.access_token ? { 'Authorization': `Bearer ${session.access_token}` } : {})
+        },
         body: JSON.stringify(maintenanceForm)
       })
 
@@ -226,13 +247,13 @@ export default function TransportadoraVeiculosPage() {
 
   const filteredVeiculos = vehiclesWithDetails.filter(v => {
     // Filtro de busca
-    const matchesSearch = searchQuery === "" || 
+    const matchesSearch = searchQuery === "" ||
       v.plate?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       v.model?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       v.year?.toString().includes(searchQuery)
 
     // Filtro de status
-    const matchesStatus = statusFilter === "all" || 
+    const matchesStatus = statusFilter === "all" ||
       (statusFilter === "active" && v.is_active) ||
       (statusFilter === "inactive" && !v.is_active)
 
@@ -351,8 +372,8 @@ export default function TransportadoraVeiculosPage() {
                         {/* Foto e Status */}
                         <div className="relative">
                           {veiculo.photo_url ? (
-                            <img 
-                              src={veiculo.photo_url} 
+                            <img
+                              src={veiculo.photo_url}
                               alt={veiculo.plate}
                               className="w-full h-40 rounded-lg object-cover border border-[var(--border)]"
                             />
@@ -408,8 +429,8 @@ export default function TransportadoraVeiculosPage() {
 
                         {/* Ações */}
                         <div className="flex gap-2 pt-2 border-t border-[var(--border)]">
-                          <Button 
-                            variant="outline" 
+                          <Button
+                            variant="outline"
                             size="sm"
                             className="flex-1"
                             onClick={(e) => {
@@ -422,8 +443,8 @@ export default function TransportadoraVeiculosPage() {
                             <FileText className="h-4 w-4 mr-1" />
                             Docs
                           </Button>
-                          <Button 
-                            variant="outline" 
+                          <Button
+                            variant="outline"
                             size="sm"
                             className="flex-1"
                             onClick={(e) => {
@@ -457,8 +478,8 @@ export default function TransportadoraVeiculosPage() {
                       <div className="flex items-start justify-between gap-4">
                         <div className="flex gap-4 flex-1">
                           {veiculo.photo_url ? (
-                            <img 
-                              src={veiculo.photo_url} 
+                            <img
+                              src={veiculo.photo_url}
                               alt={veiculo.plate}
                               className="w-20 h-20 rounded-lg object-cover border border-[var(--border)]"
                             />
@@ -495,8 +516,8 @@ export default function TransportadoraVeiculosPage() {
                           </div>
                         </div>
                         <div className="flex gap-2">
-                          <Button 
-                            variant="outline" 
+                          <Button
+                            variant="outline"
                             size="sm"
                             onClick={(e) => {
                               e.stopPropagation()
@@ -508,8 +529,8 @@ export default function TransportadoraVeiculosPage() {
                             <FileText className="h-4 w-4 mr-2" />
                             Documentos
                           </Button>
-                          <Button 
-                            variant="outline" 
+                          <Button
+                            variant="outline"
                             size="sm"
                             onClick={(e) => {
                               e.stopPropagation()
@@ -602,12 +623,11 @@ export default function TransportadoraVeiculosPage() {
                             return (
                               <div key={doc.id} className="relative pl-12">
                                 {/* Timeline dot */}
-                                <div className={`absolute left-4 top-6 w-4 h-4 rounded-full border-2 ${
-                                  doc.status === 'expired' ? 'bg-red-500 border-red-500' :
+                                <div className={`absolute left-4 top-6 w-4 h-4 rounded-full border-2 ${doc.status === 'expired' ? 'bg-red-500 border-red-500' :
                                   isExpiring ? 'bg-yellow-500 border-yellow-500' :
-                                  'bg-green-500 border-green-500'
-                                }`}></div>
-                                
+                                    'bg-green-500 border-green-500'
+                                  }`}></div>
+
                                 <Card className="p-4 hover:shadow-lg transition-shadow">
                                   <div className="flex items-start justify-between gap-4">
                                     <div className="flex-1">
@@ -619,20 +639,20 @@ export default function TransportadoraVeiculosPage() {
                                         </Badge>
                                         {isExpiring && (
                                           <Badge variant={daysToExpiry! < 0 ? 'destructive' : 'outline'} className={daysToExpiry! >= 0 ? 'border-yellow-500 text-yellow-700' : ''}>
-                                            {daysToExpiry! < 0 
+                                            {daysToExpiry! < 0
                                               ? `Vencido há ${Math.abs(daysToExpiry!)} dias`
                                               : `${daysToExpiry} dias restantes`}
                                           </Badge>
                                         )}
                                       </div>
-                                      
+
                                       {/* Preview do documento se for imagem */}
                                       {doc.file_url && (
                                         <div className="mb-3">
                                           {doc.file_url.match(/\.(jpg|jpeg|png|gif|webp)$/i) ? (
                                             <div className="relative w-full max-w-xs">
-                                              <img 
-                                                src={doc.file_url} 
+                                              <img
+                                                src={doc.file_url}
                                                 alt={doc.document_type}
                                                 className="w-full h-32 object-cover rounded-lg border border-[var(--border)] cursor-pointer hover:opacity-80 transition-opacity"
                                                 onClick={() => window.open(doc.file_url, '_blank')}
@@ -677,13 +697,13 @@ export default function TransportadoraVeiculosPage() {
                                           </div>
                                         )}
                                       </div>
-                                      
+
                                       {doc.file_url && (
                                         <div className="mt-3 pt-3 border-t border-[var(--border)]">
-                                          <a 
-                                            href={doc.file_url} 
-                                            target="_blank" 
-                                            rel="noopener noreferrer" 
+                                          <a
+                                            href={doc.file_url}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
                                             className="inline-flex items-center gap-2 text-[var(--brand)] hover:underline"
                                           >
                                             <ExternalLink className="h-4 w-4" />
@@ -778,13 +798,12 @@ export default function TransportadoraVeiculosPage() {
                             return (
                               <div key={maint.id} className="relative pl-12">
                                 {/* Timeline dot */}
-                                <div className={`absolute left-4 top-6 w-4 h-4 rounded-full border-2 ${
-                                  maint.status === 'completed' ? 'bg-green-500 border-green-500' :
+                                <div className={`absolute left-4 top-6 w-4 h-4 rounded-full border-2 ${maint.status === 'completed' ? 'bg-green-500 border-green-500' :
                                   maint.status === 'in_progress' ? 'bg-blue-500 border-blue-500' :
-                                  maint.status === 'cancelled' ? 'bg-red-500 border-red-500' :
-                                  'bg-yellow-500 border-yellow-500'
-                                }`}></div>
-                                
+                                    maint.status === 'cancelled' ? 'bg-red-500 border-red-500' :
+                                      'bg-yellow-500 border-yellow-500'
+                                  }`}></div>
+
                                 <Card className="p-4 hover:shadow-lg transition-shadow">
                                   <div className="flex items-start justify-between gap-4">
                                     <div className="flex-1">
@@ -792,18 +811,18 @@ export default function TransportadoraVeiculosPage() {
                                         <Wrench className="h-5 w-5 text-[var(--brand)]" />
                                         <h3 className="font-bold capitalize">{maint.maintenance_type.replace('_', ' ')}</h3>
                                         <Badge variant={
-                                          maint.status === 'completed' ? 'default' : 
-                                          maint.status === 'in_progress' ? 'secondary' : 
-                                          maint.status === 'cancelled' ? 'destructive' : 'outline'
+                                          maint.status === 'completed' ? 'default' :
+                                            maint.status === 'in_progress' ? 'secondary' :
+                                              maint.status === 'cancelled' ? 'destructive' : 'outline'
                                         }>
                                           {maint.status === 'scheduled' ? 'Agendada' :
-                                           maint.status === 'in_progress' ? 'Em Andamento' :
-                                           maint.status === 'completed' ? 'Concluída' : 'Cancelada'}
+                                            maint.status === 'in_progress' ? 'Em Andamento' :
+                                              maint.status === 'completed' ? 'Concluída' : 'Cancelada'}
                                         </Badge>
                                       </div>
-                                      
+
                                       <p className="text-sm text-[var(--ink)] mb-3">{maint.description}</p>
-                                      
+
                                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
                                         {maint.scheduled_date && (
                                           <div className="flex items-center gap-2">
@@ -846,7 +865,7 @@ export default function TransportadoraVeiculosPage() {
                                           </div>
                                         )}
                                       </div>
-                                      
+
                                       {totalCost > 0 && (
                                         <div className="mt-3 pt-3 border-t border-[var(--border)]">
                                           <div className="flex items-center gap-2">
@@ -895,22 +914,22 @@ export default function TransportadoraVeiculosPage() {
                             .slice(-10)
                           }>
                             <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-                            <XAxis 
-                              dataKey="date" 
+                            <XAxis
+                              dataKey="date"
                               stroke="var(--ink-muted)"
                               style={{ fontSize: '12px' }}
                               angle={-45}
                               textAnchor="end"
                               height={80}
                             />
-                            <YAxis 
+                            <YAxis
                               stroke="var(--ink-muted)"
                               style={{ fontSize: '12px' }}
                             />
-                            <Tooltip 
+                            <Tooltip
                               formatter={(value: number) => formatCurrency(value)}
-                              contentStyle={{ 
-                                backgroundColor: 'var(--bg)', 
+                              contentStyle={{
+                                backgroundColor: 'var(--bg)',
                                 border: '1px solid var(--border)',
                                 borderRadius: '8px'
                               }}
@@ -960,7 +979,7 @@ export default function TransportadoraVeiculosPage() {
                   </SelectContent>
                 </Select>
               </div>
-              
+
               {selectedVehicle && (
                 <DocumentUpload
                   vehicleId={selectedVehicle}
@@ -988,8 +1007,8 @@ export default function TransportadoraVeiculosPage() {
             <div className="space-y-4">
               <div>
                 <Label>Tipo de Manutenção</Label>
-                <Select 
-                  value={maintenanceForm.maintenance_type} 
+                <Select
+                  value={maintenanceForm.maintenance_type}
                   onValueChange={(value: any) => setMaintenanceForm({ ...maintenanceForm, maintenance_type: value })}
                 >
                   <SelectTrigger>
@@ -1083,8 +1102,8 @@ export default function TransportadoraVeiculosPage() {
 
               <div>
                 <Label>Status</Label>
-                <Select 
-                  value={maintenanceForm.status} 
+                <Select
+                  value={maintenanceForm.status}
                   onValueChange={(value: any) => setMaintenanceForm({ ...maintenanceForm, status: value })}
                 >
                   <SelectTrigger>
