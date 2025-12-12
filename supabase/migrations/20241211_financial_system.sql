@@ -48,15 +48,15 @@ CREATE TABLE IF NOT EXISTS gf_manual_costs_v2 (
   -- Vínculos operacionais (opcional)
   vehicle_id UUID REFERENCES vehicles(id) ON DELETE SET NULL,
   route_id UUID REFERENCES routes(id) ON DELETE SET NULL,
-  driver_id UUID REFERENCES profiles(id) ON DELETE SET NULL,
+  driver_id UUID REFERENCES users(id) ON DELETE SET NULL,
   -- Documentação
   attachment_url TEXT,
   attachment_name VARCHAR(255),
   notes TEXT,
   -- Metadata
   status VARCHAR(20) DEFAULT 'confirmed' CHECK (status IN ('pending', 'confirmed', 'cancelled')),
-  created_by UUID REFERENCES profiles(id) ON DELETE SET NULL,
-  approved_by UUID REFERENCES profiles(id) ON DELETE SET NULL,
+  created_by UUID REFERENCES users(id) ON DELETE SET NULL,
+  approved_by UUID REFERENCES users(id) ON DELETE SET NULL,
   approved_at TIMESTAMPTZ,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW(),
@@ -96,7 +96,7 @@ CREATE TABLE IF NOT EXISTS gf_manual_revenues (
   notes TEXT,
   -- Metadata
   status VARCHAR(20) DEFAULT 'confirmed' CHECK (status IN ('pending', 'confirmed', 'cancelled')),
-  created_by UUID REFERENCES profiles(id) ON DELETE SET NULL,
+  created_by UUID REFERENCES users(id) ON DELETE SET NULL,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW(),
   -- Constraint: pelo menos um tenant
@@ -126,7 +126,7 @@ CREATE TABLE IF NOT EXISTS gf_budgets (
   alert_threshold_percent INT DEFAULT 80, -- Alerta quando atingir X%
   -- Metadata
   notes TEXT,
-  created_by UUID REFERENCES profiles(id) ON DELETE SET NULL,
+  created_by UUID REFERENCES users(id) ON DELETE SET NULL,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW(),
   -- Unicidade
@@ -191,7 +191,7 @@ CREATE TABLE IF NOT EXISTS gf_financial_alerts (
   -- Status
   is_read BOOLEAN DEFAULT false,
   is_dismissed BOOLEAN DEFAULT false,
-  dismissed_by UUID REFERENCES profiles(id),
+  dismissed_by UUID REFERENCES users(id),
   dismissed_at TIMESTAMPTZ,
   -- Metadata
   created_at TIMESTAMPTZ DEFAULT NOW()
