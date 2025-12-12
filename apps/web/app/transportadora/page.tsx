@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { KpiCardEnhanced } from "@/components/transportadora/kpi-card-enhanced"
+import { KpiCard } from "@/components/kpi-card"
 import { DataTable } from "@/components/transportadora/data-table"
 import { QuickActions } from "@/components/transportadora/quick-actions"
 import { RecentActivities } from "@/components/transportadora/recent-activities"
@@ -28,14 +28,17 @@ const FleetMap = dynamic(
     ssr: false
   }
 )
-import { 
-  Truck, 
-  Map, 
-  Users, 
+import {
+  Truck,
+  Map,
+  Users,
   Navigation,
   AlertCircle,
   Calendar,
-  DollarSign
+  DollarSign,
+  ArrowUpRight,
+  ArrowDownRight,
+  Minus
 } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
@@ -67,7 +70,7 @@ export default function TransportadoraDashboard() {
             if (meResponse.ok) {
               const meData = await meResponse.json()
               console.log('✅ [Transportadora] Resposta da API /api/auth/me:', { success: meData.success, hasUser: !!meData.user, role: meData.user?.role })
-              
+
               if (meData.success && meData.user && (meData.user.role === 'transportadora' || meData.user.role === 'admin')) {
                 console.log('✅ [Transportadora] Usuário transportadora autenticado via API /api/auth/me, definindo usuário...')
                 setUser(meData.user)
@@ -93,7 +96,7 @@ export default function TransportadoraDashboard() {
           if (sessionError) {
             console.error('Erro ao verificar sessão Supabase:', sessionError)
           }
-          
+
           if (session) {
             console.log('✅ Sessão Supabase encontrada, buscando dados do usuário')
             const { data, error: dbError } = await supabase
@@ -291,7 +294,7 @@ export default function TransportadoraDashboard() {
       const fleetData = (vehicles || []).map((vehicle: any) => {
         const bus = (mapData as any)?.buses?.find((b: any) => b.vehicle_id === vehicle.id)
         const garage = (mapData as any)?.garages?.find((g: any) => g.vehicle_id === vehicle.id)
-        
+
         if (bus) {
           return {
             id: vehicle.id,
@@ -303,7 +306,7 @@ export default function TransportadoraDashboard() {
             lng: bus.lng,
             passengerCount: bus.passenger_count || 0,
             capacity: bus.capacity || vehicle.capacity || 0,
-            lastUpdate: bus.last_update ? 
+            lastUpdate: bus.last_update ?
               new Date(bus.last_update).toLocaleString('pt-BR') : 'N/A'
           }
         } else if (garage) {
@@ -317,7 +320,7 @@ export default function TransportadoraDashboard() {
             lng: garage.last_position?.lng,
             passengerCount: 0,
             capacity: vehicle.capacity || 0,
-            lastUpdate: garage.last_position?.timestamp ? 
+            lastUpdate: garage.last_position?.timestamp ?
               new Date(garage.last_position.timestamp).toLocaleString('pt-BR') : 'N/A'
           }
         } else {
@@ -337,7 +340,7 @@ export default function TransportadoraDashboard() {
       })
 
       setFleet(fleetData)
-      
+
       // Carregar motoristas
       const { data: driversData } = await supabase
         .from('users')
@@ -383,7 +386,7 @@ export default function TransportadoraDashboard() {
       currentMonthStart.setHours(0, 0, 0, 0)
       const currentMonthEnd = new Date(currentMonthStart)
       currentMonthEnd.setMonth(currentMonthEnd.getMonth() + 1)
-      
+
       const { data: vehicleCosts } = await supabase
         .from('v_carrier_vehicle_costs_summary')
         .select('total_cost_brl')
@@ -405,7 +408,7 @@ export default function TransportadoraDashboard() {
         .eq('transportadora_id', transportadoraId)
 
       const routeIds = routes?.map((r: any) => r.id) || []
-      
+
       // Buscar total de viagens do mês (já temos currentMonthStart definido acima)
       let tripsCount = 0
       if (routeIds.length > 0) {
@@ -426,7 +429,7 @@ export default function TransportadoraDashboard() {
       // Atualizar KPIs
       const onRouteCount = fleetData.filter((v: any) => v.status === 'on-route').length
       const criticalAlertsCount = alerts?.filter((a: any) => a.alert_level === 'critical' || a.alert_level === 'expired').length || 0
-      
+
       const newKpis = {
         totalFleet: fleetData.length,
         onRoute: onRouteCount,
@@ -457,11 +460,11 @@ export default function TransportadoraDashboard() {
           .lt('month', previousMonthEnd.toISOString()),
         routeIds.length > 0
           ? supabase
-              .from('trips')
-              .select('*', { count: 'exact', head: true })
-              .in('route_id', routeIds)
-              .gte('created_at', previousMonthStart.toISOString())
-              .lt('created_at', previousMonthEnd.toISOString())
+            .from('trips')
+            .select('*', { count: 'exact', head: true })
+            .in('route_id', routeIds)
+            .gte('created_at', previousMonthStart.toISOString())
+            .lt('created_at', previousMonthEnd.toISOString())
           : Promise.resolve({ count: 0 })
       ])
 
@@ -579,7 +582,7 @@ export default function TransportadoraDashboard() {
                 <SelectItem value="custom">{t('transportadora', 'period_custom')}</SelectItem>
               </SelectContent>
             </Select>
-            <Button 
+            <Button
               className="flex-shrink-0 w-full sm:w-auto min-h-[44px] touch-manipulation"
               onClick={() => router.push("/transportadora/relatorios")}
             >
@@ -594,33 +597,24 @@ export default function TransportadoraDashboard() {
           "grid gap-3 sm:gap-4",
           isMobile ? "grid-cols-1" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
         )}>
-          <KpiCardEnhanced
+          <KpiCard
             icon={Truck}
             label={t('transportadora', 'kpi_total_fleet')}
-            value={kpis.totalFleet}
-            previousValue={previousKpis.totalFleet}
-            formatValue={(v) => v.toString()}
-            iconColor="var(--brand)"
-            iconBgColor="var(--brand-light)"
+            value={kpis.totalFleet.toString()}
+            trend={previousKpis.totalFleet > 0 ? Math.round(((kpis.totalFleet - previousKpis.totalFleet) / previousKpis.totalFleet) * 100) : 0}
             onClick={() => router.push('/transportadora/veiculos')}
           />
-          <KpiCardEnhanced
+          <KpiCard
             icon={Navigation}
             label={t('transportadora', 'kpi_on_route')}
-            value={kpis.onRoute}
-            previousValue={previousKpis.onRoute}
-            formatValue={(v) => v.toString()}
-            iconColor="var(--accent)"
-            iconBgColor="var(--accent-light)"
+            value={kpis.onRoute.toString()}
+            trend={previousKpis.onRoute > 0 ? Math.round(((kpis.onRoute - previousKpis.onRoute) / previousKpis.onRoute) * 100) : 0}
           />
-          <KpiCardEnhanced
+          <KpiCard
             icon={Users}
             label={t('transportadora', 'kpi_active_drivers')}
-            value={kpis.activeDrivers}
-            previousValue={previousKpis.activeDrivers}
-            formatValue={(v) => v.toString()}
-            iconColor="#10B981"
-            iconBgColor="rgba(16, 185, 129, 0.1)"
+            value={kpis.activeDrivers.toString()}
+            trend={previousKpis.activeDrivers > 0 ? Math.round(((kpis.activeDrivers - previousKpis.activeDrivers) / previousKpis.activeDrivers) * 100) : 0}
             onClick={() => {
               try {
                 router.push('/transportadora/motoristas')
@@ -630,14 +624,11 @@ export default function TransportadoraDashboard() {
               }
             }}
           />
-          <KpiCardEnhanced
+          <KpiCard
             icon={AlertCircle}
             label={t('transportadora', 'kpi_critical_alerts')}
-            value={kpis.criticalAlerts}
-            previousValue={previousKpis.criticalAlerts}
-            formatValue={(v) => v.toString()}
-            iconColor="#EF4444"
-            iconBgColor="rgba(239, 68, 68, 0.1)"
+            value={kpis.criticalAlerts.toString()}
+            trend={previousKpis.criticalAlerts > 0 ? Math.round(((kpis.criticalAlerts - previousKpis.criticalAlerts) / previousKpis.criticalAlerts) * 100) : 0}
             onClick={() => {
               try {
                 router.push('/transportadora/alertas')
@@ -654,14 +645,11 @@ export default function TransportadoraDashboard() {
           "grid gap-3 sm:gap-4",
           isMobile ? "grid-cols-1" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
         )}>
-          <KpiCardEnhanced
+          <KpiCard
             icon={DollarSign}
             label={t('transportadora', 'kpi_monthly_costs')}
-            value={kpis.totalCostsThisMonth}
-            previousValue={previousKpis.totalCostsThisMonth}
-            formatValue={(v) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 0 }).format(v)}
-            iconColor="#9333EA"
-            iconBgColor="rgba(147, 51, 234, 0.1)"
+            value={new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 0 }).format(kpis.totalCostsThisMonth)}
+            trend={previousKpis.totalCostsThisMonth > 0 ? Math.round(((kpis.totalCostsThisMonth - previousKpis.totalCostsThisMonth) / previousKpis.totalCostsThisMonth) * 100) : 0}
             onClick={() => {
               try {
                 router.push('/transportadora/custos')
@@ -671,23 +659,17 @@ export default function TransportadoraDashboard() {
               }
             }}
           />
-          <KpiCardEnhanced
+          <KpiCard
             icon={Navigation}
             label={t('transportadora', 'kpi_monthly_trips')}
-            value={kpis.totalTrips}
-            previousValue={previousKpis.totalTrips}
-            formatValue={(v) => v.toString()}
-            iconColor="#3B82F6"
-            iconBgColor="rgba(59, 130, 246, 0.1)"
+            value={kpis.totalTrips.toString()}
+            trend={previousKpis.totalTrips > 0 ? Math.round(((kpis.totalTrips - previousKpis.totalTrips) / previousKpis.totalTrips) * 100) : 0}
           />
-          <KpiCardEnhanced
+          <KpiCard
             icon={AlertCircle}
             label={t('transportadora', 'kpi_expiring_documents')}
-            value={kpis.delayed}
-            previousValue={previousKpis.delayed}
-            formatValue={(v) => v.toString()}
-            iconColor="#F59E0B"
-            iconBgColor="rgba(245, 158, 11, 0.1)"
+            value={kpis.delayed.toString()}
+            trend={previousKpis.delayed > 0 ? Math.round(((kpis.delayed - previousKpis.delayed) / previousKpis.delayed) * 100) : 0}
             hint={t('transportadora', 'hint_click_details')}
             onClick={() => {
               try {
@@ -715,26 +697,26 @@ export default function TransportadoraDashboard() {
           >
             <LineChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-              <XAxis 
-                dataKey="hora" 
+              <XAxis
+                dataKey="hora"
                 stroke="var(--ink-muted)"
                 style={{ fontSize: '12px' }}
               />
-              <YAxis 
+              <YAxis
                 stroke="var(--ink-muted)"
                 style={{ fontSize: '12px' }}
               />
-              <Tooltip 
-                contentStyle={{ 
-                  backgroundColor: 'var(--bg)', 
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: 'var(--bg)',
                   border: '1px solid var(--border)',
                   borderRadius: '8px'
                 }}
               />
-              <Line 
-                type="monotone" 
-                dataKey="emRota" 
-                stroke="var(--brand)" 
+              <Line
+                type="monotone"
+                dataKey="emRota"
+                stroke="var(--brand)"
                 strokeWidth={2}
                 dot={{ fill: 'var(--brand)', r: 4 }}
                 activeDot={{ r: 6 }}
@@ -787,21 +769,21 @@ export default function TransportadoraDashboard() {
           >
             <BarChart data={topDrivers}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-              <XAxis 
-                dataKey="name" 
+              <XAxis
+                dataKey="name"
                 stroke="var(--ink-muted)"
                 style={{ fontSize: '12px' }}
                 angle={-45}
                 textAnchor="end"
                 height={80}
               />
-              <YAxis 
+              <YAxis
                 stroke="var(--ink-muted)"
                 style={{ fontSize: '12px' }}
               />
-              <Tooltip 
-                contentStyle={{ 
-                  backgroundColor: 'var(--bg)', 
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: 'var(--bg)',
                   border: '1px solid var(--border)',
                   borderRadius: '8px'
                 }}
@@ -827,9 +809,9 @@ export default function TransportadoraDashboard() {
                   </CardTitle>
                   <p className="text-xs sm:text-sm text-[var(--ink-muted)]">{t('transportadora', 'fleet_map_subtitle')}</p>
                 </div>
-                <Button 
-                  size="sm" 
-                  variant="outline" 
+                <Button
+                  size="sm"
+                  variant="outline"
                   className="flex-shrink-0 w-full sm:w-auto min-h-[44px] touch-manipulation"
                   onClick={() => router.push('/transportadora/mapa')}
                 >
@@ -843,7 +825,7 @@ export default function TransportadoraDashboard() {
                 isMobile ? "h-64" : "h-48 sm:h-64 md:h-80 lg:h-96"
               )}>
                 <LazyWrapper>
-                  <FleetMap 
+                  <FleetMap
                     transportadoraId={userData?.transportadora_id}
                   />
                 </LazyWrapper>
@@ -882,9 +864,9 @@ export default function TransportadoraDashboard() {
                   </CardTitle>
                   <p className="text-xs sm:text-sm text-[var(--ink-muted)]">{t('transportadora', 'active_drivers_subtitle')}</p>
                 </div>
-                <Button 
-                  size="sm" 
-                  variant="outline" 
+                <Button
+                  size="sm"
+                  variant="outline"
                   className="flex-shrink-0 w-full sm:w-auto min-h-[44px] touch-manipulation"
                   onClick={(e) => {
                     console.log('🔵 [DEBUG] Button Ver todos motoristas clicked', e)
@@ -966,12 +948,12 @@ export default function TransportadoraDashboard() {
                   render: (value) => (
                     <Badge variant={
                       value === "on-route" ? "default" :
-                      value === "available" ? "secondary" :
-                      "destructive"
+                        value === "available" ? "secondary" :
+                          "destructive"
                     } className="text-xs">
                       {value === "on-route" ? t('transportadora', 'status_on_route') :
-                       value === "available" ? t('transportadora', 'status_available') : 
-                       value === "delayed" ? t('transportadora', 'status_delayed') : t('transportadora', 'status_inactive')}
+                        value === "available" ? t('transportadora', 'status_available') :
+                          value === "delayed" ? t('transportadora', 'status_delayed') : t('transportadora', 'status_inactive')}
                     </Badge>
                   )
                 },

@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card"
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
-import { EmpresaKPICards } from "@/components/empresa/empresa-kpi-cards"
+
 import { ControlTowerCards } from "@/components/empresa/control-tower-cards"
 import { useEmpresaTenant } from "@/components/providers/empresa-tenant-provider"
 import { DashboardSkeleton } from "@/components/empresa/dashboard-skeleton"
@@ -14,9 +14,9 @@ import { DashboardCharts } from "@/components/empresa/dashboard-charts"
 import { PeriodFilter, type PeriodFilter as PeriodFilterType } from "@/components/empresa/period-filter"
 import { useEmpresaKPIs, useControlTower } from "@/hooks/use-empresa-data"
 import { useRealtimeKPIs, useRealtimeAlerts } from "@/hooks/use-realtime-updates"
-import { KPICardEnhanced } from "@/components/empresa/dashboard/kpi-card-enhanced"
+import { KpiCard } from "@/components/kpi-card"
 import { ControlTowerVisual } from "@/components/empresa/dashboard/control-tower-visual"
-import { MapPin, Clock, AlertTriangle, TrendingUp, DollarSign, CheckCircle } from "lucide-react"
+import { MapPin, Clock, AlertTriangle, TrendingUp, DollarSign, CheckCircle, ArrowUpRight, ArrowDownRight, Minus } from "lucide-react"
 import { useMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
 import { ResponsiveChart } from "@/components/shared/responsive-chart"
@@ -208,63 +208,42 @@ export default function EmpresaDashboard() {
           "grid gap-4",
           isMobile ? "grid-cols-1" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
         )}>
-          <KPICardEnhanced
+          <KpiCard
             label="Viagens Hoje"
-            value={kpis.trips_today}
+            value={kpis.trips_today.toString()}
             icon={MapPin}
-            color="text-blue-600"
-            bgColor="bg-blue-50"
-            delay={0.1}
           />
-          <KPICardEnhanced
+          <KpiCard
             label="Em Andamento"
-            value={kpis.trips_in_progress}
+            value={kpis.trips_in_progress.toString()}
             icon={Clock}
-            color="text-orange-600"
-            bgColor="bg-orange-50"
-            delay={0.2}
           />
-          <KPICardEnhanced
+          <KpiCard
             label="Concluídas"
-            value={kpis.trips_completed}
+            value={kpis.trips_completed.toString()}
             icon={CheckCircle}
-            color="text-green-600"
-            bgColor="bg-green-50"
-            delay={0.3}
           />
-          <KPICardEnhanced
+          <KpiCard
             label="Atrasos > 5min"
-            value={kpis.delays_over_5min}
+            value={kpis.delays_over_5min.toString()}
             icon={AlertTriangle}
-            color="text-red-600"
-            bgColor="bg-red-50"
-            delay={0.4}
           />
-          <KPICardEnhanced
+          <KpiCard
             label="Ocupação Média"
             value={`${(kpis.avg_occupancy * 100).toFixed(1)}%`}
             icon={TrendingUp}
-            color="text-purple-600"
-            bgColor="bg-purple-50"
-            delay={0.5}
           />
-          <KPICardEnhanced
+          <KpiCard
             label="SLA D+0"
             value={`${kpis.sla_d0.toFixed(1)}%`}
             icon={CheckCircle}
-            color="text-indigo-600"
-            bgColor="bg-indigo-50"
-            subtitle="GOLF FOX → Empresa"
-            delay={0.6}
+            hint="GOLF FOX → Empresa"
           />
-          <KPICardEnhanced
+          <KpiCard
             label="Custo Diário"
             value={new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(kpis.daily_cost || 0)}
             icon={DollarSign}
-            color="text-emerald-600"
-            bgColor="bg-emerald-50"
-            subtitle="Faturado GOLF FOX"
-            delay={0.7}
+            hint="Faturado GOLF FOX"
           />
         </div>
 

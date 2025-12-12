@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import "./mobile-optimizations.css";
-import { Toaster } from "react-hot-toast";
+import { ToasterProvider } from "@/components/providers/toaster-provider";
 import { WebVitalsInit } from "@/components/web-vitals-init";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { ReactQueryProvider } from "@/lib/react-query-provider";
@@ -73,7 +73,7 @@ export default function RootLayout({
             <ReactQueryProvider>
               <WebVitalsInit />
               {children}
-              <Toaster position="top-right" />
+              <ToasterProvider />
               {/* Analytics e SpeedInsights desabilitados temporariamente - incompatibilidade com Next.js 16
               <Analytics />
               <SpeedInsights />

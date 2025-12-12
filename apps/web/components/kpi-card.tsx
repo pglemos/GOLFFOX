@@ -1,8 +1,10 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { type LucideIcon } from "lucide-react"
+import { type LucideIcon, ArrowUpRight, ArrowDownRight, Minus } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { Card } from "@/components/ui/card"
+import { Skeleton } from "@/components/ui/skeleton"
 
 interface KpiCardProps {
   icon: LucideIcon
@@ -10,63 +12,94 @@ interface KpiCardProps {
   value: string | number
   hint?: string
   trend?: number
+  trendLabel?: string
+  loading?: boolean
   className?: string
+  onClick?: () => void
 }
 
-export function KpiCard({ icon: Icon, label, value, hint, trend, className }: KpiCardProps) {
+export function KpiCard({
+  icon: Icon,
+  label,
+  value,
+  hint,
+  trend,
+  trendLabel,
+  loading = false,
+  className,
+  onClick
+}: KpiCardProps) {
+
+  if (loading) {
+    return (
+      <Card variant="premium" className={cn("p-6 h-full flex flex-col justify-between", className)}>
+        <div className="flex items-start justify-between mb-4">
+          <div className="p-3 rounded-xl bg-muted animate-pulse w-12 h-12" />
+          <Skeleton className="h-6 w-16 rounded-full" />
+        </div>
+        <div className="space-y-2">
+          <Skeleton className="h-4 w-24" />
+          <Skeleton className="h-8 w-32" />
+        </div>
+      </Card>
+    )
+  }
+
+  const isPositive = trend !== undefined && trend > 0
+  const isNegative = trend !== undefined && trend < 0
+  const isNeutral = trend !== undefined && trend === 0
+
   return (
     <motion.div
-      layout
-      whileHover={{ scale: 1.02, y: -4 }}
-      transition={{ duration: 0.2, ease: "easeOut" }}
-      className="group cursor-pointer"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+      whileHover={onClick ? { scale: 1.02, y: -4 } : undefined}
+      onClick={onClick}
+      className={cn(onClick && "cursor-pointer")}
     >
-      <div className={cn(
-        "kpi-card relative overflow-hidden",
-        "hover:border-[var(--brand)]/30",
-        className
-      )}>
-        {/* Background gradient sutil no hover */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[var(--brand)]/0 via-[var(--brand)]/0 to-[var(--brand)]/0 group-hover:from-[var(--brand)]/5 group-hover:via-[var(--brand)]/5 group-hover:to-[var(--brand)]/5 transition-all duration-300" />
-        
-        <div className="relative p-6">
-          <div className="flex items-start justify-between gap-3">
-            <div className="flex items-center gap-4 flex-1">
-              {/* Icon Container */}
-              <div className="p-3 rounded-[var(--radius-lg)] bg-[var(--brand-light)] group-hover:bg-[var(--brand)] transition-colors duration-200">
-                <Icon className="w-5 h-5 text-[var(--brand)] group-hover:text-white transition-colors duration-200" />
-              </div>
-              
-              {/* Content */}
-              <div className="flex-1 min-w-0">
-                <p className="text-sm text-[var(--ink-muted)] mb-2 font-medium">
-                  {label}
-                </p>
-                <p className="text-3xl font-bold tabular-nums text-[var(--ink-strong)] truncate">
-                  {value}
-                </p>
-                {hint && (
-                  <p className="text-xs text-[var(--ink-muted)] mt-1.5">
-                    {hint}
-                  </p>
-                )}
-              </div>
+      <Card variant="premium" className={cn("p-6 h-full relative overflow-hidden group", className)}>
+        {/* Background Decorative Gradient */}
+        <div className="absolute top-0 right-0 w-32 h-32 bg-[var(--brand)]/5 rounded-full blur-3xl -mr-16 -mt-16 transition-all duration-500 group-hover:bg-[var(--brand)]/10" />
+
+        <div className="relative flex flex-col h-full justify-between">
+          <div className="flex items-start justify-between mb-4">
+            {/* Icon Box */}
+            <div className="p-3 rounded-xl bg-[var(--brand-light)] border border-[var(--brand)]/10 group-hover:border-[var(--brand)]/30 transition-colors duration-300">
+              <Icon className="w-6 h-6 text-[var(--brand)]" />
             </div>
-            
+
             {/* Trend Badge */}
             {trend !== undefined && (
               <div className={cn(
-                "px-2 py-1 rounded-full text-xs font-semibold flex-shrink-0",
-                trend >= 0 
-                  ? "bg-[var(--success-light)] text-[var(--success)]" 
-                  : "bg-[var(--error-light)] text-[var(--error)]"
+                "flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold backdrop-blur-sm border",
+                isPositive && "bg-[var(--success-light)] text-[var(--success)] border-[var(--success)]/20",
+                isNegative && "bg-[var(--error-light)] text-[var(--error)] border-[var(--error)]/20",
+                isNeutral && "bg-[var(--muted)] text-[var(--muted-foreground)] border-[var(--border)]"
               )}>
-                {trend >= 0 ? '↑' : '↓'} {Math.abs(trend)}%
+                {isPositive && <ArrowUpRight className="w-3 h-3" />}
+                {isNegative && <ArrowDownRight className="w-3 h-3" />}
+                {isNeutral && <Minus className="w-3 h-3" />}
+                <span>{Math.abs(trend)}%</span>
               </div>
             )}
           </div>
+
+          <div>
+            <h3 className="text-sm font-medium text-[var(--ink-muted)] mb-1">{label}</h3>
+            <div className="flex items-baseline gap-2">
+              <span className="text-3xl font-bold text-[var(--ink-strong)] tracking-tight">
+                {value}
+              </span>
+            </div>
+            {(hint || trendLabel) && (
+              <p className="text-xs text-[var(--ink-light)] mt-2 flex items-center gap-1">
+                {hint || trendLabel}
+              </p>
+            )}
+          </div>
         </div>
-      </div>
+      </Card>
     </motion.div>
   )
 }
