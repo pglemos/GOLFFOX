@@ -2,7 +2,6 @@
 
 import * as React from "react"
 import * as TabsPrimitive from "@radix-ui/react-tabs"
-import { motion } from "framer-motion"
 
 import { cn } from "@/lib/utils"
 
@@ -15,12 +14,8 @@ const TabsList = React.forwardRef<
   <TabsPrimitive.List
     ref={ref}
     className={cn(
-      "inline-flex h-12 items-center justify-start rounded-xl bg-gradient-to-br from-[var(--bg-soft)] to-[var(--bg)] p-1.5 text-[var(--ink-muted)]",
-      "w-full max-w-full overflow-x-auto gap-1 sm:gap-2",
-      "-mx-1 px-1 sm:mx-0 sm:px-1",
-      "scroll-smooth",
-      "border-2 border-[var(--border)] shadow-sm",
-      "backdrop-blur-sm",
+      "inline-flex h-10 items-center justify-start gap-1",
+      "w-full border-b border-[var(--border)]",
       className
     )}
     {...props}
@@ -32,39 +27,19 @@ const TabsTrigger = React.forwardRef<
   React.ElementRef<typeof TabsPrimitive.Trigger>,
   React.ComponentPropsWithoutRef<typeof TabsPrimitive.Trigger>
 >(({ className, ...props }, ref) => {
-  const [isActive, setIsActive] = React.useState(false)
-  
   return (
     <TabsPrimitive.Trigger
       ref={ref}
-      onMouseEnter={() => !isActive && setIsActive(false)}
       className={cn(
-        "relative inline-flex items-center justify-center whitespace-nowrap rounded-lg px-5 py-2.5 text-sm font-semibold",
-        "transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] focus-visible:ring-opacity-20",
+        "inline-flex items-center justify-center whitespace-nowrap px-4 py-2 text-sm font-medium",
+        "transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)]/20",
         "disabled:pointer-events-none disabled:opacity-50",
-        "data-[state=active]:text-[var(--brand)] data-[state=active]:bg-gradient-to-br data-[state=active]:from-white data-[state=active]:to-[var(--bg-soft)] dark:data-[state=active]:from-[var(--bg-elevated)] dark:data-[state=active]:to-[var(--bg)]",
-        "data-[state=active]:shadow-lg data-[state=active]:border data-[state=active]:border-[var(--brand)]/20",
-        "hover:text-[var(--ink-strong)] hover:bg-gradient-to-br hover:from-[var(--bg-hover)] hover:to-[var(--bg-soft)]",
-        "min-w-[120px] sm:min-w-[0] flex-shrink-0",
-        "group backdrop-blur-sm",
+        "text-[var(--ink-muted)] hover:text-[var(--ink)]",
+        "data-[state=active]:text-[var(--brand)] data-[state=active]:border-b-2 data-[state=active]:border-[var(--brand)] data-[state=active]:-mb-px",
         className
       )}
       {...props}
-    >
-      <span className="relative z-10">{props.children}</span>
-      {isActive && (
-        <motion.div
-          layoutId="activeTab"
-          className="absolute inset-0 rounded-lg bg-white dark:bg-[var(--bg-elevated)] shadow-md"
-          initial={false}
-          transition={{
-            type: "spring",
-            stiffness: 500,
-            damping: 30
-          }}
-        />
-      )}
-    </TabsPrimitive.Trigger>
+    />
   )
 })
 TabsTrigger.displayName = TabsPrimitive.Trigger.displayName
@@ -76,8 +51,7 @@ const TabsContent = React.forwardRef<
   <TabsPrimitive.Content
     ref={ref}
     className={cn(
-      "mt-4 ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] focus-visible:ring-opacity-20",
-      "animate-fade-in-up",
+      "mt-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)]/20",
       className
     )}
     {...props}
@@ -86,3 +60,4 @@ const TabsContent = React.forwardRef<
 TabsContent.displayName = TabsPrimitive.Content.displayName
 
 export { Tabs, TabsList, TabsTrigger, TabsContent }
+
