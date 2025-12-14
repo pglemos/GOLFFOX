@@ -23,10 +23,11 @@ export async function GET(request: NextRequest) {
     }
 
     const supabaseAdmin = getSupabaseAdmin()
-    
+
+    // Buscar veículos com relacionamento carriers via transportadora_id
     const { data, error } = await supabaseAdmin
       .from('vehicles')
-      .select('*, companies(id, name)')
+      .select('*, carriers:transportadora_id(id, name)')
       .order('created_at', { ascending: false })
 
     if (error) {
@@ -37,8 +38,15 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // Retornar array diretamente para compatibilidade
-    return NextResponse.json(data || [])
+    // Mapear para incluir carrier_name de forma plana
+    const vehiclesWithCarrier = (data || []).map((v: any) => ({
+      ...v,
+      carrier_name: v.carriers?.name || null,
+      carriers: undefined  // Remover objeto aninhado para manter resposta limpa
+    }))
+
+    // Retornar array com carrier_name mapeado
+    return NextResponse.json(vehiclesWithCarrier)
   } catch (error: any) {
     console.error('Erro ao listar veículos:', error)
     return NextResponse.json(
