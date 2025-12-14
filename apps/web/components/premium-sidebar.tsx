@@ -33,7 +33,14 @@ import {
   ChevronRight,
   Wrench,
   Award,
-  TrendingUp
+  TrendingUp,
+  MessageSquare,
+  Layers,
+  Activity,
+  PieChart,
+  Gauge,
+  UserCircle,
+  UsersRound
 } from "lucide-react"
 import { OperationalAlertsBadge } from "@/components/operational-alerts-badge"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
@@ -97,7 +104,7 @@ const adminMenuGroups: MenuGroup[] = [
         href: "/admin/transportadoras",
         children: [
           {
-            icon: Users,
+            icon: UserCircle,
             label: "Motoristas",
             href: "/admin/transportadoras/motoristas"
           },
@@ -114,7 +121,7 @@ const adminMenuGroups: MenuGroup[] = [
         href: "/admin/empresas",
         children: [
           {
-            icon: Users,
+            icon: UsersRound,
             label: "Funcionários",
             href: "/admin/empresas/funcionarios"
           }
@@ -148,7 +155,7 @@ const adminMenuGroups: MenuGroup[] = [
         href: "/admin/projecoes"
       },
       {
-        icon: BarChart3,
+        icon: PieChart,
         label: "Analytics",
         href: "/admin/analytics"
       },
@@ -163,12 +170,12 @@ const adminMenuGroups: MenuGroup[] = [
     label: "Sistema",
     items: [
       {
-        icon: BarChart3,
+        icon: Activity,
         label: "Monitoramento",
         href: "/admin/monitoramento"
       },
       {
-        icon: AlertTriangle,
+        icon: Layers,
         label: "Escalonamento",
         href: "/admin/escalonamento"
       }
@@ -272,7 +279,7 @@ const transportadoraMenuGroups: MenuGroup[] = [
             href: "/transportadora/motoristas/ranking"
           },
           {
-            icon: BarChart3,
+            icon: Gauge,
             label: "SLA",
             href: "/transportadora/motoristas/sla"
           }
@@ -305,7 +312,7 @@ const transportadoraMenuGroups: MenuGroup[] = [
         href: "/transportadora/receitas"
       },
       {
-        icon: BarChart3,
+        icon: PieChart,
         label: "Margens",
         href: "/transportadora/margens"
       }
@@ -320,7 +327,7 @@ const transportadoraMenuGroups: MenuGroup[] = [
         href: "/transportadora/relatorios"
       },
       {
-        icon: LayoutDashboard,
+        icon: MessageSquare,
         label: "Mensagens",
         href: "/transportadora/mensagens"
       }
