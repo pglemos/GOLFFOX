@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -129,6 +129,9 @@ export function CreateTransportadoraModal({ isOpen, onClose, onSave }: CreateTra
           <DialogTitle className="text-lg sm:text-2xl font-bold break-words">
             Criar Nova Transportadora
           </DialogTitle>
+          <DialogDescription className="text-sm text-muted-foreground">
+            Preencha os dados para cadastrar uma nova transportadora no sistema.
+          </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-6">

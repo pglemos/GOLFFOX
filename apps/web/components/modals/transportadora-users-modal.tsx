@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -112,6 +112,9 @@ export function TransportadoraUsersModal({ carrier, isOpen, onClose, onSave }: T
       <DialogContent className="w-[95vw] sm:w-[90vw] max-w-2xl max-h-[90vh] overflow-y-auto p-4 sm:p-6 mx-auto">
         <DialogHeader className="pb-4 sm:pb-6">
           <DialogTitle className="text-xl sm:text-2xl font-bold break-words">Usuários - {carrier.name}</DialogTitle>
+          <DialogDescription className="text-sm text-muted-foreground">
+            Gerencie os logins de acesso para esta transportadora.
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 sm:space-y-6">
