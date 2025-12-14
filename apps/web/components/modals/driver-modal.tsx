@@ -173,26 +173,18 @@ export function DriverModal({ driver, isOpen, onClose, onSave, carriers = [] }: 
         await auditLogs.update('driver', driver.id, { name: driverData.name, email: driverData.email })
       } else {
         // Criar motorista via API com Service Role (respeita RLS e políticas)
-        const resp = await fetch('/api/operador/create-employee', {
+        const resp = await fetch('/api/admin/drivers', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            email: driverData.email,
             name: driverData.name,
+            email: driverData.email,
             phone: driverData.phone,
-            role: 'driver',
             transportadora_id: formData.transportadora_id,
             cpf: formData.cpf,
-            rg: formData.rg,
             cnh: formData.cnh,
             cnh_category: formData.cnh_category,
-            address_zip_code: formData.address_zip_code,
-            address_street: formData.address_street,
-            address_number: formData.address_number,
-            address_complement: formData.address_complement,
-            address_neighborhood: formData.address_neighborhood,
-            address_city: formData.address_city,
-            address_state: formData.address_state,
+            is_active: true,
           })
         })
 
@@ -202,7 +194,7 @@ export function DriverModal({ driver, isOpen, onClose, onSave, carriers = [] }: 
           throw new Error(msg)
         }
 
-        const newDriverId = body.userId
+        const newDriverId = body.driver?.id || body.userId
         if (!newDriverId) {
           throw new Error('Falha ao obter ID do motorista criado')
         }

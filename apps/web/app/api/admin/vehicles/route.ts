@@ -10,6 +10,7 @@ const vehicleSchema = z.object({
   plate: z.string().min(1, 'Placa é obrigatória'),
   model: z.string().min(1, 'Modelo é obrigatório'),
   brand: z.string().optional().nullable(),
+  prefix: z.string().optional().nullable(),
   year: z.number().int().min(1900).max(2100).optional().nullable(),
   capacity: z.number().int().min(1).optional().nullable(),
   company_id: z.string().uuid().optional().nullable(),
@@ -135,6 +136,9 @@ export async function POST(request: NextRequest) {
     // Adicionar campos opcionais apenas se fornecidos
     if (validated.brand) {
       vehicleData.brand = validated.brand
+    }
+    if (validated.prefix) {
+      vehicleData.prefix = validated.prefix
     }
     if (validated.year) {
       vehicleData.year = validated.year
