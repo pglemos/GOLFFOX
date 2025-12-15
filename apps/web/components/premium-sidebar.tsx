@@ -1,8 +1,8 @@
 "use client"
 
 import React, { useEffect, useMemo } from "react"
-import { usePathname, useRouter } from "next/navigation"
-import Link from "next/link"
+import { usePathname, useRouter } from "@/lib/next-navigation"
+// Usar âncoras nativas para compatibilidade com Next.js canary
 import { useViewTransition } from "@/hooks/use-view-transition"
 import {
   Sidebar,
@@ -519,7 +519,7 @@ export function PremiumSidebar({
                           isActive={isActive}
                           tooltip={item.label}
                         >
-                          <Link
+                          <a
                             href={item.href}
                             onClick={(e) => {
                               e.preventDefault()
@@ -528,7 +528,7 @@ export function PremiumSidebar({
                           >
                             <Icon className="size-4" />
                             <span>{item.label}</span>
-                          </Link>
+                          </a>
                         </SidebarMenuButton>
                         {/* Badge */}
                         {item.badge && (
@@ -563,7 +563,7 @@ export function PremiumSidebar({
                                     isCollapsed && "justify-center px-2"
                                   )}
                                 >
-                                  <Link
+                                  <a
                                     href={child.href}
                                     onClick={(e) => {
                                       e.preventDefault()
@@ -572,7 +572,7 @@ export function PremiumSidebar({
                                   >
                                     <ChildIcon className="size-4" />
                                     {!isCollapsed && <span>{child.label}</span>}
-                                  </Link>
+                                  </a>
                                 </SidebarMenuButton>
                               </SidebarMenuItem>
                             )

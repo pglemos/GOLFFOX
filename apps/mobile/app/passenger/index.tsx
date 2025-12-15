@@ -37,7 +37,7 @@ export default function PassengerDashboard() {
             // Registrar cancelamento no Supabase
             // Utilizando alertsv2 como log operacional por enquanto
             await supabase.from('alertsv2').insert({
-                company_id: profile?.current_company_id,
+                company_id: profile?.company_id,
                 type: 'passenger_cancellation',
                 severity: 'info',
                 status: 'resolved',

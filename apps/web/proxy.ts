@@ -163,26 +163,57 @@ export const proxy = async (request: NextRequest) => {
   if (pathname.startsWith('/empresa') || pathname.startsWith('/admin') || pathname.startsWith('/transportadora')) {
     // Extrair access_token dos cookies
     const accessToken = extractAccessToken(request)
+    const sessionCookie = request.cookies.get('golffox-session')?.value
+    let cookieRole: string | null = null
+    if (sessionCookie) {
+      try {
+        const decoded = Buffer.from(sessionCookie, 'base64').toString('utf-8')
+        const session = JSON.parse(decoded)
+        cookieRole = session?.role || null
+      } catch {}
+    }
 
     if (!accessToken) {
-      if (isDevelopment) {
-        console.log('[MIDDLEWARE] Nenhum token encontrado, redirecionando para login')
+      // Em desenvolvimento, permitir acesso se cookie indicar role compatível com a rota
+      if (isDevelopment && cookieRole) {
+        const allowed =
+          (pathname.startsWith('/admin') && cookieRole === 'admin') ||
+          (pathname.startsWith('/empresa') && ['admin', 'empresa', 'operator'].includes(cookieRole)) ||
+          (pathname.startsWith('/transportadora') && ['admin', 'operador', 'carrier', 'transportadora'].includes(cookieRole))
+        if (allowed) {
+          return NextResponse.next()
+        }
+      } else {
+        if (isDevelopment) {
+          console.log('[MIDDLEWARE] Nenhum token encontrado, redirecionando para login')
+        }
+        const loginUrl = new URL('/', request.url)
+        loginUrl.searchParams.set('next', pathname)
+        return NextResponse.redirect(loginUrl)
       }
-      const loginUrl = new URL('/', request.url)
-      loginUrl.searchParams.set('next', pathname)
-      return NextResponse.redirect(loginUrl)
     }
 
     // Validar token com Supabase Auth
-    const isValid = await validateAccessToken(accessToken)
+    const isValid = accessToken ? await validateAccessToken(accessToken) : false
 
     if (!isValid) {
-      if (isDevelopment) {
-        console.log('[MIDDLEWARE] Token inválido, redirecionando para login')
+      // Em desenvolvimento, permitir acesso se cookie indicar role compatível com a rota
+      if (isDevelopment && cookieRole) {
+        const allowed =
+          (pathname.startsWith('/admin') && cookieRole === 'admin') ||
+          (pathname.startsWith('/empresa') && ['admin', 'empresa', 'operator'].includes(cookieRole)) ||
+          (pathname.startsWith('/transportadora') && ['admin', 'operador', 'carrier', 'transportadora'].includes(cookieRole))
+        if (allowed) {
+          return NextResponse.next()
+        }
+      } else {
+        if (isDevelopment) {
+          console.log('[MIDDLEWARE] Token inválido, redirecionando para login')
+        }
+        const loginUrl = new URL('/', request.url)
+        loginUrl.searchParams.set('next', pathname)
+        return NextResponse.redirect(loginUrl)
       }
-      const loginUrl = new URL('/', request.url)
-      loginUrl.searchParams.set('next', pathname)
-      return NextResponse.redirect(loginUrl)
     }
   }
 
@@ -197,7 +228,63 @@ export const proxy = async (request: NextRequest) => {
   // Não interferir na raiz para evitar loops de redirecionamento
   // A página de login verifica o cookie golffox-session e redireciona apropriadamente
   if (pathname === '/') {
-    // Não fazer nada na raiz - deixar a página de login gerenciar
+    const sessionCookie = request.cookies.get('golffox-session')?.value
+    const nextParamRaw = request.nextUrl.searchParams.get('next')
+
+    const sanitizePath = (raw: string | null, base: string): string | null => {
+      if (!raw) return null
+      try {
+        const decoded = decodeURIComponent(raw)
+        if (/^https?:\/\//i.test(decoded)) return null
+        if (!decoded.startsWith('/')) return null
+        const url = new URL(decoded, base)
+        url.searchParams.delete('company')
+        return url.pathname
+      } catch {
+        return null
+      }
+    }
+    const isAllowedForRole = (role: string, path: string): boolean => {
+      if (path.startsWith('/admin')) return role === 'admin'
+      if (path.startsWith('/empresa')) return ['admin', 'empresa', 'operator'].includes(role)
+      if (path.startsWith('/transportadora')) return ['admin', 'operador', 'carrier', 'transportadora'].includes(role)
+      return true
+    }
+
+    let role: string | null = null
+    let token: string | null = null
+
+    if (sessionCookie) {
+      try {
+        const decoded = Buffer.from(sessionCookie, 'base64').toString('utf-8')
+        const session = JSON.parse(decoded)
+        token = session?.access_token || session?.accessToken || null
+        role = session?.role || null
+      } catch {}
+    }
+
+    const safeNext = sanitizePath(nextParamRaw, request.url)
+
+    if (safeNext && role && isAllowedForRole(role, safeNext)) {
+      const url = new URL(safeNext, request.url)
+      return NextResponse.redirect(url)
+    }
+
+    if (role) {
+      // Em desenvolvimento, redirecionar mesmo sem validar token
+      if (isDevelopment || (token && await validateAccessToken(token))) {
+        let target: string | null = null
+        if (role === 'admin') target = '/admin'
+        else if (role === 'empresa' || role === 'operator') target = '/empresa'
+        else if (role === 'operador' || role === 'transportadora' || role === 'carrier') target = '/transportadora'
+        else target = null
+        if (target) {
+          const url = new URL(target, request.url)
+          return NextResponse.redirect(url)
+        }
+      }
+    }
+
     return NextResponse.next()
   }
 

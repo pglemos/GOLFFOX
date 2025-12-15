@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react"
 // Substituir Link por <a> para evitar erro de export do next/link
-import { useRouter, usePathname } from "next/navigation"
+import { useRouter, usePathname } from "@/lib/next-navigation"
 import {
   Search,
   Settings2,

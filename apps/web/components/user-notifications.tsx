@@ -37,7 +37,7 @@ export function UserNotifications() {
             const { data: { user } } = await supabase.auth.getUser()
             if (!user) return []
 
-            const { data, error } = await supabase
+            const { data, error } = await (supabase as any)
                 .from('gf_notifications')
                 .select('*')
                 .eq('user_id', user.id)
@@ -45,7 +45,7 @@ export function UserNotifications() {
                 .limit(20)
 
             if (error) throw error
-            return data as Notification[]
+            return (data as unknown as Notification[]) || []
         },
         // Refetch a cada 30s ou realtime
         refetchInterval: 30000
@@ -54,7 +54,7 @@ export function UserNotifications() {
     // Mutation para marcar como lido
     const markAsRead = useMutation({
         mutationFn: async (id: string) => {
-            await supabase.from('gf_notifications').update({ is_read: true }).eq('id', id)
+            await (supabase as any).from('gf_notifications').update({ is_read: true }).eq('id', id)
         },
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ['user-notifications'] })
     })
@@ -64,7 +64,7 @@ export function UserNotifications() {
         mutationFn: async () => {
             const { data: { user } } = await supabase.auth.getUser()
             if (!user) return
-            await supabase.from('gf_notifications').update({ is_read: true }).eq('user_id', user.id).eq('is_read', false)
+            await (supabase as any).from('gf_notifications').update({ is_read: true }).eq('user_id', user.id).eq('is_read', false)
         },
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ['user-notifications'] })
     })

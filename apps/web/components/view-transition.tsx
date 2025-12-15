@@ -7,7 +7,7 @@
 'use client'
 
 import { ReactNode, useCallback } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter } from '@/lib/next-navigation'
 import { useViewTransition, useViewTransitionsSupported } from '@/hooks/use-view-transition'
 
 interface ViewTransitionLinkProps {

@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react';
-import { View, StyleSheet, Dimensions } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { Text, Card, useTheme, ActivityIndicator } from 'react-native-paper';
-import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
-import { supabase } from '../../src/services/supabase';
 
 interface BusLocation {
     latitude: number;
@@ -15,7 +13,6 @@ export default function PassengerMapScreen() {
     const [isLoading, setIsLoading] = useState(true);
     const theme = useTheme();
 
-    // Mock da localização do ponto do passageiro
     const myStop = {
         latitude: -23.56,
         longitude: -46.65,
@@ -23,7 +20,6 @@ export default function PassengerMapScreen() {
     };
 
     useEffect(() => {
-        // Simular localização inicial do ônibus
         setBusLocation({
             latitude: -23.55,
             longitude: -46.64,
@@ -31,35 +27,9 @@ export default function PassengerMapScreen() {
         });
         setIsLoading(false);
 
-        // Inscrever para atualizações em tempo real
-        const channel = supabase
-            .channel('bus-location')
-            .on(
-                'postgres_changes',
-                {
-                    event: '*',
-                    schema: 'public',
-                    table: 'vehicle_locations',
-                    // filter: `route_id=eq.${selectedRouteId}`,
-                },
-                (payload) => {
-                    if (payload.new) {
-                        const loc = payload.new as any;
-                        setBusLocation({
-                            latitude: loc.latitude,
-                            longitude: loc.longitude,
-                            timestamp: loc.timestamp,
-                        });
-                    }
-                }
-            )
-            .subscribe();
-
-        // Simular atualizações a cada 5 segundos para demo
         const interval = setInterval(() => {
             setBusLocation((prev) => {
                 if (!prev) return null;
-                // Mover ônibus ligeiramente em direção ao ponto do passageiro
                 return {
                     latitude: prev.latitude + (myStop.latitude - prev.latitude) * 0.1,
                     longitude: prev.longitude + (myStop.longitude - prev.longitude) * 0.1,
@@ -68,57 +38,31 @@ export default function PassengerMapScreen() {
             });
         }, 5000);
 
-        return () => {
-            channel.unsubscribe();
-            clearInterval(interval);
-        };
+        return () => clearInterval(interval);
     }, []);
-
-    const initialRegion = {
-        latitude: myStop.latitude,
-        longitude: myStop.longitude,
-        latitudeDelta: 0.02,
-        longitudeDelta: 0.02,
-    };
 
     if (isLoading) {
         return (
             <View style={styles.loadingContainer}>
                 <ActivityIndicator size="large" color={theme.colors.primary} />
-                <Text>Carregando mapa...</Text>
+                <Text>Carregando...</Text>
             </View>
         );
     }
 
     return (
         <View style={styles.container}>
-            <MapView
-                style={styles.map}
-                provider={PROVIDER_GOOGLE}
-                initialRegion={initialRegion}
-                showsUserLocation
-                showsMyLocationButton
-            >
-                {/* Marcador do ponto do passageiro */}
-                <Marker
-                    coordinate={{ latitude: myStop.latitude, longitude: myStop.longitude }}
-                    title={myStop.name}
-                    description="Seu ponto de embarque"
-                    pinColor="#10B981"
-                />
+            <View style={styles.mapPlaceholder}>
+                <Text variant="headlineMedium">🗺️</Text>
+                <Text variant="titleMedium" style={styles.mapText}>Mapa de Rastreamento</Text>
+                <Text variant="bodySmall" style={styles.mapNote}>
+                    O mapa estará disponível na versão de produção.
+                </Text>
+                <Text variant="bodySmall" style={styles.mapNote}>
+                    (react-native-maps requer EAS Build)
+                </Text>
+            </View>
 
-                {/* Marcador do ônibus */}
-                {busLocation && (
-                    <Marker
-                        coordinate={{ latitude: busLocation.latitude, longitude: busLocation.longitude }}
-                        title="🚌 Ônibus"
-                        description="Posição em tempo real"
-                        pinColor={theme.colors.primary}
-                    />
-                )}
-            </MapView>
-
-            {/* Card de status */}
             <Card style={styles.statusCard}>
                 <Card.Content>
                     <View style={styles.statusRow}>
@@ -139,6 +83,18 @@ export default function PassengerMapScreen() {
                     </View>
                 </Card.Content>
             </Card>
+
+            <Card style={styles.infoCard}>
+                <Card.Content>
+                    <Text variant="titleMedium">📍 {myStop.name}</Text>
+                    <Text variant="bodySmall" style={styles.coordsText}>
+                        Lat: {busLocation?.latitude.toFixed(4)} | Lon: {busLocation?.longitude.toFixed(4)}
+                    </Text>
+                    <Text variant="bodySmall" style={styles.timestampText}>
+                        Atualização: {busLocation?.timestamp ? new Date(busLocation.timestamp).toLocaleTimeString('pt-BR') : '--'}
+                    </Text>
+                </Card.Content>
+            </Card>
         </View>
     );
 }
@@ -146,6 +102,7 @@ export default function PassengerMapScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        backgroundColor: '#F8FAFC',
     },
     loadingContainer: {
         flex: 1,
@@ -153,18 +110,27 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         gap: 16,
     },
-    map: {
+    mapPlaceholder: {
         flex: 1,
-        width: Dimensions.get('window').width,
-        height: Dimensions.get('window').height,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#E2E8F0',
+        margin: 16,
+        borderRadius: 16,
+    },
+    mapText: {
+        color: '#64748B',
+        marginTop: 16,
+        marginBottom: 8,
+    },
+    mapNote: {
+        color: '#94A3B8',
+        textAlign: 'center',
     },
     statusCard: {
-        position: 'absolute',
-        bottom: 24,
-        left: 16,
-        right: 16,
-        backgroundColor: 'rgba(255,255,255,0.95)',
-        borderRadius: 12,
+        marginHorizontal: 16,
+        marginBottom: 16,
+        backgroundColor: '#FFFFFF',
     },
     statusRow: {
         flexDirection: 'row',
@@ -191,5 +157,18 @@ const styles = StyleSheet.create({
     etaText: {
         color: '#3B82F6',
         fontWeight: 'bold',
+    },
+    infoCard: {
+        marginHorizontal: 16,
+        marginBottom: 16,
+        backgroundColor: '#FFFFFF',
+    },
+    coordsText: {
+        color: '#64748B',
+        marginTop: 8,
+    },
+    timestampText: {
+        color: '#94A3B8',
+        marginTop: 4,
     },
 });

@@ -87,9 +87,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setIsLoading(true);
         try {
             await signOut();
+        } catch (error) {
+            console.log('Logout completed with info:', error);
+        } finally {
+            // Sempre limpar estado local, mesmo se signOut falhar
             setSession(null);
             setProfile(null);
-        } finally {
             setIsLoading(false);
         }
     };

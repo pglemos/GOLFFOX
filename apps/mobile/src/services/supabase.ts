@@ -1,9 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 import * as SecureStore from 'expo-secure-store';
-import Constants from 'expo-constants';
 
-const supabaseUrl = Constants.expoConfig?.extra?.supabaseUrl || process.env.EXPO_PUBLIC_SUPABASE_URL || '';
-const supabaseAnonKey = Constants.expoConfig?.extra?.supabaseAnonKey || process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || '';
+const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL || '';
+const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || '';
 
 // Adaptador de storage para Expo SecureStore
 const ExpoSecureStoreAdapter = {
@@ -47,13 +46,13 @@ export interface UserProfile {
     role: UserRole;
     name?: string;
     company_id?: string;
-    carrier_id?: string;
 }
 
 export async function getUserProfile(userId: string): Promise<UserProfile | null> {
+    console.log('🔍 Buscando perfil para:', userId);
     const { data, error } = await supabase
         .from('users')
-        .select('id, email, role, name, company_id, carrier_id')
+        .select('id, email, role, name, company_id')
         .eq('id', userId)
         .single();
 
@@ -79,9 +78,17 @@ export async function signIn(email: string, password: string) {
 }
 
 export async function signOut() {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-        throw error;
+    try {
+        const { error } = await supabase.auth.signOut();
+        // Ignorar erro de sessão não existente - usuário já está deslogado
+        if (error && !error.message?.includes('session')) {
+            throw error;
+        }
+    } catch (error: any) {
+        // Ignorar AuthSessionMissingError - significa que não há sessão
+        if (!error?.message?.includes('Auth session missing')) {
+            console.error('Logout error:', error);
+        }
     }
 }
 

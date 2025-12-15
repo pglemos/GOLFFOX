@@ -4,7 +4,7 @@ import { Card, Text, Divider, useTheme, Chip, Avatar } from 'react-native-paper'
 import { useAuth } from '../../src/auth/AuthProvider';
 import { supabase } from '../../src/services/supabase';
 import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
+import { ptBR } from 'date-fns/locale/pt-BR';
 
 interface TripHistory {
     id: string;

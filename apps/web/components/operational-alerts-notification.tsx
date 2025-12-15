@@ -18,7 +18,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { getUnresolvedAlerts, resolveAlert, type OperationalAlert } from '@/lib/operational-alerts'
 import { supabase } from '@/lib/supabase'
-import { useRouter } from 'next/navigation'
+import { useRouter } from '@/lib/next-navigation'
 import { notifySuccess, notifyError } from '@/lib/toast'
 
 export function OperationalAlertsNotification() {

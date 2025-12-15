@@ -6,7 +6,7 @@
  */
 
 import { useCallback, useTransition } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter } from '@/lib/next-navigation'
 
 /**
  * Hook para navegação com View Transitions

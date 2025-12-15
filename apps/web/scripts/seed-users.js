@@ -44,28 +44,43 @@ const testUsers = [
     email: 'operator@test.com',
     password: DEFAULT_PASSWORD,
     name: 'Operador Teste',
-    role: 'operator',
+    role: 'operador',
     company_id: null // Será definido após criar empresa
   },
   {
     email: 'passenger@test.com',
     password: DEFAULT_PASSWORD,
     name: 'Passageiro Teste',
-    role: 'passenger',
+    role: 'passageiro',
+    company_id: null // Será definido após criar empresa
+  },
+  // Usuários para App Mobile
+  {
+    email: 'teste@motorista.com',
+    password: DEFAULT_PASSWORD,
+    name: 'Motorista Teste',
+    role: 'motorista',
+    company_id: null // Será definido após criar empresa/transportadora
+  },
+  {
+    email: 'teste@passageiro.com',
+    password: DEFAULT_PASSWORD,
+    name: 'Passageiro Mobile',
+    role: 'passageiro',
     company_id: null // Será definido após criar empresa
   }
 ]
 
 async function seedUsers() {
   console.log('🌱 Iniciando seed de usuários de teste...')
-  
+
   try {
     // Verificar se a tabela existe
     const { data: tableCheck, error: tableError } = await supabase
       .from('users')
       .select('id')
       .limit(1)
-    
+
     if (tableError) {
       if (tableError.message.includes('does not exist')) {
         console.error('❌ Tabela users não existe')
@@ -74,16 +89,16 @@ async function seedUsers() {
       }
       console.warn('⚠️ Aviso ao verificar tabela:', tableError.message)
     }
-    
+
     // Buscar empresa de teste (primeira empresa ativa)
     const { data: companies } = await supabase
       .from('companies')
       .select('id')
       .eq('is_active', true)
       .limit(1)
-    
+
     const companyId = companies && companies.length > 0 ? companies[0].id : null
-    
+
     if (companyId) {
       console.log(`✅ Empresa encontrada: ${companyId}`)
       // Atualizar company_id para operator e passenger
@@ -96,9 +111,9 @@ async function seedUsers() {
       console.warn('⚠️ Nenhuma empresa ativa encontrada')
       console.warn('   Execute seed-companies.js primeiro ou crie uma empresa manualmente')
     }
-    
+
     const results = []
-    
+
     for (const userData of testUsers) {
       try {
         // Verificar se usuário já existe no Supabase Auth
@@ -111,7 +126,7 @@ async function seedUsers() {
         } catch (listErr) {
           console.warn(`⚠️  Erro ao listar usuários: ${listErr.message}`)
         }
-        
+
         // Se usuário existe, tentar obter pelo email
         if (!existing) {
           try {
@@ -123,10 +138,10 @@ async function seedUsers() {
             // Usuário não existe, continuar para criação
           }
         }
-        
+
         if (existing) {
           console.log(`⏭️  Usuário já existe: ${userData.email}`)
-          
+
           // Atualizar perfil na tabela users
           const { error: updateError } = await supabase
             .from('users')
@@ -139,7 +154,7 @@ async function seedUsers() {
             }, {
               onConflict: 'id'
             })
-          
+
           if (updateError) {
             console.error(`   ⚠️  Erro ao atualizar perfil: ${updateError.message}`)
             // Não falhar se erro for de coluna não existente ou similar
@@ -151,7 +166,7 @@ async function seedUsers() {
           } else {
             console.log(`   ✅ Perfil atualizado na tabela users`)
           }
-          
+
           results.push({
             email: userData.email,
             status: 'exists',
@@ -160,11 +175,11 @@ async function seedUsers() {
           })
           continue
         }
-        
+
         // Tentar criar usuário no Supabase Auth
         let authData = null
         let authError = null
-        
+
         try {
           const createResult = await supabase.auth.admin.createUser({
             email: userData.email,
@@ -181,21 +196,21 @@ async function seedUsers() {
           authError = createException
           console.warn(`⚠️  Exceção ao criar usuário ${userData.email}:`, createException.message)
         }
-        
+
         if (authError) {
           // Se erro for de usuário já existe, tentar obter o usuário
-          const isAlreadyExistsError = 
-            authError.message?.includes('already registered') || 
+          const isAlreadyExistsError =
+            authError.message?.includes('already registered') ||
             authError.message?.includes('already exists') ||
             authError.message?.includes('User already registered') ||
             authError.message?.includes('Database error') // Pode ser erro genérico de banco
-          
+
           if (isAlreadyExistsError) {
             console.log(`⏭️  Usuário ${userData.email} pode já existir, tentando obter...`)
-            
+
             // Tentar múltiplas formas de obter o usuário
             let foundUser = null
-            
+
             // Método 1: getUserByEmail
             try {
               const { data: userByEmail, error: getError } = await supabase.auth.admin.getUserByEmail(userData.email)
@@ -206,7 +221,7 @@ async function seedUsers() {
             } catch (getErr) {
               // Ignorar erro
             }
-            
+
             // Método 2: listUsers e filtrar
             if (!foundUser) {
               try {
@@ -221,7 +236,7 @@ async function seedUsers() {
                 // Ignorar erro
               }
             }
-            
+
             if (foundUser) {
               // Atualizar perfil
               const { error: updateError } = await supabase
@@ -235,7 +250,7 @@ async function seedUsers() {
                 }, {
                   onConflict: 'id'
                 })
-              
+
               if (updateError) {
                 console.warn(`   ⚠️  Erro ao atualizar perfil: ${updateError.message}`)
                 // Se erro for de coluna não existente, não é crítico
@@ -245,7 +260,7 @@ async function seedUsers() {
               } else {
                 console.log(`   ✅ Perfil atualizado na tabela users`)
               }
-              
+
               results.push({
                 email: userData.email,
                 status: 'exists',
@@ -274,7 +289,7 @@ async function seedUsers() {
             continue
           }
         }
-        
+
         if (!authData || !authData.user) {
           console.error(`❌ Erro: dados de autenticação não retornados para ${userData.email}`)
           results.push({
@@ -284,7 +299,7 @@ async function seedUsers() {
           })
           continue
         }
-        
+
         // Criar perfil na tabela users
         const { error: profileError } = await supabase
           .from('users')
@@ -295,7 +310,7 @@ async function seedUsers() {
             role: userData.role,
             company_id: userData.company_id
           })
-        
+
         if (profileError) {
           console.error(`   ⚠️  Erro ao criar perfil: ${profileError.message}`)
           // Tentar deletar usuário do auth se perfil falhar
@@ -307,7 +322,7 @@ async function seedUsers() {
           })
           continue
         }
-        
+
         console.log(`✅ Usuário criado: ${userData.email} (${userData.role})`)
         results.push({
           email: userData.email,
@@ -315,7 +330,7 @@ async function seedUsers() {
           id: authData.user.id,
           userId: authData.user.id
         })
-        
+
       } catch (error) {
         console.error(`❌ Erro ao processar usuário ${userData.email}:`, error.message)
         results.push({
@@ -325,17 +340,17 @@ async function seedUsers() {
         })
       }
     }
-    
+
     // Resumo
     console.log('\n📊 Resumo do seed:')
     const created = results.filter(r => r.status === 'created').length
     const exists = results.filter(r => r.status === 'exists').length
     const errors = results.filter(r => r.status === 'error').length
-    
+
     console.log(`   • Criados: ${created}`)
     console.log(`   • Já existem: ${exists}`)
     console.log(`   • Erros: ${errors}`)
-    
+
     console.log('\n📋 Credenciais de teste:')
     testUsers.forEach(user => {
       const result = results.find(r => r.email === user.email)
@@ -343,7 +358,7 @@ async function seedUsers() {
         console.log(`   ${user.email} / ${user.password} (${user.role})`)
       }
     })
-    
+
     if (errors > 0) {
       console.log('\n⚠️ Seed concluído com erros')
       process.exit(1)
@@ -351,7 +366,7 @@ async function seedUsers() {
       console.log('\n✅ Seed concluído com sucesso!')
       process.exit(0)
     }
-    
+
   } catch (error) {
     console.error('❌ Erro inesperado:', error)
     process.exit(1)

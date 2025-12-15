@@ -59,7 +59,7 @@ export default function ReceitasPage() {
         if (!carrierId) return
         setLoading(true)
         try {
-            const { data, error } = await supabase
+            const { data, error } = await (supabase as any)
                 .from('gf_manual_revenues')
                 .select('*')
                 .eq('carrier_id', carrierId)
@@ -77,7 +77,7 @@ export default function ReceitasPage() {
     const handleSubmit = async () => {
         if (!carrierId) return
         try {
-            const { error } = await supabase.from('gf_manual_revenues').insert({
+            const { error } = await (supabase as any).from('gf_manual_revenues').insert({
                 carrier_id: carrierId,
                 description: formData.description,
                 amount: parseFloat(formData.amount),

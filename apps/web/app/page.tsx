@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState, useCallback, Suspense, useMemo, memo } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useRouter, useSearchParams } from "@/lib/next-navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -110,13 +110,6 @@ function LoginContent() {
   useEffect(() => {
     const nextParam = searchParams.get('next')
 
-    // Se há ?next= na URL, significa que o middleware redirecionou aqui
-    // Neste caso, NÃO verificar sessão para evitar loops
-    // O middleware já verificou e redirecionou, então apenas mostrar a página de login
-    if (nextParam) {
-      return
-    }
-
     // Evitar múltiplas verificações - verificar apenas uma vez
     if (sessionCheckRef.current) {
       return
@@ -133,8 +126,7 @@ function LoginContent() {
     // Timeout maior para garantir que a página seja renderizada primeiro em mobile
     const timeoutId = setTimeout(() => {
       try {
-        // Não verificar nextParam aqui pois já foi verificado acima
-        // Se chegou aqui, não há nextParam, então podemos verificar sessão normalmente
+        const rawNext = nextParam || null
 
         // ✅ Usar apenas verificação de cookie - não usar Supabase auth na página de login
         // para evitar conflitos e erros de logout automático
@@ -171,9 +163,7 @@ function LoginContent() {
 
           const userRole = userData.role || getUserRoleByEmail(userData.email || '')
 
-          // Não usar nextParam aqui pois já verificamos acima que não há nextParam
-          // Se houvesse nextParam, não teríamos chegado aqui
-          const safeNext = null
+          const safeNext = sanitizePath(rawNext)
 
           const isAllowedForRole = (role: string, path: string): boolean => {
             if (path.startsWith('/admin')) return role === 'admin'
@@ -750,9 +740,11 @@ function LoginContent() {
           // Definir flag para evitar interferência do useEffect
           (window as any).__golffox_redirecting = true
 
-          // Redirecionar IMEDIATAMENTE - sem esperar
-          // O cookie será enviado automaticamente na próxima requisição
-          window.location.href = redirectUrl
+          try {
+            router.replace(redirectUrl)
+          } catch {
+            window.location.assign(redirectUrl)
+          }
         } else {
           router.replace(redirectUrl)
         }

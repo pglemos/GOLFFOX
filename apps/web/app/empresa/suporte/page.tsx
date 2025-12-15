@@ -42,7 +42,22 @@ export default function EmpresaSuportePage() {
     }
 
     return (
-        <AppShell user={user ? { id: user.id, name: user.name || "Empresa", email: user.email, role: "empresa", avatar_url: user.avatar_url } : undefined} panel="empresa">
+        <AppShell
+            panel="empresa"
+            user={user ? {
+                id: user.id,
+                name: user.name || "Empresa",
+                email: user.email,
+                role: "empresa",
+                avatar_url: user.avatar_url
+            } : {
+                id: '',
+                name: 'Empresa',
+                email: '',
+                role: 'empresa',
+                avatar_url: undefined
+            }}
+        >
             <div className="space-y-6 max-w-2xl mx-auto">
                 <div>
                     <h1 className="text-3xl font-bold">Suporte e Feedback</h1>

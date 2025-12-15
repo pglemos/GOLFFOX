@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, memo, useMemo } from "react"
-import { usePathname } from "next/navigation"
+import { usePathname } from "@/lib/next-navigation"
 import { Topbar } from "./topbar"
 import { PremiumSidebar } from "./premium-sidebar"
 import { EnvVarsBanner } from "./env-vars-banner"

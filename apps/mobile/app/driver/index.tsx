@@ -1,23 +1,75 @@
-import { View, StyleSheet, ScrollView } from 'react-native';
-import { Card, Text, Button, Avatar, Divider, useTheme } from 'react-native-paper';
+import { useState, useEffect } from 'react';
+import { View, StyleSheet, ScrollView, Pressable } from 'react-native';
+import { Card, Text, Avatar, Chip, useTheme, IconButton, Divider } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../../src/auth/AuthProvider';
+import { LinearGradient } from 'expo-linear-gradient';
+
+interface Trip {
+    id: string;
+    code: string;
+    type: 'entrada' | 'saida';
+    shift: string;
+    departureTime: string;
+    arrivalTime: string;
+    origin: string;
+    destination: string;
+    originCity: string;
+    destinationCity: string;
+    isNext: boolean;
+}
+
+// Mock data - em produção viria do Supabase
+const mockTrips: Trip[] = [
+    {
+        id: '1',
+        code: 'GF-ESF-013',
+        type: 'entrada',
+        shift: 'Turno Manhã',
+        departureTime: '06:30',
+        arrivalTime: '07:45',
+        origin: 'Terminal Central',
+        destination: 'Empresa ABC',
+        originCity: 'Centro',
+        destinationCity: 'Distrito Industrial',
+        isNext: true,
+    },
+    {
+        id: '2',
+        code: 'GF-ST2-019',
+        type: 'saida',
+        shift: 'Turno Tarde',
+        departureTime: '17:00',
+        arrivalTime: '18:15',
+        origin: 'Empresa ABC',
+        destination: 'Terminal Central',
+        originCity: 'Distrito Industrial',
+        destinationCity: 'Centro',
+        isNext: false,
+    },
+    {
+        id: '3',
+        code: 'GF-ET6-001',
+        type: 'entrada',
+        shift: 'Turno Extra',
+        departureTime: '20:00',
+        arrivalTime: '21:00',
+        origin: 'Shopping',
+        destination: 'Condomínio Park',
+        originCity: 'Centro',
+        destinationCity: 'Zona Sul',
+        isNext: false,
+    },
+];
 
 export default function DriverDashboard() {
     const { profile, logout } = useAuth();
     const router = useRouter();
     const theme = useTheme();
+    const [activeTab, setActiveTab] = useState<'pending' | 'completed'>('pending');
 
-    const handleStartRoute = () => {
+    const handleStartTrip = (tripId: string) => {
         router.push('/driver/checklist');
-    };
-
-    const handleScan = () => {
-        router.push('/driver/scan');
-    };
-
-    const handleHistory = () => {
-        router.push('/driver/history');
     };
 
     const handleLogout = async () => {
@@ -25,152 +77,329 @@ export default function DriverDashboard() {
         router.replace('/login');
     };
 
-    return (
-        <ScrollView style={styles.container}>
-            {/* Header com perfil */}
-            <Card style={styles.profileCard}>
-                <Card.Content style={styles.profileContent}>
-                    <Avatar.Icon size={64} icon="account" style={{ backgroundColor: theme.colors.primary }} />
-                    <View style={styles.profileInfo}>
-                        <Text variant="titleLarge">{profile?.name || 'Motorista'}</Text>
-                        <Text variant="bodyMedium" style={styles.email}>{profile?.email}</Text>
+    const getGreeting = () => {
+        const hour = new Date().getHours();
+        if (hour < 12) return 'Bom dia';
+        if (hour < 18) return 'Boa tarde';
+        return 'Boa noite';
+    };
+
+    const renderTripCard = (trip: Trip) => (
+        <Pressable
+            key={trip.id}
+            onPress={() => handleStartTrip(trip.id)}
+            style={({ pressed }) => [
+                styles.tripCardWrapper,
+                pressed && { opacity: 0.9, transform: [{ scale: 0.98 }] }
+            ]}
+        >
+            {trip.isNext ? (
+                <LinearGradient
+                    colors={['#0D9488', '#14B8A6']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={styles.tripCardNext}
+                >
+                    <View style={styles.tripHeader}>
+                        <Text style={styles.tripShiftWhite}>
+                            {trip.shift} | {trip.type === 'entrada' ? 'Entrada' : 'Saída'} | {trip.code}
+                        </Text>
+                        <Chip
+                            mode="flat"
+                            compact
+                            style={styles.nextChip}
+                            textStyle={styles.nextChipText}
+                        >
+                            Próxima
+                        </Chip>
                     </View>
-                </Card.Content>
-            </Card>
 
-            {/* Status da Rota Atual */}
-            <Card style={styles.card}>
-                <Card.Content>
-                    <Text variant="titleMedium" style={styles.cardTitle}>📍 Status Atual</Text>
-                    <Divider style={styles.divider} />
-                    <Text variant="bodyLarge" style={styles.statusText}>
-                        Nenhuma rota ativa
-                    </Text>
-                    <Text variant="bodySmall" style={styles.statusSubtext}>
-                        Inicie uma nova rota para começar
-                    </Text>
-                </Card.Content>
-            </Card>
+                    <View style={styles.tripContent}>
+                        <View style={styles.tripTimeBlock}>
+                            <Text style={styles.tripTimeWhite}>{trip.departureTime}</Text>
+                            <Text style={styles.tripLocationWhite}>{trip.origin}</Text>
+                            <Text style={styles.tripCityWhite}>{trip.originCity}</Text>
+                        </View>
 
-            {/* Ações Principais */}
-            <View style={styles.actionsContainer}>
-                <Card style={styles.actionCard}>
-                    <Card.Content style={styles.actionContent}>
-                        <Avatar.Icon size={48} icon="clipboard-check" style={{ backgroundColor: '#10B981' }} />
-                        <Text variant="titleSmall" style={styles.actionTitle}>Iniciar Rota</Text>
+                        <View style={styles.tripArrowContainer}>
+                            <View style={styles.tripArrowCircle}>
+                                <Text style={styles.tripArrowText}>›</Text>
+                            </View>
+                        </View>
+
+                        <View style={[styles.tripTimeBlock, { alignItems: 'flex-end' }]}>
+                            <Text style={styles.tripTimeWhite}>{trip.arrivalTime}</Text>
+                            <Text style={styles.tripLocationWhite}>{trip.destination}</Text>
+                            <Text style={styles.tripCityWhite}>{trip.destinationCity}</Text>
+                        </View>
+                    </View>
+                </LinearGradient>
+            ) : (
+                <Card style={styles.tripCard}>
+                    <Card.Content>
+                        <View style={styles.tripHeader}>
+                            <Text style={styles.tripShift}>
+                                {trip.shift} | {trip.type === 'entrada' ? 'Entrada' : 'Saída'} | {trip.code}
+                            </Text>
+                        </View>
+
+                        <View style={styles.tripContent}>
+                            <View style={styles.tripTimeBlock}>
+                                <Text style={styles.tripTime}>{trip.departureTime}</Text>
+                                <Text style={styles.tripLocation}>{trip.origin}</Text>
+                                <Text style={styles.tripCity}>{trip.originCity}</Text>
+                            </View>
+
+                            <View style={styles.tripArrowContainer}>
+                                <View style={styles.tripArrowCircleLight}>
+                                    <Text style={styles.tripArrowTextLight}>›</Text>
+                                </View>
+                            </View>
+
+                            <View style={[styles.tripTimeBlock, { alignItems: 'flex-end' }]}>
+                                <Text style={styles.tripTime}>{trip.arrivalTime}</Text>
+                                <Text style={styles.tripLocation}>{trip.destination}</Text>
+                                <Text style={styles.tripCity}>{trip.destinationCity}</Text>
+                            </View>
+                        </View>
                     </Card.Content>
-                    <Card.Actions>
-                        <Button mode="contained" onPress={handleStartRoute} style={styles.actionButton}>
-                            Começar
-                        </Button>
-                    </Card.Actions>
                 </Card>
+            )}
+        </Pressable>
+    );
 
-                <Card style={styles.actionCard}>
-                    <Card.Content style={styles.actionContent}>
-                        <Avatar.Icon size={48} icon="qrcode-scan" style={{ backgroundColor: '#3B82F6' }} />
-                        <Text variant="titleSmall" style={styles.actionTitle}>Check-in/out</Text>
-                    </Card.Content>
-                    <Card.Actions>
-                        <Button mode="contained" onPress={handleScan} style={styles.actionButton}>
-                            Escanear
-                        </Button>
-                    </Card.Actions>
-                </Card>
+    return (
+        <View style={styles.container}>
+            {/* Header */}
+            <View style={styles.header}>
+                <View style={styles.headerContent}>
+                    <Avatar.Icon
+                        size={48}
+                        icon="bus"
+                        style={styles.avatar}
+                        color="#0D9488"
+                    />
+                    <View style={styles.headerText}>
+                        <Text style={styles.greeting}>{getGreeting()},</Text>
+                        <Text style={styles.driverName}>{profile?.name || 'Motorista'}</Text>
+                    </View>
+                </View>
+                <IconButton
+                    icon="logout"
+                    iconColor="#64748B"
+                    size={24}
+                    onPress={handleLogout}
+                />
             </View>
 
-            {/* Histórico */}
-            <Card style={styles.card}>
-                <Card.Content>
-                    <Text variant="titleMedium" style={styles.cardTitle}>📋 Histórico de Viagens</Text>
-                    <Text variant="bodyMedium" style={styles.historyText}>
-                        Veja suas viagens anteriores
+            {/* Tabs */}
+            <View style={styles.tabsContainer}>
+                <Pressable
+                    onPress={() => setActiveTab('pending')}
+                    style={[styles.tab, activeTab === 'pending' && styles.tabActive]}
+                >
+                    <Text style={[styles.tabText, activeTab === 'pending' && styles.tabTextActive]}>
+                        Suas Viagens
                     </Text>
-                </Card.Content>
-                <Card.Actions>
-                    <Button mode="text" onPress={handleHistory}>
-                        Ver Histórico →
-                    </Button>
-                </Card.Actions>
-            </Card>
+                </Pressable>
+                <Pressable
+                    onPress={() => setActiveTab('completed')}
+                    style={[styles.tab, activeTab === 'completed' && styles.tabActive]}
+                >
+                    <Text style={[styles.tabText, activeTab === 'completed' && styles.tabTextActive]}>
+                        Realizadas
+                    </Text>
+                </Pressable>
+            </View>
 
-            {/* Logout */}
-            <Button
-                mode="outlined"
-                onPress={handleLogout}
-                style={styles.logoutButton}
-                icon="logout"
-            >
-                Sair da Conta
-            </Button>
-        </ScrollView>
+            {/* Date indicator */}
+            <Text style={styles.dateLabel}>Hoje</Text>
+
+            {/* Trips List */}
+            <ScrollView style={styles.tripsList} showsVerticalScrollIndicator={false}>
+                {mockTrips.map(renderTripCard)}
+                <View style={{ height: 100 }} />
+            </ScrollView>
+        </View>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        padding: 16,
         backgroundColor: '#F8FAFC',
     },
-    profileCard: {
-        marginBottom: 16,
+    header: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingHorizontal: 20,
+        paddingTop: 16,
+        paddingBottom: 12,
         backgroundColor: '#FFFFFF',
+        borderBottomWidth: 1,
+        borderBottomColor: '#E2E8F0',
     },
-    profileContent: {
+    headerContent: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 16,
+        gap: 12,
     },
-    profileInfo: {
-        flex: 1,
+    avatar: {
+        backgroundColor: '#CCFBF1',
     },
-    email: {
+    headerText: {
+        gap: 2,
+    },
+    greeting: {
+        fontSize: 14,
         color: '#64748B',
     },
-    card: {
-        marginBottom: 16,
+    driverName: {
+        fontSize: 18,
+        fontWeight: '600',
+        color: '#0F172A',
+    },
+    tabsContainer: {
+        flexDirection: 'row',
+        paddingHorizontal: 20,
+        paddingTop: 16,
+        gap: 24,
         backgroundColor: '#FFFFFF',
     },
-    cardTitle: {
-        marginBottom: 8,
+    tab: {
+        paddingBottom: 12,
     },
-    divider: {
+    tabActive: {
+        borderBottomWidth: 2,
+        borderBottomColor: '#0D9488',
+    },
+    tabText: {
+        fontSize: 16,
+        color: '#94A3B8',
+    },
+    tabTextActive: {
+        color: '#0F172A',
+        fontWeight: '600',
+    },
+    dateLabel: {
+        fontSize: 14,
+        color: '#0D9488',
+        textAlign: 'center',
+        paddingVertical: 16,
+        fontWeight: '500',
+    },
+    tripsList: {
+        flex: 1,
+        paddingHorizontal: 16,
+    },
+    tripCardWrapper: {
         marginBottom: 12,
     },
-    statusText: {
-        color: '#64748B',
-        textAlign: 'center',
-        marginVertical: 16,
+    tripCardNext: {
+        borderRadius: 16,
+        padding: 16,
+        elevation: 4,
+        shadowColor: '#0D9488',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
     },
-    statusSubtext: {
-        color: '#94A3B8',
-        textAlign: 'center',
-    },
-    actionsContainer: {
-        flexDirection: 'row',
-        gap: 12,
-        marginBottom: 16,
-    },
-    actionCard: {
-        flex: 1,
+    tripCard: {
+        borderRadius: 16,
         backgroundColor: '#FFFFFF',
+        elevation: 2,
     },
-    actionContent: {
+    tripHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
         alignItems: 'center',
-        gap: 8,
+        marginBottom: 12,
     },
-    actionTitle: {
-        textAlign: 'center',
-    },
-    actionButton: {
-        flex: 1,
-    },
-    historyText: {
+    tripShift: {
+        fontSize: 12,
         color: '#64748B',
     },
-    logoutButton: {
-        marginTop: 8,
-        marginBottom: 32,
+    tripShiftWhite: {
+        fontSize: 12,
+        color: 'rgba(255, 255, 255, 0.8)',
+    },
+    nextChip: {
+        backgroundColor: '#10B981',
+        height: 24,
+    },
+    nextChipText: {
+        color: '#FFFFFF',
+        fontSize: 11,
+        fontWeight: '600',
+    },
+    tripContent: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+    },
+    tripTimeBlock: {
+        flex: 1,
+    },
+    tripTime: {
+        fontSize: 28,
+        fontWeight: '300',
+        color: '#0D9488',
+        marginBottom: 4,
+    },
+    tripTimeWhite: {
+        fontSize: 28,
+        fontWeight: '300',
+        color: '#FFFFFF',
+        marginBottom: 4,
+    },
+    tripLocation: {
+        fontSize: 14,
+        fontWeight: '500',
+        color: '#0F172A',
+        marginBottom: 2,
+    },
+    tripLocationWhite: {
+        fontSize: 14,
+        fontWeight: '500',
+        color: '#FFFFFF',
+        marginBottom: 2,
+    },
+    tripCity: {
+        fontSize: 12,
+        color: '#94A3B8',
+    },
+    tripCityWhite: {
+        fontSize: 12,
+        color: 'rgba(255, 255, 255, 0.7)',
+    },
+    tripArrowContainer: {
+        paddingHorizontal: 16,
+    },
+    tripArrowCircle: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        backgroundColor: 'rgba(255, 255, 255, 0.3)',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    tripArrowCircleLight: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        backgroundColor: '#E0F2F1',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    tripArrowText: {
+        fontSize: 24,
+        color: '#FFFFFF',
+        fontWeight: 'bold',
+    },
+    tripArrowTextLight: {
+        fontSize: 24,
+        color: '#0D9488',
+        fontWeight: 'bold',
     },
 });

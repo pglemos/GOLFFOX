@@ -4,7 +4,6 @@ import { motion } from "framer-motion"
 import { LucideIcon } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ArrowUpRight } from "lucide-react"
-import Link from "next/link"
 
 interface QuickAction {
   title: string
@@ -31,7 +30,7 @@ export function QuickActionsGrid({ actions }: QuickActionsGridProps) {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: index * 0.1, duration: 0.5 }}
           >
-            <Link href={action.href} className="block h-full group">
+            <a href={action.href} className="block h-full group">
               <Card className="relative h-full overflow-hidden bg-card/50 backdrop-blur-sm border-[var(--border)] hover:shadow-2xl hover:shadow-[var(--brand)]/10 transition-all duration-500 hover:border-[var(--brand)]/50 cursor-pointer">
                 {/* Gradient Background */}
                 <motion.div
@@ -92,7 +91,7 @@ export function QuickActionsGrid({ actions }: QuickActionsGridProps) {
                   initial={false}
                 />
               </Card>
-            </Link>
+            </a>
           </motion.div>
         )
       })}
