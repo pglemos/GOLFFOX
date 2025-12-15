@@ -117,22 +117,23 @@ export async function POST(
       )
     }
 
+    // Determinar senha: usar fornecida ou gerar dos últimos 6 dígitos do CPF
+    const cleanCpf = cpf?.replace(/\D/g, '') || ''
+    let finalPassword = password
     if (!password || password.length < 6) {
       // Se não foi fornecida senha, usar últimos 6 dígitos do CPF
-      const cleanCpf = cpf?.replace(/\D/g, '') || ''
       if (cleanCpf.length < 6) {
         return NextResponse.json(
           { success: false, error: 'CPF inválido para gerar senha' },
           { status: 400 }
         )
       }
-      password = cleanCpf.slice(-6)
+      finalPassword = cleanCpf.slice(-6)
     }
 
     const supabase = getSupabaseAdmin()
 
     // Gerar email para Auth baseado no CPF (para login com CPF)
-    const cleanCpf = cpf?.replace(/\D/g, '') || ''
     let authEmail: string
     if (cleanCpf.length >= 11) {
       // Login com CPF: email fictício baseado no CPF
@@ -163,7 +164,7 @@ export async function POST(
     if (!authUserId) {
       const { data: authData, error: authError } = await supabase.auth.admin.createUser({
         email: authEmail,
-        password: password,
+        password: finalPassword,
         email_confirm: true,
         user_metadata: { name, role: 'motorista' }
       })
