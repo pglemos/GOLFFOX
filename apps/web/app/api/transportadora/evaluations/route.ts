@@ -1,0 +1,87 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { createServerClient } from '@/lib/supabase-server';
+
+// GET /api/transportadora/evaluations - Avaliações NPS das viagens
+export async function GET(request: NextRequest) {
+    try {
+        const supabase = createServerClient();
+        const { searchParams } = new URL(request.url);
+
+        const driverId = searchParams.get('driver_id');
+        const tripId = searchParams.get('trip_id');
+        const minScore = searchParams.get('min_score');
+        const maxScore = searchParams.get('max_score');
+        const limit = parseInt(searchParams.get('limit') || '100');
+
+        let query = supabase
+            .from('trip_evaluations')
+            .select(`
+                *,
+                passenger:users!passenger_id(id, name, email),
+                driver:users!driver_id(id, name),
+                trip:trips(id, scheduled_date, route:routes(name))
+            `)
+            .order('created_at', { ascending: false })
+            .limit(limit);
+
+        if (driverId) {
+            query = query.eq('driver_id', driverId);
+        }
+
+        if (tripId) {
+            query = query.eq('trip_id', tripId);
+        }
+
+        if (minScore) {
+            query = query.gte('nps_score', parseInt(minScore));
+        }
+
+        if (maxScore) {
+            query = query.lte('nps_score', parseInt(maxScore));
+        }
+
+        const { data, error } = await query;
+
+        if (error) {
+            console.error('Error fetching evaluations:', error);
+            return NextResponse.json({ error: error.message }, { status: 500 });
+        }
+
+        // Calcular NPS e estatísticas
+        const scores = data?.map(e => e.nps_score) || [];
+        const totalResponses = scores.length;
+
+        const promoters = scores.filter(s => s >= 9).length;
+        const passives = scores.filter(s => s >= 7 && s <= 8).length;
+        const detractors = scores.filter(s => s <= 6).length;
+
+        const nps = totalResponses > 0
+            ? Math.round(((promoters - detractors) / totalResponses) * 100)
+            : 0;
+
+        const avgScore = totalResponses > 0
+            ? (scores.reduce((a, b) => a + b, 0) / totalResponses).toFixed(1)
+            : 0;
+
+        const stats = {
+            totalResponses,
+            avgScore: parseFloat(avgScore as string),
+            nps,
+            promoters,
+            passives,
+            detractors,
+            distribution: Array.from({ length: 11 }, (_, i) => ({
+                score: i,
+                count: scores.filter(s => s === i).length,
+            })),
+        };
+
+        return NextResponse.json({ data, stats });
+    } catch (error) {
+        console.error('Evaluations API error:', error);
+        return NextResponse.json(
+            { error: 'Erro ao buscar avaliações' },
+            { status: 500 }
+        );
+    }
+}

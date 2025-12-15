@@ -1,0 +1,71 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { createServerClient } from '@/lib/supabase-server';
+
+// GET /api/empresa/evaluations - Ver avaliações dos funcionários
+export async function GET(request: NextRequest) {
+    try {
+        const supabase = createServerClient();
+        const { searchParams } = new URL(request.url);
+
+        const companyId = searchParams.get('company_id');
+        const passengerId = searchParams.get('passenger_id');
+        const limit = parseInt(searchParams.get('limit') || '100');
+
+        let query = supabase
+            .from('trip_evaluations')
+            .select(`
+                *,
+                passenger:users!passenger_id(id, name, email, company_id),
+                driver:users!driver_id(id, name),
+                trip:trips(id, scheduled_date, route:routes(name))
+            `)
+            .order('created_at', { ascending: false })
+            .limit(limit);
+
+        if (passengerId) {
+            query = query.eq('passenger_id', passengerId);
+        }
+
+        const { data, error } = await query;
+
+        if (error) {
+            console.error('Error fetching evaluations:', error);
+            return NextResponse.json({ error: error.message }, { status: 500 });
+        }
+
+        // Filtrar por company_id se fornecido
+        let filteredData = data;
+        if (companyId && data) {
+            filteredData = data.filter(e => (e.passenger as any)?.company_id === companyId);
+        }
+
+        // Calcular estatísticas
+        const scores = filteredData?.map(e => e.nps_score) || [];
+        const totalResponses = scores.length;
+
+        const promoters = scores.filter(s => s >= 9).length;
+        const detractors = scores.filter(s => s <= 6).length;
+
+        const nps = totalResponses > 0
+            ? Math.round(((promoters - detractors) / totalResponses) * 100)
+            : 0;
+
+        const avgScore = totalResponses > 0
+            ? (scores.reduce((a, b) => a + b, 0) / totalResponses).toFixed(1)
+            : 0;
+
+        const stats = {
+            totalResponses,
+            avgScore: parseFloat(avgScore as string),
+            nps,
+        };
+
+        return NextResponse.json({ data: filteredData, stats });
+    } catch (error) {
+        console.error('Evaluations API error:', error);
+        return NextResponse.json(
+            { error: 'Erro ao buscar avaliações' },
+            { status: 500 }
+        );
+    }
+}
