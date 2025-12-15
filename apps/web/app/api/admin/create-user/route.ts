@@ -211,25 +211,28 @@ export async function POST(request: NextRequest) {
         // #endregion
 
         // Criar registro na tabela users com colunas de endereço obrigatórias
+        const userData: Record<string, any> = {
+            id: userId,
+            email: sanitizedEmail,
+            name: sanitizedName,
+            phone: sanitizedPhone,
+            role: targetRole,
+            company_id: company_id,
+            is_active: true,
+        }
+        // Adicionar campos opcionais apenas se fornecidos
+        if (sanitizedCpf) userData.cpf = sanitizedCpf
+        if (address_zip_code) userData.address_zip_code = address_zip_code
+        if (address_street) userData.address_street = address_street
+        if (address_number) userData.address_number = address_number
+        if (address_neighborhood) userData.address_neighborhood = address_neighborhood
+        if (address_complement) userData.address_complement = address_complement
+        if (address_city) userData.address_city = address_city
+        if (address_state) userData.address_state = address_state
+
         const { error: userError } = await supabaseAdmin
             .from('users')
-            .upsert({
-                id: userId,
-                email: sanitizedEmail,
-                name: sanitizedName,
-                phone: sanitizedPhone,
-                role: targetRole,
-                company_id: company_id,
-                is_active: true,
-                cpf: sanitizedCpf,
-                address_zip_code,
-                address_street,
-                address_number,
-                address_neighborhood,
-                address_complement: address_complement || null,
-                address_city,
-                address_state
-            }, { onConflict: 'id' })
+            .upsert(userData as any, { onConflict: 'id' })
 
         if (userError) {
             // #region agent log
