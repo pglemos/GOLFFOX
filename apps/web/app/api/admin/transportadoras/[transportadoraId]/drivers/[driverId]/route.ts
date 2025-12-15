@@ -30,9 +30,9 @@ export async function PUT(
       )
     }
 
-    // @ts-ignore - Supabase type inference issue
-    const { data: driver, error } = await ((supabase
-      .from('drivers' as any)
+    // Atualizar na tabela users onde motoristas são armazenados
+    const { data: driver, error } = await supabase
+      .from('users')
       .update({
         name,
         email: email || null,
@@ -40,11 +40,12 @@ export async function PUT(
         cpf: cpf || null,
         cnh: cnh || null,
         cnh_category: cnh_category || null
-      } as any) as any)
+      })
       .eq('id', driverId)
       .eq('transportadora_id', transportadoraId)
+      .eq('role', 'driver')
       .select()
-      .single()) as any
+      .single()
 
     if (error) {
       console.error('Erro ao atualizar motorista:', error)
@@ -85,12 +86,13 @@ export async function DELETE(
       )
     }
 
-    // @ts-ignore - Supabase type inference issue
-    const { error } = await (supabase
-      .from('drivers' as any)
+    // Deletar da tabela users onde motoristas são armazenados
+    const { error } = await supabase
+      .from('users')
       .delete()
       .eq('id', driverId)
-      .eq('transportadora_id', transportadoraId) as any)
+      .eq('transportadora_id', transportadoraId)
+      .eq('role', 'driver')
 
     if (error) {
       console.error('Erro ao excluir motorista:', error)

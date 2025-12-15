@@ -73,7 +73,7 @@ export async function getUserProfile(userId: string): Promise<UserProfile | null
     console.log('🔍 Buscando perfil para:', userId);
     const { data, error } = await supabase
         .from('users')
-        .select('id, email, role, name, company_id, carrier_id, phone')
+        .select('id, email, role, name, company_id, phone')
         .eq('id', userId)
         .single();
 

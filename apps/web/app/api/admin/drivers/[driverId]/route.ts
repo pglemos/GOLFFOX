@@ -34,10 +34,9 @@ export async function PUT(
 
     const transportadoraId = transportadora_id || carrier_id // Compatibilidade
 
-    // Atualizar motorista
-    // @ts-ignore - Supabase type inference issue
-    const { data: driver, error: driverError } = await ((supabase
-      .from('drivers' as any)
+    // Atualizar motorista na tabela users
+    const { data: driver, error: driverError } = await supabase
+      .from('users')
       .update({
         name,
         email: email || null,
@@ -49,10 +48,11 @@ export async function PUT(
         cnh_expiry: cnh_expiry || null,
         is_active: is_active ?? true,
         updated_at: new Date().toISOString()
-      } as any) as any)
+      })
       .eq('id', driverId)
+      .eq('role', 'driver')
       .select()
-      .single()) as any
+      .single()
 
     if (driverError) {
       console.error('Erro ao atualizar motorista:', driverError)
@@ -84,12 +84,13 @@ export async function GET(
     const supabase = supabaseServiceRole
     const { driverId } = await context.params
 
-    // @ts-ignore - Supabase type instantiation is excessively deep
-    const { data: driver, error } = await (((supabase
-      .from('drivers' as any)
-      .select('*, carriers!inner(name)')) as any)
+    // Buscar motorista da tabela users
+    const { data: driver, error } = await supabase
+      .from('users')
+      .select('*, carriers:transportadora_id(name)')
       .eq('id', driverId)
-      .single()) as any
+      .eq('role', 'driver')
+      .single()
 
     if (error) {
       console.error('Erro ao buscar motorista:', error)

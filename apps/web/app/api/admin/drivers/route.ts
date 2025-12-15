@@ -35,26 +35,23 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Criar motorista
-    // @ts-ignore - Supabase type inference issue
-    const { data: driver, error: driverError } = await ((supabase
-      .from('drivers' as any)
-      .insert([
-        {
-          name,
-          email: email || null,
-          phone: phone || null,
-          transportadora_id: transportadoraId,
-          cpf: cpf || null,
-          cnh: cnh || null,
-          cnh_category: cnh_category || null,
-          cnh_expiry: cnh_expiry || null,
-          is_active: is_active ?? true,
-          role: 'driver'
-        }
-      ] as any) as any)
+    // Criar motorista na tabela users
+    const { data: driver, error: driverError } = await supabase
+      .from('users')
+      .insert({
+        name,
+        email: email || null,
+        phone: phone || null,
+        transportadora_id: transportadoraId,
+        cpf: cpf || null,
+        cnh: cnh || null,
+        cnh_category: cnh_category || null,
+        cnh_expiry: cnh_expiry || null,
+        is_active: is_active ?? true,
+        role: 'driver'
+      })
       .select()
-      .single()) as any
+      .single()
 
     if (driverError) {
       console.error('Erro ao criar motorista:', driverError)
