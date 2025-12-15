@@ -71,25 +71,56 @@ export interface UserProfile {
 
 export async function getUserProfile(userId: string): Promise<UserProfile | null> {
     console.log('🔍 Buscando perfil para:', userId);
-    const { data, error } = await supabase
-        .from('users')
-        .select('id, email, role, name, company_id, phone')
-        .eq('id', userId)
-        .single();
 
-    if (error) {
-        console.error('Error fetching user profile:', error);
+    try {
+        // Primeiro tenta via API do backend (bypassa RLS)
+        const API_URL = process.env.EXPO_PUBLIC_API_URL || 'https://golffox.vercel.app';
+        const response = await fetch(`${API_URL}/api/mobile/profile?userId=${userId}`);
+
+        if (response.ok) {
+            const data = await response.json();
+            console.log('✅ Perfil encontrado via API:', data.name);
+
+            // Converter role do schema para PT-BR se necessário
+            const rawRole = data.role as string;
+            const normalizedRole = schemaToRole[rawRole as SchemaRole] || rawRole as UserRole;
+
+            return {
+                ...data,
+                role: normalizedRole,
+            } as UserProfile;
+        }
+
+        // Fallback para query direta (se RLS permitir)
+        console.log('⚠️ API falhou, tentando query direta...');
+        const { data, error } = await supabase
+            .from('users')
+            .select('id, email, role, name, company_id, transportadora_id, phone')
+            .eq('id', userId)
+            .maybeSingle();
+
+        if (error) {
+            console.error('Error fetching user profile:', error);
+            return null;
+        }
+
+        if (!data) {
+            console.warn('Perfil não encontrado para userId:', userId);
+            return null;
+        }
+
+        // Converter role do schema para PT-BR se necessário
+        const rawRole = data.role as string;
+        const normalizedRole = schemaToRole[rawRole as SchemaRole] || rawRole as UserRole;
+
+        return {
+            ...data,
+            role: normalizedRole,
+        } as UserProfile;
+    } catch (err) {
+        console.error('Exception in getUserProfile:', err);
         return null;
     }
-
-    // Converter role do schema para PT-BR se necessário
-    const rawRole = data.role as string;
-    const normalizedRole = schemaToRole[rawRole as SchemaRole] || rawRole as UserRole;
-
-    return {
-        ...data,
-        role: normalizedRole,
-    } as UserProfile;
 }
 
 export async function signIn(loginInput: string, password: string) {
