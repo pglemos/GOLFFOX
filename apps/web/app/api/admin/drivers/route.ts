@@ -26,7 +26,6 @@ export async function POST(request: NextRequest) {
       cpf,
       cnh,
       cnh_category,
-      cnh_expiry,
       is_active,
       // Campos de endereço (opcionais)
       address_zip_code,
@@ -129,7 +128,6 @@ export async function POST(request: NextRequest) {
         cpf: cpf || null,
         cnh: cnh || null,
         cnh_category: cnh_category || null,
-        cnh_expiry: cnh_expiry || null,
         role: 'driver',
         is_active: is_active ?? true,
         address_zip_code: address_zip_code || null,
