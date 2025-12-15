@@ -20,7 +20,7 @@ export async function GET(
   const params = await context.params
 
   try {
-    const { transportadoraId: tId, carrierId: cId  } = params
+    const { transportadoraId: tId, carrierId: cId } = params
     const transportadoraId = tId || cId
 
     if (!transportadoraId) {
@@ -36,7 +36,7 @@ export async function GET(
     const { data: drivers, error } = await supabase
       .from('users')
       .select('*')
-      .eq('role', 'driver')
+      .eq('role', 'motorista')
       .eq('transportadora_id', transportadoraId)
       .order('name', { ascending: true })
 
@@ -67,7 +67,7 @@ export async function POST(
   const params = await context.params
 
   try {
-    const { transportadoraId: tId, carrierId: cId  } = params
+    const { transportadoraId: tId, carrierId: cId } = params
     const transportadoraId = tId || cId
 
     if (!transportadoraId) {
@@ -187,7 +187,7 @@ export async function POST(
     }
 
     // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/802544c4-70d0-43c7-a57c-6692b28ca17d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'drivers/route.ts:POST',message:'Before UPSERT driver',data:{authUserId,driverEmail,existingAuthUser,transportadoraId},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix'})}).catch(()=>{});
+    fetch('http://127.0.0.1:7242/ingest/802544c4-70d0-43c7-a57c-6692b28ca17d', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'drivers/route.ts:POST', message: 'Before UPSERT driver', data: { authUserId, driverEmail, existingAuthUser, transportadoraId }, timestamp: Date.now(), sessionId: 'debug-session', runId: 'post-fix' }) }).catch(() => { });
     // #endregion
 
     // 3. Usar UPSERT na tabela users para evitar erro de chave duplicada
@@ -217,7 +217,7 @@ export async function POST(
 
     if (error) {
       // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/802544c4-70d0-43c7-a57c-6692b28ca17d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'drivers/route.ts:POST',message:'UPSERT ERROR',data:{authUserId,errorMessage:error.message,errorCode:error.code},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix'})}).catch(()=>{});
+      fetch('http://127.0.0.1:7242/ingest/802544c4-70d0-43c7-a57c-6692b28ca17d', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'drivers/route.ts:POST', message: 'UPSERT ERROR', data: { authUserId, errorMessage: error.message, errorCode: error.code }, timestamp: Date.now(), sessionId: 'debug-session', runId: 'post-fix' }) }).catch(() => { });
       // #endregion
       console.error('Erro ao criar motorista na tabela users:', error)
       // Só deleta do Auth se não era um usuário existente
@@ -232,7 +232,7 @@ export async function POST(
     }
 
     // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/802544c4-70d0-43c7-a57c-6692b28ca17d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'drivers/route.ts:POST',message:'UPSERT SUCCESS',data:{driverId:driver?.id,driverName:driver?.name},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix'})}).catch(()=>{});
+    fetch('http://127.0.0.1:7242/ingest/802544c4-70d0-43c7-a57c-6692b28ca17d', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'drivers/route.ts:POST', message: 'UPSERT SUCCESS', data: { driverId: driver?.id, driverName: driver?.name }, timestamp: Date.now(), sessionId: 'debug-session', runId: 'post-fix' }) }).catch(() => { });
     // #endregion
 
     return NextResponse.json({ success: true, driver })

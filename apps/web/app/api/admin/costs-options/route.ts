@@ -22,12 +22,12 @@ export async function GET(request: NextRequest) {
     }
 
     const supabaseAdmin = getSupabaseAdmin()
-    
+
     // Buscar todas as opções em paralelo
     const [routesRes, vehiclesRes, driversRes, carriersRes] = await Promise.all([
       supabaseAdmin.from('routes').select('id, name').order('name'),
       supabaseAdmin.from('vehicles').select('id, plate').order('plate'),
-      supabaseAdmin.from('users').select('id, email').eq('role', 'driver').order('email'),
+      supabaseAdmin.from('users').select('id, email').eq('role', 'motorista').order('email'),
       supabaseAdmin.from('carriers').select('id, name').order('name')
     ])
 

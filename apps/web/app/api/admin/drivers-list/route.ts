@@ -21,12 +21,12 @@ export async function GET(request: NextRequest) {
     }
 
     const supabaseAdmin = getSupabaseAdmin()
-    
+
     // Selecionar todas as colunas para evitar erros de colunas inexistentes
     const { data, error } = await supabaseAdmin
       .from('users')
       .select('*')
-      .eq('role', 'driver')
+      .eq('role', 'motorista')
       .order('created_at', { ascending: false })
 
     if (error) {

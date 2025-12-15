@@ -43,7 +43,7 @@ export async function PUT(
       })
       .eq('id', driverId)
       .eq('transportadora_id', transportadoraId)
-      .eq('role', 'driver')
+      .eq('role', 'motorista')
       .select()
       .single()
 
@@ -92,7 +92,7 @@ export async function DELETE(
       .delete()
       .eq('id', driverId)
       .eq('transportadora_id', transportadoraId)
-      .eq('role', 'driver')
+      .eq('role', 'motorista')
 
     if (error) {
       console.error('Erro ao excluir motorista:', error)

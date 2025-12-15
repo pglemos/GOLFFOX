@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
     const { data: drivers, error: driversError } = await supabase
       .from('users')
       .select('id, name, email, phone, transportadora_id')
-      .eq('role', 'driver')
+      .eq('role', 'motorista')
       .eq('transportadora_id', transportadoraId)
 
     if (driversError) throw driversError

@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
         email: driverEmail,
         password: password,
         email_confirm: true,
-        user_metadata: { name, role: 'driver' }
+        user_metadata: { name, role: 'motorista' }
       })
 
       if (authError) {
@@ -128,7 +128,7 @@ export async function POST(request: NextRequest) {
         cpf: cpf || null,
         cnh: cnh || null,
         cnh_category: cnh_category || null,
-        role: 'driver',
+        role: 'motorista',
         is_active: is_active ?? true,
         address_zip_code: address_zip_code || null,
         address_street: address_street || null,

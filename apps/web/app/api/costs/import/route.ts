@@ -52,7 +52,7 @@ async function importHandler(request: NextRequest) {
     // Parse do arquivo
     const buffer = await file.arrayBuffer()
     const text = new TextDecoder().decode(buffer)
-    
+
     let parsedData
     if (file.name.endsWith('.csv')) {
       parsedData = await parseCSV(text, mapping)
@@ -95,7 +95,7 @@ async function importHandler(request: NextRequest) {
     const { data: drivers } = await supabaseServiceRole
       .from('users')
       .select('id, email')
-      .eq('role', 'driver')
+      .eq('role', 'motorista')
 
     const routeMap = new Map(routes?.map((r: any) => [r.name, r.id]) || [])
     const vehicleMap = new Map(vehicles?.map((v: any) => [v.plate, v.id]) || [])
@@ -110,7 +110,7 @@ async function importHandler(request: NextRequest) {
         // Mapear categoria
         const categoryKey = `${row.category}|${row.subcategory || ''}`
         let categoryId = categoryMap.get(categoryKey)
-        
+
         if (!categoryId) {
           // Tentar sem subcategoria
           for (const [key, id] of categoryMap.entries()) {

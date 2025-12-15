@@ -59,7 +59,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
             .from('users')
             .select('id, name')
             .eq('id', driverId)
-            .eq('role', 'driver')
+            .eq('role', 'motorista')
             .single()
 
         if (driverError || !driver) {
@@ -128,7 +128,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
             .from('users')
             .select('id')
             .eq('id', driverId)
-            .eq('role', 'driver')
+            .eq('role', 'motorista')
             .single()
 
         if (driverError || !driver) {

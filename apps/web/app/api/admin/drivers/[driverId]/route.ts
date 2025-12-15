@@ -50,7 +50,7 @@ export async function PUT(
         updated_at: new Date().toISOString()
       })
       .eq('id', driverId)
-      .eq('role', 'driver')
+      .eq('role', 'motorista')
       .select()
       .single()
 
@@ -89,7 +89,7 @@ export async function GET(
       .from('users')
       .select('*, carriers:transportadora_id(name)')
       .eq('id', driverId)
-      .eq('role', 'driver')
+      .eq('role', 'motorista')
       .single()
 
     if (error) {

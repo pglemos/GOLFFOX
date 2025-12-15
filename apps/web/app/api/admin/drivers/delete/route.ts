@@ -41,29 +41,29 @@ export async function DELETE(request: NextRequest) {
     // - gf_driver_documents (documentos do motorista)
     // - gf_driver_events (eventos do motorista)
     // - trips.driver_id tem ON DELETE SET NULL, então setamos manualmente
-    
+
     logger.log(`🗑️ Tentando excluir motorista: ${driverId}`)
-    
+
     // Primeiro, setar driver_id para NULL em trips (mesmo que seja SET NULL, fazemos explicitamente)
     await supabaseAdmin
       .from('trips')
       .update({ driver_id: null })
       .eq('driver_id', driverId)
-    
+
     // Agora excluir o motorista
     const { data, error } = await supabaseAdmin
       .from('users')
       .delete()
       .eq('id', driverId)
-      .eq('role', 'driver')
+      .eq('role', 'motorista')
       .select()
 
     if (error) {
       console.error('❌ Erro ao excluir motorista:', error)
       console.error('Detalhes do erro:', JSON.stringify(error, null, 2))
       return NextResponse.json(
-        { 
-          error: 'Erro ao excluir motorista', 
+        {
+          error: 'Erro ao excluir motorista',
           message: error.message,
           details: error.details || error.hint || 'Sem detalhes adicionais',
           code: error.code
