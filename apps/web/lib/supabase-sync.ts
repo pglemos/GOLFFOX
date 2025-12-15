@@ -225,11 +225,24 @@ function mapDataToSupabase(
 
     case 'driver':
       // Garantir role
-      if (!mapped.role) mapped.role = 'driver'
+      if (!mapped.role) mapped.role = 'motorista'
       // Garantir boolean
       if (typeof mapped.is_active !== 'boolean') {
         mapped.is_active = mapped.is_active !== false
       }
+      // Filtrar apenas campos válidos da tabela users
+      const validUserFields = [
+        'id', 'email', 'name', 'phone', 'role', 'company_id', 'transportadora_id',
+        'is_active', 'cpf', 'cnh', 'cnh_category', 'avatar_url',
+        'address_zip_code', 'address_street', 'address_number',
+        'address_neighborhood', 'address_complement', 'address_city', 'address_state',
+        'created_at', 'updated_at'
+      ]
+      Object.keys(mapped).forEach(key => {
+        if (!validUserFields.includes(key)) {
+          delete mapped[key]
+        }
+      })
       break
 
     case 'route':
