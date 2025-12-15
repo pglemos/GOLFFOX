@@ -1,14 +1,11 @@
 import { Stack } from 'expo-router';
-import { useTheme } from 'react-native-paper';
 
 export default function DriverLayout() {
-    const theme = useTheme();
-
     return (
         <Stack
             screenOptions={{
                 headerStyle: {
-                    backgroundColor: theme.colors.primary,
+                    backgroundColor: '#0D9488',
                 },
                 headerTintColor: '#FFFFFF',
                 headerTitleStyle: {
@@ -20,7 +17,7 @@ export default function DriverLayout() {
                 name="index"
                 options={{
                     title: 'Motorista',
-                    headerLeft: () => null, // Prevent back to login
+                    headerLeft: () => null,
                 }}
             />
             <Stack.Screen
@@ -38,6 +35,10 @@ export default function DriverLayout() {
             <Stack.Screen
                 name="history"
                 options={{ title: 'Histórico' }}
+            />
+            <Stack.Screen
+                name="chat"
+                options={{ title: 'Central de Operações' }}
             />
         </Stack>
     );

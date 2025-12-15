@@ -215,6 +215,28 @@ export default function DriverDashboard() {
             {/* Date indicator */}
             <Text style={styles.dateLabel}>Hoje</Text>
 
+            {/* Quick Actions */}
+            <View style={styles.quickActions}>
+                <Pressable style={styles.quickActionBtn} onPress={() => router.push('/driver/chat')}>
+                    <View style={[styles.quickActionIcon, { backgroundColor: '#DBEAFE' }]}>
+                        <Text style={styles.quickActionEmoji}>💬</Text>
+                    </View>
+                    <Text style={styles.quickActionLabel}>Central</Text>
+                </Pressable>
+                <Pressable style={styles.quickActionBtn} onPress={() => router.push('/driver/history')}>
+                    <View style={[styles.quickActionIcon, { backgroundColor: '#FEF3C7' }]}>
+                        <Text style={styles.quickActionEmoji}>📊</Text>
+                    </View>
+                    <Text style={styles.quickActionLabel}>Histórico</Text>
+                </Pressable>
+                <Pressable style={styles.quickActionBtn} onPress={() => router.push('/driver/scan')}>
+                    <View style={[styles.quickActionIcon, { backgroundColor: '#CCFBF1' }]}>
+                        <Text style={styles.quickActionEmoji}>📱</Text>
+                    </View>
+                    <Text style={styles.quickActionLabel}>Check-in</Text>
+                </Pressable>
+            </View>
+
             {/* Trips List */}
             <ScrollView style={styles.tripsList} showsVerticalScrollIndicator={false}>
                 {mockTrips.map(renderTripCard)}
@@ -401,5 +423,35 @@ const styles = StyleSheet.create({
         fontSize: 24,
         color: '#0D9488',
         fontWeight: 'bold',
+    },
+    quickActions: {
+        flexDirection: 'row',
+        paddingHorizontal: 16,
+        paddingBottom: 12,
+        gap: 12,
+    },
+    quickActionBtn: {
+        flex: 1,
+        backgroundColor: '#FFFFFF',
+        borderRadius: 12,
+        padding: 12,
+        alignItems: 'center',
+        elevation: 1,
+    },
+    quickActionIcon: {
+        width: 44,
+        height: 44,
+        borderRadius: 12,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginBottom: 6,
+    },
+    quickActionEmoji: {
+        fontSize: 22,
+    },
+    quickActionLabel: {
+        fontSize: 11,
+        color: '#64748B',
+        fontWeight: '500',
     },
 });
