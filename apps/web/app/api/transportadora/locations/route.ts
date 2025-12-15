@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
         if (lastOnly) {
             // Buscar última localização de cada motorista ativo
             const { data, error } = await supabase
-                .from('driver_locations')
+                .from('driver_locations' as any)
                 .select(`
                     *,
                     driver:users!driver_id(id, name, phone),
@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
 
             // Agrupar por motorista e pegar apenas a última
             const latestByDriver = new Map();
-            data?.forEach(location => {
+            data?.forEach((location: any) => {
                 if (!latestByDriver.has(location.driver_id)) {
                     latestByDriver.set(location.driver_id, location);
                 }
@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
 
         // Busca com filtros
         let query = supabase
-            .from('driver_locations')
+            .from('driver_locations' as any)
             .select(`
                 *,
                 driver:users!driver_id(id, name)

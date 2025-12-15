@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
         const limit = parseInt(searchParams.get('limit') || '100');
 
         let query = supabase
-            .from('passenger_cancellations')
+            .from('passenger_cancellations' as any)
             .select(`
                 *,
                 passenger:users!passenger_id(id, name, email, phone)

@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
         cnh_expiry: cnh_expiry || null,
         is_active: is_active ?? true,
         role: 'driver'
-      })
+      } as any)
       .select()
       .single()
 

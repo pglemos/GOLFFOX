@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
         const limit = parseInt(searchParams.get('limit') || '100');
 
         let query = supabase
-            .from('driver_messages')
+            .from('driver_messages' as any)
             .select(`
                 *,
                 driver:users!driver_id(id, name, phone)
@@ -48,8 +48,8 @@ export async function GET(request: NextRequest) {
         // Estatísticas
         const stats = {
             total: data?.length || 0,
-            unread: data?.filter(m => !m.read_at).length || 0,
-            emergencies: data?.filter(m => m.is_emergency).length || 0,
+            unread: data?.filter((m: any) => !m.read_at).length || 0,
+            emergencies: data?.filter((m: any) => m.is_emergency).length || 0,
         };
 
         return NextResponse.json({ data, stats });
@@ -77,7 +77,7 @@ export async function POST(request: NextRequest) {
         }
 
         const { data, error } = await supabase
-            .from('driver_messages')
+            .from('driver_messages' as any)
             .insert({
                 driver_id,
                 carrier_id,
@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
                 message,
                 message_type,
                 is_emergency: false,
-            })
+            } as any)
             .select()
             .single();
 
@@ -119,8 +119,8 @@ export async function PUT(request: NextRequest) {
         }
 
         const { data, error } = await supabase
-            .from('driver_messages')
-            .update({ read_at: new Date().toISOString() })
+            .from('driver_messages' as any)
+            .update({ read_at: new Date().toISOString() } as any)
             .in('id', ids)
             .select();
 
