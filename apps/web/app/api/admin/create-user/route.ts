@@ -47,24 +47,33 @@ export async function POST(request: NextRequest) {
         const targetRole = role || 'operador'
         const sanitizedCpf = cpf?.toString().replace(/\D/g, '') || null
 
-        // Validações - Apenas email e nome são obrigatórios
+        // Determinar email para Auth (login)
+        // Se tem CPF, usar como login. Senão, usar email fornecido
+        let authEmail: string
+        if (sanitizedCpf && sanitizedCpf.length >= 11) {
+            // Login com CPF: email fictício baseado no CPF
+            const rolePrefix = targetRole === 'passageiro' ? 'passageiro' : 'funcionario'
+            authEmail = `${sanitizedCpf}@${rolePrefix}.golffox.app`
+        } else if (sanitizedEmail) {
+            authEmail = sanitizedEmail
+        } else {
+            return NextResponse.json({ error: 'CPF ou Email é obrigatório' }, { status: 400 })
+        }
+
+        // Senha: últimos 6 dígitos do CPF ou senha fornecida ou temporária
+        let finalPassword: string
+        if (sanitizedCpf && sanitizedCpf.length >= 6) {
+            finalPassword = sanitizedCpf.slice(-6)
+        } else if (sanitizedPassword && sanitizedPassword.length >= 6) {
+            finalPassword = sanitizedPassword
+        } else {
+            finalPassword = `GolfFox${Math.random().toString(36).substring(2, 10)}!`
+        }
+
+        // Validações
         if (!company_id) {
             return NextResponse.json({ error: 'company_id é obrigatório' }, { status: 400 })
         }
-
-        if (!sanitizedEmail) {
-            return NextResponse.json({ error: 'Email é obrigatório' }, { status: 400 })
-        }
-
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-        if (!emailRegex.test(sanitizedEmail)) {
-            return NextResponse.json({ error: 'Email inválido' }, { status: 400 })
-        }
-
-        // Se senha não fornecida, gerar uma senha temporária
-        const finalPassword = sanitizedPassword && sanitizedPassword.length >= 6
-            ? sanitizedPassword
-            : `GolfFox${Math.random().toString(36).substring(2, 10)}!`
 
         if (!sanitizedName) {
             return NextResponse.json({ error: 'Nome é obrigatório' }, { status: 400 })
@@ -128,7 +137,7 @@ export async function POST(request: NextRequest) {
         let existingAuthUser: any = null
         try {
             const { data: authUsers } = await supabaseAdmin.auth.admin.listUsers()
-            existingAuthUser = authUsers?.users?.find((u: any) => u.email?.toLowerCase() === sanitizedEmail)
+            existingAuthUser = authUsers?.users?.find((u: any) => u.email?.toLowerCase() === authEmail.toLowerCase())
         } catch (listError) {
             logger.warn('⚠️ Não foi possível verificar usuários no Auth (continuando):', listError)
         }
@@ -149,7 +158,7 @@ export async function POST(request: NextRequest) {
         } else {
             try {
                 let createResult = await supabaseAdmin.auth.admin.createUser({
-                    email: sanitizedEmail,
+                    email: authEmail,
                     password: finalPassword,
                     email_confirm: true,
                     user_metadata: { name: sanitizedName }
@@ -158,7 +167,7 @@ export async function POST(request: NextRequest) {
                 if (createResult.error && createResult.error.message?.includes('Database error')) {
                     logger.warn('⚠️ Erro de banco detectado, tentando abordagem alternativa...')
                     createResult = await supabaseAdmin.auth.admin.createUser({
-                        email: sanitizedEmail,
+                        email: authEmail,
                         password: finalPassword,
                         email_confirm: false
                     })
@@ -170,7 +179,7 @@ export async function POST(request: NextRequest) {
                 if (createUserError && !authData?.user) {
                     try {
                         const { data: authUsers } = await supabaseAdmin.auth.admin.listUsers()
-                        const foundUser = authUsers?.users?.find((u: any) => u.email?.toLowerCase() === sanitizedEmail)
+                        const foundUser = authUsers?.users?.find((u: any) => u.email?.toLowerCase() === authEmail.toLowerCase())
                         if (foundUser) {
                             authData = { user: foundUser }
                             createUserError = null
@@ -213,7 +222,7 @@ export async function POST(request: NextRequest) {
         // Criar registro na tabela users com colunas de endereço obrigatórias
         const userData: Record<string, any> = {
             id: userId,
-            email: sanitizedEmail,
+            email: sanitizedEmail || null, // Email real do usuário, não o fictício do Auth
             name: sanitizedName,
             phone: sanitizedPhone,
             role: targetRole,

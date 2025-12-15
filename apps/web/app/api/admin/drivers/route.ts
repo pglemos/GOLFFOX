@@ -52,11 +52,21 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Gerar email se não fornecido (para auth)
-    const driverEmail = email || `driver.${Date.now()}@temp.golffox.com`
-
-    // Gerar senha: últimos 6 dígitos do CPF ou '123456' se não houver CPF
+    // Gerar email para Auth baseado no CPF (para login com CPF)
     const cleanCpf = cpf?.replace(/\D/g, '') || ''
+
+    // Se tem CPF, usar como login. Senão, usar email fornecido ou gerar um temporário
+    let authEmail: string
+    if (cleanCpf.length >= 11) {
+      // Login com CPF: email fictício baseado no CPF
+      authEmail = `${cleanCpf}@motorista.golffox.app`
+    } else if (email) {
+      authEmail = email
+    } else {
+      authEmail = `driver.${Date.now()}@temp.golffox.com`
+    }
+
+    // Senha: últimos 6 dígitos do CPF ou '123456' se não houver CPF válido
     const password = cleanCpf.length >= 6 ? cleanCpf.slice(-6) : '123456'
 
     // 1. Verificar se usuário já existe no Auth
@@ -65,7 +75,7 @@ export async function POST(request: NextRequest) {
 
     try {
       const { data: authUsers } = await supabase.auth.admin.listUsers()
-      const found = authUsers?.users?.find((u: any) => u.email?.toLowerCase() === driverEmail.toLowerCase())
+      const found = authUsers?.users?.find((u: any) => u.email?.toLowerCase() === authEmail.toLowerCase())
       if (found) {
         authUserId = found.id
         existingAuthUser = true
@@ -78,7 +88,7 @@ export async function POST(request: NextRequest) {
     // 2. Criar usuário no Auth se não existir
     if (!authUserId) {
       const { data: authData, error: authError } = await supabase.auth.admin.createUser({
-        email: driverEmail,
+        email: authEmail,
         password: password,
         email_confirm: true,
         user_metadata: { name, role: 'motorista' }
@@ -89,7 +99,7 @@ export async function POST(request: NextRequest) {
         if (authError.message?.includes('already') || authError.message?.includes('registered')) {
           try {
             const { data: authUsers } = await supabase.auth.admin.listUsers()
-            const found = authUsers?.users?.find((u: any) => u.email?.toLowerCase() === driverEmail.toLowerCase())
+            const found = authUsers?.users?.find((u: any) => u.email?.toLowerCase() === authEmail.toLowerCase())
             if (found) {
               authUserId = found.id
               existingAuthUser = true
@@ -123,7 +133,7 @@ export async function POST(request: NextRequest) {
         id: authUserId,
         transportadora_id: transportadoraId,
         name,
-        email: driverEmail,
+        email: email || null, // Email real do usuário, não o fictício do Auth
         phone: phone || null,
         cpf: cpf || null,
         cnh: cnh || null,
