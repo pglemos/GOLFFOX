@@ -92,11 +92,53 @@ export async function getUserProfile(userId: string): Promise<UserProfile | null
     } as UserProfile;
 }
 
-export async function signIn(email: string, password: string) {
-    const { data, error } = await supabase.auth.signInWithPassword({
+export async function signIn(loginInput: string, password: string) {
+    // Limpar apenas números do input (pode ser CPF ou email)
+    const cleanInput = loginInput.replace(/\D/g, '');
+
+    // Se parece ser um CPF (11 dígitos), converter para formato de email
+    let email: string;
+    if (cleanInput.length === 11) {
+        // É um CPF - tentar primeiro como motorista, depois como passageiro/funcionário
+        // O Auth retornará erro se não existir, então tentamos os dois
+        email = `${cleanInput}@motorista.golffox.app`;
+    } else if (loginInput.includes('@')) {
+        // É um email normal
+        email = loginInput.toLowerCase().trim();
+    } else {
+        // Tentar como CPF mesmo assim (pode ter menos dígitos por erro de digitação)
+        email = `${cleanInput}@motorista.golffox.app`;
+    }
+
+    // Primeira tentativa: como motorista
+    let { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
     });
+
+    // Se falhou e parece ser CPF, tentar como passageiro
+    if (error && cleanInput.length >= 11) {
+        const passageiroEmail = `${cleanInput}@passageiro.golffox.app`;
+        const result = await supabase.auth.signInWithPassword({
+            email: passageiroEmail,
+            password,
+        });
+
+        if (!result.error) {
+            return result.data;
+        }
+
+        // Tentar também como funcionário
+        const funcionarioEmail = `${cleanInput}@funcionario.golffox.app`;
+        const funcResult = await supabase.auth.signInWithPassword({
+            email: funcionarioEmail,
+            password,
+        });
+
+        if (!funcResult.error) {
+            return funcResult.data;
+        }
+    }
 
     if (error) {
         throw error;

@@ -118,16 +118,30 @@ export async function POST(
     }
 
     if (!password || password.length < 6) {
-      return NextResponse.json(
-        { success: false, error: 'Senha é obrigatória e deve ter no mínimo 6 caracteres' },
-        { status: 400 }
-      )
+      // Se não foi fornecida senha, usar últimos 6 dígitos do CPF
+      const cleanCpf = cpf?.replace(/\D/g, '') || ''
+      if (cleanCpf.length < 6) {
+        return NextResponse.json(
+          { success: false, error: 'CPF inválido para gerar senha' },
+          { status: 400 }
+        )
+      }
+      password = cleanCpf.slice(-6)
     }
 
     const supabase = getSupabaseAdmin()
 
-    // Gerar email se não fornecido (para auth)
-    const driverEmail = email || `driver.${Date.now()}@temp.golffox.com`
+    // Gerar email para Auth baseado no CPF (para login com CPF)
+    const cleanCpf = cpf?.replace(/\D/g, '') || ''
+    let authEmail: string
+    if (cleanCpf.length >= 11) {
+      // Login com CPF: email fictício baseado no CPF
+      authEmail = `${cleanCpf}@motorista.golffox.app`
+    } else if (email) {
+      authEmail = email
+    } else {
+      authEmail = `driver.${Date.now()}@temp.golffox.com`
+    }
 
     // 1. Verificar se usuário já existe no Auth
     let authUserId: string | null = null
@@ -135,7 +149,7 @@ export async function POST(
 
     try {
       const { data: authUsers } = await supabase.auth.admin.listUsers()
-      const found = authUsers?.users?.find((u: any) => u.email?.toLowerCase() === driverEmail.toLowerCase())
+      const found = authUsers?.users?.find((u: any) => u.email?.toLowerCase() === authEmail.toLowerCase())
       if (found) {
         authUserId = found.id
         existingAuthUser = true
@@ -148,10 +162,10 @@ export async function POST(
     // 2. Criar usuário no Auth se não existir
     if (!authUserId) {
       const { data: authData, error: authError } = await supabase.auth.admin.createUser({
-        email: driverEmail,
+        email: authEmail,
         password: password,
         email_confirm: true,
-        user_metadata: { name, role: role || 'driver' }
+        user_metadata: { name, role: 'motorista' }
       })
 
       if (authError) {
@@ -159,7 +173,7 @@ export async function POST(
         if (authError.message?.includes('already') || authError.message?.includes('registered')) {
           try {
             const { data: authUsers } = await supabase.auth.admin.listUsers()
-            const found = authUsers?.users?.find((u: any) => u.email?.toLowerCase() === driverEmail.toLowerCase())
+            const found = authUsers?.users?.find((u: any) => u.email?.toLowerCase() === authEmail.toLowerCase())
             if (found) {
               authUserId = found.id
               existingAuthUser = true
@@ -187,7 +201,7 @@ export async function POST(
     }
 
     // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/802544c4-70d0-43c7-a57c-6692b28ca17d', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'drivers/route.ts:POST', message: 'Before UPSERT driver', data: { authUserId, driverEmail, existingAuthUser, transportadoraId }, timestamp: Date.now(), sessionId: 'debug-session', runId: 'post-fix' }) }).catch(() => { });
+    fetch('http://127.0.0.1:7242/ingest/802544c4-70d0-43c7-a57c-6692b28ca17d', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'drivers/route.ts:POST', message: 'Before UPSERT driver', data: { authUserId, authEmail, existingAuthUser, transportadoraId }, timestamp: Date.now(), sessionId: 'debug-session', runId: 'post-fix' }) }).catch(() => { });
     // #endregion
 
     // 3. Usar UPSERT na tabela users para evitar erro de chave duplicada
@@ -197,12 +211,12 @@ export async function POST(
         id: authUserId,
         transportadora_id: transportadoraId,
         name,
-        email: driverEmail,
+        email: email || null, // Email real do usuário, não o fictício do Auth
         phone: phone || null,
         cpf,
         cnh: cnh || null,
         cnh_category: cnh_category || null,
-        role: role || 'driver',
+        role: 'motorista',
         is_active: true,
         address_zip_code,
         address_street,
