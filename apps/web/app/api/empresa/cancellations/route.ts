@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClient } from '@/lib/supabase-server';
+import { getSupabaseAdmin } from '@/lib/supabase-server';
 
 // GET /api/empresa/cancellations - Não-embarques dos funcionários
 export async function GET(request: NextRequest) {
     try {
-        const supabase = createServerClient();
+        const supabase = getSupabaseAdmin();
         const { searchParams } = new URL(request.url);
 
         const passengerId = searchParams.get('passenger_id');
@@ -44,13 +44,13 @@ export async function GET(request: NextRequest) {
         const stats = {
             total: data?.length || 0,
             byReason: {
-                home_office: data?.filter(c => c.reason === 'home_office').length || 0,
-                folga: data?.filter(c => c.reason === 'folga').length || 0,
-                ferias: data?.filter(c => c.reason === 'ferias').length || 0,
-                medico: data?.filter(c => c.reason === 'medico').length || 0,
-                outro: data?.filter(c => c.reason === 'outro').length || 0,
+                home_office: data?.filter((c: any) => c.reason === 'home_office').length || 0,
+                folga: data?.filter((c: any) => c.reason === 'folga').length || 0,
+                ferias: data?.filter((c: any) => c.reason === 'ferias').length || 0,
+                medico: data?.filter((c: any) => c.reason === 'medico').length || 0,
+                outro: data?.filter((c: any) => c.reason === 'outro').length || 0,
             },
-            pausedNotifications: data?.filter(c => c.pause_notifications).length || 0,
+            pausedNotifications: data?.filter((c: any) => c.pause_notifications).length || 0,
         };
 
         return NextResponse.json({ data, stats });

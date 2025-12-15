@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClient } from '@/lib/supabase-server';
+import { getSupabaseAdmin } from '@/lib/supabase-server';
 
 // GET /api/empresa/announcements - Listar avisos
 export async function GET(request: NextRequest) {
     try {
-        const supabase = createServerClient();
+        const supabase = getSupabaseAdmin();
         const { searchParams } = new URL(request.url);
 
         const companyId = searchParams.get('company_id');
@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
         const activeOnly = searchParams.get('active') !== 'false';
         const limit = parseInt(searchParams.get('limit') || '50');
 
-        let query = supabase
+        let query = (supabase as any)
             .from('announcements')
             .select('*')
             .order('published_at', { ascending: false })
@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
 // POST /api/empresa/announcements - Criar aviso
 export async function POST(request: NextRequest) {
     try {
-        const supabase = createServerClient();
+        const supabase = getSupabaseAdmin();
         const body = await request.json();
         const { company_id, carrier_id, title, message, type = 'info', target_role = 'all', expires_at } = body;
 
@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        const { data, error } = await supabase
+        const { data, error } = await (supabase as any)
             .from('announcements')
             .insert({
                 company_id,
@@ -95,7 +95,7 @@ export async function POST(request: NextRequest) {
 // PUT /api/empresa/announcements - Atualizar aviso
 export async function PUT(request: NextRequest) {
     try {
-        const supabase = createServerClient();
+        const supabase = getSupabaseAdmin();
         const body = await request.json();
         const { id, ...updates } = body;
 
@@ -106,7 +106,7 @@ export async function PUT(request: NextRequest) {
             );
         }
 
-        const { data, error } = await supabase
+        const { data, error } = await (supabase as any)
             .from('announcements')
             .update(updates)
             .eq('id', id)
@@ -131,7 +131,7 @@ export async function PUT(request: NextRequest) {
 // DELETE /api/empresa/announcements - Desativar aviso
 export async function DELETE(request: NextRequest) {
     try {
-        const supabase = createServerClient();
+        const supabase = getSupabaseAdmin();
         const { searchParams } = new URL(request.url);
         const id = searchParams.get('id');
 
@@ -142,7 +142,7 @@ export async function DELETE(request: NextRequest) {
             );
         }
 
-        const { error } = await supabase
+        const { error } = await (supabase as any)
             .from('announcements')
             .update({ is_active: false })
             .eq('id', id);

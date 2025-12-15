@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClient } from '@/lib/supabase-server';
+import { getSupabaseAdmin } from '@/lib/supabase-server';
 
 // GET /api/transportadora/messages - Listar mensagens dos motoristas
 export async function GET(request: NextRequest) {
     try {
-        const supabase = createServerClient();
+        const supabase = getSupabaseAdmin();
         const { searchParams } = new URL(request.url);
 
         const driverId = searchParams.get('driver_id');
@@ -65,7 +65,7 @@ export async function GET(request: NextRequest) {
 // POST /api/transportadora/messages - Enviar mensagem para motorista
 export async function POST(request: NextRequest) {
     try {
-        const supabase = createServerClient();
+        const supabase = getSupabaseAdmin();
         const body = await request.json();
         const { driver_id, carrier_id, message, message_type = 'text' } = body;
 
@@ -107,7 +107,7 @@ export async function POST(request: NextRequest) {
 // PUT /api/transportadora/messages - Marcar mensagens como lidas
 export async function PUT(request: NextRequest) {
     try {
-        const supabase = createServerClient();
+        const supabase = getSupabaseAdmin();
         const body = await request.json();
         const { ids } = body; // Array de IDs
 

@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClient } from '@/lib/supabase-server';
+import { getSupabaseAdmin } from '@/lib/supabase-server';
 
 // GET /api/empresa/evaluations - Ver avaliações dos funcionários
 export async function GET(request: NextRequest) {
     try {
-        const supabase = createServerClient();
+        const supabase = getSupabaseAdmin();
         const { searchParams } = new URL(request.url);
 
         const companyId = searchParams.get('company_id');
@@ -36,22 +36,22 @@ export async function GET(request: NextRequest) {
         // Filtrar por company_id se fornecido
         let filteredData = data;
         if (companyId && data) {
-            filteredData = data.filter(e => (e.passenger as any)?.company_id === companyId);
+            filteredData = data.filter((e: any) => (e.passenger as any)?.company_id === companyId);
         }
 
         // Calcular estatísticas
-        const scores = filteredData?.map(e => e.nps_score) || [];
+        const scores: number[] = filteredData?.map((e: any) => e.nps_score as number) || [];
         const totalResponses = scores.length;
 
-        const promoters = scores.filter(s => s >= 9).length;
-        const detractors = scores.filter(s => s <= 6).length;
+        const promoters = scores.filter((s: number) => s >= 9).length;
+        const detractors = scores.filter((s: number) => s <= 6).length;
 
         const nps = totalResponses > 0
             ? Math.round(((promoters - detractors) / totalResponses) * 100)
             : 0;
 
         const avgScore = totalResponses > 0
-            ? (scores.reduce((a, b) => a + b, 0) / totalResponses).toFixed(1)
+            ? (scores.reduce((a: number, b: number) => a + b, 0) / totalResponses).toFixed(1)
             : 0;
 
         const stats = {

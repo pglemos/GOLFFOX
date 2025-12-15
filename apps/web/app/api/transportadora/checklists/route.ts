@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClient } from '@/lib/supabase-server';
+import { getSupabaseAdmin } from '@/lib/supabase-server';
 
 // GET /api/transportadora/checklists - Listar checklists dos motoristas
 export async function GET(request: NextRequest) {
     try {
-        const supabase = createServerClient();
+        const supabase = getSupabaseAdmin();
         const { searchParams } = new URL(request.url);
 
         const driverId = searchParams.get('driver_id');
@@ -71,7 +71,7 @@ export async function GET(request: NextRequest) {
 // PUT /api/transportadora/checklists - Aprovar/rejeitar checklist
 export async function PUT(request: NextRequest) {
     try {
-        const supabase = createServerClient();
+        const supabase = getSupabaseAdmin();
         const body = await request.json();
         const { id, status, reviewed_by } = body;
 

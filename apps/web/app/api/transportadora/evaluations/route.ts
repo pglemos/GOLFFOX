@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClient } from '@/lib/supabase-server';
+import { getSupabaseAdmin } from '@/lib/supabase-server';
 
 // GET /api/transportadora/evaluations - Avaliações NPS das viagens
 export async function GET(request: NextRequest) {
     try {
-        const supabase = createServerClient();
+        const supabase = getSupabaseAdmin();
         const { searchParams } = new URL(request.url);
 
         const driverId = searchParams.get('driver_id');
@@ -48,12 +48,12 @@ export async function GET(request: NextRequest) {
         }
 
         // Calcular NPS e estatísticas
-        const scores = data?.map(e => e.nps_score) || [];
+        const scores: number[] = data?.map((e: any) => e.nps_score as number) || [];
         const totalResponses = scores.length;
 
-        const promoters = scores.filter(s => s >= 9).length;
-        const passives = scores.filter(s => s >= 7 && s <= 8).length;
-        const detractors = scores.filter(s => s <= 6).length;
+        const promoters = scores.filter((s: number) => s >= 9).length;
+        const passives = scores.filter((s: number) => s >= 7 && s <= 8).length;
+        const detractors = scores.filter((s: number) => s <= 6).length;
 
         const nps = totalResponses > 0
             ? Math.round(((promoters - detractors) / totalResponses) * 100)
@@ -72,7 +72,7 @@ export async function GET(request: NextRequest) {
             detractors,
             distribution: Array.from({ length: 11 }, (_, i) => ({
                 score: i,
-                count: scores.filter(s => s === i).length,
+                count: scores.filter((s: number) => s === i).length,
             })),
         };
 
