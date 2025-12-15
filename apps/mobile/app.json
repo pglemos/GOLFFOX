@@ -22,7 +22,12 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#1E3A8A"
       },
-      "package": "com.golffox.mobile"
+      "package": "com.golffox.mobile",
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyD79t05YxpU2RnEczY-NSDxhdbY9OvigsM"
+        }
+      }
     },
     "web": {
       "bundler": "metro",
@@ -35,6 +40,12 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "3aca962d-8b95-49f2-9ecc-09fa0f7c87a6"
+      }
     }
   }
 }

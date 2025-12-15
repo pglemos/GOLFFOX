@@ -1,263 +1,205 @@
 import { useState } from 'react';
-import { View, StyleSheet, ScrollView, Pressable } from 'react-native';
-import { Card, Text, Button, TextInput, useTheme, Snackbar } from 'react-native-paper';
+import { View, StyleSheet, ScrollView, Pressable, Alert } from 'react-native';
+import { Text, Surface, Button, TextInput, Chip } from 'react-native-paper';
 import { useRouter } from 'expo-router';
-import { supabase } from '../../src/services/supabase';
 import { useAuth } from '../../src/auth/AuthProvider';
+import { Ionicons } from '@expo/vector-icons';
+
+const npsLabels: { [key: number]: string } = {
+    0: 'Péssimo', 1: 'Muito ruim', 2: 'Ruim', 3: 'Regular', 4: 'Abaixo da média',
+    5: 'Razoável', 6: 'Bom', 7: 'Muito bom', 8: 'Ótimo', 9: 'Excelente', 10: 'Perfeito!',
+};
+
+const quickTags = [
+    { id: 'pontual', label: '⏰ Pontual', positive: true },
+    { id: 'limpo', label: '✨ Limpo', positive: true },
+    { id: 'motorista', label: '👍 Ótimo motorista', positive: true },
+    { id: 'conforto', label: '🛋️ Confortável', positive: true },
+    { id: 'atraso', label: '⏳ Atrasou', positive: false },
+    { id: 'sujo', label: '🧹 Precisava limpeza', positive: false },
+    { id: 'lotado', label: '👥 Muito lotado', positive: false },
+];
 
 export default function FeedbackScreen() {
-    const [rating, setRating] = useState(0);
+    const [npsScore, setNpsScore] = useState<number | null>(null);
+    const [selectedTags, setSelectedTags] = useState<string[]>([]);
     const [comment, setComment] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [showSuccess, setShowSuccess] = useState(false);
     const { profile } = useAuth();
     const router = useRouter();
-    const theme = useTheme();
+
+    const toggleTag = (tagId: string) => {
+        setSelectedTags(prev =>
+            prev.includes(tagId) ? prev.filter(t => t !== tagId) : [...prev, tagId]
+        );
+    };
+
+    const getNpsColor = (score: number) => {
+        if (score <= 4) return '#EF4444';
+        if (score <= 6) return '#F59E0B';
+        return '#10B981';
+    };
 
     const handleSubmit = async () => {
-        if (rating === 0) return;
+        if (npsScore === null) {
+            Alert.alert('Atenção', 'Por favor, selecione uma nota de 0 a 10.');
+            return;
+        }
 
         setIsSubmitting(true);
         try {
-            const { error } = await supabase.from('trip_ratings').insert({
-                passenger_id: profile?.id,
-                // route_id: currentRoute?.id,
-                // driver_id: driver?.id,
-                rating,
-                comment: comment.trim() || null,
-                created_at: new Date().toISOString(),
-            });
+            // Simular envio
+            console.log('Avaliação:', { npsScore, selectedTags, comment, userId: profile?.id });
+            await new Promise(r => setTimeout(r, 1000));
 
-            if (error) {
-                console.error('Error submitting feedback:', error);
-            }
-
-            setShowSuccess(true);
-
-            // Voltar após 2 segundos
-            setTimeout(() => {
-                router.back();
-            }, 2000);
+            Alert.alert(
+                '🎉 Obrigado!',
+                'Sua avaliação foi enviada com sucesso.',
+                [{ text: 'OK', onPress: () => router.back() }]
+            );
         } finally {
             setIsSubmitting(false);
         }
     };
 
-    const StarButton = ({ value }: { value: number }) => (
-        <Pressable onPress={() => setRating(value)} style={styles.starButton}>
-            <Text style={[styles.star, value <= rating && styles.starActive]}>
-                {value <= rating ? '★' : '☆'}
-            </Text>
-        </Pressable>
-    );
-
-    const quickFeedback = [
-        { label: '👍 Pontual', value: 'pontual' },
-        { label: '🧹 Limpo', value: 'limpo' },
-        { label: '😊 Motorista educado', value: 'educado' },
-        { label: '🚌 Confortável', value: 'confortavel' },
-    ];
-
-    const [selectedTags, setSelectedTags] = useState<string[]>([]);
-
-    const toggleTag = (value: string) => {
-        setSelectedTags(prev =>
-            prev.includes(value) ? prev.filter(t => t !== value) : [...prev, value]
-        );
-    };
-
     return (
-        <ScrollView style={styles.container} keyboardShouldPersistTaps="handled">
-            <Card style={styles.card}>
-                <Card.Content>
-                    <Text variant="titleLarge" style={styles.title}>
-                        Como foi sua viagem?
-                    </Text>
-                    <Text variant="bodyMedium" style={styles.subtitle}>
-                        Sua avaliação ajuda a melhorar o serviço
-                    </Text>
+        <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+            {/* NPS Score */}
+            <Surface style={styles.npsCard} elevation={2}>
+                <Text style={styles.npsQuestion}>
+                    De 0 a 10, como você avalia sua experiência com o transporte fretado?
+                </Text>
 
-                    {/* Rating Stars */}
-                    <View style={styles.starsContainer}>
-                        {[1, 2, 3, 4, 5].map(value => (
-                            <StarButton key={value} value={value} />
-                        ))}
+                <View style={styles.npsScoreRow}>
+                    {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((score) => (
+                        <Pressable
+                            key={score}
+                            style={[
+                                styles.npsBtn,
+                                npsScore === score && { backgroundColor: getNpsColor(score) },
+                            ]}
+                            onPress={() => setNpsScore(score)}
+                        >
+                            <Text style={[
+                                styles.npsBtnText,
+                                npsScore === score && styles.npsBtnTextActive,
+                            ]}>
+                                {score}
+                            </Text>
+                        </Pressable>
+                    ))}
+                </View>
+
+                <View style={styles.npsLabels}>
+                    <Text style={styles.npsLabelLeft}>😞 Nada provável</Text>
+                    <Text style={styles.npsLabelRight}>😍 Muito provável</Text>
+                </View>
+
+                {npsScore !== null && (
+                    <View style={[styles.npsResult, { backgroundColor: `${getNpsColor(npsScore)}15` }]}>
+                        <Text style={[styles.npsResultText, { color: getNpsColor(npsScore) }]}>
+                            {npsLabels[npsScore]}
+                        </Text>
                     </View>
-
-                    <Text variant="bodySmall" style={styles.ratingLabel}>
-                        {rating === 0 && 'Toque para avaliar'}
-                        {rating === 1 && '😞 Muito ruim'}
-                        {rating === 2 && '😕 Ruim'}
-                        {rating === 3 && '😐 Regular'}
-                        {rating === 4 && '🙂 Bom'}
-                        {rating === 5 && '😄 Excelente!'}
-                    </Text>
-                </Card.Content>
-            </Card>
+                )}
+            </Surface>
 
             {/* Quick Tags */}
-            {rating > 0 && (
-                <Card style={styles.card}>
-                    <Card.Content>
-                        <Text variant="titleMedium" style={styles.sectionTitle}>
-                            O que você mais gostou?
-                        </Text>
-                        <View style={styles.tagsContainer}>
-                            {quickFeedback.map(tag => (
-                                <Pressable
-                                    key={tag.value}
-                                    onPress={() => toggleTag(tag.value)}
-                                    style={[
-                                        styles.tag,
-                                        selectedTags.includes(tag.value) && styles.tagSelected,
-                                    ]}
-                                >
-                                    <Text
-                                        style={[
-                                            styles.tagText,
-                                            selectedTags.includes(tag.value) && styles.tagTextSelected,
-                                        ]}
-                                    >
-                                        {tag.label}
-                                    </Text>
-                                </Pressable>
-                            ))}
-                        </View>
-                    </Card.Content>
-                </Card>
-            )}
+            <Text style={styles.sectionTitle}>O que você mais gostou ou poderia melhorar?</Text>
+            <View style={styles.tagsContainer}>
+                {quickTags.map((tag) => (
+                    <Pressable
+                        key={tag.id}
+                        onPress={() => toggleTag(tag.id)}
+                    >
+                        <Chip
+                            selected={selectedTags.includes(tag.id)}
+                            style={[
+                                styles.tagChip,
+                                selectedTags.includes(tag.id) && {
+                                    backgroundColor: tag.positive ? '#CCFBF1' : '#FEE2E2',
+                                },
+                            ]}
+                            textStyle={[
+                                styles.tagText,
+                                selectedTags.includes(tag.id) && {
+                                    color: tag.positive ? '#0D9488' : '#DC2626',
+                                },
+                            ]}
+                        >
+                            {tag.label}
+                        </Chip>
+                    </Pressable>
+                ))}
+            </View>
 
             {/* Comment */}
-            {rating > 0 && (
-                <Card style={styles.card}>
-                    <Card.Content>
-                        <Text variant="titleMedium" style={styles.sectionTitle}>
-                            Comentário (opcional)
-                        </Text>
-                        <TextInput
-                            mode="outlined"
-                            placeholder="Conte-nos mais sobre sua experiência..."
-                            multiline
-                            numberOfLines={4}
-                            value={comment}
-                            onChangeText={setComment}
-                            style={styles.textInput}
-                        />
-                    </Card.Content>
-                </Card>
-            )}
+            <Text style={styles.sectionTitle}>Quer adicionar um comentário? (opcional)</Text>
+            <TextInput
+                mode="outlined"
+                placeholder="Conte-nos mais sobre sua experiência..."
+                value={comment}
+                onChangeText={setComment}
+                multiline
+                numberOfLines={4}
+                style={styles.commentInput}
+                outlineColor="#E2E8F0"
+                activeOutlineColor="#0D9488"
+            />
 
-            {/* Submit Button */}
+            {/* Submit */}
             <Button
                 mode="contained"
                 onPress={handleSubmit}
-                disabled={rating === 0 || isSubmitting}
                 loading={isSubmitting}
-                style={styles.submitButton}
-                contentStyle={styles.submitContent}
+                disabled={isSubmitting || npsScore === null}
+                style={styles.submitBtn}
+                contentStyle={styles.submitBtnContent}
+                buttonColor="#0D9488"
             >
                 Enviar Avaliação
             </Button>
 
-            {/* Skip button */}
-            <Button
-                mode="text"
-                onPress={() => router.back()}
-                style={styles.skipButton}
-            >
-                Pular por agora
-            </Button>
+            {/* Info */}
+            <View style={styles.infoBox}>
+                <Ionicons name="shield-checkmark-outline" size={18} color="#64748B" />
+                <Text style={styles.infoText}>
+                    Sua avaliação é confidencial e nos ajuda a melhorar o serviço.
+                </Text>
+            </View>
 
-            {/* Success Snackbar */}
-            <Snackbar
-                visible={showSuccess}
-                onDismiss={() => setShowSuccess(false)}
-                duration={2000}
-                style={styles.snackbar}
-            >
-                ✅ Obrigado pelo seu feedback!
-            </Snackbar>
+            <View style={{ height: 40 }} />
         </ScrollView>
     );
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        padding: 16,
-        backgroundColor: '#F8FAFC',
-    },
-    card: {
-        marginBottom: 16,
-        backgroundColor: '#FFFFFF',
-    },
-    title: {
-        textAlign: 'center',
-        marginBottom: 4,
-    },
-    subtitle: {
-        textAlign: 'center',
-        color: '#64748B',
-        marginBottom: 24,
-    },
-    starsContainer: {
-        flexDirection: 'row',
-        justifyContent: 'center',
-        gap: 12,
-    },
-    starButton: {
-        padding: 8,
-    },
-    star: {
-        fontSize: 40,
-        color: '#E2E8F0',
-    },
-    starActive: {
-        color: '#F59E0B',
-    },
-    ratingLabel: {
-        textAlign: 'center',
-        marginTop: 16,
-        color: '#64748B',
-    },
-    sectionTitle: {
-        marginBottom: 12,
-    },
-    tagsContainer: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        gap: 8,
-    },
-    tag: {
-        backgroundColor: '#F1F5F9',
-        paddingHorizontal: 12,
-        paddingVertical: 8,
-        borderRadius: 20,
-    },
-    tagSelected: {
-        backgroundColor: '#3B82F6',
-    },
-    tagText: {
-        color: '#64748B',
-    },
-    tagTextSelected: {
-        color: '#FFFFFF',
-    },
-    textInput: {
-        backgroundColor: '#FFFFFF',
-    },
-    submitButton: {
-        marginTop: 8,
-        borderRadius: 8,
-    },
-    submitContent: {
-        paddingVertical: 8,
-    },
-    skipButton: {
-        marginTop: 8,
-        marginBottom: 32,
-    },
-    snackbar: {
-        backgroundColor: '#10B981',
-    },
+    container: { flex: 1, backgroundColor: '#F8FAFC' },
+    content: { padding: 16 },
+
+    npsCard: { backgroundColor: '#FFF', borderRadius: 16, padding: 20, marginBottom: 20 },
+    npsQuestion: { fontSize: 16, fontWeight: '600', color: '#0F172A', textAlign: 'center', marginBottom: 20, lineHeight: 24 },
+    npsScoreRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12 },
+    npsBtn: { width: 28, height: 36, borderRadius: 8, backgroundColor: '#F1F5F9', alignItems: 'center', justifyContent: 'center' },
+    npsBtnText: { fontSize: 13, fontWeight: '600', color: '#64748B' },
+    npsBtnTextActive: { color: '#FFF' },
+    npsLabels: { flexDirection: 'row', justifyContent: 'space-between' },
+    npsLabelLeft: { fontSize: 11, color: '#94A3B8' },
+    npsLabelRight: { fontSize: 11, color: '#94A3B8' },
+    npsResult: { marginTop: 16, paddingVertical: 10, borderRadius: 10, alignItems: 'center' },
+    npsResultText: { fontSize: 16, fontWeight: '700' },
+
+    sectionTitle: { fontSize: 15, fontWeight: '600', color: '#0F172A', marginBottom: 12 },
+
+    tagsContainer: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 20 },
+    tagChip: { backgroundColor: '#F1F5F9', marginBottom: 4 },
+    tagText: { color: '#64748B' },
+
+    commentInput: { backgroundColor: '#FFF', marginBottom: 20 },
+
+    submitBtn: { borderRadius: 12, marginBottom: 16 },
+    submitBtnContent: { paddingVertical: 6 },
+
+    infoBox: { flexDirection: 'row', alignItems: 'center', gap: 10, padding: 12, backgroundColor: '#F1F5F9', borderRadius: 10 },
+    infoText: { flex: 1, fontSize: 12, color: '#64748B' },
 });

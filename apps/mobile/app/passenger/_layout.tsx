@@ -1,40 +1,130 @@
-import { Stack } from 'expo-router';
+import { Tabs } from 'expo-router';
 import { useTheme } from 'react-native-paper';
+import { Ionicons } from '@expo/vector-icons';
+
+type IoniconsName = React.ComponentProps<typeof Ionicons>['name'];
 
 export default function PassengerLayout() {
     const theme = useTheme();
 
+    const getTabIcon = (name: IoniconsName, focused: boolean) => (
+        <Ionicons
+            name={focused ? name : `${name}-outline` as IoniconsName}
+            size={24}
+            color={focused ? '#0D9488' : '#94A3B8'}
+        />
+    );
+
     return (
-        <Stack
+        <Tabs
             screenOptions={{
                 headerStyle: {
-                    backgroundColor: theme.colors.primary,
+                    backgroundColor: '#0D9488',
                 },
                 headerTintColor: '#FFFFFF',
                 headerTitleStyle: {
                     fontWeight: 'bold',
                 },
+                tabBarActiveTintColor: '#0D9488',
+                tabBarInactiveTintColor: '#94A3B8',
+                tabBarStyle: {
+                    backgroundColor: '#FFFFFF',
+                    borderTopWidth: 1,
+                    borderTopColor: '#E2E8F0',
+                    paddingTop: 4,
+                    height: 60,
+                },
+                tabBarLabelStyle: {
+                    fontSize: 11,
+                    fontWeight: '500',
+                    marginBottom: 6,
+                },
             }}
         >
-            <Stack.Screen
+            <Tabs.Screen
                 name="index"
                 options={{
-                    title: 'Passageiro',
+                    title: 'Início',
+                    headerTitle: 'GolfFox',
+                    tabBarIcon: ({ focused }) => getTabIcon('home', focused),
                     headerLeft: () => null,
                 }}
             />
-            <Stack.Screen
+            <Tabs.Screen
                 name="map"
-                options={{ title: 'Acompanhar Ônibus' }}
+                options={{
+                    title: 'Mapa',
+                    headerTitle: 'Localize seu Transporte',
+                    tabBarIcon: ({ focused }) => getTabIcon('map', focused),
+                }}
             />
-            <Stack.Screen
+            <Tabs.Screen
+                name="checkin"
+                options={{
+                    title: 'Check-in',
+                    headerTitle: 'Registrar Check-in',
+                    tabBarIcon: ({ focused }) => getTabIcon('qr-code', focused),
+                }}
+            />
+            <Tabs.Screen
+                name="mural"
+                options={{
+                    title: 'Mural',
+                    headerTitle: 'Mural de Avisos',
+                    tabBarIcon: ({ focused }) => getTabIcon('megaphone', focused),
+                }}
+            />
+            <Tabs.Screen
+                name="perfil"
+                options={{
+                    title: 'Mais',
+                    headerTitle: 'Meu Perfil',
+                    tabBarIcon: ({ focused }) => getTabIcon('person', focused),
+                }}
+            />
+            {/* Telas ocultas na tab bar */}
+            <Tabs.Screen
                 name="details"
-                options={{ title: 'Detalhes da Rota' }}
+                options={{
+                    href: null,
+                    headerTitle: 'Detalhes da Rota',
+                }}
             />
-            <Stack.Screen
+            <Tabs.Screen
                 name="feedback"
-                options={{ title: 'Avaliar Viagem' }}
+                options={{
+                    href: null,
+                    headerTitle: 'Avaliar Viagem',
+                }}
             />
-        </Stack>
+            <Tabs.Screen
+                name="ajuda"
+                options={{
+                    href: null,
+                    headerTitle: 'Ajuda e FAQ',
+                }}
+            />
+            <Tabs.Screen
+                name="endereco"
+                options={{
+                    href: null,
+                    headerTitle: 'Meu Endereço',
+                }}
+            />
+            <Tabs.Screen
+                name="historico"
+                options={{
+                    href: null,
+                    headerTitle: 'Histórico',
+                }}
+            />
+            <Tabs.Screen
+                name="estatisticas"
+                options={{
+                    href: null,
+                    headerTitle: 'Estatísticas',
+                }}
+            />
+        </Tabs>
     );
 }

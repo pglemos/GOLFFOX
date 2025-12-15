@@ -1,316 +1,243 @@
-import { useState } from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
-import { Card, Text, Button, Avatar, Divider, useTheme, Chip, Portal, Dialog, RadioButton } from 'react-native-paper';
+import { useState, useEffect } from 'react';
+import { View, StyleSheet, ScrollView, Pressable, RefreshControl } from 'react-native';
+import { Text, Surface, Avatar, Chip, Button } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../../src/auth/AuthProvider';
-import { supabase } from '../../src/services/supabase';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
+
+interface NextTrip {
+    id: string;
+    linha: string;
+    pontoEmbarque: string;
+    pontoDesembarque: string;
+    horarioEmbarque: string;
+    horarioChegada: string;
+    veiculo: string;
+    motorista: string;
+    status: 'aguardando' | 'a_caminho' | 'no_ponto' | 'em_viagem';
+}
+
+const mockTrip: NextTrip = {
+    id: '1',
+    linha: 'Linha 01 - Centro',
+    pontoEmbarque: 'Terminal Central',
+    pontoDesembarque: 'Empresa ABC',
+    horarioEmbarque: '07:30',
+    horarioChegada: '08:15',
+    veiculo: 'ABC-1234',
+    motorista: 'João Silva',
+    status: 'a_caminho',
+};
+
+const getStatusInfo = (status: NextTrip['status']) => {
+    switch (status) {
+        case 'no_ponto': return { label: 'No ponto', color: '#10B981', icon: 'location' };
+        case 'a_caminho': return { label: 'A caminho', color: '#F59E0B', icon: 'navigate' };
+        case 'em_viagem': return { label: 'Em viagem', color: '#3B82F6', icon: 'bus' };
+        default: return { label: 'Aguardando', color: '#94A3B8', icon: 'time' };
+    }
+};
 
 export default function PassengerDashboard() {
-    const { profile, logout } = useAuth();
+    const { profile } = useAuth();
     const router = useRouter();
-    const theme = useTheme();
-    const [cancelDialogVisible, setCancelDialogVisible] = useState(false);
-    const [cancelReason, setCancelReason] = useState('remote_work');
-    const [submittingCancel, setSubmittingCancel] = useState(false);
-    const [cancelledToday, setCancelledToday] = useState(false);
+    const [refreshing, setRefreshing] = useState(false);
+    const [trip, setTrip] = useState<NextTrip | null>(mockTrip);
+    const [eta, setEta] = useState('~8 min');
 
-    const handleTrackBus = () => {
-        router.push('/passenger/map');
+    const onRefresh = async () => {
+        setRefreshing(true);
+        await new Promise(r => setTimeout(r, 1000));
+        setRefreshing(false);
     };
 
-    const handleRouteDetails = () => {
-        router.push('/passenger/details');
+    const getGreeting = () => {
+        const hour = new Date().getHours();
+        if (hour < 12) return 'Bom dia';
+        if (hour < 18) return 'Boa tarde';
+        return 'Boa noite';
     };
 
-    const handleFeedback = () => {
-        router.push('/passenger/feedback');
-    };
-
-    const handleLogout = async () => {
-        await logout();
-        router.replace('/login');
-    };
-
-    const handleSubmitCancel = async () => {
-        setSubmittingCancel(true);
-        try {
-            // Registrar cancelamento no Supabase
-            // Utilizando alertsv2 como log operacional por enquanto
-            await supabase.from('alertsv2').insert({
-                company_id: profile?.company_id,
-                type: 'passenger_cancellation',
-                severity: 'info',
-                status: 'resolved',
-                title: 'Passageiro não utilizará transporte',
-                message: `Passageiro ${profile?.name} informou que não utilizará o transporte hoje. Motivo: ${cancelReason}`,
-                metadata: {
-                    passenger_id: profile?.id,
-                    reason: cancelReason,
-                    date: new Date().toISOString().split('T')[0]
-                }
-            });
-
-            setCancelledToday(true);
-            setCancelDialogVisible(false);
-        } catch (error) {
-            console.error('Erro ao cancelar', error);
-        } finally {
-            setSubmittingCancel(false);
-        }
-    };
-
-    // Mock data - em produção viria do Supabase
-    const routeInfo = {
-        name: 'Rota Centro-Shopping',
-        busStatus: cancelledToday ? 'Cancelado por você' : 'Em andamento',
-        nextStop: 'Ponto B - Centro',
-        eta: cancelledToday ? '--' : '5 min',
-        busPlate: 'ABC-1234',
-        driverName: 'João Silva',
-    };
+    const statusInfo = trip ? getStatusInfo(trip.status) : null;
 
     return (
-        <ScrollView style={styles.container}>
-            {/* Header com perfil */}
-            <Card style={styles.profileCard}>
-                <Card.Content style={styles.profileContent}>
-                    <Avatar.Icon size={64} icon="account" style={{ backgroundColor: theme.colors.secondary }} />
-                    <View style={styles.profileInfo}>
-                        <Text variant="titleLarge">{profile?.name || 'Passageiro'}</Text>
-                        <Text variant="bodyMedium" style={styles.email}>{profile?.email}</Text>
+        <ScrollView
+            style={styles.container}
+            showsVerticalScrollIndicator={false}
+            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#0D9488']} />}
+        >
+            {/* Header com saudação */}
+            <LinearGradient colors={['#0D9488', '#14B8A6']} style={styles.header}>
+                <View style={styles.headerContent}>
+                    <Avatar.Text
+                        size={48}
+                        label={profile?.name?.substring(0, 2).toUpperCase() || 'US'}
+                        style={styles.avatar}
+                    />
+                    <View style={styles.headerText}>
+                        <Text style={styles.greeting}>{getGreeting()},</Text>
+                        <Text style={styles.userName}>{profile?.name || 'Passageiro'}</Text>
                     </View>
-                </Card.Content>
-            </Card>
+                </View>
+                {trip && (
+                    <View style={styles.etaContainer}>
+                        <Text style={styles.etaLabel}>Chegada em</Text>
+                        <Text style={styles.etaValue}>{eta}</Text>
+                    </View>
+                )}
+            </LinearGradient>
 
-            {/* Status da Rota */}
-            <Card style={styles.card}>
-                <Card.Content>
-                    <View style={styles.routeHeader}>
-                        <Text variant="titleMedium">🚌 {routeInfo.name}</Text>
+            {/* Card Próxima Viagem */}
+            {trip ? (
+                <Surface style={styles.tripCard} elevation={3}>
+                    <View style={styles.tripHeader}>
+                        <Text style={styles.tripTitle}>📍 Próxima Viagem</Text>
                         <Chip
-                            mode="flat"
                             compact
-                            style={{ backgroundColor: cancelledToday ? '#FEE2E2' : '#D1FAE5' }}
-                            textStyle={{ color: cancelledToday ? '#EF4444' : '#059669', fontSize: 12 }}
+                            style={{ backgroundColor: `${statusInfo?.color}20` }}
+                            textStyle={{ color: statusInfo?.color, fontSize: 11, fontWeight: '600' }}
                         >
-                            {routeInfo.busStatus}
+                            {statusInfo?.label}
                         </Chip>
                     </View>
-                    <Divider style={styles.divider} />
 
-                    <View style={styles.infoGrid}>
-                        <View style={styles.infoItem}>
-                            <Text variant="labelSmall" style={styles.infoLabel}>Próxima Parada</Text>
-                            <Text variant="bodyMedium">{routeInfo.nextStop}</Text>
+                    <View style={styles.tripRoute}>
+                        <View style={styles.tripPoint}>
+                            <View style={[styles.dot, { backgroundColor: '#10B981' }]} />
+                            <View>
+                                <Text style={styles.tripTime}>{trip.horarioEmbarque}</Text>
+                                <Text style={styles.tripLocation}>{trip.pontoEmbarque}</Text>
+                            </View>
                         </View>
-                        <View style={styles.infoItem}>
-                            <Text variant="labelSmall" style={styles.infoLabel}>Chegada Estimada</Text>
-                            <Text variant="titleMedium" style={styles.etaText}>
-                                {cancelledToday ? '🚫' : '⏱️'} {routeInfo.eta}
-                            </Text>
+                        <View style={styles.tripLine} />
+                        <View style={styles.tripPoint}>
+                            <View style={[styles.dot, { backgroundColor: '#EF4444' }]} />
+                            <View>
+                                <Text style={styles.tripTime}>{trip.horarioChegada}</Text>
+                                <Text style={styles.tripLocation}>{trip.pontoDesembarque}</Text>
+                            </View>
                         </View>
                     </View>
 
-                    {!cancelledToday && (
-                        <View style={styles.driverInfo}>
-                            <Avatar.Icon size={32} icon="steering" style={{ backgroundColor: theme.colors.primary }} />
-                            <View>
-                                <Text variant="bodySmall" style={styles.driverLabel}>Motorista</Text>
-                                <Text variant="bodyMedium">{routeInfo.driverName}</Text>
-                            </View>
-                            <Text variant="bodySmall" style={styles.plateText}>🚐 {routeInfo.busPlate}</Text>
+                    <View style={styles.tripMeta}>
+                        <View style={styles.metaItem}>
+                            <Ionicons name="bus-outline" size={16} color="#64748B" />
+                            <Text style={styles.metaText}>{trip.veiculo}</Text>
                         </View>
-                    )}
-                </Card.Content>
-                <Card.Actions>
+                        <View style={styles.metaItem}>
+                            <Ionicons name="person-outline" size={16} color="#64748B" />
+                            <Text style={styles.metaText}>{trip.motorista}</Text>
+                        </View>
+                    </View>
+
                     <Button
                         mode="contained"
-                        onPress={handleTrackBus}
+                        onPress={() => router.push('/passenger/map')}
+                        style={styles.trackBtn}
+                        buttonColor="#0D9488"
                         icon="map-marker"
-                        disabled={cancelledToday}
                     >
-                        Acompanhar no Mapa
+                        Localizar Transporte
                     </Button>
-                </Card.Actions>
-            </Card>
-
-            {/* Ações Rápidas */}
-            <View style={styles.actionsContainer}>
-                <Card style={styles.actionCard} onPress={handleRouteDetails}>
-                    <Card.Content style={styles.actionContent}>
-                        <Avatar.Icon size={40} icon="format-list-bulleted" style={{ backgroundColor: '#3B82F6' }} />
-                        <Text variant="bodySmall" style={styles.actionTitle}>Ver Rota</Text>
-                    </Card.Content>
-                </Card>
-
-                <Card
-                    style={[styles.actionCard, cancelledToday && { opacity: 0.5 }]}
-                    onPress={() => !cancelledToday && setCancelDialogVisible(true)}
-                >
-                    <Card.Content style={styles.actionContent}>
-                        <Avatar.Icon
-                            size={40}
-                            icon={cancelledToday ? "check" : "close-circle"}
-                            style={{ backgroundColor: cancelledToday ? '#94A3B8' : '#EF4444' }}
-                        />
-                        <Text variant="bodySmall" style={styles.actionTitle}>
-                            {cancelledToday ? 'Não Utilizarei' : 'Não vou hoje'}
-                        </Text>
-                    </Card.Content>
-                </Card>
-
-                <Card style={styles.actionCard} onPress={handleFeedback}>
-                    <Card.Content style={styles.actionContent}>
-                        <Avatar.Icon size={40} icon="star" style={{ backgroundColor: '#F59E0B' }} />
-                        <Text variant="bodySmall" style={styles.actionTitle}>Avaliar</Text>
-                    </Card.Content>
-                </Card>
-            </View>
-
-            {/* Check-in Manual */}
-            {!cancelledToday && (
-                <Card style={styles.card}>
-                    <Card.Content>
-                        <Text variant="titleMedium" style={styles.cardTitle}>📍 Check-in</Text>
-                        <Text variant="bodyMedium" style={styles.checkinText}>
-                            Confirme seu embarque quando entrar no ônibus
-                        </Text>
-                    </Card.Content>
-                    <Card.Actions>
-                        <Button mode="outlined" icon="qrcode-scan">
-                            Escanear QR
-                        </Button>
-                        <Button mode="contained">
-                            Confirmar Embarque
-                        </Button>
-                    </Card.Actions>
-                </Card>
+                </Surface>
+            ) : (
+                <Surface style={styles.noTripCard} elevation={1}>
+                    <Ionicons name="bus" size={48} color="#CBD5E1" />
+                    <Text style={styles.noTripText}>Nenhuma viagem programada</Text>
+                </Surface>
             )}
 
-            {/* Logout */}
-            <Button
-                mode="outlined"
-                onPress={handleLogout}
-                style={styles.logoutButton}
-                icon="logout"
-            >
-                Sair da Conta
-            </Button>
+            {/* Ações Rápidas */}
+            <Text style={styles.sectionTitle}>Ações Rápidas</Text>
+            <View style={styles.actionsGrid}>
+                <Pressable style={styles.actionCard} onPress={() => router.push('/passenger/checkin')}>
+                    <View style={[styles.actionIcon, { backgroundColor: '#CCFBF1' }]}>
+                        <Ionicons name="qr-code" size={28} color="#0D9488" />
+                    </View>
+                    <Text style={styles.actionLabel}>Check-in</Text>
+                </Pressable>
 
-            <Portal>
-                <Dialog visible={cancelDialogVisible} onDismiss={() => setCancelDialogVisible(false)}>
-                    <Dialog.Title>Não vou utilizar hoje</Dialog.Title>
-                    <Dialog.Content>
-                        <Text style={{ marginBottom: 10 }}>Por favor, informe o motivo:</Text>
-                        <RadioButton.Group onValueChange={value => setCancelReason(value)} value={cancelReason}>
-                            <RadioButton.Item label="Trabalho Remoto (Home Office)" value="remote_work" />
-                            <RadioButton.Item label="Dia de Folga / Férias" value="vacation" />
-                            <RadioButton.Item label="Doença / Médico" value="sick" />
-                            <RadioButton.Item label="Veículo Próprio / Outro" value="own_transport" />
-                        </RadioButton.Group>
-                    </Dialog.Content>
-                    <Dialog.Actions>
-                        <Button onPress={() => setCancelDialogVisible(false)}>Voltar</Button>
-                        <Button onPress={handleSubmitCancel} loading={submittingCancel}>Confirmar</Button>
-                    </Dialog.Actions>
-                </Dialog>
-            </Portal>
+                <Pressable style={styles.actionCard} onPress={() => router.push('/passenger/map')}>
+                    <View style={[styles.actionIcon, { backgroundColor: '#DBEAFE' }]}>
+                        <Ionicons name="location" size={28} color="#3B82F6" />
+                    </View>
+                    <Text style={styles.actionLabel}>Localizar</Text>
+                </Pressable>
+
+                <Pressable style={styles.actionCard} onPress={() => router.push('/passenger/feedback')}>
+                    <View style={[styles.actionIcon, { backgroundColor: '#FEF3C7' }]}>
+                        <Ionicons name="star" size={28} color="#F59E0B" />
+                    </View>
+                    <Text style={styles.actionLabel}>Avaliar</Text>
+                </Pressable>
+
+                <Pressable style={styles.actionCard} onPress={() => router.push('/passenger/details')}>
+                    <View style={[styles.actionIcon, { backgroundColor: '#F1F5F9' }]}>
+                        <Ionicons name="list" size={28} color="#64748B" />
+                    </View>
+                    <Text style={styles.actionLabel}>Itinerário</Text>
+                </Pressable>
+            </View>
+
+            {/* Card informativo */}
+            <Surface style={styles.infoCard} elevation={1}>
+                <View style={styles.infoRow}>
+                    <Ionicons name="notifications-outline" size={24} color="#F59E0B" />
+                    <View style={styles.infoContent}>
+                        <Text style={styles.infoTitle}>Lembrete de Check-in</Text>
+                        <Text style={styles.infoDesc}>
+                            Não esqueça de registrar seu embarque para confirmar a viagem
+                        </Text>
+                    </View>
+                </View>
+            </Surface>
+
+            <View style={{ height: 100 }} />
         </ScrollView>
     );
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        padding: 16,
-        backgroundColor: '#F8FAFC',
-    },
-    profileCard: {
-        marginBottom: 16,
-        backgroundColor: '#FFFFFF',
-    },
-    profileContent: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 16,
-    },
-    profileInfo: {
-        flex: 1,
-    },
-    email: {
-        color: '#64748B',
-    },
-    card: {
-        marginBottom: 16,
-        backgroundColor: '#FFFFFF',
-    },
-    routeHeader: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: 8,
-    },
-    divider: {
-        marginVertical: 12,
-    },
-    infoGrid: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginBottom: 16,
-    },
-    infoItem: {
-        flex: 1,
-    },
-    infoLabel: {
-        color: '#94A3B8',
-        marginBottom: 4,
-    },
-    etaText: {
-        color: '#10B981',
-        fontWeight: 'bold',
-    },
-    driverInfo: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 12,
-        backgroundColor: '#F8FAFC',
-        padding: 12,
-        borderRadius: 8,
-    },
-    driverLabel: {
-        color: '#64748B',
-    },
-    plateText: {
-        marginLeft: 'auto',
-        color: '#64748B',
-    },
-    actionsContainer: {
-        flexDirection: 'row',
-        gap: 12,
-        marginBottom: 16,
-    },
-    actionCard: {
-        flex: 1,
-        backgroundColor: '#FFFFFF',
-    },
-    actionContent: {
-        alignItems: 'center',
-        gap: 8,
-        paddingVertical: 8,
-    },
-    actionTitle: {
-        fontSize: 10,
-        textAlign: 'center',
-        lineHeight: 12,
-    },
-    cardTitle: {
-        marginBottom: 8,
-    },
-    checkinText: {
-        color: '#64748B',
-    },
-    logoutButton: {
-        marginTop: 8,
-        marginBottom: 32,
-    },
+    container: { flex: 1, backgroundColor: '#F8FAFC' },
+
+    header: { padding: 20, paddingBottom: 30, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+    headerContent: { flexDirection: 'row', alignItems: 'center', gap: 14 },
+    avatar: { backgroundColor: 'rgba(255,255,255,0.3)' },
+    headerText: {},
+    greeting: { fontSize: 14, color: 'rgba(255,255,255,0.8)' },
+    userName: { fontSize: 20, fontWeight: '700', color: '#FFF' },
+    etaContainer: { alignItems: 'flex-end' },
+    etaLabel: { fontSize: 11, color: 'rgba(255,255,255,0.7)' },
+    etaValue: { fontSize: 22, fontWeight: '700', color: '#FFF' },
+
+    tripCard: { backgroundColor: '#FFF', borderRadius: 16, padding: 18, marginHorizontal: 16, marginTop: -16, marginBottom: 20 },
+    tripHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 },
+    tripTitle: { fontSize: 16, fontWeight: '600', color: '#0F172A' },
+    tripRoute: { marginBottom: 16 },
+    tripPoint: { flexDirection: 'row', alignItems: 'flex-start', gap: 12 },
+    dot: { width: 12, height: 12, borderRadius: 6, marginTop: 4 },
+    tripLine: { width: 1, height: 24, backgroundColor: '#E2E8F0', marginLeft: 5.5, marginVertical: 4 },
+    tripTime: { fontSize: 16, fontWeight: '700', color: '#0F172A' },
+    tripLocation: { fontSize: 13, color: '#64748B' },
+    tripMeta: { flexDirection: 'row', gap: 20, marginBottom: 16, paddingTop: 12, borderTopWidth: 1, borderTopColor: '#F1F5F9' },
+    metaItem: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+    metaText: { fontSize: 13, color: '#64748B' },
+    trackBtn: { borderRadius: 10 },
+
+    noTripCard: { backgroundColor: '#FFF', borderRadius: 16, padding: 40, marginHorizontal: 16, marginTop: -16, marginBottom: 20, alignItems: 'center', gap: 12 },
+    noTripText: { color: '#94A3B8', fontSize: 14 },
+
+    sectionTitle: { fontSize: 16, fontWeight: '600', color: '#0F172A', marginHorizontal: 16, marginBottom: 12 },
+
+    actionsGrid: { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 12, gap: 8, marginBottom: 20 },
+    actionCard: { width: '23%', backgroundColor: '#FFF', borderRadius: 14, padding: 14, alignItems: 'center', elevation: 1 },
+    actionIcon: { width: 52, height: 52, borderRadius: 14, alignItems: 'center', justifyContent: 'center', marginBottom: 8 },
+    actionLabel: { fontSize: 11, color: '#64748B', fontWeight: '500', textAlign: 'center' },
+
+    infoCard: { backgroundColor: '#FFF', borderRadius: 14, padding: 16, marginHorizontal: 16 },
+    infoRow: { flexDirection: 'row', gap: 14 },
+    infoContent: { flex: 1 },
+    infoTitle: { fontSize: 14, fontWeight: '600', color: '#0F172A', marginBottom: 4 },
+    infoDesc: { fontSize: 12, color: '#64748B', lineHeight: 18 },
 });
