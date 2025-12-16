@@ -13,13 +13,23 @@ function getSupabaseAdmin() {
     return createClient(url, serviceKey)
 }
 
+const corsHeaders = {
+    'Access-Control-Allow-Origin': '*', // Permitir qualquer origem (ou restrinja se necessário)
+    'Access-Control-Allow-Methods': 'GET, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+}
+
+export async function OPTIONS() {
+    return NextResponse.json({}, { headers: corsHeaders })
+}
+
 export async function GET(request: NextRequest) {
     try {
         const { searchParams } = new URL(request.url)
         const userId = searchParams.get('userId')
 
         if (!userId) {
-            return NextResponse.json({ error: 'userId é obrigatório' }, { status: 400 })
+            return NextResponse.json({ error: 'userId é obrigatório' }, { status: 400, headers: corsHeaders })
         }
 
         const supabase = getSupabaseAdmin()
@@ -32,16 +42,16 @@ export async function GET(request: NextRequest) {
 
         if (error) {
             console.error('Erro ao buscar perfil:', error)
-            return NextResponse.json({ error: error.message }, { status: 500 })
+            return NextResponse.json({ error: error.message }, { status: 500, headers: corsHeaders })
         }
 
         if (!data) {
-            return NextResponse.json({ error: 'Perfil não encontrado' }, { status: 404 })
+            return NextResponse.json({ error: 'Perfil não encontrado' }, { status: 404, headers: corsHeaders })
         }
 
-        return NextResponse.json(data)
+        return NextResponse.json(data, { headers: corsHeaders })
     } catch (error: any) {
         console.error('Exception ao buscar perfil:', error)
-        return NextResponse.json({ error: error.message }, { status: 500 })
+        return NextResponse.json({ error: error.message }, { status: 500, headers: corsHeaders })
     }
 }
