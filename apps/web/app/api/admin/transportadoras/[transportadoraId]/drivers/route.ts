@@ -201,9 +201,7 @@ export async function POST(
       )
     }
 
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/802544c4-70d0-43c7-a57c-6692b28ca17d', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'drivers/route.ts:POST', message: 'Before UPSERT driver', data: { authUserId, authEmail, existingAuthUser, transportadoraId }, timestamp: Date.now(), sessionId: 'debug-session', runId: 'post-fix' }) }).catch(() => { });
-    // #endregion
+
 
     // 3. Usar UPSERT na tabela users para evitar erro de chave duplicada
     const { data: driver, error } = await supabase
@@ -231,9 +229,7 @@ export async function POST(
       .single()
 
     if (error) {
-      // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/802544c4-70d0-43c7-a57c-6692b28ca17d', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'drivers/route.ts:POST', message: 'UPSERT ERROR', data: { authUserId, errorMessage: error.message, errorCode: error.code }, timestamp: Date.now(), sessionId: 'debug-session', runId: 'post-fix' }) }).catch(() => { });
-      // #endregion
+
       console.error('Erro ao criar motorista na tabela users:', error)
       // Só deleta do Auth se não era um usuário existente
       if (!existingAuthUser) {
@@ -246,9 +242,7 @@ export async function POST(
       )
     }
 
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/802544c4-70d0-43c7-a57c-6692b28ca17d', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'drivers/route.ts:POST', message: 'UPSERT SUCCESS', data: { driverId: driver?.id, driverName: driver?.name }, timestamp: Date.now(), sessionId: 'debug-session', runId: 'post-fix' }) }).catch(() => { });
-    // #endregion
+
 
     return NextResponse.json({ success: true, driver })
   } catch (err) {

@@ -33,8 +33,8 @@ export function useAuthFast() {
           const u = JSON.parse(decoded)
           // #region agent log
           console.log('[DEBUG useAuthFast] 🍪 Cookie RAW data:', JSON.stringify(u, null, 2));
-          console.log('[DEBUG useAuthFast] 🖼️ avatar_url status:', { 
-            hasAvatarUrl: !!u?.avatar_url, 
+          console.log('[DEBUG useAuthFast] 🖼️ avatar_url status:', {
+            hasAvatarUrl: !!u?.avatar_url,
             avatarUrl: u?.avatar_url,
             avatarUrlType: typeof u?.avatar_url,
             cookieKeys: u ? Object.keys(u) : []
@@ -60,9 +60,7 @@ export function useAuthFast() {
       // Primeiro, tentar cookie (instantâneo)
       const cookieUser = getCookieUser()
       if (cookieUser && mounted) {
-        // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/802544c4-70d0-43c7-a57c-6692b28ca17d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'use-auth-fast.tsx:checkAuth:cookieUser',message:'H1: User from cookie',data:{userId:cookieUser.id,hasAvatarUrl:!!cookieUser.avatar_url,avatarUrl:cookieUser.avatar_url},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H1'})}).catch(()=>{});
-        // #endregion
+
         setUser(cookieUser)
         setLoading(false)
         return
@@ -75,9 +73,7 @@ export function useAuthFast() {
           if (res.ok) {
             const data = await res.json().catch(() => null)
             const u = data?.user
-            // #region agent log
-            fetch('http://127.0.0.1:7242/ingest/802544c4-70d0-43c7-a57c-6692b28ca17d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'use-auth-fast.tsx:checkAuth:apiMe',message:'H2: API /api/auth/me response',data:{hasUser:!!u,hasAvatarUrl:!!u?.avatar_url,avatarUrl:u?.avatar_url,userKeys:u?Object.keys(u):[]},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H2'})}).catch(()=>{});
-            // #endregion
+
             if (u?.id && u?.role) {
               setUser({ id: u.id, email: u.email || '', name: u.name || u.email?.split('@')[0] || '', role: u.role, avatar_url: u.avatar_url })
               setLoading(false)
@@ -117,11 +113,11 @@ export function useAuthFast() {
     const handleAuthUpdate = (event?: Event) => {
       console.log('[DEBUG useAuthFast] 🔄 auth:update EVENT RECEIVED at', new Date().toISOString());
       setLoading(true)
-      
+
       // Adicionar delay para garantir que o banco foi atualizado
       setTimeout(() => {
         // Forçar busca no servidor (ignorar cookie desatualizado)
-        fetch('/api/auth/me', { 
+        fetch('/api/auth/me', {
           credentials: 'include',
           // Forçar sem cache
           cache: 'no-store',
@@ -139,12 +135,12 @@ export function useAuthFast() {
               console.log('[DEBUG useAuthFast] 🔄 auth:update - FULL Server response:', JSON.stringify(u, null, 2));
               console.log('[DEBUG useAuthFast] 🔄 auth:update - Avatar URL received:', u?.avatar_url);
               if (u?.id && u?.role) {
-                const newUser = { 
-                  id: u.id, 
-                  email: u.email || '', 
-                  name: u.name || u.email?.split('@')[0] || '', 
-                  role: u.role, 
-                  avatar_url: u.avatar_url 
+                const newUser = {
+                  id: u.id,
+                  email: u.email || '',
+                  name: u.name || u.email?.split('@')[0] || '',
+                  role: u.role,
+                  avatar_url: u.avatar_url
                 }
                 console.log('[DEBUG useAuthFast] 🔄 Setting NEW user state:', JSON.stringify(newUser, null, 2));
                 setUser(newUser)

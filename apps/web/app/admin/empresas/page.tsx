@@ -150,68 +150,61 @@ export default function EmpresasPage() {
 
   return (
     <AppShell user={{ id: user.id, name: user.name || "Admin", email: user.email, role: user.role || "admin", avatar_url: user.avatar_url }}>
-      <div
-        className="w-full max-w-full overflow-x-hidden min-w-0 box-border"
-        style={{
-          backgroundImage: 'none',
-          background: 'var(--bg)'
-        } as React.CSSProperties}
-      >
-        <div className="space-y-4 sm:space-y-6 w-full max-w-full min-w-0">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 w-full">
-            <div className="min-w-0 flex-1 w-full sm:w-auto">
-              <div className="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-2">
-                <h1 className="text-xl sm:text-2xl md:text-3xl font-bold break-words leading-tight">Empresas</h1>
-                {!loadingEmpresas && !errorEmpresas && Array.isArray(empresas) && empresas.length > 0 && (
-                  <span className="px-2.5 py-0.5 rounded-full text-xs sm:text-sm font-semibold bg-[var(--brand)]/10 text-[var(--brand)]">
-                    {empresas.length}
-                  </span>
-                )}
-              </div>
-              <p className="text-xs sm:text-sm md:text-base text-[var(--ink-muted)] break-words leading-relaxed">Gerencie empresas e funcionários</p>
+      <div className="w-full h-full space-y-4 sm:space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 w-full">
+          <div className="min-w-0 flex-1 w-full sm:w-auto">
+            <div className="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-2">
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold break-words leading-tight">Empresas</h1>
+              {!loadingEmpresas && !errorEmpresas && Array.isArray(empresas) && empresas.length > 0 && (
+                <span className="px-2.5 py-0.5 rounded-full text-xs sm:text-sm font-semibold bg-[var(--brand)]/10 text-[var(--brand)]">
+                  {empresas.length}
+                </span>
+              )}
             </div>
-            <Button
-              onClick={() => setIsCreateOperatorModalOpen(true)}
-              className="w-full sm:w-auto flex-shrink-0 min-h-[44px] h-auto text-sm sm:text-base px-4 sm:px-6 py-2.5 sm:py-2.5 whitespace-nowrap touch-manipulation"
-            >
-              <Plus className="h-4 w-4 mr-2 flex-shrink-0" />
-              <span className="hidden sm:inline">Criar Empresa</span>
-              <span className="sm:hidden">Criar</span>
-            </Button>
+            <p className="text-xs sm:text-sm md:text-base text-[var(--ink-muted)] break-words leading-relaxed">Gerencie empresas e funcionários</p>
           </div>
+          <Button
+            onClick={() => setIsCreateOperatorModalOpen(true)}
+            className="w-full sm:w-auto flex-shrink-0 min-h-[44px] h-auto text-sm sm:text-base px-4 sm:px-6 py-2.5 sm:py-2.5 whitespace-nowrap touch-manipulation"
+          >
+            <Plus className="h-4 w-4 mr-2 flex-shrink-0" />
+            <span className="hidden sm:inline">Criar Empresa</span>
+            <span className="sm:hidden">Criar</span>
+          </Button>
+        </div>
 
-          {errorEmpresas && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-3 sm:p-4 w-full">
-              <p className="text-xs sm:text-sm text-red-800 break-words">Erro ao carregar empresas: {errorEmpresas instanceof Error ? errorEmpresas.message : String(errorEmpresas)}</p>
-            </div>
-          )}
+        {errorEmpresas && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-3 sm:p-4 w-full">
+            <p className="text-xs sm:text-sm text-red-800 break-words">Erro ao carregar empresas: {errorEmpresas instanceof Error ? errorEmpresas.message : String(errorEmpresas)}</p>
+          </div>
+        )}
 
-          {loadingEmpresas && (
-            <div className="flex flex-col sm:flex-row items-center justify-center py-8 sm:py-12 gap-3 w-full">
-              <div className="w-8 h-8 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin flex-shrink-0"></div>
-              <span className="text-xs sm:text-sm md:text-base text-[var(--ink-muted)] text-center break-words">Carregando empresas...</span>
-            </div>
-          )}
+        {loadingEmpresas && (
+          <div className="flex flex-col sm:flex-row items-center justify-center py-8 sm:py-12 gap-3 w-full">
+            <div className="w-8 h-8 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin flex-shrink-0"></div>
+            <span className="text-xs sm:text-sm md:text-base text-[var(--ink-muted)] text-center break-words">Carregando empresas...</span>
+          </div>
+        )}
 
-          {!loadingEmpresas && !errorEmpresas && Array.isArray(empresas) && empresas.length === 0 && (
-            <Card className="p-4 sm:p-6 md:p-8 text-center w-full max-w-full overflow-hidden">
-              <Briefcase className="h-10 w-10 sm:h-12 sm:w-12 text-[var(--ink-muted)] mx-auto mb-3 sm:mb-4 flex-shrink-0" />
-              <h3 className="text-sm sm:text-base md:text-lg font-semibold mb-2 break-words px-2">Nenhuma empresa cadastrada</h3>
-              <p className="text-xs sm:text-sm md:text-base text-[var(--ink-muted)] mb-4 break-words px-2">Clique em &quot;Criar Empresa&quot; para criar uma nova empresa e operador.</p>
-            </Card>
-          )}
+        {!loadingEmpresas && !errorEmpresas && Array.isArray(empresas) && empresas.length === 0 && (
+          <Card className="p-4 sm:p-6 md:p-8 text-center w-full max-w-full overflow-hidden">
+            <Briefcase className="h-10 w-10 sm:h-12 sm:w-12 text-[var(--ink-muted)] mx-auto mb-3 sm:mb-4 flex-shrink-0" />
+            <h3 className="text-sm sm:text-base md:text-lg font-semibold mb-2 break-words px-2">Nenhuma empresa cadastrada</h3>
+            <p className="text-xs sm:text-sm md:text-base text-[var(--ink-muted)] mb-4 break-words px-2">Clique em &quot;Criar Empresa&quot; para criar uma nova empresa e operador.</p>
+          </Card>
+        )}
 
-          {!loadingEmpresas && !errorEmpresas && Array.isArray(empresas) && empresas.length > 0 && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 w-full max-w-full">
-              {empresas.map((empresa: any, index: number) => (
-                <motion.div
-                  key={empresa.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.05 }}
-                  whileHover={{ y: -4 }}
-                  className="group"
-                >
+        {!loadingEmpresas && !errorEmpresas && Array.isArray(empresas) && empresas.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 w-full max-w-full">
+            {empresas.map((empresa: any, index: number) => (
+              <motion.div
+                key={empresa.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.05 }}
+                whileHover={{ y: -4 }}
+                className="group"
+              >
                 <Card key={empresa.id} className="p-4 sm:p-5 overflow-hidden w-full border border-[var(--border)] hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm hover:border-[var(--brand)]/30 flex flex-col">
                   <div className="flex-1 flex flex-col gap-3 w-full">
                     {/* Header com ícone e nome */}
@@ -304,54 +297,53 @@ export default function EmpresasPage() {
                     </div>
                   </div>
                 </Card>
-                </motion.div>
-              ))}
-            </div>
-          )}
+              </motion.div>
+            ))}
+          </div>
+        )}
 
-          {/* Modal Criar Operador */}
-          <CreateOperatorModal
-            isOpen={isCreateOperatorModalOpen}
-            onClose={() => setIsCreateOperatorModalOpen(false)}
-            onSave={async () => {
-              setIsCreateOperatorModalOpen(false)
-              // Aguardar um pouco para garantir que a empresa foi criada no banco
-              await new Promise(resolve => setTimeout(resolve, 1500))
-              // Recarregar dados - refetchEmpresas já limpa cache e busca novos dados
-              await refetchEmpresas()
-            }}
-          />
+        {/* Modal Criar Operador */}
+        <CreateOperatorModal
+          isOpen={isCreateOperatorModalOpen}
+          onClose={() => setIsCreateOperatorModalOpen(false)}
+          onSave={async () => {
+            setIsCreateOperatorModalOpen(false)
+            // Aguardar um pouco para garantir que a empresa foi criada no banco
+            await new Promise(resolve => setTimeout(resolve, 1500))
+            // Recarregar dados - refetchEmpresas já limpa cache e busca novos dados
+            await refetchEmpresas()
+          }}
+        />
 
-          {/* Modal Usuários/Funcionários */}
-          {selectedCompanyForUsers && (
-            <CompanyUsersModal
-              company={selectedCompanyForUsers}
-              isOpen={isUsersModalOpen}
-              onClose={() => {
-                setIsUsersModalOpen(false)
-                setSelectedCompanyForUsers(null)
-              }}
-              onSave={async () => {
-                await refetchEmpresas()
-              }}
-            />
-          )}
-
-          {/* Modal Editar Empresa */}
-          <EditCompanyModal
-            company={selectedCompanyForEdit}
-            isOpen={isEditModalOpen}
+        {/* Modal Usuários/Funcionários */}
+        {selectedCompanyForUsers && (
+          <CompanyUsersModal
+            company={selectedCompanyForUsers}
+            isOpen={isUsersModalOpen}
             onClose={() => {
-              setIsEditModalOpen(false)
-              setSelectedCompanyForEdit(null)
+              setIsUsersModalOpen(false)
+              setSelectedCompanyForUsers(null)
             }}
             onSave={async () => {
-              setIsEditModalOpen(false)
-              setSelectedCompanyForEdit(null)
               await refetchEmpresas()
             }}
           />
-        </div>
+        )}
+
+        {/* Modal Editar Empresa */}
+        <EditCompanyModal
+          company={selectedCompanyForEdit}
+          isOpen={isEditModalOpen}
+          onClose={() => {
+            setIsEditModalOpen(false)
+            setSelectedCompanyForEdit(null)
+          }}
+          onSave={async () => {
+            setIsEditModalOpen(false)
+            setSelectedCompanyForEdit(null)
+            await refetchEmpresas()
+          }}
+        />
       </div>
     </AppShell>
   )

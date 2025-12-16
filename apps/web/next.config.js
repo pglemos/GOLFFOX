@@ -8,6 +8,12 @@ let nextConfig = {
   allowedDevOrigins: ['*.replit.dev', '*.replit.app', '*.picard.replit.dev'],
   // Corrigir warning sobre múltiplos lockfiles
   outputFileTracingRoot: path.join(__dirname, '../../'),
+  // Logs detalhados de requisições de dados (fetch)
+  logging: {
+    fetches: {
+      fullUrl: true,
+    },
+  },
   typescript: {
     // Temporariamente habilitado para permitir deploy
     // TODO: Corrigir todos os erros TypeScript de tipos Supabase
