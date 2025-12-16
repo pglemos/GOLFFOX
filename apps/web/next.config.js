@@ -13,6 +13,9 @@ let nextConfig = {
     // TODO: Corrigir todos os erros TypeScript de tipos Supabase
     ignoreBuildErrors: true,
   },
+  // Transpile removido para evitar conflitos de módulo
+  // transpilePackages: [],
+
   // Next.js 16: Turbopack é o bundler padrão - otimizado para produção
   // Turbopack oferece performance superior com cache incremental
   // Configuração vazia permite que Next.js use webpack ou turbopack conforme disponibilidade
