@@ -95,7 +95,7 @@ export default function DriverDashboard() {
         >
             {trip.isNext ? (
                 <LinearGradient
-                    colors={['#0D9488', '#14B8A6']}
+                    colors={['#F97316', '#FB923C']}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 1 }}
                     style={styles.tripCardNext}
@@ -177,7 +177,7 @@ export default function DriverDashboard() {
                         size={48}
                         icon="bus"
                         style={styles.avatar}
-                        color="#0D9488"
+                        color="#F97316"
                     />
                     <View style={styles.headerText}>
                         <Text style={styles.greeting}>{getGreeting()},</Text>
@@ -230,7 +230,7 @@ export default function DriverDashboard() {
                     <Text style={styles.quickActionLabel}>Histórico</Text>
                 </Pressable>
                 <Pressable style={styles.quickActionBtn} onPress={() => router.push('/driver/scan')}>
-                    <View style={[styles.quickActionIcon, { backgroundColor: '#CCFBF1' }]}>
+                    <View style={[styles.quickActionIcon, { backgroundColor: '#FFF7ED' }]}>
                         <Text style={styles.quickActionEmoji}>📱</Text>
                     </View>
                     <Text style={styles.quickActionLabel}>Check-in</Text>
@@ -268,7 +268,7 @@ const styles = StyleSheet.create({
         gap: 12,
     },
     avatar: {
-        backgroundColor: '#CCFBF1',
+        backgroundColor: '#FFF7ED',
     },
     headerText: {
         gap: 2,
@@ -294,7 +294,7 @@ const styles = StyleSheet.create({
     },
     tabActive: {
         borderBottomWidth: 2,
-        borderBottomColor: '#0D9488',
+        borderBottomColor: '#F97316',
     },
     tabText: {
         fontSize: 16,
@@ -306,7 +306,7 @@ const styles = StyleSheet.create({
     },
     dateLabel: {
         fontSize: 14,
-        color: '#0D9488',
+        color: '#F97316',
         textAlign: 'center',
         paddingVertical: 16,
         fontWeight: '500',
@@ -322,7 +322,7 @@ const styles = StyleSheet.create({
         borderRadius: 16,
         padding: 16,
         elevation: 4,
-        shadowColor: '#0D9488',
+        shadowColor: '#F97316',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
         shadowRadius: 8,
@@ -366,7 +366,7 @@ const styles = StyleSheet.create({
     tripTime: {
         fontSize: 28,
         fontWeight: '300',
-        color: '#0D9488',
+        color: '#F97316',
         marginBottom: 4,
     },
     tripTimeWhite: {
@@ -410,7 +410,7 @@ const styles = StyleSheet.create({
         width: 40,
         height: 40,
         borderRadius: 20,
-        backgroundColor: '#E0F2F1',
+        backgroundColor: '#FFF7ED',
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -421,7 +421,7 @@ const styles = StyleSheet.create({
     },
     tripArrowTextLight: {
         fontSize: 24,
-        color: '#0D9488',
+        color: '#F97316',
         fontWeight: 'bold',
     },
     quickActions: {

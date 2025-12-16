@@ -65,10 +65,10 @@ export default function PassengerDashboard() {
         <ScrollView
             style={styles.container}
             showsVerticalScrollIndicator={false}
-            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#0D9488']} />}
+            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#F97316']} />}
         >
             {/* Header com saudação */}
-            <LinearGradient colors={['#0D9488', '#14B8A6']} style={styles.header}>
+            <LinearGradient colors={['#F97316', '#FB923C']} style={styles.header}>
                 <View style={styles.headerContent}>
                     <Avatar.Text
                         size={48}
@@ -135,7 +135,7 @@ export default function PassengerDashboard() {
                         mode="contained"
                         onPress={() => router.push('/passenger/map')}
                         style={styles.trackBtn}
-                        buttonColor="#0D9488"
+                        buttonColor="#F97316"
                         icon="map-marker"
                     >
                         Localizar Transporte
@@ -152,8 +152,8 @@ export default function PassengerDashboard() {
             <Text style={styles.sectionTitle}>Ações Rápidas</Text>
             <View style={styles.actionsGrid}>
                 <Pressable style={styles.actionCard} onPress={() => router.push('/passenger/checkin')}>
-                    <View style={[styles.actionIcon, { backgroundColor: '#CCFBF1' }]}>
-                        <Ionicons name="qr-code" size={28} color="#0D9488" />
+                    <View style={[styles.actionIcon, { backgroundColor: '#FFF7ED' }]}>
+                        <Ionicons name="qr-code" size={28} color="#F97316" />
                     </View>
                     <Text style={styles.actionLabel}>Check-in</Text>
                 </Pressable>

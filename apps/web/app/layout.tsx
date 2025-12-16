@@ -36,10 +36,6 @@ export const metadata: Metadata = {
   formatDetection: {
     telephone: false,
   },
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#FFFFFF' },
-    { media: '(prefers-color-scheme: dark)', color: '#09090B' },
-  ],
 };
 
 export const viewport = {
@@ -47,7 +43,11 @@ export const viewport = {
   initialScale: 1,
   maximumScale: 5,
   userScalable: true,
-  viewportFit: "cover", // Para dispositivos com notch
+  viewportFit: "cover",
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#FFFFFF' },
+    { media: '(prefers-color-scheme: dark)', color: '#09090B' },
+  ],
 };
 
 // Next.js 16: Partial Pre-Rendering (PPR) habilitado via cacheComponents no next.config.js
