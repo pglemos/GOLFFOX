@@ -3,6 +3,7 @@ import { Text, Surface, Avatar, Divider } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../../src/auth/AuthProvider';
 import { Ionicons } from '@expo/vector-icons';
+import { theme } from '../../src/styles/theme';
 
 interface MenuItem {
     icon: string;
@@ -82,12 +83,12 @@ export default function PerfilScreen() {
 const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: '#F8FAFC', padding: 16 },
 
-    profileCard: { backgroundColor: '#FFF', borderRadius: 16, padding: 24, alignItems: 'center', marginBottom: 16 },
-    avatar: { backgroundColor: '#0D9488', marginBottom: 12 },
+    profileCard: { backgroundColor: theme.colors.card, borderRadius: 16, padding: 24, alignItems: 'center', marginBottom: 16 },
+    avatar: { backgroundColor: theme.colors.primary, marginBottom: 12 },
     userName: { fontSize: 20, fontWeight: '700', color: '#0F172A' },
     userEmail: { fontSize: 14, color: '#64748B', marginBottom: 12 },
-    roleTag: { backgroundColor: '#CCFBF1', paddingHorizontal: 16, paddingVertical: 6, borderRadius: 20 },
-    roleText: { color: '#0D9488', fontWeight: '600', fontSize: 12 },
+    roleTag: { backgroundColor: theme.colors.primaryLight, paddingHorizontal: 16, paddingVertical: 6, borderRadius: 20 },
+    roleText: { color: theme.colors.primary, fontWeight: '600', fontSize: 12 },
 
     menuCard: { backgroundColor: '#FFF', borderRadius: 16, marginBottom: 16, overflow: 'hidden' },
     menuItem: { flexDirection: 'row', alignItems: 'center', padding: 16, gap: 14 },

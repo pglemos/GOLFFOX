@@ -6,12 +6,13 @@ type IoniconsName = React.ComponentProps<typeof Ionicons>['name'];
 
 export default function PassengerLayout() {
     const theme = useTheme();
+    const colors = theme.colors;
 
     const getTabIcon = (name: IoniconsName, focused: boolean) => (
         <Ionicons
             name={focused ? name : `${name}-outline` as IoniconsName}
             size={24}
-            color={focused ? '#0D9488' : '#94A3B8'}
+            color={focused ? colors.primary : colors.secondary}
         />
     );
 
@@ -19,18 +20,18 @@ export default function PassengerLayout() {
         <Tabs
             screenOptions={{
                 headerStyle: {
-                    backgroundColor: '#0D9488',
+                    backgroundColor: colors.primary,
                 },
-                headerTintColor: '#FFFFFF',
+                headerTintColor: colors.onPrimary,
                 headerTitleStyle: {
                     fontWeight: 'bold',
                 },
-                tabBarActiveTintColor: '#0D9488',
-                tabBarInactiveTintColor: '#94A3B8',
+                tabBarActiveTintColor: colors.primary,
+                tabBarInactiveTintColor: colors.secondary,
                 tabBarStyle: {
-                    backgroundColor: '#FFFFFF',
+                    backgroundColor: colors.background,
                     borderTopWidth: 1,
-                    borderTopColor: '#E2E8F0',
+                    borderTopColor: colors.elevation.level5,
                     paddingTop: 4,
                     height: 60,
                 },
