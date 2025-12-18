@@ -1,6 +1,5 @@
 "use client"
 
-import Link from "next/link"
 import { useState, useEffect } from "react"
 import { AppShell } from "@/components/app-shell"
 import { Card } from "@/components/ui/card"
@@ -23,6 +22,8 @@ import {
 import { motion } from "framer-motion"
 import { notifyError } from "@/lib/toast"
 import { useAuth } from "@/hooks/use-auth"
+
+const Link: any = require("next/link")
 
 interface DriverMetrics {
   id: string

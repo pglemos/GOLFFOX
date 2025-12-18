@@ -11,11 +11,9 @@
 import * as helpers from '@swc/helpers';
 
 // Se _apply_decorated_descriptor existe mas applyDecoratedDescriptor não, criar alias
-if (helpers._apply_decorated_descriptor && !helpers.applyDecoratedDescriptor) {
-  helpers.applyDecoratedDescriptor = helpers._apply_decorated_descriptor;
-}
 
 // Re-exportar tudo, incluindo o alias
 export * from '@swc/helpers';
-export { helpers.applyDecoratedDescriptor as applyDecoratedDescriptor };
+export const applyDecoratedDescriptor =
+  helpers.applyDecoratedDescriptor ?? helpers._apply_decorated_descriptor;
 

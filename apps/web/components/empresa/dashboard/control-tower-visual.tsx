@@ -3,7 +3,8 @@
 import { motion } from "framer-motion"
 import { LucideIcon, AlertCircle, Truck, Route, HelpCircle } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
-import Link from "next/link"
+
+const Link: any = require("next/link")
 
 interface ControlTowerItem {
   label: string

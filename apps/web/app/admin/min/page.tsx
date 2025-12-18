@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button"
 import { MapPin, DollarSign, FileText } from "lucide-react"
 import { motion } from "framer-motion"
 import { useAuthFast } from "@/hooks/use-auth-fast"
-import Link from "next/link"
+
+const Link: any = require("next/link")
 
 export default function AdminMin() {
   const { user, loading } = useAuthFast()

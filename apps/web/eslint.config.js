@@ -1,0 +1,38 @@
+const nextCoreWebVitals = require("eslint-config-next/core-web-vitals")
+const nextTypeScript = require("eslint-config-next/typescript")
+
+module.exports = [
+  ...nextCoreWebVitals,
+  ...nextTypeScript,
+  { ignores: ["coverage/**", "playwright-report/**", "test-results/**"] },
+  {
+    files: [
+      "app/admin/min/page.tsx",
+      "app/admin/rotas/rotas-content.tsx",
+      "app/transportadora/motoristas/page.tsx",
+      "app/transportadora/motoristas/ranking/page.tsx",
+      "components/empresa/dashboard/control-tower-visual.tsx",
+      "components/empresa/operator/dashboard/control-tower-visual.tsx",
+    ],
+    rules: {
+      "@typescript-eslint/no-require-imports": "off",
+    },
+  },
+  {
+    rules: {
+      "@typescript-eslint/no-explicit-any": "warn",
+      "@typescript-eslint/ban-ts-comment": "warn",
+      "@typescript-eslint/no-empty-object-type": "warn",
+      "@typescript-eslint/no-unused-vars": "warn",
+      "prefer-const": "warn",
+      "react-hooks/exhaustive-deps": "warn",
+      "react-hooks/immutability": "warn",
+      "react-hooks/preserve-manual-memoization": "warn",
+      "react-hooks/purity": "warn",
+      "react-hooks/set-state-in-effect": "warn",
+      "react-hooks/use-memo": "warn",
+      "react/no-unescaped-entities": "warn",
+      "@next/next/no-img-element": "warn",
+    },
+  },
+]

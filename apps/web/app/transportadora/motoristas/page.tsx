@@ -3,7 +3,6 @@
 import { useEffect, useState, useMemo, useCallback } from "react"
 import dynamic from "next/dynamic"
 import { AppShell } from "@/components/app-shell"
-import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -14,6 +13,8 @@ import { motion } from "framer-motion"
 import { useAuth } from "@/hooks/use-auth"
 import { useDebounce } from "@/hooks/use-debounce"
 import { SkeletonList } from "@/components/ui/skeleton"
+
+const Link: any = require("next/link")
 
 // Lazy load modal
 const DriverModal = dynamic(

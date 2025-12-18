@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import Link from "next/link"
 import { motion } from "framer-motion"
 import {
   Route,
@@ -37,6 +36,8 @@ import { SearchBarPremium } from "@/components/shared/search-bar-premium"
 import { FilterDrawer } from "@/components/shared/filter-drawer"
 import { EmptyState } from "@/components/shared/empty-state"
 import { LoadingSkeleton } from "@/components/shared/loading-skeleton"
+
+const Link: any = require("next/link")
 
 export function RotasPageContent() {
   const router = useRouter()

@@ -5,6 +5,7 @@ const isProd = process.env.NODE_ENV === 'production'
 let nextConfig = {
   reactStrictMode: true,
   output: 'standalone',
+  experimental: process.platform === 'win32' ? { useWasmBinary: true } : {},
   allowedDevOrigins: ['*.replit.dev', '*.replit.app', '*.picard.replit.dev'],
   // Corrigir warning sobre múltiplos lockfiles
   outputFileTracingRoot: path.join(__dirname, '../../'),
