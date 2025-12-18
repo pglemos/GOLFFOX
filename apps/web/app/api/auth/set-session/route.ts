@@ -44,7 +44,9 @@ export async function POST(req: NextRequest) {
     const cookieValue = Buffer.from(JSON.stringify(sessionPayload)).toString('base64')
 
     const url = new URL(req.url)
-    const isSecure = url.protocol === "https:" || req.headers.get('x-forwarded-proto') === 'https'
+    const protocolSecure = url.protocol === "https:" || req.headers.get('x-forwarded-proto') === 'https'
+    // Em desenvolvimento (localhost), forçar secure=false para garantir que o cookie seja salvo
+    const isSecure = isDev ? false : protocolSecure
     const host = req.headers.get('host') || 'unknown'
 
     debug('set-session: preparando cookie', {
@@ -52,6 +54,7 @@ export async function POST(req: NextRequest) {
       hasToken: !!accessToken,
       host,
       isSecure,
+      isDev
     }, 'set-session')
 
     const res = NextResponse.json({ ok: true })

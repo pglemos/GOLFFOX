@@ -19,18 +19,21 @@ let nextConfig = {
     // TODO: Corrigir todos os erros TypeScript de tipos Supabase
     ignoreBuildErrors: true,
   },
-  // Transpile removido para evitar conflitos de módulo
-  // transpilePackages: [],
+  // Transpile pacotes ESM problemáticos para CommonJS
+  transpilePackages: ['@supabase/supabase-js'],
 
-  // Next.js 16: Turbopack é o bundler padrão - otimizado para produção
-  // Turbopack oferece performance superior com cache incremental
-  // Configuração vazia permite que Next.js use webpack ou turbopack conforme disponibilidade
-  // turbopack: {},
+  // Configuração webpack para resolver problema ESM do Supabase
+  webpack: (config) => {
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@supabase/supabase-js': require.resolve('@supabase/supabase-js'),
+    }
+    return config
+  },
 
   // Configuração SWC: Next.js automaticamente usa WASM como fallback se binário nativo falhar
   // O binário nativo (@next/swc-win32-x64-msvc) é preferido para melhor performance
   // WASM é mais lento mas funciona como fallback se o binário nativo não carregar
-  // Turbopack não funciona com WASM - se SWC nativo falhar, Next.js usará webpack automaticamente
   async headers() {
     return [
       {
@@ -116,68 +119,6 @@ let nextConfig = {
       },
     ],
   },
-  /*
-  webpack: (config, { dev, isServer }) => {
-    config.resolve.alias = {
-      ...config.resolve.alias,
-      '@': path.resolve(__dirname),
-      '@shared': path.resolve(__dirname, '../../shared'),
-      // Resolver conflito @swc/helpers entre pdfkit/fontkit e projeto
-      // Usar a versão do Next.js (0.5.15) que tem _apply_decorated_descriptor
-      '@swc/helpers': path.resolve(__dirname, 'node_modules/next/node_modules/@swc/helpers'),
-    }
-
-    // Adicionar plugin para injetar compatibilidade
-    if (!isServer) {
-      config.plugins = config.plugins || []
-      // FIXME: This patch might be causing "exports is not defined" errors. Disabling to test stability.
-      // config.plugins.push(
-      //   new (require('webpack').NormalModuleReplacementPlugin)(
-      //     /@swc\/helpers$/,
-      //     (resource) => {
-      //       // Para módulos ESM do fontkit, usar wrapper de compatibilidade
-      //       if (resource.context && resource.context.includes('fontkit')) {
-      //         resource.request = path.resolve(__dirname, 'lib/swc-helpers-patch.mjs')
-      //       }
-      //     }
-      //   )
-      // )
-    }
-
-    // Configurações básicas para cliente
-    if (!isServer) {
-      config.resolve.fallback = {
-        ...config.resolve.fallback,
-        fs: false,
-        net: false,
-        tls: false,
-      }
-    }
-
-    // Cache para desenvolvimento
-    if (dev) {
-      config.cache = {
-        type: 'filesystem',
-        buildDependencies: {
-          config: [__filename],
-        },
-      }
-
-      // Logging melhorado em desenvolvimento
-      if (process.env.NODE_ENV === 'development') {
-        const originalResolve = config.resolve
-        config.resolve = {
-          ...originalResolve,
-          alias: {
-            ...originalResolve.alias,
-          },
-        }
-      }
-    }
-    return config
-  },
-  */
 }
 
 module.exports = nextConfig
-

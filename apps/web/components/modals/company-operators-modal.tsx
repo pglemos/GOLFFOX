@@ -116,10 +116,10 @@ export function CompanyUsersModal({
           <DialogHeader className="pb-4 sm:pb-6">
             <DialogTitle className="text-xl sm:text-2xl font-bold flex items-center gap-2 break-words">
               <Users className="h-5 w-5 flex-shrink-0" />
-              Funcionários - {company?.name}
+              Logins - {company?.name}
             </DialogTitle>
             <DialogDescription className="text-sm sm:text-base break-words">
-              Gerencie todos os funcionários e usuários desta empresa
+              Gerencie todos os logins e usuários desta empresa
             </DialogDescription>
           </DialogHeader>
 
@@ -134,65 +134,71 @@ export function CompanyUsersModal({
                 className="w-full sm:w-auto min-h-[44px] text-xs sm:text-sm"
               >
                 <Plus className="h-4 w-4 mr-2 flex-shrink-0" />
-                <span className="hidden sm:inline">Criar Novo Usuário</span>
-                <span className="sm:hidden">Criar Usuário</span>
+                <span className="hidden sm:inline">Criar Novo Login</span>
+                <span className="sm:hidden">Criar</span>
               </Button>
             </div>
 
             {loading ? (
               <div className="flex items-center justify-center py-12">
                 <Loader2 className="h-8 w-8 animate-spin text-[var(--brand)]" />
-                <span className="ml-3 text-[var(--ink-muted)]">Carregando usuários...</span>
+                <span className="ml-3 text-[var(--ink-muted)]">Carregando logins...</span>
               </div>
             ) : operators.length === 0 ? (
               <div className="text-center py-12">
                 <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium mb-2">Nenhum usuário cadastrado</h3>
+                <h3 className="text-lg font-medium mb-2">Nenhum login cadastrado</h3>
                 <p className="text-sm text-[var(--ink-muted)] mb-4">
-                  Clique em &quot;Criar Novo Usuário&quot; para adicionar um funcionário
+                  Clique em &quot;Criar Novo Login&quot; para adicionar um acesso
                 </p>
               </div>
             ) : (
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {operators.map((operator) => (
                   <div
                     key={operator.id}
-                    className="border border-[var(--border)] rounded-lg p-4 hover:bg-[var(--bg-hover)] transition-colors"
+                    className="border border-[var(--border)] rounded-lg p-3 sm:p-4 hover:bg-[var(--bg-hover)] transition-colors bg-card"
                   >
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
-                          <h3 className="font-semibold">{operator.name || 'Sem nome'}</h3>
-                          <span className={`px-2 py-1 rounded text-xs ${operator.is_active
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-gray-100 text-gray-800'
-                            }`}>
-                            {operator.is_active ? 'Ativo' : 'Inativo'}
-                          </span>
-                          <span className="px-2 py-1 rounded text-xs bg-blue-100 text-blue-800 capitalize">
-                            {operator.role || 'Sem papel'}
-                          </span>
-                        </div>
-                        <div className="space-y-1 text-sm">
-                          <div className="flex items-center gap-2">
-                            <span className="text-[var(--ink-muted)] w-20">Email:</span>
-                            <span className="font-mono">{operator.email}</span>
+                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex flex-wrap items-center gap-2 mb-2">
+                          <div className="font-bold text-base sm:text-lg text-[var(--ink)] break-words leading-tight mr-1">
+                            {operator.name || 'Sem nome'}
                           </div>
-                          {operator.phone && (
-                            <div className="flex items-center gap-2">
-                              <span className="text-[var(--ink-muted)] w-20">Telefone:</span>
-                              <span>{operator.phone}</span>
-                            </div>
-                          )}
+                          <div className="flex items-center gap-1.5 shrink-0">
+                            <span className={`px-1.5 py-0.5 rounded text-[10px] sm:text-xs font-medium uppercase tracking-wide border ${operator.is_active
+                              ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                              : 'bg-gray-50 text-gray-600 border-gray-200'
+                              }`}>
+                              {operator.is_active ? 'Ativo' : 'Inativo'}
+                            </span>
+                            <span className="px-1.5 py-0.5 rounded text-[10px] sm:text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200 uppercase tracking-wide">
+                              {operator.role || 'Sem papel'}
+                            </span>
+                          </div>
+                        </div>
+                        
+                        <div className="grid grid-cols-1 gap-1 text-sm text-[var(--ink-muted)]">
+                          <div className="flex items-center gap-2 overflow-hidden">
+                            <span className="text-[var(--ink-light)] text-xs font-medium uppercase tracking-wider w-12 shrink-0">Email:</span>
+                            <span className="font-mono text-xs sm:text-sm truncate" title={operator.email}>{operator.email}</span>
+                          </div>
                           {operator.cpf && (
                             <div className="flex items-center gap-2">
-                              <span className="text-[var(--ink-muted)] w-20">CPF:</span>
-                              <span>{operator.cpf}</span>
+                              <span className="text-[var(--ink-light)] text-xs font-medium uppercase tracking-wider w-12 shrink-0">CPF:</span>
+                              <span className="font-mono text-xs sm:text-sm">{operator.cpf}</span>
+                            </div>
+                          )}
+                          {operator.phone && (
+                            <div className="flex items-center gap-2">
+                              <span className="text-[var(--ink-light)] text-xs font-medium uppercase tracking-wider w-12 shrink-0">Tel:</span>
+                              <span className="font-mono text-xs sm:text-sm">{operator.phone}</span>
                             </div>
                           )}
                         </div>
                       </div>
-                      <div className="flex flex-col sm:flex-row gap-2 ml-0 sm:ml-4 mt-3 sm:mt-0 w-full sm:w-auto">
+
+                      <div className="flex flex-row sm:flex-col gap-2 w-full sm:w-auto shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 mt-1 sm:mt-0 border-dashed border-gray-100">
                         <Button
                           variant="outline"
                           size="sm"
@@ -200,18 +206,18 @@ export function CompanyUsersModal({
                             setSelectedOperatorForEdit(operator)
                             setIsEditModalOpen(true)
                           }}
-                          className="w-full sm:w-auto min-h-[44px] text-xs sm:text-sm"
+                          className="flex-1 sm:flex-none h-8 sm:h-9 text-xs"
                         >
-                          <Edit className="h-4 w-4 mr-2 flex-shrink-0" />
+                          <Edit className="h-3.5 w-3.5 mr-1.5" />
                           Editar
                         </Button>
                         <Button
                           variant="destructive"
                           size="sm"
                           onClick={() => handleDeleteOperator(operator.id, operator.name || operator.email)}
-                          className="w-full sm:w-auto min-h-[44px] text-xs sm:text-sm"
+                          className="flex-1 sm:flex-none h-8 sm:h-9 text-xs"
                         >
-                          <Trash2 className="h-4 w-4 mr-2 flex-shrink-0" />
+                          <Trash2 className="h-3.5 w-3.5 mr-1.5" />
                           Excluir
                         </Button>
                       </div>
@@ -270,4 +276,3 @@ export function CompanyUsersModal({
     </>
   )
 }
-
