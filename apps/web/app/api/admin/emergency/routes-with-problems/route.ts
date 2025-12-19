@@ -1,26 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { getSupabaseAdmin } from '@/lib/supabase-client'
+import { logError } from '@/lib/logger'
+import { requireAuth } from '@/lib/api-auth'
 
 export const runtime = 'nodejs'
 
 export async function GET(req: NextRequest) {
+  // Verificar autenticação admin
+  const authError = await requireAuth(req, 'admin')
+  if (authError) return authError
+
   try {
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-
-    if (!supabaseUrl || !supabaseServiceKey) {
-      return NextResponse.json(
-        { success: false, error: 'Configuração do Supabase não encontrada' },
-        { status: 500 }
-      )
-    }
-
-    const supabase = createClient(supabaseUrl, supabaseServiceKey, {
-      auth: {
-        autoRefreshToken: false,
-        persistSession: false
-      }
-    })
+    const supabase = getSupabaseAdmin()
 
     // Buscar rotas ativas
     const { data: allRoutes, error: routesError } = await supabase
@@ -47,7 +38,7 @@ export async function GET(req: NextRequest) {
       .in('severity', ['high', 'critical'])
 
     if (incidentsError) {
-      console.error('Erro ao buscar incidentes:', incidentsError)
+      logError('Erro ao buscar incidentes', { error: incidentsError }, 'RoutesWithProblemsAPI')
     }
 
     // Buscar solicitações de socorro abertas
@@ -57,7 +48,7 @@ export async function GET(req: NextRequest) {
       .eq('status', 'open')
 
     if (assistanceError) {
-      console.error('Erro ao buscar solicitações de socorro:', assistanceError)
+      logError('Erro ao buscar solicitações de socorro', { error: assistanceError }, 'EmergencyRoutesWithProblemsAPI')
     }
 
     // Filtrar rotas que têm problemas
@@ -143,7 +134,7 @@ export async function GET(req: NextRequest) {
       routes: formattedRoutes
     })
   } catch (error: any) {
-    console.error('Erro ao buscar rotas com problemas:', error)
+    logError('Erro ao buscar rotas com problemas', { error }, 'RoutesWithProblemsAPI')
     return NextResponse.json(
       {
         success: false,

@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { getSupabaseAdmin } from '@/lib/supabase-client'
+import { requireAuth } from '@/lib/api-auth'
+import { logError } from '@/lib/logger'
 import { z } from 'zod'
 
 // Schema de validação
@@ -16,13 +18,6 @@ const documentSchema = z.object({
     notes: z.string().optional().nullable(),
 })
 
-// Supabase service client (bypasses RLS)
-const supabaseAdmin = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    { auth: { persistSession: false } }
-)
-
 interface RouteParams {
     params: Promise<{ vehicleId: string }>
 }
@@ -32,6 +27,10 @@ interface RouteParams {
  * Lista todos os documentos de um veículo
  */
 export async function GET(request: NextRequest, { params }: RouteParams) {
+    // Verificar autenticação admin
+    const authError = await requireAuth(request, 'admin')
+    if (authError) return authError
+
     try {
         const { vehicleId } = await params
 
@@ -41,6 +40,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
                 { status: 400 }
             )
         }
+
+        const supabaseAdmin = getSupabaseAdmin()
 
         // Verificar se veículo existe
         const { data: vehicle, error: vehicleError } = await supabaseAdmin
@@ -64,7 +65,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
             .order('document_type', { ascending: true })
 
         if (error) {
-            console.error('Erro ao buscar documentos:', error)
+            logError('Erro ao buscar documentos', { error, vehicleId }, 'VehicleDocumentsAPI')
             return NextResponse.json(
                 { error: 'Erro ao buscar documentos' },
                 { status: 500 }
@@ -73,7 +74,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
         return NextResponse.json(documents || [])
     } catch (error) {
-        console.error('Erro na API de documentos:', error)
+        logError('Erro na API de documentos', { error, vehicleId, method: 'GET' }, 'VehicleDocumentsAPI')
         return NextResponse.json(
             { error: 'Erro interno do servidor' },
             { status: 500 }
@@ -86,6 +87,10 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
  * Adiciona um documento a um veículo
  */
 export async function POST(request: NextRequest, { params }: RouteParams) {
+    // Verificar autenticação admin
+    const authError = await requireAuth(request, 'admin')
+    if (authError) return authError
+
     try {
         const { vehicleId } = await params
 
@@ -95,6 +100,8 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
                 { status: 400 }
             )
         }
+
+        const supabaseAdmin = getSupabaseAdmin()
 
         const body = await request.json()
 
@@ -144,7 +151,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
                 .single()
 
             if (updateError) {
-                console.error('Erro ao atualizar documento:', updateError)
+                logError('Erro ao atualizar documento', { error: updateError, vehicleId }, 'VehicleDocumentsAPI')
                 return NextResponse.json(
                     { error: 'Erro ao atualizar documento' },
                     { status: 500 }
@@ -165,7 +172,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
             .single()
 
         if (createError) {
-            console.error('Erro ao criar documento:', createError)
+            logError('Erro ao criar documento', { error: createError, vehicleId }, 'VehicleDocumentsAPI')
             return NextResponse.json(
                 { error: 'Erro ao criar documento' },
                 { status: 500 }
@@ -174,7 +181,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
         return NextResponse.json(created, { status: 201 })
     } catch (error) {
-        console.error('Erro na API de documentos:', error)
+        logError('Erro na API de documentos', { error, vehicleId, method: 'GET' }, 'VehicleDocumentsAPI')
         return NextResponse.json(
             { error: 'Erro interno do servidor' },
             { status: 500 }
@@ -200,6 +207,8 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
             )
         }
 
+        const supabaseAdmin = getSupabaseAdmin()
+
         // Verificar se documento existe e pertence ao veículo
         const { data: document, error: docError } = await supabaseAdmin
             .from('gf_vehicle_documents')
@@ -222,7 +231,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
             .eq('id', documentId)
 
         if (deleteError) {
-            console.error('Erro ao excluir documento:', deleteError)
+            logError('Erro ao excluir documento', { error: deleteError, vehicleId }, 'VehicleDocumentsAPI')
             return NextResponse.json(
                 { error: 'Erro ao excluir documento' },
                 { status: 500 }
@@ -234,7 +243,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
 
         return NextResponse.json({ success: true })
     } catch (error) {
-        console.error('Erro na API de documentos:', error)
+        logError('Erro na API de documentos', { error, vehicleId, method: 'GET' }, 'VehicleDocumentsAPI')
         return NextResponse.json(
             { error: 'Erro interno do servidor' },
             { status: 500 }

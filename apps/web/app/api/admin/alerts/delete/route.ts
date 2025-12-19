@@ -43,8 +43,7 @@ export async function DELETE(request: NextRequest) {
       .select()
 
     if (error) {
-      console.error('❌ Erro ao excluir alerta:', error)
-      console.error('Detalhes do erro:', JSON.stringify(error, null, 2))
+      logError('Erro ao excluir alerta', { error, alertId, errorDetails: JSON.stringify(error, null, 2) }, 'AlertsDeleteAPI')
       return NextResponse.json(
         { 
           error: 'Erro ao excluir alerta', 
@@ -66,7 +65,7 @@ export async function DELETE(request: NextRequest) {
       message: 'Alerta excluído com sucesso'
     })
   } catch (error: any) {
-    console.error('Erro ao excluir alerta:', error)
+    logError('Erro ao excluir alerta', { error, alertId: request.nextUrl.searchParams.get('id') }, 'AlertsDeleteAPI')
     return NextResponse.json(
       { error: 'Erro ao excluir alerta', message: error.message },
       { status: 500 }

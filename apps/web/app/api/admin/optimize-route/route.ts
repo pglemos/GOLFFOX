@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js'
 import type { OptimizeRouteRequest, OptimizeRouteResponse } from '@/types/routes'
 import { calculateHash } from '@/lib/route-optimization'
 import { logError } from '@/lib/logger'
+import { requireAuth } from '@/lib/api-auth'
 
 const RATE_LIMIT = new Map<string, { count: number; resetAt: number }>()
 
@@ -170,6 +171,10 @@ function distance(a: { lat: number; lng: number }, b: { lat: number; lng: number
 }
 
 export async function POST(request: NextRequest) {
+  // Verificar autenticação (admin ou empresa podem otimizar rotas)
+  const authError = await requireAuth(request, ['admin', 'empresa', 'operator'])
+  if (authError) return authError
+
   try {
     const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown'
     if (!checkRateLimit(ip)) {

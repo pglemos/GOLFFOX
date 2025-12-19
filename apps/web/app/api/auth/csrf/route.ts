@@ -1,19 +1,24 @@
 import { NextRequest, NextResponse } from "next/server"
 import { randomBytes } from "crypto"
 import { logError } from '@/lib/logger'
+import { applyRateLimit } from '@/lib/rate-limit'
+import { successResponse, errorResponse } from '@/lib/api-response'
 
 function generateToken(length = 32) {
   return randomBytes(length).toString('hex')
 }
 
 export async function GET(req: NextRequest) {
+  // Aplicar rate limiting para prevenir abuso
+  const rateLimitResponse = await applyRateLimit(req, 'auth')
+  if (rateLimitResponse) return rateLimitResponse
   try {
     const token = generateToken(32)
     const url = new URL(req.url)
     const isSecure = url.protocol === 'https:'
 
     // Retornar tanto 'token' (compatibilidade) quanto 'csrfToken' (formato esperado pelos testes)
-    const res = NextResponse.json({ 
+    const res = successResponse({ 
       token, // Mantém compatibilidade com código existente
       csrfToken: token // Formato esperado pelos testes
     })
@@ -33,10 +38,6 @@ export async function GET(req: NextRequest) {
     return res
   } catch (error: unknown) {
     logError('Erro ao gerar token CSRF', { error }, 'CSRFAPI')
-    const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido'
-    return NextResponse.json(
-      { error: 'Erro ao gerar token CSRF', message: errorMessage },
-      { status: 500 }
-    )
+    return errorResponse(error, 500, 'Erro ao gerar token CSRF')
   }
 }

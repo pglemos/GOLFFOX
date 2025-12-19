@@ -1,19 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { NextRequest } from 'next/server'
 import { requireAuth } from '@/lib/api-auth'
-import { logger } from '@/lib/logger'
+import { logger, logError } from '@/lib/logger'
 import { invalidateEntityCache } from '@/lib/next-cache'
+import { getSupabaseAdmin } from '@/lib/supabase-client'
+import { validationErrorResponse, errorResponse, successResponse } from '@/lib/api-response'
 
 export const runtime = 'nodejs'
-
-function getSupabaseAdmin() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-  if (!url || !serviceKey) {
-    throw new Error('Supabase não configurado')
-  }
-  return createClient(url, serviceKey)
-}
 
 // Aceitar tanto DELETE quanto POST para compatibilidade
 export async function DELETE(request: NextRequest) {
@@ -65,16 +57,8 @@ async function handleDelete(request: NextRequest) {
       .eq('company_id', companyId)
 
     if (usersUpdateError) {
-      console.error('❌ Erro ao atualizar users:', usersUpdateError)
-      return NextResponse.json(
-        { 
-          error: 'Erro ao atualizar usuários da empresa', 
-          message: usersUpdateError.message,
-          details: usersUpdateError.details || usersUpdateError.hint,
-          code: usersUpdateError.code
-        },
-        { status: 500 }
-      )
+      logError('Erro ao atualizar users', { error: usersUpdateError, companyId }, 'CompaniesDeleteAPI')
+      return errorResponse(usersUpdateError, 500, 'Erro ao atualizar usuários da empresa')
     }
     logger.log('   ✅ Users atualizados')
 
@@ -88,7 +72,7 @@ async function handleDelete(request: NextRequest) {
       .eq('company_id', companyId)
 
     if (routesError && routesError.code !== '42P01') {
-      console.error('❌ Erro ao excluir routes:', routesError)
+      logError('Erro ao excluir routes', { error: routesError, companyId }, 'CompaniesDeleteAPI')
       return NextResponse.json(
         { error: 'Erro ao excluir rotas da empresa', message: routesError.message },
         { status: 500 }
@@ -117,7 +101,7 @@ async function handleDelete(request: NextRequest) {
         .eq(columnName, companyId)
 
       if (depError && depError.code !== '42P01' && depError.code !== '42703') {
-        console.error(`❌ Erro ao excluir ${table}:`, depError)
+        logError(`Erro ao excluir ${table}`, { error: depError, table, companyId }, 'CompaniesDeleteAPI')
         // Não retornar erro fatal, algumas tabelas podem não existir
       }
     }
@@ -132,17 +116,8 @@ async function handleDelete(request: NextRequest) {
       .select()
 
     if (error) {
-      console.error('❌ Erro ao excluir empresa:', error)
-      console.error('Detalhes do erro:', JSON.stringify(error, null, 2))
-      return NextResponse.json(
-        { 
-          error: 'Erro ao excluir empresa', 
-          message: error.message,
-          details: error.details || error.hint || 'Sem detalhes adicionais',
-          code: error.code
-        },
-        { status: 500 }
-      )
+      logError('Erro ao excluir empresa', { error, companyId, errorDetails: JSON.stringify(error, null, 2) }, 'CompaniesDeleteAPI')
+      return errorResponse(error, 500, 'Erro ao excluir empresa')
     }
 
     // Invalidar cache após exclusão
@@ -150,17 +125,10 @@ async function handleDelete(request: NextRequest) {
 
     logger.log(`✅ Empresa excluída com sucesso: ${companyId}`, data)
 
-    return NextResponse.json({
-      success: true,
-      message: 'Empresa excluída com sucesso'
-    })
+    return successResponse(null, 200, { message: 'Empresa excluída com sucesso' })
   } catch (err) {
-    console.error('Erro ao excluir empresa:', err)
-    const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
-    return NextResponse.json(
-      { error: 'Erro ao excluir empresa', message: errorMessage },
-      { status: 500 }
-    )
+    logError('Erro ao excluir empresa', { error: err }, 'CompaniesDeleteAPI')
+    return errorResponse(err, 500, 'Erro ao excluir empresa')
   }
 }
 

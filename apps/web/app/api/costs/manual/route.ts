@@ -3,7 +3,7 @@ import { supabaseServiceRole } from '@/lib/supabase-server'
 import { requireCompanyAccess } from '@/lib/api-auth'
 import { z } from 'zod'
 import { withRateLimit } from '@/lib/rate-limit'
-import { logger } from '@/lib/logger'
+import { logger, logError } from '@/lib/logger'
 
 const costSchema = z.object({
   company_id: z.string().uuid(),
@@ -262,7 +262,7 @@ async function createManualCostHandler(request: NextRequest) {
       .single()
 
     if (error) {
-      console.error('Erro ao criar custo:', error)
+      logger.error('Erro ao criar custo', { error }, 'CostsManualAPI')
       
       // Em modo de teste ou desenvolvimento, se a tabela não existe ou há qualquer erro, retornar resposta simulada
       if (isTestMode || isDevelopment) {
@@ -304,7 +304,7 @@ async function createManualCostHandler(request: NextRequest) {
         { status: 400 }
       )
     }
-    console.error('Erro ao criar custo:', error)
+    logger.error('Erro ao criar custo', { error }, 'CostsManualAPI')
     return NextResponse.json(
       { error: error.message || 'Erro desconhecido' },
       { status: 500 }
@@ -381,7 +381,7 @@ async function listManualCostsHandler(request: NextRequest) {
     const { data, error, count } = await query
 
     if (error) {
-      console.error('Erro ao buscar custos:', error)
+      logger.error('Erro ao buscar custos', { error }, 'CostsManualAPI')
       
       // Em modo de teste, se a tabela não existe, retornar dados simulados
       if ((isTestMode || isDevelopment) && (error.message?.includes('does not exist') || error.message?.includes('relation') || error.code === '42P01')) {
@@ -519,7 +519,7 @@ async function listManualCostsHandler(request: NextRequest) {
     // Retornar lista diretamente (o teste espera array)
     return NextResponse.json(mappedData, { status: 200 })
   } catch (error: any) {
-    console.error('Erro ao buscar custos:', error)
+    logError('Erro ao buscar custos', { error }, 'CostsManualAPI')
     
     // Em modo de teste, retornar lista vazia (array) em caso de erro
     const isTestMode = request.headers.get('x-test-mode') === 'true'

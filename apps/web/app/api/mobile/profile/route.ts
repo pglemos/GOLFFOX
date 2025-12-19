@@ -1,17 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { getSupabaseAdmin } from '@/lib/supabase-client'
+import { logError } from '@/lib/logger'
+import { requireAuth } from '@/lib/api-auth'
 
 // API para buscar perfil do usuário autenticado (bypassa RLS)
 // GET /api/mobile/profile?userId=xxx
-
-function getSupabaseAdmin() {
-    const url = process.env.NEXT_PUBLIC_SUPABASE_URL
-    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-    if (!url || !serviceKey) {
-        throw new Error('Supabase não configurado')
-    }
-    return createClient(url, serviceKey)
-}
 
 const corsHeaders = {
     'Access-Control-Allow-Origin': '*', // Permitir qualquer origem (ou restrinja se necessário)
@@ -24,6 +17,10 @@ export async function OPTIONS() {
 }
 
 export async function GET(request: NextRequest) {
+    // Verificar autenticação (qualquer usuário autenticado pode ver seu próprio perfil)
+    const authError = await requireAuth(request)
+    if (authError) return authError
+
     try {
         const { searchParams } = new URL(request.url)
         const userId = searchParams.get('userId')
@@ -41,7 +38,7 @@ export async function GET(request: NextRequest) {
             .maybeSingle()
 
         if (error) {
-            console.error('Erro ao buscar perfil:', error)
+            logError('Erro ao buscar perfil', { error, userId }, 'MobileProfileAPI')
             return NextResponse.json({ error: error.message }, { status: 500, headers: corsHeaders })
         }
 
@@ -51,7 +48,7 @@ export async function GET(request: NextRequest) {
 
         return NextResponse.json(data, { headers: corsHeaders })
     } catch (error: any) {
-        console.error('Exception ao buscar perfil:', error)
+        logError('Exception ao buscar perfil', { error, userId: request.nextUrl.searchParams.get('userId') }, 'MobileProfileAPI')
         return NextResponse.json({ error: error.message }, { status: 500, headers: corsHeaders })
     }
 }

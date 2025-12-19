@@ -1,21 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
 import { requireCompanyAccess, validateAuth } from '@/lib/api-auth'
 import { withRateLimit } from '@/lib/rate-limit'
 import { logger } from '@/lib/logger'
+import { getSupabaseAdmin } from '@/lib/supabase-client'
 
 export const runtime = 'nodejs'
-
-function getSupabaseAdmin() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE
-  if (!url || !serviceKey) {
-    throw new Error('Supabase não configurado: defina NEXT_PUBLIC_SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY')
-  }
-  return createClient(url, serviceKey, {
-    auth: { autoRefreshToken: false, persistSession: false }
-  })
-}
 
 // OPTIONS handler para CORS
 export async function OPTIONS(request: NextRequest) {
@@ -217,7 +206,7 @@ async function schedulePostHandler(request: NextRequest) {
         .single()
 
       if (error) {
-        console.error('Erro ao atualizar agendamento:', error)
+        logger.error('Erro ao atualizar agendamento', { error }, 'ScheduleReportsAPI')
         // Verificar se erro é porque tabela não existe
         if (error.message?.includes('does not exist') || error.message?.includes('relation') || error.message?.includes('table')) {
           return NextResponse.json(
@@ -303,7 +292,7 @@ async function schedulePostHandler(request: NextRequest) {
         .single()
 
       if (error) {
-        console.error('Erro ao criar agendamento:', error)
+        logger.error('Erro ao criar agendamento', { error }, 'ScheduleReportsAPI')
         // Verificar se erro é porque tabela não existe ou coluna não existe
         if (error.message?.includes('does not exist') || error.message?.includes('relation') || error.message?.includes('table') || error.message?.includes('column')) {
           // Se erro for sobre coluna created_by, tentar novamente sem ela
@@ -354,7 +343,7 @@ async function schedulePostHandler(request: NextRequest) {
       return NextResponse.json({ schedule: data }, { status: 201 })
     }
   } catch (err) {
-    console.error('Erro ao agendar relatório:', err)
+    logger.error('Erro ao agendar relatório', { error: err }, 'ReportsScheduleAPI')
     const errorMessage = err instanceof Error ? err.message : 'Erro ao agendar relatório'
     return NextResponse.json(
       { 
@@ -393,7 +382,7 @@ async function scheduleGetHandler(request: NextRequest) {
 
     return NextResponse.json({ schedules: data || [] })
   } catch (err) {
-    console.error('Erro ao listar agendamentos:', err)
+    logger.error('Erro ao listar agendamentos', { error: err }, 'ReportsScheduleAPI')
     const errorMessage = err instanceof Error ? err.message : 'Erro ao listar agendamentos'
     return NextResponse.json(
       { error: errorMessage },
@@ -428,7 +417,7 @@ async function scheduleDeleteHandler(request: NextRequest) {
 
     return NextResponse.json({ success: true })
   } catch (err) {
-    console.error('Erro ao deletar agendamento:', err)
+    logger.error('Erro ao deletar agendamento', { error: err }, 'ReportsScheduleAPI')
     const errorMessage = err instanceof Error ? err.message : 'Erro ao deletar agendamento'
     return NextResponse.json(
       { error: errorMessage },

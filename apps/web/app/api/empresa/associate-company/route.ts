@@ -1,22 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
-
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL
-const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY
-
-function getSupabaseAdmin() {
-  if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
-    throw new Error('Supabase não configurado')
-  }
-  return createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY, {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false
-    }
-  })
-}
+import { requireAuth } from '@/lib/api-auth'
+import { getSupabaseAdmin } from '@/lib/supabase-client'
 
 export async function POST(request: NextRequest) {
+  // Verificar autenticação (admin ou empresa)
+  const authError = await requireAuth(request, ['admin', 'empresa', 'operator'])
+  if (authError) return authError
   try {
     const { email, companyId } = await request.json()
     
@@ -126,7 +115,7 @@ export async function POST(request: NextRequest) {
       companyId: finalCompanyId
     })
   } catch (err) {
-    console.error('Erro ao associar operador:', err)
+    logError('Erro ao associar operador', { error: err }, 'AssociateCompanyAPI')
     const errorMessage = err instanceof Error ? err.message : 'Erro interno'
     return NextResponse.json({ error: errorMessage }, { status: 500 })
   }

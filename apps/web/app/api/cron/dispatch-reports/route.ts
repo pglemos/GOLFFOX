@@ -161,7 +161,7 @@ async function handleDispatchReports(request: NextRequest) {
         })
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
-        console.error(`Erro ao processar agendamento ${schedule.id}:`, err)
+        logger.error(`Erro ao processar agendamento ${schedule.id}`, { error: err, scheduleId: schedule.id }, 'DispatchReportsCron')
         
         // Registrar alerta operacional
         await alertCronFailure(
@@ -185,7 +185,7 @@ async function handleDispatchReports(request: NextRequest) {
     })
   } catch (err) {
     const errorMessage = err instanceof Error ? err.message : 'Erro ao processar agendamentos'
-    console.error('Erro no cron de relatórios:', err)
+    logger.error('Erro no cron de relatórios', { error: err }, 'DispatchReportsCron')
     
     // Registrar alerta crítico
     await alertCronFailure('dispatch-reports', errorMessage)
@@ -306,7 +306,7 @@ async function generateAndDispatchReport(
       .single()
 
     if (historyError) {
-      console.error('Erro ao registrar histórico:', historyError)
+      logger.error('Erro ao registrar histórico', { error: historyError }, 'DispatchReportsCron')
     }
 
     // Enviar por email (se Resend configurado)

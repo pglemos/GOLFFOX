@@ -1,15 +1,21 @@
 // Rota de compatibilidade: chama a rota /api/admin/transportadoras/update
-import { NextRequest } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { PUT as transportadoraUpdatePUT } from '../../transportadoras/update/route'
+import { requireAuth } from '@/lib/api-auth'
+import { logError } from '@/lib/logger'
 
 export async function PUT(req: NextRequest) {
+  // Verificar autenticação admin
+  const authError = await requireAuth(req, 'admin')
+  if (authError) return authError
+
   try {
     return await transportadoraUpdatePUT(req)
   } catch (error) {
-    console.error('Erro na rota transportadora/update:', error)
-    return new Response(
-      JSON.stringify({ error: 'Erro ao processar requisição' }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
+    logError('Erro na rota transportadora/update', { error }, 'TransportadoraUpdateAPI')
+    return NextResponse.json(
+      { error: 'Erro ao processar requisição' },
+      { status: 500 }
     )
   }
 }

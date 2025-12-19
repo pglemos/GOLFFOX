@@ -2,18 +2,11 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requireCompanyAccess } from '@/lib/api-auth'
 import { withRateLimit } from '@/lib/rate-limit'
+import { logger } from '@/lib/logger'
+import { getSupabaseAdmin } from '@/lib/supabase-client'
 import nodemailer from 'nodemailer'
 
-function getSupabaseAdmin() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE
-  if (!url || !serviceKey) {
-    throw new Error('Supabase não configurado: defina NEXT_PUBLIC_SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY')
-  }
-  return createClient(url, serviceKey, {
-    auth: { autoRefreshToken: false, persistSession: false }
-  })
-}
+// Usar getSupabaseAdmin de supabase-client.ts (importado acima)
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY
 const SMTP_HOST = process.env.SMTP_HOST
@@ -280,7 +273,7 @@ async function dispatchPostHandler(request: NextRequest) {
           )
         }
       } catch (emailError) {
-        console.error('Erro ao enviar email:', emailError)
+        logger.error('Erro ao enviar email', { error: emailError }, 'DispatchReportsAPI')
         // Não falhar a operação se email falhar
       }
     }
@@ -305,7 +298,7 @@ async function dispatchPostHandler(request: NextRequest) {
       generated_at: new Date().toISOString()
     })
   } catch (err) {
-    console.error('Erro ao gerar/dispatch relatório:', err)
+    logger.error('Erro ao gerar/dispatch relatório', { error: err }, 'ReportsDispatchAPI')
     const errorMessage = err instanceof Error ? err.message : 'Erro ao gerar relatório'
     return NextResponse.json(
       { error: errorMessage },
@@ -339,7 +332,7 @@ async function dispatchGetHandler(request: NextRequest) {
 
     return NextResponse.json({ schedules: data || [] })
   } catch (err) {
-    console.error('Erro ao listar schedules:', err)
+    logger.error('Erro ao listar schedules', { error: err }, 'DispatchReportsAPI')
     const errorMessage = err instanceof Error ? err.message : 'Erro ao listar schedules'
     return NextResponse.json(
       { error: errorMessage },

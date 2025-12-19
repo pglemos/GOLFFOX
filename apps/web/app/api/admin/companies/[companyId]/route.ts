@@ -1,18 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
 import { requireAuth } from '@/lib/api-auth'
 import { invalidateEntityCache } from '@/lib/next-cache'
+import { getSupabaseAdmin } from '@/lib/supabase-client'
+import { logError } from '@/lib/logger'
 
 export const runtime = 'nodejs'
-
-function getSupabaseAdmin() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-  if (!url || !serviceKey) {
-    throw new Error('Supabase não configurado: defina NEXT_PUBLIC_SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY')
-  }
-  return createClient(url, serviceKey)
-}
 
 // Validação de UUID
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
@@ -135,7 +127,7 @@ export async function PUT(
       .single()
 
     if (updateError) {
-      console.error('Erro ao atualizar empresa:', updateError)
+      logError('Erro ao atualizar empresa', { error: updateError, companyId }, 'CompaniesUpdateAPI')
       return NextResponse.json(
         { 
           error: 'Erro ao atualizar empresa',
@@ -154,7 +146,7 @@ export async function PUT(
       company: updatedCompany
     })
   } catch (err) {
-    console.error('Erro ao atualizar empresa:', err)
+    logError('Erro ao atualizar empresa', { error: err, companyId: (await context.params).companyId }, 'CompaniesUpdateAPI')
     const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
     return NextResponse.json(
       { 
@@ -242,7 +234,7 @@ export async function DELETE(
         .eq('id', companyId)
 
       if (updateError) {
-        console.error('Erro ao arquivar empresa:', updateError)
+        logError('Erro ao arquivar empresa', { error: updateError, companyId }, 'CompaniesArchiveAPI')
         return NextResponse.json(
           { error: 'Erro ao arquivar empresa', message: updateError.message },
           { status: 500 }
@@ -270,7 +262,7 @@ export async function DELETE(
         .eq('id', companyId)
 
       if (deleteError) {
-        console.error('Erro ao excluir empresa:', deleteError)
+        logError('Erro ao excluir empresa', { error: deleteError, companyId }, 'CompaniesDeleteAPI')
         return NextResponse.json(
           { error: 'Erro ao excluir empresa', message: deleteError.message },
           { status: 500 }
@@ -287,7 +279,7 @@ export async function DELETE(
       })
     }
   } catch (error: any) {
-    console.error('Erro ao excluir empresa:', error)
+    logError('Erro ao excluir empresa', { error, companyId }, 'CompaniesDeleteAPI')
     return NextResponse.json(
       { error: 'Erro ao excluir empresa', message: error.message },
       { status: 500 }

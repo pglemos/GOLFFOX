@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { getSupabaseAdmin } from '@/lib/supabase-client'
+import { requireAuth } from '@/lib/api-auth'
+import { logError } from '@/lib/logger'
 import { z } from 'zod'
 
 // Schema de validação para documento
@@ -16,24 +18,16 @@ const documentSchema = z.object({
     notes: z.string().nullable().optional(),
 })
 
-function getSupabaseAdmin() {
-    const url = process.env.NEXT_PUBLIC_SUPABASE_URL
-    const key = process.env.SUPABASE_SERVICE_ROLE_KEY
-
-    if (!url || !key) {
-        throw new Error('Supabase environment variables not configured')
-    }
-
-    return createClient(url, key, {
-        auth: { persistSession: false }
-    })
-}
 
 // GET - Listar documentos do motorista
 export async function GET(
     request: NextRequest,
     context: { params: Promise<{ driverId: string }> }
 ) {
+    // Verificar autenticação admin
+    const authError = await requireAuth(request, 'admin')
+    if (authError) return authError
+
     try {
         const { driverId } = await context.params
 
@@ -53,7 +47,7 @@ export async function GET(
             .order('created_at', { ascending: false })
 
         if (error) {
-            console.error('Erro ao buscar documentos:', error)
+            logError('Erro ao buscar documentos', { error, driverId }, 'DriverDocumentsAPI')
             return NextResponse.json(
                 { error: 'Erro ao buscar documentos' },
                 { status: 500 }
@@ -62,7 +56,7 @@ export async function GET(
 
         return NextResponse.json(data || [])
     } catch (error) {
-        console.error('Erro interno:', error)
+        logError('Erro interno', { error, driverId, method: 'GET' }, 'DriverDocumentsAPI')
         return NextResponse.json(
             { error: 'Erro interno do servidor' },
             { status: 500 }
@@ -123,7 +117,7 @@ export async function POST(
         }
 
         if (result.error) {
-            console.error('Erro ao salvar documento:', result.error)
+            logError('Erro ao salvar documento', { error: result.error, driverId }, 'DriverDocumentsAPI')
             return NextResponse.json(
                 { error: 'Erro ao salvar documento' },
                 { status: 500 }
@@ -138,7 +132,7 @@ export async function POST(
                 { status: 400 }
             )
         }
-        console.error('Erro interno:', error)
+        logError('Erro interno', { error, driverId, method: 'GET' }, 'DriverDocumentsAPI')
         return NextResponse.json(
             { error: 'Erro interno do servidor' },
             { status: 500 }
@@ -172,7 +166,7 @@ export async function DELETE(
             .eq('driver_id', driverId)
 
         if (error) {
-            console.error('Erro ao remover documento:', error)
+            logError('Erro ao remover documento', { error, driverId }, 'DriverDocumentsAPI')
             return NextResponse.json(
                 { error: 'Erro ao remover documento' },
                 { status: 500 }
@@ -181,7 +175,7 @@ export async function DELETE(
 
         return NextResponse.json({ success: true })
     } catch (error) {
-        console.error('Erro interno:', error)
+        logError('Erro interno', { error, driverId, method: 'GET' }, 'DriverDocumentsAPI')
         return NextResponse.json(
             { error: 'Erro interno do servidor' },
             { status: 500 }

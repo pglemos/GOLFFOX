@@ -1,19 +1,15 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { NextRequest } from 'next/server'
 import { debug, warn, logError } from '@/lib/logger'
-
-// Helper para criar cliente admin
-function getSupabaseAdmin() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-  if (!url || !serviceKey) {
-    throw new Error('Supabase não configurado')
-  }
-  return createClient(url, serviceKey)
-}
+import { requireAuth } from '@/lib/api-auth'
+import { getSupabaseAdmin } from '@/lib/supabase-client'
+import { successResponse, errorResponse, validationErrorResponse } from '@/lib/api-response'
 
 // POST /api/admin/drivers - Criar motorista
 export async function POST(request: NextRequest) {
+  // Verificar autenticação admin
+  const authError = await requireAuth(request, 'admin')
+  if (authError) return authError
+
   try {
     const supabase = getSupabaseAdmin()
     const body = await request.json()
@@ -39,18 +35,12 @@ export async function POST(request: NextRequest) {
     } = body
 
     if (!name) {
-      return NextResponse.json(
-        { success: false, error: 'Nome é obrigatório' },
-        { status: 400 }
-      )
+      return validationErrorResponse('Nome é obrigatório')
     }
 
     const transportadoraId = transportadora_id || carrier_id // Compatibilidade
     if (!transportadoraId) {
-      return NextResponse.json(
-        { success: false, error: 'Transportadora é obrigatória' },
-        { status: 400 }
-      )
+      return validationErrorResponse('Transportadora é obrigatória')
     }
 
     // Gerar email para Auth baseado no CPF (para login com CPF)
@@ -110,10 +100,7 @@ export async function POST(request: NextRequest) {
 
         if (!authUserId) {
           logError('Erro ao criar usuário Auth para motorista', { error: authError }, 'DriversAPI')
-          return NextResponse.json(
-            { success: false, error: 'Erro ao criar autenticação do motorista: ' + authError.message },
-            { status: 500 }
-          )
+          return errorResponse(authError, 500, 'Erro ao criar autenticação do motorista')
         }
       } else if (authData?.user) {
         authUserId = authData.user.id
@@ -121,10 +108,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (!authUserId) {
-      return NextResponse.json(
-        { success: false, error: 'Erro ao criar usuário Auth (sem ID)' },
-        { status: 500 }
-      )
+      return errorResponse(new Error('Erro ao criar usuário Auth (sem ID)'), 500)
     }
 
     // 3. Usar UPSERT na tabela users para evitar erro de chave duplicada
@@ -159,18 +143,12 @@ export async function POST(request: NextRequest) {
         await supabase.auth.admin.deleteUser(authUserId)
       }
 
-      return NextResponse.json(
-        { success: false, error: driverError.message },
-        { status: 500 }
-      )
+      return errorResponse(driverError, 500, 'Erro ao criar motorista')
     }
 
-    return NextResponse.json({ success: true, driver })
+    return successResponse({ driver })
   } catch (error: any) {
     logError('Erro na API de criar motorista', { error }, 'DriversAPI')
-    return NextResponse.json(
-      { success: false, error: error.message || 'Erro desconhecido' },
-      { status: 500 }
-    )
+    return errorResponse(error, 500, 'Erro ao criar motorista')
   }
 }

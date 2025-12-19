@@ -9,10 +9,14 @@ import { NextRequest, NextResponse } from 'next/server'
 import { monitoring, type HealthCheck } from '@/lib/monitoring'
 import { createClient } from '@supabase/supabase-js'
 import { logError } from '@/lib/logger'
+import { applyRateLimit } from '@/lib/rate-limit'
 
 export const runtime = 'nodejs'
 
 export async function GET(request: NextRequest) {
+  // Aplicar rate limiting para health check
+  const rateLimitResponse = await applyRateLimit(request, 'public')
+  if (rateLimitResponse) return rateLimitResponse
   try {
     // Executar health check
     const healthCheck = await monitoring.performHealthCheck()

@@ -3,13 +3,17 @@
  * Retorna a especificação OpenAPI da API
  */
 
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { readFile } from 'fs/promises'
 import { join } from 'path'
+import { applyRateLimit } from '@/lib/rate-limit'
 
 export const runtime = 'nodejs'
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  // Aplicar rate limiting para documentação pública
+  const rateLimitResponse = await applyRateLimit(request, 'public')
+  if (rateLimitResponse) return rateLimitResponse
   try {
     // Usar process.cwd() que funciona bem no Node.js runtime
     // No Vercel, process.cwd() aponta para o diretório raiz do projeto

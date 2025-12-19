@@ -1,8 +1,13 @@
 import { NextRequest, NextResponse } from "next/server"
 import { logError } from '@/lib/logger'
 import { invalidateCachedAuth } from '@/lib/auth-cache'
+import { applyRateLimit } from '@/lib/rate-limit'
+import { successResponse, errorResponse } from '@/lib/api-response'
 
 export async function POST(req: NextRequest) {
+  // Rate limit para logout (pode ser chamado mesmo sem auth válida)
+  const rateLimitResponse = await applyRateLimit(req, 'auth')
+  if (rateLimitResponse) return rateLimitResponse
   try {
     const url = new URL(req.url)
     const isSecure = url.protocol === "https:"
@@ -55,7 +60,7 @@ export async function POST(req: NextRequest) {
     return res
   } catch (error: any) {
     logError('Erro ao limpar sessão', { error }, 'ClearSessionAPI')
-    return NextResponse.json({ error: error?.message || "unexpected_error" }, { status: 500 })
+    return errorResponse(error, 500, 'Erro ao limpar sessão')
   }
 }
 

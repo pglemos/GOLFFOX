@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseServiceRole } from '@/lib/supabase-server'
+import { getSupabaseAdmin } from '@/lib/supabase-client'
 import { parseCSV } from '@/lib/costs/import-parser'
 import { requireCompanyAccess } from '@/lib/api-auth'
 import { z } from 'zod'
 import { withRateLimit } from '@/lib/rate-limit'
+import { logError } from '@/lib/logger'
 
 const importSchema = z.object({
   company_id: z.string().uuid(),
@@ -70,8 +71,10 @@ async function importHandler(request: NextRequest) {
       )
     }
 
+    const supabase = getSupabaseAdmin()
+
     // Buscar categorias de custos
-    const { data: categories } = await supabaseServiceRole
+    const { data: categories } = await supabase
       .from('gf_cost_categories')
       .select('id, group_name, category, subcategory')
       .eq('is_active', true)
@@ -83,16 +86,16 @@ async function importHandler(request: NextRequest) {
     })
 
     // Buscar rotas, veículos e motoristas para mapeamento
-    const { data: routes } = await supabaseServiceRole
+    const { data: routes } = await supabase
       .from('routes')
       .select('id, name')
       .eq('company_id', companyId)
 
-    const { data: vehicles } = await supabaseServiceRole
+    const { data: vehicles } = await supabase
       .from('vehicles')
       .select('id, plate')
 
-    const { data: drivers } = await supabaseServiceRole
+    const { data: drivers } = await supabase
       .from('users')
       .select('id, email')
       .eq('role', 'motorista')
@@ -164,13 +167,13 @@ async function importHandler(request: NextRequest) {
     }
 
     // Inserir em lote
-    const { data: inserted, error: insertError } = await supabaseServiceRole
+    const { data: inserted, error: insertError } = await supabase
       .from('gf_costs')
       .insert(costsToInsert as any)
       .select()
 
     if (insertError) {
-      console.error('Erro ao inserir custos:', insertError)
+      logError('Erro ao inserir custos', { error: insertError, companyId }, 'CostsImportAPI')
       return NextResponse.json(
         { error: insertError.message, errors },
         { status: 500 }
@@ -184,7 +187,7 @@ async function importHandler(request: NextRequest) {
       errors_details: errors.slice(0, 10) // Limitar detalhes de erros
     })
   } catch (error: any) {
-    console.error('Erro ao importar custos:', error)
+    logError('Erro ao importar custos', { error, companyId: request.formData ? (await request.formData()).get('company_id') : null }, 'CostsImportAPI')
     return NextResponse.json(
       { error: error.message || 'Erro desconhecido' },
       { status: 500 }

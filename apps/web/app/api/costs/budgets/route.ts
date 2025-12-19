@@ -100,10 +100,11 @@ async function getBudgetsHandler(request: NextRequest) {
     }
 
     return NextResponse.json({ data: data || [] })
-  } catch (error: any) {
+  } catch (error: unknown) {
     logError('Erro ao buscar orçamentos', { error }, 'CostsBudgetsAPI')
+    const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido'
     return NextResponse.json(
-      { error: error.message || 'Erro desconhecido' },
+      { error: errorMessage },
       { status: 500 }
     )
   }
@@ -196,7 +197,7 @@ async function createOrUpdateBudgetHandler(request: NextRequest) {
         .single()
 
       if (error) {
-        console.error('Erro ao atualizar orçamento:', error)
+        logError('Erro ao atualizar orçamento', { error }, 'CostsBudgetsAPI')
         if (error.message?.includes('does not exist') || error.message?.includes('relation') || error.message?.includes('table')) {
           return NextResponse.json(
             { 
@@ -311,8 +312,9 @@ async function deleteBudgetHandler(request: NextRequest) {
     return NextResponse.json({ success: true })
   } catch (error: unknown) {
     logError('Erro ao deletar orçamento', { error }, 'CostsBudgetsAPI')
+    const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido'
     return NextResponse.json(
-      { error: error.message || 'Erro desconhecido' },
+      { error: errorMessage },
       { status: 500 }
     )
   }

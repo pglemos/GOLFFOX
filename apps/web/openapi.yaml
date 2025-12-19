@@ -16,9 +16,9 @@ servers:
 tags:
   - name: Admin
     description: Endpoints administrativos
-  - name: Operator
-    description: Endpoints do operador
-  - name: Carrier
+  - name: Empresa
+    description: Endpoints da empresa contratante
+  - name: Transportadora
     description: Endpoints da transportadora
   - name: Auth
     description: Autenticação

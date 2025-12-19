@@ -1,8 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getSupabaseAdmin } from '@/lib/supabase-server';
+import { getSupabaseAdmin } from '@/lib/supabase-client';
+import { logError } from '@/lib/logger';
+import { requireAuth } from '@/lib/api-auth';
 
 // GET /api/transportadora/locations - Rastreamento GPS em tempo real
 export async function GET(request: NextRequest) {
+    // Verificar autenticação (transportadora)
+    const authError = await requireAuth(request, ['admin', 'transportadora', 'operador', 'carrier'])
+    if (authError) return authError
+
     try {
         const supabase = getSupabaseAdmin();
         const { searchParams } = new URL(request.url);
@@ -66,13 +72,13 @@ export async function GET(request: NextRequest) {
         const { data, error } = await query;
 
         if (error) {
-            console.error('Error fetching locations:', error);
+            logError('Error fetching locations', { error }, 'LocationsAPI');
             return NextResponse.json({ error: error.message }, { status: 500 });
         }
 
         return NextResponse.json({ data });
     } catch (error) {
-        console.error('Locations API error:', error);
+        logError('Locations API error', { error }, 'LocationsAPI');
         return NextResponse.json(
             { error: 'Erro ao buscar localizações' },
             { status: 500 }

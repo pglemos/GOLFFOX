@@ -1,18 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
 import { requireAuth } from '@/lib/api-auth'
 import { invalidateEntityCache } from '@/lib/next-cache'
+import { getSupabaseAdmin } from '@/lib/supabase-client'
+import { logError } from '@/lib/logger'
 
 export const runtime = 'nodejs'
-
-function getSupabaseAdmin() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-  if (!url || !serviceKey) {
-    throw new Error('Supabase não configurado: defina NEXT_PUBLIC_SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY')
-  }
-  return createClient(url, serviceKey)
-}
 
 // Validação de UUID
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
@@ -121,7 +113,7 @@ export async function PUT(
       .single()
 
     if (updateError) {
-      console.error('Erro ao atualizar viagem:', updateError)
+      logError('Erro ao atualizar viagem', { error: updateError, tripId }, 'TripsUpdateAPI')
       return NextResponse.json(
         { 
           error: 'Erro ao atualizar viagem',
@@ -140,7 +132,7 @@ export async function PUT(
       trip: updatedTrip
     })
   } catch (err) {
-    console.error('Erro ao atualizar viagem:', err)
+    logError('Erro ao atualizar viagem', { error: err, tripId: (await context.params).tripId }, 'TripsUpdateAPI')
     const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
     return NextResponse.json(
       { 
@@ -209,7 +201,7 @@ export async function DELETE(
       .eq('id', tripId)
 
     if (deleteError) {
-      console.error('Erro ao excluir viagem:', deleteError)
+      logError('Erro ao excluir viagem', { error: deleteError, tripId }, 'TripsDeleteAPI')
       return NextResponse.json(
         { error: 'Erro ao excluir viagem', message: deleteError.message },
         { status: 500 }
@@ -225,7 +217,7 @@ export async function DELETE(
       message: 'Viagem excluída com sucesso'
     })
   } catch (err) {
-    console.error('Erro ao excluir viagem:', err)
+    logError('Erro ao excluir viagem', { error: err, tripId: (await context.params).tripId }, 'TripsDeleteAPI')
     const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
     return NextResponse.json(
       { error: 'Erro ao excluir viagem', message: errorMessage },

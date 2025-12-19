@@ -1,10 +1,13 @@
 import { NextRequest, NextResponse } from "next/server"
-import { createClient } from "@supabase/supabase-js"
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+import { getSupabaseAdmin } from '@/lib/supabase-client'
+import { logError } from '@/lib/logger'
+import { requireAuth } from '@/lib/api-auth'
 
 export async function GET(req: NextRequest) {
+  // Verificar autenticação (transportadora)
+  const authError = await requireAuth(req, ['admin', 'transportadora', 'operador', 'carrier'])
+  if (authError) return authError
+
   try {
     const { searchParams } = new URL(req.url)
     const startDate = searchParams.get('start_date')
@@ -15,7 +18,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'transportadora_id é obrigatório' }, { status: 400 })
     }
 
-    const supabase = createClient(supabaseUrl, supabaseServiceKey)
+    const supabase = getSupabaseAdmin()
 
     // Buscar motoristas da transportadora
     const { data: drivers, error: driversError } = await supabase
@@ -99,7 +102,7 @@ export async function GET(req: NextRequest) {
       }
     })
   } catch (err) {
-    console.error('Erro ao gerar relatório de performance:', err)
+    logError('Erro ao gerar relatório de performance', { error: err }, 'DriverPerformanceReportAPI')
     const errorMessage = err instanceof Error ? err.message : 'Erro ao gerar relatório'
     return NextResponse.json(
       { error: errorMessage },

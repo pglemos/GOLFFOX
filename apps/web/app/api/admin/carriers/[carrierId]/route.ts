@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseServiceRole } from '@/lib/supabase-server'
+import { getSupabaseAdmin } from '@/lib/supabase-client'
 import { requireAuth } from '@/lib/api-auth'
+import { logError } from '@/lib/logger'
 
 export const runtime = 'nodejs'
 
@@ -21,14 +22,15 @@ export async function GET(
             return NextResponse.json({ error: 'ID da transportadora obrigatório' }, { status: 400 })
         }
 
-        const { data, error } = await supabaseServiceRole
+        const supabase = getSupabaseAdmin()
+        const { data, error } = await supabase
             .from('carriers')
             .select('*')
             .eq('id', carrierId)
             .single()
 
         if (error) {
-            console.error('Erro ao buscar transportadora:', error)
+            logError('Erro ao buscar transportadora', { error, carrierId }, 'CarriersGetAPI')
             return NextResponse.json({ error: 'Erro ao buscar dados' }, { status: 500 })
         }
 
@@ -38,7 +40,7 @@ export async function GET(
 
         return NextResponse.json(data)
     } catch (error: any) {
-        console.error('Erro inesperado:', error)
+        logError('Erro inesperado', { error, carrierId }, 'CarriersGetAPI')
         return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 })
     }
 }

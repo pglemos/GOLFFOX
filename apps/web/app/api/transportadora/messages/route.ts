@@ -1,8 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getSupabaseAdmin } from '@/lib/supabase-server';
+import { getSupabaseAdmin } from '@/lib/supabase-client';
+import { logError } from '@/lib/logger';
+import { requireAuth } from '@/lib/api-auth';
 
 // GET /api/transportadora/messages - Listar mensagens dos motoristas
 export async function GET(request: NextRequest) {
+    // Verificar autenticação (transportadora)
+    const authError = await requireAuth(request, ['admin', 'transportadora', 'operador', 'carrier'])
+    if (authError) return authError
+
     try {
         const supabase = getSupabaseAdmin();
         const { searchParams } = new URL(request.url);
@@ -41,7 +47,7 @@ export async function GET(request: NextRequest) {
         const { data, error } = await query;
 
         if (error) {
-            console.error('Error fetching messages:', error);
+            logError('Error fetching messages', { error }, 'MessagesAPI');
             return NextResponse.json({ error: error.message }, { status: 500 });
         }
 
@@ -54,7 +60,7 @@ export async function GET(request: NextRequest) {
 
         return NextResponse.json({ data, stats });
     } catch (error) {
-        console.error('Messages API error:', error);
+        logError('Messages API error', { error }, 'MessagesAPI');
         return NextResponse.json(
             { error: 'Erro ao buscar mensagens' },
             { status: 500 }
@@ -64,6 +70,10 @@ export async function GET(request: NextRequest) {
 
 // POST /api/transportadora/messages - Enviar mensagem para motorista
 export async function POST(request: NextRequest) {
+    // Verificar autenticação (transportadora)
+    const authError = await requireAuth(request, ['admin', 'transportadora', 'operador', 'carrier'])
+    if (authError) return authError
+
     try {
         const supabase = getSupabaseAdmin();
         const body = await request.json();
@@ -90,13 +100,13 @@ export async function POST(request: NextRequest) {
             .single();
 
         if (error) {
-            console.error('Error sending message:', error);
+            logError('Error sending message', { error }, 'MessagesAPI');
             return NextResponse.json({ error: error.message }, { status: 500 });
         }
 
         return NextResponse.json({ data });
     } catch (error) {
-        console.error('Messages POST API error:', error);
+        logError('Messages POST API error', { error }, 'MessagesAPI');
         return NextResponse.json(
             { error: 'Erro ao enviar mensagem' },
             { status: 500 }
@@ -106,6 +116,10 @@ export async function POST(request: NextRequest) {
 
 // PUT /api/transportadora/messages - Marcar mensagens como lidas
 export async function PUT(request: NextRequest) {
+    // Verificar autenticação (transportadora)
+    const authError = await requireAuth(request, ['admin', 'transportadora', 'operador', 'carrier'])
+    if (authError) return authError
+
     try {
         const supabase = getSupabaseAdmin();
         const body = await request.json();
@@ -125,13 +139,13 @@ export async function PUT(request: NextRequest) {
             .select();
 
         if (error) {
-            console.error('Error marking messages as read:', error);
+            logError('Error marking messages as read', { error }, 'MessagesAPI');
             return NextResponse.json({ error: error.message }, { status: 500 });
         }
 
         return NextResponse.json({ data, updated: data?.length || 0 });
     } catch (error) {
-        console.error('Messages PUT API error:', error);
+        logError('Messages PUT API error', { error }, 'MessagesAPI');
         return NextResponse.json(
             { error: 'Erro ao atualizar mensagens' },
             { status: 500 }

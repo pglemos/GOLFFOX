@@ -1,6 +1,10 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
+import { requireAuth } from '@/lib/api-auth'
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  // Verificar autenticação admin
+  const authError = await requireAuth(request, 'admin')
+  if (authError) return authError
   try {
     // Usar RPC ou query direta se possível
     // Nota: information_schema pode não estar acessível via Supabase client

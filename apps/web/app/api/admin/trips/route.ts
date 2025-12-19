@@ -1,18 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
 import { requireAuth } from '@/lib/api-auth'
 import { logError } from '@/lib/logger'
+import { getSupabaseAdmin } from '@/lib/supabase-client'
 
 export const runtime = 'nodejs'
-
-function getSupabaseAdmin() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-  if (!url || !serviceKey) {
-    throw new Error('Supabase não configurado: defina NEXT_PUBLIC_SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY')
-  }
-  return createClient(url, serviceKey)
-}
 
 // OPTIONS handler para CORS
 export async function OPTIONS(request: NextRequest) {
@@ -108,7 +99,7 @@ export async function GET(request: NextRequest) {
       offset
     })
   } catch (err) {
-    console.error('Erro ao listar viagens:', err)
+    logError('Erro ao listar viagens', { error: err }, 'TripsAPI')
     const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
     return NextResponse.json(
       { error: 'Erro ao listar viagens', message: errorMessage },

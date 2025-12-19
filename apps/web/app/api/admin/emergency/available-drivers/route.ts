@@ -1,26 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { getSupabaseAdmin } from '@/lib/supabase-client'
+import { logError } from '@/lib/logger'
+import { requireAuth } from '@/lib/api-auth'
 
 export const runtime = 'nodejs'
 
 export async function GET(req: NextRequest) {
+  // Verificar autenticação admin
+  const authError = await requireAuth(req, 'admin')
+  if (authError) return authError
+
   try {
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-
-    if (!supabaseUrl || !supabaseServiceKey) {
-      return NextResponse.json(
-        { success: false, error: 'Configuração do Supabase não encontrada' },
-        { status: 500 }
-      )
-    }
-
-    const supabase = createClient(supabaseUrl, supabaseServiceKey, {
-      auth: {
-        autoRefreshToken: false,
-        persistSession: false
-      }
-    })
+    const supabase = getSupabaseAdmin()
 
     // Buscar motoristas ativos
     const { data: drivers, error: driversError } = await supabase
@@ -41,7 +32,7 @@ export async function GET(req: NextRequest) {
       .eq('status', 'inProgress')
 
     if (tripsError) {
-      console.error('Erro ao buscar viagens ativas:', tripsError)
+      logError('Erro ao buscar viagens ativas', { error: tripsError }, 'AvailableDriversAPI')
     }
 
     const activeDriverIds = new Set(
@@ -64,7 +55,7 @@ export async function GET(req: NextRequest) {
       drivers: availableDrivers
     })
   } catch (error: any) {
-    console.error('Erro ao buscar motoristas disponíveis:', error)
+    logError('Erro ao buscar motoristas disponíveis', { error }, 'AvailableDriversAPI')
     return NextResponse.json(
       {
         success: false,

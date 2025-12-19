@@ -1,9 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { getSupabaseAdmin } from '@/lib/supabase-client'
+import { logError } from '@/lib/logger'
+import { requireAuth } from '@/lib/api-auth'
 
 export const runtime = 'nodejs'
 
 export async function POST(req: NextRequest) {
+  // Verificar autenticação admin
+  const authError = await requireAuth(req, 'admin')
+  if (authError) return authError
+
   try {
     const body = await req.json()
     const { routeId, driverId, vehicleId } = body
@@ -15,22 +21,7 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-
-    if (!supabaseUrl || !supabaseServiceKey) {
-      return NextResponse.json(
-        { success: false, error: 'Configuração do Supabase não encontrada' },
-        { status: 500 }
-      )
-    }
-
-    const supabase = createClient(supabaseUrl, supabaseServiceKey, {
-      auth: {
-        autoRefreshToken: false,
-        persistSession: false
-      }
-    })
+    const supabase = getSupabaseAdmin()
 
     // Buscar informações da rota
     const { data: route, error: routeError } = await supabase
@@ -128,7 +119,7 @@ export async function POST(req: NextRequest) {
       assistanceRequestId
     })
   } catch (error: any) {
-    console.error('Erro ao despachar socorro:', error)
+    logError('Erro ao despachar socorro', { error }, 'EmergencyDispatchAPI')
     return NextResponse.json(
       {
         success: false,

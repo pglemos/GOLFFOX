@@ -158,13 +158,6 @@ export async function validateAuth(request: NextRequest): Promise<AuthenticatedU
       return null
     }
 
-    if (!accessToken) {
-      warn('Token de acesso não encontrado em nenhum lugar', {
-        path: request.nextUrl.pathname
-      }, 'ApiAuth')
-      return null
-    }
-
     // 4. Verificar cache antes de chamar Supabase Auth
     const cachedUser = getCachedAuth(accessToken)
     if (cachedUser) {
@@ -273,9 +266,14 @@ export function hasRole(user: AuthenticatedUser | null, requiredRole: string | s
     return ['admin', 'empresa', 'operator'].includes(user.role) // Compatibilidade com role antiga
   }
 
-  // operador = gestor da transportadora (antigo carrier)
-  if (roles.includes('operador') || roles.includes('transportadora')) {
-    return ['admin', 'operador', 'carrier', 'transportadora'].includes(user.role) // Compatibilidade
+  // transportadora = gestor da transportadora (antigo carrier/operador)
+  if (roles.includes('transportadora')) {
+    return ['admin', 'transportadora', 'operador', 'carrier'].includes(user.role) // Compatibilidade
+  }
+
+  // operador (mantido para compatibilidade, mas prefira 'transportadora')
+  if (roles.includes('operador')) {
+    return ['admin', 'transportadora', 'operador', 'carrier'].includes(user.role)
   }
 
   return roles.includes(user.role)

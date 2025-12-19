@@ -1,8 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getSupabaseAdmin } from '@/lib/supabase-server';
+import { getSupabaseAdmin } from '@/lib/supabase-client';
+import { logError } from '@/lib/logger';
+import { requireAuth } from '@/lib/api-auth';
 
 // GET /api/empresa/announcements - Listar avisos
 export async function GET(request: NextRequest) {
+    // Verificar autenticação (empresa ou admin)
+    const authError = await requireAuth(request, ['admin', 'empresa', 'operator'])
+    if (authError) return authError
+
     try {
         const supabase = getSupabaseAdmin();
         const { searchParams } = new URL(request.url);
@@ -33,13 +39,13 @@ export async function GET(request: NextRequest) {
         const { data, error } = await query;
 
         if (error) {
-            console.error('Error fetching announcements:', error);
+            logError('Error fetching announcements', { error, companyId }, 'AnnouncementsAPI');
             return NextResponse.json({ error: error.message }, { status: 500 });
         }
 
         return NextResponse.json({ data });
     } catch (error) {
-        console.error('Announcements API error:', error);
+        logError('Announcements API error', { error, companyId }, 'AnnouncementsAPI');
         return NextResponse.json(
             { error: 'Erro ao buscar avisos' },
             { status: 500 }
@@ -49,6 +55,10 @@ export async function GET(request: NextRequest) {
 
 // POST /api/empresa/announcements - Criar aviso
 export async function POST(request: NextRequest) {
+    // Verificar autenticação (empresa ou admin)
+    const authError = await requireAuth(request, ['admin', 'empresa', 'operator'])
+    if (authError) return authError
+
     try {
         const supabase = getSupabaseAdmin();
         const body = await request.json();
@@ -78,13 +88,13 @@ export async function POST(request: NextRequest) {
             .single();
 
         if (error) {
-            console.error('Error creating announcement:', error);
+            logError('Error creating announcement', { error, companyId }, 'AnnouncementsAPI');
             return NextResponse.json({ error: error.message }, { status: 500 });
         }
 
         return NextResponse.json({ data });
     } catch (error) {
-        console.error('Announcements POST API error:', error);
+        logError('Announcements POST API error', { error, companyId }, 'AnnouncementsAPI');
         return NextResponse.json(
             { error: 'Erro ao criar aviso' },
             { status: 500 }
@@ -94,6 +104,10 @@ export async function POST(request: NextRequest) {
 
 // PUT /api/empresa/announcements - Atualizar aviso
 export async function PUT(request: NextRequest) {
+    // Verificar autenticação (empresa ou admin)
+    const authError = await requireAuth(request, ['admin', 'empresa', 'operator'])
+    if (authError) return authError
+
     try {
         const supabase = getSupabaseAdmin();
         const body = await request.json();
@@ -114,13 +128,13 @@ export async function PUT(request: NextRequest) {
             .single();
 
         if (error) {
-            console.error('Error updating announcement:', error);
+            logError('Error updating announcement', { error, announcementId: id }, 'AnnouncementsAPI');
             return NextResponse.json({ error: error.message }, { status: 500 });
         }
 
         return NextResponse.json({ data });
     } catch (error) {
-        console.error('Announcements PUT API error:', error);
+        logError('Announcements PUT API error', { error, announcementId }, 'AnnouncementsAPI');
         return NextResponse.json(
             { error: 'Erro ao atualizar aviso' },
             { status: 500 }
@@ -130,6 +144,10 @@ export async function PUT(request: NextRequest) {
 
 // DELETE /api/empresa/announcements - Desativar aviso
 export async function DELETE(request: NextRequest) {
+    // Verificar autenticação (empresa ou admin)
+    const authError = await requireAuth(request, ['admin', 'empresa', 'operator'])
+    if (authError) return authError
+
     try {
         const supabase = getSupabaseAdmin();
         const { searchParams } = new URL(request.url);
@@ -148,13 +166,13 @@ export async function DELETE(request: NextRequest) {
             .eq('id', id);
 
         if (error) {
-            console.error('Error deleting announcement:', error);
+            logError('Error deleting announcement', { error }, 'AnnouncementsAPI');
             return NextResponse.json({ error: error.message }, { status: 500 });
         }
 
         return NextResponse.json({ success: true });
     } catch (error) {
-        console.error('Announcements DELETE API error:', error);
+        logError('Announcements DELETE API error', { error }, 'AnnouncementsAPI');
         return NextResponse.json(
             { error: 'Erro ao remover aviso' },
             { status: 500 }

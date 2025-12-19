@@ -1,5 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { logError } from '@/lib/logger'
+import { NextRequest } from 'next/server'
+import { logError, debug } from '@/lib/logger'
+import { requireAuth } from '@/lib/api-auth'
+import { successResponse, unauthorizedResponse, errorResponse } from '@/lib/api-response'
 
 function tryDecode(cookieValue: string): any | null {
   try {
@@ -18,13 +20,18 @@ function tryDecode(cookieValue: string): any | null {
 }
 
 export async function GET(request: NextRequest) {
+  // Verificar autenticação (qualquer usuário autenticado pode ver seus próprios dados)
+  const authError = await requireAuth(request)
+  if (authError) return authError
+
+  // Obter dados do cookie para compatibilidade com código existente
   const cookie = request.cookies.get('golffox-session')?.value
   if (!cookie) {
-    return NextResponse.json({ success: false }, { status: 401 })
+    return unauthorizedResponse('Sessão não encontrada')
   }
   const userData = tryDecode(cookie)
   if (!userData || !userData.id || !userData.role) {
-    return NextResponse.json({ success: false }, { status: 401 })
+    return unauthorizedResponse('Sessão inválida')
   }
 
   // Buscar dados completos do usuário no banco para incluir transportadora_id, company_id, etc.
@@ -54,11 +61,7 @@ export async function GET(request: NextRequest) {
         .eq('id', userData.id)
         .maybeSingle()
 
-      // #region agent log
-      logger.log('[DEBUG H2] /api/auth/me - FULL dbUser from database:', JSON.stringify(dbUser, null, 2));
-      logger.log('[DEBUG H2] /api/auth/me - avatar_url specifically:', dbUser?.avatar_url);
-      if (dbError) logger.log('[DEBUG H2] /api/auth/me - DB ERROR:', JSON.stringify(dbError));
-      // #endregion
+      debug('[DEBUG H2] /api/auth/me - FULL dbUser from database', { dbUser, avatar_url: dbUser?.avatar_url, dbError }, 'AuthMeAPI')
 
       if (dbUser) {
         return NextResponse.json({
@@ -75,17 +78,14 @@ export async function GET(request: NextRequest) {
         })
       }
     } else {
-      // #region agent log
-      logger.log('[DEBUG H2] /api/auth/me - MISSING service key, falling back to cookie data');
-      // #endregion
+      debug('[DEBUG H2] /api/auth/me - MISSING service key, falling back to cookie data', {}, 'AuthMeAPI')
     }
   } catch (error) {
     logError('Erro ao buscar dados do usuário no banco', { error }, 'AuthMeAPI')
   }
 
   // Fallback para dados do cookie
-  return NextResponse.json({
-    success: true,
+  return successResponse({
     user: {
       id: userData.id,
       email: userData.email || '',

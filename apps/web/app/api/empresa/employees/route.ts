@@ -1,20 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
 import { requireAuth } from '@/lib/api-auth'
-import { logger } from '@/lib/logger'
+import { logger, logError } from '@/lib/logger'
+import { getSupabaseAdmin } from '@/lib/supabase-client'
 
 export const runtime = 'nodejs'
-
-function getSupabaseAdmin() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE
-  if (!url || !serviceKey) {
-    throw new Error('Supabase não configurado: defina NEXT_PUBLIC_SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY')
-  }
-  return createClient(url, serviceKey, {
-    auth: { autoRefreshToken: false, persistSession: false }
-  })
-}
 
 export async function GET(request: NextRequest) {
   try {
@@ -106,7 +95,7 @@ export async function GET(request: NextRequest) {
     })
 
     if (error) {
-      console.error('❌ [API /api/operador/employees] Erro:', error)
+      logError('[API /api/operador/employees] Erro', { error }, 'EmployeesAPI')
       return NextResponse.json(
         { error: error.message },
         { status: 500 }
@@ -121,7 +110,7 @@ export async function GET(request: NextRequest) {
       pageSize
     })
   } catch (error: any) {
-    console.error('❌ [API /api/operador/employees] Erro inesperado:', error)
+    logError('[API /api/operador/employees] Erro inesperado', { error }, 'EmployeesAPI')
     return NextResponse.json(
       { error: error.message || 'Erro desconhecido' },
       { status: 500 }

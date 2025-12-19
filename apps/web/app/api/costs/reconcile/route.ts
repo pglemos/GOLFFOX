@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseServiceRole } from '@/lib/supabase-server'
+import { getSupabaseAdmin } from '@/lib/supabase-client'
 import { requireAuth } from '@/lib/api-auth'
 import { z } from 'zod'
 import { withRateLimit } from '@/lib/rate-limit'
+import { logError } from '@/lib/logger'
 
 const reconcileSchema = z.object({
   invoice_id: z.string().uuid(),
@@ -24,8 +25,10 @@ async function reconcileHandler(request: NextRequest) {
     const body = await request.json()
     const validated = reconcileSchema.parse(body)
 
+    const supabase = getSupabaseAdmin()
+
     // Buscar dados de conciliação (view materializada - selecionar todas as colunas)
-    const { data: conciliation, error: conciliationError } = await supabaseServiceRole
+    const { data: conciliation, error: conciliationError } = await supabase
       .from('v_costs_conciliation')
       .select('*')
       .eq('invoice_id', validated.invoice_id)
@@ -98,7 +101,7 @@ async function reconcileHandler(request: NextRequest) {
       .single()
 
     if (updateError) {
-      console.error('Erro ao atualizar fatura:', updateError)
+      logError('Erro ao atualizar fatura', { error: updateError }, 'CostsReconcileAPI')
       return NextResponse.json(
         { error: updateError.message },
         { status: 500 }
@@ -121,7 +124,7 @@ async function reconcileHandler(request: NextRequest) {
         { status: 400 }
       )
     }
-    console.error('Erro ao conciliar custo:', err)
+    logError('Erro ao conciliar custo', { error: err }, 'CostsReconcileAPI')
     const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
     return NextResponse.json(
       { error: errorMessage },

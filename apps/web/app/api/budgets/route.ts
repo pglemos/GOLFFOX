@@ -116,7 +116,7 @@ export async function GET(request: NextRequest) {
         }))
 
         return NextResponse.json({ success: true, data: budgets })
-    } catch (error) {
+    } catch (error: unknown) {
         logError('Erro interno', { error }, 'BudgetsAPI')
         return NextResponse.json(
             { success: false, error: 'Erro interno do servidor' },

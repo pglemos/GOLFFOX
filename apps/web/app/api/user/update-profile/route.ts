@@ -1,8 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseServiceRole } from '@/lib/supabase-server'
-import { createClient } from '@supabase/supabase-js'
+import { getSupabaseAdmin } from '@/lib/supabase-client'
+import { requireAuth } from '@/lib/api-auth'
+import { logError } from '@/lib/logger'
 
 export const runtime = 'nodejs'
+
+export async function POST(req: NextRequest) {
+  // Verificar autenticação (qualquer usuário autenticado pode atualizar seu próprio perfil)
+  const authError = await requireAuth(req)
+  if (authError) return authError
+
+  try {
+    // Obter dados do usuário autenticado do cookie (mantendo compatibilidade com código existente)
+    const cookie = req.cookies.get('golffox-session')?.value
+    if (!cookie) {
+      return NextResponse.json(
+        { success: false, error: 'Não autenticado' },
+        { status: 401 }
+      )
+    }
 
 function tryDecode(cookieValue: string): any | null {
   try {
@@ -16,17 +32,6 @@ function tryDecode(cookieValue: string): any | null {
       return null
     }
   }
-}
-
-export async function POST(req: NextRequest) {
-  try {
-    // Verificar autenticação via cookie
-    const cookie = req.cookies.get('golffox-session')?.value
-    if (!cookie) {
-      return NextResponse.json(
-        { success: false, error: 'Não autenticado' },
-        { status: 401 }
-      )
     }
 
     const userData = tryDecode(cookie)
@@ -46,16 +51,18 @@ export async function POST(req: NextRequest) {
     let updated = false
     const updates: string[] = []
 
+    const supabase = getSupabaseAdmin()
+
     // Atualizar nome se fornecido
     if (name !== undefined && name !== null && name.trim() !== '') {
-      const { data, error: nameError } = await supabaseServiceRole
+      const { data, error: nameError } = await supabase
         .from('users')
         .update({ name: name.trim() })
         .eq('id', userId)
         .select()
 
       if (nameError) {
-        console.error('Erro ao atualizar nome:', nameError)
+        logError('Erro ao atualizar nome', { error: nameError, userId }, 'UpdateProfileAPI')
         return NextResponse.json(
           { success: false, error: 'Erro ao atualizar nome: ' + nameError.message },
           { status: 500 }
@@ -72,13 +79,13 @@ export async function POST(req: NextRequest) {
     // Atualizar email se fornecido (requer sessão Supabase válida)
     if (email !== undefined && email !== null && email.trim() !== '' && email !== userData.email) {
       // 1. Atualizar email no Supabase Auth
-      const { data: updateData, error: updateError } = await supabaseServiceRole.auth.admin.updateUserById(
+      const { data: updateData, error: updateError } = await supabase.auth.admin.updateUserById(
         userId,
         { email: email.trim() }
       )
 
       if (updateError) {
-        console.error('Erro ao atualizar email no Auth:', updateError)
+        logError('Erro ao atualizar email no Auth', { error: updateError, userId }, 'UpdateProfileAPI')
         return NextResponse.json(
           { success: false, error: 'Erro ao atualizar email: ' + updateError.message },
           { status: 500 }
@@ -86,13 +93,13 @@ export async function POST(req: NextRequest) {
       }
 
       // 2. Atualizar email na tabela users para manter sincronia
-      const { error: dbError } = await supabaseServiceRole
+      const { error: dbError } = await supabase
         .from('users')
         .update({ email: email.trim() })
         .eq('id', userId)
 
       if (dbError) {
-        console.error('Erro ao atualizar email no banco:', dbError)
+        logError('Erro ao atualizar email no banco', { error: dbError, userId }, 'UpdateProfileAPI')
         // Não falhar completamente se o Auth passou, mas logar erro
       }
 
@@ -106,13 +113,13 @@ export async function POST(req: NextRequest) {
     // Atualizar senha se fornecida (requer sessão Supabase válida)
     if (newPassword !== undefined && newPassword !== null && newPassword.length >= 6) {
       // Atualizar senha usando admin API
-      const { data: updateData, error: updateError } = await supabaseServiceRole.auth.admin.updateUserById(
+      const { data: updateData, error: updateError } = await supabase.auth.admin.updateUserById(
         userId,
         { password: newPassword }
       )
 
       if (updateError) {
-        console.error('Erro ao atualizar senha:', updateError)
+        logError('Erro ao atualizar senha', { error: updateError, userId }, 'UpdateProfileAPI')
         return NextResponse.json(
           { success: false, error: 'Erro ao atualizar senha: ' + updateError.message },
           { status: 500 }
@@ -154,7 +161,7 @@ export async function POST(req: NextRequest) {
 
     return response
   } catch (error: any) {
-    console.error('Erro ao atualizar perfil:', error)
+    logError('Erro ao atualizar perfil', { error }, 'UpdateProfileAPI')
     return NextResponse.json(
       {
         success: false,

@@ -10,7 +10,20 @@
 
 const fs = require('fs')
 const path = require('path')
-const yaml = require('yaml')
+
+// Tentar usar biblioteca yaml, fallback para js-yaml ou parsing manual
+let yaml
+try {
+  yaml = require('yaml')
+} catch {
+  try {
+    yaml = require('js-yaml')
+  } catch {
+    // Fallback: usar JSON direto se YAML não disponível
+    console.warn('⚠️  Biblioteca YAML não encontrada. Instale com: npm install yaml ou npm install js-yaml')
+    yaml = null
+  }
+}
 
 const SOURCE_FILE = path.join(__dirname, '../apps/web/openapi.yaml')
 const OUTPUT_FILES = [
@@ -27,7 +40,19 @@ function generateOpenAPI() {
     }
 
     const yamlContent = fs.readFileSync(SOURCE_FILE, 'utf-8')
-    const jsonContent = yaml.parse(yamlContent)
+    let jsonContent
+    if (yaml) {
+      jsonContent = yaml.parse(yamlContent)
+    } else {
+      // Se não há parser YAML, tentar ler JSON direto (se openapi.json já existe)
+      console.warn('⚠️  Usando fallback: lendo openapi.json diretamente')
+      const jsonPath = path.join(__dirname, '../docs/api/openapi.json')
+      if (fs.existsSync(jsonPath)) {
+        jsonContent = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'))
+      } else {
+        throw new Error('Biblioteca YAML não disponível e openapi.json não encontrado. Instale: npm install yaml')
+      }
+    }
 
     // Validar estrutura básica
     if (!jsonContent.openapi || !jsonContent.info) {

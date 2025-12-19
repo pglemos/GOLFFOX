@@ -1,19 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
 import { requireAuth } from '@/lib/api-auth'
-import { logger } from '@/lib/logger'
+import { logger, logError } from '@/lib/logger'
 import { invalidateEntityCache } from '@/lib/next-cache'
+import { getSupabaseAdmin } from '@/lib/supabase-client'
 
 export const runtime = 'nodejs'
-
-function getSupabaseAdmin() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-  if (!url || !serviceKey) {
-    throw new Error('Supabase não configurado')
-  }
-  return createClient(url, serviceKey)
-}
 
 export async function DELETE(request: NextRequest) {
   try {
@@ -55,8 +46,7 @@ export async function DELETE(request: NextRequest) {
       .select()
 
     if (error) {
-      console.error('❌ Erro ao excluir veículo:', error)
-      console.error('Detalhes do erro:', JSON.stringify(error, null, 2))
+      logError('Erro ao excluir veículo', { error, vehicleId, errorDetails: JSON.stringify(error, null, 2) }, 'VehiclesDeleteAPI')
       return NextResponse.json(
         { 
           error: 'Erro ao excluir veículo', 
@@ -78,7 +68,7 @@ export async function DELETE(request: NextRequest) {
       message: 'Veículo excluído com sucesso'
     })
   } catch (error: any) {
-    console.error('Erro ao excluir veículo:', error)
+    logError('Erro ao excluir veículo', { error, vehicleId: request.nextUrl.searchParams.get('id') }, 'VehiclesDeleteAPI')
     return NextResponse.json(
       { error: 'Erro ao excluir veículo', message: error.message },
       { status: 500 }

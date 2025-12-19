@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
       .order('period_month', { ascending: false })
 
     if (error) {
-      console.error('Erro ao buscar dados de orçamento vs realizado:', error)
+      logError('Erro ao buscar dados de orçamento vs realizado', { error, companyId }, 'CostsVsBudgetAPI')
       return NextResponse.json(
         { error: error.message },
         { status: 500 }
@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ data: data || [] })
   } catch (err) {
-    console.error('Erro ao buscar dados de orçamento vs realizado:', err)
+    logError('Erro ao buscar dados de orçamento vs realizado', { error: err, companyId: request.nextUrl.searchParams.get('company_id') }, 'CostsVsBudgetAPI')
     const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
     return NextResponse.json(
       { error: errorMessage },

@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseServiceRole } from '@/lib/supabase-server'
+import { getSupabaseAdmin } from '@/lib/supabase-client'
+import { requireAuth } from '@/lib/api-auth'
+import { logError } from '@/lib/logger'
 import { invalidateEntityCache } from '@/lib/next-cache'
 
 // PUT /api/admin/transportadoras/[transportadoraId]/vehicles/[vehicleId]
@@ -7,10 +9,14 @@ export async function PUT(
   request: NextRequest,
   context: { params: Promise<{ transportadoraId?: string; carrierId?: string; vehicleId: string }> }
 ) {
+  // Verificar autenticação admin
+  const authError = await requireAuth(request, 'admin')
+  if (authError) return authError
+
   const params = await context.params
 
   try {
-    const supabase = supabaseServiceRole
+    const supabase = getSupabaseAdmin()
     const transportadoraId = params.transportadoraId || params.carrierId
     const { vehicleId } = params
     if (!transportadoraId) {
@@ -61,7 +67,7 @@ export async function PUT(
       .single()
 
     if (error) {
-      console.error('Erro ao atualizar veículo:', error)
+      logError('Erro ao atualizar veículo', { error, vehicleId, transportadoraId }, 'TransportadoraVehicleUpdateAPI')
       return NextResponse.json(
         { success: false, error: error.message },
         { status: 500 }
@@ -73,7 +79,7 @@ export async function PUT(
 
     return NextResponse.json({ success: true, vehicle })
   } catch (error: any) {
-    console.error('Erro na API de atualizar veículo:', error)
+    logError('Erro na API de atualizar veículo', { error, vehicleId: (await context.params).vehicleId }, 'TransportadoraVehicleUpdateAPI')
     return NextResponse.json(
       { success: false, error: error.message || 'Erro desconhecido' },
       { status: 500 }
@@ -86,10 +92,14 @@ export async function DELETE(
   request: NextRequest,
   context: { params: Promise<{ transportadoraId?: string; carrierId?: string; vehicleId: string }> }
 ) {
+  // Verificar autenticação admin
+  const authError = await requireAuth(request, 'admin')
+  if (authError) return authError
+
   const params = await context.params
 
   try {
-    const supabase = supabaseServiceRole
+    const supabase = getSupabaseAdmin()
     const transportadoraId = params.transportadoraId || params.carrierId
     const { vehicleId } = params
     if (!transportadoraId) {
@@ -106,7 +116,7 @@ export async function DELETE(
       .eq('transportadora_id', transportadoraId)
 
     if (error) {
-      console.error('Erro ao excluir veículo:', error)
+      logError('Erro ao excluir veículo', { error, vehicleId, transportadoraId }, 'TransportadoraVehicleDeleteAPI')
       return NextResponse.json(
         { success: false, error: error.message },
         { status: 500 }
@@ -118,7 +128,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true })
   } catch (error: any) {
-    console.error('Erro na API de excluir veículo:', error)
+    logError('Erro na API de excluir veículo', { error, vehicleId: (await context.params).vehicleId }, 'TransportadoraVehicleDeleteAPI')
     return NextResponse.json(
       { success: false, error: error.message || 'Erro desconhecido' },
       { status: 500 }

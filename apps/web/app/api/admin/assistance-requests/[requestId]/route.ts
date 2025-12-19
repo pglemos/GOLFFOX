@@ -1,18 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
 import { requireAuth } from '@/lib/api-auth'
 import { invalidateEntityCache } from '@/lib/next-cache'
+import { getSupabaseAdmin } from '@/lib/supabase-client'
+import { logError } from '@/lib/logger'
 
 export const runtime = 'nodejs'
-
-function getSupabaseAdmin() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-  if (!url || !serviceKey) {
-    throw new Error('Supabase não configurado')
-  }
-  return createClient(url, serviceKey)
-}
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
 
@@ -73,7 +65,7 @@ export async function PUT(
       .single()
 
     if (updateError) {
-      console.error('Erro ao atualizar ocorrência:', updateError)
+      logError('Erro ao atualizar ocorrência', { error: updateError, requestId }, 'AssistanceRequestsUpdateAPI')
       return NextResponse.json(
         { 
           error: 'Erro ao atualizar ocorrência',
@@ -91,7 +83,7 @@ export async function PUT(
       request: updatedRequest
     })
   } catch (err) {
-    console.error('Erro ao atualizar ocorrência:', err)
+    logError('Erro ao atualizar ocorrência', { error: err, requestId: (await context.params).requestId }, 'AssistanceRequestsUpdateAPI')
     const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
     return NextResponse.json(
       { 

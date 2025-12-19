@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseServiceRole } from '@/lib/supabase-server'
+import { getSupabaseAdmin } from '@/lib/supabase-client'
 import { requireAuth } from '@/lib/api-auth'
 import { applyRateLimit } from '@/lib/rate-limit'
 import { z } from 'zod'
 import { CarrierInsert } from '@/types/carrier'
-import { logger } from '@/lib/logger'
+import { logger, logError } from '@/lib/logger'
+import { successResponse, errorResponse, validationErrorResponse } from '@/lib/api-response'
 
 export const runtime = 'nodejs'
 
@@ -45,7 +46,7 @@ export async function POST(req: NextRequest) {
 
     const authErrorResponse = await requireAuth(req, 'admin')
     if (authErrorResponse) {
-      console.error('[CREATE CARRIER] Auth failed:', authErrorResponse.status)
+      logError('[CREATE CARRIER] Auth failed', { status: authErrorResponse.status }, 'CarriersCreateAPI')
       return authErrorResponse
     }
 
@@ -84,38 +85,26 @@ export async function POST(req: NextRequest) {
 
     logger.debug('[CREATE CARRIER] Attempting insert...', JSON.stringify(insertData, null, 2))
 
-    const { data, error } = await supabaseServiceRole
+    const supabase = getSupabaseAdmin()
+    const { data, error } = await supabase
       .from('carriers')
       .insert(insertData as any)
       .select()
       .single()
 
     if (error) {
-      console.error('[CREATE CARRIER] Database error:', error.code, error.message, error.details)
-      return NextResponse.json(
-        { success: false, error: 'Erro ao criar transportadora', message: error.message },
-        { status: 500 }
-      )
+      logError('[CREATE CARRIER] Database error', { error, code: error.code, details: error.details }, 'CarriersCreateAPI')
+      return errorResponse(error, 500, 'Erro ao criar transportadora')
     }
 
     logger.debug('[CREATE CARRIER] Success! Carrier created:', (data as any).id)
 
-    return NextResponse.json({
-      success: true,
-      carrier: data
-    })
+    return successResponse({ carrier: data })
   } catch (error: unknown) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        { success: false, error: 'Dados inválidos', details: error.errors },
-        { status: 400 }
-      )
+      return validationErrorResponse('Dados inválidos', { details: error.errors })
     }
-    const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido ao processar requisição'
-    return NextResponse.json(
-      { success: false, error: 'Erro ao processar requisição', message: errorMessage },
-      { status: 500 }
-    )
+    return errorResponse(error, 500, 'Erro ao processar requisição')
   }
 }
 

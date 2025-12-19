@@ -1,19 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
 import { requireAuth } from '@/lib/api-auth'
-import { logger } from '@/lib/logger'
+import { logger, logError } from '@/lib/logger'
 import { invalidateEntityCache } from '@/lib/next-cache'
+import { getSupabaseAdmin } from '@/lib/supabase-client'
 
 export const runtime = 'nodejs'
-
-function getSupabaseAdmin() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-  if (!url || !serviceKey) {
-    throw new Error('Supabase não configurado')
-  }
-  return createClient(url, serviceKey)
-}
 
 export async function DELETE(request: NextRequest) {
   try {
@@ -47,7 +38,7 @@ export async function DELETE(request: NextRequest) {
       .eq('route_id', routeId)
 
     if (tripsFetchError) {
-      console.error('❌ Erro ao buscar trips da rota:', tripsFetchError)
+      logError('Erro ao buscar trips da rota', { error: tripsFetchError, routeId }, 'RoutesDeleteAPI')
       return NextResponse.json(
         { error: 'Erro ao buscar viagens da rota', message: tripsFetchError.message },
         { status: 500 }
@@ -72,7 +63,7 @@ export async function DELETE(request: NextRequest) {
         if (tripSummaryError.code === '42P01') {
           logger.log('   ⚠️ Tabela trip_summary não existe (OK)')
         } else {
-          console.error('❌ Erro ao excluir trip_summary:', tripSummaryError)
+          logError('Erro ao excluir trip_summary', { error: tripSummaryError, routeId }, 'RoutesDeleteAPI')
           return NextResponse.json(
             { error: 'Erro ao excluir resumos de viagens', message: tripSummaryError.message },
             { status: 500 }
@@ -127,7 +118,7 @@ export async function DELETE(request: NextRequest) {
         if (depError) {
           // Se a tabela não existir ou não tiver a coluna, continuar
           if (depError.code !== '42P01' && depError.code !== '42703') {
-            console.error(`❌ Erro ao excluir ${table}:`, depError)
+            logError(`Erro ao excluir ${table}`, { error: depError, table, routeId }, 'RoutesDeleteAPI')
             return NextResponse.json(
               { error: `Erro ao excluir ${table}`, message: depError.message },
               { status: 500 }
@@ -145,7 +136,7 @@ export async function DELETE(request: NextRequest) {
         .eq('route_id', routeId)
 
       if (tripsDeleteError) {
-        console.error('❌ Erro ao excluir viagens da rota:', tripsDeleteError)
+        logError('Erro ao excluir viagens da rota', { error: tripsDeleteError, routeId }, 'RoutesDeleteAPI')
         return NextResponse.json(
           { error: 'Erro ao excluir viagens da rota', message: tripsDeleteError.message },
           { status: 500 }
@@ -162,7 +153,7 @@ export async function DELETE(request: NextRequest) {
       .eq('route_id', routeId)
 
     if (stopsDeleteError) {
-      console.error('❌ Erro ao excluir paradas da rota:', stopsDeleteError)
+      logError('Erro ao excluir paradas da rota', { error: stopsDeleteError, routeId }, 'RoutesDeleteAPI')
       return NextResponse.json(
         { error: 'Erro ao excluir paradas da rota', message: stopsDeleteError.message },
         { status: 500 }
@@ -177,8 +168,7 @@ export async function DELETE(request: NextRequest) {
       .select()
 
     if (error) {
-      console.error('❌ Erro ao excluir rota:', error)
-      console.error('Detalhes do erro:', JSON.stringify(error, null, 2))
+      logError('Erro ao excluir rota', { error, routeId, errorDetails: JSON.stringify(error, null, 2) }, 'RoutesDeleteAPI')
       return NextResponse.json(
         { 
           error: 'Erro ao excluir rota', 
@@ -197,7 +187,7 @@ export async function DELETE(request: NextRequest) {
 
     return NextResponse.json({ success: true, message: 'Rota excluída com sucesso' })
   } catch (error: any) {
-    console.error('Erro ao excluir rota:', error)
+    logError('Erro ao excluir rota', { error, routeId: request.nextUrl.searchParams.get('id') }, 'RoutesDeleteAPI')
     return NextResponse.json(
       { error: 'Erro ao excluir rota', message: error.message },
       { status: 500 }

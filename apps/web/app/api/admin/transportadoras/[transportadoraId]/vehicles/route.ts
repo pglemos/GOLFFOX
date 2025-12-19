@@ -1,21 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
-
-// Helper para criar cliente admin
-function getSupabaseAdmin() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-  if (!url || !serviceKey) {
-    throw new Error('Supabase não configurado')
-  }
-  return createClient(url, serviceKey)
-}
+import { getSupabaseAdmin } from '@/lib/supabase-client'
+import { requireAuth } from '@/lib/api-auth'
+import { logError } from '@/lib/logger'
 
 // GET /api/admin/transportadoras/[transportadoraId]/vehicles
 export async function GET(
   request: NextRequest,
   context: { params: Promise<{ transportadoraId?: string; carrierId?: string }> }
 ) {
+  // Verificar autenticação admin
+  const authError = await requireAuth(request, 'admin')
+  if (authError) return authError
+
   const params = await context.params
 
   try {
@@ -39,7 +35,7 @@ export async function GET(
       .order('created_at', { ascending: false })
 
     if (error) {
-      console.error('Erro ao buscar veículos:', error)
+      logError('Erro ao buscar veículos', { error, transportadoraId }, 'TransportadoraVehiclesAPI')
       return NextResponse.json(
         { success: false, error: error.message },
         { status: 500 }
@@ -48,7 +44,7 @@ export async function GET(
 
     return NextResponse.json({ success: true, vehicles: vehicles || [] })
   } catch (err) {
-    console.error('Erro na API de veículos:', err)
+    logError('Erro na API de veículos', { error: err, transportadoraId: (await context.params).transportadoraId || (await context.params).carrierId }, 'TransportadoraVehiclesAPI')
     const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
     return NextResponse.json(
       { success: false, error: errorMessage },
@@ -62,6 +58,10 @@ export async function POST(
   request: NextRequest,
   context: { params: Promise<{ transportadoraId?: string; carrierId?: string }> }
 ) {
+  // Verificar autenticação admin
+  const authError = await requireAuth(request, 'admin')
+  if (authError) return authError
+
   const params = await context.params
 
   try {
@@ -119,7 +119,7 @@ export async function POST(
       .single()
 
     if (error) {
-      console.error('Erro ao criar veículo:', error)
+      logError('Erro ao criar veículo', { error, transportadoraId }, 'TransportadoraVehiclesAPI')
       return NextResponse.json(
         { success: false, error: error.message },
         { status: 500 }
@@ -128,7 +128,7 @@ export async function POST(
 
     return NextResponse.json({ success: true, vehicle })
   } catch (error: any) {
-    console.error('Erro na API de criar veículo:', error)
+    logError('Erro na API de criar veículo', { error, transportadoraId: (await context.params).transportadoraId || (await context.params).carrierId }, 'TransportadoraVehiclesAPI')
     return NextResponse.json(
       { success: false, error: error.message || 'Erro desconhecido' },
       { status: 500 }

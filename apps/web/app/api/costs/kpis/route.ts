@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseServiceRole } from '@/lib/supabase-server'
+import { getSupabaseAdmin } from '@/lib/supabase-client'
 import { requireAuth, validateAuth, requireCompanyAccess } from '@/lib/api-auth'
 import { withRateLimit } from '@/lib/rate-limit'
-import { logger } from '@/lib/logger'
+import { logger, logError } from '@/lib/logger'
 
 async function getCostsKpisHandler(request: NextRequest) {
   try {
@@ -57,14 +57,15 @@ async function getCostsKpisHandler(request: NextRequest) {
     }
 
     // Buscar KPIs da view (view materializada - selecionar todas as colunas)
-    const { data, error } = await supabaseServiceRole
+    const supabase = getSupabaseAdmin()
+    const { data, error } = await supabase
       .from('v_costs_kpis')
       .select('*')
       .eq('company_id', companyId)
       .maybeSingle()
 
     if (error) {
-      console.error('Erro ao buscar KPIs de custos:', error)
+      logError('Erro ao buscar KPIs de custos', { error, companyId }, 'CostsKpisAPI')
       
       // Verificar se erro é porque view não existe
       if (error.code === 'PGRST205' || error.message?.includes('Could not find the table') || error.message?.includes('does not exist') || error.message?.includes('relation') || error.message?.includes('view')) {
@@ -109,7 +110,7 @@ async function getCostsKpisHandler(request: NextRequest) {
 
     // Adicionar variação vs orçamento se houver
     const periodDays = period === '90' ? 90 : 30
-    const { data: budgetData, error: budgetError } = await supabaseServiceRole
+    const { data: budgetData, error: budgetError } = await supabase
       .from('v_costs_vs_budget')
       .select('budgeted_amount, actual_amount, variance_percent')
       .eq('company_id', companyId)
@@ -135,7 +136,7 @@ async function getCostsKpisHandler(request: NextRequest) {
 
     return NextResponse.json(response)
   } catch (err) {
-    console.error('Erro ao buscar KPIs de custos:', err)
+    logError('Erro ao buscar KPIs de custos', { error: err, companyId }, 'CostsKpisAPI')
     const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
     return NextResponse.json(
       { error: errorMessage },

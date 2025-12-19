@@ -7,7 +7,10 @@
     "migrations:status": "node scripts/check-migrations-status.js",
     "migrations:apply": "node scripts/apply-migrations.js",
     "migrations:apply:direct": "node scripts/apply-migrations-direct.js",
-    "migrations:verify": "echo 'Execute scripts/verify-migration.sql no Supabase SQL Editor'"
+    "migrations:verify": "echo 'Execute scripts/verify-migration.sql no Supabase SQL Editor'",
+    "migrations:validate": "node scripts/validate-migrations.js",
+    "generate:openapi": "node scripts/generate-openapi.js",
+    "audit:public-routes": "node scripts/audit-public-routes.js"
   },
   "keywords": [],
   "author": "",

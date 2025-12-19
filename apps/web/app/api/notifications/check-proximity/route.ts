@@ -31,6 +31,14 @@ function getSupabaseAdmin() {
  */
 export async function POST(request: NextRequest) {
   try {
+    // Aplicar rate limiting
+    const rateLimitResponse = await applyRateLimit(request, 'api')
+    if (rateLimitResponse) return rateLimitResponse
+
+    // Verificar autenticação (requer usuário autenticado)
+    const authError = await requireAuth(request)
+    if (authError) return authError
+
     if (!GOOGLE_MAPS_API_KEY) {
       return NextResponse.json(
         { error: 'Google Maps API key não configurada' },
@@ -48,6 +56,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Usar service-role para esta operação (necessário para ler dados de múltiplas empresas)
     const supabase = getSupabaseAdmin()
 
     // Buscar paradas da rota que ainda não foram visitadas

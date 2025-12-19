@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
 import { requireCompanyAccess, requireAuth } from '@/lib/api-auth'
 import Papa from 'papaparse'
 import { withRateLimit } from '@/lib/rate-limit'
-import { logger } from '@/lib/logger'
+import { logger, logError } from '@/lib/logger'
 import { getSupabaseAdmin, fetchReportRange } from '@/server/services/reporting'
 
 export const runtime = 'nodejs'
@@ -116,7 +115,7 @@ async function runReportHandler(request: NextRequest): Promise<NextResponse> {
     if (!normalizedReportKey || !REPORT_CONFIGS[normalizedReportKey]) {
       const validKeys = Object.keys(REPORT_CONFIGS)
       const validAliases = Object.keys(reportKeyAliases)
-      console.error('ReportKey inválido:', { received: reportKey, normalized: normalizedReportKey, validKeys, validAliases })
+      logError('ReportKey inválido', { received: reportKey, normalized: normalizedReportKey, validKeys, validAliases }, 'ReportsRunAPI')
       return NextResponse.json(
         {
           error: 'Relatório inválido',
@@ -181,7 +180,7 @@ async function runReportHandler(request: NextRequest): Promise<NextResponse> {
 
 
     if (error) {
-      console.error('Erro ao buscar dados do relatório:', error)
+      logger.error('Erro ao buscar dados do relatório', { error }, 'RunReportsAPI')
 
       // Verificar se erro é porque view não existe
       if (error.message?.includes('does not exist') || error.message?.includes('relation') || error.message?.includes('view')) {
@@ -211,7 +210,7 @@ async function runReportHandler(request: NextRequest): Promise<NextResponse> {
               )
             }
           } catch (genError) {
-            console.error('Erro ao gerar arquivo vazio:', genError)
+            logger.error('Erro ao gerar arquivo vazio', { error: genError }, 'RunReportsAPI')
             // Se falhar ao gerar arquivo vazio, retornar CSV como último recurso
             return generateCSV([], config.columns, finalReportKey)
           }
@@ -254,7 +253,7 @@ async function runReportHandler(request: NextRequest): Promise<NextResponse> {
             )
           }
         } catch (genError) {
-          console.error('Erro ao gerar arquivo vazio:', genError)
+          logError('Erro ao gerar arquivo vazio', { error: genError, reportKey: finalReportKey }, 'ReportsRunAPI')
           // Se falhar ao gerar arquivo vazio, retornar CSV como último recurso
           return generateCSV([], config.columns, finalReportKey)
         }
@@ -329,7 +328,7 @@ async function runReportHandler(request: NextRequest): Promise<NextResponse> {
           )
       }
     } catch (formatError: any) {
-      console.error('Erro ao gerar arquivo:', formatError)
+      logError('Erro ao gerar arquivo', { error: formatError, format, reportKey: finalReportKey }, 'ReportsRunAPI')
       // Sempre retornar formato correto baseado no parâmetro format, não usar CSV como fallback
       // O teste espera Content-Type correto baseado no formato solicitado
       if (format === 'pdf') {
@@ -368,7 +367,7 @@ async function runReportHandler(request: NextRequest): Promise<NextResponse> {
       )
     }
   } catch (error: any) {
-    console.error('Erro ao gerar relatório:', error)
+    logError('Erro ao gerar relatório', { error }, 'ReportsRunAPI')
     try {
       // Sempre retornar formato correto baseado no parâmetro format
       if (format === 'pdf') {
@@ -509,7 +508,7 @@ async function generateCSVStream(
       while (true) {
         const { data: page, error } = await fetchReportRange(supabase, viewName, columns, filters, pageLimit, pageOffset)
         if (error) {
-          console.error('Erro ao paginar relatório:', error)
+          logError('Erro ao paginar relatório', { error, viewName, pageOffset, pageLimit }, 'ReportsRunAPI')
           break
         }
         if (!page || page.length === 0) {
@@ -579,7 +578,7 @@ async function generateExcel(data: any[], columns: string[], reportKey: string) 
       }
     })
   } catch (error) {
-    console.error('Erro ao gerar Excel:', error)
+    logError('Erro ao gerar Excel', { error }, 'ReportsRunAPI')
     // Retornar Excel vazio com Content-Type correto (não usar CSV como fallback)
     const filename = `relatorio_${reportKey}_${new Date().toISOString().split('T')[0]}.xlsx`
     return new NextResponse('', {
@@ -599,7 +598,7 @@ async function generatePDF(data: any[], columns: string[], reportKey: string) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       PDFDocument = await import('pdfkit')
     } catch (importError) {
-      console.error('Erro ao importar PDFKit, retornando PDF vazio:', importError)
+      logError('Erro ao importar PDFKit, retornando PDF vazio', { error: importError, reportKey }, 'ReportsRunAPI')
       // Se PDFKit não está disponível, retornar PDF vazio com Content-Type correto
       const filename = `relatorio_${reportKey}_${new Date().toISOString().split('T')[0]}.pdf`
       return new NextResponse('', {
@@ -634,7 +633,7 @@ async function generatePDF(data: any[], columns: string[], reportKey: string) {
               }
             }))
           } catch (endError) {
-            console.error('Erro ao finalizar PDF:', endError)
+            logError('Erro ao finalizar PDF', { error: endError }, 'ReportsRunAPI')
             // Retornar PDF vazio com Content-Type correto
             const filename = `relatorio_${reportKey}_${new Date().toISOString().split('T')[0]}.pdf`
             resolve(new NextResponse('', {
@@ -647,7 +646,7 @@ async function generatePDF(data: any[], columns: string[], reportKey: string) {
         })
 
         doc.on('error', (error: Error) => {
-          console.error('Erro ao gerar PDF:', error)
+          logError('Erro ao gerar PDF', { error }, 'ReportsRunAPI')
           // Retornar PDF vazio com Content-Type correto
           const filename = `relatorio_${reportKey}_${new Date().toISOString().split('T')[0]}.pdf`
           resolve(new NextResponse('', {
@@ -704,7 +703,7 @@ async function generatePDF(data: any[], columns: string[], reportKey: string) {
 
         doc.end()
       } catch (error) {
-        console.error('Erro ao criar documento PDF:', error)
+        logError('Erro ao criar documento PDF', { error, reportKey }, 'ReportsRunAPI')
         // Retornar PDF vazio com Content-Type correto (não usar CSV como fallback)
         const filename = `relatorio_${reportKey}_${new Date().toISOString().split('T')[0]}.pdf`
         resolve(new NextResponse('', {
@@ -716,7 +715,7 @@ async function generatePDF(data: any[], columns: string[], reportKey: string) {
       }
     })
   } catch (error) {
-    console.error('Erro ao gerar PDF:', error)
+    logError('Erro ao gerar PDF', { error }, 'ReportsRunAPI')
     // Retornar PDF vazio com Content-Type correto (não usar CSV como fallback)
     const filename = `relatorio_${reportKey}_${new Date().toISOString().split('T')[0]}.pdf`
     return new NextResponse('', {

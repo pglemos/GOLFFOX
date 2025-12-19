@@ -1,19 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { NextRequest } from 'next/server'
 import { requireAuth } from '@/lib/api-auth'
-import { logger } from '@/lib/logger'
+import { logger, logError } from '@/lib/logger'
 import { invalidateEntityCache } from '@/lib/next-cache'
+import { getSupabaseAdmin } from '@/lib/supabase-client'
+import { validationErrorResponse, errorResponse, successResponse } from '@/lib/api-response'
 
 export const runtime = 'nodejs'
-
-function getSupabaseAdmin() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-  if (!url || !serviceKey) {
-    throw new Error('Supabase não configurado')
-  }
-  return createClient(url, serviceKey)
-}
 
 export async function DELETE(request: NextRequest) {
   try {
@@ -26,10 +18,7 @@ export async function DELETE(request: NextRequest) {
     const driverId = searchParams.get('id')
 
     if (!driverId) {
-      return NextResponse.json(
-        { error: 'ID do motorista é obrigatório' },
-        { status: 400 }
-      )
+      return validationErrorResponse('ID do motorista é obrigatório')
     }
 
     const supabaseAdmin = getSupabaseAdmin()
@@ -59,17 +48,8 @@ export async function DELETE(request: NextRequest) {
       .select()
 
     if (error) {
-      console.error('❌ Erro ao excluir motorista:', error)
-      console.error('Detalhes do erro:', JSON.stringify(error, null, 2))
-      return NextResponse.json(
-        {
-          error: 'Erro ao excluir motorista',
-          message: error.message,
-          details: error.details || error.hint || 'Sem detalhes adicionais',
-          code: error.code
-        },
-        { status: 500 }
-      )
+      logError('Erro ao excluir motorista', { error, driverId, details: error.details, hint: error.hint, code: error.code }, 'DriversDeleteAPI')
+      return errorResponse(error, 500, 'Erro ao excluir motorista')
     }
 
     // Invalidar cache após exclusão
@@ -77,16 +57,10 @@ export async function DELETE(request: NextRequest) {
 
     logger.log(`✅ Motorista excluído com sucesso: ${driverId}`, data)
 
-    return NextResponse.json({
-      success: true,
-      message: 'Motorista excluído com sucesso'
-    })
+    return successResponse(null, 200, { message: 'Motorista excluído com sucesso' })
   } catch (error: any) {
-    console.error('Erro ao excluir motorista:', error)
-    return NextResponse.json(
-      { error: 'Erro ao excluir motorista', message: error.message },
-      { status: 500 }
-    )
+    logError('Erro ao excluir motorista', { error, driverId: request.nextUrl.searchParams.get('id') }, 'DriversDeleteAPI')
+    return errorResponse(error, 500, 'Erro ao excluir motorista')
   }
 }
 

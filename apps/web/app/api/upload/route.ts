@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
 import { requireAuth } from '@/lib/api-auth'
+import { getSupabaseAdmin } from '@/lib/supabase-client'
+import { applyRateLimit } from '@/lib/rate-limit'
+import { logError } from '@/lib/logger'
 
 export const runtime = 'nodejs'
 
@@ -14,25 +16,12 @@ const ALLOWED_BUCKETS = [
     'avatars'
 ]
 
-import { logError } from '@/lib/logger'
-
-function getSupabaseAdmin() {
-    const url = process.env.NEXT_PUBLIC_SUPABASE_URL
-    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-
-    if (!url) logError('CRITICAL: NEXT_PUBLIC_SUPABASE_URL is missing', {}, 'UploadAPI')
-    if (!serviceKey) logError('CRITICAL: SUPABASE_SERVICE_ROLE_KEY is missing', {}, 'UploadAPI')
-
-    if (!url || !serviceKey) {
-        throw new Error('Supabase não configurado corretamente no servidor')
-    }
-    return createClient(url, serviceKey, {
-        auth: { autoRefreshToken: false, persistSession: false }
-    })
-}
-
 export async function POST(request: NextRequest) {
     try {
+        // Aplicar rate limiting
+        const rateLimitResponse = await applyRateLimit(request, 'api')
+        if (rateLimitResponse) return rateLimitResponse
+
         // Verificar autenticação
         const authErrorResponse = await requireAuth(request)
         if (authErrorResponse) {
@@ -104,7 +93,7 @@ export async function POST(request: NextRequest) {
             })
 
         if (uploadError) {
-            console.error('Erro no upload:', uploadError)
+            logError('Erro no upload', { error: uploadError, bucket, entityId }, 'UploadAPI')
             return NextResponse.json({
                 error: 'Erro ao fazer upload',
                 details: uploadError.message

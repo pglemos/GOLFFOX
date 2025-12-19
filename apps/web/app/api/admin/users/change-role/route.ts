@@ -1,15 +1,19 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { supabaseServiceRole } from '@/lib/supabase-server'
+import { NextRequest } from 'next/server'
+import { getSupabaseAdmin } from '@/lib/supabase-client'
 import { requireAuth } from '@/lib/api-auth'
 import { applyRateLimit } from '@/lib/rate-limit'
 import { z } from 'zod'
 import { logger } from '@/lib/logger'
+import { successResponse, errorResponse, notFoundResponse } from '@/lib/api-response'
+import { normalizeRole, isValidRole } from '@/lib/role-mapper'
 
 export const runtime = 'nodejs'
 
 const changeRoleSchema = z.object({
     userId: z.string().uuid('ID de usuário inválido'),
-    newRole: z.enum(['admin', 'operator', 'transportadora', 'driver', 'passenger']),
+    newRole: z.string().refine((role) => isValidRole(role), {
+        message: 'Role inválido. Use: admin, empresa, transportadora, motorista, passageiro'
+    }),
     oldRole: z.string().optional(),
 })
 
@@ -26,51 +30,44 @@ export async function POST(req: NextRequest) {
         const body = await req.json()
         const validated = changeRoleSchema.parse(body)
 
+        // Normalizar role para nomenclatura canônica (PT-BR)
+        const normalizedRole = normalizeRole(validated.newRole)
+        
+        const supabase = getSupabaseAdmin()
+
         // Buscar usuário
-        const { data: targetUser, error: fetchError } = await supabaseServiceRole
+        const { data: targetUser, error: fetchError } = await supabase
             .from('users')
             .select('id, email, role, name')
             .eq('id', validated.userId)
             .single()
 
         if (fetchError || !targetUser) {
-            return NextResponse.json(
-                { success: false, error: 'Usuário não encontrado' },
-                { status: 404 }
-            )
+            logger.warn('Usuário não encontrado para mudança de papel', { userId: validated.userId, error: fetchError }, 'ChangeRoleAPI')
+            return notFoundResponse('Usuário não encontrado')
         }
 
-        // Validação: não permitir mudar se role é a mesma
-        if ((targetUser as any).role === validated.newRole) {
-            return NextResponse.json(
-                { success: false, error: 'O usuário já possui este papel' },
-                { status: 400 }
-            )
+        // Validação: não permitir mudar se role é a mesma (comparar com role normalizado)
+        if (normalizeRole((targetUser as any).role) === normalizedRole) {
+            return errorResponse(new Error('O usuário já possui este papel'), 400)
         }
 
-        // Atualizar role usando service role (bypass RLS)
-        const { data: updatedUser, error: updateError } = await supabaseServiceRole
+        // Atualizar role usando service role (bypass RLS) - usar role normalizado
+        const { data: updatedUser, error: updateError } = await supabase
             .from('users')
-            .update({ role: validated.newRole } as any)
+            .update({ role: normalizedRole } as any)
             .eq('id', validated.userId)
             .select()
             .single()
 
         if (updateError) {
-            console.error('❌ Erro ao atualizar papel:', updateError)
-            return NextResponse.json(
-                {
-                    success: false,
-                    error: 'Erro ao alterar papel',
-                    details: updateError.message
-                },
-                { status: 500 }
-            )
+            logger.error('Erro ao atualizar papel', { error: updateError, userId: validated.userId }, 'ChangeRoleAPI')
+            return errorResponse(updateError, 500, 'Erro ao alterar papel')
         }
 
         // Log de auditoria (opcional - se falhar não impede a operação)
         try {
-            await ((supabaseServiceRole
+            await ((supabase
                 // @ts-ignore - Supabase type inference issue
                 .from('audit_logs' as any)) as any)
                 .insert({
@@ -80,7 +77,8 @@ export async function POST(req: NextRequest) {
                     resource_id: validated.userId,
                     details: {
                         old_role: (targetUser as any).role,
-                        new_role: validated.newRole,
+                        new_role: normalizedRole,
+                        original_requested_role: validated.newRole,
                         user_email: (targetUser as any).email,
                         changed_by: req.headers.get('user-email') || 'admin'
                     }
@@ -90,24 +88,18 @@ export async function POST(req: NextRequest) {
             // Não falhar a operação por causa de log
         }
 
-        return NextResponse.json({
-            success: true,
-            user: updatedUser,
-            message: `Papel alterado de "${(targetUser as any).role}" para "${validated.newRole}" com sucesso`
-        })
+        return successResponse(
+            { user: updatedUser },
+            200,
+            { message: `Papel alterado de "${(targetUser as any).role}" para "${normalizedRole}" com sucesso` }
+        )
     } catch (error: any) {
-        console.error('❌ Erro ao processar mudança de papel:', error)
+        logger.error('Erro ao processar mudança de papel', { error }, 'ChangeRoleAPI')
 
         if (error instanceof z.ZodError) {
-            return NextResponse.json(
-                { success: false, error: 'Dados inválidos', details: error.errors },
-                { status: 400 }
-            )
+            return errorResponse(error, 400, 'Dados inválidos')
         }
 
-        return NextResponse.json(
-            { success: false, error: 'Erro ao processar requisição', message: error.message },
-            { status: 500 }
-        )
+        return errorResponse(error, 500)
     }
 }

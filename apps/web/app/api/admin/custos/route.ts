@@ -1,9 +1,13 @@
 "use server"
 
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import { logError } from '@/lib/logger'
+import { requireAuth } from '@/lib/api-auth'
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  // Verificar autenticação admin
+  const authError = await requireAuth(request, 'admin')
+  if (authError) return authError
     try {
         // Mock data for cost control
         const kpis = {

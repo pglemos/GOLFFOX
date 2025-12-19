@@ -7,20 +7,12 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { getSupabaseAdmin } from '@/lib/supabase-client'
 import { requireAuth } from '@/lib/api-auth'
+import { logError } from '@/lib/logger'
 import type { ManualCost, ManualCostInsert, CostFilters } from '@/types/financial'
 
 export const runtime = 'nodejs'
-
-function getSupabaseAdmin() {
-    const url = process.env.NEXT_PUBLIC_SUPABASE_URL
-    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-    if (!url || !serviceKey) {
-        throw new Error('Supabase não configurado')
-    }
-    return createClient(url, serviceKey)
-}
 
 // GET /api/costs/manual-v2
 export async function GET(request: NextRequest) {
@@ -132,7 +124,7 @@ export async function GET(request: NextRequest) {
         const { data, error, count } = await query
 
         if (error) {
-            console.error('[API] Erro ao buscar custos:', error)
+            logError('[API] Erro ao buscar custos', { error }, 'CostsManualV2API')
             // Se a tabela não existe, retornar vazio em vez de erro
             if (error.message?.includes('does not exist') || error.code === 'PGRST205') {
                 return NextResponse.json({
@@ -194,7 +186,7 @@ export async function GET(request: NextRequest) {
             totalPages,
         })
     } catch (error) {
-        console.error('[API] Erro interno:', error)
+        logError('[API] Erro interno', { error }, 'CostsManualV2API')
         return NextResponse.json(
             { success: false, error: 'Erro interno do servidor' },
             { status: 500 }
@@ -295,7 +287,7 @@ export async function POST(request: NextRequest) {
             .single()
 
         if (error) {
-            console.error('[API] Erro ao criar custo:', error)
+            logError('[API] Erro ao criar custo', { error }, 'CostsManualV2API')
             return NextResponse.json(
                 { success: false, error: error.message },
                 { status: 500 }
@@ -336,7 +328,7 @@ export async function POST(request: NextRequest) {
 
         return NextResponse.json({ success: true, data: newCost }, { status: 201 })
     } catch (error) {
-        console.error('[API] Erro interno:', error)
+        logError('[API] Erro interno', { error }, 'CostsManualV2API')
         return NextResponse.json(
             { success: false, error: 'Erro interno do servidor' },
             { status: 500 }

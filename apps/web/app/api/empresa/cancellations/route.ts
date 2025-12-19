@@ -1,8 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getSupabaseAdmin } from '@/lib/supabase-server';
+import { getSupabaseAdmin } from '@/lib/supabase-client';
+import { logError } from '@/lib/logger';
+import { requireAuth } from '@/lib/api-auth';
 
 // GET /api/empresa/cancellations - Não-embarques dos funcionários
 export async function GET(request: NextRequest) {
+    // Verificar autenticação (empresa ou admin)
+    const authError = await requireAuth(request, ['admin', 'empresa', 'operator'])
+    if (authError) return authError
+
     try {
         const supabase = getSupabaseAdmin();
         const { searchParams } = new URL(request.url);
@@ -36,7 +42,7 @@ export async function GET(request: NextRequest) {
         const { data, error } = await query;
 
         if (error) {
-            console.error('Error fetching cancellations:', error);
+            logError('Error fetching cancellations', { error }, 'CancellationsAPI');
             return NextResponse.json({ error: error.message }, { status: 500 });
         }
 
@@ -55,7 +61,7 @@ export async function GET(request: NextRequest) {
 
         return NextResponse.json({ data, stats });
     } catch (error) {
-        console.error('Cancellations API error:', error);
+        logError('Cancellations API error', { error }, 'CancellationsAPI');
         return NextResponse.json(
             { error: 'Erro ao buscar cancelamentos' },
             { status: 500 }

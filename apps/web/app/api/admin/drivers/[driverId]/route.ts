@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseServiceRole } from '@/lib/supabase-server'
+import { getSupabaseAdmin } from '@/lib/supabase-client'
+import { requireAuth } from '@/lib/api-auth'
+import { logError } from '@/lib/logger'
 import { invalidateEntityCache } from '@/lib/next-cache'
 
 // PUT /api/admin/drivers/[driverId] - Editar motorista
@@ -7,8 +9,12 @@ export async function PUT(
   request: NextRequest,
   context: { params: Promise<{ driverId: string }> }
 ) {
+  // Verificar autenticação admin
+  const authError = await requireAuth(request, 'admin')
+  if (authError) return authError
+
   try {
-    const supabase = supabaseServiceRole
+    const supabase = getSupabaseAdmin()
     const { driverId } = await context.params
     const body = await request.json()
 
@@ -55,7 +61,7 @@ export async function PUT(
       .single()
 
     if (driverError) {
-      console.error('Erro ao atualizar motorista:', driverError)
+      logError('Erro ao atualizar motorista', { error: driverError, driverId }, 'DriversUpdateAPI')
       return NextResponse.json(
         { success: false, error: driverError.message },
         { status: 500 }
@@ -67,7 +73,7 @@ export async function PUT(
 
     return NextResponse.json({ success: true, driver })
   } catch (error: any) {
-    console.error('Erro na API de atualizar motorista:', error)
+    logError('Erro na API de atualizar motorista', { error, driverId: (await context.params).driverId }, 'DriversUpdateAPI')
     return NextResponse.json(
       { success: false, error: error.message || 'Erro desconhecido' },
       { status: 500 }
@@ -80,8 +86,12 @@ export async function GET(
   request: NextRequest,
   context: { params: Promise<{ driverId: string }> }
 ) {
+  // Verificar autenticação admin
+  const authError = await requireAuth(request, 'admin')
+  if (authError) return authError
+
   try {
-    const supabase = supabaseServiceRole
+    const supabase = getSupabaseAdmin()
     const { driverId } = await context.params
 
     // Buscar motorista da tabela users
@@ -93,7 +103,7 @@ export async function GET(
       .single()
 
     if (error) {
-      console.error('Erro ao buscar motorista:', error)
+      logError('Erro ao buscar motorista', { error, driverId }, 'DriversGetAPI')
       return NextResponse.json(
         { success: false, error: error.message },
         { status: 500 }
@@ -102,7 +112,7 @@ export async function GET(
 
     return NextResponse.json({ success: true, driver })
   } catch (error: any) {
-    console.error('Erro na API de buscar motorista:', error)
+    logError('Erro na API de buscar motorista', { error, driverId: (await context.params).driverId }, 'DriversGetAPI')
     return NextResponse.json(
       { success: false, error: error.message || 'Erro desconhecido' },
       { status: 500 }

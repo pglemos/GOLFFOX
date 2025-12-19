@@ -1,0 +1,836 @@
+{
+  "public": [
+    {
+      "route": "/send-email/route.ts",
+      "file": "send-email\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Pública legítima (PRECISA rate limit)"
+    },
+    {
+      "route": "/health/route.ts",
+      "file": "health\\route.ts",
+      "hasRateLimit": true,
+      "status": "OK - Pública legítima (tem rate limit)"
+    },
+    {
+      "route": "/cep/route.ts",
+      "file": "cep\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Pública legítima (PRECISA rate limit)"
+    },
+    {
+      "route": "/webhooks/incoming/route.ts",
+      "file": "webhooks\\incoming\\route.ts",
+      "hasRateLimit": true,
+      "status": "OK - Pública legítima (tem rate limit)"
+    },
+    {
+      "route": "/docs/openapi/route.ts",
+      "file": "docs\\openapi\\route.ts",
+      "hasRateLimit": true,
+      "status": "OK - Pública legítima (tem rate limit)"
+    },
+    {
+      "route": "/auth/seed-admin/route.ts",
+      "file": "auth\\seed-admin\\route.ts",
+      "hasRateLimit": false,
+      "status": "DEV ONLY - Verificar se tem proteção NODE_ENV"
+    },
+    {
+      "route": "/auth/login/route.ts",
+      "file": "auth\\login\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Pública legítima (PRECISA rate limit)"
+    },
+    {
+      "route": "/auth/fix-transportadora-user/route.ts",
+      "file": "auth\\fix-transportadora-user\\route.ts",
+      "hasRateLimit": false,
+      "status": "DEV ONLY - Verificar se tem proteção NODE_ENV"
+    },
+    {
+      "route": "/auth/fix-test-user/route.ts",
+      "file": "auth\\fix-test-user\\route.ts",
+      "hasRateLimit": false,
+      "status": "DEV ONLY - Verificar se tem proteção NODE_ENV"
+    },
+    {
+      "route": "/auth/csrf/route.ts",
+      "file": "auth\\csrf\\route.ts",
+      "hasRateLimit": true,
+      "status": "OK - Pública legítima (tem rate limit)"
+    },
+    {
+      "route": "/analytics/web-vitals/route.ts",
+      "file": "analytics\\web-vitals\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Pública legítima (PRECISA rate limit)"
+    }
+  ],
+  "protected": [
+    {
+      "route": "/upload/route.ts",
+      "file": "upload\\route.ts",
+      "hasRateLimit": true,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/test-session/route.ts",
+      "file": "test-session\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/revenues/route.ts",
+      "file": "revenues\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/budgets/route.ts",
+      "file": "budgets\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/user/upload-avatar/route.ts",
+      "file": "user\\upload-avatar\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/user/update-profile/route.ts",
+      "file": "user\\update-profile\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/transportadora/upload/route.ts",
+      "file": "transportadora\\upload\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/transportadora/messages/route.ts",
+      "file": "transportadora\\messages\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/transportadora/locations/route.ts",
+      "file": "transportadora\\locations\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/transportadora/evaluations/route.ts",
+      "file": "transportadora\\evaluations\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/transportadora/checklists/route.ts",
+      "file": "transportadora\\checklists\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/transportadora/checkins/route.ts",
+      "file": "transportadora\\checkins\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/transportadora/alerts/route.ts",
+      "file": "transportadora\\alerts\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/reports/schedule/route.ts",
+      "file": "reports\\schedule\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/reports/run/route.ts",
+      "file": "reports\\run\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/reports/dispatch/route.ts",
+      "file": "reports\\dispatch\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/notifications/email/route.ts",
+      "file": "notifications\\email\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/notifications/check-proximity/route.ts",
+      "file": "notifications\\check-proximity\\route.ts",
+      "hasRateLimit": true,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/mobile/profile/route.ts",
+      "file": "mobile\\profile\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/empresa/evaluations/route.ts",
+      "file": "empresa\\evaluations\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/empresa/employees/route.ts",
+      "file": "empresa\\employees\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/empresa/cancellations/route.ts",
+      "file": "empresa\\cancellations\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/empresa/associate-company/route.ts",
+      "file": "empresa\\associate-company\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/empresa/announcements/route.ts",
+      "file": "empresa\\announcements\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/costs/reconcile/route.ts",
+      "file": "costs\\reconcile\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/costs/manual-v2/route.ts",
+      "file": "costs\\manual-v2\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/costs/manual/route.ts",
+      "file": "costs\\manual\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/costs/kpis/route.ts",
+      "file": "costs\\kpis\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/costs/import/route.ts",
+      "file": "costs\\import\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/costs/export/route.ts",
+      "file": "costs\\export\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/costs/categories/route.ts",
+      "file": "costs\\categories\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/costs/budgets/route.ts",
+      "file": "costs\\budgets\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/auth/me/route.ts",
+      "file": "auth\\me\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/admin/vehicles-list/route.ts",
+      "file": "admin\\vehicles-list\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/admin/vehicles/route.ts",
+      "file": "admin\\vehicles\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/admin/users-list/route.ts",
+      "file": "admin\\users-list\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/admin/trips/route.ts",
+      "file": "admin\\trips\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/admin/transportadoras-list/route.ts",
+      "file": "admin\\transportadoras-list\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/admin/seed-cost-categories/route.ts",
+      "file": "admin\\seed-cost-categories\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/admin/routes-list/route.ts",
+      "file": "admin\\routes-list\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/admin/routes/route.ts",
+      "file": "admin\\routes\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/admin/optimize-route/route.ts",
+      "file": "admin\\optimize-route\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/admin/migrate-users-address/route.ts",
+      "file": "admin\\migrate-users-address\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/admin/kpis/route.ts",
+      "file": "admin\\kpis\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/admin/generate-stops/route.ts",
+      "file": "admin\\generate-stops\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/admin/fix-database/route.ts",
+      "file": "admin\\fix-database\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/admin/execute-sql-fix/route.ts",
+      "file": "admin\\execute-sql-fix\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/admin/employees-list/route.ts",
+      "file": "admin\\employees-list\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/admin/drivers-list/route.ts",
+      "file": "admin\\drivers-list\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/admin/drivers/route.ts",
+      "file": "admin\\drivers\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/admin/custos/route.ts",
+      "file": "admin\\custos\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/admin/create-user/route.ts",
+      "file": "admin\\create-user\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/admin/create-transportadora-login/route.ts",
+      "file": "admin\\create-transportadora-login\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/admin/create-empresa-user/route.ts",
+      "file": "admin\\create-empresa-user\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/admin/create-empresa-login/route.ts",
+      "file": "admin\\create-empresa-login\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/admin/costs-options/route.ts",
+      "file": "admin\\costs-options\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/admin/companies-list/route.ts",
+      "file": "admin\\companies-list\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/admin/companies/route.ts",
+      "file": "admin\\companies\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/admin/audit-log/route.ts",
+      "file": "admin\\audit-log\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/admin/audit-db/route.ts",
+      "file": "admin\\audit-db\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/admin/assistance-requests-list/route.ts",
+      "file": "admin\\assistance-requests-list\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/admin/alerts-list/route.ts",
+      "file": "admin\\alerts-list\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/transportadora/storage/signed-url/route.ts",
+      "file": "transportadora\\storage\\signed-url\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/transportadora/reports/fleet-usage/route.ts",
+      "file": "transportadora\\reports\\fleet-usage\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/transportadora/reports/trips/route.ts",
+      "file": "transportadora\\reports\\trips\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/transportadora/reports/driver-performance/route.ts",
+      "file": "transportadora\\reports\\driver-performance\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/transportadora/costs/vehicle/route.ts",
+      "file": "transportadora\\costs\\vehicle\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/transportadora/costs/route/route.ts",
+      "file": "transportadora\\costs\\route\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/admin/vehicles/delete/route.ts",
+      "file": "admin\\vehicles\\delete\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/admin/users/[userId]/route.ts",
+      "file": "admin\\users\\[userId]\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/admin/users/delete/route.ts",
+      "file": "admin\\users\\delete\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/admin/users/change-role/route.ts",
+      "file": "admin\\users\\change-role\\route.ts",
+      "hasRateLimit": true,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/admin/trips/[tripId]/route.ts",
+      "file": "admin\\trips\\[tripId]\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/admin/transportadoras/update/route.ts",
+      "file": "admin\\transportadoras\\update\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/admin/transportadoras/delete/route.ts",
+      "file": "admin\\transportadoras\\delete\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/admin/transportadoras/create/route.ts",
+      "file": "admin\\transportadoras\\create\\route.ts",
+      "hasRateLimit": true,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/admin/transportadora/update/route.ts",
+      "file": "admin\\transportadora\\update\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/admin/transportadora/delete/route.ts",
+      "file": "admin\\transportadora\\delete\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/admin/transportadora/create/route.ts",
+      "file": "admin\\transportadora\\create\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/admin/routes/delete/route.ts",
+      "file": "admin\\routes\\delete\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/admin/emergency/available-vehicles/route.ts",
+      "file": "admin\\emergency\\available-vehicles\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/admin/emergency/routes-with-problems/route.ts",
+      "file": "admin\\emergency\\routes-with-problems\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/admin/emergency/available-drivers/route.ts",
+      "file": "admin\\emergency\\available-drivers\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/admin/emergency/dispatch/route.ts",
+      "file": "admin\\emergency\\dispatch\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/admin/drivers/delete/route.ts",
+      "file": "admin\\drivers\\delete\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/admin/drivers/[driverId]/route.ts",
+      "file": "admin\\drivers\\[driverId]\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/admin/companies/[companyId]/route.ts",
+      "file": "admin\\companies\\[companyId]\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/admin/companies/delete/route.ts",
+      "file": "admin\\companies\\delete\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/admin/carriers/[carrierId]/route.ts",
+      "file": "admin\\carriers\\[carrierId]\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/admin/alerts/[alertId]/route.ts",
+      "file": "admin\\alerts\\[alertId]\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/admin/assistance-requests/delete/route.ts",
+      "file": "admin\\assistance-requests\\delete\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/admin/assistance-requests/[requestId]/route.ts",
+      "file": "admin\\assistance-requests\\[requestId]\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/admin/alerts/update/route.ts",
+      "file": "admin\\alerts\\update\\route.ts",
+      "hasRateLimit": true,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/admin/alerts/delete/route.ts",
+      "file": "admin\\alerts\\delete\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/transportadora/vehicles/[vehicleId]/documents/route.ts",
+      "file": "transportadora\\vehicles\\[vehicleId]\\documents\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/transportadora/vehicles/[vehicleId]/maintenances/route.ts",
+      "file": "transportadora\\vehicles\\[vehicleId]\\maintenances\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/transportadora/drivers/[driverId]/exams/route.ts",
+      "file": "transportadora\\drivers\\[driverId]\\exams\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/transportadora/drivers/[driverId]/documents/route.ts",
+      "file": "transportadora\\drivers\\[driverId]\\documents\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/admin/vehicles/[vehicleId]/documents/route.ts",
+      "file": "admin\\vehicles\\[vehicleId]\\documents\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/admin/transportadoras/[transportadoraId]/vehicles/route.ts",
+      "file": "admin\\transportadoras\\[transportadoraId]\\vehicles\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/admin/transportadoras/[transportadoraId]/users/route.ts",
+      "file": "admin\\transportadoras\\[transportadoraId]\\users\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/admin/transportadoras/[transportadoraId]/drivers/route.ts",
+      "file": "admin\\transportadoras\\[transportadoraId]\\drivers\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/admin/drivers/[driverId]/documents/route.ts",
+      "file": "admin\\drivers\\[driverId]\\documents\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/admin/drivers/[driverId]/compensation/route.ts",
+      "file": "admin\\drivers\\[driverId]\\compensation\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/admin/carriers/[carrierId]/documents/route.ts",
+      "file": "admin\\carriers\\[carrierId]\\documents\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/admin/transportadoras/[transportadoraId]/vehicles/[vehicleId]/route.ts",
+      "file": "admin\\transportadoras\\[transportadoraId]\\vehicles\\[vehicleId]\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    },
+    {
+      "route": "/admin/transportadoras/[transportadoraId]/drivers/[driverId]/route.ts",
+      "file": "admin\\transportadoras\\[transportadoraId]\\drivers\\[driverId]\\route.ts",
+      "hasRateLimit": false,
+      "status": "OK - Protegida"
+    }
+  ],
+  "needsReview": [
+    {
+      "route": "/transportadora/motoristas/route.ts",
+      "file": "transportadora\\motoristas\\route.ts",
+      "hasRateLimit": false,
+      "status": "PRECISA REVISÃO - Sem requireAuth mas não é rota pública conhecida"
+    },
+    {
+      "route": "/transportadora/alertas/route.ts",
+      "file": "transportadora\\alertas\\route.ts",
+      "hasRateLimit": false,
+      "status": "PRECISA REVISÃO - Sem requireAuth mas não é rota pública conhecida"
+    },
+    {
+      "route": "/empresa/optimize-route/route.ts",
+      "file": "empresa\\optimize-route\\route.ts",
+      "hasRateLimit": false,
+      "status": "PRECISA REVISÃO - Sem requireAuth mas não é rota pública conhecida"
+    },
+    {
+      "route": "/empresa/historico-rotas/route.ts",
+      "file": "empresa\\historico-rotas\\route.ts",
+      "hasRateLimit": false,
+      "status": "PRECISA REVISÃO - Sem requireAuth mas não é rota pública conhecida"
+    },
+    {
+      "route": "/empresa/create-employee/route.ts",
+      "file": "empresa\\create-employee\\route.ts",
+      "hasRateLimit": false,
+      "status": "PRECISA REVISÃO - Sem requireAuth mas não é rota pública conhecida"
+    },
+    {
+      "route": "/cron/refresh-kpis/route.ts",
+      "file": "cron\\refresh-kpis\\route.ts",
+      "hasRateLimit": false,
+      "status": "PRECISA REVISÃO - Sem requireAuth mas não é rota pública conhecida"
+    },
+    {
+      "route": "/cron/refresh-costs-mv/route.ts",
+      "file": "cron\\refresh-costs-mv\\route.ts",
+      "hasRateLimit": false,
+      "status": "PRECISA REVISÃO - Sem requireAuth mas não é rota pública conhecida"
+    },
+    {
+      "route": "/cron/dispatch-reports/route.ts",
+      "file": "cron\\dispatch-reports\\route.ts",
+      "hasRateLimit": false,
+      "status": "PRECISA REVISÃO - Sem requireAuth mas não é rota pública conhecida"
+    },
+    {
+      "route": "/costs/vs-budget/route.ts",
+      "file": "costs\\vs-budget\\route.ts",
+      "hasRateLimit": false,
+      "status": "PRECISA REVISÃO - Sem requireAuth mas não é rota pública conhecida"
+    },
+    {
+      "route": "/auth/set-session/route.ts",
+      "file": "auth\\set-session\\route.ts",
+      "hasRateLimit": false,
+      "status": "PRECISA REVISÃO - Sem requireAuth mas não é rota pública conhecida"
+    },
+    {
+      "route": "/auth/clear-session/route.ts",
+      "file": "auth\\clear-session\\route.ts",
+      "hasRateLimit": true,
+      "status": "PRECISA REVISÃO - Sem requireAuth mas não é rota pública conhecida"
+    },
+    {
+      "route": "/admin/migrate-users-to-cpf-login/route.ts",
+      "file": "admin\\migrate-users-to-cpf-login\\route.ts",
+      "hasRateLimit": false,
+      "status": "PRECISA REVISÃO - Sem requireAuth mas não é rota pública conhecida"
+    },
+    {
+      "route": "/admin/create-carrier-login/route.ts",
+      "file": "admin\\create-carrier-login\\route.ts",
+      "hasRateLimit": false,
+      "status": "PRECISA REVISÃO - Sem requireAuth mas não é rota pública conhecida"
+    },
+    {
+      "route": "/admin/vehicles/[vehicleId]/route.ts",
+      "file": "admin\\vehicles\\[vehicleId]\\route.ts",
+      "hasRateLimit": false,
+      "status": "PRECISA REVISÃO - Sem requireAuth mas não é rota pública conhecida"
+    },
+    {
+      "route": "/admin/transportadora/[transportadoraId]/vehicles/route.ts",
+      "file": "admin\\transportadora\\[transportadoraId]\\vehicles\\route.ts",
+      "hasRateLimit": false,
+      "status": "PRECISA REVISÃO - Sem requireAuth mas não é rota pública conhecida"
+    },
+    {
+      "route": "/admin/transportadora/[transportadoraId]/users/route.ts",
+      "file": "admin\\transportadora\\[transportadoraId]\\users\\route.ts",
+      "hasRateLimit": false,
+      "status": "PRECISA REVISÃO - Sem requireAuth mas não é rota pública conhecida"
+    },
+    {
+      "route": "/admin/transportadora/[transportadoraId]/drivers/route.ts",
+      "file": "admin\\transportadora\\[transportadoraId]\\drivers\\route.ts",
+      "hasRateLimit": false,
+      "status": "PRECISA REVISÃO - Sem requireAuth mas não é rota pública conhecida"
+    },
+    {
+      "route": "/admin/companies/[companyId]/documents/route.ts",
+      "file": "admin\\companies\\[companyId]\\documents\\route.ts",
+      "hasRateLimit": false,
+      "status": "PRECISA REVISÃO - Sem requireAuth mas não é rota pública conhecida"
+    },
+    {
+      "route": "/admin/transportadora/[transportadoraId]/vehicles/[vehicleId]/route.ts",
+      "file": "admin\\transportadora\\[transportadoraId]\\vehicles\\[vehicleId]\\route.ts",
+      "hasRateLimit": false,
+      "status": "PRECISA REVISÃO - Sem requireAuth mas não é rota pública conhecida"
+    },
+    {
+      "route": "/admin/transportadora/[transportadoraId]/drivers/[driverId]/route.ts",
+      "file": "admin\\transportadora\\[transportadoraId]\\drivers\\[driverId]\\route.ts",
+      "hasRateLimit": false,
+      "status": "PRECISA REVISÃO - Sem requireAuth mas não é rota pública conhecida"
+    }
+  ]
+}

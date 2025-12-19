@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseServiceRole } from '@/lib/supabase-server'
+import { getSupabaseAdmin } from '@/lib/supabase-client'
 import { requireCompanyAccess } from '@/lib/api-auth'
 import { exportToCSV, exportToExcel, exportToPDF } from '@/lib/export-utils'
 import { withRateLimit } from '@/lib/rate-limit'
+import { logError } from '@/lib/logger'
 
 async function exportHandler(request: NextRequest) {
   try {
@@ -53,7 +54,7 @@ async function exportHandler(request: NextRequest) {
     const columns = [
       'date','group_name','category','subcategory','route_name','vehicle_plate','driver_email','amount','qty','unit','source','notes','company_id','route_id','vehicle_id','driver_id','cost_category_id'
     ]
-    let query = supabaseServiceRole
+    let query = getSupabaseAdmin()
       .from('v_costs_secure')
       .select(columns.join(','))
       .eq('company_id', companyId)
@@ -80,7 +81,7 @@ async function exportHandler(request: NextRequest) {
     const { data: costs, error } = await query.order('date', { ascending: false }).range(offset, offset + limit - 1)
 
     if (error) {
-      console.error('Erro ao buscar custos para exportação:', error)
+      logError('Erro ao buscar custos para exportação', { error, companyId }, 'CostsExportAPI')
       // Em dev/test, retornar lista vazia se a view não existe
       if (isTestMode || isDevelopment) {
         return NextResponse.json({ success: true, data: [] }, { status: 200 })
@@ -89,7 +90,7 @@ async function exportHandler(request: NextRequest) {
     }
 
     // Buscar nome da empresa
-    const { data: company } = await supabaseServiceRole
+    const { data: company } = await supabase
       .from('companies')
       .select('name')
       .eq('id', companyId)
@@ -150,7 +151,7 @@ async function exportHandler(request: NextRequest) {
           let pageOffset = offset
           const pageLimit = limit
           while (true) {
-            const { data: page, error: pageError } = await supabaseServiceRole
+            const { data: page, error: pageError } = await supabase
               .from('v_costs_secure')
               .select(columns.join(','))
               .eq('company_id', companyId)
@@ -158,7 +159,7 @@ async function exportHandler(request: NextRequest) {
               .range(pageOffset, pageOffset + pageLimit - 1)
 
             if (pageError) {
-              console.error('Erro ao paginar custos:', pageError)
+              logError('Erro ao paginar custos', { error: pageError }, 'CostsExportAPI')
               break
             }
             if (!page || page.length === 0) {
@@ -219,7 +220,7 @@ async function exportHandler(request: NextRequest) {
       })
     }
   } catch (error: any) {
-    console.error('Erro ao exportar custos:', error)
+    logError('Erro ao exportar custos', { error, companyId: request.nextUrl.searchParams.get('company_id') }, 'CostsExportAPI')
     return NextResponse.json(
       { error: error.message || 'Erro desconhecido' },
       { status: 500 }

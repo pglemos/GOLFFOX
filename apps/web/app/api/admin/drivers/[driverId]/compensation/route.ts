@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { getSupabaseAdmin } from '@/lib/supabase-client'
+import { requireAuth } from '@/lib/api-auth'
+import { logError } from '@/lib/logger'
 import { z } from 'zod'
 
 // Schema de validação
@@ -28,12 +30,6 @@ const compensationSchema = z.object({
     notes: z.string().optional().nullable(),
 })
 
-// Supabase service client (bypasses RLS)
-const supabaseAdmin = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    { auth: { persistSession: false } }
-)
 
 interface RouteParams {
     params: Promise<{ driverId: string }>
@@ -78,7 +74,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
             .single()
 
         if (error && error.code !== 'PGRST116') { // PGRST116 = no rows found
-            console.error('Erro ao buscar compensação:', error)
+            logError('Erro ao buscar compensação', { error, driverId }, 'DriverCompensationAPI')
             return NextResponse.json(
                 { error: 'Erro ao buscar dados de compensação' },
                 { status: 500 }
@@ -87,7 +83,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
         return NextResponse.json(compensation || null)
     } catch (error) {
-        console.error('Erro na API de compensação:', error)
+        logError('Erro na API de compensação', { error, driverId, method: 'GET' }, 'DriverCompensationAPI')
         return NextResponse.json(
             { error: 'Erro interno do servidor' },
             { status: 500 }
@@ -100,8 +96,13 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
  * Cria ou atualiza a compensação de um motorista
  */
 export async function POST(request: NextRequest, { params }: RouteParams) {
+    // Verificar autenticação admin
+    const authError = await requireAuth(request, 'admin')
+    if (authError) return authError
+
     try {
         const { driverId } = await params
+        const supabaseAdmin = getSupabaseAdmin()
 
         if (!driverId) {
             return NextResponse.json(
@@ -159,7 +160,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
                 .single()
 
             if (updateError) {
-                console.error('Erro ao atualizar compensação:', updateError)
+                logError('Erro ao atualizar compensação', { error: updateError, driverId }, 'DriverCompensationAPI')
                 return NextResponse.json(
                     { error: 'Erro ao atualizar dados de compensação' },
                     { status: 500 }
@@ -181,7 +182,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
             .single()
 
         if (createError) {
-            console.error('Erro ao criar compensação:', createError)
+            logError('Erro ao criar compensação', { error: createError, driverId }, 'DriverCompensationAPI')
             return NextResponse.json(
                 { error: 'Erro ao criar dados de compensação' },
                 { status: 500 }
@@ -190,7 +191,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
         return NextResponse.json(created, { status: 201 })
     } catch (error) {
-        console.error('Erro na API de compensação:', error)
+        logError('Erro na API de compensação', { error, driverId, method: 'POST' }, 'DriverCompensationAPI')
         return NextResponse.json(
             { error: 'Erro interno do servidor' },
             { status: 500 }
@@ -213,6 +214,8 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
             )
         }
 
+        const supabaseAdmin = getSupabaseAdmin()
+
         // Desativar compensação (soft delete)
         const { error: updateError } = await supabaseAdmin
             .from('gf_driver_compensation')
@@ -225,7 +228,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
             .eq('is_active', true)
 
         if (updateError) {
-            console.error('Erro ao desativar compensação:', updateError)
+            logError('Erro ao desativar compensação', { error: updateError, driverId }, 'DriverCompensationAPI')
             return NextResponse.json(
                 { error: 'Erro ao desativar dados de compensação' },
                 { status: 500 }
@@ -234,7 +237,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
 
         return NextResponse.json({ success: true })
     } catch (error) {
-        console.error('Erro na API de compensação:', error)
+        logError('Erro na API de compensação', { error, driverId, method: 'DELETE' }, 'DriverCompensationAPI')
         return NextResponse.json(
             { error: 'Erro interno do servidor' },
             { status: 500 }

@@ -1,19 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
 import { requireAuth } from '@/lib/api-auth'
-import { logger } from '@/lib/logger'
+import { logger, logError } from '@/lib/logger'
 import { invalidateEntityCache } from '@/lib/next-cache'
+import { getSupabaseAdmin } from '@/lib/supabase-client'
 
 export const runtime = 'nodejs'
-
-function getSupabaseAdmin() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-  if (!url || !serviceKey) {
-    throw new Error('Supabase não configurado')
-  }
-  return createClient(url, serviceKey)
-}
 
 export async function DELETE(request: NextRequest) {
   try {
@@ -43,8 +34,7 @@ export async function DELETE(request: NextRequest) {
       .select()
 
     if (error) {
-      console.error('❌ Erro ao excluir solicitação de socorro:', error)
-      console.error('Detalhes do erro:', JSON.stringify(error, null, 2))
+      logError('Erro ao excluir solicitação de socorro', { error, requestId, details: error.details, hint: error.hint, code: error.code }, 'AssistanceRequestsDeleteAPI')
       return NextResponse.json(
         { 
           error: 'Erro ao excluir solicitação de socorro', 
@@ -66,7 +56,7 @@ export async function DELETE(request: NextRequest) {
       message: 'Solicitação de socorro excluída com sucesso'
     })
   } catch (error: any) {
-    console.error('Erro ao excluir solicitação de socorro:', error)
+    logError('Erro ao excluir solicitação de socorro', { error, requestId: request.nextUrl.searchParams.get('id') }, 'AssistanceRequestsDeleteAPI')
     return NextResponse.json(
       { error: 'Erro ao excluir solicitação de socorro', message: error.message },
       { status: 500 }

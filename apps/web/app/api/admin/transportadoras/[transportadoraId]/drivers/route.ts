@@ -1,22 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
-import { logger } from '@/lib/logger'
-
-// Helper para criar cliente admin
-function getSupabaseAdmin() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-  if (!url || !serviceKey) {
-    throw new Error('Supabase não configurado')
-  }
-  return createClient(url, serviceKey)
-}
+import { getSupabaseAdmin } from '@/lib/supabase-client'
+import { requireAuth } from '@/lib/api-auth'
+import { logger, logError } from '@/lib/logger'
 
 // GET /api/admin/transportadoras/[transportadoraId]/drivers
 export async function GET(
   request: NextRequest,
   context: { params: Promise<{ transportadoraId?: string; carrierId?: string }> }
 ) {
+  // Verificar autenticação admin
+  const authError = await requireAuth(request, 'admin')
+  if (authError) return authError
+
   const params = await context.params
 
   try {
@@ -41,7 +36,7 @@ export async function GET(
       .order('name', { ascending: true })
 
     if (error) {
-      console.error('Erro ao buscar motoristas:', error)
+      logError('Erro ao buscar motoristas', { error, transportadoraId }, 'TransportadoraDriversAPI')
       return NextResponse.json(
         { success: false, error: error.message },
         { status: 500 }
@@ -50,7 +45,7 @@ export async function GET(
 
     return NextResponse.json({ success: true, drivers })
   } catch (err) {
-    console.error('Erro na API de motoristas:', err)
+    logError('Erro na API de motoristas', { error: err, transportadoraId: (await context.params).transportadoraId || (await context.params).carrierId }, 'TransportadoraDriversAPI')
     const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
     return NextResponse.json(
       { success: false, error: errorMessage },
@@ -183,7 +178,7 @@ export async function POST(
         }
 
         if (!authUserId) {
-          console.error('Erro ao criar usuário Auth para motorista:', authError)
+          logError('Erro ao criar usuário Auth para motorista', { error: authError, transportadoraId }, 'TransportadoraDriversAPI')
           return NextResponse.json(
             { success: false, error: 'Erro ao criar autenticação do motorista: ' + authError.message },
             { status: 500 }
@@ -230,7 +225,7 @@ export async function POST(
 
     if (error) {
 
-      console.error('Erro ao criar motorista na tabela users:', error)
+      logError('Erro ao criar motorista na tabela users', { error, transportadoraId }, 'TransportadoraDriversAPI')
       // Só deleta do Auth se não era um usuário existente
       if (!existingAuthUser) {
         await supabase.auth.admin.deleteUser(authUserId)
@@ -246,7 +241,7 @@ export async function POST(
 
     return NextResponse.json({ success: true, driver })
   } catch (err) {
-    console.error('Erro na API de criar motorista:', err)
+    logError('Erro na API de criar motorista', { error: err, transportadoraId: (await context.params).transportadoraId || (await context.params).carrierId }, 'TransportadoraDriversAPI')
     const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
     return NextResponse.json(
       { success: false, error: errorMessage },

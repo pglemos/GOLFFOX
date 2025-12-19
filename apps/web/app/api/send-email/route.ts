@@ -25,12 +25,12 @@ export async function POST(request: Request) {
 
         const { data, error } = await resend.emails.send({
             from: process.env.RESEND_FROM_EMAIL || 'GolfFox <onboarding@resend.dev>',
-            to: [to],
-            subject: subject,
-            html: html,
-            text: text
+          to: [to],
+          subject: subject,
+          html: html,
+          text: text
         });
-
+    
         if (error) {
             logError('Erro ao enviar e-mail via Resend', { error, to: to.replace(/^(.{2}).+(@.*)$/, '$1***$2') }, 'SendEmailAPI');
             return NextResponse.json({ error: 'Failed to send email', details: error }, { status: 500 });

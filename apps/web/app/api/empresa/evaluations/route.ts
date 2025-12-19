@@ -1,8 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getSupabaseAdmin } from '@/lib/supabase-server';
+import { getSupabaseAdmin } from '@/lib/supabase-client';
+import { logError } from '@/lib/logger';
+import { requireAuth } from '@/lib/api-auth';
 
 // GET /api/empresa/evaluations - Ver avaliações dos funcionários
 export async function GET(request: NextRequest) {
+    // Verificar autenticação (empresa ou admin)
+    const authError = await requireAuth(request, ['admin', 'empresa', 'operator'])
+    if (authError) return authError
+
     try {
         const supabase = getSupabaseAdmin();
         const { searchParams } = new URL(request.url);
@@ -29,7 +35,7 @@ export async function GET(request: NextRequest) {
         const { data, error } = await query;
 
         if (error) {
-            console.error('Error fetching evaluations:', error);
+            logError('Error fetching evaluations', { error }, 'EvaluationsAPI');
             return NextResponse.json({ error: error.message }, { status: 500 });
         }
 
@@ -62,7 +68,7 @@ export async function GET(request: NextRequest) {
 
         return NextResponse.json({ data: filteredData, stats });
     } catch (error) {
-        console.error('Evaluations API error:', error);
+        logError('Evaluations API error', { error }, 'EvaluationsAPI');
         return NextResponse.json(
             { error: 'Erro ao buscar avaliações' },
             { status: 500 }

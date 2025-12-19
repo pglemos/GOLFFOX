@@ -16,18 +16,6 @@ const documentSchema = z.object({
     notes: z.string().nullable().optional(),
 })
 
-function getSupabaseAdmin() {
-    const url = process.env.NEXT_PUBLIC_SUPABASE_URL
-    const key = process.env.SUPABASE_SERVICE_ROLE_KEY
-
-    if (!url || !key) {
-        throw new Error('Supabase environment variables not configured')
-    }
-
-    return createClient(url, key, {
-        auth: { persistSession: false }
-    })
-}
 
 // GET - Listar documentos da empresa
 export async function GET(
@@ -53,7 +41,7 @@ export async function GET(
             .order('created_at', { ascending: false })
 
         if (error) {
-            console.error('Erro ao buscar documentos:', error)
+            logError('Erro ao buscar documentos', { error, companyId }, 'CompanyDocumentsAPI')
             return NextResponse.json(
                 { error: 'Erro ao buscar documentos' },
                 { status: 500 }
@@ -62,7 +50,7 @@ export async function GET(
 
         return NextResponse.json(data || [])
     } catch (error) {
-        console.error('Erro interno:', error)
+        logError('Erro interno', { error, companyId, method: 'GET' }, 'CompanyDocumentsAPI')
         return NextResponse.json(
             { error: 'Erro interno do servidor' },
             { status: 500 }
@@ -85,10 +73,10 @@ export async function POST(
             )
         }
 
+        const supabase = getSupabaseAdmin()
+
         const body = await request.json()
         const validatedData = documentSchema.parse(body)
-
-        const supabase = getSupabaseAdmin()
 
         // Verificar se já existe documento deste tipo
         const { data: existing } = await supabase
@@ -123,7 +111,7 @@ export async function POST(
         }
 
         if (result.error) {
-            console.error('Erro ao salvar documento:', result.error)
+            logError('Erro ao salvar documento', { error: result.error, companyId }, 'CompanyDocumentsAPI')
             return NextResponse.json(
                 { error: 'Erro ao salvar documento' },
                 { status: 500 }
@@ -138,7 +126,7 @@ export async function POST(
                 { status: 400 }
             )
         }
-        console.error('Erro interno:', error)
+        logError('Erro interno', { error, companyId, method: 'GET' }, 'CompanyDocumentsAPI')
         return NextResponse.json(
             { error: 'Erro interno do servidor' },
             { status: 500 }
@@ -172,7 +160,7 @@ export async function DELETE(
             .eq('company_id', companyId)
 
         if (error) {
-            console.error('Erro ao remover documento:', error)
+            logError('Erro ao remover documento', { error, companyId }, 'CompanyDocumentsAPI')
             return NextResponse.json(
                 { error: 'Erro ao remover documento' },
                 { status: 500 }
@@ -181,7 +169,7 @@ export async function DELETE(
 
         return NextResponse.json({ success: true })
     } catch (error) {
-        console.error('Erro interno:', error)
+        logError('Erro interno', { error, companyId, method: 'GET' }, 'CompanyDocumentsAPI')
         return NextResponse.json(
             { error: 'Erro interno do servidor' },
             { status: 500 }

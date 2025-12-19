@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseServiceRole } from '@/lib/supabase-server'
+import { getSupabaseAdmin } from '@/lib/supabase-client'
+import { requireAuth } from '@/lib/api-auth'
+import { logError } from '@/lib/logger'
 import { invalidateEntityCache } from '@/lib/next-cache'
 
 // PUT /api/admin/transportadoras/[transportadoraId]/drivers/[driverId]
@@ -7,10 +9,14 @@ export async function PUT(
   request: NextRequest,
   context: { params: Promise<{ transportadoraId?: string; carrierId?: string; driverId: string }> }
 ) {
+  // Verificar autenticação admin
+  const authError = await requireAuth(request, 'admin')
+  if (authError) return authError
+
   const params = await context.params
 
   try {
-    const supabase = supabaseServiceRole
+    const supabase = getSupabaseAdmin()
     const transportadoraId = params.transportadoraId || params.carrierId
     const { driverId } = params
     if (!transportadoraId) {
@@ -48,7 +54,7 @@ export async function PUT(
       .single()
 
     if (error) {
-      console.error('Erro ao atualizar motorista:', error)
+      logError('Erro ao atualizar motorista', { error, driverId, transportadoraId }, 'TransportadoraDriverUpdateAPI')
       return NextResponse.json(
         { success: false, error: error.message },
         { status: 500 }
@@ -60,7 +66,7 @@ export async function PUT(
 
     return NextResponse.json({ success: true, driver })
   } catch (error: any) {
-    console.error('Erro na API de atualizar motorista:', error)
+    logError('Erro na API de atualizar motorista', { error, driverId: (await context.params).driverId }, 'TransportadoraDriverUpdateAPI')
     return NextResponse.json(
       { success: false, error: error.message || 'Erro desconhecido' },
       { status: 500 }
@@ -95,7 +101,7 @@ export async function DELETE(
       .eq('role', 'motorista')
 
     if (error) {
-      console.error('Erro ao excluir motorista:', error)
+      logError('Erro ao excluir motorista', { error, driverId, transportadoraId }, 'TransportadoraDriverDeleteAPI')
       return NextResponse.json(
         { success: false, error: error.message },
         { status: 500 }
@@ -107,7 +113,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true })
   } catch (error: any) {
-    console.error('Erro na API de excluir motorista:', error)
+    logError('Erro na API de excluir motorista', { error, driverId: (await context.params).driverId }, 'TransportadoraDriverDeleteAPI')
     return NextResponse.json(
       { success: false, error: error.message || 'Erro desconhecido' },
       { status: 500 }

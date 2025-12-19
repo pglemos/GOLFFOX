@@ -1,9 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { getSupabaseAdmin } from '@/lib/supabase-client'
+import { logError } from '@/lib/logger'
+import { requireAuth } from '@/lib/api-auth'
 
 export const runtime = 'nodejs'
 
 export async function POST(req: NextRequest) {
+  // Verificar autenticação (qualquer usuário autenticado pode fazer upload do próprio avatar)
+  const authError = await requireAuth(req)
+  if (authError) return authError
+
   try {
     const formData = await req.formData()
     const file = formData.get('file') as File
@@ -32,23 +38,8 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    // Criar cliente Supabase com service role para bypass RLS
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-
-    if (!supabaseUrl || !supabaseServiceKey) {
-      return NextResponse.json(
-        { success: false, error: 'Configuração do Supabase não encontrada' },
-        { status: 500 }
-      )
-    }
-
-    const supabase = createClient(supabaseUrl, supabaseServiceKey, {
-      auth: {
-        autoRefreshToken: false,
-        persistSession: false
-      }
-    })
+    // Usar cliente Supabase admin para bypass RLS
+    const supabase = getSupabaseAdmin()
 
     // Converter File para Buffer
     const bytes = await file.arrayBuffer()
@@ -91,7 +82,7 @@ export async function POST(req: NextRequest) {
       .select('id, avatar_url')
 
     if (updateError) {
-      console.error('Erro ao atualizar avatar_url no banco:', updateError)
+      logError('Erro ao atualizar avatar_url no banco', { error: updateError, userId }, 'UploadAvatarAPI')
       throw updateError
     }
 
@@ -103,10 +94,11 @@ export async function POST(req: NextRequest) {
     // Verificar se o avatar_url foi realmente atualizado
     const updatedUser = updateData[0]
     if (updatedUser.avatar_url !== publicUrl) {
-      console.error('Avatar URL não corresponde ao esperado:', {
+      logError('Avatar URL não corresponde ao esperado', {
         expected: publicUrl,
-        actual: updatedUser.avatar_url
-      })
+        actual: updatedUser.avatar_url,
+        userId
+      }, 'UploadAvatarAPI')
       throw new Error('A foto de perfil não foi atualizada corretamente no banco de dados')
     }
 
@@ -121,7 +113,7 @@ export async function POST(req: NextRequest) {
       message: 'Foto de perfil atualizada com sucesso'
     })
   } catch (error: any) {
-    console.error('Erro ao fazer upload:', error)
+    logError('Erro ao fazer upload', { error, userId: req.formData ? (await req.formData()).get('userId') : null }, 'UploadAvatarAPI')
     return NextResponse.json(
       { 
         success: false, 

@@ -134,7 +134,7 @@ export async function GET(request: NextRequest) {
 
       return NextResponse.json(sorted)
     }
-  } catch (err) {
+  } catch (err: unknown) {
     logError('Erro ao buscar categorias', { error: err }, 'CostsCategoriesAPI')
     const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
     return NextResponse.json(
@@ -186,8 +186,8 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({ success: true, data }, { status: 201 })
-  } catch (error) {
-    console.error('[API] Erro interno:', error)
+  } catch (error: unknown) {
+    logError('Erro interno', { error }, 'CostsCategoriesAPI')
     return NextResponse.json(
       { success: false, error: 'Erro interno do servidor' },
       { status: 500 }
