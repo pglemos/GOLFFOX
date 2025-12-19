@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { BarChart3, Download, FileText, Calendar, Filter } from "lucide-react"
 import { supabase } from "@/lib/supabase"
-import { useRouter } from "next/navigation"
+import { useRouter } from "@/lib/next-navigation"
 import { 
   exportToCSV, 
   exportToExcel, 

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { debug, warn, logError } from '@/lib/logger'
 
 // Helper para criar cliente admin
 function getSupabaseAdmin() {
@@ -79,10 +80,10 @@ export async function POST(request: NextRequest) {
       if (found) {
         authUserId = found.id
         existingAuthUser = true
-        console.log('Motorista já existe no Auth, usando ID existente:', authUserId)
+        debug('Motorista já existe no Auth, usando ID existente', { authUserId }, 'DriversAPI')
       }
     } catch (listErr) {
-      console.warn('Não foi possível verificar usuários existentes no Auth:', listErr)
+      warn('Não foi possível verificar usuários existentes no Auth', { error: listErr }, 'DriversAPI')
     }
 
     // 2. Criar usuário no Auth se não existir
@@ -108,7 +109,7 @@ export async function POST(request: NextRequest) {
         }
 
         if (!authUserId) {
-          console.error('Erro ao criar usuário Auth para motorista:', authError)
+          logError('Erro ao criar usuário Auth para motorista', { error: authError }, 'DriversAPI')
           return NextResponse.json(
             { success: false, error: 'Erro ao criar autenticação do motorista: ' + authError.message },
             { status: 500 }
@@ -152,7 +153,7 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (driverError) {
-      console.error('Erro ao criar motorista na tabela users:', driverError)
+      logError('Erro ao criar motorista na tabela users', { error: driverError }, 'DriversAPI')
       // Só deleta do Auth se não era um usuário existente
       if (!existingAuthUser) {
         await supabase.auth.admin.deleteUser(authUserId)
@@ -166,7 +167,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, driver })
   } catch (error: any) {
-    console.error('Erro na API de criar motorista:', error)
+    logError('Erro na API de criar motorista', { error }, 'DriversAPI')
     return NextResponse.json(
       { success: false, error: error.message || 'Erro desconhecido' },
       { status: 500 }

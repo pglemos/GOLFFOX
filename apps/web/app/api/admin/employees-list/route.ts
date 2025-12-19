@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requireAuth } from '@/lib/api-auth'
+import { logError } from '@/lib/logger'
 
 export const runtime = 'nodejs'
 
@@ -50,7 +51,7 @@ export async function GET(request: NextRequest) {
     const { data, error } = await query
 
     if (error) {
-      console.error('Erro ao buscar funcionários no admin API:', error)
+      logError('Erro ao buscar funcionários no admin API', { error, companyId }, 'EmployeesListAPI')
       return NextResponse.json({ success: false, error: error.message }, { status: 500 })
     }
 
@@ -78,7 +79,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(employees)
   } catch (error: any) {
-    console.error('Erro inesperado no employees-list API:', error)
+    logError('Erro inesperado no employees-list API', { error }, 'EmployeesListAPI')
     return NextResponse.json({ success: false, error: error.message }, { status: 500 })
   }
 }

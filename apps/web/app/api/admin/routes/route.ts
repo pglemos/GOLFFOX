@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requireAuth } from '@/lib/api-auth'
-import { logger } from '@/lib/logger'
+import { logger, logError } from '@/lib/logger'
 
 export const runtime = 'nodejs'
 
@@ -155,7 +155,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (createError) {
-      console.error('Erro ao criar rota:', createError)
+      logError('Erro ao criar rota', { error: createError }, 'RoutesAPI')
       
       // Em modo de teste/desenvolvimento, se a tabela não existe, retornar resposta simulada
       if ((isTestMode || isDevelopment) && (
@@ -194,7 +194,7 @@ export async function POST(request: NextRequest) {
       id: newRoute.id
     }, { status: 201 })
   } catch (err) {
-    console.error('Erro ao criar rota:', err)
+    logError('Erro ao criar rota', { error: err }, 'RoutesAPI')
     const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
     return NextResponse.json(
       { 
@@ -239,7 +239,7 @@ export async function GET(request: NextRequest) {
     const { data, error, count } = await query
 
     if (error) {
-      console.error('Erro ao buscar rotas:', error)
+      logError('Erro ao buscar rotas', { error }, 'RoutesAPI')
       return NextResponse.json(
         { error: 'Erro ao buscar rotas', message: error.message },
         { status: 500 }
@@ -253,7 +253,7 @@ export async function GET(request: NextRequest) {
       offset
     })
   } catch (error: any) {
-    console.error('Erro ao listar rotas:', error)
+    logError('Erro ao listar rotas', { error }, 'RoutesAPI')
     return NextResponse.json(
       { error: 'Erro ao listar rotas', message: error.message },
       { status: 500 }

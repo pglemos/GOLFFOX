@@ -7,6 +7,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requireAuth } from '@/lib/api-auth'
+import { logError } from '@/lib/logger'
 import type { ManualRevenue, ManualRevenueInsert, RevenueFilters } from '@/types/financial'
 
 export const runtime = 'nodejs'
@@ -117,7 +118,7 @@ export async function GET(request: NextRequest) {
         const { data, error, count } = await query
 
         if (error) {
-            console.error('[API] Erro ao buscar receitas:', error)
+            logError('Erro ao buscar receitas', { error, filters }, 'RevenuesAPI')
             // Se a tabela não existe, retornar vazio em vez de erro
             if (error.message?.includes('does not exist') || error.code === 'PGRST205') {
                 return NextResponse.json({
@@ -170,7 +171,7 @@ export async function GET(request: NextRequest) {
             totalPages,
         })
     } catch (error) {
-        console.error('[API] Erro interno:', error)
+        logError('Erro interno ao processar receitas', { error }, 'RevenuesAPI')
         return NextResponse.json(
             { success: false, error: 'Erro interno do servidor' },
             { status: 500 }
@@ -260,7 +261,7 @@ export async function POST(request: NextRequest) {
             .single()
 
         if (error) {
-            console.error('[API] Erro ao criar receita:', error)
+            logError('Erro ao criar receita', { error, body: { category: body.category, amount: body.amount } }, 'RevenuesAPI')
             return NextResponse.json(
                 { success: false, error: error.message },
                 { status: 500 }
@@ -292,7 +293,7 @@ export async function POST(request: NextRequest) {
 
         return NextResponse.json({ success: true, data: newRevenue }, { status: 201 })
     } catch (error) {
-        console.error('[API] Erro interno:', error)
+        logError('Erro interno ao processar receitas', { error }, 'RevenuesAPI')
         return NextResponse.json(
             { success: false, error: 'Erro interno do servidor' },
             { status: 500 }

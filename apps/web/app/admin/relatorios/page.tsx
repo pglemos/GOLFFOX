@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { BarChart3, Download, FileText, Calendar, Filter, Clock, Mail, ChevronDown, ChevronUp, Save, X } from "lucide-react"
-import { useRouter } from "next/navigation"
+import { useRouter } from "@/lib/next-navigation"
 import { 
   formatDelaysReport,
   formatOccupancyReport,

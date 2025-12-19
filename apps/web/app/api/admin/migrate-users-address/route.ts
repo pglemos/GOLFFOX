@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requireAuth } from '@/lib/api-auth'
-import { logger } from '@/lib/logger'
+import { logger, logError } from '@/lib/logger'
 
 export const runtime = 'nodejs'
 
@@ -124,7 +124,7 @@ ALTER TABLE users ADD COLUMN IF NOT EXISTS address_state VARCHAR(2);
     })
 
   } catch (error: any) {
-    console.error('Erro na migração:', error)
+    logError('Erro na migração', { error }, 'MigrateUsersAddressAPI')
     return NextResponse.json({
       success: false,
       error: 'Erro ao executar migração',

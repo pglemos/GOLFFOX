@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requireAuth } from '@/lib/api-auth'
-import { logger } from '@/lib/logger'
+import { logger, logError } from '@/lib/logger'
 
 export const runtime = 'nodejs'
 
@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
       .order('created_at', { ascending: false })
 
     if (error) {
-      console.error('Erro ao buscar rotas:', error)
+      logError('Erro ao buscar rotas', { error }, 'RoutesListAPI')
       return NextResponse.json(
         { error: 'Erro ao buscar rotas', message: error.message },
         { status: 500 }
@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
     // Retornar array diretamente para compatibilidade
     return NextResponse.json(data || [])
   } catch (error: any) {
-    console.error('Erro ao listar rotas:', error)
+    logError('Erro ao listar rotas', { error }, 'RoutesListAPI')
     return NextResponse.json(
       { error: 'Erro ao listar rotas', message: error.message },
       { status: 500 }

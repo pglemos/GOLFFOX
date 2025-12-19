@@ -2,21 +2,10 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabaseServiceRole } from '@/lib/supabase-server'
 import { requireAuth } from '@/lib/api-auth'
 import { z } from 'zod'
-import { logger } from '@/lib/logger'
+import { logger, logError } from '@/lib/logger'
+import { createVehicleSchema, validateWithSchema } from '@/lib/validation/schemas'
 
 export const runtime = 'nodejs'
-
-const vehicleSchema = z.object({
-  plate: z.string().min(1, 'Placa é obrigatória'),
-  model: z.string().min(1, 'Modelo é obrigatório'),
-  brand: z.string().optional().nullable(),
-  prefix: z.string().optional().nullable(),
-  year: z.number().int().min(1900).max(2100).optional().nullable(),
-  capacity: z.number().int().min(1).optional().nullable(),
-  company_id: z.string().uuid().optional().nullable(),
-  transportadora_id: z.string().uuid().optional().nullable(),
-  is_active: z.boolean().default(true),
-})
 
 export async function OPTIONS() {
   return new NextResponse(null, {
@@ -83,7 +72,16 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const validated = vehicleSchema.parse(body)
+    
+    // ✅ Validar usando schema compartilhado
+    const validation = validateWithSchema(createVehicleSchema, body)
+    if (!validation.success) {
+      return NextResponse.json(
+        { error: 'Dados inválidos', details: validation.error.errors },
+        { status: 400 }
+      )
+    }
+    const validated = validation.data
 
     // Se company_id não foi fornecido, buscar primeira empresa ativa
     // Em modo de teste/desenvolvimento, criar empresa automaticamente se não existir
@@ -180,7 +178,7 @@ export async function POST(request: NextRequest) {
         }, { status: 201 })
       }
 
-      console.error('Erro ao criar veículo:', createError)
+      logError('Erro ao criar veículo', { error: createError }, 'VehiclesAPI')
       return NextResponse.json(
         { error: 'Erro ao criar veículo', message: createError.message, code: createError.code },
         { status: 500 }

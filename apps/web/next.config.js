@@ -5,7 +5,6 @@ const isProd = process.env.NODE_ENV === 'production'
 let nextConfig = {
   reactStrictMode: true,
   output: 'standalone',
-  experimental: process.platform === 'win32' ? { useWasmBinary: true } : {},
   allowedDevOrigins: ['*.replit.dev', '*.replit.app', '*.picard.replit.dev'],
   // Corrigir warning sobre múltiplos lockfiles
   outputFileTracingRoot: path.join(__dirname, '../../'),
@@ -16,12 +15,35 @@ let nextConfig = {
     },
   },
   typescript: {
-    // Temporariamente habilitado para permitir deploy
-    // TODO: Corrigir todos os erros TypeScript de tipos Supabase
+    // ⚠️ ATENÇÃO: ignoreBuildErrors está habilitado temporariamente
+    // Estado atual: ~154 erros TypeScript restantes (principalmente tipos Supabase e Next.js 16)
+    // Plano de remoção:
+    // 1. Corrigir erros críticos primeiro (tipos de API, autenticação)
+    // 2. Corrigir erros de tipos Supabase (regenerar tipos se necessário)
+    // 3. Corrigir erros de componentes React
+    // 4. Remover ignoreBuildErrors quando < 20 erros restantes
+    // Ver: apps/web/CORRECOES_TYPESCRIPT.md para progresso
     ignoreBuildErrors: true,
   },
   // Transpile pacotes ESM problemáticos para CommonJS
   transpilePackages: ['@supabase/supabase-js'],
+
+  // ✅ Code splitting avançado
+  experimental: {
+    ...(process.platform === 'win32' ? { useWasmBinary: true } : {}),
+    // Otimizar imports de pacotes grandes
+    optimizePackageImports: [
+      '@radix-ui/react-accordion',
+      '@radix-ui/react-dialog',
+      '@radix-ui/react-dropdown-menu',
+      '@radix-ui/react-select',
+      '@tanstack/react-table',
+      '@tanstack/react-query',
+      'recharts',
+      '@googlemaps/js-api-loader',
+      '@react-google-maps/api',
+    ],
+  },
 
   // Configuração webpack para resolver problema ESM do Supabase
   webpack: (config) => {

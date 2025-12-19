@@ -1,6 +1,6 @@
 "use client"
 
-import { usePathname } from "next/navigation"
+import { usePathname } from "@/lib/next-navigation"
 import { useState } from "react"
 import { useOperatorTenant, useEmpresaTenant } from "@/components/providers/empresa-tenant-provider"
 

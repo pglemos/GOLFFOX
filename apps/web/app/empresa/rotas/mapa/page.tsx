@@ -1,6 +1,6 @@
 ﻿"use client"
 
-import { useSearchParams } from "next/navigation"
+import { useSearchParams } from "@/lib/next-navigation"
 import { Suspense } from "react"
 import { AppShell } from "@/components/app-shell"
 import { FleetMap } from "@/components/fleet-map"

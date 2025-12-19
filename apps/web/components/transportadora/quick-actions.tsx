@@ -12,7 +12,7 @@ import {
   Upload,
   Download
 } from "lucide-react"
-import { useRouter } from "next/navigation"
+import { useRouter } from "@/lib/next-navigation"
 import { motion } from "framer-motion"
 import { t } from "@/lib/i18n"
 
@@ -116,4 +116,3 @@ export function QuickActions({ className }: QuickActionsProps) {
     </Card>
   )
 }
-

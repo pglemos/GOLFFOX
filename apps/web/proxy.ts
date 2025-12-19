@@ -1,318 +1,355 @@
+/**
+ * Next.js 16.1 Middleware (Proxy)
+ * 
+ * Centraliza autenticação, autorização e roteamento de requisições.
+ * Segue as melhores práticas do Next.js 16.1 com TypeScript strict mode.
+ * 
+ * Responsabilidades:
+ * - Validação de autenticação via Supabase
+ * - Proteção de rotas baseada em roles
+ * - Redirecionamentos de compatibilidade (carrier → transportadora, etc.)
+ * - Normalização de URLs
+ */
+
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { validateAuth, hasRole, type AuthenticatedUser } from '@/lib/api-auth'
+import { debug, warn, error as logError } from '@/lib/logger'
 
 const isDevelopment = process.env.NODE_ENV === 'development'
 
 /**
- * Valida token de acesso com Supabase Auth
- * Retorna true se token válido, false caso contrário
+ * Rotas que não requerem autenticação
  */
-async function validateAccessToken(accessToken: string): Promise<boolean> {
+const PUBLIC_ROUTES = [
+  '/',
+  '/unauthorized',
+  '/diagnostico',
+] as const
+
+/**
+ * Rotas de assets e internas do Next.js que devem ser ignoradas
+ */
+const STATIC_ROUTES = [
+  '/_next',
+  '/static',
+  '/assets',
+  '/icons',
+  '/favicon.ico',
+  '/_vercel',
+] as const
+
+/**
+ * Mapeamento de rotas antigas para novas (compatibilidade)
+ */
+const ROUTE_REDIRECTS: Record<string, string> = {
+  '/carrier': '/transportadora',
+  '/operator': '/empresa',
+  '/operador': '/transportadora',
+  '/login': '/',
+}
+
+/**
+ * Roles permitidas para cada rota protegida
+ */
+const ROUTE_ROLES: Record<string, string[]> = {
+  '/admin': ['admin'],
+  '/empresa': ['admin', 'empresa', 'operator'], // operator é compatibilidade
+  '/transportadora': ['admin', 'operador', 'carrier', 'transportadora'], // carrier é compatibilidade
+}
+
+/**
+ * Mapeamento de role para rota padrão de redirecionamento
+ */
+const ROLE_DEFAULT_ROUTES: Record<string, string> = {
+  admin: '/admin',
+  empresa: '/empresa',
+  operator: '/empresa', // compatibilidade
+  operador: '/transportadora',
+  carrier: '/transportadora', // compatibilidade
+  transportadora: '/transportadora',
+}
+
+/**
+ * Verifica se uma rota é pública (não requer autenticação)
+ */
+function isPublicRoute(pathname: string): boolean {
+  return PUBLIC_ROUTES.some(route => pathname === route || pathname.startsWith(`${route}/`))
+}
+
+/**
+ * Verifica se uma rota é estática (assets, _next, etc.)
+ */
+function isStaticRoute(pathname: string): boolean {
+  return STATIC_ROUTES.some(route => pathname.startsWith(route)) || pathname === '/favicon.ico'
+}
+
+/**
+ * Verifica se uma rota requer autenticação
+ */
+function isProtectedRoute(pathname: string): boolean {
+  return Object.keys(ROUTE_ROLES).some(route => pathname.startsWith(route))
+}
+
+/**
+ * Obtém roles permitidas para uma rota
+ */
+function getAllowedRoles(pathname: string): string[] | null {
+  for (const [route, roles] of Object.entries(ROUTE_ROLES)) {
+    if (pathname.startsWith(route)) {
+      return roles
+    }
+  }
+  return null
+}
+
+/**
+ * Sanitiza e valida um path de redirecionamento
+ */
+function sanitizeRedirectPath(raw: string | null, baseUrl: string): string | null {
+  if (!raw) return null
+  
   try {
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-    if (!supabaseUrl || !supabaseAnonKey) {
-      if (isDevelopment) {
-        console.error('[MIDDLEWARE] Supabase não configurado')
-      }
-      return false
+    const decoded = decodeURIComponent(raw)
+    
+    // Rejeitar URLs absolutas (prevenir open redirect)
+    if (/^https?:\/\//i.test(decoded)) {
+      warn('Tentativa de redirecionamento para URL absoluta bloqueada', { path: decoded }, 'Proxy')
+      return null
     }
-
-    const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-      auth: { persistSession: false, autoRefreshToken: false }
-    })
-
-    const { data: { user }, error } = await supabase.auth.getUser(accessToken)
-
-    if (error || !user) {
-      if (isDevelopment) {
-        console.warn('[MIDDLEWARE] Token inválido:', error?.message || 'Usuário não encontrado')
-      }
-      return false
+    
+    // Deve começar com /
+    if (!decoded.startsWith('/')) {
+      return null
     }
-
-    if (isDevelopment) {
-      console.log('[MIDDLEWARE] Token válido para usuário:', user.email)
-    }
-
-    return true
-  } catch (error) {
-    if (isDevelopment) {
-      console.error('[MIDDLEWARE] Erro ao validar token:', error)
-    }
-    return false
+    
+    // Validar URL
+    const url = new URL(decoded, baseUrl)
+    
+    // Remover parâmetros sensíveis
+    url.searchParams.delete('company')
+    
+    return url.pathname
+  } catch {
+    return null
   }
 }
 
 /**
- * Extrai access_token de cookies disponíveis
- * Prioridade: golffox-session (base64) > Supabase cookie
+ * Obtém rota padrão para um role
  */
-function extractAccessToken(request: NextRequest): string | null {
-  // 1. Tentar obter do cookie golffox-session (base64)
-  const golffoxSession = request.cookies.get('golffox-session')?.value
-  if (golffoxSession) {
-    try {
-      const decoded = Buffer.from(golffoxSession, 'base64').toString('utf-8')
-      const sessionData = JSON.parse(decoded)
-      const token = sessionData.access_token || sessionData.accessToken
-      if (token) {
-        if (isDevelopment) {
-          console.log('[MIDDLEWARE] Token encontrado no cookie golffox-session')
-        }
-        return token
-      }
-    } catch (error) {
-      if (isDevelopment) {
-        console.warn('[MIDDLEWARE] Erro ao decodificar golffox-session:', error)
-      }
+function getDefaultRouteForRole(role: string): string | null {
+  return ROLE_DEFAULT_ROUTES[role] || null
+}
+
+/**
+ * Aplica redirecionamentos de compatibilidade
+ */
+function applyCompatibilityRedirects(pathname: string, request: NextRequest): NextResponse | null {
+  for (const [oldRoute, newRoute] of Object.entries(ROUTE_REDIRECTS)) {
+    if (pathname === oldRoute || pathname.startsWith(`${oldRoute}/`)) {
+      const newPath = pathname.replace(oldRoute, newRoute)
+      const newUrl = new URL(newPath, request.url)
+      newUrl.search = request.nextUrl.search
+      
+      debug('Redirecionamento de compatibilidade', {
+        from: pathname,
+        to: newPath
+      }, 'Proxy')
+      
+      return NextResponse.redirect(newUrl)
     }
   }
-
-  // 2. Tentar obter do cookie do Supabase
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  if (supabaseUrl) {
-    const projectRef = supabaseUrl.split('//')[1]?.split('.')[0]
-    if (projectRef) {
-      const supabaseCookieName = `sb-${projectRef}-auth-token`
-      const supabaseCookie = request.cookies.get(supabaseCookieName)?.value
-      if (supabaseCookie) {
-        try {
-          const tokenData = JSON.parse(supabaseCookie)
-          const token = tokenData?.access_token || tokenData?.accessToken
-          if (token) {
-            if (isDevelopment) {
-              console.log('[MIDDLEWARE] Token encontrado no cookie do Supabase')
-            }
-            return token
-          }
-        } catch (error) {
-          if (isDevelopment) {
-            console.warn('[MIDDLEWARE] Erro ao processar cookie do Supabase:', error)
-          }
-        }
-      }
-    }
-  }
-
+  
   return null
 }
 
-export const proxy = async (request: NextRequest) => {
-  const { pathname, searchParams } = request.nextUrl
+/**
+ * Limpa parâmetros de query indesejados
+ */
+function cleanQueryParams(pathname: string, request: NextRequest): NextResponse | null {
+  // Limpar ?company da rota /empresa
+  if (pathname === '/empresa' && request.nextUrl.searchParams.has('company')) {
+    const url = request.nextUrl.clone()
+    url.searchParams.delete('company')
+    
+    debug('Limpando parâmetro company da URL', { pathname }, 'Proxy')
+    
+    return NextResponse.redirect(url)
+  }
+  
+  return null
+}
 
-  // ✅ Permitir desabilitar autenticação via variável de ambiente (apenas em desenvolvimento)
-  // ⚠️ SEGURANÇA: Nunca permitir bypass em produção
+/**
+ * Middleware principal (Proxy)
+ * 
+ * Next.js 16.1: Edge Runtime por padrão
+ * - Não pode usar Node.js APIs
+ * - Deve ser assíncrono
+ * - Deve retornar NextResponse
+ */
+export async function proxy(request: NextRequest): Promise<NextResponse> {
+  const { pathname, searchParams } = request.nextUrl
+  
+  // Permitir desabilitar proxy apenas em desenvolvimento (para testes)
   if (process.env.NEXT_PUBLIC_DISABLE_MIDDLEWARE === 'true' && isDevelopment) {
+    debug('Proxy desabilitado via variável de ambiente', {}, 'Proxy')
     return NextResponse.next()
   }
-
-  // ✅ Bypass para rotas de API - não aplicar middleware em rotas de API
+  
+  // Ignorar rotas de API (elas têm sua própria autenticação)
   if (pathname.startsWith('/api')) {
     return NextResponse.next()
   }
-  // ✅ Bypass para assets e rotas internas do Next/Vercel
-  if (
-    pathname.startsWith('/_next') ||
-    pathname.startsWith('/static') ||
-    pathname.startsWith('/assets') ||
-    pathname.startsWith('/icons') ||
-    pathname === '/favicon.ico' ||
-    pathname.startsWith('/_vercel')
-  ) {
+  
+  // Ignorar rotas estáticas
+  if (isStaticRoute(pathname)) {
     return NextResponse.next()
   }
-
-  const response = NextResponse.next()
-
-  // Redirecionar /login para / (raiz)
-  if (pathname === '/login' || pathname.startsWith('/login/')) {
-    const rootUrl = new URL('/', request.url)
-    // Preservar parâmetros de query se existirem
-    if (searchParams.has('next')) {
-      rootUrl.searchParams.set('next', searchParams.get('next')!)
-    }
-    return NextResponse.redirect(rootUrl)
+  
+  // Aplicar redirecionamentos de compatibilidade
+  const compatibilityRedirect = applyCompatibilityRedirects(pathname, request)
+  if (compatibilityRedirect) {
+    return compatibilityRedirect
   }
-
-  // ✅ Redirecionar /carrier para /transportadora (compatibilidade)
-  if (pathname.startsWith('/carrier')) {
-    const transportadoraUrl = new URL(pathname.replace('/carrier', '/transportadora'), request.url)
-    transportadoraUrl.search = request.nextUrl.search
-    return NextResponse.redirect(transportadoraUrl)
+  
+  // Limpar parâmetros de query indesejados
+  const queryCleanup = cleanQueryParams(pathname, request)
+  if (queryCleanup) {
+    return queryCleanup
   }
-
-  // ✅ Redirecionar /operator para /empresa (compatibilidade - role antiga operator → nova role empresa)
-  if (pathname.startsWith('/operator')) {
-    const empresaUrl = new URL(pathname.replace('/operator', '/empresa'), request.url)
-    empresaUrl.search = request.nextUrl.search
-    return NextResponse.redirect(empresaUrl)
-  }
-
-  // ✅ Redirecionar /operador para /transportadora (compatibilidade - nome confuso)
-  if (pathname.startsWith('/operador')) {
-    const transportadoraUrl = new URL(pathname.replace('/operador', '/transportadora'), request.url)
-    transportadoraUrl.search = request.nextUrl.search
-    return NextResponse.redirect(transportadoraUrl)
-  }
-
-  // ✅ Proteger rotas /empresa, /admin e /transportadora com autenticação
-  // VALIDAR token com Supabase antes de liberar acesso
-  if (pathname.startsWith('/empresa') || pathname.startsWith('/admin') || pathname.startsWith('/transportadora')) {
-    // Extrair access_token dos cookies
-    const accessToken = extractAccessToken(request)
-    const sessionCookie = request.cookies.get('golffox-session')?.value
-    let cookieRole: string | null = null
-    if (sessionCookie) {
-      try {
-        const decoded = Buffer.from(sessionCookie, 'base64').toString('utf-8')
-        const session = JSON.parse(decoded)
-        cookieRole = session?.role || null
-      } catch {}
+  
+  // Rotas públicas não requerem autenticação
+  if (isPublicRoute(pathname)) {
+    // Para a rota raiz (/), verificar se há sessão e redirecionar se apropriado
+    if (pathname === '/') {
+      return handleRootRoute(request)
     }
-
-    if (!accessToken) {
-      // Em desenvolvimento, permitir acesso se cookie indicar role compatível com a rota
-      if (isDevelopment && cookieRole) {
-        const allowed =
-          (pathname.startsWith('/admin') && cookieRole === 'admin') ||
-          (pathname.startsWith('/empresa') && ['admin', 'empresa', 'operator'].includes(cookieRole)) ||
-          (pathname.startsWith('/transportadora') && ['admin', 'operador', 'carrier', 'transportadora'].includes(cookieRole))
-        if (allowed) {
-          return NextResponse.next()
-        }
-      } else {
-        if (isDevelopment) {
-          console.log('[MIDDLEWARE] Nenhum token encontrado, redirecionando para login')
-        }
-        const loginUrl = new URL('/', request.url)
-        loginUrl.searchParams.set('next', pathname)
-        return NextResponse.redirect(loginUrl)
-      }
-    }
-
-    // Validar token com Supabase Auth
-    const isValid = accessToken ? await validateAccessToken(accessToken) : false
-
-    if (!isValid) {
-      // Em desenvolvimento, permitir acesso se cookie indicar role compatível com a rota
-      if (isDevelopment && cookieRole) {
-        const allowed =
-          (pathname.startsWith('/admin') && cookieRole === 'admin') ||
-          (pathname.startsWith('/empresa') && ['admin', 'empresa', 'operator'].includes(cookieRole)) ||
-          (pathname.startsWith('/transportadora') && ['admin', 'operador', 'carrier', 'transportadora'].includes(cookieRole))
-        if (allowed) {
-          return NextResponse.next()
-        }
-      } else {
-        if (isDevelopment) {
-          console.log('[MIDDLEWARE] Token inválido, redirecionando para login')
-        }
-        const loginUrl = new URL('/', request.url)
-        loginUrl.searchParams.set('next', pathname)
-        return NextResponse.redirect(loginUrl)
-      }
-    }
-  }
-
-  // Limpar query param ?company (mantido)
-  if (pathname === '/empresa' && searchParams.has('company')) {
-    const url = request.nextUrl.clone()
-    url.searchParams.delete('company')
-    return NextResponse.redirect(url)
-  }
-
-  // ✅ Permitir que a página de login (raiz) gerencie seus próprios redirecionamentos
-  // Não interferir na raiz para evitar loops de redirecionamento
-  // A página de login verifica o cookie golffox-session e redireciona apropriadamente
-  if (pathname === '/') {
-    const sessionCookie = request.cookies.get('golffox-session')?.value
-    const nextParamRaw = request.nextUrl.searchParams.get('next')
-
-    const sanitizePath = (raw: string | null, base: string): string | null => {
-      if (!raw) return null
-      try {
-        const decoded = decodeURIComponent(raw)
-        if (/^https?:\/\//i.test(decoded)) return null
-        if (!decoded.startsWith('/')) return null
-        const url = new URL(decoded, base)
-        url.searchParams.delete('company')
-        return url.pathname
-      } catch {
-        return null
-      }
-    }
-    const isAllowedForRole = (role: string, path: string): boolean => {
-      if (path.startsWith('/admin')) return role === 'admin'
-      if (path.startsWith('/empresa')) return ['admin', 'empresa', 'operator'].includes(role)
-      if (path.startsWith('/transportadora')) return ['admin', 'operador', 'carrier', 'transportadora'].includes(role)
-      return true
-    }
-
-    let role: string | null = null
-    let token: string | null = null
-
-    if (sessionCookie) {
-      try {
-        const decoded = Buffer.from(sessionCookie, 'base64').toString('utf-8')
-        const session = JSON.parse(decoded)
-        token = session?.access_token || session?.accessToken || null
-        role = session?.role || null
-      } catch {}
-    }
-
-    const safeNext = sanitizePath(nextParamRaw, request.url)
-
-    if (safeNext && role && isAllowedForRole(role, safeNext)) {
-      const url = new URL(safeNext, request.url)
-      return NextResponse.redirect(url)
-    }
-
-    if (role) {
-      // Em desenvolvimento, redirecionar mesmo sem validar token
-      if (isDevelopment || (token && await validateAccessToken(token))) {
-        let target: string | null = null
-        if (role === 'admin') target = '/admin'
-        else if (role === 'empresa' || role === 'operator') target = '/empresa'
-        else if (role === 'operador' || role === 'transportadora' || role === 'carrier') target = '/transportadora'
-        else target = null
-        if (target) {
-          const url = new URL(target, request.url)
-          return NextResponse.redirect(url)
-        }
-      }
-    }
-
+    
     return NextResponse.next()
   }
-
-  return response
+  
+  // Proteger rotas que requerem autenticação
+  if (isProtectedRoute(pathname)) {
+    return await handleProtectedRoute(pathname, request)
+  }
+  
+  // Permitir outras rotas (não protegidas)
+  return NextResponse.next()
 }
 
+/**
+ * Manipula a rota raiz (/)
+ * Verifica sessão e redireciona se usuário já estiver autenticado
+ */
+async function handleRootRoute(request: NextRequest): Promise<NextResponse> {
+  const nextParam = request.nextUrl.searchParams.get('next')
+  const safeNext = sanitizeRedirectPath(nextParam, request.url)
+  
+  // Validar autenticação usando lib/api-auth.ts
+  const user = await validateAuth(request)
+  
+  if (user) {
+    // Se há parâmetro ?next e usuário tem permissão, redirecionar
+    if (safeNext) {
+      const allowedRoles = getAllowedRoles(safeNext)
+      if (allowedRoles && hasRole(user, allowedRoles)) {
+        const url = new URL(safeNext, request.url)
+        debug('Redirecionando para rota solicitada', {
+          path: safeNext,
+          role: user.role
+        }, 'Proxy')
+        return NextResponse.redirect(url)
+      }
+    }
+    
+    // Redirecionar para rota padrão do role
+    const defaultRoute = getDefaultRouteForRole(user.role)
+    if (defaultRoute) {
+      debug('Redirecionando para rota padrão do role', {
+        role: user.role,
+        route: defaultRoute
+      }, 'Proxy')
+      return NextResponse.redirect(new URL(defaultRoute, request.url))
+    }
+  }
+  
+  // Não autenticado ou sem rota padrão - permitir acesso à página de login
+  return NextResponse.next()
+}
+
+/**
+ * Manipula rotas protegidas
+ * Valida autenticação e autorização baseada em roles
+ */
+async function handleProtectedRoute(
+  pathname: string,
+  request: NextRequest
+): Promise<NextResponse> {
+  // Obter roles permitidas para esta rota
+  const allowedRoles = getAllowedRoles(pathname)
+  
+  if (!allowedRoles) {
+    // Rota protegida mas sem roles definidas - negar acesso por segurança
+    warn('Rota protegida sem roles definidas', { pathname }, 'Proxy')
+    return NextResponse.redirect(new URL('/unauthorized?reason=unauthorized', request.url))
+  }
+  
+  // Validar autenticação usando lib/api-auth.ts (centralizado e consistente)
+  const user = await validateAuth(request)
+  
+  if (!user) {
+    // Não autenticado - redirecionar para login com ?next
+    debug('Usuário não autenticado, redirecionando para login', { pathname }, 'Proxy')
+    const loginUrl = new URL('/', request.url)
+    loginUrl.searchParams.set('next', pathname)
+    return NextResponse.redirect(loginUrl)
+  }
+  
+  // Verificar se usuário tem role permitida
+  if (!hasRole(user, allowedRoles)) {
+    // Não autorizado - redirecionar para página de não autorizado
+    warn('Acesso negado - role não permitida', {
+      pathname,
+      userRole: user.role,
+      allowedRoles
+    }, 'Proxy')
+    
+    const unauthorizedUrl = new URL('/unauthorized', request.url)
+    unauthorizedUrl.searchParams.set('reason', 'unauthorized')
+    unauthorizedUrl.searchParams.set('role', user.role)
+    return NextResponse.redirect(unauthorizedUrl)
+  }
+  
+  // Usuário autenticado e autorizado - permitir acesso
+  debug('Acesso permitido', {
+    pathname,
+    role: user.role
+  }, 'Proxy')
+  
+  return NextResponse.next()
+}
+
+// Exportar como default para Next.js middleware
 export default proxy
 
+/**
+ * Configuração do matcher para Next.js 16.1
+ * 
+ * Otimiza performance ao limitar quando o middleware é executado.
+ * Next.js 16.1 suporta patterns mais complexos.
+ */
 export const config = {
   matcher: [
-    '/login',
-    '/login/:path*',
-    '/admin/:path*',
-    '/empresa',
-    '/empresa/:path*',
-    '/operator/:path*',
-    '/operador',
-    '/operador/:path*',
-    '/carrier/:path*',
-    '/transportadora/:path*',
     /*
-     * Match all request paths except for the ones starting with:
-     * - api (API routes)
+     * Match all request paths except:
+     * - api (API routes têm autenticação própria)
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
+     * - public files (images, etc.)
      */
-    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+    '/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)).*)',
   ],
 }
-

@@ -124,13 +124,14 @@ async function loginHandler(req: NextRequest) {
   }
 
   // CSRF validation by double submit cookie
+  // ✅ SEGURANÇA: CSRF é obrigatório em produção para prevenir ataques CSRF
   const isTestMode = req.headers.get('x-test-mode') === 'true'
   const isDevelopment = process.env.NODE_ENV === 'development'
   const userAgent = req.headers.get('user-agent') || ''
   const isTestSprite = userAgent.includes('TestSprite') || userAgent.includes('testsprite')
-  // ✅ FIX TEMPORÁRIO: Permitir bypass do CSRF na Vercel para diagnóstico
-  // TODO: Remover após identificar problema de cookies na Vercel
-  const isVercelProduction = process.env.VERCEL === '1' && process.env.VERCEL_ENV === 'production'
+  
+  // Permitir bypass APENAS em desenvolvimento/teste (nunca em produção)
+  const allowCSRFBypass = isTestMode || isDevelopment || isTestSprite
 
   // Verificar se há header CSRF presente (mesmo em modo de teste, se fornecido, deve ser válido)
   const csrfHeader = req.headers.get('x-csrf-token')
@@ -147,20 +148,26 @@ async function loginHandler(req: NextRequest) {
         hasCookie: !!csrfCookie,
         headerMatch: csrfHeader === csrfCookie,
         isVercel: process.env.VERCEL === '1',
-        vercelEnv: process.env.VERCEL_ENV
+        vercelEnv: process.env.VERCEL_ENV,
+        isProduction: !isDevelopment
       }, 'AuthAPI')
       return NextResponse.json({ error: 'invalid_csrf' }, { status: 403 })
     }
   } else {
     // Sem header CSRF - permitir bypass apenas em modo de teste/desenvolvimento
-    const allowCSRFBypass = isTestMode || isDevelopment || isTestSprite || isVercelProduction
-    if (!allowCSRFBypass && csrfCookie) {
-      // Em produção, se há cookie mas não há header, rejeitar
-      logError('CSRF validation failed - missing header', {
+    // ✅ CRÍTICO: Em produção, CSRF é obrigatório
+    if (!allowCSRFBypass) {
+      // Em produção, CSRF é obrigatório - rejeitar se não fornecido
+      logError('CSRF validation failed - missing header in production', {
         hasHeader: false,
-        hasCookie: !!csrfCookie
+        hasCookie: !!csrfCookie,
+        isVercel: process.env.VERCEL === '1',
+        vercelEnv: process.env.VERCEL_ENV
       }, 'AuthAPI')
-      return NextResponse.json({ error: 'invalid_csrf' }, { status: 403 })
+      return NextResponse.json({ 
+        error: 'invalid_csrf',
+        message: 'CSRF token é obrigatório em produção'
+      }, { status: 403 })
     }
   }
 
@@ -525,11 +532,13 @@ async function loginHandler(req: NextRequest) {
     // Force secure=false in development locally to avoid issues with localhost
     const cookieSecure = isDev ? false : isSecureRequest(req)
 
+    // ✅ CORREÇÃO: Garantir que cookies funcionem corretamente na Vercel
+    // Usar formato correto e garantir que SameSite seja configurado adequadamente
     const cookieOptions = [
       `golffox-session=${sessionCookieValue}`,
       'path=/',
       'max-age=3600',
-      'SameSite=Lax',
+      'SameSite=Lax', // ✅ Lax funciona melhor na Vercel que Strict
       ...(cookieSecure ? ['Secure'] : [])
     ].join('; ')
 

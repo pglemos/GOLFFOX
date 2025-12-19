@@ -7,7 +7,7 @@ import { FileText, Download, BarChart3 } from "lucide-react"
 import { motion } from "framer-motion"
 import { useEffect, useState } from "react"
 import { supabase } from "@/lib/supabase"
-import { useRouter } from "next/navigation"
+import { useRouter } from "@/lib/next-navigation"
 import { notifySuccess, notifyError } from "@/lib/toast"
 import { exportToCSV, exportToExcel, exportToPDF, formatDelaysReport, formatOccupancyReport, formatNotBoardedReport, type ReportData } from "@/lib/export-utils"
 import {

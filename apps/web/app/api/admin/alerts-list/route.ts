@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requireAuth } from '@/lib/api-auth'
-import { logger } from '@/lib/logger'
+import { logError } from '@/lib/logger'
+import { redisCacheService, createCacheKey } from '@/lib/cache/redis-cache.service'
 
 export const runtime = 'nodejs'
 
@@ -26,6 +27,14 @@ export async function GET(request: NextRequest) {
     const severity = searchParams.get('severity')
     const status = searchParams.get('status')
     
+    // ✅ Cache Redis para alertas (TTL: 5 minutos)
+    const cacheKey = createCacheKey('alerts', severity || 'all', status || 'all')
+    
+    const cachedAlerts = await redisCacheService.get<unknown[]>(cacheKey)
+    if (cachedAlerts) {
+      return NextResponse.json(cachedAlerts)
+    }
+    
     let query = supabaseAdmin
       .from('gf_incidents')
       .select(`
@@ -49,17 +58,22 @@ export async function GET(request: NextRequest) {
     const { data, error } = await query
 
     if (error) {
-      console.error('Erro ao buscar alertas:', error)
+      logError('Erro ao buscar alertas', { error, severity, status }, 'AlertsListAPI')
       return NextResponse.json(
         { error: 'Erro ao buscar alertas', message: error.message },
         { status: 500 }
       )
     }
 
+    const alerts = data || []
+    
+    // ✅ Armazenar no cache (TTL: 5 minutos - 300 segundos)
+    await redisCacheService.set(cacheKey, alerts, 300)
+
     // Retornar array diretamente para compatibilidade
-    return NextResponse.json(data || [])
+    return NextResponse.json(alerts)
   } catch (error: any) {
-    console.error('Erro ao listar alertas:', error)
+    logError('Erro ao listar alertas', { error }, 'AlertsListAPI')
     return NextResponse.json(
       { error: 'Erro ao listar alertas', message: error.message },
       { status: 500 }

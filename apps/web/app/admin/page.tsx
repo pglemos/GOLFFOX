@@ -21,7 +21,7 @@ import {
   TrendingUp,
   Gauge,
 } from "lucide-react"
-import { useRouter } from "next/navigation"
+import { useRouter } from "@/lib/next-navigation"
 import { motion } from "framer-motion"
 import { useAuthFast } from "@/hooks/use-auth-fast"
 import { DashboardKPIs } from "@/components/admin/dashboard/dashboard-kpis"

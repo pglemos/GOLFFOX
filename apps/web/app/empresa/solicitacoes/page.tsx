@@ -7,7 +7,7 @@ import { Plus, Columns } from "lucide-react"
 import { motion } from "framer-motion"
 import { useEffect, useState } from "react"
 import { supabase } from "@/lib/supabase"
-import { useRouter } from "next/navigation"
+import { useRouter } from "@/lib/next-navigation"
 import { SolicitacaoModal } from "@/components/empresa/solicitacao-modal"
 
 export default function SolicitacoesOperatorPage() {

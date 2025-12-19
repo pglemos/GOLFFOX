@@ -1,5 +1,6 @@
 // Rota de compatibilidade: redireciona para /api/admin/create-transportadora-login
 import { NextRequest, NextResponse } from 'next/server'
+import { logError } from '@/lib/logger'
 
 export async function POST(req: NextRequest) {
   try {
@@ -20,7 +21,7 @@ export async function POST(req: NextRequest) {
     const data = await response.json()
     return NextResponse.json(data, { status: response.status })
   } catch (error) {
-    console.error('Erro na rota create-carrier-login:', error)
+    logError('Erro na rota create-carrier-login', { error }, 'CreateCarrierLoginAPI')
     return NextResponse.json(
       { error: 'Erro ao processar requisição' },
       { status: 500 }

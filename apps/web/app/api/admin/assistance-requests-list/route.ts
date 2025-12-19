@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requireAuth } from '@/lib/api-auth'
-import { logger } from '@/lib/logger'
+import { logger, logError } from '@/lib/logger'
 
 export const runtime = 'nodejs'
 
@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
     const { data, error } = await query
 
     if (error) {
-      console.error('Erro ao buscar solicitações de socorro:', error)
+      logError('Erro ao buscar solicitações de socorro', { error, status }, 'AssistanceRequestsListAPI')
       return NextResponse.json(
         { error: 'Erro ao buscar solicitações de socorro', message: error.message },
         { status: 500 }
@@ -53,7 +53,7 @@ export async function GET(request: NextRequest) {
     // Retornar array diretamente para compatibilidade
     return NextResponse.json(data || [])
   } catch (error: any) {
-    console.error('Erro ao listar solicitações de socorro:', error)
+    logError('Erro ao listar solicitações de socorro', { error }, 'AssistanceRequestsListAPI')
     return NextResponse.json(
       { error: 'Erro ao listar solicitações de socorro', message: error.message },
       { status: 500 }

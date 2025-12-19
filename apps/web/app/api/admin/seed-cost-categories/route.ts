@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase-server'
 import { requireAuth } from '@/lib/api-auth'
 import { withRateLimit } from '@/lib/rate-limit'
-import { logger } from '@/lib/logger'
+import { logger, logError } from '@/lib/logger'
 
 /**
  * Endpoint para popular categorias de custo essenciais
@@ -105,7 +105,7 @@ async function seedCostCategoriesHandler(request: NextRequest) {
       results,
     })
   } catch (error: unknown) {
-    console.error('Erro ao popular categorias de custo:', error)
+    logError('Erro ao popular categorias de custo', { error }, 'SeedCostCategoriesAPI')
     return NextResponse.json(
       {
         error: 'Erro ao popular categorias de custo',

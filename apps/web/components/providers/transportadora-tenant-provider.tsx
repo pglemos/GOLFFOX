@@ -2,7 +2,6 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
 import { supabase } from '@/lib/supabase'
-import { useRouter } from 'next/navigation'
 
 interface TransportadoraContextType {
     transportadoraId: string | null
@@ -15,7 +14,6 @@ interface TransportadoraContextType {
 const TenantContext = createContext<TransportadoraContextType | undefined>(undefined)
 
 export function TransportadoraTenantProvider({ children }: { children: ReactNode }) {
-    const router = useRouter()
     const [transportadoraId, setTransportadoraId] = useState<string | null>(null)
     const [transportadoraName, setTransportadoraName] = useState('Transportadora')
     const [logoUrl, setLogoUrl] = useState<string | null>(null)

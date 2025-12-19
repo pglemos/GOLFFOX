@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requireAuth } from '@/lib/api-auth'
+import { logError } from '@/lib/logger'
 
 export const runtime = 'nodejs'
 
@@ -33,7 +34,7 @@ export async function GET(request: NextRequest) {
       .limit(limit)
 
     if (error) {
-      console.error('Erro ao buscar audit log:', error)
+      logError('Erro ao buscar audit log', { error, limit }, 'AuditLogAPI')
       return NextResponse.json(
         { error: 'Erro ao buscar audit log', message: error.message },
         { status: 500 }
@@ -45,7 +46,7 @@ export async function GET(request: NextRequest) {
       logs: data || []
     })
   } catch (err) {
-    console.error('Erro ao listar audit log:', err)
+    logError('Erro ao listar audit log', { error: err }, 'AuditLogAPI')
     const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
     return NextResponse.json(
       { error: 'Erro ao listar audit log', message: errorMessage },

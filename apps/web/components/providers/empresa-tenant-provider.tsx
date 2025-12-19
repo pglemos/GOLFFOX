@@ -2,7 +2,8 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode, useCallback, useMemo } from 'react'
 import { supabase } from '@/lib/supabase'
-import { useRouter, useSearchParams, usePathname } from 'next/navigation'
+import { useRouter, useSearchParams, usePathname } from '@/lib/next-navigation'
+import { ensureSupabaseSession } from '@/lib/supabase-session'
 
 interface TenantContextType {
   tenantCompanyId: string | null
@@ -43,6 +44,7 @@ function OperatorTenantProviderInner({ children }: { children: ReactNode }) {
     try {
       setLoading(true)
       setError(null)
+      await ensureSupabaseSession()
       console.log('🔍 Carregando empresas do operador...')
 
       // ✅ PRIMEIRO: Tentar buscar da view v_my_companies

@@ -6,7 +6,7 @@ import { Building2 } from "lucide-react"
 import { motion } from "framer-motion"
 import { useEffect, useState } from "react"
 import { supabase } from "@/lib/supabase"
-import { useRouter } from "next/navigation"
+import { useRouter } from "@/lib/next-navigation"
 
 export default function PrestadoresOperatorPage() {
   const router = useRouter()

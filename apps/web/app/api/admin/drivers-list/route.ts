@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requireAuth } from '@/lib/api-auth'
+import { logError } from '@/lib/logger'
 
 export const runtime = 'nodejs'
 
@@ -30,7 +31,7 @@ export async function GET(request: NextRequest) {
       .order('created_at', { ascending: false })
 
     if (error) {
-      console.error('Erro ao buscar motoristas:', error)
+      logError('Erro ao buscar motoristas', { error }, 'DriversListAPI')
       return NextResponse.json(
         { error: 'Erro ao buscar motoristas', message: error.message },
         { status: 500 }
@@ -40,7 +41,7 @@ export async function GET(request: NextRequest) {
     // Retornar array diretamente para compatibilidade
     return NextResponse.json(data || [])
   } catch (err) {
-    console.error('Erro ao listar motoristas:', err)
+    logError('Erro ao listar motoristas', { error: err }, 'DriversListAPI')
     const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
     return NextResponse.json(
       { error: 'Erro ao listar motoristas', message: errorMessage },

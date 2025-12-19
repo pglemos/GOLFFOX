@@ -22,7 +22,7 @@ npx supabase gen types typescript --project-id vmoxzesvjcfmrebagcwo > types/supa
 ### 2. Testes de Autenticação ✅
 
 **Scripts criados:**
-- ✅ `scripts/test-auth-middleware.js` - Teste automatizado do middleware
+- ✅ `scripts/test-auth-middleware.js` - Teste automatizado do proxy (anteriormente middleware)
 - ✅ `scripts/test-cookie-httponly.md` - Guia de teste manual
 
 **Como testar:**
@@ -72,7 +72,7 @@ npm run db:migrate
 | Item | Status | Detalhes |
 |------|--------|----------|
 | Tipos Supabase | ✅ | Regenerados, 0 erros TypeScript |
-| Middleware Auth | ✅ | Valida tokens com Supabase |
+| Proxy Auth | ✅ | Valida tokens com Supabase (anteriormente middleware) |
 | Cookie HttpOnly | ✅ | Server-side apenas |
 | CSP | ✅ | Endurecida (sem unsafe-eval em prod) |
 | TypeScript | ✅ | 0 erros, ignoreBuildErrors removido |
@@ -110,7 +110,7 @@ npm run db:migrate
 - `apps/web/scripts/test-cookie-httponly.md`
 
 ### Modificados:
-- `apps/web/middleware.ts` - Validação de tokens
+- `apps/web/proxy.ts` - Validação de tokens e roteamento (anteriormente middleware.ts)
 - `apps/web/lib/auth.ts` - Cookie HttpOnly
 - `apps/web/app/api/auth/set-session/route.ts` - HttpOnly
 - `apps/web/app/api/auth/clear-session/route.ts` - HttpOnly
@@ -148,7 +148,7 @@ npm run db:migrate
 **Todas as tarefas foram concluídas com sucesso!**
 
 O sistema está:
-- ✅ Mais seguro (middleware, cookies, CSP)
+- ✅ Mais seguro (proxy, cookies, CSP)
 - ✅ Com melhor qualidade (TypeScript, testes)
 - ✅ Melhor organizado (migrations versionadas)
 - ✅ Totalmente documentado

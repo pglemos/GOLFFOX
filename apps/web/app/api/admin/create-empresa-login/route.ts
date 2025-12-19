@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requireAuth } from '@/lib/api-auth'
-import { logger } from '@/lib/logger'
+import { logger, logError } from '@/lib/logger'
 
 export const runtime = 'nodejs'
 
@@ -202,11 +202,11 @@ export async function POST(request: NextRequest) {
         }
         
         if (createUserError) {
-          console.error('❌ Erro ao criar usuário:', {
+          logError('Erro ao criar usuário', {
             message: createUserError.message,
             status: createUserError.status,
             code: (createUserError as any).code
-          })
+          }, 'CreateEmpresaLoginAPI')
           
           // Se o erro for de usuário já existente, tentar buscar
           if (createUserError.message?.toLowerCase().includes('already') || 
@@ -225,19 +225,18 @@ export async function POST(request: NextRequest) {
           logger.log('✅ Usuário criado com sucesso no Auth')
         }
       } catch (err: any) {
-        console.error('❌ Exceção ao chamar createUser:', err)
+        logError('Exceção ao chamar createUser', { error: err }, 'CreateEmpresaLoginAPI')
         createUserError = err
       }
     }
 
     if (createUserError) {
-      console.error('❌ Erro ao criar usuário no Auth:', {
+      logError('Erro ao criar usuário no Auth', {
         message: createUserError.message,
         status: createUserError.status,
         name: createUserError.name,
-        code: (createUserError as any).code,
-        fullError: createUserError
-      })
+        code: (createUserError as any).code
+      }, 'CreateEmpresaLoginAPI')
       
       // Verificar se o erro é porque o usuário já existe
       const errorMessage = createUserError.message?.toLowerCase() || ''
@@ -253,7 +252,7 @@ export async function POST(request: NextRequest) {
         const { data: existingUsers, error: listError } = await supabaseAdmin.auth.admin.listUsers()
         
         if (listError) {
-          console.error('❌ Erro ao listar usuários:', listError)
+          logError('Erro ao listar usuários', { error: listError }, 'CreateEmpresaLoginAPI')
         }
         
         const existingUser = existingUsers?.users?.find((u: any) => u.email?.toLowerCase() === email.toLowerCase())
@@ -278,7 +277,7 @@ export async function POST(request: NextRequest) {
             })
           
           if (updateError) {
-            console.error('❌ Erro ao atualizar company_id:', updateError)
+            logError('Erro ao atualizar company_id', { error: updateError }, 'CreateEmpresaLoginAPI')
             return NextResponse.json(
               { 
                 error: 'Usuário já existe mas não foi possível associá-lo à empresa', 
@@ -329,7 +328,7 @@ export async function POST(request: NextRequest) {
           } else {
             // Usuário não foi criado, retornar erro
             const detailedMessage = createUserError.message || 'Erro desconhecido ao criar usuário'
-            console.error('❌ Usuário não foi criado:', detailedMessage)
+            logError('Usuário não foi criado', { message: detailedMessage }, 'CreateEmpresaLoginAPI')
             return NextResponse.json(
               { 
                 error: 'Erro ao criar usuário no sistema de autenticação', 
@@ -345,18 +344,18 @@ export async function POST(request: NextRequest) {
             )
           }
         } catch (checkError) {
-          console.error('❌ Erro ao verificar usuário:', checkError)
+          logError('Erro ao verificar usuário', { error: checkError }, 'CreateEmpresaLoginAPI')
         }
       }
       
       // Se ainda houver erro e não foi resolvido acima
       if (createUserError) {
         const detailedMessage = createUserError.message || 'Erro desconhecido ao criar usuário'
-        console.error('❌ Erro detalhado:', {
+        logError('Erro detalhado ao criar login', {
           message: detailedMessage,
           status: createUserError.status,
           code: (createUserError as any).code
-        })
+        }, 'CreateEmpresaLoginAPI')
         
         return NextResponse.json(
           { 
@@ -374,7 +373,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (!authData?.user) {
-      console.error('❌ Usuário não foi criado (authData.user é null)')
+      logError('Usuário não foi criado (authData.user é null)', {}, 'CreateEmpresaLoginAPI')
       return NextResponse.json(
         { 
           error: 'Erro ao criar usuário', 
@@ -404,7 +403,7 @@ export async function POST(request: NextRequest) {
       })
 
     if (userError) {
-      console.error('❌ Erro ao criar registro na tabela users:', {
+      logError('Erro ao criar registro na tabela users', {
         message: userError.message,
         code: userError.code,
         details: userError.details,
@@ -415,7 +414,7 @@ export async function POST(request: NextRequest) {
         await supabaseAdmin.auth.admin.deleteUser(userId)
         logger.log('✅ Usuário removido do Auth após falha')
       } catch (deleteError) {
-        console.error('❌ Erro ao remover usuário do Auth após falha:', deleteError)
+        logError('Erro ao remover usuário do Auth após falha', { error: deleteError }, 'CreateEmpresaLoginAPI')
       }
       return NextResponse.json(
         { 
@@ -468,7 +467,7 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error: any) {
-    console.error('Erro ao criar login de operador:', error)
+    logError('Erro ao criar login de operador', { error }, 'CreateEmpresaLoginAPI')
     return NextResponse.json(
       { error: 'Erro ao criar login de operador', message: error.message },
       { status: 500 }

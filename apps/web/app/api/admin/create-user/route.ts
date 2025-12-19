@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requireAuth } from '@/lib/api-auth'
-import { logger } from '@/lib/logger'
+import { logger, logError } from '@/lib/logger'
 
 export const runtime = 'nodejs'
 
@@ -237,7 +237,7 @@ export async function POST(request: NextRequest) {
 
         if (userError) {
 
-            console.error('❌ Erro ao criar registro na tabela users:', userError)
+            logError('Erro ao criar registro na tabela users', { error: userError }, 'CreateUserAPI')
             try { await supabaseAdmin.auth.admin.deleteUser(userId) } catch (e) { }
             return NextResponse.json({ error: 'Erro ao criar registro do usuário', message: userError.message }, { status: 500 })
         }
@@ -264,7 +264,7 @@ export async function POST(request: NextRequest) {
         })
 
     } catch (error: any) {
-        console.error('Erro ao criar usuário:', error)
+        logError('Erro ao criar usuário', { error }, 'CreateUserAPI')
         return NextResponse.json({ error: 'Erro ao criar usuário', message: error.message }, { status: 500 })
     }
 }

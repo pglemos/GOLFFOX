@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requireAuth } from '@/lib/api-auth'
-import { logger } from '@/lib/logger'
+import { logger, logError } from '@/lib/logger'
 
 export const runtime = 'nodejs'
 
@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
       carriers: carriersRes.data || []
     })
   } catch (error: any) {
-    console.error('Erro ao buscar opções de custos:', error)
+    logError('Erro ao buscar opções de custos', { error }, 'CostsOptionsAPI')
     return NextResponse.json(
       { error: 'Erro ao buscar opções de custos', message: error.message },
       { status: 500 }

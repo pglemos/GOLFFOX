@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import type { OptimizeRouteRequest, OptimizeRouteResponse } from '@/types/routes'
 import { calculateHash } from '@/lib/route-optimization'
+import { logError } from '@/lib/logger'
 
 const RATE_LIMIT = new Map<string, { count: number; resetAt: number }>()
 
@@ -229,8 +230,9 @@ export async function POST(request: NextRequest) {
     // Sem cache, apenas otimizar
     const result = await optimizeWithGoogle(body)
     return NextResponse.json(result)
+
   } catch (error: any) {
-    console.error('Erro ao otimizar rota:', error)
+    logError('Erro ao otimizar rota', { error }, 'OptimizeRouteAPI')
     return NextResponse.json(
       { error: error.message || 'Erro ao otimizar rota' },
       { status: 500 }

@@ -11,9 +11,9 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Truck, Search, Edit, MapPin, FileText, Wrench, AlertCircle, Calendar, ExternalLink, Upload, DollarSign, Clock, Grid3x3, List, Filter, Download } from "lucide-react"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
 import { supabase } from "@/lib/supabase"
-import { useRouter } from "next/navigation"
+import { ensureSupabaseSession } from "@/lib/supabase-session"
+import { useRouter } from "@/lib/next-navigation"
 import { motion } from "framer-motion"
-import { useRouter as useRouterNext } from "next/navigation"
 import { DocumentUpload } from "@/components/transportadora/document-upload"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -22,7 +22,6 @@ import { Textarea } from "@/components/ui/textarea"
 
 export default function TransportadoraVeiculosPage() {
   const router = useRouter()
-  const routerNext = useRouterNext()
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [veiculos, setVeiculos] = useState<any[]>([])
@@ -51,7 +50,7 @@ export default function TransportadoraVeiculosPage() {
 
   useEffect(() => {
     const getUser = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
+      const session = await ensureSupabaseSession()
       if (!session) {
         router.push("/")
         return
@@ -92,7 +91,7 @@ export default function TransportadoraVeiculosPage() {
 
   const loadVehicleDocuments = async (vehicleId: string) => {
     try {
-      const { data: { session } } = await supabase.auth.getSession()
+      const session = await ensureSupabaseSession()
       const res = await fetch(`/api/transportadora/vehicles/${vehicleId}/documents`, {
         credentials: 'include',
         headers: session?.access_token ? {
@@ -112,7 +111,7 @@ export default function TransportadoraVeiculosPage() {
 
   const loadVehicleMaintenances = async (vehicleId: string) => {
     try {
-      const { data: { session } } = await supabase.auth.getSession()
+      const session = await ensureSupabaseSession()
       const res = await fetch(`/api/transportadora/vehicles/${vehicleId}/maintenances`, {
         credentials: 'include',
         headers: session?.access_token ? {
@@ -134,7 +133,7 @@ export default function TransportadoraVeiculosPage() {
     if (!selectedVehicle || !maintenanceForm.description) return
 
     try {
-      const { data: { session } } = await supabase.auth.getSession()
+      const session = await ensureSupabaseSession()
       const res = await fetch(`/api/transportadora/vehicles/${selectedVehicle}/maintenances`, {
         method: 'POST',
         credentials: 'include',
@@ -449,7 +448,7 @@ export default function TransportadoraVeiculosPage() {
                             className="flex-1"
                             onClick={(e) => {
                               e.stopPropagation()
-                              routerNext.push(`/transportadora/mapa?vehicle_id=${veiculo.id}`)
+                              router.push(`/transportadora/mapa?vehicle_id=${veiculo.id}`)
                             }}
                           >
                             <MapPin className="h-4 w-4 mr-1" />
@@ -534,7 +533,7 @@ export default function TransportadoraVeiculosPage() {
                             size="sm"
                             onClick={(e) => {
                               e.stopPropagation()
-                              routerNext.push(`/transportadora/mapa?vehicle_id=${veiculo.id}`)
+                              router.push(`/transportadora/mapa?vehicle_id=${veiculo.id}`)
                             }}
                           >
                             <MapPin className="h-4 w-4 mr-2" />

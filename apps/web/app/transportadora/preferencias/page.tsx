@@ -7,7 +7,7 @@ import { Settings } from "lucide-react"
 import { motion } from "framer-motion"
 import { useEffect, useState } from "react"
 import { supabase } from "@/lib/supabase"
-import { useRouter } from "next/navigation"
+import { useRouter } from "@/lib/next-navigation"
 import { useAuthFast } from "@/hooks/use-auth-fast"
 
 export default function PreferenciasTransportadoraPage() {

@@ -9,6 +9,7 @@ import { AlertTriangle, RefreshCw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { createAlert } from '@/lib/operational-alerts'
+import { logError } from '@/lib/logger'
 
 interface Props {
   children: ReactNode
@@ -40,7 +41,14 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: any) {
-    console.error('ErrorBoundary capturou um erro:', error, errorInfo)
+    // ✅ Log estruturado do erro
+    logError('ErrorBoundary capturou um erro', {
+      error: error.message,
+      stack: error.stack,
+      name: error.name,
+      componentStack: errorInfo.componentStack,
+      url: typeof window !== 'undefined' ? window.location.href : 'unknown'
+    }, 'ErrorBoundary')
 
     // Registrar alerta operacional (com tratamento de erro - não bloquear renderização)
     createAlert({
@@ -55,8 +63,8 @@ export class ErrorBoundary extends Component<Props, State> {
       },
       source: 'error-boundary',
     }).catch((alertError) => {
-      // Não bloquear se createAlert falhar
-      console.error('Erro ao criar alerta:', alertError)
+      // Não bloquear se createAlert falhar, mas logar o erro
+      logError('Erro ao criar alerta operacional', { error: alertError }, 'ErrorBoundary')
     })
 
     this.setState({

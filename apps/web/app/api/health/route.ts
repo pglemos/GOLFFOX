@@ -1,35 +1,110 @@
-import { NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase'
+/**
+ * Health Check API
+ * 
+ * Endpoint para verificar saúde do sistema
+ * Usado por load balancers e ferramentas de monitoramento
+ */
 
-export async function GET() {
-  const start = Date.now()
-  let dbStatus = 'unknown'
-  let dbError: string | null = null
+import { NextRequest, NextResponse } from 'next/server'
+import { monitoring, type HealthCheck } from '@/lib/monitoring'
+import { createClient } from '@supabase/supabase-js'
+import { logError } from '@/lib/logger'
 
+export const runtime = 'nodejs'
+
+export async function GET(request: NextRequest) {
   try {
-    const { error } = await supabase.from('users').select('*', { count: 'exact', head: true })
-    if (error) throw error
-    dbStatus = 'healthy'
-  } catch (err: unknown) {
-    dbStatus = 'unhealthy'
-    dbError = err instanceof Error ? err.message : 'Unknown error'
-  }
+    // Executar health check
+    const healthCheck = await monitoring.performHealthCheck()
 
-  const duration = Date.now() - start
+    // Verificar conexão com Supabase (real)
+    try {
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+      const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
-  return NextResponse.json(
-    {
-      status: dbStatus === 'healthy' ? 'ok' : 'error',
-      timestamp: new Date().toISOString(),
-      services: {
-        database: {
-          status: dbStatus,
-          latency: `${duration}ms`,
-          error: dbError
+      if (supabaseUrl && serviceKey) {
+        const supabase = createClient(supabaseUrl, serviceKey, {
+          auth: { autoRefreshToken: false, persistSession: false }
+        })
+
+        const startTime = Date.now()
+        // Fazer query simples para verificar conexão
+        const { error } = await supabase.from('users').select('id').limit(1)
+        const latency = Date.now() - startTime
+
+        if (error) {
+          healthCheck.checks.supabase = {
+            status: 'error',
+            message: error.message,
+            latency
+          }
+          healthCheck.status = healthCheck.status === 'healthy' ? 'degraded' : 'unhealthy'
+        } else {
+          healthCheck.checks.supabase = {
+            status: 'ok',
+            message: 'Conexão com Supabase OK',
+            latency
+          }
         }
+      }
+    } catch (error) {
+      healthCheck.checks.supabase = {
+        status: 'error',
+        message: error instanceof Error ? error.message : 'Erro desconhecido'
+      }
+      healthCheck.status = healthCheck.status === 'healthy' ? 'degraded' : 'unhealthy'
+    }
+
+    // Verificar Redis (se configurado)
+    try {
+      const redisUrl = process.env.UPSTASH_REDIS_REST_URL
+      const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN
+
+      if (redisUrl && redisToken) {
+        const { Redis } = await import('@upstash/redis')
+        const redis = new Redis({
+          url: redisUrl,
+          token: redisToken,
+        })
+
+        const startTime = Date.now()
+        await redis.ping()
+        const latency = Date.now() - startTime
+
+        healthCheck.checks.redis = {
+          status: 'ok',
+          message: 'Conexão com Redis OK',
+          latency
+        }
+      } else {
+        healthCheck.checks.redis = {
+          status: 'ok',
+          message: 'Redis não configurado (opcional)'
+        }
+      }
+    } catch (error) {
+      healthCheck.checks.redis = {
+        status: 'error',
+        message: error instanceof Error ? error.message : 'Erro ao conectar Redis'
+      }
+      // Redis não é crítico, não degradar status geral
+    }
+
+    // Determinar status HTTP baseado no health check
+    const statusCode = healthCheck.status === 'healthy' ? 200 : 
+                      healthCheck.status === 'degraded' ? 200 : 503
+
+    return NextResponse.json(healthCheck, { status: statusCode })
+  } catch (error) {
+    logError('Erro ao executar health check', { error }, 'HealthCheckAPI')
+    return NextResponse.json(
+      {
+        status: 'unhealthy',
+        checks: {},
+        timestamp: new Date(),
+        error: 'Erro interno ao executar health check'
       },
-      version: '1.0.0'
-    },
-    { status: dbStatus === 'healthy' ? 200 : 503 }
-  )
+      { status: 503 }
+    )
+  }
 }

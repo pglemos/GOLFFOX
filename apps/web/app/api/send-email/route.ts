@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { debug } from '@/lib/logger';
 // import { Resend } from 'resend';
 
 // const resend = new Resend(process.env.RESEND_API_KEY);
@@ -11,7 +12,7 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
         }
 
-        console.log('📧 Simulando envio de e-mail:', { to, subject });
+        debug('Simulando envio de e-mail', { to: to.replace(/^(.{2}).+(@.*)$/, '$1***$2'), subject }, 'SendEmailAPI');
 
         // TODO: Descomentar quando configurar RESEND_API_KEY
         /*

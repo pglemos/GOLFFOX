@@ -23,8 +23,9 @@
 ### 5. Correção de Encoding
 - ✅ Corrigido "funcionÃ¡rios" para "funcionários" em `sincronizar/page.tsx`
 
-### 6. Proteção do Middleware
+### 6. Proteção do Proxy (Middleware)
 - ✅ `NEXT_PUBLIC_DISABLE_MIDDLEWARE` agora funciona apenas em desenvolvimento
+- ✅ Refatorado para usar logger estruturado e centralizar autenticação
 
 ### 7. Dados Mockados
 - ✅ Substituído `todayTrips: 560` por placeholder em `motoristas/page.tsx`
@@ -45,7 +46,7 @@
 ### 3. Consolidação de Rotas Duplicadas ✅
 - ✅ Criados redirecionamentos em `/api/operator/*` para `/api/operador/*`
 - ✅ Mantida compatibilidade com rotas antigas
-- ✅ Middleware já redireciona `/operator` → `/operador` e `/carrier` → `/transportadora`
+- ✅ Proxy já redireciona `/operator` → `/empresa` e `/carrier` → `/transportadora`
 
 ### 4. Expansão de Testes E2E ✅
 - ✅ Criados novos testes:
@@ -106,7 +107,7 @@
 - `components/operator/funcionario-modal.tsx`
 - `.gitignore`
 - `app/operador/sincronizar/page.tsx`
-- `middleware.ts`
+- `proxy.ts` (anteriormente middleware.ts)
 - `components/topbar.tsx`
 - `components/app-shell.tsx`
 - `app/transportadora/motoristas/page.tsx`

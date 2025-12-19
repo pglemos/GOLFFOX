@@ -14,12 +14,14 @@ const ALLOWED_BUCKETS = [
     'avatars'
 ]
 
+import { logError } from '@/lib/logger'
+
 function getSupabaseAdmin() {
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL
     const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
-    if (!url) console.error('CRITICAL: NEXT_PUBLIC_SUPABASE_URL is missing')
-    if (!serviceKey) console.error('CRITICAL: SUPABASE_SERVICE_ROLE_KEY is missing')
+    if (!url) logError('CRITICAL: NEXT_PUBLIC_SUPABASE_URL is missing', {}, 'UploadAPI')
+    if (!serviceKey) logError('CRITICAL: SUPABASE_SERVICE_ROLE_KEY is missing', {}, 'UploadAPI')
 
     if (!url || !serviceKey) {
         throw new Error('Supabase não configurado corretamente no servidor')
@@ -123,7 +125,7 @@ export async function POST(request: NextRequest) {
             type: file.type,
         })
     } catch (error: any) {
-        console.error('Erro no upload:', error)
+        logError('Erro no upload', { error }, 'UploadAPI')
         return NextResponse.json({
             error: 'Erro interno',
             details: error.message

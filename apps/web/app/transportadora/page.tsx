@@ -41,7 +41,8 @@ import {
   Minus
 } from "lucide-react"
 import { supabase } from "@/lib/supabase"
-import { useRouter } from "next/navigation"
+import { ensureSupabaseSession } from "@/lib/supabase-session"
+import { useRouter } from "@/lib/next-navigation"
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts"
 import { t } from "@/lib/i18n"
 import { cn } from "@/lib/utils"
@@ -71,10 +72,15 @@ export default function TransportadoraDashboard() {
               const meData = await meResponse.json()
               console.log('✅ [Transportadora] Resposta da API /api/auth/me:', { success: meData.success, hasUser: !!meData.user, role: meData.user?.role })
 
-              if (meData.success && meData.user && (meData.user.role === 'transportadora' || meData.user.role === 'admin')) {
+              if (
+                meData.success &&
+                meData.user &&
+                ['transportadora', 'operador', 'carrier', 'admin'].includes(meData.user.role)
+              ) {
                 console.log('✅ [Transportadora] Usuário transportadora autenticado via API /api/auth/me, definindo usuário...')
                 setUser(meData.user)
                 setUserData(meData.user)
+                await ensureSupabaseSession()
                 setLoading(false)
                 console.log('✅ [Transportadora] Autenticação concluída com sucesso')
                 return
@@ -109,14 +115,14 @@ export default function TransportadoraDashboard() {
               console.warn('⚠️ Erro ao buscar dados do usuário:', dbError)
             }
 
-            if (data && (data.role === 'transportadora' || data.role === 'admin')) {
+            if (data && ['transportadora', 'operador', 'carrier', 'admin'].includes(data.role)) {
               console.log('✅ Usuário transportadora autenticado via Supabase Auth')
               setUser({ ...session.user, ...data })
               setUserData(data)
               setLoading(false)
               return
             } else {
-              console.warn('⚠️ Usuário não tem role transportadora:', data?.role)
+              console.warn('⚠️ Usuário não tem role transportadora/operador:', data?.role)
             }
           } else {
             console.warn('⚠️ Nenhuma sessão Supabase encontrada')
@@ -263,12 +269,8 @@ export default function TransportadoraDashboard() {
 
   const loadFleetData = async () => {
     try {
-      // Buscar dados da transportadora
-      const { data: transportadoraData } = await supabase
-        .from('users')
-        .select('transportadora_id')
-        .eq('id', user?.id)
-        .single()
+      // Buscar dados da transportadora (preferir cookie para evitar RLS no client)
+      const transportadoraData = { transportadora_id: (userData as any)?.transportadora_id || (user as any)?.transportadora_id || null }
 
       if (!transportadoraData?.transportadora_id) {
         console.error("Usuário não está associado a uma transportadora")

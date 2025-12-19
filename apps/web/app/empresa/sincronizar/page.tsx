@@ -7,7 +7,7 @@ import { Card } from "@/components/ui/card"
 import { RefreshCw, CheckCircle, AlertCircle } from "lucide-react"
 import { motion } from "framer-motion"
 import { supabase } from "@/lib/supabase"
-import { useRouter } from "next/navigation"
+import { useRouter } from "@/lib/next-navigation"
 import { geocodeAddress, optimizeRoute } from "@/lib/google-maps"
 
 export default function SincronizarPage() {

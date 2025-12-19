@@ -8,7 +8,7 @@ import { supabase } from "@/lib/supabase"
 import { formatDistanceToNow } from "date-fns"
 import { ptBR } from "date-fns/locale"
 import { Button } from "@/components/ui/button"
-import { useRouter } from "next/navigation"
+import { useRouter } from "@/lib/next-navigation"
 
 interface RecentAlertsCardProps {
     companyId: string

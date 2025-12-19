@@ -19,7 +19,10 @@ interface Trip {
     isNext: boolean;
 }
 
-// Mock data - em produção viria do Supabase
+// Importar serviço de viagens
+import { TripsService } from '../../src/services/trips.service'
+
+// Mock data - será substituído por chamadas reais
 const mockTrips: Trip[] = [
     {
         id: '1',

@@ -1,8 +1,11 @@
 #!/usr/bin/env node
 
 /**
- * Script de teste para validar autenticação do middleware
- * Testa se o middleware valida tokens corretamente
+ * Script de teste para validar autenticação do proxy (middleware)
+ * Testa se o proxy valida tokens corretamente
+ * 
+ * Nota: O arquivo foi renomeado de middleware.ts para proxy.ts para refletir
+ * melhor sua função de proxy de rede e roteamento.
  */
 
 const http = require('http');
@@ -97,7 +100,7 @@ async function runTests() {
   await testRoute('/', 'Teste 3: / (raiz - pública)');
 
   // Teste 4: Rota de API (bypass)
-  await testRoute('/api/health', 'Teste 4: /api/health (bypass middleware)');
+  await testRoute('/api/health', 'Teste 4: /api/health (bypass proxy)');
 
   console.log('\n✅ Testes concluídos!');
   console.log('\nNotas:');

@@ -124,7 +124,7 @@
 - `app/transportadora/motoristas/page.tsx`
 
 #### Configuração
-- `middleware.ts`
+- `proxy.ts` (anteriormente middleware.ts)
 - `.gitignore`
 - `lib/i18n.ts`
 - `package.json`

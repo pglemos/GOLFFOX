@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import { supabase } from "@/lib/supabase"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useRouter, useSearchParams } from "@/lib/next-navigation"
 import { Map, Filter, Layers, Navigation, RefreshCw, Maximize2 } from "lucide-react"
 
 function TransportadoraMapaContent() {

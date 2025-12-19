@@ -7,6 +7,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requireAuth } from '@/lib/api-auth'
+import { logError } from '@/lib/logger'
 import type { Budget, BudgetInsert } from '@/types/financial'
 
 export const runtime = 'nodejs'
@@ -81,7 +82,7 @@ export async function GET(request: NextRequest) {
         const { data, error } = await query
 
         if (error) {
-            console.error('[API] Erro ao buscar orçamentos:', error)
+            logError('Erro ao buscar orçamentos', { error, year, month, categoryId }, 'BudgetsAPI')
             // Se a tabela não existe, retornar vazio em vez de erro
             if (error.message?.includes('does not exist') || error.code === 'PGRST205') {
                 return NextResponse.json({
@@ -210,7 +211,7 @@ export async function POST(request: NextRequest) {
             .single()
 
         if (error) {
-            console.error('[API] Erro ao salvar orçamento:', error)
+            logError('Erro ao salvar orçamento', { error, body: { categoryId: body.categoryId, periodYear: body.periodYear, periodMonth: body.periodMonth } }, 'BudgetsAPI')
             return NextResponse.json(
                 { success: false, error: error.message },
                 { status: 500 }

@@ -1,366 +1,231 @@
-# Arquitetura do GolfFox
+# Arquitetura do Sistema - GolfFox
 
-## Visão Geral
+Visão geral da arquitetura técnica do sistema GolfFox.
 
-O GolfFox é uma aplicação híbrida moderna que utiliza **React Native (Expo 54)** para mobile e **Next.js 16** para web, seguindo os princípios de **Clean Architecture** e **Domain-Driven Design (DDD)**. O backend é servido pelo **Supabase** (PostgreSQL + Auth + Storage + Realtime).
+---
 
-## Stack Tecnológica
+## 🏗️ Arquitetura Geral
 
-### Frontend Mobile (React Native)
-| Tecnologia | Versão | Propósito |
-|------------|--------|-----------|
-| React Native | 0.81.5 | Framework mobile |
-| Expo | 54.0.27 | Build tool e runtime |
-| TypeScript | 5.9.2 | Linguagem |
-| Expo Router | 6.0.17 | Navegação file-based |
-| React Native Paper | 5.14.5 | Componentes UI |
-| react-native-maps | 1.26.20 | Mapas |
-| expo-location | 19.0.8 | Geolocalização |
-
-### Frontend Web (Next.js)
-| Tecnologia | Versão | Propósito |
-|------------|--------|-----------|
-| Next.js | 16.0.7 | Framework React |
-| React | 19.2.1 | UI Library |
-| TypeScript | 5.9.3 | Linguagem |
-| Tailwind CSS | 4.1.17 | Estilização |
-| Radix UI | Latest | Componentes acessíveis |
-| Zustand | 5.0.2 | Estado global |
-| TanStack Query | 5.90.12 | Cache e data fetching |
-
-### Backend
-| Tecnologia | Propósito |
-|------------|-----------|
-| Supabase | BaaS (Auth, Storage, Realtime) |
-| PostgreSQL | Banco de dados relacional |
-| Upstash Redis | Rate limiting |
-
-## Estrutura do Projeto
+### Monorepo
 
 ```
-📁 GOLFFOX/
-├── 📱 apps/mobile/              # React Native App (Expo 54)
-│   ├── app/                     # Expo Router (File-based routing)
-│   │   ├── _layout.tsx          # Layout raiz (providers)
-│   │   ├── index.tsx            # Tela inicial (redirect)
-│   │   ├── login.tsx            # Tela de login
-│   │   ├── driver/              # Rotas do Motorista
-│   │   │   ├── _layout.tsx      # Stack do motorista
-│   │   │   ├── index.tsx        # Dashboard motorista
-│   │   │   ├── checklist.tsx    # Checklist pré-rota
-│   │   │   ├── route.tsx        # Mapa com rastreamento
-│   │   │   ├── scan.tsx         # Scanner QR/NFC
-│   │   │   └── history.tsx      # Histórico de viagens
-│   │   └── passenger/           # Rotas do Passageiro
-│   │       ├── _layout.tsx      # Stack do passageiro
-│   │       ├── index.tsx        # Dashboard passageiro
-│   │       ├── map.tsx          # Mapa tempo real
-│   │       ├── details.tsx      # Detalhes da rota
-│   │       └── feedback.tsx     # Avaliação
-│   ├── src/                     # Código-fonte
-│   │   ├── auth/                # Autenticação (hooks, context)
-│   │   ├── services/            # Supabase, geolocalização
-│   │   ├── components/          # UI compartilhado
-│   │   ├── features/            # Funcionalidades (checkin, tracking)
-│   │   └── utils/               # Utilitários
-│   ├── assets/                  # Ícones e imagens
-│   ├── app.config.ts            # Configuração Expo
-│   ├── eas.json                 # Configuração EAS Build
-│   └── package.json             # Dependências
-│
-├── 🌐 apps/web/                 # Next.js Web App
-│   ├── app/                     # App Router (Next.js 16 + Turbopack)
-│   │   ├── admin/               # Painel Administrativo
-│   │   ├── empresa/             # Painel da Empresa Contratante
-│   │   ├── transportadora/      # Painel da Transportadora
-│   │   ├── api/                 # API Routes
-│   │   ├── page.tsx             # Página de Login
-│   │   └── layout.tsx           # Layout Principal
-│   ├── components/              # Componentes React
-│   │   ├── ui/                  # Componentes UI base (Radix UI)
-│   │   ├── admin/               # Componentes Admin
-│   │   ├── empresa/             # Componentes Empresa
-│   │   ├── transportadora/      # Componentes Transportadora
-│   │   └── providers/           # Context Providers
-│   ├── lib/                     # Utilitários e Helpers
-│   │   ├── supabase.ts          # Cliente Supabase
-│   │   ├── auth.ts              # Gerenciamento de Auth
-│   │   └── logger.ts            # Sistema de Logging
-│   ├── hooks/                   # React Hooks customizados
-│   ├── middleware.ts            # Middleware Next.js
-│   └── package.json             # Dependências
-│
-├── 📚 database/                 # Banco de Dados
-│   ├── migrations/              # Migrations SQL
-│   ├── seeds/                   # Dados iniciais
-│   └── scripts/                 # Scripts SQL
-│
-├── 📚 docs/                     # Documentação técnica
-├── 🔧 scripts/                  # Scripts de automação
-└── 🏗️ supabase/                 # Configuração Supabase
+GOLFFOX/
+├── apps/
+│   ├── web/          # Next.js Web App
+│   └── mobile/       # React Native Mobile App
+├── supabase/
+│   └── migrations/   # Migrations do banco
+├── docs/             # Documentação
+└── scripts/          # Scripts utilitários
 ```
 
-## Camadas da Arquitetura
+---
 
-### 1. Presentation Layer (Apresentação)
+## 🌐 Frontend Web
 
-#### Mobile (React Native)
-- **Expo Router**: Navegação file-based em `app/`
-- **Componentes**: React Native Paper + componentes customizados
-- **Estado Local**: React useState/useReducer
+### Stack Tecnológica
 
-```typescript
-// Exemplo: apps/mobile/app/driver/index.tsx
-import { View, Text } from 'react-native';
-import { useAuth } from '@/src/auth/useAuth';
+- **Next.js 16.1** - Framework React com App Router
+- **React 19.0 RC** - Biblioteca UI
+- **TypeScript 5.9.3** - Type safety
+- **Tailwind CSS 4.1.17** - Estilização
+- **Radix UI** - Componentes acessíveis
+- **TanStack Query** - Cache e sincronização
+- **Zustand** - Gerenciamento de estado
 
-export default function DriverDashboard() {
-  const { user } = useAuth();
-  
-  return (
-    <View>
-      <Text>Bem-vindo, {user?.name}</Text>
-    </View>
-  );
-}
+### Estrutura
+
+```
+apps/web/
+├── app/                    # Next.js App Router
+│   ├── api/               # API Routes (Edge Runtime)
+│   ├── admin/             # Painel Admin
+│   ├── empresa/           # Painel Empresa
+│   └── transportadora/    # Painel Transportadora
+├── components/            # Componentes React
+├── lib/                   # Utilitários
+│   ├── api-auth.ts       # Autenticação
+│   ├── logger.ts         # Logging
+│   └── validation/       # Schemas Zod
+├── hooks/                # React Hooks
+├── types/                # TypeScript types
+└── proxy.ts              # Middleware (Edge Runtime)
 ```
 
-#### Web (Next.js)
-- **App Router**: Navegação file-based em `app/`
-- **Componentes**: Radix UI + Tailwind CSS
-- **Estado Global**: Zustand para estado compartilhado
+---
 
-```typescript
-// Exemplo: apps/web/app/admin/page.tsx
-'use client';
-import { useAdminKPIs } from '@/hooks/useAdminKPIs';
+## 🔐 Autenticação e Autorização
 
-export default function AdminDashboard() {
-  const { data, isLoading } = useAdminKPIs();
-  
-  if (isLoading) return <LoadingSpinner />;
-  
-  return (
-    <div className="grid grid-cols-4 gap-4">
-      <KPICard title="Viagens" value={data.trips} />
-    </div>
-  );
-}
+### Fluxo de Autenticação
+
 ```
-
-### 2. Application Layer (Aplicação)
-
-#### Hooks Customizados
-Encapsulam lógica de negócio e data fetching:
-
-```typescript
-// Exemplo: apps/web/hooks/useAdminKPIs.ts
-import { useQuery } from '@tanstack/react-query';
-
-export function useAdminKPIs() {
-  return useQuery({
-    queryKey: ['admin', 'kpis'],
-    queryFn: () => fetch('/api/admin/kpis').then(r => r.json()),
-    staleTime: 30 * 1000, // 30 segundos
-  });
-}
-```
-
-#### Stores (Zustand)
-Gerenciamento de estado global:
-
-```typescript
-// Exemplo: apps/web/stores/useAuthStore.ts
-import { create } from 'zustand';
-
-interface AuthStore {
-  user: User | null;
-  setUser: (user: User | null) => void;
-  logout: () => void;
-}
-
-export const useAuthStore = create<AuthStore>((set) => ({
-  user: null,
-  setUser: (user) => set({ user }),
-  logout: () => set({ user: null }),
-}));
-```
-
-### 3. Domain Layer (Domínio)
-
-Entidades e tipos compartilhados:
-
-```typescript
-// Exemplo: types/user.ts
-export interface User {
-  id: string;
-  email: string;
-  role: 'admin' | 'empresa' | 'operador' | 'motorista' | 'passageiro';
-  name: string;
-  isActive: boolean;
-}
-
-export interface Trip {
-  id: string;
-  routeId: string;
-  driverId: string;
-  vehicleId: string;
-  status: 'scheduled' | 'in_progress' | 'completed' | 'cancelled';
-  startTime: Date;
-  endTime?: Date;
-}
-```
-
-### 4. Infrastructure Layer (Infraestrutura)
-
-#### Cliente Supabase
-```typescript
-// Exemplo: apps/web/lib/supabase.ts
-import { createClient } from '@supabase/supabase-js';
-
-export const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
-```
-
-#### API Routes (Next.js)
-```typescript
-// Exemplo: apps/web/app/api/admin/kpis/route.ts
-import { NextResponse } from 'next/server';
-import { createServerClient } from '@/lib/supabase-server';
-
-export async function GET() {
-  const supabase = createServerClient();
-  const { data, error } = await supabase
-    .from('v_admin_kpis')
-    .select('*')
-    .single();
-    
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
-  
-  return NextResponse.json(data);
-}
-```
-
-## Gerenciamento de Estado
-
-### Web (Next.js)
-
-| Ferramenta | Uso |
-|------------|-----|
-| **Zustand** | Estado global (auth, UI, preferências) |
-| **TanStack Query** | Cache de dados do servidor |
-| **useState** | Estado local de componentes |
-| **React Context** | Providers (tema, toast, modais) |
-
-### Mobile (React Native)
-
-| Ferramenta | Uso |
-|------------|-----|
-| **React Context** | Autenticação, tema |
-| **useState/useReducer** | Estado local |
-| **expo-secure-store** | Armazenamento seguro (tokens) |
-
-## Segurança
-
-### Autenticação
-- Supabase Auth com cookies `httpOnly`
-- JWT tokens com expiração de 1 hora
-- Refresh tokens seguros
-
-### Rate Limiting
-```typescript
-// Implementado com Upstash Redis
-import { Ratelimit } from '@upstash/ratelimit';
-import { Redis } from '@upstash/redis';
-
-const ratelimit = new Ratelimit({
-  redis: Redis.fromEnv(),
-  limiter: Ratelimit.slidingWindow(10, '10 s'),
-});
+1. Usuário faz login → POST /api/auth/login
+2. Servidor valida credenciais (Supabase Auth)
+3. Servidor cria cookie de sessão (golffox-session)
+4. Proxy (proxy.ts) valida sessão em cada requisição
+5. Rotas protegidas verificam role via requireAuth
 ```
 
 ### Proteção de Rotas
-- **Middleware Next.js**: Valida sessão e redireciona baseado em roles
-- **RLS no Supabase**: Isolamento de dados por empresa
 
-## Testes
+- **Páginas:** Protegidas pelo `proxy.ts` (Edge Runtime)
+- **APIs:** Protegidas por `requireAuth()` em cada rota
 
-### Web
-| Tipo | Ferramenta |
-|------|------------|
-| Unit Tests | Jest + Testing Library |
-| E2E Tests | Playwright |
-| Type Check | TypeScript |
+### Roles e Permissões
 
-### Mobile
-| Tipo | Ferramenta |
-|------|------------|
-| Lint | ESLint |
-| Type Check | TypeScript |
-| Doctor | expo-doctor |
+| Role | Acesso |
+|------|--------|
+| `admin` | Todas as rotas |
+| `empresa` | `/empresa/*` |
+| `transportadora` | `/transportadora/*` |
+| `motorista` | Mobile app apenas |
+| `passageiro` | Mobile app apenas |
 
-### Executando Testes
+---
 
-```bash
-# Web - Testes unitários
-cd apps/web
-npm test
+## 🗄️ Backend e Banco de Dados
 
-# Web - E2E
-npm run test:e2e
+### Supabase
 
-# Mobile - Verificação
-cd apps/mobile
-npx expo-doctor
+- **PostgreSQL** - Banco de dados relacional
+- **Row Level Security (RLS)** - Isolamento multi-tenant
+- **Auth** - Autenticação de usuários
+- **Storage** - Armazenamento de arquivos
+- **Realtime** - Sincronização em tempo real
+
+### Estrutura do Banco
+
+```
+Principais Tabelas:
+- users              # Usuários do sistema
+- companies          # Empresas contratantes
+- carriers           # Transportadoras
+- vehicles           # Veículos
+- routes            # Rotas
+- trips             # Viagens
+- gf_costs          # Custos
+- gf_audit_log      # Logs de auditoria
 ```
 
-## Deploy
+### Multi-tenant
 
-### Web (Vercel)
-- Deploy automático via GitHub Actions
-- Preview deployments para PRs
-- Edge Functions para API routes
+- Isolamento via RLS (Row Level Security)
+- Cada empresa/transportadora vê apenas seus dados
+- Service role bypassa RLS quando necessário
 
-### Mobile (EAS Build)
-- Build via Expo Application Services
-- Distribuição para TestFlight (iOS) e Play Store (Android)
+---
 
-```bash
-# Build de produção
-eas build --platform all --profile production
+## 📱 Mobile App
 
-# Submit para lojas
-eas submit --platform all
+### Stack
+
+- **React Native** - Framework mobile
+- **Expo 54** - Tooling e runtime
+- **Expo Router** - File-based routing
+- **TypeScript 5.9.2** - Type safety
+
+### Funcionalidades
+
+- Login/Autenticação
+- Rastreamento GPS
+- Checklists
+- Feedback de passageiros
+
+---
+
+## 🔄 CI/CD
+
+### GitHub Actions
+
+- **Lint:** ESLint
+- **Type Check:** TypeScript
+- **Testes:** Jest + Playwright
+- **Build:** Next.js build
+- **Deploy:** Vercel (automático)
+
+### Workflow
+
+```
+Push → CI (lint, test, build) → Deploy Vercel
 ```
 
-## Performance
+---
 
-### Otimizações Implementadas
+## 🛡️ Segurança
 
-1. **Turbopack**: Build mais rápido no desenvolvimento
-2. **React Server Components**: Redução de JavaScript no cliente
-3. **Image Optimization**: Next.js Image com sharp
-4. **Code Splitting**: Lazy loading automático
-5. **Caching**: TanStack Query + HTTP cache
+### Implementado
 
-### Monitoramento
+- ✅ CSRF Protection (double-submit cookie)
+- ✅ Rate Limiting (Upstash Redis)
+- ✅ Input Sanitization
+- ✅ Row Level Security (RLS)
+- ✅ Secure Cookies (HttpOnly, SameSite)
+- ✅ Content Security Policy (CSP)
 
-- **Vercel Analytics**: Métricas de performance
-- **Vercel Speed Insights**: Core Web Vitals
-- **Sentry** (planejado): Error tracking
+### Práticas
 
-## Conclusão
+- Validação de dados com Zod
+- Sanitização de inputs
+- Logging estruturado (sem dados sensíveis)
+- Autenticação obrigatória em rotas protegidas
 
-Esta arquitetura fornece uma base sólida para o desenvolvimento do GolfFox, garantindo:
+---
 
-- **Escalabilidade**: Estrutura modular para fácil adição de features
-- **Manutenibilidade**: Separação clara de responsabilidades
-- **Testabilidade**: Camadas desacopladas facilitam testes
-- **Segurança**: Múltiplas camadas de proteção
-- **Performance**: Otimizações modernas implementadas
+## 📊 Monitoramento
 
-Para mais detalhes sobre implementações específicas, consulte os demais documentos em `docs/`.
+### Logging
+
+- **Estruturado:** Via `lib/logger.ts`
+- **Níveis:** `debug`, `warn`, `error`
+- **Contexto:** Tags e metadados
+
+### Métricas
+
+- **Web Vitals:** Coletados via `/api/analytics/web-vitals`
+- **Performance:** Monitoramento de queries e operações
+
+---
+
+## 🚀 Deploy
+
+### Vercel
+
+- **Web App:** Deploy automático via GitHub
+- **Edge Runtime:** Para `proxy.ts` e API routes
+- **Cron Jobs:** Configurados em `vercel.json`
+
+### Variáveis de Ambiente
+
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY`
+
+---
+
+## 📚 Padrões de Código
+
+### Clean Architecture
+
+- **Camada de Apresentação:** `app/`, `components/`
+- **Camada de Aplicação:** `lib/services/`
+- **Camada de Domínio:** `lib/repositories/`
+- **Infraestrutura:** `lib/supabase-*`
+
+### Repository Pattern
+
+- Abstração de acesso a dados
+- Facilita testes e manutenção
+
+---
+
+## 🔍 Diagramas
+
+Ver diagramas em `/docs/diagrams/`:
+- Fluxograma completo do sistema
+- Fluxo de login
+- Fluxo de viagens
+
+---
+
+**Última atualização:** 2025-01-XX

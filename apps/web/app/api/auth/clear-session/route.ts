@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
+import { logError } from '@/lib/logger'
 
 export async function POST(req: NextRequest) {
   try {
@@ -44,7 +45,7 @@ export async function POST(req: NextRequest) {
 
     return res
   } catch (error: any) {
-    console.error("Erro ao limpar sessão:", error)
+    logError('Erro ao limpar sessão', { error }, 'ClearSessionAPI')
     return NextResponse.json({ error: error?.message || "unexpected_error" }, { status: 500 })
   }
 }

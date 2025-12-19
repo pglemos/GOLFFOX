@@ -17,7 +17,7 @@ jest.mock('next/server', () => {
   }
 })
 
-import { middleware } from '../middleware'
+import proxy from '../proxy'
 
 function makeReq(url: string) {
   const u = new URL(url)
@@ -38,7 +38,7 @@ function makeReq(url: string) {
   } as any
 }
 
-describe('middleware operator URL normalization', () => {
+describe('proxy operator URL normalization', () => {
   beforeEach(() => {
     process.env.NODE_ENV = 'test'
     delete process.env.NEXT_PUBLIC_BASE_URL
@@ -46,7 +46,7 @@ describe('middleware operator URL normalization', () => {
 
   test('redirects /operator?company=abc to /operator', async () => {
     const req = makeReq('http://localhost/operator?company=abc')
-    const res = await middleware(req)
+    const res = await proxy(req)
     expect(res.status).toBeGreaterThanOrEqual(300)
     const location = res.headers.get('location') || res.headers.get('Location')
     expect(location).toBe('http://localhost/operator')
@@ -54,14 +54,14 @@ describe('middleware operator URL normalization', () => {
 
   test('preserves other params while removing company', async () => {
     const req = makeReq('http://localhost/operator/funcionarios?company=abc&foo=1')
-    const res = await middleware(req)
+    const res = await proxy(req)
     const location = res.headers.get('location') || res.headers.get('Location')
     expect(location).toBe('http://localhost/operator/funcionarios?foo=1')
   })
 
   test('without company param, no normalization redirect; auth may redirect', async () => {
     const req = makeReq('http://localhost/operator/funcionarios?search=joao')
-    const res = await middleware(req)
+    const res = await proxy(req)
     const location = res.headers.get('location') || ''
     expect(location.includes('/login?next=')).toBe(true)
   })

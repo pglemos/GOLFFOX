@@ -16,8 +16,33 @@ const EMAIL_REGEX =
   /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
 const PASSWORD_REGEX = /^(?=.*[A-Z])(?=.*\d).{8,}$/
 
-const AUTH_ENDPOINT = process.env.NEXT_PUBLIC_AUTH_ENDPOINT ?? "/api/auth/login"
+const DEFAULT_AUTH_ENDPOINT = "/api/auth/login"
+const AUTH_ENDPOINT = process.env.NEXT_PUBLIC_AUTH_ENDPOINT ?? DEFAULT_AUTH_ENDPOINT
 const DEFAULT_LOGGED_URL = process.env.NEXT_PUBLIC_LOGGED_URL ?? "/operador"
+
+function resolveAuthEndpoint(raw: string): string {
+  const trimmed = (raw || DEFAULT_AUTH_ENDPOINT).trim()
+  if (!trimmed) return DEFAULT_AUTH_ENDPOINT
+  if (trimmed.startsWith("/")) return trimmed
+
+  // Treat as path-like value (e.g. "api/auth/login")
+  if (!/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(trimmed)) {
+    return `/${trimmed.replace(/^\/+/, "")}`
+  }
+
+  // Absolute URL (helps avoid CORS issues when host differs like 0.0.0.0/127.0.0.1/localhost)
+  try {
+    const url = new URL(trimmed)
+    const isLocalHost =
+      url.hostname === "localhost" || url.hostname === "127.0.0.1" || url.hostname === "0.0.0.0"
+    if (typeof window !== "undefined" && isLocalHost) {
+      return `${url.pathname}${url.search}`
+    }
+    return url.toString()
+  } catch {
+    return DEFAULT_AUTH_ENDPOINT
+  }
+}
 
 const sanitizeInput = (value: string) => value.replace(/[<>"'`;()]/g, "").trim()
 
@@ -87,6 +112,7 @@ FloatingOrbs.displayName = "FloatingOrbs"
 function LoginContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const resolvedAuthEndpoint = useMemo(() => resolveAuthEndpoint(AUTH_ENDPOINT), [])
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [loading, setLoading] = useState(false)
@@ -410,7 +436,8 @@ function LoginContent() {
       }
 
       const controller = new AbortController()
-      const timeoutId = window.setTimeout(() => controller.abort(), 10_000)
+      const requestTimeoutMs = process.env.NODE_ENV === 'development' ? 60_000 : 15_000
+      const timeoutId = window.setTimeout(() => controller.abort(), requestTimeoutMs)
       const maskedEmail = sanitizedEmail.replace(/^(.{2}).+(@.*)$/, "$1***$2")
 
       try {
@@ -486,7 +513,7 @@ function LoginContent() {
 
         console.log('✅ [CSRF] Token final obtido:', finalCsrfToken.substring(0, 10) + '...')
         console.log('🔍 [LOGIN] Preparando requisição:', {
-          endpoint: AUTH_ENDPOINT,
+          endpoint: resolvedAuthEndpoint,
           hasEmail: !!sanitizedEmail,
           hasPassword: !!sanitizedPassword,
           emailLength: sanitizedEmail?.length,
@@ -495,7 +522,7 @@ function LoginContent() {
 
         let response: Response
         try {
-          response = await fetch(AUTH_ENDPOINT, {
+          response = await fetch(resolvedAuthEndpoint, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -589,6 +616,7 @@ function LoginContent() {
         const token = data?.token
         const user = data?.user
         const sessionData = data?.session
+        const refreshToken = data?.refreshToken ?? sessionData?.refresh_token
         if (user && !user.email && sessionData?.user?.email) {
           user.email = sessionData.user.email
         }
@@ -636,7 +664,7 @@ function LoginContent() {
         // ✅ OTIMIZADO: Processar sessão de forma síncrona e rápida
         // O cookie já foi definido pelo servidor, então apenas persistir no cliente
         // ✅ Incluir name e avatar_url para exibição no Topbar
-        AuthManager.persistSession(
+        await AuthManager.persistSession(
           {
             id: user.id,
             email: user.email,
@@ -645,7 +673,7 @@ function LoginContent() {
             name: user.name || user.email.split('@')[0],
             avatar_url: user.avatar_url || null,
           },
-          { token, storage: rememberMe ? "both" : "session" }
+          { accessToken: token, refreshToken, storage: rememberMe ? "both" : "session" }
         )
 
         setFailedAttempts(0)
@@ -778,6 +806,7 @@ function LoginContent() {
       router,
       searchParams,
       rememberMe,
+      resolvedAuthEndpoint,
     ]
   )
 
@@ -1083,7 +1112,7 @@ function LoginContent() {
 
                 {/* Mobile: Formulário Premium */}
                 <form
-                  action={AUTH_ENDPOINT}
+                  action={resolvedAuthEndpoint}
                   method="post"
                   onSubmit={(e) => {
                     e.preventDefault()
@@ -1394,7 +1423,7 @@ function LoginContent() {
 
               {/* Formulário minimalista */}
               <form
-                action={AUTH_ENDPOINT}
+                action={resolvedAuthEndpoint}
                 method="post"
                 onSubmit={(e) => {
                   e.preventDefault()

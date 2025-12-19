@@ -5,7 +5,8 @@ import { AppShell } from "@/components/app-shell"
 import { Button } from "@/components/ui/button"
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card"
 import { supabase } from "@/lib/supabase"
-import { useRouter } from "next/navigation"
+import { ensureSupabaseSession } from "@/lib/supabase-session"
+import { useRouter } from "@/lib/next-navigation"
 
 import { ControlTowerCards } from "@/components/empresa/control-tower-cards"
 import { useEmpresaTenant } from "@/components/providers/empresa-tenant-provider"
@@ -88,6 +89,7 @@ export default function EmpresaDashboard() {
                   role: userData.role
                 })
                 setUser(userData)
+                await ensureSupabaseSession()
                 setLoading(false)
                 return
               }
@@ -98,11 +100,7 @@ export default function EmpresaDashboard() {
         }
 
         // ✅ FALLBACK: Tentar obter sessão do Supabase Auth
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession()
-        if (sessionError) {
-          console.error('Erro ao verificar sessão Supabase:', sessionError)
-          // Não definir erro imediatamente - pode ser apenas falta de sessão Supabase
-        }
+        const session = await ensureSupabaseSession()
 
         if (!session) {
           // Se não há sessão Supabase e não há cookie, redirecionar para login

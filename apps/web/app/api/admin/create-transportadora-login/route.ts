@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requireAuth } from '@/lib/api-auth'
 import { z } from 'zod'
-import { logger } from '@/lib/logger'
+import { logger, logError } from '@/lib/logger'
 
 export const runtime = 'nodejs'
 
@@ -90,18 +90,18 @@ export async function POST(req: NextRequest) {
       })
 
     if (upsertError) {
-      console.error('❌ Erro ao criar/atualizar usuário na tabela users:', {
+      logError('Erro ao criar/atualizar usuário na tabela users', {
         message: upsertError.message,
         code: upsertError.code,
         details: upsertError.details,
         hint: upsertError.hint
-      })
+      }, 'CreateTransportadoraLoginAPI')
       // Tentar remover usuário do Auth se possível
       try {
         await supabaseAdmin.auth.admin.deleteUser(authData.user.id)
         logger.log('✅ Usuário removido do Auth após falha ao criar registro')
       } catch (deleteError) {
-        console.error('❌ Erro ao remover usuário do Auth após falha:', deleteError)
+        logError('Erro ao remover usuário do Auth após falha', { error: deleteError }, 'CreateTransportadoraLoginAPI')
       }
       return NextResponse.json(
         {
@@ -135,7 +135,7 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       )
     }
-    console.error('Erro ao criar login transportadora:', error)
+    logError('Erro ao criar login transportadora', { error }, 'CreateTransportadoraLoginAPI')
     return NextResponse.json(
       { success: false, error: 'Erro ao processar requisição', message: error.message },
       { status: 500 }

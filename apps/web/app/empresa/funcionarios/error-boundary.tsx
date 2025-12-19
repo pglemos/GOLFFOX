@@ -1,9 +1,10 @@
-﻿"use client"
+"use client"
 
 import { Component, ReactNode } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { AlertCircle } from "lucide-react"
+import { logError } from "@/lib/logger"
 
 interface Props {
   children: ReactNode
@@ -25,7 +26,13 @@ export class FuncionariosErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: any) {
-    console.error('❌ Erro capturado pelo ErrorBoundary:', error, errorInfo)
+    logError('Erro capturado pelo ErrorBoundary', {
+      error: error.message,
+      stack: error.stack,
+      name: error.name,
+      componentStack: errorInfo.componentStack,
+      url: typeof window !== 'undefined' ? window.location.href : 'unknown'
+    }, 'FuncionariosErrorBoundary')
   }
 
   render() {

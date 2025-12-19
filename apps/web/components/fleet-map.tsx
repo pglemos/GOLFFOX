@@ -22,7 +22,7 @@ import { modalContent } from "@/lib/animations"
 import { loadGoogleMapsAPI } from "@/lib/google-maps-loader"
 import { TemporalProgressBar } from "./temporal-progress-bar"
 import { InteractiveMarkerHotspot } from "./interactive-marker-hotspot"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useRouter, useSearchParams } from "@/lib/next-navigation"
 import { MarkerClusterer } from "@googlemaps/markerclusterer"
 import { formatRelativeTime } from "@/lib/kpi-utils"
 
@@ -178,9 +178,53 @@ export const FleetMap = memo(function FleetMap({ companyId, transportadoraId, ro
       }
 
       if (data) {
-        setBuses(data.buses || [])
-        setStops(data.stops || [])
-        setRoutes(data.routes || [])
+        const toNumber = (value: unknown): number | null => {
+          if (typeof value === 'number') return Number.isFinite(value) ? value : null
+          if (typeof value === 'string') {
+            const parsed = Number.parseFloat(value)
+            return Number.isFinite(parsed) ? parsed : null
+          }
+          return null
+        }
+
+        const rawBuses: any[] = Array.isArray((data as any).buses) ? (data as any).buses : []
+        const normalizedBuses = rawBuses
+          .map((bus: any) => {
+            const lat = toNumber(bus?.lat)
+            const lng = toNumber(bus?.lng)
+            return {
+              ...bus,
+              lat,
+              lng,
+              heading: toNumber(bus?.heading) ?? 0,
+              speed: toNumber(bus?.speed) ?? 0,
+              passenger_count: Number.isFinite(Number(bus?.passenger_count)) ? Number(bus?.passenger_count) : 0,
+              capacity: Number.isFinite(Number(bus?.capacity)) ? Number(bus?.capacity) : undefined,
+            }
+          })
+          .filter((bus: any) => typeof bus?.lat === 'number' && typeof bus?.lng === 'number')
+
+        const rawStops: any[] = Array.isArray((data as any).stops) ? (data as any).stops : []
+        const normalizedStops = rawStops
+          .map((stop: any) => {
+            const lat = toNumber(stop?.lat)
+            const lng = toNumber(stop?.lng)
+            return { ...stop, lat, lng }
+          })
+          .filter((stop: any) => typeof stop?.lat === 'number' && typeof stop?.lng === 'number')
+
+        const rawRoutes: any[] = Array.isArray((data as any).routes) ? (data as any).routes : []
+        const normalizedRoutes = rawRoutes.map((route: any) => {
+          const points: any[] = Array.isArray(route?.polyline_points) ? route.polyline_points : []
+          const normalizedPoints = points
+            .map((p: any) => ({ lat: toNumber(p?.lat), lng: toNumber(p?.lng) }))
+            .filter((p: any) => typeof p.lat === 'number' && typeof p.lng === 'number')
+          return { ...route, polyline_points: normalizedPoints }
+        })
+
+        setBuses(normalizedBuses)
+        setStops(normalizedStops)
+        setRoutes(normalizedRoutes)
       }
     } catch (error) {
       logError('Erro ao carregar dados do mapa', { error }, 'FleetMap')

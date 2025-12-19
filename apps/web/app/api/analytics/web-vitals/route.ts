@@ -5,6 +5,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { withRateLimit } from '@/lib/rate-limit'
+import { logError } from '@/lib/logger'
 
 export const runtime = 'nodejs'
 
@@ -53,7 +54,7 @@ async function postHandler(request: NextRequest) {
         })
 
         if (error) {
-          console.error('Erro ao salvar Web Vitals:', error)
+          logError('Erro ao salvar Web Vitals', { error, url }, 'WebVitalsAPI')
         }
 
         // Verificar métricas com rating 'poor' e gerar alertas
@@ -72,12 +73,12 @@ async function postHandler(request: NextRequest) {
           })
         }
       } catch (supabaseError) {
-        console.error('Erro Supabase (Web Vitals):', supabaseError)
+        logError('Erro Supabase ao processar Web Vitals', { error: supabaseError, url }, 'WebVitalsAPI')
       }
     }
     return NextResponse.json({ success: true })
   } catch (error: any) {
-    console.error('Erro ao processar Web Vitals:', error)
+    logError('Erro ao processar Web Vitals', { error }, 'WebVitalsAPI')
     // Não falhar para o cliente de analytics; responder sucesso mesmo em erros internos
     return NextResponse.json({ success: false })
   }

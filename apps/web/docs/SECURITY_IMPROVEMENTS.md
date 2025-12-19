@@ -2,20 +2,22 @@
 
 Este documento descreve as melhorias de segurança implementadas no sistema GolfFox.
 
-## 1. Validação de Token no Middleware
+## 1. Validação de Token no Proxy (Middleware)
 
 ### Problema Anterior
-O middleware verificava apenas a existência do cookie `golffox-session` sem validar o token com o Supabase, permitindo acesso não autorizado com cookies forjados.
+O proxy (anteriormente middleware) verificava apenas a existência do cookie `golffox-session` sem validar o token com o Supabase, permitindo acesso não autorizado com cookies forjados.
 
 ### Solução Implementada
 - Validação do `access_token` usando `supabase.auth.getUser()` antes de liberar rotas protegidas
 - Extração de token de múltiplas fontes (cookie golffox-session, cookie Supabase)
-- Logs de debug em desenvolvimento para facilitar troubleshooting
+- Logging estruturado usando `lib/logger.ts` para facilitar troubleshooting
+- Centralização da autenticação usando `lib/api-auth.ts` (validateAuth, hasRole)
 
 **Arquivos modificados:**
-- `apps/web/middleware.ts`
+- `apps/web/proxy.ts` (anteriormente middleware.ts)
+- `apps/web/lib/api-auth.ts` (refatorado para usar logger estruturado)
 
-**Impacto:** Previne acesso não autorizado a rotas `/admin`, `/operador` e `/transportadora` com cookies forjados.
+**Impacto:** Previne acesso não autorizado a rotas `/admin`, `/empresa` e `/transportadora` com cookies forjados.
 
 ---
 
@@ -104,7 +106,7 @@ Para validar as melhorias de segurança:
    - Abrir DevTools → Console
    - Verificar que não há avisos de CSP em produção
 
-4. **Testar middleware:**
+4. **Testar proxy:**
    - Tentar criar cookie forjado e acessar rota protegida
    - Deve falhar na validação do token
 

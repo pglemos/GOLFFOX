@@ -7,6 +7,7 @@ export interface UserData {
   email: string
   role: string
   accessToken: string
+  refreshToken?: string
   name?: string
   avatar_url?: string | null
   companyId?: string | null
@@ -34,10 +35,14 @@ export class AuthManager {
           id: data.user.id,
           email: data.user.email || '',
           role: userRole,
-          accessToken: data.session.access_token
+          accessToken: data.session.access_token,
+          refreshToken: data.session.refresh_token,
         }
 
-        this.persistSession(userData, { token: data.session.access_token })
+        this.persistSession(userData, {
+          accessToken: data.session.access_token,
+          refreshToken: data.session.refresh_token,
+        })
 
         return { success: true, user: userData }
       }
@@ -140,15 +145,29 @@ export class AuthManager {
   }
 
 
-  static async persistSession(userData: UserData, options?: { storage?: 'local' | 'session' | 'both'; token?: string }) {
+  static async persistSession(
+    userData: UserData,
+    options?: {
+      storage?: 'local' | 'session' | 'both'
+      token?: string
+      accessToken?: string
+      refreshToken?: string
+    }
+  ) {
     if (typeof window === 'undefined') return
 
+    const accessToken = options?.accessToken ?? options?.token ?? userData.accessToken
+    const refreshToken = options?.refreshToken ?? userData.refreshToken
+
+    options = options ?? {}
+    if (refreshToken) options.token = refreshToken
+
     // ✅ Sincronizar com Supabase Auth client-side
-    if (options?.token) {
+    if (accessToken && options.token) {
       try {
         // Não aguardar para não bloquear a UI
-        supabase.auth.setSession({
-          access_token: options.token,
+        await supabase.auth.setSession({
+          access_token: accessToken,
           refresh_token: options.token // Usar mesmo token se não tiver refresh
         }).then(({ error }: { error: any }) => {
           if (error) console.warn('Erro ao sincronizar sessão Supabase:', error)
@@ -210,7 +229,7 @@ export class AuthManager {
             role: userData.role,
             companyId: userData.companyId || null
           },
-          access_token: options?.token || userData.accessToken
+          access_token: accessToken
         })
       })
 

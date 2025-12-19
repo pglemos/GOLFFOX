@@ -1,10 +1,13 @@
 /**
  * Helper para validação de autenticação em rotas API
  * Previne duplicação de código e garante consistência
+ * 
+ * Segue as melhores práticas do Next.js 16.1 com logging estruturado
  */
 
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { debug, warn, error as logError } from '@/lib/logger'
 
 export interface AuthenticatedUser {
   id: string
@@ -14,6 +17,33 @@ export interface AuthenticatedUser {
 }
 
 const isDevelopment = process.env.NODE_ENV === 'development'
+
+function decodeBase64(raw: string): string | null {
+  try {
+    if (typeof Buffer !== 'undefined') {
+      return Buffer.from(raw, 'base64').toString('utf-8')
+    }
+    if (typeof atob !== 'undefined') {
+      const binary = atob(raw)
+      const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0))
+      return new TextDecoder().decode(bytes)
+    }
+  } catch {
+    return null
+  }
+  return null
+}
+
+function decodeBase64Json(raw: string): Record<string, unknown> | null {
+  const decoded = decodeBase64(raw)
+  if (!decoded) return null
+  try {
+    const parsed = JSON.parse(decoded)
+    return parsed && typeof parsed === 'object' ? (parsed as Record<string, unknown>) : null
+  } catch {
+    return null
+  }
+}
 
 /**
  * Valida autenticação SEMPRE buscando dados do Supabase
@@ -27,16 +57,17 @@ export async function validateAuth(request: NextRequest): Promise<AuthenticatedU
     const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
     if (!supabaseUrl || !supabaseAnonKey) {
-      console.error('❌ Supabase não configurado')
+      logError('Supabase não configurado', {
+        hasUrl: !!supabaseUrl,
+        hasAnonKey: !!supabaseAnonKey
+      }, 'ApiAuth')
       return null
     }
 
-    if (isDevelopment) {
-      console.log('🔍 validateAuth - Verificando autenticação', {
-        path: request.nextUrl.pathname,
-        method: request.method
-      })
-    }
+    debug('Verificando autenticação', {
+      path: request.nextUrl.pathname,
+      method: request.method
+    }, 'ApiAuth')
 
     let accessToken: string | null = null
     let tokenSource: string = 'none'
@@ -46,7 +77,7 @@ export async function validateAuth(request: NextRequest): Promise<AuthenticatedU
     if (authHeader && authHeader.startsWith('Bearer ')) {
       accessToken = authHeader.substring(7)
       tokenSource = 'header'
-      console.log('[AUTH] Token encontrado no header Authorization')
+      debug('Token encontrado no header Authorization', {}, 'ApiAuth')
     }
 
     // 2. Tentar obter do cookie do Supabase - PRIORIDADE ALTA (token sempre válido)
@@ -55,11 +86,10 @@ export async function validateAuth(request: NextRequest): Promise<AuthenticatedU
       if (projectRef) {
         const supabaseCookieName = `sb-${projectRef}-auth-token`
 
-        if (isDevelopment) {
-          const allCookies = request.cookies.getAll().map(c => c.name)
-          console.log('[AUTH] Cookies disponíveis:', allCookies.join(', '))
-          console.log('[AUTH] Procurando cookie do Supabase:', supabaseCookieName)
-        }
+        debug('Procurando cookie do Supabase', {
+          cookieName: supabaseCookieName,
+          availableCookies: request.cookies.getAll().map(c => c.name)
+        }, 'ApiAuth')
 
         const supabaseCookie = request.cookies.get(supabaseCookieName)?.value
 
@@ -70,19 +100,17 @@ export async function validateAuth(request: NextRequest): Promise<AuthenticatedU
             if (token) {
               accessToken = token
               tokenSource = 'supabase-cookie'
-              console.log('[AUTH] ✅ Token encontrado no cookie do Supabase')
+              debug('Token encontrado no cookie do Supabase', {}, 'ApiAuth')
             } else {
-              if (isDevelopment) {
-                console.warn('[AUTH] Cookie do Supabase encontrado mas sem access_token. Chaves:', Object.keys(tokenData).join(', '))
-              }
+              warn('Cookie do Supabase encontrado mas sem access_token', {
+                availableKeys: Object.keys(tokenData)
+              }, 'ApiAuth')
             }
           } catch (error) {
-            console.warn('[AUTH] Erro ao processar cookie do Supabase:', error)
+            warn('Erro ao processar cookie do Supabase', { error }, 'ApiAuth')
           }
         } else {
-          if (isDevelopment) {
-            console.log('[AUTH] Cookie do Supabase não encontrado:', supabaseCookieName)
-          }
+          debug('Cookie do Supabase não encontrado', { cookieName: supabaseCookieName }, 'ApiAuth')
         }
       }
     }
@@ -93,34 +121,36 @@ export async function validateAuth(request: NextRequest): Promise<AuthenticatedU
       const golffoxSession = request.cookies.get('golffox-session')?.value
 
       if (golffoxSession) {
-        try {
-          // Decodificar cookie base64
-          const decoded = Buffer.from(golffoxSession, 'base64').toString('utf-8')
-          const sessionData = JSON.parse(decoded)
+        const sessionData = decodeBase64Json(golffoxSession)
+        if (sessionData) {
 
           // Tentar obter access_token do cookie customizado
           // Suportar tanto access_token (server-side) quanto accessToken (client-side AuthManager)
-          const token = sessionData.access_token || sessionData.accessToken
+          const token = (sessionData as any).access_token || (sessionData as any).accessToken
 
           if (token) {
             accessToken = token
             tokenSource = 'custom-cookie'
-            console.log('[AUTH] Token encontrado no cookie customizado (golffox-session)')
+            debug('Token encontrado no cookie customizado (golffox-session)', {}, 'ApiAuth')
           } else {
-            console.warn('[AUTH] Cookie customizado encontrado mas sem access_token. Chaves disponíveis:', Object.keys(sessionData).join(', '))
+            warn('Cookie customizado encontrado mas sem access_token', {
+              availableKeys: Object.keys(sessionData)
+            }, 'ApiAuth')
           }
-        } catch (error) {
-          console.error('[AUTH] Erro ao processar cookie customizado:', error)
+        } else {
+          logError('Erro ao processar cookie customizado', { error: 'decode_failed' }, 'ApiAuth')
         }
       } else {
-        if (isDevelopment) {
-          console.log('[AUTH] Cookie golffox-session não encontrado. Cookies disponíveis:', request.cookies.getAll().map(c => c.name).join(', '))
-        }
+        debug('Cookie golffox-session não encontrado', {
+          availableCookies: request.cookies.getAll().map(c => c.name)
+        }, 'ApiAuth')
       }
     }
 
     if (!accessToken) {
-      console.warn('[AUTH] Token de acesso não encontrado em nenhum lugar')
+      warn('Token de acesso não encontrado em nenhum lugar', {
+        path: request.nextUrl.pathname
+      }, 'ApiAuth')
       return null
     }
 
@@ -129,26 +159,27 @@ export async function validateAuth(request: NextRequest): Promise<AuthenticatedU
       auth: { persistSession: false, autoRefreshToken: false }
     })
 
-    if (isDevelopment) {
-      console.log('[AUTH] Tentando validar token do Supabase. Fonte:', tokenSource, 'Token length:', accessToken?.length || 0)
-    }
+    debug('Validando token do Supabase', {
+      source: tokenSource,
+      tokenLength: accessToken?.length || 0
+    }, 'ApiAuth')
 
     const { data: { user }, error: authError } = await supabase.auth.getUser(accessToken)
 
     if (authError || !user) {
-      console.error('[AUTH] Erro ao validar token com Supabase:', {
+      logError('Erro ao validar token com Supabase', {
         message: authError?.message || 'Usuário nulo',
         status: authError?.status,
         name: authError?.name,
         tokenSource,
         tokenLength: accessToken?.length || 0
-      })
+      }, 'ApiAuth')
       return null
     }
 
     // 5. SEMPRE buscar dados completos do usuário no banco de dados
     if (!serviceKey) {
-      console.error('[AUTH] Service role key não configurada')
+      logError('Service role key não configurada', {}, 'ApiAuth')
       return null
     }
 
@@ -164,12 +195,17 @@ export async function validateAuth(request: NextRequest): Promise<AuthenticatedU
       .maybeSingle()
 
     if (dbError) {
-      console.error('[AUTH] Erro ao buscar dados do usuário no banco:', dbError)
+      logError('Erro ao buscar dados do usuário no banco', {
+        error: dbError,
+        userId: user.id
+      }, 'ApiAuth')
       return null
     }
 
     if (!userData) {
-      console.error('[AUTH] Usuário não encontrado na tabela users:', user.id)
+      logError('Usuário não encontrado na tabela users', {
+        userId: user.id
+      }, 'ApiAuth')
       return null
     }
 
@@ -181,16 +217,15 @@ export async function validateAuth(request: NextRequest): Promise<AuthenticatedU
       companyId: userData.company_id || null
     }
 
-    if (isDevelopment) {
-      console.log('✅ Usuário autenticado e dados obtidos do banco:', {
-        id: authenticatedUser.id,
-        role: authenticatedUser.role
-      })
-    }
+    debug('Usuário autenticado e dados obtidos do banco', {
+      id: authenticatedUser.id,
+      role: authenticatedUser.role,
+      email: authenticatedUser.email.replace(/^(.{2}).+(@.*)$/, '$1***$2') // Mascarar email
+    }, 'ApiAuth')
 
     return authenticatedUser
   } catch (error) {
-    console.error('❌ Erro inesperado na autenticação:', error)
+    logError('Erro inesperado na autenticação', { error }, 'ApiAuth')
     return null
   }
 }
@@ -234,9 +269,10 @@ export async function requireAuth(
   const user = await validateAuth(request)
 
   if (!user) {
-    if (isDevelopment) {
-      console.error('❌ Autenticação falhou para:', request.nextUrl.pathname)
-    }
+    logError('Autenticação falhou', {
+      path: request.nextUrl.pathname,
+      method: request.method
+    }, 'ApiAuth')
 
     return NextResponse.json(
       {

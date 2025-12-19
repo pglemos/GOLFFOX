@@ -4,7 +4,7 @@ Use este checklist para validar que todas as correções foram implementadas cor
 
 ## ✅ Segurança
 
-### Middleware de Autenticação
+### Proxy de Autenticação (Middleware)
 - [ ] Acessar `/admin` sem estar logado redireciona para `/`
 - [ ] Cookie forjado não permite acesso a rotas protegidas
 - [ ] Logs de debug aparecem no console em desenvolvimento
@@ -122,9 +122,10 @@ Antes de fazer deploy em produção:
 
 ## 🐛 Troubleshooting
 
-### Middleware não valida tokens
+### Proxy não valida tokens
 - Verificar que `NEXT_PUBLIC_SUPABASE_URL` e `NEXT_PUBLIC_SUPABASE_ANON_KEY` estão configuradas
-- Verificar logs no console (desenvolvimento)
+- Verificar logs estruturados usando `lib/logger.ts` (desenvolvimento)
+- Verificar que `validateAuth` de `lib/api-auth.ts` está sendo usado
 
 ### Cookie não é HttpOnly
 - Verificar que está usando a API `/api/auth/set-session`

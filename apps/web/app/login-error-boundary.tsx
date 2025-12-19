@@ -4,6 +4,7 @@ import { Component, ReactNode } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { AlertCircle } from "lucide-react"
+import { logError } from "@/lib/logger"
 
 interface Props {
   children: ReactNode
@@ -25,7 +26,13 @@ export class LoginErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: any) {
-    console.error('❌ Erro capturado na página de login:', error, errorInfo)
+    logError('Erro capturado na página de login', {
+      error: error.message,
+      stack: error.stack,
+      name: error.name,
+      componentStack: errorInfo.componentStack,
+      url: typeof window !== 'undefined' ? window.location.href : 'unknown'
+    }, 'LoginErrorBoundary')
   }
 
   render() {

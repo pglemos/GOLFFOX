@@ -29,7 +29,7 @@ Este guia fornece um checklist completo para testar todas as funcionalidades do 
 
 3. **Testar troca de empresa**
    - Selecione uma empresa diferente
-   - A URL NÃO deve adicionar `?company=` (middleware normaliza)
+   - A URL NÃO deve adicionar `?company=` (proxy normaliza)
    - Verifique se o localStorage persiste a seleção
    - Recarregue a página e verifique se a seleção persiste
 

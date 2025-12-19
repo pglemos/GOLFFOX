@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { debug, logError } from '@/lib/logger'
 
 // API para migrar usuários antigos para o novo formato de login com CPF
 // POST /api/admin/migrate-users-to-cpf-login
@@ -99,7 +100,7 @@ export async function POST(request: NextRequest) {
                 }
 
                 results.migrated++
-                console.log(`✅ Migrado: ${user.name} - ${newAuthEmail}`)
+                debug('Usuário migrado', { name: user.name, email: newAuthEmail.replace(/^(.{2}).+(@.*)$/, '$1***$2') }, 'MigrateUsersToCPFAPI')
 
             } catch (err: any) {
                 results.errors.push(`${user.name}: ${err.message}`)
@@ -112,7 +113,7 @@ export async function POST(request: NextRequest) {
             results
         })
     } catch (error: any) {
-        console.error('Erro na migração:', error)
+        logError('Erro na migração', { error }, 'MigrateUsersToCPFAPI')
         return NextResponse.json({ error: error.message }, { status: 500 })
     }
 }

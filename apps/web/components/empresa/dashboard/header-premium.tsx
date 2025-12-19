@@ -4,7 +4,7 @@ import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { MapPin, Building2 } from "lucide-react"
 import { fadeInUp } from "@/lib/animations"
-import { useRouter } from "next/navigation"
+import { useRouter } from "@/lib/next-navigation"
 
 interface HeaderPremiumProps {
   title: string

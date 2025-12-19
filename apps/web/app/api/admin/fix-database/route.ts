@@ -2,7 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requireAuth } from '@/lib/api-auth'
 import { withRateLimit } from '@/lib/rate-limit'
-import { logger } from '@/lib/logger'
+import { logError } from '@/lib/logger'
+import { withDangerousRouteAudit, AuditContext } from '@/lib/middleware/dangerous-route-audit'
+import { validateSQLOrThrow } from '@/lib/validation/sql-validator'
 
 export const runtime = 'nodejs'
 
@@ -15,7 +17,7 @@ function getSupabaseAdmin() {
   return createClient(url, serviceKey)
 }
 
-async function fixDatabaseHandler(request: NextRequest) {
+async function fixDatabaseHandler(request: NextRequest, auditContext: AuditContext) {
   try {
     // Validar autenticação (apenas admin)
     const authErrorResponse = await requireAuth(request, 'admin')
@@ -29,7 +31,6 @@ async function fixDatabaseHandler(request: NextRequest) {
       const requiredSecret = process.env.ADMIN_SECRET
       
       if (requiredSecret && adminSecret !== requiredSecret) {
-        logger.warn('Tentativa de acesso a rota perigosa sem secret', { path: request.nextUrl.pathname })
         return NextResponse.json(
           { error: 'Acesso negado', message: 'Secret adicional requerido para esta operação' },
           { status: 403 }
@@ -45,6 +46,9 @@ async function fixDatabaseHandler(request: NextRequest) {
       UPDATE companies SET updated_at = created_at WHERE updated_at IS NULL;
     `
 
+    // ✅ Validar SQL antes de executar
+    const validatedSQL = validateSQLOrThrow(sql)
+
     // Tentar executar via RPC (se disponível) ou usar query direta
     try {
       // Verificar se a coluna já existe (selecionar apenas id e updated_at para verificação)
@@ -57,7 +61,7 @@ async function fixDatabaseHandler(request: NextRequest) {
       if (company && !('updated_at' in company)) {
         // Tentar executar via função RPC (se existir)
         const { data: rpcResult, error: rpcError } = await supabaseAdmin.rpc('exec_sql', {
-          sql_query: sql
+          sql_query: validatedSQL
         })
 
         if (rpcError) {
@@ -65,7 +69,7 @@ async function fixDatabaseHandler(request: NextRequest) {
           return NextResponse.json({
             success: false,
             message: 'Não foi possível executar SQL automaticamente',
-            sql: sql,
+            sql: validatedSQL,
             instructions: 'Execute este SQL no Supabase Dashboard (SQL Editor)'
           })
         }
@@ -85,11 +89,14 @@ async function fixDatabaseHandler(request: NextRequest) {
       return NextResponse.json({
         success: false,
         message: 'Execute este SQL manualmente no Supabase Dashboard',
-        sql: sql
+        sql: validatedSQL
       })
     }
   } catch (err) {
-    console.error('Erro ao corrigir banco:', err)
+    logError('Erro ao corrigir banco', { 
+      error: err instanceof Error ? err.message : 'Erro desconhecido',
+      userId: auditContext.userId 
+    }, 'FixDatabaseAPI')
     const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
     return NextResponse.json(
       { error: 'Erro ao corrigir banco', message: errorMessage },
@@ -98,6 +105,12 @@ async function fixDatabaseHandler(request: NextRequest) {
   }
 }
 
-// Exportar com rate limiting muito restritivo
-export const POST = withRateLimit(fixDatabaseHandler, 'sensitive')
+// ✅ Exportar com auditoria obrigatória e rate limiting
+const handlerWithAudit = withDangerousRouteAudit(
+  fixDatabaseHandler,
+  'fix_database',
+  'database'
+)
+
+export const POST = withRateLimit(handlerWithAudit, 'sensitive')
 

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requireAuth } from '@/lib/api-auth'
-import { logger } from '@/lib/logger'
+import { logger, logError } from '@/lib/logger'
 
 export const runtime = 'nodejs'
 
@@ -216,7 +216,7 @@ export async function POST(request: NextRequest) {
         .single()
 
       if (companyError) {
-        console.error('Erro ao criar empresa:', companyError)
+        logError('Erro ao criar empresa', { error: companyError }, 'CreateEmpresaUserAPI')
         return NextResponse.json(
           { 
             error: 'Erro ao criar empresa',
@@ -388,7 +388,7 @@ export async function POST(request: NextRequest) {
           
           if (profileError2) {
             // Se ainda falhar, fazer rollback completo
-            console.error('Erro ao atualizar perfil (sem name):', profileError2)
+            logError('Erro ao atualizar perfil (sem name)', { error: profileError2 }, 'CreateEmpresaUserAPI')
             await supabaseAdmin.auth.admin.deleteUser(userId)
             await supabaseAdmin.from('companies').delete().eq('id', finalCompanyId)
             return NextResponse.json(
@@ -402,7 +402,7 @@ export async function POST(request: NextRequest) {
           }
         } else {
           // Outro tipo de erro - fazer rollback
-          console.error('Erro ao atualizar perfil:', profileError)
+          logError('Erro ao atualizar perfil', { error: profileError }, 'CreateEmpresaUserAPI')
           await supabaseAdmin.auth.admin.deleteUser(authData.user.id)
           await supabaseAdmin.from('companies').delete().eq('id', company.id)
           return NextResponse.json(
@@ -426,7 +426,7 @@ export async function POST(request: NextRequest) {
         
         if (profileError) {
           // Se falhar, fazer rollback completo
-          console.error('Erro ao atualizar perfil (fallback):', profileError)
+          logError('Erro ao atualizar perfil (fallback)', { error: profileError }, 'CreateEmpresaUserAPI')
           await supabaseAdmin.auth.admin.deleteUser(userId)
           await supabaseAdmin.from('companies').delete().eq('id', companyId)
           return NextResponse.json(
@@ -440,12 +440,12 @@ export async function POST(request: NextRequest) {
         }
       } catch (e2) {
         // Erro inesperado - fazer rollback completo
-        console.error('Erro ao atualizar perfil (fallback também falhou):', e2)
+        logError('Erro ao atualizar perfil (fallback também falhou)', { error: e2 }, 'CreateEmpresaUserAPI')
         try {
           await supabaseAdmin.auth.admin.deleteUser(userId)
           await supabaseAdmin.from('companies').delete().eq('id', finalCompanyId)
         } catch (cleanupError) {
-          console.error('Erro ao fazer rollback:', cleanupError)
+          logError('Erro ao fazer rollback', { error: cleanupError }, 'CreateEmpresaUserAPI')
         }
         return NextResponse.json(
           { 
@@ -572,7 +572,7 @@ export async function POST(request: NextRequest) {
       },
     }, { status: 201 })
   } catch (err) {
-    console.error('Erro ao criar operador:', err)
+    logError('Erro ao criar operador', { error: err }, 'CreateEmpresaUserAPI')
     // Retornar mensagem de erro mais descritiva
     const errorMessage = err instanceof Error ? err.message : 'Erro ao criar operador'
     const errorDetails = process.env.NODE_ENV === 'development' ? {

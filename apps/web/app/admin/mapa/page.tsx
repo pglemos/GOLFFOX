@@ -3,7 +3,7 @@
 import { Suspense } from "react"
 import { AppShell } from "@/components/app-shell"
 import dynamic from "next/dynamic"
-import { useSearchParams } from "next/navigation"
+import { useSearchParams } from "@/lib/next-navigation"
 import { motion } from "framer-motion"
 import { MapPin } from "lucide-react"
 import { useAuthFast } from "@/hooks/use-auth-fast"

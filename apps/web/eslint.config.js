@@ -12,7 +12,6 @@ module.exports = [
       "app/transportadora/motoristas/page.tsx",
       "app/transportadora/motoristas/ranking/page.tsx",
       "components/empresa/dashboard/control-tower-visual.tsx",
-      "components/empresa/operator/dashboard/control-tower-visual.tsx",
     ],
     rules: {
       "@typescript-eslint/no-require-imports": "off",
@@ -33,6 +32,17 @@ module.exports = [
       "react-hooks/use-memo": "warn",
       "react/no-unescaped-entities": "warn",
       "@next/next/no-img-element": "warn",
+      // Prevenir uso direto de console.* - usar logger estruturado
+      "no-console": ["warn", {
+        allow: [] // Não permitir nenhum console.* direto
+      }],
+    },
+  },
+  // Permitir console.* apenas em arquivos de teste e scripts
+  {
+    files: ["**/*.test.{ts,tsx}", "**/*.spec.{ts,tsx}", "scripts/**/*.{js,ts}"],
+    rules: {
+      "no-console": "off",
     },
   },
 ]

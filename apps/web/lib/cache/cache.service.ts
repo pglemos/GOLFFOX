@@ -207,12 +207,18 @@ export function createNextCache<T extends (...args: any[]) => Promise<any>>(
  *    - Não persiste entre requests
  *    - Ideal para: Server Components, Route Handlers
  * 
- * 2. createNextCache() - Cache persistente do Next.js
+ * 2. Redis Cache (redis-cache.service.ts) - Cache distribuído
+ *    - Use para cache compartilhado entre instâncias (Vercel)
+ *    - Persiste entre requests e deployments
+ *    - Ideal para: KPIs, queries pesadas, dados raramente alterados
+ *    - TTL configurável, invalidação por tags
+ * 
+ * 3. createNextCache() - Cache persistente do Next.js
  *    - Use para cache que deve persistir entre requests
  *    - Integrado com revalidateTag() e revalidatePath()
  *    - Ideal para: Dados que mudam raramente, queries de banco pesadas
  * 
- * 3. cache() do React - Memoização por request
+ * 4. cache() do React - Memoização por request
  *    - Use em Server Components para evitar work duplicado
  *    - Automático, não precisa de chaves
  *    - Ideal para: Funções de fetch em Server Components

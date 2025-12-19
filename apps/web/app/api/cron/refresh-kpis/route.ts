@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseServiceRole } from '@/lib/supabase-server'
+import { logError, debug } from '@/lib/logger'
+import { redisCacheService, createCacheKey } from '@/lib/cache/redis-cache.service'
 
 export async function GET(request: NextRequest) {
   const authHeader = request.headers.get('authorization')
@@ -52,7 +54,7 @@ export async function GET(request: NextRequest) {
     const { error: rpcError } = await supabaseServiceRole.rpc('refresh_mv_operator_kpis')
     
     if (rpcError) {
-      console.error('Erro ao atualizar MV de KPIs:', rpcError)
+      logError('Erro ao atualizar MV de KPIs', { error: rpcError }, 'CronRefreshKPIs')
       
       // Se a função não existe, retornar erro mais descritivo
       if (rpcError.message && rpcError.message.includes('function') && rpcError.message.includes('does not exist')) {
@@ -76,13 +78,18 @@ export async function GET(request: NextRequest) {
       )
     }
 
+    // ✅ Invalidar cache de KPIs após atualização
+    const cacheKey = createCacheKey('kpis', 'admin')
+    await redisCacheService.invalidate(cacheKey)
+    debug('Cache de KPIs invalidado após refresh', {}, 'CronRefreshKPIs')
+
     return NextResponse.json({ 
       success: true, 
       refreshed_at: new Date().toISOString(),
       message: 'KPIs atualizados com sucesso'
     })
   } catch (error: any) {
-    console.error('Erro ao executar refresh_mv_operator_kpis:', error)
+    logError('Erro ao executar refresh_mv_operator_kpis', { error }, 'CronRefreshKPIs')
     return NextResponse.json(
       { 
         error: 'Erro interno ao processar requisição',

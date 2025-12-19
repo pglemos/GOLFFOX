@@ -41,7 +41,7 @@ Todas as tarefas foram executadas com sucesso de forma **100% remota e autônoma
 **Status:** ✅ **COMPLETO**
 
 **Scripts criados:**
-- `apps/web/scripts/test-auth-middleware.js` - Teste automatizado
+- `apps/web/scripts/test-auth-middleware.js` - Teste automatizado do proxy (anteriormente middleware)
 - `apps/web/scripts/test-cookie-httponly.md` - Guia de teste manual
 - `apps/web/package.json` - Script `npm run test:auth` adicionado
 

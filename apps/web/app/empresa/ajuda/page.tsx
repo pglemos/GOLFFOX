@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button"
 import { HelpCircle, MessageCircle, FileText, ExternalLink } from "lucide-react"
 import { motion } from "framer-motion"
 import { supabase } from "@/lib/supabase"
-import { useRouter } from "next/navigation"
+import { useRouter } from "@/lib/next-navigation"
 
 export default function AjudaOperatorPage() {
   const router = useRouter()

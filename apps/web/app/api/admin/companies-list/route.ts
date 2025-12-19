@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requireAuth } from '@/lib/api-auth'
-import { logger } from '@/lib/logger'
+import { logger, logError } from '@/lib/logger'
 
 export const runtime = 'nodejs'
 
@@ -72,7 +72,7 @@ export async function GET(request: NextRequest) {
     }
 
     if (error) {
-      console.error('❌ Erro ao buscar empresas:', error)
+      logError('Erro ao buscar empresas', { error }, 'CompaniesListAPI')
       return NextResponse.json(
         { success: false, error: 'Erro ao buscar empresas', message: error.message },
         { status: 500 }
@@ -93,7 +93,7 @@ export async function GET(request: NextRequest) {
       companies: formattedCompanies
     })
   } catch (error: any) {
-    console.error('Erro ao listar empresas:', error)
+    logError('Erro ao listar empresas', { error }, 'CompaniesListAPI')
     return NextResponse.json(
       { success: false, error: 'Erro ao listar empresas', message: error.message },
       { status: 500 }

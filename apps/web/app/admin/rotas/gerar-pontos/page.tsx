@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card"
 import { AlertCircle } from "lucide-react"
 import { useAuthFast } from "@/hooks/use-auth-fast"
 import StopGenerator from '../../../../components/stop-generation/stop-generator'
-import { useSearchParams } from "next/navigation"
+import { useSearchParams } from "@/lib/next-navigation"
 import { motion } from "framer-motion"
 
 function GerarPontosContent() {

@@ -1,6 +1,7 @@
 "use server"
 
 import { NextResponse } from "next/server"
+import { logError } from '@/lib/logger'
 
 export async function GET() {
     try {
@@ -31,7 +32,7 @@ export async function GET() {
 
         return NextResponse.json({ kpis, distribution, monthlyTrend })
     } catch (error) {
-        console.error('Erro na rota custos:', error)
+        logError('Erro na rota custos', { error }, 'CustosAPI')
         return NextResponse.json(
             { error: 'Erro ao processar requisição' },
             { status: 500 }

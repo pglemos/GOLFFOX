@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseServiceRole } from '@/lib/supabase-server'
+import { logError } from '@/lib/logger'
 
 export async function GET(request: NextRequest) {
   const authHeader = request.headers.get('authorization')
@@ -25,7 +26,7 @@ export async function GET(request: NextRequest) {
     const { error } = await (supabaseServiceRole.rpc as any)('refresh_mv_costs_monthly')
     
     if (error) {
-      console.error('Erro ao atualizar MV de custos:', error)
+      logError('Erro ao atualizar MV de custos', { error }, 'CronRefreshCostsMV')
       return NextResponse.json(
         { error: error.message },
         { status: 500 }
@@ -37,7 +38,7 @@ export async function GET(request: NextRequest) {
       refreshed_at: new Date().toISOString() 
     })
   } catch (error: any) {
-    console.error('Erro ao executar refresh_mv_costs_monthly:', error)
+    logError('Erro ao executar refresh_mv_costs_monthly', { error }, 'CronRefreshCostsMV')
     return NextResponse.json(
       { error: error.message || 'Erro desconhecido' },
       { status: 500 }

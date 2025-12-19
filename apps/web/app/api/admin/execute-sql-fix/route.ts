@@ -2,7 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requireAuth } from '@/lib/api-auth'
 import { withRateLimit } from '@/lib/rate-limit'
-import { logger } from '@/lib/logger'
+import { logError } from '@/lib/logger'
+import { withDangerousRouteAudit, AuditContext } from '@/lib/middleware/dangerous-route-audit'
+import { validateSQLOrThrow } from '@/lib/validation/sql-validator'
 
 export const runtime = 'nodejs'
 
@@ -15,7 +17,7 @@ function getSupabaseAdmin() {
   return createClient(url, serviceKey)
 }
 
-async function executeSqlFixHandler(request: NextRequest) {
+async function executeSqlFixHandler(request: NextRequest, auditContext: AuditContext) {
   try {
     // Validar autenticação (apenas admin)
     const authErrorResponse = await requireAuth(request, 'admin')
@@ -30,7 +32,6 @@ async function executeSqlFixHandler(request: NextRequest) {
       const requiredSecret = process.env.ADMIN_SECRET
       
       if (requiredSecret && adminSecret !== requiredSecret) {
-        logger.warn('Tentativa de acesso a rota perigosa sem secret', { path: request.nextUrl.pathname })
         return NextResponse.json(
           { error: 'Acesso negado', message: 'Secret adicional requerido para esta operação' },
           { status: 403 }
@@ -41,7 +42,6 @@ async function executeSqlFixHandler(request: NextRequest) {
     const supabaseAdmin = getSupabaseAdmin()
 
     // Criar função SQL que pode ser executada via RPC
-    // Primeiro, vamos tentar criar a função via uma chamada direta
     const createFunctionSQL = `
       CREATE OR REPLACE FUNCTION fix_companies_updated_at()
       RETURNS void AS $$
@@ -83,6 +83,9 @@ async function executeSqlFixHandler(request: NextRequest) {
       $$ LANGUAGE plpgsql SECURITY DEFINER;
     `
 
+    // ✅ Validar SQL antes de executar
+    const validatedSQL = validateSQLOrThrow(createFunctionSQL)
+
     // Tentar executar via RPC (se a função já existir)
     try {
       const { data: rpcResult, error: rpcError } = await supabaseAdmin.rpc('fix_companies_updated_at')
@@ -101,7 +104,7 @@ async function executeSqlFixHandler(request: NextRequest) {
     return NextResponse.json({
       success: false,
       message: 'Execute o SQL manualmente no Supabase Dashboard',
-      sql: createFunctionSQL,
+      sql: validatedSQL,
       instructions: [
         '1. Acesse Supabase Dashboard > SQL Editor',
         '2. Execute o SQL fornecido acima',
@@ -109,7 +112,10 @@ async function executeSqlFixHandler(request: NextRequest) {
       ]
     })
   } catch (error: any) {
-    console.error('Erro ao executar correção:', error)
+    logError('Erro ao executar correção', { 
+      error: error.message,
+      userId: auditContext.userId 
+    }, 'ExecuteSQLFixAPI')
     return NextResponse.json(
       { error: 'Erro ao executar correção', message: error.message },
       { status: 500 }
@@ -117,6 +123,12 @@ async function executeSqlFixHandler(request: NextRequest) {
   }
 }
 
-// Exportar com rate limiting muito restritivo
-export const POST = withRateLimit(executeSqlFixHandler, 'sensitive')
+// ✅ Exportar com auditoria obrigatória e rate limiting
+const handlerWithAudit = withDangerousRouteAudit(
+  executeSqlFixHandler,
+  'execute_sql_fix',
+  'database'
+)
+
+export const POST = withRateLimit(handlerWithAudit, 'sensitive')
 

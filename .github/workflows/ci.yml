@@ -23,11 +23,11 @@ jobs:
       - name: Install
         run: npm ci
       - name: Lint
-        run: npm run lint || true
+        run: npm run lint
       - name: Type Check
-        run: npm run type-check || true
+        run: npm run type-check
       - name: Test
-        run: npm test -- --ci --reporters=default --reporters=jest-junit || true
+        run: npm test -- --ci --reporters=default --reporters=jest-junit
       - name: Build
         run: npm run build
       - name: Validate OpenAPI
@@ -49,13 +49,13 @@ jobs:
       - name: Install
         run: npm ci
       - name: Lint
-        run: npm run lint || true
+        run: npm run lint
       - name: Type Check
-        run: npm run type-check || true
+        run: npm run type-check
       - name: Test
-        run: npm test || true
+        run: npm test
       - name: Expo Doctor
-        run: npx expo-doctor || true
+        run: npx expo-doctor
 
   openapi-diff:
     runs-on: ubuntu-latest
