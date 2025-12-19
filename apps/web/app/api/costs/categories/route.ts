@@ -7,6 +7,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requireAuth } from '@/lib/api-auth'
+import { logError } from '@/lib/logger'
 import type { CostCategory, CostCategoryInsert, ProfileType } from '@/types/financial'
 
 export const runtime = 'nodejs'
@@ -65,7 +66,7 @@ export async function GET(request: NextRequest) {
       const { data, error } = await query
 
       if (error) {
-        console.error('[API] Erro ao buscar categorias (nova estrutura):', error)
+        logError('Erro ao buscar categorias (nova estrutura)', { error }, 'CostsCategoriesAPI')
         return NextResponse.json(
           { success: false, error: error.message, data: [] },
           { status: 200 }
@@ -97,7 +98,7 @@ export async function GET(request: NextRequest) {
         .select(categoryColumns)
 
       if (error) {
-        console.error('Erro ao buscar categorias:', error)
+        logError('Erro ao buscar categorias', { error }, 'CostsCategoriesAPI')
 
         // Se a tabela não existe, retornar array vazio
         if (error.message?.includes('does not exist') ||
@@ -134,7 +135,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(sorted)
     }
   } catch (err) {
-    console.error('[API] Erro ao buscar categorias:', err)
+    logError('Erro ao buscar categorias', { error: err }, 'CostsCategoriesAPI')
     const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
     return NextResponse.json(
       { error: errorMessage, data: [] },
@@ -177,7 +178,7 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (error) {
-      console.error('[API] Erro ao criar categoria:', error)
+      logError('Erro ao criar categoria', { error }, 'CostsCategoriesAPI')
       return NextResponse.json(
         { success: false, error: error.message },
         { status: 500 }

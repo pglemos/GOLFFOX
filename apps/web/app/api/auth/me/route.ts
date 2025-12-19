@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { logger } from '@/lib/logger'
+import { logError } from '@/lib/logger'
 
 function tryDecode(cookieValue: string): any | null {
   try {
@@ -80,7 +80,7 @@ export async function GET(request: NextRequest) {
       // #endregion
     }
   } catch (error) {
-    console.error('Erro ao buscar dados do usuário no banco:', error)
+    logError('Erro ao buscar dados do usuário no banco', { error }, 'AuthMeAPI')
   }
 
   // Fallback para dados do cookie

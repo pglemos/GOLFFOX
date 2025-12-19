@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requireAuth } from '@/lib/api-auth'
-import { logError } from '@/lib/logger'
 
 export const runtime = 'nodejs'
 
@@ -48,7 +47,7 @@ export async function GET(request: NextRequest) {
     const { data, error } = await query
 
     if (error) {
-      console.error('Erro ao buscar usuários:', error)
+      logError('Erro ao buscar usuários', { error }, 'UsersListAPI')
       return NextResponse.json(
         { success: false, error: 'Erro ao buscar usuários', message: error.message },
         { status: 500 }
@@ -61,7 +60,7 @@ export async function GET(request: NextRequest) {
       users: data || []
     })
   } catch (err) {
-    console.error('Erro ao listar usuários:', err)
+    logError('Erro ao listar usuários', { error: err }, 'UsersListAPI')
     const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
     return NextResponse.json(
       { success: false, error: 'Erro ao listar usuários', message: errorMessage },

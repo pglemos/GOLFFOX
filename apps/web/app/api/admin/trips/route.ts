@@ -108,7 +108,7 @@ export async function GET(request: NextRequest) {
       offset
     })
   } catch (err) {
-    logError('Erro ao listar viagens', { error: err }, 'TripsAPI')
+    console.error('Erro ao listar viagens:', err)
     const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
     return NextResponse.json(
       { error: 'Erro ao listar viagens', message: errorMessage },
@@ -333,7 +333,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       { 
         error: 'Erro ao criar viagem',
-        message: error.message || 'Erro desconhecido',
+        message: error instanceof Error ? error.message : 'Erro desconhecido',
         details: process.env.NODE_ENV === 'development' ? error : undefined
       },
       { status: 500 }

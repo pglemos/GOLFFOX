@@ -3,6 +3,7 @@ import { supabaseServiceRole } from '@/lib/supabase-server'
 import { requireCompanyAccess, requireAuth, validateAuth } from '@/lib/api-auth'
 import { z } from 'zod'
 import { withRateLimit } from '@/lib/rate-limit'
+import { logError } from '@/lib/logger'
 
 const budgetSchema = z.object({
   company_id: z.string().uuid(),
@@ -75,7 +76,7 @@ async function getBudgetsHandler(request: NextRequest) {
     const { data, error } = await query
 
     if (error) {
-      console.error('Erro ao buscar orçamentos:', error)
+      logError('Erro ao buscar orçamentos', { error }, 'CostsBudgetsAPI')
       
       // Verificar se erro é porque tabela não existe
       if (error.message?.includes('does not exist') || error.message?.includes('relation') || error.message?.includes('table')) {
@@ -100,7 +101,7 @@ async function getBudgetsHandler(request: NextRequest) {
 
     return NextResponse.json({ data: data || [] })
   } catch (error: any) {
-    console.error('Erro ao buscar orçamentos:', error)
+    logError('Erro ao buscar orçamentos', { error }, 'CostsBudgetsAPI')
     return NextResponse.json(
       { error: error.message || 'Erro desconhecido' },
       { status: 500 }
@@ -226,7 +227,7 @@ async function createOrUpdateBudgetHandler(request: NextRequest) {
         .single()
 
       if (error) {
-        console.error('Erro ao criar orçamento:', error)
+        logError('Erro ao criar orçamento', { error }, 'CostsBudgetsAPI')
         if (error.message?.includes('does not exist') || error.message?.includes('relation') || error.message?.includes('table')) {
           return NextResponse.json(
             { 
@@ -243,14 +244,14 @@ async function createOrUpdateBudgetHandler(request: NextRequest) {
     }
 
     return NextResponse.json({ success: true, data: result }, { status: existing ? 200 : 201 })
-  } catch (error: any) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: 'Dados inválidos', details: error.errors },
         { status: 400 }
       )
     }
-    console.error('Erro ao salvar orçamento:', error)
+    logError('Erro ao salvar orçamento', { error }, 'CostsBudgetsAPI')
     return NextResponse.json(
       { 
         error: error.message || 'Erro desconhecido',
@@ -299,7 +300,7 @@ async function deleteBudgetHandler(request: NextRequest) {
       .eq('id', budgetId)
 
     if (error) {
-      console.error('Erro ao deletar orçamento:', error)
+      logError('Erro ao deletar orçamento', { error }, 'CostsBudgetsAPI')
       return NextResponse.json(
         { error: error.message },
         { status: 500 }

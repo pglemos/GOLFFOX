@@ -99,7 +99,7 @@ export async function POST(req: NextRequest) {
       // Tentar remover usuário do Auth se possível
       try {
         await supabaseAdmin.auth.admin.deleteUser(authData.user.id)
-        logger.log('✅ Usuário removido do Auth após falha ao criar registro')
+        // Usuário removido do Auth após falha ao criar registro
       } catch (deleteError) {
         logError('Erro ao remover usuário do Auth após falha', { error: deleteError }, 'CreateTransportadoraLoginAPI')
       }

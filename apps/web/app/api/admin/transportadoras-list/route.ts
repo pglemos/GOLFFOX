@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseServiceRole } from '@/lib/supabase-server'
 import { requireAuth } from '@/lib/api-auth'
-import { logError } from '@/lib/logger'
 
 export const runtime = 'nodejs'
 
@@ -28,7 +27,7 @@ export async function GET(req: NextRequest) {
       .order('name', { ascending: true })
 
     if (error) {
-      console.error('[DEBUG] Erro ao buscar carriers:', error)
+      logError('Erro ao buscar carriers', { error }, 'TransportadorasListAPI')
       return NextResponse.json(
         { success: false, error: 'Erro ao buscar transportadoras', message: error.message },
         { status: 500 }
