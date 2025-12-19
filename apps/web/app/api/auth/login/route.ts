@@ -543,13 +543,13 @@ async function loginHandler(req: NextRequest) {
 
     response.headers.set('Set-Cookie', cookieOptions)
 
-    logger.log('✅ Login bem-sucedido - cookie customizado criado:', {
+    debug('✅ Login bem-sucedido - cookie customizado criado', {
       userId: userPayload.id,
       email: userPayload.email,
       name: userPayload.name,
       role: userPayload.role,
       hasAvatarUrl: !!userPayload.avatar_url
-    })
+    }, 'AuthAPI')
 
     debug('Login API concluído', { role, emailHash: email.replace(/^(.{2}).+(@.*)$/, '$1***$2') }, 'AuthAPI')
     return response
