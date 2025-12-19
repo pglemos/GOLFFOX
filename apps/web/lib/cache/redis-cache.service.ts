@@ -10,10 +10,10 @@ import { debug, warn, logError } from '@/lib/logger'
 
 // Reutilizar conexão Redis do rate-limit.ts
 function getRedisClient(): Redis | null {
-  const upstashEnabled = Boolean(
-    process.env.UPSTASH_REDIS_REST_URL && 
-    process.env.UPSTASH_REDIS_REST_TOKEN
-  )
+  const upstashUrl = process.env.UPSTASH_REDIS_REST_URL
+  const upstashToken = process.env.UPSTASH_REDIS_REST_TOKEN
+  
+  const upstashEnabled = Boolean(upstashUrl && upstashToken)
 
   if (!upstashEnabled) {
     return null
@@ -21,8 +21,8 @@ function getRedisClient(): Redis | null {
 
   try {
     return new Redis({
-      url: process.env.UPSTASH_REDIS_REST_URL!,
-      token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+      url: upstashUrl!,
+      token: upstashToken!,
     })
   } catch (error) {
     warn('Falha ao criar cliente Redis', { error }, 'RedisCache')
