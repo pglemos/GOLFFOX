@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { logError } from '@/lib/logger';
 import { getSupabaseAdmin } from '@/lib/supabase-client';
-import { logError } from '@/lib/logger';
 import { requireAuth } from '@/lib/api-auth';
 
 // GET /api/transportadora/evaluations - Avaliações NPS das viagens
