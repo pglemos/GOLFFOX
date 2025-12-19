@@ -25,6 +25,11 @@ let nextConfig = {
 
   // Configuração webpack para resolver problema ESM do Supabase
   webpack: (config) => {
+    // Workaround (Windows + SWC WASM + webpack):
+    // Alguns módulos CJS do próprio Next (dist/client/components) são analisados
+    // pelo webpack como ESM e acabam sendo empacotados sem `exports`, quebrando
+    // imports internos como `createCacheMap` e `isRedirectError`.
+    // Forçamos esses arquivos a serem tratados como CommonJS dinâmico.
     config.resolve.alias = {
       ...config.resolve.alias,
       '@supabase/supabase-js': require.resolve('@supabase/supabase-js'),

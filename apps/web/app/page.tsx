@@ -92,8 +92,6 @@ function LoginContent() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [csrfToken, setCsrfToken] = useState<string>("")
-  const [emailValid, setEmailValid] = useState(false)
-  const [passwordValid, setPasswordValid] = useState(false)
   const [fieldErrors, setFieldErrors] = useState<{ email?: string; password?: string }>({})
   const [success, setSuccess] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
@@ -312,22 +310,7 @@ function LoginContent() {
     fetchCsrf()
   }, [])
 
-  // Validação apenas quando o campo perde o foco ou no submit (não durante digitação)
-  const [emailTouched, setEmailTouched] = useState(false)
-  const [passwordTouched, setPasswordTouched] = useState(false)
-
-  useEffect(() => {
-    if (emailTouched) {
-      setEmailValid(EMAIL_REGEX.test(sanitizeInput(email)))
-    }
-  }, [email, emailTouched])
-
-  useEffect(() => {
-    if (passwordTouched) {
-      setPasswordValid(password.trim().length > 0)
-    }
-  }, [password, passwordTouched])
-
+  // Habilitar submit sem depender de blur (evita botão travado no mobile)
   // Carregar estado de tentativas do localStorage
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -814,8 +797,7 @@ function LoginContent() {
   StatItem.displayName = "StatItem"
 
   // Memoizar valores computados para performance
-  const isFormValid = useMemo(() => emailValid && passwordValid, [emailValid, passwordValid])
-  const canSubmit = useMemo(() => !loading && !transitioning && isFormValid, [loading, transitioning, isFormValid])
+  const canSubmit = useMemo(() => !loading && !transitioning, [loading, transitioning])
   const shouldReduceMotion = useReducedMotion()
 
   return (
@@ -1101,6 +1083,8 @@ function LoginContent() {
 
                 {/* Mobile: Formulário Premium */}
                 <form
+                  action={AUTH_ENDPOINT}
+                  method="post"
                   onSubmit={(e) => {
                     e.preventDefault()
                     if (!loading && !transitioning) {
@@ -1123,11 +1107,12 @@ function LoginContent() {
                       <Input
                         id="login-email"
                         ref={emailInputRef}
+                        name="email"
                         type="email"
+                        required
                         placeholder="golffox@admin.com"
                         value={email}
                         onChange={(e) => setEmail(sanitizeInput(e.target.value))}
-                        onBlur={() => setEmailTouched(true)}
                         onKeyDown={(e) => {
                           if (e.key === 'Enter' && !loading && !transitioning && password.trim().length > 0) {
                             e.preventDefault()
@@ -1166,11 +1151,12 @@ function LoginContent() {
 
                       <Input
                         id="login-password"
+                        name="password"
                         type={showPassword ? "text" : "password"}
+                        required
                         placeholder="Digite sua senha"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        onBlur={() => setPasswordTouched(true)}
                         onKeyDown={(e) => {
                           if (e.key === 'Enter' && !loading && !transitioning) {
                             e.preventDefault()
@@ -1408,6 +1394,8 @@ function LoginContent() {
 
               {/* Formulário minimalista */}
               <form
+                action={AUTH_ENDPOINT}
+                method="post"
                 onSubmit={(e) => {
                   e.preventDefault()
                   if (!loading && !transitioning) {
@@ -1428,11 +1416,12 @@ function LoginContent() {
                     <Input
                       id="login-email-desktop"
                       ref={emailInputRef}
+                      name="email"
                       type="email"
+                      required
                       placeholder="nome@empresa.com"
                       value={email}
                       onChange={(e) => setEmail(sanitizeInput(e.target.value))}
-                      onBlur={() => setEmailTouched(true)}
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' && !loading && !transitioning && password.trim().length > 0) {
                           e.preventDefault()
@@ -1469,11 +1458,12 @@ function LoginContent() {
                     </div>
                     <Input
                       id="login-password-desktop"
+                      name="password"
                       type={showPassword ? "text" : "password"}
+                      required
                       placeholder="Digite sua senha"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      onBlur={() => setPasswordTouched(true)}
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' && !loading && !transitioning) {
                           e.preventDefault()

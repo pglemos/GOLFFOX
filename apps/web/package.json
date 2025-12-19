@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev -p 3000 -H 0.0.0.0 --webpack",
     "dev:turbo": "next dev -p 3000 -H 0.0.0.0 --turbo",
-    "postinstall": "node scripts/ensure-native-binaries.js",
+    "postinstall": "node scripts/ensure-native-binaries.js && node scripts/patch-next-webpack-exports.js",
     "build": "next build --webpack",
     "start": "next start -p 5000 -H 0.0.0.0",
     "lint": "eslint app components hooks lib server stores types workers",
@@ -72,7 +72,7 @@
     "html2canvas": "^1.4.1",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.556.0",
-    "next": "^16.0.10",
+    "next": "^16.1.0",
     "next-auth": "^4.24.13",
     "next-seo": "^6.6.0",
     "next-sitemap": "^4.2.3",
@@ -100,7 +100,7 @@
   "devDependencies": {
     "@commitlint/cli": "^19.6.0",
     "@commitlint/config-conventional": "^19.6.0",
-    "@next/bundle-analyzer": "^16.0.7",
+    "@next/bundle-analyzer": "^16.1.0",
     "@playwright/test": "^1.49.0",
     "@swc/helpers": "^0.5.15",
     "@tailwindcss/postcss": "^4.1.17",
@@ -124,7 +124,7 @@
     "cross-env": "^7.0.3",
     "dotenv": "^17.2.3",
     "eslint": "^9.18.0",
-    "eslint-config-next": "^16.0.7",
+    "eslint-config-next": "^16.1.0",
     "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-jsx-a11y": "^6.10.2",
     "eslint-plugin-react": "^7.37.2",
@@ -161,8 +161,8 @@
     ]
   },
   "optionalDependencies": {
-    "@next/swc-wasm-nodejs": "^16.0.0",
-    "@next/swc-win32-x64-msvc": "^16.0.10",
+    "@next/swc-wasm-nodejs": "^16.1.0",
+    "@next/swc-win32-x64-msvc": "^16.1.0",
     "@tailwindcss/oxide-linux-x64-gnu": "^4.1.18",
     "@tailwindcss/oxide-linux-x64-musl": "^4.1.18",
     "@tailwindcss/oxide-win32-x64-msvc": "^4.1.18",

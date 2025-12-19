@@ -15,6 +15,44 @@ function sanitize(value: unknown): string {
   return value.replace(/[<>"'`;()]/g, '').trim()
 }
 
+function sanitizeNextPath(raw: string | null, origin: string): string | null {
+  if (!raw) return null
+  try {
+    const decoded = decodeURIComponent(raw)
+    if (/^https?:\/\//i.test(decoded)) return null
+    if (!decoded.startsWith('/')) return null
+    const url = new URL(decoded, origin)
+    return url.pathname
+  } catch {
+    return null
+  }
+}
+
+function isAllowedForRole(role: string, path: string): boolean {
+  if (path.startsWith('/admin')) return role === 'admin'
+  // empresa = empresa contratante (antigo operator)
+  if (path.startsWith('/empresa')) return ['admin', 'empresa', 'operator'].includes(role)
+  // operador = gestor da transportadora (antigo carrier)
+  if (path.startsWith('/transportadora')) return ['admin', 'operador', 'carrier', 'transportadora'].includes(role)
+  return true
+}
+
+function getRedirectPath(role: string): string {
+  switch (role) {
+    case 'admin':
+      return '/admin'
+    case 'empresa':
+    case 'operator':
+      return '/empresa'
+    case 'operador':
+    case 'carrier':
+    case 'transportadora':
+      return '/transportadora'
+    default:
+      return '/'
+  }
+}
+
 function getSupabaseAdmin() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
@@ -55,9 +93,20 @@ function isSecureRequest(req: NextRequest): boolean {
 
 async function loginHandler(req: NextRequest) {
   let payload: { email?: string; password?: string } = {}
+  const contentType = (req.headers.get('content-type') || '').toLowerCase()
+  const accept = (req.headers.get('accept') || '').toLowerCase()
+  const wantsJson = contentType.includes('application/json') || accept.includes('application/json')
 
   try {
-    payload = await req.json()
+    if (contentType.includes('application/json')) {
+      payload = await req.json()
+    } else {
+      const form = await req.formData()
+      payload = {
+        email: form.get('email')?.toString(),
+        password: form.get('password')?.toString(),
+      }
+    }
   } catch {
     return NextResponse.json({ error: 'invalid_payload' }, { status: 400 })
   }
@@ -434,24 +483,30 @@ async function loginHandler(req: NextRequest) {
       avatar_url: finalUser?.avatar_url || null,
     }
 
-    const response = NextResponse.json({
-      token,
-      refreshToken,
-      user: userPayload,
-      session: {
-        access_token: data.session.access_token,
-        refresh_token: data.session.refresh_token,
-        expires_in: data.session.expires_in,
-        expires_at: data.session.expires_at,
-        token_type: data.session.token_type,
-        user: {
-          id: data.user.id,
-          email: data.user.email,
-          user_metadata: data.user.user_metadata,
-          app_metadata: data.user.app_metadata,
+    const safeNext = sanitizeNextPath(req.nextUrl.searchParams.get('next'), req.nextUrl.origin)
+    const defaultRedirect = getRedirectPath(role)
+    const redirectPath = safeNext && isAllowedForRole(role, safeNext) ? safeNext : defaultRedirect
+
+    const response = wantsJson
+      ? NextResponse.json({
+        token,
+        refreshToken,
+        user: userPayload,
+        session: {
+          access_token: data.session.access_token,
+          refresh_token: data.session.refresh_token,
+          expires_in: data.session.expires_in,
+          expires_at: data.session.expires_at,
+          token_type: data.session.token_type,
+          user: {
+            id: data.user.id,
+            email: data.user.email,
+            user_metadata: data.user.user_metadata,
+            app_metadata: data.user.app_metadata,
+          }
         }
-      }
-    }, { status: 200 })
+      }, { status: 200 })
+      : new NextResponse(null, { status: 303, headers: { Location: redirectPath } })
 
     // ✅ Criar cookie customizado no servidor para autenticação nas rotas API
     // Incluir access_token do Supabase para validação sempre com Supabase Auth
