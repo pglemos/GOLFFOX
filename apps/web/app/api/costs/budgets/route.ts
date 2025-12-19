@@ -244,7 +244,7 @@ async function createOrUpdateBudgetHandler(request: NextRequest) {
     }
 
     return NextResponse.json({ success: true, data: result }, { status: existing ? 200 : 201 })
-  } catch (error: unknown) {
+  } catch (error: any) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: 'Dados inválidos', details: error.errors },
@@ -252,9 +252,10 @@ async function createOrUpdateBudgetHandler(request: NextRequest) {
       )
     }
     logError('Erro ao salvar orçamento', { error }, 'CostsBudgetsAPI')
+    const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido'
     return NextResponse.json(
       { 
-        error: error.message || 'Erro desconhecido',
+        error: errorMessage,
         details: process.env.NODE_ENV === 'development' ? error : undefined
       },
       { status: 500 }
@@ -308,8 +309,8 @@ async function deleteBudgetHandler(request: NextRequest) {
     }
 
     return NextResponse.json({ success: true })
-  } catch (error: any) {
-    console.error('Erro ao deletar orçamento:', error)
+  } catch (error: unknown) {
+    logError('Erro ao deletar orçamento', { error }, 'CostsBudgetsAPI')
     return NextResponse.json(
       { error: error.message || 'Erro desconhecido' },
       { status: 500 }

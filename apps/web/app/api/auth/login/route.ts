@@ -222,7 +222,7 @@ async function loginHandler(req: NextRequest) {
         supabaseAdmin = getSupabaseAdmin()
       } catch (adminErr: any) {
         logError('Erro ao criar cliente Supabase Admin', {
-          error: adminErr?.message || adminErr,
+          error: adminErr instanceof Error ? adminErr.message : String(adminErr),
           hasUrl: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
           hasServiceKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY
         }, 'AuthAPI')

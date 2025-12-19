@@ -128,7 +128,7 @@ export async function POST(req: NextRequest) {
         name: validated.name
       }
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { success: false, error: 'Dados inválidos', details: error.errors },
@@ -136,8 +136,9 @@ export async function POST(req: NextRequest) {
       )
     }
     logError('Erro ao criar login transportadora', { error }, 'CreateTransportadoraLoginAPI')
+    const errorMessage = error instanceof Error ? error.message : 'Erro ao processar requisição'
     return NextResponse.json(
-      { success: false, error: 'Erro ao processar requisição', message: error.message },
+      { success: false, error: 'Erro ao processar requisição', message: errorMessage },
       { status: 500 }
     )
   }
