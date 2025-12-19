@@ -30,7 +30,7 @@ let nextConfig = {
 
   // ✅ Code splitting avançado
   experimental: {
-    ...(process.platform === 'win32' ? { useWasmBinary: true } : {}),
+    // useWasmBinary: apenas em Windows local, Vercel usa Linux
     // Otimizar imports de pacotes grandes
     optimizePackageImports: [
       '@radix-ui/react-accordion',
