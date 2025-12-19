@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requireAuth } from '@/lib/api-auth'
-import { logger } from '@/lib/logger'
+import { logError } from '@/lib/logger'
 
 export const runtime = 'nodejs'
 
@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
       .order('created_at', { ascending: false })
 
     if (error) {
-      console.error('Erro ao buscar veículos:', error)
+      logError('Erro ao buscar veículos', { error }, 'VehiclesListAPI')
       return NextResponse.json(
         { error: 'Erro ao buscar veículos', message: error.message },
         { status: 500 }
@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Mapear para incluir carrier_name de forma plana
-    const vehiclesWithCarrier = (data || []).map((v: any) => ({
+    const vehiclesWithCarrier = (data || []).map((v: { [key: string]: unknown; carriers?: { name?: string } }) => ({
       ...v,
       carrier_name: v.carriers?.name || null,
       carriers: undefined  // Remover objeto aninhado para manter resposta limpa
@@ -47,10 +47,11 @@ export async function GET(request: NextRequest) {
 
     // Retornar array com carrier_name mapeado
     return NextResponse.json(vehiclesWithCarrier)
-  } catch (error: any) {
-    console.error('Erro ao listar veículos:', error)
+  } catch (error: unknown) {
+    logError('Erro ao listar veículos', { error }, 'VehiclesListAPI')
+    const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido'
     return NextResponse.json(
-      { error: 'Erro ao listar veículos', message: error.message },
+      { error: 'Erro ao listar veículos', message: errorMessage },
       { status: 500 }
     )
   }

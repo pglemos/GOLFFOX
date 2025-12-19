@@ -31,10 +31,11 @@ export async function GET(req: NextRequest) {
       maxAge: 15 * 60, // 15 minutos
     })
     return res
-  } catch (error: any) {
+  } catch (error: unknown) {
     logError('Erro ao gerar token CSRF', { error }, 'CSRFAPI')
+    const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido'
     return NextResponse.json(
-      { error: 'Erro ao gerar token CSRF', message: error.message },
+      { error: 'Erro ao gerar token CSRF', message: errorMessage },
       { status: 500 }
     )
   }

@@ -11,8 +11,19 @@ export const runtime = 'nodejs'
 
 export async function GET() {
   try {
+    // Usar process.cwd() que funciona bem no Node.js runtime
+    // No Vercel, process.cwd() aponta para o diretório raiz do projeto
     const openApiPath = join(process.cwd(), 'apps/web/openapi.yaml')
-    const content = await readFile(openApiPath, 'utf-8')
+    
+    // Fallback: tentar caminho alternativo se o primeiro não existir
+    let content: string
+    try {
+      content = await readFile(openApiPath, 'utf-8')
+    } catch (err) {
+      // Tentar caminho relativo do diretório de build
+      const fallbackPath = join(process.cwd(), 'openapi.yaml')
+      content = await readFile(fallbackPath, 'utf-8')
+    }
     
     return new NextResponse(content, {
       headers: {

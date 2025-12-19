@@ -1,21 +1,30 @@
 import { NextRequest, NextResponse } from "next/server"
 import { logError } from '@/lib/logger'
+import { invalidateCachedAuth } from '@/lib/auth-cache'
 
 export async function POST(req: NextRequest) {
   try {
     const url = new URL(req.url)
     const isSecure = url.protocol === "https:"
 
-    // Extra: ler cookie atual para registro/auditoria mínima
+    // Extra: ler cookie atual para registro/auditoria mínima e invalidar cache
     const existing = req.cookies.get("golffox-session")?.value
     let userMeta: any = null
+    let accessToken: string | null = null
     if (existing) {
       try {
         const decoded = Buffer.from(existing, "base64").toString("utf-8")
         userMeta = JSON.parse(decoded)
+        // Extrair token para invalidar cache
+        accessToken = userMeta?.access_token || userMeta?.accessToken || null
       } catch (_e) {
         userMeta = null
       }
+    }
+
+    // Invalidar cache de autenticação se houver token
+    if (accessToken) {
+      invalidateCachedAuth(accessToken)
     }
 
     const res = NextResponse.json({ ok: true, cleared: true, user: userMeta || null })

@@ -112,9 +112,10 @@ export async function POST(request: NextRequest) {
             message: `Migração concluída. ${results.migrated} usuários migrados.`,
             results
         })
-    } catch (error: any) {
+    } catch (error: unknown) {
         logError('Erro na migração', { error }, 'MigrateUsersToCPFAPI')
-        return NextResponse.json({ error: error.message }, { status: 500 })
+        const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido'
+        return NextResponse.json({ error: errorMessage }, { status: 500 })
     }
 }
 
@@ -163,7 +164,8 @@ export async function GET(request: NextRequest) {
             needsMigration: usersWithStatus.filter(u => u.needsMigration).length,
             users: usersWithStatus
         })
-    } catch (error: any) {
-        return NextResponse.json({ error: error.message }, { status: 500 })
+    } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido'
+        return NextResponse.json({ error: errorMessage }, { status: 500 })
     }
 }

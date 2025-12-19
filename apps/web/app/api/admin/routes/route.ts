@@ -252,10 +252,11 @@ export async function GET(request: NextRequest) {
       limit,
       offset
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
     logError('Erro ao listar rotas', { error }, 'RoutesAPI')
+    const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido'
     return NextResponse.json(
-      { error: 'Erro ao listar rotas', message: error.message },
+      { error: 'Erro ao listar rotas', message: errorMessage },
       { status: 500 }
     )
   }

@@ -72,10 +72,11 @@ export async function GET(request: NextRequest) {
 
     // Retornar array diretamente para compatibilidade
     return NextResponse.json(alerts)
-  } catch (error: any) {
+  } catch (error: unknown) {
     logError('Erro ao listar alertas', { error }, 'AlertsListAPI')
+    const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido'
     return NextResponse.json(
-      { error: 'Erro ao listar alertas', message: error.message },
+      { error: 'Erro ao listar alertas', message: errorMessage },
       { status: 500 }
     )
   }

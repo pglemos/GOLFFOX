@@ -88,13 +88,15 @@ export async function GET(request: NextRequest) {
       refreshed_at: new Date().toISOString(),
       message: 'KPIs atualizados com sucesso'
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
     logError('Erro ao executar refresh_mv_operator_kpis', { error }, 'CronRefreshKPIs')
+    const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido'
+    const errorStack = error instanceof Error ? error.stack : undefined
     return NextResponse.json(
       { 
         error: 'Erro interno ao processar requisição',
-        message: error.message || 'Erro desconhecido',
-        details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+        message: errorMessage,
+        details: process.env.NODE_ENV === 'development' ? errorStack : undefined
       },
       { status: 500 }
     )

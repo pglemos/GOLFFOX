@@ -27,7 +27,8 @@
     "test:auth": "node scripts/test-auth-middleware.js",
     "test:proxy": "node scripts/test-auth-middleware.js",
     "audit:security": "ts-node scripts/audit-api-security.ts",
-    "health:check": "curl http://localhost:3000/api/health || echo 'Server not running'"
+    "health:check": "curl http://localhost:3000/api/health || echo 'Server not running'",
+    "generate:openapi": "node ../../scripts/generate-openapi.js"
   },
   "dependencies": {
     "@e965/xlsx": "^0.20.3",

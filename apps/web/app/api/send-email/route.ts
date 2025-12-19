@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
-import { debug } from '@/lib/logger';
-// import { Resend } from 'resend';
+import { debug, error as logError, info } from '@/lib/logger';
+import { Resend } from 'resend';
 
-// const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
 export async function POST(request: Request) {
     try {
@@ -12,28 +12,41 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
         }
 
-        debug('Simulando envio de e-mail', { to: to.replace(/^(.{2}).+(@.*)$/, '$1***$2'), subject }, 'SendEmailAPI');
-
-        // TODO: Descomentar quando configurar RESEND_API_KEY
-        /*
-        const { data, error } = await resend.emails.send({
-          from: 'GolfFox <onboarding@resend.dev>',
-          to: [to],
-          subject: subject,
-          html: html,
-          text: text
-        });
-    
-        if (error) {
-          return NextResponse.json({ error }, { status: 500 });
+        // Verificar se Resend está configurado
+        if (!resend) {
+            logError('RESEND_API_KEY não configurada', {}, 'SendEmailAPI');
+            return NextResponse.json(
+                { error: 'Email service not configured', message: 'RESEND_API_KEY not set' },
+                { status: 500 }
+            );
         }
-        */
 
-        // Simulação de sucesso
-        await new Promise(resolve => setTimeout(resolve, 500));
+        info('Enviando e-mail via Resend', { to: to.replace(/^(.{2}).+(@.*)$/, '$1***$2'), subject }, 'SendEmailAPI');
 
-        return NextResponse.json({ message: 'Email queued successfully (simulation)' });
+        const { data, error } = await resend.emails.send({
+            from: process.env.RESEND_FROM_EMAIL || 'GolfFox <onboarding@resend.dev>',
+            to: [to],
+            subject: subject,
+            html: html,
+            text: text
+        });
+
+        if (error) {
+            logError('Erro ao enviar e-mail via Resend', { error, to: to.replace(/^(.{2}).+(@.*)$/, '$1***$2') }, 'SendEmailAPI');
+            return NextResponse.json({ error: 'Failed to send email', details: error }, { status: 500 });
+        }
+
+        info('E-mail enviado com sucesso', { messageId: data?.id, to: to.replace(/^(.{2}).+(@.*)$/, '$1***$2') }, 'SendEmailAPI');
+
+        return NextResponse.json({ 
+            message: 'Email sent successfully',
+            messageId: data?.id
+        });
     } catch (error) {
-        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+        logError('Erro interno ao processar envio de e-mail', { error }, 'SendEmailAPI');
+        return NextResponse.json(
+            { error: 'Internal Server Error', message: error instanceof Error ? error.message : 'Unknown error' },
+            { status: 500 }
+        );
     }
 }

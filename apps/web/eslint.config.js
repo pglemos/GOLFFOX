@@ -34,7 +34,7 @@ module.exports = [
       "@next/next/no-img-element": "warn",
       // Prevenir uso direto de console.* - usar logger estruturado
       "no-console": ["warn", {
-        allow: [] // Não permitir nenhum console.* direto
+        allow: ["warn", "error"] // Permitir apenas console.warn e console.error em casos excepcionais
       }],
     },
   },

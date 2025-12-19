@@ -8,6 +8,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { debug, warn, error as logError } from '@/lib/logger'
+import { getCachedAuth, setCachedAuth, invalidateCachedAuth } from './auth-cache'
 
 export interface AuthenticatedUser {
   id: string
@@ -71,6 +72,9 @@ export async function validateAuth(request: NextRequest): Promise<AuthenticatedU
 
     let accessToken: string | null = null
     let tokenSource: string = 'none'
+
+    // Tentar obter token primeiro para verificar cache
+    // (cache lookup será feito após obter o token)
 
     // 1. Tentar obter token do header Authorization (Bearer token) - PRIORIDADE MÁXIMA
     const authHeader = request.headers.get('authorization')
@@ -154,12 +158,29 @@ export async function validateAuth(request: NextRequest): Promise<AuthenticatedU
       return null
     }
 
-    // 4. Validar token com Supabase Auth
+    if (!accessToken) {
+      warn('Token de acesso não encontrado em nenhum lugar', {
+        path: request.nextUrl.pathname
+      }, 'ApiAuth')
+      return null
+    }
+
+    // 4. Verificar cache antes de chamar Supabase Auth
+    const cachedUser = getCachedAuth(accessToken)
+    if (cachedUser) {
+      debug('Usuário encontrado no cache', {
+        userId: cachedUser.id,
+        role: cachedUser.role
+      }, 'ApiAuth')
+      return cachedUser
+    }
+
+    // 5. Validar token com Supabase Auth (cache miss)
     const supabase = createClient(supabaseUrl, supabaseAnonKey, {
       auth: { persistSession: false, autoRefreshToken: false }
     })
 
-    debug('Validando token do Supabase', {
+    debug('Validando token do Supabase (cache miss)', {
       source: tokenSource,
       tokenLength: accessToken?.length || 0
     }, 'ApiAuth')
@@ -222,6 +243,11 @@ export async function validateAuth(request: NextRequest): Promise<AuthenticatedU
       role: authenticatedUser.role,
       email: authenticatedUser.email.replace(/^(.{2}).+(@.*)$/, '$1***$2') // Mascarar email
     }, 'ApiAuth')
+
+    // Armazenar no cache para próximas requisições
+    if (accessToken) {
+      setCachedAuth(accessToken, authenticatedUser)
+    }
 
     return authenticatedUser
   } catch (error) {

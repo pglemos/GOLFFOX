@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requireAuth } from '@/lib/api-auth'
-import { logger, logError } from '@/lib/logger'
+import { logError } from '@/lib/logger'
 
 export const runtime = 'nodejs'
 
@@ -39,10 +39,11 @@ export async function GET(request: NextRequest) {
 
     // Retornar array diretamente para compatibilidade
     return NextResponse.json(data || [])
-  } catch (error: any) {
+  } catch (error: unknown) {
     logError('Erro ao listar rotas', { error }, 'RoutesListAPI')
+    const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido'
     return NextResponse.json(
-      { error: 'Erro ao listar rotas', message: error.message },
+      { error: 'Erro ao listar rotas', message: errorMessage },
       { status: 500 }
     )
   }

@@ -91,15 +91,15 @@ O projeto utiliza uma arquitetura híbrida moderna:
 ├── 🌐 apps/web/               # Next.js Web App
 │   ├── app/                   # App Router (Next.js 16.1 + Turbopack)
 │   │   ├── admin/             # Painel Administrativo
-│   │   ├── operator/          # Painel do Operador
-│   │   ├── carrier/           # Painel da Transportadora
+│   │   ├── empresa/           # Painel da Empresa
+│   │   ├── transportadora/    # Painel da Transportadora
 │   │   ├── driver/            # Painel do Motorista
 │   │   ├── passenger/         # Painel do Passageiro
 │   │   ├── api/               # API Routes
 │   │   │   ├── auth/          # Autenticação
 │   │   │   ├── admin/         # Endpoints Admin
-│   │   │   ├── operator/      # Endpoints Operador
-│   │   │   ├── carrier/       # Endpoints Transportadora
+│   │   │   ├── empresa/       # Endpoints Empresa
+│   │   │   ├── transportadora/ # Endpoints Transportadora
 │   │   │   ├── costs/         # Gestão de Custos
 │   │   │   ├── reports/       # Relatórios
 │   │   │   ├── cron/          # Cron Jobs
@@ -110,8 +110,8 @@ O projeto utiliza uma arquitetura híbrida moderna:
 │   ├── components/            # Componentes React
 │   │   ├── ui/                # Componentes UI base (Radix UI)
 │   │   ├── admin/             # Componentes Admin
-│   │   ├── operator/          # Componentes Operador
-│   │   ├── carrier/           # Componentes Transportadora
+│   │   ├── empresa/           # Componentes Empresa
+│   │   ├── transportadora/    # Componentes Transportadora
 │   │   ├── modals/            # Modais
 │   │   └── providers/         # Context Providers
 │   ├── lib/                   # Utilitários e Helpers
@@ -120,7 +120,7 @@ O projeto utiliza uma arquitetura híbrida moderna:
 │   │   ├── api-auth.ts        # Helpers de autenticação API
 │   │   └── logger.ts          # Sistema de Logging
 │   ├── hooks/                 # React Hooks customizados
-│   ├── middleware.ts          # Middleware Next.js
+│   ├── proxy.ts              # Proxy/Middleware Next.js (Edge Runtime)
 │   └── package.json           # Dependências Node.js
 │
 ├── 📚 database/               # Banco de Dados
@@ -186,7 +186,7 @@ O projeto utiliza uma arquitetura híbrida moderna:
 
 7. **Permissões** (`/admin/permissoes`) - Gestão de papéis
    - Controle de acesso
-   - Papéis: admin, operator, carrier, driver, passenger
+   - Papéis: admin, empresa, transportadora, motorista, passageiro
    - Troca de papéis de usuários
 
 8. **Socorro** (`/admin/socorro`) - Ocorrências
@@ -295,22 +295,22 @@ O projeto utiliza uma arquitetura híbrida moderna:
 
 **Acesso**: Usuários com role `operador` ou `admin`
 
-**URL**: https://golffox.vercel.app/carrier
+**URL**: https://golffox.vercel.app/transportadora
 
 #### Módulos Implementados
 
 1. **Dashboard** - Visão geral da transportadora
-2. **Mapa** (`/carrier/mapa`) - Visualização da frota
-3. **Veículos** (`/carrier/veiculos`) - Gestão de veículos
-4. **Motoristas** (`/carrier/motoristas`) - Gestão de motoristas
-5. **Relatórios** (`/carrier/relatorios`) - Relatórios
-6. **Alertas** (`/carrier/alertas`) - Alertas
-7. **Custos** (`/carrier/custos`) - Gestão de custos da transportadora
+2. **Mapa** (`/transportadora/mapa`) - Visualização da frota
+3. **Veículos** (`/transportadora/veiculos`) - Gestão de veículos
+4. **Motoristas** (`/transportadora/motoristas`) - Gestão de motoristas
+5. **Relatórios** (`/transportadora/relatorios`) - Relatórios
+6. **Alertas** (`/transportadora/alertas`) - Alertas
+7. **Custos** (`/transportadora/custos`) - Gestão de custos da transportadora
     - Custos por rota
     - Custos por veículo
     - Relatórios financeiros
 
-8. **Ajuda** (`/carrier/ajuda`) - Central de ajuda
+8. **Ajuda** (`/transportadora/ajuda`) - Central de ajuda
 
 ## 🔐 Sistema de Autenticação
 
@@ -341,7 +341,7 @@ O sistema utiliza autenticação baseada em cookies com verificação obrigatór
 
 ### Proteção de Rotas
 
-O middleware (`apps/web/middleware.ts`) protege automaticamente:
+O proxy (`apps/web/proxy.ts`) protege automaticamente:
 
 - `/admin/*` - Apenas role `admin`
 - `/empresa/*` - Roles `admin` ou `empresa`
@@ -445,7 +445,7 @@ SUPABASE_SERVICE_ROLE_KEY=sua_chave_service_role
 
 # Autenticação
 NEXT_PUBLIC_AUTH_ENDPOINT=/api/auth/login
-NEXT_PUBLIC_LOGGED_URL=/operator
+NEXT_PUBLIC_LOGGED_URL=/empresa
 
 # Mapas
 NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=sua_chave_google_maps

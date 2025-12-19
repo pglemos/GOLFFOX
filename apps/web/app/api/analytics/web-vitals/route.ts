@@ -58,13 +58,13 @@ async function postHandler(request: NextRequest) {
         }
 
         // Verificar métricas com rating 'poor' e gerar alertas
-        const poorMetrics = metrics?.filter((m: any) => m.rating === 'poor') || []
+        const poorMetrics = metrics?.filter((m: { rating?: string; name?: string }) => m.rating === 'poor') || []
         if (poorMetrics.length > 0) {
-          await supabase.from('gf_operational_alerts').insert({
+          await (supabase.from('gf_operational_alerts') as any).insert({
             type: 'performance',
             severity: 'warning',
             title: 'Métricas de Performance Degradadas',
-            message: `Web Vitals com rating 'poor': ${poorMetrics.map((m: any) => m.name).join(', ')}`,
+            message: `Web Vitals com rating 'poor': ${poorMetrics.map((m: { name?: string }) => m.name).join(', ')}`,
             details: {
               url,
               metrics: poorMetrics,
@@ -77,7 +77,7 @@ async function postHandler(request: NextRequest) {
       }
     }
     return NextResponse.json({ success: true })
-  } catch (error: any) {
+  } catch (error: unknown) {
     logError('Erro ao processar Web Vitals', { error }, 'WebVitalsAPI')
     // Não falhar para o cliente de analytics; responder sucesso mesmo em erros internos
     return NextResponse.json({ success: false })

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { withRateLimit } from '@/lib/rate-limit'
-import { logger } from '@/lib/logger'
+import { warn, error as logError } from '@/lib/logger'
 
 async function cepHandler(request: NextRequest) {
     let cep: string | null = null
@@ -50,7 +50,7 @@ async function cepHandler(request: NextRequest) {
                 }
             }
         } catch (viaCepError) {
-            logger.warn('ViaCEP falhou, tentando BrasilAPI', { cep: cleanCep, error: viaCepError })
+            warn('ViaCEP falhou, tentando BrasilAPI', { cep: cleanCep, error: viaCepError }, 'CEPAPI')
         }
 
         // Fallback: Tentar BrasilAPI (especialmente útil para CEPs genéricos -000)
@@ -84,8 +84,8 @@ async function cepHandler(request: NextRequest) {
             { success: false, error: 'CEP não encontrado' },
             { status: 404 }
         )
-    } catch (error: any) {
-        logger.error('Erro ao buscar CEP', { error, cep })
+    } catch (error: unknown) {
+        logError('Erro ao buscar CEP', { error, cep }, 'CEPAPI')
         return NextResponse.json(
             { success: false, error: 'Erro ao buscar endereço pelo CEP' },
             { status: 500 }

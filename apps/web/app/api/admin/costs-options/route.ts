@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requireAuth } from '@/lib/api-auth'
-import { logger, logError } from '@/lib/logger'
+import { logError } from '@/lib/logger'
 
 export const runtime = 'nodejs'
 
@@ -38,10 +38,11 @@ export async function GET(request: NextRequest) {
       drivers: driversRes.data || [],
       carriers: carriersRes.data || []
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
     logError('Erro ao buscar opções de custos', { error }, 'CostsOptionsAPI')
+    const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido'
     return NextResponse.json(
-      { error: 'Erro ao buscar opções de custos', message: error.message },
+      { error: 'Erro ao buscar opções de custos', message: errorMessage },
       { status: 500 }
     )
   }

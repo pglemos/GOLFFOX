@@ -3,7 +3,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { createClient } from '@supabase/supabase-js'
 import { getUserRoleByEmail } from '@/lib/user-role'
-import { logger } from '@/lib/logger'
 import { debug, error as logError } from '@/lib/logger'
 import { withRateLimit } from '@/lib/rate-limit'
 

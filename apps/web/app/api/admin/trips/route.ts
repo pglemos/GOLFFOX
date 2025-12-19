@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requireAuth } from '@/lib/api-auth'
-import { logger } from '@/lib/logger'
+import { logError } from '@/lib/logger'
 
 export const runtime = 'nodejs'
 
@@ -94,7 +94,7 @@ export async function GET(request: NextRequest) {
     const { data, error, count } = await query
 
     if (error) {
-      console.error('Erro ao buscar viagens:', error)
+      logError('Erro ao buscar viagens', { error }, 'TripsAPI')
       return NextResponse.json(
         { error: 'Erro ao buscar viagens', message: error.message },
         { status: 500 }
@@ -108,7 +108,7 @@ export async function GET(request: NextRequest) {
       offset
     })
   } catch (err) {
-    console.error('Erro ao listar viagens:', err)
+    logError('Erro ao listar viagens', { error: err }, 'TripsAPI')
     const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
     return NextResponse.json(
       { error: 'Erro ao listar viagens', message: errorMessage },
@@ -312,7 +312,7 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (createError) {
-      console.error('Erro ao criar viagem:', createError)
+      logError('Erro ao criar viagem', { error: createError }, 'TripsAPI')
       return NextResponse.json(
         { 
           error: 'Erro ao criar viagem',
@@ -328,8 +328,8 @@ export async function POST(request: NextRequest) {
       trip: newTrip,
       id: newTrip.id
     }, { status: 201 })
-  } catch (error: any) {
-    console.error('Erro ao criar viagem:', error)
+  } catch (error: unknown) {
+    logError('Erro ao criar viagem', { error }, 'TripsAPI')
     return NextResponse.json(
       { 
         error: 'Erro ao criar viagem',

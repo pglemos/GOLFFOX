@@ -231,10 +231,11 @@ export async function POST(request: NextRequest) {
     const result = await optimizeWithGoogle(body)
     return NextResponse.json(result)
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     logError('Erro ao otimizar rota', { error }, 'OptimizeRouteAPI')
+    const errorMessage = error instanceof Error ? error.message : 'Erro ao otimizar rota'
     return NextResponse.json(
-      { error: error.message || 'Erro ao otimizar rota' },
+      { error: errorMessage },
       { status: 500 }
     )
   }

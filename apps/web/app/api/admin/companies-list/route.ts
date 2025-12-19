@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requireAuth } from '@/lib/api-auth'
-import { logger, logError } from '@/lib/logger'
+import { info, logError } from '@/lib/logger'
 
 export const runtime = 'nodejs'
 
@@ -34,10 +34,7 @@ export async function GET(request: NextRequest) {
 
     const supabaseAdmin = getSupabaseAdmin()
     
-    logger.log('🔍 Buscando empresas no banco de dados...')
-    
     // Buscar TODAS as empresas primeiro (sem filtro)
-    logger.log('🔍 Buscando todas as empresas...')
     let { data, error } = await supabaseAdmin
       .from('companies')
       .select('id, name, is_active')
@@ -49,7 +46,7 @@ export async function GET(request: NextRequest) {
         .from('companies')
         .select('id, name, is_active')
       
-      data = result.data?.map((c: any) => ({ ...c, is_active: c.is_active ?? true })) || null
+      data = result.data?.map((c: { id: string; name: string; is_active?: boolean }) => ({ ...c, is_active: c.is_active ?? true })) || null
       error = result.error
     }
     
@@ -80,12 +77,15 @@ export async function GET(request: NextRequest) {
     }
 
     // Garantir que os dados estão no formato correto
-    const formattedCompanies = (data || []).map((c: any) => ({
+    const formattedCompanies = (data || []).map((c: { id: string; name: string }) => ({
       id: c.id,
       name: c.name || 'Sem nome'
-    })).filter((c: any) => c.id && c.name)
+    })).filter((c: { id: string; name: string }) => c.id && c.name)
 
-    logger.log(`✅ ${formattedCompanies.length} empresas encontradas:`, formattedCompanies.map((c: any) => c.name))
+    // Log apenas em desenvolvimento
+    if (isDevelopment) {
+      info(`✅ ${formattedCompanies.length} empresas encontradas`)
+    }
 
     // Retornar no formato esperado pelo frontend
     return NextResponse.json({

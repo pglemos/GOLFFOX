@@ -56,7 +56,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Transformar para o formato esperado pela página
-    const employees = (data || []).map((emp: any) => ({
+    const employees = (data || []).map((emp: { id: string; company_id: string; name?: string; email?: string; phone?: string; cpf?: string; address?: string; latitude?: number | string; longitude?: number | string; is_active?: boolean; company?: { name: string } }) => ({
       id: emp.id,
       employee_id: emp.id,
       company_id: emp.company_id,
@@ -78,9 +78,10 @@ export async function GET(request: NextRequest) {
     }))
 
     return NextResponse.json(employees)
-  } catch (error: any) {
+  } catch (error: unknown) {
     logError('Erro inesperado no employees-list API', { error }, 'EmployeesListAPI')
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 })
+    const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido'
+    return NextResponse.json({ success: false, error: errorMessage }, { status: 500 })
   }
 }
 

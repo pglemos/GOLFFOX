@@ -123,8 +123,9 @@ ALTER TABLE users ADD COLUMN IF NOT EXISTS address_state VARCHAR(2);
       message: 'Colunas de endereço adicionadas com sucesso!'
     })
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     logError('Erro na migração', { error }, 'MigrateUsersAddressAPI')
+    const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido'
     return NextResponse.json({
       success: false,
       error: 'Erro ao executar migração',
