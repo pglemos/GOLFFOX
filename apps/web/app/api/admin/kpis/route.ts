@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
     const views = [
       'v_admin_kpis_materialized',
       'v_admin_kpis',
-      'v_operator_kpis'
+      'v_operador_kpis'
     ]
 
     let kpisData: unknown[] = []

@@ -16,10 +16,10 @@ const EXPECTED_VIEWS = [
   'v_admin_dashboard_kpis_secure',
   // operador secure views
   'v_my_companies',
-  'v_operator_dashboard_kpis_secure',
-  'v_operator_routes_secure',
-  'v_operator_alerts_secure',
-  'v_operator_costs_secure',
+  'v_operador_dashboard_kpis_secure',
+  'v_operador_routes_secure',
+  'v_operador_alerts_secure',
+  'v_operador_costs_secure',
   // Reports secure views
   'v_reports_delays_secure',
   'v_reports_occupancy_secure',
@@ -42,7 +42,7 @@ const EXPECTED_VIEWS = [
 // Lista de materialized views esperadas
 const EXPECTED_MATVIEWS = [
   'mv_admin_kpis',
-  'mv_operator_kpis',
+  'mv_operador_kpis',
 ]
 
 // Lista de funções esperadas
@@ -51,7 +51,7 @@ const EXPECTED_FUNCTIONS = [
   'company_ownership',
   'refresh_mv_admin_kpis',
   'refresh_mv_admin_kpis_with_cleanup',
-  'refresh_mv_operator_kpis',
+  'refresh_mv_operador_kpis',
   'v_positions_by_interval',
   'gf_map_snapshot_full',
   'update_gf_report_schedules_updated_at',
@@ -360,7 +360,7 @@ async function checkPerformance(client) {
   // Testar views críticas com 10 execuções para calcular p95
   const criticalViews = [
     'v_live_vehicles',
-    'v_operator_dashboard_kpis_secure',
+    'v_operador_dashboard_kpis_secure',
     'v_admin_dashboard_kpis',
     'v_costs_breakdown',
   ]

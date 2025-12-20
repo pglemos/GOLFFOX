@@ -13,7 +13,7 @@ export function useOperatorKPIs(companyId: string | null) {
       // Usar view segura diretamente (materialized views não suportam RLS)
       // A view segura já tem RLS configurado e funciona corretamente
       const { data, error: kpiError } = await supabase
-        .from("v_operator_dashboard_kpis_secure")
+        .from("v_operador_dashboard_kpis_secure")
         .select("*")
         .eq("company_id", companyId)
         .single()
@@ -47,19 +47,19 @@ export function useControlTower(companyId: string | null) {
 
       const [delaysRes, stoppedRes, deviationsRes, assistanceRes] = await Promise.all([
         supabase
-          .from("v_operator_alerts_secure")
+          .from("v_operador_alerts_secure")
           .select("id", { count: "exact", head: true })
           .eq("type", "route_delayed")
           .eq("severity", "critical")
           .eq("company_id", companyId),
         supabase
-          .from("v_operator_alerts_secure")
+          .from("v_operador_alerts_secure")
           .select("id", { count: "exact", head: true })
           .eq("type", "bus_stopped")
           .eq("is_resolved", false)
           .eq("company_id", companyId),
         supabase
-          .from("v_operator_alerts_secure")
+          .from("v_operador_alerts_secure")
           .select("id", { count: "exact", head: true })
           .eq("type", "deviation")
           .eq("is_resolved", false)
@@ -147,7 +147,7 @@ export function useRoutes(companyId: string | null) {
       if (!companyId) return []
 
       const { data, error } = await supabase
-        .from("v_operator_routes_secure")
+        .from("v_operador_routes_secure")
         .select("*")
         .order("name", { ascending: true })
 
@@ -175,7 +175,7 @@ export function useAlerts(
       if (!companyId) return { data: [], count: 0, nextPage: null }
 
       let query = supabase
-        .from("v_operator_alerts_secure")
+        .from("v_operador_alerts_secure")
         .select("*", { count: "exact" })
         .order("created_at", { ascending: false })
         .range((pageParam - 1) * pageSize, pageParam * pageSize - 1)

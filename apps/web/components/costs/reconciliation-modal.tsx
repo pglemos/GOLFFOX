@@ -389,7 +389,7 @@ export function ReconciliationModal({
                     <th className="px-4 py-3 text-left text-sm font-semibold">Status</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-200">
+                <tbody className="divide-y divide-border-light">
                   {invoiceLines.map((line) => {
                     const status = getDiscrepancyStatus(line)
                     return (
@@ -562,7 +562,7 @@ export function ReconciliationModal({
                 <Button 
                   onClick={handleApprove}
                   disabled={processing}
-                  className="bg-success hover:bg-green-700 min-h-[44px] text-xs sm:text-sm w-full sm:w-auto"
+                  className="bg-success hover:bg-success min-h-[44px] text-xs sm:text-sm w-full sm:w-auto"
                 >
                   <CheckCircle className="h-4 w-4 mr-2 flex-shrink-0" />
                   {processing ? 'Processando...' : 'Aprovar'}
@@ -583,7 +583,7 @@ export function ReconciliationModal({
                 <Button 
                   onClick={handleApprove}
                   disabled={processing}
-                  className="bg-success hover:bg-green-700 min-h-[44px] text-xs sm:text-sm w-full sm:w-auto"
+                  className="bg-success hover:bg-success min-h-[44px] text-xs sm:text-sm w-full sm:w-auto"
                 >
                   <CheckCircle className="h-4 w-4 mr-2 flex-shrink-0" />
                   {processing ? 'Processando...' : 'Aprovar'}

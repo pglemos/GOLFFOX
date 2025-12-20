@@ -39,7 +39,7 @@ export default function ConformidadeOperatorPage() {
         .single()
 
       let query = supabase
-        .from('gf_operator_incidents')
+        .from('gf_operador_incidents')
         .select('*')
         .order('created_at', { ascending: false })
 

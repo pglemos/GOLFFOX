@@ -27,7 +27,7 @@ describe('useOperatorKPIs hook', () => {
       sla_d0: 95,
     }
 
-    mockSupabaseClient.setTableData('v_operator_dashboard_kpis_secure', [kpiData])
+    mockSupabaseClient.setTableData('v_operador_dashboard_kpis_secure', [kpiData])
 
     const { result } = renderHook(() => useOperatorKPIs('company-1'), {
       wrapper: renderWithProviders,
@@ -61,7 +61,7 @@ describe('useControlTower hook', () => {
   })
 
   it('deve buscar dados da torre de controle', async () => {
-    mockSupabaseClient.setTableData('v_operator_alerts_secure', [])
+    mockSupabaseClient.setTableData('v_operador_alerts_secure', [])
     mockSupabaseClient.setTableData('gf_service_requests', [])
 
     const { result } = renderHook(() => useControlTower('company-1'), {

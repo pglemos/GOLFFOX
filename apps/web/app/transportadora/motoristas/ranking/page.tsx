@@ -112,11 +112,11 @@ export default function MotoristasPage() {
   const getRankBadgeColor = (rank: number) => {
     switch (rank) {
       case 1:
-        return "bg-gradient-to-r from-warning to-yellow-600 text-white"
+        return "bg-gradient-to-r from-warning to-warning text-white"
       case 2:
-        return "bg-gradient-to-r from-muted to-gray-500 text-white"
+        return "bg-gradient-to-r from-muted to-ink-muted text-white"
       case 3:
-        return "bg-gradient-to-r from-orange-400 to-brand-hover text-white"
+        return "bg-gradient-to-r from-brand to-brand-hover text-white"
       default:
         return "bg-muted text-ink-strong"
     }
@@ -141,7 +141,7 @@ export default function MotoristasPage() {
 
         {/* Métricas Gerais */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card className="p-4 bg-gradient-to-br from-yellow-50 to-yellow-100 border-warning-light">
+          <Card className="p-4 bg-gradient-to-br from-warning-light to-warning-light border-warning-light">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs font-medium text-warning mb-1">Motoristas Ativos</p>
@@ -152,7 +152,7 @@ export default function MotoristasPage() {
               </div>
             </div>
           </Card>
-          <Card className="p-4 bg-gradient-to-br from-success-light to-green-100 border-success-light">
+          <Card className="p-4 bg-gradient-to-br from-success-light to-success-light border-success-light">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs font-medium text-success mb-1">Faturamento Total</p>
@@ -242,7 +242,7 @@ export default function MotoristasPage() {
                       <div className="flex items-center gap-4 flex-1">
                         <div className={`h-12 w-12 rounded-lg flex items-center justify-center font-bold text-lg ${getRankBadgeColor(motorista.rank)}`}>#{motorista.rank}</div>
                         <div className="flex items-center gap-3 flex-1">
-                          <div className="h-12 w-12 rounded-full bg-gradient-to-br from-orange-400 to-brand-hover flex items-center justify-center text-white font-bold text-lg">
+                          <div className="h-12 w-12 rounded-full bg-gradient-to-br from-brand to-brand-hover flex items-center justify-center text-white font-bold text-lg">
                             {motorista.name.charAt(0)}
                           </div>
                           <div className="flex-1 min-w-0">
@@ -266,7 +266,7 @@ export default function MotoristasPage() {
                               <span className="font-medium">{motorista.punctualityScore}%</span>
                             </div>
                             <div className="h-2 bg-muted rounded-full overflow-hidden">
-                              <div className="h-full bg-gradient-to-r from-blue-400 to-info rounded-full transition-all" style={{ width: `${motorista.punctualityScore}%` }} />
+                              <div className="h-full bg-gradient-to-r from-info to-info rounded-full transition-all" style={{ width: `${motorista.punctualityScore}%` }} />
                             </div>
                           </div>
                           <div>

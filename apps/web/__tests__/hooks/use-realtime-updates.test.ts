@@ -44,7 +44,7 @@ describe('useRealtimeUpdates', () => {
       expect(mockChannel.on).toHaveBeenCalledWith(
         'postgres_changes',
         expect.objectContaining({
-          table: 'mv_operator_kpis',
+          table: 'mv_operador_kpis',
           filter: 'company_id=eq.company-1',
         }),
         expect.any(Function)

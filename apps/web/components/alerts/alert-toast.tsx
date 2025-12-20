@@ -16,7 +16,7 @@ export function AlertToast({ t, title, message, severity, onDismiss }: AlertToas
     const getColors = () => {
         switch (severity) {
             case 'critical':
-                return 'bg-error-light0 border-red-600' // Darker red/white
+                return 'bg-error-light border-error' // Darker red/white
             case 'warning':
                 return 'bg-amber-500 border-amber-600'
             case 'info':

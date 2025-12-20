@@ -54,7 +54,7 @@ export default function PrestadoresOperatorPage() {
       if (userData?.company_id) {
         // @ts-ignore - Supabase type inference issue with views
         const { data, error } = await (((supabase
-          .from('v_operator_assigned_carriers' as any)
+          .from('v_operador_assigned_carriers' as any)
           .select('*')
           .eq('empresa_id', userData.company_id)) as any) as any)
         

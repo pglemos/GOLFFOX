@@ -115,9 +115,9 @@ export function OperationalAlertsNotification() {
       case 'critical':
         return 'bg-error-light text-error border-error-light'
       case 'error':
-        return 'bg-error-light text-error border-red-100'
+        return 'bg-error-light text-error border-error-light'
       case 'warning':
-        return 'bg-warning-light text-warning border-yellow-100'
+        return 'bg-warning-light text-warning border-warning-light'
       case 'info':
         return 'bg-info-light text-info border-info-light'
       default:

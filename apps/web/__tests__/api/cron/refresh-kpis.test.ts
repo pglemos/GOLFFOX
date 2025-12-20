@@ -16,7 +16,7 @@ describe('GET /api/cron/refresh-kpis', () => {
   })
 
   it('deve executar refresh de KPIs com autenticação válida', async () => {
-    mockSupabaseClient.setRPCHandler('refresh_mv_operator_kpis', async () => ({
+    mockSupabaseClient.setRPCHandler('refresh_mv_operador_kpis', async () => ({
       data: null,
       error: null,
     }))
@@ -49,7 +49,7 @@ describe('GET /api/cron/refresh-kpis', () => {
   })
 
   it('deve lidar com erro na função RPC', async () => {
-    mockSupabaseClient.setRPCHandler('refresh_mv_operator_kpis', async () => ({
+    mockSupabaseClient.setRPCHandler('refresh_mv_operador_kpis', async () => ({
       data: null,
       error: {
         message: 'Function does not exist',

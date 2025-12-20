@@ -305,19 +305,19 @@ export default function CustosPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0 }}
           >
-            <Card className="relative overflow-hidden bg-gradient-to-br from-brand-light to-brand-light border-brand-soft dark:from-orange-950 dark:to-orange-900 dark:border-brand">
+            <Card className="relative overflow-hidden bg-gradient-to-br from-brand-light to-brand-light border-brand-soft dark:from-brand dark:to-brand dark:border-brand">
               <div className="absolute top-0 right-0 w-32 h-32 bg-brand/10 rounded-bl-full" />
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-brand dark:text-orange-300 flex items-center gap-2">
+                <CardTitle className="text-sm font-medium text-brand dark:text-brand flex items-center gap-2">
                   <TrendingDown className="h-4 w-4" />
                   Total de Custos
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-orange-900 dark:text-brand-light">
+                <div className="text-2xl font-bold text-brand dark:text-brand-light">
                   <CountUp value={kpis.totalCosts} />
                 </div>
-                <p className="text-xs text-brand dark:text-orange-400 mt-1">
+                <p className="text-xs text-brand dark:text-brand mt-1">
                   {kpis.costEntries} lançamentos no mês
                 </p>
               </CardContent>
@@ -329,16 +329,16 @@ export default function CustosPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
           >
-            <Card className="relative overflow-hidden bg-gradient-to-br from-success-light to-green-100 border-success-light dark:from-green-950 dark:to-success dark:border-success">
+            <Card className="relative overflow-hidden bg-gradient-to-br from-success-light to-success-light border-success-light dark:from-success dark:to-success dark:border-success">
               <div className="absolute top-0 right-0 w-32 h-32 bg-success-light0/10 rounded-bl-full" />
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-success dark:text-green-300 flex items-center gap-2">
+                <CardTitle className="text-sm font-medium text-success dark:text-success flex items-center gap-2">
                   <TrendingUp className="h-4 w-4" />
                   Total de Receitas
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-success dark:text-green-100">
+                <div className="text-2xl font-bold text-success dark:text-success-light">
                   <CountUp value={kpis.totalRevenues} />
                 </div>
                 <p className="text-xs text-success dark:text-success mt-1">
@@ -354,22 +354,22 @@ export default function CustosPage() {
             transition={{ delay: 0.2 }}
           >
             <Card className={`relative overflow-hidden ${kpis.margin >= 0
-                ? 'bg-gradient-to-br from-info-light to-info-light border-info-light dark:from-blue-950 dark:to-info dark:border-info'
-                : 'bg-gradient-to-br from-error-light to-red-100 border-error-light dark:from-red-950 dark:to-error dark:border-red-800'
+                ? 'bg-gradient-to-br from-info-light to-info-light border-info-light dark:from-info dark:to-info dark:border-info'
+                : 'bg-gradient-to-br from-error-light to-error-light border-error-light dark:from-error dark:to-error dark:border-error'
               }`}>
               <div className={`absolute top-0 right-0 w-32 h-32 ${kpis.margin >= 0 ? 'bg-info-light0/10' : 'bg-error-light0/10'} rounded-bl-full`} />
               <CardHeader className="pb-2">
-                <CardTitle className={`text-sm font-medium flex items-center gap-2 ${kpis.margin >= 0 ? 'text-info dark:text-blue-300' : 'text-error dark:text-red-300'
+                <CardTitle className={`text-sm font-medium flex items-center gap-2 ${kpis.margin >= 0 ? 'text-info dark:text-info' : 'text-error dark:text-error'
                   }`}>
                   {kpis.margin >= 0 ? <TrendingUp className="h-4 w-4" /> : <TrendingDown className="h-4 w-4" />}
                   Margem
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className={`text-2xl font-bold ${kpis.margin >= 0 ? 'text-info dark:text-info-light' : 'text-error dark:text-red-100'}`}>
+                <div className={`text-2xl font-bold ${kpis.margin >= 0 ? 'text-info dark:text-info-light' : 'text-error dark:text-error-light'}`}>
                   <CountUp value={Math.abs(kpis.margin)} prefix={kpis.margin < 0 ? '-' : ''} />
                 </div>
-                <p className={`text-xs mt-1 ${kpis.margin >= 0 ? 'text-info dark:text-blue-400' : 'text-error dark:text-red-400'}`}>
+                <p className={`text-xs mt-1 ${kpis.margin >= 0 ? 'text-info dark:text-info' : 'text-error dark:text-error'}`}>
                   {kpis.marginPercent}% da receita
                 </p>
               </CardContent>

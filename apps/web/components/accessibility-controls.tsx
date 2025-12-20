@@ -287,11 +287,11 @@ export function AccessibilityControls({
 
                 {/* Keyboard Shortcuts Info */}
                 <div className="bg-info-light dark:bg-info/20 p-3 rounded text-xs">
-                  <div className="font-medium text-info dark:text-blue-200 mb-2 flex items-center gap-1">
+                  <div className="font-medium text-info dark:text-info-light mb-2 flex items-center gap-1">
                     <Info className="w-3 h-3" />
                     Atalhos de Teclado
                   </div>
-                  <div className="text-info dark:text-blue-300 space-y-1">
+                  <div className="text-info dark:text-info space-y-1">
                     <div><kbd className="bg-info-light dark:bg-info px-1 rounded">Alt + S</kbd> - Pular para conteúdo</div>
                     <div><kbd className="bg-info-light dark:bg-info px-1 rounded">Alt + H</kbd> - Alto contraste</div>
                     <div><kbd className="bg-info-light dark:bg-info px-1 rounded">Esc</kbd> - Fechar modais</div>

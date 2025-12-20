@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
             { name: 'Combustível', value: 35, color: '#ef4444' }, // error
             { name: 'Manutenção', value: 25, color: '#f59e0b' }, // amber-500
             { name: 'Motoristas', value: 30, color: '#3b82f6' }, // info-light0
-            { name: 'Outros', value: 10, color: '#6b7280' }, // gray-500
+            { name: 'Outros', value: 10, color: '#64748B' }, // ink-muted
         ]
 
         // Monthly trend data for charts

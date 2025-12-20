@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
 
   try {
     // Verificar se a função RPC existe antes de chamar
-    const { error: rpcError } = await supabaseServiceRole.rpc('refresh_mv_operator_kpis')
+    const { error: rpcError } = await supabaseServiceRole.rpc('refresh_mv_operador_kpis')
     
     if (rpcError) {
       logError('Erro ao atualizar MV de KPIs', { error: rpcError }, 'CronRefreshKPIs')
@@ -61,7 +61,7 @@ export async function GET(request: NextRequest) {
         return NextResponse.json(
           { 
             error: 'Função RPC não encontrada',
-            message: 'A função refresh_mv_operator_kpis não existe no banco de dados. Verifique se as migrações foram executadas.',
+            message: 'A função refresh_mv_operador_kpis não existe no banco de dados. Verifique se as migrações foram executadas.',
             details: rpcError.message
           },
           { status: 500 }
@@ -71,7 +71,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(
         { 
           error: 'Erro ao atualizar KPIs',
-          message: rpcError.message || 'Erro desconhecido ao executar refresh_mv_operator_kpis',
+          message: rpcError.message || 'Erro desconhecido ao executar refresh_mv_operador_kpis',
           details: rpcError
         },
         { status: 500 }
@@ -89,7 +89,7 @@ export async function GET(request: NextRequest) {
       message: 'KPIs atualizados com sucesso'
     })
   } catch (error: unknown) {
-    logError('Erro ao executar refresh_mv_operator_kpis', { error }, 'CronRefreshKPIs')
+    logError('Erro ao executar refresh_mv_operador_kpis', { error }, 'CronRefreshKPIs')
     const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido'
     const errorStack = error instanceof Error ? error.stack : undefined
     return NextResponse.json(

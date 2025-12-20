@@ -18,7 +18,7 @@ export function useRealtimeKPIs(companyId: string | null) {
         {
           event: "*",
           schema: "public",
-          table: "mv_operator_kpis",
+          table: "mv_operador_kpis",
           filter: `company_id=eq.${companyId}`,
         },
         () => {

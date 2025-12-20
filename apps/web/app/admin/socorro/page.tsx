@@ -240,7 +240,7 @@ export default function SocorroPage() {
                   onValueChange={setSelectedRouteId}
                   disabled={loadingResources}
                 >
-                  <SelectTrigger className={`h-12 text-base ${!selectedRouteId ? 'border-red-300' : ''}`}>
+                  <SelectTrigger className={`h-12 text-base ${!selectedRouteId ? 'border-error-light' : ''}`}>
                     <SelectValue placeholder="Selecione uma rota com problema" />
                   </SelectTrigger>
                   <SelectContent>

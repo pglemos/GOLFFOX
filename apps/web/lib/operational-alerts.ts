@@ -136,7 +136,7 @@ export async function getUnresolvedAlerts(
   try {
     // Priorizar view segura por operador se existir, com fallback para tabela base
     let query = supabase
-      .from('v_operator_alerts_secure')
+      .from('v_operador_alerts_secure')
       .select('*')
       .eq('is_resolved', false)
       .order('created_at', { ascending: false })
@@ -207,7 +207,7 @@ export async function hasCriticalAlerts(): Promise<boolean> {
   try {
     // Tentar pela view segura primeiro
     let { data, error } = await supabase
-      .from('v_operator_alerts_secure')
+      .from('v_operador_alerts_secure')
       .select('id, severity, is_resolved')
       .eq('severity', 'critical')
       .eq('is_resolved', false)

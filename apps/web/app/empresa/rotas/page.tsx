@@ -35,7 +35,7 @@ export default function OperatorRotasPage() {
     queryFn: async () => {
       if (!tenantCompanyId) return []
       const { data, error } = await supabase
-        .from("v_operator_routes_secure")
+        .from("v_operador_routes_secure")
         .select("*")
         .order("name", { ascending: true })
 

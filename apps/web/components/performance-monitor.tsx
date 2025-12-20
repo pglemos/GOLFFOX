@@ -264,7 +264,7 @@ export function PerformanceMonitor({
                     <div className="font-medium text-warning dark:text-warning-light mb-1">
                       Dicas de Otimização:
                     </div>
-                    <ul className="text-warning dark:text-yellow-300 space-y-1">
+                    <ul className="text-warning dark:text-warning space-y-1">
                       {metrics.fps < 30 && (
                         <li>• Reduza animações complexas</li>
                       )}

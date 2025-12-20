@@ -73,7 +73,7 @@ export default function SatisfacaoPage() {
 
                 {/* Main KPIs */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <Card className="bg-gradient-to-br from-yellow-50 to-yellow-100 border-warning-light">
+                    <Card className="bg-gradient-to-br from-warning-light to-warning-light border-warning-light">
                         <CardContent className="pt-6">
                             <div className="flex items-center gap-2 mb-2">
                                 {renderStars(data.overall_rating)}

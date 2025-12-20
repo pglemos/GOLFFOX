@@ -20,7 +20,7 @@ export default function PreferenciasOperatorPage() {
   }, [user])
 
   const load = async () => {
-    const { data } = await supabase.from('gf_operator_settings').select('*').limit(1).maybeSingle()
+    const { data } = await supabase.from('gf_operador_settings').select('*').limit(1).maybeSingle()
     setSettings(data)
   }
 
