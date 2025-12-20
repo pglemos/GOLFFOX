@@ -26,13 +26,13 @@ export function LoadingSkeleton({
             animate="visible"
             transition={{ delay: i * 0.1 }}
           >
-            <Card className="bg-card/50 backdrop-blur-sm border-[var(--border)]">
+            <Card className="bg-card/50 backdrop-blur-sm border-border">
               <CardHeader>
-                <div className="h-4 w-24 bg-[var(--bg-hover)] rounded animate-pulse mb-2" />
-                <div className="h-8 w-32 bg-[var(--bg-hover)] rounded animate-pulse" />
+                <div className="h-4 w-24 bg-bg-hover rounded animate-pulse mb-2" />
+                <div className="h-8 w-32 bg-bg-hover rounded animate-pulse" />
               </CardHeader>
               <CardContent>
-                <div className="h-3 w-16 bg-[var(--bg-hover)] rounded animate-pulse" />
+                <div className="h-3 w-16 bg-bg-hover rounded animate-pulse" />
               </CardContent>
             </Card>
           </motion.div>
@@ -52,13 +52,13 @@ export function LoadingSkeleton({
             animate="visible"
             transition={{ delay: i * 0.05 }}
           >
-            <Card className="bg-card/50 backdrop-blur-sm border-[var(--border)]">
+            <Card className="bg-card/50 backdrop-blur-sm border-border">
               <CardContent className="p-4">
                 <div className="flex items-center gap-4">
-                  <div className="h-12 w-12 rounded-lg bg-[var(--bg-hover)] animate-pulse" />
+                  <div className="h-12 w-12 rounded-lg bg-bg-hover animate-pulse" />
                   <div className="flex-1 space-y-2">
-                    <div className="h-4 w-3/4 bg-[var(--bg-hover)] rounded animate-pulse" />
-                    <div className="h-3 w-1/2 bg-[var(--bg-hover)] rounded animate-pulse" />
+                    <div className="h-4 w-3/4 bg-bg-hover rounded animate-pulse" />
+                    <div className="h-3 w-1/2 bg-bg-hover rounded animate-pulse" />
                   </div>
                 </div>
               </CardContent>
@@ -71,9 +71,9 @@ export function LoadingSkeleton({
 
   if (type === "table") {
     return (
-      <Card className={`bg-card/50 backdrop-blur-sm border-[var(--border)] ${className}`}>
+      <Card className={`bg-card/50 backdrop-blur-sm border-border ${className}`}>
         <CardHeader>
-          <div className="h-6 w-48 bg-[var(--bg-hover)] rounded animate-pulse" />
+          <div className="h-6 w-48 bg-bg-hover rounded animate-pulse" />
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
@@ -84,12 +84,12 @@ export function LoadingSkeleton({
                 initial="hidden"
                 animate="visible"
                 transition={{ delay: i * 0.05 }}
-                className="flex items-center gap-4 py-3 border-b border-[var(--border)]"
+                className="flex items-center gap-4 py-3 border-b border-border"
               >
-                <div className="h-4 w-16 bg-[var(--bg-hover)] rounded animate-pulse" />
-                <div className="h-4 w-32 bg-[var(--bg-hover)] rounded animate-pulse" />
-                <div className="h-4 w-24 bg-[var(--bg-hover)] rounded animate-pulse" />
-                <div className="h-4 w-20 bg-[var(--bg-hover)] rounded animate-pulse ml-auto" />
+                <div className="h-4 w-16 bg-bg-hover rounded animate-pulse" />
+                <div className="h-4 w-32 bg-bg-hover rounded animate-pulse" />
+                <div className="h-4 w-24 bg-bg-hover rounded animate-pulse" />
+                <div className="h-4 w-20 bg-bg-hover rounded animate-pulse ml-auto" />
               </motion.div>
             ))}
           </div>
@@ -109,13 +109,13 @@ export function LoadingSkeleton({
           animate="visible"
           transition={{ delay: i * 0.1 }}
         >
-          <Card className="bg-card/50 backdrop-blur-sm border-[var(--border)]">
+          <Card className="bg-card/50 backdrop-blur-sm border-border">
             <CardHeader>
-              <div className="h-5 w-32 bg-[var(--bg-hover)] rounded animate-pulse mb-2" />
-              <div className="h-4 w-24 bg-[var(--bg-hover)] rounded animate-pulse" />
+              <div className="h-5 w-32 bg-bg-hover rounded animate-pulse mb-2" />
+              <div className="h-4 w-24 bg-bg-hover rounded animate-pulse" />
             </CardHeader>
             <CardContent>
-              <div className="h-20 bg-[var(--bg-hover)] rounded animate-pulse" />
+              <div className="h-20 bg-bg-hover rounded animate-pulse" />
             </CardContent>
           </Card>
         </motion.div>

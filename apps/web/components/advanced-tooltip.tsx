@@ -120,7 +120,7 @@ export function AdvancedTooltip({ stop, isVisible, position, onClose: _onClose }
                     alt={stop.passenger.name}
                   />
                   <AvatarFallback className="bg-gray-100 text-gray-600 text-sm font-medium">
-                    {stop.passenger.name.split(' ').map(n => n[0]).join('').substring(0, 2)}
+                    {stop.passageiro.name.split(' ').map(n => n[0]).join('').substring(0, 2)}
                   </AvatarFallback>
                 </Avatar>
                 
@@ -130,12 +130,12 @@ export function AdvancedTooltip({ stop, isVisible, position, onClose: _onClose }
                       {stop.passenger.name}
                     </h3>
                     <div className="flex items-center gap-1">
-                      <span className="text-lg" role="img" aria-label={stop.passenger.type}>
+                      <span className="text-lg" role="img" aria-label={stop.passageiro.type}>
                         {passengerTypeIcons[stop.passenger.type]}
                       </span>
                       <Badge 
                         variant="secondary" 
-                        className={`text-xs ${passengerTypeColors[stop.passenger.type]}`}
+                        className={`text-xs ${passengerTypeColors[stop.passageiro.type]}`}
                       >
                         {stop.passenger.type}
                       </Badge>
@@ -171,13 +171,13 @@ export function AdvancedTooltip({ stop, isVisible, position, onClose: _onClose }
                   {stop.passenger.phone && (
                     <div className="flex items-center gap-2 text-xs text-gray-600">
                       <Phone className="w-3 h-3" />
-                      <span className="font-mono">{stop.passenger.phone}</span>
+                      <span className="font-mono">{stop.passageiro.phone}</span>
                     </div>
                   )}
                   {stop.passenger.email && (
                     <div className="flex items-center gap-2 text-xs text-gray-600">
                       <Mail className="w-3 h-3" />
-                      <span className="truncate">{stop.passenger.email}</span>
+                      <span className="truncate">{stop.passageiro.email}</span>
                     </div>
                   )}
                 </div>

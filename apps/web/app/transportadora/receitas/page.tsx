@@ -48,8 +48,8 @@ export default function ReceitasPage() {
         reference_month: new Date().toISOString().slice(0, 7)
     })
 
-    // Mock carrier ID for now - in production, get from user profile
-    const carrierId = user?.id || 'mock-carrier'
+    // Mock transportadora ID for now - in production, get from user profile
+    const carrierId = user?.id || 'mock-transportadora'
 
     useEffect(() => {
         loadRevenues()

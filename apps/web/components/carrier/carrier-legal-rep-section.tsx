@@ -47,7 +47,7 @@ export function CarrierLegalRepSection({
     const [uploading, setUploading] = useState(false) // Mantido para compatibilidade visual, mas controlado pelo save
 
     const { upload } = useFileUpload({
-        bucket: "carrier-documents",
+        bucket: "transportadora-documents",
         maxSize: 10,
     })
 

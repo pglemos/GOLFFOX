@@ -45,10 +45,10 @@ Este documento contém as credenciais de teste para acessar a aplicação GolfFo
 O sistema implementa redirecionamento automático baseado no tipo de usuário:
 
 - **Admin** → `/admin`
-- **Operator** → `/operator`
-- **Carrier** → `/carrier`
-- **Driver** → `/driver`
-- **Passenger** → `/passenger`
+- **operador** → `/operador`
+- **transportadora** → `/transportadora`
+- **motorista** → `/motorista`
+- **passageiro** → `/passageiro`
 
 ## 🛡️ Segurança
 

@@ -107,7 +107,7 @@ export class AuthManager {
     if (requiredRole === 'empresa') {
       return ['admin', 'empresa'].includes(user.role)
     }
-    // operador = gestor da transportadora (antigo carrier)
+    // operador = gestor da transportadora (antigo transportadora)
     if (requiredRole === 'operador' || requiredRole === 'transportadora') {
       return ['admin', 'operador'].includes(user.role)
     }
@@ -129,13 +129,13 @@ export class AuthManager {
         // Motorista e Passageiro devem usar app mobile, não painéis web
         return null
       // Compatibilidade com roles antigas (inglês) - Temporário durante migração
-      case 'operator':
-        return '/empresa'  // antigo operator → nova rota /empresa
-      case 'carrier':
+      case 'operador':
+        return '/empresa'  // antigo operador → nova rota /empresa
+      case 'transportadora':
       case 'transportadora':
         return '/transportadora'
-      case 'driver':
-      case 'passenger':
+      case 'motorista':
+      case 'passageiro':
         return null
       default:
         // Fallback para empresa se role não for reconhecido

@@ -78,7 +78,7 @@ SELECT id, email FROM auth.users WHERE email IN (
 
 Copie os IDs e substitua em `lib/supabase/seeds_v74.sql` onde tem:
 - `00000000-0000-0000-0000-0000000000a1` (admin)
-- `00000000-0000-0000-0000-0000000000o1` (operator)
+- `00000000-0000-0000-0000-0000000000o1` (operador)
 - etc.
 
 ### PASSO 4: Executar Seeds (2 min)

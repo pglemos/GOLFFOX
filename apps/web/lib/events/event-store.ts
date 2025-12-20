@@ -67,6 +67,11 @@ class EventStore {
         eventType: event.eventType, 
         aggregateId: event.aggregateId 
       }, 'EventStore')
+      
+      // Publicar evento após salvar (para handlers)
+      // Importação dinâmica para evitar dependência circular
+      const { eventPublisher } = await import('./event-publisher')
+      await eventPublisher.publish(event)
     } catch (error) {
       logError('Falha ao salvar evento', { error, event }, 'EventStore')
       throw error
@@ -85,7 +90,7 @@ class EventStore {
 
       const { data, error } = await supabase
         .from('gf_event_store')
-        .select('*')
+        .select('id, event_id, event_type, aggregate_id, aggregate_type, occurred_at, event_data, metadata, created_at')
         .eq('aggregate_type', aggregateType)
         .eq('aggregate_id', aggregateId)
         .order('occurred_at', { ascending: true })

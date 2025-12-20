@@ -65,7 +65,7 @@ git status
 git add .
 
 # 4. Fazer commit
-git commit -m "feat: Deploy - Configuração de 3 painéis (Admin/Operator/Carrier) na Vercel
+git commit -m "feat: Deploy - Configuração de 3 painéis (Admin/operador/transportadora) na Vercel
 
 - Middleware de autenticação por role
 - Componentes adaptativos (Sidebar, Topbar, AppShell)
@@ -111,18 +111,18 @@ Após o deploy completar com sucesso, teste:
 - [ ] Redireciona para `/admin`
 - [ ] Acessa todas as 12 abas
 - [ ] Menu lateral mostra "Admin • Premium"
-- [ ] Não consegue acessar `/operator` ou `/carrier` (ou pode, se configurado)
+- [ ] Não consegue acessar `/operador` ou `/transportadora` (ou pode, se configurado)
 
-**Operator** (`operador@empresa.com` / `senha123`):
+**operador** (`operador@empresa.com` / `senha123`):
 - [ ] Login funciona
-- [ ] Redireciona para `/operator`
+- [ ] Redireciona para `/operador`
 - [ ] Dashboard mostra viagens
 - [ ] Menu lateral mostra 5 itens
 - [ ] Não consegue acessar `/admin`
 
-**Carrier** (`transportadora@trans.com` / `senha123`):
+**transportadora** (`transportadora@trans.com` / `senha123`):
 - [ ] Login funciona
-- [ ] Redireciona para `/carrier`
+- [ ] Redireciona para `/transportadora`
 - [ ] Dashboard mostra frota
 - [ ] Menu lateral mostra 7 itens
 - [ ] Não consegue acessar `/admin`

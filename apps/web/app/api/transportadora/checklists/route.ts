@@ -6,7 +6,7 @@ import { requireAuth } from '@/lib/api-auth';
 // GET /api/transportadora/checklists - Listar checklists dos motoristas
 export async function GET(request: NextRequest) {
     // Verificar autenticação (transportadora)
-    const authError = await requireAuth(request, ['admin', 'transportadora', 'operador', 'carrier'])
+    const authError = await requireAuth(request, ['admin', 'transportadora', 'operador', 'transportadora'])
     if (authError) return authError
 
     try {
@@ -77,7 +77,7 @@ export async function GET(request: NextRequest) {
 // PUT /api/transportadora/checklists - Aprovar/rejeitar checklist
 export async function PUT(request: NextRequest) {
     // Verificar autenticação (transportadora)
-    const authError = await requireAuth(request, ['admin', 'transportadora', 'operador', 'carrier'])
+    const authError = await requireAuth(request, ['admin', 'transportadora', 'operador', 'transportadora'])
     if (authError) return authError
 
     try {

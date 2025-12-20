@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requireAuth } from '@/lib/api-auth'
-import { logError } from '@/lib/logger'
+import { logError, logger } from '@/lib/logger'
 
 export const runtime = 'nodejs'
 
@@ -311,14 +311,14 @@ export async function POST(request: NextRequest) {
         // NÃO deletar empresa em modo de teste, pois pode ser reutilizada
         return NextResponse.json({
           success: true,
-          userId: 'test-operator-' + Date.now(),
+          userId: 'test-operador-' + Date.now(),
           created: true,
           email: operatorEmail,
           role: 'operador',
           companyId: company?.id || companyId || '',
           company: company || null,
           operator: {
-            id: 'test-operator-' + Date.now(),
+            id: 'test-operador-' + Date.now(),
             email: operatorEmail,
           },
         }, { status: 201 })

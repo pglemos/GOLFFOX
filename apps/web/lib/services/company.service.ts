@@ -7,6 +7,7 @@ import { logger } from '@/lib/logger'
 import { CompanyRepository, type Company as CompanyEntity } from '@/lib/repositories'
 import { withCache, cacheService } from '@/lib/cache/cache.service'
 import { cacheDataFetch } from '@/lib/react-cache'
+import { publishCreatedEvent } from '@/lib/events'
 
 export interface CompanyFilters {
   isActive?: boolean
@@ -116,6 +117,24 @@ export class CompanyService {
       } catch (cacheError) {
         logger.warn('Erro ao invalidar cache após criar empresa', { error: cacheError, companyId: company.id })
         // Não relança o erro - a operação principal foi bem-sucedida
+      }
+
+      // Publicar evento de criação (Event Sourcing)
+      try {
+        await publishCreatedEvent(
+          'Company',
+          company.id,
+          {
+            name: company.name,
+            cnpj: company.cnpj,
+            email: company.email,
+            phone: company.phone,
+          },
+          undefined // userId será adicionado nas rotas API
+        )
+      } catch (eventError) {
+        logger.warn('Erro ao publicar evento de criação de empresa', { error: eventError, companyId: company.id })
+        // Não relança o erro - evento não deve quebrar a operação
       }
 
       return company

@@ -15,7 +15,7 @@ O código foi atualizado corretamente no repositório, mas o Vercel ainda está 
 1. **Código Local (Correto):**
    - `apps/web/components/sidebar-new.tsx` - Linha 65: "Transportadoras" ✅
    - `apps/web/app/admin/transportadoras/page.tsx` - Página criada ✅
-   - `apps/web/components/modals/carrier-*.tsx` - Todos os modais criados ✅
+   - `apps/web/components/modals/transportadora-*.tsx` - Todos os modais criados ✅
 
 2. **Código no Vercel (Em Cache):**
    - O sidebar ainda mostra `/admin/motoristas` ❌
@@ -90,7 +90,7 @@ Após o deploy:
 |---------|--------|-------------|
 | `sidebar-new.tsx` | ✅ Atualizado | Commit 78a36c3 |
 | `transportadoras/page.tsx` | ✅ Criado | Commit 71c266f |
-| `carrier-vehicles-modal.tsx` | ✅ Criado | Commit 71c266f |
+| `transportadora-vehicles-modal.tsx` | ✅ Criado | Commit 71c266f |
 | `APIs /carriers/*` | ✅ Criadas | Commit 71c266f |
 | **Vercel Deploy** | ⏳ Aguardando | ~5-10 minutos |
 

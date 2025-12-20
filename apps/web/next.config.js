@@ -43,6 +43,8 @@ let nextConfig = {
       '@googlemaps/js-api-loader',
       '@react-google-maps/api',
     ],
+    // Habilitar hook de instrumentação para APM (Datadog)
+    instrumentationHook: true,
   },
 
   // Configuração webpack para resolver problema ESM do Supabase

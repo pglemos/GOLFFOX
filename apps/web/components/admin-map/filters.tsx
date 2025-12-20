@@ -112,7 +112,7 @@ export const MapFilters = memo(function MapFilters({
       const driversQuery = supabase
         .from('users')
         .select('id, name')
-        .eq('role', 'driver')
+        .eq('role', 'motorista')
         .order('name')
       
       if (filters.company) {
@@ -243,8 +243,8 @@ export const MapFilters = memo(function MapFilters({
 
         {/* Motorista */}
         <Select
-          value={filters.driver || '__ALL__'}
-          onValueChange={(value) => handleFilterChange('driver', value)}
+          value={filters.motorista || '__ALL__'}
+          onValueChange={(value) => handleFilterChange('motorista', value)}
         >
           <SelectTrigger className="w-48">
             <SelectValue placeholder="Motorista" />

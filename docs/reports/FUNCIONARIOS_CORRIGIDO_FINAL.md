@@ -31,7 +31,7 @@ Ctrl + Shift + Delete
 Marque "Cached images and files" e clique em "Clear data"
 
 ### 3️⃣ Acesse a Página
-**URL:** https://golffox.vercel.app/operator/funcionarios?company=11111111-1111-4111-8111-1111111111c1
+**URL:** https://golffox.vercel.app/operador/funcionarios?company=11111111-1111-4111-8111-1111111111c1
 
 **Resultado esperado:**
 - Deve carregar 10 funcionários da Acme Corp

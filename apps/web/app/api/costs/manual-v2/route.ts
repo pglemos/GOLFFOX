@@ -172,7 +172,7 @@ export async function GET(request: NextRequest) {
             vehicle: row.vehicle as ManualCost['vehicle'],
             route: row.route as ManualCost['route'],
             company: row.company as ManualCost['company'],
-            carrier: row.carrier as ManualCost['carrier'],
+            transportadora: row.transportadora as ManualCost['transportadora'],
         }))
 
         const totalPages = count ? Math.ceil(count / pageSize) : 0

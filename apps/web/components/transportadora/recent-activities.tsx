@@ -16,7 +16,7 @@ import { t } from "@/lib/i18n"
 
 interface Activity {
   id: string
-  type: "vehicle" | "driver" | "document" | "alert" | "maintenance"
+  type: "vehicle" | "motorista" | "document" | "alert" | "maintenance"
   title: string
   description?: string
   timestamp: string
@@ -58,7 +58,7 @@ export function RecentActivities({
           <CardTitle className="text-base sm:text-lg">{t('transportadora', 'recent_activities_title')}</CardTitle>
         </CardHeader>
         <CardContent className="px-3 sm:px-6">
-          <p className="text-xs sm:text-sm text-[var(--ink-muted)] text-center py-6 sm:py-8">
+          <p className="text-xs sm:text-sm text-ink-muted text-center py-6 sm:py-8">
             {t('transportadora', 'recent_activities_empty')}
           </p>
         </CardContent>
@@ -81,23 +81,23 @@ export function RecentActivities({
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.1 }}
-                className="flex items-start gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg hover:bg-[var(--bg-hover)] active:bg-[var(--bg-hover)] transition-colors touch-manipulation"
+                className="flex items-start gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg hover:bg-bg-hover active:bg-bg-hover transition-colors touch-manipulation"
               >
                 <div className={`p-1.5 sm:p-2 rounded-lg flex-shrink-0 ${
                   activity.status 
                     ? activityColors[activity.status]
-                    : "bg-[var(--brand-light)] text-[var(--brand)]"
+                    : "bg-brand-light text-brand"
                 }`}>
                   <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs sm:text-sm font-medium text-[var(--ink-strong)] truncate">
+                      <p className="text-xs sm:text-sm font-medium text-ink-strong truncate">
                         {activity.title}
                       </p>
                       {activity.description && (
-                        <p className="text-xs text-[var(--ink-muted)] mt-0.5 sm:mt-1 line-clamp-2">
+                        <p className="text-xs text-ink-muted mt-0.5 sm:mt-1 line-clamp-2">
                           {activity.description}
                         </p>
                       )}
@@ -117,7 +117,7 @@ export function RecentActivities({
                       </Badge>
                     )}
                   </div>
-                  <div className="flex items-center gap-1 mt-1.5 sm:mt-2 text-xs text-[var(--ink-muted)]">
+                  <div className="flex items-center gap-1 mt-1.5 sm:mt-2 text-xs text-ink-muted">
                     <Clock className="w-3 h-3 flex-shrink-0" />
                     <span className="truncate">{formatRelativeTime(new Date(activity.timestamp))}</span>
                   </div>

@@ -28,7 +28,7 @@ function UnauthorizedContent() {
     },
     mobile_only: {
       title: "Acesso via Aplicativo Mobile",
-      description: role === 'driver' 
+      description: role === 'motorista' 
         ? "Motoristas devem acessar o sistema através do aplicativo mobile GolfFox. Por favor, baixe o app no seu dispositivo móvel."
         : "Passageiros devem acessar o sistema através do aplicativo mobile GolfFox. Por favor, baixe o app no seu dispositivo móvel.",
       showMobileInfo: true

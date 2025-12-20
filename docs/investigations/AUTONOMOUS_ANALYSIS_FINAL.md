@@ -55,32 +55,32 @@ email: z.string().email().optional().or(z.literal('').transform(() => null)).nul
 
 1. **Log de Autenticação Falha:**
    ```typescript
-   console.error('[CREATE CARRIER] Auth failed:', authErrorResponse.status)
+   console.error('[CREATE transportadora] Auth failed:', authErrorResponse.status)
    ```
 
 2. **Log de Request Recebido:**
    ```typescript
-   console.log('[CREATE CARRIER] Request body received:', JSON.stringify(body, null, 2))
+   console.log('[CREATE transportadora] Request body received:', JSON.stringify(body, null, 2))
    ```
 
 3. **Log de Validação Sucesso:**
    ```typescript
-   console.log('[CREATE CARRIER] Validation passed:', JSON.stringify(validated, null, 2))
+   console.log('[CREATE transportadora] Validation passed:', JSON.stringify(validated, null, 2))
    ```
 
 4. **Log de Insert Attempt:**
    ```typescript
-   console.log('[CREATE CARRIER] Attempting insert...', JSON.stringify(insertData, null, 2))
+   console.log('[CREATE transportadora] Attempting insert...', JSON.stringify(insertData, null, 2))
    ```
 
 5. **Log de Erro de Banco:**
    ```typescript
-   console.error('[CREATE CARRIER] Database error:', error.code, error.message, error.details)
+   console.error('[CREATE transportadora] Database error:', error.code, error.message, error.details)
    ```
 
 6. **Log de Sucesso:**
    ```typescript
-   console.log('[CREATE CARRIER] Success! Carrier created:', data.id)
+   console.log('[CREATE transportadora] Success! transportadora created:', data.id)
    ```
 
 **Benefício:** Agora podemos ver EXATAMENTE onde o erro está acontecendo nos logs do Vercel.
@@ -117,7 +117,7 @@ Criar Transportadora
 **No Vercel:**
 1. Acesse: https://vercel.com/synvolt/golffox
 2. Vá para **Logs** tab
-3. Filtrar por: **"CREATE CARRIER"**
+3. Filtrar por: **"CREATE transportadora"**
 4. Ver exatamente:
    - Request recebido
    - Validação passou/falhou
@@ -126,9 +126,9 @@ Criar Transportadora
 
 **Exemplo de log de sucesso:**
 ```
-[CREATE CARRIER] Request body received: { "name": "Teste Debug" }
-[CREATE CARRIER] Validation passed: { "name": "Teste Debug", "email": null, ... }
-[CREATE CARRIER] Attempting insert: { "name": "Teste Debug", ... }
+[CREATE transportadora] Request body received: { "name": "Teste Debug" }
+[CREATE transportadora] Validation passed: { "name": "Teste Debug", "email": null, ... }
+[CREATE transportadora] Attempting insert: { "name": "Teste Debug", ... }
 [CREATE CARRIER] Success! Carrier created: abc-123-def
 ```
 
@@ -199,7 +199,7 @@ USING (true) WITH CHECK (true);
 4. Outro erro específico visível nos logs
 
 **Como descobrir:**
-- Ver logs do Vercel (filtrando por "CREATE CARRIER")
+- Ver logs do Vercel (filtrando por "CREATE transportadora")
 - Ver console do browser (F12)
 - Ver network tab do browser (status da chamada API)
 

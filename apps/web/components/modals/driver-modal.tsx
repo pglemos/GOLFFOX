@@ -30,8 +30,8 @@ import { Badge } from "@/components/ui/badge"
 import dynamic from "next/dynamic"
 
 // Lazy load seções pesadas
-const DriverCompensationSection = dynamic(() => import("@/components/driver/driver-compensation-section"), { ssr: false })
-const DriverDocumentsSection = dynamic(() => import("@/components/driver/driver-documents-section"), { ssr: false })
+const DriverCompensationSection = dynamic(() => import("@/components/motorista/motorista-compensation-section"), { ssr: false })
+const DriverDocumentsSection = dynamic(() => import("@/components/motorista/motorista-documents-section"), { ssr: false })
 
 interface Driver {
   id?: string
@@ -83,7 +83,7 @@ export function DriverModal({ driver, isOpen, onClose, onSave, carriers = [] }: 
     email: "",
     phone: "",
     cpf: "",
-    role: "driver"
+    role: "motorista"
   })
   const [documents, setDocuments] = useState<DriverDocument[]>([])
   const [loading, setLoading] = useState(false)
@@ -93,13 +93,13 @@ export function DriverModal({ driver, isOpen, onClose, onSave, carriers = [] }: 
     if (driver) {
       setFormData({
         ...driver,
-        address_zip_code: driver.address_zip_code || '',
-        address_street: driver.address_street || '',
-        address_number: driver.address_number || '',
-        address_complement: driver.address_complement || '',
-        address_neighborhood: driver.address_neighborhood || '',
-        address_city: driver.address_city || '',
-        address_state: driver.address_state || '',
+        address_zip_code: motorista.address_zip_code || '',
+        address_street: motorista.address_street || '',
+        address_number: motorista.address_number || '',
+        address_complement: motorista.address_complement || '',
+        address_neighborhood: motorista.address_neighborhood || '',
+        address_city: motorista.address_city || '',
+        address_state: motorista.address_state || '',
       })
       loadDriverData(driver.id!)
     } else {
@@ -111,7 +111,7 @@ export function DriverModal({ driver, isOpen, onClose, onSave, carriers = [] }: 
         rg: "",
         cnh: "",
         cnh_category: "",
-        role: "driver",
+        role: "motorista",
         address_zip_code: "",
         address_street: "",
         address_number: "",
@@ -148,20 +148,20 @@ export function DriverModal({ driver, isOpen, onClose, onSave, carriers = [] }: 
     try {
       const driverData = {
         ...formData,
-        role: "driver"
+        role: "motorista"
       }
 
       if (driver?.id) {
         const { error } = await (supabase as any)
           .from("users")
           .update(driverData)
-          .eq("id", driver.id)
+          .eq("id", motorista.id)
 
         if (error) throw error
 
         // Sincronização com Supabase (garantia adicional)
         await sync({
-          resourceType: 'driver',
+          resourceType: 'motorista',
           resourceId: driver.id,
           action: 'update',
           data: driverData,
@@ -170,7 +170,7 @@ export function DriverModal({ driver, isOpen, onClose, onSave, carriers = [] }: 
         notifySuccess('', { i18n: { ns: 'common', key: 'success.driverUpdated' } })
 
         // Log de auditoria
-        await auditLogs.update('driver', driver.id, { name: driverData.name, email: driverData.email })
+        await auditLogs.update('motorista', motorista.id, { name: driverData.name, email: driverData.email })
       } else {
         // Criar motorista via API com Service Role (respeita RLS e políticas)
         const resp = await fetch('/api/admin/drivers', {
@@ -201,14 +201,14 @@ export function DriverModal({ driver, isOpen, onClose, onSave, carriers = [] }: 
 
         // Sincronização informativa
         await sync({
-          resourceType: 'driver',
+          resourceType: 'motorista',
           resourceId: newDriverId,
           action: 'create',
           data: driverData,
         })
 
         notifySuccess('', { i18n: { ns: 'common', key: 'success.driverCreated' } })
-        await auditLogs.create('driver', newDriverId, { name: driverData.name, email: driverData.email })
+        await auditLogs.create('motorista', newDriverId, { name: driverData.name, email: driverData.email })
       }
 
       onSave()
@@ -230,9 +230,9 @@ export function DriverModal({ driver, isOpen, onClose, onSave, carriers = [] }: 
     try {
       const form = new FormData()
       form.append('file', file)
-      form.append('bucket', 'driver-documents')
-      form.append('folder', 'driver-documents')
-      form.append('entityId', driver.id)
+      form.append('bucket', 'motorista-documents')
+      form.append('folder', 'motorista-documents')
+      form.append('entityId', motorista.id)
 
       const response = await fetch('/api/upload', {
         method: 'POST',
@@ -272,7 +272,7 @@ export function DriverModal({ driver, isOpen, onClose, onSave, carriers = [] }: 
         <DialogHeader className="pb-4 sm:pb-6">
           <DialogTitle className="text-xl sm:text-2xl font-bold flex items-center gap-2 break-words">
             <Users className="h-5 w-5 flex-shrink-0" />
-            {driver ? "Editar Motorista" : "Cadastrar Motorista"}
+            {motorista ? "Editar Motorista" : "Cadastrar Motorista"}
           </DialogTitle>
         </DialogHeader>
 
@@ -536,7 +536,7 @@ export function DriverModal({ driver, isOpen, onClose, onSave, carriers = [] }: 
                   disabled={loading}
                   className="w-full sm:w-auto order-1 sm:order-2 bg-orange-500 hover:bg-orange-600 min-h-[44px] text-base font-medium touch-manipulation"
                 >
-                  {loading ? "Salvando..." : driver ? "Atualizar" : "Cadastrar"}
+                  {loading ? "Salvando..." : motorista ? "Atualizar" : "Cadastrar"}
                 </Button>
               </DialogFooter>
             </form>

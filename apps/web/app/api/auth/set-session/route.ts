@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { debug, error } from "@/lib/logger"
+import { withRateLimit } from '@/lib/rate-limit'
 
 interface UserData {
   id: string
@@ -8,7 +9,7 @@ interface UserData {
   companyId?: string | null
 }
 
-export async function POST(req: NextRequest) {
+async function setSessionHandler(req: NextRequest) {
   try {
     // Verificação simples de CSRF via double-submit cookie
     const csrfHeader = req.headers.get('x-csrf-token') || ''
@@ -30,14 +31,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "invalid_user_payload" }, { status: 400 })
     }
 
-    // Payload no cookie (inclui access_token para validação no middleware)
+    // Payload no cookie (NÃO inclui access_token por segurança)
     // Cookie é HttpOnly, então não é acessível via JavaScript (proteção XSS)
+    // O access_token deve ser obtido do cookie do Supabase ou header Authorization
     const sessionPayload = {
       id: user.id,
       email: user.email,
       role: user.role,
-      companyId: user.companyId ?? null,
-      access_token: accessToken // Incluído para validação no middleware (HttpOnly protege)
+      companyId: user.companyId ?? null
+      // ✅ REMOVIDO: access_token não deve estar no cookie customizado
+      // O token será obtido do cookie do Supabase (sb-{project}-auth-token) ou header Authorization
     }
 
     // Serializa como Base64 (padrão do sistema)
@@ -51,7 +54,7 @@ export async function POST(req: NextRequest) {
 
     debug('set-session: preparando cookie', {
       user: { id: user.id, role: user.role },
-      hasToken: !!accessToken,
+      // Nota: accessToken não é mais armazenado no cookie por segurança
       host,
       isSecure,
       isDev
@@ -77,3 +80,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: errorMessage }, { status: 500 })
   }
 }
+
+// Exportar com rate limiting
+export const POST = withRateLimit(setSessionHandler, 'auth')

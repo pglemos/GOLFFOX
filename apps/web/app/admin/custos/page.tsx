@@ -559,7 +559,7 @@ export default function CustosPage() {
                             <p className="text-xs text-muted-foreground">
                               {cost.category?.name || 'Sem categoria'} • {new Date(cost.costDate).toLocaleDateString('pt-BR')}
                               {cost.company?.name && ` • ${cost.company.name}`}
-                              {cost.carrier?.name && ` • ${cost.carrier.name}`}
+                              {cost.transportadora?.name && ` • ${cost.transportadora.name}`}
                             </p>
                           </div>
                         </div>

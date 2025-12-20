@@ -25,7 +25,7 @@
 ### ✅ v64_fix_drivers_transportadora_id
 - **Status:** Aplicada (idempotente)
 - **Ação:** Tentou migrar tabela `drivers` (não existe)
-- **Resultado:** Esperado - motoristas estão na tabela `users` com `role = 'driver'`
+- **Resultado:** Esperado - motoristas estão na tabela `users` com `role = 'motorista'`
 
 ---
 

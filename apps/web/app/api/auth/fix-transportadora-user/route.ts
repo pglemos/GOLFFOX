@@ -52,7 +52,7 @@ export async function GET(req: NextRequest) {
     }
 
     if (userId) {
-      // Buscar transportadora_id (carrier) associado
+      // Buscar transportadora_id (transportadora) associado
       const { data: carrierData } = await supabaseAdmin
         .from('gf_carriers')
         .select('id')

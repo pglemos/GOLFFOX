@@ -177,7 +177,7 @@ export default function TransportadorasPage() {
   }, [])
 
   useGlobalSync(
-    ['carrier.created', 'carrier.updated', 'carrier.deleted', 'user.created', 'user.updated'],
+    ['transportadora.created', 'transportadora.updated', 'transportadora.deleted', 'user.created', 'user.updated'],
     () => {
       if (!loadingCarriers) {
         loadCarriers()
@@ -296,7 +296,7 @@ export default function TransportadorasPage() {
                             <div className="p-1 rounded-lg bg-gradient-to-br from-[var(--brand-light)] to-[var(--brand-soft)]">
                               <Truck className="h-4 w-4 text-[var(--brand)]" />
                             </div>
-                            <h3 className="font-bold text-base sm:text-lg group-hover:text-[var(--brand)] transition-colors">{carrier.name}</h3>
+                            <h3 className="font-bold text-base sm:text-lg group-hover:text-[var(--brand)] transition-colors">{transportadora.name}</h3>
                           </div>
                           <div className="flex flex-wrap gap-2 sm:gap-4 text-xs sm:text-sm text-[var(--ink-muted)]">
                             {carrier.address && (

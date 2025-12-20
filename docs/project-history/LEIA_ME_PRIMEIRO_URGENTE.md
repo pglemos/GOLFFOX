@@ -169,7 +169,7 @@ node scripts/test-complete-system.js golffox@admin.com SuaSenhaReal
 
 1. Abra: https://golffox.vercel.app
 2. Faça login
-3. Deve redirecionar para `/admin` ou `/operator`
+3. Deve redirecionar para `/admin` ou `/operador`
 4. Dashboard deve carregar sem erros
 
 ---

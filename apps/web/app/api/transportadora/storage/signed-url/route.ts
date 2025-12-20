@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
     const folder = pathParts[0]
     const entityId = pathParts[1]
 
-    if (folder === 'driver-documents' || folder === 'medical-exams') {
+    if (folder === 'motorista-documents' || folder === 'medical-exams') {
       // Verificar se o motorista pertence à transportadora
       const { data: driver } = await supabaseServiceRole
         .from('users')
@@ -85,7 +85,7 @@ export async function POST(req: NextRequest) {
 
     // Criar URL assinada válida por 1 hora
     const { data, error } = await supabaseServiceRole.storage
-      .from('carrier-documents')
+      .from('transportadora-documents')
       .createSignedUrl(file_path, 3600) // 1 hora
 
     if (error) {

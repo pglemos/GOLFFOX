@@ -67,7 +67,7 @@
 - ✅ `gf_event_store` - Service role full access
 - ✅ `gf_web_vitals` - Service role + anon insert
 - ✅ `gf_operational_alerts` - Service role full access
-- ✅ `gf_audit_log` - Múltiplas políticas (admin, operator, user)
+- ✅ `gf_audit_log` - Múltiplas políticas (admin, operador, user)
 
 ### Triggers
 

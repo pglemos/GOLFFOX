@@ -60,7 +60,7 @@ Vários arquivos ainda estavam usando `carrier_id` em queries Supabase:
    - Parâmetro `carrier_id` → `transportadora_id` (com compatibilidade)
    - Queries atualizadas para usar `transportadora_id`
 
-3. **`apps/web/app/api/transportadora/reports/driver-performance/route.ts`**
+3. **`apps/web/app/api/transportadora/reports/motorista-performance/route.ts`**
    - Parâmetro `carrier_id` → `transportadora_id` (com compatibilidade)
    - Queries atualizadas para usar `transportadora_id` em `users` e `routes`
 

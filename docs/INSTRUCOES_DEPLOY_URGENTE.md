@@ -28,7 +28,7 @@ Após o push automático do código, você precisa executar as migrations e conf
 SELECT table_name 
 FROM information_schema.tables 
 WHERE table_schema = 'public' 
-AND (table_name LIKE '%driver%' OR table_name LIKE '%vehicle%' OR table_name LIKE '%route_cost%')
+AND (table_name LIKE '%motorista%' OR table_name LIKE '%vehicle%' OR table_name LIKE '%route_cost%')
 ORDER BY table_name;
 ```
 
@@ -49,7 +49,7 @@ ORDER BY table_name;
 3. Vá em: **Storage** → **Buckets**
 4. Clique em **New Bucket**
 5. Configure:
-   - **Name:** `carrier-documents`
+   - **Name:** `transportadora-documents`
    - **Public bucket:** ❌ **DESMARCADO** (deixe como privado)
    - **File size limit:** `10 MB`
    - **Allowed MIME types:** `image/jpeg,image/png,application/pdf`
@@ -89,15 +89,15 @@ Após o Vercel fazer o deploy automaticamente (após o push), teste:
 
 1. **Login como Carrier:**
    - Acesse: https://golffox.vercel.app
-   - Login com conta `carrier`
-   - Deve redirecionar para `/carrier`
+   - Login com conta `transportadora`
+   - Deve redirecionar para `/transportadora`
 
 2. **Testar Páginas:**
-   - ✅ `/carrier/motoristas` - Tabs devem funcionar
-   - ✅ `/carrier/veiculos` - Tabs devem funcionar
-   - ✅ `/carrier/custos` - Dashboard deve abrir
-   - ✅ `/carrier/alertas` - Dashboard deve abrir
-   - ✅ `/carrier/mapa` - Mapa deve carregar com Realtime
+   - ✅ `/transportadora/motoristas` - Tabs devem funcionar
+   - ✅ `/transportadora/veiculos` - Tabs devem funcionar
+   - ✅ `/transportadora/custos` - Dashboard deve abrir
+   - ✅ `/transportadora/alertas` - Dashboard deve abrir
+   - ✅ `/transportadora/mapa` - Mapa deve carregar com Realtime
 
 3. **Testar Upload:**
    - ✅ Upload de documento de motorista
@@ -131,7 +131,7 @@ ORDER BY viewname;
 ```sql
 SELECT schemaname, tablename, policyname 
 FROM pg_policies 
-WHERE tablename LIKE '%driver%' OR tablename LIKE '%vehicle%' OR tablename LIKE '%route_cost%'
+WHERE tablename LIKE '%motorista%' OR tablename LIKE '%vehicle%' OR tablename LIKE '%route_cost%'
 ORDER BY tablename, policyname;
 ```
 

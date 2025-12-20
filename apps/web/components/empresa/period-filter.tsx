@@ -15,9 +15,9 @@ interface PeriodFilterProps {
 
 export function PeriodFilter({ value, onChange, className }: PeriodFilterProps) {
   const options: { value: PeriodFilter; label: string; icon: typeof Calendar }[] = [
-    { value: "today", label: t('operator', 'charts.today'), icon: Calendar },
-    { value: "week", label: t('operator', 'charts.week'), icon: CalendarDays },
-    { value: "month", label: t('operator', 'charts.month'), icon: CalendarRange },
+    { value: "today", label: t('operador', 'charts.today'), icon: Calendar },
+    { value: "week", label: t('operador', 'charts.week'), icon: CalendarDays },
+    { value: "month", label: t('operador', 'charts.month'), icon: CalendarRange },
   ]
 
   return (

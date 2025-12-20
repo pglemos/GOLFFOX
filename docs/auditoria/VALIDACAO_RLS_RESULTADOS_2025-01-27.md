@@ -80,7 +80,7 @@ Validação RLS realizada diretamente no banco de dados Supabase usando MCP.
 ### `driver_positions` (4 políticas) ✅
 1. **Drivers can insert positions** (INSERT)
    - Drivers podem inserir suas próprias posições
-   - Condição: `current_role() = 'driver'` AND `driver_id = auth.uid()`
+   - Condição: `current_role() = 'motorista'` AND `driver_id = auth.uid()`
 
 2. **pos_admin_all** (SELECT)
    - Admin pode ler todas as posições
@@ -88,11 +88,11 @@ Validação RLS realizada diretamente no banco de dados Supabase usando MCP.
 
 3. **pos_company_read** (SELECT)
    - Operadores e passageiros podem ler posições de trips da empresa
-   - Condição: `current_role() IN ('operador', 'passenger')` AND trip pertence à empresa
+   - Condição: `current_role() IN ('operador', 'passageiro')` AND trip pertence à empresa
 
 4. **pos_driver_read** (SELECT)
    - Drivers podem ler suas próprias posições
-   - Condição: `current_role() = 'driver'` AND `driver_id = auth.uid()`
+   - Condição: `current_role() = 'motorista'` AND `driver_id = auth.uid()`
 
 **Status:** ✅ Completo e bem implementado
 

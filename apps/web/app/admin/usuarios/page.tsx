@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input"
 import { ChangeRoleModal } from "@/components/modals/change-role-modal"
 import { notifySuccess, notifyError } from "@/lib/toast"
 import { EditUserModal } from "@/components/modals/edit-user-modal"
-import { CreateUserModal } from "@/components/modals/create-operator-login-modal"
+import { CreateUserModal } from "@/components/modals/create-operador-login-modal"
 import {
     Select,
     SelectContent,
@@ -178,10 +178,10 @@ export default function UsuariosPage() {
                                 type: "select",
                                 options: [
                                     { label: "Administrador", value: "admin" },
-                                    { label: "Operador", value: "operator" },
+                                    { label: "Operador", value: "operador" },
                                     { label: "Transportadora", value: "transportadora" },
-                                    { label: "Motorista", value: "driver" },
-                                    { label: "Passageiro", value: "passenger" }
+                                    { label: "Motorista", value: "motorista" },
+                                    { label: "Passageiro", value: "passageiro" }
                                 ]
                             },
                             {
@@ -249,10 +249,10 @@ export default function UsuariosPage() {
                                         <SelectContent>
                                             <SelectItem value="all">Todos os papéis</SelectItem>
                                             <SelectItem value="admin">Administrador</SelectItem>
-                                            <SelectItem value="operator">Operador</SelectItem>
+                                            <SelectItem value="operador">Operador</SelectItem>
                                             <SelectItem value="transportadora">Transportadora</SelectItem>
-                                            <SelectItem value="driver">Motorista</SelectItem>
-                                            <SelectItem value="passenger">Passageiro</SelectItem>
+                                            <SelectItem value="motorista">Motorista</SelectItem>
+                                            <SelectItem value="passageiro">Passageiro</SelectItem>
                                         </SelectContent>
                                     </Select>
                                     <Select value={tempFilterStatus} onValueChange={setTempFilterStatus}>

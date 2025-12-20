@@ -34,9 +34,9 @@
 - [x] Ajuda & Suporte (`/admin/ajuda-suporte`)
 
 #### Portal do Operador (3 módulos)
-- [x] Funcionários (`/operator/funcionarios`)
-- [x] Rotas (`/operator/rotas`)
-- [x] Sincronizar (`/operator/sincronizar`)
+- [x] Funcionários (`/operador/funcionarios`)
+- [x] Rotas (`/operador/rotas`)
+- [x] Sincronizar (`/operador/sincronizar`)
 
 #### Componentes
 - [x] AppShell (Layout principal)

@@ -25,7 +25,7 @@
 - **URL:** `https://vmoxzesvjcfmrebagcwo.supabase.co/rest/v1/mv_operator_kpis?select=*&company_id=eq.f91a6141-d7d9-4683-a12c-7888d72f5c54`
 - **Causa:** Materialized views não suportam RLS no PostgreSQL/Supabase
 - **Solução:** Modificado hook `useOperatorKPIs` para usar apenas `v_operator_dashboard_kpis_secure` diretamente
-- **Arquivo Corrigido:** `apps/web/hooks/use-operator-data.ts`
+- **Arquivo Corrigido:** `apps/web/hooks/use-operador-data.ts`
 - **Status:** ✅ Corrigido
 
 ## ✅ Funcionalidades Testadas e Funcionando

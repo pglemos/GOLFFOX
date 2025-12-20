@@ -15,7 +15,7 @@ import { Label } from "@/components/ui/label"
 import { Users, Plus, Edit, Trash2, Loader2 } from "lucide-react"
 import { notifySuccess, notifyError } from "@/lib/toast"
 import { globalSyncManager } from "@/lib/global-sync"
-import { CreateUserModal } from "./create-operator-login-modal"
+import { CreateUserModal } from "./create-operador-login-modal"
 import { EditUserModal } from "./edit-user-modal"
 
 interface Company {
@@ -163,17 +163,17 @@ export function CompanyUsersModal({
                       <div className="flex-1 min-w-0">
                         <div className="flex flex-wrap items-center gap-2 mb-2">
                           <div className="font-bold text-base sm:text-lg text-[var(--ink)] break-words leading-tight mr-1">
-                            {operator.name || 'Sem nome'}
+                            {operador.name || 'Sem nome'}
                           </div>
                           <div className="flex items-center gap-1.5 shrink-0">
-                            <span className={`px-1.5 py-0.5 rounded text-[10px] sm:text-xs font-medium uppercase tracking-wide border ${operator.is_active
+                            <span className={`px-1.5 py-0.5 rounded text-[10px] sm:text-xs font-medium uppercase tracking-wide border ${operador.is_active
                               ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
                               : 'bg-gray-50 text-gray-600 border-gray-200'
                               }`}>
-                              {operator.is_active ? 'Ativo' : 'Inativo'}
+                              {operador.is_active ? 'Ativo' : 'Inativo'}
                             </span>
                             <span className="px-1.5 py-0.5 rounded text-[10px] sm:text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200 uppercase tracking-wide">
-                              {operator.role || 'Sem papel'}
+                              {operador.role || 'Sem papel'}
                             </span>
                           </div>
                         </div>
@@ -181,18 +181,18 @@ export function CompanyUsersModal({
                         <div className="grid grid-cols-1 gap-1 text-sm text-[var(--ink-muted)]">
                           <div className="flex items-center gap-2 overflow-hidden">
                             <span className="text-[var(--ink-light)] text-xs font-medium uppercase tracking-wider w-12 shrink-0">Email:</span>
-                            <span className="font-mono text-xs sm:text-sm truncate" title={operator.email}>{operator.email}</span>
+                            <span className="font-mono text-xs sm:text-sm truncate" title={operador.email}>{operador.email}</span>
                           </div>
                           {operator.cpf && (
                             <div className="flex items-center gap-2">
                               <span className="text-[var(--ink-light)] text-xs font-medium uppercase tracking-wider w-12 shrink-0">CPF:</span>
-                              <span className="font-mono text-xs sm:text-sm">{operator.cpf}</span>
+                              <span className="font-mono text-xs sm:text-sm">{operador.cpf}</span>
                             </div>
                           )}
                           {operator.phone && (
                             <div className="flex items-center gap-2">
                               <span className="text-[var(--ink-light)] text-xs font-medium uppercase tracking-wider w-12 shrink-0">Tel:</span>
-                              <span className="font-mono text-xs sm:text-sm">{operator.phone}</span>
+                              <span className="font-mono text-xs sm:text-sm">{operador.phone}</span>
                             </div>
                           )}
                         </div>

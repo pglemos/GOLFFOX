@@ -9,8 +9,8 @@
 
 Foi realizada uma análise completa e correção de todos os problemas de responsividade mobile nos 3 painéis do sistema GOLF FOX:
 - **Painel Administrativo** (`/admin`)
-- **Painel do Operador** (`/operator`)
-- **Painel da Transportadora** (`/carrier`)
+- **Painel do Operador** (`/operador`)
+- **Painel da Transportadora** (`/transportadora`)
 
 Todas as correções foram implementadas seguindo as melhores práticas de design responsivo e UX mobile.
 
@@ -58,7 +58,7 @@ Todas as correções foram implementadas seguindo as melhores práticas de desig
 - Textos com tamanhos responsivos
 - Badges ocultos em mobile quando necessário
 
-### 5. **Dashboard Operator** (`apps/web/app/operator/page.tsx`)
+### 5. **Dashboard operador** (`apps/web/app/operador/page.tsx`)
 ✅ **Correções:**
 - Header responsivo com flex-col em mobile
 - KPIs com grid adaptativo
@@ -68,7 +68,7 @@ Todas as correções foram implementadas seguindo as melhores práticas de desig
 - Textos truncados para evitar overflow
 - Mapa preview com altura responsiva
 
-### 6. **Dashboard Carrier** (`apps/web/app/carrier/page.tsx`)
+### 6. **Dashboard transportadora** (`apps/web/app/transportadora/page.tsx`)
 ✅ **Correções:**
 - Header com select e botões responsivos
 - Grids de KPIs adaptativos (gap-3 sm:gap-4)
@@ -80,7 +80,7 @@ Todas as correções foram implementadas seguindo as melhores práticas de desig
 
 ### 7. **Componentes Auxiliares**
 
-#### **OperatorKPICards** (`apps/web/components/operator/operator-kpi-cards.tsx`)
+#### **OperatorKPICards** (`apps/web/components/operador/operador-kpi-cards.tsx`)
 ✅ **Correções:**
 - Grid responsivo (1 coluna mobile, 2 tablet, 3 desktop, 4 xl)
 - Padding ajustado (p-3 sm:p-4)
@@ -88,7 +88,7 @@ Todas as correções foram implementadas seguindo as melhores práticas de desig
 - Textos truncados
 - Gap otimizado (gap-3 sm:gap-4)
 
-#### **ControlTowerCards** (`apps/web/components/operator/control-tower-cards.tsx`)
+#### **ControlTowerCards** (`apps/web/components/operador/control-tower-cards.tsx`)
 ✅ **Correções:**
 - Cards com altura mínima responsiva
 - Padding ajustado (p-3 sm:p-4)
@@ -96,7 +96,7 @@ Todas as correções foram implementadas seguindo as melhores práticas de desig
 - Ícones e textos responsivos
 - WhileTap animation para feedback tátil
 
-#### **DataTable** (`apps/web/components/carrier/data-table.tsx`)
+#### **DataTable** (`apps/web/components/transportadora/data-table.tsx`)
 ✅ **Correções:**
 - Header responsivo com flex-col em mobile
 - Tabela com scroll horizontal otimizado
@@ -195,7 +195,7 @@ Todas as correções foram implementadas seguindo as melhores práticas de desig
 - [x] Botões com área de toque adequada
 - [x] Textos não ultrapassam limites
 
-### **Painel Operator** (`/operator`)
+### **Painel operador** (`/operador`)
 - [x] Header responsivo
 - [x] KPIs em grid adaptativo
 - [x] Control Tower Cards responsivos
@@ -203,7 +203,7 @@ Todas as correções foram implementadas seguindo as melhores práticas de desig
 - [x] Mapa preview responsivo
 - [x] Navegação fluida
 
-### **Painel Carrier** (`/carrier`)
+### **Painel transportadora** (`/transportadora`)
 - [x] Header com select responsivo
 - [x] KPIs em grid adaptativo
 - [x] Mapa com altura responsiva

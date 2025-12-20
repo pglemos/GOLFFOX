@@ -123,7 +123,7 @@ export function AssociateOperatorModal({
           </div>
 
           <div>
-            <Label htmlFor="operator-email" className="text-base font-medium">Operador</Label>
+            <Label htmlFor="operador-email" className="text-base font-medium">Operador</Label>
             {loadingOperators ? (
               <div className="flex items-center justify-center py-4">
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -131,7 +131,7 @@ export function AssociateOperatorModal({
               </div>
             ) : (
               <select
-                id="operator-email"
+                id="operador-email"
                 value={operatorEmail}
                 onChange={(e) => setOperatorEmail(e.target.value)}
                 className="w-full mt-1 h-11 sm:h-12 px-3 sm:px-4 py-2 sm:py-3 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--brand)]"

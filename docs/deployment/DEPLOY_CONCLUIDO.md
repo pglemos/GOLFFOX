@@ -44,7 +44,7 @@
 Os seguintes erros são pré-existentes e foram temporariamente ignorados para permitir o deploy:
 
 1. `app/api/reports/run/route.ts` - Tipos do pdfkit
-2. `app/operator/page.tsx` - Props do ControlTowerCards
+2. `app/operador/page.tsx` - Props do ControlTowerCards
 3. `components/admin-map/panels.tsx` - Propriedades faltantes em RoutePolyline
 4. `components/costs/cost-detail-table.tsx` - Comparação de tipos
 5. `components/fleet-map.tsx` - Export faltante em kpi-utils

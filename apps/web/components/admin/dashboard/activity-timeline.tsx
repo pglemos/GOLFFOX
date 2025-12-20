@@ -44,20 +44,20 @@ export function ActivityTimeline({ activities, loading, onViewAll }: ActivityTim
 
   const getActionColor = (actionType: string): string => {
     const colorMap: Record<string, string> = {
-      create: 'bg-[var(--success)]',
-      update: 'bg-[var(--brand)]',
-      delete: 'bg-[var(--error)]',
-      approve: 'bg-[var(--success)]',
-      reject: 'bg-[var(--error)]',
-      configure: 'bg-[var(--brand)]',
-      invite: 'bg-[var(--brand)]',
-      export: 'bg-[var(--brand)]',
+      create: 'bg-success',
+      update: 'bg-brand',
+      delete: 'bg-error',
+      approve: 'bg-success',
+      reject: 'bg-error',
+      configure: 'bg-brand',
+      invite: 'bg-brand',
+      export: 'bg-brand',
     }
-    return colorMap[actionType.toLowerCase()] || 'bg-[var(--brand)]'
+    return colorMap[actionType.toLowerCase()] || 'bg-brand'
   }
 
   return (
-    <Card className="bg-card/50 backdrop-blur-sm border-[var(--border)] hover:shadow-xl transition-all duration-300">
+    <Card className="bg-card/50 backdrop-blur-sm border-border hover:shadow-xl transition-all duration-300">
       <CardHeader className="pb-4">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <div className="flex-1">
@@ -82,19 +82,19 @@ export function ActivityTimeline({ activities, loading, onViewAll }: ActivityTim
       </CardHeader>
       <CardContent className="pt-0">
         {loading ? (
-          <div className="p-12 text-center text-[var(--ink-muted)]">
-            <div className="w-8 h-8 border-2 border-[var(--brand)] border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+          <div className="p-12 text-center text-ink-muted">
+            <div className="w-8 h-8 border-2 border-brand border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
             <p className="text-sm">Carregando atividades...</p>
           </div>
         ) : activities.length === 0 ? (
-          <div className="p-12 text-center text-[var(--ink-muted)]">
+          <div className="p-12 text-center text-ink-muted">
             <Activity className="h-12 w-12 mx-auto mb-3 opacity-50" />
             <p className="text-sm">Nenhuma atividade recente</p>
           </div>
         ) : (
           <div className="relative">
             {/* Timeline Line */}
-            <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-gradient-to-b from-[var(--brand)]/20 via-[var(--border)] to-transparent" />
+            <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-gradient-to-b from-brand/20 via-border to-transparent" />
 
             <div className="space-y-0">
               {activities.slice(0, 10).map((activity, index) => {
@@ -127,7 +127,7 @@ export function ActivityTimeline({ activities, loading, onViewAll }: ActivityTim
 
                     {/* Content Card */}
                     <motion.div
-                      className="bg-card/50 backdrop-blur-sm rounded-xl p-4 border border-[var(--border)] hover:border-[var(--brand)]/50 hover:shadow-lg transition-all duration-300 group-hover:bg-card/80"
+                      className="bg-card/50 backdrop-blur-sm rounded-xl p-4 border border-border hover:border-brand/50 hover:shadow-lg transition-all duration-300 group-hover:bg-card/80"
                       whileHover={{ x: 4, scale: 1.01 }}
                     >
                       <div className="flex items-start gap-4">
@@ -140,14 +140,14 @@ export function ActivityTimeline({ activities, loading, onViewAll }: ActivityTim
                         </motion.div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-start justify-between gap-2 mb-1">
-                            <p className="font-semibold text-sm text-[var(--ink-strong)] group-hover:text-[var(--brand)] transition-colors">
+                            <p className="font-semibold text-sm text-ink-strong group-hover:text-brand transition-colors">
                               {actionText}: {resourceName}
                             </p>
                             <Badge variant="outline" className="text-xs flex-shrink-0 hidden sm:inline-flex">
                               {activity.action_type}
                             </Badge>
                           </div>
-                          <p className="text-xs text-[var(--ink-muted)]">
+                          <p className="text-xs text-ink-muted">
                             {formatRelativeTime(activity.created_at)}
                             {activity.details?.companyId && ` • Empresa: ${activity.details.companyId.slice(0, 8)}`}
                           </p>

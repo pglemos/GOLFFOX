@@ -36,15 +36,15 @@
 ## ✅ Verificações Completas
 
 ### 1. Código-Fonte ✅
-- ✅ **0** ocorrências de `operator?company=`
+- ✅ **0** ocorrências de `operador?company=`
 - ✅ **199** arquivos auditados
-- ✅ Todos os `router.push('/operator')` sem parâmetros
-- ✅ Todos os `href="/operator"` corretos
+- ✅ Todos os `router.push('/operador')` sem parâmetros
+- ✅ Todos os `href="/operador"` corretos
 
 ### 2. Banco de Dados ✅
 - ✅ **0** registros com padrão antigo
 - ✅ **10** funcionários cadastrados na empresa de teste
-- ✅ Empresa de teste com `role='operator'`
+- ✅ Empresa de teste com `role='operador'`
 - ✅ Mapeamento user-empresa funcionando
 
 ### 3. Configurações ✅

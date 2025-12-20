@@ -6,7 +6,7 @@ import { requireAuth } from '@/lib/api-auth';
 // GET /api/empresa/evaluations - Ver avaliações dos funcionários
 export async function GET(request: NextRequest) {
     // Verificar autenticação (empresa ou admin)
-    const authError = await requireAuth(request, ['admin', 'empresa', 'operator'])
+    const authError = await requireAuth(request, ['admin', 'empresa', 'operador'])
     if (authError) return authError
 
     try {

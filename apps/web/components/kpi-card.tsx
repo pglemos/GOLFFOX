@@ -60,22 +60,22 @@ export function KpiCard({
     >
       <Card variant="premium" className={cn("p-6 h-full relative overflow-hidden group", className)}>
         {/* Background Decorative Gradient */}
-        <div className="absolute top-0 right-0 w-32 h-32 bg-[var(--brand)]/5 rounded-full blur-3xl -mr-16 -mt-16 transition-all duration-500 group-hover:bg-[var(--brand)]/10" />
+        <div className="absolute top-0 right-0 w-32 h-32 bg-brand/5 rounded-full blur-3xl -mr-16 -mt-16 transition-all duration-500 group-hover:bg-brand/10" />
 
         <div className="relative flex flex-col h-full justify-between">
           <div className="flex items-start justify-between mb-4">
             {/* Icon Box */}
-            <div className="p-3 rounded-xl bg-[var(--brand-light)] border border-[var(--brand)]/10 group-hover:border-[var(--brand)]/30 transition-colors duration-300">
-              <Icon className="w-6 h-6 text-[var(--brand)]" />
+            <div className="p-3 rounded-xl bg-brand-light border border-brand/10 group-hover:border-brand/30 transition-colors duration-300">
+              <Icon className="w-6 h-6 text-brand" />
             </div>
 
             {/* Trend Badge */}
             {trend !== undefined && (
               <div className={cn(
                 "flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold backdrop-blur-sm border",
-                isPositive && "bg-[var(--success-light)] text-[var(--success)] border-[var(--success)]/20",
-                isNegative && "bg-[var(--error-light)] text-[var(--error)] border-[var(--error)]/20",
-                isNeutral && "bg-[var(--muted)] text-[var(--muted-foreground)] border-[var(--border)]"
+                isPositive && "bg-success-light text-success border-success/20",
+                isNegative && "bg-error-light text-error border-error/20",
+                isNeutral && "bg-muted text-muted-foreground border-border"
               )}>
                 {isPositive && <ArrowUpRight className="w-3 h-3" />}
                 {isNegative && <ArrowDownRight className="w-3 h-3" />}
@@ -86,14 +86,14 @@ export function KpiCard({
           </div>
 
           <div>
-            <h3 className="text-sm font-medium text-[var(--ink-muted)] mb-1">{label}</h3>
+            <h3 className="text-sm font-medium text-ink-muted mb-1">{label}</h3>
             <div className="flex items-baseline gap-2">
-              <span className="text-3xl font-bold text-[var(--ink-strong)] tracking-tight">
+              <span className="text-3xl font-bold text-ink-strong tracking-tight">
                 {value}
               </span>
             </div>
             {(hint || trendLabel) && (
-              <p className="text-xs text-[var(--ink-light)] mt-2 flex items-center gap-1">
+              <p className="text-xs text-ink-light mt-2 flex items-center gap-1">
                 {hint || trendLabel}
               </p>
             )}

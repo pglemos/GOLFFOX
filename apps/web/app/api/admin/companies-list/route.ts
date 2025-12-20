@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requireAuth } from '@/lib/api-auth'
-import { info, logError } from '@/lib/logger'
+import { info, logError, logger } from '@/lib/logger'
 
 export const runtime = 'nodejs'
 

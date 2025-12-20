@@ -5,7 +5,7 @@
   - **Padronizar Service Role**: usar apenas `SUPABASE_SERVICE_ROLE_KEY` (com fallback controlado), unificando os clientes server-side.
   - **Rate limiting**: configurar Upstash em prod/preview e evitar fail-open (responder 429 em produção quando indisponível).
   - **Crons Vercel**: garantir `CRON_SECRET` definido e crons ativos (refresh-kpis, refresh-costs-mv, dispatch-reports).
-  - **OpenAPI 100%**: completar especificação para todos os domínios (`admin/operator/costs/cron/docs`) e validar em CI.
+  - **OpenAPI 100%**: completar especificação para todos os domínios (`admin/operador/costs/cron/docs`) e validar em CI.
   - **CSP duplicado**: centralizar os headers de segurança (manter em Next ou Vercel, não nos dois).
   - **RBAC por rota**: garantir `requireAuth`/`requireCompanyAccess` em todos endpoints sensíveis; criar verificação automatizada.
   - **Storage**: revisar buckets (ex.: fotos de veículos) e usar URLs assinadas se necessário.
@@ -39,13 +39,13 @@
   - health: health
   - docs: openapi
 
-- **Frontend Web (Next.js – apps/web/app)**: áreas `admin`, `operator`, `carrier`, `passenger`, páginas de teste e error boundaries; middleware protege UI (bypass `/api`).
+- **Frontend Web (Next.js – apps/web/app)**: áreas `admin`, `operador`, `transportadora`, `passageiro`, páginas de teste e error boundaries; middleware protege UI (bypass `/api`).
 
 - **Mobile (Flutter – apps/mobile/lib)**: bootstrap, providers, roteamento, serviços, telas por domínio (driver/operator/passenger), Sentry e testes.
 
 - **Banco/Dados**:
   - Migrations v41–v49 e v74 (RLS, matviews KPIs/custos, funções, LGPD/PII).
-  - RLS custos/operator; matview `mv_costs_monthly` e função `refresh_mv_costs_monthly()`.
+  - RLS custos/operador; matview `mv_costs_monthly` e função `refresh_mv_costs_monthly()`.
 
 - **Infra/DevOps**:
   - `vercel.json` com crons (refresh-kpis, refresh-costs-mv, dispatch-reports) e headers (CSP/HSTS/XFO/RP).
@@ -54,7 +54,7 @@
 
 
 ### 3) Lacunas (com justificativa e solução)
-- **OpenAPI incompleto**: documentação parcial (não cobre `admin`, `operator`, `cron`, grande parte de `costs`).  
+- **OpenAPI incompleto**: documentação parcial (não cobre `admin`, `operador`, `cron`, grande parte de `costs`).  
   - Impacto: integração/contrato instável, dificulta testes e comunicação.  
   - Ação: completar spec e validar em CI; publicar `/api/docs`.
 
@@ -68,7 +68,7 @@
 
 - **Proteção de rotas**: middleware não cobre `/api` (intencional), requer `requireAuth` em endpoints sensíveis.  
   - Impacto: risco de endpoint sem RBAC por engano.  
-  - Ação: verificação automatizada (lint/test) exigindo `requireAuth`/`requireCompanyAccess` em `admin/*` e `operator/*`.
+  - Ação: verificação automatizada (lint/test) exigindo `requireAuth`/`requireCompanyAccess` em `admin/*` e `operador/*`.
 
 - **CSP duplicada (Next e Vercel)**: headers em dois lugares.  
   - Impacto: manutenção e possíveis conflitos.  
@@ -94,7 +94,7 @@
 
 - **Média** — `docs/api/openapi.json` parcial.  
   - Risco: integração, testes de contrato.  
-  - Correção: completar rotas `admin/operator/costs/cron/docs` e validar em CI.
+  - Correção: completar rotas `admin/operador/costs/cron/docs` e validar em CI.
 
 - **Baixa** — CSP duplicado (`vercel.json` e `next.config.js`).  
   - Risco: manutenção/conflitos.  

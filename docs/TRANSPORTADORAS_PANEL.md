@@ -35,7 +35,7 @@ Permite visualizar e gerenciar todas as transportadoras cadastradas no sistema.
 
 **Ações Disponíveis:**
 - **Editar**: Atualizar informações da transportadora
-- **Login de Acesso**: Criar e gerenciar usuários com role "carrier"
+- **Login de Acesso**: Criar e gerenciar usuários com role "transportadora"
 - **Ver Motoristas**: Visualizar todos os motoristas associados
 - **Excluir**: Remover transportadora do sistema
 
@@ -49,7 +49,7 @@ Modal para criar e gerenciar usuários que terão acesso ao painel da transporta
 - Senha (mínimo 6 caracteres)
 
 **Funcionalidades:**
-- ✅ Criar novo usuário com role "carrier"
+- ✅ Criar novo usuário com role "transportadora"
 - ✅ Listar usuários existentes
 - ✅ Excluir usuários
 - ✅ Autenticação automática via Supabase Auth
@@ -76,15 +76,15 @@ Modal que exibe todos os motoristas associados à transportadora.
 - `apps/web/app/api/admin/carriers/create/route.ts`
 - `apps/web/app/api/admin/carriers/update/route.ts`
 - `apps/web/app/api/admin/carriers/delete/route.ts`
-- `apps/web/app/api/admin/create-carrier-login/route.ts`
+- `apps/web/app/api/admin/create-transportadora-login/route.ts`
 - `apps/web/app/api/admin/carriers/[carrierId]/users/route.ts`
 - `apps/web/app/api/admin/carriers/[carrierId]/drivers/route.ts`
 
 ### Componentes (Modals)
-- `apps/web/components/modals/create-carrier-modal.tsx`
-- `apps/web/components/modals/edit-carrier-modal.tsx`
-- `apps/web/components/modals/carrier-users-modal.tsx`
-- `apps/web/components/modals/carrier-drivers-modal.tsx`
+- `apps/web/components/modals/create-transportadora-modal.tsx`
+- `apps/web/components/modals/edit-transportadora-modal.tsx`
+- `apps/web/components/modals/transportadora-users-modal.tsx`
+- `apps/web/components/modals/transportadora-drivers-modal.tsx`
 
 ### Arquivos Modificados
 - `apps/web/components/sidebar.tsx` - Substituição da aba Motoristas por Transportadoras
@@ -105,26 +105,26 @@ Modal que exibe todos os motoristas associados à transportadora.
 - updated_at (timestamptz)
 ```
 
-### Tabela: `users` (role: carrier)
+### Tabela: `users` (role: transportadora)
 
 ```sql
 - id (uuid, PK) -- Linked to Supabase Auth
 - email (text, UNIQUE)
 - name (text)
-- role (text) -- 'carrier'
+- role (text) -- 'transportadora'
 - carrier_id (uuid, FK -> carriers)
 - created_at (timestamptz)
 - updated_at (timestamptz)
 ```
 
-### Tabela: `users` (role: driver)
+### Tabela: `users` (role: motorista)
 
 ```sql
 - id (uuid, PK)
 - email (text)
 - name (text)
 - phone (text, nullable)
-- role (text) -- 'driver'
+- role (text) -- 'motorista'
 - carrier_id (uuid, FK -> carriers)
 - created_at (timestamptz)
 ```
@@ -144,11 +144,11 @@ if (authErrorResponse) return authErrorResponse
 
 ### Criação de Usuários Carrier
 
-A criação de usuários carrier é feita através de `supabaseServiceRole.auth.admin.createUser()`, que:
+A criação de usuários transportadora é feita através de `supabaseServiceRole.auth.admin.createUser()`, que:
 - Cria o usuário no Supabase Auth
 - Define o email como confirmado automaticamente
 - Associa o usuário à transportadora via `carrier_id`
-- Define o role como "carrier"
+- Define o role como "transportadora"
 
 ---
 
@@ -194,7 +194,7 @@ A aba de Transportadoras segue **exatamente o mesmo padrão** da aba de Empresas
 6. Sistema:
    - Cria usuário no Supabase Auth
    - Associa `carrier_id`
-   - Define role como "carrier"
+   - Define role como "transportadora"
    - Atualiza lista de usuários
 
 ### Visualizar Motoristas

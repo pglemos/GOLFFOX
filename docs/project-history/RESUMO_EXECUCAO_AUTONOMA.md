@@ -20,24 +20,24 @@
 - ✅ `database/migrations/gf_rpc_map_snapshot.sql` (modificado - adicionado capacity)
 
 ### ✅ APIs Backend
-- ✅ `apps/web/app/api/carrier/drivers/[driverId]/documents/route.ts` (novo)
-- ✅ `apps/web/app/api/carrier/drivers/[driverId]/exams/route.ts` (novo)
-- ✅ `apps/web/app/api/carrier/vehicles/[vehicleId]/documents/route.ts` (novo)
-- ✅ `apps/web/app/api/carrier/vehicles/[vehicleId]/maintenances/route.ts` (novo)
-- ✅ `apps/web/app/api/carrier/upload/route.ts` (novo)
-- ✅ `apps/web/app/api/carrier/costs/vehicle/route.ts` (novo)
-- ✅ `apps/web/app/api/carrier/costs/route/route.ts` (novo)
-- ✅ `apps/web/app/api/carrier/alerts/route.ts` (novo)
+- ✅ `apps/web/app/api/transportadora/drivers/[driverId]/documents/route.ts` (novo)
+- ✅ `apps/web/app/api/transportadora/drivers/[driverId]/exams/route.ts` (novo)
+- ✅ `apps/web/app/api/transportadora/vehicles/[vehicleId]/documents/route.ts` (novo)
+- ✅ `apps/web/app/api/transportadora/vehicles/[vehicleId]/maintenances/route.ts` (novo)
+- ✅ `apps/web/app/api/transportadora/upload/route.ts` (novo)
+- ✅ `apps/web/app/api/transportadora/costs/vehicle/route.ts` (novo)
+- ✅ `apps/web/app/api/transportadora/costs/route/route.ts` (novo)
+- ✅ `apps/web/app/api/transportadora/alerts/route.ts` (novo)
 - ✅ `apps/web/app/api/notifications/email/route.ts` (novo)
 
 ### ✅ Frontend - Páginas
-- ✅ `apps/web/app/carrier/motoristas/page.tsx` (modificado - tabs completas)
-- ✅ `apps/web/app/carrier/veiculos/page.tsx` (modificado - tabs completas)
-- ✅ `apps/web/app/carrier/custos/page.tsx` (novo)
-- ✅ `apps/web/app/carrier/alertas/page.tsx` (modificado - dashboard completo)
+- ✅ `apps/web/app/transportadora/motoristas/page.tsx` (modificado - tabs completas)
+- ✅ `apps/web/app/transportadora/veiculos/page.tsx` (modificado - tabs completas)
+- ✅ `apps/web/app/transportadora/custos/page.tsx` (novo)
+- ✅ `apps/web/app/transportadora/alertas/page.tsx` (modificado - dashboard completo)
 
 ### ✅ Componentes
-- ✅ `apps/web/components/carrier/document-upload.tsx` (novo)
+- ✅ `apps/web/components/transportadora/document-upload.tsx` (novo)
 - ✅ `apps/web/components/ui/alert.tsx` (novo)
 - ✅ `apps/web/components/fleet-map.tsx` (modificado - Realtime + badges)
 - ✅ `apps/web/components/sidebar.tsx` (modificado - link de custos)
@@ -86,12 +86,12 @@
 
 ### 🔴 CRÍTICO: Criar Bucket no Supabase Storage
 
-**Nome:** `carrier-documents`
+**Nome:** `transportadora-documents`
 
 **Como fazer:**
 1. Supabase Dashboard → Storage → Buckets
 2. New Bucket
-3. Name: `carrier-documents`
+3. Name: `transportadora-documents`
 4. Public: ❌ **DESABILITADO**
 5. File size limit: `10 MB`
 6. Allowed MIME types: `image/jpeg,image/png,application/pdf`
@@ -120,7 +120,7 @@
 SELECT table_name 
 FROM information_schema.tables 
 WHERE table_schema = 'public' 
-AND (table_name LIKE '%driver%' OR table_name LIKE '%vehicle%' OR table_name LIKE '%route_cost%')
+AND (table_name LIKE '%motorista%' OR table_name LIKE '%vehicle%' OR table_name LIKE '%route_cost%')
 ORDER BY table_name;
 ```
 
@@ -139,7 +139,7 @@ ORDER BY viewname;
 
 ### Verificar Bucket:
 1. Supabase Dashboard → Storage → Buckets
-2. Verificar se `carrier-documents` existe
+2. Verificar se `transportadora-documents` existe
 3. Verificar se está como privado (não público)
 
 ---
@@ -186,7 +186,7 @@ ORDER BY viewname;
 Após o Vercel fazer o deploy automático, o sistema NÃO funcionará completamente até que você:
 
 1. ✅ Execute as migrations no Supabase (PASSO 1)
-2. ✅ Crie o bucket `carrier-documents` (PASSO 2)
+2. ✅ Crie o bucket `transportadora-documents` (PASSO 2)
 3. ✅ Habilite Realtime nas tabelas (PASSO 3)
 
 **Sem essas 3 configurações, as funcionalidades do Painel da Transportadora não estarão disponíveis.**

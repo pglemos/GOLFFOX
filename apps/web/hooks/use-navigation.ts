@@ -37,7 +37,7 @@ export function useNavigation(): NavigationState {
   // Lógica específica para itens do Sidebar
   const isSidebarItemActive = (path: string): boolean => {
     // Dashboards dos painéis só ficam ativos na rota exata
-    if (path === "/admin" || path === "/operador" || path === "/operator" || path === "/transportadora") {
+    if (path === "/admin" || path === "/operador" || path === "/operador" || path === "/transportadora") {
       return currentPath === path
     }
     // Outras rotas podem ter subrotas ativas

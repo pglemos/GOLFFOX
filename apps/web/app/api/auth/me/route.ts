@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server'
 import { logError, debug } from '@/lib/logger'
 import { requireAuth } from '@/lib/api-auth'
+import { withRateLimit } from '@/lib/rate-limit'
 import { successResponse, unauthorizedResponse, errorResponse } from '@/lib/api-response'
 
 function tryDecode(cookieValue: string): any | null {
@@ -19,7 +20,7 @@ function tryDecode(cookieValue: string): any | null {
   }
 }
 
-export async function GET(request: NextRequest) {
+async function meHandler(request: NextRequest) {
   // Verificar autenticação (qualquer usuário autenticado pode ver seus próprios dados)
   const authError = await requireAuth(request)
   if (authError) return authError
@@ -97,3 +98,6 @@ export async function GET(request: NextRequest) {
     }
   })
 }
+
+// Exportar com rate limiting
+export const GET = withRateLimit(meHandler, 'api')

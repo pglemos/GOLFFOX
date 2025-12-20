@@ -8,15 +8,15 @@ import { Label } from "@/components/ui/label"
 import { notifySuccess, notifyError } from "@/lib/toast"
 import { supabase } from "@/lib/supabase"
 import { AddressForm, AddressData } from "@/components/address-form"
-import { Carrier } from "@/types/carrier"
+import { transportadora } from "@/types/transportadora"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Building2, FileText, CreditCard, User } from "lucide-react"
 import dynamic from "next/dynamic"
 
 // Lazy load seções pesadas
-const CarrierDocumentsSection = dynamic(() => import("@/components/carrier/carrier-documents-section"), { ssr: false })
-const CarrierBankingSection = dynamic(() => import("@/components/carrier/carrier-banking-section"), { ssr: false })
-const CarrierLegalRepSection = dynamic(() => import("@/components/carrier/carrier-legal-rep-section"), { ssr: false })
+const CarrierDocumentsSection = dynamic(() => import("@/components/transportadora/transportadora-documents-section"), { ssr: false })
+const CarrierBankingSection = dynamic(() => import("@/components/transportadora/transportadora-banking-section"), { ssr: false })
+const CarrierLegalRepSection = dynamic(() => import("@/components/transportadora/transportadora-legal-rep-section"), { ssr: false })
 
 interface EditCarrierModalProps {
   carrier: Carrier
@@ -47,22 +47,22 @@ export function EditCarrierModal({ carrier, isOpen, onClose, onSave }: EditCarri
 
   useEffect(() => {
     if (carrier) {
-      setName(carrier.name || "")
-      setAddress(carrier.address || "")
-      setPhone(carrier.phone || "")
-      setContactPerson(carrier.contact_person || "")
-      setEmail(carrier.email || "")
-      setCnpj(carrier.cnpj || "")
-      setStateRegistration(carrier.state_registration || "")
-      setMunicipalRegistration(carrier.municipal_registration || "")
+      setName(transportadora.name || "")
+      setAddress(transportadora.address || "")
+      setPhone(transportadora.phone || "")
+      setContactPerson(transportadora.contact_person || "")
+      setEmail(transportadora.email || "")
+      setCnpj(transportadora.cnpj || "")
+      setStateRegistration(transportadora.state_registration || "")
+      setMunicipalRegistration(transportadora.municipal_registration || "")
       setAddressData({
-        cep: carrier.address_zip_code || "",
-        street: carrier.address_street || "",
-        number: carrier.address_number || "",
-        neighborhood: carrier.address_neighborhood || "",
-        complement: carrier.address_complement || "",
-        city: carrier.address_city || "",
-        state: carrier.address_state || ""
+        cep: transportadora.address_zip_code || "",
+        street: transportadora.address_street || "",
+        number: transportadora.address_number || "",
+        neighborhood: transportadora.address_neighborhood || "",
+        complement: transportadora.address_complement || "",
+        city: transportadora.address_city || "",
+        state: transportadora.address_state || ""
       })
     }
   }, [carrier, isOpen])
@@ -81,7 +81,7 @@ export function EditCarrierModal({ carrier, isOpen, onClose, onSave }: EditCarri
         return
       }
 
-      const response = await fetch(`/api/admin/transportadora/update?id=${carrier.id}`, {
+      const response = await fetch(`/api/admin/transportadora/update?id=${transportadora.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

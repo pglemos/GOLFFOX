@@ -64,7 +64,7 @@ Todos os problemas de responsividade dos formulários foram identificados e corr
 
 ---
 
-### ✅ 2.2. Formulário de Funcionários (`components/operator/funcionario-modal.tsx`)
+### ✅ 2.2. Formulário de Funcionários (`components/operador/funcionario-modal.tsx`)
 
 **Mudanças:**
 - ✅ DialogContent: `w-[95vw] max-w-[600px] max-h-[90vh] overflow-y-auto p-4 sm:p-6`

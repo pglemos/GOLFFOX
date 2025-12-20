@@ -14,7 +14,7 @@ import { useOperatorTenant } from "@/components/providers/empresa-tenant-provide
 import { useDebounce } from "@/hooks/use-debounce"
 import { useQuery } from "@tanstack/react-query"
 import { useActiveTrips } from "@/hooks/use-empresa-data"
-import operatorI18nData from "@/i18n/operator.json"
+import operatorI18nData from "@/i18n/operador.json"
 
 const operatorI18n: any = operatorI18nData ?? {
   routes_title: "Rotas",
@@ -31,7 +31,7 @@ export default function OperatorRotasPage() {
 
   // Fetch das rotas usando React Query
   const { data: rotas = [], isLoading: rotasLoading, error: rotasError } = useQuery({
-    queryKey: ["operator-routes", tenantCompanyId],
+    queryKey: ["operador-routes", tenantCompanyId],
     queryFn: async () => {
       if (!tenantCompanyId) return []
       const { data, error } = await supabase

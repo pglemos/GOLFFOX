@@ -12,7 +12,7 @@ export function useRealtimeKPIs(companyId: string | null) {
     if (!companyId) return
 
     const channel = supabase
-      .channel(`operator-kpis:${companyId}`)
+      .channel(`operador-kpis:${companyId}`)
       .on(
         "postgres_changes",
         {
@@ -23,7 +23,7 @@ export function useRealtimeKPIs(companyId: string | null) {
         },
         () => {
           // Invalidar cache quando houver mudanças
-          queryClient.invalidateQueries({ queryKey: ["operator-kpis", companyId] })
+          queryClient.invalidateQueries({ queryKey: ["operador-kpis", companyId] })
         }
       )
       .subscribe()
@@ -41,7 +41,7 @@ export function useRealtimeAlerts(companyId: string | null) {
     if (!companyId) return
 
     const channel = supabase
-      .channel(`operator-alerts:${companyId}`)
+      .channel(`operador-alerts:${companyId}`)
       .on(
         "postgres_changes",
         {
@@ -70,7 +70,7 @@ export function useRealtimeRoutes(companyId: string | null) {
     if (!companyId) return
 
     const channel = supabase
-      .channel(`operator-routes:${companyId}`)
+      .channel(`operador-routes:${companyId}`)
       .on(
         "postgres_changes",
         {

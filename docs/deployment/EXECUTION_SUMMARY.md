@@ -113,7 +113,7 @@ Implementar sistema completo de gestão de transporte (GolfFox) com:
 ### 2. Trip Management
 - ✅ CRUD de trips com RLS
 - ✅ Estados: scheduled → inProgress → completed/cancelled
-- ✅ Reopen com `p_force` (admin/operator/carrier apenas)
+- ✅ Reopen com `p_force` (admin/operador/transportadora apenas)
 - ✅ Concorrência segura (FOR UPDATE no RPC)
 
 ### 3. Real-time Tracking
@@ -170,7 +170,7 @@ Motion: 160-240ms micro
 
 ### Por que `p_force` no RPC?
 **Decisão:** Permitir reabertura de trip completed sem bypassar RLS.  
-**Impacto:** Apenas admin/operator/carrier podem usar `p_force: true`.
+**Impacto:** Apenas admin/operador/transportadora podem usar `p_force: true`.
 
 ### Por que FOR UPDATE no RPC?
 **Decisão:** Prevenir race conditions em mudanças de status concorrentes.  

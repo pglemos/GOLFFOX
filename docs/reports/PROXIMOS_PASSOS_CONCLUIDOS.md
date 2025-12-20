@@ -144,7 +144,7 @@ Acesse: http://localhost:3000
 - Dashboard em `/admin`
 - Mapa em `/admin/mapa`
 - Todas as páginas do admin
-- Portal do operador em `/operator`
+- Portal do operador em `/operador`
 
 ---
 

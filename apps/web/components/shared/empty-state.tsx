@@ -30,7 +30,7 @@ export function EmptyState({
       animate="visible"
       className={className}
     >
-      <Card className="bg-card/50 backdrop-blur-sm border-[var(--border)] border-dashed">
+      <Card className="bg-card/50 backdrop-blur-sm border-border border-dashed">
         <CardContent className="flex flex-col items-center justify-center p-12 text-center">
           <motion.div
             initial={{ scale: 0 }}
@@ -38,20 +38,20 @@ export function EmptyState({
             transition={{ type: "spring", stiffness: 200, damping: 15 }}
             className="mb-6"
           >
-            <div className="p-4 rounded-full bg-gradient-to-br from-[var(--brand-light)] to-[var(--brand-soft)]">
-              <Icon className="h-12 w-12 text-[var(--brand)]" />
+            <div className="p-4 rounded-full bg-gradient-to-br from-brand-light to-brand-soft">
+              <Icon className="h-12 w-12 text-brand" />
             </div>
           </motion.div>
-          <h3 className="text-xl font-semibold text-[var(--ink-strong)] mb-2">
+          <h3 className="text-xl font-semibold text-ink-strong mb-2">
             {title}
           </h3>
-          <p className="text-sm text-[var(--ink-muted)] mb-6 max-w-md">
+          <p className="text-sm text-ink-muted mb-6 max-w-md">
             {description}
           </p>
           {actionLabel && onAction && (
             <Button
               onClick={onAction}
-              className="bg-gradient-to-r from-[var(--brand)] to-[var(--brand-hover)] hover:from-[var(--brand-hover)] hover:to-[var(--brand)]"
+              className="bg-gradient-to-r from-brand to-brand-hover hover:from-brand-hover hover:to-brand"
             >
               {actionLabel}
             </Button>

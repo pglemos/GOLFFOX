@@ -1135,7 +1135,7 @@ export const AdvancedRouteMap = memo(function AdvancedRouteMap({
                 id: selectedStop.passenger.id,
                 name: selectedStop.passenger.name,
                 ...(selectedStop.passenger.photo && { photo: selectedStop.passenger.photo }),
-                type: selectedStop.passenger.type === 'student' ? 'student' as const : 'regular' as const,
+                type: selectedStop.passageiro.type === 'student' ? 'student' as const : 'regular' as const,
                 ...(selectedStop.passenger.phone && { phone: selectedStop.passenger.phone }),
                 ...(selectedStop.passenger.observations && { observations: selectedStop.passenger.observations })
               } : {

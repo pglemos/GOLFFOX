@@ -50,9 +50,9 @@ Todas as funcionalidades solicitadas foram implementadas com sucesso.
 12. ✅ **Ajuda & Suporte** (`/admin/ajuda-suporte`) - FAQ + WhatsApp
 
 #### Portal do Operador (3 Módulos)
-1. ✅ **Funcionários** (`/operator/funcionarios`) - Cadastrar funcionários (nome, CPF, endereço, empresa) com geocodificação automática
-2. ✅ **Rotas** (`/operator/rotas`) - Visualizar em qual rota cada funcionário está
-3. ✅ **Sincronizar** (`/operator/sincronizar`) - Reprocessar pontos de parada
+1. ✅ **Funcionários** (`/operador/funcionarios`) - Cadastrar funcionários (nome, CPF, endereço, empresa) com geocodificação automática
+2. ✅ **Rotas** (`/operador/rotas`) - Visualizar em qual rota cada funcionário está
+3. ✅ **Sincronizar** (`/operador/sincronizar`) - Reprocessar pontos de parada
 
 #### Componentes Principais
 - ✅ `FleetMap` - Mapa Google Maps com veículos em tempo real

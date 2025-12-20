@@ -47,7 +47,7 @@ export function DriverDocumentsSection({
     const [uploading, setUploading] = useState(false)
 
     const { upload } = useFileUpload({
-        bucket: "driver-documents",
+        bucket: "motorista-documents",
         maxSize: 10,
     })
 

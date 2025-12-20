@@ -48,8 +48,8 @@
   - INSERT/UPDATE/DELETE: Apenas admin
 
 ### Rotas API Protegidas
-- ✅ `/api/admin/create-operator` - Requer admin
-- ✅ `/api/operator/create-employee` - Requer operator/admin
+- ✅ `/api/admin/create-operador` - Requer admin
+- ✅ `/api/operador/create-employee` - Requer operador/admin
 - ✅ `/api/costs/import` - Valida acesso à empresa
 - ✅ `/api/costs/manual` - Valida acesso à empresa
 - ✅ `/api/costs/reconcile` - Requer autenticação
@@ -60,7 +60,7 @@
 - ✅ `/api/reports/dispatch` - Protegido por CRON_SECRET
 
 ### Middleware
-- ✅ Proteção de `/admin` e `/operator`
+- ✅ Proteção de `/admin` e `/operador`
 - ✅ Validação de role (admin, operator)
 - ✅ Redirecionamento para `/login` ou `/unauthorized`
 - ✅ Validação de token com Supabase
@@ -82,7 +82,7 @@
 ## ✅ Fase 5: Frontend (Admin/Operator) & Mapa
 
 ### Branding
-- ✅ `operator-logo-section.tsx` - Exibe logo/nome da empresa
+- ✅ `operador-logo-section.tsx` - Exibe logo/nome da empresa
 - ✅ Fallback para "Operador" se não houver logo
 - ✅ "GOLF FOX" removido do painel do operador
 
@@ -181,7 +181,7 @@
 ### Segurança
 - **RLS Policies:** 2 novas (v49)
 - **Rotas Protegidas:** 10+ APIs
-- **Middleware:** Proteção completa de `/admin` e `/operator`
+- **Middleware:** Proteção completa de `/admin` e `/operador`
 
 ### Deploy
 - **Status:** ✅ Concluído

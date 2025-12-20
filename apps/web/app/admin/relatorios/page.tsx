@@ -186,8 +186,8 @@ export default function RelatoriosPage() {
       })(),
       {
         loading: 'Gerando relatório...',
-        success: t('operator', 'reports.exportSuccess', { title: report.title }),
-        error: t('operator', 'reports.exportError')
+        success: t('operador', 'reports.exportSuccess', { title: report.title }),
+        error: t('operador', 'reports.exportError')
       },
       { id: 'export' }
     )

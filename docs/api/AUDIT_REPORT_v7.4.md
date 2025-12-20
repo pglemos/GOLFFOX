@@ -44,7 +44,7 @@ CREATE POLICY "Authenticated users can view trips" ON trips
 - ✅ Can force trip state transitions
 - ✅ Can manage users, companies, routes, vehicles across all organizations
 
-#### **Operator Role** (`role = 'operator'`)
+#### **operador Role** (`role = 'operador'`)
 - ✅ SELECT: View users in their company only (`company_id` filtered)
 - ✅ SELECT: View/manage routes for their company
 - ✅ SELECT: View trips for company routes
@@ -52,14 +52,14 @@ CREATE POLICY "Authenticated users can view trips" ON trips
 - ✅ SELECT: View driver positions for company trips
 - ✅ Can force trip transitions for company trips
 
-#### **Carrier Role** (`role = 'carrier'`)
-- ✅ SELECT: View users in their carrier network (`carrier_id` filtered)
+#### **transportadora Role** (`role = 'transportadora'`)
+- ✅ SELECT: View users in their transportadora network (`carrier_id` filtered)
 - ✅ SELECT/INSERT/UPDATE/DELETE: Manage carrier vehicles
 - ✅ SELECT: View routes where `carrier_id` matches
 - ✅ SELECT: View trips on carrier routes
 - ✅ SELECT: View driver positions for carrier trips
 
-#### **Driver Role** (`role = 'driver'`)
+#### **motorista Role** (`role = 'motorista'`)
 - ✅ SELECT: View own profile and assigned trips (`driver_id = auth.uid()`)
 - ✅ INSERT: Insert GPS positions for own trips only (`driver_id = auth.uid()`)
 - ✅ SELECT: View own position history
@@ -67,7 +67,7 @@ CREATE POLICY "Authenticated users can view trips" ON trips
 - ✅ SELECT: View passengers on own trips
 - ✅ INSERT/UPDATE: Manage checklists for own trips
 
-#### **Passenger Role** (`role = 'passenger'`)
+#### **passageiro Role** (`role = 'passageiro'`)
 - ✅ SELECT: View assigned trips via `trip_passengers` table
 - ✅ SELECT: View driver positions for assigned trips
 - ✅ SELECT: View own profile
@@ -86,11 +86,11 @@ CREATE POLICY "Authenticated users can view trips" ON trips
 ### Features
 - ✅ **Row Locking**: `SELECT ... FOR UPDATE` prevents race conditions
 - ✅ **State Validation**: Enforces valid transitions:
-  - `scheduled → inProgress` (Driver starts trip)
-  - `inProgress → completed` (Driver completes trip)
-  - `inProgress → cancelled` (Admin/Operator cancels)
-  - `scheduled → cancelled` (Admin/Operator cancels)
-- ✅ **Force Mode**: Admin/Operator can reopen completed trips with `p_force = true`
+  - `scheduled → inProgress` (motorista starts trip)
+  - `inProgress → completed` (motorista completes trip)
+  - `inProgress → cancelled` (Admin/operador cancels)
+  - `scheduled → cancelled` (Admin/operador cancels)
+- ✅ **Force Mode**: Admin/operador can reopen completed trips with `p_force = true`
   - `completed → inProgress` (Reopen trip)
 - ✅ **Audit Trail**: All transitions logged to `trip_events` table
 - ✅ **Automatic Timestamps**: Sets `actual_start_time` and `actual_end_time`
@@ -178,7 +178,7 @@ trip_summary:
 
 **Flutter Implementation:**
 ```dart
-// Stream driver positions with real-time updates
+// Stream motorista positions with real-time updates
 final stream = SupabaseService.instance.streamDriverPositionsRealtime(tripId);
 stream.listen((positions) {
   // Update map markers in real-time
@@ -299,7 +299,7 @@ final checklists = await SupabaseService.instance.getChecklistsForTrip(tripId);
 **Recommended Implementation:**
 1. Create Supabase Storage buckets:
    - `vehicle-documents` (insurance, registration)
-   - `driver-documents` (license, certifications)
+   - `motorista-documents` (license, certifications)
    - `trip-photos` (incident reports, delivery proofs)
 
 2. RLS Policies for Storage:
@@ -313,9 +313,9 @@ final checklists = await SupabaseService.instance.getChecklistsForTrip(tripId);
 
 3. Flutter Integration:
    ```dart
-   // Upload driver license photo
+   // Upload motorista license photo
    await Supabase.instance.client.storage
-     .from('driver-documents')
+     .from('motorista-documents')
      .upload('$driverId/license.jpg', File(imagePath));
    ```
 
@@ -405,7 +405,7 @@ flutter build apk --dart-define=SUPABASE_URL=https://xxx.supabase.co \
 
 ### GPS Tracking Implementation
 ```dart
-// Start tracking when driver starts trip
+// Start tracking when motorista starts trip
 await TrackingService().startTracking(
   tripId: trip.id,
   driverId: currentUser.id,

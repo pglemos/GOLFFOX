@@ -116,7 +116,7 @@ Auditoria completa do sistema GolfFox realizada conforme plano de trabalho. Foco
 - `apps/web/app/api/admin/alerts/[alertId]/route.ts` - Otimizado `.select('*')` para apenas `id` e corrigido `any`
 - `apps/web/app/api/admin/assistance-requests/[requestId]/route.ts` - Otimizado `.select('*')` para apenas `id` e corrigido `any`
 - `apps/web/app/api/admin/transportadoras/[transportadoraId]/drivers/route.ts` - Otimizado `.select('*')` para 12 colunas específicas e corrigido `any`
-- `apps/web/app/api/admin/create-operator/route.ts` - Otimizado `.select('*')` para colunas específicas e corrigido múltiplos `any`
+- `apps/web/app/api/admin/create-operador/route.ts` - Otimizado `.select('*')` para colunas específicas e corrigido múltiplos `any`
 - `apps/web/app/api/admin/fix-database/route.ts` - Otimizado `.select('*')` para `id,updated_at` e corrigido `any`
 - `apps/web/app/api/admin/transportadoras/[transportadoraId]/users/route.ts` - Otimizado `.select('*')` para 8 colunas específicas e corrigido `any`
 - `apps/web/app/api/reports/schedule/route.ts` - Otimizado `.select('*')` para 9 colunas específicas e corrigido múltiplos `any`
@@ -132,7 +132,7 @@ Auditoria completa do sistema GolfFox realizada conforme plano de trabalho. Foco
 - `apps/web/app/api/transportadora/vehicles/[vehicleId]/documents/route.ts` - Otimizado `.select('*')` para 15 colunas específicas e corrigido `any`
 - `apps/web/app/api/transportadora/drivers/[driverId]/exams/route.ts` - Otimizado `.select('*')` para 13 colunas específicas e corrigido `any`
 - `apps/web/app/api/transportadora/drivers/[driverId]/documents/route.ts` - Otimizado `.select('*')` para 12 colunas específicas e corrigido `any`
-- `apps/web/app/api/transportadora/reports/driver-performance/route.ts` - Otimizado `.select('*')` para 9 colunas específicas e corrigido `any`
+- `apps/web/app/api/transportadora/reports/motorista-performance/route.ts` - Otimizado `.select('*')` para 9 colunas específicas e corrigido `any`
 
 ---
 
@@ -193,7 +193,7 @@ Auditoria completa do sistema GolfFox realizada conforme plano de trabalho. Foco
 
 **Total de arquivos otimizados:** 25 arquivos críticos
 - 15 arquivos de listagem (trips, routes, companies, vehicles, users-list, drivers-list, transportadoras-list, audit-log, transportadoras/users, reports/schedule, costs/categories, transportadora/vehicles/maintenances, transportadora/vehicles/documents, transportadora/drivers/exams, transportadora/drivers/documents)
-- 10 arquivos de operações (assistance-requests, transportadoras/drivers, create-operator, fix-database, cron/dispatch-reports, transportadora/alerts, operador/associate-company, reports/dispatch, transportadora/reports/driver-performance, costs/reconcile/kpis/vs-budget - views mantêm `*`)
+- 10 arquivos de operações (assistance-requests, transportadoras/drivers, create-operador, fix-database, cron/dispatch-reports, transportadora/alerts, operador/associate-company, reports/dispatch, transportadora/reports/motorista-performance, costs/reconcile/kpis/vs-budget - views mantêm `*`)
 
 **Total de correções TypeScript:** ~80+ substituições de `any` por tipos seguros
 - Substituído `error: any` por `err instanceof Error` em todos os catch blocks
@@ -323,8 +323,8 @@ Foi criado um script SQL completo para validação RLS:
 | `gf_web_vitals` | ❌ RLS Desabilitado | ✅ RLS Habilitado | 3 políticas |
 
 **Migrations aplicadas:**
-- `enable_rls_route_stops` - Políticas para admin, operator, transportadora, driver
-- `enable_rls_trip_passengers` - Políticas para admin, operator, transportadora, driver, passenger
+- `enable_rls_route_stops` - Políticas para admin, operador, transportadora, motorista
+- `enable_rls_trip_passengers` - Políticas para admin, operador, transportadora, motorista, passageiro
 - `enable_rls_gf_web_vitals` - Insert público (analytics), select apenas admin
 
 ### ✅ Índices Duplicados Removidos
@@ -344,10 +344,10 @@ Foi criado um script SQL completo para validação RLS:
 | Grupo | Views |
 |-------|-------|
 | Básicas | `profiles`, `v_trip_overview`, `v_trip_latest_position`, `v_driver_last_position`, `v_my_companies` |
-| Operator | `v_operator_alerts`, `v_operator_alerts_secure`, `v_operator_employees`, `v_operator_employees_secure`, `v_operator_costs`, `v_operator_costs_secure`, `v_operator_routes`, `v_operator_routes_secure`, `v_operator_requests`, `v_operator_sla`, `v_operator_dashboard_kpis`, `v_operator_dashboard_kpis_secure` |
+| operador | `v_operator_alerts`, `v_operator_alerts_secure`, `v_operator_employees`, `v_operator_employees_secure`, `v_operator_costs`, `v_operator_costs_secure`, `v_operator_routes`, `v_operator_routes_secure`, `v_operator_requests`, `v_operator_sla`, `v_operator_dashboard_kpis`, `v_operator_dashboard_kpis_secure` |
 | Admin | `v_admin_dashboard_kpis`, `v_active_trips` |
 | Custos | `v_costs_breakdown`, `v_costs_secure`, `v_costs_kpis`, `v_costs_conciliation`, `v_costs_vs_budget` |
-| Carrier | `v_carrier_expiring_documents`, `v_carrier_route_costs_summary`, `v_carrier_vehicle_costs_summary`, `v_route_stops` |
+| transportadora | `v_carrier_expiring_documents`, `v_carrier_route_costs_summary`, `v_carrier_vehicle_costs_summary`, `v_route_stops` |
 | Reports | `v_reports_delays`, `v_reports_delays_secure`, `v_reports_efficiency`, `v_reports_efficiency_secure`, `v_reports_not_boarded`, `v_reports_not_boarded_secure`, `v_reports_occupancy`, `v_reports_occupancy_secure`, `v_reports_roi_sla_secure`, `v_reports_driver_ranking` |
 
 **Migrations aplicadas:**

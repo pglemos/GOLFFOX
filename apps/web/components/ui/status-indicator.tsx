@@ -23,11 +23,11 @@ export function StatusIndicator({
   }
 
   const colorClasses = {
-    success: "bg-[var(--success)]",
-    warning: "bg-[var(--warning)]",
-    error: "bg-[var(--error)]",
-    info: "bg-[var(--info)]",
-    neutral: "bg-[var(--ink-muted)]"
+    success: "bg-success",
+    warning: "bg-warning",
+    error: "bg-error",
+    info: "bg-info",
+    neutral: "bg-ink-muted"
   }
 
   return (

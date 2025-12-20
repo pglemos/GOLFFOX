@@ -1,4 +1,4 @@
-# 🔧 Solução: Redirecionamento de `/operator?company=`
+# 🔧 Solução: Redirecionamento de `/operador?company=`
 
 **Data:** 06/11/2025  
 **Status:** ✅ RESOLVIDO
@@ -7,7 +7,7 @@
 
 ## 🎯 Problema Identificado
 
-A URL `https://golffox.vercel.app/operator?company=11111111-1111-4111-8111-1111111111c1` estava causando problemas:
+A URL `https://golffox.vercel.app/operador?company=11111111-1111-4111-8111-1111111111c1` estava causando problemas:
 - Ficava em loading infinito
 - Não deveria existir com esse parâmetro
 - O dashboard do operador não usa/precisa do parâmetro `?company=`
@@ -27,11 +27,11 @@ import type { NextRequest } from 'next/server'
 export function middleware(request: NextRequest) {
   const { pathname, searchParams } = request.nextUrl
 
-  // Redirecionar /operator?company=* para /operator (limpar parâmetro)
-  if (pathname === '/operator' && searchParams.has('company')) {
+  // Redirecionar /operador?company=* para /operador (limpar parâmetro)
+  if (pathname === '/operador' && searchParams.has('company')) {
     const url = request.nextUrl.clone()
     url.searchParams.delete('company')
-    console.log('🔄 Middleware: Redirecionando /operator?company= para /operator')
+    console.log('🔄 Middleware: Redirecionando /operador?company= para /operador')
     return NextResponse.redirect(url)
   }
 
@@ -40,23 +40,23 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/operator',
-    '/operator/:path*',
+    '/operador',
+    '/operador/:path*',
   ],
 }
 ```
 
 **Funcionalidade:**
-- Intercepta TODAS as requisições para `/operator`
+- Intercepta TODAS as requisições para `/operador`
 - Se detectar `?company=`, remove o parâmetro
-- Faz redirect 307 (temporary) para `/operator` limpo
+- Faz redirect 307 (temporary) para `/operador` limpo
 - Executa no lado do servidor (Edge Runtime)
 
 ---
 
 ### 2. Limpeza no Cliente (Fallback)
 
-**Arquivo:** `web-app/app/operator/page.tsx`
+**Arquivo:** `web-app/app/operador/page.tsx`
 
 ```typescript
 export default function OperatorDashboard() {
@@ -70,7 +70,7 @@ export default function OperatorDashboard() {
       // Se tem parâmetro ?company=, redirecionar para URL limpa
       if (url.searchParams.has('company')) {
         console.log('⚠️ Removendo parâmetro ?company= da URL')
-        router.replace('/operator')
+        router.replace('/operador')
         return
       }
     }
@@ -93,12 +93,12 @@ export default function OperatorDashboard() {
 
 | Cenário | URL de Entrada | URL Final | Status |
 |---------|----------------|-----------|--------|
-| Link direto | `/operator?company=xxx` | `/operator` | ✅ Redirect |
-| Link limpo | `/operator` | `/operator` | ✅ Normal |
-| Subpáginas | `/operator/funcionarios?company=xxx` | Inalterado | ✅ OK |
+| Link direto | `/operador?company=xxx` | `/operador` | ✅ Redirect |
+| Link limpo | `/operador` | `/operador` | ✅ Normal |
+| Subpáginas | `/operador/funcionarios?company=xxx` | Inalterado | ✅ OK |
 | Admin | `/admin?company=xxx` | Inalterado | ✅ OK |
 
-**Observação:** Apenas `/operator` é afetado. Subpáginas como `/operator/funcionarios?company=xxx` são permitidas (pois usam o parâmetro corretamente).
+**Observação:** Apenas `/operador` é afetado. Subpáginas como `/operador/funcionarios?company=xxx` são permitidas (pois usam o parâmetro corretamente).
 
 ---
 
@@ -108,9 +108,9 @@ export default function OperatorDashboard() {
 
 ```bash
 # Nenhuma ocorrência de push/href/replace com /operator?company=
-grep -r "push.*operator.*company" web-app/
-grep -r "href.*operator.*company" web-app/
-grep -r "replace.*operator.*company" web-app/
+grep -r "push.*operador.*company" web-app/
+grep -r "href.*operador.*company" web-app/
+grep -r "replace.*operador.*company" web-app/
 
 # Resultado: 0 ocorrências
 ```
@@ -179,7 +179,7 @@ grep -r "replace.*operator.*company" web-app/
 # 1. Commit das mudanças
 git add web-app/middleware.ts
 git add web-app/app/operator/page.tsx
-git commit -m "fix: redirect /operator?company= to /operator"
+git commit -m "fix: redirect /operador?company= to /operador"
 
 # 2. Push (deploy automático)
 git push origin main
@@ -187,8 +187,8 @@ git push origin main
 
 ### Para Teste Manual:
 
-1. Acesse: `https://golffox.vercel.app/operator?company=11111111-1111-4111-8111-1111111111c1`
-2. Deve redirecionar automaticamente para: `https://golffox.vercel.app/operator`
+1. Acesse: `https://golffox.vercel.app/operador?company=11111111-1111-4111-8111-1111111111c1`
+2. Deve redirecionar automaticamente para: `https://golffox.vercel.app/operador`
 3. Verifique no console do navegador (F12) se não há erros
 4. Dashboard deve carregar normalmente
 
@@ -232,7 +232,7 @@ git push origin main
 
 **Status:** ✅ **PROBLEMA RESOLVIDO**
 
-Qualquer acesso a `/operator?company=*` será **automaticamente redirecionado** para `/operator` (sem parâmetros).
+Qualquer acesso a `/operador?company=*` será **automaticamente redirecionado** para `/operador` (sem parâmetros).
 
 O link problemático está **bloqueado e excluído** através de redirect automático.
 

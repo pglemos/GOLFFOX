@@ -106,8 +106,8 @@ O middleware já criado em `middleware.ts` continua funcionando como **camada ad
 export function middleware(request: NextRequest) {
   const { pathname, searchParams } = request.nextUrl
 
-  // Redirecionar /operator?company=* para /operator (limpar parâmetro)
-  if (pathname === '/operator' && searchParams.has('company')) {
+  // Redirecionar /operador?company=* para /operador (limpar parâmetro)
+  if (pathname === '/operador' && searchParams.has('company')) {
     const url = request.nextUrl.clone()
     url.searchParams.delete('company')
     return NextResponse.redirect(url)
@@ -123,7 +123,7 @@ export function middleware(request: NextRequest) {
 
 ### Antes (❌ Problema):
 ```
-Login → redirectUrl = "/operator?company=xxx"
+Login → redirectUrl = "/operador?company=xxx"
       → router.push(redirectUrl)
       → /operator?company=xxx (URL suja)
       → Loading infinito
@@ -131,9 +131,9 @@ Login → redirectUrl = "/operator?company=xxx"
 
 ### Depois (✅ Correto):
 ```
-Login → redirectUrl = "/operator"
-      → redirectUrl.split('?')[0] = "/operator"
-      → router.push("/operator")
+Login → redirectUrl = "/operador"
+      → redirectUrl.split('?')[0] = "/operador"
+      → router.push("/operador")
       → /operator (URL limpa)
       → Dashboard carrega normalmente
 ```
@@ -210,7 +210,7 @@ Resultado: ✅ Middleware redireciona para /operator
 
 2. **Teste Manual:**
    - Fazer login com `operador@empresa.com`
-   - Verificar que redireciona para `/operator` (sem parâmetros)
+   - Verificar que redireciona para `/operador` (sem parâmetros)
    - Verificar que dashboard carrega normalmente
 
 3. **Monitoramento:**
@@ -231,7 +231,7 @@ Resultado: ✅ Middleware redireciona para /operator
 
 2. **Verificar console do navegador (F12):**
    - Procurar por: `🚀 Executando redirecionamento suave para:`
-   - Deve mostrar: `/operator` (sem parâmetros)
+   - Deve mostrar: `/operador` (sem parâmetros)
 
 3. **Verificar se middleware está deployado:**
    ```bash
@@ -253,7 +253,7 @@ Resultado: ✅ Middleware redireciona para /operator
 3. ✅ `web-app/middleware.ts`
    - Já estava correto (proteção adicional)
 
-4. ✅ `web-app/app/operator/page.tsx`
+4. ✅ `web-app/app/operador/page.tsx`
    - Já tinha limpeza de parâmetros (fallback)
 
 ---
@@ -262,7 +262,7 @@ Resultado: ✅ Middleware redireciona para /operator
 
 **Status:** ✅ **PROBLEMA RESOLVIDO**
 
-O login agora redireciona corretamente para `/operator` **sem parâmetros indesejados**.
+O login agora redireciona corretamente para `/operador` **sem parâmetros indesejados**.
 
 **Proteção em 3 camadas:**
 1. ✅ Login limpa URLs antes do redirect

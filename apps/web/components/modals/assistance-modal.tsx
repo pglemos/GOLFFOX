@@ -67,7 +67,7 @@ export function AssistanceModal({ request, isOpen, onClose, onSave }: Assistance
       const { data: drivers } = await supabase
         .from("users")
         .select("*")
-        .eq("role", "driver")
+        .eq("role", "motorista")
         .eq("is_active", true)
 
       if (drivers) {

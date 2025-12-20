@@ -81,7 +81,7 @@ Existem duas versões da função `gf_map_snapshot_full`:
 
 **Análise do Código:**
 - ✅ `apps/web/components/fleet-map.tsx` (linha 157): Usa versão com 3 parâmetros ✅
-- ✅ `apps/web/app/carrier/page.tsx` (linha 212): Usa versão com 3 parâmetros ✅
+- ✅ `apps/web/app/transportadora/page.tsx` (linha 212): Usa versão com 3 parâmetros ✅
 
 **Conclusão:** O código está correto, mas a versão antiga da função no banco causa ambiguidade.
 
@@ -163,7 +163,7 @@ O usuário confirmou que todas as variáveis estão configuradas na Vercel há m
 
 ---
 
-### 🎯 Painel do Operador (`/operator`)
+### 🎯 Painel do Operador (`/operador`)
 
 #### Status: ✅ 80% Funcional
 
@@ -194,7 +194,7 @@ REFRESH MATERIALIZED VIEW CONCURRENTLY public.mv_operator_kpis;
 
 ---
 
-### 🎯 Painel da Transportadora (`/carrier`)
+### 🎯 Painel da Transportadora (`/transportadora`)
 
 #### Status: ✅ 75% Funcional
 

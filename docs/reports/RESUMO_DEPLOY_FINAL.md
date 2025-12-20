@@ -81,23 +81,23 @@ Após deploy completar:
 
 **Teste com:**
 - Admin: `golffox@admin.com` / `senha123`
-- Operator: `operador@empresa.com` / `senha123`
-- Carrier: `transportadora@trans.com` / `senha123`
+- operador: `operador@empresa.com` / `senha123`
+- transportadora: `transportadora@trans.com` / `senha123`
 
 ## 📋 Arquivos Criados/Modificados
 
 ### Novos Arquivos:
 - `web-app/middleware.ts`
 - `web-app/app/unauthorized/page.tsx`
-- `web-app/app/operator/funcionarios/page.tsx`
-- `web-app/app/operator/alertas/page.tsx`
-- `web-app/app/operator/ajuda/page.tsx`
-- `web-app/app/carrier/mapa/page.tsx`
-- `web-app/app/carrier/veiculos/page.tsx`
-- `web-app/app/carrier/motoristas/page.tsx`
-- `web-app/app/carrier/alertas/page.tsx`
-- `web-app/app/carrier/relatorios/page.tsx`
-- `web-app/app/carrier/ajuda/page.tsx`
+- `web-app/app/operador/funcionarios/page.tsx`
+- `web-app/app/operador/alertas/page.tsx`
+- `web-app/app/operador/ajuda/page.tsx`
+- `web-app/app/transportadora/mapa/page.tsx`
+- `web-app/app/transportadora/veiculos/page.tsx`
+- `web-app/app/transportadora/motoristas/page.tsx`
+- `web-app/app/transportadora/alertas/page.tsx`
+- `web-app/app/transportadora/relatorios/page.tsx`
+- `web-app/app/transportadora/ajuda/page.tsx`
 - `web-app/.env.local.example`
 - `docs/DEPLOY_VERCEL.md`
 - `docs/DEPLOY_CHECKLIST.md`
@@ -110,8 +110,8 @@ Após deploy completar:
 - `web-app/components/topbar.tsx`
 - `web-app/components/app-shell.tsx`
 - `web-app/components/fleet-map.tsx`
-- `web-app/app/operator/page.tsx`
-- `web-app/app/carrier/page.tsx`
+- `web-app/app/operador/page.tsx`
+- `web-app/app/transportadora/page.tsx`
 
 ## ⚠️ Avisos de Build (Não Críticos)
 

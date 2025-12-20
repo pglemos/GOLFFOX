@@ -40,7 +40,7 @@ Pelo link correto:
 - `.tsx`, `.ts`, `.jsx`, `.js`, `.json`
 
 **Padrões buscados:**
-- `operator?company=` (com regex case-insensitive)
+- `operador?company=` (com regex case-insensitive)
 - UUID específico: `11111111-1111-4111-8111-1111111111c1`
 
 ### 2. **Banco de Dados**
@@ -53,7 +53,7 @@ Pelo link correto:
 | `gf_report_schedules` | `report_config` | **0** ✅ |
 
 **Ações realizadas:**
-- ✅ Busca por padrão regex `operator\?company=` em campos JSON/TEXT
+- ✅ Busca por padrão regex `operador\?company=` em campos JSON/TEXT
 - ✅ Verificação de até 100 registros por tabela
 - ✅ Nenhuma correção necessária
 
@@ -97,7 +97,7 @@ Pelo link correto:
 ### 2. **Testes de Verificação**
 
 ```bash
-✅ PASSED: Empresa de teste configurada corretamente (role='operator')
+✅ PASSED: Empresa de teste configurada corretamente (role='operador')
 ✅ PASSED: Funcionários cadastrados para empresa de teste (>=1)
 ⚠️  FAILED: Links no banco sem parâmetros company (tabela não existe)
 ```

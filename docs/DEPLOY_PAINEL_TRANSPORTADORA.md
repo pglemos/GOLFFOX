@@ -19,7 +19,7 @@
 SELECT table_name 
 FROM information_schema.tables 
 WHERE table_schema = 'public' 
-AND (table_name LIKE '%driver%' OR table_name LIKE '%vehicle%' OR table_name LIKE '%route_cost%')
+AND (table_name LIKE '%motorista%' OR table_name LIKE '%vehicle%' OR table_name LIKE '%route_cost%')
 ORDER BY table_name;
 ```
 
@@ -54,7 +54,7 @@ ORDER BY viewname;
 3. Vá em: **Storage** → **Buckets**
 4. Clique em **New Bucket**
 5. Configure:
-   - **Name:** `carrier-documents`
+   - **Name:** `transportadora-documents`
    - **Public bucket:** ❌ **DESABILITADO** (deixe desmarcado - bucket privado)
    - **File size limit:** `10 MB` (ou maior se necessário)
    - **Allowed MIME types:** `image/jpeg,image/png,application/pdf`
@@ -114,15 +114,15 @@ Após o deploy, verifique:
 
 1. **Login como Carrier:**
    - Acesse: https://golffox.vercel.app
-   - Faça login com uma conta de role `carrier`
-   - Deve redirecionar para `/carrier`
+   - Faça login com uma conta de role `transportadora`
+   - Deve redirecionar para `/transportadora`
 
 2. **Testar Funcionalidades:**
-   - ✅ Acessar `/carrier/motoristas` - deve abrir com tabs
-   - ✅ Acessar `/carrier/veiculos` - deve abrir com tabs
-   - ✅ Acessar `/carrier/custos` - deve abrir dashboard
-   - ✅ Acessar `/carrier/alertas` - deve abrir dashboard
-   - ✅ Acessar `/carrier/mapa` - deve mostrar mapa em tempo real
+   - ✅ Acessar `/transportadora/motoristas` - deve abrir com tabs
+   - ✅ Acessar `/transportadora/veiculos` - deve abrir com tabs
+   - ✅ Acessar `/transportadora/custos` - deve abrir dashboard
+   - ✅ Acessar `/transportadora/alertas` - deve abrir dashboard
+   - ✅ Acessar `/transportadora/mapa` - deve mostrar mapa em tempo real
 
 3. **Testar Upload de Arquivos:**
    - ✅ Fazer upload de documento de motorista
@@ -167,7 +167,7 @@ Isso geralmente significa que as APIs estão retornando dados vazios ou em forma
 Para testar as funcionalidades, você pode criar dados de teste:
 
 ```sql
--- Criar um motorista de teste (assumindo que já existe um usuário com role 'driver')
+-- Criar um motorista de teste (assumindo que já existe um usuário com role 'motorista')
 -- ATUALIZE os IDs conforme necessário
 
 -- Exemplo de documento de motorista:
@@ -207,7 +207,7 @@ VALUES (
 Antes de considerar o deploy completo, verifique:
 
 - [ ] Todas as migrations foram aplicadas (v50 a v54)
-- [ ] Bucket `carrier-documents` foi criado no Supabase Storage
+- [ ] Bucket `transportadora-documents` foi criado no Supabase Storage
 - [ ] Realtime está habilitado para `driver_positions`, `trips`, `trip_passengers`
 - [ ] Função `gf_map_snapshot_full` foi atualizada com campo `capacity`
 - [ ] Dependência `recharts` está instalada no frontend

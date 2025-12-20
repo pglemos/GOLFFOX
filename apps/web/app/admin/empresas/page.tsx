@@ -17,7 +17,7 @@ import { SkeletonList } from "@/components/ui/skeleton"
 
 // Lazy load modais pesados
 const CreateOperatorModal = dynamic(
-  () => import("@/components/modals/create-operator-modal").then(m => ({ default: m.CreateOperatorModal })),
+  () => import("@/components/modals/create-operador-modal").then(m => ({ default: m.CreateOperatorModal })),
   { ssr: false, loading: () => null }
 )
 const CompanyUsersModal = dynamic(

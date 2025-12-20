@@ -4,7 +4,7 @@ import * as React from "react"
 import { logError } from '@/lib/logger'
 
 export default function GlobalError({ error, reset }: { error: Error; reset: () => void }) {
-  // ✅ Log error estruturado (sempre loga, mesmo em produção)
+  // ✅ Log error estruturado
   React.useEffect(() => {
     logError('Global error capturado', {
       error: error.message,

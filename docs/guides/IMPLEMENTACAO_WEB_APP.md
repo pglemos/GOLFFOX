@@ -219,7 +219,7 @@ Abra: **http://localhost:3000**
 
 1. **Suporte a Supabase existente:** URLs e keys hardcoded (da lib Flutter)
 2. **Tipagem:** TypeScript configurado mas tipos específicos precisam ser gerados do Supabase
-3. **Rotas:** Layouts por role (`/admin`, `/operator`, etc.)
+3. **Rotas:** Layouts por role (`/admin`, `/operador`, etc.)
 4. **Auth Guard:** Implementar middleware/guards nas rotas protegidas
 
 ---

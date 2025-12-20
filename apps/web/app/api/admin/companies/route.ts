@@ -3,6 +3,9 @@ import { requireAuth } from '@/lib/api-auth'
 import { withRateLimit } from '@/lib/rate-limit'
 import { CompanyService, type CompanyFilters, type CreateCompanyData } from '@/lib/services'
 import { formatError } from '@/lib/error-utils'
+// CQRS (opcional - pode usar diretamente o service ou via command)
+// import { CreateCompanyCommand, cqrsBus } from '@/lib/cqrs'
+// import '@/lib/cqrs/bus/register-handlers'
 
 export const runtime = 'nodejs'
 

@@ -102,7 +102,7 @@ INSERT INTO public.users (id, email, role, is_active, created_at, updated_at)
 VALUES (
   'UUID_DO_USUARIO_AUTH',  -- ID do passo 1
   'seu@email.com',
-  'admin',  -- ou 'operator', 'carrier'
+  'admin',  -- ou 'operador', 'transportadora'
   true,
   NOW(),
   NOW()
@@ -126,10 +126,10 @@ SET role = EXCLUDED.role,
 **Arquivo:** `apps/web/app/api/auth/login/route.ts` (linhas 161-183)
 
 #### Análise:
-Se o usuário tem role `operator`, o sistema verifica a associação com empresa:
+Se o usuário tem role `operador`, o sistema verifica a associação com empresa:
 
 ```typescript
-if (role === 'operator') {
+if (role === 'operador') {
   const { data: mapping } = await supabase
     .from('gf_user_company_map')
     .select('company_id')
@@ -146,7 +146,7 @@ if (role === 'operator') {
 ```
 
 #### Sintoma:
-- Login falha apenas para usuários com role "operator"
+- Login falha apenas para usuários com role "operador"
 - Mensagem: "Usuário operador sem empresa associada"
 - Erro 403
 
@@ -303,7 +303,7 @@ WHERE u.email = 'seu@email.com';
 Resultado esperado:
 - ✅ Deve retornar 1 linha
 - ✅ `is_active` deve ser `true`
-- ✅ `role` deve ser definido ('admin', 'operator', 'carrier')
+- ✅ `role` deve ser definido ('admin', 'operador', 'transportadora')
 - ✅ `confirmed_at` não deve ser NULL
 
 ### **Passo 5: Verificar Cookies no Browser**

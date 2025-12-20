@@ -7,6 +7,7 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { normalizeRole } from '@/lib/role-mapper'
 import { debug, warn, error as logError } from '@/lib/logger'
 import { getCachedAuth, setCachedAuth, invalidateCachedAuth } from './auth-cache'
 
@@ -119,37 +120,10 @@ export async function validateAuth(request: NextRequest): Promise<AuthenticatedU
       }
     }
 
-    // 3. Como último recurso, tentar obter do cookie customizado (golffox-session)
-    // Mas apenas se não encontrou em outros lugares
-    if (!accessToken) {
-      const golffoxSession = request.cookies.get('golffox-session')?.value
-
-      if (golffoxSession) {
-        const sessionData = decodeBase64Json(golffoxSession)
-        if (sessionData) {
-
-          // Tentar obter access_token do cookie customizado
-          // Suportar tanto access_token (server-side) quanto accessToken (client-side AuthManager)
-          const token = (sessionData as any).access_token || (sessionData as any).accessToken
-
-          if (token) {
-            accessToken = token
-            tokenSource = 'custom-cookie'
-            debug('Token encontrado no cookie customizado (golffox-session)', {}, 'ApiAuth')
-          } else {
-            warn('Cookie customizado encontrado mas sem access_token', {
-              availableKeys: Object.keys(sessionData)
-            }, 'ApiAuth')
-          }
-        } else {
-          logError('Erro ao processar cookie customizado', { error: 'decode_failed' }, 'ApiAuth')
-        }
-      } else {
-        debug('Cookie golffox-session não encontrado', {
-          availableCookies: request.cookies.getAll().map(c => c.name)
-        }, 'ApiAuth')
-      }
-    }
+    // 3. ✅ REMOVIDO: Não tentar obter token do cookie customizado (golffox-session)
+    // O cookie customizado não contém mais access_token por segurança
+    // O token deve vir sempre do cookie do Supabase ou header Authorization
+    // Isso garante que o token seja sempre validado pelo Supabase Auth
 
     if (!accessToken) {
       warn('Token de acesso não encontrado em nenhum lugar', {
@@ -224,10 +198,14 @@ export async function validateAuth(request: NextRequest): Promise<AuthenticatedU
     }
 
     // Usar dados do banco (sempre atualizados)
+    // Normalizar role para garantir consistência (EN → PT-BR)
+    const rawRole = userData.role || user.user_metadata?.role || user.app_metadata?.role || 'passageiro'
+    const normalizedRole = normalizeRole(rawRole)
+    
     const authenticatedUser: AuthenticatedUser = {
       id: userData.id,
       email: userData.email || user.email || '',
-      role: userData.role || user.user_metadata?.role || user.app_metadata?.role || 'passageiro',
+      role: normalizedRole,
       companyId: userData.company_id || null
     }
 
@@ -251,32 +229,26 @@ export async function validateAuth(request: NextRequest): Promise<AuthenticatedU
 
 /**
  * Valida se o usuário tem role específica
+ * Normaliza roles antes de comparar para garantir consistência
  */
 export function hasRole(user: AuthenticatedUser | null, requiredRole: string | string[]): boolean {
   if (!user) return false
 
-  const roles = Array.isArray(requiredRole) ? requiredRole : [requiredRole]
+  // Normalizar role do usuário
+  const userRole = normalizeRole(user.role)
+  
+  // Normalizar roles requeridas
+  const roles = Array.isArray(requiredRole) 
+    ? requiredRole.map(r => normalizeRole(r))
+    : [normalizeRole(requiredRole)]
 
-  if (roles.includes('admin')) {
-    return user.role === 'admin'
+  // Admin sempre tem acesso a tudo (exceto se verificação específica de não-admin)
+  if (userRole === 'admin') {
+    return true
   }
 
-  // empresa = usuários da empresa contratante (antigo operator)
-  if (roles.includes('empresa')) {
-    return ['admin', 'empresa', 'operator'].includes(user.role) // Compatibilidade com role antiga
-  }
-
-  // transportadora = gestor da transportadora (antigo carrier/operador)
-  if (roles.includes('transportadora')) {
-    return ['admin', 'transportadora', 'operador', 'carrier'].includes(user.role) // Compatibilidade
-  }
-
-  // operador (mantido para compatibilidade, mas prefira 'transportadora')
-  if (roles.includes('operador')) {
-    return ['admin', 'transportadora', 'operador', 'carrier'].includes(user.role)
-  }
-
-  return roles.includes(user.role)
+  // Verificar se role normalizado do usuário está na lista de roles permitidas
+  return roles.includes(userRole)
 }
 
 

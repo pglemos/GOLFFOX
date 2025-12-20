@@ -138,7 +138,7 @@ flutter run \
 
 ### Erro "invalid transition"
 **Causa:** Tentou mudar status de forma inválida  
-**Solução:** Use `p_force: true` para transições reversas (apenas admin/operator/carrier)
+**Solução:** Use `p_force: true` para transições reversas (apenas admin/operador/transportadora)
 
 ### Realtime não atualiza
 **Causa:** Realtime não habilitado no painel  
@@ -146,7 +146,7 @@ flutter run \
 
 ### Erro ao inserir posição
 **Causa:** RLS bloqueando  
-**Solução:** Verifique se o usuário logado é o driver da trip
+**Solução:** Verifique se o usuário logado é o motorista da trip
 
 ---
 

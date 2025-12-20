@@ -38,16 +38,16 @@
 - [ ] Testar logout
 
 **Middleware de Proteção:**
-- [ ] Tentar acessar `/operator` sem login → deve redirecionar
+- [ ] Tentar acessar `/operador` sem login → deve redirecionar
 - [ ] Tentar acessar `/admin` sem login → deve redirecionar
-- [ ] Fazer login como `operator` e tentar acessar `/admin` → deve redirecionar
+- [ ] Fazer login como `operador` e tentar acessar `/admin` → deve redirecionar
 - [ ] Fazer login como `admin` e acessar `/admin` → deve funcionar
 
 **APIs Protegidas:**
 - [ ] Testar `/api/costs/manual` sem autenticação → deve retornar 401
 - [ ] Testar `/api/costs/manual` com autenticação → deve funcionar
 - [ ] Testar `/api/costs/import` com autenticação → deve funcionar
-- [ ] Testar `/api/operator/create-employee` como operator → deve funcionar
+- [ ] Testar `/api/operador/create-employee` como operador → deve funcionar
 
 **Branding do Operador:**
 - [ ] Fazer login como operador
@@ -85,7 +85,7 @@
 
 **Arquivos com Erros:**
 - [ ] `app/api/reports/run/route.ts` - Instalar `@types/pdfkit`
-- [ ] `app/operator/page.tsx` - Corrigir props do `ControlTowerCards`
+- [ ] `app/operador/page.tsx` - Corrigir props do `ControlTowerCards`
 - [ ] `components/admin-map/panels.tsx` - Adicionar propriedades em `RoutePolyline`
 - [ ] `components/costs/cost-detail-table.tsx` - Corrigir comparação de tipos
 - [ ] `components/fleet-map.tsx` - Adicionar export `formatTimeRemaining` em `kpi-utils`

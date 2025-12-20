@@ -9,7 +9,7 @@
 ## ✅ TAREFA COMPLETA
 
 ### Objetivo Original
-> "Atualizar a implementação para substituir sistematicamente o link `https://golffox.vercel.app/operator?company=11111111-1111-4111-8111-1111111111c1` pelo link correto `https://golffox.vercel.app/operator` em toda a aplicação."
+> "Atualizar a implementação para substituir sistematicamente o link `https://golffox.vercel.app/operador?company=11111111-1111-4111-8111-1111111111c1` pelo link correto `https://golffox.vercel.app/operador` em toda a aplicação."
 
 ### Resultado
 ✅ **TAREFA CONCLUÍDA COM SUCESSO**

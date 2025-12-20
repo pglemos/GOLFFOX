@@ -22,7 +22,7 @@ curl https://golffox-bzj0446dr-synvolt.vercel.app/api/health
 
 ### 4. Rotas Protegidas (sem login)
 - Acesse: https://golffox-bzj0446dr-synvolt.vercel.app/operator
-- **Esperado:** Redireciona para `/login?redirect=/operator`
+- **Esperado:** Redireciona para `/login?redirect=/operador`
 
 - Acesse: https://golffox-bzj0446dr-synvolt.vercel.app/admin
 - **Esperado:** Redireciona para `/login?redirect=/admin`
@@ -39,14 +39,14 @@ curl https://golffox-bzj0446dr-synvolt.vercel.app/api/costs/manual?company_id=te
 
 ### Pré-requisito
 Ter credenciais de teste:
-- Operador: `operator@example.com`
+- Operador: `operador@example.com`
 - Admin: `admin@example.com`
 
 ### 1. Login como Operador
 1. Acesse `/login`
 2. Faça login com credenciais de operador
 3. **Verificar:**
-   - Redireciona para `/operator`
+   - Redireciona para `/operador`
    - Logo/nome da empresa aparece (se configurado)
    - "GOLF FOX" não aparece
 

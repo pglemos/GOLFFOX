@@ -191,19 +191,19 @@ function LoginContent() {
 
           const isAllowedForRole = (role: string, path: string): boolean => {
             if (path.startsWith('/admin')) return role === 'admin'
-            // empresa = empresa contratante (antigo operator)
-            if (path.startsWith('/empresa')) return ['admin', 'empresa', 'operator'].includes(role)
+            // empresa = empresa contratante (antigo operador)
+            if (path.startsWith('/empresa')) return ['admin', 'empresa', 'operador'].includes(role)
             // operador = transportadora
-            if (path.startsWith('/transportadora')) return ['admin', 'operador', 'carrier', 'transportadora'].includes(role)
+            if (path.startsWith('/transportadora')) return ['admin', 'operador', 'transportadora', 'transportadora'].includes(role)
             return true
           }
 
           // Normalizar roles para PT-BR
           const normalizedRole =
-            userRole === 'operator' ? 'empresa' :  // antigo operator → empresa
-              userRole === 'carrier' ? 'operador' :  // antigo carrier → operador
-                userRole === 'driver' ? 'motorista' :
-                  userRole === 'passenger' ? 'passageiro' : userRole
+            userRole === 'operador' ? 'empresa' :  // antigo operador → empresa
+              userRole === 'transportadora' ? 'operador' :  // antigo transportadora → operador
+                userRole === 'motorista' ? 'motorista' :
+                  userRole === 'passageiro' ? 'passageiro' : userRole
 
           // Redirect baseado na role normalizada
           let redirectUrl =
@@ -375,10 +375,10 @@ function LoginContent() {
 
   const isAllowedForRole = (role: string, path: string): boolean => {
     if (path.startsWith('/admin')) return role === 'admin'
-    // empresa = empresa contratante (antigo operator)
-    if (path.startsWith('/empresa')) return ['admin', 'empresa', 'operator'].includes(role)
+    // empresa = empresa contratante (antigo operador)
+    if (path.startsWith('/empresa')) return ['admin', 'empresa', 'operador'].includes(role)
     // operador = gestor da transportadora
-    if (path.startsWith('/transportadora')) return ['admin', 'operador', 'carrier', 'transportadora'].includes(role)
+    if (path.startsWith('/transportadora')) return ['admin', 'operador', 'transportadora', 'transportadora'].includes(role)
     return true
   }
 
@@ -687,8 +687,8 @@ function LoginContent() {
         }
 
         // ✅ Verificar se o role permite acesso web
-        // Driver e Passenger devem usar app mobile
-        if (userRoleFromDatabase === 'driver' || userRoleFromDatabase === 'passenger') {
+        // motorista e passageiro devem usar app mobile
+        if (userRoleFromDatabase === 'motorista' || userRoleFromDatabase === 'passageiro') {
           setError(`Seu perfil (${userRoleFromDatabase}) deve acessar o sistema através do aplicativo mobile. Por favor, baixe o app GolfFox no seu dispositivo móvel.`)
           setLoading(false)
           setTransitioning(false)
@@ -717,7 +717,7 @@ function LoginContent() {
           redirectUrl = AuthManager.getRedirectUrl(userRoleFromDatabase)
         }
 
-        // Se não houver URL de redirecionamento (driver/passenger), mostrar erro
+        // Se não houver URL de redirecionamento (motorista/passageiro), mostrar erro
         if (!redirectUrl) {
           setError(`Seu perfil (${userRoleFromDatabase}) deve acessar o sistema através do aplicativo mobile. Por favor, baixe o app GolfFox no seu dispositivo móvel.`)
           setLoading(false)
@@ -983,7 +983,7 @@ function LoginContent() {
             transition={{ delay: 0.5 }}
             className="text-sm text-gray-400"
           >
-            Novo por aqui? <span className="text-gray-900 font-medium cursor-pointer hover:text-[var(--brand)] transition-colors">Fale com vendas</span>
+            Novo por aqui? <span className="text-gray-900 font-medium cursor-pointer hover:text-brand transition-colors">Fale com vendas</span>
           </motion.div>
         </div>
 
@@ -1000,7 +1000,7 @@ function LoginContent() {
               initial={{ opacity: 1, y: 0 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-              className="lg:hidden bg-gradient-to-br from-white via-white to-[var(--bg-soft)] rounded-3xl shadow-2xl border border-[var(--border)] p-6 sm:p-8 mb-8 relative overflow-hidden"
+              className="lg:hidden bg-gradient-to-br from-white via-white to-bg-soft rounded-3xl shadow-2xl border border-border p-6 sm:p-8 mb-8 relative overflow-hidden"
             >
               {/* Background pattern sutil */}
               <div className="absolute inset-0 opacity-[0.02] bg-[radial-gradient(circle_at_1px_1px,rgb(0,0,0)_1px,transparent_0)] bg-[length:24px_24px]" />
@@ -1017,7 +1017,7 @@ function LoginContent() {
                     whileHover={{ scale: 1.05 }}
                     className="inline-flex items-center justify-center gap-3 mb-4"
                   >
-                    <h2 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-[var(--ink-strong)] to-[var(--brand)] bg-clip-text text-transparent">
+                    <h2 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-ink-strong to-brand bg-clip-text text-transparent">
                       GOLF FOX
                     </h2>
                   </motion.div>
@@ -1068,10 +1068,10 @@ function LoginContent() {
                   transition={{ duration: 0.5, delay: 0.1 }}
                   className="lg:hidden mb-8"
                 >
-                  <h1 className="text-3xl sm:text-4xl font-bold text-[var(--ink-strong)] mb-3 tracking-tight">
+                  <h1 className="text-3xl sm:text-4xl font-bold text-ink-strong mb-3 tracking-tight">
                     Entre em sua conta
                   </h1>
-                  <p className="text-base sm:text-lg text-[var(--ink-muted)] leading-relaxed font-light">
+                  <p className="text-base sm:text-lg text-ink-muted leading-relaxed font-light">
                     Acesse sua frota com inteligência e controle total.
                   </p>
                 </motion.div>
@@ -1084,11 +1084,11 @@ function LoginContent() {
                         initial={{ opacity: 0, y: -10, scale: 0.95 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                        className="p-4 bg-gradient-to-r from-[var(--error-light)] to-red-50/80 border-2 border-[var(--error)]/20 rounded-2xl text-sm text-[var(--error)] shadow-sm backdrop-blur-sm"
+                        className="p-4 bg-gradient-to-r from-error-light to-red-50/80 border-2 border-error/20 rounded-2xl text-sm text-error shadow-sm backdrop-blur-sm"
                         role="alert"
                       >
                         <div className="flex items-start gap-3">
-                          <div className="w-5 h-5 rounded-full bg-[var(--error)] flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <div className="w-5 h-5 rounded-full bg-error flex items-center justify-center flex-shrink-0 mt-0.5">
                             <span className="text-white text-xs font-bold">!</span>
                           </div>
                           <p className="flex-1 font-medium">{error}</p>
@@ -1101,7 +1101,7 @@ function LoginContent() {
                         initial={{ opacity: 0, y: -10, scale: 0.95 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                        className="p-4 bg-gradient-to-r from-[var(--success-light)] to-green-50/80 border-2 border-[var(--success)]/20 rounded-2xl text-sm text-[var(--success)] shadow-sm backdrop-blur-sm flex items-center gap-3"
+                        className="p-4 bg-gradient-to-r from-success-light to-green-50/80 border-2 border-success/20 rounded-2xl text-sm text-success shadow-sm backdrop-blur-sm flex items-center gap-3"
                       >
                         <Sparkles className="w-5 h-5 flex-shrink-0" />
                         <span className="font-medium">Login realizado com sucesso!</span>
@@ -1124,12 +1124,12 @@ function LoginContent() {
                 >
                   {/* Campo Email Premium */}
                   <div className="space-y-2">
-                    <label className="block text-sm font-semibold text-[var(--ink-strong)] mb-2" htmlFor="login-email">
+                    <label className="block text-sm font-semibold text-ink-strong mb-2" htmlFor="login-email">
                       E-mail
                     </label>
                     <div className="relative group">
                       {/* Mail Icon Premium */}
-                      <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none z-10 text-[var(--ink-muted)]">
+                      <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none z-10 text-ink-muted">
                         <Mail className="h-5 w-5" />
                       </div>
 
@@ -1149,16 +1149,16 @@ function LoginContent() {
                           }
                         }}
                         autoComplete="email"
-                        className={`w-full h-14 pl-12 pr-4 bg-gradient-to-br from-[var(--bg-soft)] to-[var(--bg)] border-2 ${fieldErrors.email
-                          ? "border-[var(--error)] focus:border-[var(--error)] focus:ring-2 focus:ring-[var(--error)]/20 shadow-[0_0_0_4px_rgba(239,68,68,0.1)]"
-                          : "border-[var(--border)] focus:border-[var(--brand)] focus:ring-2 focus:ring-[var(--brand)]/20 hover:border-[var(--border-strong)]"
-                          } rounded-2xl text-base focus:bg-white placeholder:text-[var(--ink-muted)] font-medium`}
+                        className={`w-full h-14 pl-12 pr-4 bg-gradient-to-br from-bg-soft to-bg border-2 ${fieldErrors.email
+                          ? "border-error focus:border-error focus:ring-2 focus:ring-error/20 shadow-[0_0_0_4px_rgba(239,68,68,0.1)]"
+                          : "border-border focus:border-brand focus:ring-2 focus:ring-brand/20 hover:border-strong"
+                          } rounded-2xl text-base focus:bg-white placeholder:text-ink-muted font-medium`}
                       />
                       {fieldErrors.email && (
                         <motion.p
                           initial={{ opacity: 0, y: -5 }}
                           animate={{ opacity: 1, y: 0 }}
-                          className="mt-2 text-xs text-[var(--error)] font-medium flex items-center gap-1"
+                          className="mt-2 text-xs text-error font-medium flex items-center gap-1"
                           aria-live="assertive"
                         >
                           <span>⚠</span> {fieldErrors.email}
@@ -1169,12 +1169,12 @@ function LoginContent() {
 
                   {/* Campo Senha Premium */}
                   <div className="space-y-2">
-                    <label className="block text-sm font-semibold text-[var(--ink-strong)] mb-2" htmlFor="login-password">
+                    <label className="block text-sm font-semibold text-ink-strong mb-2" htmlFor="login-password">
                       Senha
                     </label>
                     <div className="relative group">
                       {/* Lock Icon Premium */}
-                      <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none z-10 text-[var(--ink-muted)]">
+                      <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none z-10 text-ink-muted">
                         <Lock className="h-5 w-5" />
                       </div>
 
@@ -1194,17 +1194,17 @@ function LoginContent() {
                         }}
                         ref={passwordInputRef}
                         autoComplete="current-password"
-                        className={`w-full h-14 pl-12 pr-14 bg-gradient-to-br from-[var(--bg-soft)] to-[var(--bg)] border-2 ${fieldErrors.password
-                          ? "border-[var(--error)] focus:border-[var(--error)] focus:ring-2 focus:ring-[var(--error)]/20 shadow-[0_0_0_4px_rgba(239,68,68,0.1)]"
-                          : "border-[var(--border)] focus:border-[var(--brand)] focus:ring-2 focus:ring-[var(--brand)]/20 hover:border-[var(--border-strong)]"
-                          } rounded-2xl text-base focus:bg-white placeholder:text-[var(--ink-muted)] font-medium`}
+                        className={`w-full h-14 pl-12 pr-14 bg-gradient-to-br from-bg-soft to-bg border-2 ${fieldErrors.password
+                          ? "border-error focus:border-error focus:ring-2 focus:ring-error/20 shadow-[0_0_0_4px_rgba(239,68,68,0.1)]"
+                          : "border-border focus:border-brand focus:ring-2 focus:ring-brand/20 hover:border-strong"
+                          } rounded-2xl text-base focus:bg-white placeholder:text-ink-muted font-medium`}
                       />
                       <motion.button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--ink-muted)] hover:text-[var(--brand)] transition-colors h-9 w-9 flex items-center justify-center rounded-xl hover:bg-[var(--bg-hover)] z-10 touch-manipulation"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-muted hover:text-brand transition-colors h-9 w-9 flex items-center justify-center rounded-xl hover:bg-bg-hover z-10 touch-manipulation"
                         aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
                       >
                         {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
@@ -1213,7 +1213,7 @@ function LoginContent() {
                         <motion.p
                           initial={{ opacity: 0, y: -5 }}
                           animate={{ opacity: 1, y: 0 }}
-                          className="mt-2 text-xs text-[var(--error)] font-medium flex items-center gap-1"
+                          className="mt-2 text-xs text-error font-medium flex items-center gap-1"
                           aria-live="assertive"
                         >
                           <span>⚠</span> {fieldErrors.password}
@@ -1237,9 +1237,9 @@ function LoginContent() {
                         id="remember-me"
                         checked={rememberMe}
                         onCheckedChange={(checked) => setRememberMe(checked === true)}
-                        className="h-5 w-5 rounded-lg border-2 border-[var(--border)] data-[state=checked]:bg-[var(--brand)] data-[state=checked]:border-[var(--brand)] transition-all duration-200"
+                        className="h-5 w-5 rounded-lg border-2 border-border data-[state=checked]:bg-brand data-[state=checked]:border-brand transition-all duration-200"
                       />
-                      <span className="whitespace-nowrap text-[var(--ink-muted)] group-hover:text-[var(--ink-strong)] transition-colors font-medium">
+                      <span className="whitespace-nowrap text-ink-muted group-hover:text-ink-strong transition-colors font-medium">
                         Manter conectado
                       </span>
                     </motion.label>
@@ -1248,7 +1248,7 @@ function LoginContent() {
                       onClick={() => console.log("Forgot password clicked")}
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
-                      className="text-[var(--brand)] hover:text-[var(--brand-hover)] font-semibold transition-colors touch-manipulation text-sm whitespace-nowrap"
+                      className="text-brand hover:text-brand-hover font-semibold transition-colors touch-manipulation text-sm whitespace-nowrap"
                     >
                       Esqueceu sua senha?
                     </motion.button>
@@ -1265,7 +1265,7 @@ function LoginContent() {
                     <Button
                       type="submit"
                       disabled={!canSubmit}
-                      className="w-full h-14 bg-gradient-to-r from-[var(--brand)] via-[var(--brand-hover)] to-[var(--brand)] bg-[length:200%_100%] hover:bg-[position:100%_0] text-white font-bold text-base shadow-[var(--shadow-brand-lg)] hover:shadow-[var(--shadow-brand-lg)] transition-all duration-500 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none rounded-2xl relative overflow-hidden group touch-manipulation will-change-transform"
+                      className="w-full h-14 bg-gradient-to-r from-brand via-brand-hover to-brand bg-[length:200%_100%] hover:bg-[position:100%_0] text-white font-bold text-base shadow-brand-lg hover:shadow-brand-lg transition-all duration-500 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none rounded-2xl relative overflow-hidden group touch-manipulation will-change-transform"
                     >
                       {/* Shimmer effect otimizado */}
                       {!shouldReduceMotion && !loading && !transitioning && (
@@ -1316,13 +1316,13 @@ function LoginContent() {
                   transition={{ duration: shouldReduceMotion ? 0 : 0.4, delay: shouldReduceMotion ? 0 : 0.6 }}
                   className="mt-8 sm:mt-10 md:mt-12 text-center"
                 >
-                  <div className="flex items-center justify-center gap-2 text-xs sm:text-sm text-[var(--ink-muted)]">
-                    <Shield className="h-3 w-3 sm:h-4 sm:w-4 text-[var(--brand)]" />
+                  <div className="flex items-center justify-center gap-2 text-xs sm:text-sm text-ink-muted">
+                    <Shield className="h-3 w-3 sm:h-4 sm:w-4 text-brand" />
                     <p>
                       Protegido por{" "}
-                      <span className="text-[var(--brand)] font-semibold">Golf Fox Security</span>
+                      <span className="text-brand font-semibold">Golf Fox Security</span>
                     </p>
-                    <Zap className="h-3 w-3 sm:h-4 sm:w-4 text-[var(--brand)] opacity-60" />
+                    <Zap className="h-3 w-3 sm:h-4 sm:w-4 text-brand opacity-60" />
                   </div>
                 </motion.div>
 
@@ -1381,10 +1381,10 @@ function LoginContent() {
                 transition={{ duration: 0.5 }}
                 className="mb-8 sm:mb-10 md:mb-12"
               >
-                <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-[var(--ink-strong)] mb-2 sm:mb-3 tracking-tight">
+                <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-ink-strong mb-2 sm:mb-3 tracking-tight">
                   Entrar
                 </h1>
-                <p className="text-base sm:text-lg text-[var(--ink-muted)] font-light">
+                <p className="text-base sm:text-lg text-ink-muted font-light">
                   Acesse sua conta Golf Fox
                 </p>
               </motion.div>
@@ -1396,11 +1396,11 @@ function LoginContent() {
                     initial={{ opacity: 0, y: -10, scale: 0.95 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                    className="mb-6 sm:mb-8 p-4 bg-gradient-to-r from-[var(--error-light)] to-red-50/80 border-2 border-[var(--error)]/20 rounded-2xl text-xs sm:text-sm text-[var(--error)] shadow-sm backdrop-blur-sm"
+                    className="mb-6 sm:mb-8 p-4 bg-gradient-to-r from-error-light to-red-50/80 border-2 border-error/20 rounded-2xl text-xs sm:text-sm text-error shadow-sm backdrop-blur-sm"
                     role="alert"
                   >
                     <div className="flex items-start gap-3">
-                      <div className="w-5 h-5 rounded-full bg-[var(--error)] flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <div className="w-5 h-5 rounded-full bg-error flex items-center justify-center flex-shrink-0 mt-0.5">
                         <span className="text-white text-xs font-bold">!</span>
                       </div>
                       <p className="flex-1 font-medium">{error}</p>
@@ -1413,7 +1413,7 @@ function LoginContent() {
                     initial={{ opacity: 0, y: -10, scale: 0.95 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                    className="mb-6 sm:mb-8 p-4 bg-gradient-to-r from-[var(--success-light)] to-green-50/80 border-2 border-[var(--success)]/20 rounded-2xl text-xs sm:text-sm text-[var(--success)] shadow-sm backdrop-blur-sm flex items-center gap-3"
+                    className="mb-6 sm:mb-8 p-4 bg-gradient-to-r from-success-light to-green-50/80 border-2 border-success/20 rounded-2xl text-xs sm:text-sm text-success shadow-sm backdrop-blur-sm flex items-center gap-3"
                   >
                     <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
                     <span className="font-medium">Login realizado com sucesso!</span>
@@ -1435,11 +1435,11 @@ function LoginContent() {
               >
                 {/* Campo Email - Desktop Premium */}
                 <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-[var(--ink-strong)] mb-2" htmlFor="login-email-desktop">
+                  <label className="block text-sm font-semibold text-ink-strong mb-2" htmlFor="login-email-desktop">
                     E-mail
                   </label>
                   <div className="relative group">
-                    <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none z-10 text-[var(--ink-muted)]">
+                    <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none z-10 text-ink-muted">
                       <Mail className="h-5 w-5" />
                     </div>
                     <Input
@@ -1458,16 +1458,16 @@ function LoginContent() {
                         }
                       }}
                       autoComplete="email"
-                      className={`w-full h-14 pl-12 pr-4 bg-gradient-to-br from-[var(--bg-soft)] to-[var(--bg)] border-2 ${fieldErrors.email
-                        ? "border-[var(--error)] focus:border-[var(--error)] focus:ring-2 focus:ring-[var(--error)]/20 shadow-[0_0_0_4px_rgba(239,68,68,0.1)]"
-                        : "border-[var(--border)] focus:border-[var(--brand)] focus:ring-2 focus:ring-[var(--brand)]/20 hover:border-[var(--border-strong)]"
-                        } rounded-2xl text-base focus:bg-white placeholder:text-[var(--ink-muted)] font-medium`}
+                      className={`w-full h-14 pl-12 pr-4 bg-gradient-to-br from-bg-soft to-bg border-2 ${fieldErrors.email
+                        ? "border-error focus:border-error focus:ring-2 focus:ring-error/20 shadow-[0_0_0_4px_rgba(239,68,68,0.1)]"
+                        : "border-border focus:border-brand focus:ring-2 focus:ring-brand/20 hover:border-strong"
+                        } rounded-2xl text-base focus:bg-white placeholder:text-ink-muted font-medium`}
                     />
                     {fieldErrors.email && (
                       <motion.p
                         initial={{ opacity: 0, y: -5 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="mt-2 text-xs text-[var(--error)] font-medium flex items-center gap-1"
+                        className="mt-2 text-xs text-error font-medium flex items-center gap-1"
                         aria-live="assertive"
                       >
                         <span>⚠</span> {fieldErrors.email}
@@ -1478,11 +1478,11 @@ function LoginContent() {
 
                 {/* Campo Senha - Desktop Premium */}
                 <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-[var(--ink-strong)] mb-2" htmlFor="login-password-desktop">
+                  <label className="block text-sm font-semibold text-ink-strong mb-2" htmlFor="login-password-desktop">
                     Senha
                   </label>
                   <div className="relative group">
-                    <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none z-10 text-[var(--ink-muted)]">
+                    <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none z-10 text-ink-muted">
                       <Lock className="h-5 w-5" />
                     </div>
                     <Input
@@ -1501,10 +1501,10 @@ function LoginContent() {
                       }}
                       ref={passwordInputRef}
                       autoComplete="current-password"
-                      className={`w-full h-14 pl-12 pr-14 bg-gradient-to-br from-[var(--bg-soft)] to-[var(--bg)] border-2 ${fieldErrors.password
-                        ? "border-[var(--error)] focus:border-[var(--error)] focus:ring-2 focus:ring-[var(--error)]/20 shadow-[0_0_0_4px_rgba(239,68,68,0.1)]"
-                        : "border-[var(--border)] focus:border-[var(--brand)] focus:ring-2 focus:ring-[var(--brand)]/20 hover:border-[var(--border-strong)]"
-                        } rounded-2xl text-base focus:bg-white placeholder:text-[var(--ink-muted)] font-medium`}
+                      className={`w-full h-14 pl-12 pr-14 bg-gradient-to-br from-bg-soft to-bg border-2 ${fieldErrors.password
+                        ? "border-error focus:border-error focus:ring-2 focus:ring-error/20 shadow-[0_0_0_4px_rgba(239,68,68,0.1)]"
+                        : "border-border focus:border-brand focus:ring-2 focus:ring-brand/20 hover:border-strong"
+                        } rounded-2xl text-base focus:bg-white placeholder:text-ink-muted font-medium`}
                     />
                     <motion.button
                       type="button"

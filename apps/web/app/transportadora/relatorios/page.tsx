@@ -132,7 +132,7 @@ export default function TransportadoraRelatoriosPage() {
           }
           break
         case 'drivers':
-          apiUrl = `/api/transportadora/reports/driver-performance?transportadora_id=${transportadoraId}&start_date=${dateStart}&end_date=${dateEnd}`
+          apiUrl = `/api/transportadora/reports/motorista-performance?transportadora_id=${transportadoraId}&start_date=${dateStart}&end_date=${dateEnd}`
           const driversRes = await fetch(apiUrl)
           const driversData = await driversRes.json()
           if (driversData.success) {

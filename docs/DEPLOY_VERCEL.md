@@ -14,8 +14,8 @@ O projeto GOLF FOX é um sistema de gestão de transporte que consiste em:
 
 1. **Web App** (Next.js 14/15) - 3 painéis:
    - `/admin` - Painel Administrativo
-   - `/operator` - Painel do Operador
-   - `/carrier` - Painel da Transportadora
+   - `/operador` - Painel do Operador
+   - `/transportadora` - Painel da Transportadora
 
 2. **Mobile Apps** (Flutter) - Preparados para integração:
    - App Motorista
@@ -149,14 +149,14 @@ Se o build passar localmente, deve passar na Vercel.
 - Acesse `/login`
 - Faça login com conta de teste:
   - Admin: `golffox@admin.com` / `senha123`
-  - Operator: `operador@empresa.com` / `senha123`
-  - Carrier: `transportadora@trans.com` / `senha123`
+  - operador: `operador@empresa.com` / `senha123`
+  - transportadora: `transportadora@trans.com` / `senha123`
 
 ### 2. Testar Permissões
 
 - Admin deve conseguir acessar `/admin`
-- Operator deve conseguir acessar `/operator` mas ser bloqueado em `/admin`
-- Carrier deve conseguir acessar `/carrier` mas ser bloqueado em `/admin`
+- operador deve conseguir acessar `/operador` mas ser bloqueado em `/admin`
+- transportadora deve conseguir acessar `/transportadora` mas ser bloqueado em `/admin`
 
 ### 3. Testar Funcionalidades
 
@@ -185,8 +185,8 @@ Se desejar separar os painéis em subdomínios:
 1. Acesse **Settings** → **Domains**
 2. Adicione domínios:
    - `admin.golffox.vercel.app` → `/admin`
-   - `operador.golffox.vercel.app` → `/operator`
-   - `transportadora.golffox.vercel.app` → `/carrier`
+   - `operador.golffox.vercel.app` → `/operador`
+   - `transportadora.golffox.vercel.app` → `/transportadora`
 
 Ou configure via `vercel.json`:
 

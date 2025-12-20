@@ -219,10 +219,10 @@ export function CreateUserModal({
                   required
                 >
                   <option value="operador">Operador</option>
-                  <option value="passenger">Passageiro</option>
+                  <option value="passageiro">Passageiro</option>
                   <option value="admin">Administrador</option>
                   <option value="transportadora">Transportadora</option>
-                  <option value="driver">Motorista</option>
+                  <option value="motorista">Motorista</option>
                 </select>
               </div>
 
@@ -246,9 +246,9 @@ export function CreateUserModal({
               )}
 
               <div className="col-span-1 sm:col-span-2">
-                <Label htmlFor="operator-name" className="text-base font-medium">Nome Completo *</Label>
+                <Label htmlFor="operador-name" className="text-base font-medium">Nome Completo *</Label>
                 <Input
-                  id="operator-name"
+                  id="operador-name"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   placeholder="Nome completo"
@@ -259,9 +259,9 @@ export function CreateUserModal({
               </div>
 
               <div>
-                <Label htmlFor="operator-cpf" className="text-base font-medium">CPF *</Label>
+                <Label htmlFor="operador-cpf" className="text-base font-medium">CPF *</Label>
                 <Input
-                  id="operator-cpf"
+                  id="operador-cpf"
                   value={formData.cpf}
                   onChange={(e) => setFormData({ ...formData, cpf: formatCPF(e.target.value) })}
                   placeholder="000.000.000-00"
@@ -273,9 +273,9 @@ export function CreateUserModal({
               </div>
 
               <div>
-                <Label htmlFor="operator-phone" className="text-base font-medium">Telefone</Label>
+                <Label htmlFor="operador-phone" className="text-base font-medium">Telefone</Label>
                 <Input
-                  id="operator-phone"
+                  id="operador-phone"
                   type="tel"
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: formatPhone(e.target.value) })}
@@ -287,9 +287,9 @@ export function CreateUserModal({
               </div>
 
               <div className="col-span-1 sm:col-span-2">
-                <Label htmlFor="operator-email" className="text-base font-medium">Email (Login) *</Label>
+                <Label htmlFor="operador-email" className="text-base font-medium">Email (Login) *</Label>
                 <Input
-                  id="operator-email"
+                  id="operador-email"
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
@@ -301,9 +301,9 @@ export function CreateUserModal({
               </div>
 
               <div className="col-span-1 sm:col-span-2">
-                <Label htmlFor="operator-password" className="text-base font-medium">Senha *</Label>
+                <Label htmlFor="operador-password" className="text-base font-medium">Senha *</Label>
                 <Input
-                  id="operator-password"
+                  id="operador-password"
                   type="password"
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}

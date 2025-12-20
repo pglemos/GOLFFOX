@@ -39,7 +39,7 @@ Todas as tabelas necessárias **JÁ EXISTEM** no banco de dados:
    - Não há problema de RLS bloqueando service_role
 
 2. **Backend APIs:**
-   - `/api/admin/create-operator` existe (544 linhas)
+   - `/api/admin/create-operador` existe (544 linhas)
    - `/api/admin/transportadora/create` existe (94 linhas)
    - Todas têm auth, rate limiting e validação
 
@@ -97,7 +97,7 @@ Como tudo está funcionando no backend, o problema deve ser:
 Mesmos passos, mas:
 1. Ir para Empresas
 2. Criar empresa
-3. Network filtrar "operator" ou "company"
+3. Network filtrar "operador" ou "company"
 
 ### Passo 2: Análise dos Logs
 

@@ -51,7 +51,7 @@
   - `database/`: migrations, seeds e scripts SQL Supabase
   - `docs/`: guias, architecture, audit e deployment docs
   - `.github/`: CI/CD (build, deploy, checks)
-- Multi-tenant via `company_id`/RLS, papéis: admin, operator (empresa), carrier (transportadora), driver, passenger.
+- Multi-tenant via `company_id`/RLS, papéis: admin, operador (empresa), transportadora (transportadora), motorista, passageiro.
 - Rastreamento em tempo real: inserção periódica em `driver_positions` + Supabase Realtime; fallback polling.
 - Relatórios: views, materialized views e APIs para geração/dispatch/schedule.
 
@@ -82,8 +82,8 @@
   - `PUT|DELETE /api/admin/trips/[tripId]` – atualiza/exclui viagem – `web-app/app/api/admin/trips/[tripId]/route.ts:31,153`
   - `GET /api/admin/kpis` – leitura de views com fallback – `web-app/app/api/admin/kpis/route.ts:16`
   - `GET /api/admin/costs-options` – listas de filtros (rotas, veículos, motoristas, carriers) – `web-app/app/api/admin/costs-options/route.ts:16`
-  - `POST /api/admin/create-operator` – cria operador e mapeia empresa + auditoria – `web-app/app/api/admin/create-operator/route.ts:28`
-  - `POST /api/admin/create-operator-login` – cria login e associa empresa – `web-app/app/api/admin/create-operator-login/route.ts:16`
+  - `POST /api/admin/create-operador` – cria operador e mapeia empresa + auditoria – `web-app/app/api/admin/create-operador/route.ts:28`
+  - `POST /api/admin/create-operador-login` – cria login e associa empresa – `web-app/app/api/admin/create-operador-login/route.ts:16`
   - `POST /api/admin/execute-sql-fix` – SQL de correção de `updated_at` – `web-app/app/api/admin/execute-sql-fix/route.ts:16`
   - `POST /api/admin/fix-database` – tenta executar fix via RPC – `web-app/app/api/admin/fix-database/route.ts:16`
   - `POST|GET /api/admin/seed-cost-categories` – seed/lista categorias de custos – `web-app/app/api/admin/seed-cost-categories/route.ts:42,109`
@@ -109,9 +109,9 @@
   - `GET|POST /api/reports/dispatch` – gera/manda email; registra histórico – `web-app/app/api/reports/dispatch/route.ts:300,153` (SMTP mock; TODO nodemailer)
   - `OPTIONS|GET|POST|DELETE /api/reports/schedule` – agenda, lista, remove – `web-app/app/api/reports/schedule/route.ts:19,35,370,403`
 - Operator
-  - `POST /api/operator/associate-company` – mapeia operador a empresa – `web-app/app/api/operator/associate-company/route.ts:19`
-  - `OPTIONS|POST /api/operator/create-employee` – cria usuário (Auth + `users`) – `web-app/app/api/operator/create-employee/route.ts:19,30`
-  - `POST /api/operator/optimize-route` – otimização sequência de pontos – `web-app/app/api/operator/optimize-route/route.ts:28`
+  - `POST /api/operador/associate-company` – mapeia operador a empresa – `web-app/app/api/operador/associate-company/route.ts:19`
+  - `OPTIONS|POST /api/operador/create-employee` – cria usuário (Auth + `users`) – `web-app/app/api/operador/create-employee/route.ts:19,30`
+  - `POST /api/operador/optimize-route` – otimização sequência de pontos – `web-app/app/api/operador/optimize-route/route.ts:28`
 - Cron
   - `GET|POST /api/cron/dispatch-reports` – job de envio de relatórios (CRON_SECRET) – `web-app/app/api/cron/dispatch-reports/route.ts:331,335`
   - `GET /api/cron/refresh-kpis` – atualiza MVs de KPIs via RPC – `web-app/app/api/cron/refresh-kpis/route.ts:4`
@@ -127,7 +127,7 @@
 - Vercel cron jobs e env: `web-app/vercel.json`, `VERCEL_ENV_VARS.txt`
 
 ### Frontend / Apps
-- Admin/Operator/Carrier/Passenger pages: `web-app/app/*/*/page.tsx`, com dashboards, mapa, custos, alertas, relatórios.
+- Admin/operador/transportadora/passageiro pages: `web-app/app/*/*/page.tsx`, com dashboards, mapa, custos, alertas, relatórios.
 - Componentes de UI: `web-app/components/ui/*` (botões, inputs, cards, etc.), `admin-map/*` (camadas, painéis, renderização). Validação e desenho robusto de polylines/coordenadas: `web-app/components/admin-map/layers.tsx:85-111`.
 - Hooks e serviços: `web-app/lib/*` (auth, logger, realtime, map-utils, costs, exports, route optimization, supabase client/service-role).
 
@@ -256,8 +256,8 @@
   - `PUT|DELETE /api/admin/trips/[tripId]` – Atualizar/Excluir viagem – `web-app/app/api/admin/trips/[tripId]/route.ts:31,153`
   - `GET /api/admin/kpis` – KPIs com fallback de views – `web-app/app/api/admin/kpis/route.ts:16`
   - `GET /api/admin/costs-options` – Opções de filtros custos – `web-app/app/api/admin/costs-options/route.ts:16`
-  - `POST /api/admin/create-operator` – Criar operador – `web-app/app/api/admin/create-operator/route.ts:28`
-  - `POST /api/admin/create-operator-login` – Criar login operador – `web-app/app/api/admin/create-operator-login/route.ts:16`
+  - `POST /api/admin/create-operador` – Criar operador – `web-app/app/api/admin/create-operador/route.ts:28`
+  - `POST /api/admin/create-operador-login` – Criar login operador – `web-app/app/api/admin/create-operador-login/route.ts:16`
   - `POST /api/admin/execute-sql-fix` – SQL fix – `web-app/app/api/admin/execute-sql-fix/route.ts:16`
   - `POST /api/admin/fix-database` – Fix via RPC – `web-app/app/api/admin/fix-database/route.ts:16`
   - `POST|GET /api/admin/seed-cost-categories` – Seed/lista categorias – `web-app/app/api/admin/seed-cost-categories/route.ts:42,109`
@@ -283,9 +283,9 @@
   - `GET|POST /api/reports/dispatch` – Dispatch relatórios – `web-app/app/api/reports/dispatch/route.ts:300,153`
   - `OPTIONS|GET|POST|DELETE /api/reports/schedule` – Agendamentos – `web-app/app/api/reports/schedule/route.ts:19,35,370,403`
 - Operator
-  - `POST /api/operator/associate-company` – Associar operador – `web-app/app/api/operator/associate-company/route.ts:19`
-  - `OPTIONS|POST /api/operator/create-employee` – Criar usuário – `web-app/app/api/operator/create-employee/route.ts:19,30`
-  - `POST /api/operator/optimize-route` – Otimizar rota – `web-app/app/api/operator/optimize-route/route.ts:28`
+  - `POST /api/operador/associate-company` – Associar operador – `web-app/app/api/operador/associate-company/route.ts:19`
+  - `OPTIONS|POST /api/operador/create-employee` – Criar usuário – `web-app/app/api/operador/create-employee/route.ts:19,30`
+  - `POST /api/operador/optimize-route` – Otimizar rota – `web-app/app/api/operador/optimize-route/route.ts:28`
 - Cron
   - `GET|POST /api/cron/dispatch-reports` – Enviar relatórios – `web-app/app/api/cron/dispatch-reports/route.ts:331,335`
   - `GET /api/cron/refresh-kpis` – Atualizar KPIs – `web-app/app/api/cron/refresh-kpis/route.ts:4`
@@ -296,7 +296,7 @@
   - `GET /api/health` – Health-check – `web-app/app/api/health/route.ts:8`
 
 ### Middleware e Configuração
-- `web-app/middleware.ts` – protege `/admin` e `/operator`, valida roles, cookies e redirects.
+- `web-app/middleware.ts` – protege `/admin` e `/operador`, valida roles, cookies e redirects.
 - `web-app/next.config.js` – habilita type-safety; lint no build.
 - `web-app/vercel.json` – jobs cron configurados (refresh KPIs/custos; dispatch reports).
 

@@ -35,7 +35,7 @@ export function TransportadoraDriversModal({ carrier, isOpen, onClose }: Transpo
     cnh: "",
     cnh_category: "",
     password: "",
-    role: "driver",
+    role: "motorista",
     address_zip_code: "",
     address_street: "",
     address_number: "",
@@ -55,7 +55,7 @@ export function TransportadoraDriversModal({ carrier, isOpen, onClose }: Transpo
   const loadDrivers = async () => {
     try {
       setLoading(true)
-      const response = await fetch(`/api/admin/transportadora/${carrier.id}/drivers`)
+      const response = await fetch(`/api/admin/transportadora/${transportadora.id}/drivers`)
       if (response.ok) {
         const result = await response.json()
         setDrivers(result.drivers || [])
@@ -79,7 +79,7 @@ export function TransportadoraDriversModal({ carrier, isOpen, onClose }: Transpo
       cnh: "",
       cnh_category: "",
       password: "",
-      role: "driver",
+      role: "motorista",
       address_zip_code: "",
       address_street: "",
       address_number: "",
@@ -116,7 +116,7 @@ export function TransportadoraDriversModal({ carrier, isOpen, onClose }: Transpo
         throw new Error("Endereço completo é obrigatório")
       }
 
-      const response = await fetch(`/api/admin/transportadora/${carrier.id}/drivers`, {
+      const response = await fetch(`/api/admin/transportadora/${transportadora.id}/drivers`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -148,7 +148,7 @@ export function TransportadoraDriversModal({ carrier, isOpen, onClose }: Transpo
     setLoading(true)
 
     try {
-      const response = await fetch(`/api/admin/transportadora/${carrier.id}/drivers/${editingDriver.id}`, {
+      const response = await fetch(`/api/admin/transportadora/${transportadora.id}/drivers/${editingDriver.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
@@ -178,7 +178,7 @@ export function TransportadoraDriversModal({ carrier, isOpen, onClose }: Transpo
     setLoading(true)
 
     try {
-      const response = await fetch(`/api/admin/transportadora/${carrier.id}/drivers/${driverId}`, {
+      const response = await fetch(`/api/admin/transportadora/${transportadora.id}/drivers/${driverId}`, {
         method: 'DELETE'
       })
 
@@ -200,21 +200,21 @@ export function TransportadoraDriversModal({ carrier, isOpen, onClose }: Transpo
   const handleEditClick = (driver: any) => {
     setEditingDriver(driver)
     setFormData({
-      name: driver.name || "",
-      email: driver.email || "",
-      phone: driver.phone || "",
-      cpf: driver.cpf || "",
-      cnh: driver.cnh || "",
-      cnh_category: driver.cnh_category || "",
+      name: motorista.name || "",
+      email: motorista.email || "",
+      phone: motorista.phone || "",
+      cpf: motorista.cpf || "",
+      cnh: motorista.cnh || "",
+      cnh_category: motorista.cnh_category || "",
       password: "",
-      role: driver.role || "driver",
-      address_zip_code: driver.address_zip_code || "",
-      address_street: driver.address_street || "",
-      address_number: driver.address_number || "",
-      address_neighborhood: driver.address_neighborhood || "",
-      address_complement: driver.address_complement || "",
-      address_city: driver.address_city || "",
-      address_state: driver.address_state || "",
+      role: motorista.role || "motorista",
+      address_zip_code: motorista.address_zip_code || "",
+      address_street: motorista.address_street || "",
+      address_number: motorista.address_number || "",
+      address_neighborhood: motorista.address_neighborhood || "",
+      address_complement: motorista.address_complement || "",
+      address_city: motorista.address_city || "",
+      address_state: motorista.address_state || "",
     })
     setActiveTab("form")
   }
@@ -223,7 +223,7 @@ export function TransportadoraDriversModal({ carrier, isOpen, onClose }: Transpo
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="w-[95vw] sm:w-[90vw] max-w-5xl max-h-[90vh] overflow-hidden flex flex-col p-4 sm:p-6 mx-auto">
         <DialogHeader className="pb-4 sm:pb-6">
-          <DialogTitle className="text-xl sm:text-2xl font-bold break-words">Motoristas - {carrier.name}</DialogTitle>
+          <DialogTitle className="text-xl sm:text-2xl font-bold break-words">Motoristas - {transportadora.name}</DialogTitle>
         </DialogHeader>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 overflow-hidden flex flex-col">
@@ -265,15 +265,15 @@ export function TransportadoraDriversModal({ carrier, isOpen, onClose }: Transpo
             {!loading && drivers.length > 0 && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {drivers.map((driver) => (
-                  <Card key={driver.id} className="p-4 hover:shadow-md transition-shadow">
+                  <Card key={motorista.id} className="p-4 hover:shadow-md transition-shadow">
                     <div className="space-y-3">
                       {/* Cabeçalho */}
                       <div className="flex items-start justify-between">
                         <div className="flex items-center gap-2">
                           <Users className="h-5 w-5 text-[var(--brand)]" />
                           <div>
-                            <h4 className="font-bold text-lg">{driver.name}</h4>
-                            <Badge variant="outline" className="mt-1">{driver.role || "driver"}</Badge>
+                            <h4 className="font-bold text-lg">{motorista.name}</h4>
+                            <Badge variant="outline" className="mt-1">{motorista.role || "motorista"}</Badge>
                           </div>
                         </div>
                         <div className="flex flex-col items-end gap-2">
@@ -321,7 +321,7 @@ export function TransportadoraDriversModal({ carrier, isOpen, onClose }: Transpo
                         )}
                         {driver.cnh && (
                           <div className="text-xs text-[var(--muted)]">
-                            CNH: {driver.cnh} {driver.cnh_category && `(${driver.cnh_category})`}
+                            CNH: {motorista.cnh} {motorista.cnh_category && `(${motorista.cnh_category})`}
                           </div>
                         )}
                       </div>

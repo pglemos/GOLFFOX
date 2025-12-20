@@ -36,7 +36,7 @@ users (1) ←→ (N) chat_messages
 ### Security Model (RLS)
 - **Minimum Privilege**: Users see only data within their scope
 - **Driver**: Own positions and assigned trips
-- **Passenger**: Trips they're enrolled in
+- **passageiro**: Trips they're enrolled in
 - **Operator/Admin**: Company-scoped data
 - **Carrier**: Carrier-scoped data
 

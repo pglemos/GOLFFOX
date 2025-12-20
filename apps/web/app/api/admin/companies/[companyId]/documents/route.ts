@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { getSupabaseAdmin } from '@/lib/supabase-client'
+import { logError } from '@/lib/logger'
 import { z } from 'zod'
 
 // Schema de validação para documento
@@ -36,7 +38,7 @@ export async function GET(
 
         const { data, error } = await supabase
             .from('gf_company_documents')
-            .select('*')
+            .select('id, company_id, document_type, document_number, expiry_date, issue_date, file_url, file_name, file_size, file_type, status, notes, created_at, updated_at')
             .eq('company_id', companyId)
             .order('created_at', { ascending: false })
 
@@ -49,8 +51,9 @@ export async function GET(
         }
 
         return NextResponse.json(data || [])
-    } catch (error) {
-        logError('Erro interno', { error, companyId, method: 'GET' }, 'CompanyDocumentsAPI')
+    } catch (error: any) {
+        const { companyId: errorCompanyId } = await context.params
+        logError('Erro interno', { error, companyId: errorCompanyId, method: 'GET' }, 'CompanyDocumentsAPI')
         return NextResponse.json(
             { error: 'Erro interno do servidor' },
             { status: 500 }
@@ -89,19 +92,19 @@ export async function POST(
         let result
         if (existing) {
             // Atualizar documento existente
-            result = await supabase
-                .from('gf_company_documents')
+            result = await (supabase
+                .from('gf_company_documents') as any)
                 .update({
                     ...validatedData,
                     updated_at: new Date().toISOString(),
                 })
-                .eq('id', existing.id)
+                .eq('id', (existing as any).id)
                 .select()
                 .single()
         } else {
             // Criar novo documento
-            result = await supabase
-                .from('gf_company_documents')
+            result = await (supabase
+                .from('gf_company_documents') as any)
                 .insert({
                     company_id: companyId,
                     ...validatedData,
@@ -119,14 +122,15 @@ export async function POST(
         }
 
         return NextResponse.json(result.data)
-    } catch (error) {
+    } catch (error: any) {
         if (error instanceof z.ZodError) {
             return NextResponse.json(
                 { error: 'Dados inválidos', details: error.errors },
                 { status: 400 }
             )
         }
-        logError('Erro interno', { error, companyId, method: 'GET' }, 'CompanyDocumentsAPI')
+        const { companyId: errorCompanyId } = await context.params
+        logError('Erro interno', { error, companyId: errorCompanyId, method: 'POST' }, 'CompanyDocumentsAPI')
         return NextResponse.json(
             { error: 'Erro interno do servidor' },
             { status: 500 }
@@ -168,8 +172,9 @@ export async function DELETE(
         }
 
         return NextResponse.json({ success: true })
-    } catch (error) {
-        logError('Erro interno', { error, companyId, method: 'GET' }, 'CompanyDocumentsAPI')
+    } catch (error: any) {
+        const { companyId: errorCompanyId } = await context.params
+        logError('Erro interno', { error, companyId: errorCompanyId, method: 'DELETE' }, 'CompanyDocumentsAPI')
         return NextResponse.json(
             { error: 'Erro interno do servidor' },
             { status: 500 }

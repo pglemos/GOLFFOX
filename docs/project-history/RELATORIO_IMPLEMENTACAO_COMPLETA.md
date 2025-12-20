@@ -29,7 +29,7 @@ Todas as funcionalidades do Google Maps API necessárias para o escopo do projet
 - ✅ Fallback quando API não está disponível
 
 **Integrado em:**
-- ✅ Modal de funcionários (`components/operator/funcionario-modal.tsx`)
+- ✅ Modal de funcionários (`components/operador/funcionario-modal.tsx`)
 - ✅ Modal de criação de rotas (`app/admin/rotas/route-create-modal.tsx`)
 
 ---
@@ -107,7 +107,7 @@ Todas as funcionalidades do Google Maps API necessárias para o escopo do projet
 ## 2. INTEGRAÇÕES REALIZADAS
 
 ### ✅ 2.1. Formulário de Funcionários
-**Arquivo:** `apps/web/components/operator/funcionario-modal.tsx`
+**Arquivo:** `apps/web/components/operador/funcionario-modal.tsx`
 
 **Mudanças:**
 - ✅ Substituído input de endereço por `AddressAutocomplete`
@@ -173,7 +173,7 @@ node scripts/test-google-maps-complete.js
 | **Rastreamento GPS em tempo real** | ✅ Já existia | `components/fleet-map.tsx` |
 | **Mapas em tempo real** | ✅ Já existia | Todos os painéis |
 | **Visualização de rotas** | ✅ Já existia | `components/fleet-map.tsx` |
-| **Otimização de rotas** | ✅ Já existia | `api/operator/optimize-route` |
+| **Otimização de rotas** | ✅ Já existia | `api/operador/optimize-route` |
 | **Geocoding (endereço → coordenadas)** | ✅ Já existia | `lib/google-maps.ts` |
 | **Reverse Geocoding (coordenadas → endereço)** | ✅ **IMPLEMENTADO** | `lib/google-maps-reverse.ts` |
 | **Notificações de aproximação** | ✅ **IMPLEMENTADO** | `lib/notifications/proximity-service.ts` |
@@ -193,7 +193,7 @@ node scripts/test-google-maps-complete.js
 6. ✅ `apps/web/scripts/test-google-maps-complete.js`
 
 ### Arquivos Modificados
-1. ✅ `apps/web/components/operator/funcionario-modal.tsx`
+1. ✅ `apps/web/components/operador/funcionario-modal.tsx`
 2. ✅ `apps/web/app/admin/rotas/route-create-modal.tsx`
 
 ---

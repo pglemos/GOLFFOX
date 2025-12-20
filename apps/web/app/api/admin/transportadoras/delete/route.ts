@@ -137,7 +137,7 @@ export async function DELETE(req: NextRequest) {
       .eq('id', carrierId)
 
     if (deleteError) {
-      logError('Erro ao excluir carrier', { error: deleteError, carrierId }, 'TransportadorasDeleteAPI')
+      logError('Erro ao excluir transportadora', { error: deleteError, carrierId }, 'TransportadorasDeleteAPI')
       return NextResponse.json(
         { 
           success: false, 
@@ -150,7 +150,7 @@ export async function DELETE(req: NextRequest) {
     }
 
     // Invalidar cache após exclusão
-    await invalidateEntityCache('carrier', carrierId)
+    await invalidateEntityCache('transportadora', carrierId)
 
     return NextResponse.json({
       success: true,

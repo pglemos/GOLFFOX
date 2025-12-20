@@ -50,7 +50,7 @@ doc.on('data', (chunk: Buffer) => chunks.push(chunk))
 
 ---
 
-### 2. `app/operator/page.tsx`
+### 2. `app/operador/page.tsx`
 
 **Erro:** Propriedade `loading` não existe em `ControlTowerCardsProps`
 ```typescript
@@ -181,7 +181,7 @@ return severityOrder[aSeverity] - severityOrder[bSeverity]
 
 ---
 
-### 9. `components/operator/csv-import-modal.tsx`
+### 9. `components/operador/csv-import-modal.tsx`
 
 **Erro:** `toast.warning` não existe
 ```typescript
@@ -257,14 +257,14 @@ npm run build
 ## 📝 Arquivos Modificados
 
 1. `app/api/reports/run/route.ts` - 3 correções
-2. `app/operator/page.tsx` - 1 correção
+2. `app/operador/page.tsx` - 1 correção
 3. `components/admin-map/admin-map.tsx` - 1 correção (interface)
 4. `components/costs/cost-detail-table.tsx` - 1 correção
 5. `components/fleet-map.tsx` - 1 correção (import)
 6. `components/modals/route-modal.tsx` - 1 correção
 7. `components/modals/vehicle-modal.tsx` - 1 correção
 8. `components/operational-alerts-notification.tsx` - 1 correção
-9. `components/operator/csv-import-modal.tsx` - 2 correções
+9. `components/operador/csv-import-modal.tsx` - 2 correções
 10. `next.config.js` - Removido `ignoreBuildErrors`
 
 **Total:** 10 arquivos, 13 correções

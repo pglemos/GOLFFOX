@@ -1,7 +1,7 @@
 # ✅ Página de Funcionários - Correções Aplicadas
 
 ## Resumo Executivo
-Todos os problemas foram identificados e corrigidos. A página `/operator/funcionarios` está funcional com:
+Todos os problemas foram identificados e corrigidos. A página `/operador/funcionarios` está funcional com:
 - ✅ 10 funcionários cadastrados
 - ✅ RLS configurado
 - ✅ Views seguras criadas
@@ -14,8 +14,8 @@ Todos os problemas foram identificados e corrigidos. A página `/operator/funcio
 
 ### 1. ❌ Problema: Empresa sem role correto
 **Status:** ✅ CORRIGIDO
-- **Causa:** Empresa tinha `role = 'company'` ao invés de `'operator'`
-- **Solução:** Atualizado para `role = 'operator'`
+- **Causa:** Empresa tinha `role = 'company'` ao invés de `'operador'`
+- **Solução:** Atualizado para `role = 'operador'`
 - **Script:** `fix-funcionarios-issues.js`
 
 ### 2. ❌ Problema: Nenhum funcionário cadastrado
@@ -261,7 +261,7 @@ company_ownership(company_id UUID) → BOOLEAN
 
 1. **Testar na aplicação:**
    - Login como operador@empresa.com
-   - Acessar `/operator/funcionarios?company=11111111-1111-4111-8111-1111111111c1`
+   - Acessar `/operador/funcionarios?company=11111111-1111-4111-8111-1111111111c1`
    - Verificar se 10 funcionários aparecem
 
 2. **Verificar logs no console (F12):**

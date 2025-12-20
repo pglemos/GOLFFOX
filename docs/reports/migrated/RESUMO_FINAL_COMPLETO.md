@@ -23,7 +23,7 @@
 
 ### 🔴 Críticas (P0) - 5/5 ✅
 
-1. ✅ **Middleware com autenticação** - Rotas `/admin` e `/operator` protegidas
+1. ✅ **Middleware com autenticação** - Rotas `/admin` e `/operador` protegidas
 2. ✅ **Branding operador** - Removido "GOLF FOX", white-label implementado
 3. ✅ **RLS em gf_user_company_map** - Migration v49 aplicada no Supabase
 4. ✅ **Type-safety** - `ignoreBuildErrors: false` habilitado
@@ -44,14 +44,14 @@
 
 14. ✅ `/api/costs/manual` - POST/GET protegidos
 15. ✅ `/api/costs/reconcile` - POST protegido
-16. ✅ `/api/operator/create-employee` - POST protegido
+16. ✅ `/api/operador/create-employee` - POST protegido
 17. ✅ `/api/reports/schedule` - POST protegido
 
 ### 🔵 Validações API Adicionais - 9/9 ✅
 
 18. ✅ `/api/costs/export` - GET protegido
 19. ✅ `/api/costs/budgets` - GET/POST/DELETE protegidos
-20. ✅ `/api/admin/create-operator` - POST protegido (admin only)
+20. ✅ `/api/admin/create-operador` - POST protegido (admin only)
 21. ✅ `/api/reports/run` - POST protegido
 22. ✅ `/api/reports/dispatch` - POST protegido
 
@@ -97,7 +97,7 @@
 4. ✅ `web-app/lib/auth.ts` - Console.log removido
 
 ### Componentes
-5. ✅ `web-app/components/operator/operator-logo-section.tsx` - Branding
+5. ✅ `web-app/components/operador/operador-logo-section.tsx` - Branding
 6. ✅ `web-app/components/fleet-map.tsx` - Padding + acessibilidade
 
 ### Rotas API (13 rotas)
@@ -106,8 +106,8 @@
 9. ✅ `web-app/app/api/costs/reconcile/route.ts`
 10. ✅ `web-app/app/api/costs/export/route.ts`
 11. ✅ `web-app/app/api/costs/budgets/route.ts`
-12. ✅ `web-app/app/api/operator/create-employee/route.ts`
-13. ✅ `web-app/app/api/admin/create-operator/route.ts`
+12. ✅ `web-app/app/api/operador/create-employee/route.ts`
+13. ✅ `web-app/app/api/admin/create-operador/route.ts`
 14. ✅ `web-app/app/api/reports/schedule/route.ts`
 15. ✅ `web-app/app/api/reports/run/route.ts`
 16. ✅ `web-app/app/api/reports/dispatch/route.ts`
@@ -128,7 +128,7 @@
 
 ### Depois
 - ✅ 13 rotas API protegidas
-- ✅ Middleware protege `/admin` e `/operator`
+- ✅ Middleware protege `/admin` e `/operador`
 - ✅ RLS ativo em `gf_user_company_map`
 - ✅ White-label correto
 - ✅ Type-safety em produção

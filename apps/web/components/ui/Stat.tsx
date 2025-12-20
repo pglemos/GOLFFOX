@@ -57,7 +57,7 @@ const Stat = ({ icon: Icon, label, value, hint, trend, trendLabel, className }: 
           {/* Icon Container - Ultra Premium */}
           <div className="relative flex-shrink-0 py-1">
             <motion.div 
-              className="p-3 sm:p-3.5 rounded-xl bg-gradient-to-br from-[var(--brand-light)] to-[var(--brand-soft)] group-hover:from-[var(--brand)] group-hover:to-[var(--brand-hover)] transition-all duration-300 relative shadow-md group-hover:shadow-[var(--shadow-brand)]"
+              className="p-3 sm:p-3.5 rounded-xl bg-gradient-to-br from-brand-light to-brand-soft group-hover:from-brand group-hover:to-brand-hover transition-all duration-300 relative shadow-md group-hover:shadow-brand"
               whileHover={{ 
                 rotate: [0, -8, 8, 0],
                 scale: 1.15
@@ -69,10 +69,10 @@ const Stat = ({ icon: Icon, label, value, hint, trend, trendLabel, className }: 
                 className="absolute inset-0 rounded-xl bg-gradient-to-br from-white/30 via-white/10 to-transparent opacity-0 group-hover:opacity-100"
                 transition={{ duration: 0.4 }}
               />
-              <Icon className="w-6 h-6 sm:w-7 sm:h-7 text-[var(--brand)] group-hover:text-white transition-all duration-300 relative z-10" style={{ filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1))' }} />
+              <Icon className="w-6 h-6 sm:w-7 sm:h-7 text-brand group-hover:text-white transition-all duration-300 relative z-10" style={{ filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1))' }} />
             </motion.div>
             <motion.div
-              className="absolute inset-0 rounded-xl bg-[var(--brand)] opacity-0 group-hover:opacity-20 blur-xl"
+              className="absolute inset-0 rounded-xl bg-brand opacity-0 group-hover:opacity-20 blur-xl"
               style={{ top: '-4px', right: '-4px', bottom: '-4px', left: '-4px', zIndex: -1 }}
               transition={{ duration: 0.4 }}
             />
@@ -80,11 +80,11 @@ const Stat = ({ icon: Icon, label, value, hint, trend, trendLabel, className }: 
 
           {/* Content */}
           <div className="flex-1 overflow-visible">
-            <p className="text-sm sm:text-sm font-medium text-[var(--ink-muted)] mb-1.5 sm:mb-2">
+            <p className="text-sm sm:text-sm font-medium text-ink-muted mb-1.5 sm:mb-2">
               {label}
             </p>
             <motion.p 
-              className="text-3xl sm:text-3xl lg:text-4xl font-bold tabular-nums text-[var(--ink-strong)]"
+              className="text-3xl sm:text-3xl lg:text-4xl font-bold tabular-nums text-ink-strong"
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.1, duration: 0.3 }}
@@ -92,7 +92,7 @@ const Stat = ({ icon: Icon, label, value, hint, trend, trendLabel, className }: 
               {typeof value === 'number' ? display : displayValue}
             </motion.p>
             {hint && (
-              <p className="text-xs sm:text-xs text-[var(--ink-muted)] mt-1.5 sm:mt-2">
+              <p className="text-xs sm:text-xs text-ink-muted mt-1.5 sm:mt-2">
                 {hint}
               </p>
             )}
@@ -104,12 +104,12 @@ const Stat = ({ icon: Icon, label, value, hint, trend, trendLabel, className }: 
           <div className={cn(
             "px-2 py-1 rounded-full text-xs font-semibold flex-shrink-0",
             trend >= 0
-              ? "bg-[var(--success-light)] text-[var(--success)]"
-              : "bg-[var(--error-light)] text-[var(--error)]"
+              ? "bg-success-light text-success"
+              : "bg-error-light text-error"
           )}>
             <span className="hidden sm:inline">{trend >= 0 ? '↑' : '↓'} {Math.abs(trend)}%</span>
             <span className="sm:hidden">{trend >= 0 ? '↑' : '↓'}</span>
-            {trendLabel && <span className="ml-1 text-[var(--ink-muted)] hidden sm:inline">vs {trendLabel}</span>}
+            {trendLabel && <span className="ml-1 text-ink-muted hidden sm:inline">vs {trendLabel}</span>}
           </div>
         )}
       </div>

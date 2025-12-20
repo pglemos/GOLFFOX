@@ -224,7 +224,7 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave, carriers }: Veh
 
       // Incluir company_id ou transportadora_id baseado no papel do usuário
       // Para admin: pode definir qualquer company_id
-      // Para operator: deve usar o company_id do usuário
+      // Para operador: deve usar o company_id do usuário
       // Para transportadora: deve usar o transportadora_id do usuário
       if (userInfo.role === 'admin') {
         // Admin pode definir company_id manualmente se fornecido no formData
@@ -235,7 +235,7 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave, carriers }: Veh
           vehicleDataRaw.transportadora_id = formData.transportadora_id
         }
       } else if (userInfo.role === 'operador') {
-        // Operator deve usar seu próprio company_id
+        // operador deve usar seu próprio company_id
         if (userInfo.company_id) {
           vehicleDataRaw.company_id = userInfo.company_id
         } else if (formData.company_id) {

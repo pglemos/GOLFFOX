@@ -47,7 +47,7 @@ export function CarrierDocumentsSection({
     const [uploading, setUploading] = useState(false)
 
     const { upload } = useFileUpload({
-        bucket: "carrier-documents",
+        bucket: "transportadora-documents",
         maxSize: 10,
     })
 

@@ -61,7 +61,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         // Buscar documentos
         const { data: documents, error } = await supabaseAdmin
             .from('gf_carrier_documents')
-            .select('*')
+            .select('id, carrier_id, document_type, document_number, expiry_date, issue_date, file_url, file_name, file_size, file_type, status, notes, created_at, updated_at')
             .eq('carrier_id', carrierId)
             .order('document_type', { ascending: true })
 
@@ -74,8 +74,9 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         }
 
         return NextResponse.json(documents || [])
-    } catch (error) {
-        logError('Erro na API de documentos', { error, carrierId, method: 'GET' }, 'CarrierDocumentsAPI')
+    } catch (error: any) {
+        const { carrierId: errorCarrierId } = await params
+        logError('Erro na API de documentos', { error, carrierId: errorCarrierId, method: 'GET' }, 'CarrierDocumentsAPI')
         return NextResponse.json(
             { error: 'Erro interno do servidor' },
             { status: 500 }
@@ -140,8 +141,8 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
         if (existing) {
             // Atualizar documento existente
-            const { data: updated, error: updateError } = await supabaseAdmin
-                .from('gf_carrier_documents')
+            const { data: updated, error: updateError } = await (supabaseAdmin
+                .from('gf_carrier_documents') as any)
                 .update({
                     ...documentData,
                     updated_at: new Date().toISOString(),
@@ -151,7 +152,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
                 .single()
 
             if (updateError) {
-                logError('Erro ao atualizar documento', { error: updateError, carrierId, documentId }, 'CarrierDocumentsAPI')
+                logError('Erro ao atualizar documento', { error: updateError, carrierId, documentId: (existing as any).id }, 'CarrierDocumentsAPI')
                 return NextResponse.json(
                     { error: 'Erro ao atualizar documento' },
                     { status: 500 }
@@ -162,8 +163,8 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         }
 
         // Criar novo documento
-        const { data: created, error: createError } = await supabaseAdmin
-            .from('gf_carrier_documents')
+        const { data: created, error: createError } = await (supabaseAdmin
+            .from('gf_carrier_documents') as any)
             .insert({
                 carrier_id: carrierId,
                 ...documentData,
@@ -180,8 +181,9 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         }
 
         return NextResponse.json(created, { status: 201 })
-    } catch (error) {
-        logError('Erro na API de documentos', { error, carrierId, method: 'GET' }, 'CarrierDocumentsAPI')
+    } catch (error: any) {
+        const { carrierId: errorCarrierId } = await params
+        logError('Erro na API de documentos', { error, carrierId: errorCarrierId, method: 'POST' }, 'CarrierDocumentsAPI')
         return NextResponse.json(
             { error: 'Erro interno do servidor' },
             { status: 500 }
@@ -197,6 +199,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
     try {
         const { carrierId } = await params
+        const supabaseAdmin = getSupabaseAdmin()
         const { searchParams } = new URL(request.url)
         const documentId = searchParams.get('documentId')
 
@@ -237,8 +240,9 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
         }
 
         return NextResponse.json({ success: true })
-    } catch (error) {
-        logError('Erro na API de documentos', { error, carrierId, method: 'GET' }, 'CarrierDocumentsAPI')
+    } catch (error: any) {
+        const { carrierId: errorCarrierId } = await params
+        logError('Erro na API de documentos', { error, carrierId: errorCarrierId, method: 'DELETE' }, 'CarrierDocumentsAPI')
         return NextResponse.json(
             { error: 'Erro interno do servidor' },
             { status: 500 }

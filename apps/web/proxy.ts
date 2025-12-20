@@ -14,6 +14,7 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { validateAuth, hasRole, type AuthenticatedUser } from '@/lib/api-auth'
+import { normalizeRole } from '@/lib/role-mapper'
 import { debug, warn, error as logError } from '@/lib/logger'
 
 const isDevelopment = process.env.NODE_ENV === 'development'
@@ -51,23 +52,23 @@ const ROUTE_REDIRECTS: Record<string, string> = {
 
 /**
  * Roles permitidas para cada rota protegida
+ * Nota: Roles são normalizadas antes da verificação, então aceitamos ambos os formatos
  */
 const ROUTE_ROLES: Record<string, string[]> = {
   '/admin': ['admin'],
-  '/empresa': ['admin', 'empresa', 'operator'], // operator é compatibilidade
-  '/transportadora': ['admin', 'operador', 'carrier', 'transportadora'], // carrier é compatibilidade
+  '/empresa': ['admin', 'empresa'], // operator será normalizado para empresa
+  '/transportadora': ['admin', 'operador', 'transportadora'], // carrier será normalizado para operador
 }
 
 /**
  * Mapeamento de role para rota padrão de redirecionamento
+ * Nota: Roles são normalizadas antes do redirecionamento
  */
 const ROLE_DEFAULT_ROUTES: Record<string, string> = {
   admin: '/admin',
   empresa: '/empresa',
-  operator: '/empresa', // compatibilidade
   operador: '/transportadora',
-  carrier: '/transportadora', // compatibilidade
-  transportadora: '/transportadora',
+  transportadora: '/transportadora', // sinônimo de operador
 }
 
 /**
@@ -137,9 +138,11 @@ function sanitizeRedirectPath(raw: string | null, baseUrl: string): string | nul
 
 /**
  * Obtém rota padrão para um role
+ * Normaliza o role antes de buscar a rota
  */
 function getDefaultRouteForRole(role: string): string | null {
-  return ROLE_DEFAULT_ROUTES[role] || null
+  const normalizedRole = normalizeRole(role)
+  return ROLE_DEFAULT_ROUTES[normalizedRole] || null
 }
 
 /**
@@ -307,18 +310,23 @@ async function handleProtectedRoute(
     return NextResponse.redirect(loginUrl)
   }
   
-  // Verificar se usuário tem role permitida
-  if (!hasRole(user, allowedRoles)) {
+  // Normalizar role do usuário antes de verificar
+  const normalizedUserRole = normalizeRole(user.role)
+  const normalizedUser: AuthenticatedUser = { ...user, role: normalizedUserRole }
+  
+  // Verificar se usuário tem role permitida (usando role normalizado)
+  if (!hasRole(normalizedUser, allowedRoles)) {
     // Não autorizado - redirecionar para página de não autorizado
     warn('Acesso negado - role não permitida', {
       pathname,
       userRole: user.role,
+      normalizedRole: normalizedUserRole,
       allowedRoles
     }, 'Proxy')
     
     const unauthorizedUrl = new URL('/unauthorized', request.url)
     unauthorizedUrl.searchParams.set('reason', 'unauthorized')
-    unauthorizedUrl.searchParams.set('role', user.role)
+    unauthorizedUrl.searchParams.set('role', normalizedUserRole)
     return NextResponse.redirect(unauthorizedUrl)
   }
   

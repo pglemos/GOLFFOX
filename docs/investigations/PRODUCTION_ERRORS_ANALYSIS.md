@@ -10,7 +10,7 @@
 
 ### 1. ❌ BUG #2: API create-operator - 404 Not Found
 **Status:** ✅ JÁ CORRIGIDO
-- API existe em: `apps/web/app/api/admin/create-operator/route.ts` (544 linhas)
+- API existe em: `apps/web/app/api/admin/create-operador/route.ts` (544 linhas)
 - Verificado durante investigação anterior
 - **Ação:** Verificar se está funcionando corretamente no Vercel
 
@@ -34,7 +34,7 @@
 ### Fase 1: Verificar Existência de APIs ✅
 
 1. **Criar Empresa**
-   - [ ] Verificar `/api/admin/create-operator`
+   - [ ] Verificar `/api/admin/create-operador`
    - [ ] Verificar `/api/admin/companies` (alternativo)
 
 2. **Criar Transportadora**
@@ -48,7 +48,7 @@
 ### Fase 2: Verificar Modais Frontend ✅
 
 1. **Modal Criar Empresa**
-   - [ ] Verificar `components/modals/create-operator-modal.tsx`
+   - [ ] Verificar `components/modals/create-operador-modal.tsx`
    - [ ] Verificar tratamento de erro
    - [ ] Verificar se fecha modal em caso de erro
 
@@ -95,7 +95,7 @@
 ### Correçãi 1: Garantir que APIs Existem
 
 **Arquivos a Verificar:**
-- `apps/web/app/api/admin/create-operator/route.ts` ✅ EXISTE
+- `apps/web/app/api/admin/create-operador/route.ts` ✅ EXISTE
 - `apps/web/app/api/admin/transportadora/create/route.ts` ❓ VERIFICAR
 - `apps/web/app/api/admin/transportadoras/create/route.ts` ❓ VERIFICAR
 

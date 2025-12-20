@@ -35,7 +35,7 @@
 **Checklist Rápido:**
 1. [ ] Acessar aplicação: https://golffox-bzj0446dr-synvolt.vercel.app
 2. [ ] Testar login/logout
-3. [ ] Verificar middleware (tentar acessar `/operator` sem login)
+3. [ ] Verificar middleware (tentar acessar `/operador` sem login)
 4. [ ] Testar como operador (verificar branding)
 5. [ ] Testar como admin (verificar acesso)
 6. [ ] Testar APIs protegidas
@@ -76,7 +76,7 @@
 
 **Arquivos:**
 - `app/api/reports/run/route.ts`
-- `app/operator/page.tsx`
+- `app/operador/page.tsx`
 - `components/admin-map/panels.tsx`
 - `components/costs/cost-detail-table.tsx`
 - `components/fleet-map.tsx`

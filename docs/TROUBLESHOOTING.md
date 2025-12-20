@@ -60,8 +60,8 @@
    SELECT id, email, role FROM users WHERE email = 'seu@email.com';
    ```
    - Confirme que `role = 'admin'` para acessar `/admin`
-   - Confirme que `role = 'operator'` para acessar `/operator`
-   - Confirme que `role = 'carrier'` para acessar `/carrier`
+   - Confirme que `role = 'operador'` para acessar `/operador`
+   - Confirme que `role = 'transportadora'` para acessar `/transportadora`
 
 2. **Atualizar Role Manualmente**:
    ```sql
@@ -260,12 +260,12 @@
 
 2. **Verificar Pathname**:
    - Adicione `console.log(pathname)` temporariamente
-   - Confirme que pathname começa com `/admin`, `/operator` ou `/carrier`
+   - Confirme que pathname começa com `/admin`, `/operador` ou `/transportadora`
 
 3. **Passar Prop Manualmente**:
    - Nas páginas, passe explicitamente:
    ```tsx
-   <AppShell panel="operator" ...>
+   <AppShell panel="operador" ...>
    ```
 
 ### 8. Build Demora Muito ou Timeout

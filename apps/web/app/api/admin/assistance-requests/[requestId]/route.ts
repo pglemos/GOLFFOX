@@ -57,8 +57,8 @@ export async function PUT(
     if (body.dispatched_vehicle_id !== undefined) updateData.dispatched_vehicle_id = body.dispatched_vehicle_id || null
 
     // Atualizar ocorrência
-    const { data: updatedRequest, error: updateError } = await supabaseAdmin
-      .from('gf_service_requests')
+    const { data: updatedRequest, error: updateError } = await (supabaseAdmin
+      .from('gf_service_requests') as any)
       .update(updateData)
       .eq('id', requestId)
       .select()

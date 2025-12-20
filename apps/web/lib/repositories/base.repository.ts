@@ -48,6 +48,9 @@ export abstract class BaseRepository<T> {
 
   /**
    * Buscar por ID
+   * 
+   * NOTA: Usa select('*') por ser genérico. Repositórios específicos podem sobrescrever
+   * este método para otimizar seleção de colunas.
    */
   async findById(id: string): Promise<T | null> {
     try {
@@ -223,6 +226,9 @@ export abstract class BaseRepository<T> {
 
   /**
    * Buscar com filtros customizados
+   * 
+   * NOTA: Usa select('*') por ser genérico. Repositórios específicos podem sobrescrever
+   * este método para otimizar seleção de colunas.
    */
   async findOne(filters: FilterOptions): Promise<T | null> {
     try {

@@ -15,14 +15,14 @@
 - Validação de role do usuário (operator/admin) antes de permitir acesso
 - Redirecionamento para `/login` se não autenticado
 - Redirecionamento para `/unauthorized` se role incorreto
-- Proteção aplicada a `/admin/*` e `/operator/*`
+- Proteção aplicada a `/admin/*` e `/operador/*`
 
 **Impacto:** **CRÍTICO** - Previne acesso não autorizado a rotas protegidas
 
 ---
 
 ### ✅ FIX-002: Branding Operador - Remover "GOLF FOX" (SEC-001)
-**Arquivo:** `web-app/components/operator/operator-logo-section.tsx`
+**Arquivo:** `web-app/components/operador/operador-logo-section.tsx`
 
 **Mudanças:**
 - Integrado com `useOperatorTenant()` para obter `companyName` e `logoUrl`
@@ -121,9 +121,9 @@
    ```
 
 2. ✅ **Testar middleware de autenticação:**
-   - Acessar `/operator` sem login → deve redirecionar para `/login`
-   - Acessar `/admin` como operator → deve redirecionar para `/unauthorized`
-   - Acessar `/operator` como admin → deve permitir acesso
+   - Acessar `/operador` sem login → deve redirecionar para `/login`
+   - Acessar `/admin` como operador → deve redirecionar para `/unauthorized`
+   - Acessar `/operador` como admin → deve permitir acesso
 
 3. ✅ **Validar branding operador:**
    - Login como operador → verificar se exibe logo/nome da empresa

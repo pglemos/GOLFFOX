@@ -55,7 +55,7 @@
 **Correct URLs:**
 - Admin: `/admin` (requires role: 'admin')
 - Transportadora: `/transportadora` (requires role: 'transportadora')
-- Operador: `/operador` (requires role: 'operator')
+- Operador: `/operador` (requires role: 'operador')
 
 **Conclusion:** ✅ **NOT A BUG** - Correct role-based access control
 
@@ -64,16 +64,16 @@
 - Test credentials should access their correct panels:
   - `admin@trans.com` → `/admin` ✅
   - `teste@transportadora.com` → `/transportadora`
-  - `teste@empresa.com` → `/operador` (if operator role)
+  - `teste@empresa.com` → `/operador` (if operador role)
 
 ---
 
 ### ✅ VERIFIED: Bug #2 - Create-Operator API
 
-**Issue:** API `/api/admin/create-operator` does not exist
+**Issue:** API `/api/admin/create-operador` does not exist
 
 **Investigation:**
-- File: `app/api/admin/create-operator/route.ts`
+- File: `app/api/admin/create-operador/route.ts`
 - Status: **EXISTS** (544 lines)
 
 **Findings:**
@@ -114,7 +114,7 @@
 
 **APIs Verified (Code Review Only):**
 - ✅ `/api/admin/users/change-role/route.ts` - EXISTS, looks correct
-- ✅ `/api/admin/create-operator/route.ts` - EXISTS, comprehensive
+- ✅ `/api/admin/create-operador/route.ts` - EXISTS, comprehensive
 - ❓ Transportadora CRUD APIs - Not found/verified
 - ❓ Alerts API - Not found/verified
 
@@ -151,7 +151,7 @@ Manual testing required to verify these issues. The create-operator API exists a
 
 **Status:** Already Implemented (Better Than Expected)
 
-**Investigation of `create-operator-modal.tsx` (lines 120-200):**
+**Investigation of `create-operador-modal.tsx` (lines 120-200):**
 
 ✅ **Already Has:**
 1. Proper error handling (try/catch)

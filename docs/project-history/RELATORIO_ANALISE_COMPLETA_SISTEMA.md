@@ -104,11 +104,11 @@
 
 ---
 
-## 2. PAINEL DO OPERADOR (`/operator`)
+## 2. PAINEL DO OPERADOR (`/operador`)
 
 ### ✅ Funcionalidades Implementadas
 
-#### Dashboard (`apps/web/app/operator/page.tsx`)
+#### Dashboard (`apps/web/app/operador/page.tsx`)
 - ✅ Tenant provider funcionando (`useOperatorTenant`)
 - ✅ KPIs via hooks React Query (`useOperatorKPIs`, `useControlTower`)
 - ✅ Hooks tentam `mv_operator_kpis` primeiro, depois `v_operator_dashboard_kpis_secure`
@@ -118,7 +118,7 @@
 
 **Status:** ✅ Funcional, mas depende de views e materialized views
 
-#### Funcionários (`apps/web/app/operator/funcionarios/page.tsx`)
+#### Funcionários (`apps/web/app/operador/funcionarios/page.tsx`)
 - ✅ CRUD completo implementado
 - ✅ Busca e paginação
 - ✅ Importação CSV
@@ -127,7 +127,7 @@
 
 **Status:** ✅ Funcional
 
-#### Rotas (`apps/web/app/operator/rotas/page.tsx`)
+#### Rotas (`apps/web/app/operador/rotas/page.tsx`)
 - ✅ Lista de rotas da empresa
 - ✅ View `v_operator_routes_secure` usada
 - ✅ Estatísticas de viagens
@@ -136,7 +136,7 @@
 
 **Status:** ✅ Funcional, depende de view existir
 
-#### Solicitações (`apps/web/app/operator/solicitacoes/page.tsx`)
+#### Solicitações (`apps/web/app/operador/solicitacoes/page.tsx`)
 - ✅ Kanban board implementado
 - ✅ 5 colunas: Rascunho, Enviado, Em Análise, Aprovado, Reprovado
 - ✅ Modal para criar solicitação
@@ -145,14 +145,14 @@
 **Status:** ✅ Funcional
 
 #### Outras Páginas
-- ✅ Rotas Mapa (`apps/web/app/operator/rotas/mapa/page.tsx`) - Implementado
-- ✅ Prestadores (`apps/web/app/operator/prestadores/page.tsx`) - Implementado
-- ✅ Custos (`apps/web/app/operator/custos/page.tsx`) - Implementado
-- ✅ Relatórios (`apps/web/app/operator/relatorios/page.tsx`) - Implementado
-- ✅ Conformidade (`apps/web/app/operator/conformidade/page.tsx`) - Implementado
-- ✅ Comunicações (`apps/web/app/operator/comunicacoes/page.tsx`) - Implementado
-- ✅ Preferências (`apps/web/app/operator/preferencias/page.tsx`) - Implementado
-- ✅ Ajuda (`apps/web/app/operator/ajuda/page.tsx`) - Implementado
+- ✅ Rotas Mapa (`apps/web/app/operador/rotas/mapa/page.tsx`) - Implementado
+- ✅ Prestadores (`apps/web/app/operador/prestadores/page.tsx`) - Implementado
+- ✅ Custos (`apps/web/app/operador/custos/page.tsx`) - Implementado
+- ✅ Relatórios (`apps/web/app/operador/relatorios/page.tsx`) - Implementado
+- ✅ Conformidade (`apps/web/app/operador/conformidade/page.tsx`) - Implementado
+- ✅ Comunicações (`apps/web/app/operador/comunicacoes/page.tsx`) - Implementado
+- ✅ Preferências (`apps/web/app/operador/preferencias/page.tsx`) - Implementado
+- ✅ Ajuda (`apps/web/app/operador/ajuda/page.tsx`) - Implementado
 
 ### ⚠️ Problemas Identificados
 
@@ -186,11 +186,11 @@
 
 ---
 
-## 3. PAINEL DA TRANSPORTADORA (`/carrier`)
+## 3. PAINEL DA TRANSPORTADORA (`/transportadora`)
 
 ### ✅ Funcionalidades Implementadas
 
-#### Dashboard (`apps/web/app/carrier/page.tsx`)
+#### Dashboard (`apps/web/app/transportadora/page.tsx`)
 - ✅ KPIs da transportadora
 - ✅ Gráficos de linha, pizza e barras
 - ✅ Mapa da frota integrado (`FleetMap`)
@@ -201,7 +201,7 @@
 
 **Status:** ✅ Funcional, mas depende de RPC e views
 
-#### Mapa (`apps/web/app/carrier/mapa/page.tsx`)
+#### Mapa (`apps/web/app/transportadora/mapa/page.tsx`)
 - ✅ Componente `FleetMap` implementado
 - ✅ Filtros por status e rota
 - ✅ Controles de mapa (satélite, terreno)
@@ -210,12 +210,12 @@
 **Status:** ✅ Funcional, depende de Google Maps API e RPC
 
 #### Outras Páginas
-- ✅ Veículos (`apps/web/app/carrier/veiculos/page.tsx`) - Implementado
-- ✅ Motoristas (`apps/web/app/carrier/motoristas/page.tsx`) - Implementado
-- ✅ Alertas (`apps/web/app/carrier/alertas/page.tsx`) - Implementado
-- ✅ Relatórios (`apps/web/app/carrier/relatorios/page.tsx`) - Implementado
-- ✅ Custos (`apps/web/app/carrier/custos/page.tsx`) - Implementado
-- ✅ Ajuda (`apps/web/app/carrier/ajuda/page.tsx`) - Implementado
+- ✅ Veículos (`apps/web/app/transportadora/veiculos/page.tsx`) - Implementado
+- ✅ Motoristas (`apps/web/app/transportadora/motoristas/page.tsx`) - Implementado
+- ✅ Alertas (`apps/web/app/transportadora/alertas/page.tsx`) - Implementado
+- ✅ Relatórios (`apps/web/app/transportadora/relatorios/page.tsx`) - Implementado
+- ✅ Custos (`apps/web/app/transportadora/custos/page.tsx`) - Implementado
+- ✅ Ajuda (`apps/web/app/transportadora/ajuda/page.tsx`) - Implementado
 
 ### ⚠️ Problemas Identificados
 
@@ -258,8 +258,8 @@
 2. **RLS Policies:**
    - Implementadas em múltiplas migrações
    - Admin: acesso total
-   - Operator: filtrado por `company_id`
-   - Carrier: filtrado por `carrier_id`
+   - operador: filtrado por `company_id`
+   - transportadora: filtrado por `carrier_id`
    - Funções helper: `get_user_role()`, `get_user_company_id()`, `get_user_carrier_id()`
 
 3. **Views Criadas:**
@@ -318,7 +318,7 @@
 
 2. **Middleware:**
    - `apps/web/middleware.ts` - Implementado
-   - Proteção de rotas `/admin`, `/operator`, `/carrier`
+   - Proteção de rotas `/admin`, `/operador`, `/transportadora`
    - Validação de cookies `golffox-session`
    - Redirecionamento por role
 

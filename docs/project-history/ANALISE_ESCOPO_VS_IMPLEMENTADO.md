@@ -37,7 +37,7 @@ O documento de escopo define **Golf Fox** como uma plataforma SaaS completa de g
 
 ✅ **Implementado:**
 - Sistema de autenticação (Supabase Auth)
-- Tabela `users` com roles: admin, operator, carrier, driver, passenger
+- Tabela `users` com roles: admin, operador, transportadora, motorista, passageiro
 - Login com CSRF protection
 - Middleware de proteção de rotas
 - Gerenciamento de permissões
@@ -93,11 +93,11 @@ O documento de escopo define **Golf Fox** como uma plataforma SaaS completa de g
 **Status: 25% Implementado**
 
 ✅ **Implementado:**
-- Dashboard básico (`/carrier`)
-- Visualização de veículos (`/carrier/veiculos`)
-- Visualização de motoristas (`/carrier/motoristas`)
-- Mapa da frota (`/carrier/mapa`)
-- Relatórios básicos (`/carrier/relatorios`)
+- Dashboard básico (`/transportadora`)
+- Visualização de veículos (`/transportadora/veiculos`)
+- Visualização de motoristas (`/transportadora/motoristas`)
+- Mapa da frota (`/transportadora/mapa`)
+- Relatórios básicos (`/transportadora/relatorios`)
 - KPIs básicos: Total da Frota, Em Rota, Motoristas Ativos, Atrasados
 - Listagem de veículos com busca
 - Listagem de motoristas com busca
@@ -253,7 +253,7 @@ O documento de escopo define **Golf Fox** como uma plataforma SaaS completa de g
 
 ✅ **Implementado:**
 - Tabela `drivers` no banco de dados
-- Usuários com role 'driver'
+- Usuários com role 'motorista'
 - Associação básica com transportadora
 - Interface admin (`/admin/motoristas`)
 
@@ -439,7 +439,7 @@ O documento de escopo define **Golf Fox** como uma plataforma SaaS completa de g
 **Status: 10% Implementado**
 
 ✅ **Implementado:**
-- Interface básica (`/driver`)
+- Interface básica (`/motorista`)
 - Autenticação
 
 ❌ **Faltando (CORE DO SISTEMA - PRIORIDADE ALTA):**
@@ -491,7 +491,7 @@ O documento de escopo define **Golf Fox** como uma plataforma SaaS completa de g
 **Status: 5% Implementado**
 
 ✅ **Implementado:**
-- Interface básica (`/passenger`)
+- Interface básica (`/passageiro`)
 - Autenticação
 
 ❌ **Faltando (CORE DO SISTEMA - PRIORIDADE ALTA):**

@@ -135,16 +135,16 @@ Senha: senha123
 3. **Admin Dashboard** (`lib/screens/admin/admin_dashboard.dart`)
    - Gestão completa do sistema
 
-4. **Operator Dashboard** (`lib/screens/operator/operator_dashboard.dart`)
+4. **operador Dashboard** (`lib/screens/operador/operator_dashboard.dart`)
    - Gestão de rotas e horários
 
-5. **Carrier Dashboard** (`lib/screens/carrier/carrier_dashboard.dart`)
+5. **transportadora Dashboard** (`lib/screens/transportadora/carrier_dashboard.dart`)
    - Gestão de frota
 
-6. **Driver Dashboard** (`lib/screens/driver/driver_dashboard.dart`)
+6. **motorista Dashboard** (`lib/screens/motorista/driver_dashboard.dart`)
    - Trips e tracking em tempo real
 
-7. **Passenger Dashboard** (`lib/screens/passenger/passenger_dashboard.dart`)
+7. **passageiro Dashboard** (`lib/screens/passageiro/passenger_dashboard.dart`)
    - Visualizar viagens
 
 ---

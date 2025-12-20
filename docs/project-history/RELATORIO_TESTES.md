@@ -98,7 +98,7 @@
 
 **Verificação:**
 - ❌ Campo "Perfil de Permissão" não existe no formulário de motorista
-- ✅ Role "driver" é atribuído automaticamente pelo sistema
+- ✅ Role "motorista" é atribuído automaticamente pelo sistema
 - ✅ Simplifica o processo de cadastro
 - ✅ Previne erros de seleção de perfil incorreto
 
@@ -122,7 +122,7 @@
 ### Arquivos Atualizados:
 1. ✅ `components/sidebar-new.tsx` - Adicionado link "Usuários"
 2. ✅ `components/modals/transportadora-drivers-modal.tsx` - Formatação + remoção de role
-3. ✅ `components/modals/create-operator-login-modal.tsx` - Formatação aplicada
+3. ✅ `components/modals/create-operador-login-modal.tsx` - Formatação aplicada
 4. ✅ `components/modals/edit-user-modal.tsx` - Formatação aplicada
 5. ✅ `hooks/use-auth-fast.tsx` - Event listener para atualizações
 6. ✅ `app/admin/configuracoes/page.tsx` - Dispatch de eventos
@@ -145,7 +145,7 @@
 
 ### ✅ Gestão de Motoristas
 - [x] Remoção de seletor de perfil
-- [x] Auto-atribuição de role "driver"
+- [x] Auto-atribuição de role "motorista"
 - [x] Formulário simplificado
 
 ### ✅ Página de Usuários

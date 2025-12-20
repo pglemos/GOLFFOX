@@ -27,7 +27,7 @@ export function BroadcastModal({ isOpen, onClose, onSave, empresaId }: Broadcast
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!title || !message) {
-      notifyError('', undefined, { i18n: { ns: 'operator', key: 'broadcast.validation.titleMessageRequired' } })
+      notifyError('', undefined, { i18n: { ns: 'operador', key: 'broadcast.validation.titleMessageRequired' } })
       return
     }
 
@@ -45,7 +45,7 @@ export function BroadcastModal({ isOpen, onClose, onSave, empresaId }: Broadcast
 
       if (error) throw error
 
-      notifySuccess('', { i18n: { ns: 'operator', key: 'broadcast.success.sent' } })
+      notifySuccess('', { i18n: { ns: 'operador', key: 'broadcast.success.sent' } })
       onSave()
       onClose()
       setTitle("")
@@ -53,7 +53,7 @@ export function BroadcastModal({ isOpen, onClose, onSave, empresaId }: Broadcast
       setTarget("empresa")
     } catch (error: any) {
       logError("Erro ao enviar broadcast", { error }, 'BroadcastModal')
-      notifyError(error, `Erro ao enviar broadcast: ${error.message}`, { i18n: { ns: 'operator', key: 'broadcast.errors.send', params: { message: error.message } } })
+      notifyError(error, `Erro ao enviar broadcast: ${error.message}`, { i18n: { ns: 'operador', key: 'broadcast.errors.send', params: { message: error.message } } })
     } finally {
       setLoading(false)
     }

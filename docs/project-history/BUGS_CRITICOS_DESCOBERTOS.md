@@ -73,8 +73,8 @@ POST /api/admin/create-operator
 
 **Código do Frontend:**
 ```typescript
-// apps/web/components/modals/create-operator-modal.tsx:129
-const response = await fetch('/api/admin/create-operator', {
+// apps/web/components/modals/create-operador-modal.tsx:129
+const response = await fetch('/api/admin/create-operador', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
@@ -109,7 +109,7 @@ const response = await fetch('/api/admin/create-operator', {
 Request para endpoint inexistente retorna 404, mas modal interpreta como sucesso e fecha silenciosamente.
 
 **Correção Necessária:**
-Criar arquivo `/app/api/admin/create-operator/route.ts` com implementação completa (ver código exemplo no AUDITORIA_FINAL_COMPLETA.md)
+Criar arquivo `/app/api/admin/create-operador/route.ts` com implementação completa (ver código exemplo no AUDITORIA_FINAL_COMPLETA.md)
 
 ---
 
@@ -299,7 +299,7 @@ Alterar redirect do logout de `/unauthorized` para `/`
   SELECT * FROM gf_user WHERE email LIKE 'teste@%';
   ```
   
-- [ ] **Criar `/api/admin/create-operator`**
+- [ ] **Criar `/api/admin/create-operador`**
   ```bash
   Criar: apps/web/app/api/admin/create-operator/route.ts
   Implementar: Lógica completa de criação

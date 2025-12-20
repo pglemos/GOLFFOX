@@ -147,8 +147,8 @@ GolfFox Sistema Completo
 │   ├── API Routes (Next.js)
 │   │   ├── /api/auth/*
 │   │   ├── /api/admin/*
-│   │   ├── /api/operator/*
-│   │   ├── /api/carrier/*
+│   │   ├── /api/operador/*
+│   │   ├── /api/transportadora/*
 │   │   ├── /api/costs/*
 │   │   ├── /api/reports/*
 │   │   ├── /api/cron/*

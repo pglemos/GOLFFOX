@@ -44,10 +44,10 @@ export async function GET(req: NextRequest) {
       .filter(driver => !activeDriverIds.has(driver.id))
       .map(driver => ({
         id: driver.id,
-        name: driver.name || driver.email?.split('@')[0] || 'Motorista',
+        name: motorista.name || motorista.email?.split('@')[0] || 'Motorista',
         email: driver.email,
         status: 'Ativo',
-        displayName: `${driver.name || driver.email?.split('@')[0] || 'Motorista'} (Status: Ativo)`
+        displayName: `${motorista.name || motorista.email?.split('@')[0] || 'Motorista'} (Status: Ativo)`
       }))
 
     return NextResponse.json({

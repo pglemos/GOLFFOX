@@ -60,8 +60,8 @@ export async function POST(req: NextRequest) {
 
     // Construir caminho do arquivo baseado no tipo de pasta
     let filePath = ''
-    if (folder === 'driver-documents' && driverId) {
-      filePath = `driver-documents/${driverId}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`
+    if (folder === 'motorista-documents' && driverId) {
+      filePath = `motorista-documents/${driverId}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`
     } else if (folder === 'medical-exams' && driverId) {
       filePath = `medical-exams/${driverId}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`
     } else if (folder === 'vehicle-documents' && vehicleId) {
@@ -79,7 +79,7 @@ export async function POST(req: NextRequest) {
 
     // Upload para Supabase Storage
     const { data: uploadData, error: uploadError } = await supabaseServiceRole.storage
-      .from('carrier-documents')
+      .from('transportadora-documents')
       .upload(filePath, buffer, {
         contentType: file.type,
         cacheControl: '3600',
@@ -96,11 +96,11 @@ export async function POST(req: NextRequest) {
     // Obter URL assinada (bucket é privado)
     // A URL será acessível via Supabase Storage com autenticação
     const baseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
-    const publicUrl = `${baseUrl}/storage/v1/object/carrier-documents/${filePath}`
+    const publicUrl = `${baseUrl}/storage/v1/object/transportadora-documents/${filePath}`
 
     // Também criar URL assinada válida por 1 ano para acesso direto
     const { data: signedUrlData } = await supabaseServiceRole.storage
-      .from('carrier-documents')
+      .from('transportadora-documents')
       .createSignedUrl(filePath, 31536000) // 1 ano em segundos
 
     return NextResponse.json({

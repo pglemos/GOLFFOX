@@ -37,49 +37,49 @@ Foi implementada a versão completa (100%) do Painel da Transportadora (Carrier 
 - ✅ Função `get_trip_passenger_count()` para contar passageiros
 
 #### v54_carrier_storage_setup.sql
-- ✅ Políticas RLS para bucket `carrier-documents` no Supabase Storage
+- ✅ Políticas RLS para bucket `transportadora-documents` no Supabase Storage
 - ✅ Acesso restrito por transportadora
-- ✅ Suporte a 3 pastas: `driver-documents`, `vehicle-documents`, `medical-exams`
+- ✅ Suporte a 3 pastas: `motorista-documents`, `vehicle-documents`, `medical-exams`
 
 ---
 
 ### 2. APIs Backend (Next.js API Routes)
 
-#### `/api/carrier/drivers/[driverId]/documents`
+#### `/api/transportadora/drivers/[driverId]/documents`
 - ✅ GET: Listar documentos do motorista
 - ✅ POST: Criar novo documento
 - ✅ Validação com Zod
 
-#### `/api/carrier/drivers/[driverId]/exams`
+#### `/api/transportadora/drivers/[driverId]/exams`
 - ✅ GET: Listar exames médicos do motorista
 - ✅ POST: Criar novo exame médico
 - ✅ Validação com Zod
 
-#### `/api/carrier/vehicles/[vehicleId]/documents`
+#### `/api/transportadora/vehicles/[vehicleId]/documents`
 - ✅ GET: Listar documentos do veículo
 - ✅ POST: Criar novo documento do veículo
 
-#### `/api/carrier/vehicles/[vehicleId]/maintenances`
+#### `/api/transportadora/vehicles/[vehicleId]/maintenances`
 - ✅ GET: Listar manutenções do veículo
 - ✅ POST: Criar nova manutenção
 
-#### `/api/carrier/upload`
+#### `/api/transportadora/upload`
 - ✅ POST: Upload de arquivos para Supabase Storage
 - ✅ Validação de tipo de arquivo (PDF, JPG, PNG)
 - ✅ Validação de tamanho máximo (10MB)
 - ✅ Retorna URL pública do arquivo
 
-#### `/api/carrier/costs/vehicle`
+#### `/api/transportadora/costs/vehicle`
 - ✅ GET: Listar custos por veículo (com filtros de data)
 - ✅ POST: Criar novo custo de veículo
 - ✅ Filtro automático por transportadora
 
-#### `/api/carrier/costs/route`
+#### `/api/transportadora/costs/route`
 - ✅ GET: Listar custos por rota (com filtros de data)
 - ✅ POST: Criar novo custo de rota
 - ✅ Filtro automático por transportadora
 
-#### `/api/carrier/alerts`
+#### `/api/transportadora/alerts`
 - ✅ GET: Listar alertas de vencimento
 - ✅ Estatísticas: total, críticos, warnings, vencidos
 - ✅ Filtros por nível de alerta
@@ -92,7 +92,7 @@ Foi implementada a versão completa (100%) do Painel da Transportadora (Carrier 
 
 ### 3. Frontend - Páginas
 
-#### `/carrier/motoristas` (Atualizada)
+#### `/transportadora/motoristas` (Atualizada)
 - ✅ Tabs: Lista, Documentos, Exames, Alertas
 - ✅ Upload de documentos via modal
 - ✅ Upload de exames médicos via modal
@@ -100,7 +100,7 @@ Foi implementada a versão completa (100%) do Painel da Transportadora (Carrier 
 - ✅ Alertas de vencimento integrados
 - ✅ Busca de motoristas
 
-#### `/carrier/veiculos` (Atualizada)
+#### `/transportadora/veiculos` (Atualizada)
 - ✅ Tabs: Lista, Documentos, Manutenções
 - ✅ Upload de documentos (CRLV, IPVA, Seguro, Inspeção, Alvará)
 - ✅ Registro de manutenções (preventiva, corretiva, revisão, etc.)
@@ -108,7 +108,7 @@ Foi implementada a versão completa (100%) do Painel da Transportadora (Carrier 
 - ✅ Visualização de documentos com vencimento
 - ✅ Histórico completo de manutenções
 
-#### `/carrier/custos` (Nova)
+#### `/transportadora/custos` (Nova)
 - ✅ Tabs: Visão Geral, Por Veículo, Por Rota
 - ✅ KPIs: Total do mês, % Combustível, % Manutenção, Total de veículos
 - ✅ Gráfico de barras: Custos por categoria (últimos 6 meses)
@@ -117,7 +117,7 @@ Foi implementada a versão completa (100%) do Painel da Transportadora (Carrier 
 - ✅ Detalhamento de custos por veículo
 - ✅ Detalhamento de custos por rota com métricas de rentabilidade
 
-#### `/carrier/alertas` (Nova)
+#### `/transportadora/alertas` (Nova)
 - ✅ Dashboard de alertas de vencimento
 - ✅ Estatísticas: Total, Críticos, Vencidos, Atenção
 - ✅ Tabs: Todos, Críticos, Vencidos, Atenção
@@ -125,7 +125,7 @@ Foi implementada a versão completa (100%) do Painel da Transportadora (Carrier 
 - ✅ Links diretos para edição
 - ✅ Botão para enviar email de alerta
 
-#### `/carrier/mapa` (Atualizada)
+#### `/transportadora/mapa` (Atualizada)
 - ✅ Supabase Realtime para atualização automática
 - ✅ Badges de passageiros nos marcadores (`X/Y` passageiros/capacidade)
 - ✅ Atualização em tempo real de posições
@@ -159,7 +159,7 @@ Foi implementada a versão completa (100%) do Painel da Transportadora (Carrier 
 ### 5. Navegação
 
 #### Sidebar
-- ✅ Link adicionado para `/carrier/custos`
+- ✅ Link adicionado para `/transportadora/custos`
 - ✅ Ícone DollarSign para identificação visual
 - ✅ Links mantidos para todas as páginas existentes
 
@@ -258,7 +258,7 @@ Execute as migrations na ordem no Supabase SQL Editor:
 ### 2. Configurar Supabase Storage
 1. Acesse: https://app.supabase.com
 2. Vá em: Storage → Buckets → New Bucket
-3. Nome: `carrier-documents`
+3. Nome: `transportadora-documents`
 4. Public: `false`
 5. File size limit: `10 MB`
 6. Allowed MIME types: `image/jpeg, image/png, application/pdf`
@@ -305,22 +305,22 @@ git push origin main
 - `database/migrations/gf_rpc_map_snapshot.sql` (modificado - adicionado capacity)
 
 ### APIs
-- `apps/web/app/api/carrier/drivers/[driverId]/documents/route.ts` (novo)
-- `apps/web/app/api/carrier/drivers/[driverId]/exams/route.ts` (novo)
-- `apps/web/app/api/carrier/vehicles/[vehicleId]/documents/route.ts` (novo)
-- `apps/web/app/api/carrier/vehicles/[vehicleId]/maintenances/route.ts` (novo)
-- `apps/web/app/api/carrier/upload/route.ts` (novo)
-- `apps/web/app/api/carrier/costs/vehicle/route.ts` (novo)
-- `apps/web/app/api/carrier/costs/route/route.ts` (novo)
-- `apps/web/app/api/carrier/alerts/route.ts` (novo)
+- `apps/web/app/api/transportadora/drivers/[driverId]/documents/route.ts` (novo)
+- `apps/web/app/api/transportadora/drivers/[driverId]/exams/route.ts` (novo)
+- `apps/web/app/api/transportadora/vehicles/[vehicleId]/documents/route.ts` (novo)
+- `apps/web/app/api/transportadora/vehicles/[vehicleId]/maintenances/route.ts` (novo)
+- `apps/web/app/api/transportadora/upload/route.ts` (novo)
+- `apps/web/app/api/transportadora/costs/vehicle/route.ts` (novo)
+- `apps/web/app/api/transportadora/costs/route/route.ts` (novo)
+- `apps/web/app/api/transportadora/alerts/route.ts` (novo)
 - `apps/web/app/api/notifications/email/route.ts` (novo)
 
 ### Frontend
-- `apps/web/app/carrier/motoristas/page.tsx` (modificado - tabs completas)
-- `apps/web/app/carrier/veiculos/page.tsx` (modificado - tabs completas)
-- `apps/web/app/carrier/custos/page.tsx` (novo)
-- `apps/web/app/carrier/alertas/page.tsx` (novo)
-- `apps/web/components/carrier/document-upload.tsx` (novo)
+- `apps/web/app/transportadora/motoristas/page.tsx` (modificado - tabs completas)
+- `apps/web/app/transportadora/veiculos/page.tsx` (modificado - tabs completas)
+- `apps/web/app/transportadora/custos/page.tsx` (novo)
+- `apps/web/app/transportadora/alertas/page.tsx` (novo)
+- `apps/web/components/transportadora/document-upload.tsx` (novo)
 - `apps/web/components/fleet-map.tsx` (modificado - Realtime + badges)
 - `apps/web/components/ui/alert.tsx` (novo)
 - `apps/web/components/sidebar.tsx` (modificado - link de custos)

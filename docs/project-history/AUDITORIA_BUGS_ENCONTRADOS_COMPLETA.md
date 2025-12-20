@@ -31,10 +31,10 @@ Modal abre, usuário preenche formulário completo, mas ao clicar "Criar Empresa
 **Causa Raiz:**
 ```typescript
 // Frontend tenta chamar:
-fetch('/api/admin/create-operator', { method: 'POST', ... })
+fetch('/api/admin/create-operador', { method: 'POST', ... })
 
 // Backend: 404 Not Found
-// Arquivo apps/web/app/api/admin/create-operator/route.ts NÃO EXISTE
+// Arquivo apps/web/app/api/admin/create-operador/route.ts NÃO EXISTE
 ```
 
 **Evidências:**
@@ -234,7 +234,7 @@ Alterar redirect do logout de `/unauthorized` para `/`
 ## 📋 BUGS POR CATEGORIA
 
 ### Falhas de API (Inexistentes ou Bugadas):
-1. ❌ `/api/admin/create-operator` - **NÃO EXISTE**
+1. ❌ `/api/admin/create-operador` - **NÃO EXISTE**
 2. ❌ API de criar transportadora - Falha
 3. ❌ API de editar transportadora - Não salva / não carrega dados
 4. ❌ API de trocar papel - Problema de sessão
@@ -375,7 +375,7 @@ Alterar redirect do logout de `/unauthorized` para `/`
    # Testar login novamente
    ```
 
-2. **Implementar `/api/admin/create-operator`**
+2. **Implementar `/api/admin/create-operador`**
    ```bash
    Criar: apps/web/app/api/admin/create-operator/route.ts
    Implementar: POST handler com Supabase service role

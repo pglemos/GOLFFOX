@@ -49,14 +49,14 @@ Deve retornar ✅ para as views criadas.
 Acesse https://golffox.vercel.app/operator e navegue:
 
 - ✅ Dashboard (KPIs e Torre de Controle)
-- ✅ `/operator/rotas` → `/operator/rotas/mapa?route_id=...`
-- ✅ `/operator/prestadores` (read-only)
-- ✅ `/operator/solicitacoes` (kanban)
-- ✅ `/operator/custos`
-- ✅ `/operator/relatorios`
-- ✅ `/operator/conformidade`
-- ✅ `/operator/comunicacoes`
-- ✅ `/operator/preferencias`
+- ✅ `/operador/rotas` → `/operador/rotas/mapa?route_id=...`
+- ✅ `/operador/prestadores` (read-only)
+- ✅ `/operador/solicitacoes` (kanban)
+- ✅ `/operador/custos`
+- ✅ `/operador/relatorios`
+- ✅ `/operador/conformidade`
+- ✅ `/operador/comunicacoes`
+- ✅ `/operador/preferencias`
 
 ### 6. Verificar RLS Funcionando
 
@@ -78,7 +78,7 @@ SELECT * FROM gf_service_requests WHERE empresa_id != :empresa_id; -- Deve estar
 → Execute as migrações de views (`gf_operator_views.sql`)
 
 ### Erro: "Permission denied"
-→ Execute as migrações de RLS (`gf_operator_rls.sql`) e verifique que o usuário tem `role = 'operator'` e `company_id` correto
+→ Execute as migrações de RLS (`gf_operator_rls.sql`) e verifique que o usuário tem `role = 'operador'` e `company_id` correto
 
 ### Erro: "Page 404" em `/operador`
 → Já corrigido com redirect no `next.config.js`. Aguarde deploy da Vercel.
@@ -91,7 +91,7 @@ SELECT * FROM gf_service_requests WHERE empresa_id != :empresa_id; -- Deve estar
 
 ## 📚 Documentação
 
-- `docs/README-OPERATOR.md` - Guia do operador
+- `docs/README-operador.md` - Guia do operador
 - `docs/AUDITORIA_MOBILE_v42.md` - Auditoria mobile
 - `docs/DEPLOY_VERCEL.md` - Deploy e configuração
 
@@ -103,7 +103,7 @@ SELECT * FROM gf_service_requests WHERE empresa_id != :empresa_id; -- Deve estar
 - [ ] Health-check passou localmente
 - [ ] Variáveis de ambiente configuradas na Vercel
 - [ ] Páginas testadas em produção
-- [ ] Redirecionamento `/operador` → `/operator` funcionando
+- [ ] Redirecionamento `/operador` → `/operador` funcionando
 
 ## 🎯 Pronto!
 

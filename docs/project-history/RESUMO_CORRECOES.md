@@ -45,7 +45,7 @@
 - ✅ Modal NÃO fecha mais automaticamente em erro
 - ✅ Usuário pode ver mensagem e tentar novamente
 
-**Arquivo editado:** `apps/web/components/modals/create-operator-modal.tsx` (linhas 139-186)
+**Arquivo editado:** `apps/web/components/modals/create-operador-modal.tsx` (linhas 139-186)
 
 **Novo comportamento:**
 ```typescript
@@ -80,7 +80,7 @@ if (!response.ok) {
 ## 🔍 DESCOBERTAS IMPORTANTES
 
 ### 1️⃣ API create-operator EXISTE e FUNCIONA
-- Localização: `apps/web/app/api/admin/create-operator/route.ts`
+- Localização: `apps/web/app/api/admin/create-operador/route.ts`
 - 544 linhas, completamente implementada
 - ✅ Teste de criação de empresa: **SUCESSO**
 
@@ -158,7 +158,7 @@ if (!response.ok) {
 
 ## 📁 ARQUIVOS MODIFICADOS
 
-1. ✅ `apps/web/components/modals/create-operator-modal.tsx`
+1. ✅ `apps/web/components/modals/create-operador-modal.tsx`
    - Linhas ~139-186: Melhorado tratamento de erros
    
 2. ✅ `scripts/create_test_users.js`

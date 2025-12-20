@@ -15,7 +15,7 @@ interface EmpresaLogoSectionProps {
 export function EmpresaLogoSection({ panelHomeUrl, panelBranding }: EmpresaLogoSectionProps) {
     const pathname = usePathname()
     // Suportar tanto /empresa (nova rota) quanto /operador (compatibilidade)
-    const isEmpresaPanel = (pathname?.startsWith('/empresa') || pathname?.startsWith('/operador') || pathname?.startsWith('/operator')) ?? false
+    const isEmpresaPanel = (pathname?.startsWith('/empresa') || pathname?.startsWith('/operador') || pathname?.startsWith('/operador')) ?? false
     const isAdminPanel = pathname?.startsWith('/admin') ?? false
     const { companyName, logoUrl } = useEmpresaTenant()
     const [imgFailed, setImgFailed] = useState(false)

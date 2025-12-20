@@ -25,10 +25,10 @@
 
 **Test accounts** (password: `senha123` for all):
 - `admin@golffox.com` (Admin - full access)
-- `operator@golffox.com` (Operator - company-scoped)
-- `carrier@golffox.com` (Carrier - carrier-scoped)
-- `driver@golffox.com` (Driver - own trips only)
-- `passenger@golffox.com` (Passenger - assigned trips only)
+- `operador@golffox.com` (operador - company-scoped)
+- `transportadora@golffox.com` (transportadora - transportadora-scoped)
+- `motorista@golffox.com` (motorista - own trips only)
+- `passageiro@golffox.com` (passageiro - assigned trips only)
 
 **Test scenarios:**
 1. Login as driver → Start a trip → See GPS tracking
@@ -52,10 +52,10 @@ CREATE POLICY "Authenticated users can view trips" ON trips
 **After:**
 ```sql
 -- Drivers can only see their own trips
-CREATE POLICY "Driver view own trips" ON trips
+CREATE POLICY "motorista view own trips" ON trips
   FOR SELECT TO authenticated 
   USING (
-    get_user_role() = 'driver' AND 
+    get_user_role() = 'motorista' AND 
     driver_id = auth.uid()
   );
 ```
@@ -78,9 +78,9 @@ if (result['success']) {
 ```
 
 **Valid transitions:**
-- `scheduled` → `inProgress` (Driver starts)
-- `inProgress` → `completed` (Driver finishes)
-- `inProgress` → `cancelled` (Admin/Operator cancels)
+- `scheduled` → `inProgress` (motorista starts)
+- `inProgress` → `completed` (motorista finishes)
+- `inProgress` → `cancelled` (Admin/operador cancels)
 - `completed` → `inProgress` (Admin reopen with `force: true`)
 
 ### 📊 Automatic Trip Summaries
@@ -121,7 +121,7 @@ print('Total distance: ${summary['total_distance_km']} km');
 SELECT id, email, role FROM users WHERE email = 'your@email.com';
 
 -- Update if needed
-UPDATE users SET role = 'driver' WHERE email = 'your@email.com';
+UPDATE users SET role = 'motorista' WHERE email = 'your@email.com';
 ```
 
 ### Error: "Function rpc_trip_transition does not exist"
@@ -202,7 +202,7 @@ WHERE jobname = 'refresh-trip-reports';
 ### Trip Management
 
 ```dart
-// Start trip (driver)
+// Start trip (motorista)
 await SupabaseService.instance.transitionTripStatus(
   tripId: id,
   newStatus: 'inProgress',
@@ -226,7 +226,7 @@ await SupabaseService.instance.transitionTripStatus(
 ### Real-time Tracking
 
 ```dart
-// Stream driver positions (real-time)
+// Stream motorista positions (real-time)
 SupabaseService.instance
   .streamDriverPositionsRealtime(tripId)
   .listen((positions) {

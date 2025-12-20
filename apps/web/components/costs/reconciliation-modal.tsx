@@ -189,7 +189,7 @@ export function ReconciliationModal({
 
       setStatus('approved')
 
-      notifySuccess('', { i18n: { ns: 'operator', key: 'reconciliation.approved' } })
+      notifySuccess('', { i18n: { ns: 'operador', key: 'reconciliation.approved' } })
       onApprove?.()
       onClose()
     } catch (error: any) {
@@ -223,7 +223,7 @@ export function ReconciliationModal({
 
       setStatus('rejected')
 
-      notifySuccess('', { i18n: { ns: 'operator', key: 'reconciliation.rejected' } })
+      notifySuccess('', { i18n: { ns: 'operador', key: 'reconciliation.rejected' } })
       onReject?.()
       onClose()
     } catch (error: any) {

@@ -69,7 +69,7 @@ export async function PUT(
     }
 
     // Invalidar cache após atualização
-    await invalidateEntityCache('driver', driverId)
+    await invalidateEntityCache('motorista', driverId)
 
     return NextResponse.json({ success: true, driver })
   } catch (error: any) {

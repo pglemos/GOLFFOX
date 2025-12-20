@@ -9,7 +9,7 @@ Todas as funcionalidades principais foram implementadas e testadas. O painel est
 ## 📋 Funcionalidades Implementadas
 
 ### 1. ✅ Importação CSV de Funcionários
-**Arquivo:** `web-app/components/operator/csv-import-modal.tsx`
+**Arquivo:** `web-app/components/operador/csv-import-modal.tsx`
 
 - ✅ Parser CSV com detecção automática de header
 - ✅ Validação completa (nome, email, CPF)
@@ -19,14 +19,14 @@ Todas as funcionalidades principais foram implementadas e testadas. O painel est
 - ✅ Criação de usuários via API route segura
 - ✅ Tratamento de erros e relatórios detalhados
 
-**Uso:** Botão "Importar CSV" em `/operator/funcionarios`
+**Uso:** Botão "Importar CSV" em `/operador/funcionarios`
 
 ---
 
 ### 2. ✅ CRUD Completo de Funcionários
-**Arquivo:** `web-app/components/operator/funcionario-modal.tsx`
+**Arquivo:** `web-app/components/operador/funcionario-modal.tsx`
 
-- ✅ Criar funcionário (via API route `/api/operator/create-employee`)
+- ✅ Criar funcionário (via API route `/api/operador/create-employee`)
 - ✅ Editar funcionário existente
 - ✅ Geocodificação de endereço ao salvar
 - ✅ Validação de campos (nome, email, telefone, CPF)
@@ -36,7 +36,7 @@ Todas as funcionalidades principais foram implementadas e testadas. O painel est
 ---
 
 ### 3. ✅ Solicitações para GolfFox
-**Arquivo:** `web-app/components/operator/solicitacao-modal.tsx`
+**Arquivo:** `web-app/components/operador/solicitacao-modal.tsx`
 
 - ✅ Modal completo para criar solicitações
 - ✅ Tipos de solicitação:
@@ -49,12 +49,12 @@ Todas as funcionalidades principais foram implementadas e testadas. O painel est
 - ✅ Integração com RPC `rpc_request_service`
 - ✅ Filtro automático por `empresa_id`
 
-**Página:** `/operator/solicitacoes`
+**Página:** `/operador/solicitacoes`
 
 ---
 
 ### 4. ✅ Exportação de Custos e Relatórios
-**Arquivo:** `web-app/app/operator/custos/page.tsx`
+**Arquivo:** `web-app/app/operador/custos/page.tsx`
 
 - ✅ Exportação em CSV, Excel e PDF
 - ✅ Detalhamento de custos por rota/período
@@ -62,7 +62,7 @@ Todas as funcionalidades principais foram implementadas e testadas. O painel est
 - ✅ Filtro por `empresa_id`
 - ✅ Resumo financeiro (custo total, divergências)
 
-**Arquivo:** `web-app/app/operator/relatorios/page.tsx`
+**Arquivo:** `web-app/app/operador/relatorios/page.tsx`
 
 - ✅ 6 tipos de relatórios disponíveis:
   - Atrasos (com formatter)
@@ -77,7 +77,7 @@ Todas as funcionalidades principais foram implementadas e testadas. O painel est
 ---
 
 ### 5. ✅ Broadcast de Comunicações
-**Arquivo:** `web-app/components/operator/broadcast-modal.tsx`
+**Arquivo:** `web-app/components/operador/broadcast-modal.tsx`
 
 - ✅ Modal para criar broadcasts
 - ✅ Seleção de grupo alvo (Empresa, Rota, Turno)
@@ -85,12 +85,12 @@ Todas as funcionalidades principais foram implementadas e testadas. O painel est
 - ✅ Histórico de comunicações
 - ✅ Filtro por `empresa_id`
 
-**Página:** `/operator/comunicacoes`
+**Página:** `/operador/comunicacoes`
 
 ---
 
 ### 6. ✅ Conformidade e Segurança
-**Página:** `/operator/conformidade`
+**Página:** `/operador/conformidade`
 
 - ✅ Lista de incidentes filtrados por `empresa_id`
 - ✅ Exibição de tipo, severidade, status
@@ -141,7 +141,7 @@ web-app/
 ## 🔧 Melhorias Técnicas Implementadas
 
 ### API Routes
-- ✅ `/api/operator/create-employee` - Criação segura de funcionários usando `service_role`
+- ✅ `/api/operador/create-employee` - Criação segura de funcionários usando `service_role`
 
 ### Geocodificação
 - ✅ Integração com Google Maps Geocoding API
@@ -206,7 +206,7 @@ web-app/
    - `SUPABASE_SERVICE_ROLE` (server-side only)
 
 3. **Criar Usuário Operador de Teste:**
-   - `role = 'operator'`
+   - `role = 'operador'`
    - `company_id` definido
    - Associado a uma empresa válida
 

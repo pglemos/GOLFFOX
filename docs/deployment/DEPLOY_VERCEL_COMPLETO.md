@@ -163,8 +163,8 @@ curl https://golffox.vercel.app/api/health
    - Verificar redirecionamento
 
 2. **Middleware:**
-   - Tentar acessar `/operator` sem login → deve redirecionar
-   - Tentar acessar `/admin` como operator → deve redirecionar
+   - Tentar acessar `/operador` sem login → deve redirecionar
+   - Tentar acessar `/admin` como operador → deve redirecionar
 
 3. **Branding:**
    - Login como operador → verificar logo/nome da empresa

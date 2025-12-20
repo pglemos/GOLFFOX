@@ -296,7 +296,7 @@ export function useSupabaseCount(
     // Aplicar filtros
     Object.entries(filters).forEach(([key, value]) => {
       if (value !== undefined && value !== null) {
-        if (typeof value === 'object' && value !== null && 'operator' in value && 'value' in value) {
+        if (typeof value === 'object' && value !== null && 'operador' in value && 'value' in value) {
           // Filtros complexos como gte, eq, etc.
           const filterValue = value as { operator: string; value: unknown }
           const queryBuilder = query as any

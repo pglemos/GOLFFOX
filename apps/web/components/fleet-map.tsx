@@ -360,7 +360,7 @@ export const FleetMap = memo(function FleetMap({ companyId, transportadoraId, ro
             color: '#FFFFFF',
             fontSize: '11px',
             fontWeight: 'bold',
-            className: 'map-passenger-badge'
+            className: 'map-passageiro-badge'
           },
           // Nota: Google Maps não suporta aria-label nativamente.
           // Para navegação por teclado, seria necessário criar overlay customizado com <button>.
@@ -626,14 +626,14 @@ export const FleetMap = memo(function FleetMap({ companyId, transportadoraId, ro
     }))
 
   return (
-    <div className="relative w-full rounded-[var(--radius-xl)] overflow-hidden border border-[var(--border)] shadow-lg">
+    <div className="relative w-full rounded-3xl overflow-hidden border border-border shadow-lg">
       {/* Barra Superior Fixa */}
       {(selectedBus || filters.route) && formattedStops.length > 0 && (
-        <div className="absolute top-0 left-0 right-0 z-30 bg-white/95 backdrop-blur-sm border-b border-[var(--border)] px-6 py-3 flex items-center justify-between">
+        <div className="absolute top-0 left-0 right-0 z-30 bg-white/95 backdrop-blur-sm border-b border-border px-6 py-3 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div>
-              <div className="text-xs text-[var(--ink-muted)]">Tempo Total da Rota</div>
-              <div className="text-2xl font-bold text-[var(--ink-strong)] font-mono">
+              <div className="text-xs text-ink-muted">Tempo Total da Rota</div>
+              <div className="text-2xl font-bold text-ink-strong font-mono">
                 {(() => {
                   if (formattedStops.length < 2) return '00:00'
                   const first = formattedStops[0]
@@ -646,13 +646,13 @@ export const FleetMap = memo(function FleetMap({ companyId, transportadoraId, ro
               </div>
             </div>
             {selectedBus && (
-              <div className="border-l border-[var(--border)] pl-4">
-                <div className="text-xs text-[var(--ink-muted)]">Veículo</div>
+              <div className="border-l border-border pl-4">
+                <div className="text-xs text-ink-muted">Veículo</div>
                 <div className="text-lg font-semibold">{selectedBus.vehicle_plate}</div>
               </div>
             )}
           </div>
-          <div className="text-sm text-[var(--ink-muted)]">
+          <div className="text-sm text-ink-muted">
             {formattedStops.length} paradas
           </div>
         </div>
@@ -669,7 +669,7 @@ export const FleetMap = memo(function FleetMap({ companyId, transportadoraId, ro
         <div className="absolute inset-0 z-40 flex items-center justify-center bg-white/70 backdrop-blur-sm">
           <div className="text-center">
             <div className="loader-spinner mx-auto"></div>
-            <p className="mt-4 text-[var(--ink-muted)]">Carregando mapa...</p>
+            <p className="mt-4 text-ink-muted">Carregando mapa...</p>
           </div>
         </div>
       )}
@@ -678,9 +678,9 @@ export const FleetMap = memo(function FleetMap({ companyId, transportadoraId, ro
       {mapError && (
         <div className="absolute inset-0 z-40 flex items-center justify-center bg-white/80 backdrop-blur-sm">
           <div className="text-center max-w-md">
-            <AlertCircle className="h-16 w-16 text-[var(--danger)] mx-auto mb-4" />
-            <h3 className="text-xl font-semibold mb-2 text-[var(--ink)]">Erro no Mapa</h3>
-            <p className="text-[var(--ink-muted)] mb-6">{mapError}</p>
+            <AlertCircle className="h-16 w-16 text-error mx-auto mb-4" />
+            <h3 className="text-xl font-semibold mb-2 text-ink">Erro no Mapa</h3>
+            <p className="text-ink-muted mb-6">{mapError}</p>
             <Button 
               onClick={() => {
                 setMapError(null)
@@ -702,7 +702,7 @@ export const FleetMap = memo(function FleetMap({ companyId, transportadoraId, ro
         animate={{ opacity: 1, y: 0 }}
         className="absolute top-6 left-6 z-10"
       >
-        <Card className="p-4 bg-card/50 backdrop-blur-sm border-[var(--border)] shadow-xl">
+        <Card className="p-4 bg-card/50 backdrop-blur-sm border-border shadow-xl">
           <div className="flex flex-wrap gap-3">
             <Input
               placeholder="Empresa"
@@ -717,7 +717,7 @@ export const FleetMap = memo(function FleetMap({ companyId, transportadoraId, ro
               onChange={(e) => handleFilterChange('route', e.target.value)}
             />
             <select
-              className="px-3 py-2 rounded-[var(--radius-lg)] border border-[var(--border)] bg-white min-w-[140px] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand)] focus:ring-opacity-20"
+              className="px-3 py-2 rounded-lg-custom border border-border bg-white min-w-[140px] text-sm focus:outline-none focus:ring-2 focus:ring-brand focus:ring-opacity-20"
               value={filters.status}
               onChange={(e) => handleFilterChange('status', e.target.value)}
             >
@@ -733,14 +733,14 @@ export const FleetMap = memo(function FleetMap({ companyId, transportadoraId, ro
 
       {/* Barra Temporal Interativa */}
       {(selectedBus || filters.route) && formattedStops.length > 0 && (
-        <div className="absolute bottom-0 left-0 right-0 z-30 bg-white border-t border-[var(--border)]">
+        <div className="absolute bottom-0 left-0 right-0 z-30 bg-white border-t border-border">
           <TemporalProgressBar stops={formattedStops} />
         </div>
       )}
 
       {/* Ações flutuantes */}
       <div className="absolute bottom-6 right-6 z-10 flex flex-col gap-2">
-        <Button size="icon" onClick={loadMapData} className="bg-white hover:bg-[var(--bg-hover)] shadow-lg">
+        <Button size="icon" onClick={loadMapData} className="bg-white hover:bg-bg-hover shadow-lg">
           <RefreshCw className="h-4 w-4" />
         </Button>
         <Button size="icon" variant="outline" className="bg-white shadow-lg">
@@ -764,28 +764,28 @@ export const FleetMap = memo(function FleetMap({ companyId, transportadoraId, ro
             variants={modalContent}
             className="absolute top-2 right-2 sm:top-6 sm:right-6 w-[calc(100vw-1rem)] sm:w-80 z-20 max-w-sm"
           >
-            <Card className="p-4 sm:p-6 bg-card/50 backdrop-blur-sm border-[var(--border)] shadow-2xl">
+            <Card className="p-4 sm:p-6 bg-card/50 backdrop-blur-sm border-border shadow-2xl">
               <div className="flex items-start justify-between mb-4 sm:mb-6">
                 <div className="flex-1 min-w-0 pr-2">
                   <h3 className="font-bold text-lg sm:text-xl truncate">{selectedBus.vehicle_plate}</h3>
-                  <p className="text-sm text-[var(--ink-muted)] truncate">{selectedBus.vehicle_model}</p>
+                  <p className="text-sm text-ink-muted truncate">{selectedBus.vehicle_model}</p>
                 </div>
-                <Button size="icon" variant="ghost" onClick={() => setSelectedBus(null)} className="hover:bg-[var(--bg-hover)]">
+                <Button size="icon" variant="ghost" onClick={() => setSelectedBus(null)} className="hover:bg-bg-hover">
                   <X className="h-4 w-4" />
                 </Button>
               </div>
 
               <div className="space-y-3 sm:space-y-4 text-sm">
                 <div>
-                  <span className="text-[var(--ink-muted)] block mb-1 text-xs sm:text-sm">Motorista:</span>
+                  <span className="text-ink-muted block mb-1 text-xs sm:text-sm">Motorista:</span>
                   <p className="font-semibold text-sm sm:text-base truncate">{selectedBus.driver_name}</p>
                 </div>
                 <div>
-                  <span className="text-[var(--ink-muted)] block mb-1 text-xs sm:text-sm">Rota:</span>
+                  <span className="text-ink-muted block mb-1 text-xs sm:text-sm">Rota:</span>
                   <p className="font-semibold text-sm sm:text-base truncate">{selectedBus.route_name}</p>
                 </div>
                 <div>
-                  <span className="text-[var(--ink-muted)] block mb-2">Status:</span>
+                  <span className="text-ink-muted block mb-2">Status:</span>
                   <Badge 
                     variant={
                       (selectedBus.color === 'green' ? 'default' : 
@@ -799,15 +799,15 @@ export const FleetMap = memo(function FleetMap({ companyId, transportadoraId, ro
                      selectedBus.color === 'red' ? 'Parado (>3min)' : 'Garagem'}
                   </Badge>
                 </div>
-                <div className="flex items-center gap-4 pt-2 border-t border-[var(--border)]">
-                  <UsersIcon className="h-4 w-4 text-[var(--ink-muted)]" />
+                <div className="flex items-center gap-4 pt-2 border-t border-border">
+                  <UsersIcon className="h-4 w-4 text-ink-muted" />
                   <div className="flex-1">
-                    <span className="text-[var(--ink-muted)] block text-xs">Passageiros</span>
+                    <span className="text-ink-muted block text-xs">Passageiros</span>
                     <span className="font-semibold">{selectedBus.passenger_count || 0}/{selectedBus.capacity || 0}</span>
                   </div>
-                  <Clock className="h-4 w-4 text-[var(--ink-muted)]" />
+                  <Clock className="h-4 w-4 text-ink-muted" />
                   <div>
-                    <span className="text-[var(--ink-muted)] block text-xs">Última atualização</span>
+                    <span className="text-ink-muted block text-xs">Última atualização</span>
                     <span className="font-semibold text-xs">
                       {formatRelativeTime(selectedBus.last_update)}
                     </span>
@@ -826,7 +826,7 @@ export const FleetMap = memo(function FleetMap({ companyId, transportadoraId, ro
 
       {/* Legenda */}
       <div className="absolute bottom-2 left-2 sm:bottom-6 sm:left-6 z-10">
-        <Card className="p-2 sm:p-4 bg-card/50 backdrop-blur-sm border-[var(--border)] shadow-xl">
+        <Card className="p-2 sm:p-4 bg-card/50 backdrop-blur-sm border-border shadow-xl">
           <div className="space-y-1 sm:space-y-2 text-xs sm:text-sm font-medium">
             <div className="flex items-center gap-2 sm:gap-3">
               <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-full" style={{ backgroundColor: busColors.green }}></div>

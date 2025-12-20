@@ -9,7 +9,7 @@ import { notifyError, notifySuccess } from '@/lib/toast'
  */
 export interface UseFileUploadOptions {
     /** Nome do bucket no Supabase Storage */
-    bucket: 'vehicle-documents' | 'driver-documents' | 'carrier-documents' | 'company-documents' | 'vehicle-photos' | 'avatars'
+    bucket: 'vehicle-documents' | 'motorista-documents' | 'transportadora-documents' | 'company-documents' | 'vehicle-photos' | 'avatars'
     /** Tamanho máximo em MB (padrão: 10) */
     maxSize?: number
     /** Tipos de arquivo permitidos (padrão: PDF e imagens) */

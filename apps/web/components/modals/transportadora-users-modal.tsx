@@ -33,7 +33,7 @@ export function TransportadoraUsersModal({ carrier, isOpen, onClose, onSave }: T
   const loadUsers = async () => {
     try {
       setLoading(true)
-      const response = await fetch(`/api/admin/transportadora/${carrier.id}/users`)
+      const response = await fetch(`/api/admin/transportadora/${transportadora.id}/users`)
       if (response.ok) {
         const result = await response.json()
         setUsers(result.users || [])
@@ -111,7 +111,7 @@ export function TransportadoraUsersModal({ carrier, isOpen, onClose, onSave }: T
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="w-[95vw] sm:w-[90vw] max-w-2xl max-h-[90vh] overflow-y-auto p-4 sm:p-6 mx-auto">
         <DialogHeader className="pb-4 sm:pb-6">
-          <DialogTitle className="text-xl sm:text-2xl font-bold break-words">Usuários - {carrier.name}</DialogTitle>
+          <DialogTitle className="text-xl sm:text-2xl font-bold break-words">Usuários - {transportadora.name}</DialogTitle>
           <DialogDescription className="text-sm text-muted-foreground">
             Gerencie os logins de acesso para esta transportadora.
           </DialogDescription>

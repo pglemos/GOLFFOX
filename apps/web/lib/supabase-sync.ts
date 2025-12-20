@@ -145,7 +145,7 @@ function validateSyncData(
       }
       break
 
-    case 'driver':
+    case 'motorista':
       if (!data.name) errors.push('Nome é obrigatório')
       if (!data.email) errors.push('Email é obrigatório')
       if (data.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
@@ -223,7 +223,7 @@ function mapDataToSupabase(
       }
       break
 
-    case 'driver':
+    case 'motorista':
       // Garantir role
       if (!mapped.role) mapped.role = 'motorista'
       // Garantir boolean
@@ -304,7 +304,7 @@ async function executeSyncWithRetry(
     // Determinar tabela baseada no tipo de recurso
     const tableMap: Record<string, string> = {
       vehicle: 'vehicles',
-      driver: 'users',
+      motorista: 'users',
       route: 'routes',
       maintenance: 'gf_vehicle_maintenance',
       checklist: 'gf_vehicle_checklists',

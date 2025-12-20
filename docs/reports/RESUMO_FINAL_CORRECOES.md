@@ -11,7 +11,7 @@
 | ID | Correção | Arquivo | Status |
 |----|----------|---------|--------|
 | FIX-001 | Middleware com autenticação e role check | `middleware.ts` | ✅ |
-| FIX-002 | Branding operador - remover "GOLF FOX" | `operator-logo-section.tsx` | ✅ |
+| FIX-002 | Branding operador - remover "GOLF FOX" | `operador-logo-section.tsx` | ✅ |
 | FIX-003 | RLS em gf_user_company_map | `v49_protect_user_company_map.sql` | ✅ |
 | FIX-004 | Remover ignoreBuildErrors | `next.config.js` | ✅ |
 | FIX-005 | Padding 20% no fitBounds | `fleet-map.tsx` | ✅ |
@@ -44,7 +44,7 @@
 
 ### Arquivos Modificados
 1. `web-app/middleware.ts` - Autenticação e role check
-2. `web-app/components/operator/operator-logo-section.tsx` - Branding
+2. `web-app/components/operador/operador-logo-section.tsx` - Branding
 3. `web-app/next.config.js` - Type-safety e lint
 4. `web-app/components/fleet-map.tsx` - Padding e acessibilidade
 5. `vercel.json` - Cron jobs
@@ -63,9 +63,9 @@
 ```
 
 ### 2. Testar Middleware
-- Acessar `/operator` sem login → deve redirecionar
-- Acessar `/admin` como operator → deve redirecionar para `/unauthorized`
-- Acessar `/operator` como admin → deve permitir
+- Acessar `/operador` sem login → deve redirecionar
+- Acessar `/admin` como operador → deve redirecionar para `/unauthorized`
+- Acessar `/operador` como admin → deve permitir
 
 ### 3. Validar Branding
 - Login como operador → verificar se exibe logo/nome da empresa
@@ -80,7 +80,7 @@ npm run build  # Deve falhar se houver erros TS/ESLint
 ### 5. Aplicar Validação em Outras Rotas API
 Usar `requireAuth()` ou `requireCompanyAccess()` nas rotas:
 - `/api/costs/*`
-- `/api/operator/*`
+- `/api/operador/*`
 - `/api/admin/*`
 - `/api/reports/*`
 
@@ -101,7 +101,7 @@ Usar `requireAuth()` ou `requireCompanyAccess()` nas rotas:
 
 ## ✅ Checklist de Validação
 
-- [x] Middleware protege rotas `/admin` e `/operator`
+- [x] Middleware protege rotas `/admin` e `/operador`
 - [x] Branding "GOLF FOX" removido do painel operador
 - [x] Migration v49 criada (aplicar no Supabase)
 - [x] Type-safety habilitado em produção

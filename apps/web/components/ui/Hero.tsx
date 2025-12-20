@@ -15,7 +15,7 @@ const Hero = React.forwardRef<HTMLDivElement, HeroProps>(
         ref={ref}
         className={cn(
           "relative overflow-hidden p-8 md:p-12 rounded-lg shadow-[0_2px_8px_rgba(0,0,0,0.1)] max-w-[1200px] mx-auto",
-          glass ? "hero-glass" : "bg-gradient-to-br from-[var(--accent)] via-[var(--accent-soft)] to-[var(--brand)]",
+          glass ? "hero-glass" : "bg-gradient-to-br from-accent-custom via-accent-custom-soft to-brand",
           className
         )}
         {...props}

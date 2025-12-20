@@ -32,7 +32,7 @@ import { Label } from "@/components/ui/label"
 
 // Lazy load modal
 const DriverModal = dynamic(
-    () => import("@/components/modals/driver-modal").then(m => ({ default: m.DriverModal })),
+    () => import("@/components/modals/motorista-modal").then(m => ({ default: m.DriverModal })),
     { ssr: false, loading: () => null }
 )
 
@@ -79,7 +79,7 @@ export default function TransportadoraMotoristasPage() {
             id: "",
             name: "",
             email: "",
-            role: "driver",
+            role: "motorista",
             transportadora_id: newDriverCarrierId,
             transportadora_name: transportadoras.find(t => t.id === newDriverCarrierId)?.name
         })
@@ -230,9 +230,9 @@ export default function TransportadoraMotoristasPage() {
                                                     <div className="p-1 rounded-lg bg-gradient-to-br from-[var(--brand-light)] to-[var(--brand-soft)]">
                                                         <Users className="h-4 w-4 text-[var(--brand)]" />
                                                     </div>
-                                                    <h3 className="font-bold text-base sm:text-lg group-hover:text-[var(--brand)] transition-colors">{driver.name}</h3>
-                                                    <Badge variant={driver.is_active !== false ? "default" : "secondary"}>
-                                                        {driver.is_active !== false ? "Ativo" : "Inativo"}
+                                                    <h3 className="font-bold text-base sm:text-lg group-hover:text-[var(--brand)] transition-colors">{motorista.name}</h3>
+                                                    <Badge variant={motorista.is_active !== false ? "default" : "secondary"}>
+                                                        {motorista.is_active !== false ? "Ativo" : "Inativo"}
                                                     </Badge>
                                                 </div>
                                                 <div className="space-y-1 text-sm text-[var(--ink-muted)]">

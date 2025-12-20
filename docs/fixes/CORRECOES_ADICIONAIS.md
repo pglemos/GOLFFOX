@@ -101,11 +101,11 @@ As seguintes rotas devem usar `requireAuth()` ou `requireCompanyAccess()`:
    - `/api/costs/budgets` - GET/POST/PUT/DELETE
 
 2. **Rotas de Operador:**
-   - `/api/operator/create-employee` - POST
-   - `/api/operator/optimize-route` - POST
+   - `/api/operador/create-employee` - POST
+   - `/api/operador/optimize-route` - POST
 
 3. **Rotas de Admin:**
-   - `/api/admin/create-operator` - POST
+   - `/api/admin/create-operador` - POST
    - `/api/admin/generate-stops` - POST
    - `/api/admin/optimize-route` - POST
 
@@ -129,7 +129,7 @@ export async function POST(request: NextRequest) {
   const { companyId } = await request.json()
   
   // Validar autenticação
-  const authError = await requireAuth(request, ['operator', 'admin'])
+  const authError = await requireAuth(request, ['operador', 'admin'])
   if (authError) return authError
   
   // OU validar acesso à empresa
@@ -149,7 +149,7 @@ export async function POST(request: NextRequest) {
 # 1. Fazer login e obter cookie
 curl -X POST http://localhost:3000/api/auth/set-session \
   -H "Content-Type: application/json" \
-  -d '{"user": {"id": "...", "email": "...", "role": "operator", "accessToken": "..."}}'
+  -d '{"user": {"id": "...", "email": "...", "role": "operador", "accessToken": "..."}}'
 
 # 2. Acessar rota protegida com cookie
 curl -I http://localhost:3000/operator \

@@ -13,7 +13,7 @@ Todos os testes foram executados com sucesso e todas as correções necessárias
 
 ## ✅ Testes Realizados
 
-### 1. Dashboard Principal (`/carrier`)
+### 1. Dashboard Principal (`/transportadora`)
 - **Status:** ✅ Passou
 - **Funcionalidades Testadas:**
   - Carregamento de KPIs (Frota, Em Rota, Motoristas, Alertas, Custos, Viagens)
@@ -29,7 +29,7 @@ Todos os testes foram executados com sucesso e todas as correções necessárias
 - ✅ Altura responsiva do mapa no dashboard (h-64 md:h-80 lg:h-96)
 - ✅ Indicadores visuais melhorados para KPIs
 
-### 2. Página de Motoristas (`/carrier/motoristas`)
+### 2. Página de Motoristas (`/transportadora/motoristas`)
 - **Status:** ✅ Passou
 - **Funcionalidades Testadas:**
   - Listagem de motoristas da transportadora
@@ -40,11 +40,11 @@ Todos os testes foram executados com sucesso e todas as correções necessárias
 
 **Correções Aplicadas:**
 - ✅ Upload de documentos funcionando com URLs assinadas
-- ✅ Integração com Supabase Storage (bucket `carrier-documents`)
+- ✅ Integração com Supabase Storage (bucket `transportadora-documents`)
 - ✅ Validação de tipos de arquivo (PDF, JPG, PNG)
 - ✅ Limite de tamanho de 10MB
 
-### 3. Página de Veículos (`/carrier/veiculos`)
+### 3. Página de Veículos (`/transportadora/veiculos`)
 - **Status:** ✅ Passou
 - **Funcionalidades Testadas:**
   - Listagem de veículos da transportadora
@@ -52,7 +52,7 @@ Todos os testes foram executados com sucesso e todas as correções necessárias
   - Aba de Manutenções com cadastro
   - Link para visualizar veículo no mapa
 
-### 4. Página de Custos (`/carrier/custos`)
+### 4. Página de Custos (`/transportadora/custos`)
 - **Status:** ✅ Passou
 - **Funcionalidades Testadas:**
   - Filtros de data (início e fim)
@@ -67,7 +67,7 @@ Todos os testes foram executados com sucesso e todas as correções necessárias
 - ✅ Formatação de moeda brasileira (BRL)
 - ✅ Cálculos de percentuais corretos
 
-### 5. Página de Alertas (`/carrier/alertas`)
+### 5. Página de Alertas (`/transportadora/alertas`)
 - **Status:** ✅ Passou
 - **Funcionalidades Testadas:**
   - Estatísticas de alertas (Total, Críticos, Vencidos, Atenção)
@@ -76,7 +76,7 @@ Todos os testes foram executados com sucesso e todas as correções necessárias
   - Links para visualizar documentos/veículos relacionados
   - Botão de enviar email (API de notificações - implementar futuramente)
 
-### 6. Página de Mapa (`/carrier/mapa`)
+### 6. Página de Mapa (`/transportadora/mapa`)
 - **Status:** ✅ Passou
 - **Funcionalidades Testadas:**
   - Visualização de veículos em tempo real no mapa
@@ -114,15 +114,15 @@ Todos os testes foram executados com sucesso e todas as correções necessárias
 **Arquivo:** `database/migrations/update_gf_map_snapshot_carrier_id.sql`
 
 ### 2. Upload de Arquivos no Storage
-**Problema:** Bucket `carrier-documents` é privado, mas estava usando `getPublicUrl()`.
+**Problema:** Bucket `transportadora-documents` é privado, mas estava usando `getPublicUrl()`.
 
 **Solução:**
 - ✅ Implementado uso de URLs assinadas (`createSignedUrl`) válidas por 1 ano
-- ✅ Criada API auxiliar `/api/carrier/storage/signed-url` para gerar URLs assinadas sob demanda
+- ✅ Criada API auxiliar `/api/transportadora/storage/signed-url` para gerar URLs assinadas sob demanda
 
 **Arquivos:**
-- `apps/web/app/api/carrier/upload/route.ts`
-- `apps/web/app/api/carrier/storage/signed-url/route.ts` (novo)
+- `apps/web/app/api/transportadora/upload/route.ts`
+- `apps/web/app/api/transportadora/storage/signed-url/route.ts` (novo)
 
 ### 3. Dashboard - Consulta de Custos
 **Problema:** Query estava comparando string `YYYY-MM` com timestamp.
@@ -131,7 +131,7 @@ Todos os testes foram executados com sucesso e todas as correções necessárias
 - ✅ Corrigida para usar `gte` e `lt` com timestamps ISO
 - ✅ Criado `currentMonthStart` e `currentMonthEnd` corretamente
 
-**Arquivo:** `apps/web/app/carrier/page.tsx`
+**Arquivo:** `apps/web/app/transportadora/page.tsx`
 
 ### 4. Estado dos KPIs
 **Problema:** Estado inicial não incluía todas as propriedades usadas.
@@ -139,7 +139,7 @@ Todos os testes foram executados com sucesso e todas as correções necessárias
 **Solução:**
 - ✅ Adicionadas propriedades `criticalAlerts`, `totalCostsThisMonth` e `totalTrips` ao estado inicial
 
-**Arquivo:** `apps/web/app/carrier/page.tsx`
+**Arquivo:** `apps/web/app/transportadora/page.tsx`
 
 ### 5. Visualização de Passageiros
 **Problema:** Dashboard não mostrava informação de passageiros na tabela.
@@ -150,7 +150,7 @@ Todos os testes foram executados com sucesso e todas as correções necessárias
 - ✅ Exibição também no painel lateral do mapa
 
 **Arquivos:**
-- `apps/web/app/carrier/page.tsx`
+- `apps/web/app/transportadora/page.tsx`
 - `apps/web/components/fleet-map.tsx`
 
 ---
@@ -244,7 +244,7 @@ Todos os testes foram executados com sucesso e todas as correções necessárias
 - ✅ `trip_passengers` - Passageiros embarcados
 
 ### Storage
-- ✅ Bucket `carrier-documents` criado (privado)
+- ✅ Bucket `transportadora-documents` criado (privado)
 - ✅ Políticas RLS configuradas para upload/download
 
 ---

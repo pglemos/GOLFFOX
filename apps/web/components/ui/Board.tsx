@@ -35,7 +35,7 @@ const BoardTitle = React.forwardRef<
   <h2
     ref={ref}
     className={cn(
-      "text-2xl font-bold text-[var(--ink-strong)]",
+      "text-2xl font-bold text-ink-strong",
       className
     )}
     {...props}

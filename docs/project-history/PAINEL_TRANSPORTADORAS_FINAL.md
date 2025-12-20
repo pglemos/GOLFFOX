@@ -66,7 +66,7 @@ ANTES:                      AGORA:
 
 | Ação | Descrição | Status |
 |------|-----------|--------|
-| **Criar Login** | Email, nome, senha → Role: "carrier" | ✅ |
+| **Criar Login** | Email, nome, senha → Role: "transportadora" | ✅ |
 | **Listar Usuários** | Todos os usuários da transportadora | ✅ |
 | **Excluir Usuário** | Remover acesso de um usuário | ✅ |
 | **Autenticação** | Integração com Supabase Auth | ✅ |
@@ -171,7 +171,7 @@ users {
   id: uuid (PK) -- Supabase Auth ID
   email: text (UNIQUE)
   name: text
-  role: 'carrier'
+  role: 'transportadora'
   carrier_id: uuid (FK → carriers)
   created_at: timestamptz
   updated_at: timestamptz
@@ -183,7 +183,7 @@ users {
   email: text
   name: text
   phone: text
-  role: 'driver'
+  role: 'motorista'
   carrier_id: uuid (FK → carriers)
   created_at: timestamptz
 }
@@ -236,7 +236,7 @@ users {
 6. Clica em "Criar Usuário"
 7. Sistema:
    ├─ Cria usuário no Supabase Auth ✅
-   ├─ Define role = 'carrier' ✅
+   ├─ Define role = 'transportadora' ✅
    ├─ Associa carrier_id ✅
    └─ Confirma email automaticamente ✅
 8. Notificação: "Usuário criado com sucesso" ✅
@@ -253,7 +253,7 @@ users {
    ├─ Nome do motorista ✅
    ├─ Email ✅
    ├─ Telefone ✅
-   └─ Badge com role "driver" ✅
+   └─ Badge com role "motorista" ✅
 5. Se não houver motoristas, exibe mensagem informativa ✅
 ```
 

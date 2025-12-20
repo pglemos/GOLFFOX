@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
     const data = await response.json()
     return NextResponse.json(data, { status: response.status })
   } catch (error) {
-    logError('Erro na rota create-carrier-login', { error }, 'CreateCarrierLoginAPI')
+    logError('Erro na rota create-transportadora-login', { error }, 'CreateCarrierLoginAPI')
     return NextResponse.json(
       { error: 'Erro ao processar requisição' },
       { status: 500 }

@@ -274,7 +274,7 @@ CRON_SECRET=e830db45672f9a1c0216de1e4783c9b1f2e2588a9553235c4c4ed3c39f643a69336c
 |----------|------|-----------|--------|
 | `NEXT_PUBLIC_BASE_URL` | Public | URL base da aplicação (usado em links e redirecionamentos) | `http://localhost:3000` |
 | `NEXT_PUBLIC_AUTH_ENDPOINT` | Public | Endpoint de autenticação personalizado | `/api/auth/login` |
-| `NEXT_PUBLIC_LOGGED_URL` | Public | URL padrão após login bem-sucedido | `/operator` |
+| `NEXT_PUBLIC_LOGGED_URL` | Public | URL padrão após login bem-sucedido | `/operador` |
 | `NEXT_PUBLIC_DISABLE_MIDDLEWARE` | Public | Desabilitar middleware de autenticação (útil para testes) | `false` |
 
 ### Banco de Dados (Avançado)

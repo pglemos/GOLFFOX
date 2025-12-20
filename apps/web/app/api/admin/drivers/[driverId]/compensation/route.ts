@@ -42,6 +42,7 @@ interface RouteParams {
 export async function GET(request: NextRequest, { params }: RouteParams) {
     try {
         const { driverId } = await params
+        const supabaseAdmin = getSupabaseAdmin()
 
         if (!driverId) {
             return NextResponse.json(
@@ -68,7 +69,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         // Buscar compensação ativa
         const { data: compensation, error } = await supabaseAdmin
             .from('gf_driver_compensation')
-            .select('*')
+            .select('id, driver_id, base_salary, currency, payment_frequency, contract_type, has_meal_allowance, meal_allowance_value, has_transport_allowance, transport_allowance_value, has_health_insurance, health_insurance_value, has_dental_insurance, dental_insurance_value, has_life_insurance, life_insurance_value, has_fuel_card, fuel_card_limit, other_benefits, start_date, end_date, is_active, notes, created_at, updated_at')
             .eq('driver_id', driverId)
             .eq('is_active', true)
             .single()
@@ -82,8 +83,9 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         }
 
         return NextResponse.json(compensation || null)
-    } catch (error) {
-        logError('Erro na API de compensação', { error, driverId, method: 'GET' }, 'DriverCompensationAPI')
+    } catch (error: any) {
+        const { driverId: errorDriverId } = await params
+        logError('Erro na API de compensação', { error, driverId: errorDriverId, method: 'GET' }, 'DriverCompensationAPI')
         return NextResponse.json(
             { error: 'Erro interno do servidor' },
             { status: 500 }
@@ -149,8 +151,8 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
         if (existing) {
             // Atualizar compensação existente
-            const { data: updated, error: updateError } = await supabaseAdmin
-                .from('gf_driver_compensation')
+            const { data: updated, error: updateError } = await (supabaseAdmin
+                .from('gf_driver_compensation') as any)
                 .update({
                     ...compensationData,
                     updated_at: new Date().toISOString(),
@@ -171,8 +173,8 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         }
 
         // Criar nova compensação
-        const { data: created, error: createError } = await supabaseAdmin
-            .from('gf_driver_compensation')
+        const { data: created, error: createError } = await (supabaseAdmin
+            .from('gf_driver_compensation') as any)
             .insert({
                 driver_id: driverId,
                 ...compensationData,
@@ -190,8 +192,9 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         }
 
         return NextResponse.json(created, { status: 201 })
-    } catch (error) {
-        logError('Erro na API de compensação', { error, driverId, method: 'POST' }, 'DriverCompensationAPI')
+    } catch (error: any) {
+        const { driverId: errorDriverId } = await params
+        logError('Erro na API de compensação', { error, driverId: errorDriverId, method: 'POST' }, 'DriverCompensationAPI')
         return NextResponse.json(
             { error: 'Erro interno do servidor' },
             { status: 500 }
@@ -217,8 +220,8 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
         const supabaseAdmin = getSupabaseAdmin()
 
         // Desativar compensação (soft delete)
-        const { error: updateError } = await supabaseAdmin
-            .from('gf_driver_compensation')
+        const { error: updateError } = await (supabaseAdmin
+            .from('gf_driver_compensation') as any)
             .update({
                 is_active: false,
                 end_date: new Date().toISOString().split('T')[0],
@@ -236,8 +239,9 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
         }
 
         return NextResponse.json({ success: true })
-    } catch (error) {
-        logError('Erro na API de compensação', { error, driverId, method: 'DELETE' }, 'DriverCompensationAPI')
+    } catch (error: any) {
+        const { driverId: errorDriverId } = await params
+        logError('Erro na API de compensação', { error, driverId: errorDriverId, method: 'DELETE' }, 'DriverCompensationAPI')
         return NextResponse.json(
             { error: 'Erro interno do servidor' },
             { status: 500 }

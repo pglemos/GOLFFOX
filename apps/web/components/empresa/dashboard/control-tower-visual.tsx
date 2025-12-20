@@ -140,7 +140,7 @@ export function ControlTowerVisual({
                     >
                       {item.value}
                     </motion.p>
-                    <p className="text-sm font-medium text-[var(--ink-strong)] group-hover:text-[var(--brand)] transition-colors">
+                    <p className="text-sm font-medium text-ink-strong group-hover:text-brand transition-colors">
                       {item.label}
                     </p>
                   </CardContent>
@@ -157,7 +157,7 @@ export function ControlTowerVisual({
                   <p className={`text-3xl sm:text-4xl font-bold ${item.color} mb-2 opacity-60`}>
                     {item.value}
                   </p>
-                  <p className="text-sm font-medium text-[var(--ink-muted)]">
+                  <p className="text-sm font-medium text-ink-muted">
                     {item.label}
                   </p>
                 </CardContent>

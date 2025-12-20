@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
     } else if (email) {
       authEmail = email
     } else {
-      authEmail = `driver.${Date.now()}@temp.golffox.com`
+      authEmail = `motorista.${Date.now()}@temp.golffox.com`
     }
 
     // Senha: últimos 6 dígitos do CPF ou '123456' se não houver CPF válido

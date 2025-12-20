@@ -135,7 +135,7 @@ flutter build ios --release
 2. Verifique acesso ao Dashboard `/admin`
 3. Teste o Mapa da Frota `/admin/mapa`
 4. Teste todas as 11 páginas do Admin
-5. Teste Portal do Operador `/operator`
+5. Teste Portal do Operador `/operador`
 
 ### 5.2 Banco de Dados
 

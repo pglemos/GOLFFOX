@@ -1,11 +1,11 @@
 ﻿import common from '@/i18n/common.json'
-import operator from '@/i18n/operator.json'
+import operador from '@/i18n/operador.json'
 import admin from '@/i18n/admin.json'
 import transportadora from '@/i18n/transportadora.json'
 import ptBR from '@/i18n/pt-BR.json'
 import enUS from '@/i18n/en-US.json'
 
-type Namespace = 'common' | 'operator' | 'admin' | 'transportadora'
+type Namespace = 'common' | 'operador' | 'admin' | 'transportadora'
 
 type Locale = 'pt-BR' | 'en-US'
 

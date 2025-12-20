@@ -1,7 +1,7 @@
 import { PUT } from '@/app/api/admin/users/[userId]/route'
 import { createAdminRequest } from '../../../helpers/api-test-helpers'
 import { mockSupabaseClient } from '../../../helpers/mock-supabase'
-import { createTestUser } from '../../../helpers/test-data'
+import { NextRequest } from 'next/server'
 
 jest.mock('@supabase/supabase-js', () => ({
   createClient: jest.fn(() => mockSupabaseClient),
@@ -17,84 +17,153 @@ jest.mock('@/lib/api-auth', () => ({
   }),
 }))
 
+jest.mock('@/lib/next-cache', () => ({
+  invalidateEntityCache: jest.fn(async () => {}),
+}))
+
 describe('PUT /api/admin/users/[userId]', () => {
+  const userId = '123e4567-e89b-12d3-a456-426614174000'
+
   beforeEach(() => {
     jest.clearAllMocks()
     mockSupabaseClient.clear()
-    process.env.NEXT_PUBLIC_SUPABASE_URL = 'http://localhost:54321'
-    process.env.SUPABASE_SERVICE_ROLE_KEY = 'test-service-key'
   })
 
-  it('deve atualizar usuário com dados válidos', async () => {
-    const user = createTestUser({ role: 'operador' })
-    mockSupabaseClient.setTableData('users', [user])
+  it('deve atualizar usuário com sucesso', async () => {
+    const existingUser = {
+      id: userId,
+      email: 'user@example.com',
+    }
+
+    mockSupabaseClient.from.mockReturnValue({
+      select: jest.fn().mockReturnThis(),
+      eq: jest.fn().mockReturnThis(),
+      single: jest.fn().mockResolvedValue({
+        data: existingUser,
+        error: null,
+      }),
+      update: jest.fn().mockReturnThis(),
+    })
+
+    const updateData = {
+      name: 'Novo Nome',
+      email: 'newemail@example.com',
+      phone: '11999999999',
+    }
+
+    // Mock do update
+    const mockUpdate = {
+      eq: jest.fn().mockReturnThis(),
+      select: jest.fn().mockReturnThis(),
+      single: jest.fn().mockResolvedValue({
+        data: { ...existingUser, ...updateData },
+        error: null,
+      }),
+    }
+
+    mockSupabaseClient.from().update.mockReturnValue(mockUpdate)
 
     const req = createAdminRequest({
       method: 'PUT',
-      body: {
-        name: 'Nome Atualizado',
-        phone: '+5511999999999',
-      },
+      url: `http://localhost:3000/api/admin/users/${userId}`,
+      body: updateData,
     })
 
     const response = await PUT(req, {
-      params: Promise.resolve({ userId: user.id }),
+      params: Promise.resolve({ userId }),
     })
-    const data = await response.json()
 
     expect(response.status).toBe(200)
-    expect(data.success).toBe(true)
-    expect(data.user.name).toBe('Nome Atualizado')
+    const json = await response.json()
+    expect(json.success).toBe(true)
+    expect(json.user.name).toBe('Novo Nome')
   })
 
-  it('deve validar UUID', async () => {
+  it('deve retornar 400 se userId não for UUID válido', async () => {
+    const invalidUserId = 'invalid-id'
+
     const req = createAdminRequest({
       method: 'PUT',
-      body: { name: 'Teste' },
+      url: `http://localhost:3000/api/admin/users/${invalidUserId}`,
+      body: { name: 'Test' },
     })
 
     const response = await PUT(req, {
-      params: Promise.resolve({ userId: 'invalid-uuid' }),
+      params: Promise.resolve({ userId: invalidUserId }),
     })
-    const data = await response.json()
 
     expect(response.status).toBe(400)
-    expect(data.error).toBe('user_id deve ser um UUID válido')
+    const json = await response.json()
+    expect(json.error).toContain('UUID válido')
   })
 
-  it('deve retornar 404 se usuário não encontrado', async () => {
+  it('deve retornar 404 se usuário não existir', async () => {
+    mockSupabaseClient.from.mockReturnValue({
+      select: jest.fn().mockReturnThis(),
+      eq: jest.fn().mockReturnThis(),
+      single: jest.fn().mockResolvedValue({
+        data: null,
+        error: { message: 'Not found' },
+      }),
+    })
+
     const req = createAdminRequest({
       method: 'PUT',
-      body: { name: 'Teste' },
+      url: `http://localhost:3000/api/admin/users/${userId}`,
+      body: { name: 'Test' },
     })
 
     const response = await PUT(req, {
-      params: Promise.resolve({ userId: '00000000-0000-0000-0000-000000000000' }),
+      params: Promise.resolve({ userId }),
     })
-    const data = await response.json()
 
     expect(response.status).toBe(404)
-    expect(data.error).toBe('Usuário não encontrado')
+    const json = await response.json()
+    expect(json.error).toContain('não encontrado')
   })
 
-  it('deve validar email quando fornecido', async () => {
-    const user = createTestUser()
-    mockSupabaseClient.setTableData('users', [user])
+  it('deve retornar 400 se email for inválido', async () => {
+    const existingUser = {
+      id: userId,
+      email: 'user@example.com',
+    }
+
+    mockSupabaseClient.from.mockReturnValue({
+      select: jest.fn().mockReturnThis(),
+      eq: jest.fn().mockReturnThis(),
+      single: jest.fn().mockResolvedValue({
+        data: existingUser,
+        error: null,
+      }),
+    })
 
     const req = createAdminRequest({
       method: 'PUT',
-      body: {
-        email: 'email-invalido',
-      },
+      url: `http://localhost:3000/api/admin/users/${userId}`,
+      body: { email: 'invalid-email' },
     })
 
     const response = await PUT(req, {
-      params: Promise.resolve({ userId: user.id }),
+      params: Promise.resolve({ userId }),
     })
-    const data = await response.json()
 
     expect(response.status).toBe(400)
-    expect(data.error).toBe('Email inválido')
+    const json = await response.json()
+    expect(json.error).toContain('Email inválido')
+  })
+
+  it('deve retornar 403 se usuário não for admin', async () => {
+    const req = createAdminRequest({
+      method: 'PUT',
+      url: `http://localhost:3000/api/admin/users/${userId}`,
+      body: { name: 'Test' },
+      headers: { 'x-user-role': 'empresa' },
+    })
+
+    const response = await PUT(req, {
+      params: Promise.resolve({ userId }),
+    })
+
+    expect(response.status).toBe(403)
   })
 })
-

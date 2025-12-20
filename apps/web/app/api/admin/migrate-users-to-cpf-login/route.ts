@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
         const { data: users, error: usersError } = await supabase
             .from('users')
             .select('id, email, cpf, role, name')
-            .in('role', ['motorista', 'driver', 'passageiro', 'passenger', 'funcionario', 'operador'])
+            .in('role', ['motorista', 'motorista', 'passageiro', 'passageiro', 'funcionario', 'operador'])
             .not('cpf', 'is', null)
 
         if (usersError) {
@@ -46,9 +46,9 @@ export async function POST(request: NextRequest) {
 
             // Determinar o prefixo do email baseado no role
             let emailPrefix: string
-            if (['motorista', 'driver'].includes(user.role)) {
+            if (['motorista', 'motorista'].includes(user.role)) {
                 emailPrefix = 'motorista'
-            } else if (['passageiro', 'passenger'].includes(user.role)) {
+            } else if (['passageiro', 'passageiro'].includes(user.role)) {
                 emailPrefix = 'passageiro'
             } else {
                 emailPrefix = 'funcionario'
@@ -89,8 +89,8 @@ export async function POST(request: NextRequest) {
 
                 // Atualizar role na tabela users para o formato português se necessário
                 let newRole = user.role
-                if (user.role === 'driver') newRole = 'motorista'
-                if (user.role === 'passenger') newRole = 'passageiro'
+                if (user.role === 'motorista') newRole = 'motorista'
+                if (user.role === 'passageiro') newRole = 'passageiro'
 
                 if (newRole !== user.role) {
                     await supabase
@@ -128,7 +128,7 @@ export async function GET(request: NextRequest) {
         const { data: users, error } = await supabase
             .from('users')
             .select('id, email, cpf, role, name')
-            .in('role', ['motorista', 'driver', 'passageiro', 'passenger', 'funcionario', 'operador'])
+            .in('role', ['motorista', 'motorista', 'passageiro', 'passageiro', 'funcionario', 'operador'])
 
         if (error) {
             return NextResponse.json({ error: error.message }, { status: 500 })
@@ -138,8 +138,8 @@ export async function GET(request: NextRequest) {
             const cleanCpf = user.cpf?.replace(/\D/g, '') || ''
 
             let emailPrefix = 'funcionario'
-            if (['motorista', 'driver'].includes(user.role)) emailPrefix = 'motorista'
-            if (['passageiro', 'passenger'].includes(user.role)) emailPrefix = 'passageiro'
+            if (['motorista', 'motorista'].includes(user.role)) emailPrefix = 'motorista'
+            if (['passageiro', 'passageiro'].includes(user.role)) emailPrefix = 'passageiro'
 
             const expectedAuthEmail = cleanCpf.length >= 11 ? `${cleanCpf}@${emailPrefix}.golffox.app` : null
 

@@ -31,9 +31,9 @@
 **Script:** `scripts/test-middleware-auth.js`
 
 **Testes Incluídos:**
-1. Acessar `/operator` sem autenticação → deve redirecionar para `/login`
+1. Acessar `/operador` sem autenticação → deve redirecionar para `/login`
 2. Acessar `/admin` sem autenticação → deve redirecionar para `/login`
-3. Acessar `/operator` com cookie inválido → deve redirecionar
+3. Acessar `/operador` com cookie inválido → deve redirecionar
 4. Acessar rota pública `/login` → deve permitir acesso
 
 **Para executar:**
@@ -54,7 +54,7 @@ node scripts/test-middleware-auth.js
 1. `POST /api/costs/manual` → deve retornar 401 sem auth
 2. `GET /api/costs/manual` → deve retornar 401 sem auth
 3. `POST /api/costs/reconcile` → deve retornar 401 sem auth
-4. `POST /api/operator/create-employee` → deve retornar 401 sem auth
+4. `POST /api/operador/create-employee` → deve retornar 401 sem auth
 5. `POST /api/reports/schedule` → deve retornar 401 sem auth
 6. `GET /api/health` → deve permitir (rota pública)
 
@@ -137,7 +137,7 @@ node scripts/run-all-tests.js
 - [x] Dados existentes na tabela
 
 ### Middleware
-- [ ] Teste 1: `/operator` sem auth → redirect
+- [ ] Teste 1: `/operador` sem auth → redirect
 - [ ] Teste 2: `/admin` sem auth → redirect
 - [ ] Teste 3: Cookie inválido → redirect
 - [ ] Teste 4: Rota pública acessível
@@ -146,7 +146,7 @@ node scripts/run-all-tests.js
 - [ ] Teste 1: `POST /api/costs/manual` → 401
 - [ ] Teste 2: `GET /api/costs/manual` → 401
 - [ ] Teste 3: `POST /api/costs/reconcile` → 401
-- [ ] Teste 4: `POST /api/operator/create-employee` → 401
+- [ ] Teste 4: `POST /api/operador/create-employee` → 401
 - [ ] Teste 5: `POST /api/reports/schedule` → 401
 - [ ] Teste 6: `GET /api/health` → 200 (público)
 

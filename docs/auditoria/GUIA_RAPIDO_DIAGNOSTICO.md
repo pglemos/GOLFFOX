@@ -156,7 +156,7 @@ INSERT INTO public.users (
 VALUES (
   'ID_DO_AUTH_USERS',  -- ⚠️ SUBSTITUA AQUI
   'seu@email.com',     -- ⚠️ SUBSTITUA AQUI
-  'admin',             -- ou 'operator' ou 'carrier'
+  'admin',             -- ou 'operador' ou 'transportadora'
   true,
   NOW(),
   NOW()

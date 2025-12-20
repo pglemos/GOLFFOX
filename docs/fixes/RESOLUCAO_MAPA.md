@@ -87,7 +87,7 @@ DROP POLICY IF EXISTS "vehicles_insert_policy" ON public.vehicles;
 DROP POLICY IF EXISTS "vehicles_update_policy" ON public.vehicles;
 DROP POLICY IF EXISTS "vehicles_delete_policy" ON public.vehicles;
 DROP POLICY IF EXISTS "Admin full access vehicles" ON public.vehicles;
-DROP POLICY IF EXISTS "Carrier manage vehicles" ON public.vehicles;
+DROP POLICY IF EXISTS "transportadora manage vehicles" ON public.vehicles;
 DROP POLICY IF EXISTS "Others view vehicles" ON public.vehicles;
 DROP POLICY IF EXISTS "vehicles_admin_all" ON public.vehicles;
 DROP POLICY IF EXISTS "vehicles_company_read" ON public.vehicles;
@@ -117,7 +117,7 @@ CREATE POLICY "operator_select_company_vehicles" ON public.vehicles
     EXISTS (
       SELECT 1 FROM public.users 
       WHERE id = auth.uid() 
-      AND role = 'operator'
+      AND role = 'operador'
       AND company_id = vehicles.company_id
     )
   );
@@ -128,7 +128,7 @@ CREATE POLICY "operator_insert_company_vehicles" ON public.vehicles
     EXISTS (
       SELECT 1 FROM public.users 
       WHERE id = auth.uid() 
-      AND role = 'operator'
+      AND role = 'operador'
       AND company_id = vehicles.company_id
     )
   );
@@ -139,7 +139,7 @@ CREATE POLICY "operator_update_company_vehicles" ON public.vehicles
     EXISTS (
       SELECT 1 FROM public.users 
       WHERE id = auth.uid() 
-      AND role = 'operator'
+      AND role = 'operador'
       AND company_id = vehicles.company_id
     )
   )
@@ -147,7 +147,7 @@ CREATE POLICY "operator_update_company_vehicles" ON public.vehicles
     EXISTS (
       SELECT 1 FROM public.users 
       WHERE id = auth.uid() 
-      AND role = 'operator'
+      AND role = 'operador'
       AND company_id = vehicles.company_id
     )
   );

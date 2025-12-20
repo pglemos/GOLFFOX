@@ -34,8 +34,8 @@
 
 **Arquivos modificados:**
 - ✅ `apps/web/app/admin/configuracoes/page.tsx`
-- ✅ `apps/web/app/operator/configuracoes/page.tsx`
-- ✅ `apps/web/app/carrier/configuracoes/page.tsx`
+- ✅ `apps/web/app/operador/configuracoes/page.tsx`
+- ✅ `apps/web/app/transportadora/configuracoes/page.tsx`
 
 **Mudanças:**
 - ❌ Removida verificação de `supabase.auth.getSession()`

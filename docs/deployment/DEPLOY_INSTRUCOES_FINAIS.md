@@ -8,8 +8,8 @@
 ## ✅ Correções Aplicadas
 
 ### 1. Rotas API Protegidas
-- ✅ `/api/admin/create-operator` - Autenticação admin
-- ✅ `/api/operator/create-employee` - Autenticação operator/admin
+- ✅ `/api/admin/create-operador` - Autenticação admin
+- ✅ `/api/operador/create-employee` - Autenticação operador/admin
 - ✅ `/api/costs/import` - Validação de acesso à empresa
 - ✅ `/api/costs/manual` - Validação de acesso à empresa
 - ✅ `/api/costs/reconcile` - Autenticação
@@ -119,8 +119,8 @@ vercel --prod
    - Verificar redirecionamento
 
 3. **Testar Middleware:**
-   - Tentar acessar `/operator` sem login → deve redirecionar
-   - Tentar acessar `/admin` como operator → deve redirecionar
+   - Tentar acessar `/operador` sem login → deve redirecionar
+   - Tentar acessar `/admin` como operador → deve redirecionar
 
 4. **Verificar Logs:**
    - Vercel Dashboard → Deployments → [último deploy] → Functions Logs

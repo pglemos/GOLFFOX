@@ -32,7 +32,7 @@ Ao tentar criar empresa na aba `/admin/empresas`, o sistema retorna erro "Usuár
 2. `apps/web/app/api/auth/login/route.ts` - Criação de cookie otimizada
 3. `apps/web/app/api/admin/companies/route.ts` - Logs de debug
 4. `apps/web/app/api/admin/companies-list/route.ts` - Removido bypass em produção
-5. `apps/web/components/modals/create-operator-modal.tsx` - Adicionado credentials
+5. `apps/web/components/modals/create-operador-modal.tsx` - Adicionado credentials
 6. `apps/web/app/admin/empresas/page.tsx` - Adicionado credentials
 
 ## Teste de Validação

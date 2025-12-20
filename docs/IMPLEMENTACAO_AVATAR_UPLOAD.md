@@ -11,8 +11,8 @@ Implementação completa do sistema de upload de fotos de perfil (avatars) para 
 
 #### Arquivos Modificados:
 - `apps/web/app/admin/configuracoes/page.tsx`
-- `apps/web/app/operator/configuracoes/page.tsx`
-- `apps/web/app/carrier/configuracoes/page.tsx`
+- `apps/web/app/operador/configuracoes/page.tsx`
+- `apps/web/app/transportadora/configuracoes/page.tsx`
 
 #### Melhorias Implementadas:
 - ✅ Layout responsivo em grid (3 colunas desktop, 1 coluna mobile)

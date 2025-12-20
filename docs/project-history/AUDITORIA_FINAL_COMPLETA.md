@@ -56,13 +56,13 @@
 ### 🔴 #2: API Criar Empresa - Não Existe
 
 **Seção:** Admin → Empresas  
-**Endpoint:** `POST /api/admin/create-operator`  
+**Endpoint:** `POST /api/admin/create-operador`  
 **Status:** 404 Not Found
 
 **Código do Frontend:**
 ```typescript
-// apps/web/components/modals/create-operator-modal.tsx:129
-const response = await fetch('/api/admin/create-operator', {
+// apps/web/components/modals/create-operador-modal.tsx:129
+const response = await fetch('/api/admin/create-operador', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
@@ -75,7 +75,7 @@ const response = await fetch('/api/admin/create-operator', {
 **Busca no Backend:**
 ```bash
 # Resultado: 0 arquivos encontrados
-grep -r "create-operator" apps/web/app/api/
+grep -r "create-operador" apps/web/app/api/
 ```
 
 **Impacto:**  
@@ -341,7 +341,7 @@ Estados: 13+
 
 ### 🔴 HOJE (4-6 horas) - Bloqueadores:
 
-1. **Implementar `/api/admin/create-operator`** (2h)
+1. **Implementar `/api/admin/create-operador`** (2h)
    ```bash
    - Criar: apps/web/app/api/admin/create-operator/route.ts
    - Implementar: Lógica de criação empresa + operador

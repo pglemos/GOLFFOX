@@ -2,7 +2,7 @@
  * Metrics Collector
  * 
  * Coletor de métricas para monitoramento
- * Pode ser integrado com APM (Datadog, New Relic, etc.)
+ * Integrado com APM (Datadog)
  */
 
 import { debug, warn } from '@/lib/logger'
@@ -92,14 +92,20 @@ class MetricsCollector {
   }
 
   /**
-   * Enviar métrica para APM (se configurado)
+   * Enviar métrica para APM (Datadog)
    */
   private sendToAPM(metric: CounterMetric | GaugeMetric | HistogramMetric): void {
-    // TODO: Integrar com Datadog, New Relic, etc.
-    // Exemplo:
-    // if (process.env.DATADOG_API_KEY) {
-    //   datadogClient.increment(metric.name, metric.value, metric.tags)
-    // }
+    try {
+      // Importar dinamicamente para não quebrar se não estiver instalado
+      const { recordMetric } = require('../apm/datadog')
+      recordMetric(metric.name, metric.value, metric.tags)
+    } catch (error) {
+      // Se Datadog não estiver configurado, apenas logar em debug
+      debug('APM não disponível (métrica não enviada)', { 
+        name: metric.name, 
+        value: metric.value 
+      }, 'MetricsCollector')
+    }
   }
 
   /**

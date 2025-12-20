@@ -11,7 +11,7 @@
 ### ✅ BOAS NOTÍCIAS
 
 1. **Todas as APIs Backend EXISTEM e estão bem implementadas**
-   - ✅ `/api/admin/create-operator` - 544 linhas, robusto
+   - ✅ `/api/admin/create-operador` - 544 linhas, robusto
    - ✅ `/api/admin/transportadora/create` - 94 linhas, funcional
    - ✅ `/api/admin/transportadora/update` - existe
    

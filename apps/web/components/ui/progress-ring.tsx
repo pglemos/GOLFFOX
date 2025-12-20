@@ -32,7 +32,7 @@ export function ProgressRing({
           stroke="currentColor"
           strokeWidth={strokeWidth}
           fill="none"
-          className="text-[var(--bg-hover)]"
+          className="text-bg-hover"
         />
         <motion.circle
           cx={size / 2}

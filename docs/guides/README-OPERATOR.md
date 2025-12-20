@@ -4,9 +4,9 @@ Documentação completa do painel do operador multi-tenant do GOLFFOX.
 
 ## Visão Geral
 
-O painel do operador (`/operator`) é uma aplicação 100% multi-tenant que permite que operadores gerenciem a operação de transporte de uma ou mais empresas clientes. Todos os dados são isolados por `company_id` através de Row Level Security (RLS) e views seguras.
+O painel do operador (`/operador`) é uma aplicação 100% multi-tenant que permite que operadores gerenciem a operação de transporte de uma ou mais empresas clientes. Todos os dados são isolados por `company_id` através de Row Level Security (RLS) e views seguras.
 
-Nota de links: todas as URLs absolutas devem apontar para `https://golffox.vercel.app/operator` sem o parâmetro `company`. Qualquer acesso com `?company=` é automaticamente normalizado (middleware) preservando demais parâmetros de query.
+Nota de links: todas as URLs absolutas devem apontar para `https://golffox.vercel.app/operador` sem o parâmetro `company`. Qualquer acesso com `?company=` é automaticamente normalizado (middleware) preservando demais parâmetros de query.
 
 ## Arquitetura Multi-tenant
 
@@ -76,7 +76,7 @@ O `OperatorTenantProvider` gerencia:
 ### Uso
 
 ```typescript
-import { useOperatorTenant } from '@/components/providers/operator-tenant-provider'
+import { useOperatorTenant } from '@/components/providers/operador-tenant-provider'
 
 function MyComponent() {
   const { tenantCompanyId, companyName, logoUrl, switchTenant } = useOperatorTenant()
@@ -91,12 +91,12 @@ function MyComponent() {
 
 ## Funcionalidades
 
-### Dashboard (`/operator`)
+### Dashboard (`/operador`)
 
 - **KPIs em tempo real**: Viagens hoje, em andamento, concluídas, atrasos >5min, ocupação média, custo/dia, SLA D+0
 - **Torre de Controle**: Cards clicáveis para alertas (atrasos, veículos parados, desvios, socorros)
 
-### Funcionários (`/operator/funcionarios`)
+### Funcionários (`/operador/funcionarios`)
 
 - **Importação CSV PRO**:
   - Parse robusto com PapaParse
@@ -106,13 +106,13 @@ function MyComponent() {
   - Preview antes de importar
   - Relatório pós-importação (sucesso, erros, endereços não resolvidos)
 
-### Rotas (`/operator/rotas`)
+### Rotas (`/operador/rotas`)
 
 - Lista de rotas com filtros (turno, status, período)
 - Ações rápidas: Gerar Pontos, Otimizar, Ver no Mapa
 - Otimização via Google Directions + Distance Matrix (cached)
 
-### Mapa (`/operator/rotas/mapa`)
+### Mapa (`/operador/rotas/mapa`)
 
 - Polyline 4px #2E7D32 com sombra
 - Markers SVG: círculo (embarque), quadrado (desembarque), numerados
@@ -123,7 +123,7 @@ function MyComponent() {
 - Realtime: atualização a cada 5s com debounce 300ms
 - Clustering quando >50 markers
 
-### Custos (`/operator/custos`)
+### Custos (`/operador/custos`)
 
 - Visualização de custos via `v_operator_costs_secure`
 - Modal de conciliação:
@@ -133,7 +133,7 @@ function MyComponent() {
 - Gráficos (Recharts): evolução mensal, breakdown por rota/veículo/motorista
 - Export (CSV/Excel/PDF) com logo/nome da empresa
 
-### Relatórios (`/operator/relatorios`)
+### Relatórios (`/operador/relatorios`)
 
 - Catálogo de relatórios disponíveis
 - Agendamento via cron
@@ -143,13 +143,13 @@ function MyComponent() {
 
 ## Internacionalização (i18n)
 
-Todos os textos estão em `web-app/i18n/operator.json` (PT-BR).
+Todos os textos estão em `web-app/i18n/operador.json` (PT-BR).
 
 **Não há nenhuma string "GOLF FOX" na UI** (exceto rodapé legal quando obrigatório).
 
 ## Performance
 
-- **TTFB < 300ms** em `/operator`
+- **TTFB < 300ms** em `/operador`
 - **60 FPS** em interações de mapa e listas
 - **First content < 1.5s** (prod)
 - Lazy loading de mapas/relatórios/gráficos

@@ -14,7 +14,7 @@
 | `/api/costs/import` | POST | `requireCompanyAccess` | ✅ |
 | `/api/costs/manual` | POST | `requireCompanyAccess` | ✅ |
 | `/api/costs/manual` | GET | `requireCompanyAccess` | ✅ |
-| `/api/costs/reconcile` | POST | `requireAuth(['operator', 'admin'])` | ✅ |
+| `/api/costs/reconcile` | POST | `requireAuth(['operador', 'admin'])` | ✅ |
 | `/api/costs/export` | GET | `requireCompanyAccess` | ✅ |
 | `/api/costs/budgets` | GET | `requireCompanyAccess` | ✅ |
 | `/api/costs/budgets` | POST | `requireCompanyAccess` | ✅ |
@@ -28,7 +28,7 @@
 
 | Rota | Método | Validação | Status |
 |------|--------|-----------|--------|
-| `/api/operator/create-employee` | POST | `requireAuth(['operator', 'admin'])` | ✅ |
+| `/api/operador/create-employee` | POST | `requireAuth(['operador', 'admin'])` | ✅ |
 
 **Total:** 1 endpoint protegido
 
@@ -38,7 +38,7 @@
 
 | Rota | Método | Validação | Status |
 |------|--------|-----------|--------|
-| `/api/admin/create-operator` | POST | `requireAuth('admin')` | ✅ |
+| `/api/admin/create-operador` | POST | `requireAuth('admin')` | ✅ |
 
 **Total:** 1 endpoint protegido (apenas admin)
 
@@ -98,10 +98,10 @@
 - Retorna 403 se role incorreta
 
 **Rotas que usam:**
-- `/api/costs/reconcile` → `['operator', 'admin']`
-- `/api/operator/create-employee` → `['operator', 'admin']`
-- `/api/admin/create-operator` → `'admin'` (apenas admin)
-- `/api/reports/run` → `['admin', 'operator']` (quando sem companyId)
+- `/api/costs/reconcile` → `['operador', 'admin']`
+- `/api/operador/create-employee` → `['operador', 'admin']`
+- `/api/admin/create-operador` → `'admin'` (apenas admin)
+- `/api/reports/run` → `['admin', 'operador']` (quando sem companyId)
 
 ---
 
@@ -154,8 +154,8 @@ curl -X POST http://localhost:3000/api/costs/manual \
 - [x] `/api/costs/budgets` - GET protegido
 - [x] `/api/costs/budgets` - POST protegido
 - [x] `/api/costs/budgets` - DELETE protegido
-- [x] `/api/operator/create-employee` - POST protegido
-- [x] `/api/admin/create-operator` - POST protegido (admin only)
+- [x] `/api/operador/create-employee` - POST protegido
+- [x] `/api/admin/create-operador` - POST protegido (admin only)
 - [x] `/api/reports/schedule` - POST protegido
 - [x] `/api/reports/run` - POST protegido
 - [x] `/api/reports/dispatch` - POST protegido

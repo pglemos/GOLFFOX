@@ -7,9 +7,9 @@
 
 ## ✅ DESCOBERTAS IMPORTANTES
 
-### 1. API `/api/admin/create-operator` JÁ EXISTE!
+### 1. API `/api/admin/create-operador` JÁ EXISTE!
 
-**Localização:** `f:\GOLFFOX\apps\web\app\api\admin\create-operator\route.ts`  
+**Localização:** `f:\GOLFFOX\apps\web\app\api\admin\create-operador\route.ts`  
 **Linhas:** 544 linhas  
 **Status:** ✅ **IMPLEMENTADA E FUNCIONAL**
 
@@ -61,7 +61,7 @@ const { data: newCompany, error: companyError } = await supabaseAdmin
 
 ```typescript
 // Linha 129-137: Requisição para a API
-const response = await fetch('/api/admin/create-operator', {
+const response = await fetch('/api/admin/create-operador', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
@@ -110,7 +110,7 @@ WHERE table_name = 'companies';
 
 ### ✅ Ação 2: Melhorar Feedback de Erros no Modal
 
-**Arquivo:** `apps/web/components/modals/create-operator-modal.tsx`  
+**Arquivo:** `apps/web/components/modals/create-operador-modal.tsx`  
 **Objetivo:** Não fechar modal silenciosamente quando API falha
 
 **Alteração Necessária (Linhas 139-150):**

@@ -39,8 +39,8 @@ export const AppShell = memo(function AppShell({ user, children, panel }: AppShe
   // Detectar painel automaticamente se não fornecido (memoizado)
   const detectedPanel: 'admin' | 'operador' | 'transportadora' | 'empresa' = useMemo(() =>
     panel ||
-    ((pathname?.startsWith('/operador') || pathname?.startsWith('/operator')) ? 'operador' :
-      (pathname?.startsWith('/transportadora') || pathname?.startsWith('/carrier')) ? 'transportadora' :
+    ((pathname?.startsWith('/operador') || pathname?.startsWith('/operador')) ? 'operador' :
+      (pathname?.startsWith('/transportadora') || pathname?.startsWith('/transportadora')) ? 'transportadora' :
         (pathname?.startsWith('/empresa') || pathname?.startsWith('/company')) ? 'empresa' : 'admin'),
     [panel, pathname]
   )

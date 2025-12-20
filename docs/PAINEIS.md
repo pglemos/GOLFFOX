@@ -31,11 +31,11 @@ O sistema GOLF FOX possui 3 painéis web independentes, todos hospedados no mesm
 
 12 itens de navegação com animações premium.
 
-### 2. Painel do Operador (`/operator`)
+### 2. Painel do Operador (`/operador`)
 
-**Acesso**: Usuários com role `operator` ou `admin`
+**Acesso**: Usuários com role `operador` ou `admin`
 
-**URL**: https://golffox.vercel.app/operator
+**URL**: https://golffox.vercel.app/operador
 
 #### Funcionalidades
 
@@ -67,11 +67,11 @@ O sistema GOLF FOX possui 3 painéis web independentes, todos hospedados no mesm
 
 5 itens focados nas necessidades do operador.
 
-### 3. Painel da Transportadora (`/carrier`)
+### 3. Painel da Transportadora (`/transportadora`)
 
-**Acesso**: Usuários com role `carrier` ou `admin`
+**Acesso**: Usuários com role `transportadora` ou `admin`
 
-**URL**: https://golffox.vercel.app/carrier
+**URL**: https://golffox.vercel.app/transportadora
 
 #### Funcionalidades
 
@@ -126,18 +126,18 @@ O sistema GOLF FOX possui 3 painéis web independentes, todos hospedados no mesm
 - ✅ Gerenciamento de usuários e permissões
 
 ### Operator
-- ✅ Acesso ao painel `/operator`
+- ✅ Acesso ao painel `/operador`
 - ✅ Visualização de dados da empresa
 - ✅ Gerenciamento de funcionários
 - ❌ Bloqueado em `/admin`
-- ❌ Bloqueado em `/carrier`
+- ❌ Bloqueado em `/transportadora`
 
 ### Carrier
-- ✅ Acesso ao painel `/carrier`
+- ✅ Acesso ao painel `/transportadora`
 - ✅ Gestão da própria frota
 - ✅ Relatórios da transportadora
 - ❌ Bloqueado em `/admin`
-- ❌ Bloqueado em `/operator`
+- ❌ Bloqueado em `/operador`
 
 ### Driver (Motorista)
 - ❌ Sem acesso aos painéis web (usa app mobile)
@@ -156,8 +156,8 @@ O sistema GOLF FOX possui 3 painéis web independentes, todos hospedados no mesm
 3. Sistema verifica role no Supabase
 4. Redireciona automaticamente:
    - `admin` → `/admin`
-   - `operator` → `/operator`
-   - `carrier` → `/carrier`
+   - `operador` → `/operador`
+   - `transportadora` → `/transportadora`
    - Outros → `/login` (sem acesso)
 
 ### Middleware de Proteção
@@ -187,8 +187,8 @@ Todos os painéis usam o **mesmo projeto Supabase**:
 
 ### Filtros por Empresa/Transportadora
 
-- **Operator**: Filtra dados por `company_id`
-- **Carrier**: Filtra dados por `carrier_id`
+- **operador**: Filtra dados por `company_id`
+- **transportadora**: Filtra dados por `carrier_id`
 - **Admin**: Acessa todos os dados (sem filtros)
 
 ### Dados em Tempo Real

@@ -219,7 +219,7 @@ export function InteractiveMarkerHotspot({
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-xs sm:text-sm text-gray-900 truncate">{stop.passenger.name}</p>
+                  <p className="font-semibold text-xs sm:text-sm text-gray-900 truncate">{stop.passageiro.name}</p>
                   <Badge className={`text-xs ${passengerConfig.color}`}>
                     <PassengerIcon className={`w-3 h-3 mr-1 ${passengerConfig.iconColor}`} />
                     {passengerConfig.label}
@@ -260,7 +260,7 @@ export function InteractiveMarkerHotspot({
                       <div className="flex items-center gap-2 pt-3">
                         <Phone className="w-4 h-4 text-gray-500" />
                         <a 
-                          href={`tel:${stop.passenger.phone}`}
+                          href={`tel:${stop.passageiro.phone}`}
                           className="text-sm text-blue-600 hover:text-blue-800 transition-colors"
                         >
                           {stop.passenger.phone}
@@ -276,7 +276,7 @@ export function InteractiveMarkerHotspot({
                           <p className="text-xs text-gray-600 mb-1">Observações:</p>
                           <p className="text-sm text-gray-700 leading-relaxed">
                             {stop.passenger.observations.length > 140 
-                              ? `${stop.passenger.observations.slice(0, 140)}...`
+                              ? `${stop.passageiro.observations.slice(0, 140)}...`
                               : stop.passenger.observations
                             }
                           </p>

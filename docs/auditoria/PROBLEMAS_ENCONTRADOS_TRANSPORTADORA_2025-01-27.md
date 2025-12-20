@@ -64,7 +64,7 @@
 ### Relatórios (`/transportadora/relatorios`)
 - ✅ Estrutura de página implementada
 - ✅ Múltiplos tipos de relatórios
-- ✅ APIs: `/api/transportadora/reports/fleet-usage`, `/api/transportadora/reports/driver-performance`, `/api/transportadora/reports/trips`
+- ✅ APIs: `/api/transportadora/reports/fleet-usage`, `/api/transportadora/reports/motorista-performance`, `/api/transportadora/reports/trips`
 - ✅ Exportação: CSV, Excel, PDF
 - ✅ Corrigido uso de `transportadora_id` (removido `carrier_id`)
 
@@ -109,7 +109,7 @@
 - `/api/transportadora/vehicles/{id}/documents` - Documentos do veículo
 - `/api/transportadora/vehicles/{id}/maintenances` - Manutenções do veículo
 - `/api/transportadora/reports/fleet-usage` - Relatório de uso da frota
-- `/api/transportadora/reports/driver-performance` - Relatório de performance de motoristas
+- `/api/transportadora/reports/motorista-performance` - Relatório de performance de motoristas
 - `/api/transportadora/reports/trips` - Relatório de viagens
 
 ## ✅ Status Final

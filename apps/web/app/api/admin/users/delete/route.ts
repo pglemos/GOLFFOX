@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server'
 import { requireAuth } from '@/lib/api-auth'
+import { withRateLimit } from '@/lib/rate-limit'
 import { logger, logError } from '@/lib/logger'
 import { invalidateEntityCache } from '@/lib/next-cache'
 import { getSupabaseAdmin } from '@/lib/supabase-client'
@@ -8,13 +9,12 @@ import { validationErrorResponse, errorResponse, successResponse } from '@/lib/a
 export const runtime = 'nodejs'
 
 // Aceitar tanto DELETE quanto POST para compatibilidade
-export async function DELETE(request: NextRequest) {
+async function deleteHandler(request: NextRequest) {
   return handleDelete(request)
 }
 
-export async function POST(request: NextRequest) {
-  return handleDelete(request)
-}
+export const DELETE = withRateLimit(deleteHandler, 'sensitive')
+export const POST = withRateLimit(deleteHandler, 'sensitive')
 
 async function handleDelete(request: NextRequest) {
   try {

@@ -137,7 +137,7 @@ export function CreateOperatorModal({
         return
       }
 
-      const response = await fetch('/api/admin/create-operator', {
+      const response = await fetch('/api/admin/create-operador', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -155,13 +155,13 @@ export function CreateOperatorModal({
           const errorData = await response.json()
           errorMessage = errorData.error || errorData.message || errorMessage
           errorDetails = errorData.details || ''
-          console.error('❌ Erro da API create-operator:', {
+          console.error('❌ Erro da API create-operador:', {
             status: response.status,
             statusText: response.statusText,
             errorData
           })
         } catch (parseError) {
-          console.error('❌ Erro da API create-operator (sem JSON):', {
+          console.error('❌ Erro da API create-operador (sem JSON):', {
             status: response.status,
             statusText: response.statusText
           })
@@ -190,7 +190,7 @@ export function CreateOperatorModal({
 
       if (!result.companyId && !result.company_id) {
         const errorMsg = 'Resposta inválida da API: companyId não encontrado'
-        console.error('❌ Resposta da API create-operator:', result)
+        console.error('❌ Resposta da API create-operador:', result)
         notifyError(new Error(errorMsg), errorMsg)
         setLoading(false)
         setProgress('')

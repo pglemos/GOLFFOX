@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
       },
       mobile: {
         stack: "flutter3.24",
-        features: ["driver", "passenger", "operador", "admin"],
+        features: ["motorista", "passageiro", "operador", "admin"],
         tem_tracking_service: false // precisa verificar
       },
       db: {

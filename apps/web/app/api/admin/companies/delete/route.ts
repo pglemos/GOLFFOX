@@ -1,4 +1,4 @@
-import { NextRequest } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { requireAuth } from '@/lib/api-auth'
 import { logger, logError } from '@/lib/logger'
 import { invalidateEntityCache } from '@/lib/next-cache'
@@ -51,8 +51,8 @@ async function handleDelete(request: NextRequest) {
     // ORDEM CRÍTICA DE EXCLUSÃO:
     // 1. Atualizar users para setar company_id = NULL (pode não ter ON DELETE SET NULL)
     logger.log('   1. Atualizando users (setando company_id para NULL)...')
-    const { error: usersUpdateError } = await supabaseAdmin
-      .from('users')
+    const { error: usersUpdateError } = await (supabaseAdmin
+      .from('users') as any)
       .update({ company_id: null })
       .eq('company_id', companyId)
 
@@ -66,8 +66,8 @@ async function handleDelete(request: NextRequest) {
     logger.log('   2. Excluindo dependências...')
     
     // Excluir routes (e suas dependências serão excluídas via CASCADE)
-    const { error: routesError } = await supabaseAdmin
-      .from('routes')
+    const { error: routesError } = await (supabaseAdmin
+      .from('routes') as any)
       .delete()
       .eq('company_id', companyId)
 
@@ -95,8 +95,8 @@ async function handleDelete(request: NextRequest) {
       // Algumas tabelas podem usar empresa_id em vez de company_id
       const columnName = table === 'gf_service_requests' ? 'empresa_id' : 'company_id'
       
-      const { error: depError } = await supabaseAdmin
-        .from(table)
+      const { error: depError } = await (supabaseAdmin
+        .from(table) as any)
         .delete()
         .eq(columnName, companyId)
 
@@ -109,8 +109,8 @@ async function handleDelete(request: NextRequest) {
 
     // 3. Excluir empresa permanentemente
     logger.log('   3. Excluindo empresa...')
-    const { data, error } = await supabaseAdmin
-      .from('companies')
+    const { data, error } = await (supabaseAdmin
+      .from('companies') as any)
       .delete()
       .eq('id', companyId)
       .select()

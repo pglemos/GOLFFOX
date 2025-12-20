@@ -66,7 +66,7 @@
 
 ### 🔴 CRÍTICO: Criar Bucket no Supabase Storage
 
-**Nome:** `carrier-documents`
+**Nome:** `transportadora-documents`
 
 **Como fazer:**
 1. Acesse: https://app.supabase.com
@@ -74,7 +74,7 @@
 3. Vá em: **Storage** → **Buckets**
 4. Clique em **New Bucket**
 5. Configure:
-   - **Name:** `carrier-documents`
+   - **Name:** `transportadora-documents`
    - **Public bucket:** ❌ **DESABILITADO** (deixe desmarcado - bucket privado)
    - **File size limit:** `10 MB` (ou maior se necessário)
    - **Allowed MIME types:** `image/jpeg,image/png,application/pdf`
@@ -110,19 +110,19 @@
 Após criar o bucket e verificar o Realtime, teste:
 
 1. **Upload de Arquivo:**
-   - Acesse `/carrier/motoristas` → Aba "Documentos"
+   - Acesse `/transportadora/motoristas` → Aba "Documentos"
    - Clique em "Upload Documento"
    - Faça upload de um arquivo PDF/JPEG
    - Verifique se o arquivo aparece na lista
 
 2. **Mapa em Tempo Real:**
-   - Acesse `/carrier/mapa`
+   - Acesse `/transportadora/mapa`
    - Abra em duas abas diferentes
    - Atualize posição de um veículo em uma aba
    - Verifique se a outra aba atualiza automaticamente
 
 3. **Alertas de Vencimento:**
-   - Acesse `/carrier/alertas`
+   - Acesse `/transportadora/alertas`
    - Verifique se os alertas são exibidos corretamente
 
 ---
@@ -145,7 +145,7 @@ Após criar o bucket e verificar o Realtime, teste:
 **Todas as migrations foram aplicadas com sucesso via MCP Supabase!**
 
 Apenas resta:
-1. ✅ Criar o bucket `carrier-documents` no Storage (1 minuto)
+1. ✅ Criar o bucket `transportadora-documents` no Storage (1 minuto)
 2. ✅ Verificar se Realtime está habilitado (1 minuto)
 
 **Total de tempo restante:** ~2 minutos

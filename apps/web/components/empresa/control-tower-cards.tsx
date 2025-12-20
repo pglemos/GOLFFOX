@@ -20,7 +20,7 @@ export const ControlTowerCards = memo(function ControlTowerCards({
 }: ControlTowerCardsProps) {
   const cards = [
     {
-      label: t('operator', 'control_tower_delays'),
+      label: t('operador', 'control_tower_delays'),
       value: delays,
       icon: AlertCircle,
       color: 'text-red-500',
@@ -28,7 +28,7 @@ export const ControlTowerCards = memo(function ControlTowerCards({
       href: '/operador/alertas?type=route_delayed'
     },
     {
-      label: t('operator', 'control_tower_stopped'),
+      label: t('operador', 'control_tower_stopped'),
       value: stoppedVehicles,
       icon: Truck,
       color: 'text-orange-500',
@@ -36,7 +36,7 @@ export const ControlTowerCards = memo(function ControlTowerCards({
       href: '/operador/alertas?type=bus_stopped'
     },
     {
-      label: t('operator', 'control_tower_deviations'),
+      label: t('operador', 'control_tower_deviations'),
       value: routeDeviations,
       icon: Route,
       color: 'text-yellow-500',
@@ -44,7 +44,7 @@ export const ControlTowerCards = memo(function ControlTowerCards({
       href: '/operador/alertas?type=deviation'
     },
     {
-      label: t('operator', 'control_tower_assistance'),
+      label: t('operador', 'control_tower_assistance'),
       value: openAssistance,
       icon: HelpCircle,
       color: 'text-blue-500',

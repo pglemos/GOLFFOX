@@ -14,12 +14,12 @@
 - [ ] Tentar login com credenciais inválidas → deve mostrar erro
 
 ### Middleware de Proteção
-- [ ] Acessar `/operator` sem login → deve redirecionar para `/login`
+- [ ] Acessar `/operador` sem login → deve redirecionar para `/login`
 - [ ] Acessar `/admin` sem login → deve redirecionar para `/login`
-- [ ] Fazer login como `operator` e acessar `/operator` → deve funcionar
-- [ ] Fazer login como `operator` e tentar acessar `/admin` → deve redirecionar para `/unauthorized`
+- [ ] Fazer login como `operador` e acessar `/operador` → deve funcionar
+- [ ] Fazer login como `operador` e tentar acessar `/admin` → deve redirecionar para `/unauthorized`
 - [ ] Fazer login como `admin` e acessar `/admin` → deve funcionar
-- [ ] Fazer login como `admin` e acessar `/operator` → deve funcionar
+- [ ] Fazer login como `admin` e acessar `/operador` → deve funcionar
 
 ### Cookies de Sessão
 - [ ] Verificar se cookie `golffox-session` é criado após login
@@ -46,14 +46,14 @@
 - [ ] `POST /api/costs/reconcile` com auth → deve funcionar
 
 ### APIs de Operador
-- [ ] `POST /api/operator/create-employee` sem auth → deve retornar 401
-- [ ] `POST /api/operator/create-employee` como operator → deve funcionar
-- [ ] `POST /api/operator/create-employee` como admin → deve funcionar
+- [ ] `POST /api/operador/create-employee` sem auth → deve retornar 401
+- [ ] `POST /api/operador/create-employee` como operador → deve funcionar
+- [ ] `POST /api/operador/create-employee` como admin → deve funcionar
 
 ### APIs de Admin
-- [ ] `POST /api/admin/create-operator` sem auth → deve retornar 401
-- [ ] `POST /api/admin/create-operator` como operator → deve retornar 403
-- [ ] `POST /api/admin/create-operator` como admin → deve funcionar
+- [ ] `POST /api/admin/create-operador` sem auth → deve retornar 401
+- [ ] `POST /api/admin/create-operador` como operador → deve retornar 403
+- [ ] `POST /api/admin/create-operador` como admin → deve funcionar
 
 ---
 

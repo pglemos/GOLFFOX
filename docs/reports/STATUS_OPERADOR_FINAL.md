@@ -4,16 +4,16 @@
 
 ### 1. Modais e Funcionalidades CRUD
 
-#### **Funcionários (`/operator/funcionarios`)**
+#### **Funcionários (`/operador/funcionarios`)**
 - ✅ Modal completo de CRUD (`FuncionarioModal`)
-- ✅ Criar funcionário via API route (`/api/operator/create-employee`)
+- ✅ Criar funcionário via API route (`/api/operador/create-employee`)
 - ✅ Geocodificação automática de endereços (Google Maps)
 - ✅ Filtro por empresa_id do operador
 - ✅ Busca por nome, email, CPF
 - ✅ Edição de dados do funcionário
 - ⏳ Importação CSV (botão criado, funcionalidade pendente)
 
-#### **Solicitações (`/operator/solicitacoes`)**
+#### **Solicitações (`/operador/solicitacoes`)**
 - ✅ Modal completo para criar solicitações (`SolicitacaoModal`)
 - ✅ Kanban de status (Rascunho, Enviado, Em Análise, Aprovado, Reprovado)
 - ✅ Filtro por empresa_id do operador
@@ -25,14 +25,14 @@
   - Socorro (com descrição)
 - ✅ Integração com RPC `rpc_request_service`
 
-#### **Rotas (`/operator/rotas`)**
+#### **Rotas (`/operador/rotas`)**
 - ✅ Lista de rotas filtradas por empresa_id
 - ✅ Botão "Ver no Mapa" para navegação avançada
-- ✅ Link para solicitar nova rota (`/operator/solicitacoes`)
+- ✅ Link para solicitar nova rota (`/operador/solicitacoes`)
 - ✅ Exibição de funcionários por rota
 - ✅ Filtros automáticos por empresa do operador
 
-#### **Prestadores (`/operator/prestadores`)**
+#### **Prestadores (`/operador/prestadores`)**
 - ✅ Lista read-only de transportadoras alocadas
 - ✅ Exibição de SLA agregado (pontualidade, disponibilidade)
 - ✅ Filtro por empresa_id do operador
@@ -40,7 +40,7 @@
 
 ### 2. API Routes
 
-- ✅ `/api/operator/create-employee` - Criação de funcionários via service_role
+- ✅ `/api/operador/create-employee` - Criação de funcionários via service_role
 
 ### 3. Componentes Reutilizáveis
 
@@ -63,7 +63,7 @@
 ## ⏳ Funcionalidades Pendentes (Não Críticas)
 
 ### 1. Importação CSV de Funcionários
-- Botão criado em `/operator/funcionarios`
+- Botão criado em `/operador/funcionarios`
 - Falta implementar:
   - Parser CSV/Excel (usar `papaparse` ou similar)
   - Validação Zod dos campos
@@ -106,7 +106,7 @@
    - Executar `gf_operator_rls.sql`
 
 2. **Testar com Dados Reais**
-   - Criar usuário operador com `role = 'operator'` e `company_id`
+   - Criar usuário operador com `role = 'operador'` e `company_id`
    - Testar criação de funcionários
    - Testar criação de solicitações
    - Validar RLS (operador só vê dados da sua empresa)

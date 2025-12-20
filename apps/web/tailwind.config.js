@@ -71,11 +71,84 @@ module.exports = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        // GOLF FOX Design System - Brand Colors
+        brand: {
+          DEFAULT: "var(--brand)",
+          hover: "var(--brand-hover)",
+          light: "var(--brand-light)",
+          soft: "var(--brand-soft)",
+        },
+        // GOLF FOX Design System - Ink (Text) Colors
+        ink: {
+          DEFAULT: "var(--ink)",
+          strong: "var(--ink-strong)",
+          muted: "var(--ink-muted)",
+          light: "var(--ink-light)",
+          disabled: "var(--ink-disabled)",
+        },
+        // GOLF FOX Design System - Background Colors
+        bg: {
+          DEFAULT: "var(--bg)",
+          soft: "var(--bg-soft)",
+          elevated: "var(--bg-elevated)",
+          hover: "var(--bg-hover)",
+          pattern: "var(--bg-pattern)",
+        },
+        // GOLF FOX Design System - Accent Colors (custom, different from shadcn accent)
+        "accent-custom": {
+          DEFAULT: "var(--accent)",
+          dark: "var(--accent-dark)",
+          soft: "var(--accent-soft)",
+          light: "var(--accent-light)",
+        },
+        // GOLF FOX Design System - Status Colors
+        success: {
+          DEFAULT: "var(--success)",
+          light: "var(--success-light)",
+        },
+        warning: {
+          DEFAULT: "var(--warning)",
+          light: "var(--warning-light)",
+        },
+        error: {
+          DEFAULT: "var(--error)",
+          light: "var(--error-light)",
+        },
+        info: {
+          DEFAULT: "var(--info)",
+          light: "var(--info-light)",
+        },
+      },
+      borderColor: {
+        DEFAULT: "hsl(var(--border))",
+        strong: "var(--border-strong)",
+        light: "var(--border-light)",
+      },
+      boxShadow: {
+        xs: "var(--shadow-xs)",
+        sm: "var(--shadow-sm)",
+        md: "var(--shadow-md)",
+        lg: "var(--shadow-lg)",
+        xl: "var(--shadow-xl)",
+        "2xl": "var(--shadow-2xl)",
+        inner: "var(--shadow-inner)",
+        brand: "var(--shadow-brand)",
+        "brand-lg": "var(--shadow-brand-lg)",
+        soft: "var(--shadow-soft)",
+        glow: "var(--shadow-glow)",
       },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+        xs: "var(--radius-xs)",
+        "sm-custom": "var(--radius-sm)",
+        "md-custom": "var(--radius-md)",
+        "lg-custom": "var(--radius-lg)",
+        xl: "var(--radius-xl)",
+        "2xl": "var(--radius-2xl)",
+        "3xl": "var(--radius-3xl)",
+        full: "var(--radius-full)",
       },
       spacing: {
         '18': '4.5rem', // 72px for topbar height

@@ -230,10 +230,10 @@ export function EditUserModal({
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="admin">Administrador</SelectItem>
-                  <SelectItem value="operator">Operador</SelectItem>
+                  <SelectItem value="operador">Operador</SelectItem>
                   <SelectItem value="transportadora">Transportadora</SelectItem>
-                  <SelectItem value="driver">Motorista</SelectItem>
-                  <SelectItem value="passenger">Passageiro</SelectItem>
+                  <SelectItem value="motorista">Motorista</SelectItem>
+                  <SelectItem value="passageiro">Passageiro</SelectItem>
                 </SelectContent>
               </Select>
             </div>

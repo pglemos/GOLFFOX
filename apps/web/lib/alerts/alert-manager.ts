@@ -12,7 +12,7 @@ export interface AlertRule {
   name: string
   metric: string
   threshold: number
-  operator: 'gt' | 'lt' | 'eq' | 'gte' | 'lte'
+  operador: 'gt' | 'lt' | 'eq' | 'gte' | 'lte'
   severity: 'info' | 'warning' | 'error' | 'critical'
   enabled: boolean
   cooldown?: number // Segundos entre alertas
@@ -92,7 +92,7 @@ class AlertManager {
           id: crypto.randomUUID(),
           ruleId: rule.id,
           name: rule.name,
-          message: `${rule.name}: ${metricName} = ${value} ${this.getOperatorSymbol(rule.operator)} ${rule.threshold}`,
+          message: `${rule.name}: ${metricName} = ${value} ${this.getOperatorSymbol(rule.operador)} ${rule.threshold}`,
           severity: rule.severity,
           metric: metricName,
           value,
@@ -114,7 +114,7 @@ class AlertManager {
   /**
    * Avaliar threshold
    */
-  private evaluateThreshold(value: number, threshold: number, operator: AlertRule['operator']): boolean {
+  private evaluateThreshold(value: number, threshold: number, operador: AlertRule['operador']): boolean {
     switch (operator) {
       case 'gt':
         return value > threshold
@@ -134,7 +134,7 @@ class AlertManager {
   /**
    * Obter símbolo do operador
    */
-  private getOperatorSymbol(operator: AlertRule['operator']): string {
+  private getOperatorSymbol(operador: AlertRule['operador']): string {
     switch (operator) {
       case 'gt': return '>'
       case 'lt': return '<'
@@ -198,7 +198,7 @@ alertManager.registerRule({
   name: 'Taxa de Erro Alta',
   metric: 'api.error.rate',
   threshold: 0.1, // 10%
-  operator: 'gt',
+  operador: 'gt',
   severity: 'error',
   enabled: true,
   cooldown: 300, // 5 minutos
@@ -209,7 +209,7 @@ alertManager.registerRule({
   name: 'Tempo de Resposta Lento',
   metric: 'api.response.duration',
   threshold: 3000, // 3 segundos
-  operator: 'gt',
+  operador: 'gt',
   severity: 'warning',
   enabled: true,
   cooldown: 600, // 10 minutos

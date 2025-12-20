@@ -33,7 +33,7 @@
 **Onde está:**
 - `apps/web/components/fleet-map.tsx`
 - `apps/web/components/admin-map/admin-map.tsx`
-- `apps/web/app/carrier/page.tsx`
+- `apps/web/app/transportadora/page.tsx`
 
 **Funcionalidade:** Rastreamento de veículos em tempo real nos mapas ✅
 
@@ -101,7 +101,7 @@
 - ✅ Distance Matrix API (parcialmente - apenas para ETA)
 
 **Onde está:**
-- `apps/web/app/api/operator/optimize-route/route.ts`
+- `apps/web/app/api/operador/optimize-route/route.ts`
 - `apps/web/app/api/admin/optimize-route/route.ts`
 - `apps/web/lib/google-maps.ts`
 
@@ -117,7 +117,7 @@
 
 **Onde está:**
 - `apps/web/lib/google-maps.ts` - função `geocodeAddress()`
-- `apps/web/app/operator/sincronizar/page.tsx`
+- `apps/web/app/operador/sincronizar/page.tsx`
 
 **Funcionalidade:** Conversão de endereços em coordenadas ✅
 
@@ -234,8 +234,8 @@ export function AddressAutocomplete({ onSelect }: { onSelect: (address: string, 
 ```
 
 2. **Integrar em formulários:**
-- `apps/web/app/operator/funcionarios/page.tsx` - cadastro de funcionários
-- `apps/web/app/operator/rotas/page.tsx` - criação de rotas
+- `apps/web/app/operador/funcionarios/page.tsx` - cadastro de funcionários
+- `apps/web/app/operador/rotas/page.tsx` - criação de rotas
 - Todos os formulários que pedem endereço
 
 ---
@@ -248,7 +248,7 @@ export function AddressAutocomplete({ onSelect }: { onSelect: (address: string, 
 |-----|-------|-----|------|
 | **Maps JavaScript API** | ✅ | Mapas interativos | Todos os painéis |
 | **Geocoding API** | ✅ | Endereço → Coordenadas | `lib/google-maps.ts` |
-| **Directions API** | ✅ | Otimização de rotas | `api/operator/optimize-route` |
+| **Directions API** | ✅ | Otimização de rotas | `api/operador/optimize-route` |
 | **Geometry Library** | ✅ | Cálculos de distância | `lib/map-utils.ts` |
 | **Reverse Geocoding API** | ✅ | Coordenadas → Endereço | `lib/google-maps-reverse.ts` (NOVO) |
 | **Distance Matrix API** | ✅ | ETA e proximidade | `lib/notifications/proximity-service.ts` (NOVO) |

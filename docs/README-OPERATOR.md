@@ -5,12 +5,12 @@
 - Acompanha execução, SLA e custos (faturado GOLF FOX), sem criar/editar transportadoras diretamente.
 
 ## Principais Páginas
-- `/operator` Dashboard: KPIs do dia + Torre de Controle + Mapa preview
-- Funcionários: `/operator/funcionarios`
-- Rotas & Mapa: `/operator/rotas` e `/operator/rotas/mapa?route_id=...`
-- Prestadores (read-only): `/operator/prestadores`
-- Solicitações (kanban): `/operator/solicitacoes`
-- Custos & Relatórios: `/operator/custos`, `/operator/relatorios`
+- `/operador` Dashboard: KPIs do dia + Torre de Controle + Mapa preview
+- Funcionários: `/operador/funcionarios`
+- Rotas & Mapa: `/operador/rotas` e `/operador/rotas/mapa?route_id=...`
+- Prestadores (read-only): `/operador/prestadores`
+- Solicitações (kanban): `/operador/solicitacoes`
+- Custos & Relatórios: `/operador/custos`, `/operador/relatorios`
 - Conformidade / Comunicações / Preferências
 
 ## Dados & Segurança
@@ -21,8 +21,8 @@
 ## Como testar rapidamente
 1. Aplique as migrações em `database/migrations`.
 2. (Opcional) Execute o seed `database/seeds/operator_demo_seed.sql` ajustando IDs.
-3. Rode o health-check: `ts-node web-app/scripts/health-check-operator.ts`.
-4. Acesse `/operator` no ambiente apontado.
+3. Rode o health-check: `ts-node web-app/scripts/health-check-operador.ts`.
+4. Acesse `/operador` no ambiente apontado.
 
 ## Escopo (Regra de Negócio)
 - Operador = Empresa-cliente da GOLF FOX.

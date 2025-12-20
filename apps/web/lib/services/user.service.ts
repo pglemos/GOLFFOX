@@ -68,7 +68,7 @@ export class UserService {
       const supabaseAdmin = getSupabaseAdmin()
       const { data, error } = await supabaseAdmin
         .from('users')
-        .select('*')
+        .select('id, email, name, role, is_active, company_id, phone, cpf, created_at, updated_at')
         .eq('id', userId)
         .single()
 

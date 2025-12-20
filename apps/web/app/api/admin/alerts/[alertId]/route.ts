@@ -35,7 +35,7 @@ export async function PUT(
     // Verificar se alerta existe
     const { data: existingAlert, error: fetchError } = await supabaseAdmin
       .from('alerts')
-      .select('*')
+      .select('id, description, severity, status, route_id, vehicle_id')
       .eq('id', alertId)
       .single()
 
@@ -55,11 +55,11 @@ export async function PUT(
     if (body.vehicle_id !== undefined) updateData.vehicle_id = body.vehicle_id || null
 
     // Atualizar alerta
-    const { data: updatedAlert, error: updateError } = await supabaseAdmin
-      .from('alerts')
+    const { data: updatedAlert, error: updateError } = await (supabaseAdmin
+      .from('alerts') as any)
       .update(updateData)
       .eq('id', alertId)
-      .select()
+      .select('id, description, severity, status, route_id, vehicle_id, created_at, updated_at')
       .single()
 
     if (updateError) {

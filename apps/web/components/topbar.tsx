@@ -89,7 +89,7 @@ export function Topbar({
 
   // Determinar painel atual e rotas correspondentes
   const getPanelRoutes = () => {
-    if (pathname?.startsWith('/operador') || pathname?.startsWith('/operator')) {
+    if (pathname?.startsWith('/operador') || pathname?.startsWith('/operador')) {
       return {
         settings: '/operador/configuracoes'
       }

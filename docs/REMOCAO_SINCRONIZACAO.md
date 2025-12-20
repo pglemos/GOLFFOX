@@ -42,7 +42,7 @@ Os seguintes arquivos foram **mantidos** pois ainda são utilizados em outros lu
 **Status:** ✅ Mantido
 **Motivo:** Usado em vários modais e hooks:
 - `apps/web/components/modals/vehicle-modal.tsx`
-- `apps/web/components/modals/driver-modal.tsx`
+- `apps/web/components/modals/motorista-modal.tsx`
 - `apps/web/components/modals/change-role-modal.tsx`
 - `apps/web/components/modals/assistance-modal.tsx`
 - `apps/web/components/modals/schedule-report-modal.tsx`

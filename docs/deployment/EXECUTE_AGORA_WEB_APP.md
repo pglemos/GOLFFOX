@@ -76,24 +76,24 @@ web-app/
 - Quick Actions: Gerenciar, Relatórios, Config, Reabrir
 - Recent Activity: Lista com badges
 
-### **Operador** (`/operator`)
+### **Operador** (`/operador`)
 - Lista de viagens com filtros
 - Busca semântica (ID, rota, veículo, motorista)
 - Stats cards: Total, Em andamento, Concluídas
 
-### **Transportadora** (`/carrier`)
+### **Transportadora** (`/transportadora`)
 - Mapa da frota (placeholder)
 - Tabela de veículos em tempo real
 - Motoristas ativos com rating
 - Stats: Total, Em rota, Atrasados
 
-### **Motorista** (`/driver`)
+### **Motorista** (`/motorista`)
 - Viagem ativa destacada com gradiente
 - Progress bar animada
 - Botões Iniciar/Finalizar/Ver mapa
 - Lista de todas as viagens
 
-### **Passageiro** (`/passenger`)
+### **Passageiro** (`/passageiro`)
 - Viagem ativa com ETA em tempo real
 - Chat e ver mapa
 - Lista de viagens

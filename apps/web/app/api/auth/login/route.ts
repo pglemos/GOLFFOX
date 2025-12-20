@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { createClient } from '@supabase/supabase-js'
 import { getUserRoleByEmail } from '@/lib/user-role'
+import { normalizeRole } from '@/lib/role-mapper'
 import { debug, error as logError } from '@/lib/logger'
 import { withRateLimit } from '@/lib/rate-limit'
 
@@ -28,24 +29,30 @@ function sanitizeNextPath(raw: string | null, origin: string): string | null {
 }
 
 function isAllowedForRole(role: string, path: string): boolean {
-  if (path.startsWith('/admin')) return role === 'admin'
-  // empresa = empresa contratante (antigo operator)
-  if (path.startsWith('/empresa')) return ['admin', 'empresa', 'operator'].includes(role)
-  // operador = gestor da transportadora (antigo carrier)
-  if (path.startsWith('/transportadora')) return ['admin', 'operador', 'carrier', 'transportadora'].includes(role)
+  // Normalizar role antes de verificar
+  const normalizedRole = normalizeRole(role)
+  
+  if (path.startsWith('/admin')) return normalizedRole === 'admin'
+  // empresa = empresa contratante (antigo operador)
+  if (path.startsWith('/empresa')) return ['admin', 'empresa'].includes(normalizedRole)
+  // operador = gestor da transportadora (antigo transportadora)
+  // Nota: operador e transportadora são sinônimos neste contexto
+  if (path.startsWith('/transportadora')) return ['admin', 'operador', 'transportadora'].includes(normalizedRole)
   return true
 }
 
 function getRedirectPath(role: string): string {
-  switch (role) {
+  // Normalizar role antes de redirecionar
+  const normalizedRole = normalizeRole(role)
+  
+  switch (normalizedRole) {
     case 'admin':
       return '/admin'
     case 'empresa':
-    case 'operator':
       return '/empresa'
     case 'operador':
-    case 'carrier':
     case 'transportadora':
+      // operador e transportadora são sinônimos - ambos vão para /transportadora
       return '/transportadora'
     default:
       return '/'
@@ -406,6 +413,16 @@ async function loginHandler(req: NextRequest) {
       }, { status: 403 })
     }
 
+    // ✅ NORMALIZAR ROLE: Converter roles EN para PT-BR (operador → empresa, transportadora → operador)
+    // Isso garante consistência mesmo se o banco tiver roles em inglês
+    role = normalizeRole(role)
+    
+    debug('Role normalizado', {
+      originalRole: existingUser.role,
+      normalizedRole: role,
+      email: data.user.email || email
+    }, 'AuthAPI')
+
     // Usar dados do usuário encontrado
     let finalUser = existingUser
 
@@ -515,7 +532,8 @@ async function loginHandler(req: NextRequest) {
       : new NextResponse(null, { status: 303, headers: { Location: redirectPath } })
 
     // ✅ Criar cookie customizado no servidor para autenticação nas rotas API
-    // Incluir access_token do Supabase para validação sempre com Supabase Auth
+    // ✅ SEGURANÇA: NÃO incluir access_token no cookie customizado
+    // O token será obtido do cookie do Supabase (sb-{project}-auth-token) ou header Authorization
     const sessionCookieValue = Buffer.from(JSON.stringify({
       id: userPayload.id,
       email: userPayload.email,
@@ -523,8 +541,8 @@ async function loginHandler(req: NextRequest) {
       role: userPayload.role,
       companyId: userPayload.companyId,
       transportadoraId: userPayload.transportadoraId,
-      avatar_url: userPayload.avatar_url,
-      access_token: data.session.access_token // Incluir token do Supabase para validação
+      avatar_url: userPayload.avatar_url
+      // ✅ REMOVIDO: access_token não deve estar no cookie por segurança
     })).toString('base64')
 
     const isDev = process.env.NODE_ENV === 'development'

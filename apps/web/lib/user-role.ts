@@ -7,17 +7,17 @@ const ROLE_MAP: RoleMapping[] = [
   // Conjunto principal (PT-BR) - Novo modelo de domínio
   { email: 'golffox@admin.com', role: 'admin' },
   { email: 'teste@empresa.com', role: 'empresa' },       // Gestor/Admin da Empresa Contratante
-  { email: 'operador@empresa.com', role: 'empresa' },    // Antigo role operator → agora empresa
-  { email: 'transportadora@trans.com', role: 'operador' }, // Antigo carrier → agora operador
+  { email: 'operador@empresa.com', role: 'empresa' },    // Antigo role operador → agora empresa
+  { email: 'transportadora@trans.com', role: 'operador' }, // Antigo transportadora → agora operador
   { email: 'teste@transportadora.com', role: 'operador' },
-  { email: 'motorista@trans.com', role: 'motorista' },   // Antigo driver → agora motorista
-  { email: 'passageiro@empresa.com', role: 'passageiro' }, // Antigo passenger → agora passageiro
+  { email: 'motorista@trans.com', role: 'motorista' },   // Antigo motorista → agora motorista
+  { email: 'passageiro@empresa.com', role: 'passageiro' }, // Antigo passageiro → agora passageiro
 
   // Conjunto alternativo (inglês) - Mapeamento para novas roles PT-BR
   { email: 'admin@golffox.com', role: 'admin' },
-  { email: 'operator@golffox.com', role: 'empresa' },    // operator → empresa
-  { email: 'carrier@golffox.com', role: 'operador' },    // carrier → operador
-  { email: 'driver@golffox.com', role: 'motorista' },    // driver → motorista
+  { email: 'operador@golffox.com', role: 'empresa' },    // operador → empresa
+  { email: 'transportadora@golffox.com', role: 'operador' },    // transportadora → operador
+  { email: 'motorista@golffox.com', role: 'motorista' },    // motorista → motorista
 
   // Variantes antigas (compatibilidade)
   { email: 'transportadora@golffox.com', role: 'operador' },

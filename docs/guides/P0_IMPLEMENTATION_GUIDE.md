@@ -52,7 +52,7 @@ RETURNS uuid LANGUAGE sql STABLE SECURITY DEFINER AS
 
 ### 3. **Realtime Subscriptions for GPS Tracking**
 
-**Problem:** No real-time updates for driver positions on passenger/operator dashboards.
+**Problem:** No real-time updates for motorista positions on passageiro/operador dashboards.
 
 **Solution:**
 - Added `createRealtimeSubscription()` helper to `SupabaseConfig`
@@ -61,7 +61,7 @@ RETURNS uuid LANGUAGE sql STABLE SECURITY DEFINER AS
 
 **Implementation:**
 ```dart
-// Subscribe to driver positions for a specific trip
+// Subscribe to motorista positions for a specific trip
 _supabaseService.streamDriverPositionsRealtime(tripId).listen((positions) {
   setState(() => _driverPositions = positions);
 });
@@ -69,8 +69,8 @@ _supabaseService.streamDriverPositionsRealtime(tripId).listen((positions) {
 
 **Files Changed:**
 - `lib/supabase/supabase_config.dart`
-- `lib/screens/driver/trip_detail_screen.dart`
-- `lib/screens/passenger/passenger_dashboard.dart`
+- `lib/screens/motorista/trip_detail_screen.dart`
+- `lib/screens/passageiro/passenger_dashboard.dart`
 
 **Manual Step Required:**
 Go to Supabase Dashboard → **Database** → **Replication** → Enable `public.driver_positions`
@@ -87,9 +87,9 @@ Go to Supabase Dashboard → **Database** → **Replication** → Enable `public
 - Role-based data filtering (admin/operator/carrier/driver/passenger)
 
 **Files Changed:**
-- `lib/screens/driver/driver_dashboard.dart`
-- `lib/screens/passenger/passenger_dashboard.dart`
-- `lib/screens/driver/trip_detail_screen.dart`
+- `lib/screens/motorista/driver_dashboard.dart`
+- `lib/screens/passageiro/passenger_dashboard.dart`
+- `lib/screens/motorista/trip_detail_screen.dart`
 
 ---
 
@@ -115,7 +115,7 @@ if (result['success'] == false) {
 ```
 
 **Files Changed:**
-- `lib/screens/driver/trip_detail_screen.dart`
+- `lib/screens/motorista/trip_detail_screen.dart`
 
 ---
 
@@ -178,10 +178,10 @@ flutter run \
 ### Driver Flow
 - [ ] Driver logs in successfully
 - [ ] Dashboard loads trips from Supabase (not mocks)
-- [ ] Driver can start trip → status transitions to `inProgress`
+- [ ] motorista can start trip → status transitions to `inProgress`
 - [ ] GPS tracking starts automatically
 - [ ] Driver positions are inserted to Supabase
-- [ ] Driver can complete trip → status transitions to `completed`
+- [ ] motorista can complete trip → status transitions to `completed`
 - [ ] Invalid transitions show error messages
 
 ### Passenger Flow
@@ -199,9 +199,9 @@ flutter run \
 
 ### RLS Verification
 - [ ] Driver can only see their assigned trips
-- [ ] Passenger can only see trips they're enrolled in
+- [ ] passageiro can only see trips they're enrolled in
 - [ ] Carrier can only see routes/vehicles for their carrier_id
-- [ ] Driver can only insert positions with `driver_id = auth.uid()`
+- [ ] motorista can only insert positions with `driver_id = auth.uid()`
 
 ---
 
@@ -220,7 +220,7 @@ flutter run --dart-define=SUPABASE_URL=... --dart-define=SUPABASE_ANON_KEY=...
 - `scheduled` → `inProgress`
 - `inProgress` → `completed`
 - `inProgress` → `cancelled`
-- Admin/Operator can use `p_force=true` to override
+- Admin/operador can use `p_force=true` to override
 
 ### Real-time Not Working
 **Solution:** Enable Realtime in Supabase Dashboard:
@@ -273,7 +273,7 @@ for USER in admin@golffox.com operator@golffox.com carrier@golffox.com driver@go
 done
 
 # Test 2: Insert driver position (requires JWT)
-echo "Testing driver position insert..."
+echo "Testing motorista position insert..."
 # ... implementation
 
 # Test 3: RPC trip transition

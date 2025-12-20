@@ -89,7 +89,7 @@
 - ✅ Persistência de sessão
 
 ### Middleware:
-- ✅ Proteção de rotas `/admin` e `/operator`
+- ✅ Proteção de rotas `/admin` e `/operador`
 - ✅ Validação de cookies
 - ✅ Decodificação de sessão
 - ✅ Redirecionamento baseado em role
@@ -98,7 +98,7 @@
 ### Frontend:
 - ✅ Página de login (`/`)
 - ✅ Dashboard admin (`/admin`)
-- ✅ Dashboard operator (`/operator`)
+- ✅ Dashboard operador (`/operador`)
 - ✅ Redirecionamento após login
 - ✅ Persistência de sessão
 

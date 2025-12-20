@@ -27,13 +27,13 @@ export function SearchBarPremium({
       className={className}
     >
       <div className="relative group">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--ink-muted)] group-focus-within:text-[var(--brand)] transition-colors duration-300" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-ink-muted group-focus-within:text-brand transition-colors duration-300" />
         <Input
           type="text"
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
-          className="pl-10 pr-10 h-11 bg-card/50 backdrop-blur-sm border-[var(--border)] focus-visible:border-[var(--brand)] focus-visible:shadow-lg focus-visible:shadow-[var(--brand)]/10 transition-all duration-300"
+          className="pl-10 pr-10 h-11 bg-card/50 backdrop-blur-sm border-border focus-visible:border-brand focus-visible:shadow-lg focus-visible:shadow-brand/10 transition-all duration-300"
         />
         <AnimatePresence>
           {value && (

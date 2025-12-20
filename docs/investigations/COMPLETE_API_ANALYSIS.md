@@ -8,8 +8,8 @@
 ## ✅ APIs Verificadas - TODAS EXISTEM
 
 ### 1. Criar Empresa
-- **Endpoint:** `/api/admin/create-operator`
-- **Arquivo:** `apps/web/app/api/admin/create-operator/route.ts`
+- **Endpoint:** `/api/admin/create-operador`
+- **Arquivo:** `apps/web/app/api/admin/create-operador/route.ts`
 - **Tamanho:** 544 linhas
 - **Status:** ✅ EXISTE E É ROBUSTO
 - **Features:**
@@ -42,7 +42,7 @@
 
 ### 1. ⚠️ Schema Validation Inconsistency
 
-**Criar Empresa (create-operator):**
+**Criar Empresa (create-operador):**
 - Espera: `company_name`, `operator_email`, etc.
 - Validação no backend
 

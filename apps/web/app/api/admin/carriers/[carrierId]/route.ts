@@ -25,7 +25,7 @@ export async function GET(
         const supabase = getSupabaseAdmin()
         const { data, error } = await supabase
             .from('carriers')
-            .select('*')
+            .select('id, name, cnpj, address, phone, email, is_active, created_at, updated_at')
             .eq('id', carrierId)
             .single()
 
@@ -40,7 +40,9 @@ export async function GET(
 
         return NextResponse.json(data)
     } catch (error: any) {
-        logError('Erro inesperado', { error, carrierId }, 'CarriersGetAPI')
+        const params = await props.params
+        const { carrierId: errorCarrierId } = params
+        logError('Erro inesperado', { error, carrierId: errorCarrierId }, 'CarriersGetAPI')
         return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 })
     }
 }

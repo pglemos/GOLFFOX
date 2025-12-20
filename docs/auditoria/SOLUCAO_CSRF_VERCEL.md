@@ -115,7 +115,7 @@ Token recebido: eyJhbGci...
 
 **Resultado esperado:**
 - ✅ Login bem-sucedido
-- Redirecionamento para `/admin` ou `/operator`
+- Redirecionamento para `/admin` ou `/operador`
 
 ---
 

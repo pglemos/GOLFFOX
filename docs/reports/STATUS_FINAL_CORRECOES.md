@@ -23,7 +23,7 @@ Todas as correções críticas e melhorias identificadas na auditoria foram apli
 | ID | Correção | Arquivo | Status |
 |----|----------|---------|--------|
 | FIX-001 | Middleware com autenticação | `middleware.ts` | ✅ |
-| FIX-002 | Branding operador | `operator-logo-section.tsx` | ✅ |
+| FIX-002 | Branding operador | `operador-logo-section.tsx` | ✅ |
 | FIX-003 | RLS em gf_user_company_map | `v49_protect_user_company_map.sql` | ✅ Criado |
 | FIX-004 | Type-safety em produção | `next.config.js` | ✅ |
 | FIX-005 | Padding 20% no mapa | `fleet-map.tsx` | ✅ |
@@ -47,7 +47,7 @@ Todas as correções críticas e melhorias identificadas na auditoria foram apli
 |----|------|--------|-----------|--------|
 | FIX-014 | `/api/costs/manual` | POST/GET | `requireCompanyAccess` | ✅ |
 | FIX-015 | `/api/costs/reconcile` | POST | `requireAuth` | ✅ |
-| FIX-016 | `/api/operator/create-employee` | POST | `requireAuth` | ✅ |
+| FIX-016 | `/api/operador/create-employee` | POST | `requireAuth` | ✅ |
 | FIX-017 | `/api/reports/schedule` | POST | `requireCompanyAccess` | ✅ |
 
 ---
@@ -68,7 +68,7 @@ Todas as correções críticas e melhorias identificadas na auditoria foram apli
 ## 📁 Arquivos Modificados
 
 1. ✅ `web-app/middleware.ts` - Autenticação completa
-2. ✅ `web-app/components/operator/operator-logo-section.tsx` - Branding
+2. ✅ `web-app/components/operador/operador-logo-section.tsx` - Branding
 3. ✅ `web-app/next.config.js` - Type-safety
 4. ✅ `web-app/components/fleet-map.tsx` - Padding + acessibilidade
 5. ✅ `vercel.json` - Cron jobs
@@ -77,7 +77,7 @@ Todas as correções críticas e melhorias identificadas na auditoria foram apli
 8. ✅ `web-app/app/api/costs/import/route.ts` - Validação auth
 9. ✅ `web-app/app/api/costs/manual/route.ts` - Validação auth
 10. ✅ `web-app/app/api/costs/reconcile/route.ts` - Validação auth
-11. ✅ `web-app/app/api/operator/create-employee/route.ts` - Validação auth
+11. ✅ `web-app/app/api/operador/create-employee/route.ts` - Validação auth
 12. ✅ `web-app/app/api/reports/schedule/route.ts` - Validação auth
 
 ---

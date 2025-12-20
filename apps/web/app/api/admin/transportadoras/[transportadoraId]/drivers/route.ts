@@ -136,7 +136,7 @@ export async function POST(
     } else if (email) {
       authEmail = email
     } else {
-      authEmail = `driver.${Date.now()}@temp.golffox.com`
+      authEmail = `motorista.${Date.now()}@temp.golffox.com`
     }
 
     // 1. Verificar se usuário já existe no Auth

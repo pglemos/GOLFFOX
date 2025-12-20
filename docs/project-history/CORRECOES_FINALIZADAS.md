@@ -7,9 +7,9 @@
 
 ## 🎯 DIAGNÓSTICO REALIZADO
 
-### ✅ 1. API `/api/admin/create-operator` - CONFIRMADA
+### ✅ 1. API `/api/admin/create-operador` - CONFIRMADA
 
-**Localização:** `apps/web/app/api/admin/create-operator/route.ts`  
+**Localização:** `apps/web/app/api/admin/create-operador/route.ts`  
 **Status:** ✅ **EXISTE E ESTÁ FUNCIONAL**  
 **Tamanho:** 544 linhas
 
@@ -45,7 +45,7 @@ const { data: newCompany } = await supabaseAdmin
 |-------|------|-------------|-----------|
 | `golffox@admin.com` | admin | ✅ Existe | ✅ Existe |
 | `teste@transportadora.com` | transportadora | ✅ Criado | ✅ Criado |
-| `teste@empresa.com` | passenger | ✅ Criado | ✅ Criado |
+| `teste@empresa.com` | passageiro | ✅ Criado | ✅ Criado |
 
 **Senha para todos:** `senha123`
 
@@ -108,7 +108,7 @@ Agora que os usuários existem, vamos testar:
 
 ### 2. Melhorar Feedback de Erros no Modal
 
-**Arquivo:** `apps/web/components/modals/create-operator-modal.tsx`
+**Arquivo:** `apps/web/components/modals/create-operador-modal.tsx`
 
 **Mudanças necessárias:**
 ```typescript

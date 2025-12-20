@@ -157,7 +157,7 @@ export async function GET(request: NextRequest) {
             createdAt: row.created_at as string,
             updatedAt: row.updated_at as string,
             company: row.company as ManualRevenue['company'],
-            carrier: row.carrier as ManualRevenue['carrier'],
+            transportadora: row.transportadora as ManualRevenue['transportadora'],
         }))
 
         const totalPages = count ? Math.ceil(count / pageSize) : 0

@@ -130,7 +130,7 @@ export function DriverPickerModal({
                       }}
                     >
                       <div className="flex-1">
-                        <div className="font-medium">{driver.name}</div>
+                        <div className="font-medium">{motorista.name}</div>
                         {driver.cpf && (
                           <div className="text-sm text-gray-500">
                             CPF: {maskCPF(driver.cpf)}

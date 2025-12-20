@@ -33,10 +33,10 @@ interface ChangeRoleModalProps {
 
 const ROLES = [
   { value: 'admin', label: 'Administrador' },
-  { value: 'operator', label: 'Operador' },
+  { value: 'operador', label: 'Operador' },
   { value: 'transportadora', label: 'Transportadora' },
-  { value: 'driver', label: 'Motorista' },
-  { value: 'passenger', label: 'Passageiro' },
+  { value: 'motorista', label: 'Motorista' },
+  { value: 'passageiro', label: 'Passageiro' },
 ]
 
 export function ChangeRoleModal({
@@ -129,7 +129,7 @@ export function ChangeRoleModal({
 
         // Sincronização com Supabase (garantia adicional)
         await sync({
-          resourceType: 'driver',
+          resourceType: 'motorista',
           resourceId: user.id,
           action: 'update',
           data: {

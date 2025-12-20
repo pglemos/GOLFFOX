@@ -16,7 +16,7 @@ Este relatório documenta a classificação, causa raiz e soluções implementad
   - Tipo: ambiente (porta divergente/servidor HMR)
   - Criticidade: baixa (não bloqueia produção; típico em dev quando porta difere)
 
-- `net::ERR_ABORTED http://localhost:3000/operator/funcionarios?_rsc=...` e `.../api/operator/create-employee`
+- `net::ERR_ABORTED http://localhost:3000/operador/funcionarios?_rsc=...` e `.../api/operador/create-employee`
   - Tipo: ambiente/runtime (navegação para 3000 com servidor em 3001)
   - Criticidade: média (depende do ambiente; corrigível alinhando porta)
 
@@ -24,14 +24,14 @@ Este relatório documenta a classificação, causa raiz e soluções implementad
 
 - Interceptor global de `fetch` em `web-app/lib/supabase.ts` simulava respostas para erros do Supabase, mascarando falhas reais e contribuindo para abortos de requisições e diagnóstico confuso.
 - Link da `Topbar` apontava para `/admin/preferences` sem página correspondente.
-- Página `/operator/alertas` usava coluna incorreta (`type`) em vez de `alert_type` e ignorava o filtro via URL.
+- Página `/operador/alertas` usava coluna incorreta (`type`) em vez de `alert_type` e ignorava o filtro via URL.
 - Ambiente com dev server em `3001` mas navegação em `3000` provocando abortos (HMR e API internas).
 
 ## Soluções Implementadas
 
 1. Remoção da interceptação global de `fetch` em `web-app/lib/supabase.ts`.
 2. Criação da página `web-app/app/admin/preferences/page.tsx` para o link da Topbar.
-3. Correção de `/operator/alertas`:
+3. Correção de `/operador/alertas`:
    - Uso de `alert_type` na busca e exibição.
    - Filtro via URL (`?filter=delay|stopped|deviation`) mapeado para `route_delayed|bus_stopped|route_deviation`.
    - Cores por severidade (inclui `critical`).

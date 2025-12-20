@@ -89,8 +89,8 @@ URLs de produção:
 
 **Contas de teste:**
 - Admin: `golffox@admin.com` / `senha123`
-- Operator: `operador@empresa.com` / `senha123`
-- Carrier: `transportadora@trans.com` / `senha123`
+- operador: `operador@empresa.com` / `senha123`
+- transportadora: `transportadora@trans.com` / `senha123`
 
 ---
 

@@ -39,9 +39,9 @@ Esta auditoria verificou a estrutura do Supabase (banco de dados, storage, polí
 **Principais verificações:**
 - ✅ Políticas para `users` - OK (Service role, users own profile, admin access)
 - ✅ Políticas para `companies` - OK (Service role, company ownership)
-- ✅ Políticas para `carriers` - OK (Service role, carrier ownership)
-- ✅ Políticas para `vehicles` - OK (Service role, company/carrier ownership)
-- ✅ Políticas para `routes` - OK (Service role, company/carrier ownership)
+- ✅ Políticas para `carriers` - OK (Service role, transportadora ownership)
+- ✅ Políticas para `vehicles` - OK (Service role, company/transportadora ownership)
+- ✅ Políticas para `routes` - OK (Service role, company/transportadora ownership)
 - ✅ Políticas para `trips` - OK (Service role, role-based access)
 
 **Políticas de Storage:**
@@ -93,7 +93,7 @@ Esta auditoria verificou a estrutura do Supabase (banco de dados, storage, polí
    - Tipos MIME: `image/jpeg`, `image/jpg`, `image/png`, `image/webp`
    - Políticas RLS: 4 políticas ativas
 
-2. ✅ **`carrier-documents`**
+2. ✅ **`transportadora-documents`**
    - Público: `false`
    - Limite: `10MB` (10.485.760 bytes)
    - Tipos MIME: `image/jpeg`, `image/png`, `application/pdf`
@@ -107,7 +107,7 @@ Esta auditoria verificou a estrutura do Supabase (banco de dados, storage, polí
 **Status: ✅ OK**
 
 - ✅ Políticas para `avatars` - 4 políticas criadas e ativas
-- ✅ Políticas para `carrier-documents` - Políticas existentes
+- ✅ Políticas para `transportadora-documents` - Políticas existentes
 - ⚠️ **Recomendação:** Verificar políticas para `vehicle-photos` se necessário
 
 ---
@@ -168,21 +168,21 @@ Esta auditoria verificou a estrutura do Supabase (banco de dados, storage, polí
 
 **Total de páginas:** 16 páginas
 
-1. ✅ `/operator` - Dashboard principal
-2. ✅ `/operator/rotas` - Gerenciamento de rotas
-3. ✅ `/operator/rotas/mapa` - Mapa de rotas
-4. ✅ `/operator/funcionarios` - Gestão de funcionários
-5. ✅ `/operator/prestadores` - Gestão de prestadores
-6. ✅ `/operator/solicitacoes` - Solicitações
-7. ✅ `/operator/alertas` - Notificações
-8. ✅ `/operator/relatorios` - Relatórios
-9. ✅ `/operator/custos` - Gestão de custos
-10. ✅ `/operator/configuracoes` - **Configurações (RECENTE)**
-11. ✅ `/operator/preferencias` - Preferências
-12. ✅ `/operator/conformidade` - Conformidade
-13. ✅ `/operator/comunicacoes` - Comunicações
-14. ✅ `/operator/sincronizar` - Sincronização
-15. ✅ `/operator/ajuda` - Ajuda
+1. ✅ `/operador` - Dashboard principal
+2. ✅ `/operador/rotas` - Gerenciamento de rotas
+3. ✅ `/operador/rotas/mapa` - Mapa de rotas
+4. ✅ `/operador/funcionarios` - Gestão de funcionários
+5. ✅ `/operador/prestadores` - Gestão de prestadores
+6. ✅ `/operador/solicitacoes` - Solicitações
+7. ✅ `/operador/alertas` - Notificações
+8. ✅ `/operador/relatorios` - Relatórios
+9. ✅ `/operador/custos` - Gestão de custos
+10. ✅ `/operador/configuracoes` - **Configurações (RECENTE)**
+11. ✅ `/operador/preferencias` - Preferências
+12. ✅ `/operador/conformidade` - Conformidade
+13. ✅ `/operador/comunicacoes` - Comunicações
+14. ✅ `/operador/sincronizar` - Sincronização
+15. ✅ `/operador/ajuda` - Ajuda
 
 ### 4.2 Navegação
 **Status: ✅ OK**
@@ -196,7 +196,7 @@ Esta auditoria verificou a estrutura do Supabase (banco de dados, storage, polí
 **Status: ✅ OK**
 
 **Principais rotas verificadas:**
-- ✅ `/api/operator/*` - Rotas específicas do operador
+- ✅ `/api/operador/*` - Rotas específicas do operador
 - ✅ `/api/user/upload-avatar` - Upload de avatar (compartilhado)
 
 ---
@@ -208,17 +208,17 @@ Esta auditoria verificou a estrutura do Supabase (banco de dados, storage, polí
 
 **Total de páginas:** 10 páginas
 
-1. ✅ `/carrier` - Dashboard principal
-2. ✅ `/carrier/veiculos` - Gestão de veículos
-3. ✅ `/carrier/motoristas` - Gestão de motoristas
-4. ✅ `/carrier/rotas` - Gerenciamento de rotas
-5. ✅ `/carrier/mapa` - Mapa em tempo real
-6. ✅ `/carrier/alertas` - Notificações
-7. ✅ `/carrier/relatorios` - Relatórios
-8. ✅ `/carrier/custos` - Gestão de custos
-9. ✅ `/carrier/configuracoes` - **Configurações (RECENTE)**
-10. ✅ `/carrier/preferencias` - Preferências
-11. ✅ `/carrier/ajuda` - Ajuda
+1. ✅ `/transportadora` - Dashboard principal
+2. ✅ `/transportadora/veiculos` - Gestão de veículos
+3. ✅ `/transportadora/motoristas` - Gestão de motoristas
+4. ✅ `/transportadora/rotas` - Gerenciamento de rotas
+5. ✅ `/transportadora/mapa` - Mapa em tempo real
+6. ✅ `/transportadora/alertas` - Notificações
+7. ✅ `/transportadora/relatorios` - Relatórios
+8. ✅ `/transportadora/custos` - Gestão de custos
+9. ✅ `/transportadora/configuracoes` - **Configurações (RECENTE)**
+10. ✅ `/transportadora/preferencias` - Preferências
+11. ✅ `/transportadora/ajuda` - Ajuda
 
 ### 5.2 Navegação
 **Status: ✅ OK**
@@ -232,11 +232,11 @@ Esta auditoria verificou a estrutura do Supabase (banco de dados, storage, polí
 **Status: ✅ OK**
 
 **Principais rotas verificadas:**
-- ✅ `/api/carrier/*` - Rotas específicas da transportadora
-- ✅ `/api/carrier/vehicles/*` - Gestão de veículos
-- ✅ `/api/carrier/drivers/*` - Gestão de motoristas
-- ✅ `/api/carrier/costs/*` - Gestão de custos
-- ✅ `/api/carrier/reports/*` - Relatórios
+- ✅ `/api/transportadora/*` - Rotas específicas da transportadora
+- ✅ `/api/transportadora/vehicles/*` - Gestão de veículos
+- ✅ `/api/transportadora/drivers/*` - Gestão de motoristas
+- ✅ `/api/transportadora/costs/*` - Gestão de custos
+- ✅ `/api/transportadora/reports/*` - Relatórios
 - ✅ `/api/user/upload-avatar` - Upload de avatar (compartilhado)
 
 ---
@@ -247,7 +247,7 @@ Esta auditoria verificou a estrutura do Supabase (banco de dados, storage, polí
 **Status: ✅ OK**
 
 **Verificações:**
-- ✅ Proteção de rotas `/admin` e `/operator`
+- ✅ Proteção de rotas `/admin` e `/operador`
 - ✅ Verificação de cookie `golffox-session`
 - ✅ Validação de role do usuário
 - ✅ Redirecionamento para login quando não autenticado
@@ -255,8 +255,8 @@ Esta auditoria verificou a estrutura do Supabase (banco de dados, storage, polí
 - ✅ Bypass para rotas de API e assets estáticos
 
 **Observação:**
-- ⚠️ Middleware não protege rotas `/carrier` explicitamente (mas verifica cookie)
-- ✅ Redirecionamento para `/carrier` funciona corretamente
+- ⚠️ Middleware não protege rotas `/transportadora` explicitamente (mas verifica cookie)
+- ✅ Redirecionamento para `/transportadora` funciona corretamente
 
 ### 6.2 Autenticação
 **Status: ✅ OK**
@@ -288,20 +288,20 @@ Nenhum problema crítico identificado.
    - **Ação:** Considerar definir limite (ex: 10MB)
    - **Prioridade:** Baixa
 
-3. ⚠️ **Middleware não protege explicitamente `/carrier`**
+3. ⚠️ **Middleware não protege explicitamente `/transportadora`**
    - **Status:** Funciona mas não está explícito no matcher
-   - **Ação:** Considerar adicionar `/carrier/:path*` ao matcher
+   - **Ação:** Considerar adicionar `/transportadora/:path*` ao matcher
    - **Prioridade:** Baixa
 
 ### 7.3 Melhorias Sugeridas
 **Status: 💡 RECOMENDAÇÕES**
 
-1. 💡 **Adicionar proteção explícita para `/carrier` no middleware**
+1. 💡 **Adicionar proteção explícita para `/transportadora` no middleware**
    ```typescript
    matcher: [
      '/admin/:path*',
-     '/operator/:path*',
-     '/carrier/:path*', // Adicionar
+     '/operador/:path*',
+     '/transportadora/:path*', // Adicionar
    ]
    ```
 
@@ -390,7 +390,7 @@ Nenhum problema crítico identificado.
 **Problemas encontrados:** Nenhum problema crítico. Apenas melhorias sugeridas.
 
 **Recomendações:**
-1. Adicionar proteção explícita para `/carrier` no middleware (opcional)
+1. Adicionar proteção explícita para `/transportadora` no middleware (opcional)
 2. Definir limite para bucket `vehicle-photos` (opcional)
 3. Considerar remover página `/admin/sincronizacao` se não for mais usada (opcional)
 

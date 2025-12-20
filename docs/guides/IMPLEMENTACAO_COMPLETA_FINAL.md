@@ -182,10 +182,10 @@ Todas as senhas: **`senha123`**
 |-----|-----------|
 | `/` | Login |
 | `/admin` | Admin (KPIs, métricas) |
-| `/operator` | Operador (viagens, filtros) |
-| `/carrier` | Transportadora (frota, mapa) |
-| `/driver` | Motorista (rastreamento) |
-| `/passenger` | Passageiro (ETA, chat) |
+| `/operador` | Operador (viagens, filtros) |
+| `/transportadora` | Transportadora (frota, mapa) |
+| `/motorista` | Motorista (rastreamento) |
+| `/passageiro` | Passageiro (ETA, chat) |
 
 ---
 

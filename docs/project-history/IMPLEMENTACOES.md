@@ -12,17 +12,17 @@ Criado utilitário de formatação (`lib/format-utils.ts`) que formata automatic
 #### Arquivos Atualizados:
 - ✅ `lib/format-utils.ts` - Novo arquivo com funções de formatação
 - ✅ `components/modals/transportadora-drivers-modal.tsx` - Formatação aplicada
-- ✅ `components/modals/create-operator-login-modal.tsx` - Formatação aplicada
+- ✅ `components/modals/create-operador-login-modal.tsx` - Formatação aplicada
 - ✅ `components/modals/edit-user-modal.tsx` - Formatação aplicada
 
 ### 2. ✅ Remoção do Seletor de Perfil em Motoristas
 
 **Antes**: Formulário de motorista permitia escolher "Motorista" ou "Transportadora"
-**Agora**: Campo de permissão removido - todos os motoristas criados têm o role "driver" automaticamente
+**Agora**: Campo de permissão removido - todos os motoristas criados têm o role "motorista" automaticamente
 
 #### Mudanças:
 - Removido o campo "Perfil de Permissão" do formulário `transportadora-drivers-modal.tsx`
-- Role "driver" é automaticamente atribuído no backend via API
+- Role "motorista" é automaticamente atribuído no backend via API
 
 ### 3. ✅ Correção da Busca de Endereço por CEP
 
@@ -82,7 +82,7 @@ O migration `add_address_to_users.sql` já existe e inclui todas as colunas nece
 1. Acessar painel de Transportadora
 2. Criar novo motorista
 3. Verificar que não há seletor de perfil
-4. Após criação, confirmar no banco que o role é "driver"
+4. Após criação, confirmar no banco que o role é "motorista"
 
 ## 🔧 Funções Utilitárias Disponíveis
 

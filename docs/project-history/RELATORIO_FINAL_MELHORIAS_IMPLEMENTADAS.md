@@ -43,7 +43,7 @@ Todas as melhorias solicitadas foram implementadas com sucesso! O sistema agora 
 - Categoria CNH
 
 **Arquivos Criados/Modificados:**
-- ✅ `apps/web/components/modals/carrier-drivers-modal.tsx` (REESCRITO)
+- ✅ `apps/web/components/modals/transportadora-drivers-modal.tsx` (REESCRITO)
 - ✅ `apps/web/app/api/admin/carriers/[carrierId]/drivers/route.ts` (GET, POST)
 - ✅ `apps/web/app/api/admin/carriers/[carrierId]/drivers/[driverId]/route.ts` (PUT, DELETE)
 
@@ -72,7 +72,7 @@ Todas as melhorias solicitadas foram implementadas com sucesso! O sistema agora 
 - Veículo Ativo (checkbox)
 
 **Arquivos Criados/Modificados:**
-- ✅ `apps/web/components/modals/carrier-vehicles-modal.tsx` (REESCRITO)
+- ✅ `apps/web/components/modals/transportadora-vehicles-modal.tsx` (REESCRITO)
 - ✅ `apps/web/app/api/admin/carriers/[carrierId]/vehicles/route.ts` (POST)
 - ✅ `apps/web/app/api/admin/carriers/[carrierId]/vehicles/[vehicleId]/route.ts` (PUT, DELETE)
 
@@ -94,7 +94,7 @@ Todas as melhorias solicitadas foram implementadas com sucesso! O sistema agora 
 - ✅ Scroll vertical quando necessário
 
 **Arquivo Modificado:**
-- ✅ `apps/web/components/modals/create-carrier-modal.tsx`
+- ✅ `apps/web/components/modals/create-transportadora-modal.tsx`
 
 ---
 
@@ -115,7 +115,7 @@ Todas as melhorias solicitadas foram implementadas com sucesso! O sistema agora 
 - Dados do responsável (nome, e-mail, telefone)
 
 **Arquivo Modificado:**
-- ✅ `apps/web/components/modals/create-operator-modal.tsx`
+- ✅ `apps/web/components/modals/create-operador-modal.tsx`
 
 ---
 

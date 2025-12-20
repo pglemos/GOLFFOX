@@ -217,7 +217,7 @@ export function useAdvancedNavigation() {
       const currentParams = new URLSearchParams(searchParams.toString())
       if (maintainState) {
         // Preservar parâmetros importantes
-        const preservedParams = ['route', 'company', 'driver', 'vehicle']
+        const preservedParams = ['route', 'company', 'motorista', 'vehicle']
         preservedParams.forEach(param => {
           const value = currentParams.get(param)
           if (value) mapParams += `&${param}=${value}`

@@ -15,7 +15,7 @@ Auditoria completa do monorepo GOLFFOX (Next.js + TypeScript + Supabase + Flutte
 
 ### 1. Segurança (P0 - Crítico)
 - ✅ **RLS Multi-tenant:** Migration v49 aplicada - `gf_user_company_map` protegido
-- ✅ **Middleware:** Autenticação e RBAC implementados para `/admin` e `/operator`
+- ✅ **Middleware:** Autenticação e RBAC implementados para `/admin` e `/operador`
 - ✅ **APIs Protegidas:** 10+ rotas API com validação de autenticação e acesso à empresa
 - ✅ **Prevenção de Escalação:** Usuários não podem se auto-adicionar a empresas
 

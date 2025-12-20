@@ -75,7 +75,7 @@ export default function TransportadoraDashboard() {
               if (
                 meData.success &&
                 meData.user &&
-                ['transportadora', 'operador', 'carrier', 'admin'].includes(meData.user.role)
+                ['transportadora', 'operador', 'transportadora', 'admin'].includes(meData.user.role)
               ) {
                 console.log('✅ [Transportadora] Usuário transportadora autenticado via API /api/auth/me, definindo usuário...')
                 setUser(meData.user)
@@ -115,7 +115,7 @@ export default function TransportadoraDashboard() {
               console.warn('⚠️ Erro ao buscar dados do usuário:', dbError)
             }
 
-            if (data && ['transportadora', 'operador', 'carrier', 'admin'].includes(data.role)) {
+            if (data && ['transportadora', 'operador', 'transportadora', 'admin'].includes(data.role)) {
               console.log('✅ Usuário transportadora autenticado via Supabase Auth')
               setUser({ ...session.user, ...data })
               setUserData(data)
@@ -301,7 +301,7 @@ export default function TransportadoraDashboard() {
           return {
             id: vehicle.id,
             plate: vehicle.plate,
-            driver: bus.driver_name || 'N/A',
+            motorista: bus.driver_name || 'N/A',
             status: 'on-route',
             route: bus.route_name || 'Livre',
             lat: bus.lat,
@@ -315,7 +315,7 @@ export default function TransportadoraDashboard() {
           return {
             id: vehicle.id,
             plate: vehicle.plate,
-            driver: 'N/A',
+            motorista: 'N/A',
             status: 'available',
             route: 'Livre',
             lat: garage.last_position?.lat,
@@ -329,7 +329,7 @@ export default function TransportadoraDashboard() {
           return {
             id: vehicle.id,
             plate: vehicle.plate,
-            driver: 'N/A',
+            motorista: 'N/A',
             status: vehicle.is_active ? 'available' : 'inactive',
             route: 'Livre',
             lat: null,
@@ -347,7 +347,7 @@ export default function TransportadoraDashboard() {
       const { data: driversData } = await supabase
         .from('users')
         .select('*')
-        .eq('role', 'driver')
+        .eq('role', 'motorista')
         .eq('transportadora_id', transportadoraId)
 
       let driversWithStats: any[] = []
@@ -900,14 +900,14 @@ export default function TransportadoraDashboard() {
                           <Users className="h-4 w-4 sm:h-5 sm:w-5 text-[var(--brand)]" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="font-semibold text-xs sm:text-sm text-[var(--ink-strong)] truncate">{driver.name}</p>
+                          <p className="font-semibold text-xs sm:text-sm text-[var(--ink-strong)] truncate">{motorista.name}</p>
                           <p className="text-xs text-[var(--ink-muted)] truncate">
                             {driver.trips} viagem(ns) • ⭐ {driver.rating}
                           </p>
                         </div>
                       </div>
-                      <Badge variant={driver.status === "active" ? "default" : "secondary"} className="flex-shrink-0 text-xs">
-                        {driver.status === "active" ? t('transportadora', 'status_active') : t('transportadora', 'status_pause')}
+                      <Badge variant={motorista.status === "active" ? "default" : "secondary"} className="flex-shrink-0 text-xs">
+                        {motorista.status === "active" ? t('transportadora', 'status_active') : t('transportadora', 'status_pause')}
                       </Badge>
                     </div>
                   ))
@@ -939,7 +939,7 @@ export default function TransportadoraDashboard() {
                   )
                 },
                 {
-                  key: 'driver',
+                  key: 'motorista',
                   label: t('transportadora', 'table_driver'),
                   sortable: true
                 },

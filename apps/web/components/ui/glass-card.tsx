@@ -19,7 +19,7 @@ export function GlassCard({ intensity = "medium", className, children, ...props 
     <Card 
       className={cn(
         intensityClasses[intensity],
-        "border-[var(--border)] shadow-lg",
+        "border-border shadow-lg",
         className
       )} 
       {...props}

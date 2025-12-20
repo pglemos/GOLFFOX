@@ -54,8 +54,8 @@ export async function PUT(
     const body = await request.json()
 
     // Verificar se empresa existe e buscar cnpj para validação
-    const { data: existingCompany, error: fetchError } = await supabaseAdmin
-      .from('companies')
+    const { data: existingCompany, error: fetchError } = await (supabaseAdmin
+      .from('companies') as any)
       .select('id,cnpj')
       .eq('id', companyId)
       .single()
@@ -68,9 +68,9 @@ export async function PUT(
     }
 
     // Validar CNPJ único se fornecido e diferente do atual
-    if (body.cnpj && body.cnpj !== existingCompany.cnpj) {
-      const { data: companyWithSameCnpj } = await supabaseAdmin
-        .from('companies')
+    if (body.cnpj && body.cnpj !== (existingCompany as any).cnpj) {
+      const { data: companyWithSameCnpj } = await (supabaseAdmin
+        .from('companies') as any)
         .select('id')
         .eq('cnpj', body.cnpj)
         .neq('id', companyId)
@@ -119,8 +119,8 @@ export async function PUT(
     if (body.is_active !== undefined) updateData.is_active = body.is_active
 
     // Atualizar empresa
-    const { data: updatedCompany, error: updateError } = await supabaseAdmin
-      .from('companies')
+    const { data: updatedCompany, error: updateError } = await (supabaseAdmin
+      .from('companies') as any)
       .update(updateData)
       .eq('id', companyId)
       .select()
@@ -228,8 +228,8 @@ export async function DELETE(
 
     if (totalDependencies > 0) {
       // Soft delete se tiver dependências
-      const { error: updateError } = await supabaseAdmin
-        .from('companies')
+      const { error: updateError } = await (supabaseAdmin
+        .from('companies') as any)
         .update({ is_active: false })
         .eq('id', companyId)
 
@@ -279,7 +279,9 @@ export async function DELETE(
       })
     }
   } catch (error: any) {
-    logError('Erro ao excluir empresa', { error, companyId }, 'CompaniesDeleteAPI')
+    const params = await context.params
+    const { companyId: errorCompanyId } = params
+    logError('Erro ao excluir empresa', { error, companyId: errorCompanyId }, 'CompaniesDeleteAPI')
     return NextResponse.json(
       { error: 'Erro ao excluir empresa', message: error.message },
       { status: 500 }

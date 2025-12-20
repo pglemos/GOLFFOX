@@ -23,7 +23,7 @@ export async function DELETE(request: NextRequest) {
 
     const supabaseAdmin = getSupabaseAdmin()
 
-    // Excluir permanentemente o motorista (usuário com role 'driver')
+    // Excluir permanentemente o motorista (usuário com role 'motorista')
     // A tabela users tem referência a auth.users com ON DELETE CASCADE,
     // então excluir da tabela users também excluirá do Auth automaticamente
     // As foreign keys com ON DELETE CASCADE vão excluir automaticamente:
@@ -53,7 +53,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Invalidar cache após exclusão
-    await invalidateEntityCache('driver', driverId)
+    await invalidateEntityCache('motorista', driverId)
 
     logger.log(`✅ Motorista excluído com sucesso: ${driverId}`, data)
 

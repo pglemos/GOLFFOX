@@ -29,7 +29,7 @@ Substituí a aba "Motoristas" por **"Transportadoras"** no painel administrativo
 
 4. **Login de Acesso**
    - Criar usuários com acesso ao painel da transportadora
-   - Role: "carrier"
+   - Role: "transportadora"
    - Campos: Nome, Email, Senha (mínimo 6 caracteres)
    - Listar todos os usuários cadastrados
    - Excluir usuários
@@ -54,15 +54,15 @@ Substituí a aba "Motoristas" por **"Transportadoras"** no painel administrativo
 - `apps/web/app/api/admin/carriers/create/route.ts`
 - `apps/web/app/api/admin/carriers/update/route.ts`
 - `apps/web/app/api/admin/carriers/delete/route.ts`
-- `apps/web/app/api/admin/create-carrier-login/route.ts`
+- `apps/web/app/api/admin/create-transportadora-login/route.ts`
 - `apps/web/app/api/admin/carriers/[carrierId]/users/route.ts`
 - `apps/web/app/api/admin/carriers/[carrierId]/drivers/route.ts`
 
 ### Componentes/Modais (4 componentes)
-- `apps/web/components/modals/create-carrier-modal.tsx`
-- `apps/web/components/modals/edit-carrier-modal.tsx`
-- `apps/web/components/modals/carrier-users-modal.tsx`
-- `apps/web/components/modals/carrier-drivers-modal.tsx`
+- `apps/web/components/modals/create-transportadora-modal.tsx`
+- `apps/web/components/modals/edit-transportadora-modal.tsx`
+- `apps/web/components/modals/transportadora-users-modal.tsx`
+- `apps/web/components/modals/transportadora-drivers-modal.tsx`
 
 ### Documentação
 - `docs/TRANSPORTADORAS_PANEL.md`
@@ -98,7 +98,7 @@ Admin → Criar Transportadora → Preencher formulário → Salvar
 ```
 Admin → Selecionar Transportadora → Login de Acesso → 
 Criar Novo Login → Preencher email, nome, senha → 
-Sistema cria usuário no Supabase Auth com role "carrier"
+Sistema cria usuário no Supabase Auth com role "transportadora"
 ```
 
 ### 3. Visualizar Motoristas
@@ -129,17 +129,17 @@ Modal lista todos os motoristas com carrier_id correspondente
 - contact_person (text, nullable)
 - created_at, updated_at
 
-### Tabela: `users` (role: carrier)
+### Tabela: `users` (role: transportadora)
 - id (uuid, PK - Supabase Auth)
 - email (text, UNIQUE)
 - name (text)
-- role = 'carrier'
+- role = 'transportadora'
 - carrier_id (uuid, FK → carriers)
 
-### Tabela: `users` (role: driver)
+### Tabela: `users` (role: motorista)
 - id (uuid, PK)
 - email, name, phone
-- role = 'driver'
+- role = 'motorista'
 - carrier_id (uuid, FK → carriers)
 
 ---

@@ -54,7 +54,7 @@ export async function parseCSV(
     'veiculo': 'vehicle_plate',
     'vehicle': 'vehicle_plate',
     'motorista': 'driver_email',
-    'driver': 'driver_email',
+    'motorista': 'driver_email',
     'observacoes': 'notes',
     'notes': 'notes'
   }

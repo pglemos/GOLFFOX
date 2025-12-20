@@ -15,7 +15,7 @@ const TabsList = React.forwardRef<
     ref={ref}
     className={cn(
       "inline-flex h-10 items-center justify-start gap-1",
-      "w-full border-b border-[var(--border)]",
+      "w-full border-b border-border",
       className
     )}
     {...props}
@@ -32,10 +32,10 @@ const TabsTrigger = React.forwardRef<
       ref={ref}
       className={cn(
         "inline-flex items-center justify-center whitespace-nowrap px-4 py-2 text-sm font-medium",
-        "transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)]/20",
+        "transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/20",
         "disabled:pointer-events-none disabled:opacity-50",
-        "text-[var(--ink-muted)] hover:text-[var(--ink)]",
-        "data-[state=active]:text-[var(--brand)] data-[state=active]:border-b-2 data-[state=active]:border-[var(--brand)] data-[state=active]:-mb-px",
+        "text-ink-muted hover:text-ink",
+        "data-[state=active]:text-brand data-[state=active]:border-b-2 data-[state=active]:border-brand data-[state=active]:-mb-px",
         className
       )}
       {...props}
@@ -51,7 +51,7 @@ const TabsContent = React.forwardRef<
   <TabsPrimitive.Content
     ref={ref}
     className={cn(
-      "mt-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)]/20",
+      "mt-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/20",
       className
     )}
     {...props}

@@ -31,9 +31,9 @@
 
 ### Testes Funcionais
 - [ ] Login como admin → acessar `/admin` → deve permitir
-- [ ] Login como operator → acessar `/operator` → deve permitir
-- [ ] Login como operator → acessar `/admin` → deve redirecionar para `/unauthorized`
-- [ ] Sem login → acessar `/operator` → deve redirecionar para `/login`
+- [ ] Login como operador → acessar `/operador` → deve permitir
+- [ ] Login como operador → acessar `/admin` → deve redirecionar para `/unauthorized`
+- [ ] Sem login → acessar `/operador` → deve redirecionar para `/login`
 - [ ] Sem login → acessar `/admin` → deve redirecionar para `/login`
 
 ### Branding
@@ -45,8 +45,8 @@
 - [ ] POST `/api/costs/manual` sem auth → deve retornar 401
 - [ ] POST `/api/costs/manual` com auth → deve funcionar
 - [ ] GET `/api/costs/export` sem auth → deve retornar 401
-- [ ] POST `/api/admin/create-operator` como operator → deve retornar 403
-- [ ] POST `/api/admin/create-operator` como admin → deve funcionar
+- [ ] POST `/api/admin/create-operador` como operador → deve retornar 403
+- [ ] POST `/api/admin/create-operador` como admin → deve funcionar
 
 ### RLS
 - [ ] Como operador, tentar inserir mapeamento para outra empresa → deve falhar

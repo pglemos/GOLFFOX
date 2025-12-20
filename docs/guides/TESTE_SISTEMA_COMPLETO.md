@@ -37,7 +37,7 @@
 #### 🟢 OPERADOR (`operador@trans.com`)
 **Funcionalidades Esperadas:**
 - ✅ Login bem-sucedido
-- ✅ Redirecionamento para `/operator`
+- ✅ Redirecionamento para `/operador`
 - ✅ Dashboard verde com título "Painel Operacional"
 - ✅ Cards: Rotas, Horários, Motoristas, Relatórios
 - ✅ Menu de usuário com logout
@@ -45,7 +45,7 @@
 #### 🟠 TRANSPORTADORA (`transportadora@trans.com`)
 **Funcionalidades Esperadas:**
 - ✅ Login bem-sucedido
-- ✅ Redirecionamento para `/carrier`
+- ✅ Redirecionamento para `/transportadora`
 - ✅ Dashboard laranja com título "Painel da Transportadora"
 - ✅ Cards: Frota, Motoristas, Viagens, Financeiro
 - ✅ Menu de usuário com logout
@@ -53,7 +53,7 @@
 #### 🟣 MOTORISTA (`motorista@trans.com`)
 **Funcionalidades Esperadas:**
 - ✅ Login bem-sucedido
-- ✅ Redirecionamento para `/driver`
+- ✅ Redirecionamento para `/motorista`
 - ✅ Dashboard roxo com título "Painel do Motorista"
 - ✅ Cards: Minhas Viagens, Ganhos, Veículo, Documentos
 - ✅ Menu de usuário com logout
@@ -61,7 +61,7 @@
 #### 🔷 PASSAGEIRO (`passageiro@trans.com`)
 **Funcionalidades Esperadas:**
 - ✅ Login bem-sucedido
-- ✅ Redirecionamento para `/passenger`
+- ✅ Redirecionamento para `/passageiro`
 - ✅ Dashboard teal com título "Painel do Passageiro"
 - ✅ Cards: Reservar Viagem, Minhas Viagens, Pagamentos, Suporte
 - ✅ Menu de usuário com logout
@@ -70,10 +70,10 @@
 
 #### Acesso Não Autorizado
 - ✅ Tentar acessar `/admin` sem login → Redirecionamento para `/login`
-- ✅ Tentar acessar `/operator` sem login → Redirecionamento para `/login`
-- ✅ Tentar acessar `/carrier` sem login → Redirecionamento para `/login`
-- ✅ Tentar acessar `/driver` sem login → Redirecionamento para `/login`
-- ✅ Tentar acessar `/passenger` sem login → Redirecionamento para `/login`
+- ✅ Tentar acessar `/operador` sem login → Redirecionamento para `/login`
+- ✅ Tentar acessar `/transportadora` sem login → Redirecionamento para `/login`
+- ✅ Tentar acessar `/motorista` sem login → Redirecionamento para `/login`
+- ✅ Tentar acessar `/passageiro` sem login → Redirecionamento para `/login`
 
 #### Validação de Credenciais
 - ✅ Email inválido → Mensagem de erro

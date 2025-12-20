@@ -16,7 +16,7 @@ interface Message {
     id: string
     sender_id: string
     sender_name: string
-    sender_type: 'operator' | 'driver'
+    sender_type: 'operador' | 'motorista'
     content: string
     created_at: string
 }
@@ -51,12 +51,12 @@ export default function MensagensPage() {
 
     useEffect(() => {
         if (selectedDriver) {
-            // Mock messages for selected driver
+            // Mock messages for selected motorista
             const mockMessages: Message[] = [
-                { id: '1', sender_id: selectedDriver.id, sender_name: selectedDriver.name, sender_type: 'driver', content: 'Bom dia! Iniciando rota.', created_at: '2024-12-12T08:00:00' },
-                { id: '2', sender_id: 'op1', sender_name: 'Central', sender_type: 'operator', content: 'Bom dia! Tudo certo, boa viagem!', created_at: '2024-12-12T08:01:00' },
-                { id: '3', sender_id: selectedDriver.id, sender_name: selectedDriver.name, sender_type: 'driver', content: 'Houve um pequeno atraso no ponto 3.', created_at: '2024-12-12T08:30:00' },
-                { id: '4', sender_id: 'op1', sender_name: 'Central', sender_type: 'operator', content: 'Entendido, obrigado por informar.', created_at: '2024-12-12T08:31:00' },
+                { id: '1', sender_id: selectedDriver.id, sender_name: selectedDriver.name, sender_type: 'motorista', content: 'Bom dia! Iniciando rota.', created_at: '2024-12-12T08:00:00' },
+                { id: '2', sender_id: 'op1', sender_name: 'Central', sender_type: 'operador', content: 'Bom dia! Tudo certo, boa viagem!', created_at: '2024-12-12T08:01:00' },
+                { id: '3', sender_id: selectedDriver.id, sender_name: selectedDriver.name, sender_type: 'motorista', content: 'Houve um pequeno atraso no ponto 3.', created_at: '2024-12-12T08:30:00' },
+                { id: '4', sender_id: 'op1', sender_name: 'Central', sender_type: 'operador', content: 'Entendido, obrigado por informar.', created_at: '2024-12-12T08:31:00' },
             ]
             setMessages(mockMessages)
         }
@@ -73,7 +73,7 @@ export default function MensagensPage() {
             id: Date.now().toString(),
             sender_id: 'op1',
             sender_name: 'Central',
-            sender_type: 'operator',
+            sender_type: 'operador',
             content: newMessage,
             created_at: new Date().toISOString()
         }
@@ -91,7 +91,7 @@ export default function MensagensPage() {
     return (
         <AppShell panel="transportadora" user={user ? { id: user.id, name: user.name || 'Operador', email: user.email || '', role: user.role || 'operador' } : { id: 'mock', name: 'Operador', email: 'op@golffox.com', role: 'operador' }}>
             <div className="flex h-[calc(100vh-120px)]">
-                {/* Driver List */}
+                {/* motorista List */}
                 <div className="w-80 border-r">
                     <div className="p-4 border-b">
                         <h2 className="font-semibold flex items-center gap-2">
@@ -103,7 +103,7 @@ export default function MensagensPage() {
                         {drivers.map(driver => (
                             <div
                                 key={driver.id}
-                                className={`p-4 border-b cursor-pointer hover:bg-muted/50 ${selectedDriver?.id === driver.id ? 'bg-muted' : ''}`}
+                                className={`p-4 border-b cursor-pointer hover:bg-muted/50 ${selectedDriver?.id === motorista.id ? 'bg-muted' : ''}`}
                                 onClick={() => setSelectedDriver(driver)}
                             >
                                 <div className="flex items-center gap-3">
@@ -116,9 +116,9 @@ export default function MensagensPage() {
                                         )}
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <p className="font-medium truncate">{driver.name}</p>
+                                        <p className="font-medium truncate">{motorista.name}</p>
                                         {driver.last_message && (
-                                            <p className="text-sm text-muted-foreground truncate">{driver.last_message}</p>
+                                            <p className="text-sm text-muted-foreground truncate">{motorista.last_message}</p>
                                         )}
                                     </div>
                                 </div>
@@ -148,11 +148,11 @@ export default function MensagensPage() {
                                     {messages.map(msg => (
                                         <div
                                             key={msg.id}
-                                            className={`flex ${msg.sender_type === 'operator' ? 'justify-end' : 'justify-start'}`}
+                                            className={`flex ${msg.sender_type === 'operador' ? 'justify-end' : 'justify-start'}`}
                                         >
-                                            <div className={`max-w-[70%] rounded-lg p-3 ${msg.sender_type === 'operator' ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>
+                                            <div className={`max-w-[70%] rounded-lg p-3 ${msg.sender_type === 'operador' ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>
                                                 <p>{msg.content}</p>
-                                                <p className={`text-xs mt-1 ${msg.sender_type === 'operator' ? 'text-primary-foreground/70' : 'text-muted-foreground'}`}>
+                                                <p className={`text-xs mt-1 ${msg.sender_type === 'operador' ? 'text-primary-foreground/70' : 'text-muted-foreground'}`}>
                                                     {formatTime(msg.created_at)}
                                                 </p>
                                             </div>

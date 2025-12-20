@@ -75,10 +75,10 @@ export default function RelatoriosOperatorPage() {
         exportToPDF(reportData, `${report.id}_${new Date().toISOString().split('T')[0]}.pdf`)
       }
 
-      notifySuccess('', { i18n: { ns: 'operator', key: 'reports.exportSuccess', params: { title: report.title } } })
+      notifySuccess('', { i18n: { ns: 'operador', key: 'reports.exportSuccess', params: { title: report.title } } })
     } catch (error: any) {
       console.error("Erro ao exportar relatório:", error)
-      notifyError('Erro ao exportar', undefined, { i18n: { ns: 'operator', key: 'reports.exportError', params: { message: error.message || 'Erro desconhecido' } } })
+      notifyError('Erro ao exportar', undefined, { i18n: { ns: 'operador', key: 'reports.exportError', params: { message: error.message || 'Erro desconhecido' } } })
     }
   }
 

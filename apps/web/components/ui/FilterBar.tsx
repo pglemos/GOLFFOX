@@ -17,9 +17,9 @@ const FilterBar = React.forwardRef<HTMLDivElement, FilterBarProps>(
     return (
       <div ref={ref} className={cn("filter-bar", className)} {...props}>
         <div className="flex items-center gap-2 flex-shrink-0">
-          <Filter className="h-5 w-5 text-[var(--ink-muted)]" />
+          <Filter className="h-5 w-5 text-ink-muted" />
           {activeCount > 0 && (
-            <span className="px-2 py-0.5 rounded-full bg-[var(--brand)] text-white text-xs font-semibold">
+            <span className="px-2 py-0.5 rounded-full bg-brand text-white text-xs font-semibold">
               {activeCount}
             </span>
           )}

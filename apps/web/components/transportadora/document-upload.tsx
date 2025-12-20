@@ -10,7 +10,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 interface DocumentUploadProps {
   driverId?: string
   vehicleId?: string
-  folder: 'driver-documents' | 'vehicle-documents' | 'medical-exams'
+  folder: 'motorista-documents' | 'vehicle-documents' | 'medical-exams'
   documentType?: string
   onSuccess?: () => void
   onError?: (error: string) => void
@@ -102,7 +102,7 @@ export function DocumentUpload({
       const uploadData = await uploadRes.json()
 
       // Se for documento de motorista, salvar no banco
-      if (driverId && folder === 'driver-documents' && documentType) {
+      if (driverId && folder === 'motorista-documents' && documentType) {
         const docData: DocumentData = {
           document_type: documentType,
           file_url: uploadData.file_url,
@@ -189,16 +189,16 @@ export function DocumentUpload({
           className="mt-2"
           disabled={uploading}
         />
-        <p className="text-xs text-[var(--ink-muted)] mt-1">
+        <p className="text-xs text-ink-muted mt-1">
           Formatos aceitos: PDF, JPG, PNG. Tamanho máximo: 10MB
         </p>
       </div>
 
       {file && (
-        <div className="flex items-center gap-2 p-3 rounded-lg border border-[var(--border)] bg-[var(--bg)]">
-          <FileText className="h-4 w-4 text-[var(--brand)] flex-shrink-0" />
+        <div className="flex items-center gap-2 p-3 rounded-lg border border-border bg-bg">
+          <FileText className="h-4 w-4 text-brand flex-shrink-0" />
           <span className="text-sm flex-1 truncate">{file.name}</span>
-          <span className="text-xs text-[var(--ink-muted)]">
+          <span className="text-xs text-ink-muted">
             {(file.size / 1024 / 1024).toFixed(2)} MB
           </span>
           <Button 

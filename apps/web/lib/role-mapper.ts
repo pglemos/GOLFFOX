@@ -5,11 +5,13 @@
  */
 
 export const ROLE_ALIASES: Record<string, string> = {
-  'operator': 'empresa',
-  'carrier': 'transportadora',
-  'operador': 'transportadora', // operador também mapeia para transportadora
-  'driver': 'motorista',
-  'passenger': 'passageiro',
+  // Mapeamento EN → PT-BR
+  'operador': 'empresa',
+  'transportadora': 'operador', // transportadora → operador (gestor da transportadora)
+  'motorista': 'motorista',
+  'passageiro': 'passageiro',
+  // Sinônimos PT-BR
+  'transportadora': 'operador', // transportadora e operador são sinônimos
 }
 
 /**
@@ -34,11 +36,11 @@ export function isValidRole(role: string): boolean {
     'motorista',
     'passageiro',
     // Nomenclatura antiga (EN) - para compatibilidade
-    'operator',
-    'carrier',
     'operador',
-    'driver',
-    'passenger',
+    'transportadora',
+    'operador',
+    'motorista',
+    'passageiro',
   ]
   
   return validRoles.includes(role.toLowerCase().trim())

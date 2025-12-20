@@ -242,7 +242,7 @@ users {
   id: uuid (PK)
   email: text
   name: text
-  role: 'carrier' | 'driver'
+  role: 'transportadora' | 'motorista'
   carrier_id: uuid (FK → carriers) ✅
 }
 

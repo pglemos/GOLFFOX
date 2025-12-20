@@ -254,7 +254,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Verificar se driver existe (se fornecido)
+    // Verificar se motorista existe (se fornecido)
     if (driverId) {
       const { data: driver, error: driverError } = await supabaseAdmin
         .from('users')
@@ -269,7 +269,7 @@ export async function POST(request: NextRequest) {
         )
       }
 
-      if (driver.role !== 'driver') {
+      if (motorista.role !== 'motorista') {
         return NextResponse.json(
           { error: 'Usuário não é um motorista' },
           { status: 400 }

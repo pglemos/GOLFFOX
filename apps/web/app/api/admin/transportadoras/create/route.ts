@@ -3,7 +3,7 @@ import { getSupabaseAdmin } from '@/lib/supabase-client'
 import { requireAuth } from '@/lib/api-auth'
 import { applyRateLimit } from '@/lib/rate-limit'
 import { z } from 'zod'
-import { CarrierInsert } from '@/types/carrier'
+import { CarrierInsert } from '@/types/transportadora'
 import { logger, logError } from '@/lib/logger'
 import { successResponse, errorResponse, validationErrorResponse } from '@/lib/api-response'
 
@@ -46,15 +46,15 @@ export async function POST(req: NextRequest) {
 
     const authErrorResponse = await requireAuth(req, 'admin')
     if (authErrorResponse) {
-      logError('[CREATE CARRIER] Auth failed', { status: authErrorResponse.status }, 'CarriersCreateAPI')
+      logError('[CREATE transportadora] Auth failed', { status: authErrorResponse.status }, 'CarriersCreateAPI')
       return authErrorResponse
     }
 
     const body = await req.json()
-    logger.debug('[CREATE CARRIER] Request body received:', JSON.stringify(body, null, 2))
+    logger.debug('[CREATE transportadora] Request body received:', JSON.stringify(body, null, 2))
 
     const validated = carrierSchema.parse(body)
-    logger.debug('[CREATE CARRIER] Validation passed:', JSON.stringify(validated, null, 2))
+    logger.debug('[CREATE transportadora] Validation passed:', JSON.stringify(validated, null, 2))
 
     const insertData: CarrierInsert = {
       name: validated.name,
@@ -83,7 +83,7 @@ export async function POST(req: NextRequest) {
       insertData.municipal_registration = validated.municipal_registration
     }
 
-    logger.debug('[CREATE CARRIER] Attempting insert...', JSON.stringify(insertData, null, 2))
+    logger.debug('[CREATE transportadora] Attempting insert...', JSON.stringify(insertData, null, 2))
 
     const supabase = getSupabaseAdmin()
     const { data, error } = await supabase
@@ -93,11 +93,11 @@ export async function POST(req: NextRequest) {
       .single()
 
     if (error) {
-      logError('[CREATE CARRIER] Database error', { error, code: error.code, details: error.details }, 'CarriersCreateAPI')
+      logError('[CREATE transportadora] Database error', { error, code: error.code, details: error.details }, 'CarriersCreateAPI')
       return errorResponse(error, 500, 'Erro ao criar transportadora')
     }
 
-    logger.debug('[CREATE CARRIER] Success! Carrier created:', (data as any).id)
+    logger.debug('[CREATE transportadora] Success! transportadora created:', (data as any).id)
 
     return successResponse({ carrier: data })
   } catch (error: unknown) {

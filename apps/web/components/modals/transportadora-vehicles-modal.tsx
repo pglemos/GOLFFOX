@@ -49,7 +49,7 @@ export function TransportadoraVehiclesModal({ carrier, isOpen, onClose }: Transp
   const loadVehicles = async () => {
     try {
       setLoading(true)
-      const response = await fetch(`/api/admin/transportadora/${carrier.id}/vehicles`)
+      const response = await fetch(`/api/admin/transportadora/${transportadora.id}/vehicles`)
       if (response.ok) {
         const result = await response.json()
         setVehicles(result.vehicles || [])
@@ -84,7 +84,7 @@ export function TransportadoraVehiclesModal({ carrier, isOpen, onClose }: Transp
     setLoading(true)
 
     try {
-      const response = await fetch(`/api/admin/transportadora/${carrier.id}/vehicles`, {
+      const response = await fetch(`/api/admin/transportadora/${transportadora.id}/vehicles`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -118,7 +118,7 @@ export function TransportadoraVehiclesModal({ carrier, isOpen, onClose }: Transp
     setLoading(true)
 
     try {
-      const response = await fetch(`/api/admin/transportadora/${carrier.id}/vehicles/${editingVehicle.id}`, {
+      const response = await fetch(`/api/admin/transportadora/${transportadora.id}/vehicles/${editingVehicle.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -152,7 +152,7 @@ export function TransportadoraVehiclesModal({ carrier, isOpen, onClose }: Transp
     setLoading(true)
 
     try {
-      const response = await fetch(`/api/admin/transportadora/${carrier.id}/vehicles/${vehicleId}`, {
+      const response = await fetch(`/api/admin/transportadora/${transportadora.id}/vehicles/${vehicleId}`, {
         method: 'DELETE'
       })
 
@@ -192,7 +192,7 @@ export function TransportadoraVehiclesModal({ carrier, isOpen, onClose }: Transp
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="w-[95vw] sm:w-[90vw] max-w-5xl max-h-[90vh] overflow-hidden flex flex-col p-4 sm:p-6 mx-auto">
         <DialogHeader className="pb-4 sm:pb-6">
-          <DialogTitle className="text-xl sm:text-2xl font-bold break-words">Veículos - {carrier.name}</DialogTitle>
+          <DialogTitle className="text-xl sm:text-2xl font-bold break-words">Veículos - {transportadora.name}</DialogTitle>
         </DialogHeader>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 overflow-hidden flex flex-col">

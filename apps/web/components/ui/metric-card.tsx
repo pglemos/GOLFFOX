@@ -35,11 +35,11 @@ export function MetricCard({
       transition={{ delay, duration: 0.5 }}
       className={cn("group", className)}
     >
-      <Card className="relative h-full overflow-hidden bg-card/50 backdrop-blur-sm border-[var(--border)] hover:shadow-xl transition-all duration-500 hover:border-[var(--brand)]/50">
+      <Card className="relative h-full overflow-hidden bg-card/50 backdrop-blur-sm border-border hover:shadow-xl transition-all duration-500 hover:border-brand/50">
         <CardHeader>
           <CardDescription className="flex items-center gap-2">
-            <div className="p-2 rounded-lg bg-gradient-to-br from-[var(--brand-light)] to-[var(--brand-soft)] group-hover:from-[var(--brand)] group-hover:to-[var(--brand-hover)] transition-all duration-300">
-              <Icon className="h-4 w-4 text-[var(--brand)] group-hover:text-white transition-colors" />
+            <div className="p-2 rounded-lg bg-gradient-to-br from-brand-light to-brand-soft group-hover:from-brand group-hover:to-brand-hover transition-all duration-300">
+              <Icon className="h-4 w-4 text-brand group-hover:text-white transition-colors" />
             </div>
             {title}
             {status && (
@@ -52,7 +52,7 @@ export function MetricCard({
         </CardHeader>
         {subtitle && (
           <CardContent className="pt-0">
-            <p className="text-xs text-[var(--ink-muted)]">{subtitle}</p>
+            <p className="text-xs text-ink-muted">{subtitle}</p>
           </CardContent>
         )}
       </Card>

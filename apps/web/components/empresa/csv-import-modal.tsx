@@ -65,7 +65,7 @@ export function CSVImportModal({ isOpen, onClose, onSave, empresaId }: CSVImport
     setCsvAvailable(Boolean(mod?.parseCSV))
     if (!mod?.parseCSV) {
       notifyError('Funcionalidade de importação CSV não disponível. Verifique se o módulo está instalado.', undefined, {
-        i18n: { ns: 'operator', key: 'csv_import.error', params: { message: 'Módulo ausente' } }
+        i18n: { ns: 'operador', key: 'csv_import.error', params: { message: 'Módulo ausente' } }
       })
       return
     }
@@ -80,14 +80,14 @@ export function CSVImportModal({ isOpen, onClose, onSave, empresaId }: CSVImport
 
       if (!result || !result.valid) {
         notifyError("Erro ao processar arquivo CSV", undefined, {
-          i18n: { ns: 'operator', key: 'csv_import.error', params: { message: 'Processamento' } }
+          i18n: { ns: 'operador', key: 'csv_import.error', params: { message: 'Processamento' } }
         })
         return
       }
 
       if (result.valid.length === 0) {
         notifyError("Nenhum funcionário válido encontrado no arquivo", undefined, {
-          i18n: { ns: 'operator', key: 'csv_import.error', params: { message: 'Nenhum válido' } }
+          i18n: { ns: 'operador', key: 'csv_import.error', params: { message: 'Nenhum válido' } }
         })
         return
       }
@@ -113,12 +113,12 @@ export function CSVImportModal({ isOpen, onClose, onSave, empresaId }: CSVImport
 
     const mod = await loadCsvModule()
     if (!mod?.parseCSV || !mod?.geocodeBatch || !mod?.importEmployees) {
-      notifyError('', undefined, { i18n: { ns: 'operator', key: 'csv_import.error', params: { message: 'Funcionalidade de importação CSV não disponível. Verifique se o módulo está instalado.' } } })
+      notifyError('', undefined, { i18n: { ns: 'operador', key: 'csv_import.error', params: { message: 'Funcionalidade de importação CSV não disponível. Verifique se o módulo está instalado.' } } })
       return
     }
 
     if (!empresaId) {
-      notifyError('', undefined, { i18n: { ns: 'operator', key: 'csv_import.error', params: { message: 'Empresa não selecionada' } } })
+      notifyError('', undefined, { i18n: { ns: 'operador', key: 'csv_import.error', params: { message: 'Empresa não selecionada' } } })
       return
     }
 
@@ -131,7 +131,7 @@ export function CSVImportModal({ isOpen, onClose, onSave, empresaId }: CSVImport
       const parseResult = await mod.parseCSV(file) as ParseResult
 
       if (!parseResult || parseResult.valid.length === 0) {
-        notifyError('', undefined, { i18n: { ns: 'operator', key: 'csv_import.error', params: { message: 'Nenhum funcionário válido para importar' } } })
+        notifyError('', undefined, { i18n: { ns: 'operador', key: 'csv_import.error', params: { message: 'Nenhum funcionário válido para importar' } } })
         setImporting(false)
         return
       }
@@ -163,15 +163,15 @@ export function CSVImportModal({ isOpen, onClose, onSave, empresaId }: CSVImport
       setImportResult(result)
 
       if (result.unresolvedAddresses && result.unresolvedAddresses.length > 0) {
-        notifyWarning('', { i18n: { ns: 'operator', key: 'csv_import.summary', params: { success: result.success, errorsSuffix: result.errors && result.errors.length > 0 ? `, ${result.errors.length} erros` : '', unresolvedSuffix: `, ${result.unresolvedAddresses.length} ${operatorI18n.csv_import?.unresolved_addresses || 'Endereços não resolvidos'}` } } })
+        notifyWarning('', { i18n: { ns: 'operador', key: 'csv_import.summary', params: { success: result.success, errorsSuffix: result.errors && result.errors.length > 0 ? `, ${result.errors.length} erros` : '', unresolvedSuffix: `, ${result.unresolvedAddresses.length} ${operatorI18n.csv_import?.unresolved_addresses || 'Endereços não resolvidos'}` } } })
       } else {
-        notifySuccess('', { i18n: { ns: 'operator', key: 'csv_import.summary', params: { success: result.success, errorsSuffix: result.errors && result.errors.length > 0 ? `, ${result.errors.length} erros` : '', unresolvedSuffix: '' } } })
+        notifySuccess('', { i18n: { ns: 'operador', key: 'csv_import.summary', params: { success: result.success, errorsSuffix: result.errors && result.errors.length > 0 ? `, ${result.errors.length} erros` : '', unresolvedSuffix: '' } } })
       }
 
       onSave()
     } catch (error: any) {
       logError("Erro na importação", { error }, 'CSVImportModal')
-      notifyError('', undefined, { i18n: { ns: 'operator', key: 'csv_import.error', params: { message: error?.message || 'Erro desconhecido' } } })
+      notifyError('', undefined, { i18n: { ns: 'operador', key: 'csv_import.error', params: { message: error?.message || 'Erro desconhecido' } } })
     } finally {
       setImporting(false)
     }

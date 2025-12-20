@@ -105,7 +105,7 @@ export function VehicleChecklistModal({
       const { data, error } = await supabase
         .from("users")
         .select("id, name, email")
-        .eq("role", "driver")
+        .eq("role", "motorista")
         .eq("is_active", true)
 
       if (error) throw error

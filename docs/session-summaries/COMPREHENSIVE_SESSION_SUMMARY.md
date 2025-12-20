@@ -78,7 +78,7 @@ apps/web/app/transportadora/configuracoes/page.tsx (lines 202-207)
 
 #### Bug #2 - NOT A BUG ✅
 **Status:** API exists and is comprehensive
-- File: `app/api/admin/create-operator/route.ts` (544 lines)
+- File: `app/api/admin/create-operador/route.ts` (544 lines)
 - Features:
   - ✅ Rate limiting
   - ✅ Authentication (admin only)
@@ -103,7 +103,7 @@ apps/web/app/transportadora/configuracoes/page.tsx (lines 202-207)
 
 **Investigation Results:**
 
-Reviewed `create-operator-modal.tsx` error handling:
+Reviewed `create-operador-modal.tsx` error handling:
 - ✅ Does NOT close modal on error
 - ✅ User-friendly messages by status code
 - ✅ Error toasts displayed

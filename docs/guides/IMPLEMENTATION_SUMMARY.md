@@ -13,10 +13,10 @@
 
 - **Replaced permissive policies** (all authenticated users) with strict role-based access
 - **Admin**: Full access to all tables
-- **Operator**: Company-scoped access (filtered by `company_id`)
-- **Carrier**: Carrier-scoped access (filtered by `carrier_id`)
-- **Driver**: Own trips only (`driver_id = auth.uid()`), can insert own GPS positions
-- **Passenger**: Assigned trips only (via `trip_passengers` table)
+- **operador**: Company-scoped access (filtered by `company_id`)
+- **transportadora**: transportadora-scoped access (filtered by `carrier_id`)
+- **motorista**: Own trips only (`driver_id = auth.uid()`), can insert own GPS positions
+- **passageiro**: Assigned trips only (via `trip_passengers` table)
 
 **Impact:** Database-level security enforcement, zero trust architecture
 
@@ -29,9 +29,9 @@
 - **RPC Function**: `rpc_trip_transition(p_trip_id, p_new_status, p_force, p_notes)`
 - **Row Locking**: `SELECT ... FOR UPDATE` prevents race conditions
 - **Valid Transitions**:
-  - `scheduled → inProgress` (Driver starts)
-  - `inProgress → completed` (Driver completes)
-  - `inProgress → cancelled` (Admin/Operator cancels)
+  - `scheduled → inProgress` (motorista starts)
+  - `inProgress → completed` (motorista completes)
+  - `inProgress → cancelled` (Admin/operador cancels)
   - `completed → inProgress` (Admin reopen with `force=true`)
 - **Audit Trail**: All transitions logged to `trip_events` table
 
@@ -186,15 +186,15 @@ If empty and you need scheduled MV refresh, contact Supabase support to enable `
 
 ### Test Accounts (password: `senha123`)
 - `admin@golffox.com` - Full access, can force reopen trips
-- `operator@golffox.com` - Company-scoped access
-- `carrier@golffox.com` - Carrier vehicles/routes only
-- `driver@golffox.com` - Own trips only, GPS insertion
-- `passenger@golffox.com` - Assigned trips only
+- `operador@golffox.com` - Company-scoped access
+- `transportadora@golffox.com` - transportadora vehicles/routes only
+- `motorista@golffox.com` - Own trips only, GPS insertion
+- `passageiro@golffox.com` - Assigned trips only
 
 ### Test Scenarios
 
 #### **Scenario 1: Driver Trip Lifecycle**
-1. Login as `driver@golffox.com`
+1. Login as `motorista@golffox.com`
 2. Navigate to assigned trip
 3. Click "Start Trip" → Status changes to `inProgress`
 4. Watch GPS positions appearing in real-time (map updates)
@@ -208,8 +208,8 @@ If empty and you need scheduled MV refresh, contact Supabase support to enable `
 4. Check audit log shows `forced: true`
 
 #### **Scenario 3: Operator Scope**
-1. Login as `operator@golffox.com`
-2. Verify: Only trips from operator's company are visible
+1. Login as `operador@golffox.com`
+2. Verify: Only trips from operador's company are visible
 3. Try to view driver from another company → Should fail (RLS)
 
 #### **Scenario 4: Real-time Updates**
@@ -279,7 +279,7 @@ SELECT rpc_trip_transition(
 ### 1. **Helper Functions**
 - `get_user_role()` - Get current user's role from context
 - `get_user_company_id()` - Get company for filtering
-- `get_user_carrier_id()` - Get carrier for filtering
+- `get_user_carrier_id()` - Get transportadora for filtering
 
 ### 2. **Indexes for Performance**
 ```sql

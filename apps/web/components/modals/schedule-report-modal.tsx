@@ -142,13 +142,13 @@ export function ScheduleReportModal({
       // Validações
       if (!selectedCompany) {
         notifyError("Selecione uma empresa", undefined, {
-          i18n: { ns: 'operator', key: 'reports.schedule.validation.selectCompany' }
+          i18n: { ns: 'operador', key: 'reports.schedule.validation.selectCompany' }
         })
         return
       }
       if (!selectedReport) {
         notifyError("Selecione um relatório", undefined, {
-          i18n: { ns: 'operator', key: 'reports.schedule.validation.selectReport' }
+          i18n: { ns: 'operador', key: 'reports.schedule.validation.selectReport' }
         })
         return
       }
@@ -215,7 +215,7 @@ export function ScheduleReportModal({
       }
 
       notifySuccess(`Agendamento ${schedule ? 'atualizado' : 'criado'} com sucesso!`, {
-        i18n: { ns: 'operator', key: schedule ? 'reports.schedule.successUpdated' : 'reports.schedule.successCreated' }
+        i18n: { ns: 'operador', key: schedule ? 'reports.schedule.successUpdated' : 'reports.schedule.successCreated' }
       })
       onSave()
       onClose()
@@ -232,7 +232,7 @@ export function ScheduleReportModal({
     } catch (error: any) {
       console.error("Erro ao criar agendamento:", error)
       notifyError(error.message || "Erro ao criar agendamento", undefined, {
-        i18n: { ns: 'operator', key: 'reports.schedule.errors.createSchedule' }
+        i18n: { ns: 'operador', key: 'reports.schedule.errors.createSchedule' }
       })
     } finally {
       setLoading(false)

@@ -98,7 +98,7 @@ export default function SLAMotoristaPage() {
                     </Card>
                 </div>
 
-                {/* Driver List */}
+                {/* motorista List */}
                 <div className="space-y-3">
                     {drivers.map(driver => (
                         <Card key={driver.id}>
@@ -109,27 +109,27 @@ export default function SLAMotoristaPage() {
                                             <Users className="h-5 w-5 text-primary" />
                                         </div>
                                         <div>
-                                            <p className="font-medium">{driver.name}</p>
-                                            <p className="text-sm text-muted-foreground">{driver.trips_completed} viagens</p>
+                                            <p className="font-medium">{motorista.name}</p>
+                                            <p className="text-sm text-muted-foreground">{motorista.trips_completed} viagens</p>
                                         </div>
                                     </div>
 
                                     <div className="flex-1 max-w-xs">
                                         <div className="flex items-center justify-between mb-1">
                                             <span className="text-sm">Pontualidade</span>
-                                            <span className="text-sm font-medium">{driver.on_time_rate}%</span>
+                                            <span className="text-sm font-medium">{motorista.on_time_rate}%</span>
                                         </div>
-                                        <Progress value={driver.on_time_rate} className="h-2" />
+                                        <Progress value={motorista.on_time_rate} className="h-2" />
                                     </div>
 
                                     <div className="flex items-center gap-4">
                                         <div className="text-center">
                                             <p className="text-sm text-muted-foreground">Atraso Médio</p>
-                                            <p className="font-medium">{driver.avg_delay_minutes.toFixed(1)} min</p>
+                                            <p className="font-medium">{motorista.avg_delay_minutes.toFixed(1)} min</p>
                                         </div>
                                         <div className="text-center">
                                             <p className="text-sm text-muted-foreground">Incidentes</p>
-                                            <p className="font-medium">{driver.incidents}</p>
+                                            <p className="font-medium">{motorista.incidents}</p>
                                         </div>
                                         {getStatusBadge(driver.sla_status)}
                                     </div>

@@ -125,7 +125,7 @@ export async function GET(req: NextRequest) {
           name: driver.name,
           email: driver.email
         } : null,
-        displayName: `${route.name}${vehicle || driver ? ` (Veículo: ${vehicle?.plate || 'N/A'} / Motorista: ${driver?.name || 'N/A'})` : ''}`
+        displayName: `${route.name}${vehicle || motorista ? ` (Veículo: ${vehicle?.plate || 'N/A'} / Motorista: ${motorista?.name || 'N/A'})` : ''}`
       }
     })
 

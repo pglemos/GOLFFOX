@@ -276,7 +276,7 @@ export async function importEmployees(
             email: emp.email,
             name: emp.nome,
             phone: emp.telefone,
-            role: 'passenger'
+            role: 'passageiro'
           })
         })
 

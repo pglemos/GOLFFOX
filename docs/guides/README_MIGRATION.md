@@ -22,7 +22,7 @@ A auditoria completa do sistema GOLFFOX foi realizada com sucesso. **Todos os li
 - Verificação de 199 arquivos de código (`.ts`, `.tsx`, `.js`, `.jsx`, `.json`)
 - Verificação de 6 tabelas do banco de dados
 - Verificação de 4 arquivos de configuração
-- Busca por padrão: `operator?company=`
+- Busca por padrão: `operador?company=`
 
 ### 2. Testes Automatizados ✅
 - 11 testes end-to-end executados

@@ -15,10 +15,10 @@ const badgeVariants = cva(
         destructive:
           "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80 hover:shadow-md",
         outline: "text-foreground hover:bg-accent hover:shadow-sm",
-        gradient: "border-transparent bg-gradient-to-r from-[var(--brand)] to-[var(--brand-hover)] text-white hover:from-[var(--brand-hover)] hover:to-[var(--brand)] hover:shadow-lg",
-        success: "border-transparent bg-[var(--success)] text-white hover:bg-[var(--success)]/90 hover:shadow-md",
-        warning: "border-transparent bg-[var(--warning)] text-white hover:bg-[var(--warning)]/90 hover:shadow-md",
-        info: "border-transparent bg-[var(--info)] text-white hover:bg-[var(--info)]/90 hover:shadow-md",
+        gradient: "border-transparent bg-gradient-to-r from-brand to-brand-hover text-white hover:from-brand-hover hover:to-brand hover:shadow-lg",
+        success: "border-transparent bg-success text-white hover:bg-success/90 hover:shadow-md",
+        warning: "border-transparent bg-warning text-white hover:bg-warning/90 hover:shadow-md",
+        info: "border-transparent bg-info text-white hover:bg-info/90 hover:shadow-md",
       },
     },
     defaultVariants: {

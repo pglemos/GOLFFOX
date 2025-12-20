@@ -67,8 +67,8 @@ ORDER BY tablename, policyname;
 
 **Verifique especialmente:**
 - `driver_positions`: 4 policies (admin, insert, driver_read, company_read, carrier_read)
-- `trips`: 5 policies (admin, company, carrier, driver, passenger)
-- `users`: 5 policies (admin, company, carrier, self read, self update)
+- `trips`: 5 policies (admin, company, transportadora, motorista, passageiro)
+- `users`: 5 policies (admin, company, transportadora, self read, self update)
 
 ---
 
@@ -223,11 +223,11 @@ ORDER BY u.email;
 ✅ Esperado: 5 usuários com roles corretos
 
 **Esperado Roles:**
-- `golffox@admin.com` → role = `admin`, company/carrier = NULL
-- `operador@empresa.com` → role = `operator`, company = 'Acme Corp'
-- `transportadora@trans.com` → role = `carrier`, carrier = 'TransPrime'
-- `motorista@trans.com` → role = `driver`, carrier = 'TransPrime'
-- `passageiro@empresa.com` → role = `passenger`, company = 'Acme Corp'
+- `golffox@admin.com` → role = `admin`, company/transportadora = NULL
+- `operador@empresa.com` → role = `operador`, company = 'Acme Corp'
+- `transportadora@trans.com` → role = `transportadora`, transportadora = 'TransPrime'
+- `motorista@trans.com` → role = `motorista`, transportadora = 'TransPrime'
+- `passageiro@empresa.com` → role = `passageiro`, company = 'Acme Corp'
 
 ---
 

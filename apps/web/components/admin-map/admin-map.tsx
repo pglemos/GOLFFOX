@@ -160,7 +160,7 @@ export function AdminMap({
     company: companyId || '',
     route: routeId || '',
     vehicle: vehicleId || '',
-    driver: '',
+    motorista: '',
     status: '',
     shift: '',
     search: '',
@@ -1592,7 +1592,7 @@ export function AdminMap({
     if (filters.company) params.set('company_id', filters.company)
     if (filters.route) params.set('route_id', filters.route)
     if (filters.vehicle) params.set('vehicle_id', filters.vehicle)
-    if (filters.driver) params.set('driver_id', filters.driver)
+    if (filters.motorista) params.set('driver_id', filters.motorista)
     if (filters.status) params.set('status', filters.status)
     if (filters.shift) params.set('shift', filters.shift)
     
