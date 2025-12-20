@@ -108,3 +108,5 @@ vercel logs
 - ✅ Extensão Vercel configurada no Cursor
 - ✅ MCP Vercel configurado
 
+
+

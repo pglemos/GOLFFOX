@@ -71,3 +71,5 @@ O token usado para o link foi o token correto encontrado em `AUTONOMY_RULES.md`:
 
 ⚠️ **Importante**: O arquivo `.env.local` foi adicionado ao `.gitignore` automaticamente para proteger as credenciais.
 
+
+

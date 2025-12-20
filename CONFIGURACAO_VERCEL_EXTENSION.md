@@ -1,8 +1,15 @@
 # Configuração da Extensão Vercel for VS Code - 20/12/2025
 
-## ✅ Status: Configurada
+## ✅ Status: Configurada e Corrigida (20/12/2025)
 
-A extensão **Vercel for VS Code by Sodefa** já está instalada e configurada com sucesso!
+A extensão **Vercel for VS Code by Sodefa** está instalada e configurada com sucesso!
+
+### ⚠️ Correção Aplicada
+
+O token foi atualizado para o token correto do Vercel:
+- **Token anterior (inválido)**: `Ao7Xv6TB9X1af7cbDjL2Svt9`
+- **Token intermediário**: `V8FJoSMM3um4TfU05Y19PwFa`
+- **Token atual (novo, gerado em 20/12/2025)**: `1oIlqDMYnq8roc76Oly57J4m`
 
 ### Detalhes da Instalação
 
@@ -18,7 +25,7 @@ O token do Vercel já está configurado no arquivo de configurações do Cursor:
 
 ```json
 {
-    "vercelVSCode.accessToken": "Ao7Xv6TB9X1af7cbDjL2Svt9"
+    "vercelVSCode.accessToken": "1oIlqDMYnq8roc76Oly57J4m"
 }
 ```
 
@@ -91,9 +98,27 @@ Se a extensão não estiver funcionando:
 ## Próximos Passos
 
 1. ✅ Extensão instalada
-2. ✅ Token configurado
-3. 🔄 **Reinicie o Cursor** para garantir que todas as configurações sejam aplicadas
+2. ✅ Token configurado e corrigido (20/12/2025)
+3. 🔄 **REINICIE O CURSOR COMPLETAMENTE** (Cmd + Q) para aplicar as mudanças
 4. Teste a extensão usando os comandos do Vercel
+
+### ⚠️ IMPORTANTE: Após a Correção
+
+Após atualizar o token, você **DEVE**:
+1. Fechar completamente o Cursor (Cmd + Q)
+2. Reabrir o Cursor
+3. Verificar se a extensão Vercel está funcionando sem erros de autorização
+4. Se ainda houver erro, verifique os logs da extensão (View > Output > Vercel)
+
+### 🔧 Configuração Adicional (Workspace)
+
+O token também foi configurado no arquivo `.vscode/settings.json` do workspace:
+- **Arquivo**: `.vscode/settings.json` (no diretório raiz do projeto)
+- Isso garante que a extensão encontre o token mesmo quando o workspace está aberto
+
+**Nota**: A extensão pode procurar o token em:
+1. Workspace settings (`.vscode/settings.json`) - ✅ Configurado
+2. User settings (`~/Library/Application Support/Cursor/User/settings.json`) - ✅ Configurado
 
 ## Referências
 

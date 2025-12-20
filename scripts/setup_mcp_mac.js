@@ -152,7 +152,7 @@ const mcpConfig = {
             ],
             "env": {
                 "PATH": mcpEnvPath,
-                "VERCEL_TOKEN": "Ao7Xv6TB9X1af7cbDjL2Svt9"
+                "VERCEL_TOKEN": "1oIlqDMYnq8roc76Oly57J4m"
             }
         },
         "Filesystem": {
