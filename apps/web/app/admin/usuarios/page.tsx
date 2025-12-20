@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input"
 import { ChangeRoleModal } from "@/components/modals/change-role-modal"
 import { notifySuccess, notifyError } from "@/lib/toast"
 import { EditUserModal } from "@/components/modals/edit-user-modal"
-import { CreateUserModal } from "@/components/modals/create-operador-login-modal"
+import { CreateUserModal } from "@/components/modals/create-operator-login-modal"
 import {
     Select,
     SelectContent,
@@ -136,7 +136,7 @@ export default function UsuariosPage() {
     }
 
     if (authLoading || !user) {
-        return <div className="min-h-screen flex items-center justify-center"><div className="w-16 h-16 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin mx-auto"></div></div>
+        return <div className="min-h-screen flex items-center justify-center"><div className="w-16 h-16 border-4 border-text-brand border-t-transparent rounded-full animate-spin mx-auto"></div></div>
     }
 
     return (
@@ -145,7 +145,7 @@ export default function UsuariosPage() {
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 w-full">
                     <div className="min-w-0">
                         <h1 className="text-2xl sm:text-3xl font-bold mb-2 break-words">Usuários</h1>
-                        <p className="text-sm sm:text-base text-[var(--ink-muted)] break-words">Gerencie todos os usuários do sistema</p>
+                        <p className="text-sm sm:text-base text-ink-muted break-words">Gerencie todos os usuários do sistema</p>
                     </div>
                     <Button
                         onClick={() => setIsCreateUserModalOpen(true)}
@@ -210,11 +210,11 @@ export default function UsuariosPage() {
                         description="Filtre os usuários por papel e status"
                     />
                 ) : (
-                    <Card className="overflow-hidden bg-card border-[var(--border)]">
+                    <Card className="overflow-hidden bg-card border-border">
                         <CardHeader className="p-3 sm:p-6">
                             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
                                 <div className="flex items-center gap-2 min-w-0">
-                                    <Filter className="h-4 w-4 sm:h-5 sm:w-5 text-[var(--brand)] flex-shrink-0" />
+                                    <Filter className="h-4 w-4 sm:h-5 sm:w-5 text-brand flex-shrink-0" />
                                     <CardTitle className="text-base sm:text-lg font-semibold break-words">Filtros</CardTitle>
                                 </div>
                                 <Button
@@ -266,7 +266,7 @@ export default function UsuariosPage() {
                                         </SelectContent>
                                     </Select>
                                 </div>
-                                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2 sm:gap-2 pt-4 border-t border-[var(--border)]">
+                                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2 sm:gap-2 pt-4 border-t border-border">
                                     <Button
                                         variant="outline"
                                         size="sm"
@@ -291,7 +291,7 @@ export default function UsuariosPage() {
                 )}
 
                 {/* Tabela de Usuários - Mobile: Cards, Desktop: Tabela */}
-                <Card className="overflow-hidden bg-card border-[var(--border)]">
+                <Card className="overflow-hidden bg-card border-border">
                     {isMobile ? (
                         /* Mobile: Cards Layout */
                         <div className="p-3 space-y-3">

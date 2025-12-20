@@ -215,10 +215,10 @@ export default function AdminDashboard() {
           <div className="grid-responsive-cards">
             {[1, 2, 3, 4, 5, 6].map((i) => (
               <div key={i} className="stat-card p-6 space-y-3">
-                <div className="h-12 w-12 rounded-lg bg-[var(--bg-hover)] animate-pulse" />
+                <div className="h-12 w-12 rounded-lg bg-bg-hover animate-pulse" />
                 <div className="space-y-2">
-                  <div className="h-4 w-24 bg-[var(--bg-hover)] rounded animate-pulse" />
-                  <div className="h-8 w-16 bg-[var(--bg-hover)] rounded animate-pulse" />
+                  <div className="h-4 w-24 bg-bg-hover rounded animate-pulse" />
+                  <div className="h-8 w-16 bg-bg-hover rounded animate-pulse" />
                 </div>
               </div>
             ))}
@@ -293,11 +293,11 @@ export default function AdminDashboard() {
               description="Filtre os dados do dashboard"
             />
           ) : (
-            <Card className="bg-card/50 backdrop-blur-sm border-[var(--border)] hover:shadow-xl transition-all duration-300">
+            <Card className="bg-card/50 backdrop-blur-sm border-border hover:shadow-xl transition-all duration-300">
               <CardHeader className="pb-4 px-3 sm:px-6">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
                   <div className="flex items-center gap-2">
-                    <Filter className="h-5 w-5 text-[var(--brand)] flex-shrink-0" />
+                    <Filter className="h-5 w-5 text-brand flex-shrink-0" />
                     <CardTitle className="text-base sm:text-lg font-semibold">Filtros</CardTitle>
                   </div>
                   <Button
@@ -326,7 +326,7 @@ export default function AdminDashboard() {
                 <CardContent className="pt-0 px-3 sm:px-6">
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 mb-4">
                     <div className="space-y-2">
-                      <label className="block text-sm font-medium text-[var(--ink-strong)]">Empresa</label>
+                      <label className="block text-sm font-medium text-text-ink-strong">Empresa</label>
                       <Input
                         placeholder="Todas as empresas"
                         value={tempFilters.empresa}
@@ -335,9 +335,9 @@ export default function AdminDashboard() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="block text-sm font-medium text-[var(--ink-strong)]">Data</label>
+                      <label className="block text-sm font-medium text-text-ink-strong">Data</label>
                       <div className="relative">
-                        <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--ink-muted)] pointer-events-none z-10" />
+                        <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-ink-muted pointer-events-none z-10" />
                         <Input
                           type="date"
                           value={tempFilters.data}
@@ -347,9 +347,9 @@ export default function AdminDashboard() {
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <label className="block text-sm font-medium text-[var(--ink-strong)]">Turno</label>
+                      <label className="block text-sm font-medium text-text-ink-strong">Turno</label>
                       <select
-                        className="w-full min-h-[44px] px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--bg-soft)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand)] focus:ring-opacity-20 transition-all touch-manipulation"
+                        className="w-full min-h-[44px] px-3 py-2 rounded-lg border border-border bg-bg-soft text-sm focus:outline-none focus:ring-2 focus:ring-text-brand focus:ring-opacity-20 transition-all touch-manipulation"
                         value={tempFilters.turno}
                         onChange={(e) => setTempFilters({ ...tempFilters, turno: e.target.value })}
                       >
@@ -360,7 +360,7 @@ export default function AdminDashboard() {
                       </select>
                     </div>
                   </div>
-                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2 sm:gap-2 pt-4 border-t border-[var(--border)]">
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2 sm:gap-2 pt-4 border-t border-border">
                     <Button
                       variant="outline"
                       size="sm"
@@ -436,8 +436,8 @@ export default function AdminDashboard() {
               description: "Visualize veículos em tempo real",
               icon: MapPin,
               href: "/admin/mapa",
-              gradient: "from-[var(--brand)] to-[var(--brand-hover)]",
-              bgGradient: "from-[var(--brand)]/10 to-[var(--brand-hover)]/5",
+              gradient: "from-text-brand to-brand-hover",
+              bgGradient: "from-text-brand/10 to-brand-hover/5",
             },
             {
               title: "Alertas e Notificações",

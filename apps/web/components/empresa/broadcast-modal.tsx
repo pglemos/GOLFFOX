@@ -101,7 +101,7 @@ export function BroadcastModal({ isOpen, onClose, onSave, empresaId }: Broadcast
             <Label htmlFor="message" className="text-base font-medium">Mensagem</Label>
             <textarea
               id="message"
-              className="min-h-[150px] rounded-md border border-[var(--border)] p-2 sm:p-3 text-base"
+              className="min-h-[150px] rounded-md border border-border p-2 sm:p-3 text-base"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               placeholder="Digite sua mensagem aqui..."

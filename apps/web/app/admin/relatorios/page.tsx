@@ -206,15 +206,15 @@ export default function RelatoriosPage() {
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold mb-2">Relatórios</h1>
-          <p className="text-[var(--ink-muted)]">Visões de operação e análises</p>
+          <p className="text-ink-muted">Visões de operação e análises</p>
         </div>
 
         {/* Filtros */}
-        <Card className="bg-card/50 backdrop-blur-sm border-[var(--border)]">
+        <Card className="bg-card/50 backdrop-blur-sm border-border">
           <CardHeader>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Filter className="h-5 w-5 text-[var(--brand)]" />
+                <Filter className="h-5 w-5 text-brand" />
                 <CardTitle className="text-lg">Filtros</CardTitle>
               </div>
               <Button
@@ -243,7 +243,7 @@ export default function RelatoriosPage() {
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Data Início</label>
                   <div className="relative">
-                    <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--ink-muted)]" />
+                    <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-ink-muted" />
                     <Input
                       type="date"
                       value={tempDateStart}
@@ -255,7 +255,7 @@ export default function RelatoriosPage() {
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Data Fim</label>
                   <div className="relative">
-                    <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--ink-muted)]" />
+                    <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-ink-muted" />
                     <Input
                       type="date"
                       value={tempDateEnd}
@@ -273,7 +273,7 @@ export default function RelatoriosPage() {
                   />
                 </div>
               </div>
-              <div className="flex items-center justify-end gap-2 pt-4 border-t border-[var(--border)]">
+              <div className="flex items-center justify-end gap-2 pt-4 border-t border-border">
                 <Button
                   variant="outline"
                   size="sm"
@@ -307,14 +307,14 @@ export default function RelatoriosPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.1 }}
               >
-                <Card className="p-6 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-[var(--border)] hover:border-[var(--brand)]/30 group">
+                <Card className="p-6 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-border hover:border-text-brand/30 group">
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
-                      <div className="p-2 rounded-lg bg-gradient-to-br from-[var(--brand-light)] to-[var(--brand-soft)] w-fit mb-2 group-hover:scale-110 transition-transform duration-300">
-                        <Icon className="h-6 w-6 text-[var(--brand)]" />
+                      <div className="p-2 rounded-lg bg-gradient-to-br from-bg-brand-light to-bg-brand-soft w-fit mb-2 group-hover:scale-110 transition-transform duration-300">
+                        <Icon className="h-6 w-6 text-brand" />
                       </div>
-                      <h3 className="font-bold text-lg mb-1 group-hover:text-[var(--brand)] transition-colors">{report.title}</h3>
-                      <p className="text-sm text-[var(--ink-muted)]">{report.description}</p>
+                      <h3 className="font-bold text-lg mb-1 group-hover:text-brand transition-colors">{report.title}</h3>
+                      <p className="text-sm text-ink-muted">{report.description}</p>
                     </div>
                   </div>
                   <div className="flex flex-col gap-2">
@@ -364,19 +364,19 @@ export default function RelatoriosPage() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Mail className="h-5 w-5 text-[var(--brand)]" />
+                <Mail className="h-5 w-5 text-brand" />
                 Agendamentos de Relatórios
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
                 {schedules.map((schedule) => (
-                  <div key={schedule.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-[var(--bg-hover)] transition-colors">
+                  <div key={schedule.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-bg-hover transition-colors">
                     <div className="flex-1">
                       <div className="font-semibold">
                         {reports.find(r => r.id === schedule.report_key)?.title || schedule.report_key}
                       </div>
-                      <div className="text-sm text-[var(--ink-muted)]">
+                      <div className="text-sm text-ink-muted">
                         {schedule.cron} para {schedule.recipients?.join(', ') || 'N/A'}
                       </div>
                     </div>

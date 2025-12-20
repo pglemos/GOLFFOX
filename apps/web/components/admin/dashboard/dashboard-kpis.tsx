@@ -87,8 +87,8 @@ export function DashboardKPIs({ kpis }: DashboardKPIsProps) {
                         <Card className="group hover:shadow-lg transition-all duration-300 cursor-pointer">
                             <CardHeader>
                                 <CardDescription className="flex items-center gap-2">
-                                    <div className="p-2 rounded-lg bg-gradient-to-br from-[var(--brand-light)] to-[var(--brand-soft)] group-hover:from-[var(--brand)] group-hover:to-[var(--brand-hover)] transition-all duration-300">
-                                        <Icon className="h-4 w-4 text-[var(--brand)] group-hover:text-white transition-colors" />
+                                    <div className="p-2 rounded-lg bg-gradient-to-br from-bg-brand-light to-bg-brand-soft group-hover:from-text-brand group-hover:to-brand-hover transition-all duration-300">
+                                        <Icon className="h-4 w-4 text-brand group-hover:text-white transition-colors" />
                                     </div>
                                     {kpi.label}
                                 </CardDescription>
@@ -106,7 +106,7 @@ export function DashboardKPIs({ kpis }: DashboardKPIsProps) {
                                 )}
                             </CardHeader>
                             <CardFooter className="flex-col items-start gap-1.5 text-sm pt-0">
-                                <div className="text-[var(--ink-muted)] text-xs">
+                                <div className="text-ink-muted text-xs">
                                     {kpi.hint}
                                 </div>
                             </CardFooter>

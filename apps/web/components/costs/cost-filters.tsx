@@ -108,7 +108,7 @@ export function CostFilters({
       <CardHeader>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Filter className="h-5 w-5 text-[var(--brand)]" />
+            <Filter className="h-5 w-5 text-brand" />
             <CardTitle className="text-lg">Filtros</CardTitle>
             {hasActiveFilters && (
               <span className="px-2 py-1 bg-orange-100 text-orange-700 rounded-full text-xs font-medium">
@@ -279,7 +279,7 @@ export function CostFilters({
               </div>
             )}
           </div>
-          <div className="flex items-center justify-end gap-2 pt-4 border-t border-[var(--border)]">
+          <div className="flex items-center justify-end gap-2 pt-4 border-t border-border">
             <Button
               variant="outline"
               size="sm"

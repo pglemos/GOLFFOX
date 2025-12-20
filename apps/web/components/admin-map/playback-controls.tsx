@@ -40,7 +40,7 @@ export function PlaybackControls({
   }
 
   return (
-    <Card className="p-3 sm:p-4 bg-card/50 backdrop-blur-sm border-[var(--border)] shadow-md sm:shadow-xl max-md:p-2">
+    <Card className="p-3 sm:p-4 bg-card/50 backdrop-blur-sm border-border shadow-md sm:shadow-xl max-md:p-2">
       <div className="flex items-center gap-4 max-md:gap-2 max-md:flex-wrap">
         {/* Controles de reprodução */}
         <div className="flex items-center gap-2">
@@ -79,7 +79,7 @@ export function PlaybackControls({
         {/* Timeline slider */}
         <div className="flex-1">
           <div className="flex items-center gap-2">
-            <span className="text-xs text-[var(--ink-muted)] w-20 text-right">
+            <span className="text-xs text-ink-muted w-20 text-right">
               {currentTime ? currentTime.toLocaleTimeString('pt-BR') : '00:00'}
             </span>
             <Slider
@@ -92,7 +92,7 @@ export function PlaybackControls({
               step={0.1}
               className="flex-1"
             />
-            <span className="text-xs text-[var(--ink-muted)] w-20">
+            <span className="text-xs text-ink-muted w-20">
               {duration ? duration.toLocaleTimeString('pt-BR') : '00:00'}
             </span>
           </div>
@@ -100,7 +100,7 @@ export function PlaybackControls({
 
         {/* Velocidade */}
         <div className="flex items-center gap-2 border-l pl-4">
-          <Gauge className="h-4 w-4 text-[var(--ink-muted)]" />
+          <Gauge className="h-4 w-4 text-ink-muted" />
           <Button
             size="sm"
             variant={speed === 1 ? 'default' : 'outline'}

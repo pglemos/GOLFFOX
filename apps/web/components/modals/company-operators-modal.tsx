@@ -15,7 +15,7 @@ import { Label } from "@/components/ui/label"
 import { Users, Plus, Edit, Trash2, Loader2 } from "lucide-react"
 import { notifySuccess, notifyError } from "@/lib/toast"
 import { globalSyncManager } from "@/lib/global-sync"
-import { CreateUserModal } from "./create-operador-login-modal"
+import { CreateUserModal } from "./create-operator-login-modal"
 import { EditUserModal } from "./edit-user-modal"
 
 interface Company {

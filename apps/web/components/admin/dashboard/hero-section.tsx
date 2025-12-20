@@ -53,7 +53,7 @@ export function HeroSection({
       variants={staggerContainerFast}
       initial="hidden"
       animate="visible"
-      className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[var(--brand)] via-orange-500 to-[var(--brand-hover)] p-6 sm:p-8 lg:p-10 shadow-2xl"
+      className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-text-brand via-orange-500 to-brand-hover p-6 sm:p-8 lg:p-10 shadow-2xl"
     >
 
       {/* Gradient Overlay */}

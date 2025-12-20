@@ -141,10 +141,10 @@ export function CarrierMap({ vehicles, className = "" }: CarrierMapProps) {
 
   if (error) {
     return (
-      <div className={`aspect-[4/3] bg-[var(--bg)] rounded-xl flex items-center justify-center border border-[var(--muted)]/20 ${className}`}>
+      <div className={`aspect-[4/3] bg-bg-bg rounded-xl flex items-center justify-center border border-text-muted-foreground/20 ${className}`}>
         <div className="text-center">
-          <MapIcon className="h-16 w-16 mx-auto mb-4 text-[var(--err)]" />
-          <p className="text-[var(--err)]">{error}</p>
+          <MapIcon className="h-16 w-16 mx-auto mb-4 text-error" />
+          <p className="text-error">{error}</p>
         </div>
       </div>
     )
@@ -152,10 +152,10 @@ export function CarrierMap({ vehicles, className = "" }: CarrierMapProps) {
 
   if (loading) {
     return (
-      <div className={`aspect-[4/3] bg-[var(--bg)] rounded-xl flex items-center justify-center border border-[var(--muted)]/20 ${className}`}>
+      <div className={`aspect-[4/3] bg-bg-bg rounded-xl flex items-center justify-center border border-text-muted-foreground/20 ${className}`}>
         <div className="text-center">
-          <MapIcon className="h-16 w-16 mx-auto mb-4 text-[var(--muted)] animate-pulse" />
-          <p className="text-[var(--muted)]">Carregando mapa...</p>
+          <MapIcon className="h-16 w-16 mx-auto mb-4 text-text-muted-foreground animate-pulse" />
+          <p className="text-text-muted-foreground">Carregando mapa...</p>
         </div>
       </div>
     )

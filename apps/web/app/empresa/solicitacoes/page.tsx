@@ -78,7 +78,7 @@ export default function SolicitacoesOperatorPage() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
           <div className="min-w-0 flex-1">
             <h1 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2 break-words">Solicitações & Mudanças</h1>
-            <p className="text-sm sm:text-base text-[var(--ink-muted)] break-words">Abra solicitações para a GOLF FOX e acompanhe o status</p>
+            <p className="text-sm sm:text-base text-ink-muted break-words">Abra solicitações para a GOLF FOX e acompanhe o status</p>
           </div>
           <Button 
             className="bg-orange-500 hover:bg-orange-600 w-full sm:w-auto flex-shrink-0 min-h-[44px] text-sm sm:text-base px-4 sm:px-6 py-2 sm:py-2.5" 
@@ -100,20 +100,20 @@ export default function SolicitacoesOperatorPage() {
               whileHover={{ y: -4 }}
               className="group"
             >
-            <Card key={col.key} className="p-3 sm:p-4 overflow-hidden w-full hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-[var(--border)] hover:border-[var(--brand)]/30">
+            <Card key={col.key} className="p-3 sm:p-4 overflow-hidden w-full hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-border hover:border-text-brand/30">
               <div className="flex items-center justify-between mb-2 sm:mb-3">
                 <h3 className="font-semibold text-sm sm:text-base break-words flex-1">{col.label}</h3>
-                <Columns className="h-4 w-4 text-[var(--ink-muted)] flex-shrink-0 ml-2" />
+                <Columns className="h-4 w-4 text-ink-muted flex-shrink-0 ml-2" />
               </div>
               <div className="space-y-2 sm:space-y-3">
                 {items.filter(i => i.status === col.key).map(item => (
-                  <div key={item.id} className="p-2 sm:p-3 rounded-lg border border-[var(--border)] bg-[var(--bg-soft)]">
+                  <div key={item.id} className="p-2 sm:p-3 rounded-lg border border-border bg-bg-soft">
                     <p className="text-xs sm:text-sm font-medium break-words">{item.tipo}</p>
-                    <p className="text-xs text-[var(--ink-muted)] mt-1">{new Date(item.created_at).toLocaleString('pt-BR')}</p>
+                    <p className="text-xs text-ink-muted mt-1">{new Date(item.created_at).toLocaleString('pt-BR')}</p>
                   </div>
                 ))}
                 {items.filter(i => i.status === col.key).length === 0 && (
-                  <p className="text-xs text-[var(--ink-muted)] text-center py-2">Sem itens</p>
+                  <p className="text-xs text-ink-muted text-center py-2">Sem itens</p>
                 )}
               </div>
             </Card>

@@ -55,11 +55,11 @@ export function PeriodPicker({ from, to, onChange, onClose }: PeriodPickerProps)
       variants={modalContent}
       className="absolute top-12 sm:top-16 right-2 sm:right-4 z-30 w-[calc(100vw-1rem)] sm:w-80 max-w-sm"
     >
-      <Card className="p-4 sm:p-6 bg-card/50 backdrop-blur-sm border-[var(--border)] shadow-2xl">
+      <Card className="p-4 sm:p-6 bg-card/50 backdrop-blur-sm border-border shadow-2xl">
         <div className="flex items-start justify-between mb-4 sm:mb-6">
           <div className="flex-1 min-w-0 pr-2">
             <h3 className="font-bold text-lg sm:text-xl">Período</h3>
-            <p className="text-xs sm:text-sm text-[var(--ink-muted)]">Selecione o período para playback</p>
+            <p className="text-xs sm:text-sm text-ink-muted">Selecione o período para playback</p>
           </div>
           <Button size="icon" variant="ghost" onClick={onClose}>
             <X className="h-4 w-4" />
@@ -88,7 +88,7 @@ export function PeriodPicker({ from, to, onChange, onClose }: PeriodPickerProps)
           </div>
 
           <div className="pt-2 border-t">
-            <p className="text-xs text-[var(--ink-muted)] mb-2">Seleção rápida:</p>
+            <p className="text-xs text-ink-muted mb-2">Seleção rápida:</p>
             <div className="grid grid-cols-2 gap-2">
               <Button
                 variant="outline"

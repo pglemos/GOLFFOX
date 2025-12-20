@@ -202,7 +202,7 @@ export default function SocorroPage() {
   }
 
   if (authLoading || !user) {
-    return <div className="min-h-screen flex items-center justify-center"><div className="w-16 h-16 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin mx-auto"></div></div>
+    return <div className="min-h-screen flex items-center justify-center"><div className="w-16 h-16 border-4 border-text-brand border-t-transparent rounded-full animate-spin mx-auto"></div></div>
   }
 
   return (
@@ -211,10 +211,10 @@ export default function SocorroPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold mb-2 flex items-center gap-2">
-              <LifeBuoy className="h-8 w-8 text-[var(--error)]" />
+              <LifeBuoy className="h-8 w-8 text-text-error" />
               Despacho de Socorro
             </h1>
-            <p className="text-[var(--ink-muted)]">Utilize este painel para enviar um motorista e veículo de socorro para uma rota que apresentou problemas.</p>
+            <p className="text-ink-muted">Utilize este painel para enviar um motorista e veículo de socorro para uma rota que apresentou problemas.</p>
           </div>
           <Button onClick={() => {
             setSelectedRequest(null)
@@ -226,13 +226,13 @@ export default function SocorroPage() {
         </div>
 
         {/* Formulário de Despacho de Socorro */}
-        <Card className="border-2 bg-card/50 backdrop-blur-sm border-[var(--border)] shadow-lg">
+        <Card className="border-2 bg-card/50 backdrop-blur-sm border-border shadow-lg">
           <CardContent className="pt-6">
             <div className="space-y-6">
               {/* 1. Selecione a Rota com Problema */}
               <div className="space-y-2">
                 <Label className="text-base font-semibold flex items-center gap-2">
-                  <span className="bg-[var(--brand)] text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold">1</span>
+                  <span className="bg-text-brand text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold">1</span>
                   Selecione a Rota com Problema
                 </Label>
                 <Select 
@@ -262,7 +262,7 @@ export default function SocorroPage() {
               {/* 2. Escolha o Motorista de Socorro */}
               <div className="space-y-2">
                 <Label className="text-base font-semibold flex items-center gap-2">
-                  <span className="bg-[var(--brand)] text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold">2</span>
+                  <span className="bg-text-brand text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold">2</span>
                   Escolha o Motorista de Socorro
                 </Label>
                 <Select 
@@ -292,7 +292,7 @@ export default function SocorroPage() {
               {/* 3. Escolha o Veículo de Socorro */}
               <div className="space-y-2">
                 <Label className="text-base font-semibold flex items-center gap-2">
-                  <span className="bg-[var(--brand)] text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold">3</span>
+                  <span className="bg-text-brand text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold">3</span>
                   Escolha o Veículo de Socorro
                 </Label>
                 <Select 
@@ -324,7 +324,7 @@ export default function SocorroPage() {
                 <Button
                   onClick={handleDispatchEmergency}
                   disabled={dispatching || !selectedRouteId || !selectedDriverId || !selectedVehicleId || loadingResources}
-                  className="w-full bg-[var(--error)] hover:bg-[var(--error)]/90 h-12 text-base font-semibold"
+                  className="w-full bg-text-error hover:bg-text-error/90 h-12 text-base font-semibold"
                   size="lg"
                 >
                   <Send className="h-5 w-5 mr-2" />
@@ -336,7 +336,7 @@ export default function SocorroPage() {
         </Card>
 
         {/* Separador */}
-        <div className="border-t border-[var(--border)] pt-6">
+        <div className="border-t border-border pt-6">
           <h2 className="text-2xl font-bold mb-4">Ocorrências de Socorro</h2>
         </div>
 
@@ -345,7 +345,7 @@ export default function SocorroPage() {
           <CardHeader>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Filter className="h-5 w-5 text-[var(--brand)]" />
+                <Filter className="h-5 w-5 text-brand" />
                 <CardTitle className="text-lg">Filtros</CardTitle>
               </div>
               <Button
@@ -381,7 +381,7 @@ export default function SocorroPage() {
                   />
                 </div>
                 <select
-                  className="px-3 py-2 rounded-lg border border-[var(--border)] bg-white text-sm"
+                  className="px-3 py-2 rounded-lg border border-border bg-white text-sm"
                   value={tempFilterStatus}
                   onChange={(e) => setTempFilterStatus(e.target.value)}
                 >
@@ -392,7 +392,7 @@ export default function SocorroPage() {
                   <option value="cancelled">Canceladas</option>
                 </select>
               </div>
-              <div className="flex items-center justify-end gap-2 pt-4 border-t border-[var(--border)]">
+              <div className="flex items-center justify-end gap-2 pt-4 border-t border-border">
                 <Button
                   variant="outline"
                   size="sm"
@@ -432,14 +432,14 @@ export default function SocorroPage() {
               whileHover={{ y: -4 }}
               className="group"
             >
-              <Card className="p-4 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-[var(--border)] hover:border-[var(--error)]/30">
+              <Card className="p-4 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-border hover:border-text-error/30">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
                       <div className="p-1.5 rounded-lg bg-red-100">
-                        <LifeBuoy className="h-4 w-4 text-[var(--error)]" />
+                        <LifeBuoy className="h-4 w-4 text-text-error" />
                       </div>
-                      <h3 className="font-bold text-lg capitalize group-hover:text-[var(--error)] transition-colors">{ocorrencia.request_type}</h3>
+                      <h3 className="font-bold text-lg capitalize group-hover:text-text-error transition-colors">{ocorrencia.request_type}</h3>
                       <Badge 
                         variant={
                           ocorrencia.status === 'open' ? 'destructive' :
@@ -453,9 +453,9 @@ export default function SocorroPage() {
                       </Badge>
                     </div>
                     {ocorrencia.description && (
-                      <p className="text-sm text-[var(--ink-muted)] mb-2">{ocorrencia.description}</p>
+                      <p className="text-sm text-ink-muted mb-2">{ocorrencia.description}</p>
                     )}
-                    <div className="space-y-1 text-xs text-[var(--ink-muted)]">
+                    <div className="space-y-1 text-xs text-ink-muted">
                       {ocorrencia.address && (
                         <p>📍 {ocorrencia.address}</p>
                       )}
@@ -572,7 +572,7 @@ export default function SocorroPage() {
             <Card className="p-12 text-center">
               <LifeBuoy className="h-12 w-12 text-gray-400 mx-auto mb-4" />
               <h3 className="text-lg font-medium mb-2">Nenhuma ocorrência encontrada</h3>
-              <p className="text-sm text-[var(--ink-muted)]">
+              <p className="text-sm text-ink-muted">
                 {searchQuery ? "Tente ajustar sua busca" : "Não há ocorrências no momento"}
               </p>
             </Card>

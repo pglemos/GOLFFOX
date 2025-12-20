@@ -194,8 +194,8 @@ export default function EmpresaDashboard() {
         {/* Filtros de Período */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
           <div className="flex-1 min-w-0">
-            <h2 className="text-base sm:text-lg font-semibold text-[var(--ink-strong)]">Indicadores de Performance</h2>
-            <p className="text-xs sm:text-sm text-[var(--ink-muted)] mt-1">Métricas principais da sua operação</p>
+            <h2 className="text-base sm:text-lg font-semibold text-text-ink-strong">Indicadores de Performance</h2>
+            <p className="text-xs sm:text-sm text-ink-muted mt-1">Métricas principais da sua operação</p>
           </div>
           <div className="w-full sm:w-auto">
             <PeriodFilter value={period} onChange={setPeriod} />
@@ -249,8 +249,8 @@ export default function EmpresaDashboard() {
         {/* Control Tower Visual */}
         <div>
           <div className="mb-4 sm:mb-6">
-            <h2 className="text-lg sm:text-xl font-semibold text-[var(--ink-strong)] mb-1">Torre de Controle</h2>
-            <p className="text-xs sm:text-sm text-[var(--ink-muted)]">Monitoramento em tempo real de incidentes</p>
+            <h2 className="text-lg sm:text-xl font-semibold text-text-ink-strong mb-1">Torre de Controle</h2>
+            <p className="text-xs sm:text-sm text-ink-muted">Monitoramento em tempo real de incidentes</p>
           </div>
           <ControlTowerVisual
             delays={controlTower.delays}
@@ -269,8 +269,8 @@ export default function EmpresaDashboard() {
         {/* Gráficos */}
         <div>
           <div className="mb-4 sm:mb-6">
-            <h2 className="text-lg sm:text-xl font-semibold text-[var(--ink-strong)] mb-1">Análises e Gráficos</h2>
-            <p className="text-xs sm:text-sm text-[var(--ink-muted)]">Visualizações detalhadas do desempenho</p>
+            <h2 className="text-lg sm:text-xl font-semibold text-text-ink-strong mb-1">Análises e Gráficos</h2>
+            <p className="text-xs sm:text-sm text-ink-muted">Visualizações detalhadas do desempenho</p>
           </div>
           <DashboardCharts kpis={kpis} period={period as "today" | "week" | "month" | undefined} />
         </div>
@@ -284,7 +284,7 @@ export default function EmpresaDashboard() {
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
                 <div className="flex-1 min-w-0 pr-2 sm:pr-4">
                   <CardTitle className="text-lg sm:text-xl font-semibold mb-1.5">Mapa em Tempo Real</CardTitle>
-                  <p className="text-xs sm:text-sm text-[var(--ink-muted)]">Visualize todas as rotas ativas no mapa</p>
+                  <p className="text-xs sm:text-sm text-ink-muted">Visualize todas as rotas ativas no mapa</p>
                 </div>
                 <Button variant="outline" size="sm" className="w-full sm:w-auto min-h-[44px] touch-manipulation" onClick={() => router.push("/empresa/rotas/mapa")}>
                   <MapPin className="h-4 w-4 mr-2" />

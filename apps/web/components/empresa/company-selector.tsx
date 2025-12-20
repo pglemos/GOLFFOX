@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { ChevronDown, Building2 } from "lucide-react"
 import { useOperatorTenant } from "@/components/providers/empresa-tenant-provider"
-import operatorI18n from "@/i18n/operador.json"
+import operatorI18n from "@/i18n/operator.json"
 import { motion } from "framer-motion"
 
 export function CompanySelector() {

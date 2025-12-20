@@ -314,7 +314,7 @@ export default function TransportadoraRelatoriosPage() {
   }
 
   if (loading) {
-    return <div className="min-h-screen flex items-center justify-center"><div className="w-16 h-16 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin mx-auto"></div></div>
+    return <div className="min-h-screen flex items-center justify-center"><div className="w-16 h-16 border-4 border-text-brand border-t-transparent rounded-full animate-spin mx-auto"></div></div>
   }
 
   return (
@@ -322,20 +322,20 @@ export default function TransportadoraRelatoriosPage() {
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold mb-2">Relatórios</h1>
-          <p className="text-[var(--ink-muted)]">Relatórios da transportadora</p>
+          <p className="text-ink-muted">Relatórios da transportadora</p>
         </div>
 
         {/* Filtros */}
         <Card className="p-4">
           <div className="flex items-center gap-2 mb-4">
-            <Filter className="h-5 w-5 text-[var(--brand)]" />
+            <Filter className="h-5 w-5 text-brand" />
             <h3 className="font-semibold">Filtros</h3>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div className="space-y-2">
               <label className="text-sm font-medium">Data Início</label>
               <div className="relative">
-                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--ink-muted)]" />
+                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-ink-muted" />
                 <Input
                   type="date"
                   value={dateStart}
@@ -347,7 +347,7 @@ export default function TransportadoraRelatoriosPage() {
             <div className="space-y-2">
               <label className="text-sm font-medium">Data Fim</label>
               <div className="relative">
-                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--ink-muted)]" />
+                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-ink-muted" />
                 <Input
                   type="date"
                   value={dateEnd}
@@ -423,14 +423,14 @@ export default function TransportadoraRelatoriosPage() {
                 whileHover={{ y: -4 }}
                 className="group"
               >
-                <Card className="p-6 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-[var(--border)] hover:border-[var(--brand)]/30">
+                <Card className="p-6 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-border hover:border-text-brand/30">
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
-                      <div className="p-2 rounded-lg bg-gradient-to-br from-[var(--brand-light)] to-[var(--brand-soft)] w-fit mb-2">
-                        <Icon className="h-6 w-6 text-[var(--brand)]" />
+                      <div className="p-2 rounded-lg bg-gradient-to-br from-bg-brand-light to-bg-brand-soft w-fit mb-2">
+                        <Icon className="h-6 w-6 text-brand" />
                       </div>
-                      <h3 className="font-bold text-lg mb-1 group-hover:text-[var(--brand)] transition-colors">{report.title}</h3>
-                      <p className="text-sm text-[var(--ink-muted)]">{report.description}</p>
+                      <h3 className="font-bold text-lg mb-1 group-hover:text-brand transition-colors">{report.title}</h3>
+                      <p className="text-sm text-ink-muted">{report.description}</p>
                     </div>
                   </div>
                   <DropdownMenu>

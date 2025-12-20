@@ -281,7 +281,7 @@ export default function AlertasPage() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
           <div className="min-w-0 flex-1">
             <h1 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2 break-words">Alertas</h1>
-            <p className="text-sm sm:text-base text-[var(--ink-muted)] break-words">Monitoramento e gestão de alertas do sistema</p>
+            <p className="text-sm sm:text-base text-ink-muted break-words">Monitoramento e gestão de alertas do sistema</p>
           </div>
           <Button variant="outline" onClick={handleExport} className="w-full sm:w-auto flex-shrink-0 min-h-[44px] touch-manipulation">
             <Download className="h-4 w-4 mr-2" />
@@ -290,11 +290,11 @@ export default function AlertasPage() {
         </div>
 
         {/* Filtros */}
-        <Card className="overflow-hidden bg-card/50 backdrop-blur-sm border-[var(--border)]">
+        <Card className="overflow-hidden bg-card/50 backdrop-blur-sm border-border">
           <CardHeader className="p-3 sm:p-6">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
               <div className="flex items-center gap-2 min-w-0">
-                <Filter className="h-4 w-4 sm:h-5 sm:w-5 text-[var(--brand)] flex-shrink-0" />
+                <Filter className="h-4 w-4 sm:h-5 sm:w-5 text-brand flex-shrink-0" />
                 <CardTitle className="text-base sm:text-lg font-semibold break-words">Filtros</CardTitle>
               </div>
               <Button
@@ -323,7 +323,7 @@ export default function AlertasPage() {
             <CardContent className="p-3 sm:p-6 pt-0">
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-4">
                 <div className="relative w-full sm:flex-1 min-w-0">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--ink-muted)] pointer-events-none" />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-ink-muted pointer-events-none" />
                   <Input
                     placeholder="Buscar alertas..."
                     className="pl-10 w-full min-h-[44px]"
@@ -332,7 +332,7 @@ export default function AlertasPage() {
                   />
                 </div>
                 <select
-                  className="px-3 py-2 rounded-lg border border-[var(--border)] bg-white text-sm w-full sm:w-auto min-h-[44px] touch-manipulation"
+                  className="px-3 py-2 rounded-lg border border-border bg-white text-sm w-full sm:w-auto min-h-[44px] touch-manipulation"
                   value={tempFilterSeverity}
                   onChange={(e) => setTempFilterSeverity(e.target.value)}
                 >
@@ -342,7 +342,7 @@ export default function AlertasPage() {
                   <option value="info">Info</option>
                 </select>
                 <select
-                  className="px-3 py-2 rounded-lg border border-[var(--border)] bg-white text-sm w-full sm:w-auto min-h-[44px] touch-manipulation"
+                  className="px-3 py-2 rounded-lg border border-border bg-white text-sm w-full sm:w-auto min-h-[44px] touch-manipulation"
                   value={tempFilterStatus}
                   onChange={(e) => setTempFilterStatus(e.target.value)}
                 >
@@ -352,7 +352,7 @@ export default function AlertasPage() {
                   <option value="resolved">Resolvido</option>
                 </select>
               </div>
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2 sm:gap-2 pt-4 border-t border-[var(--border)]">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2 sm:gap-2 pt-4 border-t border-border">
                 <Button
                   variant="outline"
                   size="sm"
@@ -381,7 +381,7 @@ export default function AlertasPage() {
             <Card className="p-12 text-center">
               <AlertTriangle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
               <h3 className="text-lg font-medium mb-2">Nenhum alerta encontrado</h3>
-              <p className="text-sm text-[var(--ink-muted)]">
+              <p className="text-sm text-ink-muted">
                 {searchQuery ? "Tente ajustar sua busca" : "Não há alertas no momento"}
               </p>
             </Card>
@@ -395,7 +395,7 @@ export default function AlertasPage() {
                 whileHover={{ y: -4 }}
                 className="group"
               >
-                <Card className="p-3 sm:p-4 hover:shadow-xl transition-all duration-300 overflow-hidden bg-card/50 backdrop-blur-sm border-[var(--border)] hover:border-[var(--brand)]/30">
+                <Card className="p-3 sm:p-4 hover:shadow-xl transition-all duration-300 overflow-hidden bg-card/50 backdrop-blur-sm border-border hover:border-text-brand/30">
                   <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
                     <div className="flex gap-3 sm:gap-4 flex-1 min-w-0">
                       <div className={`p-1.5 rounded-lg flex-shrink-0 ${alerta.severity === 'critical' ? 'bg-red-100' :
@@ -426,12 +426,12 @@ export default function AlertasPage() {
                               alerta.status === 'assigned' ? 'Atribuído' :
                                 'Resolvido'}
                           </Badge>
-                          <span className="text-xs sm:text-sm text-[var(--ink-muted)] break-words">
+                          <span className="text-xs sm:text-sm text-ink-muted break-words">
                             {new Date(alerta.created_at).toLocaleString('pt-BR')}
                           </span>
                         </div>
                         <p className="font-medium mb-2 break-words text-sm sm:text-base">{alerta.description}</p>
-                        <div className="space-y-1 text-xs text-[var(--ink-muted)]">
+                        <div className="space-y-1 text-xs text-ink-muted">
                           {alerta.companies && (
                             <p className="break-words">🏢 Empresa: {alerta.companies.name}</p>
                           )}

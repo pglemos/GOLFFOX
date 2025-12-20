@@ -39,11 +39,21 @@ export interface FilterOptions {
 
 export abstract class BaseRepository<T> {
   protected tableName: string
-  protected supabase: SupabaseClient
+  protected _supabase: SupabaseClient | null = null
 
   constructor(tableName: string) {
     this.tableName = tableName
-    this.supabase = getSupabaseAdmin()
+  }
+
+  /**
+   * Lazy getter para Supabase client
+   * Evita inicialização durante o build
+   */
+  protected get supabase(): SupabaseClient {
+    if (!this._supabase) {
+      this._supabase = getSupabaseAdmin()
+    }
+    return this._supabase
   }
 
   /**

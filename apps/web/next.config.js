@@ -43,8 +43,8 @@ let nextConfig = {
       '@googlemaps/js-api-loader',
       '@react-google-maps/api',
     ],
-    // Habilitar hook de instrumentação para APM (Datadog)
-    instrumentationHook: true,
+    // instrumentationHook não é mais necessário no Next.js 16.1.0+
+    // O arquivo instrumentation.ts é detectado automaticamente
   },
 
   // Configuração webpack para resolver problema ESM do Supabase

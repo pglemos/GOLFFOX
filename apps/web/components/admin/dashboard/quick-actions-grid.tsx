@@ -31,7 +31,7 @@ export function QuickActionsGrid({ actions }: QuickActionsGridProps) {
             transition={{ delay: index * 0.1, duration: 0.5 }}
           >
             <a href={action.href} className="block h-full group">
-              <Card className="relative h-full overflow-hidden bg-card/50 backdrop-blur-sm border-[var(--border)] hover:shadow-2xl hover:shadow-[var(--brand)]/10 transition-all duration-500 hover:border-[var(--brand)]/50 cursor-pointer">
+              <Card className="relative h-full overflow-hidden bg-card/50 backdrop-blur-sm border-border hover:shadow-2xl hover:shadow-text-brand/10 transition-all duration-500 hover:border-text-brand/50 cursor-pointer">
                 {/* Gradient Background */}
                 <motion.div
                   className={`absolute inset-0 bg-gradient-to-br ${action.bgGradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500`}
@@ -47,10 +47,10 @@ export function QuickActionsGrid({ actions }: QuickActionsGridProps) {
                 <CardHeader className="relative z-10 pb-4">
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1">
-                      <CardTitle className="text-lg sm:text-xl font-semibold mb-2 group-hover:text-[var(--brand)] transition-colors duration-300">
+                      <CardTitle className="text-lg sm:text-xl font-semibold mb-2 group-hover:text-brand transition-colors duration-300">
                         {action.title}
                       </CardTitle>
-                      <p className="text-xs sm:text-sm text-[var(--ink-muted)] group-hover:text-[var(--ink-strong)] transition-colors duration-300">
+                      <p className="text-xs sm:text-sm text-ink-muted group-hover:text-text-ink-strong transition-colors duration-300">
                         {action.description}
                       </p>
                     </div>
@@ -66,14 +66,14 @@ export function QuickActionsGrid({ actions }: QuickActionsGridProps) {
 
                 <CardContent className="relative z-10 pt-0">
                   <motion.div
-                    className="h-32 sm:h-40 rounded-xl bg-gradient-to-br from-[var(--brand)]/10 via-[var(--brand)]/5 to-[var(--accent)]/10 flex items-center justify-center group-hover:from-[var(--brand)]/25 group-hover:via-[var(--brand)]/15 group-hover:to-[var(--accent)]/25 transition-all duration-500 relative overflow-hidden"
+                    className="h-32 sm:h-40 rounded-xl bg-gradient-to-br from-text-brand/10 via-text-brand/5 to-accent-custom/10 flex items-center justify-center group-hover:from-text-brand/25 group-hover:via-text-brand/15 group-hover:to-accent-custom/25 transition-all duration-500 relative overflow-hidden"
                     whileHover={{ scale: 1.02 }}
                   >
                     <motion.div
-                      className="absolute inset-0 bg-gradient-to-br from-[var(--brand)]/20 to-transparent opacity-0 group-hover:opacity-100"
+                      className="absolute inset-0 bg-gradient-to-br from-text-brand/20 to-transparent opacity-0 group-hover:opacity-100"
                       transition={{ duration: 0.5 }}
                     />
-                    <Icon className="h-16 w-16 text-[var(--brand)] opacity-30 group-hover:opacity-70 transition-all duration-500 relative z-10 drop-shadow-lg" />
+                    <Icon className="h-16 w-16 text-brand opacity-30 group-hover:opacity-70 transition-all duration-500 relative z-10 drop-shadow-lg" />
                   </motion.div>
                 </CardContent>
 
@@ -82,7 +82,7 @@ export function QuickActionsGrid({ actions }: QuickActionsGridProps) {
                   className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                   initial={false}
                 >
-                  <ArrowUpRight className="h-5 w-5 text-[var(--brand)]" />
+                  <ArrowUpRight className="h-5 w-5 text-brand" />
                 </motion.div>
 
                 {/* Shine Effect */}

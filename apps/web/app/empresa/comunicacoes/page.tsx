@@ -73,7 +73,7 @@ function ComunicacoesOperatorPageInner() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold mb-2">Comunicações</h1>
-            <p className="text-[var(--ink-muted)]">Broadcasts internos e histórico</p>
+            <p className="text-ink-muted">Broadcasts internos e histórico</p>
           </div>
           <Button className="bg-orange-500 hover:bg-orange-600" onClick={() => setIsModalOpen(true)}>
             <Send className="h-4 w-4 mr-2" /> Novo Broadcast
@@ -90,15 +90,15 @@ function ComunicacoesOperatorPageInner() {
               whileHover={{ y: -4 }}
               className="group"
             >
-            <Card key={i} className="p-4 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-[var(--border)] hover:border-[var(--brand)]/30">
+            <Card key={i} className="p-4 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-border hover:border-text-brand/30">
               <p className="font-semibold">{m.title}</p>
-              <p className="text-sm text-[var(--ink-muted)]">{m.message}</p>
-              <p className="text-xs text-[var(--ink-muted)] mt-1">{new Date(m.created_at).toLocaleString('pt-BR')}</p>
+              <p className="text-sm text-ink-muted">{m.message}</p>
+              <p className="text-xs text-ink-muted mt-1">{new Date(m.created_at).toLocaleString('pt-BR')}</p>
             </Card>
             </motion.div>
           ))}
           {items.length === 0 && (
-            <Card className="p-12 text-center text-sm text-[var(--ink-muted)]">Nenhuma comunicação ainda.</Card>
+            <Card className="p-12 text-center text-sm text-ink-muted">Nenhuma comunicação ainda.</Card>
           )}
         </div>
 
@@ -120,7 +120,7 @@ function ComunicacoesOperatorPageInner() {
 
 export default function ComunicacoesOperatorPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="w-16 h-16 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin mx-auto" /></div>}>
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="w-16 h-16 border-4 border-text-brand border-t-transparent rounded-full animate-spin mx-auto" /></div>}>
       <ComunicacoesOperatorPageInner />
     </Suspense>
   )

@@ -110,7 +110,7 @@ export default function HistoricoRotasPage() {
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div>
                         <h1 className="text-2xl sm:text-3xl font-bold">Histórico de Rotas</h1>
-                        <p className="text-sm text-[var(--ink-muted)] mt-1">
+                        <p className="text-sm text-ink-muted mt-1">
                             Consulte o histórico detalhado de execução das rotas
                         </p>
                     </div>
@@ -123,7 +123,7 @@ export default function HistoricoRotasPage() {
                 </div>
 
                 {/* Filters */}
-                <Card className="p-4 bg-card/50 backdrop-blur-sm border-[var(--border)]">
+                <Card className="p-4 bg-card/50 backdrop-blur-sm border-border">
                     <div className="flex flex-col sm:flex-row gap-4">
                         <div className="relative flex-1">
                             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -155,13 +155,13 @@ export default function HistoricoRotasPage() {
                     {loading ? (
                         <div className="text-center py-12">
                             <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-orange-500 border-r-transparent" />
-                            <p className="mt-4 text-[var(--ink-muted)]">Carregando histórico...</p>
+                            <p className="mt-4 text-ink-muted">Carregando histórico...</p>
                         </div>
                     ) : filteredExecutions.length === 0 ? (
                         <Card className="p-12 text-center">
                             <Navigation className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-                            <p className="text-lg font-medium text-[var(--ink-muted)]">Nenhuma rota encontrada</p>
-                            <p className="text-sm text-[var(--ink-muted)] mt-1">Tente ajustar os filtros de busca.</p>
+                            <p className="text-lg font-medium text-ink-muted">Nenhuma rota encontrada</p>
+                            <p className="text-sm text-ink-muted mt-1">Tente ajustar os filtros de busca.</p>
                         </Card>
                     ) : (
                         <div className="grid gap-4">
@@ -174,14 +174,14 @@ export default function HistoricoRotasPage() {
                                   whileHover={{ y: -4 }}
                                   className="group"
                                 >
-                                <Card key={exec.id} className="p-4 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-[var(--border)] hover:border-[var(--brand)]/30">
+                                <Card key={exec.id} className="p-4 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-border hover:border-text-brand/30">
                                     <div className="flex flex-col lg:flex-row gap-4 lg:items-center">
                                         {/* Main Info */}
                                         <div className="flex-1 space-y-2">
                                             <div className="flex items-start justify-between">
                                                 <div>
                                                     <h3 className="font-semibold text-lg">{exec.route}</h3>
-                                                    <div className="flex items-center gap-2 text-sm text-[var(--ink-muted)]">
+                                                    <div className="flex items-center gap-2 text-sm text-ink-muted">
                                                         <MapPin className="h-3 w-3" />
                                                         {exec.municipality}
                                                     </div>
@@ -210,19 +210,19 @@ export default function HistoricoRotasPage() {
                                         {/* Metrics */}
                                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 lg:w-auto lg:flex-shrink-0 bg-gray-50 p-3 rounded-lg">
                                             <div className="text-center">
-                                                <p className="text-xs text-[var(--ink-muted)]">Duração</p>
+                                                <p className="text-xs text-ink-muted">Duração</p>
                                                 <p className="font-medium">{exec.duration}</p>
                                             </div>
                                             <div className="text-center">
-                                                <p className="text-xs text-[var(--ink-muted)]">Distância</p>
+                                                <p className="text-xs text-ink-muted">Distância</p>
                                                 <p className="font-medium">{exec.distance} km</p>
                                             </div>
                                             <div className="text-center">
-                                                <p className="text-xs text-[var(--ink-muted)]">Passageiros</p>
+                                                <p className="text-xs text-ink-muted">Passageiros</p>
                                                 <p className="font-medium">{exec.passengers}</p>
                                             </div>
                                             <div className="text-center">
-                                                <p className="text-xs text-[var(--ink-muted)]">Custo</p>
+                                                <p className="text-xs text-ink-muted">Custo</p>
                                                 <p className="font-medium text-green-600">R$ {exec.cost.toFixed(2)}</p>
                                             </div>
                                         </div>
@@ -237,7 +237,7 @@ export default function HistoricoRotasPage() {
                                                     </svg>
                                                     <span className="absolute text-xs font-medium">{exec.punctuality}%</span>
                                                 </div>
-                                                <p className="text-[10px] text-[var(--ink-muted)] mt-1">Pontualidade</p>
+                                                <p className="text-[10px] text-ink-muted mt-1">Pontualidade</p>
                                             </div>
                                             <div className="text-center">
                                                 <div className="relative inline-flex items-center justify-center">
@@ -247,7 +247,7 @@ export default function HistoricoRotasPage() {
                                                     </svg>
                                                     <span className="absolute text-xs font-medium">{exec.optimization}%</span>
                                                 </div>
-                                                <p className="text-[10px] text-[var(--ink-muted)] mt-1">Otimização</p>
+                                                <p className="text-[10px] text-ink-muted mt-1">Otimização</p>
                                             </div>
                                         </div>
 

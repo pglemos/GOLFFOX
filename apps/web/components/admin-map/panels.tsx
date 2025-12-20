@@ -37,11 +37,11 @@ export const VehiclePanel = memo(function VehiclePanel({
       variants={modalContent}
       className="absolute top-2 right-2 sm:top-6 sm:right-6 w-[calc(100vw-1rem)] sm:w-80 z-30 max-w-sm"
     >
-      <Card className="p-3 sm:p-6 bg-card/50 backdrop-blur-sm border-[var(--border)] shadow-lg sm:shadow-2xl">
+      <Card className="p-3 sm:p-6 bg-card/50 backdrop-blur-sm border-border shadow-lg sm:shadow-2xl">
         <div className="flex items-start justify-between mb-4 sm:mb-6">
           <div className="flex-1 min-w-0 pr-2">
             <h3 className="font-bold text-lg sm:text-xl truncate">{vehicle.plate}</h3>
-            <p className="text-sm text-[var(--ink-muted)] truncate">{vehicle.model}</p>
+            <p className="text-sm text-ink-muted truncate">{vehicle.model}</p>
           </div>
           <Button size="icon" variant="ghost" onClick={onClose}>
             <X className="h-4 w-4" />
@@ -50,22 +50,22 @@ export const VehiclePanel = memo(function VehiclePanel({
 
         <div className="space-y-3 sm:space-y-4 text-sm">
           <div>
-            <span className="text-[var(--ink-muted)] block mb-1">Motorista:</span>
+            <span className="text-ink-muted block mb-1">Motorista:</span>
             <p className="font-semibold truncate">{vehicle.driver_name}</p>
           </div>
 
           <div>
-            <span className="text-[var(--ink-muted)] block mb-1">Empresa:</span>
+            <span className="text-ink-muted block mb-1">Empresa:</span>
             <p className="font-semibold truncate">{vehicle.company_name}</p>
           </div>
 
           <div>
-            <span className="text-[var(--ink-muted)] block mb-1">Rota:</span>
+            <span className="text-ink-muted block mb-1">Rota:</span>
             <p className="font-semibold truncate">{vehicle.route_name}</p>
           </div>
 
           <div>
-            <span className="text-[var(--ink-muted)] block mb-2">Status:</span>
+            <span className="text-ink-muted block mb-2">Status:</span>
             <Badge
               variant={
                 (vehicle.vehicle_status === 'moving'
@@ -91,14 +91,14 @@ export const VehiclePanel = memo(function VehiclePanel({
           </div>
 
           <div className="flex items-center gap-4 pt-2 border-t">
-            <Users className="h-4 w-4 text-[var(--ink-muted)]" />
+            <Users className="h-4 w-4 text-ink-muted" />
             <div>
-              <span className="text-[var(--ink-muted)] block text-xs">Passageiros</span>
+              <span className="text-ink-muted block text-xs">Passageiros</span>
               <span className="font-semibold">{vehicle.passenger_count || 0}</span>
             </div>
-            <Clock className="h-4 w-4 text-[var(--ink-muted)]" />
+            <Clock className="h-4 w-4 text-ink-muted" />
             <div>
-              <span className="text-[var(--ink-muted)] block text-xs">Velocidade</span>
+              <span className="text-ink-muted block text-xs">Velocidade</span>
               <span className="font-semibold">
                 {vehicle.speed ? `${(vehicle.speed * 3.6).toFixed(0)} km/h` : 'Parado'}
               </span>
@@ -147,11 +147,11 @@ export const RoutePanel = memo(function RoutePanel({ route, onClose, onViewDetai
       variants={modalContent}
       className="absolute top-2 right-2 sm:top-6 sm:right-6 w-[calc(100vw-1rem)] sm:w-80 z-30 max-w-sm"
     >
-      <Card className="p-3 sm:p-6 bg-card/50 backdrop-blur-sm border-[var(--border)] shadow-lg sm:shadow-2xl">
+      <Card className="p-3 sm:p-6 bg-card/50 backdrop-blur-sm border-border shadow-lg sm:shadow-2xl">
         <div className="flex items-start justify-between mb-4 sm:mb-6">
           <div className="flex-1 min-w-0 pr-2">
             <h3 className="font-bold text-lg sm:text-xl truncate">{route.route_name}</h3>
-            <p className="text-sm text-[var(--ink-muted)] truncate">{route.company_name}</p>
+            <p className="text-sm text-ink-muted truncate">{route.company_name}</p>
           </div>
           <Button size="icon" variant="ghost" onClick={onClose}>
             <X className="h-4 w-4" />
@@ -161,25 +161,25 @@ export const RoutePanel = memo(function RoutePanel({ route, onClose, onViewDetai
         <div className="space-y-3 sm:space-y-4 text-sm">
           <div className="grid grid-cols-2 gap-3 sm:gap-4">
             <div>
-              <span className="text-[var(--ink-muted)] block mb-1 text-xs sm:text-sm">Paradas:</span>
+              <span className="text-ink-muted block mb-1 text-xs sm:text-sm">Paradas:</span>
               <p className="font-semibold text-base sm:text-lg">{route.stops_count || 0}</p>
             </div>
             <div>
-              <span className="text-[var(--ink-muted)] block mb-1 text-xs sm:text-sm">Pontos:</span>
+              <span className="text-ink-muted block mb-1 text-xs sm:text-sm">Pontos:</span>
               <p className="font-semibold text-base sm:text-lg">{route.polyline_points?.length || 0}</p>
             </div>
           </div>
 
           {route.origin_address && (
             <div>
-              <span className="text-[var(--ink-muted)] block mb-1 text-xs sm:text-sm">Origem:</span>
+              <span className="text-ink-muted block mb-1 text-xs sm:text-sm">Origem:</span>
               <p className="font-semibold text-xs sm:text-sm break-words">{route.origin_address}</p>
             </div>
           )}
 
           {route.destination_address && (
             <div>
-              <span className="text-[var(--ink-muted)] block mb-1 text-xs sm:text-sm">Destino:</span>
+              <span className="text-ink-muted block mb-1 text-xs sm:text-sm">Destino:</span>
               <p className="font-semibold text-xs sm:text-sm break-words">{route.destination_address}</p>
             </div>
           )}
@@ -210,11 +210,11 @@ export const AlertsPanel = memo(function AlertsPanel({ alerts, onClose }: Alerts
       variants={modalContent}
       className="absolute top-2 right-2 sm:top-6 sm:right-6 w-[calc(100vw-1rem)] sm:w-80 md:w-96 z-30 max-h-[calc(100vh-1rem)] sm:max-h-[600px] overflow-y-auto max-w-sm md:max-w-md"
     >
-      <Card className="p-3 sm:p-6 bg-card/50 backdrop-blur-sm border-[var(--border)] shadow-lg sm:shadow-2xl">
+      <Card className="p-3 sm:p-6 bg-card/50 backdrop-blur-sm border-border shadow-lg sm:shadow-2xl">
         <div className="flex items-start justify-between mb-4 sm:mb-6">
           <div className="flex-1 min-w-0 pr-2">
             <h3 className="font-bold text-lg sm:text-xl">Alertas Abertos</h3>
-            <p className="text-sm text-[var(--ink-muted)]">{alerts.length} alerta(s)</p>
+            <p className="text-sm text-ink-muted">{alerts.length} alerta(s)</p>
           </div>
           <Button size="icon" variant="ghost" onClick={onClose}>
             <X className="h-4 w-4" />
@@ -225,7 +225,7 @@ export const AlertsPanel = memo(function AlertsPanel({ alerts, onClose }: Alerts
           {alerts.map((alert) => (
             <div
               key={alert.alert_id}
-              className="p-2 sm:p-3 border rounded-lg hover:bg-[var(--bg-hover)] cursor-pointer"
+              className="p-2 sm:p-3 border rounded-lg hover:bg-bg-hover cursor-pointer"
               onClick={() => {
                 // Implementar navegação para alerta
               }}
@@ -237,7 +237,7 @@ export const AlertsPanel = memo(function AlertsPanel({ alerts, onClose }: Alerts
                 >
                   {alert.alert_type === 'incident' ? 'Incidente' : 'Socorro'}
                 </Badge>
-                <span className="text-xs text-[var(--ink-muted)] whitespace-nowrap">
+                <span className="text-xs text-ink-muted whitespace-nowrap">
                   {new Date(alert.created_at).toLocaleTimeString()}
                 </span>
               </div>

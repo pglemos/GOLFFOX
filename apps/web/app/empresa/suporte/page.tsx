@@ -61,7 +61,7 @@ export default function EmpresaSuportePage() {
             <div className="space-y-6 max-w-2xl mx-auto">
                 <div>
                     <h1 className="text-3xl font-bold">Suporte e Feedback</h1>
-                    <p className="text-[var(--ink-muted)]">Precisa de ajuda? Entre em contato com nossa equipe.</p>
+                    <p className="text-ink-muted">Precisa de ajuda? Entre em contato com nossa equipe.</p>
                 </div>
 
                 <Card>
@@ -136,7 +136,7 @@ export default function EmpresaSuportePage() {
                     </CardContent>
                 </Card>
 
-                <div className="text-center text-sm text-[var(--ink-muted)]">
+                <div className="text-center text-sm text-ink-muted">
                     <p>Para emergências operacionais (socorro, acidentes), ligue para nossa Central 24h: <strong>0800 123 4567</strong></p>
                 </div>
             </div>

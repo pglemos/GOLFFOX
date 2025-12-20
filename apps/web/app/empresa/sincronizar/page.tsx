@@ -139,7 +139,7 @@ export default function SincronizarPage() {
   }
 
   if (loading) {
-    return <div className="min-h-screen flex items-center justify-center"><div className="w-16 h-16 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin mx-auto"></div></div>
+    return <div className="min-h-screen flex items-center justify-center"><div className="w-16 h-16 border-4 border-text-brand border-t-transparent rounded-full animate-spin mx-auto"></div></div>
   }
 
   return (
@@ -147,7 +147,7 @@ export default function SincronizarPage() {
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold mb-2">Sincronizar Pontos de Parada</h1>
-          <p className="text-[var(--muted)]">Reprocessar e otimizar pontos de parada de todas as rotas</p>
+          <p className="text-text-muted-foreground">Reprocessar e otimizar pontos de parada de todas as rotas</p>
         </div>
 
         <motion.div
@@ -155,12 +155,12 @@ export default function SincronizarPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
         >
-        <Card className="p-6 bg-card/50 backdrop-blur-sm border-[var(--border)] hover:shadow-xl transition-all duration-300">
+        <Card className="p-6 bg-card/50 backdrop-blur-sm border-border hover:shadow-xl transition-all duration-300">
           <div className="space-y-4">
-            <p className="text-sm text-[var(--muted)]">
+            <p className="text-sm text-text-muted-foreground">
               Este processo irá:
             </p>
-            <ul className="list-disc list-inside space-y-2 text-sm text-[var(--muted)]">
+            <ul className="list-disc list-inside space-y-2 text-sm text-text-muted-foreground">
               <li>Buscar todos os funcionários cadastrados</li>
               <li>Geocodificar endereços que não possuem coordenadas</li>
               <li>Otimizar a ordem dos pontos usando Google Directions API</li>
@@ -188,9 +188,9 @@ export default function SincronizarPage() {
                     {resultado.sucesso ? "Sucesso" : "Erro"}
                   </p>
                 </div>
-                <p className="text-sm text-[var(--muted)]">{resultado.mensagem}</p>
+                <p className="text-sm text-text-muted-foreground">{resultado.mensagem}</p>
                 {resultado.processadas !== undefined && (
-                  <p className="text-sm text-[var(--muted)] mt-1">
+                  <p className="text-sm text-text-muted-foreground mt-1">
                     Rotas processadas: {resultado.processadas} | Erros: {resultado.erros}
                   </p>
                 )}

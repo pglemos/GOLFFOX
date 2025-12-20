@@ -546,8 +546,8 @@ export default function TransportadoraDashboard() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin mx-auto"></div>
-          <p className="mt-4 text-[var(--ink-muted)]">{t('transportadora', 'loading')}</p>
+          <div className="w-16 h-16 border-4 border-text-brand border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <p className="mt-4 text-ink-muted">{t('transportadora', 'loading')}</p>
         </div>
       </div>
     )
@@ -565,8 +565,8 @@ export default function TransportadoraDashboard() {
         {/* Header */}
         <div className="flex flex-col gap-3 sm:gap-4 pb-2">
           <div className="flex-1 min-w-0">
-            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-2 text-[var(--ink-strong)]">{t('transportadora', 'header_title')}</h1>
-            <p className="text-xs sm:text-sm md:text-base text-[var(--ink-muted)]">{t('transportadora', 'header_subtitle')}</p>
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-2 text-text-ink-strong">{t('transportadora', 'header_title')}</h1>
+            <p className="text-xs sm:text-sm md:text-base text-ink-muted">{t('transportadora', 'header_subtitle')}</p>
           </div>
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
             <Select
@@ -809,7 +809,7 @@ export default function TransportadoraDashboard() {
                     <Map className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
                     <span className="truncate">{t('transportadora', 'fleet_map_title')}</span>
                   </CardTitle>
-                  <p className="text-xs sm:text-sm text-[var(--ink-muted)]">{t('transportadora', 'fleet_map_subtitle')}</p>
+                  <p className="text-xs sm:text-sm text-ink-muted">{t('transportadora', 'fleet_map_subtitle')}</p>
                 </div>
                 <Button
                   size="sm"
@@ -823,7 +823,7 @@ export default function TransportadoraDashboard() {
             </CardHeader>
             <CardContent className="pt-0 px-3 sm:px-6">
               <div className={cn(
-                "rounded-lg overflow-hidden border border-[var(--border)] shadow-inner bg-gray-50 dark:bg-gray-900",
+                "rounded-lg overflow-hidden border border-border shadow-inner bg-gray-50 dark:bg-gray-900",
                 isMobile ? "h-64" : "h-48 sm:h-64 md:h-80 lg:h-96"
               )}>
                 <LazyWrapper>
@@ -832,7 +832,7 @@ export default function TransportadoraDashboard() {
                   />
                 </LazyWrapper>
               </div>
-              <div className="mt-3 flex flex-wrap gap-2 text-xs text-[var(--ink-muted)]">
+              <div className="mt-3 flex flex-wrap gap-2 text-xs text-ink-muted">
                 <div className="flex items-center gap-1">
                   <div className="w-3 h-3 rounded-full bg-green-500 flex-shrink-0"></div>
                   <span>{t('transportadora', 'fleet_map_legend_moving')}</span>
@@ -864,7 +864,7 @@ export default function TransportadoraDashboard() {
                     <Users className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
                     <span className="truncate">{t('transportadora', 'active_drivers_title')}</span>
                   </CardTitle>
-                  <p className="text-xs sm:text-sm text-[var(--ink-muted)]">{t('transportadora', 'active_drivers_subtitle')}</p>
+                  <p className="text-xs sm:text-sm text-ink-muted">{t('transportadora', 'active_drivers_subtitle')}</p>
                 </div>
                 <Button
                   size="sm"
@@ -889,19 +889,19 @@ export default function TransportadoraDashboard() {
             <CardContent className="pt-0 px-3 sm:px-6">
               <div className="space-y-2 max-h-96 overflow-y-auto">
                 {drivers.length === 0 ? (
-                  <div className="p-6 sm:p-8 text-center text-[var(--ink-muted)]">
+                  <div className="p-6 sm:p-8 text-center text-ink-muted">
                     <p className="text-xs sm:text-sm">{t('transportadora', 'active_drivers_empty')}</p>
                   </div>
                 ) : (
                   drivers.map((driver, i) => (
-                    <div key={i} className="flex items-center justify-between p-2 sm:p-3 rounded-lg hover:bg-[var(--bg-hover)] active:bg-[var(--bg-hover)] transition-colors border border-transparent hover:border-[var(--border)] touch-manipulation">
+                    <div key={i} className="flex items-center justify-between p-2 sm:p-3 rounded-lg hover:bg-bg-hover active:bg-bg-hover transition-colors border border-transparent hover:border-border touch-manipulation">
                       <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
-                        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-[var(--brand-light)] flex items-center justify-center flex-shrink-0">
-                          <Users className="h-4 w-4 sm:h-5 sm:w-5 text-[var(--brand)]" />
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-brand-light flex items-center justify-center flex-shrink-0">
+                          <Users className="h-4 w-4 sm:h-5 sm:w-5 text-brand" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="font-semibold text-xs sm:text-sm text-[var(--ink-strong)] truncate">{motorista.name}</p>
-                          <p className="text-xs text-[var(--ink-muted)] truncate">
+                          <p className="font-semibold text-xs sm:text-sm text-text-ink-strong truncate">{motorista.name}</p>
+                          <p className="text-xs text-ink-muted truncate">
                             {driver.trips} viagem(ns) • ⭐ {driver.rating}
                           </p>
                         </div>
@@ -933,7 +933,7 @@ export default function TransportadoraDashboard() {
                   sortable: true,
                   render: (value, row) => (
                     <div className="flex items-center gap-2">
-                      <Truck className="h-4 w-4 text-[var(--brand)] flex-shrink-0" />
+                      <Truck className="h-4 w-4 text-brand flex-shrink-0" />
                       <span className="font-semibold text-sm">{value || row.id}</span>
                     </div>
                   )

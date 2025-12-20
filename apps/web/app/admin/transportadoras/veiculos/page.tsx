@@ -158,7 +158,7 @@ export default function TransportadoraVeiculosPage() {
     }
 
     if (authLoading || !user) {
-        return <div className="min-h-screen flex items-center justify-center"><div className="w-16 h-16 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin" /></div>
+        return <div className="min-h-screen flex items-center justify-center"><div className="w-16 h-16 border-4 border-text-brand border-t-transparent rounded-full animate-spin" /></div>
     }
 
     return (
@@ -168,7 +168,7 @@ export default function TransportadoraVeiculosPage() {
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
                     <div className="min-w-0 flex-1">
                         <h1 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2">Veículos das Transportadoras</h1>
-                        <p className="text-sm sm:text-base text-[var(--muted)]">Todos os veículos de todas as transportadoras</p>
+                        <p className="text-sm sm:text-base text-text-muted-foreground">Todos os veículos de todas as transportadoras</p>
                     </div>
                     <Button
                         onClick={handleNewVehicle}
@@ -224,7 +224,7 @@ export default function TransportadoraVeiculosPage() {
                                     transition={{ duration: 0.3 }}
                                     whileHover={{ y: -4 }}
                                 >
-                                    <Card className="p-3 sm:p-4 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-[var(--border)] hover:border-[var(--brand)]/30 group">
+                                    <Card className="p-3 sm:p-4 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-border hover:border-text-brand/30 group">
                                         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
                                             <div className="flex-1 flex gap-3 sm:gap-4 min-w-0">
                                                 {vehicle.photo_url && (
@@ -232,15 +232,15 @@ export default function TransportadoraVeiculosPage() {
                                                     <img
                                                         src={vehicle.photo_url}
                                                         alt={vehicle.plate}
-                                                        className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg object-cover border-2 border-[var(--border)] flex-shrink-0"
+                                                        className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg object-cover border-2 border-border flex-shrink-0"
                                                     />
                                                 )}
                                                 <div className="flex-1 min-w-0">
                                                     <div className="flex flex-wrap items-center gap-2 mb-2">
-                                                        <div className="p-1 rounded-lg bg-gradient-to-br from-[var(--brand-light)] to-[var(--brand-soft)]">
-                                                            <Truck className="h-4 w-4 text-[var(--brand)]" />
+                                                        <div className="p-1 rounded-lg bg-gradient-to-br from-bg-brand-light to-bg-brand-soft">
+                                                            <Truck className="h-4 w-4 text-brand" />
                                                         </div>
-                                                        <h3 className="font-bold text-base sm:text-lg group-hover:text-[var(--brand)] transition-colors">{vehicle.plate}</h3>
+                                                        <h3 className="font-bold text-base sm:text-lg group-hover:text-brand transition-colors">{vehicle.plate}</h3>
                                                         {vehicle.prefix && (
                                                             <Badge variant="outline">Prefixo: {vehicle.prefix}</Badge>
                                                         )}
@@ -249,7 +249,7 @@ export default function TransportadoraVeiculosPage() {
                                                         </Badge>
                                                     </div>
                                                     <p className="font-medium mb-1 text-sm sm:text-base">{vehicle.model || "Sem modelo"}</p>
-                                                    <div className="flex flex-wrap gap-2 sm:gap-4 text-xs sm:text-sm text-[var(--ink-muted)]">
+                                                    <div className="flex flex-wrap gap-2 sm:gap-4 text-xs sm:text-sm text-ink-muted">
                                                         {vehicle.year && (
                                                             <span className="flex items-center gap-1">
                                                                 <Calendar className="h-3 w-3" />

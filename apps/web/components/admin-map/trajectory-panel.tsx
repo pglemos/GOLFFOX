@@ -34,11 +34,11 @@ export function TrajectoryPanel({
       variants={modalContent}
       className="absolute top-2 right-2 sm:top-6 sm:right-6 w-[calc(100vw-1rem)] sm:w-80 md:w-96 z-30 max-h-[calc(100vh-1rem)] sm:max-h-[80vh] overflow-y-auto max-w-sm md:max-w-md"
     >
-      <Card className="p-3 sm:p-6 bg-card/50 backdrop-blur-sm border-[var(--border)] shadow-lg sm:shadow-2xl">
+      <Card className="p-3 sm:p-6 bg-card/50 backdrop-blur-sm border-border shadow-lg sm:shadow-2xl">
         <div className="flex items-start justify-between mb-4 sm:mb-6">
           <div className="flex-1 min-w-0 pr-2">
             <h3 className="font-bold text-lg sm:text-xl">Análise de Trajeto</h3>
-            <p className="text-xs sm:text-sm text-[var(--ink-muted)] truncate">{vehiclePlate} - {routeName}</p>
+            <p className="text-xs sm:text-sm text-ink-muted truncate">{vehiclePlate} - {routeName}</p>
           </div>
           <Button size="icon" variant="ghost" onClick={onClose}>
             <X className="h-4 w-4" />
@@ -48,12 +48,12 @@ export function TrajectoryPanel({
         <div className="space-y-4 sm:space-y-6">
           {/* Métricas Gerais */}
           <div>
-            <h4 className="font-semibold mb-2 sm:mb-3 text-xs sm:text-sm text-[var(--ink-muted)]">Métricas Gerais</h4>
+            <h4 className="font-semibold mb-2 sm:mb-3 text-xs sm:text-sm text-ink-muted">Métricas Gerais</h4>
             <div className="grid grid-cols-2 gap-2 sm:gap-4">
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <Map className="h-4 w-4 text-[var(--ink-muted)]" />
-                  <span className="text-xs text-[var(--ink-muted)]">Distância</span>
+                  <Map className="h-4 w-4 text-ink-muted" />
+                  <span className="text-xs text-ink-muted">Distância</span>
                 </div>
                 <div className="space-y-1">
                   <p className="text-sm">
@@ -73,8 +73,8 @@ export function TrajectoryPanel({
 
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <Clock className="h-4 w-4 text-[var(--ink-muted)]" />
-                  <span className="text-xs text-[var(--ink-muted)]">Tempo</span>
+                  <Clock className="h-4 w-4 text-ink-muted" />
+                  <span className="text-xs text-ink-muted">Tempo</span>
                 </div>
                 <div className="space-y-1">
                   <p className="text-sm">
@@ -96,7 +96,7 @@ export function TrajectoryPanel({
 
           {/* Conformidade */}
           <div>
-            <h4 className="font-semibold mb-2 sm:mb-3 text-xs sm:text-sm text-[var(--ink-muted)]">Conformidade</h4>
+            <h4 className="font-semibold mb-2 sm:mb-3 text-xs sm:text-sm text-ink-muted">Conformidade</h4>
             <div className="flex items-center gap-3">
               <div className="flex-1">
                 <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
@@ -129,7 +129,7 @@ export function TrajectoryPanel({
           {/* Desvios */}
           {analysis.deviations.length > 0 && (
             <div>
-              <h4 className="font-semibold mb-2 sm:mb-3 text-xs sm:text-sm text-[var(--ink-muted)] flex items-center gap-2">
+              <h4 className="font-semibold mb-2 sm:mb-3 text-xs sm:text-sm text-ink-muted flex items-center gap-2">
                 <AlertTriangle className="h-3 w-3 sm:h-4 sm:w-4 text-orange-500" />
                 Desvios de Rota ({analysis.deviations.length})
               </h4>
@@ -137,13 +137,13 @@ export function TrajectoryPanel({
                 {analysis.deviations.slice(0, 5).map((deviation, idx) => (
                   <div key={idx} className="text-xs p-2 bg-orange-50 rounded border border-orange-200">
                     <p className="font-semibold">{deviation.distance}m fora da rota</p>
-                    <p className="text-[var(--ink-muted)]">
+                    <p className="text-ink-muted">
                       {deviation.timestamp.toLocaleTimeString('pt-BR')}
                     </p>
                   </div>
                 ))}
                 {analysis.deviations.length > 5 && (
-                  <p className="text-xs text-[var(--ink-muted)]">
+                  <p className="text-xs text-ink-muted">
                     +{analysis.deviations.length - 5} mais desvios...
                   </p>
                 )}
@@ -154,20 +154,20 @@ export function TrajectoryPanel({
           {/* Paradas Não Planejadas */}
           {analysis.unplannedStops.length > 0 && (
             <div>
-              <h4 className="font-semibold mb-2 sm:mb-3 text-xs sm:text-sm text-[var(--ink-muted)]">
+              <h4 className="font-semibold mb-2 sm:mb-3 text-xs sm:text-sm text-ink-muted">
                 Paradas Não Planejadas ({analysis.unplannedStops.length})
               </h4>
               <div className="space-y-2 max-h-24 sm:max-h-32 overflow-y-auto">
                 {analysis.unplannedStops.slice(0, 3).map((stop, idx) => (
                   <div key={idx} className="text-xs p-2 bg-blue-50 rounded border border-blue-200">
                     <p className="font-semibold">{stop.duration} min parado</p>
-                    <p className="text-[var(--ink-muted)]">
+                    <p className="text-ink-muted">
                       {stop.timestamp.toLocaleTimeString('pt-BR')}
                     </p>
                   </div>
                 ))}
                 {analysis.unplannedStops.length > 3 && (
-                  <p className="text-xs text-[var(--ink-muted)]">
+                  <p className="text-xs text-ink-muted">
                     +{analysis.unplannedStops.length - 3} mais paradas...
                   </p>
                 )}
@@ -178,7 +178,7 @@ export function TrajectoryPanel({
           {/* Segmentos Divergentes */}
           {analysis.divergentSegments.length > 0 && (
             <div>
-              <h4 className="font-semibold mb-2 sm:mb-3 text-xs sm:text-sm text-[var(--ink-muted)]">
+              <h4 className="font-semibold mb-2 sm:mb-3 text-xs sm:text-sm text-ink-muted">
                 Segmentos Divergentes ({analysis.divergentSegments.length})
               </h4>
               <div className="space-y-2 max-h-24 sm:max-h-32 overflow-y-auto">
@@ -187,10 +187,10 @@ export function TrajectoryPanel({
                     <p className="font-semibold">
                       Segmento {segment.startIndex}-{segment.endIndex}
                     </p>
-                    <p className="text-[var(--ink-muted)]">
+                    <p className="text-ink-muted">
                       Planejado: {(segment.plannedDistance / 1000).toFixed(2)} km
                     </p>
-                    <p className="text-[var(--ink-muted)]">
+                    <p className="text-ink-muted">
                       Real: {(segment.actualDistance / 1000).toFixed(2)} km
                     </p>
                     {segment.deviation > 0 && (
@@ -201,7 +201,7 @@ export function TrajectoryPanel({
                   </div>
                 ))}
                 {analysis.divergentSegments.length > 3 && (
-                  <p className="text-xs text-[var(--ink-muted)]">
+                  <p className="text-xs text-ink-muted">
                     +{analysis.divergentSegments.length - 3} mais segmentos...
                   </p>
                 )}

@@ -68,7 +68,7 @@ function TransportadoraMapaContent() {
   }, [router])
 
   if (loading) {
-    return <div className="min-h-screen flex items-center justify-center"><div className="w-16 h-16 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin mx-auto"></div></div>
+    return <div className="min-h-screen flex items-center justify-center"><div className="w-16 h-16 border-4 border-text-brand border-t-transparent rounded-full animate-spin mx-auto"></div></div>
   }
 
   return (
@@ -77,7 +77,7 @@ function TransportadoraMapaContent() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold mb-2">Mapa da Frota</h1>
-            <p className="text-[var(--ink-muted)]">Acompanhe sua frota em tempo real</p>
+            <p className="text-ink-muted">Acompanhe sua frota em tempo real</p>
           </div>
           <Button
             variant="outline"
@@ -157,7 +157,7 @@ function TransportadoraMapaContent() {
           </CardContent>
         </Card>
 
-        <div className="h-[calc(100vh-400px)] min-h-[600px] rounded-lg overflow-hidden border border-[var(--border)] relative">
+        <div className="h-[calc(100vh-400px)] min-h-[600px] rounded-lg overflow-hidden border border-border relative">
           <FleetMap 
             transportadoraId={transportadoraId || undefined}
             routeId={routeId || undefined}

@@ -241,7 +241,7 @@ export default function TransportadoraVeiculosPage() {
   }, [veiculos])
 
   if (loading) {
-    return <div className="min-h-screen flex items-center justify-center"><div className="w-16 h-16 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin mx-auto"></div></div>
+    return <div className="min-h-screen flex items-center justify-center"><div className="w-16 h-16 border-4 border-brand border-t-transparent rounded-full animate-spin mx-auto"></div></div>
   }
 
   const filteredVeiculos = vehiclesWithDetails.filter(v => {
@@ -265,7 +265,7 @@ export default function TransportadoraVeiculosPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold mb-2">Veículos</h1>
-            <p className="text-[var(--ink-muted)]">Gerencie a frota da transportadora</p>
+            <p className="text-ink-muted">Gerencie a frota da transportadora</p>
           </div>
         </div>
 
@@ -374,11 +374,11 @@ export default function TransportadoraVeiculosPage() {
                             <img
                               src={veiculo.photo_url}
                               alt={veiculo.plate}
-                              className="w-full h-40 rounded-lg object-cover border border-[var(--border)]"
+                              className="w-full h-40 rounded-lg object-cover border border-border"
                             />
                           ) : (
-                            <div className="w-full h-40 rounded-lg bg-[var(--brand-light)] flex items-center justify-center border border-[var(--border)]">
-                              <Truck className="h-12 w-12 text-[var(--brand)]" />
+                            <div className="w-full h-40 rounded-lg bg-brand-light flex items-center justify-center border border-border">
+                              <Truck className="h-12 w-12 text-brand" />
                             </div>
                           )}
                           <div className="absolute top-2 right-2">
@@ -399,11 +399,11 @@ export default function TransportadoraVeiculosPage() {
                         {/* Informações */}
                         <div>
                           <div className="flex items-center gap-2 mb-1">
-                            <Truck className="h-4 w-4 text-[var(--brand)]" />
+                            <Truck className="h-4 w-4 text-brand" />
                             <h3 className="font-bold text-lg">{veiculo.plate}</h3>
                           </div>
                           <p className="font-medium text-sm mb-2">{veiculo.model || "Sem modelo"}</p>
-                          <div className="space-y-1 text-xs text-[var(--ink-muted)]">
+                          <div className="space-y-1 text-xs text-ink-muted">
                             <div className="flex justify-between">
                               <span>Ano:</span>
                               <span className="font-medium">{veiculo.year || "N/A"}</span>
@@ -413,7 +413,7 @@ export default function TransportadoraVeiculosPage() {
                               <span className="font-medium">{veiculo.capacity || "N/A"} lugares</span>
                             </div>
                             {veiculo.lastMaintenance && (
-                              <div className="flex justify-between items-center pt-1 border-t border-[var(--border)]">
+                              <div className="flex justify-between items-center pt-1 border-t border-border">
                                 <span className="flex items-center gap-1">
                                   <Wrench className="h-3 w-3" />
                                   Última manutenção:
@@ -427,7 +427,7 @@ export default function TransportadoraVeiculosPage() {
                         </div>
 
                         {/* Ações */}
-                        <div className="flex gap-2 pt-2 border-t border-[var(--border)]">
+                        <div className="flex gap-2 pt-2 border-t border-border">
                           <Button
                             variant="outline"
                             size="sm"
@@ -480,16 +480,16 @@ export default function TransportadoraVeiculosPage() {
                             <img
                               src={veiculo.photo_url}
                               alt={veiculo.plate}
-                              className="w-20 h-20 rounded-lg object-cover border border-[var(--border)]"
+                              className="w-20 h-20 rounded-lg object-cover border border-border"
                             />
                           ) : (
-                            <div className="w-20 h-20 rounded-lg bg-[var(--brand-light)] flex items-center justify-center border border-[var(--border)]">
-                              <Truck className="h-8 w-8 text-[var(--brand)]" />
+                            <div className="w-20 h-20 rounded-lg bg-brand-light flex items-center justify-center border border-border">
+                              <Truck className="h-8 w-8 text-brand" />
                             </div>
                           )}
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-2">
-                              <Truck className="h-5 w-5 text-[var(--brand)]" />
+                              <Truck className="h-5 w-5 text-brand" />
                               <h3 className="font-bold text-lg">{veiculo.plate}</h3>
                               <Badge variant={veiculo.is_active ? "default" : "secondary"}>
                                 {veiculo.is_active ? "Ativo" : "Inativo"}
@@ -502,7 +502,7 @@ export default function TransportadoraVeiculosPage() {
                               )}
                             </div>
                             <p className="font-medium mb-1">{veiculo.model || "Sem modelo"}</p>
-                            <div className="flex gap-4 text-sm text-[var(--ink-muted)]">
+                            <div className="flex gap-4 text-sm text-ink-muted">
                               <span>Ano: {veiculo.year || "N/A"}</span>
                               <span>Capacidade: {veiculo.capacity || "N/A"} lugares</span>
                               {veiculo.lastMaintenance && (
@@ -550,7 +550,7 @@ export default function TransportadoraVeiculosPage() {
               <Card className="p-12 text-center">
                 <Truck className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                 <h3 className="text-lg font-medium mb-2">Nenhum veículo encontrado</h3>
-                <p className="text-sm text-[var(--ink-muted)]">
+                <p className="text-sm text-ink-muted">
                   {searchQuery ? "Tente ajustar sua busca" : "Não há veículos cadastrados"}
                 </p>
               </Card>
@@ -597,7 +597,7 @@ export default function TransportadoraVeiculosPage() {
                     <Card className="p-12 text-center">
                       <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                       <h3 className="text-lg font-medium mb-2">Nenhum documento encontrado</h3>
-                      <p className="text-sm text-[var(--ink-muted)] mb-4">
+                      <p className="text-sm text-ink-muted mb-4">
                         Faça upload dos documentos do veículo
                       </p>
                       <Button onClick={() => setIsUploadModalOpen(true)}>
@@ -608,7 +608,7 @@ export default function TransportadoraVeiculosPage() {
                   ) : (
                     <div className="relative">
                       {/* Timeline vertical */}
-                      <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-[var(--border)]"></div>
+                      <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-border-border"></div>
                       <div className="space-y-6">
                         {documents
                           .sort((a, b) => {
@@ -631,7 +631,7 @@ export default function TransportadoraVeiculosPage() {
                                   <div className="flex items-start justify-between gap-4">
                                     <div className="flex-1">
                                       <div className="flex items-center gap-2 mb-3">
-                                        <FileText className="h-5 w-5 text-[var(--brand)]" />
+                                        <FileText className="h-5 w-5 text-brand" />
                                         <h3 className="font-bold uppercase">{doc.document_type}</h3>
                                         <Badge variant={doc.status === 'valid' ? 'default' : doc.status === 'expired' ? 'destructive' : 'secondary'}>
                                           {doc.status === 'valid' ? 'Válido' : doc.status === 'expired' ? 'Vencido' : doc.status === 'pending' ? 'Pendente' : 'Cancelado'}
@@ -653,7 +653,7 @@ export default function TransportadoraVeiculosPage() {
                                               <img
                                                 src={doc.file_url}
                                                 alt={doc.document_type}
-                                                className="w-full h-32 object-cover rounded-lg border border-[var(--border)] cursor-pointer hover:opacity-80 transition-opacity"
+                                                className="w-full h-32 object-cover rounded-lg border border-border cursor-pointer hover:opacity-80 transition-opacity"
                                                 onClick={() => window.open(doc.file_url, '_blank')}
                                               />
                                               <div className="absolute inset-0 bg-black/0 hover:bg-black/10 rounded-lg transition-colors flex items-center justify-center">
@@ -661,14 +661,14 @@ export default function TransportadoraVeiculosPage() {
                                               </div>
                                             </div>
                                           ) : (
-                                            <div className="w-full max-w-xs p-8 bg-[var(--bg-hover)] rounded-lg border border-[var(--border)] flex items-center justify-center">
-                                              <FileText className="h-12 w-12 text-[var(--ink-muted)]" />
+                                            <div className="w-full max-w-xs p-8 bg-bg-hover rounded-lg border border-border flex items-center justify-center">
+                                              <FileText className="h-12 w-12 text-ink-muted" />
                                             </div>
                                           )}
                                         </div>
                                       )}
 
-                                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-[var(--ink-muted)]">
+                                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-ink-muted">
                                         {doc.document_number && (
                                           <div>
                                             <span className="font-medium">Número:</span> {doc.document_number}
@@ -698,12 +698,12 @@ export default function TransportadoraVeiculosPage() {
                                       </div>
 
                                       {doc.file_url && (
-                                        <div className="mt-3 pt-3 border-t border-[var(--border)]">
+                                        <div className="mt-3 pt-3 border-t border-border">
                                           <a
                                             href={doc.file_url}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="inline-flex items-center gap-2 text-[var(--brand)] hover:underline"
+                                            className="inline-flex items-center gap-2 text-brand hover:underline"
                                           >
                                             <ExternalLink className="h-4 w-4" />
                                             Ver documento completo
@@ -725,7 +725,7 @@ export default function TransportadoraVeiculosPage() {
               <Card className="p-12 text-center">
                 <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                 <h3 className="text-lg font-medium mb-2">Selecione um veículo</h3>
-                <p className="text-sm text-[var(--ink-muted)] mb-4">
+                <p className="text-sm text-ink-muted mb-4">
                   Escolha um veículo da lista para visualizar seus documentos
                 </p>
                 <Button onClick={() => setActiveTab('list')}>
@@ -773,7 +773,7 @@ export default function TransportadoraVeiculosPage() {
                     <Card className="p-12 text-center">
                       <Wrench className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                       <h3 className="text-lg font-medium mb-2">Nenhuma manutenção encontrada</h3>
-                      <p className="text-sm text-[var(--ink-muted)] mb-4">
+                      <p className="text-sm text-ink-muted mb-4">
                         Registre manutenções do veículo
                       </p>
                       <Button onClick={() => setIsMaintenanceModalOpen(true)}>
@@ -784,7 +784,7 @@ export default function TransportadoraVeiculosPage() {
                   ) : (
                     <div className="relative">
                       {/* Timeline vertical */}
-                      <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-[var(--border)]"></div>
+                      <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-border-border"></div>
                       <div className="space-y-6">
                         {maintenances
                           .sort((a, b) => {
@@ -807,7 +807,7 @@ export default function TransportadoraVeiculosPage() {
                                   <div className="flex items-start justify-between gap-4">
                                     <div className="flex-1">
                                       <div className="flex items-center gap-2 mb-3">
-                                        <Wrench className="h-5 w-5 text-[var(--brand)]" />
+                                        <Wrench className="h-5 w-5 text-brand" />
                                         <h3 className="font-bold capitalize">{maint.maintenance_type.replace('_', ' ')}</h3>
                                         <Badge variant={
                                           maint.status === 'completed' ? 'default' :
@@ -820,60 +820,60 @@ export default function TransportadoraVeiculosPage() {
                                         </Badge>
                                       </div>
 
-                                      <p className="text-sm text-[var(--ink)] mb-3">{maint.description}</p>
+                                      <p className="text-sm text-ink mb-3">{maint.description}</p>
 
                                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
                                         {maint.scheduled_date && (
                                           <div className="flex items-center gap-2">
-                                            <Calendar className="h-4 w-4 text-[var(--ink-muted)]" />
-                                            <span className="text-[var(--ink-muted)]">Agendada:</span>
+                                            <Calendar className="h-4 w-4 text-ink-muted" />
+                                            <span className="text-ink-muted">Agendada:</span>
                                             <span className="font-medium">{formatDate(maint.scheduled_date)}</span>
                                           </div>
                                         )}
                                         {maint.completed_date && (
                                           <div className="flex items-center gap-2">
-                                            <Clock className="h-4 w-4 text-[var(--ink-muted)]" />
-                                            <span className="text-[var(--ink-muted)]">Concluída:</span>
+                                            <Clock className="h-4 w-4 text-ink-muted" />
+                                            <span className="text-ink-muted">Concluída:</span>
                                             <span className="font-medium">{formatDate(maint.completed_date)}</span>
                                           </div>
                                         )}
                                         {maint.next_maintenance_date && (
                                           <div className="flex items-center gap-2">
-                                            <Calendar className="h-4 w-4 text-[var(--ink-muted)]" />
-                                            <span className="text-[var(--ink-muted)]">Próxima:</span>
+                                            <Calendar className="h-4 w-4 text-ink-muted" />
+                                            <span className="text-ink-muted">Próxima:</span>
                                             <span className="font-medium">{formatDate(maint.next_maintenance_date)}</span>
                                           </div>
                                         )}
                                         {maint.odometer_km && (
                                           <div className="flex items-center gap-2">
-                                            <Truck className="h-4 w-4 text-[var(--ink-muted)]" />
-                                            <span className="text-[var(--ink-muted)]">Odômetro:</span>
+                                            <Truck className="h-4 w-4 text-ink-muted" />
+                                            <span className="text-ink-muted">Odômetro:</span>
                                             <span className="font-medium">{maint.odometer_km.toLocaleString('pt-BR')} km</span>
                                           </div>
                                         )}
                                         {maint.workshop_name && (
                                           <div>
-                                            <span className="text-[var(--ink-muted)]">Oficina:</span>
+                                            <span className="text-ink-muted">Oficina:</span>
                                             <span className="font-medium ml-1">{maint.workshop_name}</span>
                                           </div>
                                         )}
                                         {maint.mechanic_name && (
                                           <div>
-                                            <span className="text-[var(--ink-muted)]">Mecânico:</span>
+                                            <span className="text-ink-muted">Mecânico:</span>
                                             <span className="font-medium ml-1">{maint.mechanic_name}</span>
                                           </div>
                                         )}
                                       </div>
 
                                       {totalCost > 0 && (
-                                        <div className="mt-3 pt-3 border-t border-[var(--border)]">
+                                        <div className="mt-3 pt-3 border-t border-border">
                                           <div className="flex items-center gap-2">
-                                            <DollarSign className="h-4 w-4 text-[var(--ink-muted)]" />
-                                            <span className="text-sm text-[var(--ink-muted)]">Custo Total:</span>
+                                            <DollarSign className="h-4 w-4 text-ink-muted" />
+                                            <span className="text-sm text-ink-muted">Custo Total:</span>
                                             <span className="font-semibold text-lg">{formatCurrency(totalCost)}</span>
                                           </div>
                                           {(maint.cost_parts_brl > 0 || maint.cost_labor_brl > 0) && (
-                                            <div className="flex gap-4 mt-2 text-xs text-[var(--ink-muted)]">
+                                            <div className="flex gap-4 mt-2 text-xs text-ink-muted">
                                               {maint.cost_parts_brl > 0 && (
                                                 <span>Peças: {formatCurrency(parseFloat(maint.cost_parts_brl.toString()))}</span>
                                               )}
@@ -945,7 +945,7 @@ export default function TransportadoraVeiculosPage() {
               <Card className="p-12 text-center">
                 <Wrench className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                 <h3 className="text-lg font-medium mb-2">Selecione um veículo</h3>
-                <p className="text-sm text-[var(--ink-muted)] mb-4">
+                <p className="text-sm text-ink-muted mb-4">
                   Escolha um veículo da lista para visualizar suas manutenções
                 </p>
                 <Button onClick={() => setActiveTab('list')}>

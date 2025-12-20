@@ -330,7 +330,7 @@ export default function OperatorConfiguracoesPage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <p className="text-[var(--ink-muted)]">Carregando informações do usuário...</p>
+          <p className="text-ink-muted">Carregando informações do usuário...</p>
         </div>
       </div>
     )
@@ -339,13 +339,13 @@ export default function OperatorConfiguracoesPage() {
   return (
     <AppShell user={{ id: user.id, name: user.name || "Operador", email: user.email, role: user.role || "operador", avatar_url: user.avatar_url }} panel="operador">
       <div className="w-full max-w-5xl mx-auto space-y-6">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-[var(--border)]">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-border">
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-2 mb-2">
               <Settings2 className="h-6 w-6 sm:h-7 sm:w-7 text-orange-500" />
               Configurações
             </h1>
-            <p className="text-sm sm:text-base text-[var(--ink-muted)]">
+            <p className="text-sm sm:text-base text-ink-muted">
               Gerencie suas informações pessoais e preferências
             </p>
           </div>
@@ -381,7 +381,7 @@ export default function OperatorConfiguracoesPage() {
                   </label>
                 </div>
                 <h2 className="text-lg font-semibold mb-1">Foto de Perfil</h2>
-                <p className="text-sm text-[var(--ink-muted)] mb-3">
+                <p className="text-sm text-ink-muted mb-3">
                   Formatos: JPG, PNG (máx. 5MB)
                 </p>
                 {uploadingImage && (
@@ -394,7 +394,7 @@ export default function OperatorConfiguracoesPage() {
               <div className="text-center">
                 <Download className="h-8 w-8 text-orange-500 mx-auto mb-3" />
                 <h2 className="text-lg font-semibold mb-1">Exportar Dados</h2>
-                <p className="text-sm text-[var(--ink-muted)] mb-4">
+                <p className="text-sm text-ink-muted mb-4">
                   Baixe uma cópia dos seus dados pessoais
                 </p>
                 <Button variant="outline" className="w-full">
@@ -446,7 +446,7 @@ export default function OperatorConfiguracoesPage() {
                 <div className="space-y-2">
                   <Label htmlFor="email">Email (Login)</Label>
                   <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--ink-muted)]" />
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-ink-muted" />
                     <Input
                       id="email"
                       type="email"
@@ -489,7 +489,7 @@ export default function OperatorConfiguracoesPage() {
                 <div className="space-y-2">
                   <Label htmlFor="newPassword">Nova Senha</Label>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--ink-muted)]" />
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-ink-muted" />
                     <Input
                       id="newPassword"
                       type={showNewPassword ? "text" : "password"}
@@ -501,7 +501,7 @@ export default function OperatorConfiguracoesPage() {
                     <button
                       type="button"
                       onClick={() => setShowNewPassword(!showNewPassword)}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 text-[var(--ink-muted)] hover:text-[var(--ink-strong)] h-8 w-8 flex items-center justify-center rounded-lg hover:bg-[var(--bg-soft)] z-10"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-ink-muted hover:text-text-ink-strong h-8 w-8 flex items-center justify-center rounded-lg hover:bg-bg-soft z-10"
                     >
                       {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
@@ -511,7 +511,7 @@ export default function OperatorConfiguracoesPage() {
                 <div className="space-y-2">
                   <Label htmlFor="confirmPassword">Confirmar Nova Senha</Label>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--ink-muted)]" />
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-ink-muted" />
                     <Input
                       id="confirmPassword"
                       type={showNewPassword ? "text" : "password"}
@@ -523,7 +523,7 @@ export default function OperatorConfiguracoesPage() {
                   </div>
                 </div>
 
-                <p className="text-xs text-[var(--ink-muted)]">
+                <p className="text-xs text-ink-muted">
                   Deixe em branco se não deseja alterar a senha
                 </p>
               </div>
@@ -563,10 +563,10 @@ export default function OperatorConfiguracoesPage() {
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between pt-4 border-t border-[var(--border)]">
+                <div className="flex items-center justify-between pt-4 border-t border-border">
                   <div>
                     <p className="font-medium">Alternância Rápida</p>
-                    <p className="text-sm text-[var(--ink-muted)]">Alterne o tema rapidamente</p>
+                    <p className="text-sm text-ink-muted">Alterne o tema rapidamente</p>
                   </div>
                   <ThemeToggle />
                 </div>
@@ -586,10 +586,10 @@ export default function OperatorConfiguracoesPage() {
                   { key: 'alerts', label: 'Alertas Críticos', desc: 'Alertas urgentes do sistema' },
                   { key: 'reports', label: 'Relatórios Semanais', desc: 'Resumo semanal de atividades' }
                 ].map(({ key, label, desc }) => (
-                  <div key={key} className="flex items-center justify-between p-4 rounded-lg border border-[var(--border)] hover:bg-[var(--bg-soft)] transition-colors">
+                  <div key={key} className="flex items-center justify-between p-4 rounded-lg border border-border hover:bg-bg-soft transition-colors">
                     <div className="flex-1">
                       <p className="font-medium mb-1">{label}</p>
-                      <p className="text-sm text-[var(--ink-muted)]">{desc}</p>
+                      <p className="text-sm text-ink-muted">{desc}</p>
                     </div>
                     <button
                       onClick={() => handleNotificationChange(key, !formData.notifications[key as keyof typeof formData.notifications])}
@@ -623,7 +623,7 @@ export default function OperatorConfiguracoesPage() {
                     id="language"
                     value={formData.language}
                     onChange={(e) => handleLanguageChange(e.target.value)}
-                    className="w-full px-3 py-2 border border-[var(--border)] rounded-lg bg-[var(--bg)] focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-opacity-20"
+                    className="w-full px-3 py-2 border border-border rounded-lg bg-bg-bg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-opacity-20"
                   >
                     <option value="pt-BR">Português (Brasil)</option>
                     <option value="en-US">English (US)</option>
@@ -634,12 +634,12 @@ export default function OperatorConfiguracoesPage() {
                 <div className="space-y-2">
                   <Label htmlFor="timezone">Fuso Horário</Label>
                   <div className="relative">
-                    <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--ink-muted)]" />
+                    <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-ink-muted" />
                     <select
                       id="timezone"
                       value={formData.timezone}
                       onChange={(e) => handleTimezoneChange(e.target.value)}
-                      className="w-full pl-10 pr-3 py-2 border border-[var(--border)] rounded-lg bg-[var(--bg)] focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-opacity-20"
+                      className="w-full pl-10 pr-3 py-2 border border-border rounded-lg bg-bg-bg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-opacity-20"
                     >
                       <option value="America/Sao_Paulo">Brasília (GMT-3)</option>
                       <option value="America/Manaus">Manaus (GMT-4)</option>

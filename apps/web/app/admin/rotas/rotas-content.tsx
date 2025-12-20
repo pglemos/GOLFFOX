@@ -208,13 +208,13 @@ export function RotasPageContent() {
           {/* Header */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-[var(--ink-strong)] flex items-center gap-2">
-                <div className="p-2 rounded-lg bg-gradient-to-br from-[var(--brand-light)] to-[var(--brand-soft)]">
-                  <Route className="h-6 w-6 text-[var(--brand)]" />
+              <h1 className="text-3xl font-bold text-text-ink-strong flex items-center gap-2">
+                <div className="p-2 rounded-lg bg-gradient-to-br from-bg-brand-light to-bg-brand-soft">
+                  <Route className="h-6 w-6 text-brand" />
                 </div>
                 Rotas
               </h1>
-              <p className="text-[var(--ink-muted)] mt-1">Gerencie as rotas do sistema</p>
+              <p className="text-ink-muted mt-1">Gerencie as rotas do sistema</p>
             </div>
             <div className="flex gap-2">
               <RouteCreateModal
@@ -280,23 +280,23 @@ export function RotasPageContent() {
                   transition={{ delay: index * 0.05 }}
                   whileHover={{ y: -4 }}
                 >
-                  <Card className="p-3 sm:p-4 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-[var(--border)] hover:border-[var(--brand)]/30 group">
+                  <Card className="p-3 sm:p-4 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-border hover:border-text-brand/30 group">
                     <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
                       <div className="flex-1 min-w-0">
                         <div className="flex flex-wrap items-center gap-2 mb-2">
-                          <div className="p-1 rounded-lg bg-gradient-to-br from-[var(--brand-light)] to-[var(--brand-soft)]">
-                            <Route className="h-4 w-4 text-[var(--brand)]" />
+                          <div className="p-1 rounded-lg bg-gradient-to-br from-bg-brand-light to-bg-brand-soft">
+                            <Route className="h-4 w-4 text-brand" />
                           </div>
-                          <h3 className="font-bold text-base sm:text-lg group-hover:text-[var(--brand)] transition-colors">{rota.name}</h3>
+                          <h3 className="font-bold text-base sm:text-lg group-hover:text-brand transition-colors">{rota.name}</h3>
                           <Badge variant={rota.is_active ? "default" : "secondary"}>
                             {rota.is_active ? "Ativa" : "Inativa"}
                           </Badge>
                         </div>
-                        <p className="text-sm text-[var(--ink-muted)] mb-2 flex items-center gap-1">
+                        <p className="text-sm text-ink-muted mb-2 flex items-center gap-1">
                           <Building2 className="h-3 w-3" />
                           {rota.companies?.name}
                         </p>
-                        <div className="flex flex-wrap gap-2 sm:gap-4 text-xs sm:text-sm text-[var(--ink-muted)]">
+                        <div className="flex flex-wrap gap-2 sm:gap-4 text-xs sm:text-sm text-ink-muted">
                           <span className="flex items-center gap-1">
                             <MapPin className="h-3 w-3" />
                             {rota.description || "Sem descrição"}

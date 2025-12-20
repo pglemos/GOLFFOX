@@ -135,7 +135,7 @@ export default function RelatoriosOperatorPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold mb-2">Relatórios</h1>
-            <p className="text-[var(--ink-muted)]">Geração e exportação de relatórios</p>
+            <p className="text-ink-muted">Geração e exportação de relatórios</p>
           </div>
         </div>
 
@@ -151,16 +151,16 @@ export default function RelatoriosOperatorPage() {
                 whileHover={{ y: -4 }}
                 className="group"
               >
-                <Card key={r.id} className="p-6 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-[var(--border)] hover:border-[var(--brand)]/30">
+                <Card key={r.id} className="p-6 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-border hover:border-text-brand/30">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
-                        <div className="p-2 rounded-lg bg-gradient-to-br from-[var(--brand-light)] to-[var(--brand-soft)] group-hover:scale-110 transition-transform duration-300">
-                          <Icon className="h-5 w-5 text-[var(--brand)]" />
+                        <div className="p-2 rounded-lg bg-gradient-to-br from-bg-brand-light to-bg-brand-soft group-hover:scale-110 transition-transform duration-300">
+                          <Icon className="h-5 w-5 text-brand" />
                         </div>
-                        <h3 className="font-semibold group-hover:text-[var(--brand)] transition-colors">{r.title}</h3>
+                        <h3 className="font-semibold group-hover:text-brand transition-colors">{r.title}</h3>
                       </div>
-                      <p className="text-sm text-[var(--ink-muted)]">{r.desc}</p>
+                      <p className="text-sm text-ink-muted">{r.desc}</p>
                     </div>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>

@@ -139,7 +139,7 @@ export function AddressForm({
             onKeyPress={handleCepKeyPress}
             disabled={disabled || loadingCep}
             className={cn(
-              "flex w-full rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--bg-soft)] px-4 py-2 text-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-[var(--ink-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] focus-visible:ring-opacity-20 disabled:cursor-not-allowed disabled:opacity-50 h-11",
+              "flex w-full rounded-lg-custom border border-border bg-bg-soft px-4 py-2 text-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-ink-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-text-brand focus-visible:ring-opacity-20 disabled:cursor-not-allowed disabled:opacity-50 h-11",
               cepError && "border-red-500"
             )}
           />
@@ -147,7 +147,7 @@ export function AddressForm({
             type="button"
             onClick={() => handleCepSearch()}
             disabled={disabled || loadingCep || unformatNumber(value.cep).length !== 8}
-            className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-[var(--radius-lg)] text-sm font-semibold ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] focus-visible:ring-opacity-20 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-[var(--border)] bg-transparent hover:bg-[var(--bg-hover)] hover:border-[var(--brand)] py-2 h-11 px-4"
+            className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg-custom text-sm font-semibold ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-text-brand focus-visible:ring-opacity-20 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-border bg-transparent hover:bg-bg-hover hover:border-text-brand py-2 h-11 px-4"
           >
             {loadingCep ? (
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -173,7 +173,7 @@ export function AddressForm({
           value={value.street}
           onChange={(e) => onChange({ ...value, street: e.target.value })}
           disabled={disabled}
-          className="flex w-full rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--bg-soft)] px-4 py-2 text-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-[var(--ink-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] focus-visible:ring-opacity-20 disabled:cursor-not-allowed disabled:opacity-50 h-11"
+          className="flex w-full rounded-lg-custom border border-border bg-bg-soft px-4 py-2 text-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-ink-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-text-brand focus-visible:ring-opacity-20 disabled:cursor-not-allowed disabled:opacity-50 h-11"
         />
       </div>
 
@@ -192,7 +192,7 @@ export function AddressForm({
             value={value.number}
             onChange={(e) => onChange({ ...value, number: e.target.value })}
             disabled={disabled}
-            className="flex w-full rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--bg-soft)] px-4 py-2 text-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-[var(--ink-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] focus-visible:ring-opacity-20 disabled:cursor-not-allowed disabled:opacity-50 h-11"
+            className="flex w-full rounded-lg-custom border border-border bg-bg-soft px-4 py-2 text-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-ink-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-text-brand focus-visible:ring-opacity-20 disabled:cursor-not-allowed disabled:opacity-50 h-11"
           />
         </div>
 
@@ -210,7 +210,7 @@ export function AddressForm({
             value={value.neighborhood}
             onChange={(e) => onChange({ ...value, neighborhood: e.target.value })}
             disabled={disabled}
-            className="flex w-full rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--bg-soft)] px-4 py-2 text-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-[var(--ink-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] focus-visible:ring-opacity-20 disabled:cursor-not-allowed disabled:opacity-50 h-11"
+            className="flex w-full rounded-lg-custom border border-border bg-bg-soft px-4 py-2 text-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-ink-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-text-brand focus-visible:ring-opacity-20 disabled:cursor-not-allowed disabled:opacity-50 h-11"
           />
         </div>
       </div>
@@ -228,7 +228,7 @@ export function AddressForm({
           value={value.complement}
           onChange={(e) => onChange({ ...value, complement: e.target.value })}
           disabled={disabled}
-          className="flex w-full rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--bg-soft)] px-4 py-2 text-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-[var(--ink-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] focus-visible:ring-opacity-20 disabled:cursor-not-allowed disabled:opacity-50 h-11"
+          className="flex w-full rounded-lg-custom border border-border bg-bg-soft px-4 py-2 text-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-ink-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-text-brand focus-visible:ring-opacity-20 disabled:cursor-not-allowed disabled:opacity-50 h-11"
         />
       </div>
 
@@ -245,7 +245,7 @@ export function AddressForm({
             value={value.city}
             readOnly
             disabled
-            className="flex w-full rounded-[var(--radius-lg)] border border-[var(--border)] px-4 py-2 text-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-[var(--ink-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] focus-visible:ring-opacity-20 disabled:cursor-not-allowed disabled:opacity-50 h-11 bg-gray-50"
+            className="flex w-full rounded-lg-custom border border-border px-4 py-2 text-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-ink-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-text-brand focus-visible:ring-opacity-20 disabled:cursor-not-allowed disabled:opacity-50 h-11 bg-gray-50"
           />
         </div>
 
@@ -261,7 +261,7 @@ export function AddressForm({
             value={value.state}
             readOnly
             disabled
-            className="flex w-full rounded-[var(--radius-lg)] border border-[var(--border)] px-4 py-2 text-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-[var(--ink-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] focus-visible:ring-opacity-20 disabled:cursor-not-allowed disabled:opacity-50 h-11 bg-gray-50"
+            className="flex w-full rounded-lg-custom border border-border px-4 py-2 text-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-ink-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-text-brand focus-visible:ring-opacity-20 disabled:cursor-not-allowed disabled:opacity-50 h-11 bg-gray-50"
           />
         </div>
       </div>

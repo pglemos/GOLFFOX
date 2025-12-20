@@ -17,7 +17,7 @@ import { SkeletonList } from "@/components/ui/skeleton"
 
 // Lazy load modais pesados
 const CreateOperatorModal = dynamic(
-  () => import("@/components/modals/create-operador-modal").then(m => ({ default: m.CreateOperatorModal })),
+  () => import("@/components/modals/create-operator-modal").then(m => ({ default: m.CreateOperatorModal })),
   { ssr: false, loading: () => null }
 )
 const CompanyUsersModal = dynamic(
@@ -145,7 +145,7 @@ export default function EmpresasPage() {
   }, [loadEmpresas])
 
   if (authLoading || !user) {
-    return <div className="min-h-screen flex items-center justify-center"><div className="w-16 h-16 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin mx-auto"></div></div>
+    return <div className="min-h-screen flex items-center justify-center"><div className="w-16 h-16 border-4 border-text-brand border-t-transparent rounded-full animate-spin mx-auto"></div></div>
   }
 
   return (
@@ -156,12 +156,12 @@ export default function EmpresasPage() {
             <div className="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-2">
               <h1 className="text-xl sm:text-2xl md:text-3xl font-bold break-words leading-tight">Empresas</h1>
               {!loadingEmpresas && !errorEmpresas && Array.isArray(empresas) && empresas.length > 0 && (
-                <span className="px-2.5 py-0.5 rounded-full text-xs sm:text-sm font-semibold bg-[var(--brand)]/10 text-[var(--brand)]">
+                <span className="px-2.5 py-0.5 rounded-full text-xs sm:text-sm font-semibold bg-text-brand/10 text-brand">
                   {empresas.length}
                 </span>
               )}
             </div>
-            <p className="text-xs sm:text-sm md:text-base text-[var(--ink-muted)] break-words leading-relaxed">Gerencie empresas e funcionários</p>
+            <p className="text-xs sm:text-sm md:text-base text-ink-muted break-words leading-relaxed">Gerencie empresas e funcionários</p>
           </div>
           <Button
             onClick={() => setIsCreateOperatorModalOpen(true)}
@@ -181,16 +181,16 @@ export default function EmpresasPage() {
 
         {loadingEmpresas && (
           <div className="flex flex-col sm:flex-row items-center justify-center py-8 sm:py-12 gap-3 w-full">
-            <div className="w-8 h-8 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin flex-shrink-0"></div>
-            <span className="text-xs sm:text-sm md:text-base text-[var(--ink-muted)] text-center break-words">Carregando empresas...</span>
+            <div className="w-8 h-8 border-4 border-text-brand border-t-transparent rounded-full animate-spin flex-shrink-0"></div>
+            <span className="text-xs sm:text-sm md:text-base text-ink-muted text-center break-words">Carregando empresas...</span>
           </div>
         )}
 
         {!loadingEmpresas && !errorEmpresas && Array.isArray(empresas) && empresas.length === 0 && (
           <Card className="p-4 sm:p-6 md:p-8 text-center w-full max-w-full overflow-hidden">
-            <Briefcase className="h-10 w-10 sm:h-12 sm:w-12 text-[var(--ink-muted)] mx-auto mb-3 sm:mb-4 flex-shrink-0" />
+            <Briefcase className="h-10 w-10 sm:h-12 sm:w-12 text-ink-muted mx-auto mb-3 sm:mb-4 flex-shrink-0" />
             <h3 className="text-sm sm:text-base md:text-lg font-semibold mb-2 break-words px-2">Nenhuma empresa cadastrada</h3>
-            <p className="text-xs sm:text-sm md:text-base text-[var(--ink-muted)] mb-4 break-words px-2">Clique em &quot;Criar Empresa&quot; para criar uma nova empresa e operador.</p>
+            <p className="text-xs sm:text-sm md:text-base text-ink-muted mb-4 break-words px-2">Clique em &quot;Criar Empresa&quot; para criar uma nova empresa e operador.</p>
           </Card>
         )}
 
@@ -205,15 +205,15 @@ export default function EmpresasPage() {
                 whileHover={{ y: -4 }}
                 className="group"
               >
-                <Card key={empresa.id} className="p-4 sm:p-5 overflow-hidden w-full border border-[var(--border)] hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm hover:border-[var(--brand)]/30 flex flex-col">
+                <Card key={empresa.id} className="p-4 sm:p-5 overflow-hidden w-full border border-border hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm hover:border-text-brand/30 flex flex-col">
                   <div className="flex-1 flex flex-col gap-3 w-full">
                     {/* Header com ícone e nome */}
                     <div className="flex items-start gap-3 mb-1">
-                      <div className="p-2 rounded-lg bg-gradient-to-br from-[var(--brand-light)] to-[var(--brand-soft)] flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
-                        <Briefcase className="h-5 w-5 text-[var(--brand)]" />
+                      <div className="p-2 rounded-lg bg-gradient-to-br from-bg-brand-light to-bg-brand-soft flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
+                        <Briefcase className="h-5 w-5 text-brand" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-bold text-base sm:text-lg break-words leading-tight text-[var(--ink)] group-hover:text-[var(--brand)] transition-colors">
+                        <h3 className="font-bold text-base sm:text-lg break-words leading-tight text-[var(--ink)] group-hover:text-brand transition-colors">
                           {empresa.name}
                         </h3>
                       </div>
@@ -223,35 +223,35 @@ export default function EmpresasPage() {
                     <div className="space-y-2 flex-1">
                       {empresa.address && (
                         <div className="flex items-start gap-2">
-                          <span className="text-xs text-[var(--ink-muted)] font-medium min-w-[60px]">Endereço:</span>
-                          <p className="text-xs sm:text-sm text-[var(--ink-muted)] break-words flex-1 leading-relaxed" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
+                          <span className="text-xs text-ink-muted font-medium min-w-[60px]">Endereço:</span>
+                          <p className="text-xs sm:text-sm text-ink-muted break-words flex-1 leading-relaxed" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
                             {empresa.address}
                           </p>
                         </div>
                       )}
                       {empresa.phone && (
                         <div className="flex items-start gap-2">
-                          <span className="text-xs text-[var(--ink-muted)] font-medium min-w-[60px]">Telefone:</span>
-                          <p className="text-xs sm:text-sm text-[var(--ink-muted)] break-words flex-1 leading-relaxed" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
+                          <span className="text-xs text-ink-muted font-medium min-w-[60px]">Telefone:</span>
+                          <p className="text-xs sm:text-sm text-ink-muted break-words flex-1 leading-relaxed" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
                             {empresa.phone}
                           </p>
                         </div>
                       )}
                       {empresa.email && (
                         <div className="flex items-start gap-2">
-                          <span className="text-xs text-[var(--ink-muted)] font-medium min-w-[60px]">Email:</span>
-                          <p className="text-xs sm:text-sm text-[var(--ink-muted)] break-words flex-1 leading-relaxed" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
+                          <span className="text-xs text-ink-muted font-medium min-w-[60px]">Email:</span>
+                          <p className="text-xs sm:text-sm text-ink-muted break-words flex-1 leading-relaxed" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
                             {empresa.email}
                           </p>
                         </div>
                       )}
                       {!empresa.address && !empresa.phone && !empresa.email && (
-                        <p className="text-xs sm:text-sm text-[var(--ink-muted)] italic">Sem informações adicionais</p>
+                        <p className="text-xs sm:text-sm text-ink-muted italic">Sem informações adicionais</p>
                       )}
                     </div>
 
                     {/* Botões de ação */}
-                    <div className="grid grid-cols-2 gap-2 pt-2 border-t border-[var(--border)]">
+                    <div className="grid grid-cols-2 gap-2 pt-2 border-t border-border">
                       <Button
                         variant="outline"
                         size="sm"

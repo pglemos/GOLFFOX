@@ -43,7 +43,7 @@ export function EnvVarsBanner() {
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: -100, opacity: 0 }}
         transition={{ duration: 0.3, ease: "easeOut" }}
-        className="fixed top-16 sm:top-18 left-0 right-0 z-[calc(var(--z-fixed)+1)] bg-gradient-to-r from-[var(--warning)] to-[var(--error)] text-white shadow-lg"
+        className="fixed top-16 sm:top-18 left-0 right-0 z-[1031] bg-gradient-to-r from-warning to-text-error text-white shadow-lg"
       >
         <div className="mx-auto max-w-[1600px] px-4 sm:px-6 py-3">
           <div className="flex items-center justify-between gap-4">

@@ -76,7 +76,7 @@ export default function PrestadoresOperatorPage() {
       <div className="space-y-4 sm:space-y-6 w-full overflow-x-hidden">
         <div className="min-w-0 flex-1">
           <h1 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2 break-words">Prestadores Alocados</h1>
-          <p className="text-sm sm:text-base text-[var(--ink-muted)] break-words">Lista read-only de transportadoras alocadas</p>
+          <p className="text-sm sm:text-base text-ink-muted break-words">Lista read-only de transportadoras alocadas</p>
         </div>
 
         <div className="grid gap-3 sm:gap-4 w-full">
@@ -89,14 +89,14 @@ export default function PrestadoresOperatorPage() {
               whileHover={{ y: -4 }}
               className="group"
             >
-            <Card key={i} className="p-3 sm:p-4 overflow-hidden w-full hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-[var(--border)] hover:border-[var(--brand)]/30">
+            <Card key={i} className="p-3 sm:p-4 overflow-hidden w-full hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-border hover:border-text-brand/30">
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full">
-                <div className="p-1.5 rounded-lg bg-gradient-to-br from-[var(--brand-light)] to-[var(--brand-soft)]">
-                  <Building2 className="h-4 w-4 text-[var(--brand)] flex-shrink-0" />
+                <div className="p-1.5 rounded-lg bg-gradient-to-br from-bg-brand-light to-bg-brand-soft">
+                  <Building2 className="h-4 w-4 text-brand flex-shrink-0" />
                 </div>
                 <div className="flex-1 min-w-0 w-full">
-                  <p className="font-semibold text-sm sm:text-base break-words group-hover:text-[var(--brand)] transition-colors">{p.carrier_name || 'Transportadora'}</p>
-                  <p className="text-xs text-[var(--ink-muted)] mt-1 break-words">Período: {p.period_start} — {p.period_end || 'atual'}</p>
+                  <p className="font-semibold text-sm sm:text-base break-words group-hover:text-brand transition-colors">{p.carrier_name || 'Transportadora'}</p>
+                  <p className="text-xs text-ink-muted mt-1 break-words">Período: {p.period_start} — {p.period_end || 'atual'}</p>
                 </div>
                 <div className="text-xs sm:text-sm text-left sm:text-right w-full sm:w-auto mt-2 sm:mt-0">
                   <p className="break-words">SLA (Pontualidade): {(p.avg_punctuality || 0).toFixed(1)}%</p>
@@ -107,7 +107,7 @@ export default function PrestadoresOperatorPage() {
             </motion.div>
           ))}
           {prestadores.length === 0 && (
-            <Card className="p-6 sm:p-12 text-center text-sm text-[var(--ink-muted)] w-full">
+            <Card className="p-6 sm:p-12 text-center text-sm text-ink-muted w-full">
               <p className="break-words">Nenhum prestador alocado.</p>
             </Card>
           )}

@@ -34,7 +34,7 @@ export default function TransportadoraAjudaPage() {
   }, [router])
 
   if (loading) {
-    return <div className="min-h-screen flex items-center justify-center"><div className="w-16 h-16 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin mx-auto"></div></div>
+    return <div className="min-h-screen flex items-center justify-center"><div className="w-16 h-16 border-4 border-text-brand border-t-transparent rounded-full animate-spin mx-auto"></div></div>
   }
 
   const faqCategories = {
@@ -112,7 +112,7 @@ export default function TransportadoraAjudaPage() {
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold mb-2">Ajuda & Suporte</h1>
-          <p className="text-[var(--ink-muted)]">Central de ajuda para transportadoras</p>
+          <p className="text-ink-muted">Central de ajuda para transportadoras</p>
         </div>
 
         {/* Cards de Ação Rápida */}
@@ -124,14 +124,14 @@ export default function TransportadoraAjudaPage() {
             whileHover={{ y: -4 }}
             className="group"
           >
-          <Card className="p-6 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-[var(--border)] hover:border-[var(--brand)]/30 cursor-pointer">
+          <Card className="p-6 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-border hover:border-text-brand/30 cursor-pointer">
             <div className="flex items-center gap-4 mb-4">
-              <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-[var(--brand-light)] to-[var(--brand-soft)] flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                <MessageCircle className="h-6 w-6 text-[var(--brand)]" />
+              <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-bg-brand-light to-bg-brand-soft flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                <MessageCircle className="h-6 w-6 text-brand" />
               </div>
               <div>
                 <h3 className="font-semibold mb-1">Suporte WhatsApp</h3>
-                <p className="text-sm text-[var(--ink-muted)]">Entre em contato conosco</p>
+                <p className="text-sm text-ink-muted">Entre em contato conosco</p>
               </div>
             </div>
             <Button 
@@ -152,14 +152,14 @@ export default function TransportadoraAjudaPage() {
             whileHover={{ y: -4 }}
             className="group"
           >
-          <Card className="p-6 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-[var(--border)] hover:border-[var(--accent)]/30 cursor-pointer">
+          <Card className="p-6 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-border hover:border-[var(--accent)]/30 cursor-pointer">
             <div className="flex items-center gap-4 mb-4">
               <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-[var(--accent-light)] to-[var(--accent-soft)] flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                 <FileText className="h-6 w-6 text-[var(--accent)]" />
               </div>
               <div>
                 <h3 className="font-semibold mb-1">Documentação</h3>
-                <p className="text-sm text-[var(--ink-muted)]">Guia completo do sistema</p>
+                <p className="text-sm text-ink-muted">Guia completo do sistema</p>
               </div>
             </div>
             <Button 
@@ -180,14 +180,14 @@ export default function TransportadoraAjudaPage() {
             whileHover={{ y: -4 }}
             className="group"
           >
-          <Card className="p-6 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-[var(--border)] hover:border-purple-500/30 cursor-pointer">
+          <Card className="p-6 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-border hover:border-purple-500/30 cursor-pointer">
             <div className="flex items-center gap-4 mb-4">
               <div className="w-12 h-12 rounded-lg bg-purple-100 dark:bg-purple-900/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                 <Video className="h-6 w-6 text-purple-600 dark:text-purple-400" />
               </div>
               <div>
                 <h3 className="font-semibold mb-1">Tutoriais em Vídeo</h3>
-                <p className="text-sm text-[var(--ink-muted)]">Aprenda com vídeos</p>
+                <p className="text-sm text-ink-muted">Aprenda com vídeos</p>
               </div>
             </div>
             <Button 
@@ -208,14 +208,14 @@ export default function TransportadoraAjudaPage() {
             whileHover={{ y: -4 }}
             className="group"
           >
-          <Card className="p-6 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-[var(--border)] hover:border-green-500/30 cursor-pointer">
+          <Card className="p-6 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-border hover:border-green-500/30 cursor-pointer">
             <div className="flex items-center gap-4 mb-4">
               <div className="w-12 h-12 rounded-lg bg-green-100 dark:bg-green-900/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                 <Mail className="h-6 w-6 text-green-600 dark:text-green-400" />
               </div>
               <div>
                 <h3 className="font-semibold mb-1">Contato por Email</h3>
-                <p className="text-sm text-[var(--ink-muted)]">Envie sua dúvida</p>
+                <p className="text-sm text-ink-muted">Envie sua dúvida</p>
               </div>
             </div>
             <Button 
@@ -236,7 +236,7 @@ export default function TransportadoraAjudaPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
         >
-        <Card className="p-6 bg-card/50 backdrop-blur-sm border-[var(--border)]">
+        <Card className="p-6 bg-card/50 backdrop-blur-sm border-border">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-bold">Perguntas Frequentes</h2>
             <div className="flex items-center gap-4">
@@ -267,18 +267,18 @@ export default function TransportadoraAjudaPage() {
             {filteredFaqItems.length === 0 ? (
               <div className="text-center py-12">
                 <HelpCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-[var(--ink-muted)]">Nenhuma pergunta encontrada</p>
+                <p className="text-ink-muted">Nenhuma pergunta encontrada</p>
               </div>
             ) : (
               filteredFaqItems.map((item, index) => (
-                <div key={index} className="border-b border-[var(--border)] pb-4 last:border-0">
+                <div key={index} className="border-b border-border pb-4 last:border-0">
                   <div className="flex items-start gap-3">
                     <Badge variant="outline" className="flex-shrink-0">
                       {faqCategories[item.category as keyof typeof faqCategories]}
                     </Badge>
                     <div className="flex-1">
                       <h3 className="font-semibold mb-2">{item.question}</h3>
-                      <p className="text-sm text-[var(--ink-muted)]">{item.answer}</p>
+                      <p className="text-sm text-ink-muted">{item.answer}</p>
                     </div>
                   </div>
                 </div>
@@ -294,10 +294,10 @@ export default function TransportadoraAjudaPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
         >
-        <Card className="p-6 bg-card/50 backdrop-blur-sm border-[var(--border)]">
+        <Card className="p-6 bg-card/50 backdrop-blur-sm border-border">
           <h2 className="text-xl font-bold mb-4">Status do Sistema</h2>
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-[var(--ok)] animate-pulse"></div>
+            <div className="w-3 h-3 rounded-full bg-success animate-pulse"></div>
             <span className="text-sm">Todos os sistemas operacionais</span>
           </div>
         </Card>

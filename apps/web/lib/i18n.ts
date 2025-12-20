@@ -1,5 +1,5 @@
 ﻿import common from '@/i18n/common.json'
-import operador from '@/i18n/operador.json'
+import operator from '@/i18n/operator.json'
 import admin from '@/i18n/admin.json'
 import transportadora from '@/i18n/transportadora.json'
 import ptBR from '@/i18n/pt-BR.json'
@@ -12,7 +12,7 @@ type Locale = 'pt-BR' | 'en-US'
 // Aceitar objetos aninhados vindos dos JSONs
 const dictionaries: Record<Namespace, Record<string, unknown>> = {
   common: common as Record<string, unknown>,
-  operator: operator as Record<string, unknown>,
+  operador: operator as Record<string, unknown>, // Alias: operador usa operator.json
   admin: admin as Record<string, unknown>,
   transportadora: transportadora as Record<string, unknown>,
 }

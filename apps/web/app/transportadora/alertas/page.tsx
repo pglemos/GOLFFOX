@@ -108,7 +108,7 @@ export default function AlertasPage() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold">Alertas Operacionais</h1>
-            <p className="text-sm text-[var(--ink-muted)] mt-1">
+            <p className="text-sm text-ink-muted mt-1">
               Monitore a saúde da sua frota e motoristas
             </p>
           </div>
@@ -172,13 +172,13 @@ export default function AlertasPage() {
         {loading ? (
           <div className="text-center py-12">
             <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-orange-500 border-r-transparent" />
-            <p className="mt-4 text-[var(--ink-muted)]">Carregando alertas...</p>
+            <p className="mt-4 text-ink-muted">Carregando alertas...</p>
           </div>
         ) : filteredAlerts.length === 0 ? (
           <Card className="p-12 text-center">
             <CheckCircle2 className="h-16 w-16 text-green-500 mx-auto mb-4" />
-            <p className="text-lg font-medium text-[var(--ink-muted)]">Tudo certo por aqui!</p>
-            <p className="text-sm text-[var(--ink-muted)] mt-1">Nenhum alerta pendente.</p>
+            <p className="text-lg font-medium text-ink-muted">Tudo certo por aqui!</p>
+            <p className="text-sm text-ink-muted mt-1">Nenhum alerta pendente.</p>
           </Card>
         ) : (
           <div className="space-y-3">
@@ -198,7 +198,7 @@ export default function AlertasPage() {
                 >
                   <Card
                     key={alert.id}
-                    className={cn("p-4 transition-all hover:shadow-xl bg-card/50 backdrop-blur-sm border-[var(--border)] hover:border-[var(--brand)]/30", cfg.border, cfg.bg)}
+                    className={cn("p-4 transition-all hover:shadow-xl bg-card/50 backdrop-blur-sm border-border hover:border-text-brand/30", cfg.border, cfg.bg)}
                   >
                     <div className="flex gap-4">
                       <div className={cn("h-10 w-10 rounded-full flex items-center justify-center flex-shrink-0", cfg.bg)}>
@@ -212,7 +212,7 @@ export default function AlertasPage() {
                               <h3 className="font-semibold capitalize">{alert.alert_type.replace(/_/g, ' ')}</h3>
                               <Badge variant="outline" className={cn("text-xs", cfg.color)}>{cfg.label}</Badge>
                             </div>
-                            <p className="text-sm text-[var(--ink-muted)]">{alert.message}</p>
+                            <p className="text-sm text-ink-muted">{alert.message}</p>
                           </div>
                         </div>
                         <div className="flex gap-2 flex-shrink-0 mt-2">
@@ -222,7 +222,7 @@ export default function AlertasPage() {
                         </div>
                       </div>
                     </div>
-                    <div className="flex flex-wrap gap-4 text-xs text-[var(--ink-muted)] mt-2 border-t pt-2 border-dashed border-gray-200">
+                    <div className="flex flex-wrap gap-4 text-xs text-ink-muted mt-2 border-t pt-2 border-dashed border-gray-200">
                       {meta.plate && (
                         <span className="flex items-center gap-1">
                           <Truck className="h-3 w-3" /> {meta.plate}

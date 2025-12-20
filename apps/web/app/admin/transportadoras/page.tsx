@@ -205,7 +205,7 @@ export default function TransportadorasPage() {
   }, [carriers, debouncedSearchQuery])
 
   if (authLoading || !user) {
-    return <div className="min-h-screen flex items-center justify-center"><div className="w-16 h-16 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin mx-auto"></div></div>
+    return <div className="min-h-screen flex items-center justify-center"><div className="w-16 h-16 border-4 border-text-brand border-t-transparent rounded-full animate-spin mx-auto"></div></div>
   }
 
   return (
@@ -223,12 +223,12 @@ export default function TransportadorasPage() {
               <div className="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-2">
                 <h1 className="text-xl sm:text-2xl md:text-3xl font-bold break-words leading-tight">Transportadoras</h1>
                 {!loadingCarriers && !errorCarriers && Array.isArray(carriers) && carriers.length > 0 && (
-                  <span className="px-2.5 py-0.5 rounded-full text-xs sm:text-sm font-semibold bg-[var(--brand)]/10 text-[var(--brand)]">
+                  <span className="px-2.5 py-0.5 rounded-full text-xs sm:text-sm font-semibold bg-text-brand/10 text-brand">
                     {carriers.length}
                   </span>
                 )}
               </div>
-              <p className="text-xs sm:text-sm md:text-base text-[var(--ink-muted)] break-words leading-relaxed">Gerencie transportadoras</p>
+              <p className="text-xs sm:text-sm md:text-base text-ink-muted break-words leading-relaxed">Gerencie transportadoras</p>
             </div>
             <Button
               onClick={() => setIsCreateModalOpen(true)}
@@ -261,18 +261,18 @@ export default function TransportadorasPage() {
 
           {loadingCarriers && (
             <div className="flex flex-col sm:flex-row items-center justify-center py-8 sm:py-12 gap-3 w-full">
-              <div className="w-8 h-8 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin flex-shrink-0"></div>
-              <span className="text-xs sm:text-sm md:text-base text-[var(--ink-muted)] text-center break-words">Carregando transportadoras...</span>
+              <div className="w-8 h-8 border-4 border-text-brand border-t-transparent rounded-full animate-spin flex-shrink-0"></div>
+              <span className="text-xs sm:text-sm md:text-base text-ink-muted text-center break-words">Carregando transportadoras...</span>
             </div>
           )}
 
           {!loadingCarriers && !errorCarriers && Array.isArray(filteredCarriers) && filteredCarriers.length === 0 && (
             <Card className="p-4 sm:p-6 md:p-8 text-center w-full max-w-full overflow-hidden">
-              <Truck className="h-10 w-10 sm:h-12 sm:w-12 text-[var(--ink-muted)] mx-auto mb-3 sm:mb-4 flex-shrink-0" />
+              <Truck className="h-10 w-10 sm:h-12 sm:w-12 text-ink-muted mx-auto mb-3 sm:mb-4 flex-shrink-0" />
               <h3 className="text-sm sm:text-base md:text-lg font-semibold mb-2 break-words px-2">
                 {debouncedSearchQuery ? "Nenhuma transportadora encontrada" : "Nenhuma transportadora cadastrada"}
               </h3>
-              <p className="text-xs sm:text-sm md:text-base text-[var(--ink-muted)] mb-4 break-words px-2">
+              <p className="text-xs sm:text-sm md:text-base text-ink-muted mb-4 break-words px-2">
                 {debouncedSearchQuery ? "Tente buscar por outros termos." : "Clique em \"Criar Transportadora\" para criar uma nova transportadora."}
               </p>
             </Card>
@@ -288,17 +288,17 @@ export default function TransportadorasPage() {
                   transition={{ delay: index * 0.05 }}
                   whileHover={{ y: -4 }}
                 >
-                  <Card className="p-3 sm:p-4 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-[var(--border)] hover:border-[var(--brand)]/30 group">
+                  <Card className="p-3 sm:p-4 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-border hover:border-text-brand/30 group">
                     <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
                       <div className="flex-1 flex gap-3 sm:gap-4 min-w-0">
                         <div className="flex-1 min-w-0">
                           <div className="flex flex-wrap items-center gap-2 mb-2">
-                            <div className="p-1 rounded-lg bg-gradient-to-br from-[var(--brand-light)] to-[var(--brand-soft)]">
-                              <Truck className="h-4 w-4 text-[var(--brand)]" />
+                            <div className="p-1 rounded-lg bg-gradient-to-br from-bg-brand-light to-bg-brand-soft">
+                              <Truck className="h-4 w-4 text-brand" />
                             </div>
-                            <h3 className="font-bold text-base sm:text-lg group-hover:text-[var(--brand)] transition-colors">{transportadora.name}</h3>
+                            <h3 className="font-bold text-base sm:text-lg group-hover:text-brand transition-colors">{transportadora.name}</h3>
                           </div>
-                          <div className="flex flex-wrap gap-2 sm:gap-4 text-xs sm:text-sm text-[var(--ink-muted)]">
+                          <div className="flex flex-wrap gap-2 sm:gap-4 text-xs sm:text-sm text-ink-muted">
                             {carrier.address && (
                               <span className="flex items-center gap-1">
                                 Endereço: {carrier.address}

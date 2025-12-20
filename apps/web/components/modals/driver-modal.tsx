@@ -30,8 +30,8 @@ import { Badge } from "@/components/ui/badge"
 import dynamic from "next/dynamic"
 
 // Lazy load seções pesadas
-const DriverCompensationSection = dynamic(() => import("@/components/motorista/motorista-compensation-section"), { ssr: false })
-const DriverDocumentsSection = dynamic(() => import("@/components/motorista/motorista-documents-section"), { ssr: false })
+const DriverCompensationSection = dynamic(() => import("@/components/driver/driver-compensation-section"), { ssr: false })
+const DriverDocumentsSection = dynamic(() => import("@/components/driver/driver-documents-section"), { ssr: false })
 
 interface Driver {
   id?: string

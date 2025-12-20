@@ -15,21 +15,21 @@ export function ToasterProvider() {
                     backdropFilter: 'blur(8px)',
                 },
                 success: {
-                    className: '!border-l-[var(--success)]',
+                    className: '!border-l-success',
                     iconTheme: {
                         primary: 'var(--success)',
                         secondary: 'white',
                     },
                 },
                 error: {
-                    className: '!border-l-[var(--error)]',
+                    className: '!border-l-text-error',
                     iconTheme: {
                         primary: 'var(--error)',
                         secondary: 'white',
                     },
                 },
                 loading: {
-                    className: '!border-l-[var(--brand)]',
+                    className: '!border-l-text-brand',
                     iconTheme: {
                         primary: 'var(--brand)',
                         secondary: 'white',

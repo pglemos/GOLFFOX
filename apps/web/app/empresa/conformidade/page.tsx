@@ -63,7 +63,7 @@ export default function ConformidadeOperatorPage() {
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold mb-2">Conformidade & Segurança</h1>
-          <p className="text-[var(--ink-muted)]">Incidentes, auditorias e documentos</p>
+          <p className="text-ink-muted">Incidentes, auditorias e documentos</p>
         </div>
 
         <div className="grid gap-4">
@@ -76,22 +76,22 @@ export default function ConformidadeOperatorPage() {
               whileHover={{ y: -4 }}
               className="group"
             >
-            <Card key={idx} className="p-4 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-[var(--border)] hover:border-orange-500/30">
+            <Card key={idx} className="p-4 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-border hover:border-orange-500/30">
               <div className="flex items-center gap-3">
                 <div className="p-1.5 rounded-lg bg-orange-100">
                   <FileWarning className="h-4 w-4 text-orange-500" />
                 </div>
                 <div className="flex-1">
                   <p className="font-semibold">{i.tipo} â€¢ {i.severidade}</p>
-                  <p className="text-xs text-[var(--ink-muted)]">{new Date(i.created_at).toLocaleString('pt-BR')}</p>
+                  <p className="text-xs text-ink-muted">{new Date(i.created_at).toLocaleString('pt-BR')}</p>
                 </div>
-                <span className="text-xs px-2 py-1 rounded bg-[var(--bg-soft)] border border-[var(--border)]">{i.status}</span>
+                <span className="text-xs px-2 py-1 rounded bg-bg-soft border border-border">{i.status}</span>
               </div>
             </Card>
             </motion.div>
           ))}
           {incidentes.length === 0 && (
-            <Card className="p-12 text-center text-sm text-[var(--ink-muted)]">Nenhum incidente registrado.</Card>
+            <Card className="p-12 text-center text-sm text-ink-muted">Nenhum incidente registrado.</Card>
           )}
         </div>
       </div>

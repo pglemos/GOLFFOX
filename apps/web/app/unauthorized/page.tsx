@@ -42,7 +42,7 @@ function UnauthorizedContent() {
   const message = messages[reason] || messages.unauthorized
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-[var(--bg)] via-[var(--bg-soft)] to-[var(--bg)]">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-bg-bg via-bg-bg-soft to-bg-bg">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -51,26 +51,26 @@ function UnauthorizedContent() {
       >
         <Card className="p-8 backdrop-blur-xl bg-white/10 border-white/20">
           <div className="text-center">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-[var(--error)]/20 flex items-center justify-center">
-              <ShieldAlert className="h-8 w-8 text-[var(--error)]" />
+            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-text-error/20 flex items-center justify-center">
+              <ShieldAlert className="h-8 w-8 text-text-error" />
             </div>
             <h1 className="text-2xl font-bold mb-2">{message.title}</h1>
-            <p className="text-[var(--ink-muted)] mb-6">{message.description}</p>
+            <p className="text-ink-muted mb-6">{message.description}</p>
             
             {message.showMobileInfo && (
-              <div className="mb-6 p-4 bg-gradient-to-br from-[var(--brand)]/10 to-[var(--accent)]/10 border-2 border-[var(--brand)]/20 rounded-lg">
-                <p className="text-sm font-semibold text-[var(--ink-strong)] mb-2">
+              <div className="mb-6 p-4 bg-gradient-to-br from-text-brand/10 to-accent-custom/10 border-2 border-text-brand/20 rounded-lg">
+                <p className="text-sm font-semibold text-text-ink-strong mb-2">
                   📱 Aplicativo Mobile GolfFox
                 </p>
-                <p className="text-xs text-[var(--ink-muted)]">
+                <p className="text-xs text-ink-muted">
                   O aplicativo está disponível para iOS e Android. Entre em contato com o administrador do sistema para obter o link de download.
                 </p>
               </div>
             )}
             
             {role && role !== 'unknown' && (
-              <div className="mb-6 p-3 bg-[var(--bg-soft)] rounded-lg">
-                <p className="text-sm text-[var(--ink-muted)]">
+              <div className="mb-6 p-3 bg-bg-soft rounded-lg">
+                <p className="text-sm text-ink-muted">
                   Seu papel atual: <span className="font-semibold">{role}</span>
                 </p>
               </div>

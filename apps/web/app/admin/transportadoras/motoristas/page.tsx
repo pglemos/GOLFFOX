@@ -32,7 +32,7 @@ import { Label } from "@/components/ui/label"
 
 // Lazy load modal
 const DriverModal = dynamic(
-    () => import("@/components/modals/motorista-modal").then(m => ({ default: m.DriverModal })),
+    () => import("@/components/modals/driver-modal").then(m => ({ default: m.DriverModal })),
     { ssr: false, loading: () => null }
 )
 
@@ -157,7 +157,7 @@ export default function TransportadoraMotoristasPage() {
     }
 
     if (authLoading || !user) {
-        return <div className="min-h-screen flex items-center justify-center"><div className="w-16 h-16 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin" /></div>
+        return <div className="min-h-screen flex items-center justify-center"><div className="w-16 h-16 border-4 border-text-brand border-t-transparent rounded-full animate-spin" /></div>
     }
 
     return (
@@ -167,7 +167,7 @@ export default function TransportadoraMotoristasPage() {
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
                     <div className="min-w-0 flex-1">
                         <h1 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2">Motoristas</h1>
-                        <p className="text-sm sm:text-base text-[var(--muted)]">Todos os motoristas de todas as transportadoras</p>
+                        <p className="text-sm sm:text-base text-text-muted-foreground">Todos os motoristas de todas as transportadoras</p>
                     </div>
                     <Button
                         onClick={handleNewDriver}
@@ -223,19 +223,19 @@ export default function TransportadoraMotoristasPage() {
                                     transition={{ duration: 0.3 }}
                                     whileHover={{ y: -4 }}
                                 >
-                                    <Card className="p-3 sm:p-4 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-[var(--border)] hover:border-[var(--brand)]/30 group">
+                                    <Card className="p-3 sm:p-4 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-border hover:border-text-brand/30 group">
                                         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
                                             <div className="flex-1 min-w-0">
                                                 <div className="flex flex-wrap items-center gap-2 mb-2">
-                                                    <div className="p-1 rounded-lg bg-gradient-to-br from-[var(--brand-light)] to-[var(--brand-soft)]">
-                                                        <Users className="h-4 w-4 text-[var(--brand)]" />
+                                                    <div className="p-1 rounded-lg bg-gradient-to-br from-bg-brand-light to-bg-brand-soft">
+                                                        <Users className="h-4 w-4 text-brand" />
                                                     </div>
-                                                    <h3 className="font-bold text-base sm:text-lg group-hover:text-[var(--brand)] transition-colors">{motorista.name}</h3>
+                                                    <h3 className="font-bold text-base sm:text-lg group-hover:text-brand transition-colors">{motorista.name}</h3>
                                                     <Badge variant={motorista.is_active !== false ? "default" : "secondary"}>
                                                         {motorista.is_active !== false ? "Ativo" : "Inativo"}
                                                     </Badge>
                                                 </div>
-                                                <div className="space-y-1 text-sm text-[var(--ink-muted)]">
+                                                <div className="space-y-1 text-sm text-ink-muted">
                                                     <div className="flex items-center gap-2">
                                                         <Mail className="h-3 w-3" />
                                                         <span>{driver.email}</span>

@@ -359,17 +359,17 @@ export default function AdminConfiguracoesPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[var(--bg)]">
-        <div className="w-8 h-8 border-2 border-[var(--brand)] border-t-transparent rounded-full animate-spin mx-auto"></div>
+      <div className="min-h-screen flex items-center justify-center bg-bg">
+        <div className="w-8 h-8 border-2 border-brand border-t-transparent rounded-full animate-spin mx-auto"></div>
       </div>
     )
   }
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[var(--bg)]">
+      <div className="min-h-screen flex items-center justify-center bg-bg">
         <div className="text-center">
-          <p className="text-[var(--ink-muted)]">Carregando informações do usuário...</p>
+          <p className="text-ink-muted">Carregando informações do usuário...</p>
         </div>
       </div>
     )
@@ -383,13 +383,13 @@ export default function AdminConfiguracoesPage() {
     <AppShell user={{ id: user.id, name: user.name || "Admin", email: user.email, role: user.role || "admin", avatar_url: user.avatar_url }} panel="admin">
       <div className="w-full max-w-5xl mx-auto space-y-6">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-[var(--border)]">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-border">
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-2 mb-2">
-              <Settings2 className="h-6 w-6 sm:h-7 sm:w-7 text-[var(--brand)]" />
+              <Settings2 className="h-6 w-6 sm:h-7 sm:w-7 text-brand" />
               Configurações
             </h1>
-            <p className="text-sm sm:text-base text-[var(--ink-muted)]">
+            <p className="text-sm sm:text-base text-ink-muted">
               Gerencie suas informações pessoais e preferências
             </p>
           </div>
@@ -415,7 +415,7 @@ export default function AdminConfiguracoesPage() {
                       </span>
                     )}
                   </div>
-                  <label className="absolute bottom-0 right-0 bg-[var(--brand)] text-white p-3 rounded-full cursor-pointer hover:bg-[var(--brand-dark)] transition-colors shadow-lg">
+                  <label className="absolute bottom-0 right-0 bg-brand text-white p-3 rounded-full cursor-pointer hover:bg-brand-dark transition-colors shadow-lg">
                     <Camera className="h-5 w-5" />
                     <input
                       type="file"
@@ -427,11 +427,11 @@ export default function AdminConfiguracoesPage() {
                   </label>
                 </div>
                 <h2 className="text-lg font-semibold mb-1">Foto de Perfil</h2>
-                <p className="text-sm text-[var(--ink-muted)] mb-3">
+                <p className="text-sm text-ink-muted mb-3">
                   Formatos: JPG, PNG (máx. 5MB)
                 </p>
                 {uploadingImage && (
-                  <p className="text-sm text-[var(--brand)] font-medium">Fazendo upload...</p>
+                  <p className="text-sm text-brand font-medium">Fazendo upload...</p>
                 )}
               </div>
             </Card>
@@ -439,9 +439,9 @@ export default function AdminConfiguracoesPage() {
             {/* Exportar Dados */}
             <Card className="p-6">
               <div className="text-center">
-                <Download className="h-8 w-8 text-[var(--brand)] mx-auto mb-3" />
+                <Download className="h-8 w-8 text-brand mx-auto mb-3" />
                 <h2 className="text-lg font-semibold mb-1">Exportar Dados</h2>
-                <p className="text-sm text-[var(--ink-muted)] mb-4">
+                <p className="text-sm text-ink-muted mb-4">
                   Baixe uma cópia dos seus dados pessoais
                 </p>
                 <Button variant="outline" className="w-full">
@@ -458,7 +458,7 @@ export default function AdminConfiguracoesPage() {
             <Card className="p-6">
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-2">
-                  <User className="h-5 w-5 text-[var(--brand)]" />
+                  <User className="h-5 w-5 text-brand" />
                   <h2 className="text-xl font-semibold">Informações Pessoais</h2>
                 </div>
                 <Button
@@ -495,7 +495,7 @@ export default function AdminConfiguracoesPage() {
                 <div className="space-y-2">
                   <Label htmlFor="email">Email (Login)</Label>
                   <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--ink-muted)]" />
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-ink-muted" />
                     <Input
                       id="email"
                       type="email"
@@ -513,7 +513,7 @@ export default function AdminConfiguracoesPage() {
             <Card className="p-6">
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-2">
-                  <Shield className="h-5 w-5 text-[var(--brand)]" />
+                  <Shield className="h-5 w-5 text-brand" />
                   <h2 className="text-xl font-semibold">Segurança</h2>
                 </div>
                 <Button
@@ -539,7 +539,7 @@ export default function AdminConfiguracoesPage() {
                 <div className="space-y-2">
                   <Label htmlFor="newPassword">Nova Senha</Label>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--ink-muted)]" />
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-ink-muted" />
                     <Input
                       id="newPassword"
                       type={showNewPassword ? "text" : "password"}
@@ -551,7 +551,7 @@ export default function AdminConfiguracoesPage() {
                     <button
                       type="button"
                       onClick={() => setShowNewPassword(!showNewPassword)}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 text-[var(--ink-muted)] hover:text-[var(--ink-strong)] h-8 w-8 flex items-center justify-center rounded-lg hover:bg-[var(--bg-soft)] z-10"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-ink-muted hover:text-ink-strong h-8 w-8 flex items-center justify-center rounded-lg hover:bg-bg-soft z-10"
                     >
                       {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
@@ -561,7 +561,7 @@ export default function AdminConfiguracoesPage() {
                 <div className="space-y-2">
                   <Label htmlFor="confirmPassword">Confirmar Nova Senha</Label>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--ink-muted)]" />
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-ink-muted" />
                     <Input
                       id="confirmPassword"
                       type={showNewPassword ? "text" : "password"}
@@ -578,7 +578,7 @@ export default function AdminConfiguracoesPage() {
             {/* Aparência */}
             <Card className="p-6">
               <div className="flex items-center gap-2 mb-6">
-                <Palette className="h-5 w-5 text-[var(--brand)]" />
+                <Palette className="h-5 w-5 text-brand" />
                 <h2 className="text-xl font-semibold">Aparência</h2>
               </div>
 
@@ -610,10 +610,10 @@ export default function AdminConfiguracoesPage() {
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between pt-4 border-t border-[var(--border)]">
+                <div className="flex items-center justify-between pt-4 border-t border-border">
                   <div>
                     <p className="font-medium">Alternância Rápida</p>
-                    <p className="text-sm text-[var(--ink-muted)]">Alterne o tema rapidamente</p>
+                    <p className="text-sm text-ink-muted">Alterne o tema rapidamente</p>
                   </div>
                   <ThemeToggle />
                 </div>
@@ -623,7 +623,7 @@ export default function AdminConfiguracoesPage() {
             {/* Notificações */}
             <Card className="p-6">
               <div className="flex items-center gap-2 mb-6">
-                <Bell className="h-5 w-5 text-[var(--brand)]" />
+                <Bell className="h-5 w-5 text-brand" />
                 <h2 className="text-xl font-semibold">Notificações</h2>
               </div>
 
@@ -634,15 +634,15 @@ export default function AdminConfiguracoesPage() {
                   { key: 'alerts', label: 'Alertas Críticos', desc: 'Alertas urgentes do sistema' },
                   { key: 'reports', label: 'Relatórios Semanais', desc: 'Resumo semanal de atividades' }
                 ].map(({ key, label, desc }) => (
-                  <div key={key} className="flex items-center justify-between p-4 rounded-lg border border-[var(--border)] hover:bg-[var(--bg-soft)] transition-colors">
+                  <div key={key} className="flex items-center justify-between p-4 rounded-lg border border-border hover:bg-bg-soft transition-colors">
                     <div className="flex-1">
                       <p className="font-medium mb-1">{label}</p>
-                      <p className="text-sm text-[var(--ink-muted)]">{desc}</p>
+                      <p className="text-sm text-ink-muted">{desc}</p>
                     </div>
                     <button
                       onClick={() => handleNotificationChange(key, !formData.notifications[key as keyof typeof formData.notifications])}
                       className={`relative w-12 h-6 rounded-full transition-colors ml-4 ${formData.notifications[key as keyof typeof formData.notifications]
-                        ? 'bg-[var(--brand)]'
+                        ? 'bg-brand'
                         : 'bg-gray-300'
                         }`}
                     >
@@ -661,7 +661,7 @@ export default function AdminConfiguracoesPage() {
             {/* Preferências Gerais */}
             <Card className="p-6">
               <div className="flex items-center gap-2 mb-6">
-                <Globe className="h-5 w-5 text-[var(--brand)]" />
+                <Globe className="h-5 w-5 text-brand" />
                 <h2 className="text-xl font-semibold">Preferências Gerais</h2>
               </div>
 
@@ -672,7 +672,7 @@ export default function AdminConfiguracoesPage() {
                     id="language"
                     value={formData.language}
                     onChange={(e) => handleLanguageChange(e.target.value)}
-                    className="w-full px-3 py-2 border border-[var(--border)] rounded-lg bg-[var(--bg)] focus:outline-none focus:ring-2 focus:ring-[var(--brand)] focus:ring-opacity-20"
+                    className="w-full px-3 py-2 border border-border rounded-lg bg-bg focus:outline-none focus:ring-2 focus:ring-brand focus:ring-opacity-20"
                   >
                     <option value="pt-BR">Português (Brasil)</option>
                     <option value="en-US">English (US)</option>
@@ -683,12 +683,12 @@ export default function AdminConfiguracoesPage() {
                 <div className="space-y-2">
                   <Label htmlFor="timezone">Fuso Horário</Label>
                   <div className="relative">
-                    <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--ink-muted)]" />
+                    <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-ink-muted" />
                     <select
                       id="timezone"
                       value={formData.timezone}
                       onChange={(e) => handleTimezoneChange(e.target.value)}
-                      className="w-full pl-10 pr-3 py-2 border border-[var(--border)] rounded-lg bg-[var(--bg)] focus:outline-none focus:ring-2 focus:ring-[var(--brand)] focus:ring-opacity-20"
+                      className="w-full pl-10 pr-3 py-2 border border-border rounded-lg bg-bg focus:outline-none focus:ring-2 focus:ring-brand focus:ring-opacity-20"
                     >
                       <option value="America/Sao_Paulo">Brasília (GMT-3)</option>
                       <option value="America/Manaus">Manaus (GMT-4)</option>

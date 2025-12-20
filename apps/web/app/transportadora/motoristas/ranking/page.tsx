@@ -129,7 +129,7 @@ export default function MotoristasPage() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold">Gestão de Motoristas</h1>
-            <p className="text-sm text-[var(--ink-muted)] mt-1">
+            <p className="text-sm text-ink-muted mt-1">
               Classificação baseada em performance e indicadores
             </p>
           </div>
@@ -215,7 +215,7 @@ export default function MotoristasPage() {
         {/* Ranking de Desempenho */}
         <div className="space-y-4">
           <h2 className="text-lg font-semibold">Classificação de Desempenho</h2>
-          <p className="text-sm text-[var(--ink-muted)] -mt-2">
+          <p className="text-sm text-ink-muted -mt-2">
             Classificação baseada em performance e indicadores de condução
           </p>
 
@@ -234,7 +234,7 @@ export default function MotoristasPage() {
                 >
                   <Card
                     key={driver.id}
-                    className={`p-4 transition-all cursor-pointer hover:shadow-xl bg-card/50 backdrop-blur-sm border-[var(--border)] hover:border-[var(--brand)]/30 ${selectedDriver === motorista.id ? 'ring-2 ring-orange-500' : ''}`}
+                    className={`p-4 transition-all cursor-pointer hover:shadow-xl bg-card/50 backdrop-blur-sm border-border hover:border-text-brand/30 ${selectedDriver === motorista.id ? 'ring-2 ring-orange-500' : ''}`}
                     onClick={() => setSelectedDriver(selectedDriver === driver.id ? null : driver.id)}
                   >
                     <div className="flex flex-col lg:flex-row gap-4">
@@ -247,22 +247,22 @@ export default function MotoristasPage() {
                           </div>
                           <div className="flex-1 min-w-0">
                             <p className="font-semibold text-base truncate">{motorista.name}</p>
-                            <p className="text-xs text-[var(--ink-muted)] truncate">{motorista.email}</p>
+                            <p className="text-xs text-ink-muted truncate">{motorista.email}</p>
                           </div>
                         </div>
                       </div>
                       {/* Score */}
                       <div className="flex items-center gap-6 flex-wrap lg:flex-nowrap">
                         <div className="text-center">
-                          <p className="text-xs text-[var(--ink-muted)] mb-1">Pontuação</p>
+                          <p className="text-xs text-ink-muted mb-1">Pontuação</p>
                           <p className="text-2xl font-bold text-orange-500">{motorista.score}</p>
-                          <p className="text-xs text-[var(--ink-muted)]">/100</p>
+                          <p className="text-xs text-ink-muted">/100</p>
                         </div>
                         {/* Progress Bars */}
                         <div className="space-y-2 flex-1 min-w-[200px]">
                           <div>
                             <div className="flex justify-between text-xs mb-1">
-                              <span className="text-[var(--ink-muted)]">Pontualidade</span>
+                              <span className="text-ink-muted">Pontualidade</span>
                               <span className="font-medium">{motorista.punctualityScore}%</span>
                             </div>
                             <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
@@ -271,7 +271,7 @@ export default function MotoristasPage() {
                           </div>
                           <div>
                             <div className="flex justify-between text-xs mb-1">
-                              <span className="text-[var(--ink-muted)]">Economia</span>
+                              <span className="text-ink-muted">Economia</span>
                               <span className="font-medium">{motorista.economyScore}%</span>
                             </div>
                             <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
@@ -280,7 +280,7 @@ export default function MotoristasPage() {
                           </div>
                           <div>
                             <div className="flex justify-between text-xs mb-1">
-                              <span className="text-[var(--ink-muted)]">Segurança</span>
+                              <span className="text-ink-muted">Segurança</span>
                               <span className="font-medium">{motorista.safetyScore}%</span>
                             </div>
                             <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
@@ -291,11 +291,11 @@ export default function MotoristasPage() {
                         {/* Stats */}
                         <div className="flex gap-6">
                           <div className="text-center">
-                            <p className="text-xs text-[var(--ink-muted)] mb-1">Corridas</p>
+                            <p className="text-xs text-ink-muted mb-1">Corridas</p>
                             <p className="text-lg font-bold">{motorista.totalTrips}</p>
                           </div>
                           <div className="text-center">
-                            <p className="text-xs text-[var(--ink-muted)] mb-1">Ganhos</p>
+                            <p className="text-xs text-ink-muted mb-1">Ganhos</p>
                             <p className="text-lg font-bold text-green-600">
                               R$ {motorista.totalEarnings.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                             </p>
@@ -312,19 +312,19 @@ export default function MotoristasPage() {
                     {selectedDriver === driver.id && (
                       <div className="mt-4 pt-4 border-t grid grid-cols-2 sm:grid-cols-4 gap-4">
                         <div className="space-y-1">
-                          <p className="text-xs text-[var(--ink-muted)]">Pontualidade</p>
+                          <p className="text-xs text-ink-muted">Pontualidade</p>
                           <p className="text-sm font-medium flex items-center gap-1">{motorista.punctualityScore}%<Clock className="h-3 w-3 text-blue-500" /></p>
                         </div>
                         <div className="space-y-1">
-                          <p className="text-xs text-[var(--ink-muted)]">Economia</p>
+                          <p className="text-xs text-ink-muted">Economia</p>
                           <p className="text-sm font-medium flex items-center gap-1">{motorista.economyScore}%<Fuel className="h-3 w-3 text-green-500" /></p>
                         </div>
                         <div className="space-y-1">
-                          <p className="text-xs text-[var(--ink-muted)]">Conformidade</p>
+                          <p className="text-xs text-ink-muted">Conformidade</p>
                           <p className="text-sm font-medium flex items-center gap-1">{motorista.safetyScore}%<AlertCircle className="h-3 w-3 text-purple-500" /></p>
                         </div>
                         <div className="space-y-1">
-                          <p className="text-xs text-[var(--ink-muted)]">Avaliação</p>
+                          <p className="text-xs text-ink-muted">Avaliação</p>
                           <p className="text-sm font-medium flex items-center gap-1">{motorista.avgRating.toFixed(1)}<Star className="h-3 w-3 text-yellow-500 fill-yellow-500" /></p>
                         </div>
                       </div>

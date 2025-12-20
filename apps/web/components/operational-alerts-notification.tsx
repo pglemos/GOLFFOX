@@ -139,7 +139,7 @@ export function OperationalAlertsNotification() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative hover:bg-[var(--bg-hover)]">
+        <Button variant="ghost" size="icon" className="relative hover:bg-bg-hover">
           <Bell className="h-5 w-5" />
           {totalCount > 0 && (
             <Badge
@@ -154,13 +154,13 @@ export function OperationalAlertsNotification() {
       <DropdownMenuContent align="end" className="w-80">
         <div className="p-3 border-b">
           <h3 className="font-semibold text-sm">Alertas Operacionais</h3>
-          <p className="text-xs text-[var(--ink-muted)]">
+          <p className="text-xs text-ink-muted">
             {totalCount} alerta{totalCount !== 1 ? 's' : ''} não resolvido{totalCount !== 1 ? 's' : ''}
           </p>
         </div>
         <div className="max-h-96 overflow-y-auto">
           {alerts.length === 0 ? (
-            <div className="p-4 text-center text-sm text-[var(--ink-muted)]">
+            <div className="p-4 text-center text-sm text-ink-muted">
               Nenhum alerta pendente
             </div>
           ) : (
@@ -184,10 +184,10 @@ export function OperationalAlertsNotification() {
                         {alert.severity}
                       </Badge>
                     </div>
-                    <p className="text-xs text-[var(--ink-muted)] line-clamp-2">
+                    <p className="text-xs text-ink-muted line-clamp-2">
                       {alert.message || alert.title}
                     </p>
-                    <p className="text-xs text-[var(--ink-muted)] mt-1">
+                    <p className="text-xs text-ink-muted mt-1">
                       {new Date(alert.created_at).toLocaleString('pt-BR')}
                     </p>
                   </div>

@@ -1938,7 +1938,7 @@ export function AdminMap({
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h3 className="text-xl font-semibold mb-2">Modo Lista</h3>
-                <p className="text-[var(--ink-muted)]">{mapError}</p>
+                <p className="text-ink-muted">{mapError}</p>
               </div>
               <Button onClick={() => window.location.reload()}>
                 <RefreshCw className="h-4 w-4 mr-2" />
@@ -1989,7 +1989,7 @@ export function AdminMap({
           <div className="text-center max-w-md">
             <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
             <h3 className="text-xl font-semibold mb-2">Erro no Mapa</h3>
-            <p className="text-[var(--ink-muted)] mb-6">{mapError}</p>
+            <p className="text-ink-muted mb-6">{mapError}</p>
             <Button onClick={() => window.location.reload()}>
               <RefreshCw className="h-4 w-4 mr-2" />
               Tentar Novamente
@@ -2002,7 +2002,7 @@ export function AdminMap({
       {!loading && !mapError && vehicles.length === 0 && (
         <div className="absolute inset-0 z-30 flex items-center justify-center bg-white/50 backdrop-blur-sm">
           <div className="text-center max-w-md p-6 bg-white rounded-lg shadow-lg">
-            <MapIcon className="h-16 w-16 text-[var(--ink-muted)] mx-auto mb-4" />
+            <MapIcon className="h-16 w-16 text-ink-muted mx-auto mb-4" />
             <h3 className="text-xl font-semibold mb-2">Sem veículos ativos</h3>
             <p className="text-sm text-ink-muted mb-4">
               Nenhum veículo encontrado com os filtros selecionados.

@@ -83,8 +83,8 @@ export default function MigratePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[var(--bg)]">
-        <div className="w-8 h-8 border-2 border-[var(--brand)] border-t-transparent rounded-full animate-spin mx-auto"></div>
+      <div className="min-h-screen flex items-center justify-center bg-bg-bg">
+        <div className="w-8 h-8 border-2 border-text-brand border-t-transparent rounded-full animate-spin mx-auto"></div>
       </div>
     )
   }
@@ -98,12 +98,12 @@ export default function MigratePage() {
           transition={{ duration: 0.5 }}
           className="flex items-center gap-3"
         >
-          <div className="p-3 rounded-lg bg-gradient-to-br from-[var(--brand-light)] to-[var(--brand-soft)]">
-            <Database className="h-6 w-6 text-[var(--brand)]" />
+          <div className="p-3 rounded-lg bg-gradient-to-br from-bg-brand-light to-bg-brand-soft">
+            <Database className="h-6 w-6 text-brand" />
           </div>
           <div>
             <h1 className="text-3xl font-bold">Migração do Banco de Dados</h1>
-            <p className="text-[var(--ink-muted)]">Ferramentas de migração e verificação</p>
+            <p className="text-ink-muted">Ferramentas de migração e verificação</p>
           </div>
         </motion.div>
 
@@ -112,7 +112,7 @@ export default function MigratePage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
         >
-        <Card className="p-6 bg-card/50 backdrop-blur-sm border-[var(--border)]">
+        <Card className="p-6 bg-card/50 backdrop-blur-sm border-border">
           <h2 className="text-xl font-semibold mb-4">Status da Migração</h2>
           <div className="flex gap-4 mb-4">
             <Button onClick={checkMigration} disabled={checking}>
@@ -127,10 +127,10 @@ export default function MigratePage() {
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="mt-4 p-4 bg-[var(--bg-soft)] rounded-lg"
+              className="mt-4 p-4 bg-bg-soft rounded-lg"
             >
               <h3 className="font-semibold mb-2 flex items-center gap-2">
-                <Database className="h-5 w-5 text-[var(--brand)]" />
+                <Database className="h-5 w-5 text-brand" />
                 Resultado:
               </h3>
               <div className="grid grid-cols-2 gap-2 text-sm">
@@ -171,7 +171,7 @@ export default function MigratePage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
         >
-        <Card className="p-6 bg-card/50 backdrop-blur-sm border-[var(--border)]">
+        <Card className="p-6 bg-card/50 backdrop-blur-sm border-border">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-semibold">SQL para Executar</h2>
             <Button onClick={copyToClipboard} variant={copied ? "default" : "outline"}>

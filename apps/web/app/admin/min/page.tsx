@@ -14,8 +14,8 @@ export default function AdminMin() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[var(--bg)]">
-        <div className="w-8 h-8 border-2 border-[var(--brand)] border-t-transparent rounded-full animate-spin mx-auto"></div>
+      <div className="min-h-screen flex items-center justify-center bg-bg-bg">
+        <div className="w-8 h-8 border-2 border-text-brand border-t-transparent rounded-full animate-spin mx-auto"></div>
       </div>
     )
   }
@@ -31,7 +31,7 @@ export default function AdminMin() {
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold mb-2">Áreas do Admin</h1>
-          <p className="text-[var(--ink-muted)]">Selecione uma área para acessar:</p>
+          <p className="text-ink-muted">Selecione uma área para acessar:</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -47,11 +47,11 @@ export default function AdminMin() {
                 className="group"
               >
                 <Link href={link.href}>
-                  <Card className="p-6 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-[var(--border)] hover:border-[var(--brand)]/30 cursor-pointer">
+                  <Card className="p-6 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-border hover:border-text-brand/30 cursor-pointer">
                     <div className={`p-3 rounded-lg bg-gradient-to-br ${link.color} w-fit mb-4 group-hover:scale-110 transition-transform duration-300`}>
                       <Icon className="h-6 w-6 text-white" />
                     </div>
-                    <h3 className="font-bold text-lg group-hover:text-[var(--brand)] transition-colors">{link.label}</h3>
+                    <h3 className="font-bold text-lg group-hover:text-brand transition-colors">{link.label}</h3>
                   </Card>
                 </Link>
               </motion.div>

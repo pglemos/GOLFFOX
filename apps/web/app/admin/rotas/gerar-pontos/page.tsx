@@ -16,8 +16,8 @@ function GerarPontosContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[var(--bg)]">
-        <div className="w-8 h-8 border-2 border-[var(--brand)] border-t-transparent rounded-full animate-spin mx-auto"></div>
+      <div className="min-h-screen flex items-center justify-center bg-bg-bg">
+        <div className="w-8 h-8 border-2 border-text-brand border-t-transparent rounded-full animate-spin mx-auto"></div>
       </div>
     )
   }
@@ -31,7 +31,7 @@ function GerarPontosContent() {
           transition={{ duration: 0.5 }}
         >
           <h1 className="text-3xl font-bold mb-2">Gerador de Pontos da Rota</h1>
-          <p className="text-[var(--ink-muted)]">Gere e otimize pontos de parada para suas rotas</p>
+          <p className="text-ink-muted">Gere e otimize pontos de parada para suas rotas</p>
         </motion.div>
 
         {!routeId && (
@@ -54,7 +54,7 @@ function GerarPontosContent() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
         >
-          <Card className="p-6 bg-card/50 backdrop-blur-sm border-[var(--border)]">
+          <Card className="p-6 bg-card/50 backdrop-blur-sm border-border">
             <StopGenerator routeId={routeId} />
           </Card>
         </motion.div>
@@ -67,7 +67,7 @@ export default function Page() {
   return (
     <Suspense fallback={
       <div className="min-h-screen flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-[var(--brand)] border-t-transparent rounded-full animate-spin mx-auto"></div>
+        <div className="w-8 h-8 border-2 border-text-brand border-t-transparent rounded-full animate-spin mx-auto"></div>
       </div>
     }>
       <GerarPontosContent />

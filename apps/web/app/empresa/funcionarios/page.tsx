@@ -231,7 +231,7 @@ function FuncionariosPageContent() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
           <div className="min-w-0 flex-1">
             <h1 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2 break-words">Funcionários</h1>
-            <p className="text-sm sm:text-base text-[var(--muted)] break-words">
+            <p className="text-sm sm:text-base text-text-muted-foreground break-words">
               {companyName ? `Empresa: ${companyName}` : "Gerencie seus funcionários"}
               {totalCount > 0 && ` • ${totalCount} funcionário${totalCount !== 1 ? 's' : ''}`}
             </p>
@@ -285,16 +285,16 @@ function FuncionariosPageContent() {
                       transition={{ delay: index * 0.05 }}
                       whileHover={{ y: -4 }}
                     >
-                      <Card className="p-3 sm:p-4 hover:shadow-xl transition-all duration-300 overflow-hidden bg-card/50 backdrop-blur-sm border-[var(--border)] hover:border-[var(--brand)]/30 group">
+                      <Card className="p-3 sm:p-4 hover:shadow-xl transition-all duration-300 overflow-hidden bg-card/50 backdrop-blur-sm border-border hover:border-text-brand/30 group">
                         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
                           <div className="flex-1 min-w-0">
                             <div className="flex items-start gap-2 mb-2">
-                              <div className="p-1.5 rounded-lg bg-gradient-to-br from-[var(--brand-light)] to-[var(--brand-soft)]">
-                                <Users className="h-4 w-4 text-[var(--brand)] flex-shrink-0" />
+                              <div className="p-1.5 rounded-lg bg-gradient-to-br from-bg-brand-light to-bg-brand-soft">
+                                <Users className="h-4 w-4 text-brand flex-shrink-0" />
                               </div>
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2 flex-wrap">
-                                  <h3 className="font-bold text-base sm:text-lg break-words flex-1 min-w-0 group-hover:text-[var(--brand)] transition-colors">
+                                  <h3 className="font-bold text-base sm:text-lg break-words flex-1 min-w-0 group-hover:text-brand transition-colors">
                                     {funcionario.name || "Nome não disponível"}
                                   </h3>
                                   {funcionario.is_active ? (

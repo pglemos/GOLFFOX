@@ -3,7 +3,7 @@ import { getSupabaseAdmin } from '@/lib/supabase-client'
 import { requireAuth } from '@/lib/api-auth'
 import { applyRateLimit } from '@/lib/rate-limit'
 import { z } from 'zod'
-import { CarrierInsert } from '@/types/transportadora'
+import { CarrierInsert } from '@/types/carrier'
 import { logger, logError } from '@/lib/logger'
 import { successResponse, errorResponse, validationErrorResponse } from '@/lib/api-response'
 

@@ -47,7 +47,7 @@ export default function DiagnosticoPage() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[var(--bg)] via-[var(--bg-soft)] to-[var(--bg)] p-8">
+    <div className="min-h-screen bg-gradient-to-br from-bg-bg via-bg-bg-soft to-bg-bg p-8">
       <div className="max-w-4xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -55,16 +55,16 @@ export default function DiagnosticoPage() {
           transition={{ duration: 0.5 }}
           className="space-y-6"
         >
-        <Card className="p-8 bg-card/50 backdrop-blur-sm border-[var(--border)] shadow-xl">
+        <Card className="p-8 bg-card/50 backdrop-blur-sm border-border shadow-xl">
           <div className="flex items-center gap-3 mb-4">
-            <div className="p-3 rounded-lg bg-gradient-to-br from-[var(--brand-light)] to-[var(--brand-soft)]">
-              <Search className="h-6 w-6 text-[var(--brand)]" />
+            <div className="p-3 rounded-lg bg-gradient-to-br from-bg-brand-light to-bg-brand-soft">
+              <Search className="h-6 w-6 text-brand" />
             </div>
             <div>
               <h1 className="text-3xl font-bold mb-2">
                 Diagnóstico Completo - GolfFox
               </h1>
-              <p className="text-[var(--ink-muted)]">
+              <p className="text-ink-muted">
                 Informações detalhadas sobre cookies, sessão e ambiente
               </p>
             </div>
@@ -101,7 +101,7 @@ export default function DiagnosticoPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
               >
-              <Card className="p-6 bg-card/50 backdrop-blur-sm border-[var(--border)]">
+              <Card className="p-6 bg-card/50 backdrop-blur-sm border-border">
                 <div className="flex items-center gap-2 mb-4">
                   <div className="p-2 rounded-lg bg-blue-100">
                     <Cookie className="h-5 w-5 text-blue-600" />
@@ -179,7 +179,7 @@ export default function DiagnosticoPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
               >
-              <Card className="p-6 bg-card/50 backdrop-blur-sm border-[var(--border)]">
+              <Card className="p-6 bg-card/50 backdrop-blur-sm border-border">
                 <h2 className="text-xl font-bold text-gray-900 mb-4">
                   🌐 Navegador
                 </h2>
@@ -213,7 +213,7 @@ export default function DiagnosticoPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 }}
               >
-              <Card className="p-6 bg-card/50 backdrop-blur-sm border-[var(--border)]">
+              <Card className="p-6 bg-card/50 backdrop-blur-sm border-border">
                 <h2 className="text-xl font-bold text-gray-900 mb-4">
                   ⚙️ Ambiente
                 </h2>
@@ -255,7 +255,7 @@ export default function DiagnosticoPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5 }}
               >
-              <Card className="p-6 bg-card/50 backdrop-blur-sm border-[var(--border)]">
+              <Card className="p-6 bg-card/50 backdrop-blur-sm border-border">
                 <div className="flex items-center gap-2 mb-4">
                   <div className="p-2 rounded-lg bg-gray-100">
                     <Settings className="h-5 w-5 text-gray-600" />

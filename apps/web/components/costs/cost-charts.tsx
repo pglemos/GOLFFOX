@@ -143,7 +143,7 @@ export function CostCharts({ companyId, period = 'month' }: CostChartProps) {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="h-5 w-5 text-[var(--brand)]" />
+              <TrendingUp className="h-5 w-5 text-brand" />
               Evolução Mensal de Custos
             </CardTitle>
           </CardHeader>
@@ -172,7 +172,7 @@ export function CostCharts({ companyId, period = 'month' }: CostChartProps) {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Route className="h-5 w-5 text-[var(--brand)]" />
+              <Route className="h-5 w-5 text-brand" />
               Custos por Rota
             </CardTitle>
           </CardHeader>
@@ -201,7 +201,7 @@ export function CostCharts({ companyId, period = 'month' }: CostChartProps) {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Truck className="h-5 w-5 text-[var(--brand)]" />
+              <Truck className="h-5 w-5 text-brand" />
               Custos por Veículo
             </CardTitle>
           </CardHeader>
@@ -230,7 +230,7 @@ export function CostCharts({ companyId, period = 'month' }: CostChartProps) {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Users className="h-5 w-5 text-[var(--brand)]" />
+              <Users className="h-5 w-5 text-brand" />
               Custos por Motorista
             </CardTitle>
           </CardHeader>
@@ -259,7 +259,7 @@ export function CostCharts({ companyId, period = 'month' }: CostChartProps) {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Building2 className="h-5 w-5 text-[var(--brand)]" />
+              <Building2 className="h-5 w-5 text-brand" />
               Custos por Empresa
             </CardTitle>
           </CardHeader>

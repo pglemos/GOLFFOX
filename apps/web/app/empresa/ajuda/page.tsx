@@ -30,7 +30,7 @@ export default function AjudaOperatorPage() {
   }, [router])
 
   if (loading) {
-    return <div className="min-h-screen flex items-center justify-center"><div className="w-16 h-16 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin mx-auto"></div></div>
+    return <div className="min-h-screen flex items-center justify-center"><div className="w-16 h-16 border-4 border-text-brand border-t-transparent rounded-full animate-spin mx-auto"></div></div>
   }
 
   const faqItems = [
@@ -49,12 +49,12 @@ export default function AjudaOperatorPage() {
   ]
 
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="w-16 h-16 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin mx-auto"></div></div>}>
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="w-16 h-16 border-4 border-text-brand border-t-transparent rounded-full animate-spin mx-auto"></div></div>}>
       <AppShell user={{ id: user?.id || "", name: user?.name || "Operador", email: user?.email || "", role: "operador", avatar_url: user?.avatar_url }}>
         <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold mb-2">Ajuda & Suporte</h1>
-          <p className="text-[var(--ink-muted)]">Central de ajuda para operadores</p>
+          <p className="text-ink-muted">Central de ajuda para operadores</p>
         </div>
 
         {/* Cards de Ação Rápida */}
@@ -66,14 +66,14 @@ export default function AjudaOperatorPage() {
             whileHover={{ y: -4 }}
             className="group"
           >
-          <Card className="p-6 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-[var(--border)] hover:border-[var(--brand)]/30 cursor-pointer">
+          <Card className="p-6 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-border hover:border-text-brand/30 cursor-pointer">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-[var(--brand-light)] to-[var(--brand-soft)] flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                <MessageCircle className="h-6 w-6 text-[var(--brand)]" />
+              <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-bg-brand-light to-bg-brand-soft flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                <MessageCircle className="h-6 w-6 text-brand" />
               </div>
               <div>
                 <h3 className="font-semibold mb-1">Suporte WhatsApp</h3>
-                <p className="text-sm text-[var(--ink-muted)]">Entre em contato conosco</p>
+                <p className="text-sm text-ink-muted">Entre em contato conosco</p>
               </div>
             </div>
             <Button 
@@ -94,14 +94,14 @@ export default function AjudaOperatorPage() {
             whileHover={{ y: -4 }}
             className="group"
           >
-          <Card className="p-6 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-[var(--border)] hover:border-[var(--accent)]/30 cursor-pointer">
+          <Card className="p-6 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-border hover:border-[var(--accent)]/30 cursor-pointer">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-[var(--accent-light)] to-[var(--accent-soft)] flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                 <FileText className="h-6 w-6 text-[var(--accent)]" />
               </div>
               <div>
                 <h3 className="font-semibold mb-1">Documentação</h3>
-                <p className="text-sm text-[var(--ink-muted)]">Guia completo do sistema</p>
+                <p className="text-sm text-ink-muted">Guia completo do sistema</p>
               </div>
             </div>
             <Button 
@@ -122,14 +122,14 @@ export default function AjudaOperatorPage() {
             whileHover={{ y: -4 }}
             className="group"
           >
-          <Card className="p-6 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-[var(--border)] hover:border-[var(--ok)]/30 cursor-pointer">
+          <Card className="p-6 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-border hover:border-[var(--ok)]/30 cursor-pointer">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-lg bg-green-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                 <HelpCircle className="h-6 w-6 text-[var(--ok)]" />
               </div>
               <div>
                 <h3 className="font-semibold mb-1">FAQ</h3>
-                <p className="text-sm text-[var(--ink-muted)]">Perguntas frequentes</p>
+                <p className="text-sm text-ink-muted">Perguntas frequentes</p>
               </div>
             </div>
             <Button className="w-full mt-4" variant="outline">
@@ -145,13 +145,13 @@ export default function AjudaOperatorPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
         >
-        <Card className="p-6 bg-card/50 backdrop-blur-sm border-[var(--border)]">
+        <Card className="p-6 bg-card/50 backdrop-blur-sm border-border">
           <h2 className="text-xl font-bold mb-4">Perguntas Frequentes</h2>
           <div className="space-y-4">
             {faqItems.map((item, index) => (
-              <div key={index} className="border-b border-[var(--border)] pb-4 last:border-0">
+              <div key={index} className="border-b border-border pb-4 last:border-0">
                 <h3 className="font-semibold mb-2">{item.question}</h3>
-                <p className="text-sm text-[var(--ink-muted)]">{item.answer}</p>
+                <p className="text-sm text-ink-muted">{item.answer}</p>
               </div>
             ))}
           </div>
@@ -164,10 +164,10 @@ export default function AjudaOperatorPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
         >
-        <Card className="p-6 bg-card/50 backdrop-blur-sm border-[var(--border)]">
+        <Card className="p-6 bg-card/50 backdrop-blur-sm border-border">
           <h2 className="text-xl font-bold mb-4">Status do Sistema</h2>
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-[var(--ok)] animate-pulse"></div>
+            <div className="w-3 h-3 rounded-full bg-success animate-pulse"></div>
             <span className="text-sm">Todos os sistemas operacionais</span>
           </div>
         </Card>

@@ -14,7 +14,7 @@ import { useOperatorTenant } from "@/components/providers/empresa-tenant-provide
 import { useDebounce } from "@/hooks/use-debounce"
 import { useQuery } from "@tanstack/react-query"
 import { useActiveTrips } from "@/hooks/use-empresa-data"
-import operatorI18nData from "@/i18n/operador.json"
+import operatorI18nData from "@/i18n/operator.json"
 
 const operatorI18n: any = operatorI18nData ?? {
   routes_title: "Rotas",
@@ -123,7 +123,7 @@ export default function OperatorRotasPage() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
           <div className="min-w-0 flex-1">
             <h1 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2 break-words">{operatorI18n.routes_title || "Rotas"}</h1>
-            <p className="text-sm sm:text-base text-[var(--muted)] break-words">{operatorI18n.routes_subtitle || "Gerencie as rotas da sua empresa"}</p>
+            <p className="text-sm sm:text-base text-text-muted-foreground break-words">{operatorI18n.routes_subtitle || "Gerencie as rotas da sua empresa"}</p>
           </div>
           <div className="flex flex-wrap gap-2 w-full sm:w-auto">
             <a href="/operador/rotas/mapa" className="flex-1 sm:flex-initial">
@@ -201,14 +201,14 @@ export default function OperatorRotasPage() {
                 whileHover={{ y: -4 }}
                 className="group"
               >
-                <Card key={rota.id} className="p-4 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-[var(--border)] hover:border-[var(--brand)]/30">
+                <Card key={rota.id} className="p-4 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-border hover:border-text-brand/30">
                   <div className="flex items-start justify-between gap-4 mb-4">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-2">
-                        <div className="p-1.5 rounded-lg bg-gradient-to-br from-[var(--brand-light)] to-[var(--brand-soft)]">
-                          <Navigation className="h-4 w-4 text-[var(--brand)] flex-shrink-0" />
+                        <div className="p-1.5 rounded-lg bg-gradient-to-br from-bg-brand-light to-bg-brand-soft">
+                          <Navigation className="h-4 w-4 text-brand flex-shrink-0" />
                         </div>
-                        <h3 className="font-bold text-lg truncate group-hover:text-[var(--brand)] transition-colors">{rota.name || "Rota sem nome"}</h3>
+                        <h3 className="font-bold text-lg truncate group-hover:text-brand transition-colors">{rota.name || "Rota sem nome"}</h3>
                         {activeRouteIds.has(rota.id) && (
                           <Badge className="bg-green-500 hover:bg-green-600 animate-pulse text-white border-0 flex items-center gap-1">
                             <span className="w-2 h-2 rounded-full bg-white block"></span>

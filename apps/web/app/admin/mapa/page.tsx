@@ -12,7 +12,7 @@ import { useAuthFast } from "@/hooks/use-auth-fast"
 const AdminMap = dynamic(() => import('@/components/admin-map').then(m => ({ default: m.AdminMap })), { 
   ssr: false,
   loading: () => <div className="w-full h-[600px] bg-gray-100 animate-pulse rounded-lg flex items-center justify-center">
-    <p className="text-[var(--ink-muted)]">Carregando mapa...</p>
+    <p className="text-ink-muted">Carregando mapa...</p>
   </div>
 })
 
@@ -35,8 +35,8 @@ function MapaContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[var(--bg)]">
-        <div className="w-8 h-8 border-2 border-[var(--brand)] border-t-transparent rounded-full animate-spin mx-auto"></div>
+      <div className="min-h-screen flex items-center justify-center bg-bg-bg">
+        <div className="w-8 h-8 border-2 border-text-brand border-t-transparent rounded-full animate-spin mx-auto"></div>
       </div>
     )
   }
@@ -59,12 +59,12 @@ function MapaContent() {
           transition={{ duration: 0.5 }}
           className="flex items-center gap-3"
         >
-          <div className="p-3 rounded-[var(--radius-lg)] bg-[var(--brand-light)]">
-            <MapPin className="h-6 w-6 text-[var(--brand)]" />
+          <div className="p-3 rounded-lg-custom bg-brand-light">
+            <MapPin className="h-6 w-6 text-brand" />
           </div>
           <div>
             <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-1">Mapa da Frota</h1>
-            <p className="text-xs sm:text-sm md:text-base text-[var(--ink-muted)]">Visualize veículos e rotas em tempo real</p>
+            <p className="text-xs sm:text-sm md:text-base text-ink-muted">Visualize veículos e rotas em tempo real</p>
           </div>
         </motion.div>
 

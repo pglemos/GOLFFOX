@@ -36,7 +36,7 @@ export default function PreferenciasOperatorPage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <p className="text-[var(--ink-muted)]">Carregando informações do usuário...</p>
+          <p className="text-ink-muted">Carregando informações do usuário...</p>
         </div>
       </div>
     )
@@ -48,7 +48,7 @@ export default function PreferenciasOperatorPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold mb-2">Preferências & Integrações</h1>
-            <p className="text-[var(--ink-muted)]">Definições de turnos, tolerâncias e conectores</p>
+            <p className="text-ink-muted">Definições de turnos, tolerâncias e conectores</p>
           </div>
           <Button variant="outline"><Settings className="h-4 w-4 mr-2" /> Salvar</Button>
         </div>
@@ -58,10 +58,10 @@ export default function PreferenciasOperatorPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
         >
-        <Card className="p-6 bg-card/50 backdrop-blur-sm border-[var(--border)] hover:shadow-xl transition-all duration-300">
-          <p className="text-sm text-[var(--ink-muted)]">Em breve: formulário de turnos padrão, tolerâncias, centros de custo, feriados corporativos e conectores (RH/SSO/Webhooks/API Keys).</p>
+        <Card className="p-6 bg-card/50 backdrop-blur-sm border-border hover:shadow-xl transition-all duration-300">
+          <p className="text-sm text-ink-muted">Em breve: formulário de turnos padrão, tolerâncias, centros de custo, feriados corporativos e conectores (RH/SSO/Webhooks/API Keys).</p>
           {settings && (
-            <pre className="mt-4 text-xs bg-[var(--bg-soft)] p-3 rounded-lg overflow-auto">{JSON.stringify(settings, null, 2)}</pre>
+            <pre className="mt-4 text-xs bg-bg-soft p-3 rounded-lg overflow-auto">{JSON.stringify(settings, null, 2)}</pre>
           )}
         </Card>
         </motion.div>

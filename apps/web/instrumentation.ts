@@ -8,6 +8,11 @@
  */
 
 export async function register() {
+  // Não executar durante o build (apenas em runtime)
+  if (process.env.NEXT_PHASE === 'phase-production-build') {
+    return
+  }
+
   // Só executar no servidor (Node.js runtime)
   if (process.env.NEXT_RUNTIME === 'nodejs') {
     // Inicializar Datadog APM apenas no servidor (Node.js)

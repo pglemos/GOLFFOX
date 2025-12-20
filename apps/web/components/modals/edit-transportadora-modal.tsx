@@ -8,15 +8,15 @@ import { Label } from "@/components/ui/label"
 import { notifySuccess, notifyError } from "@/lib/toast"
 import { supabase } from "@/lib/supabase"
 import { AddressForm, AddressData } from "@/components/address-form"
-import { transportadora } from "@/types/transportadora"
+import type { Carrier } from "@/types/carrier"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Building2, FileText, CreditCard, User } from "lucide-react"
 import dynamic from "next/dynamic"
 
 // Lazy load seções pesadas
-const CarrierDocumentsSection = dynamic(() => import("@/components/transportadora/transportadora-documents-section"), { ssr: false })
-const CarrierBankingSection = dynamic(() => import("@/components/transportadora/transportadora-banking-section"), { ssr: false })
-const CarrierLegalRepSection = dynamic(() => import("@/components/transportadora/transportadora-legal-rep-section"), { ssr: false })
+const CarrierDocumentsSection = dynamic(() => import("@/components/carrier/carrier-documents-section"), { ssr: false })
+const CarrierBankingSection = dynamic(() => import("@/components/carrier/carrier-banking-section"), { ssr: false })
+const CarrierLegalRepSection = dynamic(() => import("@/components/carrier/carrier-legal-rep-section"), { ssr: false })
 
 interface EditCarrierModalProps {
   carrier: Carrier

@@ -17,7 +17,7 @@ import { supabase } from "@/lib/supabase"
 import { notifySuccess, notifyError } from "@/lib/toast"
 import { optimizeRoute } from "@/lib/route-optimization"
 import { geocodeAddress } from "@/lib/geocoding"
-import { DriverPickerModal } from "@/components/admin/motorista-picker-modal"
+import { DriverPickerModal } from "@/components/admin/driver-picker-modal"
 import { VehiclePickerModal } from "@/components/admin/vehicle-picker-modal"
 import { z } from "zod"
 import React from "react"
@@ -297,7 +297,7 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
         <DialogContent className="w-[95vw] max-w-6xl max-h-[90vh] overflow-hidden flex flex-col p-6 sm:p-8">
           <DialogHeader className="pb-6">
             <DialogTitle className="flex items-center gap-3 text-2xl font-bold">
-              <Route className="h-6 w-6 text-[var(--brand)]" />
+              <Route className="h-6 w-6 text-brand" />
               Nova Rota
             </DialogTitle>
             <DialogDescription className="text-base text-gray-600 mt-2">

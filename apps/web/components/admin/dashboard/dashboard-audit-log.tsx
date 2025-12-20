@@ -44,16 +44,16 @@ export function DashboardAuditLog({ logs, loading }: DashboardAuditLogProps) {
 
     const getActionColor = (actionType: string) => {
         const colorMap: Record<string, string> = {
-            create: 'bg-[var(--success)]',
-            update: 'bg-[var(--brand)]',
-            delete: 'bg-[var(--error)]',
-            approve: 'bg-[var(--success)]',
-            reject: 'bg-[var(--error)]',
-            configure: 'bg-[var(--brand)]',
-            invite: 'bg-[var(--brand)]',
-            export: 'bg-[var(--brand)]',
+            create: 'bg-success',
+            update: 'bg-text-brand',
+            delete: 'bg-text-error',
+            approve: 'bg-success',
+            reject: 'bg-text-error',
+            configure: 'bg-text-brand',
+            invite: 'bg-text-brand',
+            export: 'bg-text-brand',
         }
-        return colorMap[actionType.toLowerCase()] || 'bg-[var(--brand)]'
+        return colorMap[actionType.toLowerCase()] || 'bg-text-brand'
     }
 
     return (
@@ -71,16 +71,16 @@ export function DashboardAuditLog({ logs, loading }: DashboardAuditLogProps) {
             </CardHeader>
             <CardContent className="pt-0 px-3 sm:px-6">
                 {loading ? (
-                    <div className="p-12 text-center text-[var(--ink-muted)]">
-                        <div className="w-8 h-8 border-2 border-[var(--brand)] border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+                    <div className="p-12 text-center text-ink-muted">
+                        <div className="w-8 h-8 border-2 border-text-brand border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
                         <p className="text-sm">{t('admin', 'dashboard.auditLog.loading')}</p>
                     </div>
                 ) : logs.length === 0 ? (
-                    <div className="p-12 text-center text-[var(--ink-muted)]">
+                    <div className="p-12 text-center text-ink-muted">
                         <p className="text-sm">{t('admin', 'dashboard.auditLog.empty')}</p>
                     </div>
                 ) : (
-                    <div className="divide-y divide-[var(--border)]">
+                    <div className="divide-y divide-border-border">
                         {logs.map((log, index) => {
                             const ActionIcon = getActionIcon(log.action_type)
                             const actionColor = getActionColor(log.action_type)
@@ -96,7 +96,7 @@ export function DashboardAuditLog({ logs, loading }: DashboardAuditLogProps) {
                                     initial={{ opacity: 0, x: -10 }}
                                     animate={{ opacity: 1, x: 0 }}
                                     transition={{ delay: index * 0.05 }}
-                                    className="p-3 sm:p-4 hover:bg-[var(--bg-hover)] active:bg-[var(--bg-hover)] transition-colors flex items-center gap-2 sm:gap-4 group touch-manipulation"
+                                    className="p-3 sm:p-4 hover:bg-bg-hover active:bg-bg-hover transition-colors flex items-center gap-2 sm:gap-4 group touch-manipulation"
                                 >
                                     <motion.div 
                                         className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg ${actionColor} flex items-center justify-center flex-shrink-0 shadow-sm`}
@@ -106,10 +106,10 @@ export function DashboardAuditLog({ logs, loading }: DashboardAuditLogProps) {
                                         <ActionIcon className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
                                     </motion.div>
                                     <div className="flex-1">
-                                        <p className="font-semibold text-xs sm:text-sm text-[var(--ink-strong)]">
+                                        <p className="font-semibold text-xs sm:text-sm text-text-ink-strong">
                                             {actionText}: {resourceName}
                                         </p>
-                                        <p className="text-xs text-[var(--ink-muted)] mt-0.5">
+                                        <p className="text-xs text-ink-muted mt-0.5">
                                             {formatRelativeTime(log.created_at)}
                                             {log.details?.companyId && ` • ${t('admin', 'dashboard.auditLog.company')}: ${log.details.companyId.slice(0, 8)}`}
                                         </p>
