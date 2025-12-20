@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
     const isActive = searchParams.get('is_active')
 
     let query = supabase
-      .from('transportadoras')
+      .from('carriers')
       .select('id, name, address, phone, email, cnpj, contact_person, is_active, created_at, updated_at')
       .order('created_at', { ascending: false })
 
@@ -53,7 +53,7 @@ export async function GET(request: NextRequest) {
 
     // Contar total (para paginação)
     let countQuery = supabase
-      .from('transportadoras')
+      .from('carriers')
       .select('id', { count: 'exact', head: true })
 
     if (search) {

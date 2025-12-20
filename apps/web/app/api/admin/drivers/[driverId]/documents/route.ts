@@ -56,6 +56,7 @@ export async function GET(
 
         return NextResponse.json(data || [])
     } catch (error) {
+        const { driverId } = await context.params
         logError('Erro interno', { error, driverId, method: 'GET' }, 'DriverDocumentsAPI')
         return NextResponse.json(
             { error: 'Erro interno do servidor' },
@@ -132,7 +133,8 @@ export async function POST(
                 { status: 400 }
             )
         }
-        logError('Erro interno', { error, driverId, method: 'GET' }, 'DriverDocumentsAPI')
+        const { driverId: driverIdError } = await context.params
+        logError('Erro interno', { error, driverId: driverIdError, method: 'POST' }, 'DriverDocumentsAPI')
         return NextResponse.json(
             { error: 'Erro interno do servidor' },
             { status: 500 }
@@ -175,7 +177,8 @@ export async function DELETE(
 
         return NextResponse.json({ success: true })
     } catch (error) {
-        logError('Erro interno', { error, driverId, method: 'GET' }, 'DriverDocumentsAPI')
+        const { driverId: driverIdError } = await context.params
+        logError('Erro interno', { error, driverId: driverIdError, method: 'DELETE' }, 'DriverDocumentsAPI')
         return NextResponse.json(
             { error: 'Erro interno do servidor' },
             { status: 500 }
