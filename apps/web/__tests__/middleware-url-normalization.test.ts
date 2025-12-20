@@ -17,7 +17,7 @@ jest.mock('next/server', () => {
   }
 })
 
-import proxy from '../proxy'
+import middleware from '../middleware'
 
 function makeReq(url: string) {
   const u = new URL(url)
