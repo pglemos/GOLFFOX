@@ -4,6 +4,7 @@
   "description": "GolfFox Transport Management System",
   "private": true,
   "scripts": {
+    "setup:mcp": "node scripts/setup_mcp_mac.js",
     "migrations:status": "node scripts/check-migrations-status.js",
     "migrations:apply": "node scripts/apply-migrations.js",
     "migrations:apply:direct": "node scripts/apply-migrations-direct.js",

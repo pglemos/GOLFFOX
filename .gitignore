@@ -149,3 +149,4 @@ mcp.json
 
 # Flutter SDK (should not be in repo - remove if present)
 flutter/
+.env*.local
