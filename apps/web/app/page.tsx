@@ -830,7 +830,7 @@ function LoginContent() {
           errorName: err?.name,
           errorMessage: err?.message,
           errorStack: err?.stack?.substring(0, 500)
-        }, "LoginPage")
+        })
       } finally {
         // Não resetar loading/transitioning se o redirecionamento está ocorrendo
         // Isso evita flicker antes do redirecionamento
