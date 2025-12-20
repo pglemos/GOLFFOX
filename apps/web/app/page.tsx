@@ -736,11 +736,31 @@ function LoginContent() {
           return
         }
 
+        // ✅ VALIDAÇÃO CRÍTICA: Garantir que redirectUrl é uma string válida ANTES de usar
+        if (!redirectUrl || typeof redirectUrl !== 'string' || redirectUrl.trim() === '') {
+          console.error('❌ [LOGIN] redirectUrl inválido antes de split:', { redirectUrl, type: typeof redirectUrl })
+          setError("Erro ao determinar rota de redirecionamento. Entre em contato com o administrador.")
+          setLoading(false)
+          setTransitioning(false)
+          if (typeof document !== "undefined") document.body.style.cursor = prevCursor
+          return
+        }
+
         // Limpar query params da URL de redirecionamento
-        redirectUrl = typeof redirectUrl === 'string' ? redirectUrl.split("?")[0] : redirectUrl
+        const finalRedirectUrl = redirectUrl.split("?")[0]
+
+        // ✅ VALIDAÇÃO FINAL: Garantir que redirectUrl ainda é válido após split
+        if (!finalRedirectUrl || finalRedirectUrl.trim() === '') {
+          console.error('❌ [LOGIN] redirectUrl inválido após split:', finalRedirectUrl)
+          setError("Erro ao determinar rota de redirecionamento. Entre em contato com o administrador.")
+          setLoading(false)
+          setTransitioning(false)
+          if (typeof document !== "undefined") document.body.style.cursor = prevCursor
+          return
+        }
 
         debug("Login bem-sucedido", {
-          redirectUrl,
+          redirectUrl: finalRedirectUrl,
           email: maskedEmail,
           role: userRoleFromDatabase,
           source: 'database'
@@ -758,14 +778,20 @@ function LoginContent() {
           // window.location.replace não adiciona ao histórico, evitando loops
           // window.location.href força um reload completo e garante que o middleware veja o cookie
           // Isso também remove o parâmetro ?next= da URL
-          console.log('🔄 Redirecionando para:', redirectUrl)
+          console.log('🔄 Redirecionando para:', finalRedirectUrl)
           
           // ✅ IMPORTANTE: Não usar setTimeout - redirecionar imediatamente
           // O cookie já foi definido na resposta HTTP, então está disponível
           // O delay pode causar problemas com o middleware interceptando antes
-          window.location.replace(redirectUrl)
+          try {
+            window.location.replace(finalRedirectUrl)
+          } catch (redirectError: any) {
+            console.error('❌ [LOGIN] Erro ao redirecionar com window.location.replace:', redirectError)
+            // Fallback para router se window.location.replace falhar
+            router.replace(finalRedirectUrl)
+          }
         } else {
-          router.replace(redirectUrl)
+          router.replace(finalRedirectUrl)
         }
 
         return
