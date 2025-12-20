@@ -789,7 +789,30 @@ function LoginContent() {
         }
 
         // Limpar query params da URL de redirecionamento
-        const finalRedirectUrl = redirectUrl.split("?")[0]
+        // ✅ VALIDAÇÃO: Garantir que redirectUrl é uma string antes de chamar split
+        let finalRedirectUrl: string
+        if (typeof redirectUrl === 'string' && redirectUrl.trim() !== '') {
+          // ✅ VALIDAÇÃO: Garantir que split é uma função antes de chamar
+          if (typeof redirectUrl.split === 'function') {
+            finalRedirectUrl = redirectUrl.split("?")[0]
+          } else {
+            console.error('❌ [LOGIN] redirectUrl.split não é uma função:', {
+              type: typeof redirectUrl.split,
+              redirectUrl
+            })
+            finalRedirectUrl = redirectUrl
+          }
+        } else {
+          console.error('❌ [LOGIN] redirectUrl inválido antes de split:', {
+            redirectUrl,
+            type: typeof redirectUrl
+          })
+          setError("Erro ao determinar rota de redirecionamento. Entre em contato com o administrador.")
+          setLoading(false)
+          setTransitioning(false)
+          if (typeof document !== "undefined") document.body.style.cursor = prevCursor
+          return
+        }
 
         // ✅ VALIDAÇÃO FINAL: Garantir que redirectUrl ainda é válido após split
         if (!finalRedirectUrl || finalRedirectUrl.trim() === '') {
