@@ -753,11 +753,16 @@ function LoginContent() {
           // Definir flag para evitar interferência do useEffect
           (window as any).__golffox_redirecting = true
 
-          try {
-            router.replace(redirectUrl)
-          } catch {
-            window.location.assign(redirectUrl)
-          }
+          // ✅ CORREÇÃO: Usar window.location.href para garantir redirecionamento completo
+          // router.replace pode não funcionar corretamente se o cookie ainda não foi processado
+          // window.location.href força um reload completo e garante que o middleware veja o cookie
+          // Isso também remove o parâmetro ?next= da URL
+          console.log('🔄 Redirecionando para:', redirectUrl)
+          
+          // Pequeno delay para garantir que o cookie seja processado pelo navegador
+          setTimeout(() => {
+            window.location.href = redirectUrl
+          }, 100)
         } else {
           router.replace(redirectUrl)
         }

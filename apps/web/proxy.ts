@@ -254,11 +254,14 @@ async function handleRootRoute(request: NextRequest): Promise<NextResponse> {
   const user = await validateAuth(request)
   
   if (user) {
-    // Se há parâmetro ?next e usuário tem permissão, redirecionar
+    // ✅ CORREÇÃO: Se há parâmetro ?next e usuário tem permissão, redirecionar
+    // Remover o parâmetro ?next da URL ao redirecionar
     if (safeNext) {
       const allowedRoles = getAllowedRoles(safeNext)
       if (allowedRoles && hasRole(user, allowedRoles)) {
         const url = new URL(safeNext, request.url)
+        // Limpar parâmetros de query ao redirecionar
+        url.search = ''
         debug('Redirecionando para rota solicitada', {
           path: safeNext,
           role: user.role
@@ -270,15 +273,19 @@ async function handleRootRoute(request: NextRequest): Promise<NextResponse> {
     // Redirecionar para rota padrão do role
     const defaultRoute = getDefaultRouteForRole(user.role)
     if (defaultRoute) {
+      const url = new URL(defaultRoute, request.url)
+      // Limpar parâmetros de query ao redirecionar
+      url.search = ''
       debug('Redirecionando para rota padrão do role', {
         role: user.role,
         route: defaultRoute
       }, 'Proxy')
-      return NextResponse.redirect(new URL(defaultRoute, request.url))
+      return NextResponse.redirect(url)
     }
   }
   
   // Não autenticado ou sem rota padrão - permitir acesso à página de login
+  // ✅ CORREÇÃO: Se há parâmetro ?next, manter na URL para redirecionamento após login
   return NextResponse.next()
 }
 
