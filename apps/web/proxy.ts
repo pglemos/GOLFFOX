@@ -235,6 +235,7 @@ export default async function proxy(request: NextRequest): Promise<NextResponse>
       return handleRootRoute(request)
     }
     
+    // Para outras rotas públicas, permitir acesso sem verificação
     return NextResponse.next()
   }
   
@@ -267,7 +268,7 @@ async function handleRootRoute(request: NextRequest): Promise<NextResponse> {
         const url = new URL(safeNext, request.url)
         // Limpar parâmetros de query ao redirecionar
         url.search = ''
-        debug('Redirecionando para rota solicitada', {
+        debug('Redirecionando para rota solicitada (via ?next)', {
           path: safeNext,
           role: user.role
         }, 'Proxy')
@@ -291,6 +292,15 @@ async function handleRootRoute(request: NextRequest): Promise<NextResponse> {
   
   // Não autenticado ou sem rota padrão - permitir acesso à página de login
   // ✅ CORREÇÃO: Se há parâmetro ?next, manter na URL para redirecionamento após login
+  // Mas apenas se não houver cookie de sessão (usuário realmente não autenticado)
+  const hasSessionCookie = request.cookies.get('golffox-session')?.value
+  if (!hasSessionCookie && safeNext) {
+    // Manter ?next= na URL apenas se não houver sessão
+    debug('Mantendo parâmetro ?next na URL para redirecionamento após login', {
+      next: safeNext
+    }, 'Proxy')
+  }
+  
   return NextResponse.next()
 }
 
