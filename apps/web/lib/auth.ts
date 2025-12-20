@@ -166,13 +166,15 @@ export class AuthManager {
     if (accessToken && options.token) {
       try {
         // Não aguardar para não bloquear a UI
-        await supabase.auth.setSession({
+        const { error } = await supabase.auth.setSession({
           access_token: accessToken,
           refresh_token: options.token // Usar mesmo token se não tiver refresh
-        }).then(({ error }: { error: any }) => {
-          if (error) console.warn('Erro ao sincronizar sessão Supabase:', error)
-          else console.log('✅ Sessão Supabase sincronizada')
         })
+        if (error) {
+          console.warn('Erro ao sincronizar sessão Supabase:', error)
+        } else {
+          console.log('✅ Sessão Supabase sincronizada')
+        }
       } catch (e) {
         console.warn('Falha ao setar sessão Supabase:', e)
       }
