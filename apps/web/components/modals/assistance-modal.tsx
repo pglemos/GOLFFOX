@@ -151,7 +151,7 @@ export function AssistanceModal({ request, isOpen, onClose, onSave }: Assistance
       <DialogContent className="w-[95vw] sm:w-[90vw] max-w-2xl max-h-[90vh] overflow-y-auto p-4 sm:p-6 mx-auto">
         <DialogHeader className="pb-4 sm:pb-6">
           <DialogTitle className="text-xl sm:text-2xl font-bold flex items-center gap-2 break-words">
-            <LifeBuoy className="h-5 w-5 text-[var(--error)] flex-shrink-0" />
+            <LifeBuoy className="h-5 w-5 text-error flex-shrink-0" />
             Despachar Socorro
           </DialogTitle>
         </DialogHeader>
@@ -159,7 +159,7 @@ export function AssistanceModal({ request, isOpen, onClose, onSave }: Assistance
         {request && (
           <div className="space-y-4 sm:space-y-6">
             {/* Informações da Ocorrência */}
-            <div className="p-4 bg-[var(--error-light)] rounded-lg border border-[var(--error)]/20">
+            <div className="p-4 bg-error-light rounded-lg border border-error/20">
               <h3 className="font-semibold mb-2">Ocorrência #{request.id.slice(0, 8)}</h3>
               <p className="text-sm mb-2">
                 <span className="font-medium">Tipo:</span> {request.request_type}
@@ -199,7 +199,7 @@ export function AssistanceModal({ request, isOpen, onClose, onSave }: Assistance
                   )}
                 </SelectContent>
               </Select>
-              <p className="text-xs text-[var(--ink-muted)]">
+              <p className="text-xs text-ink-muted">
                 {availableDrivers.length} motorista(s) disponível(is)
               </p>
             </div>
@@ -227,19 +227,19 @@ export function AssistanceModal({ request, isOpen, onClose, onSave }: Assistance
                   )}
                 </SelectContent>
               </Select>
-              <p className="text-xs text-[var(--ink-muted)]">
+              <p className="text-xs text-ink-muted">
                 {availableVehicles.length} veículo(s) disponível(is)
               </p>
             </div>
 
             {/* Rota Afetada (se houver) */}
             {request.route_id && (
-              <div className="p-3 bg-[var(--bg-soft)] rounded-lg">
+              <div className="p-3 bg-bg-soft rounded-lg">
                 <div className="flex items-center gap-2 mb-1">
-                  <Navigation className="h-4 w-4 text-[var(--brand)]" />
+                  <Navigation className="h-4 w-4 text-brand" />
                   <span className="text-sm font-medium">Rota Afetada</span>
                 </div>
-                <p className="text-xs text-[var(--ink-muted)]">ID: {request.route_id.slice(0, 8)}</p>
+                <p className="text-xs text-ink-muted">ID: {request.route_id.slice(0, 8)}</p>
               </div>
             )}
           </div>
@@ -257,7 +257,7 @@ export function AssistanceModal({ request, isOpen, onClose, onSave }: Assistance
           <Button 
             onClick={handleDispatch}
             disabled={loading || !selectedDriverId || !selectedVehicleId}
-            className="bg-[var(--error)] hover:bg-[var(--error)]/90 w-full sm:w-auto order-1 sm:order-2 min-h-[44px] text-base font-medium"
+            className="bg-error hover:bg-error/90 w-full sm:w-auto order-1 sm:order-2 min-h-[44px] text-base font-medium"
           >
             <Send className="h-4 w-4 mr-2 flex-shrink-0" />
             <span className="hidden sm:inline">{loading ? "Despachando..." : "Despachar Socorro"}</span>

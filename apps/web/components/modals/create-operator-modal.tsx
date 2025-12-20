@@ -273,13 +273,13 @@ export function CreateOperatorModal({
         <form onSubmit={handleSubmit} className="space-y-4">
           {loading && (
             <div className="space-y-2">
-              <div className="flex items-center gap-2 text-sm text-[var(--ink-muted)]">
+              <div className="flex items-center gap-2 text-sm text-ink-muted">
                 <Loader2 className="h-4 w-4 animate-spin" />
                 <span>{progress}</span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2">
                 <div
-                  className="bg-[var(--brand)] h-2 rounded-full transition-all duration-300"
+                  className="bg-brand h-2 rounded-full transition-all duration-300"
                   style={{ width: `${(step / 7) * 100}%` }}
                 />
               </div>
@@ -396,7 +396,7 @@ export function CreateOperatorModal({
                 <UserPlus className="h-5 w-5" />
                 Dados do Responsável (Opcional)
               </h3>
-              <p className="text-sm text-[var(--ink-muted)] mb-4">
+              <p className="text-sm text-ink-muted mb-4">
                 Você pode preencher os dados do responsável agora ou criar os operadores depois através do botão &quot;Usu?rio Operador&quot; na lista de empresas.
               </p>
 

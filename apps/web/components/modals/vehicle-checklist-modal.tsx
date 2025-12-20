@@ -251,7 +251,7 @@ export function VehicleChecklistModal({
               type="date"
               value={formData.filled_at}
               onChange={(e) => setFormData({ ...formData, filled_at: e.target.value })}
-              className="w-full h-11 sm:h-12 px-3 sm:px-4 py-2 sm:py-3 rounded-lg border border-[var(--border)] bg-white text-base"
+              className="w-full h-11 sm:h-12 px-3 sm:px-4 py-2 sm:py-3 rounded-lg border border-border bg-white text-base"
             />
           </div>
 

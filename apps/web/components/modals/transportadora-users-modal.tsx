@@ -189,10 +189,10 @@ export function TransportadoraUsersModal({ carrier, isOpen, onClose, onSave }: T
           <div className="space-y-2">
             <h3 className="font-semibold">Usuários Cadastrados ({users.length})</h3>
             {loading && users.length === 0 && (
-              <div className="text-center py-4 text-[var(--muted)]">Carregando...</div>
+              <div className="text-center py-4 text-muted-foreground">Carregando...</div>
             )}
             {!loading && users.length === 0 && (
-              <Card className="p-4 text-center text-[var(--muted)]">
+              <Card className="p-4 text-center text-muted-foreground">
                 Nenhum usuário cadastrado
               </Card>
             )}
@@ -201,7 +201,7 @@ export function TransportadoraUsersModal({ carrier, isOpen, onClose, onSave }: T
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="font-semibold">{user.name}</p>
-                    <p className="text-sm text-[var(--muted)]">{user.email}</p>
+                    <p className="text-sm text-muted-foreground">{user.email}</p>
                   </div>
                   <Button
                     variant="destructive"

@@ -97,14 +97,28 @@ class MetricsCollector {
   private sendToAPM(metric: CounterMetric | GaugeMetric | HistogramMetric): void {
     try {
       // Importar dinamicamente para não quebrar se não estiver instalado
-      const { recordMetric } = require('../apm/datadog')
-      recordMetric(metric.name, metric.value, metric.tags)
+      // Verificar se o módulo existe antes de usar
+      let apmModule
+      try {
+        apmModule = require('../apm/datadog')
+      } catch (requireError) {
+        // Se o módulo não existir, apenas retornar silenciosamente
+        return
+      }
+      
+      if (apmModule && typeof apmModule.recordMetric === 'function') {
+        apmModule.recordMetric(metric.name, metric.value, metric.tags)
+      }
     } catch (error) {
       // Se Datadog não estiver configurado, apenas logar em debug
-      debug('APM não disponível (métrica não enviada)', { 
-        name: metric.name, 
-        value: metric.value 
-      }, 'MetricsCollector')
+      // Não propagar erro para não quebrar o fluxo principal
+      if (process.env.NODE_ENV === 'development') {
+        debug('APM não disponível (métrica não enviada)', { 
+          name: metric.name, 
+          value: metric.value,
+          error: error instanceof Error ? error.message : String(error)
+        }, 'MetricsCollector')
+      }
     }
   }
 

@@ -125,7 +125,7 @@ export function CompanyUsersModal({
 
           <div className="space-y-4 sm:space-y-6">
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
-              <p className="text-sm sm:text-base text-[var(--ink-muted)] break-words">
+              <p className="text-sm sm:text-base text-ink-muted break-words">
                 {operators.length} {operators.length === 1 ? 'usuário cadastrado' : 'usuários cadastrados'}
               </p>
               <Button
@@ -141,14 +141,14 @@ export function CompanyUsersModal({
 
             {loading ? (
               <div className="flex items-center justify-center py-12">
-                <Loader2 className="h-8 w-8 animate-spin text-[var(--brand)]" />
-                <span className="ml-3 text-[var(--ink-muted)]">Carregando logins...</span>
+                <Loader2 className="h-8 w-8 animate-spin text-brand" />
+                <span className="ml-3 text-ink-muted">Carregando logins...</span>
               </div>
             ) : operators.length === 0 ? (
               <div className="text-center py-12">
                 <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                 <h3 className="text-lg font-medium mb-2">Nenhum login cadastrado</h3>
-                <p className="text-sm text-[var(--ink-muted)] mb-4">
+                <p className="text-sm text-ink-muted mb-4">
                   Clique em &quot;Criar Novo Login&quot; para adicionar um acesso
                 </p>
               </div>
@@ -157,12 +157,12 @@ export function CompanyUsersModal({
                 {operators.map((operator) => (
                   <div
                     key={operator.id}
-                    className="border border-[var(--border)] rounded-lg p-3 sm:p-4 hover:bg-[var(--bg-hover)] transition-colors bg-card"
+                    className="border border-border rounded-lg p-3 sm:p-4 hover:bg-bg-hover transition-colors bg-card"
                   >
                     <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
                       <div className="flex-1 min-w-0">
                         <div className="flex flex-wrap items-center gap-2 mb-2">
-                          <div className="font-bold text-base sm:text-lg text-[var(--ink)] break-words leading-tight mr-1">
+                          <div className="font-bold text-base sm:text-lg text-ink break-words leading-tight mr-1">
                             {operador.name || 'Sem nome'}
                           </div>
                           <div className="flex items-center gap-1.5 shrink-0">
@@ -178,20 +178,20 @@ export function CompanyUsersModal({
                           </div>
                         </div>
                         
-                        <div className="grid grid-cols-1 gap-1 text-sm text-[var(--ink-muted)]">
+                        <div className="grid grid-cols-1 gap-1 text-sm text-ink-muted">
                           <div className="flex items-center gap-2 overflow-hidden">
-                            <span className="text-[var(--ink-light)] text-xs font-medium uppercase tracking-wider w-12 shrink-0">Email:</span>
+                            <span className="text-ink-light text-xs font-medium uppercase tracking-wider w-12 shrink-0">Email:</span>
                             <span className="font-mono text-xs sm:text-sm truncate" title={operador.email}>{operador.email}</span>
                           </div>
                           {operator.cpf && (
                             <div className="flex items-center gap-2">
-                              <span className="text-[var(--ink-light)] text-xs font-medium uppercase tracking-wider w-12 shrink-0">CPF:</span>
+                              <span className="text-ink-light text-xs font-medium uppercase tracking-wider w-12 shrink-0">CPF:</span>
                               <span className="font-mono text-xs sm:text-sm">{operador.cpf}</span>
                             </div>
                           )}
                           {operator.phone && (
                             <div className="flex items-center gap-2">
-                              <span className="text-[var(--ink-light)] text-xs font-medium uppercase tracking-wider w-12 shrink-0">Tel:</span>
+                              <span className="text-ink-light text-xs font-medium uppercase tracking-wider w-12 shrink-0">Tel:</span>
                               <span className="font-mono text-xs sm:text-sm">{operador.phone}</span>
                             </div>
                           )}

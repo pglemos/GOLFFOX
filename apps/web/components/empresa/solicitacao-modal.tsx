@@ -131,7 +131,7 @@ export function SolicitacaoModal({ isOpen, onClose, onSave, empresaId }: Solicit
               <Label htmlFor="descricao">Descrição do Problema</Label>
               <textarea
                 id="descricao"
-                className="min-h-[100px] rounded-md border border-[var(--border)] p-2"
+                className="min-h-[100px] rounded-md border border-border p-2"
                 placeholder="Descreva a situação de socorro..."
                 value={payload.descricao || ""}
                 onChange={(e) => handlePayloadChange("descricao", e.target.value)}
@@ -154,7 +154,7 @@ export function SolicitacaoModal({ isOpen, onClose, onSave, empresaId }: Solicit
                 <Label htmlFor="mudancas">Mudanças Solicitadas</Label>
                 <textarea
                   id="mudancas"
-                  className="min-h-[100px] rounded-md border border-[var(--border)] p-2"
+                  className="min-h-[100px] rounded-md border border-border p-2"
                   placeholder="Descreva as alterações..."
                   value={payload.changes?.description || ""}
                   onChange={(e) => handlePayloadChange("changes", { description: e.target.value })}

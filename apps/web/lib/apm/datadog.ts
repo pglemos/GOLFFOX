@@ -39,7 +39,22 @@ export function initializeDatadog() {
 
   try {
     // Importar dinamicamente para não quebrar se não estiver instalado
-    const tracer = require('dd-trace')
+    // Verificar se o módulo existe antes de usar
+    let tracer
+    try {
+      tracer = require('dd-trace')
+    } catch (requireError) {
+      // Se dd-trace não estiver instalado, retornar null silenciosamente
+      debug('dd-trace não disponível (não instalado)', {}, 'DatadogAPM')
+      isInitialized = true
+      return null
+    }
+    
+    if (!tracer || typeof tracer.init !== 'function') {
+      warn('dd-trace não está disponível corretamente', {}, 'DatadogAPM')
+      isInitialized = true
+      return null
+    }
     
     tracer.init({
       service: process.env.DATADOG_SERVICE_NAME || 'golffox-web',

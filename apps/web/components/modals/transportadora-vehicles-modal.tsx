@@ -217,13 +217,13 @@ export function TransportadoraVehiclesModal({ carrier, isOpen, onClose }: Transp
             </div>
 
             {loading && (
-              <div className="text-center py-8 text-[var(--muted)]">Carregando veículos...</div>
+              <div className="text-center py-8 text-muted-foreground">Carregando veículos...</div>
             )}
 
             {!loading && vehicles.length === 0 && (
               <Card className="p-8 text-center">
                 <Truck className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-[var(--muted)] mb-4">Nenhum veículo associado a esta transportadora</p>
+                <p className="text-muted-foreground mb-4">Nenhum veículo associado a esta transportadora</p>
                 <Button onClick={() => setActiveTab("form")}>
                   <Plus className="h-4 w-4 mr-2" />
                   Criar Primeiro Veículo
@@ -239,11 +239,11 @@ export function TransportadoraVehiclesModal({ carrier, isOpen, onClose }: Transp
                       {/* Cabeçalho */}
                       <div className="flex items-start justify-between">
                         <div className="flex items-center gap-2">
-                          <Truck className="h-5 w-5 text-[var(--brand)]" />
+                          <Truck className="h-5 w-5 text-brand" />
                           <div>
                             <h4 className="font-bold text-lg">{vehicle.plate}</h4>
                             {vehicle.prefix && (
-                              <p className="text-xs text-[var(--muted)]">Prefixo: {vehicle.prefix}</p>
+                              <p className="text-xs text-muted-foreground">Prefixo: {vehicle.prefix}</p>
                             )}
                           </div>
                         </div>
@@ -276,7 +276,7 @@ export function TransportadoraVehiclesModal({ carrier, isOpen, onClose }: Transp
                       {/* Informações do Veículo */}
                       <div className="space-y-2 text-sm">
                         {vehicle.manufacturer && vehicle.model && (
-                          <div className="flex items-center gap-2 text-[var(--muted)]">
+                          <div className="flex items-center gap-2 text-muted-foreground">
                             <Hash className="h-4 w-4" />
                             <span>{vehicle.manufacturer} - {vehicle.model}</span>
                           </div>
@@ -284,14 +284,14 @@ export function TransportadoraVehiclesModal({ carrier, isOpen, onClose }: Transp
                         
                         <div className="grid grid-cols-2 gap-2">
                           {vehicle.year && (
-                            <div className="flex items-center gap-2 text-[var(--muted)]">
+                            <div className="flex items-center gap-2 text-muted-foreground">
                               <Calendar className="h-4 w-4" />
                               <span>Ano: {vehicle.year}</span>
                             </div>
                           )}
                           
                           {vehicle.capacity && (
-                            <div className="flex items-center gap-2 text-[var(--muted)]">
+                            <div className="flex items-center gap-2 text-muted-foreground">
                               <Capacity className="h-4 w-4" />
                               <span>{vehicle.capacity} passageiros</span>
                             </div>
@@ -299,7 +299,7 @@ export function TransportadoraVehiclesModal({ carrier, isOpen, onClose }: Transp
                         </div>
 
                         {vehicle.renavam && (
-                          <div className="text-xs text-[var(--muted)]">
+                          <div className="text-xs text-muted-foreground">
                             RENAVAM: {vehicle.renavam}
                           </div>
                         )}

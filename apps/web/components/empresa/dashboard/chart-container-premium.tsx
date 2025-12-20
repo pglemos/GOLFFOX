@@ -24,12 +24,12 @@ export function ChartContainerPremium({
       animate="visible"
       transition={{ delay }}
     >
-      <Card className="bg-card/50 backdrop-blur-sm border-[var(--border)] hover:shadow-xl transition-all duration-300 overflow-hidden">
+      <Card className="bg-card/50 backdrop-blur-sm border-border hover:shadow-xl transition-all duration-300 overflow-hidden">
         {/* Gradient Accent */}
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[var(--brand)] via-[var(--brand-hover)] to-[var(--brand)]" />
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-brand via-brand-hover to-brand" />
         
         <CardHeader className="pb-4">
-          <CardTitle className="text-lg sm:text-xl font-semibold bg-gradient-to-br from-[var(--ink-strong)] to-[var(--ink)] bg-clip-text text-transparent">
+          <CardTitle className="text-lg sm:text-xl font-semibold bg-gradient-to-br from-ink-strong to-ink bg-clip-text text-transparent">
             {title}
           </CardTitle>
           {description && (

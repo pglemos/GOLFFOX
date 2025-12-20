@@ -34,7 +34,7 @@ export function EmpresaLogoSection({ panelHomeUrl, panelBranding }: EmpresaLogoS
                         referrerPolicy="no-referrer"
                         onError={() => setImgFailed(true)}
                     />
-                    <span className="font-bold text-lg sm:text-2xl tracking-tight text-[var(--ink-strong)] hidden xs:block">
+                    <span className="font-bold text-lg sm:text-2xl tracking-tight text-ink-strong hidden xs:block">
                         {companyName || 'Empresa'}
                     </span>
                 </a>
@@ -43,7 +43,7 @@ export function EmpresaLogoSection({ panelHomeUrl, panelBranding }: EmpresaLogoS
         // Se não há logo ou falhou, mostrar apenas o nome da empresa
         return (
             <a href={panelHomeUrl} className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
-                <span className="font-bold text-lg sm:text-2xl tracking-tight text-[var(--ink-strong)]">
+                <span className="font-bold text-lg sm:text-2xl tracking-tight text-ink-strong">
                     {companyName || 'Empresa'}
                 </span>
             </a>
@@ -61,7 +61,7 @@ export function EmpresaLogoSection({ panelHomeUrl, panelBranding }: EmpresaLogoS
     return (
         <a href={panelHomeUrl} className="flex items-center gap-2 sm:gap-3 flex-shrink-0 group">
             <div className="flex items-center gap-2">
-                <span className="font-bold text-lg sm:text-2xl tracking-tight text-[var(--ink-strong)] hidden xs:block">
+                <span className="font-bold text-lg sm:text-2xl tracking-tight text-ink-strong hidden xs:block">
                     {brandingText}
                 </span>
             </div>

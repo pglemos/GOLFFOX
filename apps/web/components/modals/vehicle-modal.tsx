@@ -497,7 +497,7 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave, carriers }: Veh
                 <Label>Foto do Veículo</Label>
                 <div className="flex items-center gap-4">
                   {photoPreview && (
-                    <div className="relative w-32 h-32 rounded-lg overflow-hidden border border-[var(--border)]">
+                    <div className="relative w-32 h-32 rounded-lg overflow-hidden border border-border">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={photoPreview}
@@ -536,7 +536,7 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave, carriers }: Veh
                         {photoPreview ? "Trocar Foto" : "Upload Foto"}
                       </Button>
                     </div>
-                    <p className="text-xs text-[var(--ink-muted)] mt-1">
+                    <p className="text-xs text-ink-muted mt-1">
                       Máximo 5MB (JPG, PNG)
                     </p>
                   </div>
@@ -630,7 +630,7 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave, carriers }: Veh
                     id="status"
                     value={formData.is_active ? "active" : "inactive"}
                     onChange={(e) => setFormData({ ...formData, is_active: e.target.value === "active" })}
-                    className="w-full px-3 py-2 rounded-lg border border-[var(--border)] bg-white"
+                    className="w-full px-3 py-2 rounded-lg border border-border bg-white"
                   >
                     <option value="active">Ativo</option>
                     <option value="inactive">Inativo</option>

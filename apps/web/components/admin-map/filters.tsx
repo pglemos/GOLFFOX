@@ -165,7 +165,7 @@ export const MapFilters = memo(function MapFilters({
   }, [filters.search])
 
   return (
-    <Card className="p-3 sm:p-4 bg-card/50 backdrop-blur-sm border-[var(--border)] shadow-md sm:shadow-xl max-md:p-2">
+    <Card className="p-3 sm:p-4 bg-card/50 backdrop-blur-sm border-border shadow-md sm:shadow-xl max-md:p-2">
       <div className="flex flex-wrap items-center gap-3 max-md:gap-2">
         {/* Modo: Ao vivo | Histórico */}
         <div className="flex items-center gap-2 border-r pr-3">
@@ -296,9 +296,9 @@ export const MapFilters = memo(function MapFilters({
 
         {/* Busca Global */}
         <div className="relative flex-1 min-w-[200px]">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--ink-muted)]" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-ink-muted" />
           {isSearching && (
-            <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--ink-muted)] animate-spin" />
+            <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-ink-muted animate-spin" />
           )}
           <Input
             placeholder="Buscar (ID, placa, motorista)..."

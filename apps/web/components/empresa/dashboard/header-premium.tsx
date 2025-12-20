@@ -28,7 +28,7 @@ export function HeaderPremium({
       variants={fadeInUp}
       initial="hidden"
       animate="visible"
-      className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[var(--brand)]/10 via-[var(--brand)]/5 to-[var(--accent)]/10 p-6 sm:p-8 border border-[var(--border)] backdrop-blur-sm"
+      className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-brand/10 via-brand/5 to-accent-custom/10 p-6 sm:p-8 border border-border backdrop-blur-sm"
     >
 
       <div className="relative z-10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -37,7 +37,7 @@ export function HeaderPremium({
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 bg-gradient-to-br from-[var(--ink-strong)] to-[var(--ink)] bg-clip-text text-transparent"
+            className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 bg-gradient-to-br from-ink-strong to-ink bg-clip-text text-transparent"
           >
             {title}
           </motion.h1>
@@ -46,7 +46,7 @@ export function HeaderPremium({
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.2 }}
-              className="flex items-center gap-2 text-sm text-[var(--ink-muted)] mb-2"
+              className="flex items-center gap-2 text-sm text-ink-muted mb-2"
             >
               <Building2 className="h-4 w-4" />
               <span className="truncate">{companyName}</span>
@@ -57,7 +57,7 @@ export function HeaderPremium({
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.3 }}
-              className="text-sm sm:text-base text-[var(--ink-muted)]"
+              className="text-sm sm:text-base text-ink-muted"
             >
               {subtitle}
             </motion.p>
@@ -70,7 +70,7 @@ export function HeaderPremium({
         >
           <Button 
             onClick={() => router.push(actionHref)}
-            className="bg-gradient-to-r from-[var(--brand)] to-[var(--brand-hover)] hover:from-[var(--brand-hover)] hover:to-[var(--brand)] text-white shadow-lg hover:shadow-xl transition-all duration-300 w-full sm:w-auto min-h-[44px] touch-manipulation"
+            className="bg-gradient-to-r from-brand to-brand-hover hover:from-brand-hover hover:to-brand text-white shadow-lg hover:shadow-xl transition-all duration-300 w-full sm:w-auto min-h-[44px] touch-manipulation"
           >
             <MapPin className="h-4 w-4 mr-2" />
             {actionLabel}

@@ -248,13 +248,13 @@ export function TransportadoraDriversModal({ carrier, isOpen, onClose }: Transpo
             </div>
 
             {loading && (
-              <div className="text-center py-8 text-[var(--muted)]">Carregando motoristas...</div>
+              <div className="text-center py-8 text-muted-foreground">Carregando motoristas...</div>
             )}
 
             {!loading && drivers.length === 0 && (
               <Card className="p-8 text-center">
                 <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-[var(--muted)] mb-4">Nenhum motorista associado a esta transportadora</p>
+                <p className="text-muted-foreground mb-4">Nenhum motorista associado a esta transportadora</p>
                 <Button onClick={() => setActiveTab("form")}>
                   <Plus className="h-4 w-4 mr-2" />
                   Criar Primeiro Motorista
@@ -270,7 +270,7 @@ export function TransportadoraDriversModal({ carrier, isOpen, onClose }: Transpo
                       {/* Cabeçalho */}
                       <div className="flex items-start justify-between">
                         <div className="flex items-center gap-2">
-                          <Users className="h-5 w-5 text-[var(--brand)]" />
+                          <Users className="h-5 w-5 text-brand" />
                           <div>
                             <h4 className="font-bold text-lg">{motorista.name}</h4>
                             <Badge variant="outline" className="mt-1">{motorista.role || "motorista"}</Badge>
@@ -302,25 +302,25 @@ export function TransportadoraDriversModal({ carrier, isOpen, onClose }: Transpo
                       {/* Informações do Motorista */}
                       <div className="space-y-2 text-sm">
                         {driver.email && (
-                          <div className="flex items-center gap-2 text-[var(--muted)]">
+                          <div className="flex items-center gap-2 text-muted-foreground">
                             <Mail className="h-4 w-4" />
                             <span>{driver.email}</span>
                           </div>
                         )}
                         {driver.phone && (
-                          <div className="flex items-center gap-2 text-[var(--muted)]">
+                          <div className="flex items-center gap-2 text-muted-foreground">
                             <Phone className="h-4 w-4" />
                             <span>{driver.phone}</span>
                           </div>
                         )}
                         {driver.cpf && (
-                          <div className="flex items-center gap-2 text-[var(--muted)]">
+                          <div className="flex items-center gap-2 text-muted-foreground">
                             <CreditCard className="h-4 w-4" />
                             <span>CPF: {driver.cpf}</span>
                           </div>
                         )}
                         {driver.cnh && (
-                          <div className="text-xs text-[var(--muted)]">
+                          <div className="text-xs text-muted-foreground">
                             CNH: {motorista.cnh} {motorista.cnh_category && `(${motorista.cnh_category})`}
                           </div>
                         )}

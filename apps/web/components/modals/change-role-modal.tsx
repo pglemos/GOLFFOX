@@ -165,7 +165,7 @@ export function ChangeRoleModal({
         <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
           <div className="space-y-2">
             <Label className="text-base font-medium">Usuário</Label>
-            <p className="text-sm sm:text-base text-[var(--ink-muted)] break-words">{user?.name || user?.email}</p>
+            <p className="text-sm sm:text-base text-ink-muted break-words">{user?.name || user?.email}</p>
           </div>
 
           <div className="space-y-2">

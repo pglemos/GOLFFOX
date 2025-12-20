@@ -389,15 +389,15 @@ export function RouteModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="w-[95vw] sm:w-[90vw] max-w-3xl max-h-[90vh] overflow-y-auto p-4 sm:p-6 mx-auto bg-card/95 backdrop-blur-sm border-[var(--border)]">
-        <DialogHeader className="pb-4 sm:pb-6 border-b border-[var(--border)]">
-          <DialogTitle className="text-xl sm:text-2xl font-bold flex items-center gap-2 break-words bg-gradient-to-r from-[var(--brand)] to-[var(--brand-hover)] bg-clip-text text-transparent">
-            <div className="p-2 rounded-lg bg-gradient-to-br from-[var(--brand-light)] to-[var(--brand-soft)]">
-              <Route className="h-5 w-5 text-[var(--brand)] flex-shrink-0" />
+      <DialogContent className="w-[95vw] sm:w-[90vw] max-w-3xl max-h-[90vh] overflow-y-auto p-4 sm:p-6 mx-auto bg-card/95 backdrop-blur-sm border-border">
+        <DialogHeader className="pb-4 sm:pb-6 border-b border-border">
+          <DialogTitle className="text-xl sm:text-2xl font-bold flex items-center gap-2 break-words bg-gradient-to-r from-brand to-brand-hover bg-clip-text text-transparent">
+            <div className="p-2 rounded-lg bg-gradient-to-br from-brand-light to-brand-soft">
+              <Route className="h-5 w-5 text-brand flex-shrink-0" />
             </div>
             {route?.id ? 'Editar Rota' : 'Nova Rota'}
           </DialogTitle>
-          <DialogDescription className="text-sm sm:text-base break-words text-[var(--ink-muted)] mt-2">
+          <DialogDescription className="text-sm sm:text-base break-words text-ink-muted mt-2">
             {route?.id ? "Edite os dados da rota" : "Preencha os dados da rota, selecione os funcionários e otimize o trajeto"}
           </DialogDescription>
         </DialogHeader>

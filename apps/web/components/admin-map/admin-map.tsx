@@ -1907,8 +1907,8 @@ export function AdminMap({
       {loading && (
         <div className="absolute inset-0 z-40 flex items-center justify-center bg-white/70 backdrop-blur-sm">
           <div className="text-center">
-            <div className="w-12 h-12 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin mx-auto"></div>
-            <p className="mt-4 text-[var(--ink-muted)]">Carregando mapa...</p>
+            <div className="w-12 h-12 border-4 border-brand border-t-transparent rounded-full animate-spin mx-auto"></div>
+            <p className="mt-4 text-ink-muted">Carregando mapa...</p>
             {mapError && (
               <p className="mt-2 text-sm text-red-600">{mapError}</p>
             )}
@@ -1922,7 +1922,7 @@ export function AdminMap({
           <div className="text-center p-6">
             <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
             <h3 className="text-lg font-semibold mb-2">Erro ao carregar mapa</h3>
-            <p className="text-[var(--ink-muted)] mb-4">{mapError}</p>
+            <p className="text-ink-muted mb-4">{mapError}</p>
             <Button onClick={() => window.location.reload()}>
               <RefreshCw className="h-4 w-4 mr-2" />
               Recarregar Página
@@ -1954,7 +1954,7 @@ export function AdminMap({
                     <div className="flex items-start justify-between mb-2">
                       <div>
                         <h4 className="font-semibold">{vehicle.plate}</h4>
-                        <p className="text-sm text-[var(--ink-muted)]">{vehicle.model}</p>
+                        <p className="text-sm text-ink-muted">{vehicle.model}</p>
                       </div>
                       <Badge variant={vehicle.vehicle_status === 'moving' ? 'default' : 'secondary'}>
                         {vehicle.vehicle_status === 'moving'
@@ -1966,7 +1966,7 @@ export function AdminMap({
                           : 'Na Garagem'}
                       </Badge>
                     </div>
-                    <div className="text-sm text-[var(--ink-muted)] space-y-1">
+                    <div className="text-sm text-ink-muted space-y-1">
                       <p>Rota: {vehicle.route_name || 'N/D'}</p>
                       <p>Motorista: {vehicle.driver_name || 'N/D'}</p>
                       <p>Posição: {vehicle.lat?.toFixed(4)}, {vehicle.lng?.toFixed(4)}</p>
@@ -1978,8 +1978,8 @@ export function AdminMap({
               </div>
             ) : (
               <div className="text-center py-12">
-                <MapIcon className="h-16 w-16 text-[var(--ink-muted)] mx-auto mb-4" />
-                <p className="text-[var(--ink-muted)]">Nenhum veículo encontrado.</p>
+                <MapIcon className="h-16 w-16 text-ink-muted mx-auto mb-4" />
+                <p className="text-ink-muted">Nenhum veículo encontrado.</p>
               </div>
             )}
           </div>
@@ -2004,10 +2004,10 @@ export function AdminMap({
           <div className="text-center max-w-md p-6 bg-white rounded-lg shadow-lg">
             <MapIcon className="h-16 w-16 text-[var(--ink-muted)] mx-auto mb-4" />
             <h3 className="text-xl font-semibold mb-2">Sem veículos ativos</h3>
-            <p className="text-sm text-[var(--ink-muted)] mb-4">
+            <p className="text-sm text-ink-muted mb-4">
               Nenhum veículo encontrado com os filtros selecionados.
             </p>
-            <details className="text-left text-sm text-[var(--ink-muted)] bg-gray-50 p-4 rounded mb-4">
+            <details className="text-left text-sm text-ink-muted bg-gray-50 p-4 rounded mb-4">
               <summary className="cursor-pointer font-medium mb-2">Possíveis causas:</summary>
               <ul className="list-disc list-inside space-y-1 mt-2">
                 <li>Não há veículos marcados como ativos no banco de dados</li>
@@ -2028,7 +2028,7 @@ export function AdminMap({
               <RefreshCw className="h-4 w-4 mr-2" />
               Recarregar Dados
             </Button>
-            <p className="text-xs text-[var(--ink-light)] mt-4">
+            <p className="text-xs text-ink-light mt-4">
               Abra o console (F12) para ver logs detalhados
             </p>
           </div>
@@ -2044,7 +2044,7 @@ export function AdminMap({
                 size="icon"
                 variant="outline"
                 onClick={handleExport}
-                className="bg-white shadow-lg hover:bg-[var(--bg-hover)]"
+                className="bg-white shadow-lg hover:bg-bg-hover"
                 aria-label="Exportar mapa e dados"
               >
                 <Download className="h-4 w-4" aria-hidden="true" />

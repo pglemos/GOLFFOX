@@ -327,7 +327,7 @@ export function ScheduleReportModal({
                 }}
                 required
               />
-              <p className="text-xs text-[var(--ink-muted)]">
+              <p className="text-xs text-ink-muted">
                 Formato: minuto (0-59) hora (0-23) dia (1-31) mês (1-12) dia-semana (0-6)
               </p>
             </div>

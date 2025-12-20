@@ -101,7 +101,8 @@
     "vaul": "^1.1.2",
     "web-vitals": "^5.1.0",
     "zod": "^3.25.76",
-    "zustand": "^5.0.2"
+    "zustand": "^5.0.2",
+    "dd-trace": "^5.81.0"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.6.0",
@@ -128,7 +129,6 @@
     "autoprefixer": "^10.4.20",
     "canvas": "^3.2.0",
     "cross-env": "^7.0.3",
-    "dd-trace": "^5.81.0",
     "dotenv": "^17.2.3",
     "eslint": "^9.18.0",
     "eslint-config-next": "^16.1.0",

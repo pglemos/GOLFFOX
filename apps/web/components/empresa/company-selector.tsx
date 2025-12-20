@@ -55,13 +55,13 @@ export function CompanySelector() {
         </motion.div>
       )}
       <div className="flex flex-col">
-        <span className="font-bold text-sm sm:text-base tracking-tight text-[var(--ink-strong)]">
+        <span className="font-bold text-sm sm:text-base tracking-tight text-ink-strong">
           {operatorI18n.header_title}
         </span>
         {companies.length > 1 ? (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="h-auto p-0 text-xs text-[var(--ink-muted)] hover:text-[var(--ink-strong)] justify-start">
+              <Button variant="ghost" size="sm" className="h-auto p-0 text-xs text-ink-muted hover:text-ink-strong justify-start">
                 {companyName} <ChevronDown className="h-3 w-3 ml-1" />
               </Button>
             </DropdownMenuTrigger>
@@ -70,7 +70,7 @@ export function CompanySelector() {
                 <DropdownMenuItem
                   key={company.id}
                   onClick={() => switchTenant(company.id)}
-                  className={tenantCompanyId === company.id ? "bg-[var(--bg-hover)]" : ""}
+                  className={tenantCompanyId === company.id ? "bg-bg-hover" : ""}
                 >
                   {company.logoUrl ? (
                     <img
@@ -89,7 +89,7 @@ export function CompanySelector() {
             </DropdownMenuContent>
           </DropdownMenu>
         ) : (
-          <span className="text-xs text-[var(--ink-muted)]">
+          <span className="text-xs text-ink-muted">
             {companyName}
           </span>
         )}
