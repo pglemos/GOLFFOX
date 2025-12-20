@@ -442,7 +442,7 @@ function LoginContent() {
       const maskedEmail = sanitizedEmail.replace(/^(.{2}).+(@.*)$/, "$1***$2")
 
       try {
-        debug("Iniciando autenticação", { email: maskedEmail }, "LoginPage")
+        debug("[LoginPage] Iniciando autenticação", { email: maskedEmail })
 
         // ✅ OBRIGATÓRIO: Usar apenas a API que verifica o banco de dados do Supabase
         // A API /api/auth/login verifica:
@@ -759,12 +759,12 @@ function LoginContent() {
           return
         }
 
-        debug("Login bem-sucedido", {
+        debug("[LoginPage] Login bem-sucedido", {
           redirectUrl: finalRedirectUrl,
           email: maskedEmail,
           role: userRoleFromDatabase,
           source: 'database'
-        }, "LoginPage")
+        })
 
         // ✅ REDIRECIONAMENTO IMEDIATO - sem delays desnecessários
         // O cookie já foi definido pelo servidor na resposta HTTP
