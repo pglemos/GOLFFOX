@@ -1,86 +1,66 @@
-# Correção do Erro "true is not a function" no Login
+# Correção do Erro "true is not a function"
 
-## Problema Identificado
+## Problema
 
-O erro "true is not a function" estava ocorrendo durante o processo de login, especificamente na linha onde `router.replace(redirectUrl)` ou `window.location.replace(redirectUrl)` era chamado.
+O erro "true is not a function" estava ocorrendo durante o processo de login, especificamente na linha onde `await AuthManager.persistSession(...)` era chamado.
 
-## Causa Raiz
+## Causas Identificadas
 
-O problema ocorria porque `redirectUrl` poderia ser um valor booleano (`true`) em vez de uma string, e quando esse valor era passado para `router.replace()` ou `window.location.replace()`, causava o erro "true is not a function".
+1. **Falta de validação em `isAllowedForRole`**: A função poderia estar sendo chamada com valores inválidos ou retornando valores inesperados.
 
-### Possíveis Causas:
+2. **Falta de validação em `redirectUrl.split()`**: O método `split()` poderia estar sendo chamado em um valor que não é uma string.
 
-1. **Validação insuficiente**: A validação na linha 723 verificava apenas se `redirectUrl` era falsy ou não era string, mas não verificava explicitamente se era um booleano.
+3. **Falta de validação em `supabase.auth.setSession`**: O método `setSession` poderia não estar disponível ou não ser uma função.
 
-2. **Problema na linha 740**: A linha `redirectUrl = typeof redirectUrl === 'string' ? redirectUrl.split("?")[0] : redirectUrl` mantinha o valor original se não fosse string, incluindo valores booleanos.
+4. **Falta de try-catch global em `persistSession`**: Erros inesperados não estavam sendo capturados adequadamente.
 
-3. **Falta de validação antes do uso**: Não havia validação final antes de chamar `router.replace()` ou `window.location.replace()`.
+## Correções Aplicadas
 
-## Correção Aplicada
+### 1. Validações Robustas em `persistSession` (`apps/web/lib/auth.ts`)
 
-### 1. Validação Robusta Antes de Usar `redirectUrl`
+- Adicionado try-catch global em torno de toda a função `persistSession`
+- Adicionadas validações detalhadas para `supabase`, `supabase.auth`, e `supabase.auth.setSession`
+- Adicionados logs detalhados para facilitar o debug
+- Garantido que todos os caminhos de retorno retornam `Promise.resolve()` explicitamente
 
-```typescript
-// ✅ VALIDAÇÃO CRÍTICA: Garantir que redirectUrl é uma string válida ANTES de usar
-if (!redirectUrl || typeof redirectUrl !== 'string' || redirectUrl.trim() === '') {
-  console.error('❌ [LOGIN] redirectUrl inválido antes de split:', { redirectUrl, type: typeof redirectUrl })
-  setError("Erro ao determinar rota de redirecionamento. Entre em contato com o administrador.")
-  setLoading(false)
-  setTransitioning(false)
-  if (typeof document !== "undefined") document.body.style.cursor = prevCursor
-  return
-}
-```
+### 2. Validações em `isAllowedForRole` (`apps/web/app/page.tsx`)
 
-### 2. Uso de Variável Separada para o Valor Final
+- Adicionada validação para garantir que `isAllowedForRole` é uma função antes de chamar
+- Adicionado try-catch em torno da chamada de `isAllowedForRole`
+- Adicionados logs de erro detalhados
 
-```typescript
-// Limpar query params da URL de redirecionamento
-const finalRedirectUrl = redirectUrl.split("?")[0]
+### 3. Validações em `redirectUrl.split()` (`apps/web/app/page.tsx`)
 
-// ✅ VALIDAÇÃO FINAL: Garantir que redirectUrl ainda é válido após split
-if (!finalRedirectUrl || finalRedirectUrl.trim() === '') {
-  console.error('❌ [LOGIN] redirectUrl inválido após split:', finalRedirectUrl)
-  setError("Erro ao determinar rota de redirecionamento. Entre em contato com o administrador.")
-  setLoading(false)
-  setTransitioning(false)
-  if (typeof document !== "undefined") document.body.style.cursor = prevCursor
-  return
-}
-```
+- Adicionada validação para garantir que `redirectUrl` é uma string antes de chamar `split()`
+- Adicionada validação para garantir que `split` é uma função antes de chamar
+- Adicionados logs de erro detalhados
 
-### 3. Try-Catch no Redirecionamento
+### 4. Try-catch Robusto em `handleLogin` (`apps/web/app/page.tsx`)
 
-```typescript
-try {
-  window.location.replace(finalRedirectUrl)
-} catch (redirectError: any) {
-  console.error('❌ [LOGIN] Erro ao redirecionar com window.location.replace:', redirectError)
-  // Fallback para router se window.location.replace falhar
-  router.replace(finalRedirectUrl)
-}
-```
+- Adicionado try-catch em torno da chamada de `persistSession`
+- Adicionados logs de erro detalhados
+- Garantido que o fluxo de login continua mesmo se `persistSession` falhar
 
 ## Arquivos Modificados
 
-- `apps/web/app/page.tsx` (linhas 739-769)
+1. `apps/web/lib/auth.ts` - Validações e try-catch em `persistSession`
+2. `apps/web/app/page.tsx` - Validações em `isAllowedForRole` e `redirectUrl.split()`
 
-## Benefícios da Correção
+## Testes Recomendados
 
-1. **Validação robusta**: Garante que `redirectUrl` é sempre uma string válida antes de ser usada.
-2. **Melhor tratamento de erros**: Logs detalhados para debug e tratamento adequado de erros.
-3. **Fallback seguro**: Se `window.location.replace()` falhar, usa `router.replace()` como fallback.
-4. **Prevenção de erros**: Evita que valores booleanos ou outros tipos incorretos sejam passados para funções que esperam strings.
+1. Testar login com `golffox@admin.com` / `senha123`
+2. Verificar os logs no console para identificar qualquer problema restante
+3. Testar com diferentes roles (admin, empresa, operador, transportadora)
+4. Verificar se o redirecionamento funciona corretamente após o login
 
 ## Status
 
-✅ **Correção aplicada e commitada**
-
-O código foi corrigido e está pronto para testes. O erro "true is not a function" não deve mais ocorrer.
+✅ Todas as correções foram aplicadas e commitadas
+✅ Sem erros de lint
+✅ Código pronto para testes
 
 ## Próximos Passos
 
-1. Testar o login novamente com `golffox@admin.com` / `senha123`
-2. Verificar se o redirecionamento para `/admin` funciona corretamente
-3. Confirmar que não há mais erros no console do navegador
-
+1. Testar o login no navegador
+2. Verificar os logs no console para identificar qualquer problema restante
+3. Se o erro persistir, os logs detalhados ajudarão a identificar a causa exata
