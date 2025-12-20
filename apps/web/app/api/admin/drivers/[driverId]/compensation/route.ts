@@ -157,7 +157,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
                     ...compensationData,
                     updated_at: new Date().toISOString(),
                 })
-                .eq('id', existing.id)
+                .eq('id', (existing as any).id)
                 .select()
                 .single()
 

@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
 
     // Selecionar todas as colunas para evitar erros de colunas inexistentes
     const { data, error } = await supabaseServiceRole
-      .from('carriers')
+      .from('transportadoras')
       .select('*')
       .order('name', { ascending: true })
 

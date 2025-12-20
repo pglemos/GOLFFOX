@@ -43,7 +43,7 @@ export function TransportadoraTenantProvider({ children }: { children: ReactNode
                 if (foundId) {
                     // Buscar dados da transportadora
                     const { data: transportadoraData } = await (supabase as any)
-                        .from('carriers')
+                        .from('transportadoras')
                         .select('id, name, logo_url')
                         .eq('id', foundId)
                         .single()

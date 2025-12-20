@@ -40,8 +40,8 @@ export async function PUT(
     const transportadoraId = transportadora_id
 
     // Atualizar motorista na tabela users
-    const { data: motorista, error: driverError } = await supabase
-      .from('users')
+    const { data: motorista, error: driverError } = await (supabase
+      .from('users') as any)
       .update({
         name,
         email: email || null,

@@ -34,7 +34,7 @@ export async function DELETE(req: NextRequest) {
 
     // Verificar se a transportadora existe
     const { data: transportadora, error: carrierError } = await supabase
-      .from('carriers')
+      .from('transportadoras')
       .select('id, name')
       .eq('id', carrierId)
       .single()
@@ -132,7 +132,7 @@ export async function DELETE(req: NextRequest) {
 
     // 5. Agora podemos excluir a transportadora
     const { error: deleteError } = await supabase
-      .from('carriers')
+      .from('transportadoras')
       .delete()
       .eq('id', carrierId)
 

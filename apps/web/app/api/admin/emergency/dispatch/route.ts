@@ -37,6 +37,8 @@ export async function POST(req: NextRequest) {
       )
     }
 
+    const routeData = route as any
+
     // Verificar se já existe uma solicitação de socorro aberta para esta rota
     const { data: existingRequest, error: checkError } = await supabase
       .from('gf_assistance_requests')
@@ -49,8 +51,9 @@ export async function POST(req: NextRequest) {
 
     if (existingRequest) {
       // Atualizar solicitação existente
-      const { data: updated, error: updateError } = await supabase
-        .from('gf_assistance_requests')
+      const existingId = (existingRequest as any).id
+      const { data: updated, error: updateError } = await (supabase
+        .from('gf_assistance_requests') as any)
         .update({
           dispatched_driver_id: driverId,
           dispatched_vehicle_id: vehicleId,
@@ -58,7 +61,7 @@ export async function POST(req: NextRequest) {
           dispatched_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
         })
-        .eq('id', existingRequest.id)
+        .eq('id', existingId)
         .select()
         .single()
 
@@ -66,16 +69,16 @@ export async function POST(req: NextRequest) {
         throw updateError
       }
 
-      assistanceRequestId = updated.id
+      assistanceRequestId = (updated as any).id
     } else {
       // Criar nova solicitação de socorro
-      const { data: newRequest, error: createError } = await supabase
-        .from('gf_assistance_requests')
+      const { data: newRequest, error: createError } = await (supabase
+        .from('gf_assistance_requests') as any)
         .insert({
           route_id: routeId,
-          company_id: route.company_id,
+          company_id: routeData.company_id,
           request_type: 'emergency',
-          description: `Despacho de socorro para a rota ${route.name}`,
+          description: `Despacho de socorro para a rota ${routeData.name}`,
           status: 'dispatched',
           dispatched_driver_id: driverId,
           dispatched_vehicle_id: vehicleId,
@@ -88,7 +91,7 @@ export async function POST(req: NextRequest) {
         throw createError
       }
 
-      assistanceRequestId = newRequest.id
+      assistanceRequestId = (newRequest as any).id
     }
 
     // Criar incidente relacionado (se não existir)
@@ -100,16 +103,16 @@ export async function POST(req: NextRequest) {
       .maybeSingle()
 
     if (!existingIncident) {
-      await supabase
-        .from('gf_incidents')
+      await (supabase
+        .from('gf_incidents') as any)
         .insert({
-          company_id: route.company_id,
+          company_id: routeData.company_id,
           route_id: routeId,
           veiculo_id: vehicleId,
           motorista_id: driverId,
           severity: 'critical',
           status: 'open',
-          description: `Despacho de socorro para a rota ${route.name}`
+          description: `Despacho de socorro para a rota ${routeData.name}`
         })
     }
 

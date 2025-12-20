@@ -54,20 +54,20 @@ export async function GET(req: NextRequest) {
     // Filtrar rotas que têm problemas
     const routeIdsWithProblems = new Set<string>()
     
-    incidents?.forEach(incident => {
+    ;(incidents || [] as any[]).forEach((incident: any) => {
       if (incident.route_id) {
         routeIdsWithProblems.add(incident.route_id)
       }
     })
 
-    assistanceRequests?.forEach(request => {
+    ;(assistanceRequests || [] as any[]).forEach((request: any) => {
       if (request.route_id) {
         routeIdsWithProblems.add(request.route_id)
       }
     })
 
     // Buscar informações de veículos e motoristas através das viagens ativas
-    const routesWithProblemsList = (allRoutes || []).filter(route => routeIdsWithProblems.has(route.id))
+    const routesWithProblemsList = ((allRoutes || []) as any[]).filter((route: any) => routeIdsWithProblems.has(route.id))
     
     // Buscar viagens ativas para essas rotas
     const routeIdsArray = Array.from(routeIdsWithProblems)
@@ -81,7 +81,7 @@ export async function GET(req: NextRequest) {
     const routeVehicleMap = new Map<string, string>()
     const routeDriverMap = new Map<string, string>()
     
-    activeTrips?.forEach(trip => {
+    ;((activeTrips as any)?.data || []).forEach((trip: any) => {
       if (trip.veiculo_id) routeVehicleMap.set(trip.route_id, trip.veiculo_id)
       if (trip.motorista_id) routeDriverMap.set(trip.route_id, trip.motorista_id)
     })
@@ -100,11 +100,11 @@ export async function GET(req: NextRequest) {
       .select('id, name, email')
       .in('id', driverIds) : { data: [] }
 
-    const vehiclesMap = new Map((veiculos || []).map(v => [v.id, v]))
-    const driversMap = new Map((motoristas || []).map(d => [d.id, d]))
+    const vehiclesMap = new Map(((veiculos || []) as any[]).map((v: any) => [v.id, v]))
+    const driversMap = new Map(((motoristas || []) as any[]).map((d: any) => [d.id, d]))
 
     // Formatar rotas com informações completas
-    const formattedRoutes = routesWithProblemsList.map(route => {
+    const formattedRoutes = routesWithProblemsList.map((route: any) => {
       const vehicleId = routeVehicleMap.get(route.id)
       const driverId = routeDriverMap.get(route.id)
       const veiculo = vehicleId ? vehiclesMap.get(vehicleId) : null
@@ -116,16 +116,16 @@ export async function GET(req: NextRequest) {
         origin: route.origin || '',
         destination: route.destination || '',
         veiculo: veiculo ? {
-          id: veiculo.id,
-          plate: veiculo.plate,
-          model: veiculo.model
+          id: (veiculo as any).id,
+          plate: (veiculo as any).plate,
+          model: (veiculo as any).model
         } : null,
         motorista: motorista ? {
-          id: motorista.id,
-          name: motorista.name,
-          email: motorista.email
+          id: (motorista as any).id,
+          name: (motorista as any).name,
+          email: (motorista as any).email
         } : null,
-        displayName: `${route.name}${veiculo || motorista ? ` (Veículo: ${veiculo?.plate || 'N/A'} / Motorista: ${motorista?.name || 'N/A'})` : ''}`
+        displayName: `${route.name}${veiculo || motorista ? ` (Veículo: ${(veiculo as any)?.plate || 'N/A'} / Motorista: ${(motorista as any)?.name || 'N/A'})` : ''}`
       }
     })
 

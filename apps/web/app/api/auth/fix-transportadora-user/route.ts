@@ -54,7 +54,7 @@ export async function GET(req: NextRequest) {
     if (userId) {
       // Buscar transportadora_id (transportadora) associado
       const { data: transportadoraData } = await supabaseAdmin
-        .from('gf_carriers')
+        .from('gf_transportadoras')
         .select('id')
         .limit(1)
         .single()

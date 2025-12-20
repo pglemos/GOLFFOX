@@ -87,7 +87,7 @@ export async function POST(req: NextRequest) {
 
     const supabase = getSupabaseAdmin()
     const { data, error } = await supabase
-      .from('carriers')
+      .from('transportadoras')
       .insert(insertData as any)
       .select()
       .single()

@@ -46,7 +46,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
         // Verificar se transportadora existe
         const { data: transportadora, error: carrierError } = await supabaseAdmin
-            .from('carriers')
+            .from('transportadoras')
             .select('id, name')
             .eq('id', carrierId)
             .single()
@@ -119,7 +119,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
         // Verificar se transportadora existe
         const { data: transportadora, error: carrierError } = await supabaseAdmin
-            .from('carriers')
+            .from('transportadoras')
             .select('id')
             .eq('id', carrierId)
             .single()
@@ -141,18 +141,19 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
         if (existing) {
             // Atualizar documento existente
+            const existingId = (existing as any).id
             const { data: updated, error: updateError } = await (supabaseAdmin
                 .from('gf_transportadora_documents') as any)
                 .update({
                     ...documentData,
                     updated_at: new Date().toISOString(),
                 })
-                .eq('id', existing.id)
+                .eq('id', existingId)
                 .select()
                 .single()
 
             if (updateError) {
-                logError('Erro ao atualizar documento', { error: updateError, carrierId, documentId: (existing as any).id }, 'CarrierDocumentsAPI')
+                logError('Erro ao atualizar documento', { error: updateError, carrierId, documentId: existingId }, 'CarrierDocumentsAPI')
                 return NextResponse.json(
                     { error: 'Erro ao atualizar documento' },
                     { status: 500 }

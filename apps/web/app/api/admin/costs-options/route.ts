@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
       supabaseAdmin.from('routes').select('id, name').order('name'),
       supabaseAdmin.from('veiculos').select('id, plate').order('plate'),
       supabaseAdmin.from('users').select('id, email').eq('role', 'motorista').order('email'),
-      supabaseAdmin.from('carriers').select('id, name').order('name')
+      supabaseAdmin.from('transportadoras').select('id, name').order('name')
     ])
 
     return NextResponse.json({

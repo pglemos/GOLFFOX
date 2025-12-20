@@ -34,8 +34,8 @@ export async function DELETE(request: NextRequest) {
     logger.log(`🗑️ Tentando excluir motorista: ${driverId}`)
 
     // Primeiro, setar motorista_id para NULL em trips (mesmo que seja SET NULL, fazemos explicitamente)
-    await supabaseAdmin
-      .from('trips')
+    await (supabaseAdmin
+      .from('trips') as any)
       .update({ motorista_id: null })
       .eq('motorista_id', driverId)
 

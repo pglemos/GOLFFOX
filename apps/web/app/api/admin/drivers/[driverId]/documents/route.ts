@@ -96,19 +96,19 @@ export async function POST(
         let result
         if (existing) {
             // Atualizar documento existente
-            result = await supabase
-                .from('gf_driver_documents')
+            result = await (supabase
+                .from('gf_driver_documents') as any)
                 .update({
                     ...validatedData,
                     updated_at: new Date().toISOString(),
                 })
-                .eq('id', existing.id)
+                .eq('id', (existing as any).id)
                 .select()
                 .single()
         } else {
             // Criar novo documento
-            result = await supabase
-                .from('gf_driver_documents')
+            result = await (supabase
+                .from('gf_driver_documents') as any)
                 .insert({
                     motorista_id: driverId,
                     ...validatedData,
