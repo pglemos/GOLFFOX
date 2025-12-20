@@ -1,5 +1,5 @@
 /**
- * Next.js 16.1 Middleware
+ * Next.js 16.1 Middleware (Proxy)
  * 
  * Centraliza autenticação, autorização e roteamento de requisições.
  * Segue as melhores práticas do Next.js 16.1 com TypeScript strict mode.
@@ -115,7 +115,7 @@ function sanitizeRedirectPath(raw: string | null, baseUrl: string): string | nul
     
     // Rejeitar URLs absolutas (prevenir open redirect)
     if (/^https?:\/\//i.test(decoded)) {
-      warn('Tentativa de redirecionamento para URL absoluta bloqueada', { path: decoded }, 'Middleware')
+      warn('Tentativa de redirecionamento para URL absoluta bloqueada', { path: decoded }, 'Proxy')
       return null
     }
     
@@ -158,7 +158,7 @@ function applyCompatibilityRedirects(pathname: string, request: NextRequest): Ne
       debug('Redirecionamento de compatibilidade', {
         from: pathname,
         to: newPath
-      }, 'Middleware')
+      }, 'Proxy')
       
       return NextResponse.redirect(newUrl)
     }
@@ -176,7 +176,7 @@ function cleanQueryParams(pathname: string, request: NextRequest): NextResponse 
     const url = request.nextUrl.clone()
     url.searchParams.delete('company')
     
-    debug('Limpando parâmetro company da URL', { pathname }, 'Middleware')
+    debug('Limpando parâmetro company da URL', { pathname }, 'Proxy')
     
     return NextResponse.redirect(url)
   }
@@ -185,19 +185,24 @@ function cleanQueryParams(pathname: string, request: NextRequest): NextResponse 
 }
 
 /**
- * Middleware principal
+ * Proxy/Middleware principal
  * 
  * Next.js 16.1: Edge Runtime por padrão
  * - Não pode usar Node.js APIs
  * - Deve ser assíncrono
  * - Deve retornar NextResponse
+ * 
+ * Boas práticas Next.js 16.1:
+ * - Lógica simples e focada
+ * - Evitar operações pesadas
+ * - Usar matcher para otimizar performance
  */
-export async function middleware(request: NextRequest): Promise<NextResponse> {
+export default async function proxy(request: NextRequest): Promise<NextResponse> {
   const { pathname, searchParams } = request.nextUrl
   
-  // Permitir desabilitar middleware apenas em desenvolvimento (para testes)
+  // Permitir desabilitar proxy apenas em desenvolvimento (para testes)
   if (process.env.NEXT_PUBLIC_DISABLE_MIDDLEWARE === 'true' && isDevelopment) {
-    debug('Middleware desabilitado via variável de ambiente', {}, 'Middleware')
+    debug('Proxy desabilitado via variável de ambiente', {}, 'Proxy')
     return NextResponse.next()
   }
   
@@ -265,7 +270,7 @@ async function handleRootRoute(request: NextRequest): Promise<NextResponse> {
         debug('Redirecionando para rota solicitada', {
           path: safeNext,
           role: user.role
-        }, 'Middleware')
+        }, 'Proxy')
         return NextResponse.redirect(url)
       }
     }
@@ -279,7 +284,7 @@ async function handleRootRoute(request: NextRequest): Promise<NextResponse> {
       debug('Redirecionando para rota padrão do role', {
         role: user.role,
         route: defaultRoute
-      }, 'Middleware')
+      }, 'Proxy')
       return NextResponse.redirect(url)
     }
   }
@@ -302,7 +307,7 @@ async function handleProtectedRoute(
   
   if (!allowedRoles) {
     // Rota protegida mas sem roles definidas - negar acesso por segurança
-    warn('Rota protegida sem roles definidas', { pathname }, 'Middleware')
+    warn('Rota protegida sem roles definidas', { pathname }, 'Proxy')
     return NextResponse.redirect(new URL('/unauthorized?reason=unauthorized', request.url))
   }
   
@@ -311,7 +316,7 @@ async function handleProtectedRoute(
   
   if (!user) {
     // Não autenticado - redirecionar para login com ?next
-    debug('Usuário não autenticado, redirecionando para login', { pathname }, 'Middleware')
+    debug('Usuário não autenticado, redirecionando para login', { pathname }, 'Proxy')
     const loginUrl = new URL('/', request.url)
     loginUrl.searchParams.set('next', pathname)
     return NextResponse.redirect(loginUrl)
@@ -329,7 +334,7 @@ async function handleProtectedRoute(
       userRole: user.role,
       normalizedRole: normalizedUserRole,
       allowedRoles
-    }, 'Middleware')
+    }, 'Proxy')
     
     const unauthorizedUrl = new URL('/unauthorized', request.url)
     unauthorizedUrl.searchParams.set('reason', 'unauthorized')
@@ -341,13 +346,12 @@ async function handleProtectedRoute(
   debug('Acesso permitido', {
     pathname,
     role: user.role
-  }, 'Middleware')
+  }, 'Proxy')
   
   return NextResponse.next()
 }
 
-// Exportar como default para Next.js middleware
-export default middleware
+// ✅ Exportação já está como default acima (Next.js 16.1 best practice)
 
 /**
  * Configuração do matcher para Next.js 16.1
