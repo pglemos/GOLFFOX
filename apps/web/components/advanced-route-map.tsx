@@ -43,7 +43,7 @@ interface RouteStop {
   stop_type: 'pickup' | 'dropoff'
   passenger_photo?: string
   observations?: string
-  passenger?: PassengerInfo
+  passageiro?: PassengerInfo
 }
 
 interface RouteData {
@@ -309,7 +309,7 @@ export const AdvancedRouteMap = memo(function AdvancedRouteMap({
           stop_type: index === 0 ? 'pickup' : 'dropoff',
           passenger_photo: stop.gf_employee_company?.photo_url,
           observations: stop.observations,
-          passenger: {
+          passageiro: {
             id: stop.passenger_id || '',
             name: stop.gf_employee_company?.name || 'Passageiro não identificado',
             phone: stop.gf_employee_company?.phone,
@@ -900,18 +900,18 @@ export const AdvancedRouteMap = memo(function AdvancedRouteMap({
       <Card className={`${className}`}>
         <div className="p-8 text-center">
           <div className="flex flex-col items-center gap-4">
-            <div className="p-4 bg-red-50 rounded-full">
+            <div className="p-4 bg-error-light rounded-full">
               {isOnline ? (
-                <AlertCircle className="w-8 h-8 text-red-600" />
+                <AlertCircle className="w-8 h-8 text-error" />
               ) : (
-                <WifiOff className="w-8 h-8 text-red-600" />
+                <WifiOff className="w-8 h-8 text-error" />
               )}
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              <h3 className="text-lg font-semibold text-ink-strong mb-2">
                 {isOnline ? 'Erro ao Carregar Mapa' : 'Sem Conexão'}
               </h3>
-              <p className="text-gray-600 mb-4">{error}</p>
+              <p className="text-ink-muted mb-4">{error}</p>
               <Button onClick={loadRouteData} variant="outline">
                 <RotateCcw className="w-4 h-4 mr-2" />
                 Tentar Novamente
@@ -927,7 +927,7 @@ export const AdvancedRouteMap = memo(function AdvancedRouteMap({
     return (
       <Card className={`${className}`}>
         <div className="p-8 text-center">
-          <p className="text-gray-600">Nenhuma rota encontrada</p>
+          <p className="text-ink-muted">Nenhuma rota encontrada</p>
         </div>
       </Card>
     )
@@ -943,7 +943,7 @@ export const AdvancedRouteMap = memo(function AdvancedRouteMap({
           isMobile ? 'flex-wrap justify-center' : ''
         }`} role="status" aria-label="Status da conexão">
           <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs ${
-            isOnline ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+            isOnline ? 'bg-success-light text-success' : 'bg-error-light text-error'
           }`} aria-live="polite">
             {isOnline ? (
               <Wifi className="w-3 h-3" aria-hidden="true" />
@@ -954,7 +954,7 @@ export const AdvancedRouteMap = memo(function AdvancedRouteMap({
           </div>
           
           {cacheExpiry && (
-            <div className={`text-xs text-gray-500 ${
+            <div className={`text-xs text-ink-muted ${
               isMobile ? 'text-center' : ''
             }`} aria-label={`Cache válido até ${new Date(cacheExpiry).toLocaleTimeString()}`}>
               Cache válido até {new Date(cacheExpiry).toLocaleTimeString()}
@@ -962,7 +962,7 @@ export const AdvancedRouteMap = memo(function AdvancedRouteMap({
           )}
         </div>
 
-        <div className={`flex items-center gap-2 text-xs text-gray-500 ${
+        <div className={`flex items-center gap-2 text-xs text-ink-muted ${
           isMobile ? 'justify-center' : ''
         }`} role="status" aria-label="Métricas de performance" aria-live="polite">
           <span aria-label={`Taxa de quadros por segundo: ${metrics.fps}`}>FPS: {metrics.fps}</span>
@@ -979,7 +979,7 @@ export const AdvancedRouteMap = memo(function AdvancedRouteMap({
             isMobile ? 'flex-col text-center' : 'flex-row'
           }`}>
             <div className="flex items-center gap-2">
-              <RouteIcon className="h-5 w-5 text-blue-600" aria-hidden="true" />
+              <RouteIcon className="h-5 w-5 text-info" aria-hidden="true" />
               <span id="route-title" className="text-lg font-semibold">
                 {routeData?.name || 'Rota'}
               </span>
@@ -988,20 +988,20 @@ export const AdvancedRouteMap = memo(function AdvancedRouteMap({
               isMobile ? 'flex-wrap justify-center' : ''
             }`} role="list" aria-label="Informações da rota">
               <div className="flex items-center gap-2" role="listitem">
-                <Clock className="h-4 w-4 text-gray-500" aria-hidden="true" />
-                <span className="text-sm text-gray-600" aria-label={`Duração estimada: ${formatDuration(routeData?.estimatedDuration || 0)}`}>
+                <Clock className="h-4 w-4 text-ink-muted" aria-hidden="true" />
+                <span className="text-sm text-ink-muted" aria-label={`Duração estimada: ${formatDuration(routeData?.estimatedDuration || 0)}`}>
                   {formatDuration(routeData?.estimatedDuration || 0)}
                 </span>
               </div>
               <div className="flex items-center gap-2" role="listitem">
-                <Navigation className="h-4 w-4 text-gray-500" aria-hidden="true" />
-                <span className="text-sm text-gray-600" aria-label={`Distância total: ${formatDistance(routeData?.totalDistance || 0)}`}>
+                <Navigation className="h-4 w-4 text-ink-muted" aria-hidden="true" />
+                <span className="text-sm text-ink-muted" aria-label={`Distância total: ${formatDistance(routeData?.totalDistance || 0)}`}>
                   {formatDistance(routeData?.totalDistance || 0)}
                 </span>
               </div>
               <div className="flex items-center gap-2" role="listitem">
-                <Users className="h-4 w-4 text-gray-500" aria-hidden="true" />
-                <span className="text-sm text-gray-600" aria-label={`Número de paradas: ${routeData?.stops.length || 0}`}>
+                <Users className="h-4 w-4 text-ink-muted" aria-hidden="true" />
+                <span className="text-sm text-ink-muted" aria-label={`Número de paradas: ${routeData?.stops.length || 0}`}>
                   {routeData?.stops.length || 0} paradas
                 </span>
               </div>
@@ -1073,11 +1073,11 @@ export const AdvancedRouteMap = memo(function AdvancedRouteMap({
           <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-90">
             <div className="text-center">
               <motion.div
-                className="w-8 h-8 border-4 border-blue-200 border-t-blue-600 rounded-full mx-auto mb-4"
+                className="w-8 h-8 border-4 border-info-light border-t-blue-600 rounded-full mx-auto mb-4"
                 animate={{ rotate: 360 }}
                 transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
               />
-              <p className="text-sm text-gray-600 font-medium">
+              <p className="text-sm text-ink-muted font-medium">
                 Inicializando mapa...
               </p>
             </div>
@@ -1109,7 +1109,7 @@ export const AdvancedRouteMap = memo(function AdvancedRouteMap({
             address: selectedStop.address,
             scheduledTime: selectedStop.estimated_arrival || new Date().toISOString(),
             type: selectedStop.stop_type as 'pickup' | 'dropoff',
-            passenger: selectedStop.passenger || {
+            passageiro: selectedStop.passageiro || {
               id: selectedStop.passenger_id || '',
               name: selectedStop.passenger_name || 'Passageiro não identificado',
               type: 'visitor' as const
@@ -1131,13 +1131,13 @@ export const AdvancedRouteMap = memo(function AdvancedRouteMap({
               type: selectedStop.stop_type as 'pickup' | 'dropoff',
               address: selectedStop.address,
               scheduledTime: selectedStop.estimated_arrival || new Date().toISOString(),
-              passenger: selectedStop.passenger ? {
-                id: selectedStop.passenger.id,
-                name: selectedStop.passenger.name,
-                ...(selectedStop.passenger.photo && { photo: selectedStop.passenger.photo }),
+              passageiro: selectedStop.passageiro ? {
+                id: selectedStop.passageiro.id,
+                name: selectedStop.passageiro.name,
+                ...(selectedStop.passageiro.photo && { photo: selectedStop.passageiro.photo }),
                 type: selectedStop.passageiro.type === 'student' ? 'student' as const : 'regular' as const,
-                ...(selectedStop.passenger.phone && { phone: selectedStop.passenger.phone }),
-                ...(selectedStop.passenger.observations && { observations: selectedStop.passenger.observations })
+                ...(selectedStop.passageiro.phone && { phone: selectedStop.passageiro.phone }),
+                ...(selectedStop.passageiro.observations && { observations: selectedStop.passageiro.observations })
               } : {
                 id: selectedStop.passenger_id || '',
                 name: selectedStop.passenger_name || 'Passageiro não identificado',
@@ -1173,7 +1173,7 @@ export const AdvancedRouteMap = memo(function AdvancedRouteMap({
               onClick={(e: any) => e.stopPropagation()}
             >
               <div className="flex items-start justify-between mb-4">
-                <h3 className="text-lg font-bold text-gray-900">
+                <h3 className="text-lg font-bold text-ink-strong">
                   Detalhes da Parada
                 </h3>
                 <Button
@@ -1194,31 +1194,31 @@ export const AdvancedRouteMap = memo(function AdvancedRouteMap({
                       className="w-10 h-10 rounded-full object-cover"
                     />
                   ) : (
-                    <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
-                      <span className="text-sm font-medium text-gray-600">
+                    <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">
+                      <span className="text-sm font-medium text-ink-muted">
                         {selectedStop.passenger_name?.charAt(0) || '?'}
                       </span>
                     </div>
                   )}
                   <div>
-                    <h4 className="font-semibold text-gray-900">
+                    <h4 className="font-semibold text-ink-strong">
                       {selectedStop.passenger_name || 'Passageiro'}
                     </h4>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-ink-muted">
                       Parada #{selectedStop.stop_order}
                     </p>
                   </div>
                 </div>
 
                 <div>
-                  <h5 className="font-medium text-gray-900 mb-1">Endereço</h5>
-                  <p className="text-sm text-gray-600">{selectedStop.address}</p>
+                  <h5 className="font-medium text-ink-strong mb-1">Endereço</h5>
+                  <p className="text-sm text-ink-muted">{selectedStop.address}</p>
                 </div>
 
                 {selectedStop.estimated_arrival && (
                   <div>
-                    <h5 className="font-medium text-gray-900 mb-1">Horário Previsto</h5>
-                    <p className="text-sm text-blue-600 font-medium">
+                    <h5 className="font-medium text-ink-strong mb-1">Horário Previsto</h5>
+                    <p className="text-sm text-info font-medium">
                       {new Date(selectedStop.estimated_arrival).toLocaleTimeString('pt-BR', {
                         hour: '2-digit',
                         minute: '2-digit'
@@ -1229,8 +1229,8 @@ export const AdvancedRouteMap = memo(function AdvancedRouteMap({
 
                 {selectedStop.observations && (
                   <div>
-                    <h5 className="font-medium text-gray-900 mb-1">Observações</h5>
-                    <p className="text-sm text-gray-600">{selectedStop.observations}</p>
+                    <h5 className="font-medium text-ink-strong mb-1">Observações</h5>
+                    <p className="text-sm text-ink-muted">{selectedStop.observations}</p>
                   </div>
                 )}
 

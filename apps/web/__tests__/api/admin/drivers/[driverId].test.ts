@@ -16,8 +16,8 @@ describe('GET /api/admin/drivers/[driverId]', () => {
 
   it('deve buscar motorista por ID', async () => {
     const transportadora = createTestTransportadora()
-    const driver = createTestDriver(transportadora.id)
-    mockSupabaseClient.setTableData('drivers', [driver])
+    const motorista = createTestDriver(transportadora.id)
+    mockSupabaseClient.setTableData('drivers', [motorista])
     mockSupabaseClient.setTableData('carriers', [transportadora])
 
     const req = createAdminRequest({
@@ -25,7 +25,7 @@ describe('GET /api/admin/drivers/[driverId]', () => {
     }) as NextRequest
 
     const context = {
-      params: Promise.resolve({ driverId: driver.id }),
+      params: Promise.resolve({ driverId: motorista.id }),
     }
 
     const response = await GET(req, context)
@@ -33,8 +33,8 @@ describe('GET /api/admin/drivers/[driverId]', () => {
 
     expect(response.status).toBe(200)
     expect(data.success).toBe(true)
-    expect(data.driver).toBeDefined()
-    expect(data.driver.id).toBe(driver.id)
+    expect(data.motorista).toBeDefined()
+    expect(data.motorista.id).toBe(motorista.id)
   })
 
   it('deve lidar com motorista não encontrado', async () => {
@@ -64,8 +64,8 @@ describe('PUT /api/admin/drivers/[driverId]', () => {
 
   it('deve atualizar motorista', async () => {
     const transportadora = createTestTransportadora()
-    const driver = createTestDriver(transportadora.id)
-    mockSupabaseClient.setTableData('drivers', [driver])
+    const motorista = createTestDriver(transportadora.id)
+    mockSupabaseClient.setTableData('drivers', [motorista])
     mockSupabaseClient.setTableData('carriers', [transportadora])
 
     const req = createAdminRequest({
@@ -78,7 +78,7 @@ describe('PUT /api/admin/drivers/[driverId]', () => {
     }) as NextRequest
 
     const context = {
-      params: Promise.resolve({ driverId: driver.id }),
+      params: Promise.resolve({ driverId: motorista.id }),
     }
 
     const response = await PUT(req, context)
@@ -86,13 +86,13 @@ describe('PUT /api/admin/drivers/[driverId]', () => {
 
     expect(response.status).toBe(200)
     expect(data.success).toBe(true)
-    expect(data.driver).toBeDefined()
+    expect(data.motorista).toBeDefined()
   })
 
   it('deve validar nome obrigatório', async () => {
     const transportadora = createTestTransportadora()
-    const driver = createTestDriver(transportadora.id)
-    mockSupabaseClient.setTableData('drivers', [driver])
+    const motorista = createTestDriver(transportadora.id)
+    mockSupabaseClient.setTableData('drivers', [motorista])
 
     const req = createAdminRequest({
       method: 'PUT',
@@ -102,7 +102,7 @@ describe('PUT /api/admin/drivers/[driverId]', () => {
     }) as NextRequest
 
     const context = {
-      params: Promise.resolve({ driverId: driver.id }),
+      params: Promise.resolve({ driverId: motorista.id }),
     }
 
     const response = await PUT(req, context)
@@ -115,8 +115,8 @@ describe('PUT /api/admin/drivers/[driverId]', () => {
 
   it('deve aceitar carrier_id como alternativa', async () => {
     const transportadora = createTestTransportadora()
-    const driver = createTestDriver(transportadora.id)
-    mockSupabaseClient.setTableData('drivers', [driver])
+    const motorista = createTestDriver(transportadora.id)
+    mockSupabaseClient.setTableData('drivers', [motorista])
     mockSupabaseClient.setTableData('carriers', [transportadora])
 
     const req = createAdminRequest({
@@ -128,7 +128,7 @@ describe('PUT /api/admin/drivers/[driverId]', () => {
     }) as NextRequest
 
     const context = {
-      params: Promise.resolve({ driverId: driver.id }),
+      params: Promise.resolve({ driverId: motorista.id }),
     }
 
     const response = await PUT(req, context)

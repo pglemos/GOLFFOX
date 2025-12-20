@@ -267,8 +267,8 @@ describe('AuthManager', () => {
       expect(AuthManager.getRedirectUrl('operador')).toBe('/transportadora')
     })
 
-    it('deve retornar /empresa para role operator (compat.)', () => {
-      expect(AuthManager.getRedirectUrl('operator')).toBe('/empresa')
+    it('deve retornar /empresa para role operador (compat.)', () => {
+      expect(AuthManager.getRedirectUrl('operador')).toBe('/empresa')
     })
 
     it('deve retornar /empresa para role empresa', () => {
@@ -279,8 +279,8 @@ describe('AuthManager', () => {
       expect(AuthManager.getRedirectUrl('transportadora')).toBe('/transportadora')
     })
 
-    it('deve retornar /transportadora para role carrier (compat.)', () => {
-      expect(AuthManager.getRedirectUrl('carrier')).toBe('/transportadora')
+    it('deve retornar /transportadora para role transportadora (compat.)', () => {
+      expect(AuthManager.getRedirectUrl('transportadora')).toBe('/transportadora')
     })
 
     it('deve retornar /empresa como fallback para role desconhecido', () => {

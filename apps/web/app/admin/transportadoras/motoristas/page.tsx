@@ -36,7 +36,7 @@ const DriverModal = dynamic(
     { ssr: false, loading: () => null }
 )
 
-interface Driver {
+interface motorista {
     id: string
     name: string
     email: string
@@ -55,10 +55,10 @@ interface Transportadora {
 
 export default function TransportadoraMotoristasPage() {
     const { user, loading: authLoading } = useAuthFast()
-    const [drivers, setDrivers] = useState<Driver[]>([])
+    const [drivers, setDrivers] = useState<motorista[]>([])
     const [transportadoras, setTransportadoras] = useState<Transportadora[]>([])
     const [dataLoading, setDataLoading] = useState(true)
-    const [selectedDriver, setSelectedDriver] = useState<Driver | null>(null)
+    const [selectedDriver, setSelectedDriver] = useState<motorista | null>(null)
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [isSelectCarrierOpen, setIsSelectCarrierOpen] = useState(false)
     const [newDriverCarrierId, setNewDriverCarrierId] = useState<string>("")
@@ -182,7 +182,7 @@ export default function TransportadoraMotoristasPage() {
                 {/* Search + Filter */}
                 <div className="flex flex-col sm:flex-row gap-2">
                     <div className="relative flex-1">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-ink-light h-4 w-4" />
                         <Input
                             placeholder="Buscar motoristas..."
                             value={searchQuery}
@@ -215,9 +215,9 @@ export default function TransportadoraMotoristasPage() {
                                 <p className="text-muted-foreground">Nenhum motorista encontrado</p>
                             </Card>
                         ) : (
-                            filteredDrivers.map((driver) => (
+                            filteredDrivers.map((motorista) => (
                                 <motion.div
-                                    key={driver.id}
+                                    key={motorista.id}
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ duration: 0.3 }}
@@ -238,18 +238,18 @@ export default function TransportadoraMotoristasPage() {
                                                 <div className="space-y-1 text-sm text-ink-muted">
                                                     <div className="flex items-center gap-2">
                                                         <Mail className="h-3 w-3" />
-                                                        <span>{driver.email}</span>
+                                                        <span>{motorista.email}</span>
                                                     </div>
-                                                    {driver.phone && (
+                                                    {motorista.phone && (
                                                         <div className="flex items-center gap-2">
                                                             <Phone className="h-3 w-3" />
-                                                            <span>{driver.phone}</span>
+                                                            <span>{motorista.phone}</span>
                                                         </div>
                                                     )}
-                                                    {driver.transportadora_name && (
+                                                    {motorista.transportadora_name && (
                                                         <div className="flex items-center gap-2">
                                                             <Building2 className="h-3 w-3" />
-                                                            <span>{driver.transportadora_name}</span>
+                                                            <span>{motorista.transportadora_name}</span>
                                                         </div>
                                                     )}
                                                 </div>
@@ -258,7 +258,7 @@ export default function TransportadoraMotoristasPage() {
                                                 <Button
                                                     variant="outline"
                                                     size="sm"
-                                                    onClick={() => { setSelectedDriver(driver); setIsModalOpen(true) }}
+                                                    onClick={() => { setSelectedDriver(motorista); setIsModalOpen(true) }}
                                                     className="min-h-[44px] touch-manipulation"
                                                 >
                                                     <Edit className="h-4 w-4 mr-1" />
@@ -267,7 +267,7 @@ export default function TransportadoraMotoristasPage() {
                                                 <Button
                                                     variant="outline"
                                                     size="sm"
-                                                    onClick={() => handleDelete(driver.id, driver.name)}
+                                                    onClick={() => handleDelete(motorista.id, motorista.name)}
                                                     className="min-h-[44px] touch-manipulation text-destructive hover:bg-destructive/10"
                                                 >
                                                     <Trash2 className="h-4 w-4" />
@@ -324,7 +324,7 @@ export default function TransportadoraMotoristasPage() {
 
             {/* Modal de motorista */}
             <DriverModal
-                driver={selectedDriver}
+                motorista={selectedDriver}
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 onSave={() => { setIsModalOpen(false); loadDrivers() }}

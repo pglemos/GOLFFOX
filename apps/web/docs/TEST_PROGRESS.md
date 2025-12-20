@@ -94,7 +94,7 @@
 - [x] `use-navigation.test.ts` - Hook de navegação
 - [x] `use-responsive.test.ts` - Hook responsivo
 - [x] `use-performance.test.ts` - Hook de performance
-- [x] `use-operator-data.test.ts` - Hooks de dados do operador
+- [x] `use-operador-data.test.ts` - Hooks de dados do operador
 - [x] `use-admin-vehicles.test.ts` - Hook de veículos admin
 - [x] `use-admin-kpis.test.ts` - Hook de KPIs admin
 - [x] `use-supabase-query.test.ts` - Hook de query Supabase
@@ -106,7 +106,7 @@
 - [x] `admin/complete-workflow.spec.ts` - Fluxo administrativo completo
 - [x] `admin/costs-reconcile.spec.ts` - Conciliação de custos
 - [x] `costs/complete-flow.spec.ts` - Fluxo de custos completo
-- [x] `operator/workflow.spec.ts` - Fluxo do operador
+- [x] `operador/workflow.spec.ts` - Fluxo do operador
 - [x] `transportadora/workflow.spec.ts` - Fluxo da transportadora
 - [ ] `emergency/dispatch-flow.spec.ts` - Fluxo de emergência
 

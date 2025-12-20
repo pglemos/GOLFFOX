@@ -80,13 +80,13 @@ export default function AjudaSuportePage() {
         >
         <Card className="p-6 bg-card/50 backdrop-blur-sm border-border">
           <div className="flex items-center gap-2 mb-4">
-            <div className={`p-2 rounded-lg ${statusSistema.status === 'online' ? 'bg-green-100' : 'bg-red-100'}`}>
-              <CheckCircle className={`h-5 w-5 ${statusSistema.status === 'online' ? 'text-[var(--ok)]' : 'text-[var(--err)]'}`} />
+            <div className={`p-2 rounded-lg ${statusSistema.status === 'online' ? 'bg-success-light' : 'bg-error-light'}`}>
+              <CheckCircle className={`h-5 w-5 ${statusSistema.status === 'online' ? 'text-success' : 'text-error'}`} />
             </div>
             <h3 className="font-bold text-lg">Status do Sistema</h3>
           </div>
           <p className="text-sm text-text-muted-foreground">
-            Status: <span className="font-medium text-[var(--ok)]">Online</span>
+            Status: <span className="font-medium text-success">Online</span>
           </p>
           <p className="text-xs text-text-muted-foreground mt-2">
             Última verificação: {statusSistema.timestamp.toLocaleString()}

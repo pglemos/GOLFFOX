@@ -40,13 +40,13 @@ export async function GET(req: NextRequest) {
 
     // Filtrar veículos disponíveis (não estão em viagem)
     const availableVehicles = (vehicles || [])
-      .filter(vehicle => !activeVehicleIds.has(vehicle.id))
-      .map(vehicle => ({
-        id: vehicle.id,
-        plate: vehicle.plate,
-        model: vehicle.model || 'Sem modelo',
-        brand: vehicle.brand || '',
-        displayName: `${vehicle.plate}${vehicle.model ? ` (${vehicle.brand || ''} ${vehicle.model})` : ''}`
+      .filter(veiculo => !activeVehicleIds.has(veiculo.id))
+      .map(veiculo => ({
+        id: veiculo.id,
+        plate: veiculo.plate,
+        model: veiculo.model || 'Sem modelo',
+        brand: veiculo.brand || '',
+        displayName: `${veiculo.plate}${veiculo.model ? ` (${veiculo.brand || ''} ${veiculo.model})` : ''}`
       }))
 
     return NextResponse.json({

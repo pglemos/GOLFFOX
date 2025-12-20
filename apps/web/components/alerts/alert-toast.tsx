@@ -16,11 +16,11 @@ export function AlertToast({ t, title, message, severity, onDismiss }: AlertToas
     const getColors = () => {
         switch (severity) {
             case 'critical':
-                return 'bg-red-500 border-red-600' // Darker red/white
+                return 'bg-error-light0 border-red-600' // Darker red/white
             case 'warning':
                 return 'bg-amber-500 border-amber-600'
             case 'info':
-                return 'bg-blue-500 border-blue-600'
+                return 'bg-info-light0 border-blue-600'
             default:
                 return 'bg-slate-800 border-slate-700'
         }
@@ -38,25 +38,25 @@ export function AlertToast({ t, title, message, severity, onDismiss }: AlertToas
             <div className={`flex-1 w-0 p-4`}>
                 <div className="flex items-start">
                     <div className="flex-shrink-0 pt-0.5">
-                        <div className={`rounded-full p-2 ${severity === 'critical' ? 'bg-red-100' :
-                                severity === 'warning' ? 'bg-amber-100' : 'bg-blue-100'
+                        <div className={`rounded-full p-2 ${severity === 'critical' ? 'bg-error-light' :
+                                severity === 'warning' ? 'bg-amber-100' : 'bg-info-light'
                             }`}>
-                            <AlertTriangle className={`h-6 w-6 ${severity === 'critical' ? 'text-red-600' :
-                                    severity === 'warning' ? 'text-amber-600' : 'text-blue-600'
+                            <AlertTriangle className={`h-6 w-6 ${severity === 'critical' ? 'text-error' :
+                                    severity === 'warning' ? 'text-amber-600' : 'text-info'
                                 }`} />
                         </div>
                     </div>
                     <div className="ml-3 flex-1">
-                        <p className="text-sm font-medium text-gray-900">
+                        <p className="text-sm font-medium text-ink-strong">
                             {title}
                         </p>
-                        <p className="mt-1 text-sm text-gray-500">
+                        <p className="mt-1 text-sm text-ink-muted">
                             {message}
                         </p>
                     </div>
                 </div>
             </div>
-            <div className="flex border-l border-gray-200">
+            <div className="flex border-l border-border-light">
                 <button
                     onClick={() => {
                         toast.dismiss(t.id)

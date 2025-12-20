@@ -93,11 +93,11 @@ export default function HistoricoRotasPage() {
     const getStatusBadge = (status: string) => {
         switch (status) {
             case 'completed':
-                return <Badge className="bg-green-100 text-green-700 hover:bg-green-200 border-green-200">Concluída</Badge>
+                return <Badge className="bg-success-light text-success hover:bg-success-light border-green-200">Concluída</Badge>
             case 'in_progress':
-                return <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-200 border-blue-200">Em Andamento</Badge>
+                return <Badge className="bg-info-light text-info hover:bg-info-light border-info-light">Em Andamento</Badge>
             case 'cancelled':
-                return <Badge className="bg-red-100 text-red-700 hover:bg-red-200 border-red-200">Cancelada</Badge>
+                return <Badge className="bg-error-light text-error hover:bg-error-light border-error-light">Cancelada</Badge>
             default:
                 return <Badge variant="outline">{status}</Badge>
         }
@@ -126,7 +126,7 @@ export default function HistoricoRotasPage() {
                 <Card className="p-4 bg-card/50 backdrop-blur-sm border-border">
                     <div className="flex flex-col sm:flex-row gap-4">
                         <div className="relative flex-1">
-                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-ink-light" />
                             <Input
                                 placeholder="Buscar por rota, município ou motorista..."
                                 value={searchTerm}
@@ -159,7 +159,7 @@ export default function HistoricoRotasPage() {
                         </div>
                     ) : filteredExecutions.length === 0 ? (
                         <Card className="p-12 text-center">
-                            <Navigation className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+                            <Navigation className="h-16 w-16 text-ink-light mx-auto mb-4" />
                             <p className="text-lg font-medium text-ink-muted">Nenhuma rota encontrada</p>
                             <p className="text-sm text-ink-muted mt-1">Tente ajustar os filtros de busca.</p>
                         </Card>
@@ -193,22 +193,22 @@ export default function HistoricoRotasPage() {
 
                                             <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm">
                                                 <div className="flex items-center gap-2">
-                                                    <Calendar className="h-4 w-4 text-gray-400" />
+                                                    <Calendar className="h-4 w-4 text-ink-light" />
                                                     {exec.date.toLocaleDateString('pt-BR')}
                                                 </div>
                                                 <div className="flex items-center gap-2">
-                                                    <Clock className="h-4 w-4 text-gray-400" />
+                                                    <Clock className="h-4 w-4 text-ink-light" />
                                                     {exec.date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
                                                 </div>
                                                 <div className="flex items-center gap-2">
-                                                    <Navigation className="h-4 w-4 text-gray-400" />
+                                                    <Navigation className="h-4 w-4 text-ink-light" />
                                                     {exec.motorista}
                                                 </div>
                                             </div>
                                         </div>
 
                                         {/* Metrics */}
-                                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 lg:w-auto lg:flex-shrink-0 bg-gray-50 p-3 rounded-lg">
+                                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 lg:w-auto lg:flex-shrink-0 bg-bg-soft p-3 rounded-lg">
                                             <div className="text-center">
                                                 <p className="text-xs text-ink-muted">Duração</p>
                                                 <p className="font-medium">{exec.duration}</p>
@@ -223,7 +223,7 @@ export default function HistoricoRotasPage() {
                                             </div>
                                             <div className="text-center">
                                                 <p className="text-xs text-ink-muted">Custo</p>
-                                                <p className="font-medium text-green-600">R$ {exec.cost.toFixed(2)}</p>
+                                                <p className="font-medium text-success">R$ {exec.cost.toFixed(2)}</p>
                                             </div>
                                         </div>
 
@@ -232,8 +232,8 @@ export default function HistoricoRotasPage() {
                                             <div className="text-center">
                                                 <div className="relative inline-flex items-center justify-center">
                                                     <svg className="w-10 h-10 transform -rotate-90">
-                                                        <circle cx="20" cy="20" r="16" stroke="currentColor" strokeWidth="3" fill="transparent" className="text-gray-200" />
-                                                        <circle cx="20" cy="20" r="16" stroke="currentColor" strokeWidth="3" fill="transparent" className="text-blue-500" strokeDasharray={100} strokeDashoffset={100 - exec.punctuality} />
+                                                        <circle cx="20" cy="20" r="16" stroke="currentColor" strokeWidth="3" fill="transparent" className="text-ink-light" />
+                                                        <circle cx="20" cy="20" r="16" stroke="currentColor" strokeWidth="3" fill="transparent" className="text-info" strokeDasharray={100} strokeDashoffset={100 - exec.punctuality} />
                                                     </svg>
                                                     <span className="absolute text-xs font-medium">{exec.punctuality}%</span>
                                                 </div>
@@ -242,8 +242,8 @@ export default function HistoricoRotasPage() {
                                             <div className="text-center">
                                                 <div className="relative inline-flex items-center justify-center">
                                                     <svg className="w-10 h-10 transform -rotate-90">
-                                                        <circle cx="20" cy="20" r="16" stroke="currentColor" strokeWidth="3" fill="transparent" className="text-gray-200" />
-                                                        <circle cx="20" cy="20" r="16" stroke="currentColor" strokeWidth="3" fill="transparent" className="text-green-500" strokeDasharray={100} strokeDashoffset={100 - exec.optimization} />
+                                                        <circle cx="20" cy="20" r="16" stroke="currentColor" strokeWidth="3" fill="transparent" className="text-ink-light" />
+                                                        <circle cx="20" cy="20" r="16" stroke="currentColor" strokeWidth="3" fill="transparent" className="text-success" strokeDasharray={100} strokeDashoffset={100 - exec.optimization} />
                                                     </svg>
                                                     <span className="absolute text-xs font-medium">{exec.optimization}%</span>
                                                 </div>

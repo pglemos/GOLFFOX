@@ -315,7 +315,7 @@ export function FuncionarioModal({ funcionario, isOpen, onClose, onSave, empresa
             <Button 
               type="submit" 
               disabled={loading} 
-              className="bg-orange-500 hover:bg-orange-600 w-full sm:w-auto order-1 sm:order-2 h-11 sm:h-12 text-base font-medium"
+              className="bg-brand hover:bg-orange-600 w-full sm:w-auto order-1 sm:order-2 h-11 sm:h-12 text-base font-medium"
             >
               {loading ? "Salvando..." : "Salvar"}
             </Button>

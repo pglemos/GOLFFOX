@@ -79,7 +79,7 @@ export default function ConformidadeOperatorPage() {
             <Card key={idx} className="p-4 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-border hover:border-orange-500/30">
               <div className="flex items-center gap-3">
                 <div className="p-1.5 rounded-lg bg-orange-100">
-                  <FileWarning className="h-4 w-4 text-orange-500" />
+                  <FileWarning className="h-4 w-4 text-brand" />
                 </div>
                 <div className="flex-1">
                   <p className="font-semibold">{i.tipo} â€¢ {i.severidade}</p>

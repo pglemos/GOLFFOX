@@ -62,7 +62,7 @@ ANTES:                      AGORA:
 | **Excluir** | Remover transportadora (com confirmação) | ✅ |
 | **Listar** | Exibir todas as transportadoras cadastradas | ✅ |
 
-### 2️⃣ Login de Acesso (Usuários Carrier)
+### 2️⃣ Login de Acesso (Usuários transportadora)
 
 | Ação | Descrição | Status |
 |------|-----------|--------|
@@ -101,16 +101,16 @@ apps/web/app/api/admin/
 │  └─ [carrierId]/
 │     ├─ users/route.ts
 │     └─ drivers/route.ts
-└─ create-carrier-login/route.ts
+└─ create-transportadora-login/route.ts
 ```
 
 #### Componentes (4 modais)
 ```
 apps/web/components/modals/
-├─ create-carrier-modal.tsx
-├─ edit-carrier-modal.tsx
-├─ carrier-users-modal.tsx
-└─ carrier-drivers-modal.tsx
+├─ create-transportadora-modal.tsx
+├─ edit-transportadora-modal.tsx
+├─ transportadora-users-modal.tsx
+└─ transportadora-drivers-modal.tsx
 ```
 
 #### Documentação
@@ -166,7 +166,7 @@ carriers {
   updated_at: timestamptz
 }
 
--- Usuários Carrier (Login de Acesso)
+-- Usuários transportadora (Login de Acesso)
 users {
   id: uuid (PK) -- Supabase Auth ID
   email: text (UNIQUE)
@@ -268,7 +268,7 @@ users {
 ❌ Motoristas listados diretamente
 ❌ Sem organização por transportadora
 ❌ Sem gestão de transportadoras
-❌ Sem criação de login carrier
+❌ Sem criação de login transportadora
 ```
 
 ### DEPOIS
@@ -278,7 +278,7 @@ users {
 ✅ Transportadoras organizadas em cards
 ✅ Motoristas agrupados por transportadora
 ✅ CRUD completo de transportadoras
-✅ Criação de login de acesso (carrier)
+✅ Criação de login de acesso (transportadora)
 ✅ Visualização de motoristas por transportadora
 ✅ Mesma UI/UX da aba Empresas
 ```
@@ -321,7 +321,7 @@ vercel --prod  # ⏳ Em execução
 
 ✅ **Nova aba "Transportadoras"** no painel admin  
 ✅ **CRUD completo** de transportadoras  
-✅ **Criação de login de acesso** (usuários carrier)  
+✅ **Criação de login de acesso** (usuários transportadora)  
 ✅ **Visualização de motoristas** por transportadora  
 ✅ **UI/UX idêntica** à aba Empresas  
 ✅ **APIs RESTful** completas e seguras  

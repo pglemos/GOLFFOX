@@ -8,7 +8,7 @@
 
 ## 🔍 Bugs Conhecidos (Do Documento)
 
-### 1. ❌ BUG #2: API create-operator - 404 Not Found
+### 1. ❌ BUG #2: API create-operador - 404 Not Found
 **Status:** ✅ JÁ CORRIGIDO
 - API existe em: `apps/web/app/api/admin/create-operador/route.ts` (544 linhas)
 - Verificado durante investigação anterior
@@ -123,12 +123,12 @@
 ## 📊 Status Atual
 
 **APIs Verificadas:**
-- ✅ create-operator: EXISTE (544 linhas)
+- ✅ create-operador: EXISTE (544 linhas)
 - ⏳ transportadora/create: PRECISA VERIFICAR
 - ⏳ transportadora/update: PRECISA VERIFICAR
 
 **Modais Verificados:**
-- ✅ create-operator-modal: BOM TRATAMENTO DE ERROS
+- ✅ create-operador-modal: BOM TRATAMENTO DE ERROS
 - ✅ create-transportadora-modal: CNPJ VALIDAÇÃO REMOVIDA
 - ⏳ edit-transportadora-modal: PRECISA VERIFICAR
 

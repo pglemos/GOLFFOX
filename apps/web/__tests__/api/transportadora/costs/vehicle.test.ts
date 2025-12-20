@@ -1,4 +1,4 @@
-import { GET, POST } from '@/app/api/transportadora/costs/vehicle/route'
+import { GET, POST } from '@/app/api/transportadora/costs/veiculo/route'
 import { createTransportadoraRequest } from '../../../helpers/api-test-helpers'
 import { mockSupabaseClient } from '../../../helpers/mock-supabase'
 import { createTestUser, createTestTransportadora, createTestVehicle } from '../../../helpers/test-data'
@@ -28,7 +28,7 @@ jest.mock('@/lib/api-auth', () => ({
   }),
 }))
 
-describe('GET /api/transportadora/costs/vehicle', () => {
+describe('GET /api/transportadora/costs/veiculo', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockSupabaseClient.clear()
@@ -37,18 +37,18 @@ describe('GET /api/transportadora/costs/vehicle', () => {
   it('deve listar custos de veículos', async () => {
     const transportadora = createTestTransportadora()
     const user = createTestUser({ role: 'transportadora', transportadora_id: transportadora.id })
-    const vehicle = createTestVehicle(transportadora.id)
+    const veiculo = createTestVehicle(transportadora.id)
     
     mockSupabaseClient.setTableData('users', [user])
     mockSupabaseClient.setTableData('vehicle_costs', [
       {
         id: 'cost-1',
-        vehicle_id: vehicle.id,
+        vehicle_id: veiculo.id,
         cost_date: '2024-01-15',
         amount_brl: 100.0,
       },
     ])
-    mockSupabaseClient.setTableData('vehicles', [vehicle])
+    mockSupabaseClient.setTableData('vehicles', [veiculo])
 
     const req = createTransportadoraRequest({
       method: 'GET',
@@ -64,15 +64,15 @@ describe('GET /api/transportadora/costs/vehicle', () => {
   it('deve filtrar por vehicle_id', async () => {
     const transportadora = createTestTransportadora()
     const user = createTestUser({ role: 'transportadora', transportadora_id: transportadora.id })
-    const vehicle = createTestVehicle(transportadora.id)
+    const veiculo = createTestVehicle(transportadora.id)
     
     mockSupabaseClient.setTableData('users', [user])
     mockSupabaseClient.setTableData('vehicle_costs', [])
-    mockSupabaseClient.setTableData('vehicles', [vehicle])
+    mockSupabaseClient.setTableData('vehicles', [veiculo])
 
     const req = createTransportadoraRequest({
       method: 'GET',
-      url: `http://localhost:3000/api/transportadora/costs/vehicle?vehicle_id=${vehicle.id}`,
+      url: `http://localhost:3000/api/transportadora/costs/veiculo?vehicle_id=${veiculo.id}`,
     }) as NextRequest
 
     const response = await GET(req)
@@ -90,7 +90,7 @@ describe('GET /api/transportadora/costs/vehicle', () => {
 
     const req = createTransportadoraRequest({
       method: 'GET',
-      url: 'http://localhost:3000/api/transportadora/costs/vehicle?start_date=2024-01-01&end_date=2024-01-31',
+      url: 'http://localhost:3000/api/transportadora/costs/veiculo?start_date=2024-01-01&end_date=2024-01-31',
     }) as NextRequest
 
     const response = await GET(req)
@@ -99,7 +99,7 @@ describe('GET /api/transportadora/costs/vehicle', () => {
   })
 })
 
-describe('POST /api/transportadora/costs/vehicle', () => {
+describe('POST /api/transportadora/costs/veiculo', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockSupabaseClient.clear()
@@ -108,16 +108,16 @@ describe('POST /api/transportadora/costs/vehicle', () => {
   it('deve criar custo de veículo', async () => {
     const transportadora = createTestTransportadora()
     const user = createTestUser({ role: 'transportadora', transportadora_id: transportadora.id })
-    const vehicle = createTestVehicle(transportadora.id)
+    const veiculo = createTestVehicle(transportadora.id)
     
     mockSupabaseClient.setTableData('users', [user])
-    mockSupabaseClient.setTableData('vehicles', [vehicle])
+    mockSupabaseClient.setTableData('vehicles', [veiculo])
     mockSupabaseClient.setTableData('vehicle_costs', [])
 
     const req = createTransportadoraRequest({
       method: 'POST',
       body: {
-        vehicle_id: vehicle.id,
+        vehicle_id: veiculo.id,
         cost_category: 'combustivel',
         cost_date: '2024-01-15',
         amount_brl: 100.0,
@@ -150,15 +150,15 @@ describe('POST /api/transportadora/costs/vehicle', () => {
     const transportadora1 = createTestTransportadora()
     const transportadora2 = createTestTransportadora({ id: 'other-transportadora' })
     const user = createTestUser({ role: 'transportadora', transportadora_id: transportadora1.id })
-    const vehicle = createTestVehicle(transportadora2.id)
+    const veiculo = createTestVehicle(transportadora2.id)
     
     mockSupabaseClient.setTableData('users', [user])
-    mockSupabaseClient.setTableData('vehicles', [vehicle])
+    mockSupabaseClient.setTableData('vehicles', [veiculo])
 
     const req = createTransportadoraRequest({
       method: 'POST',
       body: {
-        vehicle_id: vehicle.id,
+        vehicle_id: veiculo.id,
         cost_category: 'combustivel',
         cost_date: '2024-01-15',
         amount_brl: 100.0,

@@ -24,7 +24,7 @@ Event Sourcing foi implementado para rastrear todas as operações críticas do 
 - ✅ Integração preparada para outros services
 
 ### 3. Integração com APIs
-- ✅ **POST /api/admin/create-operator** - Publica eventos de criação de empresa e usuário
+- ✅ **POST /api/admin/create-operador** - Publica eventos de criação de empresa e usuário
 - ✅ Preparado para outras rotas críticas
 
 ### 4. Event Handlers Registrados

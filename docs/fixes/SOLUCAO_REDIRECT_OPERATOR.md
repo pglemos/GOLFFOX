@@ -107,7 +107,7 @@ export default function OperatorDashboard() {
 ### Busca por referências ao link problemático:
 
 ```bash
-# Nenhuma ocorrência de push/href/replace com /operator?company=
+# Nenhuma ocorrência de push/href/replace com /operador?company=
 grep -r "push.*operador.*company" web-app/
 grep -r "href.*operador.*company" web-app/
 grep -r "replace.*operador.*company" web-app/
@@ -124,7 +124,7 @@ grep -r "replace.*operador.*company" web-app/
 ### Fluxo de Requisição:
 
 ```
-1. Usuário acessa: /operator?company=11111111-1111-4111-8111-1111111111c1
+1. Usuário acessa: /operador?company=11111111-1111-4111-8111-1111111111c1
                     ↓
 2. Middleware intercepta
                     ↓
@@ -132,7 +132,7 @@ grep -r "replace.*operador.*company" web-app/
                     ↓
 4. Remove parâmetro
                     ↓
-5. Redirect 307 para: /operator
+5. Redirect 307 para: /operador
                     ↓
 6. Página carrega normalmente
 ```
@@ -141,7 +141,7 @@ grep -r "replace.*operador.*company" web-app/
 
 ```
 // No console do servidor/vercel
-🔄 Middleware: Redirecionando /operator?company= para /operator
+🔄 Middleware: Redirecionando /operador?company= para /operador
 
 // No console do navegador (se middleware não executar)
 ⚠️ Removendo parâmetro ?company= da URL
@@ -178,7 +178,7 @@ grep -r "replace.*operador.*company" web-app/
 ```bash
 # 1. Commit das mudanças
 git add web-app/middleware.ts
-git add web-app/app/operator/page.tsx
+git add web-app/app/operador/page.tsx
 git commit -m "fix: redirect /operador?company= to /operador"
 
 # 2. Push (deploy automático)

@@ -77,7 +77,7 @@ http://localhost:8080
 1. Tela de login é exibida
 2. Após inserir credenciais corretas, o usuário é autenticado
 3. O sistema carrega o perfil do usuário
-4. Redirecionamento automático para a tela apropriada baseada no papel (operator)
+4. Redirecionamento automático para a tela apropriada baseada no papel (operador)
 
 ## 📊 Logs de Debug
 
@@ -86,9 +86,9 @@ O sistema agora possui logs detalhados que podem ser verificados no console do n
 ```
 🔍 Loading user profile for ID: [user-id]
 📋 Profile data: {...}
-✅ User profile loaded: golffox@admin.com with role: operator
-Root redirect - authenticated: true, role: operator
-User authenticated with role operator, redirecting to: /operator
+✅ User profile loaded: golffox@admin.com with role: operador
+Root redirect - authenticated: true, role: operador
+User authenticated with role operador, redirecting to: /operador
 ```
 
 ## 🎯 Status Final

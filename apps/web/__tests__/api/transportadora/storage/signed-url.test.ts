@@ -37,9 +37,9 @@ describe('POST /api/transportadora/storage/signed-url', () => {
   it('deve gerar URL assinada para documento de motorista', async () => {
     const transportadora = createTestTransportadora()
     const user = createTestUser({ role: 'transportadora', transportadora_id: transportadora.id })
-    const driver = createTestUser({ role: 'driver', transportadora_id: transportadora.id })
+    const motorista = createTestUser({ role: 'motorista', transportadora_id: transportadora.id })
     
-    mockSupabaseClient.setTableData('users', [user, driver])
+    mockSupabaseClient.setTableData('users', [user, motorista])
     mockSupabaseClient.storage = {
       from: jest.fn(() => ({
         createSignedUrl: jest.fn().mockResolvedValue({
@@ -52,7 +52,7 @@ describe('POST /api/transportadora/storage/signed-url', () => {
     const req = createTransportadoraRequest({
       method: 'POST',
       body: {
-        file_path: `driver-documents/${driver.id}/document.pdf`,
+        file_path: `motorista-documents/${motorista.id}/document.pdf`,
       },
     }) as NextRequest
 
@@ -66,10 +66,10 @@ describe('POST /api/transportadora/storage/signed-url', () => {
   it('deve gerar URL assinada para documento de veículo', async () => {
     const transportadora = createTestTransportadora()
     const user = createTestUser({ role: 'transportadora', transportadora_id: transportadora.id })
-    const vehicle = createTestVehicle(transportadora.id)
+    const veiculo = createTestVehicle(transportadora.id)
     
     mockSupabaseClient.setTableData('users', [user])
-    mockSupabaseClient.setTableData('vehicles', [vehicle])
+    mockSupabaseClient.setTableData('vehicles', [veiculo])
     mockSupabaseClient.storage = {
       from: jest.fn(() => ({
         createSignedUrl: jest.fn().mockResolvedValue({
@@ -82,7 +82,7 @@ describe('POST /api/transportadora/storage/signed-url', () => {
     const req = createTransportadoraRequest({
       method: 'POST',
       body: {
-        file_path: `vehicle-documents/${vehicle.id}/document.pdf`,
+        file_path: `veiculo-documents/${veiculo.id}/document.pdf`,
       },
     }) as NextRequest
 
@@ -110,14 +110,14 @@ describe('POST /api/transportadora/storage/signed-url', () => {
     const transportadora1 = createTestTransportadora()
     const transportadora2 = createTestTransportadora({ id: 'other-transportadora' })
     const user = createTestUser({ role: 'transportadora', transportadora_id: transportadora1.id })
-    const driver = createTestUser({ role: 'driver', transportadora_id: transportadora2.id })
+    const motorista = createTestUser({ role: 'motorista', transportadora_id: transportadora2.id })
     
-    mockSupabaseClient.setTableData('users', [user, driver])
+    mockSupabaseClient.setTableData('users', [user, motorista])
 
     const req = createTransportadoraRequest({
       method: 'POST',
       body: {
-        file_path: `driver-documents/${driver.id}/document.pdf`,
+        file_path: `motorista-documents/${motorista.id}/document.pdf`,
       },
     }) as NextRequest
 

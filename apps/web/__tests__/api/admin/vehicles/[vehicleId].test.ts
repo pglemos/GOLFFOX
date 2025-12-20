@@ -16,8 +16,8 @@ describe('DELETE /api/admin/vehicles/[vehicleId]', () => {
   })
 
   it('deve excluir veículo sem viagens associadas', async () => {
-    const vehicle = createTestVehicle('transportadora-1', { plate: 'ABC1234' })
-    mockSupabaseClient.setTableData('vehicles', [vehicle])
+    const veiculo = createTestVehicle('transportadora-1', { plate: 'ABC1234' })
+    mockSupabaseClient.setTableData('vehicles', [veiculo])
     mockSupabaseClient.setTableData('trips', [])
     mockSupabaseClient.setTableData('gf_vehicle_maintenance', [])
     mockSupabaseClient.setTableData('gf_vehicle_checklists', [])
@@ -27,7 +27,7 @@ describe('DELETE /api/admin/vehicles/[vehicleId]', () => {
     }) as NextRequest
 
     const context = {
-      params: Promise.resolve({ vehicleId: vehicle.id }),
+      params: Promise.resolve({ vehicleId: veiculo.id }),
     }
 
     const response = await DELETE(req, context)
@@ -38,10 +38,10 @@ describe('DELETE /api/admin/vehicles/[vehicleId]', () => {
   })
 
   it('deve arquivar veículo com viagens associadas', async () => {
-    const vehicle = createTestVehicle('transportadora-1', { plate: 'ABC1234' })
-    mockSupabaseClient.setTableData('vehicles', [vehicle])
+    const veiculo = createTestVehicle('transportadora-1', { plate: 'ABC1234' })
+    mockSupabaseClient.setTableData('vehicles', [veiculo])
     mockSupabaseClient.setTableData('trips', [
-      { id: 'trip-1', vehicle_id: vehicle.id },
+      { id: 'trip-1', vehicle_id: veiculo.id },
     ])
 
     const req = createAdminRequest({
@@ -49,7 +49,7 @@ describe('DELETE /api/admin/vehicles/[vehicleId]', () => {
     }) as NextRequest
 
     const context = {
-      params: Promise.resolve({ vehicleId: vehicle.id }),
+      params: Promise.resolve({ vehicleId: veiculo.id }),
     }
 
     const response = await DELETE(req, context)
@@ -75,7 +75,7 @@ describe('DELETE /api/admin/vehicles/[vehicleId]', () => {
     const data = await response.json()
 
     expect(response.status).toBe(400)
-    expect(data.error).toBe('Vehicle not found')
+    expect(data.error).toBe('veiculo not found')
   })
 
   it('deve validar UUID do vehicleId', async () => {
@@ -102,8 +102,8 @@ describe('PATCH /api/admin/vehicles/[vehicleId]', () => {
   })
 
   it('deve atualizar veículo', async () => {
-    const vehicle = createTestVehicle('transportadora-1', { plate: 'ABC1234' })
-    mockSupabaseClient.setTableData('vehicles', [vehicle])
+    const veiculo = createTestVehicle('transportadora-1', { plate: 'ABC1234' })
+    mockSupabaseClient.setTableData('vehicles', [veiculo])
 
     const req = createAdminRequest({
       method: 'PATCH',
@@ -115,7 +115,7 @@ describe('PATCH /api/admin/vehicles/[vehicleId]', () => {
     }) as NextRequest
 
     const context = {
-      params: Promise.resolve({ vehicleId: vehicle.id }),
+      params: Promise.resolve({ vehicleId: veiculo.id }),
     }
 
     const response = await PATCH(req, context)
@@ -126,8 +126,8 @@ describe('PATCH /api/admin/vehicles/[vehicleId]', () => {
   })
 
   it('deve rejeitar campos não permitidos', async () => {
-    const vehicle = createTestVehicle('transportadora-1')
-    mockSupabaseClient.setTableData('vehicles', [vehicle])
+    const veiculo = createTestVehicle('transportadora-1')
+    mockSupabaseClient.setTableData('vehicles', [veiculo])
 
     const req = createAdminRequest({
       method: 'PATCH',
@@ -137,7 +137,7 @@ describe('PATCH /api/admin/vehicles/[vehicleId]', () => {
     }) as NextRequest
 
     const context = {
-      params: Promise.resolve({ vehicleId: vehicle.id }),
+      params: Promise.resolve({ vehicleId: veiculo.id }),
     }
 
     const response = await PATCH(req, context)

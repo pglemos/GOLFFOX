@@ -162,8 +162,8 @@ export const createAdminRequest = (options: MockRequestOptions = {}) =>
 export const createOperatorRequest = (companyId: string = 'company-1', options: MockRequestOptions = {}) =>
   createAuthenticatedRequest(
     {
-      id: 'operator-1',
-      email: 'operator@test.com',
+      id: 'operador-1',
+      email: 'operador@test.com',
       role: 'operador',
       companyId,
     },

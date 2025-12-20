@@ -16,7 +16,7 @@ import { t } from "@/lib/i18n"
 
 interface Activity {
   id: string
-  type: "vehicle" | "motorista" | "document" | "alert" | "maintenance"
+  type: "veiculo" | "motorista" | "document" | "alert" | "maintenance"
   title: string
   description?: string
   timestamp: string
@@ -30,18 +30,18 @@ interface RecentActivitiesProps {
 }
 
 const activityIcons = {
-  vehicle: Truck,
-  driver: Users,
+  veiculo: Truck,
+  motorista: Users,
   document: FileText,
   alert: AlertCircle,
   maintenance: Wrench
 }
 
 const activityColors = {
-  success: "bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400",
-  warning: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400",
-  error: "bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400",
-  info: "bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400"
+  success: "bg-success-light text-success dark:bg-green-900/20 dark:text-green-400",
+  warning: "bg-warning-light text-warning dark:bg-yellow-900/20 dark:text-yellow-400",
+  error: "bg-error-light text-error dark:bg-red-900/20 dark:text-red-400",
+  info: "bg-info-light text-info dark:bg-blue-900/20 dark:text-blue-400"
 }
 
 export function RecentActivities({

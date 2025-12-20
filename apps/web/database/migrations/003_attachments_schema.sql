@@ -10,7 +10,7 @@
 -- Plus expands existing tables with banking and legal rep info
 
 -- ====================================================
--- PART 1: VEHICLE DOCUMENTS TABLE
+-- PART 1: veiculo DOCUMENTS TABLE
 -- ====================================================
 CREATE TABLE IF NOT EXISTS public.gf_vehicle_documents (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -89,7 +89,7 @@ BEGIN
 END $$;
 
 -- ====================================================
--- PART 3: DRIVER COMPENSATION TABLE (Salary & Benefits)
+-- PART 3: motorista COMPENSATION TABLE (Salary & Benefits)
 -- ====================================================
 CREATE TABLE IF NOT EXISTS public.gf_driver_compensation (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -128,7 +128,7 @@ CREATE INDEX IF NOT EXISTS idx_gf_driver_compensation_active ON public.gf_driver
 COMMENT ON TABLE public.gf_driver_compensation IS 'Salários e benefícios dos motoristas';
 
 -- ====================================================
--- PART 4: CARRIER DOCUMENTS TABLE
+-- PART 4: transportadora DOCUMENTS TABLE
 -- ====================================================
 CREATE TABLE IF NOT EXISTS public.gf_carrier_documents (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -211,7 +211,7 @@ ALTER TABLE public.gf_vehicle_documents ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.gf_driver_compensation ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.gf_carrier_documents ENABLE ROW LEVEL SECURITY;
 
--- Vehicle Documents Policies
+-- veiculo Documents Policies
 DROP POLICY IF EXISTS "Service role full access on gf_vehicle_documents" ON public.gf_vehicle_documents;
 CREATE POLICY "Service role full access on gf_vehicle_documents" 
   ON public.gf_vehicle_documents FOR ALL TO service_role USING (true) WITH CHECK (true);
@@ -227,7 +227,7 @@ CREATE POLICY "Users can read vehicle_documents for their company"
     )
   );
 
--- Driver Compensation Policies
+-- motorista Compensation Policies
 DROP POLICY IF EXISTS "Service role full access on gf_driver_compensation" ON public.gf_driver_compensation;
 CREATE POLICY "Service role full access on gf_driver_compensation" 
   ON public.gf_driver_compensation FOR ALL TO service_role USING (true) WITH CHECK (true);
@@ -236,27 +236,27 @@ DROP POLICY IF EXISTS "Drivers can read their own compensation" ON public.gf_dri
 CREATE POLICY "Drivers can read their own compensation" 
   ON public.gf_driver_compensation FOR SELECT TO authenticated USING (driver_id = auth.uid());
 
-DROP POLICY IF EXISTS "Admins can manage driver compensation" ON public.gf_driver_compensation;
-CREATE POLICY "Admins can manage driver compensation"
+DROP POLICY IF EXISTS "Admins can manage motorista compensation" ON public.gf_driver_compensation;
+CREATE POLICY "Admins can manage motorista compensation"
   ON public.gf_driver_compensation FOR ALL TO authenticated
-  USING (EXISTS (SELECT 1 FROM users WHERE id = auth.uid() AND role IN ('admin', 'operator')))
-  WITH CHECK (EXISTS (SELECT 1 FROM users WHERE id = auth.uid() AND role IN ('admin', 'operator')));
+  USING (EXISTS (SELECT 1 FROM users WHERE id = auth.uid() AND role IN ('admin', 'operador')))
+  WITH CHECK (EXISTS (SELECT 1 FROM users WHERE id = auth.uid() AND role IN ('admin', 'operador')));
 
--- Carrier Documents Policies
+-- transportadora Documents Policies
 DROP POLICY IF EXISTS "Service role full access on gf_carrier_documents" ON public.gf_carrier_documents;
 CREATE POLICY "Service role full access on gf_carrier_documents" 
   ON public.gf_carrier_documents FOR ALL TO service_role USING (true) WITH CHECK (true);
 
-DROP POLICY IF EXISTS "Users can read carrier_documents for their carrier" ON public.gf_carrier_documents;
-CREATE POLICY "Users can read carrier_documents for their carrier" 
+DROP POLICY IF EXISTS "Users can read carrier_documents for their transportadora" ON public.gf_carrier_documents;
+CREATE POLICY "Users can read carrier_documents for their transportadora" 
   ON public.gf_carrier_documents FOR SELECT TO authenticated 
   USING (carrier_id IN (SELECT transportadora_id FROM users WHERE id = auth.uid()));
 
-DROP POLICY IF EXISTS "Admins can manage carrier documents" ON public.gf_carrier_documents;
-CREATE POLICY "Admins can manage carrier documents"
+DROP POLICY IF EXISTS "Admins can manage transportadora documents" ON public.gf_carrier_documents;
+CREATE POLICY "Admins can manage transportadora documents"
   ON public.gf_carrier_documents FOR ALL TO authenticated
-  USING (EXISTS (SELECT 1 FROM users WHERE id = auth.uid() AND role IN ('admin', 'operator')))
-  WITH CHECK (EXISTS (SELECT 1 FROM users WHERE id = auth.uid() AND role IN ('admin', 'operator')));
+  USING (EXISTS (SELECT 1 FROM users WHERE id = auth.uid() AND role IN ('admin', 'operador')))
+  WITH CHECK (EXISTS (SELECT 1 FROM users WHERE id = auth.uid() AND role IN ('admin', 'operador')));
 
 -- ====================================================
 -- PART 7: TRIGGERS FOR UPDATED_AT
@@ -280,9 +280,9 @@ CREATE TRIGGER update_gf_carrier_docs_updated_at
 -- PART 8: VIEW FOR EXPIRING DOCUMENTS
 -- ====================================================
 CREATE OR REPLACE VIEW public.v_all_expiring_documents AS
--- Vehicle Documents
+-- veiculo Documents
 SELECT 
-  'vehicle' as entity_type,
+  'veiculo' as entity_type,
   vd.vehicle_id as entity_id,
   v.plate as entity_name,
   vd.document_type,
@@ -303,9 +303,9 @@ WHERE vd.expiry_date IS NOT NULL
 
 UNION ALL
 
--- Driver Documents
+-- motorista Documents
 SELECT 
-  'driver' as entity_type,
+  'motorista' as entity_type,
   dd.driver_id as entity_id,
   u.name as entity_name,
   dd.document_type,
@@ -326,9 +326,9 @@ WHERE dd.expires_at IS NOT NULL
 
 UNION ALL
 
--- Carrier Documents
+-- transportadora Documents
 SELECT 
-  'carrier' as entity_type,
+  'transportadora' as entity_type,
   cd.carrier_id as entity_id,
   c.name as entity_name,
   cd.document_type,

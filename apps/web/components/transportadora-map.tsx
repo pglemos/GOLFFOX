@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback, useRef } from "react"
 import { Map as MapIcon } from "lucide-react"
 import { loadGoogleMapsAPI } from "@/lib/google-maps-loader"
 
-interface Vehicle {
+interface veiculo {
   id: string
   plate: string
   lat: number
@@ -13,7 +13,7 @@ interface Vehicle {
 }
 
 interface CarrierMapProps {
-  vehicles: Vehicle[]
+  vehicles: veiculo[]
   className?: string
 }
 
@@ -101,21 +101,21 @@ export function CarrierMap({ vehicles, className = "" }: CarrierMapProps) {
     // Adicionar novos marcadores
     const bounds = new google.maps.LatLngBounds()
 
-    vehicles.forEach(vehicle => {
-      const icon = getVehicleIcon(vehicle.status)
+    vehicles.forEach(veiculo => {
+      const icon = getVehicleIcon(veiculo.status)
       const marker = new google.maps.Marker({
-        position: { lat: vehicle.lat, lng: vehicle.lng },
+        position: { lat: veiculo.lat, lng: veiculo.lng },
         map: mapInstanceRef.current,
         ...(icon && { icon }),
-        title: `${vehicle.plate} - ${vehicle.status}`
+        title: `${veiculo.plate} - ${veiculo.status}`
       })
 
       // Info window
       const infoWindow = new google.maps.InfoWindow({
         content: `
           <div style="padding: 8px;">
-            <h3 style="margin: 0 0 4px 0; font-weight: bold;">${vehicle.plate}</h3>
-            <p style="margin: 0; color: #666;">Status: ${vehicle.status}</p>
+            <h3 style="margin: 0 0 4px 0; font-weight: bold;">${veiculo.plate}</h3>
+            <p style="margin: 0; color: #666;">Status: ${veiculo.status}</p>
           </div>
         `
       })
@@ -124,8 +124,8 @@ export function CarrierMap({ vehicles, className = "" }: CarrierMapProps) {
         infoWindow.open(mapInstanceRef.current, marker)
       })
 
-      markersRef.current.set(vehicle.id, marker)
-      bounds.extend({ lat: vehicle.lat, lng: vehicle.lng })
+      markersRef.current.set(veiculo.id, marker)
+      bounds.extend({ lat: veiculo.lat, lng: veiculo.lng })
     })
 
     // Ajustar zoom para mostrar todos os veículos

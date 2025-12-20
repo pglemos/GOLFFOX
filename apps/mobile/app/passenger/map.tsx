@@ -108,7 +108,7 @@ export default function PassengerMapScreen() {
                 {/* Tabs */}
                 <View style={styles.tabs}>
                     <Chip mode="flat" selected style={styles.tab}>Itinerário</Chip>
-                    <Chip mode="outlined" style={styles.tab} onPress={() => router.push('/passenger/checkin')}>Check-in</Chip>
+                    <Chip mode="outlined" style={styles.tab} onPress={() => router.push('/passageiro/checkin')}>Check-in</Chip>
                 </View>
 
                 {/* Lista de paradas */}

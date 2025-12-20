@@ -23,12 +23,12 @@ export default function PerfilScreen() {
     };
 
     const menuItems: MenuItem[] = [
-        { icon: 'person-outline', label: 'Dados Pessoais', desc: 'Nome, CPF, telefone', route: '/passenger/perfil' },
-        { icon: 'location-outline', label: 'Meu Endereço', desc: 'Atualizar local de embarque', route: '/passenger/endereco' },
-        { icon: 'star-outline', label: 'Avaliar Viagem', desc: 'Enviar feedback', route: '/passenger/feedback' },
-        { icon: 'time-outline', label: 'Histórico', desc: 'Viagens anteriores', route: '/passenger/historico' },
-        { icon: 'bar-chart-outline', label: 'Estatísticas', desc: 'Resumo de uso', route: '/passenger/estatisticas' },
-        { icon: 'help-circle-outline', label: 'Ajuda e FAQ', desc: 'Dúvidas frequentes', route: '/passenger/ajuda' },
+        { icon: 'person-outline', label: 'Dados Pessoais', desc: 'Nome, CPF, telefone', route: '/passageiro/perfil' },
+        { icon: 'location-outline', label: 'Meu Endereço', desc: 'Atualizar local de embarque', route: '/passageiro/endereco' },
+        { icon: 'star-outline', label: 'Avaliar Viagem', desc: 'Enviar feedback', route: '/passageiro/feedback' },
+        { icon: 'time-outline', label: 'Histórico', desc: 'Viagens anteriores', route: '/passageiro/historico' },
+        { icon: 'bar-chart-outline', label: 'Estatísticas', desc: 'Resumo de uso', route: '/passageiro/estatisticas' },
+        { icon: 'help-circle-outline', label: 'Ajuda e FAQ', desc: 'Dúvidas frequentes', route: '/passageiro/ajuda' },
     ];
 
     return (

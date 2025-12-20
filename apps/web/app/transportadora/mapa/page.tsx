@@ -187,19 +187,19 @@ function TransportadoraMapaContent() {
           <CardContent>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded-full bg-green-500"></div>
+                <div className="w-4 h-4 rounded-full bg-success-light0"></div>
                 <span className="text-sm">Em movimento</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded-full bg-yellow-500"></div>
+                <div className="w-4 h-4 rounded-full bg-warning-light0"></div>
                 <span className="text-sm">Parado (&lt;2min)</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded-full bg-red-500"></div>
+                <div className="w-4 h-4 rounded-full bg-error-light0"></div>
                 <span className="text-sm">Parado (&gt;3min)</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded-full bg-blue-500"></div>
+                <div className="w-4 h-4 rounded-full bg-info-light0"></div>
                 <span className="text-sm">Na garagem</span>
               </div>
             </div>

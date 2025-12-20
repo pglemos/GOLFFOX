@@ -1,5 +1,5 @@
 /**
- * Create Driver Command
+ * Create motorista Command
  * 
  * Command para criar um novo motorista
  */

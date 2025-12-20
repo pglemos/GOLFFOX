@@ -16,7 +16,7 @@ import { Search, AlertTriangle } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { ScrollArea } from "@/components/ui/scroll-area"
 
-interface Vehicle {
+interface veiculo {
   id: string
   plate: string
   model: string
@@ -28,7 +28,7 @@ interface Vehicle {
 interface VehiclePickerModalProps {
   isOpen: boolean
   onClose: () => void
-  onSelect: (vehicle: Vehicle) => void
+  onSelect: (veiculo: veiculo) => void
   companyId?: string
   requiredCapacity?: number
 }
@@ -40,7 +40,7 @@ export function VehiclePickerModal({
   companyId,
   requiredCapacity
 }: VehiclePickerModalProps) {
-  const [vehicles, setVehicles] = useState<Vehicle[]>([])
+  const [vehicles, setVehicles] = useState<veiculo[]>([])
   const [loading, setLoading] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
   const [statusFilter, setStatusFilter] = useState<string>("all")
@@ -66,8 +66,8 @@ export function VehiclePickerModal({
         throw new Error(result.error || 'Erro ao carregar veículos')
       }
 
-      // Mapear dados da API para o formato Vehicle (adicionar status padrão se não existir)
-      const vehiclesData: Vehicle[] = (result.vehicles || []).map((v: any) => ({
+      // Mapear dados da API para o formato veiculo (adicionar status padrão se não existir)
+      const vehiclesData: veiculo[] = (result.vehicles || []).map((v: any) => ({
         id: v.id,
         plate: v.plate,
         model: v.model,
@@ -121,7 +121,7 @@ export function VehiclePickerModal({
         <div className="space-y-4">
           <div className="flex gap-2">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-ink-light" />
               <Input
                 placeholder="Buscar por placa ou modelo..."
                 value={searchQuery}
@@ -152,50 +152,50 @@ export function VehiclePickerModal({
           )}
 
           {loading ? (
-            <div className="text-center py-8 text-gray-500">Carregando...</div>
+            <div className="text-center py-8 text-ink-muted">Carregando...</div>
           ) : (
             <ScrollArea className="h-[400px]">
               <div className="space-y-2">
                 {filteredVehicles.length === 0 ? (
-                  <div className="text-center py-8 text-gray-500">
+                  <div className="text-center py-8 text-ink-muted">
                     Nenhum veículo encontrado
                   </div>
                 ) : (
-                  filteredVehicles.map((vehicle) => {
-                    const hasCapacity = !requiredCapacity || vehicle.capacity >= requiredCapacity
+                  filteredVehicles.map((veiculo) => {
+                    const hasCapacity = !requiredCapacity || veiculo.capacity >= requiredCapacity
                     return (
                       <div
-                        key={vehicle.id}
-                        className={`flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 cursor-pointer transition-colors ${
+                        key={veiculo.id}
+                        className={`flex items-center justify-between p-3 border rounded-lg hover:bg-bg-soft cursor-pointer transition-colors ${
                           !hasCapacity ? "opacity-60" : ""
                         }`}
                         onClick={() => {
                           if (hasCapacity) {
-                            onSelect(vehicle)
+                            onSelect(veiculo)
                             onClose()
                           }
                         }}
                       >
                         <div className="flex-1">
-                          <div className="font-medium">{vehicle.plate}</div>
-                          <div className="text-sm text-gray-500">{vehicle.model}</div>
-                          <div className="text-xs text-gray-400">
-                            Capacidade: {vehicle.capacity} passageiros
+                          <div className="font-medium">{veiculo.plate}</div>
+                          <div className="text-sm text-ink-muted">{veiculo.model}</div>
+                          <div className="text-xs text-ink-light">
+                            Capacidade: {veiculo.capacity} passageiros
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
                           <Badge
                             variant={
-                              vehicle.is_active
+                              veiculo.is_active
                                 ? "default"
-                                : vehicle.status === "maintenance"
+                                : veiculo.status === "maintenance"
                                 ? "destructive"
                                 : "secondary"
                             }
                           >
-                            {vehicle.is_active
+                            {veiculo.is_active
                               ? "Ativo"
-                              : vehicle.status === "maintenance"
+                              : veiculo.status === "maintenance"
                               ? "Manutenção"
                               : "Garagem"}
                           </Badge>

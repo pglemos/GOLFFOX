@@ -15,24 +15,24 @@
 **Status:** Todas as migrations foram executadas com sucesso no Supabase.
 
 ### Componentes React (8/8)
-- ✅ `components/providers/operator-tenant-provider.tsx` - Provider multi-tenant
-- ✅ `components/operator/company-selector.tsx` - Seletor de empresas
-- ✅ `components/operator/operator-logo-section.tsx` - Logo condicional
-- ✅ `components/operator/operator-kpi-cards.tsx` - Cards de KPIs
-- ✅ `components/operator/control-tower-cards.tsx` - Cards da torre de controle
-- ✅ `components/operator/csv-import-modal.tsx` - Modal de importação CSV
-- ✅ `components/operator/funcionario-modal.tsx` - Modal de funcionário
-- ✅ `app/operator/layout.tsx` - Layout com provider
+- ✅ `components/providers/operador-tenant-provider.tsx` - Provider multi-tenant
+- ✅ `components/operador/company-selector.tsx` - Seletor de empresas
+- ✅ `components/operador/operador-logo-section.tsx` - Logo condicional
+- ✅ `components/operador/operador-kpi-cards.tsx` - Cards de KPIs
+- ✅ `components/operador/control-tower-cards.tsx` - Cards da torre de controle
+- ✅ `components/operador/csv-import-modal.tsx` - Modal de importação CSV
+- ✅ `components/operador/funcionario-modal.tsx` - Modal de funcionário
+- ✅ `app/operador/layout.tsx` - Layout com provider
 
 ### APIs (3/3)
-- ✅ `app/api/operator/optimize-route/route.ts` - Otimização de rotas
-- ✅ `app/api/operator/create-employee/route.ts` - Criação de funcionários
+- ✅ `app/api/operador/optimize-route/route.ts` - Otimização de rotas
+- ✅ `app/api/operador/create-employee/route.ts` - Criação de funcionários
 - ✅ `app/api/cron/refresh-kpis/route.ts` - Refresh de KPIs
 - ✅ `app/api/reports/dispatch/route.ts` - Dispatch de relatórios
 
 ### Configuração
 - ✅ `vercel.json` - Cron configurado (a cada 5 minutos)
-- ✅ `i18n/operator.json` - Strings em português
+- ✅ `i18n/operador.json` - Strings em português
 - ✅ `lib/importers/employee-csv.ts` - Importador CSV com geocoding
 
 ### Integrações
@@ -111,7 +111,7 @@ node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
 
 ### 3. Testes Manuais
 
-**📖 Veja guia completo:** `docs/GUIA-TESTES-OPERATOR.md`
+**📖 Veja guia completo:** `docs/GUIA-TESTES-operador.md`
 
 #### Checklist Rápido
 
@@ -143,25 +143,25 @@ node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
 - [ ] Verificar RLS está funcionando nas queries
 
 #### Teste 4: Funcionários
-- [ ] Acessar `/operator/funcionarios`
+- [ ] Acessar `/operador/funcionarios`
 - [ ] Testar importação CSV (dry-run primeiro)
 - [ ] Verificar geocoding de endereços
 - [ ] Verificar relatório pós-importação
 
 #### Teste 5: Rotas e Mapa
-- [ ] Acessar `/operator/rotas`
+- [ ] Acessar `/operador/rotas`
 - [ ] Testar otimização de rota
-- [ ] Acessar `/operator/rotas/mapa`
+- [ ] Acessar `/operador/rotas/mapa`
 - [ ] Verificar features do mapa (polyline, markers, tooltips, timeline)
 
 #### Teste 6: Custos e Reconciliação
-- [ ] Acessar `/operator/custos`
+- [ ] Acessar `/operador/custos`
 - [ ] Verificar visualização de custos
 - [ ] Testar modal de reconciliação
 - [ ] Verificar detecção de discrepâncias
 
 #### Teste 7: Relatórios
-- [ ] Acessar `/operator/relatorios`
+- [ ] Acessar `/operador/relatorios`
 - [ ] Testar agendamento de relatório
 - [ ] Verificar histórico de relatórios
 - [ ] Testar "Executar agora"
@@ -200,8 +200,8 @@ node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
 
 ## 📋 Checklist Final de Aceitação
 
-- [ ] Zero "GOLF FOX" labels em `/operator` (exceto footer legal)
-- [ ] Todas as páginas `/operator` usando views `*_secure`
+- [ ] Zero "GOLF FOX" labels em `/operador` (exceto footer legal)
+- [ ] Todas as páginas `/operador` usando views `*_secure`
 - [ ] RLS ativo em todas as tabelas (SELECT/INSERT/UPDATE/DELETE)
 - [ ] Branding da empresa no header, KPIs, exports
 - [ ] Importador CSV robusto com geocoding e relatório
@@ -223,8 +223,8 @@ node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
 
 ## 📚 Documentação
 
-- ✅ `README-OPERATOR.md` - Documentação completa do painel
-- ✅ `database/migrations/README-V43-OPERATOR-MIGRATIONS.md` - Guia de migrations
+- ✅ `README-operador.md` - Documentação completa do painel
+- ✅ `database/migrations/README-V43-operador-MIGRATIONS.md` - Guia de migrations
 - ✅ Este documento - Status e próximos passos
 
 ## 🚀 Deploy

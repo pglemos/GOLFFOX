@@ -8,7 +8,7 @@
 import { useEffect, useRef, memo } from 'react'
 import { MarkerClusterer } from '@googlemaps/markerclusterer'
 import { calculateHeading } from '@/lib/map-utils'
-import type { Vehicle, RoutePolyline, Alert } from './admin-map'
+import type { veiculo, RoutePolyline, Alert } from './admin-map'
 import type { HistoricalPosition } from '@/lib/playback-service'
 import { MarkerManager } from './marker-manager'
 import { debug, warn, error as logError } from '@/lib/logger'
@@ -34,11 +34,11 @@ export interface RouteStop {
 
 interface MapLayersProps {
   map: google.maps.Map
-  vehicles: Vehicle[]
+  vehicles: veiculo[]
   routes: RoutePolyline[]
   alerts: Alert[]
-  selectedVehicle: Vehicle | null
-  onVehicleClick: (vehicle: Vehicle) => void
+  selectedVehicle: veiculo | null
+  onVehicleClick: (veiculo: veiculo) => void
   onRouteClick: (route: RoutePolyline) => void
   onAlertClick: (alert: Alert) => void
   clustererRef: React.MutableRefObject<MarkerClusterer | null>
@@ -173,25 +173,25 @@ export const MapLayers = memo(function MapLayers({
 
     const markers: google.maps.Marker[] = []
 
-    vehicles.forEach((vehicle) => {
+    vehicles.forEach((veiculo) => {
       // Verificar se o veículo tem coordenadas válidas
       // Se não tiver, pular a criação do marcador no mapa, mas o veículo ainda aparecerá na lista
-      if (!isValidCoordinate(vehicle.lat, vehicle.lng)) {
+      if (!isValidCoordinate(veiculo.lat, veiculo.lng)) {
         // Veículo sem coordenadas GPS - não criar marcador no mapa
         // Mas o veículo ainda estará disponível na lista de veículos
-        debug('Veículo sem coordenadas GPS — exibido só na lista', { plate: vehicle.plate, vehicle_id: vehicle.vehicle_id }, 'AdminMapLayers')
+        debug('Veículo sem coordenadas GPS — exibido só na lista', { plate: veiculo.plate, vehicle_id: veiculo.vehicle_id }, 'AdminMapLayers')
         return
       }
 
       // Determinar cor baseado no status
       let color = '#10B981' // verde - em movimento
-      if (vehicle.vehicle_status === 'stopped_short') color = '#F59E0B' // amarelo
-      if (vehicle.vehicle_status === 'stopped_long') color = '#EF4444' // vermelho
-      if (vehicle.vehicle_status === 'garage') color = '#3B82F6' // azul
+      if (veiculo.vehicle_status === 'stopped_short') color = '#F59E0B' // amarelo
+      if (veiculo.vehicle_status === 'stopped_long') color = '#EF4444' // vermelho
+      if (veiculo.vehicle_status === 'garage') color = '#3B82F6' // azul
 
       // Criar ícone com heading
-      const heading = vehicle.heading !== null && !isNaN(vehicle.heading) 
-        ? vehicle.heading % 360 // Normalizar para 0-360
+      const heading = veiculo.heading !== null && !isNaN(veiculo.heading) 
+        ? veiculo.heading % 360 // Normalizar para 0-360
         : 0
       
       const icon = {
@@ -206,28 +206,28 @@ export const MapLayers = memo(function MapLayers({
 
       try {
         const marker = new google.maps.Marker({
-          position: { lat: vehicle.lat, lng: vehicle.lng },
+          position: { lat: veiculo.lat, lng: veiculo.lng },
           map: null, // Clusterer vai adicionar
           icon,
-          title: `${vehicle.plate} - ${vehicle.route_name}`,
+          title: `${veiculo.plate} - ${veiculo.route_name}`,
         })
 
         // Tooltip no hover
         const infoWindow = new google.maps.InfoWindow({
           content: `
             <div style="padding: 8px; min-width: 200px; font-family: system-ui;">
-              <div style="font-weight: bold; margin-bottom: 4px;">${vehicle.plate}</div>
-              <div style="font-size: 12px; color: #666;">${vehicle.route_name}</div>
-              <div style="font-size: 12px; color: #666;">${vehicle.driver_name}</div>
+              <div style="font-weight: bold; margin-bottom: 4px;">${veiculo.plate}</div>
+              <div style="font-size: 12px; color: #666;">${veiculo.route_name}</div>
+              <div style="font-size: 12px; color: #666;">${veiculo.driver_name}</div>
               <div style="font-size: 11px; color: #999; margin-top: 4px;">
-                ${vehicle.speed ? `${(vehicle.speed * 3.6).toFixed(0)} km/h` : 'Parado'}
+                ${veiculo.speed ? `${(veiculo.speed * 3.6).toFixed(0)} km/h` : 'Parado'}
               </div>
             </div>
           `,
         })
 
         marker.addListener('click', () => {
-          onVehicleClick(vehicle)
+          onVehicleClick(veiculo)
           infoWindow.close()
         })
 
@@ -236,14 +236,14 @@ export const MapLayers = memo(function MapLayers({
         })
 
         markers.push(marker)
-        vehicleMarkersRef.current.set(vehicle.vehicle_id, marker)
+        vehicleMarkersRef.current.set(veiculo.vehicle_id, marker)
 
         // Usar MarkerManager para virtualização se ativo
         if (useVirtualization && markerManagerRef.current) {
-          markerManagerRef.current.addMarker(vehicle.vehicle_id, marker)
+          markerManagerRef.current.addMarker(veiculo.vehicle_id, marker)
         }
       } catch (error) {
-        logError('Erro ao criar marcador para veículo', { vehicle_id: vehicle.vehicle_id, error }, 'AdminMapLayers')
+        logError('Erro ao criar marcador para veículo', { vehicle_id: veiculo.vehicle_id, error }, 'AdminMapLayers')
         return // Pular este veículo
       }
     })

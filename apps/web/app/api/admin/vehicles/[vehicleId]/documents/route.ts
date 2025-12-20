@@ -44,13 +44,13 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         const supabaseAdmin = getSupabaseAdmin()
 
         // Verificar se veículo existe
-        const { data: vehicle, error: vehicleError } = await supabaseAdmin
+        const { data: veiculo, error: vehicleError } = await supabaseAdmin
             .from('vehicles')
             .select('id, plate')
             .eq('id', vehicleId)
             .single()
 
-        if (vehicleError || !vehicle) {
+        if (vehicleError || !veiculo) {
             return NextResponse.json(
                 { error: 'Veículo não encontrado' },
                 { status: 404 }
@@ -117,13 +117,13 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         const documentData = validationResult.data
 
         // Verificar se veículo existe
-        const { data: vehicle, error: vehicleError } = await supabaseAdmin
+        const { data: veiculo, error: vehicleError } = await supabaseAdmin
             .from('vehicles')
             .select('id')
             .eq('id', vehicleId)
             .single()
 
-        if (vehicleError || !vehicle) {
+        if (vehicleError || !veiculo) {
             return NextResponse.json(
                 { error: 'Veículo não encontrado' },
                 { status: 404 }

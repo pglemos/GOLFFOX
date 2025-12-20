@@ -121,7 +121,7 @@ export function BroadcastModal({ isOpen, onClose, onSave, empresaId }: Broadcast
             <Button 
               type="submit" 
               disabled={loading} 
-              className="bg-orange-500 hover:bg-orange-600 w-full sm:w-auto order-1 sm:order-2 min-h-[44px] text-base font-medium"
+              className="bg-brand hover:bg-orange-600 w-full sm:w-auto order-1 sm:order-2 min-h-[44px] text-base font-medium"
             >
               <Send className="h-4 w-4 mr-2 flex-shrink-0" />
               <span className="hidden sm:inline">{loading ? "Enviando..." : "Enviar Broadcast"}</span>

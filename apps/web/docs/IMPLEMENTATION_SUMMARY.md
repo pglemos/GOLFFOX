@@ -78,17 +78,17 @@
 
 **Criado:**
 - `lib/domain/entities/company.entity.ts` - Entidade Company
-- `lib/domain/entities/vehicle.entity.ts` - Entidade Vehicle
+- `lib/domain/entities/veiculo.entity.ts` - Entidade veiculo
 - `lib/domain/value-objects/email.vo.ts` - Value Object Email
 - `lib/domain/value-objects/uuid.vo.ts` - Value Object UUID
 - `lib/domain/domain-events/company-created.event.ts` - Evento
-- `lib/domain/domain-events/vehicle-updated.event.ts` - Evento
+- `lib/domain/domain-events/veiculo-updated.event.ts` - Evento
 
 ### 9. Estrutura CQRS ✅
 
 **Criado:**
 - `lib/cqrs/commands/create-company.command.ts`
-- `lib/cqrs/commands/update-vehicle.command.ts`
+- `lib/cqrs/commands/update-veiculo.command.ts`
 - `lib/cqrs/queries/get-company.query.ts`
 - `lib/cqrs/queries/list-vehicles.query.ts`
 - `lib/cqrs/handlers/command-handler.interface.ts`

@@ -53,23 +53,23 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 
 // Roles em PT-BR (mobile) e EN (schema)
 export type UserRole = 'admin' | 'empresa' | 'operador' | 'motorista' | 'passageiro';
-type SchemaRole = 'admin' | 'operator' | 'carrier' | 'driver' | 'passenger';
+type SchemaRole = 'admin' | 'operador' | 'transportadora' | 'motorista' | 'passageiro';
 
 // Mapeamento PT-BR ↔ EN
 const roleToSchema: Record<UserRole, SchemaRole> = {
     admin: 'admin',
-    empresa: 'operator',
-    operador: 'carrier',
-    motorista: 'driver',
-    passageiro: 'passenger',
+    empresa: 'operador',
+    operador: 'transportadora',
+    motorista: 'motorista',
+    passageiro: 'passageiro',
 };
 
 const schemaToRole: Record<SchemaRole, UserRole> = {
     admin: 'admin',
-    operator: 'empresa',
-    carrier: 'operador',
-    driver: 'motorista',
-    passenger: 'passageiro',
+    operador: 'empresa',
+    transportadora: 'operador',
+    motorista: 'motorista',
+    passageiro: 'passageiro',
 };
 
 export interface UserProfile {
@@ -214,7 +214,7 @@ export async function getSession() {
 }
 
 // ====================================================
-// DRIVER SERVICES
+// motorista SERVICES
 // ====================================================
 
 export interface Trip {
@@ -228,7 +228,7 @@ export interface Trip {
     start_time?: string;
     end_time?: string;
     route?: Route;
-    vehicle?: Vehicle;
+    veiculo?: veiculo;
 }
 
 export interface Route {
@@ -240,7 +240,7 @@ export interface Route {
     estimated_duration?: number;
 }
 
-export interface Vehicle {
+export interface veiculo {
     id: string;
     plate: string;
     model?: string;
@@ -256,14 +256,14 @@ export async function getDriverTrips(driverId: string, date?: string) {
         .select(`
             *,
             route:routes(*),
-            vehicle:vehicles(*)
+            veiculo:vehicles(*)
         `)
         .eq('driver_id', driverId)
         .gte('scheduled_date', today)
         .order('scheduled_start_time', { ascending: true });
 
     if (error) {
-        console.error('Error fetching driver trips:', error);
+        console.error('Error fetching motorista trips:', error);
         return [];
     }
 
@@ -364,7 +364,7 @@ export async function getTripCheckins(tripId: string) {
         .from('passenger_checkins')
         .select(`
             *,
-            passenger:users!passenger_id(id, name, email)
+            passageiro:users!passenger_id(id, name, email)
         `)
         .eq('trip_id', tripId)
         .order('created_at', { ascending: true });
@@ -427,7 +427,7 @@ export async function getDriverLastLocation(driverId: string) {
 export interface DriverMessage {
     driver_id: string;
     carrier_id?: string;
-    sender: 'driver' | 'central';
+    sender: 'motorista' | 'central';
     message: string;
     message_type?: 'text' | 'location' | 'emergency' | 'delay' | 'system';
     is_emergency?: boolean;
@@ -466,7 +466,7 @@ export async function getDriverMessages(driverId: string, limit = 50) {
 }
 
 // ====================================================
-// PASSENGER SERVICES
+// passageiro SERVICES
 // ====================================================
 
 export async function getPassengerTrips(passengerId: string) {
@@ -476,15 +476,15 @@ export async function getPassengerTrips(passengerId: string) {
         .select(`
             *,
             route:routes(*),
-            vehicle:vehicles(*),
-            driver:users!driver_id(id, name, phone)
+            veiculo:vehicles(*),
+            motorista:users!driver_id(id, name, phone)
         `)
         .gte('scheduled_date', new Date().toISOString().split('T')[0])
         .order('scheduled_start_time', { ascending: true })
         .limit(10);
 
     if (error) {
-        console.error('Error fetching passenger trips:', error);
+        console.error('Error fetching passageiro trips:', error);
         return [];
     }
 

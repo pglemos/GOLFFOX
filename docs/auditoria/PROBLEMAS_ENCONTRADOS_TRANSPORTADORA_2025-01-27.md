@@ -52,7 +52,7 @@
 ### Custos (`/transportadora/custos`)
 - ✅ Estrutura de página implementada
 - ✅ Análises detalhadas de custos
-- ✅ APIs: `/api/transportadora/costs/vehicle`, `/api/transportadora/costs/route`
+- ✅ APIs: `/api/transportadora/costs/veiculo`, `/api/transportadora/costs/route`
 - ✅ Gráficos e visualizações
 
 ### Alertas (`/transportadora/alertas`)
@@ -104,7 +104,7 @@
 ### APIs do Painel Transportadora:
 - `/api/transportadora/motoristas` - Lista de motoristas
 - `/api/transportadora/alertas` - Lista de alertas
-- `/api/transportadora/costs/vehicle` - Custos por veículo
+- `/api/transportadora/costs/veiculo` - Custos por veículo
 - `/api/transportadora/costs/route` - Custos por rota
 - `/api/transportadora/vehicles/{id}/documents` - Documentos do veículo
 - `/api/transportadora/vehicles/{id}/maintenances` - Manutenções do veículo

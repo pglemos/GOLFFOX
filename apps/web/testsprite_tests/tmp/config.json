@@ -9,7 +9,7 @@
     "projectName": "GOLFFOX",
     "projectPath": "F:\\GOLFFOX\\apps\\web",
     "testIds": [],
-    "additionalInstruction": "IMPORTANT: Run all tests against https://golffox.vercel.app (NOT localhost). Use credentials: golffox@admin.com / senha123 for admin, teste@empresa.com / senha123 for company, teste@transportadora.com / senha123 for carrier. The login form is on the root page /.",
+    "additionalInstruction": "IMPORTANT: Run all tests against https://golffox.vercel.app (NOT localhost). Use credentials: golffox@admin.com / senha123 for admin, teste@empresa.com / senha123 for company, teste@transportadora.com / senha123 for transportadora. The login form is on the root page /.",
     "envs": {
       "API_KEY": "sk-user-QSb1WyBxhEsDuDPMVHN1YnKL-PvBLASIO9FkQMyEbyE4pV1RA-l12OS4HyvNZR4DYWJPloZM1dkKnChQzydCDORW-hDbwqcGxLQlewmnKfaVDbVI_yxkyZKr7M_nZf4Mqrk"
     }

@@ -1,9 +1,9 @@
 /**
- * Tipos TypeScript para Carrier/Transportadora
+ * Tipos TypeScript para transportadora/Transportadora
  * Baseados nos schemas Zod definidos nas rotas de API
  */
 
-export interface Carrier {
+export interface transportadora {
   id: string
   name: string
   address?: string | null

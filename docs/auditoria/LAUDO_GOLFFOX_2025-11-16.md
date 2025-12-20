@@ -24,14 +24,14 @@
   - Banco: Postgres (Supabase) com RLS extensivo, materialized views e RPCs.
   - Infra: Vercel (build/headers/crons), Docker Compose local (stack Supabase + Redis), scripts Node/PS/SQL.
 - **Arquitetura**: monorepo com `apps/web` (Next.js) e `apps/mobile` (Flutter), `database` (migrations/scripts), `infra` (docker), `docs` (arquitetura, OpenAPI parcial, checklists). API em `apps/web/app/api/**` segmentada por domínios.
-- **Propósito/escopo**: SaaS de fretamento corporativo — planejamento/execução de rotas, check-in/out, rastreamento, gestão de frota/custos/manutenção, incidentes/qualidade, relatórios/KPIs, com perfis admin/operator/carrier/driver/passenger.
+- **Propósito/escopo**: SaaS de fretamento corporativo — planejamento/execução de rotas, check-in/out, rastreamento, gestão de frota/custos/manutenção, incidentes/qualidade, relatórios/KPIs, com perfis admin/operador/transportadora/motorista/passageiro.
 
 
 ### 2) Inventário do que já existe (Repertório Atual)
 - **Backend/API (Next.js – apps/web/app/api/**)**:
   - auth: csrf, login, set-session, clear-session, seed-admin
   - admin: vehicles, users, companies, routes, trips, drivers, alerts, assistance-requests, listas, kpis, optimize-route, generate-stops, fix-database, execute-sql-fix, seed-cost-categories, audit-log, audit-db
-  - operator: associate-company, create-employee, optimize-route
+  - operador: associate-company, create-employee, optimize-route
   - costs: budgets, categories, export, import, kpis, manual, reconcile, vs-budget
   - reports: run, dispatch, schedule
   - analytics: web-vitals
@@ -41,7 +41,7 @@
 
 - **Frontend Web (Next.js – apps/web/app)**: áreas `admin`, `operador`, `transportadora`, `passageiro`, páginas de teste e error boundaries; middleware protege UI (bypass `/api`).
 
-- **Mobile (Flutter – apps/mobile/lib)**: bootstrap, providers, roteamento, serviços, telas por domínio (driver/operator/passenger), Sentry e testes.
+- **Mobile (Flutter – apps/mobile/lib)**: bootstrap, providers, roteamento, serviços, telas por domínio (motorista/operador/passageiro), Sentry e testes.
 
 - **Banco/Dados**:
   - Migrations v41–v49 e v74 (RLS, matviews KPIs/custos, funções, LGPD/PII).
@@ -109,7 +109,7 @@
 - **RLS abrangente e coerente**: políticas por empresa/role em custos e operador; reduz vazamento de dados multi-tenant.
 - **Materialized views e função de refresh**: suporte eficiente a KPIs/relatórios; cron dedicado.
 - **Sentry**: integrado no server/edge/client com instrumentation; base para tracing e alertas.
-- **API modular por domínios**: clareza operacional e escalabilidade (auth/admin/operator/costs/reports/cron/analytics/health/docs).
+- **API modular por domínios**: clareza operacional e escalabilidade (auth/admin/operador/costs/reports/cron/analytics/health/docs).
 - **Mobile moderno**: Riverpod, GoRouter, serviços e Sentry; base sólida para apps de campo.
 
 
@@ -133,7 +133,7 @@
 - **Médio prazo (8–30 dias)**:
   - Completar OpenAPI (100%) e automatizar publicação/validação.
   - Adicionar CI (lint, type-check, test, build, OpenAPI validation, migrations dry-run).
-  - Testes de autorização multi-empresa (admin/operator/carrier/passageiro) cobrindo endpoints críticos.
+  - Testes de autorização multi-empresa (admin/operador/transportadora/passageiro) cobrindo endpoints críticos.
   - Policies de Storage e URLs assinadas para assets sensíveis.
 
 - **Longo prazo (30+ dias)**:

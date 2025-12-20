@@ -38,8 +38,8 @@ describe('PUT /api/admin/assistance-requests/[requestId]', () => {
       body: {
         description: 'Solicitação atualizada',
         status: 'dispatched',
-        dispatched_driver_id: 'driver-1',
-        dispatched_vehicle_id: 'vehicle-1',
+        dispatched_driver_id: 'motorista-1',
+        dispatched_vehicle_id: 'veiculo-1',
       },
     }) as NextRequest
 

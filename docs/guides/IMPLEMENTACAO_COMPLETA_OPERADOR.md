@@ -113,19 +113,19 @@ Todas as funcionalidades principais foram implementadas e testadas. O painel est
 
 ```
 web-app/
-├── components/operator/
+├── components/operador/
 │   ├── csv-import-modal.tsx         ✅ Novo
 │   ├── funcionario-modal.tsx        ✅ Novo
 │   ├── solicitacao-modal.tsx        ✅ Novo
 │   ├── broadcast-modal.tsx          ✅ Novo
-│   ├── operator-kpi-cards.tsx      ✅ Existente
+│   ├── operador-kpi-cards.tsx      ✅ Existente
 │   └── control-tower-cards.tsx      ✅ Existente
 │
-├── app/api/operator/
+├── app/api/operador/
 │   └── create-employee/
 │       └── route.ts                 ✅ Novo
 │
-└── app/operator/
+└── app/operador/
     ├── funcionarios/page.tsx        ✅ Melhorado
     ├── solicitacoes/page.tsx        ✅ Melhorado
     ├── rotas/page.tsx               ✅ Melhorado

@@ -15,9 +15,9 @@ Todas as correções para os 7 testes falhando do TestSprite foram implementadas
 - Mapeamento de erros do Supabase para sempre retornar 401
 - Melhorada detecção de erros de autenticação (invalid, credentials, password, email)
 
-### 2. TC003 - Operator Creation (500) ✅
+### 2. TC003 - operador Creation (500) ✅
 
-**Arquivo:** `web-app/app/api/admin/create-operator/route.ts`
+**Arquivo:** `web-app/app/api/admin/create-operador/route.ts`
 
 **Correções:**
 - Adicionado rollback robusto em caso de erro ao criar usuário ou empresa
@@ -28,7 +28,7 @@ Todas as correções para os 7 testes falhando do TestSprite foram implementadas
 
 ### 3. TC004 - Employee Creation (500) ✅
 
-**Arquivo:** `web-app/app/api/operator/create-employee/route.ts`
+**Arquivo:** `web-app/app/api/operador/create-employee/route.ts`
 
 **Correções:**
 - Permitido que admin crie funcionários sem `company_id` (será null)
@@ -132,8 +132,8 @@ Todas as correções para os 7 testes falhando do TestSprite foram implementadas
 ## Arquivos Modificados
 
 1. `web-app/app/api/auth/login/route.ts`
-2. `web-app/app/api/admin/create-operator/route.ts`
-3. `web-app/app/api/operator/create-employee/route.ts`
+2. `web-app/app/api/admin/create-operador/route.ts`
+3. `web-app/app/api/operador/create-employee/route.ts`
 4. `web-app/app/api/costs/budgets/route.ts`
 5. `web-app/app/api/costs/kpis/route.ts`
 6. `web-app/app/api/reports/run/route.ts`

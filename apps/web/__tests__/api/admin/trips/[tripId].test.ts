@@ -27,7 +27,7 @@ describe('PUT /api/admin/trips/[tripId]', () => {
   })
 
   it('deve atualizar viagem', async () => {
-    const trip = createTestTrip('route-1', 'vehicle-1', 'driver-1')
+    const trip = createTestTrip('route-1', 'veiculo-1', 'motorista-1')
     mockSupabaseClient.setTableData('trips', [trip])
 
     const req = createAdminRequest({
@@ -91,15 +91,15 @@ describe('PUT /api/admin/trips/[tripId]', () => {
   })
 
   it('deve aceitar snake_case e camelCase', async () => {
-    const trip = createTestTrip('route-1', 'vehicle-1', 'driver-1')
+    const trip = createTestTrip('route-1', 'veiculo-1', 'motorista-1')
     mockSupabaseClient.setTableData('trips', [trip])
 
     const req = createAdminRequest({
       method: 'PUT',
       body: {
         routeId: 'route-2',
-        vehicleId: 'vehicle-2',
-        driverId: 'driver-2',
+        vehicleId: 'veiculo-2',
+        driverId: 'motorista-2',
       },
     }) as NextRequest
 
@@ -122,7 +122,7 @@ describe('DELETE /api/admin/trips/[tripId]', () => {
   })
 
   it('deve excluir viagem', async () => {
-    const trip = createTestTrip('route-1', 'vehicle-1', 'driver-1')
+    const trip = createTestTrip('route-1', 'veiculo-1', 'motorista-1')
     mockSupabaseClient.setTableData('trips', [trip])
 
     const req = createAdminRequest({

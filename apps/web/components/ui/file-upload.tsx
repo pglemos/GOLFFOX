@@ -233,7 +233,7 @@ export function FileUpload({
         if ((preview && isPdfFile(preview)) || isPdfFile(fileName || '')) {
             return (
                 <div className="flex flex-col items-center gap-2">
-                    <FileText className="h-12 w-12 text-red-500" />
+                    <FileText className="h-12 w-12 text-error" />
                     <span className="text-xs text-muted-foreground truncate max-w-[200px]">
                         {fileName || 'documento.pdf'}
                     </span>

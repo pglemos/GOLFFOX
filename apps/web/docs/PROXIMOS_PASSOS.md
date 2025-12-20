@@ -7,7 +7,7 @@
 - ✅ Hook React para facilitar uso
 - ✅ Componente de monitoramento
 - ✅ Mecanismo de reconciliação periódica
-- ✅ Integração em: Vehicle, Driver, Route, Maintenance, Checklist
+- ✅ Integração em: veiculo, motorista, Route, Maintenance, Checklist
 
 ### Admin Panel
 - ✅ Todas as páginas principais
@@ -25,7 +25,7 @@
 **Prioridade:** Alta
 
 Integrar sincronização nos modais restantes:
-- [ ] `create-operator-modal.tsx` - Criação de operadores
+- [ ] `create-operador-modal.tsx` - Criação de operadores
 - [ ] `change-role-modal.tsx` - Mudança de papel de usuário
 - [ ] `assistance-modal.tsx` - Solicitações de socorro
 - [ ] `schedule-report-modal.tsx` - Agendamento de relatórios

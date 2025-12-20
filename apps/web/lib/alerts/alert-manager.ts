@@ -76,7 +76,7 @@ class AlertManager {
       }
 
       // Verificar threshold
-      const shouldAlert = this.evaluateThreshold(value, rule.threshold, rule.operator)
+      const shouldAlert = this.evaluateThreshold(value, rule.threshold, rule.operador)
 
       if (shouldAlert) {
         // Verificar cooldown
@@ -115,7 +115,7 @@ class AlertManager {
    * Avaliar threshold
    */
   private evaluateThreshold(value: number, threshold: number, operador: AlertRule['operador']): boolean {
-    switch (operator) {
+    switch (operador) {
       case 'gt':
         return value > threshold
       case 'lt':
@@ -135,7 +135,7 @@ class AlertManager {
    * Obter símbolo do operador
    */
   private getOperatorSymbol(operador: AlertRule['operador']): string {
-    switch (operator) {
+    switch (operador) {
       case 'gt': return '>'
       case 'lt': return '<'
       case 'eq': return '='

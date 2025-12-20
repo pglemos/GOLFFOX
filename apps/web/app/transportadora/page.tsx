@@ -293,49 +293,49 @@ export default function TransportadoraDashboard() {
       })
 
       // Mapear veículos com posições do RPC
-      const fleetData = (vehicles || []).map((vehicle: any) => {
-        const bus = (mapData as any)?.buses?.find((b: any) => b.vehicle_id === vehicle.id)
-        const garage = (mapData as any)?.garages?.find((g: any) => g.vehicle_id === vehicle.id)
+      const fleetData = (vehicles || []).map((veiculo: any) => {
+        const bus = (mapData as any)?.buses?.find((b: any) => b.vehicle_id === veiculo.id)
+        const garage = (mapData as any)?.garages?.find((g: any) => g.vehicle_id === veiculo.id)
 
         if (bus) {
           return {
-            id: vehicle.id,
-            plate: vehicle.plate,
+            id: veiculo.id,
+            plate: veiculo.plate,
             motorista: bus.driver_name || 'N/A',
             status: 'on-route',
             route: bus.route_name || 'Livre',
             lat: bus.lat,
             lng: bus.lng,
             passengerCount: bus.passenger_count || 0,
-            capacity: bus.capacity || vehicle.capacity || 0,
+            capacity: bus.capacity || veiculo.capacity || 0,
             lastUpdate: bus.last_update ?
               new Date(bus.last_update).toLocaleString('pt-BR') : 'N/A'
           }
         } else if (garage) {
           return {
-            id: vehicle.id,
-            plate: vehicle.plate,
+            id: veiculo.id,
+            plate: veiculo.plate,
             motorista: 'N/A',
             status: 'available',
             route: 'Livre',
             lat: garage.last_position?.lat,
             lng: garage.last_position?.lng,
             passengerCount: 0,
-            capacity: vehicle.capacity || 0,
+            capacity: veiculo.capacity || 0,
             lastUpdate: garage.last_position?.timestamp ?
               new Date(garage.last_position.timestamp).toLocaleString('pt-BR') : 'N/A'
           }
         } else {
           return {
-            id: vehicle.id,
-            plate: vehicle.plate,
+            id: veiculo.id,
+            plate: veiculo.plate,
             motorista: 'N/A',
-            status: vehicle.is_active ? 'available' : 'inactive',
+            status: veiculo.is_active ? 'available' : 'inactive',
             route: 'Livre',
             lat: null,
             lng: null,
             passengerCount: 0,
-            capacity: vehicle.capacity || 0,
+            capacity: veiculo.capacity || 0,
             lastUpdate: 'N/A'
           }
         }
@@ -361,11 +361,11 @@ export default function TransportadoraDashboard() {
           .select('*')
           .in('driver_id', driverIds)) as any)
 
-        driversWithStats = (driversData || []).map((driver: any) => {
-          const ranking = rankings?.find((r: any) => r.driver_id === driver.id)
+        driversWithStats = (driversData || []).map((motorista: any) => {
+          const ranking = rankings?.find((r: any) => r.driver_id === motorista.id)
           return {
-            id: driver.id,
-            name: driver.name,
+            id: motorista.id,
+            name: motorista.name,
             trips: (ranking as any)?.trips_completed || 0,
             rating: (ranking as any)?.total_points ? ((ranking as any).total_points / 100).toFixed(1) : '0.0',
             status: 'active'
@@ -522,8 +522,8 @@ export default function TransportadoraDashboard() {
           status: a.alert_level === 'expired' ? 'error' as const : 'warning' as const
         })) || []),
         ...fleetData.slice(0, 2).map((v: any) => ({
-          id: `vehicle-${v.id}`,
-          type: 'vehicle' as const,
+          id: `veiculo-${v.id}`,
+          type: 'veiculo' as const,
           title: `${t('transportadora', 'activity_vehicle')} ${v.plate} ${v.status === 'on-route' ? t('transportadora', 'activity_on_route') : t('transportadora', 'activity_available')}`,
           description: v.route,
           timestamp: v.lastUpdate !== 'N/A' ? new Date(v.lastUpdate).toISOString() : new Date().toISOString(),
@@ -823,7 +823,7 @@ export default function TransportadoraDashboard() {
             </CardHeader>
             <CardContent className="pt-0 px-3 sm:px-6">
               <div className={cn(
-                "rounded-lg overflow-hidden border border-border shadow-inner bg-gray-50 dark:bg-gray-900",
+                "rounded-lg overflow-hidden border border-border shadow-inner bg-bg-soft dark:bg-ink-strong",
                 isMobile ? "h-64" : "h-48 sm:h-64 md:h-80 lg:h-96"
               )}>
                 <LazyWrapper>
@@ -834,21 +834,21 @@ export default function TransportadoraDashboard() {
               </div>
               <div className="mt-3 flex flex-wrap gap-2 text-xs text-ink-muted">
                 <div className="flex items-center gap-1">
-                  <div className="w-3 h-3 rounded-full bg-green-500 flex-shrink-0"></div>
+                  <div className="w-3 h-3 rounded-full bg-success-light0 flex-shrink-0"></div>
                   <span>{t('transportadora', 'fleet_map_legend_moving')}</span>
                 </div>
                 <div className="flex items-center gap-1">
-                  <div className="w-3 h-3 rounded-full bg-yellow-500 flex-shrink-0"></div>
+                  <div className="w-3 h-3 rounded-full bg-warning-light0 flex-shrink-0"></div>
                   <span className="hidden sm:inline">{t('transportadora', 'fleet_map_legend_stopped_short')}</span>
                   <span className="sm:hidden">{t('transportadora', 'fleet_map_legend_stopped_short').split('(')[0].trim()}</span>
                 </div>
                 <div className="flex items-center gap-1">
-                  <div className="w-3 h-3 rounded-full bg-red-500 flex-shrink-0"></div>
+                  <div className="w-3 h-3 rounded-full bg-error-light0 flex-shrink-0"></div>
                   <span className="hidden sm:inline">{t('transportadora', 'fleet_map_legend_stopped_long')}</span>
                   <span className="sm:hidden">{t('transportadora', 'fleet_map_legend_stopped_long').split('(')[0].trim()}</span>
                 </div>
                 <div className="flex items-center gap-1">
-                  <div className="w-3 h-3 rounded-full bg-blue-500 flex-shrink-0"></div>
+                  <div className="w-3 h-3 rounded-full bg-info-light0 flex-shrink-0"></div>
                   <span>{t('transportadora', 'fleet_map_legend_garage')}</span>
                 </div>
               </div>
@@ -893,7 +893,7 @@ export default function TransportadoraDashboard() {
                     <p className="text-xs sm:text-sm">{t('transportadora', 'active_drivers_empty')}</p>
                   </div>
                 ) : (
-                  drivers.map((driver, i) => (
+                  drivers.map((motorista, i) => (
                     <div key={i} className="flex items-center justify-between p-2 sm:p-3 rounded-lg hover:bg-bg-hover active:bg-bg-hover transition-colors border border-transparent hover:border-border touch-manipulation">
                       <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
                         <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-brand-light flex items-center justify-center flex-shrink-0">
@@ -902,7 +902,7 @@ export default function TransportadoraDashboard() {
                         <div className="flex-1 min-w-0">
                           <p className="font-semibold text-xs sm:text-sm text-text-ink-strong truncate">{motorista.name}</p>
                           <p className="text-xs text-ink-muted truncate">
-                            {driver.trips} viagem(ns) • ⭐ {driver.rating}
+                            {motorista.trips} viagem(ns) • ⭐ {motorista.rating}
                           </p>
                         </div>
                       </div>

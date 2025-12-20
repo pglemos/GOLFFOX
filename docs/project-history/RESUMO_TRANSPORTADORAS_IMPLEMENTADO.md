@@ -153,9 +153,9 @@ Modal lista todos os motoristas com carrier_id correspondente
 | Criar transportadora | ✅ Implementado |
 | Editar transportadora | ✅ Implementado |
 | Excluir transportadora | ✅ Implementado |
-| Criar login de acesso (carrier) | ✅ Implementado |
-| Listar usuários carrier | ✅ Implementado |
-| Excluir usuários carrier | ✅ Implementado |
+| Criar login de acesso (transportadora) | ✅ Implementado |
+| Listar usuários transportadora | ✅ Implementado |
+| Excluir usuários transportadora | ✅ Implementado |
 | Visualizar motoristas | ✅ Implementado |
 | Atualização da sidebar | ✅ Implementado |
 | Documentação | ✅ Implementado |

@@ -41,10 +41,10 @@ As seguintes correções devem resolver os seguintes testes do TestSprite:
    - ✅ Erro 500 no endpoint `/api/costs/categories` (já corrigido no código)
    - ✅ Erro `column companies.is_active does not exist` (resolvido com migração)
 
-2. **TC011** - Driver Mobile App Check-In
+2. **TC011** - motorista Mobile App Check-In
    - ✅ Erro `Could not find the 'cpf' column of 'users'` (resolvido com migração)
 
-3. **TC004/TC005** - Admin/Operator Creation
+3. **TC004/TC005** - Admin/operador Creation
    - ✅ Erros relacionados a `is_active` em `companies` (resolvido com migração)
    - ✅ Erros 404 nas views de KPIs (resolvido com migração)
 

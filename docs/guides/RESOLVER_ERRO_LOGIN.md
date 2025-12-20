@@ -36,7 +36,7 @@ AuthFailure(AuthErrorCode.profileMissing): Perfil não encontrado.
 
 2. **Cria perfis em `public.users`**
    - Vincula ao auth ID correto
-   - Atribui role apropriado (admin, operator, driver, etc.)
+   - Atribui role apropriado (admin, operador, motorista, etc.)
    - Conecta a company_id ou carrier_id
 
 3. **Idempotente**

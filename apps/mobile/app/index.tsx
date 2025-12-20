@@ -19,10 +19,10 @@ export default function Index() {
         // Redirecionar com base no role
         switch (profile?.role) {
             case 'motorista':
-                router.replace('/driver');
+                router.replace('/motorista');
                 break;
             case 'passageiro':
-                router.replace('/passenger');
+                router.replace('/passageiro');
                 break;
             case 'admin':
             case 'empresa':

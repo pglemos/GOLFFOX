@@ -94,10 +94,10 @@ export default function AjudaOperatorPage() {
             whileHover={{ y: -4 }}
             className="group"
           >
-          <Card className="p-6 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-border hover:border-[var(--accent)]/30 cursor-pointer">
+          <Card className="p-6 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-border hover:border-accent-custom/30 cursor-pointer">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-[var(--accent-light)] to-[var(--accent-soft)] flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                <FileText className="h-6 w-6 text-[var(--accent)]" />
+              <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-accent-custom-light to-accent-custom-soft flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                <FileText className="h-6 w-6 text-accent-custom" />
               </div>
               <div>
                 <h3 className="font-semibold mb-1">Documentação</h3>
@@ -122,10 +122,10 @@ export default function AjudaOperatorPage() {
             whileHover={{ y: -4 }}
             className="group"
           >
-          <Card className="p-6 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-border hover:border-[var(--ok)]/30 cursor-pointer">
+          <Card className="p-6 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-border hover:border-success/30 cursor-pointer">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-lg bg-green-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                <HelpCircle className="h-6 w-6 text-[var(--ok)]" />
+              <div className="w-12 h-12 rounded-lg bg-success-light flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                <HelpCircle className="h-6 w-6 text-success" />
               </div>
               <div>
                 <h3 className="font-semibold mb-1">FAQ</h3>

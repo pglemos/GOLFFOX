@@ -173,7 +173,7 @@ export function BudgetView({ companyId }: BudgetViewProps) {
       <Card className="p-6">
         <div className="animate-pulse space-y-4">
           {[1, 2, 3].map(i => (
-            <div key={i} className="h-12 bg-gray-200 rounded"></div>
+            <div key={i} className="h-12 bg-muted rounded"></div>
           ))}
         </div>
       </Card>
@@ -227,7 +227,7 @@ export function BudgetView({ companyId }: BudgetViewProps) {
         </CardHeader>
         <CardContent>
           {budgets.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
+            <div className="text-center py-8 text-ink-muted">
               Nenhum orçamento cadastrado
             </div>
           ) : (
@@ -257,7 +257,7 @@ export function BudgetView({ companyId }: BudgetViewProps) {
                       : 0
 
                     return (
-                      <tr key={budget.id} className="border-b hover:bg-gray-50">
+                      <tr key={budget.id} className="border-b hover:bg-bg-soft">
                         <td className="p-2">
                           {budget.period_month.toString().padStart(2, '0')}/{budget.period_year}
                         </td>
@@ -274,7 +274,7 @@ export function BudgetView({ companyId }: BudgetViewProps) {
                           {actual && (
                             <Badge 
                               variant={variancePercent > 0 ? 'destructive' : 'default'}
-                              className={variancePercent > 0 ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}
+                              className={variancePercent > 0 ? 'bg-error-light text-error' : 'bg-success-light text-success'}
                             >
                               {variancePercent > 0 ? '+' : ''}{variancePercent.toFixed(1)}%
                             </Badge>
@@ -294,7 +294,7 @@ export function BudgetView({ companyId }: BudgetViewProps) {
                               size="sm"
                               onClick={() => handleDelete(budget.id)}
                             >
-                              <Trash2 className="h-4 w-4 text-red-500" />
+                              <Trash2 className="h-4 w-4 text-error" />
                             </Button>
                           </div>
                         </td>
@@ -357,7 +357,7 @@ export function BudgetView({ companyId }: BudgetViewProps) {
                 <Label htmlFor="notes">Observações</Label>
                 <textarea
                   id="notes"
-                  className="w-full px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm"
+                  className="w-full px-3 py-2 rounded-lg border border-border bg-white text-sm"
                   rows={3}
                   value={formData.notes}
                   onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
@@ -367,7 +367,7 @@ export function BudgetView({ companyId }: BudgetViewProps) {
                 <Button type="button" variant="outline" onClick={() => { setShowForm(false); resetForm(); }}>
                   Cancelar
                 </Button>
-                <Button type="submit" className="bg-orange-500 hover:bg-orange-600">
+                <Button type="submit" className="bg-brand hover:bg-orange-600">
                   Salvar
                 </Button>
               </div>

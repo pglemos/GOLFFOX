@@ -37,7 +37,7 @@ describe('POST /api/admin/drivers', () => {
 
     expect(response.status).toBe(200)
     expect(data.success).toBe(true)
-    expect(data.driver.name).toBe('Motorista Teste')
+    expect(data.motorista.name).toBe('Motorista Teste')
   })
 
   it('deve validar nome obrigatório', async () => {

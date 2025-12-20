@@ -30,10 +30,10 @@ import { Badge } from "@/components/ui/badge"
 import dynamic from "next/dynamic"
 
 // Lazy load seções pesadas
-const DriverCompensationSection = dynamic(() => import("@/components/driver/driver-compensation-section"), { ssr: false })
-const DriverDocumentsSection = dynamic(() => import("@/components/driver/driver-documents-section"), { ssr: false })
+const DriverCompensationSection = dynamic(() => import("@/components/motorista/motorista-compensation-section"), { ssr: false })
+const DriverDocumentsSection = dynamic(() => import("@/components/motorista/motorista-documents-section"), { ssr: false })
 
-interface Driver {
+interface motorista {
   id?: string
   name: string
   email: string
@@ -64,21 +64,21 @@ interface DriverDocument {
   is_valid?: boolean
 }
 
-interface Carrier {
+interface transportadora {
   id: string
   name: string
 }
 
 interface DriverModalProps {
-  driver: Driver | null
+  motorista: motorista | null
   isOpen: boolean
   onClose: () => void
   onSave: () => void
-  carriers?: Carrier[]
+  carriers?: transportadora[]
 }
 
-export function DriverModal({ driver, isOpen, onClose, onSave, carriers = [] }: DriverModalProps) {
-  const [formData, setFormData] = useState<Driver>({
+export function DriverModal({ motorista, isOpen, onClose, onSave, carriers = [] }: DriverModalProps) {
+  const [formData, setFormData] = useState<motorista>({
     name: "",
     email: "",
     phone: "",
@@ -90,9 +90,9 @@ export function DriverModal({ driver, isOpen, onClose, onSave, carriers = [] }: 
   const { sync } = useSupabaseSync({ showToast: false })
 
   useEffect(() => {
-    if (driver) {
+    if (motorista) {
       setFormData({
-        ...driver,
+        ...motorista,
         address_zip_code: motorista.address_zip_code || '',
         address_street: motorista.address_street || '',
         address_number: motorista.address_number || '',
@@ -101,7 +101,7 @@ export function DriverModal({ driver, isOpen, onClose, onSave, carriers = [] }: 
         address_city: motorista.address_city || '',
         address_state: motorista.address_state || '',
       })
-      loadDriverData(driver.id!)
+      loadDriverData(motorista.id!)
     } else {
       setFormData({
         name: "",
@@ -122,7 +122,7 @@ export function DriverModal({ driver, isOpen, onClose, onSave, carriers = [] }: 
       })
       setDocuments([])
     }
-  }, [driver, isOpen])
+  }, [motorista, isOpen])
 
   const loadDriverData = async (driverId: string) => {
     try {
@@ -151,7 +151,7 @@ export function DriverModal({ driver, isOpen, onClose, onSave, carriers = [] }: 
         role: "motorista"
       }
 
-      if (driver?.id) {
+      if (motorista?.id) {
         const { error } = await (supabase as any)
           .from("users")
           .update(driverData)
@@ -162,7 +162,7 @@ export function DriverModal({ driver, isOpen, onClose, onSave, carriers = [] }: 
         // Sincronização com Supabase (garantia adicional)
         await sync({
           resourceType: 'motorista',
-          resourceId: driver.id,
+          resourceId: motorista.id,
           action: 'update',
           data: driverData,
         })
@@ -194,7 +194,7 @@ export function DriverModal({ driver, isOpen, onClose, onSave, carriers = [] }: 
           throw new Error(msg)
         }
 
-        const newDriverId = body.driver?.id || body.userId
+        const newDriverId = body.motorista?.id || body.userId
         if (!newDriverId) {
           throw new Error('Falha ao obter ID do motorista criado')
         }
@@ -222,7 +222,7 @@ export function DriverModal({ driver, isOpen, onClose, onSave, carriers = [] }: 
   }
 
   const handleDocumentUpload = async (type: DriverDocument['document_type'], file: File) => {
-    if (!driver?.id) {
+    if (!motorista?.id) {
       notifyError('', undefined, { i18n: { ns: 'common', key: 'validation.saveDriverFirst' } })
       return
     }
@@ -250,7 +250,7 @@ export function DriverModal({ driver, isOpen, onClose, onSave, carriers = [] }: 
       const { error: docError } = await (supabase as any)
         .from("gf_driver_documents")
         .insert({
-          driver_id: driver.id,
+          driver_id: motorista.id,
           document_type: type,
           file_url: publicUrl,
           file_name: file.name
@@ -259,7 +259,7 @@ export function DriverModal({ driver, isOpen, onClose, onSave, carriers = [] }: 
       if (docError) throw docError
 
       notifySuccess('', { i18n: { ns: 'common', key: 'success.documentUploaded' } })
-      loadDriverData(driver.id)
+      loadDriverData(motorista.id)
     } catch (error: any) {
       console.error("Erro ao fazer upload:", error)
       notifyError(error, t('common', 'errors.documentUpload'))
@@ -364,9 +364,9 @@ export function DriverModal({ driver, isOpen, onClose, onSave, carriers = [] }: 
                           <SelectValue placeholder="Selecione a transportadora" />
                         </SelectTrigger>
                         <SelectContent>
-                          {carriers.map((carrier) => (
-                            <SelectItem key={carrier.id} value={carrier.id}>
-                              {carrier.name}
+                          {carriers.map((transportadora) => (
+                            <SelectItem key={transportadora.id} value={transportadora.id}>
+                              {transportadora.name}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -534,7 +534,7 @@ export function DriverModal({ driver, isOpen, onClose, onSave, carriers = [] }: 
                 <Button
                   type="submit"
                   disabled={loading}
-                  className="w-full sm:w-auto order-1 sm:order-2 bg-orange-500 hover:bg-orange-600 min-h-[44px] text-base font-medium touch-manipulation"
+                  className="w-full sm:w-auto order-1 sm:order-2 bg-brand hover:bg-orange-600 min-h-[44px] text-base font-medium touch-manipulation"
                 >
                   {loading ? "Salvando..." : motorista ? "Atualizar" : "Cadastrar"}
                 </Button>
@@ -544,15 +544,15 @@ export function DriverModal({ driver, isOpen, onClose, onSave, carriers = [] }: 
 
           <TabsContent value="documentos">
             <DriverDocumentsSection
-              driverId={driver?.id ?? formData.id}
-              isEditing={!!driver?.id || !!formData.id}
+              driverId={motorista?.id ?? formData.id}
+              isEditing={!!motorista?.id || !!formData.id}
             />
           </TabsContent>
 
           <TabsContent value="salario">
             <DriverCompensationSection
-              driverId={driver?.id ?? formData.id}
-              isEditing={!!driver?.id || !!formData.id}
+              driverId={motorista?.id ?? formData.id}
+              isEditing={!!motorista?.id || !!formData.id}
             />
           </TabsContent>
         </Tabs>

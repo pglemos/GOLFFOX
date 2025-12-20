@@ -133,7 +133,7 @@ export default function PassengerDashboard() {
 
                     <Button
                         mode="contained"
-                        onPress={() => router.push('/passenger/map')}
+                        onPress={() => router.push('/passageiro/map')}
                         style={styles.trackBtn}
                         buttonColor="#F97316"
                         icon="map-marker"
@@ -151,28 +151,28 @@ export default function PassengerDashboard() {
             {/* Ações Rápidas */}
             <Text style={styles.sectionTitle}>Ações Rápidas</Text>
             <View style={styles.actionsGrid}>
-                <Pressable style={styles.actionCard} onPress={() => router.push('/passenger/checkin')}>
+                <Pressable style={styles.actionCard} onPress={() => router.push('/passageiro/checkin')}>
                     <View style={[styles.actionIcon, { backgroundColor: '#FFF7ED' }]}>
                         <Ionicons name="qr-code" size={28} color="#F97316" />
                     </View>
                     <Text style={styles.actionLabel}>Check-in</Text>
                 </Pressable>
 
-                <Pressable style={styles.actionCard} onPress={() => router.push('/passenger/map')}>
+                <Pressable style={styles.actionCard} onPress={() => router.push('/passageiro/map')}>
                     <View style={[styles.actionIcon, { backgroundColor: '#DBEAFE' }]}>
                         <Ionicons name="location" size={28} color="#3B82F6" />
                     </View>
                     <Text style={styles.actionLabel}>Localizar</Text>
                 </Pressable>
 
-                <Pressable style={styles.actionCard} onPress={() => router.push('/passenger/feedback')}>
+                <Pressable style={styles.actionCard} onPress={() => router.push('/passageiro/feedback')}>
                     <View style={[styles.actionIcon, { backgroundColor: '#FEF3C7' }]}>
                         <Ionicons name="star" size={28} color="#F59E0B" />
                     </View>
                     <Text style={styles.actionLabel}>Avaliar</Text>
                 </Pressable>
 
-                <Pressable style={styles.actionCard} onPress={() => router.push('/passenger/details')}>
+                <Pressable style={styles.actionCard} onPress={() => router.push('/passageiro/details')}>
                     <View style={[styles.actionIcon, { backgroundColor: '#F1F5F9' }]}>
                         <Ionicons name="list" size={28} color="#64748B" />
                     </View>

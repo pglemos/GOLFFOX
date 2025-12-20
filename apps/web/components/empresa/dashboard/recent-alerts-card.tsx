@@ -38,8 +38,8 @@ export function RecentAlertsCard({ companyId }: RecentAlertsCardProps) {
     return (
         <Card className="h-full bg-white/50 backdrop-blur-sm border-orange-100/50">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-                    <AlertTriangle className="h-5 w-5 text-orange-500" />
+                <CardTitle className="text-lg font-semibold text-ink-strong flex items-center gap-2">
+                    <AlertTriangle className="h-5 w-5 text-brand" />
                     Alertas Recentes
                 </CardTitle>
                 <Button variant="ghost" size="sm" onClick={() => router.push('/empresa/alertas')} className="text-xs">
@@ -49,27 +49,27 @@ export function RecentAlertsCard({ companyId }: RecentAlertsCardProps) {
             <CardContent>
                 {isLoading ? (
                     <div className="space-y-4">
-                        {[1, 2, 3].map(i => <div key={i} className="h-16 bg-gray-100 animate-pulse rounded-md" />)}
+                        {[1, 2, 3].map(i => <div key={i} className="h-16 bg-muted animate-pulse rounded-md" />)}
                     </div>
                 ) : alerts.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
-                        <CheckCircle className="h-8 w-8 mb-2 text-green-500 opacity-50" />
+                        <CheckCircle className="h-8 w-8 mb-2 text-success opacity-50" />
                         <p className="text-sm">Tudo operando normalmente</p>
                     </div>
                 ) : (
                     <div className="space-y-3">
                         {alerts.map((alert: any) => (
                             <div key={alert.id} className="p-3 bg-white rounded-lg border border-gray-100 shadow-sm flex items-start gap-3">
-                                <div className={`mt-0.5 p-1.5 rounded-full flex-shrink-0 ${alert.severity === 'critical' ? 'bg-red-100 text-red-600' :
-                                        alert.severity === 'warning' ? 'bg-orange-100 text-orange-600' : 'bg-blue-100 text-blue-600'
+                                <div className={`mt-0.5 p-1.5 rounded-full flex-shrink-0 ${alert.severity === 'critical' ? 'bg-error-light text-error' :
+                                        alert.severity === 'warning' ? 'bg-orange-100 text-orange-600' : 'bg-info-light text-info'
                                     }`}>
                                     <AlertTriangle className="h-3.5 w-3.5" />
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                    <p className="text-sm font-medium text-gray-900 truncate pr-2" title={alert.message}>
+                                    <p className="text-sm font-medium text-ink-strong truncate pr-2" title={alert.message}>
                                         {alert.message}
                                     </p>
-                                    <div className="flex items-center gap-3 mt-1 text-xs text-gray-500">
+                                    <div className="flex items-center gap-3 mt-1 text-xs text-ink-muted">
                                         <span className="flex items-center gap-1">
                                             <Clock className="h-3 w-3" />
                                             {formatDistanceToNow(new Date(alert.created_at), { addSuffix: true, locale: ptBR })}

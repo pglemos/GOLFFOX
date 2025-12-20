@@ -98,13 +98,13 @@ export function OperationalAlertsNotification() {
   const getSeverityIcon = (severity: OperationalAlert['severity']) => {
     switch (severity) {
       case 'critical':
-        return <XCircle className="h-4 w-4 text-red-600" />
+        return <XCircle className="h-4 w-4 text-error" />
       case 'error':
-        return <AlertCircle className="h-4 w-4 text-red-500" />
+        return <AlertCircle className="h-4 w-4 text-error" />
       case 'warning':
-        return <AlertTriangle className="h-4 w-4 text-yellow-500" />
+        return <AlertTriangle className="h-4 w-4 text-warning" />
       case 'info':
-        return <Info className="h-4 w-4 text-blue-500" />
+        return <Info className="h-4 w-4 text-info" />
       default:
         return <AlertCircle className="h-4 w-4" />
     }
@@ -113,15 +113,15 @@ export function OperationalAlertsNotification() {
   const getSeverityColor = (severity: OperationalAlert['severity']) => {
     switch (severity) {
       case 'critical':
-        return 'bg-red-100 text-red-800 border-red-200'
+        return 'bg-error-light text-error border-error-light'
       case 'error':
-        return 'bg-red-50 text-red-700 border-red-100'
+        return 'bg-error-light text-error border-red-100'
       case 'warning':
-        return 'bg-yellow-50 text-yellow-700 border-yellow-100'
+        return 'bg-warning-light text-warning border-yellow-100'
       case 'info':
-        return 'bg-blue-50 text-blue-700 border-blue-100'
+        return 'bg-info-light text-info border-blue-100'
       default:
-        return 'bg-gray-50 text-gray-700 border-gray-100'
+        return 'bg-bg-soft text-ink-strong border-gray-100'
     }
   }
 

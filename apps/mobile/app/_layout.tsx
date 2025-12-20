@@ -67,8 +67,8 @@ export default function RootLayout() {
                     >
                         <Stack.Screen name="index" options={{ headerShown: false }} />
                         <Stack.Screen name="login" options={{ title: 'Entrar' }} />
-                        <Stack.Screen name="driver" options={{ headerShown: false }} />
-                        <Stack.Screen name="passenger" options={{ headerShown: false }} />
+                        <Stack.Screen name="motorista" options={{ headerShown: false }} />
+                        <Stack.Screen name="passageiro" options={{ headerShown: false }} />
                     </Stack>
                 </AuthProvider>
             </PaperProvider>

@@ -117,9 +117,9 @@ export function UserNotifications() {
                                     <div className="flex gap-3">
                                         <div className={cn(
                                             "mt-1 h-2 w-2 rounded-full flex-shrink-0",
-                                            notification.type === 'error' ? "bg-red-500" :
-                                                notification.type === 'warning' ? "bg-yellow-500" :
-                                                    notification.type === 'success' ? "bg-green-500" : "bg-blue-500"
+                                            notification.type === 'error' ? "bg-error-light0" :
+                                                notification.type === 'warning' ? "bg-warning-light0" :
+                                                    notification.type === 'success' ? "bg-success-light0" : "bg-info-light0"
                                         )} />
                                         <div className="flex-1 space-y-1">
                                             <p className={cn("text-sm font-medium leading-none", !notification.is_read && "font-semibold")}>

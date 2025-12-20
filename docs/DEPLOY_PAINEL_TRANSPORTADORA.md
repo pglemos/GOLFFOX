@@ -19,7 +19,7 @@
 SELECT table_name 
 FROM information_schema.tables 
 WHERE table_schema = 'public' 
-AND (table_name LIKE '%motorista%' OR table_name LIKE '%vehicle%' OR table_name LIKE '%route_cost%')
+AND (table_name LIKE '%motorista%' OR table_name LIKE '%veiculo%' OR table_name LIKE '%route_cost%')
 ORDER BY table_name;
 ```
 
@@ -112,7 +112,7 @@ O Vercel fará o deploy automaticamente após o push.
 
 Após o deploy, verifique:
 
-1. **Login como Carrier:**
+1. **Login como transportadora:**
    - Acesse: https://golffox.vercel.app
    - Faça login com uma conta de role `transportadora`
    - Deve redirecionar para `/transportadora`
@@ -212,8 +212,8 @@ Antes de considerar o deploy completo, verifique:
 - [ ] Função `gf_map_snapshot_full` foi atualizada com campo `capacity`
 - [ ] Dependência `recharts` está instalada no frontend
 - [ ] Deploy no Vercel foi concluído
-- [ ] Login como carrier funciona
-- [ ] Todas as páginas do carrier abrem corretamente
+- [ ] Login como transportadora funciona
+- [ ] Todas as páginas do transportadora abrem corretamente
 - [ ] Upload de arquivos funciona
 - [ ] Mapa em tempo real funciona
 

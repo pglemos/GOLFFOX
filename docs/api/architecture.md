@@ -1,20 +1,20 @@
 # GolfFox Transport Management System - Architecture Plan
 
 ## Executive Summary
-This document outlines the comprehensive architecture for GolfFox, a transport management system with multi-persona apps (Driver/Passenger Flutter apps) and admin dashboards (Next.js), backed by Supabase with real-time tracking, RLS security, and modern UX.
+This document outlines the comprehensive architecture for GolfFox, a transport management system with multi-persona apps (motorista/passageiro Flutter apps) and admin dashboards (Next.js), backed by Supabase with real-time tracking, RLS security, and modern UX.
 
 ## System Overview
-- **Flutter Apps**: Driver & Passenger mobile applications
+- **Flutter Apps**: motorista & passageiro mobile applications
 - **Backend**: Supabase (PostgreSQL + Auth + Realtime)
 - **Architecture**: Multi-persona role-based access control
 - **Real-time**: GPS tracking, trip status updates, chat/incidents
 
 ## Core Personas & Access Patterns
 1. **Admin**: Global KPIs, system management, trip reopening with force
-2. **Operator**: Daily timeline, incident management, quick actions
-3. **Carrier**: Fleet health, driver/passenger communication, route monitoring
-4. **Driver**: Trip management, GPS tracking transmission, status transitions
-5. **Passenger**: Trip tracking, real-time updates, incident reporting
+2. **operador**: Daily timeline, incident management, quick actions
+3. **transportadora**: Fleet health, motorista/passageiro communication, route monitoring
+4. **motorista**: Trip management, GPS tracking transmission, status transitions
+5. **passageiro**: Trip tracking, real-time updates, incident reporting
 
 ## Data Models & Relationships
 
@@ -35,16 +35,16 @@ users (1) ←→ (N) chat_messages
 
 ### Security Model (RLS)
 - **Minimum Privilege**: Users see only data within their scope
-- **Driver**: Own positions and assigned trips
+- **motorista**: Own positions and assigned trips
 - **passageiro**: Trips they're enrolled in
-- **Operator/Admin**: Company-scoped data
-- **Carrier**: Carrier-scoped data
+- **operador/Admin**: Company-scoped data
+- **transportadora**: transportadora-scoped data
 
 ## Technical Implementation Plan
 
 ### Phase 1: Foundation & Data Layer
 1. **Data Models** (`lib/models/`)
-   - User, Company, Carrier, Vehicle, Route
+   - User, Company, transportadora, veiculo, Route
    - Trip, DriverPosition, TripEvent, TripSummary
    - TripPassenger, PassengerReport, ChatMessage
 
@@ -59,7 +59,7 @@ users (1) ←→ (N) chat_messages
 1. **AuthManager Interface**
    - Sign in/out flows
    - Role detection & storage
-   - Company/carrier context retrieval
+   - Company/transportadora context retrieval
 
 2. **Route Guards**
    - Persona-based screen routing
@@ -67,19 +67,19 @@ users (1) ←→ (N) chat_messages
    - Session management
 
 ### Phase 3: Core Features
-1. **Driver Features**
+1. **motorista Features**
    - Trip status management (scheduled → inProgress → completed)
    - Real-time GPS transmission (10s intervals)
    - Offline queue with backoff retry
    - RPC integration for status transitions
 
-2. **Passenger Features**
+2. **passageiro Features**
    - Real-time trip tracking
-   - Driver position visualization
+   - motorista position visualization
    - Incident reporting
    - Chat functionality
 
-3. **Admin/Operator Features**
+3. **Admin/operador Features**
    - Trip monitoring dashboard
    - Incident management
    - Trip reopening with force override
@@ -112,7 +112,7 @@ users (1) ←→ (N) chat_messages
    - Empty states & loading skeletons
 
 ## Security Considerations
-- **RLS Policies**: Enforce data isolation by role/company/carrier
+- **RLS Policies**: Enforce data isolation by role/company/transportadora
 - **API Security**: Validate all inputs, use prepared statements
 - **Real-time Security**: Channel-level permissions for Supabase Realtime
 - **Offline Security**: Encrypt sensitive data in local storage

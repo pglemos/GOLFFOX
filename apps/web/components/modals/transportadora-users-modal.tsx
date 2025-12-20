@@ -10,13 +10,13 @@ import { UserPlus, Trash2 } from "lucide-react"
 import { notifySuccess, notifyError } from "@/lib/toast"
 
 interface TransportadoraUsersModalProps {
-  carrier: { id: string; name: string }
+  transportadora: { id: string; name: string }
   isOpen: boolean
   onClose: () => void
   onSave: () => void
 }
 
-export function TransportadoraUsersModal({ carrier, isOpen, onClose, onSave }: TransportadoraUsersModalProps) {
+export function TransportadoraUsersModal({ transportadora, isOpen, onClose, onSave }: TransportadoraUsersModalProps) {
   const [users, setUsers] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
   const [showCreateForm, setShowCreateForm] = useState(false)
@@ -25,10 +25,10 @@ export function TransportadoraUsersModal({ carrier, isOpen, onClose, onSave }: T
   const [newUserPassword, setNewUserPassword] = useState("")
 
   useEffect(() => {
-    if (isOpen && carrier) {
+    if (isOpen && transportadora) {
       loadUsers()
     }
-  }, [isOpen, carrier])
+  }, [isOpen, transportadora])
 
   const loadUsers = async () => {
     try {
@@ -54,7 +54,7 @@ export function TransportadoraUsersModal({ carrier, isOpen, onClose, onSave }: T
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          transportadora_id: carrier.id,
+          transportadora_id: transportadora.id,
           email: newUserEmail,
           name: newUserName,
           password: newUserPassword,
@@ -178,7 +178,7 @@ export function TransportadoraUsersModal({ carrier, isOpen, onClose, onSave }: T
                   >
                     Cancelar
                   </Button>
-                  <Button type="submit" disabled={loading} className="w-full sm:w-auto order-1 sm:order-2 bg-orange-500 hover:bg-orange-600 min-h-[44px] text-base font-medium">
+                  <Button type="submit" disabled={loading} className="w-full sm:w-auto order-1 sm:order-2 bg-brand hover:bg-orange-600 min-h-[44px] text-base font-medium">
                     {loading ? 'Criando...' : 'Criar Usuário'}
                   </Button>
                 </div>

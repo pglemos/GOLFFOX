@@ -180,7 +180,7 @@ export function CostFilters({
               <div className="space-y-2">
                 <Label>Rota</Label>
                 <select
-                  className="w-full min-h-[44px] px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm touch-manipulation"
+                  className="w-full min-h-[44px] px-3 py-2 rounded-lg border border-border bg-white text-sm touch-manipulation"
                   value={tempFilters.route_id || ''}
                   onChange={(e) => handleTempFilterChange('route_id', e.target.value || undefined)}
                 >
@@ -197,13 +197,13 @@ export function CostFilters({
               <div className="space-y-2">
                 <Label>Veículo</Label>
                 <select
-                  className="w-full px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm"
+                  className="w-full px-3 py-2 rounded-lg border border-border bg-white text-sm"
                   value={tempFilters.vehicle_id || ''}
                   onChange={(e) => handleTempFilterChange('vehicle_id', e.target.value || undefined)}
                 >
                   <option value="">Todos os veículos</option>
-                  {vehicles.map(vehicle => (
-                    <option key={vehicle.id} value={vehicle.id}>{vehicle.plate}</option>
+                  {vehicles.map(veiculo => (
+                    <option key={veiculo.id} value={veiculo.id}>{veiculo.plate}</option>
                   ))}
                 </select>
               </div>
@@ -214,13 +214,13 @@ export function CostFilters({
               <div className="space-y-2">
                 <Label>Motorista</Label>
                 <select
-                  className="w-full px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm"
+                  className="w-full px-3 py-2 rounded-lg border border-border bg-white text-sm"
                   value={tempFilters.driver_id || ''}
                   onChange={(e) => handleTempFilterChange('driver_id', e.target.value || undefined)}
                 >
                   <option value="">Todos os motoristas</option>
-                  {drivers.map(driver => (
-                    <option key={driver.id} value={driver.id}>{driver.email}</option>
+                  {drivers.map(motorista => (
+                    <option key={motorista.id} value={motorista.id}>{motorista.email}</option>
                   ))}
                 </select>
               </div>
@@ -231,7 +231,7 @@ export function CostFilters({
               <div className="space-y-2">
                 <Label>Grupo de Custo</Label>
                 <select
-                  className="w-full px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm"
+                  className="w-full px-3 py-2 rounded-lg border border-border bg-white text-sm"
                   value={tempFilters.group_name || ''}
                   onChange={(e) => handleTempFilterChange('group_name', e.target.value || undefined)}
                 >
@@ -248,7 +248,7 @@ export function CostFilters({
               <div className="space-y-2">
                 <Label>Categoria</Label>
                 <select
-                  className="w-full px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm"
+                  className="w-full px-3 py-2 rounded-lg border border-border bg-white text-sm"
                   value={tempFilters.category_id || ''}
                   onChange={(e) => handleTempFilterChange('category_id', e.target.value || undefined)}
                 >
@@ -267,13 +267,13 @@ export function CostFilters({
               <div className="space-y-2">
                 <Label>Transportadora</Label>
                 <select
-                  className="w-full px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm"
+                  className="w-full px-3 py-2 rounded-lg border border-border bg-white text-sm"
                   value={tempFilters.carrier_id || ''}
                   onChange={(e) => handleTempFilterChange('carrier_id', e.target.value || undefined)}
                 >
                   <option value="">Todas as transportadoras</option>
-                  {carriers.map(carrier => (
-                    <option key={carrier.id} value={carrier.id}>{carrier.name}</option>
+                  {carriers.map(transportadora => (
+                    <option key={transportadora.id} value={transportadora.id}>{transportadora.name}</option>
                   ))}
                 </select>
               </div>

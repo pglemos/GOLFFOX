@@ -38,15 +38,15 @@ export class FuncionariosErrorBoundary extends Component<Props, State> {
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen flex items-center justify-center p-4 bg-gray-50">
+        <div className="min-h-screen flex items-center justify-center p-4 bg-bg-soft">
           <Card className="p-8 max-w-md w-full text-center">
-            <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-            <h2 className="text-xl font-bold mb-2 text-red-600">Erro inesperado</h2>
-            <p className="text-gray-600 mb-4">
+            <AlertCircle className="h-12 w-12 text-error mx-auto mb-4" />
+            <h2 className="text-xl font-bold mb-2 text-error">Erro inesperado</h2>
+            <p className="text-ink-muted mb-4">
               Ocorreu um erro ao carregar a página de funcionários.
             </p>
             {this.state.error && (
-              <details className="text-left text-sm text-gray-500 mb-4 bg-gray-50 p-4 rounded">
+              <details className="text-left text-sm text-ink-muted mb-4 bg-bg-soft p-4 rounded">
                 <summary className="cursor-pointer font-medium mb-2">Detalhes do erro:</summary>
                 <pre className="whitespace-pre-wrap text-xs mt-2">
                   {this.state.error.message}

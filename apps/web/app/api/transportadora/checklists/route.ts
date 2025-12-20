@@ -23,8 +23,8 @@ export async function GET(request: NextRequest) {
             .from('vehicle_checklists' as any)
             .select(`
                 *,
-                driver:users!driver_id(id, name, phone),
-                vehicle:vehicles(id, plate, model),
+                motorista:users!driver_id(id, name, phone),
+                veiculo:vehicles(id, plate, model),
                 trip:trips(id, scheduled_date, route:routes(name))
             `)
             .order('created_at', { ascending: false })

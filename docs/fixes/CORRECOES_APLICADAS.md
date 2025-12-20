@@ -12,7 +12,7 @@
 
 **Mudanças:**
 - Adicionada validação de autenticação via cookies do Supabase
-- Validação de role do usuário (operator/admin) antes de permitir acesso
+- Validação de role do usuário (operador/admin) antes de permitir acesso
 - Redirecionamento para `/login` se não autenticado
 - Redirecionamento para `/unauthorized` se role incorreto
 - Proteção aplicada a `/admin/*` e `/operador/*`
@@ -135,7 +135,7 @@
 
 ### Curto Prazo (30 dias)
 - Migrar JWT de localStorage para httpOnly cookies (`@supabase/ssr`)
-- Adicionar testes E2E para fluxos críticos (operator)
+- Adicionar testes E2E para fluxos críticos (operador)
 - Configurar domain restriction para Google Maps API no GCP
 - Implementar timeline no mapa (requisito funcional)
 
@@ -146,15 +146,15 @@
 ### Teste Manual - Middleware Auth
 ```bash
 # 1. Sem autenticação
-curl -I http://localhost:3000/operator
-# Esperado: 307 Redirect para /login?redirect=/operator
+curl -I http://localhost:3000/operador
+# Esperado: 307 Redirect para /login?redirect=/operador
 
 # 2. Com token inválido
-curl -I http://localhost:3000/operator \
+curl -I http://localhost:3000/operador \
   -H "Cookie: sb-access-token=invalid"
 # Esperado: 307 Redirect para /login
 
-# 3. Com role incorreto (operator tentando acessar /admin)
+# 3. Com role incorreto (operador tentando acessar /admin)
 # Esperado: 307 Redirect para /unauthorized
 ```
 

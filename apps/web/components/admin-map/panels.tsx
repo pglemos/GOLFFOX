@@ -12,10 +12,10 @@ import { Badge } from '@/components/ui/badge'
 import { X, Navigation, LifeBuoy, History, Clock, Users, MapPin } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { modalContent } from '@/lib/animations'
-import type { Vehicle, RoutePolyline, Alert } from './admin-map'
+import type { veiculo, RoutePolyline, Alert } from './admin-map'
 
 interface VehiclePanelProps {
-  vehicle: Vehicle
+  veiculo: veiculo
   onClose: () => void
   onFollow: () => void
   onDispatch: () => void
@@ -23,7 +23,7 @@ interface VehiclePanelProps {
 }
 
 export const VehiclePanel = memo(function VehiclePanel({
-  vehicle,
+  veiculo,
   onClose,
   onFollow,
   onDispatch,
@@ -40,8 +40,8 @@ export const VehiclePanel = memo(function VehiclePanel({
       <Card className="p-3 sm:p-6 bg-card/50 backdrop-blur-sm border-border shadow-lg sm:shadow-2xl">
         <div className="flex items-start justify-between mb-4 sm:mb-6">
           <div className="flex-1 min-w-0 pr-2">
-            <h3 className="font-bold text-lg sm:text-xl truncate">{vehicle.plate}</h3>
-            <p className="text-sm text-ink-muted truncate">{vehicle.model}</p>
+            <h3 className="font-bold text-lg sm:text-xl truncate">{veiculo.plate}</h3>
+            <p className="text-sm text-ink-muted truncate">{veiculo.model}</p>
           </div>
           <Button size="icon" variant="ghost" onClick={onClose}>
             <X className="h-4 w-4" />
@@ -51,40 +51,40 @@ export const VehiclePanel = memo(function VehiclePanel({
         <div className="space-y-3 sm:space-y-4 text-sm">
           <div>
             <span className="text-ink-muted block mb-1">Motorista:</span>
-            <p className="font-semibold truncate">{vehicle.driver_name}</p>
+            <p className="font-semibold truncate">{veiculo.driver_name}</p>
           </div>
 
           <div>
             <span className="text-ink-muted block mb-1">Empresa:</span>
-            <p className="font-semibold truncate">{vehicle.company_name}</p>
+            <p className="font-semibold truncate">{veiculo.company_name}</p>
           </div>
 
           <div>
             <span className="text-ink-muted block mb-1">Rota:</span>
-            <p className="font-semibold truncate">{vehicle.route_name}</p>
+            <p className="font-semibold truncate">{veiculo.route_name}</p>
           </div>
 
           <div>
             <span className="text-ink-muted block mb-2">Status:</span>
             <Badge
               variant={
-                (vehicle.vehicle_status === 'moving'
+                (veiculo.vehicle_status === 'moving'
                   ? 'default'
-                  : vehicle.vehicle_status === 'stopped_long'
+                  : veiculo.vehicle_status === 'stopped_long'
                   ? 'destructive'
                   : 'outline') as 'default' | 'destructive' | 'outline' | 'secondary'
               }
               className={
-                vehicle.vehicle_status !== 'moving' && vehicle.vehicle_status !== 'stopped_long'
-                  ? 'border-yellow-500 text-yellow-700'
+                veiculo.vehicle_status !== 'moving' && veiculo.vehicle_status !== 'stopped_long'
+                  ? 'border-warning text-warning'
                   : ''
               }
             >
-              {vehicle.vehicle_status === 'moving'
+              {veiculo.vehicle_status === 'moving'
                 ? 'Em Movimento'
-                : vehicle.vehicle_status === 'stopped_long'
+                : veiculo.vehicle_status === 'stopped_long'
                 ? 'Parado (>3min)'
-                : vehicle.vehicle_status === 'stopped_short'
+                : veiculo.vehicle_status === 'stopped_short'
                 ? 'Parado (<2min)'
                 : 'Na Garagem'}
             </Badge>
@@ -94,13 +94,13 @@ export const VehiclePanel = memo(function VehiclePanel({
             <Users className="h-4 w-4 text-ink-muted" />
             <div>
               <span className="text-ink-muted block text-xs">Passageiros</span>
-              <span className="font-semibold">{vehicle.passenger_count || 0}</span>
+              <span className="font-semibold">{veiculo.passenger_count || 0}</span>
             </div>
             <Clock className="h-4 w-4 text-ink-muted" />
             <div>
               <span className="text-ink-muted block text-xs">Velocidade</span>
               <span className="font-semibold">
-                {vehicle.speed ? `${(vehicle.speed * 3.6).toFixed(0)} km/h` : 'Parado'}
+                {veiculo.speed ? `${(veiculo.speed * 3.6).toFixed(0)} km/h` : 'Parado'}
               </span>
             </div>
           </div>
@@ -233,7 +233,7 @@ export const AlertsPanel = memo(function AlertsPanel({ alerts, onClose }: Alerts
               <div className="flex items-start justify-between mb-1 sm:mb-2 gap-2">
                 <Badge
                   variant={(alert.severity === 'critical' ? 'destructive' : 'outline') as 'default' | 'destructive' | 'outline' | 'secondary'}
-                  className={`text-xs ${alert.severity !== 'critical' ? 'border-yellow-500 text-yellow-700' : ''}`}
+                  className={`text-xs ${alert.severity !== 'critical' ? 'border-warning text-warning' : ''}`}
                 >
                   {alert.alert_type === 'incident' ? 'Incidente' : 'Socorro'}
                 </Badge>

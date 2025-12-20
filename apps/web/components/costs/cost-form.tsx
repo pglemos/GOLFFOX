@@ -228,7 +228,7 @@ export function CostForm({
         <Card>
             <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                    <DollarSign className="h-5 w-5 text-orange-500" />
+                    <DollarSign className="h-5 w-5 text-brand" />
                     Novo Custo
                 </CardTitle>
             </CardHeader>
@@ -262,7 +262,7 @@ export function CostForm({
                             {...form.register("description")}
                         />
                         {form.formState.errors.description && (
-                            <p className="text-xs text-red-500">{form.formState.errors.description.message}</p>
+                            <p className="text-xs text-error">{form.formState.errors.description.message}</p>
                         )}
                     </div>
 
@@ -283,7 +283,7 @@ export function CostForm({
                                 />
                             </div>
                             {form.formState.errors.amount && (
-                                <p className="text-xs text-red-500">{form.formState.errors.amount.message}</p>
+                                <p className="text-xs text-error">{form.formState.errors.amount.message}</p>
                             )}
                         </div>
 
@@ -373,7 +373,7 @@ export function CostForm({
                     <div className="space-y-4 p-4 border rounded-lg">
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
-                                <RotateCw className="h-4 w-4 text-blue-500" />
+                                <RotateCw className="h-4 w-4 text-info" />
                                 <Label htmlFor="isRecurring">Custo recorrente</Label>
                             </div>
                             <Switch
@@ -443,7 +443,7 @@ export function CostForm({
                         {attachment ? (
                             <div className="flex items-center justify-between p-3 border rounded-lg bg-muted/50">
                                 <div className="flex items-center gap-2 truncate">
-                                    <FileText className="h-4 w-4 text-blue-500" />
+                                    <FileText className="h-4 w-4 text-info" />
                                     <span className="text-sm truncate">{attachment.name}</span>
                                     <span className="text-xs text-muted-foreground">
                                         ({(attachment.size / 1024).toFixed(1)} KB)

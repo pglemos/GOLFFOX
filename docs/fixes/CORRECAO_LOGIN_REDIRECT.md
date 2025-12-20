@@ -9,7 +9,7 @@
 
 Após o login, o sistema estava redirecionando para:
 ```
-❌ /operator?company=11111111-1111-4111-8111-1111111111c1
+❌ /operador?company=11111111-1111-4111-8111-1111111111c1
 ```
 
 Isso causava:
@@ -125,7 +125,7 @@ export function middleware(request: NextRequest) {
 ```
 Login → redirectUrl = "/operador?company=xxx"
       → router.push(redirectUrl)
-      → /operator?company=xxx (URL suja)
+      → /operador?company=xxx (URL suja)
       → Loading infinito
 ```
 
@@ -134,7 +134,7 @@ Login → redirectUrl = "/operador?company=xxx"
 Login → redirectUrl = "/operador"
       → redirectUrl.split('?')[0] = "/operador"
       → router.push("/operador")
-      → /operator (URL limpa)
+      → /operador (URL limpa)
       → Dashboard carrega normalmente
 ```
 
@@ -146,7 +146,7 @@ Agora temos **3 camadas** de proteção:
 
 1. **Login Page** - Remove parâmetros antes do redirect
 2. **Middleware** - Intercepta e limpa URLs no servidor
-3. **Operator Page** - Remove parâmetros no cliente (fallback)
+3. **operador Page** - Remove parâmetros no cliente (fallback)
 
 ---
 
@@ -156,19 +156,19 @@ Agora temos **3 camadas** de proteção:
 ```
 Email: operador@empresa.com
 Senha: senha123
-Resultado: ✅ Redireciona para /operator (limpo)
+Resultado: ✅ Redireciona para /operador (limpo)
 ```
 
 ### Cenário 2: Login com ?next=
 ```
-URL: /login?next=/operator?company=xxx
-Resultado: ✅ Redireciona para /operator (sem parâmetros)
+URL: /login?next=/operador?company=xxx
+Resultado: ✅ Redireciona para /operador (sem parâmetros)
 ```
 
 ### Cenário 3: Acesso Direto
 ```
-URL: /operator?company=xxx
-Resultado: ✅ Middleware redireciona para /operator
+URL: /operador?company=xxx
+Resultado: ✅ Middleware redireciona para /operador
 ```
 
 ---
@@ -177,12 +177,12 @@ Resultado: ✅ Middleware redireciona para /operator
 
 **ANTES:**
 ```
-❌ Login → /operator?company=11111111-1111-4111-8111-1111111111c1
+❌ Login → /operador?company=11111111-1111-4111-8111-1111111111c1
 ```
 
 **DEPOIS:**
 ```
-✅ Login → /operator
+✅ Login → /operador
 ```
 
 ---
@@ -193,7 +193,7 @@ Resultado: ✅ Middleware redireciona para /operator
 - [x] `redirectUrl` é limpo antes do push
 - [x] `useEffect` de sessão limpa URLs
 - [x] Middleware intercepta URLs problemáticas
-- [x] Página operator remove parâmetros (fallback)
+- [x] Página operador remove parâmetros (fallback)
 - [ ] Teste manual em produção (pendente)
 - [ ] Verificar logs do Vercel (pendente)
 
@@ -267,7 +267,7 @@ O login agora redireciona corretamente para `/operador` **sem parâmetros indese
 **Proteção em 3 camadas:**
 1. ✅ Login limpa URLs antes do redirect
 2. ✅ Middleware intercepta no servidor
-3. ✅ Página operator limpa no cliente
+3. ✅ Página operador limpa no cliente
 
 ---
 

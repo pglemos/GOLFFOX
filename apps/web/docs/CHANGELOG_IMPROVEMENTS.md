@@ -33,15 +33,15 @@
 
 #### Rotas e Compatibilidade
 - ✅ **Consolidação de Rotas Duplicadas**
-  - Redirecionamentos de `/api/operator/*` → `/api/operador/*`
-  - Redirecionamentos de `/api/carrier/*` → `/api/transportadora/*`
+  - Redirecionamentos de `/api/operador/*` → `/api/operador/*`
+  - Redirecionamentos de `/api/transportadora/*` → `/api/transportadora/*`
   - Compatibilidade mantida com rotas antigas
 
 #### Testes
 - ✅ **Expansão de Testes E2E**
   - `e2e/admin/vehicles-management.spec.ts`
-  - `e2e/operator/employees-workflow.spec.ts`
-  - `e2e/carrier/drivers-management.spec.ts`
+  - `e2e/operador/employees-workflow.spec.ts`
+  - `e2e/transportadora/drivers-management.spec.ts`
   - `e2e/costs/complete-flow.spec.ts`
   - `e2e/routes/route-creation.spec.ts`
   - `e2e/map/real-time-tracking.spec.ts`
@@ -91,8 +91,8 @@
 
 #### Testes E2E
 - `e2e/admin/vehicles-management.spec.ts`
-- `e2e/operator/employees-workflow.spec.ts`
-- `e2e/carrier/drivers-management.spec.ts`
+- `e2e/operador/employees-workflow.spec.ts`
+- `e2e/transportadora/drivers-management.spec.ts`
 - `e2e/costs/complete-flow.spec.ts`
 - `e2e/routes/route-creation.spec.ts`
 - `e2e/map/real-time-tracking.spec.ts`
@@ -105,7 +105,7 @@
 ### 🔧 Arquivos Modificados
 
 #### Componentes
-- `components/operator/funcionario-modal.tsx`
+- `components/operador/funcionario-modal.tsx`
 - `components/topbar.tsx`
 - `components/app-shell.tsx`
 
@@ -114,8 +114,8 @@
 - `app/api/admin/seed-cost-categories/route.ts`
 - `app/api/admin/execute-sql-fix/route.ts`
 - `app/api/admin/fix-database/route.ts`
-- `app/api/operator/create-employee/route.ts`
-- `app/api/operator/optimize-route/route.ts`
+- `app/api/operador/create-employee/route.ts`
+- `app/api/operador/optimize-route/route.ts`
 - `app/api/health/route.ts`
 - `app/api/cep/route.ts`
 

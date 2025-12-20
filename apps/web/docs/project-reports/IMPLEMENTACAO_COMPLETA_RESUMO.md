@@ -8,7 +8,7 @@
 ## 📋 Arquivos Criados
 
 ### Scripts de Seed e Setup
-1. ✅ `scripts/seed-operator-data.js` - Seed específico para operador
+1. ✅ `scripts/seed-operador-data.js` - Seed específico para operador
 2. ✅ `scripts/seed-company-branding.js` - Configuração automática de branding
 3. ✅ `scripts/check-vercel-env.js` - Verificação de variáveis Vercel
 4. ✅ `scripts/test-cron-jobs.js` - Teste de cron jobs via HTTP

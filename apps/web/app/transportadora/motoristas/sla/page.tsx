@@ -42,8 +42,8 @@ export default function SLAMotoristaPage() {
 
     const getStatusBadge = (status: 'green' | 'yellow' | 'red') => {
         switch (status) {
-            case 'green': return <Badge className="bg-green-500">Dentro do SLA</Badge>
-            case 'yellow': return <Badge className="bg-yellow-500">Atenção</Badge>
+            case 'green': return <Badge className="bg-success-light0">Dentro do SLA</Badge>
+            case 'yellow': return <Badge className="bg-warning-light0">Atenção</Badge>
             case 'red': return <Badge variant="destructive">Crítico</Badge>
         }
     }
@@ -66,7 +66,7 @@ export default function SLAMotoristaPage() {
                     <Card>
                         <CardContent className="pt-6">
                             <div className="flex items-center gap-3">
-                                <TrendingUp className="h-8 w-8 text-green-600" />
+                                <TrendingUp className="h-8 w-8 text-success" />
                                 <div>
                                     <p className="text-sm text-muted-foreground">Taxa Média de Pontualidade</p>
                                     <p className="text-2xl font-bold">{avgOnTimeRate.toFixed(1)}%</p>
@@ -77,7 +77,7 @@ export default function SLAMotoristaPage() {
                     <Card>
                         <CardContent className="pt-6">
                             <div className="flex items-center gap-3">
-                                <AlertTriangle className="h-8 w-8 text-yellow-600" />
+                                <AlertTriangle className="h-8 w-8 text-warning" />
                                 <div>
                                     <p className="text-sm text-muted-foreground">Motoristas em Alerta</p>
                                     <p className="text-2xl font-bold">{drivers.filter(d => d.sla_status !== 'green').length}</p>
@@ -88,7 +88,7 @@ export default function SLAMotoristaPage() {
                     <Card>
                         <CardContent className="pt-6">
                             <div className="flex items-center gap-3">
-                                <Users className="h-8 w-8 text-blue-600" />
+                                <Users className="h-8 w-8 text-info" />
                                 <div>
                                     <p className="text-sm text-muted-foreground">Total de Motoristas</p>
                                     <p className="text-2xl font-bold">{drivers.length}</p>
@@ -100,8 +100,8 @@ export default function SLAMotoristaPage() {
 
                 {/* motorista List */}
                 <div className="space-y-3">
-                    {drivers.map(driver => (
-                        <Card key={driver.id}>
+                    {drivers.map(motorista => (
+                        <Card key={motorista.id}>
                             <CardContent className="p-4">
                                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                                     <div className="flex items-center gap-3">
@@ -131,7 +131,7 @@ export default function SLAMotoristaPage() {
                                             <p className="text-sm text-muted-foreground">Incidentes</p>
                                             <p className="font-medium">{motorista.incidents}</p>
                                         </div>
-                                        {getStatusBadge(driver.sla_status)}
+                                        {getStatusBadge(motorista.sla_status)}
                                     </div>
                                 </div>
                             </CardContent>

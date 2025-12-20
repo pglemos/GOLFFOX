@@ -42,7 +42,7 @@ test.describe('Critical Flows', () => {
     await page.goto('http://localhost:3000/admin/trips')
     await page.click('button:has-text("Nova Viagem")')
     await page.selectOption('select[name="route"]', 'Rota Teste')
-    await page.selectOption('select[name="vehicle"]', 'Veículo Teste')
+    await page.selectOption('select[name="veiculo"]', 'Veículo Teste')
     await page.click('button:has-text("Iniciar Viagem")')
 
     // 2. Verificar que viagem está ativa

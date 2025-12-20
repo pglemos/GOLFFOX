@@ -26,11 +26,11 @@ describe('DELETE /api/admin/transportadoras/delete', () => {
   it('deve deletar transportadora e limpar referências', async () => {
     const transportadora = createTestTransportadora()
     const user = createTestUser({ transportadora_id: transportadora.id })
-    const vehicle = createTestVehicle(transportadora.id)
+    const veiculo = createTestVehicle(transportadora.id)
 
     mockSupabaseClient.setTableData('carriers', [transportadora])
     mockSupabaseClient.setTableData('users', [user])
-    mockSupabaseClient.setTableData('vehicles', [vehicle])
+    mockSupabaseClient.setTableData('vehicles', [veiculo])
     mockSupabaseClient.setTableData('routes', [])
 
     const req = createAdminRequest({

@@ -7,7 +7,7 @@ import { test, expect } from '@playwright/test'
 test.describe('Otimização de Rotas - Operador', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/')
-    await page.fill('input[type="email"]', 'operator@test.com')
+    await page.fill('input[type="email"]', 'operador@test.com')
     await page.fill('input[type="password"]', 'senha123')
     await page.click('button:has-text("Entrar")')
     await page.waitForURL(/\/operador/)

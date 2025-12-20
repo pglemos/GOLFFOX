@@ -5,7 +5,7 @@
 ### Implementação Completa
 1. ✅ **Middleware de autenticação** (`web-app/middleware.ts`)
    - Valida sessão Supabase
-   - Autorização por role (admin/operator/carrier)
+   - Autorização por role (admin/operador/transportadora)
    - Redirecionamento automático
 
 2. ✅ **Componentes Adaptativos**
@@ -14,8 +14,8 @@
    - `AppShell`: Detecção automática de painel
 
 3. ✅ **Páginas Completas**
-   - **Operator**: funcionarios, alertas, ajuda
-   - **Carrier**: mapa, veiculos, motoristas, alertas, relatorios, ajuda
+   - **operador**: funcionarios, alertas, ajuda
+   - **transportadora**: mapa, veiculos, motoristas, alertas, relatorios, ajuda
    - **Dashboards**: Atualizados com dados reais do Supabase
 
 4. ✅ **Configuração Vercel**
@@ -75,8 +75,8 @@ git push origin main
 Após deploy completar:
 
 - 🌐 **Admin**: https://golffox.vercel.app/admin
-- 🌐 **Operator**: https://golffox.vercel.app/operator
-- 🌐 **Carrier**: https://golffox.vercel.app/carrier
+- 🌐 **operador**: https://golffox.vercel.app/operador
+- 🌐 **transportadora**: https://golffox.vercel.app/transportadora
 - 🌐 **Login**: https://golffox.vercel.app/login
 
 **Teste com:**

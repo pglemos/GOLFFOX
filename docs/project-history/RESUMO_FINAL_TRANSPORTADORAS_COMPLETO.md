@@ -13,7 +13,7 @@ Substituiu a aba "Motoristas" por "Transportadoras" no painel admin, seguindo o 
 
 **Funcionalidades:**
 - ✅ CRUD completo de transportadoras
-- ✅ Criar login de acesso (role: carrier)
+- ✅ Criar login de acesso (role: transportadora)
 - ✅ Visualizar motoristas por transportadora
 
 ### 2️⃣ Segunda Parte: Adição de Veículos
@@ -45,7 +45,7 @@ Integrou a visualização de veículos dentro da aba de transportadoras.
 ### Botões e Suas Funções
 
 1. **Editar** → Atualizar dados da transportadora
-2. **Login de Acesso** → Criar/gerenciar usuários carrier
+2. **Login de Acesso** → Criar/gerenciar usuários transportadora
 3. **Ver Motoristas** → Listar motoristas da transportadora
 4. **Ver Veículos** → Listar veículos da transportadora ⭐ NOVO
 5. **Excluir** → Remover transportadora
@@ -71,17 +71,17 @@ apps/web/app/api/admin/
 │     ├─ users/route.ts
 │     ├─ drivers/route.ts
 │     └─ vehicles/route.ts ⭐ NOVO
-└─ create-carrier-login/route.ts
+└─ create-transportadora-login/route.ts
 ```
 
 ### 📁 Componentes (5 modais)
 ```
 apps/web/components/modals/
-├─ create-carrier-modal.tsx
-├─ edit-carrier-modal.tsx
-├─ carrier-users-modal.tsx
-├─ carrier-drivers-modal.tsx
-└─ carrier-vehicles-modal.tsx ⭐ NOVO
+├─ create-transportadora-modal.tsx
+├─ edit-transportadora-modal.tsx
+├─ transportadora-users-modal.tsx
+├─ transportadora-drivers-modal.tsx
+└─ transportadora-vehicles-modal.tsx ⭐ NOVO
 ```
 
 ### 📁 Documentação (4 documentos)
@@ -197,8 +197,8 @@ apps/web/components/sidebar.tsx
 6. Clica em "Criar Novo Login"
 7. Preenche: email, nome, senha
 8. Salva
-   ✅ Usuário carrier criado
-   ✅ Pode acessar /carrier com suas credenciais
+   ✅ Usuário transportadora criado
+   ✅ Pode acessar /transportadora com suas credenciais
 ```
 
 ### Fluxo 2: Visualizar Motoristas e Veículos
@@ -223,8 +223,8 @@ apps/web/components/sidebar.tsx
 
 ```
 carriers (transportadoras)
-    ├─→ users (role: carrier) ← Login de acesso
-    ├─→ users (role: driver) ← Motoristas
+    ├─→ users (role: transportadora) ← Login de acesso
+    ├─→ users (role: motorista) ← Motoristas
     └─→ vehicles ← Veículos
 ```
 
@@ -280,10 +280,10 @@ vehicles {
 - [x] Excluir transportadora
 - [x] Listar transportadoras
 
-### Login de Acesso (Carrier)
-- [x] Criar usuário carrier
-- [x] Listar usuários carrier
-- [x] Excluir usuário carrier
+### Login de Acesso (transportadora)
+- [x] Criar usuário transportadora
+- [x] Listar usuários transportadora
+- [x] Excluir usuário transportadora
 - [x] Autenticação Supabase
 
 ### Motoristas
@@ -309,7 +309,7 @@ vehicles {
 
 2. ✅ **Gerenciar Acessos**
    - Criar login de acesso para transportadoras
-   - Gerenciar usuários carrier
+   - Gerenciar usuários transportadora
 
 3. ✅ **Visualizar Recursos**
    - Ver motoristas de cada transportadora

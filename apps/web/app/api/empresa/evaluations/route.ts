@@ -21,8 +21,8 @@ export async function GET(request: NextRequest) {
             .from('trip_evaluations' as any)
             .select(`
                 *,
-                passenger:users!passenger_id(id, name, email, company_id),
-                driver:users!driver_id(id, name),
+                passageiro:users!passenger_id(id, name, email, company_id),
+                motorista:users!driver_id(id, name),
                 trip:trips(id, scheduled_date, route:routes(name))
             `)
             .order('created_at', { ascending: false })
@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
         // Filtrar por company_id se fornecido
         let filteredData = data;
         if (companyId && data) {
-            filteredData = data.filter((e: any) => (e.passenger as any)?.company_id === companyId);
+            filteredData = data.filter((e: any) => (e.passageiro as any)?.company_id === companyId);
         }
 
         // Calcular estatísticas

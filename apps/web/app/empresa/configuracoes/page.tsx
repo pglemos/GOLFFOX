@@ -342,7 +342,7 @@ export default function OperatorConfiguracoesPage() {
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-border">
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-2 mb-2">
-              <Settings2 className="h-6 w-6 sm:h-7 sm:w-7 text-orange-500" />
+              <Settings2 className="h-6 w-6 sm:h-7 sm:w-7 text-brand" />
               Configurações
             </h1>
             <p className="text-sm sm:text-base text-ink-muted">
@@ -356,7 +356,7 @@ export default function OperatorConfiguracoesPage() {
             <Card className="p-6">
               <div className="flex flex-col items-center text-center">
                 <div className="relative mb-4">
-                  <div className="w-32 h-32 rounded-full bg-orange-500 flex items-center justify-center shadow-lg overflow-hidden">
+                  <div className="w-32 h-32 rounded-full bg-brand flex items-center justify-center shadow-lg overflow-hidden">
                     {profileImage ? (
                       <img
                         src={profileImage}
@@ -369,7 +369,7 @@ export default function OperatorConfiguracoesPage() {
                       </span>
                     )}
                   </div>
-                  <label className="absolute bottom-0 right-0 bg-orange-500 text-white p-3 rounded-full cursor-pointer hover:bg-orange-600 transition-colors shadow-lg">
+                  <label className="absolute bottom-0 right-0 bg-brand text-white p-3 rounded-full cursor-pointer hover:bg-orange-600 transition-colors shadow-lg">
                     <Camera className="h-5 w-5" />
                     <input
                       type="file"
@@ -385,14 +385,14 @@ export default function OperatorConfiguracoesPage() {
                   Formatos: JPG, PNG (máx. 5MB)
                 </p>
                 {uploadingImage && (
-                  <p className="text-sm text-orange-500 font-medium">Fazendo upload...</p>
+                  <p className="text-sm text-brand font-medium">Fazendo upload...</p>
                 )}
               </div>
             </Card>
 
             <Card className="p-6">
               <div className="text-center">
-                <Download className="h-8 w-8 text-orange-500 mx-auto mb-3" />
+                <Download className="h-8 w-8 text-brand mx-auto mb-3" />
                 <h2 className="text-lg font-semibold mb-1">Exportar Dados</h2>
                 <p className="text-sm text-ink-muted mb-4">
                   Baixe uma cópia dos seus dados pessoais
@@ -409,7 +409,7 @@ export default function OperatorConfiguracoesPage() {
             <Card className="p-6">
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-2">
-                  <User className="h-5 w-5 text-orange-500" />
+                  <User className="h-5 w-5 text-brand" />
                   <h2 className="text-xl font-semibold">Informações Pessoais</h2>
                 </div>
                 <Button
@@ -463,7 +463,7 @@ export default function OperatorConfiguracoesPage() {
             <Card className="p-6">
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-2">
-                  <Shield className="h-5 w-5 text-orange-500" />
+                  <Shield className="h-5 w-5 text-brand" />
                   <h2 className="text-xl font-semibold">Segurança</h2>
                 </div>
                 <Button
@@ -531,7 +531,7 @@ export default function OperatorConfiguracoesPage() {
 
             <Card className="p-6">
               <div className="flex items-center gap-2 mb-6">
-                <Palette className="h-5 w-5 text-orange-500" />
+                <Palette className="h-5 w-5 text-brand" />
                 <h2 className="text-xl font-semibold">Aparência</h2>
               </div>
 
@@ -575,7 +575,7 @@ export default function OperatorConfiguracoesPage() {
 
             <Card className="p-6">
               <div className="flex items-center gap-2 mb-6">
-                <Bell className="h-5 w-5 text-orange-500" />
+                <Bell className="h-5 w-5 text-brand" />
                 <h2 className="text-xl font-semibold">Notificações</h2>
               </div>
 
@@ -594,8 +594,8 @@ export default function OperatorConfiguracoesPage() {
                     <button
                       onClick={() => handleNotificationChange(key, !formData.notifications[key as keyof typeof formData.notifications])}
                       className={`relative w-12 h-6 rounded-full transition-colors ml-4 ${formData.notifications[key as keyof typeof formData.notifications]
-                        ? 'bg-orange-500'
-                        : 'bg-gray-300'
+                        ? 'bg-brand'
+                        : 'bg-muted'
                         }`}
                     >
                       <span
@@ -612,7 +612,7 @@ export default function OperatorConfiguracoesPage() {
 
             <Card className="p-6">
               <div className="flex items-center gap-2 mb-6">
-                <Globe className="h-5 w-5 text-orange-500" />
+                <Globe className="h-5 w-5 text-brand" />
                 <h2 className="text-xl font-semibold">Preferências Gerais</h2>
               </div>
 

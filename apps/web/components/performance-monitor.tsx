@@ -58,14 +58,14 @@ export function PerformanceMonitor({
 
   const getStatusColor = (value: number, threshold: number, inverse = false) => {
     const isGood = inverse ? value <= threshold : value >= threshold
-    return isGood ? 'text-green-500' : 'text-red-500'
+    return isGood ? 'text-success' : 'text-error'
   }
 
   const getStatusIcon = (isGood: boolean) => {
     return isGood ? (
-      <CheckCircle className="w-4 h-4 text-green-500" />
+      <CheckCircle className="w-4 h-4 text-success" />
     ) : (
-      <AlertTriangle className="w-4 h-4 text-red-500" />
+      <AlertTriangle className="w-4 h-4 text-error" />
     )
   }
 
@@ -115,7 +115,7 @@ export function PerformanceMonitor({
       exit={{ scale: 0, opacity: 0 }}
     >
       <Card className={`${isMobile ? 'w-80' : 'w-96'} shadow-lg border-2 ${
-        isPerformanceGood ? 'border-green-200' : 'border-red-200'
+        isPerformanceGood ? 'border-green-200' : 'border-error-light'
       }`}>
         <CardHeader className="pb-2">
           <div className="flex items-center justify-between">
@@ -260,11 +260,11 @@ export function PerformanceMonitor({
 
                 {/* Performance Tips */}
                 {!isPerformanceGood && (
-                  <div className="bg-yellow-50 dark:bg-yellow-900/20 p-2 rounded text-xs">
-                    <div className="font-medium text-yellow-800 dark:text-yellow-200 mb-1">
+                  <div className="bg-warning-light dark:bg-yellow-900/20 p-2 rounded text-xs">
+                    <div className="font-medium text-warning dark:text-yellow-200 mb-1">
                       Dicas de Otimização:
                     </div>
-                    <ul className="text-yellow-700 dark:text-yellow-300 space-y-1">
+                    <ul className="text-warning dark:text-yellow-300 space-y-1">
                       {metrics.fps < 30 && (
                         <li>• Reduza animações complexas</li>
                       )}

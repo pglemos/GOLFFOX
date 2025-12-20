@@ -187,9 +187,9 @@ export function AssistanceModal({ request, isOpen, onClose, onSave }: Assistance
                   <SelectValue placeholder="Selecione um motorista disponível" />
                 </SelectTrigger>
                 <SelectContent>
-                  {availableDrivers.map((driver) => (
-                    <SelectItem key={driver.id} value={driver.id}>
-                      {driver.name} - {driver.email}
+                  {availableDrivers.map((motorista) => (
+                    <SelectItem key={motorista.id} value={motorista.id}>
+                      {motorista.name} - {motorista.email}
                     </SelectItem>
                   ))}
                   {availableDrivers.length === 0 && (
@@ -215,9 +215,9 @@ export function AssistanceModal({ request, isOpen, onClose, onSave }: Assistance
                   <SelectValue placeholder="Selecione um veículo disponível" />
                 </SelectTrigger>
                 <SelectContent>
-                  {availableVehicles.map((vehicle) => (
-                    <SelectItem key={vehicle.id} value={vehicle.id}>
-                      {vehicle.plate} - {vehicle.model || "Sem modelo"}
+                  {availableVehicles.map((veiculo) => (
+                    <SelectItem key={veiculo.id} value={veiculo.id}>
+                      {veiculo.plate} - {veiculo.model || "Sem modelo"}
                     </SelectItem>
                   ))}
                   {availableVehicles.length === 0 && (

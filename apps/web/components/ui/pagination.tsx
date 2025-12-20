@@ -63,7 +63,7 @@ export function Pagination({ currentPage, totalPages, onPageChange, className }:
       {getPageNumbers().map((page, index) => {
         if (page === "...") {
           return (
-            <span key={`ellipsis-${index}`} className="px-2 text-gray-500">
+            <span key={`ellipsis-${index}`} className="px-2 text-ink-muted">
               ...
             </span>
           )
@@ -76,7 +76,7 @@ export function Pagination({ currentPage, totalPages, onPageChange, className }:
             size="sm"
             onClick={() => onPageChange(page as number)}
             className={cn(
-              currentPage === page && "bg-orange-500 hover:bg-orange-600 text-white"
+              currentPage === page && "bg-brand hover:bg-orange-600 text-white"
             )}
           >
             {page}

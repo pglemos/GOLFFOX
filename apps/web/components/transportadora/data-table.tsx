@@ -179,10 +179,10 @@ export function DataTable<T extends Record<string, any>>({
   const getStatusBadge = (status: string) => {
     const statusLower = status?.toLowerCase() || ''
     if (statusLower.includes('active') || statusLower.includes('ativo')) {
-      return <Badge className="bg-green-500 hover:bg-green-600 text-white">{status}</Badge>
+      return <Badge className="bg-success-light0 hover:bg-success text-white">{status}</Badge>
     }
     if (statusLower.includes('pending') || statusLower.includes('pendente')) {
-      return <Badge className="bg-orange-500 hover:bg-orange-600 text-white">{status}</Badge>
+      return <Badge className="bg-brand hover:bg-orange-600 text-white">{status}</Badge>
     }
     if (statusLower.includes('inactive') || statusLower.includes('inativo')) {
       return <Badge variant="secondary">{status}</Badge>

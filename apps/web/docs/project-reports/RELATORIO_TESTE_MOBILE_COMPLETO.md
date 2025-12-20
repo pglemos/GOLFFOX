@@ -68,8 +68,8 @@ O script procura por classes **explícitas** (`min-h-[44px]` ou `btn-mobile`), m
 5. `app/admin/rotas/route-create-modal.tsx` - 8 botões
 
 ### Prioridade Média:
-- Páginas do Carrier
-- Páginas do Operator
+- Páginas do transportadora
+- Páginas do operador
 - Componentes de mapa
 
 ## 🔧 Recomendações

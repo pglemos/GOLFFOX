@@ -21,7 +21,7 @@ curl https://golffox-bzj0446dr-synvolt.vercel.app/api/health
 - **Esperado:** Página de login aparece
 
 ### 4. Rotas Protegidas (sem login)
-- Acesse: https://golffox-bzj0446dr-synvolt.vercel.app/operator
+- Acesse: https://golffox-bzj0446dr-synvolt.vercel.app/operador
 - **Esperado:** Redireciona para `/login?redirect=/operador`
 
 - Acesse: https://golffox-bzj0446dr-synvolt.vercel.app/admin

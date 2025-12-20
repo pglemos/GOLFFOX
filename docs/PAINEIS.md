@@ -125,25 +125,25 @@ O sistema GOLF FOX possui 3 painéis web independentes, todos hospedados no mesm
 - ✅ Todas as funcionalidades administrativas
 - ✅ Gerenciamento de usuários e permissões
 
-### Operator
+### operador
 - ✅ Acesso ao painel `/operador`
 - ✅ Visualização de dados da empresa
 - ✅ Gerenciamento de funcionários
 - ❌ Bloqueado em `/admin`
 - ❌ Bloqueado em `/transportadora`
 
-### Carrier
+### transportadora
 - ✅ Acesso ao painel `/transportadora`
 - ✅ Gestão da própria frota
 - ✅ Relatórios da transportadora
 - ❌ Bloqueado em `/admin`
 - ❌ Bloqueado em `/operador`
 
-### Driver (Motorista)
+### motorista (Motorista)
 - ❌ Sem acesso aos painéis web (usa app mobile)
 - ✅ Acesso ao app mobile de motorista
 
-### Passenger (Passageiro)
+### passageiro (Passageiro)
 - ❌ Sem acesso aos painéis web (usa app mobile)
 - ✅ Acesso ao app mobile de passageiro
 

@@ -7,7 +7,7 @@
  * Responsabilidades:
  * - Validação de autenticação via Supabase
  * - Proteção de rotas baseada em roles
- * - Redirecionamentos de compatibilidade (carrier → transportadora, etc.)
+ * - Redirecionamentos de compatibilidade (transportadora → transportadora, etc.)
  * - Normalização de URLs
  */
 
@@ -44,8 +44,8 @@ const STATIC_ROUTES = [
  * Mapeamento de rotas antigas para novas (compatibilidade)
  */
 const ROUTE_REDIRECTS: Record<string, string> = {
-  '/carrier': '/transportadora',
-  '/operator': '/empresa',
+  '/transportadora': '/transportadora',
+  '/operador': '/empresa',
   '/operador': '/transportadora',
   '/login': '/',
 }
@@ -56,8 +56,8 @@ const ROUTE_REDIRECTS: Record<string, string> = {
  */
 const ROUTE_ROLES: Record<string, string[]> = {
   '/admin': ['admin'],
-  '/empresa': ['admin', 'empresa'], // operator será normalizado para empresa
-  '/transportadora': ['admin', 'operador', 'transportadora'], // carrier será normalizado para operador
+  '/empresa': ['admin', 'empresa'], // operador será normalizado para empresa
+  '/transportadora': ['admin', 'operador', 'transportadora'], // transportadora será normalizado para operador
 }
 
 /**

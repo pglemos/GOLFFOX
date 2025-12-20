@@ -99,10 +99,10 @@ web-app/
 │   ├── layout.tsx          ✅ Root layout
 │   ├── page.tsx           ✅ Login
 │   ├── admin/page.tsx     ✅ Dashboard Admin
-│   ├── operator/page.tsx  ✅ Dashboard Operador
-│   ├── carrier/page.tsx    ✅ Dashboard Transportadora
-│   ├── driver/page.tsx     ✅ Dashboard Motorista
-│   └── passenger/page.tsx  ✅ Dashboard Passageiro
+│   ├── operador/page.tsx  ✅ Dashboard Operador
+│   ├── transportadora/page.tsx    ✅ Dashboard Transportadora
+│   ├── motorista/page.tsx     ✅ Dashboard Motorista
+│   └── passageiro/page.tsx  ✅ Dashboard Passageiro
 │
 ├── components/
 │   ├── ui/                 ✅ Componentes base

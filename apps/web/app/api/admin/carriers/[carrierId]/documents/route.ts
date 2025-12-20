@@ -45,13 +45,13 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         const supabaseAdmin = getSupabaseAdmin()
 
         // Verificar se transportadora existe
-        const { data: carrier, error: carrierError } = await supabaseAdmin
+        const { data: transportadora, error: carrierError } = await supabaseAdmin
             .from('carriers')
             .select('id, name')
             .eq('id', carrierId)
             .single()
 
-        if (carrierError || !carrier) {
+        if (carrierError || !transportadora) {
             return NextResponse.json(
                 { error: 'Transportadora não encontrada' },
                 { status: 404 }
@@ -118,13 +118,13 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         const documentData = validationResult.data
 
         // Verificar se transportadora existe
-        const { data: carrier, error: carrierError } = await supabaseAdmin
+        const { data: transportadora, error: carrierError } = await supabaseAdmin
             .from('carriers')
             .select('id')
             .eq('id', carrierId)
             .single()
 
-        if (carrierError || !carrier) {
+        if (carrierError || !transportadora) {
             return NextResponse.json(
                 { error: 'Transportadora não encontrada' },
                 { status: 404 }

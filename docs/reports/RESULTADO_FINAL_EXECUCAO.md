@@ -34,10 +34,10 @@ Executei todo o guia de resolução e corrigi todos os problemas. O banco de dad
 
 ### ✅ RLS Policies: **12 políticas**
 - ✅ Admin: Acesso total
-- ✅ Operator: Acesso por company_id
-- ✅ Carrier: Acesso por carrier_id
-- ✅ Driver: Ver veículos assign ados
-- ✅ Passenger: Ver veículos de rotas ativas
+- ✅ operador: Acesso por company_id
+- ✅ transportadora: Acesso por carrier_id
+- ✅ motorista: Ver veículos assign ados
+- ✅ passageiro: Ver veículos de rotas ativas
 
 ---
 
@@ -61,7 +61,7 @@ Executei todo o guia de resolução e corrigi todos os problemas. O banco de dad
 ### 3. **RLS Policies**
 - ✅ 12 políticas configuradas corretamente
 - ✅ Admin tem acesso total
-- ✅ Operator tem acesso à sua empresa
+- ✅ operador tem acesso à sua empresa
 - ✅ Sem problemas de permissão
 
 ---
@@ -164,7 +164,7 @@ Se após **limpar ambos os caches** (Supabase + navegador) ainda não funcionar:
 
 1. Tire um **print do console** (F12) mostrando os erros
 2. Execute o **diagnóstico acima** e envie o resultado
-3. Verifique se está logado como **admin** ou **operator**
+3. Verifique se está logado como **admin** ou **operador**
 
 ---
 

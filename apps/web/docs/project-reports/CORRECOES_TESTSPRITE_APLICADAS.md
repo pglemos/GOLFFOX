@@ -17,7 +17,7 @@ Este documento resume todas as correções aplicadas baseadas no relatório do T
 
 ## 📋 Correções Implementadas
 
-### 1. ✅ TC002: Validação de UUID em Vehicle Delete (ALTA)
+### 1. ✅ TC002: Validação de UUID em veiculo Delete (ALTA)
 
 **Arquivo:** `app/api/admin/vehicles/[vehicleId]/route.ts`
 
@@ -87,9 +87,9 @@ Este documento resume todas as correções aplicadas baseadas no relatório do T
 
 ---
 
-### 5. ✅ TC004: Validação de Create Operator (ALTA)
+### 5. ✅ TC004: Validação de Create operador (ALTA)
 
-**Arquivo:** `app/api/admin/create-operator/route.ts`
+**Arquivo:** `app/api/admin/create-operador/route.ts`
 
 **Problema:**
 - API esperava `companyName` mas não aceitava `company_id`
@@ -109,7 +109,7 @@ Este documento resume todas as correções aplicadas baseadas no relatório do T
 
 ### 6. ✅ TC006: Erro 500 em Create Employee (CRÍTICA)
 
-**Arquivo:** `app/api/operator/create-employee/route.ts`
+**Arquivo:** `app/api/operador/create-employee/route.ts`
 
 **Problema:**
 - Endpoint retornava erro 500 genérico
@@ -131,7 +131,7 @@ Este documento resume todas as correções aplicadas baseadas no relatório do T
 
 ### 7. ✅ TC007: Erro 500 em Optimize Route (ALTA)
 
-**Arquivo:** `app/api/operator/optimize-route/route.ts`
+**Arquivo:** `app/api/operador/optimize-route/route.ts`
 
 **Problema:**
 - Endpoint retornava erro 500

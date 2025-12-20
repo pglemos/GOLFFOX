@@ -126,8 +126,8 @@ Se ainda não configurou, adicione estas 4 variáveis:
 **Depois**: Aguarde o build completar e teste as URLs:
 
 - 🌐 https://golffox.vercel.app/admin
-- 🌐 https://golffox.vercel.app/operator
-- 🌐 https://golffox.vercel.app/carrier
+- 🌐 https://golffox.vercel.app/operador
+- 🌐 https://golffox.vercel.app/transportadora
 
 ---
 

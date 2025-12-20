@@ -99,11 +99,11 @@ export interface ManualCost {
     updatedAt: string;
     // Relacionamentos (quando join)
     category?: CostCategory | null;
-    vehicle?: { id: string; plate: string; model?: string } | null;
+    veiculo?: { id: string; plate: string; model?: string } | null;
     route?: { id: string; name: string } | null;
-    driver?: { id: string; name?: string; email: string } | null;
+    motorista?: { id: string; name?: string; email: string } | null;
     company?: { id: string; name: string } | null;
-    carrier?: { id: string; name: string } | null;
+    transportadora?: { id: string; name: string } | null;
 }
 
 export interface ManualCostInsert {
@@ -168,7 +168,7 @@ export interface ManualRevenue {
     updatedAt: string;
     // Relacionamentos
     company?: { id: string; name: string } | null;
-    carrier?: { id: string; name: string } | null;
+    transportadora?: { id: string; name: string } | null;
 }
 
 export interface ManualRevenueInsert {

@@ -56,7 +56,7 @@ describe('PUT /api/admin/transportadoras/update', () => {
 
     expect(response.status).toBe(200)
     expect(data.success).toBe(true)
-    expect(data.carrier.name).toBe('Transportadora Atualizada')
+    expect(data.transportadora.name).toBe('Transportadora Atualizada')
   })
 
   it('deve rejeitar sem ID', async () => {

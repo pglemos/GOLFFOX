@@ -22,12 +22,12 @@ interface PhotoItem {
 
 const initialChecklist: ChecklistItem[] = [
     // Veículo e Mecânica
-    { id: 'freios', label: 'Freios funcionando corretamente', category: 'vehicle', value: null },
-    { id: 'farois', label: 'Faróis e luzes operacionais', category: 'vehicle', value: null },
-    { id: 'pneus', label: 'Pneus em bom estado', category: 'vehicle', value: null },
-    { id: 'oleo', label: 'Nível de óleo verificado', category: 'vehicle', value: null },
-    { id: 'combustivel', label: 'Combustível suficiente', category: 'vehicle', value: null },
-    { id: 'agua', label: 'Nível de água do radiador', category: 'vehicle', value: null },
+    { id: 'freios', label: 'Freios funcionando corretamente', category: 'veiculo', value: null },
+    { id: 'farois', label: 'Faróis e luzes operacionais', category: 'veiculo', value: null },
+    { id: 'pneus', label: 'Pneus em bom estado', category: 'veiculo', value: null },
+    { id: 'oleo', label: 'Nível de óleo verificado', category: 'veiculo', value: null },
+    { id: 'combustivel', label: 'Combustível suficiente', category: 'veiculo', value: null },
+    { id: 'agua', label: 'Nível de água do radiador', category: 'veiculo', value: null },
     // Segurança
     { id: 'extintores', label: 'Extintores verificados e lacrados', category: 'safety', value: null },
     { id: 'cintos', label: 'Cintos de segurança funcionando', category: 'safety', value: null },
@@ -47,7 +47,7 @@ const initialPhotos: PhotoItem[] = [
 ];
 
 const categories = {
-    vehicle: { title: '🚌 Veículo e Mecânica', color: '#0D9488' },
+    veiculo: { title: '🚌 Veículo e Mecânica', color: '#0D9488' },
     safety: { title: '🛡️ Segurança', color: '#F59E0B' },
     general: { title: '📋 Documentação e Geral', color: '#3B82F6' },
 };
@@ -136,11 +136,11 @@ export default function ChecklistScreen() {
                     'Você marcou alguns itens como "NÃO". Deseja continuar mesmo assim?',
                     [
                         { text: 'Revisar', style: 'cancel' },
-                        { text: 'Continuar', onPress: () => router.push('/driver/route') }
+                        { text: 'Continuar', onPress: () => router.push('/motorista/route') }
                     ]
                 );
             } else {
-                router.push('/driver/route');
+                router.push('/motorista/route');
             }
         } finally {
             setIsSubmitting(false);

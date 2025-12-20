@@ -243,7 +243,7 @@ export default function TransportadorasPage() {
           {/* Busca */}
           <div className="flex flex-col sm:flex-row gap-2">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-ink-light h-4 w-4" />
               <Input
                 placeholder="Buscar transportadoras por nome, endereço ou telefone..."
                 value={searchQuery}
@@ -254,8 +254,8 @@ export default function TransportadorasPage() {
           </div>
 
           {errorCarriers && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-3 sm:p-4 w-full">
-              <p className="text-xs sm:text-sm text-red-800 break-words">Erro ao carregar transportadoras: {errorCarriers instanceof Error ? errorCarriers.message : String(errorCarriers)}</p>
+            <div className="bg-error-light border border-error-light rounded-lg p-3 sm:p-4 w-full">
+              <p className="text-xs sm:text-sm text-error break-words">Erro ao carregar transportadoras: {errorCarriers instanceof Error ? errorCarriers.message : String(errorCarriers)}</p>
             </div>
           )}
 
@@ -280,9 +280,9 @@ export default function TransportadorasPage() {
 
           {!loadingCarriers && !errorCarriers && Array.isArray(filteredCarriers) && filteredCarriers.length > 0 && (
             <div className="grid gap-3 sm:gap-4 w-full">
-              {filteredCarriers.map((carrier: any, index: number) => (
+              {filteredCarriers.map((transportadora: any, index: number) => (
                 <motion.div
-                  key={carrier.id}
+                  key={transportadora.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.05 }}
@@ -299,14 +299,14 @@ export default function TransportadorasPage() {
                             <h3 className="font-bold text-base sm:text-lg group-hover:text-brand transition-colors">{transportadora.name}</h3>
                           </div>
                           <div className="flex flex-wrap gap-2 sm:gap-4 text-xs sm:text-sm text-ink-muted">
-                            {carrier.address && (
+                            {transportadora.address && (
                               <span className="flex items-center gap-1">
-                                Endereço: {carrier.address}
+                                Endereço: {transportadora.address}
                               </span>
                             )}
-                            {carrier.phone && (
+                            {transportadora.phone && (
                               <span className="flex items-center gap-1">
-                                Tel: {carrier.phone}
+                                Tel: {transportadora.phone}
                               </span>
                             )}
                           </div>
@@ -318,7 +318,7 @@ export default function TransportadorasPage() {
                           size="sm"
                           onClick={(e) => {
                             e.stopPropagation()
-                            setSelectedCarrierForEdit(carrier)
+                            setSelectedCarrierForEdit(transportadora)
                             setIsEditModalOpen(true)
                           }}
                           className="min-h-[44px] touch-manipulation"
@@ -331,7 +331,7 @@ export default function TransportadorasPage() {
                           size="sm"
                           onClick={(e) => {
                             e.stopPropagation()
-                            setSelectedCarrierForUsers({ id: carrier.id, name: carrier.name })
+                            setSelectedCarrierForUsers({ id: transportadora.id, name: transportadora.name })
                             setIsUsersModalOpen(true)
                           }}
                           className="min-h-[44px] touch-manipulation"
@@ -344,7 +344,7 @@ export default function TransportadorasPage() {
                           size="sm"
                           onClick={(e) => {
                             e.stopPropagation()
-                            handleDeleteCarrier(carrier.id, carrier.name)
+                            handleDeleteCarrier(transportadora.id, transportadora.name)
                           }}
                           className="min-h-[44px] touch-manipulation text-destructive hover:bg-destructive/10"
                         >
@@ -373,7 +373,7 @@ export default function TransportadorasPage() {
         {/* Modal Usuários de Acesso */}
         {selectedCarrierForUsers && (
           <TransportadoraUsersModal
-            carrier={selectedCarrierForUsers}
+            transportadora={selectedCarrierForUsers}
             isOpen={isUsersModalOpen}
             onClose={() => {
               setIsUsersModalOpen(false)
@@ -387,7 +387,7 @@ export default function TransportadorasPage() {
 
         {/* Modal Editar Transportadora */}
         <EditTransportadoraModal
-          carrier={selectedCarrierForEdit}
+          transportadora={selectedCarrierForEdit}
           isOpen={isEditModalOpen}
           onClose={() => {
             setIsEditModalOpen(false)

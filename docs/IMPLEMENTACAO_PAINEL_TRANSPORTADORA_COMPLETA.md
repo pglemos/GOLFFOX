@@ -2,7 +2,7 @@
 
 ## Resumo Executivo
 
-Foi implementada a versão completa (100%) do Painel da Transportadora (Carrier Panel) do sistema Golf Fox, incluindo todas as funcionalidades de gestão de motoristas, frota, mapa em tempo real e controle de custos.
+Foi implementada a versão completa (100%) do Painel da Transportadora (transportadora Panel) do sistema Golf Fox, incluindo todas as funcionalidades de gestão de motoristas, frota, mapa em tempo real e controle de custos.
 
 **Data de Implementação:** 16 de Novembro de 2025  
 **Status:** ✅ Completo
@@ -39,7 +39,7 @@ Foi implementada a versão completa (100%) do Painel da Transportadora (Carrier 
 #### v54_carrier_storage_setup.sql
 - ✅ Políticas RLS para bucket `transportadora-documents` no Supabase Storage
 - ✅ Acesso restrito por transportadora
-- ✅ Suporte a 3 pastas: `motorista-documents`, `vehicle-documents`, `medical-exams`
+- ✅ Suporte a 3 pastas: `motorista-documents`, `veiculo-documents`, `medical-exams`
 
 ---
 
@@ -69,7 +69,7 @@ Foi implementada a versão completa (100%) do Painel da Transportadora (Carrier 
 - ✅ Validação de tamanho máximo (10MB)
 - ✅ Retorna URL pública do arquivo
 
-#### `/api/transportadora/costs/vehicle`
+#### `/api/transportadora/costs/veiculo`
 - ✅ GET: Listar custos por veículo (com filtros de data)
 - ✅ POST: Criar novo custo de veículo
 - ✅ Filtro automático por transportadora
@@ -310,7 +310,7 @@ git push origin main
 - `apps/web/app/api/transportadora/vehicles/[vehicleId]/documents/route.ts` (novo)
 - `apps/web/app/api/transportadora/vehicles/[vehicleId]/maintenances/route.ts` (novo)
 - `apps/web/app/api/transportadora/upload/route.ts` (novo)
-- `apps/web/app/api/transportadora/costs/vehicle/route.ts` (novo)
+- `apps/web/app/api/transportadora/costs/veiculo/route.ts` (novo)
 - `apps/web/app/api/transportadora/costs/route/route.ts` (novo)
 - `apps/web/app/api/transportadora/alerts/route.ts` (novo)
 - `apps/web/app/api/notifications/email/route.ts` (novo)

@@ -174,14 +174,14 @@ export async function POST(request: NextRequest) {
         // Buscar company_id do veículo se disponível
         let companyIdForRoute = null
         if (vehicleId) {
-          const { data: vehicle } = await supabaseAdmin
+          const { data: veiculo } = await supabaseAdmin
             .from('vehicles')
             .select('company_id')
             .eq('id', vehicleId)
             .single()
           
-          if (vehicle?.company_id) {
-            companyIdForRoute = vehicle.company_id
+          if (veiculo?.company_id) {
+            companyIdForRoute = veiculo.company_id
           }
         }
         
@@ -231,22 +231,22 @@ export async function POST(request: NextRequest) {
       route = existingRoute
     }
 
-    // Verificar se vehicle existe e está ativo (se fornecido)
+    // Verificar se veiculo existe e está ativo (se fornecido)
     if (vehicleId) {
-      const { data: vehicle, error: vehicleError } = await supabaseAdmin
+      const { data: veiculo, error: vehicleError } = await supabaseAdmin
         .from('vehicles')
         .select('id, is_active')
         .eq('id', vehicleId)
         .single()
 
-      if (vehicleError || !vehicle) {
+      if (vehicleError || !veiculo) {
         return NextResponse.json(
           { error: 'Veículo não encontrado' },
           { status: 404 }
         )
       }
 
-      if (!vehicle.is_active) {
+      if (!veiculo.is_active) {
         return NextResponse.json(
           { error: 'Veículo não está ativo' },
           { status: 400 }
@@ -256,13 +256,13 @@ export async function POST(request: NextRequest) {
 
     // Verificar se motorista existe (se fornecido)
     if (driverId) {
-      const { data: driver, error: driverError } = await supabaseAdmin
+      const { data: motorista, error: driverError } = await supabaseAdmin
         .from('users')
         .select('id, role')
         .eq('id', driverId)
         .single()
 
-      if (driverError || !driver) {
+      if (driverError || !motorista) {
         return NextResponse.json(
           { error: 'Motorista não encontrado' },
           { status: 404 }

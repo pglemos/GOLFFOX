@@ -72,7 +72,7 @@ export default function DriverDashboard() {
     const [activeTab, setActiveTab] = useState<'pending' | 'completed'>('pending');
 
     const handleStartTrip = (tripId: string) => {
-        router.push('/driver/checklist');
+        router.push('/motorista/checklist');
     };
 
     const handleLogout = async () => {
@@ -220,19 +220,19 @@ export default function DriverDashboard() {
 
             {/* Quick Actions */}
             <View style={styles.quickActions}>
-                <Pressable style={styles.quickActionBtn} onPress={() => router.push('/driver/chat')}>
+                <Pressable style={styles.quickActionBtn} onPress={() => router.push('/motorista/chat')}>
                     <View style={[styles.quickActionIcon, { backgroundColor: '#DBEAFE' }]}>
                         <Text style={styles.quickActionEmoji}>💬</Text>
                     </View>
                     <Text style={styles.quickActionLabel}>Central</Text>
                 </Pressable>
-                <Pressable style={styles.quickActionBtn} onPress={() => router.push('/driver/history')}>
+                <Pressable style={styles.quickActionBtn} onPress={() => router.push('/motorista/history')}>
                     <View style={[styles.quickActionIcon, { backgroundColor: '#FEF3C7' }]}>
                         <Text style={styles.quickActionEmoji}>📊</Text>
                     </View>
                     <Text style={styles.quickActionLabel}>Histórico</Text>
                 </Pressable>
-                <Pressable style={styles.quickActionBtn} onPress={() => router.push('/driver/scan')}>
+                <Pressable style={styles.quickActionBtn} onPress={() => router.push('/motorista/scan')}>
                     <View style={[styles.quickActionIcon, { backgroundColor: '#FFF7ED' }]}>
                         <Text style={styles.quickActionEmoji}>📱</Text>
                     </View>

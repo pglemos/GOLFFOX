@@ -152,10 +152,10 @@ export default function TransportadoraAjudaPage() {
             whileHover={{ y: -4 }}
             className="group"
           >
-          <Card className="p-6 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-border hover:border-[var(--accent)]/30 cursor-pointer">
+          <Card className="p-6 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-border hover:border-accent-custom/30 cursor-pointer">
             <div className="flex items-center gap-4 mb-4">
-              <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-[var(--accent-light)] to-[var(--accent-soft)] flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                <FileText className="h-6 w-6 text-[var(--accent)]" />
+              <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-accent-custom-light to-accent-custom-soft flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                <FileText className="h-6 w-6 text-accent-custom" />
               </div>
               <div>
                 <h3 className="font-semibold mb-1">Documentação</h3>
@@ -208,10 +208,10 @@ export default function TransportadoraAjudaPage() {
             whileHover={{ y: -4 }}
             className="group"
           >
-          <Card className="p-6 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-border hover:border-green-500/30 cursor-pointer">
+          <Card className="p-6 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-border hover:border-success/30 cursor-pointer">
             <div className="flex items-center gap-4 mb-4">
-              <div className="w-12 h-12 rounded-lg bg-green-100 dark:bg-green-900/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                <Mail className="h-6 w-6 text-green-600 dark:text-green-400" />
+              <div className="w-12 h-12 rounded-lg bg-success-light dark:bg-green-900/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                <Mail className="h-6 w-6 text-success dark:text-green-400" />
               </div>
               <div>
                 <h3 className="font-semibold mb-1">Contato por Email</h3>
@@ -241,7 +241,7 @@ export default function TransportadoraAjudaPage() {
             <h2 className="text-xl font-bold">Perguntas Frequentes</h2>
             <div className="flex items-center gap-4">
               <div className="relative w-64">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-ink-light h-4 w-4" />
                 <Input
                   placeholder="Buscar no FAQ..."
                   value={searchQuery}
@@ -266,7 +266,7 @@ export default function TransportadoraAjudaPage() {
           <div className="space-y-4">
             {filteredFaqItems.length === 0 ? (
               <div className="text-center py-12">
-                <HelpCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <HelpCircle className="h-12 w-12 text-ink-light mx-auto mb-4" />
                 <p className="text-ink-muted">Nenhuma pergunta encontrada</p>
               </div>
             ) : (

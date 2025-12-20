@@ -131,7 +131,7 @@ export function AdvancedNavigationButton({
         {/* Indicador de progresso */}
         {(isLoading || isTransitioning) && (
           <motion.div
-            className="absolute bottom-0 left-0 h-0.5 bg-blue-500"
+            className="absolute bottom-0 left-0 h-0.5 bg-info-light0"
             initial={{ width: '0%' }}
             animate={{ width: '100%' }}
             transition={{ duration: 0.3, ease: 'easeInOut' }}
@@ -166,8 +166,8 @@ export function QuickNavigation({ currentTab, routeId, className = '' }: QuickNa
           key={tab.id}
           className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
             currentTab === tab.id
-              ? 'bg-blue-100 text-blue-700 shadow-sm'
-              : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+              ? 'bg-info-light text-info shadow-sm'
+              : 'text-ink-muted hover:bg-muted hover:text-ink-strong'
           }`}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}

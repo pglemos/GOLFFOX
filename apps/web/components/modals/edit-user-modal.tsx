@@ -323,7 +323,7 @@ export function EditUserModal({
                   id="city"
                   value={formData.address_city}
                   readOnly
-                  className="bg-gray-50"
+                  className="bg-bg-soft"
                 />
               </div>
 
@@ -333,7 +333,7 @@ export function EditUserModal({
                   id="state"
                   value={formData.address_state}
                   readOnly
-                  className="bg-gray-50"
+                  className="bg-bg-soft"
                 />
               </div>
             </div>
@@ -368,7 +368,7 @@ export function EditUserModal({
             <Button
               type="submit"
               disabled={loading}
-              className="w-full sm:w-auto order-1 sm:order-2 bg-orange-500 hover:bg-orange-600 min-h-[44px] text-base font-medium"
+              className="w-full sm:w-auto order-1 sm:order-2 bg-brand hover:bg-orange-600 min-h-[44px] text-base font-medium"
             >
               {loading ? (
                 <>

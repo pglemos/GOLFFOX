@@ -68,7 +68,7 @@
 
 ---
 
-### ✅ VERIFIED: Bug #2 - Create-Operator API
+### ✅ VERIFIED: Bug #2 - Create-operador API
 
 **Issue:** API `/api/admin/create-operador` does not exist
 
@@ -80,7 +80,7 @@
 1. ✅ API endpoint exists and is comprehensive
 2. ✅ Has proper error handling
 3. ✅ Includes rollback logic
-4. ✅ Supports both company creation and operator creation
+4. ✅ Supports both company creation and operador creation
 5. ✅ Has development mode helpers
 
 **Features Found:**
@@ -119,7 +119,7 @@
 - ❓ Alerts API - Not found/verified
 
 **Recommendation:**
-Manual testing required to verify these issues. The create-operator API exists and is well-implemented, suggesting other CRUD APIs may also exist but have frontend integration issues.
+Manual testing required to verify these issues. The create-operador API exists and is well-implemented, suggesting other CRUD APIs may also exist but have frontend integration issues.
 
 ---
 
@@ -225,7 +225,7 @@ if (!response.ok) {
 | Category | Status | Notes |
 |----------|--------|-------|
 | P0 Bugs Investigated | 3/8 | 3 are NOT bugs, 5 need manual testing |
-| APIs Verified (exists) | 2/2 | create-operator, change-role |
+| APIs Verified (exists) | 2/2 | create-operador, change-role |
 | i18n Implementation | 30% | Admin dashboard done, pages remaining |
 | Modal Error Handling | ✅ | Already excellent |
 | Component Tests | 0% | Not started |

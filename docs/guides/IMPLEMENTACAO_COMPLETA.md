@@ -155,7 +155,7 @@ web-app/
 │   │   ├── relatorios/page.tsx         ✅ Relatórios
 │   │   ├── custos/page.tsx             ✅ Custos
 │   │   └── ajuda-suporte/page.tsx      ✅ Ajuda & Suporte
-│   └── operator/
+│   └── operador/
 │       ├── funcionarios/page.tsx       ✅ Funcionários
 │       ├── rotas/page.tsx              ✅ Rotas
 │       └── sincronizar/page.tsx        ✅ Sincronizar

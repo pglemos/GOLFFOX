@@ -12,8 +12,8 @@ const DATABASE_URL = process.env.DATABASE_URL || process.env.SUPABASE_DB_URL || 
 
 // Dados de seed
 const COMPANIES = [
-  { name: 'Transporte Expresso', role: 'operator' },
-  { name: 'Logística Rápida', role: 'operator' },
+  { name: 'Transporte Expresso', role: 'operador' },
+  { name: 'Logística Rápida', role: 'operador' },
   { name: 'Fretamento Premium', role: 'transportadora' },
 ]
 
@@ -108,7 +108,7 @@ async function seedDrivers(client, companies) {
     
     for (let j = 0; j < driverCount; j++) {
       const driverName = `Motorista ${company.name} ${j + 1}`
-      const driverEmail = `driver${i}_${j}@demo.golffox.com`
+      const driverEmail = `motorista${i}_${j}@demo.golffox.com`
       
       // Verificar se motorista já existe
       const { rows: existing } = await client.query(
@@ -125,7 +125,7 @@ async function seedDrivers(client, companies) {
       const { rows } = await client.query(
         `INSERT INTO public.users (
           email, name, role, company_id, is_active, created_at
-        ) VALUES ($1, $2, 'driver', $3, true, NOW())
+        ) VALUES ($1, $2, 'motorista', $3, true, NOW())
         RETURNING id, name, email`,
         [driverEmail, driverName, company.id]
       )
@@ -199,8 +199,8 @@ async function seedTrips(client, routes, vehicles, drivers) {
         
         if (availableVehicles.length === 0 || availableDrivers.length === 0) continue
         
-        const vehicle = availableVehicles[Math.floor(Math.random() * availableVehicles.length)]
-        const driver = availableDrivers[Math.floor(Math.random() * availableDrivers.length)]
+        const veiculo = availableVehicles[Math.floor(Math.random() * availableVehicles.length)]
+        const motorista = availableDrivers[Math.floor(Math.random() * availableDrivers.length)]
         
         // Horário agendado (manhã ou tarde)
         const scheduledTime = new Date(date)
@@ -216,7 +216,7 @@ async function seedTrips(client, routes, vehicles, drivers) {
           `SELECT id FROM public.trips 
            WHERE route_id = $1 AND vehicle_id = $2 
            AND DATE(scheduled_at) = $3`,
-          [route.id, vehicle.id, date.toISOString().split('T')[0]]
+          [route.id, veiculo.id, date.toISOString().split('T')[0]]
         )
         
         if (existing.length > 0) {
@@ -230,14 +230,14 @@ async function seedTrips(client, routes, vehicles, drivers) {
             route_id, vehicle_id, driver_id, status, scheduled_at, created_at
           ) VALUES ($1, $2, $3, $4, $5, NOW())
           RETURNING id`,
-          [route.id, vehicle.id, driver.id, status, scheduledTime.toISOString()]
+          [route.id, veiculo.id, motorista.id, status, scheduledTime.toISOString()]
         )
         
         trips.push(rows[0])
         
         // Se status for inProgress ou completed, criar posições
         if (status === 'inProgress' || status === 'completed') {
-          await seedPositions(client, rows[0].id, vehicle.id, driver.id, scheduledTime)
+          await seedPositions(client, rows[0].id, veiculo.id, motorista.id, scheduledTime)
         }
       }
     }
@@ -304,7 +304,7 @@ async function seedCosts(client, companies, routes, vehicles) {
       const availableVehicles = vehicles.filter(v => v.company_id === routeCompanyId)
       if (availableVehicles.length === 0) continue
       
-      const vehicle = availableVehicles[Math.floor(Math.random() * availableVehicles.length)]
+      const veiculo = availableVehicles[Math.floor(Math.random() * availableVehicles.length)]
       
       // Criar custo
       const km = 50 + Math.floor(Math.random() * 100)
@@ -316,7 +316,7 @@ async function seedCosts(client, companies, routes, vehicles) {
             route_id, vehicle_id, date, km, total, created_at
           ) VALUES ($1, $2, $3, $4, $5, NOW())
           ON CONFLICT DO NOTHING`,
-          [route.id, vehicle.id, date.toISOString().split('T')[0], km, total]
+          [route.id, veiculo.id, date.toISOString().split('T')[0], km, total]
         )
         costCount++
       } catch (error) {

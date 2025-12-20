@@ -62,19 +62,19 @@ export async function GET(req: NextRequest) {
     if (positionsError) throw positionsError
 
     // Calcular estatísticas
-    const vehicleUsage = vehicles?.map(vehicle => {
+    const vehicleUsage = vehicles?.map(veiculo => {
       const vehicleTrips = trips?.filter(t => {
         // Verificar se o veículo está associado à rota da trip
         return true // Simplificado - em produção, verificar associação veículo-rota
       }) || []
 
-      const vehiclePositions = positions?.filter(p => p.vehicle_id === vehicle.id) || []
+      const vehiclePositions = positions?.filter(p => p.vehicle_id === veiculo.id) || []
       
       return {
-        vehicle_id: vehicle.id,
-        plate: vehicle.plate,
-        model: vehicle.model,
-        is_active: vehicle.is_active,
+        vehicle_id: veiculo.id,
+        plate: veiculo.plate,
+        model: veiculo.model,
+        is_active: veiculo.is_active,
         total_trips: vehicleTrips.length,
         trips_in_period: vehicleTrips.filter(t => {
           const tripDate = new Date(t.created_at)

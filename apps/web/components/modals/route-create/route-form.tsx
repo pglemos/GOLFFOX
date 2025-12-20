@@ -94,14 +94,14 @@ export function RouteForm({
                         </SelectTrigger>
                         <SelectContent className="max-h-[300px]">
                             {loadingCompanies ? (
-                                <div className="px-4 py-3 text-base text-gray-500 flex items-center gap-2">
-                                    <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+                                <div className="px-4 py-3 text-base text-ink-muted flex items-center gap-2">
+                                    <div className="w-4 h-4 border-2 border-border border-t-transparent rounded-full animate-spin"></div>
                                     Carregando empresas...
                                 </div>
                             ) : companies.length === 0 ? (
-                                <div className="px-4 py-3 text-base text-gray-500">
+                                <div className="px-4 py-3 text-base text-ink-muted">
                                     <div>Nenhuma empresa encontrada</div>
-                                    <div className="text-xs text-gray-400 mt-1">
+                                    <div className="text-xs text-ink-light mt-1">
                                         Verifique se há empresas cadastradas no sistema
                                     </div>
                                 </div>
@@ -270,7 +270,7 @@ export function RouteForm({
                                 <Badge key={date} variant="secondary" className="flex items-center gap-2 text-sm px-3 py-1.5">
                                     {new Date(date).toLocaleDateString('pt-BR')}
                                     <X
-                                        className="h-4 w-4 cursor-pointer hover:text-red-600"
+                                        className="h-4 w-4 cursor-pointer hover:text-error"
                                         onClick={() => removeException(date)}
                                     />
                                 </Badge>
@@ -324,9 +324,9 @@ export function RouteForm({
                     </div>
 
                     {warnings.length > 0 && (
-                        <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                        <div className="p-3 bg-warning-light border border-yellow-200 rounded-lg">
                             {warnings.map((w, i) => (
-                                <div key={i} className="text-sm text-yellow-800 flex items-center gap-2">
+                                <div key={i} className="text-sm text-warning flex items-center gap-2">
                                     <AlertTriangle className="h-4 w-4" />
                                     {w}
                                 </div>

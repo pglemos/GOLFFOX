@@ -8,14 +8,14 @@ import { LinearGradient } from 'expo-linear-gradient';
 interface Message {
     id: string;
     text: string;
-    sender: 'driver' | 'central';
+    sender: 'motorista' | 'central';
     timestamp: string;
     read: boolean;
 }
 
 const mockMessages: Message[] = [
     { id: '1', text: 'Bom dia! Sua rota de hoje foi atualizada.', sender: 'central', timestamp: '07:00', read: true },
-    { id: '2', text: 'Ok, recebi. Vou iniciar em 10 minutos.', sender: 'driver', timestamp: '07:05', read: true },
+    { id: '2', text: 'Ok, recebi. Vou iniciar em 10 minutos.', sender: 'motorista', timestamp: '07:05', read: true },
     { id: '3', text: 'Perfeito! Tenha uma boa viagem.', sender: 'central', timestamp: '07:06', read: true },
 ];
 
@@ -37,7 +37,7 @@ export default function ChatScreen() {
         const newMessage: Message = {
             id: Date.now().toString(),
             text: inputText.trim(),
-            sender: 'driver',
+            sender: 'motorista',
             timestamp: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
             read: false,
         };
@@ -62,7 +62,7 @@ export default function ChatScreen() {
         setSendingSos(true);
         try {
             // Simular envio de SOS
-            console.log('SOS enviado:', { driver: profile?.name, time: new Date().toISOString() });
+            console.log('SOS enviado:', { motorista: profile?.name, time: new Date().toISOString() });
             await new Promise(r => setTimeout(r, 1500));
 
             setSosVisible(false);
@@ -76,7 +76,7 @@ export default function ChatScreen() {
             const sosMessage: Message = {
                 id: Date.now().toString(),
                 text: '🆘 ALERTA DE EMERGÊNCIA ENVIADO',
-                sender: 'driver',
+                sender: 'motorista',
                 timestamp: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
                 read: true,
             };
@@ -119,21 +119,21 @@ export default function ChatScreen() {
                         key={message.id}
                         style={[
                             styles.messageBubble,
-                            message.sender === 'driver' ? styles.driverBubble : styles.centralBubble,
+                            message.sender === 'motorista' ? styles.driverBubble : styles.centralBubble,
                         ]}
                     >
                         <Text style={[
                             styles.messageText,
-                            message.sender === 'driver' && styles.driverText,
+                            message.sender === 'motorista' && styles.driverText,
                         ]}>
                             {message.text}
                         </Text>
                         <Text style={[
                             styles.messageTime,
-                            message.sender === 'driver' && styles.driverTime,
+                            message.sender === 'motorista' && styles.driverTime,
                         ]}>
                             {message.timestamp}
-                            {message.sender === 'driver' && (
+                            {message.sender === 'motorista' && (
                                 <Text> {message.read ? '✓✓' : '✓'}</Text>
                             )}
                         </Text>

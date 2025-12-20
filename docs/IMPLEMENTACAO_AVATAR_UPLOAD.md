@@ -3,7 +3,7 @@
 ## Data: 2025-01-27
 
 ## Resumo
-Implementação completa do sistema de upload de fotos de perfil (avatars) para todos os painéis (Admin, Operator, Carrier), incluindo correções de layout, autenticação e criação de infraestrutura no Supabase.
+Implementação completa do sistema de upload de fotos de perfil (avatars) para todos os painéis (Admin, operador, transportadora), incluindo correções de layout, autenticação e criação de infraestrutura no Supabase.
 
 ## Alterações Realizadas
 

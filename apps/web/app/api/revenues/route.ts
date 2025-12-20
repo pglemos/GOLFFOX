@@ -74,7 +74,7 @@ export async function GET(request: NextRequest) {
             .select(`
         *,
         company:companies(id, name),
-        carrier:carriers(id, name)
+        transportadora:carriers(id, name)
       `, { count: 'exact' })
 
         // Aplicar filtro de tenant baseado no papel
@@ -256,7 +256,7 @@ export async function POST(request: NextRequest) {
             .select(`
         *,
         company:companies(id, name),
-        carrier:carriers(id, name)
+        transportadora:carriers(id, name)
       `)
             .single()
 
@@ -288,7 +288,7 @@ export async function POST(request: NextRequest) {
             createdAt: data.created_at,
             updatedAt: data.updated_at,
             company: data.company,
-            carrier: data.carrier,
+            transportadora: data.transportadora,
         }
 
         return NextResponse.json({ success: true, data: newRevenue }, { status: 201 })

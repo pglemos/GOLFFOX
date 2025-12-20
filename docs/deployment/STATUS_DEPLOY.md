@@ -11,10 +11,10 @@
 **Arquivos commitados:**
 - Middleware de autenticação
 - Componentes adaptativos (Sidebar, Topbar, AppShell)
-- Páginas Operator (funcionarios, alertas, ajuda)
-- Páginas Carrier (mapa, veiculos, motoristas, alertas, relatorios, ajuda)
+- Páginas operador (funcionarios, alertas, ajuda)
+- Páginas transportadora (mapa, veiculos, motoristas, alertas, relatorios, ajuda)
 - Configuração vercel.json
-- Correções de build (fleet-map.tsx, carrier/page.tsx)
+- Correções de build (fleet-map.tsx, transportadora/page.tsx)
 - Documentação completa
 
 ### 2. Build Local ✅

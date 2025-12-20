@@ -166,7 +166,7 @@ export function ImportCostModal({ isOpen, onClose, onSave, companyId }: ImportCo
       <DialogContent className="w-[95vw] sm:w-[90vw] max-w-[700px] max-h-[90vh] overflow-y-auto p-4 sm:p-6 mx-auto">
         <DialogHeader className="pb-4 sm:pb-6">
           <DialogTitle className="text-xl sm:text-2xl font-bold flex items-center gap-2 break-words">
-            <Upload className="h-5 w-5 text-orange-500 flex-shrink-0" />
+            <Upload className="h-5 w-5 text-brand flex-shrink-0" />
             Importar Custos via CSV
           </DialogTitle>
         </DialogHeader>
@@ -194,10 +194,10 @@ export function ImportCostModal({ isOpen, onClose, onSave, companyId }: ImportCo
                 Selecionar Arquivo
               </Button>
               {file && (
-                <span className="text-sm text-gray-600 truncate flex-1">{file.name}</span>
+                <span className="text-sm text-ink-muted truncate flex-1">{file.name}</span>
               )}
             </div>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-ink-muted">
               Formato esperado: data, categoria, subcategoria (opcional), valor, quantidade (opcional), 
               unidade (opcional), rota (opcional), veículo (opcional), motorista (opcional), observações (opcional)
             </p>
@@ -205,21 +205,21 @@ export function ImportCostModal({ isOpen, onClose, onSave, companyId }: ImportCo
 
           {/* Erros */}
           {errors.length > 0 && (
-            <div className="p-3 rounded-lg bg-red-50 border border-red-200">
+            <div className="p-3 rounded-lg bg-error-light border border-error-light">
               <div className="flex items-center gap-2 mb-2">
-                <AlertCircle className="h-4 w-4 text-red-500" />
-                <span className="text-sm font-medium text-red-700">
+                <AlertCircle className="h-4 w-4 text-error" />
+                <span className="text-sm font-medium text-error">
                   Erros de Validação ({errors.length}):
                 </span>
               </div>
-              <ul className="text-xs text-red-600 space-y-1 max-h-32 overflow-y-auto">
+              <ul className="text-xs text-error space-y-1 max-h-32 overflow-y-auto">
                 {errors.slice(0, 10).map((err, i) => (
                   <li key={i}>
                     Linha {err.line}: {err.errors.join(', ')}
                   </li>
                 ))}
                 {errors.length > 10 && (
-                  <li className="text-gray-500">... e mais {errors.length - 10} erros</li>
+                  <li className="text-ink-muted">... e mais {errors.length - 10} erros</li>
                 )}
               </ul>
             </div>
@@ -227,16 +227,16 @@ export function ImportCostModal({ isOpen, onClose, onSave, companyId }: ImportCo
 
           {/* Preview */}
           {preview.length > 0 && (
-            <div className="border border-gray-200 rounded-lg p-3">
+            <div className="border border-border-light rounded-lg p-3">
               <div className="flex items-center gap-2 mb-2">
-                <CheckCircle2 className="h-4 w-4 text-green-500" />
+                <CheckCircle2 className="h-4 w-4 text-success" />
                 <span className="text-sm font-medium">
                   Preview ({preview.length} primeiras linhas válidas)
                 </span>
               </div>
               <div className="max-h-48 overflow-y-auto">
                 <table className="w-full text-xs">
-                  <thead className="sticky top-0 bg-gray-50">
+                  <thead className="sticky top-0 bg-bg-soft">
                     <tr>
                       <th className="text-left p-1">Data</th>
                       <th className="text-left p-1">Categoria</th>
@@ -246,11 +246,11 @@ export function ImportCostModal({ isOpen, onClose, onSave, companyId }: ImportCo
                   </thead>
                   <tbody>
                     {preview.map((row, i) => (
-                      <tr key={i} className="border-t border-gray-200">
+                      <tr key={i} className="border-t border-border-light">
                         <td className="p-1">{row.date}</td>
                         <td className="p-1">{row.category}{row.subcategory ? ` - ${row.subcategory}` : ''}</td>
                         <td className="p-1">R$ {row.amount.toFixed(2)}</td>
-                        <td className="p-1 text-gray-500">{row.route_name || '-'}</td>
+                        <td className="p-1 text-ink-muted">{row.route_name || '-'}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -266,9 +266,9 @@ export function ImportCostModal({ isOpen, onClose, onSave, companyId }: ImportCo
                 <span>Importando...</span>
                 <span>{importProgress.current} / {importProgress.total}</span>
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
+              <div className="w-full bg-muted rounded-full h-2">
                 <div
-                  className="bg-orange-500 h-2 rounded-full transition-all"
+                  className="bg-brand h-2 rounded-full transition-all"
                   style={{ width: `${importProgress.total > 0 ? (importProgress.current / importProgress.total) * 100 : 0}%` }}
                 />
               </div>
@@ -290,7 +290,7 @@ export function ImportCostModal({ isOpen, onClose, onSave, companyId }: ImportCo
             type="button"
             onClick={handleImport}
             disabled={!file || preview.length === 0 || importing}
-            className="bg-orange-500 hover:bg-orange-600 w-full sm:w-auto order-1 sm:order-2 min-h-[44px] text-base font-medium"
+            className="bg-brand hover:bg-orange-600 w-full sm:w-auto order-1 sm:order-2 min-h-[44px] text-base font-medium"
           >
             {importing ? 'Importando...' : 'Importar'}
           </Button>

@@ -28,7 +28,7 @@ A refatoração de logger foi concluída com sucesso para **todos os arquivos cr
 
 ### 3. Admin APIs - Criação de Usuários (100% completo)
 - ✅ `create-empresa-login`, `create-empresa-user`
-- ✅ `create-transportadora-login`, `create-carrier-login`
+- ✅ `create-transportadora-login`, `create-transportadora-login`
 - ✅ `create-user`
 
 ### 4. Admin APIs - Operações CRUD (100% completo)

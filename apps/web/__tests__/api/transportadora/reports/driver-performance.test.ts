@@ -1,4 +1,4 @@
-import { GET } from '@/app/api/transportadora/reports/driver-performance/route'
+import { GET } from '@/app/api/transportadora/reports/motorista-performance/route'
 import { createTransportadoraRequest } from '../../../helpers/api-test-helpers'
 import { mockSupabaseClient } from '../../../helpers/mock-supabase'
 import { createTestTransportadora, createTestUser } from '../../../helpers/test-data'
@@ -8,7 +8,7 @@ jest.mock('@supabase/supabase-js', () => ({
   createClient: jest.fn(() => mockSupabaseClient),
 }))
 
-describe('GET /api/transportadora/reports/driver-performance', () => {
+describe('GET /api/transportadora/reports/motorista-performance', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockSupabaseClient.clear()
@@ -18,12 +18,12 @@ describe('GET /api/transportadora/reports/driver-performance', () => {
 
   it('deve gerar relatório de performance de motoristas', async () => {
     const transportadora = createTestTransportadora()
-    const driver = createTestUser({ role: 'driver', transportadora_id: transportadora.id })
+    const motorista = createTestUser({ role: 'motorista', transportadora_id: transportadora.id })
     
-    mockSupabaseClient.setTableData('users', [driver])
+    mockSupabaseClient.setTableData('users', [motorista])
     mockSupabaseClient.setTableData('gf_gamification_scores', [
       {
-        driver_id: driver.id,
+        driver_id: motorista.id,
         trips_completed: 10,
         total_points: 500,
         average_rating: 4.5,
@@ -38,7 +38,7 @@ describe('GET /api/transportadora/reports/driver-performance', () => {
 
     const req = createTransportadoraRequest({
       method: 'GET',
-      url: `http://localhost:3000/api/transportadora/reports/driver-performance?transportadora_id=${transportadora.id}`,
+      url: `http://localhost:3000/api/transportadora/reports/motorista-performance?transportadora_id=${transportadora.id}`,
     }) as NextRequest
 
     const response = await GET(req)
@@ -59,7 +59,7 @@ describe('GET /api/transportadora/reports/driver-performance', () => {
 
     const req = createTransportadoraRequest({
       method: 'GET',
-      url: `http://localhost:3000/api/transportadora/reports/driver-performance?transportadora_id=${transportadora.id}&start_date=2024-01-01&end_date=2024-01-31`,
+      url: `http://localhost:3000/api/transportadora/reports/motorista-performance?transportadora_id=${transportadora.id}&start_date=2024-01-01&end_date=2024-01-31`,
     }) as NextRequest
 
     const response = await GET(req)
@@ -72,7 +72,7 @@ describe('GET /api/transportadora/reports/driver-performance', () => {
   it('deve rejeitar sem transportadora_id', async () => {
     const req = createTransportadoraRequest({
       method: 'GET',
-      url: 'http://localhost:3000/api/transportadora/reports/driver-performance',
+      url: 'http://localhost:3000/api/transportadora/reports/motorista-performance',
     }) as NextRequest
 
     const response = await GET(req)
@@ -91,7 +91,7 @@ describe('GET /api/transportadora/reports/driver-performance', () => {
 
     const req = createTransportadoraRequest({
       method: 'GET',
-      url: `http://localhost:3000/api/transportadora/reports/driver-performance?carrier_id=${transportadora.id}`,
+      url: `http://localhost:3000/api/transportadora/reports/motorista-performance?carrier_id=${transportadora.id}`,
     }) as NextRequest
 
     const response = await GET(req)

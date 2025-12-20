@@ -63,8 +63,8 @@ export default function TransportadoraRotasPage() {
                 .from('gf_routes')
                 .select(`
           *,
-          driver:users!gf_routes_driver_id_fkey(name),
-          vehicle:gf_vehicles(plate)
+          motorista:users!gf_routes_driver_id_fkey(name),
+          veiculo:gf_vehicles(plate)
         `)
                 .eq('transportadora_id', (user as any)?.transportadora_id)
                 .order('scheduled_date', { ascending: false })
@@ -73,8 +73,8 @@ export default function TransportadoraRotasPage() {
 
             const formattedRoutes = (data || []).map((r: any) => ({
                 ...r,
-                driver_name: r.driver?.name,
-                vehicle_plate: r.vehicle?.plate,
+                driver_name: r.motorista?.name,
+                vehicle_plate: r.veiculo?.plate,
             }))
 
             setRoutes(formattedRoutes)
@@ -125,7 +125,7 @@ export default function TransportadoraRotasPage() {
                 {/* Search + Filter */}
                 <div className="flex flex-col sm:flex-row gap-2">
                     <div className="relative flex-1">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-ink-light h-4 w-4" />
                         <Input
                             placeholder="Buscar rotas..."
                             value={searchQuery}
@@ -181,10 +181,10 @@ export default function TransportadoraRotasPage() {
                                                         <Badge variant={statusConfig.variant}>{statusConfig.label}</Badge>
                                                     </div>
                                                     <div className="flex items-center gap-2 mb-2 text-sm">
-                                                        <MapPin className="h-4 w-4 text-green-500" />
+                                                        <MapPin className="h-4 w-4 text-success" />
                                                         <span>{route.origin}</span>
                                                         <span className="text-muted-foreground">→</span>
-                                                        <MapPin className="h-4 w-4 text-red-500" />
+                                                        <MapPin className="h-4 w-4 text-error" />
                                                         <span>{route.destination}</span>
                                                     </div>
                                                     <div className="flex flex-wrap gap-2 sm:gap-4 text-xs sm:text-sm text-ink-muted">

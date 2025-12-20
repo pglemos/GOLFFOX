@@ -126,7 +126,7 @@ export function createTestTransportadora(overrides: Partial<TestTransportadora> 
  * Factory para criar veículo de teste
  */
 export function createTestVehicle(transportadoraId: string, overrides: Partial<TestVehicle> = {}): TestVehicle {
-  const id = overrides.id || `vehicle-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+  const id = overrides.id || `veiculo-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
   
   return {
     id,
@@ -145,7 +145,7 @@ export function createTestVehicle(transportadoraId: string, overrides: Partial<T
  * Factory para criar motorista de teste
  */
 export function createTestDriver(transportadoraId: string, overrides: Partial<TestDriver> = {}): TestDriver {
-  const id = overrides.id || `driver-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+  const id = overrides.id || `motorista-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
   
   return {
     id,
@@ -235,18 +235,18 @@ export const seeders = {
     const transportadora = createTestTransportadora()
     const company = createTestCompany()
     const admin = createTestUser({ role: 'admin' })
-    const operator = createTestUser({ role: 'operador', company_id: company.id })
-    const vehicle = createTestVehicle(transportadora.id)
-    const driver = createTestDriver(transportadora.id)
+    const operador = createTestUser({ role: 'operador', company_id: company.id })
+    const veiculo = createTestVehicle(transportadora.id)
+    const motorista = createTestDriver(transportadora.id)
     const route = createTestRoute(transportadora.id, { company_id: company.id })
 
     return {
       transportadora,
       company,
       admin,
-      operator,
-      vehicle,
-      driver,
+      operador,
+      veiculo,
+      motorista,
       route,
     }
   },
@@ -254,15 +254,15 @@ export const seeders = {
   /**
    * Cria dados básicos para testes de operador
    */
-  operator: () => {
+  operador: () => {
     const company = createTestCompany()
-    const operator = createTestUser({ role: 'operador', company_id: company.id })
+    const operador = createTestUser({ role: 'operador', company_id: company.id })
     const transportadora = createTestTransportadora()
     const route = createTestRoute(transportadora.id, { company_id: company.id })
 
     return {
       company,
-      operator,
+      operador,
       transportadora,
       route,
     }
@@ -274,15 +274,15 @@ export const seeders = {
   transportadora: () => {
     const transportadora = createTestTransportadora()
     const user = createTestUser({ role: 'transportadora', transportadora_id: transportadora.id })
-    const vehicle = createTestVehicle(transportadora.id)
-    const driver = createTestDriver(transportadora.id)
+    const veiculo = createTestVehicle(transportadora.id)
+    const motorista = createTestDriver(transportadora.id)
     const route = createTestRoute(transportadora.id)
 
     return {
       transportadora,
       user,
-      vehicle,
-      driver,
+      veiculo,
+      motorista,
       route,
     }
   },

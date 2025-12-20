@@ -37,7 +37,7 @@ Sistema completo de gestão de transporte de funcionários com Painel Admin Web,
 4. **Veículos** - CRUD + manutenção preventiva
 5. **Motoristas** - CRUD + documentos + gamificação
 6. **Empresas** - CRUD + funcionários cadastrados
-7. **Permissões** - Gestão de papéis (admin, operator, carrier, driver, passenger)
+7. **Permissões** - Gestão de papéis (admin, operador, transportadora, motorista, passageiro)
 8. **Socorro** - Ocorrências + despacho de emergência
 9. **Alertas** - Histórico com filtros
 10. **Relatórios** - Visões de operação (PDF/Excel/CSV)
@@ -53,7 +53,7 @@ Sistema completo de gestão de transporte de funcionários com Painel Admin Web,
     - Reprocessamento de falhas
     - Status em tempo real
 
-### Portal do Operador (`/operator`)
+### Portal do Operador (`/operador`)
 1. **Funcionários** - Cadastro com geocodificação automática
 2. **Rotas** - Visualização de funcionários por rota
 3. **Sincronizar** - Reprocessamento de pontos de parada
@@ -214,7 +214,7 @@ flutter build ios --release
 ## 🔒 Segurança
 
 - RLS (Row Level Security) ativo no Supabase
-- Políticas por papel (admin, operator, carrier, driver, passenger)
+- Políticas por papel (admin, operador, transportadora, motorista, passageiro)
 - Autenticação via Supabase Auth
 - Validação de dados no frontend e backend
 - Proteção LGPD de PII (CPF mascarado, logs sanitizados)
@@ -318,7 +318,7 @@ npm run test:coverage
 ## 📚 Documentação Adicional
 
 - [Configuração de Ambiente](./docs/CONFIGURACAO-AMBIENTE.md)
-- [Guia de Testes Operator](./docs/GUIA-TESTES-OPERATOR.md)
+- [Guia de Testes operador](./docs/GUIA-TESTES-operador.md)
 - [Próximos Passos](./docs/PROXIMOS_PASSOS.md)
 
 ---

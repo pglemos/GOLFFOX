@@ -4,7 +4,7 @@
 
 - ✅ Build local passa com sucesso
 - ✅ Middleware de autenticação criado
-- ✅ 3 painéis configurados (Admin, Operator, Carrier)
+- ✅ 3 painéis configurados (Admin, operador, transportadora)
 - ✅ Componentes adaptativos funcionando
 - ✅ Todas as páginas criadas
 - ✅ Documentação completa
@@ -69,7 +69,7 @@ git commit -m "feat: Deploy - Configuração de 3 painéis (Admin/operador/trans
 
 - Middleware de autenticação por role
 - Componentes adaptativos (Sidebar, Topbar, AppShell)
-- Páginas completas para Operator e Carrier
+- Páginas completas para operador e transportadora
 - Documentação completa de deploy
 - Build validado localmente"
 
@@ -100,8 +100,8 @@ Após o deploy completar com sucesso, teste:
 
 #### URLs Principais:
 - 🌐 **Admin**: https://golffox.vercel.app/admin
-- 🌐 **Operator**: https://golffox.vercel.app/operator
-- 🌐 **Carrier**: https://golffox.vercel.app/carrier
+- 🌐 **operador**: https://golffox.vercel.app/operador
+- 🌐 **transportadora**: https://golffox.vercel.app/transportadora
 - 🌐 **Login**: https://golffox.vercel.app/login
 
 #### Testes de Autenticação:
@@ -137,12 +137,12 @@ Após o deploy completar com sucesso, teste:
 - [ ] Relatórios exportam (CSV/Excel/PDF)
 - [ ] Navegação rotas→mapa funciona
 
-#### Operator Panel:
+#### operador Panel:
 - [ ] Dashboard mostra viagens da empresa
 - [ ] Funcionários listam
 - [ ] Alertas aparecem
 
-#### Carrier Panel:
+#### transportadora Panel:
 - [ ] Dashboard mostra frota
 - [ ] Mapa mostra veículos da transportadora
 - [ ] Relatórios exportam

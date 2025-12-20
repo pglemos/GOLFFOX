@@ -105,16 +105,16 @@ export function RoutePreviewMap({
     return (
         <div className="space-y-3 sm:space-y-4 h-full flex flex-col">
             <div className="grid grid-cols-3 gap-2 sm:gap-4">
-                <div className="p-2 sm:p-3 bg-gray-50 rounded-lg">
-                    <div className="text-xs sm:text-sm text-gray-600">Distância Total</div>
+                <div className="p-2 sm:p-3 bg-bg-soft rounded-lg">
+                    <div className="text-xs sm:text-sm text-ink-muted">Distância Total</div>
                     <div className="text-lg sm:text-2xl font-bold">{totalKm} km</div>
                 </div>
-                <div className="p-2 sm:p-3 bg-gray-50 rounded-lg">
-                    <div className="text-xs sm:text-sm text-gray-600">Tempo Total</div>
+                <div className="p-2 sm:p-3 bg-bg-soft rounded-lg">
+                    <div className="text-xs sm:text-sm text-ink-muted">Tempo Total</div>
                     <div className="text-lg sm:text-2xl font-bold">{totalMinutes} min</div>
                 </div>
-                <div className="p-2 sm:p-3 bg-gray-50 rounded-lg">
-                    <div className="text-xs sm:text-sm text-gray-600">Paradas</div>
+                <div className="p-2 sm:p-3 bg-bg-soft rounded-lg">
+                    <div className="text-xs sm:text-sm text-ink-muted">Paradas</div>
                     <div className="text-lg sm:text-2xl font-bold">{result.ordered.length}</div>
                 </div>
             </div>
@@ -158,7 +158,7 @@ export function RoutePreviewMap({
                         return (
                             <div
                                 key={point.id}
-                                className="flex items-center gap-2 text-xs sm:text-sm p-1.5 sm:p-2 hover:bg-gray-50 rounded cursor-move"
+                                className="flex items-center gap-2 text-xs sm:text-sm p-1.5 sm:p-2 hover:bg-bg-soft rounded cursor-move"
                                 draggable
                                 onDragStart={(e) => {
                                     e.dataTransfer.setData("text/plain", idx.toString())
@@ -187,7 +187,7 @@ export function RoutePreviewMap({
                                 <span className="flex-1 truncate">
                                     {emp ? `${emp.first_name} ${emp.last_name}` : `Parada ${point.order}`}
                                 </span>
-                                <Navigation className="h-3 w-3 sm:h-4 sm:w-4 text-gray-400 flex-shrink-0" />
+                                <Navigation className="h-3 w-3 sm:h-4 sm:w-4 text-ink-light flex-shrink-0" />
                             </div>
                         )
                     })}

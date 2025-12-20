@@ -10,7 +10,7 @@
 -- - passenger_cancellations: Registro de não-embarques
 
 -- ====================================================
--- PART 1: PASSENGER CHECK-INS
+-- PART 1: passageiro CHECK-INS
 -- ====================================================
 CREATE TABLE IF NOT EXISTS public.passenger_checkins (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -33,7 +33,7 @@ CREATE INDEX IF NOT EXISTS idx_passenger_checkins_driver ON public.passenger_che
 CREATE INDEX IF NOT EXISTS idx_passenger_checkins_created ON public.passenger_checkins(created_at);
 
 -- ====================================================
--- PART 2: VEHICLE CHECKLISTS
+-- PART 2: veiculo CHECKLISTS
 -- ====================================================
 CREATE TABLE IF NOT EXISTS public.vehicle_checklists (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -59,7 +59,7 @@ CREATE INDEX IF NOT EXISTS idx_vehicle_checklists_vehicle ON public.vehicle_chec
 CREATE INDEX IF NOT EXISTS idx_vehicle_checklists_status ON public.vehicle_checklists(status);
 
 -- ====================================================
--- PART 3: DRIVER LOCATIONS (GPS Tracking)
+-- PART 3: motorista LOCATIONS (GPS Tracking)
 -- ====================================================
 CREATE TABLE IF NOT EXISTS public.driver_locations (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -80,13 +80,13 @@ CREATE INDEX IF NOT EXISTS idx_driver_locations_trip ON public.driver_locations(
 CREATE INDEX IF NOT EXISTS idx_driver_locations_recorded ON public.driver_locations(recorded_at DESC);
 
 -- ====================================================
--- PART 4: DRIVER MESSAGES (Chat)
+-- PART 4: motorista MESSAGES (Chat)
 -- ====================================================
 CREATE TABLE IF NOT EXISTS public.driver_messages (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     driver_id UUID NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
     carrier_id UUID, -- Transportadora (para multitenancy)
-    sender TEXT NOT NULL CHECK (sender IN ('driver', 'central')),
+    sender TEXT NOT NULL CHECK (sender IN ('motorista', 'central')),
     message TEXT NOT NULL,
     message_type TEXT DEFAULT 'text' CHECK (message_type IN ('text', 'location', 'emergency', 'delay', 'system')),
     is_emergency BOOLEAN DEFAULT false,
@@ -102,7 +102,7 @@ CREATE INDEX IF NOT EXISTS idx_driver_messages_created ON public.driver_messages
 CREATE INDEX IF NOT EXISTS idx_driver_messages_emergency ON public.driver_messages(is_emergency) WHERE is_emergency = true;
 
 -- ====================================================
--- PART 5: PASSENGER CANCELLATIONS
+-- PART 5: passageiro CANCELLATIONS
 -- ====================================================
 CREATE TABLE IF NOT EXISTS public.passenger_cancellations (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -121,7 +121,7 @@ CREATE INDEX IF NOT EXISTS idx_passenger_cancellations_passenger ON public.passe
 CREATE INDEX IF NOT EXISTS idx_passenger_cancellations_date ON public.passenger_cancellations(scheduled_date);
 
 -- ====================================================
--- PART 6: PASSENGER EVALUATIONS (NPS)
+-- PART 6: passageiro EVALUATIONS (NPS)
 -- ====================================================
 CREATE TABLE IF NOT EXISTS public.trip_evaluations (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -203,12 +203,12 @@ CREATE POLICY "Drivers can insert locations" ON public.driver_locations
     FOR INSERT TO authenticated 
     WITH CHECK (driver_id = auth.uid());
 
--- Users can read driver locations for their trips
+-- Users can read motorista locations for their trips
 CREATE POLICY "Users can read trip locations" ON public.driver_locations 
     FOR SELECT TO authenticated 
     USING (true); -- Ajustar para company_id se necessário
 
--- Driver messages policies
+-- motorista messages policies
 CREATE POLICY "Drivers can manage own messages" ON public.driver_messages 
     FOR ALL TO authenticated 
     USING (driver_id = auth.uid())
@@ -258,7 +258,7 @@ BEGIN
     -- Adicionar nova constraint com roles em PT e EN
     ALTER TABLE public.users ADD CONSTRAINT users_role_check 
         CHECK (role IN (
-            'admin', 'operator', 'carrier', 'driver', 'passenger',
+            'admin', 'operador', 'transportadora', 'motorista', 'passageiro',
             'empresa', 'operador', 'motorista', 'passageiro'
         ));
 EXCEPTION

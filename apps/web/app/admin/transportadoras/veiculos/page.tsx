@@ -36,7 +36,7 @@ const VehicleModal = dynamic(
     { ssr: false, loading: () => null }
 )
 
-interface Vehicle {
+interface veiculo {
     id: string
     plate: string
     model: string
@@ -56,10 +56,10 @@ interface Transportadora {
 
 export default function TransportadoraVeiculosPage() {
     const { user, loading: authLoading } = useAuthFast()
-    const [vehicles, setVehicles] = useState<Vehicle[]>([])
+    const [vehicles, setVehicles] = useState<veiculo[]>([])
     const [transportadoras, setTransportadoras] = useState<Transportadora[]>([])
     const [dataLoading, setDataLoading] = useState(true)
-    const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null)
+    const [selectedVehicle, setSelectedVehicle] = useState<veiculo | null>(null)
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [isSelectCarrierOpen, setIsSelectCarrierOpen] = useState(false)
     const [newVehicleCarrierId, setNewVehicleCarrierId] = useState<string>("")
@@ -183,7 +183,7 @@ export default function TransportadoraVeiculosPage() {
                 {/* Search + Filter */}
                 <div className="flex flex-col sm:flex-row gap-2">
                     <div className="relative flex-1">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-ink-light h-4 w-4" />
                         <Input
                             placeholder="Buscar veículos por placa, modelo..."
                             value={searchQuery}
@@ -216,9 +216,9 @@ export default function TransportadoraVeiculosPage() {
                                 <p className="text-muted-foreground">Nenhum veículo encontrado</p>
                             </Card>
                         ) : (
-                            filteredVehicles.map((vehicle) => (
+                            filteredVehicles.map((veiculo) => (
                                 <motion.div
-                                    key={vehicle.id}
+                                    key={veiculo.id}
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ duration: 0.3 }}
@@ -227,11 +227,11 @@ export default function TransportadoraVeiculosPage() {
                                     <Card className="p-3 sm:p-4 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-border hover:border-text-brand/30 group">
                                         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
                                             <div className="flex-1 flex gap-3 sm:gap-4 min-w-0">
-                                                {vehicle.photo_url && (
+                                                {veiculo.photo_url && (
                                                     /* eslint-disable-next-line @next/next/no-img-element */
                                                     <img
-                                                        src={vehicle.photo_url}
-                                                        alt={vehicle.plate}
+                                                        src={veiculo.photo_url}
+                                                        alt={veiculo.plate}
                                                         className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg object-cover border-2 border-border flex-shrink-0"
                                                     />
                                                 )}
@@ -240,27 +240,27 @@ export default function TransportadoraVeiculosPage() {
                                                         <div className="p-1 rounded-lg bg-gradient-to-br from-bg-brand-light to-bg-brand-soft">
                                                             <Truck className="h-4 w-4 text-brand" />
                                                         </div>
-                                                        <h3 className="font-bold text-base sm:text-lg group-hover:text-brand transition-colors">{vehicle.plate}</h3>
-                                                        {vehicle.prefix && (
-                                                            <Badge variant="outline">Prefixo: {vehicle.prefix}</Badge>
+                                                        <h3 className="font-bold text-base sm:text-lg group-hover:text-brand transition-colors">{veiculo.plate}</h3>
+                                                        {veiculo.prefix && (
+                                                            <Badge variant="outline">Prefixo: {veiculo.prefix}</Badge>
                                                         )}
-                                                        <Badge variant={vehicle.is_active !== false ? "default" : "secondary"}>
-                                                            {vehicle.is_active !== false ? "Ativo" : "Inativo"}
+                                                        <Badge variant={veiculo.is_active !== false ? "default" : "secondary"}>
+                                                            {veiculo.is_active !== false ? "Ativo" : "Inativo"}
                                                         </Badge>
                                                     </div>
-                                                    <p className="font-medium mb-1 text-sm sm:text-base">{vehicle.model || "Sem modelo"}</p>
+                                                    <p className="font-medium mb-1 text-sm sm:text-base">{veiculo.model || "Sem modelo"}</p>
                                                     <div className="flex flex-wrap gap-2 sm:gap-4 text-xs sm:text-sm text-ink-muted">
-                                                        {vehicle.year && (
+                                                        {veiculo.year && (
                                                             <span className="flex items-center gap-1">
                                                                 <Calendar className="h-3 w-3" />
-                                                                {vehicle.year}
+                                                                {veiculo.year}
                                                             </span>
                                                         )}
-                                                        {vehicle.capacity && <span>Capacidade: {vehicle.capacity}</span>}
-                                                        {vehicle.carrier_name && (
+                                                        {veiculo.capacity && <span>Capacidade: {veiculo.capacity}</span>}
+                                                        {veiculo.carrier_name && (
                                                             <span className="flex items-center gap-1">
                                                                 <Building2 className="h-3 w-3" />
-                                                                {vehicle.carrier_name}
+                                                                {veiculo.carrier_name}
                                                             </span>
                                                         )}
                                                     </div>
@@ -270,7 +270,7 @@ export default function TransportadoraVeiculosPage() {
                                                 <Button
                                                     variant="outline"
                                                     size="sm"
-                                                    onClick={() => { setSelectedVehicle(vehicle); setIsModalOpen(true) }}
+                                                    onClick={() => { setSelectedVehicle(veiculo); setIsModalOpen(true) }}
                                                     className="min-h-[44px] touch-manipulation"
                                                 >
                                                     <Edit className="h-4 w-4 mr-1" />
@@ -279,7 +279,7 @@ export default function TransportadoraVeiculosPage() {
                                                 <Button
                                                     variant="outline"
                                                     size="sm"
-                                                    onClick={() => handleDelete(vehicle.id, vehicle.plate)}
+                                                    onClick={() => handleDelete(veiculo.id, veiculo.plate)}
                                                     className="min-h-[44px] touch-manipulation text-destructive hover:bg-destructive/10"
                                                 >
                                                     <Trash2 className="h-4 w-4" />
@@ -336,7 +336,7 @@ export default function TransportadoraVeiculosPage() {
 
             {/* Modal */}
             <VehicleModal
-                vehicle={selectedVehicle as any}
+                veiculo={selectedVehicle as any}
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 onSave={() => { setIsModalOpen(false); loadVehicles() }}

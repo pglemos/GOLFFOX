@@ -89,8 +89,8 @@ Todas as tarefas das **Fase 1 (Correções Críticas)** e **Fase 2 (Melhorias Es
 
 #### Testes E2E
 - `e2e/admin/vehicles-management.spec.ts`
-- `e2e/operator/employees-workflow.spec.ts`
-- `e2e/carrier/drivers-management.spec.ts`
+- `e2e/operador/employees-workflow.spec.ts`
+- `e2e/transportadora/drivers-management.spec.ts`
 - `e2e/costs/complete-flow.spec.ts`
 - `e2e/routes/route-creation.spec.ts`
 - `e2e/map/real-time-tracking.spec.ts`

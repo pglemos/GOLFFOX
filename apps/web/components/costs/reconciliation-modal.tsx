@@ -313,7 +313,7 @@ export function ReconciliationModal({
       <DialogContent className="w-[95vw] sm:w-[90vw] max-w-5xl max-h-[90vh] overflow-y-auto p-4 sm:p-6 mx-auto">
         <DialogHeader className="pb-4 sm:pb-6">
           <DialogTitle className="text-xl sm:text-2xl font-bold flex items-center gap-2 break-words">
-            <FileText className="h-5 w-5 text-orange-500 flex-shrink-0" />
+            <FileText className="h-5 w-5 text-brand flex-shrink-0" />
             Conciliação de Fatura
             {invoice && (
               <Badge 
@@ -336,25 +336,25 @@ export function ReconciliationModal({
         {loading ? (
           <div className="p-8 text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Carregando dados...</p>
+            <p className="mt-4 text-ink-muted">Carregando dados...</p>
           </div>
         ) : (
           <div className="space-y-4 sm:space-y-6 py-2 sm:py-4">
             {/* Resumo da Fatura */}
             {invoice && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 p-3 sm:p-4 bg-gray-50 rounded-lg">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 p-3 sm:p-4 bg-bg-soft rounded-lg">
                 <div>
-                  <p className="text-sm text-gray-600">Período</p>
+                  <p className="text-sm text-ink-muted">Período</p>
                   <p className="font-semibold">
                     {new Date(invoice.period_start).toLocaleDateString('pt-BR')} - {new Date(invoice.period_end).toLocaleDateString('pt-BR')}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600">Total</p>
+                  <p className="text-sm text-ink-muted">Total</p>
                   <p className="font-semibold text-lg">{formatCurrency(invoice.total_amount)}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600">Status</p>
+                  <p className="text-sm text-ink-muted">Status</p>
                   <Badge 
                     variant={
                       invoice.status === 'approved' ? 'default' : 
@@ -370,7 +370,7 @@ export function ReconciliationModal({
                   </Badge>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600">Linhas</p>
+                  <p className="text-sm text-ink-muted">Linhas</p>
                   <p className="font-semibold">{invoiceLines.length}</p>
                 </div>
               </div>
@@ -379,7 +379,7 @@ export function ReconciliationModal({
             {/* Tabela de Conciliação */}
             <div className="border rounded-lg overflow-hidden">
               <table className="w-full">
-                <thead className="bg-gray-50">
+                <thead className="bg-bg-soft">
                   <tr>
                     <th className="px-4 py-3 text-left text-sm font-semibold">Rota</th>
                     <th className="px-4 py-3 text-left text-sm font-semibold">KM</th>
@@ -395,22 +395,22 @@ export function ReconciliationModal({
                     return (
                       <tr 
                         key={line.id}
-                        className={status.hasSignificantDiscrepancy ? 'bg-red-50' : ''}
+                        className={status.hasSignificantDiscrepancy ? 'bg-error-light' : ''}
                       >
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-2">
-                            <RouteIcon className="h-4 w-4 text-gray-400" />
+                            <RouteIcon className="h-4 w-4 text-ink-light" />
                             <span className="font-medium">{line.route_name}</span>
                           </div>
                         </td>
                         <td className="px-4 py-3">
                           <div className="space-y-1">
                             <div className="text-sm">
-                              <span className="text-gray-500">Medido: </span>
+                              <span className="text-ink-muted">Medido: </span>
                               {formatDistance(line.measured_km)}
                             </div>
                             <div className="text-sm">
-                              <span className="text-gray-500">Faturado: </span>
+                              <span className="text-ink-muted">Faturado: </span>
                               {formatDistance(line.invoiced_km)}
                             </div>
                             {status.kmDiscrepancy.isSignificant && (
@@ -423,11 +423,11 @@ export function ReconciliationModal({
                         <td className="px-4 py-3">
                           <div className="space-y-1">
                             <div className="text-sm">
-                              <span className="text-gray-500">Medido: </span>
+                              <span className="text-ink-muted">Medido: </span>
                               {formatDuration(line.measured_time || 0)}
                             </div>
                             <div className="text-sm">
-                              <span className="text-gray-500">Faturado: </span>
+                              <span className="text-ink-muted">Faturado: </span>
                               {formatDuration(line.invoiced_time || 0)}
                             </div>
                             {status.timeDiscrepancy.isSignificant && (
@@ -440,11 +440,11 @@ export function ReconciliationModal({
                         <td className="px-4 py-3">
                           <div className="space-y-1">
                             <div className="text-sm">
-                              <span className="text-gray-500">Medido: </span>
+                              <span className="text-ink-muted">Medido: </span>
                               {line.measured_trips || 0}
                             </div>
                             <div className="text-sm">
-                              <span className="text-gray-500">Faturado: </span>
+                              <span className="text-ink-muted">Faturado: </span>
                               {line.invoiced_trips || line.trip_count || 0}
                             </div>
                             {status.tripsDiscrepancy.isSignificant && (
@@ -457,7 +457,7 @@ export function ReconciliationModal({
                         <td className="px-4 py-3">
                           <div className="font-semibold">{formatCurrency(line.amount)}</div>
                           {line.discrepancy && Math.abs(line.discrepancy) > 0.01 && (
-                            <div className="text-xs text-gray-500">
+                            <div className="text-xs text-ink-muted">
                               Diferença: {formatCurrency(line.discrepancy)}
                             </div>
                           )}
@@ -483,22 +483,22 @@ export function ReconciliationModal({
             </div>
 
             {/* Resumo de Divergências */}
-            <div className="p-4 bg-gray-50 rounded-lg">
+            <div className="p-4 bg-bg-soft rounded-lg">
               <h4 className="font-semibold mb-2">Resumo de Divergências</h4>
               <div className="grid grid-cols-3 gap-4 text-sm">
                 <div>
-                  <span className="text-gray-600">Total de linhas: </span>
+                  <span className="text-ink-muted">Total de linhas: </span>
                   <span className="font-semibold">{invoiceLines.length}</span>
                 </div>
                 <div>
-                  <span className="text-gray-600">Com divergência: </span>
-                  <span className="font-semibold text-red-600">
+                  <span className="text-ink-muted">Com divergência: </span>
+                  <span className="font-semibold text-error">
                     {invoiceLines.filter(l => getDiscrepancyStatus(l).hasSignificantDiscrepancy).length}
                   </span>
                 </div>
                 <div>
-                  <span className="text-gray-600">Sem divergência: </span>
-                  <span className="font-semibold text-green-600">
+                  <span className="text-ink-muted">Sem divergência: </span>
+                  <span className="font-semibold text-success">
                     {invoiceLines.filter(l => !getDiscrepancyStatus(l).hasSignificantDiscrepancy).length}
                   </span>
                 </div>
@@ -554,7 +554,7 @@ export function ReconciliationModal({
                   variant="outline" 
                   onClick={handleReject}
                   disabled={processing}
-                  className="text-red-600 hover:text-red-700 min-h-[44px] text-xs sm:text-sm w-full sm:w-auto"
+                  className="text-error hover:text-error min-h-[44px] text-xs sm:text-sm w-full sm:w-auto"
                 >
                   <XCircle className="h-4 w-4 mr-2 flex-shrink-0" />
                   Rejeitar
@@ -562,7 +562,7 @@ export function ReconciliationModal({
                 <Button 
                   onClick={handleApprove}
                   disabled={processing}
-                  className="bg-green-600 hover:bg-green-700 min-h-[44px] text-xs sm:text-sm w-full sm:w-auto"
+                  className="bg-success hover:bg-green-700 min-h-[44px] text-xs sm:text-sm w-full sm:w-auto"
                 >
                   <CheckCircle className="h-4 w-4 mr-2 flex-shrink-0" />
                   {processing ? 'Processando...' : 'Aprovar'}
@@ -575,7 +575,7 @@ export function ReconciliationModal({
                   variant="outline" 
                   onClick={handleReject}
                   disabled={processing}
-                  className="text-red-600 hover:text-red-700 min-h-[44px] text-xs sm:text-sm w-full sm:w-auto"
+                  className="text-error hover:text-error min-h-[44px] text-xs sm:text-sm w-full sm:w-auto"
                 >
                   <XCircle className="h-4 w-4 mr-2 flex-shrink-0" />
                   Rejeitar
@@ -583,7 +583,7 @@ export function ReconciliationModal({
                 <Button 
                   onClick={handleApprove}
                   disabled={processing}
-                  className="bg-green-600 hover:bg-green-700 min-h-[44px] text-xs sm:text-sm w-full sm:w-auto"
+                  className="bg-success hover:bg-green-700 min-h-[44px] text-xs sm:text-sm w-full sm:w-auto"
                 >
                   <CheckCircle className="h-4 w-4 mr-2 flex-shrink-0" />
                   {processing ? 'Processando...' : 'Aprovar'}

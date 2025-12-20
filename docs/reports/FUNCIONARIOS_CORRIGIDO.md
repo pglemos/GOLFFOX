@@ -137,18 +137,18 @@ is_active → default true
 ### Usuário de Teste
 - **Email:** operador@empresa.com
 - **Senha:** senha123
-- **Role:** operator
+- **Role:** operador
 - **ID:** c68854a1-563e-4eca-8069-31894c6fcad5
 
 ### Empresa
 - **Nome:** Acme Corp
 - **ID:** 11111111-1111-4111-8111-1111111111c1
-- **Role:** operator
+- **Role:** operador
 - **Funcionários:** 10
 
 ### URL de Acesso
 ```
-https://golffox.vercel.app/operator
+https://golffox.vercel.app/operador
 ```
 
 ---
@@ -298,7 +298,7 @@ company_ownership(company_id UUID) → BOOLEAN
 ## Resumo Técnico
 
 ### O que foi corrigido:
-1. ✅ Role da empresa (company → operator)
+1. ✅ Role da empresa (company → operador)
 2. ✅ Funcionários criados (0 → 10)
 3. ✅ View segura criada e testada
 4. ✅ Mapeamentos user→empresa validados

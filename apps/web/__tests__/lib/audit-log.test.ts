@@ -41,8 +41,8 @@ describe('Audit Log', () => {
 
       await logAudit({
         action: 'create',
-        resourceType: 'vehicle',
-        resourceId: 'vehicle-1',
+        resourceType: 'veiculo',
+        resourceId: 'veiculo-1',
         details: { plate: 'ABC1234' },
       })
 
@@ -51,8 +51,8 @@ describe('Audit Log', () => {
         expect.objectContaining({
           actor_id: 'user-1',
           action_type: 'create',
-          resource_type: 'vehicle',
-          resource_id: 'vehicle-1',
+          resource_type: 'veiculo',
+          resource_id: 'veiculo-1',
         })
       )
     })
@@ -87,8 +87,8 @@ describe('Audit Log', () => {
 
       await logAudit({
         action: 'create',
-        resourceType: 'vehicle',
-        resourceId: 'vehicle-1',
+        resourceType: 'veiculo',
+        resourceId: 'veiculo-1',
       })
 
       expect(mockInsert).toHaveBeenCalledWith(
@@ -113,8 +113,8 @@ describe('Audit Log', () => {
 
       await logAudit({
         action: 'create',
-        resourceType: 'vehicle',
-        resourceId: 'vehicle-1',
+        resourceType: 'veiculo',
+        resourceId: 'veiculo-1',
         companyId: 'company-2',
       })
 
@@ -140,8 +140,8 @@ describe('Audit Log', () => {
 
       await logAudit({
         action: 'create',
-        resourceType: 'driver',
-        resourceId: 'driver-1',
+        resourceType: 'motorista',
+        resourceId: 'motorista-1',
         details: {
           name: 'João',
           cpf: '12345678900',
@@ -173,8 +173,8 @@ describe('Audit Log', () => {
 
       await logAudit({
         action: 'create',
-        resourceType: 'driver',
-        resourceId: 'driver-1',
+        resourceType: 'motorista',
+        resourceId: 'motorista-1',
         details: {
           name: 'João',
           address: 'Rua Teste, 123, Bairro, Cidade',
@@ -198,8 +198,8 @@ describe('Audit Log', () => {
 
       await logAudit({
         action: 'create',
-        resourceType: 'vehicle',
-        resourceId: 'vehicle-1',
+        resourceType: 'veiculo',
+        resourceId: 'veiculo-1',
       })
 
       expect(supabase.from).not.toHaveBeenCalled()
@@ -221,8 +221,8 @@ describe('Audit Log', () => {
       await expect(
         logAudit({
           action: 'create',
-          resourceType: 'vehicle',
-          resourceId: 'vehicle-1',
+          resourceType: 'veiculo',
+          resourceId: 'veiculo-1',
         })
       ).resolves.toBeUndefined()
     })
@@ -242,23 +242,23 @@ describe('Audit Log', () => {
     })
 
     it('deve criar log de criação', async () => {
-      await auditLogs.create('vehicle', 'vehicle-1', { plate: 'ABC1234' })
+      await auditLogs.create('veiculo', 'veiculo-1', { plate: 'ABC1234' })
 
       const insertCall = (supabase.from as jest.Mock).mock.results[0].value.insert.mock.calls[0][0]
       expect(insertCall.action_type).toBe('create')
-      expect(insertCall.resource_type).toBe('vehicle')
-      expect(insertCall.resource_id).toBe('vehicle-1')
+      expect(insertCall.resource_type).toBe('veiculo')
+      expect(insertCall.resource_id).toBe('veiculo-1')
     })
 
     it('deve criar log de atualização', async () => {
-      await auditLogs.update('vehicle', 'vehicle-1', { plate: 'XYZ5678' })
+      await auditLogs.update('veiculo', 'veiculo-1', { plate: 'XYZ5678' })
 
       const insertCall = (supabase.from as jest.Mock).mock.results[0].value.insert.mock.calls[0][0]
       expect(insertCall.action_type).toBe('update')
     })
 
     it('deve criar log de deleção', async () => {
-      await auditLogs.delete('vehicle', 'vehicle-1')
+      await auditLogs.delete('veiculo', 'veiculo-1')
 
       const insertCall = (supabase.from as jest.Mock).mock.results[0].value.insert.mock.calls[0][0]
       expect(insertCall.action_type).toBe('delete')

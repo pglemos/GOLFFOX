@@ -54,8 +54,8 @@ export default function EscalonamentoPage() {
     const getSeverityBadge = (severity: string) => {
         switch (severity) {
             case 'critical': return <Badge variant="destructive">Crítico</Badge>
-            case 'high': return <Badge className="bg-orange-500">Alto</Badge>
-            case 'medium': return <Badge className="bg-yellow-500">Médio</Badge>
+            case 'high': return <Badge className="bg-brand">Alto</Badge>
+            case 'medium': return <Badge className="bg-warning-light0">Médio</Badge>
             default: return <Badge variant="secondary">Baixo</Badge>
         }
     }
@@ -63,8 +63,8 @@ export default function EscalonamentoPage() {
     const getStatusBadge = (status: string) => {
         switch (status) {
             case 'pending': return <Badge variant="outline">Pendente</Badge>
-            case 'in_progress': return <Badge className="bg-blue-500">Em Andamento</Badge>
-            case 'resolved': return <Badge className="bg-green-500">Resolvido</Badge>
+            case 'in_progress': return <Badge className="bg-info-light0">Em Andamento</Badge>
+            case 'resolved': return <Badge className="bg-success-light0">Resolvido</Badge>
             default: return <Badge variant="secondary">Dispensado</Badge>
         }
     }
@@ -90,7 +90,7 @@ export default function EscalonamentoPage() {
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div>
                         <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-2">
-                            <ArrowUp className="h-7 w-7 text-orange-500" />
+                            <ArrowUp className="h-7 w-7 text-brand" />
                             Escalonamento para Admin
                         </h1>
                         <p className="text-sm text-muted-foreground mt-1">
@@ -101,10 +101,10 @@ export default function EscalonamentoPage() {
 
                 {/* Summary */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <Card className={criticalCount > 0 ? "border-red-500 bg-red-50" : ""}>
+                    <Card className={criticalCount > 0 ? "border-error bg-error-light" : ""}>
                         <CardContent className="pt-6">
                             <div className="flex items-center gap-3">
-                                <AlertTriangle className={`h-8 w-8 ${criticalCount > 0 ? 'text-red-600' : 'text-muted-foreground'}`} />
+                                <AlertTriangle className={`h-8 w-8 ${criticalCount > 0 ? 'text-error' : 'text-muted-foreground'}`} />
                                 <div>
                                     <p className="text-2xl font-bold">{criticalCount}</p>
                                     <p className="text-sm text-muted-foreground">Críticos Pendentes</p>
@@ -115,7 +115,7 @@ export default function EscalonamentoPage() {
                     <Card>
                         <CardContent className="pt-6">
                             <div className="flex items-center gap-3">
-                                <Clock className="h-8 w-8 text-yellow-600" />
+                                <Clock className="h-8 w-8 text-warning" />
                                 <div>
                                     <p className="text-2xl font-bold">{pendingCount}</p>
                                     <p className="text-sm text-muted-foreground">Total Pendentes</p>
@@ -126,7 +126,7 @@ export default function EscalonamentoPage() {
                     <Card>
                         <CardContent className="pt-6">
                             <div className="flex items-center gap-3">
-                                <CheckCircle className="h-8 w-8 text-green-600" />
+                                <CheckCircle className="h-8 w-8 text-success" />
                                 <div>
                                     <p className="text-2xl font-bold">{alerts.filter(a => a.status === 'resolved').length}</p>
                                     <p className="text-sm text-muted-foreground">Resolvidos</p>
@@ -139,7 +139,7 @@ export default function EscalonamentoPage() {
                 {/* Alerts List */}
                 <div className="space-y-3">
                     {alerts.map(alert => (
-                        <Card key={alert.id} className={alert.severity === 'critical' && alert.status === 'pending' ? 'border-red-500' : ''}>
+                        <Card key={alert.id} className={alert.severity === 'critical' && alert.status === 'pending' ? 'border-error' : ''}>
                             <CardContent className="p-4">
                                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                                     <div className="flex-1">

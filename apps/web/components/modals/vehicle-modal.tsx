@@ -30,9 +30,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import dynamic from "next/dynamic"
 
 // Lazy load seção de documentos
-const VehicleDocumentsSection = dynamic(() => import("@/components/vehicle/vehicle-documents-section"), { ssr: false })
+const VehicleDocumentsSection = dynamic(() => import("@/components/veiculo/veiculo-documents-section"), { ssr: false })
 
-interface Vehicle {
+interface veiculo {
   id?: string
   plate: string
   model: string
@@ -46,7 +46,7 @@ interface Vehicle {
 }
 
 interface VehicleModalProps {
-  vehicle: Vehicle | null
+  veiculo: veiculo | null
   isOpen: boolean
   onClose: () => void
 
@@ -54,8 +54,8 @@ interface VehicleModalProps {
   carriers?: { id: string, name: string }[]
 }
 
-export function VehicleModal({ vehicle, isOpen, onClose, onSave, carriers }: VehicleModalProps) {
-  const [formData, setFormData] = useState<Vehicle>({
+export function VehicleModal({ veiculo, isOpen, onClose, onSave, carriers }: VehicleModalProps) {
+  const [formData, setFormData] = useState<veiculo>({
     plate: "",
     model: "",
     year: "",
@@ -100,9 +100,9 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave, carriers }: Veh
   }, [isOpen])
 
   useEffect(() => {
-    if (vehicle) {
-      setFormData(vehicle)
-      setPhotoPreview(vehicle.photo_url || "")
+    if (veiculo) {
+      setFormData(veiculo)
+      setPhotoPreview(veiculo.photo_url || "")
     } else {
       setFormData({
         plate: "",
@@ -115,7 +115,7 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave, carriers }: Veh
       setPhotoPreview("")
     }
     setPhotoFile(null)
-  }, [vehicle, isOpen])
+  }, [veiculo, isOpen])
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -139,7 +139,7 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave, carriers }: Veh
     try {
       const form = new FormData()
       form.append('file', photoFile)
-      form.append('bucket', 'vehicle-photos')
+      form.append('bucket', 'veiculo-photos')
       form.append('folder', 'vehicles')
       form.append('entityId', vehicleId)
 
@@ -167,7 +167,7 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave, carriers }: Veh
     setLoading(true)
 
     try {
-      let vehicleId = vehicle?.id
+      let vehicleId = veiculo?.id
 
       // Preparar dados do veículo com validação rigorosa
       let photoUrl: string | null = formData.photo_url ?? null
@@ -249,12 +249,12 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave, carriers }: Veh
       }
 
       // Se for update, manter company_id/transportadora_id existente se não foi alterado
-      if (vehicleId && vehicle) {
-        if (!vehicleDataRaw.company_id && vehicle.company_id) {
-          vehicleDataRaw.company_id = vehicle.company_id
+      if (vehicleId && veiculo) {
+        if (!vehicleDataRaw.company_id && veiculo.company_id) {
+          vehicleDataRaw.company_id = veiculo.company_id
         }
-        if (!vehicleDataRaw.transportadora_id && (vehicle as any).transportadora_id) {
-          vehicleDataRaw.transportadora_id = (vehicle as any).transportadora_id
+        if (!vehicleDataRaw.transportadora_id && (veiculo as any).transportadora_id) {
+          vehicleDataRaw.transportadora_id = (veiculo as any).transportadora_id
         }
       }
 
@@ -347,7 +347,7 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave, carriers }: Veh
         // Log de auditoria (não bloquear em caso de erro)
         try {
           await Promise.race([
-            auditLogs.update('vehicle', vehicleId, {
+            auditLogs.update('veiculo', vehicleId, {
               plate: finalVehicleData.plate,
               model: finalVehicleData.model
             }),
@@ -414,7 +414,7 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave, carriers }: Veh
         // Log de auditoria (não bloquear em caso de erro)
         try {
           if (vehicleId) {
-            await auditLogs.create('vehicle', vehicleId, {
+            await auditLogs.create('veiculo', vehicleId, {
               plate: finalVehicleData.plate || '',
               model: finalVehicleData.model || ''
             })
@@ -476,7 +476,7 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave, carriers }: Veh
         <DialogHeader className="pb-4 sm:pb-6">
           <DialogTitle className="text-xl sm:text-2xl font-bold flex items-center gap-2 break-words">
             <Truck className="h-5 w-5 flex-shrink-0" />
-            {vehicle ? "Editar Veículo" : "Cadastrar Veículo"}
+            {veiculo ? "Editar Veículo" : "Cadastrar Veículo"}
           </DialogTitle>
         </DialogHeader>
 
@@ -510,7 +510,7 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave, carriers }: Veh
                           setPhotoPreview("")
                           setPhotoFile(null)
                         }}
-                        className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                        className="absolute top-1 right-1 bg-error-light0 text-white rounded-full p-1 hover:bg-error"
                       >
                         <X className="h-3 w-3" />
                       </button>
@@ -519,7 +519,7 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave, carriers }: Veh
                   <div>
                     <div>
                       <input
-                        id="vehicle-photo-input"
+                        id="veiculo-photo-input"
                         type="file"
                         accept="image/*"
                         onChange={handleFileChange}
@@ -530,7 +530,7 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave, carriers }: Veh
                         variant="outline"
                         size="sm"
                         className="min-h-[44px] touch-manipulation"
-                        onClick={() => document.getElementById('vehicle-photo-input')?.click()}
+                        onClick={() => document.getElementById('veiculo-photo-input')?.click()}
                       >
                         <Upload className="h-4 w-4 mr-2" />
                         {photoPreview ? "Trocar Foto" : "Upload Foto"}
@@ -558,9 +558,9 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave, carriers }: Veh
                         <SelectValue placeholder="Selecione a transportadora" />
                       </SelectTrigger>
                       <SelectContent>
-                        {carriers.map((carrier) => (
-                          <SelectItem key={carrier.id} value={carrier.id}>
-                            {carrier.name}
+                        {carriers.map((transportadora) => (
+                          <SelectItem key={transportadora.id} value={transportadora.id}>
+                            {transportadora.name}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -650,9 +650,9 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave, carriers }: Veh
                 <Button
                   type="submit"
                   disabled={loading}
-                  className="w-full sm:w-auto order-1 sm:order-2 bg-orange-500 hover:bg-orange-600 min-h-[44px] text-base font-medium"
+                  className="w-full sm:w-auto order-1 sm:order-2 bg-brand hover:bg-orange-600 min-h-[44px] text-base font-medium"
                 >
-                  {loading ? "Salvando..." : vehicle ? "Atualizar" : "Cadastrar"}
+                  {loading ? "Salvando..." : veiculo ? "Atualizar" : "Cadastrar"}
                 </Button>
               </DialogFooter>
             </form>
@@ -660,8 +660,8 @@ export function VehicleModal({ vehicle, isOpen, onClose, onSave, carriers }: Veh
 
           <TabsContent value="documentos">
             <VehicleDocumentsSection
-              vehicleId={vehicle?.id ?? formData.id}
-              isEditing={!!vehicle?.id || !!formData.id}
+              vehicleId={veiculo?.id ?? formData.id}
+              isEditing={!!veiculo?.id || !!formData.id}
             />
           </TabsContent>
         </Tabs>

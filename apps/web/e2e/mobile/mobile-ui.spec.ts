@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test'
 
-test.describe('Mobile UI - Admin & Operator', () => {
+test.describe('Mobile UI - Admin & operador', () => {
   test('Admin Map mobile: sidebar toggle, filters and playback', async ({ page }) => {
     await page.goto('/admin/mapa')
 
@@ -20,8 +20,8 @@ test.describe('Mobile UI - Admin & Operator', () => {
     await expect(page.getByText('Mapa')).toBeVisible()
   })
 
-  test('Operator mobile: KPI cards and period filter interactions', async ({ page }) => {
-    await page.goto('/operator')
+  test('operador mobile: KPI cards and period filter interactions', async ({ page }) => {
+    await page.goto('/operador')
 
     await expect(page.getByText('Painel do Operador')).toBeVisible()
 

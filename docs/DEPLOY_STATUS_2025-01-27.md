@@ -28,7 +28,7 @@
 - Cobertura estimada: ~35-40% (antes: ~25-30%)
 
 ### 4. Estrutura CQRS ✅
-- Commands criados (Vehicle, Driver, Route, Carrier)
+- Commands criados (veiculo, motorista, Route, transportadora)
 - Handlers criados (CreateCompanyHandler)
 - Documentação criada
 

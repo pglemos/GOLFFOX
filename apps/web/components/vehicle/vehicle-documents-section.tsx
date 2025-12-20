@@ -47,7 +47,7 @@ export function VehicleDocumentsSection({
     const [uploading, setUploading] = useState(false)
 
     const { upload } = useFileUpload({
-        bucket: "vehicle-documents",
+        bucket: "veiculo-documents",
         maxSize: 10,
     })
 

@@ -41,9 +41,9 @@ export function ControlTowerVisual({
       label: labels.delays,
       value: delays,
       icon: AlertCircle,
-      color: 'text-red-600',
-      bgColor: 'bg-red-50',
-      borderColor: 'border-red-200',
+      color: 'text-error',
+      bgColor: 'bg-error-light',
+      borderColor: 'border-error-light',
       href: '/operador/alertas?type=route_delayed'
     },
     {
@@ -59,8 +59,8 @@ export function ControlTowerVisual({
       label: labels.deviations,
       value: routeDeviations,
       icon: Route,
-      color: 'text-yellow-600',
-      bgColor: 'bg-yellow-50',
+      color: 'text-warning',
+      bgColor: 'bg-warning-light',
       borderColor: 'border-yellow-200',
       href: '/operador/alertas?type=deviation'
     },
@@ -68,9 +68,9 @@ export function ControlTowerVisual({
       label: labels.assistance,
       value: openAssistance,
       icon: HelpCircle,
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-50',
-      borderColor: 'border-blue-200',
+      color: 'text-info',
+      bgColor: 'bg-info-light',
+      borderColor: 'border-info-light',
       href: '/operador/alertas?type=assistance_open'
     }
   ]
@@ -119,7 +119,7 @@ export function ControlTowerVisual({
                       </motion.div>
                       {hasIssues && (
                         <motion.div
-                          className="w-3 h-3 rounded-full bg-red-500"
+                          className="w-3 h-3 rounded-full bg-error-light0"
                           animate={{
                             scale: [1, 1.3, 1],
                             opacity: [1, 0.7, 1]

@@ -22,29 +22,29 @@ export function HeroSection({
       icon: TrendingUp,
       label: "Viagens Hoje",
       value: totalTrips,
-      color: "from-blue-500 to-cyan-500",
-      bgColor: "bg-blue-500/10",
+      color: "from-info to-cyan-500",
+      bgColor: "bg-info/10",
     },
     {
       icon: Truck,
       label: "Veículos Ativos",
       value: activeVehicles,
-      color: "from-orange-500 to-red-500",
-      bgColor: "bg-orange-500/10",
+      color: "from-brand to-error",
+      bgColor: "bg-brand/10",
     },
     {
       icon: Users,
       label: "Em Trânsito",
       value: employeesInTransit,
-      color: "from-green-500 to-emerald-500",
-      bgColor: "bg-green-500/10",
+      color: "from-success to-emerald-500",
+      bgColor: "bg-success/10",
     },
     {
       icon: AlertCircle,
       label: "Alertas Críticos",
       value: criticalAlerts,
-      color: "from-red-500 to-rose-500",
-      bgColor: "bg-red-500/10",
+      color: "from-error to-rose-500",
+      bgColor: "bg-error/10",
     },
   ]
 
@@ -53,7 +53,7 @@ export function HeroSection({
       variants={staggerContainerFast}
       initial="hidden"
       animate="visible"
-      className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-text-brand via-orange-500 to-brand-hover p-6 sm:p-8 lg:p-10 shadow-2xl"
+      className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-text-brand via-brand to-brand-hover p-6 sm:p-8 lg:p-10 shadow-2xl"
     >
 
       {/* Gradient Overlay */}

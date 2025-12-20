@@ -30,7 +30,7 @@ describe('Proximity Service', () => {
     const mockBus: any = {
       lat: -19.916681,
       lng: -43.934493,
-      vehicleId: 'vehicle-1',
+      vehicleId: 'veiculo-1',
       routeId: 'route-1',
       timestamp: new Date(),
     }
@@ -40,7 +40,7 @@ describe('Proximity Service', () => {
       lng: -43.935493,
       stopId: 'stop-1',
       routeId: 'route-1',
-      passengerIds: ['passenger-1'],
+      passengerIds: ['passageiro-1'],
     }
 
     it('deve retornar isNearby=true quando distância está dentro do threshold', async () => {
@@ -112,7 +112,7 @@ describe('Proximity Service', () => {
     const mockBus: any = {
       lat: -19.916681,
       lng: -43.934493,
-      vehicleId: 'vehicle-1',
+      vehicleId: 'veiculo-1',
       routeId: 'route-1',
       timestamp: new Date(),
     }
@@ -159,7 +159,7 @@ describe('Proximity Service', () => {
     const mockBus: any = {
       lat: -19.916681,
       lng: -43.934493,
-      vehicleId: 'vehicle-1',
+      vehicleId: 'veiculo-1',
       routeId: 'route-1',
       timestamp: new Date(),
     }

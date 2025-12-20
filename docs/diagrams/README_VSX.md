@@ -50,17 +50,17 @@
    - Secundária: `#059669` (RGB: 5, 150, 105)
    - Terciária: `#047857` (RGB: 4, 120, 87)
 
-3. **Laranja** (Transportadora/Carrier)
+3. **Laranja** (Transportadora/transportadora)
    - Primária: `#F59E0B` (RGB: 245, 158, 11)
    - Secundária: `#D97706` (RGB: 217, 119, 6)
    - Terciária: `#B45309` (RGB: 180, 83, 9)
 
-4. **Roxo** (Motorista/Driver)
+4. **Roxo** (Motorista/motorista)
    - Primária: `#9333EA` (RGB: 147, 51, 234)
    - Secundária: `#7C3AED` (RGB: 124, 58, 237)
    - Terciária: `#6D28D9` (RGB: 109, 40, 217)
 
-5. **Ciano** (Passageiro/Passenger)
+5. **Ciano** (Passageiro/passageiro)
    - Primária: `#06B6D4` (RGB: 6, 182, 212)
    - Secundária: `#0891B2` (RGB: 8, 145, 178)
    - Terciária: `#0E7490` (RGB: 14, 116, 144)
@@ -138,8 +138,8 @@ GolfFox Sistema Completo
 ├── Camada de Apresentação (Frontend)
 │   ├── Next.js Web App
 │   │   ├── Painel Admin (/admin)
-│   │   ├── Painel Operador (/operator)
-│   │   └── Painel Transportadora (/carrier)
+│   │   ├── Painel Operador (/operador)
+│   │   └── Painel Transportadora (/transportadora)
 │   └── Flutter Mobile App
 │       ├── App Motorista
 │       └── App Passageiro
@@ -182,7 +182,7 @@ GolfFox Sistema Completo
 Usuário → Login Page → API /api/auth/login → Supabase Auth → 
 Verificação users table → Criação cookie golffox-session → 
 Middleware valida cookie → Redirecionamento baseado em role →
-Painel correspondente (Admin/Operator/Carrier/Driver/Passenger)
+Painel correspondente (Admin/operador/transportadora/motorista/passageiro)
 ```
 
 ### 2. Fluxo de Dados (Painéis Web)

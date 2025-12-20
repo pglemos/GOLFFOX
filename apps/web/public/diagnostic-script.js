@@ -53,7 +53,7 @@ async function runDiagnostic() {
     results.userInfo = data;
     console.log('✅ Role do usuário:', data.role);
     console.log('✅ Company ID:', data.company_id || 'null');
-    console.log('✅ Carrier ID:', data.carrier_id || 'null');
+    console.log('✅ transportadora ID:', data.carrier_id || 'null');
   } catch (error) {
     results.errors.push({ step: 'userInfo', error: error.message });
     console.error('❌ Erro ao buscar informações do usuário:', error);

@@ -42,7 +42,7 @@ Implementação bem-sucedida das tarefas críticas do plano de auditoria técnic
 **Implementação:**
 
 **Domain Layer:**
-- Entities: Company, Vehicle
+- Entities: Company, veiculo
 - Value Objects: Email, UUID
 - Domain Events: CompanyCreated, VehicleUpdated
 

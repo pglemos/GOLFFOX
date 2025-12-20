@@ -29,7 +29,7 @@ O sistema foi completamente auditado e **nenhuma ocorrência do link antigo foi 
    - /pages (Legacy pages if exists)
 
 📄 Arquivos auditados: 199
-🔍 Padrão buscado: operator\?company=
+🔍 Padrão buscado: operador\?company=
 ✅ Ocorrências encontradas: 0
 ```
 
@@ -129,7 +129,7 @@ O sistema foi completamente auditado e **nenhuma ocorrência do link antigo foi 
 
 ### Correções de Código (1 arquivo)
 ```
-🔧 page.tsx (operator/funcionarios)
+🔧 page.tsx (operador/funcionarios)
    - Validação de UUID
    - Tratamento de erros melhorado
    - Mensagens de erro mais claras

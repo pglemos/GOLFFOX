@@ -145,19 +145,19 @@ import { formatRelativeTime } from "@/lib/kpi-utils"
 
 ---
 
-### 7. `components/modals/vehicle-modal.tsx`
+### 7. `components/modals/veiculo-modal.tsx`
 
 **Erro:** `vehicleId` pode ser `undefined`
 ```typescript
 // ❌ Antes
-await auditLogs.create('vehicle', vehicleId, { 
+await auditLogs.create('veiculo', vehicleId, { 
   plate: finalVehicleData.plate || '', 
   model: finalVehicleData.model || '' 
 })
 
 // ✅ Depois
 if (vehicleId) {
-  await auditLogs.create('vehicle', vehicleId, { 
+  await auditLogs.create('veiculo', vehicleId, { 
     plate: finalVehicleData.plate || '', 
     model: finalVehicleData.model || '' 
   })
@@ -262,7 +262,7 @@ npm run build
 4. `components/costs/cost-detail-table.tsx` - 1 correção
 5. `components/fleet-map.tsx` - 1 correção (import)
 6. `components/modals/route-modal.tsx` - 1 correção
-7. `components/modals/vehicle-modal.tsx` - 1 correção
+7. `components/modals/veiculo-modal.tsx` - 1 correção
 8. `components/operational-alerts-notification.tsx` - 1 correção
 9. `components/operador/csv-import-modal.tsx` - 2 correções
 10. `next.config.js` - Removido `ignoreBuildErrors`

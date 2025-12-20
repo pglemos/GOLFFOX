@@ -167,11 +167,11 @@ function FuncionariosPageContent() {
   // Se ainda está carregando o usuário (primeira vez), mostra loading simples
   if (loading && !user && !error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-bg-soft">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Carregando usuário...</p>
-          <p className="text-xs text-gray-400 mt-2">Se demorar muito, recarregue a página</p>
+          <p className="text-ink-muted">Carregando usuário...</p>
+          <p className="text-xs text-ink-light mt-2">Se demorar muito, recarregue a página</p>
         </div>
       </div>
     )
@@ -183,9 +183,9 @@ function FuncionariosPageContent() {
       <AppShell user={userObj}>
         <div className="min-h-screen flex items-center justify-center p-4">
           <Card className="p-8 max-w-md w-full text-center">
-            <AlertCircle className="h-12 w-12 text-yellow-500 mx-auto mb-4" />
+            <AlertCircle className="h-12 w-12 text-warning mx-auto mb-4" />
             <h2 className="text-xl font-bold mb-2">Nenhuma empresa selecionada</h2>
-            <p className="text-gray-600 mb-4">
+            <p className="text-ink-muted mb-4">
               Selecione uma empresa para continuar.
             </p>
             <Button onClick={() => router.push('/operador')} variant="default">
@@ -203,9 +203,9 @@ function FuncionariosPageContent() {
       <AppShell user={userObj}>
         <div className="min-h-screen flex items-center justify-center p-4">
           <Card className="p-8 max-w-md w-full text-center">
-            <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-            <h2 className="text-xl font-bold mb-2 text-red-600">Erro ao carregar</h2>
-            <p className="text-gray-600 mb-4">{error}</p>
+            <AlertCircle className="h-12 w-12 text-error mx-auto mb-4" />
+            <h2 className="text-xl font-bold mb-2 text-error">Erro ao carregar</h2>
+            <p className="text-ink-muted mb-4">{error}</p>
             <div className="flex gap-2 justify-center">
               <Button onClick={() => window.location.reload()} variant="default">
                 Tentar Novamente
@@ -254,7 +254,7 @@ function FuncionariosPageContent() {
 
         {/* Busca */}
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-ink-light h-4 w-4" />
           <Input
             placeholder="Buscar por nome, email ou CPF..."
             value={searchQuery}
@@ -267,7 +267,7 @@ function FuncionariosPageContent() {
         {(loading || employeesLoading || tenantLoading) && (
           <div className="text-center py-12">
             <div className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-gray-600">Carregando funcionários...</p>
+            <p className="text-ink-muted">Carregando funcionários...</p>
           </div>
         )}
 
@@ -298,18 +298,18 @@ function FuncionariosPageContent() {
                                     {funcionario.name || "Nome não disponível"}
                                   </h3>
                                   {funcionario.is_active ? (
-                                    <Badge variant="outline" className="bg-green-50 text-green-700 text-xs flex-shrink-0">
+                                    <Badge variant="outline" className="bg-success-light text-success text-xs flex-shrink-0">
                                       Ativo
                                     </Badge>
                                   ) : (
-                                    <Badge variant="outline" className="bg-gray-50 text-gray-700 text-xs flex-shrink-0">
+                                    <Badge variant="outline" className="bg-bg-soft text-ink-strong text-xs flex-shrink-0">
                                       Inativo
                                     </Badge>
                                   )}
                                 </div>
                               </div>
                             </div>
-                            <div className="space-y-1 text-sm text-gray-600 pl-7">
+                            <div className="space-y-1 text-sm text-ink-muted pl-7">
                               {funcionario.email && (
                                 <div className="flex items-start gap-2">
                                   <Mail className="h-4 w-4 flex-shrink-0 mt-0.5" />
@@ -324,13 +324,13 @@ function FuncionariosPageContent() {
                               )}
                               {funcionario.cpf && (
                                 <div className="flex items-center gap-2">
-                                  <span className="text-xs text-gray-500 break-words">CPF: {funcionario.cpf}</span>
+                                  <span className="text-xs text-ink-muted break-words">CPF: {funcionario.cpf}</span>
                                 </div>
                               )}
                               {funcionario.address && (
                                 <div className="flex items-start gap-2">
                                   <Building className="h-4 w-4 flex-shrink-0 mt-0.5" />
-                                  <span className="text-xs text-gray-500 break-words">{funcionario.address}</span>
+                                  <span className="text-xs text-ink-muted break-words">{funcionario.address}</span>
                                 </div>
                               )}
                             </div>
@@ -348,7 +348,7 @@ function FuncionariosPageContent() {
                               </DropdownMenuItem>
                               <DropdownMenuItem
                                 onClick={() => handleDelete(funcionario)}
-                                className="text-red-600 min-h-[44px] touch-manipulation"
+                                className="text-error min-h-[44px] touch-manipulation"
                               >
                                 <Trash2 className="h-4 w-4 mr-2" />
                                 Desativar
@@ -373,9 +373,9 @@ function FuncionariosPageContent() {
               </>
             ) : (
               <Card className="p-12 text-center">
-                <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <Users className="h-12 w-12 text-ink-light mx-auto mb-4" />
                 <h3 className="text-lg font-medium mb-2">Nenhum funcionário encontrado</h3>
-                <p className="text-sm text-gray-500 mb-4">
+                <p className="text-sm text-ink-muted mb-4">
                   {debouncedSearch
                     ? "Tente ajustar sua busca"
                     : "Nenhum funcionário cadastrado para esta empresa"}

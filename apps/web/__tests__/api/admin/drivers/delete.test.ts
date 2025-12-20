@@ -28,13 +28,13 @@ describe('DELETE /api/admin/drivers/delete', () => {
   })
 
   it('deve excluir motorista', async () => {
-    const driver = createTestUser({ role: 'driver' })
-    mockSupabaseClient.setTableData('users', [driver])
+    const motorista = createTestUser({ role: 'motorista' })
+    mockSupabaseClient.setTableData('users', [motorista])
     mockSupabaseClient.setTableData('trips', [])
 
     const req = createAdminRequest({
       method: 'DELETE',
-      url: `http://localhost:3000/api/admin/drivers/delete?id=${driver.id}`,
+      url: `http://localhost:3000/api/admin/drivers/delete?id=${motorista.id}`,
     }) as NextRequest
 
     const response = await DELETE(req)
@@ -46,15 +46,15 @@ describe('DELETE /api/admin/drivers/delete', () => {
   })
 
   it('deve atualizar trips antes de excluir', async () => {
-    const driver = createTestUser({ role: 'driver' })
-    mockSupabaseClient.setTableData('users', [driver])
+    const motorista = createTestUser({ role: 'motorista' })
+    mockSupabaseClient.setTableData('users', [motorista])
     mockSupabaseClient.setTableData('trips', [
-      { id: 'trip-1', driver_id: driver.id },
+      { id: 'trip-1', driver_id: motorista.id },
     ])
 
     const req = createAdminRequest({
       method: 'DELETE',
-      url: `http://localhost:3000/api/admin/drivers/delete?id=${driver.id}`,
+      url: `http://localhost:3000/api/admin/drivers/delete?id=${motorista.id}`,
     }) as NextRequest
 
     const response = await DELETE(req)
@@ -78,14 +78,14 @@ describe('DELETE /api/admin/drivers/delete', () => {
   })
 
   it('deve lidar com erro ao excluir', async () => {
-    const driver = createTestUser({ role: 'driver' })
+    const motorista = createTestUser({ role: 'motorista' })
     mockSupabaseClient.setTableError('users', {
       message: 'Database error',
     })
 
     const req = createAdminRequest({
       method: 'DELETE',
-      url: `http://localhost:3000/api/admin/drivers/delete?id=${driver.id}`,
+      url: `http://localhost:3000/api/admin/drivers/delete?id=${motorista.id}`,
     }) as NextRequest
 
     const response = await DELETE(req)

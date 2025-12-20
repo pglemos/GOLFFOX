@@ -97,17 +97,17 @@ export function DocumentCard({
     const FileIcon = fileUrl && isImageFile(fileUrl) ? ImageIcon : FileText
 
     const statusConfig: Record<DocumentStatus, { color: string; icon: typeof CheckCircle2 }> = {
-        valid: { color: 'text-green-600 bg-green-50 border-green-200', icon: CheckCircle2 },
-        expired: { color: 'text-red-600 bg-red-50 border-red-200', icon: XCircle },
-        pending: { color: 'text-yellow-600 bg-yellow-50 border-yellow-200', icon: Clock },
-        rejected: { color: 'text-red-600 bg-red-50 border-red-200', icon: XCircle },
+        valid: { color: 'text-success bg-success-light border-green-200', icon: CheckCircle2 },
+        expired: { color: 'text-error bg-error-light border-error-light', icon: XCircle },
+        pending: { color: 'text-warning bg-warning-light border-yellow-200', icon: Clock },
+        rejected: { color: 'text-error bg-error-light border-error-light', icon: XCircle },
     }
 
     const alertConfig: Record<AlertLevel, { color: string; bgColor: string }> = {
-        ok: { color: 'text-green-600', bgColor: 'bg-green-50' },
-        warning: { color: 'text-yellow-600', bgColor: 'bg-yellow-50' },
+        ok: { color: 'text-success', bgColor: 'bg-success-light' },
+        warning: { color: 'text-warning', bgColor: 'bg-warning-light' },
         critical: { color: 'text-orange-600', bgColor: 'bg-orange-50' },
-        expired: { color: 'text-red-600', bgColor: 'bg-red-50' },
+        expired: { color: 'text-error', bgColor: 'bg-error-light' },
     }
 
     const handleDelete = async () => {

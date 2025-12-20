@@ -61,19 +61,19 @@ export default function MargensPage() {
                     <Card>
                         <CardContent className="pt-6">
                             <p className="text-sm text-muted-foreground">Receita Total</p>
-                            <p className="text-2xl font-bold text-green-600">{formatCurrency(totalRevenue)}</p>
+                            <p className="text-2xl font-bold text-success">{formatCurrency(totalRevenue)}</p>
                         </CardContent>
                     </Card>
                     <Card>
                         <CardContent className="pt-6">
                             <p className="text-sm text-muted-foreground">Custos Totais</p>
-                            <p className="text-2xl font-bold text-red-600">{formatCurrency(totalCost)}</p>
+                            <p className="text-2xl font-bold text-error">{formatCurrency(totalCost)}</p>
                         </CardContent>
                     </Card>
                     <Card>
                         <CardContent className="pt-6">
                             <p className="text-sm text-muted-foreground">Margem Total</p>
-                            <p className="text-2xl font-bold text-blue-600">{formatCurrency(totalMargin)}</p>
+                            <p className="text-2xl font-bold text-info">{formatCurrency(totalMargin)}</p>
                         </CardContent>
                     </Card>
                     <Card className="bg-primary/5">
@@ -108,8 +108,8 @@ export default function MargensPage() {
                                                 <Route className="h-4 w-4 text-muted-foreground" />
                                                 {m.route_name}
                                             </td>
-                                            <td className="p-3 text-right text-green-600">{formatCurrency(m.revenue)}</td>
-                                            <td className="p-3 text-right text-red-600">{formatCurrency(m.cost)}</td>
+                                            <td className="p-3 text-right text-success">{formatCurrency(m.revenue)}</td>
+                                            <td className="p-3 text-right text-error">{formatCurrency(m.cost)}</td>
                                             <td className="p-3 text-right font-medium">{formatCurrency(m.margin)}</td>
                                             <td className="p-3 text-right">
                                                 <Badge variant={m.margin_percent >= 35 ? 'default' : 'destructive'}>

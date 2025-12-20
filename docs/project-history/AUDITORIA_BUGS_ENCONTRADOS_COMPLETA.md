@@ -333,7 +333,7 @@ Alterar redirect do logout de `/unauthorized` para `/`
 - **Delete (cancelados):** ✅ Funciona
 
 ### Modais Testados:
-- **create-operator-modal:** ❌ API inexistente
+- **create-operador-modal:** ❌ API inexistente
 - **route-create-modal:** ❌ Bugado (978 linhas)
 - **edit-transportadora:** ❌ Não carrega dados
 - **trocar-papel-modal:** ❌ Não persiste
@@ -377,7 +377,7 @@ Alterar redirect do logout de `/unauthorized` para `/`
 
 2. **Implementar `/api/admin/create-operador`**
    ```bash
-   Criar: apps/web/app/api/admin/create-operator/route.ts
+   Criar: apps/web/app/api/admin/create-operador/route.ts
    Implementar: POST handler com Supabase service role
    Testar: Criação de empresa + operador
    ```

@@ -162,7 +162,7 @@ export async function POST(request: NextRequest) {
       if (isTestMode || isDevelopment) {
         logger.warn('⚠️ Erro ao criar veículo em modo de teste/desenvolvimento, retornando resposta simulada:', createError.message)
         // Gerar ID único baseado na placa
-        const mockId = `mock-vehicle-${validated.plate.replace(/[^a-zA-Z0-9]/g, '-')}-${Date.now()}`
+        const mockId = `mock-veiculo-${validated.plate.replace(/[^a-zA-Z0-9]/g, '-')}-${Date.now()}`
         return NextResponse.json({
           id: mockId.substring(0, 36), // Limitar tamanho para parecer UUID
           plate: validated.plate,

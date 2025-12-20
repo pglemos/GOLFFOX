@@ -13,7 +13,7 @@ jest.mock('@/lib/api-auth', () => ({
     const userRole = req.headers.get('x-user-role')
     if (userRole === 'operador') {
       return {
-        id: 'operator-user-id',
+        id: 'operador-user-id',
         role: 'operador',
         companyId: 'company-1',
       }
@@ -76,7 +76,7 @@ describe('GET /api/operador/employees', () => {
     mockSupabaseClient.setTableData('companies', [company])
     mockSupabaseClient.setTableData('users', [
       {
-        id: 'operator-user-id',
+        id: 'operador-user-id',
         company_id: company.id,
       },
     ])

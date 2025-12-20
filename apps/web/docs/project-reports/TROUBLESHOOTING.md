@@ -53,7 +53,7 @@ const { data: userInfo } = await supabase
 console.log('Usuário:', userInfo);
 ```
 
-**Problema comum:** Usuário não tem role 'admin' ou 'operator' e não consegue ver veículos.
+**Problema comum:** Usuário não tem role 'admin' ou 'operador' e não consegue ver veículos.
 
 #### 4. Testar query diretamente
 
@@ -162,7 +162,7 @@ Se nenhuma solução funcionou:
 
 - [ ] Há veículos com `is_active = true` no banco?
 - [ ] RLS está configurado corretamente?
-- [ ] Usuário tem role apropriada (admin/operator)?
+- [ ] Usuário tem role apropriada (admin/operador)?
 - [ ] Não há erros 404 no console (views inexistentes)?
 - [ ] Não há erros 400 (colunas inexistentes)?
 - [ ] Cache do Supabase foi recarregado?

@@ -84,7 +84,7 @@ CREATE TABLE IF NOT EXISTS public.users (
   id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   email TEXT NOT NULL UNIQUE,
   name TEXT NOT NULL,
-  role TEXT NOT NULL CHECK (role IN ('admin', 'operator', 'carrier', 'driver', 'passenger')),
+  role TEXT NOT NULL CHECK (role IN ('admin', 'operador', 'transportadora', 'motorista', 'passageiro')),
   company_id UUID REFERENCES public.companies(id) ON DELETE SET NULL,
   carrier_id TEXT,
   phone VARCHAR(20),

@@ -45,13 +45,13 @@ interface Maintenance {
     workshop_name?: string
     mechanic_name?: string
     odometer_km?: number
-    vehicle?: {
+    veiculo?: {
         plate: string
         model: string
     }
 }
 
-interface Vehicle {
+interface veiculo {
     id: string
     plate: string
     model: string
@@ -68,16 +68,16 @@ const MAINTENANCE_TYPES = [
 ]
 
 const STATUS_CONFIG = {
-    scheduled: { label: 'Agendada', icon: Clock, variant: 'secondary' as const, color: 'text-yellow-500' },
-    in_progress: { label: 'Em Andamento', icon: Wrench, variant: 'default' as const, color: 'text-blue-500' },
-    completed: { label: 'Concluída', icon: CheckCircle, variant: 'outline' as const, color: 'text-green-500' },
-    cancelled: { label: 'Cancelada', icon: AlertTriangle, variant: 'destructive' as const, color: 'text-red-500' },
+    scheduled: { label: 'Agendada', icon: Clock, variant: 'secondary' as const, color: 'text-warning' },
+    in_progress: { label: 'Em Andamento', icon: Wrench, variant: 'default' as const, color: 'text-info' },
+    completed: { label: 'Concluída', icon: CheckCircle, variant: 'outline' as const, color: 'text-success' },
+    cancelled: { label: 'Cancelada', icon: AlertTriangle, variant: 'destructive' as const, color: 'text-error' },
 }
 
 export default function ManutencaoPage() {
     const { user, loading: authLoading } = useAuthFast()
     const [maintenances, setMaintenances] = useState<Maintenance[]>([])
-    const [vehicles, setVehicles] = useState<Vehicle[]>([])
+    const [vehicles, setVehicles] = useState<veiculo[]>([])
     const [dataLoading, setDataLoading] = useState(true)
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [selectedMaintenance, setSelectedMaintenance] = useState<Maintenance | null>(null)
@@ -131,7 +131,7 @@ export default function ManutencaoPage() {
                 .from('vehicle_maintenances')
                 .select(`
           *,
-          vehicle:vehicles(plate, model)
+          veiculo:vehicles(plate, model)
         `)
                 .order('scheduled_date', { ascending: false })
 
@@ -174,8 +174,8 @@ export default function ManutencaoPage() {
             result = result.filter(m =>
                 m.description?.toLowerCase().includes(query) ||
                 m.maintenance_type?.toLowerCase().includes(query) ||
-                m.vehicle?.plate?.toLowerCase().includes(query) ||
-                m.vehicle?.model?.toLowerCase().includes(query)
+                m.veiculo?.plate?.toLowerCase().includes(query) ||
+                m.veiculo?.model?.toLowerCase().includes(query)
             )
         }
 
@@ -268,7 +268,7 @@ export default function ManutencaoPage() {
                 {/* Search + Filters */}
                 <div className="flex flex-col sm:flex-row gap-2">
                     <div className="relative flex-1">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-ink-light h-4 w-4" />
                         <Input
                             placeholder="Buscar manutenções..."
                             value={searchQuery}
@@ -348,7 +348,7 @@ export default function ManutencaoPage() {
                                         transition={{ duration: 0.3 }}
                                         whileHover={{ y: -4 }}
                                     >
-                                        <Card className={`p-3 sm:p-4 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-border hover:border-text-brand/30 group ${isOverdue ? 'border-red-500/50' : ''}`}>
+                                        <Card className={`p-3 sm:p-4 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-border hover:border-text-brand/30 group ${isOverdue ? 'border-error/50' : ''}`}>
                                             <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
                                                 <div className="flex-1 min-w-0">
                                                     <div className="flex flex-wrap items-center gap-2 mb-2">
@@ -356,7 +356,7 @@ export default function ManutencaoPage() {
                                                             <Wrench className="h-4 w-4 text-brand" />
                                                         </div>
                                                         <h3 className="font-bold text-base sm:text-lg group-hover:text-brand transition-colors">
-                                                            {maintenance.vehicle?.plate || 'Veículo'}
+                                                            {maintenance.veiculo?.plate || 'Veículo'}
                                                         </h3>
                                                         <Badge variant="outline">{typeLabel}</Badge>
                                                         <Badge variant={statusConfig.variant} className="flex items-center gap-1">
@@ -370,7 +370,7 @@ export default function ManutencaoPage() {
                                                             </Badge>
                                                         )}
                                                     </div>
-                                                    <p className="font-medium mb-1 text-sm sm:text-base">{maintenance.vehicle?.model}</p>
+                                                    <p className="font-medium mb-1 text-sm sm:text-base">{maintenance.veiculo?.model}</p>
                                                     {maintenance.description && (
                                                         <p className="text-sm text-ink-muted mb-2">{maintenance.description}</p>
                                                     )}
@@ -433,7 +433,7 @@ export default function ManutencaoPage() {
                                                 onClick={() => { setSelectedMaintenance(maintenance); setIsModalOpen(true) }}
                                             >
                                                 <div className="flex justify-between items-start mb-2">
-                                                    <span className="font-bold text-sm">{maintenance.vehicle?.plate}</span>
+                                                    <span className="font-bold text-sm">{maintenance.veiculo?.plate}</span>
                                                     <Badge variant="outline" className="text-[10px] h-5">{maintenance.maintenance_type}</Badge>
                                                 </div>
                                                 <p className="text-xs text-muted-foreground line-clamp-2 mb-2">{maintenance.description || 'Sem descrição'}</p>

@@ -10,12 +10,12 @@
 
 **Substituir** o link com parâmetros fixos:
 ```
-❌ /operator?company=11111111-1111-4111-8111-1111111111c1
+❌ /operador?company=11111111-1111-4111-8111-1111111111c1
 ```
 
 **Por** link limpo:
 ```
-✅ /operator
+✅ /operador
 ```
 
 ---

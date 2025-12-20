@@ -181,7 +181,7 @@ WHERE schemaname = 'public'
 ### `gf_vehicle_checklists`
 - **Propósito:** Checklists de verificação pré-viagem
 - **Tipo:** View ou tabela (depende de `vehicle_checklists`)
-- **Uso:** Mobile app (Driver checklist)
+- **Uso:** Mobile app (motorista checklist)
 
 ---
 

@@ -11,7 +11,7 @@ import { useAuthFast } from "@/hooks/use-auth-fast"
 // Lazy load AdminMap (componente pesado)
 const AdminMap = dynamic(() => import('@/components/admin-map').then(m => ({ default: m.AdminMap })), { 
   ssr: false,
-  loading: () => <div className="w-full h-[600px] bg-gray-100 animate-pulse rounded-lg flex items-center justify-center">
+  loading: () => <div className="w-full h-[600px] bg-muted animate-pulse rounded-lg flex items-center justify-center">
     <p className="text-ink-muted">Carregando mapa...</p>
   </div>
 })
@@ -23,7 +23,7 @@ function MapaContent() {
   // Ler parâmetros da URL para rota específica e filtros
   const routeId = searchParams?.get('route') || null
   const companyId = searchParams?.get('company') || null
-  const vehicleId = searchParams?.get('vehicle') || null
+  const vehicleId = searchParams?.get('veiculo') || null
   const latParam = searchParams?.get('lat')
   const lngParam = searchParams?.get('lng')
   const zoomParam = searchParams?.get('zoom')

@@ -99,13 +99,13 @@ export default function RouteScreen() {
     };
 
     const handleFinishRoute = async () => {
-        router.replace('/driver');
+        router.replace('/motorista');
     };
 
     const handleSOS = async () => {
         setSendingSos(true);
         try {
-            console.log('SOS enviado:', { driver: profile?.name, location: location?.coords });
+            console.log('SOS enviado:', { motorista: profile?.name, location: location?.coords });
             setSosDialogVisible(false);
         } finally {
             setSendingSos(false);

@@ -34,8 +34,8 @@
       "file": "\\app\\api\\admin\\audit-db\\route.ts"
     },
     {
-      "path": "/admin/create-operator",
-      "file": "\\app\\api\\admin\\create-operator\\route.ts"
+      "path": "/admin/create-operador",
+      "file": "\\app\\api\\admin\\create-operador\\route.ts"
     },
     {
       "path": "/admin/generate-stops",
@@ -66,12 +66,12 @@
       "file": "\\app\\api\\cron\\refresh-kpis\\route.ts"
     },
     {
-      "path": "/operator/create-employee",
-      "file": "\\app\\api\\operator\\create-employee\\route.ts"
+      "path": "/operador/create-employee",
+      "file": "\\app\\api\\operador\\create-employee\\route.ts"
     },
     {
-      "path": "/operator/optimize-route",
-      "file": "\\app\\api\\operator\\optimize-route\\route.ts"
+      "path": "/operador/optimize-route",
+      "file": "\\app\\api\\operador\\optimize-route\\route.ts"
     },
     {
       "path": "/reports/dispatch",

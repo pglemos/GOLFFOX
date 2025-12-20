@@ -92,8 +92,8 @@ Após o deploy iniciar:
 Após deploy bem-sucedido, teste:
 
 - **Admin**: https://golffox.vercel.app/admin
-- **Operator**: https://golffox.vercel.app/operator  
-- **Carrier**: https://golffox.vercel.app/carrier
+- **operador**: https://golffox.vercel.app/operador  
+- **transportadora**: https://golffox.vercel.app/transportadora
 - **Login**: https://golffox.vercel.app/login
 
 ### 6. Testar Autenticação

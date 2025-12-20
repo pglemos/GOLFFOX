@@ -22,7 +22,7 @@ Permite visualizar e gerenciar todas as transportadoras cadastradas no sistema.
 - ✅ Criar nova transportadora
 - ✅ Editar transportadora existente
 - ✅ Excluir transportadora
-- ✅ Criar login de acesso (usuário carrier) para a transportadora
+- ✅ Criar login de acesso (usuário transportadora) para a transportadora
 - ✅ Visualizar motoristas associados à transportadora
 
 ### 2. Gerenciamento de Transportadoras
@@ -39,7 +39,7 @@ Permite visualizar e gerenciar todas as transportadoras cadastradas no sistema.
 - **Ver Motoristas**: Visualizar todos os motoristas associados
 - **Excluir**: Remover transportadora do sistema
 
-### 3. Login de Acesso (Usuários Carrier)
+### 3. Login de Acesso (Usuários transportadora)
 
 Modal para criar e gerenciar usuários que terão acesso ao painel da transportadora.
 
@@ -62,7 +62,7 @@ Modal que exibe todos os motoristas associados à transportadora.
 - Nome do motorista
 - Email
 - Telefone
-- Role (driver)
+- Role (motorista)
 
 ---
 
@@ -142,7 +142,7 @@ const authErrorResponse = await requireAuth(req, 'admin')
 if (authErrorResponse) return authErrorResponse
 ```
 
-### Criação de Usuários Carrier
+### Criação de Usuários transportadora
 
 A criação de usuários transportadora é feita através de `supabaseServiceRole.auth.admin.createUser()`, que:
 - Cria o usuário no Supabase Auth
@@ -228,10 +228,10 @@ Response:
 }
 ```
 
-### Criando Usuário Carrier
+### Criando Usuário transportadora
 
 ```bash
-POST /api/admin/create-carrier-login
+POST /api/admin/create-transportadora-login
 Content-Type: application/json
 Authorization: Bearer <token>
 
@@ -265,7 +265,7 @@ Response:
 - [ ] Excluir transportadora (com confirmação)
 - [ ] Criar login de acesso para transportadora
 - [ ] Criar múltiplos logins para mesma transportadora
-- [ ] Excluir usuário carrier
+- [ ] Excluir usuário transportadora
 - [ ] Visualizar motoristas de uma transportadora vazia
 - [ ] Visualizar motoristas de uma transportadora com vários motoristas
 

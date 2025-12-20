@@ -31,8 +31,8 @@
 - `passageiro@golffox.com` (passageiro - assigned trips only)
 
 **Test scenarios:**
-1. Login as driver → Start a trip → See GPS tracking
-2. Login as operator → View company trips only
+1. Login as motorista → Start a trip → See GPS tracking
+2. Login as operador → View company trips only
 3. Login as admin → Use "Reopen Trip" with force flag
 4. Open two devices → Watch real-time position updates
 
@@ -105,7 +105,7 @@ print('Total distance: ${summary['total_distance_km']} km');
 ### 🗂️ New Features
 
 1. **Audit Trail**: Every trip state change logged to `trip_events`
-2. **Checklists**: Pre/post-trip vehicle inspections
+2. **Checklists**: Pre/post-trip veiculo inspections
 3. **Reporting**: Materialized views for analytics (auto-refresh every minute)
 
 ---
@@ -287,7 +287,7 @@ print('Avg Speed: ${summary?['avg_speed_kmh']} km/h');
 4. 🔜 **Add E2E tests** (Playwright for web admin)
 5. 🔜 **Set up Sentry** (Error monitoring)
 6. 🔜 **Create Postman collection** (API documentation)
-7. 🔜 **Storage buckets** (Vehicle/driver documents)
+7. 🔜 **Storage buckets** (veiculo/motorista documents)
 
 ---
 

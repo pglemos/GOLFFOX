@@ -3,7 +3,7 @@ import { getSupabaseAdmin } from '@/lib/supabase-client'
 import { requireAuth } from '@/lib/api-auth'
 import { applyRateLimit } from '@/lib/rate-limit'
 import { z } from 'zod'
-import { CarrierInsert } from '@/types/carrier'
+import { CarrierInsert } from '@/types/transportadora'
 import { logger, logError } from '@/lib/logger'
 import { successResponse, errorResponse, validationErrorResponse } from '@/lib/api-response'
 
@@ -99,7 +99,7 @@ export async function POST(req: NextRequest) {
 
     logger.debug('[CREATE transportadora] Success! transportadora created:', (data as any).id)
 
-    return successResponse({ carrier: data })
+    return successResponse({ transportadora: data })
   } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return validationErrorResponse('Dados inválidos', { details: error.errors })

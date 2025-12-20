@@ -2,7 +2,7 @@
 
 ## 🎯 Objetivo
 Implementar sistema completo de gestão de transporte (GolfFox) com:
-- ✅ Auth com 5 perfis (admin/operator/carrier/driver/passenger)
+- ✅ Auth com 5 perfis (admin/operador/transportadora/motorista/passageiro)
 - ✅ RLS por papel com privilégios mínimos
 - ✅ Realtime em positions
 - ✅ RPC de transição com concorrência segura + p_force
@@ -93,10 +93,10 @@ Implementar sistema completo de gestão de transporte (GolfFox) com:
 │ RLS by Role                             │
 ├─────────────────────────────────────────┤
 │ admin    → Full access to everything    │
-│ operator → Company-scoped (via co_id)   │
-│ carrier  → Carrier-scoped (via ca_id)   │
-│ driver   → Own trips only               │
-│ passenger→ Assigned trips only          │
+│ operador → Company-scoped (via co_id)   │
+│ transportadora  → transportadora-scoped (via ca_id)   │
+│ motorista   → Own trips only               │
+│ passageiro→ Assigned trips only          │
 └─────────────────────────────────────────┘
 ```
 
@@ -117,7 +117,7 @@ Implementar sistema completo de gestão de transporte (GolfFox) com:
 - ✅ Concorrência segura (FOR UPDATE no RPC)
 
 ### 3. Real-time Tracking
-- ✅ Driver positions via Realtime
+- ✅ motorista positions via Realtime
 - ✅ Inserção de posições a cada 10s (com backoff)
 - ✅ Stream filtrado por trip_id
 - ✅ Polyline no mapa em tempo real
@@ -137,7 +137,7 @@ Implementar sistema completo de gestão de transporte (GolfFox) com:
 ### 6. Reports
 - ✅ Materialized view `mvw_trip_report` (preparado)
 - ✅ pg_cron job para refresh automático (preparado)
-- ✅ Filtros por data, status, company, carrier
+- ✅ Filtros por data, status, company, transportadora
 
 ---
 
@@ -232,7 +232,7 @@ Motion: 160-240ms micro
 ## 📈 Métricas de Sucesso
 
 - ✅ **Auth**: 5 logins funcionando com `senha123`
-- ✅ **RLS**: Admin vê tudo, operator vê company, etc.
+- ✅ **RLS**: Admin vê tudo, operador vê company, etc.
 - ✅ **Realtime**: Positions atualizando em < 1s
 - ✅ **RPC**: Transitions funcionando com concorrência
 - ✅ **Trigger**: Summary recalculado automaticamente

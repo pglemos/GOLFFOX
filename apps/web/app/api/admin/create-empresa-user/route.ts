@@ -298,7 +298,7 @@ export async function POST(request: NextRequest) {
               role: 'operador',
               companyId: company?.id || companyId || '',
               company: company || null,
-              operator: {
+              operador: {
                 id: existingUser.id,
                 email: operatorEmail,
               },
@@ -317,7 +317,7 @@ export async function POST(request: NextRequest) {
           role: 'operador',
           companyId: company?.id || companyId || '',
           company: company || null,
-          operator: {
+          operador: {
             id: 'test-operador-' + Date.now(),
             email: operatorEmail,
           },
@@ -566,7 +566,7 @@ export async function POST(request: NextRequest) {
       role: 'operador',
       companyId: finalCompanyId,
       company,
-      operator: {
+      operador: {
         id: userId,
         email: operatorEmail,
       },

@@ -83,8 +83,8 @@ Após o push (ou se já estiver conectado):
 
 URLs de produção:
 - 🌐 Admin: https://golffox.vercel.app/admin
-- 🌐 Operator: https://golffox.vercel.app/operator
-- 🌐 Carrier: https://golffox.vercel.app/carrier
+- 🌐 operador: https://golffox.vercel.app/operador
+- 🌐 transportadora: https://golffox.vercel.app/transportadora
 - 🌐 Login: https://golffox.vercel.app/login
 
 **Contas de teste:**

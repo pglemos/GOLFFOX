@@ -18,7 +18,7 @@
 
 ### 3. Imports Next.js
 - ✅ Corrigido `import { Link }` para `import Link` em 5 arquivos
-- ✅ Arquivos: `components/sidebar.tsx`, `components/operator/operator-logo-section.tsx`, `components/ui/sidebar-demo.tsx`, `app/admin/error.tsx`, `app/admin/rotas/rotas-content.tsx`
+- ✅ Arquivos: `components/sidebar.tsx`, `components/operador/operador-logo-section.tsx`, `components/ui/sidebar-demo.tsx`, `app/admin/error.tsx`, `app/admin/rotas/rotas-content.tsx`
 
 ### 4. Hooks React
 - ✅ Inicializados `useRef` hooks com valores padrão

@@ -153,7 +153,7 @@ export interface CarrierDocument extends BaseDocument {
 }
 
 // ====================================================
-// DRIVER COMPENSATION
+// motorista COMPENSATION
 // ====================================================
 
 export type PaymentFrequency = 'weekly' | 'biweekly' | 'monthly'
@@ -226,7 +226,7 @@ export interface DriverCompensationFormData {
 }
 
 // ====================================================
-// CARRIER BANKING & LEGAL REP
+// transportadora BANKING & LEGAL REP
 // ====================================================
 
 export type BankAccountType = 'corrente' | 'poupanca'
@@ -268,7 +268,7 @@ export interface CarrierLegalRepData {
 // ====================================================
 
 export interface ExpiringDocument {
-    entity_type: 'vehicle' | 'driver' | 'carrier'
+    entity_type: 'veiculo' | 'motorista' | 'transportadora'
     entity_id: string
     entity_name: string
     document_type: string

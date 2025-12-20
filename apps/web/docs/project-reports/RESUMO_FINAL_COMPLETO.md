@@ -113,7 +113,7 @@
 - `RESUMO_FINAL_COMPLETO.md` - Este arquivo
 
 ### Arquivos Modificados
-- `app/api/admin/create-operator/route.ts` - Removidos campos obrigatórios
+- `app/api/admin/create-operador/route.ts` - Removidos campos obrigatórios
 - `app/api/admin/companies-list/route.ts` - Retorno padronizado
 - `app/api/admin/routes-list/route.ts` - Retorno padronizado
 - `app/api/admin/vehicles-list/route.ts` - Retorno padronizado

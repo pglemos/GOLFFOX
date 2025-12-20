@@ -49,10 +49,10 @@ Este relatório documenta a auditoria de segurança realizada em todas as rotas 
 **Operador:**
 - `/api/operador/create-employee` - ✅ `validateAuth` + validação de role
 - `/api/operador/employees` - ✅ `requireAuth`
-- `/api/operador/optimize-route` - ✅ `requireAuth(['operator', 'admin'])`
+- `/api/operador/optimize-route` - ✅ `requireAuth(['operador', 'admin'])`
 
 **Transportadora:**
-- `/api/transportadora/*` - ✅ `requireAuth(['carrier', 'admin'])`
+- `/api/transportadora/*` - ✅ `requireAuth(['transportadora', 'admin'])`
 
 **Custos:**
 - `/api/costs/*` - ✅ `requireAuth` com validação de role
@@ -141,8 +141,8 @@ Este relatório documenta a auditoria de segurança realizada em todas as rotas 
 ## Checklist de Validação
 
 - [ ] Todas as rotas `/api/admin/*` têm `requireAuth('admin')`
-- [ ] Todas as rotas `/api/operador/*` têm `requireAuth(['operator', 'admin'])`
-- [ ] Todas as rotas `/api/transportadora/*` têm `requireAuth(['carrier', 'admin'])`
+- [ ] Todas as rotas `/api/operador/*` têm `requireAuth(['operador', 'admin'])`
+- [ ] Todas as rotas `/api/transportadora/*` têm `requireAuth(['transportadora', 'admin'])`
 - [ ] Rotas sensíveis têm rate limiting
 - [ ] Rotas de manutenção têm proteção adicional
 - [ ] Rotas públicas têm rate limiting adequado

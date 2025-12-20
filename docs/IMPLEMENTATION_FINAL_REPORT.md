@@ -63,7 +63,7 @@ lib/
 ├── cache/
 │   └── redis-cache.service.ts     # Cache distribuído
 ├── domain/
-│   ├── entities/                 # Company, Vehicle
+│   ├── entities/                 # Company, veiculo
 │   ├── value-objects/            # Email, UUID
 │   └── domain-events/            # CompanyCreated, VehicleUpdated
 ├── cqrs/

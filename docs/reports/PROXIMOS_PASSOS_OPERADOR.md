@@ -39,14 +39,14 @@ No projeto Vercel → Settings → Environment Variables, confirme:
 
 ```bash
 cd web-app
-npx ts-node scripts/health-check-operator.ts
+npx ts-node scripts/health-check-operador.ts
 ```
 
 Deve retornar ✅ para as views criadas.
 
 ### 5. Validar Páginas em Produção
 
-Acesse https://golffox.vercel.app/operator e navegue:
+Acesse https://golffox.vercel.app/operador e navegue:
 
 - ✅ Dashboard (KPIs e Torre de Controle)
 - ✅ `/operador/rotas` → `/operador/rotas/mapa?route_id=...`

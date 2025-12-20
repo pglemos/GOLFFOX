@@ -28,7 +28,7 @@ Este documento descreve as correções implementadas com base no relatório de t
 - Verificações de `isMounted` antes de chamar `setState`
 
 ### 3. ✅ TC004/TC005 - Modal de Associar Operador (Erro com is_active)
-**Arquivo:** `web-app/components/modals/associate-operator-modal.tsx`
+**Arquivo:** `web-app/components/modals/associate-operador-modal.tsx`
 
 **Problema:** Query falhava quando a coluna `is_active` não existia na tabela `users`.
 
@@ -75,7 +75,7 @@ Este documento descreve as correções implementadas com base no relatório de t
 - TC004/TC005: Erros relacionados a `is_active` em `companies`
 
 ### 2. ⚠️ Endpoints Retornando 405 (Method Not Allowed)
-**Problema:** Os endpoints `/api/admin/create-operator` e `/api/operator/create-employee` estão configurados corretamente para POST, mas os testes podem estar fazendo GET.
+**Problema:** Os endpoints `/api/admin/create-operador` e `/api/operador/create-employee` estão configurados corretamente para POST, mas os testes podem estar fazendo GET.
 
 **Possíveis Causas:**
 - TestSprite pode estar fazendo requisições GET em vez de POST
@@ -87,12 +87,12 @@ Este documento descreve as correções implementadas com base no relatório de t
 - Verificar se há problemas de autenticação que impedem o acesso aos endpoints
 - Testar endpoints diretamente via Postman/curl com POST
 
-### 3. ⚠️ Rotas `/admin-dashboard` e `/operator-dashboard` Não Existem
-**Problema:** TestSprite está tentando acessar `/admin-dashboard` e `/operator-dashboard`, mas as rotas corretas são `/admin` e `/operator`.
+### 3. ⚠️ Rotas `/admin-dashboard` e `/operador-dashboard` Não Existem
+**Problema:** TestSprite está tentando acessar `/admin-dashboard` e `/operador-dashboard`, mas as rotas corretas são `/admin` e `/operador`.
 
 **Solução:** As rotas corretas já existem:
 - `/admin` - Dashboard administrativo
-- `/operator` - Dashboard do operador
+- `/operador` - Dashboard do operador
 
 **Ação Necessária:** Se necessário, criar redirecionamentos ou aliases para essas rotas, ou ajustar os testes do TestSprite para usar as rotas corretas.
 
@@ -159,7 +159,7 @@ Este documento descreve as correções implementadas com base no relatório de t
 
 1. `web-app/app/api/costs/categories/route.ts` - Tratamento de erros melhorado
 2. `web-app/app/admin/empresas/page.tsx` - Corrigido loop infinito de renderização
-3. `web-app/components/modals/associate-operator-modal.tsx` - Removido filtro is_active
+3. `web-app/components/modals/associate-operador-modal.tsx` - Removido filtro is_active
 4. `web-app/components/topbar.tsx` - Corrigido logout
 5. `database/scripts/fix_missing_columns.sql` - Script SQL criado (NOVO)
 

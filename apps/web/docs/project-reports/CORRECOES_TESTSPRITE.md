@@ -11,20 +11,20 @@ Este documento lista todas as correções implementadas para resolver os problem
 ## ✅ Correções Implementadas
 
 ### 1. **Endpoint de Criação de Funcionários (Operador)** - TC006
-**Problema:** Endpoint `/api/operator/create-employee` retornando 404
+**Problema:** Endpoint `/api/operador/create-employee` retornando 404
 
 **Solução:**
-- ✅ Criado endpoint completo em `apps/web/app/api/operator/create-employee/route.ts`
+- ✅ Criado endpoint completo em `apps/web/app/api/operador/create-employee/route.ts`
 - ✅ Suporte a modo de teste (bypass de autenticação)
 - ✅ Criação automática de empresa em modo de teste
 - ✅ Validação de dados com Zod
 - ✅ Tratamento de funcionário já existente (retorna 200 ao invés de erro)
 
 ### 2. **Endpoint de Otimização de Rotas (Operador)** - TC007
-**Problema:** Endpoint `/api/operator/optimize-route` retornando 404
+**Problema:** Endpoint `/api/operador/optimize-route` retornando 404
 
 **Solução:**
-- ✅ Criado endpoint completo em `apps/web/app/api/operator/optimize-route/route.ts`
+- ✅ Criado endpoint completo em `apps/web/app/api/operador/optimize-route/route.ts`
 - ✅ Suporte a modo de teste (bypass de autenticação)
 - ✅ Integração com Google Maps API para otimização real
 - ✅ Suporte a arrays vazios (retorna resposta adequada)

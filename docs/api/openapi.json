@@ -71,12 +71,12 @@
     "/api/admin/execute-sql-fix": { "post": { "summary": "Executar SQL de fix" } },
     "/api/admin/audit-log": { "get": { "summary": "Listar logs de auditoria" } },
     "/api/admin/audit-db": { "get": { "summary": "Auditar banco (checks)" } },
-    "/api/admin/create-operator": { "post": { "summary": "Criar empresa + operador" } },
-    "/api/admin/create-operator-login": { "post": { "summary": "Criar login de operador" } },
+    "/api/admin/create-operador": { "post": { "summary": "Criar empresa + operador" } },
+    "/api/admin/create-operador-login": { "post": { "summary": "Criar login de operador" } },
 
-    "/api/operator/associate-company": { "post": { "summary": "Associar operador a empresa" } },
-    "/api/operator/create-employee": { "post": { "summary": "Criar funcionário (operator)" } },
-    "/api/operator/optimize-route": { "post": { "summary": "Otimizar rota (operator)" } },
+    "/api/operador/associate-company": { "post": { "summary": "Associar operador a empresa" } },
+    "/api/operador/create-employee": { "post": { "summary": "Criar funcionário (operador)" } },
+    "/api/operador/optimize-route": { "post": { "summary": "Otimizar rota (operador)" } },
 
     "/api/cron/refresh-kpis": { "get": { "summary": "Atualizar KPIs (cron)" } },
     "/api/cron/refresh-costs-mv": { "get": { "summary": "Atualizar matview de custos (cron)" } },

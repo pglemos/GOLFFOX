@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label"
 import { notifySuccess, notifyError } from "@/lib/toast"
 import { supabase } from "@/lib/supabase"
 import { AddressForm, AddressData } from "@/components/address-form"
-import type { Carrier } from "@/types/carrier"
+import type { transportadora } from "@/types/transportadora"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Building2, FileText, CreditCard, User } from "lucide-react"
 import dynamic from "next/dynamic"
@@ -19,13 +19,13 @@ const CarrierBankingSection = dynamic(() => import("@/components/carrier/carrier
 const CarrierLegalRepSection = dynamic(() => import("@/components/carrier/carrier-legal-rep-section"), { ssr: false })
 
 interface EditCarrierModalProps {
-  carrier: Carrier
+  transportadora: transportadora
   isOpen: boolean
   onClose: () => void
   onSave: () => void
 }
 
-export function EditCarrierModal({ carrier, isOpen, onClose, onSave }: EditCarrierModalProps) {
+export function EditCarrierModal({ transportadora, isOpen, onClose, onSave }: EditCarrierModalProps) {
   const [name, setName] = useState("")
   const [address, setAddress] = useState("")
   const [phone, setPhone] = useState("")
@@ -46,7 +46,7 @@ export function EditCarrierModal({ carrier, isOpen, onClose, onSave }: EditCarri
   })
 
   useEffect(() => {
-    if (carrier) {
+    if (transportadora) {
       setName(transportadora.name || "")
       setAddress(transportadora.address || "")
       setPhone(transportadora.phone || "")
@@ -65,7 +65,7 @@ export function EditCarrierModal({ carrier, isOpen, onClose, onSave }: EditCarri
         state: transportadora.address_state || ""
       })
     }
-  }, [carrier, isOpen])
+  }, [transportadora, isOpen])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -168,7 +168,7 @@ export function EditCarrierModal({ carrier, isOpen, onClose, onSave }: EditCarri
     }
   }
 
-  if (!carrier) return null
+  if (!transportadora) return null
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -308,7 +308,7 @@ export function EditCarrierModal({ carrier, isOpen, onClose, onSave }: EditCarri
                 <Button
                   type="submit"
                   disabled={loading || !name}
-                  className="w-full sm:w-auto order-1 sm:order-2 bg-orange-500 hover:bg-orange-600 min-h-[44px] text-base font-medium"
+                  className="w-full sm:w-auto order-1 sm:order-2 bg-brand hover:bg-orange-600 min-h-[44px] text-base font-medium"
                 >
                   {loading ? 'Salvando...' : 'Salvar Dados'}
                 </Button>
@@ -318,21 +318,21 @@ export function EditCarrierModal({ carrier, isOpen, onClose, onSave }: EditCarri
 
           <TabsContent value="documentos">
             <CarrierDocumentsSection
-              carrierId={carrier.id}
+              carrierId={transportadora.id}
               isEditing={true}
             />
           </TabsContent>
 
           <TabsContent value="bancario">
             <CarrierBankingSection
-              carrierId={carrier.id}
+              carrierId={transportadora.id}
               isEditing={true}
             />
           </TabsContent>
 
           <TabsContent value="representante">
             <CarrierLegalRepSection
-              carrierId={carrier.id}
+              carrierId={transportadora.id}
               isEditing={true}
             />
           </TabsContent>

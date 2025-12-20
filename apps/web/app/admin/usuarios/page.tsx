@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input"
 import { ChangeRoleModal } from "@/components/modals/change-role-modal"
 import { notifySuccess, notifyError } from "@/lib/toast"
 import { EditUserModal } from "@/components/modals/edit-user-modal"
-import { CreateUserModal } from "@/components/modals/create-operator-login-modal"
+import { CreateUserModal } from "@/components/modals/create-operador-login-modal"
 import {
     Select,
     SelectContent,

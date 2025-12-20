@@ -1,5 +1,5 @@
 /**
- * Vehicle Updated Domain Event
+ * veiculo Updated Domain Event
  * 
  * Evento de domínio disparado quando um veículo é atualizado
  */

@@ -16,7 +16,7 @@ import { supabase } from "@/lib/supabase"
 import { maskCPF } from "@/lib/geocoding"
 import { ScrollArea } from "@/components/ui/scroll-area"
 
-interface Driver {
+interface motorista {
   id: string
   name: string
   cpf: string
@@ -27,7 +27,7 @@ interface Driver {
 interface DriverPickerModalProps {
   isOpen: boolean
   onClose: () => void
-  onSelect: (driver: Driver) => void
+  onSelect: (motorista: motorista) => void
   companyId?: string
 }
 
@@ -37,7 +37,7 @@ export function DriverPickerModal({
   onSelect,
   companyId
 }: DriverPickerModalProps) {
-  const [drivers, setDrivers] = useState<Driver[]>([])
+  const [drivers, setDrivers] = useState<motorista[]>([])
   const [loading, setLoading] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
 
@@ -62,7 +62,7 @@ export function DriverPickerModal({
         throw new Error(result.error || 'Erro ao carregar motoristas')
       }
 
-      const driversData: Driver[] = (result.drivers || []).map((d: any) => ({
+      const driversData: motorista[] = (result.drivers || []).map((d: any) => ({
         id: d.id,
         name: d.name || "Sem nome",
         cpf: d.cpf || "",
@@ -101,7 +101,7 @@ export function DriverPickerModal({
 
         <div className="space-y-4">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-ink-light" />
             <Input
               placeholder="Buscar por nome ou CPF..."
               value={searchQuery}
@@ -111,35 +111,35 @@ export function DriverPickerModal({
           </div>
 
           {loading ? (
-            <div className="text-center py-8 text-gray-500">Carregando...</div>
+            <div className="text-center py-8 text-ink-muted">Carregando...</div>
           ) : (
             <ScrollArea className="h-[400px]">
               <div className="space-y-2">
                 {filteredDrivers.length === 0 ? (
-                  <div className="text-center py-8 text-gray-500">
+                  <div className="text-center py-8 text-ink-muted">
                     Nenhum motorista encontrado
                   </div>
                 ) : (
-                  filteredDrivers.map((driver) => (
+                  filteredDrivers.map((motorista) => (
                     <div
-                      key={driver.id}
-                      className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
+                      key={motorista.id}
+                      className="flex items-center justify-between p-3 border rounded-lg hover:bg-bg-soft cursor-pointer transition-colors"
                       onClick={() => {
-                        onSelect(driver)
+                        onSelect(motorista)
                         onClose()
                       }}
                     >
                       <div className="flex-1">
                         <div className="font-medium">{motorista.name}</div>
-                        {driver.cpf && (
-                          <div className="text-sm text-gray-500">
-                            CPF: {maskCPF(driver.cpf)}
+                        {motorista.cpf && (
+                          <div className="text-sm text-ink-muted">
+                            CPF: {maskCPF(motorista.cpf)}
                           </div>
                         )}
                       </div>
                       <div className="flex items-center gap-2">
-                        {driver.documents_valid ? (
-                          <Badge variant="default" className="bg-green-100 text-green-700">
+                        {motorista.documents_valid ? (
+                          <Badge variant="default" className="bg-success-light text-success">
                             <CheckCircle2 className="h-3 w-3 mr-1" />
                             Docs OK
                           </Badge>
@@ -149,9 +149,9 @@ export function DriverPickerModal({
                             Pendente
                           </Badge>
                         )}
-                        {driver.rating && (
+                        {motorista.rating && (
                           <Badge variant="outline">
-                            ⭐ {driver.rating.toFixed(1)}
+                            ⭐ {motorista.rating.toFixed(1)}
                           </Badge>
                         )}
                       </div>

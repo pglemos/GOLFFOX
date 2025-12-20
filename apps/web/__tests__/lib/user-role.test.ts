@@ -9,17 +9,17 @@ describe('lib/user-role', () => {
 
     it('deve retornar role operador para email de operador', () => {
       expect(getUserRoleByEmail('operador@empresa.com')).toBe('operador')
-      expect(getUserRoleByEmail('operator@golffox.com')).toBe('operador')
+      expect(getUserRoleByEmail('operador@golffox.com')).toBe('operador')
     })
 
     it('deve retornar role transportadora para email de transportadora', () => {
       expect(getUserRoleByEmail('transportadora@trans.com')).toBe('transportadora')
-      expect(getUserRoleByEmail('carrier@golffox.com')).toBe('transportadora')
+      expect(getUserRoleByEmail('transportadora@golffox.com')).toBe('transportadora')
     })
 
-    it('deve retornar role driver como padrão', () => {
-      expect(getUserRoleByEmail('unknown@email.com')).toBe('driver')
-      expect(getUserRoleByEmail('')).toBe('driver')
+    it('deve retornar role motorista como padrão', () => {
+      expect(getUserRoleByEmail('unknown@email.com')).toBe('motorista')
+      expect(getUserRoleByEmail('')).toBe('motorista')
     })
 
     it('deve ser case-insensitive', () => {

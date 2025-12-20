@@ -134,10 +134,10 @@
         },
         "roles": {
             "admin": "Administrador",
-            "operator": "Operador",
+            "operador": "Operador",
             "transportadora": "Transportadora",
-            "driver": "Motorista",
-            "passenger": "Passageiro"
+            "motorista": "Motorista",
+            "passageiro": "Passageiro"
         },
         "actions": {
             "changeRole": "Trocar Papel",

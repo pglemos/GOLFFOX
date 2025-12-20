@@ -103,11 +103,11 @@ Todas as correções críticas e melhorias identificadas na auditoria foram apli
 ### 1. Testar Middleware
 ```bash
 # Sem autenticação
-curl -I http://localhost:3000/operator
+curl -I http://localhost:3000/operador
 # Esperado: 307 Redirect para /login
 
 # Com autenticação
-curl -I http://localhost:3000/operator \
+curl -I http://localhost:3000/operador \
   -H "Cookie: golffox-session=<cookie_value>"
 # Esperado: 200 OK
 ```

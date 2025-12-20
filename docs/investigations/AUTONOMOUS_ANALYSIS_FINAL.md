@@ -129,16 +129,16 @@ Criar Transportadora
 [CREATE transportadora] Request body received: { "name": "Teste Debug" }
 [CREATE transportadora] Validation passed: { "name": "Teste Debug", "email": null, ... }
 [CREATE transportadora] Attempting insert: { "name": "Teste Debug", ... }
-[CREATE CARRIER] Success! Carrier created: abc-123-def
+[CREATE transportadora] Success! transportadora created: abc-123-def
 ```
 
 **Exemplo de log de erro:**
 ```
-[CREATE CARRIER] Auth failed: 401
+[CREATE transportadora] Auth failed: 401
 ```
 ou
 ```
-[CREATE CARRIER] Database error: 42501 new row violates row-level security policy
+[CREATE transportadora] Database error: 42501 new row violates row-level security policy
 ```
 
 ---

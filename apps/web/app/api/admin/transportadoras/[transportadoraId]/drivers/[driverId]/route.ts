@@ -37,7 +37,7 @@ export async function PUT(
     }
 
     // Atualizar na tabela users onde motoristas são armazenados
-    const { data: driver, error } = await supabase
+    const { data: motorista, error } = await supabase
       .from('users')
       .update({
         name,
@@ -64,7 +64,7 @@ export async function PUT(
     // Invalidar cache após atualização
     await invalidateEntityCache('motorista', driverId)
 
-    return NextResponse.json({ success: true, driver })
+    return NextResponse.json({ success: true, motorista })
   } catch (error: any) {
     logError('Erro na API de atualizar motorista', { error, driverId: (await context.params).driverId }, 'TransportadoraDriverUpdateAPI')
     return NextResponse.json(

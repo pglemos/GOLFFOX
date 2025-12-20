@@ -152,15 +152,15 @@ curl -X POST http://localhost:3000/api/auth/set-session \
   -d '{"user": {"id": "...", "email": "...", "role": "operador", "accessToken": "..."}}'
 
 # 2. Acessar rota protegida com cookie
-curl -I http://localhost:3000/operator \
+curl -I http://localhost:3000/operador \
   -H "Cookie: golffox-session=<cookie_value>"
 # Esperado: 200 OK
 ```
 
 ### Teste 2: Middleware sem Cookie
 ```bash
-curl -I http://localhost:3000/operator
-# Esperado: 307 Redirect para /login?redirect=/operator
+curl -I http://localhost:3000/operador
+# Esperado: 307 Redirect para /login?redirect=/operador
 ```
 
 ### Teste 3: API com Autenticação

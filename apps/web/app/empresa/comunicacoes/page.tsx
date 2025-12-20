@@ -75,7 +75,7 @@ function ComunicacoesOperatorPageInner() {
             <h1 className="text-3xl font-bold mb-2">Comunicações</h1>
             <p className="text-ink-muted">Broadcasts internos e histórico</p>
           </div>
-          <Button className="bg-orange-500 hover:bg-orange-600" onClick={() => setIsModalOpen(true)}>
+          <Button className="bg-brand hover:bg-orange-600" onClick={() => setIsModalOpen(true)}>
             <Send className="h-4 w-4 mr-2" /> Novo Broadcast
           </Button>
         </div>

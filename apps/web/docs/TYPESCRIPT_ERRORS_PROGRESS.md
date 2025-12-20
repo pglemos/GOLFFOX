@@ -30,7 +30,7 @@
 - ✅ Corrigido `documentId` em `carriers/[carrierId]/documents/route.ts`
 
 ### 3. Identificadores Duplicados
-- ✅ Corrigido `POST` duplicado em `create-operator/route.ts`
+- ✅ Corrigido `POST` duplicado em `create-operador/route.ts`
 
 ### 4. Tipos Supabase (Type Assertions)
 - ✅ Adicionado type assertions (`as any`) para queries Supabase com tipos `never`

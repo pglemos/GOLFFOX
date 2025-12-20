@@ -102,7 +102,7 @@ export default function MuralScreen() {
                     </Surface>
                 ))}
 
-                <Pressable style={styles.verMaisBtn} onPress={() => router.push('/passenger/ajuda')}>
+                <Pressable style={styles.verMaisBtn} onPress={() => router.push('/passageiro/ajuda')}>
                     <Text style={styles.verMaisText}>Ver todas as dúvidas →</Text>
                 </Pressable>
 

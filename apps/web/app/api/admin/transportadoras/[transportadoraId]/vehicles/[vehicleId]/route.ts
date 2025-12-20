@@ -47,7 +47,7 @@ export async function PUT(
       )
     }
 
-    const { data: vehicle, error } = await supabase
+    const { data: veiculo, error } = await supabase
       .from('vehicles')
       .update({
         plate,
@@ -75,9 +75,9 @@ export async function PUT(
     }
 
     // Invalidar cache após atualização
-    await invalidateEntityCache('vehicle', vehicleId)
+    await invalidateEntityCache('veiculo', vehicleId)
 
-    return NextResponse.json({ success: true, vehicle })
+    return NextResponse.json({ success: true, veiculo })
   } catch (error: any) {
     logError('Erro na API de atualizar veículo', { error, vehicleId: (await context.params).vehicleId }, 'TransportadoraVehicleUpdateAPI')
     return NextResponse.json(
@@ -124,7 +124,7 @@ export async function DELETE(
     }
 
     // Invalidar cache após exclusão
-    await invalidateEntityCache('vehicle', vehicleId)
+    await invalidateEntityCache('veiculo', vehicleId)
 
     return NextResponse.json({ success: true })
   } catch (error: any) {

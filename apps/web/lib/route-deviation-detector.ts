@@ -158,17 +158,17 @@ export function detectMultipleRouteDeviations(
 ): Map<string, DeviationResult> {
   const results = new Map<string, DeviationResult>()
 
-  vehicles.forEach((vehicle) => {
-    const routePolyline = routesMap.get(vehicle.route_id)
+  vehicles.forEach((veiculo) => {
+    const routePolyline = routesMap.get(veiculo.route_id)
     if (routePolyline) {
       const deviation = detectRouteDeviation(
-        vehicle.lat,
-        vehicle.lng,
-        vehicle.speed,
+        veiculo.lat,
+        veiculo.lng,
+        veiculo.speed,
         routePolyline,
         threshold
       )
-      results.set(vehicle.vehicle_id, deviation)
+      results.set(veiculo.vehicle_id, deviation)
     }
   })
 

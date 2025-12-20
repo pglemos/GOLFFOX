@@ -3,7 +3,7 @@
 
 ## 📊 Resumo Executivo
 
-Esta auditoria verificou a estrutura do Supabase (banco de dados, storage, políticas RLS) e os 3 painéis (Admin, Operator, Carrier) para identificar problemas, inconsistências ou funcionalidades faltantes.
+Esta auditoria verificou a estrutura do Supabase (banco de dados, storage, políticas RLS) e os 3 painéis (Admin, operador, transportadora) para identificar problemas, inconsistências ou funcionalidades faltantes.
 
 ---
 
@@ -98,7 +98,7 @@ Esta auditoria verificou a estrutura do Supabase (banco de dados, storage, polí
    - Limite: `10MB` (10.485.760 bytes)
    - Tipos MIME: `image/jpeg`, `image/png`, `application/pdf`
 
-3. ✅ **`vehicle-photos`**
+3. ✅ **`veiculo-photos`**
    - Público: `true`
    - Limite: `null` (sem limite configurado)
    - Tipos MIME: `null` (sem restrição)
@@ -108,7 +108,7 @@ Esta auditoria verificou a estrutura do Supabase (banco de dados, storage, polí
 
 - ✅ Políticas para `avatars` - 4 políticas criadas e ativas
 - ✅ Políticas para `transportadora-documents` - Políticas existentes
-- ⚠️ **Recomendação:** Verificar políticas para `vehicle-photos` se necessário
+- ⚠️ **Recomendação:** Verificar políticas para `veiculo-photos` se necessário
 
 ---
 
@@ -161,7 +161,7 @@ Esta auditoria verificou a estrutura do Supabase (banco de dados, storage, polí
 
 ---
 
-## ✅ 4. PAINEL OPERATOR
+## ✅ 4. PAINEL operador
 
 ### 4.1 Páginas Existentes
 **Status: ✅ OK**
@@ -201,7 +201,7 @@ Esta auditoria verificou a estrutura do Supabase (banco de dados, storage, polí
 
 ---
 
-## ✅ 5. PAINEL CARRIER
+## ✅ 5. PAINEL transportadora
 
 ### 5.1 Páginas Existentes
 **Status: ✅ OK**
@@ -283,7 +283,7 @@ Nenhum problema crítico identificado.
    - **Ação:** Considerar remover completamente ou manter para uso futuro
    - **Prioridade:** Baixa
 
-2. ⚠️ **Bucket `vehicle-photos` sem limite de tamanho**
+2. ⚠️ **Bucket `veiculo-photos` sem limite de tamanho**
    - **Status:** Limite configurado como `null`
    - **Ação:** Considerar definir limite (ex: 10MB)
    - **Prioridade:** Baixa
@@ -305,11 +305,11 @@ Nenhum problema crítico identificado.
    ]
    ```
 
-2. 💡 **Definir limite para bucket `vehicle-photos`**
+2. 💡 **Definir limite para bucket `veiculo-photos`**
    ```sql
    UPDATE storage.buckets 
    SET file_size_limit = 10485760 
-   WHERE id = 'vehicle-photos';
+   WHERE id = 'veiculo-photos';
    ```
 
 3. 💡 **Remover página `/admin/sincronizacao` se não for mais usada**
@@ -359,14 +359,14 @@ Nenhum problema crítico identificado.
 
 ### 9.3 Frontend
 - **Páginas Admin:** 19
-- **Páginas Operator:** 16
-- **Páginas Carrier:** 10
+- **Páginas operador:** 16
+- **Páginas transportadora:** 10
 - **Total de páginas:** 45
 
 ### 9.4 API Routes
 - **Rotas Admin:** 50+
-- **Rotas Operator:** 10+
-- **Rotas Carrier:** 15+
+- **Rotas operador:** 10+
+- **Rotas transportadora:** 15+
 - **Rotas compartilhadas:** 10+
 - **Total de rotas:** 85+
 
@@ -381,8 +381,8 @@ Nenhum problema crítico identificado.
 - ✅ Storage: Buckets criados e configurados
 - ✅ Políticas RLS: Todas ativas e funcionando
 - ✅ Painel Admin: Completo e funcional
-- ✅ Painel Operator: Completo e funcional
-- ✅ Painel Carrier: Completo e funcional
+- ✅ Painel operador: Completo e funcional
+- ✅ Painel transportadora: Completo e funcional
 - ✅ Autenticação: Funcionando corretamente
 - ✅ Navegação: Todas as rotas funcionando
 - ✅ Funcionalidades recentes: Upload de avatar implementado e funcionando
@@ -391,7 +391,7 @@ Nenhum problema crítico identificado.
 
 **Recomendações:**
 1. Adicionar proteção explícita para `/transportadora` no middleware (opcional)
-2. Definir limite para bucket `vehicle-photos` (opcional)
+2. Definir limite para bucket `veiculo-photos` (opcional)
 3. Considerar remover página `/admin/sincronizacao` se não for mais usada (opcional)
 
 **Próximos passos sugeridos:**

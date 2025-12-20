@@ -17,20 +17,20 @@ export default function Error({
   }, [error])
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gray-50">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-bg-soft">
       <Card className="p-8 max-w-md w-full text-center shadow-lg">
-        <h2 className="text-2xl font-bold mb-4 text-red-600">Algo deu errado!</h2>
-        <p className="text-gray-600 mb-4">
+        <h2 className="text-2xl font-bold mb-4 text-error">Algo deu errado!</h2>
+        <p className="text-ink-muted mb-4">
           {error.message || 'Ocorreu um erro inesperado ao carregar a página de funcionários.'}
         </p>
         {process.env.NODE_ENV === 'development' && error.stack && (
-          <details className="text-left text-xs text-gray-500 mb-6 bg-gray-100 p-4 rounded overflow-auto max-h-40">
+          <details className="text-left text-xs text-ink-muted mb-6 bg-muted p-4 rounded overflow-auto max-h-40">
             <summary className="cursor-pointer font-semibold mb-2">Detalhes técnicos</summary>
             <pre className="whitespace-pre-wrap">{error.stack}</pre>
           </details>
         )}
         <div className="flex gap-4 justify-center flex-wrap">
-          <Button onClick={reset} variant="default" className="bg-orange-500 hover:bg-orange-600">
+          <Button onClick={reset} variant="default" className="bg-brand hover:bg-orange-600">
             Tentar Novamente
           </Button>
           <Button onClick={() => window.location.href = '/operador'} variant="outline">
@@ -38,7 +38,7 @@ export default function Error({
           </Button>
         </div>
         {error.digest && (
-          <p className="text-xs text-gray-400 mt-4">Erro ID: {error.digest}</p>
+          <p className="text-xs text-ink-light mt-4">Erro ID: {error.digest}</p>
         )}
       </Card>
     </div>

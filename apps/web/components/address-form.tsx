@@ -140,7 +140,7 @@ export function AddressForm({
             disabled={disabled || loadingCep}
             className={cn(
               "flex w-full rounded-lg-custom border border-border bg-bg-soft px-4 py-2 text-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-ink-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-text-brand focus-visible:ring-opacity-20 disabled:cursor-not-allowed disabled:opacity-50 h-11",
-              cepError && "border-red-500"
+              cepError && "border-error"
             )}
           />
           <Button
@@ -156,7 +156,7 @@ export function AddressForm({
             )}
           </Button>
         </div>
-        {cepError && <p className="text-sm text-red-500 mt-1">{cepError}</p>}
+        {cepError && <p className="text-sm text-error mt-1">{cepError}</p>}
       </div>
 
       <div>
@@ -245,7 +245,7 @@ export function AddressForm({
             value={value.city}
             readOnly
             disabled
-            className="flex w-full rounded-lg-custom border border-border px-4 py-2 text-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-ink-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-text-brand focus-visible:ring-opacity-20 disabled:cursor-not-allowed disabled:opacity-50 h-11 bg-gray-50"
+            className="flex w-full rounded-lg-custom border border-border px-4 py-2 text-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-ink-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-text-brand focus-visible:ring-opacity-20 disabled:cursor-not-allowed disabled:opacity-50 h-11 bg-bg-soft"
           />
         </div>
 
@@ -261,7 +261,7 @@ export function AddressForm({
             value={value.state}
             readOnly
             disabled
-            className="flex w-full rounded-lg-custom border border-border px-4 py-2 text-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-ink-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-text-brand focus-visible:ring-opacity-20 disabled:cursor-not-allowed disabled:opacity-50 h-11 bg-gray-50"
+            className="flex w-full rounded-lg-custom border border-border px-4 py-2 text-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-ink-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-text-brand focus-visible:ring-opacity-20 disabled:cursor-not-allowed disabled:opacity-50 h-11 bg-bg-soft"
           />
         </div>
       </div>

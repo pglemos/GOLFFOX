@@ -175,7 +175,7 @@ export function SolicitacaoModal({ isOpen, onClose, onSave, empresaId }: Solicit
             <Button 
               type="submit" 
               disabled={loading} 
-              className="bg-orange-500 hover:bg-orange-600 w-full sm:w-auto order-1 sm:order-2 min-h-[44px] text-base font-medium"
+              className="bg-brand hover:bg-orange-600 w-full sm:w-auto order-1 sm:order-2 min-h-[44px] text-base font-medium"
             >
               {loading ? "Enviando..." : "Enviar Solicitação"}
             </Button>

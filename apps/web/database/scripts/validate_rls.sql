@@ -74,9 +74,9 @@ ORDER BY tablename;
 -- 5. VALIDAÇÃO DE POLÍTICAS ESPECÍFICAS CRÍTICAS
 -- ====================================================
 
--- 5.1 Driver Positions (deve ter políticas para insert e read)
+-- 5.1 motorista Positions (deve ter políticas para insert e read)
 SELECT 
-  '5.1 Driver Positions Policies' as validacao,
+  '5.1 motorista Positions Policies' as validacao,
   CASE 
     WHEN COUNT(*) >= 2 THEN '✅ OK (' || COUNT(*)::text || ' políticas)'
     ELSE '❌ FALTANDO: Mínimo 2 políticas necessárias'

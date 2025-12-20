@@ -28,13 +28,13 @@ describe('POST /api/transportadora/upload', () => {
     const file = new File(['test content'], 'test.pdf', { type: 'application/pdf' })
     const formData = new FormData()
     formData.append('file', file)
-    formData.append('folder', 'driver-documents')
-    formData.append('driverId', 'driver-1')
+    formData.append('folder', 'motorista-documents')
+    formData.append('driverId', 'motorista-1')
 
     mockSupabaseClient.storage = {
       from: jest.fn(() => ({
         upload: jest.fn().mockResolvedValue({
-          data: { path: 'driver-documents/driver-1/test.pdf' },
+          data: { path: 'motorista-documents/motorista-1/test.pdf' },
           error: null,
         }),
       })),
@@ -54,7 +54,7 @@ describe('POST /api/transportadora/upload', () => {
 
   it('deve validar arquivo obrigatório', async () => {
     const formData = new FormData()
-    formData.append('folder', 'driver-documents')
+    formData.append('folder', 'motorista-documents')
 
     const req = createTransportadoraRequest({
       method: 'POST',
@@ -89,8 +89,8 @@ describe('POST /api/transportadora/upload', () => {
     const file = new File(['test'], 'test.txt', { type: 'text/plain' })
     const formData = new FormData()
     formData.append('file', file)
-    formData.append('folder', 'driver-documents')
-    formData.append('driverId', 'driver-1')
+    formData.append('folder', 'motorista-documents')
+    formData.append('driverId', 'motorista-1')
 
     const req = createTransportadoraRequest({
       method: 'POST',
@@ -109,8 +109,8 @@ describe('POST /api/transportadora/upload', () => {
     const file = new File([largeContent], 'large.pdf', { type: 'application/pdf' })
     const formData = new FormData()
     formData.append('file', file)
-    formData.append('folder', 'driver-documents')
-    formData.append('driverId', 'driver-1')
+    formData.append('folder', 'motorista-documents')
+    formData.append('driverId', 'motorista-1')
 
     const req = createTransportadoraRequest({
       method: 'POST',
@@ -124,11 +124,11 @@ describe('POST /api/transportadora/upload', () => {
     expect(data.error).toContain('Arquivo muito grande')
   })
 
-  it('deve validar driverId para driver-documents', async () => {
+  it('deve validar driverId para motorista-documents', async () => {
     const file = new File(['test'], 'test.pdf', { type: 'application/pdf' })
     const formData = new FormData()
     formData.append('file', file)
-    formData.append('folder', 'driver-documents')
+    formData.append('folder', 'motorista-documents')
 
     const req = createTransportadoraRequest({
       method: 'POST',

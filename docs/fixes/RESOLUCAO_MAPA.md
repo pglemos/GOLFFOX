@@ -110,7 +110,7 @@ CREATE POLICY "admin_full_access_vehicles" ON public.vehicles
     )
   );
 
--- Criar política OPERATOR (apenas sua empresa)
+-- Criar política operador (apenas sua empresa)
 CREATE POLICY "operator_select_company_vehicles" ON public.vehicles
   FOR SELECT TO authenticated 
   USING (
@@ -311,7 +311,7 @@ Envie o output acima para análise.
 
 ## ✅ Checklist Final
 
-- [ ] Usuário está autenticado como admin ou operator
+- [ ] Usuário está autenticado como admin ou operador
 - [ ] Há pelo menos 1 veículo com `is_active = true` no banco
 - [ ] RLS policies foram atualizadas (Passo 3)
 - [ ] Cache do Supabase foi limpo (Passo 4)

@@ -17,7 +17,7 @@ test.describe('Gerenciamento de Documentos - Transportadora', () => {
     await page.goto('/transportadora/motoristas')
     
     // Procurar por motorista e botão de upload
-    const driverRow = page.locator('tbody tr, [data-testid*="driver"]').first()
+    const driverRow = page.locator('tbody tr, [data-testid*="motorista"]').first()
     if (await driverRow.isVisible({ timeout: 5000 })) {
       const uploadButton = driverRow.locator('button:has-text(/upload|documento|anexar/i)')
       if (await uploadButton.isVisible({ timeout: 3000 })) {
@@ -47,7 +47,7 @@ test.describe('Gerenciamento de Documentos - Transportadora', () => {
   test('deve fazer upload de documento de veículo', async ({ page }) => {
     await page.goto('/transportadora/frota')
     
-    const vehicleRow = page.locator('tbody tr, [data-testid*="vehicle"]').first()
+    const vehicleRow = page.locator('tbody tr, [data-testid*="veiculo"]').first()
     if (await vehicleRow.isVisible({ timeout: 5000 })) {
       const uploadButton = vehicleRow.locator('button:has-text(/upload|documento/i)')
       if (await uploadButton.isVisible({ timeout: 3000 })) {

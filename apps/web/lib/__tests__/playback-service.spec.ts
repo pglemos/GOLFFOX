@@ -35,8 +35,8 @@ describe('PlaybackService', () => {
         {
           position_id: 'pos-1',
           trip_id: 'trip-1',
-          vehicle_id: 'vehicle-1',
-          driver_id: 'driver-1',
+          vehicle_id: 'veiculo-1',
+          driver_id: 'motorista-1',
           route_id: 'route-1',
           lat: -19.916681,
           lng: -43.934493,
@@ -48,8 +48,8 @@ describe('PlaybackService', () => {
         {
           position_id: 'pos-2',
           trip_id: 'trip-1',
-          vehicle_id: 'vehicle-1',
-          driver_id: 'driver-1',
+          vehicle_id: 'veiculo-1',
+          driver_id: 'motorista-1',
           route_id: 'route-1',
           lat: -19.917681,
           lng: -43.935493,
@@ -84,7 +84,7 @@ describe('PlaybackService', () => {
       })
 
       expect(positions).toHaveLength(2)
-      expect(positions[0].vehicle_id).toBe('vehicle-1')
+      expect(positions[0].vehicle_id).toBe('veiculo-1')
       expect(positions[0].lat).toBe(-19.916681)
     })
 
@@ -110,8 +110,8 @@ describe('PlaybackService', () => {
         {
           position_id: 'pos-1',
           trip_id: 'trip-1',
-          vehicle_id: 'vehicle-1',
-          driver_id: 'driver-1',
+          vehicle_id: 'veiculo-1',
+          driver_id: 'motorista-1',
           route_id: 'route-1',
           lat: -19.916681,
           lng: -43.934493,
@@ -205,8 +205,8 @@ describe('PlaybackService', () => {
         {
           position_id: 'pos-1',
           trip_id: 'trip-1',
-          vehicle_id: 'vehicle-1',
-          driver_id: 'driver-1',
+          vehicle_id: 'veiculo-1',
+          driver_id: 'motorista-1',
           route_id: 'route-1',
           lat: -19.916681,
           lng: -43.934493,
@@ -218,8 +218,8 @@ describe('PlaybackService', () => {
         {
           position_id: 'pos-2',
           trip_id: 'trip-1',
-          vehicle_id: 'vehicle-1',
-          driver_id: 'driver-1',
+          vehicle_id: 'veiculo-1',
+          driver_id: 'motorista-1',
           route_id: 'route-1',
           lat: -19.917681,
           lng: -43.935493,

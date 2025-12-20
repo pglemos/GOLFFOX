@@ -33,13 +33,13 @@ export async function DELETE(req: NextRequest) {
     const supabase = getSupabaseAdmin()
 
     // Verificar se a transportadora existe
-    const { data: carrier, error: carrierError } = await supabase
+    const { data: transportadora, error: carrierError } = await supabase
       .from('carriers')
       .select('id, name')
       .eq('id', carrierId)
       .single()
 
-    if (carrierError || !carrier) {
+    if (carrierError || !transportadora) {
       return NextResponse.json(
         { success: false, error: 'Transportadora não encontrada', message: carrierError?.message },
         { status: 404 }

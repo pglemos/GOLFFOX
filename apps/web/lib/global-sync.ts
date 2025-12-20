@@ -10,9 +10,9 @@ type SyncEventType =
   | 'user.created'
   | 'user.updated' 
   | 'user.deleted'
-  | 'vehicle.created'
-  | 'vehicle.updated'
-  | 'vehicle.deleted'
+  | 'veiculo.created'
+  | 'veiculo.updated'
+  | 'veiculo.deleted'
   | 'route.created'
   | 'route.updated'
   | 'route.deleted'
@@ -109,9 +109,9 @@ class GlobalSyncManager {
         'DELETE': 'user.deleted'
       },
       'vehicles': {
-        'INSERT': 'vehicle.created',
-        'UPDATE': 'vehicle.updated',
-        'DELETE': 'vehicle.deleted'
+        'INSERT': 'veiculo.created',
+        'UPDATE': 'veiculo.updated',
+        'DELETE': 'veiculo.deleted'
       },
       'routes': {
         'INSERT': 'route.created',

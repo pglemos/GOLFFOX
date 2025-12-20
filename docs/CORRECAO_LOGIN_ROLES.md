@@ -33,7 +33,7 @@ let role = existingUser.role
 
 // DEPOIS
 let role = existingUser.role
-role = normalizeRole(role) // Normaliza operator → empresa, carrier → operador
+role = normalizeRole(role) // Normaliza operador → empresa, transportadora → operador
 ```
 
 ### 2. Normalização no Proxy (Middleware)

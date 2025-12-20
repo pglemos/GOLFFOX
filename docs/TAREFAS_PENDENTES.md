@@ -57,8 +57,8 @@
 **Esforço estimado:** 16-32 horas
 
 **Já existe:**
-- ✅ Telas de Driver (checklist, route, scan, history, chat)
-- ✅ Telas de Passenger (map, details, feedback, checkin, etc.)
+- ✅ Telas de motorista (checklist, route, scan, history, chat)
+- ✅ Telas de passageiro (map, details, feedback, checkin, etc.)
 - ✅ Autenticação integrada
 - ✅ Integração com Supabase
 

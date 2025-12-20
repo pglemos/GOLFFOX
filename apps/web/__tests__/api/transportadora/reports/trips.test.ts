@@ -19,12 +19,12 @@ describe('GET /api/transportadora/reports/trips', () => {
   it('deve gerar relatório de viagens', async () => {
     const transportadora = createTestTransportadora()
     const route = createTestRoute(transportadora.id)
-    const trip = createTestTrip(route.id, 'vehicle-1', 'driver-1', { status: 'completed' })
+    const trip = createTestTrip(route.id, 'veiculo-1', 'motorista-1', { status: 'completed' })
     
     mockSupabaseClient.setTableData('routes', [route])
     mockSupabaseClient.setTableData('trips', [trip])
     mockSupabaseClient.setTableData('users', [
-      { id: 'driver-1', name: 'Motorista Teste', email: 'driver@test.com' },
+      { id: 'motorista-1', name: 'Motorista Teste', email: 'motorista@test.com' },
     ])
     mockSupabaseClient.setTableData('trip_passengers', [])
 

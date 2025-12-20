@@ -65,15 +65,15 @@ export async function GET(req: NextRequest) {
     if (tripsError) throw tripsError
 
     // Calcular performance por motorista
-    const driverPerformance = drivers?.map(driver => {
-      const driverRanking = rankings?.find(r => r.driver_id === driver.id)
-      const driverTrips = trips?.filter(t => t.driver_id === driver.id) || []
+    const driverPerformance = drivers?.map(motorista => {
+      const driverRanking = rankings?.find(r => r.driver_id === motorista.id)
+      const driverTrips = trips?.filter(t => t.driver_id === motorista.id) || []
 
       return {
-        driver_id: driver.id,
-        name: driver.name,
-        email: driver.email,
-        phone: driver.phone,
+        driver_id: motorista.id,
+        name: motorista.name,
+        email: motorista.email,
+        phone: motorista.phone,
         total_trips: driverRanking?.trips_completed || driverTrips.length,
         trips_in_period: driverTrips.length,
         total_points: driverRanking?.total_points || 0,

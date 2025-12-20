@@ -24,10 +24,10 @@ jest.mock('@/lib/rate-limit', () => ({
 jest.mock('@/lib/role-mapper', () => ({
   normalizeRole: jest.fn((role: string) => {
     const roleMap: Record<string, string> = {
-      'operator': 'empresa',
-      'carrier': 'transportadora',
-      'driver': 'motorista',
-      'passenger': 'passageiro',
+      'operador': 'empresa',
+      'transportadora': 'transportadora',
+      'motorista': 'motorista',
+      'passageiro': 'passageiro',
       'admin': 'admin',
       'empresa': 'empresa',
       'transportadora': 'transportadora',

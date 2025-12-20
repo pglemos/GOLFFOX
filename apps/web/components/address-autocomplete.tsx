@@ -102,11 +102,11 @@ export function AddressAutocomplete({
             onChange={handleInputChange}
             placeholder="Carregando serviço de endereços..."
             disabled={true}
-            className={cn(error && "border-red-500")}
+            className={cn(error && "border-error")}
           />
-          <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-gray-400" />
+          <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-ink-light" />
         </div>
-        {error && <p className="text-sm text-red-500">{error}</p>}
+        {error && <p className="text-sm text-error">{error}</p>}
       </div>
     )
   }
@@ -124,14 +124,14 @@ export function AddressAutocomplete({
             placeholder={placeholder}
             disabled={disabled}
             required={required}
-            className={cn(error && "border-red-500")}
+            className={cn(error && "border-error")}
           />
-          <MapPin className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <MapPin className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-ink-light" />
         </div>
-        <p className="text-sm text-yellow-600">
+        <p className="text-sm text-warning">
           Serviço de autocomplete não disponível. Você pode digitar o endereço manualmente.
         </p>
-        {error && <p className="text-sm text-red-500">{error}</p>}
+        {error && <p className="text-sm text-error">{error}</p>}
       </div>
     )
   }
@@ -163,22 +163,22 @@ export function AddressAutocomplete({
             disabled={disabled || isLoading}
             required={required}
             className={cn(
-              error && "border-red-500",
+              error && "border-error",
               isLoading && "pr-12",
               "text-base h-11 sm:h-12 px-4 py-3 pr-12"
             )}
           />
         </Autocomplete>
         {isLoading && (
-          <Loader2 className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 animate-spin text-gray-400" />
+          <Loader2 className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 animate-spin text-ink-light" />
         )}
         {!isLoading && (
-          <MapPin className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+          <MapPin className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-ink-light" />
         )}
       </div>
-      {error && <p className="text-sm text-red-500 mt-1">{error}</p>}
+      {error && <p className="text-sm text-error mt-1">{error}</p>}
       {value && !autocomplete && (
-        <p className="text-xs text-gray-500 mt-1">
+        <p className="text-xs text-ink-muted mt-1">
           Selecione um endereço da lista para geocodificação automática
         </p>
       )}

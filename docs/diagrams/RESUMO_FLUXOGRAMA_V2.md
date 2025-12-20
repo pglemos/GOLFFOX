@@ -29,34 +29,34 @@
 14. ✅ Transportadoras (/admin/transportadoras)
 15. ✅ Preferências (/admin/preferences, /admin/min)
 
-#### **Painel Operador (/operator) - 13 MÓDULOS:**
-1. ✅ Dashboard (/operator)
-2. ✅ Funcionários (/operator/funcionarios)
-3. ✅ Rotas (/operator/rotas, /operator/rotas/mapa)
-4. ✅ Alertas (/operator/alertas)
-5. ✅ Comunicações (/operator/comunicacoes)
-6. ✅ Conformidade (/operator/conformidade)
-7. ✅ Custos (/operator/custos)
-8. ✅ Relatórios (/operator/relatorios)
-9. ✅ Solicitações (/operator/solicitacoes)
-10. ✅ Prestadores (/operator/prestadores)
-11. ✅ Ajuda (/operator/ajuda)
-12. ✅ Sincronizar (/operator/sincronizar)
-13. ✅ Preferências (/operator/preferencias)
+#### **Painel Operador (/operador) - 13 MÓDULOS:**
+1. ✅ Dashboard (/operador)
+2. ✅ Funcionários (/operador/funcionarios)
+3. ✅ Rotas (/operador/rotas, /operador/rotas/mapa)
+4. ✅ Alertas (/operador/alertas)
+5. ✅ Comunicações (/operador/comunicacoes)
+6. ✅ Conformidade (/operador/conformidade)
+7. ✅ Custos (/operador/custos)
+8. ✅ Relatórios (/operador/relatorios)
+9. ✅ Solicitações (/operador/solicitacoes)
+10. ✅ Prestadores (/operador/prestadores)
+11. ✅ Ajuda (/operador/ajuda)
+12. ✅ Sincronizar (/operador/sincronizar)
+13. ✅ Preferências (/operador/preferencias)
 
-#### **Painel Transportadora (/carrier) - 8 MÓDULOS:**
-1. ✅ Dashboard (/carrier)
-2. ✅ Mapa (/carrier/mapa)
-3. ✅ Veículos (/carrier/veiculos)
-4. ✅ Motoristas (/carrier/motoristas)
-5. ✅ Relatórios (/carrier/relatorios)
-6. ✅ Alertas (/carrier/alertas)
-7. ✅ Custos (/carrier/custos)
-8. ✅ Ajuda (/carrier/ajuda)
+#### **Painel Transportadora (/transportadora) - 8 MÓDULOS:**
+1. ✅ Dashboard (/transportadora)
+2. ✅ Mapa (/transportadora/mapa)
+3. ✅ Veículos (/transportadora/veiculos)
+4. ✅ Motoristas (/transportadora/motoristas)
+5. ✅ Relatórios (/transportadora/relatorios)
+6. ✅ Alertas (/transportadora/alertas)
+7. ✅ Custos (/transportadora/custos)
+8. ✅ Ajuda (/transportadora/ajuda)
 
 #### **Outras Páginas:**
-- ✅ /driver (Painel Web Motorista)
-- ✅ /passenger (Painel Web Passageiro)
+- ✅ /motorista (Painel Web Motorista)
+- ✅ /passageiro (Painel Web Passageiro)
 - ✅ /diagnostico (Diagnóstico sistema)
 - ✅ /unauthorized (Não autorizado)
 - ✅ Páginas de teste
@@ -88,8 +88,8 @@
 #### **Mobile Core (18 módulos):**
 - ✅ core/auth, core/config, core/error, core/logging
 - ✅ core/routing, core/security, core/theme, core/supabase
-- ✅ features/auth, driver, passenger, mapa, routes, vehicles
-- ✅ features/alertas, custos, relatorios, operator, carrier
+- ✅ features/auth, motorista, passageiro, mapa, routes, vehicles
+- ✅ features/alertas, custos, relatorios, operador, transportadora
 
 ### 🔌 **API ROUTES (89 ENDPOINTS)**
 
@@ -107,7 +107,7 @@
 - ✅ Audit (db, log)
 - ✅ Carriers (create, update, delete, list, [id]/drivers/vehicles/users)
 - ✅ Companies (POST, GET list, GET [id], DELETE)
-- ✅ Create Operator/Login, Create Carrier/Login
+- ✅ Create operador/Login, Create transportadora/Login
 - ✅ Costs Options
 - ✅ Drivers (list, POST, GET [id], DELETE)
 - ✅ Employees List
@@ -119,19 +119,19 @@
 - ✅ Users (list, GET [id], DELETE)
 - ✅ Vehicles (list, POST, GET [id], PUT [id], DELETE)
 
-#### **Operator (3 endpoints):**
-- ✅ POST /api/operator/associate-company
-- ✅ POST /api/operator/create-employee
-- ✅ POST /api/operator/optimize-route
+#### **operador (3 endpoints):**
+- ✅ POST /api/operador/associate-company
+- ✅ POST /api/operador/create-employee
+- ✅ POST /api/operador/optimize-route
 
-#### **Carrier (11 endpoints):**
-- ✅ GET /api/carrier/alerts
-- ✅ GET /api/carrier/costs/route, /costs/vehicle
-- ✅ GET /api/carrier/drivers/[id]/documents, /exams
-- ✅ GET /api/carrier/reports/driver-performance, /fleet-usage, /trips
-- ✅ POST /api/carrier/storage/signed-url
-- ✅ POST /api/carrier/upload
-- ✅ GET /api/carrier/vehicles/[id]/documents, /maintenances
+#### **transportadora (11 endpoints):**
+- ✅ GET /api/transportadora/alerts
+- ✅ GET /api/transportadora/costs/route, /costs/veiculo
+- ✅ GET /api/transportadora/drivers/[id]/documents, /exams
+- ✅ GET /api/transportadora/reports/motorista-performance, /fleet-usage, /trips
+- ✅ POST /api/transportadora/storage/signed-url
+- ✅ POST /api/transportadora/upload
+- ✅ GET /api/transportadora/vehicles/[id]/documents, /maintenances
 
 #### **Costs (8 endpoints):**
 - ✅ GET /api/costs/kpis
@@ -209,12 +209,12 @@
 #### **Migrations (60 arquivos SQL):**
 - ✅ v41: Gamificação, Views KPIs, RPCs rotas
 - ✅ v42: Realtime tables habilitadas
-- ✅ v43: Admin core, MatViews, RLS, Views, Operator RLS
-- ✅ v44: Costs taxonomy, MatViews, Views, Map views, Operator employees
+- ✅ v43: Admin core, MatViews, RLS, Views, operador RLS
+- ✅ v44: Costs taxonomy, MatViews, Views, Map views, operador employees
 - ✅ v45: LGPD PII protection
 - ✅ v46: Route optimization, Map advanced features
 - ✅ v47-v49: Fixes auth, RLS, triggers, Protect user_company_map
-- ✅ v50-v54: Carrier complete
+- ✅ v50-v54: transportadora complete
 - ✅ v74: Canonical migration
 - ✅ Auxiliares: gf_operator_tables, gf_operator_rpcs, gf_operator_views, etc.
 
@@ -222,10 +222,10 @@
 
 #### **Row Level Security (RLS):**
 - ✅ Admin: acesso total
-- ✅ Operator: dados empresa (company_id)
-- ✅ Carrier: dados transportadora (carrier_id)
-- ✅ Driver: próprias viagens (driver_id)
-- ✅ Passenger: viagens atribuídas
+- ✅ operador: dados empresa (company_id)
+- ✅ transportadora: dados transportadora (carrier_id)
+- ✅ motorista: próprias viagens (driver_id)
+- ✅ passageiro: viagens atribuídas
 - ✅ Todas tabelas protegidas
 
 ### 🔄 **REALTIME E NOTIFICAÇÕES**
@@ -255,17 +255,17 @@
 #### **React Components:**
 - ✅ UI Base (Radix UI)
 - ✅ Admin Components
-- ✅ Operator Components
-- ✅ Carrier Components
+- ✅ operador Components
+- ✅ transportadora Components
 - ✅ Modals
 - ✅ Providers (Context)
 
 #### **React Hooks Customizados:**
 - ✅ use-auth-fast
-- ✅ use-operator-data
-- ✅ use-operator-tenant
+- ✅ use-operador-data
+- ✅ use-operador-tenant
 - ✅ use-realtime-updates
-- ✅ use-operator-kpis
+- ✅ use-operador-kpis
 - ✅ use-control-tower
 
 #### **State Management:**

@@ -98,7 +98,7 @@ export async function POST(
 
     const supabase = getSupabaseAdmin()
 
-    const { data: vehicle, error } = await supabase
+    const { data: veiculo, error } = await supabase
       .from('vehicles')
       .insert([
         {
@@ -126,7 +126,7 @@ export async function POST(
       )
     }
 
-    return NextResponse.json({ success: true, vehicle })
+    return NextResponse.json({ success: true, veiculo })
   } catch (error: any) {
     logError('Erro na API de criar veículo', { error, transportadoraId: (await context.params).transportadoraId || (await context.params).carrierId }, 'TransportadoraVehiclesAPI')
     return NextResponse.json(

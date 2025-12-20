@@ -19,25 +19,25 @@ Este documento contém as credenciais de teste para acessar a aplicação GolfFo
 ### 📊 Operador
 - **Email:** `operador@empresa.com`
 - **Senha:** `senha123`
-- **Tipo:** Operator
+- **Tipo:** operador
 - **Dashboard:** Painel de operações com gestão de viagens, monitoramento em tempo real e KPIs
 
 ### 🚛 Transportadora
 - **Email:** `transportadora@trans.com`
 - **Senha:** `senha123`
-- **Tipo:** Carrier
+- **Tipo:** transportadora
 - **Dashboard:** Painel de transportadora com gestão de frota, motoristas e viagens
 
 ### 🚗 Motorista
 - **Email:** `motorista@trans.com`
 - **Senha:** `senha123`
-- **Tipo:** Driver
+- **Tipo:** motorista
 - **Dashboard:** Painel do motorista com viagens atribuídas, rastreamento e detalhes de rota
 
 ### 👤 Passageiro
 - **Email:** `passageiro@empresa.com`
 - **Senha:** `senha123`
-- **Tipo:** Passenger
+- **Tipo:** passageiro
 - **Dashboard:** Painel do passageiro com acompanhamento de viagem em tempo real e relatório de incidentes
 
 ## 🔄 Sistema de Redirecionamento
@@ -65,25 +65,25 @@ O sistema implementa redirecionamento automático baseado no tipo de usuário:
 - Configurações do sistema
 - Gestão de transportadoras
 
-### Operator
+### operador
 - Monitoramento de viagens em tempo real
 - Gestão de rotas e horários
 - KPIs operacionais
 - Ações rápidas de operação
 
-### Carrier
+### transportadora
 - Gestão de frota de veículos
 - Controle de motoristas
 - Viagens da transportadora
 - Métricas de performance
 
-### Driver
+### motorista
 - Viagens atribuídas
 - Rastreamento GPS em tempo real
 - Detalhes de rota
 - Status de viagem
 
-### Passenger
+### passageiro
 - Acompanhamento de viagem em tempo real
 - Localização do motorista
 - Relatório de incidentes

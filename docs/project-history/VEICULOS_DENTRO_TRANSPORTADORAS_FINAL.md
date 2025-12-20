@@ -61,7 +61,7 @@
 
 **Botões Disponíveis por Transportadora:**
 - ✏️ **Editar** - Editar dados da transportadora
-- 👤 **Login de Acesso** - Gerenciar usuários carrier
+- 👤 **Login de Acesso** - Gerenciar usuários transportadora
 - 👥 **Ver Motoristas** - Ver motoristas da transportadora
 - 🚛 **Ver Veículos** - Ver veículos da transportadora ✅ NOVO
 - 🗑️ **Excluir** - Excluir transportadora

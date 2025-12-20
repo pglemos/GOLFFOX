@@ -63,7 +63,7 @@ export function TrajectoryPanel({
                     <span className="font-semibold">Real:</span> {(analysis.totalDistanceActual / 1000).toFixed(2)} km
                   </p>
                   {analysis.extraDistance > 0 && (
-                    <p className="text-xs text-red-600">
+                    <p className="text-xs text-error">
                       <TrendingUp className="h-3 w-3 inline mr-1" />
                       +{(analysis.extraDistance / 1000).toFixed(2)} km extra
                     </p>
@@ -99,14 +99,14 @@ export function TrajectoryPanel({
             <h4 className="font-semibold mb-2 sm:mb-3 text-xs sm:text-sm text-ink-muted">Conformidade</h4>
             <div className="flex items-center gap-3">
               <div className="flex-1">
-                <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                <div className="h-2 bg-muted rounded-full overflow-hidden">
                   <div
                     className={`h-full ${
                       analysis.conformityPercentage >= 90
-                        ? 'bg-green-500'
+                        ? 'bg-success-light0'
                         : analysis.conformityPercentage >= 70
-                        ? 'bg-yellow-500'
-                        : 'bg-red-500'
+                        ? 'bg-warning-light0'
+                        : 'bg-error-light0'
                     }`}
                     style={{ width: `${analysis.conformityPercentage}%` }}
                   />
@@ -130,7 +130,7 @@ export function TrajectoryPanel({
           {analysis.deviations.length > 0 && (
             <div>
               <h4 className="font-semibold mb-2 sm:mb-3 text-xs sm:text-sm text-ink-muted flex items-center gap-2">
-                <AlertTriangle className="h-3 w-3 sm:h-4 sm:w-4 text-orange-500" />
+                <AlertTriangle className="h-3 w-3 sm:h-4 sm:w-4 text-brand" />
                 Desvios de Rota ({analysis.deviations.length})
               </h4>
               <div className="space-y-2 max-h-32 sm:max-h-40 overflow-y-auto">
@@ -159,7 +159,7 @@ export function TrajectoryPanel({
               </h4>
               <div className="space-y-2 max-h-24 sm:max-h-32 overflow-y-auto">
                 {analysis.unplannedStops.slice(0, 3).map((stop, idx) => (
-                  <div key={idx} className="text-xs p-2 bg-blue-50 rounded border border-blue-200">
+                  <div key={idx} className="text-xs p-2 bg-info-light rounded border border-info-light">
                     <p className="font-semibold">{stop.duration} min parado</p>
                     <p className="text-ink-muted">
                       {stop.timestamp.toLocaleTimeString('pt-BR')}
@@ -183,7 +183,7 @@ export function TrajectoryPanel({
               </h4>
               <div className="space-y-2 max-h-24 sm:max-h-32 overflow-y-auto">
                 {analysis.divergentSegments.slice(0, 3).map((segment, idx) => (
-                  <div key={idx} className="text-xs p-2 bg-red-50 rounded border border-red-200">
+                  <div key={idx} className="text-xs p-2 bg-error-light rounded border border-error-light">
                     <p className="font-semibold">
                       Segmento {segment.startIndex}-{segment.endIndex}
                     </p>
@@ -194,7 +194,7 @@ export function TrajectoryPanel({
                       Real: {(segment.actualDistance / 1000).toFixed(2)} km
                     </p>
                     {segment.deviation > 0 && (
-                      <p className="text-red-600">
+                      <p className="text-error">
                         +{(segment.deviation / 1000).toFixed(2)} km extra
                       </p>
                     )}

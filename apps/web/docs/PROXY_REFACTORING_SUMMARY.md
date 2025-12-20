@@ -49,7 +49,7 @@
 - ✅ `docs/CHANGELOG_IMPROVEMENTS.md`
 - ✅ `docs/SECURITY_IMPROVEMENTS.md`
 - ✅ `docs/VALIDATION_CHECKLIST.md`
-- ✅ `docs/GUIA-TESTES-OPERATOR.md`
+- ✅ `docs/GUIA-TESTES-operador.md`
 - ✅ `docs/EXECUTION_COMPLETE.md`
 - ✅ `scripts/test-auth-middleware.js`
 
@@ -73,7 +73,7 @@
 ```typescript
 PUBLIC_ROUTES          // Rotas que não requerem autenticação
 STATIC_ROUTES          // Assets e rotas internas do Next.js
-ROUTE_REDIRECTS        // Mapeamento de compatibilidade (carrier → transportadora)
+ROUTE_REDIRECTS        // Mapeamento de compatibilidade (transportadora → transportadora)
 ROUTE_ROLES            // Roles permitidas para cada rota protegida
 ROLE_DEFAULT_ROUTES    // Rota padrão para cada role
 ```

@@ -89,7 +89,7 @@ O documento de escopo define **Golf Fox** como uma plataforma SaaS completa de g
 
 ---
 
-### 4. 🏢 PAINEL DA TRANSPORTADORA (CARRIER)
+### 4. 🏢 PAINEL DA TRANSPORTADORA (transportadora)
 **Status: 25% Implementado**
 
 ✅ **Implementado:**
@@ -885,10 +885,10 @@ O documento de escopo define **Golf Fox** como uma plataforma SaaS completa de g
 | Gestão de Usuários | 85% | 🟢 Quase Completo | Baixa |
 | Gestão de Frota (Admin) | 60% | 🟡 Parcial | Alta |
 | **Painel da Transportadora** | **25%** | 🔴 **Incompleto** | **CRÍTICA** |
-| ↳ Gestão Motoristas (Carrier) | 10% | 🔴 Crítico | **CRÍTICA** |
-| ↳ Gestão Frota (Carrier) | 35% | 🔴 Crítico | **CRÍTICA** |
-| ↳ Mapa Tempo Real (Carrier) | 45% | 🟡 Parcial | **CRÍTICA** |
-| ↳ Controle Custos (Carrier) | 15% | 🔴 Crítico | **CRÍTICA** |
+| ↳ Gestão Motoristas (transportadora) | 10% | 🔴 Crítico | **CRÍTICA** |
+| ↳ Gestão Frota (transportadora) | 35% | 🔴 Crítico | **CRÍTICA** |
+| ↳ Mapa Tempo Real (transportadora) | 45% | 🟡 Parcial | **CRÍTICA** |
+| ↳ Controle Custos (transportadora) | 15% | 🔴 Crítico | **CRÍTICA** |
 | Gestão de Motoristas (Admin) | 40% | 🔴 Incompleto | Alta |
 | Planejamento de Rotas | 55% | 🟡 Parcial | Alta |
 | Check-in/Check-out | 20% | 🔴 Incompleto | **CRÍTICA** |
@@ -910,7 +910,7 @@ O documento de escopo define **Golf Fox** como uma plataforma SaaS completa de g
 
 ### 🔴 PRIORIDADE CRÍTICA (CORE DO SISTEMA)
 
-1. **🏢 PAINEL DA TRANSPORTADORA (CARRIER) - NOVO!**
+1. **🏢 PAINEL DA TRANSPORTADORA (transportadora) - NOVO!**
    - **Gestão de Motoristas (Cadastro Completo):**
      - Tabela `driver_documents` e `driver_medical_exams`
      - Upload de CNH, exames médicos, documentos
@@ -1031,10 +1031,10 @@ O documento de escopo define **Golf Fox** como uma plataforma SaaS completa de g
 
 ### CRÍTICO (4-5 meses)
 - **Painel da Transportadora: 6 semanas**
-  - Gestão Motoristas (Carrier): 2 semanas
-  - Gestão Frota (Carrier): 2 semanas
+  - Gestão Motoristas (transportadora): 2 semanas
+  - Gestão Frota (transportadora): 2 semanas
   - Mapa Tempo Real Avançado: 1,5 semanas
-  - Controle de Custos (Carrier): 0,5 semanas
+  - Controle de Custos (transportadora): 0,5 semanas
 - Check-in/Check-out: 3 semanas
 - App Motorista: 6 semanas
 - App Passageiro: 6 semanas

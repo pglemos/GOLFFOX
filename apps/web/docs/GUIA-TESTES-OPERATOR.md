@@ -7,7 +7,7 @@ Este guia fornece um checklist completo para testar todas as funcionalidades do 
 ## 📋 Pré-requisitos
 
 - [ ] Migrations v43 executadas no Supabase
-- [ ] Empresas configuradas usando `scripts/setup-operator-company-interactive.js`
+- [ ] Empresas configuradas usando `scripts/setup-operador-company-interactive.js`
 - [ ] Operadores mapeados às empresas
 - [ ] Branding configurado para cada empresa
 - [ ] Variáveis de ambiente configuradas no Vercel
@@ -53,7 +53,7 @@ Este guia fornece um checklist completo para testar todas as funcionalidades do 
 ### Passos
 
 1. **Acessar dashboard**
-   - Acesse `/operator`
+   - Acesse `/operador`
    - Verifique se a página carrega sem erros
 
 2. **Verificar KPIs**
@@ -134,7 +134,7 @@ Este guia fornece um checklist completo para testar todas as funcionalidades do 
 ### Passos
 
 1. **Acessar página de funcionários**
-   - Acesse `/operator/funcionarios`
+   - Acesse `/operador/funcionarios`
    - Verifique se a página carrega sem erros
 
 2. **Verificar lista de funcionários**
@@ -175,7 +175,7 @@ Este guia fornece um checklist completo para testar todas as funcionalidades do 
 ### Passos
 
 1. **Acessar página de rotas**
-   - Acesse `/operator/rotas`
+   - Acesse `/operador/rotas`
    - Verifique se apenas rotas da empresa aparecem
    - Verifique se os dados estão corretos
 
@@ -186,7 +186,7 @@ Este guia fornece um checklist completo para testar todas as funcionalidades do 
    - Verifique se o resultado é salvo
 
 3. **Acessar mapa**
-   - Acesse `/operator/rotas/mapa` ou clique em "Ver no Mapa"
+   - Acesse `/operador/rotas/mapa` ou clique em "Ver no Mapa"
    - Verifique se o mapa carrega
 
 4. **Verificar features do mapa**
@@ -223,7 +223,7 @@ Este guia fornece um checklist completo para testar todas as funcionalidades do 
 ### Passos
 
 1. **Acessar página de custos**
-   - Acesse `/operator/custos`
+   - Acesse `/operador/custos`
    - Verifique se apenas custos da empresa aparecem
 
 2. **Verificar visualização de custos**
@@ -268,7 +268,7 @@ Este guia fornece um checklist completo para testar todas as funcionalidades do 
 ### Passos
 
 1. **Acessar página de relatórios**
-   - Acesse `/operator/relatorios`
+   - Acesse `/operador/relatorios`
    - Verifique se a página carrega
 
 2. **Verificar catálogo de relatórios**

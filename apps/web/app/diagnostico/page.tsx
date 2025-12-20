@@ -83,13 +83,13 @@ export default function DiagnosticoPage() {
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg"
+              className="mb-6 p-4 bg-error-light border border-error-light rounded-lg"
             >
               <div className="flex items-center gap-2 mb-2">
-                <AlertCircle className="h-5 w-5 text-red-600" />
-                <p className="text-red-800 font-semibold">Erro:</p>
+                <AlertCircle className="h-5 w-5 text-error" />
+                <p className="text-error font-semibold">Erro:</p>
               </div>
-              <p className="text-red-600">{erro}</p>
+              <p className="text-error">{erro}</p>
             </motion.div>
           )}
 
@@ -103,8 +103,8 @@ export default function DiagnosticoPage() {
               >
               <Card className="p-6 bg-card/50 backdrop-blur-sm border-border">
                 <div className="flex items-center gap-2 mb-4">
-                  <div className="p-2 rounded-lg bg-blue-100">
-                    <Cookie className="h-5 w-5 text-blue-600" />
+                  <div className="p-2 rounded-lg bg-info-light">
+                    <Cookie className="h-5 w-5 text-info" />
                   </div>
                   <h2 className="text-xl font-bold">
                     Cookies e Sessão
@@ -113,13 +113,13 @@ export default function DiagnosticoPage() {
                 
                 <div className="space-y-4">
                   <div>
-                    <p className="font-semibold text-gray-700">Total de cookies:</p>
-                    <p className="text-gray-600">{resultado.session.cookies.total}</p>
+                    <p className="font-semibold text-ink-strong">Total de cookies:</p>
+                    <p className="text-ink-muted">{resultado.session.cookies.total}</p>
                   </div>
 
                   <div>
-                    <p className="font-semibold text-gray-700">Cookie golffox-session:</p>
-                    <div className="mt-2 p-3 bg-gray-50 rounded">
+                    <p className="font-semibold text-ink-strong">Cookie golffox-session:</p>
+                    <div className="mt-2 p-3 bg-bg-soft rounded">
                       <p className="text-sm">
                         Existe: {resultado.session.cookies.session.exists ? '✅ Sim' : '❌ Não'}
                       </p>
@@ -141,8 +141,8 @@ export default function DiagnosticoPage() {
                   </div>
 
                   <div>
-                    <p className="font-semibold text-gray-700">Cookie golffox-csrf:</p>
-                    <div className="mt-2 p-3 bg-gray-50 rounded">
+                    <p className="font-semibold text-ink-strong">Cookie golffox-csrf:</p>
+                    <div className="mt-2 p-3 bg-bg-soft rounded">
                       <p className="text-sm">
                         Existe: {resultado.session.cookies.csrf.exists ? '✅ Sim' : '❌ Não'}
                       </p>
@@ -153,19 +153,19 @@ export default function DiagnosticoPage() {
                   </div>
 
                   <div>
-                    <p className="font-semibold text-gray-700">Lista de todos os cookies:</p>
+                    <p className="font-semibold text-ink-strong">Lista de todos os cookies:</p>
                     <div className="mt-2 space-y-1">
                       {resultado.session.cookies.list.map((c: any, i: number) => (
-                        <div key={i} className="p-2 bg-gray-50 rounded text-sm">
+                        <div key={i} className="p-2 bg-bg-soft rounded text-sm">
                           <span className="font-mono">{c.name}</span>
                           {' - '}
-                          <span className="text-gray-600">
+                          <span className="text-ink-muted">
                             {c.hasValue ? `${c.valueLength} bytes` : 'vazio'}
                           </span>
                         </div>
                       ))}
                       {resultado.session.cookies.list.length === 0 && (
-                        <p className="text-red-600">❌ Nenhum cookie encontrado!</p>
+                        <p className="text-error">❌ Nenhum cookie encontrado!</p>
                       )}
                     </div>
                   </div>
@@ -180,28 +180,28 @@ export default function DiagnosticoPage() {
                 transition={{ delay: 0.3 }}
               >
               <Card className="p-6 bg-card/50 backdrop-blur-sm border-border">
-                <h2 className="text-xl font-bold text-gray-900 mb-4">
+                <h2 className="text-xl font-bold text-ink-strong mb-4">
                   🌐 Navegador
                 </h2>
                 
                 <div className="space-y-2">
-                  <div className="p-3 bg-gray-50 rounded">
-                    <p className="font-semibold text-gray-700">Cookies habilitados:</p>
-                    <p className={resultado.browser.cookiesEnabled ? 'text-green-600' : 'text-red-600'}>
+                  <div className="p-3 bg-bg-soft rounded">
+                    <p className="font-semibold text-ink-strong">Cookies habilitados:</p>
+                    <p className={resultado.browser.cookiesEnabled ? 'text-success' : 'text-error'}>
                       {resultado.browser.cookiesEnabled ? '✅ Sim' : '❌ Não'}
                     </p>
                   </div>
 
-                  <div className="p-3 bg-gray-50 rounded">
-                    <p className="font-semibold text-gray-700">Cookies no document.cookie:</p>
+                  <div className="p-3 bg-bg-soft rounded">
+                    <p className="font-semibold text-ink-strong">Cookies no document.cookie:</p>
                     <pre className="text-xs bg-white p-2 rounded mt-1 overflow-x-auto whitespace-pre-wrap break-all">
                       {resultado.browser.cookies}
                     </pre>
                   </div>
 
-                  <div className="p-3 bg-gray-50 rounded">
-                    <p className="font-semibold text-gray-700">User Agent:</p>
-                    <p className="text-xs text-gray-600 break-all">{resultado.browser.userAgent}</p>
+                  <div className="p-3 bg-bg-soft rounded">
+                    <p className="font-semibold text-ink-strong">User Agent:</p>
+                    <p className="text-xs text-ink-muted break-all">{resultado.browser.userAgent}</p>
                   </div>
                 </div>
               </Card>
@@ -214,34 +214,34 @@ export default function DiagnosticoPage() {
                 transition={{ delay: 0.4 }}
               >
               <Card className="p-6 bg-card/50 backdrop-blur-sm border-border">
-                <h2 className="text-xl font-bold text-gray-900 mb-4">
+                <h2 className="text-xl font-bold text-ink-strong mb-4">
                   ⚙️ Ambiente
                 </h2>
                 
                 <div className="space-y-2">
-                  <div className="p-3 bg-gray-50 rounded">
-                    <p className="font-semibold text-gray-700">VERCEL:</p>
-                    <p className="text-gray-600">{resultado.session.environment.VERCEL || 'false'}</p>
+                  <div className="p-3 bg-bg-soft rounded">
+                    <p className="font-semibold text-ink-strong">VERCEL:</p>
+                    <p className="text-ink-muted">{resultado.session.environment.VERCEL || 'false'}</p>
                   </div>
 
-                  <div className="p-3 bg-gray-50 rounded">
-                    <p className="font-semibold text-gray-700">VERCEL_ENV:</p>
-                    <p className="text-gray-600">{resultado.session.environment.VERCEL_ENV || 'N/A'}</p>
+                  <div className="p-3 bg-bg-soft rounded">
+                    <p className="font-semibold text-ink-strong">VERCEL_ENV:</p>
+                    <p className="text-ink-muted">{resultado.session.environment.VERCEL_ENV || 'N/A'}</p>
                   </div>
 
-                  <div className="p-3 bg-gray-50 rounded">
-                    <p className="font-semibold text-gray-700">Protocol:</p>
-                    <p className="text-gray-600">{resultado.session.url.protocol}</p>
+                  <div className="p-3 bg-bg-soft rounded">
+                    <p className="font-semibold text-ink-strong">Protocol:</p>
+                    <p className="text-ink-muted">{resultado.session.url.protocol}</p>
                   </div>
 
-                  <div className="p-3 bg-gray-50 rounded">
-                    <p className="font-semibold text-gray-700">Host:</p>
-                    <p className="text-gray-600">{resultado.session.url.host}</p>
+                  <div className="p-3 bg-bg-soft rounded">
+                    <p className="font-semibold text-ink-strong">Host:</p>
+                    <p className="text-ink-muted">{resultado.session.url.host}</p>
                   </div>
 
-                  <div className="p-3 bg-gray-50 rounded">
-                    <p className="font-semibold text-gray-700">x-forwarded-proto:</p>
-                    <p className="text-gray-600">
+                  <div className="p-3 bg-bg-soft rounded">
+                    <p className="font-semibold text-ink-strong">x-forwarded-proto:</p>
+                    <p className="text-ink-muted">
                       {resultado.session.headers['x-forwarded-proto'] || 'N/A'}
                     </p>
                   </div>
@@ -257,14 +257,14 @@ export default function DiagnosticoPage() {
               >
               <Card className="p-6 bg-card/50 backdrop-blur-sm border-border">
                 <div className="flex items-center gap-2 mb-4">
-                  <div className="p-2 rounded-lg bg-gray-100">
-                    <Settings className="h-5 w-5 text-gray-600" />
+                  <div className="p-2 rounded-lg bg-muted">
+                    <Settings className="h-5 w-5 text-ink-muted" />
                   </div>
                   <h2 className="text-xl font-bold">
                     JSON Completo
                   </h2>
                 </div>
-                <pre className="text-xs bg-gray-900 text-green-400 p-4 rounded overflow-x-auto">
+                <pre className="text-xs bg-ink-strong text-green-400 p-4 rounded overflow-x-auto">
                   {JSON.stringify(resultado, null, 2)}
                 </pre>
               </Card>

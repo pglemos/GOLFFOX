@@ -109,9 +109,9 @@ function AlertasOperatorPageInner() {
       <AppShell user={{ id: user?.id || "", name: user?.name || "Operador", email: user?.email || "", role: "operador", avatar_url: user?.avatar_url }}>
         <div className="min-h-screen flex items-center justify-center p-4">
           <Card className="p-8 max-w-md w-full text-center">
-            <AlertTriangle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-            <h2 className="text-xl font-bold mb-2 text-red-600">Erro ao carregar</h2>
-            <p className="text-gray-600 mb-4">{tenantError || error}</p>
+            <AlertTriangle className="h-12 w-12 text-error mx-auto mb-4" />
+            <h2 className="text-xl font-bold mb-2 text-error">Erro ao carregar</h2>
+            <p className="text-ink-muted mb-4">{tenantError || error}</p>
             <Button onClick={() => window.location.reload()} variant="default">
               Tentar Novamente
             </Button>
@@ -127,7 +127,7 @@ function AlertasOperatorPageInner() {
         <div className="min-h-screen flex items-center justify-center p-4">
           <Card className="p-8 max-w-md w-full text-center">
             <h2 className="text-xl font-bold mb-2">Nenhuma empresa selecionada</h2>
-            <p className="text-gray-600 mb-4">Selecione uma empresa para continuar</p>
+            <p className="text-ink-muted mb-4">Selecione uma empresa para continuar</p>
             <Button onClick={() => router.push('/operador')} variant="default">
               Voltar para Dashboard
             </Button>
@@ -154,13 +154,13 @@ function AlertasOperatorPageInner() {
     switch (severity) {
       case 'critical':
       case 'error':
-        return 'text-red-500'
+        return 'text-error'
       case 'warning':
-        return 'text-yellow-500'
+        return 'text-warning'
       case 'info':
-        return 'text-blue-500'
+        return 'text-info'
       default:
-        return 'text-gray-500'
+        return 'text-ink-muted'
     }
   }
 
@@ -168,13 +168,13 @@ function AlertasOperatorPageInner() {
     switch (severity) {
       case 'critical':
       case 'error':
-        return 'bg-red-50 text-red-700 border-red-200'
+        return 'bg-error-light text-error border-error-light'
       case 'warning':
-        return 'bg-yellow-50 text-yellow-700 border-yellow-200'
+        return 'bg-warning-light text-warning border-yellow-200'
       case 'info':
-        return 'bg-blue-50 text-blue-700 border-blue-200'
+        return 'bg-info-light text-info border-info-light'
       default:
-        return 'bg-gray-50 text-gray-700 border-gray-200'
+        return 'bg-bg-soft text-ink-strong border-border-light'
     }
   }
 
@@ -183,13 +183,13 @@ function AlertasOperatorPageInner() {
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold mb-2">Alertas</h1>
-          <p className="text-gray-600">Notificações e alertas do sistema</p>
+          <p className="text-ink-muted">Notificações e alertas do sistema</p>
         </div>
 
         {/* Filtros */}
         <div className="flex gap-4 flex-wrap">
           <div className="relative flex-1 min-w-[200px]">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-ink-light h-4 w-4" />
             <Input
               placeholder="Buscar alertas..."
               value={searchQuery}
@@ -198,7 +198,7 @@ function AlertasOperatorPageInner() {
             />
           </div>
           <select
-            className="px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm"
+            className="px-3 py-2 rounded-lg border border-border bg-white text-sm"
             value={filterType}
             onChange={(e) => setFilterType(e.target.value)}
           >
@@ -225,9 +225,9 @@ function AlertasOperatorPageInner() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-2 flex-wrap">
                       <div className={`p-1.5 rounded-lg flex-shrink-0 ${
-                        alerta.severity === 'critical' || alerta.severity === 'error' ? 'bg-red-100' :
-                        alerta.severity === 'warning' ? 'bg-yellow-100' :
-                        'bg-blue-100'
+                        alerta.severity === 'critical' || alerta.severity === 'error' ? 'bg-error-light' :
+                        alerta.severity === 'warning' ? 'bg-warning-light' :
+                        'bg-info-light'
                       }`}>
                         <AlertTriangle className={`h-4 w-4 ${getAlertColor(alerta.severity || undefined)}`} />
                       </div>
@@ -238,11 +238,11 @@ function AlertasOperatorPageInner() {
                         {alerta.severity || "normal"}
                       </Badge>
                     </div>
-                    <p className="text-sm text-gray-700 mb-2 break-words">
+                    <p className="text-sm text-ink-strong mb-2 break-words">
                       {alerta.message || "Sem mensagem"}
                     </p>
                     {alerta.created_at && (
-                      <div className="flex items-center gap-1 text-xs text-gray-500">
+                      <div className="flex items-center gap-1 text-xs text-ink-muted">
                         <Clock className="h-3 w-3" />
                         <span>{new Date(alerta.created_at).toLocaleString('pt-BR')}</span>
                       </div>
@@ -298,9 +298,9 @@ function AlertasOperatorPageInner() {
           
           {filteredAlertas.length === 0 && !alertsLoading && (
             <Card className="p-12 text-center">
-              <Bell className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+              <Bell className="h-12 w-12 text-ink-light mx-auto mb-4" />
               <h3 className="text-lg font-medium mb-2">Nenhum alerta encontrado</h3>
-              <p className="text-sm text-gray-500 mb-4">
+              <p className="text-sm text-ink-muted mb-4">
                 {debouncedSearch ? "Tente ajustar sua busca" : "Não há alertas no momento"}
               </p>
               {!debouncedSearch && (

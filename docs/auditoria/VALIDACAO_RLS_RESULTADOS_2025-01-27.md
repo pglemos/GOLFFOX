@@ -129,7 +129,7 @@ Validação RLS realizada diretamente no banco de dados Supabase usando MCP.
 
 ### `vehicles` (13 políticas) ✅
 - Maior número de políticas (13)
-- Cobre admin, carrier, operator, driver, passenger
+- Cobre admin, transportadora, operador, motorista, passageiro
 - Inclui operações CRUD completas
 
 **Status:** ✅ Muito completo

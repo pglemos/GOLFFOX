@@ -84,7 +84,7 @@ Go to Supabase Dashboard → **Database** → **Replication** → Enable `public
 **Solution:**
 - Replaced `LocalDataService.getTripsForUser()` with `SupabaseService.getTripsForUser()`
 - All CRUD operations now respect RLS policies
-- Role-based data filtering (admin/operator/carrier/driver/passenger)
+- Role-based data filtering (admin/operador/transportadora/motorista/passageiro)
 
 **Files Changed:**
 - `lib/screens/motorista/driver_dashboard.dart`
@@ -126,7 +126,7 @@ if (result['success'] == false) {
 The SQL migration removes `GRANT ALL` permissions and applies minimal grants:
 
 ```sql
--- Driver positions: only SELECT and INSERT
+-- motorista positions: only SELECT and INSERT
 GRANT SELECT, INSERT ON driver_positions TO authenticated;
 
 -- Routes/Vehicles: SELECT for all, modify via RLS
@@ -175,32 +175,32 @@ flutter run \
 
 ## 🧪 Testing Checklist
 
-### Driver Flow
-- [ ] Driver logs in successfully
+### motorista Flow
+- [ ] motorista logs in successfully
 - [ ] Dashboard loads trips from Supabase (not mocks)
 - [ ] motorista can start trip → status transitions to `inProgress`
 - [ ] GPS tracking starts automatically
-- [ ] Driver positions are inserted to Supabase
+- [ ] motorista positions are inserted to Supabase
 - [ ] motorista can complete trip → status transitions to `completed`
 - [ ] Invalid transitions show error messages
 
-### Passenger Flow
-- [ ] Passenger logs in successfully
+### passageiro Flow
+- [ ] passageiro logs in successfully
 - [ ] Dashboard shows active trip
-- [ ] Map displays real-time driver positions
+- [ ] Map displays real-time motorista positions
 - [ ] Positions update automatically (Realtime)
 - [ ] Map auto-centers on latest position
 
-### Operator/Admin Flow
-- [ ] Can view all trips (admin) or company trips (operator)
+### operador/Admin Flow
+- [ ] Can view all trips (admin) or company trips (operador)
 - [ ] Can force transition trip status with `p_force=true`
 - [ ] Can view trip events audit log
 - [ ] Can access trip summary analytics
 
 ### RLS Verification
-- [ ] Driver can only see their assigned trips
+- [ ] motorista can only see their assigned trips
 - [ ] passageiro can only see trips they're enrolled in
-- [ ] Carrier can only see routes/vehicles for their carrier_id
+- [ ] transportadora can only see routes/vehicles for their carrier_id
 - [ ] motorista can only insert positions with `driver_id = auth.uid()`
 
 ---
@@ -243,7 +243,7 @@ The SQL migration creates indexes for common queries:
 -- Trip-based position queries (most common)
 CREATE INDEX idx_driver_positions_trip_id ON driver_positions(trip_id, timestamp DESC);
 
--- Driver-based queries
+-- motorista-based queries
 CREATE INDEX idx_driver_positions_driver_id ON driver_positions(driver_id, timestamp DESC);
 
 -- Composite for filtered queries
@@ -264,7 +264,7 @@ set -e
 echo "🧪 Running GolfFox Sanity Tests..."
 
 # Test 1: Auth for all 5 test users
-for USER in admin@golffox.com operator@golffox.com carrier@golffox.com driver@golffox.com passenger@golffox.com; do
+for USER in admin@golffox.com operador@golffox.com transportadora@golffox.com motorista@golffox.com passageiro@golffox.com; do
   echo "Testing auth for $USER..."
   curl -X POST "$SUPABASE_URL/auth/v1/token?grant_type=password" \
     -H "apikey: $SUPABASE_ANON_KEY" \
@@ -272,7 +272,7 @@ for USER in admin@golffox.com operator@golffox.com carrier@golffox.com driver@go
     -d "{\"email\":\"$USER\",\"password\":\"senha123\"}"
 done
 
-# Test 2: Insert driver position (requires JWT)
+# Test 2: Insert motorista position (requires JWT)
 echo "Testing motorista position insert..."
 # ... implementation
 
@@ -287,7 +287,7 @@ echo "✅ All sanity tests passed!"
 
 ## 📚 Architecture Reference
 
-- **RLS Policies:** Canonical role-based access (admin/operator/carrier/driver/passenger)
+- **RLS Policies:** Canonical role-based access (admin/operador/transportadora/motorista/passageiro)
 - **State Machine:** `rpc_trip_transition` enforces valid transitions
 - **Realtime:** Server-side filtering by `trip_id` for efficiency
 - **Audit Log:** All transitions logged in `trip_events` table
@@ -300,14 +300,14 @@ echo "✅ All sanity tests passed!"
 ### P1 - Quality & Reliability
 - [ ] Add Sentry for error tracking
 - [ ] Implement checklist UI (12-item pre-trip inspection)
-- [ ] Storage buckets + RLS for vehicle documents
+- [ ] Storage buckets + RLS for veiculo documents
 - [ ] Automated sanity tests in CI
 
 ### P2 - User Experience
 - [ ] Offline mode improvements (queue sync)
 - [ ] Push notifications for trip events
-- [ ] Driver performance dashboard
-- [ ] Passenger ETA calculations
+- [ ] motorista performance dashboard
+- [ ] passageiro ETA calculations
 
 ---
 

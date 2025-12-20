@@ -42,7 +42,7 @@
 #### Mapa da Frota (`apps/web/app/admin/mapa/page.tsx`)
 - ✅ Componente `AdminMap` implementado
 - ✅ Lazy loading do componente pesado
-- ✅ Parâmetros de URL (route, company, vehicle, lat, lng, zoom)
+- ✅ Parâmetros de URL (route, company, veiculo, lat, lng, zoom)
 - ✅ Integração com Google Maps API
 
 **Status:** ✅ Funcional, depende de Google Maps API configurada
@@ -231,7 +231,7 @@
    - `v_carrier_route_costs_summary` - precisa existir
    - **Ação:** Verificar se todas as views existem
 
-3. **Filtro por Carrier:**
+3. **Filtro por transportadora:**
    - Dashboard usa `userData?.carrier_id` para filtrar
    - **Ação:** Verificar se `carrier_id` está sendo populado corretamente
 

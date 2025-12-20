@@ -23,7 +23,7 @@
 ```
 ✅ golffox@admin.com (admin)
 ✅ teste@transportadora.com (transportadora) 
-✅ teste@empresa.com (passenger)
+✅ teste@empresa.com (passageiro)
 ```
 
 **Credenciais de teste:** `senha123`
@@ -79,7 +79,7 @@ if (!response.ok) {
 
 ## 🔍 DESCOBERTAS IMPORTANTES
 
-### 1️⃣ API create-operator EXISTE e FUNCIONA
+### 1️⃣ API create-operador EXISTE e FUNCIONA
 - Localização: `apps/web/app/api/admin/create-operador/route.ts`
 - 544 linhas, completamente implementada
 - ✅ Teste de criação de empresa: **SUCESSO**

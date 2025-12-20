@@ -274,7 +274,7 @@ async function createOperatorHandler(request: NextRequest) {
         phone: company.phone,
         email: company.email,
       },
-      operator: operatorUser,
+      operador: operatorUser,
       operatorId: userId,
       userId: userId, // Compatibilidade
       email: operatorEmail || null,

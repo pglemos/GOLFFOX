@@ -34,12 +34,12 @@
 
 ---
 
-### 🟡 TC002: Vehicle Deletion with Trip Validation (MELHOROU)
+### 🟡 TC002: veiculo Deletion with Trip Validation (MELHOROU)
 **Status:** ❌ 500 → ❌ 400 (com validação)
 
 **Antes:**
 ```
-AssertionError: Expected 400 for invalid vehicle ID, got 500
+AssertionError: Expected 400 for invalid veiculo ID, got 500
 ```
 
 **Depois:**
@@ -76,7 +76,7 @@ AssertionError: Expected status 200 on missing route_id but got 400
 
 ---
 
-### ✅ TC004: Create New Operator User (CORRIGIDO! 🎉)
+### ✅ TC004: Create New operador User (CORRIGIDO! 🎉)
 **Status:** ❌ 400 → ✅ **PASSOU!**
 
 **Antes:**
@@ -124,7 +124,7 @@ AssertionError: Expected 201 Created, got 401
 
 ---
 
-### 🔴 TC006: Create Employee as Operator (MELHOROU MAS AINDA FALHA)
+### 🔴 TC006: Create Employee as operador (MELHOROU MAS AINDA FALHA)
 **Status:** ❌ 500 (genérico) → ❌ 500 (erro específico do Supabase Auth)
 
 **Antes:**
@@ -162,7 +162,7 @@ response: {
 
 ---
 
-### 🟡 TC007: Optimize Route for Operator (MELHOROU)
+### 🟡 TC007: Optimize Route for operador (MELHOROU)
 **Status:** ❌ 500 → ❌ 400 (validação)
 
 **Antes:**
@@ -271,7 +271,7 @@ AssertionError: 'status' field missing in response
 
 ### ✅ Correções que Funcionaram 100%
 
-1. **TC004 - Create Operator** 
+1. **TC004 - Create operador** 
    - Status: ❌ → ✅
    - Aceita `company_id` e `company_name`
 
@@ -285,7 +285,7 @@ AssertionError: 'status' field missing in response
 
 ### 🟡 Correções que Melhoraram (mas teste ainda falha)
 
-4. **TC002 - Vehicle Delete**
+4. **TC002 - veiculo Delete**
    - Antes: 500 → Depois: 400 com validação
    - Validação UUID funcionando
    - Falta: incluir `tripsCount` sempre
@@ -367,7 +367,7 @@ AssertionError: 'status' field missing in response
 
 ### Prioridade ALTA 🔥
 
-3. **Incluir `tripsCount` em Todas as Respostas de Vehicle Delete**
+3. **Incluir `tripsCount` em Todas as Respostas de veiculo Delete**
    - **Problema:** Campo ausente mesmo quando é 0
    - **Impacto:** TC002 falhando
    - **Ação:** Modificar `app/api/admin/vehicles/[vehicleId]/route.ts`

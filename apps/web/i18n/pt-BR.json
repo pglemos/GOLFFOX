@@ -41,7 +41,7 @@
     "costs": "Custos",
     "carriers": "Transportadoras"
   },
-  "operator": {
+  "operador": {
     "dashboard": "Dashboard",
     "employees": "Funcionários",
     "routes": "Rotas",
@@ -57,7 +57,7 @@
       "saveError": "Erro ao salvar funcionário"
     }
   },
-  "carrier": {
+  "transportadora": {
     "dashboard": "Dashboard",
     "drivers": "Motoristas",
     "vehicles": "Veículos",

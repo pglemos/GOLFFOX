@@ -16,10 +16,10 @@ interface AdminMapProps {
 
 ## Interfaces
 
-### Vehicle
+### veiculo
 
 ```typescript
-interface Vehicle {
+interface veiculo {
   vehicle_id: string
   trip_id: string
   route_id: string

@@ -14,7 +14,7 @@ const EXPECTED_VIEWS = [
   // Admin views
   'v_admin_dashboard_kpis',
   'v_admin_dashboard_kpis_secure',
-  // Operator secure views
+  // operador secure views
   'v_my_companies',
   'v_operator_dashboard_kpis_secure',
   'v_operator_routes_secure',

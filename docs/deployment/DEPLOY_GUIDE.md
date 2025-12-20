@@ -182,7 +182,7 @@ GOLFFOX/
 ├── web-app/                    # Next.js Web App
 │   ├── app/
 │   │   ├── admin/            # 11 páginas do Admin
-│   │   └── operator/         # 3 páginas do Operador
+│   │   └── operador/         # 3 páginas do Operador
 │   ├── components/
 │   │   ├── fleet-map.tsx    # Mapa Google Maps
 │   │   └── app-shell.tsx    # Layout principal

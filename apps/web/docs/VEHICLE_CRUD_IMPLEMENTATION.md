@@ -22,7 +22,7 @@ Could not find the 'company_id' column of 'vehicles' in the schema cache
 
 Para garantir compatibilidade imediata com o banco de produção atual, implementamos remoção automática de colunas inexistentes em 3 camadas:
 
-**Camada 1: UI Component (`vehicle-modal.tsx`)**
+**Camada 1: UI Component (`veiculo-modal.tsx`)**
 ```typescript
 // Preparar dados do veículo SEM colunas inexistentes
 const vehicleDataRaw: any = {
@@ -42,7 +42,7 @@ if ('photo_url' in finalVehicleData) delete finalVehicleData.photo_url
 
 **Camada 2: Sync Service (`supabase-sync.ts`)**
 ```typescript
-case 'vehicle':
+case 'veiculo':
   // Última camada de proteção antes de enviar ao Supabase
   if ('capacity' in mapped) delete mapped.capacity
   if ('company_id' in mapped) delete mapped.company_id
@@ -85,7 +85,7 @@ Para adicionar as colunas ao banco de dados:
 
 ### 2.1 Create (Criar Veículo)
 
-**Arquivo:** `web-app/components/modals/vehicle-modal.tsx`
+**Arquivo:** `web-app/components/modals/veiculo-modal.tsx`
 
 **Funcionalidades:**
 - ✅ Formulário com validação em tempo real
@@ -105,7 +105,7 @@ Para adicionar as colunas ao banco de dados:
 **Exemplo de Uso:**
 ```typescript
 <VehicleModal
-  vehicle={null}
+  veiculo={null}
   isOpen={isModalOpen}
   onClose={() => setIsModalOpen(false)}
   onSave={loadVeiculos}
@@ -131,7 +131,7 @@ Para adicionar as colunas ao banco de dados:
 
 ### 2.3 Update (Editar Veículo)
 
-**Arquivo:** `web-app/components/modals/vehicle-modal.tsx`
+**Arquivo:** `web-app/components/modals/veiculo-modal.tsx`
 
 **Funcionalidades:**
 - ✅ Pré-preenchimento de formulário
@@ -176,7 +176,7 @@ const handleDeleteVehicle = async (vehicleId: string) => {
 
     toast.success("Veículo excluído com sucesso!")
     loadVeiculos()
-    setDeleteConfirm({isOpen: false, vehicle: null})
+    setDeleteConfirm({isOpen: false, veiculo: null})
   } catch (error: any) {
     console.error("Erro ao excluir veículo:", error)
     toast.error(error.message || "Erro ao excluir veículo")
@@ -195,7 +195,7 @@ const handleDeleteVehicle = async (vehicleId: string) => {
 
 ### 3.2 Storage de Fotos
 
-**Bucket:** `vehicle-photos`
+**Bucket:** `veiculo-photos`
 
 **Políticas:**
 - Leitura pública
@@ -212,13 +212,13 @@ const uploadPhoto = async (vehicleId: string): Promise<string | null> => {
     const filePath = `vehicles/${fileName}`
 
     const { error: uploadError } = await supabase.storage
-      .from('vehicle-photos')
+      .from('veiculo-photos')
       .upload(filePath, photoFile, { upsert: true })
 
     if (uploadError) throw uploadError
 
     const { data } = supabase.storage
-      .from('vehicle-photos')
+      .from('veiculo-photos')
       .getPublicUrl(filePath)
 
     return data.publicUrl
@@ -240,7 +240,7 @@ const subscription = supabase
   .on('postgres_changes', 
     { event: '*', schema: 'public', table: 'vehicles' },
     (payload) => {
-      console.log('Vehicle changed:', payload)
+      console.log('veiculo changed:', payload)
       loadVeiculos() // Recarregar lista
     }
   )
@@ -278,7 +278,7 @@ console.error('❌ Erro ao carregar veículos:', error)
 
 **Audit Logs (Produção):**
 ```typescript
-await auditLogs.create('vehicle', vehicleId, { 
+await auditLogs.create('veiculo', vehicleId, { 
   plate: finalVehicleData.plate, 
   model: finalVehicleData.model 
 })
@@ -366,8 +366,8 @@ await auditLogs.create('vehicle', vehicleId, {
 
 **Roles:**
 - `admin`: CRUD completo
-- `carrier`: CRUD apenas da própria empresa
-- `driver`: Read-only dos próprios veículos
+- `transportadora`: CRUD apenas da própria empresa
+- `motorista`: Read-only dos próprios veículos
 
 ## 8. Documentação para Usuários
 

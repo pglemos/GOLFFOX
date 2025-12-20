@@ -77,9 +77,9 @@ export async function GET(req: NextRequest) {
     // Filtrar apenas veículos da transportadora do usuário após buscar
     const filteredData = (data || []).filter((cost: any) => {
       if (!userData?.transportadora_id) return false
-      const vehicle = cost.vehicles
-      if (!vehicle) return false
-      return vehicle.transportadora_id === userData.transportadora_id
+      const veiculo = cost.vehicles
+      if (!veiculo) return false
+      return veiculo.transportadora_id === userData.transportadora_id
     })
 
     return NextResponse.json(filteredData)
@@ -105,13 +105,13 @@ export async function POST(req: NextRequest) {
     const validated = vehicleCostSchema.parse(body)
 
     // Verificar se o veículo pertence à transportadora do usuário
-    const { data: vehicle } = await supabaseServiceRole
+    const { data: veiculo } = await supabaseServiceRole
       .from('vehicles')
       .select('transportadora_id')
       .eq('id', validated.vehicle_id)
       .single()
 
-    if (!vehicle) {
+    if (!veiculo) {
       return NextResponse.json(
         { error: 'Veículo não encontrado' },
         { status: 404 }
@@ -124,7 +124,7 @@ export async function POST(req: NextRequest) {
       .eq('id', user.id)
       .single()
 
-    if (userData?.transportadora_id !== vehicle.transportadora_id) {
+    if (userData?.transportadora_id !== veiculo.transportadora_id) {
       return NextResponse.json(
         { error: 'Acesso negado: veículo não pertence à sua transportadora' },
         { status: 403 }

@@ -830,7 +830,7 @@ function LoginContent() {
   const shouldReduceMotion = useReducedMotion()
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row relative overflow-hidden bg-gray-100 lg:bg-black w-full max-w-full">
+    <div className="min-h-screen flex flex-col lg:flex-row relative overflow-hidden bg-muted lg:bg-black w-full max-w-full">
       {/* Background com efeitos sutis otimizados (somente desktop) */}
       <div className="absolute inset-0 hidden lg:block" aria-hidden="true">
         <FloatingOrbs />
@@ -974,16 +974,16 @@ function LoginContent() {
       </motion.div>
 
       {/* Seção Direita - Formulário Minimalista */}
-      <div className="flex-1 lg:w-1/2 flex flex-col min-h-screen relative w-full max-w-full overflow-x-hidden lg:bg-white bg-gray-100">
+      <div className="flex-1 lg:w-1/2 flex flex-col min-h-screen relative w-full max-w-full overflow-x-hidden lg:bg-white bg-muted">
         {/* Barra superior minimalista (apenas desktop) */}
         <div className="hidden lg:flex justify-end items-center p-8 relative z-10">
           <motion.div
             initial={{ opacity: 1 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5 }}
-            className="text-sm text-gray-400"
+            className="text-sm text-ink-light"
           >
-            Novo por aqui? <span className="text-gray-900 font-medium cursor-pointer hover:text-brand transition-colors">Fale com vendas</span>
+            Novo por aqui? <span className="text-ink-strong font-medium cursor-pointer hover:text-brand transition-colors">Fale com vendas</span>
           </motion.div>
         </div>
 
@@ -1043,7 +1043,7 @@ function LoginContent() {
                           <motion.div
                             animate={{ rotate: 360 }}
                             transition={{ duration: 0.75, repeat: Infinity, ease: "linear" }}
-                            className="absolute inset-0 rounded-full border-[1.5px] border-gray-200/60 border-t-[#F97316]"
+                            className="absolute inset-0 rounded-full border-[1.5px] border-border-light/60 border-t-[#F97316]"
                           />
                         </div>
 
@@ -1052,7 +1052,7 @@ function LoginContent() {
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
                           transition={{ delay: 0.1 }}
-                          className="text-xs font-normal text-gray-500 tracking-tight"
+                          className="text-xs font-normal text-ink-muted tracking-tight"
                         >
                           {transitioning ? "Entrando..." : "Autenticando"}
                         </motion.p>
@@ -1327,7 +1327,7 @@ function LoginContent() {
                 </motion.div>
 
                 <noscript>
-                  <p className="mt-6 text-xs text-center text-gray-500">
+                  <p className="mt-6 text-xs text-center text-ink-muted">
                     Ative o JavaScript para utilizar o login.
                   </p>
                 </noscript>
@@ -1356,7 +1356,7 @@ function LoginContent() {
                         <motion.div
                           animate={{ rotate: 360 }}
                           transition={{ duration: 0.75, repeat: Infinity, ease: "linear" }}
-                          className="absolute inset-0 rounded-full border-[1.5px] border-gray-200/60 border-t-[#F97316]"
+                          className="absolute inset-0 rounded-full border-[1.5px] border-border-light/60 border-t-[#F97316]"
                         />
                       </div>
 
@@ -1365,7 +1365,7 @@ function LoginContent() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.1 }}
-                        className="text-sm font-normal text-gray-500 tracking-tight"
+                        className="text-sm font-normal text-ink-muted tracking-tight"
                       >
                         {transitioning ? "Entrando..." : "Autenticando"}
                       </motion.p>
@@ -1633,7 +1633,7 @@ function LoginContent() {
               </motion.div>
 
               <noscript>
-                <p className="mt-6 text-xs text-center text-gray-500">
+                <p className="mt-6 text-xs text-center text-ink-muted">
                   Ative o JavaScript para utilizar o login.
                 </p>
               </noscript>

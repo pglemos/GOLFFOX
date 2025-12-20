@@ -86,21 +86,21 @@ Executados testes do TestSprite que resultaram em **5 testes passando (25%)** e 
 
 ### Falhas Devido a Problemas de Login (12 testes)
 1. ❌ **TC003** - CSRF Token Request and Validation
-2. ❌ **TC004** - Admin Creates Operator and Company
-3. ❌ **TC005** - Operator Creates Employee
+2. ❌ **TC004** - Admin Creates operador and Company
+3. ❌ **TC005** - operador Creates Employee
 4. ❌ **TC006** - Real-Time GPS Tracking and Map Visualization
 5. ❌ **TC007** - Role-Based Access Control Enforcement
 6. ❌ **TC008** - Cost Management Budget Creation and Reconciliation
 7. ❌ **TC009** - Report Generation and Scheduling
 8. ❌ **TC010** - Health Check Endpoint Validity
-9. ❌ **TC012** - Passenger Mobile App Real-Time Bus Tracking and Notifications
+9. ❌ **TC012** - passageiro Mobile App Real-Time Bus Tracking and Notifications
 10. ❌ **TC016** - Middleware Permissions Validation
 11. ❌ **TC017** - Report Format Output Verification
 12. ❌ **TC018** - Multi-Tenant Data Isolation
 13. ❌ **TC019** - API for Web Vitals Analytics Data Ingestion
 
 ### Outras Falhas (3 testes)
-1. ❌ **TC011** - Driver Mobile App Check-In and GPS Navigation (coluna `name` ausente - **RESOLVIDO**)
+1. ❌ **TC011** - motorista Mobile App Check-In and GPS Navigation (coluna `name` ausente - **RESOLVIDO**)
 2. ❌ **TC013** - Audit Logs Capture and Security (acesso limitado a logs)
 
 ## Próximos Passos

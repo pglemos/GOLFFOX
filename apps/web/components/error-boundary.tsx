@@ -88,22 +88,22 @@ export class ErrorBoundary extends Component<Props, State> {
       }
 
       return (
-        <div className="min-h-screen flex items-center justify-center p-4 bg-gray-50">
+        <div className="min-h-screen flex items-center justify-center p-4 bg-bg-soft">
           <Card className="max-w-2xl w-full">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-red-600">
+              <CardTitle className="flex items-center gap-2 text-error">
                 <AlertTriangle className="h-5 w-5" />
                 Oops! Algo deu errado
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <p className="text-gray-600">
+              <p className="text-ink-muted">
                 Ocorreu um erro inesperado. Por favor, tente novamente ou entre em contato com o suporte se o problema persistir.
               </p>
 
               {process.env.NODE_ENV === 'development' && this.state.error && (
-                <div className="bg-gray-100 p-4 rounded-lg">
-                  <p className="font-mono text-sm text-red-600 mb-2">
+                <div className="bg-muted p-4 rounded-lg">
+                  <p className="font-mono text-sm text-error mb-2">
                     {this.state.error.name}: {this.state.error.message}
                   </p>
                   {this.state.error.stack && (

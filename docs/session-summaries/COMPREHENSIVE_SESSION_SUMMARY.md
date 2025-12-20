@@ -62,7 +62,7 @@ apps/web/app/transportadora/configuracoes/page.tsx (lines 202-207)
 
 **Investigated Issues:**
 - Bug #1: Transportadora/Empresa login
-- Bug #2: Create-operator API missing
+- Bug #2: Create-operador API missing
 - Bug #8: Logout redirect
 
 **Key Findings:**
@@ -265,7 +265,7 @@ import { DashboardAuditLog } from '@/components/admin/dashboard/dashboard-audit-
 |------|-----------|--------|-------|
 | Manual Browser | 4 scenarios | 4/4 | Profile update, UI verification |
 | Code Review | 8 APIs/components | 8/8 | All verified working |
-| API Existence | 2 endpoints | 2/2 | create-operator, change-role |
+| API Existence | 2 endpoints | 2/2 | create-operador, change-role |
 
 ---
 
@@ -385,7 +385,7 @@ import { DashboardAuditLog } from '@/components/admin/dashboard/dashboard-audit-
 | Bug # | Description | Status | Notes |
 |-------|-------------|--------|-------|
 | #1 | Login Transportadora/Empresa | ✅ NOT A BUG | Correct RBAC |
-| #2 | Create-operator API | ✅ NOT A BUG | API exists (544 lines) |
+| #2 | Create-operador API | ✅ NOT A BUG | API exists (544 lines) |
 | #3 | Create Transportadora fails | ⏳ NEEDS TESTING | Manual verification needed |
 | #4 | Edit Transportadora bugs | ⏳ NEEDS TESTING | Modal investigation needed |
 | #5 | Change role doesn't persist | ⏳ NEEDS TESTING | API correct, frontend? |

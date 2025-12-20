@@ -4,7 +4,7 @@
 
 import { t, I18nKey } from '@/lib/i18n'
 import common from '@/i18n/common.json'
-import operator from '@/i18n/operator.json'
+import operador from '@/i18n/operador.json'
 import admin from '@/i18n/admin.json'
 
 describe('i18n', () => {
@@ -16,8 +16,8 @@ describe('i18n', () => {
       expect(typeof result).toBe('string')
     })
 
-    it('deve retornar tradução do namespace operator', () => {
-      const result = t('operator', 'test')
+    it('deve retornar tradução do namespace operador', () => {
+      const result = t('operador', 'test')
       expect(typeof result).toBe('string')
     })
 
@@ -78,7 +78,7 @@ describe('i18n', () => {
 
     it('deve aceitar I18nKey sem params', () => {
       const key: I18nKey = {
-        ns: 'operator',
+        ns: 'operador',
         key: 'test',
       }
       expect(key.params).toBeUndefined()

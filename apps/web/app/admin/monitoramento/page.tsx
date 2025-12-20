@@ -46,7 +46,7 @@ export default function MonitoramentoPage() {
     }, [])
 
     const StatusIcon = health.status === 'ok' ? CheckCircle : health.status === 'error' ? XCircle : Activity
-    const statusColor = health.status === 'ok' ? 'text-green-500' : health.status === 'error' ? 'text-red-500' : 'text-gray-400'
+    const statusColor = health.status === 'ok' ? 'text-success' : health.status === 'error' ? 'text-error' : 'text-ink-light'
 
     return (
         <AppShell panel="admin" user={user ? { id: user.id, name: user.name || 'Admin', email: user.email || '', role: user.role || 'admin' } : { id: 'mock', name: 'Admin', email: 'admin@golffox.com', role: 'admin' }}>

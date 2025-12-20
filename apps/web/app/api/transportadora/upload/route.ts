@@ -64,8 +64,8 @@ export async function POST(req: NextRequest) {
       filePath = `motorista-documents/${driverId}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`
     } else if (folder === 'medical-exams' && driverId) {
       filePath = `medical-exams/${driverId}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`
-    } else if (folder === 'vehicle-documents' && vehicleId) {
-      filePath = `vehicle-documents/${vehicleId}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`
+    } else if (folder === 'veiculo-documents' && vehicleId) {
+      filePath = `veiculo-documents/${vehicleId}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`
     } else {
       return NextResponse.json(
         { error: 'ID do motorista ou veículo não fornecido para a pasta especificada' },

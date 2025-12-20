@@ -33,16 +33,16 @@
 - **Causa:** Usuário de teste não existe no Supabase Auth
 - **Solução:** Criar usuário `valid.user@example.com` no Supabase Auth
 
-### TC004 - Admin Creates Operator and Company
+### TC004 - Admin Creates operador and Company
 - **Status:** ❌ Failed
 - **Erro:** Login falhou com credenciais de admin
 - **Causa:** Usuário `admin@example.com` não existe no Supabase Auth
 - **Solução:** Criar usuário admin no Supabase Auth
 
-### TC005 - Operator Creates Employee
+### TC005 - operador Creates Employee
 - **Status:** ❌ Failed
 - **Erro:** Login falhou com credenciais de operador
-- **Causa:** Usuário `operator@example.com` não existe no Supabase Auth
+- **Causa:** Usuário `operador@example.com` não existe no Supabase Auth
 - **Solução:** Criar usuário operador no Supabase Auth
 
 ### TC006 - Real-Time GPS Tracking and Map Visualization
@@ -72,9 +72,9 @@
 ### 1. Usuários de Teste Não Existem no Supabase Auth
 
 **Problema:** Os testes esperam os seguintes usuários:
-- `valid.user@example.com` / `ValidPassword123!` (passenger)
+- `valid.user@example.com` / `ValidPassword123!` (passageiro)
 - `admin@example.com` / `AdminPass123!` (admin)
-- `operator@example.com` / `OperatorPass123!` (operator)
+- `operador@example.com` / `OperatorPass123!` (operador)
 
 **Tentativa de Solução:** Scripts foram criados para criar usuários automaticamente, mas falharam com erro "Database error creating new user".
 

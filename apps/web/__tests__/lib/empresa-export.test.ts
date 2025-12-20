@@ -1,8 +1,8 @@
 /**
- * Testes para Operator Export
+ * Testes para operador Export
  */
 
-import { exportOperatorData, prepareEmployeesExport, prepareAlertsExport, prepareRoutesExport } from '@/lib/operator-export'
+import { exportOperatorData, prepareEmployeesExport, prepareAlertsExport, prepareRoutesExport } from '@/lib/operador-export'
 import { exportToCSV, exportToExcel, exportToPDF } from '@/lib/export-utils'
 
 jest.mock('@/lib/export-utils', () => ({
@@ -11,7 +11,7 @@ jest.mock('@/lib/export-utils', () => ({
   exportToPDF: jest.fn(),
 }))
 
-describe('Operator Export', () => {
+describe('operador Export', () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })

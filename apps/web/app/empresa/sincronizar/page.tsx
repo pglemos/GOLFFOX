@@ -177,14 +177,14 @@ export default function SincronizarPage() {
             </Button>
 
             {resultado && (
-              <div className={`p-4 rounded-xl ${resultado.sucesso ? 'bg-[var(--ok)]/10 border border-[var(--ok)]' : 'bg-[var(--err)]/10 border border-[var(--err)]'}`}>
+              <div className={`p-4 rounded-xl ${resultado.sucesso ? 'bg-success/10 border border-success' : 'bg-error/10 border border-error'}`}>
                 <div className="flex items-center gap-2 mb-2">
                   {resultado.sucesso ? (
-                    <CheckCircle className="h-5 w-5 text-[var(--ok)]" />
+                    <CheckCircle className="h-5 w-5 text-success" />
                   ) : (
-                    <AlertCircle className="h-5 w-5 text-[var(--err)]" />
+                    <AlertCircle className="h-5 w-5 text-error" />
                   )}
-                  <p className={`font-medium ${resultado.sucesso ? 'text-[var(--ok)]' : 'text-[var(--err)]'}`}>
+                  <p className={`font-medium ${resultado.sucesso ? 'text-success' : 'text-error'}`}>
                     {resultado.sucesso ? "Sucesso" : "Erro"}
                   </p>
                 </div>

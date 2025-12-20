@@ -6,12 +6,12 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
-import type { Vehicle } from './admin-map'
+import type { veiculo } from './admin-map'
 import { warn } from '@/lib/logger'
 
 interface HeatmapLayerProps {
   map: google.maps.Map
-  vehicles: Vehicle[]
+  vehicles: veiculo[]
   enabled: boolean
   mode: 'live' | 'history'
 }
@@ -64,8 +64,8 @@ export function HeatmapLayer({
     }
 
     // Preparar dados para heatmap
-    const dataPoints: HeatmapDataPoint[] = validVehicles.map((vehicle) => ({
-      location: new google.maps.LatLng(vehicle.lat, vehicle.lng),
+    const dataPoints: HeatmapDataPoint[] = validVehicles.map((veiculo) => ({
+      location: new google.maps.LatLng(veiculo.lat, veiculo.lng),
       weight: 1, // Peso igual para cada veículo
     }))
 

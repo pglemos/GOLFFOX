@@ -300,7 +300,7 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
               <Route className="h-6 w-6 text-brand" />
               Nova Rota
             </DialogTitle>
-            <DialogDescription className="text-base text-gray-600 mt-2">
+            <DialogDescription className="text-base text-ink-muted mt-2">
               Preencha os dados da rota, selecione os funcionários e otimize o trajeto
             </DialogDescription>
           </DialogHeader>
@@ -349,9 +349,9 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
                   destination={formData.destination_address || ""}
                 />
               ) : mapError ? (
-                <div className="text-center py-8 text-red-600">{mapError}</div>
+                <div className="text-center py-8 text-error">{mapError}</div>
               ) : (
-                <div className="text-center py-8 text-gray-500">
+                <div className="text-center py-8 text-ink-muted">
                   Clique em &quot;Pre-visualizar &amp; Otimizar&quot; para ver o mapa
                 </div>
               )}
@@ -372,7 +372,7 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
               onClick={handleOptimize}
               disabled={optimizing || !formData.company_id || !formData.selected_employees?.length}
               variant="outline"
-              className="bg-orange-500 hover:bg-orange-600 text-white w-full sm:w-auto order-2 sm:order-2 text-base font-medium h-11 sm:h-12"
+              className="bg-brand hover:bg-orange-600 text-white w-full sm:w-auto order-2 sm:order-2 text-base font-medium h-11 sm:h-12"
               aria-label="Pré-visualizar e otimizar rota"
             >
               {optimizing ? "Otimizando..." : <span className="hidden sm:inline">Pré-visualizar & Otimizar</span>}
@@ -381,7 +381,7 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
             <Button
               onClick={handleSave}
               disabled={saving}
-              className="bg-orange-500 hover:bg-orange-600 text-white w-full sm:w-auto order-1 sm:order-3 text-base font-medium h-11 sm:h-12"
+              className="bg-brand hover:bg-orange-600 text-white w-full sm:w-auto order-1 sm:order-3 text-base font-medium h-11 sm:h-12"
               aria-label="Salvar rota"
             >
               {saving ? "Salvando..." : "Salvar"}
@@ -393,10 +393,10 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
       <DriverPickerModal
         isOpen={isDriverModalOpen}
         onClose={() => setIsDriverModalOpen(false)}
-        onSelect={(driver) => setSelectedDriver({
-          id: driver.id,
-          name: driver.name,
-          documents_valid: driver.documents_valid
+        onSelect={(motorista) => setSelectedDriver({
+          id: motorista.id,
+          name: motorista.name,
+          documents_valid: motorista.documents_valid
         })}
         companyId={formData.company_id}
       />
@@ -404,8 +404,8 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
       <VehiclePickerModal
         isOpen={isVehicleModalOpen}
         onClose={() => setIsVehicleModalOpen(false)}
-        onSelect={(vehicle) =>
-          setSelectedVehicle({ id: vehicle.id, plate: vehicle.plate, capacity: vehicle.capacity })
+        onSelect={(veiculo) =>
+          setSelectedVehicle({ id: veiculo.id, plate: veiculo.plate, capacity: veiculo.capacity })
         }
         companyId={formData.company_id}
         requiredCapacity={formData.selected_employees?.length}
@@ -513,16 +513,16 @@ function LocalRoutePreviewMap({
   return (
     <div className="space-y-3 sm:space-y-4 h-full flex flex-col">
       <div className="grid grid-cols-3 gap-2 sm:gap-4">
-        <div className="p-2 sm:p-3 bg-gray-50 rounded-lg">
-          <div className="text-xs sm:text-sm text-gray-600">Distância Total</div>
+        <div className="p-2 sm:p-3 bg-bg-soft rounded-lg">
+          <div className="text-xs sm:text-sm text-ink-muted">Distância Total</div>
           <div className="text-lg sm:text-2xl font-bold">{totalKm} km</div>
         </div>
-        <div className="p-2 sm:p-3 bg-gray-50 rounded-lg">
-          <div className="text-xs sm:text-sm text-gray-600">Tempo Total</div>
+        <div className="p-2 sm:p-3 bg-bg-soft rounded-lg">
+          <div className="text-xs sm:text-sm text-ink-muted">Tempo Total</div>
           <div className="text-lg sm:text-2xl font-bold">{totalMinutes} min</div>
         </div>
-        <div className="p-2 sm:p-3 bg-gray-50 rounded-lg">
-          <div className="text-xs sm:text-sm text-gray-600">Paradas</div>
+        <div className="p-2 sm:p-3 bg-bg-soft rounded-lg">
+          <div className="text-xs sm:text-sm text-ink-muted">Paradas</div>
           <div className="text-lg sm:text-2xl font-bold">{result.ordered.length}</div>
         </div>
       </div>
@@ -566,7 +566,7 @@ function LocalRoutePreviewMap({
             return (
               <div
                 key={point.id}
-                className="flex items-center gap-2 text-xs sm:text-sm p-1.5 sm:p-2 hover:bg-gray-50 rounded cursor-move"
+                className="flex items-center gap-2 text-xs sm:text-sm p-1.5 sm:p-2 hover:bg-bg-soft rounded cursor-move"
                 draggable
                 onDragStart={(e) => {
                   e.dataTransfer.setData("text/plain", idx.toString())
@@ -595,7 +595,7 @@ function LocalRoutePreviewMap({
                 <span className="flex-1 truncate">
                   {emp ? `${emp.first_name} ${emp.last_name}` : `Parada ${point.order}`}
                 </span>
-                <Navigation className="h-3 w-3 sm:h-4 sm:w-4 text-gray-400 flex-shrink-0" />
+                <Navigation className="h-3 w-3 sm:h-4 sm:w-4 text-ink-light flex-shrink-0" />
               </div>
             )
           })}

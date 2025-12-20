@@ -1,27 +1,27 @@
 import { normalizeOperatorUrl } from '../lib/url'
 
 describe('normalizeOperatorUrl', () => {
-  test('removes company param from /operator root', () => {
-    const input = 'https://example.com/operator?company=11111111-1111-4111-8111-1111111111c1'
+  test('removes company param from /operador root', () => {
+    const input = 'https://example.com/operador?company=11111111-1111-4111-8111-1111111111c1'
     const out = normalizeOperatorUrl(input)
-    expect(out).toBe('/operator')
+    expect(out).toBe('/operador')
   })
 
   test('preserves other query params when removing company', () => {
-    const input = 'https://example.com/operator?company=abc&foo=bar&baz=1'
+    const input = 'https://example.com/operador?company=abc&foo=bar&baz=1'
     const out = normalizeOperatorUrl(input)
-    expect(out).toBe('/operator?foo=bar&baz=1')
+    expect(out).toBe('/operador?foo=bar&baz=1')
   })
 
-  test('works for nested operator routes', () => {
-    const input = 'https://example.com/operator/funcionarios?company=abc&search=joao'
+  test('works for nested operador routes', () => {
+    const input = 'https://example.com/operador/funcionarios?company=abc&search=joao'
     const out = normalizeOperatorUrl(input)
-    expect(out).toBe('/operator/funcionarios?search=joao')
+    expect(out).toBe('/operador/funcionarios?search=joao')
   })
 
-  test('normalizes relative operator URL by stripping company param', () => {
-    const input = '/operator?company=abc'
+  test('normalizes relative operador URL by stripping company param', () => {
+    const input = '/operador?company=abc'
     const out = normalizeOperatorUrl(input)
-    expect(out).toBe('/operator')
+    expect(out).toBe('/operador')
   })
 })

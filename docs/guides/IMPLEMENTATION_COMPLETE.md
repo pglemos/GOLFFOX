@@ -25,7 +25,7 @@
 
 **⚠️ Verifique se executou sem erros!**
 
-### 2. Configure Realtime (Driver Positions)
+### 2. Configure Realtime (motorista Positions)
 
 1. No Dashboard → **Database** → **Replication**
 2. Encontre a tabela `driver_positions`

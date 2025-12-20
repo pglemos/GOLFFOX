@@ -9,7 +9,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 type ScanMode = 'qr' | 'nfc' | 'manual';
 
-interface Passenger {
+interface passageiro {
     id: string;
     name: string;
     identifier: string;
@@ -17,7 +17,7 @@ interface Passenger {
     checkInTime?: string;
 }
 
-const mockPassengers: Passenger[] = [
+const mockPassengers: passageiro[] = [
     { id: '1', name: 'João Silva', identifier: '001234', checkedIn: false },
     { id: '2', name: 'Maria Santos', identifier: '001235', checkedIn: false },
     { id: '3', name: 'Pedro Costa', identifier: '001236', checkedIn: true, checkInTime: '07:32' },
@@ -26,11 +26,11 @@ const mockPassengers: Passenger[] = [
 
 export default function ScanScreen() {
     const [mode, setMode] = useState<ScanMode>('manual');
-    const [passengers, setPassengers] = useState<Passenger[]>(mockPassengers);
+    const [passengers, setPassengers] = useState<passageiro[]>(mockPassengers);
     const [permission, requestPermission] = useCameraPermissions();
     const [scanned, setScanned] = useState(false);
     const [confirmDialogVisible, setConfirmDialogVisible] = useState(false);
-    const [selectedPassenger, setSelectedPassenger] = useState<Passenger | null>(null);
+    const [selectedPassenger, setSelectedPassenger] = useState<passageiro | null>(null);
     const { profile } = useAuth();
 
     const embarkedCount = passengers.filter(p => p.checkedIn).length;
@@ -86,8 +86,8 @@ export default function ScanScreen() {
         setTimeout(() => setScanned(false), 2000);
     };
 
-    const handleManualCheckIn = (passenger: Passenger) => {
-        setSelectedPassenger(passenger);
+    const handleManualCheckIn = (passageiro: passageiro) => {
+        setSelectedPassenger(passageiro);
         setConfirmDialogVisible(true);
     };
 
@@ -163,24 +163,24 @@ export default function ScanScreen() {
 
     const renderManual = () => (
         <ScrollView style={styles.manualContainer} showsVerticalScrollIndicator={false}>
-            {passengers.map(passenger => (
-                <Surface key={passenger.id} style={styles.passengerCard} elevation={1}>
+            {passengers.map(passageiro => (
+                <Surface key={passageiro.id} style={styles.passengerCard} elevation={1}>
                     <View style={styles.passengerInfo}>
-                        <View style={[styles.statusDot, { backgroundColor: passenger.checkedIn ? '#10B981' : '#CBD5E1' }]} />
+                        <View style={[styles.statusDot, { backgroundColor: passageiro.checkedIn ? '#10B981' : '#CBD5E1' }]} />
                         <View style={styles.passengerDetails}>
-                            <Text style={styles.passengerName}>{passenger.name}</Text>
-                            <Text style={styles.passengerId}>ID: {passenger.identifier}</Text>
-                            {passenger.checkedIn && passenger.checkInTime && (
-                                <Text style={styles.checkInTime}>Embarcou às {passenger.checkInTime}</Text>
+                            <Text style={styles.passengerName}>{passageiro.name}</Text>
+                            <Text style={styles.passengerId}>ID: {passageiro.identifier}</Text>
+                            {passageiro.checkedIn && passageiro.checkInTime && (
+                                <Text style={styles.checkInTime}>Embarcou às {passageiro.checkInTime}</Text>
                             )}
                         </View>
                     </View>
                     <Pressable
-                        style={[styles.actionBtn, passenger.checkedIn && styles.actionBtnDisembark]}
-                        onPress={() => handleManualCheckIn(passenger)}
+                        style={[styles.actionBtn, passageiro.checkedIn && styles.actionBtnDisembark]}
+                        onPress={() => handleManualCheckIn(passageiro)}
                     >
-                        <Text style={[styles.actionBtnText, passenger.checkedIn && styles.actionBtnTextDisembark]}>
-                            {passenger.checkedIn ? 'Desembarcar' : 'Embarcar'}
+                        <Text style={[styles.actionBtnText, passageiro.checkedIn && styles.actionBtnTextDisembark]}>
+                            {passageiro.checkedIn ? 'Desembarcar' : 'Embarcar'}
                         </Text>
                     </Pressable>
                 </Surface>

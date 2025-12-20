@@ -588,7 +588,7 @@ Uma plataforma unificada com:
 
 | Termo | Definição |
 |-------|-----------|
-| **Carrier** | Transportadora parceira responsável pelos veículos |
+| **transportadora** | Transportadora parceira responsável pelos veículos |
 | **Empresa** | Empresa que contrata o serviço de transporte |
 | **Operador** | Usuário que gerencia a transportadora |
 | **RLS** | Row Level Security - segurança a nível de linha no banco |

@@ -12,15 +12,15 @@
 **Problema:** Imports usando nomenclatura antiga (PT-BR) que não correspondem aos arquivos reais.
 
 **Correções:**
-- `create-operador-modal` → `create-operator-modal`
-- `create-operador-login-modal` → `create-operator-login-modal`
-- `motorista-modal` → `driver-modal`
-- `motorista-picker-modal` → `driver-picker-modal`
-- `motorista-compensation-section` → `driver/driver-compensation-section`
-- `motorista-documents-section` → `driver/driver-documents-section`
-- `transportadora-documents-section` → `carrier/carrier-documents-section`
-- `transportadora-banking-section` → `carrier/carrier-banking-section`
-- `transportadora-legal-rep-section` → `carrier/carrier-legal-rep-section`
+- `create-operador-modal` → `create-operador-modal`
+- `create-operador-login-modal` → `create-operador-login-modal`
+- `motorista-modal` → `motorista-modal`
+- `motorista-picker-modal` → `motorista-picker-modal`
+- `motorista-compensation-section` → `motorista/motorista-compensation-section`
+- `motorista-documents-section` → `motorista/motorista-documents-section`
+- `transportadora-documents-section` → `transportadora/transportadora-documents-section`
+- `transportadora-banking-section` → `transportadora/transportadora-banking-section`
+- `transportadora-legal-rep-section` → `transportadora/transportadora-legal-rep-section`
 
 **Arquivos Corrigidos:**
 - `app/admin/empresas/page.tsx`
@@ -29,7 +29,7 @@
 - `app/admin/rotas/route-create-modal.tsx`
 - `app/transportadora/motoristas/page.tsx`
 - `components/modals/company-operators-modal.tsx`
-- `components/modals/driver-modal.tsx`
+- `components/modals/motorista-modal.tsx`
 - `components/modals/edit-transportadora-modal.tsx`
 
 ### 2. Imports de Tipos Incorretos ✅
@@ -37,7 +37,7 @@
 **Problema:** Import usando `@/types/transportadora` que não existe.
 
 **Correção:**
-- `@/types/transportadora` → `@/types/carrier`
+- `@/types/transportadora` → `@/types/transportadora`
 
 **Arquivos Corrigidos:**
 - `app/api/admin/transportadoras/create/route.ts`
@@ -46,11 +46,11 @@
 
 ### 3. Imports de i18n Incorretos ✅
 
-**Problema:** Import usando `operador.json` que não existe (existe `operator.json`).
+**Problema:** Import usando `operador.json` que não existe (existe `operador.json`).
 
 **Correção:**
-- `@/i18n/operador.json` → `@/i18n/operator.json`
-- Atualizado `lib/i18n.ts` para usar `operator.json` como alias de `operador`
+- `@/i18n/operador.json` → `@/i18n/operador.json`
+- Atualizado `lib/i18n.ts` para usar `operador.json` como alias de `operador`
 
 **Arquivos Corrigidos:**
 - `lib/i18n.ts`

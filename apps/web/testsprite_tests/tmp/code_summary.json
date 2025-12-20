@@ -54,8 +54,8 @@
       ]
     },
     {
-      "name": "Carrier Panel (Transportadora)",
-      "description": "Carrier management panel for managing drivers, vehicles, routes, revenues, and margins",
+      "name": "transportadora Panel (Transportadora)",
+      "description": "transportadora management panel for managing drivers, vehicles, routes, revenues, and margins",
       "files": [
         "app/transportadora/page.tsx",
         "app/transportadora/layout.tsx",
@@ -109,7 +109,7 @@
         "lib/export-utils.ts",
         "lib/export-map-png.ts",
         "lib/exports.ts",
-        "lib/operator-export.ts"
+        "lib/operador-export.ts"
       ]
     },
     {

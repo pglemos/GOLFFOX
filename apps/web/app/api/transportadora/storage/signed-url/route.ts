@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
 
     if (folder === 'motorista-documents' || folder === 'medical-exams') {
       // Verificar se o motorista pertence à transportadora
-      const { data: driver } = await supabaseServiceRole
+      const { data: motorista } = await supabaseServiceRole
         .from('users')
         .select('transportadora_id')
         .eq('id', entityId)
@@ -55,15 +55,15 @@ export async function POST(req: NextRequest) {
         .eq('id', user.id)
         .single()
 
-      if (!driver || userData?.transportadora_id !== driver.transportadora_id) {
+      if (!motorista || userData?.transportadora_id !== motorista.transportadora_id) {
         return NextResponse.json(
           { error: 'Acesso negado' },
           { status: 403 }
         )
       }
-    } else if (folder === 'vehicle-documents') {
+    } else if (folder === 'veiculo-documents') {
       // Verificar se o veículo pertence à transportadora
-      const { data: vehicle } = await supabaseServiceRole
+      const { data: veiculo } = await supabaseServiceRole
         .from('vehicles')
         .select('transportadora_id')
         .eq('id', entityId)
@@ -75,7 +75,7 @@ export async function POST(req: NextRequest) {
         .eq('id', user.id)
         .single()
 
-      if (!vehicle || userData?.transportadora_id !== vehicle.transportadora_id) {
+      if (!veiculo || userData?.transportadora_id !== veiculo.transportadora_id) {
         return NextResponse.json(
           { error: 'Acesso negado' },
           { status: 403 }

@@ -63,8 +63,8 @@ export default function AdminContratosPage() {
 
     const getStatusBadge = (status: string) => {
         switch (status) {
-            case 'active': return <Badge className="bg-green-500">Ativo</Badge>
-            case 'pending': return <Badge className="bg-yellow-500">Pendente</Badge>
+            case 'active': return <Badge className="bg-success-light0">Ativo</Badge>
+            case 'pending': return <Badge className="bg-warning-light0">Pendente</Badge>
             case 'expired': return <Badge variant="destructive">Expirado</Badge>
             default: return <Badge variant="secondary">{status}</Badge>
         }
@@ -114,7 +114,7 @@ export default function AdminContratosPage() {
                                         <div className="flex items-center gap-4">
                                             <div className="text-center">
                                                 <p className="text-sm text-muted-foreground">Valor Mensal</p>
-                                                <p className="font-bold text-green-600">{formatCurrency(contract.value_amount)}</p>
+                                                <p className="font-bold text-success">{formatCurrency(contract.value_amount)}</p>
                                             </div>
                                             <div className="text-center">
                                                 <p className="text-sm text-muted-foreground">Período</p>

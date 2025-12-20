@@ -33,7 +33,7 @@
         "app/admin/socorro/page.tsx(289,67): error TS2769: No overload matches this call.\r",
         "app/admin/socorro/page.tsx(315,39): error TS2345: Argument of type '{ status: string; resolved_at: string; }' is not assignable to parameter of type 'never'.\r",
         "app/admin/veiculos/page.tsx(9,90): error TS7016: Could not find a declaration file for module 'lucide-react'. 'F:/GOLFFOX/web-app/node_modules/lucide-react/dist/cjs/lucide-react.js' implicitly has an 'any' type.\r",
-        "app/api/admin/create-operator/route.ts(253,75): error TS2551: Property 'catch' does not exist on type 'PostgrestFilterBuilder<any, any, any, null, \"companies\", unknown, \"DELETE\">'. Did you mean 'match'?\r",
+        "app/api/admin/create-operador/route.ts(253,75): error TS2551: Property 'catch' does not exist on type 'PostgrestFilterBuilder<any, any, any, null, \"companies\", unknown, \"DELETE\">'. Did you mean 'match'?\r",
         "app/api/admin/seed-cost-categories/route.ts(2,10): error TS2305: Module '\"@/lib/supabase-server\"' has no exported member 'getSupabaseAdmin'.\r",
         "app/api/admin/trips/route.ts(78,9): error TS2345: Argument of type 'PostgrestFilterBuilder<any, any, any, { id: any; }[], \"routes\", unknown, \"GET\">' is not assignable to parameter of type 'readonly any[]'.\r",
         "app/api/admin/vehicles/[vehicleId]/route.ts(73,17): error TS2345: Argument of type '{ is_active: boolean; }' is not assignable to parameter of type 'never'.\r",

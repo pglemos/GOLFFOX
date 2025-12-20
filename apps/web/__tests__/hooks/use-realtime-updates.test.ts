@@ -40,7 +40,7 @@ describe('useRealtimeUpdates', () => {
     it('deve criar canal quando companyId é fornecido', () => {
       renderHook(() => useRealtimeKPIs('company-1'), { wrapper: createWrapper() })
 
-      expect(supabase.channel).toHaveBeenCalledWith('operator-kpis:company-1')
+      expect(supabase.channel).toHaveBeenCalledWith('operador-kpis:company-1')
       expect(mockChannel.on).toHaveBeenCalledWith(
         'postgres_changes',
         expect.objectContaining({
@@ -89,7 +89,7 @@ describe('useRealtimeUpdates', () => {
       }
 
       await waitFor(() => {
-        expect(queryClient.getQueryCache().find({ queryKey: ['operator-kpis', 'company-1'] })).toBeDefined()
+        expect(queryClient.getQueryCache().find({ queryKey: ['operador-kpis', 'company-1'] })).toBeDefined()
       })
     })
   })
@@ -98,7 +98,7 @@ describe('useRealtimeUpdates', () => {
     it('deve criar canal quando companyId é fornecido', () => {
       renderHook(() => useRealtimeAlerts('company-1'), { wrapper: createWrapper() })
 
-      expect(supabase.channel).toHaveBeenCalledWith('operator-alerts:company-1')
+      expect(supabase.channel).toHaveBeenCalledWith('operador-alerts:company-1')
       expect(mockChannel.on).toHaveBeenCalledWith(
         'postgres_changes',
         expect.objectContaining({
@@ -140,7 +140,7 @@ describe('useRealtimeUpdates', () => {
     it('deve criar canal quando companyId é fornecido', () => {
       renderHook(() => useRealtimeRoutes('company-1'), { wrapper: createWrapper() })
 
-      expect(supabase.channel).toHaveBeenCalledWith('operator-routes:company-1')
+      expect(supabase.channel).toHaveBeenCalledWith('operador-routes:company-1')
       expect(mockChannel.on).toHaveBeenCalledWith(
         'postgres_changes',
         expect.objectContaining({

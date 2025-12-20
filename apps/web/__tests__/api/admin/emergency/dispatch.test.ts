@@ -18,20 +18,20 @@ describe('POST /api/admin/emergency/dispatch', () => {
 
   it('deve despachar veículo e motorista para emergência', async () => {
     const route = createTestRoute()
-    const vehicle = createTestVehicle('transportadora-1')
-    const driver = createTestUser({ role: 'driver' })
+    const veiculo = createTestVehicle('transportadora-1')
+    const motorista = createTestUser({ role: 'motorista' })
     
     mockSupabaseClient.setTableData('routes', [route])
-    mockSupabaseClient.setTableData('vehicles', [vehicle])
-    mockSupabaseClient.setTableData('users', [driver])
+    mockSupabaseClient.setTableData('vehicles', [veiculo])
+    mockSupabaseClient.setTableData('users', [motorista])
     mockSupabaseClient.setTableData('gf_assistance_requests', [])
 
     const req = createAdminRequest({
       method: 'POST',
       body: {
         routeId: route.id,
-        driverId: driver.id,
-        vehicleId: vehicle.id,
+        driverId: motorista.id,
+        vehicleId: veiculo.id,
       },
     }) as NextRequest
 
@@ -65,8 +65,8 @@ describe('POST /api/admin/emergency/dispatch', () => {
       method: 'POST',
       body: {
         routeId: 'non-existent',
-        driverId: 'driver-1',
-        vehicleId: 'vehicle-1',
+        driverId: 'motorista-1',
+        vehicleId: 'veiculo-1',
       },
     }) as NextRequest
 
@@ -80,12 +80,12 @@ describe('POST /api/admin/emergency/dispatch', () => {
 
   it('deve atualizar solicitação existente', async () => {
     const route = createTestRoute()
-    const vehicle = createTestVehicle('transportadora-1')
-    const driver = createTestUser({ role: 'driver' })
+    const veiculo = createTestVehicle('transportadora-1')
+    const motorista = createTestUser({ role: 'motorista' })
     
     mockSupabaseClient.setTableData('routes', [route])
-    mockSupabaseClient.setTableData('vehicles', [vehicle])
-    mockSupabaseClient.setTableData('users', [driver])
+    mockSupabaseClient.setTableData('vehicles', [veiculo])
+    mockSupabaseClient.setTableData('users', [motorista])
     mockSupabaseClient.setTableData('gf_assistance_requests', [
       {
         id: 'request-1',
@@ -98,8 +98,8 @@ describe('POST /api/admin/emergency/dispatch', () => {
       method: 'POST',
       body: {
         routeId: route.id,
-        driverId: driver.id,
-        vehicleId: vehicle.id,
+        driverId: motorista.id,
+        vehicleId: veiculo.id,
       },
     }) as NextRequest
 

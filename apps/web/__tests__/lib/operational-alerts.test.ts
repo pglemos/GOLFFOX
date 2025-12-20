@@ -206,17 +206,17 @@ describe('Operational Alerts', () => {
         insert: mockInsert,
       })
 
-      await alertSyncFailure('vehicle', 'vehicle-1', 'Network error', { retryCount: 3 })
+      await alertSyncFailure('veiculo', 'veiculo-1', 'Network error', { retryCount: 3 })
 
       expect(mockInsert).toHaveBeenCalledWith(
         expect.objectContaining({
           type: 'sync_failure',
           severity: 'error',
-          title: 'Falha de Sincronização: vehicle',
+          title: 'Falha de Sincronização: veiculo',
           message: 'Network error',
           details: expect.objectContaining({
-            resource_type: 'vehicle',
-            resource_id: 'vehicle-1',
+            resource_type: 'veiculo',
+            resource_id: 'veiculo-1',
             error: 'Network error',
             retryCount: 3,
           }),
@@ -232,7 +232,7 @@ describe('Operational Alerts', () => {
         insert: mockInsert,
       })
 
-      await alertRouteDeviation('route-1', 'vehicle-1', 1000, {
+      await alertRouteDeviation('route-1', 'veiculo-1', 1000, {
         expectedLat: -19.916681,
         actualLat: -19.917681,
       })
@@ -245,7 +245,7 @@ describe('Operational Alerts', () => {
           message: expect.stringContaining('route-1'),
           details: expect.objectContaining({
             route_id: 'route-1',
-            vehicle_id: 'vehicle-1',
+            vehicle_id: 'veiculo-1',
             deviation_meters: 1000,
             expectedLat: -19.916681,
             actualLat: -19.917681,

@@ -28,13 +28,13 @@ describe('DELETE /api/admin/vehicles/delete', () => {
   })
 
   it('deve excluir veículo', async () => {
-    const vehicle = createTestVehicle('transportadora-1', { plate: 'ABC1234' })
-    mockSupabaseClient.setTableData('vehicles', [vehicle])
+    const veiculo = createTestVehicle('transportadora-1', { plate: 'ABC1234' })
+    mockSupabaseClient.setTableData('vehicles', [veiculo])
     mockSupabaseClient.setTableData('trips', [])
 
     const req = createAdminRequest({
       method: 'DELETE',
-      url: `http://localhost:3000/api/admin/vehicles/delete?id=${vehicle.id}`,
+      url: `http://localhost:3000/api/admin/vehicles/delete?id=${veiculo.id}`,
     }) as NextRequest
 
     const response = await DELETE(req)
@@ -46,15 +46,15 @@ describe('DELETE /api/admin/vehicles/delete', () => {
   })
 
   it('deve atualizar trips antes de excluir', async () => {
-    const vehicle = createTestVehicle('transportadora-1', { plate: 'ABC1234' })
-    mockSupabaseClient.setTableData('vehicles', [vehicle])
+    const veiculo = createTestVehicle('transportadora-1', { plate: 'ABC1234' })
+    mockSupabaseClient.setTableData('vehicles', [veiculo])
     mockSupabaseClient.setTableData('trips', [
-      { id: 'trip-1', vehicle_id: vehicle.id },
+      { id: 'trip-1', vehicle_id: veiculo.id },
     ])
 
     const req = createAdminRequest({
       method: 'DELETE',
-      url: `http://localhost:3000/api/admin/vehicles/delete?id=${vehicle.id}`,
+      url: `http://localhost:3000/api/admin/vehicles/delete?id=${veiculo.id}`,
     }) as NextRequest
 
     const response = await DELETE(req)
@@ -78,14 +78,14 @@ describe('DELETE /api/admin/vehicles/delete', () => {
   })
 
   it('deve lidar com erro ao excluir', async () => {
-    const vehicle = createTestVehicle('transportadora-1')
+    const veiculo = createTestVehicle('transportadora-1')
     mockSupabaseClient.setTableError('vehicles', {
       message: 'Database error',
     })
 
     const req = createAdminRequest({
       method: 'DELETE',
-      url: `http://localhost:3000/api/admin/vehicles/delete?id=${vehicle.id}`,
+      url: `http://localhost:3000/api/admin/vehicles/delete?id=${veiculo.id}`,
     }) as NextRequest
 
     const response = await DELETE(req)

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabaseServiceRole } from '@/lib/supabase-server'
 import { requireAuth } from '@/lib/api-auth'
 import { z } from 'zod'
-import { CarrierUpdate } from '@/types/carrier'
+import { CarrierUpdate } from '@/types/transportadora'
 import { invalidateEntityCache } from '@/lib/next-cache'
 
 export const runtime = 'nodejs'
@@ -120,7 +120,7 @@ export async function PUT(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      carrier: data
+      transportadora: data
     })
   } catch (error: unknown) {
     if (error instanceof z.ZodError) {

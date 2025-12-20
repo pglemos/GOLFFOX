@@ -93,7 +93,7 @@ export default function AlertasPage() {
 
   // Escutar eventos de sincronização global (apenas após carregamento inicial)
   useGlobalSync(
-    ['alert.created', 'alert.updated', 'route.created', 'route.updated', 'vehicle.created', 'vehicle.updated'],
+    ['alert.created', 'alert.updated', 'route.created', 'route.updated', 'veiculo.created', 'veiculo.updated'],
     () => {
       // Recarregar alertas quando houver mudanças (apenas se não estiver carregando)
       if (!dataLoading && user && !authLoading) {
@@ -379,7 +379,7 @@ export default function AlertasPage() {
         <div className="grid gap-3 sm:gap-4 w-full">
           {filteredAlertas.length === 0 ? (
             <Card className="p-12 text-center">
-              <AlertTriangle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+              <AlertTriangle className="h-12 w-12 text-ink-light mx-auto mb-4" />
               <h3 className="text-lg font-medium mb-2">Nenhum alerta encontrado</h3>
               <p className="text-sm text-ink-muted">
                 {searchQuery ? "Tente ajustar sua busca" : "Não há alertas no momento"}
@@ -398,14 +398,14 @@ export default function AlertasPage() {
                 <Card className="p-3 sm:p-4 hover:shadow-xl transition-all duration-300 overflow-hidden bg-card/50 backdrop-blur-sm border-border hover:border-text-brand/30">
                   <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
                     <div className="flex gap-3 sm:gap-4 flex-1 min-w-0">
-                      <div className={`p-1.5 rounded-lg flex-shrink-0 ${alerta.severity === 'critical' ? 'bg-red-100' :
+                      <div className={`p-1.5 rounded-lg flex-shrink-0 ${alerta.severity === 'critical' ? 'bg-error-light' :
                           alerta.severity === 'warning' ? 'bg-orange-100' :
-                            'bg-blue-100'
+                            'bg-info-light'
                         }`}>
                         <AlertTriangle
-                          className={`h-4 w-4 ${alerta.severity === 'critical' ? 'text-red-500' :
-                              alerta.severity === 'warning' ? 'text-orange-500' :
-                                'text-blue-500'
+                          className={`h-4 w-4 ${alerta.severity === 'critical' ? 'text-error' :
+                              alerta.severity === 'warning' ? 'text-brand' :
+                                'text-info'
                             }`}
                         />
                       </div>

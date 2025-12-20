@@ -22,9 +22,9 @@ O arquivo `proxy.ts` (anteriormente `middleware.ts`) existe e está configurado 
 2. ✅ **Autorização baseada em roles** via `hasRole`
 3. ✅ **Proteção de rotas** baseada em roles:
    - `/admin` - apenas `admin`
-   - `/empresa` - `admin`, `empresa`, `operator`
-   - `/transportadora` - `admin`, `operador`, `carrier`, `transportadora`
-4. ✅ **Redirecionamentos de compatibilidade** (carrier → transportadora, etc.)
+   - `/empresa` - `admin`, `empresa`, `operador`
+   - `/transportadora` - `admin`, `operador`, `transportadora`, `transportadora`
+4. ✅ **Redirecionamentos de compatibilidade** (transportadora → transportadora, etc.)
 5. ✅ **Normalização de URLs** (remoção de parâmetros sensíveis)
 6. ✅ **Logging estruturado** (usa `lib/logger.ts`)
 

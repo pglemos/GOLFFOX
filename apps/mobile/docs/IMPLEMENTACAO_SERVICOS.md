@@ -60,15 +60,15 @@ await LocationService.startTracking(tripId, vehicleId, {
 
 ### 1. Integrar Serviços nas Telas
 
-**Driver Dashboard (`app/driver/index.tsx`):**
+**motorista Dashboard (`app/motorista/index.tsx`):**
 - Substituir `mockTrips` por `TripsService.getNextTrips()`
 - Usar `TripsService.getCurrentTrip()` para viagem atual
 
-**Driver Route (`app/driver/route.tsx`):**
+**motorista Route (`app/motorista/route.tsx`):**
 - Integrar `LocationService.startTracking()` ao iniciar viagem
 - Parar rastreamento ao finalizar viagem
 
-**Passenger Map (`app/passenger/map.tsx`):**
+**passageiro Map (`app/passageiro/map.tsx`):**
 - Buscar localização do veículo via Supabase Realtime
 - Exibir posição em tempo real
 

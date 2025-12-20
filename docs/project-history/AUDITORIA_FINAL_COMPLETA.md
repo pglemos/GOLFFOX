@@ -343,7 +343,7 @@ Estados: 13+
 
 1. **Implementar `/api/admin/create-operador`** (2h)
    ```bash
-   - Criar: apps/web/app/api/admin/create-operator/route.ts
+   - Criar: apps/web/app/api/admin/create-operador/route.ts
    - Implementar: Lógica de criação empresa + operador
    - Usar: Supabase service role para bypass RLS
    - Testar: Criar empresa via modal
@@ -474,7 +474,7 @@ Estados: 13+
 🚨 **SISTEMA PRECISA DE CORREÇÕES URGENTES ANTES DE USO EM PRODUÇÃO**
 
 **Ações Imediatas:**
-1. Implementar APIs faltantes (create-operator)
+1. Implementar APIs faltantes (create-operador)
 2. Corrigir credenciais de teste ou criar usuários no Supabase
 3. Adicionar feedback de erros nos modais
 4. Testar fluxo completo após correções

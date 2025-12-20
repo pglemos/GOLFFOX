@@ -157,8 +157,8 @@ export default function EmpresaDashboard() {
       <AppShell user={{ id: user?.id || "", name: user?.name || "Empresa", email: user?.email || "", role: "empresa", avatar_url: (user as any)?.avatar_url }}>
         <div className="min-h-screen flex items-center justify-center p-4">
           <Card className="p-8 max-w-md w-full text-center">
-            <h2 className="text-xl font-bold mb-2 text-red-600">Erro ao carregar</h2>
-            <p className="text-gray-600 mb-4">{tenantError || error}</p>
+            <h2 className="text-xl font-bold mb-2 text-error">Erro ao carregar</h2>
+            <p className="text-ink-muted mb-4">{tenantError || error}</p>
             <Button onClick={() => window.location.reload()} variant="default">
               Tentar Novamente
             </Button>
@@ -174,7 +174,7 @@ export default function EmpresaDashboard() {
         <div className="min-h-screen flex items-center justify-center p-4">
           <Card className="p-8 max-w-md w-full text-center">
             <h2 className="text-xl font-bold mb-2">Nenhuma empresa selecionada</h2>
-            <p className="text-gray-600 mb-4">Aguarde enquanto carregamos suas empresas...</p>
+            <p className="text-ink-muted mb-4">Aguarde enquanto carregamos suas empresas...</p>
             <div className="w-8 h-8 border-2 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
           </Card>
         </div>
@@ -297,7 +297,7 @@ export default function EmpresaDashboard() {
                 "bg-gradient-to-br from-orange-500/10 to-orange-600/10 rounded-lg flex items-center justify-center border border-orange-200/50",
                 isMobile ? "h-48" : "h-64" // Aumentado para alinhar com lista de alertas
               )}>
-                <MapPin className="h-10 w-10 sm:h-12 sm:w-12 text-orange-500 opacity-40" />
+                <MapPin className="h-10 w-10 sm:h-12 sm:w-12 text-brand opacity-40" />
               </div>
             </CardContent>
           </Card>

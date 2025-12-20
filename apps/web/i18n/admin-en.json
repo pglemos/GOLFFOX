@@ -73,7 +73,7 @@
         "actions": {
             "edit": "Edit",
             "delete": "Delete",
-            "createOperator": "Create Operator",
+            "createOperator": "Create operador",
             "viewDetails": "View Details"
         },
         "success": {
@@ -91,10 +91,10 @@
     "transportadoras": {
         "title": "Carriers",
         "subtitle": "Manage carriers and their vehicles",
-        "createButton": "Create Carrier",
+        "createButton": "Create transportadora",
         "loading": "Loading carriers...",
         "noTransportadoras": "No carriers registered",
-        "searchPlaceholder": "Search carrier...",
+        "searchPlaceholder": "Search transportadora...",
         "table": {
             "name": "Name",
             "cnpj": "Tax ID",
@@ -110,15 +110,15 @@
             "manageVehicles": "Manage Vehicles"
         },
         "success": {
-            "created": "Carrier created successfully!",
-            "updated": "Carrier updated successfully!",
-            "deleted": "Carrier deleted successfully!"
+            "created": "transportadora created successfully!",
+            "updated": "transportadora updated successfully!",
+            "deleted": "transportadora deleted successfully!"
         },
         "errors": {
             "loadFailed": "Error loading carriers",
-            "createFailed": "Error creating carrier",
-            "updateFailed": "Error updating carrier",
-            "deleteFailed": "Error deleting carrier"
+            "createFailed": "Error creating transportadora",
+            "updateFailed": "Error updating transportadora",
+            "deleteFailed": "Error deleting transportadora"
         }
     },
     "permissions": {
@@ -134,10 +134,10 @@
         },
         "roles": {
             "admin": "Administrator",
-            "operator": "Operator",
-            "transportadora": "Carrier",
-            "driver": "Driver",
-            "passenger": "Passenger"
+            "operador": "operador",
+            "transportadora": "transportadora",
+            "motorista": "motorista",
+            "passageiro": "passageiro"
         },
         "actions": {
             "changeRole": "Change Role",

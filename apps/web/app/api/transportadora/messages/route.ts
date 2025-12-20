@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
             .from('driver_messages' as any)
             .select(`
                 *,
-                driver:users!driver_id(id, name, phone)
+                motorista:users!driver_id(id, name, phone)
             `)
             .order('created_at', { ascending: false })
             .limit(limit);

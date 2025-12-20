@@ -61,10 +61,10 @@ export async function DELETE(
       // Para outros erros, assumir que o veículo não existe e retornar 400
       debug("Erro ao verificar veículo, assumindo que não existe", { vehicleId, error: checkError }, CONTEXT)
       return NextResponse.json({
-        error: "Vehicle not found",
+        error: "veiculo not found",
         archived: false,
         tripsCount: 0,
-        message: "Vehicle not found"
+        message: "veiculo not found"
       }, { status: 400 })
     }
 
@@ -72,10 +72,10 @@ export async function DELETE(
     if (!existingVehicle) {
       debug("Veículo não encontrado (já foi deletado ou nunca existiu)", { vehicleId }, CONTEXT)
       return NextResponse.json({
-        error: "Vehicle not found",
+        error: "veiculo not found",
         archived: false,
         tripsCount: 0,
-        message: "Vehicle not found"
+        message: "veiculo not found"
       }, { status: 400 })
     }
 
@@ -102,7 +102,7 @@ export async function DELETE(
       }
 
       // Invalidar cache após arquivamento
-      await invalidateEntityCache('vehicle', vehicleId)
+      await invalidateEntityCache('veiculo', vehicleId)
 
       debug("Veículo marcado como inativo devido a viagens associadas", { vehicleId, tripsCount }, CONTEXT)
       return NextResponse.json({ success: true, archived: true, tripsCount: tripsCount ?? 0 }, { status: 200 })
@@ -161,7 +161,7 @@ export async function DELETE(
     }
 
     // Invalidar cache após exclusão
-    await invalidateEntityCache('vehicle', vehicleId)
+    await invalidateEntityCache('veiculo', vehicleId)
 
     debug("Veículo excluído com sucesso", { vehicleId }, CONTEXT)
     return NextResponse.json({ success: true, tripsCount: 0, archived: false }, { status: 200 })
@@ -227,7 +227,7 @@ export async function PATCH(
     }
 
     // Invalidar cache após atualização
-    await invalidateEntityCache('vehicle', vehicleId)
+    await invalidateEntityCache('veiculo', vehicleId)
 
     return NextResponse.json(data, { status: 200 })
   } catch (error: unknown) {

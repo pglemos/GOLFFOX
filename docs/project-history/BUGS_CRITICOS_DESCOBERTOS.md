@@ -62,13 +62,13 @@
 
 **Endpoint Requisitado:**
 ```typescript
-POST /api/admin/create-operator
+POST /api/admin/create-operador
 ```
 
 **Status Backend:**
 ```bash
 ❌ 404 Not Found
-❌ Arquivo apps/web/app/api/admin/create-operator/route.ts NÃO EXISTE
+❌ Arquivo apps/web/app/api/admin/create-operador/route.ts NÃO EXISTE
 ```
 
 **Código do Frontend:**
@@ -301,7 +301,7 @@ Alterar redirect do logout de `/unauthorized` para `/`
   
 - [ ] **Criar `/api/admin/create-operador`**
   ```bash
-  Criar: apps/web/app/api/admin/create-operator/route.ts
+  Criar: apps/web/app/api/admin/create-operador/route.ts
   Implementar: Lógica completa de criação
   Testar: Criar empresa via modal
   ```

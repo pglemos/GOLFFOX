@@ -397,7 +397,7 @@ export function CreateUserModal({
                   id="city"
                   value={formData.address_city}
                   readOnly
-                  className="h-11 bg-gray-50"
+                  className="h-11 bg-bg-soft"
                 />
               </div>
 
@@ -407,13 +407,13 @@ export function CreateUserModal({
                   id="state"
                   value={formData.address_state}
                   readOnly
-                  className="h-11 bg-gray-50"
+                  className="h-11 bg-bg-soft"
                 />
               </div>
             </div>
 
             {error && (
-              <div className="p-3 bg-red-50 border border-red-200 rounded-md text-sm text-red-700 mt-4">
+              <div className="p-3 bg-error-light border border-error-light rounded-md text-sm text-error mt-4">
                 {error}
               </div>
             )}
@@ -432,7 +432,7 @@ export function CreateUserModal({
             <Button
               type="submit"
               disabled={loading}
-              className="w-full sm:w-auto order-1 sm:order-2 bg-orange-500 hover:bg-orange-600 min-h-[44px] text-base font-medium"
+              className="w-full sm:w-auto order-1 sm:order-2 bg-brand hover:bg-orange-600 min-h-[44px] text-base font-medium"
             >
               {loading ? (
                 <>

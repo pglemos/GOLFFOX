@@ -231,7 +231,7 @@ node scripts/test-health-check.js
 CRON_SECRET=xxx node scripts/test-cron-jobs.js
 
 # Reexecutar seed (se necessário)
-node scripts/seed-operator-data.js --companies=auto --routes=12 --employees=40
+node scripts/seed-operador-data.js --companies=auto --routes=12 --employees=40
 
 # Reexecutar branding
 node scripts/seed-company-branding.js --defaults

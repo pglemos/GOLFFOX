@@ -9,7 +9,7 @@ import { notifyError, notifySuccess } from '@/lib/toast'
  */
 export interface UseFileUploadOptions {
     /** Nome do bucket no Supabase Storage */
-    bucket: 'vehicle-documents' | 'motorista-documents' | 'transportadora-documents' | 'company-documents' | 'vehicle-photos' | 'avatars'
+    bucket: 'veiculo-documents' | 'motorista-documents' | 'transportadora-documents' | 'company-documents' | 'veiculo-photos' | 'avatars'
     /** Tamanho máximo em MB (padrão: 10) */
     maxSize?: number
     /** Tipos de arquivo permitidos (padrão: PDF e imagens) */
@@ -73,7 +73,7 @@ const DEFAULT_MAX_SIZE = 10
  * @example
  * ```tsx
  * const { upload, uploading, error } = useFileUpload({
- *   bucket: 'vehicle-documents',
+ *   bucket: 'veiculo-documents',
  *   folder: 'crlv'
  * })
  * 

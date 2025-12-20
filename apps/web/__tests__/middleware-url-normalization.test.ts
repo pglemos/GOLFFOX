@@ -38,29 +38,29 @@ function makeReq(url: string) {
   } as any
 }
 
-describe('proxy operator URL normalization', () => {
+describe('proxy operador URL normalization', () => {
   beforeEach(() => {
     process.env.NODE_ENV = 'test'
     delete process.env.NEXT_PUBLIC_BASE_URL
   })
 
-  test('redirects /operator?company=abc to /operator', async () => {
-    const req = makeReq('http://localhost/operator?company=abc')
+  test('redirects /operador?company=abc to /operador', async () => {
+    const req = makeReq('http://localhost/operador?company=abc')
     const res = await proxy(req)
     expect(res.status).toBeGreaterThanOrEqual(300)
     const location = res.headers.get('location') || res.headers.get('Location')
-    expect(location).toBe('http://localhost/operator')
+    expect(location).toBe('http://localhost/operador')
   })
 
   test('preserves other params while removing company', async () => {
-    const req = makeReq('http://localhost/operator/funcionarios?company=abc&foo=1')
+    const req = makeReq('http://localhost/operador/funcionarios?company=abc&foo=1')
     const res = await proxy(req)
     const location = res.headers.get('location') || res.headers.get('Location')
-    expect(location).toBe('http://localhost/operator/funcionarios?foo=1')
+    expect(location).toBe('http://localhost/operador/funcionarios?foo=1')
   })
 
   test('without company param, no normalization redirect; auth may redirect', async () => {
-    const req = makeReq('http://localhost/operator/funcionarios?search=joao')
+    const req = makeReq('http://localhost/operador/funcionarios?search=joao')
     const res = await proxy(req)
     const location = res.headers.get('location') || ''
     expect(location.includes('/login?next=')).toBe(true)

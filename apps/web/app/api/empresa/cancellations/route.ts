@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
             .from('passenger_cancellations' as any)
             .select(`
                 *,
-                passenger:users!passenger_id(id, name, email, phone)
+                passageiro:users!passenger_id(id, name, email, phone)
             `)
             .order('created_at', { ascending: false })
             .limit(limit);

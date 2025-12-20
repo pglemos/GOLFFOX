@@ -45,7 +45,7 @@ CRON_SECRET=0216de1e4783c9b1f2e2588a9553235c4c4ed3c39f643a69336cc823c9147b73 nod
 ### 2. Testes de Autenticação e Multi-tenant
 
 #### Login
-- [ ] Acessar `/operator`
+- [ ] Acessar `/operador`
 - [ ] Login com credenciais de operador funciona
 - [ ] Redirecionamento após login funciona
 

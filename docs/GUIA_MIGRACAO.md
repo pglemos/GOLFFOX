@@ -23,7 +23,7 @@ Orientar a migração para a estrutura atual do monorepo, garantindo segurança,
    - Atualizar imports conforme novos aliases
 4. Banco de Dados e RLS
    - Validar migrações em `database/migrations/*`
-   - Confirmar políticas RLS essenciais ativas (admin/operator/carrier/driver/passenger)
+   - Confirmar políticas RLS essenciais ativas (admin/operador/transportadora/motorista/passageiro)
 5. Observabilidade e Segurança
    - Cookies `httpOnly`, `secure`, `sameSite=lax` com payload mínimo
    - Rate limiting em endpoints sensíveis (`reports`, `costs`, `auth`)

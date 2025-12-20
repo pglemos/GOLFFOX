@@ -23,15 +23,15 @@ export const ControlTowerCards = memo(function ControlTowerCards({
       label: t('operador', 'control_tower_delays'),
       value: delays,
       icon: AlertCircle,
-      color: 'text-red-500',
-      bgColor: 'bg-red-50',
+      color: 'text-error',
+      bgColor: 'bg-error-light',
       href: '/operador/alertas?type=route_delayed'
     },
     {
       label: t('operador', 'control_tower_stopped'),
       value: stoppedVehicles,
       icon: Truck,
-      color: 'text-orange-500',
+      color: 'text-brand',
       bgColor: 'bg-orange-50',
       href: '/operador/alertas?type=bus_stopped'
     },
@@ -39,16 +39,16 @@ export const ControlTowerCards = memo(function ControlTowerCards({
       label: t('operador', 'control_tower_deviations'),
       value: routeDeviations,
       icon: Route,
-      color: 'text-yellow-500',
-      bgColor: 'bg-yellow-50',
+      color: 'text-warning',
+      bgColor: 'bg-warning-light',
       href: '/operador/alertas?type=deviation'
     },
     {
       label: t('operador', 'control_tower_assistance'),
       value: openAssistance,
       icon: HelpCircle,
-      color: 'text-blue-500',
-      bgColor: 'bg-blue-50',
+      color: 'text-info',
+      bgColor: 'bg-info-light',
       href: '/operador/alertas?type=assistance_open'
     }
   ]
@@ -71,7 +71,7 @@ export const ControlTowerCards = memo(function ControlTowerCards({
                     <card.icon className={`${card.color} h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0`} />
                     <span className={`${card.color} text-xl sm:text-2xl font-bold`}>{card.value}</span>
                   </div>
-                  <p className="text-xs sm:text-sm text-gray-700 font-medium truncate">{card.label}</p>
+                  <p className="text-xs sm:text-sm text-ink-strong font-medium truncate">{card.label}</p>
                 </div>
               </a>
             ) : (
@@ -80,7 +80,7 @@ export const ControlTowerCards = memo(function ControlTowerCards({
                   <card.icon className={`${card.color} h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0`} />
                   <span className={`${card.color} text-xl sm:text-2xl font-bold`}>{card.value}</span>
                 </div>
-                <p className="text-xs sm:text-sm text-gray-700 font-medium truncate">{card.label}</p>
+                <p className="text-xs sm:text-sm text-ink-strong font-medium truncate">{card.label}</p>
               </div>
             )}
           </motion.div>

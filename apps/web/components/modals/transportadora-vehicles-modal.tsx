@@ -14,12 +14,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox"
 
 interface TransportadoraVehiclesModalProps {
-  carrier: { id: string; name: string }
+  transportadora: { id: string; name: string }
   isOpen: boolean
   onClose: () => void
 }
 
-export function TransportadoraVehiclesModal({ carrier, isOpen, onClose }: TransportadoraVehiclesModalProps) {
+export function TransportadoraVehiclesModal({ transportadora, isOpen, onClose }: TransportadoraVehiclesModalProps) {
   const [vehicles, setVehicles] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
   const [activeTab, setActiveTab] = useState("list")
@@ -40,11 +40,11 @@ export function TransportadoraVehiclesModal({ carrier, isOpen, onClose }: Transp
   })
 
   useEffect(() => {
-    if (isOpen && carrier) {
+    if (isOpen && transportadora) {
       loadVehicles()
       setActiveTab("list")
     }
-  }, [isOpen, carrier])
+  }, [isOpen, transportadora])
 
   const loadVehicles = async () => {
     try {
@@ -89,7 +89,7 @@ export function TransportadoraVehiclesModal({ carrier, isOpen, onClose }: Transp
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...formData,
-          transportadora_id: carrier.id,
+          transportadora_id: transportadora.id,
           year: formData.year ? parseInt(formData.year) : null,
           capacity: formData.capacity ? parseInt(formData.capacity) : null
         })
@@ -171,19 +171,19 @@ export function TransportadoraVehiclesModal({ carrier, isOpen, onClose }: Transp
     }
   }
 
-  const handleEditClick = (vehicle: any) => {
-    setEditingVehicle(vehicle)
+  const handleEditClick = (veiculo: any) => {
+    setEditingVehicle(veiculo)
     setFormData({
-      plate: vehicle.plate || "",
-      prefix: vehicle.prefix || "",
-      manufacturer: vehicle.manufacturer || "",
-      model: vehicle.model || "",
-      year: vehicle.year?.toString() || "",
-      capacity: vehicle.capacity?.toString() || "",
-      is_active: vehicle.is_active ?? true,
-      vehicle_type: vehicle.vehicle_type || "bus",
-      renavam: vehicle.renavam || "",
-      chassis: vehicle.chassis || ""
+      plate: veiculo.plate || "",
+      prefix: veiculo.prefix || "",
+      manufacturer: veiculo.manufacturer || "",
+      model: veiculo.model || "",
+      year: veiculo.year?.toString() || "",
+      capacity: veiculo.capacity?.toString() || "",
+      is_active: veiculo.is_active ?? true,
+      vehicle_type: veiculo.vehicle_type || "bus",
+      renavam: veiculo.renavam || "",
+      chassis: veiculo.chassis || ""
     })
     setActiveTab("form")
   }
@@ -222,7 +222,7 @@ export function TransportadoraVehiclesModal({ carrier, isOpen, onClose }: Transp
 
             {!loading && vehicles.length === 0 && (
               <Card className="p-8 text-center">
-                <Truck className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <Truck className="h-12 w-12 text-ink-light mx-auto mb-4" />
                 <p className="text-muted-foreground mb-4">Nenhum veículo associado a esta transportadora</p>
                 <Button onClick={() => setActiveTab("form")}>
                   <Plus className="h-4 w-4 mr-2" />
@@ -233,29 +233,29 @@ export function TransportadoraVehiclesModal({ carrier, isOpen, onClose }: Transp
 
             {!loading && vehicles.length > 0 && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {vehicles.map((vehicle) => (
-                  <Card key={vehicle.id} className="p-4 hover:shadow-md transition-shadow">
+                {vehicles.map((veiculo) => (
+                  <Card key={veiculo.id} className="p-4 hover:shadow-md transition-shadow">
                     <div className="space-y-3">
                       {/* Cabeçalho */}
                       <div className="flex items-start justify-between">
                         <div className="flex items-center gap-2">
                           <Truck className="h-5 w-5 text-brand" />
                           <div>
-                            <h4 className="font-bold text-lg">{vehicle.plate}</h4>
-                            {vehicle.prefix && (
-                              <p className="text-xs text-muted-foreground">Prefixo: {vehicle.prefix}</p>
+                            <h4 className="font-bold text-lg">{veiculo.plate}</h4>
+                            {veiculo.prefix && (
+                              <p className="text-xs text-muted-foreground">Prefixo: {veiculo.prefix}</p>
                             )}
                           </div>
                         </div>
                         <div className="flex flex-col items-end gap-2">
-                          <Badge variant={vehicle.is_active ? "default" : "secondary"}>
-                            {vehicle.is_active ? "Ativo" : "Inativo"}
+                          <Badge variant={veiculo.is_active ? "default" : "secondary"}>
+                            {veiculo.is_active ? "Ativo" : "Inativo"}
                           </Badge>
                           <div className="flex gap-1">
                             <Button
                               size="sm"
                               variant="outline"
-                              onClick={() => handleEditClick(vehicle)}
+                              onClick={() => handleEditClick(veiculo)}
                               className="min-h-[44px] min-w-[44px]"
                             >
                               <Edit className="h-4 w-4" />
@@ -263,7 +263,7 @@ export function TransportadoraVehiclesModal({ carrier, isOpen, onClose }: Transp
                             <Button
                               size="sm"
                               variant="destructive"
-                              onClick={() => handleDeleteVehicle(vehicle.id, vehicle.plate)}
+                              onClick={() => handleDeleteVehicle(veiculo.id, veiculo.plate)}
                               disabled={loading}
                               className="min-h-[44px] min-w-[44px]"
                             >
@@ -275,32 +275,32 @@ export function TransportadoraVehiclesModal({ carrier, isOpen, onClose }: Transp
 
                       {/* Informações do Veículo */}
                       <div className="space-y-2 text-sm">
-                        {vehicle.manufacturer && vehicle.model && (
+                        {veiculo.manufacturer && veiculo.model && (
                           <div className="flex items-center gap-2 text-muted-foreground">
                             <Hash className="h-4 w-4" />
-                            <span>{vehicle.manufacturer} - {vehicle.model}</span>
+                            <span>{veiculo.manufacturer} - {veiculo.model}</span>
                           </div>
                         )}
                         
                         <div className="grid grid-cols-2 gap-2">
-                          {vehicle.year && (
+                          {veiculo.year && (
                             <div className="flex items-center gap-2 text-muted-foreground">
                               <Calendar className="h-4 w-4" />
-                              <span>Ano: {vehicle.year}</span>
+                              <span>Ano: {veiculo.year}</span>
                             </div>
                           )}
                           
-                          {vehicle.capacity && (
+                          {veiculo.capacity && (
                             <div className="flex items-center gap-2 text-muted-foreground">
                               <Capacity className="h-4 w-4" />
-                              <span>{vehicle.capacity} passageiros</span>
+                              <span>{veiculo.capacity} passageiros</span>
                             </div>
                           )}
                         </div>
 
-                        {vehicle.renavam && (
+                        {veiculo.renavam && (
                           <div className="text-xs text-muted-foreground">
-                            RENAVAM: {vehicle.renavam}
+                            RENAVAM: {veiculo.renavam}
                           </div>
                         )}
                       </div>
@@ -438,7 +438,7 @@ export function TransportadoraVehiclesModal({ carrier, isOpen, onClose }: Transp
                 <Button 
                   type="submit" 
                   disabled={loading || !formData.plate}
-                  className="w-full sm:w-auto order-1 sm:order-2 bg-orange-500 hover:bg-orange-600 min-h-[44px] text-base font-medium"
+                  className="w-full sm:w-auto order-1 sm:order-2 bg-brand hover:bg-orange-600 min-h-[44px] text-base font-medium"
                 >
                   {loading ? 'Salvando...' : editingVehicle ? 'Atualizar Veículo' : 'Criar Veículo'}
                 </Button>

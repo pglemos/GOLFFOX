@@ -4,7 +4,7 @@ test.describe('Fluxo do Operador', () => {
   test.beforeEach(async ({ page }) => {
     // Login como operador
     await page.goto('/')
-    await page.fill('input[type="email"]', 'operator@test.com')
+    await page.fill('input[type="email"]', 'operador@test.com')
     await page.fill('input[type="password"]', 'senha123')
     await page.click('button:has-text("Entrar")')
     await page.waitForURL(/\/operador/)

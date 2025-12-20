@@ -45,8 +45,8 @@ O arquivo tinha um erro de sintaxe que impedia a compilação do Next.js, causan
 
 ### ❌ Testes Falhando (8/10) - **Provavelmente devido ao erro de sintaxe que impedia compilação**:
 
-1. **TC002** - Vehicle Deletion (erro 500 no login - servidor não compilou)
-2. **TC004** - Create Operator (erro 500 - servidor não compilou)
+1. **TC002** - veiculo Deletion (erro 500 no login - servidor não compilou)
+2. **TC004** - Create operador (erro 500 - servidor não compilou)
 3. **TC005** - Manual Cost Entry (erro 500 - servidor não compilou)
 4. **TC006** - Create Employee (erro 500 - servidor não compilou - **CORRIGIDO AGORA**)
 5. **TC007** - Optimize Route (erro 500 - servidor não compilou)
@@ -58,12 +58,12 @@ O arquivo tinha um erro de sintaxe que impedia a compilação do Next.js, causan
 
 ## 🔍 Problemas Identificados nos Testes
 
-### 1. TC002 - Vehicle Deletion
+### 1. TC002 - veiculo Deletion
 **Problema:** Teste tenta criar viagem via endpoint `/api/admin/trips` que não existe
 
 **Solução:** O endpoint de criação de veículos já foi corrigido, mas o teste precisa de ajustes ou criação do endpoint de trips.
 
-### 2. TC004 - Create Operator
+### 2. TC004 - Create operador
 **Problema:** Erro 500 - provavelmente relacionado ao servidor não ter recompilado
 
 **Solução:** Reiniciar servidor e testar novamente.

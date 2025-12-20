@@ -5,7 +5,7 @@
     "layout": "web-app/app/layout.tsx - Root layout com Inter font e metadata",
     "globals_css": "web-app/app/globals.css - Sistema completo de design tokens com cores GolfFox (#FF6B00 laranja, #F5F5F7 fundo), radius 20-24px, shadows premium, animações fade-in/slide-in",
     "app_shell": "web-app/components/app-shell.tsx - Container principal que integra Topbar + Sidebar + Main content responsivo",
-    "topbar": "web-app/components/topbar.tsx - Header fixo 64px com logo GOLF FOX + badge 'Admin • Premium', 4 pills navegação (Painel, App Motorista, App Passageiro, Operator Portal), search global, botão Preferências, avatar com dropdown",
+    "topbar": "web-app/components/topbar.tsx - Header fixo 64px com logo GOLF FOX + badge 'Admin • Premium', 4 pills navegação (Painel, App Motorista, App Passageiro, operador Portal), search global, botão Preferências, avatar com dropdown",
     "sidebar": "web-app/components/sidebar.tsx - Sidebar fixa 240px com 11 seções animadas (Dashboard, Mapa, Rotas, Veículos, Motoristas, Empresas, Permissões, Socorro, Alertas, Relatórios, Custos, Ajuda), hover scale + highlight laranja, ativo com barra laranja + bold, stagger animations 0.03s",
     "dashboard": "web-app/app/admin/page.tsx - Hero com gradient sutil, filtros (Empresa, Data, Turno), 4 KPIs cards (Colaboradores, Veículos, Rotas, Alertas), cards Mapa preview + Notificações, atividades recentes, animações motion.div",
     "mapa": "web-app/app/admin/mapa/page.tsx + components/fleet-map.tsx - Google Maps em tela larga, ícones ônibus 4 cores (verde=movimento, amarelo=parado<2min, vermelho=parado>3min, azul=garagem), filtros flutuantes, painel lateral ao clicar veículo, polylines rotas, legendas, realtime Supabase, atualização 10s",

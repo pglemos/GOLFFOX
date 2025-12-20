@@ -329,15 +329,15 @@ export function FinancialDashboardExpanded({
                     transition={{ delay: 0 }}
                 >
                     <Card className="relative overflow-hidden">
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/10 rounded-bl-full" />
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-brand/10 rounded-bl-full" />
                         <CardHeader className="pb-2">
                             <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                                <TrendingDown className="h-4 w-4 text-orange-500" />
+                                <TrendingDown className="h-4 w-4 text-brand" />
                                 Total de Custos
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold text-orange-500">
+                            <div className="text-2xl font-bold text-brand">
                                 <CountUp value={kpis?.totalCosts30d || 0} />
                             </div>
                             <p className="text-xs text-muted-foreground mt-1">
@@ -353,15 +353,15 @@ export function FinancialDashboardExpanded({
                     transition={{ delay: 0.1 }}
                 >
                     <Card className="relative overflow-hidden">
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-green-500/10 rounded-bl-full" />
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-success-light0/10 rounded-bl-full" />
                         <CardHeader className="pb-2">
                             <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                                <TrendingUp className="h-4 w-4 text-green-500" />
+                                <TrendingUp className="h-4 w-4 text-success" />
                                 Total de Receitas
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold text-green-500">
+                            <div className="text-2xl font-bold text-success">
                                 <CountUp value={kpis?.totalRevenues30d || 0} />
                             </div>
                             <p className="text-xs text-muted-foreground mt-1">
@@ -377,19 +377,19 @@ export function FinancialDashboardExpanded({
                     transition={{ delay: 0.2 }}
                 >
                     <Card className="relative overflow-hidden">
-                        <div className={`absolute top-0 right-0 w-32 h-32 ${(kpis?.margin30d || 0) >= 0 ? 'bg-blue-500/10' : 'bg-red-500/10'} rounded-bl-full`} />
+                        <div className={`absolute top-0 right-0 w-32 h-32 ${(kpis?.margin30d || 0) >= 0 ? 'bg-info-light0/10' : 'bg-error-light0/10'} rounded-bl-full`} />
                         <CardHeader className="pb-2">
                             <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                                 {(kpis?.margin30d || 0) >= 0 ? (
-                                    <TrendingUp className="h-4 w-4 text-blue-500" />
+                                    <TrendingUp className="h-4 w-4 text-info" />
                                 ) : (
-                                    <TrendingDown className="h-4 w-4 text-red-500" />
+                                    <TrendingDown className="h-4 w-4 text-error" />
                                 )}
                                 Margem
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <div className={`text-2xl font-bold ${(kpis?.margin30d || 0) >= 0 ? 'text-blue-500' : 'text-red-500'}`}>
+                            <div className={`text-2xl font-bold ${(kpis?.margin30d || 0) >= 0 ? 'text-info' : 'text-error'}`}>
                                 <CountUp value={Math.abs(kpis?.margin30d || 0)} prefix={(kpis?.margin30d || 0) < 0 ? '-' : ''} />
                             </div>
                             <p className="text-xs text-muted-foreground mt-1">
@@ -556,7 +556,7 @@ export function FinancialDashboardExpanded({
                                                 </div>
                                             </div>
                                             <div className="flex items-center gap-2">
-                                                <span className="font-semibold text-orange-500">
+                                                <span className="font-semibold text-brand">
                                                     {formatCurrency(cost.amount)}
                                                 </span>
                                                 <ChevronRight className="h-4 w-4 text-muted-foreground" />
@@ -606,7 +606,7 @@ export function FinancialDashboardExpanded({
                                                 </p>
                                             </div>
                                             <div className="flex items-center gap-2">
-                                                <span className="font-semibold text-green-500">
+                                                <span className="font-semibold text-success">
                                                     {formatCurrency(revenue.amount)}
                                                 </span>
                                                 <ChevronRight className="h-4 w-4 text-muted-foreground" />

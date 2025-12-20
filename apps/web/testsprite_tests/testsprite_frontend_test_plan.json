@@ -2,7 +2,7 @@
   {
     "id": "TC001",
     "title": "Login Success for All User Roles",
-    "description": "Check that users with valid credentials can successfully authenticate and are redirected to the correct dashboard or mobile app area based on their role (admin, company, carrier, driver, passenger).",
+    "description": "Check that users with valid credentials can successfully authenticate and are redirected to the correct dashboard or mobile app area based on their role (admin, company, transportadora, motorista, passageiro).",
     "category": "functional",
     "priority": "High",
     "steps": [
@@ -40,11 +40,11 @@
       },
       {
         "type": "action",
-        "description": "Repeat login with valid carrier user credentials"
+        "description": "Repeat login with valid transportadora user credentials"
       },
       {
         "type": "assertion",
-        "description": "Verify carrier user is authenticated and redirected to /transportadora panel"
+        "description": "Verify transportadora user is authenticated and redirected to /transportadora panel"
       },
       {
         "type": "action",
@@ -52,11 +52,11 @@
       },
       {
         "type": "action",
-        "description": "Repeat login with valid driver user credentials"
+        "description": "Repeat login with valid motorista user credentials"
       },
       {
         "type": "assertion",
-        "description": "Verify driver user is authenticated and redirected to mobile driver app"
+        "description": "Verify motorista user is authenticated and redirected to mobile motorista app"
       },
       {
         "type": "action",
@@ -64,11 +64,11 @@
       },
       {
         "type": "action",
-        "description": "Repeat login with valid passenger user credentials"
+        "description": "Repeat login with valid passageiro user credentials"
       },
       {
         "type": "assertion",
-        "description": "Verify passenger user is authenticated and redirected to mobile passenger app"
+        "description": "Verify passageiro user is authenticated and redirected to mobile passageiro app"
       }
     ]
   },
@@ -130,14 +130,14 @@
       },
       {
         "type": "action",
-        "description": "Repeat above steps with driver user attempting access to company and admin routes"
+        "description": "Repeat above steps with motorista user attempting access to company and admin routes"
       }
     ]
   },
   {
     "id": "TC004",
     "title": "Real-time Fleet Tracking Updates",
-    "description": "Verify real-time retrieval and display of GPS locations updates for vehicles and routes on admin and carrier dashboards within 1 second delay.",
+    "description": "Verify real-time retrieval and display of GPS locations updates for vehicles and routes on admin and transportadora dashboards within 1 second delay.",
     "category": "functional",
     "priority": "High",
     "steps": [
@@ -151,15 +151,15 @@
       },
       {
         "type": "action",
-        "description": "Simulate vehicle location updates via Supabase subscription"
+        "description": "Simulate veiculo location updates via Supabase subscription"
       },
       {
         "type": "assertion",
-        "description": "Verify map updates vehicle locations on screen within 1 second after update is pushed"
+        "description": "Verify map updates veiculo locations on screen within 1 second after update is pushed"
       },
       {
         "type": "action",
-        "description": "Repeat the test logged in as carrier user on the carrier panel"
+        "description": "Repeat the test logged in as transportadora user on the transportadora panel"
       }
     ]
   },
@@ -217,7 +217,7 @@
       },
       {
         "type": "action",
-        "description": "Simulate a route deviation event from a vehicle"
+        "description": "Simulate a route deviation event from a veiculo"
       },
       {
         "type": "assertion",
@@ -225,28 +225,28 @@
       },
       {
         "type": "assertion",
-        "description": "Verify notification is sent to the admin and carrier panels"
+        "description": "Verify notification is sent to the admin and transportadora panels"
       },
       {
         "type": "action",
-        "description": "Trigger an emergency assistance request from driver app"
+        "description": "Trigger an emergency assistance request from motorista app"
       },
       {
         "type": "assertion",
-        "description": "Verify emergency alert is dispatched and communication channel is opened between driver and admin"
+        "description": "Verify emergency alert is dispatched and communication channel is opened between motorista and admin"
       }
     ]
   },
   {
     "id": "TC007",
     "title": "Mobile App Checklist and Boarding via QR/NFC",
-    "description": "Test driver and passenger mobile app flows for completing checklists, scanning QR/NFC codes for embarkation, including offline fallback functionality.",
+    "description": "Test motorista and passageiro mobile app flows for completing checklists, scanning QR/NFC codes for embarkation, including offline fallback functionality.",
     "category": "functional",
     "priority": "High",
     "steps": [
       {
         "type": "action",
-        "description": "Login to driver mobile app"
+        "description": "Login to motorista mobile app"
       },
       {
         "type": "action",
@@ -258,11 +258,11 @@
       },
       {
         "type": "action",
-        "description": "Scan passenger QR code for embarkation"
+        "description": "Scan passageiro QR code for embarkation"
       },
       {
         "type": "assertion",
-        "description": "Verify passenger boarding is recorded successfully"
+        "description": "Verify passageiro boarding is recorded successfully"
       },
       {
         "type": "action",

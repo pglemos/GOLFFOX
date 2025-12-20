@@ -124,7 +124,7 @@ export function AccessibilityControls({
       animate={{ scale: 1, opacity: 1 }}
       exit={{ scale: 0, opacity: 0 }}
     >
-      <Card className={`${isMobile ? 'w-80' : 'w-96'} shadow-lg border-2 border-blue-200`}>
+      <Card className={`${isMobile ? 'w-80' : 'w-96'} shadow-lg border-2 border-info-light`}>
         <CardHeader className="pb-2">
           <div className="flex items-center justify-between">
             <CardTitle className="text-sm flex items-center gap-2">
@@ -286,16 +286,16 @@ export function AccessibilityControls({
                 <Separator />
 
                 {/* Keyboard Shortcuts Info */}
-                <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded text-xs">
-                  <div className="font-medium text-blue-800 dark:text-blue-200 mb-2 flex items-center gap-1">
+                <div className="bg-info-light dark:bg-blue-900/20 p-3 rounded text-xs">
+                  <div className="font-medium text-info dark:text-blue-200 mb-2 flex items-center gap-1">
                     <Info className="w-3 h-3" />
                     Atalhos de Teclado
                   </div>
-                  <div className="text-blue-700 dark:text-blue-300 space-y-1">
-                    <div><kbd className="bg-blue-100 dark:bg-blue-800 px-1 rounded">Alt + S</kbd> - Pular para conteúdo</div>
-                    <div><kbd className="bg-blue-100 dark:bg-blue-800 px-1 rounded">Alt + H</kbd> - Alto contraste</div>
-                    <div><kbd className="bg-blue-100 dark:bg-blue-800 px-1 rounded">Esc</kbd> - Fechar modais</div>
-                    <div><kbd className="bg-blue-100 dark:bg-blue-800 px-1 rounded">Tab</kbd> - Navegar elementos</div>
+                  <div className="text-info dark:text-blue-300 space-y-1">
+                    <div><kbd className="bg-info-light dark:bg-blue-800 px-1 rounded">Alt + S</kbd> - Pular para conteúdo</div>
+                    <div><kbd className="bg-info-light dark:bg-blue-800 px-1 rounded">Alt + H</kbd> - Alto contraste</div>
+                    <div><kbd className="bg-info-light dark:bg-blue-800 px-1 rounded">Esc</kbd> - Fechar modais</div>
+                    <div><kbd className="bg-info-light dark:bg-blue-800 px-1 rounded">Tab</kbd> - Navegar elementos</div>
                   </div>
                 </div>
 

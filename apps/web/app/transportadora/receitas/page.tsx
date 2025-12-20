@@ -117,7 +117,7 @@ export default function ReceitasPage() {
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div>
                         <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-2">
-                            <DollarSign className="h-7 w-7 text-green-600" />
+                            <DollarSign className="h-7 w-7 text-success" />
                             Receitas e Repasses
                         </h1>
                         <p className="text-sm text-muted-foreground mt-1">
@@ -131,13 +131,13 @@ export default function ReceitasPage() {
                 </div>
 
                 {/* KPI */}
-                <Card className="bg-green-50 border-green-200">
+                <Card className="bg-success-light border-green-200">
                     <CardContent className="pt-6">
                         <div className="flex items-center gap-4">
-                            <ArrowUpRight className="h-10 w-10 text-green-600" />
+                            <ArrowUpRight className="h-10 w-10 text-success" />
                             <div>
-                                <p className="text-sm text-green-700">Total de Receitas</p>
-                                <p className="text-3xl font-bold text-green-800">{formatCurrency(totalRevenue)}</p>
+                                <p className="text-sm text-success">Total de Receitas</p>
+                                <p className="text-3xl font-bold text-success">{formatCurrency(totalRevenue)}</p>
                             </div>
                         </div>
                     </CardContent>
@@ -170,7 +170,7 @@ export default function ReceitasPage() {
                                     </div>
                                     <div className="flex items-center gap-3">
                                         <Badge variant="outline">{typeLabels[r.type]}</Badge>
-                                        <p className="text-lg font-bold text-green-600">{formatCurrency(r.amount)}</p>
+                                        <p className="text-lg font-bold text-success">{formatCurrency(r.amount)}</p>
                                     </div>
                                 </CardContent>
                             </Card>

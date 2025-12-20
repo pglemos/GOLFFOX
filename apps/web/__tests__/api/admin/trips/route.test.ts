@@ -28,8 +28,8 @@ describe('GET /api/admin/trips', () => {
 
   it('deve listar viagens', async () => {
     const trips = [
-      createTestTrip('route-1', 'vehicle-1', 'driver-1'),
-      createTestTrip('route-2', 'vehicle-2', 'driver-2'),
+      createTestTrip('route-1', 'veiculo-1', 'motorista-1'),
+      createTestTrip('route-2', 'veiculo-2', 'motorista-2'),
     ]
     mockSupabaseClient.setTableData('trips', trips)
 
@@ -46,12 +46,12 @@ describe('GET /api/admin/trips', () => {
   })
 
   it('deve filtrar por vehicle_id', async () => {
-    const trip = createTestTrip('route-1', 'vehicle-1', 'driver-1')
+    const trip = createTestTrip('route-1', 'veiculo-1', 'motorista-1')
     mockSupabaseClient.setTableData('trips', [trip])
 
     const req = createAdminRequest({
       method: 'GET',
-      url: 'http://localhost:3000/api/admin/trips?vehicle_id=vehicle-1',
+      url: 'http://localhost:3000/api/admin/trips?vehicle_id=veiculo-1',
     }) as NextRequest
 
     const response = await GET(req)
@@ -62,7 +62,7 @@ describe('GET /api/admin/trips', () => {
   })
 
   it('deve filtrar por route_id', async () => {
-    const trip = createTestTrip('route-1', 'vehicle-1', 'driver-1')
+    const trip = createTestTrip('route-1', 'veiculo-1', 'motorista-1')
     mockSupabaseClient.setTableData('trips', [trip])
 
     const req = createAdminRequest({
@@ -78,7 +78,7 @@ describe('GET /api/admin/trips', () => {
   })
 
   it('deve filtrar por status', async () => {
-    const trip = createTestTrip('route-1', 'vehicle-1', 'driver-1', { status: 'completed' })
+    const trip = createTestTrip('route-1', 'veiculo-1', 'motorista-1', { status: 'completed' })
     mockSupabaseClient.setTableData('trips', [trip])
 
     const req = createAdminRequest({
@@ -94,7 +94,7 @@ describe('GET /api/admin/trips', () => {
   })
 
   it('deve filtrar por data', async () => {
-    const trip = createTestTrip('route-1', 'vehicle-1', 'driver-1')
+    const trip = createTestTrip('route-1', 'veiculo-1', 'motorista-1')
     mockSupabaseClient.setTableData('trips', [trip])
 
     const req = createAdminRequest({
@@ -129,8 +129,8 @@ describe('POST /api/admin/trips', () => {
       method: 'POST',
       body: {
         route_id: route.id,
-        vehicle_id: 'vehicle-1',
-        driver_id: 'driver-1',
+        vehicle_id: 'veiculo-1',
+        driver_id: 'motorista-1',
         scheduled_date: '2024-01-15',
         status: 'scheduled',
       },
@@ -147,7 +147,7 @@ describe('POST /api/admin/trips', () => {
     const req = createAdminRequest({
       method: 'POST',
       body: {
-        vehicle_id: 'vehicle-1',
+        vehicle_id: 'veiculo-1',
       },
     }) as NextRequest
 

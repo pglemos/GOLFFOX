@@ -51,7 +51,7 @@ export default function SatisfacaoPage() {
         return Array.from({ length: 5 }).map((_, i) => (
             <Star
                 key={i}
-                className={`h-5 w-5 ${i < Math.round(rating) ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`}
+                className={`h-5 w-5 ${i < Math.round(rating) ? 'fill-yellow-400 text-yellow-400' : 'text-ink-light'}`}
             />
         ))
     }
@@ -63,7 +63,7 @@ export default function SatisfacaoPage() {
             <div className="p-4 sm:p-6 lg:p-8 space-y-6">
                 <div>
                     <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-2">
-                        <Star className="h-7 w-7 text-yellow-500" />
+                        <Star className="h-7 w-7 text-warning" />
                         Indicadores de Satisfação
                     </h1>
                     <p className="text-sm text-muted-foreground mt-1">
@@ -86,9 +86,9 @@ export default function SatisfacaoPage() {
                     <Card>
                         <CardContent className="pt-6">
                             <div className="flex items-center gap-2">
-                                <ThumbsUp className="h-8 w-8 text-green-600" />
+                                <ThumbsUp className="h-8 w-8 text-success" />
                                 <div>
-                                    <p className="text-2xl font-bold text-green-600">{data.positive_percent}%</p>
+                                    <p className="text-2xl font-bold text-success">{data.positive_percent}%</p>
                                     <p className="text-sm text-muted-foreground">Positivos</p>
                                 </div>
                             </div>
@@ -98,9 +98,9 @@ export default function SatisfacaoPage() {
                     <Card>
                         <CardContent className="pt-6">
                             <div className="flex items-center gap-2">
-                                <TrendingUp className="h-8 w-8 text-blue-600" />
+                                <TrendingUp className="h-8 w-8 text-info" />
                                 <div>
-                                    <p className="text-2xl font-bold text-blue-600">{data.nps_score}</p>
+                                    <p className="text-2xl font-bold text-info">{data.nps_score}</p>
                                     <p className="text-sm text-muted-foreground">NPS Score</p>
                                 </div>
                             </div>

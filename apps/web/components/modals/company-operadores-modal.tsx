@@ -15,7 +15,7 @@ import { Label } from "@/components/ui/label"
 import { Users, Plus, Edit, Trash2, Loader2 } from "lucide-react"
 import { notifySuccess, notifyError } from "@/lib/toast"
 import { globalSyncManager } from "@/lib/global-sync"
-import { CreateUserModal } from "./create-operator-login-modal"
+import { CreateUserModal } from "./create-operador-login-modal"
 import { EditUserModal } from "./edit-user-modal"
 
 interface Company {
@@ -23,7 +23,7 @@ interface Company {
   name: string
 }
 
-interface Operator {
+interface operador {
   id: string
   name: string | null
   email: string
@@ -47,9 +47,9 @@ export function CompanyUsersModal({
   onSave,
 }: CompanyUsersModalProps) {
   const [loading, setLoading] = useState(false)
-  const [operators, setOperators] = useState<Operator[]>([])
+  const [operators, setOperators] = useState<operador[]>([])
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
-  const [selectedOperatorForEdit, setSelectedOperatorForEdit] = useState<Operator | null>(null)
+  const [selectedOperatorForEdit, setSelectedOperatorForEdit] = useState<operador | null>(null)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   useEffect(() => {
     if (company && isOpen) {
@@ -146,7 +146,7 @@ export function CompanyUsersModal({
               </div>
             ) : operators.length === 0 ? (
               <div className="text-center py-12">
-                <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <Users className="h-12 w-12 text-ink-light mx-auto mb-4" />
                 <h3 className="text-lg font-medium mb-2">Nenhum login cadastrado</h3>
                 <p className="text-sm text-ink-muted mb-4">
                   Clique em &quot;Criar Novo Login&quot; para adicionar um acesso
@@ -154,9 +154,9 @@ export function CompanyUsersModal({
               </div>
             ) : (
               <div className="space-y-3">
-                {operators.map((operator) => (
+                {operators.map((operador) => (
                   <div
-                    key={operator.id}
+                    key={operador.id}
                     className="border border-border rounded-lg p-3 sm:p-4 hover:bg-bg-hover transition-colors bg-card"
                   >
                     <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
@@ -168,11 +168,11 @@ export function CompanyUsersModal({
                           <div className="flex items-center gap-1.5 shrink-0">
                             <span className={`px-1.5 py-0.5 rounded text-[10px] sm:text-xs font-medium uppercase tracking-wide border ${operador.is_active
                               ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                              : 'bg-gray-50 text-gray-600 border-gray-200'
+                              : 'bg-bg-soft text-ink-muted border-border-light'
                               }`}>
                               {operador.is_active ? 'Ativo' : 'Inativo'}
                             </span>
-                            <span className="px-1.5 py-0.5 rounded text-[10px] sm:text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200 uppercase tracking-wide">
+                            <span className="px-1.5 py-0.5 rounded text-[10px] sm:text-xs font-medium bg-info-light text-info border border-info-light uppercase tracking-wide">
                               {operador.role || 'Sem papel'}
                             </span>
                           </div>
@@ -183,13 +183,13 @@ export function CompanyUsersModal({
                             <span className="text-ink-light text-xs font-medium uppercase tracking-wider w-12 shrink-0">Email:</span>
                             <span className="font-mono text-xs sm:text-sm truncate" title={operador.email}>{operador.email}</span>
                           </div>
-                          {operator.cpf && (
+                          {operador.cpf && (
                             <div className="flex items-center gap-2">
                               <span className="text-ink-light text-xs font-medium uppercase tracking-wider w-12 shrink-0">CPF:</span>
                               <span className="font-mono text-xs sm:text-sm">{operador.cpf}</span>
                             </div>
                           )}
-                          {operator.phone && (
+                          {operador.phone && (
                             <div className="flex items-center gap-2">
                               <span className="text-ink-light text-xs font-medium uppercase tracking-wider w-12 shrink-0">Tel:</span>
                               <span className="font-mono text-xs sm:text-sm">{operador.phone}</span>
@@ -203,7 +203,7 @@ export function CompanyUsersModal({
                           variant="outline"
                           size="sm"
                           onClick={() => {
-                            setSelectedOperatorForEdit(operator)
+                            setSelectedOperatorForEdit(operador)
                             setIsEditModalOpen(true)
                           }}
                           className="flex-1 sm:flex-none h-8 sm:h-9 text-xs"
@@ -214,7 +214,7 @@ export function CompanyUsersModal({
                         <Button
                           variant="destructive"
                           size="sm"
-                          onClick={() => handleDeleteOperator(operator.id, operator.name || operator.email)}
+                          onClick={() => handleDeleteOperator(operador.id, operador.name || operador.email)}
                           className="flex-1 sm:flex-none h-8 sm:h-9 text-xs"
                         >
                           <Trash2 className="h-3.5 w-3.5 mr-1.5" />

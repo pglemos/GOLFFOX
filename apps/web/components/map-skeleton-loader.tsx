@@ -46,7 +46,7 @@ export function MapSkeletonLoader({ className = '' }: MapSkeletonLoaderProps) {
 
       {/* Mapa skeleton */}
       <Card className="overflow-hidden">
-        <div className="h-96 bg-gray-100 relative">
+        <div className="h-96 bg-muted relative">
           {/* Simulação de mapa com gradiente animado */}
           <motion.div
             className="absolute inset-0 bg-gradient-to-br from-blue-50 via-green-50 to-blue-50"
@@ -97,11 +97,11 @@ export function MapSkeletonLoader({ className = '' }: MapSkeletonLoaderProps) {
           <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-80">
             <div className="text-center">
               <motion.div
-                className="w-8 h-8 border-4 border-blue-200 border-t-blue-600 rounded-full mx-auto mb-4"
+                className="w-8 h-8 border-4 border-info-light border-t-blue-600 rounded-full mx-auto mb-4"
                 animate={{ rotate: 360 }}
                 transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
               />
-              <p className="text-sm text-gray-600 font-medium">
+              <p className="text-sm text-ink-muted font-medium">
                 Carregando mapa...
               </p>
             </div>
@@ -127,7 +127,7 @@ export function MapSkeletonLoader({ className = '' }: MapSkeletonLoaderProps) {
           <div className="relative">
             <Skeleton className="h-2 w-full rounded-full" />
             <motion.div
-              className="absolute top-1/2 w-4 h-4 bg-gray-300 rounded-full transform -translate-y-1/2"
+              className="absolute top-1/2 w-4 h-4 bg-muted rounded-full transform -translate-y-1/2"
               animate={{ left: ['0%', '100%', '0%'] }}
               transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
             />
@@ -153,7 +153,7 @@ export function MapSkeletonLoader({ className = '' }: MapSkeletonLoaderProps) {
 
           {/* Informações da parada atual */}
           <motion.div
-            className="p-3 bg-gray-50 rounded-lg border"
+            className="p-3 bg-bg-soft rounded-lg border"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5 }}

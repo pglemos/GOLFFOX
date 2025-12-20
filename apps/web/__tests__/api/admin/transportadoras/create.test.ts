@@ -65,7 +65,7 @@ describe('POST /api/admin/transportadoras/create', () => {
 
     expect(response.status).toBe(200)
     expect(data.success).toBe(true)
-    expect(data.carrier).toMatchObject({
+    expect(data.transportadora).toMatchObject({
       name: transportadoraData.name,
       cnpj: transportadoraData.cnpj,
       email: transportadoraData.email,

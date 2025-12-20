@@ -9,7 +9,7 @@
 - ✅ Company `11111111-1111-4111-8111-1111111111c1` (Acme Corp) existe
 - ✅ **10 funcionários ativos** neste company
 - ✅ RLS configurado (5 políticas)
-- ✅ Usuário operator configurado
+- ✅ Usuário operador configurado
 
 #### 2. **Frontend Corrigido** ✅
 - ✅ Adicionado logs de debug no console

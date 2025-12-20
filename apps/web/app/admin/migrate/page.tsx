@@ -142,17 +142,17 @@ export default function MigratePage() {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: i * 0.05 }}
                     className={`p-3 rounded-lg flex items-center gap-2 ${
-                      r.status === "exists" ? "bg-green-50 text-green-800 border border-green-200" :
-                      r.status === "needs_creation" ? "bg-yellow-50 text-yellow-800 border border-yellow-200" :
-                      "bg-red-50 text-red-800 border border-red-200"
+                      r.status === "exists" ? "bg-success-light text-success border border-green-200" :
+                      r.status === "needs_creation" ? "bg-warning-light text-warning border border-yellow-200" :
+                      "bg-error-light text-error border border-error-light"
                     }`}
                   >
                     {r.status === "exists" ? (
-                      <CheckCircle className="h-4 w-4 text-green-600" />
+                      <CheckCircle className="h-4 w-4 text-success" />
                     ) : r.status === "needs_creation" ? (
-                      <AlertCircle className="h-4 w-4 text-yellow-600" />
+                      <AlertCircle className="h-4 w-4 text-warning" />
                     ) : (
-                      <AlertCircle className="h-4 w-4 text-red-600" />
+                      <AlertCircle className="h-4 w-4 text-error" />
                     )}
                     <span className="font-medium">{r.table}.{r.column}</span>
                     <span className="ml-auto">
@@ -179,13 +179,13 @@ export default function MigratePage() {
             </Button>
           </div>
 
-          <pre className="bg-gray-900 text-green-400 p-4 rounded-lg overflow-x-auto text-sm whitespace-pre-wrap">
+          <pre className="bg-ink-strong text-green-400 p-4 rounded-lg overflow-x-auto text-sm whitespace-pre-wrap">
             {MIGRATION_SQL}
           </pre>
 
-          <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-            <h3 className="font-semibold text-blue-800 mb-2">📌 Instruções:</h3>
-            <ol className="list-decimal list-inside text-blue-700 space-y-2">
+          <div className="mt-6 p-4 bg-info-light border border-info-light rounded-lg">
+            <h3 className="font-semibold text-info mb-2">📌 Instruções:</h3>
+            <ol className="list-decimal list-inside text-info space-y-2">
               <li>Clique em "Copiar SQL" acima</li>
               <li>Clique em "Abrir Supabase Dashboard"</li>
               <li>Cole o SQL no editor</li>

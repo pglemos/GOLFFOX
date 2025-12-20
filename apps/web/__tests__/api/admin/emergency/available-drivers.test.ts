@@ -18,8 +18,8 @@ describe('GET /api/admin/emergency/available-drivers', () => {
 
   it('deve listar motoristas disponíveis', async () => {
     const drivers = [
-      createTestUser({ role: 'driver', is_active: true, name: 'Motorista 1' }),
-      createTestUser({ role: 'driver', is_active: true, name: 'Motorista 2' }),
+      createTestUser({ role: 'motorista', is_active: true, name: 'Motorista 1' }),
+      createTestUser({ role: 'motorista', is_active: true, name: 'Motorista 2' }),
     ]
     mockSupabaseClient.setTableData('users', drivers)
     mockSupabaseClient.setTableData('trips', [])
@@ -38,8 +38,8 @@ describe('GET /api/admin/emergency/available-drivers', () => {
   })
 
   it('deve filtrar motoristas ocupados', async () => {
-    const availableDriver = createTestUser({ role: 'driver', is_active: true, name: 'Disponível' })
-    const occupiedDriver = createTestUser({ role: 'driver', is_active: true, name: 'Ocupado' })
+    const availableDriver = createTestUser({ role: 'motorista', is_active: true, name: 'Disponível' })
+    const occupiedDriver = createTestUser({ role: 'motorista', is_active: true, name: 'Ocupado' })
     
     mockSupabaseClient.setTableData('users', [availableDriver, occupiedDriver])
     mockSupabaseClient.setTableData('trips', [
@@ -61,8 +61,8 @@ describe('GET /api/admin/emergency/available-drivers', () => {
   })
 
   it('deve retornar apenas motoristas ativos', async () => {
-    const activeDriver = createTestUser({ role: 'driver', is_active: true })
-    const inactiveDriver = createTestUser({ role: 'driver', is_active: false })
+    const activeDriver = createTestUser({ role: 'motorista', is_active: true })
+    const inactiveDriver = createTestUser({ role: 'motorista', is_active: false })
     
     mockSupabaseClient.setTableData('users', [activeDriver, inactiveDriver])
     mockSupabaseClient.setTableData('trips', [])

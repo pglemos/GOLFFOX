@@ -113,7 +113,7 @@ describe('RealtimeService', () => {
           setTimeout(() => {
             handler({
               new: {
-                vehicle_id: 'vehicle-1',
+                vehicle_id: 'veiculo-1',
                 trip_id: 'trip-1',
                 lat: -19.916681,
                 lng: -43.934493,
@@ -130,7 +130,7 @@ describe('RealtimeService', () => {
             single: jest.fn(() =>
               Promise.resolve({
                 data: {
-                  vehicle_id: 'vehicle-1',
+                  vehicle_id: 'veiculo-1',
                   lat: -19.916681,
                   lng: -43.934493,
                   speed: 10,
@@ -168,8 +168,8 @@ describe('RealtimeService', () => {
               new: {
                 id: 'trip-1',
                 route_id: 'route-1',
-                vehicle_id: 'vehicle-1',
-                driver_id: 'driver-1',
+                vehicle_id: 'veiculo-1',
+                driver_id: 'motorista-1',
                 status: 'completed',
               },
             })
@@ -214,7 +214,7 @@ describe('RealtimeService', () => {
                 id: 'incident-1',
                 company_id: 'company-1',
                 route_id: 'route-1',
-                vehicle_id: 'vehicle-1',
+                vehicle_id: 'veiculo-1',
                 severity: 'high',
                 description: 'Test incident',
                 created_at: new Date().toISOString(),
@@ -291,9 +291,9 @@ describe('RealtimeService', () => {
                       heading: 90,
                       timestamp: new Date().toISOString(),
                       trips: {
-                        vehicle_id: 'vehicle-1',
+                        vehicle_id: 'veiculo-1',
                         route_id: 'route-1',
-                        driver_id: 'driver-1',
+                        driver_id: 'motorista-1',
                         status: 'inProgress',
                       },
                     },
@@ -368,8 +368,8 @@ describe('RealtimeService', () => {
               new: {
                 id: 'trip-1',
                 route_id: 'route-1',
-                vehicle_id: 'vehicle-1',
-                driver_id: 'driver-1',
+                vehicle_id: 'veiculo-1',
+                driver_id: 'motorista-1',
                 status: 'inProgress',
               },
             })
@@ -379,8 +379,8 @@ describe('RealtimeService', () => {
               new: {
                 id: 'trip-1',
                 route_id: 'route-1',
-                vehicle_id: 'vehicle-1',
-                driver_id: 'driver-1',
+                vehicle_id: 'veiculo-1',
+                driver_id: 'motorista-1',
                 status: 'completed',
               },
             })
@@ -409,9 +409,9 @@ describe('RealtimeService', () => {
 
       const tripData = {
         id: 'trip-1',
-        vehicle_id: 'vehicle-1',
+        vehicle_id: 'veiculo-1',
         route_id: 'route-1',
-        driver_id: 'driver-1',
+        driver_id: 'motorista-1',
         status: 'inProgress',
       }
 
@@ -525,9 +525,9 @@ describe('RealtimeService', () => {
               Promise.resolve({
                 data: {
                   id: 'trip-1',
-                  vehicle_id: 'vehicle-1',
+                  vehicle_id: 'veiculo-1',
                   route_id: 'route-1',
-                  driver_id: 'driver-1',
+                  driver_id: 'motorista-1',
                   status: 'inProgress',
                 },
                 error: null,

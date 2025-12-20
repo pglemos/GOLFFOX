@@ -22,7 +22,7 @@ interface StopInfo {
   address: string
   scheduledTime: string
   type: 'pickup' | 'dropoff'
-  passenger: PassengerInfo
+  passageiro: PassengerInfo
   coordinates: { lat: number; lng: number }
 }
 
@@ -40,8 +40,8 @@ const passengerTypeIcons = {
 }
 
 const passengerTypeColors = {
-  student: 'bg-blue-100 text-blue-800',
-  employee: 'bg-green-100 text-green-800',
+  student: 'bg-info-light text-info',
+  employee: 'bg-success-light text-success',
   visitor: 'bg-purple-100 text-purple-800'
 }
 
@@ -114,37 +114,37 @@ export function AdvancedTooltip({ stop, isVisible, position, onClose: _onClose }
             <CardContent className="p-4 space-y-3">
               {/* Header com foto e informações básicas */}
               <div className="flex items-start gap-3">
-                <Avatar className="w-10 h-10 border-2 border-gray-200">
+                <Avatar className="w-10 h-10 border-2 border-border-light">
                   <AvatarImage 
-                    src={stop.passenger.photo} 
-                    alt={stop.passenger.name}
+                    src={stop.passageiro.photo} 
+                    alt={stop.passageiro.name}
                   />
-                  <AvatarFallback className="bg-gray-100 text-gray-600 text-sm font-medium">
+                  <AvatarFallback className="bg-muted text-ink-muted text-sm font-medium">
                     {stop.passageiro.name.split(' ').map(n => n[0]).join('').substring(0, 2)}
                   </AvatarFallback>
                 </Avatar>
                 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between">
-                    <h3 className="font-semibold text-gray-900 truncate">
-                      {stop.passenger.name}
+                    <h3 className="font-semibold text-ink-strong truncate">
+                      {stop.passageiro.name}
                     </h3>
                     <div className="flex items-center gap-1">
                       <span className="text-lg" role="img" aria-label={stop.passageiro.type}>
-                        {passengerTypeIcons[stop.passenger.type]}
+                        {passengerTypeIcons[stop.passageiro.type]}
                       </span>
                       <Badge 
                         variant="secondary" 
                         className={`text-xs ${passengerTypeColors[stop.passageiro.type]}`}
                       >
-                        {stop.passenger.type}
+                        {stop.passageiro.type}
                       </Badge>
                     </div>
                   </div>
                   
                   <div className="flex items-center gap-1 mt-1">
-                    <Clock className="w-3 h-3 text-gray-500" />
-                    <span className="text-sm text-gray-600 font-mono">
+                    <Clock className="w-3 h-3 text-ink-muted" />
+                    <span className="text-sm text-ink-muted font-mono">
                       {formatTime(stop.scheduledTime)}
                     </span>
                     <Badge 
@@ -158,24 +158,24 @@ export function AdvancedTooltip({ stop, isVisible, position, onClose: _onClose }
               </div>
 
               {/* Endereço */}
-              <div className="flex items-start gap-2 p-2 bg-gray-50 rounded-lg">
-                <MapPin className="w-4 h-4 text-gray-500 mt-0.5 flex-shrink-0" />
-                <p className="text-sm text-gray-700 leading-relaxed">
+              <div className="flex items-start gap-2 p-2 bg-bg-soft rounded-lg">
+                <MapPin className="w-4 h-4 text-ink-muted mt-0.5 flex-shrink-0" />
+                <p className="text-sm text-ink-strong leading-relaxed">
                   {stop.address}
                 </p>
               </div>
 
               {/* Informações de contato */}
-              {(stop.passenger.phone || stop.passenger.email) && (
+              {(stop.passageiro.phone || stop.passageiro.email) && (
                 <div className="space-y-1">
-                  {stop.passenger.phone && (
-                    <div className="flex items-center gap-2 text-xs text-gray-600">
+                  {stop.passageiro.phone && (
+                    <div className="flex items-center gap-2 text-xs text-ink-muted">
                       <Phone className="w-3 h-3" />
                       <span className="font-mono">{stop.passageiro.phone}</span>
                     </div>
                   )}
-                  {stop.passenger.email && (
-                    <div className="flex items-center gap-2 text-xs text-gray-600">
+                  {stop.passageiro.email && (
+                    <div className="flex items-center gap-2 text-xs text-ink-muted">
                       <Mail className="w-3 h-3" />
                       <span className="truncate">{stop.passageiro.email}</span>
                     </div>
@@ -184,7 +184,7 @@ export function AdvancedTooltip({ stop, isVisible, position, onClose: _onClose }
               )}
 
               {/* Observações */}
-              {stop.passenger.observations && (
+              {stop.passageiro.observations && (
                 <div className="p-2 bg-amber-50 border border-amber-200 rounded-lg">
                   <div className="flex items-start gap-2">
                     <AlertCircle className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
@@ -193,7 +193,7 @@ export function AdvancedTooltip({ stop, isVisible, position, onClose: _onClose }
                         Observações
                       </p>
                       <p className="text-xs text-amber-700 leading-relaxed">
-                        {truncateObservations(stop.passenger.observations)}
+                        {truncateObservations(stop.passageiro.observations)}
                       </p>
                     </div>
                   </div>
@@ -202,7 +202,7 @@ export function AdvancedTooltip({ stop, isVisible, position, onClose: _onClose }
 
               {/* Coordenadas (para debug/desenvolvimento) */}
               <div className="pt-2 border-t border-gray-100">
-                <p className="text-xs text-gray-400 font-mono">
+                <p className="text-xs text-ink-light font-mono">
                   {stop.coordinates.lat.toFixed(6)}, {stop.coordinates.lng.toFixed(6)}
                 </p>
               </div>

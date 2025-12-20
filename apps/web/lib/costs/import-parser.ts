@@ -52,7 +52,7 @@ export async function parseCSV(
     'rota': 'route_name',
     'route': 'route_name',
     'veiculo': 'vehicle_plate',
-    'vehicle': 'vehicle_plate',
+    'veiculo': 'vehicle_plate',
     'motorista': 'driver_email',
     'motorista': 'driver_email',
     'observacoes': 'notes',

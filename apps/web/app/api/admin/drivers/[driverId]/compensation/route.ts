@@ -52,14 +52,14 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         }
 
         // Verificar se motorista existe
-        const { data: driver, error: driverError } = await supabaseAdmin
+        const { data: motorista, error: driverError } = await supabaseAdmin
             .from('users')
             .select('id, name')
             .eq('id', driverId)
             .eq('role', 'motorista')
             .single()
 
-        if (driverError || !driver) {
+        if (driverError || !motorista) {
             return NextResponse.json(
                 { error: 'Motorista não encontrado' },
                 { status: 404 }
@@ -127,14 +127,14 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         const compensationData = validationResult.data
 
         // Verificar se motorista existe
-        const { data: driver, error: driverError } = await supabaseAdmin
+        const { data: motorista, error: driverError } = await supabaseAdmin
             .from('users')
             .select('id')
             .eq('id', driverId)
             .eq('role', 'motorista')
             .single()
 
-        if (driverError || !driver) {
+        if (driverError || !motorista) {
             return NextResponse.json(
                 { error: 'Motorista não encontrado' },
                 { status: 404 }

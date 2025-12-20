@@ -17,11 +17,11 @@ import { SkeletonList } from "@/components/ui/skeleton"
 
 // Lazy load modais pesados
 const CreateOperatorModal = dynamic(
-  () => import("@/components/modals/create-operator-modal").then(m => ({ default: m.CreateOperatorModal })),
+  () => import("@/components/modals/create-operador-modal").then(m => ({ default: m.CreateOperatorModal })),
   { ssr: false, loading: () => null }
 )
 const CompanyUsersModal = dynamic(
-  () => import("@/components/modals/company-operators-modal").then(m => ({ default: m.CompanyUsersModal })),
+  () => import("@/components/modals/company-operadores-modal").then(m => ({ default: m.CompanyUsersModal })),
   { ssr: false, loading: () => null }
 )
 const EditCompanyModal = dynamic(
@@ -174,8 +174,8 @@ export default function EmpresasPage() {
         </div>
 
         {errorEmpresas && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-3 sm:p-4 w-full">
-            <p className="text-xs sm:text-sm text-red-800 break-words">Erro ao carregar empresas: {errorEmpresas instanceof Error ? errorEmpresas.message : String(errorEmpresas)}</p>
+          <div className="bg-error-light border border-error-light rounded-lg p-3 sm:p-4 w-full">
+            <p className="text-xs sm:text-sm text-error break-words">Erro ao carregar empresas: {errorEmpresas instanceof Error ? errorEmpresas.message : String(errorEmpresas)}</p>
           </div>
         )}
 
@@ -213,7 +213,7 @@ export default function EmpresasPage() {
                         <Briefcase className="h-5 w-5 text-brand" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-bold text-base sm:text-lg break-words leading-tight text-[var(--ink)] group-hover:text-brand transition-colors">
+                        <h3 className="font-bold text-base sm:text-lg break-words leading-tight text-ink group-hover:text-brand transition-colors">
                           {empresa.name}
                         </h3>
                       </div>

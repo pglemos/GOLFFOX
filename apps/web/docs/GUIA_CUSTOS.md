@@ -107,7 +107,7 @@ O arquivo CSV deve conter as seguintes colunas (algumas opcionais):
 
 ```csv
 data,categoria,subcategoria,valor,quantidade,unidade,rota,veiculo,motorista,observacoes
-2024-01-15,Combustível,Diesel,2500.00,500,litro,Rota Centro,ABC1234,driver@example.com,Abastecimento semanal
+2024-01-15,Combustível,Diesel,2500.00,500,litro,Rota Centro,ABC1234,motorista@example.com,Abastecimento semanal
 ```
 
 ### Colunas Obrigatórias

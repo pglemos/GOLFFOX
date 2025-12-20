@@ -46,8 +46,8 @@ describe('GET /api/admin/emergency/routes-with-problems', () => {
 
   it('deve incluir informações de veículo e motorista', async () => {
     const route = createTestRoute()
-    const vehicle = createTestVehicle('transportadora-1')
-    const driver = createTestUser({ role: 'driver' })
+    const veiculo = createTestVehicle('transportadora-1')
+    const motorista = createTestUser({ role: 'motorista' })
     
     mockSupabaseClient.setTableData('routes', [route])
     mockSupabaseClient.setTableData('gf_incidents', [
@@ -63,13 +63,13 @@ describe('GET /api/admin/emergency/routes-with-problems', () => {
       {
         id: 'trip-1',
         route_id: route.id,
-        vehicle_id: vehicle.id,
-        driver_id: driver.id,
+        vehicle_id: veiculo.id,
+        driver_id: motorista.id,
         status: 'inProgress',
       },
     ])
-    mockSupabaseClient.setTableData('vehicles', [vehicle])
-    mockSupabaseClient.setTableData('users', [driver])
+    mockSupabaseClient.setTableData('vehicles', [veiculo])
+    mockSupabaseClient.setTableData('users', [motorista])
 
     const req = createAdminRequest({
       method: 'GET',
@@ -81,8 +81,8 @@ describe('GET /api/admin/emergency/routes-with-problems', () => {
     expect(response.status).toBe(200)
     expect(data.success).toBe(true)
     if (data.routes.length > 0) {
-      expect(data.routes[0].vehicle).toBeDefined()
-      expect(data.routes[0].driver).toBeDefined()
+      expect(data.routes[0].veiculo).toBeDefined()
+      expect(data.routes[0].motorista).toBeDefined()
     }
   })
 

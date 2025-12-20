@@ -53,7 +53,7 @@ export interface AdminMapProps {
 }
 
 // Interfaces exportadas
-export interface Vehicle {
+export interface veiculo {
   vehicle_id: string
   trip_id: string
   route_id: string
@@ -118,10 +118,10 @@ export function AdminMap({
   // State
   const [loading, setLoading] = useState(true)
   const [mapError, setMapError] = useState<string | null>(null)
-  const [vehicles, setVehicles] = useState<Vehicle[]>([])
+  const [vehicles, setVehicles] = useState<veiculo[]>([])
   const [routes, setRoutes] = useState<RoutePolyline[]>([])
   const [alerts, setAlerts] = useState<Alert[]>([])
-  const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null)
+  const [selectedVehicle, setSelectedVehicle] = useState<veiculo | null>(null)
   const [selectedRoute, setSelectedRoute] = useState<RoutePolyline | null>(null)
   const [selectedAlert, setSelectedAlert] = useState<Alert | null>(null)
   const [mode, setMode] = useState<'live' | 'history'>('live')
@@ -159,7 +159,7 @@ export function AdminMap({
   const [filters, setFilters] = useState({
     company: companyId || '',
     route: routeId || '',
-    vehicle: vehicleId || '',
+    veiculo: vehicleId || '',
     motorista: '',
     status: '',
     shift: '',
@@ -1030,7 +1030,7 @@ export function AdminMap({
         )
         if (index >= 0) {
           const updated = [...prev]
-          const vehicle = updated[index]
+          const veiculo = updated[index]
           
           // Validar coordenadas antes de atualizar
           if (!isValidCoordinate(update.data.lat, update.data.lng)) {
@@ -1046,10 +1046,10 @@ export function AdminMap({
           
           // Atualizar campos do veículo existente
           updated[index] = {
-            ...vehicle,
+            ...veiculo,
             lat: normalized.lat,
             lng: normalized.lng,
-            speed: update.data.speed !== null && !isNaN(update.data.speed) ? update.data.speed : vehicle.speed,
+            speed: update.data.speed !== null && !isNaN(update.data.speed) ? update.data.speed : veiculo.speed,
             heading: update.data.heading,
             vehicle_status: update.data.vehicle_status,
             passenger_count: update.data.passenger_count,
@@ -1058,8 +1058,8 @@ export function AdminMap({
           
           // Verificar desvio de rota (apenas se veículo está em movimento e tem rota)
           // Usar setTimeout para não bloquear a atualização do estado
-          if (vehicle.route_id && update.data.speed && update.data.speed > 1.4) {
-            const route = routes.find((r) => r.route_id === vehicle.route_id)
+          if (veiculo.route_id && update.data.speed && update.data.speed > 1.4) {
+            const route = routes.find((r) => r.route_id === veiculo.route_id)
             if (route && route.polyline_points && route.polyline_points.length >= 2) {
               // Executar detecção de desvio de forma assíncrona para não bloquear UI
               setTimeout(() => {
@@ -1075,21 +1075,21 @@ export function AdminMap({
                   // Criar alerta se desviou
                   if (deviation.isDeviated) {
                     const isCritical = deviation.distance > 500
-                    const deviationKey = `${vehicle.vehicle_id}-${route.route_id}-${Math.floor(deviation.distance / 100)}`
+                    const deviationKey = `${veiculo.vehicle_id}-${route.route_id}-${Math.floor(deviation.distance / 100)}`
                     
                     createAlert({
                       type: 'route_deviation',
                       severity: isCritical ? 'critical' : 'error',
-                      title: `Veículo fora de rota: ${vehicle.plate}`,
-                      message: `Veículo ${vehicle.plate} está ${Math.round(deviation.distance)}m fora da rota planejada.`,
+                      title: `Veículo fora de rota: ${veiculo.plate}`,
+                      message: `Veículo ${veiculo.plate} está ${Math.round(deviation.distance)}m fora da rota planejada.`,
                       metadata: {
-                        vehicle_id: vehicle.vehicle_id,
-                        route_id: vehicle.route_id,
+                        vehicle_id: veiculo.vehicle_id,
+                        route_id: veiculo.route_id,
                         distance: deviation.distance,
                         lat: update.data.lat,
                         lng: update.data.lng,
                       },
-                      company_id: vehicle.company_id,
+                      company_id: veiculo.company_id,
                     }).catch((error) => {
                       logError('Erro ao criar alerta de desvio', { error }, 'AdminMap')
                     })
@@ -1103,7 +1103,7 @@ export function AdminMap({
                       })
                       
                       notifyError(
-                        `🚨 DESVIO CRÍTICO: ${vehicle.plate} está ${Math.round(deviation.distance)}m fora da rota!`,
+                        `🚨 DESVIO CRÍTICO: ${veiculo.plate} está ${Math.round(deviation.distance)}m fora da rota!`,
                         undefined,
                         {
                           duration: 8000,
@@ -1130,7 +1130,7 @@ export function AdminMap({
                         })
                         
                         notifyError(
-                          `⚠️ Desvio: ${vehicle.plate} está ${Math.round(deviation.distance)}m fora da rota`,
+                          `⚠️ Desvio: ${veiculo.plate} está ${Math.round(deviation.distance)}m fora da rota`,
                           undefined,
                           {
                             duration: 5000,
@@ -1215,7 +1215,7 @@ export function AdminMap({
     const positions = await playbackServiceRef.current.loadPositions(
       filters.company || null,
       filters.route || null,
-      filters.vehicle || null,
+      filters.veiculo || null,
       playbackFrom,
       playbackTo,
       1 // 1 minuto de intervalo
@@ -1261,18 +1261,18 @@ export function AdminMap({
     setHistoricalTrajectories(trajectories)
     setShowTrajectories(true)
     notifySuccess(t('common','success.positionsLoaded', { count: positions.length, trajectories: trajectories.length }))
-  }, [filters.company, filters.route, filters.vehicle, playbackFrom, playbackTo])
+  }, [filters.company, filters.route, filters.veiculo, playbackFrom, playbackTo])
 
   // Visualizar histórico e análise de trajeto
-  const handleViewVehicleHistory = useCallback(async (vehicle: Vehicle) => {
-    if (!vehicle.trip_id || !vehicle.route_id) {
+  const handleViewVehicleHistory = useCallback(async (veiculo: veiculo) => {
+    if (!veiculo.trip_id || !veiculo.route_id) {
       notifyError(t('common','errors.noTripOrRoute'))
       return
     }
 
     try {
       // Buscar rota planejada
-      const route = routes.find((r) => r.route_id === vehicle.route_id)
+      const route = routes.find((r) => r.route_id === veiculo.route_id)
       if (!route || !route.polyline_points || route.polyline_points.length < 2) {
         notifyError(t('common','errors.routeIncomplete'))
         return
@@ -1282,7 +1282,7 @@ export function AdminMap({
       const { data: tripData, error: tripError } = await supabase
         .from('trips')
         .select('id, started_at, completed_at, route_id')
-        .eq('id', vehicle.trip_id)
+        .eq('id', veiculo.trip_id)
         .single()
 
       if (tripError || !tripData) {
@@ -1300,8 +1300,8 @@ export function AdminMap({
 
       const positions = await playbackServiceRef.current.loadPositions(
         null,
-        vehicle.route_id,
-        vehicle.vehicle_id,
+        veiculo.route_id,
+        veiculo.vehicle_id,
         from,
         to,
         1
@@ -1333,8 +1333,8 @@ export function AdminMap({
       
       // Mostrar trajeto no mapa
       const trajectory = {
-        vehicle_id: vehicle.vehicle_id,
-        trip_id: vehicle.trip_id,
+        vehicle_id: veiculo.vehicle_id,
+        trip_id: veiculo.trip_id,
         positions: positions.map((p) => ({
           lat: p.lat,
           lng: p.lng,
@@ -1353,8 +1353,8 @@ export function AdminMap({
   }, [routes])
 
   // Carregar trajetos quando veículo selecionado
-  const loadVehicleTrajectory = useCallback(async (vehicle: Vehicle) => {
-    if (!vehicle.trip_id) {
+  const loadVehicleTrajectory = useCallback(async (veiculo: veiculo) => {
+    if (!veiculo.trip_id) {
       setHistoricalTrajectories([])
       return
     }
@@ -1364,7 +1364,7 @@ export function AdminMap({
       const { data: tripData, error: tripError } = await supabase
         .from('trips')
         .select('id, started_at, completed_at')
-        .eq('id', vehicle.trip_id)
+        .eq('id', veiculo.trip_id)
         .single()
 
       if (tripError || !tripData) {
@@ -1381,8 +1381,8 @@ export function AdminMap({
 
       const positions = await playbackServiceRef.current.loadPositions(
         null,
-        vehicle.route_id || null,
-        vehicle.vehicle_id,
+        veiculo.route_id || null,
+        veiculo.vehicle_id,
         from,
         to,
         1
@@ -1390,8 +1390,8 @@ export function AdminMap({
 
       if (positions.length > 0) {
         const trajectory = {
-          vehicle_id: vehicle.vehicle_id,
-          trip_id: vehicle.trip_id,
+          vehicle_id: veiculo.vehicle_id,
+          trip_id: veiculo.trip_id,
           positions: positions.map((p) => ({
             lat: p.lat,
             lng: p.lng,
@@ -1505,20 +1505,20 @@ export function AdminMap({
   })
 
   // Despachar socorro
-  const handleDispatchAssistance = useCallback(async (vehicle: Vehicle) => {
+  const handleDispatchAssistance = useCallback(async (veiculo: veiculo) => {
     try {
       // Criar requisição de socorro
       const { data, error } = await (supabase as any)
         .from('gf_service_requests')
         .insert({
-          empresa_id: vehicle.company_id,
+          empresa_id: veiculo.company_id,
           tipo: 'socorro',
           payload: {
-            vehicle_id: vehicle.vehicle_id,
-            driver_id: vehicle.driver_id,
-            route_id: vehicle.route_id,
-            latitude: vehicle.lat,
-            longitude: vehicle.lng,
+            vehicle_id: veiculo.vehicle_id,
+            driver_id: veiculo.driver_id,
+            route_id: veiculo.route_id,
+            latitude: veiculo.lat,
+            longitude: veiculo.lng,
           },
           status: 'enviado',
           priority: 'urgente',
@@ -1591,7 +1591,7 @@ export function AdminMap({
     const params = new URLSearchParams()
     if (filters.company) params.set('company_id', filters.company)
     if (filters.route) params.set('route_id', filters.route)
-    if (filters.vehicle) params.set('vehicle_id', filters.vehicle)
+    if (filters.veiculo) params.set('vehicle_id', filters.veiculo)
     if (filters.motorista) params.set('driver_id', filters.motorista)
     if (filters.status) params.set('status', filters.status)
     if (filters.shift) params.set('shift', filters.shift)
@@ -1656,17 +1656,17 @@ export function AdminMap({
         <div 
           id="map-container" 
           ref={mapRef} 
-          className="w-full h-full min-h-[600px] bg-gray-100"
+          className="w-full h-full min-h-[600px] bg-muted"
           style={{ 
             minHeight: '600px',
             position: 'relative'
           }}
         />
       ) : (
-        <div className="w-full h-full min-h-[600px] bg-gray-50 flex items-center justify-center">
+        <div className="w-full h-full min-h-[600px] bg-bg-soft flex items-center justify-center">
           <div className="text-center p-6">
-            <MapIcon className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-600">Mapa não disponível - Modo Lista Ativo</p>
+            <MapIcon className="h-16 w-16 text-ink-light mx-auto mb-4" />
+            <p className="text-ink-muted">Mapa não disponível - Modo Lista Ativo</p>
           </div>
         </div>
       )}
@@ -1806,7 +1806,7 @@ export function AdminMap({
       <AnimatePresence>
         {selectedVehicle && (
           <VehiclePanel
-            vehicle={selectedVehicle}
+            veiculo={selectedVehicle}
             onClose={() => setSelectedVehicle(null)}
             onFollow={() => {
               // Seguir veículo (auto-center)
@@ -1910,7 +1910,7 @@ export function AdminMap({
             <div className="w-12 h-12 border-4 border-brand border-t-transparent rounded-full animate-spin mx-auto"></div>
             <p className="mt-4 text-ink-muted">Carregando mapa...</p>
             {mapError && (
-              <p className="mt-2 text-sm text-red-600">{mapError}</p>
+              <p className="mt-2 text-sm text-error">{mapError}</p>
             )}
           </div>
         </div>
@@ -1920,7 +1920,7 @@ export function AdminMap({
       {mapError && !loading && !listMode && (
         <div className="absolute inset-0 z-30 flex items-center justify-center bg-white/90">
           <div className="text-center p-6">
-            <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+            <AlertCircle className="h-12 w-12 text-error mx-auto mb-4" />
             <h3 className="text-lg font-semibold mb-2">Erro ao carregar mapa</h3>
             <p className="text-ink-muted mb-4">{mapError}</p>
             <Button onClick={() => window.location.reload()}>
@@ -1949,29 +1949,29 @@ export function AdminMap({
             {/* Lista de Veículos */}
             {vehicles.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {vehicles.map((vehicle) => (
-                  <Card key={vehicle.vehicle_id} className="p-4 hover:shadow-md transition-shadow">
+                {vehicles.map((veiculo) => (
+                  <Card key={veiculo.vehicle_id} className="p-4 hover:shadow-md transition-shadow">
                     <div className="flex items-start justify-between mb-2">
                       <div>
-                        <h4 className="font-semibold">{vehicle.plate}</h4>
-                        <p className="text-sm text-ink-muted">{vehicle.model}</p>
+                        <h4 className="font-semibold">{veiculo.plate}</h4>
+                        <p className="text-sm text-ink-muted">{veiculo.model}</p>
                       </div>
-                      <Badge variant={vehicle.vehicle_status === 'moving' ? 'default' : 'secondary'}>
-                        {vehicle.vehicle_status === 'moving'
+                      <Badge variant={veiculo.vehicle_status === 'moving' ? 'default' : 'secondary'}>
+                        {veiculo.vehicle_status === 'moving'
                           ? 'Em Movimento'
-                          : vehicle.vehicle_status === 'stopped_long'
+                          : veiculo.vehicle_status === 'stopped_long'
                           ? 'Parado (>3min)'
-                          : vehicle.vehicle_status === 'stopped_short'
+                          : veiculo.vehicle_status === 'stopped_short'
                           ? 'Parado (<2min)'
                           : 'Na Garagem'}
                       </Badge>
                     </div>
                     <div className="text-sm text-ink-muted space-y-1">
-                      <p>Rota: {vehicle.route_name || 'N/D'}</p>
-                      <p>Motorista: {vehicle.driver_name || 'N/D'}</p>
-                      <p>Posição: {vehicle.lat?.toFixed(4)}, {vehicle.lng?.toFixed(4)}</p>
-                      <p>Velocidade: {vehicle.speed ? `${(vehicle.speed * 3.6).toFixed(0)} km/h` : 'N/D'}</p>
-                      <p>Passageiros: {vehicle.passenger_count || 0}</p>
+                      <p>Rota: {veiculo.route_name || 'N/D'}</p>
+                      <p>Motorista: {veiculo.driver_name || 'N/D'}</p>
+                      <p>Posição: {veiculo.lat?.toFixed(4)}, {veiculo.lng?.toFixed(4)}</p>
+                      <p>Velocidade: {veiculo.speed ? `${(veiculo.speed * 3.6).toFixed(0)} km/h` : 'N/D'}</p>
+                      <p>Passageiros: {veiculo.passenger_count || 0}</p>
                     </div>
                   </Card>
                 ))}
@@ -1987,7 +1987,7 @@ export function AdminMap({
       ) : mapError && !listMode ? (
         <div className="absolute inset-0 z-40 flex items-center justify-center bg-white/80 backdrop-blur-sm">
           <div className="text-center max-w-md">
-            <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
+            <AlertCircle className="h-16 w-16 text-error mx-auto mb-4" />
             <h3 className="text-xl font-semibold mb-2">Erro no Mapa</h3>
             <p className="text-ink-muted mb-6">{mapError}</p>
             <Button onClick={() => window.location.reload()}>
@@ -2007,7 +2007,7 @@ export function AdminMap({
             <p className="text-sm text-ink-muted mb-4">
               Nenhum veículo encontrado com os filtros selecionados.
             </p>
-            <details className="text-left text-sm text-ink-muted bg-gray-50 p-4 rounded mb-4">
+            <details className="text-left text-sm text-ink-muted bg-bg-soft p-4 rounded mb-4">
               <summary className="cursor-pointer font-medium mb-2">Possíveis causas:</summary>
               <ul className="list-disc list-inside space-y-1 mt-2">
                 <li>Não há veículos marcados como ativos no banco de dados</li>

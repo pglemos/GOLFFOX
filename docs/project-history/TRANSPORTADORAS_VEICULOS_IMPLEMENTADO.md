@@ -65,7 +65,7 @@ Cada veículo mostra:
 
 #### Componente
 ```
-apps/web/components/modals/carrier-vehicles-modal.tsx
+apps/web/components/modals/transportadora-vehicles-modal.tsx
 ```
 
 #### API

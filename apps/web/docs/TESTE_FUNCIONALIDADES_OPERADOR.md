@@ -12,9 +12,9 @@ Este documento contém um checklist completo para testar todas as funcionalidade
 ## 1. Login e Seleção de Empresa
 
 ### 1.1 Login
-- [ ] Acessar `/operator`
+- [ ] Acessar `/operador`
 - [ ] Realizar login com credenciais de operador
-- [ ] Redirecionamento para `/operator` após login bem-sucedido
+- [ ] Redirecionamento para `/operador` após login bem-sucedido
 
 ### 1.2 Seleção de Empresa
 - [ ] Se múltiplas empresas: seletor de empresa aparece
@@ -73,7 +73,7 @@ Este documento contém um checklist completo para testar todas as funcionalidade
 
 ### 3.3 Otimização
 - [ ] Botão "Otimizar rota" funciona
-- [ ] API `/api/operator/optimize-route` responde
+- [ ] API `/api/operador/optimize-route` responde
 - [ ] Resultado da otimização é exibido
 - [ ] Cache de otimização funciona
 

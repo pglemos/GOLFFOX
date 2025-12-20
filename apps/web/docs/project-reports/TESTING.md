@@ -55,7 +55,7 @@ node scripts/setup-test-environment.js
 Este script executa:
 - ✅ Verificação de variáveis de ambiente
 - ✅ Seed de empresas de teste
-- ✅ Seed de usuários de teste (admin, operator, passenger)
+- ✅ Seed de usuários de teste (admin, operador, passageiro)
 - ✅ Seed de categorias de custo
 
 **Ou** execute os seeds individualmente:
@@ -106,7 +106,7 @@ npx @testsprite/testsprite-mcp@latest generateCodeAndExecute --testIds ["TC001",
 - **Status**: ✅ Passando
 - **Valida**: Autenticação de usuários
 
-### TC002: Vehicle Deletion or Archival with Trip Validation
+### TC002: veiculo Deletion or Archival with Trip Validation
 - **Endpoint**: `DELETE /api/admin/vehicles/[vehicleId]`
 - **Status**: ⚠️ Requer endpoint de trips
 - **Valida**: Exclusão/arquivamento de veículos com validação de viagens
@@ -116,8 +116,8 @@ npx @testsprite/testsprite-mcp@latest generateCodeAndExecute --testIds ["TC001",
 - **Status**: ✅ Passando
 - **Valida**: Geração de paradas otimizadas
 
-### TC004: Create New Operator User
-- **Endpoint**: `POST /api/admin/create-operator`
+### TC004: Create New operador User
+- **Endpoint**: `POST /api/admin/create-operador`
 - **Status**: ⚠️ Requer endpoint de companies
 - **Valida**: Criação de usuários operadores
 
@@ -126,14 +126,14 @@ npx @testsprite/testsprite-mcp@latest generateCodeAndExecute --testIds ["TC001",
 - **Status**: ⚠️ Requer tabela gf_cost_categories
 - **Valida**: Criação e consulta de custos manuais
 
-### TC006: Create Employee as Operator
-- **Endpoint**: `POST /api/operator/create-employee`
+### TC006: Create Employee as operador
+- **Endpoint**: `POST /api/operador/create-employee`
 - **Status**: ⚠️ Requer migrations e seeds
 - **Valida**: Criação de funcionários por operadores
 
-### TC007: Optimize Route for Operator
-- **Endpoint**: `POST /api/operator/optimize-route`
-- **Status**: ⚠️ Requer usuário operator de teste
+### TC007: Optimize Route for operador
+- **Endpoint**: `POST /api/operador/optimize-route`
+- **Status**: ⚠️ Requer usuário operador de teste
 - **Valida**: Otimização de rotas para operadores
 
 ### TC008: Generate Report on Demand
@@ -197,8 +197,8 @@ npx @testsprite/testsprite-mcp@latest generateCodeAndExecute --testIds ["TC001",
 Após executar o seed de usuários, você terá:
 
 - **Admin**: `golffox@admin.com` / `senha123`
-- **Operator**: `operator@test.com` / `senha123`
-- **Passenger**: `passenger@test.com` / `senha123`
+- **operador**: `operador@test.com` / `senha123`
+- **passageiro**: `passageiro@test.com` / `senha123`
 
 ## 🎯 Meta de Taxa de Sucesso
 

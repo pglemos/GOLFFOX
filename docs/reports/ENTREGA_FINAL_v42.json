@@ -51,7 +51,7 @@
     "Implementar despache completo na aba Socorro",
     "Adicionar exportação de relatórios (PDF, Excel, CSV)",
     "Criar componente de banner para alertar sobre env vars faltantes",
-    "Verificar features mobile Flutter (driver, passenger, operator)",
+    "Verificar features mobile Flutter (motorista, passageiro, operador)",
     "Implementar notificações push no mobile"
   ]
 }

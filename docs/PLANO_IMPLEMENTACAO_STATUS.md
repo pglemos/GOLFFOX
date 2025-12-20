@@ -26,7 +26,7 @@
 - **Status:** Completo
 - **Implementado:**
   - Camada de domínio (`lib/domain/`)
-    - Entities: Company, Vehicle
+    - Entities: Company, veiculo
     - Value Objects: Email, UUID
     - Domain Events: CompanyCreated, VehicleUpdated
   - Estrutura CQRS (`lib/cqrs/`)
@@ -81,8 +81,8 @@
 ### 3. ⏳ Funcionalidades Mobile
 - **Status:** Estrutura básica existe
 - **Já existe:**
-  - Telas de Driver (checklist, route, scan, history, chat)
-  - Telas de Passenger (map, details, feedback, checkin, etc.)
+  - Telas de motorista (checklist, route, scan, history, chat)
+  - Telas de passageiro (map, details, feedback, checkin, etc.)
   - Autenticação integrada
 - **Pode melhorar:**
   - Testes unitários e E2E

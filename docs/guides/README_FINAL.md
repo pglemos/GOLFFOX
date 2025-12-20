@@ -90,7 +90,7 @@ flutter run \
 ## 🎨 Features Implementadas
 
 1. **Auth & Authorization**: 5 perfis com roteamento automático
-2. **RLS Granular**: Admin/Operator/Carrier/Driver/Passenger
+2. **RLS Granular**: Admin/operador/transportadora/motorista/passageiro
 3. **Trip Management**: Estados + transições + reabertura
 4. **Real-time Tracking**: Positions via Realtime
 5. **Auto Summary**: Trigger recalcula distância/tempo/velocidade
@@ -117,7 +117,7 @@ WHERE schemaname = 'public';
 
 ### Ver usuários e roles
 ```sql
-SELECT u.id, u.email, u.role, c.name as company, ca.name as carrier
+SELECT u.id, u.email, u.role, c.name as company, ca.name as transportadora
 FROM public.users u
 LEFT JOIN public.companies c ON c.id = u.company_id
 LEFT JOIN public.carriers ca ON ca.id = u.carrier_id;

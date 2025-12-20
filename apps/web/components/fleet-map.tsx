@@ -792,7 +792,7 @@ export const FleetMap = memo(function FleetMap({ companyId, transportadoraId, ro
                       selectedBus.color === 'red' ? 'destructive' : 
                       selectedBus.color === 'yellow' ? 'outline' : 'default') as 'default' | 'destructive' | 'outline' | 'secondary'
                     }
-                    className={selectedBus.color === 'green' ? 'bg-green-500 text-white' : selectedBus.color === 'yellow' ? 'border-yellow-500 text-yellow-700' : ''}
+                    className={selectedBus.color === 'green' ? 'bg-success-light0 text-white' : selectedBus.color === 'yellow' ? 'border-warning text-warning' : ''}
                   >
                     {selectedBus.color === 'green' ? 'Em Movimento' : 
                      selectedBus.color === 'yellow' ? 'Parado' :

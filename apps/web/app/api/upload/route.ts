@@ -8,11 +8,11 @@ export const runtime = 'nodejs'
 
 // Buckets permitidos
 const ALLOWED_BUCKETS = [
-    'vehicle-documents',
+    'veiculo-documents',
     'motorista-documents',
     'transportadora-documents',
     'company-documents',
-    'vehicle-photos',
+    'veiculo-photos',
     'avatars'
 ]
 

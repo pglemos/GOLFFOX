@@ -270,7 +270,7 @@ export default function CustosPage() {
 
             <Sheet open={showCostForm} onOpenChange={setShowCostForm}>
               <SheetTrigger asChild>
-                <Button className="bg-orange-500 hover:bg-orange-600">
+                <Button className="bg-brand hover:bg-orange-600">
                   <Plus className="h-4 w-4 mr-2" />
                   Novo Lançamento
                 </Button>
@@ -306,7 +306,7 @@ export default function CustosPage() {
             transition={{ delay: 0 }}
           >
             <Card className="relative overflow-hidden bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200 dark:from-orange-950 dark:to-orange-900 dark:border-orange-800">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/10 rounded-bl-full" />
+              <div className="absolute top-0 right-0 w-32 h-32 bg-brand/10 rounded-bl-full" />
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-orange-700 dark:text-orange-300 flex items-center gap-2">
                   <TrendingDown className="h-4 w-4" />
@@ -330,9 +330,9 @@ export default function CustosPage() {
             transition={{ delay: 0.1 }}
           >
             <Card className="relative overflow-hidden bg-gradient-to-br from-green-50 to-green-100 border-green-200 dark:from-green-950 dark:to-green-900 dark:border-green-800">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-green-500/10 rounded-bl-full" />
+              <div className="absolute top-0 right-0 w-32 h-32 bg-success-light0/10 rounded-bl-full" />
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-green-700 dark:text-green-300 flex items-center gap-2">
+                <CardTitle className="text-sm font-medium text-success dark:text-green-300 flex items-center gap-2">
                   <TrendingUp className="h-4 w-4" />
                   Total de Receitas
                 </CardTitle>
@@ -341,7 +341,7 @@ export default function CustosPage() {
                 <div className="text-2xl font-bold text-green-900 dark:text-green-100">
                   <CountUp value={kpis.totalRevenues} />
                 </div>
-                <p className="text-xs text-green-600 dark:text-green-400 mt-1">
+                <p className="text-xs text-success dark:text-green-400 mt-1">
                   {kpis.revenueEntries} lançamentos no mês
                 </p>
               </CardContent>
@@ -354,12 +354,12 @@ export default function CustosPage() {
             transition={{ delay: 0.2 }}
           >
             <Card className={`relative overflow-hidden ${kpis.margin >= 0
-                ? 'bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 dark:from-blue-950 dark:to-blue-900 dark:border-blue-800'
-                : 'bg-gradient-to-br from-red-50 to-red-100 border-red-200 dark:from-red-950 dark:to-red-900 dark:border-red-800'
+                ? 'bg-gradient-to-br from-blue-50 to-blue-100 border-info-light dark:from-blue-950 dark:to-blue-900 dark:border-blue-800'
+                : 'bg-gradient-to-br from-red-50 to-red-100 border-error-light dark:from-red-950 dark:to-red-900 dark:border-red-800'
               }`}>
-              <div className={`absolute top-0 right-0 w-32 h-32 ${kpis.margin >= 0 ? 'bg-blue-500/10' : 'bg-red-500/10'} rounded-bl-full`} />
+              <div className={`absolute top-0 right-0 w-32 h-32 ${kpis.margin >= 0 ? 'bg-info-light0/10' : 'bg-error-light0/10'} rounded-bl-full`} />
               <CardHeader className="pb-2">
-                <CardTitle className={`text-sm font-medium flex items-center gap-2 ${kpis.margin >= 0 ? 'text-blue-700 dark:text-blue-300' : 'text-red-700 dark:text-red-300'
+                <CardTitle className={`text-sm font-medium flex items-center gap-2 ${kpis.margin >= 0 ? 'text-info dark:text-blue-300' : 'text-error dark:text-red-300'
                   }`}>
                   {kpis.margin >= 0 ? <TrendingUp className="h-4 w-4" /> : <TrendingDown className="h-4 w-4" />}
                   Margem
@@ -369,7 +369,7 @@ export default function CustosPage() {
                 <div className={`text-2xl font-bold ${kpis.margin >= 0 ? 'text-blue-900 dark:text-blue-100' : 'text-red-900 dark:text-red-100'}`}>
                   <CountUp value={Math.abs(kpis.margin)} prefix={kpis.margin < 0 ? '-' : ''} />
                 </div>
-                <p className={`text-xs mt-1 ${kpis.margin >= 0 ? 'text-blue-600 dark:text-blue-400' : 'text-red-600 dark:text-red-400'}`}>
+                <p className={`text-xs mt-1 ${kpis.margin >= 0 ? 'text-info dark:text-blue-400' : 'text-error dark:text-red-400'}`}>
                   {kpis.marginPercent}% da receita
                 </p>
               </CardContent>
@@ -570,7 +570,7 @@ export default function CustosPage() {
                               Recorrente
                             </Badge>
                           )}
-                          <span className="font-semibold text-orange-500">
+                          <span className="font-semibold text-brand">
                             {formatCurrency(cost.amount)}
                           </span>
                           <ChevronRight className="h-4 w-4 text-muted-foreground" />
@@ -625,7 +625,7 @@ export default function CustosPage() {
                           </p>
                         </div>
                         <div className="flex items-center gap-2">
-                          <span className="font-semibold text-green-500">
+                          <span className="font-semibold text-success">
                             {formatCurrency(revenue.amount)}
                           </span>
                           <ChevronRight className="h-4 w-4 text-muted-foreground" />

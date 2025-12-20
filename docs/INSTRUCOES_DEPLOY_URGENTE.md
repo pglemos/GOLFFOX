@@ -28,7 +28,7 @@ Após o push automático do código, você precisa executar as migrations e conf
 SELECT table_name 
 FROM information_schema.tables 
 WHERE table_schema = 'public' 
-AND (table_name LIKE '%motorista%' OR table_name LIKE '%vehicle%' OR table_name LIKE '%route_cost%')
+AND (table_name LIKE '%motorista%' OR table_name LIKE '%veiculo%' OR table_name LIKE '%route_cost%')
 ORDER BY table_name;
 ```
 
@@ -87,7 +87,7 @@ Abra o arquivo `database/migrations/gf_rpc_map_snapshot.sql` e execute a funçã
 
 Após o Vercel fazer o deploy automaticamente (após o push), teste:
 
-1. **Login como Carrier:**
+1. **Login como transportadora:**
    - Acesse: https://golffox.vercel.app
    - Login com conta `transportadora`
    - Deve redirecionar para `/transportadora`
@@ -131,7 +131,7 @@ ORDER BY viewname;
 ```sql
 SELECT schemaname, tablename, policyname 
 FROM pg_policies 
-WHERE tablename LIKE '%motorista%' OR tablename LIKE '%vehicle%' OR tablename LIKE '%route_cost%'
+WHERE tablename LIKE '%motorista%' OR tablename LIKE '%veiculo%' OR tablename LIKE '%route_cost%'
 ORDER BY tablename, policyname;
 ```
 

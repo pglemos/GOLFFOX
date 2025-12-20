@@ -14,7 +14,7 @@
 #### **F2 - AppShell**
 - ✅ `components/app-shell.tsx` - Topbar + Sidebar
 - ✅ Layout responsivo com grid 260px + 1fr
-- ✅ Menu dinâmico por role (admin, operator, carrier, driver, passenger)
+- ✅ Menu dinâmico por role (admin, operador, transportadora, motorista, passageiro)
 - ✅ Glass effect com backdrop-blur
 - ✅ Theme switcher (dark/light)
 - ✅ Badge de notificações
@@ -132,25 +132,25 @@ Abra: **http://localhost:3000**
 
 ### **Pendente (F6-F10)**
 
-#### **F6 - Dashboard Operator** ⏳
+#### **F6 - Dashboard operador** ⏳
 - Lista de viagens com filtros
 - Busca semântica
 - Grid/List view toggle
 - Status pills
 
-#### **F7 - Dashboard Carrier** ⏳
+#### **F7 - Dashboard transportadora** ⏳
 - Mapa da frota (markers)
 - Cards de veículos/motoristas
 - Stats em tempo real
 - Legend
 
-#### **F8 - Dashboard Driver** ⏳
+#### **F8 - Dashboard motorista** ⏳
 - Minhas viagens
 - Rastreamento GPS
 - Botão "Iniciar rota"
 - Finalizar trip
 
-#### **F9 - Dashboard Passenger** ⏳
+#### **F9 - Dashboard passageiro** ⏳
 - Viagens associadas
 - ETA em tempo real
 - Chat simplificado

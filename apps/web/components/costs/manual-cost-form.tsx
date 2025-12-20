@@ -133,7 +133,7 @@ export function ManualCostForm({
               <Label htmlFor="group">Grupo de Custo *</Label>
               <select
                 id="group"
-                className="w-full px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm"
+                className="w-full px-3 py-2 rounded-lg border border-border bg-white text-sm"
                 value={formData.selectedGroup}
                 onChange={(e) => {
                   setFormData({ ...formData, selectedGroup: e.target.value, cost_category_id: '' })
@@ -151,7 +151,7 @@ export function ManualCostForm({
               <Label htmlFor="category">Categoria *</Label>
               <select
                 id="category"
-                className="w-full px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm"
+                className="w-full px-3 py-2 rounded-lg border border-border bg-white text-sm"
                 value={formData.cost_category_id}
                 onChange={(e) => setFormData({ ...formData, cost_category_id: e.target.value })}
                 required
@@ -224,7 +224,7 @@ export function ManualCostForm({
             <Label htmlFor="notes">Observações</Label>
             <textarea
               id="notes"
-              className="w-full px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm"
+              className="w-full px-3 py-2 rounded-lg border border-border bg-white text-sm"
               rows={3}
               value={formData.notes}
               onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
@@ -236,7 +236,7 @@ export function ManualCostForm({
             <Button type="button" variant="outline" onClick={onClose}>
               Cancelar
             </Button>
-            <Button type="submit" disabled={loading} className="bg-orange-500 hover:bg-orange-600">
+            <Button type="submit" disabled={loading} className="bg-brand hover:bg-orange-600">
               {loading ? 'Salvando...' : 'Salvar'}
             </Button>
           </DialogFooter>

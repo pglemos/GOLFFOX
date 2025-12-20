@@ -64,10 +64,10 @@ web-app/
 
 Para completar a aplicação, ainda falta:
 
-- [ ] Página Operator Dashboard
-- [ ] Página Carrier Dashboard  
-- [ ] Página Driver Dashboard
-- [ ] Página Passenger Dashboard
+- [ ] Página operador Dashboard
+- [ ] Página transportadora Dashboard  
+- [ ] Página motorista Dashboard
+- [ ] Página passageiro Dashboard
 - [ ] Integração completa com Supabase
 - [ ] Mapas com markers
 - [ ] Gráficos com Recharts

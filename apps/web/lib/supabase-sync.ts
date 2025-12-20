@@ -136,7 +136,7 @@ function validateSyncData(
 
   // Validações específicas por tipo de recurso
   switch (resourceType) {
-    case 'vehicle':
+    case 'veiculo':
       if (!data.plate) errors.push('Placa é obrigatória')
       if (!data.model) errors.push('Modelo é obrigatório')
       // Validar capacity apenas se existir (pode não existir no schema)
@@ -212,7 +212,7 @@ function mapDataToSupabase(
 
   // Ajustes específicos por tipo
   switch (resourceType) {
-    case 'vehicle':
+    case 'veiculo':
       // Garantir que campos numéricos sejam números
       if (mapped.year) mapped.year = parseInt(mapped.year) || null
       if (mapped.capacity) mapped.capacity = parseInt(mapped.capacity) || null
@@ -303,7 +303,7 @@ async function executeSyncWithRetry(
 
     // Determinar tabela baseada no tipo de recurso
     const tableMap: Record<string, string> = {
-      vehicle: 'vehicles',
+      veiculo: 'vehicles',
       motorista: 'users',
       route: 'routes',
       maintenance: 'gf_vehicle_maintenance',

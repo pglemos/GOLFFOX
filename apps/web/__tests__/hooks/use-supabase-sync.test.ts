@@ -47,8 +47,8 @@ describe('useSupabaseSync', () => {
     const { result } = renderHook(() => useSupabaseSync())
 
     const operation = {
-      resourceType: 'vehicle',
-      resourceId: 'vehicle-1',
+      resourceType: 'veiculo',
+      resourceId: 'veiculo-1',
       action: 'create' as const,
       data: { plate: 'ABC1234' },
     }
@@ -84,8 +84,8 @@ describe('useSupabaseSync', () => {
     const { result } = renderHook(() => useSupabaseSync())
 
     const operation = {
-      resourceType: 'vehicle',
-      resourceId: 'vehicle-1',
+      resourceType: 'veiculo',
+      resourceId: 'veiculo-1',
       action: 'create' as const,
       data: { plate: 'ABC1234' },
     }
@@ -111,8 +111,8 @@ describe('useSupabaseSync', () => {
     const { result } = renderHook(() => useSupabaseSync({ onSuccess }))
 
     await result.current.sync({
-      resourceType: 'vehicle',
-      resourceId: 'vehicle-1',
+      resourceType: 'veiculo',
+      resourceId: 'veiculo-1',
       action: 'create',
       data: {},
     })
@@ -137,8 +137,8 @@ describe('useSupabaseSync', () => {
     const { result } = renderHook(() => useSupabaseSync({ onError }))
 
     await result.current.sync({
-      resourceType: 'vehicle',
-      resourceId: 'vehicle-1',
+      resourceType: 'veiculo',
+      resourceId: 'veiculo-1',
       action: 'create',
       data: {},
     })
@@ -156,8 +156,8 @@ describe('useSupabaseSync', () => {
     const { result } = renderHook(() => useSupabaseSync({ showToast: false }))
 
     await result.current.sync({
-      resourceType: 'vehicle',
-      resourceId: 'vehicle-1',
+      resourceType: 'veiculo',
+      resourceId: 'veiculo-1',
       action: 'create',
       data: {},
     })
@@ -172,8 +172,8 @@ describe('useSupabaseSync', () => {
     const { result } = renderHook(() => useSupabaseSync())
 
     const resultValue = await result.current.sync({
-      resourceType: 'vehicle',
-      resourceId: 'vehicle-1',
+      resourceType: 'veiculo',
+      resourceId: 'veiculo-1',
       action: 'create',
       data: {},
     })

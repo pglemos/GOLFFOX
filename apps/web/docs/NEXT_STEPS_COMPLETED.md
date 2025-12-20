@@ -69,7 +69,7 @@
 - `app/api/admin/create-empresa-login/route.ts` (10+ ocorrências)
 - `app/api/admin/create-empresa-user/route.ts` (8+ ocorrências)
 - `app/api/admin/create-transportadora-login/route.ts`
-- `app/api/admin/create-carrier-login/route.ts`
+- `app/api/admin/create-transportadora-login/route.ts`
 - `app/api/admin/create-user/route.ts`
 
 ---

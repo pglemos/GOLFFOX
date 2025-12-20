@@ -6,7 +6,7 @@ Todas as correções baseadas no relatório TestSprite foram implementadas com s
 
 ## Correções Implementadas
 
-### 1. TC003 - Operator Creation (500) ✅
+### 1. TC003 - operador Creation (500) ✅
 
 **Problema:** Erro 500 ao criar operador
 
@@ -54,7 +54,7 @@ Todas as correções baseadas no relatório TestSprite foram implementadas com s
 
 ## Arquivos Modificados
 
-1. `web-app/app/api/admin/create-operator/route.ts`
+1. `web-app/app/api/admin/create-operador/route.ts`
    - Tabelas opcionais não causam erro 500
    - Tratamento robusto de erros
 

@@ -1,5 +1,5 @@
 import { renderHook, waitFor } from '@testing-library/react'
-import { useOperatorKPIs, useControlTower, useEmployees } from '@/hooks/use-operator-data'
+import { useOperatorKPIs, useControlTower, useEmployees } from '@/hooks/use-operador-data'
 import { renderWithProviders } from '../../helpers/component-helpers'
 import { mockSupabaseClient } from '../../helpers/mock-supabase'
 

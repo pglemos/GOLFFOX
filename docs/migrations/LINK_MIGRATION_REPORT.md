@@ -10,12 +10,12 @@
 
 Substituir sistematicamente todas as referências do link:
 ```
-❌ https://golffox.vercel.app/operator?company=11111111-1111-4111-8111-1111111111c1
+❌ https://golffox.vercel.app/operador?company=11111111-1111-4111-8111-1111111111c1
 ```
 
 Pelo link correto:
 ```
-✅ https://golffox.vercel.app/operator
+✅ https://golffox.vercel.app/operador
 ```
 
 ---
@@ -106,13 +106,13 @@ Pelo link correto:
 
 #### Teste Manual 1: Navegação Principal
 ```
-URL: https://golffox.vercel.app/operator
+URL: https://golffox.vercel.app/operador
 Login: operador@empresa.com / senha123
 
 Passos:
 1. Acessar dashboard do operador
 2. Verificar que não há parâmetros ?company= na URL
-3. Navegar para /operator/funcionarios
+3. Navegar para /operador/funcionarios
 4. Verificar que funcionários aparecem corretamente
 5. Voltar para dashboard
 
@@ -122,10 +122,10 @@ Resultado esperado: ✅ Navegação fluida sem ?company= na URL
 #### Teste Manual 2: Deep Links
 ```
 URLs a testar:
-- /operator/rotas
-- /operator/funcionarios
-- /operator/alertas
-- /operator/custos
+- /operador/rotas
+- /operador/funcionarios
+- /operador/alertas
+- /operador/custos
 
 Resultado esperado: ✅ Todas as páginas carregam sem parâmetros company
 ```

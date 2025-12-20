@@ -46,7 +46,7 @@ export function EmployeeSelector({
                 </Badge>
             </div>
             <div className="relative">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-ink-light" />
                 <Input
                     placeholder="Buscar por nome ou CPF..."
                     value={searchQuery}
@@ -57,9 +57,9 @@ export function EmployeeSelector({
             </div>
             <ScrollArea className="h-[250px] sm:h-[350px] border rounded-lg p-4">
                 {loading ? (
-                    <div className="text-center py-8 text-gray-500">Carregando...</div>
+                    <div className="text-center py-8 text-ink-muted">Carregando...</div>
                 ) : filteredEmployees.length === 0 ? (
-                    <div className="text-center py-8 text-gray-500">Nenhum funcionário encontrado</div>
+                    <div className="text-center py-8 text-ink-muted">Nenhum funcionário encontrado</div>
                 ) : (
                     <div className="space-y-2">
                         {filteredEmployees.map((emp) => {
@@ -67,7 +67,7 @@ export function EmployeeSelector({
                             return (
                                 <div
                                     key={emp.employee_id}
-                                    className={`flex items-start gap-3 p-2 rounded-lg border cursor-pointer transition-colors ${isSelected ? "bg-orange-50 border-orange-200" : "hover:bg-gray-50"
+                                    className={`flex items-start gap-3 p-2 rounded-lg border cursor-pointer transition-colors ${isSelected ? "bg-orange-50 border-orange-200" : "hover:bg-bg-soft"
                                         }`}
                                     onClick={() => onToggleEmployee(emp.employee_id)}
                                     role="button"
@@ -89,9 +89,9 @@ export function EmployeeSelector({
                                         <div className="font-medium">
                                             {emp.first_name} {emp.last_name}
                                         </div>
-                                        <div className="text-sm text-gray-600 truncate">{emp.address}</div>
+                                        <div className="text-sm text-ink-muted truncate">{emp.address}</div>
                                         {emp.cpf && (
-                                            <div className="text-xs text-gray-400">{maskCPF(emp.cpf)}</div>
+                                            <div className="text-xs text-ink-light">{maskCPF(emp.cpf)}</div>
                                         )}
                                         {(!emp.lat || !emp.lng) && (
                                             <Badge variant="destructive" className="mt-1 text-xs">

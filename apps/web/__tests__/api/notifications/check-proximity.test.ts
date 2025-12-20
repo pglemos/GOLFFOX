@@ -54,7 +54,7 @@ describe('POST /api/notifications/check-proximity', () => {
       body: {
         tripId: 'trip-1',
         routeId: route.id,
-        vehicleId: 'vehicle-1',
+        vehicleId: 'veiculo-1',
         busLat: -19.9167,
         busLng: -43.9345,
         thresholdMeters: 500,
@@ -91,7 +91,7 @@ describe('POST /api/notifications/check-proximity', () => {
       body: {
         tripId: 'trip-1',
         routeId: 'route-1',
-        vehicleId: 'vehicle-1',
+        vehicleId: 'veiculo-1',
         busLat: -19.9167,
         busLng: -43.9345,
       },
@@ -115,7 +115,7 @@ describe('POST /api/notifications/check-proximity', () => {
       body: {
         tripId: 'trip-1',
         routeId: route.id,
-        vehicleId: 'vehicle-1',
+        vehicleId: 'veiculo-1',
         busLat: -19.9167,
         busLng: -43.9345,
       },

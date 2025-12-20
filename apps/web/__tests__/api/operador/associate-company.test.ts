@@ -22,15 +22,15 @@ describe('POST /api/operador/associate-company', () => {
     mockSupabaseClient.setTableData('gf_user_company_map', [])
     mockSupabaseClient.setAuthUsers([
       {
-        id: 'operator-user-id',
-        email: 'operator@test.com',
+        id: 'operador-user-id',
+        email: 'operador@test.com',
       },
     ])
 
     const req = createOperatorRequest({
       method: 'POST',
       body: {
-        email: 'operator@test.com',
+        email: 'operador@test.com',
         companyId: company.id,
       },
     }) as NextRequest
@@ -63,15 +63,15 @@ describe('POST /api/operador/associate-company', () => {
     mockSupabaseClient.setTableData('gf_user_company_map', [])
     mockSupabaseClient.setAuthUsers([
       {
-        id: 'operator-user-id',
-        email: 'operator@test.com',
+        id: 'operador-user-id',
+        email: 'operador@test.com',
       },
     ])
 
     const req = createOperatorRequest({
       method: 'POST',
       body: {
-        email: 'operator@test.com',
+        email: 'operador@test.com',
       },
     }) as NextRequest
 
@@ -87,21 +87,21 @@ describe('POST /api/operador/associate-company', () => {
     mockSupabaseClient.setTableData('companies', [company])
     mockSupabaseClient.setTableData('gf_user_company_map', [
       {
-        user_id: 'operator-user-id',
+        user_id: 'operador-user-id',
         company_id: company.id,
       },
     ])
     mockSupabaseClient.setAuthUsers([
       {
-        id: 'operator-user-id',
-        email: 'operator@test.com',
+        id: 'operador-user-id',
+        email: 'operador@test.com',
       },
     ])
 
     const req = createOperatorRequest({
       method: 'POST',
       body: {
-        email: 'operator@test.com',
+        email: 'operador@test.com',
         companyId: company.id,
       },
     }) as NextRequest
@@ -135,15 +135,15 @@ describe('POST /api/operador/associate-company', () => {
     mockSupabaseClient.setTableData('companies', [])
     mockSupabaseClient.setAuthUsers([
       {
-        id: 'operator-user-id',
-        email: 'operator@test.com',
+        id: 'operador-user-id',
+        email: 'operador@test.com',
       },
     ])
 
     const req = createOperatorRequest({
       method: 'POST',
       body: {
-        email: 'operator@test.com',
+        email: 'operador@test.com',
         companyId: 'non-existent',
       },
     }) as NextRequest

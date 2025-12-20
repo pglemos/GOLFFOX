@@ -159,7 +159,7 @@ curl https://golffox.vercel.app/api/health
 
 1. **Login:**
    - Acessar `https://golffox.vercel.app/login`
-   - Fazer login como admin/operator
+   - Fazer login como admin/operador
    - Verificar redirecionamento
 
 2. **Middleware:**

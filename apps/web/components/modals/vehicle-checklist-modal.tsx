@@ -234,9 +234,9 @@ export function VehicleChecklistModal({
                 <SelectValue placeholder="Selecione o motorista" />
               </SelectTrigger>
               <SelectContent>
-                {drivers.map((driver) => (
-                  <SelectItem key={driver.id} value={driver.id}>
-                    {driver.name || driver.email}
+                {drivers.map((motorista) => (
+                  <SelectItem key={motorista.id} value={motorista.id}>
+                    {motorista.name || motorista.email}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -267,7 +267,7 @@ export function VehicleChecklistModal({
                   />
                   <Label className="cursor-pointer">{item.label}</Label>
                   {formData.issues[item.key] === 'failed' && (
-                    <span className="text-xs text-red-500 ml-auto">Falhou</span>
+                    <span className="text-xs text-error ml-auto">Falhou</span>
                   )}
                 </div>
               ))}
@@ -320,7 +320,7 @@ export function VehicleChecklistModal({
             <Button 
               type="submit" 
               disabled={loading}
-              className="w-full sm:w-auto order-1 sm:order-2 bg-orange-500 hover:bg-orange-600 min-h-[44px] text-base font-medium"
+              className="w-full sm:w-auto order-1 sm:order-2 bg-brand hover:bg-orange-600 min-h-[44px] text-base font-medium"
             >
               {loading ? "Salvando..." : checklist ? "Atualizar" : "Cadastrar"}
             </Button>

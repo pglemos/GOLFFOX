@@ -26,8 +26,8 @@ interface MapFiltersProps {
   filters: {
     company: string
     route: string
-    vehicle: string
-    driver: string
+    veiculo: string
+    motorista: string
     status: string
     shift: string
     search: string
@@ -225,8 +225,8 @@ export const MapFilters = memo(function MapFilters({
 
         {/* Veículo */}
         <Select
-          value={filters.vehicle || '__ALL__'}
-          onValueChange={(value) => handleFilterChange('vehicle', value)}
+          value={filters.veiculo || '__ALL__'}
+          onValueChange={(value) => handleFilterChange('veiculo', value)}
         >
           <SelectTrigger className="w-48">
             <SelectValue placeholder="Veículo" />

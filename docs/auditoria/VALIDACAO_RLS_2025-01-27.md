@@ -66,15 +66,15 @@ As seguintes tabelas devem ter RLS habilitado:
 
 ## ⚠️ Políticas Faltantes Identificadas
 
-### Driver Positions
+### motorista Positions
 **Status:** ⚠️ NÃO ENCONTRADO NA MIGRATION 001
 
 **Políticas Esperadas (conforme VALIDATION_CHECKLIST.md):**
 - Admin: acesso total
 - Insert: drivers podem inserir suas próprias posições
-- Driver read: drivers podem ler suas próprias posições
+- motorista read: drivers podem ler suas próprias posições
 - Company read: operadores podem ler posições de drivers da empresa
-- Carrier read: transportadoras podem ler posições de seus drivers
+- transportadora read: transportadoras podem ler posições de seus drivers
 
 **Ação Necessária:** Criar políticas RLS para `driver_positions` se a tabela existir.
 

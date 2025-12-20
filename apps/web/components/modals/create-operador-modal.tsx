@@ -204,7 +204,7 @@ export function CreateOperatorModal({
       if (result.company) {
         globalSyncManager.triggerSync('company.created', result.company)
       }
-      if (result.operator || result.userId) {
+      if (result.operador || result.userId) {
         globalSyncManager.triggerSync('user.created', {
           id: result.userId || result.operatorId,
           email: result.email || formData.responsibleEmail || '',
@@ -277,7 +277,7 @@ export function CreateOperatorModal({
                 <Loader2 className="h-4 w-4 animate-spin" />
                 <span>{progress}</span>
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
+              <div className="w-full bg-muted rounded-full h-2">
                 <div
                   className="bg-brand h-2 rounded-full transition-all duration-300"
                   style={{ width: `${(step / 7) * 100}%` }}
@@ -452,7 +452,7 @@ export function CreateOperatorModal({
             <Button
               type="submit"
               disabled={loading}
-              className="w-full sm:w-auto order-1 sm:order-2 bg-orange-500 hover:bg-orange-600 min-h-[44px] text-base font-medium"
+              className="w-full sm:w-auto order-1 sm:order-2 bg-brand hover:bg-orange-600 min-h-[44px] text-base font-medium"
             >
               {loading ? (
                 <>

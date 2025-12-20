@@ -107,25 +107,25 @@ export async function GET(req: NextRequest) {
     const formattedRoutes = routesWithProblemsList.map(route => {
       const vehicleId = routeVehicleMap.get(route.id)
       const driverId = routeDriverMap.get(route.id)
-      const vehicle = vehicleId ? vehiclesMap.get(vehicleId) : null
-      const driver = driverId ? driversMap.get(driverId) : null
+      const veiculo = vehicleId ? vehiclesMap.get(vehicleId) : null
+      const motorista = driverId ? driversMap.get(driverId) : null
       
       return {
         id: route.id,
         name: route.name,
         origin: route.origin || '',
         destination: route.destination || '',
-        vehicle: vehicle ? {
-          id: vehicle.id,
-          plate: vehicle.plate,
-          model: vehicle.model
+        veiculo: veiculo ? {
+          id: veiculo.id,
+          plate: veiculo.plate,
+          model: veiculo.model
         } : null,
-        driver: driver ? {
-          id: driver.id,
-          name: driver.name,
-          email: driver.email
+        motorista: motorista ? {
+          id: motorista.id,
+          name: motorista.name,
+          email: motorista.email
         } : null,
-        displayName: `${route.name}${vehicle || motorista ? ` (Veículo: ${vehicle?.plate || 'N/A'} / Motorista: ${motorista?.name || 'N/A'})` : ''}`
+        displayName: `${route.name}${veiculo || motorista ? ` (Veículo: ${veiculo?.plate || 'N/A'} / Motorista: ${motorista?.name || 'N/A'})` : ''}`
       }
     })
 

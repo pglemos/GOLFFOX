@@ -126,7 +126,7 @@ export function TemporalProgressBar({
   }
 
   return (
-    <div className="w-full bg-white border-t border-gray-200 p-4 space-y-4">
+    <div className="w-full bg-white border-t border-border-light p-4 space-y-4">
       {/* Cabeçalho com controles */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
@@ -155,14 +155,14 @@ export function TemporalProgressBar({
           </div>
           
           <div className="flex items-center gap-2">
-            <Clock className="w-4 h-4 text-gray-500" />
-            <span className="text-sm font-medium text-gray-700">
+            <Clock className="w-4 h-4 text-ink-muted" />
+            <span className="text-sm font-medium text-ink-strong">
               {Math.round(progress)}% concluído
             </span>
           </div>
         </div>
         
-        <div className="text-sm text-gray-600 font-mono">
+        <div className="text-sm text-ink-muted font-mono">
           {timeRemaining}
         </div>
       </div>
@@ -200,10 +200,10 @@ export function TemporalProgressBar({
                 <div
                   className={`w-3 h-3 rounded-full border-2 transition-all duration-300 ${
                     status === 'completed'
-                      ? 'bg-green-500 border-green-500'
+                      ? 'bg-success-light0 border-success'
                       : status === 'current'
                       ? 'bg-primary border-primary animate-pulse'
-                      : 'bg-white border-gray-300'
+                      : 'bg-white border-border'
                   }`}
                 />
                 
@@ -211,24 +211,24 @@ export function TemporalProgressBar({
                 <div
                   className={`mt-1 w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium transition-all duration-300 ${
                     status === 'completed'
-                      ? 'bg-green-100 text-green-700'
+                      ? 'bg-success-light text-success'
                       : status === 'current'
                       ? 'bg-primary text-white'
-                      : 'bg-gray-100 text-gray-500'
+                      : 'bg-muted text-ink-muted'
                   }`}
                 >
                   {index + 1}
                 </div>
                 
                 {/* Horário */}
-                <div className="mt-1 text-xs text-gray-600 font-mono">
+                <div className="mt-1 text-xs text-ink-muted font-mono">
                   {formatTime(stop.scheduledTime)}
                 </div>
                 
                 {/* Tipo de parada */}
                 <div className={`mt-1 text-xs px-2 py-0.5 rounded-full ${
                   stop.type === 'pickup' 
-                    ? 'bg-blue-100 text-blue-700' 
+                    ? 'bg-info-light text-info' 
                     : 'bg-orange-100 text-orange-700'
                 }`}>
                   {stop.type === 'pickup' ? 'Embarque' : 'Desembarque'}
@@ -236,7 +236,7 @@ export function TemporalProgressBar({
                 
                 {/* Duração até próxima parada */}
                 {index < stops.length - 1 && (
-                  <div className="absolute top-8 left-full ml-2 text-xs text-gray-500 whitespace-nowrap">
+                  <div className="absolute top-8 left-full ml-2 text-xs text-ink-muted whitespace-nowrap">
                     {(() => {
                       const nextStop = stops[index + 1]
                       if (!nextStop) return ''
@@ -257,27 +257,27 @@ export function TemporalProgressBar({
       {/* Informações da parada atual */}
       {stops[currentStopIndex] && (
         <motion.div
-          className="p-3 bg-gray-50 rounded-lg border"
+          className="p-3 bg-bg-soft rounded-lg border"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           key={currentStopIndex}
         >
           <div className="flex items-center justify-between">
             <div>
-              <h4 className="font-medium text-gray-900">
+              <h4 className="font-medium text-ink-strong">
                 Parada {currentStopIndex + 1} de {stops.length}
               </h4>
-              <p className="text-sm text-gray-600 mt-1">
+              <p className="text-sm text-ink-muted mt-1">
                 {stops[currentStopIndex].address}
               </p>
             </div>
             <div className="text-right">
-              <div className="text-sm font-medium text-gray-900">
+              <div className="text-sm font-medium text-ink-strong">
                 {formatTime(stops[currentStopIndex].scheduledTime)}
               </div>
               <div className={`text-xs px-2 py-1 rounded-full mt-1 ${
                 stops[currentStopIndex].type === 'pickup'
-                  ? 'bg-blue-100 text-blue-700'
+                  ? 'bg-info-light text-info'
                   : 'bg-orange-100 text-orange-700'
               }`}>
                 {stops[currentStopIndex].type === 'pickup' ? 'Embarque' : 'Desembarque'}

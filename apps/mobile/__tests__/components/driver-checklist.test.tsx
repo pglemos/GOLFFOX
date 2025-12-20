@@ -1,5 +1,5 @@
 /**
- * Testes Mobile: Driver Checklist
+ * Testes Mobile: motorista Checklist
  * 
  * Testes unitários para o componente de checklist do motorista
  */
@@ -34,7 +34,7 @@ const ChecklistScreen = () => {
   )
 }
 
-describe('Driver Checklist', () => {
+describe('motorista Checklist', () => {
   it('deve renderizar itens do checklist', () => {
     const { getByText } = render(<ChecklistScreen />)
     

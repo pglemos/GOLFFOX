@@ -26,8 +26,8 @@ const REPLACEMENTS = [
   { pattern: /\bpassenger\b/gi, replacement: 'passageiro', context: 'comentários e variáveis' },
   
   // Mensagens e logs
-  { pattern: /operator\s+email/gi, replacement: 'email do operador', context: 'mensagens' },
-  { pattern: /carrier\s+id/gi, replacement: 'id da transportadora', context: 'mensagens' },
+  { pattern: /operador\s+email/gi, replacement: 'email do operador', context: 'mensagens' },
+  { pattern: /transportadora\s+id/gi, replacement: 'id da transportadora', context: 'mensagens' },
 ]
 
 // Diretórios a processar

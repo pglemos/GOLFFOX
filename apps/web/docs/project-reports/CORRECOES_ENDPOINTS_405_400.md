@@ -29,8 +29,8 @@
 - **Problema:** Alguns endpoints podem retornar 405 se acessados com métodos HTTP não suportados
 - **Solução:** Adicionados handlers OPTIONS para CORS em todos os endpoints de API
 - **Arquivos:**
-  - `web-app/app/api/admin/create-operator/route.ts`
-  - `web-app/app/api/operator/create-employee/route.ts`
+  - `web-app/app/api/admin/create-operador/route.ts`
+  - `web-app/app/api/operador/create-employee/route.ts`
   - `web-app/app/api/reports/run/route.ts`
   - `web-app/app/api/reports/schedule/route.ts`
   - `web-app/app/api/analytics/web-vitals/route.ts`

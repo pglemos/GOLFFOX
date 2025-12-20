@@ -21,7 +21,7 @@ interface Message {
     created_at: string
 }
 
-interface Driver {
+interface motorista {
     id: string
     name: string
     is_online: boolean
@@ -30,8 +30,8 @@ interface Driver {
 
 export default function MensagensPage() {
     const { user } = useAuth()
-    const [drivers, setDrivers] = useState<Driver[]>([])
-    const [selectedDriver, setSelectedDriver] = useState<Driver | null>(null)
+    const [drivers, setDrivers] = useState<motorista[]>([])
+    const [selectedDriver, setSelectedDriver] = useState<motorista | null>(null)
     const [messages, setMessages] = useState<Message[]>([])
     const [newMessage, setNewMessage] = useState("")
     const [loading, setLoading] = useState(true)
@@ -39,7 +39,7 @@ export default function MensagensPage() {
 
     useEffect(() => {
         // Mock drivers list
-        const mockDrivers: Driver[] = [
+        const mockDrivers: motorista[] = [
             { id: '1', name: 'João Silva', is_online: true, last_message: 'Ok, entendido!' },
             { id: '2', name: 'Maria Santos', is_online: true, last_message: 'Chegando em 5 min' },
             { id: '3', name: 'Pedro Costa', is_online: false, last_message: 'Rota finalizada' },
@@ -100,24 +100,24 @@ export default function MensagensPage() {
                         </h2>
                     </div>
                     <ScrollArea className="h-full">
-                        {drivers.map(driver => (
+                        {drivers.map(motorista => (
                             <div
-                                key={driver.id}
+                                key={motorista.id}
                                 className={`p-4 border-b cursor-pointer hover:bg-muted/50 ${selectedDriver?.id === motorista.id ? 'bg-muted' : ''}`}
-                                onClick={() => setSelectedDriver(driver)}
+                                onClick={() => setSelectedDriver(motorista)}
                             >
                                 <div className="flex items-center gap-3">
                                     <div className="relative">
                                         <Avatar className="h-10 w-10">
-                                            <AvatarFallback>{driver.name.slice(0, 2).toUpperCase()}</AvatarFallback>
+                                            <AvatarFallback>{motorista.name.slice(0, 2).toUpperCase()}</AvatarFallback>
                                         </Avatar>
-                                        {driver.is_online && (
-                                            <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full" />
+                                        {motorista.is_online && (
+                                            <span className="absolute bottom-0 right-0 w-3 h-3 bg-success-light0 border-2 border-white rounded-full" />
                                         )}
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <p className="font-medium truncate">{motorista.name}</p>
-                                        {driver.last_message && (
+                                        {motorista.last_message && (
                                             <p className="text-sm text-muted-foreground truncate">{motorista.last_message}</p>
                                         )}
                                     </div>

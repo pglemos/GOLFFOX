@@ -459,14 +459,14 @@
       "status": "OK - Protegida"
     },
     {
-      "route": "/transportadora/reports/driver-performance/route.ts",
-      "file": "transportadora\\reports\\driver-performance\\route.ts",
+      "route": "/transportadora/reports/motorista-performance/route.ts",
+      "file": "transportadora\\reports\\motorista-performance\\route.ts",
       "hasRateLimit": false,
       "status": "OK - Protegida"
     },
     {
-      "route": "/transportadora/costs/vehicle/route.ts",
-      "file": "transportadora\\costs\\vehicle\\route.ts",
+      "route": "/transportadora/costs/veiculo/route.ts",
+      "file": "transportadora\\costs\\veiculo\\route.ts",
       "hasRateLimit": false,
       "status": "OK - Protegida"
     },
@@ -785,8 +785,8 @@
       "status": "PRECISA REVISÃO - Sem requireAuth mas não é rota pública conhecida"
     },
     {
-      "route": "/admin/create-carrier-login/route.ts",
-      "file": "admin\\create-carrier-login\\route.ts",
+      "route": "/admin/create-transportadora-login/route.ts",
+      "file": "admin\\create-transportadora-login\\route.ts",
       "hasRateLimit": false,
       "status": "PRECISA REVISÃO - Sem requireAuth mas não é rota pública conhecida"
     },

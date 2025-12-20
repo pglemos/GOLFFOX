@@ -70,10 +70,10 @@ export async function GET(request: NextRequest) {
             .select(`
         *,
         category:gf_cost_categories(id, name, icon, color),
-        vehicle:vehicles(id, plate, model),
+        veiculo:vehicles(id, plate, model),
         route:routes(id, name),
         company:companies(id, name),
-        carrier:carriers(id, name)
+        transportadora:carriers(id, name)
       `, { count: 'exact' })
 
         // Aplicar filtro de tenant baseado no papel
@@ -169,7 +169,7 @@ export async function GET(request: NextRequest) {
             createdAt: row.created_at as string,
             updatedAt: row.updated_at as string,
             category: row.category as ManualCost['category'],
-            vehicle: row.vehicle as ManualCost['vehicle'],
+            veiculo: row.veiculo as ManualCost['veiculo'],
             route: row.route as ManualCost['route'],
             company: row.company as ManualCost['company'],
             transportadora: row.transportadora as ManualCost['transportadora'],
@@ -320,10 +320,10 @@ export async function POST(request: NextRequest) {
             createdAt: data.created_at,
             updatedAt: data.updated_at,
             category: data.category,
-            vehicle: data.vehicle,
+            veiculo: data.veiculo,
             route: data.route,
             company: data.company,
-            carrier: data.carrier,
+            transportadora: data.transportadora,
         }
 
         return NextResponse.json({ success: true, data: newCost }, { status: 201 })

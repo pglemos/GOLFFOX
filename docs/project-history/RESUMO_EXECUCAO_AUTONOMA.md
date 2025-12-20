@@ -25,7 +25,7 @@
 - ✅ `apps/web/app/api/transportadora/vehicles/[vehicleId]/documents/route.ts` (novo)
 - ✅ `apps/web/app/api/transportadora/vehicles/[vehicleId]/maintenances/route.ts` (novo)
 - ✅ `apps/web/app/api/transportadora/upload/route.ts` (novo)
-- ✅ `apps/web/app/api/transportadora/costs/vehicle/route.ts` (novo)
+- ✅ `apps/web/app/api/transportadora/costs/veiculo/route.ts` (novo)
 - ✅ `apps/web/app/api/transportadora/costs/route/route.ts` (novo)
 - ✅ `apps/web/app/api/transportadora/alerts/route.ts` (novo)
 - ✅ `apps/web/app/api/notifications/email/route.ts` (novo)
@@ -120,7 +120,7 @@
 SELECT table_name 
 FROM information_schema.tables 
 WHERE table_schema = 'public' 
-AND (table_name LIKE '%motorista%' OR table_name LIKE '%vehicle%' OR table_name LIKE '%route_cost%')
+AND (table_name LIKE '%motorista%' OR table_name LIKE '%veiculo%' OR table_name LIKE '%route_cost%')
 ORDER BY table_name;
 ```
 

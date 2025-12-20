@@ -23,9 +23,9 @@ export default function RouteDetailsScreen() {
 
     const routeInfo = {
         name: 'Rota Centro-Shopping',
-        vehicle: 'Ônibus Mercedes-Benz 1721',
+        veiculo: 'Ônibus Mercedes-Benz 1721',
         plate: 'ABC-1234',
-        driver: 'João Silva',
+        motorista: 'João Silva',
         totalStops: mockStops.length,
         duration: '~1 hora',
     };
@@ -41,12 +41,12 @@ export default function RouteDetailsScreen() {
                     <View style={styles.infoGrid}>
                         <View style={styles.infoItem}>
                             <Text variant="labelSmall" style={styles.label}>Veículo</Text>
-                            <Text variant="bodyMedium">{routeInfo.vehicle}</Text>
+                            <Text variant="bodyMedium">{routeInfo.veiculo}</Text>
                             <Text variant="bodySmall" style={styles.plateText}>🚐 {routeInfo.plate}</Text>
                         </View>
                         <View style={styles.infoItem}>
                             <Text variant="labelSmall" style={styles.label}>Motorista</Text>
-                            <Text variant="bodyMedium">{routeInfo.driver}</Text>
+                            <Text variant="bodyMedium">{routeInfo.motorista}</Text>
                         </View>
                     </View>
 

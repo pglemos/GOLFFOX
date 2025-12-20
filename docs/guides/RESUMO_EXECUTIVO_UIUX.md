@@ -108,7 +108,7 @@ web-app/
 
 ### **F6 - Dashboard Operador**
 ```
-app/operator/page.tsx
+app/operador/page.tsx
 - Lista de viagens
 - Filtros (status, busca)
 - Grid/List toggle
@@ -116,7 +116,7 @@ app/operator/page.tsx
 
 ### **F7 - Dashboard Transportadora**
 ```
-app/carrier/page.tsx
+app/transportadora/page.tsx
 - Mapa da frota
 - Cards veículos/motoristas
 - Legend
@@ -124,7 +124,7 @@ app/carrier/page.tsx
 
 ### **F8 - Dashboard Motorista**
 ```
-app/driver/page.tsx
+app/motorista/page.tsx
 - Minhas viagens
 - Rastreamento GPS
 - Iniciar rota
@@ -132,7 +132,7 @@ app/driver/page.tsx
 
 ### **F9 - Dashboard Passageiro**
 ```
-app/passenger/page.tsx
+app/passageiro/page.tsx
 - Viagens associadas
 - ETA
 - Chat

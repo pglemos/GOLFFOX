@@ -69,28 +69,28 @@ export default function ProjecoesFinanceirasPage() {
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between pb-2">
                             <CardTitle className="text-sm font-medium">Receita Projetada (6m)</CardTitle>
-                            <ArrowUpRight className="h-4 w-4 text-green-500" />
+                            <ArrowUpRight className="h-4 w-4 text-success" />
                         </CardHeader>
                         <CardContent>
-                            <p className="text-2xl font-bold text-green-600">{formatCurrency(totalProjectedRevenue)}</p>
+                            <p className="text-2xl font-bold text-success">{formatCurrency(totalProjectedRevenue)}</p>
                         </CardContent>
                     </Card>
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between pb-2">
                             <CardTitle className="text-sm font-medium">Custos Projetados (6m)</CardTitle>
-                            <ArrowDownRight className="h-4 w-4 text-red-500" />
+                            <ArrowDownRight className="h-4 w-4 text-error" />
                         </CardHeader>
                         <CardContent>
-                            <p className="text-2xl font-bold text-red-600">{formatCurrency(totalProjectedCosts)}</p>
+                            <p className="text-2xl font-bold text-error">{formatCurrency(totalProjectedCosts)}</p>
                         </CardContent>
                     </Card>
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between pb-2">
                             <CardTitle className="text-sm font-medium">Margem Projetada (6m)</CardTitle>
-                            <BarChart3 className="h-4 w-4 text-blue-500" />
+                            <BarChart3 className="h-4 w-4 text-info" />
                         </CardHeader>
                         <CardContent>
-                            <p className="text-2xl font-bold text-blue-600">{formatCurrency(totalProjectedMargin)}</p>
+                            <p className="text-2xl font-bold text-info">{formatCurrency(totalProjectedMargin)}</p>
                         </CardContent>
                     </Card>
                 </div>
@@ -119,8 +119,8 @@ export default function ProjecoesFinanceirasPage() {
                                                 <Calendar className="h-4 w-4 text-muted-foreground" />
                                                 {formatMonth(f.month)}
                                             </td>
-                                            <td className="p-3 text-right text-green-600">{formatCurrency(f.projected_revenue)}</td>
-                                            <td className="p-3 text-right text-red-600">{formatCurrency(f.projected_costs)}</td>
+                                            <td className="p-3 text-right text-success">{formatCurrency(f.projected_revenue)}</td>
+                                            <td className="p-3 text-right text-error">{formatCurrency(f.projected_costs)}</td>
                                             <td className="p-3 text-right font-medium">{formatCurrency(f.projected_margin)}</td>
                                             <td className="p-3 text-right">
                                                 <Badge variant="outline">

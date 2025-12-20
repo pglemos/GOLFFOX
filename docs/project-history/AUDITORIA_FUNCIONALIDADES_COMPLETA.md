@@ -15,7 +15,7 @@
 - ✅ Criar transportadora
 - ✅ Editar transportadora
 - ✅ Excluir transportadora
-- ✅ Login de Acesso (criar usuário carrier)
+- ✅ Login de Acesso (criar usuário transportadora)
 - ✅ Ver Motoristas (modal)
 - ✅ Ver Veículos (modal)
 
@@ -24,7 +24,7 @@ APIs:
 - ✅ POST /api/admin/carriers/create
 - ✅ PUT /api/admin/carriers/update
 - ✅ DELETE /api/admin/carriers/delete
-- ✅ POST /api/admin/create-carrier-login
+- ✅ POST /api/admin/create-transportadora-login
 - ✅ GET /api/admin/carriers/[carrierId]/users
 - ✅ GET /api/admin/carriers/[carrierId]/drivers
 - ✅ GET /api/admin/carriers/[carrierId]/vehicles
@@ -38,8 +38,8 @@ APIs:
 
 APIs:
 - ✅ GET /api/admin/companies-list
-- ✅ POST /api/admin/create-operator
-- ✅ POST /api/admin/create-operator-login
+- ✅ POST /api/admin/create-operador
+- ✅ POST /api/admin/create-operador-login
 - ✅ PUT /api/admin/companies/[companyId]
 - ✅ DELETE /api/admin/companies/delete
 
@@ -87,68 +87,68 @@ APIs:
 
 ---
 
-### 2. CARRIER PANEL
+### 2. transportadora PANEL
 
-#### 2.1 Dashboard (/carrier)
+#### 2.1 Dashboard (/transportadora)
 - ✅ KPIs (Motoristas, Veículos, Custos, Alertas)
 - ✅ Mapa da frota em tempo real
 - ✅ Status dos veículos
 
-#### 2.2 Motoristas (/carrier/motoristas)
+#### 2.2 Motoristas (/transportadora/motoristas)
 - ✅ Listar motoristas
 - ✅ Ver documentos (aba)
 - ✅ Ver exames (aba)
 - ✅ Ver alertas (aba)
 - ✅ Upload de documentos
 
-APIs Carrier:
-- ✅ GET /api/carrier/drivers/[driverId]/documents
-- ✅ POST /api/carrier/drivers/[driverId]/documents
-- ✅ GET /api/carrier/drivers/[driverId]/exams
-- ✅ POST /api/carrier/drivers/[driverId]/exams
-- ✅ POST /api/carrier/upload
+APIs transportadora:
+- ✅ GET /api/transportadora/drivers/[driverId]/documents
+- ✅ POST /api/transportadora/drivers/[driverId]/documents
+- ✅ GET /api/transportadora/drivers/[driverId]/exams
+- ✅ POST /api/transportadora/drivers/[driverId]/exams
+- ✅ POST /api/transportadora/upload
 
-#### 2.3 Veículos (/carrier/veiculos)
+#### 2.3 Veículos (/transportadora/veiculos)
 - ✅ Listar veículos
 - ✅ Ver documentos (aba)
 - ✅ Ver manutenções (aba)
 - ✅ Upload de documentos
 
-APIs Carrier:
-- ✅ GET /api/carrier/vehicles/[vehicleId]/documents
-- ✅ POST /api/carrier/vehicles/[vehicleId]/documents
-- ✅ GET /api/carrier/vehicles/[vehicleId]/maintenances
-- ✅ POST /api/carrier/vehicles/[vehicleId]/maintenances
+APIs transportadora:
+- ✅ GET /api/transportadora/vehicles/[vehicleId]/documents
+- ✅ POST /api/transportadora/vehicles/[vehicleId]/documents
+- ✅ GET /api/transportadora/vehicles/[vehicleId]/maintenances
+- ✅ POST /api/transportadora/vehicles/[vehicleId]/maintenances
 
-#### 2.4 Custos (/carrier/custos)
+#### 2.4 Custos (/transportadora/custos)
 - ✅ Ver custos por veículo
 - ✅ Ver custos por rota
 - ✅ Adicionar custos
 
 APIs:
-- ✅ GET /api/carrier/costs/vehicle
-- ✅ POST /api/carrier/costs/vehicle
-- ✅ GET /api/carrier/costs/route
-- ✅ POST /api/carrier/costs/route
+- ✅ GET /api/transportadora/costs/veiculo
+- ✅ POST /api/transportadora/costs/veiculo
+- ✅ GET /api/transportadora/costs/route
+- ✅ POST /api/transportadora/costs/route
 
-#### 2.5 Alertas (/carrier/alertas)
+#### 2.5 Alertas (/transportadora/alertas)
 - ✅ Listar alertas de documentos expirados
 - ✅ Listar alertas de exames expirados
 
 APIs:
-- ✅ GET /api/carrier/alerts
+- ✅ GET /api/transportadora/alerts
 
 ---
 
-### 3. OPERATOR PANEL
+### 3. operador PANEL
 
-#### 3.1 Funcionários (/operator/funcionarios)
+#### 3.1 Funcionários (/operador/funcionarios)
 - ✅ Listar funcionários
 - ❓ Criar funcionário (verificar)
 - ❓ Editar funcionário (verificar)
 - ❓ Excluir funcionário (verificar)
 
-#### 3.2 Solicitações (/operator/solicitacoes)
+#### 3.2 Solicitações (/operador/solicitacoes)
 - ✅ Listar solicitações
 - ❓ Criar solicitação (verificar)
 - ❓ Editar solicitação (verificar)
@@ -164,8 +164,8 @@ APIs:
 4. ✅ Admin - Empresas (já funcionando)
 
 ### MÉDIA PRIORIDADE
-5. ❓ Operator - Funcionários (verificar CRUD)
-6. ❓ Operator - Solicitações (verificar CRUD)
+5. ❓ operador - Funcionários (verificar CRUD)
+6. ❓ operador - Solicitações (verificar CRUD)
 
 ---
 
@@ -180,7 +180,7 @@ APIs:
 ## PRÓXIMOS PASSOS
 
 1. Criar APIs faltantes para motoristas
-2. Verificar funcionalidades do painel Operator
+2. Verificar funcionalidades do painel operador
 3. Testar todas as funcionalidades via preview
 4. Garantir integração Supabase em todos os endpoints
 

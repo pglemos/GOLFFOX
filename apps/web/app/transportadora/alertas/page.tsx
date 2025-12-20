@@ -49,17 +49,17 @@ export default function AlertasPage() {
 
   const getAlertTypeConfig = (type: string, severity: string) => {
     // Mapear tipos sistema para UI
-    if (type === 'veiculo_parado') return { icon: Truck, color: "text-red-600", bg: "bg-red-50", border: "border-red-200", label: "Veículo Parado" }
+    if (type === 'veiculo_parado') return { icon: Truck, color: "text-error", bg: "bg-error-light", border: "border-error-light", label: "Veículo Parado" }
 
     // Fallback por severidade
     switch (severity) {
       case "critical":
-        return { icon: XCircle, color: "text-red-600", bg: "bg-red-50", border: "border-red-200", label: "Crítico" }
+        return { icon: XCircle, color: "text-error", bg: "bg-error-light", border: "border-error-light", label: "Crítico" }
       case "warning":
-        return { icon: AlertTriangle, color: "text-yellow-600", bg: "bg-yellow-50", border: "border-yellow-200", label: "Aviso" }
+        return { icon: AlertTriangle, color: "text-warning", bg: "bg-warning-light", border: "border-yellow-200", label: "Aviso" }
       case "info":
       default:
-        return { icon: Info, color: "text-blue-600", bg: "bg-blue-50", border: "border-blue-200", label: "Informativo" }
+        return { icon: Info, color: "text-info", bg: "bg-info-light", border: "border-info-light", label: "Informativo" }
     }
   }
 
@@ -126,11 +126,11 @@ export default function AlertasPage() {
           >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs font-medium text-gray-600 mb-1">Críticos</p>
-                <p className="text-3xl font-bold text-red-600">{alertCounts.critico}</p>
+                <p className="text-xs font-medium text-ink-muted mb-1">Críticos</p>
+                <p className="text-3xl font-bold text-error">{alertCounts.critico}</p>
               </div>
-              <div className="h-12 w-12 rounded-full bg-red-100 flex items-center justify-center">
-                <XCircle className="h-6 w-6 text-red-600" />
+              <div className="h-12 w-12 rounded-full bg-error-light flex items-center justify-center">
+                <XCircle className="h-6 w-6 text-error" />
               </div>
             </div>
           </Card>
@@ -144,11 +144,11 @@ export default function AlertasPage() {
           >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs font-medium text-gray-600 mb-1">Avisos</p>
-                <p className="text-3xl font-bold text-yellow-600">{alertCounts.aviso}</p>
+                <p className="text-xs font-medium text-ink-muted mb-1">Avisos</p>
+                <p className="text-3xl font-bold text-warning">{alertCounts.aviso}</p>
               </div>
-              <div className="h-12 w-12 rounded-full bg-yellow-100 flex items-center justify-center">
-                <AlertTriangle className="h-6 w-6 text-yellow-600" />
+              <div className="h-12 w-12 rounded-full bg-warning-light flex items-center justify-center">
+                <AlertTriangle className="h-6 w-6 text-warning" />
               </div>
             </div>
           </Card>
@@ -158,7 +158,7 @@ export default function AlertasPage() {
         <Card className="p-4">
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-ink-light" />
               <Input
                 placeholder="Buscar por placa, motorista ou mensagem..."
                 value={searchTerm}
@@ -176,7 +176,7 @@ export default function AlertasPage() {
           </div>
         ) : filteredAlerts.length === 0 ? (
           <Card className="p-12 text-center">
-            <CheckCircle2 className="h-16 w-16 text-green-500 mx-auto mb-4" />
+            <CheckCircle2 className="h-16 w-16 text-success mx-auto mb-4" />
             <p className="text-lg font-medium text-ink-muted">Tudo certo por aqui!</p>
             <p className="text-sm text-ink-muted mt-1">Nenhum alerta pendente.</p>
           </Card>
@@ -216,13 +216,13 @@ export default function AlertasPage() {
                           </div>
                         </div>
                         <div className="flex gap-2 flex-shrink-0 mt-2">
-                          <Button size="sm" variant="outline" className="text-green-600 hover:bg-green-50" onClick={() => handleResolve(alert.id)}>
+                          <Button size="sm" variant="outline" className="text-success hover:bg-success-light" onClick={() => handleResolve(alert.id)}>
                             Resolver / Marcar Visto
                           </Button>
                         </div>
                       </div>
                     </div>
-                    <div className="flex flex-wrap gap-4 text-xs text-ink-muted mt-2 border-t pt-2 border-dashed border-gray-200">
+                    <div className="flex flex-wrap gap-4 text-xs text-ink-muted mt-2 border-t pt-2 border-dashed border-border-light">
                       {meta.plate && (
                         <span className="flex items-center gap-1">
                           <Truck className="h-3 w-3" /> {meta.plate}
@@ -235,7 +235,7 @@ export default function AlertasPage() {
                       )}
                       {/* Data expiry se houver */}
                       {meta.expiry_date && (
-                        <span className="flex items-center gap-1 text-red-500 font-semibold">
+                        <span className="flex items-center gap-1 text-error font-semibold">
                           Vencimento: {new Date(meta.expiry_date).toLocaleDateString()}
                         </span>
                       )}

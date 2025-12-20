@@ -89,7 +89,7 @@ Login: `motorista@trans.com` / `senha123`
 
 ### 🔐 Security
 - ✅ RLS habilitado em todas as tabelas
-- ✅ Políticas granulares (admin/operator/carrier/driver/passenger)
+- ✅ Políticas granulares (admin/operador/transportadora/motorista/passageiro)
 - ✅ Helper functions com SECURITY DEFINER
 - ✅ Concorrência segura (FOR UPDATE)
 

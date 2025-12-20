@@ -48,7 +48,7 @@
 - `app/api/admin/create-empresa-login/route.ts` - 10+ ocorrências
 - `app/api/admin/create-empresa-user/route.ts` - 8+ ocorrências
 - `app/api/admin/create-transportadora-login/route.ts` - 1 ocorrência
-- `app/api/admin/create-carrier-login/route.ts` - 1 ocorrência
+- `app/api/admin/create-transportadora-login/route.ts` - 1 ocorrência
 - `app/api/admin/create-user/route.ts` - Múltiplas ocorrências
 
 ### Prioridade Média

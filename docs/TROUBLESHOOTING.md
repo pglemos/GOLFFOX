@@ -242,7 +242,7 @@
 ### 7. Sidebar Não Mostra Menu Correto
 
 **Sintomas**:
-- Menu do admin aparece no painel do operator
+- Menu do admin aparece no painel do operador
 - Menu incorreto para o painel atual
 - Links quebrados
 

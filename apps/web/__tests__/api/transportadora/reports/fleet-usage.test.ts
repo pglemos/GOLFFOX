@@ -18,9 +18,9 @@ describe('GET /api/transportadora/reports/fleet-usage', () => {
 
   it('deve gerar relatório de uso da frota', async () => {
     const transportadora = createTestTransportadora()
-    const vehicle = createTestVehicle(transportadora.id, { plate: 'ABC1234' })
+    const veiculo = createTestVehicle(transportadora.id, { plate: 'ABC1234' })
     
-    mockSupabaseClient.setTableData('vehicles', [vehicle])
+    mockSupabaseClient.setTableData('vehicles', [veiculo])
     mockSupabaseClient.setTableData('trips', [])
     mockSupabaseClient.setTableData('routes', [
       { id: 'route-1', transportadora_id: transportadora.id },
@@ -43,8 +43,8 @@ describe('GET /api/transportadora/reports/fleet-usage', () => {
 
   it('deve filtrar por período', async () => {
     const transportadora = createTestTransportadora()
-    const vehicle = createTestVehicle(transportadora.id)
-    mockSupabaseClient.setTableData('vehicles', [vehicle])
+    const veiculo = createTestVehicle(transportadora.id)
+    mockSupabaseClient.setTableData('vehicles', [veiculo])
     mockSupabaseClient.setTableData('trips', [])
     mockSupabaseClient.setTableData('routes', [])
     mockSupabaseClient.setTableData('driver_positions', [])
@@ -76,8 +76,8 @@ describe('GET /api/transportadora/reports/fleet-usage', () => {
 
   it('deve calcular taxa de utilização', async () => {
     const transportadora = createTestTransportadora()
-    const vehicle = createTestVehicle(transportadora.id)
-    mockSupabaseClient.setTableData('vehicles', [vehicle])
+    const veiculo = createTestVehicle(transportadora.id)
+    mockSupabaseClient.setTableData('vehicles', [veiculo])
     mockSupabaseClient.setTableData('trips', [
       { id: 'trip-1', route_id: 'route-1', created_at: new Date().toISOString() },
     ])

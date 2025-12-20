@@ -199,7 +199,7 @@ export async function POST(
 
 
     // 3. Usar UPSERT na tabela users para evitar erro de chave duplicada
-    const { data: driver, error } = await supabase
+    const { data: motorista, error } = await supabase
       .from('users')
       .upsert({
         id: authUserId,
@@ -239,7 +239,7 @@ export async function POST(
 
 
 
-    return NextResponse.json({ success: true, driver })
+    return NextResponse.json({ success: true, motorista })
   } catch (err) {
     logError('Erro na API de criar motorista', { error: err, transportadoraId: (await context.params).transportadoraId || (await context.params).carrierId }, 'TransportadoraDriversAPI')
     const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'

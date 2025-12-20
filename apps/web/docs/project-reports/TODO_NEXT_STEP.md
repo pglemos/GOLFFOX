@@ -38,7 +38,7 @@
 
 **Testes de Rotas:**
 - ✅ `/` - Home funcionando (200 OK)
-- ⚠️ `/operator` - Redirecionamento (307) - Esperado para autenticação
+- ⚠️ `/operador` - Redirecionamento (307) - Esperado para autenticação
 - ✅ `/api/health` - Implementado (verifica status da aplicação e conexão Supabase)
 
 ---
@@ -69,7 +69,7 @@ node scripts/seed-demo.js  # Se existir
 **Ação:**
 ```bash
 # Executar script interativo
-node scripts/setup-operator-company-interactive.js
+node scripts/setup-operador-company-interactive.js
 ```
 
 **Ou manualmente via SQL:**
@@ -143,7 +143,7 @@ VALUES
 ### Scripts Criados:
 - `scripts/run-precheck-v43.js` - Pré-check Supabase
 - `scripts/validate-v43-migrations.js` - Validação pós-migração
-- `scripts/seed-operator-mappings.js` - Seed de mapeamentos
+- `scripts/seed-operador-mappings.js` - Seed de mapeamentos
 - `scripts/test-vercel-routes.js` - Teste de rotas HTTP
 - `scripts/audit-vercel.js` - Auditoria Vercel
 
@@ -182,7 +182,7 @@ node scripts/run-precheck-v43.js
 node scripts/validate-v43-migrations.js
 
 # Seed de mapeamentos
-node scripts/seed-operator-mappings.js
+node scripts/seed-operador-mappings.js
 
 # Teste de rotas Vercel
 node scripts/test-vercel-routes.js

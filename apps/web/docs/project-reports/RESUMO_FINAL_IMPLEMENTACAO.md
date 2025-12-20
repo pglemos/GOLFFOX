@@ -8,12 +8,12 @@
 ## ✅ CONCLUÍDO
 
 ### 1. Scripts Criados e Executados
-- ✅ `scripts/seed-operator-data.js` - 40 rotas, 42 funcionários, 25 alertas
+- ✅ `scripts/seed-operador-data.js` - 40 rotas, 42 funcionários, 25 alertas
 - ✅ `scripts/seed-company-branding.js` - 9 empresas com branding
 - ✅ `scripts/check-vercel-env.js` - Verificação de variáveis
 - ✅ `scripts/test-cron-jobs.js` - Teste de cron jobs
 - ✅ `scripts/test-health-check.js` - Teste de health check
-- ✅ `scripts/validate-operator-data.js` - Validação de dados
+- ✅ `scripts/validate-operador-data.js` - Validação de dados
 
 ### 2. Documentação Criada
 - ✅ `docs/VERCEL_ENV_SETUP.md` - Guia completo de setup
@@ -141,7 +141,7 @@ Seguir checklist em: `docs/TESTE_FUNCIONALIDADES_OPERADOR.md`
 ### Comandos Úteis
 ```bash
 # Validar dados
-node scripts/validate-operator-data.js
+node scripts/validate-operador-data.js
 
 # Testar health check
 node scripts/test-health-check.js
@@ -153,7 +153,7 @@ CRON_SECRET=xxx node scripts/test-cron-jobs.js
 node scripts/check-vercel-env.js
 
 # Reexecutar seed
-node scripts/seed-operator-data.js --companies=auto --routes=12 --employees=40
+node scripts/seed-operador-data.js --companies=auto --routes=12 --employees=40
 
 # Reexecutar branding
 node scripts/seed-company-branding.js --defaults

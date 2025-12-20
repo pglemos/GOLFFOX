@@ -201,7 +201,7 @@ export default function TransportadoraVeiculosPage() {
             const { data: expiringDocs } = await supabase
               .from('v_carrier_expiring_documents')
               .select('*')
-              .eq('entity_type', 'vehicle')
+              .eq('entity_type', 'veiculo')
               .eq('entity_id', v.id)
               .in('alert_level', ['expired', 'critical'])
               .limit(1)
@@ -283,7 +283,7 @@ export default function TransportadoraVeiculosPage() {
                 <div className="flex flex-col sm:flex-row gap-4">
                   {/* Busca */}
                   <div className="relative flex-1">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-ink-light h-4 w-4" />
                     <Input
                       placeholder="Buscar veículos por placa, modelo, ano..."
                       value={searchQuery}
@@ -548,7 +548,7 @@ export default function TransportadoraVeiculosPage() {
             )}
             {filteredVeiculos.length === 0 && (
               <Card className="p-12 text-center">
-                <Truck className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <Truck className="h-12 w-12 text-ink-light mx-auto mb-4" />
                 <h3 className="text-lg font-medium mb-2">Nenhum veículo encontrado</h3>
                 <p className="text-sm text-ink-muted">
                   {searchQuery ? "Tente ajustar sua busca" : "Não há veículos cadastrados"}
@@ -595,7 +595,7 @@ export default function TransportadoraVeiculosPage() {
                 <div className="space-y-4">
                   {documents.length === 0 ? (
                     <Card className="p-12 text-center">
-                      <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                      <FileText className="h-12 w-12 text-ink-light mx-auto mb-4" />
                       <h3 className="text-lg font-medium mb-2">Nenhum documento encontrado</h3>
                       <p className="text-sm text-ink-muted mb-4">
                         Faça upload dos documentos do veículo
@@ -622,9 +622,9 @@ export default function TransportadoraVeiculosPage() {
                             return (
                               <div key={doc.id} className="relative pl-12">
                                 {/* Timeline dot */}
-                                <div className={`absolute left-4 top-6 w-4 h-4 rounded-full border-2 ${doc.status === 'expired' ? 'bg-red-500 border-red-500' :
-                                  isExpiring ? 'bg-yellow-500 border-yellow-500' :
-                                    'bg-green-500 border-green-500'
+                                <div className={`absolute left-4 top-6 w-4 h-4 rounded-full border-2 ${doc.status === 'expired' ? 'bg-error border-error' :
+                                  isExpiring ? 'bg-warning border-warning' :
+                                    'bg-success border-success'
                                   }`}></div>
 
                                 <Card className="p-4 hover:shadow-lg transition-shadow">
@@ -637,7 +637,7 @@ export default function TransportadoraVeiculosPage() {
                                           {doc.status === 'valid' ? 'Válido' : doc.status === 'expired' ? 'Vencido' : doc.status === 'pending' ? 'Pendente' : 'Cancelado'}
                                         </Badge>
                                         {isExpiring && (
-                                          <Badge variant={daysToExpiry! < 0 ? 'destructive' : 'outline'} className={daysToExpiry! >= 0 ? 'border-yellow-500 text-yellow-700' : ''}>
+                                          <Badge variant={daysToExpiry! < 0 ? 'destructive' : 'outline'} className={daysToExpiry! >= 0 ? 'border-warning text-warning' : ''}>
                                             {daysToExpiry! < 0
                                               ? `Vencido há ${Math.abs(daysToExpiry!)} dias`
                                               : `${daysToExpiry} dias restantes`}
@@ -723,7 +723,7 @@ export default function TransportadoraVeiculosPage() {
               </div>
             ) : (
               <Card className="p-12 text-center">
-                <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <FileText className="h-12 w-12 text-ink-light mx-auto mb-4" />
                 <h3 className="text-lg font-medium mb-2">Selecione um veículo</h3>
                 <p className="text-sm text-ink-muted mb-4">
                   Escolha um veículo da lista para visualizar seus documentos
@@ -771,7 +771,7 @@ export default function TransportadoraVeiculosPage() {
                 <div className="space-y-4">
                   {maintenances.length === 0 ? (
                     <Card className="p-12 text-center">
-                      <Wrench className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                      <Wrench className="h-12 w-12 text-ink-light mx-auto mb-4" />
                       <h3 className="text-lg font-medium mb-2">Nenhuma manutenção encontrada</h3>
                       <p className="text-sm text-ink-muted mb-4">
                         Registre manutenções do veículo
@@ -797,10 +797,10 @@ export default function TransportadoraVeiculosPage() {
                             return (
                               <div key={maint.id} className="relative pl-12">
                                 {/* Timeline dot */}
-                                <div className={`absolute left-4 top-6 w-4 h-4 rounded-full border-2 ${maint.status === 'completed' ? 'bg-green-500 border-green-500' :
-                                  maint.status === 'in_progress' ? 'bg-blue-500 border-blue-500' :
-                                    maint.status === 'cancelled' ? 'bg-red-500 border-red-500' :
-                                      'bg-yellow-500 border-yellow-500'
+                                <div className={`absolute left-4 top-6 w-4 h-4 rounded-full border-2 ${maint.status === 'completed' ? 'bg-success border-success' :
+                                  maint.status === 'in_progress' ? 'bg-info border-info' :
+                                    maint.status === 'cancelled' ? 'bg-error border-error' :
+                                      'bg-warning border-warning'
                                   }`}></div>
 
                                 <Card className="p-4 hover:shadow-lg transition-shadow">
@@ -943,7 +943,7 @@ export default function TransportadoraVeiculosPage() {
               </div>
             ) : (
               <Card className="p-12 text-center">
-                <Wrench className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <Wrench className="h-12 w-12 text-ink-light mx-auto mb-4" />
                 <h3 className="text-lg font-medium mb-2">Selecione um veículo</h3>
                 <p className="text-sm text-ink-muted mb-4">
                   Escolha um veículo da lista para visualizar suas manutenções
@@ -982,7 +982,7 @@ export default function TransportadoraVeiculosPage() {
               {selectedVehicle && (
                 <DocumentUpload
                   vehicleId={selectedVehicle}
-                  folder="vehicle-documents"
+                  folder="veiculo-documents"
                   documentType={documentType}
                   onSuccess={() => {
                     setIsUploadModalOpen(false)

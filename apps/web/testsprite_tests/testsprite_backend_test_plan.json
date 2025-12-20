@@ -6,8 +6,8 @@
   },
   {
     "id": "TC002",
-    "title": "vehicle deletion or archival with trip validation",
-    "description": "Test the /api/admin/vehicles/{vehicleId} DELETE endpoint to verify vehicle deletion or archival behavior when the vehicle has associated trips, including validation of vehicle ID and handling of conflicts."
+    "title": "veiculo deletion or archival with trip validation",
+    "description": "Test the /api/admin/vehicles/{vehicleId} DELETE endpoint to verify veiculo deletion or archival behavior when the veiculo has associated trips, including validation of veiculo ID and handling of conflicts."
   },
   {
     "id": "TC003",
@@ -16,8 +16,8 @@
   },
   {
     "id": "TC004",
-    "title": "create new operator user",
-    "description": "Test the /api/admin/create-operator POST endpoint for creating a new operator user with valid email and company_id, including validation of input data and error handling."
+    "title": "create new operador user",
+    "description": "Test the /api/admin/create-operador POST endpoint for creating a new operador user with valid email and company_id, including validation of input data and error handling."
   },
   {
     "id": "TC005",
@@ -26,13 +26,13 @@
   },
   {
     "id": "TC006",
-    "title": "create employee as operator",
-    "description": "Test the /api/operator/create-employee POST endpoint for creating an employee with valid data, handling existing employees, invalid data, unauthorized access, and server errors."
+    "title": "create employee as operador",
+    "description": "Test the /api/operador/create-employee POST endpoint for creating an employee with valid data, handling existing employees, invalid data, unauthorized access, and server errors."
   },
   {
     "id": "TC007",
-    "title": "optimize route for operator",
-    "description": "Test the /api/operator/optimize-route POST endpoint to verify successful route optimization for operators."
+    "title": "optimize route for operador",
+    "description": "Test the /api/operador/optimize-route POST endpoint to verify successful route optimization for operators."
   },
   {
     "id": "TC008",

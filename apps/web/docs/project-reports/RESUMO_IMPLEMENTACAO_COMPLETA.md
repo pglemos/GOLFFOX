@@ -88,8 +88,8 @@
 - ✅ `PUT /api/admin/users/[userId]`
 
 #### **APIs de Criação**
-- ✅ `POST /api/admin/create-operator` (criar empresa)
-- ✅ `POST /api/admin/create-operator-login` (criar login operador)
+- ✅ `POST /api/admin/create-operador` (criar empresa)
+- ✅ `POST /api/admin/create-operador-login` (criar login operador)
 
 ### 4. Componentes Criados
 
@@ -107,7 +107,7 @@
 
 - ✅ `test-codebase-structure.js` - Testa estrutura de arquivos e conexão
 - ✅ `test-system-complete.js` - Testa todas as APIs e funcionalidades
-- ✅ `test-create-operator-login.js` - Testa criação de login
+- ✅ `test-create-operador-login.js` - Testa criação de login
 - ✅ `test-all-deletes.js` - Testa exclusões permanentes
 - ✅ Vários scripts de teste específicos para rotas, empresas, etc.
 

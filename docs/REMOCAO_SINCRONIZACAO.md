@@ -41,14 +41,14 @@ Os seguintes arquivos foram **mantidos** pois ainda são utilizados em outros lu
 ### `apps/web/lib/supabase-sync.ts`
 **Status:** ✅ Mantido
 **Motivo:** Usado em vários modais e hooks:
-- `apps/web/components/modals/vehicle-modal.tsx`
+- `apps/web/components/modals/veiculo-modal.tsx`
 - `apps/web/components/modals/motorista-modal.tsx`
 - `apps/web/components/modals/change-role-modal.tsx`
 - `apps/web/components/modals/assistance-modal.tsx`
 - `apps/web/components/modals/schedule-report-modal.tsx`
 - `apps/web/components/modals/route-modal.tsx`
-- `apps/web/components/modals/vehicle-maintenance-modal.tsx`
-- `apps/web/components/modals/vehicle-checklist-modal.tsx`
+- `apps/web/components/modals/veiculo-maintenance-modal.tsx`
+- `apps/web/components/modals/veiculo-checklist-modal.tsx`
 
 ### `apps/web/hooks/use-supabase-sync.ts`
 **Status:** ✅ Mantido

@@ -170,7 +170,7 @@ export default function TransportadoraRelatoriosPage() {
         case 'costs':
           // Buscar custos de veículos e rotas
           const [costsVehicleRes, costsRouteRes] = await Promise.all([
-            fetch(`/api/transportadora/costs/vehicle?start_date=${dateStart}&end_date=${dateEnd}`),
+            fetch(`/api/transportadora/costs/veiculo?start_date=${dateStart}&end_date=${dateEnd}`),
             fetch(`/api/transportadora/costs/route?start_date=${dateStart}&end_date=${dateEnd}`)
           ])
           const costsVehicleData = costsVehicleRes.ok ? await costsVehicleRes.json() : []

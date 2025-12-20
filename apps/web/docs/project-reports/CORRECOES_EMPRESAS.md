@@ -29,7 +29,7 @@
 ✅ **Operador**: `operador@empresa.com`
 - User ID: `c68854a1-563e-4eca-8069-31894c6fcad5`
 - Senha: `Operador123!@#`
-- Role: `operator`
+- Role: `operador`
 - Vinculado à empresa criada
 
 ## Como Testar
@@ -49,10 +49,10 @@
   - Adicionados estados de loading e erro
   - Melhorado tratamento de funcionários
 
-- `web-app/app/api/admin/create-operator/route.ts`
+- `web-app/app/api/admin/create-operador/route.ts`
   - Implementada lógica de fallback para colunas opcionais
   - Melhorado tratamento de erros
 
-- `web-app/scripts/create-operator-empresa.js`
+- `web-app/scripts/create-operador-empresa.js`
   - Script criado para criar empresa e operador específicos
 

@@ -120,17 +120,17 @@ export function AdvancedPlaybackControls({
             {/* Status atual */}
             <div className="flex items-center gap-2">
               <div className={`w-2 h-2 rounded-full ${
-                playbackState.isPlaying ? 'bg-green-500 animate-pulse' : 'bg-gray-400'
+                playbackState.isPlaying ? 'bg-success-light0 animate-pulse' : 'bg-muted'
               }`} />
-              <span className="text-sm font-medium text-gray-700">
+              <span className="text-sm font-medium text-ink-strong">
                 {playbackState.isPlaying ? 'Reproduzindo' : 'Pausado'}
               </span>
             </div>
 
             {/* Parada atual */}
             <div className="flex items-center gap-2">
-              <MapPin className="w-4 h-4 text-blue-600" />
-              <span className="text-sm text-gray-600">
+              <MapPin className="w-4 h-4 text-info" />
+              <span className="text-sm text-ink-muted">
                 Parada {playbackState.currentStopIndex + 1} de {playbackState.totalStops}
               </span>
             </div>
@@ -144,7 +144,7 @@ export function AdvancedPlaybackControls({
             {/* Tempo restante */}
             <div className="flex items-center gap-2">
               <Clock className="w-4 h-4 text-orange-600" />
-              <span className="text-sm text-gray-600">
+              <span className="text-sm text-ink-muted">
                 {formatDuration(getRemainingTime())} restantes
               </span>
             </div>
@@ -188,7 +188,7 @@ export function AdvancedPlaybackControls({
                       step={1}
                       className="w-full"
                     />
-                    <div className="text-xs text-gray-500 text-center mt-1">
+                    <div className="text-xs text-ink-muted text-center mt-1">
                       {playbackState.volume}%
                     </div>
                   </motion.div>
@@ -202,7 +202,7 @@ export function AdvancedPlaybackControls({
               size="sm"
               onClick={onToggleLoop}
               className={`h-8 w-8 p-0 ${
-                playbackState.isLooping ? 'text-blue-600 bg-blue-50' : ''
+                playbackState.isLooping ? 'text-info bg-info-light' : ''
               }`}
               aria-label={playbackState.isLooping ? 'Desativar loop' : 'Ativar loop'}
             >
@@ -218,7 +218,7 @@ export function AdvancedPlaybackControls({
               variant="ghost"
               size="sm"
               onClick={() => setShowSettings(!showSettings)}
-              className={`h-8 w-8 p-0 ${showSettings ? 'text-blue-600 bg-blue-50' : ''}`}
+              className={`h-8 w-8 p-0 ${showSettings ? 'text-info bg-info-light' : ''}`}
               aria-label="Configurações"
             >
               <Settings className="w-4 h-4" />
@@ -255,7 +255,7 @@ export function AdvancedPlaybackControls({
             >
               <div className="space-y-3">
                 <div>
-                  <label className="text-sm font-medium text-gray-700 mb-2 block">
+                  <label className="text-sm font-medium text-ink-strong mb-2 block">
                     Velocidade de Reprodução
                   </label>
                   <div className="flex gap-2 flex-wrap">
@@ -279,7 +279,7 @@ export function AdvancedPlaybackControls({
 
         {/* Barra de progresso principal */}
         <div className="space-y-2">
-          <div className="flex items-center justify-between text-sm text-gray-600">
+          <div className="flex items-center justify-between text-sm text-ink-muted">
             <span>{formatTime(playbackState.currentTime)}</span>
             <span className="text-xs">
               {getProgressPercentage().toFixed(1)}% concluído
@@ -289,7 +289,7 @@ export function AdvancedPlaybackControls({
 
           {/* Barra de progresso clicável */}
           <div 
-            className="relative h-2 bg-gray-200 rounded-full cursor-pointer group"
+            className="relative h-2 bg-muted rounded-full cursor-pointer group"
             onClick={handleProgressClick}
           >
             <motion.div

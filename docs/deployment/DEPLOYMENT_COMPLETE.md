@@ -145,7 +145,7 @@ SELECT COUNT(*) FROM trips;
 
 ### 🔐 Security
 - ✅ RLS habilitado em todas as tabelas
-- ✅ Políticas por papel (admin/operator/carrier/driver/passenger)
+- ✅ Políticas por papel (admin/operador/transportadora/motorista/passageiro)
 - ✅ Helper functions com SECURITY DEFINER
 - ✅ Concorrência segura no RPC (FOR UPDATE)
 
@@ -165,7 +165,7 @@ SELECT COUNT(*) FROM trips;
 
 ### 📊 Business Logic
 - ✅ Estados de trip: scheduled → inProgress → completed/cancelled
-- ✅ Reabertura com p_force (apenas admin/operator/carrier)
+- ✅ Reabertura com p_force (apenas admin/operador/transportadora)
 - ✅ Cálculo de distância Haversine
 - ✅ Audit trail completo (trip_events)
 - ✅ Auto-cálculo de resumo

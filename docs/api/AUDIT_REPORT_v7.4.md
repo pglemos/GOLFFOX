@@ -10,7 +10,7 @@
 
 ### Current State
 - ✅ **Base Schema**: Tables for users, companies, routes, vehicles, trips, driver_positions, trip_passengers
-- ✅ **Authentication**: Supabase Auth integrated with role-based access (admin/operator/carrier/driver/passenger)
+- ✅ **Authentication**: Supabase Auth integrated with role-based access (admin/operador/transportadora/motorista/passageiro)
 - ✅ **GPS Tracking**: Real-time location tracking service with offline queue
 - ✅ **Multi-Persona Dashboards**: Complete UI for all user roles
 - ⚠️ **Previous RLS**: Overly permissive policies (all authenticated users had full access)
@@ -49,15 +49,15 @@ CREATE POLICY "Authenticated users can view trips" ON trips
 - ✅ SELECT: View/manage routes for their company
 - ✅ SELECT: View trips for company routes
 - ✅ INSERT/UPDATE: Create/update trips for company routes
-- ✅ SELECT: View driver positions for company trips
+- ✅ SELECT: View motorista positions for company trips
 - ✅ Can force trip transitions for company trips
 
 #### **transportadora Role** (`role = 'transportadora'`)
 - ✅ SELECT: View users in their transportadora network (`carrier_id` filtered)
-- ✅ SELECT/INSERT/UPDATE/DELETE: Manage carrier vehicles
+- ✅ SELECT/INSERT/UPDATE/DELETE: Manage transportadora vehicles
 - ✅ SELECT: View routes where `carrier_id` matches
-- ✅ SELECT: View trips on carrier routes
-- ✅ SELECT: View driver positions for carrier trips
+- ✅ SELECT: View trips on transportadora routes
+- ✅ SELECT: View motorista positions for transportadora trips
 
 #### **motorista Role** (`role = 'motorista'`)
 - ✅ SELECT: View own profile and assigned trips (`driver_id = auth.uid()`)
@@ -69,7 +69,7 @@ CREATE POLICY "Authenticated users can view trips" ON trips
 
 #### **passageiro Role** (`role = 'passageiro'`)
 - ✅ SELECT: View assigned trips via `trip_passengers` table
-- ✅ SELECT: View driver positions for assigned trips
+- ✅ SELECT: View motorista positions for assigned trips
 - ✅ SELECT: View own profile
 
 ### Implementation File
@@ -264,9 +264,9 @@ checklists:
 ```
 
 ### RLS Policies
-- ✅ Driver: Full access to checklists for own trips
+- ✅ motorista: Full access to checklists for own trips
 - ✅ Admin: Full access
-- ✅ Operator/Carrier: Read-only
+- ✅ operador/transportadora: Read-only
 
 ### Flutter Integration
 ```dart
@@ -298,16 +298,16 @@ final checklists = await SupabaseService.instance.getChecklistsForTrip(tripId);
 
 **Recommended Implementation:**
 1. Create Supabase Storage buckets:
-   - `vehicle-documents` (insurance, registration)
+   - `veiculo-documents` (insurance, registration)
    - `motorista-documents` (license, certifications)
    - `trip-photos` (incident reports, delivery proofs)
 
 2. RLS Policies for Storage:
    ```sql
-   -- Carriers can upload/view their vehicle docs
-   CREATE POLICY "Carriers manage vehicle docs" ON storage.objects
+   -- Carriers can upload/view their veiculo docs
+   CREATE POLICY "Carriers manage veiculo docs" ON storage.objects
      FOR ALL TO authenticated
-     USING (bucket_id = 'vehicle-documents' AND 
+     USING (bucket_id = 'veiculo-documents' AND 
             (SELECT carrier_id FROM vehicles WHERE id = (storage.foldername(name))[1]) = get_user_carrier_id());
    ```
 
@@ -357,10 +357,10 @@ describe('Haversine Distance', () => {
 ```
 
 #### **Manual Testing Checklist**
-- [ ] Login as each role (admin, operator, carrier, driver, passenger)
-- [ ] Verify driver can only see own trips
-- [ ] Verify driver can insert GPS positions
-- [ ] Verify operator can only see company data
+- [ ] Login as each role (admin, operador, transportadora, motorista, passageiro)
+- [ ] Verify motorista can only see own trips
+- [ ] Verify motorista can insert GPS positions
+- [ ] Verify operador can only see company data
 - [ ] Test trip state transitions (scheduled → inProgress → completed)
 - [ ] Test force reopen as admin
 - [ ] Verify real-time position updates on map
@@ -459,7 +459,7 @@ Future<void> main() async {
 
 ### ✅ Completed (Ready for Testing)
 - [x] Database schema with all required tables
-- [x] Canonical RLS policies by role (admin/operator/carrier/driver/passenger)
+- [x] Canonical RLS policies by role (admin/operador/transportadora/motorista/passageiro)
 - [x] RPC function for trip transitions with concurrency control
 - [x] Trip summary calculation with Haversine formula
 - [x] Automatic triggers for summary recalculation

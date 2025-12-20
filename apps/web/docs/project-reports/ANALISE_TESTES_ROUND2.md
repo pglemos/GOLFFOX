@@ -18,7 +18,7 @@
 - **Correção Aplicada:** ✅ Mapeamento de erros de autenticação para sempre retornar 401
 - **Status:** ✅ Corrigido
 
-#### TC003 - Operator Creation (500)
+#### TC003 - operador Creation (500)
 - **Problema:** Erro 500 ao criar operador
 - **Causa Provável:** 
   - Erro no banco de dados ao criar empresa ou usuário
@@ -72,8 +72,8 @@
 - **Arquivo:** `web-app/app/api/auth/login/route.ts`
 - **Mudança:** Mapeamento de erros de autenticação para sempre retornar 401, mesmo se Supabase retornar 400
 
-### 2. TC003 - Operator Creation (Mensagens de erro melhoradas)
-- **Arquivo:** `web-app/app/api/admin/create-operator/route.ts`
+### 2. TC003 - operador Creation (Mensagens de erro melhoradas)
+- **Arquivo:** `web-app/app/api/admin/create-operador/route.ts`
 - **Mudança:** Mensagens de erro mais descritivas com detalhes em modo de desenvolvimento
 
 ---

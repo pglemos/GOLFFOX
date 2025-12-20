@@ -100,7 +100,7 @@
 - ❌ `i18n.ts` - Internacionalização
 - ❌ `google-maps-loader.ts` - Carregador Google Maps
 - ❌ `google-maps-reverse.ts` - Reverse geocoding
-- ❌ `operator-export.ts` - Exportação de operador
+- ❌ `operador-export.ts` - Exportação de operador
 - ❌ `export-map-png.ts` - Exportação de mapas PNG
 - ❌ `exports.ts` - Utilitários de exportação
 - ❌ `global-sync.ts` - Sincronização global
@@ -126,7 +126,7 @@
 - ❌ **Custos**: `cost-dashboard.tsx`, `reconciliation-modal.tsx`, `import-cost-modal.tsx`, `cost-charts.tsx`, `budget-view.tsx`
 - ❌ **Mapas**: `admin-map.tsx`, `fleet-map.tsx`, `transportadora-map.tsx`, `advanced-route-map.tsx`
 - ❌ **Modais**: Todos os modais (~30 componentes)
-- ❌ **Operador**: `dashboard-charts.tsx`, `operator-kpi-cards.tsx`, `control-tower-cards.tsx`
+- ❌ **Operador**: `dashboard-charts.tsx`, `operador-kpi-cards.tsx`, `control-tower-cards.tsx`
 - ❌ **Transportadora**: `kpi-card-enhanced.tsx`, `data-table.tsx`, `recent-activities.tsx`
 - ❌ **UI Base**: `textarea.tsx`, `tabs.tsx`, `pagination.tsx`, `skeleton.tsx`, `alert.tsx`, `tooltip.tsx`, `switch.tsx`, `slider.tsx`, `separator.tsx`, `scroll-area.tsx`, `progress.tsx`, `label.tsx`, `dropdown-menu.tsx`, `checkbox.tsx`, `badge.tsx`, `avatar.tsx`
 - ❌ E mais ~100 componentes...
@@ -140,7 +140,7 @@
 - ✅ `use-navigation.test.ts`
 - ✅ `use-responsive.test.ts`
 - ✅ `use-performance.test.ts`
-- ✅ `use-operator-data.test.ts`
+- ✅ `use-operador-data.test.ts`
 - ✅ `use-admin-vehicles.test.ts`
 - ✅ `use-admin-kpis.test.ts`
 - ✅ `use-supabase-query.test.ts`
@@ -192,7 +192,7 @@
 2. **Integrações** (~5 bibliotecas)
    - `google-maps-loader.ts`
    - `google-maps-reverse.ts`
-   - `operator-export.ts`
+   - `operador-export.ts`
 
 ### Prioridade BAIXA (Componentes e Hooks)
 1. **Componentes UI Base** (~20 componentes)

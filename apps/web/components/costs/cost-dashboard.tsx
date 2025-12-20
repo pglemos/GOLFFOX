@@ -173,12 +173,12 @@ export function CostDashboard({ companyId, period = '30' }: CostDashboardProps) 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">Custo Total</CardTitle>
-            <DollarSign className="h-4 w-4 text-orange-500" />
+            <CardTitle className="text-sm font-medium text-ink-muted">Custo Total</CardTitle>
+            <DollarSign className="h-4 w-4 text-brand" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{formatCurrency(kpis.total_cost)}</div>
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-ink-muted mt-1">
               Últimos {period} dias: {formatCurrency(kpis.total_cost_30d || kpis.total_cost_90d)}
             </p>
           </CardContent>
@@ -186,12 +186,12 @@ export function CostDashboard({ companyId, period = '30' }: CostDashboardProps) 
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">Custo/KM</CardTitle>
-            <TrendingUp className="h-4 w-4 text-blue-500" />
+            <CardTitle className="text-sm font-medium text-ink-muted">Custo/KM</CardTitle>
+            <TrendingUp className="h-4 w-4 text-info" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{formatCurrency(kpis.cost_per_km)}</div>
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-ink-muted mt-1">
               Total KM: {formatCount(kpis.total_km)}
             </p>
           </CardContent>
@@ -199,12 +199,12 @@ export function CostDashboard({ companyId, period = '30' }: CostDashboardProps) 
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">Custo/Viagem</CardTitle>
-            <BarChart3 className="h-4 w-4 text-green-500" />
+            <CardTitle className="text-sm font-medium text-ink-muted">Custo/Viagem</CardTitle>
+            <BarChart3 className="h-4 w-4 text-success" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{formatCurrency(kpis.cost_per_trip)}</div>
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-ink-muted mt-1">
               Total viagens: {kpis.total_trips}
             </p>
           </CardContent>
@@ -212,27 +212,27 @@ export function CostDashboard({ companyId, period = '30' }: CostDashboardProps) 
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">Variação vs Orçamento</CardTitle>
+            <CardTitle className="text-sm font-medium text-ink-muted">Variação vs Orçamento</CardTitle>
             {budgetVariance && budgetVariance.variance_percent > 0 ? (
-              <TrendingUp className="h-4 w-4 text-red-500" />
+              <TrendingUp className="h-4 w-4 text-error" />
             ) : (
-              <TrendingDown className="h-4 w-4 text-green-500" />
+              <TrendingDown className="h-4 w-4 text-success" />
             )}
           </CardHeader>
           <CardContent>
             {budgetVariance ? (
               <>
-                <div className={`text-2xl font-bold ${budgetVariance.variance_percent > 0 ? 'text-red-600' : 'text-green-600'}`}>
+                <div className={`text-2xl font-bold ${budgetVariance.variance_percent > 0 ? 'text-error' : 'text-success'}`}>
                   {budgetVariance.variance_percent > 0 ? '+' : ''}{budgetVariance.variance_percent.toFixed(1)}%
                 </div>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-ink-muted mt-1">
                   {formatCurrency(Math.abs(budgetVariance.variance_absolute))}
                 </p>
               </>
             ) : (
               <>
-                <div className="text-2xl font-bold text-gray-400">-</div>
-                <p className="text-xs text-gray-500 mt-1">Sem orçamento</p>
+                <div className="text-2xl font-bold text-ink-light">-</div>
+                <p className="text-xs text-ink-muted mt-1">Sem orçamento</p>
               </>
             )}
           </CardContent>
@@ -245,13 +245,13 @@ export function CostDashboard({ companyId, period = '30' }: CostDashboardProps) 
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="h-5 w-5 text-orange-500" />
+              <TrendingUp className="h-5 w-5 text-brand" />
               Evolução Mensal (Últimos 12 Meses)
             </CardTitle>
           </CardHeader>
           <CardContent>
             {chartsLoading ? (
-              <div className="w-full h-[300px] bg-gray-100 animate-pulse rounded-lg" />
+              <div className="w-full h-[300px] bg-muted animate-pulse rounded-lg" />
             ) : (
               <ResponsiveContainer width="100%" height={300}>
                 <LineChart data={monthlyTrend}>
@@ -280,13 +280,13 @@ export function CostDashboard({ companyId, period = '30' }: CostDashboardProps) 
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <PieChart className="h-5 w-5 text-orange-500" />
+              <PieChart className="h-5 w-5 text-brand" />
               Distribuição por Grupo de Custo
             </CardTitle>
           </CardHeader>
           <CardContent>
             {chartsLoading ? (
-              <div className="w-full h-[300px] bg-gray-100 animate-pulse rounded-lg" />
+              <div className="w-full h-[300px] bg-muted animate-pulse rounded-lg" />
             ) : breakdown.length > 0 ? (
               <ResponsiveContainer width="100%" height={300}>
                 <RechartsPieChart>
@@ -308,7 +308,7 @@ export function CostDashboard({ companyId, period = '30' }: CostDashboardProps) 
                 </RechartsPieChart>
               </ResponsiveContainer>
             ) : (
-              <div className="h-[300px] flex items-center justify-center text-gray-500">
+              <div className="h-[300px] flex items-center justify-center text-ink-muted">
                 Sem dados para exibir
               </div>
             )}
@@ -321,7 +321,7 @@ export function CostDashboard({ companyId, period = '30' }: CostDashboardProps) 
         <Card className="border-orange-200 bg-orange-50">
           <CardContent className="p-4">
             <div className="flex items-center gap-2">
-              <AlertCircle className="h-5 w-5 text-orange-500" />
+              <AlertCircle className="h-5 w-5 text-brand" />
               <div>
                 <p className="font-semibold text-orange-800">
                   Divergência significativa do orçamento detectada

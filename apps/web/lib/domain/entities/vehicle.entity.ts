@@ -1,7 +1,7 @@
 /**
- * Vehicle Entity
+ * veiculo Entity
  * 
- * Entidade de domínio para Vehicle
+ * Entidade de domínio para veiculo
  */
 
 export interface VehicleProps {
@@ -19,10 +19,10 @@ export interface VehicleProps {
   updated_at: Date
 }
 
-export class Vehicle {
+export class veiculo {
   private constructor(private props: VehicleProps) {}
 
-  static create(props: Omit<VehicleProps, 'id' | 'created_at' | 'updated_at'>): Vehicle {
+  static create(props: Omit<VehicleProps, 'id' | 'created_at' | 'updated_at'>): veiculo {
     // Validações de negócio
     if (!props.plate || props.plate.trim().length === 0) {
       throw new Error('Placa do veículo é obrigatória')
@@ -47,7 +47,7 @@ export class Vehicle {
       throw new Error('Capacidade do veículo deve ser maior que zero')
     }
 
-    return new Vehicle({
+    return new veiculo({
       ...props,
       id: crypto.randomUUID(),
       created_at: new Date(),
@@ -55,8 +55,8 @@ export class Vehicle {
     })
   }
 
-  static fromDatabase(props: VehicleProps): Vehicle {
-    return new Vehicle(props)
+  static fromDatabase(props: VehicleProps): veiculo {
+    return new veiculo(props)
   }
 
   // Getters

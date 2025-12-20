@@ -32,7 +32,7 @@ interface StopDetails {
   type: 'pickup' | 'dropoff'
   address: string
   scheduledTime: string
-  passenger: PassengerDetails
+  passageiro: PassengerDetails
   coordinates: { lat: number; lng: number }
   stopNumber: number
   isCompleted: boolean
@@ -51,8 +51,8 @@ const passengerTypeConfig = {
   regular: { 
     icon: User, 
     label: 'Regular', 
-    color: 'bg-blue-100 text-blue-800',
-    iconColor: 'text-blue-600'
+    color: 'bg-info-light text-info',
+    iconColor: 'text-info'
   },
   elderly: { 
     icon: User, 
@@ -69,8 +69,8 @@ const passengerTypeConfig = {
   student: { 
     icon: User, 
     label: 'Estudante', 
-    color: 'bg-green-100 text-green-800',
-    iconColor: 'text-green-600'
+    color: 'bg-success-light text-success',
+    iconColor: 'text-success'
   }
 }
 
@@ -83,7 +83,7 @@ export function InteractiveMarkerHotspot({
 }: InteractiveMarkerHotspotProps) {
   const [isExpanded, setIsExpanded] = useState(false)
   const cardRef = useRef<HTMLDivElement>(null)
-  const passengerConfig = passengerTypeConfig[stop.passenger.type]
+  const passengerConfig = passengerTypeConfig[stop.passageiro.type]
   const PassengerIcon = passengerConfig.icon
 
   // Ajustar posição para manter o card visível na tela
@@ -158,22 +158,22 @@ export function InteractiveMarkerHotspot({
             <div className="flex items-center justify-between p-3 sm:p-4 border-b bg-gradient-to-r from-blue-50 to-indigo-50">
               <div className="flex items-center gap-3">
                 <div className={`p-2 rounded-full ${
-                  stop.type === 'pickup' ? 'bg-green-100' : 'bg-red-100'
+                  stop.type === 'pickup' ? 'bg-success-light' : 'bg-error-light'
                 }`}>
                   <MapPin className={`w-4 h-4 ${
-                    stop.type === 'pickup' ? 'text-green-600' : 'text-red-600'
+                    stop.type === 'pickup' ? 'text-success' : 'text-error'
                   }`} />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-sm sm:text-base text-gray-900 truncate">
+                  <h3 className="font-semibold text-sm sm:text-base text-ink-strong truncate">
                     Parada #{stop.stopNumber}
                   </h3>
                   <Badge 
                     variant="secondary" 
                     className={`text-xs ${
                       stop.type === 'pickup' 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-red-100 text-red-800'
+                        ? 'bg-success-light text-success' 
+                        : 'bg-error-light text-error'
                     }`}
                   >
                     {stop.type === 'pickup' ? 'Embarque' : 'Desembarque'}
@@ -213,13 +213,13 @@ export function InteractiveMarkerHotspot({
               {/* Passageiro */}
               <div className="flex items-center gap-2 sm:gap-3">
                 <Avatar className="w-8 h-8 sm:w-10 sm:h-10">
-                  <AvatarImage src={stop.passenger.photo} alt={stop.passenger.name} />
+                  <AvatarImage src={stop.passageiro.photo} alt={stop.passageiro.name} />
                   <AvatarFallback className="text-xs sm:text-sm font-medium">
-                    {getInitials(stop.passenger.name)}
+                    {getInitials(stop.passageiro.name)}
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-xs sm:text-sm text-gray-900 truncate">{stop.passageiro.name}</p>
+                  <p className="font-semibold text-xs sm:text-sm text-ink-strong truncate">{stop.passageiro.name}</p>
                   <Badge className={`text-xs ${passengerConfig.color}`}>
                     <PassengerIcon className={`w-3 h-3 mr-1 ${passengerConfig.iconColor}`} />
                     {passengerConfig.label}
@@ -229,16 +229,16 @@ export function InteractiveMarkerHotspot({
 
               {/* Endereço */}
               <div className="flex items-start gap-2">
-                <MapPin className="w-3 h-3 sm:w-4 sm:h-4 text-gray-500 mt-0.5 flex-shrink-0" />
-                <p className="text-xs sm:text-sm text-gray-700 leading-relaxed break-words">
+                <MapPin className="w-3 h-3 sm:w-4 sm:h-4 text-ink-muted mt-0.5 flex-shrink-0" />
+                <p className="text-xs sm:text-sm text-ink-strong leading-relaxed break-words">
                   {stop.address}
                 </p>
               </div>
 
               {/* Horário */}
               <div className="flex items-center gap-2">
-                <Clock className="w-3 h-3 sm:w-4 sm:h-4 text-gray-500" />
-                <p className="text-xs sm:text-sm text-gray-700">
+                <Clock className="w-3 h-3 sm:w-4 sm:h-4 text-ink-muted" />
+                <p className="text-xs sm:text-sm text-ink-strong">
                   Previsto para <span className="font-medium">{formatTime(stop.scheduledTime)}</span>
                 </p>
               </div>
@@ -254,30 +254,30 @@ export function InteractiveMarkerHotspot({
                   transition={{ duration: 0.3, ease: 'easeInOut' }}
                   className="overflow-hidden"
                 >
-                  <div className="px-4 pb-4 space-y-3 border-t bg-gray-50/50">
+                  <div className="px-4 pb-4 space-y-3 border-t bg-bg-soft/50">
                     {/* Telefone */}
-                    {stop.passenger.phone && (
+                    {stop.passageiro.phone && (
                       <div className="flex items-center gap-2 pt-3">
-                        <Phone className="w-4 h-4 text-gray-500" />
+                        <Phone className="w-4 h-4 text-ink-muted" />
                         <a 
                           href={`tel:${stop.passageiro.phone}`}
-                          className="text-sm text-blue-600 hover:text-blue-800 transition-colors"
+                          className="text-sm text-info hover:text-info transition-colors"
                         >
-                          {stop.passenger.phone}
+                          {stop.passageiro.phone}
                         </a>
                       </div>
                     )}
 
                     {/* Observações */}
-                    {stop.passenger.observations && (
+                    {stop.passageiro.observations && (
                       <div className="flex items-start gap-2">
-                        <MessageSquare className="w-4 h-4 text-gray-500 mt-0.5 flex-shrink-0" />
+                        <MessageSquare className="w-4 h-4 text-ink-muted mt-0.5 flex-shrink-0" />
                         <div className="flex-1">
-                          <p className="text-xs text-gray-600 mb-1">Observações:</p>
-                          <p className="text-sm text-gray-700 leading-relaxed">
-                            {stop.passenger.observations.length > 140 
+                          <p className="text-xs text-ink-muted mb-1">Observações:</p>
+                          <p className="text-sm text-ink-strong leading-relaxed">
+                            {stop.passageiro.observations.length > 140 
                               ? `${stop.passageiro.observations.slice(0, 140)}...`
-                              : stop.passenger.observations
+                              : stop.passageiro.observations
                             }
                           </p>
                         </div>

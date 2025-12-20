@@ -11,17 +11,17 @@ ALTER TABLE users DROP CONSTRAINT IF EXISTS users_role_check;
 -- 2. Migrar roles de inglês para português
 -- ============================================
 
--- operator → empresa (Empresa Contratante)
-UPDATE users SET role = 'empresa' WHERE role = 'operator';
+-- operador → empresa (Empresa Contratante)
+UPDATE users SET role = 'empresa' WHERE role = 'operador';
 
--- carrier → operador (Gestor da Transportadora)
-UPDATE users SET role = 'operador' WHERE role = 'carrier';
+-- transportadora → operador (Gestor da Transportadora)
+UPDATE users SET role = 'operador' WHERE role = 'transportadora';
 
--- driver → motorista
-UPDATE users SET role = 'motorista' WHERE role = 'driver';
+-- motorista → motorista
+UPDATE users SET role = 'motorista' WHERE role = 'motorista';
 
--- passenger → passageiro
-UPDATE users SET role = 'passageiro' WHERE role = 'passenger';
+-- passageiro → passageiro
+UPDATE users SET role = 'passageiro' WHERE role = 'passageiro';
 
 -- ============================================
 -- 3. Adicionar nova constraint com roles PT-BR
@@ -33,7 +33,7 @@ ALTER TABLE users ADD CONSTRAINT users_role_check
 -- 4. Atualizar RLS policies (se existirem)
 -- ============================================
 
--- Exemplo: Atualizar policies que referenciam 'operator'
+-- Exemplo: Atualizar policies que referenciam 'operador'
 -- DROP POLICY IF EXISTS "operator_access" ON tabela;
 -- CREATE POLICY "empresa_access" ON tabela ...
 

@@ -14,12 +14,12 @@ import { useCep } from "@/hooks/use-cep"
 import { formatCPF, formatPhone, formatCEP, unformatNumber } from "@/lib/format-utils"
 
 interface TransportadoraDriversModalProps {
-  carrier: { id: string; name: string }
+  transportadora: { id: string; name: string }
   isOpen: boolean
   onClose: () => void
 }
 
-export function TransportadoraDriversModal({ carrier, isOpen, onClose }: TransportadoraDriversModalProps) {
+export function TransportadoraDriversModal({ transportadora, isOpen, onClose }: TransportadoraDriversModalProps) {
   const [drivers, setDrivers] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
   const [activeTab, setActiveTab] = useState("list")
@@ -46,11 +46,11 @@ export function TransportadoraDriversModal({ carrier, isOpen, onClose }: Transpo
   })
 
   useEffect(() => {
-    if (isOpen && carrier) {
+    if (isOpen && transportadora) {
       loadDrivers()
       setActiveTab("list")
     }
-  }, [isOpen, carrier])
+  }, [isOpen, transportadora])
 
   const loadDrivers = async () => {
     try {
@@ -121,7 +121,7 @@ export function TransportadoraDriversModal({ carrier, isOpen, onClose }: Transpo
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...formData,
-          transportadora_id: carrier.id
+          transportadora_id: transportadora.id
         })
       })
 
@@ -197,8 +197,8 @@ export function TransportadoraDriversModal({ carrier, isOpen, onClose }: Transpo
     }
   }
 
-  const handleEditClick = (driver: any) => {
-    setEditingDriver(driver)
+  const handleEditClick = (motorista: any) => {
+    setEditingDriver(motorista)
     setFormData({
       name: motorista.name || "",
       email: motorista.email || "",
@@ -253,7 +253,7 @@ export function TransportadoraDriversModal({ carrier, isOpen, onClose }: Transpo
 
             {!loading && drivers.length === 0 && (
               <Card className="p-8 text-center">
-                <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <Users className="h-12 w-12 text-ink-light mx-auto mb-4" />
                 <p className="text-muted-foreground mb-4">Nenhum motorista associado a esta transportadora</p>
                 <Button onClick={() => setActiveTab("form")}>
                   <Plus className="h-4 w-4 mr-2" />
@@ -264,7 +264,7 @@ export function TransportadoraDriversModal({ carrier, isOpen, onClose }: Transpo
 
             {!loading && drivers.length > 0 && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {drivers.map((driver) => (
+                {drivers.map((motorista) => (
                   <Card key={motorista.id} className="p-4 hover:shadow-md transition-shadow">
                     <div className="space-y-3">
                       {/* Cabeçalho */}
@@ -281,7 +281,7 @@ export function TransportadoraDriversModal({ carrier, isOpen, onClose }: Transpo
                             <Button
                               size="sm"
                               variant="outline"
-                              onClick={() => handleEditClick(driver)}
+                              onClick={() => handleEditClick(motorista)}
                               className="min-h-[44px] min-w-[44px]"
                             >
                               <Edit className="h-4 w-4" />
@@ -289,7 +289,7 @@ export function TransportadoraDriversModal({ carrier, isOpen, onClose }: Transpo
                             <Button
                               size="sm"
                               variant="destructive"
-                              onClick={() => handleDeleteDriver(driver.id, driver.name)}
+                              onClick={() => handleDeleteDriver(motorista.id, motorista.name)}
                               disabled={loading}
                               className="min-h-[44px] min-w-[44px]"
                             >
@@ -301,25 +301,25 @@ export function TransportadoraDriversModal({ carrier, isOpen, onClose }: Transpo
 
                       {/* Informações do Motorista */}
                       <div className="space-y-2 text-sm">
-                        {driver.email && (
+                        {motorista.email && (
                           <div className="flex items-center gap-2 text-muted-foreground">
                             <Mail className="h-4 w-4" />
-                            <span>{driver.email}</span>
+                            <span>{motorista.email}</span>
                           </div>
                         )}
-                        {driver.phone && (
+                        {motorista.phone && (
                           <div className="flex items-center gap-2 text-muted-foreground">
                             <Phone className="h-4 w-4" />
-                            <span>{driver.phone}</span>
+                            <span>{motorista.phone}</span>
                           </div>
                         )}
-                        {driver.cpf && (
+                        {motorista.cpf && (
                           <div className="flex items-center gap-2 text-muted-foreground">
                             <CreditCard className="h-4 w-4" />
-                            <span>CPF: {driver.cpf}</span>
+                            <span>CPF: {motorista.cpf}</span>
                           </div>
                         )}
-                        {driver.cnh && (
+                        {motorista.cnh && (
                           <div className="text-xs text-muted-foreground">
                             CNH: {motorista.cnh} {motorista.cnh_category && `(${motorista.cnh_category})`}
                           </div>
@@ -493,7 +493,7 @@ export function TransportadoraDriversModal({ carrier, isOpen, onClose }: Transpo
                     id="city"
                     value={formData.address_city}
                     readOnly
-                    className="h-11 bg-gray-50"
+                    className="h-11 bg-bg-soft"
                   />
                 </div>
 
@@ -503,7 +503,7 @@ export function TransportadoraDriversModal({ carrier, isOpen, onClose }: Transpo
                     id="state"
                     value={formData.address_state}
                     readOnly
-                    className="h-11 bg-gray-50"
+                    className="h-11 bg-bg-soft"
                   />
                 </div>
               </div>
@@ -522,7 +522,7 @@ export function TransportadoraDriversModal({ carrier, isOpen, onClose }: Transpo
                 <Button
                   type="submit"
                   disabled={loading || !formData.name}
-                  className="w-full sm:w-auto order-1 sm:order-2 bg-orange-500 hover:bg-orange-600 min-h-[44px] text-base font-medium"
+                  className="w-full sm:w-auto order-1 sm:order-2 bg-brand hover:bg-orange-600 min-h-[44px] text-base font-medium"
                 >
                   {loading ? 'Salvando...' : editingDriver ? 'Atualizar Motorista' : 'Criar Motorista'}
                 </Button>

@@ -59,7 +59,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Invalidar cache após exclusão
-    await invalidateEntityCache('vehicle', vehicleId)
+    await invalidateEntityCache('veiculo', vehicleId)
 
     logger.log(`✅ Veículo excluído com sucesso: ${vehicleId}`, data)
 

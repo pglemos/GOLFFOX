@@ -48,15 +48,15 @@ describe('Supabase Sync Service', () => {
       mockInsert.mockReturnValue({
         select: jest.fn().mockReturnValue({
           single: jest.fn().mockResolvedValue({
-            data: { id: 'vehicle-123', plate: 'ABC1234', model: 'Modelo X' },
+            data: { id: 'veiculo-123', plate: 'ABC1234', model: 'Modelo X' },
             error: null,
           }),
         }),
       })
 
       const operation = {
-        resourceType: 'vehicle',
-        resourceId: 'vehicle-123',
+        resourceType: 'veiculo',
+        resourceId: 'veiculo-123',
         action: 'create' as const,
         data: {
           plate: 'ABC1234',
@@ -78,7 +78,7 @@ describe('Supabase Sync Service', () => {
         eq: jest.fn().mockReturnValue({
           select: jest.fn().mockReturnValue({
             single: jest.fn().mockResolvedValue({
-              data: { id: 'driver-123', name: 'João Silva', email: 'joao@example.com' },
+              data: { id: 'motorista-123', name: 'João Silva', email: 'joao@example.com' },
               error: null,
             }),
           }),
@@ -86,8 +86,8 @@ describe('Supabase Sync Service', () => {
       })
 
       const operation = {
-        resourceType: 'driver',
-        resourceId: 'driver-123',
+        resourceType: 'motorista',
+        resourceId: 'motorista-123',
         action: 'update' as const,
         data: {
           name: 'João Silva',
@@ -160,8 +160,8 @@ describe('Supabase Sync Service', () => {
       })
 
       const operation = {
-        resourceType: 'vehicle',
-        resourceId: 'vehicle-123',
+        resourceType: 'veiculo',
+        resourceId: 'veiculo-123',
         action: 'create' as const,
         data: {
           plate: 'ABC1234',
@@ -187,13 +187,13 @@ describe('Supabase Sync Service', () => {
       // Verificar se foi salvo como falha
       const failed = getFailedSyncs()
       expect(failed.length).toBeGreaterThan(0)
-      expect(failed[0].operation.resourceId).toBe('vehicle-123')
+      expect(failed[0].operation.resourceId).toBe('veiculo-123')
     })
 
     it('deve validar dados antes de sincronizar', async () => {
       const operation = {
-        resourceType: 'vehicle',
-        resourceId: 'vehicle-123',
+        resourceType: 'veiculo',
+        resourceId: 'veiculo-123',
         action: 'create' as const,
         data: {
           // Falta placa obrigatória
@@ -226,7 +226,7 @@ describe('Supabase Sync Service', () => {
       })
 
       const operation = {
-        resourceType: 'vehicle',
+        resourceType: 'veiculo',
         resourceId: 'test-123',
         action: 'create' as const,
         data: {
@@ -264,7 +264,7 @@ describe('Supabase Sync Service', () => {
       })
 
       const operation = {
-        resourceType: 'vehicle',
+        resourceType: 'veiculo',
         resourceId: 'test-123',
         action: 'create' as const,
         data: {
@@ -294,7 +294,7 @@ describe('Supabase Sync Service', () => {
       })
 
       const operation = {
-        resourceType: 'vehicle',
+        resourceType: 'veiculo',
         resourceId: 'reprocess-test',
         action: 'create' as const,
         data: {
@@ -343,7 +343,7 @@ describe('Supabase Sync Service', () => {
 
       const operation = {
         id: 'clear-test-123',
-        resourceType: 'vehicle',
+        resourceType: 'veiculo',
         resourceId: 'clear-test',
         action: 'create' as const,
         data: {
@@ -375,15 +375,15 @@ describe('Supabase Sync Service', () => {
       mockInsert.mockReturnValue({
         select: jest.fn().mockReturnValue({
           single: jest.fn().mockResolvedValue({
-            data: { id: 'vehicle-123' },
+            data: { id: 'veiculo-123' },
             error: null,
           }),
         }),
       })
 
       const operation = {
-        resourceType: 'vehicle',
-        resourceId: 'vehicle-123',
+        resourceType: 'veiculo',
+        resourceId: 'veiculo-123',
         action: 'create' as const,
         data: {
           plate: 'ABC1234',

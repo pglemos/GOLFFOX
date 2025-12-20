@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
                 .from('driver_locations' as any)
                 .select(`
                     *,
-                    driver:users!driver_id(id, name, phone),
+                    motorista:users!driver_id(id, name, phone),
                     trip:trips(id, status, route:routes(name))
                 `)
                 .order('recorded_at', { ascending: false });
@@ -52,7 +52,7 @@ export async function GET(request: NextRequest) {
             .from('driver_locations' as any)
             .select(`
                 *,
-                driver:users!driver_id(id, name)
+                motorista:users!driver_id(id, name)
             `)
             .order('recorded_at', { ascending: false })
             .limit(500);

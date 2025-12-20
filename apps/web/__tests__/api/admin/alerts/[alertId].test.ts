@@ -111,7 +111,7 @@ describe('PUT /api/admin/alerts/[alertId]', () => {
         severity: 'critical',
         status: 'assigned',
         route_id: 'route-1',
-        vehicle_id: 'vehicle-1',
+        vehicle_id: 'veiculo-1',
       },
     }) as NextRequest
 

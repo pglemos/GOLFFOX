@@ -80,10 +80,10 @@ final events = await SupabaseService.instance.getTripEvents(tripId);
 **File:** `lib/supabase/migration_v7_4_canonical.sql` (Lines 33-48, 380-394)  
 **Flutter:** `lib/services/supabase_service.dart` (Lines 346-374)
 
-- **Table**: `checklists` for vehicle inspections
+- **Table**: `checklists` for veiculo inspections
 - **Types**: `pre_trip` (before departure), `post_trip` (after arrival)
-- **Fields**: Vehicle condition, fuel level, lights, brakes, emergency kit, notes
-- **RLS**: Drivers manage own trip checklists, admin/operator read-only
+- **Fields**: veiculo condition, fuel level, lights, brakes, emergency kit, notes
+- **RLS**: Drivers manage own trip checklists, admin/operador read-only
 
 **Usage:**
 ```dart
@@ -107,7 +107,7 @@ await SupabaseService.instance.createChecklist(
 - **Base View**: `trip_report_view` (live data)
 - **Materialized View**: `mvw_trip_report` (cached for performance)
 - **pg_cron Job**: Auto-refresh every 1 minute
-- **Includes**: Trip details, route info, company name, driver name, summary metrics, passenger count
+- **Includes**: Trip details, route info, company name, motorista name, summary metrics, passageiro count
 
 **Usage:**
 ```dart
@@ -122,7 +122,7 @@ final reports = await SupabaseService.instance.getTripReports(
 ### 7. **Real-time Streaming** ✅
 **Flutter:** `lib/services/supabase_service.dart` (Lines 243-260)
 
-- **Stream Driver Positions**: Real-time GPS updates
+- **Stream motorista Positions**: Real-time GPS updates
 - **Stream Trip Status**: Live status changes
 - **Requires**: Realtime enabled in Supabase Dashboard (manual step)
 
@@ -148,7 +148,7 @@ New methods added:
 - `streamTripStatus()` - Real-time trip monitoring
 - `streamDriverPositionsRealtime()` - Live GPS tracking
 - `getRoutesForUser()` - Role-aware route queries
-- `getVehiclesForUser()` - Role-aware vehicle queries
+- `getVehiclesForUser()` - Role-aware veiculo queries
 - `getTripReports()` - Analytics from materialized view
 - `createChecklist()` / `getChecklistsForTrip()` - Inspection management
 
@@ -193,7 +193,7 @@ If empty and you need scheduled MV refresh, contact Supabase support to enable `
 
 ### Test Scenarios
 
-#### **Scenario 1: Driver Trip Lifecycle**
+#### **Scenario 1: motorista Trip Lifecycle**
 1. Login as `motorista@golffox.com`
 2. Navigate to assigned trip
 3. Click "Start Trip" → Status changes to `inProgress`
@@ -207,22 +207,22 @@ If empty and you need scheduled MV refresh, contact Supabase support to enable `
 3. Click "Reopen Trip" (force mode) → Status back to `inProgress`
 4. Check audit log shows `forced: true`
 
-#### **Scenario 3: Operator Scope**
+#### **Scenario 3: operador Scope**
 1. Login as `operador@golffox.com`
 2. Verify: Only trips from operador's company are visible
-3. Try to view driver from another company → Should fail (RLS)
+3. Try to view motorista from another company → Should fail (RLS)
 
 #### **Scenario 4: Real-time Updates**
 1. Open app on two devices
-2. Device 1: Login as driver, start trip
-3. Device 2: Login as passenger, view same trip
+2. Device 1: Login as motorista, start trip
+3. Device 2: Login as passageiro, view same trip
 4. Device 1: Move around (GPS tracking)
 5. Device 2: Watch position marker move in real-time
 
 #### **Scenario 5: Checklists**
-1. Login as driver
+1. Login as motorista
 2. Before starting trip, create pre-trip checklist
-3. Mark vehicle condition, fuel, lights, brakes
+3. Mark veiculo condition, fuel, lights, brakes
 4. After completing trip, create post-trip checklist
 5. View checklist history for trip
 
@@ -357,7 +357,7 @@ idx_mvw_trip_report_id (UNIQUE)
 - 🔜 Performance testing (concurrent transitions)
 
 ### Long-term (Future)
-- 🔮 Storage buckets for vehicle/driver documents
+- 🔮 Storage buckets for veiculo/motorista documents
 - 🔮 Push notifications for trip events
 - 🔮 Advanced analytics dashboard
 - 🔮 Integration with external ERP systems

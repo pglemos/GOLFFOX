@@ -279,9 +279,9 @@ export default function SocorroPage() {
                         {loadingResources ? 'Carregando motoristas...' : 'Nenhum motorista disponível'}
                       </SelectItem>
                     ) : (
-                      availableDrivers.map((driver) => (
-                        <SelectItem key={driver.id} value={driver.id}>
-                          {driver.displayName}
+                      availableDrivers.map((motorista) => (
+                        <SelectItem key={motorista.id} value={motorista.id}>
+                          {motorista.displayName}
                         </SelectItem>
                       ))
                     )}
@@ -309,9 +309,9 @@ export default function SocorroPage() {
                         {loadingResources ? 'Carregando veículos...' : 'Nenhum veículo disponível'}
                       </SelectItem>
                     ) : (
-                      availableVehicles.map((vehicle) => (
-                        <SelectItem key={vehicle.id} value={vehicle.id}>
-                          {vehicle.displayName}
+                      availableVehicles.map((veiculo) => (
+                        <SelectItem key={veiculo.id} value={veiculo.id}>
+                          {veiculo.displayName}
                         </SelectItem>
                       ))
                     )}
@@ -372,7 +372,7 @@ export default function SocorroPage() {
             <CardContent>
               <div className="flex gap-4 mb-4">
                 <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-ink-light h-4 w-4" />
                   <Input
                     placeholder="Buscar ocorrências..."
                     value={searchQuery}
@@ -436,7 +436,7 @@ export default function SocorroPage() {
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
-                      <div className="p-1.5 rounded-lg bg-red-100">
+                      <div className="p-1.5 rounded-lg bg-error-light">
                         <LifeBuoy className="h-4 w-4 text-text-error" />
                       </div>
                       <h3 className="font-bold text-lg capitalize group-hover:text-text-error transition-colors">{ocorrencia.request_type}</h3>
@@ -475,7 +475,7 @@ export default function SocorroPage() {
                       <p>🕐 {new Date(ocorrencia.created_at).toLocaleString('pt-BR')}</p>
                       {ocorrencia.status === 'open' && ocorrencia.created_at && (
                         <div className="flex items-center gap-1 mt-2">
-                          <Clock className="h-3 w-3 text-orange-500" />
+                          <Clock className="h-3 w-3 text-brand" />
                           <span className="text-xs text-orange-600 font-medium">
                             Tempo de resposta: {(() => {
                               const minutes = Math.floor((Date.now() - new Date(ocorrencia.created_at).getTime()) / (1000 * 60))
@@ -570,7 +570,7 @@ export default function SocorroPage() {
           ))}
           {ocorrencias.length === 0 && (
             <Card className="p-12 text-center">
-              <LifeBuoy className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+              <LifeBuoy className="h-12 w-12 text-ink-light mx-auto mb-4" />
               <h3 className="text-lg font-medium mb-2">Nenhuma ocorrência encontrada</h3>
               <p className="text-sm text-ink-muted">
                 {searchQuery ? "Tente ajustar sua busca" : "Não há ocorrências no momento"}

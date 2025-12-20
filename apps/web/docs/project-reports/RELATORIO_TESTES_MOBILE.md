@@ -19,10 +19,10 @@ As seguintes páginas foram corrigidas e estão funcionando corretamente no mobi
 3. **Admin/Motoristas** - ✅ Corrigida
 4. **Admin/Veículos** - ✅ Corrigida
 5. **Admin/Alertas** - ✅ Corrigida
-6. **Operator/Funcionários** - ✅ Corrigida
-7. **Operator/Solicitações** - ✅ Corrigida
-8. **Operator/Prestadores** - ✅ Corrigida
-9. **Carrier/Alertas** - ✅ Corrigida
+6. **operador/Funcionários** - ✅ Corrigida
+7. **operador/Solicitações** - ✅ Corrigida
+8. **operador/Prestadores** - ✅ Corrigida
+9. **transportadora/Alertas** - ✅ Corrigida
 
 ### ⚠️ Páginas com Problemas Menores
 
@@ -31,9 +31,9 @@ Estas páginas têm alguns botões sem altura mínima, mas o layout geral está 
 - Admin/Relatórios
 - Admin/Rotas
 - Admin/Socorro
-- Carrier/Veículos
-- Carrier/Motoristas
-- Operator/Rotas
+- transportadora/Veículos
+- transportadora/Motoristas
+- operador/Rotas
 
 ### ❌ Componentes que Precisam de Correção
 
@@ -41,31 +41,31 @@ Estas páginas têm alguns botões sem altura mínima, mas o layout geral está 
 
 Os seguintes modais precisam de `w-[95vw] sm:w-[90vw]`:
 
-1. `components/admin/driver-picker-modal.tsx`
-2. `components/admin/vehicle-picker-modal.tsx`
+1. `components/admin/motorista-picker-modal.tsx`
+2. `components/admin/veiculo-picker-modal.tsx`
 3. `components/costs/import-cost-modal.tsx`
 4. `components/costs/reconciliation-modal.tsx`
 5. `components/modals/assistance-modal.tsx`
-6. `components/modals/associate-operator-modal.tsx`
-7. `components/modals/carrier-drivers-modal.tsx`
-8. `components/modals/carrier-users-modal.tsx`
-9. `components/modals/carrier-vehicles-modal.tsx`
+6. `components/modals/associate-operador-modal.tsx`
+7. `components/modals/transportadora-drivers-modal.tsx`
+8. `components/modals/transportadora-users-modal.tsx`
+9. `components/modals/transportadora-vehicles-modal.tsx`
 10. `components/modals/change-role-modal.tsx`
 11. `components/modals/company-operators-modal.tsx`
-12. `components/modals/create-operator-login-modal.tsx`
-13. `components/modals/create-operator-modal.tsx`
-14. `components/modals/driver-modal.tsx`
+12. `components/modals/create-operador-login-modal.tsx`
+13. `components/modals/create-operador-modal.tsx`
+14. `components/modals/motorista-modal.tsx`
 15. `components/modals/edit-alert-modal.tsx`
 16. `components/modals/edit-assistance-modal.tsx`
 17. `components/modals/edit-company-modal.tsx`
 18. `components/modals/edit-user-modal.tsx`
 19. `components/modals/route-modal.tsx`
 20. `components/modals/schedule-report-modal.tsx`
-21. `components/modals/vehicle-checklist-modal.tsx`
-22. `components/modals/vehicle-maintenance-modal.tsx`
-23. `components/modals/vehicle-modal.tsx`
-24. `components/operator/broadcast-modal.tsx`
-25. `components/operator/csv-import-modal.tsx`
+21. `components/modals/veiculo-checklist-modal.tsx`
+22. `components/modals/veiculo-maintenance-modal.tsx`
+23. `components/modals/veiculo-modal.tsx`
+24. `components/operador/broadcast-modal.tsx`
+25. `components/operador/csv-import-modal.tsx`
 
 #### Botões sem Altura Mínima
 
@@ -101,7 +101,7 @@ Portanto, esses botões funcionarão corretamente mesmo sem a classe explícita.
 
 ## Conclusão
 
-As **páginas principais** dos 3 painéis (Admin, Operator, Carrier) estão **funcionando corretamente no mobile**. Os erros encontrados são principalmente em:
+As **páginas principais** dos 3 painéis (Admin, operador, transportadora) estão **funcionando corretamente no mobile**. Os erros encontrados são principalmente em:
 
 1. Componentes auxiliares (mapas, controles avançados)
 2. Modais secundários que não foram corrigidos ainda

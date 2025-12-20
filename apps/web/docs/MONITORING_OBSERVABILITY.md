@@ -103,7 +103,7 @@ alertManager.registerRule({
   name: 'Taxa de Erro Alta',
   metric: 'api.error.rate',
   threshold: 0.1,
-  operator: 'gt',
+  operador: 'gt',
   severity: 'error',
   enabled: true,
   cooldown: 300

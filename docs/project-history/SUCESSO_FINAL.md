@@ -85,7 +85,7 @@
 - ✅ CSRF token gerado e validado
 - ✅ Login com Supabase funcionando
 - ✅ Cookie de sessão criado corretamente
-- ✅ Validação de role (admin, operator, carrier)
+- ✅ Validação de role (admin, operador, transportadora)
 - ✅ Persistência de sessão
 
 ### Middleware:

@@ -14,8 +14,8 @@
         302
       ]
     },
-    "/operator": {
-      "name": "Operator Dashboard",
+    "/operador": {
+      "name": "operador Dashboard",
       "status": 307,
       "statusText": "Temporary Redirect",
       "accessible": false,

@@ -21,22 +21,22 @@ describe('lib/api-auth', () => {
       expect(hasRole(user, 'admin')).toBe(true)
     })
 
-    it('deve retornar false para operator acessando admin', () => {
-      const user = { id: '2', email: 'operator@test.com', role: 'operador' }
+    it('deve retornar false para operador acessando admin', () => {
+      const user = { id: '2', email: 'operador@test.com', role: 'operador' }
       expect(hasRole(user, 'admin')).toBe(false)
     })
 
-    it('deve retornar true para admin acessando operator', () => {
+    it('deve retornar true para admin acessando operador', () => {
       const user = { id: '3', email: 'admin@test.com', role: 'admin' }
       expect(hasRole(user, 'operador')).toBe(true)
     })
 
-    it('deve retornar true para operator acessando operator', () => {
-      const user = { id: '4', email: 'operator@test.com', role: 'operador' }
+    it('deve retornar true para operador acessando operador', () => {
+      const user = { id: '4', email: 'operador@test.com', role: 'operador' }
       expect(hasRole(user, 'operador')).toBe(true)
     })
 
-    it('deve retornar false para transportadora acessando operator', () => {
+    it('deve retornar false para transportadora acessando operador', () => {
       const user = { id: '5', email: 'transportadora@test.com', role: 'transportadora' }
       expect(hasRole(user, 'operador')).toBe(false)
     })
@@ -84,7 +84,7 @@ describe('lib/api-auth', () => {
     })
 
     it('deve retornar erro 403 para role incorreta', async () => {
-      const user = { id: 'user-1', email: 'operator@test.com', role: 'operador' }
+      const user = { id: 'user-1', email: 'operador@test.com', role: 'operador' }
       mockSupabaseClient.setTableData('users', [user])
       
       mockSupabaseClient.setAuthHandler('getUser', async () => ({

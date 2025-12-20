@@ -1,4 +1,4 @@
-import { POST } from '@/app/api/admin/create-operator/route'
+import { POST } from '@/app/api/admin/create-operador/route'
 import { createAdminRequest } from '../../helpers/api-test-helpers'
 import { mockSupabaseClient } from '../../helpers/mock-supabase'
 import { NextRequest } from 'next/server'
@@ -37,7 +37,7 @@ jest.mock('@/lib/services', () => ({
   },
 }))
 
-describe('POST /api/admin/create-operator', () => {
+describe('POST /api/admin/create-operador', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockSupabaseClient.clear()
@@ -94,7 +94,7 @@ describe('POST /api/admin/create-operator', () => {
     expect(response.status).toBe(201)
     expect(data.success).toBe(true)
     expect(data.companyId).toBeDefined()
-    expect(data.operator).toBeDefined()
+    expect(data.operador).toBeDefined()
     expect(data.userId).toBeDefined()
   })
 

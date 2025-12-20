@@ -8,7 +8,7 @@
 -- PART 1: MISSING TABLES
 -- ====================================================
 
--- Driver Positions (High frequency updates)
+-- motorista Positions (High frequency updates)
 CREATE TABLE IF NOT EXISTS public.driver_positions (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   trip_id UUID REFERENCES public.trips(id) ON DELETE CASCADE,
@@ -108,7 +108,7 @@ CREATE INDEX IF NOT EXISTS idx_checklists_trip_id ON public.checklists(trip_id);
 -- PART 2: MISSING VIEWS
 -- ====================================================
 
--- View: vehicle_positions (Latest position per vehicle for Realtime)
+-- View: vehicle_positions (Latest position per veiculo for Realtime)
 -- Note: This is a simplified view. In production, consider a materialized view or a separate table updated by triggers.
 CREATE OR REPLACE VIEW public.vehicle_positions AS
 SELECT DISTINCT ON (t.vehicle_id)
@@ -191,7 +191,7 @@ ALTER TABLE public.trip_passengers ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.trip_events ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.checklists ENABLE ROW LEVEL SECURITY;
 
--- Driver Positions: Service role full access, drivers can insert, others read via trips
+-- motorista Positions: Service role full access, drivers can insert, others read via trips
 CREATE POLICY "Service role full access on driver_positions" ON public.driver_positions FOR ALL TO service_role USING (true) WITH CHECK (true);
 CREATE POLICY "Drivers can insert their positions" ON public.driver_positions FOR INSERT TO authenticated WITH CHECK (driver_id = auth.uid());
 CREATE POLICY "Users can read positions for their company trips" ON public.driver_positions FOR SELECT TO authenticated USING (

@@ -172,22 +172,22 @@ git push origin main
 
 ### Links Corretos
 ```
-✅ /operator                    (Dashboard)
-✅ /operator/funcionarios      (Lista de funcionários)
-✅ /operator/rotas             (Gestão de rotas)
-✅ /operator/alertas           (Central de alertas)
-✅ /operator/custos            (Gestão de custos)
+✅ /operador                    (Dashboard)
+✅ /operador/funcionarios      (Lista de funcionários)
+✅ /operador/rotas             (Gestão de rotas)
+✅ /operador/alertas           (Central de alertas)
+✅ /operador/custos            (Gestão de custos)
 ```
 
 ### Links com Query String (Permitidos)
 ```
-✅ /operator/funcionarios?company={uuid}  (Quando necessário filtrar)
-✅ /operator/rotas/mapa?route_id={id}    (Parâmetros dinâmicos)
+✅ /operador/funcionarios?company={uuid}  (Quando necessário filtrar)
+✅ /operador/rotas/mapa?route_id={id}    (Parâmetros dinâmicos)
 ```
 
 ### Padrões Evitados
 ```
-❌ /operator?company=11111111-1111-4111-8111-1111111111c1
+❌ /operador?company=11111111-1111-4111-8111-1111111111c1
 ```
 
 ---

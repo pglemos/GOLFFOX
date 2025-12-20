@@ -44,15 +44,15 @@
 - ✅ Formato: `{ success, data?, error?, message? }`
 
 ### 3. Consolidação de Rotas Duplicadas ✅
-- ✅ Criados redirecionamentos em `/api/operator/*` para `/api/operador/*`
+- ✅ Criados redirecionamentos em `/api/operador/*` para `/api/operador/*`
 - ✅ Mantida compatibilidade com rotas antigas
-- ✅ Proxy já redireciona `/operator` → `/empresa` e `/carrier` → `/transportadora`
+- ✅ Proxy já redireciona `/operador` → `/empresa` e `/transportadora` → `/transportadora`
 
 ### 4. Expansão de Testes E2E ✅
 - ✅ Criados novos testes:
   - `e2e/admin/vehicles-management.spec.ts`
-  - `e2e/operator/employees-workflow.spec.ts`
-  - `e2e/carrier/drivers-management.spec.ts`
+  - `e2e/operador/employees-workflow.spec.ts`
+  - `e2e/transportadora/drivers-management.spec.ts`
   - `e2e/costs/complete-flow.spec.ts`
   - `e2e/routes/route-creation.spec.ts`
   - `e2e/map/real-time-tracking.spec.ts`
@@ -97,14 +97,14 @@
 - `docs/SECURITY_AUDIT_REPORT.md`
 - `docs/EXECUTION_SUMMARY.md`
 - `e2e/admin/vehicles-management.spec.ts`
-- `e2e/operator/employees-workflow.spec.ts`
-- `e2e/carrier/drivers-management.spec.ts`
+- `e2e/operador/employees-workflow.spec.ts`
+- `e2e/transportadora/drivers-management.spec.ts`
 - `e2e/costs/complete-flow.spec.ts`
 - `e2e/routes/route-creation.spec.ts`
 - `e2e/map/real-time-tracking.spec.ts`
 
 ### Arquivos Modificados
-- `components/operator/funcionario-modal.tsx`
+- `components/operador/funcionario-modal.tsx`
 - `.gitignore`
 - `app/operador/sincronizar/page.tsx`
 - `proxy.ts` (anteriormente middleware.ts)
@@ -112,8 +112,8 @@
 - `components/app-shell.tsx`
 - `app/transportadora/motoristas/page.tsx`
 - `app/api/admin/companies/route.ts`
-- `app/api/operator/create-employee/route.ts`
-- `app/api/operator/optimize-route/route.ts`
+- `app/api/operador/create-employee/route.ts`
+- `app/api/operador/optimize-route/route.ts`
 - `lib/i18n.ts`
 - `app/api/health/route.ts`
 - `app/api/cep/route.ts`

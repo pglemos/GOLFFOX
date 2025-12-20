@@ -108,7 +108,7 @@
   - `OPTIONS|POST /api/reports/run` – gera e retorna relatórios (arquivos/JSON) – `web-app/app/api/reports/run/route.ts:20,60`
   - `GET|POST /api/reports/dispatch` – gera/manda email; registra histórico – `web-app/app/api/reports/dispatch/route.ts:300,153` (SMTP mock; TODO nodemailer)
   - `OPTIONS|GET|POST|DELETE /api/reports/schedule` – agenda, lista, remove – `web-app/app/api/reports/schedule/route.ts:19,35,370,403`
-- Operator
+- operador
   - `POST /api/operador/associate-company` – mapeia operador a empresa – `web-app/app/api/operador/associate-company/route.ts:19`
   - `OPTIONS|POST /api/operador/create-employee` – cria usuário (Auth + `users`) – `web-app/app/api/operador/create-employee/route.ts:19,30`
   - `POST /api/operador/optimize-route` – otimização sequência de pontos – `web-app/app/api/operador/optimize-route/route.ts:28`
@@ -227,7 +227,7 @@
   - Consolidar documentação e criar “Architecture Overview”.
 - Longo prazo (30+ dias)
   - Completar App Passageiro (confirm check-in/out, ratings).
-  - Painéis Carrier/Operator com indicadores ampliados.
+  - Painéis transportadora/operador com indicadores ampliados.
   - Sentry/APM completo (web+mobile); dashboards operacionais.
 
 ---
@@ -282,7 +282,7 @@
   - `OPTIONS|POST /api/reports/run` – Gerar relatórios – `web-app/app/api/reports/run/route.ts:20,60`
   - `GET|POST /api/reports/dispatch` – Dispatch relatórios – `web-app/app/api/reports/dispatch/route.ts:300,153`
   - `OPTIONS|GET|POST|DELETE /api/reports/schedule` – Agendamentos – `web-app/app/api/reports/schedule/route.ts:19,35,370,403`
-- Operator
+- operador
   - `POST /api/operador/associate-company` – Associar operador – `web-app/app/api/operador/associate-company/route.ts:19`
   - `OPTIONS|POST /api/operador/create-employee` – Criar usuário – `web-app/app/api/operador/create-employee/route.ts:19,30`
   - `POST /api/operador/optimize-route` – Otimizar rota – `web-app/app/api/operador/optimize-route/route.ts:28`

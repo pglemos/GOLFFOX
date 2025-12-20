@@ -8,7 +8,7 @@
 ## ✅ CONCLUÍDO
 
 ### Scripts Criados e Executados
-1. ✅ `scripts/seed-operator-data.js` - Executado com sucesso
+1. ✅ `scripts/seed-operador-data.js` - Executado com sucesso
    - 36 rotas criadas
    - 42 funcionários criados
    - 25 alertas criados

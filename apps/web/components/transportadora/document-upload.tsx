@@ -10,7 +10,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 interface DocumentUploadProps {
   driverId?: string
   vehicleId?: string
-  folder: 'motorista-documents' | 'vehicle-documents' | 'medical-exams'
+  folder: 'motorista-documents' | 'veiculo-documents' | 'medical-exams'
   documentType?: string
   onSuccess?: () => void
   onError?: (error: string) => void
@@ -143,7 +143,7 @@ export function DocumentUpload({
       }
 
       // Se for documento de veículo, salvar no banco
-      if (vehicleId && folder === 'vehicle-documents' && documentType) {
+      if (vehicleId && folder === 'veiculo-documents' && documentType) {
         const docData: DocumentData = {
           document_type: documentType,
           file_url: uploadData.file_url,
@@ -221,9 +221,9 @@ export function DocumentUpload({
       )}
 
       {success && (
-        <Alert className="border-green-500 bg-green-50 dark:bg-green-900/20">
-          <AlertCircle className="h-4 w-4 text-green-600" />
-          <AlertDescription className="text-green-800 dark:text-green-200">
+        <Alert className="border-success bg-success-light dark:bg-green-900/20">
+          <AlertCircle className="h-4 w-4 text-success" />
+          <AlertDescription className="text-success dark:text-green-200">
             Arquivo enviado com sucesso!
           </AlertDescription>
         </Alert>

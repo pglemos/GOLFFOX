@@ -10,7 +10,7 @@
 ### Correções Aplicadas
 - ✅ Imports faltando corrigidos (logger, logError, getSupabaseAdmin, NextResponse)
 - ✅ Variáveis não definidas corrigidas (carrierId, companyId, driverId, supabaseAdmin)
-- ✅ Identificadores duplicados corrigidos (POST em create-operator)
+- ✅ Identificadores duplicados corrigidos (POST em create-operador)
 - ✅ Type assertions adicionadas para tipos Supabase `never`
 - ✅ Documentação criada (`TYPESCRIPT_ERRORS_PROGRESS.md`)
 
@@ -42,7 +42,7 @@
 ## ✅ Fase 2.3: Testes - CONCLUÍDA
 
 ### Testes Criados
-- ✅ `create-operator.test.ts` - Teste para criação de empresa/operador
+- ✅ `create-operador.test.ts` - Teste para criação de empresa/operador
 
 ### Status
 - Estrutura de testes mantida
@@ -86,7 +86,7 @@
 
 ### Resultado
 - **223 arquivos modificados** com padronização de termos
-- **Termos padronizados:** operator→operador, carrier→transportadora, driver→motorista, passenger→passageiro
+- **Termos padronizados:** operador→operador, transportadora→transportadora, motorista→motorista, passageiro→passageiro
 - **Nomes de arquivos/rotas mantidos** para compatibilidade
 
 ---
@@ -106,7 +106,7 @@
 - ✅ **Event Helper** - Helpers para criar/publicar eventos
 - ✅ **Audit Handler** - Registra eventos em `gf_audit_log`
 - ✅ **Integração em Services** - `CompanyService.createCompany` publica eventos
-- ✅ **Integração em APIs** - `POST /api/admin/create-operator` publica eventos
+- ✅ **Integração em APIs** - `POST /api/admin/create-operador` publica eventos
 
 ### Eventos Rastreados
 - ✅ `CompanyCreated` - Quando empresa é criada
@@ -122,7 +122,7 @@
 
 ### Estrutura Criada
 - ✅ **CQRS Bus** - Message bus para commands/queries
-- ✅ **Commands** - 6 commands criados (Company, Vehicle, Driver, Route, Carrier)
+- ✅ **Commands** - 6 commands criados (Company, veiculo, motorista, Route, transportadora)
 - ✅ **Handlers** - 1 handler criado (CreateCompanyHandler)
 - ✅ **Queries** - 2 queries existentes (GetCompany, ListVehicles)
 

@@ -600,7 +600,7 @@ export default function TransportadoraConfiguracoesPage() {
                       onClick={() => handleNotificationChange(key, !formData.notifications[key as keyof typeof formData.notifications])}
                       className={`relative w-12 h-6 rounded-full transition-colors ml-4 ${formData.notifications[key as keyof typeof formData.notifications]
                         ? 'bg-brand'
-                        : 'bg-gray-300'
+                        : 'bg-muted'
                         }`}
                     >
                       <span

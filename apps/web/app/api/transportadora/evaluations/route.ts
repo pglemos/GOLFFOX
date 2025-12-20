@@ -23,8 +23,8 @@ export async function GET(request: NextRequest) {
             .from('trip_evaluations' as any)
             .select(`
                 *,
-                passenger:users!passenger_id(id, name, email),
-                driver:users!driver_id(id, name),
+                passageiro:users!passenger_id(id, name, email),
+                motorista:users!driver_id(id, name),
                 trip:trips(id, scheduled_date, route:routes(name))
             `)
             .order('created_at', { ascending: false })

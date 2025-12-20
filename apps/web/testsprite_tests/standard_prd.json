@@ -16,10 +16,10 @@
     "Ensure high performance, security, and scalability through modern technology stack and cloud infrastructure."
   ],
   "key_features": [
-    "Authentication & Authorization with role-based access control for admin, company, carrier, driver, and passenger roles.",
-    "Admin Dashboard with KPIs, fleet map with real-time tracking and playback, route and vehicle management, driver management with gamification, company and carrier CRUD operations, and detailed reports.",
+    "Authentication & Authorization with role-based access control for admin, company, transportadora, motorista, and passageiro roles.",
+    "Admin Dashboard with KPIs, fleet map with real-time tracking and playback, route and veiculo management, motorista management with gamification, company and transportadora CRUD operations, and detailed reports.",
     "Company Panel for managing employees, routes, costs, and service providers with geocoding and alert notifications.",
-    "Carrier Panel to manage drivers, vehicles, routes, revenues, and financial reports.",
+    "transportadora Panel to manage drivers, vehicles, routes, revenues, and financial reports.",
     "Mobile Apps for Drivers and Passengers enabling checklists, GPS navigation, QR/NFC embarkation, real-time bus tracking, notifications, and feedback.",
     "Google Maps API integration for advanced route visualization and fleet tracking.",
     "Real-time updates using Supabase subscriptions to synchronize data across the system.",
@@ -31,10 +31,10 @@
   "user_flow_summary": [
     "User accesses login page and submits credentials.",
     "System authenticates user and retrieves role from database.",
-    "Based on role, the user is redirected to respective dashboard: admin (/admin), company (/empresa), carrier (/transportadora), or mobile app for driver/passenger.",
+    "Based on role, the user is redirected to respective dashboard: admin (/admin), company (/empresa), transportadora (/transportadora), or mobile app for motorista/passageiro.",
     "Admin manages companies, carriers, vehicles, drivers, routes, alerts, and reviews KPIs.",
     "Company users manage employees, assigned routes, costs, and receive notifications.",
-    "Carrier users handle fleet, drivers, monitor routes, report and control costs.",
+    "transportadora users handle fleet, drivers, monitor routes, report and control costs.",
     "Drivers use mobile app to complete checklist, navigate routes, scan passengers for embarkation, and communicate with dispatch.",
     "Passengers use mobile app to track bus location, receive arrival notifications, view route details, and provide service feedback.",
     "Real-time location and status updates are propagated via Supabase Realtime subscriptions.",
@@ -109,8 +109,8 @@
         ]
       },
       {
-        "name": "Carrier Panel (Transportadora)",
-        "description": "Carrier management panel for managing drivers, vehicles, routes, revenues, and margins",
+        "name": "transportadora Panel (Transportadora)",
+        "description": "transportadora management panel for managing drivers, vehicles, routes, revenues, and margins",
         "files": [
           "app/transportadora/page.tsx",
           "app/transportadora/layout.tsx",
@@ -164,7 +164,7 @@
           "lib/export-utils.ts",
           "lib/export-map-png.ts",
           "lib/exports.ts",
-          "lib/operator-export.ts"
+          "lib/operador-export.ts"
         ]
       },
       {

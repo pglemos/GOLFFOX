@@ -41,11 +41,11 @@ export async function GET(req: NextRequest) {
 
     // Filtrar motoristas disponíveis (não estão em viagem)
     const availableDrivers = (drivers || [])
-      .filter(driver => !activeDriverIds.has(driver.id))
-      .map(driver => ({
-        id: driver.id,
+      .filter(motorista => !activeDriverIds.has(motorista.id))
+      .map(motorista => ({
+        id: motorista.id,
         name: motorista.name || motorista.email?.split('@')[0] || 'Motorista',
-        email: driver.email,
+        email: motorista.email,
         status: 'Ativo',
         displayName: `${motorista.name || motorista.email?.split('@')[0] || 'Motorista'} (Status: Ativo)`
       }))

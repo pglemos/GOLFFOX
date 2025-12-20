@@ -119,7 +119,7 @@ export function AssociateOperatorModal({
         <div className="space-y-4 sm:space-y-6 py-2 sm:py-4">
           <div>
             <Label className="text-base font-medium">Empresa</Label>
-            <p className="text-sm sm:text-base text-gray-600 mt-1 break-words">{companyName}</p>
+            <p className="text-sm sm:text-base text-ink-muted mt-1 break-words">{companyName}</p>
           </div>
 
           <div>
@@ -134,7 +134,7 @@ export function AssociateOperatorModal({
                 id="operador-email"
                 value={operatorEmail}
                 onChange={(e) => setOperatorEmail(e.target.value)}
-                className="w-full mt-1 h-11 sm:h-12 px-3 sm:px-4 py-2 sm:py-3 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brand"
+                className="w-full mt-1 h-11 sm:h-12 px-3 sm:px-4 py-2 sm:py-3 text-base border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-brand"
               >
                 <option value="">Selecione um operador</option>
                 {operators.map((op) => (
@@ -147,7 +147,7 @@ export function AssociateOperatorModal({
           </div>
 
           {error && (
-            <div className="p-3 bg-red-50 border border-red-200 rounded-md text-sm text-red-700">
+            <div className="p-3 bg-error-light border border-error-light rounded-md text-sm text-error">
               {error}
             </div>
           )}
@@ -165,7 +165,7 @@ export function AssociateOperatorModal({
           <Button 
             onClick={handleAssociate} 
             disabled={loading || !operatorEmail}
-            className="w-full sm:w-auto order-1 sm:order-2 bg-orange-500 hover:bg-orange-600 min-h-[44px] text-base font-medium"
+            className="w-full sm:w-auto order-1 sm:order-2 bg-brand hover:bg-orange-600 min-h-[44px] text-base font-medium"
           >
             {loading ? (
               <>

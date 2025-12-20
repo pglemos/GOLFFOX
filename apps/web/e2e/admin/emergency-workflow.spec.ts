@@ -50,14 +50,14 @@ test.describe('Fluxo de Emergência - Admin', () => {
       const form = page.locator('form, [role="dialog"]')
       if (await form.isVisible({ timeout: 3000 })) {
         // Preencher campos se existirem
-        const vehicleSelect = page.locator('select[name*="vehicle"], input[name*="vehicle"]')
+        const vehicleSelect = page.locator('select[name*="veiculo"], input[name*="veiculo"]')
         if (await vehicleSelect.isVisible({ timeout: 2000 })) {
-          await vehicleSelect.first().fill('vehicle-1')
+          await vehicleSelect.first().fill('veiculo-1')
         }
         
-        const driverSelect = page.locator('select[name*="driver"], input[name*="driver"]')
+        const driverSelect = page.locator('select[name*="motorista"], input[name*="motorista"]')
         if (await driverSelect.isVisible({ timeout: 2000 })) {
-          await driverSelect.first().fill('driver-1')
+          await driverSelect.first().fill('motorista-1')
         }
         
         const submitButton = page.locator('button:has-text(/enviar|confirmar|despachar/i)')
@@ -81,7 +81,7 @@ test.describe('Fluxo de Emergência - Admin', () => {
       await page.waitForTimeout(500) // Aguardar debounce
       
       // Verificar que resultados foram filtrados
-      const results = page.locator('[data-testid*="vehicle"], .vehicle-item')
+      const results = page.locator('[data-testid*="veiculo"], .veiculo-item')
       if (await results.first().isVisible({ timeout: 2000 })) {
         await expect(results.first()).toBeVisible()
       }

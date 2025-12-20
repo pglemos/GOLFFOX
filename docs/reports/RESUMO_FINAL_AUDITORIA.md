@@ -61,7 +61,7 @@
 
 ### Middleware
 - ✅ Proteção de `/admin` e `/operador`
-- ✅ Validação de role (admin, operator)
+- ✅ Validação de role (admin, operador)
 - ✅ Redirecionamento para `/login` ou `/unauthorized`
 - ✅ Validação de token com Supabase
 
@@ -79,7 +79,7 @@
 
 ---
 
-## ✅ Fase 5: Frontend (Admin/Operator) & Mapa
+## ✅ Fase 5: Frontend (Admin/operador) & Mapa
 
 ### Branding
 - ✅ `operador-logo-section.tsx` - Exibe logo/nome da empresa

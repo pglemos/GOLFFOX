@@ -206,7 +206,7 @@ ORDER BY email;
 
 ```sql
 -- Verificar se public.users foram linkados
-SELECT u.email, u.role, c.name as company, ca.name as carrier
+SELECT u.email, u.role, c.name as company, ca.name as transportadora
 FROM public.users u
 LEFT JOIN public.companies c ON c.id = u.company_id
 LEFT JOIN public.carriers ca ON ca.id = u.carrier_id
@@ -262,31 +262,31 @@ SELECT COUNT(*) FROM trips;
 
 ---
 
-### Teste Driver
+### Teste motorista
 
 ```sql
--- Simular usuário driver
+-- Simular usuário motorista
 SELECT set_config('request.jwt.claims', json_build_object('sub', (SELECT id FROM auth.users WHERE email = 'motorista@trans.com'))::text, true);
 
--- Deve retornar apenas trips do driver
+-- Deve retornar apenas trips do motorista
 SELECT COUNT(*) FROM trips WHERE driver_id = (SELECT id FROM auth.users WHERE email = 'motorista@trans.com');
 ```
 
-✅ Esperado: Retorna apenas trips do driver logado
+✅ Esperado: Retorna apenas trips do motorista logado
 
 ---
 
-### Teste Operator (Company-scoped)
+### Teste operador (Company-scoped)
 
 ```sql
--- Simular usuário operator
+-- Simular usuário operador
 SELECT set_config('request.jwt.claims', json_build_object('sub', (SELECT id FROM auth.users WHERE email = 'operador@empresa.com'))::text, true);
 
 -- Deve retornar apenas routes da company
 SELECT COUNT(*) FROM routes WHERE company_id = (SELECT company_id FROM public.users WHERE email = 'operador@empresa.com');
 ```
 
-✅ Esperado: Retorna apenas routes da company do operator
+✅ Esperado: Retorna apenas routes da company do operador
 
 ---
 
@@ -362,7 +362,7 @@ WHERE trip_id = (SELECT id FROM trips LIMIT 1);
 - [ ] 5 auth.users criados e confirmados
 - [ ] 5 public.users linkados com roles corretos
 - [ ] Realtime habilitado em `driver_positions`
-- [ ] RLS testado (admin, driver, operator)
+- [ ] RLS testado (admin, motorista, operador)
 - [ ] RPC de transição funcionando
 - [ ] Trip summary sendo calculado
 

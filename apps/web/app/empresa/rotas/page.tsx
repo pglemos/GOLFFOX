@@ -14,7 +14,7 @@ import { useOperatorTenant } from "@/components/providers/empresa-tenant-provide
 import { useDebounce } from "@/hooks/use-debounce"
 import { useQuery } from "@tanstack/react-query"
 import { useActiveTrips } from "@/hooks/use-empresa-data"
-import operatorI18nData from "@/i18n/operator.json"
+import operatorI18nData from "@/i18n/operador.json"
 
 const operatorI18n: any = operatorI18nData ?? {
   routes_title: "Rotas",
@@ -90,8 +90,8 @@ export default function OperatorRotasPage() {
       <AppShell user={{ id: user?.id || "", name: user?.name || "Operador", email: user?.email || "", role: "operador", avatar_url: user?.avatar_url }}>
         <div className="min-h-screen flex items-center justify-center p-4">
           <Card className="p-8 max-w-md w-full text-center">
-            <h2 className="text-xl font-bold mb-2 text-red-600">Erro ao carregar</h2>
-            <p className="text-gray-600 mb-4">{tenantError || (rotasError as any)?.message}</p>
+            <h2 className="text-xl font-bold mb-2 text-error">Erro ao carregar</h2>
+            <p className="text-ink-muted mb-4">{tenantError || (rotasError as any)?.message}</p>
             <Button onClick={() => window.location.reload()} variant="default">
               Tentar Novamente
             </Button>
@@ -107,7 +107,7 @@ export default function OperatorRotasPage() {
         <div className="min-h-screen flex items-center justify-center p-4">
           <Card className="p-8 max-w-md w-full text-center">
             <h2 className="text-xl font-bold mb-2">Nenhuma empresa selecionada</h2>
-            <p className="text-gray-600 mb-4">Selecione uma empresa para continuar</p>
+            <p className="text-ink-muted mb-4">Selecione uma empresa para continuar</p>
             <Button onClick={() => router.push('/operador')} variant="default">
               Voltar para Dashboard
             </Button>
@@ -145,7 +145,7 @@ export default function OperatorRotasPage() {
         {/* Busca */}
         <div className="flex flex-col sm:flex-row gap-2">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-ink-light h-4 w-4" />
             <Input
               placeholder="Buscar rotas por nome ou transportadora..."
               value={searchQuery}
@@ -167,11 +167,11 @@ export default function OperatorRotasPage() {
             })
             .length === 0 && !rotasLoading && (
               <Card className="p-12 text-center">
-                <Navigation className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <Navigation className="h-12 w-12 text-ink-light mx-auto mb-4" />
                 <h3 className="text-lg font-medium mb-2">
                   {debouncedSearchQuery ? "Nenhuma rota encontrada" : "Nenhuma rota encontrada"}
                 </h3>
-                <p className="text-sm text-gray-500 mb-4">
+                <p className="text-sm text-ink-muted mb-4">
                   {debouncedSearchQuery ? "Tente buscar por outros termos." : "Comece criando uma nova rota ou solicitação"}
                 </p>
                 <a href="/operador/solicitacoes">
@@ -210,7 +210,7 @@ export default function OperatorRotasPage() {
                         </div>
                         <h3 className="font-bold text-lg truncate group-hover:text-brand transition-colors">{rota.name || "Rota sem nome"}</h3>
                         {activeRouteIds.has(rota.id) && (
-                          <Badge className="bg-green-500 hover:bg-green-600 animate-pulse text-white border-0 flex items-center gap-1">
+                          <Badge className="bg-success-light0 hover:bg-success animate-pulse text-white border-0 flex items-center gap-1">
                             <span className="w-2 h-2 rounded-full bg-white block"></span>
                             AO VIVO
                           </Badge>
@@ -221,16 +221,16 @@ export default function OperatorRotasPage() {
                       </div>
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-3 text-sm">
                         <div>
-                          <span className="text-gray-500">Total de Viagens:</span>
+                          <span className="text-ink-muted">Total de Viagens:</span>
                           <p className="font-semibold">{rota.total_trips || 0}</p>
                         </div>
                         <div>
-                          <span className="text-gray-500">Concluídas:</span>
-                          <p className="font-semibold text-green-600">{rota.completed_trips || 0}</p>
+                          <span className="text-ink-muted">Concluídas:</span>
+                          <p className="font-semibold text-success">{rota.completed_trips || 0}</p>
                         </div>
                         {rota.avg_delay_minutes && (
                           <div>
-                            <span className="text-gray-500">Atraso Médio:</span>
+                            <span className="text-ink-muted">Atraso Médio:</span>
                             <p className="font-semibold">{Number(rota.avg_delay_minutes).toFixed(1)} min</p>
                           </div>
                         )}
@@ -245,17 +245,17 @@ export default function OperatorRotasPage() {
                   </div>
 
                   {rota.gf_route_plan && Array.isArray(rota.gf_route_plan) && rota.gf_route_plan.length > 0 && (
-                    <div className="mt-4 pt-4 border-t border-gray-200">
-                      <h4 className="font-semibold mb-2 text-sm text-gray-700">Funcionários nesta rota:</h4>
+                    <div className="mt-4 pt-4 border-t border-border-light">
+                      <h4 className="font-semibold mb-2 text-sm text-ink-strong">Funcionários nesta rota:</h4>
                       <div className="space-y-2 max-h-40 overflow-y-auto">
                         {rota.gf_route_plan
                           .filter((stop: any) => stop && stop.gf_employee_company)
                           .map((stop: any, idx: number) => (
-                            <div key={idx} className="p-2 bg-gray-50 rounded-lg flex items-center gap-2">
-                              <Users className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                            <div key={idx} className="p-2 bg-bg-soft rounded-lg flex items-center gap-2">
+                              <Users className="h-4 w-4 text-ink-light flex-shrink-0" />
                               <div className="min-w-0 flex-1">
                                 <p className="text-sm font-medium truncate">{stop.gf_employee_company?.name || "Nome não disponível"}</p>
-                                <p className="text-xs text-gray-500">
+                                <p className="text-xs text-ink-muted">
                                   {stop.gf_employee_company?.cpf && `CPF: ${stop.gf_employee_company.cpf} • `}
                                   Ordem: {stop.stop_order || idx + 1}
                                 </p>

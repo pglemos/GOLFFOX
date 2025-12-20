@@ -126,7 +126,7 @@ curl -X POST http://localhost:3000/api/costs/manual \
 
 ### Teste 3: Rota Admin com Operador
 ```bash
-curl -X POST http://localhost:3000/api/admin/create-operator \
+curl -X POST http://localhost:3000/api/admin/create-operador \
   -H "Cookie: golffox-session=<cookie_operator>" \
   -H "Content-Type: application/json" \
   -d '{"companyName": "...", ...}'

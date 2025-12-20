@@ -8,7 +8,7 @@
 
 ## 📋 Problemas Corrigidos
 
-### 1. ✅ TC002 - Vehicle Deletion (Erro 500 ao criar veículo)
+### 1. ✅ TC002 - veiculo Deletion (Erro 500 ao criar veículo)
 
 **Problema:** Endpoint de criação de veículos retornava erro 500
 
@@ -39,12 +39,12 @@
 
 ---
 
-### 3. ✅ TC006 - Create Employee as Operator (Endpoint 404)
+### 3. ✅ TC006 - Create Employee as operador (Endpoint 404)
 
-**Problema:** Endpoint `/api/operator/create-employee` não existia (404)
+**Problema:** Endpoint `/api/operador/create-employee` não existia (404)
 
 **Correções Aplicadas:**
-- ✅ Endpoint criado em `apps/web/app/api/operator/create-employee/route.ts`
+- ✅ Endpoint criado em `apps/web/app/api/operador/create-employee/route.ts`
 - ✅ Suporte completo a criação de funcionários
 - ✅ Aceita autenticação via Bearer token ou Basic Auth
 - ✅ Validação de dados com Zod
@@ -56,12 +56,12 @@
 
 ---
 
-### 4. ✅ TC007 - Optimize Route for Operator (Endpoint 404)
+### 4. ✅ TC007 - Optimize Route for operador (Endpoint 404)
 
-**Problema:** Endpoint `/api/operator/optimize-route` não existia (404)
+**Problema:** Endpoint `/api/operador/optimize-route` não existia (404)
 
 **Correções Aplicadas:**
-- ✅ Endpoint criado em `apps/web/app/api/operator/optimize-route/route.ts`
+- ✅ Endpoint criado em `apps/web/app/api/operador/optimize-route/route.ts`
 - ✅ Aceita autenticação via Bearer token ou Basic Auth
 - ✅ Integração com Google Maps API para otimização real
 - ✅ Suporte a arrays vazios (retorna resposta adequada)
@@ -142,8 +142,8 @@ Em modo de teste, os endpoints criam automaticamente:
 ## 📝 Arquivos Criados/Modificados
 
 ### Novos Arquivos
-1. `apps/web/app/api/operator/create-employee/route.ts` ✅
-2. `apps/web/app/api/operator/optimize-route/route.ts` ✅
+1. `apps/web/app/api/operador/create-employee/route.ts` ✅
+2. `apps/web/app/api/operador/optimize-route/route.ts` ✅
 3. `apps/web/CORRECOES_TESTSPRITE.md` ✅
 4. `apps/web/RESUMO_CORRECOES_TESTSPRITE.md` ✅ (este arquivo)
 
@@ -197,7 +197,7 @@ npx @testsprite/testsprite-mcp@latest generateCodeAndExecute
 
 ## ✅ Checklist Final
 
-- [x] TC002 - Vehicle Deletion corrigido
+- [x] TC002 - veiculo Deletion corrigido
 - [x] TC005 - Manual Cost Entry corrigido
 - [x] TC006 - Create Employee corrigido
 - [x] TC007 - Optimize Route corrigido
