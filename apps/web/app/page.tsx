@@ -720,7 +720,7 @@ function LoginContent() {
         }
 
         // Se não houver URL de redirecionamento (motorista/passageiro), mostrar erro
-        if (!redirectUrl) {
+        if (!redirectUrl || typeof redirectUrl !== 'string') {
           setError(`Seu perfil (${userRoleFromDatabase}) deve acessar o sistema através do aplicativo mobile. Por favor, baixe o app GolfFox no seu dispositivo móvel.`)
           setLoading(false)
           setTransitioning(false)
@@ -737,7 +737,7 @@ function LoginContent() {
         }
 
         // Limpar query params da URL de redirecionamento
-        redirectUrl = redirectUrl.split("?")[0]
+        redirectUrl = typeof redirectUrl === 'string' ? redirectUrl.split("?")[0] : redirectUrl
 
         debug("Login bem-sucedido", {
           redirectUrl,
