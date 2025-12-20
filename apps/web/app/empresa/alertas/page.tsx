@@ -220,7 +220,7 @@ function AlertasOperatorPageInner() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.05 }}
             >
-              <Card className="p-4 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-[var(--border)] hover:border-[var(--brand)]/30 group">
+              <Card className="p-4 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-border hover:border-brand/30 group">
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-2 flex-wrap">
@@ -231,7 +231,7 @@ function AlertasOperatorPageInner() {
                       }`}>
                         <AlertTriangle className={`h-4 w-4 ${getAlertColor(alerta.severity || undefined)}`} />
                       </div>
-                      <h3 className="font-bold text-lg capitalize truncate group-hover:text-[var(--brand)] transition-colors">
+                      <h3 className="font-bold text-lg capitalize truncate group-hover:text-brand transition-colors">
                         {(alerta as any).alert_type?.replace(/_/g, ' ') || "Alerta"}
                       </h3>
                       <Badge className={`${getBadgeColor(alerta.severity || undefined)} flex-shrink-0`}>

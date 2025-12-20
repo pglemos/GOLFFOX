@@ -1511,7 +1511,7 @@ function LoginContent() {
                       onClick={() => setShowPassword(!showPassword)}
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--ink-muted)] hover:text-[var(--brand)] transition-colors h-9 w-9 flex items-center justify-center rounded-xl hover:bg-[var(--bg-hover)] z-10 touch-manipulation"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-muted hover:text-brand transition-colors h-9 w-9 flex items-center justify-center rounded-xl hover:bg-bg-hover z-10 touch-manipulation"
                       aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
                     >
                       {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
@@ -1520,7 +1520,7 @@ function LoginContent() {
                       <motion.p
                         initial={{ opacity: 0, y: -5 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="mt-2 text-xs text-[var(--error)] font-medium flex items-center gap-1"
+                        className="mt-2 text-xs text-error font-medium flex items-center gap-1"
                         aria-live="assertive"
                       >
                         <span>⚠</span> {fieldErrors.password}
@@ -1544,9 +1544,9 @@ function LoginContent() {
                       id="remember-me-desktop"
                       checked={rememberMe}
                       onCheckedChange={(checked) => setRememberMe(checked === true)}
-                      className="h-5 w-5 rounded-lg border-2 border-[var(--border)] data-[state=checked]:bg-[var(--brand)] data-[state=checked]:border-[var(--brand)] transition-all duration-200"
+                      className="h-5 w-5 rounded-lg border-2 border-border data-[state=checked]:bg-brand data-[state=checked]:border-brand transition-all duration-200"
                     />
-                    <span className="whitespace-nowrap text-[var(--ink-muted)] group-hover:text-[var(--ink-strong)] transition-colors font-medium">
+                    <span className="whitespace-nowrap text-ink-muted group-hover:text-ink-strong transition-colors font-medium">
                       Lembrar-me
                     </span>
                   </motion.label>
@@ -1555,7 +1555,7 @@ function LoginContent() {
                     onClick={() => console.log("Forgot password clicked")}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className="text-[var(--brand)] hover:text-[var(--brand-hover)] font-semibold transition-colors touch-manipulation text-sm whitespace-nowrap"
+                    className="text-brand hover:text-brand-hover font-semibold transition-colors touch-manipulation text-sm whitespace-nowrap"
                   >
                     Esqueceu a senha?
                   </motion.button>
@@ -1572,7 +1572,7 @@ function LoginContent() {
                   <Button
                     type="submit"
                     disabled={loading || transitioning}
-                    className="w-full h-14 bg-gradient-to-r from-[var(--brand)] via-[var(--brand-hover)] to-[var(--brand)] bg-[length:200%_100%] hover:bg-[position:100%_0] text-white font-bold text-base shadow-[var(--shadow-brand-lg)] hover:shadow-[var(--shadow-brand-lg)] transition-all duration-500 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none rounded-2xl relative overflow-hidden group touch-manipulation will-change-transform"
+                    className="w-full h-14 bg-gradient-to-r from-brand via-brand-hover to-brand bg-[length:200%_100%] hover:bg-[position:100%_0] text-white font-bold text-base shadow-brand-lg hover:shadow-brand-lg transition-all duration-500 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none rounded-2xl relative overflow-hidden group touch-manipulation will-change-transform"
                   >
                     {/* Shimmer effect otimizado */}
                     {!shouldReduceMotion && !loading && !transitioning && (
@@ -1622,13 +1622,13 @@ function LoginContent() {
                 transition={{ duration: shouldReduceMotion ? 0 : 0.4, delay: shouldReduceMotion ? 0 : 0.6 }}
                 className="mt-8 sm:mt-10 md:mt-12 text-center"
               >
-                <div className="flex items-center justify-center gap-2 text-xs sm:text-sm text-[var(--ink-muted)]">
-                  <Shield className="h-3 w-3 sm:h-4 sm:w-4 text-[var(--brand)]" />
+                <div className="flex items-center justify-center gap-2 text-xs sm:text-sm text-ink-muted">
+                  <Shield className="h-3 w-3 sm:h-4 sm:w-4 text-brand" />
                   <p>
                     Protegido por{" "}
-                    <span className="text-[var(--brand)] font-semibold">Golf Fox Security</span>
+                    <span className="text-brand font-semibold">Golf Fox Security</span>
                   </p>
-                  <Zap className="h-3 w-3 sm:h-4 sm:w-4 text-[var(--brand)] opacity-60" />
+                  <Zap className="h-3 w-3 sm:h-4 sm:w-4 text-brand opacity-60" />
                 </div>
               </motion.div>
 
