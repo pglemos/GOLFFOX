@@ -1,5 +1,5 @@
-import { NextRequest } from 'next/server'
-import { logError, debug } from '@/lib/logger'
+import { NextRequest, NextResponse } from 'next/server'
+import { logError, debug, logger } from '@/lib/logger'
 import { requireAuth } from '@/lib/api-auth'
 import { withRateLimit } from '@/lib/rate-limit'
 import { successResponse, unauthorizedResponse, errorResponse } from '@/lib/api-response'
