@@ -728,11 +728,32 @@ function LoginContent() {
         // ✅ VALIDAÇÃO: Garantir que safeNext é uma string válida antes de usar
         // Verificar se safeNext é string E se isAllowedForRole retorna true
         if (safeNext && typeof safeNext === 'string' && safeNext.trim() !== '') {
-          const isAllowed = isAllowedForRole(userRoleFromDatabase, safeNext)
-          if (isAllowed === true) {
-            redirectUrl = safeNext
+          // ✅ VALIDAÇÃO: Garantir que isAllowedForRole é uma função antes de chamar
+          if (typeof isAllowedForRole === 'function') {
+            try {
+              const isAllowed = isAllowedForRole(userRoleFromDatabase, safeNext)
+              if (isAllowed === true) {
+                redirectUrl = safeNext
+              } else {
+                // Se não for permitido, usar o role do banco para determinar o painel
+                redirectUrl = AuthManager.getRedirectUrl(userRoleFromDatabase)
+              }
+            } catch (roleCheckError: any) {
+              console.error('❌ [LOGIN] Erro ao verificar permissão de role:', {
+                error: roleCheckError,
+                message: roleCheckError?.message,
+                role: userRoleFromDatabase,
+                path: safeNext
+              })
+              // Em caso de erro, usar o role do banco para determinar o painel
+              redirectUrl = AuthManager.getRedirectUrl(userRoleFromDatabase)
+            }
           } else {
-            // Se não for permitido, usar o role do banco para determinar o painel
+            console.error('❌ [LOGIN] isAllowedForRole não é uma função:', {
+              type: typeof isAllowedForRole,
+              value: isAllowedForRole
+            })
+            // Em caso de erro, usar o role do banco para determinar o painel
             redirectUrl = AuthManager.getRedirectUrl(userRoleFromDatabase)
           }
         } else {
