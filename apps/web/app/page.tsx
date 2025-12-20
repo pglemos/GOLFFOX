@@ -711,8 +711,8 @@ function LoginContent() {
         const safeNext = sanitizePath(rawNext)
         let redirectUrl: string | null
 
-        // Se houver parâmetro ?next= e for permitido para o role, usar ele
-        if (safeNext && isAllowedForRole(userRoleFromDatabase, safeNext)) {
+        // ✅ VALIDAÇÃO: Garantir que safeNext é uma string válida antes de usar
+        if (safeNext && typeof safeNext === 'string' && safeNext.trim() !== '' && isAllowedForRole(userRoleFromDatabase, safeNext)) {
           redirectUrl = safeNext
         } else {
           // Caso contrário, usar o role do banco para determinar o painel
