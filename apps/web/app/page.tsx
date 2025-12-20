@@ -712,8 +712,15 @@ function LoginContent() {
         let redirectUrl: string | null
 
         // ✅ VALIDAÇÃO: Garantir que safeNext é uma string válida antes de usar
-        if (safeNext && typeof safeNext === 'string' && safeNext.trim() !== '' && isAllowedForRole(userRoleFromDatabase, safeNext)) {
-          redirectUrl = safeNext
+        // Verificar se safeNext é string E se isAllowedForRole retorna true
+        if (safeNext && typeof safeNext === 'string' && safeNext.trim() !== '') {
+          const isAllowed = isAllowedForRole(userRoleFromDatabase, safeNext)
+          if (isAllowed === true) {
+            redirectUrl = safeNext
+          } else {
+            // Se não for permitido, usar o role do banco para determinar o painel
+            redirectUrl = AuthManager.getRedirectUrl(userRoleFromDatabase)
+          }
         } else {
           // Caso contrário, usar o role do banco para determinar o painel
           redirectUrl = AuthManager.getRedirectUrl(userRoleFromDatabase)
