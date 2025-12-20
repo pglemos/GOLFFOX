@@ -666,6 +666,8 @@ function LoginContent() {
         // ✅ OTIMIZADO: Processar sessão de forma síncrona e rápida
         // O cookie já foi definido pelo servidor, então apenas persistir no cliente
         // ✅ Incluir name e avatar_url para exibição no Topbar
+        // ✅ VALIDAÇÃO: Garantir que rememberMe é sempre um booleano válido
+        const storageMode = typeof rememberMe === 'boolean' && rememberMe ? "both" : "session"
         await AuthManager.persistSession(
           {
             id: user.id,
@@ -675,7 +677,7 @@ function LoginContent() {
             name: user.name || user.email.split('@')[0],
             avatar_url: user.avatar_url || null,
           },
-          { accessToken: token, refreshToken, storage: rememberMe ? "both" : "session" }
+          { accessToken: token, refreshToken, storage: storageMode }
         )
 
         setFailedAttempts(0)

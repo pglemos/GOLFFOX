@@ -156,6 +156,12 @@ export class AuthManager {
   ) {
     if (typeof window === 'undefined') return
 
+    // ✅ VALIDAÇÃO: Garantir que supabase está disponível
+    if (!supabase || !supabase.auth) {
+      console.warn('[AuthManager] Supabase não está disponível, pulando sincronização de sessão')
+      // Continuar com o resto da função mesmo se Supabase não estiver disponível
+    }
+
     const accessToken = options?.accessToken ?? options?.token ?? userData.accessToken
     const refreshToken = options?.refreshToken ?? userData.refreshToken
 
@@ -165,15 +171,19 @@ export class AuthManager {
     // ✅ Sincronizar com Supabase Auth client-side
     if (accessToken && options.token) {
       try {
-        // Não aguardar para não bloquear a UI
-        const { error } = await supabase.auth.setSession({
-          access_token: accessToken,
-          refresh_token: options.token // Usar mesmo token se não tiver refresh
-        })
-        if (error) {
-          console.warn('Erro ao sincronizar sessão Supabase:', error)
+        // ✅ VALIDAÇÃO: Garantir que setSession é uma função antes de chamar
+        if (supabase?.auth?.setSession && typeof supabase.auth.setSession === 'function') {
+          const { error } = await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: options.token // Usar mesmo token se não tiver refresh
+          })
+          if (error) {
+            console.warn('Erro ao sincronizar sessão Supabase:', error)
+          } else {
+            console.log('✅ Sessão Supabase sincronizada')
+          }
         } else {
-          console.log('✅ Sessão Supabase sincronizada')
+          console.warn('[AuthManager] supabase.auth.setSession não está disponível ou não é uma função')
         }
       } catch (e) {
         console.warn('Falha ao setar sessão Supabase:', e)
