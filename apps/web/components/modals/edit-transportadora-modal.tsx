@@ -14,9 +14,9 @@ import { Building2, FileText, CreditCard, User } from "lucide-react"
 import dynamic from "next/dynamic"
 
 // Lazy load seções pesadas
-const CarrierDocumentsSection = dynamic(() => import("@/components/carrier/carrier-documents-section"), { ssr: false })
-const CarrierBankingSection = dynamic(() => import("@/components/carrier/carrier-banking-section"), { ssr: false })
-const CarrierLegalRepSection = dynamic(() => import("@/components/carrier/carrier-legal-rep-section"), { ssr: false })
+const TransportadoraDocumentsSection = dynamic(() => import("@/components/transportadora/transportadora-documents-section"), { ssr: false })
+const TransportadoraBankingSection = dynamic(() => import("@/components/transportadora/transportadora-banking-section"), { ssr: false })
+const TransportadoraLegalRepSection = dynamic(() => import("@/components/transportadora/transportadora-legal-rep-section"), { ssr: false })
 
 interface EditTransportadoraModalProps {
   transportadora: transportadora
@@ -317,22 +317,22 @@ export function EditCarrierModal({ transportadora, isOpen, onClose, onSave }: Ed
           </TabsContent>
 
           <TabsContent value="documentos">
-            <CarrierDocumentsSection
-              carrierId={transportadora.id}
+            <TransportadoraDocumentsSection
+              transportadoraId={transportadora.id}
               isEditing={true}
             />
           </TabsContent>
 
           <TabsContent value="bancario">
-            <CarrierBankingSection
-              carrierId={transportadora.id}
+            <TransportadoraBankingSection
+              transportadoraId={transportadora.id}
               isEditing={true}
             />
           </TabsContent>
 
           <TabsContent value="representante">
-            <CarrierLegalRepSection
-              carrierId={transportadora.id}
+            <TransportadoraLegalRepSection
+              transportadoraId={transportadora.id}
               isEditing={true}
             />
           </TabsContent>

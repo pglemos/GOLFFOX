@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
-import { Loader2, FileText, RefreshCw, Building2, Save } from "lucide-react"
+import { Loader2, FileText, RefreshCw, User, Save } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
@@ -10,11 +10,11 @@ import { DocumentCard } from "@/components/ui/document-card"
 import { useFileUpload } from "@/hooks/use-file-upload"
 import { notifySuccess, notifyError } from "@/lib/toast"
 import {
-    TransportadoraDocumentType,
-    TRANSPORTADORA_DOCUMENT_LABELS,
-    CARRIER_DOCS_WITH_EXPIRY,
-    REQUIRED_TRANSPORTADORA_DOCUMENTS,
-    TransportadoraDocument,
+    MotoristaDocumentType,
+    MOTORISTA_DOCUMENT_LABELS,
+    DRIVER_DOCS_WITH_EXPIRY,
+    REQUIRED_MOTORISTA_DOCUMENTS,
+    MotoristaDocument,
 } from "@/types/documents"
 import {
     Select,
@@ -24,40 +24,39 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 
-interface TransportadoraDocumentsSectionProps {
-    carrierId: string | undefined
+interface MotoristaDocumentsSectionProps {
+    motoristaId: string | undefined
     isEditing: boolean
     compact?: boolean
 }
 
 /**
- * Componente para gerenciar documentos de uma transportadora
+ * Componente para gerenciar documentos de um motorista
  */
-export function CarrierDocumentsSection({
-    carrierId,
+export function MotoristaDocumentsSection({
+    motoristaId: driverId,
     isEditing,
     compact = false,
-}: TransportadoraDocumentsSectionProps) {
-    const [documents, setDocuments] = useState<TransportadoraDocument[]>([])
+}: MotoristaDocumentsSectionProps) {
+    const [documents, setDocuments] = useState<MotoristaDocument[]>([])
     const [loading, setLoading] = useState(false)
-    const [selectedType, setSelectedType] = useState<TransportadoraDocumentType>("cnpj_card")
+    const [selectedType, setSelectedType] = useState<MotoristaDocumentType>("cnh")
     const [expiryDate, setExpiryDate] = useState("")
     const [documentNumber, setDocumentNumber] = useState("")
     const [fileToUpload, setFileToUpload] = useState<File | null>(null)
     const [uploading, setUploading] = useState(false)
 
     const { upload } = useFileUpload({
-        bucket: "transportadora-documents",
+        bucket: "motorista-documents",
         maxSize: 10,
     })
 
-    // Carregar documentos existentes
     const loadDocuments = useCallback(async () => {
-        if (!carrierId) return
+        if (!driverId) return
 
         setLoading(true)
         try {
-            const response = await fetch(`/api/admin/carriers/${carrierId}/documents`)
+            const response = await fetch(`/api/admin/drivers/${driverId}/documents`)
             if (response.ok) {
                 const data = await response.json()
                 setDocuments(data || [])
@@ -67,18 +66,17 @@ export function CarrierDocumentsSection({
         } finally {
             setLoading(false)
         }
-    }, [carrierId])
+    }, [driverId])
 
     useEffect(() => {
-        if (carrierId && isEditing) {
+        if (driverId && isEditing) {
             loadDocuments()
         }
-    }, [carrierId, isEditing, loadDocuments])
+    }, [driverId, isEditing, loadDocuments])
 
-    // Fazer upload de documento
     const handleManualSave = async () => {
-        if (!carrierId) {
-            notifyError(new Error("Salve a transportadora primeiro"), "Erro")
+        if (!driverId) {
+            notifyError(new Error("Salve o motorista primeiro"), "Erro")
             return
         }
 
@@ -89,10 +87,10 @@ export function CarrierDocumentsSection({
 
         setUploading(true)
         try {
-            const result = await upload(fileToUpload, carrierId, selectedType)
+            const result = await upload(fileToUpload, driverId, selectedType)
             if (!result) return
 
-            const response = await fetch(`/api/admin/carriers/${carrierId}/documents`, {
+            const response = await fetch(`/api/admin/drivers/${driverId}/documents`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -123,13 +121,12 @@ export function CarrierDocumentsSection({
         }
     }
 
-    // Remover documento
     const handleDelete = async (documentId: string) => {
-        if (!carrierId) return
+        if (!driverId) return
 
         try {
             const response = await fetch(
-                `/api/admin/carriers/${carrierId}/documents?documentId=${documentId}`,
+                `/api/admin/drivers/${driverId}/documents?documentId=${documentId}`,
                 { method: "DELETE" }
             )
 
@@ -144,18 +141,17 @@ export function CarrierDocumentsSection({
         }
     }
 
-    const getDocumentByType = (type: TransportadoraDocumentType) => {
+    const getDocumentByType = (type: MotoristaDocumentType) => {
         return documents.find((d) => d.document_type === type)
     }
 
-    const documentTypes = (Object.keys(TRANSPORTADORA_DOCUMENT_LABELS) as TransportadoraDocumentType[])
-        .filter(t => t !== 'legal_rep_cnh')
+    const documentTypes = Object.keys(MOTORISTA_DOCUMENT_LABELS) as MotoristaDocumentType[]
 
-    if (!isEditing || !carrierId) {
+    if (!isEditing || !driverId) {
         return (
             <div className="text-center py-8 text-muted-foreground">
-                <Building2 className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>Salve a transportadora primeiro para adicionar documentos</p>
+                <User className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                <p>Salve o motorista primeiro para adicionar documentos</p>
             </div>
         )
     }
@@ -168,31 +164,28 @@ export function CarrierDocumentsSection({
         )
     }
 
-    // Modo compacto
     if (compact) {
         return (
             <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                    <h4 className="font-medium">Documentos da Transportadora</h4>
+                    <h4 className="font-medium">Documentos do Motorista</h4>
                     <Button size="sm" variant="outline" onClick={loadDocuments} disabled={loading}>
                         <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
                     </Button>
                 </div>
 
-                {documentTypes.slice(0, 6).map((type) => {
+                {REQUIRED_MOTORISTA_DOCUMENTS.map((type) => {
                     const doc = getDocumentByType(type)
-                    const isRequired = REQUIRED_TRANSPORTADORA_DOCUMENTS.includes(type)
-
                     return (
                         <DocumentCard
                             key={type}
                             documentType={type}
-                            documentLabel={TRANSPORTADORA_DOCUMENT_LABELS[type]}
+                            documentLabel={MOTORISTA_DOCUMENT_LABELS[type]}
                             fileUrl={doc?.file_url}
                             fileName={doc?.file_name}
                             expiryDate={doc?.expiry_date}
                             status={doc?.status}
-                            required={isRequired}
+                            required={true}
                             onDelete={doc ? () => handleDelete(doc.id) : undefined}
                             compact
                         />
@@ -202,7 +195,6 @@ export function CarrierDocumentsSection({
         )
     }
 
-    // Modo completo
     return (
         <div className="space-y-6">
             {/* Formulário de Upload */}
@@ -217,7 +209,7 @@ export function CarrierDocumentsSection({
                         <Label>Tipo de Documento</Label>
                         <Select
                             value={selectedType}
-                            onValueChange={(v) => setSelectedType(v as TransportadoraDocumentType)}
+                            onValueChange={(v) => setSelectedType(v as MotoristaDocumentType)}
                         >
                             <SelectTrigger>
                                 <SelectValue />
@@ -225,8 +217,8 @@ export function CarrierDocumentsSection({
                             <SelectContent>
                                 {documentTypes.map((type) => (
                                     <SelectItem key={type} value={type}>
-                                        {TRANSPORTADORA_DOCUMENT_LABELS[type]}
-                                        {REQUIRED_TRANSPORTADORA_DOCUMENTS.includes(type) && " *"}
+                                        {MOTORISTA_DOCUMENT_LABELS[type]}
+                                        {REQUIRED_MOTORISTA_DOCUMENTS.includes(type) && " *"}
                                     </SelectItem>
                                 ))}
                             </SelectContent>
@@ -242,7 +234,7 @@ export function CarrierDocumentsSection({
                         />
                     </div>
 
-                    {CARRIER_DOCS_WITH_EXPIRY.includes(selectedType) && (
+                    {DRIVER_DOCS_WITH_EXPIRY.includes(selectedType) && (
                         <div className="space-y-2">
                             <Label>Data de Vencimento</Label>
                             <Input
@@ -264,7 +256,7 @@ export function CarrierDocumentsSection({
                     currentFileName={fileToUpload?.name}
                 />
 
-                <div className="flex justify-end">
+                <div className="flex justify-end mt-4">
                     <Button
                         onClick={handleManualSave}
                         disabled={!fileToUpload || uploading}
@@ -282,32 +274,32 @@ export function CarrierDocumentsSection({
             {/* Lista de Documentos */}
             <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                    <h4 className="font-medium">Documentos Enviados ({documents.filter(d => d.document_type !== 'legal_rep_cnh').length})</h4>
+                    <h4 className="font-medium">Documentos Enviados ({documents.length})</h4>
                     <Button size="sm" variant="ghost" onClick={loadDocuments} disabled={loading}>
                         <RefreshCw className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`} />
                         Atualizar
                     </Button>
                 </div>
 
-                {documents.filter(d => d.document_type !== 'legal_rep_cnh').length === 0 ? (
+                {documents.length === 0 ? (
                     <div className="text-center py-8 text-muted-foreground border-2 border-dashed rounded-lg">
                         <FileText className="h-8 w-8 mx-auto mb-2 opacity-50" />
                         <p>Nenhum documento enviado ainda</p>
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {documents.filter(d => d.document_type !== 'legal_rep_cnh').map((doc) => (
+                        {documents.map((doc) => (
                             <DocumentCard
                                 key={doc.id}
                                 documentType={doc.document_type}
-                                documentLabel={TRANSPORTADORA_DOCUMENT_LABELS[doc.document_type as TransportadoraDocumentType] || doc.document_type}
+                                documentLabel={MOTORISTA_DOCUMENT_LABELS[doc.document_type as MotoristaDocumentType] || doc.document_type}
                                 fileUrl={doc.file_url}
                                 fileName={doc.file_name}
                                 fileSize={doc.file_size}
                                 expiryDate={doc.expiry_date}
                                 status={doc.status}
                                 documentNumber={doc.document_number}
-                                required={REQUIRED_TRANSPORTADORA_DOCUMENTS.includes(doc.document_type as TransportadoraDocumentType)}
+                                required={REQUIRED_MOTORISTA_DOCUMENTS.includes(doc.document_type as MotoristaDocumentType)}
                                 onDelete={() => handleDelete(doc.id)}
                             />
                         ))}
@@ -318,4 +310,4 @@ export function CarrierDocumentsSection({
     )
 }
 
-export default CarrierDocumentsSection
+export default DriverDocumentsSection

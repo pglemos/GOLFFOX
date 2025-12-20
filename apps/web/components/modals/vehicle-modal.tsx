@@ -30,7 +30,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import dynamic from "next/dynamic"
 
 // Lazy load seção de documentos
-const VehicleDocumentsSection = dynamic(() => import("@/components/vehicle/vehicle-documents-section"), { ssr: false })
+const VeiculoDocumentsSection = dynamic(() => import("@/components/veiculo/veiculo-documents-section"), { ssr: false })
 
 interface veiculo {
   id?: string
@@ -659,8 +659,8 @@ export function VehicleModal({ veiculo, isOpen, onClose, onSave, carriers }: Vei
           </TabsContent>
 
           <TabsContent value="documentos">
-            <VehicleDocumentsSection
-              vehicleId={veiculo?.id ?? formData.id}
+            <VeiculoDocumentsSection
+              veiculoId={veiculo?.id ?? formData.id}
               isEditing={!!veiculo?.id || !!formData.id}
             />
           </TabsContent>

@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/select"
 
 interface TransportadoraBankingSectionProps {
-    carrierId: string | undefined
+    transportadoraId: string | undefined
     isEditing: boolean
     initialData?: TransportadoraBankingData
     onSave?: (data: TransportadoraBankingData) => void

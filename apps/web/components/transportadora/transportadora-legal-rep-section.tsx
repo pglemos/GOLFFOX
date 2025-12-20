@@ -16,7 +16,7 @@ import {
 } from "@/types/documents"
 
 interface TransportadoraLegalRepSectionProps {
-    carrierId: string | undefined
+    transportadoraId: string | undefined
     isEditing: boolean
     initialData?: TransportadoraLegalRepData
     onSave?: (data: TransportadoraLegalRepData) => void

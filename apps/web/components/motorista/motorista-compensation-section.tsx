@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/select"
 
 interface MotoristaCompensationSectionProps {
-    driverId: string | undefined
+    motoristaId: string | undefined
     isEditing: boolean
 }
 

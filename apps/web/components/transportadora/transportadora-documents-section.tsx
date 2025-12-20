@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
-import { Loader2, FileText, AlertTriangle, RefreshCw, Save } from "lucide-react"
+import { Loader2, FileText, RefreshCw, Building2, Save } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
@@ -10,11 +10,11 @@ import { DocumentCard } from "@/components/ui/document-card"
 import { useFileUpload } from "@/hooks/use-file-upload"
 import { notifySuccess, notifyError } from "@/lib/toast"
 import {
-    VeiculoDocumentType,
-    VEICULO_DOCUMENT_LABELS,
-    VEHICLE_DOCS_WITH_EXPIRY,
-    REQUIRED_VEICULO_DOCUMENTS,
-    VeiculoDocument,
+    TransportadoraDocumentType,
+    TRANSPORTADORA_DOCUMENT_LABELS,
+    CARRIER_DOCS_WITH_EXPIRY,
+    REQUIRED_TRANSPORTADORA_DOCUMENTS,
+    TransportadoraDocument,
 } from "@/types/documents"
 import {
     Select,
@@ -24,39 +24,40 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 
-interface VeiculoDocumentsSectionProps {
-    vehicleId: string | undefined
+interface TransportadoraDocumentsSectionProps {
+    transportadoraId: string | undefined
     isEditing: boolean
     compact?: boolean
 }
 
 /**
- * Componente para gerenciar documentos de um veículo
+ * Componente para gerenciar documentos de uma transportadora
  */
-export function VehicleDocumentsSection({
-    vehicleId,
+export function TransportadoraDocumentsSection({
+    transportadoraId: carrierId,
     isEditing,
     compact = false,
-}: VeiculoDocumentsSectionProps) {
-    const [documents, setDocuments] = useState<VeiculoDocument[]>([])
+}: TransportadoraDocumentsSectionProps) {
+    const [documents, setDocuments] = useState<TransportadoraDocument[]>([])
     const [loading, setLoading] = useState(false)
-    const [selectedType, setSelectedType] = useState<VeiculoDocumentType>("crlv")
+    const [selectedType, setSelectedType] = useState<TransportadoraDocumentType>("cnpj_card")
     const [expiryDate, setExpiryDate] = useState("")
     const [documentNumber, setDocumentNumber] = useState("")
     const [fileToUpload, setFileToUpload] = useState<File | null>(null)
     const [uploading, setUploading] = useState(false)
 
     const { upload } = useFileUpload({
-        bucket: "veiculo-documents",
+        bucket: "transportadora-documents",
         maxSize: 10,
     })
 
+    // Carregar documentos existentes
     const loadDocuments = useCallback(async () => {
-        if (!vehicleId) return
+        if (!carrierId) return
 
         setLoading(true)
         try {
-            const response = await fetch(`/api/admin/vehicles/${vehicleId}/documents`)
+            const response = await fetch(`/api/admin/carriers/${carrierId}/documents`)
             if (response.ok) {
                 const data = await response.json()
                 setDocuments(data || [])
@@ -66,17 +67,18 @@ export function VehicleDocumentsSection({
         } finally {
             setLoading(false)
         }
-    }, [vehicleId])
+    }, [carrierId])
 
     useEffect(() => {
-        if (vehicleId && isEditing) {
+        if (carrierId && isEditing) {
             loadDocuments()
         }
-    }, [vehicleId, isEditing, loadDocuments])
+    }, [carrierId, isEditing, loadDocuments])
 
+    // Fazer upload de documento
     const handleManualSave = async () => {
-        if (!vehicleId) {
-            notifyError(new Error("Salve o veículo primeiro"), "Erro")
+        if (!carrierId) {
+            notifyError(new Error("Salve a transportadora primeiro"), "Erro")
             return
         }
 
@@ -87,10 +89,10 @@ export function VehicleDocumentsSection({
 
         setUploading(true)
         try {
-            const result = await upload(fileToUpload, vehicleId, selectedType)
+            const result = await upload(fileToUpload, carrierId, selectedType)
             if (!result) return
 
-            const response = await fetch(`/api/admin/vehicles/${vehicleId}/documents`, {
+            const response = await fetch(`/api/admin/carriers/${carrierId}/documents`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -105,7 +107,9 @@ export function VehicleDocumentsSection({
                 }),
             })
 
-            if (!response.ok) throw new Error("Erro ao salvar documento")
+            if (!response.ok) {
+                throw new Error("Erro ao salvar documento")
+            }
 
             notifySuccess("Documento salvo com sucesso!")
             await loadDocuments()
@@ -119,16 +123,19 @@ export function VehicleDocumentsSection({
         }
     }
 
+    // Remover documento
     const handleDelete = async (documentId: string) => {
-        if (!vehicleId) return
+        if (!carrierId) return
 
         try {
             const response = await fetch(
-                `/api/admin/vehicles/${vehicleId}/documents?documentId=${documentId}`,
+                `/api/admin/carriers/${carrierId}/documents?documentId=${documentId}`,
                 { method: "DELETE" }
             )
 
-            if (!response.ok) throw new Error("Erro ao remover documento")
+            if (!response.ok) {
+                throw new Error("Erro ao remover documento")
+            }
 
             notifySuccess("Documento removido!")
             await loadDocuments()
@@ -137,17 +144,18 @@ export function VehicleDocumentsSection({
         }
     }
 
-    const getDocumentByType = (type: VeiculoDocumentType) => {
+    const getDocumentByType = (type: TransportadoraDocumentType) => {
         return documents.find((d) => d.document_type === type)
     }
 
-    const documentTypes = Object.keys(VEICULO_DOCUMENT_LABELS) as VeiculoDocumentType[]
+    const documentTypes = (Object.keys(TRANSPORTADORA_DOCUMENT_LABELS) as TransportadoraDocumentType[])
+        .filter(t => t !== 'legal_rep_cnh')
 
-    if (!isEditing || !vehicleId) {
+    if (!isEditing || !carrierId) {
         return (
             <div className="text-center py-8 text-muted-foreground">
-                <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>Salve o veículo primeiro para adicionar documentos</p>
+                <Building2 className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                <p>Salve a transportadora primeiro para adicionar documentos</p>
             </div>
         )
     }
@@ -160,31 +168,30 @@ export function VehicleDocumentsSection({
         )
     }
 
+    // Modo compacto
     if (compact) {
         return (
             <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                    <h4 className="font-medium">Documentos do Veículo</h4>
+                    <h4 className="font-medium">Documentos da Transportadora</h4>
                     <Button size="sm" variant="outline" onClick={loadDocuments} disabled={loading}>
                         <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
                     </Button>
                 </div>
 
-                {documentTypes.map((type) => {
+                {documentTypes.slice(0, 6).map((type) => {
                     const doc = getDocumentByType(type)
-                    const isRequired = REQUIRED_VEICULO_DOCUMENTS.includes(type)
+                    const isRequired = REQUIRED_TRANSPORTADORA_DOCUMENTS.includes(type)
 
                     return (
                         <DocumentCard
                             key={type}
                             documentType={type}
-                            documentLabel={VEICULO_DOCUMENT_LABELS[type]}
+                            documentLabel={TRANSPORTADORA_DOCUMENT_LABELS[type]}
                             fileUrl={doc?.file_url}
                             fileName={doc?.file_name}
-                            fileSize={doc?.file_size}
                             expiryDate={doc?.expiry_date}
                             status={doc?.status}
-                            documentNumber={doc?.document_number}
                             required={isRequired}
                             onDelete={doc ? () => handleDelete(doc.id) : undefined}
                             compact
@@ -195,6 +202,7 @@ export function VehicleDocumentsSection({
         )
     }
 
+    // Modo completo
     return (
         <div className="space-y-6">
             {/* Formulário de Upload */}
@@ -209,7 +217,7 @@ export function VehicleDocumentsSection({
                         <Label>Tipo de Documento</Label>
                         <Select
                             value={selectedType}
-                            onValueChange={(v) => setSelectedType(v as VeiculoDocumentType)}
+                            onValueChange={(v) => setSelectedType(v as TransportadoraDocumentType)}
                         >
                             <SelectTrigger>
                                 <SelectValue />
@@ -217,8 +225,8 @@ export function VehicleDocumentsSection({
                             <SelectContent>
                                 {documentTypes.map((type) => (
                                     <SelectItem key={type} value={type}>
-                                        {VEICULO_DOCUMENT_LABELS[type]}
-                                        {REQUIRED_VEICULO_DOCUMENTS.includes(type) && " *"}
+                                        {TRANSPORTADORA_DOCUMENT_LABELS[type]}
+                                        {REQUIRED_TRANSPORTADORA_DOCUMENTS.includes(type) && " *"}
                                     </SelectItem>
                                 ))}
                             </SelectContent>
@@ -234,7 +242,7 @@ export function VehicleDocumentsSection({
                         />
                     </div>
 
-                    {VEHICLE_DOCS_WITH_EXPIRY.includes(selectedType) && (
+                    {CARRIER_DOCS_WITH_EXPIRY.includes(selectedType) && (
                         <div className="space-y-2">
                             <Label>Data de Vencimento</Label>
                             <Input
@@ -256,7 +264,7 @@ export function VehicleDocumentsSection({
                     currentFileName={fileToUpload?.name}
                 />
 
-                <div className="flex justify-end mt-4">
+                <div className="flex justify-end">
                     <Button
                         onClick={handleManualSave}
                         disabled={!fileToUpload || uploading}
@@ -274,35 +282,32 @@ export function VehicleDocumentsSection({
             {/* Lista de Documentos */}
             <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                    <h4 className="font-medium">Documentos Enviados ({documents.length})</h4>
+                    <h4 className="font-medium">Documentos Enviados ({documents.filter(d => d.document_type !== 'legal_rep_cnh').length})</h4>
                     <Button size="sm" variant="ghost" onClick={loadDocuments} disabled={loading}>
                         <RefreshCw className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`} />
                         Atualizar
                     </Button>
                 </div>
 
-                {documents.length === 0 ? (
+                {documents.filter(d => d.document_type !== 'legal_rep_cnh').length === 0 ? (
                     <div className="text-center py-8 text-muted-foreground border-2 border-dashed rounded-lg">
-                        <AlertTriangle className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                        <FileText className="h-8 w-8 mx-auto mb-2 opacity-50" />
                         <p>Nenhum documento enviado ainda</p>
-                        <p className="text-xs mt-1">
-                            Documentos obrigatórios: {REQUIRED_VEICULO_DOCUMENTS.map((t) => VEICULO_DOCUMENT_LABELS[t]).join(", ")}
-                        </p>
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {documents.map((doc) => (
+                        {documents.filter(d => d.document_type !== 'legal_rep_cnh').map((doc) => (
                             <DocumentCard
                                 key={doc.id}
                                 documentType={doc.document_type}
-                                documentLabel={VEICULO_DOCUMENT_LABELS[doc.document_type as VeiculoDocumentType] || doc.document_type}
+                                documentLabel={TRANSPORTADORA_DOCUMENT_LABELS[doc.document_type as TransportadoraDocumentType] || doc.document_type}
                                 fileUrl={doc.file_url}
                                 fileName={doc.file_name}
                                 fileSize={doc.file_size}
                                 expiryDate={doc.expiry_date}
                                 status={doc.status}
                                 documentNumber={doc.document_number}
-                                required={REQUIRED_VEICULO_DOCUMENTS.includes(doc.document_type as VeiculoDocumentType)}
+                                required={REQUIRED_TRANSPORTADORA_DOCUMENTS.includes(doc.document_type as TransportadoraDocumentType)}
                                 onDelete={() => handleDelete(doc.id)}
                             />
                         ))}
@@ -313,4 +318,4 @@ export function VehicleDocumentsSection({
     )
 }
 
-export default VehicleDocumentsSection
+export default CarrierDocumentsSection

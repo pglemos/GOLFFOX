@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
-import { Loader2, FileText, RefreshCw, User, Save } from "lucide-react"
+import { Loader2, FileText, AlertTriangle, RefreshCw, Save } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
@@ -10,11 +10,11 @@ import { DocumentCard } from "@/components/ui/document-card"
 import { useFileUpload } from "@/hooks/use-file-upload"
 import { notifySuccess, notifyError } from "@/lib/toast"
 import {
-    MotoristaDocumentType,
-    MOTORISTA_DOCUMENT_LABELS,
-    DRIVER_DOCS_WITH_EXPIRY,
-    REQUIRED_MOTORISTA_DOCUMENTS,
-    MotoristaDocument,
+    VeiculoDocumentType,
+    VEICULO_DOCUMENT_LABELS,
+    VEHICLE_DOCS_WITH_EXPIRY,
+    REQUIRED_VEICULO_DOCUMENTS,
+    VeiculoDocument,
 } from "@/types/documents"
 import {
     Select,
@@ -24,39 +24,39 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 
-interface MotoristaDocumentsSectionProps {
-    driverId: string | undefined
+interface VeiculoDocumentsSectionProps {
+    veiculoId: string | undefined
     isEditing: boolean
     compact?: boolean
 }
 
 /**
- * Componente para gerenciar documentos de um motorista
+ * Componente para gerenciar documentos de um veículo
  */
-export function DriverDocumentsSection({
-    driverId,
+export function VeiculoDocumentsSection({
+    veiculoId: vehicleId,
     isEditing,
     compact = false,
-}: MotoristaDocumentsSectionProps) {
-    const [documents, setDocuments] = useState<MotoristaDocument[]>([])
+}: VeiculoDocumentsSectionProps) {
+    const [documents, setDocuments] = useState<VeiculoDocument[]>([])
     const [loading, setLoading] = useState(false)
-    const [selectedType, setSelectedType] = useState<MotoristaDocumentType>("cnh")
+    const [selectedType, setSelectedType] = useState<VeiculoDocumentType>("crlv")
     const [expiryDate, setExpiryDate] = useState("")
     const [documentNumber, setDocumentNumber] = useState("")
     const [fileToUpload, setFileToUpload] = useState<File | null>(null)
     const [uploading, setUploading] = useState(false)
 
     const { upload } = useFileUpload({
-        bucket: "motorista-documents",
+        bucket: "veiculo-documents",
         maxSize: 10,
     })
 
     const loadDocuments = useCallback(async () => {
-        if (!driverId) return
+        if (!vehicleId) return
 
         setLoading(true)
         try {
-            const response = await fetch(`/api/admin/drivers/${driverId}/documents`)
+            const response = await fetch(`/api/admin/vehicles/${vehicleId}/documents`)
             if (response.ok) {
                 const data = await response.json()
                 setDocuments(data || [])
@@ -66,17 +66,17 @@ export function DriverDocumentsSection({
         } finally {
             setLoading(false)
         }
-    }, [driverId])
+    }, [vehicleId])
 
     useEffect(() => {
-        if (driverId && isEditing) {
+        if (vehicleId && isEditing) {
             loadDocuments()
         }
-    }, [driverId, isEditing, loadDocuments])
+    }, [vehicleId, isEditing, loadDocuments])
 
     const handleManualSave = async () => {
-        if (!driverId) {
-            notifyError(new Error("Salve o motorista primeiro"), "Erro")
+        if (!vehicleId) {
+            notifyError(new Error("Salve o veículo primeiro"), "Erro")
             return
         }
 
@@ -87,10 +87,10 @@ export function DriverDocumentsSection({
 
         setUploading(true)
         try {
-            const result = await upload(fileToUpload, driverId, selectedType)
+            const result = await upload(fileToUpload, vehicleId, selectedType)
             if (!result) return
 
-            const response = await fetch(`/api/admin/drivers/${driverId}/documents`, {
+            const response = await fetch(`/api/admin/vehicles/${vehicleId}/documents`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -105,9 +105,7 @@ export function DriverDocumentsSection({
                 }),
             })
 
-            if (!response.ok) {
-                throw new Error("Erro ao salvar documento")
-            }
+            if (!response.ok) throw new Error("Erro ao salvar documento")
 
             notifySuccess("Documento salvo com sucesso!")
             await loadDocuments()
@@ -122,17 +120,15 @@ export function DriverDocumentsSection({
     }
 
     const handleDelete = async (documentId: string) => {
-        if (!driverId) return
+        if (!vehicleId) return
 
         try {
             const response = await fetch(
-                `/api/admin/drivers/${driverId}/documents?documentId=${documentId}`,
+                `/api/admin/vehicles/${vehicleId}/documents?documentId=${documentId}`,
                 { method: "DELETE" }
             )
 
-            if (!response.ok) {
-                throw new Error("Erro ao remover documento")
-            }
+            if (!response.ok) throw new Error("Erro ao remover documento")
 
             notifySuccess("Documento removido!")
             await loadDocuments()
@@ -141,17 +137,17 @@ export function DriverDocumentsSection({
         }
     }
 
-    const getDocumentByType = (type: MotoristaDocumentType) => {
+    const getDocumentByType = (type: VeiculoDocumentType) => {
         return documents.find((d) => d.document_type === type)
     }
 
-    const documentTypes = Object.keys(MOTORISTA_DOCUMENT_LABELS) as MotoristaDocumentType[]
+    const documentTypes = Object.keys(VEICULO_DOCUMENT_LABELS) as VeiculoDocumentType[]
 
-    if (!isEditing || !driverId) {
+    if (!isEditing || !vehicleId) {
         return (
             <div className="text-center py-8 text-muted-foreground">
-                <User className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>Salve o motorista primeiro para adicionar documentos</p>
+                <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                <p>Salve o veículo primeiro para adicionar documentos</p>
             </div>
         )
     }
@@ -168,24 +164,28 @@ export function DriverDocumentsSection({
         return (
             <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                    <h4 className="font-medium">Documentos do Motorista</h4>
+                    <h4 className="font-medium">Documentos do Veículo</h4>
                     <Button size="sm" variant="outline" onClick={loadDocuments} disabled={loading}>
                         <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
                     </Button>
                 </div>
 
-                {REQUIRED_MOTORISTA_DOCUMENTS.map((type) => {
+                {documentTypes.map((type) => {
                     const doc = getDocumentByType(type)
+                    const isRequired = REQUIRED_VEICULO_DOCUMENTS.includes(type)
+
                     return (
                         <DocumentCard
                             key={type}
                             documentType={type}
-                            documentLabel={MOTORISTA_DOCUMENT_LABELS[type]}
+                            documentLabel={VEICULO_DOCUMENT_LABELS[type]}
                             fileUrl={doc?.file_url}
                             fileName={doc?.file_name}
+                            fileSize={doc?.file_size}
                             expiryDate={doc?.expiry_date}
                             status={doc?.status}
-                            required={true}
+                            documentNumber={doc?.document_number}
+                            required={isRequired}
                             onDelete={doc ? () => handleDelete(doc.id) : undefined}
                             compact
                         />
@@ -209,7 +209,7 @@ export function DriverDocumentsSection({
                         <Label>Tipo de Documento</Label>
                         <Select
                             value={selectedType}
-                            onValueChange={(v) => setSelectedType(v as MotoristaDocumentType)}
+                            onValueChange={(v) => setSelectedType(v as VeiculoDocumentType)}
                         >
                             <SelectTrigger>
                                 <SelectValue />
@@ -217,8 +217,8 @@ export function DriverDocumentsSection({
                             <SelectContent>
                                 {documentTypes.map((type) => (
                                     <SelectItem key={type} value={type}>
-                                        {MOTORISTA_DOCUMENT_LABELS[type]}
-                                        {REQUIRED_MOTORISTA_DOCUMENTS.includes(type) && " *"}
+                                        {VEICULO_DOCUMENT_LABELS[type]}
+                                        {REQUIRED_VEICULO_DOCUMENTS.includes(type) && " *"}
                                     </SelectItem>
                                 ))}
                             </SelectContent>
@@ -234,7 +234,7 @@ export function DriverDocumentsSection({
                         />
                     </div>
 
-                    {DRIVER_DOCS_WITH_EXPIRY.includes(selectedType) && (
+                    {VEHICLE_DOCS_WITH_EXPIRY.includes(selectedType) && (
                         <div className="space-y-2">
                             <Label>Data de Vencimento</Label>
                             <Input
@@ -283,8 +283,11 @@ export function DriverDocumentsSection({
 
                 {documents.length === 0 ? (
                     <div className="text-center py-8 text-muted-foreground border-2 border-dashed rounded-lg">
-                        <FileText className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                        <AlertTriangle className="h-8 w-8 mx-auto mb-2 opacity-50" />
                         <p>Nenhum documento enviado ainda</p>
+                        <p className="text-xs mt-1">
+                            Documentos obrigatórios: {REQUIRED_VEICULO_DOCUMENTS.map((t) => VEICULO_DOCUMENT_LABELS[t]).join(", ")}
+                        </p>
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -292,14 +295,14 @@ export function DriverDocumentsSection({
                             <DocumentCard
                                 key={doc.id}
                                 documentType={doc.document_type}
-                                documentLabel={MOTORISTA_DOCUMENT_LABELS[doc.document_type as MotoristaDocumentType] || doc.document_type}
+                                documentLabel={VEICULO_DOCUMENT_LABELS[doc.document_type as VeiculoDocumentType] || doc.document_type}
                                 fileUrl={doc.file_url}
                                 fileName={doc.file_name}
                                 fileSize={doc.file_size}
                                 expiryDate={doc.expiry_date}
                                 status={doc.status}
                                 documentNumber={doc.document_number}
-                                required={REQUIRED_MOTORISTA_DOCUMENTS.includes(doc.document_type as MotoristaDocumentType)}
+                                required={REQUIRED_VEICULO_DOCUMENTS.includes(doc.document_type as VeiculoDocumentType)}
                                 onDelete={() => handleDelete(doc.id)}
                             />
                         ))}
@@ -310,4 +313,4 @@ export function DriverDocumentsSection({
     )
 }
 
-export default DriverDocumentsSection
+export default VehicleDocumentsSection
